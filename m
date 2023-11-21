@@ -1,116 +1,117 @@
-Return-Path: <netdev+bounces-49771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C207F36B5
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:14:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F25697F36B6
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C8EF1F2320C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:14:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC255281E50
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D5A5A0E1;
-	Tue, 21 Nov 2023 19:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E892C5A113;
+	Tue, 21 Nov 2023 19:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s5uGKiNY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1675210C;
-	Tue, 21 Nov 2023 11:14:01 -0800 (PST)
-Received: from [192.168.1.103] (178.176.72.255) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 21 Nov
- 2023 22:13:52 +0300
-Subject: Re: [PATCH 12/13] net: ravb: Assert/deassert reset on suspend/resume
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
-	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-13-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <c9f68819-7dc0-3035-4bf4-6bda5dfc621e@omp.ru>
-Date: Tue, 21 Nov 2023 22:13:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B90A91
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 11:15:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MGTvRTTrQcCawAuW2+Iv7rhq2frdZ9GnlaYNicRau6j/hzXgzRvGJpZkcZ3gGPwvNgqoYSAzPP56TNcqvtUkgMv5w+tEZK1ewF61xlqRnZY9jhwBc+5JLsvNZjxLyAWocjuhBw4LefHZng4jagIopIiZxqxIShEPNRQfsOhnxvPMiW31cc2+wwv50ULoX9tUdR2IxzbWfOvMCzhMTqybSQcgiYwJLg0byaoHkE/hpQbJM7/W2fE1MZKAtHmzFqnTFp5HPG+DUUMESdPI0aL8Hsa6Mps+Ht/r4av8LYUjOQir/UoVki58xtph/lHWTTymVc6tmzHWRjRGfWrrXGJm7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YBr64ZilBOTLiMJbkHeR7JSiY3tDPBNzBYrz3fxz/AU=;
+ b=R8bSBEHuTk6wTjkTpzfMLW2OBMgM9tBMt2Hmztd92Hc2yNEuHqYSwOITSp/C4csxhmhuzjy5mwjILBV4TbAbv9vYL+FfVCkp8+4r2OAjzqKuaZmtjhIw+HR16zFiCBelALROmlIPvuyKgcvfJ/yLnhi5VMJhp1Ta0k3OZgc4rkS0QTuWFjzK1w2uTt7qo+6o9vfWO1IJ81YmWLCFwWmjaU2AzcEhKvFI089E643HKXd4IIwnjL2cm0WttzwsUulsUah6zdRKPApaCQhdxRVi1RBDpSi6s1r42570U8DQOaq4ZF59AEhGvV5XgQbhYVTvO9ad+h7Q0kkfiUKQbMZO/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YBr64ZilBOTLiMJbkHeR7JSiY3tDPBNzBYrz3fxz/AU=;
+ b=s5uGKiNYv6Veq5VFyDOy5kIXo6QT8tMNPYxiyvQ9EBo2+u4n0nuFYcRTckPBdE/pnykWfwaYEgI5VAppH9AY148tHZ2xFPVg2MMVJZ5UxGVIaj13TebV1hbs67Fe4mhCbYb92LH/57rQ3CTiU6p+dZ4Dll84Y8jZ7f6P7WLbaZc=
+Received: from CY8P220CA0020.NAMP220.PROD.OUTLOOK.COM (2603:10b6:930:46::18)
+ by SJ0PR12MB7033.namprd12.prod.outlook.com (2603:10b6:a03:448::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Tue, 21 Nov
+ 2023 19:15:13 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:930:46:cafe::c0) by CY8P220CA0020.outlook.office365.com
+ (2603:10b6:930:46::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.18 via Frontend
+ Transport; Tue, 21 Nov 2023 19:15:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7025.13 via Frontend Transport; Tue, 21 Nov 2023 19:15:13 +0000
+Received: from jatayu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 21 Nov
+ 2023 13:15:10 -0600
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <Thomas.Lendacky@amd.com>, <Shyam-sundar.S-k@amd.com>,
+	Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net 0/3] amd-xgbe: fixes to handle corner-cases
+Date: Wed, 22 Nov 2023 00:44:32 +0530
+Message-ID: <20231121191435.4049995-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231120084606.4083194-13-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 18:58:14
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.255
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 19:02:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 4:18:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|SJ0PR12MB7033:EE_
+X-MS-Office365-Filtering-Correlation-Id: 51b44ce2-906b-42cd-1dea-08dbeac6301e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CjZRSYsaJXk01MCY52BSqO9lGpoiXNxd67R7CaM9l8Yx1AYcQqPjU4DbjqpgYe2kQbFcidfyB8CeifgIy51a+t0Ljg3+WFw9Aoxlu1WSkyi4XzgiH1OLi5Ff2D7swPqoyyVbF9ObiiZVeNxWslS/4A4wGBOTPcvkpzMr3FS3zIO9v/zMDkLkb07byhkVoG2787HDq6284liLfdum8jnZ78r4B8BbRQZkzmtZTz7gZYjpkgbR2zwlLwQTx3fYN4t11JA6xVrm9IHbGbHVWtB0QtH/6/qkNhs/Ux1fBAgYTO9pQYXkkoTvwMqpcg+gD4HgJCZutCZGvHsq+hcdqEr9L1CrUJBZZF7G0/85/n7y90BOSH6ZGMWR5Wfrn2wisMHZZf7t8QI0nFwxMVJ7WVjLyQroW1UPc77s+jTO5KU51O4rd0dZVRoN5B0MN93IDol/MaGiOPJJaFw/mlLQ4o6KhjvolDbi6dt/Zqf9xLfps6ScPvVJ8mAMxX2MBtJYGt0+qFibc7u5z3eNMNzE5LTP1DhzXvw2E+eRHB7DGTs+KenVMOw6XmE6gwBXv3CrITZC5zGkSZ/w8kwTt8u7R/baVKpkOoB7Kr2fzH1DzMPneyFsTGROhGmiLv6A4bgWrTqm646DNfwN7Bw9sQJIII8gN5r9GaFOBXoM53UIFCu6SUSh8NUPpzJ+0ZCD1VRFXl9DgGC1RyTg/gCVRhV+UXgpZyHO7Z8nzkIHb4tQu1JE0+DdJcx5jzv9cCNxviOmG0DR3UQvbfROlAW84OAhwq4pkA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(396003)(346002)(136003)(230922051799003)(64100799003)(82310400011)(186009)(1800799012)(451199024)(40470700004)(46966006)(36840700001)(40460700003)(316002)(6916009)(70206006)(54906003)(36756003)(70586007)(7696005)(336012)(426003)(2616005)(6666004)(26005)(1076003)(478600001)(16526019)(82740400003)(356005)(81166007)(83380400001)(36860700001)(86362001)(47076005)(40480700001)(5660300002)(4744005)(2906002)(4326008)(8936002)(41300700001)(8676002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 19:15:13.3823
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51b44ce2-906b-42cd-1dea-08dbeac6301e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7033
 
-On 11/20/23 11:46 AM, Claudiu wrote:
+This series include bug fixes to amd-xgbe driver.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> RZ/G3S can go to deep sleep states where power to most of the SoC parts
-> is off. When resumming from such state the Ethernet controller needs to be
+Raju Rangoju (3):
+  amd-xgbe: handle corner-case during sfp hotplug
+  amd-xgbe: handle the corner-case during tx completion
+  amd-xgbe: propagate the correct speed and duplex status
 
-   Resuming.
+ drivers/net/ethernet/amd/xgbe/xgbe-drv.c     | 14 ++++++++++++++
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 11 ++++++++---
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c    | 14 +++++++++++++-
+ 3 files changed, 35 insertions(+), 4 deletions(-)
 
-> reinitialized. Deasserting the reset signal for it should also be done.
-> Thus add reset assert/deassert on suspend/resume functions.
+-- 
+2.25.1
 
-   Firefox' spell checker trips over deassert[ing] and you have |de-assert"
-below:
-
-> On resume function the de-assert was not reverted in case of failures to
-> give user a chance to restore the interface (e.g. bringing down/up the
-> interface) in case suspend/resume fails.
-
-   I'm not seeing us reverting anything on the resume failure...
-
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
 
