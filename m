@@ -1,163 +1,136 @@
-Return-Path: <netdev+bounces-49580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D589F7F28DC
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:25:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B69BB7F28FF
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:31:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12AE81C2165E
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E711A1C20E92
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8383B29C;
-	Tue, 21 Nov 2023 09:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLGW+Mk/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84253B7BA;
+	Tue, 21 Nov 2023 09:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124E3A29C
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:25:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2FFC433C8;
-	Tue, 21 Nov 2023 09:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700558709;
-	bh=38sr1Q2BPM9IpVdNqVNgjqzJqHLOllAYY6K3NqpVO3E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NLGW+Mk/Or2bYvH0kKqT1Qcmu46Al1JIkvPTX8vEqdlBem2Qr7inde0CNBIsh2XU7
-	 Ef4ScvGW2GA/IC6AukfqcmzHYxzUS4tvvRyzChtH8iVPvjkcyIwAhd0swbmikbAeSG
-	 xqkMQHunUADfbfnLtGJTZBa/zgV6y0Nl5jrcTjCBBGvzy69Ld7zUlkqHlw+dAXMzYd
-	 dSGcrQ7JN4t567zY0/ZLuUJZqCiTlm1bE5x25JAB08+EYqU6bYS9UIAyhKYMhS8FF/
-	 z2A37s6Dg076rG1rw3hm2vG0yazyVPjfeB3Y19FIVVhEU1XLk8lV5W9srpLOj6nxhd
-	 gTgbUmp/s11uw==
-Message-ID: <73c9030e-28dc-447d-8888-2504a01e549d@kernel.org>
-Date: Tue, 21 Nov 2023 11:25:03 +0200
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F280EC1;
+	Tue, 21 Nov 2023 01:31:18 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AL9UpU021510095, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AL9UpU021510095
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Nov 2023 17:30:52 +0800
+Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Tue, 21 Nov 2023 17:30:52 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Tue, 21 Nov 2023 17:30:51 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Tue, 21 Nov 2023 17:30:51 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Heiner Kallweit <heiner.kallweit@web.de>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v11 09/13] net:ethernet:realtek:rtase: Implement pci_driver suspend and resume function
+Thread-Topic: [PATCH net-next v11 09/13] net:ethernet:realtek:rtase: Implement
+ pci_driver suspend and resume function
+Thread-Index: AQHaF8h49q/By0XF+EyMW2bU6F3AArB688YAgAmV+oA=
+Date: Tue, 21 Nov 2023 09:30:51 +0000
+Message-ID: <da79c9899e454b80a73ef44d7fdd0135@realtek.com>
+References: <20231115133414.1221480-1-justinlai0215@realtek.com>
+ <20231115133414.1221480-10-justinlai0215@realtek.com>
+ <22d15e87-a629-4c4c-a2dc-dcae50822e72@web.de>
+In-Reply-To: <22d15e87-a629-4c4c-a2dc-dcae50822e72@web.de>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 5/7] net: ethernet: ti: am65-cpsw: add mqprio
- qdisc offload in channel mode
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Grygorii Strashko <grygorii.strashko@ti.com>
-References: <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-6-rogerq@kernel.org>
- <20231120230314.tqozomqbd6jiqbf7@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231120230314.tqozomqbd6jiqbf7@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-
-
-On 21/11/2023 01:03, Vladimir Oltean wrote:
-> On Mon, Nov 20, 2023 at 04:01:45PM +0200, Roger Quadros wrote:
->> +static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
->> +{
->> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
->> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
->> +	struct tc_mqprio_qopt_offload *mqprio = type_data;
->> +	struct am65_cpsw_common *common = port->common;
->> +	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
->> +	int i, tc, offset, count, prio, ret;
->> +	u8 num_tc = qopt->num_tc;
->> +	u32 tx_prio_map = 0;
->> +
->> +	memcpy(&p_mqprio->mqprio_hw, mqprio, sizeof(*mqprio));
->> +
->> +	ret = pm_runtime_get_sync(common->dev);
->> +	if (ret < 0) {
->> +		pm_runtime_put_noidle(common->dev);
->> +		return ret;
->> +	}
->> +
->> +	if (!num_tc) {
->> +		am65_cpsw_reset_tc_mqprio(ndev);
->> +		ret = -EINVAL;
-> 
-> num_tc == 0 is what signals the deletion of the mqprio qdisc.
-> Why return -EINVAL?
-
-Right. I'll drop the -EINVAL.
-> 
->> +		goto exit_put;
->> +	}
->> +
->> +	ret = am65_cpsw_mqprio_verify_shaper(port, mqprio);
->> +	if (ret)
->> +		goto exit_put;
->> +
->> +	netdev_set_num_tc(ndev, num_tc);
->> +
->> +	/* Multiple Linux priorities can map to a Traffic Class
->> +	 * A Traffic Class can have multiple contiguous Queues,
->> +	 * Queues get mapped to Channels (thread_id),
->> +	 *	if not VLAN tagged, thread_id is used as packet_priority
->> +	 *	if VLAN tagged. VLAN priority is used as packet_priority
->> +	 * packet_priority gets mapped to header_priority in p0_rx_pri_map,
->> +	 * header_priority gets mapped to switch_priority in pn_tx_pri_map.
->> +	 * As p0_rx_pri_map is left at defaults (0x76543210), we can
->> +	 * assume that Queue_n gets mapped to header_priority_n. We can then
->> +	 * set the switch priority in pn_tx_pri_map.
->> +	 */
->> +
->> +	for (tc = 0; tc < num_tc; tc++) {
->> +		prio = tc;
->> +
->> +		/* For simplicity we assign the same priority (TCn) to
->> +		 * all queues of a Traffic Class.
->> +		 */
->> +		for (i = qopt->offset[tc]; i < qopt->offset[tc] + qopt->count[tc]; i++)
->> +			tx_prio_map |= prio << (4 * i);
->> +
->> +		count = qopt->count[tc];
->> +		offset = qopt->offset[tc];
->> +		netdev_set_tc_queue(ndev, tc, count, offset);
->> +	}
->> +
->> +	writel(tx_prio_map, port->port_base + AM65_CPSW_PN_REG_TX_PRI_MAP);
->> +
->> +	am65_cpsw_tx_pn_shaper_apply(port);
->> +
->> +exit_put:
->> +	pm_runtime_put(common->dev);
->> +
->> +	return ret;
->> +}
->> +
->>  static int am65_cpsw_port_est_enabled(struct am65_cpsw_port *port)
->>  {
->>  	return port->qos.est_oper || port->qos.est_admin;
->> @@ -737,16 +989,6 @@ static int am65_cpsw_qos_setup_tc_block(struct net_device *ndev, struct flow_blo
->>  					  port, port, true);
->>  }
->>  
->> -static u32
->> -am65_cpsw_qos_tx_rate_calc(u32 rate_mbps, unsigned long bus_freq)
->> -{
->> -	u32 ir;
->> -
->> -	bus_freq /= 1000000;
->> -	ir = DIV_ROUND_UP(((u64)rate_mbps * 32768),  bus_freq);
->> -	return ir;
->> -}
->> -
-> 
-> Insufficient code movement in the previous patch?
-
-Let me move it to patch 3.
-
--- 
-cheers,
--roger
+PiBPbiAxNS4xMS4yMDIzIDE0OjM0LCBKdXN0aW4gTGFpIHdyb3RlOg0KPiA+IEltcGxlbWVudCB0
+aGUgcGNpX2RyaXZlciBzdXNwZW5kIGZ1bmN0aW9uIHRvIGVuYWJsZSB0aGUgZGV2aWNlIHRvDQo+
+ID4gc2xlZXAsIGFuZCBpbXBsZW1lbnQgdGhlIHJlc3VtZSBmdW5jdGlvbiB0byBlbmFibGUgdGhl
+IGRldmljZSB0bw0KPiA+IHJlc3VtZSBvcGVyYXRpb24uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5
+OiBKdXN0aW4gTGFpIDxqdXN0aW5sYWkwMjE1QHJlYWx0ZWsuY29tPg0KPiA+IC0tLQ0KPiA+ICAu
+Li4vbmV0L2V0aGVybmV0L3JlYWx0ZWsvcnRhc2UvcnRhc2VfbWFpbi5jICAgfCA2NCArKysrKysr
+KysrKysrKysrKysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA2NCBpbnNlcnRpb25zKCspDQo+ID4N
+Cj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9ydGFzZS9ydGFz
+ZV9tYWluLmMNCj4gPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsvcnRhc2UvcnRhc2Vf
+bWFpbi5jDQo+ID4gaW5kZXggMTI2MDc2NjNkZDcyLi5iNzY3OWI3NGNjOGEgMTAwNjQ0DQo+ID4g
+LS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9ydGFzZS9ydGFzZV9tYWluLmMNCj4g
+PiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3J0YXNlL3J0YXNlX21haW4uYw0K
+PiA+IEBAIC0yMzIzLDEyICsyMzIzLDc2IEBAIHN0YXRpYyB2b2lkIHJ0YXNlX3NodXRkb3duKHN0
+cnVjdCBwY2lfZGV2DQo+ICpwZGV2KQ0KPiA+ICAgICAgIHJ0YXNlX3Jlc2V0X2ludGVycnVwdChw
+ZGV2LCB0cCk7ICB9DQo+ID4NCj4gPiArI2lmZGVmIENPTkZJR19QTQ0KPiA+ICtzdGF0aWMgaW50
+IHJ0YXNlX3N1c3BlbmQoc3RydWN0IHBjaV9kZXYgKnBkZXYsIHBtX21lc3NhZ2VfdCBzdGF0ZSkg
+ew0KPiA+ICsgICAgIHN0cnVjdCBuZXRfZGV2aWNlICpkZXYgPSBwY2lfZ2V0X2RydmRhdGEocGRl
+dik7DQo+ID4gKw0KPiA+ICsgICAgIGlmICghbmV0aWZfcnVubmluZyhkZXYpKQ0KPiA+ICsgICAg
+ICAgICAgICAgZ290byBvdXQ7DQo+ID4gKw0KPiA+ICsgICAgIG5ldGlmX3N0b3BfcXVldWUoZGV2
+KTsNCj4gPiArICAgICBuZXRpZl9jYXJyaWVyX29mZihkZXYpOw0KPiA+ICsgICAgIG5ldGlmX2Rl
+dmljZV9kZXRhY2goZGV2KTsNCj4gPiArICAgICBydGFzZV9od19yZXNldChkZXYpOw0KPiA+ICsN
+Cj4gPiArb3V0Og0KPiA+ICsgICAgIHBjaV9zYXZlX3N0YXRlKHBkZXYpOw0KPiA+ICsNCj4gPiAr
+ICAgICByZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIGludCBydGFzZV9yZXN1
+bWUoc3RydWN0IHBjaV9kZXYgKnBkZXYpIHsNCj4gPiArICAgICBzdHJ1Y3QgbmV0X2RldmljZSAq
+ZGV2ID0gcGNpX2dldF9kcnZkYXRhKHBkZXYpOw0KPiA+ICsgICAgIHN0cnVjdCBydGFzZV9wcml2
+YXRlICp0cCA9IG5ldGRldl9wcml2KGRldik7DQo+ID4gKyAgICAgaW50IHJldDsNCj4gPiArDQo+
+ID4gKyAgICAgcGNpX3NldF9wb3dlcl9zdGF0ZShwZGV2LCBQQ0lfRDApOw0KPiA+ICsgICAgIHBj
+aV9yZXN0b3JlX3N0YXRlKHBkZXYpOw0KPiA+ICsgICAgIHBjaV9lbmFibGVfd2FrZShwZGV2LCBQ
+Q0lfRDAsIDApOw0KPiA+ICsNCj4gDQo+IElNTyB0aGlzIGlzIGRvbmUgYnkgdGhlIFBDSSBjb3Jl
+IGFscmVhZHkuIFNlZSBvdGhlciBkcml2ZXJzIGFuZCBQQ0kgY29yZSBjb2RlLg0KDQpUaGFuayB5
+b3UsIEkgd2lsbCBjaGVjayB0aGlzIHBhcnQuDQo+IA0KPiA+ICsgICAgIC8qIHJlc3RvcmUgbGFz
+dCBtb2RpZmllZCBtYWMgYWRkcmVzcyAqLw0KPiA+ICsgICAgIHJ0YXNlX3Jhcl9zZXQodHAsIGRl
+di0+ZGV2X2FkZHIpOw0KPiA+ICsNCj4gPiArICAgICBpZiAoIW5ldGlmX3J1bm5pbmcoZGV2KSkN
+Cj4gPiArICAgICAgICAgICAgIGdvdG8gb3V0Ow0KPiA+ICsNCj4gPiArICAgICBydGFzZV93YWl0
+X2Zvcl9xdWllc2NlbmNlKGRldik7DQo+ID4gKw0KPiA+ICsgICAgIHJ0YXNlX3R4X2NsZWFyKHRw
+KTsNCj4gPiArICAgICBydGFzZV9yeF9jbGVhcih0cCk7DQo+ID4gKw0KPiA+ICsgICAgIHJldCA9
+IHJ0YXNlX2luaXRfcmluZyhkZXYpOw0KPiA+ICsgICAgIGlmIChyZXQpIHsNCj4gPiArICAgICAg
+ICAgICAgIG5ldGRldl9lcnIoZGV2LCAidW5hYmxlIHRvIGluaXQgcmluZ1xuIik7DQo+ID4gKyAg
+ICAgICAgICAgICBydGFzZV9mcmVlX2Rlc2ModHApOw0KPiA+ICsgICAgICAgICAgICAgcmV0dXJu
+IC1FTk9NRU07DQo+ID4gKyAgICAgfQ0KPiA+ICsNCj4gPiArICAgICBydGFzZV9od19jb25maWco
+ZGV2KTsNCj4gPiArICAgICAvKiBhbHdheXMgbGluaywgc28gc3RhcnQgdG8gdHJhbnNtaXQgJiBy
+ZWNlaXZlICovDQo+ID4gKyAgICAgcnRhc2VfaHdfc3RhcnQoZGV2KTsNCj4gPiArDQo+ID4gKyAg
+ICAgbmV0aWZfY2Fycmllcl9vbihkZXYpOw0KPiA+ICsgICAgIG5ldGlmX3dha2VfcXVldWUoZGV2
+KTsNCj4gPiArICAgICBuZXRpZl9kZXZpY2VfYXR0YWNoKGRldik7DQo+ID4gKw0KPiA+ICtvdXQ6
+DQo+ID4gKyAgICAgcmV0dXJuIDA7DQo+ID4gK30NCj4gPiArI2VuZGlmIC8qIENPTkZJR19QTSAq
+Lw0KPiA+ICsNCj4gPiAgc3RhdGljIHN0cnVjdCBwY2lfZHJpdmVyIHJ0YXNlX3BjaV9kcml2ZXIg
+PSB7DQo+ID4gICAgICAgLm5hbWUgPSBLQlVJTERfTU9ETkFNRSwNCj4gPiAgICAgICAuaWRfdGFi
+bGUgPSBydGFzZV9wY2lfdGJsLA0KPiA+ICAgICAgIC5wcm9iZSA9IHJ0YXNlX2luaXRfb25lLA0K
+PiA+ICAgICAgIC5yZW1vdmUgPSBydGFzZV9yZW1vdmVfb25lLA0KPiA+ICAgICAgIC5zaHV0ZG93
+biA9IHJ0YXNlX3NodXRkb3duLA0KPiA+ICsjaWZkZWYgQ09ORklHX1BNDQo+ID4gKyAgICAgLnN1
+c3BlbmQgPSBydGFzZV9zdXNwZW5kLA0KPiA+ICsgICAgIC5yZXN1bWUgPSBydGFzZV9yZXN1bWUs
+DQo+IA0KPiBVc2UgcG1fc2xlZXBfcHRyIGFuZCByZWxhdGVkIG1hY3JvcyB0aGVuIHlvdSBkb24n
+dCBuZWVkIHRoZSBjb25kaXRpb25hbA0KPiBjb21waWxpbmcuDQoNClRoYW5rcyBmb3IgeW91ciBz
+dWdnZXN0aW9uLCBJIHdpbGwgbW9kaWZ5IHRoaXMgZHJpdmVyLg0KPiANCj4gPiArI2VuZGlmDQo+
+ID4gIH07DQo+ID4NCj4gPiAgbW9kdWxlX3BjaV9kcml2ZXIocnRhc2VfcGNpX2RyaXZlcik7DQoN
+Cg==
 
