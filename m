@@ -1,149 +1,131 @@
-Return-Path: <netdev+bounces-49552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F65A7F2619
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:06:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A85D87F262D
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:12:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25681C203B9
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 07:06:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4D3A1C20908
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 07:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33841E513;
-	Tue, 21 Nov 2023 07:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272DD1F93F;
+	Tue, 21 Nov 2023 07:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qaO+wPer"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="l3y/Gfkx";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DieFae+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4B313D
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 23:05:56 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54366784377so7156462a12.3
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 23:05:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700550355; x=1701155155; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nH4swh9fEPW3jOPrSOjxPBymwQwviSlAcTZL7Zl3GV8=;
-        b=qaO+wPerdX+S5dO/FQz5QgjDZeD3mfsqCC0BV7nKyCucG79JLovMpx5y+7l6rPYAEY
-         ATCltATFbvEPX1nL775gZksKFSYrqNdIX4X/ZcryMmqqcI4FbPujTi7yWlFI+YjvW2kW
-         dBWs7/UhuQM3AWbyzgRSmDXh4B+/0afOItuHHFKzJRO0nAf7aU49abstiOu5bQobXo14
-         /f5qsVmVuxQqh92AVnN9xE5O/BKzCVCXphLFAvo/JIO24bRMVy+6I0A85ew+W23Y1ZE4
-         cap91yM1OlRwryteekYsmcTfaLZpFBbfbp+YeZoQEfbicBJ1CP+lrH5xuDIS2rXO2uj+
-         3heQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700550355; x=1701155155;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nH4swh9fEPW3jOPrSOjxPBymwQwviSlAcTZL7Zl3GV8=;
-        b=NQlFIPPbkdWVjR9UPWRtDDM67ZdDovbxbxPk5JQbXxoPGJKCarboK7ps7Qg0F5GI8/
-         5uM5ZilqxDQq1GwmFEE1wfWcEz6QcfWalNivFe4Lq/jWX7eqeITlzQcR7A2ARSYM8KFB
-         FtyqvRkg5Voi7Wa5W2iBa9TbadCAADeedP9dT6oK3Bwm6SYXdJEPpK0M5A/vZXq/W4X4
-         6BHIPxKgMcEJjtiPh1AkcSDjwRmt2gA2Vb9ogWxVVJXHVA9sjPShVr40Yq29WviN+B4T
-         pA0IUW168wX/kyK8dWTwHwkb/gTh+jQsT5MVaOXQq6LaDp9XIFC78pZwi+bAM14Uouty
-         iRLg==
-X-Gm-Message-State: AOJu0YyOascSzylGV9lV5rd6RIJQ1mcMUGlAfN9y5g2v6dGrvdk3CSOx
-	/LnQuTLY+nTD67xpOqbXH0zRog==
-X-Google-Smtp-Source: AGHT+IE1a+YEDF3Zd/0pxGp+hscPwUbFohbkkbzTi3fgItdsnqsgNCjC4LC3b0DaoXGdzLzfmGaYFg==
-X-Received: by 2002:aa7:df17:0:b0:53e:468d:64a9 with SMTP id c23-20020aa7df17000000b0053e468d64a9mr1197574edy.21.1700550354648;
-        Mon, 20 Nov 2023 23:05:54 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.11])
-        by smtp.gmail.com with ESMTPSA id c17-20020a056402101100b0054851cd28d2sm4011789edu.79.2023.11.20.23.05.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 23:05:54 -0800 (PST)
-Message-ID: <3009000a-c973-4894-83d6-ce2ddab5ccf0@linaro.org>
-Date: Tue, 21 Nov 2023 08:05:52 +0100
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADE09D;
+	Mon, 20 Nov 2023 23:12:18 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailout.nyi.internal (Postfix) with ESMTP id EC98C5C0C58;
+	Tue, 21 Nov 2023 02:12:17 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Tue, 21 Nov 2023 02:12:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1700550737; x=1700637137; bh=04
+	AJGy4oa9MjsWPrnDD6xwdZTHm1YQvdW/pByyPc3e4=; b=l3y/GfkxohGfFNzHRn
+	q6FVzZTcaDrXmOpvsaQHmG88ZqMXyAvxlK5ST3wLqsTS4nuaPcboBQCDMU5F88N9
+	Rwo9MkPLprXRBCa0J9wNzSoH3Mz4r94RGGnIxY7fwdNHnA9V05TLW8YetDSc/8gF
+	zFxMZNBdkDBDrtA4Mcmy4llX4R3uI7Lc5btmrwlwhekq9uS/X225pw34oNF0MLS4
+	rvtgfVzfla49q6LF8nVYNgW+z/zc5DbNEBn+OAwooArtY1QKF0NcvHMcXF+btJTS
+	wFkyJ6nXIzyJzbX16MUFEFwpqaYa3a7EWVqCdJavQYhhLi7BTQHj2LlBwSzGqjEV
+	p6/g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1700550737; x=1700637137; bh=04AJGy4oa9Mjs
+	WPrnDD6xwdZTHm1YQvdW/pByyPc3e4=; b=DieFae+IkvBry6ckdYrqzlm5f2EvV
+	Gz4k1d/Nkf9QG+RK7385W/wqPjrEBmFDS7OvD1Y9kMtnlMThpZ8P7ETyUKi1fns/
+	eelqEuahniXG1+M/Huws2Du8YG1IIrD0g0JdwhC1J0Ku8CHbUZiKZSIzFbifEfbZ
+	KpXRRUJB7fhw+pknysF0mPVS5mgXGUXdQN/6DxkCvQlmfzlpswfX4NPz9I4c++Ij
+	T0y7M3LfXFMFcET/dZz/VTUCEl5b53VyoJPhzmo4LhWCMmomkpp+9JX0qhG2wNh6
+	D/3g9i7a4jucIVa6wYEAlMIAngRjInvFCjw8dxfOFSDeWU57EQkzvStug==
+X-ME-Sender: <xms:UVhcZdhzHLX1f7YO0lRDCQH5RNOBmk7etLt49IPt_ygACfZ7IV16nQ>
+    <xme:UVhcZSB_RxAVa3l8XFsGt-lPPlLq_hDnziSdTznTSN6c2DmipxIIBWvjKSQZPnJbF
+    VJtljbJ3h97AA>
+X-ME-Received: <xmr:UVhcZdE4iBOEOZAj25hW98bMC40B-aLu8PeDxwpMt4zwsN91G_v6Yw8-rcXQhk3Htb9TuBqnwWlrbjof1P35IlM-5j6bIlT5CSRdCg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudegkedguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
+    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehge
+    dvvedvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhroh
+    grhhdrtghomh
+X-ME-Proxy: <xmx:UVhcZSRjm5e5ctBWRIev_eny3UvWzt27e4WdoSvuL1T6GxbVnwKM3w>
+    <xmx:UVhcZaxSrwFbFSuLkwTyrGQVusaayxZXMiEmf3mv5fRdF1dbQ68Dbw>
+    <xmx:UVhcZY5XYxslPmDaYixYkpwAd1kZ5kThJRYXzCZUDFJgFbSOmtL1zQ>
+    <xmx:UVhcZfhbVYtcK7abWjliZJgHkXP-wYmi-tD_RekiGcq44sQZE-7B9Q>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 21 Nov 2023 02:12:16 -0500 (EST)
+Date: Tue, 21 Nov 2023 08:12:09 +0100
+From: Greg KH <greg@kroah.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: andrew@lunn.ch, aliceryhl@google.com, benno.lossin@proton.me,
+	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 5/5] net: phy: add Rust Asix PHY driver
+Message-ID: <2023112136-paver-agreed-0bc1@gregkh>
+References: <20231117093915.2515418-1-aliceryhl@google.com>
+ <20231119.185736.1872000177070369059.fujita.tomonori@gmail.com>
+ <363b810d-7d6c-48bd-879b-f97acffa70b6@lunn.ch>
+ <20231121.151939.1903605088782465261.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc: virtual_ncidev: Add variable to check if ndev is
- running
-Content-Language: en-US
-To: bongsu.jeon@samsung.com, Nguyen Dinh Phi <phind.uet@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
- <syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>
-References: <b2bd6689-5161-483a-a05c-811927831082@linaro.org>
- <20231119164705.1991375-1-phind.uet@gmail.com>
- <CGME20231120184433epcas2p23e9f5db776d46ad8dd77a16dd326c1bc@epcms2p1>
- <20231121013146epcms2p1587bebc341f17406625e8b0490b6ab1a@epcms2p1>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231121013146epcms2p1587bebc341f17406625e8b0490b6ab1a@epcms2p1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231121.151939.1903605088782465261.fujita.tomonori@gmail.com>
 
-On 21/11/2023 02:31, Bongsu Jeon wrote:
-> On 20/11/2023 19:23, Phi Nguyen wrote:
+On Tue, Nov 21, 2023 at 03:19:39PM +0900, FUJITA Tomonori wrote:
+> On Sun, 19 Nov 2023 17:03:30 +0100
+> Andrew Lunn <andrew@lunn.ch> wrote:
 > 
->> The issue arises when an skb is added to the send_buff after invoking 
->> ndev->ops->close() but before unregistering the device. In such cases, 
->> the virtual device will generate a copy of skb, but with no consumer 
->> thereafter. Consequently, this object persists indefinitely.
->>
->> This problem seems to stem from the existence of time gaps between 
->> ops->close() and the destruction of the workqueue. During this interval, 
->> incoming requests continue to trigger the send function.
+> >> >> +            let _ = dev.init_hw();
+> >> >> +            let _ = dev.start_aneg();
+> >> > 
+> >> > Just to confirm: You want to call `start_aneg` even if `init_hw` returns
+> >> > failure? And you want to ignore both errors?
+> >> 
+> >> Yeah, I tried to implement the exact same behavior in the original C driver.
+> > 
+> > You probably could check the return values, and it would not make a
+> > difference. Also, link_change_notify() is a void function, so you
+> > cannot return the error anyway.
+> > 
+> > These low level functions basically only fail if the hardware is
+> > `dead`. You get an -EIO or maybe -TIMEDOUT back. And there is no real
+> > recovery. You tend to get such errors during probe and fail the
+> > probe. Or maybe if power management is wrong and it has turned a
+> > critical clock off. But that is unlikely in this case, we are calling
+> > link_change_notify because the PHY has told us something changed
+> > recently, so it probably is alive.
+> > 
+> > I would say part of not checking the return code is also that C does
+> > not have the nice feature that Rust has of making very simple to check
+> > the return code. That combined with it being mostly pointless for PHY
+> > drivers.
 > 
-> Dear Krzysztof,
-> 
-> Even though i agree on this patch, i think that NFC subsystem could handle this scenario not to trigger the send function after close.
-> Do you think it would be better that each nci driver has the responsibility to handle this scenario?
+> Understood. I'll check the first return value if you prefer. I might
+> add WARN_ON_ONCE after Rust supports it.
 
-It's better if core does it, but so far each driver was taking care of
-it. Send a patch if you have some better solution.
+Please don't, it shouldn't support it, handle errors properly and
+return, don't panic machines (remember, the majority of the Linux
+systems in the world run panic-on-warn).
 
-Best regards,
-Krzysztof
-
+thanks,
+g
+reg k-h
 
