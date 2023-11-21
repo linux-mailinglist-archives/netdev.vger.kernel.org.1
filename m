@@ -1,245 +1,158 @@
-Return-Path: <netdev+bounces-49826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5897F3981
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:52:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F15097F3995
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A2F1C20CDA
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:52:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E24D1C20982
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F293E5B20A;
-	Tue, 21 Nov 2023 22:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB87C38DEA;
+	Tue, 21 Nov 2023 22:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h5UhmADJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtmmtrEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D0ED51;
-	Tue, 21 Nov 2023 14:52:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700607146; x=1732143146;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Td2JHfbNsKOAb89T6hM4eAx8IpnMCzx9WqWHq/PDql4=;
-  b=h5UhmADJQTvEteGaP30lVbl6fGOg8w50009t+RBhfEpu3oNxcE3nrWCu
-   wMFqIwiOdkwZiIf/0ECy0cuMBlFRSQRmS/bATmATzJMqMu5RJtCyyqClR
-   OBi3F2BtY7Nvg1jGw3/tBun8dgeCbcIws9ykpIaDKcYo2IP/Lgy5MA8/R
-   4UoN8b1lgiwaGVUHWvI6f4S0XxG3gLclcvOX8oPAtUHi/WUNEpFQV9wD5
-   T0xeZlZdbzbdS7B3eSrwNnEE4PG795UOqcH3OCywQ8mLnU8CKN9j4NDp6
-   /hDWgf9kuy4s77hi7//wwk4pXTnIpfBJu+xEgGW/MLse2GyRdS+lfUG08
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="371290752"
-X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
-   d="scan'208";a="371290752"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 14:52:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="837191861"
-X-IronPort-AV: E=Sophos;i="6.04,217,1695711600"; 
-   d="scan'208";a="837191861"
-Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 21 Nov 2023 14:52:20 -0800
-Received: from kbuild by b8de5498638e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r5ZbO-0008Mt-1Y;
-	Tue, 21 Nov 2023 22:52:18 +0000
-Date: Wed, 22 Nov 2023 06:51:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	schakrabarti@microsoft.com, paulros@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: Re: [PATCH V2 net-next] net: mana: Assigning IRQ affinity on HT cores
-Message-ID: <202311220507.k0uewCr0-lkp@intel.com>
-References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D684DD;
+	Tue, 21 Nov 2023 14:56:58 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cf6373ce31so2154975ad.0;
+        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700607418; x=1701212218; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
+        b=MtmmtrEVs8W0K7YmHL0aSsy4KlgbCiR/rzEoaxxd5xgwo6yySKIEcftF7a0eDvv5mW
+         sV3En1IQR2ITwWxA/VZvWTgYismKndDmu2SujOe6djQOnmzzw5WjZIG/jUf796bR1aMh
+         sh2pdnh1tpajr+3Mlca7eIzXmCJhVnnRAJ5DMHZO7Bmzhxs7oS0pe/9DI9kug2oTyeG/
+         JsF+ACBz/WxwiOu+PrN2SA/V4/lqhfbljF9Z19dghmlWxf/C2IstNvmhoPhbOF6VKUXI
+         dF+6V4pyoJoO00MS6/Yg4floS8gsSbgACoGnjkfmWA5weSVC/ixWDm+VfRESce3FI7d3
+         JoUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700607418; x=1701212218;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
+        b=iVwc9nEIheyTCs/+WJ+947PMVdO1zTldADUa5yo0JnccNN5/TOHzAd6HE5iwvqj6ih
+         QQuMihy4cGfbENu6+YvjKsWx5L9OUHt5L8jdzbukHqb/vcOszYzqT+iw6wz1JNEAFIsm
+         Xnr5JLAlqWhIcfoS6axPBhzgNsGE0oEENFztz6fIBzEglrJBg8jY78riOA/E8IbapcYb
+         Dc9/YcZ2XQd1hRBlBSgZ/YOXSrUZG4ecHIFrNp5yJFp2zRFKz2buE/VvGExSACXA+CCz
+         bntL2SVz7ABcJ3mywbqw9w2mdh5fJA4RadkIysAYFcK6PRR5fPhDJdhrKtFD3GvhXNaf
+         iq8g==
+X-Gm-Message-State: AOJu0YzMiCcI1hT2KwER33RCOLOmXYkzq2T7h6/cD4Yy6i7iHYd6jqxN
+	k5Jtk/ju2MK5utyvZoFCzXg=
+X-Google-Smtp-Source: AGHT+IE6s57NYG7jptMBdy5DVewa70KWUQtBlIN7PP5AfrSGIy85Ot97zH3PYYTC8wgjLQNl/n6VtQ==
+X-Received: by 2002:a17:902:c94b:b0:1c5:cf7c:4d50 with SMTP id i11-20020a170902c94b00b001c5cf7c4d50mr1008200pla.18.1700607418027;
+        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
+Received: from bangji.hsd1.ca.comcast.net ([2601:647:6780:42e0:7377:923f:1ff3:266d])
+        by smtp.gmail.com with ESMTPSA id m12-20020a1709026bcc00b001cc47c1c29csm8413189plt.84.2023.11.21.14.56.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 14:56:57 -0800 (PST)
+Sender: Namhyung Kim <namhyung@gmail.com>
+From: Namhyung Kim <namhyung@kernel.org>
+To: Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>
+Cc: Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH 05/14] tools headers UAPI: Update tools's copy of vhost.h header
+Date: Tue, 21 Nov 2023 14:56:40 -0800
+Message-ID: <20231121225650.390246-5-namhyung@kernel.org>
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
+In-Reply-To: <20231121225650.390246-1-namhyung@kernel.org>
+References: <20231121225650.390246-1-namhyung@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Souradeep,
+tldr; Just FYI, I'm carrying this on the perf tools tree.
 
-kernel test robot noticed the following build warnings:
+Full explanation:
 
-[auto build test WARNING on net-next/main]
+There used to be no copies, with tools/ code using kernel headers
+directly. From time to time tools/perf/ broke due to legitimate kernel
+hacking. At some point Linus complained about such direct usage. Then we
+adopted the current model.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Souradeep-Chakrabarti/net-mana-Assigning-IRQ-affinity-on-HT-cores/20231121-215912
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1700574877-6037-1-git-send-email-schakrabarti%40linux.microsoft.com
-patch subject: [PATCH V2 net-next] net: mana: Assigning IRQ affinity on HT cores
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20231122/202311220507.k0uewCr0-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231122/202311220507.k0uewCr0-lkp@intel.com/reproduce)
+The way these headers are used in perf are not restricted to just
+including them to compile something.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311220507.k0uewCr0-lkp@intel.com/
+There are sometimes used in scripts that convert defines into string
+tables, etc, so some change may break one of these scripts, or new MSRs
+may use some different #define pattern, etc.
 
-All warnings (new ones prefixed by >>):
+E.g.:
 
->> drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:5: warning: variable 'avail_cpus' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1343:19: note: uninitialized use occurs here
-           free_cpumask_var(avail_cpus);
-                            ^~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:5: note: remove the '||' if its condition is always false
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1249:39: note: initialize the variable 'avail_cpus' to silence this warning
-           cpumask_var_t filter_mask, avail_cpus;
-                                                ^
-                                                 = NULL
->> drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:5: warning: variable 'core_id_list' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1344:6: note: uninitialized use occurs here
-           if (core_id_list)
-               ^~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:2: note: remove the 'if' if its condition is always false
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:5: warning: variable 'core_id_list' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1344:6: note: uninitialized use occurs here
-           if (core_id_list)
-               ^~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1253:5: note: remove the '||' if its condition is always false
-           if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:1248:28: note: initialize the variable 'core_id_list' to silence this warning
-           unsigned int *core_id_list;
-                                     ^
-                                      = NULL
-   3 warnings generated.
+  $ ls -1 tools/perf/trace/beauty/*.sh | head -5
+  tools/perf/trace/beauty/arch_errno_names.sh
+  tools/perf/trace/beauty/drm_ioctl.sh
+  tools/perf/trace/beauty/fadvise.sh
+  tools/perf/trace/beauty/fsconfig.sh
+  tools/perf/trace/beauty/fsmount.sh
+  $
+  $ tools/perf/trace/beauty/fadvise.sh
+  static const char *fadvise_advices[] = {
+        [0] = "NORMAL",
+        [1] = "RANDOM",
+        [2] = "SEQUENTIAL",
+        [3] = "WILLNEED",
+        [4] = "DONTNEED",
+        [5] = "NOREUSE",
+  };
+  $
 
+The tools/perf/check-headers.sh script, part of the tools/ build
+process, points out changes in the original files.
 
-vim +1253 drivers/net/ethernet/microsoft/mana/gdma_main.c
+So its important not to touch the copies in tools/ when doing changes in
+the original kernel headers, that will be done later, when
+check-headers.sh inform about the change to the perf tools hackers.
 
-  1245	
-  1246	static int irq_setup(int *irqs, int nvec, int start_numa_node)
-  1247	{
-  1248		unsigned int *core_id_list;
-  1249		cpumask_var_t filter_mask, avail_cpus;
-  1250		int i, core_count = 0, cpu_count = 0, err = 0, node_count = 0;
-  1251		unsigned int cpu_first, cpu, irq_start, cores = 0, numa_node = start_numa_node;
-  1252	
-> 1253		if(!alloc_cpumask_var(&filter_mask, GFP_KERNEL)
-  1254				     || !alloc_cpumask_var(&avail_cpus, GFP_KERNEL)) {
-  1255			err = -ENOMEM;
-  1256			goto free_irq;
-  1257		}
-  1258		cpumask_copy(filter_mask, cpu_online_mask);
-  1259		cpumask_copy(avail_cpus, cpu_online_mask);
-  1260		/* count the number of cores
-  1261		 */
-  1262		for_each_cpu(cpu, filter_mask) {
-  1263			cpumask_andnot(filter_mask, filter_mask, topology_sibling_cpumask(cpu));
-  1264			cores++;
-  1265		}
-  1266		core_id_list = kcalloc(cores, sizeof(unsigned int), GFP_KERNEL);
-  1267		cpumask_copy(filter_mask, cpu_online_mask);
-  1268		/* initialize core_id_list array */
-  1269		for_each_cpu(cpu, filter_mask) {
-  1270			core_id_list[core_count] = cpu;
-  1271			cpumask_andnot(filter_mask, filter_mask, topology_sibling_cpumask(cpu));
-  1272			core_count++;
-  1273		}
-  1274	
-  1275		/* if number of cpus are equal to max_queues per port, then
-  1276		 * one extra interrupt for the hardware channel communication.
-  1277		 */
-  1278		if (nvec - 1 == num_online_cpus()) {
-  1279			irq_start = 1;
-  1280			cpu_first = cpumask_first(cpu_online_mask);
-  1281			irq_set_affinity_and_hint(irqs[0], cpumask_of(cpu_first));
-  1282		} else {
-  1283			irq_start = 0;
-  1284		}
-  1285	
-  1286		/* reset the core_count and num_node to 0.
-  1287		 */
-  1288		core_count = 0;
-  1289	
-  1290		/* for each interrupt find the cpu of a particular
-  1291		 * sibling set and if it belongs to the specific numa
-  1292		 * then assign irq to it and clear the cpu bit from
-  1293		 * the corresponding avail_cpus.
-  1294		 * Increase the cpu_count for that node.
-  1295		 * Once all cpus for a numa node is assigned, then
-  1296		 * move to different numa node and continue the same.
-  1297		 */
-  1298		for (i = irq_start; i < nvec; ) {
-  1299	
-  1300			/* check if the numa node has cpu or not
-  1301			 * to avoid infinite loop.
-  1302			 */
-  1303			if (cpumask_empty(cpumask_of_node(numa_node))) {
-  1304				numa_node++;
-  1305				if (++node_count == num_online_nodes()) {
-  1306					err = -EAGAIN;
-  1307					goto free_irq;
-  1308				}
-  1309			}
-  1310			cpu_first = cpumask_first_and(avail_cpus,
-  1311						     topology_sibling_cpumask(core_id_list[core_count]));
-  1312			if (cpu_first < nr_cpu_ids && cpu_to_node(cpu_first) == numa_node) {
-  1313				irq_set_affinity_and_hint(irqs[i], cpumask_of(cpu_first));
-  1314				cpumask_clear_cpu(cpu_first, avail_cpus);
-  1315				cpu_count = cpu_count + 1;
-  1316				i = i + 1;
-  1317	
-  1318				/* checking if all the cpus are used from the
-  1319				 * particular node.
-  1320				 */
-  1321				if (cpu_count == nr_cpus_node(numa_node)) {
-  1322					numa_node = numa_node + 1;
-  1323					if (numa_node == num_online_nodes())
-  1324						numa_node = 0;
-  1325	
-  1326					/* wrap around once numa nodes
-  1327					 * are traversed.
-  1328					 */
-  1329					if (numa_node == start_numa_node) {
-  1330						node_count = 0;
-  1331						cpumask_copy(avail_cpus, cpu_online_mask);
-  1332					}
-  1333					cpu_count = 0;
-  1334					core_count = 0;
-  1335					continue;
-  1336				}
-  1337			}
-  1338			if (++core_count == cores)
-  1339				core_count = 0;
-  1340		}
-  1341	free_irq:
-  1342		free_cpumask_var(filter_mask);
-  1343		free_cpumask_var(avail_cpus);
-  1344		if (core_id_list)
-  1345			kfree(core_id_list);
-  1346		return err;
-  1347	}
-  1348	
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Signed-off-by: Namhyung Kim <namhyung@kernel.org>
+---
+ tools/include/uapi/linux/vhost.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
+diff --git a/tools/include/uapi/linux/vhost.h b/tools/include/uapi/linux/vhost.h
+index f5c48b61ab62..649560c685f1 100644
+--- a/tools/include/uapi/linux/vhost.h
++++ b/tools/include/uapi/linux/vhost.h
+@@ -219,4 +219,12 @@
+  */
+ #define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
+ 
++/* Get the group for the descriptor table including driver & device areas
++ * of a virtqueue: read index, write group in num.
++ * The virtqueue index is stored in the index field of vhost_vring_state.
++ * The group ID of the descriptor table for this specific virtqueue
++ * is returned via num field of vhost_vring_state.
++ */
++#define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
++					      struct vhost_vring_state)
+ #endif
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0.rc1.413.gea7ed67945-goog
+
 
