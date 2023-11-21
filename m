@@ -1,112 +1,141 @@
-Return-Path: <netdev+bounces-49570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C9F7F282A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:55:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE877F2841
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3202281DC0
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77283280F92
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12909208BE;
-	Tue, 21 Nov 2023 08:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251D82111E;
+	Tue, 21 Nov 2023 09:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gQLa1kh0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8807AF9;
-	Tue, 21 Nov 2023 00:55:46 -0800 (PST)
-Received: from [192.168.1.103] (31.173.81.93) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 21 Nov
- 2023 11:55:42 +0300
-Subject: Re: [PATCH net] net: rswitch: Fix error path in rswitch_start_xmit()
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-References: <20231121055255.3627949-1-yoshihiro.shimoda.uh@renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <7b8197aa-edb8-76ed-57be-6fd8ab247a9c@omp.ru>
-Date: Tue, 21 Nov 2023 11:55:41 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCFEFA
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 01:00:18 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-32d81864e3fso3356280f8f.2
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 01:00:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700557217; x=1701162017; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YgP4xjaRgLHxF7ba0qehXb/BQTmh1YAHlwRMUelgyJQ=;
+        b=gQLa1kh0d2nWTXUTtFoXcmhkVXdFsHcz9tsuUx/dpgrLRud+eKAKYHwf+WAnPtETvI
+         zboHcGZPr0pM88+nd3yulXhKVhD9WPzi8zilINtrnF/3QjAUw9KM0urku1UrssbdGN+5
+         XBwfY5pTWbMWDNGPlabblRepSLrp76yH4LyLngvjcggf1NFo//1QdRvyibPMPtbSZ855
+         /I8FjUgSbEiEaPyMY7D0I/6T6uuWt8CAtVO0bqZJB7QpuxmKzBEysA6jnasyDVrjn3Qu
+         qghpn3m/Q0FsRa0uftF5kiG64FPZgoT00UMk+9vhHOYwA0jz+F0YbQjq1Yx2Acx8LVj2
+         Bh/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700557217; x=1701162017;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YgP4xjaRgLHxF7ba0qehXb/BQTmh1YAHlwRMUelgyJQ=;
+        b=SvSMKnm/OAzQfC42rGlxJIVTtp6almqMwifGvP/Lupx0PFWHRoKiOUrQzwPaWFvfBB
+         2rsGc1H+VIqfz6iUS6ELiYfr/skdjSLp5mrHj+KX6jj6GVCAt+kCEeuyzFYfV7yWuVwy
+         mVaKxuQwHParTq73ZIMy8tsrwgGbaaVO2Nz8961l4Ejpp/owkXAwQDSLfERjVWZqr3Dy
+         yxz9/Qdff6A4n6H8Wbm3Mn6FCUYy5ijA/G63rWr2xn4Q5TPVwJUiafAeDAcN6CThn8jn
+         dzGUbcQLTY2Wv/fYJaNjM7R6rYYBLQYXMblE7TyEOdJ6mHp0wkV1tQs005t6DYkPlXiY
+         e4rg==
+X-Gm-Message-State: AOJu0YyZFJsHDZX3kHpKIj3uNWNszrZx+QDgW7Vn+hOFf6O/Ooz6rFTE
+	xWeu1s9MsmkFNh9LEJYyrjxtmQ==
+X-Google-Smtp-Source: AGHT+IHJZMmqDwKVlLXdJz6kvXey/4BegM4Fn/KihDRr04VVpZ2X974lseOTJyi+OO48dJQGuY0i1A==
+X-Received: by 2002:a05:6000:1883:b0:32d:701b:a585 with SMTP id a3-20020a056000188300b0032d701ba585mr9003860wri.69.1700557216942;
+        Tue, 21 Nov 2023 01:00:16 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.11])
+        by smtp.gmail.com with ESMTPSA id f18-20020adfdb52000000b00332cbda1970sm3149585wrj.30.2023.11.21.01.00.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 01:00:16 -0800 (PST)
+Message-ID: <158d2d28-a998-49fd-b5f2-4b6e8923730b@linaro.org>
+Date: Tue, 21 Nov 2023 10:00:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231121055255.3627949-1-yoshihiro.shimoda.uh@renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] nfc: virtual_ncidev: Add variable to check if ndev is
+ running
 Content-Language: en-US
+To: Nguyen Dinh Phi <phind.uet@gmail.com>,
+ Bongsu Jeon <bongsu.jeon@samsung.com>
+Cc: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231121075357.344-1-phind.uet@gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231121075357.344-1-phind.uet@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.81.93]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 08:21:59
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 181497 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;31.173.81.93:7.1.2;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.81.93
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 08:27:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 7:01:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 11/21/23 8:52 AM, Yoshihiro Shimoda wrote:
-
-> This .ndo_start_xmit() function should return netdev_tx_t value,
-> not -ENOMEM. Also, before returning the function, dev_kfree_skb_any()
-> should be called. So, fix them.
-
-   Sounds like 2 separate issues -- each needing a patch of its own...
-
-> Fixes: 33f5d733b589 ("net: renesas: rswitch: Improve TX timestamp accuracy")
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On 21/11/2023 08:53, Nguyen Dinh Phi wrote:
+> syzbot reported an memory leak that happens when an skb is add to
+> send_buff after virtual nci closed.
+> This patch adds a variable to track if the ndev is running before
+> handling new skb in send function.
 > 
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index 43a7795d6591..fc9dcf5fa166 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -1535,7 +1535,8 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
->  		ts_info = kzalloc(sizeof(*ts_info), GFP_ATOMIC);
->  		if (!ts_info) {
->  			dma_unmap_single(ndev->dev.parent, dma_addr, skb->len, DMA_TO_DEVICE);
-> -			return -ENOMEM;
-> +			dev_kfree_skb_any(skb);
-> +			return ret;
+> Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
+> Reported-by: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/lkml/00000000000075472b06007df4fb@google.com
+> ---
+> V2:
+>     - Remove unused macro.
 
-   Looks like we have the same error path as when dma_mapping_error()
-returns error. Shouldn't we use *goto*? Although probably can be done
-later, as a cleanup...
 
-[...]
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-MBR, Sergey
+Best regards,
+Krzysztof
+
 
