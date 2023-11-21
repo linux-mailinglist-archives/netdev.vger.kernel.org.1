@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-49577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CAF67F28B4
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:23:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D589F7F28DC
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5611C2128E
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:23:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12AE81C2165E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E212C38F97;
-	Tue, 21 Nov 2023 09:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8383B29C;
+	Tue, 21 Nov 2023 09:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxLhBpXi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLGW+Mk/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C6D38F92
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:23:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7CFC433C9;
-	Tue, 21 Nov 2023 09:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124E3A29C
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:25:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2FFC433C8;
+	Tue, 21 Nov 2023 09:25:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700558598;
-	bh=LMdfk9OuuUrVhkCelQp93adRK8Ub64vZWMipeZbN5dw=;
+	s=k20201202; t=1700558709;
+	bh=38sr1Q2BPM9IpVdNqVNgjqzJqHLOllAYY6K3NqpVO3E=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fxLhBpXiqgpBVfRHojxLFmti9lOIWtoD5uXuo0z+HmYTIIL347ryXSyqk4i6egSSW
-	 vHQzzrJLGwEBpXKbh03aqWXGH4CgIMYE5MOt8D/VxoX73cLOLpkts0QGr0xYKcAia4
-	 Nc5jHC0erkSou6iMnuBnTnlGo42LxbGYDIuk2WyQYHgqhmtL1eAK16f9yGdLKZU3ac
-	 LnPGScOsgmBUec6hHJsEkh4iVnNOVd0mJOB9sRW82V6F0xORNRkOzqkMJihY8AqFt+
-	 Q7Ny/vCrVcbzZ39kRPSKLzR7xOFX2f1wnQatL0GVuJMT6dnP3seOArxPTUb1lCR5So
-	 1BrlR/KIIyLvg==
-Message-ID: <af23bd5d-2daf-487b-858c-9e3ad684864d@kernel.org>
-Date: Tue, 21 Nov 2023 11:23:09 +0200
+	b=NLGW+Mk/Or2bYvH0kKqT1Qcmu46Al1JIkvPTX8vEqdlBem2Qr7inde0CNBIsh2XU7
+	 Ef4ScvGW2GA/IC6AukfqcmzHYxzUS4tvvRyzChtH8iVPvjkcyIwAhd0swbmikbAeSG
+	 xqkMQHunUADfbfnLtGJTZBa/zgV6y0Nl5jrcTjCBBGvzy69Ld7zUlkqHlw+dAXMzYd
+	 dSGcrQ7JN4t567zY0/ZLuUJZqCiTlm1bE5x25JAB08+EYqU6bYS9UIAyhKYMhS8FF/
+	 z2A37s6Dg076rG1rw3hm2vG0yazyVPjfeB3Y19FIVVhEU1XLk8lV5W9srpLOj6nxhd
+	 gTgbUmp/s11uw==
+Message-ID: <73c9030e-28dc-447d-8888-2504a01e549d@kernel.org>
+Date: Tue, 21 Nov 2023 11:25:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,94 +41,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 2/7] net: ethernet: am65-cpsw: cleanup TAPRIO
- handling
+Subject: Re: [PATCH v6 net-next 5/7] net: ethernet: ti: am65-cpsw: add mqprio
+ qdisc offload in channel mode
 Content-Language: en-US
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
  vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Grygorii Strashko <grygorii.strashko@ti.com>
 References: <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-3-rogerq@kernel.org>
- <20231120140147.78726-3-rogerq@kernel.org>
- <20231120225648.pgvzd2jejg5jll2t@skbuf>
+ <20231120140147.78726-6-rogerq@kernel.org>
+ <20231120230314.tqozomqbd6jiqbf7@skbuf>
 From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231120225648.pgvzd2jejg5jll2t@skbuf>
+In-Reply-To: <20231120230314.tqozomqbd6jiqbf7@skbuf>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 21/11/2023 00:56, Vladimir Oltean wrote:
-> On Mon, Nov 20, 2023 at 04:01:42PM +0200, Roger Quadros wrote:
->> -static int am65_cpsw_configure_taprio(struct net_device *ndev,
->> -				      struct am65_cpsw_est *est_new)
->> +static void am65_cpsw_cp_taprio(struct tc_taprio_qopt_offload *from,
->> +				struct tc_taprio_qopt_offload *to)
+On 21/11/2023 01:03, Vladimir Oltean wrote:
+> On Mon, Nov 20, 2023 at 04:01:45PM +0200, Roger Quadros wrote:
+>> +static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
 >> +{
->> +	int i;
->> +
->> +	*to = *from;
->> +	for (i = 0; i < from->num_entries; i++)
->> +		to->entries[i] = from->entries[i];
->> +}
-> 
-> I think I mentioned this before: have you looked at taprio_offload_get()
-> and taprio_offload_put()?
-
-I'm sorry that I missed this. I'll take a look.
-
-> 
->> +
->> +static int am65_cpsw_taprio_replace(struct net_device *ndev,
->> +				    struct tc_taprio_qopt_offload *taprio)
->>  {
->>  	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
->> +	struct netlink_ext_ack *extack = taprio->mqprio.extack;
 >> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
->>  	struct am65_cpts *cpts = common->cpts;
->>  	int ret = 0, tact = TACT_PROG;
->> +	struct am65_cpsw_est *est_new;
->>  
->> -	am65_cpsw_est_update_state(ndev);
->> +	if (!netif_running(ndev)) {
->> +		NL_SET_ERR_MSG_MOD(extack, "interface is down, link speed unknown\n");
-> 
-> The extack message doesn't need a \n.
-
-OK.
-
-> 
->> +		return -ENETDOWN;
->> +	}
->>  
->> -	if (est_new->taprio.cmd == TAPRIO_CMD_DESTROY) {
->> -		am65_cpsw_stop_est(ndev);
->> -		return ret;
->> +	if (common->pf_p0_rx_ptype_rrobin) {
->> +		NL_SET_ERR_MSG_MOD(extack,
->> +				   "p0-rx-ptype-rrobin flag conflicts with taprio qdisc\n");
-> 
-> Also here.
-> 
->> +		return -EINVAL;
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct tc_mqprio_qopt_offload *mqprio = type_data;
+>> +	struct am65_cpsw_common *common = port->common;
+>> +	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
+>> +	int i, tc, offset, count, prio, ret;
+>> +	u8 num_tc = qopt->num_tc;
+>> +	u32 tx_prio_map = 0;
+>> +
+>> +	memcpy(&p_mqprio->mqprio_hw, mqprio, sizeof(*mqprio));
+>> +
+>> +	ret = pm_runtime_get_sync(common->dev);
+>> +	if (ret < 0) {
+>> +		pm_runtime_put_noidle(common->dev);
+>> +		return ret;
 >> +	}
 >> +
->> +	if (port->qos.link_speed == SPEED_UNKNOWN)
->> +		return -ENOLINK;
->> +
->> +	if (taprio->cycle_time_extension) {
->> +		NL_SET_ERR_MSG_MOD(extack,
->> +				   "cycle time extension not supported");
+>> +	if (!num_tc) {
+>> +		am65_cpsw_reset_tc_mqprio(ndev);
+>> +		ret = -EINVAL;
 > 
-> Here it's ok.
-> 
->> +		return -EOPNOTSUPP;
->>  	}
+> num_tc == 0 is what signals the deletion of the mqprio qdisc.
+> Why return -EINVAL?
 
-Thanks for the detailed review!
+Right. I'll drop the -EINVAL.
+> 
+>> +		goto exit_put;
+>> +	}
+>> +
+>> +	ret = am65_cpsw_mqprio_verify_shaper(port, mqprio);
+>> +	if (ret)
+>> +		goto exit_put;
+>> +
+>> +	netdev_set_num_tc(ndev, num_tc);
+>> +
+>> +	/* Multiple Linux priorities can map to a Traffic Class
+>> +	 * A Traffic Class can have multiple contiguous Queues,
+>> +	 * Queues get mapped to Channels (thread_id),
+>> +	 *	if not VLAN tagged, thread_id is used as packet_priority
+>> +	 *	if VLAN tagged. VLAN priority is used as packet_priority
+>> +	 * packet_priority gets mapped to header_priority in p0_rx_pri_map,
+>> +	 * header_priority gets mapped to switch_priority in pn_tx_pri_map.
+>> +	 * As p0_rx_pri_map is left at defaults (0x76543210), we can
+>> +	 * assume that Queue_n gets mapped to header_priority_n. We can then
+>> +	 * set the switch priority in pn_tx_pri_map.
+>> +	 */
+>> +
+>> +	for (tc = 0; tc < num_tc; tc++) {
+>> +		prio = tc;
+>> +
+>> +		/* For simplicity we assign the same priority (TCn) to
+>> +		 * all queues of a Traffic Class.
+>> +		 */
+>> +		for (i = qopt->offset[tc]; i < qopt->offset[tc] + qopt->count[tc]; i++)
+>> +			tx_prio_map |= prio << (4 * i);
+>> +
+>> +		count = qopt->count[tc];
+>> +		offset = qopt->offset[tc];
+>> +		netdev_set_tc_queue(ndev, tc, count, offset);
+>> +	}
+>> +
+>> +	writel(tx_prio_map, port->port_base + AM65_CPSW_PN_REG_TX_PRI_MAP);
+>> +
+>> +	am65_cpsw_tx_pn_shaper_apply(port);
+>> +
+>> +exit_put:
+>> +	pm_runtime_put(common->dev);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  static int am65_cpsw_port_est_enabled(struct am65_cpsw_port *port)
+>>  {
+>>  	return port->qos.est_oper || port->qos.est_admin;
+>> @@ -737,16 +989,6 @@ static int am65_cpsw_qos_setup_tc_block(struct net_device *ndev, struct flow_blo
+>>  					  port, port, true);
+>>  }
+>>  
+>> -static u32
+>> -am65_cpsw_qos_tx_rate_calc(u32 rate_mbps, unsigned long bus_freq)
+>> -{
+>> -	u32 ir;
+>> -
+>> -	bus_freq /= 1000000;
+>> -	ir = DIV_ROUND_UP(((u64)rate_mbps * 32768),  bus_freq);
+>> -	return ir;
+>> -}
+>> -
+> 
+> Insufficient code movement in the previous patch?
+
+Let me move it to patch 3.
 
 -- 
 cheers,
