@@ -1,117 +1,248 @@
-Return-Path: <netdev+bounces-49538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBC5C7F251D
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:13:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AF87F2534
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7759F282880
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:13:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 005DF1C208B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D456156EA;
-	Tue, 21 Nov 2023 05:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312A51864B;
+	Tue, 21 Nov 2023 05:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gepj/oud"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD83DC8
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 21:12:59 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r5J3t-0001tH-8h; Tue, 21 Nov 2023 06:12:37 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r5J3o-00AVcD-KQ; Tue, 21 Nov 2023 06:12:32 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r5J3o-0034kw-HW; Tue, 21 Nov 2023 06:12:32 +0100
-Date: Tue, 21 Nov 2023 06:12:32 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 098FBE7;
+	Mon, 20 Nov 2023 21:21:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700544106; x=1732080106;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=U/vzE5xUw7htLBY4ClpNy7HJvmH36d/i2p290QfaiAQ=;
+  b=Gepj/oud+COkOXxPlZtd0IeNCocTwgp0HuzEvfvGF2de4/qHb6J02DIp
+   d0OdU2HClZPc/6hvwv2DY1iByMILqwvBXvg/JiMc5psxFMWbaqYmyB9XP
+   IrlX5P8vc1NjeW6Al3sjVpUP5G6YVt5b5T/AfN6PpwrkOik1Hp9ItMQlA
+   x2gMlIqe6t4Uh4R4V5AmMeFY9B8fkNPh6gOflcRPTyIBOAcNqYBOV0pwW
+   Xh0AQSQhJf405IEy3qyv6Fv0PEEtHDIhCSfWCdS8YSIzjeAiGFfAoiphZ
+   20fkQiFZtfMP7OtQSz5C8rXbiWJ5jmvxuO2oHD0qYyhKQVBlLuX9OE6Bm
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458263438"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="458263438"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 21:21:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="7781920"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 20 Nov 2023 21:21:40 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r5JCY-0007Ky-1x;
+	Tue, 21 Nov 2023 05:21:34 +0000
+Date: Tue, 21 Nov 2023 13:17:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/9] ethtool: Expand Ethernet Power Equipment
- with PoE alongside PoDL
-Message-ID: <20231121051232.GE590719@pengutronix.de>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
- <04cb7d87-bb6b-4997-878d-490c17bfdfd0@lunn.ch>
- <20231120110944.66938859@kmaincent-XPS-13-7390>
- <20231120111008.GC590719@pengutronix.de>
- <2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch>
- <20231120204221.GD590719@pengutronix.de>
- <887dbafe-def1-443f-8df2-b20b5ddc4db7@lunn.ch>
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
+Message-ID: <202311211310.E8pJEsnT-lkp@intel.com>
+References: <20231120222341.54776-11-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <887dbafe-def1-443f-8df2-b20b5ddc4db7@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20231120222341.54776-11-kuniyu@amazon.com>
 
-On Mon, Nov 20, 2023 at 11:14:32PM +0100, Andrew Lunn wrote:
-> > > However, everything not PoDL PSE seems to be clause 33. So how about:
-> > > 
-> > > 	enum ethtool_podl_pse_admin_state podl_admin_control;
-> > > 	enum ethtool_c33_pse_admin_state c33_admin_control;  
-> > > 
-> > > At least inside the kernel we use c22, c45, c37 etc. I'm not sure they
-> > > are visible to userspace, but if we don't have a better name, maybe we
-> > > have to use c33 in userspace as well.
-> > > 
-> > > I do think naming like this makes it clear we are talking about two
-> > > parallel technologies, not a generic layer and then extensions for
-> > > podl.
-> > > 
-> > > What do you think?
-> > 
-> > I'm OK with it.
-> 
-> Great.
-> 
-> > 
-> > Köry, can you please include some kernel documentation in your patches?
-> > Something like this. I hope it will help to clarify things :) :
-> 
-> This is good. I'm just wondering where to put it. Ideally we want to
-> cross reference to it in both this header file, and in the netlink
-> UAPI.
+Hi Kuniyuki,
 
-Documentation/networking/pse-pd/introduction.rst ?
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on bpf-next/master]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Clean-up-reverse-xmas-tree-in-cookie_v-46-_check/20231121-063036
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231120222341.54776-11-kuniyu%40amazon.com
+patch subject: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
+config: arm-spear3xx_defconfig (https://download.01.org/0day-ci/archive/20231121/202311211310.E8pJEsnT-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211310.E8pJEsnT-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311211310.E8pJEsnT-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/core/sock.c:142:
+   In file included from include/net/tcp.h:32:
+>> include/net/inet_hashtables.h:472:22: error: use of undeclared identifier 'sock_pfree'
+                           skb->destructor = sock_pfree;
+                                             ^
+   1 error generated.
+--
+   In file included from net/core/filter.c:39:
+   In file included from include/linux/skmsg.h:13:
+   In file included from include/net/tcp.h:32:
+>> include/net/inet_hashtables.h:472:22: error: use of undeclared identifier 'sock_pfree'
+                           skb->destructor = sock_pfree;
+                                             ^
+   net/core/filter.c:11812:13: warning: declaration of 'struct tcp_cookie_attributes' will not be visible outside of this function [-Wvisibility]
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11821:24: error: invalid application of 'sizeof' to an incomplete type 'struct tcp_cookie_attributes'
+           if (attr__sz != sizeof(*attr))
+                                 ^~~~~~~
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11851:10: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           if (attr->tcp_opt.mss_clamp < min_mss) {
+               ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11856:10: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           if (attr->tcp_opt.wscale_ok &&
+               ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11857:10: error: incomplete definition of type 'struct tcp_cookie_attributes'
+               attr->tcp_opt.snd_wscale > TCP_MAX_WSCALE) {
+               ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11875:17: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           req->mss = attr->tcp_opt.mss_clamp;
+                      ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11877:25: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           ireq->snd_wscale = attr->tcp_opt.snd_wscale;
+                              ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11878:24: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           ireq->wscale_ok = attr->tcp_opt.wscale_ok;
+                             ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11879:24: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           ireq->tstamp_ok = attr->tcp_opt.tstamp_ok;
+                             ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11880:22: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           ireq->sack_ok = attr->tcp_opt.sack_ok;
+                           ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11881:21: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           ireq->ecn_ok = attr->ecn_ok;
+                          ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+   net/core/filter.c:11883:26: error: incomplete definition of type 'struct tcp_cookie_attributes'
+           treq->req_usec_ts = attr->usec_ts_ok;
+                               ~~~~^
+   net/core/filter.c:11812:13: note: forward declaration of 'struct tcp_cookie_attributes'
+                                           struct tcp_cookie_attributes *attr,
+                                                  ^
+>> net/core/filter.c:11887:20: error: use of undeclared identifier 'sock_pfree'
+           skb->destructor = sock_pfree;
+                             ^
+   1 warning and 13 errors generated.
+
+
+vim +/sock_pfree +472 include/net/inet_hashtables.h
+
+   451	
+   452	static inline
+   453	struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+   454				     const __be32 saddr, const __be16 sport,
+   455				     const __be32 daddr, const __be16 dport,
+   456				     bool *refcounted, inet_ehashfn_t *ehashfn)
+   457	{
+   458		struct sock *sk, *reuse_sk;
+   459		bool prefetched;
+   460	
+   461		sk = skb_steal_sock(skb, refcounted, &prefetched);
+   462		if (!sk)
+   463			return NULL;
+   464	
+   465		if (!prefetched)
+   466			return sk;
+   467	
+   468		if (sk->sk_state == TCP_NEW_SYN_RECV) {
+   469			if (inet_reqsk(sk)->syncookie) {
+   470				*refcounted = false;
+   471				skb->sk = sk;
+ > 472				skb->destructor = sock_pfree;
+   473				return inet_reqsk(sk)->rsk_listener;
+   474			}
+   475			return sk;
+   476		} else if (sk->sk_state == TCP_TIME_WAIT) {
+   477			return sk;
+   478		}
+   479	
+   480		if (sk->sk_protocol == IPPROTO_TCP) {
+   481			if (sk->sk_state != TCP_LISTEN)
+   482				return sk;
+   483		} else if (sk->sk_protocol == IPPROTO_UDP) {
+   484			if (sk->sk_state != TCP_CLOSE)
+   485				return sk;
+   486		} else {
+   487			return sk;
+   488		}
+   489	
+   490		reuse_sk = inet_lookup_reuseport(net, sk, skb, doff,
+   491						 saddr, sport, daddr, ntohs(dport),
+   492						 ehashfn);
+   493		if (!reuse_sk)
+   494			return sk;
+   495	
+   496		/* We've chosen a new reuseport sock which is never refcounted. This
+   497		 * implies that sk also isn't refcounted.
+   498		 */
+   499		WARN_ON_ONCE(*refcounted);
+   500	
+   501		return reuse_sk;
+   502	}
+   503	
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
