@@ -1,158 +1,264 @@
-Return-Path: <netdev+bounces-49820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3911C7F393C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:36:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DEBE7F3946
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6669FB21A07
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:36:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13265282989
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C66D56476;
-	Tue, 21 Nov 2023 22:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECCC55793;
+	Tue, 21 Nov 2023 22:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSP2u9Hk"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="G3pUW2bX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34165645D
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 22:36:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21076C433C8;
-	Tue, 21 Nov 2023 22:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700606167;
-	bh=Ov06uefYFHyG5gwX8OkJtStrYJotBPFjp9TDBCxGkWI=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=jSP2u9Hk2qvvGl6CUEvF1866knzE37BMWpgzWXWZR9zbHiKmkEe9MIhcp2lTxQbnr
-	 ursEZuHOYqr6pRFs2JtZZrsb2jRSz4+ZNl8p16vkHsSHLqhVFYK+SoaupZ16nCbq7j
-	 5GravrjxBZ8wclhlFOD+YPhMBvdeNTEf72hMPbH2fuYoWYtAr1oQ5FqeGz77CqhHV7
-	 YUc8hJt4FXqLZJ/1p9P328Tz0oWQzH+JEy9eIeH/DOslIs9YSPBBx0lLXW5FwloxIM
-	 z1IMSXHInFJ8vKBOFBQbajFOyGLFl01iQmGBJx6bQsS2b2539AuDLl0bn3Cdb8jdhA
-	 3xXBqofXEAXsg==
-Message-ID: <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
-Date: Tue, 21 Nov 2023 23:35:59 +0100
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E580FE7
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 14:37:49 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-59b5484fbe6so64038407b3.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 14:37:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700606269; x=1701211069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5PhJ58DzGJEIVblaXAuceHul3/IImKCshOtqF3D3RDY=;
+        b=G3pUW2bX8byqs35VWE2lNPVsBNcPlbaF5SlaScwyUrgiZSZs00xuRH+KAE+IEGFSEO
+         iaMKubjto92VurzGn40vzoGHqbMnAyi1IEwwVT+TliIjIy9E+xnQhspWx1eYKR/PeMAX
+         TDxIZpd6DUjkgW9Qgw/6ArBgbb7TlH7qK1AJoCjPXtW8BPEC4kXgSdVYK9KNSkJ/pPcQ
+         4qixQneYFUV3fi5ukpH67Z0q/RN//VSyXW3MEgEz1xm8cgclFNDGHfccsjodCS8N9prM
+         HWggSM4a45AxHT1/SM71jHFD2ku1cx41ruYKSRey7XXkvqxADsYeb7lOtMCs+VK9dQDy
+         AfCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700606269; x=1701211069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5PhJ58DzGJEIVblaXAuceHul3/IImKCshOtqF3D3RDY=;
+        b=ambJbm/f/M05Eiu4RGFgU3EXI7MxvEq72PZTpmcbJ8yku7Ve2U/tEJ7J7Mv7iUepZK
+         /j2I6+ub+anN+96CayJzEnqoCgJwGlRM298jim15j/jKGPHdUclfrTkiwgQnb9V6SxkL
+         tzhL+DDaz0uQE1FfxYGMG6JSSejc56HUcpS3DgaBvVkTWdxcQCkf6e2eiisLvqVEJuW6
+         sEwuOC1nt5d9R8rlyq/+QD6iBLcvctLwhjPd427LUYWupyeXYrl75NSbKkYx8bM2SrPT
+         BP9JvWjJh2fg3nOCtv5qLt2kdML+gx+oJ2cyx9xfhqoir2jL+8NLLdpQn5+QQzO/jLAN
+         O8/A==
+X-Gm-Message-State: AOJu0Ywb8v17zDUhtnqxFxxOz6i07vzxsC4E2tzI0KwtZOXJBSQ9bciS
+	+fRp0yk7l42nZlQLz1pmCqzm95PiPR4BvbPld1W1eg==
+X-Google-Smtp-Source: AGHT+IFagDuyax0DNgWQWewr4Jl8bk+ehoQOtcabRwSIbmpcVEP0szwxg8PkrH2pRvlyeDOVm1B6JRdrl1GS+tzgroM=
+X-Received: by 2002:a81:5b06:0:b0:5bf:f907:e07c with SMTP id
+ p6-20020a815b06000000b005bff907e07cmr437425ywb.33.1700606269085; Tue, 21 Nov
+ 2023 14:37:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
- linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com
-References: <20231117235140.1178-1-luizluca@gmail.com>
- <20231117235140.1178-3-luizluca@gmail.com>
- <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
- <20231120134818.e2k673xsjec5scy5@skbuf>
- <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
- <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
- <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231121175640.9981-1-mkoutny@suse.com>
+In-Reply-To: <20231121175640.9981-1-mkoutny@suse.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 21 Nov 2023 17:37:37 -0500
+Message-ID: <CAM0EoM=id7xo1=F5SY2f+hy8a8pkXQ5a0xNJ+JKd9e6o=--RQg@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: cls: Load net classifier modules via alias
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, 
+	Martin Wilck <mwilck@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/11/2023 23:15, Krzysztof Kozlowski wrote:
-> How is this even related to the problem? Please respond with concise
-> messages.
-> 
->> the "XXXX" for modprobe. For DSA tags, module names are generated
->> according to a fixed rule based on the tag name. However, the switch
->> variants do not have a fixed relation between module name and switch
->> families (actually, there is not even a switch family name). I could
->> (and did in a previous RFC) use the match data to inform each module
->> name. However, it adds a non-obvious relation between the module name
->> (defined in Makefile) and a string in code. I was starting to
->> implement a lookup table to match compatible strings to their module
->> names when I realized that I was just mapping a string to a module
->> name, something like what module alias already does. That's when the
->> MODULE_ALIAS("<the compatible string>") was introduced.
->>
->> After this discussion, I have some questions:
->>
->> I'm declaring the of_device_id match table in realtek-common as it is
->> the same for both interfaces. I also moved MODULE_DEVICE_TABLE(of,
->> realtek_common_of_match) to realtek-common. Should I keep the
->> MODULE_DEVICE_TABLE() on each interface module (referencing the same
->> table), or is it okay to keep it in the realtek-common module? If I
-> 
-> Why would you have the same compatible entries in different modules? You
-> do understand that device node will become populated on first bind (bind
-> of the first device)?
-> 
->> need to move it to each interface module, can I reuse a shared
->> of_device_id match table declared in realtek-common?
->>
->> If MODULE_ALIAS is not an acceptable solution, what would be the right
->> one? Go back to the static mapping between the compatible string and
->> the module name or is there a better solution?
+On Tue, Nov 21, 2023 at 12:56=E2=80=AFPM Michal Koutn=C3=BD <mkoutny@suse.c=
+om> wrote:
+>
+> The classifier modules may be loaded lazily without user's awareness and
+> control. Add respective aliases to modules and request them under these
+> aliases so that modprobe's blacklisting mechanism works also for
+> classifier modules. (The same pattern exists e.g. for filesystem
+> modules.)
+>
 
-Probably the solution is to make the design the same as for all other
-complex drivers supporting more than one bus. If your ID table is
-defined in modules A and B, then their loading should not depend on
-aliases put in some additional "common" module. We solved this many
-times for devices residing on multiple buses (e.g. I2C and SPI), so why
-this has to be done in reverse order?
+Hi Michal,
+Dumb question: What's speacial about the "tcf- '' that makes it work
+better for filtering than existing "cls_" prefix? What about actions
+(prefix "act_") etc?
 
-If you ask what would be the acceptable solution, then my answer is: do
-the same as for most of other drivers, do not reinvent stuff like
-putting same ID table or module alias in two modules. The table is
-defined only once in each driver being loaded on uevent. From that
-driver you probe whatever device you have, including calling any common
-code, subprobes, subvariants etc.
+cheers,
+jamal
 
-Best regards,
-Krzysztof
-
+> Original module names remain unchanged.
+>
+> Signed-off-by: Michal Koutn=C3=BD <mkoutny@suse.com>
+> ---
+>  include/net/pkt_cls.h    | 1 +
+>  net/sched/cls_api.c      | 2 +-
+>  net/sched/cls_basic.c    | 1 +
+>  net/sched/cls_bpf.c      | 1 +
+>  net/sched/cls_cgroup.c   | 1 +
+>  net/sched/cls_flow.c     | 1 +
+>  net/sched/cls_flower.c   | 1 +
+>  net/sched/cls_fw.c       | 1 +
+>  net/sched/cls_matchall.c | 1 +
+>  net/sched/cls_route.c    | 1 +
+>  net/sched/cls_u32.c      | 1 +
+>  11 files changed, 11 insertions(+), 1 deletion(-)
+>
+> This is primarily for TC subsystem maintainers where the
+> request_module() resides but Cc list is large because of touches in
+> various classifier modules.
+>
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index a76c9171db0e..424b4f889feb 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -24,6 +24,7 @@ struct tcf_walker {
+>
+>  int register_tcf_proto_ops(struct tcf_proto_ops *ops);
+>  void unregister_tcf_proto_ops(struct tcf_proto_ops *ops);
+> +#define MODULE_ALIAS_TCF(kind) MODULE_ALIAS("tcf-" __stringify(kind))
+>
+>  struct tcf_block_ext_info {
+>         enum flow_block_binder_type binder_type;
+> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> index 1976bd163986..02fdcceee083 100644
+> --- a/net/sched/cls_api.c
+> +++ b/net/sched/cls_api.c
+> @@ -257,7 +257,7 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held=
+,
+>  #ifdef CONFIG_MODULES
+>         if (rtnl_held)
+>                 rtnl_unlock();
+> -       request_module("cls_%s", kind);
+> +       request_module("tcf-%s", kind);
+>         if (rtnl_held)
+>                 rtnl_lock();
+>         ops =3D __tcf_proto_lookup_ops(kind);
+> diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
+> index a1f56931330c..a3500ac7fc1a 100644
+> --- a/net/sched/cls_basic.c
+> +++ b/net/sched/cls_basic.c
+> @@ -328,6 +328,7 @@ static struct tcf_proto_ops cls_basic_ops __read_most=
+ly =3D {
+>         .bind_class     =3D       basic_bind_class,
+>         .owner          =3D       THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("basic");
+>
+>  static int __init init_basic(void)
+>  {
+> diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+> index 382c7a71f81f..8d57ac155c0c 100644
+> --- a/net/sched/cls_bpf.c
+> +++ b/net/sched/cls_bpf.c
+> @@ -693,6 +693,7 @@ static struct tcf_proto_ops cls_bpf_ops __read_mostly=
+ =3D {
+>         .dump           =3D       cls_bpf_dump,
+>         .bind_class     =3D       cls_bpf_bind_class,
+>  };
+> +MODULE_ALIAS_TCF("bpf");
+>
+>  static int __init cls_bpf_init_mod(void)
+>  {
+> diff --git a/net/sched/cls_cgroup.c b/net/sched/cls_cgroup.c
+> index 7ee8dbf49ed0..0ded7d79894c 100644
+> --- a/net/sched/cls_cgroup.c
+> +++ b/net/sched/cls_cgroup.c
+> @@ -209,6 +209,7 @@ static struct tcf_proto_ops cls_cgroup_ops __read_mos=
+tly =3D {
+>         .dump           =3D       cls_cgroup_dump,
+>         .owner          =3D       THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("cgroup");
+>
+>  static int __init init_cgroup_cls(void)
+>  {
+> diff --git a/net/sched/cls_flow.c b/net/sched/cls_flow.c
+> index 6ab317b48d6c..2806aa1254e1 100644
+> --- a/net/sched/cls_flow.c
+> +++ b/net/sched/cls_flow.c
+> @@ -702,6 +702,7 @@ static struct tcf_proto_ops cls_flow_ops __read_mostl=
+y =3D {
+>         .walk           =3D flow_walk,
+>         .owner          =3D THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("flow");
+>
+>  static int __init cls_flow_init(void)
+>  {
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index e5314a31f75a..739e09e0fa57 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -3633,6 +3633,7 @@ static struct tcf_proto_ops cls_fl_ops __read_mostl=
+y =3D {
+>         .owner          =3D THIS_MODULE,
+>         .flags          =3D TCF_PROTO_OPS_DOIT_UNLOCKED,
+>  };
+> +MODULE_ALIAS_TCF("flower");
+>
+>  static int __init cls_fl_init(void)
+>  {
+> diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+> index afc534ee0a18..86c833885a2d 100644
+> --- a/net/sched/cls_fw.c
+> +++ b/net/sched/cls_fw.c
+> @@ -433,6 +433,7 @@ static struct tcf_proto_ops cls_fw_ops __read_mostly =
+=3D {
+>         .bind_class     =3D       fw_bind_class,
+>         .owner          =3D       THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("fw");
+>
+>  static int __init init_fw(void)
+>  {
+> diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
+> index c4ed11df6254..21ba73978c6a 100644
+> --- a/net/sched/cls_matchall.c
+> +++ b/net/sched/cls_matchall.c
+> @@ -398,6 +398,7 @@ static struct tcf_proto_ops cls_mall_ops __read_mostl=
+y =3D {
+>         .bind_class     =3D mall_bind_class,
+>         .owner          =3D THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("matchall");
+>
+>  static int __init cls_mall_init(void)
+>  {
+> diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
+> index 12a505db4183..a4701c0752df 100644
+> --- a/net/sched/cls_route.c
+> +++ b/net/sched/cls_route.c
+> @@ -671,6 +671,7 @@ static struct tcf_proto_ops cls_route4_ops __read_mos=
+tly =3D {
+>         .bind_class     =3D       route4_bind_class,
+>         .owner          =3D       THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("route");
+>
+>  static int __init init_route4(void)
+>  {
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index d5bdfd4a7655..a969adbd7423 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -1453,6 +1453,7 @@ static struct tcf_proto_ops cls_u32_ops __read_most=
+ly =3D {
+>         .bind_class     =3D       u32_bind_class,
+>         .owner          =3D       THIS_MODULE,
+>  };
+> +MODULE_ALIAS_TCF("u32");
+>
+>  static int __init init_u32(void)
+>  {
+> --
+> 2.42.1
+>
 
