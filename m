@@ -1,119 +1,210 @@
-Return-Path: <netdev+bounces-49659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C002D7F2E9A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:43:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54807F2F30
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF4491C21457
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:43:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 278F71F24338
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4062951C3D;
-	Tue, 21 Nov 2023 13:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B7B537F1;
+	Tue, 21 Nov 2023 13:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="DvLx8PPa"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wcOidUfs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0FD194;
-	Tue, 21 Nov 2023 05:43:21 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2FB181F8B4;
-	Tue, 21 Nov 2023 13:43:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1700574200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=0pnnsaCagmVeVOPbeelzrThd66fcAXAiseFRzraRvKo=;
-	b=DvLx8PPafiN+eloIRTUS3w/qOkbdxAlxkB9q7a5zpOFo/LxI81NQn8ZxBUYaOQ2G2QnzNH
-	QdEmxmE42YNHfiJQFoZjjsRoaT+jU/jjL7tiwn3hq6MdgijhIavfwYnwFNxnqSANY69t5/
-	/te8lNliKx21Tx/zTGSeTfPuepHLgoI=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E2998139FD;
-	Tue, 21 Nov 2023 13:43:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id ljuhNfezXGWlOQAAMHmgww
-	(envelope-from <oneukum@suse.com>); Tue, 21 Nov 2023 13:43:19 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [PATCH] USB: gl620a: check for rx buffer overflow
-Date: Tue, 21 Nov 2023 14:43:15 +0100
-Message-ID: <20231121134315.18721-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.42.1
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E609510D2
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 05:47:52 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5cb96ef7ac6so6850397b3.3
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 05:47:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700574472; x=1701179272; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VerNT8Gw12YAOZTvRS0cxBeag4LD9p5tqA+hOCXMkm4=;
+        b=wcOidUfs38u8jnj2H8TVXVfvkQeN4xtQjMQnbZPfH9MnDLqLdS2pg1YKxrzZJunLeJ
+         ng+LBwvRsPAhEtx43V5HyDYBmebwje5j39/cjHraDZP9RUQdhayIXSDwr6/0q16cLqM7
+         gupQ1E3aqYGRn18qXBiWYsXUu63h0zYQuNmEGbfvA4p8h195CWC8JICbcsccXNuSCgVQ
+         aMO9zdw3eSoIj1BC197uSw2WHFPSPl+ILUYWqDlZXssl5n8bs01MjD26pDGDlDSAaXHJ
+         W/KGKOBoEm3oHW9KR1qzUFuSObnKh0YR49T//RVChCmwy6O9Cr6CxBQM0mveCMKsYwIT
+         KEtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700574472; x=1701179272;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VerNT8Gw12YAOZTvRS0cxBeag4LD9p5tqA+hOCXMkm4=;
+        b=MSTz7IsoiWHpgCcC0efmogUPEqZPMSDP44Y3AjL+FB3Pi6mnlgn9YDZuJhcKEp6Rxy
+         tCJ3Wmn3ntd60QoF5cKvWcKHxEzgLXGjC4KxaS/9N9YUCWnfOOewf27meakIHxG86JJE
+         ZWrfO/18LcZT+RrpUuyMhi6F6ZSVNwLJ8NL6LieSlEdQpTPzNr0vxSLeO4D1c6rpUyfm
+         vYbf81wuWmZlBiVb5OpsHfPyBkVhUU2aZR/JQwMmB2T7QtqeySDj0gHX8WUy+ACkuGmK
+         5NWNjurOPef4SSMoGHEFpR6a2Kz0qQQZqBHTtsuOsWXlCtJhnb6w1dXOXLnC8Q2yJv+4
+         uqyw==
+X-Gm-Message-State: AOJu0YyCuOR2lceQ74xFIXzhgakORLWQok+zxdAWEAlZk5EfMY+t9yM8
+	MQ/DQKdFZa5NW5QQQfaNUGl4nMquV8ZV45CLT7eD8A==
+X-Google-Smtp-Source: AGHT+IGidjeQm7rHBiaDQFbjYGYX0jS7jFnwE7kpC9ngfb9OMd4RTZqw3Z/nFwGX0mNivieuXGn2zoO/akBE4N6zp0A=
+X-Received: by 2002:a81:79cd:0:b0:5cb:c143:cd90 with SMTP id
+ u196-20020a8179cd000000b005cbc143cd90mr1141125ywc.35.1700574472123; Tue, 21
+ Nov 2023 05:47:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Score: 3.70
-X-Spamd-Result: default: False [3.70 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 R_MISSING_CHARSET(2.50)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 MID_CONTAINS_FROM(1.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[15.17%]
+References: <655707db8d55e_55d7320812@john.notmuch> <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
+ <6557b2e5f3489_5ada920871@john.notmuch> <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
+ <ZVspOBmzrwm8isiD@nanopsycho> <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
+ <ZVuhBlYRwi8eGiSF@nanopsycho> <CAM0EoMknA01gmGX-XLH4fT_yW9H82bN3iNYEvFRypvTwARiNqg@mail.gmail.com>
+ <2a7d6f27-3464-c57b-b09d-55c03bc5eae6@iogearbox.net> <CAM0EoMkBHqRU9tprJ-SK3tKMfcGsnydp0UA9cH2ALjpSNyJhig@mail.gmail.com>
+ <ZVyrRFDrVqluD9k/@nanopsycho>
+In-Reply-To: <ZVyrRFDrVqluD9k/@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 21 Nov 2023 08:47:40 -0500
+Message-ID: <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
+	dan.daly@intel.com, chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The driver checks for a single package overflowing
-maximum size. That needs to be done, but it is not
-enough. As a single transmission can contain a high
-number of packets, we also need to check whether
-the aggregate of messages in itself short enough
-overflow the buffer.
-That is easiest done by checking that the current
-packet does not overflow the buffer.
+On Tue, Nov 21, 2023 at 8:06=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Mon, Nov 20, 2023 at 11:56:50PM CET, jhs@mojatatu.com wrote:
+> >On Mon, Nov 20, 2023 at 4:49=E2=80=AFPM Daniel Borkmann <daniel@iogearbo=
+x.net> wrote:
+> >>
+> >> On 11/20/23 8:56 PM, Jamal Hadi Salim wrote:
+> >> > On Mon, Nov 20, 2023 at 1:10=E2=80=AFPM Jiri Pirko <jiri@resnulli.us=
+> wrote:
+> >> >> Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
+>
+> [...]
+>
+> >
+> >> tc BPF and XDP already have widely used infrastructure and can be deve=
+loped
+> >> against libbpf or other user space libraries for a user space control =
+plane.
+> >> With 'control plane' you refer here to the tc / netlink shim you've bu=
+ilt,
+> >> but looking at the tc command line examples, this doesn't really provi=
+de a
+> >> good user experience (you call it p4 but people load bpf obj files). I=
+f the
+> >> expectation is that an operator should run tc commands, then neither i=
+t's
+> >> a nice experience for p4 nor for BPF folks. From a BPF PoV, we moved o=
+ver
+> >> to bpf_mprog and plan to also extend this for XDP to have a common loo=
+k and
+> >> feel wrt networking for developers. Why can't this be reused?
+> >
+> >The filter loading which loads the program is considered pipeline
+> >instantiation - consider it as "provisioning" more than "control"
+> >which runs at runtime. "control" is purely netlink based. The iproute2
+> >code we use links libbpf for example for the filter. If we can achieve
+> >the same with bpf_mprog then sure - we just dont want to loose
+> >functionality though.  off top of my head, some sample space:
+> >- we could have multiple pipelines with different priorities (which tc
+> >provides to us) - and each pipeline may have its own logic with many
+> >tables etc (and the choice to iterate the next one is essentially
+> >encoded in the tc action codes)
+> >- we use tc block to map groups of ports (which i dont think bpf has
+> >internal access of)
+> >
+> >In regards to usability: no i dont expect someone doing things at
+> >scale to use command line tc. The APIs are via netlink. But the tc cli
+> >is must for the rest of the masses per our traditions. Also i really
+>
+> I don't follow. You repeatedly mention "the must of the traditional tc
+> cli", but what of the existing traditional cli you use for p4tc?
+> If I look at the examples, pretty much everything looks new to me.
+> Example:
+>
+>   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
+>     action send_to_port param port eno1
+>
+> This is just TC/RTnetlink used as a channel to pass new things over. If
+> that is the case, what's traditional here?
+>
 
-Signed-off-ny: Oliver Neukum <oneukum@suse.com>
----
- drivers/net/usb/gl620a.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/usb/gl620a.c b/drivers/net/usb/gl620a.c
-index 46af78caf457..d33ae15abdc1 100644
---- a/drivers/net/usb/gl620a.c
-+++ b/drivers/net/usb/gl620a.c
-@@ -104,6 +104,10 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
- 			return 0;
- 		}
- 
-+		/* we also need to check for overflowing the buffer */
-+		if (size > skb->len)
-+			return 0;
-+
- 		// allocate the skb for the individual packet
- 		gl_skb = alloc_skb(size, GFP_ATOMIC);
- 		if (gl_skb) {
--- 
-2.42.1
+What is not traditional about it?
 
+>
+> >didnt even want to use ebpf at all for operator experience reasons -
+> >it requires a compilation of the code and an extra loading compared to
+> >what our original u32/pedit code offered.
+> >
+> >> I don't quite follow why not most of this could be implemented entirel=
+y in
+> >> user space without the detour of this and you would provide a develope=
+r
+> >> library which could then be integrated into a p4 runtime/frontend? Thi=
+s
+> >> way users never interface with ebpf parts nor tc given they also shoul=
+dn't
+> >> have to - it's an implementation detail. This is what John was also po=
+inting
+> >> out earlier.
+> >>
+> >
+> >Netlink is the API. We will provide a library for object manipulation
+> >which abstracts away the need to know netlink. Someone who for their
+> >own reasons wants to use p4runtime or TDI could write on top of this.
+> >I would not design a kernel interface to just meet p4runtime (we
+> >already have TDI which came later which does things differently). So i
+> >expect us to support both those two. And if i was to do something on
+> >SDN that was more robust i would write my own that still uses these
+> >netlink interfaces.
+>
+> Actually, what Daniel says about the p4 library used as a backend to p4
+> frontend is pretty much aligned what I claimed on the p4 calls couple of
+> times. If you have this p4 userspace tooling, it is easy for offloads to
+> replace the backed by vendor-specific library which allows p4 offload
+> suitable for all vendors (your plan of p4tc offload does not work well
+> for our hw, as we repeatedly claimed).
+>
+
+That's you - NVIDIA. You have chosen a path away from the kernel
+towards DOCA. I understand NVIDIA's frustration with dealing with
+upstream process (which has been cited to me as a good reason for
+DOCA) but please dont impose these values and your politics on other
+vendors(Intel, AMD for example) who are more than willing to invest
+into making the kernel interfaces the path forward. Your choice.
+Nobody is stopping you from offering your customers proprietary
+solutions which include a specific ebpf approach alongside DOCA. We
+believe that a singular interface regardless of the vendor is the
+right way forward. IMHO, this siloing that unfortunately is also added
+by eBPF being a double edged sword is not good for the community.
+
+> As I also said on the p4 call couple of times, I don't see the kernel
+> as the correct place to do the p4 abstractions. Why don't you do it in
+> userspace and give vendors possiblity to have p4 backends with compilers,
+> runtime optimizations etc in userspace, talking to the HW in the
+> vendor-suitable way too. Then the SW implementation could be easily eBPF
+> and the main reason (I believe) why you need to have this is TC
+> (offload) is then void.
+>
+> The "everyone wants to use TC/netlink" claim does not seem correct
+> to me. Why not to have one Linux p4 solution that fits everyones needs?
+
+You mean more fitting to the DOCA world? no, because iam a kernel
+first person and kernel interfaces are good for everyone.
+
+cheers,
+jamal
 
