@@ -1,164 +1,129 @@
-Return-Path: <netdev+bounces-49769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079D67F36AE
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:13:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E24957F36AF
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E46831C20986
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:13:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB57B1C20B61
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B211220DE4;
-	Tue, 21 Nov 2023 19:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989EC59161;
+	Tue, 21 Nov 2023 19:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cXZ1D/3h"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="nh+BfHI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C9991;
-	Tue, 21 Nov 2023 11:13:02 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALI8HKM008875;
-	Tue, 21 Nov 2023 11:12:55 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=AWKC+GczEkhuiGyImuPiTHSlgjHzmEvA5QGEFZps9BA=;
- b=cXZ1D/3h4P93mDyunsMEDn2UiRv5CkosraWU9trNJw3gWMnbsZ/pTR/4gMw1/+BIiMRl
- GaFYTwrFbzYnVz4qo631F5+URpNeqw3hgul8hu9Vlv3nT6WlaMCIhnNDvasojhPT+Q5n
- XmOhjQTY2Nv01enj+nm6WOn6LXowdmcY3VQCWof3oYp7kRa60EjDjuvYrxA8O+bie/yM
- ruhL10ckUBCP60kJ5jh+b0zUoj7H7auUCMxwEk19WLrpQHHa+tJSMQA/UqAzgrH3vgOy
- i/xXM/ZkT8o2ABwMhM1+rZmjfA/PHOpPFT+sXfxIb8fdDsuoHvNZJ36cbzweHL9fmXB/ SA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uh1jb87a8-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 21 Nov 2023 11:12:55 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 21 Nov
- 2023 11:12:54 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 21 Nov 2023 11:12:54 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 226395B6922;
-	Tue, 21 Nov 2023 11:12:54 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net-next v1] octeon_ep: get max rx packet length from firmware
-Date: Tue, 21 Nov 2023 11:12:23 -0800
-Message-ID: <20231121191224.2489474-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A084A110
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 11:13:15 -0800 (PST)
+X-KPN-MessageId: ffad03d6-88a1-11ee-a95f-005056abbe64
+Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id ffad03d6-88a1-11ee-a95f-005056abbe64;
+	Tue, 21 Nov 2023 20:13:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=ljdYkpkWzVVHQf9D1GVF+nu60LCCrweTOGhk6X/ACdI=;
+	b=nh+BfHI0W1E9q4ZYVwta6309tAGNsLRhJ0Y0SwWFXUunx4EcsA4IIFrEWVtj06kVZQAykNtnNxcrp
+	 dliR+DJEwovOH9uaTNznaYYMAbYaEmq6WYTFegNCQGnJCPhpz8T9QrJDA6YQHkS6aoTKYCWvpMMVMF
+	 LDohNp0BlCHJRHGE=
+X-KPN-MID: 33|b9UAv2Toq9Ju9tW1YhIWxdY14SsqdOibvIEhfMpX878SCJxZx6CpW7/nFGVCqKR
+ JFktEVmhjvXfKzdmJfMhqXd2IGTTFsH+x3yL2Pp4mmmA=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|Ak7Fv6JTBcjWU3cuIuJzlV2XFeePo6zc42uSVBTax8iNl24q39/HLy5aViyLMBx
+ CfWl+gyfbKHT8jNHPfVJSCw==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 03b7e6cb-88a2-11ee-a7b1-005056ab7447;
+	Tue, 21 Nov 2023 20:13:13 +0100 (CET)
+Date: Tue, 21 Nov 2023 20:13:12 +0100
+From: Antony Antony <antony@phenome.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [RFC ipsec-next v2 0/8] Add IP-TFS mode to xfrm
+Message-ID: <ZV0BSBzNh3UIqueZ@Antony2201.local>
+References: <20231113035219.920136-1-chopps@chopps.org>
+ <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: eTbUaV7jKAe1Ld-2L-H9UrIGKwgh5hvy
-X-Proofpoint-GUID: eTbUaV7jKAe1Ld-2L-H9UrIGKwgh5hvy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-21_10,2023-11-21_01,2023-05-22_02
+In-Reply-To: <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
 
-Fill max rx packet length value from firmware.
+On Mon, Nov 13, 2023 at 08:15:47AM +0100, Steffen Klassert via Devel wrote:
+> On Sun, Nov 12, 2023 at 10:52:11PM -0500, Christian Hopps wrote:
+> > From: Christian Hopps <chopps@labn.net>
+> > 
+> > This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
+> > (AggFrag encapsulation) has been standardized in RFC9347.
+> > 
+> > Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+> > 
+> > This feature supports demand driven (i.e., non-constant send rate) IP-TFS to
+> > take advantage of the AGGFRAG ESP payload encapsulation. This payload type
+> > supports aggregation and fragmentation of the inner IP packet stream which in
+> > turn yields higher small-packet bandwidth as well as reducing MTU/PMTU issues.
+> > Congestion control is unimplementated as the send rate is demand driven rather
+> > than constant.
+> > 
+> > In order to allow loading this fucntionality as a module a set of callbacks
+> > xfrm_mode_cbs has been added to xfrm as well.
+> 
+> I did a multiple days peer review with Chris on this pachset. So my
+> concerns are already addressed.
+> 
+> Further reviews are welcome! This is a bigger change and it would
+> be nice if more people could look at it.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
- .../marvell/octeon_ep/octep_ctrl_net.c         | 18 ++++++++++++++++++
- .../marvell/octeon_ep/octep_ctrl_net.h         |  9 +++++++++
- .../ethernet/marvell/octeon_ep/octep_main.c    | 10 +++++++++-
- 3 files changed, 36 insertions(+), 1 deletion(-)
+I'd like to pose a basic question to understand the new IP-TFS config 
+options for an SA.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 6dd3d03c1c0f..c9fcebb9bd9b 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -198,6 +198,24 @@ int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
- 	return octep_send_mbox_req(oct, &d, wait_for_response);
- }
- 
-+int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid)
-+{
-+	struct octep_ctrl_net_wait_data d = {0};
-+	struct octep_ctrl_net_h2f_req *req;
-+	int err;
-+
-+	req = &d.data.req;
-+	init_send_req(&d.msg, req, mtu_sz, vfid);
-+	req->hdr.s.cmd = OCTEP_CTRL_NET_H2F_CMD_MTU;
-+	req->mtu.cmd = OCTEP_CTRL_NET_CMD_GET;
-+
-+	err = octep_send_mbox_req(oct, &d, true);
-+	if (err < 0)
-+		return err;
-+
-+	return d.data.resp.mtu.val;
-+}
-+
- int octep_ctrl_net_set_mtu(struct octep_device *oct, int vfid, int mtu,
- 			   bool wait_for_response)
- {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-index 4bb97ad1f1c6..46ddaa5c64d1 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-@@ -282,6 +282,15 @@ int octep_ctrl_net_get_mac_addr(struct octep_device *oct, int vfid, u8 *addr);
- int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
- 				bool wait_for_response);
- 
-+/** Get max MTU from firmware.
-+ *
-+ * @param oct: non-null pointer to struct octep_device.
-+ * @param vfid: Index of virtual function.
-+ *
-+ * return value: mtu on success, -errno on failure.
-+ */
-+int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid);
-+
- /** Set mtu in firmware.
-  *
-  * @param oct: non-null pointer to struct octep_device.
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 3cee69b3ac38..f9c539178114 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1276,6 +1276,7 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	struct octep_device *octep_dev = NULL;
- 	struct net_device *netdev;
-+	int max_rx_pktlen;
- 	int err;
- 
- 	err = pci_enable_device(pdev);
-@@ -1346,8 +1347,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	netdev->hw_features = NETIF_F_SG;
- 	netdev->features |= netdev->hw_features;
-+
-+	max_rx_pktlen = octep_ctrl_net_get_mtu(octep_dev, OCTEP_CTRL_NET_INVALID_VFID);
-+	if (max_rx_pktlen < 0) {
-+		dev_err(&octep_dev->pdev->dev,
-+			"Failed to get max receive packet size; err = %d\n", max_rx_pktlen);
-+		goto register_dev_err;
-+	}
- 	netdev->min_mtu = OCTEP_MIN_MTU;
--	netdev->max_mtu = OCTEP_MAX_MTU;
-+	netdev->max_mtu = max_rx_pktlen - (ETH_HLEN + ETH_FCS_LEN);
- 	netdev->mtu = OCTEP_DEFAULT_MTU;
- 
- 	err = octep_ctrl_net_get_mac_addr(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
--- 
-2.25.1
+When configuring IP-TFS parameters on an SA, are all parameters actively 
+used by that SA? or does their usage vary based on the direction of the 
+traffic?
+Currently, each IP-TFS SA includes both init-delay and drop-time parameters. 
+I would like to understand whether both parameters are necessary for every SA.
 
+ip xfrm state
+
+src 2001:db8:1:2::45 dst 2001:db8:1:2::23
+proto esp spi 0x32af1f6d reqid 16389 mode iptfs
+replay-window 0 flag af-unspec esn
+aead rfc4106(gcm(aes)) 0x0... 128
+anti-replay esn context:
+seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0x0
+replay_window 128, bitmap-length 4
+00000000 00000000 00000000 00000000
+iptfs-opts pkt-size 0 max-queue-size 1048576 drop-time 1000000 reorder-window 3 init-delay 0
+
+Chris, would like to you share which of iptfs-opts are for input and which 
+are for output?
+
+My current understanding suggests that, depending on the traffic direction, 
+onlysome of these parameters might be in active use for each SA. If this is 
+indeed the case, I propose we discuss the possibility of refining our 
+configuration approach. Could we consider making these parameters mutually 
+exclusive and dependent on the traffic direction? Furthermore, given that 
+the xfrm community has previously discussed the idea of adding direction to 
+the SA — a concept also used in hardware offload scenarios — why not explore 
+adding direction to the SA?
+
+We currently have DIR with offload.
+
+ip xfrm state { add | update } ... offload [ crypto|packet ] dev DEV dir DIR
+
+Implementing direction could imply that an IP-TFS SA would require only fewer parameters
+– init-delay or drop-time, depending on the specified direction. This would 
+make ip x s output simple and comprehensible, thereby reducing potential 
+confusion. Also avoid confusing when creating state say input, why add 
+output parameters to an input SA?"
 
