@@ -1,210 +1,139 @@
-Return-Path: <netdev+bounces-49660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54807F2F30
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:48:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113BB7F2FDA
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 278F71F24338
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:48:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 409EE1C21004
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B7B537F1;
-	Tue, 21 Nov 2023 13:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE2E53808;
+	Tue, 21 Nov 2023 13:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wcOidUfs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iA8kQSC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E609510D2
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 05:47:52 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5cb96ef7ac6so6850397b3.3
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 05:47:52 -0800 (PST)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E1ED72;
+	Tue, 21 Nov 2023 05:53:39 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-332c82400a5so1376706f8f.0;
+        Tue, 21 Nov 2023 05:53:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700574472; x=1701179272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VerNT8Gw12YAOZTvRS0cxBeag4LD9p5tqA+hOCXMkm4=;
-        b=wcOidUfs38u8jnj2H8TVXVfvkQeN4xtQjMQnbZPfH9MnDLqLdS2pg1YKxrzZJunLeJ
-         ng+LBwvRsPAhEtx43V5HyDYBmebwje5j39/cjHraDZP9RUQdhayIXSDwr6/0q16cLqM7
-         gupQ1E3aqYGRn18qXBiWYsXUu63h0zYQuNmEGbfvA4p8h195CWC8JICbcsccXNuSCgVQ
-         aMO9zdw3eSoIj1BC197uSw2WHFPSPl+ILUYWqDlZXssl5n8bs01MjD26pDGDlDSAaXHJ
-         W/KGKOBoEm3oHW9KR1qzUFuSObnKh0YR49T//RVChCmwy6O9Cr6CxBQM0mveCMKsYwIT
-         KEtg==
+        d=gmail.com; s=20230601; t=1700574818; x=1701179618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d9v2mri0GlqJoBYwcjZqN/OD5vyWC0Ay18Him7NXwiw=;
+        b=iA8kQSC+jFMGhCNyAN/8b4cdS0B6Fz69WfcrPoXi+pWvSy/+7pu11quFp5Xfr8AxIx
+         316dh7wSA5YqtmHDMduWWqLQIovG2AfMGcjT+vhTKnCG7rlByz097uJik9b5RdNxc+pq
+         j6rlG8pgBaSUIORDzZJ5eaNSrVAA27mPKNGnvS9K/Ff8laKFU4ik24XPkhR8x23YhDtw
+         wN5F5zJxSAe+KR0YN4d7SKBCl4BWnCERo2hBzF+eJ4PfqXW8X8eqFveGPWbZurfDIqZF
+         mTOJXRceZ+qROZ8/8sSfskBU5Gq5nAXU+i2hoyplKqEukLFnyahJFJOYlz8/42SZYOFf
+         tj+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700574472; x=1701179272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VerNT8Gw12YAOZTvRS0cxBeag4LD9p5tqA+hOCXMkm4=;
-        b=MSTz7IsoiWHpgCcC0efmogUPEqZPMSDP44Y3AjL+FB3Pi6mnlgn9YDZuJhcKEp6Rxy
-         tCJ3Wmn3ntd60QoF5cKvWcKHxEzgLXGjC4KxaS/9N9YUCWnfOOewf27meakIHxG86JJE
-         ZWrfO/18LcZT+RrpUuyMhi6F6ZSVNwLJ8NL6LieSlEdQpTPzNr0vxSLeO4D1c6rpUyfm
-         vYbf81wuWmZlBiVb5OpsHfPyBkVhUU2aZR/JQwMmB2T7QtqeySDj0gHX8WUy+ACkuGmK
-         5NWNjurOPef4SSMoGHEFpR6a2Kz0qQQZqBHTtsuOsWXlCtJhnb6w1dXOXLnC8Q2yJv+4
-         uqyw==
-X-Gm-Message-State: AOJu0YyCuOR2lceQ74xFIXzhgakORLWQok+zxdAWEAlZk5EfMY+t9yM8
-	MQ/DQKdFZa5NW5QQQfaNUGl4nMquV8ZV45CLT7eD8A==
-X-Google-Smtp-Source: AGHT+IGidjeQm7rHBiaDQFbjYGYX0jS7jFnwE7kpC9ngfb9OMd4RTZqw3Z/nFwGX0mNivieuXGn2zoO/akBE4N6zp0A=
-X-Received: by 2002:a81:79cd:0:b0:5cb:c143:cd90 with SMTP id
- u196-20020a8179cd000000b005cbc143cd90mr1141125ywc.35.1700574472123; Tue, 21
- Nov 2023 05:47:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700574818; x=1701179618;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d9v2mri0GlqJoBYwcjZqN/OD5vyWC0Ay18Him7NXwiw=;
+        b=aqXXgd2KYf7hzMSob2eACpCmZG+cVtWpuSsipFQ/b3uapZBfEdJ5qMA5PQ4A7t7fWR
+         nZD+WGxK6tJ5a7OUv7o/Ml7PjFqRz3ivylFBpWEIRNLAcaGN8FuMk4z+KbErSVzK54eW
+         ljYfgxnyTOAJD6jleA+MeYszdhU4PrDQTYOJB3TnydXln8T3aS1RVI0+geEsOm+HwpEQ
+         YLoABjFqigo4XmrCVTbVnqc7F0MFNY6RKPu2JLciwwTpfFLroRgcKVjYrXevqqVNh21r
+         yQ26KHB6W5wTPfm8u/72u0jc8OF4b2U5P50uv8vLutoZN3QIfZCH35CCy0gKY17ZHi3T
+         YIaQ==
+X-Gm-Message-State: AOJu0Yw93OqkZhcmCA1HVByxecvhY0R86jpOxs8w2kEYpXbEnIxUm1WF
+	5c5nBb4zjHsQZzz47ezfRnk=
+X-Google-Smtp-Source: AGHT+IEvETv/u7EyA2zlFgBolEG3fdf+Q9YFSmkGv+7D6VSBeNBiPaGCAeab5oGQLKj+r6BC/3lgGA==
+X-Received: by 2002:a5d:47af:0:b0:332:cae7:2ed4 with SMTP id 15-20020a5d47af000000b00332cae72ed4mr3402756wrb.29.1700574817401;
+        Tue, 21 Nov 2023 05:53:37 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id v6-20020adfedc6000000b00326dd5486dcsm14406543wro.107.2023.11.21.05.53.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 05:53:36 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: [net-next PATCH v2] net: phy: correctly check soft_reset ret ONLY if defined for PHY
+Date: Tue, 21 Nov 2023 14:53:32 +0100
+Message-Id: <20231121135332.1455-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <655707db8d55e_55d7320812@john.notmuch> <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
- <6557b2e5f3489_5ada920871@john.notmuch> <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
- <ZVspOBmzrwm8isiD@nanopsycho> <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
- <ZVuhBlYRwi8eGiSF@nanopsycho> <CAM0EoMknA01gmGX-XLH4fT_yW9H82bN3iNYEvFRypvTwARiNqg@mail.gmail.com>
- <2a7d6f27-3464-c57b-b09d-55c03bc5eae6@iogearbox.net> <CAM0EoMkBHqRU9tprJ-SK3tKMfcGsnydp0UA9cH2ALjpSNyJhig@mail.gmail.com>
- <ZVyrRFDrVqluD9k/@nanopsycho>
-In-Reply-To: <ZVyrRFDrVqluD9k/@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 21 Nov 2023 08:47:40 -0500
-Message-ID: <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io, 
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
-	dan.daly@intel.com, chris.sommers@keysight.com, john.andy.fingerhut@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 21, 2023 at 8:06=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Mon, Nov 20, 2023 at 11:56:50PM CET, jhs@mojatatu.com wrote:
-> >On Mon, Nov 20, 2023 at 4:49=E2=80=AFPM Daniel Borkmann <daniel@iogearbo=
-x.net> wrote:
-> >>
-> >> On 11/20/23 8:56 PM, Jamal Hadi Salim wrote:
-> >> > On Mon, Nov 20, 2023 at 1:10=E2=80=AFPM Jiri Pirko <jiri@resnulli.us=
-> wrote:
-> >> >> Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
->
-> [...]
->
-> >
-> >> tc BPF and XDP already have widely used infrastructure and can be deve=
-loped
-> >> against libbpf or other user space libraries for a user space control =
-plane.
-> >> With 'control plane' you refer here to the tc / netlink shim you've bu=
-ilt,
-> >> but looking at the tc command line examples, this doesn't really provi=
-de a
-> >> good user experience (you call it p4 but people load bpf obj files). I=
-f the
-> >> expectation is that an operator should run tc commands, then neither i=
-t's
-> >> a nice experience for p4 nor for BPF folks. From a BPF PoV, we moved o=
-ver
-> >> to bpf_mprog and plan to also extend this for XDP to have a common loo=
-k and
-> >> feel wrt networking for developers. Why can't this be reused?
-> >
-> >The filter loading which loads the program is considered pipeline
-> >instantiation - consider it as "provisioning" more than "control"
-> >which runs at runtime. "control" is purely netlink based. The iproute2
-> >code we use links libbpf for example for the filter. If we can achieve
-> >the same with bpf_mprog then sure - we just dont want to loose
-> >functionality though.  off top of my head, some sample space:
-> >- we could have multiple pipelines with different priorities (which tc
-> >provides to us) - and each pipeline may have its own logic with many
-> >tables etc (and the choice to iterate the next one is essentially
-> >encoded in the tc action codes)
-> >- we use tc block to map groups of ports (which i dont think bpf has
-> >internal access of)
-> >
-> >In regards to usability: no i dont expect someone doing things at
-> >scale to use command line tc. The APIs are via netlink. But the tc cli
-> >is must for the rest of the masses per our traditions. Also i really
->
-> I don't follow. You repeatedly mention "the must of the traditional tc
-> cli", but what of the existing traditional cli you use for p4tc?
-> If I look at the examples, pretty much everything looks new to me.
-> Example:
->
->   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
->     action send_to_port param port eno1
->
-> This is just TC/RTnetlink used as a channel to pass new things over. If
-> that is the case, what's traditional here?
->
+Introduced by commit 6e2d85ec0559 ("net: phy: Stop with excessive soft
+reset").
 
+soft_reset call for phy_init_hw had multiple revision across the years
+and the implementation goes back to 2014. Originally was a simple call
+to write the generic PHY reset BIT, it was then moved to a dedicated
+function. It was then added the option for PHY driver to define their
+own special way to reset the PHY. Till this change, checking for ret was
+correct as it was always filled by either the generic reset or the
+custom implementation. This changed tho with commit 6e2d85ec0559 ("net:
+phy: Stop with excessive soft reset"), as the generic reset call to PHY
+was dropped but the ret check was never made entirely optional and
+dependent whether soft_reset was defined for the PHY driver or not.
 
-What is not traditional about it?
+Luckly nothing was ever added before the soft_reset call so the ret
+check (in the case where a PHY didn't had soft_reset defined) although
+wrong, never caused problems as ret was init 0 at the start of
+phy_init_hw.
 
->
-> >didnt even want to use ebpf at all for operator experience reasons -
-> >it requires a compilation of the code and an extra loading compared to
-> >what our original u32/pedit code offered.
-> >
-> >> I don't quite follow why not most of this could be implemented entirel=
-y in
-> >> user space without the detour of this and you would provide a develope=
-r
-> >> library which could then be integrated into a p4 runtime/frontend? Thi=
-s
-> >> way users never interface with ebpf parts nor tc given they also shoul=
-dn't
-> >> have to - it's an implementation detail. This is what John was also po=
-inting
-> >> out earlier.
-> >>
-> >
-> >Netlink is the API. We will provide a library for object manipulation
-> >which abstracts away the need to know netlink. Someone who for their
-> >own reasons wants to use p4runtime or TDI could write on top of this.
-> >I would not design a kernel interface to just meet p4runtime (we
-> >already have TDI which came later which does things differently). So i
-> >expect us to support both those two. And if i was to do something on
-> >SDN that was more robust i would write my own that still uses these
-> >netlink interfaces.
->
-> Actually, what Daniel says about the p4 library used as a backend to p4
-> frontend is pretty much aligned what I claimed on the p4 calls couple of
-> times. If you have this p4 userspace tooling, it is easy for offloads to
-> replace the backed by vendor-specific library which allows p4 offload
-> suitable for all vendors (your plan of p4tc offload does not work well
-> for our hw, as we repeatedly claimed).
->
+To prevent any kind of problem and to make the function cleaner and more
+robust, correctly move the ret check if the soft_reset section making it
+optional and needed only with the function defined.
 
-That's you - NVIDIA. You have chosen a path away from the kernel
-towards DOCA. I understand NVIDIA's frustration with dealing with
-upstream process (which has been cited to me as a good reason for
-DOCA) but please dont impose these values and your politics on other
-vendors(Intel, AMD for example) who are more than willing to invest
-into making the kernel interfaces the path forward. Your choice.
-Nobody is stopping you from offering your customers proprietary
-solutions which include a specific ebpf approach alongside DOCA. We
-believe that a singular interface regardless of the vendor is the
-right way forward. IMHO, this siloing that unfortunately is also added
-by eBPF being a double edged sword is not good for the community.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+Changes v2:
+- Drop Fixes Tag
+- Add Reviewed-by Tag
+- Add Introduced by at the top of the commit description
 
-> As I also said on the p4 call couple of times, I don't see the kernel
-> as the correct place to do the p4 abstractions. Why don't you do it in
-> userspace and give vendors possiblity to have p4 backends with compilers,
-> runtime optimizations etc in userspace, talking to the HW in the
-> vendor-suitable way too. Then the SW implementation could be easily eBPF
-> and the main reason (I believe) why you need to have this is TC
-> (offload) is then void.
->
-> The "everyone wants to use TC/netlink" claim does not seem correct
-> to me. Why not to have one Linux p4 solution that fits everyones needs?
+ drivers/net/phy/phy_device.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-You mean more fitting to the DOCA world? no, because iam a kernel
-first person and kernel interfaces are good for everyone.
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 2ce74593d6e4..478126f6b5bc 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1235,14 +1235,13 @@ int phy_init_hw(struct phy_device *phydev)
+ 
+ 	if (phydev->drv->soft_reset) {
+ 		ret = phydev->drv->soft_reset(phydev);
++		if (ret < 0)
++			return ret;
++
+ 		/* see comment in genphy_soft_reset for an explanation */
+-		if (!ret)
+-			phydev->suspended = 0;
++		phydev->suspended = 0;
+ 	}
+ 
+-	if (ret < 0)
+-		return ret;
+-
+ 	ret = phy_scan_fixups(phydev);
+ 	if (ret < 0)
+ 		return ret;
+-- 
+2.40.1
 
-cheers,
-jamal
 
