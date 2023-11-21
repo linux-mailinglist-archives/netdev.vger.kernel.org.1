@@ -1,110 +1,86 @@
-Return-Path: <netdev+bounces-49583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26B27F290F
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:35:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F87E7F2914
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73214B21715
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:35:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09696281F44
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51833B7BF;
-	Tue, 21 Nov 2023 09:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD7138DC1;
+	Tue, 21 Nov 2023 09:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KukXidsW"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22970FA;
-	Tue, 21 Nov 2023 01:35:25 -0800 (PST)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AL9Z2NX01510597, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AL9Z2NX01510597
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Nov 2023 17:35:02 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Tue, 21 Nov 2023 17:35:03 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 21 Nov 2023 17:35:02 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Tue, 21 Nov 2023 17:35:02 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>, Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Larry Chiu <larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v11 00/13] Add Realtek automotive PCIe driver
-Thread-Topic: [PATCH net-next v11 00/13] Add Realtek automotive PCIe driver
-Thread-Index: AQHaF8hx62WvfSwr8k6No036AHxBZLB8twcAgAfUibA=
-Date: Tue, 21 Nov 2023 09:35:02 +0000
-Message-ID: <6f765fed07f0455bbc46f86698c1b62d@realtek.com>
-References: <20231115133414.1221480-1-justinlai0215@realtek.com>
- <20231116175724.GF109951@vergenet.net>
-In-Reply-To: <20231116175724.GF109951@vergenet.net>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0021D695
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AFF62C433C7;
+	Tue, 21 Nov 2023 09:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700559623;
+	bh=GKaCEsuN2a26DWqLwo7f7sJIvXyNSbixPwgr7S2T4oQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KukXidsWExih6YhB33+yRukb6Bb79ecm3ZWnata59gdf+38j1It0/VBZApn/YYlii
+	 jiEk7iemmTDEuWBazjo9w0QWVKqk2fitcUfdqsAncFc10VfWOzXHgUaV1C7UXsKEtt
+	 c40sv8s657jktZH3GIqQRX6bezDyERC8v1xdBHewbMFSA4P9iWkmfoX3VuX3ofdzP9
+	 oMFi9j+5SXpNGnhxv7b5KnOAidSZyW8CB7s88Au/NY3arVsh/MBCFkeDAE51pWkwms
+	 1NL6pKqp6B/tf+wfHj+lFnyN9xDg30TvjguPxhARjP4c6+o5nSOI9uGaEmlp3YyLf/
+	 5Hrqme9YexaTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 951B1EAA955;
+	Tue, 21 Nov 2023 09:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1] octeon_ep: support Octeon CN10K devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170055962360.22415.12175732590141368949.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Nov 2023 09:40:23 +0000
+References: <20231117103817.2468176-1-srasheed@marvell.com>
+In-Reply-To: <20231117103817.2468176-1-srasheed@marvell.com>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
+ vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
+ pabeni@redhat.com, horms@kernel.org, kuba@kernel.org, davem@davemloft.net,
+ wizhao@redhat.com, konguyen@redhat.com, edumazet@google.com, corbet@lwn.net,
+ vburru@marvell.com, sedara@marvell.com
 
-> On Wed, Nov 15, 2023 at 09:34:01PM +0800, Justin Lai wrote:
-> > This series includes adding realtek automotive ethernet driver and
-> > adding rtase ethernet driver entry in MAINTAINERS file.
-> >
-> > This ethernet device driver for the PCIe interface of Realtek
-> > Automotive Ethernet Switch,applicable to RTL9054, RTL9068, RTL9072,
-> > RTL9075, RTL9068, RTL9071.
->=20
-> ...
->=20
-> >  MAINTAINERS                                   |    7 +
-> >  drivers/net/ethernet/realtek/Kconfig          |   17 +
-> >  drivers/net/ethernet/realtek/Makefile         |    1 +
-> >  drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
-> >  drivers/net/ethernet/realtek/rtase/rtase.h    |  353 +++
-> >  .../net/ethernet/realtek/rtase/rtase_main.c   | 2542 +++++++++++++++++
-> >  drivers/net/ethernet/realtek/rtase/tt.c       | 2542 +++++++++++++++++
-> >  drivers/net/ethernet/realtek/rtase/tt.h       |  353 +++
->=20
-> Hi Justin,
->=20
-> Unless I am mistaken, by the end of this patch set tt.c is identical to
-> rtase_main.c, and tt.h is identical to rtase.h.
->=20
-> If so, why?
+Hello:
 
-Sorry, tt.c and tt.h are redundant codes. This part will be corrected in th=
-e next version of the patch.
->=20
-> $ cd drivers/net/ethernet/realtek/rtase
-> $ sha1sum *.[ch] | sort
-> 9762c7f0fc1acb214d1705905495fad6b902a3c8  rtase.h
-> 9762c7f0fc1acb214d1705905495fad6b902a3c8  tt.h
-> ccfe889f5ae3b6ecfa0dfba91d30fd7beffd4291  rtase_main.c
-> ccfe889f5ae3b6ecfa0dfba91d30fd7beffd4291  tt.c
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 17 Nov 2023 02:38:10 -0800 you wrote:
+> Add PCI Endpoint NIC support for Octeon CN10K devices.
+> CN10K devices are part of Octeon 10 family products with
+> similar PCI NIC characteristics. These include:
+> - CN10KA
+> - CNF10KA
+> - CNF10KB
+> - CN10KB
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v1] octeon_ep: support Octeon CN10K devices
+    https://git.kernel.org/netdev/net-next/c/0807dc76f3bf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
