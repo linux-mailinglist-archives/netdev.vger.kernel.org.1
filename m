@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-49692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2877F3198
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:51:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9767F31BA
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE8071C2145D
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:51:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91342282F35
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3A353A1;
-	Tue, 21 Nov 2023 14:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44738537F9;
+	Tue, 21 Nov 2023 14:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZao+fKC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hU4JPsdt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3B55392;
-	Tue, 21 Nov 2023 14:51:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF260C433D9;
-	Tue, 21 Nov 2023 14:51:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700578267;
-	bh=0Hzbhezg3LEYvk3jV45ChdxYUsSKEP9VDFl59KpQ+cU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fZao+fKCi30D2OU8mkp2CSBObry/17OOuVNUgwlfsTKUlut1qgNQY0AzOoujvrPE+
-	 OpfDJuhCJMtkMquBMoNPtcugiX2F2MbHjrxXPsHUsF/Q+HJRUDfGj6Icj8cBR81Owf
-	 i14mUHT+faWDLif9ZnKlpe0Ov1VZQpGWG+0dBbk1d6tTylKII4TwX4Ckw+0JpGV/JP
-	 HW4Gxe2YCDjZduQmG4nl7UsiDWS1rQRsSBRV8Crt3qEPfRIeRoz89HoIwE54fwi1k2
-	 sS17uQEWs3lmSd4xCWaQMVKn+4mxnSBtWm4B8znU5Nm/PMRy3o8z2FcsbZyvO21EVB
-	 a51o0Ev8BST+Q==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-507a5f2193bso5831580e87.1;
-        Tue, 21 Nov 2023 06:51:06 -0800 (PST)
-X-Gm-Message-State: AOJu0Yx6w5wNfrxxNuYEul6zhV0vv1rdECmR4HuagY2PULVBBqa156cs
-	wqeY4HTBHW65jrxY5rqdk5MDB4nbtEwOSyJLCQ==
-X-Google-Smtp-Source: AGHT+IHAgECyxRGZoAUk3nMcJ8/f2p6QZjyOKysSbNWX5YzA0p6881GhJQrwodpOCv5t41nc17DnYHwCQ59f76jZIn8=
-X-Received: by 2002:a05:6512:1106:b0:50a:7648:349f with SMTP id
- l6-20020a056512110600b0050a7648349fmr1142319lfg.10.1700578265105; Tue, 21 Nov
- 2023 06:51:05 -0800 (PST)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66E012C;
+	Tue, 21 Nov 2023 06:56:54 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AC6211BF211;
+	Tue, 21 Nov 2023 14:56:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700578613;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=khxP4fXOUOIWA699Z/Zj5Syc66Lt+5ABqJOlzJsvRtk=;
+	b=hU4JPsdtnkyQxT0F1F4Q5i4r1EhdISiflUXXD+Zw5eUJr8WZIcQW19HeeaLH7/1JzDSjJ/
+	uYVtkf7/wrGLZEgPF3tsHEGkkY0oJUg99DV5oTPUKiAe1jBE6C2JbprD0TrXJnquTnbsQb
+	s6HBH5N/JeJ3Zf/JTqrKTbESTrtS/b3mlxmslNlvYglR6iOjgZuEdCM4cXX2Cn5359gzYD
+	BOLNGRlsvLYpfKbjSqtw3tAovnZxcIEpJrkwtjQeFA7M3i5umBvrKepydR9WMRKzke9d3n
+	j3b7NlNBxg/ZztRAjckYV9zWXd4Pr8LTyVXwPfDcSj9HAT0ODMcMSVYmyf0ooA==
+Date: Tue, 21 Nov 2023 15:56:50 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 2/9] ethtool: Expand Ethernet Power Equipment
+ with PoE alongside PoDL
+Message-ID: <20231121155650.5c0d2f82@kmaincent-XPS-13-7390>
+In-Reply-To: <44cbe9d3-dbd2-438c-b413-af525426781a@lunn.ch>
+References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
+	<20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
+	<04cb7d87-bb6b-4997-878d-490c17bfdfd0@lunn.ch>
+	<20231120110944.66938859@kmaincent-XPS-13-7390>
+	<20231120111008.GC590719@pengutronix.de>
+	<2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch>
+	<20231121110215.07f61e55@kmaincent-XPS-13-7390>
+	<44cbe9d3-dbd2-438c-b413-af525426781a@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231115210129.3739377-1-robh@kernel.org> <20231116182923.GH109951@vergenet.net>
-In-Reply-To: <20231116182923.GH109951@vergenet.net>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 21 Nov 2023 07:50:52 -0700
-X-Gmail-Original-Message-ID: <CAL_JsqJp=H-O=nkL=f_G=stYOL=1FP=u8w8W+hNor5Zvt+6OrA@mail.gmail.com>
-Message-ID: <CAL_JsqJp=H-O=nkL=f_G=stYOL=1FP=u8w8W+hNor5Zvt+6OrA@mail.gmail.com>
-Subject: Re: [RESEND PATCH] net: can: Use device_get_match_data()
-To: Simon Horman <horms@kernel.org>
-Cc: Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, 
-	Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Michal Simek <michal.simek@amd.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Nov 16, 2023 at 11:29=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Wed, Nov 15, 2023 at 03:01:28PM -0600, Rob Herring wrote:
-> > Use preferred device_get_match_data() instead of of_match_device() to
-> > get the driver match data. With this, adjust the includes to explicitly
-> > include the correct headers.
-> >
-> > Signed-off-by: Rob Herring <robh@kernel.org>
->
-> ...
->
-> > diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.=
-c
-> > index abe58f103043..f17fd43d03c0 100644
-> > --- a/drivers/net/can/xilinx_can.c
-> > +++ b/drivers/net/can/xilinx_can.c
-> > @@ -20,8 +20,8 @@
-> >  #include <linux/module.h>
-> >  #include <linux/netdevice.h>
-> >  #include <linux/of.h>
-> > -#include <linux/of_device.h>
-> >  #include <linux/platform_device.h>
-> > +#include <linux/property.h>
-> >  #include <linux/skbuff.h>
-> >  #include <linux/spinlock.h>
-> >  #include <linux/string.h>
-> > @@ -1726,7 +1726,6 @@ static int xcan_probe(struct platform_device *pde=
-v)
-> >       struct net_device *ndev;
-> >       struct xcan_priv *priv;
-> >       struct phy *transceiver;
-> > -     const struct of_device_id *of_id;
-> >       const struct xcan_devtype_data *devtype =3D &xcan_axi_data;
->
-> Hi Rob,
->
-> Here devtype is initialised.
->
-> >       void __iomem *addr;
-> >       int ret;
-> > @@ -1741,9 +1740,7 @@ static int xcan_probe(struct platform_device *pde=
-v)
-> >               goto err;
-> >       }
-> >
-> > -     of_id =3D of_match_device(xcan_of_match, &pdev->dev);
-> > -     if (of_id && of_id->data)
-> > -             devtype =3D of_id->data;
->
-> And in the old code devtype was conditionally re-initialised here,
-> if a match with data was found.
->
-> But in the new code devtype is re-initialised unconditionally.
->
-> Possibly I am missing something obvious, but it seems that either this
-> should somehow be made conditional, or the initialisation to &xcan_axi_da=
-ta
-> should be dropped.
+On Tue, 21 Nov 2023 15:19:19 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-of_match_device() would never fail because we only match with DT for
-this driver and if we didn't match, we wouldn't be in probe. So I'll
-drop the initialization.
+> > > However, everything not PoDL PSE seems to be clause 33. So how about:
+> > >=20
+> > > 	enum ethtool_podl_pse_admin_state podl_admin_control;
+> > > 	enum ethtool_c33_pse_admin_state c33_admin_control; =20
+> > >=20
+> > > At least inside the kernel we use c22, c45, c37 etc. I'm not sure they
+> > > are visible to userspace, but if we don't have a better name, maybe we
+> > > have to use c33 in userspace as well.
+> > >=20
+> > > I do think naming like this makes it clear we are talking about two
+> > > parallel technologies, not a generic layer and then extensions for
+> > > podl.
+> > >=20
+> > > What do you think? =20
+> >=20
+> > If we decide to add a prefix, "c33" is precise but less easily
+> > understandable, why not using simply "poe" prefix? =20
+>=20
+> I suspect poe has the exact opposite problem, its too imprecise. Its
+> too much of a marketing name, with no clear meaning. It could even be
+> some people call podl poe.
+>=20
+> To some extent, this is a user space UX problem. We can be precises in
+> the kernel and the kAPI. What ethtool decides to show to the user
+> could be different. Although it basically is the same problem.
 
-Rob
+Alright, thanks for your answer.
+
+> Do you have ethtool patches? What does the output look like?  Oleksij
+> did say a hybrid could be possible, so we probably want ethtool to
+> group these properties together and make it clear what is PoDL and
+> !PoDL.
+
+No I don't, I am only using ynl for now.
+I would be similar to podl:
+https://kernel.googlesource.com/pub/scm/network/ethtool/ethtool/+/e6cc6807f=
+87c74d4e5b1f1e9d21d3a74e75a258b/netlink/pse-pd.c
+
+Duplicating the PoDL part with c33. Using the same --set-pse and --show-pse
+options.
+
+> > Maybe as POE were originally PMDI you prefer to use c33 which won't cha=
+nge
+> > over time?=20
+> >=20
+> > Should I also modify the content of the enum?
+> > ETHTOOL_PSE_ADMIN_STATE_* to ETHTOOL_C33_PSE_ADMIN_*
+> > ETHTOOL_PSE_PW_D_STATUS_* to ETHTOOL_C33_PSE_PW_D_STATUS_* =20
+>=20
+> Yes. That will help avoid getting PODL and C33 properties missed up.
+
+Alright.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
