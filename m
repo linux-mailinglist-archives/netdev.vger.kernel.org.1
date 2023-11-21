@@ -1,151 +1,154 @@
-Return-Path: <netdev+bounces-49561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580167F26DE
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:01:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D437F26F7
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1468B217FA
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:01:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AFC22823D0
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E9E38DCA;
-	Tue, 21 Nov 2023 08:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707CC38F88;
+	Tue, 21 Nov 2023 08:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="COEgIEDE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D4BC8;
-	Tue, 21 Nov 2023 00:00:59 -0800 (PST)
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso7399909e87.2;
-        Tue, 21 Nov 2023 00:00:59 -0800 (PST)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09AC114
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:09:04 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-548db776f6cso6737a12.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:09:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700554143; x=1701158943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HKicp15faTy9dxr+lo3vJn4RmNCBFdNPH9aMUCXaj3A=;
+        b=COEgIEDEqYeeTZAhnrdzaWBpwGIcQGx/OrLX5I+ZGW7BBzOGRa1KgP+YLh+UVpJ0TB
+         yA2g/2jQ5kl1gjltZwGHDWB5sVCz703V1J0vkWMQD6Xpa+K/FYKlNjt7xE9iPH5pcxG7
+         KGH4BREMUO3FEK4fTA2lPXwhgpMHZ1IF6e0WSWr2OtYF3+sVaE/QIBn19zr6YbmZF9ZC
+         gU+9JKODmbTOf9VQVRP4TqfQICzUbuX7wxIaqwiOEoQDChRJSkw4zcCImL0oXu7fASdp
+         o2+jA+qPjx4seSSvZLMHL/vnJ45hwN/U6WV3ubC87i/wZfhk2TLrFYJEluqsRp9AruLq
+         l58g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700553657; x=1701158457;
+        d=1e100.net; s=20230601; t=1700554143; x=1701158943;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WAC7Wk7jAcTzX3Z+cItdgjy2XcXK1YIDP0sQ/+WmnbI=;
-        b=Am0V53ZajU3DfDYq06HQNkCrM3AGVGgNMYG9xpzbndrvBQilRTYJww5otVRybqEMm4
-         clXZkz/J6tMj6X5t58QhPZGk+loyJ9pmPQKZt2Tq+8bAdHS0h2JXsz6O/ORwcHvVbn0W
-         hPU/QtHZGGtnUGBLwOIlyjhd7Z6R2txZWC8RMv49QSh3UZQJXX9ZOBLBd9kjKkkGFnhp
-         2xCYgBccNMlnz6B3rzbwqTyMYS7qBP9sQebtAbM71tYm8CqG3bvwDPwk025wN1R1pLk7
-         G3NzDMJtgyw4eJE9umu7l6eGPXySbh1tidnTdoGQeG2aG7Sm/6MRzhWIqaHci2CgqZ2v
-         LfRQ==
-X-Gm-Message-State: AOJu0Yxj2Rqr/aQAJWP2mPpkGKK231wN8LJybHscF7XwPGx9vmQBaFqS
-	KRZriNVsuA7WO8v/7OvvKvIfRCFMbKr+lnra
-X-Google-Smtp-Source: AGHT+IEMKGgIaZuugrDMZDvV7GnJywK/Yx77z4jGc7Rwz9WNq4IzHq7tt5PQ58SgYfPSHkLLZyHueQ==
-X-Received: by 2002:a05:6512:983:b0:508:225e:e79f with SMTP id w3-20020a056512098300b00508225ee79fmr6014656lft.22.1700553656648;
-        Tue, 21 Nov 2023 00:00:56 -0800 (PST)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
-        by smtp.gmail.com with ESMTPSA id p15-20020a05651212cf00b0050810b0da0fsm1430948lfg.33.2023.11.21.00.00.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 00:00:56 -0800 (PST)
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso65573181fa.3;
-        Tue, 21 Nov 2023 00:00:56 -0800 (PST)
-X-Received: by 2002:a05:651c:205e:b0:2c5:1075:5ec9 with SMTP id
- t30-20020a05651c205e00b002c510755ec9mr6793793ljo.13.1700553656042; Tue, 21
- Nov 2023 00:00:56 -0800 (PST)
+        bh=HKicp15faTy9dxr+lo3vJn4RmNCBFdNPH9aMUCXaj3A=;
+        b=Qz8dEQu8QOHiMU0sISCONklTu6vJgsqCBSNF8VO8qz+I9RcotNkUWwoEF/6A1XE6fl
+         1QXyCRJXjncYnDxF2xh5Ctao+LDBDC5kFM3hfOrWgImthKvPwvdr1S3ae8xkLycISaiN
+         5gU999rlxJnopbeOT3ZpqILWpO1btB3Yy/BxORqzON9oIi+sMMEbtrE4HZQUa7xOe5ng
+         QlwG940qqbcB0OkKn65rzhSgQCCpZ8fY2IDJrnHZgxOPPmlZ1pGb4X6fEXSLX9WXGtRw
+         nGspPiRsxsiySz2uoXPSosOy5tVLgW4OResSg0wV1Bv9vbdyrCdO/J4Z5nY9b7Rpti90
+         E2fQ==
+X-Gm-Message-State: AOJu0YxzVnCcgtvE+iDL9HbQHyTKrNjaWgAxp1FWGb6Elyx+0tPOBlr0
+	Nw9LviU104G3rWoS/qHTVpDSH3vgx1YKUSqP1ffCfg==
+X-Google-Smtp-Source: AGHT+IFk7rTNn469v7x2wpKCPVaSegxVKameTngvf3SmEjxXVkO7FQ2gV5Q2EICNAOLjWO6335FnMrlK5knzBXdZPJY=
+X-Received: by 2002:a05:6402:12:b0:547:e5b:6e17 with SMTP id
+ d18-20020a056402001200b005470e5b6e17mr502485edu.2.1700554142874; Tue, 21 Nov
+ 2023 00:09:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se> <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
-In-Reply-To: <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 21 Nov 2023 09:00:41 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
-Message-ID: <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
- Ethernet TSN
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <20231121020111.1143180-1-dima@arista.com> <20231121020111.1143180-7-dima@arista.com>
+In-Reply-To: <20231121020111.1143180-7-dima@arista.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 21 Nov 2023 09:08:49 +0100
+Message-ID: <CANn89iLEANNvZ45PaPL8miZeyMUTAcLoVR4WS55gbtfiMPbueQ@mail.gmail.com>
+Subject: Re: [PATCH 6/7] net/tcp: ACCESS_ONCE() on snd/rcv SNEs
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
+	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 21, 2023 at 8:45=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-> On 20/11/2023 17:07, Niklas S=C3=B6derlund wrote:
-> > Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> > device provides Ethernet network.
-> >
-> > Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatec=
-h.se>
-
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> > @@ -0,0 +1,133 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Renesas Ethernet TSN End-station
-> > +
-> > +maintainers:
-> > +  - Niklas S=C3=B6derlund <niklas.soderlund@ragnatech.se>
-> > +
-> > +description:
-> > +  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps,=
- or 1
-> > +  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the conn=
-ected PHY.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    oneOf:
-> > +      - items:
+On Tue, Nov 21, 2023 at 3:01=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
+ote:
 >
-> Drop items.
+> SNEs need READ_ONCE()/WRITE_ONCE() for access as they can be written and
+> read at the same time.
 >
-> I assume you have oneOf above because you predict this will grow with
-> entries with fallbacks? If not, drop.
+> This is actually a shame: I planned to send it in TCP-AO patches, but
+> it seems I've chosen a wrong commit to git-commit-fixup some time ago.
+> It ended up in a commit that adds a selftest. Human factor.
 >
-> > +          - enum:
-> > +              - renesas,ethertsn-r8a779g0      # R-Car V4H
-
-renesas,r8a779g0-ethertsn
-
-R-Car S4 also has EtherTSN.
-Is it identical, so it makes sense to add a renesas,rcar-gen4-ethertsn
-fallback?
-
-> > +  renesas,rx-internal-delay:
-> > +    type: boolean
-> > +    description:
-> > +      Enable internal Rx clock delay, typically 1.8ns.
+> Fixes: 64382c71a557 ("net/tcp: Add TCP-AO SNE support")
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> ---
+>  net/ipv4/tcp_ao.c    | 4 ++--
+>  net/ipv4/tcp_input.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 >
-> Why this is bool, not delay in ns?
-> Why this is property of a board (not SoC)?
-
-Standard property is rx-internal-delay-ps.
-
-> > +
-> > +  renesas,tx-internal-delay:
-> > +    type: boolean
-> > +    description:
-> > +      Enable internal Tx clock delay, typically 2.0ns.
+> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+> index 122ff58168ee..9b7f1970c2e9 100644
+> --- a/net/ipv4/tcp_ao.c
+> +++ b/net/ipv4/tcp_ao.c
+> @@ -956,8 +956,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_=
+buff *skb,
+>                 if (unlikely(th->syn && !th->ack))
+>                         goto verify_hash;
 >
-> Same questions.
+> -               sne =3D tcp_ao_compute_sne(info->rcv_sne, tcp_sk(sk)->rcv=
+_nxt,
+> -                                        ntohl(th->seq));
+> +               sne =3D tcp_ao_compute_sne(READ_ONCE(info->rcv_sne),
+> +                                        tcp_sk(sk)->rcv_nxt, ntohl(th->s=
+eq));
 
-Standard property is tx-internal-delay-ps.
 
-Gr{oetje,eeting}s,
+I think this is a wrong fix. Something is definitely fishy here.
 
-                        Geert
+Update side should only happen for an established socket ?
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+And the read side should have locked the socket before calling
+tcp_inbound_ao_hash(),
+otherwise reading other fields (like tcp_sk(sk)->rcv_nxt) would be racy any=
+way.
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+
+>                 /* Established socket, traffic key are cached */
+>                 traffic_key =3D rcv_other_key(key);
+>                 err =3D tcp_ao_verify_hash(sk, skb, family, info, aoh, ke=
+y,
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index bcb55d98004c..78896c8be0d4 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+
+tcp_snd_sne_update() definitely only deals with full sockets
+(TCP_AO_ESTABLISHED)
+
+> @@ -3583,7 +3583,7 @@ static void tcp_snd_sne_update(struct tcp_sock *tp,=
+ u32 ack)
+>         ao =3D rcu_dereference_protected(tp->ao_info,
+>                                        lockdep_sock_is_held((struct sock =
+*)tp));
+>         if (ao && ack < tp->snd_una)
+> -               ao->snd_sne++;
+> +               WRITE_ONCE(ao->snd_sne, ao->snd_sne + 1);
+>  #endif
+>  }
+>
+> @@ -3609,7 +3609,7 @@ static void tcp_rcv_sne_update(struct tcp_sock *tp,=
+ u32 seq)
+>         ao =3D rcu_dereference_protected(tp->ao_info,
+>                                        lockdep_sock_is_held((struct sock =
+*)tp));
+>         if (ao && seq < tp->rcv_nxt)
+> -               ao->rcv_sne++;
+> +               WRITE_ONCE(ao->rcv_sne, ao->rcv_sne + 1);
+>  #endif
+>  }
+>
+> --
+> 2.42.0
+>
 
