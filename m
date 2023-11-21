@@ -1,39 +1,49 @@
-Return-Path: <netdev+bounces-49606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B88C7F2B7F
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 824087F2B87
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AD481C21712
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2D411C21732
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F90D482D7;
-	Tue, 21 Nov 2023 11:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83CD482FC;
+	Tue, 21 Nov 2023 11:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMXZumOZ"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MqoOrrMP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98D8168C5
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 11:11:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38623C433C8;
-	Tue, 21 Nov 2023 11:11:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700565068;
-	bh=2GevDf923F/wmg4AP9lHNhi0wynht5ViVr+6FizelAI=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=dMXZumOZ21LOJQSoNWfD3ARHnJ0BIeFTbpHaK4LkDyOZQT8A0iCzzLkRw76I6P+9g
-	 o3FRcHZROQWT8Qdt0atYLyVbq5KfaPeNAXYwEQmu4FvHW5qXBq4eTdDdSWsomiio5x
-	 Xmlj3Xy8stT3OnnzbNN/eFGT7VJDuEFoV2Jtj9/y9rYKYzQfZA3l+1DE/6ZApa0Vu8
-	 RGeiFn1yNbVjZ2/BX0au2m+5XnKiuBRCcGXTNDecH9U0V4uLZRUzHEy4GoS1xcuW5B
-	 hJWkj3MKowOKwZiX9rs49dZuDh59UxmCzxMjHhk5ADZ+dVzGVH2iUPYlr60xkOTro+
-	 Ff/shOIvmgtYQ==
-Message-ID: <4f09985e-396b-42e9-b7a0-5f9db58e6131@kernel.org>
-Date: Tue, 21 Nov 2023 13:11:00 +0200
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E14319C;
+	Tue, 21 Nov 2023 03:15:30 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALA99hm005185;
+	Tue, 21 Nov 2023 11:15:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=M9DOrdJVKMsr8o6F5WAHynnyalc9MnI3i2BK37d48Bs=;
+ b=MqoOrrMPDIgqJAIFe0l3PAOKMehydECbcWJnSVjdnSKQD3rYREO4d76C/Fjy5hJ1MZNv
+ QCuU4w0aAdoEMHyKvJ76Cvk/yT+NHIt2HD5W93EYzeLTVNtiT+lBQvTJPSlqtgS2qTTx
+ Na0x7KYRYgkr2OZxFezfGJF4R3/XDzJ/k/xxDxFdcc5RqWoLtEXJhUk3fG8Xyh5pm1GA
+ B1XKZ3feoQvAl56dBMgbJx3t3E7Lel4OPkNyiNqwWlRMsdrQJVad7NKtRG+nLV3vt3NB
+ 5u7o3QuAsG06XJvKXq+QYUpFxj1eM8pHLDcJ1HLJuiNwZnme7ma2v1vwj6qJ4gCKM742 tQ== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ugge19evg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 11:15:15 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ALBFErn009234
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 11:15:14 GMT
+Received: from [10.253.72.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 21 Nov
+ 2023 03:15:10 -0800
+Message-ID: <d123cc36-f467-40b4-b792-98fd2104c878@quicinc.com>
+Date: Tue, 21 Nov 2023 19:15:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,107 +51,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 2/7] net: ethernet: am65-cpsw: cleanup TAPRIO
- handling
+Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
 Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-3-rogerq@kernel.org>
- <20231120140147.78726-3-rogerq@kernel.org>
- <20231120225648.pgvzd2jejg5jll2t@skbuf>
- <af23bd5d-2daf-487b-858c-9e3ad684864d@kernel.org>
-In-Reply-To: <af23bd5d-2daf-487b-858c-9e3ad684864d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <corbet@lwn.net>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>
+References: <20231118062754.2453-1-quic_luoj@quicinc.com>
+ <20231118062754.2453-4-quic_luoj@quicinc.com>
+ <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
+ <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+ <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
+ <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
+ <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
+ <ZVuGv2005eaw+R6u@shell.armlinux.org.uk>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <ZVuGv2005eaw+R6u@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: itCDhuVuSbrHvoLLJx9XAomaO2avh_Rr
+X-Proofpoint-ORIG-GUID: itCDhuVuSbrHvoLLJx9XAomaO2avh_Rr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-21_04,2023-11-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=941 phishscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311210087
 
 
 
-On 21/11/2023 11:23, Roger Quadros wrote:
+On 11/21/2023 12:18 AM, Russell King (Oracle) wrote:
+> On Mon, Nov 20, 2023 at 04:34:55PM +0100, Andrew Lunn wrote:
+>> Are you saying there is a USXGMII-M level link change status? The link
+>> between the SoC and the PHY package is up/down? If it is down, all
+>> four MAC-PHY links are down. If it is up, it is possible to carry
+>> frames between the SoC and the PHY package, but maybe the PHYs
+>> themselves are down?
+> 
+> It shouldn't do. Each "channel" in the USXGMII-M link has its own
+> autoneg block at both ends, each conveys link status independently.
+> 
+> The MAC side structure is:
 > 
 > 
-> On 21/11/2023 00:56, Vladimir Oltean wrote:
->> On Mon, Nov 20, 2023 at 04:01:42PM +0200, Roger Quadros wrote:
->>> -static int am65_cpsw_configure_taprio(struct net_device *ndev,
->>> -				      struct am65_cpsw_est *est_new)
->>> +static void am65_cpsw_cp_taprio(struct tc_taprio_qopt_offload *from,
->>> +				struct tc_taprio_qopt_offload *to)
->>> +{
->>> +	int i;
->>> +
->>> +	*to = *from;
->>> +	for (i = 0; i < from->num_entries; i++)
->>> +		to->entries[i] = from->entries[i];
->>> +}
->>
->> I think I mentioned this before: have you looked at taprio_offload_get()
->> and taprio_offload_put()?
+>                              +----------+                +-----+
+>                      .-XGMII-> Rate     |    PCS         |     |
+> MAC1 <-MDI-> PHY <-+        | Adaption <--> Clause 49 <->     |
+>                      `-GMII-->          |                |     |
+>                              +-----^----+                |     |
+>                                    |                     |     |
+>                              +-----v---- +               |     |
+>                              | Autoneg   |               |     |
+>                              | Clause 37 |               |     |
+>                              +-----------+               |     |
+>                                                          | Mux <--> PMA <-->
+>                                                          |     |
+>                                                          .......     USXGMII-M
 > 
-> I'm sorry that I missed this. I'll take a look.
-
-Now I recollect. You mentioned this in a different series review
-https://lore.kernel.org/all/20231011102536.r65xyzmh5kap2cf2@skbuf/
-
-Since this patch is more trivial cleanups I will do the
-taprio_offload_get/free() change to a separate patch.
+> <------------------------------------------------------>
+>        These blocks are repeated for each channel
 > 
->>
->>> +
->>> +static int am65_cpsw_taprio_replace(struct net_device *ndev,
->>> +				    struct tc_taprio_qopt_offload *taprio)
->>>  {
->>>  	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
->>> +	struct netlink_ext_ack *extack = taprio->mqprio.extack;
->>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
->>>  	struct am65_cpts *cpts = common->cpts;
->>>  	int ret = 0, tact = TACT_PROG;
->>> +	struct am65_cpsw_est *est_new;
->>>  
->>> -	am65_cpsw_est_update_state(ndev);
->>> +	if (!netif_running(ndev)) {
->>> +		NL_SET_ERR_MSG_MOD(extack, "interface is down, link speed unknown\n");
->>
->> The extack message doesn't need a \n.
+> The spec goes on to state that there must be a USXGMII enable bit that
+> defaults to disabled and the PHY should assume normal XGMII/XFI
+> operation. When enabled, autoneg follows a slight modification of
+> clause 37-6.
 > 
-> OK.
-> 
->>
->>> +		return -ENETDOWN;
->>> +	}
->>>  
->>> -	if (est_new->taprio.cmd == TAPRIO_CMD_DESTROY) {
->>> -		am65_cpsw_stop_est(ndev);
->>> -		return ret;
->>> +	if (common->pf_p0_rx_ptype_rrobin) {
->>> +		NL_SET_ERR_MSG_MOD(extack,
->>> +				   "p0-rx-ptype-rrobin flag conflicts with taprio qdisc\n");
->>
->> Also here.
->>
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	if (port->qos.link_speed == SPEED_UNKNOWN)
->>> +		return -ENOLINK;
->>> +
->>> +	if (taprio->cycle_time_extension) {
->>> +		NL_SET_ERR_MSG_MOD(extack,
->>> +				   "cycle time extension not supported");
->>
->> Here it's ok.
->>
->>> +		return -EOPNOTSUPP;
->>>  	}
-> 
-> Thanks for the detailed review!
+> As far as the USXGMII-M link, I believe 2.7.8 in the USXGMII-M
+> documentation covers this, which is "hardware autoneg programming
+> sequence". It states that "if 10G link is lost or regained, the
+> software is expected to disable autoneg and re-enable autoneg". I
+> think "10G link" refers to the USXGMII-M connection, which means
+> the loss of that link shold cause software to intervene in each
+> of the PCS autoneg blocks. It is, however, rather unclear.
 > 
 
--- 
-cheers,
--roger
+The link status of PHY is updated, software should do the corresponding
+QXGMII mode configuration per channel for this PHY.
+
+The PCS QXGMII configuration reflects the current link status of the 
+connected PHY.
+
 
