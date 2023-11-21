@@ -1,41 +1,77 @@
-Return-Path: <netdev+bounces-49494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7DBA7F2360
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:00:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FD17F236B
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 833041F24A77
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:00:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0586DB21A3F
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C13C8495;
-	Tue, 21 Nov 2023 02:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C8C10A1D;
+	Tue, 21 Nov 2023 02:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gw4lbU4A"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="abn3oIPW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C42C8E2
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C001C433CA;
-	Tue, 21 Nov 2023 02:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700532025;
-	bh=uQOCVxwdvKIvn2qxuwF9Et8pByqTASiiEmyLxL5+5aY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gw4lbU4AsXiEukQxpYmO9dWCBSk7UzyOSgAoMhAXhgHE//njJ/jLtefyb5Gbdt4Y5
-	 MDTaFIZOAXEk3S41b8X+CB7rKWIhI9iQPndHQYTU2NyXEJXqALx5o9CmOiO3U8dpKL
-	 l0u21iPW9raR0e/1DQsXmZYL6Mbc5kS5RcFBzmOTEz87SMOAEbWde7Zmvtx6crnXbh
-	 K6AewcOI0Ql4GuwZ8tLVaEusYyXnu5mVS59QZJAQLZ53X3Bsuoz5lqzNZDYmtCis5Y
-	 3ts9+Eto3TZ3ETjSGp2LJgNDQLeZ6BCwuxgrGFVbclCvZvy7hFilyTOo9VryYcg6A6
-	 eIEpPIRmmuxyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 433B6E000A4;
-	Tue, 21 Nov 2023 02:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16253E7
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:20 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40842752c6eso21710165e9.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1700532078; x=1701136878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SC1Z2aKJYnydBjbbTXuq7CDbdzNLqNihvi9zYbo0HHw=;
+        b=abn3oIPWtozRE+3NUEl6UwkbEeQ6mM6mPRHjAXYg2xd9Wc2KO9HVEkTLTXieCRJUfl
+         qMydsb2uB4ffHhUu3jrqbgBtMUMBN6i8PZAkf02sIhqoIrvt7mef52wdr6NBWsMERHUY
+         Ixo1vkTCFHbtk2wMsqURKEhbQUPh8JoS1QxT5tJknFpgusjTp4RW56D33aTSKWd1xaav
+         VpXb86L+HhfMznVmosb7uC8K3IAbSYXLSmfoVuETIsYk9bhZKwq/lj3+FzX2lXv42WyQ
+         stia+OXZcDs6hEbcnxgm5VtavJXSJSFVwp9dpPtjmvrxhomJcvDv1TCL7Ke1X1FxBscK
+         oUlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700532078; x=1701136878;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SC1Z2aKJYnydBjbbTXuq7CDbdzNLqNihvi9zYbo0HHw=;
+        b=Z0z+jixxMN/GmuNckiAHYm4vFe959NAgyIjFxSnEO5OwiVcC+ybWOnJ+C1vpcfKR+O
+         yknr5dNSQYoNqG29yfkIjhsF80isSONcfAP1qO3fKUIWr1npOAz/0M/ZvQ0+EiGRGgJv
+         bq9OT+FssOB7eVDkjZuhxzlFfMgAdsPl6UA30Z3+CA4G5XPKHlpj/J7j8m/1PZ6NLsBU
+         zZWnwgox1ktq/lBFx2QKmniUnnv678f3KQxnS/jt4cdGG92jUfpibEIlkCTxiMvhEZBF
+         3bm2++6nJpLryQHpHHYmrEKBUo3DvjZbSqcEMQ851z6ANMDJ+lygC1C+XEF6jHbbvWeE
+         04xQ==
+X-Gm-Message-State: AOJu0Yw1IUQY+kCbNo5cgGmJr6V9ZW3pheP7CiZV5wRIU5/CTjkEtIFX
+	97w71yxtxc2+ghZTv98BM3zsbw==
+X-Google-Smtp-Source: AGHT+IFvvH7kq5FF9+JmqB/nlqMP2X4t2+SnfXFKKHPyCDBAfU4fv+iYMQr6gTjOPqA/V/4ke57Kzg==
+X-Received: by 2002:a5d:6d0f:0:b0:332:c4b4:2a8c with SMTP id e15-20020a5d6d0f000000b00332c4b42a8cmr5210203wrq.43.1700532078517;
+        Mon, 20 Nov 2023 18:01:18 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id c13-20020a056000184d00b00332cb846f21sm2617105wri.27.2023.11.20.18.01.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 18:01:18 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org,
+	Dmitry Safonov <dima@arista.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH 0/7] TCP-AO fixes
+Date: Tue, 21 Nov 2023 02:01:04 +0000
+Message-ID: <20231121020111.1143180-1-dima@arista.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,49 +79,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: microchip: lan743x : bidirectional throughput
- improvement
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170053202527.14605.1759031814684336138.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Nov 2023 02:00:25 +0000
-References: <20231116054350.620420-1-vishvambarpanth.s@microchip.com>
-In-Reply-To: <20231116054350.620420-1-vishvambarpanth.s@microchip.com>
-To: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
- jacob.e.keller@intel.com, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I've been working on TCP-AO key-rotation selftests and as a result
+exercised some corner-cases that are not usually met in production.
 
-On Thu, 16 Nov 2023 11:13:50 +0530 you wrote:
-> The LAN743x/PCI11xxx DMA descriptors are always 4 dwords long, but the
-> device supports placing the descriptors in memory back to back or
-> reserving space in between them using its DMA_DESCRIPTOR_SPACE (DSPACE)
-> configurable hardware setting. Currently DSPACE is unnecessarily set to
-> match the host's L1 cache line size, resulting in space reserved in
-> between descriptors in most platforms and causing a suboptimal behavior
-> (single PCIe Mem transaction per descriptor). By changing the setting
-> to DSPACE=16 many descriptors can be packed in a single PCIe Mem
-> transaction resulting in a massive performance improvement in
-> bidirectional tests without any negative effects.
-> Tested and verified improvements on x64 PC and several ARM platforms
-> (typical data below)
-> 
-> [...]
+Here are a bunch of semi-related fixes:
+- Documentation typo (reported by Markus Elfring)
+- Proper alignment for TCP-AO option in TCP header that has MAC length
+  of non 4 bytes (now a selftest with randomized maclen/algorithm/etc
+  passes)
+- 3 uAPI restricting patches that disallow more things to userspace in
+  order to prevent it shooting itself in any parts of the body
+- SNEs READ_ONCE()/WRITE_ONCE() that went missing by my human factor
+- Avoid storing MAC length from SYN header as SYN-ACK will use
+  rnext_key.maclen (drops an extra check that fails on new selftests)
 
-Here is the summary with links:
-  - [net-next] net: microchip: lan743x : bidirectional throughput improvement
-    https://git.kernel.org/netdev/net-next/c/45933b2db91b
+Please, consider applying/pulling.
 
-You are awesome, thank you!
+The following changes since commit 98b1cc82c4affc16f5598d4fa14b1858671b2263:
+
+  Linux 6.7-rc2 (2023-11-19 15:02:14 -0800)
+
+are available in the Git repository at:
+
+  git@github.com:0x7f454c46/linux.git tcp-ao-post-merge
+
+for you to fetch changes up to 4555b5b8d11f4d19ef32a761e2d87dd378e9a435:
+
+  net/tcp: Don't store TCP-AO maclen on reqsk (2023-11-21 01:48:23 +0000)
+
+----------------------------------------------------------------
+Dmitry Safonov (7):
+      Documentation/tcp: Fix an obvious typo
+      net/tcp: Consistently align TCP-AO option in the header
+      net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
+      net/tcp: Reset TCP-AO cached keys on listen() syscall
+      net/tcp: Don't add key with non-matching VRF on connected sockets
+      net/tcp: ACCESS_ONCE() on snd/rcv SNEs
+      net/tcp: Don't store TCP-AO maclen on reqsk
+
+Thanks,
+             Dmitry
+
+Cc: David Ahern <dsahern@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Francesco Ruggeri <fruggeri05@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+
+Dmitry Safonov (7):
+  Documentation/tcp: Fix an obvious typo
+  net/tcp: Consistently align TCP-AO option in the header
+  net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
+  net/tcp: Reset TCP-AO cached keys on listen() syscall
+  net/tcp: Don't add key with non-matching VRF on connected sockets
+  net/tcp: ACCESS_ONCE() on snd/rcv SNEs
+  net/tcp: Don't store TCP-AO maclen on reqsk
+
+ Documentation/networking/tcp_ao.rst |  2 +-
+ include/linux/tcp.h                 | 10 ++++------
+ include/net/tcp_ao.h                | 11 +++++++++++
+ net/ipv4/af_inet.c                  |  1 +
+ net/ipv4/tcp.c                      |  6 ++++++
+ net/ipv4/tcp_ao.c                   | 29 +++++++++++++++++++++++------
+ net/ipv4/tcp_input.c                |  9 +++++----
+ net/ipv4/tcp_ipv4.c                 |  4 ++--
+ net/ipv4/tcp_minisocks.c            |  2 +-
+ net/ipv4/tcp_output.c               | 15 ++++++---------
+ net/ipv6/tcp_ipv6.c                 |  2 +-
+ 11 files changed, 61 insertions(+), 30 deletions(-)
+
+
+base-commit: 98b1cc82c4affc16f5598d4fa14b1858671b2263
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.42.0
 
 
