@@ -1,487 +1,323 @@
-Return-Path: <netdev+bounces-49787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A247F37C5
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:55:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F3B27F37D1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE13FB21425
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:55:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15C48B2135E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8064D51016;
-	Tue, 21 Nov 2023 20:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6C151038;
+	Tue, 21 Nov 2023 21:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b5Z3y3qV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yg7Dgjpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7981BB
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 12:55:39 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-41cdc669c5eso3501cf.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 12:55:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700600139; x=1701204939; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3zIQA6Czlju2Y4hDlDvlKgz09FWuac93G5qYfLJq5Zs=;
-        b=b5Z3y3qV5xt+VG6XUB22ObRlKWIB9C4xFWQ2zF+Rano5rEeykSO7q2Zq9Sc7HOwdag
-         otrGWT/1855X0yaW1fMSdtFR95iLOjjD4HaQnHNNJ7KM1xO4KIQfNEB3POtUTdrYogko
-         lP0Z20iavthGWu3vlJp4eRJFaPe7Z39QwRZ9OjQFVXq6XbX+Z1aWgyjM89I+79EeovPk
-         s+23K+0P/z4ptZQNZeODKOb6xivyORxu2ZAi6ycl9R7sYMiIbQeSmhzA1u0nmQjQT+Bk
-         RrKWzhZwmRw/g031oWG5B6tRvvV0fAgIULqzpqJnKDeu7Sca0nnK82lsm+rUn6/kQ8On
-         406Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700600139; x=1701204939;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3zIQA6Czlju2Y4hDlDvlKgz09FWuac93G5qYfLJq5Zs=;
-        b=SKYkdRMEUXOqE146jgOtRb8DFYod8V3+JOx0/P8Qm7aklxE/BlgY6rLireg0Jq7DjU
-         R/xG/zU8i6jAN6DXDhzGhyOUFFJ13dnCgz7oSaL3eOp4IB+G4IS8lWraSu4DbLn4eYWu
-         1qXOVWyIq03uzsELqn6qwGFQeYKtk18PcSAunzWpkFXFHduWBKTX9gPiDBrogtO+uyWL
-         5VmCJNW/jSIbvCwLKFM/O8pt99g/4it0FWLPfqhVca0tMU+pOzwHrulCkwNzTPvH+3Me
-         hTa8Z9sPripVg6PX0Lu9AAnBKRbmWeB2ugL2r6WuQIQEALprgBHQJf6BoytQHWAF4meT
-         JHUQ==
-X-Gm-Message-State: AOJu0YzgoM0579e6kGM5drulSMqi39oNhDzltClUdpw6bjEbKKDyrmzg
-	DV81BEGGCRbxgzP5D/BS6lvBG1/MN01x9p9VxFFGNQ==
-X-Google-Smtp-Source: AGHT+IEvxOmwr5QH1oBTjvmPWMa36flcea+AoPT2HJGfTJnkYtMV+vgtgkV9ftPQlul7dk1JwFC/gzyDE5kcmPl4hYU=
-X-Received: by 2002:ac8:58d5:0:b0:421:56ae:e761 with SMTP id
- u21-20020ac858d5000000b0042156aee761mr59846qta.6.1700600138654; Tue, 21 Nov
- 2023 12:55:38 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F7E1A2;
+	Tue, 21 Nov 2023 13:04:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700600657; x=1732136657;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MIpWyzV+cYLlKLGRIwLslwp0aDQ9L4PO+dEzqakbsU0=;
+  b=Yg7DgjpoqmA5UHjG12W+Ae7BXLiii4Ao3v0AgXQz2i6LWF8V0d17F+vd
+   fFy10zX5qVGbxzM0OkqTAfC1aLKz8rZcsqVR+vIpcx2Hg31Px7Wt27XN1
+   tp6xZnUMcJHe03N0J7Ta5a8DHkee0z6um9b0jRCRGr3tHNUO62oaFV1LH
+   o3tnyTIg18FyChmBw8SKN2UHygohgv2eGNR9LQbjSXANbHdrUF82+NPbO
+   kcOPmnnX53MQTLrsXeK3vruGOne5TrzwwNodSwy+GtnOBr6t8+HfMn6gC
+   QpZZQTEGOOjd5hDWSckDqPdjlK4zDkziCudtt7J7/sNGznQsqqNNuEG2O
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="13476007"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="13476007"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 13:04:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="801675067"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="801675067"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Nov 2023 13:04:14 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 21 Nov 2023 13:04:13 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Tue, 21 Nov 2023 13:04:13 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Tue, 21 Nov 2023 13:04:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TI77T7eOUAl2REYrazl2qjVoHZQDDpA9Qq4+/Rl+Z6s79AwkrXKBOfCyUpDWFhLWkrFYHpjgWLPpyT0/d7zMcqIFwBqkTwvnX/ZRDs0bAHf9mc14IHnk9GbTDHuxcIZKdb6UpoX9J4Dqe1A9yUmfXMBBNAqynyc674qsGB6csh+HWpWFYKEQ/Yr2v97FYb5fFffVVINlM9v57G+rzpg39AfQrcm0yt2dEvRbUsC/LZgDDLfQ1pBeN7x66MjhOdl3vSCMnA1e1xC1JQqDVbmVlYHDx3HzRvMxng0lFaS0AT+ArwqPXdQX3UZYYo/MfQLFwv7yVZRN2qYpnXO6Y8xawQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FvrzKJDG6fTlJpbTQ67sYdqx7C93pNtD/6JBq8dg18U=;
+ b=ZTuR7xM47ho6DuZ1l1P9l6/HG08X83pWfMJqIWIfHPuBANeZwYTKIkIm6tPzBI0CxvBcjAy3N10iDRrQsb9jNJeMNXmig0E30ZjfYMakYhu8M/pAQNXFOv51dFcs10Jk0ARd8AD7LOHATtzUYK8YBYEXm9B71fhkruSG8Y8v4CoJL0En9VciQ9hZl1bXrbPpvzGWkmyhHGS5XqK+dNESjjOLmQ1YoqYMO+4Uuv3Jo7B6bZo8fL5eb1IMefz4YVnc6JnNPEIREsV+AVg13UJqeLuaplcpst/KwGkr8UWMJOPw6RojE0C30cBmVhs/MkzG15bgzR0KxB5Vr/PxDyDXAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by CO1PR11MB4785.namprd11.prod.outlook.com (2603:10b6:303:6f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.30; Tue, 21 Nov
+ 2023 21:03:59 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::8e20:31f5:2a6e:9bdd]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::8e20:31f5:2a6e:9bdd%4]) with mapi id 15.20.7002.028; Tue, 21 Nov 2023
+ 21:03:59 +0000
+Message-ID: <69d4df6f-71ea-4a64-b968-956c69812504@intel.com>
+Date: Tue, 21 Nov 2023 13:03:57 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] octeon_ep: get max rx packet length from
+ firmware
+Content-Language: en-US
+To: Shinas Rasheed <srasheed@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+	<mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+	<konguyen@redhat.com>, Veerasenareddy Burru <vburru@marvell.com>, "Sathesh
+ Edara" <sedara@marvell.com>, Eric Dumazet <edumazet@google.com>
+References: <20231121191224.2489474-1-srasheed@marvell.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Autocrypt: addr=jesse.brandeburg@intel.com; keydata=
+ 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
+ /fnLfll98Nhx
+In-Reply-To: <20231121191224.2489474-1-srasheed@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P220CA0007.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:303:115::12) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121184543.3433940-1-sgzhang@google.com> <84be10f3-0880-4ccd-b6d3-b5feecea75ef@lunn.ch>
- <CAPqVEODWZ5suy7MEc_QXz_mx5uryypz1zAi9M9re-xqhs3urSA@mail.gmail.com> <ebbdf786-54d4-491c-ab81-de03006ec727@lunn.ch>
-In-Reply-To: <ebbdf786-54d4-491c-ab81-de03006ec727@lunn.ch>
-From: Ray Zhang <sgzhang@google.com>
-Date: Tue, 21 Nov 2023 12:55:27 -0800
-Message-ID: <CAPqVEOBeuFMAFEyiDEWg39yJ33M8U1okkJ32keOyARcXqLJW9Q@mail.gmail.com>
-Subject: Re: [PATCH] net: stmmac: fix out-of-bounds read via memcpy detected
- by KASAN
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|CO1PR11MB4785:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b5ca9c4-830a-4acf-41da-08dbead561b4
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: l2gYR88FaBf5k9JTOQWPpf7nk73OtfJe069HeGzqb9CQx8u0MLXyfvxBcbf4KGzWN7jmB6PVOu6jjZbAJZNmujYBFeITjb6/d773twhTJERI2CXDHJ1X4glHGN9MFOln02j6IZPY6Z/VRSWmTwViW1ltB/18RrD+SvT0MT4iDz+WiV15/K91d9zih4vb/K8cCNSEi3HSP8f3XRLk2FwKxDysPFfvz2kprS0w25msIZkSf/76A14Plci2Khu1tr1sUR8AAAvEsJhsG/o9ZsucXmTayWCiGs5tqA9yy2GZvVwUqkg8PTv0XYxdEuAB729KYpJwAizIhNhm/HuoSkhMJi7w9K9d7E+A0pyAK9eK4BMOYTTWwr5iw7V/cvozD+1UJvkTEFG2dyPH7XnBn3bbpJtHCEg/yVCaA0mhoX+TydtVSae1B0Om8rKfZ64tR4kbh/ng6mnL7DeLMp92BQTYWj+FPwJKdXZC7xVdQ4bzcZet6Sm6w/aJ6R75lGuKjkrPHv7oHEhM3Ita1WbWdFpwn9P2MNNgLavOA+hy8wSZwjmp+fvD2vpnGBNcgWU8lrFgBuIk2DdpB9bn8mY8vMhidEvGk4zXntNdOVu0OgwLTjQyHTl5Cxyxh9sUuZeDcaKaaSBZFW7mx9ckXq72MFVz5g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(366004)(376002)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(38100700002)(31696002)(5660300002)(86362001)(2906002)(83380400001)(31686004)(7416002)(66556008)(66476007)(66946007)(44832011)(54906003)(316002)(4326008)(8676002)(8936002)(36756003)(6506007)(53546011)(82960400001)(6512007)(6486002)(2616005)(26005)(41300700001)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?alI0Mk90Y0ltQU5zWTRGTXh1Nko2RUp1YWtJSVIyYlRKVTUxejdsQ2hKalZQ?=
+ =?utf-8?B?QXU1VVJKRjkrd2t3SmoybE80Q05DNXJYMEFaK3N3R25McjNicU5DZTJRYW82?=
+ =?utf-8?B?Q1JNV0tsVUhKN05tQkJIelRTNGYxQTBIUG10V0ZrdjBoTlNjTXJURGRNdlVz?=
+ =?utf-8?B?ckZhdDE0Uk5Gak10U2NFcXhsUXhoRDZGMjBuT0tzOENFL3Izdi8yRDd1czB1?=
+ =?utf-8?B?eEF4WUZhejV1MEJmSnZTWndNNjMzbjBWbHE0L3hDTTRtRXFPZlFnQTBubDZ3?=
+ =?utf-8?B?OFpubVNhRGVxY3cybkNUYjlVRnhTY0R2dmdZYTd5YitaWFpQVUp4c3o2UXgz?=
+ =?utf-8?B?WnlScThWdEphZkRyK0ZUVUlpTXpDRGVGdzlhbXdhZWJBM1lRNTdQN1BTY0pu?=
+ =?utf-8?B?VjNOQ2pDN1p0cXBzVms1b0RHM0s2akc4QzA5ci8yc2oxY1h4WTRWaWhoZHdD?=
+ =?utf-8?B?UStFNUp4UDhyQkJZWTRNNDhPdXBhTXdMK0FIaW13Q1FCcUlNL2gyMXFFdGJ3?=
+ =?utf-8?B?UVNYcGZOaUF3RDNFZmRzbVNHOGp3dVZkckRZSlhFUks3b2hDU0xXN2xqeDJu?=
+ =?utf-8?B?bXV6QnFaUjVNeGg5d0w2UGJiUjhxSWUxYktvL3MrcWwyUmNMT2R4K1RPREtY?=
+ =?utf-8?B?NlpuNnk2S0g3T2JkOEw2dlJxbE9sNGRIbFFBd2l3RWpNSG1FVXlXaDlvL2lI?=
+ =?utf-8?B?bGJQQmFQbkVHUjRvVXJRbFBwN0JKeTdBUHB5UUlzejNLbkg1MThqSUt4WEZD?=
+ =?utf-8?B?dVVnVDY3czJjaXdoUURUMHZXY1NMQzlFUy8xZ2JYMEhxbGRsRElqMEFEdWQv?=
+ =?utf-8?B?Vk02L2lueXJKVnVhR1RVNEd4aWhIRlZXekkvMnEyZ1VBMHBVdzlyT1JWaGdK?=
+ =?utf-8?B?UTB0NjloQ1JHaU9OMnJEQWJnT2NiYi8wZ0t4aXVwQzFTMm5TaTJKbXBmYWcw?=
+ =?utf-8?B?UzZMbjFGcXpxeDZUeGZ5TUlRcWFPSnBIK0o5UldpZEJlbzgwU04vTkRWNllp?=
+ =?utf-8?B?c0tQUVhDWkZlMnhIenZmTFc2WktrSUFCRXlSclpoN1UzNW0vUHZYTzFLemcx?=
+ =?utf-8?B?WDVOdXF5SXVvOVpiMWN0OGppTVYwajVYemEzZ3U1YnhhR0hCZ2dlR2FYRWhp?=
+ =?utf-8?B?MmJTYUg2MUtxSk5SSzYrK0d5U0pxWVdyc0tyU016dTNWVEVKaWgwS2QzamtK?=
+ =?utf-8?B?anlOS2t0Vm9yRGVJQXlqZE4vbk9uZDl1cE8xaEVDWEl6QVpvaVBXQkhyV2F4?=
+ =?utf-8?B?ajZ1N0NkWjl2cmYvWlJkd3ZTVkJkQlk2cVpBWUNTL2EvMjB3NVNSNy92MFlX?=
+ =?utf-8?B?K285dmFaNUlYaUpOano0SEZRSE1aRVI5ZElmZ2c4dFkwbE5PQ1BXTVNBSFZU?=
+ =?utf-8?B?SkhxSjdDbzMyQzVRa2pnNG4xZCt0bmNyZ2YxNzRQazh5elpNNFovZkxNTFRo?=
+ =?utf-8?B?NmtJNnpGa3pvbURiS0tSS2UrOU5XbDZ4SllkZkpabEI3eGp1Ky9rajZraGZu?=
+ =?utf-8?B?QUpaNkFRKzNQYUZFK0Y0dDlHVTNqK1lCYlZlQ1NtNmlsM0hRSVpJV2d5MUpi?=
+ =?utf-8?B?eS9BT28rQ0sveXkzKysxMG9SMHJsUnlQblppYzMvWkVWV0JCektNUXlZRGQ5?=
+ =?utf-8?B?cUVxOW4wVExPZzBBTGQvamZrdE1jNFp0WS9zOHhxWmFmVWNIbWpITnVOS0Zk?=
+ =?utf-8?B?TnFkRFpoc213eVM2QWx0TU9kYjIxdnp6RlB3OWk3SDV1dHhaakpJR2hIZ0k4?=
+ =?utf-8?B?STM3QkFRdlNYZHlqNkxXUWpzdEVOVTFmMENQTE9sZWRCNWR3ZTYySE03YkIx?=
+ =?utf-8?B?ZGwwR3h3aEdzTTlzM0VtSitwMzJHL3hWdy84ZEpDU3J1UzAxWDl2Qm1RUlR5?=
+ =?utf-8?B?bDZkaW5FTEhad3FlV000OVh1Um9ORVYzWTRPajdTUHBCTkttYk40RTdKa0pp?=
+ =?utf-8?B?eitqUU9xMVdQSzI1d05ZZGJWaFg3c3ZtZERkOVFLMHlrUStYZWJQaWJSTHRw?=
+ =?utf-8?B?bUpxaXQrbUpIVFpTQUt1M3puT3l5TEloS2haNDg3UFdxRVJFSEtWVkpHYnFC?=
+ =?utf-8?B?eTEyb1BORDI4cVBrNDRsbDlZaEs0SzRPL2xmYzVLTVN3SGhkUGxFZDlkTURm?=
+ =?utf-8?B?bEZNdi9SU2xpYkRyOTZYZjRSNWpKbWorbUdDSllHR0J0M0RVZGRMSVNHdDYw?=
+ =?utf-8?B?RWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b5ca9c4-830a-4acf-41da-08dbead561b4
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 21:03:59.2289
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: un8nhb0EAi4VfMlHjwLKT3nZfn04kWZZn/qVgw0YEbn2gaqFuh6ypiZYrMS07PwodveXXsVpUBNR75ZkBBoaTpI1BRrmu0+FOT05dCm9W2A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4785
+X-OriginatorOrg: intel.com
 
-On Tue, Nov 21, 2023 at 12:36=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> >     >      q0_tx_irq_n: 4
-> >     >      q0_rx_pkt_n: 64
-> >     >      q0_rx_irq_n: 58
-> >
-> >     What useful information does this list of statistics bring in the
-> >     commit message?
-> >
-> > Each output line of "ethtool -S" is from the modified code: It shows th=
-e
-> > command still yields normal output results as expected.
->
-> Does it? Can you actually say that looking at it?
->
-Yes, I had debugging pr_err output:
+On 11/21/2023 11:12 AM, Shinas Rasheed wrote:
+> Fill max rx packet length value from firmware.
 
-[  478.894392] STMMAC_SAFETY_FEAT i=3D0, desc=3DATPES (len 6)
-[  478.899709] STMMAC_SAFETY_FEAT i=3D1, desc=3DTPES (len 5)
-[  478.905031] STMMAC_SAFETY_FEAT i=3D2, desc=3DRDPES (len 6)
-[  478.910871] STMMAC_SAFETY_FEAT i=3D3, desc=3DMPES (len 5)
-[  478.916095] STMMAC_SAFETY_FEAT i=3D4, desc=3DMTSPES (len 7)
-[  478.921379] STMMAC_SAFETY_FEAT i=3D5, desc=3DARPES (len 6)
-[  478.926517] STMMAC_SAFETY_FEAT i=3D6, desc=3DCWPES (len 6)
-[  478.931645] STMMAC_SAFETY_FEAT i=3D7, desc=3DASRPES (len 7)
-[  478.936858] STMMAC_SAFETY_FEAT i=3D8, desc=3DTTES (len 5)
-[  478.942393] STMMAC_SAFETY_FEAT i=3D9, desc=3DRTES (len 5)
-[  478.947845] STMMAC_SAFETY_FEAT i=3D10, desc=3DCTES (len 5)
-[  478.953220] STMMAC_SAFETY_FEAT i=3D11, desc=3DATES (len 5)
-[  478.958524] STMMAC_SAFETY_FEAT i=3D12, desc=3DPTES (len 5)
-[  478.963828] STMMAC_SAFETY_FEAT i=3D13, desc=3DT125ES (len 7)
-[  478.969224] STMMAC_SAFETY_FEAT i=3D14, desc=3DR125ES (len 7)
-[  478.975814] STMMAC_SAFETY_FEAT i=3D15, desc=3DRVCTES (len 7)
-[  478.981215] STMMAC_SAFETY_FEAT i=3D16, desc=3DMSTTES (len 7)
-[  478.986599] STMMAC_SAFETY_FEAT i=3D17, desc=3DSLVTES (len 7)
-[  478.992014] STMMAC_SAFETY_FEAT i=3D18, desc=3DATITES (len 7)
-[  478.997435] STMMAC_SAFETY_FEAT i=3D19, desc=3DARITES (len 7)
-[  479.003322] STMMAC_SAFETY_FEAT i=3D24, desc=3DFSMPES (len 7)
-[  479.009327] STMMAC_SAFETY_FEAT i=3D32, desc=3DTXCES (len 6)
-[  479.014637] STMMAC_SAFETY_FEAT i=3D33, desc=3DTXAMS (len 6)
-[  479.019921] STMMAC_SAFETY_FEAT i=3D34, desc=3DTXUES (len 6)
-[  479.025223] STMMAC_SAFETY_FEAT i=3D36, desc=3DRXCES (len 6)
-[  479.030500] STMMAC_SAFETY_FEAT i=3D37, desc=3DRXAMS (len 6)
-[  479.035792] STMMAC_SAFETY_FEAT i=3D38, desc=3DRXUES (len 6)
-[  479.041669] STMMAC_SAFETY_FEAT i=3D40, desc=3DECES (len 5)
-[  479.047457] STMMAC_SAFETY_FEAT i=3D41, desc=3DEAMS (len 5)
-[  479.053143] STMMAC_SAFETY_FEAT i=3D42, desc=3DEUES (len 5)
-[  479.058443] STMMAC_SAFETY_FEAT i=3D44, desc=3DRPCES (len 6)
-[  479.063739] STMMAC_SAFETY_FEAT i=3D45, desc=3DRPAMS (len 6)
-[  479.069331] STMMAC_SAFETY_FEAT i=3D46, desc=3DRPUES (len 6)
-[  479.075499] STMMAC_SAFETY_FEAT i=3D64, desc=3DTCES (len 5)
-[  479.080711] STMMAC_SAFETY_FEAT i=3D65, desc=3DTAMS (len 5)
-[  479.086348] STMMAC_SAFETY_FEAT i=3D66, desc=3DTUES (len 5)
-[  479.091573] STMMAC_MMC_STATS i=3D0, stat_string=3Dmmc_tx_octetcount_gb (=
-len 21)
-[  479.098852] STMMAC_MMC_STATS i=3D1, stat_string=3Dmmc_tx_framecount_gb (=
-len 21)
-[  479.106581] STMMAC_MMC_STATS i=3D2,
-stat_string=3Dmmc_tx_broadcastframe_g (len 24)
-[  479.113988] STMMAC_MMC_STATS i=3D3,
-stat_string=3Dmmc_tx_multicastframe_g (len 24)
-[  479.121221] STMMAC_MMC_STATS i=3D4, stat_string=3Dmmc_tx_64_octets_gb (l=
-en 20)
-[  479.128558] STMMAC_MMC_STATS i=3D5,
-stat_string=3Dmmc_tx_65_to_127_octets_gb (len 27)
-[  479.136418] STMMAC_MMC_STATS i=3D6,
-stat_string=3Dmmc_tx_128_to_255_octets_gb (len 28)
-[  479.144041] STMMAC_MMC_STATS i=3D7,
-stat_string=3Dmmc_tx_256_to_511_octets_gb (len 28)
-[  479.151663] STMMAC_MMC_STATS i=3D8,
-stat_string=3Dmmc_tx_512_to_1023_octets_gb (len 29)
-[  479.159495] STMMAC_MMC_STATS i=3D9,
-stat_string=3Dmmc_tx_1024_to_max_octets_gb (len 29)
-[  479.167255] STMMAC_MMC_STATS i=3D10, stat_string=3Dmmc_tx_unicast_gb (le=
-n 18)
-[  479.174755] STMMAC_MMC_STATS i=3D11, stat_string=3Dmmc_tx_multicast_gb (=
-len 20)
-[  479.181826] STMMAC_MMC_STATS i=3D12, stat_string=3Dmmc_tx_broadcast_gb (=
-len 20)
-[  479.188892] STMMAC_MMC_STATS i=3D13,
-stat_string=3Dmmc_tx_underflow_error (len 23)
-[  479.196211] STMMAC_MMC_STATS i=3D14, stat_string=3Dmmc_tx_singlecol_g (l=
-en 19)
-[  479.203783] STMMAC_MMC_STATS i=3D15, stat_string=3Dmmc_tx_multicol_g (le=
-n 18)
-[  479.211106] STMMAC_MMC_STATS i=3D16, stat_string=3Dmmc_tx_deferred (len =
-16)
-[  479.217826] STMMAC_MMC_STATS i=3D17, stat_string=3Dmmc_tx_latecol (len 1=
-5)
-[  479.224438] STMMAC_MMC_STATS i=3D18, stat_string=3Dmmc_tx_exesscol (len =
-16)
-[  479.231523] STMMAC_MMC_STATS i=3D19, stat_string=3Dmmc_tx_carrier_error =
-(len 21)
-[  479.239095] STMMAC_MMC_STATS i=3D20, stat_string=3Dmmc_tx_octetcount_g (=
-len 20)
-[  479.246178] STMMAC_MMC_STATS i=3D21, stat_string=3Dmmc_tx_framecount_g (=
-len 20)
-[  479.253215] STMMAC_MMC_STATS i=3D22, stat_string=3Dmmc_tx_excessdef (len=
- 17)
-[  479.260032] STMMAC_MMC_STATS i=3D23, stat_string=3Dmmc_tx_pause_frame (l=
-en 19)
-[  479.267486] STMMAC_MMC_STATS i=3D24, stat_string=3Dmmc_tx_vlan_frame_g (=
-len 20)
-[  479.274846] STMMAC_MMC_STATS i=3D25, stat_string=3Dmmc_rx_framecount_gb =
-(len 21)
-[  479.282005] STMMAC_MMC_STATS i=3D26, stat_string=3Dmmc_rx_octetcount_gb =
-(len 21)
-[  479.289186] STMMAC_MMC_STATS i=3D27, stat_string=3Dmmc_rx_octetcount_g (=
-len 20)
-[  479.296734] STMMAC_MMC_STATS i=3D28,
-stat_string=3Dmmc_rx_broadcastframe_g (len 24)
-[  479.304493] STMMAC_MMC_STATS i=3D29,
-stat_string=3Dmmc_rx_multicastframe_g (len 24)
-[  479.312253] STMMAC_MMC_STATS i=3D30, stat_string=3Dmmc_rx_crc_error (len=
- 17)
-[  479.319095] STMMAC_MMC_STATS i=3D31, stat_string=3Dmmc_rx_align_error (l=
-en 19)
-[  479.326165] STMMAC_MMC_STATS i=3D32, stat_string=3Dmmc_rx_run_error (len=
- 17)
-[  479.333660] STMMAC_MMC_STATS i=3D33, stat_string=3Dmmc_rx_jabber_error (=
-len 20)
-[  479.340771] STMMAC_MMC_STATS i=3D34, stat_string=3Dmmc_rx_undersize_g (l=
-en 19)
-[  479.348068] STMMAC_MMC_STATS i=3D35, stat_string=3Dmmc_rx_oversize_g (le=
-n 18)
-[  479.354991] STMMAC_MMC_STATS i=3D36, stat_string=3Dmmc_rx_64_octets_gb (=
-len 20)
-[  479.362603] STMMAC_MMC_STATS i=3D37,
-stat_string=3Dmmc_rx_65_to_127_octets_gb (len 27)
-[  479.370270] STMMAC_MMC_STATS i=3D38,
-stat_string=3Dmmc_rx_128_to_255_octets_gb (len 28)
-[  479.378296] STMMAC_MMC_STATS i=3D39,
-stat_string=3Dmmc_rx_256_to_511_octets_gb (len 28)
-[  479.386073] STMMAC_MMC_STATS i=3D40,
-stat_string=3Dmmc_rx_512_to_1023_octets_gb (len 29)
-[  479.394288] STMMAC_MMC_STATS i=3D41,
-stat_string=3Dmmc_rx_1024_to_max_octets_gb (len 29)
-[  479.402684] STMMAC_MMC_STATS i=3D42, stat_string=3Dmmc_rx_unicast_g (len=
- 17)
-[  479.409814] STMMAC_MMC_STATS i=3D43, stat_string=3Dmmc_rx_length_error (=
-len 20)
-[  479.416918] STMMAC_MMC_STATS i=3D44, stat_string=3Dmmc_rx_autofrangetype=
- (len 22)
-[  479.424442] STMMAC_MMC_STATS i=3D45, stat_string=3Dmmc_rx_pause_frames (=
-len 20)
-[  479.431496] STMMAC_MMC_STATS i=3D46, stat_string=3Dmmc_rx_fifo_overflow =
-(len 21)
-[  479.439027] STMMAC_MMC_STATS i=3D47, stat_string=3Dmmc_rx_vlan_frames_gb=
- (len 22)
-[  479.446291] STMMAC_MMC_STATS i=3D48, stat_string=3Dmmc_rx_watchdog_error=
- (len 22)
-[  479.454142] STMMAC_MMC_STATS i=3D49, stat_string=3Dmmc_rx_ipc_intr_mask =
-(len 21)
-[  479.461296] STMMAC_MMC_STATS i=3D50, stat_string=3Dmmc_rx_ipc_intr (len =
-16)
-[  479.468000] STMMAC_MMC_STATS i=3D51, stat_string=3Dmmc_rx_ipv4_gd (len 1=
-5)
-[  479.474577] STMMAC_MMC_STATS i=3D52, stat_string=3Dmmc_rx_ipv4_hderr (le=
-n 18)
-[  479.481716] STMMAC_MMC_STATS i=3D53, stat_string=3Dmmc_rx_ipv4_nopay (le=
-n 18)
-[  479.489143] STMMAC_MMC_STATS i=3D54, stat_string=3Dmmc_rx_ipv4_frag (len=
- 17)
-[  479.495926] STMMAC_MMC_STATS i=3D55, stat_string=3Dmmc_rx_ipv4_udsbl (le=
-n 18)
-[  479.503251] STMMAC_MMC_STATS i=3D56, stat_string=3Dmmc_rx_ipv4_gd_octets=
- (len 22)
-[  479.511207] STMMAC_MMC_STATS i=3D57,
-stat_string=3Dmmc_rx_ipv4_hderr_octets (len 25)
-[  479.519274] STMMAC_MMC_STATS i=3D58,
-stat_string=3Dmmc_rx_ipv4_nopay_octets (len 25)
-[  479.527106] STMMAC_MMC_STATS i=3D59,
-stat_string=3Dmmc_rx_ipv4_frag_octets (len 24)
-[  479.534839] STMMAC_MMC_STATS i=3D60,
-stat_string=3Dmmc_rx_ipv4_udsbl_octets (len 25)
-[  479.543108] STMMAC_MMC_STATS i=3D61, stat_string=3Dmmc_rx_ipv6_gd_octets=
- (len 22)
-[  479.551189] STMMAC_MMC_STATS i=3D62,
-stat_string=3Dmmc_rx_ipv6_hderr_octets (len 25)
-[  479.558948] STMMAC_MMC_STATS i=3D63,
-stat_string=3Dmmc_rx_ipv6_nopay_octets (len 25)
-[  479.566482] STMMAC_MMC_STATS i=3D64, stat_string=3Dmmc_rx_ipv6_gd (len 1=
-5)
-[  479.573359] STMMAC_MMC_STATS i=3D65, stat_string=3Dmmc_rx_ipv6_hderr (le=
-n 18)
-[  479.580295] STMMAC_MMC_STATS i=3D66, stat_string=3Dmmc_rx_ipv6_nopay (le=
-n 18)
-[  479.587919] STMMAC_MMC_STATS i=3D67, stat_string=3Dmmc_rx_udp_gd (len 14=
-)
-[  479.594580] STMMAC_MMC_STATS i=3D68, stat_string=3Dmmc_rx_udp_err (len 1=
-5)
-[  479.601159] STMMAC_MMC_STATS i=3D69, stat_string=3Dmmc_rx_tcp_gd (len 14=
-)
-[  479.608608] STMMAC_MMC_STATS i=3D70, stat_string=3Dmmc_rx_tcp_err (len 1=
-5)
-[  479.615219] STMMAC_MMC_STATS i=3D71, stat_string=3Dmmc_rx_icmp_gd (len 1=
-5)
-[  479.623283] STMMAC_MMC_STATS i=3D72, stat_string=3Dmmc_rx_icmp_err (len =
-16)
-[  479.630368] STMMAC_MMC_STATS i=3D73, stat_string=3Dmmc_rx_udp_gd_octets =
-(len 21)
-[  479.637536] STMMAC_MMC_STATS i=3D74, stat_string=3Dmmc_rx_udp_err_octets=
- (len 22)
-[  479.644805] STMMAC_MMC_STATS i=3D75, stat_string=3Dmmc_rx_tcp_gd_octets =
-(len 21)
-[  479.652646] STMMAC_MMC_STATS i=3D76, stat_string=3Dmmc_rx_tcp_err_octets=
- (len 22)
-[  479.659901] STMMAC_MMC_STATS i=3D77, stat_string=3Dmmc_rx_icmp_gd_octets=
- (len 22)
-[  479.667117] STMMAC_MMC_STATS i=3D78,
-stat_string=3Dmmc_rx_icmp_err_octets (len 23)
-[  479.674434] STMMAC_MMC_STATS i=3D79,
-stat_string=3Dmmc_tx_fpe_fragment_cntr (len 25)
-[  479.682463] STMMAC_MMC_STATS i=3D80, stat_string=3Dmmc_tx_hold_req_cntr =
-(len 21)
-[  479.689589] STMMAC_MMC_STATS i=3D81,
-stat_string=3Dmmc_rx_packet_assembly_err_cntr (len 32)
-[  479.698065] STMMAC_MMC_STATS i=3D82,
-stat_string=3Dmmc_rx_packet_smd_err_cntr (len 27)
-[  479.705703] STMMAC_MMC_STATS i=3D83,
-stat_string=3Dmmc_rx_packet_assembly_ok_cntr (len 31)
-[  479.714707] STMMAC_MMC_STATS i=3D84,
-stat_string=3Dmmc_rx_fpe_fragment_cntr (len 25)
-[  479.722188] STMMAC_STATS i=3D0, stat_string=3Dtx_underflow (len 13)
-[  479.728183] STMMAC_STATS i=3D1, stat_string=3Dtx_carrier (len 11)
-[  479.734050] STMMAC_STATS i=3D2, stat_string=3Dtx_losscarrier (len 15)
-[  479.740197] STMMAC_STATS i=3D3, stat_string=3Dvlan_tag (len 9)
-[  479.746215] STMMAC_STATS i=3D4, stat_string=3Dtx_deferred (len 12)
-[  479.752119] STMMAC_STATS i=3D5, stat_string=3Dtx_vlan (len 8)
-[  479.757594] STMMAC_STATS i=3D6, stat_string=3Dtx_jabber (len 10)
-[  479.763319] STMMAC_STATS i=3D7, stat_string=3Dtx_frame_flushed (len 17)
-[  479.769629] STMMAC_STATS i=3D8, stat_string=3Dtx_payload_error (len 17)
-[  479.776479] STMMAC_STATS i=3D9, stat_string=3Dtx_ip_header_error (len 19=
-)
-[  479.783392] STMMAC_STATS i=3D10, stat_string=3Drx_desc (len 8)
-[  479.788970] STMMAC_STATS i=3D11, stat_string=3Dsa_filter_fail (len 15)
-[  479.795214] STMMAC_STATS i=3D12, stat_string=3Doverflow_error (len 15)
-[  479.801703] STMMAC_STATS i=3D13, stat_string=3Dipc_csum_error (len 15)
-[  479.807983] STMMAC_STATS i=3D14, stat_string=3Drx_collision (len 13)
-[  479.814460] STMMAC_STATS i=3D15, stat_string=3Drx_crc_errors (len 14)
-[  479.820938] STMMAC_STATS i=3D16, stat_string=3Ddribbling_bit (len 14)
-[  479.827136] STMMAC_STATS i=3D17, stat_string=3Drx_length (len 10)
-[  479.833604] STMMAC_STATS i=3D18, stat_string=3Drx_mii (len 7)
-[  479.839619] STMMAC_STATS i=3D19, stat_string=3Drx_multicast (len 13)
-[  479.846480] STMMAC_STATS i=3D20, stat_string=3Drx_gmac_overflow (len 17)
-[  479.852913] STMMAC_STATS i=3D21, stat_string=3Drx_watchdog (len 12)
-[  479.859240] STMMAC_STATS i=3D22, stat_string=3Dda_rx_filter_fail (len 18=
-)
-[  479.865760] STMMAC_STATS i=3D23, stat_string=3Dsa_rx_filter_fail (len 18=
-)
-[  479.872687] STMMAC_STATS i=3D24, stat_string=3Drx_missed_cntr (len 15)
-[  479.879075] STMMAC_STATS i=3D25, stat_string=3Drx_overflow_cntr (len 17)
-[  479.885573] STMMAC_STATS i=3D26, stat_string=3Drx_vlan (len 8)
-[  479.891122] STMMAC_STATS i=3D27, stat_string=3Drx_split_hdr_pkt_n (len 1=
-9)
-[  479.897705] STMMAC_STATS i=3D28, stat_string=3Dtx_undeflow_irq (len 16)
-[  479.904499] STMMAC_STATS i=3D29, stat_string=3Dtx_process_stopped_irq (l=
-en 23)
-[  479.911457] STMMAC_STATS i=3D30, stat_string=3Dtx_jabber_irq (len 14)
-[  479.917897] STMMAC_STATS i=3D31, stat_string=3Drx_overflow_irq (len 16)
-[  479.924268] STMMAC_STATS i=3D32, stat_string=3Drx_buf_unav_irq (len 16)
-[  479.930722] STMMAC_STATS i=3D33, stat_string=3Drx_process_stopped_irq (l=
-en 23)
-[  479.938108] STMMAC_STATS i=3D34, stat_string=3Drx_watchdog_irq (len 16)
-[  479.944518] STMMAC_STATS i=3D35, stat_string=3Dtx_early_irq (len 13)
-[  479.950895] STMMAC_STATS i=3D36, stat_string=3Dfatal_bus_error_irq (len =
-20)
-[  479.957622] STMMAC_STATS i=3D37, stat_string=3Drx_early_irq (len 13)
-[  479.964082] STMMAC_STATS i=3D38, stat_string=3Dthreshold (len 10)
-[  479.970509] STMMAC_STATS i=3D39, stat_string=3Dtx_pkt_n (len 9)
-[  479.976159] STMMAC_STATS i=3D40, stat_string=3Drx_pkt_n (len 9)
-[  479.981799] STMMAC_STATS i=3D41, stat_string=3Dnormal_irq_n (len 13)
-[  479.987917] STMMAC_STATS i=3D42, stat_string=3Drx_normal_irq_n (len 16)
-[  479.994283] STMMAC_STATS i=3D43, stat_string=3Dnapi_poll (len 10)
-[  480.000395] STMMAC_STATS i=3D44, stat_string=3Dtx_normal_irq_n (len 16)
-[  480.006807] STMMAC_STATS i=3D45, stat_string=3Dtx_clean (len 9)
-[  480.012865] STMMAC_STATS i=3D46, stat_string=3Dtx_set_ic_bit (len 14)
-[  480.019043] STMMAC_STATS i=3D47, stat_string=3Dirq_receive_pmt_irq_n (le=
-n 22)
-[  480.026155] STMMAC_STATS i=3D48, stat_string=3Dmmc_tx_irq_n (len 13)
-[  480.032833] STMMAC_STATS i=3D49, stat_string=3Dmmc_rx_irq_n (len 13)
-[  480.038994] STMMAC_STATS i=3D50, stat_string=3Dmmc_rx_csum_offload_irq_n=
- (len 26)
-[  480.046500] STMMAC_STATS i=3D51, stat_string=3Dirq_tx_path_in_lpi_mode_n=
- (len 26)
-[  480.053710] STMMAC_STATS i=3D52,
-stat_string=3Dirq_tx_path_exit_lpi_mode_n (len 28)
-[  480.061074] STMMAC_STATS i=3D53, stat_string=3Dirq_rx_path_in_lpi_mode_n=
- (len 26)
-[  480.068830] STMMAC_STATS i=3D54,
-stat_string=3Dirq_rx_path_exit_lpi_mode_n (len 28)
-[  480.076913] STMMAC_STATS i=3D55, stat_string=3Dphy_eee_wakeup_error_n (l=
-en 23)
-[  480.083906] STMMAC_STATS i=3D56, stat_string=3Dip_hdr_err (len 11)
-[  480.089803] STMMAC_STATS i=3D57, stat_string=3Dip_payload_err (len 15)
-[  480.096634] STMMAC_STATS i=3D58, stat_string=3Dip_csum_bypassed (len 17)
-[  480.103087] STMMAC_STATS i=3D59, stat_string=3Dipv4_pkt_rcvd (len 14)
-[  480.109499] STMMAC_STATS i=3D60, stat_string=3Dipv6_pkt_rcvd (len 14)
-[  480.115679] STMMAC_STATS i=3D61, stat_string=3Dno_ptp_rx_msg_type_ext (l=
-en 23)
-[  480.123066] STMMAC_STATS i=3D62, stat_string=3Dptp_rx_msg_type_sync (len=
- 21)
-[  480.130471] STMMAC_STATS i=3D63, stat_string=3Dptp_rx_msg_type_follow_up=
- (len 26)
-[  480.137685] STMMAC_STATS i=3D64, stat_string=3Dptp_rx_msg_type_delay_req=
- (len 26)
-[  480.145088] STMMAC_STATS i=3D65,
-stat_string=3Dptp_rx_msg_type_delay_resp (len 27)
-[  480.152385] STMMAC_STATS i=3D66,
-stat_string=3Dptp_rx_msg_type_pdelay_req (len 27)
-[  480.160200] STMMAC_STATS i=3D67,
-stat_string=3Dptp_rx_msg_type_pdelay_resp (len 28)
-[  480.167581] STMMAC_STATS i=3D68,
-stat_string=3Dptp_rx_msg_type_pdelay_follow_u (len 32)
-[  480.175469] STMMAC_STATS i=3D69, stat_string=3Dptp_rx_msg_type_announce =
-(len 25)
-[  480.182632] STMMAC_STATS i=3D70,
-stat_string=3Dptp_rx_msg_type_management (len 27)
-[  480.190369] STMMAC_STATS i=3D71,
-stat_string=3Dptp_rx_msg_pkt_reserved_type (len 29)
-[  480.197842] STMMAC_STATS i=3D72, stat_string=3Dptp_frame_type (len 15)
-[  480.204065] STMMAC_STATS i=3D73, stat_string=3Dptp_ver (len 8)
-[  480.209614] STMMAC_STATS i=3D74, stat_string=3Dtimestamp_dropped (len 18=
-)
-[  480.216092] STMMAC_STATS i=3D75, stat_string=3Dav_pkt_rcvd (len 12)
-[  480.222731] STMMAC_STATS i=3D76, stat_string=3Dav_tagged_pkt_rcvd (len 1=
-9)
-[  480.229353] STMMAC_STATS i=3D77, stat_string=3Dvlan_tag_priority_val (le=
-n 22)
-[  480.236491] STMMAC_STATS i=3D78, stat_string=3Dl3_filter_match (len 16)
-[  480.242895] STMMAC_STATS i=3D79, stat_string=3Dl4_filter_match (len 16)
-[  480.249616] STMMAC_STATS i=3D80, stat_string=3Dl3_l4_filter_no_match (le=
-n 22)
-[  480.256931] STMMAC_STATS i=3D81, stat_string=3Dirq_pcs_ane_n (len 14)
-[  480.264320] STMMAC_STATS i=3D82, stat_string=3Dirq_pcs_link_n (len 15)
-[  480.270901] STMMAC_STATS i=3D83, stat_string=3Dirq_rgmii_n (len 12)
-[  480.276921] STMMAC_STATS i=3D84, stat_string=3Dmtl_tx_status_fifo_full (=
-len 24)
-[  480.283973] STMMAC_STATS i=3D85, stat_string=3Dmtl_tx_fifo_not_empty (le=
-n 22)
-[  480.291395] STMMAC_STATS i=3D86, stat_string=3Dmmtl_fifo_ctrl (len 15)
-[  480.298225] STMMAC_STATS i=3D87,
-stat_string=3Dmtl_tx_fifo_read_ctrl_write (len 28)
-[  480.305608] STMMAC_STATS i=3D88,
-stat_string=3Dmtl_tx_fifo_read_ctrl_wait (len 27)
-[  480.313299] STMMAC_STATS i=3D89,
-stat_string=3Dmtl_tx_fifo_read_ctrl_read (len 27)
-[  480.320641] STMMAC_STATS i=3D90,
-stat_string=3Dmtl_tx_fifo_read_ctrl_idle (len 27)
-[  480.328459] STMMAC_STATS i=3D91, stat_string=3Dmac_tx_in_pause (len 16)
-[  480.334810] STMMAC_STATS i=3D92, stat_string=3Dmac_tx_frame_ctrl_xfer (l=
-en 23)
-[  480.341777] STMMAC_STATS i=3D93, stat_string=3Dmac_tx_frame_ctrl_idle (l=
-en 23)
-[  480.349311] STMMAC_STATS i=3D94, stat_string=3Dmac_tx_frame_ctrl_wait (l=
-en 23)
-[  480.356688] STMMAC_STATS i=3D95, stat_string=3Dmac_tx_frame_ctrl_pause (=
-len 24)
-[  480.363728] STMMAC_STATS i=3D96, stat_string=3Dmac_gmii_tx_proto_engine =
-(len 25)
-[  480.370828] STMMAC_STATS i=3D97,
-stat_string=3Dmtl_rx_fifo_fill_level_full (len 28)
-[  480.378256] STMMAC_STATS i=3D98,
-stat_string=3Dmtl_rx_fifo_fill_above_thresh (len 30)
-[  480.386412] STMMAC_STATS i=3D99,
-stat_string=3Dmtl_rx_fifo_fill_below_thresh (len 30)
-[  480.393993] STMMAC_STATS i=3D100,
-stat_string=3Dmtl_rx_fifo_fill_level_empty (len 29)
-[  480.402512] STMMAC_STATS i=3D101,
-stat_string=3Dmtl_rx_fifo_read_ctrl_flush (len 28)
-[  480.410014] STMMAC_STATS i=3D102,
-stat_string=3Dmtl_rx_fifo_read_ctrl_read_data (len 32)
-[  480.418388] STMMAC_STATS i=3D103,
-stat_string=3Dmtl_rx_fifo_read_ctrl_status (len 29)
-[  480.425965] STMMAC_STATS i=3D104,
-stat_string=3Dmtl_rx_fifo_read_ctrl_idle (len 27)
-[  480.433324] STMMAC_STATS i=3D105, stat_string=3Dmtl_rx_fifo_ctrl_active =
-(len 24)
-[  480.440431] STMMAC_STATS i=3D106, stat_string=3Dmac_rx_frame_ctrl_fifo (=
-len 23)
-[  480.448023] STMMAC_STATS i=3D107, stat_string=3Dmac_gmii_rx_proto_engine=
- (len 25)
-[  480.455226] STMMAC_STATS i=3D108, stat_string=3Dtx_tso_frames (len 14)
-[  480.461458] STMMAC_STATS i=3D109, stat_string=3Dtx_tso_nfrags (len 14)
-[  480.467714] STMMAC_STATS i=3D110, stat_string=3Dmtl_est_cgce (len 13)
-[  480.473848] STMMAC_STATS i=3D111, stat_string=3Dmtl_est_hlbs (len 13)
-[  480.480489] STMMAC_STATS i=3D112, stat_string=3Dmtl_est_hlbf (len 13)
-[  480.486665] STMMAC_STATS i=3D113, stat_string=3Dmtl_est_btre (len 13)
-[  480.493206] STMMAC_STATS i=3D114, stat_string=3Dmtl_est_btrlm (len 14)
+Hi Shinas, thanks for the patch.
+
+Please provide why, and make sure you're talking to the linux kernel
+developer audience who don't know anything about your hardware. We're
+interested to know why this patch is useful to the kernel and why it
+might need to be applied.
 
 
-> > No, since strscpy does the job already. Also I could not find ethtool_p=
-uts:
-> > where is it defined? Or do you mean ethtool_put_stat, which is inapprop=
-riate to
-> > use here since it requires a skb parameter?
->
-> https://patchwork.kernel.org/project/netdevbpf/patch/20231102-ethtool_put=
-s_impl-v4-3-14e1e9278496@google.com/
->
-> Maybe check with Justin when we will resend that patch.
-Thanks for the link to ethtool_puts patch: Changing to use
-ethtool_puts in stmmac should be in a separate patch, and not related
-here.
+> 
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> ---
+>  .../marvell/octeon_ep/octep_ctrl_net.c         | 18 ++++++++++++++++++
+>  .../marvell/octeon_ep/octep_ctrl_net.h         |  9 +++++++++
+>  .../ethernet/marvell/octeon_ep/octep_main.c    | 10 +++++++++-
+>  3 files changed, 36 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+> index 6dd3d03c1c0f..c9fcebb9bd9b 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+> @@ -198,6 +198,24 @@ int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
+>  	return octep_send_mbox_req(oct, &d, wait_for_response);
+>  }
+>  
+> +int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid)
+> +{
+> +	struct octep_ctrl_net_wait_data d = {0};
 
->
->         Andrew
+I think preferred style is now d = { }; since that doesn't mess up if
+the first member of the struct is an enum.
 
-Ray
+> +	struct octep_ctrl_net_h2f_req *req;
+> +	int err;
+> +
+> +	req = &d.data.req;
+> +	init_send_req(&d.msg, req, mtu_sz, vfid);
+> +	req->hdr.s.cmd = OCTEP_CTRL_NET_H2F_CMD_MTU;
+> +	req->mtu.cmd = OCTEP_CTRL_NET_CMD_GET;
+> +
+> +	err = octep_send_mbox_req(oct, &d, true);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	return d.data.resp.mtu.val;
+> +}
+> +
+>  int octep_ctrl_net_set_mtu(struct octep_device *oct, int vfid, int mtu,
+>  			   bool wait_for_response)
+>  {
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+> index 4bb97ad1f1c6..46ddaa5c64d1 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+> @@ -282,6 +282,15 @@ int octep_ctrl_net_get_mac_addr(struct octep_device *oct, int vfid, u8 *addr);
+>  int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
+>  				bool wait_for_response);
+>  
+> +/** Get max MTU from firmware.
+> + *
+> + * @param oct: non-null pointer to struct octep_device.
+> + * @param vfid: Index of virtual function.
+> + *
+> + * return value: mtu on success, -errno on failure.
+> + */
+
+The above block is definitely not correctly formatted kdoc (if that's
+what you wanted), and you can probably get feedback about it from
+scripts/kernel-doc -v
+drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+
+I see you have some correctly formatted doc in octep_tx.c
+
+
+> +int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid);
+> +
+>  /** Set mtu in firmware.
+>   *
+>   * @param oct: non-null pointer to struct octep_device.
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> index 3cee69b3ac38..f9c539178114 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+> @@ -1276,6 +1276,7 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  {
+>  	struct octep_device *octep_dev = NULL;
+>  	struct net_device *netdev;
+> +	int max_rx_pktlen;
+>  	int err;
+>  
+>  	err = pci_enable_device(pdev);
+> @@ -1346,8 +1347,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  
+>  	netdev->hw_features = NETIF_F_SG;
+>  	netdev->features |= netdev->hw_features;
+> +
+> +	max_rx_pktlen = octep_ctrl_net_get_mtu(octep_dev, OCTEP_CTRL_NET_INVALID_VFID);
+> +	if (max_rx_pktlen < 0) {
+> +		dev_err(&octep_dev->pdev->dev,
+> +			"Failed to get max receive packet size; err = %d\n", max_rx_pktlen);
+> +		goto register_dev_err;
+> +	}
+>  	netdev->min_mtu = OCTEP_MIN_MTU;
+> -	netdev->max_mtu = OCTEP_MAX_MTU;
+> +	netdev->max_mtu = max_rx_pktlen - (ETH_HLEN + ETH_FCS_LEN);
+>  	netdev->mtu = OCTEP_DEFAULT_MTU;
+
+Not part of this patch, but was there a point to setting the mtu here
+without telling the netdev? most of the time it seems sufficient to just
+set max and min since the kernel default is already 1500 (which your
+internal define also duplicates)
+
+Mostly the code seems fine.
+
 
