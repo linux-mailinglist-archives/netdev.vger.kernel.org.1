@@ -1,244 +1,208 @@
-Return-Path: <netdev+bounces-49750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D527F3631
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:38:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E3E7F364C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:43:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F046EB21339
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:38:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 325A0B20A39
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211773D380;
-	Tue, 21 Nov 2023 18:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599EC20DC6;
+	Tue, 21 Nov 2023 18:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="0xKbHxgN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kiaBsYVz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468EE1708
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 10:38:11 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-50930f126b1so7745071e87.3
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 10:38:11 -0800 (PST)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7393F110;
+	Tue, 21 Nov 2023 10:43:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700591889; x=1701196689; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tLsY9mj+sE/CjJljiS1JURplG6R4NjGEPqmgDMelvLw=;
-        b=0xKbHxgNGaNZ6aOik6iC9nVw+iE6p8cv3FXfYEt3fZ9PsUltBqIK+/9yT6nG0MGZ8G
-         mDK/kthg1VvqGH9O7an14Va8lwsjPsVolwLapwbxBh5Hh7HPRg2v6goUpt1b0kDpL0Ux
-         ND96TIxI11hawqj3uY+TvnJEY8+4eWp0MhJReSAF5vOfdgMcRSLhW3SIYCi/srsegtEa
-         ME20FDA695M/Lh/6G8pPmFC+t+xXwZJlyTjGstDqi56YCx/maS3RA/k8dT+tGV6+nYtc
-         TBkS8/sWBlUN0LbK+7RiHHhf3JJGyvwwvmIFHvUhEYDF0z0SDMvlzv4Bxv8+2c0LUKQB
-         FZBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700591889; x=1701196689;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tLsY9mj+sE/CjJljiS1JURplG6R4NjGEPqmgDMelvLw=;
-        b=Hzs4ZQc7yRy3wJEy1LLzHj/VsyBapF0Nu96bCHlf1atSZ31i5l9AufkvUm1J6TOfLV
-         /nGtiTCzkoTVFCXNCKlfj0LmRPQV5V2i0lMlBLjEo8ss+8XXYrQHhAUYPBzPnVvga/4S
-         GETSzQMqQynFYJpaFVwinueqQor1ZBO2PvGuQNSfggY3UkGTrjT+R7e043vpjok5Boew
-         la1FtweMLxltwBP7A81Wqn/d9xV0Qh4YQnVfBdjBr6PasUMQm9RYRGgpoiVT55mVLT1T
-         Lrp61D2vo7xsy42eX2BUSdiyItj7mfEHhgu+0XtLC2tAfGU35xN3BRlxhg0hDkQDc6aq
-         UWoQ==
-X-Gm-Message-State: AOJu0YxZDpacXhVxJm+dyVhtbUd5mGFhY0zolnXCdcCY4O8YW1gZsUki
-	MyLFM5asNCKWp30v7ss8e+Gx4A==
-X-Google-Smtp-Source: AGHT+IGudSeAb2Up8kQJkm74QW+5gSTsgKefFOY/tgEli51wxWBqZnhsP9o4z9zr0lmbLGrGNw1INg==
-X-Received: by 2002:ac2:44b3:0:b0:507:984b:f174 with SMTP id c19-20020ac244b3000000b00507984bf174mr54973lfm.48.1700591889172;
-        Tue, 21 Nov 2023 10:38:09 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
-        by smtp.googlemail.com with ESMTPSA id u10-20020aa7d88a000000b00548ac1f7c5esm2921361edq.64.2023.11.21.10.38.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 10:38:08 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	devicetree@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [PATCH v2] dt-bindings: net: renesas,ethertsn: Add Ethernet TSN
-Date: Tue, 21 Nov 2023 19:37:38 +0100
-Message-ID: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.42.1
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1700592182; x=1732128182;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IHixAHhojhqDKX1MpvKPKEJH/md3GgMpTtulY7CorTo=;
+  b=kiaBsYVzbifPp3MrwIY9LY1pdPFcfFqCzfemjjEocRqszkTefCII3lJF
+   Tww4518LUarPiesy/PGi0LAnKiuLlAHrNOFZ8pZKwrdOt7BTrj86cQaOs
+   dUhAigsy6RfMDOIP2XNKcSohd64+EpGsf6ZQOtMDgf7LUrXNJYEtKe+3C
+   I=;
+X-IronPort-AV: E=Sophos;i="6.04,216,1695686400"; 
+   d="scan'208";a="45393175"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 18:43:00 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id 1256840D96;
+	Tue, 21 Nov 2023 18:42:59 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:58992]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.167:2525] with esmtp (Farcaster)
+ id 22748138-2f85-49f8-83fe-3267437bc3fd; Tue, 21 Nov 2023 18:42:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 22748138-2f85-49f8-83fe-3267437bc3fd
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Tue, 21 Nov 2023 18:42:58 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.30) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Tue, 21 Nov 2023 18:42:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 bpf-next 00/11] bpf: tcp: Support arbitrary SYN Cookie at TC.
+Date: Tue, 21 Nov 2023 10:42:34 -0800
+Message-ID: <20231121184245.69569-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.30]
+X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-device provides Ethernet network.
+Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+for the connection request until a valid ACK is responded to the SYN+ACK.
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
-* Changes since v1
-- Update patch subject, was "dt-bindings: net: renesas,ethertsn: Add
-  bindings for Ethernet TSN".
-- Add top-level $ref to ethernet-controller.yaml.
-- Rework compatible node to have a fallback, renesas,rcar-gen4-ethertsn.
-- Change compatible value to match renesas style, was
-  renesas,ethertsn-r8a779g0.
-- Change interrupt names from "tx_data", "rx_data" to "tx", "rx".
-- Add missing unevaluatedProperties.
-- Use the generic properties for internal delay tx-internal-delay-ps and
-  rx-internal-delay-ps instead of vendor specific ones.
----
- .../bindings/net/renesas,ethertsn.yaml        | 133 ++++++++++++++++++
- 1 file changed, 133 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+The cookie contains two kinds of host-specific bits, a timestamp and
+secrets, so only can it be validated by the generator.  It means SYN
+Cookie consumes network resources between the client and the server;
+intermediate nodes must remember which nodes to route ACK for the cookie.
 
-diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-new file mode 100644
-index 000000000000..475aff7714d6
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-@@ -0,0 +1,133 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Renesas Ethernet TSN End-station
-+
-+maintainers:
-+  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
-+
-+description:
-+  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
-+  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    items:
-+      - enum:
-+          - renesas,r8a779g0-ethertsn       # R-Car V4H
-+      - const: renesas,rcar-gen4-ethertsn
-+
-+  reg:
-+    items:
-+      - description: TSN End Station target
-+      - description: generalized Precision Time Protocol target
-+
-+  reg-names:
-+    items:
-+      - const: tsnes
-+      - const: gptp
-+
-+  interrupts:
-+    items:
-+      - description: TX data interrupt
-+      - description: RX data interrupt
-+
-+  interrupt-names:
-+    items:
-+      - const: tx
-+      - const: rx
-+
-+  clocks:
-+    maxItems: 1
-+
-+  power-domains:
-+    maxItems: 1
-+
-+  resets:
-+    maxItems: 1
-+
-+  phy-mode:
-+    contains:
-+      enum:
-+        - mii
-+        - rgmii
-+
-+  phy-handle:
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+    description:
-+      Specifies a reference to a node representing a PHY device.
-+
-+  rx-internal-delay-ps:
-+    enum: [0, 1800]
-+
-+  tx-internal-delay-ps:
-+    enum: [0, 2000]
-+
-+  '#address-cells':
-+    const: 1
-+
-+  '#size-cells':
-+    const: 0
-+
-+patternProperties:
-+  "^ethernet-phy@[0-9a-f]$":
-+    type: object
-+    $ref: ethernet-phy.yaml#
-+    unevaluatedProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+  - reg-names
-+  - interrupts
-+  - interrupt-names
-+  - clocks
-+  - power-domains
-+  - resets
-+  - phy-mode
-+  - phy-handle
-+  - '#address-cells'
-+  - '#size-cells'
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/r8a779g0-cpg-mssr.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/power/r8a779g0-sysc.h>
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    tsn0: ethernet@e6460000 {
-+        compatible = "renesas,r8a779g0-ethertsn", "renesas,rcar-gen4-ethertsn";
-+        reg = <0xe6460000 0x7000>,
-+              <0xe6449000 0x500>;
-+        reg-names = "tsnes", "gptp";
-+        interrupts = <GIC_SPI 429 IRQ_TYPE_LEVEL_HIGH>,
-+                     <GIC_SPI 430 IRQ_TYPE_LEVEL_HIGH>;
-+        interrupt-names = "tx", "rx";
-+        clocks = <&cpg CPG_MOD 2723>;
-+        power-domains = <&sysc R8A779G0_PD_ALWAYS_ON>;
-+        resets = <&cpg 2723>;
-+
-+        phy-mode = "rgmii";
-+        tx-internal-delay-ps = <2000>;
-+        phy-handle = <&phy3>;
-+
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        phy3: ethernet-phy@3 {
-+            compatible = "ethernet-phy-ieee802.3-c45";
-+            reg = <0>;
-+            interrupt-parent = <&gpio4>;
-+            interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-+            reset-gpios = <&gpio1 23 GPIO_ACTIVE_LOW>;
-+        };
-+    };
+SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+backend server and completes another 3WHS.  However, since the server's
+ISN differs from the cookie, the proxy must manage the ISN mappings and
+fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+node is down, all the connections through it are also down.  Keeping a
+state at proxy is painful from that perspective.
+
+At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+Our SYN Proxy consists of the front proxy layer and the backend kernel
+module.  (See slides of LPC2023 [0], p37 - p48)
+
+The cookie that SYN Proxy generates differs from the kernel's cookie in
+that it contains a secret (called rolling salt) (i) shared by all the proxy
+nodes so that any node can validate ACK and (ii) updated periodically so
+that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
+ECN, not in TS val.  This is not to sacrifice any connection quality, where
+some customers turn off the timestamp option due to retro CVE.
+
+After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+server.  Our kernel module works at Netfilter input/output hooks and first
+feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+for SYN+ACK, it looks up the corresponding request socket and overwrites
+tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+complete 3WHS with the original ACK as is.
+
+This way, our SYN Proxy does not manage the ISN mappings and can remain
+stateless.  It's working very well for high-bandwidth services like
+multiple Tbps, but we are looking for a way to drop the dirty hack and
+further optimise the sequences.
+
+If we could validate an arbitrary SYN Cookie on the backend server with
+BPF, the proxy would need not restore SYN nor pass it.  After validating
+ACK, the proxy node just needs to forward it, and then the server can do
+the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+and create a connection from the ACK.
+
+This series adds a new kfunc available on TC to create a reqsk and
+configure it based on the argument populated from SYN Cookie.
+
+    Usage:
+
+    struct tcp_cookie_attributes attr = {
+        .tcp_opt = {
+            .mss_clamp = mss,
+            .wscale_ok = wscale_ok,
+            .snd_scale = send_scale, /* < 15 */
+            .tstamp_ok = tstamp_ok,
+            .sack_ok = sack_ok,
+        },
+        .ecn_ok = ecn_ok,
+        .usec_ts_ok = usec_ts_ok,
+    };
+
+    skc = bpf_skc_lookup_tcp(...);
+    sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
+    bpf_sk_assign_tcp_reqsk(skb, sk, attr, sizeof(attr));
+    bpf_sk_release(skc);
+
+For details, please see each patch.  Here's an overview:
+
+  Patch 1 - 6 : Misc cleanup
+  Patch 7, 8  : Factorise non-BPF SYN Cookie handling
+  Patch 9, 10 : Support arbitrary SYN Cookie with BPF
+  Patch 11    : Selftest
+
+[0]: https://lpc.events/event/17/contributions/1645/attachments/1350/2701/SYN_Proxy_at_Scale_with_BPF.pdf
+
+
+Changes:
+  v3:
+    Patch 10:
+      * Guard kfunc and req->syncookie part in inet6?_steal_sock() with
+        CONFIG_SYN_COOKIE (kernel test robot)
+
+  v2: https://lore.kernel.org/netdev/20231120222341.54776-1-kuniyu@amazon.com/
+    * Drop SOCK_OPS and move SYN Cookie validation logic to TC with kfunc.
+    * Add cleanup patches to reduce discrepancy between cookie_v[46]_check()
+
+  v1: https://lore.kernel.org/bpf/20231013220433.70792-1-kuniyu@amazon.com/
+
+
+
+Kuniyuki Iwashima (11):
+  tcp: Clean up reverse xmas tree in cookie_v[46]_check().
+  tcp: Cache sock_net(sk) in cookie_v[46]_check().
+  tcp: Clean up goto labels in cookie_v[46]_check().
+  tcp: Don't pass cookie to __cookie_v[46]_check().
+  tcp: Don't initialise tp->tsoffset in tcp_get_cookie_sock().
+  tcp: Move TCP-AO bits from cookie_v[46]_check() to tcp_ao_syncookie().
+  tcp: Factorise cookie req initialisation.
+  tcp: Factorise non-BPF SYN Cookie handling.
+  bpf: tcp: Handle BPF SYN Cookie in cookie_v[46]_check().
+  bpf: tcp: Support arbitrary SYN Cookie.
+  selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
+
+ include/linux/netfilter_ipv6.h                |   8 +-
+ include/net/inet6_hashtables.h                |  16 +-
+ include/net/inet_hashtables.h                 |  16 +-
+ include/net/tcp.h                             |  49 +-
+ include/net/tcp_ao.h                          |   6 +-
+ net/core/filter.c                             | 113 +++-
+ net/core/sock.c                               |  14 +-
+ net/ipv4/syncookies.c                         | 273 +++++----
+ net/ipv4/tcp_ao.c                             |  16 +-
+ net/ipv6/syncookies.c                         | 112 ++--
+ net/netfilter/nf_synproxy_core.c              |   4 +-
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |  10 +
+ .../bpf/prog_tests/tcp_custom_syncookie.c     | 163 +++++
+ .../selftests/bpf/progs/test_siphash.h        |  64 ++
+ .../bpf/progs/test_tcp_custom_syncookie.c     | 570 ++++++++++++++++++
+ .../bpf/progs/test_tcp_custom_syncookie.h     | 161 +++++
+ 16 files changed, 1393 insertions(+), 202 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_siphash.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.h
+
 -- 
-2.42.1
+2.30.2
 
 
