@@ -1,177 +1,197 @@
-Return-Path: <netdev+bounces-49539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 714107F252C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:19:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661DD7F2539
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:23:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2280B21C47
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:19:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAE5428295D
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D5E182C7;
-	Tue, 21 Nov 2023 05:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A637E18659;
+	Tue, 21 Nov 2023 05:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j327D7gO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxgvS25m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9B4C8;
-	Mon, 20 Nov 2023 21:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700543957; x=1732079957;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pcsXmk8Q6mE4d84jdRULTsqZMUZAGSif0EL2ns/7/gA=;
-  b=j327D7gOylNOojX+/dRINxIPjD4eKbEk2sS016hmxJjSPncZHZuvxQhJ
-   dyRrinKJVhlmxK0mCqO4UQFvE28Wara40OPvVgUSjI22GiEXmXXf/JJL8
-   /f2mK6tO09CWfLc4hdAebx/uU9k7Ebo+1gLfxGG1Us88FoFBtMZw5XeQ/
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.04,215,1695686400"; 
-   d="scan'208";a="167409420"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 05:19:13 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 1BFD440D91;
-	Tue, 21 Nov 2023 05:19:11 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:30199]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.224:2525] with esmtp (Farcaster)
- id 78b88525-b3b4-4dd6-82ed-c2b6d0c9ab58; Tue, 21 Nov 2023 05:19:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 78b88525-b3b4-4dd6-82ed-c2b6d0c9ab58
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Tue, 21 Nov 2023 05:19:10 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Tue, 21 Nov 2023 05:19:06 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lkp@intel.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <oe-kbuild-all@lists.linux.dev>,
-	<pabeni@redhat.com>, <sdf@google.com>, <song@kernel.org>,
-	<yonghong.song@linux.dev>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C8F3E7;
+	Mon, 20 Nov 2023 21:23:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700544214; x=1732080214;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JDM+sJou2R6avgWQNXVVJZe/VBsI2UTfU5lcwqkBEv8=;
+  b=kxgvS25mKtRe9/JlVgTFNvytyxWEApSFdEGlM/Imy5KUFrJmFKDkveI4
+   cIaBuDTGA1166vITwy4a1nJ458MMUq15cZg6jr7GZrnrnoJD7jB9UxtsJ
+   uPXX0X5zDjCGAQsshmVmIzKWU/ojhpOxWoB5ucKQaBpUdjNivx5Xlp6fu
+   MUOsAeCuJ3jhAKDjyuJ8prUyv5/jlybdHw2UsMZIGH/eNt8BwH01G8aTE
+   v/Uol+I0brzkPtrIJfzWjxvmnkDetOdgvhCSwS15YFoCAUmNz0kEOK0Sr
+   n+VvdEnnhQMstypgdXK/FKhfpvv5+4lP6ikB3TR39oQVP2xsqBtVjHPGx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="382160663"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="382160663"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 21:23:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="14793459"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 20 Nov 2023 21:23:29 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r5JEJ-0007LQ-21;
+	Tue, 21 Nov 2023 05:23:24 +0000
+Date: Tue, 21 Nov 2023 13:21:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org
 Subject: Re: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
-Date: Mon, 20 Nov 2023 21:18:57 -0800
-Message-ID: <20231121051857.89600-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <202311211229.8GAmfTPp-lkp@intel.com>
-References: <202311211229.8GAmfTPp-lkp@intel.com>
+Message-ID: <202311211344.cgnPKNbc-lkp@intel.com>
+References: <20231120222341.54776-11-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.26]
-X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120222341.54776-11-kuniyu@amazon.com>
 
-From: kernel test robot <lkp@intel.com>
-Date: Tue, 21 Nov 2023 13:06:23 +0800
-> Hi Kuniyuki,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on bpf-next/master]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Clean-up-reverse-xmas-tree-in-cookie_v-46-_check/20231121-063036
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-> patch link:    https://lore.kernel.org/r/20231120222341.54776-11-kuniyu%40amazon.com
-> patch subject: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
-> config: arm-randconfig-001-20231121 (https://download.01.org/0day-ci/archive/20231121/202311211229.8GAmfTPp-lkp@intel.com/config)
-> compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211229.8GAmfTPp-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202311211229.8GAmfTPp-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
-> >> net/core/filter.c:11812:48: warning: 'struct tcp_cookie_attributes' declared inside parameter list will not be visible outside of this definition or declaration
->    11812 |                                         struct tcp_cookie_attributes *attr,
->          |                                                ^~~~~~~~~~~~~~~~~~~~~
->    net/core/filter.c: In function 'bpf_sk_assign_tcp_reqsk':
->    net/core/filter.c:11821:31: error: invalid application of 'sizeof' to incomplete type 'struct tcp_cookie_attributes'
->    11821 |         if (attr__sz != sizeof(*attr))
->          |                               ^
->    net/core/filter.c:11851:17: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11851 |         if (attr->tcp_opt.mss_clamp < min_mss) {
->          |                 ^~
->    net/core/filter.c:11856:17: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11856 |         if (attr->tcp_opt.wscale_ok &&
->          |                 ^~
->    net/core/filter.c:11857:17: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11857 |             attr->tcp_opt.snd_wscale > TCP_MAX_WSCALE) {
->          |                 ^~
->    net/core/filter.c:11875:24: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11875 |         req->mss = attr->tcp_opt.mss_clamp;
->          |                        ^~
->    net/core/filter.c:11877:32: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11877 |         ireq->snd_wscale = attr->tcp_opt.snd_wscale;
->          |                                ^~
->    net/core/filter.c:11878:31: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11878 |         ireq->wscale_ok = attr->tcp_opt.wscale_ok;
->          |                               ^~
->    net/core/filter.c:11879:31: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11879 |         ireq->tstamp_ok = attr->tcp_opt.tstamp_ok;
->          |                               ^~
->    net/core/filter.c:11880:29: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11880 |         ireq->sack_ok = attr->tcp_opt.sack_ok;
->          |                             ^~
->    net/core/filter.c:11881:28: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11881 |         ireq->ecn_ok = attr->ecn_ok;
->          |                            ^~
->    net/core/filter.c:11883:33: error: invalid use of undefined type 'struct tcp_cookie_attributes'
->    11883 |         treq->req_usec_ts = attr->usec_ts_ok;
->          |                                 ^~
-> 
-> 
-> vim +11812 net/core/filter.c
-> 
->  11810	
->  11811	__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
->  11812						struct tcp_cookie_attributes *attr,
->  11813						int attr__sz)
->  11814	{
+Hi Kuniyuki,
 
-bpf_sk_assign_tcp_reqsk() needs to be guarded by CONFIG_SYN_COOKIE.
+kernel test robot noticed the following build errors:
 
-Will fix in v3.
+[auto build test ERROR on bpf-next/master]
 
-Thanks!
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Clean-up-reverse-xmas-tree-in-cookie_v-46-_check/20231121-063036
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231120222341.54776-11-kuniyu%40amazon.com
+patch subject: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
+config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20231121/202311211344.cgnPKNbc-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211344.cgnPKNbc-lkp@intel.com/reproduce)
 
----8<---
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 58b567aaf577..7beba469e8a7 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -11808,6 +11808,7 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_SYN_COOKIE)
- __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
- 					struct tcp_cookie_attributes *attr,
- 					int attr__sz)
-@@ -11888,6 +11889,7 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
- 
- 	return 0;
- }
-+#endif
- 
- __bpf_kfunc_end_defs();
- 
----8<---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311211344.cgnPKNbc-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/core/filter.c:11812:13: warning: 'struct tcp_cookie_attributes' declared inside parameter list will not be visible outside of this definition or declaration
+         struct tcp_cookie_attributes *attr,
+                ^~~~~~~~~~~~~~~~~~~~~
+   net/core/filter.c: In function 'bpf_sk_assign_tcp_reqsk':
+>> net/core/filter.c:11821:25: error: dereferencing pointer to incomplete type 'struct tcp_cookie_attributes'
+     if (attr__sz != sizeof(*attr))
+                            ^~~~~
+
+
+vim +11821 net/core/filter.c
+
+ 11810	
+ 11811	__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
+ 11812						struct tcp_cookie_attributes *attr,
+ 11813						int attr__sz)
+ 11814	{
+ 11815		const struct request_sock_ops *ops;
+ 11816		struct inet_request_sock *ireq;
+ 11817		struct tcp_request_sock *treq;
+ 11818		struct request_sock *req;
+ 11819		__u16 min_mss;
+ 11820	
+ 11821		if (attr__sz != sizeof(*attr))
+ 11822			return -EINVAL;
+ 11823	
+ 11824		if (!sk)
+ 11825			return -EINVAL;
+ 11826	
+ 11827		if (!skb_at_tc_ingress(skb))
+ 11828			return -EINVAL;
+ 11829	
+ 11830		if (dev_net(skb->dev) != sock_net(sk))
+ 11831			return -ENETUNREACH;
+ 11832	
+ 11833		switch (skb->protocol) {
+ 11834		case htons(ETH_P_IP):
+ 11835			ops = &tcp_request_sock_ops;
+ 11836			min_mss = 536;
+ 11837			break;
+ 11838	#if IS_BUILTIN(CONFIG_IPV6)
+ 11839		case htons(ETH_P_IPV6):
+ 11840			ops = &tcp6_request_sock_ops;
+ 11841			min_mss = IPV6_MIN_MTU - 60;
+ 11842			break;
+ 11843	#endif
+ 11844		default:
+ 11845			return -EINVAL;
+ 11846		}
+ 11847	
+ 11848		if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN)
+ 11849			return -EINVAL;
+ 11850	
+ 11851		if (attr->tcp_opt.mss_clamp < min_mss) {
+ 11852			__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESFAILED);
+ 11853			return -EINVAL;
+ 11854		}
+ 11855	
+ 11856		if (attr->tcp_opt.wscale_ok &&
+ 11857		    attr->tcp_opt.snd_wscale > TCP_MAX_WSCALE) {
+ 11858			__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESFAILED);
+ 11859			return -EINVAL;
+ 11860		}
+ 11861	
+ 11862		if (sk_is_mptcp(sk))
+ 11863			req = mptcp_subflow_reqsk_alloc(ops, sk, false);
+ 11864		else
+ 11865			req = inet_reqsk_alloc(ops, sk, false);
+ 11866	
+ 11867		if (!req)
+ 11868			return -ENOMEM;
+ 11869	
+ 11870		ireq = inet_rsk(req);
+ 11871		treq = tcp_rsk(req);
+ 11872	
+ 11873		req->syncookie = 1;
+ 11874		req->rsk_listener = sk;
+ 11875		req->mss = attr->tcp_opt.mss_clamp;
+ 11876	
+ 11877		ireq->snd_wscale = attr->tcp_opt.snd_wscale;
+ 11878		ireq->wscale_ok = attr->tcp_opt.wscale_ok;
+ 11879		ireq->tstamp_ok	= attr->tcp_opt.tstamp_ok;
+ 11880		ireq->sack_ok = attr->tcp_opt.sack_ok;
+ 11881		ireq->ecn_ok = attr->ecn_ok;
+ 11882	
+ 11883		treq->req_usec_ts = attr->usec_ts_ok;
+ 11884	
+ 11885		skb_orphan(skb);
+ 11886		skb->sk = req_to_sk(req);
+ 11887		skb->destructor = sock_pfree;
+ 11888	
+ 11889		return 0;
+ 11890	}
+ 11891	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
