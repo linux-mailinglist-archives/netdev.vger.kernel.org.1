@@ -1,159 +1,210 @@
-Return-Path: <netdev+bounces-49776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515CD7F36D1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:31:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05CA87F36E4
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FBABB213FE
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:31:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B356D282A3C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1CB5B208;
-	Tue, 21 Nov 2023 19:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A00142047;
+	Tue, 21 Nov 2023 19:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="iIL65mGH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7klvz5c"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8848512A;
-	Tue, 21 Nov 2023 11:31:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=/hjIueDZ+uBL332IyO4l6P2oWRA58WLJYhHKA0zENV4=; b=iIL65mGHp1XZ2ttNpNUITrOSpA
-	qQzsPiMSsbuSyPirkWARjBGDraFooBaxDjQWtItSWOhgMTUOx2wuyU1YVGMkhgRXIPx7UBwHC0m65
-	BNdr59DG2hkG0rcbi2eQek0rz4CtSf+xIR9lS333jiIFpuPMU9ktNT0h7+bNimfNyhp4n1sBqaFqs
-	h+hJvdCaz/XtVcEGDk2/XshrFPoG36YHl5IXOSN5toVK0jk1pIS8Ig9OxoVe/2+smZcNp2WppFSmv
-	1attFmrXOmg+ME/nIAOBr2uTBLUna7ww7FjCNhRwgXxEk8fGj/b8dFhcpGtTHtoMziQ9ENUYsOwT+
-	lTy0ovUw==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r5WSo-000IwZ-Gc; Tue, 21 Nov 2023 20:31:14 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-11-21
-Date: Tue, 21 Nov 2023 20:31:13 +0100
-Message-Id: <20231121193113.11796-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D58042041
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 19:45:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A6DC433C8;
+	Tue, 21 Nov 2023 19:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700595909;
+	bh=0tE7FUri9NR3r1ltIJTlrq+5XAyUqVTBZs2c+Lm0tcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g7klvz5c3eK1Ct/KL2pKu0Aob8mnF4NuPOLshrD7w88j77Zqmdr+BfHVcIHDf9BAM
+	 BhAdht3THEq54q+9RDSyDLZeuZuYr1I8Ikc3lewRN25Z2UbmxCnUhBIHBZy12liD/c
+	 IFCfQNtDl8HEpPjinlFOJaNBrbm3VTb6qtdyns/aqsEwAiHa6Jj1ZD/W6dHgfWvsDQ
+	 Vbs7STtmjAu6C2DBcPgzPK3tUZQ+vKKTMxR167q+Of7kxAYS5KUibJX6z+4ELaYCpC
+	 Cr2RPffe0AU6TbI0zLABZtbWvqgtZWCNeax0OEBcLYiEIrdZT7iuaY0Cbo56A8kBiA
+	 TWhRmuSmuY3RA==
+Date: Tue, 21 Nov 2023 19:45:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>, mschmidt@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v3 3/5] i40e: Add helpers to find VSI and VEB by
+ SEID and use them
+Message-ID: <20231121194504.GB16629@kernel.org>
+References: <20231116152114.88515-1-ivecera@redhat.com>
+ <20231116152114.88515-4-ivecera@redhat.com>
+ <20231120114224.GB223713@kernel.org>
+ <26b17c32-c9ad-4b4c-8193-3a9757e587db@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27100/Tue Nov 21 09:39:58 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <26b17c32-c9ad-4b4c-8193-3a9757e587db@redhat.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Mon, Nov 20, 2023 at 06:55:42PM +0100, Ivan Vecera wrote:
+> 
+> On 20. 11. 23 12:42, Simon Horman wrote:
+> > On Thu, Nov 16, 2023 at 04:21:12PM +0100, Ivan Vecera wrote:
+> > > Add two helpers i40e_(veb|vsi)_get_by_seid() to find corresponding
+> > > VEB or VSI by their SEID value and use these helpers to replace
+> > > existing open-coded loops.
+> > > 
+> > > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> > > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> > 
+> > Hi Ivan,
+> > 
+> > some minor feedback from my side.
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+> > > index 1e9266de270b..ca8997d29c02 100644
+> > > --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> > > +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> > > @@ -1360,4 +1360,38 @@ static inline struct i40e_pf *i40e_hw_to_pf(struct i40e_hw *hw)
+> > >   struct device *i40e_hw_to_dev(struct i40e_hw *hw);
+> > > +/**
+> > > + * i40e_pf_get_vsi_by_seid - find VSI by SEID
+> > > + * @pf: pointer to a PF
+> > 
+> > nit: @seid is missing here
+> > 
+> > > + **/
+> > > +static inline struct i40e_vsi *
+> > > +i40e_pf_get_vsi_by_seid(struct i40e_pf *pf, u16 seid)
+> > > +{
+> > > +	struct i40e_vsi *vsi;
+> > > +	int i;
+> > > +
+> > > +	i40e_pf_for_each_vsi(pf, i, vsi)
+> > > +		if (vsi->seid == seid)
+> > > +			return vsi;
+> > > +
+> > > +	return NULL;
+> > > +}
+> > > +
+> > > +/**
+> > > + * i40e_pf_get_veb_by_seid - find VEB by SEID
+> > > + * @pf: pointer to a PF
+> > 
+> > Ditto
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> > 
+> > ...
+> > 
+> > > @@ -14848,23 +14831,16 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
+> > >   	}
+> > >   	/* make sure there is such a vsi and uplink */
+> > > -	i40e_pf_for_each_vsi(pf, vsi_idx, vsi)
+> > > -		if (vsi->seid == vsi_seid)
+> > > -			break;
+> > > -
+> > > -	if (vsi_idx == pf->num_alloc_vsi && vsi_seid != 0) {
+> > > -		dev_info(&pf->pdev->dev, "vsi seid %d not found\n",
+> > > -			 vsi_seid);
+> > > -		return NULL;
+> > > +	if (vsi_seid) {
+> > > +		vsi = i40e_pf_get_vsi_by_seid(pf, vsi_seid);
+> > > +		if (!vsi) {
+> > > +			dev_err(&pf->pdev->dev, "vsi seid %d not found\n",
+> > > +				vsi_seid);
+> > > +			return NULL;
+> > > +		}
+> > >   	}
+> > > -
+> > >   	if (uplink_seid && uplink_seid != pf->mac_seid) {
+> > > -		i40e_pf_for_each_veb(pf, veb_idx, veb) {
+> > > -			if (veb->seid == uplink_seid) {
+> > > -				uplink_veb = veb;
+> > > -				break;
+> > > -			}
+> > > -		}
+> > > +		uplink_veb = i40e_pf_get_veb_by_seid(pf, uplink_seid);
+> > >   		if (!uplink_veb) {
+> > >   			dev_info(&pf->pdev->dev,
+> > >   				 "uplink seid %d not found\n", uplink_seid);
+> > 
+> > The next part of this function looks like this:
+> > 
+> > 		if (!uplink_veb) {
+> > 			dev_info(&pf->pdev->dev,
+> > 				 "uplink seid %d not found\n", uplink_seid);
+> > 			return NULL;
+> > 		}
+> > 	}
+> > 	/* get veb sw struct */
+> > 	veb_idx = i40e_veb_mem_alloc(pf);
+> > 	if (veb_idx < 0)
+> > 		goto err_alloc;
+> > 	veb = pf->veb[veb_idx];
+> > 	veb->flags = flags;
+> > 	veb->uplink_seid = uplink_seid;
+> > 	veb->veb_idx = (uplink_veb ? uplink_veb->idx : I40E_NO_VEB);
+> > 	veb->enabled_tc = (enabled_tc ? enabled_tc : 0x1);
+> > 
+> > 	/* create the VEB in the switch */
+> > 	ret = i40e_add_veb(veb, vsi);
+> > 
+> > Smatch complains that vsi may be used uninitialised here.
+> > Which does seem possible to me if vsi_seid is 0.
+> 
+> Yes, the support for floating VEBs is and WAS broken prior this patch and it
+> is fixed by the following patch.
+> 
+> Prior this patch... Let's vsi_seid == 0:
+> 
+> 	/* make sure there is such a vsi and uplink */
+> 	i40e_pf_for_each_vsi(pf, vsi_idx, vsi)
+> 		if (vsi->seid == vsi_seid)
+> 			break;
+> -> here vsi_idx == pf->num_alloc_vsi because there cannot be VSI with SEID
+> == 0... and VSI points after the pf->vsi[] array.
+> 
+> 	if (vsi_idx == pf->num_alloc_vsi && vsi_seid != 0) {
+> 		dev_info(&pf->pdev->dev, "vsi seid %d not found\n",
+> 			 vsi_seid);
+> 		return NULL;
+> 	}
+> 
+> This condition is not met, although vsi_idx == pf->num_alloc_vsi but
+> vsi_seid == 0 so the rest of code ended by:
+> 
+> 	ret = i40e_add_veb(veb, vsi);
+> 
+> and vsi pointer points to invalid area (item after the last one from
+> pf->vsi).
+> 
+> As I mentioned the broken floating VEB functionality (where vsi_seid == 0
+> and uplink_seid == 0) is fixed by the following patch.
 
-The following pull-request contains BPF updates for your *net* tree.
+Thanks Ivan,
 
-We've added 19 non-merge commits during the last 4 day(s) which contain
-a total of 18 files changed, 1043 insertions(+), 416 deletions(-).
-
-The main changes are:
-
-1) Fix BPF verifier to validate callbacks as if they are called an unknown
-   number of times in order to fix not detecting some unsafe programs,
-   from Eduard Zingerman.
-
-2) Fix bpf_redirect_peer() handling which missed proper stats accounting
-   for veth and netkit and also generally fix missing stats for the latter,
-   from Peilin Ye, Daniel Borkmann et al.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrew Werner, Andrii Nakryiko, Nikolay Aleksandrov, Stanislav Fomichev, 
-Youlun Zhang
-
-----------------------------------------------------------------
-
-The following changes since commit 76df934c6d5f5c93ba7a0112b1818620ddc10b19:
-
-  MAINTAINERS: Add netdev subsystem profile link (2023-11-17 03:44:21 +0000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to acb12c859ac7c36d6d7632280fd1e263188cb07f:
-
-  Merge branch 'verify-callbacks-as-if-they-are-called-unknown-number-of-times' (2023-11-20 18:36:41 -0800)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'verify-callbacks-as-if-they-are-called-unknown-number-of-times'
-
-Daniel Borkmann (6):
-      net, vrf: Move dstats structure to core
-      net: Move {l,t,d}stats allocation to core and convert veth & vrf
-      netkit: Add tstats per-CPU traffic counters
-      bpf, netkit: Add indirect call wrapper for fetching peer dev
-      selftests/bpf: De-veth-ize the tc_redirect test case
-      selftests/bpf: Add netkit to tc_redirect selftest
-
-Eduard Zingerman (11):
-      selftests/bpf: track tcp payload offset as scalar in xdp_synproxy
-      selftests/bpf: track string payload offset as scalar in strobemeta
-      selftests/bpf: fix bpf_loop_bench for new callback verification scheme
-      bpf: extract __check_reg_arg() utility function
-      bpf: extract setup_func_entry() utility function
-      bpf: verify callbacks as if they are called unknown number of times
-      selftests/bpf: tests for iterating callbacks
-      bpf: widening for callback iterators
-      selftests/bpf: test widening for iterating callbacks
-      bpf: keep track of max number of bpf_loop callback iterations
-      selftests/bpf: check if max number of bpf_loop iterations is tracked
-
-Martin KaFai Lau (1):
-      Merge branch 'bpf_redirect_peer fixes'
-
-Peilin Ye (2):
-      veth: Use tstats per-CPU traffic counters
-      bpf: Fix dev's rx stats for bpf_redirect_peer traffic
-
- drivers/net/netkit.c                               |  22 +-
- drivers/net/veth.c                                 |  44 +--
- drivers/net/vrf.c                                  |  38 +-
- include/linux/bpf_verifier.h                       |  16 +
- include/linux/netdevice.h                          |  30 +-
- include/net/netkit.h                               |   6 +
- kernel/bpf/verifier.c                              | 402 ++++++++++++++-------
- net/core/dev.c                                     |  57 ++-
- net/core/filter.c                                  |  19 +-
- .../testing/selftests/bpf/prog_tests/tc_redirect.c | 317 +++++++++-------
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- tools/testing/selftests/bpf/progs/bpf_loop_bench.c |  13 +-
- tools/testing/selftests/bpf/progs/cb_refs.c        |   1 +
- .../testing/selftests/bpf/progs/exceptions_fail.c  |   2 +
- tools/testing/selftests/bpf/progs/strobemeta.h     |  78 ++--
- .../bpf/progs/verifier_iterating_callbacks.c       | 242 +++++++++++++
- .../bpf/progs/verifier_subprog_precision.c         |  86 ++++-
- .../selftests/bpf/progs/xdp_synproxy_kern.c        |  84 +++--
- 18 files changed, 1043 insertions(+), 416 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_iterating_callbacks.c
+I see that I flagged a false positive, sorry about that.
+I understand things quite a bit better after reading your explanation
+above.
 
