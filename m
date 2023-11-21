@@ -1,155 +1,90 @@
-Return-Path: <netdev+bounces-49629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39D47F2CF5
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:19:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1287F2CFF
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E19C282322
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:19:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 151EBB214BC
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6C84A990;
-	Tue, 21 Nov 2023 12:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47064A98D;
+	Tue, 21 Nov 2023 12:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dMcB1hlR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLA89/Ni"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F0518A;
-	Tue, 21 Nov 2023 04:19:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700569144; x=1732105144;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TH4Q5+J9vXx35s84udmwuHt+PL6CcAyQU4u+aC3JSRs=;
-  b=dMcB1hlR1wJcjf/s8t4D3iymcM86Cr+D8/VwdhZaeM8L7vsUi5EqyK5l
-   1+FZqbpzCvE15GKfWI2vYJDmFIF2UcN18JD7IStsNRT7Q2YFfZYquh/ho
-   IVFlffXHjUUGZqy8Jzhtl11r+P+bzrK69+j84S+rQpBVPjnyH/oRAB+dW
-   ZtON1K+9g+5834pYEYCkj+vWfV0g6m+WGhgA3KnUT+w01kpzPVw9EL6Zq
-   9qftgb729h3NNTACEZHkEEfY3DaKFf3IP7XGfHLyIutThQZ3Hvygh/O1L
-   71vSREvIqxfGiLWF5Ps4S0jj0TN41RQ8TdpskHXUIG9XjEQOzWctcw4AQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458325779"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="458325779"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:19:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="1098043400"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="1098043400"
-Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 21 Nov 2023 04:18:57 -0800
-Received: from kbuild by b8de5498638e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r5PiP-0007mU-29;
-	Tue, 21 Nov 2023 12:18:54 +0000
-Date: Tue, 21 Nov 2023 20:18:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Luka Perkov <luka.perkov@sartura.hr>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@somainline.org>
-Subject: Re: [PATCH net-next v3 4/8] net: qualcomm: ipqess: Add Ethtool ops
- to IPQESS port netdevices
-Message-ID: <202311211930.FOMUSlbU-lkp@intel.com>
-References: <20231114105600.1012056-5-romain.gantois@bootlin.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860AE495E3;
+	Tue, 21 Nov 2023 12:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E82EDC433C7;
+	Tue, 21 Nov 2023 12:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700569224;
+	bh=yQOaPm61GV3Mm5JVJVeShLYhMtyr0KKQXZu6Fb8eSqU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bLA89/NiF6DDvYabq6kNw5fFtzEEK2FP/tRf7MYtsALi8v7nexakB29K8lSZBctMR
+	 prQJ7jF0D86vSg/LKTbwbE2WS75DivZxEQCmC74TqFbVgnyoy9zr6Zzs+aof8klcFv
+	 miGzrT7T9q6Wrrcu9dhpqC2/TAXUQ+GqMGisQ3LGMyIKoPvvAPBWbeW3sYXxH4PHCz
+	 xndpwSACxSk14GW1KT7m1pDX3pkPdoszufGUrAfzlPMrodJrkjYSuhi/OnthZinwnu
+	 //6taz0hMdfFBeAFqjkMNb46rrOhMRk/jkjlNQ3GU2AKtsMbo++oZaIE4kY+UOwLk2
+	 GvXVRd9AQEkaw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C5017EAA95F;
+	Tue, 21 Nov 2023 12:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231114105600.1012056-5-romain.gantois@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net,v5, 0/3] hv_netvsc: fix race of netvsc, VF register,
+ and slave bit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170056922379.17536.3153244680248688483.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Nov 2023 12:20:23 +0000
+References: <1700411023-14317-1-git-send-email-haiyangz@microsoft.com>
+In-Reply-To: <1700411023-14317-1-git-send-email-haiyangz@microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com,
+ wei.liu@kernel.org, decui@microsoft.com, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, stephen@networkplumber.org,
+ davem@davemloft.net, linux-kernel@vger.kernel.org
 
-Hi Romain,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-[auto build test WARNING on net-next/main]
+On Sun, 19 Nov 2023 08:23:40 -0800 you wrote:
+> There are some races between netvsc probe, set notifier, VF register,
+> and slave bit setting.
+> This patch set fixes them.
+> 
+> Haiyang Zhang (2):
+>   hv_netvsc: fix race of netvsc and VF register_netdevice
+>   hv_netvsc: Fix race of register_netdevice_notifier and VF register
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231114105600.1012056-5-romain.gantois%40bootlin.com
-patch subject: [PATCH net-next v3 4/8] net: qualcomm: ipqess: Add Ethtool ops to IPQESS port netdevices
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20231121/202311211930.FOMUSlbU-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211930.FOMUSlbU-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net,v5,1/3] hv_netvsc: fix race of netvsc and VF register_netdevice
+    https://git.kernel.org/netdev/net/c/d30fb712e529
+  - [net,v5,2/3] hv_netvsc: Fix race of register_netdevice_notifier and VF register
+    https://git.kernel.org/netdev/net/c/85520856466e
+  - [net,v5,3/3] hv_netvsc: Mark VF as slave before exposing it to user-mode
+    https://git.kernel.org/netdev/net/c/c807d6cd089d
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311211930.FOMUSlbU-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c:165:10: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
-     165 |                 return ret;
-         |                        ^~~
-   drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c:152:9: note: initialize the variable 'ret' to silence this warning
-     152 |         int ret;
-         |                ^
-         |                 = 0
-   1 warning generated.
-
-
-vim +/ret +165 drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c
-
-   148	
-   149	static int ipqess_port_set_eee(struct net_device *dev, struct ethtool_eee *eee)
-   150	{
-   151		struct ipqess_port *port = netdev_priv(dev);
-   152		int ret;
-   153		u32 lpi_en = QCA8K_REG_EEE_CTRL_LPI_EN(port->index);
-   154		struct qca8k_priv *priv = port->sw->priv;
-   155		u32 lpi_ctl1;
-   156	
-   157		/* Port's PHY and MAC both need to be EEE capable */
-   158		if (!dev->phydev || !port->pl)
-   159			return -ENODEV;
-   160	
-   161		mutex_lock(&priv->reg_mutex);
-   162		lpi_ctl1 = qca8k_read(priv, QCA8K_REG_EEE_CTRL, &lpi_ctl1);
-   163		if (lpi_ctl1 < 0) {
-   164			mutex_unlock(&priv->reg_mutex);
- > 165			return ret;
-   166		}
-   167	
-   168		if (eee->tx_lpi_enabled && eee->eee_enabled)
-   169			lpi_ctl1 |= lpi_en;
-   170		else
-   171			lpi_ctl1 &= ~lpi_en;
-   172		ret = qca8k_write(priv, QCA8K_REG_EEE_CTRL, lpi_ctl1);
-   173		mutex_unlock(&priv->reg_mutex);
-   174	
-   175		if (ret)
-   176			return ret;
-   177	
-   178		return phylink_ethtool_set_eee(port->pl, eee);
-   179	}
-   180	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
