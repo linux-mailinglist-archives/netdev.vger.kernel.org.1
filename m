@@ -1,153 +1,183 @@
-Return-Path: <netdev+bounces-49542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0587F255C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:37:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1C47F2560
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 06:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 290291C20AA6
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:37:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8741E282927
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 05:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EDA19472;
-	Tue, 21 Nov 2023 05:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C72D1944E;
+	Tue, 21 Nov 2023 05:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="likLLOTk"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MZqcj5sn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B66BA113;
-	Mon, 20 Nov 2023 21:37:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700545049; x=1732081049;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/zrryXpKWKQAyrCPZGj07xxabi8IACpWZDfQTkTD2cw=;
-  b=likLLOTk+eHaEyvJeOnOTUF7jmxnvAanWC8ApaH1s5HahXiTQhxg8ZQ5
-   2+yqLsYfDCxXFApE5aLzK+fNJe5q2Cc1e/nW00pRPo9N96YF+iJKyUoSw
-   ksa1sqZT892qz4RccZ7QHjus3rrU45LBLXJJ+hbwtxHSkH7iofLYfY2DU
-   I=;
-X-IronPort-AV: E=Sophos;i="6.04,215,1695686400"; 
-   d="scan'208";a="364017441"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 05:37:24 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com (Postfix) with ESMTPS id C90CBA049D;
-	Tue, 21 Nov 2023 05:37:22 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:39084]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.2:2525] with esmtp (Farcaster)
- id 940a4e78-2f4b-4cb0-b273-910cbf05cc9c; Tue, 21 Nov 2023 05:37:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 940a4e78-2f4b-4cb0-b273-910cbf05cc9c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Tue, 21 Nov 2023 05:37:22 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.39;
- Tue, 21 Nov 2023 05:37:17 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lkp@intel.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <llvm@lists.linux.dev>, <martin.lau@linux.dev>,
-	<mykolal@fb.com>, <netdev@vger.kernel.org>, <oe-kbuild-all@lists.linux.dev>,
-	<pabeni@redhat.com>, <sdf@google.com>, <song@kernel.org>,
-	<yonghong.song@linux.dev>
-Subject: Re: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
-Date: Mon, 20 Nov 2023 21:37:09 -0800
-Message-ID: <20231121053709.91149-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <202311211310.E8pJEsnT-lkp@intel.com>
-References: <202311211310.E8pJEsnT-lkp@intel.com>
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C801212E;
+	Mon, 20 Nov 2023 21:38:11 -0800 (PST)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3AL5bvtx076380;
+	Mon, 20 Nov 2023 23:37:57 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1700545078;
+	bh=LQW7rDZHLAHednjr6CwLp35/rfKTZz098y7kYIUqRsg=;
+	h=From:To:CC:Subject:Date;
+	b=MZqcj5snYR+Bf6uYiQ5tvwgM95jtUMzhRfC6imY5ponno8qN1B8Zv/lK7Gd7SKwC1
+	 fbdZGAr8XegxVOb/t/G/ILObwDTh/bQCGr1hSWp8wyDfwBh+f3ubf6bTpDpzOlbJgs
+	 qlH8lZ+BLEh8iIHKtjaM2/H0z7KXYwoPlJOyMSj0=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3AL5bvF7125153
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 20 Nov 2023 23:37:57 -0600
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 20
+ Nov 2023 23:37:57 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 20 Nov 2023 23:37:57 -0600
+Received: from uda0500640.dal.design.ti.com (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3AL5br7S084679;
+	Mon, 20 Nov 2023 23:37:54 -0600
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <wojciech.drewek@intel.com>
+CC: <bigeasy@linutronix.de>, <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <r-gunasekaran@ti.com>, <srk@ti.com>
+Subject: [PATCH net-next v2] net: hsr: Add support for MC filtering at the slave device
+Date: Tue, 21 Nov 2023 11:07:53 +0530
+Message-ID: <20231121053753.32738-1-r-gunasekaran@ti.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.187.171.26]
-X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: kernel test robot <lkp@intel.com>
-Date: Tue, 21 Nov 2023 13:17:40 +0800
-> Hi Kuniyuki,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on bpf-next/master]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tcp-Clean-up-reverse-xmas-tree-in-cookie_v-46-_check/20231121-063036
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-> patch link:    https://lore.kernel.org/r/20231120222341.54776-11-kuniyu%40amazon.com
-> patch subject: [PATCH v2 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
-> config: arm-spear3xx_defconfig (https://download.01.org/0day-ci/archive/20231121/202311211310.E8pJEsnT-lkp@intel.com/config)
-> compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211310.E8pJEsnT-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202311211310.E8pJEsnT-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    In file included from net/core/sock.c:142:
->    In file included from include/net/tcp.h:32:
-> >> include/net/inet_hashtables.h:472:22: error: use of undeclared identifier 'sock_pfree'
->                            skb->destructor = sock_pfree;
->                                              ^
+From: Murali Karicheri <m-karicheri2@ti.com>
 
-Ok, sock_pfree is available with CONFIG_INET.
+When MC (multicast) list is updated by the networking layer due to a
+user command and as well as when allmulti flag is set, it needs to be
+passed to the enslaved Ethernet devices. This patch allows this
+to happen by implementing ndo_change_rx_flags() and ndo_set_rx_mode()
+API calls that in turns pass it to the slave devices using
+existing API calls.
 
-I'll guard the req->syncookie part in inet6?_steal_sock() by
-CONFIG_SYN_COOKIE too.
+Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+Changes since v1:
+* Renamed "hsr_ndo_set_rx_mode" to "hsr_set_rx_mode" based on Wojciech's comment
+* Picked up Wojciech's Reviewed-by tag from v1
+* Rebased to tip of linux-next
 
----8<---
-diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-index b6c0ed5a1e3c..9a67f47a5e64 100644
---- a/include/net/inet6_hashtables.h
-+++ b/include/net/inet6_hashtables.h
-@@ -120,12 +120,14 @@ struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
- 		return sk;
+v1: https://lore.kernel.org/netdev/20231120110105.18416-1-r-gunasekaran@ti.com/
+
+ net/hsr/hsr_device.c | 67 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
+
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 306f942c3b28..7ceb9ac6e730 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -173,7 +173,24 @@ static int hsr_dev_open(struct net_device *dev)
  
- 	if (sk->sk_state == TCP_NEW_SYN_RECV) {
-+#if IS_ENABLED(CONFIG_SYN_COOKIE)
- 		if (inet_reqsk(sk)->syncookie) {
- 			*refcounted = false;
- 			skb->sk = sk;
- 			skb->destructor = sock_pfree;
- 			return inet_reqsk(sk)->rsk_listener;
- 		}
-+#endif
- 		return sk;
- 	} else if (sk->sk_state == TCP_TIME_WAIT) {
- 		return sk;
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 0f4091112967..36609656a047 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -466,12 +466,14 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
- 		return sk;
+ static int hsr_dev_close(struct net_device *dev)
+ {
+-	/* Nothing to do here. */
++	struct hsr_port *port;
++	struct hsr_priv *hsr;
++
++	hsr = netdev_priv(dev);
++	hsr_for_each_port(hsr, port) {
++		if (port->type == HSR_PT_MASTER)
++			continue;
++		switch (port->type) {
++		case HSR_PT_SLAVE_A:
++		case HSR_PT_SLAVE_B:
++			dev_uc_unsync(port->dev, dev);
++			dev_mc_unsync(port->dev, dev);
++			break;
++		default:
++			break;
++		}
++	}
++
+ 	return 0;
+ }
  
- 	if (sk->sk_state == TCP_NEW_SYN_RECV) {
-+#if IS_ENABLED(CONFIG_SYN_COOKIE)
- 		if (inet_reqsk(sk)->syncookie) {
- 			*refcounted = false;
- 			skb->sk = sk;
- 			skb->destructor = sock_pfree;
- 			return inet_reqsk(sk)->rsk_listener;
- 		}
-+#endif
- 		return sk;
- 	} else if (sk->sk_state == TCP_TIME_WAIT) {
- 		return sk;
----8<---
+@@ -404,12 +421,60 @@ void hsr_del_ports(struct hsr_priv *hsr)
+ 		hsr_del_port(port);
+ }
+ 
++static void hsr_set_rx_mode(struct net_device *dev)
++{
++	struct hsr_port *port;
++	struct hsr_priv *hsr;
++
++	hsr = netdev_priv(dev);
++
++	hsr_for_each_port(hsr, port) {
++		if (port->type == HSR_PT_MASTER)
++			continue;
++		switch (port->type) {
++		case HSR_PT_SLAVE_A:
++		case HSR_PT_SLAVE_B:
++			dev_mc_sync_multiple(port->dev, dev);
++			dev_uc_sync_multiple(port->dev, dev);
++			break;
++		default:
++			break;
++		}
++	}
++}
++
++static void hsr_change_rx_flags(struct net_device *dev, int change)
++{
++	struct hsr_port *port;
++	struct hsr_priv *hsr;
++
++	hsr = netdev_priv(dev);
++
++	hsr_for_each_port(hsr, port) {
++		if (port->type == HSR_PT_MASTER)
++			continue;
++		switch (port->type) {
++		case HSR_PT_SLAVE_A:
++		case HSR_PT_SLAVE_B:
++			if (change & IFF_ALLMULTI)
++				dev_set_allmulti(port->dev,
++						 dev->flags &
++						 IFF_ALLMULTI ? 1 : -1);
++			break;
++		default:
++			break;
++		}
++	}
++}
++
+ static const struct net_device_ops hsr_device_ops = {
+ 	.ndo_change_mtu = hsr_dev_change_mtu,
+ 	.ndo_open = hsr_dev_open,
+ 	.ndo_stop = hsr_dev_close,
+ 	.ndo_start_xmit = hsr_dev_xmit,
++	.ndo_change_rx_flags = hsr_change_rx_flags,
+ 	.ndo_fix_features = hsr_fix_features,
++	.ndo_set_rx_mode = hsr_set_rx_mode,
+ };
+ 
+ static struct device_type hsr_type = {
+
+base-commit: 07b677953b9dca02928be323e2db853511305fa9
+-- 
+2.17.1
+
 
