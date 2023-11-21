@@ -1,122 +1,160 @@
-Return-Path: <netdev+bounces-49564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DE27F2707
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:14:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4D0A7F2713
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F79BB20FEF
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:14:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49822B21855
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD7731A88;
-	Tue, 21 Nov 2023 08:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5A938F9A;
+	Tue, 21 Nov 2023 08:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XsiEoi7+"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="d0wk8axY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097C5C3
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:13:55 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so10177a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:13:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700554433; x=1701159233; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mf+BdlEkGDbGf7M1TsZM1PoygNkC+ixC14u9l75PZkw=;
-        b=XsiEoi7+g05dayZN6xmalA1z6MxeyC2bjF6D7bzN8LEYkqtLJGTT0AY7aUiLWhFCju
-         LpoGP5q0MVEv9X7melgOzatiTFoX94fkYIAUdb6HTPkfoN82kZJcVfLS+Tt7gbp/OJ1U
-         eYmZiccnuVa99VdoAOCMNGvsLF5wDNPgxO0Ka+G8aNrkpBYt2Aovgwuuz6CMZT3WXSVd
-         qzjGtxbpApQHWreoIbQjZwyYkclX5TUIzYilJ8fd0Kf39UqLc3pxr116tUKQo5DWR+1y
-         8f5fDKsD5poiQBYt1fnWIds1WTpBOQ3nUTuEDNjoG6DiVTbhQeRDmBufSKSf5uOzfHLA
-         i8GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700554433; x=1701159233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mf+BdlEkGDbGf7M1TsZM1PoygNkC+ixC14u9l75PZkw=;
-        b=wJaIyBnz5sNHFbLV5qsLgxUKmBAU20oUhWIa8KeEAOdS8wzPimS43w8AxzuhQQi+8w
-         Ki/aRY776KM9ch2UGITInn0T0pLqQjh7Mp1W6L+KyZZN7+8NCnndovOqgboY0x0guEhw
-         kRPh1pi1/e1Cun2K33NWXpBVYS3l29rrkrppeiX0wuyZA96+yaPffPMTcz85M+wBvs1Y
-         9M6H7/tG9/F9ZbtN0wypw/xrJNDcn6QVYoRwPBi03FMNtn5+9Ad9+LUmATQoSduAQ7e4
-         hwqXhRbLBLzMGkjn/hmeFER3iyZ9hby8or12FtWkAikf7RsRVKRXmHKVX2fgNAq5sHBW
-         MAkg==
-X-Gm-Message-State: AOJu0Yw7ROQsHjS+KWfDmg6zxdVHih+viq6TQ4ibgnJvMc9yFnqOAUzD
-	C2ZVQbmU0X2myyHu/2oRdTE3D3dTF6Qdv8Ng3OByzQ==
-X-Google-Smtp-Source: AGHT+IGFwYxSbTDYvmUGtIwukajn1P1YWpIV0tYvyPHz82Xr6UQWNYv5FGNk7ZL/FeBdbiKiC7fIf9xNc3PSUwRu3tU=
-X-Received: by 2002:a05:6402:3886:b0:543:fb17:1a8 with SMTP id
- fd6-20020a056402388600b00543fb1701a8mr575639edb.3.1700554433190; Tue, 21 Nov
- 2023 00:13:53 -0800 (PST)
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8513FCB
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:17:08 -0800 (PST)
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20231121081705epoutp03b5b7fc736607aa4484e14b4b1351411e~ZlWwgjeVL1644916449epoutp03b
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 08:17:05 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20231121081705epoutp03b5b7fc736607aa4484e14b4b1351411e~ZlWwgjeVL1644916449epoutp03b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1700554625;
+	bh=lr6fW94vxYn0ZDsRpc9SHce8t6pGUFIFeLHRkfVVUXY=;
+	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+	b=d0wk8axYdNk/C8HWvC4uD6DcuHVulzVW2XsUOVk1zx2gk8uABsN5p5tRrzzXEo6j3
+	 W7C3xq7//PwKrTXQLeHQut+f7E/rD3XSAIZrzeJdrOeoaUqT6wb4dpMBkmP3wT+XbL
+	 pzwRZZI7Jum8L+jfEiNEp/kkoduiS5iKEDDzTVb8=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+	20231121081705epcas2p1650b71573632f2feb800ca67d331d56c~ZlWwOxhp81304013040epcas2p1d;
+	Tue, 21 Nov 2023 08:17:05 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.99]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4SZHKY0tXJz4x9Pt; Tue, 21 Nov
+	2023 08:17:05 +0000 (GMT)
+X-AuditID: b6c32a47-9a3ff70000002726-3d-655c677fcb48
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+	epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+	31.3C.10022.F776C556; Tue, 21 Nov 2023 17:17:03 +0900 (KST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231121020111.1143180-1-dima@arista.com> <20231121020111.1143180-8-dima@arista.com>
-In-Reply-To: <20231121020111.1143180-8-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 21 Nov 2023 09:13:42 +0100
-Message-ID: <CANn89iK-=G7p5CMuJDjioa7+ynZRrOOpd7bK3kPzxCXzygfFCQ@mail.gmail.com>
-Subject: Re: [PATCH 7/7] net/tcp: Don't store TCP-AO maclen on reqsk
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [PATCH v2] nfc: virtual_ncidev: Add variable to check if ndev
+ is running
+Reply-To: bongsu.jeon@samsung.com
+Sender: Bongsu Jeon <bongsu.jeon@samsung.com>
+From: Bongsu Jeon <bongsu.jeon@samsung.com>
+To: Nguyen Dinh Phi <phind.uet@gmail.com>, Bongsu Jeon
+	<bongsu.jeon@samsung.com>, Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+CC: "syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
+	<syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <20231121075357.344-1-phind.uet@gmail.com>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20231121081703epcms2p2d9573fae7782dac583fa061a170e5885@epcms2p2>
+Date: Tue, 21 Nov 2023 17:17:03 +0900
+X-CMS-MailID: 20231121081703epcms2p2d9573fae7782dac583fa061a170e5885
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgk+LIzCtJLcpLzFFi42LZdljTXLc+PSbVYPE8dYstzZPYLfa+3spu
+	cXnXHDaLYwvELOa9eM1ksXnOHSYHNo+ds+6ye9y5tofNo2/LKkaPmW/VPD5vkgtgjcq2yUhN
+	TEktUkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAHar6RQlphTChQK
+	SCwuVtK3synKLy1JVcjILy6xVUotSMkpMC/QK07MLS7NS9fLSy2xMjQwMDIFKkzIzjjf/Z+1
+	YAdfxZ/nbxkbGM9xdzFyckgImEjc/vCZsYuRi0NIYAejxPU7d9m7GDk4eAUEJf7uEAapERYI
+	l+js+coIYgsJKEr87zjHBhHXlXjx9yiYzSagLbH2aCMTyBwRgS5GiQsXL7OCOMwCrxkldhxt
+	ZofYxisxo/0pC4QtLbF9+VawqZwC5hJt7WugajQkfizrZYawRSVurn7LDmO/PzafEcIWkWi9
+	dxaqRlDiwc/dUHEpiU8Pz7CCPCAhkC3xvY8N5AYJgQZGiTtv70Lt1ZeYdm8BmM0r4CtxfOF1
+	MJtFQFXi/5Y3bBA1LhJd79aDxZkF5CW2v53DDDKTWUBTYv0ufYjxyhJHbkFV8El0HP4L9+GO
+	eU+YIGxVid7mL0ww306e3QJ1pYfEq22b2CYwKs5ChPQsJLtmIexawMi8ilEstaA4Nz212KjA
+	GB65yfm5mxjBSVHLfQfjjLcf9A4xMnEwHmKU4GBWEuHdwh6TKsSbklhZlVqUH19UmpNafIjR
+	FOjLicxSosn5wLScVxJvaGJpYGJmZmhuZGpgriTOe691boqQQHpiSWp2ampBahFMHxMHp1QD
+	k/8sWc3zcjfvfro5af2GvOlWYeKVp+2efZ5kXSvq/mNaxK7Ver/vPzfi2ez539BAwXRbhyJ/
+	/Jl9+sUnPwtsYY3fcNohYw63NYvoQYlZPyfU/tyafe/q3muRkxNP/2NlmiYh2Ho55Lu7os2p
+	g4USPKf37nuuvsBDb9maddUCG0uc565/zmZwhff9go+XV/g2aFlwCfmJXsk3LzYT+zm3WTM7
+	4NuMklyDN7veKDQqntJgMouYzxS+LSYjsH6Si+g8mXkTXy/aOk141pk1DzduU9X6bdmwXbWP
+	J3+FvlR0nFfA4usN003yN109E6G55UNm/IWmCWLvRfYVHfvOtsvn1td8n139Rj8n+xzZKtQn
+	cUWJpTgj0VCLuag4EQAzMW80EwQAAA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231121075419epcas2p280fa7111de7f37b46f460b6c61ff7175
+References: <20231121075357.344-1-phind.uet@gmail.com>
+	<CGME20231121075419epcas2p280fa7111de7f37b46f460b6c61ff7175@epcms2p2>
 
-On Tue, Nov 21, 2023 at 3:01=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> This extra check doesn't work for a handshake when SYN segment has
-> (current_key.maclen !=3D rnext_key.maclen). It could be amended to
-> preserve rnext_key.maclen instead of current_key.maclen, but that
-> requires a lookup on listen socket.
->
-> Originally, this extra maclen check was introduced just because it was
-> cheap. Drop it and convert tcp_request_sock::maclen into boolean
-> tcp_request_sock::used_tcp_ao.
->
-> Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+On 21/11/2023 16:54, Nguyen Dinh Phi wrote:
+> syzbot reported an memory leak that happens when an skb is add to
+> send_buff after virtual nci closed.
+> This patch adds a variable to track if the ndev is running before
+> handling new skb in send function.
+> 
+> Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
+> Reported-by: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/lkml/00000000000075472b06007df4fb@google.com
 > ---
->  include/linux/tcp.h   | 10 ++++------
->  net/ipv4/tcp_ao.c     |  4 ++--
->  net/ipv4/tcp_input.c  |  5 +++--
->  net/ipv4/tcp_output.c |  9 +++------
->  4 files changed, 12 insertions(+), 16 deletions(-)
->
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 68f3d315d2e1..3af897b00920 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -155,6 +155,9 @@ struct tcp_request_sock {
->         bool                            req_usec_ts;
->  #if IS_ENABLED(CONFIG_MPTCP)
->         bool                            drop_req;
-> +#endif
-> +#ifdef CONFIG_TCP_AO
-> +       bool                            used_tcp_ao;
-
-Why adding another 8bit field here and creating a hole ?
-
->  #endif
->         u32                             txhash;
->         u32                             rcv_isn;
-> @@ -169,7 +172,6 @@ struct tcp_request_sock {
->  #ifdef CONFIG_TCP_AO
->         u8                              ao_keyid;
->         u8                              ao_rcv_next;
-> -       u8                              maclen;
-
-Just rename maclen here to  used_tcp_ao ?
-
->  #endif
+> V2:
+>     - Remove unused macro.
+>     - Re-adding a line that was removed wrongly.
+>  drivers/nfc/virtual_ncidev.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+> index b027be0b0b6f..590b038e449e 100644
+> --- a/drivers/nfc/virtual_ncidev.c
+> +++ b/drivers/nfc/virtual_ncidev.c
+> @@ -26,10 +26,14 @@ struct virtual_nci_dev {
+>  	struct mutex mtx;
+>  	struct sk_buff *send_buff;
+>  	struct wait_queue_head wq;
+> +	bool running;
 >  };
->
+>  
+>  static int virtual_nci_open(struct nci_dev *ndev)
+>  {
+> +	struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+> +
+> +	vdev->running = true;
+>  	return 0;
+>  }
+>  
+> @@ -40,6 +44,7 @@ static int virtual_nci_close(struct nci_dev *ndev)
+>  	mutex_lock(&vdev->mtx);
+>  	kfree_skb(vdev->send_buff);
+>  	vdev->send_buff = NULL;
+> +	vdev->running = false;
+>  	mutex_unlock(&vdev->mtx);
+>  
+>  	return 0;
+> @@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
+>  	struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+>  
+>  	mutex_lock(&vdev->mtx);
+> -	if (vdev->send_buff) {
+> +	if (vdev->send_buff || !vdev->running) {
+>  		mutex_unlock(&vdev->mtx);
+>  		kfree_skb(skb);
+>  		return -1;
+> -- 
+> 2.39.2
+
+
+Reviewed-by: Bongsu Jeon
+
+Best regards,
+Bongsu
 
