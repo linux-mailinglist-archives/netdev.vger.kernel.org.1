@@ -1,214 +1,114 @@
-Return-Path: <netdev+bounces-49743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95857F351C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:42:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6107F3529
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:44:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90F272821D2
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:42:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B7481F228CC
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4698020DC9;
-	Tue, 21 Nov 2023 17:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8DE20DCD;
+	Tue, 21 Nov 2023 17:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nfnTyNBh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FqJwICL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE28F4
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:42:11 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a02d91ab195so95752566b.3
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:42:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1700588529; x=1701193329; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pP5SDBtDUDWOkpqIezUOaAd1ybPjQCdnHFhT1QKkHvo=;
-        b=nfnTyNBhl+rj3VgvE9MR8sNZoDr6NMpIJG2Svv1jvWGA8jkzlRx/kkuCPLXRBMWudJ
-         TebkWln12qrQIxkILsYQBckgtpnWs2btr+yKHadESvd/d75BN6N7Vy/Xy7ytu3wCkOiV
-         s55w38yCCMBNV0Rd517Gehfso7OjUGiqNy24A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700588529; x=1701193329;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pP5SDBtDUDWOkpqIezUOaAd1ybPjQCdnHFhT1QKkHvo=;
-        b=FBuWSkbBehvDUso6uwd02ohsIxop87w1ZPi7EVrSrn6Ega8s8q8t8ch850e3Rqbs+u
-         XeWwCm/BrxfLHD3er/XtyBwRjPJamqKAW2nhgjrCnlTzhnEa2N0ixWOuI5rZ/adErIRa
-         2GBpMdQrC1JQFpN+MPY6ctD1A4DUEFW8Hc0+EM26CKkn8wXJhOskOJemy+0GwL4lbRT1
-         /yMDFJZPqby5jf4O3+Vl9TzeuzxGLorykkSKzyjfs80R/qbJPJLrQ+SWyT0nTBVFpmLZ
-         7CQzCLBtLXF9a6P1JKfevGRAnMmHWINkoKmJLsvP1Vee2fLY5VvInt4qwTMlvYIlkpOH
-         y+yQ==
-X-Gm-Message-State: AOJu0YzZ31Kp1XaLvWA6jyGuuxfGy2dK8+dxyzMFfNDD0N5yeZqeD1lC
-	s9FCHsPliuzreg2i9u0TbcKsQr64QzOJRr3rx5YNKjk3
-X-Google-Smtp-Source: AGHT+IHCZYBuJlVE6UxOwcRXNeS5n3vbLdsWPYjpQhtyGErEW7kvW1XfRgdGf4eJdJnrV3ESJmznfw==
-X-Received: by 2002:a17:907:1c1d:b0:9ff:f7b:3afc with SMTP id nc29-20020a1709071c1d00b009ff0f7b3afcmr5764973ejc.36.1700588529484;
-        Tue, 21 Nov 2023 09:42:09 -0800 (PST)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com. [209.85.128.41])
-        by smtp.gmail.com with ESMTPSA id la5-20020a170906ad8500b009fc8f309183sm3430157ejb.51.2023.11.21.09.42.09
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 09:42:09 -0800 (PST)
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4078fe6a063so155e9.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:42:09 -0800 (PST)
-X-Received: by 2002:a05:600c:c1a:b0:40b:2979:9cc2 with SMTP id
- fm26-20020a05600c0c1a00b0040b29799cc2mr1025wmb.1.1700588528601; Tue, 21 Nov
- 2023 09:42:08 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CCC20DC7;
+	Tue, 21 Nov 2023 17:43:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D5D5C433C8;
+	Tue, 21 Nov 2023 17:43:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700588636;
+	bh=gnUMTK1bw92CwGDuRlTgAm7doJIPoMNyCa9J3hZFk0w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FqJwICL1kBDQbIlpNtsh2Lh4TokSiyA5IgHA48yDVQ5hkl4QG4EHxS0/3CnDESTZo
+	 eKUruDuuPsWMn7lBqgiR8ymZBEUyHfs4uhGLeovjKR12R/orFIU379hlSmce0jB1So
+	 owbsZstA5xYQu26HlHm1dSmGs7dNcYNbFvN8EZ12wuZ2JzI5YsNiMW96M84PZP7RVH
+	 d1YeJkqalRcdS4LfnzOUF2kPaE/9uP4bW7jDl6tkiOyZcLf+3DTvZDkViceFDI7+wC
+	 y6/TVZ9BmwA/mKO4zs17YfNmLBMDu0K7OLddMQZOvsj/izW2477J0qV+Ttlo2XsKnD
+	 hf66KY4LtQUhQ==
+Date: Tue, 21 Nov 2023 09:43:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231121094354.635ee8cd@kernel.org>
+In-Reply-To: <20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+References: <20231120105255.cgbart5amkg4efaz@skbuf>
+	<20231120121440.3274d44c@kmaincent-XPS-13-7390>
+	<20231120120601.ondrhbkqpnaozl2q@skbuf>
+	<20231120144929.3375317e@kmaincent-XPS-13-7390>
+	<20231120142316.d2emoaqeej2pg4s3@skbuf>
+	<20231120093723.4d88fb2a@kernel.org>
+	<20231120190023.ymog4yb2hcydhmua@skbuf>
+	<20231120115839.74ee5492@kernel.org>
+	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
+	<20231120133737.70dde657@kernel.org>
+	<20231120220549.cvsz2ni3wj7mcukh@skbuf>
+	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117130836.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
- <f8c1979e2c71d871998aec0126dd87adb5e76cce.camel@redhat.com>
-In-Reply-To: <f8c1979e2c71d871998aec0126dd87adb5e76cce.camel@redhat.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Tue, 21 Nov 2023 09:41:50 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=VqZq33eLiFPNiZCJmewQ1hxECmUnwbjVbvdJiDkQMAJA@mail.gmail.com>
-Message-ID: <CAD=FV=VqZq33eLiFPNiZCJmewQ1hxECmUnwbjVbvdJiDkQMAJA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] r8152: Hold the rtnl_lock for all of reset
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>, 
-	"David S . Miller" <davem@davemloft.net>, Grant Grundler <grundler@chromium.org>, 
-	Simon Horman <horms@kernel.org>, Edward Hill <ecgh@chromium.org>, linux-usb@vger.kernel.org, 
-	Laura Nao <laura.nao@collabora.com>, Alan Stern <stern@rowland.harvard.edu>, 
-	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, 21 Nov 2023 18:31:14 +0100 K=C3=B6ry Maincent wrote:
+> - Expand struct hwtstamp_config with a phc_index member for the SIOCG/SHW=
+TSTAMP
+>   commands.
+>   To keep backward compatibility if phc_index is not set in the hwtstamp_=
+config
+>   data from userspace use the default hwtstamp (the default being selecte=
+d as
+>   done in my patch series).
+>   Is this possible, would it breaks things?
 
-On Tue, Nov 21, 2023 at 2:25=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Fri, 2023-11-17 at 13:08 -0800, Douglas Anderson wrote:
-> > As of commit d9962b0d4202 ("r8152: Block future register access if
-> > register access fails") there is a race condition that can happen
-> > between the USB device reset thread and napi_enable() (not) getting
-> > called during rtl8152_open(). Specifically:
-> > * While rtl8152_open() is running we get a register access error
-> >   that's _not_ -ENODEV and queue up a USB reset.
-> > * rtl8152_open() exits before calling napi_enable() due to any reason
-> >   (including usb_submit_urb() returning an error).
-> >
-> > In that case:
-> > * Since the USB reset is perform in a separate thread asynchronously,
-> >   it can run at anytime USB device lock is not held - even before
-> >   rtl8152_open() has exited with an error and caused __dev_open() to
-> >   clear the __LINK_STATE_START bit.
-> > * The rtl8152_pre_reset() will notice that the netif_running() returns
-> >   true (since __LINK_STATE_START wasn't cleared) so it won't exit
-> >   early.
-> > * rtl8152_pre_reset() will then hang in napi_disable() because
-> >   napi_enable() was never called.
-> >
-> > We can fix the race by making sure that the r8152 reset routines don't
-> > run at the same time as we're opening the device. Specifically we need
-> > the reset routines in their entirety rely on the return value of
-> > netif_running(). The only way to reliably depend on that is for them
-> > to hold the rntl_lock() mutex for the duration of reset.
->
-> Acquiring the rtnl_lock in a callback and releasing it in a different
-> one, with the latter called depending on the configuration, looks
-> fragile and possibly prone to deadlock issues.
+I'd skip this bit, and focus on the ETHTOOL_TSINFO. Keep the ioctl as
+"legacy" and do all the extensions in ethtool. TSINFO_GET can serve
+as GET, to avoid adding 3rd command for the same thing. TSINFO_SET
+would be new (as you indicate below).
 
-Yeah, I debated this as well. I looked through the USB code and I
-couldn't find any reason that it wouldn't work to hold the lock for
-the duration. I agree that it's a little more fragile in one sense,
-but I think it avoids potential races too and that makes it less
-fragile in a different sense. ;-)
+> - In netlink part, send one netlink tsinfo skb for each phc_index.
 
+phc_index and netdev combination. A DO command can only generate one
+answer (or rather, it should generate only one answer, there are few
+hard rules in netlink). So we need to move that functionality to DUMP.
+We can filter the DUMP based on user-provided ifindex and/or phc_index.
 
-> Have you tested your patch with lockdep enabled?
-
-Yes, lockdep reported no problems with my patch. Indeed lockdep hints
-are how I ended up with the current solution. When I originally tried
-to lock the device in rtl8152_open() then lockdep yelled at me about
-the AB BA issues between the device lock and the rtnl_lock() mutex
-which made me realize that grabbing the rtnl_lock() in the reset code
-was the right solution here.
-
-
-> Can you instead acquire the rtnl lock only for pre_reset/post_rest and
-> in rtl8152_open() do something alike:
->
->         for (i =3D 0; i < MAX_WAIT; ++i) {
->                 if (usb_lock_device_for_reset(udev, NULL))
->                         goto error;
->
->                 wait_again =3D udev->reset_in_progress;
->                 usb_unlock_device(udev);
->                 if (!wait_again)
->                         break;
->
->                 usleep(1);
->         }
->         if (i =3D=3D MAX_WAIT)
->                 goto error;
->
-> which should be more polite to other locks?
-
-Right, I could add a call to usb_lock_device_for_reset() here. That
-shouldn't trigger AB BA lockdep splats since it has a timeout. I'm not
-100% convinced that it's right, though. ...and I'm fairly certain that
-if we call it we don't want to call it in a loop.
-
-I don't think we should have a loop because
-usb_lock_device_for_reset() already has a loop in it and I don't think
-an extra loop will help. I'd imagine that usb_lock_device_for_reset()
-would usually timeout only if USB reset is currently running and
-somehow blocked. If pre_reset or post_reset are currently running then
-they've already got the USB lock (from their caller) and may be
-blocked waiting for the rtnl_lock. We've already got the rtnl_lock
-(from our caller) and now we're waiting for the USB lock. In neither
-case do I think it's a good idea to drop the locks that our caller
-grabbed for us, so about the best we can do in that case is return an
-error from r8152_open() after the first timeout.
-
-Let's step back and think about why we might want to get the USB lock
-in the first place. This would only be necessary if we dropped the
-lock between pre_reset and post_reset, right? ...so we're trying to
-make sure that we're not trying to open a device while the USB reset
-code is half executed. I guess the expected order of operations we're
-trying to protect against would be:
-
-1. rtl8152_close() is called and has a transfer error that queues up a rese=
-t.
-2. USB reset starts and pre-reset runs. It should be a no-op because
-netif_running() would return false.
-3. rl8152_open() is called and opens the device successfully
-4. USB reset runs post-reset, which is no longer the inverse of
-pre-reset because netif_running() would return true. This would end up
-with, among other things, an unbalanced napi_enable() count.
-
-That feels relatively unlikely to actually hit but it does seem
-conceivably possible. Thus if we do drop the rtnl_lock between
-pre-reset and post-reset then I agree we should call
-usb_lock_device_for_reset(). Probably we need to do that for _both_
-rtl8152_open() and rtl8152_close()? We also probably don't need to
-hold the lock for the whole duration of rtl8152_open() /
-rtl8152_close(). We can just grab it and release it to make sure that
-we're not midway through a reset.
-
-I guess one sorta odd thing here is that it means that rtl8152_close()
-could now fail if someone called it at just the right time and we were
-unable to grab the USB lock. Though it does have an error return,
-that's not a failure that I'd expect most users to be able to handle
-terribly well. I guess conceivably we could return -EAGAIN or
--EDEADLOCK in this case, but ick...
-
-
-Hopefully the above makes sense. I'd be interested to hear your
-further thoughts on the issue. I'd still lean towards leaving the code
-as-is and holding the rtnl_lock across the whole reset, but for all
-practical purposes I think it would be fine to split it and add
-usb_lock_device_for_reset() to the rtl8152_open() / rtl8152_close(),
-since the issues I talk about above seem like they'd need extremely
-rare timing conditions to hit.
-
--Doug
+> Could be done in a later patch series:
+> - Expand netlink TSINFO with ETHTOOL_A_TSINFO_HWSTAMP_PROVIDER_QUALIFIER.
+>   Describing this struct:
+> enum ethtool_hwstamp_provider_qualifier {
+>  	ETHTOOL_HWSTAMP_PROVIDER_QUALIFIER_PRECISE,
+>  	ETHTOOL_HWSTAMP_PROVIDER_QUALIFIER_APPROX,
+> };=20
+>=20
+>   Set the desired qualifier through TSINFO_SET or through SIOCSHWTSTAMP by
+>   expanding again the struct hwtstamp_config.
+>=20
+> Do you think this is feasible?
 
