@@ -1,129 +1,116 @@
-Return-Path: <netdev+bounces-49770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24957F36AF
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:13:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C207F36B5
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:14:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB57B1C20B61
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:13:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C8EF1F2320C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989EC59161;
-	Tue, 21 Nov 2023 19:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="nh+BfHI0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D5A5A0E1;
+	Tue, 21 Nov 2023 19:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A084A110
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 11:13:15 -0800 (PST)
-X-KPN-MessageId: ffad03d6-88a1-11ee-a95f-005056abbe64
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id ffad03d6-88a1-11ee-a95f-005056abbe64;
-	Tue, 21 Nov 2023 20:13:05 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=ljdYkpkWzVVHQf9D1GVF+nu60LCCrweTOGhk6X/ACdI=;
-	b=nh+BfHI0W1E9q4ZYVwta6309tAGNsLRhJ0Y0SwWFXUunx4EcsA4IIFrEWVtj06kVZQAykNtnNxcrp
-	 dliR+DJEwovOH9uaTNznaYYMAbYaEmq6WYTFegNCQGnJCPhpz8T9QrJDA6YQHkS6aoTKYCWvpMMVMF
-	 LDohNp0BlCHJRHGE=
-X-KPN-MID: 33|b9UAv2Toq9Ju9tW1YhIWxdY14SsqdOibvIEhfMpX878SCJxZx6CpW7/nFGVCqKR
- JFktEVmhjvXfKzdmJfMhqXd2IGTTFsH+x3yL2Pp4mmmA=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|Ak7Fv6JTBcjWU3cuIuJzlV2XFeePo6zc42uSVBTax8iNl24q39/HLy5aViyLMBx
- CfWl+gyfbKHT8jNHPfVJSCw==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 03b7e6cb-88a2-11ee-a7b1-005056ab7447;
-	Tue, 21 Nov 2023 20:13:13 +0100 (CET)
-Date: Tue, 21 Nov 2023 20:13:12 +0100
-From: Antony Antony <antony@phenome.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
-	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
-Subject: Re: [devel-ipsec] [RFC ipsec-next v2 0/8] Add IP-TFS mode to xfrm
-Message-ID: <ZV0BSBzNh3UIqueZ@Antony2201.local>
-References: <20231113035219.920136-1-chopps@chopps.org>
- <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1675210C;
+	Tue, 21 Nov 2023 11:14:01 -0800 (PST)
+Received: from [192.168.1.103] (178.176.72.255) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 21 Nov
+ 2023 22:13:52 +0300
+Subject: Re: [PATCH 12/13] net: ravb: Assert/deassert reset on suspend/resume
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
+	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
+	<masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120084606.4083194-13-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <c9f68819-7dc0-3035-4bf4-6bda5dfc621e@omp.ru>
+Date: Tue, 21 Nov 2023 22:13:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
+In-Reply-To: <20231120084606.4083194-13-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 18:58:14
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.255
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/21/2023 19:02:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 4:18:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Mon, Nov 13, 2023 at 08:15:47AM +0100, Steffen Klassert via Devel wrote:
-> On Sun, Nov 12, 2023 at 10:52:11PM -0500, Christian Hopps wrote:
-> > From: Christian Hopps <chopps@labn.net>
-> > 
-> > This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-> > (AggFrag encapsulation) has been standardized in RFC9347.
-> > 
-> > Link: https://www.rfc-editor.org/rfc/rfc9347.txt
-> > 
-> > This feature supports demand driven (i.e., non-constant send rate) IP-TFS to
-> > take advantage of the AGGFRAG ESP payload encapsulation. This payload type
-> > supports aggregation and fragmentation of the inner IP packet stream which in
-> > turn yields higher small-packet bandwidth as well as reducing MTU/PMTU issues.
-> > Congestion control is unimplementated as the send rate is demand driven rather
-> > than constant.
-> > 
-> > In order to allow loading this fucntionality as a module a set of callbacks
-> > xfrm_mode_cbs has been added to xfrm as well.
+On 11/20/23 11:46 AM, Claudiu wrote:
+
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> I did a multiple days peer review with Chris on this pachset. So my
-> concerns are already addressed.
-> 
-> Further reviews are welcome! This is a bigger change and it would
-> be nice if more people could look at it.
+> RZ/G3S can go to deep sleep states where power to most of the SoC parts
+> is off. When resumming from such state the Ethernet controller needs to be
 
-I'd like to pose a basic question to understand the new IP-TFS config 
-options for an SA.
+   Resuming.
 
-When configuring IP-TFS parameters on an SA, are all parameters actively 
-used by that SA? or does their usage vary based on the direction of the 
-traffic?
-Currently, each IP-TFS SA includes both init-delay and drop-time parameters. 
-I would like to understand whether both parameters are necessary for every SA.
+> reinitialized. Deasserting the reset signal for it should also be done.
+> Thus add reset assert/deassert on suspend/resume functions.
 
-ip xfrm state
+   Firefox' spell checker trips over deassert[ing] and you have |de-assert"
+below:
 
-src 2001:db8:1:2::45 dst 2001:db8:1:2::23
-proto esp spi 0x32af1f6d reqid 16389 mode iptfs
-replay-window 0 flag af-unspec esn
-aead rfc4106(gcm(aes)) 0x0... 128
-anti-replay esn context:
-seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0x0
-replay_window 128, bitmap-length 4
-00000000 00000000 00000000 00000000
-iptfs-opts pkt-size 0 max-queue-size 1048576 drop-time 1000000 reorder-window 3 init-delay 0
+> On resume function the de-assert was not reverted in case of failures to
+> give user a chance to restore the interface (e.g. bringing down/up the
+> interface) in case suspend/resume fails.
 
-Chris, would like to you share which of iptfs-opts are for input and which 
-are for output?
+   I'm not seeing us reverting anything on the resume failure...
 
-My current understanding suggests that, depending on the traffic direction, 
-onlysome of these parameters might be in active use for each SA. If this is 
-indeed the case, I propose we discuss the possibility of refining our 
-configuration approach. Could we consider making these parameters mutually 
-exclusive and dependent on the traffic direction? Furthermore, given that 
-the xfrm community has previously discussed the idea of adding direction to 
-the SA — a concept also used in hardware offload scenarios — why not explore 
-adding direction to the SA?
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-We currently have DIR with offload.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-ip xfrm state { add | update } ... offload [ crypto|packet ] dev DEV dir DIR
+[...]
 
-Implementing direction could imply that an IP-TFS SA would require only fewer parameters
-– init-delay or drop-time, depending on the specified direction. This would 
-make ip x s output simple and comprehensible, thereby reducing potential 
-confusion. Also avoid confusing when creating state say input, why add 
-output parameters to an input SA?"
+MBR, Sergey
 
