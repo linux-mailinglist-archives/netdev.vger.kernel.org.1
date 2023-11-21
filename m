@@ -1,161 +1,136 @@
-Return-Path: <netdev+bounces-49508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818497F23B1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:12:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC8D7F23B3
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B25041C21132
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:12:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC23B1F2662D
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B6714A92;
-	Tue, 21 Nov 2023 02:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60231429E;
+	Tue, 21 Nov 2023 02:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RBqFzBDU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633D2C3;
-	Mon, 20 Nov 2023 18:12:34 -0800 (PST)
-X-UUID: fc53191120304ffab81e76ce8ee56509-20231121
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.32,REQID:1fcb15c5-4542-451d-85f9-59e249b4c6fa,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:1
-X-CID-INFO: VERSION:1.1.32,REQID:1fcb15c5-4542-451d-85f9-59e249b4c6fa,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:1
-X-CID-META: VersionHash:5f78ec9,CLOUDID:f5919e95-10ce-4e4b-85c2-c9b5229ff92b,B
-	ulkID:231119230408XYBZ5UP2,BulkQuantity:8,Recheck:0,SF:66|24|17|19|43|74|6
-	4|102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: fc53191120304ffab81e76ce8ee56509-20231121
-X-User: chentao@kylinos.cn
-Received: from [172.21.13.26] [(116.128.244.171)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 467459029; Tue, 21 Nov 2023 10:12:19 +0800
-Message-ID: <55b77a28-a680-4465-bb57-2a5cb20ce06a@kylinos.cn>
-Date: Tue, 21 Nov 2023 10:12:17 +0800
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1AB8E3;
+	Mon, 20 Nov 2023 18:13:07 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6bbfb8f7ac4so1418907b3a.0;
+        Mon, 20 Nov 2023 18:13:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700532787; x=1701137587; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IsJ+vBOvHozQQUHLnusyAMGlpXVOSmcYb5GpvxkMATU=;
+        b=RBqFzBDUd2YjHq2Y5gRTKoHAGsGvi6LX/TfmMTUlSXsACqGxQuBL03gnfi14LisAQF
+         XAJm7S7CJt3Oyl+WcVyM9ONELB3IJchHYCVhXCBeb1aG7RHIyr1ryofuhvPDb5H0lXf5
+         Fjyj6yHEeWu2324U1xwiH97JqtClKy1cttOd1RgAXl8vgZ/8M9pHxp623wVCMFzhpxti
+         OPWKjf38Q/Ju4RSoWMHfKJ9y90nlHOfEjONvlSE57b79fy5X5aJYnmSwWPmbcJEBHxtq
+         fQXn8o5CnIoNr5LoJic9cSOhLwhcfeBUgol7d+AScpjV67WtCh+ogkZp6khtHRVRABiO
+         Rwiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700532787; x=1701137587;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IsJ+vBOvHozQQUHLnusyAMGlpXVOSmcYb5GpvxkMATU=;
+        b=jOzVZqqAWPKo+E1u/sPTbeY4qm6qmAYHY8DuwXvcxQAUkrCg4RoN+Q54duddkMSvfc
+         fGv6qjfjMZkm2fgQJ/BHc7xAMMRjEt3K4e9kaqqAehs0k5xrBbSvANkoBPcSVPyVCdRt
+         zienwCcBUKE4TN+/BxODQbKL5EZFRX2kH8R4T6FE4cUa3GoszHq+mFBNpZJ9M38qOVjo
+         C+BLrXhWq/9KXNsK+4G0tjE3ht6uHtwjOnNnvlV0j5bsfB3eelClvzh+F/0JPT8wH47J
+         yxUE9E/Nyh1pUbCtciSSqDiBncu+JinduyoSJyMDrZ56R7B6uPm4wRld5Yq6ppKAzP4c
+         Hp8g==
+X-Gm-Message-State: AOJu0Yza+DUuVfQgz8JzyOhODaLEpYe646VDhFRkLikfveLlgeQSQtSx
+	/EvcEBSL/cEKP0rwRbjePok=
+X-Google-Smtp-Source: AGHT+IFTLVJTUjc0cp3vhCIr4tOgxnJmbofRbzxMkHyltk1zlguaVTne21bl2wJhKS9uNVeh9Ynllg==
+X-Received: by 2002:a05:6a20:7f8c:b0:187:df59:5c3c with SMTP id d12-20020a056a207f8c00b00187df595c3cmr12841723pzj.3.1700532787031;
+        Mon, 20 Nov 2023 18:13:07 -0800 (PST)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id q24-20020a17090a2e1800b00274922d4b38sm6196677pjd.27.2023.11.20.18.13.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 18:13:06 -0800 (PST)
+Date: Tue, 21 Nov 2023 11:13:06 +0900 (JST)
+Message-Id: <20231121.111306.119472527722905184.fujita.tomonori@gmail.com>
+To: tmgross@umich.edu
+Cc: boqun.feng@gmail.com, fujita.tomonori@gmail.com, andrew@lunn.ch,
+ gregkh@linuxfoundation.org, aliceryhl@google.com, benno.lossin@proton.me,
+ miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CALNs47tt94DBPvz47rssBTZ86jbHwaa7XaNnT3UbdxwY6nLg1g@mail.gmail.com>
+References: <e7d0226a-9a38-4ce9-a9b5-7bb80a19bff6@lunn.ch>
+	<ZVjePqyic7pvcb24@Boquns-Mac-mini.home>
+	<CALNs47tt94DBPvz47rssBTZ86jbHwaa7XaNnT3UbdxwY6nLg1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next] i40e: Use correct buffer size
-Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: horms@kernel.org, anthony.l.nguyen@intel.com, davem@davemloft.net,
- edumazet@google.com, intel-wired-lan@lists.osuosl.org,
- jeffrey.t.kirsher@intel.com, jesse.brandeburg@intel.com, kuba@kernel.org,
- kunwu.chan@hotmail.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, shannon.nelson@amd.com
-References: <20231113093112.GL705326@kernel.org>
- <20231115031444.33381-1-chentao@kylinos.cn>
- <55e07c56-da57-41aa-bc96-e446fad24276@intel.com>
- <4b551600-f1a3-4efe-b3e9-99cb4536f487@kylinos.cn>
- <2c61c232-1bbb-4cae-bb7f-92a7f2298e97@intel.com>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <2c61c232-1bbb-4cae-bb7f-92a7f2298e97@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Thanks for your reply. I understand what you mean, i.e. the caller of 
-'kasprintf' is responsible for calling 'kfree' to free up memory.
+On Sun, 19 Nov 2023 05:06:23 -0600
+Trevor Gross <tmgross@umich.edu> wrote:
 
-My concern is that in many scenarios, the requested memory will be 
-released after a period of use.
-
-Has anyone else forgotten to free up the requested memory when using 
-'kasprintf'? e.g. 'dam_heap_init' calls 'dma_heap_devnode' to allocate 
-memory:
-dam_heap_init
-	-> dma_heap_devnode
-		  -> kasprintf
-			->kvasprintf
-			     ->kmalloc_node_track_caller
-			  	-> __kmalloc_node_track_caller
-					  -> __do_kmalloc_node
-						  -> kasan_kmalloc
-
-
-There is no function like 'dam_heap_exit' to free the memmory allocated 
-by dma_heap_devnode.
-
-Another case is 'cpuid_devnode'. Will this cause a memory leak, and is 
-there a better way to avoid the memory leak in this case?
-
-Or is there a uniform place in the memory management module to free up 
-this memory?
-
-Thanks,
-Kunwu
-
-On 2023/11/20 19:41, Alexander Lobakin wrote:
-> From: Kunwu Chan <chentao@kylinos.cn>
-> Date: Sun, 19 Nov 2023 23:12:09 +0800
-> 
->> Hi Alexander,
->> Thank you so much for your reply, I looked at the modification you
->> mentioned, it's really cool. I'll definitely try it next time.
+>> +pub struct Registration {
+>> +    drivers: Pin<&'static mut [DriverVTable]>,
+>> +}
 >>
->> But when using it, will it be easy to forget to free up memory?
-> 
-> You have a kfree() at the end of the function.
-> 
-> Generally speaking, 'ka' stands for "[kernel] allocate" and you also
-> need to pass GPF_ as the second argument. Enough hints that you need to
-> free the pointer after using it I would say.
-> 
->> Although 'kmalloc_track_caller' is used, according to my understanding,
->> it is also necessary to release the memory at the end of use.
+>> [...]
 >>
->> On 2023/11/15 23:39, Alexander Lobakin wrote:
->>> From: Kunwu Chan <chentao@kylinos.cn>
->>> Date: Wed, 15 Nov 2023 11:14:44 +0800
->>>
->>>> The size of "i40e_dbg_command_buf" is 256, the size of "name"
->>>> depends on "IFNAMSIZ", plus a null character and format size,
->>>> the total size is more than 256, fix it.
->>>>
->>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
->>>> Suggested-by: Simon Horman <horms@kernel.org>
->>>> ---
->>>>    drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 2 +-
->>>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
->>>> b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
->>>> index 999c9708def5..e3b939c67cfe 100644
->>>> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
->>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
->>>> @@ -72,7 +72,7 @@ static ssize_t i40e_dbg_command_read(struct file
->>>> *filp, char __user *buffer,
->>>>    {
->>>>        struct i40e_pf *pf = filp->private_data;
->>>>        int bytes_not_copied;
->>>> -    int buf_size = 256;
->>>> +    int buf_size = IFNAMSIZ + sizeof(i40e_dbg_command_buf) + 4;
->>>
->>> Reverse Christmas Tree style? Should be the first one in the declaration
->>> list.
->>>
->>>>        char *buf;
->>>>        int len;
->>>
->>> You can fix it in a different way. Given that there's a kzalloc() either
->>> way, why not allocate the precise required amount of bytes by using
->>> kasprintf() instead of kzalloc() + snprintf()? You wouldn't need to
->>> calculate any buffer sizes etc. this way.
->>>
->>> Thanks,
->>> Olek
+>> +// SAFETY: `Registration` does not expose any of its state across threads.
+>> +unsafe impl Send for Registration {}
+>>
+>> +// SAFETY: `Registration` does not expose any of its state across threads.
+>> +unsafe impl Sync for Registration {}
 > 
-> Thanks,
-> Olek
+> I don't think the impl here actually makes sense. `Registration` is a
+> buffer of references to `DriverVTable`. That type isn't marked Sync so
+> by the above rules, its references should not be either.
+> 
+> Tomo, does this need to be Sync at all? Probably easiest to drop the
+> impls if not, otherwise I think it is more correct to move them to
+> `DriverVTable`.  You may have had this before, I'm not sure if
+> discussion made you change it at some point...
+
+This needs to be Sync:
+
+601 | pub struct Registration {
+    |            ^^^^^^^^^^^^
+note: required because it appears within the type `Module`
+   --> drivers/net/phy/foo_rust.rs:5:1
+    |
+5   | / kernel::module_phy_driver! {
+6   | |     drivers: [Foo],
+7   | |     device_table: [
+8   | |         DeviceId::new_with_driver::<Foo>()
+...   |
+13  | |     license: "GPL",
+14  | | }
+    | |_^
+note: required by a bound in `kernel::Module`
+   --> /home/ubuntu/git/linux/rust/kernel/lib.rs:69:27
+    |
+69  | pub trait Module: Sized + Sync {
+    |                           ^^^^ required by this bound in `Module`
+    = note: this error originates in the macro `kernel::module_phy_driver` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+
+I'm not sure we discussed but making DriverVTable Sync works.
+
+#[repr(transparent)]
+pub struct DriverVTable(Opaque<bindings::phy_driver>);
+
+// SAFETY: DriverVTable has no &self methods, so immutable references to it are useless.
+unsafe impl Sync for DriverVTable {}
+
+
+looks correct?
 
