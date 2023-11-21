@@ -1,93 +1,123 @@
-Return-Path: <netdev+bounces-49684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3DB7F3106
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:35:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C177F310E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B1F283785
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:35:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74E7128383B
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5B055C22;
-	Tue, 21 Nov 2023 14:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h54+mbZF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102B538F90;
+	Tue, 21 Nov 2023 14:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888B81A3;
-	Tue, 21 Nov 2023 06:35:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QKGUm3YOEgFjR/qZttfUWApAFjwkLqqdBvdeGQxH6vg=; b=h54+mbZFXArzqshetgeGPPBTIF
-	o5gpQfR4+aIlRkUd1ZHanwKfUHyipyyh7QdK/sSDK2hoUIeSx9i3EN0OxBG5fIhnYwhcLa5lGE5zw
-	T2tSAFDwADYzcG6h1b1F718eG0L7CUgX2FTS3dNrhpgx90M0fCqfknvu5JI+EBbaYzSc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r5RqR-000lXq-O1; Tue, 21 Nov 2023 15:35:19 +0100
-Date: Tue, 21 Nov 2023 15:35:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [RFC PATCH net-next v2 03/10] net: phy: add helpers to handle
- sfp phy connect/disconnect
-Message-ID: <cd66774b-701a-43c8-9677-d3d7fd13b059@lunn.ch>
-References: <20231117162323.626979-1-maxime.chevallier@bootlin.com>
- <20231117162323.626979-4-maxime.chevallier@bootlin.com>
- <ac7d9aa6-e403-482b-a12a-d5821787dd4c@lunn.ch>
- <ZVyBgNcFrSubz2jn@shell.armlinux.org.uk>
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 751E4BA
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 06:36:11 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SZRdW0jJCzMnG4;
+	Tue, 21 Nov 2023 22:31:27 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 21 Nov 2023 22:36:09 +0800
+Message-ID: <e3488110-e3c2-49cd-401b-a6ef51a79f9d@huawei.com>
+Date: Tue, 21 Nov 2023 22:36:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZVyBgNcFrSubz2jn@shell.armlinux.org.uk>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net] ipv4: igmp: fix refcnt uaf issue when receiving igmp
+ query packet
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20231121020558.240321-1-shaozhengchao@huawei.com>
+ <ZVwcWmg5NtuTSV7q@Laptop-X1>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZVwcWmg5NtuTSV7q@Laptop-X1>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-On Tue, Nov 21, 2023 at 10:08:00AM +0000, Russell King (Oracle) wrote:
-> On Tue, Nov 21, 2023 at 01:57:24AM +0100, Andrew Lunn wrote:
-> > > +/**
-> > > + * phy_sfp_connect_phy - Connect the SFP module's PHY to the upstream PHY
-> > > + * @upstream: pointer to the upstream phy device
-> > > + * @phy: pointer to the SFP module's phy device
-> > > + *
-> > > + * This helper allows keeping track of PHY devices on the link. It adds the
-> > > + * SFP module's phy to the phy namespace of the upstream phy
-> > > + */
-> > > +int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
-> > > +{
-> > > +	struct phy_device *phydev = upstream;
-> > 
-> > Will this function only ever be called from a PHY driver? If so, we
-> > know upstream is PHY. So we can avoid using void * and make it a
-> > struct phy_device *. 
+
+
+On 2023/11/21 10:56, Hangbin Liu wrote:
+> Hi Zhengchao,
+> On Tue, Nov 21, 2023 at 10:05:58AM +0800, Zhengchao Shao wrote:
+>> ---
+>>   net/ipv4/igmp.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+>> index 76c3ea75b8dd..f217581904d6 100644
+>> --- a/net/ipv4/igmp.c
+>> +++ b/net/ipv4/igmp.c
+>> @@ -1044,6 +1044,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+>>   	for_each_pmc_rcu(in_dev, im) {
+>>   		int changed;
+>>   
+>> +		if (!netif_running(im->interface->dev))
+>> +			continue;
 > 
-> No. This function is hooked into the .connect_phy method of
-> sfp_upstream_ops, and the SFP bus layer has no idea what the
-> "upstream" is. In this case, it's a PHY. In the case of phylink,
-> it's the phylink struct. So no, "struct phy_device *" here will
-> cause build errors.
+> I haven't checked this part for a long time. What's the difference of in_dev->dev
+> and im->interface->dev? I though they are the same, no?
+> 
+> If they are the same, should we stop processing the query earlier? e.g.
+> 
+> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> index 76c3ea75b8dd..f4e1d229c9aa 100644
+> --- a/net/ipv4/igmp.c
+> +++ b/net/ipv4/igmp.c
+> @@ -1082,6 +1082,9 @@ int igmp_rcv(struct sk_buff *skb)
+>                          goto drop;
+>          }
+> 
+> +       if (!netif_running(dev))
+> +               goto drop;
+> +
+>          in_dev = __in_dev_get_rcu(dev);
+>          if (!in_dev)
+>                  goto drop;
+> 
+> 
+> BTW, does IPv6 MLD has this issue?
+I also think mld has the same issue.
 
-O.K, thanks for checking this. It would of been nice to have some
-compile time checking what is passed is what we expect in terms of
-type, but C does not allow that in this case.
+Thread A 				Thread B
+icmpv6_rcv				br_dev_stop
+   igmp6_event_query			  br_multicast_leave_snoopers
+     start mc_query_work		            ipv6_dev_mc_dec
+       Thread C				      __ipv6_dev_mc_dec
+	mld_query_work				mutex_lock
+	  ...				        igmp6_group_dropped//r=1
+	  ...					mutex_unlock
+	  ...					ma_put
+	  ...					  refcount_dec_...//r=0
+	  mutex_lock                  		
+	  __mld_query_work
+             igmp6_group_queried
+	      refcount_inc(&ma->mca_refcnt) //r increased from 0
+	  mutex_lock
+Check whether the value of mcs_uses is 0 will solve the issue.
 
-	 Andrew
+also I think checking whether the device is still running in IGMP does
+not solve the uaf issue, but reduces the probability of the issue. I
+will try to use a lock to solve the IGMP refcnt uaf issue.
+
+> 
+> Thanks
+> Hangbin
+> 
 
