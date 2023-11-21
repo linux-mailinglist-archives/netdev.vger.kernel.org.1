@@ -1,242 +1,233 @@
-Return-Path: <netdev+bounces-49815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9BD57F3901
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:11:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392D87F390C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6661C208C6
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:11:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD942823C1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC32656465;
-	Tue, 21 Nov 2023 22:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882D849F8A;
+	Tue, 21 Nov 2023 22:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8n8hB8X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aRaeGq2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37730D56
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 14:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700604658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gdwjKLBCPHbhmKdp+NaAgsF4FPxnedN47CRRapavUMU=;
-	b=P8n8hB8XASfj9wNNqBMB+G4g/Kj+C9KpOgYZ+Fm7o2VTPe3rPbZk24eM0osJK2SOICIc+N
-	5gSgRUKTSZLJSKsHBYe4mMa/+6cw1LAhMuVKr3slh3/X3iS31KJnKTBZ4roc/wD+3X1y90
-	PpZjYnT4R4xd+qif+QqUmLoqOXECn/g=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-6CEObMDtMtWuhs46pvhg0Q-1; Tue, 21 Nov 2023 17:10:57 -0500
-X-MC-Unique: 6CEObMDtMtWuhs46pvhg0Q-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-da03ef6fc30so7421924276.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 14:10:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700604656; x=1701209456;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gdwjKLBCPHbhmKdp+NaAgsF4FPxnedN47CRRapavUMU=;
-        b=m0gSr8VeO91aAMJJIJnZl/AXNxfQz6YdxX/s5gpSS26wVbpHjI7RT9I2SEtRV67mvF
-         iDiRg+ExPoRTu7Ey7g0l1Kxg/bkOnky0ftj0n6mETfMTihqXpqzPcI0sD/QY6MJK004l
-         9AW0oSAjF5qpzAOslCnJ9+Bb9VR48GJ7Tp7oKGKe5s7ywrB8sWLI1MIOqfAcxjVot8Ej
-         jNPuITTv6mq7Lk6Nz0lPJwNIUYs3ot1YwNwAklF6k6dRB6qlAY9eBDVci0vrlQBCKlGl
-         itBqUng82lsMpOxaJWUmtXCuW3jwgQHimomE8zX0LzP+BFocJyTVfeBo6z8rhJXQa28M
-         S9Vw==
-X-Gm-Message-State: AOJu0YxdJlA87AjKLFYmuvA5c0AABGmfjaBRdVyRz0adesvXHMVGoTz6
-	ErBIg+uYo+uXmIXsBQVCChr0xUI0pPH5LSuQTOamxO8+fJrvyrebDpp8Gm0XI3v6PK0AiTJrpfC
-	8ms436NNyVxhlqa6r
-X-Received: by 2002:a25:6a42:0:b0:daf:936f:4547 with SMTP id f63-20020a256a42000000b00daf936f4547mr324093ybc.19.1700604656381;
-        Tue, 21 Nov 2023 14:10:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFE090DqFilJY7Grpyrn6Z8VnqvMejJY8JbukGhhcycTVKzgxbz8+AeQIpmf/uCRmVju8tO5Q==
-X-Received: by 2002:a25:6a42:0:b0:daf:936f:4547 with SMTP id f63-20020a256a42000000b00daf936f4547mr324079ybc.19.1700604656021;
-        Tue, 21 Nov 2023 14:10:56 -0800 (PST)
-Received: from [192.168.1.165] ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id c19-20020a056214071300b00670fd658739sm4321099qvz.38.2023.11.21.14.10.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 14:10:55 -0800 (PST)
-From: Andrew Halaney <ahalaney@redhat.com>
-Date: Tue, 21 Nov 2023 16:10:37 -0600
-Subject: [PATCH net-next] net: phy: mdio_device: Reset device only when
- necessary
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6B94C65
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 22:15:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE735C433C8;
+	Tue, 21 Nov 2023 22:15:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700604958;
+	bh=i6UN4n4gRpxPOjm3xL0N+RBHYc8j9YCh32qXnsP4KPE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aRaeGq2nDOwSk6HflVP1jp313nAkkSZzMJEKfPps1hVDAcO6ZXvemrVvb7ForqL8V
+	 kd8PWGI9ZLC3FSnXSF4KufW6Ij87DmwXA0/FiwufoXBJO5Wl8eL0pkw+bX8TNyo0v2
+	 KDwz24PD+1fnLD9PAXE357juVcpmYakZRG9iR0RdrifGZ4yFWD45IGfod5aHYaLjMG
+	 +2CZu0zwyvfWtJK5v+yWER2g/2meFqHywyn1PimYnSFUXrrQuyS7yHFP8Og5/IuqOU
+	 nqIQJCMD3b8SETwsRXKjNnU2yBx8UeaheGozIp/AcSDFNRw+EDUTrwTdO246h6qY2h
+	 P3h8xEYr+qgRg==
+Message-ID: <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org>
+Date: Tue, 21 Nov 2023 23:15:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+ linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
+ f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com
+References: <20231117235140.1178-1-luizluca@gmail.com>
+ <20231117235140.1178-3-luizluca@gmail.com>
+ <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
+ <20231120134818.e2k673xsjec5scy5@skbuf>
+ <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org>
+ <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231121-net-phy-reset-once-v1-1-37c960b6336c@redhat.com>
-X-B4-Tracking: v=1; b=H4sIANwqXWUC/x2MQQ6DMAwEvxL5jCXsXNp+BXFAdAFfDEpQlQrl7
- 025zUize1FGMmR6hYsSPpZt9ybSBZq3yVewvZuT9hpFVNhx8rF9OSE32n0GCzRqfD50Qk9teCQ
- sVu7Tgf69o5w01voDrFYUdW4AAAA=
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
- Andrew Halaney <ahalaney@redhat.com>
-X-Mailer: b4 0.12.3
 
-Currently the phy reset sequence is as shown below for a
-devicetree described mdio phy on boot:
+On 21/11/2023 15:40, Luiz Angelo Daros de Luca wrote:
+> Hi Krzysztof,
+> 
+>>> On Mon, Nov 20, 2023 at 10:20:13AM +0100, Krzysztof Kozlowski wrote:
+>>>> No, why do you need it? You should not need MODULE_ALIAS() in normal
+>>>> cases. If you need it, usually it means your device ID table is wrong
+>>>> (e.g. misses either entries or MODULE_DEVICE_TABLE()). MODULE_ALIAS() is
+>>>> not a substitute for incomplete ID table.
+>>>>
+>>>> Entire abstraction/macro is pointless and make the code less readable.
+>>>
+>>> Are you saying that the line
+>>>
+>>> MODULE_DEVICE_TABLE(of, realtek_common_of_match);
+>>>
+>>> should be put in all of realtek-mdio.c, realtek-smi.c, rtl8365mb.c and
+>>> rtl8366rb.c, but not in realtek-common.c?
+>>
+>> Driver should use MODULE_DEVICE_TABLE() for the table not MODULE_ALIAS()
+>> for each entry. I don't judge where should it be put. I just dislike
+>> usage of aliases as a incomplete-substitute of proper table.
+> 
+> MODULE_ALIAS() is in use here because of its relation with modprobe,
+> not inside the kernel.
 
-1. Assert the phy_device's reset as part of registering
-2. Deassert the phy_device's reset as part of registering
-3. Deassert the phy_device's reset as part of phy_probe
-4. Deassert the phy_device's reset as part of phy_hw_init
+The same as MODULE_DEVICE_TABLE.
 
-The extra two deasserts include waiting the deassert delay afterwards,
-which is adding unnecessary delay.
+> MODULE_DEVICE_TABLE is also in use but it does not seem to generate
+> any information usable by modprobe.
 
-Here's some snipped tracing output using the following command line
-params "trace_event=gpio:* trace_options=stacktrace" illustrating
-the reset handling and where its coming from:
+It does, exactly the same from functional point of view... which
+information are you missing?
 
-    /* Assert */
-       systemd-udevd-283     [002] .....     6.780434: gpio_value: 544 set 0
-       systemd-udevd-283     [002] .....     6.783849: <stack trace>
-     => gpiod_set_raw_value_commit
-     => gpiod_set_value_nocheck
-     => gpiod_set_value_cansleep
-     => mdio_device_reset
-     => mdiobus_register_device
-     => phy_device_register
-     => fwnode_mdiobus_phy_device_register
-     => fwnode_mdiobus_register_phy
-     => __of_mdiobus_register
-     => stmmac_mdio_register
-     => stmmac_dvr_probe
-     => stmmac_pltfr_probe
-     => devm_stmmac_pltfr_probe
-     => qcom_ethqos_probe
-     => platform_probe
+> 
+>>>
+>>> There are 5 kernel modules involved, 2 for interfaces and 2 for switches.
+>>>
+>>> Even if the same OF device ID table could be used to load multiple
+>>> modules, I'm not sure
+>>> (a) how to avoid loading the interface driver which will not be used
+>>>     (SMI if it's a MDIO-connected switch, or MDIO if it's an SMI
+>>>     connected switch)
+>>> (b) how to ensure that the drivers are loaded in the right order, i.e.
+>>>     the switch drivers are loaded before the interface drivers
+>>
+>> I am sorry, I do not understand the problem. The MODULE_DEVICE_TABLE and
+>> MODULE_ALIAS create exactly the same behavior. How any of above would
+>> happen with table but not with alias having exactly the same compatibles?
+> 
+> Realtek switches can be managed through different interfaces. In the
+> current kernel implementation, there is an MDIO driver (realtek-mdio)
+> for switches connected to the MDIO bus, and a platform driver
+> implementing the SMI protocol (a simple GPIO bit-bang).
+> 
+> The actual switch logic is implemented in two different switch
+> family/variant modules: rtl8365mb and rtl8366 (currently only for
+> rtl8366rb). As of today, both Realtek interface modules directly
+> reference each switch variant symbol, creating a hard dependency and
+> forcing the interface module to load both switch family variants. Each
+> interface module provides the same compatible strings for both
+> variants, but I haven't investigated whether this is problematic or
+> not. It appears that there is no mechanism to autoload modules based
+> on compatible strings from the device tree, and each interface module
+> is a different type of driver.
 
-    /* Deassert */
-       systemd-udevd-283     [002] .....     6.802480: gpio_value: 544 set 1
-       systemd-udevd-283     [002] .....     6.805886: <stack trace>
-     => gpiod_set_raw_value_commit
-     => gpiod_set_value_nocheck
-     => gpiod_set_value_cansleep
-     => mdio_device_reset
-     => phy_device_register
-     => fwnode_mdiobus_phy_device_register
-     => fwnode_mdiobus_register_phy
-     => __of_mdiobus_register
-     => stmmac_mdio_register
-     => stmmac_dvr_probe
-     => stmmac_pltfr_probe
-     => devm_stmmac_pltfr_probe
-     => qcom_ethqos_probe
-     => platform_probe
+??? So entire Linux kernel is broken? Somehow autoloading modules based
+on compatible strings from the device tree works for every other driver
+properly using tables... So again, I am repeating:
+stop using MODULE_ALIAS for missing/incomplete tables
 
-    /* Deassert */
-       systemd-udevd-283     [002] .....     6.882601: gpio_value: 544 set 1
-       systemd-udevd-283     [002] .....     6.886014: <stack trace>
-     => gpiod_set_raw_value_commit
-     => gpiod_set_value_nocheck
-     => gpiod_set_value_cansleep
-     => mdio_device_reset
-     => phy_probe
-     => really_probe
-     => __driver_probe_device
-     => driver_probe_device
-     => __device_attach_driver
-     => bus_for_each_drv
-     => __device_attach
-     => device_initial_probe
-     => bus_probe_device
-     => device_add
-     => phy_device_register
-     => fwnode_mdiobus_phy_device_register
-     => fwnode_mdiobus_register_phy
-     => __of_mdiobus_register
-     => stmmac_mdio_register
-     => stmmac_dvr_probe
-     => stmmac_pltfr_probe
-     => devm_stmmac_pltfr_probe
-     => qcom_ethqos_probe
-     => platform_probe
+> 
+> This patch set accomplishes two things: it moves some shared code to a
 
-    /* Deassert */
-      NetworkManager-477     [000] .....     7.023144: gpio_value: 544 set 1
-      NetworkManager-477     [000] .....     7.026596: <stack trace>
-     => gpiod_set_raw_value_commit
-     => gpiod_set_value_nocheck
-     => gpiod_set_value_cansleep
-     => mdio_device_reset
-     => phy_init_hw
-     => phy_attach_direct
-     => phylink_fwnode_phy_connect
-     => __stmmac_open
-     => stmmac_open
+Which should not... One thing per patch.
 
-There's a lot of paths where the device is getting its reset
-asserted and deasserted. Let's track the state and only actually
-do the assert/deassert when it changes.
 
-Reported-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
----
-This patch isn't the prettiest thing in the world, but the myriad of
-call paths that lead to touching the reset gpio is proving daunting to
-me. I originally tried to remove some of the reset calls in various
-places, but after staring at the different call paths I decided this was
-safer, I am not confident I covered all the corner cases when going
-about this by removing the extra phy_device_reset/mdio_device_reset
-calls.
----
- drivers/net/phy/mdio_device.c | 5 +++++
- include/linux/mdio.h          | 1 +
- 2 files changed, 6 insertions(+)
+> new Realtek common module and changes the hard dependency between
+> interface and variant modules into a more dynamic relation. Each
+> variant module registers itself in realtek-common, and interface
+> modules look for the appropriate variant. However, as interface
+> modules do not directly depend on variant modules, they might not have
+> been loaded yet, causing the driver probe to fail.
+> 
+> The solution I opted for was to request the module during the
+> interface probe (similar to what happens with DSA tag modules),
+> triggering a userland "modprobe XXXX." Even without the variant module
+> loaded, we know the compatible string that matched the interface
+> driver. We can also have some extra info from match data, but I chose
+> to simply keep using the compatible string. The issue is how to get
 
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index 044828d081d2..d2b9e62edaaa 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -122,6 +122,9 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
- 	if (!mdiodev->reset_gpio && !mdiodev->reset_ctrl)
- 		return;
- 
-+	if (mdiodev->reset_state == value)
-+		return;
-+
- 	if (mdiodev->reset_gpio)
- 		gpiod_set_value_cansleep(mdiodev->reset_gpio, value);
- 
-@@ -135,6 +138,8 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
- 	d = value ? mdiodev->reset_assert_delay : mdiodev->reset_deassert_delay;
- 	if (d)
- 		fsleep(d);
-+
-+	mdiodev->reset_state = value;
- }
- EXPORT_SYMBOL(mdio_device_reset);
- 
-diff --git a/include/linux/mdio.h b/include/linux/mdio.h
-index 007fd9c3e4b6..79ceee3c8673 100644
---- a/include/linux/mdio.h
-+++ b/include/linux/mdio.h
-@@ -38,6 +38,7 @@ struct mdio_device {
- 	/* Bus address of the MDIO device (0-31) */
- 	int addr;
- 	int flags;
-+	int reset_state;
- 	struct gpio_desc *reset_gpio;
- 	struct reset_control *reset_ctrl;
- 	unsigned int reset_assert_delay;
+How is this even related to the problem? Please respond with concise
+messages.
 
----
-base-commit: 07b677953b9dca02928be323e2db853511305fa9
-change-id: 20231121-net-phy-reset-once-1e2323982ae0
+> the "XXXX" for modprobe. For DSA tags, module names are generated
+> according to a fixed rule based on the tag name. However, the switch
+> variants do not have a fixed relation between module name and switch
+> families (actually, there is not even a switch family name). I could
+> (and did in a previous RFC) use the match data to inform each module
+> name. However, it adds a non-obvious relation between the module name
+> (defined in Makefile) and a string in code. I was starting to
+> implement a lookup table to match compatible strings to their module
+> names when I realized that I was just mapping a string to a module
+> name, something like what module alias already does. That's when the
+> MODULE_ALIAS("<the compatible string>") was introduced.
+> 
+> After this discussion, I have some questions:
+> 
+> I'm declaring the of_device_id match table in realtek-common as it is
+> the same for both interfaces. I also moved MODULE_DEVICE_TABLE(of,
+> realtek_common_of_match) to realtek-common. Should I keep the
+> MODULE_DEVICE_TABLE() on each interface module (referencing the same
+> table), or is it okay to keep it in the realtek-common module? If I
+
+Why would you have the same compatible entries in different modules? You
+do understand that device node will become populated on first bind (bind
+of the first device)?
+
+> need to move it to each interface module, can I reuse a shared
+> of_device_id match table declared in realtek-common?
+> 
+> If MODULE_ALIAS is not an acceptable solution, what would be the right
+> one? Go back to the static mapping between the compatible string and
+> the module name or is there a better solution?
+
 
 Best regards,
--- 
-Andrew Halaney <ahalaney@redhat.com>
+Krzysztof
 
 
