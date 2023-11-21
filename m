@@ -1,279 +1,100 @@
-Return-Path: <netdev+bounces-49625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA1E77F2C96
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:10:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B58DD7F2C9A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:11:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8DEB2816D5
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE24281C90
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF95495E3;
-	Tue, 21 Nov 2023 12:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919C948CEA;
+	Tue, 21 Nov 2023 12:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="0DiQ63Zz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJjRVfnN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4513E12C
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:10:27 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c8880fbb33so16420881fa.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:10:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700568625; x=1701173425; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ntfKAqPU4aWm/LRHvi2okxLjB0lcvVe/EACDTzczDJs=;
-        b=0DiQ63Zz74CrksngIF1HBqr87vwxJwnVx2Qtp7OJQq4CeQXzwqCsqVAqi/TBil6atT
-         E4HSV9kzg3QKzEheQ68GCppZoiNGFHK9yDdN1EEyD4TVex7BJ9jf/8hYeM9YsmlYQ2oT
-         ycxW/OQm1tv0Fz9CUPgijCoLQ5toCsdzqRTVKXqzdbGhgimeQEUppbJPy2Q6Gp92RIjX
-         96XQ0y70s6nz9cJMMK2WuIe9UbfxuOa0HBUSi3XoWLpdG3BF3QOu7M1ZCPLJNycmSLKV
-         olRx8nA8kwl3EnVK2Xyrsfk2w25Ntqr4Wt4FvDQasTyjSOGsL1HXWrqqnWnD3MGnZnMh
-         h1Qg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E52138
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:11:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700568666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nUFtFB9/4q4gpI1y/9fsg7wSq63KYPuBeyRHJSkbC1k=;
+	b=MJjRVfnNdP3+iF0MSP7EHZdyKJlqWIZWYDrkm3RsZ0diOPGDa5lNEw7UyGc42UsNWqo9xA
+	KFGpOwrlHS+8t6ejgANLn3XzVett9GTmECvwu8/AsZG2OLFcDBP3cE18nEUyU/zfkHH/0F
+	M4TI3mZXu7rCva2Q+LV8b2jpmuV3NG8=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-161-k0PkLSEyMueN89HOj5-ClQ-1; Tue, 21 Nov 2023 07:11:04 -0500
+X-MC-Unique: k0PkLSEyMueN89HOj5-ClQ-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-41eb42115e9so17294021cf.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:11:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700568625; x=1701173425;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ntfKAqPU4aWm/LRHvi2okxLjB0lcvVe/EACDTzczDJs=;
-        b=adp3JBiPrd7dRs8lBRlY+Bf1Ie8M+dKzbmpKytqzLLE44WkvxEn+iwvBE8WVoS/4dW
-         J362HtdO0/Cu9HBpRzYOAuu7z40QCvfAWDluLhCUzQElejteV72IPT+8Ia4ilq5cvbeS
-         rfds+5Lc+r3MJWMPNV7iDVAQwpbkFAaQvrPimKQFmpAYsoTRA5Uaf0jkWBSoOSrEww94
-         2+wXDLq9xl5QP6fOyt1CM+oqthDJskFDFR6MixeBUwtb3OMDTSKf4jUe+VLWByN6KDQQ
-         XqYIbVnGH1FPnFK51msEUXpJrc9qNRKcLON3mUWehmeAy6Jlqf1I/YpuHZTlMeKi4SQQ
-         d2zA==
-X-Gm-Message-State: AOJu0YwjphihNZfT3+jtUXCr7N/9Jdzo1eyeO6Aaiqho0JFdx+mP/Ko+
-	C/0uv2Kj7BBu/kjvIS9oG01unZyb+turRrYeunEWhA==
-X-Google-Smtp-Source: AGHT+IHhSYP9Dskk4tqKl43Llz13m39cbu1sHHZcK1T7rMXZkD8zA2Zb+Mffaejw8iF64d9t4JIszg==
-X-Received: by 2002:a2e:989a:0:b0:2c5:13e8:e6dc with SMTP id b26-20020a2e989a000000b002c513e8e6dcmr7123463ljj.31.1700568625337;
-        Tue, 21 Nov 2023 04:10:25 -0800 (PST)
-Received: from localhost (h-46-59-36-206.A463.priv.bahnhof.se. [46.59.36.206])
-        by smtp.gmail.com with ESMTPSA id bz14-20020a05651c0c8e00b002b9f4841913sm1315506ljb.1.2023.11.21.04.10.24
+        d=1e100.net; s=20230601; t=1700568664; x=1701173464;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nUFtFB9/4q4gpI1y/9fsg7wSq63KYPuBeyRHJSkbC1k=;
+        b=NKEIkbv02cngebbk9/dGjTzO7NjRfhTnGUC+8Zfxfa8tXhBpFdja+xt0R95o0cXdVv
+         jC7MHcChpJ/7BN1WlVUyZupETSAlJJNF8NWCb4fLNE/arTf8oYgtk5qL2NVi53EPxYpw
+         XHP6iqhe1bJZgcQEWnBXkFiau46a3E/1m+hGKQ18Gi4k7+7j4AX2t0G55cSAlLJXqMqn
+         TTBtxexUk4HDQCKam9ZLwqr9U3Y3LNipcEWAA8ZUKlHTufEBrKuP/mgHiZQO2HFGcVg1
+         AQhp9E7BMm2a51w3y3UtFQOymSYvBTzPsG2HwKLayAWSMLMgF2filzAWyN0jfdTlokDN
+         ADPw==
+X-Gm-Message-State: AOJu0YyxN/oqUBqQS5EVn/EhG5l4MNBqHyDsnRW43VCT3jWchmEdTGIM
+	jIYpDpfxWVXq+BNdGcUSpvFzULb8gSGbBfqB0ibnJHen3etlD9UPcKA1zGUEwKrLAnqxeyj9vGg
+	ijcfaQ8kbJnLII1Mo
+X-Received: by 2002:a05:620a:4542:b0:775:8fab:8c6d with SMTP id u2-20020a05620a454200b007758fab8c6dmr12651342qkp.1.1700568664169;
+        Tue, 21 Nov 2023 04:11:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHaQMamlsB9+OZOddaRinOvjEZo8rBDxBsfZUrGETZnBUh+F/A1r2U50deTAKHYwyYGkW1afw==
+X-Received: by 2002:a05:620a:4542:b0:775:8fab:8c6d with SMTP id u2-20020a05620a454200b007758fab8c6dmr12651317qkp.1.1700568663786;
+        Tue, 21 Nov 2023 04:11:03 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-234-2.dyn.eolo.it. [146.241.234.2])
+        by smtp.gmail.com with ESMTPSA id bn44-20020a05620a2aec00b007758b25ac3bsm3570065qkb.82.2023.11.21.04.11.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 04:10:24 -0800 (PST)
-Date: Tue, 21 Nov 2023 13:10:24 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
- Ethernet TSN
-Message-ID: <ZVyeMKjVhjW2F2e0@oden.dyn.berto.se>
-References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
- <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
+        Tue, 21 Nov 2023 04:11:03 -0800 (PST)
+Message-ID: <7948d79d8e8052c600a208142755b7a74b4aeee0.camel@redhat.com>
+Subject: Re: [PATCH v2] ipv6: Correct/silence an endian warning in
+ ip6_multipath_l3_keys
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kunwu Chan <chentao@kylinos.cn>, edumazet@google.com
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+ kunwu.chan@hotmail.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date: Tue, 21 Nov 2023 13:11:00 +0100
+In-Reply-To: <20231119143913.654381-1-chentao@kylinos.cn>
+References: 
+	<CANn89iKJ=Na2hWGv9Dau36Ojivt-icnd1BRgke033Z=a+E9Wcw@mail.gmail.com>
+	 <20231119143913.654381-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
 
-Hi Krzysztof,
+On Sun, 2023-11-19 at 22:39 +0800, Kunwu Chan wrote:
+> net/ipv6/route.c:2332:39: warning: incorrect type in assignment (differen=
+t base types)
+> net/ipv6/route.c:2332:39:    expected unsigned int [usertype] flow_label
+> net/ipv6/route.c:2332:39:    got restricted __be32
+>=20
+> Fixes: fa1be7e01ea8 ("ipv6: omit traffic class when calculating flow hash=
+")
 
-Thanks for your review.
+This does not look like the correct fixes tag, sparse warning is
+preexistent. Likely 23aebdacb05dab9efdf22b9e0413491cbd5f128f
 
-On 2023-11-21 08:45:29 +0100, Krzysztof Kozlowski wrote:
-> On 20/11/2023 17:07, Niklas Söderlund wrote:
-> > Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> > device provides Ethernet network.
-> > 
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> 
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC (and consider --no-git-fallback argument). It might
-> happen, that command when run on an older kernel, gives you outdated
-> entries. Therefore please be sure you base your patches on recent Linux
-> kernel.
-> 
-> Why do you decide to skip some maintainers?
+Please sent a new revision with the correct tag, thanks
 
-Sorry will do for v2.
+Paolo
 
-> 
-> > ---
-> >  .../bindings/net/renesas,ethertsn.yaml        | 133 ++++++++++++++++++
-> >  1 file changed, 133 insertions(+)
-> 
-> A nit, subject: drop second/last, redundant "bindings for". The
-> "dt-bindings" prefix is already stating that these are bindings.
-
-Ack.
-
-> 
-> >  create mode 100644 Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> > new file mode 100644
-> > index 000000000000..255c8f3a5a3b
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> > @@ -0,0 +1,133 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Renesas Ethernet TSN End-station
-> > +
-> > +maintainers:
-> > +  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
-> > +
-> > +description:
-> > +  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
-> > +  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    oneOf:
-> > +      - items:
-> 
-> Drop items.
-
-Ack.
-
-> 
-> I assume you have oneOf above because you predict this will grow with
-> entries with fallbacks? If not, drop.
-
-As Geert points out I will add a fallback here and somewhen add support 
-for R-Car S4 could be added.
-
-> 
-> > +          - enum:
-> > +              - renesas,ethertsn-r8a779g0      # R-Car V4H
-> > +
-> > +  reg:
-> > +    items:
-> > +      - description: TSN End Station target
-> > +      - description: generalized Precision Time Protocol target
-> > +
-> > +  reg-names:
-> > +    items:
-> > +      - const: tsnes
-> > +      - const: gptp
-> > +
-> > +  interrupts:
-> > +    items:
-> > +      - description: TX data interrupt
-> > +      - description: RX data interrupt
-> > +
-> > +  interrupt-names:
-> > +    items:
-> > +      - const: tx_data
-> 
-> tx
-> 
-> > +      - const: rx_data
-> 
-> rx
-
-Ack.
-
-> 
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  power-domains:
-> > +    maxItems: 1
-> > +
-> > +  resets:
-> > +    maxItems: 1
-> > +
-> > +  phy-mode:
-> > +    contains:
-> > +      enum:
-> > +        - mii
-> > +        - rgmii
-> > +
-> > +  phy-handle:
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      Specifies a reference to a node representing a PHY device.
-> 
-> You miss top-level $ref to ethernet controller
-
-Sorry I don't fully understand what you are asking here, there are a few 
-things about bindings I still need to learn. Looking at other bindings 
-some have a
-
-maintainers:
-  ..
-
-allOf:
-  - $ref: ethernet-controller.yaml#
-
-properties:
- ..
-
-Is it this all ollOff node I'm missing?
-
-> 
-> > +
-> > +  renesas,rx-internal-delay:
-> > +    type: boolean
-> > +    description:
-> > +      Enable internal Rx clock delay, typically 1.8ns.
-> 
-> Why this is bool, not delay in ns?
-
-The TSN is only capable of enabling or disable internal delays, not set 
-how long the delay is. The documentation states that the delay depends 
-on the electronic characteristics of the particular board, but states 
-that they typically are 1.8ns for Rx and 2.0ns for Tx.
-
-I looked at the generic properties {rx,tx}-internal-delay-ps but they 
-are of int type. So I opted for a vendor specific bool property. Do you 
-think a better route is to use the generic property and force the value 
-to be either 0 or the typical delay?
-
-> Why this is property of a board (not SoC)?
-
-I'm sorry I don't understand this question.
-
-> 
-> > +
-> > +  renesas,tx-internal-delay:
-> > +    type: boolean
-> > +    description:
-> > +      Enable internal Tx clock delay, typically 2.0ns.
-> 
-> Same questions.
-> 
-> > +
-> > +  '#address-cells':
-> > +    const: 1
-> > +
-> > +  '#size-cells':
-> > +    const: 0
-> > +
-> > +patternProperties:
-> > +  "^ethernet-phy@[0-9a-f]$":
-> > +    type: object
-> > +    $ref: ethernet-phy.yaml#
-> 
-> Missing unevaluatedProperties. Open existing bindings and look how it is
-> done there. Don't create something different.
-
-Ack.
-
-> 
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
 
