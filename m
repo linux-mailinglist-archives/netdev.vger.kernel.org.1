@@ -1,85 +1,126 @@
-Return-Path: <netdev+bounces-49783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CEF67F3797
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:37:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AD127F37A6
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9F23B219E3
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:37:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8617282667
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A803755799;
-	Tue, 21 Nov 2023 20:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2B920DE0;
+	Tue, 21 Nov 2023 20:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUMgAAwO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOcbTovf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C01A55796
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 20:37:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DEEBC433C8;
-	Tue, 21 Nov 2023 20:37:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700599043;
-	bh=ZymyDZd+iiaZum8vU8h1JUPzZr800dq5HiA5ewTdlY4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EUMgAAwOAPwdWz+Y5joqGJb/Jt0MWUxLUlXnZWLny2/BlvqDrSmCHh+B38xr+py/i
-	 KTaStytpxkLQp4JnE+SZKCzh3g284dUJ8JMjVWnQXobac57PBTQUR5vOuFFwuS8ukl
-	 RuXVlNNGfBFl0bBfSVP+leDEveSvEAIlOtSaT2P5I6lRv5CpL+pxVYKcIJNzwSMJcY
-	 aDHcRoxHzzCRgLEQ4r05VtGfPw/jlRJR9j3zm6M0SGnhPu/BV1uhd5t2MEDY9NCLpT
-	 RHVYWGnH/gz+ctuCKp5cTO+O2UzXhPtTxsAg+erk4DD9SgbGR8NkaD0fGqRn8cH00u
-	 NJmeqKMfQ84PQ==
-Date: Tue, 21 Nov 2023 12:37:21 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org, dsahern@gmail.com, dtatulea@nvidia.com
-Subject: Re: [PATCH net-next v2 08/15] net: page_pool: add nlspec for basic
- access to page pools
-Message-ID: <20231121123721.03511a3d@kernel.org>
-In-Reply-To: <655cf5c7874bd_378cc9294f4@willemb.c.googlers.com.notmuch>
-References: <20231121000048.789613-1-kuba@kernel.org>
-	<20231121000048.789613-9-kuba@kernel.org>
-	<655cf5c7874bd_378cc9294f4@willemb.c.googlers.com.notmuch>
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D520E1A3;
+	Tue, 21 Nov 2023 12:40:48 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cf6af8588fso14013755ad.0;
+        Tue, 21 Nov 2023 12:40:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700599248; x=1701204048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WCC6s9NGPFKJC7qCc4GCCVN10BOm0r6c3YXwRd9V+sE=;
+        b=NOcbTovf/u9WZES1HyIp/jIRGkMPkN5MHAZnPWJMI/4Isl55m7fCWkWUHtIsh1OHJc
+         Ax3Qf+bPc32D4BOpEhWNbFksWSQLW96IqLA0pBDsGApkwcEbxyJvh1vEwB8vanOSNRvw
+         ZN0tlrgVTvdi3tPj5d1eeG8jSlkFce1Iu1s9vpMYJvQ5SzU9a7eyzxR0MpKgxGGZXlJI
+         qE25ChhZUtaPOtFb/n3NGeqF0gvI0F69K5uUanyeZrIGiNLKcgG6pgT/KGc6Q0b0Dauv
+         3veqCzBs9yL52C0TWPC/IIQSuJuZguhr9YFnE5Q8bFue4nNhsm3496kjH11TjvO/Jqw2
+         XpUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700599248; x=1701204048;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WCC6s9NGPFKJC7qCc4GCCVN10BOm0r6c3YXwRd9V+sE=;
+        b=X0cofuNDY1XzZ8/pHZzWFlf50tsCQpB/hiAsib3/H6/dqL+mqjOBHmeHuWgukjqa6N
+         vTRl6w57GAy6ZRmkfyOLzkJZoXcHB2vqYbnRT2JVaRJRCIyekR7c0xz/HHNshm4QlSXt
+         KJtQkX7W5JguYGph3mWO3DF+4zvyyFREbDJRr/3b3xjziGUieET4VySjfdqOjdLBrK+S
+         ip3DrXfJn6Vn0SDMwKsJT9AVgDxnfJVvqcR8oBcXA7HqsPNfOCRzJ/2Wv8AFjglXfHyf
+         AXE+R3YrtwkwjtLTqtRuIUjVWSTcEjBx15B4s/UxOSZjxct7k3dhpTzxIvaUJJ4Cplyi
+         QkXA==
+X-Gm-Message-State: AOJu0YzyMBtsk33PqP+C150rMyhOb5Xlvig8b2bj+BCuEfLVMaE9061h
+	9CThYYd/r2P37IW1htwv2r8=
+X-Google-Smtp-Source: AGHT+IFE5wsKsmA/KMmkZhA/gpV1ibyC+Cl5yRXxt+owMi2A/BfcaFFEKIJ8+rLUR9zV4LdjMBDG1g==
+X-Received: by 2002:a17:903:493:b0:1cf:774c:39a8 with SMTP id jj19-20020a170903049300b001cf774c39a8mr264254plb.56.1700599248179;
+        Tue, 21 Nov 2023 12:40:48 -0800 (PST)
+Received: from localhost ([98.97.116.126])
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902e74200b001b895336435sm8325327plf.21.2023.11.21.12.40.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 12:40:47 -0800 (PST)
+Date: Tue, 21 Nov 2023 12:40:45 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ yangyingliang@huawei.com, 
+ martin.lau@kernel.org, 
+ Jakub Sitnicki <jakub@cloudflare.com>
+Message-ID: <655d15cdb26fb_1fc7a208a5@john.notmuch>
+In-Reply-To: <bc92c670-f472-43b1-af0b-a50353ed8757@linux.dev>
+References: <20231016190819.81307-1-john.fastabend@gmail.com>
+ <20231016190819.81307-2-john.fastabend@gmail.com>
+ <87cywnjblh.fsf@cloudflare.com>
+ <bc92c670-f472-43b1-af0b-a50353ed8757@linux.dev>
+Subject: Re: [PATCH bpf 1/2] bpf: sockmap, af_unix sockets need to hold ref
+ for pair sock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Nov 2023 13:24:07 -0500 Willem de Bruijn wrote:
-> Do you want to introduce a separate ID for page pools? That brings some
-> issues regarding network namespace isolation.
+Martin KaFai Lau wrote:
+> On 11/6/23 4:35 AM, Jakub Sitnicki wrote:
+> >> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> >> index 2f9d8271c6ec..705eeed10be3 100644
+> >> --- a/net/unix/unix_bpf.c
+> >> +++ b/net/unix/unix_bpf.c
+> >> @@ -143,6 +143,8 @@ static void unix_stream_bpf_check_needs_rebuild(struct proto *ops)
+> >>   
+> >>   int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+> >>   {
+> >> +	struct sock *skpair;
+> >> +
+> >>   	if (sk->sk_type != SOCK_DGRAM)
+> >>   		return -EOPNOTSUPP;
+> >>   
+> >> @@ -152,6 +154,9 @@ int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool re
+> >>   		return 0;
+> >>   	}
+> >>   
+> >> +	skpair = unix_peer(sk);
+> >> +	sock_hold(skpair);
+> >> +	psock->skpair = skpair;
+> >>   	unix_dgram_bpf_check_needs_rebuild(psock->sk_proto);
+> >>   	sock_replace_proto(sk, &unix_dgram_bpf_prot);
+> >>   	return 0;
+> > unix_dgram should not need this, since it grabs a ref on each sendmsg.
 > 
-> As a user API, it is also possible (and intuitive?) to refer to a
-> page_pool by (namespacified) ifindex plus netdev_rx_queue index,
-> or napi_id.
+> John, could you address this comment and respin v2?
 
-That does not work for "destroyed" pools. In general, there is
-no natural key for a page pool I can think of.
+Respinning now just letting some tests run for a bit and I'll kick it out.
 
-> In fairness, napi_id is also global, not per netns.
+Thanks.
+
 > 
-> By iterating over "for_each_netdev(net, ..", dump already limits
-> output to pools in the same netns and get only reports pools that
-> match the netns.
+> The unix_inet_redir_to_connected() seems needing a fix in patch 2 also as 
+> pointed out by JakubS.
 > 
-> So it's only a minor matter of visible numbering, and perhaps
-> superfluous new id.
-
-The IDs are not stable. Any reconfiguration of a device will create
-a new page pool and therefore assign a new ID. So applications can't
-hold onto the ID long term.
-
-That said the only use case for exposing the ID right now is to
-implement do/GET (since there is no other unique key). And manual debug
-with drgn, but that doesn't require uAPI. So if you prefer strongly
-I can drop the ID from the uAPI and do/GET support.
+> Thanks.
+> 
+> > 
+> > I'm not able to reproduce this bug for unix_dgram.
+> > 
+> > Have you seen any KASAN reports for unix_dgram from syzcaller?
 
