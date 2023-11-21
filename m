@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B988A7F2377
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:01:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE547F237C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7456028233E
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:01:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3D91F2643C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F850CA51;
-	Tue, 21 Nov 2023 02:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F119154B2;
+	Tue, 21 Nov 2023 02:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="TYkx5l5H"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="X10eg7GW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F19ED
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:28 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-332c82400a5so1018926f8f.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:28 -0800 (PST)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3125F4
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:29 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d895584f1so3589311f8f.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1700532087; x=1701136887; darn=vger.kernel.org;
+        d=arista.com; s=google; t=1700532088; x=1701136888; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yb/w+BKw85BILJP8CTg75niZjZVcbAJYfunsL97APOE=;
-        b=TYkx5l5HsPBsUxmethudoPU7KItkL6Z9NbWPNmRDNR2pNDYb6J60Tkwn6HqGhmaC7z
-         xP+PYJ8qvTY3R78qTa7IkP5NvASc7cQTwFW+b2Dw1MikmusEOyg/KsD4FJToWSxgnbJ3
-         tcBUPfJWPe3uSECiyqljJIRoYa+lGZ0cNIsSp/00GqTTiENcXvfXo7i9tcCr96DqLbuW
-         VoZ5NLlbeXNIQgW7A16Yua+K/BwfsKwzEaqp8eJcZ1USLEQKAIQZrj4rymtnRJ0WHnXo
-         Kbw1ABYzEkL/GbqW65tKGak+HgORJaqx63J1Y7C9n8X2vHclhflswHuQfGus2etuDWja
-         CUcA==
+        bh=pBOOKbt8qYeu3I6qmruIZOshMMipjUc2q0LuWEyo1Tk=;
+        b=X10eg7GW7jMUjWFbHr1w/Od1YyGMrWLempQxTyyVmH/D2qS1vlbLo/wlLSopElquH3
+         JHz5kQgRW/g4HyaOSEvCQ834osJnFAtAI3fcPGr6eJny9qWw6MnMtQeRrSwh0zuZ9sXD
+         J5V6KlWq7+teyUnq/3xWbEvzlJ3ll7WSF+2gN8BT9KRsyevhC7HUulUV0EoL/81epit5
+         p1RZ/yDxc1qV0zn3auvnjY6FVB2jdP6LenrvnRy7I0/LXD/4+aleNUBb2V4xGh2Wka/p
+         jgrh9fiBM4OU/gGPjjaMHtZNhGUiyCUmJ3I/i7V20LR3z9B2SbUimxKJTPSF0nbI6U+A
+         T0bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700532087; x=1701136887;
+        d=1e100.net; s=20230601; t=1700532088; x=1701136888;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yb/w+BKw85BILJP8CTg75niZjZVcbAJYfunsL97APOE=;
-        b=eG8brUbImZVSX674yUQW22cmcC3G3LuVeHoveRqblagszPVXKStUVA/pkLZwRFwRd8
-         RjnvwKDkH7F+o7Pu/+CuvC3CqpweDe76tLQDBoxQF6Hjbb3kh4vav/11XnXO0Q7+59mQ
-         tEFz7aUp4S8XOLZVtsxE49X7K8kRp2lxI7TYX8RjCDUdXL+4WoNgQQwQQVjq7DfuQfFJ
-         7Ylo3FTRyDhslEYMVHAQYZBAMFXe7LNt6tBBj09jqnCxUADycwxauPvsTs8UBXeHe71a
-         z1RyUOm+BhA3c9UuGHBVBcuIvZSVB7XfePKOilVlTnx8drxy1QCLwmCLSD1lkW4WzF82
-         baVw==
-X-Gm-Message-State: AOJu0YzXDaE27g29mq989jxNtm+aJBPCdzwCIsOOo4PknCVGvw0Oe5XI
-	xFw2DX64EfFNBUNpKkfnZmbWUg==
-X-Google-Smtp-Source: AGHT+IEVaDa9ATxoPYSGDjhsp5Kzj85OQPWhli+6R2u4dfdYhQZgJKQrddrShkTsXOzgbH54ov/2qw==
-X-Received: by 2002:adf:f0d1:0:b0:317:4ef8:1659 with SMTP id x17-20020adff0d1000000b003174ef81659mr5885838wro.28.1700532087011;
-        Mon, 20 Nov 2023 18:01:27 -0800 (PST)
+        bh=pBOOKbt8qYeu3I6qmruIZOshMMipjUc2q0LuWEyo1Tk=;
+        b=jkhi8BfHaAiqqucU7h24E9r+DNbvVlfArjsrEL2OjlMUaIlfpSiPHfEqnobrECBKmk
+         g1FthcvgF1/tnW6kN2tO1E/039VSf4rz0kO22DHwu5dqfsO949VMR3eWxBgaVNeyHmtW
+         RgOzjrGSKwHinGjxV3Rx3//ZEc8T6VLzKSpijPxK82UpdV9N2Z8KWvSXdfAcPVB4BdeK
+         sTAJ6DYv5DDxx4KIGPY6Xxs7NcoJIooHPIWhzqJXo8ZosPveMMGlcepXY5lisQCLrXn/
+         tCp6qrNVlVhcdFokgVvOTFP7NxA9niZhQEp3WtwaEWO3GmIPrHfRTYtbyKxzoAsxXzSy
+         IN/w==
+X-Gm-Message-State: AOJu0YzUCDU8IowNXRKaLDQsxfpG7VlG+mxBr2PXpbjGXWYPPrj3T8Pd
+	JAkmQrqfO9+ZoDbmCKz4R8Hl1Q==
+X-Google-Smtp-Source: AGHT+IFUb2kPEOqjsQe+RX4pd7eVkewEsSHkT4T1xu2TuDc1YK1Zv+TSvo0MSIAJJf9Mv3tFSbbACw==
+X-Received: by 2002:adf:e58b:0:b0:32d:b051:9a27 with SMTP id l11-20020adfe58b000000b0032db0519a27mr6193939wrm.20.1700532088379;
+        Mon, 20 Nov 2023 18:01:28 -0800 (PST)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id c13-20020a056000184d00b00332cb846f21sm2617105wri.27.2023.11.20.18.01.25
+        by smtp.gmail.com with ESMTPSA id c13-20020a056000184d00b00332cb846f21sm2617105wri.27.2023.11.20.18.01.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 18:01:26 -0800 (PST)
+        Mon, 20 Nov 2023 18:01:27 -0800 (PST)
 From: Dmitry Safonov <dima@arista.com>
 To: David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
@@ -66,9 +66,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Salam Noureddine <noureddine@arista.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org
-Subject: [PATCH 6/7] net/tcp: ACCESS_ONCE() on snd/rcv SNEs
-Date: Tue, 21 Nov 2023 02:01:10 +0000
-Message-ID: <20231121020111.1143180-7-dima@arista.com>
+Subject: [PATCH 7/7] net/tcp: Don't store TCP-AO maclen on reqsk
+Date: Tue, 21 Nov 2023 02:01:11 +0000
+Message-ID: <20231121020111.1143180-8-dima@arista.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231121020111.1143180-1-dima@arista.com>
 References: <20231121020111.1143180-1-dima@arista.com>
@@ -80,57 +80,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SNEs need READ_ONCE()/WRITE_ONCE() for access as they can be written and
-read at the same time.
+This extra check doesn't work for a handshake when SYN segment has
+(current_key.maclen != rnext_key.maclen). It could be amended to
+preserve rnext_key.maclen instead of current_key.maclen, but that
+requires a lookup on listen socket.
 
-This is actually a shame: I planned to send it in TCP-AO patches, but
-it seems I've chosen a wrong commit to git-commit-fixup some time ago.
-It ended up in a commit that adds a selftest. Human factor.
+Originally, this extra maclen check was introduced just because it was
+cheap. Drop it and convert tcp_request_sock::maclen into boolean
+tcp_request_sock::used_tcp_ao.
 
-Fixes: 64382c71a557 ("net/tcp: Add TCP-AO SNE support")
+Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- net/ipv4/tcp_ao.c    | 4 ++--
- net/ipv4/tcp_input.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ include/linux/tcp.h   | 10 ++++------
+ net/ipv4/tcp_ao.c     |  4 ++--
+ net/ipv4/tcp_input.c  |  5 +++--
+ net/ipv4/tcp_output.c |  9 +++------
+ 4 files changed, 12 insertions(+), 16 deletions(-)
 
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 68f3d315d2e1..3af897b00920 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -155,6 +155,9 @@ struct tcp_request_sock {
+ 	bool				req_usec_ts;
+ #if IS_ENABLED(CONFIG_MPTCP)
+ 	bool				drop_req;
++#endif
++#ifdef CONFIG_TCP_AO
++	bool				used_tcp_ao;
+ #endif
+ 	u32				txhash;
+ 	u32				rcv_isn;
+@@ -169,7 +172,6 @@ struct tcp_request_sock {
+ #ifdef CONFIG_TCP_AO
+ 	u8				ao_keyid;
+ 	u8				ao_rcv_next;
+-	u8				maclen;
+ #endif
+ };
+ 
+@@ -180,14 +182,10 @@ static inline struct tcp_request_sock *tcp_rsk(const struct request_sock *req)
+ 
+ static inline bool tcp_rsk_used_ao(const struct request_sock *req)
+ {
+-	/* The real length of MAC is saved in the request socket,
+-	 * signing anything with zero-length makes no sense, so here is
+-	 * a little hack..
+-	 */
+ #ifndef CONFIG_TCP_AO
+ 	return false;
+ #else
+-	return tcp_rsk(req)->maclen != 0;
++	return tcp_rsk(req)->used_tcp_ao;
+ #endif
+ }
+ 
 diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 122ff58168ee..9b7f1970c2e9 100644
+index 9b7f1970c2e9..07221319e8c5 100644
 --- a/net/ipv4/tcp_ao.c
 +++ b/net/ipv4/tcp_ao.c
-@@ -956,8 +956,8 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 		if (unlikely(th->syn && !th->ack))
- 			goto verify_hash;
+@@ -851,7 +851,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
+ 	const struct tcp_ao_hdr *aoh;
+ 	struct tcp_ao_key *key;
  
--		sne = tcp_ao_compute_sne(info->rcv_sne, tcp_sk(sk)->rcv_nxt,
--					 ntohl(th->seq));
-+		sne = tcp_ao_compute_sne(READ_ONCE(info->rcv_sne),
-+					 tcp_sk(sk)->rcv_nxt, ntohl(th->seq));
- 		/* Established socket, traffic key are cached */
- 		traffic_key = rcv_other_key(key);
- 		err = tcp_ao_verify_hash(sk, skb, family, info, aoh, key,
+-	treq->maclen = 0;
++	treq->used_tcp_ao = false;
+ 
+ 	if (tcp_parse_auth_options(th, NULL, &aoh) || !aoh)
+ 		return;
+@@ -863,7 +863,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
+ 
+ 	treq->ao_rcv_next = aoh->keyid;
+ 	treq->ao_keyid = aoh->rnext_keyid;
+-	treq->maclen = tcp_ao_maclen(key);
++	treq->used_tcp_ao = true;
+ }
+ 
+ static enum skb_drop_reason
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index bcb55d98004c..78896c8be0d4 100644
+index 78896c8be0d4..89cb6912dd91 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -3583,7 +3583,7 @@ static void tcp_snd_sne_update(struct tcp_sock *tp, u32 ack)
- 	ao = rcu_dereference_protected(tp->ao_info,
- 				       lockdep_sock_is_held((struct sock *)tp));
- 	if (ao && ack < tp->snd_una)
--		ao->snd_sne++;
-+		WRITE_ONCE(ao->snd_sne, ao->snd_sne + 1);
+@@ -7182,11 +7182,12 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 	if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
+ 		goto drop_and_release; /* Invalid TCP options */
+ 	if (aoh) {
+-		tcp_rsk(req)->maclen = aoh->length - sizeof(struct tcp_ao_hdr);
++		tcp_rsk(req)->used_tcp_ao = true;
+ 		tcp_rsk(req)->ao_rcv_next = aoh->keyid;
+ 		tcp_rsk(req)->ao_keyid = aoh->rnext_keyid;
++
+ 	} else {
+-		tcp_rsk(req)->maclen = 0;
++		tcp_rsk(req)->used_tcp_ao = false;
+ 	}
  #endif
- }
+ 	tcp_rsk(req)->snt_isn = isn;
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 93eef1dbbc55..f5ef15e1d9ac 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -3720,7 +3720,6 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 	if (tcp_rsk_used_ao(req)) {
+ #ifdef CONFIG_TCP_AO
+ 		struct tcp_ao_key *ao_key = NULL;
+-		u8 maclen = tcp_rsk(req)->maclen;
+ 		u8 keyid = tcp_rsk(req)->ao_keyid;
  
-@@ -3609,7 +3609,7 @@ static void tcp_rcv_sne_update(struct tcp_sock *tp, u32 seq)
- 	ao = rcu_dereference_protected(tp->ao_info,
- 				       lockdep_sock_is_held((struct sock *)tp));
- 	if (ao && seq < tp->rcv_nxt)
--		ao->rcv_sne++;
-+		WRITE_ONCE(ao->rcv_sne, ao->rcv_sne + 1);
- #endif
- }
- 
+ 		ao_key = tcp_sk(sk)->af_specific->ao_lookup(sk, req_to_sk(req),
+@@ -3730,13 +3729,11 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+ 		 * for another peer-matching key, but the peer has requested
+ 		 * ao_keyid (RFC5925 RNextKeyID), so let's keep it simple here.
+ 		 */
+-		if (unlikely(!ao_key || tcp_ao_maclen(ao_key) != maclen)) {
+-			u8 key_maclen = ao_key ? tcp_ao_maclen(ao_key) : 0;
+-
++		if (unlikely(!ao_key)) {
+ 			rcu_read_unlock();
+ 			kfree_skb(skb);
+-			net_warn_ratelimited("TCP-AO: the keyid %u with maclen %u|%u from SYN packet is not present - not sending SYNACK\n",
+-					     keyid, maclen, key_maclen);
++			net_warn_ratelimited("TCP-AO: the keyid %u from SYN packet is not present - not sending SYNACK\n",
++					     keyid);
+ 			return NULL;
+ 		}
+ 		key.ao_key = ao_key;
 -- 
 2.42.0
 
