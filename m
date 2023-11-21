@@ -1,67 +1,76 @@
-Return-Path: <netdev+bounces-49528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8857F246C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:56:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808DE7F2475
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 04:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0547A281283
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:56:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A5EC282800
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21498134A3;
-	Tue, 21 Nov 2023 02:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4869134B0;
+	Tue, 21 Nov 2023 03:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Os5g50fJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j1p7IsLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC22CB
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:56:32 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cf62a3b249so10395525ad.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:56:32 -0800 (PST)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64D86C4
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:03:02 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cf69f1163aso7602035ad.3
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:03:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700535392; x=1701140192; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700535782; x=1701140582; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7lVxM7IxfOKIhZGAnQjyX4jb5qqkmsYRP/Q35DcwOqM=;
-        b=Os5g50fJ1MHgimzrlUvLTioQQ+av/qo1M1/SuBHmdZkUvsF5jk+tW7NbZA1ysCqjUX
-         NcDzU7JZMxbY2+q3dfztI2XkT1uUkE2kGeLc76RAeZHY3gvo6FrfkhBsLGZeMdZVFOX4
-         m3trGuRbwSfF8Zf0CM7VOeqnb6BaTN397Bah66SEQjGkzXHQ7KqbU5tl2T/LtTSxvLM+
-         yzJ+esHWkrAGDpDKftnCZMGXOzy3gtPG62RcKqLjaz5PpnEU2DYyyiXaF7MfXheegWdp
-         75NdQR+bycVKmD77nc00LGHfOqbWGry2ihZLLFqvL7PNAngHcRDawrzzTL73XYM1ICEj
-         5nGg==
+        bh=Q5Mm3c6uHkYoAtPLX7/bdMoPos4PeVz5VTiYrjzmR+U=;
+        b=j1p7IsLjXRu65Pc4KCUX/SKemU4PlVN0lBX1fKYkQuXfmCkbaXsOWlLeq1JHEuGBEl
+         YnhzP46VYzfF8rCcnKjrv8STCZezdmU19SOsog3s3byt0w2+mNP+52xoSN84g3xZAsPM
+         2sl/9weesyagswGYC/5RKEuBAuP4kskumyaL4osCAFjj1AK+2tLXpEnLHvFYPh7w5XFX
+         vtr6bB6pPUw5k2c/U4UJW/KrJLDXQuUdLRUv2TQRCPm3RSE/+hsJ9yCVDaoUYXV4I6ya
+         HEkj1ZctC+loeMXJn5+3KNNx9v6Lk4emnRTlkcNnKkK+Nk+PwX+yI1pcKsCEURJvy5zr
+         aL3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700535392; x=1701140192;
+        d=1e100.net; s=20230601; t=1700535782; x=1701140582;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7lVxM7IxfOKIhZGAnQjyX4jb5qqkmsYRP/Q35DcwOqM=;
-        b=igg8GeogfXAk1VyS+iJQE8GVKwgM23dg6j6s1e3T4K7mJHoHmFWVQehfH1ICK6FbRr
-         lbboXrjakEMKyh1FLRDzZiuWAifyRrkr1SzJXAOwFEdZyxrMlMj2N7V//KyAAFlDTOC5
-         Xk7gZqBS2UFdh0Dxlsu1Mz8uE1Qvlo9jJ8CMtvswwUqWhx5Dg+E0kqq8hNcnj28GQ/dk
-         O1T3qTbSlW92fPvch1blwLFcrTnYMK/xxLb3uT/Rpyv66fQyk853gnXA36mxh7Dc1+0C
-         d9k87w6FKYgsEEvovyx7JXhU64hhQv/ieFynEgaSSC87oboZgvTHJR7ONzUSr2D8BPt+
-         Zz2A==
-X-Gm-Message-State: AOJu0YziGxiTI0PqqREX0rRvLsOskr1fyKAtj8Xh3VFTsVFrEp7rO5kY
-	lq6zTWXAGFzCJi2lTTf5uGJz2d4+WTa/EG3b
-X-Google-Smtp-Source: AGHT+IF0hxaMteeLjZHRbUyDRB+/5vIWsKwb5LDPj649PpHKYg7ywS92oXzriaZgVXMBcCP5jNqIbw==
-X-Received: by 2002:a17:903:1252:b0:1cc:251c:c381 with SMTP id u18-20020a170903125200b001cc251cc381mr7956210plh.29.1700535391952;
-        Mon, 20 Nov 2023 18:56:31 -0800 (PST)
+        bh=Q5Mm3c6uHkYoAtPLX7/bdMoPos4PeVz5VTiYrjzmR+U=;
+        b=Lzw5cv6BgfauQNrqO8v2DN6Lq7FP0gumeyQtpEsT7KRAyrOHi1dl0Gy5OGKwIH4GMX
+         w7R5wDjr+Xgsw5KUxl1ZBp+Q9b2Hh2gRxelY7cxppaqXdKHdFZmvEd6HwConoULKYtuw
+         j7QJNj3ZKed+o4o6lXloxvi+0OwoDUIMIJmRkOLFcoXZt6V2qVVna9Ol6y9jVvCEs852
+         9eIF+17h9XOYmjxoTH6KHvvnZHLZ3oSd9wrxp+8ApD+0s8n+e8lmM+KDlJhGl94tKo8p
+         UrXVEZhqmkIcumUx85OGC95UGVIvsgG3xAX1ze/0neS6GIDOH+Q8CxagOKP47+0NJOKD
+         d/cg==
+X-Gm-Message-State: AOJu0YwQOKrmzJorcI/Q4h865Vhh1Jy78qRfiOXjwoV6+W/6GHm/4zLQ
+	V394IT6I9MvPVzfbUMrVWLM=
+X-Google-Smtp-Source: AGHT+IFJsIHGXgIXFRLCqDZpMjPUF01VkjJ8T3uBZqyTYj71+XVjImJ+eTs8zqzsnESOKqGehcgC0A==
+X-Received: by 2002:a17:903:1212:b0:1c9:faef:5765 with SMTP id l18-20020a170903121200b001c9faef5765mr8311054plh.5.1700535781670;
+        Mon, 20 Nov 2023 19:03:01 -0800 (PST)
 Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170903228500b001cc0f6028b8sm6748806plh.106.2023.11.20.18.56.28
+        by smtp.gmail.com with ESMTPSA id l14-20020a170903120e00b001bb0eebd90asm6737000plh.245.2023.11.20.19.02.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 18:56:31 -0800 (PST)
-Date: Tue, 21 Nov 2023 10:56:26 +0800
+        Mon, 20 Nov 2023 19:03:01 -0800 (PST)
+Date: Tue, 21 Nov 2023 11:02:55 +0800
 From: Hangbin Liu <liuhangbin@gmail.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net] ipv4: igmp: fix refcnt uaf issue when receiving igmp
- query packet
-Message-ID: <ZVwcWmg5NtuTSV7q@Laptop-X1>
-References: <20231121020558.240321-1-shaozhengchao@huawei.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld <mmuehlfe@redhat.com>
+Subject: Re: [PATCH net-next 05/10] docs: bridge: add STP doc
+Message-ID: <ZVwd31WaAsy6Cmwy@Laptop-X1>
+References: <20231117093145.1563511-1-liuhangbin@gmail.com>
+ <20231117093145.1563511-6-liuhangbin@gmail.com>
+ <20231120113947.ljveakvl6fgrshly@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,47 +79,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231121020558.240321-1-shaozhengchao@huawei.com>
+In-Reply-To: <20231120113947.ljveakvl6fgrshly@skbuf>
 
-Hi Zhengchao,
-On Tue, Nov 21, 2023 at 10:05:58AM +0800, Zhengchao Shao wrote:
-> ---
->  net/ipv4/igmp.c | 2 ++
->  1 file changed, 2 insertions(+)
+On Mon, Nov 20, 2023 at 01:39:47PM +0200, Vladimir Oltean wrote:
+> On Fri, Nov 17, 2023 at 05:31:40PM +0800, Hangbin Liu wrote:
+> > +STP
+> > +===
 > 
-> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-> index 76c3ea75b8dd..f217581904d6 100644
-> --- a/net/ipv4/igmp.c
-> +++ b/net/ipv4/igmp.c
-> @@ -1044,6 +1044,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
->  	for_each_pmc_rcu(in_dev, im) {
->  		int changed;
->  
-> +		if (!netif_running(im->interface->dev))
-> +			continue;
+> I think it would be very good to say a few words about the user space
+> STP helper at /sbin/bridge-stp, and that the kernel only has full support
+> for the legacy STP, whereas newer protocols are all handled in user
+> space. But I don't know a lot of technical details about it, so I would
+> hope somebody else chimes in with a paragraph inserted here somewhere :)
 
-I haven't checked this part for a long time. What's the difference of in_dev->dev
-and im->interface->dev? I though they are the same, no?
-
-If they are the same, should we stop processing the query earlier? e.g.
-
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 76c3ea75b8dd..f4e1d229c9aa 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -1082,6 +1082,9 @@ int igmp_rcv(struct sk_buff *skb)
-                        goto drop;
-        }
-
-+       if (!netif_running(dev))
-+               goto drop;
-+
-        in_dev = __in_dev_get_rcu(dev);
-        if (!in_dev)
-                goto drop;
-
-
-BTW, does IPv6 MLD has this issue?
+Hmm, I google searched but can't find this tool. Nikolay, is this tool still
+widely used? Do you know where I can find the source code/doc of it?
 
 Thanks
 Hangbin
