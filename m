@@ -1,145 +1,119 @@
-Return-Path: <netdev+bounces-49658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8681D7F2E90
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:41:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C002D7F2E9A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 417B52819F4
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF4491C21457
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3251C37;
-	Tue, 21 Nov 2023 13:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4062951C3D;
+	Tue, 21 Nov 2023 13:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOZBM1wX"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="DvLx8PPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B705D52;
-	Tue, 21 Nov 2023 05:41:24 -0800 (PST)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5c08c47c055so59629027b3.1;
-        Tue, 21 Nov 2023 05:41:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700574083; x=1701178883; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcrYwFp88pWTL6yMI9KWImk/qrP0KNOz3TtNbxnSaOM=;
-        b=fOZBM1wXb/g3/+EMdX9iCcndKGIWiISBUPuYuQ8EEYPVDamQFfFgeFI+iVL9FkvVeu
-         t9rRuRsxD3KldxrPZcy3TDcMMcJrF1mgCtEo6RX+txtmnQgw5ZqwdAaM5VlHCgmWGt1Q
-         sl1PPIDAH04hj+LKXgEi5caDL2ggREufFzFMSTJA+zeZFSLHzOQoVBFWIvfLZq3y5LUg
-         Wmpf1iIVSCQYF7Fon/hUn9i/olHSacdxc4lec4y/a/hIehKOjYv0qh6xyxlWVefptyJJ
-         pxHwH01Dp/XLzjWOQL8fIXu5bQUMIx6qLYbNZFmxwRYdWAeHh3BJSiRaeGjPnWPpwHLI
-         LCfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700574083; x=1701178883;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pcrYwFp88pWTL6yMI9KWImk/qrP0KNOz3TtNbxnSaOM=;
-        b=taPcXC2DDWagd/CHbNPxBD32mohcZFvI6ExJJjteGRWBW0vAmyAGRmZ/EHsa57+6Xh
-         aAVyGRVZrUbH8Lv0Qk/5ncEe+dLy1gsg1x1gufRZRHdwLP9leJGESrOAozegLu/54hFn
-         RDo8cyUUX0FHTyAVlVL+cMkv8+PKbXH/2GC4UYt4jqLRGnQuejP0hZICIK/Z5Dv4XTBp
-         3CQTcTJQfC9ITcmMFRyHlC9lMJWWQX2beB5TlcqJWoh7Ao0ONRKtmKQPn2n9XEz9Ut0L
-         kVL9BfxAsZtfxGZGxe+sfZDakHi0gzq13LDjtSsUVbu4k1kGviyH0XIoNqGHbCaWQRZm
-         8L7w==
-X-Gm-Message-State: AOJu0YwY3S7D348WYgdx3P2hEdR7aBnEM/63mU2bkhOi7YwnCeafRO4g
-	yZ+buewtjXK/CbsWgmoHENE=
-X-Google-Smtp-Source: AGHT+IGnNXdb+UJ4t57vmW6oRjCwsQPfEVK6tlCbkzAm50ibNiQ/2l5fJcq1gCGM97LIEYHAdXCusg==
-X-Received: by 2002:a0d:d087:0:b0:5a7:ba53:6544 with SMTP id s129-20020a0dd087000000b005a7ba536544mr10495811ywd.12.1700574083485;
-        Tue, 21 Nov 2023 05:41:23 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:e005:b808:45e:1b60])
-        by smtp.gmail.com with ESMTPSA id q188-20020a0dcec5000000b00583f8f41cb8sm3010757ywd.63.2023.11.21.05.41.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 05:41:23 -0800 (PST)
-Date: Tue, 21 Nov 2023 05:41:22 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>
-Subject: Re: [PATCH 29/34] net: smc: fix opencoded find_and_set_bit() in
- smc_wr_tx_get_free_slot_index()
-Message-ID: <ZVyzgmb/+oUJ1xcR@yury-ThinkPad>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
- <20231118155105.25678-30-yury.norov@gmail.com>
- <04ff08d1-5892-44e8-bf74-802a225eeeda@linux.ibm.com>
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0FD194;
+	Tue, 21 Nov 2023 05:43:21 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 2FB181F8B4;
+	Tue, 21 Nov 2023 13:43:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1700574200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0pnnsaCagmVeVOPbeelzrThd66fcAXAiseFRzraRvKo=;
+	b=DvLx8PPafiN+eloIRTUS3w/qOkbdxAlxkB9q7a5zpOFo/LxI81NQn8ZxBUYaOQ2G2QnzNH
+	QdEmxmE42YNHfiJQFoZjjsRoaT+jU/jjL7tiwn3hq6MdgijhIavfwYnwFNxnqSANY69t5/
+	/te8lNliKx21Tx/zTGSeTfPuepHLgoI=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E2998139FD;
+	Tue, 21 Nov 2023 13:43:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id ljuhNfezXGWlOQAAMHmgww
+	(envelope-from <oneukum@suse.com>); Tue, 21 Nov 2023 13:43:19 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Subject: [PATCH] USB: gl620a: check for rx buffer overflow
+Date: Tue, 21 Nov 2023 14:43:15 +0100
+Message-ID: <20231121134315.18721-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <04ff08d1-5892-44e8-bf74-802a225eeeda@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Score: 3.70
+X-Spamd-Result: default: False [3.70 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 R_MISSING_CHARSET(2.50)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 BROKEN_CONTENT_TYPE(1.50)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 MID_CONTAINS_FROM(1.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_COUNT_TWO(0.00)[2];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.00)[15.17%]
 
-On Mon, Nov 20, 2023 at 09:43:54AM +0100, Alexandra Winter wrote:
-> 
-> 
-> On 18.11.23 16:51, Yury Norov wrote:
-> > The function opencodes find_and_set_bit() with a for_each() loop. Fix
-> > it, and make the whole function a simple almost one-liner.
-> > 
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> > ---
-> >  net/smc/smc_wr.c | 10 +++-------
-> >  1 file changed, 3 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-> > index 0021065a600a..b6f0cfc52788 100644
-> > --- a/net/smc/smc_wr.c
-> > +++ b/net/smc/smc_wr.c
-> > @@ -170,15 +170,11 @@ void smc_wr_tx_cq_handler(struct ib_cq *ib_cq, void *cq_context)
-> >  
-> >  static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
-> >  {
-> > -	*idx = link->wr_tx_cnt;
-> >  	if (!smc_link_sendable(link))
-> >  		return -ENOLINK;
-> > -	for_each_clear_bit(*idx, link->wr_tx_mask, link->wr_tx_cnt) {
-> > -		if (!test_and_set_bit(*idx, link->wr_tx_mask))
-> > -			return 0;
-> > -	}
-> > -	*idx = link->wr_tx_cnt;
-> > -	return -EBUSY;
-> > +
-> > +	*idx = find_and_set_bit(link->wr_tx_mask, link->wr_tx_cnt);
-> > +	return *idx < link->wr_tx_cnt ? 0 : -EBUSY;
-> >  }
-> >  
-> >  /**
-> 
-> 
-> My understanding is that you can omit the lines with
-> > -	*idx = link->wr_tx_cnt;
-> because they only apply to the error paths and you checked that the calling function
-> does not use the idx variable in the error cases. Do I understand this correct?
-> 
-> If so the removal of these 2 lines is not related to your change of using find_and_set_bit(),
-> do I understand that correctly?
-> 
-> If so, it may be worth mentioning that in the commit message.
+The driver checks for a single package overflowing
+maximum size. That needs to be done, but it is not
+enough. As a single transmission can contain a high
+number of packets, we also need to check whether
+the aggregate of messages in itself short enough
+overflow the buffer.
+That is easiest done by checking that the current
+packet does not overflow the buffer.
 
-I'll add:
+Signed-off-ny: Oliver Neukum <oneukum@suse.com>
+---
+ drivers/net/usb/gl620a.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-        If find_and_set_bit() doesn't acquire a bit, it returns
-        ->wr_tx_cnt, and so explicit initialization of *idx with
-        the same value is unneeded.
+diff --git a/drivers/net/usb/gl620a.c b/drivers/net/usb/gl620a.c
+index 46af78caf457..d33ae15abdc1 100644
+--- a/drivers/net/usb/gl620a.c
++++ b/drivers/net/usb/gl620a.c
+@@ -104,6 +104,10 @@ static int genelink_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 			return 0;
+ 		}
+ 
++		/* we also need to check for overflowing the buffer */
++		if (size > skb->len)
++			return 0;
++
+ 		// allocate the skb for the individual packet
+ 		gl_skb = alloc_skb(size, GFP_ATOMIC);
+ 		if (gl_skb) {
+-- 
+2.42.1
 
-Makes sense?
 
