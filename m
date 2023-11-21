@@ -1,36 +1,41 @@
-Return-Path: <netdev+bounces-49642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5295A7F2D32
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:29:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C28297F2D34
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2A42B21A62
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:29:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CE25B20FE3
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E014A9B2;
-	Tue, 21 Nov 2023 12:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DE510FB;
+	Tue, 21 Nov 2023 12:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ew/qoqOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBEC7126;
-	Tue, 21 Nov 2023 04:28:54 -0800 (PST)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1r5Ps5-0005Da-El; Tue, 21 Nov 2023 13:28:53 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netfilter-devel@vger.kernel.org>
-Cc: lorenzo@kernel.org,
-	<netdev@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH nf-next 8/8] netfilter: nf_tables: permit duplicate flowtable mappings
-Date: Tue, 21 Nov 2023 13:27:51 +0100
-Message-ID: <20231121122800.13521-9-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231121122800.13521-1-fw@strlen.de>
-References: <20231121122800.13521-1-fw@strlen.de>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469F64A9B3
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 12:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6559C433C9;
+	Tue, 21 Nov 2023 12:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700569825;
+	bh=dCBsQOEPe1YI7JdLAa5oxxxmhDn4Yab/WyL8gKZ6q2w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ew/qoqOmh2EV/DAJL1GhgI1ZgimV3LUsgWRgsz+jo6BtjjH3jwtXw4J3Ne1rI7kKU
+	 n8P1bOpZI+Sy5UyuHNIWbg20iX6CFOWpLsmbaLJWtRNz4s5naTqdXMEgy/xC2TlW6j
+	 pTAVeD68H+shr9VbJKRIKE/cvJYMZrA8QSlLh57KdYULbSt+nLT4h/NFWow+dff1OX
+	 679MfRNGC8Z0tl1XZKtdry5CjXCxbmWxCmUlo9IZ6B83ZsHAivbLgYzvQAyzUQXeoc
+	 CeSUOG+1wXl1oSfx2NUhg0ikM5p/M30frqN7OadLTrebnr9KO7nt8Y/svwavgm/hLw
+	 eVNJkNj8rIUvQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C8D0EAA95F;
+	Tue, 21 Nov 2023 12:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -38,113 +43,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: phylink: use for_each_set_bit()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170056982557.22867.2738351955688379355.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Nov 2023 12:30:25 +0000
+References: <E1r4p15-00Cpxe-C7@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1r4p15-00Cpxe-C7@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-The core ensures that no duplicate mapping (net_device x is always
-assigned to exactly one flowtable, or none at all) exists.
+Hello:
 
-Only exception: its assigned to a flowtable that is going away
-in this transaction.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Therefore relax the existing check to permit the duplicate
-entry, it is only temporary.
+On Sun, 19 Nov 2023 21:07:43 +0000 you wrote:
+> Use for_each_set_bit() rather than open coding the for() test_bit()
+> loop.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/phy/phylink.c | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
 
-The existing entry will shadow the new one until the transaction
-is committed (old entry is removed) or aborted (new entry is removed).
+Here is the summary with links:
+  - [net-next,v2] net: phylink: use for_each_set_bit()
+    https://git.kernel.org/netdev/net-next/c/335662889f5a
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nf_flow_table_offload.c | 36 +++++++++++++++++++++++----
- 1 file changed, 31 insertions(+), 5 deletions(-)
-
-diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
-index 9ec7aa4ad2e5..b6503fd45871 100644
---- a/net/netfilter/nf_flow_table_offload.c
-+++ b/net/netfilter/nf_flow_table_offload.c
-@@ -49,13 +49,14 @@ static int nf_flowtable_by_dev_insert(struct nf_flowtable *ft,
- {
- 	unsigned long key = (unsigned long)dev;
- 	struct flow_offload_xdp *cur;
-+	bool duplicate = false;
- 	int err = 0;
- 
- 	mutex_lock(&nf_xdp_hashtable_lock);
- 	hash_for_each_possible(nf_xdp_hashtable, cur, hnode, key) {
- 		if (key != cur->net_device_addr)
- 			continue;
--		err = -EEXIST;
-+		duplicate = true;
- 		break;
- 	}
- 
-@@ -67,7 +68,20 @@ static int nf_flowtable_by_dev_insert(struct nf_flowtable *ft,
- 			new->net_device_addr = key;
- 			new->ft = ft;
- 
--			hash_add_rcu(nf_xdp_hashtable, &new->hnode, key);
-+			if (duplicate) {
-+				u32 index = hash_min(key, HASH_BITS(nf_xdp_hashtable));
-+
-+				/* nf_tables_api.c makes sure that only a single flowtable
-+				 * has this device.
-+				 *
-+				 * Only exception: the flowtable is about to be removed.
-+				 * Thus we tolerate the duplicated entry, the 'old' entry
-+				 * will be unhashed after the transaction completes.
-+				 */
-+				hlist_add_tail_rcu(&new->hnode, &nf_xdp_hashtable[index]);
-+			} else {
-+				hash_add_rcu(nf_xdp_hashtable, &new->hnode, key);
-+			}
- 		} else {
- 			err = -ENOMEM;
- 		}
-@@ -80,7 +94,8 @@ static int nf_flowtable_by_dev_insert(struct nf_flowtable *ft,
- 	return err;
- }
- 
--static void nf_flowtable_by_dev_remove(const struct net_device *dev)
-+static void nf_flowtable_by_dev_remove(const struct nf_flowtable *ft,
-+				       const struct net_device *dev)
- {
- 	unsigned long key = (unsigned long)dev;
- 	struct flow_offload_xdp *cur;
-@@ -92,6 +107,17 @@ static void nf_flowtable_by_dev_remove(const struct net_device *dev)
- 		if (key != cur->net_device_addr)
- 			continue;
- 
-+		/* duplicate entry, happens when current transaction
-+		 * removes flowtable f1 and adds flowtable f2, where both
-+		 * have *dev assigned to them.
-+		 *
-+		 * nf_tables_api.c makes sure that at most one
-+		 * flowtable,dev pair with 'xdp' flag enabled can exist
-+		 * in the same generation.
-+		 */
-+		if (cur->ft != ft)
-+			continue;
-+
- 		hash_del_rcu(&cur->hnode);
- 		kfree_rcu(cur, rcuhead);
- 		found = true;
-@@ -1280,7 +1306,7 @@ static int nf_flow_offload_xdp_setup(struct nf_flowtable *flowtable,
- 	case FLOW_BLOCK_BIND:
- 		return nf_flowtable_by_dev_insert(flowtable, dev);
- 	case FLOW_BLOCK_UNBIND:
--		nf_flowtable_by_dev_remove(dev);
-+		nf_flowtable_by_dev_remove(flowtable, dev);
- 		return 0;
- 	}
- 
-@@ -1297,7 +1323,7 @@ static void nf_flow_offload_xdp_cancel(struct nf_flowtable *flowtable,
- 
- 	switch (cmd) {
- 	case FLOW_BLOCK_BIND:
--		nf_flowtable_by_dev_remove(dev);
-+		nf_flowtable_by_dev_remove(flowtable, dev);
- 		return;
- 	case FLOW_BLOCK_UNBIND:
- 		/* We do not re-bind in case hw offload would report error
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
