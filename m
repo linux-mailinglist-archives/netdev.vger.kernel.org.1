@@ -1,51 +1,53 @@
-Return-Path: <netdev+bounces-49833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E127F3A0E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:09:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB147F3A42
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:29:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18902829E3
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:09:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCAAC1C20ADC
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D89F54BFF;
-	Tue, 21 Nov 2023 23:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47CB55C26;
+	Tue, 21 Nov 2023 23:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPficb9h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YguDlj+p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4D654BF6
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 23:09:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57535C433C7;
-	Tue, 21 Nov 2023 23:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA95E55799;
+	Tue, 21 Nov 2023 23:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C58AC433C7;
+	Tue, 21 Nov 2023 23:29:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700608140;
-	bh=qBLKfkbkagbdBbl6e0aA2LHfmNjL2L1x6etHid+StRk=;
+	s=k20201202; t=1700609348;
+	bh=fEzPROx42WfkO6ncCKE3bs0DQa21Xu0Wvi6ZF8DSajY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WPficb9hFbv57jkbne0ldlaIiOnFY9BJwatJstHDqOTvAu8cnx4xrLqY87ObZH3E+
-	 3xMpYQP2cUgqRYRVRQ8rIzZYBCTV5kmJCVCLc1hbo+z4cePu5gvr4aYpAcd7wePho8
-	 skLQrVM41tGzuI/DE2vHdbYq9/C6N0uvQ/ZQeeUa3IqF2juxa8/c7h+IV11lsgwLMc
-	 vTkPDPAon7dUReZR75aVjy3Vp1y2P1P1osbp7CaTU44JN2mATJj9ZnYB8Uu3UUXMdH
-	 I5F/z112G27jBLetkyoAtUacNZgf6U4D9zKw4OnGBWEEIob4drB4VHwJh4yRsmjYno
-	 gd8FydaASHrXA==
-Date: Tue, 21 Nov 2023 15:08:59 -0800
+	b=YguDlj+pl7itFbltiXmiLAhBiOkyiiGdJyAI4BCCsdkqNRbkC82NHhpmJZERwVdBm
+	 iHKbJGIvsbOdu7H1eSNxTdDaa4h94SHPK+tF9q0rbcEWXw4ajc1aoUCC61i7VB+33C
+	 Dm80MalZYh/LSDTAyDbn63w8nr28K7/N6Io+6T/mkDuUxxgt9EswN6fvq7RN+KoOfP
+	 HNaUuoqS9BkpHRGL/Mt2tlyGrNMOoApmQEFGq5kNrV3+9eTtp0IFxa4usUQy60xPp5
+	 lUnca9vviogco38F5hZg9YisLK9X6GJ6QAEbfLJ62aUE79J2K5reijKSpaIP0awBph
+	 vXIPMZqMKveiw==
+Date: Tue, 21 Nov 2023 15:29:06 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Robert Marko <robimarko@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel test robot
- <lkp@intel.com>
-Subject: Re: [net-next PATCH] net: phy: aquantia: make mailbox interface4
- lsw addr mask more specific
-Message-ID: <20231121150859.7f934627@kernel.org>
-In-Reply-To: <20231120193504.5922-1-ansuelsmth@gmail.com>
-References: <20231120193504.5922-1-ansuelsmth@gmail.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ corbet@lwn.net, jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org,
+ mkubecek@suse.cz, willemdebruijn.kernel@gmail.com, gal@nvidia.com,
+ alexander.duyck@gmail.com, linux-doc@vger.kernel.org, Igor Bagnucki
+ <igor.bagnucki@intel.com>, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v6 1/7] net: ethtool: pass ethtool_rxfh to
+ get/set_rxfh ethtool ops
+Message-ID: <20231121152906.2dd5f487@kernel.org>
+In-Reply-To: <20231120205614.46350-2-ahmed.zaki@intel.com>
+References: <20231120205614.46350-1-ahmed.zaki@intel.com>
+	<20231120205614.46350-2-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,37 +57,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 20 Nov 2023 20:35:04 +0100 Christian Marangi wrote:
-> It seems some arch (s390) require a more specific mask for FIELD_PREP
-> and doesn't like using GENMASK(15, 2) for u16 values.
-> 
-> Fix the compilation error by adding the additional mask for the BITS
-> that the PHY ignore and AND the passed addr with the real mask that the
-> PHY will parse for the mailbox interface 4 addr to make sure extra
-> values are correctly removed.
+On Mon, 20 Nov 2023 13:56:08 -0700 Ahmed Zaki wrote:
+>  	u32	(*get_rxfh_key_size)(struct net_device *);
+>  	u32	(*get_rxfh_indir_size)(struct net_device *);
+> -	int	(*get_rxfh)(struct net_device *, u32 *indir, u8 *key,
+> -			    u8 *hfunc);
+> -	int	(*set_rxfh)(struct net_device *, const u32 *indir,
+> -			    const u8 *key, const u8 hfunc);
+> +	int	(*get_rxfh)(struct net_device *, struct ethtool_rxfh *,
+> +			    u32 *indir, u8 *key);
+> +	int	(*set_rxfh)(struct net_device *, struct ethtool_rxfh *,
+> +			    const u32 *indir, const u8 *key);
+>  	int	(*get_rxfh_context)(struct net_device *, u32 *indir, u8 *key,
+>  				    u8 *hfunc, u32 rss_context);
+>  	int	(*set_rxfh_context)(struct net_device *, const u32 *indir,
 
-Ah. Um. Pff. Erm. I'm not sure.
+This conversion looks 1/4th done. You should do the following:
 
-Endianness is not my strong suit but this code:
+ - First simplify the code by always providing a pointer to all params
+   (indir, key and func); the fact that some of them may be NULL seems
+   like a weird historic thing or a premature optimization.
+   It will simplify the drivers if all pointers are always present.
+   You don't have to remove the if () checks in the existing drivers.
 
-	/* PHY expect addr in LE */
-	addr = (__force u32)cpu_to_le32(addr); 
+ - Then make the functions take a dev pointer, and a pointer to a
+   single struct wrapping all arguments. The set_* should also take
+   an extack.
 
-	/* ... use (u16)(addr)       */
-	/* ... use (u16)(addr >> 16) */
+ - Add a rss_context member to the argument struct and a capability
+   like cap_link_lanes_supported to indicate whether driver supports
+   rss contexts, then you can remove *et_rxfh_context functions,
+   and instead call *et_rxfh() with a non-zero rss_context.
 
-does not make sense to me.
+ - Add your new member to the struct wrapping all params.
 
-You're operating on register values here, there is no endian.
-Endian only exists when you store or load from memory. IOW, this:
-
-	addr = 0x12345678;
-	print((u16)addr);
-	print(addr >> 16);
-
-will print the same exact thing regardless of the CPU endian.
-
-Why did you put the byte swap in there?
--- 
-pw-bot: cr
+If you just expose struct ethtool_rxfh to the drivers (a) there are
+fields in there drivers shouldn't touch, and (b) that struct is uAPI
+so we can't add netlink-only fields easily.
 
