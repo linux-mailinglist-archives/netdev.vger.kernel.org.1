@@ -1,111 +1,272 @@
-Return-Path: <netdev+bounces-49747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E8FF7F3560
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:56:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBAF77F3564
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2A36B2127A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:56:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDFD2824DE
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C53A59160;
-	Tue, 21 Nov 2023 17:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14345A113;
+	Tue, 21 Nov 2023 17:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O72JOhAM"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Aa0nTlqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05F318E
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:56:04 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-a00b056ca38so239139966b.2
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:56:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1700589360; x=1701194160; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MA4AVc9wusU+6rRUqfOFOnbQWEj+co4/T/ukMhfmlOA=;
-        b=O72JOhAMYHNP51q6iZdBjpc3Os0yN2Ka6WCpkneJFhM3AVDpfBnpaFMi3EdteZ+Ar5
-         qy3YBZBtTXTU9gTBsEJgo6ARRYpS4v5h7baNnztzjZut6mvIZwUZEwjsPMGOffWPakNm
-         EyBkS1jcX06G6gkl3FgZna6qFd4JmYVqTOvdM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700589360; x=1701194160;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MA4AVc9wusU+6rRUqfOFOnbQWEj+co4/T/ukMhfmlOA=;
-        b=pj2enGSAJNyGXjVKTuWbRawdRuusENl0fOz90PfR7gfBvDE6Fl60ToJ/OeFyuOmF+z
-         JguQoIKknrHg9POuEx+cEehO9g/FsScPIg6kbZ7FQPUwPfVS4Vzs09z/gASEKQMV0UR4
-         YzXCMx8HiLnhbRUmR14qATKKNEcN5YSYsHodVxN6VbndQGWUy+TxvziDLhU/JUKZuRGl
-         1EXBjFImVuf0h9X8u3kbJi4rxFqW1m4LU8bD2dvsNPppQ6YdGkGJdHfp15b+SJ/XUo0r
-         zeVVlDa1070ZyPNl6jg66eKtr7n6EbVcwsFsM6vzpWk0cClREpUCD3tudzq3jRmGthBH
-         tE7w==
-X-Gm-Message-State: AOJu0YxhOumU0vbz7CGwFV0VFDJ3UEsLoxTg2VbkILcmtIeea/NA/Ssd
-	XTEVNRH5MVqxZBj3i6Pl+XGS37PDI/0tHFjPRHzzWb9a
-X-Google-Smtp-Source: AGHT+IEv8WgSwdSvxwy6IhVZL2z7AaUbXeQUfjm7cGCtLamHeFcGAJhNXapU6nRSiQnA1jv8nKwoIg==
-X-Received: by 2002:a17:906:2da:b0:9ff:1e84:76fc with SMTP id 26-20020a17090602da00b009ff1e8476fcmr4135206ejk.5.1700589360765;
-        Tue, 21 Nov 2023 09:56:00 -0800 (PST)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com. [209.85.128.45])
-        by smtp.gmail.com with ESMTPSA id i26-20020a170906a29a00b00a01892903d6sm1340732ejz.47.2023.11.21.09.55.59
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 09:55:59 -0800 (PST)
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4078fe6a063so1585e9.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 09:55:59 -0800 (PST)
-X-Received: by 2002:a05:600c:1c1f:b0:40b:2ec6:2a87 with SMTP id
- j31-20020a05600c1c1f00b0040b2ec62a87mr1361wms.5.1700589359277; Tue, 21 Nov
- 2023 09:55:59 -0800 (PST)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40CD212C;
+	Tue, 21 Nov 2023 09:56:45 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id EDBBF1F8B8;
+	Tue, 21 Nov 2023 17:56:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1700589403; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BRUlXAJOlgJyfK030JbpQyqs8hbHXrZ60DaHyZm0foM=;
+	b=Aa0nTlqoq8GQwGFbCKlcATI6TKWypBO1S8mLSDWoN1QWlYgPTnoZPEgKGgQeUdH/mNfxfL
+	tOnDSnshswlu1ORBBjUaWdxvsCrXMNDjE9F6LYCTYnlPQiQMj01cvaFzhnOcBlXSZkNX9Z
+	8qoKsMQvqPXf7OGRwxGPZYdTS0PB//0=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9221C139FD;
+	Tue, 21 Nov 2023 17:56:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id O3x5IlrvXGW1QAAAMHmgww
+	(envelope-from <mkoutny@suse.com>); Tue, 21 Nov 2023 17:56:42 +0000
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Petr Pavlu <ppavlu@suse.cz>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Martin Wilck <mwilck@suse.com>
+Subject: [PATCH] net/sched: cls: Load net classifier modules via alias
+Date: Tue, 21 Nov 2023 18:56:40 +0100
+Message-ID: <20231121175640.9981-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117130836.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
- <20231117130836.2.I79c8a6c8cafd89979af5407d77a6eda589833dca@changeid> <4fa33b0938031d7339dbc89a415864b6d041d0c3.camel@redhat.com>
-In-Reply-To: <4fa33b0938031d7339dbc89a415864b6d041d0c3.camel@redhat.com>
-From: Doug Anderson <dianders@chromium.org>
-Date: Tue, 21 Nov 2023 09:55:46 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=VALvcLr+HbdvEen109qT3Z5EL0u4tiefTs3AH8EHXFnA@mail.gmail.com>
-Message-ID: <CAD=FV=VALvcLr+HbdvEen109qT3Z5EL0u4tiefTs3AH8EHXFnA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] r8152: Add RTL8152_INACCESSIBLE checks to more loops
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>, 
-	"David S . Miller" <davem@davemloft.net>, Grant Grundler <grundler@chromium.org>, 
-	Simon Horman <horms@kernel.org>, Edward Hill <ecgh@chromium.org>, linux-usb@vger.kernel.org, 
-	Laura Nao <laura.nao@collabora.com>, Alan Stern <stern@rowland.harvard.edu>, 
-	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.80
+X-Spamd-Result: default: False [-1.80 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 RCVD_TLS_ALL(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 BAYES_HAM(-3.00)[100.00%];
+	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_TWELVE(0.00)[24];
+	 MID_CONTAINS_FROM(1.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,suse.cz,suse.com];
+	 RCVD_COUNT_TWO(0.00)[2];
+	 SUSPICIOUS_RECIPS(1.50)[]
 
-Hi,
+The classifier modules may be loaded lazily without user's awareness and
+control. Add respective aliases to modules and request them under these
+aliases so that modprobe's blacklisting mechanism works also for
+classifier modules. (The same pattern exists e.g. for filesystem
+modules.)
 
-On Tue, Nov 21, 2023 at 2:28=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Fri, 2023-11-17 at 13:08 -0800, Douglas Anderson wrote:
-> > Previous commits added checks for RTL8152_INACCESSIBLE in the loops in
-> > the driver. There are still a few more that keep tripping the driver
-> > up in error cases and make things take longer than they should. Add
-> > those in.
-> >
-> > Signed-off-by: Douglas Anderson <dianders@chromium.org>
->
-> I think this deserves a 'Fixes' tag. Please add it.
+Original module names remain unchanged.
 
-Sure, I can add it. It didn't feel worth it to me since there's no
-real functional issue--just that it takes a little longer for these
-loops to exit out, but it shouldn't hurt. I guess that means breaking
-this commit into several depending on when the offending loop was
-added.
+Signed-off-by: Michal Koutný <mkoutny@suse.com>
+---
+ include/net/pkt_cls.h    | 1 +
+ net/sched/cls_api.c      | 2 +-
+ net/sched/cls_basic.c    | 1 +
+ net/sched/cls_bpf.c      | 1 +
+ net/sched/cls_cgroup.c   | 1 +
+ net/sched/cls_flow.c     | 1 +
+ net/sched/cls_flower.c   | 1 +
+ net/sched/cls_fw.c       | 1 +
+ net/sched/cls_matchall.c | 1 +
+ net/sched/cls_route.c    | 1 +
+ net/sched/cls_u32.c      | 1 +
+ 11 files changed, 11 insertions(+), 1 deletion(-)
 
+This is primarily for TC subsystem maintainers where the
+request_module() resides but Cc list is large because of touches in
+various classifier modules.
 
-> Additionally please insert the target tree in the subj prefix when re-
-> postin (in this case 'net')
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index a76c9171db0e..424b4f889feb 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -24,6 +24,7 @@ struct tcf_walker {
+ 
+ int register_tcf_proto_ops(struct tcf_proto_ops *ops);
+ void unregister_tcf_proto_ops(struct tcf_proto_ops *ops);
++#define MODULE_ALIAS_TCF(kind)	MODULE_ALIAS("tcf-" __stringify(kind))
+ 
+ struct tcf_block_ext_info {
+ 	enum flow_block_binder_type binder_type;
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 1976bd163986..02fdcceee083 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -257,7 +257,7 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held,
+ #ifdef CONFIG_MODULES
+ 	if (rtnl_held)
+ 		rtnl_unlock();
+-	request_module("cls_%s", kind);
++	request_module("tcf-%s", kind);
+ 	if (rtnl_held)
+ 		rtnl_lock();
+ 	ops = __tcf_proto_lookup_ops(kind);
+diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
+index a1f56931330c..a3500ac7fc1a 100644
+--- a/net/sched/cls_basic.c
++++ b/net/sched/cls_basic.c
+@@ -328,6 +328,7 @@ static struct tcf_proto_ops cls_basic_ops __read_mostly = {
+ 	.bind_class	=	basic_bind_class,
+ 	.owner		=	THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("basic");
+ 
+ static int __init init_basic(void)
+ {
+diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+index 382c7a71f81f..8d57ac155c0c 100644
+--- a/net/sched/cls_bpf.c
++++ b/net/sched/cls_bpf.c
+@@ -693,6 +693,7 @@ static struct tcf_proto_ops cls_bpf_ops __read_mostly = {
+ 	.dump		=	cls_bpf_dump,
+ 	.bind_class	=	cls_bpf_bind_class,
+ };
++MODULE_ALIAS_TCF("bpf");
+ 
+ static int __init cls_bpf_init_mod(void)
+ {
+diff --git a/net/sched/cls_cgroup.c b/net/sched/cls_cgroup.c
+index 7ee8dbf49ed0..0ded7d79894c 100644
+--- a/net/sched/cls_cgroup.c
++++ b/net/sched/cls_cgroup.c
+@@ -209,6 +209,7 @@ static struct tcf_proto_ops cls_cgroup_ops __read_mostly = {
+ 	.dump		=	cls_cgroup_dump,
+ 	.owner		=	THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("cgroup");
+ 
+ static int __init init_cgroup_cls(void)
+ {
+diff --git a/net/sched/cls_flow.c b/net/sched/cls_flow.c
+index 6ab317b48d6c..2806aa1254e1 100644
+--- a/net/sched/cls_flow.c
++++ b/net/sched/cls_flow.c
+@@ -702,6 +702,7 @@ static struct tcf_proto_ops cls_flow_ops __read_mostly = {
+ 	.walk		= flow_walk,
+ 	.owner		= THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("flow");
+ 
+ static int __init cls_flow_init(void)
+ {
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index e5314a31f75a..739e09e0fa57 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -3633,6 +3633,7 @@ static struct tcf_proto_ops cls_fl_ops __read_mostly = {
+ 	.owner		= THIS_MODULE,
+ 	.flags		= TCF_PROTO_OPS_DOIT_UNLOCKED,
+ };
++MODULE_ALIAS_TCF("flower");
+ 
+ static int __init cls_fl_init(void)
+ {
+diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+index afc534ee0a18..86c833885a2d 100644
+--- a/net/sched/cls_fw.c
++++ b/net/sched/cls_fw.c
+@@ -433,6 +433,7 @@ static struct tcf_proto_ops cls_fw_ops __read_mostly = {
+ 	.bind_class	=	fw_bind_class,
+ 	.owner		=	THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("fw");
+ 
+ static int __init init_fw(void)
+ {
+diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
+index c4ed11df6254..21ba73978c6a 100644
+--- a/net/sched/cls_matchall.c
++++ b/net/sched/cls_matchall.c
+@@ -398,6 +398,7 @@ static struct tcf_proto_ops cls_mall_ops __read_mostly = {
+ 	.bind_class	= mall_bind_class,
+ 	.owner		= THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("matchall");
+ 
+ static int __init cls_mall_init(void)
+ {
+diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
+index 12a505db4183..a4701c0752df 100644
+--- a/net/sched/cls_route.c
++++ b/net/sched/cls_route.c
+@@ -671,6 +671,7 @@ static struct tcf_proto_ops cls_route4_ops __read_mostly = {
+ 	.bind_class	=	route4_bind_class,
+ 	.owner		=	THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("route");
+ 
+ static int __init init_route4(void)
+ {
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index d5bdfd4a7655..a969adbd7423 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -1453,6 +1453,7 @@ static struct tcf_proto_ops cls_u32_ops __read_mostly = {
+ 	.bind_class	=	u32_bind_class,
+ 	.owner		=	THIS_MODULE,
+ };
++MODULE_ALIAS_TCF("u32");
+ 
+ static int __init init_u32(void)
+ {
+-- 
+2.42.1
 
-Funny, I just followed the tags for other commits to this file and the
-"net:" prefix isn't common. I guess this should be "net: usb: r8152".
-I can add it when I post v2.
 
