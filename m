@@ -1,77 +1,38 @@
-Return-Path: <netdev+bounces-49504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AE547F237C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:02:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB5B87F2355
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:53:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3D91F2643C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2631C1C21507
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F119154B2;
-	Tue, 21 Nov 2023 02:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="X10eg7GW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724088495;
+	Tue, 21 Nov 2023 01:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3125F4
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:29 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d895584f1so3589311f8f.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 18:01:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1700532088; x=1701136888; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pBOOKbt8qYeu3I6qmruIZOshMMipjUc2q0LuWEyo1Tk=;
-        b=X10eg7GW7jMUjWFbHr1w/Od1YyGMrWLempQxTyyVmH/D2qS1vlbLo/wlLSopElquH3
-         JHz5kQgRW/g4HyaOSEvCQ834osJnFAtAI3fcPGr6eJny9qWw6MnMtQeRrSwh0zuZ9sXD
-         J5V6KlWq7+teyUnq/3xWbEvzlJ3ll7WSF+2gN8BT9KRsyevhC7HUulUV0EoL/81epit5
-         p1RZ/yDxc1qV0zn3auvnjY6FVB2jdP6LenrvnRy7I0/LXD/4+aleNUBb2V4xGh2Wka/p
-         jgrh9fiBM4OU/gGPjjaMHtZNhGUiyCUmJ3I/i7V20LR3z9B2SbUimxKJTPSF0nbI6U+A
-         T0bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700532088; x=1701136888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pBOOKbt8qYeu3I6qmruIZOshMMipjUc2q0LuWEyo1Tk=;
-        b=jkhi8BfHaAiqqucU7h24E9r+DNbvVlfArjsrEL2OjlMUaIlfpSiPHfEqnobrECBKmk
-         g1FthcvgF1/tnW6kN2tO1E/039VSf4rz0kO22DHwu5dqfsO949VMR3eWxBgaVNeyHmtW
-         RgOzjrGSKwHinGjxV3Rx3//ZEc8T6VLzKSpijPxK82UpdV9N2Z8KWvSXdfAcPVB4BdeK
-         sTAJ6DYv5DDxx4KIGPY6Xxs7NcoJIooHPIWhzqJXo8ZosPveMMGlcepXY5lisQCLrXn/
-         tCp6qrNVlVhcdFokgVvOTFP7NxA9niZhQEp3WtwaEWO3GmIPrHfRTYtbyKxzoAsxXzSy
-         IN/w==
-X-Gm-Message-State: AOJu0YzUCDU8IowNXRKaLDQsxfpG7VlG+mxBr2PXpbjGXWYPPrj3T8Pd
-	JAkmQrqfO9+ZoDbmCKz4R8Hl1Q==
-X-Google-Smtp-Source: AGHT+IFUb2kPEOqjsQe+RX4pd7eVkewEsSHkT4T1xu2TuDc1YK1Zv+TSvo0MSIAJJf9Mv3tFSbbACw==
-X-Received: by 2002:adf:e58b:0:b0:32d:b051:9a27 with SMTP id l11-20020adfe58b000000b0032db0519a27mr6193939wrm.20.1700532088379;
-        Mon, 20 Nov 2023 18:01:28 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id c13-20020a056000184d00b00332cb846f21sm2617105wri.27.2023.11.20.18.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 18:01:27 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH 7/7] net/tcp: Don't store TCP-AO maclen on reqsk
-Date: Tue, 21 Nov 2023 02:01:11 +0000
-Message-ID: <20231121020111.1143180-8-dima@arista.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231121020111.1143180-1-dima@arista.com>
-References: <20231121020111.1143180-1-dima@arista.com>
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E6485
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:53:31 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SZ6k24tHwzRjSt;
+	Tue, 21 Nov 2023 09:49:14 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 21 Nov
+ 2023 09:53:29 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net] ipv4: igmp: fix refcnt uaf issue when receiving igmp query packet
+Date: Tue, 21 Nov 2023 10:05:58 +0800
+Message-ID: <20231121020558.240321-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,134 +40,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-This extra check doesn't work for a handshake when SYN segment has
-(current_key.maclen != rnext_key.maclen). It could be amended to
-preserve rnext_key.maclen instead of current_key.maclen, but that
-requires a lookup on listen socket.
+When I perform the following test operations:
+1.ip link add br0 type bridge
+2.brctl addif br0 eth0
+3.ip addr add 239.0.0.1/32 dev eth0
+4.ip addr add 239.0.0.1/32 dev br0
+5.ip addr add 224.0.0.1/32 dev br0
+6.while ((1))
+    do
+        ifconfig br0 up
+        ifconfig br0 down
+    done
+7.send IGMPv2 query packets to port eth0 continuously. For example,
+./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
+1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
 
-Originally, this extra maclen check was introduced just because it was
-cheap. Drop it and convert tcp_request_sock::maclen into boolean
-tcp_request_sock::used_tcp_ao.
+The preceding tests may trigger the refcnt uaf isuue of the mc list. The
+stack is as follows:
+	refcount_t: addition on 0; use-after-free.
+	WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate+0x78/0x110
+	CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #57
+	RIP: 0010:refcount_warn_saturate+0x78/0x110
+	Call Trace:
+	<TASK>
+	? __warn+0x83/0x130
+	? refcount_warn_saturate+0x78/0x110
+	? __report_bug+0xea/0x100
+	? report_bug+0x24/0x70
+	? handle_bug+0x3c/0x70
+	? exc_invalid_op+0x18/0x70
+	igmp_heard_query+0x221/0x690
+	igmp_rcv+0xea/0x2f0
+	ip_protocol_deliver_rcu+0x156/0x160
+	ip_local_deliver_finish+0x77/0xa0
+	__netif_receive_skb_one_core+0x8b/0xa0
+	netif_receive_skb_internal+0x80/0xd0
+	netif_receive_skb+0x18/0xc0
+	br_handle_frame_finish+0x340/0x5c0 [bridge]
+	nf_hook_bridge_pre+0x117/0x130 [bridge]
+	__netif_receive_skb_core+0x241/0x1090
+	__netif_receive_skb_list_core+0x13f/0x2e0
+	__netif_receive_skb_list+0xfc/0x190
+	netif_receive_skb_list_internal+0x102/0x1e0
+	napi_gro_receive+0xd7/0x220
+	e1000_clean_rx_irq+0x1d4/0x4f0 [e1000]
+	e1000_clean+0x5e/0xe0 [e1000]
+	__napi_poll+0x2c/0x1b0
+	net_rx_action+0x2cb/0x3a0
+	__do_softirq+0xcd/0x2a7
+	run_ksoftirqd+0x22/0x30
+	smpboot_thread_fn+0xdb/0x1d0
+	kthread+0xe2/0x110
+	ret_from_fork+0x34/0x50
+	ret_from_fork_asm+0x1a/0x30
+	</TASK>
 
-Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
-Signed-off-by: Dmitry Safonov <dima@arista.com>
+The root causes are as follows:
+Thread A					Thread B
+...						netif_receive_skb
+br_dev_stop					...
+    br_multicast_leave_snoopers			...
+        __ip_mc_dec_group			...
+            __igmp_group_dropped		igmp_rcv
+                igmp_stop_timer			    igmp_heard_query         //ref = 1
+                ip_ma_put			        igmp_mod_timer
+                    refcount_dec_and_test	            igmp_start_timer //ref = 0
+			...                                     refcount_inc //ref increases from 0
+When the device receives an IGMPv2 Query message, it starts the timer
+immediately, regardless of whether the device is running. If the device is
+down and has left the multicast group, it will cause the mc list refcount
+uaf issue.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 ---
- include/linux/tcp.h   | 10 ++++------
- net/ipv4/tcp_ao.c     |  4 ++--
- net/ipv4/tcp_input.c  |  5 +++--
- net/ipv4/tcp_output.c |  9 +++------
- 4 files changed, 12 insertions(+), 16 deletions(-)
+ net/ipv4/igmp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 68f3d315d2e1..3af897b00920 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -155,6 +155,9 @@ struct tcp_request_sock {
- 	bool				req_usec_ts;
- #if IS_ENABLED(CONFIG_MPTCP)
- 	bool				drop_req;
-+#endif
-+#ifdef CONFIG_TCP_AO
-+	bool				used_tcp_ao;
- #endif
- 	u32				txhash;
- 	u32				rcv_isn;
-@@ -169,7 +172,6 @@ struct tcp_request_sock {
- #ifdef CONFIG_TCP_AO
- 	u8				ao_keyid;
- 	u8				ao_rcv_next;
--	u8				maclen;
- #endif
- };
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 76c3ea75b8dd..f217581904d6 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -1044,6 +1044,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+ 	for_each_pmc_rcu(in_dev, im) {
+ 		int changed;
  
-@@ -180,14 +182,10 @@ static inline struct tcp_request_sock *tcp_rsk(const struct request_sock *req)
- 
- static inline bool tcp_rsk_used_ao(const struct request_sock *req)
- {
--	/* The real length of MAC is saved in the request socket,
--	 * signing anything with zero-length makes no sense, so here is
--	 * a little hack..
--	 */
- #ifndef CONFIG_TCP_AO
- 	return false;
- #else
--	return tcp_rsk(req)->maclen != 0;
-+	return tcp_rsk(req)->used_tcp_ao;
- #endif
- }
- 
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 9b7f1970c2e9..07221319e8c5 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -851,7 +851,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 	const struct tcp_ao_hdr *aoh;
- 	struct tcp_ao_key *key;
- 
--	treq->maclen = 0;
-+	treq->used_tcp_ao = false;
- 
- 	if (tcp_parse_auth_options(th, NULL, &aoh) || !aoh)
- 		return;
-@@ -863,7 +863,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 
- 	treq->ao_rcv_next = aoh->keyid;
- 	treq->ao_keyid = aoh->rnext_keyid;
--	treq->maclen = tcp_ao_maclen(key);
-+	treq->used_tcp_ao = true;
- }
- 
- static enum skb_drop_reason
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 78896c8be0d4..89cb6912dd91 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7182,11 +7182,12 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 	if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
- 		goto drop_and_release; /* Invalid TCP options */
- 	if (aoh) {
--		tcp_rsk(req)->maclen = aoh->length - sizeof(struct tcp_ao_hdr);
-+		tcp_rsk(req)->used_tcp_ao = true;
- 		tcp_rsk(req)->ao_rcv_next = aoh->keyid;
- 		tcp_rsk(req)->ao_keyid = aoh->rnext_keyid;
-+
- 	} else {
--		tcp_rsk(req)->maclen = 0;
-+		tcp_rsk(req)->used_tcp_ao = false;
- 	}
- #endif
- 	tcp_rsk(req)->snt_isn = isn;
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 93eef1dbbc55..f5ef15e1d9ac 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3720,7 +3720,6 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
- 	if (tcp_rsk_used_ao(req)) {
- #ifdef CONFIG_TCP_AO
- 		struct tcp_ao_key *ao_key = NULL;
--		u8 maclen = tcp_rsk(req)->maclen;
- 		u8 keyid = tcp_rsk(req)->ao_keyid;
- 
- 		ao_key = tcp_sk(sk)->af_specific->ao_lookup(sk, req_to_sk(req),
-@@ -3730,13 +3729,11 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
- 		 * for another peer-matching key, but the peer has requested
- 		 * ao_keyid (RFC5925 RNextKeyID), so let's keep it simple here.
- 		 */
--		if (unlikely(!ao_key || tcp_ao_maclen(ao_key) != maclen)) {
--			u8 key_maclen = ao_key ? tcp_ao_maclen(ao_key) : 0;
--
-+		if (unlikely(!ao_key)) {
- 			rcu_read_unlock();
- 			kfree_skb(skb);
--			net_warn_ratelimited("TCP-AO: the keyid %u with maclen %u|%u from SYN packet is not present - not sending SYNACK\n",
--					     keyid, maclen, key_maclen);
-+			net_warn_ratelimited("TCP-AO: the keyid %u from SYN packet is not present - not sending SYNACK\n",
-+					     keyid);
- 			return NULL;
- 		}
- 		key.ao_key = ao_key;
++		if (!netif_running(im->interface->dev))
++			continue;
+ 		if (group && group != im->multiaddr)
+ 			continue;
+ 		if (im->multiaddr == IGMP_ALL_HOSTS)
 -- 
-2.42.0
+2.34.1
 
 
