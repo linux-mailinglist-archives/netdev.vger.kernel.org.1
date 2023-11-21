@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4997E7F21D7
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2717F21D8
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01C96282350
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E54BDB21B17
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77C917D4;
-	Tue, 21 Nov 2023 00:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37CB946C;
+	Tue, 21 Nov 2023 00:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxdBZqs8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIK7OZa/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DA98BF2
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:00:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C556DC433C7;
-	Tue, 21 Nov 2023 00:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8706B8F4A
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:00:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C519C433C9;
+	Tue, 21 Nov 2023 00:00:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700524856;
-	bh=sZhDjLK9ktGXdQtjtG0R43YbeCQvqXrWZHODWg3pO/8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AxdBZqs8Biy6X8OtWJWkBMC4nHR65Mzw7issvnxILzgBmCwH8SmNMspzsEg8sBlH1
-	 A8E6hwJ+u/W8st/QIPPnDC+Oo8GeQXTrVoll5XiBtYZeQ8+spMjfTl/bHhRSXAzPpt
-	 A9M3LTobQ04LWUAL0bFD2qu55VzdgjB8KntieJ/1ANU6Zv+mY0y+rOKF/GBKUzareE
-	 EMTTRDdCJfaH3DTUI4ZiuS3i316W4GfhsmRJsCbSV9ZHDHrdTt4GYN2X7Mw4Y3hkes
-	 rFhFxAI3+tCEp4bV4nnAoxP659oBWOTSOYSdxBfD35d/HJWjQ8OuhQbesAE02zzkhp
-	 xAXmjpQ4xVbPQ==
+	s=k20201202; t=1700524857;
+	bh=Jp2284jeC+gnmYQyJi80rG3fA/xS/0PejErBGE3Tj5E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rIK7OZa/3Cz4+CCQTR+l9Q5Jahz27beUaiVOnyjaDtm5RatIfIf/hhBs2ivWGAYSR
+	 ZKCa68s5YfxzZj0eD7rE60peYUn6nEnmj05zCpSVhA2UnPjQ6nc5JgMS+6JHj9sk++
+	 fJfHMxffV5iOgs1waAW8K5AJG1Pkbf/DNxQaGLVUiyMIPJFcKDWI6Y/w2MxJjsOF8Q
+	 vqngCkhzJRS6jE/91C9MedSGOQqCNt5OuiYMsCCO646ceyBGoa8bBKVrZ0kLKWg1vm
+	 wk3vaZcY9CXyg5ZRoMn2ILhTNq2vopbtjg9+7HUQghxGvwa9DgArHStzhWmG7OukGA
+	 aGzMt2v+Y44CQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -43,10 +43,12 @@ Cc: netdev@vger.kernel.org,
 	dsahern@gmail.com,
 	dtatulea@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 00/15] net: page_pool: add netlink-based introspection
-Date: Mon, 20 Nov 2023 16:00:33 -0800
-Message-ID: <20231121000048.789613-1-kuba@kernel.org>
+Subject: [PATCH net-next v2 01/15] net: page_pool: split the page_pool_params into fast and slow
+Date: Mon, 20 Nov 2023 16:00:34 -0800
+Message-ID: <20231121000048.789613-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231121000048.789613-1-kuba@kernel.org>
+References: <20231121000048.789613-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,86 +57,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We recently started to deploy newer kernels / drivers at Meta,
-making significant use of page pools for the first time.
-We immediately run into page pool leaks both real and false positive
-warnings. As Eric pointed out/predicted there's no guarantee that
-applications will read / close their sockets so a page pool page
-may be stuck in a socket (but not leaked) forever. This happens
-a lot in our fleet. Most of these are obviously due to application
-bugs but we should not be printing kernel warnings due to minor
-application resource leaks.
+struct page_pool is rather performance critical and we use
+16B of the first cache line to store 2 pointers used only
+by test code. Future patches will add more informational
+(non-fast path) attributes.
 
-Conversely the page pool memory may get leaked at runtime, and
-we have no way to detect / track that, unless someone reconfigures
-the NIC and destroys the page pools which leaked the pages.
+It's convenient for the user of the API to not have to worry
+which fields are fast and which are slow path. Use struct
+groups to split the params into the two categories internally.
 
-The solution presented here is to expose the memory use of page
-pools via netlink. This allows for continuous monitoring of memory
-used by page pools, regardless if they were destroyed or not.
-Sample in patch 15 can print the memory use and recycling
-efficiency:
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ include/net/page_pool/types.h | 31 +++++++++++++++++++------------
+ net/core/page_pool.c          |  7 ++++---
+ 2 files changed, 23 insertions(+), 15 deletions(-)
 
-$ ./page-pool
-    eth0[2]	page pools: 10 (zombies: 0)
-		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
-		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
-
-v2:
- - hopefully fix build with PAGE_POOL=n
-v1:  https://lore.kernel.org/all/20231024160220.3973311-1-kuba@kernel.org/
- - The main change compared to the RFC is that the API now exposes
-   outstanding references and byte counts even for "live" page pools.
-   The warning is no longer printed if page pool is accessible via netlink.
-RFC: https://lore.kernel.org/all/20230816234303.3786178-1-kuba@kernel.org/
-
-Jakub Kicinski (15):
-  net: page_pool: split the page_pool_params into fast and slow
-  net: page_pool: avoid touching slow on the fastpath
-  net: page_pool: factor out uninit
-  net: page_pool: id the page pools
-  net: page_pool: record pools per netdev
-  net: page_pool: stash the NAPI ID for easier access
-  eth: link netdev to page_pools in drivers
-  net: page_pool: add nlspec for basic access to page pools
-  net: page_pool: implement GET in the netlink API
-  net: page_pool: add netlink notifications for state changes
-  net: page_pool: report amount of memory held by page pools
-  net: page_pool: report when page pool was destroyed
-  net: page_pool: expose page pool stats via netlink
-  net: page_pool: mute the periodic warning for visible page pools
-  tools: ynl: add sample for getting page-pool information
-
- Documentation/netlink/specs/netdev.yaml       | 166 +++++++
- Documentation/networking/page_pool.rst        |  10 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   1 +
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
- drivers/net/ethernet/microsoft/mana/mana_en.c |   1 +
- drivers/net/ethernet/socionext/netsec.c       |   2 +
- include/linux/list.h                          |  20 +
- include/linux/netdevice.h                     |   4 +
- include/linux/poison.h                        |   2 +
- include/net/page_pool/helpers.h               |   8 +-
- include/net/page_pool/types.h                 |  43 +-
- include/uapi/linux/netdev.h                   |  36 ++
- net/core/Makefile                             |   2 +-
- net/core/netdev-genl-gen.c                    |  60 +++
- net/core/netdev-genl-gen.h                    |  11 +
- net/core/page_pool.c                          |  78 ++--
- net/core/page_pool_priv.h                     |  12 +
- net/core/page_pool_user.c                     | 414 +++++++++++++++++
- tools/include/uapi/linux/netdev.h             |  36 ++
- tools/net/ynl/generated/netdev-user.c         | 419 ++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h         | 171 +++++++
- tools/net/ynl/lib/ynl.h                       |   2 +-
- tools/net/ynl/samples/.gitignore              |   1 +
- tools/net/ynl/samples/Makefile                |   2 +-
- tools/net/ynl/samples/page-pool.c             | 147 ++++++
- 25 files changed, 1601 insertions(+), 48 deletions(-)
- create mode 100644 net/core/page_pool_priv.h
- create mode 100644 net/core/page_pool_user.c
- create mode 100644 tools/net/ynl/samples/page-pool.c
-
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 6fc5134095ed..23950fcc4eca 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -54,18 +54,22 @@ struct pp_alloc_cache {
+  * @offset:	DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
+  */
+ struct page_pool_params {
+-	unsigned int	flags;
+-	unsigned int	order;
+-	unsigned int	pool_size;
+-	int		nid;
+-	struct device	*dev;
+-	struct napi_struct *napi;
+-	enum dma_data_direction dma_dir;
+-	unsigned int	max_len;
+-	unsigned int	offset;
++	struct_group_tagged(page_pool_params_fast, fast,
++		unsigned int	flags;
++		unsigned int	order;
++		unsigned int	pool_size;
++		int		nid;
++		struct device	*dev;
++		struct napi_struct *napi;
++		enum dma_data_direction dma_dir;
++		unsigned int	max_len;
++		unsigned int	offset;
++	);
++	struct_group_tagged(page_pool_params_slow, slow,
+ /* private: used by test code only */
+-	void (*init_callback)(struct page *page, void *arg);
+-	void *init_arg;
++		void (*init_callback)(struct page *page, void *arg);
++		void *init_arg;
++	);
+ };
+ 
+ #ifdef CONFIG_PAGE_POOL_STATS
+@@ -119,7 +123,7 @@ struct page_pool_stats {
+ #endif
+ 
+ struct page_pool {
+-	struct page_pool_params p;
++	struct page_pool_params_fast p;
+ 
+ 	long frag_users;
+ 	struct page *frag_page;
+@@ -178,6 +182,9 @@ struct page_pool {
+ 	refcount_t user_cnt;
+ 
+ 	u64 destroy_cnt;
++
++	/* Slow/Control-path information follows */
++	struct page_pool_params_slow slow;
+ };
+ 
+ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index dec544337236..ab22a2fdae57 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -173,7 +173,8 @@ static int page_pool_init(struct page_pool *pool,
+ {
+ 	unsigned int ring_qsize = 1024; /* Default */
+ 
+-	memcpy(&pool->p, params, sizeof(pool->p));
++	memcpy(&pool->p, &params->fast, sizeof(pool->p));
++	memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
+ 
+ 	/* Validate only known flags were used */
+ 	if (pool->p.flags & ~(PP_FLAG_ALL))
+@@ -388,8 +389,8 @@ static void page_pool_set_pp_info(struct page_pool *pool,
+ 	 * the overhead is negligible.
+ 	 */
+ 	page_pool_fragment_page(page, 1);
+-	if (pool->p.init_callback)
+-		pool->p.init_callback(page, pool->p.init_arg);
++	if (pool->slow.init_callback)
++		pool->slow.init_callback(page, pool->slow.init_arg);
+ }
+ 
+ static void page_pool_clear_pp_info(struct page *page)
 -- 
 2.42.0
 
