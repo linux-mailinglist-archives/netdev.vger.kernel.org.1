@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339F67F21DF
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 436A67F21E0
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E19B2282785
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE5392828F6
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9BA3C07B;
-	Tue, 21 Nov 2023 00:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9481D3C089;
+	Tue, 21 Nov 2023 00:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zqo/yMSy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/PkxA+v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA76C3C077
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:01:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D7F3C43391;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7272A3C085
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:01:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7A8C433C8;
 	Tue, 21 Nov 2023 00:01:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700524861;
-	bh=u85xHyLUUP2c2kSBZmRu+sfWWRTC5Fw14x3bAnG17oc=;
+	s=k20201202; t=1700524862;
+	bh=UfF6EmJAWSOVyktwMIWXy5NGrphE9uMhM9sHCKAUMNY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zqo/yMSyh8/WTva5m9N8yetLB8uEMW7qLeINDhU1FJZzLMAllhx6qKJRuHk7lOWG0
-	 ZNLr2jnQYPIuRm85kXnC0hXl1wOE34b4pnnK6E1o2ChxYHa39H3mTQSScLfvPo1Kdk
-	 PSVpd2Iwh4nOTwbV22E4zJrQx/zGQe5gYk7umeHogIcH97fyCZYisFaLBcPu0RGxoF
-	 TYB0U16ErU7hXx/hslIWkp7thx7rRgsJ+sz6eUP7BUpWVIj2dMVsNe1Hw9SpVcS9JB
-	 5o4wU7eGj6dPvGN2c2XEP3rLKMyyv8ZG+zjxzaOJGlTjLJTazCfiPIee59iVPWaOyg
-	 tgLwA+xr0tKXQ==
+	b=g/PkxA+vE82y02Ct9NPhdVGPMy9DI0VXsARYhTShGohcnuMUoi8UTf5juGJt7ma16
+	 J/FzJo7AKbgLypW1BJ8pDExvIU7te2eYI86VNagfQeK+9hmRvuVEhEY6LtX41A90OX
+	 dl9/vf/WzubLMaYrGUY4Pnc1hVB6wBkIpD+c7EnL4IjGh30XjTzmAlVFNbL5Kc+il2
+	 Dz7gGhZrWazv0Qrj77PvQXrXWhYb4FCy/peVkJ8oQxCLfqszOy3/nTFtDaW7z3BEQa
+	 QFCgY2aJixIaro/PLtXKmgghvNbMLiylxLpHwWXDGI3xUDv+jC1lHxax+sZihYTWFT
+	 f1MteEl2CIL8w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: netdev@vger.kernel.org,
 	dsahern@gmail.com,
 	dtatulea@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 08/15] net: page_pool: add nlspec for basic access to page pools
-Date: Mon, 20 Nov 2023 16:00:41 -0800
-Message-ID: <20231121000048.789613-9-kuba@kernel.org>
+Subject: [PATCH net-next v2 09/15] net: page_pool: implement GET in the netlink API
+Date: Mon, 20 Nov 2023 16:00:42 -0800
+Message-ID: <20231121000048.789613-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231121000048.789613-1-kuba@kernel.org>
 References: <20231121000048.789613-1-kuba@kernel.org>
@@ -57,78 +57,268 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a Netlink spec in YAML for getting very basic information
-about page pools.
+Expose the very basic page pool information via netlink.
+
+Example using ynl-py for a system with 9 queues:
+
+$ ./cli.py --no-schema --spec netlink/specs/netdev.yaml \
+           --dump page-pool-get
+[{'id': 19, 'ifindex': 2, 'napi-id': 147},
+ {'id': 18, 'ifindex': 2, 'napi-id': 146},
+ {'id': 17, 'ifindex': 2, 'napi-id': 145},
+ {'id': 16, 'ifindex': 2, 'napi-id': 144},
+ {'id': 15, 'ifindex': 2, 'napi-id': 143},
+ {'id': 14, 'ifindex': 2, 'napi-id': 142},
+ {'id': 13, 'ifindex': 2, 'napi-id': 141},
+ {'id': 12, 'ifindex': 2, 'napi-id': 140},
+ {'id': 11, 'ifindex': 2, 'napi-id': 139},
+ {'id': 10, 'ifindex': 2, 'napi-id': 138}]
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/netdev.yaml | 46 +++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ include/uapi/linux/netdev.h |  10 +++
+ net/core/netdev-genl-gen.c  |  27 ++++++++
+ net/core/netdev-genl-gen.h  |   3 +
+ net/core/page_pool_user.c   | 127 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 167 insertions(+)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 14511b13f305..84ca3c2ab872 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -86,6 +86,34 @@ name: netdev
-              See Documentation/networking/xdp-rx-metadata.rst for more details.
-         type: u64
-         enum: xdp-rx-metadata
-+  -
-+    name: page-pool
-+    attributes:
-+      -
-+        name: id
-+        doc: Unique ID of a Page Pool instance.
-+        type: uint
-+        checks:
-+          min: 1
-+          max: u32-max
-+      -
-+        name: ifindex
-+        doc: |
-+          ifindex of the netdev to which the pool belongs.
-+          May be reported as 0 if the page pool was allocated for a netdev
-+          which got destroyed already (page pools may outlast their netdevs
-+          because they wait for all memory to be returned).
-+        type: u32
-+        checks:
-+          min: 1
-+          max: s32-max
-+      -
-+        name: napi-id
-+        doc: Id of NAPI using this Page Pool instance.
-+        type: uint
-+        checks:
-+          min: 1
-+          max: u32-max
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 2943a151d4f1..176665bcf0da 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -64,11 +64,21 @@ enum {
+ 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
+ };
  
- operations:
-   list:
-@@ -120,6 +148,24 @@ name: netdev
-       doc: Notification about device configuration being changed.
-       notify: dev-get
-       mcgrp: mgmt
-+    -
-+      name: page-pool-get
-+      doc: |
-+        Get / dump information about Page Pools.
-+        (Only Page Pools associated with a net_device can be listed.)
-+      attribute-set: page-pool
-+      do:
-+        request:
-+          attributes:
-+            - id
-+        reply: &pp-reply
-+          attributes:
-+            - id
-+            - ifindex
-+            - napi-id
-+      dump:
-+        reply: *pp-reply
-+      config-cond: page-pool
++enum {
++	NETDEV_A_PAGE_POOL_ID = 1,
++	NETDEV_A_PAGE_POOL_IFINDEX,
++	NETDEV_A_PAGE_POOL_NAPI_ID,
++
++	__NETDEV_A_PAGE_POOL_MAX,
++	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+ 	NETDEV_CMD_DEV_DEL_NTF,
+ 	NETDEV_CMD_DEV_CHANGE_NTF,
++	NETDEV_CMD_PAGE_POOL_GET,
  
- mcast-groups:
-   list:
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index ea9231378aa6..9d34b451cfa7 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -10,11 +10,24 @@
+ 
+ #include <uapi/linux/netdev.h>
+ 
++/* Integer value ranges */
++static const struct netlink_range_validation netdev_a_page_pool_id_range = {
++	.min	= 1,
++	.max	= 4294967295,
++};
++
+ /* NETDEV_CMD_DEV_GET - do */
+ static const struct nla_policy netdev_dev_get_nl_policy[NETDEV_A_DEV_IFINDEX + 1] = {
+ 	[NETDEV_A_DEV_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
+ };
+ 
++/* NETDEV_CMD_PAGE_POOL_GET - do */
++#ifdef CONFIG_PAGE_POOL
++static const struct nla_policy netdev_page_pool_get_nl_policy[NETDEV_A_PAGE_POOL_ID + 1] = {
++	[NETDEV_A_PAGE_POOL_ID] = NLA_POLICY_FULL_RANGE(NLA_UINT, &netdev_a_page_pool_id_range),
++};
++#endif /* CONFIG_PAGE_POOL */
++
+ /* Ops table for netdev */
+ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	{
+@@ -29,6 +42,20 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.dumpit	= netdev_nl_dev_get_dumpit,
+ 		.flags	= GENL_CMD_CAP_DUMP,
+ 	},
++#ifdef CONFIG_PAGE_POOL
++	{
++		.cmd		= NETDEV_CMD_PAGE_POOL_GET,
++		.doit		= netdev_nl_page_pool_get_doit,
++		.policy		= netdev_page_pool_get_nl_policy,
++		.maxattr	= NETDEV_A_PAGE_POOL_ID,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd	= NETDEV_CMD_PAGE_POOL_GET,
++		.dumpit	= netdev_nl_page_pool_get_dumpit,
++		.flags	= GENL_CMD_CAP_DUMP,
++	},
++#endif /* CONFIG_PAGE_POOL */
+ };
+ 
+ static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index 7b370c073e7d..a011d12abff4 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -13,6 +13,9 @@
+ 
+ int netdev_nl_dev_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int netdev_nl_page_pool_get_doit(struct sk_buff *skb, struct genl_info *info);
++int netdev_nl_page_pool_get_dumpit(struct sk_buff *skb,
++				   struct netlink_callback *cb);
+ 
+ enum {
+ 	NETDEV_NLGRP_MGMT,
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 23074d4c75fc..24f4e54f6266 100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -5,8 +5,10 @@
+ #include <linux/xarray.h>
+ #include <net/net_debug.h>
+ #include <net/page_pool/types.h>
++#include <net/sock.h>
+ 
+ #include "page_pool_priv.h"
++#include "netdev-genl-gen.h"
+ 
+ static DEFINE_XARRAY_FLAGS(page_pools, XA_FLAGS_ALLOC1);
+ /* Protects: page_pools, netdevice->page_pools, pool->slow.netdev, pool->user.
+@@ -26,6 +28,131 @@ static DEFINE_MUTEX(page_pools_lock);
+  *    - user.list: unhashed, netdev: unknown
+  */
+ 
++typedef int (*pp_nl_fill_cb)(struct sk_buff *rsp, const struct page_pool *pool,
++			     const struct genl_info *info);
++
++static int
++netdev_nl_page_pool_get_do(struct genl_info *info, u32 id, pp_nl_fill_cb fill)
++{
++	struct page_pool *pool;
++	struct sk_buff *rsp;
++	int err;
++
++	mutex_lock(&page_pools_lock);
++	pool = xa_load(&page_pools, id);
++	if (!pool || hlist_unhashed(&pool->user.list) ||
++	    !net_eq(dev_net(pool->slow.netdev), genl_info_net(info))) {
++		err = -ENOENT;
++		goto err_unlock;
++	}
++
++	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!rsp) {
++		err = -ENOMEM;
++		goto err_unlock;
++	}
++
++	err = fill(rsp, pool, info);
++	if (err)
++		goto err_free_msg;
++
++	mutex_unlock(&page_pools_lock);
++
++	return genlmsg_reply(rsp, info);
++
++err_free_msg:
++	nlmsg_free(rsp);
++err_unlock:
++	mutex_unlock(&page_pools_lock);
++	return err;
++}
++
++struct page_pool_dump_cb {
++	unsigned long ifindex;
++	u32 pp_id;
++};
++
++static int
++netdev_nl_page_pool_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
++			     pp_nl_fill_cb fill)
++{
++	struct page_pool_dump_cb *state = (void *)cb->ctx;
++	const struct genl_info *info = genl_info_dump(cb);
++	struct net *net = sock_net(skb->sk);
++	struct net_device *netdev;
++	struct page_pool *pool;
++	int err = 0;
++
++	rtnl_lock();
++	mutex_lock(&page_pools_lock);
++	for_each_netdev_dump(net, netdev, state->ifindex) {
++		hlist_for_each_entry(pool, &netdev->page_pools, user.list) {
++			if (state->pp_id && state->pp_id < pool->user.id)
++				continue;
++
++			state->pp_id = pool->user.id;
++			err = fill(skb, pool, info);
++			if (err)
++				break;
++		}
++
++		state->pp_id = 0;
++	}
++	mutex_unlock(&page_pools_lock);
++	rtnl_unlock();
++
++	if (skb->len && err == -EMSGSIZE)
++		return skb->len;
++	return err;
++}
++
++static int
++page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
++		  const struct genl_info *info)
++{
++	void *hdr;
++
++	hdr = genlmsg_iput(rsp, info);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (nla_put_uint(rsp, NETDEV_A_PAGE_POOL_ID, pool->user.id))
++		goto err_cancel;
++
++	if (pool->slow.netdev->ifindex != LOOPBACK_IFINDEX &&
++	    nla_put_u32(rsp, NETDEV_A_PAGE_POOL_IFINDEX,
++			pool->slow.netdev->ifindex))
++		goto err_cancel;
++	if (pool->user.napi_id &&
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_NAPI_ID, pool->user.napi_id))
++		goto err_cancel;
++
++	genlmsg_end(rsp, hdr);
++
++	return 0;
++err_cancel:
++	genlmsg_cancel(rsp, hdr);
++	return -EMSGSIZE;
++}
++
++int netdev_nl_page_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	u32 id;
++
++	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_PAGE_POOL_ID))
++		return -EINVAL;
++
++	id = nla_get_uint(info->attrs[NETDEV_A_PAGE_POOL_ID]);
++
++	return netdev_nl_page_pool_get_do(info, id, page_pool_nl_fill);
++}
++
++int netdev_nl_page_pool_get_dumpit(struct sk_buff *skb,
++				   struct netlink_callback *cb)
++{
++	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_fill);
++}
++
+ int page_pool_list(struct page_pool *pool)
+ {
+ 	static u32 id_alloc_next;
 -- 
 2.42.0
 
