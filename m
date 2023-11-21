@@ -1,121 +1,193 @@
-Return-Path: <netdev+bounces-49567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687697F275D
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:22:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0507F27A9
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 093D7B2187A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:22:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7436C28288C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1240A3A278;
-	Tue, 21 Nov 2023 08:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2744C136D;
+	Tue, 21 Nov 2023 08:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EeiNnOVB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uSq3mAmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F42F9
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:22:06 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso6656a12.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:22:06 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C311995
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:40:45 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-4083f61312eso25595975e9.3
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:40:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700554925; x=1701159725; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FCK1g9YM8XFjym+Y1ma/CnG4HTN5lgzW4MRhGnM9Ctg=;
-        b=EeiNnOVB61DSfWZT9NiKt2naE2DONQ3VnXhdeyq1oif3E2uLjHqe8NkhtUTkXNLqQR
-         aqZksBmH+efpSrmqVfxtSsGpLeKixUl9TQyp+AzQeVnYnQ1F6VgUoEA1ysokhZP9hHT/
-         HP7Oo7nFZ/BjpoBWv7STFJPpRup4sxdefBsI40vk+ThVvb6vWQAIiqTkZbtiAEMER7BI
-         W4acUuzSCi8bTGLQfVNeSJqkqHZ9HOgYurOLetOjYe/NpW5/XUsAWJ4AEaAoqjpDDizt
-         OFHdnIg4nhf7fWm3ID63MP67mjRvtJgMh/v5uXxx2JGnlptz8GwElIVnxL0CWRX4wf5M
-         FAnw==
+        d=linaro.org; s=google; t=1700556044; x=1701160844; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FsxD9BfYv48OQVamFFAxMDLyeOJr8bobuaBNTZuFtUs=;
+        b=uSq3mAmWPHCsxoKSm06sUIHDIP4Pqjh764++gjHWR/jaxUsUfM5pKSxp3yQ0hlHGrt
+         uwaX3gphrt9N+9sJRp95Xq9O1bbnA+umsiP7Mmd2k0Cugyt7f7NlcPAz0i5bCKpudnYY
+         YY1G50YC/G4w6xFJxCuyML40ZJXBqPHoEeHdXufPgmt64mpAcW9IO3rVVZEZ5UMez8zF
+         BvNomFyd6MbUqclqphpOzF8WoE4lSZetxMl9g9F6mH+jNiEK1e36HCOl2UJ7b/qpD57n
+         oE7fmq9vYc4oDuX72Rdv/VwFpf/u94IupAeYph94OnaOTMbkU5O0RbnVgeBI9XlL637c
+         0C1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700554925; x=1701159725;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FCK1g9YM8XFjym+Y1ma/CnG4HTN5lgzW4MRhGnM9Ctg=;
-        b=TMV488gRf4ygJXmIEkXcsh75aan3cIKFH9R+gbzqIRIsaSDqvyiHV77n/MwuEujHqJ
-         ZChb2NhdS5SmT73VkJ+zZpEKewmVlOxL1NU+q79E7w7WBL8UCLQrLGi9IjVJZ5Gi/4+h
-         /iAoYq03sAs6MT57ffQo/516uDqcpsC1VA+WVf02xDLAQdwBVJUPVUDU0isyXytzihrQ
-         Ftr8AVXPh+hNzqZswdm4dN0G3RUVQgimk4lHno0etsSrypavOFoHMWy8oh8oiHvl0Mn3
-         VbLQorGzMXWWeejLt4yxspgxu8wbcsuYSByYjWgOIrgqqGprZe+LxfbTHQNXGVf0Q5w8
-         cS8A==
-X-Gm-Message-State: AOJu0YxRrgrXJp80a1STMj62eAq/LPwczkwVAXkXfjJloOKeFjYhbLuf
-	mrPRJv53qeIMNZ4j5bEc13NE5kFetulUs+ozJA53RQ==
-X-Google-Smtp-Source: AGHT+IEQIy1UWv0nXe/YssFHF48Ncyrazvf+xBS3VY2h5GiT2ncZWuBZH2HEP6iMFMutvlKr9G8jO5eCeWr5mET04R0=
-X-Received: by 2002:a05:6402:4414:b0:544:e2b8:ba6a with SMTP id
- y20-20020a056402441400b00544e2b8ba6amr463035eda.3.1700554924840; Tue, 21 Nov
- 2023 00:22:04 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700556044; x=1701160844;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FsxD9BfYv48OQVamFFAxMDLyeOJr8bobuaBNTZuFtUs=;
+        b=cPn4QjL90vGNZo5sE984q7Lqyi4oIBqa7nC2oQ3OAkzerxO7lwpRsyzfMoob2M42ug
+         ye9jtisMiAcFf4ZKgNfkCeXaQl0R4ksJcZDf05f62ojBXR6jI1R/px/llHW1vHuGuCEK
+         JsRYcIGKJNeHa4uQPdfka1qUwv2xcuzeUrzMB7I0OC3uS6jUBqvHNFFzRDxBUm6Nyk/Q
+         EyygrP2A7XQTqMTN+xap4HjycaxNxoMUadY1zIMKIyGrC7jmJqG/svmthbFceWk2/4GS
+         4YS84ab1GXYKO+LaO+1Nl20snEgpfcpnp7c0NH1pRD2UBv5PsUQEMbHcK3+aJbGob/UO
+         Egpw==
+X-Gm-Message-State: AOJu0YzghtpKmUYUD+gAJMccEdd2MQVWdwh8LjhH5E5dzeKH0QAFnbyx
+	J+bAKw9QU3sl+z9nxIWAfQL9kA==
+X-Google-Smtp-Source: AGHT+IEbRsvtuamm0plE03/8r7RAvIadbllOXNaZoqBXYOmNsD272i5eetmdMrGpwal+zKzs0TbZgg==
+X-Received: by 2002:adf:fd0c:0:b0:331:6ad1:81ec with SMTP id e12-20020adffd0c000000b003316ad181ecmr6463144wrr.25.1700556044155;
+        Tue, 21 Nov 2023 00:40:44 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.11])
+        by smtp.gmail.com with ESMTPSA id a18-20020adfeed2000000b00327de0173f6sm13805773wrp.115.2023.11.21.00.40.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 00:40:43 -0800 (PST)
+Message-ID: <c187f8d6-6178-4ef2-958b-16e274a49b91@linaro.org>
+Date: Tue, 21 Nov 2023 09:40:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121020111.1143180-1-dima@arista.com> <20231121020111.1143180-4-dima@arista.com>
-In-Reply-To: <20231121020111.1143180-4-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 21 Nov 2023 09:21:53 +0100
-Message-ID: <CANn89i+2xLv=bR5u0iGcmZhZ8WZjPHyzaqAe3cZAhmc95KSVag@mail.gmail.com>
-Subject: Re: [PATCH 3/7] net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
+ Ethernet TSN
+Content-Language: en-US
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
+ <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
+ <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 21, 2023 at 3:01=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> Listen socket is not an established TCP connection, so
-> setsockopt(TCP_AO_REPAIR) doesn't have any impact.
->
-> Restrict this uAPI for listen sockets.
->
-> Fixes: faadfaba5e01 ("net/tcp: Add TCP_AO_REPAIR")
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  net/ipv4/tcp.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 53bcc17c91e4..2836515ab3d7 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3594,6 +3594,10 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
-int optname,
->                 break;
->
->         case TCP_AO_REPAIR:
-> +               if (sk->sk_state =3D=3D TCP_LISTEN) {
-> +                       err =3D -ENOSTR;
+On 21/11/2023 09:00, Geert Uytterhoeven wrote:
+> On Tue, Nov 21, 2023 at 8:45 AM Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
+>> On 20/11/2023 17:07, Niklas Söderlund wrote:
+>>> Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
+>>> device provides Ethernet network.
+>>>
+>>> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> 
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+>>> @@ -0,0 +1,133 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Renesas Ethernet TSN End-station
+>>> +
+>>> +maintainers:
+>>> +  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
+>>> +
+>>> +description:
+>>> +  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
+>>> +  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    oneOf:
+>>> +      - items:
+>>
+>> Drop items.
+>>
+>> I assume you have oneOf above because you predict this will grow with
+>> entries with fallbacks? If not, drop.
+>>
+>>> +          - enum:
+>>> +              - renesas,ethertsn-r8a779g0      # R-Car V4H
+> 
+> renesas,r8a779g0-ethertsn
 
-ENOSTR is not used a single time in linux.
+You can try to make a schema for this. See for examples:
+Documentation/devicetree/bindings/arm/qcom-soc.yaml
 
-I suggest you use tcp_can_repair_sock() helper (and return -EPERM as
-other TCP_REPAIR options)
+> 
+> R-Car S4 also has EtherTSN.
+> Is it identical, so it makes sense to add a renesas,rcar-gen4-ethertsn
+> fallback?
+> 
+>>> +  renesas,rx-internal-delay:
+>>> +    type: boolean
+>>> +    description:
+>>> +      Enable internal Rx clock delay, typically 1.8ns.
+>>
+>> Why this is bool, not delay in ns?
+>> Why this is property of a board (not SoC)?
+> 
+> Standard property is rx-internal-delay-ps.
 
-> +                       break;
-> +               }
->                 err =3D tcp_ao_set_repair(sk, optval, optlen);
->                 break;
->  #ifdef CONFIG_TCP_AO
-> @@ -4293,6 +4297,8 @@ int do_tcp_getsockopt(struct sock *sk, int level,
->         }
->  #endif
->         case TCP_AO_REPAIR:
-> +               if (sk->sk_state =3D=3D TCP_LISTEN)
-> +                       return -ENOSTR;
->                 return tcp_ao_get_repair(sk, optval, optlen);
->         case TCP_AO_GET_KEYS:
->         case TCP_AO_INFO: {
-> --
-> 2.42.0
->
+Thanks.
+
+
+
+Best regards,
+Krzysztof
+
 
