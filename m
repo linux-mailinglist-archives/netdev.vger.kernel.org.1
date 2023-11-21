@@ -1,174 +1,312 @@
-Return-Path: <netdev+bounces-49628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 280177F2CEC
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:17:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51EF87F2C17
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58C361C20E31
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBFB11F227C1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FB549F7F;
-	Tue, 21 Nov 2023 12:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2BC487BF;
+	Tue, 21 Nov 2023 11:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="d6qwFxww"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="l0SjEvrD"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 1109 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 21 Nov 2023 04:17:07 PST
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F93B185
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:17:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=0nbt5
-	Iv6Psgndc9/7xheezuoX2tizM5FTvQBexU/VpI=; b=d6qwFxwwscbDqWjScE9wr
-	rRtRKKFeRXTaO3gkBNm+KhJKY+1KdIz6vFFxLILJ8za6Hx34ueTJhRlQKlvo71Qi
-	KzttJ8gNcDXt2AXVCK4f0s5bXHnlgZWovuHLs+ZrD8XYWtWGkDle9EgyYlpn2GUZ
-	7qlUgYejoifPVD5b6IKgGM=
-Received: from ubuntu.localdomain (unknown [111.222.250.119])
-	by zwqz-smtp-mta-g5-0 (Coremail) with SMTP id _____wD3f_oWmlxlBnazCw--.33745S2;
-	Tue, 21 Nov 2023 19:52:58 +0800 (CST)
-From: Shifeng Li <lishifeng1992@126.com>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jackm@dev.mellanox.co.il,
-	ogerlitz@mellanox.com,
-	roland@purestorage.com,
-	eli@mellanox.com
-Cc: dinghui@sangfor.com.cn,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shifeng Li <lishifeng1992@126.com>
-Subject: [PATCH v2] net/mlx5e: Fix a race in command alloc flow
-Date: Tue, 21 Nov 2023 03:52:51 -0800
-Message-Id: <20231121115251.588436-1-lishifeng1992@126.com>
-X-Mailer: git-send-email 2.25.1
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2055.outbound.protection.outlook.com [40.107.7.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4229D11A;
+	Tue, 21 Nov 2023 03:53:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j2+cXEaNa3PU2J2uYXDu70UMSUzFGG7WCoN0UNF7s1SjKy9tY0sHV70zefNhqRNlK6njt/u1lK7Fu380Scu9A3UPEIeE6ppa7CyDCvaB2h51S8BNvu2m5eC8JSGsw4XAe47TV3AB8ZZj+5zMOJZ6XGgnS+pbobQ7Rf8JFTdSw/AhLh7S2ZZH5zPjYAY7BtataZeV7SRfy6D60xN/HI2B8J9tkqBksVRHOFmjkMt9nHha0uwK+A1SczQgMWQ85Pb9cuu2pFPxB3PM4u6f0AuHavB9ZIXRoRwaRLmTF71YfaML8VSY4EQxzqsgYOKsWNfrgKYeY71ARRLukMGztASVfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OjsgGGgE4yXUs0YKBScoy5f/seh4ApHj5uVUteuolWI=;
+ b=PlTDDhyBRC0F7AFEsNKlDXapAP3cFE7ECmDoaF8vEOt403Mzo4OeZNk1in8prHL5ivwFJb+47+4AlX5Fz7uXhy5utik45E+MqAhwdefDrkQBYasvXkaMDGcuOwvhodcNgvFvrMo2oW1NAV+RxQcvjrFTXZZNC9JZ89NrAoDOnd0K34lGSJku7nDEvQ2XX1aDMfM8KI61KXkSmas6NosuMwnBWynqQKNegbDAOwP8SDYRQTkRv/NY/QdGItdw5sTeJf4q4vtTjYRouBggSacUADCxrUDF3jpX/biMYqjZeD4b5JaeKc2MQIdpqR0ihewH3fQUgk9nm233L5hZL6+GAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OjsgGGgE4yXUs0YKBScoy5f/seh4ApHj5uVUteuolWI=;
+ b=l0SjEvrD4zizizrXp86EfNFv+nGVZ2XO/OWN/O0KNR4YmEz2KflggfOt9MhjHz5okdeIjCJqAemw7PBnOImL66ecagFjB8o6urdnjYFzH092S8X7x1VPAErzlO2/rqiACq5KadJmdGOovFGt+MQK5M63+gI4M5FbtOh6AVSC2hE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB7942.eurprd04.prod.outlook.com (2603:10a6:20b:2a9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.17; Tue, 21 Nov
+ 2023 11:53:17 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.017; Tue, 21 Nov 2023
+ 11:53:17 +0000
+Date: Tue, 21 Nov 2023 13:53:14 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
+	vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 6/7] net: ethernet: ti: am65-cpsw-qos: Add
+ Frame Preemption MAC Merge support
+Message-ID: <20231121115314.deuvdjk64rcwktl4@skbuf>
+References: <20231120140147.78726-1-rogerq@kernel.org>
+ <20231120140147.78726-7-rogerq@kernel.org>
+ <20231120232620.uciap4bazypzlg3g@skbuf>
+ <eeea995b-a294-4a46-aa3e-93fc2b274504@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eeea995b-a294-4a46-aa3e-93fc2b274504@kernel.org>
+X-ClientProxiedBy: AS4P250CA0019.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::10) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3f_oWmlxlBnazCw--.33745S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWrWkKw1kKFy5GF1UZryDAwb_yoWrKF4UpF
-	W7Wry7AF48Gw4q9r4vqF40v3W8C39rK3srGF1I93Z3W3Z8A34kAa4kJFyjgryUuFWxtFy7
-	JayDt3W8Arn3XF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U-zVbUUUUU=
-X-Originating-IP: [111.222.250.119]
-X-CM-SenderInfo: xolvxx5ihqwiqzzsqiyswou0bp/1S2mtgUvr1pD4QWXJgAAs-
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7942:EE_
+X-MS-Office365-Filtering-Correlation-Id: d35fffd9-8729-4d14-50a9-08dbea887372
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1or0/O+jT6XAz5I4mBZLeyjZwM880PqkhVtjzraC1dQAICGJdkYu04rAmT2JzPvsB4bqQKiNjJk8v0E0Bc2x6TxZLqj0ZLKvHixvHjpeYfJbCTqY/1mpvq1PQaajmkraaYShjxH3YGms+upuhaMar51RgZx/+D+Wj9n1pSNZzxbi2iAs2b1ik4C9XjBE+cJv4LGY4C38UAfJ+KvBDrvBB7l+txjkJDKNUQJSlK9bO5mfs/j6LFNseMSp3YEEj+yYA4VwTqrnQI6OFxneS0qZHvl2yc2rxcOSJHx4S7P7DgA4roid6Jm0FiwFdCFFL54aqZdG+KdfQXjpXhPJiJvyaPZXTZv1eXj/F14H5KIhnlVpBTF175hrGkLQOt1KXupIickRUIqlrpizpj5qAHAnf7bgszlYU+5wZmPPow9Qewrs6zYTb5VQIZj7l4nTUfjCUYE93r3DR0q7tKLdW/WvWjK2smrXE0/CLOGRb0ISMJZu+y7paN9YoCRQf87vdNAfnmCYtUY6g2mDgnQk4dFHdCb52i7b3Pp7yzyFehieFFTIOymYpZT3Lj6Pn3XC4U7H5n3DHtcy88RxJxlRmkk2OvklBq0dIlS8exnzgr6rxPk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(376002)(346002)(136003)(366004)(230273577357003)(230922051799003)(230173577357003)(1800799012)(186009)(451199024)(64100799003)(5660300002)(7416002)(44832011)(2906002)(41300700001)(4326008)(8936002)(8676002)(66946007)(316002)(6916009)(66556008)(66476007)(86362001)(1076003)(26005)(966005)(6486002)(478600001)(6512007)(9686003)(6666004)(53546011)(6506007)(83380400001)(38100700002)(33716001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1liWJe7BoyLxCQgU7nlPEyV4618oYJoIq6i6c5/wOUe9/dZ5xBr2i/9n5cKj?=
+ =?us-ascii?Q?foRNjBZ1q4L+e1dGfjUn/DpcXQz5bwq9XrPsaY0Bhyvf7mPPcVGRCPm5XNNj?=
+ =?us-ascii?Q?aU1WHCyabkModd1cqaPBdNRez5o+jVknS6EE77Thk4NZX6DQRBWoWfvTE5N1?=
+ =?us-ascii?Q?tbrXg4koY4cPeWiA5plqA292sSKCguhxOWYkZB8AqvW+Mpqna+5ra80RWX3q?=
+ =?us-ascii?Q?fmYiDaE4rqGa7Z5oODa5X3AmR/sKBY+RnxHSlHNHJpy4BHVjO6j4vXRfjhyv?=
+ =?us-ascii?Q?yqjdVolP6KIY/4IB9aaL77SfE61sQ6LF9085db9//evoT+SNPKIFqYuqeaSM?=
+ =?us-ascii?Q?qIKWb8y0yx0vAA4L78NxFBHtf0YiYsyuRFN3Y3OWLjSe0lPfEoaq9QpI3po5?=
+ =?us-ascii?Q?H4AvxMui/Ihv3uqc1QncQG4oRv0W5U4+KseRRCmE1fz6zmHz/+GQnmZ3x0TF?=
+ =?us-ascii?Q?pzA5A9s2VbruI02uWLJJj6JXQYxo46D+zhjdj3hYMBv5RfjmDHh6nmIHPX39?=
+ =?us-ascii?Q?SNGlFDqWOukQqBeVJCMlzSwXhsAHaMclSPor7szAAv9/ZoONuCgxQlcdKKQK?=
+ =?us-ascii?Q?k/0pFHVupDNra7C15TNGShRoVOy8fp6mLRNTzB8wAQiRHPFlPoLAp3c0vN2a?=
+ =?us-ascii?Q?IB7oko7na8SCd4yCqHDhghQN7chCxDmH8NiU58/FA2f+WchrbAjT1sC4lMEZ?=
+ =?us-ascii?Q?wvRJhzEC5CsAaMGSBVBJbPsydEpJhimN4HCHhHw4aB2re8FpZzwmLn3G9XYC?=
+ =?us-ascii?Q?1dPpm7lMfxuWdX69ejNCpRqyQ9MnRx30HO6wrAB/2zQqKeliygUis0d+u8q9?=
+ =?us-ascii?Q?keZIw0GdiO01gtDMiEzR0Fw3m4Fm10aLvblEcUU68ZzfJzEz7c7c1eQ/vwLJ?=
+ =?us-ascii?Q?mR7H/AMwdXfgG4Ja/9voyN5W6ZWfIS4JloM6ynuMfAmj6xcDn2YWI5kROTa9?=
+ =?us-ascii?Q?Ea5DWy+/xN/gEoOIIznLfRwvyLC7euucSRPr1J0pKqQuVTBOKf0wA4PnNu2p?=
+ =?us-ascii?Q?DBzxjiQDlDQpjiZaAtATR3RLesloff9xfjIKSchx9eo3l/2ZguE2yTK4xI0M?=
+ =?us-ascii?Q?XDvZr401RpAqIq8yGw8Z9l+Ys+qa5gNC2Xpc4b0Ft4EbVSKpjVgXSw3nGtMA?=
+ =?us-ascii?Q?Cd4PeV99SMqBfBgVtY55yzXSX/IJQhbyLdBbLUn4My/+xq/cgzcJtDjBl+su?=
+ =?us-ascii?Q?gYmIBXBLrXoliYR0zSFaTfJb/0zHPPSj9LI+BnrHjoB8IFWAZUlcB/1Ye76Y?=
+ =?us-ascii?Q?Gz57nCVjzBUQFoonN8oBZupfaByiWN0MBSXc+LIqdzh4vkPbdZm3EPAmf3H3?=
+ =?us-ascii?Q?UvXAFWGMKaE5OCPmPagBM2gODMiR6wYCDMnptcRdsWAQctLKTFXDi5o7JOmU?=
+ =?us-ascii?Q?8YN2ln01YvPj9G3YS8uRSEc6JNZiW9h8S4HHiYv6cpgHzbkrKpAymqQ7K5eG?=
+ =?us-ascii?Q?6cZsaPuiyatNfSpveMYk06GnNWz4so58MtEQN2/h0YbCf+qeqfEntkRLG7w/?=
+ =?us-ascii?Q?0mcYq4pMb2hruqJAbVDYb9f6AmbZeqawdwnXCcLuwhqyZF81HfXsV2y/y326?=
+ =?us-ascii?Q?b1xGmiVJLYRoFoKxumEM7KSk/S67EDOdwCVb7gUSxLnLHqHIlsGHlWTIhuAn?=
+ =?us-ascii?Q?Ag=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d35fffd9-8729-4d14-50a9-08dbea887372
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 11:53:17.8064
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VA1du45u9yaqFD5U2FxEMx4auL1Xz32e3R9JKGra0OAhasbKqdNwa5b0lfNGHxokJTR0oK1JfXhs9HJyN5Ww6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7942
 
-Fix a cmd->ent use after free due to a race on command entry.
-Such race occurs when one of the commands releases its last refcount and
-frees its index and entry while another process running command flush
-flow takes refcount to this command entry. The process which handles
-commands flush may see this command as needed to be flushed if the other
-process allocated a ent->idx but didn't set ent to cmd->ent_arr in
-cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
-the spin lock.
+On Tue, Nov 21, 2023 at 01:02:50PM +0200, Roger Quadros wrote:
+> Yes I'm using openlldp master.
+> 
+> So I just dumped the "ethtool --show-mm" right before the "lldptool -i $h1 -t -n -V addEthCaps"
+> and this is what I see
+> 
+> # MAC Merge layer state for eth0:
+> # pMAC enabled: on
+> # TX enabled: off
+> # TX active: off
+> # TX minimum fragment size: 252
+> # RX minimum fragment size: 124
+> # Verify enabled: off
+> # Verify time: 10
+> # Max verify time: 134
+> # Verification status: DISABLED
+> # 
+> # MAC Merge layer state for eth1:
+> # pMAC enabled: on
+> # TX enabled: off
+> # TX active: off
+> # TX minimum fragment size: 124
+> # RX minimum fragment size: 124
+> # Verify enabled: off
+> # Verify time: 10
+> # Max verify time: 134
+> # Verification status: DISABLED
+> # 
+> # Additional Ethernet Capabilities TLV
+> #       Preemption capability supported
+> #       Preemption capability not enabled
+> #       Preemption capability not active
+> #       Additional fragment size: 3 (252 octets)
+> # Additional Ethernet Capabilities TLV
+> #       Preemption capability supported
+> #       Preemption capability not enabled
+> #       Preemption capability not active
+> #       Additional fragment size: 1 (124 octets)
+> # Warning: Stopping lldpad.service, but it can still be activated by:
+> #   lldpad.socket
+> # TEST: LLDP                                                          [FAIL]
+> 
+> 
+> If I add the following lines at the beginning of lldp() routine,
+> then it works.
+> 
+> lldp()
+> {
+>         RET=0
+> 
+> +        ethtool --set-mm $h1 tx-enabled on verify-enabled on
+> +        ethtool --set-mm $h2 tx-enabled on verify-enabled on
+> ...
+> }
+> 
+> Is lldp supposed to turn on tx-enabled and verify-enabled for us
+> or it is test scritps responsibility?
 
-[70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
-[70013.081968]
-[70013.081989] CPU: 26 PID: 1433361 Comm: kworker/26:1 Kdump: loaded Tainted: G           OE     4.19.90-25.17.v2101.osc.sfc.6.10.0.0030.ky10.x86_64+debug #1
-[70013.082001] Hardware name: SANGFOR 65N32-US/ASERVER-G-2605, BIOS SSSS5203 08/19/2020
-[70013.082028] Workqueue: events aer_isr
-[70013.082053] Call Trace:
-[70013.082067]  dump_stack+0x8b/0xbb
-[70013.082086]  print_address_description+0x6a/0x270
-[70013.082102]  kasan_report+0x179/0x2c0
-[70013.082133]  ? mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.082213]  ? mlx5_cmd_use_polling+0x20/0x20 [mlx5_core]
-[70013.082223]  ? kmem_cache_free+0x1ad/0x1e0
-[70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
-[70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
-[70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
-[70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
-[70013.082390]  ? __pm_runtime_resume+0x58/0x70
-[70013.082409]  pci_device_remove+0xf3/0x280
-[70013.082426]  ? pcibios_free_irq+0x10/0x10
-[70013.082439]  device_release_driver_internal+0x1c3/0x470
-[70013.082453]  pci_stop_bus_device+0x109/0x160
-[70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
-[70013.082485]  pcie_do_fatal_recovery+0x167/0x550
-[70013.082493]  aer_isr+0x7d2/0x960
-[70013.082510]  ? aer_get_device_error_info+0x420/0x420
-[70013.082526]  ? __schedule+0x821/0x2040
-[70013.082536]  ? strscpy+0x85/0x180
-[70013.082543]  process_one_work+0x65f/0x12d0
-[70013.082556]  worker_thread+0x87/0xb50
-[70013.082563]  ? __kthread_parkme+0x82/0xf0
-[70013.082569]  ? process_one_work+0x12d0/0x12d0
-[70013.082571]  kthread+0x2e9/0x3a0
-[70013.082579]  ? kthread_create_worker_on_cpu+0xc0/0xc0
-[70013.082592]  ret_from_fork+0x1f/0x40
+lldpad should absolutely do that.
+https://github.com/intel/openlldp/blob/master/lldp_8023.c#L701
 
-Fixes: e126ba97dba9 ("mlx5: Add driver for Mellanox Connect-IB adapters")
-Signed-off-by: Shifeng Li <lishifeng1992@126.com>
+Try to see what goes on and if there isn't, in fact, an error during the
+netlink communication with the kernel.
+
+Edit /usr/local/lib/systemd/system/lldpad.service:
+ExecStart=/usr/local/sbin/lldpad -t -V 7
+                                   ~~~~~
+                                   increases log level
+Then run:
+
+$ systemctl daemon-reload
+$ journalctl -u lldpad.service -f &
+$ ./ethtool_mm.sh eno0 swp0
+
+During the test you should see:
+
+lldpad[4764]: eno0: Link partner preemption capability supported
+lldpad[4764]: eno0: Link partner preemption capability not enabled
+lldpad[4764]: eno0: Link partner preemption capability not active
+lldpad[4764]: eno0: Link partner minimum fragment size: 252 octets
+lldpad[4764]: eno0: initiating MM verification with a retry interval of 127 ms...
+lldpad[4764]: rxProcessFrame: allocated TLV 0 was not stored! 0xaaaafd7cfbe0
+lldpad[4764]: swp0: Link partner preemption capability supported
+lldpad[4764]: swp0: Link partner preemption capability not enabled
+lldpad[4764]: swp0: Link partner preemption capability not active
+lldpad[4764]: swp0: Link partner minimum fragment size: 60 octets
+lldpad[4764]: swp0: initiating MM verification with a retry interval of 128 ms...
+lldpad[4764]: rxProcessFrame: allocated TLV 0 was not stored! 0xaaaafd7cfd30
+
+> 
+> The test fails later at "addFragSize 0", but that is because we don't
+> support RX fragment size 60 due to errata.
+> If I skip that test then all the rest of the tests pass.
+
+Hmm, yeah, the test is dumb. lldpad has this logic, so if we request 0
+it should still advertise 1.
+
+	if (config_add_frag_size < add_frag_size) {
+		LLDPAD_WARN("%s: Configured addFragSize (%d) smaller than the minimum value requested by kernel (%d). Using the latter\n",
+			    bd->ifname, config_add_frag_size, add_frag_size);
+		config_add_frag_size = add_frag_size;
+	}
+
+I guess that logic does engage, but the selftest doesn't expect that it
+will, because it expects that lldpad will report back exactly the
+requested value - and it will report the true value instead.
+
+Luckily I know what to do here, see the patch below.
+
+From 0ed218345f16a0f2c0efd5eba1838ccb3d8e4921 Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Tue, 21 Nov 2023 13:42:14 +0200
+Subject: [PATCH] selftests: forwarding: ethtool_mm: support devices with
+ higher rx-min-frag-size
+
+Some devices have errata due to which they cannot report ETH_ZLEN (60)
+in the rx-min-frag-size. This was foreseen of course, and lldpad has
+logic that when we request it to advertise addFragSize 0, it will round
+it up to the lowest value that is _actually_ supported by the hardware.
+
+The problem is that the selftest expects lldpad to report back to us the
+same value as we requested.
+
+Make the selftest smarter by figuring out on its own what is a
+reasonable value to expect.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
----
-v1->v2: fix code conflicts.
+ .../selftests/net/forwarding/ethtool_mm.sh    | 37 ++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index f8f0a712c943..a7b1f9686c09 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -156,15 +156,18 @@ static u8 alloc_token(struct mlx5_cmd *cmd)
- 	return token;
+diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+index 39e736f30322..6212913f4ad1 100755
+--- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
++++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
+@@ -155,15 +155,48 @@ manual_failed_verification_h2_to_h1()
+ 	manual_failed_verification $h2 $h1
  }
  
--static int cmd_alloc_index(struct mlx5_cmd *cmd)
-+static int cmd_alloc_index(struct mlx5_cmd *cmd, struct mlx5_cmd_work_ent *ent)
++smallest_supported_add_frag_size()
++{
++	local iface=$1
++	local rx_min_frag_size=
++
++	rx_min_frag_size=$(ethtool --json --show-mm $iface | \
++		jq '.[]."rx-min-frag-size"')
++
++	if [ $rx_min_frag_size -le 60 ]; then
++		echo 0
++	elif [ $rx_min_frag_size -le 124 ]; then
++		echo 1
++	elif [ $rx_min_frag_size -le 188 ]; then
++		echo 2
++	elif [ $rx_min_frag_size -le 252 ]; then
++		echo 3
++	else
++		echo "$iface: RX min frag size $rx_min_frag_size cannot be advertised over LLDP"
++		exit 1
++	fi
++}
++
++expected_add_frag_size()
++{
++	local iface=$1
++	local requested=$2
++	local min=$(smallest_supported_add_frag_size $iface)
++
++	[ $requested -le $min ] && echo $min || echo $requested
++}
++
+ lldp_change_add_frag_size()
  {
- 	unsigned long flags;
- 	int ret;
+ 	local add_frag_size=$1
++	local pattern=
  
- 	spin_lock_irqsave(&cmd->alloc_lock, flags);
- 	ret = find_first_bit(&cmd->vars.bitmask, cmd->vars.max_reg_cmds);
--	if (ret < cmd->vars.max_reg_cmds)
-+	if (ret < cmd->vars.max_reg_cmds) {
- 		clear_bit(ret, &cmd->vars.bitmask);
-+		ent->idx = ret;
-+		cmd->ent_arr[ent->idx] = ent;
-+	}
- 	spin_unlock_irqrestore(&cmd->alloc_lock, flags);
+ 	lldptool -T -i $h1 -V addEthCaps addFragSize=$add_frag_size >/dev/null
+ 	# Wait for TLVs to be received
+ 	sleep 2
+-	lldptool -i $h2 -t -n -V addEthCaps | \
+-		grep -q "Additional fragment size: $add_frag_size"
++	pattern=$(printf "Additional fragment size: %d" \
++			 $(expected_add_frag_size $h1 $add_frag_size))
++	lldptool -i $h2 -t -n -V addEthCaps | grep -q "$pattern"
+ }
  
- 	return ret < cmd->vars.max_reg_cmds ? ret : -ENOMEM;
-@@ -979,7 +982,7 @@ static void cmd_work_handler(struct work_struct *work)
- 	sem = ent->page_queue ? &cmd->vars.pages_sem : &cmd->vars.sem;
- 	down(sem);
- 	if (!ent->page_queue) {
--		alloc_ret = cmd_alloc_index(cmd);
-+		alloc_ret = cmd_alloc_index(cmd, ent);
- 		if (alloc_ret < 0) {
- 			mlx5_core_err_rl(dev, "failed to allocate command entry\n");
- 			if (ent->callback) {
-@@ -994,15 +997,14 @@ static void cmd_work_handler(struct work_struct *work)
- 			up(sem);
- 			return;
- 		}
--		ent->idx = alloc_ret;
- 	} else {
- 		ent->idx = cmd->vars.max_reg_cmds;
- 		spin_lock_irqsave(&cmd->alloc_lock, flags);
- 		clear_bit(ent->idx, &cmd->vars.bitmask);
-+		cmd->ent_arr[ent->idx] = ent;
- 		spin_unlock_irqrestore(&cmd->alloc_lock, flags);
- 	}
- 
--	cmd->ent_arr[ent->idx] = ent;
- 	lay = get_inst(cmd, ent->idx);
- 	ent->lay = lay;
- 	memset(lay, 0, sizeof(*lay));
+ lldp()
 -- 
-2.25.1
-
+2.34.1
 
