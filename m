@@ -1,98 +1,148 @@
-Return-Path: <netdev+bounces-49698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D68D7F31E2
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:05:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 918CF7F31F3
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE4A41C20E62
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:05:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C049282B37
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67B955C3D;
-	Tue, 21 Nov 2023 15:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C1547774;
+	Tue, 21 Nov 2023 15:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KC7MhirZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hy8aYddk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F651100;
-	Tue, 21 Nov 2023 07:04:57 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1cf74ad87e0so2195855ad.3;
-        Tue, 21 Nov 2023 07:04:57 -0800 (PST)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B1C12E
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:06:20 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c87adce180so34232331fa.0
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:06:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700579097; x=1701183897; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MamKMnl7Z6RhslBmaPtWYRegLQ83xlkelf65TWw0tPY=;
-        b=KC7MhirZeeyNKeMbUeebN8m8NLHo6zepgWNNtd7G4ZHne/m9M92dHCWGmD9KiksfZA
-         hNQq6a8N8+wMSOiIC7+kD0YhmlBJKgytGIW8r8KGp30v/3/iHuuAcYgD3VMU4irpVp0K
-         JBdSK57vqKFoGq7ObXV7sgVOb5GjROXOvn9GL97qksha8FSct3WKOkrtIc9d6Bw6+JeU
-         n+RMsLo04Y26wk6Ht5a3cfz2fBUaFmBEokhH8azgC5uTidoXsdYdU0XG7pW4yoL6URjv
-         a6hmKaCXk3krE+x0MrcInRoNBQK0e/Wx4oZEf36gvN6kLSFOi77aE2NbX/mL0mGnPJwj
-         u4wQ==
+        d=linaro.org; s=google; t=1700579178; x=1701183978; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q5hhhZRHfGe2KU1JRk5bNtC/vyWS7Y/hyQQ+jMEFV7c=;
+        b=Hy8aYddkZ/95OfYlHwCILXA+QWgUCK4fSs70Ig0QGyn1i5dqTEtobc2ybdjkDQJli4
+         vzE+O6K2tDC6bj+3kSyt97ZHOih2UIwduWHisNoRufWbaTv/hlkBKr/Vohd9As+knq8P
+         IGsMrEBAwR/Grf+7fekT+8yNL8FkhYAJMgKZl0CUBRek9B9pUsSswTtFMIw/HmGoAqsL
+         X+kCRWXyJ88Wi1pFoV+JYPpIgbe0Dmbjuk7fjtKNUGLfVyxi3R4Ln2T6okduvYtIb2la
+         l4yYF82cmXZZjb0UqV/CMmRqz18MGLkfsUe3MDFWL29qVB5VVEiIhqgsxLgh/oJSw+u5
+         AHQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700579097; x=1701183897;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MamKMnl7Z6RhslBmaPtWYRegLQ83xlkelf65TWw0tPY=;
-        b=VymDVQYVuq/4gfhuntEJDhyDFZ+poKiYmYenZ9bU33uFYlL799uUsR8hMDD8HsGCLk
-         iM0pZeDOm9oZtvPEnyJ/aXkCnwLF/CohVn0zn+pvy+OUz5tInyO8eOCvP/47G2C1IBbv
-         x6E77r/tL+S96Ith1A5YMYtj7/gT7V8ckQRjOJiroQZFG9ZryTbEdmXjGJ1Mlrh6rq/C
-         Y/HeTaKqU2QLYSQ1006O9gK8NWKiwE9sOnth2X4GwF1ertHTQMrifivdtBPaT8RwpCKl
-         Uic0hrXgigIaqbLsFysdR3Yk4sj8n2o7pMxMFKeywNdy475eJTT+3N3oaMZZkU9JKY1J
-         prtw==
-X-Gm-Message-State: AOJu0YzubVnNxMaubS2KHau1xZAPZ9o0kRBpKwEazjYzJrw9b8kEW9K7
-	iCh3Z80rHmJJctMOBRbx0sk6BpZciB58vLAfAGA=
-X-Google-Smtp-Source: AGHT+IFkLAr3UKyBfJx63XKcpts3fBxCuou9eVwNpuLmQdvia19EFwfrxo8iP2EARsuS6wwTlwwRa2NnMwT1CO5pOiI=
-X-Received: by 2002:a17:90a:a395:b0:283:2932:e90c with SMTP id
- x21-20020a17090aa39500b002832932e90cmr11720736pjp.12.1700579096540; Tue, 21
- Nov 2023 07:04:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700579178; x=1701183978;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q5hhhZRHfGe2KU1JRk5bNtC/vyWS7Y/hyQQ+jMEFV7c=;
+        b=MyzrAoTvsND/foQPARn9QMzOmUoR3Lz7LfNaTJXOQfGYBAjc6seT/Ou4qZbPn3KOMb
+         IGIkv7O8Tk1QoxB5EkgeyEQVNKbPI8Q5WRYBCSDC5PbY9d2CZVNxmhpBJWGmx4uFjYJ8
+         iCOTIl0QtSOUSHfV8WcxTfDMYprsmN+wZLrKN2j3XzDjuFLvqE0EFF4Vz1q2CTUmvW1f
+         50jxVeoG+VdfN3eWkgfd0fWT/rAT9FR8h8vyP2O1LvuQZ484TPg3BHfLVLZujb0GBkq0
+         Nvyqr0FgFqmUnM+FOaHrliaOaqJo0cu+WLEwWVOPeAC+ER9cM1+WZWkA+LRpt4V17uJW
+         ggyA==
+X-Gm-Message-State: AOJu0Yxf4biUPIjII2z40BbtOY2o5KN3sISwRanvPy2Iba4iQw6N4N3p
+	eFjHlxs7cVSDDS/bCU/ZsRgODA==
+X-Google-Smtp-Source: AGHT+IH11H6TVmuZTvSyx5lJTpnIVh9+XzTwKDTT+YMmaikYP5vHaHgdagiNt1T+SvZomqdOy58u3w==
+X-Received: by 2002:a05:651c:228:b0:2c5:6cb:2e50 with SMTP id z8-20020a05651c022800b002c506cb2e50mr6756215ljn.27.1700579178502;
+        Tue, 21 Nov 2023 07:06:18 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.11])
+        by smtp.gmail.com with ESMTPSA id r12-20020adfda4c000000b003232380ffd7sm14596987wrl.102.2023.11.21.07.06.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Nov 2023 07:06:15 -0800 (PST)
+Message-ID: <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
+Date: Tue, 21 Nov 2023 16:06:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120175657.4070921-1-stefan.maetje@esd.eu>
-In-Reply-To: <20231120175657.4070921-1-stefan.maetje@esd.eu>
-From: Vincent Mailhol <vincent.mailhol@gmail.com>
-Date: Wed, 22 Nov 2023 00:04:45 +0900
-Message-ID: <CAMZ6RqJiCk_yc_V_1=TkJ41KjTQpDU--Z-kEwdUugoxMbz3G0A@mail.gmail.com>
-Subject: Re: [PATCH v10 0/2] can: esd: add support for esd GmbH PCIe/402 CAN interface
-To: =?UTF-8?Q?Stefan_M=C3=A4tje?= <stefan.maetje@esd.eu>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/9] dt-bindings: clock: ipq5332: drop the few nss
+ clocks definition
+Content-Language: en-US
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
+ Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
+ <20231121-ipq5332-nsscc-v2-3-a7ff61beab72@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231121-ipq5332-nsscc-v2-3-a7ff61beab72@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue. 21 Nov. 2023 at 02:57, Stefan M=C3=A4tje <stefan.maetje@esd.eu> wro=
-te:
-> The purpose of this patch is to introduce a new CAN driver to support
-> the esd GmbH 402 family of CAN interface boards. The hardware design
-> is based on a CAN controller implemented in a FPGA attached to a
-> PCIe link.
->
-> More information on these boards can be found following the links
-> included in the commit message.
->
-> This patch supports all boards but will operate the CAN-FD capable
-> boards only in Classic-CAN mode. The CAN-FD support will be added
-> when the initial patch has stabilized.
->
-> The patch is reuses the previous work of my former colleague:
-> Link: https://lore.kernel.org/linux-can/1426592308-23817-1-git-send-email=
--thomas.koerper@esd.eu/
->
->
-> The patch is based on the linux-can-next main branch.
+On 21/11/2023 15:30, Kathiravan Thirumoorthy wrote:
+> In commit 0dd3f263c810 ("clk: qcom: ipq5332: enable few nssnoc clocks in
 
-I left one nitpick in patch 1 and two nitpicks in patch 2. Regardless,
-for the full series:
+Where is this commit coming from?
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+> driver probe"), gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
+> gcc_nssnoc_nsscc_clk are enabled in driver probe to keep it always-on.
+
+Implementation can change and for example bring back these clocks. Are
+you going to change bindings? No, drop the patch.
+
+Bindings should be dropped only in a few rare cases like clocks not
+available for OS or bugs.
+
+Best regards,
+Krzysztof
+
 
