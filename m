@@ -1,170 +1,155 @@
-Return-Path: <netdev+bounces-49627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E9B7F2C9E
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:11:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39D47F2CF5
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87102B2146C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E19C282322
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7B4495E6;
-	Tue, 21 Nov 2023 12:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6C84A990;
+	Tue, 21 Nov 2023 12:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="D/eQy0Tv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dMcB1hlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19837183
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:11:36 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c875207626so37232551fa.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:11:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700568694; x=1701173494; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Dl1uJlZrmrU26tZTtLW7Qdp26u5pIj/OGysbIfrZlxY=;
-        b=D/eQy0TvfHf8SpQqqXmbZ6RQ/EzmmlMeelWCfkefBKMuil3BWTVOvmRpLRruJ2RyZa
-         K/BDGS6U8t8wJmTGI4nPbn18GwtKE1DDfXI7A7/qV5HCCax9xi+QUpUTgwxv6r6UfXG1
-         yLLXI8cJZq1PwtIZr0C3GowMb3zi2YBBIxosALYOGVugC91jOF/y0rAzQo4wjLoPSa5P
-         SEb06lOkwtkL+ht6V/uo/V490GDub5/eZPkiSmugV+RqeIbwc23A8KYMe6jlW07eOB5B
-         vB1DzZAv4z1cnI6+SF+iwTRxgm6vuKQIeG7VrYmK5uw6MWnuyIMLFSPbAAIzEqKmT4+b
-         4Y1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700568694; x=1701173494;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dl1uJlZrmrU26tZTtLW7Qdp26u5pIj/OGysbIfrZlxY=;
-        b=uRExZsYoPvDuexLsKARJmNavyDYymrN/MAzSGSkouxoGx9rxxLkhTfHcNfV7UIubj2
-         rLIKzHJCih7CrUBfH3kJmpsWNVkpN3LfO2PbwP9JLzTj+N8EYh93jvuRTCYF6nVD/esJ
-         TEW3Q7AibDXDptgfWm7H3zXnYe77wxfPsEo+HDGPFedC1ErP5EWy6vSPymnvIlitW6wX
-         nOBvbQRk84GaIw8jGkhsPqaiUED5HHuaes9XclDjpZl1gVj7nMSDZ3T65XhjuHHOn1j6
-         Id3hg33AqrGoHQlAwGHqw6zggfFFX1FvZOzjFUujobXgwCPgUcrmYFU8EjjhojLnUKlU
-         nNpg==
-X-Gm-Message-State: AOJu0Yx7oHUSm47sBLeljcqYkwuuCPw3dX37nYjsRHP8Sv5aJzQRlboV
-	sfyHfkwaT03jXpEF6wWbj/6yAEk9touG427BBuZTNA==
-X-Google-Smtp-Source: AGHT+IG52pvb7ZoAJD/v62zOEe7vXFuUzGEmY8LMX+OPNIRBrSrLbVW1gf3hXzwmcUxUtyWJODLTlg==
-X-Received: by 2002:a2e:a406:0:b0:2c8:739d:e0de with SMTP id p6-20020a2ea406000000b002c8739de0demr7228279ljn.29.1700568694021;
-        Tue, 21 Nov 2023 04:11:34 -0800 (PST)
-Received: from localhost (h-46-59-36-206.A463.priv.bahnhof.se. [46.59.36.206])
-        by smtp.gmail.com with ESMTPSA id w14-20020a2e9bce000000b002c83b0bd971sm1274091ljj.2.2023.11.21.04.11.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 04:11:33 -0800 (PST)
-Date: Tue, 21 Nov 2023 13:11:33 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18F0518A;
+	Tue, 21 Nov 2023 04:19:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700569144; x=1732105144;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TH4Q5+J9vXx35s84udmwuHt+PL6CcAyQU4u+aC3JSRs=;
+  b=dMcB1hlR1wJcjf/s8t4D3iymcM86Cr+D8/VwdhZaeM8L7vsUi5EqyK5l
+   1+FZqbpzCvE15GKfWI2vYJDmFIF2UcN18JD7IStsNRT7Q2YFfZYquh/ho
+   IVFlffXHjUUGZqy8Jzhtl11r+P+bzrK69+j84S+rQpBVPjnyH/oRAB+dW
+   ZtON1K+9g+5834pYEYCkj+vWfV0g6m+WGhgA3KnUT+w01kpzPVw9EL6Zq
+   9qftgb729h3NNTACEZHkEEfY3DaKFf3IP7XGfHLyIutThQZ3Hvygh/O1L
+   71vSREvIqxfGiLWF5Ps4S0jj0TN41RQ8TdpskHXUIG9XjEQOzWctcw4AQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458325779"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="458325779"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:19:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="1098043400"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="1098043400"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 21 Nov 2023 04:18:57 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r5PiP-0007mU-29;
+	Tue, 21 Nov 2023 12:18:54 +0000
+Date: Tue, 21 Nov 2023 20:18:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
 	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
- Ethernet TSN
-Message-ID: <ZVyedaFBS2gLo-E1@oden.dyn.berto.se>
-References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
- <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
- <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 4/8] net: qualcomm: ipqess: Add Ethtool ops
+ to IPQESS port netdevices
+Message-ID: <202311211930.FOMUSlbU-lkp@intel.com>
+References: <20231114105600.1012056-5-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
+In-Reply-To: <20231114105600.1012056-5-romain.gantois@bootlin.com>
 
-Hi Geert,
+Hi Romain,
 
-Thanks for your review.
+kernel test robot noticed the following build warnings:
 
-On 2023-11-21 09:00:41 +0100, Geert Uytterhoeven wrote:
-> On Tue, Nov 21, 2023 at 8:45 AM Krzysztof Kozlowski
-> <krzysztof.kozlowski@linaro.org> wrote:
-> > On 20/11/2023 17:07, Niklas Söderlund wrote:
-> > > Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> > > device provides Ethernet network.
-> > >
-> > > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> 
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> > > @@ -0,0 +1,133 @@
-> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: Renesas Ethernet TSN End-station
-> > > +
-> > > +maintainers:
-> > > +  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
-> > > +
-> > > +description:
-> > > +  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
-> > > +  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
-> > > +
-> > > +properties:
-> > > +  compatible:
-> > > +    oneOf:
-> > > +      - items:
-> >
-> > Drop items.
-> >
-> > I assume you have oneOf above because you predict this will grow with
-> > entries with fallbacks? If not, drop.
-> >
-> > > +          - enum:
-> > > +              - renesas,ethertsn-r8a779g0      # R-Car V4H
-> 
-> renesas,r8a779g0-ethertsn
-> 
-> R-Car S4 also has EtherTSN.
-> Is it identical, so it makes sense to add a renesas,rcar-gen4-ethertsn
-> fallback?
+[auto build test WARNING on net-next/main]
 
-Thanks.
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231114105600.1012056-5-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next v3 4/8] net: qualcomm: ipqess: Add Ethtool ops to IPQESS port netdevices
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20231121/202311211930.FOMUSlbU-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231121/202311211930.FOMUSlbU-lkp@intel.com/reproduce)
 
-Will address both suggestions in v2.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311211930.FOMUSlbU-lkp@intel.com/
 
-> 
-> > > +  renesas,rx-internal-delay:
-> > > +    type: boolean
-> > > +    description:
-> > > +      Enable internal Rx clock delay, typically 1.8ns.
-> >
-> > Why this is bool, not delay in ns?
-> > Why this is property of a board (not SoC)?
-> 
-> Standard property is rx-internal-delay-ps.
-> 
-> > > +
-> > > +  renesas,tx-internal-delay:
-> > > +    type: boolean
-> > > +    description:
-> > > +      Enable internal Tx clock delay, typically 2.0ns.
-> >
-> > Same questions.
-> 
-> Standard property is tx-internal-delay-ps.
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
-> -- 
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c:165:10: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
+     165 |                 return ret;
+         |                        ^~~
+   drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c:152:9: note: initialize the variable 'ret' to silence this warning
+     152 |         int ret;
+         |                ^
+         |                 = 0
+   1 warning generated.
+
+
+vim +/ret +165 drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c
+
+   148	
+   149	static int ipqess_port_set_eee(struct net_device *dev, struct ethtool_eee *eee)
+   150	{
+   151		struct ipqess_port *port = netdev_priv(dev);
+   152		int ret;
+   153		u32 lpi_en = QCA8K_REG_EEE_CTRL_LPI_EN(port->index);
+   154		struct qca8k_priv *priv = port->sw->priv;
+   155		u32 lpi_ctl1;
+   156	
+   157		/* Port's PHY and MAC both need to be EEE capable */
+   158		if (!dev->phydev || !port->pl)
+   159			return -ENODEV;
+   160	
+   161		mutex_lock(&priv->reg_mutex);
+   162		lpi_ctl1 = qca8k_read(priv, QCA8K_REG_EEE_CTRL, &lpi_ctl1);
+   163		if (lpi_ctl1 < 0) {
+   164			mutex_unlock(&priv->reg_mutex);
+ > 165			return ret;
+   166		}
+   167	
+   168		if (eee->tx_lpi_enabled && eee->eee_enabled)
+   169			lpi_ctl1 |= lpi_en;
+   170		else
+   171			lpi_ctl1 &= ~lpi_en;
+   172		ret = qca8k_write(priv, QCA8K_REG_EEE_CTRL, lpi_ctl1);
+   173		mutex_unlock(&priv->reg_mutex);
+   174	
+   175		if (ret)
+   176			return ret;
+   177	
+   178		return phylink_ethtool_set_eee(port->pl, eee);
+   179	}
+   180	
 
 -- 
-Kind Regards,
-Niklas Söderlund
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
