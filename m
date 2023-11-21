@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F15097F3995
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:57:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A25F7F399E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E24D1C20982
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:57:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34DA01C20E11
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB87C38DEA;
-	Tue, 21 Nov 2023 22:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8665811F;
+	Tue, 21 Nov 2023 22:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtmmtrEV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePGd6Jnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D684DD;
-	Tue, 21 Nov 2023 14:56:58 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cf6373ce31so2154975ad.0;
-        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89601A3;
+	Tue, 21 Nov 2023 14:57:00 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5bdf5a025c1so4041565a12.0;
+        Tue, 21 Nov 2023 14:57:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700607418; x=1701212218; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700607420; x=1701212220; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
-        b=MtmmtrEVs8W0K7YmHL0aSsy4KlgbCiR/rzEoaxxd5xgwo6yySKIEcftF7a0eDvv5mW
-         sV3En1IQR2ITwWxA/VZvWTgYismKndDmu2SujOe6djQOnmzzw5WjZIG/jUf796bR1aMh
-         sh2pdnh1tpajr+3Mlca7eIzXmCJhVnnRAJ5DMHZO7Bmzhxs7oS0pe/9DI9kug2oTyeG/
-         JsF+ACBz/WxwiOu+PrN2SA/V4/lqhfbljF9Z19dghmlWxf/C2IstNvmhoPhbOF6VKUXI
-         dF+6V4pyoJoO00MS6/Yg4floS8gsSbgACoGnjkfmWA5weSVC/ixWDm+VfRESce3FI7d3
-         JoUA==
+        bh=cqLalMyfqwS29Jo7Kjmw4Rvhj33ZYdkwQdVPnwcenNQ=;
+        b=ePGd6JnzpW3f8uRv183MWvBJkUk+RgKO2sEbagig7aE9qnKr1GcjpFNF/G1PhYY1na
+         MRbyu8AynI2IB06OksyNIety/loS10aWCgYpNSBDjZNz3J8iJGC+iwXCt0TlgZd7mHKd
+         s/JneKM6BHRsGHgGaRtP/aNxkcpkzj5cU6BWfXijSVyyO1LXA8ySjsLMNNZq3dVckebh
+         4sPC46RxVW7dgX/IOMQTORrmmwl2SUVBrkP3ZiLPJfxOBRSt/dKYy9zdyuun21EVVEd4
+         a2YUD2Zsf6F6riW9LlNPfKwXTulAOnu6mGp0CYZqOcTkNZlT7P9wskkNlJOSfqls1Occ
+         lIMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700607418; x=1701212218;
+        d=1e100.net; s=20230601; t=1700607420; x=1701212220;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=pHi5YlXCcsX/D19JuU9Nw7CLS9+F6yhOBOO+wjnP29E=;
-        b=iVwc9nEIheyTCs/+WJ+947PMVdO1zTldADUa5yo0JnccNN5/TOHzAd6HE5iwvqj6ih
-         QQuMihy4cGfbENu6+YvjKsWx5L9OUHt5L8jdzbukHqb/vcOszYzqT+iw6wz1JNEAFIsm
-         Xnr5JLAlqWhIcfoS6axPBhzgNsGE0oEENFztz6fIBzEglrJBg8jY78riOA/E8IbapcYb
-         Dc9/YcZ2XQd1hRBlBSgZ/YOXSrUZG4ecHIFrNp5yJFp2zRFKz2buE/VvGExSACXA+CCz
-         bntL2SVz7ABcJ3mywbqw9w2mdh5fJA4RadkIysAYFcK6PRR5fPhDJdhrKtFD3GvhXNaf
-         iq8g==
-X-Gm-Message-State: AOJu0YzMiCcI1hT2KwER33RCOLOmXYkzq2T7h6/cD4Yy6i7iHYd6jqxN
-	k5Jtk/ju2MK5utyvZoFCzXg=
-X-Google-Smtp-Source: AGHT+IE6s57NYG7jptMBdy5DVewa70KWUQtBlIN7PP5AfrSGIy85Ot97zH3PYYTC8wgjLQNl/n6VtQ==
-X-Received: by 2002:a17:902:c94b:b0:1c5:cf7c:4d50 with SMTP id i11-20020a170902c94b00b001c5cf7c4d50mr1008200pla.18.1700607418027;
-        Tue, 21 Nov 2023 14:56:58 -0800 (PST)
+        bh=cqLalMyfqwS29Jo7Kjmw4Rvhj33ZYdkwQdVPnwcenNQ=;
+        b=T09oBqJe92K6xIzdJPZYCl+k+KwVW0cWWdok4TpBupW30eqPtF/dDYGuHKNgUfhlQq
+         kSS8cKV6iLRt6Ss3nHB5erSsEaJBV/GGaPm+kxOnTZzemsUcD1h/3stoUTdo05nCIfZH
+         xtJ25MK2AS+ltUSOqVT+iJ/25ftKGfQ2h/ou7+FwqWQFwSA9ttFyu6yTg2r+h2/bTPJd
+         dUoTGQzk+6qqkEBTjUX5QxFaaqa7CKxTKCN9M40MtM5K+1UukJrJN+fcxFN0CnvSj4A0
+         yGZ0/LvmJNJmoSzRMn6vXyCfLd+D/6EOq3SaXvXNmF0nsw7eaIuOMlRKsISi0UgJV7iZ
+         YGQA==
+X-Gm-Message-State: AOJu0YxggkA0J2TxgjHbbXbvO9l0dKEHro4vJYUvyMUHjsAhdH2qSLeL
+	ZhJmbBfOM8b3Yhv2De6k0F4=
+X-Google-Smtp-Source: AGHT+IGo6lnCKfaRn8i+090knqFd2fNc6dmrMtF/Jv8GyLdQW8Yn7o9e0cTeTmlcmLC08VGkdMcpMQ==
+X-Received: by 2002:a05:6a20:e11d:b0:187:d18a:3163 with SMTP id kr29-20020a056a20e11d00b00187d18a3163mr545061pzb.48.1700607420334;
+        Tue, 21 Nov 2023 14:57:00 -0800 (PST)
 Received: from bangji.hsd1.ca.comcast.net ([2601:647:6780:42e0:7377:923f:1ff3:266d])
-        by smtp.gmail.com with ESMTPSA id m12-20020a1709026bcc00b001cc47c1c29csm8413189plt.84.2023.11.21.14.56.56
+        by smtp.gmail.com with ESMTPSA id m12-20020a1709026bcc00b001cc47c1c29csm8413189plt.84.2023.11.21.14.56.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 14:56:57 -0800 (PST)
+        Tue, 21 Nov 2023 14:56:59 -0800 (PST)
 Sender: Namhyung Kim <namhyung@gmail.com>
 From: Namhyung Kim <namhyung@kernel.org>
 To: Arnaldo Carvalho de Melo <acme@kernel.org>,
@@ -63,14 +63,10 @@ Cc: Ian Rogers <irogers@google.com>,
 	Ingo Molnar <mingo@kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>,
 	linux-perf-users@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH 05/14] tools headers UAPI: Update tools's copy of vhost.h header
-Date: Tue, 21 Nov 2023 14:56:40 -0800
-Message-ID: <20231121225650.390246-5-namhyung@kernel.org>
+Subject: [PATCH 07/14] tools headers: Update tools's copy of socket.h header
+Date: Tue, 21 Nov 2023 14:56:42 -0800
+Message-ID: <20231121225650.390246-7-namhyung@kernel.org>
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
 In-Reply-To: <20231121225650.390246-1-namhyung@kernel.org>
 References: <20231121225650.390246-1-namhyung@kernel.org>
@@ -125,33 +121,24 @@ So its important not to touch the copies in tools/ when doing changes in
 the original kernel headers, that will be done later, when
 check-headers.sh inform about the change to the perf tools hackers.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux.dev
 Cc: netdev@vger.kernel.org
 Signed-off-by: Namhyung Kim <namhyung@kernel.org>
 ---
- tools/include/uapi/linux/vhost.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/perf/trace/beauty/include/linux/socket.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/include/uapi/linux/vhost.h b/tools/include/uapi/linux/vhost.h
-index f5c48b61ab62..649560c685f1 100644
---- a/tools/include/uapi/linux/vhost.h
-+++ b/tools/include/uapi/linux/vhost.h
-@@ -219,4 +219,12 @@
-  */
- #define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
+diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
+index 39b74d83c7c4..cfcb7e2c3813 100644
+--- a/tools/perf/trace/beauty/include/linux/socket.h
++++ b/tools/perf/trace/beauty/include/linux/socket.h
+@@ -383,6 +383,7 @@ struct ucred {
+ #define SOL_MPTCP	284
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
++#define SOL_VSOCK	287
  
-+/* Get the group for the descriptor table including driver & device areas
-+ * of a virtqueue: read index, write group in num.
-+ * The virtqueue index is stored in the index field of vhost_vring_state.
-+ * The group ID of the descriptor table for this specific virtqueue
-+ * is returned via num field of vhost_vring_state.
-+ */
-+#define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
-+					      struct vhost_vring_state)
- #endif
+ /* IPX options */
+ #define IPX_TYPE	1
 -- 
 2.43.0.rc1.413.gea7ed67945-goog
 
