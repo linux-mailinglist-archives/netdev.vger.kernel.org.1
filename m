@@ -1,88 +1,131 @@
-Return-Path: <netdev+bounces-49708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE19B7F3285
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:41:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4BE7F329D
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BB181C21AD4
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FD0528289F
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A345811B;
-	Tue, 21 Nov 2023 15:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C355A56747;
+	Tue, 21 Nov 2023 15:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zQcVP1tj"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C0C99;
-	Tue, 21 Nov 2023 07:41:22 -0800 (PST)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1r5SsI-0003vD-Qs; Tue, 21 Nov 2023 16:41:18 +0100
-Message-ID: <0a594a11-d345-48c3-a651-08ea80ab76a1@leemhuis.info>
-Date: Tue, 21 Nov 2023 16:41:17 +0100
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C43699;
+	Tue, 21 Nov 2023 07:45:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t92OZKOw/jrPAQGH9Id5OLcQ57oFZcBBd4j/l0YdMEI=; b=zQcVP1tj2x+6QgwU5DhcqEIUQY
+	buB/Vaulv/SCpMKjnIBt8ycB21gewTRNGaJirCKmo8W5ZByxhufVBsmGFcptOxIMiosfPQc9fzMVY
+	u/btbit81Q8tJPUj1IFDpT1pt7YvkyELqTVNGQRt0lSGBoA42juDjYsO+mx4J6ExZrevfjoZbD4Li
+	DTooEckGVI2tSQaSJATq6Z6LXxs4ELmvwPX3id6aKyZIXTLbg/DsHp5zp1hJ5/NSP8aFvrZY/ip/X
+	Q2y/T1+duxQsEClo+Sz/zjTseQ1sMP/RsF3P+clz05QsscjBfFhFymXfje9SaWdu4vZYZbsAScJdL
+	7juCgNPw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59934)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r5Sw6-0007Qc-0N;
+	Tue, 21 Nov 2023 15:45:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r5Sw3-0004In-UY; Tue, 21 Nov 2023 15:45:11 +0000
+Date: Tue, 21 Nov 2023 15:45:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tomer Maimon <tmaimon77@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, alexandre.torgue@foss.st.com,
+	peppe.cavallaro@st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, avifishman70@gmail.com,
+	tali.perry1@gmail.com, joel@jms.id.au, andrew@codeconstruct.com.au,
+	venture@google.com, yuenn@google.com, benjaminfair@google.com,
+	j.neuschaefer@gmx.net, openbmc@lists.ozlabs.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+Message-ID: <ZVzQh9ykusyknGgP@shell.armlinux.org.uk>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+ <20231121151733.2015384-3-tmaimon77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Fwd: inet6_sock_destruct->inet_sock_destruct trigger Call Trace
-Content-Language: en-US, de-DE
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Linux Networking <netdev@vger.kernel.org>, Linux BPF
- <bpf@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>
-References: <8bfaee54-3117-65d3-d723-6408edf93961@gmail.com>
- <c3a5d08e-9c7c-4888-916a-ba4bd22a3319@collabora.com>
-From: "Linux regression tracking #update (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <c3a5d08e-9c7c-4888-916a-ba4bd22a3319@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1700581283;bc6798bc;
-X-HE-SMSGID: 1r5SsI-0003vD-Qs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231121151733.2015384-3-tmaimon77@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 29.08.23 15:07, Muhammad Usama Anjum wrote:
-> On 6/16/23 5:43 PM, Bagas Sanjaya wrote:
->> I notice a regression report on Bugzilla [1]. Quoting from it:
-> [...]
->>> When the IPv6 address or NIC configuration changes, the following kernel warnings may be triggered:
-> [...]
->>> Thu Jun 15 09:02:31 2023 daemon.info : 09[KNL] interface utun deleted
-> [...]
->> #regzbot introduced: v6.1.27..v6.1.32 https://bugzilla.kernel.org/show_bug.cgi?id=217555
->> #regzbot title: kernel warning (oops) at inet_sock_destruct
-> The same warning has been seen on 4.14, 5.15, 6.1 and latest mainline.
->
-> This WARN_ON is present from 2008.
+On Tue, Nov 21, 2023 at 05:17:33PM +0200, Tomer Maimon wrote:
+> Add Nuvoton NPCM BMC SoCs support to STMMAC dwmac driver.
+> 
+> And modify MAINTAINERS to add a new F: entry for this driver.
+> 
+> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
 
-Hmmm, the commit that according to syzkaller's bisection caused this is
-not in those series. So I assume the bisection went sideways.
+A few comments on this...
 
-And the reporter of the bugzilla ticket never bisected this either.
-Wondering if it started to show up there due to small unrelated timing
-changes.
+> +#define IND_AC_BA_REG		0x1FE
+> +#define SR_MII_CTRL		0x3E0000
+> +
+> +#define PCS_SR_MII_CTRL_REG	0x0
+> +#define PCS_SPEED_SELECT6	BIT(6)
+> +#define PCS_AN_ENABLE		BIT(12)
+> +#define PCS_SPEED_SELECT13	BIT(13)
+> +#define PCS_RST			BIT(15)
 
-Not totally sure, but it seems like this in the end is not a real
-regression or one we can't do anything about. Thus removing this from
-the tracking; if anyone disagrees, please holler.
+include/uapi/linux/mii.h:
 
-#regzbot inconclusive: likely an older problem
-#regzbot ignore-activity
+#define BMCR_SPEED1000          0x0040  /* MSB of Speed (1000)         */
+#define BMCR_ANENABLE           0x1000  /* Enable auto negotiation     */
+#define BMCR_SPEED100           0x2000  /* Select 100Mbps              */
+#define BMCR_RESET              0x8000  /* Reset to default state      */
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+Look familiar? Maybe use the standard definitions for a standardised
+register?
 
+> +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> +			 struct plat_stmmacenet_data *plat_dat)
+> +{
+> +	u16 val;
+> +
+> +	iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> +	val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> +	val |= PCS_RST;
+> +	iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> +
+> +	while (val & PCS_RST)
+> +		val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+
+What if the PCS never clears its reset bit? Maybe use
+read_poll_timeout() ?
+
+> +
+> +	val &= ~(PCS_AN_ENABLE);
+> +	iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> +}
+
+Also, maybe it's time to require new stmmac platform support to start
+making use of the phylink PCS support rather than continuing to code its
+own?
+
+I notice, however, that you always disable inband signalling - please
+explain why. Also, what protocol does the PCS use when communicating
+with the PHY?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
