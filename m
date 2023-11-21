@@ -1,95 +1,76 @@
-Return-Path: <netdev+bounces-49779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C617F36EB
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:46:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6D37F36F9
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1E291C20BC8
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:46:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B26C1C20BCD
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C0142058;
-	Tue, 21 Nov 2023 19:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A444207F;
+	Tue, 21 Nov 2023 19:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEkur83N"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jlSQktc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DFE199;
-	Tue, 21 Nov 2023 11:46:42 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40806e4106dso658635e9.1;
-        Tue, 21 Nov 2023 11:46:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700596001; x=1701200801; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8KmH1+oaDprV5Eq23Jd2f7MjoyGQpqNp4zftRYgnu+Y=;
-        b=QEkur83N1jgg/ZMhrqpfzPMeScPgsdF+XPiedHLAD/EcahhcqvCwgaCtUnDSVL5aRQ
-         HYC9KyKMsuoZq0G/fha5PTWit2eadY4pKWQbip+OnGrHPLPXefETWw6LG0T7W4K87ufx
-         bD8wEkNX87ZLNANbarL9CZzJJW437u2zEZZV7td02upvMKk37MD88Cl8HM9DiYw5KuSt
-         +tQ1CyXDXTNlC8wV40ZNa+ns+PWaiws+LX0AgLWAC3XCYzrmquagQzh3bgabD1HL2gZS
-         /x6nabsULTa4dCKP5M0We8XATKSP2k8RN8zxVeyiNVMW/RcM416r5vmnp9o/qJfNoLtR
-         zmww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700596001; x=1701200801;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8KmH1+oaDprV5Eq23Jd2f7MjoyGQpqNp4zftRYgnu+Y=;
-        b=uKE2SXFOJnq/eFQHfxBiJuB4p2luhpf9TJV2n44xTiarnEPGQMYMa2vrr9VfuI6fUz
-         eQ5GBcKsM4hNoAC8KyKYW03UDh0it5OC0qcb7J6y2EVSf7thw6IScJ6He8ZKcao9sXpV
-         7qoug2GGoClqMmJLNAyFRhjhcMWwqdMlYfB+QUdpiULjiItrU/cmFSq0apPbefbI4gex
-         uhErlKvmfmSiBHirfvj0nFrTt8FE80NRoXTAT5CBOA3iNjGZEp528Uc9iOxu/7pftwoQ
-         OVEkGAoes0GzMwNXBXxYFdX00yyP89feYagVIDbCgNgbgKY1YkBRHreu6xY9m0rKcYd4
-         YLdg==
-X-Gm-Message-State: AOJu0YyJTkoZwP5wvDB4jykinlulbnEUlerN45wu8tdgiU9eGQKAnP9e
-	tKcBA7wP73BCsGn9eTvzJ9c=
-X-Google-Smtp-Source: AGHT+IHxUA7uZNyyQ8/99NcVE5JVL5kMKuuqWLX4uFZmbAk4bkPXh5GfW5KFXOoT/Ohxo4ZKCBFDnA==
-X-Received: by 2002:a05:600c:5195:b0:403:aced:f7f4 with SMTP id fa21-20020a05600c519500b00403acedf7f4mr3308027wmb.12.1700596000450;
-        Tue, 21 Nov 2023 11:46:40 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id fb11-20020a05600c520b00b004076f522058sm22349575wmb.0.2023.11.21.11.46.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 11:46:40 -0800 (PST)
-Subject: Re: [PATCH 19/34] sfc: switch to using atomic find_bit() API where
- appropriate
-To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
- Martin Habets <habetsm.xilinx@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-net-drivers@amd.com
-Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
- <mirsad.todorovac@alu.unizg.hr>, Matthew Wilcox <willy@infradead.org>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
- Alexey Klimov <klimov.linux@gmail.com>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
- <20231118155105.25678-20-yury.norov@gmail.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <4aa03b21-5503-1d62-66b1-aa1b3c42011d@gmail.com>
-Date: Tue, 21 Nov 2023 19:46:39 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DDCD47;
+	Tue, 21 Nov 2023 11:53:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oCWDeKEBiiqfqbYup69P6A3J0FDsD9pdJ9Svzw7qqDk=; b=jlSQktc35PwwApo7oa/8jIsXQv
+	zrKwDYza06mlvXFbZEu3LDUiRGQXousXtvgq5RPcnPndInkDlVC9gJDY/Hp4lx4AX0cnzuzCkjvXE
+	a6I5PXN+neEm/V+PyTWF9zMxBlNqPSQ1tha3oAAm6/UafEAQjN+CaSrrNb3lA5utC7JM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5Wok-000nCV-GA; Tue, 21 Nov 2023 20:53:54 +0100
+Date: Tue, 21 Nov 2023 20:53:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
+ Ethernet TSN
+Message-ID: <badce6b1-c614-4fc2-b3a2-5b1b5c011a80@lunn.ch>
+References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
+ <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
+ <ZVyeMKjVhjW2F2e0@oden.dyn.berto.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231118155105.25678-20-yury.norov@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZVyeMKjVhjW2F2e0@oden.dyn.berto.se>
 
-On 18/11/2023 15:50, Yury Norov wrote:
-> SFC code traverses rps_slot_map and rxq_retry_mask bit by bit. We can do
-> it better by using dedicated atomic find_bit() functions, because they
-> skip already clear bits.
+> > > +  renesas,rx-internal-delay:
+> > > +    type: boolean
+> > > +    description:
+> > > +      Enable internal Rx clock delay, typically 1.8ns.
+> > 
+> > Why this is bool, not delay in ns?
 > 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> The TSN is only capable of enabling or disable internal delays, not set 
+> how long the delay is. The documentation states that the delay depends 
+> on the electronic characteristics of the particular board, but states 
+> that they typically are 1.8ns for Rx and 2.0ns for Tx.
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+Do you have a board that actually requires this?
+
+In general, we try to have the PHY add the delay, not the MAC. So i
+would start with hard coding the delay to 0ns, and only implement
+these properties if you have a board where the PHY cannot add the
+delay.
+
+	Andrew
 
