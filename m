@@ -1,126 +1,109 @@
-Return-Path: <netdev+bounces-49647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0097F2D4A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:35:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC017F2D60
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A394BB2169A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:35:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECEAF2822F3
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47914A9A6;
-	Tue, 21 Nov 2023 12:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D1D9DF/l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C834A9AE;
+	Tue, 21 Nov 2023 12:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5900CD65;
-	Tue, 21 Nov 2023 04:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700570118; x=1732106118;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nivaZQ+9P0ZV/opmlAd8c2iOR56SU+o3ql7tnZt2R+U=;
-  b=D1D9DF/l34RN+o4MhIIZvE1SAi13aICV6oWBa48iBCMBGm23hWQrmP6s
-   uEhOGywmxtlqe+LnBE8YkifDTUI3ebqZh1r2Mr7go4q+r01oe7DLCEc5E
-   08uZl947mLlAIwL1+ItJzh4uRu1vemyWtfdYjZfOou80tDO4gR02isduV
-   23h8BCW6LayfdJNYYVs+dJI02YqxiJJNeFd8PHkVLbI1VNM4KuecguNCF
-   w02XkpRkKwck2wNTi1gOH4KawTSZyvwwOKNxzZ+xK0sLMp7FG8RPrrJAQ
-   mhfkMRAq1KktgtV2ya3+U7Z4xEoA0CfSYFkDbZkX6z7mh+3igwnmuq+tG
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458327794"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="458327794"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="837044350"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="837044350"
-Received: from wpastern-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.57.17])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:13 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v4 3/3] e1000e: Use pcie_capability_read_word() for reading LNKSTA
-Date: Tue, 21 Nov 2023 14:34:28 +0200
-Message-Id: <20231121123428.20907-4-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231121123428.20907-1-ilpo.jarvinen@linux.intel.com>
-References: <20231121123428.20907-1-ilpo.jarvinen@linux.intel.com>
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F016192
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:38:40 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SZP3H4pznz1P8jn;
+	Tue, 21 Nov 2023 20:35:07 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 21 Nov 2023 20:38:34 +0800
+Message-ID: <9a221a65-71ae-2bca-e33c-f62c6b625461@huawei.com>
+Date: Tue, 21 Nov 2023 20:38:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net] ipv4: igmp: fix refcnt uaf issue when receiving igmp
+ query packet
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20231121020558.240321-1-shaozhengchao@huawei.com>
+ <ZVwcWmg5NtuTSV7q@Laptop-X1>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZVwcWmg5NtuTSV7q@Laptop-X1>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-Use pcie_capability_read_word() for reading LNKSTA and remove the
-custom define that matches to PCI_EXP_LNKSTA.
 
-As only single user for cap_offset remains, replace it with a call to
-pci_pcie_cap(). Instead of e1000_adapter, make local variable out of
-pci_dev because both users are interested in it.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h |  1 -
- drivers/net/ethernet/intel/e1000e/mac.c     | 11 ++++-------
- 2 files changed, 4 insertions(+), 8 deletions(-)
+On 2023/11/21 10:56, Hangbin Liu wrote:
+> Hi Zhengchao,
+> On Tue, Nov 21, 2023 at 10:05:58AM +0800, Zhengchao Shao wrote:
+>> ---
+>>   net/ipv4/igmp.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+>> index 76c3ea75b8dd..f217581904d6 100644
+>> --- a/net/ipv4/igmp.c
+>> +++ b/net/ipv4/igmp.c
+>> @@ -1044,6 +1044,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
+>>   	for_each_pmc_rcu(in_dev, im) {
+>>   		int changed;
+>>   
+>> +		if (!netif_running(im->interface->dev))
+>> +			continue;
+> 
+> I haven't checked this part for a long time. What's the difference of in_dev->dev
+> and im->interface->dev? I though they are the same, no?
+> 
+> If they are the same, should we stop processing the query earlier? e.g.
+> 
 
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index a4d29c9e03a6..23a58cada43a 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -678,7 +678,6 @@
- 
- /* PCI/PCI-X/PCI-EX Config space */
- #define PCI_HEADER_TYPE_REGISTER     0x0E
--#define PCIE_LINK_STATUS             0x12
- 
- #define PCI_HEADER_TYPE_MULTIFUNC    0x80
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-index 5340cf73778d..694a779e718d 100644
---- a/drivers/net/ethernet/intel/e1000e/mac.c
-+++ b/drivers/net/ethernet/intel/e1000e/mac.c
-@@ -17,16 +17,13 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
- {
- 	struct e1000_mac_info *mac = &hw->mac;
- 	struct e1000_bus_info *bus = &hw->bus;
--	struct e1000_adapter *adapter = hw->adapter;
--	u16 pcie_link_status, cap_offset;
-+	struct pci_dev *pdev = hw->adapter->pdev;
-+	u16 pcie_link_status;
- 
--	cap_offset = adapter->pdev->pcie_cap;
--	if (!cap_offset) {
-+	if (!pci_pcie_cap(pdev)) {
- 		bus->width = e1000_bus_width_unknown;
- 	} else {
--		pci_read_config_word(adapter->pdev,
--				     cap_offset + PCIE_LINK_STATUS,
--				     &pcie_link_status);
-+		pcie_capability_read_word(pdev, PCI_EXP_LNKSTA, &pcie_link_status);
- 		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
- 							     pcie_link_status);
- 	}
--- 
-2.30.2
+Hi Hangbin:
+	Yes, they are the same.
 
+> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> index 76c3ea75b8dd..f4e1d229c9aa 100644
+> --- a/net/ipv4/igmp.c
+> +++ b/net/ipv4/igmp.c
+> @@ -1082,6 +1082,9 @@ int igmp_rcv(struct sk_buff *skb)
+>                          goto drop;
+>          }
+> 
+> +       if (!netif_running(dev))
+> +               goto drop;
+> +
+>          in_dev = __in_dev_get_rcu(dev);
+>          if (!in_dev)
+>                  goto drop;
+> 
+> 
+> BTW, does IPv6 MLD has this issue?
+
+I will take a look at IPv6 MLD later. maybe tonight.
+Thank you.
+
+Zhengchao Shao
+> 
+> Thanks
+> Hangbin
+> 
 
