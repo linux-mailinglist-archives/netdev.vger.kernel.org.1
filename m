@@ -1,302 +1,479 @@
-Return-Path: <netdev+bounces-49703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6337F323C
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:22:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF42C7F324A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:24:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7E90282AF8
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D8E8282FEB
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A1B5676D;
-	Tue, 21 Nov 2023 15:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="c2WUgr5U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BA256772;
+	Tue, 21 Nov 2023 15:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE70E100
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:21:57 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5ac376d311aso60072897b3.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:21:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700580117; x=1701184917; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMY4Uhh9Vom4vuQvswEdPF4Kpw3jWYoPNZBPTH1IkUY=;
-        b=c2WUgr5U4o8OwTLJLED0xFZF2qyJQnzgMJRkliNmcIHEoe7ykG3CEG3dnoqqy6QSpy
-         Y04YYiiFJkJhVGYJctwvc3U+E39GC4ROeb2GxN+qKbwOFzYh5J9FE9blgoxWUX5BMifW
-         T6mqeYXVseyy36Gd6EDJXc0SxlcFPdFMyrnoPABWdb9lN9xdFIo5NyQfLzXlDGlAEQAn
-         4EJAOXnr9hEc4a1WzTxHuTpdb0XMU0/4+1DksEKslQYGruMCrBq9YQxRBmqkaYuH+DCO
-         duSTZsCF2Z/y0oZNWkBwnanYlacAU9V2YWg8bZdmxCFbG9TAK56eBRqyG91MeK1GY2SZ
-         xDjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700580117; x=1701184917;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GMY4Uhh9Vom4vuQvswEdPF4Kpw3jWYoPNZBPTH1IkUY=;
-        b=YkhWkufKKv+lZtx598yq3oemwtX58JCR01XAeblaF0srOF/1XjoK3+MkgP11PEz88G
-         Bed9/fuP/91g24Mo5WOp6i8lxGLcH0Uij2ehHswVmmyNw5Hi68UDnPPzaAw8URsWKM/j
-         krRFgDbvO7I/i5cTvvm3hIWuA3ft2v5wNh3G6Rc/Qyvitvq/KAQgpJBf6eKOYgj1yGbV
-         xvx8qu3ZuqafS8GZFkFb0AGSEGB/whDBHIqDYReieyhCJO5qMmMew2xmbB/Hs9+0UFzH
-         APh+Nf1SHrG45Wws1rfEUPar35BorNPDFOnlNsk2wlSUjfQXiJmSN4JVQ5Q6QvLrMWKY
-         mztw==
-X-Gm-Message-State: AOJu0Yxta+QwRdAJYbBnVJlZMjjcTLEuXrvZ0sWN6mDuPq4VeGuIcQqt
-	cZzFMbz//GsnwyfzcVt+P46A14tZuYke6ishFNalhA==
-X-Google-Smtp-Source: AGHT+IHVVwKYCkXLVFrT1X9hdWg/3oXEb5fHthAPfstWeBIbVYeFWvK0EBR7lAljsMgqMGq87uQnNFuxDKEqB+zPmG4=
-X-Received: by 2002:a81:790a:0:b0:5ca:4b49:66d2 with SMTP id
- u10-20020a81790a000000b005ca4b4966d2mr6610452ywc.17.1700580116950; Tue, 21
- Nov 2023 07:21:56 -0800 (PST)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9CE3125
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:24:38 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1r5Sc0-000607-I4; Tue, 21 Nov 2023 16:24:28 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1r5Sbz-00Ac93-DS; Tue, 21 Nov 2023 16:24:27 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1r5Sbz-00HZfk-18;
+	Tue, 21 Nov 2023 16:24:27 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net-next v1 1/3] net: dsa: microchip: ksz8: move BMCR specific code to separate function
+Date: Tue, 21 Nov 2023 16:24:24 +0100
+Message-Id: <20231121152426.4188456-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6557b2e5f3489_5ada920871@john.notmuch> <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
- <ZVspOBmzrwm8isiD@nanopsycho> <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
- <ZVuhBlYRwi8eGiSF@nanopsycho> <CAM0EoMknA01gmGX-XLH4fT_yW9H82bN3iNYEvFRypvTwARiNqg@mail.gmail.com>
- <2a7d6f27-3464-c57b-b09d-55c03bc5eae6@iogearbox.net> <CAM0EoMkBHqRU9tprJ-SK3tKMfcGsnydp0UA9cH2ALjpSNyJhig@mail.gmail.com>
- <ZVyrRFDrVqluD9k/@nanopsycho> <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
- <ZVy8cEjs9VK2OVxE@nanopsycho>
-In-Reply-To: <ZVy8cEjs9VK2OVxE@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 21 Nov 2023 10:21:44 -0500
-Message-ID: <CAM0EoMmPnCeU2uLph=uwh3JxtE4RQnvcSA2WdZgORywzNFCO6g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io, 
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
-	dan.daly@intel.com, chris.sommers@keysight.com, john.andy.fingerhut@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Nov 21, 2023 at 9:19=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Tue, Nov 21, 2023 at 02:47:40PM CET, jhs@mojatatu.com wrote:
-> >On Tue, Nov 21, 2023 at 8:06=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> Mon, Nov 20, 2023 at 11:56:50PM CET, jhs@mojatatu.com wrote:
-> >> >On Mon, Nov 20, 2023 at 4:49=E2=80=AFPM Daniel Borkmann <daniel@iogea=
-rbox.net> wrote:
-> >> >>
-> >> >> On 11/20/23 8:56 PM, Jamal Hadi Salim wrote:
-> >> >> > On Mon, Nov 20, 2023 at 1:10=E2=80=AFPM Jiri Pirko <jiri@resnulli=
-.us> wrote:
-> >> >> >> Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
-> >>
-> >> [...]
-> >>
-> >> >
-> >> >> tc BPF and XDP already have widely used infrastructure and can be d=
-eveloped
-> >> >> against libbpf or other user space libraries for a user space contr=
-ol plane.
-> >> >> With 'control plane' you refer here to the tc / netlink shim you've=
- built,
-> >> >> but looking at the tc command line examples, this doesn't really pr=
-ovide a
-> >> >> good user experience (you call it p4 but people load bpf obj files)=
-. If the
-> >> >> expectation is that an operator should run tc commands, then neithe=
-r it's
-> >> >> a nice experience for p4 nor for BPF folks. From a BPF PoV, we move=
-d over
-> >> >> to bpf_mprog and plan to also extend this for XDP to have a common =
-look and
-> >> >> feel wrt networking for developers. Why can't this be reused?
-> >> >
-> >> >The filter loading which loads the program is considered pipeline
-> >> >instantiation - consider it as "provisioning" more than "control"
-> >> >which runs at runtime. "control" is purely netlink based. The iproute=
-2
-> >> >code we use links libbpf for example for the filter. If we can achiev=
-e
-> >> >the same with bpf_mprog then sure - we just dont want to loose
-> >> >functionality though.  off top of my head, some sample space:
-> >> >- we could have multiple pipelines with different priorities (which t=
-c
-> >> >provides to us) - and each pipeline may have its own logic with many
-> >> >tables etc (and the choice to iterate the next one is essentially
-> >> >encoded in the tc action codes)
-> >> >- we use tc block to map groups of ports (which i dont think bpf has
-> >> >internal access of)
-> >> >
-> >> >In regards to usability: no i dont expect someone doing things at
-> >> >scale to use command line tc. The APIs are via netlink. But the tc cl=
-i
-> >> >is must for the rest of the masses per our traditions. Also i really
-> >>
-> >> I don't follow. You repeatedly mention "the must of the traditional tc
-> >> cli", but what of the existing traditional cli you use for p4tc?
-> >> If I look at the examples, pretty much everything looks new to me.
-> >> Example:
-> >>
-> >>   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
-> >>     action send_to_port param port eno1
-> >>
-> >> This is just TC/RTnetlink used as a channel to pass new things over. I=
-f
-> >> that is the case, what's traditional here?
-> >>
-> >
-> >
-> >What is not traditional about it?
->
-> Okay, so in that case, the following example communitating with
-> userspace deamon using imaginary "p4ctrl" app is equally traditional:
->   $ p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
->      action send_to_port param port eno1
+Isolate the Basic Mode Control Register (BMCR) operations in the ksz8795
+driver by moving the BMCR-related code segments from the ksz8_r_phy()
+and ksz8_w_phy() functions to newly created ksz8_r_phy_bmcr() and
+ksz8_w_phy_bmcr() functions.
 
-Huh? Thats just an application - classical tc which part of iproute2
-that is sending to the kernel, no different than "tc flower.."
-Where do you get the "userspace" daemon part? Yes, you can write a
-daemon but it will use the same APIs as tc.
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/dsa/microchip/ksz8795.c | 351 ++++++++++++++++++----------
+ 1 file changed, 227 insertions(+), 124 deletions(-)
 
->
-> >
-> >>
-> >> >didnt even want to use ebpf at all for operator experience reasons -
-> >> >it requires a compilation of the code and an extra loading compared t=
-o
-> >> >what our original u32/pedit code offered.
-> >> >
-> >> >> I don't quite follow why not most of this could be implemented enti=
-rely in
-> >> >> user space without the detour of this and you would provide a devel=
-oper
-> >> >> library which could then be integrated into a p4 runtime/frontend? =
-This
-> >> >> way users never interface with ebpf parts nor tc given they also sh=
-ouldn't
-> >> >> have to - it's an implementation detail. This is what John was also=
- pointing
-> >> >> out earlier.
-> >> >>
-> >> >
-> >> >Netlink is the API. We will provide a library for object manipulation
-> >> >which abstracts away the need to know netlink. Someone who for their
-> >> >own reasons wants to use p4runtime or TDI could write on top of this.
-> >> >I would not design a kernel interface to just meet p4runtime (we
-> >> >already have TDI which came later which does things differently). So =
-i
-> >> >expect us to support both those two. And if i was to do something on
-> >> >SDN that was more robust i would write my own that still uses these
-> >> >netlink interfaces.
-> >>
-> >> Actually, what Daniel says about the p4 library used as a backend to p=
-4
-> >> frontend is pretty much aligned what I claimed on the p4 calls couple =
-of
-> >> times. If you have this p4 userspace tooling, it is easy for offloads =
-to
-> >> replace the backed by vendor-specific library which allows p4 offload
-> >> suitable for all vendors (your plan of p4tc offload does not work well
-> >> for our hw, as we repeatedly claimed).
-> >>
-> >
-> >That's you - NVIDIA. You have chosen a path away from the kernel
-> >towards DOCA. I understand NVIDIA's frustration with dealing with
-> >upstream process (which has been cited to me as a good reason for
-> >DOCA) but please dont impose these values and your politics on other
-> >vendors(Intel, AMD for example) who are more than willing to invest
-> >into making the kernel interfaces the path forward. Your choice.
->
-> No, you are missing the point. This has nothing to do with DOCA.
+diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
+index 4bf4d67557dc..835157815937 100644
+--- a/drivers/net/dsa/microchip/ksz8795.c
++++ b/drivers/net/dsa/microchip/ksz8795.c
+@@ -676,9 +676,98 @@ static int ksz8_r_phy_ctrl(struct ksz_device *dev, int port, u16 *val)
+ 	return 0;
+ }
+ 
++/**
++ * ksz8_r_phy_bmcr - Translates and reads from the SMI interface to a MIIM PHY
++ *		     Basic mode control register (Reg. 0).
++ * @dev: The KSZ device instance.
++ * @port: The port number to be read.
++ * @val: The value read from the SMI interface.
++ *
++ * This function reads the SMI interface and translates the hardware register
++ * bit values into their corresponding control settings for a MIIM PHY Basic
++ * mode control register.
++ *
++ * MIIM Bit Mapping Comparison between KSZ8794 and KSZ8873
++ * -------------------------------------------------------------------
++ * MIIM Bit                    | KSZ8794 Reg/Bit             | KSZ8873 Reg/Bit
++ * ----------------------------+-----------------------------+----------------
++ * Bit 15 - Soft Reset         | 0xF/4                       | Not supported
++ * Bit 14 - Loopback           | 0xD/0 (MAC), 0xF/7 (PHY)    ~ 0xD/0 (PHY)
++ * Bit 13 - Force 100          | 0xC/6                       = 0xC/6
++ * Bit 12 - AN Enable          | 0xC/7 (reverse logic)       ~ 0xC/7
++ * Bit 11 - Power Down         | 0xD/3                       = 0xD/3
++ * Bit 10 - PHY Isolate        | 0xF/5                       | Not supported
++ * Bit 9 - Restart AN          | 0xD/5                       = 0xD/5
++ * Bit 8 - Force Full-Duplex   | 0xC/5                       = 0xC/5
++ * Bit 7 - Collision Test/Res. | Not supported               | Not supported
++ * Bit 6 - Reserved            | Not supported               | Not supported
++ * Bit 5 - Hp_mdix             | 0x9/7                       ~ 0xF/7
++ * Bit 4 - Force MDI           | 0xD/1                       = 0xD/1
++ * Bit 3 - Disable MDIX        | 0xD/2                       = 0xD/2
++ * Bit 2 - Disable Far-End F.  | ????                        | 0xD/4
++ * Bit 1 - Disable Transmit    | 0xD/6                       = 0xD/6
++ * Bit 0 - Disable LED         | 0xD/7                       = 0xD/7
++ * -------------------------------------------------------------------
++ *
++ * Return: 0 on success, error code on failure.
++ */
++static int ksz8_r_phy_bmcr(struct ksz_device *dev, int port, u16 *val)
++{
++	const u16 *regs = dev->info->regs;
++	u8 restart, speed, ctrl;
++	int ret;
++
++	*val = 0;
++
++	ret = ksz_pread8(dev, port, regs[P_NEG_RESTART_CTRL], &restart);
++	if (ret)
++		return ret;
++
++	ret = ksz_pread8(dev, port, regs[P_SPEED_STATUS], &speed);
++	if (ret)
++		return ret;
++
++	ret = ksz_pread8(dev, port, regs[P_FORCE_CTRL], &ctrl);
++	if (ret)
++		return ret;
++
++	if (restart & PORT_PHY_LOOPBACK)
++		*val |= BMCR_LOOPBACK;
++
++	if (ctrl & PORT_FORCE_100_MBIT)
++		*val |= BMCR_SPEED100;
++
++	if (ksz_is_ksz88x3(dev)) {
++		if ((ctrl & PORT_AUTO_NEG_ENABLE))
++			*val |= BMCR_ANENABLE;
++	} else {
++		if (!(ctrl & PORT_AUTO_NEG_DISABLE))
++			*val |= BMCR_ANENABLE;
++	}
++
++	if (restart & PORT_POWER_DOWN)
++		*val |= BMCR_PDOWN;
++	if (restart & PORT_AUTO_NEG_RESTART)
++		*val |= BMCR_ANRESTART;
++	if (ctrl & PORT_FORCE_FULL_DUPLEX)
++		*val |= BMCR_FULLDPLX;
++	if (speed & PORT_HP_MDIX)
++		*val |= KSZ886X_BMCR_HP_MDIX;
++	if (restart & PORT_FORCE_MDIX)
++		*val |= KSZ886X_BMCR_FORCE_MDI;
++	if (restart & PORT_AUTO_MDIX_DISABLE)
++		*val |= KSZ886X_BMCR_DISABLE_AUTO_MDIX;
++	if (restart & PORT_TX_DISABLE)
++		*val |= KSZ886X_BMCR_DISABLE_TRANSMIT;
++	if (restart & PORT_LED_OFF)
++		*val |= KSZ886X_BMCR_DISABLE_LED;
++
++	return 0;
++}
++
+ int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
+ {
+-	u8 restart, speed, ctrl, link;
++	u8 ctrl, link;
+ 	int processed = true;
+ 	const u16 *regs;
+ 	u8 val1, val2;
+@@ -690,45 +779,9 @@ int ksz8_r_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 *val)
+ 
+ 	switch (reg) {
+ 	case MII_BMCR:
+-		ret = ksz_pread8(dev, p, regs[P_NEG_RESTART_CTRL], &restart);
+-		if (ret)
+-			return ret;
+-
+-		ret = ksz_pread8(dev, p, regs[P_SPEED_STATUS], &speed);
+-		if (ret)
+-			return ret;
+-
+-		ret = ksz_pread8(dev, p, regs[P_FORCE_CTRL], &ctrl);
++		ret = ksz8_r_phy_bmcr(dev, p, &data);
+ 		if (ret)
+ 			return ret;
+-
+-		if (restart & PORT_PHY_LOOPBACK)
+-			data |= BMCR_LOOPBACK;
+-		if (ctrl & PORT_FORCE_100_MBIT)
+-			data |= BMCR_SPEED100;
+-		if (ksz_is_ksz88x3(dev)) {
+-			if ((ctrl & PORT_AUTO_NEG_ENABLE))
+-				data |= BMCR_ANENABLE;
+-		} else {
+-			if (!(ctrl & PORT_AUTO_NEG_DISABLE))
+-				data |= BMCR_ANENABLE;
+-		}
+-		if (restart & PORT_POWER_DOWN)
+-			data |= BMCR_PDOWN;
+-		if (restart & PORT_AUTO_NEG_RESTART)
+-			data |= BMCR_ANRESTART;
+-		if (ctrl & PORT_FORCE_FULL_DUPLEX)
+-			data |= BMCR_FULLDPLX;
+-		if (speed & PORT_HP_MDIX)
+-			data |= KSZ886X_BMCR_HP_MDIX;
+-		if (restart & PORT_FORCE_MDIX)
+-			data |= KSZ886X_BMCR_FORCE_MDI;
+-		if (restart & PORT_AUTO_MDIX_DISABLE)
+-			data |= KSZ886X_BMCR_DISABLE_AUTO_MDIX;
+-		if (restart & PORT_TX_DISABLE)
+-			data |= KSZ886X_BMCR_DISABLE_TRANSMIT;
+-		if (restart & PORT_LED_OFF)
+-			data |= KSZ886X_BMCR_DISABLE_LED;
+ 		break;
+ 	case MII_BMSR:
+ 		ret = ksz_pread8(dev, p, regs[P_LINK_STATUS], &link);
+@@ -860,113 +913,163 @@ static int ksz8_w_phy_ctrl(struct ksz_device *dev, int port, u16 val)
+ 	return ret;
+ }
+ 
+-int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
++/**
++ * ksz8_w_phy_bmcr - Translates and writes to the SMI interface from a MIIM PHY
++ *		     Basic mode control register (Reg. 0).
++ * @dev: The KSZ device instance.
++ * @port: The port number to be configured.
++ * @val: The register value to be written.
++ *
++ * This function translates control settings from a MIIM PHY Basic mode control
++ * register into their corresponding hardware register bit values for the SMI
++ * interface.
++ *
++ * MIIM Bit Mapping Comparison between KSZ8794 and KSZ8873
++ * -------------------------------------------------------------------
++ * MIIM Bit                    | KSZ8794 Reg/Bit             | KSZ8873 Reg/Bit
++ * ----------------------------+-----------------------------+----------------
++ * Bit 15 - Soft Reset         | 0xF/4                       | Not supported
++ * Bit 14 - Loopback           | 0xD/0 (MAC), 0xF/7 (PHY)    ~ 0xD/0 (PHY)
++ * Bit 13 - Force 100          | 0xC/6                       = 0xC/6
++ * Bit 12 - AN Enable          | 0xC/7 (reverse logic)       ~ 0xC/7
++ * Bit 11 - Power Down         | 0xD/3                       = 0xD/3
++ * Bit 10 - PHY Isolate        | 0xF/5                       | Not supported
++ * Bit 9 - Restart AN          | 0xD/5                       = 0xD/5
++ * Bit 8 - Force Full-Duplex   | 0xC/5                       = 0xC/5
++ * Bit 7 - Collision Test/Res. | Not supported               | Not supported
++ * Bit 6 - Reserved            | Not supported               | Not supported
++ * Bit 5 - Hp_mdix             | 0x9/7                       ~ 0xF/7
++ * Bit 4 - Force MDI           | 0xD/1                       = 0xD/1
++ * Bit 3 - Disable MDIX        | 0xD/2                       = 0xD/2
++ * Bit 2 - Disable Far-End F.  | ????                        | 0xD/4
++ * Bit 1 - Disable Transmit    | 0xD/6                       = 0xD/6
++ * Bit 0 - Disable LED         | 0xD/7                       = 0xD/7
++ * -------------------------------------------------------------------
++ *
++ * Return: 0 on success, error code on failure.
++ */
++static int ksz8_w_phy_bmcr(struct ksz_device *dev, int port, u16 val)
+ {
+-	u8 restart, speed, ctrl, data;
+-	const u16 *regs;
+-	u8 p = phy;
++	const u16 *regs = dev->info->regs;
++	u8 restart, ctrl, speed, data;
+ 	int ret;
+ 
+-	regs = dev->info->regs;
++	/* Do not support PHY reset function. */
++	if (val & BMCR_RESET)
++		return 0;
+ 
+-	switch (reg) {
+-	case MII_BMCR:
++	ret = ksz_pread8(dev, port, regs[P_SPEED_STATUS], &speed);
++	if (ret)
++		return ret;
+ 
+-		/* Do not support PHY reset function. */
+-		if (val & BMCR_RESET)
+-			break;
+-		ret = ksz_pread8(dev, p, regs[P_SPEED_STATUS], &speed);
++	data = speed;
++	if (val & KSZ886X_BMCR_HP_MDIX)
++		data |= PORT_HP_MDIX;
++	else
++		data &= ~PORT_HP_MDIX;
++
++	if (data != speed) {
++		ret = ksz_pwrite8(dev, port, regs[P_SPEED_STATUS], data);
+ 		if (ret)
+ 			return ret;
++	}
++
++	ret = ksz_pread8(dev, port, regs[P_FORCE_CTRL], &ctrl);
++	if (ret)
++		return ret;
+ 
+-		data = speed;
+-		if (val & KSZ886X_BMCR_HP_MDIX)
+-			data |= PORT_HP_MDIX;
++	data = ctrl;
++	if (ksz_is_ksz88x3(dev)) {
++		if ((val & BMCR_ANENABLE))
++			data |= PORT_AUTO_NEG_ENABLE;
++		else
++			data &= ~PORT_AUTO_NEG_ENABLE;
++	} else {
++		if (!(val & BMCR_ANENABLE))
++			data |= PORT_AUTO_NEG_DISABLE;
+ 		else
+-			data &= ~PORT_HP_MDIX;
++			data &= ~PORT_AUTO_NEG_DISABLE;
+ 
+-		if (data != speed) {
+-			ret = ksz_pwrite8(dev, p, regs[P_SPEED_STATUS], data);
+-			if (ret)
+-				return ret;
+-		}
++		/* Fiber port does not support auto-negotiation. */
++		if (dev->ports[port].fiber)
++			data |= PORT_AUTO_NEG_DISABLE;
++	}
+ 
+-		ret = ksz_pread8(dev, p, regs[P_FORCE_CTRL], &ctrl);
++	if (val & BMCR_SPEED100)
++		data |= PORT_FORCE_100_MBIT;
++	else
++		data &= ~PORT_FORCE_100_MBIT;
++	if (val & BMCR_FULLDPLX)
++		data |= PORT_FORCE_FULL_DUPLEX;
++	else
++		data &= ~PORT_FORCE_FULL_DUPLEX;
++
++	if (data != ctrl) {
++		ret = ksz_pwrite8(dev, port, regs[P_FORCE_CTRL], data);
+ 		if (ret)
+ 			return ret;
++	}
+ 
+-		data = ctrl;
+-		if (ksz_is_ksz88x3(dev)) {
+-			if ((val & BMCR_ANENABLE))
+-				data |= PORT_AUTO_NEG_ENABLE;
+-			else
+-				data &= ~PORT_AUTO_NEG_ENABLE;
+-		} else {
+-			if (!(val & BMCR_ANENABLE))
+-				data |= PORT_AUTO_NEG_DISABLE;
+-			else
+-				data &= ~PORT_AUTO_NEG_DISABLE;
+-
+-			/* Fiber port does not support auto-negotiation. */
+-			if (dev->ports[p].fiber)
+-				data |= PORT_AUTO_NEG_DISABLE;
+-		}
++	ret = ksz_pread8(dev, port, regs[P_NEG_RESTART_CTRL], &restart);
++	if (ret)
++		return ret;
+ 
+-		if (val & BMCR_SPEED100)
+-			data |= PORT_FORCE_100_MBIT;
+-		else
+-			data &= ~PORT_FORCE_100_MBIT;
+-		if (val & BMCR_FULLDPLX)
+-			data |= PORT_FORCE_FULL_DUPLEX;
+-		else
+-			data &= ~PORT_FORCE_FULL_DUPLEX;
++	data = restart;
++	if (val & KSZ886X_BMCR_DISABLE_LED)
++		data |= PORT_LED_OFF;
++	else
++		data &= ~PORT_LED_OFF;
++	if (val & KSZ886X_BMCR_DISABLE_TRANSMIT)
++		data |= PORT_TX_DISABLE;
++	else
++		data &= ~PORT_TX_DISABLE;
++	if (val & BMCR_ANRESTART)
++		data |= PORT_AUTO_NEG_RESTART;
++	else
++		data &= ~(PORT_AUTO_NEG_RESTART);
++	if (val & BMCR_PDOWN)
++		data |= PORT_POWER_DOWN;
++	else
++		data &= ~PORT_POWER_DOWN;
++	if (val & KSZ886X_BMCR_DISABLE_AUTO_MDIX)
++		data |= PORT_AUTO_MDIX_DISABLE;
++	else
++		data &= ~PORT_AUTO_MDIX_DISABLE;
++	if (val & KSZ886X_BMCR_FORCE_MDI)
++		data |= PORT_FORCE_MDIX;
++	else
++		data &= ~PORT_FORCE_MDIX;
++	if (val & BMCR_LOOPBACK)
++		data |= PORT_PHY_LOOPBACK;
++	else
++		data &= ~PORT_PHY_LOOPBACK;
+ 
+-		if (data != ctrl) {
+-			ret = ksz_pwrite8(dev, p, regs[P_FORCE_CTRL], data);
+-			if (ret)
+-				return ret;
+-		}
++	if (data != restart) {
++		ret = ksz_pwrite8(dev, port, regs[P_NEG_RESTART_CTRL],
++				  data);
++		if (ret)
++			return ret;
++	}
+ 
+-		ret = ksz_pread8(dev, p, regs[P_NEG_RESTART_CTRL], &restart);
++	return 0;
++}
++
++int ksz8_w_phy(struct ksz_device *dev, u16 phy, u16 reg, u16 val)
++{
++	u8 ctrl, data;
++	const u16 *regs;
++	u8 p = phy;
++	int ret;
++
++	regs = dev->info->regs;
++
++	switch (reg) {
++	case MII_BMCR:
++		ret = ksz8_w_phy_bmcr(dev, p, val);
+ 		if (ret)
+ 			return ret;
+ 
+-		data = restart;
+-		if (val & KSZ886X_BMCR_DISABLE_LED)
+-			data |= PORT_LED_OFF;
+-		else
+-			data &= ~PORT_LED_OFF;
+-		if (val & KSZ886X_BMCR_DISABLE_TRANSMIT)
+-			data |= PORT_TX_DISABLE;
+-		else
+-			data &= ~PORT_TX_DISABLE;
+-		if (val & BMCR_ANRESTART)
+-			data |= PORT_AUTO_NEG_RESTART;
+-		else
+-			data &= ~(PORT_AUTO_NEG_RESTART);
+-		if (val & BMCR_PDOWN)
+-			data |= PORT_POWER_DOWN;
+-		else
+-			data &= ~PORT_POWER_DOWN;
+-		if (val & KSZ886X_BMCR_DISABLE_AUTO_MDIX)
+-			data |= PORT_AUTO_MDIX_DISABLE;
+-		else
+-			data &= ~PORT_AUTO_MDIX_DISABLE;
+-		if (val & KSZ886X_BMCR_FORCE_MDI)
+-			data |= PORT_FORCE_MDIX;
+-		else
+-			data &= ~PORT_FORCE_MDIX;
+-		if (val & BMCR_LOOPBACK)
+-			data |= PORT_PHY_LOOPBACK;
+-		else
+-			data &= ~PORT_PHY_LOOPBACK;
+ 
+-		if (data != restart) {
+-			ret = ksz_pwrite8(dev, p, regs[P_NEG_RESTART_CTRL],
+-					  data);
+-			if (ret)
+-				return ret;
+-		}
+ 		break;
+ 	case MII_ADVERTISE:
+ 		ret = ksz_pread8(dev, p, regs[P_LOCAL_CTRL], &ctrl);
+-- 
+2.39.2
 
-Right Jiri ;->
-
-> This
-> has to do with the simple limitation of your offload assuming there are
-> no runtime changes in the compiled pipeline. For Intel, maybe they
-> aren't, and it's a good fit for them. All I say is, that it is not the
-> good fit for everyone.
-
- a) it is not part of the P4 spec to dynamically make changes to the
-datapath pipeline after it is create and we are discussing a P4
-implementation not an extension that would add more value b) We are
-more than happy to add extensions in the future to accomodate for
-features but first _P4 spec_ must be met c) we had longer discussions
-with Matty, Khalid and the Rice folks who wrote a paper on that topic
-which you probably didnt attend and everything that needs to be done
-can be from user space today for all those optimizations.
-
-Conclusion is: For what you need to do (which i dont believe is a
-limitation in your hardware rather a design decision on your part) run
-your user space daemon, do optimizations and update the datapath.
-Everybody is happy.
-
->
-> >Nobody is stopping you from offering your customers proprietary
-> >solutions which include a specific ebpf approach alongside DOCA. We
-> >believe that a singular interface regardless of the vendor is the
-> >right way forward. IMHO, this siloing that unfortunately is also added
-> >by eBPF being a double edged sword is not good for the community.
-> >
-> >> As I also said on the p4 call couple of times, I don't see the kernel
-> >> as the correct place to do the p4 abstractions. Why don't you do it in
-> >> userspace and give vendors possiblity to have p4 backends with compile=
-rs,
-> >> runtime optimizations etc in userspace, talking to the HW in the
-> >> vendor-suitable way too. Then the SW implementation could be easily eB=
-PF
-> >> and the main reason (I believe) why you need to have this is TC
-> >> (offload) is then void.
-> >>
-> >> The "everyone wants to use TC/netlink" claim does not seem correct
-> >> to me. Why not to have one Linux p4 solution that fits everyones needs=
-?
-> >
-> >You mean more fitting to the DOCA world? no, because iam a kernel
->
-> Again, this has 0 relation to DOCA.
->
->
-> >first person and kernel interfaces are good for everyone.
->
-> Yeah, not really. Not always the kernel is the right answer. Your/Intel
-> plan to handle the offload by:
-> 1) abuse devlink to flash p4 binary
-> 2) parse the binary in kernel to match to the table ids of rules coming
->    from p4tc ndo_setup_tc
-> 3) abuse devlink to flash p4 binary for tc-flower
-> 4) parse the binary in kernel to match to the table ids of rules coming
->    from tc-flower ndo_setup_tc
-> is really something that is making me a little bit nauseous.
->
-> If you don't have a feasible plan to do the offload, p4tc does not make
-> sense to me to be honest.
-
-You mean if there's no plan to match your (NVIDIA?)  point of view.
-For #1 - how's this different from DDP? Wasnt that your suggestion to
-begin with? For #2 Nobody is proposing to do anything of the sort. The
-ndo is passed IDs for the objects and associated contents. For #3+#4
-tc flower thing has nothing to do with P4TC that was just some random
-proposal someone made seeing if they could ride on top of P4TC.
-
-Besides this nobody really has to satisfy your point of view - like i
-said earlier feel free to provide proprietary solutions. From a
-consumer perspective  I would not want to deal with 4 different
-vendors with 4 different proprietary approaches. The kernel is the
-unifying part. You seemed happier with tc flower just not with the
-kernel process - which is ironically the same thing we are going
-through here ;->
-
-cheers,
-jamal
-
->
-> >
-> >cheers,
-> >jamal
 
