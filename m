@@ -1,188 +1,122 @@
-Return-Path: <netdev+bounces-49631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811857F2D01
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:21:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E097E7F2D12
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5F1CB218CD
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A38E280EDB
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830D54A997;
-	Tue, 21 Nov 2023 12:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jewNDVXw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6512C4A99A;
+	Tue, 21 Nov 2023 12:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B73BF137
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:20:58 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5409bc907edso7608963a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700569257; x=1701174057; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FrwKdUOQTL6e14/zDzjYxE8ID/8xpFBXEVT3hh8Z10g=;
-        b=jewNDVXwTrHeDo7yau2boJvtNp2bHe02fY1cCoZhxxdCdBY5TmDUFgCDG564rnnfKD
-         Kjb+yDG1ldzl82T7IEjceoS5rW3EpZBsth+df/GEWSoodXGjjRyeX1o6Vh3XdlpP7ssq
-         Zp2r/XpYCnOaRuKshF8087IjeGJ6wSzoVlV9zLj3qM4lcm2kpdwqPhdoTS9wQdC23djT
-         w57F+hpMu0+h4uM29X3MKsnt/TziWPTj5yMO4H1TOlPKRB3dDJIFWANgn1fDwc6FFu/4
-         FHhyySxS2JiSwxLikR8gU69UTQz72vRHsI8/38uNK7FhPkgSgp64cyPEMLU9MUm4lLZj
-         x30w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700569257; x=1701174057;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FrwKdUOQTL6e14/zDzjYxE8ID/8xpFBXEVT3hh8Z10g=;
-        b=gLZYmq6IxclwnzgHf6FhmssOy6GlqwrVWrqp4NtXOLzUMkxSIydw4JUecJ5tlbc27U
-         tlZsVWvJyq4g4ql9SZSbOdFJ0PPshazpnB0iCVH666XusWm8UmRga1yLAkMUCkbhkBK5
-         0RGp4uC/oVBVk0C7e2+aYhEwOsdvCwb5VIQulKgkZoIFNk7WwEHyAvw+tu21Q+aHlqXL
-         8Czf9/tkBWx5IGstncyYMbnsVb2YA0pvGIMtu6F7d/uQdWFjAQ8I40Syh75wODCAIErZ
-         zCwqt7Ik0Rmq3YlCZ7N4qLsP1yiCJ+QHOql3BYU0wClheRDB2zEmlGfrUUQhsICd23Tl
-         3CCg==
-X-Gm-Message-State: AOJu0YzCAd7sn4nzJ7qMte+U6XeefGYT1bRjr+vJhD3LG/Pflu8JoJn9
-	RTieD2MfpT3njbQISiwtdOuJ6Q==
-X-Google-Smtp-Source: AGHT+IFvxZl9JDbZLXAUArq09qgXb4yDQdUfnBtbSxcXXPwC9OMXQU9WljdApPNltwVtnUw8iQ0AGg==
-X-Received: by 2002:a17:906:ba8e:b0:9dd:30c8:6f2f with SMTP id cu14-20020a170906ba8e00b009dd30c86f2fmr10117645ejd.27.1700569257251;
-        Tue, 21 Nov 2023 04:20:57 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.11])
-        by smtp.gmail.com with ESMTPSA id bo14-20020a170906d04e00b009c3f8f46c22sm5187002ejb.77.2023.11.21.04.20.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 04:20:56 -0800 (PST)
-Message-ID: <2ffb39c3-7939-46f2-8ca9-2b2cb44caaff@linaro.org>
-Date: Tue, 21 Nov 2023 13:20:54 +0100
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8209419F
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:25:51 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SZNmY1WWrz1P8g6;
+	Tue, 21 Nov 2023 20:22:21 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 21 Nov 2023 20:25:48 +0800
+Message-ID: <05108fe1-ab34-6d67-4265-2ec478ce0368@huawei.com>
+Date: Tue, 21 Nov 2023 20:25:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
- Ethernet TSN
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
-References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
- <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org>
- <ZVyeMKjVhjW2F2e0@oden.dyn.berto.se>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <ZVyeMKjVhjW2F2e0@oden.dyn.berto.se>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next,v4] bonding: return -ENOMEM instead of BUG in
+ alb_upper_dev_walk
+To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>
+CC: <j.vosburgh@gmail.com>, <andy@greyhouse.net>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>
+References: <20231118081653.1481260-1-shaozhengchao@huawei.com>
+ <0a1642c47f37cbab531fdfdcac187bf2bd392dbf.camel@redhat.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <0a1642c47f37cbab531fdfdcac187bf2bd392dbf.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-On 21/11/2023 13:10, Niklas Söderlund wrote:
->>> +
->>> +  phy-handle:
->>> +    $ref: /schemas/types.yaml#/definitions/phandle
->>> +    description:
->>> +      Specifies a reference to a node representing a PHY device.
+
+
+On 2023/11/21 19:41, Paolo Abeni wrote:
+> On Sat, 2023-11-18 at 16:16 +0800, Zhengchao Shao wrote:
+>> If failed to allocate "tags" or could not find the final upper device from
+>> start_dev's upper list in bond_verify_device_path(), only the loopback
+>> detection of the current upper device should be affected, and the system is
+>> no need to be panic.
+>> So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
+>> information when failed to allocate memory for vlan tags in
+>> bond_verify_device_path.
 >>
->> You miss top-level $ref to ethernet controller
-> 
-> Sorry I don't fully understand what you are asking here, there are a few 
-> things about bindings I still need to learn. Looking at other bindings 
-> some have a
-> 
-> maintainers:
->   ..
-> 
-> allOf:
->   - $ref: ethernet-controller.yaml#
-
-This one.
-
-> 
-> properties:
->  ..
-> 
-> Is it this all ollOff node I'm missing?
-> 
+>> I also think that the following function calls
+>> netdev_walk_all_upper_dev_rcu
+>> ---->>>alb_upper_dev_walk
+>> ---------->>>bond_verify_device_path
+>>>  From this way, "end device" can eventually be obtained from "start device"
+>> in bond_verify_device_path, IS_ERR(tags) could be instead of
+>> IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
 >>
->>> +
->>> +  renesas,rx-internal-delay:
->>> +    type: boolean
->>> +    description:
->>> +      Enable internal Rx clock delay, typically 1.8ns.
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>> v4: print information instead of warn
+>> v3: return -ENOMEM instead of zero to stop walk
+>> v2: use WARN_ON_ONCE instead of WARN_ON
+>> ---
+>>   drivers/net/bonding/bond_alb.c  | 3 ++-
+>>   drivers/net/bonding/bond_main.c | 5 ++++-
+>>   2 files changed, 6 insertions(+), 2 deletions(-)
 >>
->> Why this is bool, not delay in ns?
+>> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+>> index dc2c7b979656..7edf0fd58c34 100644
+>> --- a/drivers/net/bonding/bond_alb.c
+>> +++ b/drivers/net/bonding/bond_alb.c
+>> @@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
+>>   	if (netif_is_macvlan(upper) && !strict_match) {
+>>   		tags = bond_verify_device_path(bond->dev, upper, 0);
+>>   		if (IS_ERR_OR_NULL(tags))
+>> -			BUG();
+>> +			return -ENOMEM;
+>> +
+>>   		alb_send_lp_vid(slave, upper->dev_addr,
+>>   				tags[0].vlan_proto, tags[0].vlan_id);
+>>   		kfree(tags);
+>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+>> index 51d47eda1c87..1a40bd08f984 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -2967,8 +2967,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
+>>   
+>>   	if (start_dev == end_dev) {
+>>   		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
+>> -		if (!tags)
+>> +		if (!tags) {
+>> +			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
+>> +					    __func__, start_dev->name);
 > 
-> The TSN is only capable of enabling or disable internal delays, not set 
-> how long the delay is. The documentation states that the delay depends 
-> on the electronic characteristics of the particular board, but states 
-> that they typically are 1.8ns for Rx and 2.0ns for Tx.
-
-I don't understand that part. If you cannot configure the internal
-delay, how could it depend on the board characteristics?
-
+> I'm sorry for the repeated back and forth, but checkpatch points out
+> that the above warning adds little value: if the memory allocation
+> fails, the mm layer will emit a lot warning comprising the backtrace.
 > 
-> I looked at the generic properties {rx,tx}-internal-delay-ps but they 
-> are of int type. So I opted for a vendor specific bool property. Do you 
-> think a better route is to use the generic property and force the value 
-> to be either 0 or the typical delay?
+> I suggest to drop it, thanks!
+Thank you for your advice. And I will send v5 later.
+
+Zhengchao Shao
 > 
->> Why this is property of a board (not SoC)?
+> Paolo
 > 
-> I'm sorry I don't understand this question.
-
-Why setting internal delay is specific to a board, not to a SoC? Why
-each board would need to configure it? On which parts of hardware on the
-board does this depend?
-
-
-Best regards,
-Krzysztof
-
 
