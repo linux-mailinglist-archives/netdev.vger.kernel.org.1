@@ -1,311 +1,302 @@
-Return-Path: <netdev+bounces-49702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F577F322D
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:18:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D6337F323C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:22:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C9E81C21AE9
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:18:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7E90282AF8
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3C058109;
-	Tue, 21 Nov 2023 15:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A1B5676D;
+	Tue, 21 Nov 2023 15:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nuvoton.onmicrosoft.com header.i=@nuvoton.onmicrosoft.com header.b="AX4qUv5o"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="c2WUgr5U"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2062.outbound.protection.outlook.com [40.107.255.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B70BD;
-	Tue, 21 Nov 2023 07:17:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e2Xx9uvBEkrbza76HreBZ3sNmlQ4SG7aTB8tng6ZWlreQZ5TxAbJNcSJNTVO8Wj+U0IALTIly2OHMnAzL+/12boa0pdOBUsBNN+AW5n7B7mM4uOtK0ThKF7VA9q89/sQ6RzIknOZCBUZQmtcl/PL4UHzCxN1Oh1ne16pB0s0OCtAtK8vtR1w5qAYgYNDK7dOmrDvpmG44gO6otYRk5u/Wfi35Ox5WtQvhp771h6C5iGR1o1GCd/ZE0l5faJ87vT3/lBVQ5olaiBwbZnsYOmOy26axHGYkIpGlsNPT8lu9v/BsXwWpl2GrkMjKmPuA7xCfmJVLfCAUe7VSaAR1GT/7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TsxyS+EBEcMh9D/3MoDQ5Q14lf8Ya3LsFxMz39xL6fw=;
- b=eWkRpvurgtzO25rFQy7+z0YmglukL+THi0E8SwSK35YOBThLNLeKI00stv+tEjf1Im4g0UCWSahK95EqgKd1cCGDPvxiP/S7f103uMjml4YcHXrYdz6lxqCjAgCQdcIq3ErBAK9F//MQQYXEIPMlcAZZWPap533cwgy+B7vm7KYiNWzLNDkQh+/R0ci86I3iLLUzljSMtWUtxtuaej2+sX0FyaOkphdGAneQcIMfSCeYDZujiPQ+DIpqyvTkoinIZJqXI00E9atHlSPDGaPWs82mMsx7UEbCIxeLmqXDu6rbhNB904+rM8ihybTudYdj6UcQXyf9uR+Bwjge9F8VZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 175.98.123.7) smtp.rcpttodomain=codeconstruct.com.au
- smtp.mailfrom=nuvoton.com; dmarc=fail (p=none sp=quarantine pct=100)
- action=none header.from=gmail.com; dkim=none (message not signed); arc=none
- (0)
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE70E100
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:21:57 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5ac376d311aso60072897b3.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:21:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nuvoton.onmicrosoft.com; s=selector2-nuvoton-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TsxyS+EBEcMh9D/3MoDQ5Q14lf8Ya3LsFxMz39xL6fw=;
- b=AX4qUv5oO2du1g15ihaO11If6lwBk4KsfycwVIwmRnXVtd/AgtAB8sfg2LpNJvgkHwtoeFnGGdGqTazS2eLIZJx5L9MMYMm0eHcrX9elWf3+KAat326+9pqVVTdJKdbUff5BOWluTuu3qFHr772YlSBhrP1LZxgG151kbN4HDAY=
-Received: from SG2PR04CA0200.apcprd04.prod.outlook.com (2603:1096:4:187::15)
- by SI6PR03MB8705.apcprd03.prod.outlook.com (2603:1096:4:24f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Tue, 21 Nov
- 2023 15:17:40 +0000
-Received: from SG2PEPF000B66CA.apcprd03.prod.outlook.com
- (2603:1096:4:187:cafe::6b) by SG2PR04CA0200.outlook.office365.com
- (2603:1096:4:187::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.28 via Frontend
- Transport; Tue, 21 Nov 2023 15:17:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 175.98.123.7)
- smtp.mailfrom=nuvoton.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=gmail.com;
-Received-SPF: Pass (protection.outlook.com: domain of nuvoton.com designates
- 175.98.123.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=175.98.123.7; helo=NTHCCAS04.nuvoton.com; pr=C
-Received: from NTHCCAS04.nuvoton.com (175.98.123.7) by
- SG2PEPF000B66CA.mail.protection.outlook.com (10.167.240.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.20.7025.12 via Frontend Transport; Tue, 21 Nov 2023 15:17:40 +0000
-Received: from NTHCCAS02.nuvoton.com (10.1.9.121) by NTHCCAS04.nuvoton.com
- (10.1.8.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Tue, 21
- Nov 2023 23:17:39 +0800
-Received: from NTHCCAS01.nuvoton.com (10.1.8.28) by NTHCCAS02.nuvoton.com
- (10.1.9.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.14; Tue, 21 Nov
- 2023 23:17:39 +0800
-Received: from taln58.nuvoton.co.il (10.191.1.178) by NTHCCAS01.nuvoton.com
- (10.1.8.28) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Tue, 21 Nov 2023 23:17:39 +0800
-Received: from taln60.nuvoton.co.il (taln60 [10.191.1.180])
-	by taln58.nuvoton.co.il (Postfix) with ESMTP id B26A35F63F;
-	Tue, 21 Nov 2023 17:17:37 +0200 (IST)
-Received: by taln60.nuvoton.co.il (Postfix, from userid 10070)
-	id 9EC7B235CE27; Tue, 21 Nov 2023 17:17:36 +0200 (IST)
-From: Tomer Maimon <tmaimon77@gmail.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <alexandre.torgue@foss.st.com>,
-	<peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
-	<mcoquelin.stm32@gmail.com>, <avifishman70@gmail.com>,
-	<tali.perry1@gmail.com>, <joel@jms.id.au>, <andrew@codeconstruct.com.au>,
-	<venture@google.com>, <yuenn@google.com>, <benjaminfair@google.com>,
-	<j.neuschaefer@gmx.net>
-CC: <openbmc@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, Tomer Maimon <tmaimon77@gmail.com>
-Subject: [PATCH v1 2/2] net: stmmac: Add NPCM support
-Date: Tue, 21 Nov 2023 17:17:33 +0200
-Message-ID: <20231121151733.2015384-3-tmaimon77@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20231121151733.2015384-1-tmaimon77@gmail.com>
-References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700580117; x=1701184917; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GMY4Uhh9Vom4vuQvswEdPF4Kpw3jWYoPNZBPTH1IkUY=;
+        b=c2WUgr5U4o8OwTLJLED0xFZF2qyJQnzgMJRkliNmcIHEoe7ykG3CEG3dnoqqy6QSpy
+         Y04YYiiFJkJhVGYJctwvc3U+E39GC4ROeb2GxN+qKbwOFzYh5J9FE9blgoxWUX5BMifW
+         T6mqeYXVseyy36Gd6EDJXc0SxlcFPdFMyrnoPABWdb9lN9xdFIo5NyQfLzXlDGlAEQAn
+         4EJAOXnr9hEc4a1WzTxHuTpdb0XMU0/4+1DksEKslQYGruMCrBq9YQxRBmqkaYuH+DCO
+         duSTZsCF2Z/y0oZNWkBwnanYlacAU9V2YWg8bZdmxCFbG9TAK56eBRqyG91MeK1GY2SZ
+         xDjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700580117; x=1701184917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GMY4Uhh9Vom4vuQvswEdPF4Kpw3jWYoPNZBPTH1IkUY=;
+        b=YkhWkufKKv+lZtx598yq3oemwtX58JCR01XAeblaF0srOF/1XjoK3+MkgP11PEz88G
+         Bed9/fuP/91g24Mo5WOp6i8lxGLcH0Uij2ehHswVmmyNw5Hi68UDnPPzaAw8URsWKM/j
+         krRFgDbvO7I/i5cTvvm3hIWuA3ft2v5wNh3G6Rc/Qyvitvq/KAQgpJBf6eKOYgj1yGbV
+         xvx8qu3ZuqafS8GZFkFb0AGSEGB/whDBHIqDYReieyhCJO5qMmMew2xmbB/Hs9+0UFzH
+         APh+Nf1SHrG45Wws1rfEUPar35BorNPDFOnlNsk2wlSUjfQXiJmSN4JVQ5Q6QvLrMWKY
+         mztw==
+X-Gm-Message-State: AOJu0Yxta+QwRdAJYbBnVJlZMjjcTLEuXrvZ0sWN6mDuPq4VeGuIcQqt
+	cZzFMbz//GsnwyfzcVt+P46A14tZuYke6ishFNalhA==
+X-Google-Smtp-Source: AGHT+IHVVwKYCkXLVFrT1X9hdWg/3oXEb5fHthAPfstWeBIbVYeFWvK0EBR7lAljsMgqMGq87uQnNFuxDKEqB+zPmG4=
+X-Received: by 2002:a81:790a:0:b0:5ca:4b49:66d2 with SMTP id
+ u10-20020a81790a000000b005ca4b4966d2mr6610452ywc.17.1700580116950; Tue, 21
+ Nov 2023 07:21:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NotSetDelaration: True
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PEPF000B66CA:EE_|SI6PR03MB8705:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ae92dbe-d3bc-4f90-22b0-08dbeaa500ab
-X-MS-Exchange-SenderADCheck: 0
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	CLF0PbdKo4Rl1isfDncngsA0ttranzlel9Hhh8KQV27l/ljw0hza7C0LRLcl9lRJat/mW1LJd0FIVJV3VtUkbqRRDwgP4q6J0MUu/dQcZsDctVeZtlzUb1/J/csdFwsKChmyTCKiol9saqBK5BRdOBtHjF476OLgPZ+R03a3lZV9A3LIL+w2vUtRg862LD+D71AkvBqRm4gCSjv2Pq1l4KBGxFDil4KQPLIYDs4kr8w912knuQngRijYaK7kKCBtlIj/QpVwyu+MjnxwoQfHGOvaLWncJ69E52oycw4Chn5a0I/v8eDqsQzOmSf76a/+a/Do3dnLLq6BArmaA3HDZSijAl4hJQGZ/IteFDsYzjlo5MhxHiNKZISkSDA2uW6k1Jk4rGt/xorrAUVrYoBvOp5pNLKejHAKzVwlQlMUIkYVwLjVl2+LczjB3OkjnQXkb6FfajCigLGea/xbl5oY6/AW0am1EftpeY5xEfN0YSprKT7O+VzdVTJ7pB1705JNCRiGP2ItEBGyH9KlYdpKTjwp7JrWC4pKGDN4fE6Kf8GWWnu3GJjA/m97rClTO2JfOmRcoYOL185hJd1A5TFgwX4FvQRUiefRen27hf4OpD3cOCy3A3LSDojsZh2Ljb0K0XqYa46LIurtBYEBgKNMZ1aOmYbUtG6BZRaYu1UfxHw15WPnZDXc1dR+oLsu4MRxPtS60fKvg8MDeQSNUH4eQvMSwiCDf/N+SaVIx0oEY0XQCcpXsHQFGfFHW/Ymhc6Ef+cxbtN/nJz0/EyQ0H0MlfDcBgTDOzfbKbg/ylpelm5En7TphsYzi32FcjOWfbKkcP4Xb4L3siiPOowZ5gP4/zlZl/52yobW/bNHvLYi5ws=
-X-Forefront-Antispam-Report:
-	CIP:175.98.123.7;CTRY:TW;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:NTHCCAS04.nuvoton.com;PTR:175-98-123-7.static.tfn.net.tw;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(39860400002)(376002)(346002)(230922051799003)(48200799006)(61400799012)(451199024)(82310400011)(64100799003)(186009)(40470700004)(46966006)(36840700001)(40480700001)(2906002)(8936002)(41300700001)(4326008)(8676002)(7416002)(5660300002)(316002)(42186006)(110136005)(54906003)(76482006)(40460700003)(70586007)(47076005)(55446002)(478600001)(1076003)(26005)(82202003)(73392003)(83170400001)(6666004)(36756003)(70206006)(2616005)(6266002)(42882007)(336012)(81166007)(921008)(83380400001)(36860700001)(356005)(82740400003)(45356006)(35450700002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nuvoton.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2023 15:17:40.3682
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ae92dbe-d3bc-4f90-22b0-08dbeaa500ab
-X-MS-Exchange-CrossTenant-Id: a3f24931-d403-4b4a-94f1-7d83ac638e07
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a3f24931-d403-4b4a-94f1-7d83ac638e07;Ip=[175.98.123.7];Helo=[NTHCCAS04.nuvoton.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SG2PEPF000B66CA.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI6PR03MB8705
+References: <6557b2e5f3489_5ada920871@john.notmuch> <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
+ <ZVspOBmzrwm8isiD@nanopsycho> <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
+ <ZVuhBlYRwi8eGiSF@nanopsycho> <CAM0EoMknA01gmGX-XLH4fT_yW9H82bN3iNYEvFRypvTwARiNqg@mail.gmail.com>
+ <2a7d6f27-3464-c57b-b09d-55c03bc5eae6@iogearbox.net> <CAM0EoMkBHqRU9tprJ-SK3tKMfcGsnydp0UA9cH2ALjpSNyJhig@mail.gmail.com>
+ <ZVyrRFDrVqluD9k/@nanopsycho> <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
+ <ZVy8cEjs9VK2OVxE@nanopsycho>
+In-Reply-To: <ZVy8cEjs9VK2OVxE@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 21 Nov 2023 10:21:44 -0500
+Message-ID: <CAM0EoMmPnCeU2uLph=uwh3JxtE4RQnvcSA2WdZgORywzNFCO6g@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
+	dan.daly@intel.com, chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add Nuvoton NPCM BMC SoCs support to STMMAC dwmac driver.
+On Tue, Nov 21, 2023 at 9:19=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Tue, Nov 21, 2023 at 02:47:40PM CET, jhs@mojatatu.com wrote:
+> >On Tue, Nov 21, 2023 at 8:06=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
+ote:
+> >>
+> >> Mon, Nov 20, 2023 at 11:56:50PM CET, jhs@mojatatu.com wrote:
+> >> >On Mon, Nov 20, 2023 at 4:49=E2=80=AFPM Daniel Borkmann <daniel@iogea=
+rbox.net> wrote:
+> >> >>
+> >> >> On 11/20/23 8:56 PM, Jamal Hadi Salim wrote:
+> >> >> > On Mon, Nov 20, 2023 at 1:10=E2=80=AFPM Jiri Pirko <jiri@resnulli=
+.us> wrote:
+> >> >> >> Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
+> >>
+> >> [...]
+> >>
+> >> >
+> >> >> tc BPF and XDP already have widely used infrastructure and can be d=
+eveloped
+> >> >> against libbpf or other user space libraries for a user space contr=
+ol plane.
+> >> >> With 'control plane' you refer here to the tc / netlink shim you've=
+ built,
+> >> >> but looking at the tc command line examples, this doesn't really pr=
+ovide a
+> >> >> good user experience (you call it p4 but people load bpf obj files)=
+. If the
+> >> >> expectation is that an operator should run tc commands, then neithe=
+r it's
+> >> >> a nice experience for p4 nor for BPF folks. From a BPF PoV, we move=
+d over
+> >> >> to bpf_mprog and plan to also extend this for XDP to have a common =
+look and
+> >> >> feel wrt networking for developers. Why can't this be reused?
+> >> >
+> >> >The filter loading which loads the program is considered pipeline
+> >> >instantiation - consider it as "provisioning" more than "control"
+> >> >which runs at runtime. "control" is purely netlink based. The iproute=
+2
+> >> >code we use links libbpf for example for the filter. If we can achiev=
+e
+> >> >the same with bpf_mprog then sure - we just dont want to loose
+> >> >functionality though.  off top of my head, some sample space:
+> >> >- we could have multiple pipelines with different priorities (which t=
+c
+> >> >provides to us) - and each pipeline may have its own logic with many
+> >> >tables etc (and the choice to iterate the next one is essentially
+> >> >encoded in the tc action codes)
+> >> >- we use tc block to map groups of ports (which i dont think bpf has
+> >> >internal access of)
+> >> >
+> >> >In regards to usability: no i dont expect someone doing things at
+> >> >scale to use command line tc. The APIs are via netlink. But the tc cl=
+i
+> >> >is must for the rest of the masses per our traditions. Also i really
+> >>
+> >> I don't follow. You repeatedly mention "the must of the traditional tc
+> >> cli", but what of the existing traditional cli you use for p4tc?
+> >> If I look at the examples, pretty much everything looks new to me.
+> >> Example:
+> >>
+> >>   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
+> >>     action send_to_port param port eno1
+> >>
+> >> This is just TC/RTnetlink used as a channel to pass new things over. I=
+f
+> >> that is the case, what's traditional here?
+> >>
+> >
+> >
+> >What is not traditional about it?
+>
+> Okay, so in that case, the following example communitating with
+> userspace deamon using imaginary "p4ctrl" app is equally traditional:
+>   $ p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
+>      action send_to_port param port eno1
 
-And modify MAINTAINERS to add a new F: entry for this driver.
+Huh? Thats just an application - classical tc which part of iproute2
+that is sending to the kernel, no different than "tc flower.."
+Where do you get the "userspace" daemon part? Yes, you can write a
+daemon but it will use the same APIs as tc.
 
-Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
----
- MAINTAINERS                                   |   1 +
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   9 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../net/ethernet/stmicro/stmmac/dwmac-npcm.c  | 121 ++++++++++++++++++
- 4 files changed, 132 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-npcm.c
+>
+> >
+> >>
+> >> >didnt even want to use ebpf at all for operator experience reasons -
+> >> >it requires a compilation of the code and an extra loading compared t=
+o
+> >> >what our original u32/pedit code offered.
+> >> >
+> >> >> I don't quite follow why not most of this could be implemented enti=
+rely in
+> >> >> user space without the detour of this and you would provide a devel=
+oper
+> >> >> library which could then be integrated into a p4 runtime/frontend? =
+This
+> >> >> way users never interface with ebpf parts nor tc given they also sh=
+ouldn't
+> >> >> have to - it's an implementation detail. This is what John was also=
+ pointing
+> >> >> out earlier.
+> >> >>
+> >> >
+> >> >Netlink is the API. We will provide a library for object manipulation
+> >> >which abstracts away the need to know netlink. Someone who for their
+> >> >own reasons wants to use p4runtime or TDI could write on top of this.
+> >> >I would not design a kernel interface to just meet p4runtime (we
+> >> >already have TDI which came later which does things differently). So =
+i
+> >> >expect us to support both those two. And if i was to do something on
+> >> >SDN that was more robust i would write my own that still uses these
+> >> >netlink interfaces.
+> >>
+> >> Actually, what Daniel says about the p4 library used as a backend to p=
+4
+> >> frontend is pretty much aligned what I claimed on the p4 calls couple =
+of
+> >> times. If you have this p4 userspace tooling, it is easy for offloads =
+to
+> >> replace the backed by vendor-specific library which allows p4 offload
+> >> suitable for all vendors (your plan of p4tc offload does not work well
+> >> for our hw, as we repeatedly claimed).
+> >>
+> >
+> >That's you - NVIDIA. You have chosen a path away from the kernel
+> >towards DOCA. I understand NVIDIA's frustration with dealing with
+> >upstream process (which has been cited to me as a good reason for
+> >DOCA) but please dont impose these values and your politics on other
+> >vendors(Intel, AMD for example) who are more than willing to invest
+> >into making the kernel interfaces the path forward. Your choice.
+>
+> No, you are missing the point. This has nothing to do with DOCA.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5c9f868e13b6..43059c7d00c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2507,6 +2507,7 @@ F:	arch/arm64/boot/dts/nuvoton/
- F:	drivers/*/*/*npcm*
- F:	drivers/*/*npcm*
- F:	drivers/rtc/rtc-nct3018y.c
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-npcm.c
- F:	include/dt-bindings/clock/nuvoton,npcm7xx-clock.h
- F:	include/dt-bindings/clock/nuvoton,npcm845-clk.h
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index a2b9e289aa36..2487a674d0d3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -121,6 +121,15 @@ config DWMAC_MESON
- 	  the stmmac device driver. This driver is used for Meson6,
- 	  Meson8, Meson8b and GXBB SoCs.
- 
-+config DWMAC_NPCM
-+	tristate "Nuvoton NPCM dwmac support"
-+	depends on OF && (ARCH_NPCM || COMPILE_TEST)
-+	help
-+	  Support for Ethernet controller on Nuvoton NPCM BMC SoCs.
-+
-+	  This selects the Nuvoton NPCM BMC SoC glue layer support for
-+	  the stmmac device driver. This driver is used for NPCM8xx SoCs.
-+
- config DWMAC_QCOM_ETHQOS
- 	tristate "Qualcomm ETHQOS support"
- 	default ARCH_QCOM
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 80e598bd4255..1c86c8ca39f0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
- obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
- obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
- obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
-+obj-$(CONFIG_DWMAC_NPCM)	+= dwmac-npcm.o
- obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
- obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
- obj-$(CONFIG_DWMAC_SOCFPGA)	+= dwmac-altr-socfpga.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-npcm.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-npcm.c
-new file mode 100644
-index 000000000000..dbb857661142
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-npcm.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+// Copyright (c) 2023 Nuvoton Technology corporation.
-+
-+#include <linux/device.h>
-+#include <linux/ethtool.h>
-+#include <linux/io.h>
-+#include <linux/ioport.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+#include <linux/stmmac.h>
-+
-+#include "stmmac_platform.h"
-+
-+#define IND_AC_BA_REG		0x1FE
-+#define SR_MII_CTRL		0x3E0000
-+
-+#define PCS_SR_MII_CTRL_REG	0x0
-+#define PCS_SPEED_SELECT6	BIT(6)
-+#define PCS_AN_ENABLE		BIT(12)
-+#define PCS_SPEED_SELECT13	BIT(13)
-+#define PCS_RST			BIT(15)
-+
-+#define PCS_MASK_SPEED		0xDFBF
-+
-+struct npcm_dwmac {
-+	void __iomem	*reg;
-+};
-+
-+static void npcm_dwmac_fix_mac_speed(void *priv, unsigned int speed,
-+				     unsigned int mode)
-+{
-+	struct npcm_dwmac *dwmac = priv;
-+	u16 val;
-+
-+	iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
-+	val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-+	val &= PCS_MASK_SPEED;
-+
-+	switch (speed) {
-+	case SPEED_1000:
-+		val |= PCS_SPEED_SELECT6;
-+		break;
-+	case SPEED_100:
-+		val |= PCS_SPEED_SELECT13;
-+		break;
-+	case SPEED_10:
-+		break;
-+	}
-+
-+	iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-+}
-+
-+void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
-+			 struct plat_stmmacenet_data *plat_dat)
-+{
-+	u16 val;
-+
-+	iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
-+	val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-+	val |= PCS_RST;
-+	iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-+
-+	while (val & PCS_RST)
-+		val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-+
-+	val &= ~(PCS_AN_ENABLE);
-+	iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-+}
-+
-+static int npcm_dwmac_probe(struct platform_device *pdev)
-+{
-+	struct plat_stmmacenet_data *plat_dat;
-+	struct stmmac_resources stmmac_res;
-+	struct npcm_dwmac *dwmac;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return ret;
-+
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat_dat))
-+		return PTR_ERR(plat_dat);
-+
-+	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
-+	if (!dwmac)
-+		ret = -ENOMEM;
-+
-+	dwmac->reg = devm_platform_ioremap_resource(pdev, 1);
-+	if (IS_ERR(dwmac->reg))
-+		ret = PTR_ERR(dwmac->reg);
-+
-+	npcm_dwmac_pcs_init(dwmac, &pdev->dev, plat_dat);
-+
-+	plat_dat->has_gmac = true;
-+	plat_dat->bsp_priv = dwmac;
-+	plat_dat->fix_mac_speed = npcm_dwmac_fix_mac_speed;
-+
-+	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
-+}
-+
-+static const struct of_device_id npcm_dwmac_match[] = {
-+	{ .compatible = "nuvoton,npcm8xx-sgmii" },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, npcm_dwmac_match);
-+
-+static struct platform_driver npcm_dwmac_driver = {
-+	.probe  = npcm_dwmac_probe,
-+	.remove_new = stmmac_pltfr_remove,
-+	.driver = {
-+		.name           = "npcm-dwmac",
-+		.pm		= &stmmac_pltfr_pm_ops,
-+		.of_match_table = npcm_dwmac_match,
-+	},
-+};
-+module_platform_driver(npcm_dwmac_driver);
-+
-+MODULE_AUTHOR("Tomer Maimon <tomer.maimon@nuvoton.com>");
-+MODULE_DESCRIPTION("Nuvoton NPCM DWMAC glue layer");
-+MODULE_LICENSE("GPL v2");
--- 
-2.33.0
+Right Jiri ;->
 
+> This
+> has to do with the simple limitation of your offload assuming there are
+> no runtime changes in the compiled pipeline. For Intel, maybe they
+> aren't, and it's a good fit for them. All I say is, that it is not the
+> good fit for everyone.
+
+ a) it is not part of the P4 spec to dynamically make changes to the
+datapath pipeline after it is create and we are discussing a P4
+implementation not an extension that would add more value b) We are
+more than happy to add extensions in the future to accomodate for
+features but first _P4 spec_ must be met c) we had longer discussions
+with Matty, Khalid and the Rice folks who wrote a paper on that topic
+which you probably didnt attend and everything that needs to be done
+can be from user space today for all those optimizations.
+
+Conclusion is: For what you need to do (which i dont believe is a
+limitation in your hardware rather a design decision on your part) run
+your user space daemon, do optimizations and update the datapath.
+Everybody is happy.
+
+>
+> >Nobody is stopping you from offering your customers proprietary
+> >solutions which include a specific ebpf approach alongside DOCA. We
+> >believe that a singular interface regardless of the vendor is the
+> >right way forward. IMHO, this siloing that unfortunately is also added
+> >by eBPF being a double edged sword is not good for the community.
+> >
+> >> As I also said on the p4 call couple of times, I don't see the kernel
+> >> as the correct place to do the p4 abstractions. Why don't you do it in
+> >> userspace and give vendors possiblity to have p4 backends with compile=
+rs,
+> >> runtime optimizations etc in userspace, talking to the HW in the
+> >> vendor-suitable way too. Then the SW implementation could be easily eB=
+PF
+> >> and the main reason (I believe) why you need to have this is TC
+> >> (offload) is then void.
+> >>
+> >> The "everyone wants to use TC/netlink" claim does not seem correct
+> >> to me. Why not to have one Linux p4 solution that fits everyones needs=
+?
+> >
+> >You mean more fitting to the DOCA world? no, because iam a kernel
+>
+> Again, this has 0 relation to DOCA.
+>
+>
+> >first person and kernel interfaces are good for everyone.
+>
+> Yeah, not really. Not always the kernel is the right answer. Your/Intel
+> plan to handle the offload by:
+> 1) abuse devlink to flash p4 binary
+> 2) parse the binary in kernel to match to the table ids of rules coming
+>    from p4tc ndo_setup_tc
+> 3) abuse devlink to flash p4 binary for tc-flower
+> 4) parse the binary in kernel to match to the table ids of rules coming
+>    from tc-flower ndo_setup_tc
+> is really something that is making me a little bit nauseous.
+>
+> If you don't have a feasible plan to do the offload, p4tc does not make
+> sense to me to be honest.
+
+You mean if there's no plan to match your (NVIDIA?)  point of view.
+For #1 - how's this different from DDP? Wasnt that your suggestion to
+begin with? For #2 Nobody is proposing to do anything of the sort. The
+ndo is passed IDs for the objects and associated contents. For #3+#4
+tc flower thing has nothing to do with P4TC that was just some random
+proposal someone made seeing if they could ride on top of P4TC.
+
+Besides this nobody really has to satisfy your point of view - like i
+said earlier feel free to provide proprietary solutions. From a
+consumer perspective  I would not want to deal with 4 different
+vendors with 4 different proprietary approaches. The kernel is the
+unifying part. You seemed happier with tc flower just not with the
+kernel process - which is ironically the same thing we are going
+through here ;->
+
+cheers,
+jamal
+
+>
+> >
+> >cheers,
+> >jamal
 
