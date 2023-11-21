@@ -1,177 +1,113 @@
-Return-Path: <netdev+bounces-49534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3D27F2499
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 04:26:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12437F24A1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 04:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7D31C216CF
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:26:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D907B20C42
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 03:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3068C156D2;
-	Tue, 21 Nov 2023 03:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869E6156DB;
+	Tue, 21 Nov 2023 03:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IY8XEzmS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYntoANU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F681D8
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:26:21 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1ce5b72e743so67715ad.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:26:21 -0800 (PST)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C224D9
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:28:38 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b7f0170d7bso4877302b3a.2
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:28:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1700537181; x=1701141981; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SDqHkFfcJHn3oaEi3V9nfZPghbl+qBf+g18uag6L/K0=;
-        b=IY8XEzmS+9ksm3kcpzS2mQag9ICVOBAhw1MnBV67Ca+WQFr/TezG5W+vXfhffPmTGA
-         rbei5iikZyqR+V2ethD9iYOztXcbvhYIHkWjhg61mn1CgFhNr79RAN/HuXlAkBnrDM6z
-         4M1JrsvFaXV+AmyrvXHaBXN1MGnS8ppajIRhM=
+        d=gmail.com; s=20230601; t=1700537317; x=1701142117; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSsHzRsq5Xx0I++TzI/3MvEwwDTsLOVtRBfIOCKIdNY=;
+        b=dYntoANU/29wWk6owo6HjQXi1dAeLiJynF3CXbmXNUs1OIFCO5tb7mfQsZ9mDfg6ik
+         zXD/94/zgewUnAGz1nBzZsAaCeNWjwlLPiaS2Hdi6reg2gftP95EX5f7Dzs0m+DWXQqw
+         mboTFOlUvulJueHqJlqpAs4R1Wz512sCH398VEak4EcEb33+OjKsZPJKdRtAUKuhjGkn
+         2UKfNVbReSybIwkNeEdBaFwiM+VegE+/cjmwnH6LzbW4puot6Q+099GybGI9Dba4c0XR
+         DHJyNRZZzrfR0T0WHQtsODBNpkexwcovv4lsanPIcylHSPrkEW5r9vU8CAfduAZEvpHS
+         cxDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700537181; x=1701141981;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SDqHkFfcJHn3oaEi3V9nfZPghbl+qBf+g18uag6L/K0=;
-        b=Q2vApBCQ8Qkjbc7b3RX5VqnCZbOMjrs4Kp+kpHjGuZ4zw4Yp7bKp0ONaiSgi9MBf9C
-         b7XnTOccnyDIbnppbAgQSj7bz0bep2qVmrgveWpGulNJfXViAlRC97XR52e7X4hA2gXu
-         58f4JwiJfbu4pkeUqFM54WNna4a9NlrxbqDvE5VLX1lcH3yDNTLF1VPg7/Ajzj4gVkAv
-         hEjWlQw9oEIwjZ7kwm8pJkKiS6QE21rq+yg0+wKOUeVq/QjPsaHZIRyJ5Izu5vyaF8VW
-         sMABo8Gg9Ze1/T20VHiscc7pYWkwN1jxAXPx2njxLgd2AmBAJqWiVFGP93ZmrD8GHrPF
-         ZaVg==
-X-Gm-Message-State: AOJu0YxIWXay7Pem0CRPahErvlBlN0l6gb3tPrQE96CScu9ABNEaYVUZ
-	cyr+df+3NG8OKeCqgBaWTEw9aCywf6skkpburT8y1Q==
-X-Google-Smtp-Source: AGHT+IFMmnulfcKAR9a+hLgTra7C1d3J7eiroPT/NIW1TBY9eFiMyBHCjiwLmAWOaX8RInlhfGzBwzczb+7897HnLh0=
-X-Received: by 2002:a17:902:ceca:b0:1cf:669b:6176 with SMTP id
- d10-20020a170902ceca00b001cf669b6176mr287186plg.16.1700537180719; Mon, 20 Nov
- 2023 19:26:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700537317; x=1701142117;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zSsHzRsq5Xx0I++TzI/3MvEwwDTsLOVtRBfIOCKIdNY=;
+        b=eKMpi3n1uftcSGeTQ4PamhaAtK7L49qN57HHvYt64zB+aM5tLLpT915eOHSrXPX3WD
+         KTKt1e0YsiYp0lDuhecU/YycxCk5DXWhTNHr31DZM+ERZwBGMS8U34MCVUDOK7KbrAt7
+         31u47I2LsmBAXGNsYgDK/jsfchgbveujkfhS0t4XT7pKilGeOvPHk0Do5WZYUwt7KD2H
+         saoG5O0AqEZSjD5CNy7x3GC2ccc2p9IKsu1zcEvTwx23t4q/0giupoQXeruY1HA43AEB
+         Res4uDc3+qSbfEKrBSgdZL2GsJeJ1aQejfmtLyvbcDIya7KbaRSOukGvP6aUtM8puBq7
+         Wbwg==
+X-Gm-Message-State: AOJu0YwoAIwuGGCBVy1+PoZZSDN2uOFydyo7S/uri4PJi4iATi6Z0agz
+	sR6VAkgmkLnlrkPOwgXwg8M=
+X-Google-Smtp-Source: AGHT+IGF4UXbkrRjaKgaPHI9DZ7gwz+3MqDZUnMBhdCwIxBBjETFgh51zrLrDHM9Kl7/AbfPAVPMsg==
+X-Received: by 2002:a05:6a00:198e:b0:6b8:a6d6:f51a with SMTP id d14-20020a056a00198e00b006b8a6d6f51amr11094372pfl.31.1700537317335;
+        Mon, 20 Nov 2023 19:28:37 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id g13-20020aa7874d000000b006cb8e394574sm3047851pfo.21.2023.11.20.19.28.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 19:28:36 -0800 (PST)
+Date: Tue, 21 Nov 2023 11:28:30 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Marc Muehlfeld <mmuehlfe@redhat.com>
+Subject: Re: [PATCH net-next 01/10] net: bridge: add document for IFLA_BR enum
+Message-ID: <ZVwj3kb/3BdvKblG@Laptop-X1>
+References: <20231117093145.1563511-1-liuhangbin@gmail.com>
+ <20231117093145.1563511-2-liuhangbin@gmail.com>
+ <20231118094525.75a88d09@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117130836.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
- <20231117130836.2.I79c8a6c8cafd89979af5407d77a6eda589833dca@changeid>
-In-Reply-To: <20231117130836.2.I79c8a6c8cafd89979af5407d77a6eda589833dca@changeid>
-From: Grant Grundler <grundler@chromium.org>
-Date: Mon, 20 Nov 2023 19:26:09 -0800
-Message-ID: <CANEJEGsDwvUQZsowJwVkE9qHSoYt3x26bN4yo0y7C-zheY3zsw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] r8152: Add RTL8152_INACCESSIBLE checks to more loops
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>, 
-	"David S . Miller" <davem@davemloft.net>, Grant Grundler <grundler@chromium.org>, 
-	Simon Horman <horms@kernel.org>, Edward Hill <ecgh@chromium.org>, linux-usb@vger.kernel.org, 
-	Laura Nao <laura.nao@collabora.com>, Alan Stern <stern@rowland.harvard.edu>, 
-	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231118094525.75a88d09@kernel.org>
 
-On Fri, Nov 17, 2023 at 1:10=E2=80=AFPM Douglas Anderson <dianders@chromium=
-.org> wrote:
->
-> Previous commits added checks for RTL8152_INACCESSIBLE in the loops in
-> the driver. There are still a few more that keep tripping the driver
-> up in error cases and make things take longer than they should. Add
-> those in.
->
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+On Sat, Nov 18, 2023 at 09:45:25AM -0800, Jakub Kicinski wrote:
+> On Fri, 17 Nov 2023 17:31:36 +0800 Hangbin Liu wrote:
+> > Add document for IFLA_BR enum so we can use it in
+> > Documentation/networking/bridge.rst.
+> 
+> Did you consider writing a YAML spec instead?
+> 
+> It's unlikely to be usable today with YNL due to all the classic
+> netlink vs genetlink differences, but Breno is working on rendering 
+> the specs in documentation:
+> 
+> https://lore.kernel.org/all/20231113202936.242308-1-leitao@debian.org/
+> 
+> so in terms of just documenting attributes it may be good enough.
+> It may possibly be nice to have that documentation folder as "one 
+> stop shop" for all of netlink?
 
-Reviewed-by: Grant Grundler <grundler@chromium.org>
+Thanks for this info. Will the YAML spec be build by the document team?
+I'd prefer all the doc shows in https://www.kernel.org/doc/html/latest/
+so users could find the doc easily.
 
-I've checked all the return paths and believe these changes don't
-break any of them.
+It would be good if there is an example in Documentation/netlink/specs/ (when
+the patch applied) so I can take as a reference :)
 
-cheers,
-grant
-
-> ---
->
->  drivers/net/usb/r8152.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index d6edf0254599..aca7dd7b4090 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -3000,6 +3000,8 @@ static void rtl8152_nic_reset(struct r8152 *tp)
->                 ocp_write_byte(tp, MCU_TYPE_PLA, PLA_CR, CR_RST);
->
->                 for (i =3D 0; i < 1000; i++) {
-> +                       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                               return;
->                         if (!(ocp_read_byte(tp, MCU_TYPE_PLA, PLA_CR) & C=
-R_RST))
->                                 break;
->                         usleep_range(100, 400);
-> @@ -3329,6 +3331,8 @@ static void rtl_disable(struct r8152 *tp)
->         rxdy_gated_en(tp, true);
->
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
->                 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL=
-);
->                 if ((ocp_data & FIFO_EMPTY) =3D=3D FIFO_EMPTY)
->                         break;
-> @@ -3336,6 +3340,8 @@ static void rtl_disable(struct r8152 *tp)
->         }
->
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
->                 if (ocp_read_word(tp, MCU_TYPE_PLA, PLA_TCR0) & TCR0_TX_E=
-MPTY)
->                         break;
->                 usleep_range(1000, 2000);
-> @@ -5499,6 +5505,8 @@ static void wait_oob_link_list_ready(struct r8152 *=
-tp)
->         int i;
->
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
->                 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL=
-);
->                 if (ocp_data & LINK_LIST_READY)
->                         break;
-> @@ -5513,6 +5521,8 @@ static void r8156b_wait_loading_flash(struct r8152 =
-*tp)
->                 int i;
->
->                 for (i =3D 0; i < 100; i++) {
-> +                       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                               return;
->                         if (ocp_read_word(tp, MCU_TYPE_USB, USB_GPHY_CTRL=
-) & GPHY_PATCH_DONE)
->                                 break;
->                         usleep_range(1000, 2000);
-> @@ -5635,6 +5645,8 @@ static int r8153_pre_firmware_1(struct r8152 *tp)
->         for (i =3D 0; i < 104; i++) {
->                 u32 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_USB, USB_WDT1=
-_CTRL);
->
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return -ENODEV;
->                 if (!(ocp_data & WTD1_EN))
->                         break;
->                 usleep_range(1000, 2000);
-> @@ -5791,6 +5803,8 @@ static void r8153_aldps_en(struct r8152 *tp, bool e=
-nable)
->                 data &=3D ~EN_ALDPS;
->                 ocp_reg_write(tp, OCP_POWER_CFG, data);
->                 for (i =3D 0; i < 20; i++) {
-> +                       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                               return;
->                         usleep_range(1000, 2000);
->                         if (ocp_read_word(tp, MCU_TYPE_PLA, 0xe000) & 0x0=
-100)
->                                 break;
-> --
-> 2.43.0.rc0.421.g78406f8d94-goog
->
+Thanks
+Hangbin
+> 
+> Absolutely no strong preference on my side, just wanted to make
+> sure you're aware of that work.
 
