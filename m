@@ -1,49 +1,60 @@
-Return-Path: <netdev+bounces-49987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 205F17F4345
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:09:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5081C7F4357
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF3C28147F
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:09:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AFA82812E1
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BEB25569;
-	Wed, 22 Nov 2023 10:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F06E3D968;
+	Wed, 22 Nov 2023 10:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DZ8GOh8a"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sSzHWTyG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B255A100;
-	Wed, 22 Nov 2023 02:09:27 -0800 (PST)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AM9c5hd028838;
-	Wed, 22 Nov 2023 10:09:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=TgmvFpfDyjjrjHH2iGALQkRvhXzC2NmU7EN6MHLQb/0=;
- b=DZ8GOh8axw7+0wCMcuPV2YprThKXfIuP/H9NCD3UjbavQegFrvFzxnZS/suf6cPjCVyR
- 5nFqXPt2GznIDKdE/ema/UBD11QJTa67nRr+jHprUCtY7eGI5nOb33+/AzoChx8Sr6x7
- 532hzmBe7lxIuIwv+fbsIUm0LWPcT5MljLcUa1qwJJL3zcx30V7zOkVX6P9BueAS69rP
- moVexRJMV4YCBDV1ChSQxZpv42dt0n3XFhbFb+IlUnk8beYyXqq3l1S+5BlXyx8xY3P5
- ZSWPWdm+vV+ydpI28g4bAQlm5srrKR4Jnaxv+8o9z2hayE+n988cNh6DHQvLqSa2o6qo yg== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uh477hm9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Nov 2023 10:09:18 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AMA9Huf003409
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Nov 2023 10:09:17 GMT
-Received: from [10.216.2.74] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 22 Nov
- 2023 02:09:09 -0800
-Message-ID: <8bb79735-3b5d-4229-b0f4-bc50d61fdba1@quicinc.com>
-Date: Wed, 22 Nov 2023 15:38:36 +0530
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D20195
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:12:44 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4083f61322fso33125385e9.1
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:12:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700647963; x=1701252763; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=seKmnP9AHX9tkrlZsmKjZQmrPlkskzDjOIYe+UgARL4=;
+        b=sSzHWTyGh2SWJ5EFDTjNGXEL/VKXPhnC9q8v1wHYAM3/EguJppK7+NLMaarr0Xlipv
+         II7VDbt8AvXwQG1siOZwuciPeOt1CSNCahCOHs90WVSoAnScMJcsDFFHoFqsMY4NJo5h
+         B9s3i5+CRqcZ8NTFmxQkmvh+1I8CsS0vm5N0h5eIxR4r0OyZ+cImJK5UV7hYA2v0xty4
+         PI28B5/zO+Q+BBsQfFnP+MooqwXVLhjZ/PesUK1wcUiby639H2FJ3AFrxq/lm4lf2vE2
+         MVUDj9LWyf7QKil3wArHiBlaoSI1jEQJz5BoeZGo6Dk1yUY1OYRaxC9qmUSOnmUhtLSB
+         yk1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700647963; x=1701252763;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=seKmnP9AHX9tkrlZsmKjZQmrPlkskzDjOIYe+UgARL4=;
+        b=HgdebyCWmdzhMWCJ/ksP0kDks9LX49YSCMFRrDGlCXhrOj9rhDAb2r62/3lgsunuv8
+         EiE13KvncRmMNJP7xe8/pPAp2I6VYjWaa1J8S+EFcHD2rUCaA7+gqXSxXiXWG4KmDLUD
+         JdWhmdaKrBXFY7WL4kuGp6/n5xL5zWNvNS91Owk/a3DN+WqpB8JI9IRgV2q0710AHdc4
+         fWkJUsWLJaYUf5+laxCFKkAmddlfqHsF4fF4Bkh/za0ZKKgAXhDMrpGzxlPkchjS8yys
+         U+HfT3RV+57FsNnxsclXSG1L3E/rZ1en0dDME5tShKv/eEtoB3NlCkWiUufQ6kpWcj1C
+         dWZA==
+X-Gm-Message-State: AOJu0YxpIZW77t2lxnmVaUCiA56PaN5VwzDpfShSyp1le7sG0SCtAa11
+	TLhPaV0gWGqjj+Sbp9SLmRlYP9fzsoJK+m8Fhto=
+X-Google-Smtp-Source: AGHT+IG1vexOuJLadng7UnbtkrByhtaL1OvaB23WbAQx9Ru5qfHVBXQO9tUoR1xTfz0Qcm9dHT+fXQ==
+X-Received: by 2002:a5d:5f4f:0:b0:32d:b2cf:8ccd with SMTP id cm15-20020a5d5f4f000000b0032db2cf8ccdmr1531359wrb.47.1700647962778;
+        Wed, 22 Nov 2023 02:12:42 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.100])
+        by smtp.gmail.com with ESMTPSA id v9-20020a5d5909000000b0032f9688ea48sm16750214wrd.10.2023.11.22.02.12.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 02:12:42 -0800 (PST)
+Message-ID: <d26eae8d-4968-4ab0-bd9b-696d7b3865ec@linaro.org>
+Date: Wed, 22 Nov 2023 11:12:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,78 +64,102 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 3/9] dt-bindings: clock: ipq5332: drop the few nss
  clocks definition
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Andy Gross
-	<agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin
- Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Content-Language: en-US
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
+ Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 References: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
  <20231121-ipq5332-nsscc-v2-3-a7ff61beab72@quicinc.com>
  <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
-Content-Language: en-US
-From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-In-Reply-To: <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+ <8bb79735-3b5d-4229-b0f4-bc50d61fdba1@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <8bb79735-3b5d-4229-b0f4-bc50d61fdba1@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: vYM6GU4uF4S8RyYM9Bo6aBK6sbTyNKj4
-X-Proofpoint-GUID: vYM6GU4uF4S8RyYM9Bo6aBK6sbTyNKj4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-22_06,2023-11-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=501 clxscore=1015
- suspectscore=0 spamscore=0 bulkscore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311220071
 
-
-
-On 11/21/2023 8:36 PM, Krzysztof Kozlowski wrote:
-> On 21/11/2023 15:30, Kathiravan Thirumoorthy wrote:
->> In commit 0dd3f263c810 ("clk: qcom: ipq5332: enable few nssnoc clocks in
+On 22/11/2023 11:08, Kathiravan Thirumoorthy wrote:
 > 
-> Where is this commit coming from?
 > 
->> driver probe"), gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
->> gcc_nssnoc_nsscc_clk are enabled in driver probe to keep it always-on.
+> On 11/21/2023 8:36 PM, Krzysztof Kozlowski wrote:
+>> On 21/11/2023 15:30, Kathiravan Thirumoorthy wrote:
+>>> In commit 0dd3f263c810 ("clk: qcom: ipq5332: enable few nssnoc clocks in
+>>
+>> Where is this commit coming from?
+>>
+>>> driver probe"), gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
+>>> gcc_nssnoc_nsscc_clk are enabled in driver probe to keep it always-on.
+>>
+>> Implementation can change and for example bring back these clocks. Are
+>> you going to change bindings? No, drop the patch.
+>>
+>> Bindings should be dropped only in a few rare cases like clocks not
+>> available for OS or bugs.
 > 
-> Implementation can change and for example bring back these clocks. Are
-> you going to change bindings? No, drop the patch.
+> Thanks Krzysztof. Will drop this patch in V3.
 > 
-> Bindings should be dropped only in a few rare cases like clocks not
-> available for OS or bugs.
+> One more question to understand further. In IPQ SoCs there are bunch of 
+> coresight / QDSS clocks but coresight framework doesn't handle all 
+> clocks. Those clocks are enabled in bootloader stage itself. In such 
+> case, should I drop the clocks from both binding and driver or only from 
+> driver?
 
-Thanks Krzysztof. Will drop this patch in V3.
+That's not really the reason to drop them at all. Neither from driver,
+nor from bindings. You should not rely on bootloader handling your clocks
 
-One more question to understand further. In IPQ SoCs there are bunch of 
-coresight / QDSS clocks but coresight framework doesn't handle all 
-clocks. Those clocks are enabled in bootloader stage itself. In such 
-case, should I drop the clocks from both binding and driver or only from 
-driver?
+Best regards,
+Krzysztof
 
-Thanks,
-Kathiravan.
-
-> 
-> Best regards,
-> Krzysztof
-> 
 
