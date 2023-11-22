@@ -1,200 +1,147 @@
-Return-Path: <netdev+bounces-50046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0F97F47D1
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:29:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED117F4810
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:45:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 499A81F22007
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:29:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E4F1B2097C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A86654F8A;
-	Wed, 22 Nov 2023 13:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E0A5676A;
+	Wed, 22 Nov 2023 13:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ZGy6+h9F"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Azq5OYes"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC33197
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 05:29:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1700659747; x=1732195747;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/8Qx7YfFUxNR+Ie0FYpvO3arONICr3f/8OTctudJOCc=;
-  b=ZGy6+h9FYdEULCu5C9K20/dpTQ7qR0E/6uaHSZLorKwCtU9xSFdZ1Pfa
-   AeqKgy0n1Wn8tA6ujL5Zph7wfnax82MAamZ5W2E2/nsH9ImWAmS4DUAWU
-   RDRalUz1HC14YSNgX/JgoJdrAAOslUvlz5vq94cSf6RPB8FDtELX4Sc4B
-   vSndXpCSCQOW+E1nd9sGahWObQIf/NiQrZhP47DBFuppY+bsQoe/4+Lf/
-   iwmgp5c6fmhOm/Z0WRS+SStjZwaqovOOXVZz9a3XMkVr8WKuke6J9VyQg
-   rSWtpXrM3tYXX8478TLaYPZvtHjeMB6EW8KO8TfyJb76vXc6ayxgz3Sr2
-   w==;
-X-CSE-ConnectionGUID: 8fkZwiXeRiyZeqDSvRnwOw==
-X-CSE-MsgGUID: sMcdIeZdSFi0yzmMe/hnvg==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="179253324"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Nov 2023 06:29:06 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 22 Nov 2023 06:28:04 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
- Transport; Wed, 22 Nov 2023 06:28:04 -0700
-Date: Wed, 22 Nov 2023 14:28:04 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: Rasmus Villemoes <rasmus.villemoes@prevas.dk>, Woojung Huh
-	<woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	Per Noergaard Christensen <per.christensen@prevas.dk>
-Subject: Re: [PATCH net-next] net: dsa: microchip: add MRP software ring
- support
-Message-ID: <20231122132804.3tqmhj2aahmqcf7o@DEN-DL-M31836.microchip.com>
-References: <20231122112006.255811-1-rasmus.villemoes@prevas.dk>
- <20231122113537.o2fennnt2l2sri56@skbuf>
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B2DD54;
+	Wed, 22 Nov 2023 05:44:58 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A59D71BF206;
+	Wed, 22 Nov 2023 13:44:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700660697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HYGwltdt7UObW6m6TQ25cKM4YubrRmxjcFZzyasRZoE=;
+	b=Azq5OYesRze4Ajgq1X2y6Rlqfe3W2ZoOlUQoeG1wJLotR/9VVFNBphuxj42UDzVKdrXQjy
+	9J56sFXmNMc9wrx+YEcpbHSJiQgwOUd8F4JQNU7O4bHRX+dVDUdasgfDd9O0H7T3M1b3Dn
+	K1a5pXmttrk+jp6YLCwnw22xH011ECFtj7Ah0XLyEp0smrxan4YDdibKh58B9zfFOhGCXO
+	mJAfGFHLGMD0V+oBvkyldD3GciM/GRX5qSWa+eoCX3B8ffXDl6QKceKhcXUbQ1DqzfyrED
+	kt7Va5FGV08YXUCT1hF6KvShuTAQac8lU1ANUKXuTvN78G8FPCeCM3bZmnN5Ng==
+Date: Wed, 22 Nov 2023 14:44:53 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231122144453.5eb0382f@kmaincent-XPS-13-7390>
+In-Reply-To: <20231121094354.635ee8cd@kernel.org>
+References: <20231120105255.cgbart5amkg4efaz@skbuf>
+	<20231120121440.3274d44c@kmaincent-XPS-13-7390>
+	<20231120120601.ondrhbkqpnaozl2q@skbuf>
+	<20231120144929.3375317e@kmaincent-XPS-13-7390>
+	<20231120142316.d2emoaqeej2pg4s3@skbuf>
+	<20231120093723.4d88fb2a@kernel.org>
+	<20231120190023.ymog4yb2hcydhmua@skbuf>
+	<20231120115839.74ee5492@kernel.org>
+	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
+	<20231120133737.70dde657@kernel.org>
+	<20231120220549.cvsz2ni3wj7mcukh@skbuf>
+	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+	<20231121094354.635ee8cd@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20231122113537.o2fennnt2l2sri56@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-The 11/22/2023 13:35, Vladimir Oltean wrote:
-Hi Rasmus,
+On Tue, 21 Nov 2023 09:43:54 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-> 
-> On Wed, Nov 22, 2023 at 12:20:06PM +0100, Rasmus Villemoes wrote:
-> > From: Per Noergaard Christensen <per.christensen@prevas.dk>
-> >
-> > Add dummy functions that tells the MRP bridge instance to use
-> > implemented software routines instead of hardware-offloading.
-> >
-> > Signed-off-by: Per Noergaard Christensen <per.christensen@prevas.dk>
-> > Signed-off-by: Rasmus Villemoes <rasmus.villemoes@prevas.dk>
-> > ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 55 ++++++++++++++++++++++++++
-> >  drivers/net/dsa/microchip/ksz_common.h |  1 +
-> >  2 files changed, 56 insertions(+)
-> >
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> > index 3fed406fb46a..b0935997dc05 100644
-> > --- a/drivers/net/dsa/microchip/ksz_common.c
-> > +++ b/drivers/net/dsa/microchip/ksz_common.c
-> > @@ -3566,6 +3566,57 @@ static int ksz_set_wol(struct dsa_switch *ds, int port,
-> >       return -EOPNOTSUPP;
-> >  }
-> >
-> > +static int ksz_port_mrp_add(struct dsa_switch *ds, int port,
-> > +                         const struct switchdev_obj_mrp *mrp)
-> > +{
-> > +     struct dsa_port *dp = dsa_to_port(ds, port);
-> > +     struct ksz_device *dev = ds->priv;
-> > +
-> > +     /* port different from requested mrp ports */
-> > +     if (mrp->p_port != dp->user && mrp->s_port != dp->user)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     /* save ring id */
-> > +     dev->ports[port].mrp_ring_id = mrp->ring_id;
-> > +     return 0;
-> > +}
-> > +
-> > +static int ksz_port_mrp_del(struct dsa_switch *ds, int port,
-> > +                         const struct switchdev_obj_mrp *mrp)
-> > +{
-> > +     struct ksz_device *dev = ds->priv;
-> > +
-> > +     /* check if port not part of ring id */
-> > +     if (mrp->ring_id != dev->ports[port].mrp_ring_id)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     /* clear ring id */
-> > +     dev->ports[port].mrp_ring_id = 0;
-> > +     return 0;
-> > +}
-> > +
-> > +static int ksz_port_mrp_add_ring_role(struct dsa_switch *ds, int port,
-> > +                                   const struct switchdev_obj_ring_role_mrp *mrp)
-> > +{
-> > +     struct ksz_device *dev = ds->priv;
-> > +
-> > +     if (mrp->sw_backup && dev->ports[port].mrp_ring_id == mrp->ring_id)
-> > +             return 0;
+> On Tue, 21 Nov 2023 18:31:14 +0100 K=C3=B6ry Maincent wrote:
+> > - Expand struct hwtstamp_config with a phc_index member for the
+> > SIOCG/SHWTSTAMP commands.
+> >   To keep backward compatibility if phc_index is not set in the
+> > hwtstamp_config data from userspace use the default hwtstamp (the defau=
+lt
+> > being selected as done in my patch series).
+> >   Is this possible, would it breaks things? =20
+>=20
+> I'd skip this bit, and focus on the ETHTOOL_TSINFO. Keep the ioctl as
+> "legacy" and do all the extensions in ethtool. TSINFO_GET can serve
+> as GET, to avoid adding 3rd command for the same thing. TSINFO_SET
+> would be new (as you indicate below).
 
-As Vladimir mentioned, you should add some rules to trap all MRP frames.
-Otherwise, if you configure as MRC then you need to foward the TEST
-frames and copy to CPU the CONTROL frames. And if you start to have more
-than 2 ports under the bridge, then the traffic will be flooded on the
-other ports that are not part of the MRP ring.
-If you configure as MRM then you will never terminate the frames
-otherwise the HW will just forward them. And of course you will have the
-same issue if there are more than 2 ports under the bridge.
-I hope I didn't forget everything (as I didn't look into this for some
-time). But willing to look more into if it is needed.
+You say this patch series should simply add TSINFO_SET command to set the
+current phc_index?
 
-> > +
-> > +     return -EOPNOTSUPP;
-> > +}
-> > +
-> > +static int ksz_port_mrp_del_ring_role(struct dsa_switch *ds, int port,
-> > +                                   const struct switchdev_obj_ring_role_mrp *mrp)
-> > +{
-> > +     struct ksz_device *dev = ds->priv;
-> > +
-> > +     if (mrp->sw_backup && dev->ports[port].mrp_ring_id == mrp->ring_id)
-> > +             return 0;
-> > +
-> > +     return -EOPNOTSUPP;
-> > +}
-> > +
-> >  static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
-> >                                   const unsigned char *addr)
-> >  {
-> > @@ -3799,6 +3850,10 @@ static const struct dsa_switch_ops ksz_switch_ops = {
-> >       .port_fdb_del           = ksz_port_fdb_del,
-> >       .port_mdb_add           = ksz_port_mdb_add,
-> >       .port_mdb_del           = ksz_port_mdb_del,
-> > +     .port_mrp_add           = ksz_port_mrp_add,
-> > +     .port_mrp_del           = ksz_port_mrp_del,
-> > +     .port_mrp_add_ring_role = ksz_port_mrp_add_ring_role,
-> > +     .port_mrp_del_ring_role = ksz_port_mrp_del_ring_role,
-> >       .port_mirror_add        = ksz_port_mirror_add,
-> >       .port_mirror_del        = ksz_port_mirror_del,
-> >       .get_stats64            = ksz_get_stats64,
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-> > index b7e8a403a132..24015f0a9c98 100644
-> > --- a/drivers/net/dsa/microchip/ksz_common.h
-> > +++ b/drivers/net/dsa/microchip/ksz_common.h
-> > @@ -110,6 +110,7 @@ struct ksz_port {
-> >       bool remove_tag;                /* Remove Tag flag set, for ksz8795 only */
-> >       bool learning;
-> >       int stp_state;
-> > +     u32 mrp_ring_id;
-> >       struct phy_device phydev;
-> >
-> >       u32 fiber:1;                    /* port is fiber */
-> > --
-> > 2.40.1.1.g1c60b9335d
-> >
-> 
-> Could you please explain a bit the mechanics of this dummy implementation?
-> Don't you need to set up any packet traps for MRP PDUs, to avoid
-> forwarding them? What ring roles will work with the dummy implementation?
-> 
-> +Horatiu for an expert opinion.
-> 
+It won't solve your requirement of having simultaneous hwtimestamp and
+enabling/disabling them through rx_filter and tx_types.
+You want to do this in another patch series alongside a new SIOCG/SHWTSTAMP=
+_2
+ABI?
 
--- 
-/Horatiu
+> > - In netlink part, send one netlink tsinfo skb for each phc_index. =20
+>=20
+> phc_index and netdev combination. A DO command can only generate one
+> answer (or rather, it should generate only one answer, there are few
+> hard rules in netlink). So we need to move that functionality to DUMP.
+> We can filter the DUMP based on user-provided ifindex and/or phc_index.
+
+Currently, the dumpit function is assigned to ethnl_default_dumpit. Wouldn't
+the behavior change of the dumpit callback break the ABI?
+
+
+> > Could be done in a later patch series:
+> > - Expand netlink TSINFO with ETHTOOL_A_TSINFO_HWSTAMP_PROVIDER_QUALIFIE=
+R.
+> >   Describing this struct:
+> > enum ethtool_hwstamp_provider_qualifier {
+> >  	ETHTOOL_HWSTAMP_PROVIDER_QUALIFIER_PRECISE,
+> >  	ETHTOOL_HWSTAMP_PROVIDER_QUALIFIER_APPROX,
+> > };=20
+> >=20
+> >   Set the desired qualifier through TSINFO_SET or through SIOCSHWTSTAMP=
+ by
+> >   expanding again the struct hwtstamp_config.
+
+Just wondering to have a insight of future support, in the case of several
+provider qualifier and the SIOCG/SHWTSTAMP_2 layout containing the phc_inde=
+x.
+Will we be able to talk to the two providers qualifiers simultaneously or i=
+s it
+not possible. To know if the SIOCG/SHWTSTAMP_2 layout would contain the
+description of the qualifier provider.
+If I understand well your mail in the thread it will be the case right?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
