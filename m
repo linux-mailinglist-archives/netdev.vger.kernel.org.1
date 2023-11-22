@@ -1,195 +1,109 @@
-Return-Path: <netdev+bounces-50118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9EC17F4A4D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:32:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E607F4A9D
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:34:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AEE5B20F59
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:32:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D22B20E95
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5054654BEB;
-	Wed, 22 Nov 2023 15:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E29A4CDF0;
+	Wed, 22 Nov 2023 15:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="j5j08oG6"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ZotGumm1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F8E109
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:32:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0UZRV3tV4EpllqNrHpLI52U8I2EdmMEI3m37Cw1+Tuo=; b=j5j08oG6NdQC0nU3hYxJkXXmdw
-	fWG+/MZTTr0sO4rAqSL+JGyxVznPxpEtYmIx6Kz+mC1V8mMkaJ1/OdQ1HaRUr8YhCCRKh6jvEvBfk
-	/Cxz95n/OJZGpDrMUiTtxLrKFx/yGZ6dTDoVFPPcrOOZcPYAVbmQiyEdFuMF5LBiSnvn6vYPQKSZ2
-	4WdNV7Dquj+HElsHeZrsVmRw5lcIKwnBgqUkZmBdTm6dvd+PqQAqbPc6c/T6D5/i7MsVg+VjlUfdA
-	sgOWAZm4vLTWU1dqAyeCLtuKuVuY2qmFsSuGebJJthiMislC3IGLHWD2nYzvx5IEQjJGcQk241Q+U
-	Tu06Yluw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44144 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r5pCt-0000Me-0l;
-	Wed, 22 Nov 2023 15:32:03 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r5pCv-00DAHn-6g; Wed, 22 Nov 2023 15:32:05 +0000
-In-Reply-To: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
-References: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 10/10] net: phylink: use the PHY's
- possible_interfaces if populated
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8774E10FA
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:33:13 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5cc3dd21b0cso10848127b3.3
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:33:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700667192; x=1701271992; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q4ei9NRU/G7jwU5acqapK3n4Kv1mApAAownSARqq2L0=;
+        b=ZotGumm18UkjuzQlhCKJy3Pu0MPvp/26g9R0vuU7+vIzkLf/zZIC/dVBFj8r4LcvQ3
+         4KcAlrI11IjyvgjUHVZYV2Q6BsxRkhpzG45d88mQqmk7WCUGLkXGGwAy8jo4UFDh9UCZ
+         B9V2M4UcNPMpSYeZ3U79QjlYVG1mTdhrIMFyBpcnGwVkABFeCF6wiGtpG4iA+mUeLnw+
+         PAe8Q7QaA7hl8meuB085PBVal2zn4uaoiRQZ7nY23xgN+SC352eIE01y7Qni55kabB+y
+         TfxaCr66ufKsreFEYtxfffAOS0RYr07Huo8yR1eO5xVk3w1Go7zcwGIvArv1ugCWqm1s
+         11Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700667192; x=1701271992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q4ei9NRU/G7jwU5acqapK3n4Kv1mApAAownSARqq2L0=;
+        b=kDyk37G7qZ0m2IZiK/2NtB46lR0uTEBGwZvF5cMthwzRt1uAP5thCplyjiiidwqBXl
+         iyB6SNdTfPgEdillaIO5NSZAq/OrpL4RxU0/QuAaTelSrt333NhcWo8sCpqWB1+XZwBK
+         0aBvYkzSfDa1woFWbsSo4XJ+zDyEud5THNyxajxn5DW+JIxpIFmtu5kT4TL4Y3jUwQ5N
+         XHnlBc0SY1UuUDp2MGcw63vfvO4c4xw2vuYFBgkiz8s0hLDWbfgTKTyLKAg688A/ArXM
+         pek8rn/zxyMaGsVcyD+Pd0qujQk5JYqx1qtOAQ6TX2YZFk38DejzTwnUMtUchy5/cK+d
+         1f7A==
+X-Gm-Message-State: AOJu0YxtveMx4jYG/ymyENhu4dZFfnpmdD4Z9BIg1olrz4bg1XXhWLJK
+	tV86rr286fiaUNdep8rtTmR16Xr+9geofmUfN44xng==
+X-Google-Smtp-Source: AGHT+IE4G4KLm9Drcj26SIBaIAfNRfhVxN87Ha1FgM1GhfP1jQnP9+8vTA0KhZEZWso2wFxW5NqLLp8rwsJG9A9wifg=
+X-Received: by 2002:a0d:efc2:0:b0:5cb:e3a9:5e77 with SMTP id
+ y185-20020a0defc2000000b005cbe3a95e77mr2755985ywe.6.1700667192512; Wed, 22
+ Nov 2023 07:33:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r5pCv-00DAHn-6g@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 22 Nov 2023 15:32:05 +0000
+References: <20231121175640.9981-1-mkoutny@suse.com> <CAM0EoM=id7xo1=F5SY2f+hy8a8pkXQ5a0xNJ+JKd9e6o=--RQg@mail.gmail.com>
+ <yerqczxbz6qlrslkfbu6u2emb5esqe7tkrexdbneite2ah2a6i@l6arp7nzyj75>
+In-Reply-To: <yerqczxbz6qlrslkfbu6u2emb5esqe7tkrexdbneite2ah2a6i@l6arp7nzyj75>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 22 Nov 2023 10:33:01 -0500
+Message-ID: <CAM0EoMk_OgpjV7Huh-NHF_WxkJtQYGAMY+kutsL=qD9oYthh_w@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: cls: Load net classifier modules via alias
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, 
+	Martin Wilck <mwilck@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some PHYs such as Aquantia, Broadcom 84881, and Marvell 88X33x0 can
-switch between a set of interface types depending on the negotiated
-media speed, or can use rate adaption for some or all of these
-interface types.
+On Wed, Nov 22, 2023 at 5:41=E2=80=AFAM Michal Koutn=C3=BD <mkoutny@suse.co=
+m> wrote:
+>
+> On Tue, Nov 21, 2023 at 05:37:37PM -0500, Jamal Hadi Salim <jhs@mojatatu.=
+com> wrote:
+> > What's speacial about the "tcf- '' that makes it work
+> > better for filtering than existing "cls_" prefix?
+>
+> tcf-foo is an alias.
+> cls_foo is the canonical name of the kernel module.
+>
+> request_module() + blacklist (as described in modprobe.d(5)) works only
+> when calling with the alias. The actual string is not important, being
+> an alias is the crux.
+>
 
-We currently assume that these are Clause 45 PHYs that are configured
-not to use a specific set of interface modes, which has worked so far,
-but is just a work-around. In this workaround, we validate using all
-interfaces that the MAC supports, which can lead to extra modes being
-advertised that can not be supported.
+Thanks for the explanation.
 
-To properly address this, switch to using the newly introduced PHY
-possible_interfaces bitmap which indicates which interface modes will
-be used by the PHY as configured. We calculate the union of the PHY's
-possible interfaces and MACs supported interfaces, checking that is
-non-empty. If the PHY is on a SFP, we further reduce the set by those
-which can be used on a SFP module, again checking that is non-empty.
-Finally, we validate the subset of interfaces, taking account of
-whether rate matching will be used for each individual interface mode.
+> > What about actions (prefix "act_") etc?
+>
+> I focused only on "cls_" for the first iteration. Do you want me to look
+> at other analogous loads?
 
-This becomes independent of whether the PHY is clause 22 or clause 45.
+Yes, look at act_ and sch_
 
-It is encouraged that all PHYs that switch interface modes or use
-rate matching should populate phydev->possible_interfaces.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phylink.c | 67 +++++++++++++++++++++++++++++++--------
- 1 file changed, 54 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 39d85e47422e..48d3bd3e9fc7 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -121,6 +121,19 @@ do {									\
- })
- #endif
- 
-+static const phy_interface_t phylink_sfp_interface_preference[] = {
-+	PHY_INTERFACE_MODE_25GBASER,
-+	PHY_INTERFACE_MODE_USXGMII,
-+	PHY_INTERFACE_MODE_10GBASER,
-+	PHY_INTERFACE_MODE_5GBASER,
-+	PHY_INTERFACE_MODE_2500BASEX,
-+	PHY_INTERFACE_MODE_SGMII,
-+	PHY_INTERFACE_MODE_1000BASEX,
-+	PHY_INTERFACE_MODE_100BASEX,
-+};
-+
-+static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
-+
- /**
-  * phylink_set_port_modes() - set the port type modes in the ethtool mask
-  * @mask: ethtool link mode mask
-@@ -1764,6 +1777,47 @@ static int phylink_validate_phy(struct phylink *pl, struct phy_device *phy,
- 				unsigned long *supported,
- 				struct phylink_link_state *state)
- {
-+	DECLARE_PHY_INTERFACE_MASK(interfaces);
-+
-+	/* If the PHY provides a bitmap of the interfaces it will be using
-+	 * depending on the negotiated media speeds, use this to validate
-+	 * which ethtool link modes can be used.
-+	 */
-+	if (!phy_interface_empty(phy->possible_interfaces)) {
-+		/* We only care about the union of the PHY's interfaces and
-+		 * those which the host supports.
-+		 */
-+		phy_interface_and(interfaces, phy->possible_interfaces,
-+				  pl->config->supported_interfaces);
-+
-+		if (phy_interface_empty(interfaces)) {
-+			phylink_err(pl, "PHY has no common interfaces\n");
-+			return -EINVAL;
-+		}
-+
-+		if (phy_on_sfp(phy)) {
-+			/* If the PHY is on a SFP, limit the interfaces to
-+			 * those that can be used with a SFP module.
-+			 */
-+			phy_interface_and(interfaces, interfaces,
-+					  phylink_sfp_interfaces);
-+
-+			if (phy_interface_empty(interfaces)) {
-+				phylink_err(pl, "SFP PHY's possible interfaces becomes empty\n");
-+				return -EINVAL;
-+			}
-+		}
-+
-+		phylink_dbg(pl, "PHY %s uses interfaces %*pbl, validating %*pbl\n",
-+			    phydev_name(phy),
-+			    (int)PHY_INTERFACE_MODE_MAX,
-+			    phy->possible_interfaces,
-+			    (int)PHY_INTERFACE_MODE_MAX, interfaces);
-+
-+		return phylink_validate_mask(pl, phy, supported, state,
-+					     interfaces);
-+	}
-+
- 	/* Check whether we would use rate matching for the proposed interface
- 	 * mode.
- 	 */
-@@ -3032,19 +3086,6 @@ static void phylink_sfp_detach(void *upstream, struct sfp_bus *bus)
- 	pl->netdev->sfp_bus = NULL;
- }
- 
--static const phy_interface_t phylink_sfp_interface_preference[] = {
--	PHY_INTERFACE_MODE_25GBASER,
--	PHY_INTERFACE_MODE_USXGMII,
--	PHY_INTERFACE_MODE_10GBASER,
--	PHY_INTERFACE_MODE_5GBASER,
--	PHY_INTERFACE_MODE_2500BASEX,
--	PHY_INTERFACE_MODE_SGMII,
--	PHY_INTERFACE_MODE_1000BASEX,
--	PHY_INTERFACE_MODE_100BASEX,
--};
--
--static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
--
- static phy_interface_t phylink_choose_sfp_interface(struct phylink *pl,
- 						    const unsigned long *intf)
- {
--- 
-2.30.2
-
+cheers,
+jamal
+> Thanks,
+> Michal
 
