@@ -1,224 +1,143 @@
-Return-Path: <netdev+bounces-49997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827A57F4377
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:18:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C227F4385
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:19:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30F9A2814E0
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:18:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E755281615
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC5B3C09B;
-	Wed, 22 Nov 2023 10:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B6351020;
+	Wed, 22 Nov 2023 10:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hJPINaoo"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="L3k1/h+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729AD93;
-	Wed, 22 Nov 2023 02:17:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700648271; x=1732184271;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=lcEqE+U9cXaYuhTh9GmrnYY+OaX9wpxMzywGGTmhpFE=;
-  b=hJPINaoo3G73pCb3ci8hcNgoaPBuPJxSCfFt+l7K5a/O6nI+PJbicjl7
-   ao7QlS4puk6yLtk0fP6PO9KSDNU2fiKSNsa11UdgoZylaeUMgNGyQqPH1
-   4fzYf6X/SPm49/b3uupjps3gpk5yXsHi15oxic1YbFaiv2g3cmUgGgdih
-   6IUDuN4ZFsmEcuF6Ak1LOzmvB4mDQ6fAhqHhrcDEoXz5bY0VAPz75yC8u
-   lo0LWG7mL2IoVHYi45etmDN2ulrhq+fgzRUwQF9bEAvqrtFJsFj76GTw5
-   BqLAFQOLgIrf6iQaAAmXvR5F5BpK3NcrSQiGEguQGdIM2494Pp/PEfwJN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="5218169"
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="5218169"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 02:17:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,218,1695711600"; 
-   d="scan'208";a="8386692"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Nov 2023 02:17:50 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 22 Nov 2023 02:17:48 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 22 Nov 2023 02:17:47 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Wed, 22 Nov 2023 02:17:41 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Wed, 22 Nov 2023 02:17:41 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cSxmEE5m5QLvTOexcpNrNqpDTvHEDqAFbfr3VuBVVFoI5SreuQnv7vuFuMFZ8bdShfREGaMqVRxXEDY5uR34IjGUL7r/pOQdfw56O0z3bq2U0XLZIKuRf+Wr9akx5vi1rxFXtDtKPgbX8pBLyiooRg88Ou9H0hvFW0HC578suWE39WinsVvyII96X0i670qKrQs8dRrdZ6h+UqIz4eM3wYVmSmJoMyljzpK5T5A6vcEhKkKIBqEUHXP/hvrMvcLPg8vXgtHJDTg00mM3LKUYQcz6qauRXxhHEN3mEC13Z1iDh1AdrCD4dO5PnF+vO2X79AVGBcU4A4tH6lIMu98J3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sQiQVkd7nfF8ybd/zwGfjjcp43tW2vH657BZCdKENiA=;
- b=nmTConpXLQ7iayPko5TZ9y6SElszEaapm9VIHc03IgVHi1upi2Mgrj9dBJwAr9Qq4RwDUWNQrVsrbLx9NZezQpYApbmLbEAed92za34bKFFNCLlw8lxC5ObnzByGVFQYumjpaVwRaiOo2appAIWVr5cnV7CL14FJDN7SmEoBtyT0F4w+jIP30bQEcLxMueIOLyWHl8aTjSbtNMWtOe9Kuih/Hg7/umhTHlJMcj7Ogz01S8EUJq4GM9TLk/hbbgTr1bRbPNtjPGmJuEJedNT6fgEHVuLXTAtmOGvvDiAtarQ64cFEskYBbj7I7UKd/AzQ1JuXleRnVwAX/4rpW2iSYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SN7PR11MB7019.namprd11.prod.outlook.com (2603:10b6:806:2ae::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Wed, 22 Nov
- 2023 10:17:38 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.7025.019; Wed, 22 Nov 2023
- 10:17:38 +0000
-Message-ID: <1bbfaa5e-b9b9-4986-846f-6292a6b36ccd@intel.com>
-Date: Wed, 22 Nov 2023 11:17:31 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 3/3] net: rswitch: Fix missing dev_kfree_skb_any()
- in error path
-Content-Language: en-US
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, <s.shtylyov@omp.ru>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-References: <20231122051143.3660780-1-yoshihiro.shimoda.uh@renesas.com>
- <20231122051143.3660780-4-yoshihiro.shimoda.uh@renesas.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <20231122051143.3660780-4-yoshihiro.shimoda.uh@renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0007.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::17)
- To MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D541ED5C;
+	Wed, 22 Nov 2023 02:19:09 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AM4gAAB005014;
+	Wed, 22 Nov 2023 10:18:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=71nQ+y0aV5G11ViRq/c8FveTleKgrOJIHMuQFrseOT0=;
+ b=L3k1/h+rMQmkLKKTIK7qPA/JGmkQF62w02nI4TpsZupHcmjK+5NiqwTL4k9gKpPk9jIw
+ RPl54ppi4gVMRDrmXqYNOFxQKvZAnvJDgqFLMuEldk/rsoKJDqtiBaEe9S1z4R4tRunH
+ ZzlkkNxGWTVpRt6toO2r5rhJhDEcXY1gQ6q9f47/Knd2xc57O+hxOXy3+AxNSff+S/o2
+ ajSsFfTki55tlZlCb3u31jZd4czPscA0RIOnhBRBubHyhnRMOHZ+5+iKkF8egltNoX4R
+ w7QEploL6J0tM+ihQ6BXNOyU0I9AZWE851yCkEjgpgTZiboXlwKdTkLT7gDFlZycUN22 SQ== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uh0b4a6yf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Nov 2023 10:18:53 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AMAIqNn007616
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Nov 2023 10:18:52 GMT
+Received: from [10.216.2.74] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 22 Nov
+ 2023 02:18:45 -0800
+Message-ID: <2e357fcf-5348-4fb2-b693-2d6bb4d58b21@quicinc.com>
+Date: Wed, 22 Nov 2023 15:48:40 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SN7PR11MB7019:EE_
-X-MS-Office365-Filtering-Correlation-Id: d4bd3319-276a-4454-cf0b-08dbeb4440aa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: m40mCft79mSLOyLe3f8inOxtPo05mLkrlU8YiuukCFUACLGUeWR9/Kuym/j4yRL7eca3myrSuLLpxg/LmYp9Zz+vtV+tyJLGPzXVSNzXLvIE+GeCQpMMf0bBEOBD8AWrLQfG0kNAO4ivJhRis+jDOv3sdg8ZEz4rLVscPoXsJs+3Aainak6/vbsGJBe+ElLeO9jSVmix/bt9dsdzHj44/mb9WGYTLlatC+k4zPECUUfnb9N7/OvbjOPIylJb1g4u0HoIeePtsWAI5COizKRFvF9Lsw05IhRYj5kzMES29Bmx1BhtWCJ/MEpCp29omUzgBD2F61SYy2X2r7eAHSI2CAyMtIywn1vixQ2f8x9CmiQ4FFKY81MPvS9FEy1NAxJbtyJKltIUNU4POyaskRw3g3KLP7+yeuViCYDLWa/vjZxwxKnU/RLfwt8qAjnjVvhR2v7cmovvd/yO3YXqM5L5rZPkyC0CO7i3kvTSz3SXK1JFLal2q47tfeCaDkRFmh3GISmi+nsK+5zd/hRWJuSHyD1Cfmlcy5gVqfA8eJrZXWmDiXkwtPMuudwfhOCu8Hx735PZ4AFN7jBH1PHWqfRiPnEAW5n9se2epgSa6zT51eijK9zZ/wrHUTm6IdGXkDZrGjRmlH2rJNIr7+z4R6tUiw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(136003)(39860400002)(376002)(396003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(41300700001)(5660300002)(86362001)(44832011)(36756003)(2906002)(83380400001)(31696002)(6506007)(53546011)(6666004)(82960400001)(26005)(478600001)(2616005)(6486002)(6512007)(316002)(38100700002)(66476007)(8936002)(31686004)(66556008)(8676002)(66946007)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dThEQlVCdnpaUjRTd0xYWW9NZFpUdUl5eFQ2NG1Va2liYXp1VEVZQkQzZG1S?=
- =?utf-8?B?a1c2NzdzZ2V1eFVaSmJXbDluRUJhT1NsSW44Vld0ejEzaXF3U0FqZGs4dUQ3?=
- =?utf-8?B?YzlSVUZkR1pjdHYvVWpJYjR6L3U3WE16dms4ak9aUjA5S2FmZlZURDF2ajk1?=
- =?utf-8?B?YnpxZ3RoNXE2eGZOUnVvWC9OQnpkQUtmdW5wK2ZQVGkyUFVGL0NtZzR4TWFQ?=
- =?utf-8?B?VzFDZVBuVjZLalYyaEVhTVFpL3VjeExpVUZuNVRzQ2tHUnpzd0VsampUTFdp?=
- =?utf-8?B?cTFlcmt0N1ZIWml1UnpNN3F5VG9MMnJpLzBWQXo1WWVmN0NwOFcvd1lVeW9h?=
- =?utf-8?B?YXVxdXY4TVhlbHp3QzhEWS8wWGRCMXNwM1E0NmMwSUVsZitMV01vUGNJUE81?=
- =?utf-8?B?SnJOWTF3N1JGcGlTNnhkVHNKMjBoSE1uQ1U2OTJXZmVoMTY5bDViZVpMQzlP?=
- =?utf-8?B?RmRBZXdHem1XNWJ1WUpnV2RwUnFuNlZwZnQ3Sm44TjQ2djJXQTJvVHdsZkRW?=
- =?utf-8?B?eWZTdWpqbElKbS9YaEJaREJEVldOUlRXMzVzU0V3eFFIUkROUFlqMkovSXFk?=
- =?utf-8?B?Tk1MSnQ1QXRzU1ovdGNPT3NFYnF2VHNZR2lsL3J6SktEN0s4N2JOQlVKeHla?=
- =?utf-8?B?REdTMlJQME5uZ3ZLUXRBWS9TWG5sZjFYbDBqMkkvZmI4MzRrNmFuZzVzcnQz?=
- =?utf-8?B?WjRqNTE1bE80QnlmdnVseTh2cnB2OGsrS2xheGdEZm41cUplNlVDdFRKcnA1?=
- =?utf-8?B?VFZiNUlrKzNkeS9TNWF2bjQvVkRZelNuVE1HUng2eVhEYzBuT1BJUXIzR3FO?=
- =?utf-8?B?U2I0c2VQcGJybkRDK0xwRVU0V3ppeERueUllTW5QdFV6QzVzRFVUNERpMDU2?=
- =?utf-8?B?d0xWTjBDNHlWdE5GMzU3SnhNL2xMM1NkOGJ1NjJLaURNUUJYZGVCM0pEVVlv?=
- =?utf-8?B?dktJeHBIYURaUzlXdXhKeWRsVTJpOVFTa1hMMGZTeGtJZThoSkFXVHU2VlIz?=
- =?utf-8?B?aWh3YUlMc2Z2MDFxWUkxNnlrNXJNMzJUcU1SMlFzRSt4SFJwV3dRUWdUVndz?=
- =?utf-8?B?OVVrSjloSFVxV1pic0dxaCtYZkpzRHJNK3NMYXl4aHdEc3FJbTcyNnBoK0du?=
- =?utf-8?B?Ky9YVjQwTE1UeHZ4Tm5yS3RmcHFPMEgzeTY5K1g3SnJ1aW5wWlpFSkFLTE80?=
- =?utf-8?B?TldhdlJWcmRLTExFZWkxVEkwdjhTZmsybW9uRElCMDNpVGJEU1ZIWXl4YUVv?=
- =?utf-8?B?cWxKQjhDTHR4SVVWam01U2dzSFFGOGRlaFAyQVhhMzh1bHdRa1JQTFhFNEVa?=
- =?utf-8?B?SEFBU2ZzVE9hUnk4a3dPc2dlMGw1S3dmK0hQMWE4bHYrcGpvaVhYdGI1ZzdS?=
- =?utf-8?B?NmUrN2x1R0hoNFpVekhwdGJVcW5QQ3dCVllUUjBONjRhc2h1Q2tsZWZ5NVYx?=
- =?utf-8?B?eWNVWWZuTmFWNnNiVjRBSnhiNHd6aXBWZHZKNlM0S1A3R2NJUVM2U3MxYXUz?=
- =?utf-8?B?R1F1ZUFSem01b2JCVEdmcnRTbEN1UGpLKzAraVJqOU9LYlRDbVhSaGlDYUxa?=
- =?utf-8?B?bTlEakNJaFkrWm9KTmFlRkIySE9YY2JyVSswNklvY0Fmc28zYXZOVjNESitE?=
- =?utf-8?B?dzFzMnRyMmpvS29nelZlaE5PYXZPa0xFbkJCem1WcFloWkVnc09VM2F2OG9h?=
- =?utf-8?B?VGdYVkhweHQyK2JEbDh3ZkRWNlQ3MFhrUCtYYlA0TDZBTjc3N1Bsc0FCRzI2?=
- =?utf-8?B?V2ZEd1l3K1lQckx0bDhaUnNrdzEzYm05QXVsdU1rd05RNzRWNFpnV0RscXEr?=
- =?utf-8?B?czdjNUlWZWtJQU4yNVA2QVNnb2VMaDk2T05tN0ExbVFOc0pUMTdDeVFwMUNH?=
- =?utf-8?B?YkpNdjd0Yms5aDBPRDJUcnNBQnJsTE1TQ2EyWXljaW1PTlpXVG9wL2VKOFJ4?=
- =?utf-8?B?TXNTcDlOdTZvWE9PWlRSRUpjVnR2bDBkU0xjMSs1TW5VeGVkYktWYnZ0WTA5?=
- =?utf-8?B?dXhzaDFwdmlCUTVEOFdZcGN2YVdSbU9RZ0gzZjEwcUdxVmJyZGhKZi9ZWnl2?=
- =?utf-8?B?UkF4dE41WklSWVVwMDRwVEtheFh5OU9STHkxdmZCOHpPRHBMdG94MEFFK1Uz?=
- =?utf-8?B?SjJOblYvZ0hnSnozMndYNGltVHVuTFVXeFZNOWpMVTZqWVd1ZUNjRzEwRGpa?=
- =?utf-8?B?OEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4bd3319-276a-4454-cf0b-08dbeb4440aa
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 10:17:38.0519
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UZ3dCDkRcCvBYsLQ3sf3Vapy70HhCfBblpS+Sl/Yj1bWNd1dmEprLrtCFxF5hxovxwJu0CTUovVAN+wVh+oZHkS/C2O9PE50WpI/k1PxgiA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7019
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/9] dt-bindings: clock: ipq5332: drop the few nss
+ clocks definition
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Andy Gross
+	<agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
+ <20231121-ipq5332-nsscc-v2-3-a7ff61beab72@quicinc.com>
+ <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
+ <8bb79735-3b5d-4229-b0f4-bc50d61fdba1@quicinc.com>
+ <d26eae8d-4968-4ab0-bd9b-696d7b3865ec@linaro.org>
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <d26eae8d-4968-4ab0-bd9b-696d7b3865ec@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: WuwKox3A9KgeuJJ07yj-N41Z_moic0lQ
+X-Proofpoint-GUID: WuwKox3A9KgeuJJ07yj-N41Z_moic0lQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-22_06,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=509 malwarescore=0 bulkscore=0 clxscore=1015 phishscore=0
+ spamscore=0 impostorscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311220071
 
 
 
-On 22.11.2023 06:11, Yoshihiro Shimoda wrote:
-> Before returning the rswitch_start_xmit() in the error path,
-> dev_kfree_skb_any() should be called. So, fix it.
+On 11/22/2023 3:42 PM, Krzysztof Kozlowski wrote:
+> On 22/11/2023 11:08, Kathiravan Thirumoorthy wrote:
+>>
+>>
+>> On 11/21/2023 8:36 PM, Krzysztof Kozlowski wrote:
+>>> On 21/11/2023 15:30, Kathiravan Thirumoorthy wrote:
+>>>> In commit 0dd3f263c810 ("clk: qcom: ipq5332: enable few nssnoc clocks in
+>>>
+>>> Where is this commit coming from?
+>>>
+>>>> driver probe"), gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
+>>>> gcc_nssnoc_nsscc_clk are enabled in driver probe to keep it always-on.
+>>>
+>>> Implementation can change and for example bring back these clocks. Are
+>>> you going to change bindings? No, drop the patch.
+>>>
+>>> Bindings should be dropped only in a few rare cases like clocks not
+>>> available for OS or bugs.
+>>
+>> Thanks Krzysztof. Will drop this patch in V3.
+>>
+>> One more question to understand further. In IPQ SoCs there are bunch of
+>> coresight / QDSS clocks but coresight framework doesn't handle all
+>> clocks. Those clocks are enabled in bootloader stage itself. In such
+>> case, should I drop the clocks from both binding and driver or only from
+>> driver?
 > 
-> Fixes: 33f5d733b589 ("net: renesas: rswitch: Improve TX timestamp accuracy")
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> ---
+> That's not really the reason to drop them at all. Neither from driver,
+> nor from bindings. You should not rely on bootloader handling your clocks
 
-Nice cleanup
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
->  drivers/net/ethernet/renesas/rswitch.c | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
+Thanks, lets say if those clocks are not needed at all by OS since QDSS 
+is not used and needed only for the boot loaders to access the 
+corresponding address space, in such case what can be done? I 
+understand, at first those clocks should not have been added to the driver.
+
+
 > 
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index 45bf9808c143..e77c6ff93d81 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -1517,10 +1517,8 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
->  		return ret;
->  
->  	dma_addr = dma_map_single(ndev->dev.parent, skb->data, skb->len, DMA_TO_DEVICE);
-> -	if (dma_mapping_error(ndev->dev.parent, dma_addr)) {
-> -		dev_kfree_skb_any(skb);
-> -		return ret;
-> -	}
-> +	if (dma_mapping_error(ndev->dev.parent, dma_addr))
-> +		goto err_kfree;
->  
->  	gq->skbs[gq->cur] = skb;
->  	desc = &gq->tx_ring[gq->cur];
-> @@ -1533,10 +1531,8 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
->  		struct rswitch_gwca_ts_info *ts_info;
->  
->  		ts_info = kzalloc(sizeof(*ts_info), GFP_ATOMIC);
-> -		if (!ts_info) {
-> -			dma_unmap_single(ndev->dev.parent, dma_addr, skb->len, DMA_TO_DEVICE);
-> -			return ret;
-> -		}
-> +		if (!ts_info)
-> +			goto err_unmap;
->  
->  		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
->  		rdev->ts_tag++;
-> @@ -1558,6 +1554,14 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
->  	gq->cur = rswitch_next_queue_index(gq, true, 1);
->  	rswitch_modify(rdev->addr, GWTRC(gq->index), 0, BIT(gq->index % 32));
->  
-> +	return ret;
-> +
-> +err_unmap:
-> +	dma_unmap_single(ndev->dev.parent, dma_addr, skb->len, DMA_TO_DEVICE);
-> +
-> +err_kfree:
-> +	dev_kfree_skb_any(skb);
-> +
->  	return ret;
->  }
->  
+> Best regards,
+> Krzysztof
+> 
 
