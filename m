@@ -1,100 +1,116 @@
-Return-Path: <netdev+bounces-50237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD417F4FB9
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:39:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9537F4FC1
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:39:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CE2FB20D16
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256B01C20A1D
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD4D5ABA8;
-	Wed, 22 Nov 2023 18:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640455CD13;
+	Wed, 22 Nov 2023 18:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cIwzFy16"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2VxqY8A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1580BD62;
-	Wed, 22 Nov 2023 10:38:47 -0800 (PST)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F6D10C0;
+	Wed, 22 Nov 2023 10:39:50 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-40b2ad4953cso7028945e9.0;
+        Wed, 22 Nov 2023 10:39:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700678328; x=1732214328;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ul/VlOLFxjw0gPyqOOK5SAIso094N0vzZ4lMdO5Dw78=;
-  b=cIwzFy16POlKGv8wBBkPDjj0LwI1tdDvJQf5NW87lrqzKA4hty90vMEh
-   r2lPhViBIMRKlxg9NmOcCzQV1grliRJ3ksihEd7XWseAIy6jbnRy/shEO
-   /8ESk/iEKj9TH1z/IeqxKSartDwDJyCvoIl4200PbNO/OlsNoa22QpM70
-   c=;
-X-IronPort-AV: E=Sophos;i="6.04,219,1695686400"; 
-   d="scan'208";a="686510836"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 18:38:38 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id 3DDB1C05DA;
-	Wed, 22 Nov 2023 18:38:36 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:56960]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.99:2525] with esmtp (Farcaster)
- id 994699e5-52d1-483e-8854-9d77e40c84d2; Wed, 22 Nov 2023 18:38:35 +0000 (UTC)
-X-Farcaster-Flow-ID: 994699e5-52d1-483e-8854-9d77e40c84d2
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 22 Nov 2023 18:38:35 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 22 Nov 2023 18:38:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<haoluo@google.com>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
-	<kpsingh@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v3 bpf-next 02/11] tcp: Cache sock_net(sk) in cookie_v[46]_check().
-Date: Wed, 22 Nov 2023 10:38:22 -0800
-Message-ID: <20231122183822.3255-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iLmpfo-ihMpZwgCqcvF+bKdJ6is9q3Bks-sckmDz+5YHw@mail.gmail.com>
-References: <CANn89iLmpfo-ihMpZwgCqcvF+bKdJ6is9q3Bks-sckmDz+5YHw@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1700678388; x=1701283188; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YDjLfRk2WpjpKzC7NBxti8sskFBWWzZRE9jVKMLQcIQ=;
+        b=a2VxqY8AFbaZqVN/EzNNPCTNHVTEkWs0FTnjuFfqqZ+fTgIWNGW7kDjJH/sSdjRGOy
+         rqX0eHCewNJ/G5xE08LppATj/KQP6/aYDJYN8bmxXCmAlGtA5JgrG75lp39xQDpmjXcy
+         SAk7eH46ySz/RXoKtpjxnQHJBTSF+/Gf0E6XSu1WrSdso/8kw138kN5OxGj0UrDWvdM8
+         FajheAMITgZgX2vX10V6l/7/j1dpMTsBc4PQ8aqMKzSeyHqFi7CupLt9yxrN/l8CMmQi
+         7IxyiMtXx1uNY/71vhX3W7AgatN7d9BNaBusoCJ4iO1XyTvrI8a5BloIJqufi7cICHWX
+         3Ppg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700678388; x=1701283188;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YDjLfRk2WpjpKzC7NBxti8sskFBWWzZRE9jVKMLQcIQ=;
+        b=GY+prxma71JZUGNYmDoTcgo+Cqq0NqkwJc2mDNu6zeu1Sh63Gil8uRES9VJREMPiyj
+         MMXqeoPRl0dd16a+UZPlM4CW8j87gaqBCi5TWDz5+goxO7n3kWNIBhTfqMlrnn6ulB/P
+         gkIGzaS9YCvmkKXfJrU9aEe9Xglq4jwx800G8gZDE5wrVrAFTye4qvKOFgMAzAzslpF1
+         nZ+UUsDBaPH5CVAQxFaByli26vQeHs1AHaQn5LqGfxDPCe0JrqqkQaQ2lBx+lVd4GKjd
+         YWc58EugfSg9u1tlEZwGKOPYRn8JdJWRBl1bausYaEpbVIRgvMxMfDJ+0AqKXrP7Qb9c
+         oKOQ==
+X-Gm-Message-State: AOJu0Yy+SS+BvBgeD9IT/Z/5SNVWvHwmr0yCEinkR8Zr5ujvXfmxzl4/
+	8RiTjlkvtaRRWXNMb0cpelU=
+X-Google-Smtp-Source: AGHT+IEODA7sDfQRz1z/Fo5qEgzJagOOGYIc58x1MDSPqo64Jmqfvu9AnwF2LW8TEm+brrJaQvylhA==
+X-Received: by 2002:a05:600c:274e:b0:406:5a14:5c1e with SMTP id 14-20020a05600c274e00b004065a145c1emr321071wmw.1.1700678387986;
+        Wed, 22 Nov 2023 10:39:47 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id je20-20020a05600c1f9400b0040836519dd9sm208462wmb.25.2023.11.22.10.39.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 10:39:47 -0800 (PST)
+Message-ID: <655e4af3.050a0220.54c5a.113b@mx.google.com>
+X-Google-Original-Message-ID: <ZV5K8P1tTC3HUkqE@Ansuel-xps.>
+Date: Wed, 22 Nov 2023 19:39:44 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [net-next PATCH] net: phy: aquantia: drop wrong endianness
+ conversion for addr and CRC
+References: <20231122170813.1222-1-ansuelsmth@gmail.com>
+ <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
+ <655e4025.df0a0220.50550.3d70@mx.google.com>
+ <20231122102347.0bde86bb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122102347.0bde86bb@kernel.org>
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 22 Nov 2023 15:23:51 +0100
-> On Tue, Nov 21, 2023 at 7:44 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > sock_net(sk) is used repeatedly in cookie_v[46]_check().
-> > Let's cache it in a variable.
-> >
+On Wed, Nov 22, 2023 at 10:23:47AM -0800, Jakub Kicinski wrote:
+> On Wed, 22 Nov 2023 18:53:39 +0100 Christian Marangi wrote:
+> > So they DO get converted to the HOST endian on reading the firmware from
+> > an nvmem cell or a filesystem?
 > 
-> What about splitting this series in two ?
+> They don't get converted when "reading from nvmem / fs". 
+> They get converted when you do:
+> 
+> 		word = get_unaligned((const u32 *)(data + pos));
+> 
+> get_unaligned() is basically:
+> 
+> #if BIGENDIAN
+> #define		get_unaligned	get_unaligned_be32
+> #else
+> #define		get_unaligned	get_unaligned_le32
+> #endif
+> 
+> so you'll get different behavior here depending on the CPU.
 
-That makes sense and would be easier to review/respin.
-I'll post patch 1-8 to netdev first.
+Ugh... If that is true this is bad...
 
+When get_unaligned was suggested, I checked if the thing was doing any
+kind of conversion and from [1] I tought it was just getting the
+pointer.
 
-> 
-> First one, doing refactoring/cleanups only could be sent without the
-> RFC tag right away for review.
-> ( Directly sent to netdev$ and TCP maintainers, no BPF change yet)
-> 
-> Then the second one with functional changes would follow, sent to bpf
-> and TCP folks.
-> 
-> Thanks.
+I can't find the entry where the thing is done. Is this some kind of
+include magic with asm specific API?
+
+[1] https://elixir.bootlin.com/linux/latest/source/include/asm-generic/unaligned.h#L22
+
+-- 
+	Ansuel
 
