@@ -1,111 +1,128 @@
-Return-Path: <netdev+bounces-49866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662477F3B5D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:40:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EEBF7F3B60
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:41:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1790628291E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:40:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87BDFB215D3
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642E74439;
-	Wed, 22 Nov 2023 01:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9157D1FB6;
+	Wed, 22 Nov 2023 01:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axoW0M2H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwCsdM2z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB7D4401
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:40:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B3F37C433C8;
-	Wed, 22 Nov 2023 01:40:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700617225;
-	bh=/mDybIKKXULJmj6tE+N/3coaqNA7Go8jYqtE5oBlwP0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=axoW0M2H+a7yYV+fuxEOit2+fknALqDbLgcR24aSz46eSygV1QWM5U0E1iMgXUaQ5
-	 h295N2EqYFyMUGpDzdupGhfSPsr0+Nu7LoQ178/mhJE9/+f524Ti4Z1I0V3R/s/+lc
-	 bFLgk+JpLdnGFOXEulaCeaCiAuB+UN9pXdJz0Jsmb9Stsq6zDrZXN7KcLvCRsRxiPt
-	 xFDQh48vLaLdnyRL40TrsFCJghCotXOtf1WKpo/IgpmgBBdJ1B61Sz4wxiZjNqDi8u
-	 BJGhqgfh+xxxzXA0HdF1g+RLmNJEeTo5dTmPRBcmfbBkFYR4dtaEUSkKZ6ThHsdvQE
-	 4VRwoRKCDQTXQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 96C7AEAA955;
-	Wed, 22 Nov 2023 01:40:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25A6C12C;
+	Tue, 21 Nov 2023 17:41:14 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6cbb71c3020so264777b3a.1;
+        Tue, 21 Nov 2023 17:41:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700617273; x=1701222073; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wZkVnSThHSQ0nduxa23VteQPHRdj2Ex/elZXOf6IRxQ=;
+        b=hwCsdM2zxxJ5EjZy88b7OGh/WAkqreYdl2vZV+JsgrpGgSlXRKlRhKwf/GqMIAyvjx
+         mLORQM7zVddznURZsWaMQIseNG6TfCoGpxBj7yX7hyJJocFFymkOuLm1Rw4Uxat/URow
+         bhSpbMHmEKubjYyetZGQFZQkiP0P1tPR8z1lIu3MIMn7+cdyJKnvPpLVZdFe4NFBb03D
+         ngic5VpYtEal4ixYE/Efms/RTOi0fQUbywZ/ASoQqDiWL+7SBXtjuTzGuYgY6dDqX0q8
+         Idlyk69apU5YfCijVxUCslEjDgUf5gdvQL7K+BqnnTc3KbqaeigrQpMPjndgBKv7Inhr
+         2oGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700617273; x=1701222073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wZkVnSThHSQ0nduxa23VteQPHRdj2Ex/elZXOf6IRxQ=;
+        b=gDL3CQKpHqZVKAcj/YZao+1+wtjq7cJ59cG6HKi3H5x9+OD7Dbv2m1KtMd6/YFoQff
+         daJFlym0J8nZY5eomy1Gp/wUTwENPuNhgvwKn8T/RQXPbA+QzuUqVecVDmSc/30y1h8M
+         rrWzXPNSnGG/oxgfW9heSBOHYHtY+9rpEUWNfAl1jCvKckzSieLyqs/msYijnNReJ+89
+         m2FCp+6CpMgI0kItLhcoXqi2JLcSEA2Z3gjsD5/jSdsFAd33OelyhxJlbg3ghs5zGWU9
+         2+PiA4XdFeXHCcEH3camGIitmWkhJAbYkbeTY4hDmp5FlHU8sC8C1OUAj4YC9XRK0uWZ
+         Lt9g==
+X-Gm-Message-State: AOJu0YxVszJF+4pNlTco84lW9YGkHVAIgr4lNdbGPNNq7dZyHgxnn5Xw
+	NBirWT0nr5dGEZ8ooKMxcyg=
+X-Google-Smtp-Source: AGHT+IHAMbcH80Qv38sfnNHrOUL21YxFpmpRBj4ZbJPJ09PEy1rp7PPEr4++1O5WoMpvW2iMsf+Omg==
+X-Received: by 2002:a05:6a21:a59b:b0:187:962d:746b with SMTP id gd27-20020a056a21a59b00b00187962d746bmr1839947pzc.9.1700617273489;
+        Tue, 21 Nov 2023 17:41:13 -0800 (PST)
+Received: from macbook-pro-49.dhcp.thefacebook.com ([2620:10d:c090:400::4:da69])
+        by smtp.gmail.com with ESMTPSA id v4-20020aa78504000000b006cb884c0362sm5005865pfn.87.2023.11.21.17.41.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 17:41:12 -0800 (PST)
+Date: Tue, 21 Nov 2023 17:41:07 -0800
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	davem@davemloft.net, dsahern@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+	jolsa@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	samitolvanen@google.com, keescook@chromium.org, nathan@kernel.org,
+	ndesaulniers@google.com, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	llvm@lists.linux.dev, jpoimboe@kernel.org, joao@overdrivepizza.com,
+	mark.rutland@arm.com
+Subject: Re: [PATCH 0/2] x86/bpf: Fix FineIBT vs eBPF
+Message-ID: <20231122014107.p5zf4o6kjanypla4@macbook-pro-49.dhcp.thefacebook.com>
+References: <20231120144642.591358648@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/13] bnxt_en: Prepare to support new P7 chips
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170061722561.4150.8169365811227319023.git-patchwork-notify@kernel.org>
-Date: Wed, 22 Nov 2023 01:40:25 +0000
-References: <20231120234405.194542-1-michael.chan@broadcom.com>
-In-Reply-To: <20231120234405.194542-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120144642.591358648@infradead.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 20 Nov 2023 15:43:52 -0800 you wrote:
-> This patchset is to prepare the driver to support the new P7 chips by
-> refactoring and modifying the code.  The P7 chip is built on the P5
-> chip and many code paths can be modified to support both chips.  The
-> whole patchset to have basic support for P7 chips is about 20 patches so
-> a follow-on patchset will complete the support and add the new PCI IDs.
+On Mon, Nov 20, 2023 at 03:46:42PM +0100, Peter Zijlstra wrote:
+> Hi!
 > 
-> The first 8 patches are changes to the backing store logic to support
-> both chips with mostly common code paths and datastructures.  Both
-> chips require host backing store memory but the relevant firmware APIs
-> have been modified to make it easier to support new backing store
-> memory types.
+> There's a problem with FineIBT and eBPF using __nocfi when
+> CONFIG_BPF_JIT_ALWAYS_ON=n, in which case the __nocfi indirect call can target
+> a normal function like __bpf_prog_run32().
+
+The lack (or partially broken) cfi in the kernel built with
+CONFIG_BPF_JIT_ALWAYS_ON=n is probably the last of people security concerns.
+We introduced CONFIG_BPF_JIT_ALWAYS_ON=y to remove the interpreter,
+since mere presence of _any_ interpreter in the kernel (bpf and any other)
+is an attack vector. As it was demonstrated during spectre days an interpreter
+sitting in executable part of vmlinux .text tremendously helps to craft
+a speculative execution exploit.
+
+Anyway, motivation aside, more comments in the patch 2...
+
+> Specifically the various preambles look like:
 > 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/13] bnxt_en: The caller of bnxt_alloc_ctx_mem() should always free bp->ctx
-    https://git.kernel.org/netdev/net-next/c/aa8460bacf49
-  - [net-next,02/13] bnxt_en: Free bp->ctx inside bnxt_free_ctx_mem()
-    https://git.kernel.org/netdev/net-next/c/e50dc4c2206e
-  - [net-next,03/13] bnxt_en: Restructure context memory data structures
-    https://git.kernel.org/netdev/net-next/c/76087d997a84
-  - [net-next,04/13] bnxt_en: Add page info to struct bnxt_ctx_mem_type
-    https://git.kernel.org/netdev/net-next/c/035c57615982
-  - [net-next,05/13] bnxt_en: Use the pg_info field in bnxt_ctx_mem_type struct
-    https://git.kernel.org/netdev/net-next/c/2ad67aea11f2
-  - [net-next,06/13] bnxt_en: Add bnxt_setup_ctxm_pg_tbls() helper function
-    https://git.kernel.org/netdev/net-next/c/b098dc5a3357
-  - [net-next,07/13] bnxt_en: Add support for new backing store query firmware API
-    https://git.kernel.org/netdev/net-next/c/6a4d0774f02d
-  - [net-next,08/13] bnxt_en: Add support for HWRM_FUNC_BACKING_STORE_CFG_V2 firmware calls
-    https://git.kernel.org/netdev/net-next/c/236e237f8ffe
-  - [net-next,09/13] bnxt_en: Add db_ring_mask and related macro to bnxt_db_info struct.
-    https://git.kernel.org/netdev/net-next/c/b9e0c47ee2ec
-  - [net-next,10/13] bnxt_en: Modify TX ring indexing logic.
-    https://git.kernel.org/netdev/net-next/c/6d1add95536b
-  - [net-next,11/13] bnxt_en: Modify RX ring indexing logic.
-    https://git.kernel.org/netdev/net-next/c/c09d22674b94
-  - [net-next,12/13] bnxt_en: Modify the NAPI logic for the new P7 chips
-    https://git.kernel.org/netdev/net-next/c/f94471f3ce74
-  - [net-next,13/13] bnxt_en: Rename some macros for the P5 chips
-    https://git.kernel.org/netdev/net-next/c/1c7fd6ee2fe4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>    FineIBT				JIT
+> 
+>    __cfi_foo:
+>       endbr64
+>       subl	$hash, %r10d
+>       jz	1f
+>       ud2
+>    1: nop
+>    foo:					foo:
+>       osp nop3				   endbr64
+>       ...				   ...
+> 
+> So while bpf_dispatcher_*_func() does a __nocfi call to foo()+0 and this
+> matches what the JIT generates, it does not work for regular FineIBT functions,
+> since their +0 endbr got poisoned and things go *boom*.
+> 
+> Cure this by teaching the BPF JIT about all the various CFI forms. Notably this
+> removes the last __nocfi call on x86.
+> 
+> If the BPF folks agree (and the robots don't find fail) I'd like to take this
+> through the x86 tree, because I have a few more patches that turn the non-fatal
+> 'osp nop3' poison into a 4 byte ud1 instruction which is rather fatal. As a
+> result this problem will also surface on !IBT hardware.
+> 
 
