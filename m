@@ -1,263 +1,173 @@
-Return-Path: <netdev+bounces-49891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86C87F3BEA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:43:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53CEC7F3C1B
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D394282A7C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:43:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8264D1C20E38
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BF22BAF4;
-	Wed, 22 Nov 2023 02:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754AD2BAF4;
+	Wed, 22 Nov 2023 03:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ceZSGeCe"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620D7195
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 18:43:46 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SZlsq3FfnzWhcT;
-	Wed, 22 Nov 2023 10:43:11 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 22 Nov 2023 10:43:44 +0800
-Message-ID: <a7bad923-34a6-f08d-4dbf-974a770fc5fd@huawei.com>
-Date: Wed, 22 Nov 2023 10:43:43 +0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2081.outbound.protection.outlook.com [40.107.94.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C841A2;
+	Tue, 21 Nov 2023 19:00:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jD9lGPITQJ89M7chuGVRgHjMCm32FqVwhJI8cRxZ9JkjVELOsMUJylEbHjqoVXFicqX3IObRwhL7GOfssmHeRrEiQHn6fdfZilat6mHKEXY7ivNatQr1buMGDvCKZEzy5LBnMbavDpLqy2ss0GXyu6Fl+C7MQiE7KMmzOcYT0Ytez0QeBKtr5EhDlJW522iXXFpjAHnKmoePtu0JYUhiYjBTauFqo0Sv0+kU6QYTLFeKjJwtBpFJDHHS5SCt98kYKnMNnwSsJk5p16Y1/TwAebLD4v7s53W5gC6dYOVHsyYZ4G3KyF9nZbtTPvafGV0DuOC1LbGArUYI9SI3D7vnYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qGUoz3iOZLba0HUTtsGXf1mvMjaH1EWF/aqX1/3HHFM=;
+ b=hQeWcyf8phznZiWVRw4LT1mSHZ0RG6UbOWTF827AMem0xI12HYO+R6KTvMAac6+VR6xlr2+B0yXKuRh77tsuYIBvMWS1RzUi+cj4BysfQkJF+qMz+6hELNdhka4QOgseFnV1WCUkzhtjxomrQN4r1pJITrgyy5O+18F/zdTbzSZGqpDPtBoFCI+f+Dh/dU2C546toV5+1GD+czqq9W+VN0roTzzYeHdNMVp5U6d7+lChp1oUHiBuxuj0N3lIDYHBdXEonRabK5Kd8jw2APruDG0XVXSKmSSCuo8FooyrKbsvjZKcWglxPsYAhNKWNQJUBUlblzYUagTYoy3f0qkdzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qGUoz3iOZLba0HUTtsGXf1mvMjaH1EWF/aqX1/3HHFM=;
+ b=ceZSGeCeWTdMNqgaV+XCptI8Usx6BwBSIvzBl022u2TStszY8CAGVrXRKIVN2ixifVHwwBtYh4KmEP9uSo8pCKypWtStLGT6EuXaHzLK1gClbpbHz11xaEKn8Iai9iCOMEOHsZkjqccpHfXCkzZxva5SUYQA301L4tq7wX1MjUk=
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15)
+ by DM4PR12MB7646.namprd12.prod.outlook.com (2603:10b6:8:106::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.18; Wed, 22 Nov
+ 2023 03:00:20 +0000
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::5c47:dae1:11f6:5188]) by MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::5c47:dae1:11f6:5188%4]) with mapi id 15.20.7002.028; Wed, 22 Nov 2023
+ 03:00:20 +0000
+From: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+To: Samuel Holland <samuel.holland@sifive.com>
+CC: Ariane Keller <ariane.keller@tik.ee.ethz.ch>, Daniel Borkmann
+	<daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Simek, Michal"
+	<michal.simek@amd.com>, Paolo Abeni <pabeni@redhat.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net] net: axienet: Fix check for partial TX checksum
+Thread-Topic: [PATCH net] net: axienet: Fix check for partial TX checksum
+Thread-Index: AQHaHNzERCLofLCv5UOLU+i8bfYF3LCFpijA
+Date: Wed, 22 Nov 2023 03:00:20 +0000
+Message-ID:
+ <MN0PR12MB5953E9C46E3927CD76E94C5AB7BAA@MN0PR12MB5953.namprd12.prod.outlook.com>
+References: <20231122004219.3504219-1-samuel.holland@sifive.com>
+In-Reply-To: <20231122004219.3504219-1-samuel.holland@sifive.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR12MB5953:EE_|DM4PR12MB7646:EE_
+x-ms-office365-filtering-correlation-id: 944b064f-df54-4d38-35f2-08dbeb0729d7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ /YZcdcwJ4MaHuon+ToDiZjwjHneY3Cp8ChBe46VLA9c3NNY9Ebta9nbgHDlmVz60WELkLaLKpO09nADtzldQWTO0FVhhoJKhTlnQVIAJYS85wHQcWidXQlhjqdRf2qackX6Pc3etmNarSX3VH1ehmXW3SRUeLYUtdRVfnaXVG8xaTKc19Yi4Wg1KELPY84CKt5O/LX6WN/2dmtDohnuYXNAhmi1OHW9OUImUce3BgrSZjwMWtl31KL74DHXgVinZtgz16ytrhtu3VsxFTIZ0F2rTh8INp+f9fGsZkWfRPtc5gGe/vkYAXNe/XVKj0AgsJRqGgblFGTO8yA2695+4ux3vH5df/JwHj4emTBGJErI3TeJtc3/qDse2N/bUNKsV9jVhzpfFSHm5F1EncxzPiciVv41AMXe3PClKUT6xMRKiXyQj+RoCENmKXUY+FfE2xkpASCWsMNnt9d9KK0DgWBQ8cZxDEoMVMdhhFBjgKy46fprKhzUggANDYz6X9Yvotp5M8JboyogRUSauIOUHEHqorDzY5BtllrVTQ5i3CK7ijUUKQPYiGWu3T2SFan6g15cWpJDFix7NMQyIe2yX/rffmi3JK1MyhomR2a6xnJCKKZr9xlJZIBb6tXkDDSo7
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5953.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(39860400002)(376002)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(66476007)(66556008)(66946007)(76116006)(54906003)(316002)(9686003)(6916009)(66446008)(64756008)(4326008)(8936002)(8676002)(83380400001)(38070700009)(26005)(478600001)(71200400001)(7696005)(53546011)(6506007)(86362001)(122000001)(7416002)(5660300002)(41300700001)(2906002)(55016003)(33656002)(52536014)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?6ZmG20M9CtxniVpbQd7D2XVaxzWt7jpR+4+jhZWnCIntwG9S8mXGAswZIa8S?=
+ =?us-ascii?Q?Er4e1WGtmzcdOvdTZiybP/OlXLG3k+8d3zLRLEhRSWJe+XGHljAyhY6VTQj9?=
+ =?us-ascii?Q?AgTjh3e8YAEbWpqXGyQQ+KZLb9V7yaJuZ/hugw3WhWn7sGGmwbJyV8FS0+X/?=
+ =?us-ascii?Q?aWyzKTGgYaxEdOvzIH6qch8o6JyUP3iCyd5X0HHb0xHXiIoP9hUDNN1RdojO?=
+ =?us-ascii?Q?Kmo1rIE7FvWw0ysVFb+oa+ykCto5Lx/OznaYT582NAwl+r7flhJtsadDSKRl?=
+ =?us-ascii?Q?ydDY5HKzY74kZEMc7iXnshereCzcTIIGRKFbe0B/Y9eq4iJVH1LZ8F48mV/z?=
+ =?us-ascii?Q?Nhhs0GRsYMgdjaorf9IROfjR+MUudJuUdeqXcZAgul7tjbYiPbdMKiU7Qy40?=
+ =?us-ascii?Q?pfONBvGYhXhz9VjV2MZZQKCzat4CXHs0mvBRew6WegO2ToGUC875UVC4+WGi?=
+ =?us-ascii?Q?KOqgmW9BVDk2GC60FeP3RSybHZT+w9jsxfQ+cnsTjIr12r2U6kyCfyYkKZHE?=
+ =?us-ascii?Q?iR0NVA9pKUAMY6iTI/2sy36dfy9gm+GGy9hEGCeNT2MwgOXonFq3NMlTq6TY?=
+ =?us-ascii?Q?aLlz+3k5l1B2ZzqnLrDMpVmyTavlEFgggR8RxNZ022aJwDijojtjU0JAem8/?=
+ =?us-ascii?Q?vWID8EpIdCglqjCH1J7hQ8UEXuWUurjIMihcxMXMNDI/mpdWtDjU+PlJ6tVV?=
+ =?us-ascii?Q?oeXX0wS1yJNc403mVj1rE94L6feUmQtQPSaijAh2mvC0jnKxvchuDfr1DAIp?=
+ =?us-ascii?Q?Rpw6084j11OvqTCwccq6vM6aDm9chMpajQvSpn3KicqkmQ9kf8kchV2ICGbW?=
+ =?us-ascii?Q?ZQ89tK9C9zuZvLBlr9d6GNS0nHBaETN9eD53n3G0n/obG3AIRnhlY8CVIKug?=
+ =?us-ascii?Q?GHgF1/Aq8HjQMHIJ7Z6klT6Bra0i+t+7ffaLxBWd8I4yDWjB0YAHnFC0fbTk?=
+ =?us-ascii?Q?Cs3EBdWQ3ZVqkobXyzIlv/J29FPEHHVGBqY/PInNtUMafJrXD3FtA0NFmEA0?=
+ =?us-ascii?Q?NlCMQm4srR9GHnqO+sMibnOz4Id72pQhUSFY92bov7c08XfX4bdBr6RZXXmK?=
+ =?us-ascii?Q?Jvt6H++NR0yfWsl4xpFD5tA5SNoHAdaYLJXIt9cfhpo+UndFAOAJAVnfv4fH?=
+ =?us-ascii?Q?mswVmUznNUNKO4PbF2epVjywMKnMLmS6z30xcuZUV+ynuyZHuuc/vXQ6Ot2b?=
+ =?us-ascii?Q?OWy/wimtUOv6efb7NyAmmE6wIBIYuCo0nW03DGScMtFndlPnR8NmHQo0ut3+?=
+ =?us-ascii?Q?B6WB5EsV47f/72iWMAi+mcHVJZV6etosnUALlYdRtQ1ibc2p9YfJrLTYZLRa?=
+ =?us-ascii?Q?z6nT3gaLDLXzAxvUmHwxssBdRMx4aoV8qOg5SvouDt5u/oKSqv+YIgkv/sU8?=
+ =?us-ascii?Q?5LrZ9Vf28m1cU2LpeMe/B0u8rEfhVJO6nFUVC2GQ0qXZkKJj2nIaDdRTjGJu?=
+ =?us-ascii?Q?9rXTLXyjOs8nuS5ghkaL5A6mJWMFJdWt6VWdkb26ELSRbYUkVChcDyejw5Z3?=
+ =?us-ascii?Q?XUVaIzix8/n23mdheq7daFMPGCK9wCkpInDcuexniMqJOYyPI5EM7SmWGbF/?=
+ =?us-ascii?Q?W5LtHuizlP2T7Zwxhwo=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net] ipv4: igmp: fix refcnt uaf issue when receiving igmp
- query packet
-To: Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>
-References: <20231121020558.240321-1-shaozhengchao@huawei.com>
- <CANn89i+zX5-xdXo0nezZiXS2+JXvcr-nsmaCmc8gNzuB5Xg5hQ@mail.gmail.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <CANn89i+zX5-xdXo0nezZiXS2+JXvcr-nsmaCmc8gNzuB5Xg5hQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5953.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 944b064f-df54-4d38-35f2-08dbeb0729d7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Nov 2023 03:00:20.2032
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9jtqlQsTdvvnPGoZbRQ2Ej7JrnZhCHZNaBxpF9OTG17N4Wb1hhMktIisJ4bkCJJ/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7646
 
+> -----Original Message-----
+> From: Samuel Holland <samuel.holland@sifive.com>
+> Sent: Wednesday, November 22, 2023 6:12 AM
+> To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>
+> Cc: Samuel Holland <samuel.holland@sifive.com>; Ariane Keller
+> <ariane.keller@tik.ee.ethz.ch>; Daniel Borkmann <daniel@iogearbox.net>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Simek, Michal
+> <michal.simek@amd.com>; Paolo Abeni <pabeni@redhat.com>; linux-arm-
+> kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+> netdev@vger.kernel.org
+> Subject: [PATCH net] net: axienet: Fix check for partial TX checksum
+>=20
+> Due to a typo, the code checked the RX checksum feature in the TX path.
+>=20
+> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ether=
+net
+> driver")
+> Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
 
+Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Thanks!
+> ---
+>=20
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 82d0d44b2b02..bf6e33990490 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -822,7 +822,7 @@ axienet_start_xmit(struct sk_buff *skb, struct
+> net_device *ndev)
+>  		if (lp->features & XAE_FEATURE_FULL_TX_CSUM) {
+>  			/* Tx Full Checksum Offload Enabled */
+>  			cur_p->app0 |=3D 2;
+> -		} else if (lp->features & XAE_FEATURE_PARTIAL_RX_CSUM) {
+> +		} else if (lp->features & XAE_FEATURE_PARTIAL_TX_CSUM) {
+>  			csum_start_off =3D skb_transport_offset(skb);
+>  			csum_index_off =3D csum_start_off + skb-
+> >csum_offset;
+>  			/* Tx Partial Checksum Offload Enabled */
+> --
+> 2.42.0
 
-On 2023/11/22 1:37, Eric Dumazet wrote:
-> On Tue, Nov 21, 2023 at 2:53 AM Zhengchao Shao <shaozhengchao@huawei.com> wrote:
->>
->> When I perform the following test operations:
->> 1.ip link add br0 type bridge
->> 2.brctl addif br0 eth0
->> 3.ip addr add 239.0.0.1/32 dev eth0
->> 4.ip addr add 239.0.0.1/32 dev br0
->> 5.ip addr add 224.0.0.1/32 dev br0
->> 6.while ((1))
->>      do
->>          ifconfig br0 up
->>          ifconfig br0 down
->>      done
->> 7.send IGMPv2 query packets to port eth0 continuously. For example,
->> ./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
->> 1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
->>
->> The preceding tests may trigger the refcnt uaf isuue of the mc list. The
->> stack is as follows:
->>          refcount_t: addition on 0; use-after-free.
->>          WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate+0x78/0x110
->>          CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #57
->>          RIP: 0010:refcount_warn_saturate+0x78/0x110
->>          Call Trace:
->>          <TASK>
->>          ? __warn+0x83/0x130
->>          ? refcount_warn_saturate+0x78/0x110
->>          ? __report_bug+0xea/0x100
->>          ? report_bug+0x24/0x70
->>          ? handle_bug+0x3c/0x70
->>          ? exc_invalid_op+0x18/0x70
->>          igmp_heard_query+0x221/0x690
->>          igmp_rcv+0xea/0x2f0
->>          ip_protocol_deliver_rcu+0x156/0x160
->>          ip_local_deliver_finish+0x77/0xa0
->>          __netif_receive_skb_one_core+0x8b/0xa0
->>          netif_receive_skb_internal+0x80/0xd0
->>          netif_receive_skb+0x18/0xc0
->>          br_handle_frame_finish+0x340/0x5c0 [bridge]
->>          nf_hook_bridge_pre+0x117/0x130 [bridge]
->>          __netif_receive_skb_core+0x241/0x1090
->>          __netif_receive_skb_list_core+0x13f/0x2e0
->>          __netif_receive_skb_list+0xfc/0x190
->>          netif_receive_skb_list_internal+0x102/0x1e0
->>          napi_gro_receive+0xd7/0x220
->>          e1000_clean_rx_irq+0x1d4/0x4f0 [e1000]
->>          e1000_clean+0x5e/0xe0 [e1000]
->>          __napi_poll+0x2c/0x1b0
->>          net_rx_action+0x2cb/0x3a0
->>          __do_softirq+0xcd/0x2a7
->>          run_ksoftirqd+0x22/0x30
->>          smpboot_thread_fn+0xdb/0x1d0
->>          kthread+0xe2/0x110
->>          ret_from_fork+0x34/0x50
->>          ret_from_fork_asm+0x1a/0x30
->>          </TASK>
-> 
-> 
-> Please include symbols in stack traces, otherwise they are not precise enough.
-> 
-> scripts/decode_stacktrace.sh is your friend.
-> 
-> git grep -n scripts/decode_stacktrace.sh -- Documentation/admin-guide
-> 
-That's very usefull for me, Thank you. I will use it.
-
-When locating the issue, I print the reference counting call stack of
-the mc list when the issue occurs, like dev_tracker. As shown in the
-following figure:
-  node = ffff899f0113eb40
-  stack count is 1, op : hold
-[<0000000083ff3eef>] igmp_start_timer+0x4e/0xa0
-[<00000000d52900df>] igmp_mod_timer+0x99/0xa8
-[<0000000007b0df49>] igmp_heard_query.cold+0x3c/0x46
-[<00000000a8401267>] igmp_rcv+0x142/0x2b0
-[<00000000004cd82b>] ip_protocol_deliver_rcu+0x188/0x1c0
-[<000000007133c934>] ip_local_deliver_finish+0x44/0x60
-[<000000006dbfe577>] __netif_receive_skb_one_core+0x8b/0xa0
-[<00000000c462a041>] netif_receive_skb_internal+0x40/0xd0
-[<00000000963a8181>] netif_receive_skb+0x17/0x90
-[<000000006b194425>] br_handle_frame_finish+0x17e/0x450 [bridge]
-[<00000000a2ed8c7a>] nf_hook_bridge_pre+0x111/0x130 [bridge]
-[<00000000154b9e87>] __netif_receive_skb_core+0x1a6/0xf20
-[<000000001278b781>] __netif_receive_skb_list_core+0x13f/0x2e0
-[<000000002d543b87>] __netif_receive_skb_list+0xfd/0x190
-[<00000000de5ceec5>] netif_receive_skb_list_internal+0xfc/0x1e0
-[<00000000a02df917>] gro_normal_one+0x77/0xa0
-stack count is 1, op : put
-[<000000005042a35a>] ip_ma_put+0x16/0xb0
-[<0000000085f34370>] br_ip4_multicast_leave_snoopers.isra.0+0x47/0xa0 
-[bridge]
-[<00000000870fe473>] br_multicast_leave_snoopers+0x26/0x70 [bridge]
-[<00000000043d0a0c>] br_dev_stop+0x4c/0x50 [bridge]
-[<000000004c2d80b1>] __dev_close_many+0x99/0x110
-[<00000000cdba8c2a>] __dev_change_flags+0x10d/0x250
-[<000000004ee64457>] dev_change_flags+0x21/0x60
-[<000000007aa8f47d>] devinet_ioctl+0x5c5/0x710
-[<0000000060b50685>] inet_ioctl+0x190/0x1d0
-[<00000000a89e60f7>] sock_do_ioctl+0x38/0x140
-[<00000000b9071265>] sock_ioctl+0x195/0x370
-[<00000000c24ede15>] __se_sys_ioctl+0x85/0xc0
-[<00000000cb9d6bde>] do_syscall_64+0x33/0x40
-[<00000000b8341b80>] entry_SYSCALL_64_after_hwframe+0x62/0xc7
-stack count is 1, op : _put
-[<00000000f49c2712>] igmp_stop_timer+0x4f/0x80
-[<0000000094bd7946>] __igmp_group_dropped+0x79/0x1b0
-[<000000003f7c8697>] __ip_mc_dec_group+0xc9/0xf0
-  [<0000000085f34370>] br_ip4_multicast_leave_snoopers.isra.0+0x47/0xa0 
-[bridge]
-[<00000000870fe473>] br_multicast_leave_snoopers+0x26/0x70 [bridge]
-[<00000000043d0a0c>] br_dev_stop+0x4c/0x50 [bridge]
-[<000000004c2d80b1>] __dev_close_many+0x99/0x110
-[<00000000cdba8c2a>] __dev_change_flags+0x10d/0x250
-[<000000004ee64457>] dev_change_flags+0x21/0x60
-[<000000007aa8f47d>] devinet_ioctl+0x5c5/0x710
-[<0000000060b50685>] inet_ioctl+0x190/0x1d0
-[<00000000a89e60f7>] sock_do_ioctl+0x38/0x140
-[<00000000b9071265>] sock_ioctl+0x195/0x370
-[<00000000c24ede15>] __se_sys_ioctl+0x85/0xc0
-[<00000000cb9d6bde>] do_syscall_64+0x33/0x40
-[<00000000b8341b80>] entry_SYSCALL_64_after_hwframe+0x62/0xc7
-stack count is 1, op : hold
-[<0000000083ff3eef>] igmp_start_timer+0x4e/0xa0
-[<0000000062a4d9aa>] igmp_group_added+0x17b/0x1e0
-[<000000004d79d41c>] ____ip_mc_inc_group+0x188/0x260
-[<00000000ec98c0c0>] br_ip4_multicast_join_snoopers.isra.0+0x47/0x90 
-[bridge]
-[<0000000011f715b6>] br_multicast_join_snoopers+0x26/0x70 [bridge]
-[<0000000062443b20>] br_dev_open+0x51/0x60 [bridge]
-[<000000005333d1a7>] __dev_open+0xee/0x1a0
-[<000000007024c19b>] __dev_change_flags+0x1de/0x250
-[<000000004ee64457>] dev_change_flags+0x21/0x60
-[<000000007aa8f47d>] devinet_ioctl+0x5c5/0x710
-[<0000000060b50685>] inet_ioctl+0x190/0x1d0
-[<00000000a89e60f7>] sock_do_ioctl+0x38/0x140
-[<00000000b9071265>] sock_ioctl+0x195/0x370
-[<00000000c24ede15>] __se_sys_ioctl+0x85/0xc0
-[<00000000cb9d6bde>] do_syscall_64+0x33/0x40
-[<00000000b8341b80>] entry_SYSCALL_64_after_hwframe+0x62/0xc7
-
-Therefore, the process analysis of the issue is accurate.
->>
->> The root causes are as follows:
->> Thread A                                        Thread B
->> ...                                             netif_receive_skb
->> br_dev_stop                                     ...
->>      br_multicast_leave_snoopers                 ...
->>          __ip_mc_dec_group                       ...
->>              __igmp_group_dropped                igmp_rcv
->>                  igmp_stop_timer                     igmp_heard_query         //ref = 1
->>                  ip_ma_put                               igmp_mod_timer
->>                      refcount_dec_and_test                   igmp_start_timer //ref = 0
->>                          ...                                     refcount_inc //ref increases from 0
->> When the device receives an IGMPv2 Query message, it starts the timer
->> immediately, regardless of whether the device is running. If the device is
->> down and has left the multicast group, it will cause the mc list refcount
->> uaf issue.
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->> ---
->>   net/ipv4/igmp.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
->> index 76c3ea75b8dd..f217581904d6 100644
->> --- a/net/ipv4/igmp.c
->> +++ b/net/ipv4/igmp.c
->> @@ -1044,6 +1044,8 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
->>          for_each_pmc_rcu(in_dev, im) {
->>                  int changed;
->>
->> +               if (!netif_running(im->interface->dev))
->> +                       continue;
-> 
-> This seems racy to me.
-> 
-> I guess igmp_start_timer() should use refcount_inc_not_zero() instead.
-> 
-I think it could solves the issue.
-
-ThreadA			Thread B
-			igmp_heard_query
-__ip_mc_dec_group       ...
-   __igmp_group_dropped  ...
-     igmp_stop_timer     ...//r = 1
-     ...                   rcu_read_lock
-     ...                   igmp_mod_timer
-     ...                     igmp_start_timer  //if timer is started, r=2
-			
-     ...                   rcu_read_unlock
-   ip_ma_put //r=1
-			
-		     Thread C
-		     igmp_timer_expire //timer function will be called
-		       ip_ma_put //r=0,free im
-
-Thanks
-
-Zhengchao Shao
->>                  if (group && group != im->multiaddr)
->>                          continue;
->>                  if (im->multiaddr == IGMP_ALL_HOSTS)
->> --
->> 2.34.1
->>
-> 
 
