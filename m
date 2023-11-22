@@ -1,163 +1,194 @@
-Return-Path: <netdev+bounces-49941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BDFD7F4022
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:32:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D997F4043
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1420228111D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:32:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB469B20E9C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CE3CA50;
-	Wed, 22 Nov 2023 08:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F3420309;
+	Wed, 22 Nov 2023 08:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RbW4rpqu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="slRkge7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B3F110
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:31:55 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-548f35e6a4bso2728576a12.0
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:31:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700641914; x=1701246714; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2bJsSsHGFq9aBlChakcbUTOSPzwT4uIQYQ+fVgyJERw=;
-        b=RbW4rpquMY3g8byOobgeAYchOcyx4tUZcWmtCpvOelp9PSK7EcjUNm8glFvOC9q0+V
-         Am6hPFxrAJPurhuH14EOhLdcKCbfXiXQ5m/RjhGM6cgUs0Lenl5FVg4yTKi7wVRDNtjc
-         2KYgNuYQRtliJp7uAQ8u+gC49q1qeaWZdkXjZTnrcpvDotP+1KISSnpSD5lpb0qPBjvc
-         YVvgMEdB0we9ztl2WXrz+GXWvzJqeH4hGU5+Xv0Ji+tnQMOyHdDpfoCmUM75F5xh94P6
-         suqaN3G45ZSOhtd86Et9L9B7GpnKxXq7IV6F3d9JbJEI6h3W6eWZmo92cU7B52yRyY30
-         nvbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700641914; x=1701246714;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bJsSsHGFq9aBlChakcbUTOSPzwT4uIQYQ+fVgyJERw=;
-        b=tRmXUuIUyV82tgYpPAY9pN3aDsglqtTlhcL4+LDWqfvee3RbcIaAgWug3jQBFNp3Av
-         UWXwEvtEbeh9q6IR6XuG6sPoJyf26HDnkO2vzLlSxzNTu+w+aPTIl5ks37gwr67NuSqQ
-         KOu/SRsVEHgBRM2ImIjwN5HmqUcl5Y+MhD8s/bO5lJNSNaojtWywORvl6OgKs4OBWpAn
-         MjJFyaPuwQXV7P1bCFGy/oWbt0q93yoRadIDfVtJqJROvU5rzOKXzs5B3hT6IcZ2noAr
-         cZ8y1xlwbO8vzqSQkG7Dc40zAPbYJIs0iUk/XbRlfyiNyiylqVqMMRg9b9KJ5dDVJ4ns
-         WMVg==
-X-Gm-Message-State: AOJu0YwdeKEd/vAZAACRcmlZk9Pby9gpMq7xYUC3F3JUZksBHcpvOVg/
-	U/ShK90uKOINkB5pcbL52+NKFw==
-X-Google-Smtp-Source: AGHT+IGIyIJnN4jjMNMtZl2msEE3tRY4PJj5jNFLH8SXHZ25UCu/2u5YSaFYAVr1zFoYn5px8jwA3Q==
-X-Received: by 2002:aa7:d98e:0:b0:548:68a3:618e with SMTP id u14-20020aa7d98e000000b0054868a3618emr1209670eds.9.1700641914296;
-        Wed, 22 Nov 2023 00:31:54 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.100])
-        by smtp.gmail.com with ESMTPSA id u3-20020a05640207c300b00548851486d8sm4322937edy.44.2023.11.22.00.31.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 00:31:53 -0800 (PST)
-Message-ID: <5c4413b8-bebf-4489-a03a-d4c4ba1becdf@linaro.org>
-Date: Wed, 22 Nov 2023 09:31:51 +0100
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5EC1A8;
+	Wed, 22 Nov 2023 00:37:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vy7HXgGKiu5PHGt/lRu7enMMMadvKNVcB8ccEOdrUL+0PeYO8By+TNP35bEVCT0nuiUmD5vqlqxH7JjanhyKesqF1rVCZjcW0rapGILkaSybndGqW0crn0zSxwEvNKU4TxidmfLYof+b+DcBFtDFDSamZozV7B3KekZtqXj0g+Cb8ujBe4uY45OnulGjC5P9+HyxHaXW3Ry2DVr9YTKbpZapWbWfHToyljn1PD9JVp1tJbHGt/+aRpNXDQcsGv/3ysKsavOZsDNBbgUGI4/DD40DKhdzNFaCgou6Vuw/3JDr5dqIShr0vRKDABLxZLAe7hp51Ivp7Gt92gqNx/TFgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O7257h+R0o/o6ytyI4blx00DiIxKkZCHIKnHK+3OHe4=;
+ b=AOncMu9JgF2kj2pt9GtBdt49B+KfzwvQfA3HPdP+oD8yBJwtLmXpQWjsSOIy3/kRGDYaU2kZ0gPggEpsyAVD7ttPX3ThKXdxnXSPp6dNSUgBJM2BjeeefNtnR3xdZaHXv2ETgny6yOpdD5YiDFgqeHu5Z1bFZFKw14STVPw9561n51X6a7E2onFaeYxAh/y0EzMzzQyPrBVX/pH2AkuaOtUiY62kZZ/Q8Dup7DYMB/pg2DWVKO7PNuze9+KesFWa+d+HMB7DTac+hgtijhu1QYkqY189ugnI4NyhRX3kNL3Br5vPp6oLBYF6xlPniEFppXqj0xYwlZg73MSApHuHbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O7257h+R0o/o6ytyI4blx00DiIxKkZCHIKnHK+3OHe4=;
+ b=slRkge7aCCeqkPu5yDNlHzdlW4TJ8actLvPPg6TL/AXaDD/HunI/dWAcOUSHeWOlnnn1oSybIvj1l9s/nxPkskWZhRM9ToYHVN0t4/e1HsA4HMsGppCx3bhqibVPtwPYgueyetgBFqpfjHNNih7zbSTTTRmiS5ZIkKw2IicHUpo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
+ DM6PR12MB4957.namprd12.prod.outlook.com (2603:10b6:5:20d::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7002.28; Wed, 22 Nov 2023 08:37:03 +0000
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::5287:5f3:34f:4402]) by DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::5287:5f3:34f:4402%7]) with mapi id 15.20.7025.017; Wed, 22 Nov 2023
+ 08:37:03 +0000
+Message-ID: <9608a9aa-26d2-4d27-b9b7-31f643307d2d@amd.com>
+Date: Wed, 22 Nov 2023 16:36:47 +0800
+User-Agent: Mozilla Thunderbird
+Cc: majun@amd.com, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
+ Lijo.Lazar@amd.com, mario.limonciello@amd.com,
+ Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Subject: Re: [Patch v13 1/9] Documentation/driver-api: Add document about WBRF
+ mechanism
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Ma Jun <Jun.Ma2@amd.com>
+References: <20231030071832.2217118-1-Jun.Ma2@amd.com>
+ <20231030071832.2217118-2-Jun.Ma2@amd.com>
+ <3e18c716-4c1b-ea3-ede3-5a67555f5e72@linux.intel.com>
+Content-Language: en-US
+From: "Ma, Jun" <majun@amd.com>
+In-Reply-To: <3e18c716-4c1b-ea3-ede3-5a67555f5e72@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: KU1PR03CA0040.apcprd03.prod.outlook.com
+ (2603:1096:802:19::28) To DM4PR12MB6351.namprd12.prod.outlook.com
+ (2603:10b6:8:a2::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: net: renesas,ethertsn: Add Ethernet TSN
-Content-Language: en-US
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
- <niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
- <geert@linux-m68k.org>, devicetree@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
-References: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|DM6PR12MB4957:EE_
+X-MS-Office365-Filtering-Correlation-Id: f67f7244-989b-48a4-95b3-08dbeb363390
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RwQrJIteUGFwIDktNL6QEG349gWTk/m3Rbiz6Gna+tES/9VFUwDzJ6b8Q7bRoNcWkGecqiVDfjbsghdB65UIc2TINnW1GNegSOwZ6HYG36rNzUwgOtIwwRTjONUWS08ht73Ezd+cMkFZbu58c/fjIPwBpjuxxaAvDGdamhxc30lC9+AA/SanA7RriO+Qg4sLncgbGjatTyzqBOCOy2bsQjoytSCJXBsPoHgWxD5OmrT5ty/MM9FmVFoI2ZbMonCazJcM0i06UA+M28MKj4b6Y3reTXqn5RiTAtqOtD8TtRswT4+3inVddTNSjW6HB0l+MNSusKv2XLL8e4/Ds9Raan7sITAtl2nMexdjBoBrGbYuBRIaP0P8Gl9vvnmXcswYs83QhDphD4CMsCZd1WugCgC7CZr355x2T+mmkQxw4acSzPm7Pxns+7EgXVYyUFP2QsVtpi5QiPjQdahgggHRVIWd0qkuCCt5/O8HeOffSc53vUzXdW2vxszpCQpi5mILh1e62p08rE2SwSivIAuFUKNupe/3hwOq8KzgB+liV2JwatGpRK9Ms+mdc90gXDjjsiXwrO1qHwIveLjEzMPvKb/ViAVvYoVKEa8qqm7mZWQ8NpC9Fo2cTbQ6M71vK3CA/YqkBkXlVIQCKMHQEplxHA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(39860400002)(346002)(366004)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(83380400001)(66574015)(53546011)(7416002)(26005)(38100700002)(6512007)(4326008)(8676002)(41300700001)(5660300002)(2906002)(478600001)(8936002)(6506007)(6486002)(54906003)(6636002)(316002)(110136005)(66946007)(66556008)(66476007)(6666004)(36756003)(31696002)(31686004)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?c3loc2JSeDFuVEI3VlhwT0hLSnIzTmswRWhOcEx3SndJdk1EckVIaWlERUNv?=
+ =?utf-8?B?RWtWU0tyVGQ4Zmo2Zm1mcTZzcUpLZE1rcCt3bnRFSlF5ajEvL252clUxdFR6?=
+ =?utf-8?B?RjN5TTc3R0tQaUVuVzlnZDg3VndGRUlpS1FvZkVVd05SMG1IUmlCL0JnZjNZ?=
+ =?utf-8?B?WkFPUnpxSnIxamVMUUg4WjY1Ym5XL2Q1WXlwc0JaaEFjMGJUWDZMek1tc01r?=
+ =?utf-8?B?SHRxYjR0TjNBdjFkOEVLTjMvak84eldMT2ZKd3BRejM5eGhOa1Z6L2lGTUJR?=
+ =?utf-8?B?YjFVaVlYa1NaUmMyWi9LdUR2QnkvWTd6ZVZyL1NQTURQS1NYTklHVjN1bm1U?=
+ =?utf-8?B?enVwR3IvS1JHTUo4ZS9KUWdEU2phd08zTkNYaGZjV014NHVXRzFhK2tQek8x?=
+ =?utf-8?B?eTdaMmFDdUh6OVRYeUc0VnYvMXBhSnpLNUNLLzlkdFBvdTJWVGVNVzRLY2hP?=
+ =?utf-8?B?cFhDUXYySUxOeS9YSHF1aDZxcjFZTEZkY0cvTy9lM3BOVW1kTGtvZ3VxVnFD?=
+ =?utf-8?B?ZWdQcTFkWXVhaDdQRzlmRDVRdFBYNU5CTm80MUlPYkltTW1RMU1yeVlGOXE0?=
+ =?utf-8?B?RXBVRVNCQlRxWThYbEFaSW4zTmY3bVgzeTJCdXBDZFpOcTE1ejdFeXdablY5?=
+ =?utf-8?B?dHlCdjRxSkFjRjdncXYrRXdiQ1hORjd2bGtsR3ZsUys3dnB3TDR4aDhFa1ly?=
+ =?utf-8?B?RzVLQ2pwZEhSR1BjNmw5Qm4veW9vZllLR1JEMnJBL2Nmb2E1aW8yNU9mSkVm?=
+ =?utf-8?B?SVZWZ2ZtVXlaMCtvUENXSHQwV2VNT0szOHpWZjlCWjE4alA5bkVGbmpSN0hY?=
+ =?utf-8?B?Yk9OR0FCUCsrQTIyRmhqQk9OdHh2SzZCNFRHbGxUWVh2NzB1OTVwZG03S2ZE?=
+ =?utf-8?B?RHB1cEJVOWh1SkVqRXNabXA2ODZiRk1OSlQrczhsb3V1S0hvY1c3UEJoVTZ1?=
+ =?utf-8?B?UkpCenV5TUFZejJJcVVRc2lpUGxwTDdtOHp6OUx2SDlmdWk1cWZVeXRCeTd4?=
+ =?utf-8?B?K2RLYlo3TkFhdHRmcmRWTmNTNTBNUHRKZFc1TCtqWUxpTyt2Z25YS0g2VUgz?=
+ =?utf-8?B?ZE9qa0NhQSsvNGlQRjJ2NFhWOUFpd0FCTWVnNm01WXlGMnNNVzhlVDN6d0Np?=
+ =?utf-8?B?YWxFVS82cTFkNzEwWXZxQ0hmZExlYjJrOERJandSZE1rK0p0NVdzcVVOQ0pu?=
+ =?utf-8?B?VkdYQWhjazRmbnVySE9PcUttYVRzS3BMQTNLRHFTWG1OdlVYTHIzUXhPRzJo?=
+ =?utf-8?B?OER3c2o2QjZYQjVSa2dQUWVQT3RvdkwvYyszZW4yV3laTTVrTVJWN2tNQ1B5?=
+ =?utf-8?B?WTZNZVNic2IxWW5qaHRJMEtYMGNqUlZ3ZXZIYkFJWmhITVhXSGlKczJVYzJE?=
+ =?utf-8?B?Q0ppazY3OXlsUUJtTGhKbURldlZaL0diR3cvcmVLdWN6cFpFZ3V4dGJRSFNv?=
+ =?utf-8?B?L1dOcXh4WERLTTJkUHdROEYwNXdVdnh3RHJJL2h3aGdQUFpXNFlCSkV1NGpG?=
+ =?utf-8?B?NlNTNE5PY0RlUWI4elMxWkRyejdUSUI3RFZsQ3RnS2RJSU5lSDBrWWRxV3cv?=
+ =?utf-8?B?bXBqZThuaUxWZ3lBWWxPak5iZ2QxQlF3THpTeURGMWZQbHRUQlYwV3hyOEFv?=
+ =?utf-8?B?NU1ydGo2Y1pIaEVIOWNJV0RvcVFqbTE2TlJobWNvdkZuWDkraUZZWDFzUEtu?=
+ =?utf-8?B?V2EwM1h2ZXg4K0s2MmtheW1qNE04UFQ0ckpLVXhzQUpCOVEzZjlvZ1hrc00x?=
+ =?utf-8?B?RmFSYkw4dG16T1ZjTFNIUjhCci8zU1FuTHV1RElTSm5XSUhvaDRBYm1VWG5k?=
+ =?utf-8?B?UldaK3I0aWpvRy93WDgxUEJPL1RnbUNNQ3hyYWxXN25GamhacjU2T1VXL2Ri?=
+ =?utf-8?B?QUMvK1EvaG9tZW5nQmEwRkZDTGhySXgrSnFiWkxsODFMOW40cVd3bDY4QzV0?=
+ =?utf-8?B?aFJ0a1V1WjhHV2xGZHJHSDNxZ0YwNEVaNVB4MlA4dlNHMDY3T3N1NjJJMWY4?=
+ =?utf-8?B?bmVjbUQ3bWVBSm9tMTdvR2M5T09qYndLY0pjajNXSW5RamdiSUpiYVFMRkxh?=
+ =?utf-8?B?WllzZDNsS0E2TzUxU1NSWlc1OUVKanA5Z2gwYXVnbEE2TzM2WnIyUTNiSEox?=
+ =?utf-8?Q?dA3E3d2TnkTDQHlAmFQeMrljn?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f67f7244-989b-48a4-95b3-08dbeb363390
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 08:37:03.2815
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: agl4SkjmmP/r/Hela79FNAXVgg8PKMqBFbv0SAoKVStV+/02cZSmItJSnePaYPqt
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4957
 
-On 21/11/2023 19:37, Niklas Söderlund wrote:
-> Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> device provides Ethernet network.
+Hi llpo,
+
+Thanks for review, I'll fix the format issue in
+the next version.
+
+Regards,
+Ma Jun
+
+On 11/20/2023 7:59 PM, Ilpo Järvinen wrote:
+> On Mon, 30 Oct 2023, Ma Jun wrote:
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
-...
-
-> +patternProperties:
-> +  "^ethernet-phy@[0-9a-f]$":
-> +    type: object
-> +    $ref: ethernet-phy.yaml#
-> +    unevaluatedProperties: false
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - reg-names
-> +  - interrupts
-> +  - interrupt-names
-> +  - clocks
-> +  - power-domains
-> +  - resets
-> +  - phy-mode
-> +  - phy-handle
-> +  - '#address-cells'
-> +  - '#size-cells'
-
-If there is going to be respin, please use consistent quotes - either '
-or " (see pattern a bit above). You also need net-next in PATCH. In any
-case:
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Best regards,
-Krzysztof
-
+>> Add documentation about AMD's Wifi band RFI mitigation (WBRF) mechanism
+>> explaining the theory and how it is used.
+>>
+>> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+>> ---
+>>  Documentation/driver-api/wbrf.rst | 76 +++++++++++++++++++++++++++++++
+>>  1 file changed, 76 insertions(+)
+>>  create mode 100644 Documentation/driver-api/wbrf.rst
+>>
+>> +Driver programming interface
+>> +============================
+>> +.. kernel-doc:: drivers/platform/x86/amd/wbrf.c
+>> +
+>> +Sample Usage
+>> +=============
+> 
+> A lot better but you missed adding newlines here for this and previous 
+> section title.
+> 
+>> +The expected flow for the producers:
+>> +1). During probe, call `acpi_amd_wbrf_supported_producer` to check if WBRF
+>> +    can be enabled for the device.
+>> +2). On using some frequency band, call `acpi_amd_wbrf_add_remove` with 'add'
+>> +    param to get other consumers properly notified.
+>> +3). Or on stopping using some frequency band, call
+>> +    `acpi_amd_wbrf_add_remove` with 'remove' param to get other consumers notified.
+>> +
+>> +The expected flow for the consumers:
+>> +1). During probe, call `acpi_amd_wbrf_supported_consumer` to check if WBRF
+>> +    can be enabled for the device.
+>> +2). Call `amd_wbrf_register_notifier` to register for notification
+>> +    of frequency band change(add or remove) from other producers.
+>> +3). Call the `amd_wbrf_retrieve_freq_band` intentionally to retrieve
+>> +    current active frequency bands considering some producers may broadcast
+>> +    such information before the consumer is up.
+>> +4). On receiving a notification for frequency band change, run
+>> +    `amd_wbrf_retrieve_freq_band` again to retrieve the latest
+>> +    active frequency bands.
+>> +5). During driver cleanup, call `amd_wbrf_unregister_notifier` to
+>> +    unregister the notifier.
+> 
+> The correct kerneldoc format should be without the closing parenthesis:
+> 
+> 1. Text here that
+>    spills to second line.
+> 2. Second entry.
+> 
 
