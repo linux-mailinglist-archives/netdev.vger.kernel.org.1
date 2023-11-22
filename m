@@ -1,177 +1,93 @@
-Return-Path: <netdev+bounces-50207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B89267F4EC5
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:53:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C308B7F4ECE
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2144E2812F2
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:53:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BE952813F2
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7B94E615;
-	Wed, 22 Nov 2023 17:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205DA58AB0;
+	Wed, 22 Nov 2023 17:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1QfVTaD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dOR2PKrT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC8E1A8;
-	Wed, 22 Nov 2023 09:53:44 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3316d09c645so3620816f8f.0;
-        Wed, 22 Nov 2023 09:53:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700675622; x=1701280422; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AdOBPKB2H9imCd9isIgQYWfbsuOE5ddo9bpSACnZw7o=;
-        b=X1QfVTaDZlrZlY8VYrFGXSKljh5vJ+6tN6jZO4PO5gqom8HXXeWlwjbsWdWmR2Smz5
-         8Big+26BVjQPuAOw/UJzklCyRjUD53Qu+zIbaFa4M7WOG8w83ODm7P408a2U2lGAhjvN
-         nfeyXKfgXIThQ5TK0xjqSjM9REuI9KIFB3rpHPSq+CYzULEmZ2zCXxKcjNvtqY3FY4/v
-         Z052waF+qfkQ5/ADvoTpi7xKNgc0ZzPJx/6UO+WG/cx3hTaQ71os5oaALiA9M5H5ZrzI
-         K6dnekuSeHzPSS3YTWmh2e0P4b5FOB24X8S0A+V5ySoN8cgoRBn1BKLRic3shf7TktXD
-         6M4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700675622; x=1701280422;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AdOBPKB2H9imCd9isIgQYWfbsuOE5ddo9bpSACnZw7o=;
-        b=IxXYKczN2g3xWM4gi7rqMJbyrrVULYbaG5WIAWgAT39zgt/VEJ284CF1JiLCMaVs4Y
-         RcUEbR+tWVN+lit1S90cpe8z+1H5F49I08UpvtNcpFOtLsV4efLVA76ZNpo4XzI1SspO
-         yX2kBfD/PbflJpYb3+r1uFDZq1LrzB7N/LPE0U2DObEtQCc1RrrS8LS/FvG+aUB2Rhe6
-         iXW/2XcjuUcxQX6tdssIxj8IS48s1fA1q1uUtAez+DftfZFDfZ+zF4ka+wPkAyo1vIfa
-         Vw9ndSYN9Yw8lo9GB+k96P/sRSg4EwUvi1+CVKiwMaSFru13uMf/NoRcHanXHHd9dAAc
-         SvaQ==
-X-Gm-Message-State: AOJu0Yw9VJriRPyLzPckXnNOW8NcgzBbMBKKNjGUUgo0MyG5g4Cl+KEO
-	qgJysMOaEzsHllTtNXp2qOU=
-X-Google-Smtp-Source: AGHT+IFlnSL12ZSmipJ4vORisCI3rn2874HDuY5w0IGDLNY/BeJv0cNVcWDQ9nqh7rT9QWFD5rDiPw==
-X-Received: by 2002:a5d:67c5:0:b0:332:c441:70aa with SMTP id n5-20020a5d67c5000000b00332c44170aamr2256749wrw.26.1700675622215;
-        Wed, 22 Nov 2023 09:53:42 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id k5-20020adfe8c5000000b00331733a98ddsm14781231wrn.111.2023.11.22.09.53.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 09:53:41 -0800 (PST)
-Message-ID: <655e4025.df0a0220.50550.3d70@mx.google.com>
-X-Google-Original-Message-ID: <ZV5AI/KsHnNi/gKs@Ansuel-xps.>
-Date: Wed, 22 Nov 2023 18:53:39 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [net-next PATCH] net: phy: aquantia: drop wrong endianness
- conversion for addr and CRC
-References: <20231122170813.1222-1-ansuelsmth@gmail.com>
- <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE00758AAC;
+	Wed, 22 Nov 2023 17:55:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD0EC433C9;
+	Wed, 22 Nov 2023 17:55:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700675727;
+	bh=NKrLhVxDSneYqBCgaVREfOa2yycpjhLMjCDFnhPnIpo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dOR2PKrTFmPPs9/0hWB9mt8n2ESvpeM8wedLTWtBwke6lEOhjDVyFWNHvwr2IK0aZ
+	 YgW3ENr0qW1JAdGvsdxaJYdSAPeMnVhVn57X7EEqN5yyx1jQbLeVTODDy1LtyHZYMM
+	 YlW07D5wXxGE9SYU1aJNMsckLmGb91ESFAjhaTsn40tiHiK22RQex/bbRZxOcQnGRi
+	 Bl7DNCE+4JG/7nTxehf5ML6n/+Kiqx6vLNSBQHnvirnmGt4uafJdfcfOfVRucczSj4
+	 glznnW5TNdm61zY+kocAbaHsQbeSXSrJkeojrZL26mfQYWzd78x5z9SMRsJ0LKb98z
+	 z3jzNIaLyS+OQ==
+Date: Wed, 22 Nov 2023 09:55:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Florian
+ Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
+ list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231122095525.1438eaa3@kernel.org>
+In-Reply-To: <20231122165955.tujcadked5bgqjet@skbuf>
+References: <20231120115839.74ee5492@kernel.org>
+	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
+	<20231120133737.70dde657@kernel.org>
+	<20231120220549.cvsz2ni3wj7mcukh@skbuf>
+	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+	<20231121094354.635ee8cd@kernel.org>
+	<20231122144453.5eb0382f@kmaincent-XPS-13-7390>
+	<20231122140850.li2mvf6tpo3f2fhh@skbuf>
+	<20231122143618.cqyb45po7bon2xzg@skbuf>
+	<20231122085459.1601141e@kernel.org>
+	<20231122165955.tujcadked5bgqjet@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 22, 2023 at 05:24:33PM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 22, 2023 at 06:08:13PM +0100, Christian Marangi wrote:
-> > On further testing on BE target with kernel test robot, it was notice
-> > that the endianness conversion for addr and CRC in fw_load_memory was
-> > wrong and actually not needed. Values in define doesn't get converted
-> > and are passed as is and hardcoded values are already in what the PHY
-> > require, that is LE.
-> > 
-> > Also drop the cpu_to_be32 for CRC calculation as it's wrong and use
-> > _swab32 instead, the word is taked from firmware and is always LE, the
-> 
->                                taken
-> 
-> > mailbox will emit a BE CRC hence the word needs to be always swapped and
-> > the endianness of the host needs to be ignored.
-> 
-> I'm not convinced. If the firmware is a bytestream (as most "files" are)
-> then for val = get_unaligned((u32 *)ptr), where ptr is an array of u8:
-> 
-> ptr[0]	ptr[1]	ptr[2]	ptr[3]	val on LE	val on BE
-> 0x01	0x02	0x03	0x04	0x04030201	0x01020304
-> 
-> So, endianness matters here, and I think as Jakub already suggested, you
-> need to use get_unaligned_le32().
->
+On Wed, 22 Nov 2023 18:59:55 +0200 Vladimir Oltean wrote:
+> I wouldn't be so sure. The alternative interpretation "for PTP, give me
+> timestamps from both sources" also sounds reasonable for the distant
+> future where that will be possible (with proper cmsg identification).
+> But I don't see how to distinguish the two - the filters, expressed in
+> these terms, would be the same.
 
-So they DO get converted to the HOST endian on reading the firmware from
-an nvmem cell or a filesystem?
+We can add an attribute that explicitly says that the configuration
+is only requesting one stamp. But feels like jumping the gun at this
+stage, given we have no other option to express there.
 
-Again this is really dumping raw data from the read file directly to the
-mailbox. Unless phy_write does some conversion internally, but in that
-case how does it know what endian is the PHY internally?
+> So the ptp4l source code would have to be modified to still work with
+> the same precision as before? I'm not seeing this through.
 
-> > diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
-> > index c5f292b1c4c8..bd093633d0cf 100644
-> > --- a/drivers/net/phy/aquantia/aquantia_firmware.c
-> > +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
-> > @@ -93,9 +93,9 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
-> >  	u16 crc = 0, up_crc;
-> >  	size_t pos;
-> >  
-> > -	/* PHY expect addr in LE */
-> > -	addr = (__force u32)cpu_to_le32(addr);
-> > -
-> > +	/* PHY expect addr in LE. Hardcoded addr in defines are
-> > +	 * already in this format.
-> > +	 */
-> >  	phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> >  		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
-> >  		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
-> > @@ -128,7 +128,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
-> >  		 * We convert word to big-endian as PHY is BE and mailbox will
-> >  		 * return a BE CRC.
-> >  		 */
-> > -		word = (__force u32)cpu_to_be32(word);
-> > +		word = __swab32(word);
-> >  		crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
-> 
-> Again, I think you need to be careful with the endianness here again.
-> From what I understand here, it seems the CRC needs to be generated by
-> looking at the byte at ptr[3] first, then ptr[2], ptr[1] and finally
-> ptr[0] ?
-> 
-> If that is the case, the problem is using __swab32() on LE will do the
-> job for you, but on BE machines, it will be wrong.
-> 
-> I would make this explicit:
-> 
-> 		u8 crc_data[4];
-> 
-> 		...
-> 
-> 		/* CRC is calculated using BE order */
-> 		crc_data[0] = word >> 24;
-> 		crc_data[1] = word >> 16;
-> 		crc_data[2] = word >> 8;
-> 		crc_data[3] = word;
-> 
-> 		crc = crc_ccitt_false(crc, crc_data, sizeof(crc_data));
-> 
-> which will be (a) completely unambiguous, and (b) completely
-> independent of the host endianness.
-
-But isn't this exactly what is done with ___constant_swab32 ?
-__swab32 should not change if the HOST is BE or LE.
-
-The real question is if word is converted. (by either the read API on
-reading the FW or by phy_write on writing the thing to mailbox) (the
-test are done on a LE HOST)
-
-Our theory is that mailbox takes LE and internally converts to BE (as
-the PHY is BE) but the CRC reg calculates the CRC out of the converted
-data aka it does calculates the CRC from the BE data (converted
-internally).
-
--- 
-	Ansuel
+We can do the opposite and add a socket flag which says "DMA is okay".
 
