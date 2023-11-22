@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-49885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1697F3B83
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:50:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615C17F3B90
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:04:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 386B3B21505
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 910EC1C20ED3
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A5D5386;
-	Wed, 22 Nov 2023 01:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lKFkl7Md"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09E16FDA;
+	Wed, 22 Nov 2023 02:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE4C4426
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:50:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 294B7C433C9;
-	Wed, 22 Nov 2023 01:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700617823;
-	bh=ytwSLqGynDoxV3L8iE9r2IClifLUP14wvoD8499FKVQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lKFkl7MdEVR7qGp1syXYGejcOz6XMvPmUT2MAP6Nw+Jno0b4llFUGUrwv0HFcLZ+8
-	 k1wRmybSeLl4j90Xwnb0R8+ZyZfNFHFHrzvA+zPuuDpPtYDQ9+axWl48ZJz2lPEvxq
-	 lX6KP1y4wa5ASs+aMtTsN+aSjE17vshV6lPQEfy/HJjaZumoVrbYoTZ20KjPsaxZZk
-	 Mw1GIlm8j8B0ZDILW+PY9novEg73+Tg1hwbR/7ODIC4rJD78uXTv4FvAhVS+BoiLwF
-	 EZBwYmVF/8nwyBB2qc345+A5524P0W2lniy8aRoVJkdZEil2zyEx+bhP+PO66yXBsJ
-	 OYzpMme4QBRsw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0DFCCC595D0;
-	Wed, 22 Nov 2023 01:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E03193
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 18:04:10 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SZkvJ4R9lzMnKJ;
+	Wed, 22 Nov 2023 09:59:24 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 22 Nov 2023 10:04:07 +0800
+Message-ID: <8fc84e79-f5c9-8fbe-1fe8-b23b059f03d0@huawei.com>
+Date: Wed, 22 Nov 2023 10:04:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] dpll: Fix potential msg memleak when genlmsg_put_reply
- failed
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170061782305.9000.12246694056316498356.git-patchwork-notify@kernel.org>
-Date: Wed, 22 Nov 2023 01:50:23 +0000
-References: <20231121013709.73323-1-gehao@kylinos.cn>
-In-Reply-To: <20231121013709.73323-1-gehao@kylinos.cn>
-To: Hao Ge <gehao@kylinos.cn>
-Cc: vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com,
- jiri@resnulli.us, michal.michalik@intel.com, davem@davemloft.net,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next,v5] bonding: return -ENOMEM instead of BUG in
+ alb_upper_dev_walk
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <j.vosburgh@gmail.com>, <andy@greyhouse.net>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>
+References: <20231121125805.949940-1-shaozhengchao@huawei.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <20231121125805.949940-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 21 Nov 2023 09:37:09 +0800 you wrote:
-> We should clean the skb resource if genlmsg_put_reply failed.
+On 2023/11/21 20:58, Zhengchao Shao wrote:
+> If failed to allocate "tags" or could not find the final upper device from
+> start_dev's upper list in bond_verify_device_path(), only the loopback
+> detection of the current upper device should be affected, and the system is
+> no need to be panic.
+> So just return -ENOMEM in alb_upper_dev_walk to stop walking.
 > 
-> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
-> Signed-off-by: Hao Ge <gehao@kylinos.cn>
+> I also think that the following function calls
+> netdev_walk_all_upper_dev_rcu
+> ---->>>alb_upper_dev_walk
+> ---------->>>bond_verify_device_path
+>>From this way, "end device" can eventually be obtained from "start device"
+> in bond_verify_device_path, IS_ERR(tags) could be instead of
+> IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
+> 
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
 > ---
-> v1 -> v2: change title due to add some similar fix for some similar cases
+> v5: drop print information, if the memory allocation fails, the mm layer
+>      will emit a lot warning comprising the backtrace
+> v4: print information instead of warn
+> v3: return -ENOMEM instead of zero to stop walk
+> v2: use WARN_ON_ONCE instead of WARN_ON
+> ---
+>   drivers/net/bonding/bond_alb.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> [...]
+> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+> index dc2c7b979656..7edf0fd58c34 100644
+> --- a/drivers/net/bonding/bond_alb.c
+> +++ b/drivers/net/bonding/bond_alb.c
+> @@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
+>   	if (netif_is_macvlan(upper) && !strict_match) {
+>   		tags = bond_verify_device_path(bond->dev, upper, 0);
+>   		if (IS_ERR_OR_NULL(tags))
+> -			BUG();
+> +			return -ENOMEM;
+> +
+>   		alb_send_lp_vid(slave, upper->dev_addr,
+>   				tags[0].vlan_proto, tags[0].vlan_id);
+>   		kfree(tags);
+Hi Paolo:
+	I find that v4 has been merged into net-next. So v5 is not
+needed. But should I send another patch to drop that print info?
 
-Here is the summary with links:
-  - [v2] dpll: Fix potential msg memleak when genlmsg_put_reply failed
-    https://git.kernel.org/netdev/net/c/b6fe6f03716d
+Thanks
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Zhengchao Shao
 
 
