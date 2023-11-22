@@ -1,244 +1,100 @@
-Return-Path: <netdev+bounces-50228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010A67F4F50
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:22:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFB5D7F4F44
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB3228135C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAAEF2814B3
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6333C5D49D;
-	Wed, 22 Nov 2023 18:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF245C07A;
+	Wed, 22 Nov 2023 18:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="rC5vATeK";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Om7uyCE+"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="h7RY9xdG"
 X-Original-To: netdev@vger.kernel.org
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BD51AB;
-	Wed, 22 Nov 2023 10:21:12 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 7333258071E;
-	Wed, 22 Nov 2023 13:21:11 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Wed, 22 Nov 2023 13:21:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1700677271; x=
-	1700684471; bh=MkiWZ7hndeUKcl/hIWbjV8IQ3kJNfZ+yq9JosgeOxnU=; b=r
-	C5vATeKuhOW93dtcUKH8UClKCfjzF9Xl4bA1RFgGxj4x2Z/V0laY/04WwqJPq6Ad
-	r28Y4QVdadBBSD5RVGoYZ13ZFEDERoDtoJyZpZfd3IYyqMy8lOwzToqb2la/SDfx
-	3fvZo3l3hsKpmbbLk0+LhBOO/lr2AEG5yrTLaPM5qOmrKpwQGbkiwyFQsbCy0EXl
-	+fjuncUUzp318ZSwX1n0gML9TXAzYvF/P4IahnPdtPg5fD+w/vF1MUPmolNuh0xQ
-	GPYsmMoGG0yvy6JQLvvDEw/KxMJYlyme/dCEPWxRXcE36hZhx1Pv4VPDc3vCBT0d
-	31MDYZbgkCky8BRxwIdhg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1700677271; x=
-	1700684471; bh=MkiWZ7hndeUKcl/hIWbjV8IQ3kJNfZ+yq9JosgeOxnU=; b=O
-	m7uyCE+97C8ZSq/6OKBwWyKEv9gWkvbTgMlQEwaFo6d0wXG7ky4shzpSKmmYkVmr
-	ZVnEDlNVXE6M/quKpBnxMl4F7OgTrq84wLH6JP7DfhbYnn12BSnbZkTaRu1SivfF
-	VUJao4vmqHLyHgPZQiTtNaovT+QAWLLTxzJ31oAAF/u/+9DBat2JMnB6bDFMvpkT
-	MPK1pI2Fi8Dr5qikEv/dNTvVDQjeoBfVZdCNUXjGEVyrEHAvUFAMoxT+ff6ixRRR
-	5WqRAnardiLg5vDzdeDb8gBw+MdvC0JiuPkuy5MOJDxgAV2K3GaLJDVAyVecYIWO
-	dxfMLb4pdJRs7Zq4VlN9g==
-X-ME-Sender: <xms:l0ZeZTE8tlyliDsDO6nJF6yB4-9n1Hxeh3VBHkcV7uZcoWLrWBW2xA>
-    <xme:l0ZeZQXDzXbdPZwlmmxQOXl6HNtmmVoipOT3Xr5yeknlSaVnrtiyGLwaQmZLww036
-    5CGpfnSoFeYt0kPkw>
-X-ME-Received: <xmr:l0ZeZVLfzoiy6e6IUYzeBOZM64YzOhQFxjo-CeBjswqYCk8tZQElRF1LlO6oi_qN9ltrSay_sLnodvomndf8nNofzImIG0WpOLpODYOhc5lJkA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehuddguddutdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephf
-    fvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcu
-    oegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduie
-    ekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhi
-    iigvpedunecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:l0ZeZREuNF294xuSzhD6lAHt_Nm1M5EJKy08xIrIP8iX-kTuggJLQQ>
-    <xmx:l0ZeZZWnigLssRFcHmdKjL0nUzrlf4VaT5WJaCDtszIa7joOx3XbPQ>
-    <xmx:l0ZeZcPU29sNi1LwktVFAbRNMyIx-O4zaLnYe7TVLXZq43sh8SdyWA>
-    <xmx:l0ZeZfFC2uN9Ytr1PmSOGkCKdEOnEp793N9kct-9NZYUluUxrEijkA>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Nov 2023 13:21:09 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: john.fastabend@gmail.com,
-	davem@davemloft.net,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	kuba@kernel.org,
-	andrii@kernel.org,
-	shuah@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com,
-	alexei.starovoitov@gmail.com
-Cc: martin.lau@linux.dev,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: [PATCH ipsec-next v1 7/7] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-Date: Wed, 22 Nov 2023 11:20:28 -0700
-Message-ID: <84111ba0ea652a7013df520c151d40d400401e9c.1700676682.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <cover.1700676682.git.dxu@dxuuu.xyz>
-References: <cover.1700676682.git.dxu@dxuuu.xyz>
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7EB31B5
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 10:21:04 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-5431614d90eso107701a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 10:21:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700677260; x=1701282060; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XNDVBnjK4SKZBWySI3/3OXlEO0ThVPeUalrjXUetIak=;
+        b=h7RY9xdGYBxOi6KpUIkips2qyKutq/vFgvKYebxo44fDHvSt9ZNPDK8Q92BccPE0Wd
+         ER4Ai0QZf3+cpB6rxjR1HRpPd0MgKJg12ty/TDzeoVxHmJBgLaidlJRxOXhKQTrIPWX0
+         nPBulM1Xys0OgUmF7b4A31G5Ofmc4vy+kPuTZT+bP/uuYjpPvGcbbPeoY1b/NfqOpBlK
+         TDyeU4Co7u2knAowvLzG4NlIE6sM9bIq8Su7CHLSE3ZFD7qK4bSItnf7lW0/h+RUtNcj
+         feqOJCc4+6XaSNXj7wNmpV/wpP6rgvRrToQwc/MVYnxzpKBlpCaFaclsJ/072Q22AMtW
+         L6wA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700677260; x=1701282060;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XNDVBnjK4SKZBWySI3/3OXlEO0ThVPeUalrjXUetIak=;
+        b=DVJcxmfcbuy8TfCcLp6VvW+8IN8vFF8kvUBVhtcySadK+La03VEHvvem9D0NrhEjqb
+         J1JqZh+VTFGZhx/akS7Vik3JOwgAr/xaXcZZZgHHKMIkCm5rhnJrb3xskwnGGmmMZha9
+         g7bD7CRzcbpFKitUAJDltG1gXybAm7H0uCT6YlG+sxnbRkbn1WTowQByyxs9iuSaByDa
+         jlCcduMzhmRJz8QScDbT9xxxEbe3stmWj9VSAfOsA800/S9IhCpvCA5PbmLIQthQEaNP
+         yMdGyg5PsM2UTTohbo8f76RDVBgX7115rMPYql8DBQkw+0RwOkczovMQw7LBsglypqWG
+         uilQ==
+X-Gm-Message-State: AOJu0Yytwy+t/W1FZ1okigHeqpb349I1m9eA43yGVLZa4QtGevHkIrJ3
+	3v2Sfr1+3SF5dETq39rVaCQO2w==
+X-Google-Smtp-Source: AGHT+IFOphJWZF8PQw/kMk+nTuduIpA2YrNTCxMb95RxpsrbGCNZhoqylrz0KUevK4m0VpGx38k6bg==
+X-Received: by 2002:a17:906:446:b0:a01:cb1b:f23c with SMTP id e6-20020a170906044600b00a01cb1bf23cmr1583338eja.59.1700677260175;
+        Wed, 22 Nov 2023 10:21:00 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id g16-20020a170906539000b009fd6a22c2e9sm50004ejo.138.2023.11.22.10.20.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 10:20:59 -0800 (PST)
+Date: Wed, 22 Nov 2023 19:20:58 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org
+Subject: Re: [patch net-next v3 5/9] genetlink: implement release callback
+ and free sk_user_data there
+Message-ID: <ZV5GikewsOpDqHwK@nanopsycho>
+References: <20231120084657.458076-1-jiri@resnulli.us>
+ <20231120084657.458076-6-jiri@resnulli.us>
+ <20231120185022.78f10188@kernel.org>
+ <ZVys11ToRj+oo75s@nanopsycho>
+ <20231121095512.089139f9@kernel.org>
+ <ZV3KCF7Q2fwZyzg4@nanopsycho>
+ <20231122090820.3b139890@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122090820.3b139890@kernel.org>
 
-This commit extends test_tunnel selftest to test the new XDP xfrm state
-lookup kfunc.
+Wed, Nov 22, 2023 at 06:08:20PM CET, kuba@kernel.org wrote:
+>On Wed, 22 Nov 2023 10:29:44 +0100 Jiri Pirko wrote:
+>> >If you're doing it centrally, please put the state as a new field in
+>> >the netlink socket. sk_user_data is for the user.  
+>> 
+>> I planned to use sk_user_data. What do you mean it is for the user?
+>> I see it is already used for similar usecase by connector for example:
+>
+>I'm pretty sure I complained when it was being added. Long story.
+>AFAIU user as in if the socket is opened by a kernel module, the kernel
+>module is the user. There's no need to use this field for the
+>implementation since the implementation can simply extend its 
+>own structure to add a properly typed field.
 
-Co-developed-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../selftests/bpf/progs/test_tunnel_kern.c    | 49 +++++++++++++++++++
- tools/testing/selftests/bpf/test_tunnel.sh    | 12 +++--
- 2 files changed, 57 insertions(+), 4 deletions(-)
+Okay, excuse me, as always I'm slow here. What structure are
+you refering to?
 
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index ec7e04e012ae..17bf9ce28460 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -35,6 +35,10 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap) __ksym;
-+struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
-+		       u32 opts__sz) __ksym;
-+void bpf_xdp_xfrm_state_release(struct xfrm_state *x) __ksym;
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_ARRAY);
-@@ -948,4 +952,49 @@ int xfrm_get_state(struct __sk_buff *skb)
- 	return TC_ACT_OK;
- }
- 
-+SEC("xdp")
-+int xfrm_get_state_xdp(struct xdp_md *xdp)
-+{
-+	struct bpf_xfrm_state_opts opts = {};
-+	struct xfrm_state *x = NULL;
-+	struct ip_esp_hdr *esph;
-+	struct bpf_dynptr ptr;
-+	u8 esph_buf[8] = {};
-+	u8 iph_buf[20] = {};
-+	struct iphdr *iph;
-+	u32 off;
-+
-+	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
-+		goto out;
-+
-+	off = sizeof(struct ethhdr);
-+	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
-+	if (!iph || iph->protocol != IPPROTO_ESP)
-+		goto out;
-+
-+	off += sizeof(struct iphdr);
-+	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
-+	if (!esph)
-+		goto out;
-+
-+	opts.netns_id = BPF_F_CURRENT_NETNS,
-+	opts.daddr.a4 = iph->daddr;
-+	opts.spi = esph->spi;
-+	opts.proto = IPPROTO_ESP;
-+	opts.family = AF_INET;
-+
-+	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
-+	if (!x || opts.error)
-+		goto out;
-+
-+	if (!x->replay_esn)
-+		goto out;
-+
-+	bpf_printk("replay-window %d\n", x->replay_esn->replay_window);
-+out:
-+	if (x)
-+		bpf_xdp_xfrm_state_release(x);
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/test_tunnel.sh b/tools/testing/selftests/bpf/test_tunnel.sh
-index dd3c79129e87..17d263681c71 100755
---- a/tools/testing/selftests/bpf/test_tunnel.sh
-+++ b/tools/testing/selftests/bpf/test_tunnel.sh
-@@ -528,7 +528,7 @@ setup_xfrm_tunnel()
- 	# at_ns0 -> root
- 	ip netns exec at_ns0 \
- 		ip xfrm state add src 172.16.1.100 dst 172.16.1.200 proto esp \
--			spi $spi_in_to_out reqid 1 mode tunnel \
-+			spi $spi_in_to_out reqid 1 mode tunnel replay-window 42 \
- 			auth-trunc 'hmac(sha1)' $auth 96 enc 'cbc(aes)' $enc
- 	ip netns exec at_ns0 \
- 		ip xfrm policy add src 10.1.1.100/32 dst 10.1.1.200/32 dir out \
-@@ -537,7 +537,7 @@ setup_xfrm_tunnel()
- 	# root -> at_ns0
- 	ip netns exec at_ns0 \
- 		ip xfrm state add src 172.16.1.200 dst 172.16.1.100 proto esp \
--			spi $spi_out_to_in reqid 2 mode tunnel \
-+			spi $spi_out_to_in reqid 2 mode tunnel replay-window 42 \
- 			auth-trunc 'hmac(sha1)' $auth 96 enc 'cbc(aes)' $enc
- 	ip netns exec at_ns0 \
- 		ip xfrm policy add src 10.1.1.200/32 dst 10.1.1.100/32 dir in \
-@@ -553,14 +553,14 @@ setup_xfrm_tunnel()
- 	# root namespace
- 	# at_ns0 -> root
- 	ip xfrm state add src 172.16.1.100 dst 172.16.1.200 proto esp \
--		spi $spi_in_to_out reqid 1 mode tunnel \
-+		spi $spi_in_to_out reqid 1 mode tunnel replay-window 42 \
- 		auth-trunc 'hmac(sha1)' $auth 96  enc 'cbc(aes)' $enc
- 	ip xfrm policy add src 10.1.1.100/32 dst 10.1.1.200/32 dir in \
- 		tmpl src 172.16.1.100 dst 172.16.1.200 proto esp reqid 1 \
- 		mode tunnel
- 	# root -> at_ns0
- 	ip xfrm state add src 172.16.1.200 dst 172.16.1.100 proto esp \
--		spi $spi_out_to_in reqid 2 mode tunnel \
-+		spi $spi_out_to_in reqid 2 mode tunnel replay-window 42 \
- 		auth-trunc 'hmac(sha1)' $auth 96  enc 'cbc(aes)' $enc
- 	ip xfrm policy add src 10.1.1.200/32 dst 10.1.1.100/32 dir out \
- 		tmpl src 172.16.1.200 dst 172.16.1.100 proto esp reqid 2 \
-@@ -585,6 +585,8 @@ test_xfrm_tunnel()
- 	tc qdisc add dev veth1 clsact
- 	tc filter add dev veth1 proto ip ingress bpf da object-pinned \
- 		${BPF_PIN_TUNNEL_DIR}/xfrm_get_state
-+	ip link set dev veth1 xdpdrv pinned \
-+		${BPF_PIN_TUNNEL_DIR}/xfrm_get_state_xdp
- 	ip netns exec at_ns0 ping $PING_ARG 10.1.1.200
- 	sleep 1
- 	grep "reqid 1" ${TRACE}
-@@ -593,6 +595,8 @@ test_xfrm_tunnel()
- 	check_err $?
- 	grep "remote ip 0xac100164" ${TRACE}
- 	check_err $?
-+	grep "replay-window 42" ${TRACE}
-+	check_err $?
- 	cleanup
- 
- 	if [ $ret -ne 0 ]; then
--- 
-2.42.1
-
+Thanks!
 
