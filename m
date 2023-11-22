@@ -1,102 +1,87 @@
-Return-Path: <netdev+bounces-49975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9408A7F41E1
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:42:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67FAA7F41DB
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22BB0B21090
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:42:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97C5E1C2098B
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0ED1E536;
-	Wed, 22 Nov 2023 09:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XiML8zb5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73C751038;
+	Wed, 22 Nov 2023 09:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109D2D54;
-	Wed, 22 Nov 2023 01:42:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EQ4smjqMqmMfalcMGUhJfWa7OYmkCqYHNTOX5D4CJKg=; b=XiML8zb5vTPJVbD1Yp652UL5fn
-	G+HecxK3KyFjdQ3dQeJv0tduaxjhSD0O6UQtIu5px+GhiQxt53IyMHOMQq2w+RhZ6MHzJRJbM1ZWU
-	JzA/VxQoKj7UheMYljEMkH9BNJ/GMpsQvI3TzXK2HS81DZ9nEYJP8knlwJ5EUX2htVlG3rFWq8XDI
-	Qnd3JpoeD0Ic9ruBosaH11UE1Wr062SegIFXufj24oq4YCcy7KQnzNl5mlh2Q5E/4yB/86NoSv9vJ
-	jfbRiUCC12OYmSHA/ufO6scak/zE+QIETtw9NeGBQu0xr7Z+NhJKrv9MGT5gaNMm3/VA85GK7mVD0
-	JjF8sDUw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56008)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r5jkV-0008Gf-0D;
-	Wed, 22 Nov 2023 09:42:23 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r5jkW-00055U-SH; Wed, 22 Nov 2023 09:42:24 +0000
-Date: Wed, 22 Nov 2023 09:42:24 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v5 2/3] net: dsa: microchip: ksz8: Add function
- to configure ports with integrated PHYs
-Message-ID: <ZV3NAPB/MX3R4b2q@shell.armlinux.org.uk>
-References: <20231122092545.2895635-1-o.rempel@pengutronix.de>
- <20231122092545.2895635-3-o.rempel@pengutronix.de>
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1200D5C
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:42:28 -0800 (PST)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-58b57d05c70so6853812a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:42:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700646148; x=1701250948;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ybpS3Kpz0i70hy2wEb1DIpGOL/gddSSQCTyiAG1BSqo=;
+        b=BYenm5csWX8JMSpbyNToYTzdRwC9BO8umBp0+FUuoyVbH5Zb3grrtzq9rE8VtPYKku
+         a9ANWmQp3Md53wE9cZ/QX5n1Z3y95pjfoNmdl0zltD6HSqPyo3FBOzh/jgaFD8VfCj2z
+         4e01aSY/4166k/XfqQ0QC7496YOvGLabVW7IvMAyUau7vh6uoTlPVCK3L/GZCgHhS5sp
+         PgTGkkmwCeiOErCT6snlqt2iHxNsp0B5zwUWa8Al42u1bkUlBOgakITjS+FX8Pexa8Dq
+         Eh4kYE/embrh0ChCIG6s8a7FV/naFlVOz7AxJb8WrMCo8ZrdbrOXye172NMo8gij7UD1
+         BxVQ==
+X-Gm-Message-State: AOJu0YyXcUBTdxcZ/zZgUZQXfDEAn8w3DhHJ8wFpYSzcsoKiTJ7DVMJk
+	jnSWJAevM+1Jn4Td6O8p8DQ0CM3fxtopcmRu+hZVQzOh9rE2
+X-Google-Smtp-Source: AGHT+IE5fpvHSL6i4ngm4RSP52PXMaAoI/x3pf8nA2cPa+4li/L2TdV+k09WWzbj2jzDO+3Qvw7yCeouZuoDpB8j5+1cjXugZLaC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122092545.2895635-3-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6a02:590:b0:5bd:d69b:6f8 with SMTP id
+ by16-20020a056a02059000b005bdd69b06f8mr421000pgb.4.1700646148308; Wed, 22 Nov
+ 2023 01:42:28 -0800 (PST)
+Date: Wed, 22 Nov 2023 01:42:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008f064b060aba89c4@google.com>
+Subject: [syzbot] Monthly rds report (Nov 2023)
+From: syzbot <syzbot+listdfc3c773f22d2282a24a@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com, 
+	santosh.shilimkar@oracle.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 22, 2023 at 10:25:44AM +0100, Oleksij Rempel wrote:
-> +	if (duplex) {
+Hello rds maintainers/developers,
 
-Unnecessary.
+This is a 31-day syzbot report for the rds subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/rds
 
-> +		bool aneg_en = false;
-> +
-> +		ret = ksz_pread8(dev, port, regs[P_FORCE_CTRL], &ctrl);
-> +		if (ret)
-> +			return;
-> +
-> +		if (ksz_is_ksz88x3(dev)) {
-> +			if ((ctrl & PORT_AUTO_NEG_ENABLE))
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 20 have been fixed so far.
 
-Too many parens.
+Some of the still happening issues:
 
-> +				aneg_en = true;
+Ref Crashes Repro Title
+<1> 15      Yes   possible deadlock in rds_wake_sk_sleep (4)
+                  https://syzkaller.appspot.com/bug?extid=dcd73ff9291e6d34b3ab
+<2> 5       Yes   possible deadlock in rds_message_put
+                  https://syzkaller.appspot.com/bug?extid=f9db6ff27b9bfdcfeca0
+<3> 3       No    KCSAN: data-race in rds_sendmsg / rds_sendmsg
+                  https://syzkaller.appspot.com/bug?extid=00563755980a79a575f6
 
-Simpler:
-			aneg_en = ctrl & PORT_AUTO_NEG_ENABLE;
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> +		} else {
-> +			if (!(ctrl & PORT_AUTO_NEG_DISABLE))
-> +				aneg_en = true;
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-Simpler:
-			aneg_en = !(ctrl & PORT_AUTO_NEG_DISABLE);
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+You may send multiple commands in a single email message.
 
