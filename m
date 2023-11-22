@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-49949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584B47F40A5
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:55:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80EC57F40B5
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBDBAB20C2E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:55:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD8E281782
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E252BAEA;
-	Wed, 22 Nov 2023 08:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CFB32D628;
+	Wed, 22 Nov 2023 08:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w1OP+rmf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z2m8lKoB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E04E7
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:55:47 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so10391a12.0
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:55:47 -0800 (PST)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19DBBC
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:58:05 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so11040a12.0
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:58:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700643346; x=1701248146; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1700643484; x=1701248284; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ubcqzvXd/k53LrnkM7BqZVu71FTT3GmP018mj8qHk0Q=;
-        b=w1OP+rmf9v43f2TsteogHfc72Gy0SyzM2w/WszNH/WLO4eo1/7C85ZkxbtQXSfHO6L
-         JOVaw2CeqfM++tOJaR3+G6Q24s4TJPfoah2LJMjJi+FQ+nr41Dg0KdAaIH+dl+jUA1X7
-         BKeiyHz8yVscvHx74Q2FZi5zMFDQ+IsPDnsZVkvFGXvb8m09IOseaNj5/1cdwDAFjyNr
-         Uad4QR2D23FipBRs0byFamXoBMS+VoIwmWt7oC9JtncL/jFlWd+wcWP8DzHRPEV6mUFi
-         tOFIGdNvxS6bSiQr+btbPNpjtsvOV++6o0V4OenBH9Z69oAGfXRm3Cp+DlV/VkuKyVlb
-         z/Iw==
+        bh=UWlW3pKWnalA/G4vxRFyenzr1+YYZ2kx2gq6fht33Eo=;
+        b=z2m8lKoB+/e7Zq8NLDASo3bWyiU8Scq1K4aJYe/D/j2FvwbIWouAtXl4PFOn9pWFIJ
+         2414NukL6wLvMQbfsFT4CPkFZDjffI+Xw+/zy3WpanuCxFIW/XHpZOD68MiYlZnC5HZF
+         eUFEiLeQeqINCws0TqqDRIpAism3q0Z75gdiIZwuUlMAwabzZNJu9Bg5258v/Q4BtBbT
+         QARX/DVYbIyKA6HthzDN6lEECFO+h763gyAp9zORTruEQ5CEsqP6GUdM83vKwdX3G9YA
+         gGesGQWdo7l8B0hpow/nOkA3sAgU5K8vzWps2sVOYEf5zKjwNcJc6nsF5sJLqo0ZrmnC
+         9ZbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700643346; x=1701248146;
+        d=1e100.net; s=20230601; t=1700643484; x=1701248284;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ubcqzvXd/k53LrnkM7BqZVu71FTT3GmP018mj8qHk0Q=;
-        b=dN3OIkYb9D+g04L4NPF8CsCDEeVQ0Fg9vzYDddQpB3nxkcYMf0EDNqq70pAAU/8953
-         xpRCtga3PmF/NFlV9i2obyMVYv0c0KI8KNNe6I4BSGBk8LmDJra7KRPNoKad4SXafdOe
-         HkuilsO4SNGdHqhUWqvhX2/lLB6e4THQGys62KhE0khyx2KZ0k9TLvPj4IVkfI+Nrgyl
-         PcuVOIMZ7g0vDS1P11WUEgPYov9mPlrNTFU46XcJ1U7ojEUrwuB9P+qi56J3Ru/oebKd
-         PT+7g8WdmasMHOlU++Ac74/W3n7PTd8PecLdT62TpNAq3Ja+cP1JAejzbFBiJXOJx062
-         QHHg==
-X-Gm-Message-State: AOJu0Yy2N6T3eXNX8PLwxFI3TU3UodqZKETtgmD3/LSBEfsbgkugnJwg
-	AvFdLvJ9aDKYeOxhhYBZH+0UIYVgucHRDsSKGcePCKSbS9IpZQm0ws6IFA==
-X-Google-Smtp-Source: AGHT+IH032zj3SBMuSRUnXcOLcWmuKSb/8JOZIJqStMVirsgYOu3kg8zzg6eLIBZPHX/GTX3uVgtxevWJGYCICgETgA=
-X-Received: by 2002:a05:6402:35ca:b0:544:24a8:ebd with SMTP id
- z10-20020a05640235ca00b0054424a80ebdmr125967edc.4.1700643345726; Wed, 22 Nov
- 2023 00:55:45 -0800 (PST)
+        bh=UWlW3pKWnalA/G4vxRFyenzr1+YYZ2kx2gq6fht33Eo=;
+        b=D5NEZJuhWZI3De/ElMAo4VxDbzso5YgY9jXT07nqGrn7QygRYiZAT8FM7ceDJNOo4/
+         aarnWNqIF6g8ErC9k3j4Ypi381w69LW6J/Zb98f6uDrBeqMKR/L8pYGXL+iWPU/LUx+a
+         qiFp9gzoSkLdzR3LzgvkIyiY0LktPyNmQPRbNYhg8r0kwVA0cO6a1mwfPU06HIpJWNtj
+         +DzIMlW+1ok9AHyI0gPdaPOllbON2t/qRSuw4bf8lgmXvQGQY8N0EgPwIA5rkZ3BdyQL
+         oYni/fWGFQDPdrEy+Av3OtJfXPrAAQRGIdvKBeSAJxtVIrDKiluP19rh8Jy7ym0aEhqn
+         FCYw==
+X-Gm-Message-State: AOJu0YzTKM837ZodB0EO32BYk2Ky6Ki9efmf7JEzQv8iq21Pa8rJ6bXY
+	S75LMJzXYxXHZNmJ/1lmOxJNsRn3GRSx5Dyb3ot65A==
+X-Google-Smtp-Source: AGHT+IG+hcfxEmVuJcrkrELdJE7TNPJWr2LVjwUb9MzCyyZ1Zqkw7WYNsJsgqbuwveQ1MsBIJjhRMxi/O6DL3qMal0E=
+X-Received: by 2002:a05:6402:1cbc:b0:547:3f1:84e0 with SMTP id
+ cz28-20020a0564021cbc00b0054703f184e0mr66912edb.7.1700643483299; Wed, 22 Nov
+ 2023 00:58:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231122034420.1158898-1-kuba@kernel.org> <20231122034420.1158898-4-kuba@kernel.org>
-In-Reply-To: <20231122034420.1158898-4-kuba@kernel.org>
+References: <20231122034420.1158898-1-kuba@kernel.org> <20231122034420.1158898-5-kuba@kernel.org>
+In-Reply-To: <20231122034420.1158898-5-kuba@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 22 Nov 2023 09:55:34 +0100
-Message-ID: <CANn89iKPhGtC6wgThpoe7DmMkowNSbOQehcpDVnOayF42Uqk2g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 03/13] net: page_pool: record pools per netdev
+Date: Wed, 22 Nov 2023 09:57:52 +0100
+Message-ID: <CANn89iKGz4vLMOQJe6QctPs6Y83ddpS2MFBWLG_VOQHsfZ-uog@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 04/13] net: page_pool: stash the NAPI ID for
+ easier access
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
 	almasrymina@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
@@ -72,58 +73,16 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Nov 22, 2023 at 4:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
 >
-> Link the page pools with netdevs. This needs to be netns compatible
-> so we have two options. Either we record the pools per netns and
-> have to worry about moving them as the netdev gets moved.
-> Or we record them directly on the netdev so they move with the netdev
-> without any extra work.
+> To avoid any issues with race conditions on accessing napi
+> and having to think about the lifetime of NAPI objects
+> in netlink GET - stash the napi_id to which page pool
+> was linked at creation time.
 >
-> Implement the latter option. Since pools may outlast netdev we need
-> a place to store orphans. In time honored tradition use loopback
-> for this purpose.
->
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> v1: fix race between page pool and netdev disappearing (Simon)
-> ---
->  include/linux/list.h          | 20 ++++++++
->  include/linux/netdevice.h     |  4 ++
->  include/linux/poison.h        |  2 +
->  include/net/page_pool/types.h |  4 ++
->  net/core/page_pool_user.c     | 90 +++++++++++++++++++++++++++++++++++
->  5 files changed, 120 insertions(+)
->
-> diff --git a/include/linux/list.h b/include/linux/list.h
-> index 1837caedf723..059aa1fff41e 100644
-> --- a/include/linux/list.h
-> +++ b/include/linux/list.h
-> @@ -1119,6 +1119,26 @@ static inline void hlist_move_list(struct hlist_he=
-ad *old,
->         old->first =3D NULL;
->  }
->
->
 
-> +static void page_pool_unreg_netdev(struct net_device *netdev)
-> +{
-> +       struct page_pool *pool, *last;
-> +       struct net_device *lo;
-> +
-> +       lo =3D __dev_get_by_index(dev_net(netdev), 1);
-
-Any reason for not using dev_net(netdev)->loopback_dev ?
-
-> +       if (!lo) {
-> +               netdev_err_once(netdev,
-> +                               "can't get lo to store orphan page pools\=
-n");
-> +               page_pool_unreg_netdev_wipe(netdev);
-> +               return;
-> +       }
-> +
-
-Either way :
+Interesting... I have a patch to speedup dev_get_by_napi_id(), I will
+send it today.
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
