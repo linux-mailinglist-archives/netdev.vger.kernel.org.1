@@ -1,121 +1,177 @@
-Return-Path: <netdev+bounces-50153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6A427F4BB3
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:55:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940FF7F4BBC
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F8232810F7
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:55:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20AA1C20840
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EF14CE16;
-	Wed, 22 Nov 2023 15:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E6E4EB4E;
+	Wed, 22 Nov 2023 15:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="iQd77CTu"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="QYXSA0cT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C45E101
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:55:41 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5caa401f151so33733697b3.0
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:55:41 -0800 (PST)
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E2612A
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:57:09 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-da3b4b7c6bdso6788071276.2
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:57:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700668541; x=1701273341; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1700668628; x=1701273428; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HArRuhEJbPWUB0W1o682njJUc9wD7yRdaDevvOmIv4A=;
-        b=iQd77CTuYh9bDrTj04rT1kZKWpdPENP2kLzACJ6e9YAvQ5lJxOsIwWebscrCkoEVJm
-         QQbfSDZdCQ3UDxhVzPT15ULy552ms8Ert26n76q06rtTi10yyrq4gTSaOtNpS/H8i5pA
-         cvH8Q3oQGW+E2CtaBJtmXmlx/y5n1kSR+RJTLKU7zsRwULjVhk1c05xDbNnREAGlv2gt
-         CZeS0EcG9muwjUTE4Ty+mNKib8GFpbO1+lM3+0y4QJCkDZj2QMvkJwzw585gIWtag1A0
-         7vmKE1jQMbwlodIp7iqL5J8lFz73r8q/Jskq9Pyuh7zoeGHpOVPhU4LX6xjpokAiPFF3
-         RFgQ==
+        bh=9z0RK/SpWoz+kpe3t/H/b8d6AuI1LIxn2YVK3cS+5J4=;
+        b=QYXSA0cTP7ijP9ftrekuu2bi6VOdETFjMYEd7juf2HG4O+aTdMp2lApRD3weEsIDIP
+         ZbOA84VJirxkW4sf0kLqnlwgaYWNGnDwlKcVmmeCJtR2MR5brZk6dAb/yH1BDWQdv28c
+         pt3vEnPZXIpVo0PyiROCY4Bx3XPSQvzhygyHBGEIQ7pXcMzhI1w23cbdB30hRdWDl4XV
+         UNRY5zJmNLTLuqAp/X7S/RG+B4LZVjYNHEA6JYv3Jmj6qOoFoGYBVL/v5xcwBlD4kt/D
+         9islFrA4Ju98u4PQTY8GDLVwYj9qAr8TnX6EBcfzDD2nIVMGOQYniGfCa4YrIqE5wxNZ
+         RXfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700668541; x=1701273341;
+        d=1e100.net; s=20230601; t=1700668628; x=1701273428;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HArRuhEJbPWUB0W1o682njJUc9wD7yRdaDevvOmIv4A=;
-        b=rDpxAyx3czpyQwkbBin0fS3fFwUHdtUYJ3NjKCeZs/tdKRnysNoFbrkj9PSPTHiV9o
-         raH7nToIJnRL3PWA5nxkl3jPmbh8q3mxL0JInBrWpc0je+MTC2UEhBNGjipf9ukv6QFW
-         224WyNA5FudCXuEFoz9Fzcjho18xIcCNl+HfvUFB7PBOBMvIptqyJ7qEa3J7OVzWa8xR
-         MBGm/F8Mv+tT2TWm+xMjNyy31XjRP5aHTkseuEcPGWw5O2hQVXlbxsAgfAIeN70mKpgH
-         TYnpN9M0ZWtobf667iyoUb8XuPuTrj9u7CVmoOY7r7gEUiKkxVPwf9dVA5E2UeQMiCRM
-         Akhw==
-X-Gm-Message-State: AOJu0YyBXYxfPB87yuPpW9EYTWwSvyXiNwaU+DsbKOf3MaoKiCgBt6xn
-	DFc6QcZCmjQQXy9HpWlU/GZvmAN1osvwQDuKtL+mVw==
-X-Google-Smtp-Source: AGHT+IEatp29tETsY/z/USG4bCMF0FNTFq9EcKk6EQSgLqW7OdflPc+5AsvOvVB9eY2hZF924Cg6DLUnnnLMemc93og=
-X-Received: by 2002:a81:658a:0:b0:5a7:aece:7e59 with SMTP id
- z132-20020a81658a000000b005a7aece7e59mr2546769ywb.50.1700668540835; Wed, 22
- Nov 2023 07:55:40 -0800 (PST)
+        bh=9z0RK/SpWoz+kpe3t/H/b8d6AuI1LIxn2YVK3cS+5J4=;
+        b=EKM/mc+wjijWgStJUXJJ9jifse4ON3WohxG8uFUYeoemaw3oDL/rn+aLQJ8B4rImUp
+         S8qtV+VKlzQ9CLo3CnMxeE8iA6rrNbHaFeQrTcj6p1qfZraGGYp2y5C5449p+WV4r/9a
+         Z52rrcrz6pHQDsCv9dPOdfPzjNv28rwBFq3hhx55nFH6oNXWkkDd1S0K0gkfCxZIMooN
+         2PQJSUa1uYznricbuu+MKQtsc1IIGUiET5VRb9uFqFCAEnSk+nnl4Bc6rRJ/B2PdHbig
+         5CJgdH7BLhwH0dLOJNeVhQQbAZ8m+SEX1vNI0pBWXAmB1Twa0KoFuxSIIZBMxODb7rzn
+         3TOw==
+X-Gm-Message-State: AOJu0YxPAukhMiW2yNiSYM9ZnqEmzTtROCjZANHAXrm0linqBAU0ge1g
+	V1Ah7Dqt0Qrtx+0F/aUY2IG7Q0ehNMKK+1TJMFt/
+X-Google-Smtp-Source: AGHT+IE7Sq0ixk+Ro5+SCHHAYlwPM997OhYDeJ/ZdAr2Occ4QlfxYQNKuagMLO9THEFK5O2H3/C6jTykXeNuHGstJhw=
+X-Received: by 2002:a25:7743:0:b0:d9a:d184:8304 with SMTP id
+ s64-20020a257743000000b00d9ad1848304mr2600130ybc.35.1700668628217; Wed, 22
+ Nov 2023 07:57:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121175640.9981-1-mkoutny@suse.com> <CAM0EoM=id7xo1=F5SY2f+hy8a8pkXQ5a0xNJ+JKd9e6o=--RQg@mail.gmail.com>
- <yerqczxbz6qlrslkfbu6u2emb5esqe7tkrexdbneite2ah2a6i@l6arp7nzyj75> <CAM0EoMk_OgpjV7Huh-NHF_WxkJtQYGAMY+kutsL=qD9oYthh_w@mail.gmail.com>
-In-Reply-To: <CAM0EoMk_OgpjV7Huh-NHF_WxkJtQYGAMY+kutsL=qD9oYthh_w@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 22 Nov 2023 10:55:29 -0500
-Message-ID: <CAM0EoM=Pq02p-sbkMSQBg8=dwTC5z+AeLjeXdzeHTA1AFSLuRg@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: cls: Load net classifier modules via alias
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, 
-	Martin Wilck <mwilck@suse.com>
+References: <20231122135242.2779058-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20231122135242.2779058-1-Ilia.Gavrilov@infotecs.ru>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 22 Nov 2023 10:56:57 -0500
+Message-ID: <CAHC9VhTiq1xPXXsETNKRBOtfkB5wohVwhBeae+5QW9uV-h5vvg@mail.gmail.com>
+Subject: Re: [PATCH net] calipso: Fix memory leak in netlbl_calipso_add_pass()
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Huw Davies <huw@codeweavers.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 22, 2023 at 10:33=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
+On Wed, Nov 22, 2023 at 8:55=E2=80=AFAM Gavrilov Ilia <Ilia.Gavrilov@infote=
+cs.ru> wrote:
 >
-> On Wed, Nov 22, 2023 at 5:41=E2=80=AFAM Michal Koutn=C3=BD <mkoutny@suse.=
-com> wrote:
-> >
-> > On Tue, Nov 21, 2023 at 05:37:37PM -0500, Jamal Hadi Salim <jhs@mojatat=
-u.com> wrote:
-> > > What's speacial about the "tcf- '' that makes it work
-> > > better for filtering than existing "cls_" prefix?
-> >
-> > tcf-foo is an alias.
-> > cls_foo is the canonical name of the kernel module.
-> >
-> > request_module() + blacklist (as described in modprobe.d(5)) works only
-> > when calling with the alias. The actual string is not important, being
-> > an alias is the crux.
-> >
->
-> Thanks for the explanation.
->
+> If IPv6 support is disabled at boot (ipv6.disable=3D1),
+> the calipso_init() -> netlbl_calipso_ops_register() function isn't called=
+,
+> and the netlbl_calipso_ops_get() function always returns NULL.
+> In this case, the netlbl_calipso_add_pass() function allocates memory
+> for the doi_def variable but doesn't free it with the calipso_doi_free().
 
-Out of curiosity - how did you end up looking at this? Was there
-someone who complained or is it just standard procedure to add aliases
-to all modules and it was on a todo list somewhere?
+It looks like a better option would be to return an error code in
+netlbl_calipso_add() so we never allocate the memory in the first
+place.
 
-cheers,
-jamal
+Untested patch below, copy-n-paste'd so there is likely whitespace
+damage, but you get the idea.
 
-> > > What about actions (prefix "act_") etc?
-> >
-> > I focused only on "cls_" for the first iteration. Do you want me to loo=
-k
-> > at other analogous loads?
->
-> Yes, look at act_ and sch_
->
-> cheers,
-> jamal
-> > Thanks,
-> > Michal
+diff --git a/net/netlabel/netlabel_calipso.c b/net/netlabel/netlabel_calips=
+o.c
+index f1d5b8465217..26a504dc6e57 100644
+--- a/net/netlabel/netlabel_calipso.c
++++ b/net/netlabel/netlabel_calipso.c
+@@ -54,8 +54,31 @@ static const struct nla_policy
+calipso_genl_policy[NLBL_CALIPSO_A_MAX + 1] =3D {
+       [NLBL_CALIPSO_A_MTYPE] =3D { .type =3D NLA_U32 },
+};
+
++static const struct netlbl_calipso_ops *calipso_ops;
++
++/**
++ * netlbl_calipso_ops_register - Register the CALIPSO operations
++ * @ops: ops to register
++ *
++ * Description:
++ * Register the CALIPSO packet engine operations.
++ *
++ */
++const struct netlbl_calipso_ops *
++netlbl_calipso_ops_register(const struct netlbl_calipso_ops *ops)
++{
++       return xchg(&calipso_ops, ops);
++}
++EXPORT_SYMBOL(netlbl_calipso_ops_register);
++
++static const struct netlbl_calipso_ops *netlbl_calipso_ops_get(void)
++{
++       return READ_ONCE(calipso_ops);
++}
++
+/* NetLabel Command Handlers
+ */
++
+/**
+ * netlbl_calipso_add_pass - Adds a CALIPSO pass DOI definition
+ * @info: the Generic NETLINK info block
+@@ -100,10 +123,13 @@ static int netlbl_calipso_add(struct sk_buff
+*skb, struct genl_info *info)
+{
+       int ret_val =3D -EINVAL;
+       struct netlbl_audit audit_info;
++       const struct netlbl_calipso_ops *ops =3D netlbl_calipso_ops_get();
+
+       if (!info->attrs[NLBL_CALIPSO_A_DOI] ||
+           !info->attrs[NLBL_CALIPSO_A_MTYPE])
+               return -EINVAL;
++       if (!ops)
++               return -EOPNOTSUPP;
+
+       netlbl_netlink_auditinfo(&audit_info);
+       switch (nla_get_u32(info->attrs[NLBL_CALIPSO_A_MTYPE])) {
+@@ -363,28 +389,6 @@ int __init netlbl_calipso_genl_init(void)
+       return genl_register_family(&netlbl_calipso_gnl_family);
+}
+
+-static const struct netlbl_calipso_ops *calipso_ops;
+-
+-/**
+- * netlbl_calipso_ops_register - Register the CALIPSO operations
+- * @ops: ops to register
+- *
+- * Description:
+- * Register the CALIPSO packet engine operations.
+- *
+- */
+-const struct netlbl_calipso_ops *
+-netlbl_calipso_ops_register(const struct netlbl_calipso_ops *ops)
+-{
+-       return xchg(&calipso_ops, ops);
+-}
+-EXPORT_SYMBOL(netlbl_calipso_ops_register);
+-
+-static const struct netlbl_calipso_ops *netlbl_calipso_ops_get(void)
+-{
+-       return READ_ONCE(calipso_ops);
+-}
+-
+/**
+ * calipso_doi_add - Add a new DOI to the CALIPSO protocol engine
+ * @doi_def: the DOI structure
+
+--=20
+paul-moore.com
 
