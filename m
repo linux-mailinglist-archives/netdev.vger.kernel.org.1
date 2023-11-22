@@ -1,92 +1,184 @@
-Return-Path: <netdev+bounces-49961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8737F415A
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:16:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A1F67F4162
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9B8CB20D3E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:16:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C73442816A3
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55E92136A;
-	Wed, 22 Nov 2023 09:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FB221A10;
+	Wed, 22 Nov 2023 09:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZW/ci6WZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxdhiCdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E9F1A2;
-	Wed, 22 Nov 2023 01:16:09 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CD0C024000D;
-	Wed, 22 Nov 2023 09:16:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700644567;
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA6AD50
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:16:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700644584;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Pd8P94KReE7rtC9tl5ie2LKIkhmNIUEsbYj4grCZU0M=;
-	b=ZW/ci6WZHSFyXWwK4JmihGUwbWHjWUTjUBhA/E8IZ0w3FE/PJmx3QB7CPbJ3ECb0G+E5bQ
-	NlM5N7gLomjSpiCVQHJPvrx3oXoUmr2L2nQXlMhTPq7SSpFhaMnC/bXdsz7WQNJT4y5axb
-	60mpTFTDvJMLu4t6jmwG5miPll28wiuDyCXymKKwmtt5ZwhcCcBdLC2vljYmWsoXW8+Z21
-	ym15nG/lJC0hd524C44lrBMk6roj2wgzMZ0fDIwSkGRqraj1+cugpt76P3yNCqRePg3AcT
-	eY+urbL+FEQy7PClrqeSzREUKsgBZBkC9caSvAxLsukJUy5yURXKmtpZMJ/d/w==
-Date: Wed, 22 Nov 2023 10:16:05 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org, Conor Dooley
- <conor@kernel.org>, Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2] firmware_loader: Expand Firmware upload
- error codes with firmware invalid error
-Message-ID: <20231122101605.0786440b@kmaincent-XPS-13-7390>
-In-Reply-To: <20231121173022.3cb2fcad@kernel.org>
-References: <20231121-feature_firmware_error_code-v2-1-f879a7734a4e@bootlin.com>
-	<20231121173022.3cb2fcad@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
+	b=QxdhiCdX+e0UpV1YnY6TtkSow4lX4tk6dqXpuVpQEwF4jiY0B7v8eLSl4uhEIHcCJoHYRJ
+	+k04dECEeNXJorWvZDjBhJ4zIBT/ha8l+s8SEJ5D8TMvKi4r2eOMTMr2Giz3zja8kkALPq
+	JLDwCzkOhUtgeH+fKnwOjwQLmcz6aWA=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-8EBzWUjzNUu1tJ72BVyF7w-1; Wed, 22 Nov 2023 04:16:22 -0500
+X-MC-Unique: 8EBzWUjzNUu1tJ72BVyF7w-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-5cbab2450c5so24386187b3.3
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:16:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700644582; x=1701249382;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FvqBK0UZREQjTEFtoe+8dwMEyfkRZhPHhHrOq6zH23k=;
+        b=qa8sEogf7XlqROcFkh9HQmxN7U2mlgY7Vx5YuHjP7dPzSQYlHEYGeQoy5KgVXtFzja
+         zBHL1G9eBVS9pEnPvskr3rcEEZtWnz6dkvDiy+m58a1Vbe5V7I3bdEhYZWXGbXzeNW2e
+         0o/gROB7dRSROkKkLGgIzwbCjND3QS4G5amrRoWiOW4UAOKCRIDyIzFNmLgQ0Zm4d5or
+         W6DoTbEHoVK7yG9TgzjykvlCMqPUBn+2wSqCs4+SIJl24YutqIyxIxPlaupmJiqMPbcg
+         tWXTSaGijjqj1d9j7xTZMDzEhdMKFjWDVwBvFq6nrAF++Wnn/gNvQo3ZlAY8Pdh1zwSW
+         AJFA==
+X-Gm-Message-State: AOJu0Yw8vh/UcPzgeThyZKcMIZtE1At9nE3a83LN0tAvvfUg4afR3+wR
+	3XgIZyvcfak0dhcRaGoEMm7/1JmOVNKKG7GkpsDAHRa+Ze8W+hVqmMRsqobtz+Izn69q1JL1WBs
+	7PEyH0XfgtiUGhsgM
+X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645690ybd.33.1700644582107;
+        Wed, 22 Nov 2023 01:16:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFgjChf8tYk5WRQhvlQx17JS9JtaEmIgWhz74vAPdVRs7d7DxN/bnfe4x0/ngk4fEhGpNP7Bw==
+X-Received: by 2002:a25:e812:0:b0:daf:81e5:d2fa with SMTP id k18-20020a25e812000000b00daf81e5d2famr1645672ybd.33.1700644581817;
+        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id qd24-20020ad44818000000b0065b21b232bfsm4711765qvb.138.2023.11.22.01.16.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 01:16:21 -0800 (PST)
+Date: Wed, 22 Nov 2023 10:16:14 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com, Bogdan Marcynkov <bmarcynk@redhat.com>
+Subject: Re: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
+Message-ID: <zoq32fkokk2ygtiabxgf74xu6vkfdynrlfzdqguh67qlogzd7j@qfd57sgudzpw>
+References: <20231121211642.163474-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231121211642.163474-1-avkrasnov@salutedevices.com>
 
-Hello Jakub,
+On Wed, Nov 22, 2023 at 12:16:42AM +0300, Arseniy Krasnov wrote:
+>Tune message length calculation to make this test work on machines
+>where 'getpagesize()' returns >32KB. Now maximum message length is not
+>hardcoded (on machines above it was smaller than 'getpagesize()' return
+>value, thus we get negative value and test fails), but calculated at
+>runtime and always bigger than 'getpagesize()' result. Reproduced on
+>aarch64 with 64KB page size.
 
-On Tue, 21 Nov 2023 17:30:22 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+It was reported to me by Bogdan, so we can add:
 
-> On Tue, 21 Nov 2023 11:50:35 +0100 Kory Maincent wrote:
-> > No error code are available to signal an invalid firmware content.
-> > Drivers that can check the firmware content validity can not return this
-> > specific failure to the user-space
-> >=20
-> > Expand the firmware error code with an additional code:
-> > - "firmware invalid" code which can be used when the provided firmware
-> >   is invalid =20
->=20
-> Any idea what this is?
->=20
-> lib/test_firmware.o: warning: objtool: test_fw_upload_prepare() falls thr=
-ough
-> to next function __cfi_test_fw_upload_cancel()
->=20
-> My build shows this on an incremental clang 17 build.
+Reported-by: Bogdan Marcynkov <bmarcynk@redhat.com>
 
-Thanks for the report.
-It seems I have to update fw_upload_err_str accordingly.
-Didn't know about this test_firmware.c file.=20
+>
+>Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> tools/testing/vsock/vsock_test.c | 19 +++++++++++++------
+> 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+The fix LGTM and it worked on aarch64 machine.
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks for the fast fix!
+Stefano
+
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f5623b8d76b7..691e44c746bf 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -353,11 +353,12 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+> }
+>
+> #define SOCK_BUF_SIZE (2 * 1024 * 1024)
+>-#define MAX_MSG_SIZE (32 * 1024)
+>+#define MAX_MSG_PAGES 4
+>
+> static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+> {
+> 	unsigned long curr_hash;
+>+	size_t max_msg_size;
+> 	int page_size;
+> 	int msg_count;
+> 	int fd;
+>@@ -373,7 +374,8 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>
+> 	curr_hash = 0;
+> 	page_size = getpagesize();
+>-	msg_count = SOCK_BUF_SIZE / MAX_MSG_SIZE;
+>+	max_msg_size = MAX_MSG_PAGES * page_size;
+>+	msg_count = SOCK_BUF_SIZE / max_msg_size;
+>
+> 	for (int i = 0; i < msg_count; i++) {
+> 		size_t buf_size;
+>@@ -383,7 +385,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+> 		/* Use "small" buffers and "big" buffers. */
+> 		if (i & 1)
+> 			buf_size = page_size +
+>-					(rand() % (MAX_MSG_SIZE - page_size));
+>+					(rand() % (max_msg_size - page_size));
+> 		else
+> 			buf_size = 1 + (rand() % page_size);
+>
+>@@ -429,7 +431,6 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 	unsigned long remote_hash;
+> 	unsigned long curr_hash;
+> 	int fd;
+>-	char buf[MAX_MSG_SIZE];
+> 	struct msghdr msg = {0};
+> 	struct iovec iov = {0};
+>
+>@@ -457,8 +458,13 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 	control_writeln("SRVREADY");
+> 	/* Wait, until peer sends whole data. */
+> 	control_expectln("SENDDONE");
+>-	iov.iov_base = buf;
+>-	iov.iov_len = sizeof(buf);
+>+	iov.iov_len = MAX_MSG_PAGES * getpagesize();
+>+	iov.iov_base = malloc(iov.iov_len);
+>+	if (!iov.iov_base) {
+>+		perror("malloc");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+> 	msg.msg_iov = &iov;
+> 	msg.msg_iovlen = 1;
+>
+>@@ -483,6 +489,7 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> 		curr_hash += hash_djb2(msg.msg_iov[0].iov_base, recv_size);
+> 	}
+>
+>+	free(iov.iov_base);
+> 	close(fd);
+> 	remote_hash = control_readulong();
+>
+>-- 
+>2.25.1
+>
+
 
