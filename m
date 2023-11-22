@@ -1,194 +1,83 @@
-Return-Path: <netdev+bounces-49942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D997F4043
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:37:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 957AE7F4050
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB469B20E9C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:37:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6ED31C208E1
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F3420309;
-	Wed, 22 Nov 2023 08:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B6A15AE6;
+	Wed, 22 Nov 2023 08:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="slRkge7a"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eu12cHh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E5EC1A8;
-	Wed, 22 Nov 2023 00:37:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vy7HXgGKiu5PHGt/lRu7enMMMadvKNVcB8ccEOdrUL+0PeYO8By+TNP35bEVCT0nuiUmD5vqlqxH7JjanhyKesqF1rVCZjcW0rapGILkaSybndGqW0crn0zSxwEvNKU4TxidmfLYof+b+DcBFtDFDSamZozV7B3KekZtqXj0g+Cb8ujBe4uY45OnulGjC5P9+HyxHaXW3Ry2DVr9YTKbpZapWbWfHToyljn1PD9JVp1tJbHGt/+aRpNXDQcsGv/3ysKsavOZsDNBbgUGI4/DD40DKhdzNFaCgou6Vuw/3JDr5dqIShr0vRKDABLxZLAe7hp51Ivp7Gt92gqNx/TFgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O7257h+R0o/o6ytyI4blx00DiIxKkZCHIKnHK+3OHe4=;
- b=AOncMu9JgF2kj2pt9GtBdt49B+KfzwvQfA3HPdP+oD8yBJwtLmXpQWjsSOIy3/kRGDYaU2kZ0gPggEpsyAVD7ttPX3ThKXdxnXSPp6dNSUgBJM2BjeeefNtnR3xdZaHXv2ETgny6yOpdD5YiDFgqeHu5Z1bFZFKw14STVPw9561n51X6a7E2onFaeYxAh/y0EzMzzQyPrBVX/pH2AkuaOtUiY62kZZ/Q8Dup7DYMB/pg2DWVKO7PNuze9+KesFWa+d+HMB7DTac+hgtijhu1QYkqY189ugnI4NyhRX3kNL3Br5vPp6oLBYF6xlPniEFppXqj0xYwlZg73MSApHuHbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O7257h+R0o/o6ytyI4blx00DiIxKkZCHIKnHK+3OHe4=;
- b=slRkge7aCCeqkPu5yDNlHzdlW4TJ8actLvPPg6TL/AXaDD/HunI/dWAcOUSHeWOlnnn1oSybIvj1l9s/nxPkskWZhRM9ToYHVN0t4/e1HsA4HMsGppCx3bhqibVPtwPYgueyetgBFqpfjHNNih7zbSTTTRmiS5ZIkKw2IicHUpo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
- DM6PR12MB4957.namprd12.prod.outlook.com (2603:10b6:5:20d::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7002.28; Wed, 22 Nov 2023 08:37:03 +0000
-Received: from DM4PR12MB6351.namprd12.prod.outlook.com
- ([fe80::5287:5f3:34f:4402]) by DM4PR12MB6351.namprd12.prod.outlook.com
- ([fe80::5287:5f3:34f:4402%7]) with mapi id 15.20.7025.017; Wed, 22 Nov 2023
- 08:37:03 +0000
-Message-ID: <9608a9aa-26d2-4d27-b9b7-31f643307d2d@amd.com>
-Date: Wed, 22 Nov 2023 16:36:47 +0800
-User-Agent: Mozilla Thunderbird
-Cc: majun@amd.com, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- Lijo.Lazar@amd.com, mario.limonciello@amd.com,
- Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org,
- LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-Subject: Re: [Patch v13 1/9] Documentation/driver-api: Add document about WBRF
- mechanism
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Ma Jun <Jun.Ma2@amd.com>
-References: <20231030071832.2217118-1-Jun.Ma2@amd.com>
- <20231030071832.2217118-2-Jun.Ma2@amd.com>
- <3e18c716-4c1b-ea3-ede3-5a67555f5e72@linux.intel.com>
-Content-Language: en-US
-From: "Ma, Jun" <majun@amd.com>
-In-Reply-To: <3e18c716-4c1b-ea3-ede3-5a67555f5e72@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: KU1PR03CA0040.apcprd03.prod.outlook.com
- (2603:1096:802:19::28) To DM4PR12MB6351.namprd12.prod.outlook.com
- (2603:10b6:8:a2::6)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E364F9
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:38:45 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so10846a12.0
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:38:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700642324; x=1701247124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mEExvhcg3Mouj3bcx+bl6Kvho4NQYN2gg37RHgg68l0=;
+        b=eu12cHh7mP+cnQlOdam/64HaoRmtrAUUY69jSR0EZ0TaPlgJi+a2bsjqxsdPO1Km45
+         bWNgkHA/w8dg+WD6o28Qa5SjRAdq7sGYZKfFPY75nkIMyXMNf+7RUrQAOfSsZ4ETj8Z2
+         sw+SBWV6tFt/fXFxMu73/xJfjtF00M5EyEPzw8qRb+lgxNNnzfnNNX7UgIZU8HZ82N5p
+         wJtVUa0WPqPz8p/8Ncwrz50NRyNNl3Km5FjzCsbA+jkvCmSGMgULk/OR1pTijrFGi0M5
+         PPd37pov5OouKDQ3Qr/6wpl0kFiNK5N+vB2IYIasrupV0DRvaXid+h2BdeTU5Rpk8NkL
+         P6rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700642324; x=1701247124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mEExvhcg3Mouj3bcx+bl6Kvho4NQYN2gg37RHgg68l0=;
+        b=dxqaG+cUI5+XdROzUbK104KhuYw4uP/nLRuWz9GeALLklbGAQonuMDwEg9SnYTDLmd
+         qKeq9X7h+9mPo4uA9QqJ4fCFBRs0JUaaJsp7LbLBu5ZRfc2Y5lrEJlGsiRb84zOQ/cfH
+         MAQyb/Id2xgSto/2hkUFSsLM6+6BkeHdZpZQTbBBWvxhMUHphLmDOvCcgqyJ6chaD1cS
+         +T9RJVhnauYIt5L16uuFfmsUoAqvssVc8yrm58MQxKt6A0iRB6aauo6KY+rE9thHHskO
+         R7a7sZl1QBZEwYvYDEuyJXvMnz4mTVe6bdOifArhVAnlx2YquJQ8buMM4jHZkPueAww2
+         jbhA==
+X-Gm-Message-State: AOJu0YzFR1tDRbiVts27QBbOkmVw8V9xT64Pt0ch6eRbhil/Sx7TvQL1
+	swQxm/F5bVLakt7AwNss3rARWHv2oXb2zWp6Q+VhtQ==
+X-Google-Smtp-Source: AGHT+IE8VcGu9QZprlXtZrFsytdTCoN97pYgkzSXBVYwPsyDVhw0ZmNMz0IA1uxxzSN+oKUkJYKFeKJUJgKXacU0q4M=
+X-Received: by 2002:a05:6402:1cbc:b0:547:3f1:84e0 with SMTP id
+ cz28-20020a0564021cbc00b0054703f184e0mr64613edb.7.1700642323514; Wed, 22 Nov
+ 2023 00:38:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|DM6PR12MB4957:EE_
-X-MS-Office365-Filtering-Correlation-Id: f67f7244-989b-48a4-95b3-08dbeb363390
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	RwQrJIteUGFwIDktNL6QEG349gWTk/m3Rbiz6Gna+tES/9VFUwDzJ6b8Q7bRoNcWkGecqiVDfjbsghdB65UIc2TINnW1GNegSOwZ6HYG36rNzUwgOtIwwRTjONUWS08ht73Ezd+cMkFZbu58c/fjIPwBpjuxxaAvDGdamhxc30lC9+AA/SanA7RriO+Qg4sLncgbGjatTyzqBOCOy2bsQjoytSCJXBsPoHgWxD5OmrT5ty/MM9FmVFoI2ZbMonCazJcM0i06UA+M28MKj4b6Y3reTXqn5RiTAtqOtD8TtRswT4+3inVddTNSjW6HB0l+MNSusKv2XLL8e4/Ds9Raan7sITAtl2nMexdjBoBrGbYuBRIaP0P8Gl9vvnmXcswYs83QhDphD4CMsCZd1WugCgC7CZr355x2T+mmkQxw4acSzPm7Pxns+7EgXVYyUFP2QsVtpi5QiPjQdahgggHRVIWd0qkuCCt5/O8HeOffSc53vUzXdW2vxszpCQpi5mILh1e62p08rE2SwSivIAuFUKNupe/3hwOq8KzgB+liV2JwatGpRK9Ms+mdc90gXDjjsiXwrO1qHwIveLjEzMPvKb/ViAVvYoVKEa8qqm7mZWQ8NpC9Fo2cTbQ6M71vK3CA/YqkBkXlVIQCKMHQEplxHA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(39860400002)(346002)(366004)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(83380400001)(66574015)(53546011)(7416002)(26005)(38100700002)(6512007)(4326008)(8676002)(41300700001)(5660300002)(2906002)(478600001)(8936002)(6506007)(6486002)(54906003)(6636002)(316002)(110136005)(66946007)(66556008)(66476007)(6666004)(36756003)(31696002)(31686004)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?c3loc2JSeDFuVEI3VlhwT0hLSnIzTmswRWhOcEx3SndJdk1EckVIaWlERUNv?=
- =?utf-8?B?RWtWU0tyVGQ4Zmo2Zm1mcTZzcUpLZE1rcCt3bnRFSlF5ajEvL252clUxdFR6?=
- =?utf-8?B?RjN5TTc3R0tQaUVuVzlnZDg3VndGRUlpS1FvZkVVd05SMG1IUmlCL0JnZjNZ?=
- =?utf-8?B?WkFPUnpxSnIxamVMUUg4WjY1Ym5XL2Q1WXlwc0JaaEFjMGJUWDZMek1tc01r?=
- =?utf-8?B?SHRxYjR0TjNBdjFkOEVLTjMvak84eldMT2ZKd3BRejM5eGhOa1Z6L2lGTUJR?=
- =?utf-8?B?YjFVaVlYa1NaUmMyWi9LdUR2QnkvWTd6ZVZyL1NQTURQS1NYTklHVjN1bm1U?=
- =?utf-8?B?enVwR3IvS1JHTUo4ZS9KUWdEU2phd08zTkNYaGZjV014NHVXRzFhK2tQek8x?=
- =?utf-8?B?eTdaMmFDdUh6OVRYeUc0VnYvMXBhSnpLNUNLLzlkdFBvdTJWVGVNVzRLY2hP?=
- =?utf-8?B?cFhDUXYySUxOeS9YSHF1aDZxcjFZTEZkY0cvTy9lM3BOVW1kTGtvZ3VxVnFD?=
- =?utf-8?B?ZWdQcTFkWXVhaDdQRzlmRDVRdFBYNU5CTm80MUlPYkltTW1RMU1yeVlGOXE0?=
- =?utf-8?B?RXBVRVNCQlRxWThYbEFaSW4zTmY3bVgzeTJCdXBDZFpOcTE1ejdFeXdablY5?=
- =?utf-8?B?dHlCdjRxSkFjRjdncXYrRXdiQ1hORjd2bGtsR3ZsUys3dnB3TDR4aDhFa1ly?=
- =?utf-8?B?RzVLQ2pwZEhSR1BjNmw5Qm4veW9vZllLR1JEMnJBL2Nmb2E1aW8yNU9mSkVm?=
- =?utf-8?B?SVZWZ2ZtVXlaMCtvUENXSHQwV2VNT0szOHpWZjlCWjE4alA5bkVGbmpSN0hY?=
- =?utf-8?B?Yk9OR0FCUCsrQTIyRmhqQk9OdHh2SzZCNFRHbGxUWVh2NzB1OTVwZG03S2ZE?=
- =?utf-8?B?RHB1cEJVOWh1SkVqRXNabXA2ODZiRk1OSlQrczhsb3V1S0hvY1c3UEJoVTZ1?=
- =?utf-8?B?UkpCenV5TUFZejJJcVVRc2lpUGxwTDdtOHp6OUx2SDlmdWk1cWZVeXRCeTd4?=
- =?utf-8?B?K2RLYlo3TkFhdHRmcmRWTmNTNTBNUHRKZFc1TCtqWUxpTyt2Z25YS0g2VUgz?=
- =?utf-8?B?ZE9qa0NhQSsvNGlQRjJ2NFhWOUFpd0FCTWVnNm01WXlGMnNNVzhlVDN6d0Np?=
- =?utf-8?B?YWxFVS82cTFkNzEwWXZxQ0hmZExlYjJrOERJandSZE1rK0p0NVdzcVVOQ0pu?=
- =?utf-8?B?VkdYQWhjazRmbnVySE9PcUttYVRzS3BMQTNLRHFTWG1OdlVYTHIzUXhPRzJo?=
- =?utf-8?B?OER3c2o2QjZYQjVSa2dQUWVQT3RvdkwvYyszZW4yV3laTTVrTVJWN2tNQ1B5?=
- =?utf-8?B?WTZNZVNic2IxWW5qaHRJMEtYMGNqUlZ3ZXZIYkFJWmhITVhXSGlKczJVYzJE?=
- =?utf-8?B?Q0ppazY3OXlsUUJtTGhKbURldlZaL0diR3cvcmVLdWN6cFpFZ3V4dGJRSFNv?=
- =?utf-8?B?L1dOcXh4WERLTTJkUHdROEYwNXdVdnh3RHJJL2h3aGdQUFpXNFlCSkV1NGpG?=
- =?utf-8?B?NlNTNE5PY0RlUWI4elMxWkRyejdUSUI3RFZsQ3RnS2RJSU5lSDBrWWRxV3cv?=
- =?utf-8?B?bXBqZThuaUxWZ3lBWWxPak5iZ2QxQlF3THpTeURGMWZQbHRUQlYwV3hyOEFv?=
- =?utf-8?B?NU1ydGo2Y1pIaEVIOWNJV0RvcVFqbTE2TlJobWNvdkZuWDkraUZZWDFzUEtu?=
- =?utf-8?B?V2EwM1h2ZXg4K0s2MmtheW1qNE04UFQ0ckpLVXhzQUpCOVEzZjlvZ1hrc00x?=
- =?utf-8?B?RmFSYkw4dG16T1ZjTFNIUjhCci8zU1FuTHV1RElTSm5XSUhvaDRBYm1VWG5k?=
- =?utf-8?B?UldaK3I0aWpvRy93WDgxUEJPL1RnbUNNQ3hyYWxXN25GamhacjU2T1VXL2Ri?=
- =?utf-8?B?QUMvK1EvaG9tZW5nQmEwRkZDTGhySXgrSnFiWkxsODFMOW40cVd3bDY4QzV0?=
- =?utf-8?B?aFJ0a1V1WjhHV2xGZHJHSDNxZ0YwNEVaNVB4MlA4dlNHMDY3T3N1NjJJMWY4?=
- =?utf-8?B?bmVjbUQ3bWVBSm9tMTdvR2M5T09qYndLY0pjajNXSW5RamdiSUpiYVFMRkxh?=
- =?utf-8?B?WllzZDNsS0E2TzUxU1NSWlc1OUVKanA5Z2gwYXVnbEE2TzM2WnIyUTNiSEox?=
- =?utf-8?Q?dA3E3d2TnkTDQHlAmFQeMrljn?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f67f7244-989b-48a4-95b3-08dbeb363390
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 08:37:03.2815
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: agl4SkjmmP/r/Hela79FNAXVgg8PKMqBFbv0SAoKVStV+/02cZSmItJSnePaYPqt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4957
+References: <20231122034420.1158898-1-kuba@kernel.org> <20231122034420.1158898-2-kuba@kernel.org>
+In-Reply-To: <20231122034420.1158898-2-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 Nov 2023 09:38:29 +0100
+Message-ID: <CANn89i+bykN3d8nV+x7380HdKOUTn_Gf496hU=J9KW95t84RPg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 01/13] net: page_pool: factor out uninit
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	almasrymina@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	dsahern@gmail.com, dtatulea@nvidia.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi llpo,
+On Wed, Nov 22, 2023 at 4:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> We'll soon (next change in the series) need a fuller unwind path
+> in page_pool_create() so create the inverse of page_pool_init().
+>
+> Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
 
-Thanks for review, I'll fix the format issue in
-the next version.
-
-Regards,
-Ma Jun
-
-On 11/20/2023 7:59 PM, Ilpo Järvinen wrote:
-> On Mon, 30 Oct 2023, Ma Jun wrote:
-> 
->> Add documentation about AMD's Wifi band RFI mitigation (WBRF) mechanism
->> explaining the theory and how it is used.
->>
->> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
->> ---
->>  Documentation/driver-api/wbrf.rst | 76 +++++++++++++++++++++++++++++++
->>  1 file changed, 76 insertions(+)
->>  create mode 100644 Documentation/driver-api/wbrf.rst
->>
->> +Driver programming interface
->> +============================
->> +.. kernel-doc:: drivers/platform/x86/amd/wbrf.c
->> +
->> +Sample Usage
->> +=============
-> 
-> A lot better but you missed adding newlines here for this and previous 
-> section title.
-> 
->> +The expected flow for the producers:
->> +1). During probe, call `acpi_amd_wbrf_supported_producer` to check if WBRF
->> +    can be enabled for the device.
->> +2). On using some frequency band, call `acpi_amd_wbrf_add_remove` with 'add'
->> +    param to get other consumers properly notified.
->> +3). Or on stopping using some frequency band, call
->> +    `acpi_amd_wbrf_add_remove` with 'remove' param to get other consumers notified.
->> +
->> +The expected flow for the consumers:
->> +1). During probe, call `acpi_amd_wbrf_supported_consumer` to check if WBRF
->> +    can be enabled for the device.
->> +2). Call `amd_wbrf_register_notifier` to register for notification
->> +    of frequency band change(add or remove) from other producers.
->> +3). Call the `amd_wbrf_retrieve_freq_band` intentionally to retrieve
->> +    current active frequency bands considering some producers may broadcast
->> +    such information before the consumer is up.
->> +4). On receiving a notification for frequency band change, run
->> +    `amd_wbrf_retrieve_freq_band` again to retrieve the latest
->> +    active frequency bands.
->> +5). During driver cleanup, call `amd_wbrf_unregister_notifier` to
->> +    unregister the notifier.
-> 
-> The correct kerneldoc format should be without the closing parenthesis:
-> 
-> 1. Text here that
->    spills to second line.
-> 2. Second entry.
-> 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
