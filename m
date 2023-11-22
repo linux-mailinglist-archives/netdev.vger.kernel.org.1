@@ -1,278 +1,129 @@
-Return-Path: <netdev+bounces-50214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F9717F4F01
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:13:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B327F4EF8
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06927B20D45
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:13:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 063DAB20C5E
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2E558AD4;
-	Wed, 22 Nov 2023 18:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B0D56475;
+	Wed, 22 Nov 2023 18:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="qKbbYsqc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fm2p2vQL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC0CA2;
-	Wed, 22 Nov 2023 10:13:10 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id A11FC120071;
-	Wed, 22 Nov 2023 21:13:06 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A11FC120071
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1700676786;
-	bh=PHuX2kiU/Nw67VMyYDVUZRMzOKwEXqxibwx95TeiHrY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=qKbbYsqcVz1eJcEhXQyiURPf5mSMbm5h5oQI+sT1NLmyNPqLwKa261XpE4pm6SeoV
-	 XLKQ6NA314B2NC4a/cTzD9TdFctwL551mcgzudoYAaw3MUVSa/viTfsXYYOKEi3pSb
-	 buLKdfS5BHiHGyVvMZisk9HXAFLY/UYbT8fFtjuCIgJP35ye04xlwywE/thwwcnZXS
-	 Q+OY5e0MJgTjNrwoMrEY3VHHvxy034Qzfonr6hE58X1fO5ElsEeSc5GGV4q8ZUm7db
-	 qFkHEhoscmj2A2scwKUdVFG5VGVPqiKfJj/C6+fOUmN+7IALVUsNa4Ct9c+6gXNeNh
-	 zoN+mBSUk2d7g==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 22 Nov 2023 21:13:06 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 22 Nov 2023 21:13:06 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [RFC PATCH v3 3/3] vsock/test: SO_RCVLOWAT + deferred credit update test
-Date: Wed, 22 Nov 2023 21:05:10 +0300
-Message-ID: <20231122180510.2297075-4-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231122180510.2297075-1-avkrasnov@salutedevices.com>
-References: <20231122180510.2297075-1-avkrasnov@salutedevices.com>
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBEB1B2
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 10:11:41 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-41ea9c5e83cso12551cf.0
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 10:11:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700676701; x=1701281501; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RAQB8Hqqm5OvoGj9nVayTd/1ohNlYq2PenxVIqdoeMw=;
+        b=fm2p2vQLatnCZwoh8euniQPcouWhq6w+hG12y3Zr5zi8FDkGjNbfmrCaRUHBgH6teP
+         wFR+w1wM1oNoQL2q09ae+ckbFuL2L89lVWa9yB3yk2MLLd9czstvKxoXd9v9RPCk6UcV
+         Oec+RLvRxtbETqebZPscvPP5++7vZGlJp6ny+SxqGLf3+vsW4hWoJr/K0k0C8AdMHP85
+         sZznmIqTOw7+MaT3Gw9Z39IIxlx8B8inISbxNaJzmXzdeZaqxBkP6W7GTHIqG8XavbYm
+         2MDDT4mAF+qxpfe/9XJI8+UIQnrmxNoYF+3P4QFBEgFaRzt3YHk/8garZlUKW0ff/vLz
+         vKCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700676701; x=1701281501;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RAQB8Hqqm5OvoGj9nVayTd/1ohNlYq2PenxVIqdoeMw=;
+        b=lA0KTXRgiS9erFqaQNAG1Ko1sNn3sMMu2e6Uc1Ac8KiYtnO5Q6huxmp62O2qr8T6Aj
+         ffGBC6+6l7cJAmsPrv/6pKOuZBSfVYrOfrjhUwI0OLgRn8r9vav4AK4DkqK5i2F+bCgS
+         42Qxr38XNMj0TWMRW50JGf/gZcVOuUW21NaUUJ5yBFjOue9gNu1kkLSYEXlbpNpvTDkg
+         xXIuNoTsmYu3+5dP4dkD1Wfccsq99FM9MKSw5wF+6AEI7LT5ARZKoWPCl9DqPeJ8egjw
+         nv4rOwYLN1GhINWaOckD4xQS/eG1t7rtAl7UmSFNmsjPFAl3Wf2TmB/G9a4a6VhK5x+2
+         j6fQ==
+X-Gm-Message-State: AOJu0YxwSypwuukBsfW866wgSsaqIWzSLVdxV+NDwoSugZq1urW3DoFE
+	xrLqyPTs/xJxZJM9WZqQlEfxMniVjMHNMh5zAeVgbw==
+X-Google-Smtp-Source: AGHT+IGnVy3OkrkedALWFXc2ZxGZceq3AwioxW/zk3TSCzH69K8tQhpDqZs4kwBm6hQdtLLNyQBm88m5ggQuiUU9tgg=
+X-Received: by 2002:ac8:4e54:0:b0:420:d18c:ffd2 with SMTP id
+ e20-20020ac84e54000000b00420d18cffd2mr306349qtw.24.1700676700854; Wed, 22 Nov
+ 2023 10:11:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181545 [Nov 22 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/22 11:24:00 #22501433
-X-KSMG-AntiVirus-Status: Clean, skipped
+References: <20231120115839.74ee5492@kernel.org> <20231120211759.j5uvijsrgt2jqtwx@skbuf>
+ <20231120133737.70dde657@kernel.org> <20231120220549.cvsz2ni3wj7mcukh@skbuf>
+ <20231121183114.727fb6d7@kmaincent-XPS-13-7390> <20231121094354.635ee8cd@kernel.org>
+ <20231122144453.5eb0382f@kmaincent-XPS-13-7390> <20231122140850.li2mvf6tpo3f2fhh@skbuf>
+ <20231122143618.cqyb45po7bon2xzg@skbuf> <20231122085459.1601141e@kernel.org>
+ <20231122165955.tujcadked5bgqjet@skbuf> <20231122095525.1438eaa3@kernel.org>
+In-Reply-To: <20231122095525.1438eaa3@kernel.org>
+From: Willem de Bruijn <willemb@google.com>
+Date: Wed, 22 Nov 2023 13:11:02 -0500
+Message-ID: <CA+FuTSe+SOFciGf+d+e=Co22yZ56gGGkJ0WBbvfT-2P0+Ug8DQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Simon Horman <horms@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Mahesh Bandewar <maheshb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Test which checks, that updating SO_RCVLOWAT value also sends credit
-update message. Otherwise mutual hungup may happen when receiver didn't
-send credit update and then calls 'poll()' with non default SO_RCVLOWAT
-value (e.g. waiting enough bytes to read), while sender waits for free
-space at receiver's side. Important thing is that this test relies on
-kernel's define for maximum packet size for virtio transport and this
-value is not exported to user: VIRTIO_VSOCK_MAX_PKT_BUF_SIZE (this
-define is used to control moment when to send credit update message).
-If this value or its usage will be changed in kernel - this test may
-become useless/broken.
+On Wed, Nov 22, 2023 at 12:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 22 Nov 2023 18:59:55 +0200 Vladimir Oltean wrote:
+> > I wouldn't be so sure. The alternative interpretation "for PTP, give me
+> > timestamps from both sources" also sounds reasonable for the distant
+> > future where that will be possible (with proper cmsg identification).
+> > But I don't see how to distinguish the two - the filters, expressed in
+> > these terms, would be the same.
+>
+> We can add an attribute that explicitly says that the configuration
+> is only requesting one stamp. But feels like jumping the gun at this
+> stage, given we have no other option to express there.
+>
+> > So the ptp4l source code would have to be modified to still work with
+> > the same precision as before? I'm not seeing this through.
+>
+> We can do the opposite and add a socket flag which says "DMA is okay".
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- Changelog:
- v1 -> v2:
-  * Update commit message by removing 'This patch adds XXX' manner.
-  * Update commit message by adding details about dependency for this
-    test from kernel internal define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
-  * Add comment for this dependency in 'vsock_test.c' where this define
-    is duplicated.
- v2 -> v3:
-  * Replace synchronization based on control TCP socket with vsock
-    data socket - this is needed to allow sender transmit data only
-    when new buffer size of receiver is visible to sender. Otherwise
-    there is race and test fails sometimes.
+There already is a disconnect between configuring hardware timestamp
+generation. Through the ioctl, which is a global admin-only interface.
+And requesting timestamps with SO_TIMESTAMPING.
 
- tools/testing/vsock/vsock_test.c | 142 +++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
+Today the user of ptp4l already has to know that the admin has
+configured the right RX and TX filters. That is no different if
+multiple filters can be installed? (PHY for PTP, DMA for everything
+else).
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 5b0e93f9996c..773a71260fba 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1225,6 +1225,143 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
- 	}
- }
- 
-+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-+/* This define is the same as in 'include/linux/virtio_vsock.h':
-+ * it is used to decide when to send credit update message during
-+ * reading from rx queue of a socket. Value and its usage in
-+ * kernel is important for this test.
-+ */
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
-+
-+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
-+{
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send 1 byte more than peer's buffer size. */
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until peer sets needed buffer size. */
-+	recv_byte(fd, 1, 0);
-+
-+	if (send(fd, buf, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_rcvlowat_def_cred_upd_server(const struct test_opts *opts)
-+{
-+	size_t recv_buf_size;
-+	struct pollfd fds;
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
-+
-+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+		       &buf_size, sizeof(buf_size))) {
-+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send one dummy byte here, because 'setsockopt()' above also
-+	 * sends special packet which tells sender to update our buffer
-+	 * size. This 'send_byte()' will serialize such packet with data
-+	 * reads in a loop below. Sender starts transmission only when
-+	 * it receives this single byte.
-+	 */
-+	send_byte(fd, 1, 0);
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until there will be 128KB of data in rx queue. */
-+	while (1) {
-+		ssize_t res;
-+
-+		res = recv(fd, buf, buf_size, MSG_PEEK);
-+		if (res == buf_size)
-+			break;
-+
-+		if (res <= 0) {
-+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* There is 128KB of data in the socket's rx queue,
-+	 * dequeue first 64KB, credit update is not sent.
-+	 */
-+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	recv_buf_size++;
-+
-+	/* Updating SO_RCVLOWAT will send credit update. */
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+		       &recv_buf_size, sizeof(recv_buf_size))) {
-+		perror("setsockopt(SO_RCVLOWAT)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	memset(&fds, 0, sizeof(fds));
-+	fds.fd = fd;
-+	fds.events = POLLIN | POLLRDNORM | POLLERR |
-+		     POLLRDHUP | POLLHUP;
-+
-+	/* This 'poll()' will return once we receive last byte
-+	 * sent by client.
-+	 */
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & POLLERR) {
-+		fprintf(stderr, "'poll()' error\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & (POLLIN | POLLRDNORM)) {
-+		recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	} else {
-+		/* These flags must be set, as there is at
-+		 * least 64KB of data ready to read.
-+		 */
-+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1335,6 +1472,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_double_bind_connect_client,
- 		.run_server = test_double_bind_connect_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio SO_RCVLOWAT + deferred cred update",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_rcvlowat_def_cred_upd_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+If attribution becomes important, we could add another cmsg alongside
+the timestamp. On TX this already happens with
+IP_RECVERR/IPV6_RECVERR/PACKET_TX_TIMESTAMP. Maybe the
+sock_extended_err struct even still has a field that can be (ab)used
+for this purpose.
 
+Being able to pass multiple timestamps up to userspace eventually will
+be interesting. A large blocker is where to store these values in the
+sk_buff on the path between the driver and the socket (skb_ext?). At
+Google we already have this scenario, where the local TCP stack and
+userspace both want converted hardware timestamps -- but converted
+from raw to different timebases.
 
