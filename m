@@ -1,99 +1,158 @@
-Return-Path: <netdev+bounces-50259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C18977F5182
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 21:23:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 310707F518C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 21:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CDE02812C4
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 20:23:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6584B20D2C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 20:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BB55D918;
-	Wed, 22 Nov 2023 20:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0630759B67;
+	Wed, 22 Nov 2023 20:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CHPdezc1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="trJZ9rCt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A079A
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 12:23:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700684630; x=1732220630;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uMaYkdk7ELFbFc/sQHKRfNTGUIp0Gihc+5+qFcwD0bQ=;
-  b=CHPdezc1uPyIDMHRuGytJHJYYOUh8D6eg8eboKePfoQxKrM1BWYqfLoq
-   olhlxHO7kyz081ts3/sn0PBsjmBtPsrHB8PDYj1pVQg4BHpSxUUP05D0g
-   wAMVX3vxFOaDAjxv7OQLwpS83Z01AbqB8KHpsSf2fPeyVLzwLU/P3O6FP
-   bido6J2DsrTAimsSvatoW+Y+6vu9vEDHO7WAPvZylvWFdQGNCWWHsw0I4
-   whJz6VotWDohsE1+Q2oRFTZu1NyKXZWW0DaZsPMAxw7lPi3SkunCloY9W
-   sOBogg1sMNHmlnSbxZCVWCX3YM38K4EKgs44YdKZv3LnVGuq99F0bzbWv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="478336633"
-X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="478336633"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 12:23:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="833188356"
-X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
-   d="scan'208";a="833188356"
-Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 22 Nov 2023 12:23:47 -0800
-Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r5tlA-0000qm-36;
-	Wed, 22 Nov 2023 20:23:44 +0000
-Date: Thu, 23 Nov 2023 04:23:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Ivan Babrou <ivan@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net-next 4/4] af_unix: Try to run GC async.
-Message-ID: <202311230220.WfMchMxF-lkp@intel.com>
-References: <20231122013629.28554-5-kuniyu@amazon.com>
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D171B6
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 12:24:29 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2c8790474d5so2391811fa.2
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 12:24:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700684668; x=1701289468; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pa4PSx1bqwHUNtr2jOQTdwbCw2lGoLr2aW9SF4QV68E=;
+        b=trJZ9rCtBBkRyoW5ItepmGgU4L9zF4BIn6Jin5AdJegD6zRDhSheOjEmmOBTGnwvct
+         lbIB4p0pYlxttSLzDTBxw1YahC1CsTQok0XRB3mGcOKT60/z5Hjas28wV5fY6AOqoR5H
+         NYdwlwGyltCWdTn7ANOjAP3YCA8rwmpEBeAA6iHuyhKhYCcGigvhaP1Ws9nmVWk11iKB
+         UBF+tPS9moJRHWhpYaH54zSfk2vS9xlZw+v7qQSFKcZLsVCqheChyBndgv1dCFyDv4ew
+         ZSeV8pFFlghK2AnvOIsFm+GurSSeVe+Bi+3u59vXVjW9NsjUdcIsI52pXGR4sxU6J3kq
+         qjAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700684668; x=1701289468;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pa4PSx1bqwHUNtr2jOQTdwbCw2lGoLr2aW9SF4QV68E=;
+        b=kQISVJ0XwM1Zg+t1/B5yGw98OILYgkOITdp9j8zaQ3BJhMIOtrY4s/dRgaHG3EVMWL
+         Ed+PET2Osz5Q4Wf3EhpdIb1cbjuJXBuNVM4CpXB/70VhNG2+IUkwQHaBBCxFfJTAuBOe
+         1Iv8xqsIKMg/98uSR/GhYXRI6M167suYeOIKFEs5gY4e6d4aC+hvaUhSwS7/+SbOtUZw
+         Eix2UCO2NxbIpt+fm37g5YySFtge0VAr8ZU0I4k/tMFfRy6+VgrmPEiLy3tmRIxQazmU
+         NTEYzu2g22NDfCTtfcVoft4VbZ3jhsJCGI8X34Ivr44/8Lawj//zz3e9h7nPhwJ1dgCM
+         Stkw==
+X-Gm-Message-State: AOJu0YxlJL2gl0wf1X51eZQzTGFhNIJ9lRPGXnEwgIu6fqBlqNrgFY4a
+	T14zDRWXTDLJb1733tnW39iBRA==
+X-Google-Smtp-Source: AGHT+IHCqJnqmqruquEzZmPUrGzbkNt3QnbrS5s9HB1QFQs8oQy4JStcei9zVZVifxLEVasGTNqeiw==
+X-Received: by 2002:a2e:920b:0:b0:2c5:23e3:ed11 with SMTP id k11-20020a2e920b000000b002c523e3ed11mr2713058ljg.30.1700684667938;
+        Wed, 22 Nov 2023 12:24:27 -0800 (PST)
+Received: from [172.30.204.74] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
+        by smtp.gmail.com with ESMTPSA id f27-20020a2eb5bb000000b002b9f03729e2sm42821ljn.36.2023.11.22.12.24.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 12:24:27 -0800 (PST)
+Message-ID: <f18b6552-bf8d-4826-969a-a0de60bd0ad3@linaro.org>
+Date: Wed, 22 Nov 2023 21:24:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122013629.28554-5-kuniyu@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/9] net: mdio: ipq4019: configure CMN PLL clock for
+ ipq5332
+Content-Language: en-US
+To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, robert.marko@sartura.hr
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ quic_srichara@quicinc.com
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-5-quic_luoj@quicinc.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20231115032515.4249-5-quic_luoj@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: *
 
-Hi Kuniyuki,
 
-kernel test robot noticed the following build errors:
 
-[auto build test ERROR on net-next/main]
+On 11/15/23 04:25, Luo Jie wrote:
+> The reference clock of CMN PLL block is selectable, the internal
+> 48MHZ is used by default.
+> 
+> The output clock of CMN PLL block is for providing the clock
+> source of ethernet device(such as qca8084), there are 1 X 25MHZ
+> and 3 x 50MHZ output clocks available.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>   drivers/net/mdio/mdio-ipq4019.c | 81 ++++++++++++++++++++++++++++++++-
+>   1 file changed, 80 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/mdio/mdio-ipq4019.c b/drivers/net/mdio/mdio-ipq4019.c
+> index 93ae4684de31..ca9cda98d1f8 100644
+> --- a/drivers/net/mdio/mdio-ipq4019.c
+> +++ b/drivers/net/mdio/mdio-ipq4019.c
+> @@ -43,6 +43,13 @@
+>   /* Maximum SOC PCS(uniphy) number on IPQ platform */
+>   #define ETH_LDO_RDY_CNT				3
+>   
+> +#define CMN_PLL_REFERENCE_CLOCK			0x784
+> +#define CMN_PLL_REFCLK_INDEX			GENMASK(3, 0)
+> +#define CMN_PLL_REFCLK_EXTERNAL			BIT(9)
+> +
+> +#define CMN_PLL_POWER_ON_AND_RESET		0x780
+> +#define CMN_ANA_EN_SW_RSTN			BIT(6)
+> +
+>   enum mdio_clk_id {
+>   	MDIO_CLK_MDIO_AHB,
+>   	MDIO_CLK_UNIPHY0_AHB,
+> @@ -54,6 +61,7 @@ enum mdio_clk_id {
+>   
+>   struct ipq4019_mdio_data {
+>   	void __iomem *membase;
+> +	void __iomem *cmn_membase;
+>   	void __iomem *eth_ldo_rdy[ETH_LDO_RDY_CNT];
+>   	struct clk *clk[MDIO_CLK_CNT];
+>   	struct gpio_descs *reset_gpios;
+> @@ -227,12 +235,73 @@ static int ipq4019_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>   	return 0;
+>   }
+>   
+> +/* For the CMN PLL block, the reference clock can be configured according to
+> + * the device tree property "cmn_ref_clk", the internal 48MHZ is used by default
+> + * on the ipq533 platform.
+> + *
+> + * The output clock of CMN PLL block is provided to the MDIO slave devices,
+> + * threre are 4 CMN PLL output clocks (1x25MHZ + 3x50MHZ) enabled by default.
+> + *
+> + * such as the output 50M clock for the qca8084 PHY.
+> + */
+> +static void ipq_cmn_clock_config(struct mii_bus *bus)
+> +{
+> +	u32 reg_val;
+> +	const char *cmn_ref_clk;
+> +	struct ipq4019_mdio_data *priv = bus->priv;
+> +
+> +	if (priv && priv->cmn_membase) {
+> +		reg_val = readl(priv->cmn_membase + CMN_PLL_REFERENCE_CLOCK);
+> +		reg_val &= ~(CMN_PLL_REFCLK_EXTERNAL | CMN_PLL_REFCLK_INDEX);
+> +
+> +		/* Select reference clock source */
+> +		cmn_ref_clk = of_get_property(bus->parent->of_node, "cmn_ref_clk", NULL);
+> +		if (!cmn_ref_clk) {
+> +			/* Internal 48MHZ selected by default */
+> +			reg_val |= FIELD_PREP(CMN_PLL_REFCLK_INDEX, 7);
+> +		} else {
+> +			if (!strcmp(cmn_ref_clk, "external_25MHz"))
+As pointed out by others, such string properties won't go through
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Do-not-use-atomic-ops-for-unix_sk-sk-inflight/20231122-094214
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231122013629.28554-5-kuniyu%40amazon.com
-patch subject: [PATCH v1 net-next 4/4] af_unix: Try to run GC async.
-config: x86_64-buildonly-randconfig-006-20231122 (https://download.01.org/0day-ci/archive/20231123/202311230220.WfMchMxF-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231123/202311230220.WfMchMxF-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311230220.WfMchMxF-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: unix_get_socket
-   >>> referenced by usercopy_64.c
-   >>>               vmlinux.o:(__scm_send)
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Konrad
 
