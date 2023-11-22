@@ -1,88 +1,163 @@
-Return-Path: <netdev+bounces-49940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D50497F3FEE
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:20:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BDFD7F4022
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FF56B20E48
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:20:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1420228111D
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 08:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369F52207D;
-	Wed, 22 Nov 2023 08:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CE3CA50;
+	Wed, 22 Nov 2023 08:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="E3cta5dn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RbW4rpqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70072D62;
-	Wed, 22 Nov 2023 00:13:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/fB6eIZmKADlx9vmc7Mv1MvPBKVxtn07LHNUeWpfWWc=; b=E3cta5dn9d1WrfPbb+Hndx4N1r
-	nuU3JUcFGuqHkH8JNDR24YWXdgVr1S+yBiAHby0aAZTFmf4sK4Ff2LBoYOMTA3bDFppkoDl3QXNfs
-	fMwLRV/DWzIrNgH8QiZDB7HtbKpVY51x57a16n8VBEVnUGYnRjp8MxhfkuyT4uJhYlSjTg20lsqVN
-	5MIiTYbdK0IiC6qM8GuqzbiDo03cWqAPQsEtnH1XwtlV263zrmT46K63aH1tir/oE9EsmbhsWtiRO
-	QQYiRmk7sT53vZ+WDIUWLHxwpVgRPci35xkJWFQsnH9a06wbHNn9AVVACLX9DC38fC+D6HYH2+2t8
-	/gIhQ6/Q==;
-Received: from [167.98.27.226] (helo=rainbowdash)
-	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-	id 1r5iMH-004AEH-TG; Wed, 22 Nov 2023 08:13:18 +0000
-Received: from ben by rainbowdash with local (Exim 4.97)
-	(envelope-from <ben@rainbowdash>)
-	id 1r5iMH-00000000boe-42Oz;
-	Wed, 22 Nov 2023 08:13:17 +0000
-From: Ben Dooks <ben.dooks@codethink.co.uk>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Ben Dooks <ben.dooks@codethink.co.uk>
-Subject: [PATCH] bpf: declare bpf_sk_storage_get_cg_sock_proto
-Date: Wed, 22 Nov 2023 08:13:17 +0000
-Message-Id: <20231122081317.145355-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.37.2.352.g3c44437643
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B3F110
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:31:55 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-548f35e6a4bso2728576a12.0
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 00:31:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1700641914; x=1701246714; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2bJsSsHGFq9aBlChakcbUTOSPzwT4uIQYQ+fVgyJERw=;
+        b=RbW4rpquMY3g8byOobgeAYchOcyx4tUZcWmtCpvOelp9PSK7EcjUNm8glFvOC9q0+V
+         Am6hPFxrAJPurhuH14EOhLdcKCbfXiXQ5m/RjhGM6cgUs0Lenl5FVg4yTKi7wVRDNtjc
+         2KYgNuYQRtliJp7uAQ8u+gC49q1qeaWZdkXjZTnrcpvDotP+1KISSnpSD5lpb0qPBjvc
+         YVvgMEdB0we9ztl2WXrz+GXWvzJqeH4hGU5+Xv0Ji+tnQMOyHdDpfoCmUM75F5xh94P6
+         suqaN3G45ZSOhtd86Et9L9B7GpnKxXq7IV6F3d9JbJEI6h3W6eWZmo92cU7B52yRyY30
+         nvbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700641914; x=1701246714;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bJsSsHGFq9aBlChakcbUTOSPzwT4uIQYQ+fVgyJERw=;
+        b=tRmXUuIUyV82tgYpPAY9pN3aDsglqtTlhcL4+LDWqfvee3RbcIaAgWug3jQBFNp3Av
+         UWXwEvtEbeh9q6IR6XuG6sPoJyf26HDnkO2vzLlSxzNTu+w+aPTIl5ks37gwr67NuSqQ
+         KOu/SRsVEHgBRM2ImIjwN5HmqUcl5Y+MhD8s/bO5lJNSNaojtWywORvl6OgKs4OBWpAn
+         MjJFyaPuwQXV7P1bCFGy/oWbt0q93yoRadIDfVtJqJROvU5rzOKXzs5B3hT6IcZ2noAr
+         cZ8y1xlwbO8vzqSQkG7Dc40zAPbYJIs0iUk/XbRlfyiNyiylqVqMMRg9b9KJ5dDVJ4ns
+         WMVg==
+X-Gm-Message-State: AOJu0YwdeKEd/vAZAACRcmlZk9Pby9gpMq7xYUC3F3JUZksBHcpvOVg/
+	U/ShK90uKOINkB5pcbL52+NKFw==
+X-Google-Smtp-Source: AGHT+IGIyIJnN4jjMNMtZl2msEE3tRY4PJj5jNFLH8SXHZ25UCu/2u5YSaFYAVr1zFoYn5px8jwA3Q==
+X-Received: by 2002:aa7:d98e:0:b0:548:68a3:618e with SMTP id u14-20020aa7d98e000000b0054868a3618emr1209670eds.9.1700641914296;
+        Wed, 22 Nov 2023 00:31:54 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.100])
+        by smtp.gmail.com with ESMTPSA id u3-20020a05640207c300b00548851486d8sm4322937edy.44.2023.11.22.00.31.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 00:31:53 -0800 (PST)
+Message-ID: <5c4413b8-bebf-4489-a03a-d4c4ba1becdf@linaro.org>
+Date: Wed, 22 Nov 2023 09:31:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: renesas,ethertsn: Add Ethernet TSN
+Content-Language: en-US
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, devicetree@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Sender: srv_ts003@codethink.com
 
-The bpf_sk_storage_get_cg_sock_proto struct is exported from
-net/core/bpf_sk_storage.c but is not decalred in any header
-file. Fix the following sparse warning by adding it to the
-include/net/bpf_sk_storage.h header:
+On 21/11/2023 19:37, Niklas Söderlund wrote:
+> Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
+> device provides Ethernet network.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-net/core/bpf_sk_storage.c:334:29: warning: symbol 'bpf_sk_storage_get_cg_sock_proto' was not declared. Should it be static
+...
 
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
----
- include/net/bpf_sk_storage.h | 1 +
- 1 file changed, 1 insertion(+)
+> +patternProperties:
+> +  "^ethernet-phy@[0-9a-f]$":
+> +    type: object
+> +    $ref: ethernet-phy.yaml#
+> +    unevaluatedProperties: false
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - reg-names
+> +  - interrupts
+> +  - interrupt-names
+> +  - clocks
+> +  - power-domains
+> +  - resets
+> +  - phy-mode
+> +  - phy-handle
+> +  - '#address-cells'
+> +  - '#size-cells'
 
-diff --git a/include/net/bpf_sk_storage.h b/include/net/bpf_sk_storage.h
-index 2926f1f00d65..043155810822 100644
---- a/include/net/bpf_sk_storage.h
-+++ b/include/net/bpf_sk_storage.h
-@@ -22,6 +22,7 @@ extern const struct bpf_func_proto bpf_sk_storage_get_proto;
- extern const struct bpf_func_proto bpf_sk_storage_delete_proto;
- extern const struct bpf_func_proto bpf_sk_storage_get_tracing_proto;
- extern const struct bpf_func_proto bpf_sk_storage_delete_tracing_proto;
-+extern const struct bpf_func_proto bpf_sk_storage_get_cg_sock_proto;
- 
- struct bpf_local_storage_elem;
- struct bpf_sk_storage_diag;
--- 
-2.37.2.352.g3c44437643
+If there is going to be respin, please use consistent quotes - either '
+or " (see pattern a bit above). You also need net-next in PATCH. In any
+case:
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
 
 
