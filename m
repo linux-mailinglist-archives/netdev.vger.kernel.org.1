@@ -1,56 +1,54 @@
-Return-Path: <netdev+bounces-50122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874AB7F4A84
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:33:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2825F7F4A89
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:34:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B98C11C2095D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:33:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5EB92812B7
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FB94CDED;
-	Wed, 22 Nov 2023 15:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248C14CDED;
+	Wed, 22 Nov 2023 15:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="huSmhb3K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrIBdFne"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A864CDE1
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 15:33:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45252C433CB;
-	Wed, 22 Nov 2023 15:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B504CDEA
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 15:34:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45FBDC433CD;
+	Wed, 22 Nov 2023 15:34:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700667236;
-	bh=KNN7hkgAUhDYvHRh8LMiNipp5q373VB2dg8mVurAazc=;
+	s=k20201202; t=1700667248;
+	bh=KoGEjoqMqcRPF9uAq//ROKVqN1pu9TARfKhCvTStpiM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=huSmhb3KbSlFfKWE7IdkSnepjAjdCodTerdmFbHNta9UzGc94EwXVeV6r/HDmeCcR
-	 080pgrV3as7ugxGVsca4yxjJ3+htbXHfodneMnype/7edo5C94wmZTuchgKLtqxXlx
-	 vjTVYsS182DaMYjHhsQ5T1uNaGSY9zmDgS5o0kTeeJamlHUlux5yo6mUBk8tUmBy2b
-	 EkPSiQDojqi+krIsLU4HuQDjEqyNzuLh1Ff0zLGXTVnHiRtsCa6maXdM12hs5+Y/Rp
-	 AeRornDBWaTCtKCoVklanXe6++8FvtFT7LRjgIpqqZnRBrT1ykmNzNoTECZcYkD4v2
-	 +5jHqCafCWYTQ==
+	b=OrIBdFnecyK254oGUA8ThucUySKUS+bq1risAPonPUODo3IXek9bFKDNhCvHz2mEx
+	 zmuVNGmoscAtX04SdZVdm/q+FtBSouOiISw/e2H3ZCgRQXhw7ClcZGvmxppd1/X7Q0
+	 cIvJq2wd9wudj4vLPBbj81ciwxrV7KLzxCfh1AdK/xQPhCZLGmm9ND5Ff2THbAAfmR
+	 p5KKYdeWRDxsP66hGBqSIpT4G9TRP0LuIFr1an7O+lbVtElbJ9ginydDrRhDTAya3J
+	 V0tCbWpr7OTDV0TDYd2zskv8oCdi7NzubO7tOKv9LA6pLWNiGTV+zwtJc0kef6Rual
+	 s6Tpy2CE0m77A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
+Cc: Alex Pakhunov <alexey.pakhunov@spacex.com>,
+	Vincent Wong <vincent.wong2@spacex.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	fw@strlen.de,
+	pavan.chebbi@broadcom.com,
+	mchan@broadcom.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	justinstitt@google.com,
-	kuniyu@amazon.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 05/15] netfilter: ipset: fix race condition between swap/destroy and kernel side add/del/test
-Date: Wed, 22 Nov 2023 10:33:07 -0500
-Message-ID: <20231122153340.852434-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 08/15] tg3: Move the [rt]x_dropped counters to tg3_napi
+Date: Wed, 22 Nov 2023 10:33:10 -0500
+Message-ID: <20231122153340.852434-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231122153340.852434-1-sashal@kernel.org>
 References: <20231122153340.852434-1-sashal@kernel.org>
@@ -65,101 +63,136 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.5.12
 Content-Transfer-Encoding: 8bit
 
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
+From: Alex Pakhunov <alexey.pakhunov@spacex.com>
 
-[ Upstream commit 28628fa952fefc7f2072ce6e8016968cc452b1ba ]
+[ Upstream commit 907d1bdb8b2cc0357d03a1c34d2a08d9943760b1 ]
 
-Linkui Xiao reported that there's a race condition when ipset swap and destroy is
-called, which can lead to crash in add/del/test element operations. Swap then
-destroy are usual operations to replace a set with another one in a production
-system. The issue can in some cases be reproduced with the script:
+This change moves [rt]x_dropped counters to tg3_napi so that they can be
+updated by a single writer, race-free.
 
-ipset create hash_ip1 hash:net family inet hashsize 1024 maxelem 1048576
-ipset add hash_ip1 172.20.0.0/16
-ipset add hash_ip1 192.168.0.0/16
-iptables -A INPUT -m set --match-set hash_ip1 src -j ACCEPT
-while [ 1 ]
-do
-	# ... Ongoing traffic...
-        ipset create hash_ip2 hash:net family inet hashsize 1024 maxelem 1048576
-        ipset add hash_ip2 172.20.0.0/16
-        ipset swap hash_ip1 hash_ip2
-        ipset destroy hash_ip2
-        sleep 0.05
-done
-
-In the race case the possible order of the operations are
-
-	CPU0			CPU1
-	ip_set_test
-				ipset swap hash_ip1 hash_ip2
-				ipset destroy hash_ip2
-	hash_net_kadt
-
-Swap replaces hash_ip1 with hash_ip2 and then destroy removes hash_ip2 which
-is the original hash_ip1. ip_set_test was called on hash_ip1 and because destroy
-removed it, hash_net_kadt crashes.
-
-The fix is to force ip_set_swap() to wait for all readers to finish accessing the
-old set pointers by calling synchronize_rcu().
-
-The first version of the patch was written by Linkui Xiao <xiaolinkui@kylinos.cn>.
-
-v2: synchronize_rcu() is moved into ip_set_swap() in order not to burden
-    ip_set_destroy() unnecessarily when all sets are destroyed.
-v3: Florian Westphal pointed out that all netfilter hooks run with rcu_read_lock() held
-    and em_ipset.c wraps the entire ip_set_test() in rcu read lock/unlock pair.
-    So there's no need to extend the rcu read locked area in ipset itself.
-
-Closes: https://lore.kernel.org/all/69e7963b-e7f8-3ad0-210-7b86eebf7f78@netfilter.org/
-Reported by: Linkui Xiao <xiaolinkui@kylinos.cn>
-Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://lore.kernel.org/r/20231113182350.37472-1-alexey.pakhunov@spacex.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/netfilter/ipset/ip_set_core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/broadcom/tg3.c | 38 +++++++++++++++++++++++++----
+ drivers/net/ethernet/broadcom/tg3.h |  4 +--
+ 2 files changed, 35 insertions(+), 7 deletions(-)
 
-diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-index 58608460cf6df..809b9b1a88afc 100644
---- a/net/netfilter/ipset/ip_set_core.c
-+++ b/net/netfilter/ipset/ip_set_core.c
-@@ -61,6 +61,8 @@ MODULE_ALIAS_NFNL_SUBSYS(NFNL_SUBSYS_IPSET);
- 	ip_set_dereference((inst)->ip_set_list)[id]
- #define ip_set_ref_netlink(inst,id)	\
- 	rcu_dereference_raw((inst)->ip_set_list)[id]
-+#define ip_set_dereference_nfnl(p)	\
-+	rcu_dereference_check(p, lockdep_nfnl_is_held(NFNL_SUBSYS_IPSET))
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 9d1de202ac714..0480b10701d5d 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6846,7 +6846,7 @@ static int tg3_rx(struct tg3_napi *tnapi, int budget)
+ 				       desc_idx, *post_ptr);
+ 		drop_it_no_recycle:
+ 			/* Other statistics kept track of by card. */
+-			tp->rx_dropped++;
++			tnapi->rx_dropped++;
+ 			goto next_pkt;
+ 		}
  
- /* The set types are implemented in modules and registered set types
-  * can be found in ip_set_type_list. Adding/deleting types is
-@@ -708,15 +710,10 @@ __ip_set_put_netlink(struct ip_set *set)
- static struct ip_set *
- ip_set_rcu_get(struct net *net, ip_set_id_t index)
+@@ -8147,7 +8147,7 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ drop:
+ 	dev_kfree_skb_any(skb);
+ drop_nofree:
+-	tp->tx_dropped++;
++	tnapi->tx_dropped++;
+ 	return NETDEV_TX_OK;
+ }
+ 
+@@ -9326,7 +9326,7 @@ static void __tg3_set_rx_mode(struct net_device *);
+ /* tp->lock is held. */
+ static int tg3_halt(struct tg3 *tp, int kind, bool silent)
  {
--	struct ip_set *set;
- 	struct ip_set_net *inst = ip_set_pernet(net);
+-	int err;
++	int err, i;
  
--	rcu_read_lock();
--	/* ip_set_list itself needs to be protected */
--	set = rcu_dereference(inst->ip_set_list)[index];
--	rcu_read_unlock();
--
--	return set;
-+	/* ip_set_list and the set pointer need to be protected */
-+	return ip_set_dereference_nfnl(inst->ip_set_list)[index];
- }
+ 	tg3_stop_fw(tp);
  
- static inline void
-@@ -1397,6 +1394,9 @@ static int ip_set_swap(struct sk_buff *skb, const struct nfnl_info *info,
- 	ip_set(inst, to_id) = from;
- 	write_unlock_bh(&ip_set_ref_lock);
+@@ -9347,6 +9347,13 @@ static int tg3_halt(struct tg3 *tp, int kind, bool silent)
  
-+	/* Make sure all readers of the old set pointers are completed. */
-+	synchronize_rcu();
+ 		/* And make sure the next sample is new data */
+ 		memset(tp->hw_stats, 0, sizeof(struct tg3_hw_stats));
 +
- 	return 0;
++		for (i = 0; i < TG3_IRQ_MAX_VECS; ++i) {
++			struct tg3_napi *tnapi = &tp->napi[i];
++
++			tnapi->rx_dropped = 0;
++			tnapi->tx_dropped = 0;
++		}
+ 	}
+ 
+ 	return err;
+@@ -11896,6 +11903,9 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+ {
+ 	struct rtnl_link_stats64 *old_stats = &tp->net_stats_prev;
+ 	struct tg3_hw_stats *hw_stats = tp->hw_stats;
++	unsigned long rx_dropped;
++	unsigned long tx_dropped;
++	int i;
+ 
+ 	stats->rx_packets = old_stats->rx_packets +
+ 		get_stat64(&hw_stats->rx_ucast_packets) +
+@@ -11942,8 +11952,26 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+ 	stats->rx_missed_errors = old_stats->rx_missed_errors +
+ 		get_stat64(&hw_stats->rx_discards);
+ 
+-	stats->rx_dropped = tp->rx_dropped;
+-	stats->tx_dropped = tp->tx_dropped;
++	/* Aggregate per-queue counters. The per-queue counters are updated
++	 * by a single writer, race-free. The result computed by this loop
++	 * might not be 100% accurate (counters can be updated in the middle of
++	 * the loop) but the next tg3_get_nstats() will recompute the current
++	 * value so it is acceptable.
++	 *
++	 * Note that these counters wrap around at 4G on 32bit machines.
++	 */
++	rx_dropped = (unsigned long)(old_stats->rx_dropped);
++	tx_dropped = (unsigned long)(old_stats->tx_dropped);
++
++	for (i = 0; i < tp->irq_cnt; i++) {
++		struct tg3_napi *tnapi = &tp->napi[i];
++
++		rx_dropped += tnapi->rx_dropped;
++		tx_dropped += tnapi->tx_dropped;
++	}
++
++	stats->rx_dropped = rx_dropped;
++	stats->tx_dropped = tx_dropped;
  }
+ 
+ static int tg3_get_regs_len(struct net_device *dev)
+diff --git a/drivers/net/ethernet/broadcom/tg3.h b/drivers/net/ethernet/broadcom/tg3.h
+index 1000c894064f0..8d753f8c5b065 100644
+--- a/drivers/net/ethernet/broadcom/tg3.h
++++ b/drivers/net/ethernet/broadcom/tg3.h
+@@ -3018,6 +3018,7 @@ struct tg3_napi {
+ 	u16				*rx_rcb_prod_idx;
+ 	struct tg3_rx_prodring_set	prodring;
+ 	struct tg3_rx_buffer_desc	*rx_rcb;
++	unsigned long			rx_dropped;
+ 
+ 	u32				tx_prod	____cacheline_aligned;
+ 	u32				tx_cons;
+@@ -3026,6 +3027,7 @@ struct tg3_napi {
+ 	u32				prodmbox;
+ 	struct tg3_tx_buffer_desc	*tx_ring;
+ 	struct tg3_tx_ring_info		*tx_buffers;
++	unsigned long			tx_dropped;
+ 
+ 	dma_addr_t			status_mapping;
+ 	dma_addr_t			rx_rcb_mapping;
+@@ -3219,8 +3221,6 @@ struct tg3 {
+ 
+ 
+ 	/* begin "everything else" cacheline(s) section */
+-	unsigned long			rx_dropped;
+-	unsigned long			tx_dropped;
+ 	struct rtnl_link_stats64	net_stats_prev;
+ 	struct tg3_ethtool_stats	estats_prev;
  
 -- 
 2.42.0
