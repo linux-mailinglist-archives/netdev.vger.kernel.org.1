@@ -1,112 +1,177 @@
-Return-Path: <netdev+bounces-50206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5922E7F4EB9
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:51:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89267F4EC5
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1B2CB20CB9
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:51:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2144E2812F2
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7ADE58AA1;
-	Wed, 22 Nov 2023 17:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7B94E615;
+	Wed, 22 Nov 2023 17:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcC7JLIj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1QfVTaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EB61B5;
-	Wed, 22 Nov 2023 09:51:09 -0800 (PST)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5cd0af4a7d3so295347b3.0;
-        Wed, 22 Nov 2023 09:51:09 -0800 (PST)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC8E1A8;
+	Wed, 22 Nov 2023 09:53:44 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3316d09c645so3620816f8f.0;
+        Wed, 22 Nov 2023 09:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700675469; x=1701280269; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TxnpKs2F+HZNYkXf/Y5BgrPY0hki8e46Z6NdLZXo0Do=;
-        b=kcC7JLIjbPuJPYoTwBkF/wGQa0H69rrhifnZGH9X9ZrTez5w9yK9d0oojDaNKxKtqo
-         2pYNJAkxNjzXZd44OgQDjvziJib393yIMnLikzz1MGe0Yy8n2XKFy3ipMTv2lR0qGoIH
-         /TAzciz47OR9B3ectrenTnCDwHeo3js0OvOBLAjRV71lAEPXABJqHyaTlWlQtoBFTZHt
-         7+wa1/CwhAY26aB7mbhkBdjZ6SeazcGVosRxN7CKG+DoUdEESJS4awKQY9GbZDi2QV5d
-         xX+6PGHM2Rccf8kCkG00VPxDABOvKQER808NES31tHFbttYOLK4WhF0idp64xaUcdiqw
-         MSMw==
+        d=gmail.com; s=20230601; t=1700675622; x=1701280422; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AdOBPKB2H9imCd9isIgQYWfbsuOE5ddo9bpSACnZw7o=;
+        b=X1QfVTaDZlrZlY8VYrFGXSKljh5vJ+6tN6jZO4PO5gqom8HXXeWlwjbsWdWmR2Smz5
+         8Big+26BVjQPuAOw/UJzklCyRjUD53Qu+zIbaFa4M7WOG8w83ODm7P408a2U2lGAhjvN
+         nfeyXKfgXIThQ5TK0xjqSjM9REuI9KIFB3rpHPSq+CYzULEmZ2zCXxKcjNvtqY3FY4/v
+         Z052waF+qfkQ5/ADvoTpi7xKNgc0ZzPJx/6UO+WG/cx3hTaQ71os5oaALiA9M5H5ZrzI
+         K6dnekuSeHzPSS3YTWmh2e0P4b5FOB24X8S0A+V5ySoN8cgoRBn1BKLRic3shf7TktXD
+         6M4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700675469; x=1701280269;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TxnpKs2F+HZNYkXf/Y5BgrPY0hki8e46Z6NdLZXo0Do=;
-        b=LMSQJtX03TOgq6cwQkHx8t5B2tCJlMhlwEJkMXPw2Ziy6wsoY1GZhBlEnFBol/OizC
-         gqTvKKaJJh5f7qtUFx0f15H2mectsthw0PiWcgEwYwxHoiUya5U75A7xTWvNzEIiwRRw
-         3ZpCibVBdBjzP88SHscZl8Ttt5BSYFSof8KM0iFsDCiSn/NclCOcL3BC8vQasRPT9cFE
-         hbhmXeHm9beBQfoNqeLcd7gjPDd/I4QhVmirx81DccpBZuu8suZWAxq1+gRzQAs4Zg0U
-         IM7QiN5yLlHooq+DuYpTqx9ARLlKbeEtFQmSV4A9daRglltqLA+iIgYtdn55tObCZzLF
-         5YwA==
-X-Gm-Message-State: AOJu0Yxl5RVN/6UlEpcKN90c5tdzSFDKJ9POF2pQpIakC0oa8Zrp08dU
-	ezw6xkfr8/YWNerkq1A+frzgfzPAqvJgkmFy6j4=
-X-Google-Smtp-Source: AGHT+IFVH/BFWt02BJRt89HCYBEkZm6l8N7OMZmIj2n4mUUQxZeU4z4Xe9RaA6X/2NVtoKOkfpeHPoOXYUDC9+dm0Xc=
-X-Received: by 2002:a81:9404:0:b0:58c:b8b4:2785 with SMTP id
- l4-20020a819404000000b0058cb8b42785mr3671430ywg.45.1700675468737; Wed, 22 Nov
- 2023 09:51:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700675622; x=1701280422;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AdOBPKB2H9imCd9isIgQYWfbsuOE5ddo9bpSACnZw7o=;
+        b=IxXYKczN2g3xWM4gi7rqMJbyrrVULYbaG5WIAWgAT39zgt/VEJ284CF1JiLCMaVs4Y
+         RcUEbR+tWVN+lit1S90cpe8z+1H5F49I08UpvtNcpFOtLsV4efLVA76ZNpo4XzI1SspO
+         yX2kBfD/PbflJpYb3+r1uFDZq1LrzB7N/LPE0U2DObEtQCc1RrrS8LS/FvG+aUB2Rhe6
+         iXW/2XcjuUcxQX6tdssIxj8IS48s1fA1q1uUtAez+DftfZFDfZ+zF4ka+wPkAyo1vIfa
+         Vw9ndSYN9Yw8lo9GB+k96P/sRSg4EwUvi1+CVKiwMaSFru13uMf/NoRcHanXHHd9dAAc
+         SvaQ==
+X-Gm-Message-State: AOJu0Yw9VJriRPyLzPckXnNOW8NcgzBbMBKKNjGUUgo0MyG5g4Cl+KEO
+	qgJysMOaEzsHllTtNXp2qOU=
+X-Google-Smtp-Source: AGHT+IFlnSL12ZSmipJ4vORisCI3rn2874HDuY5w0IGDLNY/BeJv0cNVcWDQ9nqh7rT9QWFD5rDiPw==
+X-Received: by 2002:a5d:67c5:0:b0:332:c441:70aa with SMTP id n5-20020a5d67c5000000b00332c44170aamr2256749wrw.26.1700675622215;
+        Wed, 22 Nov 2023 09:53:42 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id k5-20020adfe8c5000000b00331733a98ddsm14781231wrn.111.2023.11.22.09.53.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 09:53:41 -0800 (PST)
+Message-ID: <655e4025.df0a0220.50550.3d70@mx.google.com>
+X-Google-Original-Message-ID: <ZV5AI/KsHnNi/gKs@Ansuel-xps.>
+Date: Wed, 22 Nov 2023 18:53:39 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [net-next PATCH] net: phy: aquantia: drop wrong endianness
+ conversion for addr and CRC
+References: <20231122170813.1222-1-ansuelsmth@gmail.com>
+ <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121151733.2015384-1-tmaimon77@gmail.com> <20231121151733.2015384-3-tmaimon77@gmail.com>
- <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
-In-Reply-To: <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
-From: Tomer Maimon <tmaimon77@gmail.com>
-Date: Wed, 22 Nov 2023 19:50:57 +0200
-Message-ID: <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com, edumazet@google.com, 
-	krzysztof.kozlowski+dt@linaro.org, linux-stm32@st-md-mailman.stormreply.com, 
-	benjaminfair@google.com, openbmc@lists.ozlabs.org, joabreu@synopsys.com, 
-	joel@jms.id.au, devicetree@vger.kernel.org, j.neuschaefer@gmx.net, 
-	robh+dt@kernel.org, peppe.cavallaro@st.com, 
-	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com, 
-	venture@google.com, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, 
-	netdev@vger.kernel.org, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
 
-Hi Andrew,
-
-Thanks for your comments
-
-On Tue, 21 Nov 2023 at 18:42, Andrew Lunn <andrew@lunn.ch> wrote:
+On Wed, Nov 22, 2023 at 05:24:33PM +0000, Russell King (Oracle) wrote:
+> On Wed, Nov 22, 2023 at 06:08:13PM +0100, Christian Marangi wrote:
+> > On further testing on BE target with kernel test robot, it was notice
+> > that the endianness conversion for addr and CRC in fw_load_memory was
+> > wrong and actually not needed. Values in define doesn't get converted
+> > and are passed as is and hardcoded values are already in what the PHY
+> > require, that is LE.
+> > 
+> > Also drop the cpu_to_be32 for CRC calculation as it's wrong and use
+> > _swab32 instead, the word is taked from firmware and is always LE, the
+> 
+>                                taken
+> 
+> > mailbox will emit a BE CRC hence the word needs to be always swapped and
+> > the endianness of the host needs to be ignored.
+> 
+> I'm not convinced. If the firmware is a bytestream (as most "files" are)
+> then for val = get_unaligned((u32 *)ptr), where ptr is an array of u8:
+> 
+> ptr[0]	ptr[1]	ptr[2]	ptr[3]	val on LE	val on BE
+> 0x01	0x02	0x03	0x04	0x04030201	0x01020304
+> 
+> So, endianness matters here, and I think as Jakub already suggested, you
+> need to use get_unaligned_le32().
 >
-> > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
-> > +                      struct plat_stmmacenet_data *plat_dat)
-> > +{
-> > +     u16 val;
-> > +
-> > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
-> > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > +     val |= PCS_RST;
-> > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > +
-> > +     while (val & PCS_RST)
-> > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > +
-> > +     val &= ~(PCS_AN_ENABLE);
-> > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > +}
->
-> Is this a licensed PCS implementation? Or home grown? If its been
-> licensed from somebody, it maybe should live in driver/net/pcs, so
-> others can reuse it when they license the same core.
-we are using DWC PCS, I don't see support for DWC PCS and I am not
-sure it is supposed to be supported at /drivers/net/pcs
-I do see a patch set to support DWC PCS but I don't think it answers my needs
-https://patchwork.ozlabs.org/project/netdev/patch/1559674736-2190-3-git-send-email-weifeng.voon@intel.com/
->
->        Andrew
 
-Thanks,
+So they DO get converted to the HOST endian on reading the firmware from
+an nvmem cell or a filesystem?
 
-Tomer
+Again this is really dumping raw data from the read file directly to the
+mailbox. Unless phy_write does some conversion internally, but in that
+case how does it know what endian is the PHY internally?
+
+> > diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
+> > index c5f292b1c4c8..bd093633d0cf 100644
+> > --- a/drivers/net/phy/aquantia/aquantia_firmware.c
+> > +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
+> > @@ -93,9 +93,9 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+> >  	u16 crc = 0, up_crc;
+> >  	size_t pos;
+> >  
+> > -	/* PHY expect addr in LE */
+> > -	addr = (__force u32)cpu_to_le32(addr);
+> > -
+> > +	/* PHY expect addr in LE. Hardcoded addr in defines are
+> > +	 * already in this format.
+> > +	 */
+> >  	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> >  		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
+> >  		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
+> > @@ -128,7 +128,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+> >  		 * We convert word to big-endian as PHY is BE and mailbox will
+> >  		 * return a BE CRC.
+> >  		 */
+> > -		word = (__force u32)cpu_to_be32(word);
+> > +		word = __swab32(word);
+> >  		crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
+> 
+> Again, I think you need to be careful with the endianness here again.
+> From what I understand here, it seems the CRC needs to be generated by
+> looking at the byte at ptr[3] first, then ptr[2], ptr[1] and finally
+> ptr[0] ?
+> 
+> If that is the case, the problem is using __swab32() on LE will do the
+> job for you, but on BE machines, it will be wrong.
+> 
+> I would make this explicit:
+> 
+> 		u8 crc_data[4];
+> 
+> 		...
+> 
+> 		/* CRC is calculated using BE order */
+> 		crc_data[0] = word >> 24;
+> 		crc_data[1] = word >> 16;
+> 		crc_data[2] = word >> 8;
+> 		crc_data[3] = word;
+> 
+> 		crc = crc_ccitt_false(crc, crc_data, sizeof(crc_data));
+> 
+> which will be (a) completely unambiguous, and (b) completely
+> independent of the host endianness.
+
+But isn't this exactly what is done with ___constant_swab32 ?
+__swab32 should not change if the HOST is BE or LE.
+
+The real question is if word is converted. (by either the read API on
+reading the FW or by phy_write on writing the thing to mailbox) (the
+test are done on a LE HOST)
+
+Our theory is that mailbox takes LE and internally converts to BE (as
+the PHY is BE) but the CRC reg calculates the CRC out of the converted
+data aka it does calculates the CRC from the BE data (converted
+internally).
+
+-- 
+	Ansuel
 
