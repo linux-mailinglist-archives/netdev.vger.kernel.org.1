@@ -1,74 +1,81 @@
-Return-Path: <netdev+bounces-49848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAEDE7F3ACA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:42:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 482647F3AD5
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:51:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 747D228101A
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:42:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47FB61C20971
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BEA1381;
-	Wed, 22 Nov 2023 00:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3A010E5;
+	Wed, 22 Nov 2023 00:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="J8kBBzXN"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eHy7gGcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2DD18E
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 16:42:22 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3b83d2981b5so196258b6e.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 16:42:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1700613742; x=1701218542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JAG0RDoM6r+OhcBNCljqVXixFJN9onE/iS8GXZuAZc=;
-        b=J8kBBzXNLvaLzzItbZ6aiB87DxoMjhSXat/Mmm9YQExy3E3RcYeTGt+nkBO6NxqWfA
-         VPNPDZYFNVP9FUqYg03bsV1XkDv0HTyhGQVcx9vX6LF0ONJkf/VOdMnD1McMurjfkEFx
-         Ku8fYwMMW6mqIeMr8EzT04k2zKMOVhLxCmbp5aE92Vm3nuLSUU5GO8XTCxrhXNk0WWSX
-         En2EFu79XuCuv/xfDk2kMTIyOZ2G6EMt0vZYBSn88rUcpe4dvZ7V1Up/MMxIDe62l1ZV
-         CejkP9hYykrU+xNVFjW57jGM+cL2vC7AXdZT54rRJHH+N2Wx1teMhM4r/BtLBFKhyXBH
-         XR9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700613742; x=1701218542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3JAG0RDoM6r+OhcBNCljqVXixFJN9onE/iS8GXZuAZc=;
-        b=Oh0a4tZfhnRujsZbXgZcyCMBKt73pfdJv69GzC5TuuTYoDMg+I7edyGVPMSQyjET5F
-         pgxObC/wSB/TC8tOsIJ86qDTAwm3wuH48ZOb4dkp/77QYBWBNoH/5AaAa081MzH+yaiH
-         biG93ra6chWOPtrpe8Q2E/6vrPpdbaOs145HCNAFnLuyblFekOzcYk0jnwi9vgci5GTL
-         ZYwSgw8cWUulzmc99SlVbQqa6qdMrC7TsEyzXx4lx3/EiPTqHgTUla8LqnIS4BA/FlGa
-         h00lwgEcVV2SDQKT7Y0MdnLS7CeUGraPN2Uil1jBrQ0GGgoyDq9+lMVVoP4nrFE+HWd8
-         u3qg==
-X-Gm-Message-State: AOJu0YxENHvdujh6/z45tjeyJwCzMsujV9xlc0UPoTEh4zgH8x0UR3+U
-	vuZlgtXnMjP+N0EcMFDMZ8NeZw==
-X-Google-Smtp-Source: AGHT+IFtjceUKgV711uY05lmug8NPHDY9L8jlpd8D8wBrSUqKZ6rNZvgEDLVfLqCG+sn6SOl8BLolA==
-X-Received: by 2002:a05:6808:1693:b0:3b8:3ba9:b14b with SMTP id bb19-20020a056808169300b003b83ba9b14bmr1311964oib.43.1700613741892;
-        Tue, 21 Nov 2023 16:42:21 -0800 (PST)
-Received: from sw06.internal.sifive.com ([4.53.31.132])
-        by smtp.gmail.com with ESMTPSA id z128-20020a636586000000b005b856fab5e9sm8382145pgb.18.2023.11.21.16.42.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 16:42:21 -0800 (PST)
-From: Samuel Holland <samuel.holland@sifive.com>
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Cc: Samuel Holland <samuel.holland@sifive.com>,
-	Ariane Keller <ariane.keller@tik.ee.ethz.ch>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Michal Simek <michal.simek@amd.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
+Received: from out203-205-221-164.mail.qq.com (out203-205-221-164.mail.qq.com [203.205.221.164])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2526D112;
+	Tue, 21 Nov 2023 16:51:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1700614262; bh=gzvxNaFgXpUPDEUAHkQPkAaRXyYwT0flcIsNk4lBtvw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eHy7gGcSqcOry15C7ucAHzPHBpCcAeTPNJF6rNhh84yKziGnJnLzB3WkXxu/Yp724
+	 H+DKCiIwUOeP0e1DONCK0N/StyCh9mj3nKdorOm8UwsFe+s+LCdnHm/33dtEu0iKAs
+	 C/VqE/QE+w454amPnO3zk6e/sCvh5SRAQsOruLPI=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
+	id CB7B5A80; Wed, 22 Nov 2023 08:50:55 +0800
+X-QQ-mid: xmsmtpt1700614255tc8djfbyw
+Message-ID: <tencent_884D1773977426D9D3600371696883B6A405@qq.com>
+X-QQ-XMAILINFO: NQR8mRxMnur9ovjyRgGNqgtMh6Va05ELoy2/HMi6IsAkx4szUMBjSpTD+efd4/
+	 ov9kgVGiM/scZ0CutViE1B97RX0XHB6K3ewEpzAtd9+yFfRbnUj9WEZ9Bd1lW+hdhIgoT7knR5P5
+	 AvmevPfcyOb8Q1Pf283rP6fxMoSMzU7esdpmXZ8Nw7+U2f3Dmxurp9W5yaPNyvAmgVub4v/eqKPc
+	 M0n9sOEYAc952p7plqJG51dsVJL/zmgo2nmNzO7R//sBQciI767tEoe2ZI9bg9FZ5jfnE4RM9NRF
+	 OlXoz1B1E0jZUuMDBvM29dczwMpbGZ0STD33HBb+W2+7nV8RBvsEsVQpmJ0HflOKUYabAwkmf4Mp
+	 e0FqFZyRF2qNK2busSQMv6ptOwaa/Yxk59a2I86AHNjmzA64Py5Tgd0i86qYtJURLsWvTOLx29hS
+	 IOd1qWY35fn7Vx4eN1iUWZz0fg6u26iClnu+NEhuiLJQ9vjOnCMv3Isj8uENMLNs5RB6Wz9eaEU4
+	 yEUQ2/i4j8I/roydVJb8XztnEWTZYtTuW4MawdgY4tPLIcubZR4G+JkZamrR1GTK9B0DupfCiGTQ
+	 Peofz4F2gAN3we5PJEc0KceR61ZLBnnOG470q6tkhwrsT7+fNBnpW4QKQrWU+/Sror7Gs7cymUgw
+	 08pvkKMFOIyOyN2OgEofXAYVW4EDmY5W+r4ThwO7Tkxi+AqnvNdXnFwiFlqMKT+8P/WrIfyQpeKd
+	 Bp7fQeJQv5wSKhGjSa6wLMYuq5J6znE+3634ZZ5Odg1g4mlO46H1cUHd3TtUbHTqfoPRiitmgbhx
+	 TU35ZDjq0D8B/eP+748ZE1n646xOLLxoIJlE9TJk6bpIZnQrFde8ch+1artGe9yRoXz+VjDrouC1
+	 4JFfLqg/YJiaSnBXpDH2IFKP0tBbKiUQLvrYVZ2KVUzPZP65cm3wWPDdU5fOd9UFu9bNusK+Il
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+e2c932aec5c8a6e1d31c@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	haoluo@google.com,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: axienet: Fix check for partial TX checksum
-Date: Tue, 21 Nov 2023 16:42:17 -0800
-Message-ID: <20231122004219.3504219-1-samuel.holland@sifive.com>
+	linux-trace-kernel@vger.kernel.org,
+	martin.lau@kernel.org,
+	martin.lau@linux.dev,
+	mhiramat@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	rostedt@goodmis.org,
+	sdf@google.com,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yhs@fb.com,
+	yonghong.song@linux.dev
+Subject: [PATCH net] bpf: test_run: fix WARNING in format_decode
+Date: Wed, 22 Nov 2023 08:50:56 +0800
+X-OQ-MSGID: <20231122005055.3594477-2-eadavis@qq.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <0000000000004b6de5060ab1545b@google.com>
+References: <0000000000004b6de5060ab1545b@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,29 +84,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Due to a typo, the code checked the RX checksum feature in the TX path.
+Confirm that skb->len is not 0 to ensure that skb length is valid.
 
-Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
-Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
+Fixes: 114039b34201 ("bpf: Move skb->len == 0 checks into __bpf_redirect")
+Reported-by: syzbot+e2c932aec5c8a6e1d31c@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 ---
+ net/bpf/test_run.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 82d0d44b2b02..bf6e33990490 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -822,7 +822,7 @@ axienet_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 		if (lp->features & XAE_FEATURE_FULL_TX_CSUM) {
- 			/* Tx Full Checksum Offload Enabled */
- 			cur_p->app0 |= 2;
--		} else if (lp->features & XAE_FEATURE_PARTIAL_RX_CSUM) {
-+		} else if (lp->features & XAE_FEATURE_PARTIAL_TX_CSUM) {
- 			csum_start_off = skb_transport_offset(skb);
- 			csum_index_off = csum_start_off + skb->csum_offset;
- 			/* Tx Partial Checksum Offload Enabled */
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index c9fdcc5cdce1..78258a822a5c 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -845,6 +845,9 @@ static int convert___skb_to_skb(struct sk_buff *skb, struct __sk_buff *__skb)
+ {
+ 	struct qdisc_skb_cb *cb = (struct qdisc_skb_cb *)skb->cb;
+ 
++	if (!skb->len)
++		return -EINVAL;
++
+ 	if (!__skb)
+ 		return 0;
+ 
 -- 
-2.42.0
+2.26.1
 
 
