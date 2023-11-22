@@ -1,101 +1,125 @@
-Return-Path: <netdev+bounces-50271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBEA77F52C5
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 22:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2891D7F52CB
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 22:45:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E8D1C20B5A
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 21:44:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A6491C20AF0
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 21:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E231CA84;
-	Wed, 22 Nov 2023 21:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C4B1CF8C;
+	Wed, 22 Nov 2023 21:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lat7p4OH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MZYU6+Fw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53CBDDA;
-	Wed, 22 Nov 2023 13:44:20 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-543c3756521so331337a12.2;
-        Wed, 22 Nov 2023 13:44:20 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C453B1BD
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 13:44:58 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-408c6ec1fd1so4125e9.1
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 13:44:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700689459; x=1701294259; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xtanoWGCY7h+4tm6qQcmMOcUxKcUNh5lJMouYq8Ssrc=;
-        b=lat7p4OH63n6qdxPc+6ykgrfcBC1Qq/R7mi0mjfm2BbRgSQIRmsdLxiIkQiuGHPP/w
-         RIPBvkiECCfu6DjeGcEirUxeYIG+daLHwcF+tG9nStRs/+KRWLmk5DnN5sRXafD4uZu+
-         jeoyc9ImaC5d1TlZRtQWEjQQGNKjQNc2fV8aCh1JayaklEv9a8I7mH2i7gRodXLafHP5
-         MngX6tz59P8Z+lMiPWV2ToR6thz9fZICcJ8f2yEmNwYCQqlUse0RwSjJ+F0bPh7am55j
-         BOk9Jkm8+yFmb2h92MQzY2XGJB+hzHbxykTQLczfeHvY4u8bfnzl64WfRje8snrWjTWm
-         UMTw==
+        d=google.com; s=20230601; t=1700689497; x=1701294297; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nXiWhRqFrWoSNtAFmkHRO3t9Ruwff9Gl/eAaWgquIiw=;
+        b=MZYU6+FwDpBJ6xo/We22FfLNh9FSQ9OoFhPVwTcojSXrT4Ftp9AqlcnWAfNmpcIr9K
+         V9jZa0+1o205wL1nn/7di5gW7qfzBgaK7kfvFbvKVh5WyWizYTjVcBO/mMAczdYCdGuc
+         1nKdjyS7RvhOij8CAByT3z39g1PfqZD9SM9q96esBHOWV05EJmW69iOnUSz6B7eLtlwX
+         P3E+wMiSzcK91KwTHnBXYcXwue+qaXf14m8M8fQQin74OtQURnHfN6z78jU74naoOSPQ
+         yllW3hBiopQWAJ0YfBOBUrVXzsuC32qIA4B6/iZzza4HJzPSskHO4yMRKtxJ3NVZ6N1E
+         fZPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700689459; x=1701294259;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xtanoWGCY7h+4tm6qQcmMOcUxKcUNh5lJMouYq8Ssrc=;
-        b=sCWi3hHvoiHNz6gUYSYwj4DRlLYuiMWf+PsFpZXE5iYD7MUb/JAQXa9+yht7CSY93n
-         5Ojxs+I1YrGYjmVun7qPOWaRQekLU+gxgECdFG1pAcHGos9pri5DWCGJIi5H/YEFYmWg
-         rUtjPLu4CFUCQqV4nFM0o0U3szwN8rWMxG7J0g2xcmfs4lycP7F7xGCCzziISVyFXvJW
-         FIt0i+EX3RtN60N6khhLSHK2691EO6qQq16rtRKRxKJEhneT8Z/6VCXfWKUdff4tdKti
-         YMwZbTqXjMJwTLHNcZ7U8rGKqGEMUsSJPPBYZ+ATSWPm8vGNLwU2mjZr0LunLoCwWuPV
-         o7BA==
-X-Gm-Message-State: AOJu0YyJyRXZbDc7ZRpAuRZWFn18cb6XkX3SsW0ps2RJM6EceCA/Hpxo
-	D95mFlHZLZZGgbalSoM1ApJDkGvWqY6KgQ==
-X-Google-Smtp-Source: AGHT+IFoLjbOpmkIEULy5gbxKooTudQDxiArLI8S7wXYkZ1p88cJRrIDvnnjd2TG4kAGIdT+hiYc1A==
-X-Received: by 2002:aa7:c715:0:b0:548:657c:9110 with SMTP id i21-20020aa7c715000000b00548657c9110mr2624490edq.38.1700689458596;
-        Wed, 22 Nov 2023 13:44:18 -0800 (PST)
-Received: from [192.168.50.20] (077222239035.warszawa.vectranet.pl. [77.222.239.35])
-        by smtp.gmail.com with ESMTPSA id b9-20020aa7c6c9000000b005484c7e30d8sm224480eds.1.2023.11.22.13.44.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 13:44:18 -0800 (PST)
-Message-ID: <381e90eb-a744-450b-967d-bc67afb0aa9c@gmail.com>
-Date: Wed, 22 Nov 2023 22:44:16 +0100
+        d=1e100.net; s=20230601; t=1700689497; x=1701294297;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nXiWhRqFrWoSNtAFmkHRO3t9Ruwff9Gl/eAaWgquIiw=;
+        b=pDx4YByGB4p0IvTvnyWq2je5YTzXEgGoRim84THv3OewMNvoHFNa7js5Z2gCCqi0Xx
+         SDkn26wRx3C5U77D4Idg38iSrbI9GlaL3PxJlKzlOzrACbFnC+v/mSt22/hd2DS22dn7
+         BrK00FEXzFmK9w34Pl2t31tAPY6Q5uhKH0q0Xl0wHNzTR8dGaMhX/pC4HkyeyxzctZ0y
+         cAwg5BALBvM/LHaU4yeswOW/WkkaoiF9pjj0IY8EYXiwImiJ8nJijJ8fLKqjxXS7Ssc8
+         GWYsaY9D0zNDskyjeiwCtucbnvqjalSI+8DSRW64LBxfnKpLq4NTShD2vXBxyXjQ9PjI
+         52eA==
+X-Gm-Message-State: AOJu0Yyea96ukQXIkNDzXa/3A9vsHQwtcg5XW+aliCLWS9HojztBTp9y
+	R1xOcL+uUIelqvWcNNICApAxew==
+X-Google-Smtp-Source: AGHT+IHbmV0ARllAULEuHSS994ZoR2ChYITmiV4ts7e154PIRGXVJrabc+eOugs8EXU30EkDHD1E1w==
+X-Received: by 2002:a05:600c:4e0a:b0:40a:4c7d:f300 with SMTP id b10-20020a05600c4e0a00b0040a4c7df300mr204704wmq.6.1700689496992;
+        Wed, 22 Nov 2023 13:44:56 -0800 (PST)
+Received: from localhost ([2a00:79e0:9d:4:309f:a860:c565:1fc7])
+        by smtp.gmail.com with ESMTPSA id k27-20020a5d525b000000b0032ddf2804ccsm375746wrc.83.2023.11.22.13.44.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 13:44:54 -0800 (PST)
+From: Jann Horn <jannh@google.com>
+To: Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: David Howells <dhowells@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] tls: fix NULL deref on tls_sw_splice_eof() with empty record
+Date: Wed, 22 Nov 2023 22:44:47 +0100
+Message-ID: <20231122214447.675768-1-jannh@google.com>
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: possible proble with skb_pull() in smsc75xx_rx_fixup()
-To: Oliver Neukum <oneukum@suse.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- USB list <linux-usb@vger.kernel.org>
-References: <7f704401-8fe8-487f-8d45-397e3a88417f@suse.com>
- <EB9ACA9B-78ED-48C3-99D6-86E886557FBC@gmail.com>
- <73f614e6-796e-415d-9954-8a94105f5e1c@suse.com>
-Content-Language: en-US
-From: Szymon Heidrich <szymon.heidrich@gmail.com>
-In-Reply-To: <73f614e6-796e-415d-9954-8a94105f5e1c@suse.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 20/11/2023 13:35, Oliver Neukum wrote:
-> On 16.11.23 21:09, Szymon Heidrich wrote:
->> Hello Oliver,
->>
->> Could you please give me some hints how this could be practically exploited to cause mischief?
-> 
-> Hi,
-> 
-> it seems to me like you can easily feed stuff that is not
-> part of a packet into the network layer, but you cannot overflow the buffer.
-> In other words, the issue exists, but using it to do harm is hard.
-> 
->     Regards
->         Oliver
-> 
+syzkaller discovered that if tls_sw_splice_eof() is executed as part of
+sendfile() when the plaintext/ciphertext sk_msg are empty, the send path
+gets confused because the empty ciphertext buffer does not have enough
+space for the encryption overhead. This causes tls_push_record() to go on
+the `split = true` path (which is only supposed to be used when interacting
+with an attached BPF program), and then get further confused and hit the
+tls_merge_open_record() path, which then assumes that there must be at
+least one populated buffer element, leading to a NULL deref.
 
-Hello Olivier,
+It is possible to have empty plaintext/ciphertext buffers if we previously
+bailed from tls_sw_sendmsg_locked() via the tls_trim_both_msgs() path.
+tls_sw_push_pending_record() already handles this case correctly; let's do
+the same check in tls_sw_splice_eof().
 
-Perhaps I'm missing something but as far as I can tell I can't do here anything special compared
-to crafting the packet itself. Please let me know in case I'm wrong.
+Fixes: df720d288dbb ("tls/sw: Use splice_eof() to flush")
+Cc: stable@vger.kernel.org
+Reported-by: syzbot+40d43509a099ea756317@syzkaller.appspotmail.com
+Signed-off-by: Jann Horn <jannh@google.com>
+---
+Note: syzkaller did not find a reliable reproducer for this; I wrote
+my own reproducer that reliably hits the crash on an unpatched kernel,
+and I've verified that the crash goes away with the patch applied.
 
-Best regards,
-Szymon
+ net/tls/tls_sw.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index a78e8e722409..316f76187962 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1232,11 +1232,14 @@ void tls_sw_splice_eof(struct socket *sock)
+ 	lock_sock(sk);
+ 
+ retry:
++	/* same checks as in tls_sw_push_pending_record() */
+ 	rec = ctx->open_rec;
+ 	if (!rec)
+ 		goto unlock;
+ 
+ 	msg_pl = &rec->msg_plaintext;
++	if (msg_pl->sg.size == 0)
++		goto unlock;
+ 
+ 	/* Check the BPF advisor and perform transmission. */
+ 	ret = bpf_exec_tx_verdict(msg_pl, sk, false, TLS_RECORD_TYPE_DATA,
+
+base-commit: 98b1cc82c4affc16f5598d4fa14b1858671b2263
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
+
 
