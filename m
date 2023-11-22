@@ -1,238 +1,152 @@
-Return-Path: <netdev+bounces-50217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03407F4F1A
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:15:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657E77F4F21
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:17:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 669F0B20CD8
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:15:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 845061C2099D
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760E04F5E9;
-	Wed, 22 Nov 2023 18:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636A84F5EE;
+	Wed, 22 Nov 2023 18:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBDRAYtS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQmEifow"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449BAA4;
-	Wed, 22 Nov 2023 10:15:12 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32d9effe314so5025482f8f.3;
-        Wed, 22 Nov 2023 10:15:12 -0800 (PST)
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD2DB2;
+	Wed, 22 Nov 2023 10:17:10 -0800 (PST)
+Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6cd0963c61cso57871a34.0;
+        Wed, 22 Nov 2023 10:17:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700676910; x=1701281710; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVSrNzLgRvQ4gfVAo/d/ONIYYWbL33zy5cmCQPLiW2M=;
-        b=GBDRAYtSFhR+bsEVzlsLt7J4swhqOU/ikIMR/FRLbm3J+j8aqrlBdQyEn6yr/tb+eb
-         PRxcHEv4/9eSt/xHSxPmBlBlmF7sFfdQtTm24q5DRf/zXM8b5OBnvc+lCu3LlNJ0WpiP
-         dRa+1MUjobKPqm0FnTcIqjGUfFi6r5j96LAy7Ar0PcFeUK6Zqbr+8pTAyITSqoK/BJOb
-         4hx+6wyXE+fhbyPi4lFogGPu/Y1lncj+OqmCaRnWRX4JusaNwJeM+ey0+cL7CI7PJRUF
-         re/jsDR5x/AYFvAdVaChlmjnZTdQPqV9RMuFuWwDCOAv/uVAu91jS3TLIN8BRmjNDHqm
-         YkzQ==
+        d=gmail.com; s=20230601; t=1700677029; x=1701281829; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SN/KMQ2vvLENAwtg5lCFJ/mKximo2fIUOtSV5k1GHOg=;
+        b=MQmEifowAVL8uqYrWrcgZ2Fi/Px9PmqK+aO8wnmAORa2AVQtexhmE2EO3WIkRWz8u+
+         yzlB7g4aI5+lzdhPc6oFFFq7o5vARLuu/4Y1bJpjphtNIHW1ENUPKI3UqHGXD0AhmRzV
+         oE3qE4S4/RzrNygajxNCvZbsj9O8OqCMa5odWzto04CWAFQBGxDH3L3jyoO8qFC7lr2E
+         FNxxa/Zv38u1Mi2vddEGOn6bxJH0aLonGPV1f1+semOHRHSgCp9Gvc1eiLw7yl0BtlWm
+         FFKAkLQTeMEPUIWNIYZXKC2DMzDJX84Zq3AZQAvnx0sYxzdn685leC2bUO/6oMkvq/HA
+         sMbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700676910; x=1701281710;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NVSrNzLgRvQ4gfVAo/d/ONIYYWbL33zy5cmCQPLiW2M=;
-        b=AeCnw8BOHzll8Pg8O0mmyKL5JalGbOW4Z+0SMWdBtU4dS8SX9Zo5jxa1Q9mwb0Fcex
-         Fo3wSE8CQK8ca7zfDrQAtOVBvABo5cY298DRwxnbXYoopCd0quVwIo7RBnjVjTQLrwJH
-         32W1Gadx1OkybgCg9hjwW4+tLKUbV/2dJCp8Vmi4ZgnEDqSFL99xMjacujB9oJxYU7mK
-         kdlCoJmCsyFmO1yzJhVHaBKDMzb4kUxW/aIlPvugpVIbXt+S2lQikFOuDjXogn8UvVcg
-         j6wrFsbLiLQOdwZ/D3VHGwCJO78+epv+HF++keFO6ZVm3HfSOZ633CRc/4CwUBvmNvj9
-         J09Q==
-X-Gm-Message-State: AOJu0Ywq14Co4C2+b9AmHHAExc6oU0Bu/UUXvX4dHn3qaR693HfIsAbD
-	6oB5e8fT7CG0f0R/5lMRs5E=
-X-Google-Smtp-Source: AGHT+IE6ao4vkwq952ctFLHc3qQmln2Fu/+DhwMBUg5bDQNU//QHvdiFV9OG3a65EXYc10npzM6zbA==
-X-Received: by 2002:adf:e550:0:b0:331:3b59:3edb with SMTP id z16-20020adfe550000000b003313b593edbmr2507151wrm.42.1700676910297;
-        Wed, 22 Nov 2023 10:15:10 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id u7-20020a5d5147000000b003316debbde4sm24378wrt.48.2023.11.22.10.15.08
+        d=1e100.net; s=20230601; t=1700677029; x=1701281829;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SN/KMQ2vvLENAwtg5lCFJ/mKximo2fIUOtSV5k1GHOg=;
+        b=U61e5cM5M8qllKQcRwewbbX+65sP7iBkuy0FgLUuk+hWxU5Ua30RBfljUOCVtjwUg7
+         J2fgmXKNZhXDbYfqI/S/41SVxoBtVjJ7dQ1Rr+abCCTCDR2ohUqgmhcBUExjloq1nHtM
+         0aoY1hSZh9w0LvIgm3CiGff5Yf9ompxGhNhaHsq8OxcnfphcijouIktwhwrkDZ5H0h8q
+         NTZErKTnSYK/hSHfUL2GdVwrJJxp3y9tvvUlFmk59wHvQYZEGLZSXD/TPjvoU0QW+2kQ
+         V9y5GWHQWV28rfyHM4eWEJAjC2+Z7MlnsD6O5h9nzMpXSwdvD1oAPh7YmZ5D6pdJ7oLs
+         V0JQ==
+X-Gm-Message-State: AOJu0Ywz6TINR1p+6FOwBvB72/3jdw87WAzGIve8KKk48Wi/QaWiiT0P
+	M6hIbrhfd27EMqltbeNg3i4=
+X-Google-Smtp-Source: AGHT+IF8zmQTzVazpP6jAoIXPI8DnQUqH6w+O5LIhEUZ4HGR/tZ7jrbHgzQ38SbON6pOINgCjFUFWg==
+X-Received: by 2002:a05:6830:1057:b0:6d7:f639:27e5 with SMTP id b23-20020a056830105700b006d7f63927e5mr580282otp.25.1700677029502;
+        Wed, 22 Nov 2023 10:17:09 -0800 (PST)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id ez18-20020ad45912000000b00678013cc898sm4141354qvb.36.2023.11.22.10.17.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 10:15:09 -0800 (PST)
-Message-ID: <655e452d.5d0a0220.61c31.01ae@mx.google.com>
-X-Google-Original-Message-ID: <ZV5FKswuT+PAXpWB@Ansuel-xps.>
-Date: Wed, 22 Nov 2023 19:15:06 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 04/14] net: phy: add initial support for PHY
- package in DT
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-5-ansuelsmth@gmail.com>
- <20231122105243.GB28959@kernel.org>
+        Wed, 22 Nov 2023 10:17:09 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailauth.nyi.internal (Postfix) with ESMTP id C299827C0054;
+	Wed, 22 Nov 2023 13:17:08 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Wed, 22 Nov 2023 13:17:08 -0500
+X-ME-Sender: <xms:pEVeZbfbxheYpgft4ojzpfgrT2X8-7aLDFqOma1zAza3UXutIgovpg>
+    <xme:pEVeZRMTvE8zqgZ5X0l5UQjY37gTzccZLoAIrFsNqIAR0ey2Uoc-aDDDUwM7QTPpq
+    R3M4zfvFjGBHOXnAg>
+X-ME-Received: <xmr:pEVeZUiJG_Pn1Oo7Iq2y295bOCrUrpYkFlTtvGGdaC8X8LeI191uWqPL2yA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehuddguddtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepueho
+    qhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtf
+    frrghtthgvrhhnpeeiheefkefgvdefteejjedukefhieevleeffeevheehfeffhfekhfet
+    veffvefhgfenucffohhmrghinheprhhushhtqdhlrghnghdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhht
+    phgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqd
+    gsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvg
+X-ME-Proxy: <xmx:pEVeZc-PU4PlP_rBJnv0rO-Xf2qML1-loNeDnAt1X1oO81NblTvkRg>
+    <xmx:pEVeZXv5307KS04xkG763zctq_6HRfqy-34YJL-NovAsx9Nby_Xw-Q>
+    <xmx:pEVeZbFXzPc0TjdINSe2yzfLwEUVwzfzwgONXf2DE9wVbN_wrAYbWg>
+    <xmx:pEVeZVJCOOZj0p-NAUgD775DcwKfwg3TlcQkEHi0Q40C9KZZCFdC_wkxZ9I>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 22 Nov 2023 13:17:08 -0500 (EST)
+Date: Wed, 22 Nov 2023 10:16:44 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: tmgross@umich.edu, andrew@lunn.ch, gregkh@linuxfoundation.org,
+	aliceryhl@google.com, benno.lossin@proton.me,
+	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <ZV5FjEM1EWm6iTAm@boqun-archlinux>
+References: <e7d0226a-9a38-4ce9-a9b5-7bb80a19bff6@lunn.ch>
+ <ZVjePqyic7pvcb24@Boquns-Mac-mini.home>
+ <CALNs47tt94DBPvz47rssBTZ86jbHwaa7XaNnT3UbdxwY6nLg1g@mail.gmail.com>
+ <20231121.111306.119472527722905184.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231122105243.GB28959@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231121.111306.119472527722905184.fujita.tomonori@gmail.com>
 
-On Wed, Nov 22, 2023 at 10:52:43AM +0000, Simon Horman wrote:
-> On Mon, Nov 20, 2023 at 02:50:31PM +0100, Christian Marangi wrote:
-> > Add initial support for PHY package in DT.
-> > 
-> > Make it easier to define PHY package and describe the global PHY
-> > directly in DT by refereincing them by phandles instead of custom
-> > functions in each PHY driver.
-> > 
-> > Each PHY in a package needs to be defined in a dedicated node in the
-> > mdio node. This dedicated node needs to have the compatible set to
-> > "ethernet-phy-package" and define "global-phys" and "#global-phy-cells"
-> > respectively to a list of phandle to the global phy to define for the
-> > PHY package and 0 for cells as the phandle won't take any args.
-> > 
-> > With this defined, the generic PHY probe will join each PHY in this
-> > dedicated node to the package.
-> > 
-> > PHY driver MUST set the required global PHY count in
-> > .phy_package_global_phy_num to correctly verify that DT define the
-> > correct number of phandle to the required global PHY.
-> > 
-> > mdio_bus.c and of_mdio.c is updated to now support and parse also
-> > PHY package subnote that have the compatible "phy-package".
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+On Tue, Nov 21, 2023 at 11:13:06AM +0900, FUJITA Tomonori wrote:
+[...]
 > 
-> Hi Christian,
+> I'm not sure we discussed but making DriverVTable Sync works.
 > 
-> I was a little hasty in hitting send on my previous message.
-> Please find some more minor feedback from my side below.
->
+> #[repr(transparent)]
+> pub struct DriverVTable(Opaque<bindings::phy_driver>);
+> 
+> // SAFETY: DriverVTable has no &self methods, so immutable references to it are useless.
 
-Thanks a lot for the initial review and sorry for the various warning
-you had to write about it. I know this was a new concept and that I had
-to discuss a lot about the DT structure so I was a bit relaxed in
-releasing OF node. Will handle all of them in v2. Again thanks! 
+Minor nitpicking, I would add one more sentense in the safety comment:
 
-> ...
-> 
-> > diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-> > index 64ebcb6d235c..bb910651118f 100644
-> > --- a/drivers/net/mdio/of_mdio.c
-> > +++ b/drivers/net/mdio/of_mdio.c
-> > @@ -139,6 +139,44 @@ bool of_mdiobus_child_is_phy(struct device_node *child)
-> >  }
-> >  EXPORT_SYMBOL(of_mdiobus_child_is_phy);
-> >  
-> > +static int __of_mdiobus_parse_phys(struct mii_bus *mdio, struct device_node *np,
-> > +				   bool *scanphys)
-> > +{
-> > +	struct device_node *child;
-> > +	int addr, rc;
-> > +
-> > +	/* Loop over the child nodes and register a phy_device for each phy */
-> > +	for_each_available_child_of_node(np, child) {
-> > +		if (of_device_is_compatible(child, "ethernet-phy-package")) {
-> > +			rc = __of_mdiobus_parse_phys(mdio, child, scanphys);
-> > +			if (rc && rc != -ENODEV)
-> > +				return rc;
-> 
-> for_each_available_child_of_node() makes calls to of_node_get() and
-> of_node_put(), so when jumping out of a loop it is necessary to call
-> of_node_put(), in this case of_node_put(child).
-> 
-> As flagged by Coccinelle.
-> 
-> Also flagged in of_mdiobus_find_phy() both before and after this patch.
-> 
-> > +
-> > +			continue;
-> > +		}
-> > +
-> > +		addr = of_mdio_parse_addr(&mdio->dev, child);
-> > +		if (addr < 0) {
-> > +			*scanphys = true;
-> > +			continue;
-> > +		}
-> > +
-> > +		if (of_mdiobus_child_is_phy(child))
-> > +			rc = of_mdiobus_register_phy(mdio, child, addr);
-> > +		else
-> > +			rc = of_mdiobus_register_device(mdio, child, addr);
-> > +
-> > +		if (rc == -ENODEV)
-> > +			dev_err(&mdio->dev,
-> > +				"MDIO device at address %d is missing.\n",
-> > +				addr);
-> > +		else if (rc)
-> > +			return rc;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  /**
-> >   * __of_mdiobus_register - Register mii_bus and create PHYs from the device tree
-> >   * @mdio: pointer to mii_bus structure
-> > @@ -180,25 +218,9 @@ int __of_mdiobus_register(struct mii_bus *mdio, struct device_node *np,
-> >  		return rc;
-> >  
-> >  	/* Loop over the child nodes and register a phy_device for each phy */
-> > -	for_each_available_child_of_node(np, child) {
-> > -		addr = of_mdio_parse_addr(&mdio->dev, child);
-> > -		if (addr < 0) {
-> > -			scanphys = true;
-> > -			continue;
-> > -		}
-> > -
-> > -		if (of_mdiobus_child_is_phy(child))
-> > -			rc = of_mdiobus_register_phy(mdio, child, addr);
-> > -		else
-> > -			rc = of_mdiobus_register_device(mdio, child, addr);
-> > -
-> > -		if (rc == -ENODEV)
-> > -			dev_err(&mdio->dev,
-> > -				"MDIO device at address %d is missing.\n",
-> > -				addr);
-> > -		else if (rc)
-> > -			goto unregister;
-> > -	}
-> > +	rc = __of_mdiobus_parse_phys(mdio, np, &scanphys);
-> > +	if (rc)
-> > +		goto unregister;
-> 
-> Jumping to unregister will call of_node_put(child),
-> however child appears to be uninitialised here.
-> 
-> Flagged by clang-16 W=1 build, and Smatch.
-> 
-> >  
-> >  	if (!scanphys)
-> >  		return 0;
-> 
-> ...
+	therefore it's safe to share immutable references between
+	threads.
 
--- 
-	Ansuel
+or 
+	therefore it's safe to share immutable references between
+	execution contexts.
+
+once we decide the term here ;-)
+
+The reason is to match Sync definition [1]:
+
+"""
+Types for which it is safe to share references between threads.
+
+This trait is automatically implemented when the compiler determines
+it’s appropriate.
+
+The precise definition is: a type T is Sync if and only if &T is Send.
+In other words, if there is no possibility of undefined behavior
+(including data races) when passing &T references between threads.
+"""
+
+[1]: https://doc.rust-lang.org/std/marker/trait.Sync.html
+
+Regards,
+Boqun
+
+> unsafe impl Sync for DriverVTable {}
+> 
+> 
+> looks correct?
+> 
 
