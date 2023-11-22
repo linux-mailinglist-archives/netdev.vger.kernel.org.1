@@ -1,87 +1,239 @@
-Return-Path: <netdev+bounces-50209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21737F4ED1
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:57:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B45527F4EE2
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A7481F2061F
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:57:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38269281359
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB34358AA9;
-	Wed, 22 Nov 2023 17:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGLMYMn7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46F758AAD;
+	Wed, 22 Nov 2023 18:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF8958AA2
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 17:57:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB851C433C8;
-	Wed, 22 Nov 2023 17:57:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700675874;
-	bh=N1yvqjTwVGaaVMR1e7EUwk/lhWb6MkdS/EbV1N84XtE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uGLMYMn7YA3Q9/O4UlrJduktZgez4OKx7PMbF1WzWhxIN1dZLuc7XzPw6Q9unGDiC
-	 2usUUX48PzH0H8p6GFFat6JWflfY1x7wmJoJRFVg8cyniSkVscyVMpqB5um7Yr2+9I
-	 Ef+aYKII5aqfvFRrlOae+F6kBLBuNHJwkrcTBsixbBYCCrqSF2s4xOyzCERjBJnZaK
-	 MUwBBbBTGL+nAQj479K2/hOi0RJv0WZnLDj9tlqhtEaEmIqCtYgVwSvwUvAXZH3Sdf
-	 3VA39V1eoM0Zh1jegsryMer+N1Wsguc18N5MCQiYwxO5HVMlKqcqcHuqYZDWAoTm95
-	 G/ImhQxBFmqdw==
-Date: Wed, 22 Nov 2023 17:57:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: bjorn@mork.no, andrew@lunn.ch, netdev@vger.kernel.org
-Subject: Re: [RFCv2] usbnet: assign unique random MAC
-Message-ID: <20231122175750.GA6731@kernel.org>
-References: <20231120114438.12790-1-oneukum@suse.com>
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354001B3;
+	Wed, 22 Nov 2023 10:01:53 -0800 (PST)
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-357ccaf982eso142485ab.0;
+        Wed, 22 Nov 2023 10:01:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700676112; x=1701280912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=If8d0YtZJS0mQrEYNoRxWpqFNsU6KzCVMh6IszFfggc=;
+        b=Yhfd1+HoF7cNyR9ezXQhgeBCA+4CDwxOfpWtpyPtc8rNIh1xn8UWhrPd4rzaOSuPyo
+         xWuY9/i3eHB8YMSoBRJXPJTgSKPHn23+UcVy15l8ar5hO8JGPGlSM3+Nlyoy9iHS4ius
+         NnNbtwBD4IJal8UeWMvJXuzdcrx93c0xQKLwWur0cA0kdVyDRs34zoNuK2zUXEQjyRZg
+         i+FH1unuBDtVVN3kvO5PFp4cK1S0Norxxnq77jubWVmXKpdzDQhSBm1tYig4caADN+kZ
+         FlHapmdKS9Rdtk7HPvpGWlDNQfcHaNeidmYWkmCJfLrK7r0MZxSBSMuSuNJShy7Iggkd
+         0wsQ==
+X-Gm-Message-State: AOJu0Yw7ZcAgNJN1grjpaCHpWzPYjbFIgENzKeoz47q6M1Bf6AfhF6Lc
+	mU3sBETxFV2ApVliKBylEw==
+X-Google-Smtp-Source: AGHT+IF1dkbNJetLgO0LDH6ZmMlsbwQjH0FPKo8tVU1ObnCUsCKI/ybOACitXlO0Xw/jZM71V94chA==
+X-Received: by 2002:a05:6e02:20c7:b0:35a:d0b3:427a with SMTP id 7-20020a056e0220c700b0035ad0b3427amr3956494ilq.1.1700676112384;
+        Wed, 22 Nov 2023 10:01:52 -0800 (PST)
+Received: from herring.priv ([64.188.179.252])
+        by smtp.gmail.com with ESMTPSA id v19-20020a056638359300b004665c29605fsm1766820jal.139.2023.11.22.10.01.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Nov 2023 10:01:51 -0800 (PST)
+Received: (nullmailer pid 1433277 invoked by uid 1000);
+	Wed, 22 Nov 2023 18:01:49 -0000
+From: Rob Herring <robh@kernel.org>
+To: Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Michal Simek <michal.simek@amd.com>
+Cc: Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v2] net: can: Use device_get_match_data()
+Date: Wed, 22 Nov 2023 11:01:39 -0700
+Message-ID: <20231122180140.1432025-1-robh@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120114438.12790-1-oneukum@suse.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 20, 2023 at 12:44:27PM +0100, Oliver Neukum wrote:
-> The old method had the bug of issuing the same
-> random MAC over and over even to every device.
-> This bug is as old as the driver.
-> 
-> This new method generates each device whose minidriver
-> does not provide its own MAC its own unique random
-> MAC.
-> 
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Use preferred device_get_match_data() instead of of_match_device() to
+get the driver match data. With this, adjust the includes to explicitly
+include the correct headers.
 
-Thanks Oliver,
+Error checking for matching and match data was not necessary as matching
+is always successful if we're already in probe and the match tables always
+have data pointers.
 
-I agree with the approach taken here - using a random address as a fallback
-if the driver (hw) doesn't provide one. The patch looks clean to me.
-And, form my reading, addresses feedback provided on earlier versions.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+v2:
+  - Drop calling "platform_get_device_id(pdev)->driver_data" in c_can
+    and flexcan as device_get_match_data() already did that. The logic
+    was also wrong and would have resulted in returning -ENODEV.
+  - Drop initializing devtype in xilinx_can
+---
+ drivers/net/can/c_can/c_can_platform.c | 13 ++-----------
+ drivers/net/can/flexcan/flexcan-core.c | 12 ++----------
+ drivers/net/can/mscan/mpc5xxx_can.c    |  8 ++++----
+ drivers/net/can/xilinx_can.c           |  9 +++------
+ 4 files changed, 11 insertions(+), 31 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/drivers/net/can/c_can/c_can_platform.c b/drivers/net/can/c_can/c_can_platform.c
+index f44ba2600415..e2ec69aa46e5 100644
+--- a/drivers/net/can/c_can/c_can_platform.c
++++ b/drivers/net/can/c_can/c_can_platform.c
+@@ -30,9 +30,9 @@
+ #include <linux/io.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/clk.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/regmap.h>
+ 
+@@ -259,22 +259,13 @@ static int c_can_plat_probe(struct platform_device *pdev)
+ 	void __iomem *addr;
+ 	struct net_device *dev;
+ 	struct c_can_priv *priv;
+-	const struct of_device_id *match;
+ 	struct resource *mem;
+ 	int irq;
+ 	struct clk *clk;
+ 	const struct c_can_driver_data *drvdata;
+ 	struct device_node *np = pdev->dev.of_node;
+ 
+-	match = of_match_device(c_can_of_table, &pdev->dev);
+-	if (match) {
+-		drvdata = match->data;
+-	} else if (pdev->id_entry->driver_data) {
+-		drvdata = (struct c_can_driver_data *)
+-			platform_get_device_id(pdev)->driver_data;
+-	} else {
+-		return -ENODEV;
+-	}
++	drvdata = device_get_match_data(&pdev->dev);
+ 
+ 	/* get the appropriate clk */
+ 	clk = devm_clk_get(&pdev->dev, NULL);
+diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
+index d15f85a40c1e..8ea7f2795551 100644
+--- a/drivers/net/can/flexcan/flexcan-core.c
++++ b/drivers/net/can/flexcan/flexcan-core.c
+@@ -23,11 +23,11 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/platform_device.h>
+ #include <linux/can/platform/flexcan.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/regmap.h>
+ #include <linux/regulator/consumer.h>
+ 
+@@ -2034,7 +2034,6 @@ MODULE_DEVICE_TABLE(platform, flexcan_id_table);
+ 
+ static int flexcan_probe(struct platform_device *pdev)
+ {
+-	const struct of_device_id *of_id;
+ 	const struct flexcan_devtype_data *devtype_data;
+ 	struct net_device *dev;
+ 	struct flexcan_priv *priv;
+@@ -2090,14 +2089,7 @@ static int flexcan_probe(struct platform_device *pdev)
+ 	if (IS_ERR(regs))
+ 		return PTR_ERR(regs);
+ 
+-	of_id = of_match_device(flexcan_of_match, &pdev->dev);
+-	if (of_id)
+-		devtype_data = of_id->data;
+-	else if (platform_get_device_id(pdev)->driver_data)
+-		devtype_data = (struct flexcan_devtype_data *)
+-			platform_get_device_id(pdev)->driver_data;
+-	else
+-		return -ENODEV;
++	devtype_data = device_get_match_data(&pdev->dev);
+ 
+ 	if ((devtype_data->quirks & FLEXCAN_QUIRK_SUPPORT_FD) &&
+ 	    !((devtype_data->quirks &
+diff --git a/drivers/net/can/mscan/mpc5xxx_can.c b/drivers/net/can/mscan/mpc5xxx_can.c
+index 4837df6efa92..5b3d69c3b6b6 100644
+--- a/drivers/net/can/mscan/mpc5xxx_can.c
++++ b/drivers/net/can/mscan/mpc5xxx_can.c
+@@ -12,8 +12,10 @@
+ #include <linux/module.h>
+ #include <linux/interrupt.h>
+ #include <linux/platform_device.h>
++#include <linux/property.h>
+ #include <linux/netdevice.h>
+ #include <linux/can/dev.h>
++#include <linux/of.h>
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+@@ -290,7 +292,7 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
+ 	int irq, mscan_clksrc = 0;
+ 	int err = -ENOMEM;
+ 
+-	data = of_device_get_match_data(&ofdev->dev);
++	data = device_get_match_data(&ofdev->dev);
+ 	if (!data)
+ 		return -EINVAL;
+ 
+@@ -351,13 +353,11 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
+ 
+ static void mpc5xxx_can_remove(struct platform_device *ofdev)
+ {
+-	const struct of_device_id *match;
+ 	const struct mpc5xxx_can_data *data;
+ 	struct net_device *dev = platform_get_drvdata(ofdev);
+ 	struct mscan_priv *priv = netdev_priv(dev);
+ 
+-	match = of_match_device(mpc5xxx_can_table, &ofdev->dev);
+-	data = match ? match->data : NULL;
++	data = device_get_match_data(&ofdev->dev);
+ 
+ 	unregister_mscandev(dev);
+ 	if (data && data->put_clock)
+diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
+index abe58f103043..3722eaa84234 100644
+--- a/drivers/net/can/xilinx_can.c
++++ b/drivers/net/can/xilinx_can.c
+@@ -20,8 +20,8 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
++#include <linux/property.h>
+ #include <linux/skbuff.h>
+ #include <linux/spinlock.h>
+ #include <linux/string.h>
+@@ -1726,8 +1726,7 @@ static int xcan_probe(struct platform_device *pdev)
+ 	struct net_device *ndev;
+ 	struct xcan_priv *priv;
+ 	struct phy *transceiver;
+-	const struct of_device_id *of_id;
+-	const struct xcan_devtype_data *devtype = &xcan_axi_data;
++	const struct xcan_devtype_data *devtype;
+ 	void __iomem *addr;
+ 	int ret;
+ 	int rx_max, tx_max;
+@@ -1741,9 +1740,7 @@ static int xcan_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
+-	of_id = of_match_device(xcan_of_match, &pdev->dev);
+-	if (of_id && of_id->data)
+-		devtype = of_id->data;
++	devtype = device_get_match_data(&pdev->dev);
+ 
+ 	hw_tx_max_property = devtype->flags & XCAN_FLAG_TX_MAILBOXES ?
+ 			     "tx-mailbox-count" : "tx-fifo-depth";
+-- 
+2.42.0
 
-When you repost as a non RFC please consider if this is a fix,
-in which case it should have an appropriate Fixes tag. Or
-as an enhancement (I lean towards this), in which case it should
-be targeted at net-next.
-
-The target tree should be included in the Subject, e.g.
-
-	Subject: [PATCH net-next] usbnet: assign unique random MAC
-
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
-Also, please expand the CC list as per the output of:
-
-get_maintainer.pl  <this.patch>
-
-...
 
