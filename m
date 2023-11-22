@@ -1,46 +1,47 @@
-Return-Path: <netdev+bounces-49990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807427F435E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:16:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1BB7F4362
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:16:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FFE91C208BA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:16:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83B76B20E46
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E45222083;
-	Wed, 22 Nov 2023 10:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D3B3E463;
+	Wed, 22 Nov 2023 10:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BvdVQYpL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmniymKV"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B516A83
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:15:51 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC45100
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:15:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700648150;
+	s=mimecast20190719; t=1700648156;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=zZArOzXHsetthpTt+RhsHuPDCYk009th/dGKHGi0hKo=;
-	b=BvdVQYpLVzZQjzxJIdEUReTgUGgAE3lxxAt3fQvvtaQrOAGUflbUELDXmr8WWU8Fj0zgQH
-	U3G24YR0PhI+uCaBsRJgWvomVap3oHDN/JT9ThbIV1HJ6kw0P45Llp/PsddeRGzVRKw8it
-	B9nOLyf1zQRQc25SGnbdYyhlXrgYIrg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-663-073jtuxGMvqz5LVNWHK_Lw-1; Wed,
- 22 Nov 2023 05:15:49 -0500
-X-MC-Unique: 073jtuxGMvqz5LVNWHK_Lw-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ntIwoh8nmo6x8jvo27voHZh3WCaqdVm0ct3IIneIzKs=;
+	b=QmniymKVXrHHHUgAsQyT4uqnHXfMOa4GgHWjeKaUq8zubUFC3zr7MeLRnnVNTsRw0IElfp
+	WqrSic+Ar+WF1gct982PDdGZEoimG3H01dGFSGFl1W6gmFciXHSHzC/WEC2BKWEZZub0O9
+	j+vcsnJ24bMOOz+6Nq4ek7L1yzsC/x4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-189-j5C4KuyhMn6RYTjlXQrnvg-1; Wed, 22 Nov 2023 05:15:51 -0500
+X-MC-Unique: j5C4KuyhMn6RYTjlXQrnvg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C9BBF280C28A;
-	Wed, 22 Nov 2023 10:15:48 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB7B1101A550;
+	Wed, 22 Nov 2023 10:15:50 +0000 (UTC)
 Received: from p1.luc.cera.cz (unknown [10.45.226.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7F54010E46;
-	Wed, 22 Nov 2023 10:15:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0BCCB10EA1;
+	Wed, 22 Nov 2023 10:15:48 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
@@ -55,9 +56,11 @@ Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	mschmidt@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH iwl-next v4 0/5] i40e: Simplify VSI and VEB handling
-Date: Wed, 22 Nov 2023 11:15:40 +0100
-Message-ID: <20231122101545.28819-1-ivecera@redhat.com>
+Subject: [PATCH v4 1/5] i40e: Use existing helper to find flow director VSI
+Date: Wed, 22 Nov 2023 11:15:41 +0100
+Message-ID: <20231122101545.28819-2-ivecera@redhat.com>
+In-Reply-To: <20231122101545.28819-1-ivecera@redhat.com>
+References: <20231122101545.28819-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,38 +70,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-The series simplifies handling of VSIs and VEBs by introducing for-each
-iterating macros, 'find' helper functions. Also removes the VEB
-recursion because the VEBs cannot have sub-VEBs according datasheet and
-fixes the support for floating VEBs.
+Use existing i40e_find_vsi_by_type() to find a VSI
+associated with flow director.
 
-The series content:
-Patch 1 - Uses existing helper function for find FDIR VSI instead of loop
-Patch 2 - Adds and uses macros to iterate VSI and VEB arrays
-Patch 3 - Adds 2 helper functions to find VSIs and VEBs by their SEID
-Patch 4 - Fixes broken support for floating VEBs
-Patch 5 - Removes VEB recursion and simplifies VEB handling
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-Changelog:
-v1->v2 - small correction in patch 4 description
-       - changed helper names in patch 3
-v2->v3 - correct patch files (v2 was broken)
-v3->v4 - added kdoc stuff
-       - fixed wrong check in i40e_ndo_bridge_getlink()
-
-Ivan Vecera (5):
-  i40e: Use existing helper to find flow director VSI
-  i40e: Introduce and use macros for iterating VSIs and VEBs
-  i40e: Add helpers to find VSI and VEB by SEID and use them
-  i40e: Fix broken support for floating VEBs
-  i40e: Remove VEB recursion
-
- drivers/net/ethernet/intel/i40e/i40e.h        |  93 ++-
- drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  10 +-
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |  97 ++-
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 563 ++++++++----------
- 4 files changed, 373 insertions(+), 390 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 51ee870ffa36..90966878333c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -15645,6 +15645,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ #ifdef CONFIG_I40E_DCB
+ 	enum i40e_get_fw_lldp_status_resp lldp_status;
+ #endif /* CONFIG_I40E_DCB */
++	struct i40e_vsi *vsi;
+ 	struct i40e_pf *pf;
+ 	struct i40e_hw *hw;
+ 	u16 wol_nvm_bits;
+@@ -15655,7 +15656,6 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ #endif /* CONFIG_I40E_DCB */
+ 	int err;
+ 	u32 val;
+-	u32 i;
+ 
+ 	err = pci_enable_device_mem(pdev);
+ 	if (err)
+@@ -16005,12 +16005,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	INIT_LIST_HEAD(&pf->vsi[pf->lan_vsi]->ch_list);
+ 
+ 	/* if FDIR VSI was set up, start it now */
+-	for (i = 0; i < pf->num_alloc_vsi; i++) {
+-		if (pf->vsi[i] && pf->vsi[i]->type == I40E_VSI_FDIR) {
+-			i40e_vsi_open(pf->vsi[i]);
+-			break;
+-		}
+-	}
++	vsi = i40e_find_vsi_by_type(pf, I40E_VSI_FDIR);
++	if (vsi)
++		i40e_vsi_open(vsi);
+ 
+ 	/* The driver only wants link up/down and module qualification
+ 	 * reports from firmware.  Note the negative logic.
 -- 
 2.41.0
 
