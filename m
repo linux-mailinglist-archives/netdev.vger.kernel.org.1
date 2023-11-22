@@ -1,113 +1,167 @@
-Return-Path: <netdev+bounces-50112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C607F4A47
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:31:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD7F7F4A56
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E38128124E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91001C20AF4
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFB55646A;
-	Wed, 22 Nov 2023 15:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3F458114;
+	Wed, 22 Nov 2023 15:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jaGL0fCX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZDEWehT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 382CE10E
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:31:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=M0s/UfKnGwvZebudgpO9NZspbWxD1Gk1Ise+RtEkfdA=; b=jaGL0fCXUcGGQYBRRZSFzY18IW
-	uKIJib81uEauL7FUNIh4b8NiwDF4Rac1+OHjjVpx02lhl6vFjY9kLCLPBJycYJWBRDFxfxJfRBJ+D
-	Dc6dPw6VyorGaDBH75iuuUWecnY9aJFtqIC+OXGr+NwIcwTxRLoRml5vcPDFkq01/8O3groZf+PTq
-	m5Uq7pT0XfwwQoG3qw70xLfUebQLoYCH5UkroOUzPL0Hrn9bf+0CgNNCKSdAC6T+gRnAQanA0gnZn
-	iwfNSPqD8HMJ48EQkzMynF2F+dQ5Aol77kid2c1ukMMZgO9+4dIphPm1+oR0D1t9nXmr/cKLBKFsN
-	+hMXYwWQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44082 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r5pCO-0000L7-1D;
-	Wed, 22 Nov 2023 15:31:32 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r5pCQ-00DAHD-BJ; Wed, 22 Nov 2023 15:31:34 +0000
-In-Reply-To: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
-References: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH RFC net-next 04/10] net: phy: bcm84881: fill in
- possible_interfaces
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8AD55773
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 15:32:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE59C433C8;
+	Wed, 22 Nov 2023 15:32:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700667153;
+	bh=jXdwi0sWQem1NtJoxzR0tcraYd/cc+yeZdTfSEKpRt8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PZDEWehTYpMgZQdPIoPK+9BdpHjmbnn3+wHwRbAPHcS1MTYEpsowPafStd4AtLECb
+	 7V/V7yYpbvldCqP5kcSo/9er+9mXO1a7cmzHh3J5w9vDV0eNPXU75jwHTnjUP8ejwZ
+	 Wl6bbhRLYflE1rJHO7OjqTA1zTutQUo/xLvSgWOSChXDg1dOzSF/Qwilq2G6Acn14J
+	 eAvVUDDedT6lXHVDZeIxe4s8vWhXhHEJsPTUVwd6y9Lk2hrdF5d4mMoW3mpb+83IwO
+	 uLg8eiuZCxIm4m+KO8Lb+l6taLYB8RuGAEeXjr36aCWdZPFbJakM4mHsMGcZ5E0orw
+	 cPvIm/2eSigcA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Sasha Levin <sashal@kernel.org>,
+	fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	justinstitt@google.com,
+	kuniyu@amazon.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 06/17] netfilter: ipset: fix race condition between swap/destroy and kernel side add/del/test
+Date: Wed, 22 Nov 2023 10:31:35 -0500
+Message-ID: <20231122153212.852040-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231122153212.852040-1-sashal@kernel.org>
+References: <20231122153212.852040-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.2
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r5pCQ-00DAHD-BJ@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 22 Nov 2023 15:31:34 +0000
 
-Fill in the possible_interfaces member. This PHY driver only supports
-a single configuration found on SFPs.
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+[ Upstream commit 28628fa952fefc7f2072ce6e8016968cc452b1ba ]
+
+Linkui Xiao reported that there's a race condition when ipset swap and destroy is
+called, which can lead to crash in add/del/test element operations. Swap then
+destroy are usual operations to replace a set with another one in a production
+system. The issue can in some cases be reproduced with the script:
+
+ipset create hash_ip1 hash:net family inet hashsize 1024 maxelem 1048576
+ipset add hash_ip1 172.20.0.0/16
+ipset add hash_ip1 192.168.0.0/16
+iptables -A INPUT -m set --match-set hash_ip1 src -j ACCEPT
+while [ 1 ]
+do
+	# ... Ongoing traffic...
+        ipset create hash_ip2 hash:net family inet hashsize 1024 maxelem 1048576
+        ipset add hash_ip2 172.20.0.0/16
+        ipset swap hash_ip1 hash_ip2
+        ipset destroy hash_ip2
+        sleep 0.05
+done
+
+In the race case the possible order of the operations are
+
+	CPU0			CPU1
+	ip_set_test
+				ipset swap hash_ip1 hash_ip2
+				ipset destroy hash_ip2
+	hash_net_kadt
+
+Swap replaces hash_ip1 with hash_ip2 and then destroy removes hash_ip2 which
+is the original hash_ip1. ip_set_test was called on hash_ip1 and because destroy
+removed it, hash_net_kadt crashes.
+
+The fix is to force ip_set_swap() to wait for all readers to finish accessing the
+old set pointers by calling synchronize_rcu().
+
+The first version of the patch was written by Linkui Xiao <xiaolinkui@kylinos.cn>.
+
+v2: synchronize_rcu() is moved into ip_set_swap() in order not to burden
+    ip_set_destroy() unnecessarily when all sets are destroyed.
+v3: Florian Westphal pointed out that all netfilter hooks run with rcu_read_lock() held
+    and em_ipset.c wraps the entire ip_set_test() in rcu read lock/unlock pair.
+    So there's no need to extend the rcu read locked area in ipset itself.
+
+Closes: https://lore.kernel.org/all/69e7963b-e7f8-3ad0-210-7b86eebf7f78@netfilter.org/
+Reported by: Linkui Xiao <xiaolinkui@kylinos.cn>
+Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/bcm84881.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/netfilter/ipset/ip_set_core.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
-index 9717a1626f3f..f1d47c264058 100644
---- a/drivers/net/phy/bcm84881.c
-+++ b/drivers/net/phy/bcm84881.c
-@@ -29,8 +29,19 @@ static int bcm84881_wait_init(struct phy_device *phydev)
- 					 100000, 2000000, false);
+diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+index 35d2f9c9ada02..4c133e06be1de 100644
+--- a/net/netfilter/ipset/ip_set_core.c
++++ b/net/netfilter/ipset/ip_set_core.c
+@@ -61,6 +61,8 @@ MODULE_ALIAS_NFNL_SUBSYS(NFNL_SUBSYS_IPSET);
+ 	ip_set_dereference((inst)->ip_set_list)[id]
+ #define ip_set_ref_netlink(inst,id)	\
+ 	rcu_dereference_raw((inst)->ip_set_list)[id]
++#define ip_set_dereference_nfnl(p)	\
++	rcu_dereference_check(p, lockdep_nfnl_is_held(NFNL_SUBSYS_IPSET))
+ 
+ /* The set types are implemented in modules and registered set types
+  * can be found in ip_set_type_list. Adding/deleting types is
+@@ -708,15 +710,10 @@ __ip_set_put_netlink(struct ip_set *set)
+ static struct ip_set *
+ ip_set_rcu_get(struct net *net, ip_set_id_t index)
+ {
+-	struct ip_set *set;
+ 	struct ip_set_net *inst = ip_set_pernet(net);
+ 
+-	rcu_read_lock();
+-	/* ip_set_list itself needs to be protected */
+-	set = rcu_dereference(inst->ip_set_list)[index];
+-	rcu_read_unlock();
+-
+-	return set;
++	/* ip_set_list and the set pointer need to be protected */
++	return ip_set_dereference_nfnl(inst->ip_set_list)[index];
  }
  
-+static void bcm84881_fill_possible_interfaces(struct phy_device *phydev)
-+{
-+	unsigned long *possible = phydev->possible_interfaces;
-+
-+	__set_bit(PHY_INTERFACE_MODE_SGMII, possible);
-+	__set_bit(PHY_INTERFACE_MODE_2500BASEX, possible);
-+	__set_bit(PHY_INTERFACE_MODE_10GBASER, possible);
-+}
-+
- static int bcm84881_config_init(struct phy_device *phydev)
- {
-+	bcm84881_fill_possible_interfaces(phydev);
-+
- 	switch (phydev->interface) {
- 	case PHY_INTERFACE_MODE_SGMII:
- 	case PHY_INTERFACE_MODE_2500BASEX:
-@@ -39,6 +50,7 @@ static int bcm84881_config_init(struct phy_device *phydev)
- 	default:
- 		return -ENODEV;
- 	}
+ static inline void
+@@ -1397,6 +1394,9 @@ static int ip_set_swap(struct sk_buff *skb, const struct nfnl_info *info,
+ 	ip_set(inst, to_id) = from;
+ 	write_unlock_bh(&ip_set_ref_lock);
+ 
++	/* Make sure all readers of the old set pointers are completed. */
++	synchronize_rcu();
 +
  	return 0;
  }
  
 -- 
-2.30.2
+2.42.0
 
 
