@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-50010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2617F43E6
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:30:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2FF7F43DD
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3536028164B
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:30:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17CE1B21084
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7112D618;
-	Wed, 22 Nov 2023 10:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC37584E2;
+	Wed, 22 Nov 2023 10:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A29E983
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:30:14 -0800 (PST)
-X-QQ-mid: bizesmtp82t1700648820thirpb0a
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2D7112
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 02:28:30 -0800 (PST)
+X-QQ-mid: bizesmtp82t1700648825tzubzofi
 Received: from wxdbg.localdomain.com ( [183.128.129.197])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 22 Nov 2023 18:26:59 +0800 (CST)
+	id ; Wed, 22 Nov 2023 18:27:04 +0800 (CST)
 X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: +ynUkgUhZJmYm/MasAAUBdpb5jz569s8/hBR+zFaid3tqVdoUu22qj4RjX9jt
-	KUJNU9NvgW1RNaG2A5/9UoW7pYouxd3r7tCS8KeczuvUnYO2H8fMrj4E6YfHXLXq8Jr2xLh
-	OiZicOUxMoRxEpOkcjeHkr/6eneiVxtCfj+lm8iYCF5bMcVfwYSsZ1Vfolk5sxl/YnJZ4b6
-	uU/eleyB57pPZWEIex8CGZ5QShS3S4jrRJx8pQLnfDvBag36kibnHzhm5l/FbGpU3m8R6rE
-	usaOUkvoZssEggeqcbO916fXCIWc8LGDvXQyz3wv/j3kbpfo3MOOnX6003p58RnqLT4B5TH
-	XL3+CSWuSju0Bl/jXmHHNkmRQYXHvVGG3sDF8PA+gQDBWbmAOXa2cJppkz/DwW2iwdnyvil
-	c0RKQ9MLN/SIGcmteFrM5g==
+X-QQ-FEAT: Q7mBtFKTChS4PdoiI3uUlspdILdWKnF7orrPjWXe7Ztq3XTRcbwGkvSqHYzIi
+	Dm4tFF9YpHEde3vHF9fmPoIs4bX19NA01qWO4hpPkGI+bAW/Jn5f1tIvF/6KnEfQhlFBKge
+	0ReztYuHet7Y5qFqGjIC/RqdJpFIqwxsTv/IjZ64Bxg2xSxBQ8fpdolKJ91ok5VjsyxAYSP
+	tRMqPgfrJLmNLDpp3i1+0UTz96FLYbf0qKkh6wEz4zC0A35qs13zpdGoWd+KYNXy/uavLRp
+	uZgMeXTfa0k2/FMApUX38WNS/LtcZpO2OmE6wWpUL7OO9ixec8BdrClwtoS00SZcEQf8f6L
+	UWCTpFY57Pfdljm91vIZPHIcGXIZv3RsIEoj114btyK0SmB6aJ3yVVqC5VKZy0Lwhuq3Da7
+	EONfLxpCGrIbm7K5p7VNeA==
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 4996602249448214998
+X-BIZMAIL-ID: 1897568626916506468
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
@@ -42,9 +42,9 @@ To: netdev@vger.kernel.org,
 	horms@kernel.org
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 2/5] net: wangxun: add ethtool_ops for ring parameters
-Date: Wed, 22 Nov 2023 18:22:23 +0800
-Message-Id: <20231122102226.986265-3-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 3/5] net: wangxun: add coalesce options support
+Date: Wed, 22 Nov 2023 18:22:24 +0800
+Message-Id: <20231122102226.986265-4-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20231122102226.986265-1-jiawenwu@trustnetic.com>
 References: <20231122102226.986265-1-jiawenwu@trustnetic.com>
@@ -58,394 +58,234 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-Support to query RX/TX depth with ethtool -g, and change RX/TX depth
-with ethtool -G.
+Support to show RX/TX coalesce with ethtool -c and set RX/TX
+coalesce with ethtool -C.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 18 +++++
- .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  4 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 76 +++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  6 ++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 48 ++++++++++++
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  4 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |  3 +
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 45 +++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  8 +-
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  3 +
- 11 files changed, 213 insertions(+), 3 deletions(-)
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 101 ++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |   8 ++
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.h   |   1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   4 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   4 +
+ 7 files changed, 120 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index ddc5f6d20b9c..2a09d1df3b0f 100644
+index 2a09d1df3b0f..abd2f4c92654 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -185,3 +185,21 @@ void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- 	}
+@@ -8,6 +8,7 @@
+ #include "wx_type.h"
+ #include "wx_ethtool.h"
+ #include "wx_hw.h"
++#include "wx_lib.h"
+ 
+ struct wx_stats {
+ 	char stat_string[ETH_GSTRING_LEN];
+@@ -203,3 +204,103 @@ void wx_get_ringparam(struct net_device *netdev,
+ 	ring->rx_jumbo_pending = 0;
  }
- EXPORT_SYMBOL(wx_get_drvinfo);
+ EXPORT_SYMBOL(wx_get_ringparam);
 +
-+void wx_get_ringparam(struct net_device *netdev,
-+		      struct ethtool_ringparam *ring,
-+		      struct kernel_ethtool_ringparam *kernel_ring,
-+		      struct netlink_ext_ack *extack)
++int wx_get_coalesce(struct net_device *netdev,
++		    struct ethtool_coalesce *ec,
++		    struct kernel_ethtool_coalesce *kernel_coal,
++		    struct netlink_ext_ack *extack)
 +{
 +	struct wx *wx = netdev_priv(netdev);
 +
-+	ring->rx_max_pending = WX_MAX_RXD;
-+	ring->tx_max_pending = WX_MAX_TXD;
-+	ring->rx_mini_max_pending = 0;
-+	ring->rx_jumbo_max_pending = 0;
-+	ring->rx_pending = wx->rx_ring_count;
-+	ring->tx_pending = wx->tx_ring_count;
-+	ring->rx_mini_pending = 0;
-+	ring->rx_jumbo_pending = 0;
++	ec->tx_max_coalesced_frames_irq = wx->tx_work_limit;
++	/* only valid if in constant ITR mode */
++	if (wx->rx_itr_setting <= 1)
++		ec->rx_coalesce_usecs = wx->rx_itr_setting;
++	else
++		ec->rx_coalesce_usecs = wx->rx_itr_setting >> 2;
++
++	/* if in mixed tx/rx queues per vector mode, report only rx settings */
++	if (wx->q_vector[0]->tx.count && wx->q_vector[0]->rx.count)
++		return 0;
++
++	/* only valid if in constant ITR mode */
++	if (wx->tx_itr_setting <= 1)
++		ec->tx_coalesce_usecs = wx->tx_itr_setting;
++	else
++		ec->tx_coalesce_usecs = wx->tx_itr_setting >> 2;
++
++	return 0;
 +}
-+EXPORT_SYMBOL(wx_get_ringparam);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-index 16d1a09369a6..77545d0eec56 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
-@@ -13,4 +13,8 @@ void wx_get_mac_stats(struct net_device *netdev,
- void wx_get_pause_stats(struct net_device *netdev,
- 			struct ethtool_pause_stats *stats);
- void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info);
-+void wx_get_ringparam(struct net_device *netdev,
-+		      struct ethtool_ringparam *ring,
-+		      struct kernel_ethtool_ringparam *kernel_ring,
-+		      struct netlink_ext_ack *extack);
- #endif /* _WX_ETHTOOL_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 2823861e5a92..6645aff415f8 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -2741,4 +2741,80 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
- }
- EXPORT_SYMBOL(wx_set_features);
- 
-+int wx_set_ring(struct wx *wx, u32 new_tx_count, u32 new_rx_count)
-+{
-+	struct wx_ring *temp_ring;
-+	int i, err = 0;
++EXPORT_SYMBOL(wx_get_coalesce);
 +
-+	/* allocate temporary buffer to store rings in */
-+	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
-+	temp_ring = vmalloc(i * sizeof(struct wx_ring));
-+
-+	if (!temp_ring)
-+		return -ENOMEM;
-+
-+	/* Setup new Tx resources and free the old Tx resources in that order.
-+	 * We can then assign the new resources to the rings via a memcpy.
-+	 * The advantage to this approach is that we are guaranteed to still
-+	 * have resources even in the case of an allocation failure.
-+	 */
-+	if (new_tx_count != wx->tx_ring_count) {
-+		for (i = 0; i < wx->num_tx_queues; i++) {
-+			memcpy(&temp_ring[i], wx->tx_ring[i],
-+			       sizeof(struct wx_ring));
-+
-+			temp_ring[i].count = new_tx_count;
-+			err = wx_setup_tx_resources(&temp_ring[i]);
-+			if (err) {
-+				while (i) {
-+					i--;
-+					wx_free_tx_resources(&temp_ring[i]);
-+				}
-+				goto err_setup;
-+			}
-+		}
-+
-+		for (i = 0; i < wx->num_tx_queues; i++) {
-+			wx_free_tx_resources(wx->tx_ring[i]);
-+
-+			memcpy(wx->tx_ring[i], &temp_ring[i],
-+			       sizeof(struct wx_ring));
-+		}
-+
-+		wx->tx_ring_count = new_tx_count;
-+	}
-+
-+	/* Repeat the process for the Rx rings if needed */
-+	if (new_rx_count != wx->rx_ring_count) {
-+		for (i = 0; i < wx->num_rx_queues; i++) {
-+			memcpy(&temp_ring[i], wx->rx_ring[i],
-+			       sizeof(struct wx_ring));
-+
-+			temp_ring[i].count = new_rx_count;
-+			err = wx_setup_rx_resources(&temp_ring[i]);
-+			if (err) {
-+				while (i) {
-+					i--;
-+					wx_free_rx_resources(&temp_ring[i]);
-+				}
-+				goto err_setup;
-+			}
-+		}
-+
-+		for (i = 0; i < wx->num_rx_queues; i++) {
-+			wx_free_rx_resources(wx->rx_ring[i]);
-+			memcpy(wx->rx_ring[i], &temp_ring[i],
-+			       sizeof(struct wx_ring));
-+		}
-+
-+		wx->rx_ring_count = new_rx_count;
-+	}
-+
-+err_setup:
-+	vfree(temp_ring);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL(wx_set_ring);
-+
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-index df1f4a5951f0..b4bf11684a1d 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
-@@ -29,5 +29,6 @@ int wx_setup_resources(struct wx *wx);
- void wx_get_stats64(struct net_device *netdev,
- 		    struct rtnl_link_stats64 *stats);
- int wx_set_features(struct net_device *netdev, netdev_features_t features);
-+int wx_set_ring(struct wx *wx, u32 new_tx_count, u32 new_rx_count);
- 
- #endif /* _NGBE_LIB_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index dc217437ec56..bdb2c3d33197 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -402,6 +402,12 @@ enum WX_MSCA_CMD_value {
- 
- #define WX_MAX_RXD                   8192
- #define WX_MAX_TXD                   8192
-+#define WX_MIN_RXD                   128
-+#define WX_MIN_TXD                   128
-+
-+/* Number of Transmit and Receive Descriptors must be a multiple of 8 */
-+#define WX_REQ_RX_DESCRIPTOR_MULTIPLE   8
-+#define WX_REQ_TX_DESCRIPTOR_MULTIPLE   8
- 
- #define WX_MAX_JUMBO_FRAME_SIZE      9432 /* max payload 9414 */
- #define VMDQ_P(p)                    p
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index 5baa89118600..42bd82b03488 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -7,7 +7,10 @@
- 
- #include "../libwx/wx_ethtool.h"
- #include "../libwx/wx_type.h"
-+#include "../libwx/wx_lib.h"
-+#include "../libwx/wx_hw.h"
- #include "ngbe_ethtool.h"
-+#include "ngbe_type.h"
- 
- static void ngbe_get_wol(struct net_device *netdev,
- 			 struct ethtool_wolinfo *wol)
-@@ -71,6 +74,49 @@ static int ngbe_set_pauseparam(struct net_device *netdev,
- 	return 0;
- }
- 
-+static int ngbe_set_ringparam(struct net_device *netdev,
-+			      struct ethtool_ringparam *ring,
-+			      struct kernel_ethtool_ringparam *kernel_ring,
-+			      struct netlink_ext_ack *extack)
++int wx_set_coalesce(struct net_device *netdev,
++		    struct ethtool_coalesce *ec,
++		    struct kernel_ethtool_coalesce *kernel_coal,
++		    struct netlink_ext_ack *extack)
 +{
 +	struct wx *wx = netdev_priv(netdev);
-+	u32 new_rx_count, new_tx_count;
-+	int i, err = 0;
++	u16 tx_itr_param, rx_itr_param;
++	struct wx_q_vector *q_vector;
++	u16 max_eitr;
++	int i;
 +
-+	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
++	if (wx->q_vector[0]->tx.count && wx->q_vector[0]->rx.count) {
++		/* reject Tx specific changes in case of mixed RxTx vectors */
++		if (ec->tx_coalesce_usecs)
++			return -EINVAL;
++	}
++
++	if (ec->tx_max_coalesced_frames_irq)
++		wx->tx_work_limit = ec->tx_max_coalesced_frames_irq;
++
++	if (wx->mac.type == wx_mac_sp)
++		max_eitr = WX_SP_MAX_EITR;
++	else
++		max_eitr = WX_EM_MAX_EITR;
++
++	if ((ec->rx_coalesce_usecs > (max_eitr >> 2)) ||
++	    (ec->tx_coalesce_usecs > (max_eitr >> 2)))
 +		return -EINVAL;
 +
-+	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
-+	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
++	if (ec->rx_coalesce_usecs > 1)
++		wx->rx_itr_setting = ec->rx_coalesce_usecs << 2;
++	else
++		wx->rx_itr_setting = ec->rx_coalesce_usecs;
 +
-+	new_rx_count = clamp_t(u32, ring->rx_pending, WX_MIN_RXD, WX_MAX_RXD);
-+	new_rx_count = ALIGN(new_rx_count, WX_REQ_RX_DESCRIPTOR_MULTIPLE);
++	if (wx->rx_itr_setting == 1)
++		rx_itr_param = WX_20K_ITR;
++	else
++		rx_itr_param = wx->rx_itr_setting;
 +
-+	if (new_tx_count == wx->tx_ring_count &&
-+	    new_rx_count == wx->rx_ring_count)
-+		return 0;
++	if (ec->tx_coalesce_usecs > 1)
++		wx->tx_itr_setting = ec->tx_coalesce_usecs << 2;
++	else
++		wx->tx_itr_setting = ec->tx_coalesce_usecs;
 +
-+	if (!netif_running(wx->netdev)) {
-+		for (i = 0; i < wx->num_tx_queues; i++)
-+			wx->tx_ring[i]->count = new_tx_count;
-+		for (i = 0; i < wx->num_rx_queues; i++)
-+			wx->rx_ring[i]->count = new_rx_count;
-+		wx->tx_ring_count = new_tx_count;
-+		wx->rx_ring_count = new_rx_count;
-+
-+		return 0;
++	if (wx->tx_itr_setting == 1) {
++		if (wx->mac.type == wx_mac_sp)
++			tx_itr_param = WX_12K_ITR;
++		else
++			tx_itr_param = WX_20K_ITR;
++	} else {
++		tx_itr_param = wx->tx_itr_setting;
 +	}
 +
-+	ngbe_down(wx);
++	/* mixed Rx/Tx */
++	if (wx->q_vector[0]->tx.count && wx->q_vector[0]->rx.count)
++		wx->tx_itr_setting = wx->rx_itr_setting;
 +
-+	err = wx_set_ring(wx, new_tx_count, new_rx_count);
++	for (i = 0; i < wx->num_q_vectors; i++) {
++		q_vector = wx->q_vector[i];
++		if (q_vector->tx.count && !q_vector->rx.count)
++			/* tx only */
++			q_vector->itr = tx_itr_param;
++		else
++			/* rx only or mixed */
++			q_vector->itr = rx_itr_param;
++		wx_write_eitr(q_vector);
++	}
 +
-+	wx_configure(wx);
-+	ngbe_up(wx);
-+
-+	return err;
++	return 0;
 +}
-+
++EXPORT_SYMBOL(wx_set_coalesce);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+index 77545d0eec56..3a80f8e63719 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.h
+@@ -17,4 +17,12 @@ void wx_get_ringparam(struct net_device *netdev,
+ 		      struct ethtool_ringparam *ring,
+ 		      struct kernel_ethtool_ringparam *kernel_ring,
+ 		      struct netlink_ext_ack *extack);
++int wx_get_coalesce(struct net_device *netdev,
++		    struct ethtool_coalesce *ec,
++		    struct kernel_ethtool_coalesce *kernel_coal,
++		    struct netlink_ext_ack *extack);
++int wx_set_coalesce(struct net_device *netdev,
++		    struct ethtool_coalesce *ec,
++		    struct kernel_ethtool_coalesce *kernel_coal,
++		    struct netlink_ext_ack *extack);
+ #endif /* _WX_ETHTOOL_H_ */
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index 6645aff415f8..9eb9ab8fe581 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -2150,7 +2150,7 @@ static void wx_set_ivar(struct wx *wx, s8 direction,
+  * when it needs to update EITR registers at runtime.  Hardware
+  * specific quirks/differences are taken care of here.
+  */
+-static void wx_write_eitr(struct wx_q_vector *q_vector)
++void wx_write_eitr(struct wx_q_vector *q_vector)
+ {
+ 	struct wx *wx = q_vector->wx;
+ 	int v_idx = q_vector->v_idx;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.h b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+index b4bf11684a1d..159d2e34ced9 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.h
+@@ -21,6 +21,7 @@ void wx_free_irq(struct wx *wx);
+ int wx_setup_isb_resources(struct wx *wx);
+ void wx_free_isb_resources(struct wx *wx);
+ u32 wx_misc_isb(struct wx *wx, enum wx_isb_idx idx);
++void wx_write_eitr(struct wx_q_vector *q_vector);
+ void wx_configure_vectors(struct wx *wx);
+ void wx_clean_all_rx_rings(struct wx *wx);
+ void wx_clean_all_tx_rings(struct wx *wx);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index bdb2c3d33197..8c795f908d1e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -314,6 +314,7 @@ enum WX_MSCA_CMD_value {
+ #define WX_PX_IVAR_ALLOC_VAL         0x80 /* Interrupt Allocation valid */
+ #define WX_7K_ITR                    595
+ #define WX_12K_ITR                   336
++#define WX_20K_ITR                   200
+ #define WX_SP_MAX_EITR               0x00000FF8U
+ #define WX_EM_MAX_EITR               0x00007FFCU
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+index 42bd82b03488..712e0308c397 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+@@ -118,6 +118,8 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ }
+ 
  static const struct ethtool_ops ngbe_ethtool_ops = {
++	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
++				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ,
  	.get_drvinfo		= wx_get_drvinfo,
  	.get_link		= ethtool_op_get_link,
-@@ -86,6 +132,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.get_pause_stats	= wx_get_pause_stats,
- 	.get_pauseparam		= ngbe_get_pauseparam,
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+@@ -134,6 +136,8 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
  	.set_pauseparam		= ngbe_set_pauseparam,
-+	.get_ringparam		= wx_get_ringparam,
-+	.set_ringparam		= ngbe_set_ringparam,
+ 	.get_ringparam		= wx_get_ringparam,
+ 	.set_ringparam		= ngbe_set_ringparam,
++	.get_coalesce		= wx_get_coalesce,
++	.set_coalesce		= wx_set_coalesce,
  };
  
  void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 8db804543e66..0c0b2f7bdf74 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -334,7 +334,7 @@ static void ngbe_disable_device(struct wx *wx)
- 	wx_update_stats(wx);
- }
- 
--static void ngbe_down(struct wx *wx)
-+void ngbe_down(struct wx *wx)
- {
- 	phy_stop(wx->phydev);
- 	ngbe_disable_device(wx);
-@@ -342,7 +342,7 @@ static void ngbe_down(struct wx *wx)
- 	wx_clean_all_rx_rings(wx);
- }
- 
--static void ngbe_up(struct wx *wx)
-+void ngbe_up(struct wx *wx)
- {
- 	wx_configure_vectors(wx);
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index ff754d69bdf6..0a98080a197a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -130,4 +130,7 @@
- 
- extern char ngbe_driver_name[];
- 
-+void ngbe_down(struct wx *wx);
-+void ngbe_up(struct wx *wx);
-+
- #endif /* _NGBE_TYPE_H_ */
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 8812d92d8b58..abbccef81557 100644
+index abbccef81557..fe055b006a4e 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -7,6 +7,7 @@
- 
- #include "../libwx/wx_ethtool.h"
- #include "../libwx/wx_type.h"
-+#include "../libwx/wx_lib.h"
- #include "txgbe_type.h"
- #include "txgbe_ethtool.h"
- 
-@@ -49,6 +50,48 @@ static int txgbe_set_pauseparam(struct net_device *netdev,
- 	return phylink_ethtool_set_pauseparam(txgbe->phylink, pause);
+@@ -93,6 +93,8 @@ static int txgbe_set_ringparam(struct net_device *netdev,
  }
  
-+static int txgbe_set_ringparam(struct net_device *netdev,
-+			       struct ethtool_ringparam *ring,
-+			       struct kernel_ethtool_ringparam *kernel_ring,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+	u32 new_rx_count, new_tx_count;
-+	int i, err = 0;
-+
-+	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-+		return -EINVAL;
-+
-+	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
-+	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
-+
-+	new_rx_count = clamp_t(u32, ring->rx_pending, WX_MIN_RXD, WX_MAX_RXD);
-+	new_rx_count = ALIGN(new_rx_count, WX_REQ_RX_DESCRIPTOR_MULTIPLE);
-+
-+	if (new_tx_count == wx->tx_ring_count &&
-+	    new_rx_count == wx->rx_ring_count)
-+		return 0;
-+
-+	if (!netif_running(wx->netdev)) {
-+		for (i = 0; i < wx->num_tx_queues; i++)
-+			wx->tx_ring[i]->count = new_tx_count;
-+		for (i = 0; i < wx->num_rx_queues; i++)
-+			wx->rx_ring[i]->count = new_rx_count;
-+		wx->tx_ring_count = new_tx_count;
-+		wx->rx_ring_count = new_rx_count;
-+
-+		return 0;
-+	}
-+
-+	txgbe_down(wx);
-+
-+	err = wx_set_ring(wx, new_tx_count, new_rx_count);
-+
-+	txgbe_up(wx);
-+
-+	return err;
-+}
-+
  static const struct ethtool_ops txgbe_ethtool_ops = {
++	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
++				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ,
  	.get_drvinfo		= wx_get_drvinfo,
  	.nway_reset		= txgbe_nway_reset,
-@@ -62,6 +105,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.get_pause_stats	= wx_get_pause_stats,
- 	.get_pauseparam		= txgbe_get_pauseparam,
+ 	.get_link		= ethtool_op_get_link,
+@@ -107,6 +109,8 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
  	.set_pauseparam		= txgbe_set_pauseparam,
-+	.get_ringparam		= wx_get_ringparam,
-+	.set_ringparam		= txgbe_set_ringparam,
+ 	.get_ringparam		= wx_get_ringparam,
+ 	.set_ringparam		= txgbe_set_ringparam,
++	.get_coalesce		= wx_get_coalesce,
++	.set_coalesce		= wx_set_coalesce,
  };
  
  void txgbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 526250102db2..9b1b92fa318f 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -290,7 +290,7 @@ static void txgbe_disable_device(struct wx *wx)
- 	wx_update_stats(wx);
- }
- 
--static void txgbe_down(struct wx *wx)
-+void txgbe_down(struct wx *wx)
- {
- 	struct txgbe *txgbe = netdev_to_txgbe(wx->netdev);
- 
-@@ -302,6 +302,12 @@ static void txgbe_down(struct wx *wx)
- 	wx_clean_all_rx_rings(wx);
- }
- 
-+void txgbe_up(struct wx *wx)
-+{
-+	wx_configure(wx);
-+	txgbe_up_complete(wx);
-+}
-+
- /**
-  *  txgbe_init_type_code - Initialize the shared code
-  *  @wx: pointer to hardware structure
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 3ba9ce43f394..13a2f3f53c39 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -129,6 +129,9 @@
- 
- extern char txgbe_driver_name[];
- 
-+void txgbe_down(struct wx *wx);
-+void txgbe_up(struct wx *wx);
-+
- static inline struct txgbe *netdev_to_txgbe(struct net_device *netdev)
- {
- 	struct wx *wx = netdev_priv(netdev);
 -- 
 2.27.0
 
