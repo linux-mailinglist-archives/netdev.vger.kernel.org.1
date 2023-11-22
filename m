@@ -1,97 +1,130 @@
-Return-Path: <netdev+bounces-49986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 890187F433E
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:08:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 205F17F4345
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:09:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CC8BB20E10
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:08:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFF3C28147F
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3FC2111B;
-	Wed, 22 Nov 2023 10:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BEB25569;
+	Wed, 22 Nov 2023 10:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="muX4048R"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DZ8GOh8a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5A083;
-	Wed, 22 Nov 2023 02:08:01 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-507f1c29f25so9032002e87.1;
-        Wed, 22 Nov 2023 02:08:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700647679; x=1701252479; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hj6kLcO4H7xVgRAluQPUvuiaRmKUfdS5jqw/65rYvpA=;
-        b=muX4048RWQmkhv9stYI5Wtqi4e4mPiR+e6yh/pQtxviYLPsXCkMn26WN0gGNGmlLJy
-         NIjnh141QiTrdmXmVXLwGJUng/6hWs5EmxLn38dREzZG4nJkZx/OvFa3pnfxxroVyL4q
-         U7mo8jpE8pW8ugaVEoecBRXrkhMAxrXPdnaBttghPFenhHCBoTf2Bu48d/DFHpm0fypp
-         Fw725ypy/EYP4FrYwslkyNyrUXwuoHP3yer6yhc94g5fPqI+aPJYCPPXAb+ZZ64JEgAw
-         fPqE5aCbt8FvKR/oHKEyh5X9nN1aDJqY4HxMlVTNkgHk9sqvx8sosp3XNes8PvDufwi5
-         SJlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700647679; x=1701252479;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hj6kLcO4H7xVgRAluQPUvuiaRmKUfdS5jqw/65rYvpA=;
-        b=XlEWnbG5En6Sawvb8ccWJLDWCa5piAFWzBqmH09jHd1F9ULCLa6tdp9aZ88CLd9tYh
-         BPJl3elI5ifSV/Jaw9S/H/MII9vg9TJO0WbWMSPrT7sOvPGo9IN/HnLwTQb72QnpYCUY
-         rH3tUxY5hHVS7m0FzRJnV9dxtrp/27cJ7v/uxvFK85YeBMqmemZUzKpdo6YPEa2RYKkU
-         GfAwyls9+Tlatz78YlwXttnINLhnMEAqWD2RzFIL0GLlCVXdF5Q753vMCaZeWIS8FHkj
-         /+9X7+jvdTZGi0JbeDKS+kHH4jSZh5Fd2nn5NCcUfNEFTQtUCOzphRcFVdKf3dwdkh6D
-         DDrg==
-X-Gm-Message-State: AOJu0YwBEVA7CWjiYWkH+nWLgvNgy5fDcJE/YZfH58+Ti47CMhijyad2
-	5WFy1DmHBwKyvuJ6ji4GpgMhLcRZhjQ=
-X-Google-Smtp-Source: AGHT+IFyvbZqYSaG/VBCSNqJ7mAuVYm2S1c+A4TGJ8KK3I/E5RouWfNFcCSfre+U2DLgFSvfTyDkgw==
-X-Received: by 2002:a05:6512:4809:b0:50a:a940:2d81 with SMTP id eo9-20020a056512480900b0050aa9402d81mr1251323lfb.68.1700647678713;
-        Wed, 22 Nov 2023 02:07:58 -0800 (PST)
-Received: from [192.168.1.103] ([178.176.79.58])
-        by smtp.gmail.com with ESMTPSA id fb7-20020a056512124700b0050abac6011fsm160848lfb.296.2023.11.22.02.07.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 02:07:58 -0800 (PST)
-Subject: Re: [PATCHv2] USB: gl620a: check for rx buffer overflow
-To: Oliver Neukum <oneukum@suse.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- dmitry.bezrukov@aquantia.com, marcinguy@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org
-References: <20231122095306.15175-1-oneukum@suse.com>
- <2c1a8d3e-fac1-d728-1c8d-509cd21f7b4d@omp.ru>
- <367cedf8-881b-4b88-8da0-a46a556effda@suse.com>
-From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
-Message-ID: <5a04ff8e-7044-2d46-ab12-f18f7833b7f5@gmail.com>
-Date: Wed, 22 Nov 2023 13:07:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B255A100;
+	Wed, 22 Nov 2023 02:09:27 -0800 (PST)
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AM9c5hd028838;
+	Wed, 22 Nov 2023 10:09:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=TgmvFpfDyjjrjHH2iGALQkRvhXzC2NmU7EN6MHLQb/0=;
+ b=DZ8GOh8axw7+0wCMcuPV2YprThKXfIuP/H9NCD3UjbavQegFrvFzxnZS/suf6cPjCVyR
+ 5nFqXPt2GznIDKdE/ema/UBD11QJTa67nRr+jHprUCtY7eGI5nOb33+/AzoChx8Sr6x7
+ 532hzmBe7lxIuIwv+fbsIUm0LWPcT5MljLcUa1qwJJL3zcx30V7zOkVX6P9BueAS69rP
+ moVexRJMV4YCBDV1ChSQxZpv42dt0n3XFhbFb+IlUnk8beYyXqq3l1S+5BlXyx8xY3P5
+ ZSWPWdm+vV+ydpI28g4bAQlm5srrKR4Jnaxv+8o9z2hayE+n988cNh6DHQvLqSa2o6qo yg== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uh477hm9g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Nov 2023 10:09:18 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AMA9Huf003409
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Nov 2023 10:09:17 GMT
+Received: from [10.216.2.74] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 22 Nov
+ 2023 02:09:09 -0800
+Message-ID: <8bb79735-3b5d-4229-b0f4-bc50d61fdba1@quicinc.com>
+Date: Wed, 22 Nov 2023 15:38:36 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <367cedf8-881b-4b88-8da0-a46a556effda@suse.com>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/9] dt-bindings: clock: ipq5332: drop the few nss
+ clocks definition
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Andy Gross
+	<agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
+ <20231121-ipq5332-nsscc-v2-3-a7ff61beab72@quicinc.com>
+ <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <43376552-7e79-4f34-94ca-63767a95564b@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: vYM6GU4uF4S8RyYM9Bo6aBK6sbTyNKj4
+X-Proofpoint-GUID: vYM6GU4uF4S8RyYM9Bo6aBK6sbTyNKj4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-22_06,2023-11-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=501 clxscore=1015
+ suspectscore=0 spamscore=0 bulkscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311220071
 
-On 11/22/23 1:04 PM, Oliver Neukum wrote:
 
-[...]
->>> The driver checks for a single package overflowing
->>
->>     Maybe packet?
+
+On 11/21/2023 8:36 PM, Krzysztof Kozlowski wrote:
+> On 21/11/2023 15:30, Kathiravan Thirumoorthy wrote:
+>> In commit 0dd3f263c810 ("clk: qcom: ipq5332: enable few nssnoc clocks in
 > 
-> No, that would be read as network packet, which
-> is precisely what this not not and should not
-> be mistaken for.
+> Where is this commit coming from?
+> 
+>> driver probe"), gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
+>> gcc_nssnoc_nsscc_clk are enabled in driver probe to keep it always-on.
+> 
+> Implementation can change and for example bring back these clocks. Are
+> you going to change bindings? No, drop the patch.
+> 
+> Bindings should be dropped only in a few rare cases like clocks not
+> available for OS or bugs.
 
-   But "package" hardly fits either. Is it a USB packet or something else?
+Thanks Krzysztof. Will drop this patch in V3.
 
->     Regards
->         Oliver
+One more question to understand further. In IPQ SoCs there are bunch of 
+coresight / QDSS clocks but coresight framework doesn't handle all 
+clocks. Those clocks are enabled in bootloader stage itself. In such 
+case, should I drop the clocks from both binding and driver or only from 
+driver?
 
-MBR, Sergey
+Thanks,
+Kathiravan.
+
+> 
+> Best regards,
+> Krzysztof
+> 
 
