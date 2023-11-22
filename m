@@ -1,101 +1,142 @@
-Return-Path: <netdev+bounces-50121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063C47F4A5A
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:32:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8627F4A49
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6126281417
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:32:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23343B2100A
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE16E584F0;
-	Wed, 22 Nov 2023 15:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998E15102E;
+	Wed, 22 Nov 2023 15:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OjB9lsNN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="FTugl8OI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA9354BEF
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 15:32:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4240C43397;
-	Wed, 22 Nov 2023 15:32:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700667167;
-	bh=dHrf/UhGnXm6rG+qQ+Q2hUVJvaV28d2jFcMrQVb1Y98=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OjB9lsNNSqDd3SajEmkKaP18A/4O+P2r8HY7A4aUivPnxQCsBPUyS51woeqs+JE1M
-	 elqFVBJFyqP3PPwpuiVV6kpHLfAa+B9r15hyJeaWoF7i4yYR6azizNGnB/jHh4uXc1
-	 Hf+5Mtucs403n/pQ9dBGcnmiIdTD7bVgznflp+VhBPiViZ5g690ej68Ew6FBeju0Zd
-	 ZieXMRxo/LEDV5tM/CWE7ypmRUZ/9LTwpos5vskNErs2RwvOHZRDVi/bNoEOfhTDv6
-	 qAqQBkC2WbHrSlH1mAnB5BPGmQPHsqznuY0D3CRRFPBlrRBlEfnO6GOodr4xvfvaoZ
-	 Bkz63sBvZi8AQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Alex Pakhunov <alexey.pakhunov@spacex.com>,
-	Vincent Wong <vincent.wong2@spacex.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B9611F
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 07:31:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9Fycx6buKYhHvCg5aT8NUYctGbTQUME267VJAhu1KJk=; b=FTugl8OIuqnPwVwGr8UMbLTA67
+	dAV2S6RvgC7gojc0957lDFvycx6Ft/e81PvNtXYK4FygKG77A0iOuZPlNE5m5MzDiUgY0ZBpMJmTM
+	FQ9awXjNlRM4gB6shvoF7n5jUB9/IswbfuEG6/zPm5o2VJS7kPCwlhcEwTBHGIpi2AvNNbM5PZbKQ
+	UpO8pOj5c0gvI/jnudBWEXcG/anfoqlA2DrC93uN0wzgQFO18gZCjztTCZikG8rIv2/O2k4/+drz6
+	wZWVQ/ajwjumKgQIDHWLUo9hGyH5emtr16RvK/fejrcGRYb5LxZ4KawA1KDDDCjdeF2gx7dP1CNog
+	3UZ39vPw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47552 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1r5pCY-0000Lf-27;
+	Wed, 22 Nov 2023 15:31:42 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1r5pCa-00DAHP-Kc; Wed, 22 Nov 2023 15:31:44 +0000
+In-Reply-To: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
+References: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	mchan@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 10/17] tg3: Increment tx_dropped in tg3_tso_bug()
-Date: Wed, 22 Nov 2023 10:31:39 -0500
-Message-ID: <20231122153212.852040-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231122153212.852040-1-sashal@kernel.org>
-References: <20231122153212.852040-1-sashal@kernel.org>
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH RFC net-next 06/10] net: phylink: split out per-interface
+ validation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.2
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1r5pCa-00DAHP-Kc@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 22 Nov 2023 15:31:44 +0000
 
-From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Split out the internals of phylink_validate_mask() to make the code
+easier to read.
 
-[ Upstream commit 17dd5efe5f36a96bd78012594fabe21efb01186b ]
-
-tg3_tso_bug() drops a packet if it cannot be segmented for any reason.
-The number of discarded frames should be incremented accordingly.
-
-Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
-Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Link: https://lore.kernel.org/r/20231113182350.37472-2-alexey.pakhunov@spacex.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/phy/phylink.c | 42 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 5c18ad10efc3e..b7acd994a393b 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -7874,8 +7874,10 @@ static int tg3_tso_bug(struct tg3 *tp, struct tg3_napi *tnapi,
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index c276f9482f78..11dd743141d5 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -689,26 +689,44 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
+ 	return phylink_is_empty_linkmode(supported) ? -EINVAL : 0;
+ }
  
- 	segs = skb_gso_segment(skb, tp->dev->features &
- 				    ~(NETIF_F_TSO | NETIF_F_TSO6));
--	if (IS_ERR(segs) || !segs)
-+	if (IS_ERR(segs) || !segs) {
-+		tnapi->tx_dropped++;
- 		goto tg3_tso_bug_end;
++static void phylink_validate_one(struct phylink *pl,
++				 const unsigned long *supported,
++				 const struct phylink_link_state *state,
++				 phy_interface_t interface,
++				 unsigned long *accum_supported,
++				 unsigned long *accum_advertising)
++{
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp_supported);
++	struct phylink_link_state tmp_state;
++
++	linkmode_copy(tmp_supported, supported);
++
++	tmp_state = *state;
++	tmp_state.interface = interface;
++
++	if (!phylink_validate_mac_and_pcs(pl, tmp_supported, &tmp_state)) {
++		phylink_dbg(pl, " interface %u (%s) rate match %s supports %*pbl\n",
++			    interface, phy_modes(interface),
++			    phy_rate_matching_to_str(tmp_state.rate_matching),
++			    __ETHTOOL_LINK_MODE_MASK_NBITS, tmp_supported);
++
++		linkmode_or(accum_supported, accum_supported, tmp_supported);
++		linkmode_or(accum_advertising, accum_advertising,
++			    tmp_state.advertising);
 +	}
++}
++
+ static int phylink_validate_mask(struct phylink *pl, unsigned long *supported,
+ 				 struct phylink_link_state *state,
+ 				 const unsigned long *interfaces)
+ {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(all_adv) = { 0, };
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(all_s) = { 0, };
+-	__ETHTOOL_DECLARE_LINK_MODE_MASK(s);
+-	struct phylink_link_state t;
+ 	int interface;
  
- 	skb_list_walk_safe(segs, seg, next) {
- 		skb_mark_not_on_list(seg);
+-	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX) {
+-		linkmode_copy(s, supported);
+-
+-		t = *state;
+-		t.interface = interface;
+-		if (!phylink_validate_mac_and_pcs(pl, s, &t)) {
+-			linkmode_or(all_s, all_s, s);
+-			linkmode_or(all_adv, all_adv, t.advertising);
+-		}
+-	}
++	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX)
++		phylink_validate_one(pl, supported, state, interface,
++				     all_s, all_adv);
+ 
+ 	linkmode_copy(supported, all_s);
+ 	linkmode_copy(state->advertising, all_adv);
 -- 
-2.42.0
+2.30.2
 
 
