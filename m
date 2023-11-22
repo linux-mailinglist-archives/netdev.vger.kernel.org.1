@@ -1,230 +1,177 @@
-Return-Path: <netdev+bounces-50242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939077F4FFA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:54:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A2E7F500C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:58:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E97D2814CB
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:54:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F412814AA
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4B24E61C;
-	Wed, 22 Nov 2023 18:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C055D4AC;
+	Wed, 22 Nov 2023 18:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Rp8rTiZ+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TjLlJCNu"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E850A1B3;
-	Wed, 22 Nov 2023 10:53:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9mN26oXnsGSUTNXCrfc25Xqi3h24CgPhQwQcmOWKmtQ=; b=Rp8rTiZ+O8UqGbubCwroGF8zur
-	4cOhBwFn2bjNzvoHOCKnsG4BX4F14h36kZT83vwN7EKHMRLJkIKw7jc1/hZZN29H6Nyzrv0iuo2BI
-	ytPCWimRHldZL1GYtID7RmVbPsQ9//EKtwhh2DV8x8dCsYzUn/iOUuWzRY/n3EmSdV45zdBa0MGex
-	21BVuNawD9C3UTzwTiAcL+W4piuPACk0/mGxwDQRWSr0ec0BxZsJd0uUKDdsp1q3hR4bSmzkDbU5X
-	TTJqaPvWjq/lOzbORUQKGQ9zr/4rlAg/VDzlkf+1hcREI9AzemkSACk78mDXf6uHcSb2u4t4PP+Hk
-	3ABNDpHg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58024)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r5sMA-0000eE-2A;
-	Wed, 22 Nov 2023 18:53:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r5sMA-0005Q7-K6; Wed, 22 Nov 2023 18:53:50 +0000
-Date: Wed, 22 Nov 2023 18:53:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [net-next PATCH] net: phy: aquantia: drop wrong endianness
- conversion for addr and CRC
-Message-ID: <ZV5OPr5ee2x/yMCQ@shell.armlinux.org.uk>
-References: <20231122170813.1222-1-ansuelsmth@gmail.com>
- <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
- <655e4025.df0a0220.50550.3d70@mx.google.com>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4EE3843
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 10:56:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700679386; x=1732215386;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Z9mon0MixRVxdOOX15BiI9K/cTCCV9ps4yRWdv7SSnc=;
+  b=TjLlJCNuUzxqOXv4WdW8PWffGMCp9wwtuQF4KKGLTxgDFUdrWkZ1c1vZ
+   O9SyNTQOrzfWMaM+Nno2MLomYeDAZsQWanB9/M+6PZYn4JFPwo8KeGMaQ
+   9cLf+7YDE9uuEXabXf7MTCNDiwiICHfFecj4yICfpvMf4zXdj7H38YDVu
+   ErZFKE/pkFhIEp6WJNsElEeBk3m7mlU5J6/XTyTp10/MzViN3essJnZUb
+   bffTMgaaiukZ/+hSbrxeMQ94FHkpTZnbTGasgMNhhwO/lMdRBiE7fj2QX
+   EKL5Jr1djfhLguTmFkbAnrtvKQYzqcz+ueBLj+u2Ko6+YIMdlVm2w58kn
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="377155408"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="377155408"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 10:56:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="884742331"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="884742331"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Nov 2023 10:56:24 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 22 Nov 2023 10:56:22 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 22 Nov 2023 10:56:21 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 22 Nov 2023 10:56:21 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Wed, 22 Nov 2023 10:56:21 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OAJM92KkuykmAh9PrAMwZJlVnSewUgnI48ST1RqV56aRzEVgHTm1vrl4fWIHE1u7+b/oHM4Kng+oDxgZgWBs5be1ddBN3iAoUX6f3DlmJ/XbtZBAun5RFxU8Q3bpjja/dlx6919J61tFMhZisp7YM0sMFOOg7+Ow/5/5DFpEj/CscNkDN15TEiylcsrO9z4sE94uTfg/Fc01mIOCH4Ah8bOKCfdHVK9iVqIFx1H+1b/oKCtMlGq+cNhZLA1+boiIESz0RmQ/875oXowH01wL9b/A0BMH0u7faLT+inQWPRJoYuSycKka/BFVapdIS6mlp4Fk2WGU9tlGHAPDJaYTHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=damYuqkirvNEOmD+MW7jIyaJmzJkin3Se+EL3wlVpm4=;
+ b=YBWoc1U+3Z/2Alj6pMzQlokRckpsoDDD3/svb3fA4f4vJs4+FCtJ/q9zoFR2yA0UOeNkU+cmpxhF6+hxpvpkNaaVXxnkOxWDP4WgPcC4CwcsNXSTmeTBdXeT+cJ04s0WeKqPnQEWLiuPbzl2YwOOLKAyvGJ9N3UZGQe6ihWooW+Xs4ouvQOArhMzPQQxJI0mLVYeBLF5nxIiCf0iwGSF7pqNsjXxYR6U5ZaDYQdHnjFLOj8CtD/u+vZH+BAWBoC1RFRj+mDXSM4IgLXbG9+iLqvJjd7xcY7nXmK+j6NmoKErLf6pRNMvxfQ7wVm+yGefpapLIbVF2g7nVkSNsyxRog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by PH0PR11MB5000.namprd11.prod.outlook.com (2603:10b6:510:41::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.28; Wed, 22 Nov
+ 2023 18:56:20 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::f37d:cbd6:9df8:d06d]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::f37d:cbd6:9df8:d06d%7]) with mapi id 15.20.7002.028; Wed, 22 Nov 2023
+ 18:56:20 +0000
+Date: Wed, 22 Nov 2023 19:56:12 +0100
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew@lunn.ch>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH net 0/3] dpaa2-eth: various fixes
+Message-ID: <ZV5OzJ70dW1WxeyQ@lzaremba-mobl.ger.corp.intel.com>
+References: <20231122155117.2816724-1-ioana.ciornei@nxp.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231122155117.2816724-1-ioana.ciornei@nxp.com>
+X-ClientProxiedBy: VI1PR07CA0140.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::27) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <655e4025.df0a0220.50550.3d70@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH0PR11MB5000:EE_
+X-MS-Office365-Filtering-Correlation-Id: 043d8e2e-921b-4ae8-2603-08dbeb8cb6ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dVtFuEldVI/IovhNmDbf3ySrUZa5Gt5uaZB4UITONLINnw0dOq7GRhgqTV5k3BQ85YC22/l7k8Vp43K5Y9Bvt8iGAy5dysqeD8Uv8LkZg3qcOOjBgpLNvEG8WZQRfmIyzHaIaolPMpebLnD74ABPOC1+APIT2CICBKz1nmo9QATvpk3vO0KwMEqRf3d7JQ2ntiWy6QUPTh6+hUZkrIfw6C0AzweWc38GLJUkQmK8QijNih5w+0KK3q5yYEcK0u8HPb8bGxTbI9GMToclTTiS4htvcETO5PBfhNMBKcxYrvH/DV35zaT+g5s6+G8VmEoCU1WnDtanKZHYs+Eulfflg8OAPZHHecFC4NnFPveC6YyRYMtS5dwVDf16e4ZZFK/S8LPdCLOSP/j4wurE6rvD74salG+qYvduYG2e4ETQgKfO25WMUQRJZdQpAxfBX0K26Tgpc4uAdxm9B15wkhLHChlCjDyYeIrQ0BEX7QoDmTMqV/XHGoV1ZPFlDYsnTcLfCdAN+JdSOzSUycrC1hmZ/MWPWOXnBBAyfLqKO8Opeim9JDiPymHMivyORkbi6AA3
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(39860400002)(366004)(396003)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(6512007)(6486002)(478600001)(26005)(66476007)(66946007)(66556008)(6666004)(6916009)(316002)(38100700002)(6506007)(82960400001)(83380400001)(8936002)(4326008)(8676002)(44832011)(86362001)(5660300002)(41300700001)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Q7577hcWoDqosi7tIA01/zzRLg/0pA48hVEjlfN8Gg5mlPtgQIVkvbBqVr2C?=
+ =?us-ascii?Q?6Q1GR8m1Hldmen6SFH0JF7W7keWUChW1qJ5gWHj4sMjcHvGuSMgj9JTBQZkr?=
+ =?us-ascii?Q?BsCaXJlXQB8+j7CqxX5aYmdhX+6sD5AO+b6uespASMYHbgdDqFRk5cNCMOvN?=
+ =?us-ascii?Q?gHp+ZLNhxV2w0p/pguGEd0gwRkln6vZxjZMc3ifTw8BLJCZ3+ojlYrqyXTs5?=
+ =?us-ascii?Q?x48n3A+ZOEiA0EIqE6bAY9SJn08VzcTImqV+ld1Qvyx6OPVVGrEEC/GKIjBq?=
+ =?us-ascii?Q?oBusDSPIuUFQfwOG78oSLZTg7krgs1Yy0nG6cNnouWIBEYCkVhf7mJz6dxgB?=
+ =?us-ascii?Q?oOi10kbI4TkQL5G0KH/aymrSno/igsc+7U1gNpErXv2hkWHqdTY60sMUkchK?=
+ =?us-ascii?Q?7DXxEMYZ54lCdg9g1R/UM8wJkHZsTVmbGum8ck4ys9Tr6qLJEAkYi3j6BvvL?=
+ =?us-ascii?Q?3rqQSx1iFjaMg+bcUFG7QBOCsv4NI0I8HysBWvdT0IVh0Et6FnR6OJgDHeJu?=
+ =?us-ascii?Q?VDdZjqdQB+ullVohLBiNSt+ucK70yD1qNf9ZEzTV6EgQCkrN0JWa64VHTuv0?=
+ =?us-ascii?Q?p6HHRPPwYeAUqDFoRKrJPQZVu4UKCV15nQ0oOPLbHg/vFMze58aEszNGHp5z?=
+ =?us-ascii?Q?ZNeKVn44aqHq3vixYZ9JuDQ6jdY8C+llMM8zBRGYxuOExsrQv5ukmBwxEikU?=
+ =?us-ascii?Q?4SIkG+VsJzchDw17EOd5hxrF7d/UuvLnoqEy4qoXxD0YF10ccDsMbaDfpvWG?=
+ =?us-ascii?Q?I6vj7j7BA9u4jAqp+OnZpNCj/2IN79pFxYleWNRRHBECMwNqB84U2MKK91fh?=
+ =?us-ascii?Q?1FRQK46zdtbF8rJr0UOIhyr2GV+0Er6YHY5V4bXZyJCkeA6wx8IlWFgJMJy3?=
+ =?us-ascii?Q?P7hvIFTCWe79twhvkgex/ZmManEIPVybfRr8JcCBNtQ3AisYgYof8pIXcqqb?=
+ =?us-ascii?Q?kns40JGKxxAtsNUwVxjxTEHgxiWb9Vc3T4OeCCy7l0Nt04/vy3oIKvvQX32u?=
+ =?us-ascii?Q?YRaChEi03Y+t4JCbO6oAYPoF8PTP+XoV6F/9y+/mTfOCkVbwxgUapcgJuiC4?=
+ =?us-ascii?Q?mjfED/93K7kqIlIfG8ryHyfAHgCbPk3VcR9s3izl2mG5knTFU+fyW9tia+Kl?=
+ =?us-ascii?Q?CuEFQ3GEA3s1zoy4N2ysIjdZv8pOwv0ArehH8E+0hWRU4LaI2EfuQ0Ma7IMJ?=
+ =?us-ascii?Q?k8JeVne+itDa2jIzGTpBcfmDBFoJzjZ/kRmUlIuOFzkZBeEEY8Ck/ASUj0UO?=
+ =?us-ascii?Q?chpsgPWRmem+gSEdB4G3ItErE4MIgl1JS3neqlJDEK7f7xZb9QWqnjOzZEHP?=
+ =?us-ascii?Q?UKwLMZ+3yx1LrFYPEUWYSGRr1xmhrMtH9io176vUbKLRx3BpCKeB1FEjfplq?=
+ =?us-ascii?Q?N+GCN/FiOqYlOPvEH28V3ta6UjZkE71lo7F6KtLpRLklVnKr12mh9G53xZcX?=
+ =?us-ascii?Q?YBHVrm0c3x5ikKLsaV2U1Npf8nV+N+WE+61Z861AY9lbnj+HJZvB6I2claxm?=
+ =?us-ascii?Q?3WRZZn6JJnba4pzSOeDwvYicYhnazZJsr4AWfyaL4YmYpVjyJ7KEPrEZnheY?=
+ =?us-ascii?Q?/DqVJtwIfelNuOEMFXkejq06qDAbIT5uxZJq8yo21tTTTjPRbp5VHc2wHSXq?=
+ =?us-ascii?Q?zg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 043d8e2e-921b-4ae8-2603-08dbeb8cb6ed
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 18:56:20.1144
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bhDtqDW5qRWDuNDEIBV3RYAIwPebxFmWWRwOQJJn53LPLnVNYvDZ+12XONQf0D//EcoEdAulBdv1T7yUmsdlzQmvqxcP0IW1dBjcfqC/79g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5000
+X-OriginatorOrg: intel.com
 
-On Wed, Nov 22, 2023 at 06:53:39PM +0100, Christian Marangi wrote:
-> On Wed, Nov 22, 2023 at 05:24:33PM +0000, Russell King (Oracle) wrote:
-> > On Wed, Nov 22, 2023 at 06:08:13PM +0100, Christian Marangi wrote:
-> > > On further testing on BE target with kernel test robot, it was notice
-> > > that the endianness conversion for addr and CRC in fw_load_memory was
-> > > wrong and actually not needed. Values in define doesn't get converted
-> > > and are passed as is and hardcoded values are already in what the PHY
-> > > require, that is LE.
-> > > 
-> > > Also drop the cpu_to_be32 for CRC calculation as it's wrong and use
-> > > _swab32 instead, the word is taked from firmware and is always LE, the
-> > 
-> >                                taken
-> > 
-> > > mailbox will emit a BE CRC hence the word needs to be always swapped and
-> > > the endianness of the host needs to be ignored.
-> > 
-> > I'm not convinced. If the firmware is a bytestream (as most "files" are)
-> > then for val = get_unaligned((u32 *)ptr), where ptr is an array of u8:
-> > 
-> > ptr[0]	ptr[1]	ptr[2]	ptr[3]	val on LE	val on BE
-> > 0x01	0x02	0x03	0x04	0x04030201	0x01020304
-> > 
-> > So, endianness matters here, and I think as Jakub already suggested, you
-> > need to use get_unaligned_le32().
-> >
+On Wed, Nov 22, 2023 at 05:51:14PM +0200, Ioana Ciornei wrote:
+> The first two patches fix a memory corruption issue happening between
+> the Tx and Tx confirmation of a packet by making the Tx alignment at
+> 64bytes mandatory instead of optional as it was previously.
 > 
-> So they DO get converted to the HOST endian on reading the firmware from
-> an nvmem cell or a filesystem?
+> The third patch fixes the Rx copybreak code path which recycled the
+> initial data buffer before all processing was done on the packet.
+>
 
-I don't like "converted". It's *not* a conversion. It's a fundamental
-property of accessing memory using different sizes of access.
-
-As I attempted to explain above, if you have a file, and byte 0
-contains 0xAA, byte 1 of the file contains 0xBB, byte 2 contains
-0xCC, and byte 3 contains 0xDD, then if you read that file byte by
-byte, you will get 0xAA, then 0xBB, then 0xCC and then 0xDD.
-
-If you map that file into memory, e.g. in userspace, using mmap(),
-or allocating memory and reading four bytes into memory, and access
-it using bytes, then at offset 0, you will find 0xAA, offset 1 will
-be 0xBB, etc.
-
-The problems with endianness start when you move away from byte
-access.
-
-If you use 16-bit accessors, then, a little endian machine is defined
-that a 16-bit load from memory will result in the first byte being put
-into the LSB of the 16-bit value, and the second byte will be put into
-the MSB of the 16-bit value. So that would be 0xBBAA. However, on a big
-endian machine, a 16-bit load will result in the first byte being put
-into the MSB of the 16-bit value, and the second byte will be put into
-the LSB of that value - meaning the 16-bit value will be 0xAABB.
-
-The second 16-bit value uses the next two bytes, and the order at which
-these two bytes are placed into the 16-bit value reflects the same as
-the first two bytes. So LE will be 0xDDCC and BE would be 0xCCDD.
-
-The same "swapping" happens with 32-bit, but of course instead of just
-two bytes, it covers four bytes. On LE, a 32-bit access will give
-0xDDCCBBAA. On BE, that will be 0xAABBCCDD.
-
-Again, this is not to do with any kind of "conversion" happening in
-software. It's a property of how the memory subsystem inside the CPU
-works.
-
-> Again this is really dumping raw data from the read file directly to the
-> mailbox. Unless phy_write does some conversion internally, but in that
-> case how does it know what endian is the PHY internally?
-
-phy_write() does *no* conversion. The MDIO bus defines that a 16-bit
-register value will be transferred, and the MDIO bus specifies that
-bit 15 will be sent first, followed by subsequent bits down to bit 0.
-
-The access to the hardware to make this happen is required to ensure
-that the value passed to phy_write() and read using phy_read() will
-reflect this. So, if one does this:
-
-	val = phy_read(phydev, 0);
-
-	for (i = 15; i >= 0; i--)
-		printk("%u", !!(val & BIT(i)));
-
-	printk("\n");
-
-This will give you the stream of bits in the _order_ that they appeared
-on the MDIO bus when phy_read() accessed. Doing the same with a value
-to be written will produce the bits in the same value that they will
-be placed on the MDIO bus.
-
-So, this means that if the BMCR contains 0x1234 in the PHY, phy_read()
-will return 0x1234. Passing 0x1234 into phy_write() will write 0x1234
-in that register. The host endian is entirely irrelevant here.
-
-> > I would make this explicit:
-> > 
-> > 		u8 crc_data[4];
-> > 
-> > 		...
-> > 
-> > 		/* CRC is calculated using BE order */
-> > 		crc_data[0] = word >> 24;
-> > 		crc_data[1] = word >> 16;
-> > 		crc_data[2] = word >> 8;
-> > 		crc_data[3] = word;
-> > 
-> > 		crc = crc_ccitt_false(crc, crc_data, sizeof(crc_data));
-> > 
-> > which will be (a) completely unambiguous, and (b) completely
-> > independent of the host endianness.
+I think patches 1&2 should form a single patch, because they are supposed to be 
+backported to older stable kernels and this is hard to do, if one of patches 
+lacks "Fixes" tag. At the same time, they clearly complement each other.
+ 
+> Ioana Ciornei (3):
+>   dpaa2-eth: increase the needed headroom to account for alignment
+>   dpaa2-eth: set needed_headroom for net_device
+>   dpaa2-eth: recycle the RX buffer only after all processing done
 > 
-> But isn't this exactly what is done with ___constant_swab32 ?
-> __swab32 should not change if the HOST is BE or LE.
-
-Let try again to make this clear. If one has this code:
-
-		u32 word = 0x01020304;
-		u8 *ptr;
-		int i;
-
-		ptr = (u8 *)&word;
-
-		for (i = 0; i < 4; i++)
-			printk(" %02x", ptr[i]);
-		printk("\n");
-
-Then, on a:
-- LE machine, this will print " 04 03 02 01"
-- BE machine, this will print " 01 02 03 04"
-
-Now, if you look at the definition of crc_ccitt_false(), it is
-defined to do:
-
-        while (len--)
-                crc = crc_ccitt_false_byte(crc, *buffer++);
-
-So, on a LE machine, this will feed the above bytes in the order of
-0x04, 0x03, 0x02, 0x01 in a LE machine, and 0x01, 0x02, 0x03, 0x04
-on a BE machine.
-
-> The real question is if word is converted. (by either the read API on
-> reading the FW or by phy_write on writing the thing to mailbox) (the
-> test are done on a LE HOST)
-
-There are no conversions - where a conversion I define as something
-that the software explicitly has to do rather than what the underlying
-machine hardware does.
-
-> Our theory is that mailbox takes LE and internally converts to BE (as
-> the PHY is BE) but the CRC reg calculates the CRC out of the converted
-> data aka it does calculates the CRC from the BE data (converted
-> internally).
-
-I think the talk about the endian-ness of the PHY is entirely
-unhelpful and is probably adding to confusion. The endian-ness of the
-PHY is *not* exposed to the host because the MDIO interface to the PHY
-is defined in terms of 16-bit register quantities, and bit 0 of the
-register will be bit 0 on the host irrespective of host endian.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 16 ++++++++++------
+>  drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h |  2 +-
+>  2 files changed, 11 insertions(+), 7 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
+> 
 
