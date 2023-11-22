@@ -1,269 +1,152 @@
-Return-Path: <netdev+bounces-50174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780227F4C4F
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:26:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B92B7F4C55
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ADCA2813CA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:26:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CA8AB20C91
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A6B24B28;
-	Wed, 22 Nov 2023 16:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FDB24B35;
+	Wed, 22 Nov 2023 16:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ijOQkT5v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC758BD;
-	Wed, 22 Nov 2023 08:26:00 -0800 (PST)
-Received: from [192.168.1.103] (31.173.85.136) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 22 Nov
- 2023 19:25:49 +0300
-Subject: Re: [PATCH 13/13] net: ravb: Add runtime PM support
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
-	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <04cb07fe-cccc-774a-f14d-763ce7ae7b07@omp.ru>
-Date: Wed, 22 Nov 2023 19:25:48 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16397BC
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 08:28:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700670528; x=1732206528;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dVkBwGDQh0KTnGcPQwyuRgxpErlDOtTG1iq22743jm4=;
+  b=ijOQkT5vHSG9PlytsQn72OjtCpG2owvJazDDuSTqMMBw0kM4J4ZlDbJn
+   uQ7iKkRsXgjLOlGMqlHAcuxGy8QLkoD+Psito9MNWd4rANB8WwOiuM4bx
+   C8mp7VcHVG7RtxdfI3S++2bS3Aff6nkBJ3/JZSJfLFJn4WhOWYGjbpeI2
+   ZLxdXtiAuN8EiDMHVfsGVVPgMK9G/5pqPr/88dymrLgPkoGij638I4kVg
+   nyXIbEJhSC6L55w2qGZyqYseBE3jfAxcQvBdx+o4j/Y+Zj9r5pP8lRaR1
+   PtvmzW++eFINeImWcegO4+HLTKVyDPcnAmBwzxBAN96j9Fj77ciFjHnI5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="382491241"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="382491241"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 08:27:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="1098488560"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="1098488560"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 22 Nov 2023 08:27:46 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r5q4l-0000gG-2y;
+	Wed, 22 Nov 2023 16:27:43 +0000
+Date: Thu, 23 Nov 2023 00:26:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Shyam-sundar.S-k@amd.com,
+	Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: Re: [PATCH v2 net-next 4/4] amd-xgbe: use smn functions to avoid race
+Message-ID: <202311222227.RtqixHxt-lkp@intel.com>
+References: <20231116135416.3371367-5-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.85.136 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.85.136
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116135416.3371367-5-Raju.Rangoju@amd.com>
 
-On 11/20/23 11:46 AM, Claudiu wrote:
+Hi Raju,
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+kernel test robot noticed the following build errors:
 
-> RZ/G3S supports enabling/disabling clocks for its modules (including
-> Ethernet module). For this commit adds runtime PM support which
-> relies on PM domain to enable/disable Ethernet clocks.
+[auto build test ERROR on net-next/main]
 
-   That's not exactly something new in RZ/G3S. The ravb driver has unconditional
-RPM calls already in the probe() and remove() methods... And the sh_eth driver
-has RPM support since 2009...
+url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-reorganize-the-code-of-XPCS-access/20231116-215630
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231116135416.3371367-5-Raju.Rangoju%40amd.com
+patch subject: [PATCH v2 net-next 4/4] amd-xgbe: use smn functions to avoid race
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20231122/202311222227.RtqixHxt-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231122/202311222227.RtqixHxt-lkp@intel.com/reproduce)
 
-> At the end of probe ravb_pm_runtime_put() is called which will turn
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311222227.RtqixHxt-lkp@intel.com/
 
-   I'd suggest a shorter name, like ravb_rpm_put() but (looking at this function)
-it doesn't seem hardly needed...
+All errors (new ones prefixed by >>):
 
-> off the Ethernet clocks (if no other request arrives at the driver).
-> After that if the interface is brought up (though ravb_open()) then
-> the clocks remain enabled until interface is brought down (operation
-> done though ravb_close()).
-> 
-> If any request arrives to the driver while the interface is down the
-> clocks are enabled to serve the request and then disabled.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> ---
->  drivers/net/ethernet/renesas/ravb.h      |  1 +
->  drivers/net/ethernet/renesas/ravb_main.c | 99 ++++++++++++++++++++++--
->  2 files changed, 93 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-> index c2d8d890031f..50f358472aab 100644
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-> @@ -1044,6 +1044,7 @@ struct ravb_hw_info {
->  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */
->  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
->  	unsigned refclk_in_pd:1;	/* Reference clock is part of a power domain. */
-> +	unsigned rpm:1;			/* Runtime PM available. */
+>> drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1194:2: error: call to undeclared function 'amd_smn_write'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    1194 |         amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+         |         ^
+   drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1194:2: note: did you mean 'pmd_mkwrite'?
+   include/linux/pgtable.h:610:21: note: 'pmd_mkwrite' declared here
+     610 | static inline pmd_t pmd_mkwrite(pmd_t pmd, struct vm_area_struct *vma)
+         |                     ^
+>> drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1195:2: error: call to undeclared function 'amd_smn_read'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    1195 |         amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
+         |         ^
+   drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1224:2: error: call to undeclared function 'amd_smn_write'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    1224 |         amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+         |         ^
+   drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1225:2: error: call to undeclared function 'amd_smn_read'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    1225 |         amd_smn_read(0, pdata->smn_base + offset, &ctr_mmd_data);
+         |         ^
+   4 errors generated.
+--
+>> drivers/net/ethernet/amd/xgbe/xgbe-pci.c:316:3: error: call to undeclared function 'amd_smn_read'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     316 |                 amd_smn_read(0, pdata->smn_base + (pdata->xpcs_window_def_reg), &reg);
+         |                 ^
+   1 error generated.
 
-   No, I don't think this flag makes any sense. We should support RPM
-unconditionally...
 
-[...]
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index f4634ac0c972..d70ed7e5f7f6 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -145,12 +145,41 @@ static void ravb_read_mac_address(struct device_node *np,
-[...]
-> +static void ravb_pm_runtime_put(struct ravb_private *priv)
-> +{
-> +	const struct ravb_hw_info *info = priv->info;
-> +	struct device *dev = &priv->pdev->dev;
-> +
-> +	if (!info->rpm)
-> +		return;
-> +
-> +	pm_runtime_mark_last_busy(dev);
+vim +/amd_smn_write +1194 drivers/net/ethernet/amd/xgbe/xgbe-dev.c
 
-   Not very familiar with RPM... what's this for?
+  1172	
+  1173	static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+  1174					 int mmd_reg)
+  1175	{
+  1176		unsigned int mmd_address, index, offset;
+  1177		unsigned long flags;
+  1178		int mmd_data;
+  1179	
+  1180		mmd_address = get_mmd_address(pdata, mmd_reg);
+  1181	
+  1182		/* The PCS registers are accessed using mmio. The underlying
+  1183		 * management interface uses indirect addressing to access the MMD
+  1184		 * register sets. This requires accessing of the PCS register in two
+  1185		 * phases, an address phase and a data phase.
+  1186		 *
+  1187		 * The mmio interface is based on 16-bit offsets and values. All
+  1188		 * register offsets must therefore be adjusted by left shifting the
+  1189		 * offset 1 bit and reading 16 bits of data.
+  1190		 */
+  1191		offset = get_index_offset(pdata, mmd_address, &index);
+  1192	
+  1193		spin_lock_irqsave(&pdata->xpcs_lock, flags);
+> 1194		amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+> 1195		amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
+  1196		mmd_data = (offset % 4) ? FIELD_GET(XGBE_GEN_HI_MASK, mmd_data) :
+  1197					  FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
+  1198	
+  1199		spin_unlock_irqrestore(&pdata->xpcs_lock, flags);
+  1200	
+  1201		return mmd_data;
+  1202	}
+  1203	
 
-> +	pm_runtime_put_autosuspend(dev);
-
-   Why not the usual pm_runtime_put()?
-
-> +}
-> +
->  static void ravb_mdio_ctrl(struct mdiobb_ctrl *ctrl, u32 mask, int set)
->  {
->  	struct ravb_private *priv = container_of(ctrl, struct ravb_private,
->  						 mdiobb);
-> +	int ret;
-> +
-> +	ret = ravb_pm_runtime_get(priv);
-> +	if (ret < 0)
-> +		return;
->  
->  	ravb_modify(priv->ndev, PIR, mask, set ? mask : 0);
-> +
-> +	ravb_pm_runtime_put(priv);
-
-   Hmm, does this even work? :-/ Do the MDIO bits retain the values while
-the AVB core is not clocked or even powered down?
-   Note that the sh_eth driver has RPM calls in the {read|write}_c{22?45}()
-methods which do the full register read/write while the core is powere up
-and clocked...
-
-[...]
-> @@ -2064,6 +2107,11 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	const struct ravb_hw_info *info = priv->info;
->  	struct net_device_stats *nstats, *stats0, *stats1;
-> +	int ret;
-> +
-> +	ret = ravb_pm_runtime_get(priv);
-> +	if (ret < 0)
-> +		return NULL;
-
-   Hm, sh_eth.c doesn't have any RPM calls in this method. Again, do
-the hardware counters remain valid across powering the MAC core down?
-
-[...]
-> @@ -2115,11 +2165,18 @@ static void ravb_set_rx_mode(struct net_device *ndev)
->  {
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	unsigned long flags;
-> +	int ret;
-> +
-> +	ret = ravb_pm_runtime_get(priv);
-> +	if (ret < 0)
-> +		return;
-
-   Hm, sh_eth.c doesn't have any RPM calls in this method either.
-Does changing the promiscous mode have sense for an offlined interface?
-
-[...]
-> @@ -2187,6 +2244,11 @@ static int ravb_close(struct net_device *ndev)
->  	if (info->nc_queues)
->  		ravb_ring_free(ndev, RAVB_NC);
->  
-> +	/* Note that if RPM is enabled on plaforms with ccc_gac=1 this needs to be
-
-   It's "platforms". :-)
-
-> skipped and
-
-   Overly long line?
-
-> +	 * added to suspend function after PTP is stopped.
-
-   I guess we'll have to do that because RPM is actually not RZ/G3
-specific...
-
-> +	 */
-> +	ravb_pm_runtime_put(priv);
-> +
->  	return 0;
->  }
->  
-> @@ -2636,6 +2699,12 @@ static int ravb_probe(struct platform_device *pdev)
->  	if (error)
->  		return error;
->  
-> +	info = of_device_get_match_data(&pdev->dev);
-> +
-> +	if (info->rpm) {
-> +		pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-
-   Why exactly 100 ms?
-
-> +		pm_runtime_use_autosuspend(&pdev->dev);
-> +	}
-
-   Before calling pm_runtime_enable()?
-
->  	pm_runtime_enable(&pdev->dev);
-[...]
-> @@ -2880,6 +2950,8 @@ static int ravb_probe(struct platform_device *pdev)
->  	pm_runtime_put(&pdev->dev);
->  pm_runtime_disable:
->  	pm_runtime_disable(&pdev->dev);
-> +	if (info->rpm)
-> +		pm_runtime_dont_use_autosuspend(&pdev->dev);
-
-   After calling pm_runtime_disable()?
-
-[...]
-> @@ -2908,6 +2985,8 @@ static void ravb_remove(struct platform_device *pdev)
->  			  priv->desc_bat_dma);
->  	pm_runtime_put_sync(&pdev->dev);
->  	pm_runtime_disable(&pdev->dev);
-> +	if (info->rpm)
-> +		pm_runtime_dont_use_autosuspend(&pdev->dev);
-
-   After calling pm_runtime_disable()?
-
-[...]
-
-MBR, Sergey
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
