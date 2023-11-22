@@ -1,108 +1,217 @@
-Return-Path: <netdev+bounces-50181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C692C7F4CF8
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:41:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2AA7F4D28
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03A191C20A13
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7580281387
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3140A59B6E;
-	Wed, 22 Nov 2023 16:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB7A2134B;
+	Wed, 22 Nov 2023 16:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PiPnagN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4424310C3;
-	Wed, 22 Nov 2023 08:41:16 -0800 (PST)
-Received: from [192.168.1.103] (31.173.85.136) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 22 Nov
- 2023 19:41:07 +0300
-Subject: Re: [PATCH 12/13] net: ravb: Assert/deassert reset on suspend/resume
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
-	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-13-claudiu.beznea.uj@bp.renesas.com>
- <c9f68819-7dc0-3035-4bf4-6bda5dfc621e@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <9d0e7d60-51a2-2abe-1cb9-65deca455527@omp.ru>
-Date: Wed, 22 Nov 2023 19:41:07 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2EA18E;
+	Wed, 22 Nov 2023 08:48:31 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 86218C0009;
+	Wed, 22 Nov 2023 16:48:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700671710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ajeauEZR8WppxNQT8eguJ25565qc08+DI61fuQmDdSw=;
+	b=PiPnagN9iA4MhaTLDc0PKQQxX7jexlIsRjYcnOgbXCiZ7lFZmSs3HYvO1oqFGQJNZ+OZtc
+	7llzyBJuhiaS6KK78ftrDv3r6SUHB+Cb7eL/SRe1WSpYsI746ct/ELMbb7X/t1hBFCJS4h
+	8Q/VGXKUbAqU1/IdEIJikgPyCUlltf9FXg23vlqMd7siaiPgxhNOapiSaYzyTEoM+ZfSrU
+	m7f+xt4301mwwpAuvl9VjrUQLXtVCFret7cQUG4iVqSRHzZHDUR1zADrUePzM5uy+uFULJ
+	2EMPOxfr0ZFkRdDNxnMJxeFQcJ13BCARG28OJjWx8VERkRno1n0o/PCou4C47Q==
+Date: Wed, 22 Nov 2023 17:48:28 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231122174828.7625d7f4@kmaincent-XPS-13-7390>
+In-Reply-To: <45694d77-bcf8-4377-9aa0-046796de8d74@lunn.ch>
+References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
+	<20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
+	<45694d77-bcf8-4377-9aa0-046796de8d74@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <c9f68819-7dc0-3035-4bf4-6bda5dfc621e@omp.ru>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_arrow_text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.85.136 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.85.136 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.85.136
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 11/21/23 10:13 PM, Sergey Shtylyov wrote:
-[...]
+On Sat, 18 Nov 2023 19:54:30 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+>=20
+> > +	unsigned long last_cmd_key_time;
+> > +
+> > +	enum ethtool_pse_admin_state
+> > admin_state[PD692X0_MAX_LOGICAL_PORTS]; +};
+> > +
+> > +/* Template list of the fixed bytes of the communication messages */
+> > +static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_=
+CNT]
+> > =3D {
+> > +	[PD692X0_MSG_RESET] =3D {
+> > +		.content =3D {
+> > +			.key =3D PD692X0_KEY_CMD,
+> > +			.sub =3D {0x07, 0x55, 0x00},
+> > +			.data =3D {0x55, 0x00, 0x55, 0x4e,
+> > +				 0x4e, 0x4e, 0x4e, 0x4e},
+> > +		},
+> > +	}, =20
+>=20
+> Is there any documentation about what all these magic number mean?
+>=20
+> > +/* Implementation of the i2c communication in particular when there is
+> > + * a communication loss. See the "Synchronization During Communication
+> > Loss"
+> > + * paragraph of the Communication Protocol document.
+> > + */ =20
+>=20
+> Is this document public?
 
->> reinitialized. Deasserting the reset signal for it should also be done.
->> Thus add reset assert/deassert on suspend/resume functions.
-> 
->    Firefox' spell checker trips over deassert[ing] and you have |de-assert"
+Yes:
+https://www.microchip.com/en-us/software-library/p3-55-firmware-for-pd69200=
+-for-ieee802-3bt
 
-   s/Firefox/Thunderbird/. :-)
+>=20
+> > +static int pd692x0_recv_msg(struct pd692x0_priv *priv,
+> > +			    struct pd692x0_msg *msg,
+> > +			    struct pd692x0_msg_content *buf)
+> > +{
+> > +	const struct i2c_client *client =3D priv->client;
+> > +	int ret;
+> > +
+> > +	memset(buf, 0, sizeof(*buf));
+> > +	if (msg->delay_recv)
+> > +		msleep(msg->delay_recv);
+> > +	else
+> > +		msleep(30);
+> > +
+> > +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> > +	if (buf->key)
+> > +		goto out; =20
+>=20
+> This is the first attempt to receive the message. I assume buf->key
+> not being 0 indicates something has been received?
 
-[...]
+Yes,=20
 
-MBR, Sergey
+>=20
+> > +
+> > +	msleep(100);
+> > +
+> > +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> > +	if (buf->key)
+> > +		goto out; =20
+>=20
+> So this is a second attempt. Should there be another memset? Could the
+> first failed transfer fill the buffer with random junk in the higher
+> bytes, and a successful read here could be a partial read and the end
+> of the buffer still contains the junk.
+
+Not sure. The message read should have the right size.
+I will maybe add the memset to prevent any weird behavior.
+
+> Another resend and two more attempts to receive.
+>=20
+> Is there a reason to not uses for loops here? And maybe put
+> send/receive/receive into a helper? And maybe make the first send part
+> of this, rather then separate? I think the code will be more readable
+> when restructured.
+
+I have written it like that to describe literally the communication loss
+procedure. I may restructured it for better understanding.
+
+> > +static int pd692x0_ethtool_set_config(struct pse_controller_dev *pcdev,
+> > +				      unsigned long id,
+> > +				      struct netlink_ext_ack *extack,
+> > +				      const struct pse_control_config
+> > *config) +{
+> > +	struct pd692x0_priv *priv =3D to_pd692x0_priv(pcdev);
+> > +	struct pd692x0_msg_content buf =3D {0};
+> > +	struct pd692x0_msg msg;
+> > +	int ret;
+> > +
+> > +	ret =3D pd692x0_fw_unavailable(priv);
+> > +	if (ret)
+> > +		return ret; =20
+>=20
+> It seems a bit late to check if the device has any firmware. I would
+> of expected probe to check that, and maybe attempt to download
+> firmware. If that fails, fail the probe, since the PSE is a brick.
+
+The PSE can still be flashed it never become an unusable brick.
+We can flash the wrong Firmware, or having issue in the flashing process. T=
+his
+way we could reflash the controller firmware several times.=20
+
+> > +static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_pr=
+iv
+> > *priv) +{
+> > +	struct pd692x0_msg msg =3D
+> > pd692x0_msg_template_list[PD692X0_MSG_GET_SW_VER];
+> > +	struct device *dev =3D &priv->client->dev;
+> > +	struct pd692x0_msg_content buf =3D {0};
+> > +	struct pd692x0_msg_ver ver =3D {0};
+> > +	int ret;
+> > +
+> > +	ret =3D pd692x0_sendrecv_msg(priv, &msg, &buf);
+> > +	if (ret < 0) {
+> > +		dev_err(dev, "Failed to get PSE version (%pe)\n",
+> > ERR_PTR(ret));
+> > +		return ver; =20
+>=20
+> I _think_ that return is wrong ???
+
+No, this return will return an empty struct pd692x0_msg_ver.
+Which means the firmware has not any version.
+
+> Is the firmware in Motorola SREC format? I thought the kernel had a
+> helper for that, but a quick search did not find it. So maybe i'm
+> remembering wrongly. But it seems silly for every driver to implement
+> an SREC parser.
+
+Oh, I didn't know this format. The firmware seems indeed to match this form=
+at
+specification.
+I found two reference of this Firmware format in the kernel:
+https://elixir.bootlin.com/linux/v6.5.7/source/sound/soc/codecs/zl38060.c#L=
+178
+https://elixir.bootlin.com/linux/v6.5.7/source/drivers/staging/wlan-ng/pris=
+m2fw.c
+
+Any preference in the choice? The zl38060 fw usage is maybe the easiest.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
