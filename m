@@ -1,75 +1,53 @@
-Return-Path: <netdev+bounces-50238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA9537F4FC1
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:39:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9EF7F4FDC
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256B01C20A1D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:39:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AC161C20B2C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640455CD13;
-	Wed, 22 Nov 2023 18:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB775CD29;
+	Wed, 22 Nov 2023 18:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2VxqY8A"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p702r9em"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F6D10C0;
-	Wed, 22 Nov 2023 10:39:50 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-40b2ad4953cso7028945e9.0;
-        Wed, 22 Nov 2023 10:39:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700678388; x=1701283188; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YDjLfRk2WpjpKzC7NBxti8sskFBWWzZRE9jVKMLQcIQ=;
-        b=a2VxqY8AFbaZqVN/EzNNPCTNHVTEkWs0FTnjuFfqqZ+fTgIWNGW7kDjJH/sSdjRGOy
-         rqX0eHCewNJ/G5xE08LppATj/KQP6/aYDJYN8bmxXCmAlGtA5JgrG75lp39xQDpmjXcy
-         SAk7eH46ySz/RXoKtpjxnQHJBTSF+/Gf0E6XSu1WrSdso/8kw138kN5OxGj0UrDWvdM8
-         FajheAMITgZgX2vX10V6l/7/j1dpMTsBc4PQ8aqMKzSeyHqFi7CupLt9yxrN/l8CMmQi
-         7IxyiMtXx1uNY/71vhX3W7AgatN7d9BNaBusoCJ4iO1XyTvrI8a5BloIJqufi7cICHWX
-         3Ppg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700678388; x=1701283188;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YDjLfRk2WpjpKzC7NBxti8sskFBWWzZRE9jVKMLQcIQ=;
-        b=GY+prxma71JZUGNYmDoTcgo+Cqq0NqkwJc2mDNu6zeu1Sh63Gil8uRES9VJREMPiyj
-         MMXqeoPRl0dd16a+UZPlM4CW8j87gaqBCi5TWDz5+goxO7n3kWNIBhTfqMlrnn6ulB/P
-         gkIGzaS9YCvmkKXfJrU9aEe9Xglq4jwx800G8gZDE5wrVrAFTye4qvKOFgMAzAzslpF1
-         nZ+UUsDBaPH5CVAQxFaByli26vQeHs1AHaQn5LqGfxDPCe0JrqqkQaQ2lBx+lVd4GKjd
-         YWc58EugfSg9u1tlEZwGKOPYRn8JdJWRBl1bausYaEpbVIRgvMxMfDJ+0AqKXrP7Qb9c
-         oKOQ==
-X-Gm-Message-State: AOJu0Yy+SS+BvBgeD9IT/Z/5SNVWvHwmr0yCEinkR8Zr5ujvXfmxzl4/
-	8RiTjlkvtaRRWXNMb0cpelU=
-X-Google-Smtp-Source: AGHT+IEODA7sDfQRz1z/Fo5qEgzJagOOGYIc58x1MDSPqo64Jmqfvu9AnwF2LW8TEm+brrJaQvylhA==
-X-Received: by 2002:a05:600c:274e:b0:406:5a14:5c1e with SMTP id 14-20020a05600c274e00b004065a145c1emr321071wmw.1.1700678387986;
-        Wed, 22 Nov 2023 10:39:47 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id je20-20020a05600c1f9400b0040836519dd9sm208462wmb.25.2023.11.22.10.39.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 10:39:47 -0800 (PST)
-Message-ID: <655e4af3.050a0220.54c5a.113b@mx.google.com>
-X-Google-Original-Message-ID: <ZV5K8P1tTC3HUkqE@Ansuel-xps.>
-Date: Wed, 22 Nov 2023 19:39:44 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [net-next PATCH] net: phy: aquantia: drop wrong endianness
- conversion for addr and CRC
-References: <20231122170813.1222-1-ansuelsmth@gmail.com>
- <ZV45UY6nYZ/WAHpG@shell.armlinux.org.uk>
- <655e4025.df0a0220.50550.3d70@mx.google.com>
- <20231122102347.0bde86bb@kernel.org>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08A8E7;
+	Wed, 22 Nov 2023 10:45:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=y1fBGTaRbSsoTo5doogPTMVmvkDbZKH9bppQF/sgZqE=; b=p702r9emhkbRvBPO7sN3lEkiso
+	/rQFsZ6XCANykAc95fAd27zoV5bytiHkSvzmB691lItmkNeldjgv/Ra/V+XaDFG1s0YVy8iLLUJBy
+	2/8q9JbfiTYx3FuHTMgNAHpa18lX4BM8lLM6QbpZS6V7U2hFtWIq2TTc2wDZPtvkhJbU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5sDs-000uBk-Dl; Wed, 22 Nov 2023 19:45:16 +0100
+Date: Wed, 22 Nov 2023 19:45:16 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tomer Maimon <tmaimon77@gmail.com>
+Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com,
+	edumazet@google.com, krzysztof.kozlowski+dt@linaro.org,
+	linux-stm32@st-md-mailman.stormreply.com, benjaminfair@google.com,
+	openbmc@lists.ozlabs.org, joabreu@synopsys.com, joel@jms.id.au,
+	devicetree@vger.kernel.org, j.neuschaefer@gmx.net,
+	robh+dt@kernel.org, peppe.cavallaro@st.com,
+	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com,
+	venture@google.com, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+	davem@davemloft.net
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+Message-ID: <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+ <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
+ <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,39 +56,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231122102347.0bde86bb@kernel.org>
+In-Reply-To: <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
 
-On Wed, Nov 22, 2023 at 10:23:47AM -0800, Jakub Kicinski wrote:
-> On Wed, 22 Nov 2023 18:53:39 +0100 Christian Marangi wrote:
-> > So they DO get converted to the HOST endian on reading the firmware from
-> > an nvmem cell or a filesystem?
+On Wed, Nov 22, 2023 at 07:50:57PM +0200, Tomer Maimon wrote:
+> Hi Andrew,
 > 
-> They don't get converted when "reading from nvmem / fs". 
-> They get converted when you do:
+> Thanks for your comments
 > 
-> 		word = get_unaligned((const u32 *)(data + pos));
-> 
-> get_unaligned() is basically:
-> 
-> #if BIGENDIAN
-> #define		get_unaligned	get_unaligned_be32
-> #else
-> #define		get_unaligned	get_unaligned_le32
-> #endif
-> 
-> so you'll get different behavior here depending on the CPU.
+> On Tue, 21 Nov 2023 at 18:42, Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> > > +                      struct plat_stmmacenet_data *plat_dat)
+> > > +{
+> > > +     u16 val;
+> > > +
+> > > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> > > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +     val |= PCS_RST;
+> > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +
+> > > +     while (val & PCS_RST)
+> > > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +
+> > > +     val &= ~(PCS_AN_ENABLE);
+> > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +}
+> >
+> > Is this a licensed PCS implementation? Or home grown? If its been
+> > licensed from somebody, it maybe should live in driver/net/pcs, so
+> > others can reuse it when they license the same core.
 
-Ugh... If that is true this is bad...
+> we are using DWC PCS, I don't see support for DWC PCS and I am not
+> sure it is supposed to be supported at /drivers/net/pcs
 
-When get_unaligned was suggested, I checked if the thing was doing any
-kind of conversion and from [1] I tought it was just getting the
-pointer.
+I've not followed the naming used by Synopsys. Is DWC PCS the same as
+XPCS? Does Synopsys have multiple PCS implementations?
 
-I can't find the entry where the thing is done. Is this some kind of
-include magic with asm specific API?
+> I do see a patch set to support DWC PCS but I don't think it answers my needs
+> https://patchwork.ozlabs.org/project/netdev/patch/1559674736-2190-3-git-send-email-weifeng.voon@intel.com/
 
-[1] https://elixir.bootlin.com/linux/latest/source/include/asm-generic/unaligned.h#L22
+I _think_ this patch eventually got turned into
+driver/net/pcs/pcs-xpcs.c
 
--- 
-	Ansuel
+What exactly does it not do for you?
+
+     Andrew
 
