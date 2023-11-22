@@ -1,136 +1,119 @@
-Return-Path: <netdev+bounces-50165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A23F7F4C03
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:11:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B92F7F4C15
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:15:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2369E281363
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:11:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CD051C2085D
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955E12137E;
-	Wed, 22 Nov 2023 16:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B18A4C3A4;
+	Wed, 22 Nov 2023 16:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="iVmy9Md0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DtriJOKi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA088BC;
-	Wed, 22 Nov 2023 08:11:27 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1E47D21853;
-	Wed, 22 Nov 2023 16:11:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1700669486; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tjxIQeXSz4B6dutTyQbVvz42XSlpNrvZxeWc0EaGPkQ=;
-	b=iVmy9Md0SMd/ZAJ7hwv0SH0uCj0+7Q7+bXx7BTix8G6I8LAt6xZhdlFHnJkWS5GJL3pZEK
-	7Khhvp+aPQtZe8JnN6dreGhynuyoOpUSlFBatVXG14e/EdRIJM+GNlGz9My2mMKwNaIFe1
-	EZMIOmP/kuZ8cTVzBME/0cHY2+zEorw=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8BC7813467;
-	Wed, 22 Nov 2023 16:11:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id mwpQIS0oXmVlNwAAMHmgww
-	(envelope-from <mkoutny@suse.com>); Wed, 22 Nov 2023 16:11:25 +0000
-Date: Wed, 22 Nov 2023 17:11:24 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, 
-	Martin Wilck <mwilck@suse.com>
-Subject: Re: [PATCH] net/sched: cls: Load net classifier modules via alias
-Message-ID: <rfhthr7f6st26h3ggfanaeyfi7ndld5mo46qhq7gufr6fbmzst@fbi27atd6djs>
-References: <20231121175640.9981-1-mkoutny@suse.com>
- <CAM0EoM=id7xo1=F5SY2f+hy8a8pkXQ5a0xNJ+JKd9e6o=--RQg@mail.gmail.com>
- <yerqczxbz6qlrslkfbu6u2emb5esqe7tkrexdbneite2ah2a6i@l6arp7nzyj75>
- <CAM0EoMk_OgpjV7Huh-NHF_WxkJtQYGAMY+kutsL=qD9oYthh_w@mail.gmail.com>
- <CAM0EoM=Pq02p-sbkMSQBg8=dwTC5z+AeLjeXdzeHTA1AFSLuRg@mail.gmail.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41262BD
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 08:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FY+f2qj0/72vLCisd/VN8yV9yOyc4z6I8SX1zuVOtOo=; b=DtriJOKi3vI0eepNlR+YqJ7KRJ
+	rLH1hD2gw5VyWUc+LMSslCc/B37vrHEelRKrgp1+AoZvc/M38ckn4OeO7yJlcT3xk9aLCi10fpMQN
+	fpEchRZglQVwCDuV9GACnfAzzs/WlT+f+gLNz9esPZP8hXl9WVIaL2qnFel8FT6eOSaw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5psX-000t8H-Rs; Wed, 22 Nov 2023 17:15:05 +0100
+Date: Wed, 22 Nov 2023 17:15:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	horms@kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next 1/5] net: wangxun: add flow control support
+Message-ID: <6218df6e-db11-4640-a296-946088d32916@lunn.ch>
+References: <20231122102226.986265-1-jiawenwu@trustnetic.com>
+ <20231122102226.986265-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ellx3u2ji6sqqzad"
-Content-Disposition: inline
-In-Reply-To: <CAM0EoM=Pq02p-sbkMSQBg8=dwTC5z+AeLjeXdzeHTA1AFSLuRg@mail.gmail.com>
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 BAYES_HAM(-2.90)[99.56%];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_TWELVE(0.00)[24];
-	 SIGNED_PGP(-2.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+,1:+,2:~];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,suse.cz,suse.com];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 SUSPICIOUS_RECIPS(1.50)[]
-
-
---ellx3u2ji6sqqzad
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20231122102226.986265-2-jiawenwu@trustnetic.com>
 
-On Wed, Nov 22, 2023 at 10:55:29AM -0500, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> Out of curiosity - how did you end up looking at this?
+> +	/* Calculate max LAN frame size */
+> +	link = dev->mtu + ETH_HLEN + ETH_FCS_LEN + WX_ETH_FRAMING;
+> +	tc = link;
+> +
+> +	/* Calculate delay value for device */
+> +	dv_id = WX_DV(link, tc);
 
-The trigger for this case was tcindex module -- removed in upstream, so
-we don't want to have implicit autoloads for it while we retain it in
-our distro.
+That looks odd. tc == link. So why pass both? Or is it a typo?
 
-The user has to modprobe explicitly or un-blacklist the module.
+> +/* BitTimes (BT) conversion */
+> +#define WX_BT2KB(BT)         (((BT) + (8 * 1024 - 1)) / (8 * 1024))
+> +#define WX_B2BT(BT)          ((BT) * 8)
+> +/* Calculate Interface Delay */
+> +#define WX_PHY_D     12800
+> +#define WX_MAC_D     4096
+> +#define WX_XAUI_D    (2 * 1024)
+> +#define WX_ID        (WX_MAC_D + WX_XAUI_D + WX_PHY_D)
+> +/* Calculate PCI Bus delay for low thresholds */
+> +#define WX_PCI_DELAY 10000
+> +
+> +/* Calculate delay value in bit times */
+> +#define WX_DV(_max_frame_link, _max_frame_tc) \
+> +	((36 * (WX_B2BT(_max_frame_link) + 672 + (2 * 5556) + (2 * WX_ID) + 6144) / \
+> +	  25 + 1) +  2 * WX_B2BT(_max_frame_tc))
+> +
+> +/* Calculate low threshold delay values */
+> +#define WX_LOW_DV(_max_frame_tc) \
+> +	(2 * (2 * WX_B2BT(_max_frame_tc) + (36 * WX_PCI_DELAY / 25) + 1))
 
-(For instance, we've been leveraging this for the fs-* modules due to
-various support status of filesystem modules in SLE.)
+There is too much magic here. Please make these functions, and add
+comments explaining what is going on here.
 
+> +static void ngbe_get_pauseparam(struct net_device *netdev,
+> +				struct ethtool_pauseparam *pause)
+> +{
+> +	struct wx *wx = netdev_priv(netdev);
+> +
+> +	pause->autoneg = !wx->fc.disable_fc_autoneg;
 
-Michal
+Maybe call it enable_fs_autoneg, since that is what the kAPI uses?
 
---ellx3u2ji6sqqzad
-Content-Type: application/pgp-signature; name="signature.asc"
+> +static int ngbe_set_pauseparam(struct net_device *netdev,
+> +			       struct ethtool_pauseparam *pause)
+> +{
+> +	struct wx *wx = netdev_priv(netdev);
+> +
+> +	if (!wx->phydev)
+> +		return -ENODEV;
+> +
+> +	if (!phy_validate_pause(wx->phydev, pause))
+> +		return -EINVAL;
+> +
+> +	wx->fc.disable_fc_autoneg = !pause->autoneg;
+> +	wx->fc.tx_pause = pause->tx_pause;
+> +	wx->fc.rx_pause = pause->rx_pause;
+> +
+> +	phy_set_asym_pause(wx->phydev, pause->rx_pause, pause->tx_pause);
 
------BEGIN PGP SIGNATURE-----
+You should only be doing this if pause->autoneg is true. If it is
+false, you ignore the results from autoneg, and just configure the
+hardware as indicated by pause->{tr}x_pause.
 
-iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZV4oKgAKCRAGvrMr/1gc
-jiYdAQCazlPSmBnTX8+0PP94jKGjnQ3eWojW1rjG+rqiKhgBeAEAkw8NYL7FaIsQ
-H0omuGkVP0DS2VuIKSLV7NokhGLa0QI=
-=XKw4
------END PGP SIGNATURE-----
+phylink makes this a lot easier, because it hides away all these
+details. You might want to convert to phylink. Everybody gets is wrong
+with phylib, but correct with phylink.
 
---ellx3u2ji6sqqzad--
+	 Andrew
 
