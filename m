@@ -1,168 +1,137 @@
-Return-Path: <netdev+bounces-50072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07857F4851
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:53:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A797F4853
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F19B1F22062
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:53:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032A91C20A35
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F344E638;
-	Wed, 22 Nov 2023 13:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E75A4E60E;
+	Wed, 22 Nov 2023 13:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RpN4yL9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEC2D5C;
-	Wed, 22 Nov 2023 05:53:07 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0Vww0FYJ_1700661184;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vww0FYJ_1700661184)
-          by smtp.aliyun-inc.com;
-          Wed, 22 Nov 2023 21:53:04 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	kgraul@linux.ibm.com,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: tonylu@linux.alibaba.com,
-	alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/2] net/smc: add sysctl for max conns per lgr for SMC-R v2.1
-Date: Wed, 22 Nov 2023 21:52:58 +0800
-Message-Id: <20231122135258.38746-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
-References: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A43DA10C4
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 05:53:16 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso10930a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 05:53:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700661195; x=1701265995; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gj6oyOdW2Xvm1QufVJ+uIJ0FzpSWaZsFrtXO58tNbSU=;
+        b=RpN4yL9n1g7rpT0iz3jn/B1bCzvhVT5GdU0EF4ivLIwa0NR4TlASrA/SRJ0V7usziC
+         WAwufqETpXpZM2SVy5lt9+qaTSFCc++9HuOPmiWddWHC9TAVSJdxnMogaScLrYqOGjyo
+         qs3u1KGxRSANk5eT08+NJKXDo6qanF5NcQmNiAJPIhE+bNPkkZUkAv2ZdG3P0LCtEzch
+         6PopVdZqZjoTCSBLBy3rInrbVp/pcBLIJKp33mim6nHbF0Go1MBXj2xQJDVpUx8NnluP
+         fNulPz+Jqk2paNco0U/L2mKNoV8eJdR7pLHgkTH5bitj1kx+J+KZes5bL5hxzkb6BGl9
+         A+VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700661195; x=1701265995;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gj6oyOdW2Xvm1QufVJ+uIJ0FzpSWaZsFrtXO58tNbSU=;
+        b=YEvGqph0hHWD0iYW5s3b7bnt0yZOfHYPR8h6CMw4PuXnE/0o1TT/3VOsZPG1yky7ph
+         kQfPLZeIrTDmoy8IFQ3axK8BecyhH+LBQO/baPNIt1iMR40+Q5/FUvRzleS792wGsYqa
+         o3TL5uOlsaHsUd4B91dU24sqQ8SQHyWY084TDzlUHGFTwKpIRBZkuzeHvYA9LLJaBknJ
+         HKcroVF5LB/bKYaQLBLkPJeIeK+Nr8auP7IMXwEcr9rfIj2ewUKG9p3Q8YjfjpLzkK57
+         17YXrV5gHZBakKFN1vXgIe57zm+PTd/nWWgtIK7COQsshgyEhAA8e0sjL7iPo8OfB7HB
+         eolQ==
+X-Gm-Message-State: AOJu0YwTqqbZxZPDpzjBMQmtCtdfyRRPvr09Hta13pxOnuVXjnecOA1j
+	LBvcxp7IwQlbrERN6r/DuGVdHTKYoLS1K41rpNulFw==
+X-Google-Smtp-Source: AGHT+IGlghtudxqV9qbV3LYvCA/cnj3P7s6YIQ8VB0zWLEGo+mKPxXz7fwsLwoptVjn3JbOyqJrhUb11BEZEdGUTpYE=
+X-Received: by 2002:a05:6402:35ca:b0:544:24a8:ebd with SMTP id
+ z10-20020a05640235ca00b0054424a80ebdmr172913edc.4.1700661194342; Wed, 22 Nov
+ 2023 05:53:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231122034420.1158898-1-kuba@kernel.org> <20231122034420.1158898-13-kuba@kernel.org>
+In-Reply-To: <20231122034420.1158898-13-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 Nov 2023 14:53:00 +0100
+Message-ID: <CANn89i+6HOE8rs5S3OemjrY9yKGkUb0ZMcs3+npGCLNSFROoUg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 12/13] net: page_pool: mute the periodic
+ warning for visible page pools
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	almasrymina@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	dsahern@gmail.com, dtatulea@nvidia.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a new sysctl: net.smc.smcr_max_conns_per_lgr, which is
-used to control the preferred max connections per lgr for
-SMC-R v2.1. The default value of this sysctl is 255, and
-the acceptable value ranges from 16 to 255.
+On Wed, Nov 22, 2023 at 4:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Mute the periodic "stalled pool shutdown" warning if the page pool
+> is visible to user space. Rolling out a driver using page pools
+> to just a few hundred hosts at Meta surfaces applications which
+> fail to reap their broken sockets. Obviously it's best if the
+> applications are fixed, but we don't generally print warnings
+> for application resource leaks. Admins can now depend on the
+> netlink interface for getting page pool info to detect buggy
+> apps.
+>
+> While at it throw in the ID of the pool into the message,
+> in rare cases (pools from destroyed netns) this will make
+> finding the pool with a debugger easier.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/core/page_pool.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 3d0938a60646..c2e7c9a6efbe 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -897,18 +897,21 @@ static void page_pool_release_retry(struct work_str=
+uct *wq)
+>  {
+>         struct delayed_work *dwq =3D to_delayed_work(wq);
+>         struct page_pool *pool =3D container_of(dwq, typeof(*pool), relea=
+se_dw);
+> +       void *netdev;
+>         int inflight;
+>
+>         inflight =3D page_pool_release(pool);
+>         if (!inflight)
+>                 return;
+>
+> -       /* Periodic warning */
+> -       if (time_after_eq(jiffies, pool->defer_warn)) {
+> +       /* Periodic warning for page pools the user can't see */
+> +       netdev =3D READ_ONCE(pool->slow.netdev);
+> +       if (time_after_eq(jiffies, pool->defer_warn) &&
+> +           (!netdev || netdev =3D=3D NET_PTR_POISON)) {
+>                 int sec =3D (s32)((u32)jiffies - (u32)pool->defer_start) =
+/ HZ;
 
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
----
- Documentation/networking/smc-sysctl.rst |  6 ++++++
- include/net/netns/smc.h                 |  1 +
- net/smc/smc_clc.c                       |  5 +++--
- net/smc/smc_sysctl.c                    | 12 ++++++++++++
- net/smc/smc_sysctl.h                    |  1 +
- 5 files changed, 23 insertions(+), 2 deletions(-)
+Orthogonal to your patch, but this probably could avoid all these casts.
 
-diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-index c6ef86ef4c4f..a874d007f2db 100644
---- a/Documentation/networking/smc-sysctl.rst
-+++ b/Documentation/networking/smc-sysctl.rst
-@@ -65,3 +65,9 @@ smcr_max_links_per_lgr - INTEGER
- 	for SMC-R v2.1 and later.
- 
- 	Default: 2
-+
-+smcr_max_conns_per_lgr - INTEGER
-+	Controls the max number of connections can be added to a SMC-R link group. The
-+	acceptable value ranges from 16 to 255. Only for SMC-R v2.1 and later.
-+
-+	Default: 255
-diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
-index da7023587824..fc752a50f91b 100644
---- a/include/net/netns/smc.h
-+++ b/include/net/netns/smc.h
-@@ -23,5 +23,6 @@ struct netns_smc {
- 	int				sysctl_wmem;
- 	int				sysctl_rmem;
- 	int				sysctl_max_links_per_lgr;
-+	int				sysctl_max_conns_per_lgr;
- };
- #endif
-diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-index 1f87c8895a27..0fda5156eef0 100644
---- a/net/smc/smc_clc.c
-+++ b/net/smc/smc_clc.c
-@@ -944,7 +944,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
- 	}
- 	if (smcr_indicated(ini->smc_type_v2)) {
- 		memcpy(v2_ext->roce, ini->smcrv2.ib_gid_v2, SMC_GID_SIZE);
--		v2_ext->max_conns = SMC_CONN_PER_LGR_PREFER;
-+		v2_ext->max_conns = net->smc.sysctl_max_conns_per_lgr;
- 		v2_ext->max_links = net->smc.sysctl_max_links_per_lgr;
- 	}
- 
-@@ -1191,7 +1191,8 @@ int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
- 		return SMC_CLC_DECL_NOV2EXT;
- 
- 	if (ini->smcr_version & SMC_V2) {
--		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns, SMC_CONN_PER_LGR_PREFER);
-+		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns,
-+				       net->smc.sysctl_max_conns_per_lgr);
- 		if (ini->max_conns < SMC_CONN_PER_LGR_MIN)
- 			return SMC_CLC_DECL_MAXCONNERR;
- 
-diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-index 3e9bb921e40a..a5946d1b9d60 100644
---- a/net/smc/smc_sysctl.c
-+++ b/net/smc/smc_sysctl.c
-@@ -27,6 +27,8 @@ static const int net_smc_wmem_init = (64 * 1024);
- static const int net_smc_rmem_init = (64 * 1024);
- static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
- static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
-+static int conns_per_lgr_min = SMC_CONN_PER_LGR_MIN;
-+static int conns_per_lgr_max = SMC_CONN_PER_LGR_MAX;
- 
- static struct ctl_table smc_table[] = {
- 	{
-@@ -79,6 +81,15 @@ static struct ctl_table smc_table[] = {
- 		.extra1		= &links_per_lgr_min,
- 		.extra2		= &links_per_lgr_max,
- 	},
-+	{
-+		.procname	= "smcr_max_conns_per_lgr",
-+		.data		= &init_net.smc.sysctl_max_conns_per_lgr,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= &conns_per_lgr_min,
-+		.extra2		= &conns_per_lgr_max,
-+	},
- 	{  }
- };
- 
-@@ -109,6 +120,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
- 	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
- 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
- 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
-+	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
- 
- 	return 0;
- 
-diff --git a/net/smc/smc_sysctl.h b/net/smc/smc_sysctl.h
-index 5783dd7575dd..eb2465ae1e15 100644
---- a/net/smc/smc_sysctl.h
-+++ b/net/smc/smc_sysctl.h
-@@ -24,6 +24,7 @@ static inline int smc_sysctl_net_init(struct net *net)
- {
- 	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
- 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
-+	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
- 	return 0;
- }
- 
--- 
-2.24.3 (Apple Git-128)
+long sec =3D (jiffies - pool->defer_start) / HZ;
 
+
+>
+> -               pr_warn("%s() stalled pool shutdown %d inflight %d sec\n"=
+,
+> -                       __func__, inflight, sec);
+> +               pr_warn("%s() stalled pool shutdown: id %u, %d inflight %=
+d sec\n",
+> +                       __func__, pool->user.id, inflight, sec);
+>                 pool->defer_warn =3D jiffies + DEFER_WARN_INTERVAL;
+>         }
+>
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
