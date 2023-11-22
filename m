@@ -1,136 +1,154 @@
-Return-Path: <netdev+bounces-50194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569977F4E0D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:16:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80D787F4E43
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8777A1C20A8C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:16:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FD9CB20A69
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 17:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC5857888;
-	Wed, 22 Nov 2023 17:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5285B5B8;
+	Wed, 22 Nov 2023 17:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KUA08b5U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dv+Hb9NF"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA73191;
-	Wed, 22 Nov 2023 09:16:50 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D9EEC60005;
-	Wed, 22 Nov 2023 17:16:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700673409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=96QYHoZIDIT+pxG6t2aqCRbFyqHy2hKopbA6OtGC0ug=;
-	b=KUA08b5UpgDVT1Kju2OmlHYuYPXgqPrvOrFBHuw1abLqkrs5cPxtdYXHtnbwYAM8lelA88
-	jm1PutjS30gkjtNygopDI5oZa0aJYFHh7SRzlVxIaoMc7obiW98oKo9db1aOdIPGCW+A+C
-	Ash1xYvo6E/RUmxVsIOS+G3F2KZajj+gPzSNz2utAQUa+X+rnPhvWsIVFLRCs4mq64rsBG
-	8B7O9KyJl52TiZ+/MIssxF4mxVn1/f9NlVuCbIJ2wlGym9utHkXm9tApy4zUQC6HIOOp86
-	x8o7ABaAu2TcLEwT2lNVvP6XDl3FtfSjSIZQbG8r9V97Vf2j85MUjhDjUTDdDQ==
-Date: Wed, 22 Nov 2023 18:16:47 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <20231122181647.06d9c3c9@kmaincent-XPS-13-7390>
-In-Reply-To: <04f59e77-134b-45b2-8759-84b8e22c30d5@lunn.ch>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
-	<20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
-	<2ff8bea5-5972-4d1a-a692-34ad27b05446@lunn.ch>
-	<20231122171112.59370d21@kmaincent-XPS-13-7390>
-	<04f59e77-134b-45b2-8759-84b8e22c30d5@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A500F83;
+	Wed, 22 Nov 2023 09:23:40 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-da7ea62e76cso8553276.3;
+        Wed, 22 Nov 2023 09:23:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700673820; x=1701278620; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=NynfojDHOku/gIHF0Vtvo3+Mk/LM+8uGwtlY48AR6MM=;
+        b=dv+Hb9NFVteaY/vRglrdAUYLSLXPsyrJVgF9JnPXQvEfm2SlEIoV3Cjdb0jhSU7zbH
+         EMe3pZGSj8PezsOOH/uTGeeBBu5LA3JNxQ1Y+bVhTnFqNtLE/5nmgl4RZ1iFHEI1LCoT
+         5TbcbtE8KDWmSgrwbfW75JGKxHMddg142VC4L8nmIIwuuCIGZeUzzH+VjtDviNnOaVwb
+         GOiWhExqu+Dkib8akRA40YXsGhxZICdhrM2MAa7TRgfT4LTrnVICd+kWZTuhqGLM6Syg
+         Md3q6DM9WQepd1i9ZrcmfSNK+Ittxz8Q8vKToi4P/rH1wTSWjl8nm6UxYQdTrEau63zR
+         5cmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700673820; x=1701278620;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NynfojDHOku/gIHF0Vtvo3+Mk/LM+8uGwtlY48AR6MM=;
+        b=p7UzkmWLM7ulzzCKqGFME5+zSN3n+0o9mJGfb5iSclhi6iYsPUcMwqU9BFJ9WK1GYM
+         ZUWtuLm0vdP5evOD22BFy+dNDZ8NbeHLbWlBj6bNnB/DliQrpjtsFyURqf9NaBHhmP5W
+         o4SqBb0sn3DeTQ2G6lyiFp5gBJxuN7NxXd/cpBzBCWDOSSCc+1sOQlCL528InELE9JDp
+         D9XoDxbRReIRod/CAMzQbSJbm8UU+ph0y4y9qfngXaM09fFJ6fkoIiAA1QMuUz7G93Ua
+         OnUSqtw/gC/UjbvCFRh29zxnYLlLDUzZGz7cwtBSL13VaCCcEHgUCV2eNRZwGXZMv35+
+         T+8Q==
+X-Gm-Message-State: AOJu0YwPUEQX+p7d8atOv6DSXMzAR2DikttHylEs0bz7SmSEBzeb1XVj
+	8xf+kIwh4Mpp9s7LYTlAet/SEWWrnoY9s+cfUTw=
+X-Google-Smtp-Source: AGHT+IHOpI5xPVk6Sar76TK2xFochhgo10/ziA9WnAM3iYe0K/JG8b7nGUI7tLK1eOpbXeUs9Wl63rjUYOi5f2szQMQ=
+X-Received: by 2002:a5b:1cb:0:b0:d91:fdb:afd4 with SMTP id f11-20020a5b01cb000000b00d910fdbafd4mr2751108ybp.16.1700673819823;
+ Wed, 22 Nov 2023 09:23:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+References: <20231121151733.2015384-1-tmaimon77@gmail.com> <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <ZVzQh9ykusyknGgP@shell.armlinux.org.uk>
+In-Reply-To: <ZVzQh9ykusyknGgP@shell.armlinux.org.uk>
+From: Tomer Maimon <tmaimon77@gmail.com>
+Date: Wed, 22 Nov 2023 19:23:28 +0200
+Message-ID: <CAP6Zq1gzAhp9BZNX1MOozUfQc82Vi_S==on5_nOfVfpvtgnN2g@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, edumazet@google.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, alexandre.torgue@foss.st.com, 
+	peppe.cavallaro@st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com, 
+	avifishman70@gmail.com, tali.perry1@gmail.com, joel@jms.id.au, 
+	andrew@codeconstruct.com.au, venture@google.com, yuenn@google.com, 
+	benjaminfair@google.com, j.neuschaefer@gmx.net, openbmc@lists.ozlabs.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 22 Nov 2023 17:54:53 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hi Russell,
 
-> > > > +static int pd692x0_sendrecv_msg(struct pd692x0_priv *priv,
-> > > > +				struct pd692x0_msg *msg,
-> > > > +				struct pd692x0_msg_content *buf)
-> > > > +{
-> > > > +	struct device *dev =3D &priv->client->dev;
-> > > > +	int ret;
-> > > > +
-> > > > +	ret =3D pd692x0_send_msg(priv, msg);
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > > +
-> > > > +	ret =3D pd692x0_recv_msg(priv, msg, buf);   =20
-> > >=20
-> > > So this function takes at least 10 seconds? =20
-> >=20
-> > No, on normal communication it takes a bit more than 30ms. =20
->=20
-> So i think the first step is to refactor this code to make it clear
-> what the normal path is, and what the exception path is, and the
-> timing of each.
+Thanks for your comments.
 
-Ok I will try to refactor it to makes it more readable.
+On Tue, 21 Nov 2023 at 17:45, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, Nov 21, 2023 at 05:17:33PM +0200, Tomer Maimon wrote:
+> > Add Nuvoton NPCM BMC SoCs support to STMMAC dwmac driver.
+> >
+> > And modify MAINTAINERS to add a new F: entry for this driver.
+> >
+> > Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+>
+> A few comments on this...
+>
+> > +#define IND_AC_BA_REG                0x1FE
+> > +#define SR_MII_CTRL          0x3E0000
+> > +
+> > +#define PCS_SR_MII_CTRL_REG  0x0
+> > +#define PCS_SPEED_SELECT6    BIT(6)
+> > +#define PCS_AN_ENABLE                BIT(12)
+> > +#define PCS_SPEED_SELECT13   BIT(13)
+> > +#define PCS_RST                      BIT(15)
+>
+> include/uapi/linux/mii.h:
+>
+> #define BMCR_SPEED1000          0x0040  /* MSB of Speed (1000)         */
+> #define BMCR_ANENABLE           0x1000  /* Enable auto negotiation     */
+> #define BMCR_SPEED100           0x2000  /* Select 100Mbps              */
+> #define BMCR_RESET              0x8000  /* Reset to default state      */
+>
+> Look familiar? Maybe use the standard definitions for a standardised
+> register?
+>
+> > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> > +                      struct plat_stmmacenet_data *plat_dat)
+> > +{
+> > +     u16 val;
+> > +
+> > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > +     val |= PCS_RST;
+> > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > +
+> > +     while (val & PCS_RST)
+> > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+>
+> What if the PCS never clears its reset bit? Maybe use
+> read_poll_timeout() ?
+>
+> > +
+> > +     val &= ~(PCS_AN_ENABLE);
+> > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > +}
+>
+> Also, maybe it's time to require new stmmac platform support to start
+> making use of the phylink PCS support rather than continuing to code its
+> own?
+>
+> I notice, however, that you always disable inband signalling - please
+> explain why. Also, what protocol does the PCS use when communicating
+> with the PHY?
+With disable inband signalling you mean disable auto negotiation? if
+yes it is because the PCS sgmii is connected to the external phy AN
+and is not working between the PCS and external phy.
+accessing the PCS registers is indirect. The top 13 bits (bits 21-9)
+of the offset have to be written to Indirect Access Base register
+bits 12:0 before indirectly accessing the target register with the
+offset of the bottom 9 bits (8:0) of the offset
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-> > > > +	msg.content.sub[2] =3D id;
-> > > > +	ret =3D pd692x0_sendrecv_msg(priv, &msg, &buf);   =20
-> > >=20
-> > > So this is also 10 seconds?=20
-> > >=20
-> > > Given its name, it looks like this is called via ethtool? Is the
-> > > ethtool core holding RTNL? It is generally considered bad to hold RTN=
-L for
-> > > that long. =20
-> >=20
-> > Yes it is holding RTNL lock. Should I consider another behavior in case=
- of
-> > communication loss to not holding RTNL lock so long? =20
->=20
-> How often does it happen? On the scale of its a theoretical
-> possibility, through to it happens every N calls? Also, does it happen
-> on cold boot and reboot?
->=20
-> If its never supposed to happen, i would keep holding RTNL, and add a
-> pr_warn() that the PSE has crashed and burned, waiting for it to
-> reboot. If this is likely to happen on the first communication with
-> the device, we might want to do a dummy transfer during probe to get
-> is synchronized before we start using it with the RTNL held.
+Thanks,
 
-I would say it never supposed to happen.
-I never faced the issue playing with the controller. The first communicatio=
-n is
-a simple i2c_master_recv of the controller status without entering the
-pd692x0_sendrecv_msg function, therefore it won't be an issue.
-
-Another solution could be to raise a flag if I enter in communication loss =
-and
-release the rtnlock. We would lock again the rtnl when the flags got disabl=
-ed.
-The controler won't be accessible until the flag is disabled.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Tomer
 
