@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5FB17F3C92
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:45:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C307F3C93
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 986FF1C20E3F
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:45:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60707B21C99
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63905156CE;
-	Wed, 22 Nov 2023 03:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B0015ACF;
+	Wed, 22 Nov 2023 03:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rw0GS3IG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQyNqU/U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC07154AD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46F9156FA
 	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 03:44:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E95BC433C9;
-	Wed, 22 Nov 2023 03:44:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D4A4C433C7;
+	Wed, 22 Nov 2023 03:44:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700624673;
-	bh=k6BCwT3mMlwBdbDzwICVicjvlT2vUYZ5On66Y2xJ0vw=;
+	bh=Ss4mGXWk5JCzPCZ7jnZ0waqr0mlfBJiNSYi+zYjMV/A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rw0GS3IG2X1yQ5yeEO3GngxzTB2AifJ4gkFLv9Tso9lu836nmGx1kb07xYWT3a/j6
-	 8IFOd4nxG4k3YabNJRN7tuY/STgIiDaI6cYx3Qql87QMcj12fY/1cr9Xh+MPep989H
-	 c6AorMCztSaRGTLPSDlRfcFtV6IXI+ePyw8L3ocO3xodmmz6/SsTXKAU01InS+1Fxf
-	 ghtKmv/BzjLgAOBugNXidK5P9pOt4IpewL6y3YX/PIRtkbspooHSJ/loy4HBzPuD0y
-	 lfIRVGUiumOcTVfHVgzFsI5O1lv4kPGtZEFf70FgbMlYYoKNMCqHdVRXo08FKq5P/b
-	 yNfx75gRw3UwQ==
+	b=mQyNqU/UPXDYUpGnauMjAHwJnCmPj1t+nfaS+GwiC82Y0D9Urb8c/IixzkxwPpgVS
+	 f5bG3k+eJvPJE5ZfMVutwYmMsaQbL+IdyKAp/t1wmpKZzmVKVG/tMS7NeSYQnzxvyo
+	 ghv9xaR31PxbjSr4JfMahePQED9/+7coS6sCkwP66TH5VPpDqUxng08d4rBZHeZXST
+	 dpmWXO24DXA5pWJILyUfH+0tETYzz28KErxMCDvC+C1oZOaD8SdsdJ8b7NBr83nMCw
+	 PWHc9wDAVMVcZOe47f5oRCEjPCC5EKvzNLIlVe/+hK7nurake+j4XAdJaY59mPaWrU
+	 airlEMjdICLhQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -44,9 +44,9 @@ Cc: netdev@vger.kernel.org,
 	dtatulea@nvidia.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 12/13] net: page_pool: mute the periodic warning for visible page pools
-Date: Tue, 21 Nov 2023 19:44:19 -0800
-Message-ID: <20231122034420.1158898-13-kuba@kernel.org>
+Subject: [PATCH net-next v3 13/13] tools: ynl: add sample for getting page-pool information
+Date: Tue, 21 Nov 2023 19:44:20 -0800
+Message-ID: <20231122034420.1158898-14-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231122034420.1158898-1-kuba@kernel.org>
 References: <20231122034420.1158898-1-kuba@kernel.org>
@@ -58,54 +58,919 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Mute the periodic "stalled pool shutdown" warning if the page pool
-is visible to user space. Rolling out a driver using page pools
-to just a few hundred hosts at Meta surfaces applications which
-fail to reap their broken sockets. Obviously it's best if the
-applications are fixed, but we don't generally print warnings
-for application resource leaks. Admins can now depend on the
-netlink interface for getting page pool info to detect buggy
-apps.
+Regenerate the tools/ code after netdev spec changes.
 
-While at it throw in the ID of the pool into the message,
-in rare cases (pools from destroyed netns) this will make
-finding the pool with a debugger easier.
+Add sample to query page-pool info in a concise fashion:
+
+$ ./page-pool
+    eth0[2]	page pools: 10 (zombies: 0)
+		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
+		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/page_pool.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ tools/include/uapi/linux/netdev.h     |  36 +++
+ tools/net/ynl/generated/netdev-user.c | 419 ++++++++++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h | 171 +++++++++++
+ tools/net/ynl/lib/ynl.h               |   2 +-
+ tools/net/ynl/samples/.gitignore      |   1 +
+ tools/net/ynl/samples/Makefile        |   2 +-
+ tools/net/ynl/samples/page-pool.c     | 147 +++++++++
+ 7 files changed, 776 insertions(+), 2 deletions(-)
+ create mode 100644 tools/net/ynl/samples/page-pool.c
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 3d0938a60646..c2e7c9a6efbe 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -897,18 +897,21 @@ static void page_pool_release_retry(struct work_struct *wq)
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 2943a151d4f1..9d0a48717d1f 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -64,16 +64,52 @@ enum {
+ 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_PAGE_POOL_ID = 1,
++	NETDEV_A_PAGE_POOL_IFINDEX,
++	NETDEV_A_PAGE_POOL_NAPI_ID,
++	NETDEV_A_PAGE_POOL_INFLIGHT,
++	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
++	NETDEV_A_PAGE_POOL_DESTROYED,
++
++	__NETDEV_A_PAGE_POOL_MAX,
++	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
++};
++
++enum {
++	NETDEV_A_PAGE_POOL_STATS_INFO = 1,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST = 8,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT,
++
++	__NETDEV_A_PAGE_POOL_STATS_MAX,
++	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+ 	NETDEV_CMD_DEV_DEL_NTF,
+ 	NETDEV_CMD_DEV_CHANGE_NTF,
++	NETDEV_CMD_PAGE_POOL_GET,
++	NETDEV_CMD_PAGE_POOL_ADD_NTF,
++	NETDEV_CMD_PAGE_POOL_DEL_NTF,
++	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
++	NETDEV_CMD_PAGE_POOL_STATS_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+ };
+ 
+ #define NETDEV_MCGRP_MGMT	"mgmt"
++#define NETDEV_MCGRP_PAGE_POOL	"page-pool"
+ 
+ #endif /* _UAPI_LINUX_NETDEV_H */
+diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
+index b5ffe8cd1144..f9a000584493 100644
+--- a/tools/net/ynl/generated/netdev-user.c
++++ b/tools/net/ynl/generated/netdev-user.c
+@@ -18,6 +18,11 @@ static const char * const netdev_op_strmap[] = {
+ 	[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf",
+ 	[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf",
+ 	[NETDEV_CMD_DEV_CHANGE_NTF] = "dev-change-ntf",
++	[NETDEV_CMD_PAGE_POOL_GET] = "page-pool-get",
++	[NETDEV_CMD_PAGE_POOL_ADD_NTF] = "page-pool-add-ntf",
++	[NETDEV_CMD_PAGE_POOL_DEL_NTF] = "page-pool-del-ntf",
++	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] = "page-pool-change-ntf",
++	[NETDEV_CMD_PAGE_POOL_STATS_GET] = "page-pool-stats-get",
+ };
+ 
+ const char *netdev_op_str(int op)
+@@ -59,6 +64,16 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
+ }
+ 
+ /* Policies */
++struct ynl_policy_attr netdev_page_pool_info_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
++	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
++};
++
++struct ynl_policy_nest netdev_page_pool_info_nest = {
++	.max_attr = NETDEV_A_PAGE_POOL_MAX,
++	.table = netdev_page_pool_info_policy,
++};
++
+ struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
+ 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
+ 	[NETDEV_A_DEV_PAD] = { .name = "pad", .type = YNL_PT_IGNORE, },
+@@ -72,7 +87,85 @@ struct ynl_policy_nest netdev_dev_nest = {
+ 	.table = netdev_dev_policy,
+ };
+ 
++struct ynl_policy_attr netdev_page_pool_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
++	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
++	[NETDEV_A_PAGE_POOL_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_INFLIGHT] = { .name = "inflight", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_INFLIGHT_MEM] = { .name = "inflight-mem", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_DESTROYED] = { .name = "destroyed", .type = YNL_PT_UINT, },
++};
++
++struct ynl_policy_nest netdev_page_pool_nest = {
++	.max_attr = NETDEV_A_PAGE_POOL_MAX,
++	.table = netdev_page_pool_policy,
++};
++
++struct ynl_policy_attr netdev_page_pool_stats_policy[NETDEV_A_PAGE_POOL_STATS_MAX + 1] = {
++	[NETDEV_A_PAGE_POOL_STATS_INFO] = { .name = "info", .type = YNL_PT_NEST, .nest = &netdev_page_pool_info_nest, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST] = { .name = "alloc-fast", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW] = { .name = "alloc-slow", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER] = { .name = "alloc-slow-high-order", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY] = { .name = "alloc-empty", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL] = { .name = "alloc-refill", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE] = { .name = "alloc-waive", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED] = { .name = "recycle-cached", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL] = { .name = "recycle-cache-full", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING] = { .name = "recycle-ring", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL] = { .name = "recycle-ring-full", .type = YNL_PT_UINT, },
++	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT] = { .name = "recycle-released-refcnt", .type = YNL_PT_UINT, },
++};
++
++struct ynl_policy_nest netdev_page_pool_stats_nest = {
++	.max_attr = NETDEV_A_PAGE_POOL_STATS_MAX,
++	.table = netdev_page_pool_stats_policy,
++};
++
+ /* Common nested types */
++void netdev_page_pool_info_free(struct netdev_page_pool_info *obj)
++{
++}
++
++int netdev_page_pool_info_put(struct nlmsghdr *nlh, unsigned int attr_type,
++			      struct netdev_page_pool_info *obj)
++{
++	struct nlattr *nest;
++
++	nest = mnl_attr_nest_start(nlh, attr_type);
++	if (obj->_present.id)
++		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, obj->id);
++	if (obj->_present.ifindex)
++		mnl_attr_put_u32(nlh, NETDEV_A_PAGE_POOL_IFINDEX, obj->ifindex);
++	mnl_attr_nest_end(nlh, nest);
++
++	return 0;
++}
++
++int netdev_page_pool_info_parse(struct ynl_parse_arg *yarg,
++				const struct nlattr *nested)
++{
++	struct netdev_page_pool_info *dst = yarg->data;
++	const struct nlattr *attr;
++
++	mnl_attr_for_each_nested(attr, nested) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == NETDEV_A_PAGE_POOL_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.id = 1;
++			dst->id = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.ifindex = 1;
++			dst->ifindex = mnl_attr_get_u32(attr);
++		}
++	}
++
++	return 0;
++}
++
+ /* ============== NETDEV_CMD_DEV_GET ============== */
+ /* NETDEV_CMD_DEV_GET - do */
+ void netdev_dev_get_req_free(struct netdev_dev_get_req *req)
+@@ -197,6 +290,314 @@ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp)
+ 	free(rsp);
+ }
+ 
++/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
++/* NETDEV_CMD_PAGE_POOL_GET - do */
++void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req)
++{
++	free(req);
++}
++
++void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp)
++{
++	free(rsp);
++}
++
++int netdev_page_pool_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct netdev_page_pool_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == NETDEV_A_PAGE_POOL_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.id = 1;
++			dst->id = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.ifindex = 1;
++			dst->ifindex = mnl_attr_get_u32(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_NAPI_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.napi_id = 1;
++			dst->napi_id = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.inflight = 1;
++			dst->inflight = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT_MEM) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.inflight_mem = 1;
++			dst->inflight_mem = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_DESTROYED) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.destroyed = 1;
++			dst->destroyed = mnl_attr_get_uint(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct netdev_page_pool_get_rsp *
++netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct netdev_page_pool_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
++	ys->req_policy = &netdev_page_pool_nest;
++	yrs.yarg.rsp_policy = &netdev_page_pool_nest;
++
++	if (req->_present.id)
++		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, req->id);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = netdev_page_pool_get_rsp_parse;
++	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	netdev_page_pool_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* NETDEV_CMD_PAGE_POOL_GET - dump */
++void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp)
++{
++	struct netdev_page_pool_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp);
++	}
++}
++
++struct netdev_page_pool_get_list *
++netdev_page_pool_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct netdev_page_pool_get_list);
++	yds.cb = netdev_page_pool_get_rsp_parse;
++	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
++	yds.rsp_policy = &netdev_page_pool_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	netdev_page_pool_get_list_free(yds.first);
++	return NULL;
++}
++
++/* NETDEV_CMD_PAGE_POOL_GET - notify */
++void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp)
++{
++	free(rsp);
++}
++
++/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
++/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
++void
++netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req)
++{
++	netdev_page_pool_info_free(&req->info);
++	free(req);
++}
++
++void
++netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp)
++{
++	netdev_page_pool_info_free(&rsp->info);
++	free(rsp);
++}
++
++int netdev_page_pool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
++					 void *data)
++{
++	struct netdev_page_pool_stats_get_rsp *dst;
++	struct ynl_parse_arg *yarg = data;
++	const struct nlattr *attr;
++	struct ynl_parse_arg parg;
++
++	dst = yarg->data;
++	parg.ys = yarg->ys;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == NETDEV_A_PAGE_POOL_STATS_INFO) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.info = 1;
++
++			parg.rsp_policy = &netdev_page_pool_info_nest;
++			parg.data = &dst->info;
++			if (netdev_page_pool_info_parse(&parg, attr))
++				return MNL_CB_ERROR;
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_fast = 1;
++			dst->alloc_fast = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_slow = 1;
++			dst->alloc_slow = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_slow_high_order = 1;
++			dst->alloc_slow_high_order = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_empty = 1;
++			dst->alloc_empty = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_refill = 1;
++			dst->alloc_refill = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.alloc_waive = 1;
++			dst->alloc_waive = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.recycle_cached = 1;
++			dst->recycle_cached = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.recycle_cache_full = 1;
++			dst->recycle_cache_full = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.recycle_ring = 1;
++			dst->recycle_ring = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.recycle_ring_full = 1;
++			dst->recycle_ring_full = mnl_attr_get_uint(attr);
++		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.recycle_released_refcnt = 1;
++			dst->recycle_released_refcnt = mnl_attr_get_uint(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct netdev_page_pool_stats_get_rsp *
++netdev_page_pool_stats_get(struct ynl_sock *ys,
++			   struct netdev_page_pool_stats_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct netdev_page_pool_stats_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
++	ys->req_policy = &netdev_page_pool_stats_nest;
++	yrs.yarg.rsp_policy = &netdev_page_pool_stats_nest;
++
++	if (req->_present.info)
++		netdev_page_pool_info_put(nlh, NETDEV_A_PAGE_POOL_STATS_INFO, &req->info);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = netdev_page_pool_stats_get_rsp_parse;
++	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	netdev_page_pool_stats_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
++void
++netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp)
++{
++	struct netdev_page_pool_stats_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		netdev_page_pool_info_free(&rsp->obj.info);
++		free(rsp);
++	}
++}
++
++struct netdev_page_pool_stats_get_list *
++netdev_page_pool_stats_get_dump(struct ynl_sock *ys)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct netdev_page_pool_stats_get_list);
++	yds.cb = netdev_page_pool_stats_get_rsp_parse;
++	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
++	yds.rsp_policy = &netdev_page_pool_stats_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	netdev_page_pool_stats_get_list_free(yds.first);
++	return NULL;
++}
++
+ static const struct ynl_ntf_info netdev_ntf_info[] =  {
+ 	[NETDEV_CMD_DEV_ADD_NTF] =  {
+ 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
+@@ -216,6 +617,24 @@ static const struct ynl_ntf_info netdev_ntf_info[] =  {
+ 		.policy		= &netdev_dev_nest,
+ 		.free		= (void *)netdev_dev_get_ntf_free,
+ 	},
++	[NETDEV_CMD_PAGE_POOL_ADD_NTF] =  {
++		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
++		.cb		= netdev_page_pool_get_rsp_parse,
++		.policy		= &netdev_page_pool_nest,
++		.free		= (void *)netdev_page_pool_get_ntf_free,
++	},
++	[NETDEV_CMD_PAGE_POOL_DEL_NTF] =  {
++		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
++		.cb		= netdev_page_pool_get_rsp_parse,
++		.policy		= &netdev_page_pool_nest,
++		.free		= (void *)netdev_page_pool_get_ntf_free,
++	},
++	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] =  {
++		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
++		.cb		= netdev_page_pool_get_rsp_parse,
++		.policy		= &netdev_page_pool_nest,
++		.free		= (void *)netdev_page_pool_get_ntf_free,
++	},
+ };
+ 
+ const struct ynl_family ynl_netdev_family =  {
+diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
+index 4fafac879df3..f27ad84fe020 100644
+--- a/tools/net/ynl/generated/netdev-user.h
++++ b/tools/net/ynl/generated/netdev-user.h
+@@ -21,6 +21,16 @@ const char *netdev_xdp_act_str(enum netdev_xdp_act value);
+ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
+ 
+ /* Common nested types */
++struct netdev_page_pool_info {
++	struct {
++		__u32 id:1;
++		__u32 ifindex:1;
++	} _present;
++
++	__u64 id;
++	__u32 ifindex;
++};
++
+ /* ============== NETDEV_CMD_DEV_GET ============== */
+ /* NETDEV_CMD_DEV_GET - do */
+ struct netdev_dev_get_req {
+@@ -87,4 +97,165 @@ struct netdev_dev_get_ntf {
+ 
+ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp);
+ 
++/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
++/* NETDEV_CMD_PAGE_POOL_GET - do */
++struct netdev_page_pool_get_req {
++	struct {
++		__u32 id:1;
++	} _present;
++
++	__u64 id;
++};
++
++static inline struct netdev_page_pool_get_req *
++netdev_page_pool_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct netdev_page_pool_get_req));
++}
++void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req);
++
++static inline void
++netdev_page_pool_get_req_set_id(struct netdev_page_pool_get_req *req, __u64 id)
++{
++	req->_present.id = 1;
++	req->id = id;
++}
++
++struct netdev_page_pool_get_rsp {
++	struct {
++		__u32 id:1;
++		__u32 ifindex:1;
++		__u32 napi_id:1;
++		__u32 inflight:1;
++		__u32 inflight_mem:1;
++		__u32 destroyed:1;
++	} _present;
++
++	__u64 id;
++	__u32 ifindex;
++	__u64 napi_id;
++	__u64 inflight;
++	__u64 inflight_mem;
++	__u64 destroyed;
++};
++
++void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp);
++
++/*
++ * Get / dump information about Page Pools.
++(Only Page Pools associated with a net_device can be listed.)
++
++ */
++struct netdev_page_pool_get_rsp *
++netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req);
++
++/* NETDEV_CMD_PAGE_POOL_GET - dump */
++struct netdev_page_pool_get_list {
++	struct netdev_page_pool_get_list *next;
++	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
++};
++
++void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp);
++
++struct netdev_page_pool_get_list *
++netdev_page_pool_get_dump(struct ynl_sock *ys);
++
++/* NETDEV_CMD_PAGE_POOL_GET - notify */
++struct netdev_page_pool_get_ntf {
++	__u16 family;
++	__u8 cmd;
++	struct ynl_ntf_base_type *next;
++	void (*free)(struct netdev_page_pool_get_ntf *ntf);
++	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
++};
++
++void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp);
++
++/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
++/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
++struct netdev_page_pool_stats_get_req {
++	struct {
++		__u32 info:1;
++	} _present;
++
++	struct netdev_page_pool_info info;
++};
++
++static inline struct netdev_page_pool_stats_get_req *
++netdev_page_pool_stats_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct netdev_page_pool_stats_get_req));
++}
++void
++netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req);
++
++static inline void
++netdev_page_pool_stats_get_req_set_info_id(struct netdev_page_pool_stats_get_req *req,
++					   __u64 id)
++{
++	req->_present.info = 1;
++	req->info._present.id = 1;
++	req->info.id = id;
++}
++static inline void
++netdev_page_pool_stats_get_req_set_info_ifindex(struct netdev_page_pool_stats_get_req *req,
++						__u32 ifindex)
++{
++	req->_present.info = 1;
++	req->info._present.ifindex = 1;
++	req->info.ifindex = ifindex;
++}
++
++struct netdev_page_pool_stats_get_rsp {
++	struct {
++		__u32 info:1;
++		__u32 alloc_fast:1;
++		__u32 alloc_slow:1;
++		__u32 alloc_slow_high_order:1;
++		__u32 alloc_empty:1;
++		__u32 alloc_refill:1;
++		__u32 alloc_waive:1;
++		__u32 recycle_cached:1;
++		__u32 recycle_cache_full:1;
++		__u32 recycle_ring:1;
++		__u32 recycle_ring_full:1;
++		__u32 recycle_released_refcnt:1;
++	} _present;
++
++	struct netdev_page_pool_info info;
++	__u64 alloc_fast;
++	__u64 alloc_slow;
++	__u64 alloc_slow_high_order;
++	__u64 alloc_empty;
++	__u64 alloc_refill;
++	__u64 alloc_waive;
++	__u64 recycle_cached;
++	__u64 recycle_cache_full;
++	__u64 recycle_ring;
++	__u64 recycle_ring_full;
++	__u64 recycle_released_refcnt;
++};
++
++void
++netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp);
++
++/*
++ * Get page pool statistics.
++ */
++struct netdev_page_pool_stats_get_rsp *
++netdev_page_pool_stats_get(struct ynl_sock *ys,
++			   struct netdev_page_pool_stats_get_req *req);
++
++/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
++struct netdev_page_pool_stats_get_list {
++	struct netdev_page_pool_stats_get_list *next;
++	struct netdev_page_pool_stats_get_rsp obj __attribute__((aligned(8)));
++};
++
++void
++netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp);
++
++struct netdev_page_pool_stats_get_list *
++netdev_page_pool_stats_get_dump(struct ynl_sock *ys);
++
+ #endif /* _LINUX_NETDEV_GEN_H */
+diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
+index e974378e3b8c..075d868f3b57 100644
+--- a/tools/net/ynl/lib/ynl.h
++++ b/tools/net/ynl/lib/ynl.h
+@@ -239,7 +239,7 @@ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
+ #ifndef MNL_HAS_AUTO_SCALARS
+ static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
  {
- 	struct delayed_work *dwq = to_delayed_work(wq);
- 	struct page_pool *pool = container_of(dwq, typeof(*pool), release_dw);
-+	void *netdev;
- 	int inflight;
+-	if (mnl_attr_get_len(attr) == 4)
++	if (mnl_attr_get_payload_len(attr) == 4)
+ 		return mnl_attr_get_u32(attr);
+ 	return mnl_attr_get_u64(attr);
+ }
+diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
+index 2aae60c4829f..49637b26c482 100644
+--- a/tools/net/ynl/samples/.gitignore
++++ b/tools/net/ynl/samples/.gitignore
+@@ -1,3 +1,4 @@
+ ethtool
+ devlink
+ netdev
++page-pool
+\ No newline at end of file
+diff --git a/tools/net/ynl/samples/Makefile b/tools/net/ynl/samples/Makefile
+index 3dbb106e87d9..1afefc266b7a 100644
+--- a/tools/net/ynl/samples/Makefile
++++ b/tools/net/ynl/samples/Makefile
+@@ -18,7 +18,7 @@ include $(wildcard *.d)
  
- 	inflight = page_pool_release(pool);
- 	if (!inflight)
- 		return;
+ all: $(BINS)
  
--	/* Periodic warning */
--	if (time_after_eq(jiffies, pool->defer_warn)) {
-+	/* Periodic warning for page pools the user can't see */
-+	netdev = READ_ONCE(pool->slow.netdev);
-+	if (time_after_eq(jiffies, pool->defer_warn) &&
-+	    (!netdev || netdev == NET_PTR_POISON)) {
- 		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
- 
--		pr_warn("%s() stalled pool shutdown %d inflight %d sec\n",
--			__func__, inflight, sec);
-+		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
-+			__func__, pool->user.id, inflight, sec);
- 		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
- 	}
- 
+-$(BINS): ../lib/ynl.a ../generated/protos.a
++$(BINS): ../lib/ynl.a ../generated/protos.a $(SRCS)
+ 	@echo -e '\tCC sample $@'
+ 	@$(COMPILE.c) $(CFLAGS_$@) $@.c -o $@.o
+ 	@$(LINK.c) $@.o -o $@  $(LDLIBS)
+diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
+new file mode 100644
+index 000000000000..18d359713469
+--- /dev/null
++++ b/tools/net/ynl/samples/page-pool.c
+@@ -0,0 +1,147 @@
++// SPDX-License-Identifier: GPL-2.0
++#define _GNU_SOURCE
++
++#include <stdio.h>
++#include <string.h>
++
++#include <ynl.h>
++
++#include <net/if.h>
++
++#include "netdev-user.h"
++
++struct stat {
++	unsigned int ifc;
++
++	struct {
++		unsigned int cnt;
++		size_t refs, bytes;
++	} live[2];
++
++	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
++};
++
++struct stats_array {
++	unsigned int i, max;
++	struct stat *s;
++};
++
++static struct stat *find_ifc(struct stats_array *a, unsigned int ifindex)
++{
++	unsigned int i;
++
++	for (i = 0; i < a->i; i++) {
++		if (a->s[i].ifc == ifindex)
++			return &a->s[i];
++	}
++
++	a->i++;
++	if (a->i == a->max) {
++		a->max *= 2;
++		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
++	}
++	a->s[i].ifc = ifindex;
++	return &a->s[i];
++}
++
++static void count(struct stat *s, unsigned int l,
++		  struct netdev_page_pool_get_rsp *pp)
++{
++	s->live[l].cnt++;
++	if (pp->_present.inflight)
++		s->live[l].refs += pp->inflight;
++	if (pp->_present.inflight_mem)
++		s->live[l].bytes += pp->inflight_mem;
++}
++
++int main(int argc, char **argv)
++{
++	struct netdev_page_pool_stats_get_list *pp_stats;
++	struct netdev_page_pool_get_list *pools;
++	struct stats_array a = {};
++	struct ynl_error yerr;
++	struct ynl_sock *ys;
++
++	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
++	if (!ys) {
++		fprintf(stderr, "YNL: %s\n", yerr.msg);
++		return 1;
++	}
++
++	a.max = 128;
++	a.s = calloc(a.max, sizeof(*a.s));
++	if (!a.s)
++		goto err_close;
++
++	pools = netdev_page_pool_get_dump(ys);
++	if (!pools)
++		goto err_free;
++
++	ynl_dump_foreach(pools, pp) {
++		struct stat *s = find_ifc(&a, pp->ifindex);
++
++		count(s, 1, pp);
++		if (pp->_present.destroyed)
++			count(s, 0, pp);
++	}
++	netdev_page_pool_get_list_free(pools);
++
++	pp_stats = netdev_page_pool_stats_get_dump(ys);
++	if (!pp_stats)
++		goto err_free;
++
++	ynl_dump_foreach(pp_stats, pp) {
++		struct stat *s = find_ifc(&a, pp->info.ifindex);
++
++		if (pp->_present.alloc_fast)
++			s->alloc_fast += pp->alloc_fast;
++		if (pp->_present.alloc_slow)
++			s->alloc_slow += pp->alloc_slow;
++		if (pp->_present.recycle_ring)
++			s->recycle_ring += pp->recycle_ring;
++		if (pp->_present.recycle_cached)
++			s->recycle_cache += pp->recycle_cached;
++	}
++	netdev_page_pool_stats_get_list_free(pp_stats);
++
++	for (unsigned int i = 0; i < a.i; i++) {
++		char ifname[IF_NAMESIZE];
++		struct stat *s = &a.s[i];
++		const char *name;
++		double recycle;
++
++		if (!s->ifc) {
++			name = "<orphan>\t";
++		} else {
++			name = if_indextoname(s->ifc, ifname);
++			if (name)
++				printf("%8s", name);
++			printf("[%d]\t", s->ifc);
++		}
++
++		printf("page pools: %u (zombies: %u)\n",
++		       s->live[1].cnt, s->live[0].cnt);
++		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
++		       s->live[1].refs, s->live[1].bytes,
++		       s->live[0].refs, s->live[0].bytes);
++
++		/* We don't know how many pages are sitting in cache and ring
++		 * so we will under-count the recycling rate a bit.
++		 */
++		recycle = (double)(s->recycle_ring + s->recycle_cache) /
++			(s->alloc_fast + s->alloc_slow) * 100;
++		printf("\t\trecycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)\n",
++		       recycle, s->alloc_slow, s->alloc_fast,
++		       s->recycle_ring, s->recycle_cache);
++	}
++
++	ynl_sock_destroy(ys);
++	return 0;
++
++err_free:
++	free(a.s);
++err_close:
++	fprintf(stderr, "YNL: %s\n", ys->err.msg);
++	ynl_sock_destroy(ys);
++	return 2;
++}
 -- 
 2.42.0
 
