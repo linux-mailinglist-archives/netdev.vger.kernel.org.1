@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0031B7F3C86
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:44:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80737F3C88
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21E9282BB6
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:44:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D58B21B62
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 03:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914938BF3;
-	Wed, 22 Nov 2023 03:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9B38F4D;
+	Wed, 22 Nov 2023 03:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htoa0w+C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqpTUv7w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758D88BE8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308D88C17
 	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 03:44:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A7AC433C7;
-	Wed, 22 Nov 2023 03:44:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22EEAC433C9;
+	Wed, 22 Nov 2023 03:44:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700624664;
-	bh=Sg0RC8An+tTX68PCElpMIZUaWHu+77xemmuOyBJrO4o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=htoa0w+CU+dR7v/OMuQegdkp61zA5H4kqRAq5Mwbz98/fgSG0m+sAowsVKKC3q//s
-	 oypc6bSFEpZK0G5KM09wnoA4onkLq4I3JD5n4QF1FoBaSLPfzkKh1AZjicLJGTG14K
-	 Ip8E8/vlKJmejd/i0hO6Epu6qCgj0/JPA4h6UcPuc77R2nt/4GB9kXT+AZN8Yycnpf
-	 2ZD8hQpYplEXLl6YTY+ByUjLyL6zqoEhqtVe6nD55V3PqbSQfMbcm+fCZTm0iDJeWr
-	 3uKrBpuDPTwO3TFMDzt8/kbL9WDJoUYjXwfmlc9wL0gwKzidJEUCjElNprEjIoLSA6
-	 Uw0Zo0ydu3l0g==
+	s=k20201202; t=1700624665;
+	bh=Msjdx20gPtma4cyEI0vBuNnnLjWNIuuVxWWfRfEPMWA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hqpTUv7wDc6T+dLsIh4A/lAw75mfUHpqCKfMJ4yZdyurbU3oKkOTka//IKM9rnKaN
+	 uegfyOiFPEGpUkq3Rf7sh3G1A5PgKqAvtxALClj9g4EcaaKmPg9/bGvMYNfHMkVV63
+	 uKRwLH4Y6uySmz9kTk0bXh7Ri5Jcl+fCViIm/lihHw8WJdfV90e8vt1BiD2L43iTHJ
+	 7otzyTHyMLshF/tOCGer5I6qgBkzGr+fWmIEyd6oAOOm0695glF0PAh05PJJP9xs+u
+	 foB+BNf7eHv0QkBkcn2C+pCnirDpk0zgm7NHrpY660e116zZGUfZnLHHckFmRV5cmI
+	 B8LE4yHYVwP1g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -44,10 +44,12 @@ Cc: netdev@vger.kernel.org,
 	dtatulea@nvidia.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 00/13] net: page_pool: add netlink-based introspection
-Date: Tue, 21 Nov 2023 19:44:07 -0800
-Message-ID: <20231122034420.1158898-1-kuba@kernel.org>
+Subject: [PATCH net-next v3 01/13] net: page_pool: factor out uninit
+Date: Tue, 21 Nov 2023 19:44:08 -0800
+Message-ID: <20231122034420.1158898-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231122034420.1158898-1-kuba@kernel.org>
+References: <20231122034420.1158898-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,88 +58,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We recently started to deploy newer kernels / drivers at Meta,
-making significant use of page pools for the first time.
-We immediately run into page pool leaks both real and false positive
-warnings. As Eric pointed out/predicted there's no guarantee that
-applications will read / close their sockets so a page pool page
-may be stuck in a socket (but not leaked) forever. This happens
-a lot in our fleet. Most of these are obviously due to application
-bugs but we should not be printing kernel warnings due to minor
-application resource leaks.
+We'll soon (next change in the series) need a fuller unwind path
+in page_pool_create() so create the inverse of page_pool_init().
 
-Conversely the page pool memory may get leaked at runtime, and
-we have no way to detect / track that, unless someone reconfigures
-the NIC and destroys the page pools which leaked the pages.
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/core/page_pool.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-The solution presented here is to expose the memory use of page
-pools via netlink. This allows for continuous monitoring of memory
-used by page pools, regardless if they were destroyed or not.
-Sample in patch 15 can print the memory use and recycling
-efficiency:
-
-$ ./page-pool
-    eth0[2]	page pools: 10 (zombies: 0)
-		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
-		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
-
-v3:
- - ID is still here, can't decide if it matters
- - rename destroyed -> detach-time, good enough?
- - fix build for netsec
-v2: https://lore.kernel.org/r/20231121000048.789613-1-kuba@kernel.org
- - hopefully fix build with PAGE_POOL=n
-v1: https://lore.kernel.org/all/20231024160220.3973311-1-kuba@kernel.org/
- - The main change compared to the RFC is that the API now exposes
-   outstanding references and byte counts even for "live" page pools.
-   The warning is no longer printed if page pool is accessible via netlink.
-RFC: https://lore.kernel.org/all/20230816234303.3786178-1-kuba@kernel.org/
-
-Jakub Kicinski (13):
-  net: page_pool: factor out uninit
-  net: page_pool: id the page pools
-  net: page_pool: record pools per netdev
-  net: page_pool: stash the NAPI ID for easier access
-  eth: link netdev to page_pools in drivers
-  net: page_pool: add nlspec for basic access to page pools
-  net: page_pool: implement GET in the netlink API
-  net: page_pool: add netlink notifications for state changes
-  net: page_pool: report amount of memory held by page pools
-  net: page_pool: report when page pool was destroyed
-  net: page_pool: expose page pool stats via netlink
-  net: page_pool: mute the periodic warning for visible page pools
-  tools: ynl: add sample for getting page-pool information
-
- Documentation/netlink/specs/netdev.yaml       | 170 +++++++
- Documentation/networking/page_pool.rst        |  10 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   1 +
- .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
- drivers/net/ethernet/microsoft/mana/mana_en.c |   1 +
- drivers/net/ethernet/socionext/netsec.c       |   2 +
- include/linux/list.h                          |  20 +
- include/linux/netdevice.h                     |   4 +
- include/linux/poison.h                        |   2 +
- include/net/page_pool/helpers.h               |   8 +-
- include/net/page_pool/types.h                 |  10 +
- include/uapi/linux/netdev.h                   |  36 ++
- net/core/Makefile                             |   2 +-
- net/core/netdev-genl-gen.c                    |  60 +++
- net/core/netdev-genl-gen.h                    |  11 +
- net/core/page_pool.c                          |  69 ++-
- net/core/page_pool_priv.h                     |  12 +
- net/core/page_pool_user.c                     | 414 +++++++++++++++++
- tools/include/uapi/linux/netdev.h             |  36 ++
- tools/net/ynl/generated/netdev-user.c         | 419 ++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h         | 171 +++++++
- tools/net/ynl/lib/ynl.h                       |   2 +-
- tools/net/ynl/samples/.gitignore              |   1 +
- tools/net/ynl/samples/Makefile                |   2 +-
- tools/net/ynl/samples/page-pool.c             | 147 ++++++
- 25 files changed, 1578 insertions(+), 33 deletions(-)
- create mode 100644 net/core/page_pool_priv.h
- create mode 100644 net/core/page_pool_user.c
- create mode 100644 tools/net/ynl/samples/page-pool.c
-
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index df2a06d7da52..2e4575477e71 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -238,6 +238,18 @@ static int page_pool_init(struct page_pool *pool,
+ 	return 0;
+ }
+ 
++static void page_pool_uninit(struct page_pool *pool)
++{
++	ptr_ring_cleanup(&pool->ring, NULL);
++
++	if (pool->p.flags & PP_FLAG_DMA_MAP)
++		put_device(pool->p.dev);
++
++#ifdef CONFIG_PAGE_POOL_STATS
++	free_percpu(pool->recycle_stats);
++#endif
++}
++
+ /**
+  * page_pool_create() - create a page pool.
+  * @params: parameters, see struct page_pool_params
+@@ -821,14 +833,7 @@ static void __page_pool_destroy(struct page_pool *pool)
+ 	if (pool->disconnect)
+ 		pool->disconnect(pool);
+ 
+-	ptr_ring_cleanup(&pool->ring, NULL);
+-
+-	if (pool->p.flags & PP_FLAG_DMA_MAP)
+-		put_device(pool->p.dev);
+-
+-#ifdef CONFIG_PAGE_POOL_STATS
+-	free_percpu(pool->recycle_stats);
+-#endif
++	page_pool_uninit(pool);
+ 	kfree(pool);
+ }
+ 
 -- 
 2.42.0
 
