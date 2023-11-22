@@ -1,195 +1,130 @@
-Return-Path: <netdev+bounces-50036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A7D7F4676
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:42:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC387F469B
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 13:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 285C41F21CD8
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 12:42:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC05F1F21D35
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 12:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708181EB46;
-	Wed, 22 Nov 2023 12:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA5F49F8A;
+	Wed, 22 Nov 2023 12:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pCObuymM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tc/2BAOy"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5847F12C;
-	Wed, 22 Nov 2023 04:42:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=vZFD+CZhZ5/s+IhNoZs04yZO6ujN0gvtdoUyhzS1YLA=; b=pCObuymMRo2FhAIMtEx+vZ0GNP
-	MDWcFft7pgFB9wq42UxzyziZsDkXq3sNFolqF/K2h/FCht5VrAPK5TbRLSDBic37QSYmi8YAW422c
-	2RFsLNDszOUp68E9dYgaIwqSQMdfroCLISVhtW4JFvy6MJTXe8s+gNHL4F2Dh0TvilE5P/QPIkw19
-	BDaukh00GAqCeKHAN8MgH28TdWkAEkJXn+K0DjbVwSsoXLG6ApQ+5dsgfNFWZtmYRmGQXxUsu3Fl7
-	lzflQjNhsuQXgE7NWap3CLcq/FI8Nf/VK1dEF1xxjPURrfhgQ3fYCu9tJzjmyAT22ZBrMzHk7a/Bv
-	auc4vcEw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r5mXv-00CJGw-1w;
-	Wed, 22 Nov 2023 12:41:35 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 515E03006F6; Wed, 22 Nov 2023 13:41:34 +0100 (CET)
-Date: Wed, 22 Nov 2023 13:41:34 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	davem@davemloft.net, dsahern@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
-	jolsa@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	samitolvanen@google.com, keescook@chromium.org, nathan@kernel.org,
-	ndesaulniers@google.com, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	llvm@lists.linux.dev, jpoimboe@kernel.org, joao@overdrivepizza.com,
-	mark.rutland@arm.com
-Subject: Re: [PATCH 2/2] x86/cfi,bpf: Fix BPF JIT call
-Message-ID: <20231122124134.GP4779@noisy.programming.kicks-ass.net>
-References: <20231120144642.591358648@infradead.org>
- <20231120154948.708762225@infradead.org>
- <20231122021817.ggym3biyfeksiplo@macbook-pro-49.dhcp.thefacebook.com>
- <20231122111517.GR8262@noisy.programming.kicks-ass.net>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C304D126;
+	Wed, 22 Nov 2023 12:49:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66B8AC433C7;
+	Wed, 22 Nov 2023 12:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700657341;
+	bh=6OXBSUL+nsBWDSWY/Q2r+0obUk1WW2944LvuwrKFOOg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Tc/2BAOyq/CL424TPKJ+8ok4iD2CSlMj4gj7I88R2wR3SRpoXrwpPP4CcDv0rCy4Q
+	 imtDsj4NMmiBNZozdVII4r1Tu0lKWkktCHU3pI4LzAIFYMYIaMFpbulm6tUMVwguK4
+	 qTlrJ2u4/DeMIiXbQyzfXkH/WxJG3G65JVkRZ5lf6r4VzUJTQXH/UjyJJ0V5cZAl2s
+	 w/spDO6VPLhtfPliBsbbdWVAXUjht3ojtCQDl0LfCWNNwph8Zdy7ZX7mLHL0no3jWG
+	 z8IdhyFNF5VEPzmpKIFkxea1CvPQqUVZAxIi/ByG3Lv1c90SwdjDEIcrL99R5YQgIg
+	 fP3gmG5BvwYWQ==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v2 0/4] eventfd: simplify signal helpers
+Date: Wed, 22 Nov 2023 13:48:21 +0100
+Message-Id: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122111517.GR8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJX4XWUC/32OTQ6CMBBGr0K6dkhbYpu48h6GRX8GaMRiZkijI
+ dzdwgFcvsV737cJRkrI4tZsgrAkTkuuoC+NCJPLI0KKlYWWupNWdVAGBiyY1yECpzG7GaSXURn
+ rosEgqvgmHNLnjD76yt4xgieXw3SkXo5XpLaY1gIFdRhT4nWh7/miqMP7O1gUSLBDdCZco1ba3
+ 59IGed2oVH0+77/ALQAWw7XAAAA
+To: linux-fsdevel@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, 
+ Vitaly Kuznetsov <vkuznets@redhat.com>, 
+ Sean Christopherson <seanjc@google.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+ David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
+ Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>, 
+ Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, 
+ Xu Yilun <yilun.xu@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+ Zhi Wang <zhi.a.wang@intel.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>, 
+ David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
+ Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+ Frederic Barrat <fbarrat@linux.ibm.com>, 
+ Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Eric Farman <farman@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>, 
+ Halil Pasic <pasic@linux.ibm.com>, Vineeth Vijayan <vneethv@linux.ibm.com>, 
+ Peter Oberparleiter <oberpar@linux.ibm.com>, 
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Sven Schnelle <svens@linux.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
+ Jason Herne <jjherne@linux.ibm.com>, 
+ Harald Freudenberger <freude@linux.ibm.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Diana Craciun <diana.craciun@oss.nxp.com>, 
+ Alex Williamson <alex.williamson@redhat.com>, 
+ Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>, 
+ Benjamin LaHaise <bcrl@kvack.org>, Christian Brauner <brauner@kernel.org>, 
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+ Roman Gushchin <roman.gushchin@linux.dev>, 
+ Shakeel Butt <shakeelb@google.com>, Muchun Song <muchun.song@linux.dev>, 
+ Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org, 
+ intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, 
+ linux-usb@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+ netdev@vger.kernel.org, linux-aio@kvack.org, cgroups@vger.kernel.org, 
+ linux-mm@kvack.org, Jens Axboe <axboe@kernel.dk>, 
+ Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
+X-Mailer: b4 0.13-dev-26615
+X-Developer-Signature: v=1; a=openpgp-sha256; l=564; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=6OXBSUL+nsBWDSWY/Q2r+0obUk1WW2944LvuwrKFOOg=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaTG/lhzPFmKbc7Vgs4lut/eP1hw9bOuxtyeI9s4tYwWe
+ yZZxby53lHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRf4IM/8NUuv3TH0hJOWz8
+ c65PTujVFLaLGrq6vFP/9yxi7X77UInhf0113erTobU10gp/tt37unHeHp8P0ZHTLq5c7sWdN//
+ 2D04A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-On Wed, Nov 22, 2023 at 12:15:17PM +0100, Peter Zijlstra wrote:
+Hey everyone,
 
-> Ah, so normally the __cfi_foo symbol would catch those, lemme see what I
-> can do here.
+This simplifies the eventfd_signal() and eventfd_signal_mask() helpers
+significantly. They can be made void and not take any unnecessary
+arguments.
 
-I have the below delta (untested etc..), does that look about right?
+I've added a few more simplifications based on Sean's suggestion.
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+
+Changes in v2:
+- further simplify helpers
+- Link to v1: https://lore.kernel.org/r/20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org
 
 ---
---- a/arch/x86/kernel/alternative.c
-+++ b/arch/x86/kernel/alternative.c
-@@ -845,19 +845,24 @@ enum cfi_mode cfi_mode __ro_after_init =
- #ifdef CONFIG_CFI_CLANG
- struct bpf_insn;
- 
--extern unsigned int bpf_func_proto(const void *ctx,
--				   const struct bpf_insn *insn);
-+/* Must match bpf_func_t / DEFINE_BPF_PROG_RUN() */
-+extern unsigned int __bpf_prog_runX(const void *ctx,
-+				    const struct bpf_insn *insn);
- 
--__ADDRESSABLE(bpf_func_proto);
-+/* 
-+ * Force a reference to the external symbol so the compiler generates
-+ * __kcfi_typid.
-+ */
-+__ADDRESSABLE(__bpf_prog_runX);
- 
--/* u32 __ro_after_init cfi_bpf_hash = __kcfi_typeid_bpf_func_proto */
-+/* u32 __ro_after_init cfi_bpf_hash = __kcfi_typeid___bpf_prog_runX */
- asm (
- "	.pushsection	.data..ro_after_init,\"aw\",@progbits	\n"
- "	.type	cfi_bpf_hash,@object				\n"
- "	.globl	cfi_bpf_hash					\n"
- "	.p2align	2, 0x0					\n"
- "cfi_bpf_hash:							\n"
--"	.long	__kcfi_typeid_bpf_func_proto			\n"
-+"	.long	__kcfi_typeid___bpf_prog_runX			\n"
- "	.size	cfi_bpf_hash, 4					\n"
- "	.popsection						\n"
- );
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -308,15 +308,20 @@ static void pop_callee_regs(u8 **pprog,
- 	*pprog = prog;
- }
- 
-+/*
-+ * Emit the various CFI preambles, see the large comment about FineIBT
-+ * in arch/x86/kernel/alternative.c
-+ */
-+
- static int emit_fineibt(u8 **pprog)
- {
- 	u8 *prog = *pprog;
- 
- 	EMIT_ENDBR();
--	EMIT3_off32(0x41, 0x81, 0xea, cfi_bpf_hash);
--	EMIT2(0x74, 0x07);
--	EMIT2(0x0f, 0x0b);
--	EMIT1(0x90);
-+	EMIT3_off32(0x41, 0x81, 0xea, cfi_bpf_hash);	/* subl $hash, %r10d	*/
-+	EMIT2(0x74, 0x07);				/* jz.d8 +7		*/
-+	EMIT2(0x0f, 0x0b);				/* ud2			*/
-+	EMIT1(0x90);					/* nop			*/
- 	EMIT_ENDBR_POISON();
- 
- 	*pprog = prog;
-@@ -328,7 +333,7 @@ static int emit_kcfi(u8 **pprog)
- 	u8 *prog = *pprog;
- 	int offset = 5;
- 
--	EMIT1_off32(0xb8, cfi_bpf_hash);
-+	EMIT1_off32(0xb8, cfi_bpf_hash);		/* movl $hash, %eax	*/
- #ifdef CONFIG_CALL_PADDING
- 	EMIT1(0x90);
- 	EMIT1(0x90);
-@@ -3009,6 +3014,10 @@ struct bpf_prog *bpf_int_jit_compile(str
- 			jit_data->header = header;
- 			jit_data->rw_header = rw_header;
- 		}
-+		/*
-+		 * ctx.prog_offset is used when CFI preambles put code *before*
-+		 * the function. See emit_cfi().
-+		 */
- 		prog->bpf_func = (void *)image + ctx.prog_offset;
- 		prog->jited = 1;
- 		prog->jited_len = proglen - ctx.prog_offset; // XXX?
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1431,6 +1431,9 @@ struct bpf_prog_aux {
- 	struct bpf_kfunc_desc_tab *kfunc_tab;
- 	struct bpf_kfunc_btf_tab *kfunc_btf_tab;
- 	u32 size_poke_tab;
-+#ifdef CONFIG_FINEIBT
-+	struct bpf_ksym ksym_prefix;
-+#endif
- 	struct bpf_ksym ksym;
- 	const struct bpf_prog_ops *ops;
- 	struct bpf_map **used_maps;
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -683,6 +683,23 @@ void bpf_prog_kallsyms_add(struct bpf_pr
- 	fp->aux->ksym.prog = true;
- 
- 	bpf_ksym_add(&fp->aux->ksym);
-+
-+#ifdef CONFIG_FINEIBT
-+	/*
-+	 * When FineIBT, code in the __cfi_foo() symbols can get executed
-+	 * and hence unwinder needs help.
-+	 */
-+	if (cfi_mode != CFI_FINEIBT)
-+		return;
-+
-+	snprintf(fp->aux->ksym_prefix.name, KSYM_NAME_LEN,
-+		 "__cfi_%s", fp->aux->ksym.name);
-+
-+	prog->aux->ksym_prefix.start = (unsigned long) prog->bpf_func - 16;
-+	prog->aux->ksym_prefix.end   = (unsigned long) prog->bpf_func;
-+
-+	bpf_ksym_add(&fp->aux->ksym_prefix);
-+#endif
- }
- 
- void bpf_prog_kallsyms_del(struct bpf_prog *fp)
+
+
+
+---
+base-commit: b85ea95d086471afb4ad062012a4d73cd328fa86
+change-id: 20230713-vfs-eventfd-signal-0b0d167ad6ec
+
 
