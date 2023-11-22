@@ -1,1327 +1,170 @@
-Return-Path: <netdev+bounces-50086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA3D7F48FA
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:32:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9457F4913
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:36:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDF8B1C20C04
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:32:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E02191C20B25
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 14:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267634E1D1;
-	Wed, 22 Nov 2023 14:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3857C4E1D3;
+	Wed, 22 Nov 2023 14:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ge+O6gsq"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SnKXvaAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE9A97
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 06:32:22 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6cb749044a2so3814814b3a.0
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 06:32:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700663541; x=1701268341; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CFBev2+COri1xCmD03fz5SEUObg8sqZqGSmxdwcU1Pg=;
-        b=ge+O6gsqEf4x9BhLfInLZNd147jp5t0HTMo4/3b2zy9zBKvHTl7ZK+Rm+lqDxZu2L/
-         Jg3D3Qk/7CC0INscGTjsl24RJsJwLx15HclLUShAmKZCELYk3PuSOdnGz6IxEqmmgph9
-         xG+lutfXFMGllg4OxolwZOoBl6xf4xYx4gWb3+C5tQr0PEs7MnElEfEi+4HoGkmganK+
-         XIO71wvTo6m6c41WD2WvC0oeQ6fxbF1LX7PLh/CGw3KXlfX6NJYFx1SjDuucSTrlBC3p
-         L0RYGghsPuEZRigK3a53edQDRnxOIuH40HVL9WDMuRrD9URnmucZ0xV6QKSgBlU7x0jD
-         7c5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700663541; x=1701268341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CFBev2+COri1xCmD03fz5SEUObg8sqZqGSmxdwcU1Pg=;
-        b=DKhct2h6BE4+fDHas+Ym5jm8uW8tcK1EYc1AjVFN+ptckv1yz7KbFvmNmuJCpwLjVW
-         fH0Xsf12iiCDYXegf3BhdGBuorfJihnczlMbLOGiqblY6wlcIOj4eJY1HBlvX8Gu4Go4
-         EZSTY9dzgUiOj49djFww4bW6yXXD3wN6KrMJrHoyICXVgHJGCTbiTaUnbaSuS3C66vHQ
-         87LxjkIie8Yg1lKT0r6uCk1NwewN/wOyFDCogYpk20h8C53WG98vVQPkKmQRVaWOx+gE
-         5+sNWR/yv+fWGJZr3QvPHIqca+fSVVnTroKDwi+A3IVFxxnyl6oSc8KiyhAEkdw/0ZnN
-         oUVQ==
-X-Gm-Message-State: AOJu0YxkAGi4xihNnyHXDRVjSpJKd2IMdUogpwjWyMINTjDLcjaCAZRZ
-	J4DlAtl1nimCi5luh5u/5Rg=
-X-Google-Smtp-Source: AGHT+IG/xd2H8eshmByDr4kMHVIRyuqk5JlgjZlGN8xMpIPfcCYcf5PtZ9+1nztU+Od6rNG3Nv/28w==
-X-Received: by 2002:a05:6a21:181:b0:187:b22d:a19 with SMTP id le1-20020a056a21018100b00187b22d0a19mr2453194pzb.56.1700663536504;
-        Wed, 22 Nov 2023 06:32:16 -0800 (PST)
-Received: from swarup-virtual-machine.localdomain ([171.76.83.22])
-        by smtp.gmail.com with ESMTPSA id by14-20020a056a02058e00b0059b782e8541sm8493508pgb.28.2023.11.22.06.31.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 06:31:44 -0800 (PST)
-From: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-Subject: [PATCH net-next v2] netlink: specs: devlink: add missing attributes in devlink.yaml and re-generate the related code
-Date: Wed, 22 Nov 2023 20:00:33 +0530
-Message-Id: <20231122143033.89856-1-swarupkotikalapudi@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2081.outbound.protection.outlook.com [40.107.8.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB5C195;
+	Wed, 22 Nov 2023 06:36:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=So8MlTBTG6E5nsy83l6+pTw1jOLpRCprvJlzCkHv1ALxipUcJ+RdfbLFfIoznKT0biQuuTzRdBzXhrJ1vOzvBBLehgYi49dxGCEKkfWAVlsDB/c0L+dugVU0YhB44mtwGtG0XKo/cnvJlp28C80OBuAmeXsyxZKW5TjFySUj7uPkLV7glHcCbaD5JTDWFVfqJ1OV/EOdwi/s2s3n0IerH4aliOzN3xlKJ9l3TeQwKJQ2+TwNLcFZTaOOE3hIyfISGl4vxzq/UwVLgbYISepgdCQFRqOO46H+ueOWvSLaFRdWq7liXI/v7yj1ocCy76w33jkuU05hzZkXQtow+SuXMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k8VF5+MnoOSLiu7kBZlwEDsN476yIgyikWe3UFelqvA=;
+ b=d38jia9rQiuf2dkrvc4qnHZlqb6R8AfVHZOIqetzhDNHSicPHJ9cXF4LYkvqLNDq8VM42Vbb1edaD71fE/CZTta37/BS37VK7l6Qb00HST+3Ah4QlbGFyqTjlvv7II86e4h8AVn66kYR10DaOGLNEeXYe42h94A1c89EsoQ6NLZqKPG5r5hQhZ50mtBrsk7NaKlNEsi0plxTJoExy0Tk112W2D3DB6VHtzgk55aAua73qaX0BUJTUbhRjHZXx8zJdRuxq1oJNADWYId7Ufn3o02m2rH5w7P7VZs5/icGw+jl4vO6hKU8fjsCoVXhOVW8BdCDoMJRXjwoNtxqRib8JA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k8VF5+MnoOSLiu7kBZlwEDsN476yIgyikWe3UFelqvA=;
+ b=SnKXvaAgTNYwussBTrJcDY5ZJHUMlJmUW4ZCm/BhO8LeaRmT2EaU29MkvFPGt6JLgE/DlKPQDhWjgt/q81CUQKzmbY9tMEqvFtQ3mW990vSt5Ay73UDpfwDPzBRHzJoeq3pr33ai0aKErJTUr9OtLmKkZP1kTesAJcnYUkRnsM4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by PAXPR04MB8559.eurprd04.prod.outlook.com (2603:10a6:102:216::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.19; Wed, 22 Nov
+ 2023 14:36:23 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.017; Wed, 22 Nov 2023
+ 14:36:23 +0000
+Date: Wed, 22 Nov 2023 16:36:18 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231122143618.cqyb45po7bon2xzg@skbuf>
+References: <20231120093723.4d88fb2a@kernel.org>
+ <20231120190023.ymog4yb2hcydhmua@skbuf>
+ <20231120115839.74ee5492@kernel.org>
+ <20231120211759.j5uvijsrgt2jqtwx@skbuf>
+ <20231120133737.70dde657@kernel.org>
+ <20231120220549.cvsz2ni3wj7mcukh@skbuf>
+ <20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+ <20231121094354.635ee8cd@kernel.org>
+ <20231122144453.5eb0382f@kmaincent-XPS-13-7390>
+ <20231122140850.li2mvf6tpo3f2fhh@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122140850.li2mvf6tpo3f2fhh@skbuf>
+X-ClientProxiedBy: AS4P189CA0036.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::7) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: *
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAXPR04MB8559:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe5d6e82-d157-41b4-b00f-08dbeb68663e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/5P2UEf3aI9fbQP7Pshjla4valB/CxpBhdGyqd+hHG4/OHxnEG5huXZteyOqcmRfyF8m6ujTcJM8hwp/iTRlLMQ50UVyBBenxdmG9r/jtVJYbrq9W+f/M6gWs4YSmHtuMDwm0ysvGh9aMQW38XOGBJNkw9K4z9y0tjITnL4ni3Ti2Sz76BZwG8gfBvljdqLVTmScpCS5XuZsWb+lYUNkIblfy62HX41hmEZv2hx0InIhByaEbGrLXHMU0aa5P4419j0mAkxbEvQWhWL6gdsf7G86PzLvh72WVeeGkeQi1t+DwSN5x2Scfd9FytKuwRQjzfPI++TvpXxYy9fJWlN74RbXd8DZf/sTl38zljk4kGsy4ScIzEuJF2yN7mKMg3B0tFLATQ6lQRZaZTyVMKHHK90s0uZZ7pl2S7QZsmYSElFhMBYHw9AoTLk1N0461j8WKDzYi5v4fgsaUU6lZJPjbNmZ/CdmePaToubyy/9KA497B7m2zg3CXS+kk3K48rWTCsuc3l9ls0CsJ+4wViL1RGQ6koeLyprz25ztA5WLsDJWvF4r2bhNQc0k+RppXi4m
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(39860400002)(396003)(376002)(136003)(366004)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(26005)(9686003)(6512007)(1076003)(86362001)(38100700002)(7416002)(5660300002)(44832011)(2906002)(6666004)(478600001)(6506007)(54906003)(6916009)(8676002)(316002)(66476007)(4326008)(41300700001)(66946007)(33716001)(6486002)(8936002)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rOabux9UycFeWONqiGe4ylLVp44WGFRcGHKaCpJKgdriHL3ph0IWYLwZ5HTg?=
+ =?us-ascii?Q?0x7zXyAyyxYC5kEvD0htEuxjfRHXJzHf4OcJxrwtwMWRpwnDSsXX1vPFAba6?=
+ =?us-ascii?Q?2XejtRULfdsbBl8/82gwJYjnjRIdCSeilIi+6bpLNRe7rmNVW5+Q7XVQ+QW4?=
+ =?us-ascii?Q?BcJyuVm7TCyjAK/Xv6/oqGhhni6bie2y0xE1XnXZMbbp6Rl2gk6euO8qOu9b?=
+ =?us-ascii?Q?/pP8cHGH4BjgfE/HydvrXm8YckIo2LIoG5lQrCMOC3IZ35ulZNvKpuvypehn?=
+ =?us-ascii?Q?MxyS6lIQpzladffCa9fgHhooUX1KMCMJceuVQeaERd9m1OvUrCDB8QtrtwoW?=
+ =?us-ascii?Q?hkwPHWhV98ueOZzvzMMl5dsfI8mZZ6bJsq/IapFIIhFJ8EDw4M00V1lNX5P7?=
+ =?us-ascii?Q?D6ghSuUUScZImlCgp/arMNbcFWkIgl+xdg8Ks9QPrw97VsyAM98laJEFUwco?=
+ =?us-ascii?Q?DmDzHRsi1y8MOJW/a2VL3dc3hjWLl1akPA55QkMwX7v7/5Dlg/O+riMpK23D?=
+ =?us-ascii?Q?/Py3DZPlkQ61HeTZuddqQ4HiQhfl5dorLs3gP2FqiF4xZjBGB/Zb/scCtVML?=
+ =?us-ascii?Q?35IR/BugYkHbHjyab62SbRBKjwk6vTc41eLhElY1PCUC8YXCe3tDr6VpdqVq?=
+ =?us-ascii?Q?pSHTa0iQNR3M/L7pGdjmOFB4p+BkQIm+s8Ihpc1FKWq1hnToAp1FhZ2WmFVv?=
+ =?us-ascii?Q?iNDGx9wIfvPSQWDvvn37kNOxJKGrkkrDg10un6YYwPobj5PbzzBwTwXJWgLT?=
+ =?us-ascii?Q?mDmEQOUw9VHJzVsp5eIDG6+hwt8Cmc3vHAa/bgLCzgvdzZguo1ysoRtwXHBB?=
+ =?us-ascii?Q?mB7cQd91ZMV3a5PC/4sKwfkgdd4eWW7pAVK9O/Mxd+NwCGSKzl42duuj+myg?=
+ =?us-ascii?Q?RGj0EcP87n/xsHu9nNkSwwWe+0np3w0dXCxNR9ASosUcHmHe2g6onwcWjYA6?=
+ =?us-ascii?Q?FJ5v2TJWuTTQp4fwgybyCD1d5zD5hJDlwlVU5fLB2IahGlnGQURdMUdScnUp?=
+ =?us-ascii?Q?1HfV4jnTB2uex0zJK5p8M8B9i6O7GhGOYC2eBzHTiSzlK6WgZ4unJA2Zd/E+?=
+ =?us-ascii?Q?ikVOzMakz7uLvWbAc2+0ZtRpQtSX6/OyrlKofE2dH4sLiF8L8E8CTojM7Wdg?=
+ =?us-ascii?Q?w+xJ1tV19xCPeixBa8lzUNqaFwiJr597/DB1/98lWe5iaBghk7lRDCBICbdE?=
+ =?us-ascii?Q?sLytabVbt3OXhOQE/tm/iwuhif1s3BiBkamjVq6+qo3pUXYcWSCJhZV0q8gj?=
+ =?us-ascii?Q?VRwpSYwQwqLje08sPE5JlDIz2l5z1fNSMST1R0CY8JD+C9OfZQLngVjb6ICp?=
+ =?us-ascii?Q?2zVpdm9VKxC40Z4OgWpL1UcjwnMh0jJa644Qh2UjbJS80DdulHG0XGVizW/0?=
+ =?us-ascii?Q?JT9nwYFQ5Dp9t5emkRin8lW0CVHQy338JDgIGWab+IeE7u7DvWEPI2aQwQjl?=
+ =?us-ascii?Q?ZeH7fokIpegShhtoiH2jk+e6BaJABtamFMbKBmUR3OMeg118e9YAZsp04oaq?=
+ =?us-ascii?Q?iXNI8hAKl+j219J7b0l0+PZ2jyDTQFGDf2ihF7ehuykG75gYjlsmfaRxoZwM?=
+ =?us-ascii?Q?LoyM4NTr0O2/nU/65IPv57Lu2NE2SQBim3si9JrIy7FTBJV/cQVrXVDPdgur?=
+ =?us-ascii?Q?6g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe5d6e82-d157-41b4-b00f-08dbeb68663e
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 14:36:22.8936
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TMbuoro59UvgBDqFGmY9CR0zQFyl0nAYJcxGSFLG8isIvNW8h7Y3cb6TesBTaR6nLnfMGRbhZpkDPkG7VPFsuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8559
 
-Add missing attributes in devlink.yaml.
+On Wed, Nov 22, 2023 at 04:08:50PM +0200, Vladimir Oltean wrote:
+> The concept of an "active phc_index" would not explicitly exist in the
+> UAPI. Thus I'm not sure what's with this TSINFO_SET being floated around.
+> The only thing would exist is a configurable rx_filter and tx_type per
+> hwtstamp provider (aka "{phc_index, qualifier}"). User space will have
+> to learn to select the hwtstamp provider it wants to configure through
+> netlink, and use for its class of traffic.
 
-Re-generate the related devlink-user.[ch] code.
+@Jakub, for your long-term "MAC timestamps for PTP, DMA for everything else".
+How do you see this? I guess we need some sort of priority function in
+the UAPI between hwtstamp providers.
 
-trap-get command prints nested attributes.
+And even with that, I think the enums that we currently have for filters
+are not specific enough. The most we could expose is:
 
-Test result with trap-get command:
-$ sudo ./tools/net/ynl/cli.py \
-   --spec Documentation/netlink/specs/devlink.yaml \
-   --do trap-get --json '{"bus-name": "netdevsim", \
-                          "dev-name": "netdevsim1", \
-   "trap-name": "ttl_value_is_too_small"}' --process-unknown
- {'attr-stats': {'rx-bytes': 47918326, 'rx-dropped': 21,
-                'rx-packets': 337453},
- 'bus-name': 'netdevsim',
- 'dev-name': 'netdevsim1',
- 'trap-action': 'trap',
- 'trap-generic': True,
- 'trap-group-name': 'l3_exceptions',
- 'trap-metadata': {'metadata-type-in-port': True},
- 'trap-name': 'ttl_value_is_too_small',
- 'trap-type': 'exception'}
+                      MAC provider                      DMA provider
 
-Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
----
-V2:
-  - Rebase to net-next tree
-  - param-value-data data type is dynamic, hence to accomdate
-    all data type make it as string type
-  - Change nested attribute to use corect fields
-    based on driver code e.g. region-snapshots,
-    region-snapshot, region-chunks, region-chunk,
-    linecard-supported-types, health-reporter,
-    linecard-supported-types, nested-devlink
-    and param's attributes
-V1: https://lore.kernel.org/all/ZVNPi7pmJIDJ6Ms7@swarup-virtual-machine/
+hwtstamp_rx_filters   HWTSTAMP_FILTER_PTP_V2_EVENT      HWTSTAMP_FILTER_ALL
+tx_type               HWTSTAMP_TX_ON                    HWTSTAMP_TX_ON
 
- Documentation/netlink/specs/devlink.yaml | 371 +++++++++++++++++++----
- tools/net/ynl/generated/devlink-user.c   | 275 +++++++++++++++++
- tools/net/ynl/generated/devlink-user.h   | 139 ++++++++-
- 3 files changed, 723 insertions(+), 62 deletions(-)
-
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 43067e1f63aa..26f6f4146189 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -75,6 +75,14 @@ definitions:
-         name: ipsec-crypto-bit
-       -
-         name: ipsec-packet-bit
-+  -
-+    type: enum
-+    name: rate-type
-+    entries:
-+      -
-+        name: leaf
-+      -
-+        name: node
-   -
-     type: enum
-     name: sb-threshold-type
-@@ -111,6 +119,16 @@ definitions:
-         name: none
-       -
-         name: basic
-+  -
-+    type: enum
-+    name: dpipe-header-id
-+    entries:
-+      -
-+        name: ethernet
-+      -
-+        name: ipv4
-+      -
-+        name: ipv6
-   -
-     type: enum
-     name: dpipe-match-type
-@@ -174,6 +192,16 @@ definitions:
-         name: trap
-       -
-         name: mirror
-+  -
-+    type: enum
-+    name: trap-type
-+    entries:
-+      -
-+        name: drop
-+      -
-+        name: exception
-+      -
-+        name: control
- 
- attribute-sets:
-   -
-@@ -194,23 +222,44 @@ attribute-sets:
-         name: port-type
-         type: u16
-         enum: port-type
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: port-desired-type
-+        type: u16
-+      -
-+        name: port-netdev-ifindex
-+        type: u32
-+      -
-+        name: port-netdev-name
-+        type: string
-+      -
-+        name: port-ibdev-name
-+        type: string
-       -
-         name: port-split-count
-         type: u32
-         value: 9
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: port-split-group
-+        type: u32
-       -
-         name: sb-index
-         type: u32
-         value: 11
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: sb-size
-+        type: u32
-+      -
-+        name: sb-ingress-pool-count
-+        type: u16
-+      -
-+        name: sb-egress-pool-count
-+        type: u16
-+      -
-+        name: sb-ingress-tc-count
-+        type: u16
-+      -
-+        name: sb-egress-tc-count
-+        type: u16
-       -
-         name: sb-pool-index
-         type: u16
-@@ -233,15 +282,17 @@ attribute-sets:
-         name: sb-tc-index
-         type: u16
-         value: 22
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: sb-occ-cur
-+        type: u32
-+      -
-+        name: sb-occ-max
-+        type: u32
-       -
-         name: eswitch-mode
-         type: u16
-         value: 25
-         enum: eswitch-mode
--
-       -
-         name: eswitch-inline-mode
-         type: u16
-@@ -347,6 +398,7 @@ attribute-sets:
-       -
-         name: dpipe-header-id
-         type: u32
-+        enum: dpipe-header-id
-       -
-         name: dpipe-header-fields
-         type: nest
-@@ -433,23 +485,40 @@ attribute-sets:
-         name: port-flavour
-         type: u16
-         enum: port-flavour
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: port-number
-+        type: u32
-+      -
-+        name: port-split-support-number
-+        type: u32
-+      -
-+        name: param
-+        type: nest
-+        nested-attributes: dl-param
-       -
-         name: param-name
-         type: string
-         value: 81
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: param-generic
-+        type: flag
-       -
-         name: param-type
-         type: u8
-         value: 83
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: param-value-list
-+        type: nest
-+        nested-attributes: dl-param-value-list
-+      -
-+        name: param-value
-+        type: nest
-+        nested-attributes: dl-param-value
-+      -
-+        name: param-value-data
-+        # param-value-data can be of any type e.g. u8 or u32 or string etc.
-+        # hence make it string to cover for all types
-+        type: string
-       -
-         name: param-value-cmode
-         type: u8
-@@ -458,16 +527,32 @@ attribute-sets:
-       -
-         name: region-name
-         type: string
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: region-size
-+        type: u64
-+      -
-+        name: region-snapshots
-+        type: nest
-+        nested-attributes: dl-region-snapshots
-+      -
-+        name: region-snapshot
-+        type: nest
-+        nested-attributes: dl-region-snapshot
-       -
-         name: region-snapshot-id
-         type: u32
-         value: 92
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: region-chunks
-+        type: nest
-+        nested-attributes: dl-region-chunks
-+      -
-+        name: region-chunk
-+        type: nest
-+        nested-attributes: dl-region-chunk
-+      -
-+        name: region-chunk-data
-+        type: binary
-       -
-         name: region-chunk-addr
-         type: u64
-@@ -502,9 +587,9 @@ attribute-sets:
-       -
-         name: info-version-value
-         type: string
--
--      # TODO: fill in the attributes in between
--
-+      -
-+        name: sb-pool-cell-size
-+        type: u32
-       -
-         name: fmsg
-         type: nest
-@@ -525,15 +610,33 @@ attribute-sets:
-       -
-         name: fmsg-obj-name
-         type: string
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: fms-obj-value-type
-+        type: u8
-+      -
-+        name: fms-obj-value-data
-+        type: u64
-+      -
-+        name: health-reporter
-+        type: nest
-+        nested-attributes: dl-health-reporter
- 
-       -
-         name: health-reporter-name
-         type: string
-         value: 115
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: health-reporter-state
-+        type: u8
-+      -
-+        name: health-reporter-err-count
-+        type: u64
-+      -
-+        name: health-reporter-recover-count
-+        type: u64
-+      -
-+        name: health-reporter-dump-ts
-+        type: u64
- 
-       -
-         name: health-reporter-graceful-period
-@@ -548,15 +651,27 @@ attribute-sets:
-       -
-         name: flash-update-component
-         type: string
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: flash-update-status-msg
-+        type: string
-+      -
-+        name: flash-update-status-done
-+        type: u64
-+      -
-+        name: flash-update-status-total
-+        type: u64
- 
-       -
-         name: port-pci-pf-number
-         type: u16
-         value: 127
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: port-pci-vf-number
-+        type: u16
-+      -
-+        name: attr-stats
-+        type: nest
-+        nested-attributes: dl-attr-stats
- 
-       -
-         name: trap-name
-@@ -566,8 +681,17 @@ attribute-sets:
-         name: trap-action
-         type: u8
-         enum: trap-action
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: trap-type
-+        type: u8
-+        enum: trap-type
-+      -
-+        name: trap-generic
-+        type: flag
-+      -
-+        name: trap-metadata
-+        type: nest
-+        nested-attributes: dl-trap-metadata
- 
-       -
-         name: trap-group-name
-@@ -577,8 +701,9 @@ attribute-sets:
-       -
-         name: reload-failed
-         type: u8
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: health-reporter-dump-ts-ns
-+        type: u64
- 
-       -
-         name: netns-fd
-@@ -591,8 +716,6 @@ attribute-sets:
-         name: netns-id
-         type: u32
- 
--      # TODO: fill in the attributes in between
--
-       -
-         name: health-reporter-auto-dump
-         type: u8
-@@ -610,15 +733,26 @@ attribute-sets:
-         name: port-function
-         type: nest
-         nested-attributes: dl-port-function
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: board-serial-number
-+        type: string
-+      -
-+        name: port-lanes
-+        type: u32
-+      -
-+        name: port-splittable
-+        type: u8
-+      -
-+        name: port-external
-+        type: u8
- 
-       -
-         name: port-controller-number
-         type: u32
-         value: 150
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: flash-update-status-timeout
-+        type: u64
- 
-       -
-         name: flash-update-overwrite-mask
-@@ -674,14 +808,14 @@ attribute-sets:
-         multi-attr: true
-         nested-attributes: dl-reload-act-stats
- 
--      # TODO: fill in the attributes in between
--
-       -
-         name: port-pci-sf-number
-         type: u32
-         value: 164
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: rate-type
-+        type: u16
-+        enum: rate-type
- 
-       -
-         name: rate-tx-share
-@@ -697,21 +831,31 @@ attribute-sets:
-         name: rate-parent-node-name
-         type: string
- 
--      # TODO: fill in the attributes in between
-+      -
-+         name: region-max-snpshots
-+         type: u32
- 
-       -
-         name: linecard-index
-         type: u32
-         value: 171
- 
--      # TODO: fill in the attributes in between
-+      -
-+         name: linecard-state
-+         type: u8
- 
-       -
-         name: linecard-type
-         type: string
-         value: 173
--
--      # TODO: fill in the attributes in between
-+      -
-+        name: linecard-supported-types
-+        type: nest
-+        nested-attributes: dl-linecard-supported-types
-+      -
-+        name: nested-devlink
-+        type: nest
-+        nested-attributes: dl-nested-devlink
- 
-       -
-         name: selftests
-@@ -1004,7 +1148,60 @@ attribute-sets:
-     attributes:
-       -
-         name: resource
--
-+  -
-+    name: dl-param
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: param-name
-+      -
-+        name: param-generic
-+      -
-+        name: param-type
-+      -
-+        name: param-value-list
-+  -
-+    name: dl-param-value-list
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: param-value-cmode
-+      -
-+        name: param-value-data
-+  -
-+    name: dl-param-value
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: param-value-cmode
-+      -
-+        name: param-value-data
-+  -
-+    name: dl-region-snapshots
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: region-snapshot
-+  -
-+    name: dl-region-snapshot
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: region-snapshot-id
-+  -
-+    name: dl-region-chunks
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: region-chunk
-+  -
-+    name: dl-region-chunk
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: region-chunk-data
-+      -
-+        name: region-chunk-addr
-   -
-     name: dl-fmsg
-     subset-of: devlink
-@@ -1019,7 +1216,63 @@ attribute-sets:
-         name: fmsg-nest-end
-       -
-         name: fmsg-obj-name
--
-+  -
-+    name: dl-health-reporter
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: health-reporter-name
-+      -
-+        name: health-reporter-state
-+      -
-+        name: health-reporter-err-count
-+      -
-+        name: health-reporter-recover-count
-+      -
-+        name: health-reporter-graceful-period
-+      -
-+        name: health-reporter-auto-recover
-+      -
-+        name: health-reporter-dump-ts
-+      -
-+        name: health-reporter-dump-ts-ns
-+      -
-+        name: health-reporter-auto-dump
-+  -
-+    name: dl-attr-stats
-+    attributes:
-+      - name: rx-packets
-+        type: u64
-+        value: 0
-+      - name: rx-bytes
-+        type: u64
-+      - name: rx-dropped
-+        type: u64
-+  -
-+    name: dl-trap-metadata
-+    attributes:
-+      -
-+        name: metadata-type-in-port
-+        type: flag
-+        value: 0
-+      -
-+        name: metadata-type-fa-cookie
-+        type: flag
-+  -
-+    name: dl-linecard-supported-types
-+    subset-of: devlink
-+    attributes:
-+      -
-+        name: linecard-type
-+  -
-+    name: dl-nested-devlink
-+    attributes:
-+      - name: index
-+        type: u32
-+      - name: reload-failed
-+        type: u8
-+      - name: refcount
-+        type: sint
-   -
-     name: dl-selftest-id
-     name-prefix: devlink-attr-selftest-id-
-diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
-index bc5065bd99b2..2620392ca8dd 100644
---- a/tools/net/ynl/generated/devlink-user.c
-+++ b/tools/net/ynl/generated/devlink-user.c
-@@ -132,6 +132,18 @@ const char *devlink_port_fn_attr_cap_str(enum devlink_port_fn_attr_cap value)
- 	return devlink_port_fn_attr_cap_strmap[value];
- }
- 
-+static const char * const devlink_rate_type_strmap[] = {
-+	[0] = "leaf",
-+	[1] = "node",
-+};
-+
-+const char *devlink_rate_type_str(enum devlink_rate_type value)
-+{
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(devlink_rate_type_strmap))
-+		return NULL;
-+	return devlink_rate_type_strmap[value];
-+}
-+
- static const char * const devlink_sb_threshold_type_strmap[] = {
- 	[0] = "static",
- 	[1] = "dynamic",
-@@ -184,6 +196,19 @@ devlink_eswitch_encap_mode_str(enum devlink_eswitch_encap_mode value)
- 	return devlink_eswitch_encap_mode_strmap[value];
- }
- 
-+static const char * const devlink_dpipe_header_id_strmap[] = {
-+	[0] = "ethernet",
-+	[1] = "ipv4",
-+	[2] = "ipv6",
-+};
-+
-+const char *devlink_dpipe_header_id_str(enum devlink_dpipe_header_id value)
-+{
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(devlink_dpipe_header_id_strmap))
-+		return NULL;
-+	return devlink_dpipe_header_id_strmap[value];
-+}
-+
- static const char * const devlink_dpipe_match_type_strmap[] = {
- 	[0] = "field-exact",
- };
-@@ -280,6 +305,19 @@ const char *devlink_trap_action_str(enum devlink_trap_action value)
- 	return devlink_trap_action_strmap[value];
- }
- 
-+static const char * const devlink_trap_type_strmap[] = {
-+	[0] = "drop",
-+	[1] = "exception",
-+	[2] = "control",
-+};
-+
-+const char *devlink_trap_type_str(enum devlink_trap_type value)
-+{
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(devlink_trap_type_strmap))
-+		return NULL;
-+	return devlink_trap_type_strmap[value];
-+}
-+
- /* Policies */
- struct ynl_policy_attr devlink_dl_dpipe_match_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_DPIPE_MATCH_TYPE] = { .name = "dpipe-match-type", .type = YNL_PT_U32, },
-@@ -361,6 +399,45 @@ struct ynl_policy_nest devlink_dl_resource_nest = {
- 	.table = devlink_dl_resource_policy,
- };
- 
-+struct ynl_policy_attr devlink_dl_param_value_list_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = { .name = "param-value-cmode", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_PARAM_VALUE_DATA] = { .name = "param-value-data", .type = YNL_PT_NUL_STR, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_param_value_list_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_param_value_list_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_param_value_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = { .name = "param-value-cmode", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_PARAM_VALUE_DATA] = { .name = "param-value-data", .type = YNL_PT_NUL_STR, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_param_value_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_param_value_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_region_snapshot_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_REGION_SNAPSHOT_ID] = { .name = "region-snapshot-id", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_region_snapshot_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_region_snapshot_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_region_chunk_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_REGION_CHUNK_DATA] = { .name = "region-chunk-data", .type = YNL_PT_BINARY,},
-+	[DEVLINK_ATTR_REGION_CHUNK_ADDR] = { .name = "region-chunk-addr", .type = YNL_PT_U64, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_region_chunk_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_region_chunk_policy,
-+};
-+
- struct ynl_policy_attr devlink_dl_info_version_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_INFO_VERSION_NAME] = { .name = "info-version-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_INFO_VERSION_VALUE] = { .name = "info-version-value", .type = YNL_PT_NUL_STR, },
-@@ -384,6 +461,44 @@ struct ynl_policy_nest devlink_dl_fmsg_nest = {
- 	.table = devlink_dl_fmsg_policy,
- };
- 
-+struct ynl_policy_attr devlink_dl_health_reporter_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .name = "health-reporter-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_STATE] = { .name = "health-reporter-state", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_ERR_COUNT] = { .name = "health-reporter-err-count", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_RECOVER_COUNT] = { .name = "health-reporter-recover-count", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD] = { .name = "health-reporter-graceful-period", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_RECOVER] = { .name = "health-reporter-auto-recover", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_DUMP_TS] = { .name = "health-reporter-dump-ts", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_DUMP_TS_NS] = { .name = "health-reporter-dump-ts-ns", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_DUMP] = { .name = "health-reporter-auto-dump", .type = YNL_PT_U8, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_health_reporter_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_health_reporter_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_attr_stats_policy[DEVLINK_A_DL_ATTR_STATS_MAX + 1] = {
-+	[DEVLINK_A_DL_ATTR_STATS_RX_PACKETS] = { .name = "rx-packets", .type = YNL_PT_U64, },
-+	[DEVLINK_A_DL_ATTR_STATS_RX_BYTES] = { .name = "rx-bytes", .type = YNL_PT_U64, },
-+	[DEVLINK_A_DL_ATTR_STATS_RX_DROPPED] = { .name = "rx-dropped", .type = YNL_PT_U64, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_attr_stats_nest = {
-+	.max_attr = DEVLINK_A_DL_ATTR_STATS_MAX,
-+	.table = devlink_dl_attr_stats_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_trap_metadata_policy[DEVLINK_A_DL_TRAP_METADATA_MAX + 1] = {
-+	[DEVLINK_A_DL_TRAP_METADATA_METADATA_TYPE_IN_PORT] = { .name = "metadata-type-in-port", .type = YNL_PT_FLAG, },
-+	[DEVLINK_A_DL_TRAP_METADATA_METADATA_TYPE_FA_COOKIE] = { .name = "metadata-type-fa-cookie", .type = YNL_PT_FLAG, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_trap_metadata_nest = {
-+	.max_attr = DEVLINK_A_DL_TRAP_METADATA_MAX,
-+	.table = devlink_dl_trap_metadata_policy,
-+};
-+
- struct ynl_policy_attr devlink_dl_port_function_policy[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1] = {
- 	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .name = "hw-addr", .type = YNL_PT_BINARY,},
- 	[DEVLINK_PORT_FN_ATTR_STATE] = { .name = "state", .type = YNL_PT_U8, },
-@@ -415,6 +530,26 @@ struct ynl_policy_nest devlink_dl_reload_act_stats_nest = {
- 	.table = devlink_dl_reload_act_stats_policy,
- };
- 
-+struct ynl_policy_attr devlink_dl_linecard_supported_types_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_LINECARD_TYPE] = { .name = "linecard-type", .type = YNL_PT_NUL_STR, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_linecard_supported_types_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_linecard_supported_types_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_nested_devlink_policy[DEVLINK_A_DL_NESTED_DEVLINK_MAX + 1] = {
-+	[DEVLINK_A_DL_NESTED_DEVLINK_INDEX] = { .name = "index", .type = YNL_PT_U32, },
-+	[DEVLINK_A_DL_NESTED_DEVLINK_RELOAD_FAILED] = { .name = "reload-failed", .type = YNL_PT_U8, },
-+	[DEVLINK_A_DL_NESTED_DEVLINK_REFCOUNT] = { .name = "refcount", .type = YNL_PT_UINT, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_nested_devlink_nest = {
-+	.max_attr = DEVLINK_A_DL_NESTED_DEVLINK_MAX,
-+	.table = devlink_dl_nested_devlink_policy,
-+};
-+
- struct ynl_policy_attr devlink_dl_selftest_id_policy[DEVLINK_ATTR_SELFTEST_ID_MAX + 1] = {
- 	[DEVLINK_ATTR_SELFTEST_ID_FLASH] = { .name = "flash", .type = YNL_PT_FLAG, },
- };
-@@ -478,6 +613,36 @@ struct ynl_policy_nest devlink_dl_resource_list_nest = {
- 	.table = devlink_dl_resource_list_policy,
- };
- 
-+struct ynl_policy_attr devlink_dl_param_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_PARAM_NAME] = { .name = "param-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_PARAM_GENERIC] = { .name = "param-generic", .type = YNL_PT_FLAG, },
-+	[DEVLINK_ATTR_PARAM_TYPE] = { .name = "param-type", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_PARAM_VALUE_LIST] = { .name = "param-value-list", .type = YNL_PT_NEST, .nest = &devlink_dl_param_value_list_nest, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_param_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_param_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_region_snapshots_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_REGION_SNAPSHOT] = { .name = "region-snapshot", .type = YNL_PT_NEST, .nest = &devlink_dl_region_snapshot_nest, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_region_snapshots_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_region_snapshots_policy,
-+};
-+
-+struct ynl_policy_attr devlink_dl_region_chunks_policy[DEVLINK_ATTR_MAX + 1] = {
-+	[DEVLINK_ATTR_REGION_CHUNK] = { .name = "region-chunk", .type = YNL_PT_NEST, .nest = &devlink_dl_region_chunk_nest, },
-+};
-+
-+struct ynl_policy_nest devlink_dl_region_chunks_nest = {
-+	.max_attr = DEVLINK_ATTR_MAX,
-+	.table = devlink_dl_region_chunks_policy,
-+};
-+
- struct ynl_policy_attr devlink_dl_reload_act_info_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_RELOAD_ACTION] = { .name = "reload-action", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_RELOAD_ACTION_STATS] = { .name = "reload-action-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_act_stats_nest, },
-@@ -578,14 +743,26 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_DEV_NAME] = { .name = "dev-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_PORT_INDEX] = { .name = "port-index", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_PORT_TYPE] = { .name = "port-type", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_PORT_DESIRED_TYPE] = { .name = "port-desired-type", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_PORT_NETDEV_IFINDEX] = { .name = "port-netdev-ifindex", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_PORT_NETDEV_NAME] = { .name = "port-netdev-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_PORT_IBDEV_NAME] = { .name = "port-ibdev-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_PORT_SPLIT_COUNT] = { .name = "port-split-count", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_PORT_SPLIT_GROUP] = { .name = "port-split-group", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_SB_INDEX] = { .name = "sb-index", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_SB_SIZE] = { .name = "sb-size", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_SB_INGRESS_POOL_COUNT] = { .name = "sb-ingress-pool-count", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_SB_EGRESS_POOL_COUNT] = { .name = "sb-egress-pool-count", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_SB_INGRESS_TC_COUNT] = { .name = "sb-ingress-tc-count", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_SB_EGRESS_TC_COUNT] = { .name = "sb-egress-tc-count", .type = YNL_PT_U16, },
- 	[DEVLINK_ATTR_SB_POOL_INDEX] = { .name = "sb-pool-index", .type = YNL_PT_U16, },
- 	[DEVLINK_ATTR_SB_POOL_TYPE] = { .name = "sb-pool-type", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_SB_POOL_SIZE] = { .name = "sb-pool-size", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE] = { .name = "sb-pool-threshold-type", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_SB_THRESHOLD] = { .name = "sb-threshold", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_SB_TC_INDEX] = { .name = "sb-tc-index", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_SB_OCC_CUR] = { .name = "sb-occ-cur", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_SB_OCC_MAX] = { .name = "sb-occ-max", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_ESWITCH_MODE] = { .name = "eswitch-mode", .type = YNL_PT_U16, },
- 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = { .name = "eswitch-inline-mode", .type = YNL_PT_U16, },
- 	[DEVLINK_ATTR_DPIPE_TABLES] = { .name = "dpipe-tables", .type = YNL_PT_NEST, .nest = &devlink_dl_dpipe_tables_nest, },
-@@ -639,11 +816,24 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_DPIPE_TABLE_RESOURCE_ID] = { .name = "dpipe-table-resource-id", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_DPIPE_TABLE_RESOURCE_UNITS] = { .name = "dpipe-table-resource-units", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_PORT_FLAVOUR] = { .name = "port-flavour", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_PORT_NUMBER] = { .name = "port-number", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_PORT_SPLIT_SUPPORT_NUMBER] = { .name = "port-split-support-number", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_PARAM] = { .name = "param", .type = YNL_PT_NEST, .nest = &devlink_dl_param_nest, },
- 	[DEVLINK_ATTR_PARAM_NAME] = { .name = "param-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_PARAM_GENERIC] = { .name = "param-generic", .type = YNL_PT_FLAG, },
- 	[DEVLINK_ATTR_PARAM_TYPE] = { .name = "param-type", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_PARAM_VALUE_LIST] = { .name = "param-value-list", .type = YNL_PT_NEST, .nest = &devlink_dl_param_value_list_nest, },
-+	[DEVLINK_ATTR_PARAM_VALUE] = { .name = "param-value", .type = YNL_PT_NEST, .nest = &devlink_dl_param_value_nest, },
-+	[DEVLINK_ATTR_PARAM_VALUE_DATA] = { .name = "param-value-data", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = { .name = "param-value-cmode", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_REGION_NAME] = { .name = "region-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_REGION_SIZE] = { .name = "region-size", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_REGION_SNAPSHOTS] = { .name = "region-snapshots", .type = YNL_PT_NEST, .nest = &devlink_dl_region_snapshots_nest, },
-+	[DEVLINK_ATTR_REGION_SNAPSHOT] = { .name = "region-snapshot", .type = YNL_PT_NEST, .nest = &devlink_dl_region_snapshot_nest, },
- 	[DEVLINK_ATTR_REGION_SNAPSHOT_ID] = { .name = "region-snapshot-id", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_REGION_CHUNKS] = { .name = "region-chunks", .type = YNL_PT_NEST, .nest = &devlink_dl_region_chunks_nest, },
-+	[DEVLINK_ATTR_REGION_CHUNK] = { .name = "region-chunk", .type = YNL_PT_NEST, .nest = &devlink_dl_region_chunk_nest, },
-+	[DEVLINK_ATTR_REGION_CHUNK_DATA] = { .name = "region-chunk-data", .type = YNL_PT_BINARY,},
- 	[DEVLINK_ATTR_REGION_CHUNK_ADDR] = { .name = "region-chunk-addr", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_REGION_CHUNK_LEN] = { .name = "region-chunk-len", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_INFO_DRIVER_NAME] = { .name = "info-driver-name", .type = YNL_PT_NUL_STR, },
-@@ -653,22 +843,39 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_INFO_VERSION_STORED] = { .name = "info-version-stored", .type = YNL_PT_NEST, .nest = &devlink_dl_info_version_nest, },
- 	[DEVLINK_ATTR_INFO_VERSION_NAME] = { .name = "info-version-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_INFO_VERSION_VALUE] = { .name = "info-version-value", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_SB_POOL_CELL_SIZE] = { .name = "sb-pool-cell-size", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_FMSG] = { .name = "fmsg", .type = YNL_PT_NEST, .nest = &devlink_dl_fmsg_nest, },
- 	[DEVLINK_ATTR_FMSG_OBJ_NEST_START] = { .name = "fmsg-obj-nest-start", .type = YNL_PT_FLAG, },
- 	[DEVLINK_ATTR_FMSG_PAIR_NEST_START] = { .name = "fmsg-pair-nest-start", .type = YNL_PT_FLAG, },
- 	[DEVLINK_ATTR_FMSG_ARR_NEST_START] = { .name = "fmsg-arr-nest-start", .type = YNL_PT_FLAG, },
- 	[DEVLINK_ATTR_FMSG_NEST_END] = { .name = "fmsg-nest-end", .type = YNL_PT_FLAG, },
- 	[DEVLINK_ATTR_FMSG_OBJ_NAME] = { .name = "fmsg-obj-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_FMS_OBJ_VALUE_TYPE] = { .name = "fms-obj-value-type", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_FMS_OBJ_VALUE_DATA] = { .name = "fms-obj-value-data", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER] = { .name = "health-reporter", .type = YNL_PT_NEST, .nest = &devlink_dl_health_reporter_nest, },
- 	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .name = "health-reporter-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_STATE] = { .name = "health-reporter-state", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_ERR_COUNT] = { .name = "health-reporter-err-count", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_RECOVER_COUNT] = { .name = "health-reporter-recover-count", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_DUMP_TS] = { .name = "health-reporter-dump-ts", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD] = { .name = "health-reporter-graceful-period", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_RECOVER] = { .name = "health-reporter-auto-recover", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_FLASH_UPDATE_FILE_NAME] = { .name = "flash-update-file-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_FLASH_UPDATE_COMPONENT] = { .name = "flash-update-component", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_FLASH_UPDATE_STATUS_MSG] = { .name = "flash-update-status-msg", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_FLASH_UPDATE_STATUS_DONE] = { .name = "flash-update-status-done", .type = YNL_PT_U64, },
-+	[DEVLINK_ATTR_FLASH_UPDATE_STATUS_TOTAL] = { .name = "flash-update-status-total", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_PORT_PCI_PF_NUMBER] = { .name = "port-pci-pf-number", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_PORT_PCI_VF_NUMBER] = { .name = "port-pci-vf-number", .type = YNL_PT_U16, },
-+	[DEVLINK_ATTR_ATTR_STATS] = { .name = "attr-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_attr_stats_nest, },
- 	[DEVLINK_ATTR_TRAP_NAME] = { .name = "trap-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_TRAP_ACTION] = { .name = "trap-action", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_TRAP_TYPE] = { .name = "trap-type", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_TRAP_GENERIC] = { .name = "trap-generic", .type = YNL_PT_FLAG, },
-+	[DEVLINK_ATTR_TRAP_METADATA] = { .name = "trap-metadata", .type = YNL_PT_NEST, .nest = &devlink_dl_trap_metadata_nest, },
- 	[DEVLINK_ATTR_TRAP_GROUP_NAME] = { .name = "trap-group-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_RELOAD_FAILED] = { .name = "reload-failed", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_HEALTH_REPORTER_DUMP_TS_NS] = { .name = "health-reporter-dump-ts-ns", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_NETNS_FD] = { .name = "netns-fd", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_NETNS_PID] = { .name = "netns-pid", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_NETNS_ID] = { .name = "netns-id", .type = YNL_PT_U32, },
-@@ -677,7 +884,12 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_TRAP_POLICER_RATE] = { .name = "trap-policer-rate", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_TRAP_POLICER_BURST] = { .name = "trap-policer-burst", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_PORT_FUNCTION] = { .name = "port-function", .type = YNL_PT_NEST, .nest = &devlink_dl_port_function_nest, },
-+	[DEVLINK_ATTR_BOARD_SERIAL_NUMBER] = { .name = "board-serial-number", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_PORT_LANES] = { .name = "port-lanes", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_PORT_SPLITTABLE] = { .name = "port-splittable", .type = YNL_PT_U8, },
-+	[DEVLINK_ATTR_PORT_EXTERNAL] = { .name = "port-external", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER] = { .name = "port-controller-number", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_FLASH_UPDATE_STATUS_TIMEOUT] = { .name = "flash-update-status-timeout", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_FLASH_UPDATE_OVERWRITE_MASK] = { .name = "flash-update-overwrite-mask", .type = YNL_PT_BITFIELD32, },
- 	[DEVLINK_ATTR_RELOAD_ACTION] = { .name = "reload-action", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_RELOAD_ACTIONS_PERFORMED] = { .name = "reload-actions-performed", .type = YNL_PT_BITFIELD32, },
-@@ -691,12 +903,17 @@ struct ynl_policy_attr devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_RELOAD_ACTION_INFO] = { .name = "reload-action-info", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_act_info_nest, },
- 	[DEVLINK_ATTR_RELOAD_ACTION_STATS] = { .name = "reload-action-stats", .type = YNL_PT_NEST, .nest = &devlink_dl_reload_act_stats_nest, },
- 	[DEVLINK_ATTR_PORT_PCI_SF_NUMBER] = { .name = "port-pci-sf-number", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_RATE_TYPE] = { .name = "rate-type", .type = YNL_PT_U16, },
- 	[DEVLINK_ATTR_RATE_TX_SHARE] = { .name = "rate-tx-share", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_RATE_TX_MAX] = { .name = "rate-tx-max", .type = YNL_PT_U64, },
- 	[DEVLINK_ATTR_RATE_NODE_NAME] = { .name = "rate-node-name", .type = YNL_PT_NUL_STR, },
- 	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .name = "rate-parent-node-name", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_REGION_MAX_SNPSHOTS] = { .name = "region-max-snpshots", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_LINECARD_INDEX] = { .name = "linecard-index", .type = YNL_PT_U32, },
-+	[DEVLINK_ATTR_LINECARD_STATE] = { .name = "linecard-state", .type = YNL_PT_U8, },
- 	[DEVLINK_ATTR_LINECARD_TYPE] = { .name = "linecard-type", .type = YNL_PT_NUL_STR, },
-+	[DEVLINK_ATTR_LINECARD_SUPPORTED_TYPES] = { .name = "linecard-supported-types", .type = YNL_PT_NEST, .nest = &devlink_dl_linecard_supported_types_nest, },
-+	[DEVLINK_ATTR_NESTED_DEVLINK] = { .name = "nested-devlink", .type = YNL_PT_NEST, .nest = &devlink_dl_nested_devlink_nest, },
- 	[DEVLINK_ATTR_SELFTESTS] = { .name = "selftests", .type = YNL_PT_NEST, .nest = &devlink_dl_selftest_id_nest, },
- 	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .name = "rate-tx-priority", .type = YNL_PT_U32, },
- 	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .name = "rate-tx-weight", .type = YNL_PT_U32, },
-@@ -1073,6 +1290,25 @@ int devlink_dl_resource_parse(struct ynl_parse_arg *yarg,
- 	return 0;
- }
- 
-+void devlink_dl_param_value_list_free(struct devlink_dl_param_value_list *obj)
-+{
-+	free(obj->param_value_data);
-+}
-+
-+void devlink_dl_param_value_free(struct devlink_dl_param_value *obj)
-+{
-+	free(obj->param_value_data);
-+}
-+
-+void devlink_dl_region_snapshot_free(struct devlink_dl_region_snapshot *obj)
-+{
-+}
-+
-+void devlink_dl_region_chunk_free(struct devlink_dl_region_chunk *obj)
-+{
-+	free(obj->region_chunk_data);
-+}
-+
- void devlink_dl_info_version_free(struct devlink_dl_info_version *obj)
- {
- 	free(obj->info_version_name);
-@@ -1163,6 +1399,19 @@ int devlink_dl_fmsg_parse(struct ynl_parse_arg *yarg,
- 	return 0;
- }
- 
-+void devlink_dl_health_reporter_free(struct devlink_dl_health_reporter *obj)
-+{
-+	free(obj->health_reporter_name);
-+}
-+
-+void devlink_dl_attr_stats_free(struct devlink_dl_attr_stats *obj)
-+{
-+}
-+
-+void devlink_dl_trap_metadata_free(struct devlink_dl_trap_metadata *obj)
-+{
-+}
-+
- void devlink_dl_port_function_free(struct devlink_dl_port_function *obj)
- {
- 	free(obj->hw_addr);
-@@ -1266,6 +1515,16 @@ int devlink_dl_reload_act_stats_parse(struct ynl_parse_arg *yarg,
- 	return 0;
- }
- 
-+void
-+devlink_dl_linecard_supported_types_free(struct devlink_dl_linecard_supported_types *obj)
-+{
-+	free(obj->linecard_type);
-+}
-+
-+void devlink_dl_nested_devlink_free(struct devlink_dl_nested_devlink *obj)
-+{
-+}
-+
- void devlink_dl_selftest_id_free(struct devlink_dl_selftest_id *obj)
- {
- }
-@@ -1582,6 +1841,22 @@ int devlink_dl_resource_list_parse(struct ynl_parse_arg *yarg,
- 	return 0;
- }
- 
-+void devlink_dl_param_free(struct devlink_dl_param *obj)
-+{
-+	free(obj->param_name);
-+	devlink_dl_param_value_list_free(&obj->param_value_list);
-+}
-+
-+void devlink_dl_region_snapshots_free(struct devlink_dl_region_snapshots *obj)
-+{
-+	devlink_dl_region_snapshot_free(&obj->region_snapshot);
-+}
-+
-+void devlink_dl_region_chunks_free(struct devlink_dl_region_chunks *obj)
-+{
-+	devlink_dl_region_chunk_free(&obj->region_chunk);
-+}
-+
- void devlink_dl_reload_act_info_free(struct devlink_dl_reload_act_info *obj)
- {
- 	unsigned int i;
-diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
-index 1db4edc36eaa..5865b43a49bc 100644
---- a/tools/net/ynl/generated/devlink-user.h
-+++ b/tools/net/ynl/generated/devlink-user.h
-@@ -24,6 +24,7 @@ const char *devlink_port_flavour_str(enum devlink_port_flavour value);
- const char *devlink_port_fn_state_str(enum devlink_port_fn_state value);
- const char *devlink_port_fn_opstate_str(enum devlink_port_fn_opstate value);
- const char *devlink_port_fn_attr_cap_str(enum devlink_port_fn_attr_cap value);
-+const char *devlink_rate_type_str(enum devlink_rate_type value);
- const char *
- devlink_sb_threshold_type_str(enum devlink_sb_threshold_type value);
- const char *devlink_eswitch_mode_str(enum devlink_eswitch_mode value);
-@@ -31,6 +32,7 @@ const char *
- devlink_eswitch_inline_mode_str(enum devlink_eswitch_inline_mode value);
- const char *
- devlink_eswitch_encap_mode_str(enum devlink_eswitch_encap_mode value);
-+const char *devlink_dpipe_header_id_str(enum devlink_dpipe_header_id value);
- const char *devlink_dpipe_match_type_str(enum devlink_dpipe_match_type value);
- const char *
- devlink_dpipe_action_type_str(enum devlink_dpipe_action_type value);
-@@ -41,6 +43,7 @@ const char *devlink_reload_action_str(enum devlink_reload_action value);
- const char *devlink_param_cmode_str(enum devlink_param_cmode value);
- const char *devlink_flash_overwrite_str(enum devlink_flash_overwrite value);
- const char *devlink_trap_action_str(enum devlink_trap_action value);
-+const char *devlink_trap_type_str(enum devlink_trap_type value);
- 
- /* Common nested types */
- struct devlink_dl_dpipe_match {
-@@ -53,7 +56,7 @@ struct devlink_dl_dpipe_match {
- 	} _present;
- 
- 	enum devlink_dpipe_match_type dpipe_match_type;
--	__u32 dpipe_header_id;
-+	enum devlink_dpipe_header_id dpipe_header_id;
- 	__u8 dpipe_header_global;
- 	__u32 dpipe_header_index;
- 	__u32 dpipe_field_id;
-@@ -83,7 +86,7 @@ struct devlink_dl_dpipe_action {
- 	} _present;
- 
- 	enum devlink_dpipe_action_type dpipe_action_type;
--	__u32 dpipe_header_id;
-+	enum devlink_dpipe_header_id dpipe_header_id;
- 	__u8 dpipe_header_global;
- 	__u32 dpipe_header_index;
- 	__u32 dpipe_field_id;
-@@ -143,6 +146,44 @@ struct devlink_dl_resource {
- 	__u64 resource_occ;
- };
- 
-+struct devlink_dl_param_value_list {
-+	struct {
-+		__u32 param_value_cmode:1;
-+		__u32 param_value_data_len;
-+	} _present;
-+
-+	enum devlink_param_cmode param_value_cmode;
-+	char *param_value_data;
-+};
-+
-+struct devlink_dl_param_value {
-+	struct {
-+		__u32 param_value_cmode:1;
-+		__u32 param_value_data_len;
-+	} _present;
-+
-+	enum devlink_param_cmode param_value_cmode;
-+	char *param_value_data;
-+};
-+
-+struct devlink_dl_region_snapshot {
-+	struct {
-+		__u32 region_snapshot_id:1;
-+	} _present;
-+
-+	__u32 region_snapshot_id;
-+};
-+
-+struct devlink_dl_region_chunk {
-+	struct {
-+		__u32 region_chunk_data_len;
-+		__u32 region_chunk_addr:1;
-+	} _present;
-+
-+	void *region_chunk_data;
-+	__u64 region_chunk_addr;
-+};
-+
- struct devlink_dl_info_version {
- 	struct {
- 		__u32 info_version_name_len;
-@@ -165,6 +206,49 @@ struct devlink_dl_fmsg {
- 	char *fmsg_obj_name;
- };
- 
-+struct devlink_dl_health_reporter {
-+	struct {
-+		__u32 health_reporter_name_len;
-+		__u32 health_reporter_state:1;
-+		__u32 health_reporter_err_count:1;
-+		__u32 health_reporter_recover_count:1;
-+		__u32 health_reporter_graceful_period:1;
-+		__u32 health_reporter_auto_recover:1;
-+		__u32 health_reporter_dump_ts:1;
-+		__u32 health_reporter_dump_ts_ns:1;
-+		__u32 health_reporter_auto_dump:1;
-+	} _present;
-+
-+	char *health_reporter_name;
-+	__u8 health_reporter_state;
-+	__u64 health_reporter_err_count;
-+	__u64 health_reporter_recover_count;
-+	__u64 health_reporter_graceful_period;
-+	__u8 health_reporter_auto_recover;
-+	__u64 health_reporter_dump_ts;
-+	__u64 health_reporter_dump_ts_ns;
-+	__u8 health_reporter_auto_dump;
-+};
-+
-+struct devlink_dl_attr_stats {
-+	struct {
-+		__u32 rx_packets:1;
-+		__u32 rx_bytes:1;
-+		__u32 rx_dropped:1;
-+	} _present;
-+
-+	__u64 rx_packets;
-+	__u64 rx_bytes;
-+	__u64 rx_dropped;
-+};
-+
-+struct devlink_dl_trap_metadata {
-+	struct {
-+		__u32 metadata_type_in_port:1;
-+		__u32 metadata_type_fa_cookie:1;
-+	} _present;
-+};
-+
- struct devlink_dl_port_function {
- 	struct {
- 		__u32 hw_addr_len;
-@@ -194,6 +278,26 @@ struct devlink_dl_reload_act_stats {
- 	struct devlink_dl_reload_stats_entry *reload_stats_entry;
- };
- 
-+struct devlink_dl_linecard_supported_types {
-+	struct {
-+		__u32 linecard_type_len;
-+	} _present;
-+
-+	char *linecard_type;
-+};
-+
-+struct devlink_dl_nested_devlink {
-+	struct {
-+		__u32 index:1;
-+		__u32 reload_failed:1;
-+		__u32 refcount:1;
-+	} _present;
-+
-+	__u32 index;
-+	__u8 reload_failed;
-+	__s64 refcount;
-+};
-+
- struct devlink_dl_selftest_id {
- 	struct {
- 		__u32 flash:1;
-@@ -230,6 +334,35 @@ struct devlink_dl_resource_list {
- 	struct devlink_dl_resource *resource;
- };
- 
-+struct devlink_dl_param {
-+	struct {
-+		__u32 param_name_len;
-+		__u32 param_generic:1;
-+		__u32 param_type:1;
-+		__u32 param_value_list:1;
-+	} _present;
-+
-+	char *param_name;
-+	__u8 param_type;
-+	struct devlink_dl_param_value_list param_value_list;
-+};
-+
-+struct devlink_dl_region_snapshots {
-+	struct {
-+		__u32 region_snapshot:1;
-+	} _present;
-+
-+	struct devlink_dl_region_snapshot region_snapshot;
-+};
-+
-+struct devlink_dl_region_chunks {
-+	struct {
-+		__u32 region_chunk:1;
-+	} _present;
-+
-+	struct devlink_dl_region_chunk region_chunk;
-+};
-+
- struct devlink_dl_reload_act_info {
- 	struct {
- 		__u32 reload_action:1;
-@@ -283,7 +416,7 @@ struct devlink_dl_dpipe_header {
- 	} _present;
- 
- 	char *dpipe_header_name;
--	__u32 dpipe_header_id;
-+	enum devlink_dpipe_header_id dpipe_header_id;
- 	__u8 dpipe_header_global;
- 	struct devlink_dl_dpipe_header_fields dpipe_header_fields;
- };
--- 
-2.34.1
-
+but it isn't clear: for PTP, does the DMA provider give you an RX
+timestamp too? What about a TX timestamp?
 
