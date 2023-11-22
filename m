@@ -1,117 +1,141 @@
-Return-Path: <netdev+bounces-50099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B2F7F4A0C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:16:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F38D7F4A19
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 16:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1688281203
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:16:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A0321F2222C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 15:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307404C3B5;
-	Wed, 22 Nov 2023 15:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1024EB38;
+	Wed, 22 Nov 2023 15:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="fW8Opz08"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WnPr6GfR"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A2DF92;
-	Wed, 22 Nov 2023 07:16:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=/Bu2VQs5gpUOr1zltQq4kVF4KWyL88OyPQ1qvikMssI=; b=fW8Opz08B/kmeGk2CB0ZypA8f5
-	dzvR+fPT61tokvJtftRJX5Mz/n5CmJuUSArGS5pvYdevn0AOxuvP7dC/AcamP7jtMA1envNyTLVMI
-	vwhKl6BeigUswt/arMQjSWWV74/KDMgWNodiOwL3K02O3OpmQxonaYZKGx3x9olEQe7QBhSiyrUiP
-	gkk8X0Js6aP/HYLApBl56CpOkqxwLSHd9nEfzryTXReA7z9kODuh35DBoJZlRQQ5vqYARBmUs3uT0
-	ag/W86b7wErm0ttbPj8NCaiTJdqKsNTKeC8Op+aVSVi2jM8omVloG3chv0B0duESg+6RPf7qWRgdK
-	cx6SGb5w==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r5oxq-000BUG-5x; Wed, 22 Nov 2023 16:16:30 +0100
-Received: from [178.197.248.19] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r5oxp-000Geg-Pq; Wed, 22 Nov 2023 16:16:29 +0100
-Subject: Re: [PATCH bpf-next v2 0/3] skmsg: Add the data length in skmsg to
- SIOCINQ ioctl and rx_queue
-To: Pengcheng Yang <yangpc@wangsu.com>,
- John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <1700565725-2706-1-git-send-email-yangpc@wangsu.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <6c856222-d103-8149-1cdb-b3e07105f5f8@iogearbox.net>
-Date: Wed, 22 Nov 2023 16:16:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4EAF9;
+	Wed, 22 Nov 2023 07:19:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700666375; x=1732202375;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=nrNPcz4uYEQBP3pOrCUXcuO8X6G/FSLQKBhZfBz9dLY=;
+  b=WnPr6GfRsmHheX8m0dMDThH9SdbMmURgop2QVRUSnHTfuQkivH84A0t1
+   lc+YRQ2nV87kyMZ5PhHTkOrh7Excs6jGFS/xofM/urtHV4kBMLhIvg1YF
+   gVEFTOsy20Pn+yYCZ3a0AUvM63kxv2GSXq49MzmfaAS3T1NpXGd/0MHyG
+   5DH8aPv7m1cOXumvpMhYld46TIkpCZqp+oNcfN62jj09wTcEajPR8hT1h
+   LuXAbfqp+oJY4ozRFRLCITIyEab3FsYIEtaPnftYgNfGlVQORA1+U0LD9
+   pwP+0AqQNgTATs0DjAIhfs1z99yaaRKKfBL7A3LnvNKXz+B4G4tssZRi8
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="390932784"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="390932784"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 07:19:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="833052538"
+X-IronPort-AV: E=Sophos;i="6.04,219,1695711600"; 
+   d="scan'208";a="833052538"
+Received: from tjquresh-mobl.ger.corp.intel.com (HELO localhost) ([10.252.41.76])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 07:19:09 -0800
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
+Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>, Vitaly
+ Kuznetsov <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, David Woodhouse
+ <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, Oded Gabbay
+ <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>, Tom Rix
+ <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
+ <yilun.xu@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, Zhi Wang
+ <zhi.a.wang@intel.com>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tvrtko.ursulin@linux.intel.com>, David Airlie <airlied@gmail.com>, Daniel
+ Vetter <daniel@ffwll.ch>, Leon Romanovsky <leon@kernel.org>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Frederic Barrat <fbarrat@linux.ibm.com>, Andrew
+ Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Eric Farman
+ <farman@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>, Halil
+ Pasic <pasic@linux.ibm.com>, Vineeth Vijayan <vneethv@linux.ibm.com>,
+ Peter Oberparleiter <oberpar@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Tony
+ Krowiak <akrowiak@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ Harald Freudenberger <freude@linux.ibm.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Diana Craciun <diana.craciun@oss.nxp.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Eric Auger
+ <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>, Benjamin LaHaise
+ <bcrl@kvack.org>, Christian Brauner <brauner@kernel.org>, Johannes Weiner
+ <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, Roman Gushchin
+ <roman.gushchin@linux.dev>, Shakeel Butt <shakeelb@google.com>, Muchun
+ Song <muchun.song@linux.dev>, Kirti Wankhede <kwankhede@nvidia.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fpga@vger.kernel.org,
+ intel-gvt-dev@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-s390@vger.kernel.org, linux-usb@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org, Jens
+ Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ io-uring@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] eventfd: simplify eventfd_signal()
+In-Reply-To: <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
+ <20231122-vfs-eventfd-signal-v2-2-bd549b14ce0c@kernel.org>
+Date: Wed, 22 Nov 2023 17:19:06 +0200
+Message-ID: <877cm9n7dh.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1700565725-2706-1-git-send-email-yangpc@wangsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27101/Wed Nov 22 09:40:55 2023)
+Content-Type: text/plain
 
-On 11/21/23 12:22 PM, Pengcheng Yang wrote:
-> When using skmsg redirect, the msg is queued in psock->ingress_msg,
-> and the application calling SIOCINQ ioctl will return a readable
-> length of 0, and we cannot track the data length of ingress_msg with
-> the ss tool.
-> 
-> In this patch set, we added the data length in ingress_msg to the
-> SIOCINQ ioctl and the rx_queue of tcp_diag.
-> 
-> v2:
-> - Add READ_ONCE()/WRITE_ONCE() on accesses to psock->msg_len
-> - Mask out the increment msg_len where its not needed
+On Wed, 22 Nov 2023, Christian Brauner <brauner@kernel.org> wrote:
+> diff --git a/fs/eventfd.c b/fs/eventfd.c
+> index 33a918f9566c..dc9e01053235 100644
+> --- a/fs/eventfd.c
+> +++ b/fs/eventfd.c
+> @@ -74,20 +74,17 @@ __u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
+>  /**
+>   * eventfd_signal - Adds @n to the eventfd counter.
 
-Please double check BPF CI, this series might be breaking sockmap selftests :
+This still refers to @n here, and in patch 4.
 
-https://github.com/kernel-patches/bpf/actions/runs/6922624338/job/18829650043
+BR,
+Jani.
 
-[...]
-Notice: Success: 501/13458, Skipped: 57, Failed: 1
-Error: #281 sockmap_basic
-Error: #281/16 sockmap_basic/sockmap skb_verdict fionread
-   Error: #281/16 sockmap_basic/sockmap skb_verdict fionread
-   test_sockmap_skb_verdict_fionread:PASS:open_and_load 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:bpf_prog_attach 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:socket_loopback(s) 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:create_socket_pairs(s) 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:bpf_map_update_elem(c1) 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:xsend(p0) 0 nsec
-   test_sockmap_skb_verdict_fionread:PASS:ioctl(FIONREAD) error 0 nsec
-   test_sockmap_skb_verdict_fionread:FAIL:ioctl(FIONREAD) unexpected ioctl(FIONREAD): actual 512 != expected 256
-   test_sockmap_skb_verdict_fionread:PASS:recv_timeout(c0) 0 nsec
-Error: #281/18 sockmap_basic/sockmap skb_verdict msg_f_peek
-   Error: #281/18 sockmap_basic/sockmap skb_verdict msg_f_peek
-   test_sockmap_skb_verdict_peek:PASS:open_and_load 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:bpf_prog_attach 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:socket_loopback(s) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:create_pairs(s) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:bpf_map_update_elem(c1) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:xsend(p1) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:recv(c1) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:ioctl(FIONREAD) error 0 nsec
-   test_sockmap_skb_verdict_peek:FAIL:after peek ioctl(FIONREAD) unexpected after peek ioctl(FIONREAD): actual 512 != expected 256
-   test_sockmap_skb_verdict_peek:PASS:recv(p0) 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:ioctl(FIONREAD) error 0 nsec
-   test_sockmap_skb_verdict_peek:PASS:after read ioctl(FIONREAD) 0 nsec
-Test Results:
-              bpftool: PASS
-  test_progs-no_alu32: FAIL (returned 1)
-             shutdown: CLEAN
-Error: Process completed with exit code 1.
+>   * @ctx: [in] Pointer to the eventfd context.
+> - * @n: [in] Value of the counter to be added to the eventfd internal counter.
+> - *          The value cannot be negative.
+>   *
+>   * This function is supposed to be called by the kernel in paths that do not
+>   * allow sleeping. In this function we allow the counter to reach the ULLONG_MAX
+>   * value, and we signal this as overflow condition by returning a EPOLLERR
+>   * to poll(2).
+>   *
+> - * Returns the amount by which the counter was incremented.  This will be less
+> - * than @n if the counter has overflowed.
+> + * Returns the amount by which the counter was incremented.
+>   */
+> -__u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
+> +__u64 eventfd_signal(struct eventfd_ctx *ctx)
+>  {
+> -	return eventfd_signal_mask(ctx, n, 0);
+> +	return eventfd_signal_mask(ctx, 1, 0);
+>  }
+>  EXPORT_SYMBOL_GPL(eventfd_signal);
+>  
+
+-- 
+Jani Nikula, Intel
 
