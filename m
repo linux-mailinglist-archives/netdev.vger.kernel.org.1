@@ -1,152 +1,135 @@
-Return-Path: <netdev+bounces-50218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657E77F4F21
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:17:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB197F4F33
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 19:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 845061C2099D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA9702812EE
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 18:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636A84F5EE;
-	Wed, 22 Nov 2023 18:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28BD5ABBA;
+	Wed, 22 Nov 2023 18:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQmEifow"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="GS/APCbr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="szbLNXMR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD2DB2;
-	Wed, 22 Nov 2023 10:17:10 -0800 (PST)
-Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6cd0963c61cso57871a34.0;
-        Wed, 22 Nov 2023 10:17:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700677029; x=1701281829; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SN/KMQ2vvLENAwtg5lCFJ/mKximo2fIUOtSV5k1GHOg=;
-        b=MQmEifowAVL8uqYrWrcgZ2Fi/Px9PmqK+aO8wnmAORa2AVQtexhmE2EO3WIkRWz8u+
-         yzlB7g4aI5+lzdhPc6oFFFq7o5vARLuu/4Y1bJpjphtNIHW1ENUPKI3UqHGXD0AhmRzV
-         oE3qE4S4/RzrNygajxNCvZbsj9O8OqCMa5odWzto04CWAFQBGxDH3L3jyoO8qFC7lr2E
-         FNxxa/Zv38u1Mi2vddEGOn6bxJH0aLonGPV1f1+semOHRHSgCp9Gvc1eiLw7yl0BtlWm
-         FFKAkLQTeMEPUIWNIYZXKC2DMzDJX84Zq3AZQAvnx0sYxzdn685leC2bUO/6oMkvq/HA
-         sMbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700677029; x=1701281829;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SN/KMQ2vvLENAwtg5lCFJ/mKximo2fIUOtSV5k1GHOg=;
-        b=U61e5cM5M8qllKQcRwewbbX+65sP7iBkuy0FgLUuk+hWxU5Ua30RBfljUOCVtjwUg7
-         J2fgmXKNZhXDbYfqI/S/41SVxoBtVjJ7dQ1Rr+abCCTCDR2ohUqgmhcBUExjloq1nHtM
-         0aoY1hSZh9w0LvIgm3CiGff5Yf9ompxGhNhaHsq8OxcnfphcijouIktwhwrkDZ5H0h8q
-         NTZErKTnSYK/hSHfUL2GdVwrJJxp3y9tvvUlFmk59wHvQYZEGLZSXD/TPjvoU0QW+2kQ
-         V9y5GWHQWV28rfyHM4eWEJAjC2+Z7MlnsD6O5h9nzMpXSwdvD1oAPh7YmZ5D6pdJ7oLs
-         V0JQ==
-X-Gm-Message-State: AOJu0Ywz6TINR1p+6FOwBvB72/3jdw87WAzGIve8KKk48Wi/QaWiiT0P
-	M6hIbrhfd27EMqltbeNg3i4=
-X-Google-Smtp-Source: AGHT+IF8zmQTzVazpP6jAoIXPI8DnQUqH6w+O5LIhEUZ4HGR/tZ7jrbHgzQ38SbON6pOINgCjFUFWg==
-X-Received: by 2002:a05:6830:1057:b0:6d7:f639:27e5 with SMTP id b23-20020a056830105700b006d7f63927e5mr580282otp.25.1700677029502;
-        Wed, 22 Nov 2023 10:17:09 -0800 (PST)
-Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
-        by smtp.gmail.com with ESMTPSA id ez18-20020ad45912000000b00678013cc898sm4141354qvb.36.2023.11.22.10.17.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 10:17:09 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailauth.nyi.internal (Postfix) with ESMTP id C299827C0054;
-	Wed, 22 Nov 2023 13:17:08 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Wed, 22 Nov 2023 13:17:08 -0500
-X-ME-Sender: <xms:pEVeZbfbxheYpgft4ojzpfgrT2X8-7aLDFqOma1zAza3UXutIgovpg>
-    <xme:pEVeZRMTvE8zqgZ5X0l5UQjY37gTzccZLoAIrFsNqIAR0ey2Uoc-aDDDUwM7QTPpq
-    R3M4zfvFjGBHOXnAg>
-X-ME-Received: <xmr:pEVeZUiJG_Pn1Oo7Iq2y295bOCrUrpYkFlTtvGGdaC8X8LeI191uWqPL2yA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehuddguddtkecutefuodetggdotefrod
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445AEA2;
+	Wed, 22 Nov 2023 10:21:02 -0800 (PST)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id 1BD265C0131;
+	Wed, 22 Nov 2023 13:20:59 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Wed, 22 Nov 2023 13:20:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm3; t=1700677259; x=1700763659; bh=IXy9hEwDva
+	zgBgsi6N7DtR+e9WjAm48zXkbX44TGPGQ=; b=GS/APCbrMj2F3EvQBvMqdGxB0m
+	lU0U2qu2WVG+6csf0xBpIO5GR+iNDvatl2UrLabMtjjV4grTi/KwB+nDDbDE4Wpk
+	TG0yiDVlzA0iWJvFlG0ySYigTtNDCuaDckG6qAExIGYAdILqrWwHcJia3jyRcQnu
+	dMxzbakbDjcI7gEhMVwyU9R/Xsl1TQHtuMw5bjV0mwXQk6bpQMZcYqyigWeb3s1T
+	UzRbjGjSVgoo3MYrk5x+S6WhSlrKDLP06Y89J8Z0VsJ6wsflvG4vwSaS+vpvXdZk
+	/aN2S/s+KDJ5S0hH1/GUVEpk4B/igL1YLnOJ5kBLDHlYnmiQSOO+T9oeqXgg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1700677259; x=1700763659; bh=IXy9hEwDvazgB
+	gsi6N7DtR+e9WjAm48zXkbX44TGPGQ=; b=szbLNXMRsBV1JbaczpHNx3zsmIhnk
+	QDSvv6xRx5oA2cCrseTNNyZ1C6ELqe3HwIuQu1HGuP+IZJSZGWRJZ3Heehfg6FHo
+	pLCcGjeru4izEzhI0sR0feZLBbT6Ylm267D5/N+hvzl8f3XhaMDZgukhn7Tkkx3c
+	UXNuYfTQy7YTctFi74/M69vsytdZIPQCu8Us6RUFCLKv2yIwb5a7AhCCaQXxxKzA
+	hohTyG1AGg65vPg+lG20IJDOq+zfRt70Zj2PZhy74QpdrShEVZZqjlhsRpYTCykJ
+	6BOJe/Rz8GPDuiFrHZCV1JjKdnIKnxKAMPqsqmhFg4zUdIXfWb1GZc+pQ==
+X-ME-Sender: <xms:ikZeZRA69fsvHlD-91jJp8i6LSJdbtglycXyxoVF5mRExJeH6fMMJg>
+    <xme:ikZeZfg0Skj4tRRhmSd4oXUjGY9YtHOe55HatmKxXcqRvzw8F1rMTHMqhkYKT8su-
+    -QQjkIGg1w7hEQmYw>
+X-ME-Received: <xmr:ikZeZcm1L0-GhzkPVLPqwS4rneerAoAKrzsGl8uZlDvTWCMsGWHxvyxHfZINy3xcNAWzeP87Yh0vaXwvCDJEXDZ4w47ufp4R7iF-FtaElos1AQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehuddguddutdcutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepueho
-    qhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtf
-    frrghtthgvrhhnpeeiheefkefgvdefteejjedukefhieevleeffeevheehfeffhfekhfet
-    veffvefhgfenucffohhmrghinheprhhushhtqdhlrghnghdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhht
-    phgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqd
-    gsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:pEVeZc-PU4PlP_rBJnv0rO-Xf2qML1-loNeDnAt1X1oO81NblTvkRg>
-    <xmx:pEVeZXv5307KS04xkG763zctq_6HRfqy-34YJL-NovAsx9Nby_Xw-Q>
-    <xmx:pEVeZbFXzPc0TjdINSe2yzfLwEUVwzfzwgONXf2DE9wVbN_wrAYbWg>
-    <xmx:pEVeZVJCOOZj0p-NAUgD775DcwKfwg3TlcQkEHi0Q40C9KZZCFdC_wkxZ9I>
-Feedback-ID: iad51458e:Fastmail
+    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculddvfedmnecujfgurhephf
+    fvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegu
+    gihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeikeehudegteevuddthf
+    eilefhjefgueeuueffveevheeggfeufeejfeeuudekfeenucffohhmrghinhepihgvthhf
+    rdhorhhgpdhgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:ikZeZbxo0rz_iAxlkNzfSmPoqdGaN3jmI4b__fs_TpN-Au_A60T-nQ>
+    <xmx:ikZeZWREQ0H-cS1AXfjDkgS6wr8RaOj8v9wsaPswJqk-3DFnoNS-4Q>
+    <xmx:ikZeZeaSLH4Sxx2sVvoPhJsFKEsxJ5IzzI98YmR8lu41-H8IZphkMA>
+    <xmx:i0ZeZVFDZd7eMFlnhBQZ_ZpJIu3iAsuW0I8M5hjyMDU5wNXaov9_EQ>
+Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Nov 2023 13:17:08 -0500 (EST)
-Date: Wed, 22 Nov 2023 10:16:44 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: tmgross@umich.edu, andrew@lunn.ch, gregkh@linuxfoundation.org,
-	aliceryhl@google.com, benno.lossin@proton.me,
-	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
- drivers
-Message-ID: <ZV5FjEM1EWm6iTAm@boqun-archlinux>
-References: <e7d0226a-9a38-4ce9-a9b5-7bb80a19bff6@lunn.ch>
- <ZVjePqyic7pvcb24@Boquns-Mac-mini.home>
- <CALNs47tt94DBPvz47rssBTZ86jbHwaa7XaNnT3UbdxwY6nLg1g@mail.gmail.com>
- <20231121.111306.119472527722905184.fujita.tomonori@gmail.com>
+ 22 Nov 2023 13:20:57 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	steffen.klassert@secunet.com,
+	antony.antony@secunet.com,
+	alexei.starovoitov@gmail.com
+Cc: devel@linux-ipsec.org
+Subject: [PATCH ipsec-next v1 0/7] Add bpf_xdp_get_xfrm_state() kfunc
+Date: Wed, 22 Nov 2023 11:20:21 -0700
+Message-ID: <cover.1700676682.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231121.111306.119472527722905184.fujita.tomonori@gmail.com>
 
-On Tue, Nov 21, 2023 at 11:13:06AM +0900, FUJITA Tomonori wrote:
-[...]
-> 
-> I'm not sure we discussed but making DriverVTable Sync works.
-> 
-> #[repr(transparent)]
-> pub struct DriverVTable(Opaque<bindings::phy_driver>);
-> 
-> // SAFETY: DriverVTable has no &self methods, so immutable references to it are useless.
 
-Minor nitpicking, I would add one more sentense in the safety comment:
+This patchset adds two kfunc helpers, bpf_xdp_get_xfrm_state() and
+bpf_xdp_xfrm_state_release() that wrap xfrm_state_lookup() and
+xfrm_state_put(). The intent is to support software RSS (via XDP) for
+the ongoing/upcoming ipsec pcpu work [0]. Recent experiments performed
+on (hopefully) reproducible AWS testbeds indicate that single tunnel
+pcpu ipsec can reach line rate on 100G ENA nics.
 
-	therefore it's safe to share immutable references between
-	threads.
+Note this patchset only tests/shows generic xfrm_state access. The
+"secret sauce" (if you can really even call it that) involves accessing
+a soon-to-be-upstreamed pcpu_num field in xfrm_state. Early example is
+available here [1].
 
-or 
-	therefore it's safe to share immutable references between
-	execution contexts.
+[0]: https://datatracker.ietf.org/doc/draft-ietf-ipsecme-multi-sa-performance/03/
+[1]: https://github.com/danobi/xdp-tools/blob/e89a1c617aba3b50d990f779357d6ce2863ecb27/xdp-bench/xdp_redirect_cpumap.bpf.c#L385-L406
 
-once we decide the term here ;-)
+Changes from RFCv2:
+* Rebased to ipsec-next
+* Fix netns leak
 
-The reason is to match Sync definition [1]:
+Changes from RFCv1:
+* Add Antony's commit tags
+* Add KF_ACQUIRE and KF_RELEASE semantics
 
-"""
-Types for which it is safe to share references between threads.
+Daniel Xu (7):
+  bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
+  bpf: xfrm: Add bpf_xdp_xfrm_state_release() kfunc
+  bpf: selftests: test_tunnel: Use ping -6 over ping6
+  bpf: selftests: test_tunnel: Mount bpffs if necessary
+  bpf: selftests: test_tunnel: Use vmlinux.h declarations
+  bpf: selftests: test_tunnel: Disable CO-RE relocations
+  bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
 
-This trait is automatically implemented when the compiler determines
-it’s appropriate.
+ include/net/xfrm.h                            |   9 ++
+ net/xfrm/Makefile                             |   1 +
+ net/xfrm/xfrm_policy.c                        |   2 +
+ net/xfrm/xfrm_state_bpf.c                     | 127 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/test_tunnel_kern.c    |  98 ++++++++------
+ tools/testing/selftests/bpf/test_tunnel.sh    |  43 ++++--
+ 7 files changed, 227 insertions(+), 54 deletions(-)
+ create mode 100644 net/xfrm/xfrm_state_bpf.c
 
-The precise definition is: a type T is Sync if and only if &T is Send.
-In other words, if there is no possibility of undefined behavior
-(including data races) when passing &T references between threads.
-"""
+-- 
+2.42.1
 
-[1]: https://doc.rust-lang.org/std/marker/trait.Sync.html
-
-Regards,
-Boqun
-
-> unsafe impl Sync for DriverVTable {}
-> 
-> 
-> looks correct?
-> 
 
