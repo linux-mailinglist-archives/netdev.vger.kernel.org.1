@@ -1,158 +1,147 @@
-Return-Path: <netdev+bounces-49911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786EF7F3CAD
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 05:12:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B047F3CB2
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 05:17:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31CA228102D
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:12:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B1452819C8
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECF5BE73;
-	Wed, 22 Nov 2023 04:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5E1ZvHW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB59BA25;
+	Wed, 22 Nov 2023 04:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64385BE6C
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 04:12:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2902DC433C7;
-	Wed, 22 Nov 2023 04:12:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700626368;
-	bh=cMEDDio7Z6OURfHpU46qr4lxVTQ/u0ZagmwTmCa+yF4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h5E1ZvHWi3BlyFkQ6LcK1Zyof1cSmvX69csTwaZOShPhogZk3VOZf/P25AnQmmiP6
-	 3oKsVSNYfuTtyQVFrq+TmEXhf35K0v/K6KBFd+T3e31FHGVtsNYIdUvI457WbgF2u6
-	 PtjMgASn7FnfzYIik7Th89Goyr807ry/hS9gJS3Rdy7N11ibKQhYt8WOmOINULZVeM
-	 fVwLPbr42Jd28wu0IliQY14FEl0th1zqGU7itVGDfsrd7jdImEkWEvhs4mh9PhImrW
-	 jW1bC9dtW4TU88Z4sE/a8cUsM/HdvPQfTVIfQoVyGE5zXlhIDBFY8Wg6d+aL2sgVEu
-	 57PXedrgpLSBA==
-Message-ID: <c7c8b15d-cb4e-4c5f-8466-293b437f04e6@kernel.org>
-Date: Wed, 22 Nov 2023 14:12:44 +1000
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DF210C
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 20:17:13 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SZnxp6CYSzvQwN;
+	Wed, 22 Nov 2023 12:16:46 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 22 Nov
+ 2023 12:17:10 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net,v2] ipv4: igmp: fix refcnt uaf issue when receiving igmp query packet
+Date: Wed, 22 Nov 2023 12:29:36 +0800
+Message-ID: <20231122042936.1831735-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phylink: require supported_interfaces to be
- filled
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <E1q0K1u-006EIP-ET@rmk-PC.armlinux.org.uk>
- <13087238-6a57-439e-b7cb-b465b9e27cd6@kernel.org>
- <650f3c6d-dcdb-4f7e-a3d4-130a52dd3ce9@lunn.ch>
-From: Greg Ungerer <gerg@kernel.org>
-In-Reply-To: <650f3c6d-dcdb-4f7e-a3d4-130a52dd3ce9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
+When I perform the following test operations:
+1.ip link add br0 type bridge
+2.brctl addif br0 eth0
+3.ip addr add 239.0.0.1/32 dev eth0
+4.ip addr add 239.0.0.1/32 dev br0
+5.ip addr add 224.0.0.1/32 dev br0
+6.while ((1))
+    do
+        ifconfig br0 up
+        ifconfig br0 down
+    done
+7.send IGMPv2 query packets to port eth0 continuously. For example,
+./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
+1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
 
-On 22/11/23 00:29, Andrew Lunn wrote:
->> The 6350 looks to be similar to the 6352 in many respects, though it lacks
->> a SERDES interface, but it otherwise mostly seems compatible.
-> 
-> Not having the SERDES is important. Without that SERDES, the bit about
-> Port 4 in mv88e6352_phylink_get_caps() is
-> incorrect. mv88e61852_phylink_get_caps() looks reasonable for this
-> hardware.
-              ^^^^^^^^^^
-The problem with mv88e6185_phylink_get_caps() is the cmode check fails
-for me. For my 6350 hardware chip->ports[port].cmode is "9", so set to
-MV88E6XXX_PORT_STS_CMODE_1000BASEX. But that is not part of the defines
-used in mv88e6185_phy_interface_modes[].
+The preceding tests may trigger the refcnt uaf issue of the mc list. The
+stack is as follows:
+	refcount_t: addition on 0; use-after-free.
+	WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate+0x78/0x110
+	CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #57
+	RIP: 0010:refcount_warn_saturate+0x78/0x110
+	Call Trace:
+	<TASK>
+	__warn+0x83/0x130
+	refcount_warn_saturate+0x78/0x110
+	igmp_start_timer
+	igmp_mod_timer
+	igmp_heard_query+0x221/0x690
+	igmp_rcv+0xea/0x2f0
+	ip_protocol_deliver_rcu+0x156/0x160
+	ip_local_deliver_finish+0x77/0xa0
+	__netif_receive_skb_one_core+0x8b/0xa0
+	netif_receive_skb_internal+0x80/0xd0
+	netif_receive_skb+0x18/0xc0
+	br_handle_frame_finish+0x340/0x5c0 [bridge]
+	nf_hook_bridge_pre+0x117/0x130 [bridge]
+	__netif_receive_skb_core+0x241/0x1090
+	__netif_receive_skb_list_core+0x13f/0x2e0
+	__netif_receive_skb_list+0xfc/0x190
+	netif_receive_skb_list_internal+0x102/0x1e0
+	napi_gro_receive+0xd7/0x220
+	e1000_clean_rx_irq+0x1d4/0x4f0 [e1000]
+	e1000_clean+0x5e/0xe0 [e1000]
+	__napi_poll+0x2c/0x1b0
+	net_rx_action+0x2cb/0x3a0
+	__do_softirq+0xcd/0x2a7
+	run_ksoftirqd+0x22/0x30
+	smpboot_thread_fn+0xdb/0x1d0
+	kthread+0xe2/0x110
+	ret_from_fork+0x34/0x50
+	ret_from_fork_asm+0x1a/0x30
+	</TASK>
 
-Doesn't it need to be checking in mv88e6xxx_phy_interface_modes[]
-for the cmode?
+The root causes are as follows:
+Thread A					Thread B
+...						netif_receive_skb
+br_dev_stop					...
+    br_multicast_leave_snoopers			...
+        __ip_mc_dec_group			...
+            __igmp_group_dropped		igmp_rcv
+                igmp_stop_timer			    igmp_heard_query         //ref = 1
+                ip_ma_put			        igmp_mod_timer
+                    refcount_dec_and_test	            igmp_start_timer //ref = 0
+			...                                     refcount_inc //ref increases from 0
+When the device receives an IGMPv2 Query message, it starts the timer
+immediately, regardless of whether the device is running. If the device is
+down and has left the multicast group, it will cause the mc list refcount
+uaf issue.
 
-I see another similar function, mv88e6250_phylink_get_caps().
-But that is only 10/100 capable.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+v2: use cmd "cat messages |/root/linux-next/scripts/decode_stacktrace.sh
+    /root/linux-next/vmlinux" to get precise stack traces and check whether
+    the im is destroyed before timer is started.
+---
+ net/ipv4/igmp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-So I am thinking that something like this actually makes more sense now:
-
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -577,6 +577,18 @@ static void mv88e6250_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
-         config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100;
-  }
-  
-+static void mv88e6350_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
-+                                      struct phylink_config *config)
-+{
-+       unsigned long *supported = config->supported_interfaces;
-+
-+       /* Translate the default cmode */
-+       mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
-+
-+       config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 |
-+                                  MAC_1000FD;
-+}
-+
-  static int mv88e6352_get_port4_serdes_cmode(struct mv88e6xxx_chip *chip)
-  {
-         u16 reg, val;
-@@ -5069,7 +5082,7 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
-         .vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
-         .stu_getnext = mv88e6352_g1_stu_getnext,
-         .stu_loadpurge = mv88e6352_g1_stu_loadpurge,
--       .phylink_get_caps = mv88e6185_phylink_get_caps,
-+       .phylink_get_caps = mv88e6350_phylink_get_caps,
-  };
-  
-  static const struct mv88e6xxx_ops mv88e6351_ops = {
-@@ -5117,7 +5130,7 @@ static const struct mv88e6xxx_ops mv88e6351_ops = {
-         .stu_loadpurge = mv88e6352_g1_stu_loadpurge,
-         .avb_ops = &mv88e6352_avb_ops,
-         .ptp_ops = &mv88e6352_ptp_ops,
--       .phylink_get_caps = mv88e6185_phylink_get_caps,
-+       .phylink_get_caps = mv88e6350_phylink_get_caps,
-  };
-  
-  static const struct mv88e6xxx_ops mv88e6352_ops = {
-
-
->> Using the 6352
->> phylink_get_caps function instead of the 6185 one fixes this:
->>
->> --- a/drivers/net/dsa/mv88e6xxx/chip.c
->> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
->> @@ -5418,7 +5418,7 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
->>          .set_max_frame_size = mv88e6185_g1_set_max_frame_size,
->>          .stu_getnext = mv88e6352_g1_stu_getnext,
->>          .stu_loadpurge = mv88e6352_g1_stu_loadpurge,
->> -       .phylink_get_caps = mv88e6185_phylink_get_caps,
->> +       .phylink_get_caps = mv88e6352_phylink_get_caps,
->>   };
->>
->>   static const struct mv88e6xxx_ops mv88e6351_ops = {
->>
->>
->> The story doesn't quite end here though. With this fix in place support
->> for the 6350 is then again broken by commit b92143d4420f ("net: dsa:
->> mv88e6xxx: add infrastructure for phylink_pcs"). This results in a dump
->> on boot up:
-> 
-> PCS is approximately another name of a SERDES. Since there is no
-> SERDES, you don't don't want any of the pcs ops filled in.
-> 
-> Russell knows this code much better than i do. Let see what he says.
-
-Ok, that makes sense. Russell had a suggestion for this one and I will
-follow up with that.
-
-Thanks
-Greg
-
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 76c3ea75b8dd..efeeca2b1328 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -216,8 +216,10 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
+ 	int tv = get_random_u32_below(max_delay);
+ 
+ 	im->tm_running = 1;
+-	if (!mod_timer(&im->timer, jiffies+tv+2))
+-		refcount_inc(&im->refcnt);
++	if (refcount_inc_not_zero(&im->refcnt)) {
++		if (mod_timer(&im->timer, jiffies + tv + 2))
++			ip_ma_put(im);
++	}
+ }
+ 
+ static void igmp_gq_start_timer(struct in_device *in_dev)
+-- 
+2.34.1
 
 
