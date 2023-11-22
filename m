@@ -1,223 +1,83 @@
-Return-Path: <netdev+bounces-49955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D8B07F40DD
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:01:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2107F40C0
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 10:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DB53B20F39
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBB5428176A
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 09:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EECE3D969;
-	Wed, 22 Nov 2023 09:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF551CF91;
+	Wed, 22 Nov 2023 09:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fATj2p9q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2USlBd7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D8A3C69B
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 09:01:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46A8DC4AF5E;
-	Wed, 22 Nov 2023 09:01:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700643675;
-	bh=jUp23sLyZF2ZiQtXRJ5Qs3WUcDXhAHo6TBkYOOsV0MI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=fATj2p9qoGNfI/s6bODUrFypUVSFlQt5EHL84BhKVjrPXNoB39oL0sef6JG2k7fL1
-	 RCfy/Gp6UL7xKfWryp4wY6cKihoF/JGVpHwdPRwZR1Er1vER7z0zo0V9Y9TwOhTQvs
-	 PUuoJ1wfm+qSLLOYXOGwZenwOZzpKk4WSXnARLcfBVQQPVzXAGUX8oeBxccIR23rV+
-	 O+B24eT5+ag5prUUOdYy+0NK+/fNIXeiZodCOdpD9hLhneMzCD7bJJ+5WdIrCw6b9R
-	 GRzCyQjHpCTTzO5zwd/DCjeBb0NaKQhcfzx8F8ARVMMQT99BcnqUAIRD5mWFho7m+X
-	 zZjlJnyMaJCCg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34720C61D9D;
-	Wed, 22 Nov 2023 09:01:15 +0000 (UTC)
-From:
- Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Wed, 22 Nov 2023 11:59:55 +0300
-Subject: [PATCH v5 17/39] net: cirrus: add DT support for Cirrus EP93xx
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8486E12A
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:01:00 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so10467a12.0
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:01:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700643659; x=1701248459; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ABV1J4yixoaN0GqjjkN8Tqn3Z/fTq8yc53hqxgSMBI4=;
+        b=2USlBd7eFfttCbF9EfYY9RVH1jJ6jlQULqGnZjL6gXIbc5Ssok9vOsAd94zG0GdtcP
+         afYWmKPcT3mbKwP3gL/VpP9fZTeh3H1xdqDdmVvb40sBOb/Y38rhNRkLOUi9kaOcM4BP
+         ADnYUgMU1q9+HiM9H2NPTJwSYexolFCe71jc0psIn59Zyo9RrgfC39Gqg1ukZuqKLP34
+         kTAReZlbpOwK1jkUMgCqYoSeRuNK2hThj3g3gs/xo4BDJp0BE6JHJUF1xaQgHK6GaQks
+         j9egRkhUJ5Hs5n9R8k+5YWml++sLJBahfRMUdYB9IYlLfxA3whHpURQ6/edP0V4RPfFj
+         wQLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700643659; x=1701248459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ABV1J4yixoaN0GqjjkN8Tqn3Z/fTq8yc53hqxgSMBI4=;
+        b=g+2vKJtqAIkFV04JN3ZDEFgstr+U1VdU8exQFlQTAIAJuhmXZWAjBB+z2ccWidkGs8
+         FJ3zxIFsUr9wdfcyMJdS12UOlSHHp+rBTYXHe5diobxx/ndGEtnzSMNKlvZ2HLf/rAln
+         S+GGDwfcrmpFEDvzNFXV0EEnj97V+R0jRIf9cQfdZcJ8klVw2Sp7cwDdpJ/b+b4jNj5I
+         Ydlf69v2NsVNCb00F1q9yRWoUS2dKzJwhJUHuafNzslxCY8aCyrek12XP0PXrK0xfZuY
+         mKT52o7rkLLt4XsRwUA0pwjL8M74r4Xpz3iE/wc9koTIIpUAeaUxNMMggTi/iS3QJIhl
+         eMAw==
+X-Gm-Message-State: AOJu0YycZBJvpxzijcub0U27/IsnB9LxEzcbsCKDmTvmGWn8Kf802+8o
+	JO2IJJVa4TOthHQaZdMQU0v5GnRg8nWgTtU9NZ8Uuw==
+X-Google-Smtp-Source: AGHT+IFMErANbc8PS/r+60jgzBuPXGfOs3HJFa0nz3iP4Hu94MhiuwmcrfezJbkExV30ghmdo8A2mA0cyJfhkD4+tWA=
+X-Received: by 2002:a05:6402:3222:b0:548:b26f:9980 with SMTP id
+ g34-20020a056402322200b00548b26f9980mr79592eda.5.1700643658748; Wed, 22 Nov
+ 2023 01:00:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231122-ep93xx-v5-17-d59a76d5df29@maquefel.me>
-References: <20231122-ep93xx-v5-0-d59a76d5df29@maquefel.me>
-In-Reply-To: <20231122-ep93xx-v5-0-d59a76d5df29@maquefel.me>
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1700643671; l=4248;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=Jsr2Z57/1zzjxnodjeFhBhk8dpD7lZ/Sm2ymHhuQVGM=; =?utf-8?q?b=3D9pjWKpAD7FKZ?=
- =?utf-8?q?sto7rhb4p4w2coguelUdAbhvpt2T2Yq7FGIGYi8g6RkJyz68L7uOa8aOefJAloel?=
- 02SmdDgWBz1YHde96fTJBs8pHYG3y87Y5DbV/x7CbysNGqriDtV8
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received:
- by B4 Relay for nikita.shubin@maquefel.me/20230718 with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: <nikita.shubin@maquefel.me>
+References: <20231122034420.1158898-1-kuba@kernel.org> <20231122034420.1158898-7-kuba@kernel.org>
+In-Reply-To: <20231122034420.1158898-7-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 22 Nov 2023 10:00:44 +0100
+Message-ID: <CANn89iLpTsZP1KAb_7iD03KSynFu=03CYF=2-YeNb+AjnrMXWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/13] net: page_pool: add nlspec for basic
+ access to page pools
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	almasrymina@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	dsahern@gmail.com, dtatulea@nvidia.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
+On Wed, Nov 22, 2023 at 4:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Add a Netlink spec in YAML for getting very basic information
+> about page pools.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
 
-- add OF ID match table
-- get phy_id from the device tree, as part of mdio
-- copy_addr is now always used, as there is no SoC/board that aren't
-- dropped platform header
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
----
- drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
-
-diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-index 1c2a540db13d..2a58af5fc288 100644
---- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-+++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-@@ -17,12 +17,11 @@
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
- #include <linux/platform_device.h>
-+#include <linux/of.h>
- #include <linux/delay.h>
- #include <linux/io.h>
- #include <linux/slab.h>
- 
--#include <linux/platform_data/eth-ep93xx.h>
--
- #define DRV_MODULE_NAME		"ep93xx-eth"
- 
- #define RX_QUEUE_ENTRIES	64
-@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
- 
--static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
--{
--	struct net_device *dev;
--
--	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
--	if (dev == NULL)
--		return NULL;
--
--	eth_hw_addr_set(dev, data->dev_addr);
--
--	dev->ethtool_ops = &ep93xx_ethtool_ops;
--	dev->netdev_ops = &ep93xx_netdev_ops;
--
--	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
--
--	return dev;
--}
--
--
- static void ep93xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *dev;
-@@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
- 
- static int ep93xx_eth_probe(struct platform_device *pdev)
- {
--	struct ep93xx_eth_data *data;
- 	struct net_device *dev;
- 	struct ep93xx_priv *ep;
- 	struct resource *mem;
-+	void __iomem *base_addr;
-+	struct device_node *np;
-+	u32 phy_id;
- 	int irq;
- 	int err;
- 
- 	if (pdev == NULL)
- 		return -ENODEV;
--	data = dev_get_platdata(&pdev->dev);
- 
- 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq = platform_get_irq(pdev, 0);
- 	if (!mem || irq < 0)
- 		return -ENXIO;
- 
--	dev = ep93xx_dev_alloc(data);
-+	base_addr = ioremap(mem->start, resource_size(mem));
-+	if (!base_addr)
-+		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-+
-+	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-+	if (!np)
-+		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-+
-+	err = of_property_read_u32(np, "reg", &phy_id);
-+	of_node_put(np);
-+	if (err)
-+		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-+
-+	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
- 	if (dev == NULL) {
- 		err = -ENOMEM;
- 		goto err_out;
- 	}
-+
-+	eth_hw_addr_set(dev, base_addr + 0x50);
-+	dev->ethtool_ops = &ep93xx_ethtool_ops;
-+	dev->netdev_ops = &ep93xx_netdev_ops;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-+
- 	ep = netdev_priv(dev);
- 	ep->dev = dev;
- 	SET_NETDEV_DEV(dev, &pdev->dev);
-@@ -822,15 +822,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 		goto err_out;
- 	}
- 
--	ep->base_addr = ioremap(mem->start, resource_size(mem));
--	if (ep->base_addr == NULL) {
--		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_out;
--	}
-+	ep->base_addr = base_addr;
- 	ep->irq = irq;
- 
--	ep->mii.phy_id = data->phy_id;
-+	ep->mii.phy_id = phy_id;
- 	ep->mii.phy_id_mask = 0x1f;
- 	ep->mii.reg_num_mask = 0x1f;
- 	ep->mii.dev = dev;
-@@ -857,12 +852,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 	return err;
- }
- 
-+static const struct of_device_id ep93xx_eth_of_ids[] = {
-+	{ .compatible = "cirrus,ep9301-eth" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
- 
- static struct platform_driver ep93xx_eth_driver = {
- 	.probe		= ep93xx_eth_probe,
- 	.remove_new	= ep93xx_eth_remove,
- 	.driver		= {
- 		.name	= "ep93xx-eth",
-+		.of_match_table = ep93xx_eth_of_ids,
- 	},
- };
- 
-
--- 
-2.41.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
