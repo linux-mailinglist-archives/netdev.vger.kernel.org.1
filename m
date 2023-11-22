@@ -1,87 +1,156 @@
-Return-Path: <netdev+bounces-50022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 754C57F4480
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 12:00:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB5D97F448C
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 12:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B8B528113C
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD8A41C20912
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 11:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42A52D78B;
-	Wed, 22 Nov 2023 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAE91C2BA;
+	Wed, 22 Nov 2023 11:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZyvBS9R7"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="V1I0R+iU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBF722314
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 11:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4713FC433CC;
-	Wed, 22 Nov 2023 11:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700650824;
-	bh=JwVuGcTmcYQlehqkotnDdbNmcVl+I34uPSQBTDYYs50=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZyvBS9R7eanca9Q6HLRtgVZv6n0phhRtjhUFg4VoDOZRR73Px+fqunAHVW2ZE/gWt
-	 Dc3wHMP9VN8k0RYCUk+hCmOs++6XH8BebIiz+E9V8X4UhBtj2kczKRtSqOvV68HNgo
-	 D24zU2vZlJmz3t/+pd9YRX2HF0LDb1R8lK+IItf1icMUD9zUPZNHepyejU6tI17Pe7
-	 +rUsvzo7EiPqfGGZRfWbo1i37TRFmhTLjyA0XpUZ/5FWj5gAH6BE47HfeN77p+L8ju
-	 2uTQTT8ZkeVRdLVnd5Gk2LRykB2nhVsGDi63UmEYV/UintxUUbeDmo7PDsFNjXD5sS
-	 7LRsGxSObFQnw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30E9DC3959E;
-	Wed, 22 Nov 2023 11:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2052.outbound.protection.outlook.com [40.107.21.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C053197;
+	Wed, 22 Nov 2023 03:01:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kwe6LYlPtfbcO/6mv+/W64CsQ18O9jr1GrzrOaf49XV5dVWfXRQFBUWwnpAkyYgnMzu3Rbep2Jmpa/N0wARuvymGrRKZ47G8YedmAzaaEfBGqg/QHaAD3/6R8l3gTZza1eqk21yWKK+7yLVTeDJhxWqJZe9wcMqu5z7CYbG3DfsdoEn2NiLqtxmp2MCrqMxaEreeJcp1WLZtaWArawR2jHkCZSYbNdS3LtsmyHSuI7aqwYgg6OPy/jd6pIuxjXdvd1hLoHEZzzHOgdbJSURosMyQ1c8VCwpAfIECvGBJUU5PFRaTlZfbhSQO/b8sGhBUSJVMZNV5yEciJFSxS+8lcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wRvIUBjViEEv67oGnkHMUKJ+9PFZDXoeh3NisHLOIb8=;
+ b=MWgTGfbhSJy5BbimLSau/Q9zrDjMC0CkJOa0jTGS51zPFJoBxfbQALZlBHcIeS1jOvjV7vulNDV4PeS+t05vONKf1LC08xo56dcFYIPN4T+CLkkA0R4lGBXKTYCBBd6HuYbjwhE6agxxAW3rV90XVJTgN8Q9QzKthtPBQ1yf9zi6IW4BiKavqrcsQmmnIJ0w8vKX4xcc4XsXPYE+R/VMpsJfB3eVE8FPp59zY7UpshEFRcMJZ4Mx4evMIIYCnV0F0zy8d58yJjcDYNLYOLK7c6GMqi1Hs2g+bMzIMZUQoU5Remoq4cy9g5FWUTOC/5hpYWJ13UcvkT4HpiAM9uH3OQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wRvIUBjViEEv67oGnkHMUKJ+9PFZDXoeh3NisHLOIb8=;
+ b=V1I0R+iUczMFdxjAP+zAuHzt54VfmaX1AlAj7dYZb1QhwuCKfRR7hAPuSbU8Hm5HLfXbeo01Jegyum86nPPqJ/p9cmRpDsRIYFByj1ZIO1Z7mwcZhkxUG2ZwSO8kg2koUNApzPbUKeo4JirIsZh5jmL907RueIZFGo4sZ50ugLg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB8530.eurprd04.prod.outlook.com (2603:10a6:20b:421::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.19; Wed, 22 Nov
+ 2023 11:01:26 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.017; Wed, 22 Nov 2023
+ 11:01:26 +0000
+Date: Wed, 22 Nov 2023 13:01:20 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, claudiu.manoil@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: enetc: add ethtool::get_channels support
+Message-ID: <20231122110120.crs4rh2utjweswsc@skbuf>
+References: <20231122102540.3766699-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122102540.3766699-1-wei.fang@nxp.com>
+X-ClientProxiedBy: VI1PR09CA0099.eurprd09.prod.outlook.com
+ (2603:10a6:803:78::22) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: hsr: Add support for MC filtering at the
- slave device
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170065082419.4259.7747506565091490593.git-patchwork-notify@kernel.org>
-Date: Wed, 22 Nov 2023 11:00:24 +0000
-References: <20231121053753.32738-1-r-gunasekaran@ti.com>
-In-Reply-To: <20231121053753.32738-1-r-gunasekaran@ti.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wojciech.drewek@intel.com, bigeasy@linutronix.de,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- srk@ti.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8530:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91930301-8850-474d-4987-08dbeb4a5dc2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mmN0yziFUQjz7u3LwoHOQQBHaDNMQpn/0Q5EQMspzv/b1Sk6qapqLPF4wk0elQ537wawQB9nPAIhBkhg0POB1eJQxfHfNQ9LFZVCMp/l+ViFGj6y0Xoucz5aEE0lE5+URHhfCgMBmDsE7YVBo6UC7yJ/OSwNqQlVAekchO+NzqCw5ffiaImHAijvUTpTbYXD9Hf+3Wk9ybqn0eJ/LbIbH9jahIkTnyawhp9k35lJldccuLloZFbH/HqOhCOJkh8kpoqlljN6kueKyYTL2QZTQ4LLsOMUfDyY6iv2z+vZpvtA16gjePmlMpO2BehAqmb6RZAOK/lXTOh+1EHd/srlkBfoFM+oRDJTaSW89PD8KUO+P4F9TOqBbX1sltPiSf5xRv2/ZT7HsaPqjrSYrVBjexgF7rF3SsdaqrYgJI356ECpG8aaR4lIwKwS0WFS7CxH2JNbQiAZNRh1q/3D8trGqHDOU4m/xlO2LRUHC155M85t1qA198SIq+Wrmd35zAST2b5DAOTIMgsc9xspKOyVDH8tqO9dnEXkD9FF3JOeO+8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(230922051799003)(186009)(1800799012)(451199024)(1076003)(26005)(6512007)(9686003)(86362001)(38100700002)(44832011)(5660300002)(2906002)(6506007)(508600001)(83380400001)(6666004)(6636002)(6862004)(8676002)(66476007)(4326008)(8936002)(33716001)(966005)(66556008)(66946007)(6486002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?39aKDk/NuTA0XKi18n27lN/FBvSVFNHOBINkJcbChUT1JVAN+IQDrjVAguk8?=
+ =?us-ascii?Q?/hGou58zz09jXef2dFqUB5Lg3wYZa8gYC6+lp/Ybs/eHPl1f9Msu7/oWdePH?=
+ =?us-ascii?Q?NzN+91J/QuITyjhTcxdM9WCJYsEpSH7Y87cI759dGdYxOnkKEfsXUP5VI1p/?=
+ =?us-ascii?Q?Df60sZb2jHoO9GeYAWzHasjHhjdF5kdeOqlmVfouUYH/2d41hR7yipKeld6t?=
+ =?us-ascii?Q?vnDaXmO9A0MBrtLJtjwce+deh8kdh/klMhQkfh8o8IUR5kaMeIO2VomaWkxw?=
+ =?us-ascii?Q?MWoc7ccx/aFFj2+Ej0CYnqiBhMYPnJYaJcvbNzqKSeXz1lNakqf7JK0hJJjb?=
+ =?us-ascii?Q?1jx1ueOBN3Xeun+bg+/D1wEalw5SR25iWyDRhxG+MS8u5HAKyc77ZUn0jeBz?=
+ =?us-ascii?Q?RNkFujaLYrNF7p1pGpQJYXb5UsI/zUS8cPt52RU7gEVDInjIkcz/nmyS489B?=
+ =?us-ascii?Q?93dHuhY89YvDTtE37IPPkYikwnx8dGCC/dK0Hsq7twWdz/m+roHPpVh/bCgD?=
+ =?us-ascii?Q?Aw0CsnBkx6iej3VP+0d3/muJdcOwr/aBPR4N4GqqaZhDpw24apRItnxoPOFF?=
+ =?us-ascii?Q?iuC7Q3pYHheG3rRxGilTWVdDiL0wliDHd/HLhroIMKYIhr7Nxs+g9AtA6/Rf?=
+ =?us-ascii?Q?y4R5SibCXyW+Lkf/i3FhosX68E1UxJlodFTJgRhJy3aT6J5VMtkFhMd3vIgv?=
+ =?us-ascii?Q?mLKm6U7tOsuaZRUJN86Er3MYf9saa/FBT4A/DsqYxtBGMFLnWL58ZXPJHorK?=
+ =?us-ascii?Q?AXWbzTNdX/Douz+s9DSHonhjX3Ou8tpu6DPQYtoWBDUCrFoB/v5RH3NJutaA?=
+ =?us-ascii?Q?GpdAwyPpJIbK1cPncTxXMmAM11d1k12chfQ7xr7z5XmHjbz0AK+79gbD+8Vy?=
+ =?us-ascii?Q?qNCc5IN/Urw9/JZLsPvpGpcVCvxiq21ht3BKkYCiaAzFd5fv6CMkWXHVTUho?=
+ =?us-ascii?Q?F60g2+iDWSPVnGBCPaf8rY1o9A0An2zXfIWjN3nNczLr/AFVvcpXrA3l/oOY?=
+ =?us-ascii?Q?zfr3TCWdkwBcYj9m8Q6xbjA3pWRSQ+nvXPCRM7roKW70JUJm4CAUj3M/T5uy?=
+ =?us-ascii?Q?j54UsdRlt/SXqp61VBKGS5YO+841PtDk29Duwx54OYWrsBN1jZUgqPPwdGGJ?=
+ =?us-ascii?Q?afI216gpcSzOpx0F8BcY6AL5cCqv0gQ9OQQuCb6C5TmPlaYcBptfpVYIwgAb?=
+ =?us-ascii?Q?/YQjpnKwaLzBocOP5IamSK+SrOy7usjKxg2lCitlVJOwzfwbG1/LHo8dAQ6q?=
+ =?us-ascii?Q?XBdHghAdr9BgypeRQ8BGu5OXehxUuEsJgp78KtZuTye7fGlLJfDIvpccAbTm?=
+ =?us-ascii?Q?D3wTWRdxkS0FWAwdOY0RSDH5CxtnBTMYeD3WLuU2e6OCf0owDFobMswmgO9O?=
+ =?us-ascii?Q?255cYVZN9onhyXHncYPFDgJomKXvWYT9mHsr/jUMdcnNYLnRmeqCBZGsLNYh?=
+ =?us-ascii?Q?w/+1lSp0hmynsIr9815hNjiwX0O2ZFEnPnV8Bi4KVc43gwTPUjDUtN5UfG1j?=
+ =?us-ascii?Q?mzF5+FG3YIe7+w4y9SIsKR8/U8Oyta+u91zZkunPwbg5gaIioIyEqBsf7OaL?=
+ =?us-ascii?Q?qRpVrgP4xmgM/AVU7N41sKIAtv8wwMAi04U1AeyM1I9CQU8B9YG6QD1L4YVz?=
+ =?us-ascii?Q?Eg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91930301-8850-474d-4987-08dbeb4a5dc2
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2023 11:01:26.5427
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b2crn+xiRihBBrrlehr7rZgHmUStdp4/Ole2fEbSqkgbMzlkQkvZCj9R2V/C6HoyGHicwItm7upLOpt00T2qRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8530
 
-Hello:
+Hi Wei,
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 21 Nov 2023 11:07:53 +0530 you wrote:
-> From: Murali Karicheri <m-karicheri2@ti.com>
+On Wed, Nov 22, 2023 at 06:25:40PM +0800, Wei Fang wrote:
+> Since ETHTOOL_MSG_RSS_GET netlink message [1] has been applied to
+> ethtool tree, there is a netlink error when using "ethtool -x eno0"
+> command to get RSS information from fsl-enetc driver, and the user
+> cannot get the information, the error logs are as follows:
 > 
-> When MC (multicast) list is updated by the networking layer due to a
-> user command and as well as when allmulti flag is set, it needs to be
-> passed to the enslaved Ethernet devices. This patch allows this
-> to happen by implementing ndo_change_rx_flags() and ndo_set_rx_mode()
-> API calls that in turns pass it to the slave devices using
-> existing API calls.
+> root@ls1028ardb:~# ./ethtool -x eno0
+> netlink error: Operation not supported
 > 
-> [...]
+> The rationale is that ethtool will issue a ETHTOOL_MSG_CHANNELS_GET
+> netlink message to get the number of Rx ring. However, the fsl-enetc
+> driver doesn't support ethtool::get_channels, so it directly returns
+> -EOPNOTSUPP error.
+> 
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/jkirsher/ethtool.git/commit/?id=ffab99c1f3820e21d65686e030dcf2c4fd0a8bd0
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
 
-Here is the summary with links:
-  - [net-next,v2] net: hsr: Add support for MC filtering at the slave device
-    https://git.kernel.org/netdev/net-next/c/36b20fcdd966
+I think we have 2 problems on our hands.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1. enetc is not the only driver that doesn't report ETHTOOL_MSG_CHANNELS_GET.
+   So it is a general issue for Sudheer Mogilappagari's implementation
+   of "ethtool -x" using netlink. The ioctl-based implementation used to
+   look at ETHTOOL_GRXRINGS which was handled in the kernel through
+   ethtool_ops :: get_rxnfc.
 
+2. I used to have a different implementation (and interpretation) of
+   ETHTOOL_MSG_CHANNELS_GET for enetc anyway, which associated channels
+   not with rings, but with interrupt vectors (making the reported
+   channels combined):
+   https://patchwork.kernel.org/project/netdevbpf/patch/20230206100837.451300-6-vladimir.oltean@nxp.com/
 
+I would suggest finding a way for the user space implementation to not
+assume that ETHTOOL_MSG_CHANNELS_GET is implemented by the driver.
 
