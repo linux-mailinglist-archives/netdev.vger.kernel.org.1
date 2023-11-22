@@ -1,147 +1,133 @@
-Return-Path: <netdev+bounces-49912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B047F3CB2
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 05:17:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52F57F3CEC
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 05:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B1452819C8
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1199B1C20EF9
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 04:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB59BA25;
-	Wed, 22 Nov 2023 04:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34844C134;
+	Wed, 22 Nov 2023 04:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DF210C
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 20:17:13 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SZnxp6CYSzvQwN;
-	Wed, 22 Nov 2023 12:16:46 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 22 Nov
- 2023 12:17:10 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>
-Subject: [PATCH net,v2] ipv4: igmp: fix refcnt uaf issue when receiving igmp query packet
-Date: Wed, 22 Nov 2023 12:29:36 +0800
-Message-ID: <20231122042936.1831735-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA0BD52;
+	Tue, 21 Nov 2023 20:31:30 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vwuhn.J_1700627486;
+Received: from 30.32.110.126(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vwuhn.J_1700627486)
+          by smtp.aliyun-inc.com;
+          Wed, 22 Nov 2023 12:31:28 +0800
+Message-ID: <cbad4799-44a8-bea1-a631-e2ceff0288ec@linux.alibaba.com>
+Date: Wed, 22 Nov 2023 12:31:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net v4] net/smc: avoid data corruption caused by decline
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1700620625-70866-1-git-send-email-alibuda@linux.alibaba.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <1700620625-70866-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
 
-When I perform the following test operations:
-1.ip link add br0 type bridge
-2.brctl addif br0 eth0
-3.ip addr add 239.0.0.1/32 dev eth0
-4.ip addr add 239.0.0.1/32 dev br0
-5.ip addr add 224.0.0.1/32 dev br0
-6.while ((1))
-    do
-        ifconfig br0 up
-        ifconfig br0 down
-    done
-7.send IGMPv2 query packets to port eth0 continuously. For example,
-./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
-1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
 
-The preceding tests may trigger the refcnt uaf issue of the mc list. The
-stack is as follows:
-	refcount_t: addition on 0; use-after-free.
-	WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate+0x78/0x110
-	CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #57
-	RIP: 0010:refcount_warn_saturate+0x78/0x110
-	Call Trace:
-	<TASK>
-	__warn+0x83/0x130
-	refcount_warn_saturate+0x78/0x110
-	igmp_start_timer
-	igmp_mod_timer
-	igmp_heard_query+0x221/0x690
-	igmp_rcv+0xea/0x2f0
-	ip_protocol_deliver_rcu+0x156/0x160
-	ip_local_deliver_finish+0x77/0xa0
-	__netif_receive_skb_one_core+0x8b/0xa0
-	netif_receive_skb_internal+0x80/0xd0
-	netif_receive_skb+0x18/0xc0
-	br_handle_frame_finish+0x340/0x5c0 [bridge]
-	nf_hook_bridge_pre+0x117/0x130 [bridge]
-	__netif_receive_skb_core+0x241/0x1090
-	__netif_receive_skb_list_core+0x13f/0x2e0
-	__netif_receive_skb_list+0xfc/0x190
-	netif_receive_skb_list_internal+0x102/0x1e0
-	napi_gro_receive+0xd7/0x220
-	e1000_clean_rx_irq+0x1d4/0x4f0 [e1000]
-	e1000_clean+0x5e/0xe0 [e1000]
-	__napi_poll+0x2c/0x1b0
-	net_rx_action+0x2cb/0x3a0
-	__do_softirq+0xcd/0x2a7
-	run_ksoftirqd+0x22/0x30
-	smpboot_thread_fn+0xdb/0x1d0
-	kthread+0xe2/0x110
-	ret_from_fork+0x34/0x50
-	ret_from_fork_asm+0x1a/0x30
-	</TASK>
 
-The root causes are as follows:
-Thread A					Thread B
-...						netif_receive_skb
-br_dev_stop					...
-    br_multicast_leave_snoopers			...
-        __ip_mc_dec_group			...
-            __igmp_group_dropped		igmp_rcv
-                igmp_stop_timer			    igmp_heard_query         //ref = 1
-                ip_ma_put			        igmp_mod_timer
-                    refcount_dec_and_test	            igmp_start_timer //ref = 0
-			...                                     refcount_inc //ref increases from 0
-When the device receives an IGMPv2 Query message, it starts the timer
-immediately, regardless of whether the device is running. If the device is
-down and has left the multicast group, it will cause the mc list refcount
-uaf issue.
+On 2023/11/22 10:37, D. Wythe wrote:
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
-v2: use cmd "cat messages |/root/linux-next/scripts/decode_stacktrace.sh
-    /root/linux-next/vmlinux" to get precise stack traces and check whether
-    the im is destroyed before timer is started.
----
- net/ipv4/igmp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> We found a data corruption issue during testing of SMC-R on Redis
+> applications.
+> 
+> The benchmark has a low probability of reporting a strange error as
+> shown below.
+> 
+> "Error: Protocol error, got "\xe2" as reply type byte"
+> 
+> Finally, we found that the retrieved error data was as follows:
+> 
+> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+> 
+> It is quite obvious that this is a SMC DECLINE message, which means that
+> the applications received SMC protocol message.
+> We found that this was caused by the following situations:
+> 
+> client                  server
+>          ¦  clc proposal
+>          ------------->
+>          ¦  clc accept
+>          <-------------
+>          ¦  clc confirm
+>          ------------->
+> wait llc confirm
+> 			send llc confirm
+>          ¦failed llc confirm
+>          ¦   x------
+> (after 2s)timeout
+>                          wait llc confirm rsp
+> 
+> wait decline
+> 
+> (after 1s) timeout
+>                          (after 2s) timeout
+>          ¦   decline
+>          -------------->
+>          ¦   decline
+>          <--------------
+> 
+> As a result, a decline message was sent in the implementation, and this
+> message was read from TCP by the already-fallback connection.
+> 
+> This patch double the client timeout as 2x of the server value,
+> With this simple change, the Decline messages should never cross or
+> collide (during Confirm link timeout).
+> 
+> This issue requires an immediate solution, since the protocol updates
+> involve a more long-term solution.
+> 
+> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
 
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 76c3ea75b8dd..efeeca2b1328 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -216,8 +216,10 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
- 	int tv = get_random_u32_below(max_delay);
- 
- 	im->tm_running = 1;
--	if (!mod_timer(&im->timer, jiffies+tv+2))
--		refcount_inc(&im->refcnt);
-+	if (refcount_inc_not_zero(&im->refcnt)) {
-+		if (mod_timer(&im->timer, jiffies + tv + 2))
-+			ip_ma_put(im);
-+	}
- }
- 
- static void igmp_gq_start_timer(struct in_device *in_dev)
--- 
-2.34.1
+LGTM, thanks.
 
+Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+
+>   net/smc/af_smc.c | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index abd2667..8615cc0 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -598,8 +598,12 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
+>   	struct smc_llc_qentry *qentry;
+>   	int rc;
+>   
+> -	/* receive CONFIRM LINK request from server over RoCE fabric */
+> -	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
+> +	/* Receive CONFIRM LINK request from server over RoCE fabric.
+> +	 * Increasing the client's timeout by twice as much as the server's
+> +	 * timeout by default can temporarily avoid decline messages of
+> +	 * both sides crossing or colliding
+> +	 */
+> +	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
+>   			      SMC_LLC_CONFIRM_LINK);
+>   	if (!qentry) {
+>   		struct smc_clc_msg_decline dclc;
 
