@@ -1,143 +1,101 @@
-Return-Path: <netdev+bounces-49851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB527F3AF3
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:00:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F6E7F3B16
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 02:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB5E280EAC
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:00:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BADCB21583
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 01:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6941B15A5;
-	Wed, 22 Nov 2023 01:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9A6138D;
+	Wed, 22 Nov 2023 01:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="RC2EL6F5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhjQaDiI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B2C1AA
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 17:00:12 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32fdc5be26dso3923441f8f.2
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 17:00:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1700614810; x=1701219610; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7z/Ncze8VsxsQV1/X1aHBHLUuutXLztntTa5pi1dYLs=;
-        b=RC2EL6F5X7lwgIY/nWSO438Mq/MuoWSvG6hDsB4jeubmsjh4fM/yY06uxFOdlikVvE
-         KpRNYqiKHceHvxhtaLC1xJRqb7TBmLY4abEeya0s3Ai9p8bBrONPAVeNS8YfxTbiU2Jc
-         Y1vvAAusBYtBs5ouYrqezB6mpgQjSYnoYlsfm956OIp37qOAecbUrt0SdwPQSBBBQttG
-         dFCf8AKNWkueGRvS0Ip1+AnSNsf+hk9D4utd0fbSFEoD+KoHdSLBJZLdAX36yHfd8cCh
-         iKC19BYsULHSd3j3JkXayYdsho046FC0drigacJn/VYEaDqyjQlrHukDHhwIq86RgK/Z
-         4guw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700614810; x=1701219610;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7z/Ncze8VsxsQV1/X1aHBHLUuutXLztntTa5pi1dYLs=;
-        b=B9JwIoL7FohFmR/a8LAGZH/Qkr9vRAKU3+ao6D5q/pBP3dDh3FGzS1Hie6dlUm56cG
-         CnS6GMfPz09kP3xCcqLamj+gWK0uUZM0T9I0MElnGgp7iV06R/obE8CZyy2mQVtXa7pa
-         7myJKu6O6oGFoFMzyEgbX/EiKIkXZ3ZC3/pYpY4IpsxO05RyK9+PjSIsin0s5Fa+Km80
-         FWUL3x1bcf7hem9q0SIbHv/hxN0nQ9vkpUFuV4DcT1irYkRxURX1D0YNg4CySFf7yBdv
-         5khsrYV3lCDHk1Hn8ZMmZqxurbuCn6fMnqLV7CvZHbz9cWf8H2jALSXuUzMM0qcXp+ub
-         Vu5Q==
-X-Gm-Message-State: AOJu0Yw0LAAyZdBdaAt2h/pm9Eda1+fVfDkk18robzLiuIqDkW/IN5FI
-	XdlhYAFP1LDMFWJ16xQwaq1ngw==
-X-Google-Smtp-Source: AGHT+IGWfqttaUh7V6lCiHLkEQqnJfYw1U5++qE0LNe7r9fT0KxEwUqIRkLzKCuyF/8jxNnoVwJbzw==
-X-Received: by 2002:a5d:56c4:0:b0:32d:9a8f:6245 with SMTP id m4-20020a5d56c4000000b0032d9a8f6245mr341419wrw.68.1700614810074;
-        Tue, 21 Nov 2023 17:00:10 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id l26-20020a05600c1d1a00b004067e905f44sm377388wms.9.2023.11.21.17.00.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 17:00:09 -0800 (PST)
-Message-ID: <85e84d97-af6d-47e7-b188-0ee000c4ee8c@arista.com>
-Date: Wed, 22 Nov 2023 01:00:03 +0000
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038C417CB
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 01:15:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30469C433C7;
+	Wed, 22 Nov 2023 01:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700615701;
+	bh=G82EVP9DV/Qqumn1DqaDYrguXwErpv6mwFl1p0/IK+E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NhjQaDiIVDH/xIVggDIvwgGF4q23YDimbFX16YRqaVqwzXzQX5WpZc4aiKzmMKGxc
+	 iGhTCpkZLV1JyLonwm0ydIDL5BWZ7D0pryMo73svwAU7it0O3lwklq8HIzqBYMbkuc
+	 wvPkwHAScjeu46ZaH6c5bagvo6tfvVCozKY9gAaZpXsV891muiH7nJQ04tu2Ce/Rur
+	 +0CvxYIMPgswSuHTCn9DDKu4my2QVKCVrE/oNJD015OxrrA5brtyJcWF97+Zl7G+MI
+	 QdZQwgZmRnFzsIVF6d6jwjt6OiNMCGiaIQS5CITwcFTimwUw4601yb+qsioTTW60PZ
+	 8f3Gc9xfCeRKQ==
+Date: Tue, 21 Nov 2023 17:15:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Nambiar, Amritha" <amritha.nambiar@intel.com>, Willem de Bruijn
+ <willemb@google.com>
+Cc: <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+ <sridhar.samudrala@intel.com>
+Subject: Re: [net-next PATCH v8 02/10] net: Add queue and napi association
+Message-ID: <20231121171500.0068a5bb@kernel.org>
+In-Reply-To: <d696c18b-c129-41c1-8a8a-f9273da1f215@intel.com>
+References: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
+	<170018380870.3767.15478317180336448511.stgit@anambiarhost.jf.intel.com>
+	<20231120155436.32ae11c6@kernel.org>
+	<68d2b08c-27ae-498e-9ce9-09e88796cd35@intel.com>
+	<20231121142207.18ed9f6a@kernel.org>
+	<d696c18b-c129-41c1-8a8a-f9273da1f215@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] net/tcp: Reset TCP-AO cached keys on listen() syscall
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20231121020111.1143180-1-dima@arista.com>
- <20231121020111.1143180-5-dima@arista.com>
- <CANn89i+xvBQY5HLXNkjW0o9R4SX1hqRisJnr54ZqwuOpEJdHeA@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89i+xvBQY5HLXNkjW0o9R4SX1hqRisJnr54ZqwuOpEJdHeA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11/21/23 08:18, Eric Dumazet wrote:
-> On Tue, Nov 21, 2023 at 3:01 AM Dmitry Safonov <dima@arista.com> wrote:
->>
->> TCP_LISTEN sockets are not connected to any peer, so having
->> current_key/rnext_key doesn't make sense.
->>
->> The userspace may falter over this issue by setting current or rnext
->> TCP-AO key before listen() syscall. setsockopt(TCP_AO_DEL_KEY) doesn't
->> allow removing a key that is in use (in accordance to RFC 5925), so
->> it might be inconvenient to have keys that can be destroyed only with
->> listener socket.
+On Tue, 21 Nov 2023 16:08:07 -0800 Nambiar, Amritha wrote:
+> > To reiterate - the thing I find odd about the current situation is that
+> > we hide the queues if they get disabled by lowering ethtool -L, but we
+> > don't hide them when the entire interface is down. When the entire
+> > interface is down there should be no queues, right?
 > 
-> I think this is the wrong way to solve this issue. listen() should not
-> mess with anything else than socket state.
+> "When the entire interface is down there should be no queues" - 
+> currently, 'ethtool --show-channels' reports all the available queues 
+> when interface is DOWN
+
+That's not the same. ethtool -l shows the configuration not 
+the instantiated objects. ethtool -a will also show you the
+pause settings even when cable is not plugged in.
+sysfs objects of the queues are still exposed for devices which 
+are down, that's true. But again, that's to expose the config.
+
+> > Differently put - what logic that'd make sense to the user do we apply
+> > when trying to decide if the queue is visible? < real_num_queues is
+> > an implementation detail.
+> > 
+> > We can list all the queues, always, too. No preference. I just want to
+> > make sure that the rules are clear and not very dependent on current
+> > implementation and not different driver to driver.  
 > 
->>
->> Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
-[..]
->> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
->> index fb81de10d332..a08d1266344f 100644
->> --- a/net/ipv4/af_inet.c
->> +++ b/net/ipv4/af_inet.c
->> @@ -200,6 +200,7 @@ int __inet_listen_sk(struct sock *sk, int backlog)
->>          * we can only allow the backlog to be adjusted.
->>          */
->>         if (old_state != TCP_LISTEN) {
->> +               tcp_ao_listen(sk);
-> 
-> Ouch...
-> 
-> Please add your hook in tcp_disconnect() instead of this layering violation.
-> 
-> I think you missed the fact that applications can call listen(fd,
-> backlog) multiple times,
-> if they need to dynamically adjust backlog.
+> I think currently, the queue dump results when the device is down aligns 
+> for both APIs (netdev-genl queue-get and ethtool show-channels) for all 
+> the drivers. If we decide to NOT show queues/NAPIs (with netdev-genl) 
+> when the device is down, the user would see conflicting results, the 
+> dump results with netdev-genl APIs would be different from what 'ethtool 
+> --show-channels' and 'ps -aef | grep napi' reports.
 
-Hmm, unsure, I've probably failed at describing the issue or failing to
-understand your reply :-)
+We should make the distinction between configuration and state of
+instantiated objects clear before we get too far. Say we support
+setting ring length for a specific queue. Global setting is 512,
+queue X wants 256. How do we remove the override for queue X?
+By setting it to 512? What if we want 512, and the default shifts
+to something else? We'll need an explicit "reset" command.
 
-Let me try again:
-1. sk = socket(AF_*, SOCK_STREAM, IPPROTO_TCP)
-2. setsockopt(sk, TCP_AO_ADD_KEY, ...) - adding a key to use later
-3. setsockopt(sk, IPPROTO_TCP, TCP_AO_INFO, set_current=1) - could be
-   done straight on adding a key at (2), but for an example, explicitely
-4.a. connect(sk, peer) - all as expected, the current key will be the
-     one that is used for SYN (and ending ACK if the peer doesn't
-     request to switch)
-4.b  listen(sk, ...) - userspace shoots itself in foot: the current_key
-     has no usage on TCP_LISTEN, so it just "hangs" as a pointer until
-     the socket gets destroyed.
+I think it may be cleaner to keep queue-get as state of queues,
+and configuration / settings / rules completely separate.
 
-An alternative fix would be to make setsockopt(TCP_AO_DEL_KEY) remove a
-key even if it's current_key on TCP_LISTEN, re-setting that to NULL.
-
-Now as I described, somewhat feeling like the alternative fix sounds
-better. Will proceed with that for v2.
-
-Thanks,
-             Dmitry
-
+Am I wrong? Willem?
 
