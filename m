@@ -1,211 +1,214 @@
-Return-Path: <netdev+bounces-50666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFB9F7F6921
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:54:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC1F7F6975
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D1C328183D
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 22:54:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 664531C209E3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB421E516;
-	Thu, 23 Nov 2023 22:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B822922F12;
+	Thu, 23 Nov 2023 23:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVdZNdRK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHjbyV4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA38D6C
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:53:55 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39ED10C2
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:11:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700780034;
+	s=mimecast20190719; t=1700781108;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HgkyQVWNEh0w8FRWOuAxuO8xPZdHyxrc2iTVyvbqtKU=;
-	b=KVdZNdRKx4iLxGkcyZHEGRhbM/26qc2DXXubk7qShFJU3jFD0UhmLn00mr4mcRLMWJpIYU
-	gkxfq0hQF93YZ3VdlVoZ9gK1iIKojry8n6uAt35Nr7aIwI9hHZBR2AB+8/BuYjhUbO3tyE
-	vhB5qVaFlntto3vC7tnvUo2/6wJ5bY8=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=P9UNCPaxva3mocGAduryLu7lxBwmZU5AYOzYsOMnmXM=;
+	b=hHjbyV4rUUzLUGBx3J+slaMZCUVBJQcDF6FlS3jvxrq0P6IkK4QSZKkb0LqDlVI2L0zvha
+	dfwyODGEk/AxcSGJ8xZBuCMoUDNCVtty1qO/OOF9t1WhtpKq19QlC0osgexA+41gbqe/+r
+	UGMUSIOjB4yNBcLRQmk+v1qp9gMbFq0=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-43-wdJVMYx5OHqGbOePDcTQrw-1; Thu, 23 Nov 2023 17:53:53 -0500
-X-MC-Unique: wdJVMYx5OHqGbOePDcTQrw-1
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1f5ce492010so1777628fac.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:53:53 -0800 (PST)
+ us-mta-387-mh9ZsBUhOxePyhtqRGsNwA-1; Thu, 23 Nov 2023 18:11:47 -0500
+X-MC-Unique: mh9ZsBUhOxePyhtqRGsNwA-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-77d7a162255so33683685a.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:11:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700780013; x=1701384813;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HgkyQVWNEh0w8FRWOuAxuO8xPZdHyxrc2iTVyvbqtKU=;
-        b=ktkC/LfjBpznKXbuOwgE9N2aEa1XrT0E87+0Hapt4eHFcLeKUlCPqeCayGqrsGQcys
-         mTCthafkiuqd7hHPGjZNVjMchj2W9xH392TBWddw8OdxPD2NEK3Bh9VdJVcBkAWuOxti
-         jKTQFZPAnkFLJO324kwvROXBYPPe+pg1iI/5r5wSH7yYv8A89OiU0rrtXw5Qc6XYOjzU
-         +EHG9JRBDSWWtkPTJhUZF1nMBFT7bRUE0B0pehzgRfTnEjm9/hK5AMKvpZp6BuUxU17z
-         Vr1laj8ZYIeB8R/A6KxlR8V58Zn66XI6vedUU5bdPMZ4vVJq1XqwDa7W7CVTMzeBRMNt
-         8Uhw==
-X-Gm-Message-State: AOJu0YzY1pOG+dT5T3PEyIOlDmcsBHd7XQZs/G6xQ7liEJtlIjuFAr8w
-	rMeH7Kfr0vNq77aGn74r404Jlj/UPcYPVI01etX5/C7LPFmIHqNsYHOA9Spv3tP5tpL/xcWzWA+
-	QoDAPA7jNX45rGjWES8qTUUytXqxhSpZd
-X-Received: by 2002:a05:6870:ebca:b0:1ef:cedd:5c32 with SMTP id cr10-20020a056870ebca00b001efcedd5c32mr998594oab.3.1700780013307;
-        Thu, 23 Nov 2023 14:53:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE6HGCbuC2wuf4qW3jUuFH9NOq5sUWsl30jXSKTaMc3yOR1OB7UdxlczqfoO5wGGXUKu8ApVrKHNBUO0CwSip0=
-X-Received: by 2002:a05:6870:ebca:b0:1ef:cedd:5c32 with SMTP id
- cr10-20020a056870ebca00b001efcedd5c32mr998579oab.3.1700780013047; Thu, 23 Nov
- 2023 14:53:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700781107; x=1701385907;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P9UNCPaxva3mocGAduryLu7lxBwmZU5AYOzYsOMnmXM=;
+        b=dZFsuV48ahr7Qjl7exA7tgi78BQ6F6Djxf9ehopkLIDex0kCq3Hg/cawxbkEQNxoWq
+         yT8ThEX093sbFNadGbFyt6swzHcT7xhivksnEpmjOhyUgyZ36HAcb+z4pccmsxjFH1+g
+         rIotDGdUzO9HEoFG/5E7TUQWmG1/+/hpO4FsD74Fxh0PC7CiY73H36ZBman36gG9K18f
+         098yFaBmquJFvBVWtM2zR69JFiquR5Huqfk0YczyHaxeWkzb6zx4NE92D6wE4l01Dvb2
+         jdkw1vhBx9DkZ23WbI7P7z3SQYUfUQvhELWb8632gn2ajQzna5oA5kKt3in2NKPgBgWw
+         wxng==
+X-Gm-Message-State: AOJu0Yzpn/bK/RWEH4Bgn5fkLlEtjjGbRzeB7PxbabxOcND8d1HyG/pt
+	KmZTx8PQVpXK23o08ncpZJ8j8K8yiSCdP3vRvrbpru+Drf2DaU1ALvz2u3yIxEAiq0YAVrtLPK7
+	ckYu7TLuerZMLY3r3aQYGEbyL
+X-Received: by 2002:a37:ef0a:0:b0:774:3963:41a5 with SMTP id j10-20020a37ef0a000000b00774396341a5mr861407qkk.13.1700781106745;
+        Thu, 23 Nov 2023 15:11:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFMxrwVWCHJx6/IYascYOtLDxEUb/y//Q86zmYh7bcYiqRQIb8m9qm8tKsWhmR/1kPe48ZGdA==
+X-Received: by 2002:a37:ef0a:0:b0:774:3963:41a5 with SMTP id j10-20020a37ef0a000000b00774396341a5mr861389qkk.13.1700781106433;
+        Thu, 23 Nov 2023 15:11:46 -0800 (PST)
+Received: from debian (2a01cb058d23d6009e5da12aee20e435.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9e5d:a12a:ee20:e435])
+        by smtp.gmail.com with ESMTPSA id k18-20020a05620a143200b007743671a41fsm786078qkj.72.2023.11.23.15.11.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 15:11:45 -0800 (PST)
+Date: Fri, 24 Nov 2023 00:11:42 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Michal Kubecek <mkubecek@suse.cz>
+Subject: [PATCH net-next v2] tcp: Dump bound-only sockets in inet_diag.
+Message-ID: <bfb52b5103de808cda022e2d16bac6cf3ef747d6.1700780828.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231123183835.635210-1-mkp@redhat.com> <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
-From: Mike Pattrick <mkp@redhat.com>
-Date: Thu, 23 Nov 2023 17:53:21 -0500
-Message-ID: <CAHcdBH7h-sq=Gzkan1du3uxx44WibK0yzdnUcZCuw-mp=9OxOg@mail.gmail.com>
-Subject: Re: [PATCH net-next] packet: Account for VLAN_HLEN in csum_start when
- virtio_net_hdr is enabled
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Mike Pattrick wrote:
-> > Af_packet provides checksum offload offsets to usermode applications
-> > through struct virtio_net_hdr when PACKET_VNET_HDR is enabled on the
-> > socket. For skbuffs with a vlan being sent to a SOCK_RAW socket,
-> > af_packet will include the link level header and so csum_start needs
-> > to be adjusted accordingly.
->
-> Is this patch based on observing an incorrect offset in a workload,
-> or on code inspection?
+Walk the hashinfo->bhash2 table so that inet_diag can dump TCP sockets
+that are bound but haven't yet called connect() or listen().
 
-Based on an incorrect offset in a workload. The setup involved sending
-vxlan traffic though a veth interface configured with a vlan. The
-vnet_hdr's csum_start value was off by 4, and this problem went away
-when the vlan was removed.
+This allows ss to dump bound-only TCP sockets, together with listening
+sockets (as there's no specific state for bound-only sockets). This is
+similar to the UDP behaviour for which bound-only sockets are already
+dumped by ss -lu.
 
-I'll take another look at this patch.
+The code is inspired by the ->lhash2 loop. However there's no manual
+test of the source port, since this kind of filtering is already
+handled by inet_diag_bc_sk(). Also, a maximum of 16 sockets are dumped
+at a time, to avoid running with bh disabled for too long.
 
->
-> As the referenced patch mentions, VLAN_HLEN adjustment is needed
-> in macvtap because it pulls the vlan header from skb->vlan_tci. At
-> which point skb->csum_start is wrong.
->
-> "Commit f09e2249c4f5 ("macvtap: restore vlan header on user read")
->  added this feature to macvtap. Commit 3ce9b20f1971 ("macvtap: Fix
->  csum_start when VLAN tags are present") then fixed up csum_start."
->
-> But the commit also mentions "Virtio, packet and uml do not insert
-> the vlan header in the user buffer.". This situation has not changed.
->
-> Packet sockets may receive packets with VLAN headers present, but
-> unless they were inserted manually before passing to user, as macvtap
-> does, this does not affect csum_start.
->
-> Packet sockets support reading those skb->vlan_tci stored VLAN
-> headers using AUXDATA.
->
-> > Fixes: fd3a88625844 ("net: in virtio_net_hdr only add VLAN_HLEN to csum=
-_start if payload holds vlan")
->
-> The fix should target net, not net-next.
->
-> > Signed-off-by: Mike Pattrick <mkp@redhat.com>
-> > ---
-> >  net/packet/af_packet.c | 36 ++++++++++++++++++++++++++----------
-> >  1 file changed, 26 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > index a84e00b5904b..f6b602ffe383 100644
-> > --- a/net/packet/af_packet.c
-> > +++ b/net/packet/af_packet.c
-> > @@ -2092,15 +2092,23 @@ static unsigned int run_filter(struct sk_buff *=
-skb,
-> >  }
-> >
-> >  static int packet_rcv_vnet(struct msghdr *msg, const struct sk_buff *s=
-kb,
-> > -                        size_t *len, int vnet_hdr_sz)
-> > +                        size_t *len, int vnet_hdr_sz,
-> > +                        const struct sock *sk)
-> >  {
-> >       struct virtio_net_hdr_mrg_rxbuf vnet_hdr =3D { .num_buffers =3D 0=
- };
-> > +     int vlan_hlen;
-> >
-> >       if (*len < vnet_hdr_sz)
-> >               return -EINVAL;
-> >       *len -=3D vnet_hdr_sz;
-> >
-> > -     if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)&vnet_h=
-dr, vio_le(), true, 0))
-> > +     if (sk->sk_type =3D=3D SOCK_RAW && skb_vlan_tag_present(skb))
-> > +             vlan_hlen =3D VLAN_HLEN;
-> > +     else
-> > +             vlan_hlen =3D 0;
-> > +
-> > +     if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)&vnet_h=
-dr,
-> > +                                 vio_le(), true, vlan_hlen))
-> >               return -EINVAL;
-> >
-> >       return memcpy_to_msg(msg, (void *)&vnet_hdr, vnet_hdr_sz);
-> > @@ -2368,13 +2376,21 @@ static int tpacket_rcv(struct sk_buff *skb, str=
-uct net_device *dev,
-> >               __set_bit(slot_id, po->rx_ring.rx_owner_map);
-> >       }
-> >
-> > -     if (vnet_hdr_sz &&
-> > -         virtio_net_hdr_from_skb(skb, h.raw + macoff -
-> > -                                 sizeof(struct virtio_net_hdr),
-> > -                                 vio_le(), true, 0)) {
-> > -             if (po->tp_version =3D=3D TPACKET_V3)
-> > -                     prb_clear_blk_fill_status(&po->rx_ring);
-> > -             goto drop_n_account;
-> > +     if (vnet_hdr_sz) {
-> > +             int vlan_hlen;
-> > +
-> > +             if (sk->sk_type =3D=3D SOCK_RAW && skb_vlan_tag_present(s=
-kb))
-> > +                     vlan_hlen =3D VLAN_HLEN;
-> > +             else
-> > +                     vlan_hlen =3D 0;
-> > +
-> > +             if (virtio_net_hdr_from_skb(skb, h.raw + macoff -
-> > +                                         sizeof(struct virtio_net_hdr)=
-,
-> > +                                         vio_le(), true, vlan_hlen)) {
-> > +                     if (po->tp_version =3D=3D TPACKET_V3)
-> > +                             prb_clear_blk_fill_status(&po->rx_ring);
-> > +                     goto drop_n_account;
-> > +             }
-> >       }
-> >
-> >       if (po->tp_version <=3D TPACKET_V2) {
-> > @@ -3464,7 +3480,7 @@ static int packet_recvmsg(struct socket *sock, st=
-ruct msghdr *msg, size_t len,
-> >       packet_rcv_try_clear_pressure(pkt_sk(sk));
-> >
-> >       if (vnet_hdr_len) {
-> > -             err =3D packet_rcv_vnet(msg, skb, &len, vnet_hdr_len);
-> > +             err =3D packet_rcv_vnet(msg, skb, &len, vnet_hdr_len, sk)=
-;
-> >               if (err)
-> >                       goto out_free;
-> >       }
-> > --
-> > 2.40.1
-> >
->
->
+No change is needed for ss. With an IPv4, an IPv6 and an IPv6-only
+socket, bound respectively to 40000, 64000, 60000, the result is:
+
+  $ ss -lt
+  State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess
+  UNCONN 0      0            0.0.0.0:40000      0.0.0.0:*
+  UNCONN 0      0               [::]:60000         [::]:*
+  UNCONN 0      0                  *:64000            *:*
+
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
+---
+
+v2:
+  * Use ->bhash2 instead of ->bhash (Kuniyuki Iwashima).
+  * Process no more than 16 sockets at a time (Kuniyuki Iwashima).
+
+ net/ipv4/inet_diag.c | 88 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 87 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 7d0e7aaa71e0..d7fb6a625cb7 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -1077,10 +1077,96 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
+ 		s_i = num = s_num = 0;
+ 	}
+ 
++/* Process a maximum of SKARR_SZ sockets at a time when walking hash buckets
++ * with bh disabled.
++ */
++#define SKARR_SZ 16
++
++	/* Dump bound-only sockets */
++	if (cb->args[0] == 1) {
++		if (!(idiag_states & TCPF_CLOSE))
++			goto skip_bind_ht;
++
++		for (i = s_i; i < hashinfo->bhash_size; i++) {
++			struct inet_bind_hashbucket *ibb;
++			struct inet_bind2_bucket *tb2;
++			struct sock *sk_arr[SKARR_SZ];
++			int num_arr[SKARR_SZ];
++			int idx, accum, res;
++
++resume_bind_walk:
++			num = 0;
++			accum = 0;
++			ibb = &hashinfo->bhash2[i];
++
++			spin_lock_bh(&ibb->lock);
++			inet_bind_bucket_for_each(tb2, &ibb->chain) {
++				if (!net_eq(ib2_net(tb2), net))
++					continue;
++
++				sk_for_each_bound_bhash2(sk, &tb2->owners) {
++					struct inet_sock *inet = inet_sk(sk);
++
++					if (num < s_num)
++						goto next_bind;
++
++					if (sk->sk_state != TCP_CLOSE ||
++					    !inet->inet_num)
++						goto next_bind;
++
++					if (r->sdiag_family != AF_UNSPEC &&
++					    r->sdiag_family != sk->sk_family)
++						goto next_bind;
++
++					if (!inet_diag_bc_sk(bc, sk))
++						goto next_bind;
++
++					if (!refcount_inc_not_zero(&sk->sk_refcnt))
++						goto next_bind;
++
++					num_arr[accum] = num;
++					sk_arr[accum] = sk;
++					if (++accum == SKARR_SZ)
++						goto pause_bind_walk;
++next_bind:
++					num++;
++				}
++			}
++pause_bind_walk:
++			spin_unlock_bh(&ibb->lock);
++
++			res = 0;
++			for (idx = 0; idx < accum; idx++) {
++				if (res >= 0) {
++					res = inet_sk_diag_fill(sk_arr[idx],
++								NULL, skb, cb,
++								r, NLM_F_MULTI,
++								net_admin);
++					if (res < 0)
++						num = num_arr[idx];
++				}
++				sock_gen_put(sk_arr[idx]);
++			}
++			if (res < 0)
++				goto done;
++
++			cond_resched();
++
++			if (accum == SKARR_SZ) {
++				s_num = num + 1;
++				goto resume_bind_walk;
++			}
++
++			s_num = 0;
++		}
++skip_bind_ht:
++		cb->args[0] = 2;
++		s_i = num = s_num = 0;
++	}
++
+ 	if (!(idiag_states & ~TCPF_LISTEN))
+ 		goto out;
+ 
+-#define SKARR_SZ 16
+ 	for (i = s_i; i <= hashinfo->ehash_mask; i++) {
+ 		struct inet_ehash_bucket *head = &hashinfo->ehash[i];
+ 		spinlock_t *lock = inet_ehash_lockp(hashinfo, i);
+-- 
+2.39.2
 
 
