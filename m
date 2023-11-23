@@ -1,241 +1,742 @@
-Return-Path: <netdev+bounces-50444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50907F5D18
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:58:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603357F5D1C
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B2A6281A20
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:58:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E3E2819F8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E87F22EE7;
-	Thu, 23 Nov 2023 10:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737F222087;
+	Thu, 23 Nov 2023 10:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gLKeQ1QI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzEzPVsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAEFAD44;
-	Thu, 23 Nov 2023 02:58:21 -0800 (PST)
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN8CE7I004665;
-	Thu, 23 Nov 2023 10:58:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=qLQaZ89NvhC1j+2VehIGu4V3oAPl0sgBsH3ZIGNFkaM=;
- b=gLKeQ1QI7H/gScDyatm7kmuoQmdvrzr1+I2l2JWr5AG7njKzdNwZGYQoi9hS3tEMzfQJ
- lRX5aBsFpHsnD7m5ewJJnYz8I46Ozl8rn8TyfaUVjMMXtzbMyzE/jPzbklTt47P1U+Md
- gorHEgFGgCgaD+AuXatiIS/tYhoNxPtahu53xJ3dnqgYSm+I1JNI1XI5nr+DyC5ocTZA
- Q3+FeIeApLhTiF/U+qVOGxFZuA8CeMQ56a4GTd2mvCGeeFXACOVgL5zquR++vVgHh0OQ
- bi9AVrlH9yNpYZmePQ9iPY1vdB+UC5Wsuop02mwiHWRvX4lHA4wFyWZJ9EHRRI+sSsuG ZQ== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uj30x8a11-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 10:58:06 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ANAw5fJ002445
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 10:58:05 GMT
-Received: from [10.253.33.181] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 23 Nov
- 2023 02:58:02 -0800
-Message-ID: <d2ac542c-aae3-49ae-ae2b-9defc4ca98eb@quicinc.com>
-Date: Thu, 23 Nov 2023 18:57:59 +0800
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A407D48;
+	Thu, 23 Nov 2023 02:58:28 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507bd19eac8so924902e87.0;
+        Thu, 23 Nov 2023 02:58:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700737106; x=1701341906; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=deD9Kpja6UeunYPlwo19utlQNToZs40w4PoMj3yUkec=;
+        b=PzEzPVsQ/GIMMlTwfadlaKVD18xVapT59TP2e9KWzrUhMqZpCMeqHpU0oD5b+Ct18R
+         7bUZrWFaK5J2sKkSOe9K9pE/J3J1Q78aIf1/ElyPI98iSfFZdM0ibALHW892ma07gUr1
+         DsihgtUEeuqaru2gHt2b6DD90Hg6kBb5ML0GEScZLpbparikOusqC2QJNN32vv8fYCiG
+         1i5v39X+aRmNxs2dMTnODnb2ypZd9k0a+NmvlhomLlqaEf9/RgnzY+RSbNG1/9ZVTgci
+         f17U+HPwyaIlzhiw9ex1BrFH+HXQDy1iPOEEQD26wXGF2beyL517C7BVZHQjjOAdl0Z+
+         KxOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700737106; x=1701341906;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=deD9Kpja6UeunYPlwo19utlQNToZs40w4PoMj3yUkec=;
+        b=IcL/Co20LHJg/LRepgzjZXH40S2uShRNEFKOdKupDOZKcOTAhQ7sZ+VNs+Ef3tPcyu
+         5ekYSjRJm/kwczX0M+wVoaxWmeOMFUYpWFPFax3qU4d/p2eUyDkBmgQFtbE2a3ht/Jvz
+         OXIRPferk24Gs9ZvbC1m161VDXGLYBXor7VAAOSZK6g3rTB073D/SSumm2eBTaZNNAe5
+         02Fj+yahTz391fJIBSTHvn2jAk0Lejejjxz+5SbBCLszw6FmjUilcb66qbJO6qaYjb0I
+         v+A7UMgI9HPnmI2TKQuahWLbPW5YLoo3u0kMJkB5HrdDPwcA9Mk5M42dC7ITzUKagpq0
+         ZRpg==
+X-Gm-Message-State: AOJu0Yw9wlKNCPnrn6ezdRe95BHu5EXlzQBTAmujaRFR6ST30aUl7j34
+	MBIfOyytQVYvqmge3hnNhRT/2+T5pnopYw==
+X-Google-Smtp-Source: AGHT+IEu56GKXlBWt9w/2juNagwiVMq3aNWLXoCr9up2TMGgOJyKrcswCJTSswsxZ5S8Y2N036R99A==
+X-Received: by 2002:a05:6512:689:b0:50a:a585:614d with SMTP id t9-20020a056512068900b0050aa585614dmr4097033lfe.69.1700737105827;
+        Thu, 23 Nov 2023 02:58:25 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id j8-20020ac24548000000b005030cef433esm154739lfm.94.2023.11.23.02.58.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 02:58:25 -0800 (PST)
+Date: Thu, 23 Nov 2023 13:58:22 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
+Cc: Russell King <linux@armlinux.org.uk>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
+	"David S.   Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Tan Tee Min <tee.min.tan@intel.com>, 
+	Ong Boon Leong <boon.leong.ong@intel.com>, Voon Weifeng <weifeng.voon@intel.com>, 
+	Mohammad Athari Bin Ismail <mohammad.athari.ismail@intel.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	James Li <James.Li1@synopsys.com>, Martin McKenny <Martin.McKenny@synopsys.com>
+Subject: Re: [PATCH] net: stmmac: fix FPE events losing
+Message-ID: <n6znly3wbe2eqljkr7yypliixxdarohjqkegvqrjorrxmbotnp@rpi6wwkagiy3>
+References: <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
+ <ZVTU4TTFYSMLswTs@shell.armlinux.org.uk>
+ <CY5PR12MB63727BAD92930CB04DE4DB52BFB1A@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <CY5PR12MB637235F27E5114CFB4DE1AD3BFBBA@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <aicr2gv4aqsgam4nc4wahacyakwn744xx52uojfkn7fjtd26pt@6lxmiizwkrqk>
+ <CY5PR12MB637274F20E0AE776A315A79FBFBAA@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <j5i4j343zqsuyubexjj4gqsz4ol3c7wmjpnsbxg5x4vzvtk7ni@uta6ssp4oj2a>
+ <CY5PR12MB63729B1EE424490BE0410664BFB9A@CY5PR12MB6372.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <corbet@lwn.net>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>
-References: <20231118062754.2453-1-quic_luoj@quicinc.com>
- <20231118062754.2453-4-quic_luoj@quicinc.com>
- <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
- <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
- <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
- <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
- <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
- <316fb626-4dc3-4540-9cc4-e45840e36f77@quicinc.com>
- <ZVyZ+8Q2eNfAKjO/@shell.armlinux.org.uk>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <ZVyZ+8Q2eNfAKjO/@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: pOQONhNd20YTfGS7Zztiqo-7s85JCRCK
-X-Proofpoint-GUID: pOQONhNd20YTfGS7Zztiqo-7s85JCRCK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_09,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 phishscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311230078
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CY5PR12MB63729B1EE424490BE0410664BFB9A@CY5PR12MB6372.namprd12.prod.outlook.com>
 
-
-
-On 11/21/2023 7:52 PM, Russell King (Oracle) wrote:
-> On Tue, Nov 21, 2023 at 07:10:08PM +0800, Jie Luo wrote:
->> when pcs is configured to SGMII mode, the fourth PHY can reach to
->> maximum speed 2.5G(2500BaseT) that is reached by increasing the clock
->> rate to 312.5MHZ from 125MHZ of 1G speed, but there is no corresponding
->> interface mode can be used to reflect this 2.5G speed mode(sgmii+)
+On Thu, Nov 23, 2023 at 09:44:07AM +0000, Jianheng Zhang wrote:
+> > From: Serge Semin <fancer.lancer@gmail.com>
+> > Sent: Wednesday, November 22, 2023 11:07 PM
+> > To: Jianheng Zhang <jianheng@synopsys.com>
+> > Cc: Russell King <linux@armlinux.org.uk>; Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose
+> > Abreu <joabreu@synopsys.com>; David S. Miller <davem@davemloft.net>; Eric Dumazet
+> > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+> > Maxime Coquelin <mcoquelin.stm32@gmail.com>; Tan Tee Min <tee.min.tan@intel.com>; Ong Boon
+> > Leong <boon.leong.ong@intel.com>; Voon Weifeng <weifeng.voon@intel.com>; Mohammad Athari Bin
+> > Ismail <mohammad.athari.ismail@intel.com>; netdev@vger.kernel.org;
+> > linux-stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> > linux-kernel@vger.kernel.org; James Li <lijames@synopsys.com>; Martin McKenny
+> > <mmckenny@synopsys.com>
+> > Subject: Re: [PATCH] net: stmmac: fix FPE events losing
+> > 
+> > On Wed, Nov 22, 2023 at 07:37:51AM +0000, Jianheng Zhang wrote:
+> > > > From: Serge Semin <fancer.lancer@gmail.com>
+> > > > Sent: Tuesday, November 21, 2023 8:09 PM
+> > > > To: Jianheng Zhang <jianheng@synopsys.com>
+> > > > Cc: Russell King <linux@armlinux.org.uk>; Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose
+> > > > Abreu <joabreu@synopsys.com>; David S. Miller <davem@davemloft.net>; Eric Dumazet
+> > > > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+> > > > Maxime Coquelin <mcoquelin.stm32@gmail.com>; Tan Tee Min <tee.min.tan@intel.com>; Ong
+> > Boon
+> > > > Leong <boon.leong.ong@intel.com>; Voon Weifeng <weifeng.voon@intel.com>; Mohammad Athari
+> > Bin
+> > > > Ismail <mohammad.athari.ismail@intel.com>; netdev@vger.kernel.org;
+> > > > linux-stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> > > > linux-kernel@vger.kernel.org; James Li <lijames@synopsys.com>
+> > > > Subject: Re: [PATCH] net: stmmac: fix FPE events losing
+> > > >
+> > > > On Tue, Nov 21, 2023 at 09:31:31AM +0000, Jianheng Zhang wrote:
+> > > > > > From: Jianheng Zhang
+> > > > > > Sent: Thursday, November 16, 2023 12:01 AM
+> > > > > > To: Russell King <linux@armlinux.org.uk>; Serge Semin <fancer.lancer@gmail.com>
+> > > > > > Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>;
+> > David
+> > > > S.
+> > > > > > Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski
+> > > > > > <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime Coquelin
+> > > > > > <mcoquelin.stm32@gmail.com>; Tan Tee Min <tee.min.tan@intel.com>; Ong Boon Leong
+> > > > > > <boon.leong.ong@intel.com>; Voon Weifeng <weifeng.voon@intel.com>; Mohammad Athari Bin
+> > > > Ismail
+> > > > > > <mohammad.athari.ismail@intel.com>; netdev@vger.kernel.org;
+> > > > > > linux-stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> > > > > > linux-kernel@vger.kernel.org
+> > > > > > Subject: RE: [PATCH] net: stmmac: fix FPE events losing
+> > > > > >
+> > > > > >
+> > > > > > > -----Original Message-----
+> > > > > > > From: Russell King <linux@armlinux.org.uk>
+> > > > > > > Sent: Wednesday, November 15, 2023 10:26 PM
+> > > > > > > To: Serge Semin <fancer.lancer@gmail.com>
+> > > > > > > Cc: Jianheng Zhang <jianheng@synopsys.com>; Alexandre Torgue
+> > > > <alexandre.torgue@foss.st.com>;
+> > > > > > Jose
+> > > > > > > Abreu <joabreu@synopsys.com>; David S. Miller <davem@davemloft.net>; Eric Dumazet
+> > > > > > > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> > <pabeni@redhat.com>;
+> > > > > > > Maxime Coquelin <mcoquelin.stm32@gmail.com>; Tan Tee Min <tee.min.tan@intel.com>; Ong
+> > > > Boon
+> > > > > > > Leong <boon.leong.ong@intel.com>; Voon Weifeng <weifeng.voon@intel.com>; Mohammad
+> > > > Athari
+> > > > > > Bin
+> > > > > > > Ismail <mohammad.athari.ismail@intel.com>; netdev@vger.kernel.org;
+> > > > > > > linux-stm32@st-md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
+> > > > > > > linux-kernel@vger.kernel.org
+> > > > > > > Subject: Re: [PATCH] net: stmmac: fix FPE events losing
+> > > > > > >
+> > > > > > > On Tue, Nov 14, 2023 at 02:59:57PM +0300, Serge Semin wrote:
+> > > > > > > > On Tue, Nov 14, 2023 at 11:07:34AM +0000, Jianheng Zhang wrote:
+> > > > > > > > > The 32-bit access of register MAC_FPE_CTRL_STS may clear the FPE status
+> > > > > > > > > bits unexpectedly. Use 8-bit access for MAC_FPE_CTRL_STS control bits to
+> > > > > > > > > avoid unexpected access of MAC_FPE_CTRL_STS status bits that can reduce
+> > > > > > > > > the FPE handshake retries.
+> > > > > > > > >
+> > > > > > > > > The bit[19:17] of register MAC_FPE_CTRL_STS are status register bits.
+> > > > > > > > > Those bits are clear on read (or write of 1 when RCWE bit in
+> > > > > > > > > MAC_CSR_SW_Ctrl register is set). Using 32-bit access for
+> > > > > > > > > MAC_FPE_CTRL_STS control bits makes side effects that clear the status
+> > > > > > > > > bits. Then the stmmac interrupt handler missing FPE event status and
+> > > > > > > > > leads to FPE handshake failure and retries.
+> > > > > > > > >
+> > > > > > > > > The bit[7:0] of register MAC_FPE_CTRL_STS are control bits or reserved
+> > > > > > > > > that have no access side effects, so can use 8-bit access for
+> > > > > > > > > MAC_FPE_CTRL_STS control bits.
+> > > > > > > > >
+> > > > > > > > > Fixes: 5a5586112b92 ("net: stmmac: support FPE link partner hand-shaking procedure")
+> > > > > > > > > Signed-off-by: jianheng <jianheng@synopsys.com>
+> > > > > > > > > ---
+> > > > > > > > >  drivers/net/ethernet/stmicro/stmmac/dwmac5.c | 12 ++++++------
+> > > > > > > > >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > > > > > > > >
+> > > > > > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > > > b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > > > > > index e95d35f..7333995 100644
+> > > > > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > > > > > @@ -716,11 +716,11 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32
+> > num_txq,
+> > > > u32
+> > > > > > > num_rxq,
+> > > > > > > > >  	u32 value;
+> > > > > > > > >
+> > > > > > > > >  	if (!enable) {
+> > > > > > > >
+> > > > > > > > > -		value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > > > > > > > +		value = readb(ioaddr + MAC_FPE_CTRL_STS);
+> > > > > > > >
+> > > > > > > > Note this may break the platforms which don't support non-32 MMIOs for
+> > > > > > > > some devices. None of the currently supported glue-drivers explicitly
+> > > > > > > > state they have such peculiarity, but at the same time the STMMAC-core
+> > > > > > > > driver at the present state uses the dword IO ops only. For instance
+> > > > > > > > the PCIe subsystem has the special accessors for such cases:
+> > > > > > > > pci_generic_config_read32()
+> > > > > > > > pci_generic_config_write32()
+> > > > > > > > which at the very least are utilized on the Tegra and Loongson
+> > > > > > > > platforms to access the host CSR spaces. These platforms are also
+> > > > > > > > equipped with the DW MACs. The problem might be irrelevant for all the
+> > > > > > > > currently supported DW MAC controllers implementations though, but
+> > > > > > > > still it worth to draw an attention to the problem possibility and in
+> > > > > > > > order to prevent it before ahead it would be better to just avoid
+> > > > > > > > using the byte-/word- IOs if it's possible.
+> > > > > > >
+> > > > > > > Yes, this exists for configuration accesses, and is damn annoying
+> > > > > > > because the read-modify-write of these can end up clearing PCI
+> > > > > > > status register bits that are W1C.
+> > > > > > >
+> > > > > > > I've never heard of that problem with MMIO though.
+> > > > > > >
+> > > > > > > --
+> > > > > > > RMK's Patch system:
+> > > > > > >
+> > > > > >
+> > > >
+> > https://urldefense.com/v3/__https://www.armlinux.org.uk/developer/patches/__;!!A4F2R9G_pg!ZnsQc
+> > > > > > >
+> > > > > >
+> > > >
+> > 7LKbdCiIj_nLBkt44MRSL8W8YD4WvMmPNkHFlDMrjrVqEVOVA1-P-9BVE3Oa5bC1ymKXLNV5C9mJ_rfFtLW
+> > > > > > > Fg$
+> > > > > > > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> > > > > > Thanks for all your mention about the potential risks of using readb and suggestions, I'll consider a
+> > > > new
+> > > > > > solution and update the patch.
+> > > > > >
+> > > > > > Best Regards,
+> > > > > > Jianheng
+> > > > >
+> > > > > Thanks for Andrew's suggestion. I consider the solution of set
+> > > > > MAC_CSR_SW_Ctrl.RCWE carefully and found that the MAC_CSR_SW_Ctrl.RCWE
+> > > > > is efficient for many other interrupt status registers, and some are used
+> > > > > in current stmmac driver (LPI PMT MMC etc). Those registers work fine in
+> > > > > clear on read mode with current code. So, I think there is no need to
+> > > > > set MAC_CSR_SW_Ctrl.RCWE that will make a large impact to current
+> > > > > interrupt handler.
+> > > > >
+> > > > > I try adding a new member variable(staged_fpe_state) to stmmac_fpe_cfg
+> > > > > that is used to stage the MAC_FPE_CTRL_STS value read in
+> > > > > dwmac5_fpe_send_mpacket(). And in dwmac5_fpe_irq_status(), use this staged
+> > > > > value and current value of MAC_FPE_CTRL_STS to check FPE status. The
+> > > > > draft patch is below.
+> > > >
+> > > > Are the status flags in the MAC_FPE_CTRL_STS register cleared on
+> > > > _writes_? (I am asking because for some reason my DW QoS Eth v5.10a HW
+> > > > manual has the status MAC_FPE_CTRL_STS flags marked as R/W, which is
+> > > > weird access mode for the status flags.) If they turn to be _not_
+> > > > changeable on writes, then what about just converting the
+> > > > dwmac5_fpe_configure() and dwmac5_fpe_send_mpacket() methods to always
+> > > > writing to the MAC_FPE_CTRL_STS register, and if required preserve the
+> > > > shadow control MAC_FPE_CTRL_STS flags in the stmmac_fpe_cfg structure?
+> > > > AFAICS the only flag which needs to be preserved is EFPE - "enable
+> > > > FPE" flag.
+> > > >
+> > > > Such implementation (if it's possible) shall be free from the _status_
+> > > > flags race condition and won't require additional serializations. On
+> > > > the contrary your suggestion AFAICS causes unresolved race condition
+> > > > in here
+> > > >
+> > > > > +	value = readl(ioaddr + MAC_FPE_CTRL_STS) | fpe_cfg->staged_fpe_state;
+> > > > > +	fpe_cfg->staged_fpe_state = 0x0;
+> > > >
+> > > > and here
+> > > >
+> > > > >  	value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > > > +	cfg->staged_fpe_state = value;
+> > > >
+> > > > Depending on the IRQ handling and the task scheduling timing you may
+> > > > end up with loosing the status flags anyway.
+> > > >
+> > > > * Note I am not concerning here the MAC_FPE_CTRL_STS control flags
+> > > > * race condition which AFAICS already exist in the current frame
+> > > > * preemption code. See the configs performed in the open/close/suspend
+> > > > * methods, in the link state change callbacks, in the worker task and
+> > > > * in the FPE status IRQ handler. Control flag accesses don't look
+> > > > * coherent there.
+> > > >
+> > > > -Serge(y)
+> > > >
+> > > > >
+> > > > > Best Regards,
+> > > > > Jianheng
+> > > > >
+> > > > > [PATCH v2] net: stmmac: fix FPE events losing
+> > > > >
+> > > > > ---
+> > > > >  drivers/net/ethernet/stmicro/stmmac/dwmac5.c      | 9 +++++++--
+> > > > >  drivers/net/ethernet/stmicro/stmmac/dwmac5.h      | 1 +
+> > > > >  drivers/net/ethernet/stmicro/stmmac/hwif.h        | 1 +
+> > > > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 +++++-
+> > > > >  include/linux/stmmac.h                            | 1 +
+> > > > >  5 files changed, 15 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > index e95d35f..8917fd0 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > > > @@ -736,12 +736,15 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32
+> > > > num_rxq,
+> > > > >
+> > > > >  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
+> > > > >  {
+> > > > > +	struct stmmac_priv *priv = netdev_priv(dev);
+> > > > > +	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
+> > > > >  	u32 value;
+> > > > >  	int status;
+> > > > >
+> > > > >  	status = FPE_EVENT_UNKNOWN;
+> > > > >
+> > > > > -	value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > > > +	value = readl(ioaddr + MAC_FPE_CTRL_STS) | fpe_cfg->staged_fpe_state;
+> > > > > +	fpe_cfg->staged_fpe_state = 0x0;
+> > > > >
+> > > > >  	if (value & TRSP) {
+> > > > >  		status |= FPE_EVENT_TRSP;
+> > > > > @@ -766,11 +769,13 @@ int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device
+> > *dev)
+> > > > >  	return status;
+> > > > >  }
+> > > > >
+> > > > > -void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum stmmac_mpacket_type type)
+> > > > > +void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > > > +			     enum stmmac_mpacket_type type)
+> > > > >  {
+> > > > >  	u32 value;
+> > > > >
+> > > > >  	value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > > > +	cfg->staged_fpe_state = value;
+> > > > >
+> > > > >  	if (type == MPACKET_VERIFY) {
+> > > > >  		value &= ~SRSP;
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > > b/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > > > index 53c138d..022c1a2 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > > > @@ -156,6 +156,7 @@ void dwmac5_est_irq_status(void __iomem *ioaddr, struct net_device
+> > *dev,
+> > > > >  void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> > > > >  			  bool enable);
+> > > > >  void dwmac5_fpe_send_mpacket(void __iomem *ioaddr,
+> > > > > +				 struct stmmac_fpe_cfg *cfg,
+> > > > >  			     enum stmmac_mpacket_type type);
+> > > > >  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev);
+> > > > >
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > > b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > > > index b95d3e1..5496781 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > > > @@ -415,6 +415,7 @@ struct stmmac_ops {
+> > > > >  	void (*fpe_configure)(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> > > > >  			      bool enable);
+> > > > >  	void (*fpe_send_mpacket)(void __iomem *ioaddr,
+> > > > > +				 struct stmmac_fpe_cfg *cfg,
+> > > > >  				 enum stmmac_mpacket_type type);
+> > > > >  	int (*fpe_irq_status)(void __iomem *ioaddr, struct net_device *dev);
+> > > > >  };
+> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > > index 3e50fd5..6a29f55 100644
+> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > > @@ -964,7 +964,8 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool
+> > > > is_up)
+> > > > >  	bool *hs_enable = &fpe_cfg->hs_enable;
+> > > > >
+> > > > >  	if (is_up && *hs_enable) {
+> > > > > -		stmmac_fpe_send_mpacket(priv, priv->ioaddr, MPACKET_VERIFY);
+> > > > > +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+> > > > > +					MPACKET_VERIFY);
+> > > > >  	} else {
+> > > > >  		*lo_state = FPE_STATE_OFF;
+> > > > >  		*lp_state = FPE_STATE_OFF;
+> > > > > @@ -5838,6 +5839,7 @@ static void stmmac_fpe_event_status(struct stmmac_priv *priv, int
+> > status)
+> > > > >  		/* If user has requested FPE enable, quickly response */
+> > > > >  		if (*hs_enable)
+> > > > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > > > +						fpe_cfg,
+> > > > >  						MPACKET_RESPONSE);
+> > > > >  	}
+> > > > >
+> > > > > @@ -7280,6 +7282,7 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
+> > > > >  			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
+> > > > >  				    *lo_state, *lp_state);
+> > > > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > > > +						fpe_cfg,
+> > > > >  						MPACKET_VERIFY);
+> > > > >  		}
+> > > > >  		/* Sleep then retry */
+> > > > > @@ -7294,6 +7297,7 @@ void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable)
+> > > > >  	if (priv->plat->fpe_cfg->hs_enable != enable) {
+> > > > >  		if (enable) {
+> > > > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > > > +						priv->plat->fpe_cfg,
+> > > > >  						MPACKET_VERIFY);
+> > > > >  		} else {
+> > > > >  			priv->plat->fpe_cfg->lo_fpe_state = FPE_STATE_OFF;
+> > > > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > > > > index 0b4658a..1322c78 100644
+> > > > > --- a/include/linux/stmmac.h
+> > > > > +++ b/include/linux/stmmac.h
+> > > > > @@ -175,6 +175,7 @@ struct stmmac_fpe_cfg {
+> > > > >  	bool hs_enable;				/* FPE handshake enable */
+> > > > >  	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
+> > > > >  	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
+> > > > > +	u32 staged_fpe_state; /* Staged FPE state when read MAC_FPE_CTRL_STS */
+> > > > >  };
+> > > > >
+> > > > >  struct stmmac_safety_feature_cfg {
+> > > > > --
+> > > > > 1.8.3.1
+> > > > >
+> > >
+> > > Hi Serge,
+> > >
+> > > Thanks for your suggestion.
+> > >
+> > > > Are the status flags in the MAC_FPE_CTRL_STS register cleared on
+> > > > _writes_?
+> > 
+> > > A write of 0 has no impact irrespective of the value programmed in RCWE bit.
+> > > This is safe option when writing the MAC_FPE_CTRL_STS register, which will
+> > > ensure that bits[19:16] are not modified unintentionally.
+> > > When RCWE bit is 0 and status bits[19:16] are read, those will be cleared, a write
+> > > of 0 or 1 do not have any impact in this mode.
+> > 
+> > Great! Than always writing shall do the trick.
+> > 
+> > >
+> > > > then what about just converting the
+> > > > dwmac5_fpe_configure() and dwmac5_fpe_send_mpacket() methods to always
+> > > > writing to the MAC_FPE_CTRL_STS register, and if required preserve the
+> > > > shadow control MAC_FPE_CTRL_STS flags in the stmmac_fpe_cfg structure?
+> > > > AFAICS the only flag which needs to be preserved is EFPE - "enable
+> > > > FPE" flag.
+> > 
+> > > I think this is a good solution, pls check my draft patch below.
+> > 
+> > Some comments are below.
+> > 
+> > >
+> > > -Jianheng
+> > >
+> > > [PATCH v2] net: stmmac: fix FPE events losing
+> > >
+> > > ---
+> > >  drivers/net/ethernet/stmicro/stmmac/dwmac5.c       | 26 +++++++++-------------
+> > >  drivers/net/ethernet/stmicro/stmmac/dwmac5.h       |  4 +++-
+> > >  .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  3 ++-
+> > >  drivers/net/ethernet/stmicro/stmmac/hwif.h         |  4 +++-
+> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  8 ++++++-
+> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c    |  1 +
+> > >  include/linux/stmmac.h                             |  1 +
+> > >  7 files changed, 28 insertions(+), 19 deletions(-)
+> > >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > index e95d35f..9575e84 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > > @@ -710,17 +710,15 @@ void dwmac5_est_irq_status(void __iomem *ioaddr, struct net_device *dev,
+> > >  	}
+> > >  }
+> > >
+> > > -void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> > > +void dwmac5_fpe_configure(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > +			  u32 num_txq, u32 num_rxq,
+> > >  			  bool enable)
+> > >  {
+> > 
+> > >  	u32 value;
+> > >
+> > >  	if (!enable) {
+> > > -		value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > -
+> > > -		value &= ~EFPE;
+> > > -
+> > > -		writel(value, ioaddr + MAC_FPE_CTRL_STS);
+> > > +		writel(0x0, ioaddr + MAC_FPE_CTRL_STS);
+> > > +		cfg->fpe_ctrl_sts_shadow = 0x0;
+> > >  		return;
+> > >  	}
+> > >
+> > > @@ -729,9 +727,9 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32
+> > num_rxq,
+> > >  	value |= (num_rxq - 1) << GMAC_RXQCTRL_FPRQ_SHIFT;
+> > >  	writel(value, ioaddr + GMAC_RXQ_CTRL1);
+> > >
+> > > -	value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > -	value |= EFPE;
+> > 
+> > > +	value = EFPE;
+> > >  	writel(value, ioaddr + MAC_FPE_CTRL_STS);
+> > > +	cfg->fpe_ctrl_sts_shadow = EFPE;
+> > 
+> > What about just:
+> > 	if (enable)
+> > 		cfg->fpe_csr = EFPE;
+> > 	else
+> > 		cfg->fpe_csr = 0;
+> > 
+> > 	writel(cfg->fpe_csr, ioaddr + MAC_FPE_CTRL_STS);
+> > 
+> > then ...
+> > 
+> > >  }
+> > >
+> > >  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
+> > > @@ -766,19 +764,17 @@ int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
+> > >  	return status;
+> > >  }
+> > >
+> > > -void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum stmmac_mpacket_type type)
+> > > +void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > +			     enum stmmac_mpacket_type type)
+> > >  {
+> > 
+> > >  	u32 value;
+> > >
+> > > -	value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > > +	value = cfg->fpe_ctrl_sts_shadow;
+> > >
+> > > -	if (type == MPACKET_VERIFY) {
+> > > -		value &= ~SRSP;
+> > > +	if (type == MPACKET_VERIFY)
+> > >  		value |= SVER;
+> > > -	} else {
+> > > -		value &= ~SVER;
+> > > +	else
+> > >  		value |= SRSP;
+> > > -	}
+> > >
+> > >  	writel(value, ioaddr + MAC_FPE_CTRL_STS);
+> > 
+> > this can be replaced with
+> > 
+> > 	u32 value = cfg->fpe_csr;
+> > 
+> > 	if (type == MPACKET_VERIFY)
+> > 		value |= SVER;
+> > 	else if (type == MPACKET_RESPONSE)
+> > 		value |= SRSP;
+> > 
+> > 	writel(value, ioaddr + MAC_FPE_CTRL_STS);
+> > 
+> > >  }
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > b/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > index 53c138d..aca846d 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.h
+> > > @@ -153,9 +153,11 @@ int dwmac5_est_configure(void __iomem *ioaddr, struct stmmac_est *cfg,
+> > >  			 unsigned int ptp_rate);
+> > >  void dwmac5_est_irq_status(void __iomem *ioaddr, struct net_device *dev,
+> > >  			   struct stmmac_extra_stats *x, u32 txqcnt);
+> > > -void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> > > +void dwmac5_fpe_configure(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > +			  u32 num_txq, u32 num_rxq,
+> > >  			  bool enable);
+> > >  void dwmac5_fpe_send_mpacket(void __iomem *ioaddr,
+> > > +			     struct stmmac_fpe_cfg *cfg,
+> > >  			     enum stmmac_mpacket_type type);
+> > >  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev);
+> > >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > index 453e88b..a74e71d 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > @@ -1484,7 +1484,8 @@ static int dwxgmac3_est_configure(void __iomem *ioaddr, struct
+> > stmmac_est *cfg,
+> > >  	return 0;
+> > >  }
+> > >
+> > > -static void dwxgmac3_fpe_configure(void __iomem *ioaddr, u32 num_txq,
+> > > +static void dwxgmac3_fpe_configure(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > +				   u32 num_txq,
+> > >  				   u32 num_rxq, bool enable)
+> > >  {
+> > >  	u32 value;
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > index b95d3e1..68aa2d5 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> > > @@ -412,9 +412,11 @@ struct stmmac_ops {
+> > >  			     unsigned int ptp_rate);
+> > >  	void (*est_irq_status)(void __iomem *ioaddr, struct net_device *dev,
+> > >  			       struct stmmac_extra_stats *x, u32 txqcnt);
+> > > -	void (*fpe_configure)(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> > > +	void (*fpe_configure)(void __iomem *ioaddr, struct stmmac_fpe_cfg *cfg,
+> > > +			      u32 num_txq, u32 num_rxq,
+> > >  			      bool enable);
+> > >  	void (*fpe_send_mpacket)(void __iomem *ioaddr,
+> > > +				 struct stmmac_fpe_cfg *cfg,
+> > >  				 enum stmmac_mpacket_type type);
+> > >  	int (*fpe_irq_status)(void __iomem *ioaddr, struct net_device *dev);
+> > >  };
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > index 3e50fd5..7791e9b 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > @@ -964,7 +964,8 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool
+> > is_up)
+> > >  	bool *hs_enable = &fpe_cfg->hs_enable;
+> > >
+> > >  	if (is_up && *hs_enable) {
+> > > -		stmmac_fpe_send_mpacket(priv, priv->ioaddr, MPACKET_VERIFY);
+> > > +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+> > > +					MPACKET_VERIFY);
+> > >  	} else {
+> > >  		*lo_state = FPE_STATE_OFF;
+> > >  		*lp_state = FPE_STATE_OFF;
+> > > @@ -5838,6 +5839,7 @@ static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
+> > >  		/* If user has requested FPE enable, quickly response */
+> > >  		if (*hs_enable)
+> > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > +						fpe_cfg,
+> > >  						MPACKET_RESPONSE);
+> > >  	}
+> > >
+> > > @@ -7262,6 +7264,7 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
+> > >  		if (*lo_state == FPE_STATE_ENTERING_ON &&
+> > >  		    *lp_state == FPE_STATE_ENTERING_ON) {
+> > >  			stmmac_fpe_configure(priv, priv->ioaddr,
+> > > +					     fpe_cfg,
+> > >  					     priv->plat->tx_queues_to_use,
+> > >  					     priv->plat->rx_queues_to_use,
+> > >  					     *enable);
+> > > @@ -7280,6 +7283,7 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
+> > >  			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
+> > >  				    *lo_state, *lp_state);
+> > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > +						fpe_cfg,
+> > >  						MPACKET_VERIFY);
+> > >  		}
+> > >  		/* Sleep then retry */
+> > > @@ -7294,6 +7298,7 @@ void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable)
+> > >  	if (priv->plat->fpe_cfg->hs_enable != enable) {
+> > >  		if (enable) {
+> > >  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+> > > +						priv->plat->fpe_cfg,
+> > >  						MPACKET_VERIFY);
+> > >  		} else {
+> > >  			priv->plat->fpe_cfg->lo_fpe_state = FPE_STATE_OFF;
+> > > @@ -7754,6 +7759,7 @@ int stmmac_suspend(struct device *dev)
+> > >  	if (priv->dma_cap.fpesel) {
+> > >  		/* Disable FPE */
+> > >  		stmmac_fpe_configure(priv, priv->ioaddr,
+> > > +				     priv->plat->fpe_cfg,
+> > >  				     priv->plat->tx_queues_to_use,
+> > >  				     priv->plat->rx_queues_to_use, false);
+> > >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> > > index ac41ef4..6ad3e0a 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> > > @@ -1079,6 +1079,7 @@ static int tc_setup_taprio(struct stmmac_priv *priv,
+> > >
+> > >  	priv->plat->fpe_cfg->enable = false;
+> > >  	stmmac_fpe_configure(priv, priv->ioaddr,
+> > > +			     priv->plat->fpe_cfg,
+> > >  			     priv->plat->tx_queues_to_use,
+> > >  			     priv->plat->rx_queues_to_use,
+> > >  			     false);
+> > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > > index 0b4658a..48385c7 100644
+> > > --- a/include/linux/stmmac.h
+> > > +++ b/include/linux/stmmac.h
+> > > @@ -175,6 +175,7 @@ struct stmmac_fpe_cfg {
+> > >  	bool hs_enable;				/* FPE handshake enable */
+> > >  	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
+> > >  	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
+> > 
+> > > +	u32 fpe_ctrl_sts_shadow;		/* shadow of MAC_FPE_CTRL_STS */
+> > 
+> >   +	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
+> > 
+> > I would have had it named as "fpe_csr" - short and well readable
+> > especially seeing CSR is a well known abbreviation for Control and
+> > Status register, which the MAC_FPE_CTRL_STS register actually is.
+> > 
+> > * Note one more time: current FPE handshaking implementation is vastly
+> > clumsy, needlessly overcomplicated and prone to races. I would have
+> > seriously considered having it refactored.
+> > 
+> > -Serge(y)
+> > 
+> > >  };
+> > >
+> > >  struct stmmac_safety_feature_cfg {
+> > > --
+> > > 1.8.3.1
+> > >
 > 
-> So this comes up again. 2.5G SGMII? What is that?
-
-2.5G SGMII here is reached by increasing the PCS clock rate to 312.5MHZ
-from sgmii with the clock rate 125MHZ.
-
-> 
-> Let's start off with the basics. SGMII is Cisco's modification of
-> 1000base-X. The two are broadly compatible in that they can communicate
-> with each other provided that the inband control word is disregarded.
-> 
-> 2500base-X is generally implemented as 1000base-X over-clocked by 2.5x.
-> Some manufacturers state that the inband control word is not supported.
-> Others say it can be used. This disparity comes from the lack of early
-> IEEE standardisation of this protocol.
-> 
-> Cisco SGMII as defined is a 10M/100M/1G protocol operating at 125MHz
-> with a fixed underlying baud rate of 1250Mbaud. Slower speeds are
-> achieved via symbol replication by 10x or 100x. The inband control
-> word is modified in order to convey this speed information, as well
-> as duplex and sometimes also other vendor extensions.
-> 
-> Switching SGMII to be clocked 2.5x faster means that a partner that
-> expects SGMII at normal speed sees garbage - it can't recognise the
-> waveform. Therefore, it is not possible for inband to convey any
-> information. Many vendors explicitly state that symbol replication
-> is not supported when "SGMII" is clocked at 2.5x.
-> 
-> All variants of whatever the vendor calls the 2.5G mode tend to use
-> the SGMII term because... it's Serial Gigabit... and SGMII even gets
-> used by vendors to describe the interface used for 1000base-X.
-> Vendors use terms like "HS-SGMII" and other stuff to describe their
-> 2.5x mode. Some use "2500base-X". Yours seems to use "SGMII+".
-
-i use the term SGMII+ because of the 2.5G speed achieved by operating
-the clock rate in 312.5MHZ from 1G speed of 125MHZ.
-
-> 
-> SGMII without inband signalling is basically the same as 1000base-X.
-> Therefore, SGMII clocked at 2.5x the speed is basically the same as
-> 2500base-X without inband signalling.
-
-SGMII+ disable the autoneg when the serdes works 312.5MHZ for the 2.5
-link speed.
-
-> 
-> So, the whole area is totally confused, and one should not get too
-> hung up on the terminology that vendors are using, but go back to
-> precisely what's going on at the hardware level.
-> 
-> We have raised this point almost every time someone talks about an
-> up-clocked "SGMII".
-> 
-> 
->> Actually we should add a new interface mode such as sgmii+
->> to reflect this 2.5G speed of sgmii
-> 
-> Only if there really is something different about it. For example,
-> if it were Cisco SGMII modified to operate always at 312.5MHz with
-> inband signalling updated to signal the four speeds. That would
-> definitely be a different protocol.
-
-For qca808x PHY, the clock rate is different between sgmii(125MHZ for
-speed 10/100/1000M) and sgmii+(312.5MHZ for 2.5G).
-
-> 
-> However, it's not that. What it actually is is Cisco SGMII when
-> operating at 10M/100M/1G speeds, and 2500base-X without inband
-> signalling when operating at 2.5G speed.
-
-Yes, Russell, this is what qca808x PHY works on.
-
-> 
-> We have PHYs that support this (and more) which we support. PHYs
-> that switch between 10GBASE-R, 5GBASE-R, 2500BASE-X and Cisco SGMII
-> depending on the speed that was negotiated on the media. There is
-> no definition of a single interface mode that covers all those,
-> because it isn't a single interface mode. It's four separate modes
-> that the PHY switches between - and this is no different from what
-> is happening with your PHY.
-
-This is indeed two different modes switched between 2.5G and other
-speeds(10/100/1000M).
-
-> 
-> Ultimately, you will need a way to use inband signalling with Cisco
-> SGMII for 10M/100M/1G speeds, and then switch to 2500base-X when
-> operating at 2.5G speeds, and that is done via the PHY driver
-> updating phydev->interface.
-> 
-> What we do need is some way for the PHY to also tell the PCS/MAC
-> whether inband should be used. This is something I keep bringing up
-> and now that we have PCS drivers revised to use the value from
-> phylink_pcs_neg_mode() _and_ a consistent implementation amongst them
-> we can now think about signalling to PCS drivers whether inband mode
-> needs to be turned off when switching between modes.
-
-Yes, we can switch the interface mode according to the current link
-speed in the pcs driver.
-but the issue is that the phy-mode i specified for the PHYLINK,
-if phy-mode is sgmii, the support capability is limited to maximum
-capability 1G during the PHYLINK setup and i can't configure it to 2.5G
-dynamically, if the phy-mode is 2500base-x, then PHY capability will
-be modified to only support 2.5G, other speeds can't be linked up.
-
-> 
-> There have been patches in the past that allow inband mode to be
-> queried from phylib, and this is another important component in
-> properly dealing with PHYs that need to use inband signalling with
-> Cisco SGMII, but do not support inband signalling when operating at
-> 2.5G speeds. The problem when operating at 2.5G speed is that the
-> base-X protocols are normally for use over fibre, which is the media,
-> and therefore the ethtool Autoneg bit should define whether inband
-> gets used or not. However, in the case of a PHY using 2500base-X,
-> the Autoneg bit continues to define whether autonegotiation should
-> be used on the media, and in this case it's the media side of the
-> PHY rather than the 2500base-X link.
-> 
-> So, when using a 2500base-X link to a PHY, we need to disregard the
-> Autoneg bit, but that then raises the question about how we should
-> configure it - and one solution to that would be to entire of phylib
-> what the PHY wants to do. Another is to somehow ask the PCS driver
-> whether it supports inband signalling at 2500base-X, and resolve
-> those capabilities.
-
-For the qca808x PHY, when it is linked in 2.5G, the autoneg is also
-disabled in PCS hardware, so the sgmii+ of qca808x PHY is almost
-same as 2500base-X.
-
-> 
-> That is my view where we need to get to in order to properly resolve
-> the ongoing issues about 2500base-X and PHYs that make use of that.
+> Hi Serge，
 > 
 
-Thanks Russell for the detail information about the SGMII and 2500BASE-X
-mode, it is really helpful.
+> Thanks for your comments and for pointing out the defects of the current FPE
+> handshaking implementation. I know that my patch cannot solve all the
+> defects of the current FPE handshaking. So, I want to know if it is necessary
+> that I continue submitting this patch if you want to refactor the FPE
+> handshaking further.
 
-For now, the issue is "the Supported link modes" of PHY is limited when
-the interface mode(such as sgmii) is used to setup PHYLINK, which leads
-to the PHY can't link in the speed(such as 2.5G) of the different
-interface mode(sgmii+).
+Your patch solves one of the issues the FPE code has. So please feel
+free to submit it.
 
+Regarding the FPE handshaking refactoring. I would have been glad to
+do that if I had an FPE-capable device (alas my DW XGMAC device is of
+v2.10a revision and couldn't have been even possibly equipped with
+FPE), otherwise providing a not properly debugged/tested patch(es) we
+may end up with just not working feature. In anyway it's not a reason
+for you to stop fixing some other issues in the implementation. I just
+noted that the current code has some other ones, which may bite the
+users very hard in very unexpected points.
+
+> Moreover, I want to add FPE handshaking support for DW
+> XGMAC (add fpe_send_mpacket() & fpe_irq_status() to dwxlgmac2_core.c) after
+> fixing this MAC_FPE_CTRL_STS register read issue.
+
+Why not. Got ahead please. We'll have it reviewed.
+
+-Serge(y)
+
+> 
+> -Jianheng
 
