@@ -1,114 +1,132 @@
-Return-Path: <netdev+bounces-50566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD8EC7F6229
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:58:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CA4D7F6236
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D94F6B21554
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:58:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5F8281B07
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DFA2FC27;
-	Thu, 23 Nov 2023 14:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4A033CD2;
+	Thu, 23 Nov 2023 15:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y/2HyafF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fMJ+MHbe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81903A4;
-	Thu, 23 Nov 2023 06:58:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kfGgqTUyQW3nytRqECKvTmNuGYaEc5iawnb0wTmFF4A=; b=Y/2HyafF1/CBVlx6o7AHGy62st
-	Gm9gu1nVAEutBUdDIjHMwfkLNLqbI1m1VHolp8rQW+6gOHdjpnNNuGyYCG8HuIBzE4tOLIju+dUfs
-	0WMLyF7NHK2zIwS60kgXpFYwVnCE6tvex1Kf1Sxx7/N19xriJ+1Ewj/Y6SQgBieBOK8c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r6B9S-0010J5-97; Thu, 23 Nov 2023 15:57:58 +0100
-Date: Thu, 23 Nov 2023 15:57:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Jie Luo <quic_luoj@quicinc.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
- <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
- <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
- <c697488a-d34c-4c98-b4c7-64aef2fe583f@lunn.ch>
- <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EECBD4A;
+	Thu, 23 Nov 2023 07:01:00 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2CB7BC0007;
+	Thu, 23 Nov 2023 15:00:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700751659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=67t1kQ5eApWl1dAvZGC/sSzZTqCDw1OnraYDpdtwPb0=;
+	b=fMJ+MHbePAqSLetgUTxkoWL/yRltcQ5W6pj/ZeyrU0uBwtrQhzeaOl4yuWR6rQ5akSd74C
+	MMUYTY6Z8qOcT3WD0p9rhAIMxkv1oAVx/8kmuLht5f7vmqn8xisgK51eESVTf718MKjwxh
+	oq5PLpJyTm8MmCPet+utW5pDbsW02M4vDZc0sEqKQUhWc90DQNA0qZt664kdp3J3T1T/fl
+	B9tCq9uGNkJtPSI1FYHRJlVYxWwvq12IFSKFZOa8cloJIgNIpYYTWsdS5qUglrja8lWLCq
+	d5htaDWLWfNdP7ZJk8zJQGkDYlKtVhemZ+T9MgaDdvzReQfr+GgxXDRAbnKkDg==
+Date: Thu, 23 Nov 2023 16:00:56 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231123160056.070f3311@kmaincent-XPS-13-7390>
+In-Reply-To: <20231122100142.338a2092@kernel.org>
+References: <20231120190023.ymog4yb2hcydhmua@skbuf>
+	<20231120115839.74ee5492@kernel.org>
+	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
+	<20231120133737.70dde657@kernel.org>
+	<20231120220549.cvsz2ni3wj7mcukh@skbuf>
+	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+	<20231121094354.635ee8cd@kernel.org>
+	<20231122144453.5eb0382f@kmaincent-XPS-13-7390>
+	<20231122140850.li2mvf6tpo3f2fhh@skbuf>
+	<20231122085000.79f2d14c@kernel.org>
+	<20231122165517.5cqqfor3zjqgyoow@skbuf>
+	<20231122100142.338a2092@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Nov 23, 2023 at 02:35:31PM +0000, Russell King (Oracle) wrote:
-> On Thu, Nov 23, 2023 at 03:27:05PM +0100, Andrew Lunn wrote:
-> > > Just to be more precise qca807x can operate in 3 different mode:
-> > > (this is controlled by the MODE_CFG bits)
-> > 
-> > > - QSGMII: 5 copper port
-> > 
-> > 4 slots over QSGMII, plus the second SERDES is connected to the MAC
-> > using SGMII/1000BaseX?
-> > 
-> > > - PSGMII: 5 copper port
-> > 
-> > 5 slots over QSGMII, the second SERDES is idle?
-> > 
-> > > - PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
-> > 
-> > 5 slots over QSGMII, with the second SERDES connected to an SFP cage.
-> > 
-> > Are ports 1-4 always connected to the P/Q SGMII. Its only port 5 which
-> > can use the second SERDES?
-> 
-> I think what would really help here is if there was an ascii table to
-> describe the configurations, rather than trying to put it into words.
+On Wed, 22 Nov 2023 10:01:42 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Yes.
+> On Wed, 22 Nov 2023 18:55:17 +0200 Vladimir Oltean wrote:
+> > > Well, ethtool has been the catch all for a lot of random things
+> > > for the longest time. The question is whether we want to extend
+> > > ETHTOOL_GET_TS_INFO or add a third API somewhere else. And if we
+> > > do - do we also duplicate the functionality of ETHTOOL_GET_TS_INFO
+> > > (i.e. getting capabilities)?
+> > >=20
+> > > My vote is that keeping it in ethtool is less bad than 3rd API.   =20
+> >=20
+> > With SIOCSHWTSTAMP also implemented by CAN (and presumably also by
+> > wireless in the future), I do wonder whether ethtool is the right place
+> > for the netlink conversion. =20
+>=20
+> ethtool currently provides the only way we have to configure ring
+> length, ring count, RSS, UDP tunnels etc.
+>=20
+> It's a matter of taste, IMO ethtool is a bit of a lost cause already
+> and keeping things together (ethtool already has TS_INFO) is cleaner
+> than spreading them around.
+>=20
+> > I wouldn't suggest duplicating ETHTOOL_GET_TS_INFO towards the netdev
+> > netlink family. =20
+>=20
+> FTR so far the netdev family is all about SW configuration. We should
+> probably keep it that way, so it doesn't become ginormous. It's easy
+> enough to create a new family, if needed.
 
-And also for ipq4019. We need to merge these two threads of
-conversation, since in the end they are probably the same driver, same
-device tree etc.
+So, do we have a consensus? Vlad, do you agree on putting all under ethtool?
 
-       Andrew
+ETHTOOL_GET_TS_INFO will be in charge of replacing the SIOCGHWSTAMP
+implementation. Need to add ETHTOOL_A_TSINFO_PHC_INDEX
+ETHTOOL_A_TSINFO_QUALIFIER to the request.
+
+ETHTOOL_GET_TS_INFO will list all the hwtstamp provider (aka "{phc_index,
+qualifier}") through the dumpit callback. I will add a filter to be able to
+list only the hwtstamp provider of one netdev.
+
+ETHTOOL_SET_TS_INFO will be in charge of replacing the SIOCSHWSTAMP
+implementation.
+
+Is that ok for you?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
