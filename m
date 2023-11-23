@@ -1,87 +1,132 @@
-Return-Path: <netdev+bounces-50511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7E17F5FA0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:00:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFCA7F5FB9
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:11:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ACA81C20FFA
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:00:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88B21F20EFF
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534AE24A05;
-	Thu, 23 Nov 2023 13:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B75324A08;
+	Thu, 23 Nov 2023 13:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUYio1Ao"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="k3WG98rb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3685A241F2
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 13:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E0FFC433C9;
-	Thu, 23 Nov 2023 13:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700744424;
-	bh=FIrOFNfKs9XEJ/yHdkAJmORn6V1oRynha/vBc4c79is=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YUYio1AoONSxVLrlpJo82m6FJRdBUaDHNuofLdcfV/oyvP2EaJ42/606m+3VQCCEz
-	 aRY4y6fKyiVTKmz0WstNU2CHrzNjIsdIj2laQXL0OWSwZr6v13SZL55Mo65brilV8U
-	 SZyagFW2fzpJX+jgvHVcpcMDecK5TkLkuA+dLw19QIlkMh4nG0T7nm8Tz/wi5zSj4Z
-	 +2LjamHE8ItrZVlaxVcklp8hQ9Oy3KHTTZQeldG9nWL/Kx7Da6iRiwsBTT+Q7di7/j
-	 8XFPCSIMpz2UtfcY5IBM2wby2fF0iMjWrb5nylWcQp7irqPUaDVjmmpCQ5WuHlNdUQ
-	 cNuN9RT6F1z8w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 770E2E00087;
-	Thu, 23 Nov 2023 13:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.27])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70CE0A1;
+	Thu, 23 Nov 2023 05:11:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=SirAb/jEBgE0qrD2TgpJrt8NLd9ku9glI9AfL5GoTu0=;
+	b=k3WG98rbUbwEasrQMMFPZf53UA2LR6/FQjctIhuVngLjcrP+oGLsAHT4ZCRCL/
+	6BNKe/ZvfqbKYuKCaQ7xSiZMEFFKUWqzvPKcJ0zx1ND5ilrd4sF/yboVJXrBpuHZ
+	DjAicfeDvoeCIJq7UBFKzAGr6wDpgV9P9zWDQ/NEcUG9Q=
+Received: from [172.23.69.7] (unknown [121.32.254.149])
+	by zwqz-smtp-mta-g4-0 (Coremail) with SMTP id _____wDXf9deSV9lRwv0Cw--.64556S2;
+	Thu, 23 Nov 2023 20:45:20 +0800 (CST)
+Message-ID: <7a1297c3-25d4-41d8-b421-ab1dda2973f2@126.com>
+Date: Thu, 23 Nov 2023 20:45:15 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] amd-xgbe: fixes to handle corner-cases
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170074442448.28364.11322550122492166195.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Nov 2023 13:00:24 +0000
-References: <20231121191435.4049995-1-Raju.Rangoju@amd.com>
-In-Reply-To: <20231121191435.4049995-1-Raju.Rangoju@amd.com>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Thomas.Lendacky@amd.com,
- Shyam-sundar.S-k@amd.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/mlx5e: Fix a race in command alloc flow
+To: Leon Romanovsky <leon@kernel.org>
+Cc: saeedm@nvidia.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jackm@dev.mellanox.co.il,
+ ogerlitz@mellanox.com, roland@purestorage.com, eli@mellanox.com,
+ dinghui@sangfor.com.cn, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231121115251.588436-1-lishifeng1992@126.com>
+ <20231122120245.GC4760@unreal>
+From: Shifeng Li <lishifeng1992@126.com>
+In-Reply-To: <20231122120245.GC4760@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_____wDXf9deSV9lRwv0Cw--.64556S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxGryfAF4xGr45WFy8CFW3KFg_yoWrGw1rpr
+	yfGr47AFn5GFnrtrn7Xr4jq3W8A39rK345GF1v9F1xWan8Aa4kZw1Ikr40g34UZ3yYqFyU
+	JayDKa48Jr43XaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jcmi_UUUUU=
+X-CM-SenderInfo: xolvxx5ihqwiqzzsqiyswou0bp/1tbi1wUxr153c4CXgAAAsB
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 22 Nov 2023 00:44:32 +0530 you wrote:
-> This series include bug fixes to amd-xgbe driver.
+On 2023/11/22 20:02, Leon Romanovsky wrote:
+> On Tue, Nov 21, 2023 at 03:52:51AM -0800, Shifeng Li wrote:
+>> Fix a cmd->ent use after free due to a race on command entry.
+>> Such race occurs when one of the commands releases its last refcount and
+>> frees its index and entry while another process running command flush
+>> flow takes refcount to this command entry. The process which handles
+>> commands flush may see this command as needed to be flushed if the other
+>> process allocated a ent->idx but didn't set ent to cmd->ent_arr in
+>> cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
+>> the spin lock.
+>>
+>> [70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+>> [70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
+>> [70013.081968]
+>> [70013.081989] CPU: 26 PID: 1433361 Comm: kworker/26:1 Kdump: loaded Tainted: G           OE     4.19.90-25.17.v2101.osc.sfc.6.10.0.0030.ky10.x86_64+debug #1
+>> [70013.082001] Hardware name: SANGFOR 65N32-US/ASERVER-G-2605, BIOS SSSS5203 08/19/2020
+>> [70013.082028] Workqueue: events aer_isr
+>> [70013.082053] Call Trace:
+>> [70013.082067]  dump_stack+0x8b/0xbb
+>> [70013.082086]  print_address_description+0x6a/0x270
+>> [70013.082102]  kasan_report+0x179/0x2c0
+>> [70013.082133]  ? mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+>> [70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+>> [70013.082213]  ? mlx5_cmd_use_polling+0x20/0x20 [mlx5_core]
+>> [70013.082223]  ? kmem_cache_free+0x1ad/0x1e0
+>> [70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
+>> [70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
+>> [70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
+>> [70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
+>> [70013.082390]  ? __pm_runtime_resume+0x58/0x70
+>> [70013.082409]  pci_device_remove+0xf3/0x280
+>> [70013.082426]  ? pcibios_free_irq+0x10/0x10
+>> [70013.082439]  device_release_driver_internal+0x1c3/0x470
+>> [70013.082453]  pci_stop_bus_device+0x109/0x160
+>> [70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
+>> [70013.082485]  pcie_do_fatal_recovery+0x167/0x550
+>> [70013.082493]  aer_isr+0x7d2/0x960
+>> [70013.082510]  ? aer_get_device_error_info+0x420/0x420
+>> [70013.082526]  ? __schedule+0x821/0x2040
+>> [70013.082536]  ? strscpy+0x85/0x180
+>> [70013.082543]  process_one_work+0x65f/0x12d0
+>> [70013.082556]  worker_thread+0x87/0xb50
+>> [70013.082563]  ? __kthread_parkme+0x82/0xf0
+>> [70013.082569]  ? process_one_work+0x12d0/0x12d0
+>> [70013.082571]  kthread+0x2e9/0x3a0
+>> [70013.082579]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+>> [70013.082592]  ret_from_fork+0x1f/0x40
 > 
-> Raju Rangoju (3):
->   amd-xgbe: handle corner-case during sfp hotplug
->   amd-xgbe: handle the corner-case during tx completion
->   amd-xgbe: propagate the correct speed and duplex status
+> I'm curious how did you get this error? I would expect to see some sort
+> of lock in upper level which prevents it.
 > 
-> [...]
+The logical relationship of this error is as follows:
 
-Here is the summary with links:
-  - [net,1/3] amd-xgbe: handle corner-case during sfp hotplug
-    https://git.kernel.org/netdev/net/c/676ec53844cb
-  - [net,2/3] amd-xgbe: handle the corner-case during tx completion
-    https://git.kernel.org/netdev/net/c/7121205d5330
-  - [net,3/3] amd-xgbe: propagate the correct speed and duplex status
-    https://git.kernel.org/netdev/net/c/7a2323ac24a5
+                   aer_recover_work                    |             ent->work
+------------------------------------------------------+---------------------------------
+aer_recover_work_func                                 |
+|- pcie_do_recovery                                   |
+   |- report_error_detected                            |
+     |- mlx5_pci_err_detected                          |cmd_work_handler
+       |- mlx5_enter_error_state                       |  |- cmd_alloc_index
+         |- enter_error_state                          |    |- lock cmd->alloc_lock
+           |- mlx5_cmd_flush                           |    |- clear_bit
+             |- mlx5_cmd_trigger_completions           |    |- unlock cmd->alloc_lock
+               |- lock cmd->alloc_lock                 |
+               |- vector = ~dev->cmd.vars.bitmask      |
+               |- for_each_set_bit                     |
+                 |- cmd_ent_get(cmd->ent_arr[i]) (UAF) |
+               |- unlock cmd->alloc_lock               |  |- cmd->ent_arr[ent->idx] = ent
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The cmd->ent_arr[ent->idx] assignment and the bit clearing are not protected by the cmd->alloc_lock in cmd_work_handler().
 
+> Thanks
 
 
