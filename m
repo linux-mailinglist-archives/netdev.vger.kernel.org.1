@@ -1,48 +1,47 @@
-Return-Path: <netdev+bounces-50365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB7C47F5739
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 05:04:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C42D7F5755
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 05:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BD30B21071
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:04:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5A51C20BE7
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB31AD45;
-	Thu, 23 Nov 2023 04:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F677B660;
+	Thu, 23 Nov 2023 04:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWK1r8kh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ob/WMaSz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086218C16;
-	Thu, 23 Nov 2023 04:04:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 282DAC433CB;
-	Thu, 23 Nov 2023 04:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5266BB658
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 04:10:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50803C433C7;
+	Thu, 23 Nov 2023 04:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700712268;
-	bh=KmxTa8bVp0SFdeKiJ3bvpxAg995JDczqNvga4SYbSWo=;
+	s=k20201202; t=1700712659;
+	bh=vEGs5HAbjF1IAM1gT6KyCx139kNtp9F8hRI7yxkVjjM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CWK1r8kh8zewWnlPSjyTYqxCXOjrG492jjJasW8HH+LiH2BwuJ3cKJuOnFmfORvdb
-	 Bk+rD1TfYwoZDtM76N0tdNhceFfAnA4guuvM+NakVWb1OQ3wXcctHJnmyj5VZDDfC3
-	 vCC1CNM4LZvTKpgxnAKrMw1UVieLbxe6OoWsQwzjxwDEHvd2Z96AvJdQY0TlO/bnT/
-	 EoGk6Yingh+qkilpGD5eaUQXP1qK7qPx2NegTe2t6D+X/0x6rXK/3OR45fIJp3p/l3
-	 9Mm8rcZFKmoxYhBkRsFEvNSYsU3c9Pxn/uffceJLfG+hkIbia1p1h+UrnfMQb1gw30
-	 zU37POF3C+gvA==
-Date: Wed, 22 Nov 2023 20:04:26 -0800
+	b=ob/WMaSz5Puzesg6kIs0WCLO0Ey5+KAdsoLiBDcp/oMg2ahAG2r/ibJLtOD+W6iJn
+	 n279jAkbaKCxO5BeXXxQQoabBZg652kQ0j4V73Oouz36u2S9z95o5EpwRHKuh22gOQ
+	 F5ItVw5kQEhfxeDVdsI1aDUsSp4x1kurKleSiJt1vKL0gcK1tjyBm/KzEwX4/SlxQQ
+	 NU0aKWXCX0iZj04V+SLPfREzoJj5FEs7Nb4fQo8mJK9+NUq7hevNJBNpwvdJhZ2bfF
+	 hPPBHqNAA84FNqbubT3znkYm6kD5VpoYgU0vToxP11vB05s80+kJ71L5WvpGJNdkXu
+	 /HvGmk+0tNhUw==
+Date: Wed, 22 Nov 2023 20:10:58 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build warning after merge of the net-next tree
-Message-ID: <20231122200426.390e0068@kernel.org>
-In-Reply-To: <20231123134545.3ce67bd4@canb.auug.org.au>
-References: <20231123134545.3ce67bd4@canb.auug.org.au>
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: richardcochran@gmail.com, reibax@gmail.com, davem@davemloft.net,
+ rrameshbabu@nvidia.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, maheshb@google.com
+Subject: Re: [PATCH v1] ptp: add PTP_MULTI_CLOCK_GET ioctl
+Message-ID: <20231122201058.0bfb07a9@kernel.org>
+In-Reply-To: <20231122074352.473943-1-maimon.sagi@gmail.com>
+References: <20231122074352.473943-1-maimon.sagi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,10 +51,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 23 Nov 2023 13:45:45 +1100 Stephen Rothwell wrote:
-> include/net/page_pool/types.h:73: warning: Function parameter or member 'STRUCT_GROUP(' not described in 'page_pool_params'
+On Wed, 22 Nov 2023 09:43:52 +0200 Sagi Maimon wrote:
+>         Some user space applications need to read some clocks.
+>         Each read requires moving from user space to kernel space.
+>         This asymmetry causes the measured offset to have a significant error.
 
-Yes, sorry, the script is confused when group contains only private
-fields. I'll add a public field there any day now (tm) so the warning
-will go away.
+Please CC maheshb@google.com on v2, he was doing something similar
+recently.
 
