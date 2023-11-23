@@ -1,133 +1,199 @@
-Return-Path: <netdev+bounces-50579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59E57F62B5
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:26:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEC47F62C1
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:27:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A01F8280D5C
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:26:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83FB3282005
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C753418D;
-	Thu, 23 Nov 2023 15:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03983B7A8;
+	Thu, 23 Nov 2023 15:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="xTBTLhos"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Up30EPfm"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CA4B2;
-	Thu, 23 Nov 2023 07:26:36 -0800 (PST)
-Received: from [192.168.1.107] (89-186-112-232.pool.digikabel.hu [89.186.112.232])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: hs@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id D2CCF87640;
-	Thu, 23 Nov 2023 16:26:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1700753194;
-	bh=tADxMhqmym43UtaltuF6ideItA5aCnkrDR4RpjiaUqs=;
-	h=Reply-To:Subject:To:Cc:References:From:Date:In-Reply-To:From;
-	b=xTBTLhosRSikzas9acB1UsbUoffinOBIu3tEnayeLY8j5J/RCVCfVRWTlrC7x6y7I
-	 dsV8R7Pv44VIu7LzF0R+ZDA2+yU0w/P2kV0PJLXu/aVCOKmNp6yfZVyV8Ruj2SiIr7
-	 bAAEQdwOK84GIHehfKt3tT7zX/YVax9ztrJgNAjBF+U99HfR8WQE4yjiWVhuosl5Dx
-	 cUBdEizLTWGMCfA1OwayXaoGmy/3P/bP4RRRjRVL7MdTfYgVvfM0isGAdguR2fDNtJ
-	 NNFEkhm0BxXTR0cPPx/H67C8Rnj2U1X291r9hTElzzPbg9E3Km3RUJ0ghKcINDVMWN
-	 1AR3LHSZRKUXQ==
-Reply-To: hs@denx.de
-Subject: Re: [PATCH] net: fec: fix probing of fec1 when fec0 is not probed yet
-To: Alexander Stein <alexander.stein@ew.tq-group.com>,
- netdev@vger.kernel.org, Heiko Schocher <heiko.schocher@gmail.com>
-Cc: Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
- Paolo Abeni <pabeni@redhat.com>, Shenwei Wang <shenwei.wang@nxp.com>,
- Wei Fang <wei.fang@nxp.com>, linux-kernel@vger.kernel.org
-References: <20231123132744.62519-1-hs@denx.de> <5992842.lOV4Wx5bFT@steina-w>
-From: Heiko Schocher <hs@denx.de>
-Message-ID: <1af63dea-e333-cef7-2bc6-bbf4eb8c3881@denx.de>
-Date: Thu, 23 Nov 2023 16:26:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A552D64
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 07:26:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700753216;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pe3U116kfqunsSSVD3+8u5zgquNIc0fr2DO0KLfE54Y=;
+	b=Up30EPfmyR+uHXklSqnRhHzzsMVLFNQKEoTBwS6WBThWHRYA5uhuSW1ClkhPfPz7LGtZIk
+	K7uXDrFytyMkMr4Tiahc+K1cFxThx7TfDfL2zESptdKA0YhgwbdfgjMqWdDeBcTckd2s80
+	sk/9uZ3b0qZaMoxvGNA1uJozSPyp3Ds=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-42-spX8wAeVOW62hWXKCL1IdA-1; Thu, 23 Nov 2023 10:26:54 -0500
+X-MC-Unique: spX8wAeVOW62hWXKCL1IdA-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5488320afd1so649249a12.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 07:26:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700753213; x=1701358013;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pe3U116kfqunsSSVD3+8u5zgquNIc0fr2DO0KLfE54Y=;
+        b=S7HZQrfSLFx1aCRYPBb3BGasUILHSQll1jEncA/2ehP+jtOFBNLTEWYEvuFr78/1hX
+         xt7zKfAKuC6gxIX7UuTKUV3eVEQTgf8qYSzyausBxSxRodAHZ4R69zNPBBToXtOhg6W6
+         gLf4GvYgj8eOolwMG9BpD5aWLb9GQbxNxO94HsHZpwxIJOUqY1dDf9c/IxRUqLTMW+6d
+         OAzw4pmKIRgzdbrZZLvhZ/ql2VWhId24qiOmm9UnQiyEgzj70QhEeMs4BWh6iwn8U5Sn
+         eLdLUCCoKe6cYiov6nZB3HMv3VLHAR6GWJTHkuCdWwHTuaEe2L9ym3HhDlgw13E1AVRh
+         Mepg==
+X-Gm-Message-State: AOJu0Yzyi6sSf6qDRNeT0hDGLErhlwlpkGjFQLKea3hzHRNVzSBl/tJL
+	HJx5g0fJYpN1y1xIm7IIOHRCfBDMfEUU9T5qzvzhmwsh3gMu05hXVUd81/l+UWqFjDCV8t/l9EF
+	lW6mkgWTSIp/C/62jMQJTCO5DeK7+GNgZ
+X-Received: by 2002:a17:906:4c5a:b0:9be:562:a44a with SMTP id d26-20020a1709064c5a00b009be0562a44amr4025705ejw.23.1700753213748;
+        Thu, 23 Nov 2023 07:26:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESWkeUpthJ4n6g6LPyHSwfiRnVe6XhFNJTC8y16GEyQ/V3bVT/zbkm84BuwBFLEENZ6gD1GmtY+S2S//H+LXU=
+X-Received: by 2002:a17:906:4c5a:b0:9be:562:a44a with SMTP id
+ d26-20020a1709064c5a00b009be0562a44amr4025695ejw.23.1700753213479; Thu, 23
+ Nov 2023 07:26:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5992842.lOV4Wx5bFT@steina-w>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <20231115210509.481514-3-vschneid@redhat.com> <202311202323.8c66ae1c-oliver.sang@intel.com>
+In-Reply-To: <202311202323.8c66ae1c-oliver.sang@intel.com>
+From: Valentin Schneider <vschneid@redhat.com>
+Date: Thu, 23 Nov 2023 16:26:41 +0100
+Message-ID: <CAD235PTGhmZNOiS5U1_4tCzjiZY9vp89gmSOLwR7JSnjF9ZUkg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] tcp/dcpp: Don't disable bh around timewait_sock initialization
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, dccp@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-users@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Tomas Glozar <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Alexander,
+On Mon, 20 Nov 2023 at 16:24, kernel test robot <oliver.sang@intel.com> wro=
+te:
+>
+>
+>
+> Hello,
+>
+> kernel test robot noticed "WARNING:inconsistent_lock_state" on:
+>
+> commit: 0258784e371906dfa1419556dcb7905333039f34 ("[PATCH v2 2/2] tcp/dcp=
+p: Don't disable bh around timewait_sock initialization")
+> url: https://github.com/intel-lab-lkp/linux/commits/Valentin-Schneider/tc=
+p-dcpp-Un-pin-tw_timer/20231116-053100
+> base: https://git.kernel.org/cgit/linux/kernel/git/davem/net.git 674e3180=
+89468ece99aef4796eaef7add57f36b2
+> patch link: https://lore.kernel.org/all/20231115210509.481514-3-vschneid@=
+redhat.com/
+> patch subject: [PATCH v2 2/2] tcp/dcpp: Don't disable bh around timewait_=
+sock initialization
+>
+> in testcase: boot
+>
+> compiler: gcc-12
+> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 1=
+6G
+>
+> (please refer to attached dmesg/kmsg for entire log/backtrace)
+>
+>
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <oliver.sang@intel.com>
+> | Closes: https://lore.kernel.org/oe-lkp/202311202323.8c66ae1c-oliver.san=
+g@intel.com
+>
+>
+>
+> [   53.969777][    C0]
+> [   53.970087][    C0] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [   53.970532][    C0] WARNING: inconsistent lock state
+> [   53.970976][    C0] 6.6.0-15915-g0258784e3719 #1 Tainted: G        W  =
+      N
+> [   53.971566][    C0] --------------------------------
+> [   53.972004][    C0] inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usag=
+e.
+> [   53.972562][    C0] kallsyms_test/97 [HC0[0]:SC1[1]:HE1:SE0] takes:
+> [ 53.973095][ C0] ffffc90000281348 (&tcp_hashinfo.bhash[i].lock){+.?.}-{2=
+:2}, at: inet_twsk_hashdance (include/linux/spinlock.h:351 net/ipv4/inet_ti=
+mewait_sock.c:132)
+> [   53.973952][    C0] {SOFTIRQ-ON-W} state was registered at:
+> [ 53.974434][ C0] __lock_acquire (kernel/locking/lockdep.c:5090)
+> [ 53.974857][ C0] lock_acquire (kernel/locking/lockdep.c:467 kernel/locki=
+ng/lockdep.c:5755 kernel/locking/lockdep.c:5718)
+> [ 53.975264][ C0] _raw_spin_lock (include/linux/spinlock_api_smp.h:134 ke=
+rnel/locking/spinlock.c:154)
+> [ 53.975673][ C0] inet_twsk_hashdance (include/linux/spinlock.h:351 net/i=
+pv4/inet_timewait_sock.c:132)
+> [ 53.976122][ C0] tcp_time_wait (include/net/inet_timewait_sock.h:108 net=
+/ipv4/tcp_minisocks.c:343)
+> [ 53.976533][ C0] tcp_fin (net/ipv4/tcp_input.c:4508)
+> [ 53.976911][ C0] tcp_data_queue (net/ipv4/tcp_input.c:5188)
+> [ 53.977336][ C0] tcp_rcv_state_process (net/ipv4/tcp_input.c:6850)
+> [ 53.977802][ C0] tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
+> [ 53.978216][ C0] __release_sock (net/core/sock.c:2970)
+> [ 53.978634][ C0] __tcp_close (net/ipv4/tcp.c:2847)
+> [ 53.979035][ C0] tcp_close (net/ipv4/tcp.c:2922)
+> [ 53.979413][ C0] inet_release (net/ipv4/af_inet.c:434)
+> [ 53.979817][ C0] __sock_release (net/socket.c:660)
+> [ 53.980229][ C0] sock_close (net/socket.c:1421)
+> [ 53.980610][ C0] __fput (fs/file_table.c:394)
+> [ 53.980986][ C0] task_work_run (kernel/task_work.c:182 (discriminator 1)=
+)
+> [ 53.981401][ C0] do_exit (kernel/exit.c:872)
+> [ 53.981777][ C0] do_group_exit (kernel/exit.c:1002)
 
-On 23.11.23 16:11, Alexander Stein wrote:
-> Hello Heiko,
-> 
-> Am Donnerstag, 23. November 2023, 14:27:43 CET schrieb Heiko Schocher:
->> it is possible that fec1 is probed before fec0. On SoCs
->> with FEC_QUIRK_SINGLE_MDIO set (which means fec1 uses mii
->> from fec0) init of mii fails for fec1 when fec0 is not yet
->> probed, as fec0 setups mii bus. In this case fec_enet_mii_init
->> for fec1 returns with -ENODEV, and so fec1 never comes up.
->>
->> Return here with -EPROBE_DEFER so interface gets later
->> probed again.
->>
->> Found this on imx8qxp based board, using 2 ethernet interfaces,
->> and from time to time, fec1 interface came not up.
-> 
-> But FEC_QUIRK_SINGLE_MDIO is only set for imx28. How is this related to 
-> imx8qxp?
+> [   53.984034][    C0] irq event stamp: 95812558
+> [ 53.984434][ C0] hardirqs last enabled at (95812558): _raw_spin_unlock_i=
+rqrestore (arch/x86/include/asm/irqflags.h:26 arch/x86/include/asm/irqflags=
+.h:67 arch/x86/include/asm/irqflags.h:127 include/linux/spinlock_api_smp.h:=
+151 kernel/locking/spinlock.c:194)
+> [ 53.985302][ C0] hardirqs last disabled at (95812557): _raw_spin_lock_ir=
+qsave (include/linux/spinlock_api_smp.h:108 kernel/locking/spinlock.c:162)
+> [ 53.986123][ C0] softirqs last enabled at (95812510): __do_softirq (arch=
+/x86/include/asm/preempt.h:27 kernel/softirq.c:400 kernel/softirq.c:582)
+> [ 53.986900][ C0] softirqs last disabled at (95812513): irq_exit_rcu (ker=
+nel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:622 kernel/softirq.=
+c:644)
+> [   53.987664][    C0]
+> [   53.987664][    C0] other info that might help us debug this:
+> [   53.988335][    C0]  Possible unsafe locking scenario:
+> [   53.988335][    C0]
+> [   53.988971][    C0]        CPU0
+> [   53.989291][    C0]        ----
+> [   53.989611][    C0]   lock(&tcp_hashinfo.bhash[i].lock);
+> [   53.990076][    C0]   <Interrupt>
+> [   53.990404][    C0]     lock(&tcp_hashinfo.bhash[i].lock);
+> [   53.990883][    C0]
+> [   53.990883][    C0]  *** DEADLOCK ***
+> [   53.990883][    C0]
+> [   53.991593][    C0] 3 locks held by kallsyms_test/97:
+> [ 53.992048][ C0] #0: ffffffff87560480 (rcu_read_lock){....}-{1:2}, at: n=
+etif_receive_skb_list_internal (include/linux/rcupdate.h:301 include/linux/=
+rcupdate.h:747 net/core/dev.c:5748)
+> [ 53.992919][ C0] #1: ffffffff87560480 (rcu_read_lock){....}-{1:2}, at: i=
+p_local_deliver_finish+0x1d3/0x410
+> [ 53.993815][ C0] #2: ffff88816d626cb0 (slock-AF_INET/1){+.-.}-{2:2}, at:=
+ tcp_v4_rcv (include/linux/skbuff.h:1609 include/net/tcp.h:2458 net/ipv4/tc=
+p_ipv4.c:2326)
 
-Ah, yes ... customer uses NXP based kernel there is:
+So this looks like we do rely on disabling BH in the hashdance, not
+only for the timer but also for the
+  spin_lock(&bhead2->lock);
+which needs to be softirq-safe.
 
-        /* board only enable one mii bus in default */
-        if (!of_get_property(np, "fsl,mii-exclusive", NULL))
-                fep->quirks |= FEC_QUIRK_SINGLE_MDIO;
-
-which is missing in mainline... nevertheless patch fixes a problem
-with boards having quirk FEC_QUIRK_SINGLE_MDIO set.
-
-> Will this also help for imx6ul when fec1 is almost always probed before fec0 
-> due to order of DT nodes?
-
-Yep, I think so...  do you have the chance to test such a setup?
-
-bye,
-Heiko
-> 
-> Best regards,
-> Alexander
-> 
->> Signed-off-by: Heiko Schocher <hs@denx.de>
->> ---
->>
->>  drivers/net/ethernet/freescale/fec_main.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/freescale/fec_main.c
->> b/drivers/net/ethernet/freescale/fec_main.c index
->> c3b7694a7485..d956f95e7a65 100644
->> --- a/drivers/net/ethernet/freescale/fec_main.c
->> +++ b/drivers/net/ethernet/freescale/fec_main.c
->> @@ -2445,7 +2445,7 @@ static int fec_enet_mii_init(struct platform_device
->> *pdev) mii_cnt++;
->>  			return 0;
->>  		}
->> -		return -ENOENT;
->> +		return -EPROBE_DEFER;
->>  	}
->>
->>  	bus_freq = 2500000; /* 2.5MHz by default */
-> 
-> 
-
--- 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: +49-8142-66989-52   Fax: +49-8142-66989-80   Email: hs@denx.de
 
