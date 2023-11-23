@@ -1,112 +1,245 @@
-Return-Path: <netdev+bounces-50436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231F17F5CEE
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:53:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF087F5CF8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:54:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCC7B1F20EF3
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76968281997
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC8B224F2;
-	Thu, 23 Nov 2023 10:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840E1225A1;
+	Thu, 23 Nov 2023 10:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHIU/lqr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cPMo73+Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85A5D48
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 02:53:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700736782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IXLK87Gcm11x8erF5WfjVLPG8Viyp7jopv776YPzK/A=;
-	b=WHIU/lqrDN2uFO5p8VJrsvGmoJssalBrowd3SDpGfmqXHvIKiJtkf6G3BrnoF6A77iHXVJ
-	7lWuQ04qJWBKsExSr29BfXOjWROftee4X96HP5cRvCQlO0cPi0d/5PcjuzPWMZts7Np7qP
-	hGPMmOxfqeE9bjLDJtNlb1oYyuj59MU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-S0R4WoTlNAW2IiqvrewWYQ-1; Thu, 23 Nov 2023 05:53:01 -0500
-X-MC-Unique: S0R4WoTlNAW2IiqvrewWYQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a043b44aec3so12989766b.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 02:53:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700736780; x=1701341580;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IXLK87Gcm11x8erF5WfjVLPG8Viyp7jopv776YPzK/A=;
-        b=Fjb4yl1QtSkhQvuTA40fbkNzMLbT/mQLAwGyasUZDZofun2xhci71sEn5SGzXtZDAr
-         uqep5Q/4BNv4zOp4+Ju0o3Wp79/6nFwIX3qBFgeTA/ubsx55WBWq8ZoOrG9M6gVhglgn
-         2eYrk5Av7jFaN1j4MtcJpKmGfrMMgBn/4Y9gTTy/fTGL/wPe+WqenLOAO6VgzkQI9J0m
-         Nwwte3MfL5PJ4UU0wAPbYQMliXGQ5MVgFDXSDE6XjLh9JGQZ+1CvG2ievR6IdGbVRs/o
-         T/zKp1npyd3xOQdRT7lvN+UUmQVlRhJL2V2B5SG9CChM9JXjIhUR7n1jqRX5kfaryc0g
-         GpCw==
-X-Gm-Message-State: AOJu0YxqYW/ecThCoUVvYBTK9p2+F+2n0/7hCqBul/+Mfu+Dopa/20Zp
-	QZ1okzsCoLwzSjbFJEyVgmakkC77xYcjms7qQAS/TgxeM6mpBZVfyKxJLmOSropmlNSluX+C118
-	ybs4EA2YLmKO10meC
-X-Received: by 2002:a05:6402:2903:b0:542:1ba5:68a4 with SMTP id ee3-20020a056402290300b005421ba568a4mr3475973edb.1.1700736779876;
-        Thu, 23 Nov 2023 02:52:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IERO/BGFULCn5Fi994nJ7tXuKoWwNihWZNkcH2ht0W/yvXlyDrzAOT0VxqvY3IMW2y+Rxph7A==
-X-Received: by 2002:a05:6402:2903:b0:542:1ba5:68a4 with SMTP id ee3-20020a056402290300b005421ba568a4mr3475958edb.1.1700736779528;
-        Thu, 23 Nov 2023 02:52:59 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-213.dyn.eolo.it. [146.241.241.213])
-        by smtp.gmail.com with ESMTPSA id k7-20020aa7c047000000b0053de19620b9sm511862edo.2.2023.11.23.02.52.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 02:52:59 -0800 (PST)
-Message-ID: <35045f6ef6a5b274063186c065a8215088b94cd5.camel@redhat.com>
-Subject: Re: [PATCH net-next v1 3/3] net: dsa: microchip: Fix PHY loopback
- configuration for KSZ8794 and KSZ8873
-From: Paolo Abeni <pabeni@redhat.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Jakub
- Kicinski <kuba@kernel.org>, Vladimir Oltean <olteanv@gmail.com>, Woojung
- Huh <woojung.huh@microchip.com>, Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org,  UNGLinuxDriver@microchip.com
-Date: Thu, 23 Nov 2023 11:52:57 +0100
-In-Reply-To: <20231121152426.4188456-3-o.rempel@pengutronix.de>
-References: <20231121152426.4188456-1-o.rempel@pengutronix.de>
-	 <20231121152426.4188456-3-o.rempel@pengutronix.de>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0301D44;
+	Thu, 23 Nov 2023 02:54:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700736845; x=1732272845;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nqMfxzdliDnLfs7aSBYfos4/lvab557epVfPxgNdm2E=;
+  b=cPMo73+Q6ubnksJhHN7bdgecUvNYybWhauSLMv4uh11Jg9lDdyhrti9N
+   jxRVxUn9Y8VsDYCbW0nWBVY2MSRl0HY2Lyti193qcX8Q2u/GKIIal+iL8
+   kVI/7nmDeTPA4lBGIHCHK+LfwccxfLdCOosLRm1fNjzDtwJxv9afmbj1h
+   THimyNQ6pKOrBdJd0itRdkmIwtFR5cFhZqMb+M8SsU5cm4sMRjN9BUPTX
+   1H8Qs5fjv5k2MHVJ5NUWQcjIqrSe/8TiwSoBi5kSo/bF1nWJTUff2pHRm
+   4ZfKNoEjwXB7KpatyfbC11uUV/JtnJyWr4XJd/shpAKGcLNrJYUuGCrNH
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="371599203"
+X-IronPort-AV: E=Sophos;i="6.04,221,1695711600"; 
+   d="scan'208";a="371599203"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 02:54:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="884944829"
+X-IronPort-AV: E=Sophos;i="6.04,221,1695711600"; 
+   d="scan'208";a="884944829"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Nov 2023 02:54:05 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 23 Nov 2023 02:54:04 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 23 Nov 2023 02:54:04 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 23 Nov 2023 02:54:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i18NQhhMWebSFDS4H9DSursib1IGqcZ4KirK2aIAQBt/Fu4c/p01ZJ8LfejBm27byiBHgz3pCgmb3iXOt7s49Sqmiy4842zkTR9sUiVjv+9uvRjE1B2eCNR4eDhFZ0AhCk3KXqaIO90yrUtEaueD1DQHQrip4Aa0K3xS1Ydr8Wa6A2jSC+zQJpxWfsXJ0kA78wa029a9f0PoFZ3nKCp0jUA0574VsbVYImPiu9LZTpfqdP49R1/MBCf2PllHY39znzOynz/fhnw4aGlGpc6fEMQU/MAlPpfl501IrC7sIvgPZjt+SQ97jmz8lW2lZR7BbJgQr6VUMStEKKhJzkbtgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=31Tp837vIHB9RaAcgDUCA7YnZisp2NceZQ6UB4yaElA=;
+ b=cDJ6987LfAm/ju9EWRuR4cbPhHd4DlATfmOmvoHB9iJkB97FoWVUPr42VDoBe90EQS2gnhwKW+xt0xafcKruI3cGjrqhFWdg4e5kX4ZB7BmbUimX1ZDVVxipilGPCTGvZnwBwAn7cC7G77AhvlSUxArcTJdIXmZAHQfSmlJebDZJfj/uLrgh3LWbMV81rIveb6qrWq5D7C4Iv7sE1BqaYSePaUozSvjQk1yKAtHQCUFIyZ5OI0TSkLvq45NNkH4Bbmu/syOGNpzQgR3/5OM5pC9g6yl1KB7mXAWPXCdVw+10887y49pSzUwLCTwiPCoBbDvEuRXYtg2+oPvXEhB0Dg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by SA2PR11MB5019.namprd11.prod.outlook.com (2603:10b6:806:f8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.20; Thu, 23 Nov
+ 2023 10:54:01 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.7025.019; Thu, 23 Nov 2023
+ 10:54:01 +0000
+Message-ID: <b84db4ac-eaa9-4fc8-9ce6-00da03ab711f@intel.com>
+Date: Thu, 23 Nov 2023 11:53:55 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH 3/5] octeontx2-af: Fix mcs stats register address
+Content-Language: en-US
+To: Geetha sowjanya <gakula@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <sgoutham@marvell.com>, <sbhatta@marvell.com>,
+	<hkelam@marvell.com>
+References: <20231123055941.19430-1-gakula@marvell.com>
+ <20231123055941.19430-4-gakula@marvell.com>
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20231123055941.19430-4-gakula@marvell.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0055.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cc::12) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SA2PR11MB5019:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ad8f5ba-9283-4a3d-c227-08dbec128045
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3lQ6PUwR+hseDusBnU+zqa+0mCNt76NbMzhvSvoskPeeOCudGr02dOyvIjJ4t3xhQVtdY9yicE+DuXm/kf9/zEGFEK0EHhjkDqTCd3SrgazV9laATlRS0RGE1Vp7dnuqn19SLvgzaCnqCwvWiR+KydEgn3uv15XWBglHWj9UXokrT4dch5wr95BIv8pbbJhh9p2N/EpRWMTFKF25XXNSwELPkZ6tKx/xMHpINT4UxdV2eXR+8UerAuT0UaTYHxTN4B8yH09eP+2DBSNAo+f8lIqSWlFTe0xmTz5mvNgDWMpKc8wSEYXBA41j33Hfc40sQ5gwHhmwgL/jYuQstnRq8Va3WJ1Je3yQR75pGGq5Rz188BdGEwJnaeLhlvqb4WQPt7tpyRFoDLkh+BSSXAoapn4DGle8fihoxsPC2jYPP+QsDmxzNtdbVjSnFGSS5r2XAZiRY0jNtUV7CEuA3s5VdZLiknH1/N4XD8w9PUWw7pyCQ5gX2mKibyqvGS/KSsfGNWKnwqPP0k510DQhCPctgH7X3ghQRxSz/FTsheyWzbFQFIG3SklnrHVS/7OyFv54/hJ3vctUldbSIWKZ1Xn9ZJ0uz7BvmbaybmbEcnhmZKpRGoKEqQBguNpNGc7k8TiCgIfkQ4EK9ujBz9kQW6cbfQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(396003)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(5660300002)(53546011)(7416002)(6666004)(2906002)(6506007)(6486002)(478600001)(4326008)(8676002)(8936002)(44832011)(31696002)(66476007)(66556008)(66946007)(316002)(86362001)(41300700001)(83380400001)(26005)(82960400001)(38100700002)(36756003)(31686004)(2616005)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cHdIZ1F1UFFmMFQ2ekJXdk91cVlvUytoajFEZTYweE1Ma0FYOGxTUjc5bkRp?=
+ =?utf-8?B?b2h2dFcyYnJXdEkxbFN4bm1GeTYvVHp2VE1Gc252TXN5RVlVSGJOd0lndXlI?=
+ =?utf-8?B?YmRoM2JDa3dIN25QTWlCbzhtVXJ3Q0hvVGFRcGdaWWc4ODRIMlpTYUFWOFYy?=
+ =?utf-8?B?UU5sT09IOXQ2NDVkeHlTaDA0MFBGK0F4SngxQXdmUHVob0ozWDNJWVB5RGdH?=
+ =?utf-8?B?N0RzN1o5N05xdUU4YTBMeXdQNW5FVmtHSmxlbjhyVHEzQW92MUplWU5PZm42?=
+ =?utf-8?B?NGZLY09oQnltQ0tpRUhnVEZWU2hobVJwZHJSL0NyaGhVWExBMk1RWGNldXZM?=
+ =?utf-8?B?aXpjTExSNzk2RmpvUHJKOERGdEVLU01KVXJuNUdESng2Q1RmWE5zcjZWbnJu?=
+ =?utf-8?B?RmQ1WlROd0o2b1RrWE1heGRvdE1tV0loWVFvMTEwalA2Ukl0RTJkTGdNUXEv?=
+ =?utf-8?B?SmpocGF0dGNCZDU5Yk5lMlFCUmRDa3Z2OWcxc2VWeHlnT0VJd2NqWWRHbWRF?=
+ =?utf-8?B?WXRaSVd4aTJhc3RXYTgveG5rZ2pWZUZrVWV1MnllWjQvOWtjTDllR2Vnc3JO?=
+ =?utf-8?B?elM4U3VZNm1MRnEwNDMxQjg4ZDhZbmpEa09YRktoUXZYeHhycDRaZHVCYi9r?=
+ =?utf-8?B?M1F3Slc1aVlzNjZOem5zOGdDa1FHVzdtRkh6NVY1OGJkTXBneDFmZ2MvOVdS?=
+ =?utf-8?B?ZHdsMC9qQm10T3YrUkVMdHFvYVBJZkF5dWxVdmRwSHJ6eGNzVlhyNzZtWG9C?=
+ =?utf-8?B?ZFdGMndWcWJJZ3BLbVVhYWdYekVjMGMwc2ZYUElaUHdjcGw3QWpIYmVFbW9O?=
+ =?utf-8?B?VGN0aVIvSXdKL0pQS0Z1ZnZuVnc2WkZuWnhPWFlsRklGVUhnT1hpenpTOEx3?=
+ =?utf-8?B?QTJOTFdRRU8zcE41OGs1Q1hBSHRnZklFSmFtOFQ5a2pISjNrR1V2aDBUTEFs?=
+ =?utf-8?B?alJFS1EvN1Y2Z2pIRWdDYWgxVkczeEV1OFB6VmZxb0pKQkVPVSs3QjNJUC9p?=
+ =?utf-8?B?NERWVlFKTlZFdGhZT0lNeTVqck1yY25CK1RJeEdoMnRaVHJpNUh1VlcyTDVM?=
+ =?utf-8?B?bG5uTDJDcnVXOGIyRllvOCs5Q3BCQ1VIOG9iWlhnOFl4cmFBQmR0RmhWTjIv?=
+ =?utf-8?B?NS80VEN6WEFEQ2tkaU40L3Nqd0RZbjlyWmUva3VHbEp6c1JjRWpKdGQ0V1Bx?=
+ =?utf-8?B?ZGF0NS9rZGNGRmt5Wmc4bzNJVWJ2WFFEZS96SkR0SkI3MVAxL2E5dEg1VFIr?=
+ =?utf-8?B?NStBNnNKdTRVL3hVaGFtVzJ4VVVLbThLbU9hRWJpM2xpYmFyemZ4TzEvN0ow?=
+ =?utf-8?B?WGZjdGxmTVlpMkZMYjFjdUVITm5ER1owTjNDQ2ZDUVdoU1RqNmpONTVqR1Vh?=
+ =?utf-8?B?aUk3K0N0akd0M0pWUWpyWXJxK2swNWpYdVRmbVRWL0Vac0RvN1Jhd3c0aDgw?=
+ =?utf-8?B?bW5XcFlwRUNpcGh5Z0VPZVNxS0U5QUFNRmhPWWZ5SWdyYzNvbjBRR0NGNjVM?=
+ =?utf-8?B?Vk05YnNLbEFNbHd4aGVyZEZxMElVbkZKbjd5TVg0ZDgrUEY4dGt4MTVrYm1P?=
+ =?utf-8?B?NHZjQzNlQkY5dE5OUERaVlB4am5rNFN5UjJzNFB4bFdnTmNHSUFnVHdUbmsy?=
+ =?utf-8?B?dFFjTGllSktsS3AzYTBXL1htelRXNWtZNVg3M1Bmd1NEUXhDWUdrc3ZsNTcw?=
+ =?utf-8?B?dzY2QXh2TEZsYkFzQUprTkdLU1M4RlFTblkyRnc5SndyMitvMTdCMStlZndW?=
+ =?utf-8?B?SWZ2dzF4RzlkcXhaQkpGakhycnpvcTFZeU5FNURIYnhOL29GeDhFMUE2MGZ3?=
+ =?utf-8?B?ZUppbWE2SFJUNFB4UmRsT2pmNEsrb3hGb1FRdmFWS3FOZERJZmx6NmJvODhV?=
+ =?utf-8?B?eVl3NDJFZW9ienh3eFhGSXovR0FTNkl4V056UzZVbFE5WThBWEhJTWIyd1dH?=
+ =?utf-8?B?a0RCTkpmMUFaNGN4WlNUditiaFNaUEliaTJlRFdlRmZVeTNPQzVzMTBsTjAv?=
+ =?utf-8?B?VWlGOVo0UlFFczQ2UTBqWVpIR3hYT2VVT3NteTlvZmtjaDVzYU02T0xHNVRa?=
+ =?utf-8?B?VzQ3bVhEYmNjVnlQaHVRUVhMNkdHdUJTQ1ZCM21wcGxENEZraHE2Z1FpcUNM?=
+ =?utf-8?B?KytvV29IdmFQT2E2c1h2NjhRalNzWHBkejA0a2J3UTJacnVlWmI3SkQvUHlH?=
+ =?utf-8?B?Tnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ad8f5ba-9283-4a3d-c227-08dbec128045
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2023 10:54:01.1178
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Fx2cZL0b4CQAa4Mwvixmq0WIoX0HawF3b+KZN3eJv3GY6aGsUl69Ne4/N6cAwFctFoQhXVXPxA8VHGeFNOG8VMPaCGwiaKuEMMeSrez08DQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5019
+X-OriginatorOrg: intel.com
 
-Hi,
 
-On Tue, 2023-11-21 at 16:24 +0100, Oleksij Rempel wrote:
-> Correct the PHY loopback bit handling in the ksz8_w_phy_bmcr and
-> ksz8_r_phy_bmcr functions for KSZ8794 and KSZ8873 variants in the ksz8795
-> driver. Previously, the code erroneously used Bit 7 of port register 0xD
-> for both chip variants, which is actually for LED configuration. This
-> update ensures the correct registers and bits are used for the PHY
-> loopback feature:
->=20
-> - For KSZ8794: Use 0xF / Bit 7.
-> - For KSZ8873: Use 0xD / Bit 0.
->=20
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-This looks like a bugfix, so possibly worth a Fixes tag? Given the
-dependency on the previous refactor, I think we can take it via net-
-next.
+On 23.11.2023 06:59, Geetha sowjanya wrote:
+> This patch adds the miss mcs stats register
+> for mcs supported platforms.
+> 
+> Fixes: 9312150af8da ("octeontx2-af: cn10k: mcs: Support for stats collection")
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> ---
 
-@Andrew, Florian, Vladimir: do you have any specific preference here?
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-Thanks!
-
-Paolo
-
+>  .../net/ethernet/marvell/octeontx2/af/mcs.c   |  4 +--
+>  .../ethernet/marvell/octeontx2/af/mcs_reg.h   | 31 ++++++++++++++++---
+>  2 files changed, 29 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
+> index d6effbe46208..d4a4e4c837ec 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
+> @@ -117,7 +117,7 @@ void mcs_get_rx_secy_stats(struct mcs *mcs, struct mcs_secy_stats *stats, int id
+>  	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYTAGGEDCTLX(id);
+>  	stats->pkt_tagged_ctl_cnt = mcs_reg_read(mcs, reg);
+>  
+> -	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDORNOTAGX(id);
+> +	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDX(id);
+>  	stats->pkt_untaged_cnt = mcs_reg_read(mcs, reg);
+>  
+>  	reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYCTLX(id);
+> @@ -215,7 +215,7 @@ void mcs_get_sc_stats(struct mcs *mcs, struct mcs_sc_stats *stats,
+>  		reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSCNOTVALIDX(id);
+>  		stats->pkt_notvalid_cnt = mcs_reg_read(mcs, reg);
+>  
+> -		reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSCUNCHECKEDOROKX(id);
+> +		reg = MCSX_CSE_RX_MEM_SLAVE_INPKTSSCUNCHECKEDX(id);
+>  		stats->pkt_unchecked_cnt = mcs_reg_read(mcs, reg);
+>  
+>  		if (mcs->hw->mcs_blks > 1) {
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/mcs_reg.h
+> index f3ab01fc363c..f4c6de89002c 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_reg.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_reg.h
+> @@ -810,14 +810,37 @@
+>  		offset = 0x9d8ull;			\
+>  	offset; })
+>  
+> +#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSCUNCHECKEDX(a) ({	\
+> +	u64 offset;					\
+> +							\
+> +	offset = 0xee80ull;				\
+> +	if (mcs->hw->mcs_blks > 1)			\
+> +		offset = 0xe818ull;			\
+> +	offset += (a) * 0x8ull;				\
+> +	offset; })
+> +
+> +#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDX(a) ({	\
+> +	u64 offset;					\
+> +							\
+> +	offset = 0xa680ull;				\
+> +	if (mcs->hw->mcs_blks > 1)			\
+> +		offset = 0xd018ull;			\
+> +	offset += (a) * 0x8ull;				\
+> +	offset; })
+> +
+> +#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSCLATEORDELAYEDX(a)	({	\
+> +	u64 offset;						\
+> +								\
+> +	offset = 0xf680ull;					\
+> +	if (mcs->hw->mcs_blks > 1)				\
+> +		offset = 0xe018ull;				\
+> +	offset += (a) * 0x8ull;					\
+> +	offset; })
+> +
+>  #define MCSX_CSE_RX_MEM_SLAVE_INOCTETSSCDECRYPTEDX(a)	(0xe680ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INOCTETSSCVALIDATEX(a)	(0xde80ull + (a) * 0x8ull)
+> -#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDORNOTAGX(a)	(0xa680ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYNOTAGX(a)	(0xd218 + (a) * 0x8ull)
+> -#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYUNTAGGEDX(a)	(0xd018ull + (a) * 0x8ull)
+> -#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSCUNCHECKEDOROKX(a)	(0xee80ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INPKTSSECYCTLX(a)		(0xb680ull + (a) * 0x8ull)
+> -#define MCSX_CSE_RX_MEM_SLAVE_INPKTSSCLATEORDELAYEDX(a) (0xf680ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INPKTSSAINVALIDX(a)	(0x12680ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INPKTSSANOTUSINGSAERRORX(a) (0x15680ull + (a) * 0x8ull)
+>  #define MCSX_CSE_RX_MEM_SLAVE_INPKTSSANOTVALIDX(a)	(0x13680ull + (a) * 0x8ull)
 
