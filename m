@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-50606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44CF47F6499
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:00:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC1D7F64A3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75AA11C20AF8
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:00:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EEA9B20F8F
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED553FB2E;
-	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E8E405C0;
+	Thu, 23 Nov 2023 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiF42eD/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVlUgOAd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49763E485;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3433FB35;
 	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D322C433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0B39C43395;
 	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700758826;
-	bh=FvTcFGdL8EM0GPsWwPRvCVD/NzmnOuJxQCI1KGpza40=;
+	bh=QAhKOwmSyYL/06pMRYmwqRumPVYS4ikPDyPLMLk4BuA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IiF42eD/jiBs9TaoiaHIhLbpzrx9VgYxuGEUS/26W8+bDx2T4yhhA06hJVdo55z2i
-	 jsl3MSii0ySB9RuDr5qKZJ1mrjbr1qCPn5QKRRMeefJBRFjYCG6gkfYJGHDoRrxEF5
-	 U9BNEiCvShPNASe7vghWqz8VJNOMG4hlyBGXogPsi6TDDTJk9hINVdjRDfmYJEY022
-	 ubLJUjfoKVtJzYzOKnF9EqspW50vbt1+pjP8ylRHWqupWMN1i6fkiM4DsMReA22W2j
-	 Z6AJmT3VbVDxATe8s7nQkkf2kSqJqOyZxVm6AT8tnckpdzyhMU8XRGeTlpPwF4k463
-	 wCeYPIRZ0JDBg==
+	b=AVlUgOAd/6Qj6nT4t8NFVdUtPwQ2l/VvAr/AsYAyEhcsdIDgNE74ytiYqDubRqE6S
+	 p0e/zkaOVwOAzshbkNW6MePqAsUbguzkjL48aPfFSqbNhpH1U70AWOr3jAAdyiSBic
+	 EVtmD37c45/gc21eptnlVFgYG/z2ZiNP1/wwzFi1VbaFCpzS2nJxCdUX/cVxQu7zld
+	 ezgZjc97kOLjvSYG9EPn/1PHIzVE04Gdl5kPsMZt1D8vH5sytLhN6Ytj/g0zSkZIGo
+	 rXjYt3gI0HhFVPv/fqpnNH1Wv5qV53VHTAMUFgwPGG3PHkHWZgiEPitcHT5BcrbR/o
+	 Uulq4AblryAaw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C2F7C595D0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8277EE00087;
 	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,40 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ipa: fix one GSI register field width
+Subject: Re: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170075882643.541.6637672358181350446.git-patchwork-notify@kernel.org>
+ <170075882653.541.9262158470588794948.git-patchwork-notify@kernel.org>
 Date: Thu, 23 Nov 2023 17:00:26 +0000
-References: <20231122231708.896632-1-elder@linaro.org>
-In-Reply-To: <20231122231708.896632-1-elder@linaro.org>
-To: Alex Elder <elder@linaro.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
- quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
- quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+In-Reply-To: <20231121211642.163474-1-avkrasnov@salutedevices.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, bobby.eshleman@bytedance.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@sberdevices.ru, oxffffaa@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 22 Nov 2023 17:17:08 -0600 you wrote:
-> The width of the R_LENGTH field of the EV_CH_E_CNTXT_1 GSI register
-> is 24 bits (not 20 bits) starting with IPA v5.0.  Fix this.
-> 
-> Fixes: faf0678ec8a0 ("net: ipa: add IPA v5.0 GSI register definitions")
-> Signed-off-by: Alex Elder <elder@linaro.org>
-> ---
-> v2: Fixed erroneous commit hash in the "Fixes" tag.
+On Wed, 22 Nov 2023 00:16:42 +0300 you wrote:
+> Tune message length calculation to make this test work on machines
+> where 'getpagesize()' returns >32KB. Now maximum message length is not
+> hardcoded (on machines above it was smaller than 'getpagesize()' return
+> value, thus we get negative value and test fails), but calculated at
+> runtime and always bigger than 'getpagesize()' result. Reproduced on
+> aarch64 with 64KB page size.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: ipa: fix one GSI register field width
-    https://git.kernel.org/netdev/net/c/37f0205538ba
+  - [net,v1] vsock/test: fix SEQPACKET message bounds test
+    https://git.kernel.org/netdev/net/c/f0863888f6cf
 
 You are awesome, thank you!
 -- 
