@@ -1,208 +1,193 @@
-Return-Path: <netdev+bounces-50311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491437F554A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:26:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 849067F5559
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE6A8B20EF7
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:26:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA230B20A01
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA2BA42;
-	Thu, 23 Nov 2023 00:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D1E63B;
+	Thu, 23 Nov 2023 00:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a0RMRtdr"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KlEDbsl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAFA1B3;
-	Wed, 22 Nov 2023 16:26:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700699164; x=1732235164;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=kMJqNQrPFkouBUmP1tIxtozSsYheDkR/LnL4F11wiis=;
-  b=a0RMRtdr45SnsHLYk3kiLIfZs2Z292eQtCjDOGkSajq4kJgqoPyPz1Z8
-   xhWoNH51ino8oe9+Nmimsn7SFdTQgw8cA/qSM06asNrV9XlVmhWFA6efE
-   bx/KJxGEkz9CgKaAcRip2AVvQj244oSCMbQ2SV3R4DIR0CTNKXPPkI00S
-   8UPzwDbKGWrNEIvyOLU2GF23JoceIic+G88FMkrhNsWS/7MACg0sIjNMf
-   ijDW0ytrIcjGYvd6MSyu2liYjeaUIruC6bgfya5Y7v4Nc28NcFQbnBBQQ
-   f0zW1UCdi/Sb7g9NYp8o9b8iKurHqbTYEdk8doLf35VPgtN8OmhSA3u25
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="389323011"
-X-IronPort-AV: E=Sophos;i="6.04,220,1695711600"; 
-   d="asc'?scan'208";a="389323011"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2023 16:26:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="716903060"
-X-IronPort-AV: E=Sophos;i="6.04,220,1695711600"; 
-   d="asc'?scan'208";a="716903060"
-Received: from debian-skl.sh.intel.com (HELO debian-skl) ([10.239.160.45])
-  by orsmga003.jf.intel.com with ESMTP; 22 Nov 2023 16:25:45 -0800
-Date: Thu, 23 Nov 2023 08:24:24 +0800
-From: Zhenyu Wang <zhenyuw@linux.intel.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-	Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Zhi Wang <zhi.a.wang@intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Frederic Barrat <fbarrat@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Eric Farman <farman@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Tony Krowiak <akrowiak@linux.ibm.com>,
-	Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Diana Craciun <diana.craciun@oss.nxp.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeelb@google.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] i915: make inject_virtual_interrupt() void
-Message-ID: <ZV6buHrQy2+CJ7xX@debian-scheme>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
- <20231122-vfs-eventfd-signal-v2-1-bd549b14ce0c@kernel.org>
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2AA100;
+	Wed, 22 Nov 2023 16:32:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1700699534; x=1732235534;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=CHEbKPadk4pyqek3DmP5yJp/m9dEG4KiF/yUIpEWD2c=;
+  b=KlEDbsl7TCilrGZCcsN8mS8OhgfD2KTNXxI/JwJ7+UxKPh93Hatb/ftH
+   dNHkXE6RuwHuKlsb6tfrhdBchU5+RXZZlS6/vCP8MxKdr24w4xsPVwLpu
+   b2zOG981tCimWlszbL079DULvu+CIKxHc1HcaaBdTA8Fkrn8277o9wQ2c
+   o=;
+X-IronPort-AV: E=Sophos;i="6.04,220,1695686400"; 
+   d="scan'208";a="364473715"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 00:32:10 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com (Postfix) with ESMTPS id 7DDA580640;
+	Thu, 23 Nov 2023 00:32:07 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:3865]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.99:2525] with esmtp (Farcaster)
+ id 09acb04e-cb71-483b-8fe0-f8c2bca46f92; Thu, 23 Nov 2023 00:32:07 +0000 (UTC)
+X-Farcaster-Flow-ID: 09acb04e-cb71-483b-8fe0-f8c2bca46f92
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Thu, 23 Nov 2023 00:32:06 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.50) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.39;
+ Thu, 23 Nov 2023 00:32:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
+	<song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v3 bpf-next 10/11] bpf: tcp: Support arbitrary SYN Cookie.
+Date: Wed, 22 Nov 2023 16:31:54 -0800
+Message-ID: <20231123003154.56710-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <825b7dde-f421-436e-99c8-47f9c1d83f5f@linux.dev>
+References: <825b7dde-f421-436e-99c8-47f9c1d83f5f@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ehCOKC0wDaVXxQlM"
-Content-Disposition: inline
-In-Reply-To: <20231122-vfs-eventfd-signal-v2-1-bd549b14ce0c@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Wed, 22 Nov 2023 15:19:29 -0800
+> On 11/21/23 10:42 AM, Kuniyuki Iwashima wrote:
+> > diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
+> > index 533a7337865a..9a67f47a5e64 100644
+> > --- a/include/net/inet6_hashtables.h
+> > +++ b/include/net/inet6_hashtables.h
+> > @@ -116,9 +116,23 @@ struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+> >   	if (!sk)
+> >   		return NULL;
+> >   
+> > -	if (!prefetched || !sk_fullsock(sk))
+> > +	if (!prefetched)
+> >   		return sk;
+> >   
+> > +	if (sk->sk_state == TCP_NEW_SYN_RECV) {
+> > +#if IS_ENABLED(CONFIG_SYN_COOKIE)
+> > +		if (inet_reqsk(sk)->syncookie) {
+> > +			*refcounted = false;
+> > +			skb->sk = sk;
+> > +			skb->destructor = sock_pfree;
+> 
+> Instead of re-init the skb->sk and skb->destructor, can skb_steal_sock() avoid 
+> resetting them to NULL in the first place and skb_steal_sock() returns the 
+> rsk_listener instead?
+
+Yes, but we need to move skb_steal_sock() to request_sock.h or include it just
+before skb_steal_sock() in sock.h like below.  When I include request_sock.h in
+top of sock.h, there were many build errors.
 
 
---ehCOKC0wDaVXxQlM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> btw, can inet_reqsk(sk)->rsk_listener be set to NULL after 
+> this point?
 
-On 2023.11.22 13:48:22 +0100, Christian Brauner wrote:
-> The single caller of inject_virtual_interrupt() ignores the return value
-> anyway. This allows us to simplify eventfd_signal() in follow-up
-> patches.
->=20
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  drivers/gpu/drm/i915/gvt/interrupt.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/gpu/drm/i915/gvt/interrupt.c b/drivers/gpu/drm/i915/=
-gvt/interrupt.c
-> index de3f5903d1a7..9665876b4b13 100644
-> --- a/drivers/gpu/drm/i915/gvt/interrupt.c
-> +++ b/drivers/gpu/drm/i915/gvt/interrupt.c
-> @@ -422,7 +422,7 @@ static void init_irq_map(struct intel_gvt_irq *irq)
->  #define MSI_CAP_DATA(offset) (offset + 8)
->  #define MSI_CAP_EN 0x1
-> =20
-> -static int inject_virtual_interrupt(struct intel_vgpu *vgpu)
-> +static void inject_virtual_interrupt(struct intel_vgpu *vgpu)
->  {
->  	unsigned long offset =3D vgpu->gvt->device_info.msi_cap_offset;
->  	u16 control, data;
-> @@ -434,10 +434,10 @@ static int inject_virtual_interrupt(struct intel_vg=
-pu *vgpu)
-> =20
->  	/* Do not generate MSI if MSIEN is disabled */
->  	if (!(control & MSI_CAP_EN))
-> -		return 0;
-> +		return;
-> =20
->  	if (WARN(control & GENMASK(15, 1), "only support one MSI format\n"))
-> -		return -EINVAL;
-> +		return;
-> =20
->  	trace_inject_msi(vgpu->id, addr, data);
-> =20
-> @@ -451,10 +451,10 @@ static int inject_virtual_interrupt(struct intel_vg=
-pu *vgpu)
->  	 * returned and don't inject interrupt into guest.
->  	 */
->  	if (!test_bit(INTEL_VGPU_STATUS_ATTACHED, vgpu->status))
-> -		return -ESRCH;
-> -	if (vgpu->msi_trigger && eventfd_signal(vgpu->msi_trigger, 1) !=3D 1)
-> -		return -EFAULT;
-> -	return 0;
-> +		return;
-> +	if (!vgpu->msi_trigger)
-> +		return;
-> +	eventfd_signal(vgpu->msi_trigger, 1);
->  }
+except for sock_pfree(), we will not set NULL until cookie_bpf_check().
 
-I think it's a little simpler to write as
-    if (vgpu->msi_trigger)
-            eventfd_signal(vgpu->msi_trigger, 1);
 
-Looks fine with me.
+> Beside, it is essentially assigning the incoming request to a listening sk. Does 
+> it need to call the inet6_lookup_reuseport() a few lines below to avoid skipping 
+> the bpf reuseport selection that was fixed in commit 9c02bec95954 ("bpf, net: 
+> Support SO_REUSEPORT sockets with bpf_sk_assign")?
 
-Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+Ah, good point.  I assumed bpf_sk_lookup() will do the random pick, but we
+need to call it just in case sk is picked from bpf map.
+
+As you suggested, if we return rsk_listener from skb_steal_sock(), we can
+reuse the reuseport_lookup call in inet6_steal_sock().
 
 Thanks!
 
-> =20
->  static void propagate_event(struct intel_gvt_irq *irq,
->=20
-> --=20
-> 2.42.0
->=20
 
---ehCOKC0wDaVXxQlM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCZV6bswAKCRCxBBozTXgY
-JySHAJ4qE2jv0i0ZauQv+Bv/bGwHt0ZrbACeJadIIL6gQC6kmoICLhyqplCwOeo=
-=1+t0
------END PGP SIGNATURE-----
-
---ehCOKC0wDaVXxQlM--
+---8<---
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 1d6931caf0c3..83efbe0e7c3b 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2838,6 +2838,8 @@ sk_is_refcounted(struct sock *sk)
+        return !sk_fullsock(sk) || !sock_flag(sk, SOCK_RCU_FREE);
+ }
+ 
++#include <net/request_sock.h>
++
+ /**
+  * skb_steal_sock - steal a socket from an sk_buff
+  * @skb: sk_buff to steal the socket from
+@@ -2847,20 +2849,38 @@ sk_is_refcounted(struct sock *sk)
+ static inline struct sock *
+ skb_steal_sock(struct sk_buff *skb, bool *refcounted, bool *prefetched)
+ {
+-       if (skb->sk) {
+-               struct sock *sk = skb->sk;
++       struct sock *sk = skb->sk;
+ 
++       if (!sk) {
++               *prefetched = false;
++               *refcounted = false;
++               return NULL;
++       }
++
++       *prefetched = skb_sk_is_prefetched(skb);
++       if (!*prefetched) {
+                *refcounted = true;
+-               *prefetched = skb_sk_is_prefetched(skb);
+-               if (*prefetched)
+-                       *refcounted = sk_is_refcounted(sk);
+-               skb->destructor = NULL;
+-               skb->sk = NULL;
+-               return sk;
++               goto out;
+        }
+-       *prefetched = false;
+-       *refcounted = false;
+-       return NULL;
++
++       switch (sk->sk_state) {
++       case TCP_NEW_SYN_RECV:
++               if (inet_reqsk(sk)->syncookie) {
++                       *refcounted = false;
++                       return inet_reqsk(sk)->rsk_listener;
++               }
++               fallthrough;
++       case TCP_TIME_WAIT:
++               *refcounted = true;
++               break;
++       default:
++               *refcounted = !sock_flag(sk, SOCK_RCU_FREE);
++       }
++
++out:
++       skb->destructor = NULL;
++       skb->sk = NULL;
++       return sk;
+ }
+ 
+ /* Checks if this SKB belongs to an HW offloaded socket
+---8<---
 
