@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-50350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ADE07F56AE
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:02:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B55A7F56B4
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9B81F20D4A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348AB281341
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308695245;
-	Thu, 23 Nov 2023 03:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3071253B6;
+	Thu, 23 Nov 2023 03:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rUhUJQzT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/69nASY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D3C191;
-	Wed, 22 Nov 2023 19:01:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Xptzas81N17YCuuLxBooSV9D0A5Kbw2K/uN1U+PXfjw=; b=rUhUJQzTP+xMnrOSIku0+NXS9e
-	Vwx/yg9ArH/c7A/Hi97odu9Rty203sOPxQXXqHB8k+uJkoz6Jn6LRa5jL/aFAHtZpFI2e2AtHZ2Cb
-	+WS/q/1vBCfgD+sp4sQuD362kTCVDKhoe31BMaeB8SMr1rrcM6TlTkqzK85s7wAbgJ4Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r5zyH-000w18-Cr; Thu, 23 Nov 2023 04:01:41 +0100
-Date: Thu, 23 Nov 2023 04:01:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 11/14] dt-bindings: net: add QCA807x PHY
- defines
-Message-ID: <e2e74e27-eb55-408e-8d0d-7fb15ebd13f9@lunn.ch>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-12-ansuelsmth@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DF65245
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:06:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F97CC433C7;
+	Thu, 23 Nov 2023 03:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700708760;
+	bh=2B2vvV3n/qfQp+4iNcM3q4TfvVFY4wyn6vKnW2qO5EE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=X/69nASYMtyPSOnT364mGCyFyR9SXrQ5LFl7535gjfkuHLhYuchJiHMyeCNByI9OD
+	 9sQthIe9YTYukepZvS7WTMITFQtL1F8ARcIUGKZPXNGzuFn0rFJ0eEUuqYbbDPe4Th
+	 cwMTHVAf2bCS2dmCjVDDIT4b8W7CD8cCs767SW74nIWeGzAszmUsYyCPnmvRfelk9s
+	 OaxsHZcIgENmnndzLLvKVY3Dzo8ZyDSUGDAcvJN/hTTnT/iDNuc1NI5+gwYq3Byc2t
+	 N8dm/uJol7qWIBZ8Y4+bdumuxguvCqUaJzUHga5kHPOoya5Zbpn5v6TVpk8beJlFEk
+	 bYGdZXxSkW86Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	jiri@resnulli.us,
+	jacob.e.keller@intel.com
+Subject: [PATCH net] tools: ynl: fix duplicate op name in devlink
+Date: Wed, 22 Nov 2023 19:05:58 -0800
+Message-ID: <20231123030558.1611831-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120135041.15259-12-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 20, 2023 at 02:50:38PM +0100, Christian Marangi wrote:
-> From: Robert Marko <robert.marko@sartura.hr>
-> 
-> Add DT bindings defined for Qualcomm QCA807x PHY series related to
-> calibration and DAC settings.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  include/dt-bindings/net/qcom-qca807x.h | 45 ++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
->  create mode 100644 include/dt-bindings/net/qcom-qca807x.h
-> 
-> diff --git a/include/dt-bindings/net/qcom-qca807x.h b/include/dt-bindings/net/qcom-qca807x.h
-> new file mode 100644
-> index 000000000000..42c45c7d5210
-> --- /dev/null
-> +++ b/include/dt-bindings/net/qcom-qca807x.h
-> @@ -0,0 +1,45 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
-> +/*
-> + * Device Tree constants for the Qualcomm QCA807X PHYs
-> + */
-> +
-> +#ifndef _DT_BINDINGS_QCOM_QCA807X_H
-> +#define _DT_BINDINGS_QCOM_QCA807X_H
-> +
-> +#define PSGMII_QSGMII_TX_DRIVER_140MV	0
-> +#define PSGMII_QSGMII_TX_DRIVER_160MV	1
-> +#define PSGMII_QSGMII_TX_DRIVER_180MV	2
-> +#define PSGMII_QSGMII_TX_DRIVER_200MV	3
-> +#define PSGMII_QSGMII_TX_DRIVER_220MV	4
-> +#define PSGMII_QSGMII_TX_DRIVER_240MV	5
-> +#define PSGMII_QSGMII_TX_DRIVER_260MV	6
-> +#define PSGMII_QSGMII_TX_DRIVER_280MV	7
-> +#define PSGMII_QSGMII_TX_DRIVER_300MV	8
-> +#define PSGMII_QSGMII_TX_DRIVER_320MV	9
-> +#define PSGMII_QSGMII_TX_DRIVER_400MV	10
-> +#define PSGMII_QSGMII_TX_DRIVER_500MV	11
-> +/* Default value */
-> +#define PSGMII_QSGMII_TX_DRIVER_600MV	12
+We don't support CRUD-inspired message types in YNL too well.
+One aspect that currently trips us up is the fact that single
+message ID can be used in multiple commands (as the response).
+This leads to duplicate entries in the id-to-string tables:
 
-Its not clear what these are used for. I think these are actually
-package properties, so having the correctly documented in the binding
-would help a lot understand why we need package properties.
+devlink-user.c:19:34: warning: initialized field overwritten [-Woverride-init]
+   19 |         [DEVLINK_CMD_PORT_NEW] = "port-new",
+      |                                  ^~~~~~~~~~
+devlink-user.c:19:34: note: (near initialization for ‘devlink_op_strmap[7]’)
 
-Actually using #define like this is probably wrong. You should just
-have a u32 tx_driver_mv property, and list [140, 160, 180, 200,
-... 600] as valid values. The driver should then convert to whatever
-value it should write into the register.
+Fixes tag points at where the code was generated, the "real" problem
+is that the code generator does not support CRUD.
 
-      Andrew
+Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: jiri@resnulli.us
+CC: jacob.e.keller@intel.com
+---
+ tools/net/ynl/generated/devlink-user.c | 2 +-
+ tools/net/ynl/ynl-gen-c.py             | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index bc5065bd99b2..c12ca87ca2bb 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -15,7 +15,7 @@
+ /* Enums */
+ static const char * const devlink_op_strmap[] = {
+ 	[3] = "get",
+-	[7] = "port-get",
++	// skip "port-get", duplicate reply value
+ 	[DEVLINK_CMD_PORT_NEW] = "port-new",
+ 	[13] = "sb-get",
+ 	[17] = "sb-pool-get",
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index c4003a83cd5d..3bd6b928c14f 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -1505,6 +1505,12 @@ _C_KW = {
+     cw.block_start(line=f"static const char * const {map_name}[] =")
+     for op_name, op in family.msgs.items():
+         if op.rsp_value:
++            # Make sure we don't add duplicated entries, if multiple commands
++            # produce the same response in legacy families.
++            if family.rsp_by_value[op.rsp_value] != op:
++                cw.p(f'// skip "{op_name}", duplicate reply value')
++                continue
++
+             if op.req_value == op.rsp_value:
+                 cw.p(f'[{op.enum_name}] = "{op_name}",')
+             else:
+-- 
+2.42.0
+
 
