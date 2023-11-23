@@ -1,360 +1,162 @@
-Return-Path: <netdev+bounces-50394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A3187F58BE
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:58:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1547F58C6
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 08:01:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CDB41C20A75
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:58:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138E61C20B58
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5318913ACD;
-	Thu, 23 Nov 2023 06:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SskrVJvb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B02C13AD4;
+	Thu, 23 Nov 2023 07:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9691B5
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 22:58:51 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5431614d90eso738504a12.1
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 22:58:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700722730; x=1701327530; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A0zbTvAUka6aMherpVjkOx7P0dclFSJl9tP9EnXEi5s=;
-        b=SskrVJvb03MmJ+37lx6HSL9h2QsxYtt1xCRgBEtkgNepzwMaNqub2wi5L5hmjG6qg3
-         WL/mgN82fEn1tHALcb1p1fkslXsGFcuPfrun/DKTTOPm390aua+hxAC77INSlngpn5Kh
-         r1jI1T1Gcb4k7MTOTsoz+BXYf6l4KUmACNjTbA8nvPLlZGvoO52eT3so1d3x2n8+Lout
-         gaBdZlOW9G/d205ty8NKsrr2+V4dYJU5GGgDiApOpV7bE2/a2X8k73hQmcRPVKZCfUbR
-         y4FhfjLqXLN371x2uxf2efnHruSb+tlvLOa106uDuLvNOagAszw5flJNc1OpMn5W8dby
-         HTqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700722730; x=1701327530;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A0zbTvAUka6aMherpVjkOx7P0dclFSJl9tP9EnXEi5s=;
-        b=CH8GOY+MKWh87c0jox2upuA/5qysJM+XK5jlA4rbf+T8YULYyTqNzo2NR8eiIKTC+k
-         wuHqdI6Gh+k4FuPSbdqSsYp3ZBlzY2ekoteyrj/ouX8OkHswgzxDCj9j8UqfnAOawcZI
-         1tigLlERm9shAbv1TrHNVaDdznQN3LYojpm9igCzvj9I/gCTnhilDpZDMCBRlnLcWMOg
-         lfTzsa0DA3xSJ05BH5eOEvCq2PvAd23JPO5JVMQURmUZkeXesPKOxqo4qGYoOPULuDLe
-         du/YqBz+1ryh1jNbe31h/pjmiIEOqm2cvbiAIUh2qp7PM1Lz0CHUoB5RRcl6p0fCIA8G
-         RFWA==
-X-Gm-Message-State: AOJu0YzkJ0aGw7pP+gK9bWTrPIkBXYAZWHgXF8KQFi3KI7RarMeTAcLp
-	Sbof65XIlAUVnYhg7u166fCo+w==
-X-Google-Smtp-Source: AGHT+IH0Y4UvJgztW7RfVuaHQt9zZ8sQz0ODWs0oVLGt7v79H7lPGjLBpTpfCJKpcWzCTWSsQ1W8Zw==
-X-Received: by 2002:a17:906:10d9:b0:9fd:8d07:a3ad with SMTP id v25-20020a17090610d900b009fd8d07a3admr3128295ejv.17.1700722730330;
-        Wed, 22 Nov 2023 22:58:50 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id jy18-20020a170907763200b009fada3e836asm388403ejc.53.2023.11.22.22.58.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 22:58:49 -0800 (PST)
-Date: Thu, 23 Nov 2023 07:58:48 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
-	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
-	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH net-next RFC v5 1/4] net/sched: act_mirred: Separate
- mirror and redirect into two distinct functions
-Message-ID: <ZV74KFOpn6PilY72@nanopsycho>
-References: <20231110214618.1883611-1-victor@mojatatu.com>
- <20231110214618.1883611-2-victor@mojatatu.com>
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78BD3A1
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 23:00:54 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SbTXC1w3dzvR9b;
+	Thu, 23 Nov 2023 15:00:27 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 23 Nov
+ 2023 15:00:51 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<shaozhengchao@huawei.com>
+Subject: [PATCH net,v3] ipv4: igmp: fix refcnt uaf issue when receiving igmp query packet
+Date: Thu, 23 Nov 2023 15:13:14 +0800
+Message-ID: <20231123071314.3332069-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231110214618.1883611-2-victor@mojatatu.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-Fri, Nov 10, 2023 at 10:46:15PM CET, victor@mojatatu.com wrote:
->Separate mirror and redirect code into two into two separate functions
->(tcf_mirror_act and tcf_redirect_act). This not only cleans up the code and
->improves both readability and maintainability in addition to reducing the
->complexity given different expectations for mirroring and redirecting.
->
->This patchset has a use case for the mirror part in action "blockcast".
+When I perform the following test operations:
+1.ip link add br0 type bridge
+2.brctl addif br0 eth0
+3.ip addr add 239.0.0.1/32 dev eth0
+4.ip addr add 239.0.0.1/32 dev br0
+5.ip addr add 224.0.0.1/32 dev br0
+6.while ((1))
+    do
+        ifconfig br0 up
+        ifconfig br0 down
+    done
+7.send IGMPv2 query packets to port eth0 continuously. For example,
+./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
+1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
 
-Patchset? Which one? You mean this patch?
+The preceding tests may trigger the refcnt uaf issue of the mc list. The
+stack is as follows:
+	refcount_t: addition on 0; use-after-free.
+	WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate (lib/refcount.c:25)
+	CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #80
+	Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+	RIP: 0010:refcount_warn_saturate (lib/refcount.c:25)
+	RSP: 0018:ffffb68f00657910 EFLAGS: 00010286
+	RAX: 0000000000000000 RBX: ffff8a00c3bf96c0 RCX: ffff8a07b6160908
+	RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff8a07b6160900
+	RBP: ffff8a00cba36862 R08: 0000000000000000 R09: 00000000ffff7fff
+	R10: ffffb68f006577c0 R11: ffffffffb0fdcdc8 R12: ffff8a00c3bf9680
+	R13: ffff8a00c3bf96f0 R14: 0000000000000000 R15: ffff8a00d8766e00
+	FS:  0000000000000000(0000) GS:ffff8a07b6140000(0000) knlGS:0000000000000000
+	CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+	CR2: 000055f10b520b28 CR3: 000000039741a000 CR4: 00000000000006f0
+	Call Trace:
+	<TASK>
+	igmp_heard_query (net/ipv4/igmp.c:1068)
+	igmp_rcv (net/ipv4/igmp.c:1132)
+	ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
+	ip_local_deliver_finish (net/ipv4/ip_input.c:234)
+	__netif_receive_skb_one_core (net/core/dev.c:5529)
+	netif_receive_skb_internal (net/core/dev.c:5729)
+	netif_receive_skb (net/core/dev.c:5788)
+	br_handle_frame_finish (net/bridge/br_input.c:216)
+	nf_hook_bridge_pre (net/bridge/br_input.c:294)
+	__netif_receive_skb_core (net/core/dev.c:5423)
+	__netif_receive_skb_list_core (net/core/dev.c:5606)
+	__netif_receive_skb_list (net/core/dev.c:5674)
+	netif_receive_skb_list_internal (net/core/dev.c:5764)
+	napi_gro_receive (net/core/gro.c:609)
+	e1000_clean_rx_irq (drivers/net/ethernet/intel/e1000/e1000_main.c:4467)
+	e1000_clean (drivers/net/ethernet/intel/e1000/e1000_main.c:3805)
+	__napi_poll (net/core/dev.c:6533)
+	net_rx_action (net/core/dev.c:6735)
+	__do_softirq (kernel/softirq.c:554)
+	run_ksoftirqd (kernel/softirq.c:913)
+	smpboot_thread_fn (kernel/smpboot.c:164)
+	kthread (kernel/kthread.c:388)
+	ret_from_fork (arch/x86/kernel/process.c:153)
+	ret_from_fork_asm (arch/x86/entry/entry_64.S:250)
+	</TASK>
 
->
->Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
->Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
->Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->---
-> include/net/act_api.h  |  85 ++++++++++++++++++++++++++++++++++
-> net/sched/act_mirred.c | 103 +++++++++++------------------------------
-> 2 files changed, 113 insertions(+), 75 deletions(-)
->
->diff --git a/include/net/act_api.h b/include/net/act_api.h
->index 4ae0580b63ca..8d288040aeb8 100644
->--- a/include/net/act_api.h
->+++ b/include/net/act_api.h
->@@ -12,6 +12,7 @@
-> #include <net/pkt_sched.h>
-> #include <net/net_namespace.h>
-> #include <net/netns/generic.h>
->+#include <net/dst.h>
-> 
-> struct tcf_idrinfo {
-> 	struct mutex	lock;
->@@ -293,5 +294,89 @@ static inline void tcf_action_stats_update(struct tc_action *a, u64 bytes,
-> #endif
-> }
-> 
->+static inline int tcf_mirred_forward(bool to_ingress, bool nested_call,
->+				     struct sk_buff *skb)
->+{
->+	int err;
->+
->+	if (!to_ingress)
->+		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
->+	else if (nested_call)
->+		err = netif_rx(skb);
->+	else
->+		err = netif_receive_skb(skb);
->+
->+	return err;
->+}
->+
->+static inline struct sk_buff *
->+tcf_mirred_common(struct sk_buff *skb, bool want_ingress, bool dont_clone,
->+		  bool expects_nh, struct net_device *dest_dev)
->+{
->+	struct sk_buff *skb_to_send = skb;
->+	bool at_ingress;
->+	int mac_len;
->+	bool at_nh;
->+	int err;
->+
->+	if (unlikely(!(dest_dev->flags & IFF_UP)) ||
->+	    !netif_carrier_ok(dest_dev)) {
->+		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
->+				       dest_dev->name);
->+		err = -ENODEV;
->+		goto err_out;
->+	}
->+
->+	if (!dont_clone) {
->+		skb_to_send = skb_clone(skb, GFP_ATOMIC);
->+		if (!skb_to_send) {
->+			err =  -ENOMEM;
->+			goto err_out;
->+		}
->+	}
->+
->+	at_ingress = skb_at_tc_ingress(skb);
->+
->+	/* All mirred/redirected skbs should clear previous ct info */
->+	nf_reset_ct(skb_to_send);
->+	if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
->+		skb_dst_drop(skb_to_send);
->+
->+	at_nh = skb->data == skb_network_header(skb);
->+	if (at_nh != expects_nh) {
->+		mac_len = at_ingress ? skb->mac_len :
->+			  skb_network_offset(skb);
->+		if (expects_nh) {
->+			/* target device/action expect data at nh */
->+			skb_pull_rcsum(skb_to_send, mac_len);
->+		} else {
->+			/* target device/action expect data at mac */
->+			skb_push_rcsum(skb_to_send, mac_len);
->+		}
->+	}
->+
->+	skb_to_send->skb_iif = skb->dev->ifindex;
->+	skb_to_send->dev = dest_dev;
->+
->+	return skb_to_send;
->+
->+err_out:
->+	return ERR_PTR(err);
->+}
+The root causes are as follows:
+Thread A					Thread B
+...						netif_receive_skb
+br_dev_stop					...
+    br_multicast_leave_snoopers			...
+        __ip_mc_dec_group			...
+            __igmp_group_dropped		igmp_rcv
+                igmp_stop_timer			    igmp_heard_query         //ref = 1
+                ip_ma_put			        igmp_mod_timer
+                    refcount_dec_and_test	            igmp_start_timer //ref = 0
+			...                                     refcount_inc //ref increases from 0
+When the device receives an IGMPv2 Query message, it starts the timer
+immediately, regardless of whether the device is running. If the device is
+down and has left the multicast group, it will cause the mc list refcount
+uaf issue.
 
-It's odd to see functions this size as inlined in header files. I don't
-think that is good idea.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+v3: I add some debug info in net/ipv4/igmp.c, the code is as follows.
+    Also I remove strace information started with "?"
+    1063	if (changed) {
+    1064		mdelay(50);
+    1065		printk("%s: indev:%s, im->multiaddr=0x%x, im name:%s\n",
+    1066			__func__, in_dev->dev ? in_dev->dev->name : "NULL", im->multiaddr,
+    1067			im->interface ? im->interface->dev->name : "NULL");
+    1068		igmp_mod_timer(im, max_delay);
+    1069	}
+v2: use cmd "cat messages |/root/linux-next/scripts/decode_stacktrace.sh
+    /root/linux-next/vmlinux" to get precise stack traces and check whether
+    the im is destroyed before timer is started.
+---
+ net/ipv4/igmp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 76c3ea75b8dd..efeeca2b1328 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -216,8 +216,10 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
+ 	int tv = get_random_u32_below(max_delay);
+ 
+ 	im->tm_running = 1;
+-	if (!mod_timer(&im->timer, jiffies+tv+2))
+-		refcount_inc(&im->refcnt);
++	if (refcount_inc_not_zero(&im->refcnt)) {
++		if (mod_timer(&im->timer, jiffies + tv + 2))
++			ip_ma_put(im);
++	}
+ }
+ 
+ static void igmp_gq_start_timer(struct in_device *in_dev)
+-- 
+2.34.1
 
->+
->+static inline int
->+tcf_redirect_act(struct sk_buff *skb,
->+		 bool nested_call, bool want_ingress)
->+{
->+	skb_set_redirected(skb, skb->tc_at_ingress);
->+
->+	return tcf_mirred_forward(want_ingress, nested_call, skb);
->+}
->+
->+static inline int
->+tcf_mirror_act(struct sk_buff *skb, bool nested_call, bool want_ingress)
->+{
->+	return tcf_mirred_forward(want_ingress, nested_call, skb);
->+}
-> 
-> #endif
->diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
->index 0a711c184c29..95d30cb06e54 100644
->--- a/net/sched/act_mirred.c
->+++ b/net/sched/act_mirred.c
->@@ -211,38 +211,22 @@ static bool is_mirred_nested(void)
-> 	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
-> }
-> 
->-static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
->-{
->-	int err;
->-
->-	if (!want_ingress)
->-		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
->-	else if (is_mirred_nested())
->-		err = netif_rx(skb);
->-	else
->-		err = netif_receive_skb(skb);
->-
->-	return err;
->-}
->-
-> TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
-> 				     const struct tc_action *a,
-> 				     struct tcf_result *res)
-> {
-> 	struct tcf_mirred *m = to_mirred(a);
->-	struct sk_buff *skb2 = skb;
->+	struct sk_buff *skb_to_send;
->+	unsigned int nest_level;
-> 	bool m_mac_header_xmit;
-> 	struct net_device *dev;
->-	unsigned int nest_level;
->-	int retval, err = 0;
->-	bool use_reinsert;
-> 	bool want_ingress;
-> 	bool is_redirect;
-> 	bool expects_nh;
->-	bool at_ingress;
->+	bool dont_clone;
-> 	int m_eaction;
->-	int mac_len;
->-	bool at_nh;
->+	int err = 0;
->+	int retval;
-> 
-> 	nest_level = __this_cpu_inc_return(mirred_nest_level);
-> 	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
->@@ -255,80 +239,49 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
-> 	tcf_lastuse_update(&m->tcf_tm);
-> 	tcf_action_update_bstats(&m->common, skb);
-> 
->-	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
-> 	m_eaction = READ_ONCE(m->tcfm_eaction);
->-	retval = READ_ONCE(m->tcf_action);
->+	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
->+	retval = READ_ONCE(a->tcfa_action);
-> 	dev = rcu_dereference_bh(m->tcfm_dev);
-> 	if (unlikely(!dev)) {
-> 		pr_notice_once("tc mirred: target device is gone\n");
->+		err = -ENODEV;
-> 		goto out;
-> 	}
-> 
->-	if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
->-		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
->-				       dev->name);
->-		goto out;
->-	}
->+	m_mac_header_xmit = READ_ONCE(m->tcfm_mac_header_xmit);
->+	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
->+	expects_nh = want_ingress || !m_mac_header_xmit;
-> 
-> 	/* we could easily avoid the clone only if called by ingress and clsact;
-> 	 * since we can't easily detect the clsact caller, skip clone only for
-> 	 * ingress - that covers the TC S/W datapath.
-> 	 */
->-	is_redirect = tcf_mirred_is_act_redirect(m_eaction);
->-	at_ingress = skb_at_tc_ingress(skb);
->-	use_reinsert = at_ingress && is_redirect &&
->-		       tcf_mirred_can_reinsert(retval);
->-	if (!use_reinsert) {
->-		skb2 = skb_clone(skb, GFP_ATOMIC);
->-		if (!skb2)
->-			goto out;
->-	}
->-
->-	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
->-
->-	/* All mirred/redirected skbs should clear previous ct info */
->-	nf_reset_ct(skb2);
->-	if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
->-		skb_dst_drop(skb2);
->+	dont_clone = skb_at_tc_ingress(skb) && is_redirect &&
->+		     tcf_mirred_can_reinsert(retval);
-> 
->-	expects_nh = want_ingress || !m_mac_header_xmit;
->-	at_nh = skb->data == skb_network_header(skb);
->-	if (at_nh != expects_nh) {
->-		mac_len = skb_at_tc_ingress(skb) ? skb->mac_len :
->-			  skb_network_offset(skb);
->-		if (expects_nh) {
->-			/* target device/action expect data at nh */
->-			skb_pull_rcsum(skb2, mac_len);
->-		} else {
->-			/* target device/action expect data at mac */
->-			skb_push_rcsum(skb2, mac_len);
->-		}
->+	skb_to_send = tcf_mirred_common(skb, want_ingress, dont_clone,
->+					expects_nh, dev);
->+	if (IS_ERR(skb_to_send)) {
->+		err = PTR_ERR(skb_to_send);
->+		goto out;
-> 	}
-> 
->-	skb2->skb_iif = skb->dev->ifindex;
->-	skb2->dev = dev;
->-
->-	/* mirror is always swallowed */
-> 	if (is_redirect) {
->-		skb_set_redirected(skb2, skb2->tc_at_ingress);
->-
->-		/* let's the caller reinsert the packet, if possible */
->-		if (use_reinsert) {
->-			err = tcf_mirred_forward(want_ingress, skb);
->-			if (err)
->-				tcf_action_inc_overlimit_qstats(&m->common);
->-			__this_cpu_dec(mirred_nest_level);
->-			return TC_ACT_CONSUMED;
->-		}
->+		if (skb == skb_to_send)
->+			retval = TC_ACT_CONSUMED;
->+
->+		err = tcf_redirect_act(skb_to_send, is_mirred_nested(),
->+				       want_ingress);
->+	} else {
->+		err = tcf_mirror_act(skb_to_send, is_mirred_nested(),
->+				     want_ingress);
-> 	}
-> 
->-	err = tcf_mirred_forward(want_ingress, skb2);
->-	if (err) {
-> out:
->+	if (err)
-> 		tcf_action_inc_overlimit_qstats(&m->common);
->-		if (tcf_mirred_is_act_redirect(m_eaction))
->-			retval = TC_ACT_SHOT;
->-	}
->+
-> 	__this_cpu_dec(mirred_nest_level);
-> 
-> 	return retval;
->-- 
->2.25.1
->
 
