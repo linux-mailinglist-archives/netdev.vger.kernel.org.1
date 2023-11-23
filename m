@@ -1,99 +1,43 @@
-Return-Path: <netdev+bounces-50652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F387F6724
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 20:33:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E007F679E
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 20:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39E441C21010
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:33:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C631B281B4B
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB674C3B4;
-	Thu, 23 Nov 2023 19:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB214B5D5;
+	Thu, 23 Nov 2023 19:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAGRUWPC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nZgN+Ft2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29558D47;
-	Thu, 23 Nov 2023 11:33:28 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c876f1e44dso14938081fa.0;
-        Thu, 23 Nov 2023 11:33:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700768006; x=1701372806; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/hq7LNXGTuldiV4ecttMMHQLmxEW4ioDA8UB5OvVq6I=;
-        b=FAGRUWPCXyj6exxd8QaqT3B9IdqRb54vWGM/tMjKTawkrYUcK7C0tSoTGfbsMjVpRo
-         4dVDLMpwFBZQpjuPUShK62PMEP1VHEEGr0mVWO0x0NvQKTvBd+D2BZoDhY3Thq5DfNdr
-         TCBAqMqQAi740vulbw7u15kw/5GH6MlN0H9sDjnlBw+I5xWMo0niJEIJCB7gGRnNX/he
-         1t9ZpzDLeNUpsXYByRdwOlwD7+7nMCdaljBAwRQ4spqfyEhoSzDP/Ews2UUrqbgC4XYP
-         J/ZRBOKqtdB1R3foyTwpnfz4yiUhTpmw9xQGVuOHeBPkgUe5OPQNoIGYiL9x6NvZe3U+
-         kExw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700768006; x=1701372806;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/hq7LNXGTuldiV4ecttMMHQLmxEW4ioDA8UB5OvVq6I=;
-        b=ORI4NU2QgMN1qQegL3AtgOX+2BKRogKqJKavZb+ECssQfxpBTmzfHcxfYnv/KS17xy
-         SL4/hUySM/TJ2pczrDTXyKuZ2DNp926o1rbqEt+/D4Vbq7YMgGT5xpyhIW4DPF8iYWMb
-         RoiSDNRntk3DesphtOQE+TtCHGorHLguIV2Bj+h95IZ08MZGcesbpY57d7+3vCGPVKf8
-         DsmsLaWeFeNJVC9G/ZXVhdlQdXiO+qpMvJutviJsf00Rb4DMLX88Yixwnrcku4TyMA5V
-         1MRxejgHWqOiTrBVLOl5Cv0Q9L36cbSpwHUHsTIChLHAjoJRiO7A+zdJjaulpXUt4/my
-         UJaA==
-X-Gm-Message-State: AOJu0YwHs1yDMG98avfdHWwMinNzTFy3HnTxdbPEmlUBkSw2Nl3U2UcR
-	o92CbHoTQcStMVegHaKltKg=
-X-Google-Smtp-Source: AGHT+IEpZV8AAS3AX/kSyCq/TvjTy4lvHHyqL6QV8NqZ0ODQESSmWB93J1AVOkRbP2EeuZ27xtYNUg==
-X-Received: by 2002:a2e:3a0f:0:b0:2c8:7962:cdc2 with SMTP id h15-20020a2e3a0f000000b002c87962cdc2mr223068lja.3.1700768005622;
-        Thu, 23 Nov 2023 11:33:25 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id a4-20020adfeec4000000b0033130644c87sm2442265wrp.54.2023.11.23.11.33.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 11:33:25 -0800 (PST)
-Message-ID: <655fa905.df0a0220.49d9b.7afd@mx.google.com>
-X-Google-Original-Message-ID: <ZV+pAo5jt0N9/AE2@Ansuel-xps.>
-Date: Thu, 23 Nov 2023 20:33:22 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Jie Luo <quic_luoj@quicinc.com>, Rob Herring <robh@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-References: <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
- <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
- <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
- <c697488a-d34c-4c98-b4c7-64aef2fe583f@lunn.ch>
- <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
- <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 166902D70
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 11:35:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IYrW5tzzZqBDkAAah/91+IF+KwCorD+hhjYJ4ixZ7No=; b=nZgN+Ft2Rm3BOz40nkZOJ219xY
+	IPWFuE6FeGrI+hM3K/om0lpMS8kpu4rs/RgaX9eRJTHdwIYv7h7UkxLBwputcLkynu87bjucnLhxC
+	vTfVvWInqj10zk4313UP/pDEn8aDZjtlO4ZDKcshXUoxRhbXS/uKfkSZCMqNmOa6sQ5Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r6FTP-0011iI-69; Thu, 23 Nov 2023 20:34:51 +0100
+Date: Thu, 23 Nov 2023 20:34:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Greg Ungerer <gerg@kernel.org>
+Cc: rmk+kernel@armlinux.org.uk, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: dsa: mv88e6xxx: fix marvell 6350 switch probing
+Message-ID: <4d9ac446-5a01-4c97-bc1d-41feb2359cad@lunn.ch>
+References: <20231122131944.2180408-1-gerg@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,75 +46,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
+In-Reply-To: <20231122131944.2180408-1-gerg@kernel.org>
 
-On Thu, Nov 23, 2023 at 03:57:58PM +0100, Andrew Lunn wrote:
-> On Thu, Nov 23, 2023 at 02:35:31PM +0000, Russell King (Oracle) wrote:
-> > On Thu, Nov 23, 2023 at 03:27:05PM +0100, Andrew Lunn wrote:
-> > > > Just to be more precise qca807x can operate in 3 different mode:
-> > > > (this is controlled by the MODE_CFG bits)
-> > > 
-> > > > - QSGMII: 5 copper port
-> > > 
-> > > 4 slots over QSGMII, plus the second SERDES is connected to the MAC
-> > > using SGMII/1000BaseX?
-> > > 
-> > > > - PSGMII: 5 copper port
-> > > 
-> > > 5 slots over QSGMII, the second SERDES is idle?
-> > > 
-> > > > - PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
-> > > 
-> > > 5 slots over QSGMII, with the second SERDES connected to an SFP cage.
-> > > 
-> > > Are ports 1-4 always connected to the P/Q SGMII. Its only port 5 which
-> > > can use the second SERDES?
-> > 
-> > I think what would really help here is if there was an ascii table to
-> > describe the configurations, rather than trying to put it into words.
-> 
-> Yes.
-> 
-> And also for ipq4019. We need to merge these two threads of
-> conversation, since in the end they are probably the same driver, same
-> device tree etc.
->
+> The Marvell 88e6351 switch is a slightly improved version of the 6350,
+> but is mostly identical. It will also need the dedicated 6350 function,
+> so update its phylink_get_caps as well.
 
-For everyone that missed Robert response in patch 12 let me quote him
-also here.
+In chip.h we have:
 
-"
-Hi Andrew,
-I think that the description is confusing.
-QCA807x supports 3 different modes:
-1. PSGMII (5 copper ports)
-2. PSGMII (4 copper ports + 1 combo port)
-3. QSGMII+SGMII
+        MV88E6XXX_FAMILY_6351,  /* 6171 6175 6350 6351 */
 
-So, in case option 2 is selected then the combo port can also be used for
-1000Base-X and 100Base-FX modules or copper and it will autodetect the
-exact media.
-This is supported via the SFP op-s and I have been using it without issues
-for a while.
+So please make the same change to the 6171 and 6175.
 
-I have not tested option 3 in combination with SFP to the copper
-module so I cant
-say whether that works.
-From what I can gather from the typical usage examples in the
-datasheet, this QSMII+SGMII
-mode is basically intended as a backward compatibility thing as only
-QCA SoC-s have PSGMII
-support so that you could still use SoC-s with QSGMII and SGMII support only.
+This otherwise looks O.K.
 
-So there is no way to control the SerDes-es individually, only the
-global mode can be changed via
-the Chip configuration register in the Combo port.
+    Andrew
 
-You can see the block diagram of this PHY in this public PDF on page 2[1].
-
-[1] https://content.codico.com/fileadmin/media/download/datasheets/qualcomm/qualcomm_qca8075.pdf
-"
-
--- 
-	Ansuel
+---
+pw-bot: cr
 
