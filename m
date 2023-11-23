@@ -1,135 +1,140 @@
-Return-Path: <netdev+bounces-50543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A5147F60DB
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:52:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE847F60F3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:03:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8575281EB0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5384F281E58
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3422577E;
-	Thu, 23 Nov 2023 13:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA522E82B;
+	Thu, 23 Nov 2023 14:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFlOhtzP"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="iPr0udDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0ABF25776;
-	Thu, 23 Nov 2023 13:52:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE28C433C7;
-	Thu, 23 Nov 2023 13:52:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700747537;
-	bh=g72OabfG6ivHttOZUXpkmt1ooH4gEmTwSkz/5QDX3n0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PFlOhtzPVgMD+qAvsS5wVFJkAPNP7RBdgiXO7ixlKHMgaoXoMQZULk9baBMffNVhx
-	 eZYhts3t4bqfNXIagChqG4N6+TWsbfBmIKAee1NaRqCKsnOI0Reg5EKj11PJRvvfPc
-	 tVL2s1RD0Tu7yKNvssSfIjav691QMC+7EFdbrN7bdEfPMzlDtkJF0NQcLBkfF8jHxv
-	 ns+zR/u9tmmiVd5XYIasR/AT9oUQeWjGHxho3m095Iz94NX8mT4KrXu96pGmkrkGcm
-	 K31WL9/YfEkTwhS4zrIG8d/YA5HOrTtBFBClTpJCmdnZS69ZSf1ha+XhbcEXQUSRHa
-	 eYEFxo5pLluHA==
-Date: Thu, 23 Nov 2023 13:52:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org, lorenzo@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH nf-next 1/8] netfilter: flowtable: move nf_flowtable out
- of container structures
-Message-ID: <20231123135213.GE6339@kernel.org>
-References: <20231121122800.13521-1-fw@strlen.de>
- <20231121122800.13521-2-fw@strlen.de>
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7ED71B2
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 06:03:05 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5cca8b559b3so9087067b3.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 06:03:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700748185; x=1701352985; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ks4NgGWTRdOYTAWFkBw8ls2lopTY/knpPpxWc0eVjoY=;
+        b=iPr0udDvMrnJdNyWiJ7V+SAybczUTCLS2Q2AfJXnJCl/3wXxE8u20Ku5ig86V6S28w
+         b8r63DTBsBXGllgR4IXcohAH4B5/fsbFQu24OemxiHx0Sz76qp3j64ODNH2SVtY8C4BU
+         m/tfzqa6ssmQf0N20ggvIwwXMshoPO8odLgWTpI8u+5ojLUjDuxZInQlnB48G2HMEMw2
+         3nAOM/PLOTI5VvuI1Q/qqBjuvgIgG5Z+yJWlT8mjvQPHEtOImyN5WpW9DMuePE7hna+b
+         SBSBRP9geuFWpRcWvPx7OvWIYrs1cVMtUU88/na+brxjYQez/JQAZBG7gsIvnj8wQvqw
+         2Zsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700748185; x=1701352985;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ks4NgGWTRdOYTAWFkBw8ls2lopTY/knpPpxWc0eVjoY=;
+        b=F6OvGJztyIOrPKQ6TncCEfMXwzz9JqiSb/T9h10NYUMZ/Gt1pgCZWEAEnCKggSy1u3
+         l1lxIIbvHfq6JUxPjE16l87pP1ZHD6rDeMoWYTHjzx3Konl/6OwuKt3n3DwbwaWE5Hcw
+         EFgbSw76XEJGwl2iWaGQ0rKZibYC6oN1YXmWZTvF2D5xRlOYzegNrkYqPL9JEV4Hu7BS
+         XXDQHxAn51v6uZFpez2IdsqbUwZOb7RFxOUifBq13Fd0e8+FGyp9aZu8sh2qRu5hmDpp
+         20618N1hi3Yz0yDV3KGuT8uJGnzM5kzggnTzl6C3oS+HwqOu56xWfKe6+vDrNdO4xTLS
+         bY+g==
+X-Gm-Message-State: AOJu0YzNGeEt3lmdRZHlwazOetlr94IM3p77VMyZfzYRPr+0z8BPEd/2
+	LIM/iY3GX686Yff9TflO5gGzeGzB3ykBA5wldoMiI1uVvke/nXm3
+X-Google-Smtp-Source: AGHT+IFeSEGxpikKOaXB3asFlkH9hGTW6XLBLwkVFeX0TjwdUJ7Wr4g3A78xPkh92BHyjfhhWrmud0z7maI1MIusWd0=
+X-Received: by 2002:a81:430a:0:b0:5cc:c649:85e7 with SMTP id
+ q10-20020a81430a000000b005ccc64985e7mr3982399ywa.26.1700748184870; Thu, 23
+ Nov 2023 06:03:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231121122800.13521-2-fw@strlen.de>
+References: <00000000000029fce7060ad196ad@google.com>
+In-Reply-To: <00000000000029fce7060ad196ad@google.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 23 Nov 2023 09:02:53 -0500
+Message-ID: <CAM0EoM=20ATLfrRMGh-zqgx7BrHiyCUmiCYBX_f1ST69UFRfOA@mail.gmail.com>
+Subject: Re: [syzbot] Monthly net report (Nov 2023)
+To: syzbot <syzbot+listaba4d9d9775b9482e752@syzkaller.appspotmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 21, 2023 at 01:27:44PM +0100, Florian Westphal wrote:
-> struct nf_flowtable is currently wholly embedded in either nft_flowtable
-> or tcf_ct_flow_table.
-> 
-> In order to allow flowtable acceleration via XDP, the XDP program will
-> need to map struct net_device to struct nf_flowtable.
-> 
-> To make this work reliably, make a clear separation of the frontend
-> (nft, tc) and backend (nf_flowtable) representation.
-> 
-> In this first patch, amke it so nft_flowtable and tcf_ct_flow_table
-> only store pointers to an nf_flowtable structure.
-> 
-> The main goal is to have follow patches that allow us to keep the
-> nf_flowtable structure around for a bit longer (e.g. until after
-> an rcu grace period has elapesed) when the frontend(s) are tearing the
-> structures down.
-> 
-> At this time, things are fine, but when xdp programs might be using
-> the nf_flowtable structure as well we will need a way to ensure that
-> no such users exist anymore.
-> 
-> Right now there is inufficient guarantee: nftables only ensures
-> that the netfilter hooks are unregistered, and tc only ensures the
-> tc actions have been removed.
-> 
-> Any future kfunc might still be called in parallel from an XDP
-> program.  The easies way to resolve this is to let the nf_flowtable
-> core handle release and module reference counting itself.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+On Thu, Nov 23, 2023 at 8:12=E2=80=AFAM syzbot
+<syzbot+listaba4d9d9775b9482e752@syzkaller.appspotmail.com> wrote:
+>
+> Hello net maintainers/developers,
+>
+> This is a 31-day syzbot report for the net subsystem.
+> All related reports/information can be found at:
+> https://syzkaller.appspot.com/upstream/s/net
+>
 
-...
+Hi,
+Could you please Cc the stakeholders for each issue (especially when
+there is a reproducer)? Not everybody reads every single message that
+shows up in the kernel.
 
-> @@ -312,24 +313,29 @@ static int tcf_ct_flow_table_get(struct net *net, struct tcf_ct_params *params)
->  	if (err)
->  		goto err_insert;
->  
-> -	ct_ft->nf_ft.type = &flowtable_ct;
-> -	ct_ft->nf_ft.flags |= NF_FLOWTABLE_HW_OFFLOAD |
-> -			      NF_FLOWTABLE_COUNTER;
-> -	err = nf_flow_table_init(&ct_ft->nf_ft);
-> +	ct_ft->nf_ft = kzalloc(sizeof(*ct_ft->nf_ft), GFP_KERNEL);
-> +	if (!ct_ft->nf_ft)
-> +		goto err_alloc;
+cheers,
+jamal
 
-Hi Florian,
-
-This branch will cause the function to return err, but err is 0 here.
-Perhaps it should be set to a negative error value instead?
-
-Flagged by Smatch.
-
-> +
-> +	ct_ft->nf_ft->type = &flowtable_ct;
-> +	ct_ft->nf_ft->flags |= NF_FLOWTABLE_HW_OFFLOAD |
-> +			       NF_FLOWTABLE_COUNTER;
-> +	err = nf_flow_table_init(ct_ft->nf_ft);
->  	if (err)
->  		goto err_init;
-> -	write_pnet(&ct_ft->nf_ft.net, net);
-> +	write_pnet(&ct_ft->nf_ft->net, net);
->  
->  	__module_get(THIS_MODULE);
->  out_unlock:
->  	params->ct_ft = ct_ft;
-> -	params->nf_ft = &ct_ft->nf_ft;
-> +	params->nf_ft = ct_ft->nf_ft;
->  	mutex_unlock(&zones_mutex);
->  
->  	return 0;
->  
->  err_init:
->  	rhashtable_remove_fast(&zones_ht, &ct_ft->node, zones_params);
-> +	kfree(ct_ft->nf_ft);
->  err_insert:
->  	kfree(ct_ft);
->  err_alloc:
-
-...
+> During the period, 5 new issues were detected and 13 were fixed.
+> In total, 77 issues are still open and 1358 have been fixed so far.
+>
+> Some of the still happening issues:
+>
+> Ref  Crashes Repro Title
+> <1>  3878    Yes   KMSAN: uninit-value in eth_type_trans (2)
+>                    https://syzkaller.appspot.com/bug?extid=3D0901d0cc75c3=
+d716a3a3
+> <2>  892     Yes   possible deadlock in __dev_queue_xmit (3)
+>                    https://syzkaller.appspot.com/bug?extid=3D3b165dac1509=
+4065651e
+> <3>  860     Yes   INFO: task hung in switchdev_deferred_process_work (2)
+>                    https://syzkaller.appspot.com/bug?extid=3D8ecc009e206a=
+956ab317
+> <4>  590     Yes   INFO: task hung in rtnetlink_rcv_msg
+>                    https://syzkaller.appspot.com/bug?extid=3D8218a8a0ff60=
+c19b8eae
+> <5>  390     Yes   WARNING in kcm_write_msgs
+>                    https://syzkaller.appspot.com/bug?extid=3D52624bdfbf27=
+46d37d70
+> <6>  373     Yes   INFO: rcu detected stall in corrupted (4)
+>                    https://syzkaller.appspot.com/bug?extid=3Daa7d098bd6fa=
+788fae8e
+> <7>  249     Yes   INFO: rcu detected stall in tc_modify_qdisc
+>                    https://syzkaller.appspot.com/bug?extid=3D9f78d5c664a8=
+c33f4cce
+> <8>  240     Yes   BUG: corrupted list in p9_fd_cancelled (2)
+>                    https://syzkaller.appspot.com/bug?extid=3D1d26c4ed77bc=
+6c5ed5e6
+> <9>  172     No    INFO: task hung in linkwatch_event (3)
+>                    https://syzkaller.appspot.com/bug?extid=3Dd4b2f8282f84=
+f54e87a1
+> <10> 154     Yes   WARNING in print_bfs_bug (2)
+>                    https://syzkaller.appspot.com/bug?extid=3D630f83b42d80=
+1d922b8b
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> To disable reminders for individual bugs, reply with the following comman=
+d:
+> #syz set <Ref> no-reminders
+>
+> To change bug's subsystems, reply with:
+> #syz set <Ref> subsystems: new-subsystem
+>
+> You may send multiple commands in a single email message.
+>
 
