@@ -1,115 +1,159 @@
-Return-Path: <netdev+bounces-50314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CEAC7F5583
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:49:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737307F55A6
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:52:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C88B2815F6
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:48:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03CFDB20D76
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF10DEBE;
-	Thu, 23 Nov 2023 00:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C0CEC3;
+	Thu, 23 Nov 2023 00:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MJHp2fxj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmJY+GWq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A81F18D;
-	Wed, 22 Nov 2023 16:48:54 -0800 (PST)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59B6A3;
+	Wed, 22 Nov 2023 16:51:36 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-32dff08bbdbso192721f8f.2;
+        Wed, 22 Nov 2023 16:51:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700700534; x=1732236534;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qmZdOEoSh54Tr4/Iw1S4mJwwzSQVqWEFdKjcVkgDJF0=;
-  b=MJHp2fxjVH07BlY2RJcOcCyW+L4IfRywBd+YQi44Ng2D/k1mdJ3jTgG0
-   iHLs5Rr2GzgcebgyZJihrAqupdiLXUv2ybBYvdPC3lALpcXwxp9yJRLVS
-   9hmJAB5ALzm40qUzlVfEo2VlO/Ja1v25gBknN/CYJB7pVdzFWeF/K6SIq
-   A=;
-X-IronPort-AV: E=Sophos;i="6.04,220,1695686400"; 
-   d="scan'208";a="45754520"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 00:48:51 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id AC08EC1BBB;
-	Thu, 23 Nov 2023 00:48:47 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:58429]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.2:2525] with esmtp (Farcaster)
- id 96d8e617-d220-4c49-8946-55b7f5d104c9; Thu, 23 Nov 2023 00:48:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 96d8e617-d220-4c49-8946-55b7f5d104c9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 23 Nov 2023 00:48:45 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.50) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.39;
- Thu, 23 Nov 2023 00:48:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <martineau@kernel.org>,
-	<matthieu.baerts@tessares.net>, <matttbe@kernel.org>,
-	<mptcp@lists.linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
-Subject: Re: [syzbot] [mptcp?] KMSAN: uninit-value in mptcp_incoming_options
-Date: Wed, 22 Nov 2023 16:48:34 -0800
-Message-ID: <20231123004834.58534-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <000000000000545a26060abf943b@google.com>
-References: <000000000000545a26060abf943b@google.com>
+        d=gmail.com; s=20230601; t=1700700695; x=1701305495; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FFSRqxyM60XZYlWMe+LxLHgfBXsOYKs0Arhl5TpCQS8=;
+        b=bmJY+GWq3HWahs4EB4IcBFCKr1jWEWsUmI39qTWI7a6JgFRrQDLrkOwr2SHVDtfNx9
+         H20fSBXyqclmaofznlPdgljsYj+r53IuuZbIyaFTIMNRnr1pIfFNV9qDCQh6o3YQHlQf
+         CKsBXEn2Vr2rk7RzshD9NtJ/Sp0MIWUQ2JFzq48X1KJh3/Kw+typNZ6kBZrriqSNNOAP
+         M2hSva8TsLOysae6m79iY8yqe1eg7PaZ7gPVVrCibPTFcaR5dQYFcnWZOsL+SwsOSvAK
+         5BjMFCVg4QYw+b9f2jcnIxpXnbg3udrx1EbH4JLcc1epdh+8UhFdpkqBy28G4YfUg//6
+         c4uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700700695; x=1701305495;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FFSRqxyM60XZYlWMe+LxLHgfBXsOYKs0Arhl5TpCQS8=;
+        b=KmRJZVNDneDJEQ6QEo9KU3Ne/Yg01ezaGRtGzl3IYxDrWSHzH1pekaQXAfTnEl/sYS
+         UbTTF8l/OWzrKT22Wu7ro7TvvRTusryCJQHw/ZtdUOFWykSTx+RLaCSQ2QUwKTr2mcej
+         DC+jxH7bHA7nqVcrDfSU/pRA12NiX3nczLYE+NFD6v1eht7B+lcmPUzfu+q6H+6GMCJz
+         NwwPm7Lx7oKfz2bIPI43ftQVxu5TTwG112MjCs4+qMvvk3PaRKi5Bl7zRY0kTIOSXJUt
+         WW6EEcKHwyqHLsqyE+Agw51rNohb8G+HV88+9ieNjSSxXvVo249Dc+X7SxBNSsavMt0S
+         w/bQ==
+X-Gm-Message-State: AOJu0YwpfV/imgQ6saqnmbghI0/A8qa5aHE2aJJR0Xye5C/XLycT2GVw
+	2q/c02Gdq3Kn29s3bILmkOO3j1JgEJTxk45Ge1E=
+X-Google-Smtp-Source: AGHT+IFsZynBqDZU07UjtjyWcGDEoU4r8+d4uBQx87ACMaj5T1mQc/a3y5MZDETnfbK00TiUJQ8Ke8+6cd2ruagK5V8=
+X-Received: by 2002:a05:6000:144f:b0:332:caa9:72b2 with SMTP id
+ v15-20020a056000144f00b00332caa972b2mr3445384wrx.3.1700700695019; Wed, 22 Nov
+ 2023 16:51:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+References: <20231120144642.591358648@infradead.org> <20231120154948.708762225@infradead.org>
+ <20231122021817.ggym3biyfeksiplo@macbook-pro-49.dhcp.thefacebook.com>
+ <20231122111517.GR8262@noisy.programming.kicks-ass.net> <20231122124134.GP4779@noisy.programming.kicks-ass.net>
+In-Reply-To: <20231122124134.GP4779@noisy.programming.kicks-ass.net>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 22 Nov 2023 16:51:23 -0800
+Message-ID: <CAADnVQKhpjt0pojdYGXpeyMvJnCUVvyrRKCmHg3cKYjAs-HDmA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] x86/cfi,bpf: Fix BPF JIT call
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <keescook@chromium.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	linux-arch <linux-arch@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Joao Moreira <joao@overdrivepizza.com>, 
+	Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: syzbot <syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com>
-Date: Wed, 22 Nov 2023 07:43:23 -0800
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    c2d5304e6c64 Merge tag 'platform-drivers-x86-v6.7-2' of gi..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1536e3d4e80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=e32016b84cf917ca
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b834a6b2decad004cfa1
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11469724e80000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13934aaf680000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/23ea827adf3b/disk-c2d5304e.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/0f964ac588f5/vmlinux-c2d5304e.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/b061be889285/bzImage-c2d5304e.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com
-> 
-> =====================================================
-> BUG: KMSAN: uninit-value in mptcp_incoming_options+0xc93/0x3a80 net/mptcp/options.c:1197
+On Wed, Nov 22, 2023 at 4:41=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
+>
+>
+> +/*
+> + * Emit the various CFI preambles, see the large comment about FineIBT
+> + * in arch/x86/kernel/alternative.c
 
-#syz test git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git c2d5304e6c648ebcf653bace7e51e0e6742e46c8
+.. and in cfi.h ..
+which will have a copy-paste from your other email?
 
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index cd15ec73073e..01066aa7e67d 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -370,6 +370,7 @@ void mptcp_get_options(const struct sk_buff *skb,
- 
- 	/* initialize option status */
- 	mp_opt->suboptions = 0;
-+	mp_opt->use_ack = 0;
- 
- 	length = (th->doff * 4) - sizeof(struct tcphdr);
- 	ptr = (const unsigned char *)(th + 1);
+>                 prog->bpf_func =3D (void *)image + ctx.prog_offset;
+>                 prog->jited =3D 1;
+>                 prog->jited_len =3D proglen - ctx.prog_offset; // XXX?
+
+Just drop XXX.
+
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1431,6 +1431,9 @@ struct bpf_prog_aux {
+>         struct bpf_kfunc_desc_tab *kfunc_tab;
+>         struct bpf_kfunc_btf_tab *kfunc_btf_tab;
+>         u32 size_poke_tab;
+> +#ifdef CONFIG_FINEIBT
+> +       struct bpf_ksym ksym_prefix;
+> +#endif
+>         struct bpf_ksym ksym;
+>         const struct bpf_prog_ops *ops;
+>         struct bpf_map **used_maps;
+> --- a/kernel/bpf/core.c
+> +++ b/kernel/bpf/core.c
+> @@ -683,6 +683,23 @@ void bpf_prog_kallsyms_add(struct bpf_pr
+>         fp->aux->ksym.prog =3D true;
+>
+>         bpf_ksym_add(&fp->aux->ksym);
+> +
+> +#ifdef CONFIG_FINEIBT
+> +       /*
+> +        * When FineIBT, code in the __cfi_foo() symbols can get executed
+> +        * and hence unwinder needs help.
+> +        */
+
+I like the idea!
+
+> +       if (cfi_mode !=3D CFI_FINEIBT)
+> +               return;
+
+The cfi_mode var needs to be global along with enum ?
+Or some new helper function from arch/x86 ?
+
+> +
+> +       snprintf(fp->aux->ksym_prefix.name, KSYM_NAME_LEN,
+> +                "__cfi_%s", fp->aux->ksym.name);
+> +
+> +       prog->aux->ksym_prefix.start =3D (unsigned long) prog->bpf_func -=
+ 16;
+> +       prog->aux->ksym_prefix.end   =3D (unsigned long) prog->bpf_func;
+> +
+> +       bpf_ksym_add(&fp->aux->ksym_prefix);
+> +#endif
+>  }
+>
+>  void bpf_prog_kallsyms_del(struct bpf_prog *fp)
+
+and handle deletion of ksym_prefix here.
+
+I think it's shaping up nicely.
+Pls resend both patches as a set and cc bpf @ vger.
+BPF CI will pick it up and test on arm64, x86-64, s390 with gcc and clang.
+We don't do CONFIG_*IBT testing automatically, but
+I can manually try that after the holidays.
 
