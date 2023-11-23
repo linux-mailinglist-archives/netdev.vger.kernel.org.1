@@ -1,69 +1,59 @@
-Return-Path: <netdev+bounces-50549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D887F6136
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:15:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29DD7F6149
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19FEF2811C5
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:15:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436B5B21284
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD0C25555;
-	Thu, 23 Nov 2023 14:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZOX9JDG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BF02FC33;
+	Thu, 23 Nov 2023 14:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A9E24B3F
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:15:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CF00C433C8;
-	Thu, 23 Nov 2023 14:15:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700748943;
-	bh=cn1OsqYFTsylZVMslrnd3ANfGwXOvdHCP4pfppPKtIE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EZOX9JDGnIkYV+Vag/ge9kKg8XhDt9s4msFj1lQ0o5PfSAWBP//IjfkEK/ZQGHwHH
-	 lfKZINRHsxJGfAbRCiKVcwupU/t+YMQbC+4CVUO5WYBzXGzUH6LmcGrhOGrcrykSWn
-	 64AutOAPxgVLUGfSDOJRoYfZJiLWqavVD5HwCSuS41AS0xk0avBgfOOQQVd/UfjWHh
-	 W6pcxbfznfe/E93YY8H3scQoLwOnXHKRt4BVBZeap2TeAMbm2ZSskj7GdWHo91GhUL
-	 GJktAEhjx8DOEHvTaO1tdYuvW/aP7jitz6Tui7U2MwsIj0qrdXKFX7Joxy73aAvc/E
-	 lZ7xTpWO5LpkQ==
-Date: Thu, 23 Nov 2023 14:15:39 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev call - Nov 21st
-Message-ID: <20231123141539.GF6339@kernel.org>
-References: <20231120082805.35527339@kernel.org>
- <20231121160542.GA1136838@kernel.org>
- <20231121091106.02e51d0f@kernel.org>
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F1EB9
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 06:20:37 -0800 (PST)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1r6AZD-0005RM-NJ; Thu, 23 Nov 2023 15:20:31 +0100
+Date: Thu, 23 Nov 2023 15:20:31 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Marc Muehlfeld <mmuehlfe@redhat.com>
+Subject: Re: [PATCHv2 net-next 09/10] docs: bridge: add netfilter doc
+Message-ID: <20231123142031.GA20818@breakpoint.cc>
+References: <20231123134553.3394290-1-liuhangbin@gmail.com>
+ <20231123134553.3394290-10-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231121091106.02e51d0f@kernel.org>
+In-Reply-To: <20231123134553.3394290-10-liuhangbin@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Nov 21, 2023 at 09:11:06AM -0800, Jakub Kicinski wrote:
-> Thanks to everyone who attended!
-> 
-> Notes:
-> https://docs.google.com/document/d/12BUCwVjMY_wlj6truzL4U0c54db6Neft6qirfZcynbE/
-> 
-> I forgot to mention one thing:
-> 
-> The "cc_maintainers" check in patchwork has been improved, it will
-> now ignore emails which we haven’t heard from in 3 years (1 year if 
-> the author and missing CC emails share the domain).
+Hangbin Liu <liuhangbin@gmail.com> wrote:
+> Add netfilter part for bridge document.
 
-Excellent, IIRC this was discussed at Netconf.
-Let's see how this helps.
+Reviewed-by: Florian Westphal <fw@strlen.de>
+
+Thanks Hangbin!
 
