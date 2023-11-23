@@ -1,106 +1,80 @@
-Return-Path: <netdev+bounces-50458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C60A07F5DE7
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:37:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FA37F5DF2
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BECC31C20D3A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:37:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7689DB2129B
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F541224F8;
-	Thu, 23 Nov 2023 11:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018CF23744;
+	Thu, 23 Nov 2023 11:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6AN8USd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YvsepGXQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD25EA3
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:37:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700739447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cNU0lJ4bqwRQlxt9Wpe1IHAIeheCW8RuRwLK6Qt/j8Q=;
-	b=b6AN8USdQ/hIDfY4CzP9w2haBB9DOAOm+G+vOlLCowz04hI96214Txug8jzLmQgGl6zunM
-	visLJF2/ziqbKZ2tyxCDR6DFZMFWdmZILAafvRVUIYdckt6Eq7ILedHGqFlWXu62gzwzud
-	RTUxeBDYaYq6KhJzysBv4Z8280tzjWM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-33-XsJeOZqWPIaAkYTXrWYZ7Q-1; Thu, 23 Nov 2023 06:37:25 -0500
-X-MC-Unique: XsJeOZqWPIaAkYTXrWYZ7Q-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a02344944f5so15155366b.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:37:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700739443; x=1701344243;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cNU0lJ4bqwRQlxt9Wpe1IHAIeheCW8RuRwLK6Qt/j8Q=;
-        b=dtWZeYRGH1/iW5dfBEgD6YXxPGNG6Wkdn7HxrNjkr6tSkCf1PdjswYLxqpQXacSZY9
-         Zf6nWp+2ubC+wfEq2/TeeKuGmwsA3U8FGURJk7ovL3ZPpoKx+E4pHaiZNOEnLIHwRbUQ
-         1yTAVuTSgDDgHUdcR1zrHcA2mY7GUiy3tchfmzODJYJwP9LigR5fAlxPZZdDmROUsVAl
-         yJjubkSe78W5bh+STZhSx1b/Y4iNqQdGr3eOA3P0DqyevDkae1IUDXrX8MSzZaMcDZHo
-         1K1b81YW1HabJcWC21x5ciaOxdYSfmLdO+5ch1TMcYeW/eEOiVVmCXXqjpt51L2mBz/m
-         IrFw==
-X-Gm-Message-State: AOJu0YyQU7EMNqCk6Weg3+O8JSRF49xqlDasXqgQSStJ3JasCI9kguzu
-	P6imLWXXw70niQNtuYCaqgzriHX5pt80lxS3sQZ5dPSj4eANieT9jqq1ROLaLmIkrdCVNdMDD/P
-	PMANxkE6d8z3HIJHD
-X-Received: by 2002:a17:906:cb:b0:a02:a2fb:543 with SMTP id 11-20020a17090600cb00b00a02a2fb0543mr3401951eji.7.1700739443552;
-        Thu, 23 Nov 2023 03:37:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH/qhXeu1lxpefrtiQ6p1bXy+gUpUMSWogFKiIjUP9coMkMwyY1B5XPnDJWqosDbagW70xJxA==
-X-Received: by 2002:a17:906:cb:b0:a02:a2fb:543 with SMTP id 11-20020a17090600cb00b00a02a2fb0543mr3401937eji.7.1700739443239;
-        Thu, 23 Nov 2023 03:37:23 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-213.dyn.eolo.it. [146.241.241.213])
-        by smtp.gmail.com with ESMTPSA id jx19-20020a170906ca5300b009fc9fab9178sm669800ejb.125.2023.11.23.03.37.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 03:37:22 -0800 (PST)
-Message-ID: <a24433f86e39cbb45a9606621e01446e7ad6fa53.camel@redhat.com>
-Subject: Re: [PATCH 2/4 net] qca_spi: Fix SPI IRQ handling
-From: Paolo Abeni <pabeni@redhat.com>
-To: Stefan Wahren <wahrenst@gmx.net>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>, Florian Fainelli
- <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 23 Nov 2023 12:37:21 +0100
-In-Reply-To: <20231121163004.21232-3-wahrenst@gmx.net>
-References: <20231121163004.21232-1-wahrenst@gmx.net>
-	 <20231121163004.21232-3-wahrenst@gmx.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61DBABC;
+	Thu, 23 Nov 2023 03:38:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bL/fDkgepQ3rA2OLcMw0FSWOiPAvM6tlj7ZYw7lcpMA=; b=YvsepGXQCUjYIefk0oMpzQcstk
+	JATmsjldZ0/kjiPdy3itbVphmXqZJ4Q8NIO0EhF15ImVWftA3Lwp649DaRm7Eo6cV6bTmRlNAiKFW
+	RC/NzIzfakGaM7Tvztg54eGqxpvJ7ryuW++kd9UvE+KD5ZVt61cOeqEtkWu9lBSJxHEctCFnHTvjM
+	0rPArvIpcghx4iAPqjfowacpX+nJSEk/3GORG/Xz3m2C4AJQ32gwBzTvxqMk+brwopefG9NRlI/qj
+	levhleXcb90VQH/P3bmYSaDzOZNgKCw9ZOvWhJwdjMpNh0RnQtJttDq01pc/5P9yhjnVdOGhN/XA1
+	dACn3b1A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47110)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r681p-0001Uf-37;
+	Thu, 23 Nov 2023 11:37:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r681q-0006Ao-9n; Thu, 23 Nov 2023 11:37:54 +0000
+Date: Thu, 23 Nov 2023 11:37:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v6 1/3] net: dsa: microchip: ksz8: Make flow
+ control, speed, and duplex on CPU port configurable
+Message-ID: <ZV85kq+axQ7o0Jkc@shell.armlinux.org.uk>
+References: <20231123112051.713142-1-o.rempel@pengutronix.de>
+ <20231123112051.713142-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123112051.713142-2-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 2023-11-21 at 17:30 +0100, Stefan Wahren wrote:
-> The functions qcaspi_netdev_open/close are responsible of request &
-> free of the SPI interrupt, which wasn't the best choice. Currently
-> it's possible to trigger a double free of the interrupt by calling
-> qcaspi_netdev_close() after qcaspi_netdev_open() has failed.
-> So let us split IRQ allocation & enabling, so we can take advantage
-> of a device managed IRQ and also fix the issue.
->=20
-> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA=
-7000")
-> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+On Thu, Nov 23, 2023 at 12:20:49PM +0100, Oleksij Rempel wrote:
+> +	if (!duplex)
+> +		ctrl |= SW_HALF_DUPLEX;
 
-The change makes sense, but the changelog is confusing.=C2=A0
+	if (duplex == DUPLEX_HALF)
 
-qcaspi_netdev_close() and qcaspi_netdev_open() are invoked only via
-ndo_open and ndo_close(), right? So qcaspi_netdev_close() will never be
-invoked qcaspi_netdev_open(), failure - that is when IFF_UP is not set.
-
-Cheers,
-
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
