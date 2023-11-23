@@ -1,80 +1,173 @@
-Return-Path: <netdev+bounces-50361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005CE7F5701
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:22:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3C57F570A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F984B20F23
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8CF28170A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB1C8C02;
-	Thu, 23 Nov 2023 03:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969DD8813;
+	Thu, 23 Nov 2023 03:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OwA2SWor"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="41r6vZ8a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CAB8BEB
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:22:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF702C433C8;
-	Thu, 23 Nov 2023 03:22:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700709723;
-	bh=yAc2hE061dNOWccQc37rtV38ITS3Vn4u5CYPg8/n4Gk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OwA2SWorUNCEzk8EowGrclIWcuGhbpXO1hC2zUlxu6W/+XTqwWLCLMgU/OVEW1NPA
-	 Pptk52YDyySnXpvLwsvAWmvFASfnyefyblEaiZ8xNr0FcoStAnyENB64wJDoQZrAVX
-	 LJBgDsmHZsWEq/OXZJ83vvgE+Z2v9iZ/FMrNGMJNQtm3vGDsk51Zn9uMexKqCC+IvQ
-	 ycPX9uWMnBpjL8bX3cIxzNwBWoxHRoURKngX2XlRYO9O0VqKtHhGj1xetg9WSw2Kbp
-	 BlqE6a7r3roQi2TvOv2aY8KLijDYLIyJ5UfchwwbbUxBirXymgl5ZYHVhKhd1wCj3t
-	 qXGxbLP/o9mng==
-Date: Wed, 22 Nov 2023 19:22:01 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Zhang, Xuejun" <xuejun.zhang@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, <netdev@vger.kernel.org>,
- <anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
- <qi.z.zhang@intel.com>, Wenjun Wu <wenjun1.wu@intel.com>,
- <maxtram95@gmail.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
- "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, <pabeni@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-Message-ID: <20231122192201.245a0797@kernel.org>
-In-Reply-To: <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
-	<20230822034003.31628-1-wenjun1.wu@intel.com>
-	<ZORRzEBcUDEjMniz@nanopsycho>
-	<20230822081255.7a36fa4d@kernel.org>
-	<ZOTVkXWCLY88YfjV@nanopsycho>
-	<0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
-	<ZOcBEt59zHW9qHhT@nanopsycho>
-	<5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-	<bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
-	<20231118084843.70c344d9@kernel.org>
-	<3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770611AB;
+	Wed, 22 Nov 2023 19:31:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=R2W1eIGoN44WfeZqoSJKCknBFLhg1MSvdghZBej8Tto=; b=41r6vZ8a0N5C3aFfaYIGG3Nt0+
+	w3Wk45OWIBchNx7QWgxcgGk46uyazknOwo6LSarraXU0NkFLrQhUmbSFQejl4OYdVtn+LZGZlV1Zk
+	r/YlMNC4pQdIepOfwnD2IWi1WitSCbjq3+02JW0KXua8igRoE0YY8hYTujInIJaLRFC8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r60QS-000wAv-CM; Thu, 23 Nov 2023 04:30:48 +0100
+Date: Thu, 23 Nov 2023 04:30:48 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
+ PHY package nodes
+Message-ID: <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
+References: <20231120135041.15259-1-ansuelsmth@gmail.com>
+ <20231120135041.15259-4-ansuelsmth@gmail.com>
+ <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+ <20231121144244.GA1682395-robh@kernel.org>
+ <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
+ <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
 
-On Wed, 22 Nov 2023 14:19:14 -0800 Zhang, Xuejun wrote:
-> The proposed API would incur net/core and driver changes as follows
-> a) existing drivers with ndo_set_tx_maxrate support upgraded to use new 
-> ndo_set_tx_rate
-> b) net sysfs (replacing ndo_set_maxrate with ndo_set_tx_rate with 
-> minrate and burst set to 0, -1 means ignore)
-> c) Keep the existing /sys/class/net/ethx/queues/tx_nn/tx_maxrate as it 
-> is currently
-> d) Add sysfs entry as /sys/class/net/ethx/queues/tx_nn/tx_minrate & 
-> /sys/class/net/ethx/queues/tx_nn/burst
+On Wed, Nov 22, 2023 at 07:32:22PM +0100, Christian Marangi wrote:
+> On Tue, Nov 21, 2023 at 03:45:42PM +0100, Andrew Lunn wrote:
+> > > > I do think we need somewhere to put package properties. But i don't
+> > > > think phy-mode is such a property. At the moment, i don't have a good
+> > > > example of a package property.
+> > > 
+> > > What about power supplies and reset/enable lines?
+> > 
+> > Yes, good point. I can imagine some packages sharing regulators. Reset
+> > might also be shared, but it makes things messy to handle.
+> >
+> 
+> Sooooo.... Sorry if I insist but I would really love to have something
+> ""stable"" to move this further. (the changes are easy enough so it's
+> really a matter of finding a good DT structure)
+> 
+> Maybe a good idea would be summarize the concern and see what solution
+> was proposed:
+> 
+> Concern list:
+> 1. ethernet-phy-package MUST be placed in mdio node (not in ethernet,
+>    the example was wrong anyway) and MUST have an addr
+> 
+>    Current example doesn't have an addr. I would prefer this way but
+>    no problem in changing this.
+> 
+>    Solution:
+>      - Add reg to the ethernet-phy-package node with the base address of
+>        the PHY package (base address = the first PHY address of the
+>        package)
 
-You described extending the sysfs API (which the ndo you mention 
-is for) and nothing about converging the other existing APIs.
+Yes.
+
+>        We will have a PHY node with the same address of the PHY package
+>        node. Each PHY node in the PHY package node will have reg set to
+>        the REAL address in the mdio bus.
+
+Basically Yes. I actually think the first sentence is not 100%
+correct. It could be all the package configuration registers are in
+the base address, without an actual PHY. The PHYs then follow at
+addresses above it. I can also imagine a case where the first PHY in
+the package is not used, so its not listed at all. So i think it
+should be "We often have a PHY node with the same address of the PHY
+package node."
+
+> 3. phy-mode is problematic.
+> 
+>    It's an optional value to enforce a specific mode for each PHY in the
+>    package. For complex configuration the mode won't be defined.
+> 
+>    Solution:
+>     - Rename it to package-phy-mode to make it less confusing.
+> 
+>     - Add an additional function that PHY package can use to make custom
+>       validation on the mode for every PHY attached (in the PHY package).
+> 
+>       Would make it less clear but more flexible for complex
+>       configuration. Maybe both solution can be implemented and the
+>       special function is used if the mode is not defined?
+
+The description you give is that there are two SERDES, and both could
+be connected to a MAC. What does package-phy-mode represent then? 
+
+Luo Jie patch for the qca8084 seems to have the same issue. It has two
+SERDES/PMA, and both could be connected to the MACs. So it seems like
+QCA devices don't actually fit this model. If we want to describe the
+package link mode, we probably need to list each PMA, and have a
+property in the PMA node indicating what link mode the PMA is
+operating at.
+
+At least for the moment, its not clear we actually need this at
+all. It seems like the phy-mode is all we need. The PHY driver should
+know what values are valid per port, and so can validate the value.
+
+> 4. Not finding a correct place to put PHY package info.
+> 
+>    I'm still convinced the mdio node is the correct place.
+>    - PHY package are PHY in bundle so they are actual PHY
+>    - We already have in the mdio node special handling (every DSA switch
+>      use custom compatible and PHY ID is not used to probe them
+>      normally)
+>    - Node this way won't be treated as PHY as they won't match the PHY
+>      node name pattern and also won't have the compatible pattern for
+>      PHY.
+
+We do need a compatible for the package. The kernel is unlikely to use
+it, but the validation tools will. Each package can have its own DT
+properties, so we need a .yaml to describe those properties. So i
+would expect to have a "qca807x-package" compatible, which then lists
+the tx driver strength etc. The PHYs within the package don't need
+compatible, they are just linux PHYs, probed using the same code as
+PHYs outside of a package.
+
+    Andrew
 
