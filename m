@@ -1,187 +1,120 @@
-Return-Path: <netdev+bounces-50405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DA97F5A74
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:48:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8AB37F5A84
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:52:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F5421F20EC3
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 08:48:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2B3BB20DC0
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 08:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EB119BB8;
-	Thu, 23 Nov 2023 08:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195881B295;
+	Thu, 23 Nov 2023 08:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WuL6er7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D7410F1;
-	Thu, 23 Nov 2023 00:48:37 -0800 (PST)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5cca8b559b3so6406287b3.0;
-        Thu, 23 Nov 2023 00:48:37 -0800 (PST)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DF6109
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 00:51:44 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-548f6f3cdc9so915131a12.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 00:51:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700729503; x=1701334303; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HmNjb7O2iWdLq7Ddg8O2OpVn6WB2n2n0qyfFk5EH9vg=;
+        b=WuL6er7a165vWYllkLyN8sngDJTyOuTGynfD1NayQqo+a8Yh+gwnVeCaTeSQRCQBe7
+         lqou9RgivY3GNbNMNYRncdzXZcmrqsPHWO7fZExKmezpWqeblii7HTJWdsX50abSLa47
+         AQGLn4Fr0I4JUq2ICbMyCSKKE47yPTaKFDNn0ur7I9r0+cq/W3W6k9a44DhFQMvmh5IM
+         Qye2VeBOUDJEHN3RYuTxNAMBkqrFGRJE53y9NFoz4z+1pGtqGbJdbZFsOrPNU+6XwSyz
+         qTJadi+Eg8bpuJVqyXsiIzeqanDwi2eiP7WzBcm5rCz6tWWNby0rFjfA/7A11wvfUDPE
+         JlXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700729317; x=1701334117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=by70aOFOUFhdqOrGLgCt75M9J4tcctz7/cOLhtXw5mU=;
-        b=lXzPxZtVuvJrSuES03OyPnm9QhB6d6thXcwq3c1e0LYE45DzMUwjofnzpgkdSiotGv
-         /KKcXmFiNG9tNjVPTCjp2JLu+wY7vQeEgBk3hz7Ktk/McfN8CsJWl13UlEgOrN30rk4b
-         qecS4uV+lyDaFiCmaXbqvIn6JGIaSUMbKOgHR7Z2xxLCZd3+uXMeXL5y8M27eztHglQT
-         uRM7//6hHLQtcOZ2beWI0r/MXPrW6gc45ub1RnbsyS21sUCkQ4vIML78RX0BfnzGJE6x
-         pkMwIj/Rv2TKhdub1eRljm2FSkJq+pbym0IlPtPQIKknp1gQIIY2yZyU/jG++d5n8Afg
-         u4Bg==
-X-Gm-Message-State: AOJu0YxAl/TK17K90/MdJYyNY/yFNZkAw4u+l+LKhI5q9cc62O9JFP56
-	QDYx2vJmHi2X19MfiHmYS5f4yMm9TsfwfA==
-X-Google-Smtp-Source: AGHT+IFfqLgD/PvjX4VBsW5HH0XBvXMYuE0rRvrIkmWtCcLEBvuo+qyazuZ2iHYY8Jgxj7StMEnofg==
-X-Received: by 2002:a25:6b06:0:b0:d9a:cd62:410c with SMTP id g6-20020a256b06000000b00d9acd62410cmr4853893ybc.4.1700729316791;
-        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
-        by smtp.gmail.com with ESMTPSA id e71-20020a25d34a000000b00da076458395sm214481ybf.43.2023.11.23.00.48.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5cc69df1b9aso6181697b3.3;
-        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
-X-Received: by 2002:a0d:ca90:0:b0:5ca:7a21:7e22 with SMTP id
- m138-20020a0dca90000000b005ca7a217e22mr5419324ywd.9.1700729315801; Thu, 23
- Nov 2023 00:48:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700729503; x=1701334303;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HmNjb7O2iWdLq7Ddg8O2OpVn6WB2n2n0qyfFk5EH9vg=;
+        b=jPKkNNKaPd5PvDVTP+NpPw1Kq4yfxqAZoIPOuOmYK/XVsHviHLnw2y2M64z9VEylCO
+         +lml4JO53MO8+4AbbbY5CMDtC3apmCx8XP+sViat61iZ1AJwTVL1aRFQh3ccZwKgLbFg
+         FPanbhSzZo5K6QUl26z/L6K8UTairdIFXQZH9ujSZnSDgCIU6ysLuYwIxfTZAMSHi2/r
+         H79VvoEZBloDKUyNek3nY4yrZCbAb37SSLwcKNkU78K+Sa2W/x+PJm97puLuCpNM90R4
+         02KC9dvh8/M58yKOoxb/wSNkrqfMrKNNNISdjwXtLr8qauG7Q/MWJ2Kh64kHFDLvx5eL
+         9wPw==
+X-Gm-Message-State: AOJu0YzjYMuYabJ2hofQmHxxsc6VBluI9pPhUNL4srK96T/VgtMaY+NU
+	PRT2H+SekOeAa4FquPfDdJCNJg==
+X-Google-Smtp-Source: AGHT+IGfWF+7a1dcF1cvHwp5dkWsyAs1sjpw82wpIksabk2Qn2QckdlpKCH50wfzypSiBlTAkKPlUg==
+X-Received: by 2002:a05:6402:5156:b0:53e:3d9f:3c72 with SMTP id n22-20020a056402515600b0053e3d9f3c72mr3555085edd.18.1700729502999;
+        Thu, 23 Nov 2023 00:51:42 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id h7-20020a50ed87000000b005488703d13fsm395524edr.82.2023.11.23.00.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 00:51:42 -0800 (PST)
+Date: Thu, 23 Nov 2023 09:51:41 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: jhs@mojatatu.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+	mleitner@redhat.com, vladbu@nvidia.com, paulb@nvidia.com,
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
+Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
+ blockcast tc action
+Message-ID: <ZV8SnZPBV4if5umR@nanopsycho>
+References: <20231110214618.1883611-1-victor@mojatatu.com>
+ <20231110214618.1883611-5-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com> <20231120084606.4083194-9-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231120084606.4083194-9-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 23 Nov 2023 09:48:22 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV=2_h2PW9K7zT3Hwqjdk6D2m_Dd09bqHtifAvVTM7Lrw@mail.gmail.com>
-Message-ID: <CAMuHMdV=2_h2PW9K7zT3Hwqjdk6D2m_Dd09bqHtifAvVTM7Lrw@mail.gmail.com>
-Subject: Re: [PATCH 08/13] net: ravb: Rely on PM domain to enable refclk
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, p.zabel@pengutronix.de, 
-	yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com, 
-	biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	sergei.shtylyov@cogentembedded.com, mitsuhiro.kimura.kc@renesas.com, 
-	masaru.nagai.vx@renesas.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231110214618.1883611-5-victor@mojatatu.com>
 
-Hi Claudiu,
-
-Thanks for your patch (which seems to have been delayed by 3 days, ouch)!
-
-On Thu, Nov 23, 2023 at 5:35=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
-wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Fri, Nov 10, 2023 at 10:46:18PM CET, victor@mojatatu.com wrote:
+>This action takes advantage of the presence of tc block ports set in the
+>datapath and multicasts a packet to ports on a block. By default, it will
+>broadcast the packet to a block, that is send to all members of the block except
+>the port in which the packet arrived on. However, the user may specify
+>the option "tx_type all", which will send the packet to all members of the
+>block indiscriminately.
 >
-> For RZ/G3S and RZ/G2L SoCs the Ethernet's reference clock is part of the
-> Ethernet's power domain. It is controlled though CPG driver that is
-> providing the support for power domain that Ethernet belongs. Thus,
-> to be able to implement runtime PM (at least for RZ/G3S at the moment)
-
-Why only for RZ/G3S?
-
-> w/o the need to add clock enable/disable specific calls in runtime PM
-> ops of ravb driver and interfere with other IP specific implementations,
-> add a new variable to struct_hw_info and enable the reference clock
-> based on the value of this variable (the variable states if reference
-> clock is part of the Ethernet's power domain).
+>Example usage:
+>    $ tc qdisc add dev ens7 ingress_block 22
+>    $ tc qdisc add dev ens8 ingress_block 22
 >
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>Now we can add a filter to broadcast packets to ports on ingress block id 22:
+>$ tc filter add block 22 protocol ip pref 25 \
+>  flower dst_ip 192.168.0.0/16 action blockcast blockid 22
 
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-> @@ -1043,6 +1043,7 @@ struct ravb_hw_info {
->         unsigned nc_queues:1;           /* AVB-DMAC has RX and TX NC queu=
-es */
->         unsigned magic_pkt:1;           /* E-MAC supports magic packet de=
-tection */
->         unsigned half_duplex:1;         /* E-MAC supports half duplex mod=
-e */
-> +       unsigned refclk_in_pd:1;        /* Reference clock is part of a p=
-ower domain. */
->  };
->
->  struct ravb_private {
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ether=
-net/renesas/ravb_main.c
-> index 836fdb4b3bfd..ddd8cd2c0f89 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2502,6 +2502,7 @@ static const struct ravb_hw_info gbeth_hw_info =3D =
-{
->         .tx_counters =3D 1,
->         .carrier_counters =3D 1,
->         .half_duplex =3D 1,
-> +       .refclk_in_pd =3D 1,
->  };
->
->  static const struct of_device_id ravb_match_table[] =3D {
-> @@ -2749,12 +2750,14 @@ static int ravb_probe(struct platform_device *pde=
-v)
->                 goto out_release;
->         }
->
-> -       priv->refclk =3D devm_clk_get_optional(&pdev->dev, "refclk");
-> -       if (IS_ERR(priv->refclk)) {
-> -               error =3D PTR_ERR(priv->refclk);
-> -               goto out_release;
-> +       if (!info->refclk_in_pd) {
-> +               priv->refclk =3D devm_clk_get_optional(&pdev->dev, "refcl=
-k");
-> +               if (IS_ERR(priv->refclk)) {
-> +                       error =3D PTR_ERR(priv->refclk);
-> +                       goto out_release;
-> +               }
-> +               clk_prepare_enable(priv->refclk);
->         }
-> -       clk_prepare_enable(priv->refclk);
+Name the arg "block" so it is consistent with "filter add block". Make
+sure this is aligned netlink-wise as well.
 
-Is this patch really needed? It doesn't hurt to manually enable a
-clock that is also under Runtime PM control.  Clock prepare/enable
-refcounting will take care of that.
 
 >
->         if (info->gptp_ref_clk) {
->                 priv->gptp_clk =3D devm_clk_get(&pdev->dev, "gptp");
-> @@ -2869,7 +2872,8 @@ static int ravb_probe(struct platform_device *pdev)
->         if (info->ccc_gac)
->                 ravb_ptp_stop(ndev);
->  out_disable_refclk:
-> -       clk_disable_unprepare(priv->refclk);
-> +       if (!info->refclk_in_pd)
-> +               clk_disable_unprepare(priv->refclk);
->  out_release:
->         free_netdev(ndev);
->  pm_runtime_put:
-> @@ -2890,7 +2894,8 @@ static void ravb_remove(struct platform_device *pde=
-v)
->         if (info->ccc_gac)
->                 ravb_ptp_stop(ndev);
->
-> -       clk_disable_unprepare(priv->refclk);
-> +       if (!info->refclk_in_pd)
-> +               clk_disable_unprepare(priv->refclk);
->
->         /* Set reset mode */
->         ravb_write(ndev, CCC_OPC_RESET, CCC);
+>Or if we wish to send to all ports in the block:
+>$ tc filter add block 22 protocol ip pref 25 \
+>  flower dst_ip 192.168.0.0/16 action blockcast blockid 22 tx_type all
 
-Gr{oetje,eeting}s,
+I read the discussion the the previous version again. I suggested this
+to be part of mirred. Why exactly that was not addressed?
 
-                        Geert
+Instead of:
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action blockcast blockid 22
+You'd have:
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action mirred egress redirect block 22
+
+I don't see why we need special action for this.
+
+Regarding "tx_type all":
+Do you expect to have another "tx_type"? Seems to me a bit odd. Why not
+to have this as "no_src_skip" or some other similar arg, without value
+acting as a bool (flag) on netlink level.
 
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
