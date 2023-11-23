@@ -1,153 +1,358 @@
-Return-Path: <netdev+bounces-50594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6B97F63F7
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:32:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 207F87F6446
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E283281A20
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:32:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43DB51C20DC6
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA83FB21;
-	Thu, 23 Nov 2023 16:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pTAB8MJV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9AE3FB28;
+	Thu, 23 Nov 2023 16:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52F6410C7
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:32:26 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso11927a12.1
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:32:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700757145; x=1701361945; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kHnx14cr1yCK8qle9tu2EE/pgUOBSdUP8QNopUBV1ok=;
-        b=pTAB8MJVLfCdKrBFt3EDg5XJN+BVkaCDpdEBi6MO4zb45FMBKy+MXcjfoRdWcpYcB6
-         9kHJ+ZHf/sBinz8UeEqoBleBmmzneFnTJcRxBtYx9Ht34zhCroTZoVgHibgyjrlTwIKB
-         zQgsjxRdrFZFF/wBeDXXhhjpmDbxzrzA+Ln1VPP+hs5VAmbzU3BXaMCxpTLHYRcgtZRU
-         NiWEo4aRf/qHUx3C/JXxXEyRfZI7C4mNIi0PnFpXhXxikU6xF2QdTy7ZJlFnPSHCHVJG
-         0+bhYEUmdICIRUuhX0dJr0GpDqRv097OgbWFkGy55fOOBL4zzJlMS7CSifvzSy+ZVUl7
-         m4hg==
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1544F10CE;
+	Thu, 23 Nov 2023 08:42:52 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6b709048d8eso985955b3a.2;
+        Thu, 23 Nov 2023 08:42:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700757145; x=1701361945;
+        d=1e100.net; s=20230601; t=1700757771; x=1701362571;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kHnx14cr1yCK8qle9tu2EE/pgUOBSdUP8QNopUBV1ok=;
-        b=DfzfIdjIt1B0jvBg8Li4VMbgOVQp/+mc3lfAe+rJP5Eyh1uMr/Zxd00SWdisyWaua2
-         E+qVEsdeD70B97jPAt4mIauOiYy8yYj0xYF8dxLC280jfemgKqcT2rngI1eRNfyfDzec
-         9G6xu2CXB47M3vuGvPSxZzF4X9cyn78cxtsTC5yh5xtmrLVocT1cbtQBXYz5LIlnjTo8
-         VddgU8vhqF1NDmRkcGTnyYvCzxzHOWaN6Q8EjovNOT9Fcw71ZZtqsIO6geXkQuu46Tmt
-         aA0QGp3VnsrVUwdoIsDe9d7ypF2a2YuOX7oTL4BtITf2LjqQKKXPuRH7Pl71Cn9hoMx+
-         c33w==
-X-Gm-Message-State: AOJu0YwMFaBydwo0PSV2PgTH/R+KUp4VfikmM8qbKbYBOItEA57dLtmK
-	uXwzzonh+1tvYisbLIqa2EqnrvbauHY+gkPIagmu9Q==
-X-Google-Smtp-Source: AGHT+IERAzT2DH14wnLepk/HR1XspkDfoaCAepJVb9iyd7gTXAqiNiKYOdIkOlYeflAbx8t1ArAm/oe72C+mWNV5/sc=
-X-Received: by 2002:a05:6402:35ca:b0:544:24a8:ebd with SMTP id
- z10-20020a05640235ca00b0054424a80ebdmr390780edc.4.1700757144364; Thu, 23 Nov
- 2023 08:32:24 -0800 (PST)
+        bh=pQRJZMvnwWQRNg5FA4wJF1eV8mAIW4nnY5zQ1fqyCUs=;
+        b=NDcRg95+uMdoQrLY/5btIpUo8GIE6foDhYOa8VUV8As40d/5PcPet0Gkkxz88wbDgL
+         LPbB7oo13bfGP6+f8wA69g1VwB1aOcdxIug/AeBX8qwVgekcrYi0Aqq1GY7UlqPzoGCO
+         ptoaCK3VmmpfSpbQ5Ug9est7SIR8LUgpGQ82kurqitRdv1ab5FrFw/xj4DOWdZ/lk6+2
+         /sQRpYIDA67jYSZWWeqSnpxPq2MrFOZr9LAn23aL+W4+yxwX01s8z95zDc30anjvy0c2
+         JWPKXdLcyTxTXqyBbzVeant4xDuOW5lnRntnhQSxMrnbi5AVbEEb0pQ5rtcgClG21LpP
+         FIoA==
+X-Gm-Message-State: AOJu0Yx4nDknSk8bHY66fDFsR7VEoQ8WUrcEu1lIP9snapGp7OwL8h2H
+	U0jgOO5EFHmZ/dnxsG4IXi/LwbKxM/4Q6A==
+X-Google-Smtp-Source: AGHT+IHvjDEs4oY10So/aGY63Ft08Vfqw+g9/8T045qlJ14hyCXXOCosSgJM72MukvO4QoxOAAhUpw==
+X-Received: by 2002:a05:6a20:7f98:b0:188:290d:17dc with SMTP id d24-20020a056a207f9800b00188290d17dcmr170158pzj.60.1700757771167;
+        Thu, 23 Nov 2023 08:42:51 -0800 (PST)
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com. [209.85.210.170])
+        by smtp.gmail.com with ESMTPSA id t43-20020aa78fab000000b006c9c0705b5csm1419206pfs.48.2023.11.23.08.42.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Nov 2023 08:42:50 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6b709048d8eso985941b3a.2;
+        Thu, 23 Nov 2023 08:42:50 -0800 (PST)
+X-Received: by 2002:a25:5f4b:0:b0:d9b:417:139c with SMTP id
+ h11-20020a255f4b000000b00d9b0417139cmr5509937ybm.60.1700757346993; Thu, 23
+ Nov 2023 08:35:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231115210509.481514-1-vschneid@redhat.com> <20231115210509.481514-2-vschneid@redhat.com>
- <CANn89iJPxrXi35=_OJqLsJjeNU9b8EFb_rk+EEMVCMiAOd2=5A@mail.gmail.com> <CAD235PRWd+zF1xpuXWabdgMU01XNpvtvGorBJbLn9ny2G_TSuw@mail.gmail.com>
-In-Reply-To: <CAD235PRWd+zF1xpuXWabdgMU01XNpvtvGorBJbLn9ny2G_TSuw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 Nov 2023 17:32:10 +0100
-Message-ID: <CANn89iKRSKz0e8v+Z-UsKGs4fQWDt6eTAw71VENbSmfkEicTPA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] tcp/dcpp: Un-pin tw_timer
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-users@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar <tglozar@redhat.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Thomas Gleixner <tglx@linutronix.de>
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com> <20231120070024.4079344-4-claudiu.beznea.uj@bp.renesas.com>
+In-Reply-To: <20231120070024.4079344-4-claudiu.beznea.uj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 23 Nov 2023 17:35:35 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVMpKVY8WX7dbtHfgnwgePH+i9+2BAumb37sFmqccb44g@mail.gmail.com>
+Message-ID: <CAMuHMdVMpKVY8WX7dbtHfgnwgePH+i9+2BAumb37sFmqccb44g@mail.gmail.com>
+Subject: Re: [PATCH 03/14] clk: renesas: rzg2l-cpg: Add support for MSTOP
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
+	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
+	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
+	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
+	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
+	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 23, 2023 at 3:34=E2=80=AFPM Valentin Schneider <vschneid@redhat=
-.com> wrote:
->
-> Hi Eric,
->
-> On Mon, 20 Nov 2023 at 18:56, Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > On Wed, Nov 15, 2023 at 10:05=E2=80=AFPM Valentin Schneider <vschneid@r=
-edhat.com> wrote:
-> > >
-> > > @@ -53,16 +53,14 @@ void dccp_time_wait(struct sock *sk, int state, i=
-nt timeo)
-> > >                 if (state =3D=3D DCCP_TIME_WAIT)
-> > >                         timeo =3D DCCP_TIMEWAIT_LEN;
-> > >
-> > > -               /* tw_timer is pinned, so we need to make sure BH are=
- disabled
-> > > -                * in following section, otherwise timer handler coul=
-d run before
-> > > -                * we complete the initialization.
-> > > -                */
-> > > -               local_bh_disable();
-> > > -               inet_twsk_schedule(tw, timeo);
-> > > -               /* Linkage updates.
-> > > -                * Note that access to tw after this point is illegal=
-.
-> > > -                */
-> > > +              local_bh_disable();
-> > > +
-> > > +               // Linkage updates
-> > >                 inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
-> > > +               inet_twsk_schedule(tw, timeo);
-> >
-> > We could arm a timer there, while another thread/cpu found the TW in
-> > the ehash table.
-> >
-> >
-> >
-> > > +               // Access to tw after this point is illegal.
-> > > +               inet_twsk_put(tw);
-> >
-> > This would eventually call inet_twsk_free() while the timer is armed.
-> >
-> > I think more work is needed.
-> >
-> > Perhaps make sure that a live timer owns a reference on tw->tw_refcnt
-> > (This is not the case atm)
-> >
->
-> I thought that was already the case, per inet_twsk_hashdance():
->
-> /* tw_refcnt is set to 3 because we have :
->  * - one reference for bhash chain.
->  * - one reference for ehash chain.
->  * - one reference for timer.
->
-> and
->
-> tw_timer_handler()
-> `\
->   inet_twsk_kill()
->   `\
->     inet_twsk_put()
->
-> So AFAICT, after we go through the hashdance, there's a reference on
-> tw_refcnt held by the tw_timer.
-> inet_twsk_deschedule_put() can race with arming the timer, but it only
-> calls inet_twsk_kill() if the timer
-> was already armed & has been deleted, so there's no risk of calling it
-> twice... If I got it right :-)
->
+Hi Claudiu,
 
-Again, I think you missed some details.
+On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
+wrote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> RZ/{G2L, V2L, G3S} based CPG versions have support for saving extra
+> power when clocks are disabled by activating module standby. This is done
+> though MSTOP specific registers that are part of CPG. Each individual
+> module have one or more bits associated in one MSTOP register (see table
+> "Registers for Module Standby Mode" from HW manuals). Hardware manual
+> associates modules' clocks to one or more MSTOP bits. There are 3 mapping=
+s
+> available (identified by researching RZ/G2L, RZ/G3S, RZ/V2L HW manuals):
+>
+> case 1: N clocks mapped to N MSTOP bits (with N=3D{0, ..., X})
+> case 2: N clocks mapped to 1 MSTOP bit  (with N=3D{0, ..., X})
+> case 3: N clocks mapped to M MSTOP bits (with N=3D{0, ..., X}, M=3D{0, ..=
+., Y})
+>
+> Case 3 has been currently identified on RZ/V2L for VCPL4 module.
+>
+> To cover all 3 cases the individual platform drivers will provide to
+> clock driver MSTOP register offset and associated bits in this register
+> as a bitmask and the clock driver will apply this bitmask to proper
+> MSTOP register.
+>
+> As most of the modules have more than one clock and these clocks are
+> mapped to 1 MSTOP bitmap that need to be applied to MSTOP registers,
+> to avoid switching the module to/out of standby when the module has
+> enabled/disabled clocks a counter has been associated to each module
+> (though struct mstop::count) which is incremented/decremented every
+> time a module's clock is enabled/disabled and the settings to MSTOP
+> register are applied only when the counter reaches zero (counter zero
+> means either 1st clock of the module is going to be enabled or all clocks
+> of the module are going to be disabled).
 
-I am OOO for a few days, I do not have time to elaborate.
+Thanks for your patch!
 
-You will need to properly track active timer by elevating
-tw->tw_refcnt, or I guarantee something wrong will happen.
+> The MSTOP functionality has been instantiated at the moment for RZ/G3S.
+
+Do you plan to add support for the other SoCs, too?
+
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+
+> --- a/drivers/clk/renesas/r9a08g045-cpg.c
+> +++ b/drivers/clk/renesas/r9a08g045-cpg.c
+> @@ -187,23 +187,39 @@ static const struct cpg_core_clk r9a08g045_core_clk=
+s[] __initconst =3D {
+>  };
+>
+>  static const struct rzg2l_mod_clk r9a08g045_mod_clks[] =3D {
+> -       DEF_MOD("gic_gicclk",           R9A08G045_GIC600_GICCLK, R9A08G04=
+5_CLK_P1, 0x514, 0),
+> -       DEF_MOD("ia55_clk",             R9A08G045_IA55_CLK, R9A08G045_CLK=
+_P1, 0x518, 1),
+> -       DEF_MOD("dmac_aclk",            R9A08G045_DMAC_ACLK, R9A08G045_CL=
+K_P3, 0x52c, 0),
+> -       DEF_MOD("sdhi0_imclk",          R9A08G045_SDHI0_IMCLK, CLK_SD0_DI=
+V4, 0x554, 0),
+> -       DEF_MOD("sdhi0_imclk2",         R9A08G045_SDHI0_IMCLK2, CLK_SD0_D=
+IV4, 0x554, 1),
+> -       DEF_MOD("sdhi0_clk_hs",         R9A08G045_SDHI0_CLK_HS, R9A08G045=
+_CLK_SD0, 0x554, 2),
+> -       DEF_MOD("sdhi0_aclk",           R9A08G045_SDHI0_ACLK, R9A08G045_C=
+LK_P1, 0x554, 3),
+> -       DEF_MOD("sdhi1_imclk",          R9A08G045_SDHI1_IMCLK, CLK_SD1_DI=
+V4, 0x554, 4),
+> -       DEF_MOD("sdhi1_imclk2",         R9A08G045_SDHI1_IMCLK2, CLK_SD1_D=
+IV4, 0x554, 5),
+> -       DEF_MOD("sdhi1_clk_hs",         R9A08G045_SDHI1_CLK_HS, R9A08G045=
+_CLK_SD1, 0x554, 6),
+> -       DEF_MOD("sdhi1_aclk",           R9A08G045_SDHI1_ACLK, R9A08G045_C=
+LK_P1, 0x554, 7),
+> -       DEF_MOD("sdhi2_imclk",          R9A08G045_SDHI2_IMCLK, CLK_SD2_DI=
+V4, 0x554, 8),
+> -       DEF_MOD("sdhi2_imclk2",         R9A08G045_SDHI2_IMCLK2, CLK_SD2_D=
+IV4, 0x554, 9),
+> -       DEF_MOD("sdhi2_clk_hs",         R9A08G045_SDHI2_CLK_HS, R9A08G045=
+_CLK_SD2, 0x554, 10),
+> -       DEF_MOD("sdhi2_aclk",           R9A08G045_SDHI2_ACLK, R9A08G045_C=
+LK_P1, 0x554, 11),
+> -       DEF_MOD("scif0_clk_pck",        R9A08G045_SCIF0_CLK_PCK, R9A08G04=
+5_CLK_P0, 0x584, 0),
+> -       DEF_MOD("gpio_hclk",            R9A08G045_GPIO_HCLK, R9A08G045_OS=
+CCLK, 0x598, 0),
+> +       DEF_MOD("gic_gicclk",           R9A08G045_GIC600_GICCLK, R9A08G04=
+5_CLK_P1, 0x514, 0,
+> +                                       MSTOP(ACPU, BIT(3))),
+
+According to Rev. 1.00 of the Hardware User's Manual, bit 3 of the
+CPG_BUS_ACPU_MSTOP register is reserved?
+
+Also, gic_gicclk is a critical module clock, so I guess this module
+must never be put into standby?
+
+> --- a/drivers/clk/renesas/rzg2l-cpg.c
+> +++ b/drivers/clk/renesas/rzg2l-cpg.c
+> @@ -1177,6 +1177,17 @@ rzg2l_cpg_register_core_clk(const struct cpg_core_=
+clk *core,
+>                 core->name, PTR_ERR(clk));
+>  }
+>
+> +/**
+> + * struct mstop - MSTOP specific data structure
+> + * @count: reference counter for MSTOP settings (when zero the settings
+> + *        are applied to register)
+> + * @conf: MSTOP configuration (register offset, setup bits)
+> + */
+> +struct mstop {
+> +       u32 count;
+> +       u32 conf;
+> +};
+> +
+>  /**
+>   * struct mstp_clock - MSTP gating clock
+>   *
+> @@ -1186,6 +1197,7 @@ rzg2l_cpg_register_core_clk(const struct cpg_core_c=
+lk *core,
+>   * @enabled: soft state of the clock, if it is coupled with another cloc=
+k
+>   * @priv: CPG/MSTP private data
+>   * @sibling: pointer to the other coupled clock
+> + * @mstop: MSTOP configuration
+>   */
+>  struct mstp_clock {
+>         struct clk_hw hw;
+> @@ -1194,10 +1206,46 @@ struct mstp_clock {
+>         bool enabled;
+>         struct rzg2l_cpg_priv *priv;
+>         struct mstp_clock *sibling;
+> +       struct mstop *mstop;
+>  };
+>
+>  #define to_mod_clock(_hw) container_of(_hw, struct mstp_clock, hw)
+>
+> +/* Need to be called with a lock held to avoid concurent access to mstop=
+->count. */
+
+concurrent
+
+> +static void rzg2l_mod_clock_module_set_standby(struct mstp_clock *clock,
+> +                                              bool standby)
+> +{
+> +       struct rzg2l_cpg_priv *priv =3D clock->priv;
+> +       struct mstop *mstop =3D clock->mstop;
+> +       bool update =3D false;
+> +       u32 value;
+> +
+> +       if (!mstop)
+> +               return;
+> +
+> +       value =3D MSTOP_MASK(mstop->conf) << 16;
+> +
+> +       if (standby) {
+> +               value |=3D MSTOP_MASK(mstop->conf);
+> +               /* Avoid overflow. */
+> +               if (mstop->count > 0)
+> +                       mstop->count--;
+
+Should we add a WARN() here, or is it sufficient to rely on the WARN()
+in drivers/clk/clk.c:clk_core_disable()?
+
+> +
+> +               if (!mstop->count)
+> +                       update =3D true;
+> +       } else {
+> +               if (!mstop->count)
+> +                       update =3D true;
+> +
+> +               /* Avoid overflow. */
+> +               if (mstop->count + 1 !=3D 0)
+> +                       mstop->count++;
+
+Trying to avoid an overflow won't help much here.  The counter
+will be wrong afterwards anyway, and when decrementing again later, the
+module will be put in standby too soon...
+
+> +       }
+> +
+> +       if (update)
+> +               writel(value, priv->base + MSTOP_OFF(mstop->conf));
+> +}
+> +
+>  static int rzg2l_mod_clock_endisable(struct clk_hw *hw, bool enable)
+>  {
+>         struct mstp_clock *clock =3D to_mod_clock(hw);
+
+> @@ -1401,6 +1474,37 @@ rzg2l_cpg_register_mod_clk(const struct rzg2l_mod_=
+clk *mod,
+>                 }
+>         }
+>
+> +       if (mod->mstop_conf) {
+> +               struct mstop *mstop =3D rzg2l_mod_clock_get_mstop(priv, m=
+od->mstop_conf);
+> +
+> +               if (mstop) {
+> +                       clock->mstop =3D mstop;
+
+Please move the common assignment after the if/else block...
+
+> +               } else {
+
+... so this can just become "if (!mstop) {".
+
+> +                       mstop =3D devm_kzalloc(dev, sizeof(*mstop), GFP_K=
+ERNEL);
+> +                       if (!mstop) {
+> +                               clk_unregister(clk);
+> +                               goto fail;
+
+Please use "goto unregister", and call clk_unregister() after the new
+unregister label.
+
+> +                       }
+> +
+> +                       mstop->conf =3D mod->mstop_conf;
+> +                       clock->mstop =3D mstop;
+> +               }
+> +
+> +               if (rzg2l_mod_clock_is_enabled(&clock->hw)) {
+> +                       if (clock->sibling)
+> +                               clock->mstop->count =3D 1;
+> +                       else
+> +                               clock->mstop->count++;
+> +               }
+> +
+> +               /*
+> +                * Out of reset all modules are enabled. Set module to st=
+andby
+> +                * in case associated clocks are disabled at probe.
+
+Is that always true?
+What about kexec and crashdump kernels?
+
+> +                */
+> +               if (!clock->mstop->count)
+> +                       rzg2l_mod_clock_module_set_standby(clock, true);
+> +       }
+> +
+>         return;
+>
+>  fail:
+> diff --git a/drivers/clk/renesas/rzg2l-cpg.h b/drivers/clk/renesas/rzg2l-=
+cpg.h
+> index 6e38c8fc888c..10ee8aa4a5da 100644
+> --- a/drivers/clk/renesas/rzg2l-cpg.h
+> +++ b/drivers/clk/renesas/rzg2l-cpg.h
+
+> @@ -68,6 +73,10 @@
+>  #define SEL_PLL6_2     SEL_PLL_PACK(CPG_PL6_ETH_SSEL, 0, 1)
+>  #define SEL_GPU2       SEL_PLL_PACK(CPG_PL6_SSEL, 12, 1)
+>
+> +#define MSTOP(name, bitmask)   ((CPG_##name##_MSTOP) << 16 | (bitmask))
+
+I believe the bitmask is always a single bit.
+So perhaps let MSTOP() take the bit number instead of the bitmaskl?
+You can still store BIT(bit) inside the macro.
+
+> +#define MSTOP_OFF(conf)                ((conf) >> 16)
+> +#define MSTOP_MASK(conf)       ((conf) & GENMASK(15, 0))
+> +
+>  #define EXTAL_FREQ_IN_MEGA_HZ  (24)
+>
+>  /**
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
