@@ -1,180 +1,165 @@
-Return-Path: <netdev+bounces-50491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184977F5F1D
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:38:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9828C7F5F36
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5F5F281CA0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:38:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7CB81C20FD2
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB1C22F1F;
-	Thu, 23 Nov 2023 12:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FE424A18;
+	Thu, 23 Nov 2023 12:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 038601A4;
-	Thu, 23 Nov 2023 04:37:56 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0Vx-biHa_1700743073;
-Received: from 30.221.128.94(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0Vx-biHa_1700743073)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Nov 2023 20:37:54 +0800
-Message-ID: <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
-Date: Thu, 23 Nov 2023 20:37:49 +0800
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C35D44;
+	Thu, 23 Nov 2023 04:44:02 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3ANChT1e93020939, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3ANChT1e93020939
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Nov 2023 20:43:29 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Thu, 23 Nov 2023 20:43:29 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Thu, 23 Nov
+ 2023 20:43:20 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v12 00/13] Add Realtek automotive PCIe driver
+Date: Thu, 23 Nov 2023 20:43:00 +0800
+Message-ID: <20231123124313.1398570-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
- send/recv/acked events
-From: Philo Lu <lulie@linux.alibaba.com>
-To: bpf@vger.kernel.org
-Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
- hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org
-References: <20231123030732.111576-1-lulie@linux.alibaba.com>
-In-Reply-To: <20231123030732.111576-1-lulie@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Sorry, I forgot to cc the maintainers.
+This series includes adding realtek automotive ethernet driver 
+and adding rtase ethernet driver entry in MAINTAINERS file.
 
-On 2023/11/23 11:07, Philo Lu wrote:
-> Add 3 sock_ops operators, namely BPF_SOCK_OPS_DATA_SEND_CB,
-> BPF_SOCK_OPS_DATA_RECV_CB, and BPF_SOCK_OPS_DATA_ACKED_CB. A flag
-> BPF_SOCK_OPS_DATA_EVENT_CB_FLAG is provided to minimize the performance
-> impact. The flag must be explicitly set to enable these callbacks.
->
-> If the flag is enabled, bpf sock_ops program will be called every time a
-> tcp data packet is sent, received, and acked.
-> BPF_SOCK_OPS_DATA_SEND_CB: call bpf after a data packet is sent.
-> BPF_SOCK_OPS_DATA_RECV_CB: call bpf after a data packet is receviced.
-> BPF_SOCK_OPS_DATA_ACKED_CB: call bpf after a valid ack packet is
-> processed (some sent data are ackknowledged).
->
-> We use these callbacks for fine-grained tcp monitoring, which collects
-> and analyses every tcp request/response event information. The whole
-> system has been described in SIGMOD'18 (see
-> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
-> achieve this with bpf, we require hooks for data events that call
-> sock_ops bpf (1) when any data packet is sent/received/acked, and (2)
-> after critical tcp state variables have been updated (e.g., snd_una,
-> snd_nxt, rcv_nxt). However, existing sock_ops operators cannot meet our
-> requirements.
->
-> Besides, these hooks also help to debug tcp when data send/recv/acked.
->
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> ---
->   include/net/tcp.h        |  9 +++++++++
->   include/uapi/linux/bpf.h | 14 +++++++++++++-
->   net/ipv4/tcp_input.c     |  4 ++++
->   net/ipv4/tcp_output.c    |  2 ++
->   4 files changed, 28 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index d2f0736b76b8..73eda03fdda5 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -2660,6 +2660,15 @@ static inline void tcp_bpf_rtt(struct sock *sk)
->   		tcp_call_bpf(sk, BPF_SOCK_OPS_RTT_CB, 0, NULL);
->   }
->   
-> +/* op must be one of BPF_SOCK_OPS_DATA_SEND_CB, BPF_SOCK_OPS_DATA_RECV_CB,
-> + * or BPF_SOCK_OPS_DATA_ACKED_CB.
-> + */
-> +static inline void tcp_bpf_data_event(struct sock *sk, int op)
-> +{
-> +	if (BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk), BPF_SOCK_OPS_DATA_EVENT_CB_FLAG))
-> +		tcp_call_bpf(sk, op, 0, NULL);
-> +}
-> +
->   #if IS_ENABLED(CONFIG_SMC)
->   extern struct static_key_false tcp_have_smc;
->   #endif
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 7cf8bcf9f6a2..2154a6235901 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -3016,6 +3016,7 @@ union bpf_attr {
->    * 		* **BPF_SOCK_OPS_RETRANS_CB_FLAG** (retransmission)
->    * 		* **BPF_SOCK_OPS_STATE_CB_FLAG** (TCP state change)
->    * 		* **BPF_SOCK_OPS_RTT_CB_FLAG** (every RTT)
-> + * 		* **BPF_SOCK_OPS_DATA_EVENT_CB_FLAG** (data packet send/recv/acked)
->    *
->    * 		Therefore, this function can be used to clear a callback flag by
->    * 		setting the appropriate bit to zero. e.g. to disable the RTO
-> @@ -6755,8 +6756,10 @@ enum {
->   	 * options first before the BPF program does.
->   	 */
->   	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-> +	/* Call bpf when data send/recv/acked. */
-> +	BPF_SOCK_OPS_DATA_EVENT_CB_FLAG = (1<<7),
->   /* Mask of all currently supported cb flags */
-> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
-> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
->   };
->   
->   /* List of known BPF sock_ops operators.
-> @@ -6869,6 +6872,15 @@ enum {
->   					 * by the kernel or the
->   					 * earlier bpf-progs.
->   					 */
-> +	BPF_SOCK_OPS_DATA_SEND_CB,		/* Calls BPF program when a
-> +					 * data packet is sent. Pure ack is ignored.
-> +					 */
-> +	BPF_SOCK_OPS_DATA_RECV_CB,		/* Calls BPF program when a
-> +					 * data packet is received. Pure ack is ignored.
-> +					 */
-> +	BPF_SOCK_OPS_DATA_ACKED_CB,		/* Calls BPF program when sent
-> +					 * data are acknowledged.
-> +					 */
->   };
->   
->   /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index bcb55d98004c..72c6192e7cd0 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -824,6 +824,8 @@ static void tcp_event_data_recv(struct sock *sk, struct sk_buff *skb)
->   
->   	now = tcp_jiffies32;
->   
-> +	tcp_bpf_data_event(sk, BPF_SOCK_OPS_DATA_RECV_CB);
-> +
->   	if (!icsk->icsk_ack.ato) {
->   		/* The _first_ data packet received, initialize
->   		 * delayed ACK engine.
-> @@ -3454,6 +3456,8 @@ static int tcp_clean_rtx_queue(struct sock *sk, const struct sk_buff *ack_skb,
->   		flag |= FLAG_SET_XMIT_TIMER;  /* set TLP or RTO timer */
->   	}
->   
-> +	tcp_bpf_data_event(sk, BPF_SOCK_OPS_DATA_ACKED_CB);
-> +
->   	if (icsk->icsk_ca_ops->pkts_acked) {
->   		struct ack_sample sample = { .pkts_acked = pkts_acked,
->   					     .rtt_us = sack->rate->rtt_us };
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index eb13a55d660c..ddd6a9c2150f 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -2821,6 +2821,8 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
->   		/* Send one loss probe per tail loss episode. */
->   		if (push_one != 2)
->   			tcp_schedule_loss_probe(sk, false);
-> +
-> +		tcp_bpf_data_event(sk, BPF_SOCK_OPS_DATA_SEND_CB);
->   		return false;
->   	}
->   	return !tp->packets_out && !tcp_write_queue_empty(sk);
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
+
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
+
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
+
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+v11 -> v12:
+- Use pm_sleep_ptr and related macros.
+- Remove multicast filter limit.
+- Remove VLAN support and CBS offload functions. 
+- Remove redundent code.
+- Fix compiler warnning.
+
+Justin Lai (13):
+  rtase: Add pci table supported in this module
+  rtase: Implement the .ndo_open function
+  rtase: Implement the rtase_down function
+  rtase: Implement the interrupt routine and rtase_poll
+  rtase: Implement hardware configuration function
+  rtase: Implement .ndo_start_xmit function
+  rtase: Implement a function to receive packets
+  rtase: Implement net_device_ops
+  rtase: Implement pci_driver suspend and resume function
+  rtase: Implement ethtool function
+  rtase: Add a Makefile in the rtase folder
+  realtek: Update the Makefile and Kconfig in the realtek folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   17 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  335 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2366 +++++++++++++++++
+ 6 files changed, 2736 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+-- 
+2.34.1
+
 
