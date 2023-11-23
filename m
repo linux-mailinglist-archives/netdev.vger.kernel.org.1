@@ -1,122 +1,176 @@
-Return-Path: <netdev+bounces-50651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41947F6720
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 20:31:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F387F6724
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 20:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBCB281C16
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:31:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39E441C21010
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D2D4B5B9;
-	Thu, 23 Nov 2023 19:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB674C3B4;
+	Thu, 23 Nov 2023 19:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAGRUWPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8C59A;
-	Thu, 23 Nov 2023 11:30:59 -0800 (PST)
-Received: from [192.168.1.103] (178.176.78.136) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 23 Nov
- 2023 22:30:56 +0300
-Subject: Re: [PATCH 03/13] net: ravb: Make write access to CXR35 first before
- accessing other EMAC registers
-To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
-	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-4-claudiu.beznea.uj@bp.renesas.com>
- <c27d5dd1-bcdc-a79e-bf0b-a7e93f5d9545@omp.ru>
- <2545ffad-e970-499e-9192-ff89776e1946@tuxon.dev>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <2b1caad5-281b-4284-3ffe-3c50395c6d39@omp.ru>
-Date: Thu, 23 Nov 2023 22:30:55 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29558D47;
+	Thu, 23 Nov 2023 11:33:28 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c876f1e44dso14938081fa.0;
+        Thu, 23 Nov 2023 11:33:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700768006; x=1701372806; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/hq7LNXGTuldiV4ecttMMHQLmxEW4ioDA8UB5OvVq6I=;
+        b=FAGRUWPCXyj6exxd8QaqT3B9IdqRb54vWGM/tMjKTawkrYUcK7C0tSoTGfbsMjVpRo
+         4dVDLMpwFBZQpjuPUShK62PMEP1VHEEGr0mVWO0x0NvQKTvBd+D2BZoDhY3Thq5DfNdr
+         TCBAqMqQAi740vulbw7u15kw/5GH6MlN0H9sDjnlBw+I5xWMo0niJEIJCB7gGRnNX/he
+         1t9ZpzDLeNUpsXYByRdwOlwD7+7nMCdaljBAwRQ4spqfyEhoSzDP/Ews2UUrqbgC4XYP
+         J/ZRBOKqtdB1R3foyTwpnfz4yiUhTpmw9xQGVuOHeBPkgUe5OPQNoIGYiL9x6NvZe3U+
+         kExw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700768006; x=1701372806;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/hq7LNXGTuldiV4ecttMMHQLmxEW4ioDA8UB5OvVq6I=;
+        b=ORI4NU2QgMN1qQegL3AtgOX+2BKRogKqJKavZb+ECssQfxpBTmzfHcxfYnv/KS17xy
+         SL4/hUySM/TJ2pczrDTXyKuZ2DNp926o1rbqEt+/D4Vbq7YMgGT5xpyhIW4DPF8iYWMb
+         RoiSDNRntk3DesphtOQE+TtCHGorHLguIV2Bj+h95IZ08MZGcesbpY57d7+3vCGPVKf8
+         DsmsLaWeFeNJVC9G/ZXVhdlQdXiO+qpMvJutviJsf00Rb4DMLX88Yixwnrcku4TyMA5V
+         1MRxejgHWqOiTrBVLOl5Cv0Q9L36cbSpwHUHsTIChLHAjoJRiO7A+zdJjaulpXUt4/my
+         UJaA==
+X-Gm-Message-State: AOJu0YwHs1yDMG98avfdHWwMinNzTFy3HnTxdbPEmlUBkSw2Nl3U2UcR
+	o92CbHoTQcStMVegHaKltKg=
+X-Google-Smtp-Source: AGHT+IEpZV8AAS3AX/kSyCq/TvjTy4lvHHyqL6QV8NqZ0ODQESSmWB93J1AVOkRbP2EeuZ27xtYNUg==
+X-Received: by 2002:a2e:3a0f:0:b0:2c8:7962:cdc2 with SMTP id h15-20020a2e3a0f000000b002c87962cdc2mr223068lja.3.1700768005622;
+        Thu, 23 Nov 2023 11:33:25 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id a4-20020adfeec4000000b0033130644c87sm2442265wrp.54.2023.11.23.11.33.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 11:33:25 -0800 (PST)
+Message-ID: <655fa905.df0a0220.49d9b.7afd@mx.google.com>
+X-Google-Original-Message-ID: <ZV+pAo5jt0N9/AE2@Ansuel-xps.>
+Date: Thu, 23 Nov 2023 20:33:22 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Jie Luo <quic_luoj@quicinc.com>, Rob Herring <robh@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
+ PHY package nodes
+References: <20231120135041.15259-4-ansuelsmth@gmail.com>
+ <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+ <20231121144244.GA1682395-robh@kernel.org>
+ <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
+ <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+ <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
+ <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
+ <c697488a-d34c-4c98-b4c7-64aef2fe583f@lunn.ch>
+ <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
+ <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2545ffad-e970-499e-9192-ff89776e1946@tuxon.dev>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.136
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
 
-On 11/21/23 9:02 AM, claudiu beznea wrote:
-
-[...]
-
->>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>
->>> Hardware manual of RZ/G3S (and RZ/G2L) specifies the following on the
->>> description of CXR35 register (chapter "PHY interface select register
->>> (CXR35)"): "After release reset, make write-access to this register before
->>> making write-access to other registers (except MDIOMOD). Even if not need
->>> to change the value of this register, make write-access to this register
->>> at least one time. Because RGMII/MII MODE is recognized by accessing this
->>> register".
->>>
->>> The setup procedure for EMAC module (chapter "Setup procedure" of RZ/G3S,
->>> RZ/G2L manuals) specifies the E-MAC.CXR35 register is the first EMAC
->>> register that is to be configured.
->>>
->>> Note [A] from chapter "PHY interface select register (CXR35)" specifies
->>> the following:
->>> [A] The case which CXR35 SEL_XMII is used for the selection of RGMII/MII
->>> in APB Clock 100 MHz.
->>> (1) To use RGMII interface, Set ‘H’03E8_0000’ to this register.
->>> (2) To use MII interface, Set ‘H’03E8_0002’ to this register.
->>>
->>> Take into account these indication.
->>>
->>> Fixes: 1089877ada8d ("ravb: Add RZ/G2L MII interface support")
->>
->>    The bug fixes should be submitted separately and against the net.git repo...
+On Thu, Nov 23, 2023 at 03:57:58PM +0100, Andrew Lunn wrote:
+> On Thu, Nov 23, 2023 at 02:35:31PM +0000, Russell King (Oracle) wrote:
+> > On Thu, Nov 23, 2023 at 03:27:05PM +0100, Andrew Lunn wrote:
+> > > > Just to be more precise qca807x can operate in 3 different mode:
+> > > > (this is controlled by the MODE_CFG bits)
+> > > 
+> > > > - QSGMII: 5 copper port
+> > > 
+> > > 4 slots over QSGMII, plus the second SERDES is connected to the MAC
+> > > using SGMII/1000BaseX?
+> > > 
+> > > > - PSGMII: 5 copper port
+> > > 
+> > > 5 slots over QSGMII, the second SERDES is idle?
+> > > 
+> > > > - PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
+> > > 
+> > > 5 slots over QSGMII, with the second SERDES connected to an SFP cage.
+> > > 
+> > > Are ports 1-4 always connected to the P/Q SGMII. Its only port 5 which
+> > > can use the second SERDES?
+> > 
+> > I think what would really help here is if there was an ascii table to
+> > describe the configurations, rather than trying to put it into words.
 > 
-> OK, thanks for pointing it.
+> Yes.
+> 
+> And also for ipq4019. We need to merge these two threads of
+> conversation, since in the end they are probably the same driver, same
+> device tree etc.
+>
 
-   And I think Linus' repo will do as well...
+For everyone that missed Robert response in patch 12 let me quote him
+also here.
 
-MBR, Sergey
+"
+Hi Andrew,
+I think that the description is confusing.
+QCA807x supports 3 different modes:
+1. PSGMII (5 copper ports)
+2. PSGMII (4 copper ports + 1 combo port)
+3. QSGMII+SGMII
+
+So, in case option 2 is selected then the combo port can also be used for
+1000Base-X and 100Base-FX modules or copper and it will autodetect the
+exact media.
+This is supported via the SFP op-s and I have been using it without issues
+for a while.
+
+I have not tested option 3 in combination with SFP to the copper
+module so I cant
+say whether that works.
+From what I can gather from the typical usage examples in the
+datasheet, this QSMII+SGMII
+mode is basically intended as a backward compatibility thing as only
+QCA SoC-s have PSGMII
+support so that you could still use SoC-s with QSGMII and SGMII support only.
+
+So there is no way to control the SerDes-es individually, only the
+global mode can be changed via
+the Chip configuration register in the Combo port.
+
+You can see the block diagram of this PHY in this public PDF on page 2[1].
+
+[1] https://content.codico.com/fileadmin/media/download/datasheets/qualcomm/qualcomm_qca8075.pdf
+"
+
+-- 
+	Ansuel
 
