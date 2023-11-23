@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-50609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7EB17F649F
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44CF47F6499
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:00:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D904B20F64
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75AA11C20AF8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6643FB3C;
-	Thu, 23 Nov 2023 17:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED553FB2E;
+	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQ//dAo6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiF42eD/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C30F3FB34
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B1B6DC433AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49763E485;
+	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D322C433CD;
 	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700758826;
-	bh=+z6/eVRwuP0i1C6Vym1xVA4ih4xKRmmNUGp6cW2wKx0=;
+	bh=FvTcFGdL8EM0GPsWwPRvCVD/NzmnOuJxQCI1KGpza40=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lQ//dAo6RKbjO5Gq2cJmLVHyi1FB5gGVH+08lzogFghPdavzHiCWnX/e55hMqD8ZZ
-	 4esvgT9XvlVZDiTVchljY8eV8+Wkrvrf1NyY47qjgn504iqqzeneOuClecmNPjIgSQ
-	 UF/toLW3HafhhJCD7jDQy78e1aO47/UXta8D3yz3N0c5ilv7rrpn7oxFjLYa7OPScR
-	 FC7kfvZ7xqwt7SfhohLxaKaGSzKpPJjOO+DQ3UwpoovpO5gXo8ZjktLNdLzrL73+/K
-	 /9qZAk1F5pisGdW/wuDw5vAOH4dzefnfE5qEjX3jLJAFtqJ5CyMXnCQgKmgAAqEIlF
-	 kh7tjSwyIbrBw==
+	b=IiF42eD/jiBs9TaoiaHIhLbpzrx9VgYxuGEUS/26W8+bDx2T4yhhA06hJVdo55z2i
+	 jsl3MSii0ySB9RuDr5qKZJ1mrjbr1qCPn5QKRRMeefJBRFjYCG6gkfYJGHDoRrxEF5
+	 U9BNEiCvShPNASe7vghWqz8VJNOMG4hlyBGXogPsi6TDDTJk9hINVdjRDfmYJEY022
+	 ubLJUjfoKVtJzYzOKnF9EqspW50vbt1+pjP8ylRHWqupWMN1i6fkiM4DsMReA22W2j
+	 Z6AJmT3VbVDxATe8s7nQkkf2kSqJqOyZxVm6AT8tnckpdzyhMU8XRGeTlpPwF4k463
+	 wCeYPIRZ0JDBg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A232E270D6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C2F7C595D0;
 	Thu, 23 Nov 2023 17:00:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,38 +43,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tools: ynl: fix duplicate op name in devlink
+Subject: Re: [PATCH net v2] net: ipa: fix one GSI register field width
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170075882656.541.1010663520254747201.git-patchwork-notify@kernel.org>
+ <170075882643.541.6637672358181350446.git-patchwork-notify@kernel.org>
 Date: Thu, 23 Nov 2023 17:00:26 +0000
-References: <20231123030558.1611831-1-kuba@kernel.org>
-In-Reply-To: <20231123030558.1611831-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, jacob.e.keller@intel.com
+References: <20231122231708.896632-1-elder@linaro.org>
+In-Reply-To: <20231122231708.896632-1-elder@linaro.org>
+To: Alex Elder <elder@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mka@chromium.org, andersson@kernel.org,
+ quic_cpratapa@quicinc.com, quic_avuyyuru@quicinc.com,
+ quic_jponduru@quicinc.com, quic_subashab@quicinc.com, elder@kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 22 Nov 2023 19:05:58 -0800 you wrote:
-> We don't support CRUD-inspired message types in YNL too well.
-> One aspect that currently trips us up is the fact that single
-> message ID can be used in multiple commands (as the response).
-> This leads to duplicate entries in the id-to-string tables:
+On Wed, 22 Nov 2023 17:17:08 -0600 you wrote:
+> The width of the R_LENGTH field of the EV_CH_E_CNTXT_1 GSI register
+> is 24 bits (not 20 bits) starting with IPA v5.0.  Fix this.
 > 
-> devlink-user.c:19:34: warning: initialized field overwritten [-Woverride-init]
->    19 |         [DEVLINK_CMD_PORT_NEW] = "port-new",
->       |                                  ^~~~~~~~~~
-> devlink-user.c:19:34: note: (near initialization for ‘devlink_op_strmap[7]’)
+> Fixes: faf0678ec8a0 ("net: ipa: add IPA v5.0 GSI register definitions")
+> Signed-off-by: Alex Elder <elder@linaro.org>
+> ---
+> v2: Fixed erroneous commit hash in the "Fixes" tag.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tools: ynl: fix duplicate op name in devlink
-    https://git.kernel.org/netdev/net/c/39f04b1406b2
+  - [net,v2] net: ipa: fix one GSI register field width
+    https://git.kernel.org/netdev/net/c/37f0205538ba
 
 You are awesome, thank you!
 -- 
