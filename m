@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-50534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98BC7F60AE
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:46:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBCD27F60AF
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:46:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BEBB281E56
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:46:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDD771C21141
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475DD2576E;
-	Thu, 23 Nov 2023 13:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30CF025745;
+	Thu, 23 Nov 2023 13:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4LyyfLh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxbYqfCR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A453C1
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:20 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5be30d543c4so626521a12.2
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:20 -0800 (PST)
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E793C1
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:25 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28396255b81so715171a91.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700747179; x=1701351979; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700747184; x=1701351984; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lPWCqxk9AprKqAWF8SPHWJfK/CG6Gq8Ew1oPyqgSw2Q=;
-        b=c4LyyfLhKZH3/pBX5MBsksigGylWudHVqtP8W/vJt/By5BFWEa1kDR9GhIxygQIHm0
-         ZB3dDZg/mSk8ld+iBg1AfBt2HKksYhhGadBTCIBO3ZWW9Fb5Q6d3bNymOxIcx7lItT2r
-         NQrMNO3Sk+ZY9zT3yBaLqVMqvzFOvu6c0DsA8mgfmlLR/1am5jJKaE5CJlAA3Ik7YBMR
-         gEONM7+nCqz7BvwgLP7FCuIWmvsjBKUis2MKu3y53jvEVhDD+4NAdvrcKMlbwmZepO40
-         8Vnc7PxPIYrUbVEFBOgisFgPjWzvPSRyqHL+HzyEKdfqXjOngQD0R5+AEF0jukAjsaVN
-         Xd+g==
+        bh=EjIpsKXI3OC/NrpW4LsyvsWGhqOOR0eezUm9Sj+X5y0=;
+        b=BxbYqfCRsAQMhwZ3udraeXOubsMlUi8O4/7cA3unHpK+kHUOoaXjT53c+rzxy2RJ7L
+         oePMGEiYijsY8EN4GGB3FIw7sh0lhnnr5i11PGPrkTLLGuAh9A827WMt5y6wax6jvzmC
+         zl25BksbYe+0EgoMkYzDxSwwQlfuU5ydUqUo9aDXnqm8ojiWGOmqw7S+ozkdHoyGS6gC
+         6/tR0b3rqqFz59idgXEQQrR65PmCywBV7sHlsl92Lhlkaay9pUjxgymIuVyTqsQTc0Ld
+         LHooP73JTMzquqy8KDCvtFzY03WXbQzk6kVVtTb0wXRjr3wfxv95saDYsAHomzFjY0Hy
+         Qieg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700747179; x=1701351979;
+        d=1e100.net; s=20230601; t=1700747184; x=1701351984;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lPWCqxk9AprKqAWF8SPHWJfK/CG6Gq8Ew1oPyqgSw2Q=;
-        b=MZZkRSZHYel6TUd93xwsp0f9xTgGT0uQ5uv89+SdSUXGvnoeGmg2k0XjKg7zj4StRf
-         Rr+zyneeuBjUwW86EzDIquYPOYYDqP/MSz/n6s8dQ9LY4J13dVcHCP6OmsgYOWy5qxrI
-         qfUxqXJE5TyR9jdQFJVwyC+aCvvfKZhvmTFHXHOwPndSPl0AkRRHZfDZ/otCa9+DR1x+
-         yEN8IDON9l2JMqCn99RRrmXGQD6t7pqHeS3i+XxTCpNBMw9yYfsGgvnHoT6bdE22JSG/
-         MqynBX4bDZvReysz2eirfjks6ee/I80jhBbPL4BoQaB8VRRNyK5fjq87biDb0VNfXs59
-         vY3Q==
-X-Gm-Message-State: AOJu0YwaDReDMK/LkuhNcRnRN0YeTpiwQ90pL9mh4VIZde1nAEBS9U2r
-	Q+pAfrFGkGUdWl+9aXF+yv/YsiwqtYGBsBxS
-X-Google-Smtp-Source: AGHT+IESZkWFSQ1VyWBf/B/LXgwgINHp8ylasBZFZk47i0SE/sBQqq4UdZPQAT16uXcjSMBRCwt2Xg==
-X-Received: by 2002:a17:90b:1b07:b0:285:4784:b92a with SMTP id nu7-20020a17090b1b0700b002854784b92amr5400976pjb.1.1700747179173;
-        Thu, 23 Nov 2023 05:46:19 -0800 (PST)
+        bh=EjIpsKXI3OC/NrpW4LsyvsWGhqOOR0eezUm9Sj+X5y0=;
+        b=iI7Z3XJzaOgroklGBrjyPVgwXSuuh6AL37maLOrWLPfeqqqZC+fGtPwUDw9wvG3/ib
+         Rmt24lpbBnJsNgyQaztdYCpzaaufUjX0VP5OeUfa8T0HE3ESNFt9BimdJQI+umexOulO
+         +uC3rTmZYc8u6NnjE0oB6ZpckEc7oWl9gHgcomI0eux75nYK/S9rMw6mwHaFTfZCGWTM
+         K3zEZht+vpB6k2PDRG++FQ3QO5OeexLk61Gyi2aOCUcS4zGZ+RSycRTzywrCamg8yMbA
+         ZpYP+pLK0VzkRyBlioRL2rXk03LNlhwMyPxOk8Yln+qc4xUq6sWsgBX0/kc+pnYFYlC3
+         Hwlw==
+X-Gm-Message-State: AOJu0Yz7jGGfaJicjuMQerX5gQyRZwoknXmf0ZEjWCDsbTNmMWB8XltG
+	6EzGflNjjwbDnybG/3uEz1TIOspcFCTErhUi
+X-Google-Smtp-Source: AGHT+IGxLjVBl4F5xMDn8ReYmVb8L9MW2/nQFxvN4j9ZsYpaKHjSugCkq4tpjFdJ+ay0k2qQHOn8Bg==
+X-Received: by 2002:a17:90b:4a45:b0:281:554d:b318 with SMTP id lb5-20020a17090b4a4500b00281554db318mr5242203pjb.39.1700747183883;
+        Thu, 23 Nov 2023 05:46:23 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 29-20020a17090a195d00b0028328057c67sm1414210pjh.45.2023.11.23.05.46.14
+        by smtp.gmail.com with ESMTPSA id 29-20020a17090a195d00b0028328057c67sm1414210pjh.45.2023.11.23.05.46.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 05:46:18 -0800 (PST)
+        Thu, 23 Nov 2023 05:46:23 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -71,9 +71,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Marc Muehlfeld <mmuehlfe@redhat.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 03/10] net: bridge: add document for bridge sysfs attribute
-Date: Thu, 23 Nov 2023 21:45:46 +0800
-Message-ID: <20231123134553.3394290-4-liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 04/10] docs: bridge: Add kAPI/uAPI fields
+Date: Thu, 23 Nov 2023 21:45:47 +0800
+Message-ID: <20231123134553.3394290-5-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231123134553.3394290-1-liuhangbin@gmail.com>
 References: <20231123134553.3394290-1-liuhangbin@gmail.com>
@@ -85,122 +85,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Although the sysfs interface is deprecated and should not be extended
-if new options are added. There are still users and admins use this
-interface to config bridge options. It would help users to know what
-the meaning of each field. Add correspond netlink enums (as we have
-document for them) for bridge sysfs attributes, so we can use it in
-Documentation/networking/bridge.rst.
+The current bridge kernel doc is too old. It only pointed to the
+linuxfoundation wiki page which lacks of the new features.
+
+Here let's start the new bridge document and put all the bridge info
+so new developers and users could catch up the last bridge status soon.
+
+First, add kAPI/uAPI and FAQ fields. These 2 fields are only examples and
+more APIs need to be added in future.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- net/bridge/br_sysfs_br.c | 93 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 93 insertions(+)
+ Documentation/networking/bridge.rst | 84 +++++++++++++++++++++++++----
+ net/bridge/br_private.h             |  2 +
+ 2 files changed, 76 insertions(+), 10 deletions(-)
 
-diff --git a/net/bridge/br_sysfs_br.c b/net/bridge/br_sysfs_br.c
-index ea733542244c..bd9c9b2a7859 100644
---- a/net/bridge/br_sysfs_br.c
-+++ b/net/bridge/br_sysfs_br.c
-@@ -933,6 +933,99 @@ static ssize_t vlan_stats_per_port_store(struct device *d,
- static DEVICE_ATTR_RW(vlan_stats_per_port);
- #endif
+diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
+index c859f3c1636e..84aae94f6598 100644
+--- a/Documentation/networking/bridge.rst
++++ b/Documentation/networking/bridge.rst
+@@ -4,18 +4,82 @@
+ Ethernet Bridging
+ =================
  
-+/**
-+ * DOC: Bridge sysfs attributes
-+ *
-+ * @forward_delay: IFLA_BR_FORWARD_DELAY
-+ *
-+ * @hello_time: IFLA_BR_HELLO_TIME
-+ *
-+ * @max_age: IFLA_BR_MAX_AGE
-+ *
-+ * @ageing_time: IFLA_BR_AGEING_TIME
-+ *
-+ * @stp_state: IFLA_BR_STP_STATE
-+ *
-+ * @group_fwd_mask: IFLA_BR_GROUP_FWD_MASK
-+ *
-+ * @priority: IFLA_BR_PRIORITY
-+ *
-+ * @bridge_id: IFLA_BR_BRIDGE_ID
-+ *
-+ * @root_id: IFLA_BR_ROOT_ID
-+ *
-+ * @root_path_cost: IFLA_BR_ROOT_PATH_COST
-+ *
-+ * @root_port: IFLA_BR_ROOT_PORT
-+ *
-+ * @topology_change: IFLA_BR_TOPOLOGY_CHANGE
-+ *
-+ * @topology_change_detected: IFLA_BR_TOPOLOGY_CHANGE_DETECTED
-+ *
-+ * @hello_timer: IFLA_BR_HELLO_TIMER
-+ *
-+ * @tcn_timer: IFLA_BR_TCN_TIMER
-+ *
-+ * @topology_change_timer: IFLA_BR_TOPOLOGY_CHANGE_TIMER
-+ *
-+ * @gc_timer: IFLA_BR_GC_TIMER
-+ *
-+ * @group_addr: IFLA_BR_GROUP_ADDR
-+ *
-+ * @flush: IFLA_BR_FDB_FLUSH
-+ *
-+ * @no_linklocal_learn: BR_BOOLOPT_NO_LL_LEARN
-+ *
-+ * @multicast_router: IFLA_BR_MCAST_ROUTER
-+ *
-+ * @multicast_snooping: IFLA_BR_MCAST_SNOOPING
-+ *
-+ * @multicast_querier: IFLA_BR_MCAST_QUERIER
-+ *
-+ * @multicast_query_use_ifaddr: IFLA_BR_MCAST_QUERY_USE_IFADDR
-+ *
-+ * @hash_elasticity: IFLA_BR_MCAST_HASH_ELASTICITY
-+ *
-+ * @hash_max: IFLA_BR_MCAST_HASH_MAX
-+ *
-+ * @multicast_last_member_count: IFLA_BR_MCAST_LAST_MEMBER_CNT
-+ *
-+ * @multicast_startup_query_count: IFLA_BR_MCAST_STARTUP_QUERY_CNT
-+ *
-+ * @multicast_last_member_interval: IFLA_BR_MCAST_LAST_MEMBER_INTVL
-+ *
-+ * @multicast_membership_interval: IFLA_BR_MCAST_MEMBERSHIP_INTVL
-+ *
-+ * @multicast_querier_interval: IFLA_BR_MCAST_QUERIER_INTVL
-+ *
-+ * @multicast_query_interval: IFLA_BR_MCAST_QUERY_INTVL
-+ *
-+ * @multicast_query_response_interval: IFLA_BR_MCAST_QUERY_RESPONSE_INTVL
-+ *
-+ * @multicast_startup_query_interval: IFLA_BR_MCAST_STARTUP_QUERY_INTVL
-+ *
-+ * @multicast_stats_enabled: IFLA_BR_MCAST_STATS_ENABLED
-+ *
-+ * @multicast_igmp_version: IFLA_BR_MCAST_IGMP_VERSION
-+ *
-+ * @multicast_mld_version: IFLA_BR_MCAST_MLD_VERSION
-+ *
-+ * @nf_call_iptables: IFLA_BR_NF_CALL_IPTABLES
-+ *
-+ * @nf_call_ip6tables: IFLA_BR_NF_CALL_IP6TABLES
-+ *
-+ * @nf_call_arptables: IFLA_BR_NF_CALL_ARPTABLES
-+ *
-+ * @vlan_filtering: IFLA_BR_VLAN_FILTERING
-+ *
-+ * @vlan_protocol: IFLA_BR_VLAN_PROTOCOL
-+ *
-+ * @default_pvid: IFLA_BR_VLAN_DEFAULT_PVID
-+ *
-+ * @vlan_stats_enabled: IFLA_BR_VLAN_STATS_ENABLED
-+ *
-+ * @vlan_stats_per_port: IFLA_BR_VLAN_STATS_PER_PORT
-+ */
- static struct attribute *bridge_attrs[] = {
- 	&dev_attr_forward_delay.attr,
- 	&dev_attr_hello_time.attr,
+-In order to use the Ethernet bridging functionality, you'll need the
+-userspace tools.
++Introduction
++============
+ 
+-Documentation for Linux bridging is on:
+-   https://wiki.linuxfoundation.org/networking/bridge
++A bridge is a way to connect multiple Ethernet segments together in a protocol
++independent way. Packets are forwarded based on Layer 2 destination Ethernet
++address, rather than IP address (like a router). Since forwarding is done
++at Layer 2, all Layer 3 protocols can pass through a bridge transparently.
+ 
+-The bridge-utilities are maintained at:
+-   git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bridge-utils.git
++Bridge kAPI
++===========
+ 
+-Additionally, the iproute2 utilities can be used to configure
+-bridge devices.
++Here are some core structures of bridge code.
+ 
+-If you still have questions, don't hesitate to post to the mailing list 
+-(more info https://lists.linux-foundation.org/mailman/listinfo/bridge).
++.. kernel-doc:: net/bridge/br_private.h
++   :identifiers: net_bridge_vlan
+ 
++Bridge uAPI
++===========
++
++Modern Linux bridge uAPI is accessed via Netlink interface. You can find
++below files where the bridge and bridge port netlink attributes are defined.
++
++Bridge netlink attributes
++-------------------------
++
++.. kernel-doc:: include/uapi/linux/if_link.h
++   :doc: Bridge enum definition
++
++Bridge port netlink attributes
++------------------------------
++
++.. kernel-doc:: include/uapi/linux/if_link.h
++   :doc: Bridge port enum definition
++
++Bridge sysfs
++------------
++
++All sysfs attributes are also exported via the bridge netlink API.
++You can find each attribute explanation based on the correspond netlink
++attribute.
++
++NOTE: the sysfs interface is deprecated and should not be extended if new
++options are added.
++
++.. kernel-doc:: net/bridge/br_sysfs_br.c
++   :doc: Bridge sysfs attributes
++
++FAQ
++===
++
++What does a bridge do?
++----------------------
++
++A bridge transparently forwards traffic between multiple network interfaces.
++In plain English this means that a bridge connects two or more physical
++Ethernet networks, to form one larger (logical) Ethernet network.
++
++Is it L3 protocol independent?
++------------------------------
++
++Yes. The bridge sees all frames, but it *uses* only L2 headers/information.
++As such, the bridging functionality is protocol independent, and there should
++be no trouble forwarding IPX, NetBEUI, IP, IPv6, etc.
++
++Contact Info
++============
++
++The code is currently maintained by Roopa Prabhu <roopa@nvidia.com> and
++Nikolay Aleksandrov <razor@blackwall.org>. Bridge bugs and enhancements
++are discussed on the linux-netdev mailing list netdev@vger.kernel.org and
++bridge@lists.linux-foundation.org.
++
++The list is open to anyone interested: http://vger.kernel.org/vger-lists.html#netdev
++
++External Links
++==============
++
++The old Documentation for Linux bridging is on:
++https://wiki.linuxfoundation.org/networking/bridge
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index 6b7f36769d03..051ea81864ac 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -186,6 +186,7 @@ enum {
+  * struct net_bridge_vlan - per-vlan entry
+  *
+  * @vnode: rhashtable member
++ * @tnode: rhashtable member
+  * @vid: VLAN id
+  * @flags: bridge vlan flags
+  * @priv_flags: private (in-kernel) bridge vlan flags
+@@ -196,6 +197,7 @@ enum {
+  * @refcnt: if MASTER flag set, this is bumped for each port referencing it
+  * @brvlan: if MASTER flag unset, this points to the global per-VLAN context
+  *          for this VLAN entry
++ * @tinfo: bridge tunnel info
+  * @br_mcast_ctx: if MASTER flag set, this is the global vlan multicast context
+  * @port_mcast_ctx: if MASTER flag unset, this is the per-port/vlan multicast
+  *                  context
 -- 
 2.41.0
 
