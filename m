@@ -1,100 +1,71 @@
-Return-Path: <netdev+bounces-50514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A827F5FCE
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:12:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F827F5FF6
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:16:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72106B21633
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4254C281DCB
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC2024B38;
-	Thu, 23 Nov 2023 13:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C887B24B47;
+	Thu, 23 Nov 2023 13:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EDAD54
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:12:24 -0800 (PST)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1cc23aa0096so8997275ad.2
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:12:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700745144; x=1701349944;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=co7D42Ew5PGNmMxvrOV+FDBuWMAk5mUqDhu2FPib/N4=;
-        b=ocQyEwcLeRD7YkbC6iZbcAFJ5wdOUe8wdkjXLJgSqrAHSTcrzeJlYn5APN/aS+CyHw
-         9ZnCbnx11Zz/Zuis12WtaPJ4D2rgWrQ3msxbJ6YyGVSfjM3l3yJsKkGLJYxT2V0cl7zA
-         G3SwwMhed0nzvxBfXSQS2yh9HlJU2HaGNdAj7fy3kQiir/ZK6mBZJvIvMKkLMkuWWLwu
-         jIRaJCfQRBLjvR81Ho8G7yAwwVeXdOMw6U/2MiPdP+h1SP7IFGWIb6y50hUFIbZn4/pO
-         P23vmua8RcVFl6/qnweUqNtxjr7ARfi+RRuzLRRXMqARBMlgdKb8efOeGpRF7XNjkMAW
-         UBPQ==
-X-Gm-Message-State: AOJu0YyvEYGeYxKFKEYSDMFXtgZSNEdS9cjUq2qHmXOhSt/Q+EZSsrB8
-	yW3CzgSRtvDaTyRvGQgVlG5iSzVUq9qW9a/PbVRLMI+w9UZH
-X-Google-Smtp-Source: AGHT+IFMINqJutKKVx9TByRIfYTcp2ud8KINy4P+SflmG9AERMT9n5eJb9gN7HblNG4JEj5KkkarTNiWjCChXvYC/2gHnJHUfcXH
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919D3A1;
+	Thu, 23 Nov 2023 05:16:45 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0Vwzd6KE_1700745401;
+Received: from 30.221.129.10(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vwzd6KE_1700745401)
+          by smtp.aliyun-inc.com;
+          Thu, 23 Nov 2023 21:16:43 +0800
+Message-ID: <24ea5034-78ef-c173-3739-fb05418f8d11@linux.alibaba.com>
+Date: Thu, 23 Nov 2023 21:16:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:f154:b0:1cf:8be1:4160 with SMTP id
- d20-20020a170902f15400b001cf8be14160mr360107plb.5.1700745144039; Thu, 23 Nov
- 2023 05:12:24 -0800 (PST)
-Date: Thu, 23 Nov 2023 05:12:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000029fce7060ad196ad@google.com>
-Subject: [syzbot] Monthly net report (Nov 2023)
-From: syzbot <syzbot+listaba4d9d9775b9482e752@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next 5/7] net/smc: compatible with 128-bits extend GID
+ of virtual ISM device
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kgraul@linux.ibm.com,
+ jaka@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
+ <1700402277-93750-6-git-send-email-guwen@linux.alibaba.com>
+ <20231120111739.31baf90a@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20231120111739.31baf90a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello net maintainers/developers,
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
 
-During the period, 5 new issues were detected and 13 were fixed.
-In total, 77 issues are still open and 1358 have been fixed so far.
+On 2023/11/21 03:17, Jakub Kicinski wrote:
+> On Sun, 19 Nov 2023 21:57:55 +0800 Wen Gu wrote:
+>> According to virtual ISM support feature defined by SMCv2.1, GIDs of
+>> virtual ISM device are UUIDs defined by RFC4122, which are 128-bits
+>> long. So some adaptation work is required. And note that the GIDs of
+>> existing platform firmware ISM devices still remain 64-bits long.
+> 
+> sparse (C=1 build) complains:
+> 
+> net/smc/smc_clc.c:944:73: warning: incorrect type in argument 1 (different base types)
+> net/smc/smc_clc.c:944:73:    expected unsigned short [usertype] chid
+> net/smc/smc_clc.c:944:73:    got restricted __be16 [usertype] chid
 
-Some of the still happening issues:
+It will be fixed in the next version. Thank you very much!
 
-Ref  Crashes Repro Title
-<1>  3878    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<2>  892     Yes   possible deadlock in __dev_queue_xmit (3)
-                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
-<3>  860     Yes   INFO: task hung in switchdev_deferred_process_work (2)
-                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
-<4>  590     Yes   INFO: task hung in rtnetlink_rcv_msg
-                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
-<5>  390     Yes   WARNING in kcm_write_msgs
-                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
-<6>  373     Yes   INFO: rcu detected stall in corrupted (4)
-                   https://syzkaller.appspot.com/bug?extid=aa7d098bd6fa788fae8e
-<7>  249     Yes   INFO: rcu detected stall in tc_modify_qdisc
-                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
-<8>  240     Yes   BUG: corrupted list in p9_fd_cancelled (2)
-                   https://syzkaller.appspot.com/bug?extid=1d26c4ed77bc6c5ed5e6
-<9>  172     No    INFO: task hung in linkwatch_event (3)
-                   https://syzkaller.appspot.com/bug?extid=d4b2f8282f84f54e87a1
-<10> 154     Yes   WARNING in print_bfs_bug (2)
-                   https://syzkaller.appspot.com/bug?extid=630f83b42d801d922b8b
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Thanks,
+Wen Gu
 
