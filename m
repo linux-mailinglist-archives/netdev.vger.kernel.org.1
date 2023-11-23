@@ -1,80 +1,117 @@
-Return-Path: <netdev+bounces-50459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FA37F5DF2
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:38:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0477E7F5DF7
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7689DB2129B
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:38:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F59DB212CC
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018CF23744;
-	Thu, 23 Nov 2023 11:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EBF23755;
+	Thu, 23 Nov 2023 11:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YvsepGXQ"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="R63HcEvR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61DBABC;
-	Thu, 23 Nov 2023 03:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bL/fDkgepQ3rA2OLcMw0FSWOiPAvM6tlj7ZYw7lcpMA=; b=YvsepGXQCUjYIefk0oMpzQcstk
-	JATmsjldZ0/kjiPdy3itbVphmXqZJ4Q8NIO0EhF15ImVWftA3Lwp649DaRm7Eo6cV6bTmRlNAiKFW
-	RC/NzIzfakGaM7Tvztg54eGqxpvJ7ryuW++kd9UvE+KD5ZVt61cOeqEtkWu9lBSJxHEctCFnHTvjM
-	0rPArvIpcghx4iAPqjfowacpX+nJSEk/3GORG/Xz3m2C4AJQ32gwBzTvxqMk+brwopefG9NRlI/qj
-	levhleXcb90VQH/P3bmYSaDzOZNgKCw9ZOvWhJwdjMpNh0RnQtJttDq01pc/5P9yhjnVdOGhN/XA1
-	dACn3b1A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47110)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r681p-0001Uf-37;
-	Thu, 23 Nov 2023 11:37:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r681q-0006Ao-9n; Thu, 23 Nov 2023 11:37:54 +0000
-Date: Thu, 23 Nov 2023 11:37:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Simon Horman <simon.horman@corigine.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v6 1/3] net: dsa: microchip: ksz8: Make flow
- control, speed, and duplex on CPU port configurable
-Message-ID: <ZV85kq+axQ7o0Jkc@shell.armlinux.org.uk>
-References: <20231123112051.713142-1-o.rempel@pengutronix.de>
- <20231123112051.713142-2-o.rempel@pengutronix.de>
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE18BC;
+	Thu, 23 Nov 2023 03:38:58 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN9TX74031781;
+	Thu, 23 Nov 2023 11:38:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=cahJq3zvyMWZ26vAEszpiEN1alzkguUJCq7NtLAPzUI=;
+ b=R63HcEvRKrCYdcyB3JSIBAOVShWYdv8yJHXxc/W6heEjv1FSlmblhIA7hbPW2HehIhOp
+ 7lbcpJKyDbC6WOS0GX3i3TYGYhhSQvPIR1HGI6ayQDru5ylzr6vGZ62wwHfPdsZyBvoZ
+ I1F1W+A1s/qvVEzP+e0fvhoIxSFtFZV9krHEzCyYYban1L+gY/nqhmqxKCBChfjmc72B
+ fMJBJ6JDDN37V2WdSKinBdcR9SYHr5NQ7PHNvZkp2Tr2u8wnSdxPdMHfkspvAe+HqHlX
+ 1NC2SXh6pEyDB1O/QQuNIIS8OmVn6Svp8Mz9zHbm6xJLWgg2cx29pWm33UbRrPyLTon5 mg== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhwme96v0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Nov 2023 11:38:44 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ANBch2A005721
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Nov 2023 11:38:43 GMT
+Received: from hu-jsuraj-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 23 Nov 2023 03:38:33 -0800
+From: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+To: <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+        Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Jose
+ Abreu" <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        Prasad Sodagudi
+	<psodagud@quicinc.com>,
+        Andrew Halaney <ahalaney@redhat.com>
+CC: <kernel@quicinc.com>
+Subject: [PATCH net-next v3 0/3] Ethernet DWMAC5 fault IRQ support
+Date: Thu, 23 Nov 2023 17:08:12 +0530
+Message-ID: <cover.1700737841.git.quic_jsuraj@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231123112051.713142-2-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: LfHynSKvQqDBUD3VRGTkUQMyMX0bs5LP
+X-Proofpoint-ORIG-GUID: LfHynSKvQqDBUD3VRGTkUQMyMX0bs5LP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_09,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 mlxlogscore=771 lowpriorityscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311230083
 
-On Thu, Nov 23, 2023 at 12:20:49PM +0100, Oleksij Rempel wrote:
-> +	if (!duplex)
-> +		ctrl |= SW_HALF_DUPLEX;
+Suraj Jaiswal (3):
+  dt-bindings: net: qcom,ethqos: add binding doc for fault IRQ for
+    sa8775p
+  arm64: dts: qcom: sa8775p: enable Fault IRQ
+  net: stmmac: Add driver support for DWMAC5 fault IRQ Support
 
-	if (duplex == DUPLEX_HALF)
+ .../devicetree/bindings/net/qcom,ethqos.yaml  |  7 +++++--
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi         | 10 ++++++----
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 18 +++++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 20 +++++++++++++++++++
+ 6 files changed, 52 insertions(+), 6 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
