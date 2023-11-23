@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-50588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C1B77F63D0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:20:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB70F7F63D4
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:22:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 140A9B20EA0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:20:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90C21C20DF3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FED23C088;
-	Thu, 23 Nov 2023 16:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360853FB14;
+	Thu, 23 Nov 2023 16:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ur08NYuD"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="PhQDfURz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C8E1A4
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:20:39 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6c4cf0aea06so1037041b3a.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:20:39 -0800 (PST)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6961892
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:22:03 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cc2575dfc7so7930025ad.1
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:22:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700756438; x=1701361238; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700756523; x=1701361323; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G2KoRo0/XYXAleMHfOZ9agr7EvwhTuJ4lu6/uOU5obU=;
-        b=ur08NYuDozCV4RY/zBTr4EGfKYR4awFwXCZOavw0uA238qfwk4Quy+4po9pWbSRIsI
-         eoC1H9B/NHKnIhFq1g5yglDJqE0CjODm07/Ayh/6ZmL0CyxHFyd96LDRvF2hBMiJSaxI
-         7FETE1xEvFm8LYKtIe3Cc7COjK6tLUOcP8BYKO+Zq7lm1lXK5UR/jn4+mQReSoOlmTWu
-         8yaDayLgsB7iwEwLUNVr3bNo2fACXGpUOTDK8LDtX12E2aVwySHmjyMtriDwqFxfOUkX
-         BRYFS4r5EwUhzOW2//TWurek28sfpW3GyV2w3rdfoF+mR8gkKmApvGYzzwQ4rn7/ESV/
-         qG4Q==
+        bh=s69Rqe9k2IXTXCDhRYdNVSFp8/kOsEPt2LaCLCcgL5Q=;
+        b=PhQDfURzZ/uqgjVG1XVex+MXorOjMr+MFOs4+MGmeD+tidi4oH+72s8B6UnLWjGOR/
+         irOpmkj2YpU4+pGWn2K7oT1mDmHsGJhYAnBuOxw9C7Adj9+OYUDnNR40bHVwaD2b6ILQ
+         8lSAP0GEpmdhoxzUksaOLa0bvilBzOuj7ODhLChEfRYxlxNLiGwNh67H7qcnPJ/qGeiZ
+         633x3JiS1XcXMVBbRzy68ilMMkvw34aX1216C+5lkcdUXt08lo5cv5yftqUH9RtEqUqA
+         tXems29SJ+P1DqONle6KMrhaSxgIgrlkW23oyf3cpfId2xaTW2PKQDAgI/UE66LbupwC
+         3osw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700756438; x=1701361238;
+        d=1e100.net; s=20230601; t=1700756523; x=1701361323;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G2KoRo0/XYXAleMHfOZ9agr7EvwhTuJ4lu6/uOU5obU=;
-        b=E6avfV9B31yXWAh18y9Pakv0JGGoa3PM1bkU1WuaCkq317s29ieY9FmImR0eus6AvL
-         LFXNK9Sk8C+6YkJzV/m253vKAsNKUKGWwD/wH+puIm4YaonDhidMkzZBclNPqhBpJGZW
-         iUiWT5EmrXTzS3rLiNVDB62jleHrE4353+O5ekO/JOCC21IL+kMp1ErAMQ7Y5OEuSWur
-         miidMFiM7+u7h5hNeh0+ofcBRvD01a8k8OEd8uz0wwJDIeMakMVifRYqFrMYXWv6L/1e
-         NyombjARycTkzkHiS2rbBRHIxVBBV/cbdpQzOK5vLEbhBKyenzCayVlqzCTpi0qrrzvt
-         j8Tw==
-X-Gm-Message-State: AOJu0YwBLVIRDQZnWbkZrPgIq/9Ce1NS0YTJ0THo7zboufBU2jKGMvxV
-	CxNSXXZZnThBhAvtRP8fjvZ2WdC7DOQALUMuW+q2lw==
-X-Google-Smtp-Source: AGHT+IETENxH7cDDcip7ziq+BWrmoWNCx+vdekD2xENmR1y8xU0nhjFdFYk98pomhb4mFW9UqxAwOG7wbUH6GWw2tG8=
-X-Received: by 2002:a17:90b:3e83:b0:280:c4be:3c8e with SMTP id
- rj3-20020a17090b3e8300b00280c4be3c8emr5853371pjb.48.1700756438374; Thu, 23
- Nov 2023 08:20:38 -0800 (PST)
+        bh=s69Rqe9k2IXTXCDhRYdNVSFp8/kOsEPt2LaCLCcgL5Q=;
+        b=Pf19rBWygRWz4rjzT99WcqBGK3+ocTQTtoL3m7TfD4L7Xptm3z7ry+AnyP2qnEPsx8
+         MIyVX4aUrLEvQlnU2g3S+NX3CQAX8ryRAEce2DRv2r56JyL/1n2eViKVz+6mOBWFWDgE
+         AwKwwE/DqRbYpcuGbUkjfs/lvz1GDZ9br8wUeUmvhEiDcA/IPl5pX3NyH1ral4210T/6
+         rPBa5RLltFOaC39d4p4geAeKDXsz59opql6GRVZuwq3R3XX/X2hr/Hiz/RSq1LcpTA81
+         spvQ1hCSrRzyUpYuYGXAG/5ISTqVMsHdGSsFq5C/nbzkSIOlSaF99L29e/QNCaGG+6gJ
+         yIpQ==
+X-Gm-Message-State: AOJu0Yw7N5C++ZPgfxtsCxPajXFtO9QNPdORSWnYk4NdibzMYsj0ZpaS
+	3gg8GO6TtT/IDQ1aNgYvyk3VVFPQyegsb6Pn88xg/Q==
+X-Google-Smtp-Source: AGHT+IHEBZzdeskBGrPkl9y2lJ1E2zm58mcPoySV6X+vcwkeNqditVDfNL89ZBFxdWDGlT3vBcwA2HTgnn/PRWSsCs0=
+X-Received: by 2002:a17:90b:33cf:b0:27d:166b:40f6 with SMTP id
+ lk15-20020a17090b33cf00b0027d166b40f6mr6079888pjb.41.1700756522841; Thu, 23
+ Nov 2023 08:22:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,8 +62,8 @@ References: <20231110214618.1883611-1-victor@mojatatu.com> <20231110214618.18836
  <ZV9tCT9d7dm7dOeA@nanopsycho>
 In-Reply-To: <ZV9tCT9d7dm7dOeA@nanopsycho>
 From: Jamal Hadi Salim <hadi@mojatatu.com>
-Date: Thu, 23 Nov 2023 11:20:27 -0500
-Message-ID: <CAAFAkD8G+m6foAjyc==njMw6zzCyRcQKwWaPnhnudVcWBGP0HQ@mail.gmail.com>
+Date: Thu, 23 Nov 2023 11:21:51 -0500
+Message-ID: <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
 Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
  blockcast tc action
 To: Jiri Pirko <jiri@resnulli.us>
@@ -136,18 +136,7 @@ his
 > >any sense because once you redirect the packet is gone.
 >
 > How is it mirror? It is redirect to multiple, isn't it?
-
-mirror has been used (so far in mirred action and i believe in the
-industry in general) to mean  "send a copy of the packet" - meaning
-you can send to many ports and even when you are done sending to all
-those ports the packet is still in the pipeline and you can continue
-to execute other action on it. Whereas redirect means the packet is
-stolen from the pipeline i.e if you redirect to a port the packet is
-not available to redirect to the next port or for any other action
-after that.
-You could argue a loose interpretation of redirect to a block to mean
-"mirror to all ports on the block but on the last port redirect".
-
+>
 >
 > >
 > >> >have been two actions. So i feel like adding a block to mirred is
@@ -163,11 +152,6 @@ You could argue a loose interpretation of redirect to a block to mean
 >
 > That does not looks correct at all. Do tc stuff in tc, no?
 >
-
-We could certainly annotate the dev group via tc but it seems odd ....
-
-cheers,
-jamal
 >
 > >...
 > >
@@ -177,6 +161,12 @@ jamal
 >
 > "blockcasting" to something that is not a block anymore. Not nice.
 >
+
+Sorry, missed this one. Yes blockcasting is no longer appropriate  -
+perhaps a different action altogether.
+
+cheers,
+jamal
 > >
 > >cheers,
 > >jamal
