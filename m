@@ -1,118 +1,100 @@
-Return-Path: <netdev+bounces-50513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59A57F5FBD
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:12:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A827F5FCE
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:12:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1338281DB0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:12:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72106B21633
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9706F24B37;
-	Thu, 23 Nov 2023 13:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSfg5H2P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC2024B38;
+	Thu, 23 Nov 2023 13:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454CB24A05;
-	Thu, 23 Nov 2023 13:12:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B246C433C7;
-	Thu, 23 Nov 2023 13:11:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700745135;
-	bh=VBAn7FZcvw1drif9KzTmaabLPVAYO4zX2eeQPqBTwFw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nSfg5H2PW95uhmCyWswaCk18HBzNnUr8lrZC9/jswVOaVEk9Necoc/3PSsg/eWI+c
-	 nUSNVQiBVNuTkdJG4ZroseK0fKTuKodiCnTfp5VBFncFM3thhaeXbqdq7/1OyUlFkh
-	 hvhoTdxdxKP2qiIgsXRrtgQ8aW/glFRtrG5pk0o8niH7Far3mtrppzle/A5KWCQFN1
-	 0J9D7XnhqZQWKtQ8+7lAsz1DeizPazr+k6Se4xCbJkyOxPi+pXbCyvcnpPCySfoTu/
-	 nxY4zeQuXLH9O0FYHNYyhAuFpYV+0VZCYLV3awl8R2o5zjol3Qy1blkTCXoR/k3lKT
-	 V10Lsp2N5sNOQ==
-Date: Thu, 23 Nov 2023 14:11:56 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-Cc: linux-fsdevel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Jan Kara <jack@suse.cz>, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-	Oded Gabbay <ogabbay@kernel.org>, Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Frederic Barrat <fbarrat@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Eric Farman <farman@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Vineeth Vijayan <vneethv@linux.ibm.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Tony Krowiak <akrowiak@linux.ibm.com>,
-	Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Diana Craciun <diana.craciun@oss.nxp.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
-	Benjamin LaHaise <bcrl@kvack.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeelb@google.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] i915: make inject_virtual_interrupt() void
-Message-ID: <20231123-randlage-instinkt-e458628d2d7c@brauner>
-References: <20231122-vfs-eventfd-signal-v2-0-bd549b14ce0c@kernel.org>
- <20231122-vfs-eventfd-signal-v2-1-bd549b14ce0c@kernel.org>
- <ZV6buHrQy2+CJ7xX@debian-scheme>
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EDAD54
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:12:24 -0800 (PST)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1cc23aa0096so8997275ad.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:12:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700745144; x=1701349944;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=co7D42Ew5PGNmMxvrOV+FDBuWMAk5mUqDhu2FPib/N4=;
+        b=ocQyEwcLeRD7YkbC6iZbcAFJ5wdOUe8wdkjXLJgSqrAHSTcrzeJlYn5APN/aS+CyHw
+         9ZnCbnx11Zz/Zuis12WtaPJ4D2rgWrQ3msxbJ6YyGVSfjM3l3yJsKkGLJYxT2V0cl7zA
+         G3SwwMhed0nzvxBfXSQS2yh9HlJU2HaGNdAj7fy3kQiir/ZK6mBZJvIvMKkLMkuWWLwu
+         jIRaJCfQRBLjvR81Ho8G7yAwwVeXdOMw6U/2MiPdP+h1SP7IFGWIb6y50hUFIbZn4/pO
+         P23vmua8RcVFl6/qnweUqNtxjr7ARfi+RRuzLRRXMqARBMlgdKb8efOeGpRF7XNjkMAW
+         UBPQ==
+X-Gm-Message-State: AOJu0YyvEYGeYxKFKEYSDMFXtgZSNEdS9cjUq2qHmXOhSt/Q+EZSsrB8
+	yW3CzgSRtvDaTyRvGQgVlG5iSzVUq9qW9a/PbVRLMI+w9UZH
+X-Google-Smtp-Source: AGHT+IFMINqJutKKVx9TByRIfYTcp2ud8KINy4P+SflmG9AERMT9n5eJb9gN7HblNG4JEj5KkkarTNiWjCChXvYC/2gHnJHUfcXH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZV6buHrQy2+CJ7xX@debian-scheme>
+X-Received: by 2002:a17:902:f154:b0:1cf:8be1:4160 with SMTP id
+ d20-20020a170902f15400b001cf8be14160mr360107plb.5.1700745144039; Thu, 23 Nov
+ 2023 05:12:24 -0800 (PST)
+Date: Thu, 23 Nov 2023 05:12:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000029fce7060ad196ad@google.com>
+Subject: [syzbot] Monthly net report (Nov 2023)
+From: syzbot <syzbot+listaba4d9d9775b9482e752@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> > +	if (!vgpu->msi_trigger)
-> > +		return;
-> > +	eventfd_signal(vgpu->msi_trigger, 1);
-> >  }
-> 
-> I think it's a little simpler to write as
->     if (vgpu->msi_trigger)
->             eventfd_signal(vgpu->msi_trigger, 1);
+Hello net maintainers/developers,
 
-Good point. I folded that suggestion into the patch.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
+
+During the period, 5 new issues were detected and 13 were fixed.
+In total, 77 issues are still open and 1358 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  3878    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<2>  892     Yes   possible deadlock in __dev_queue_xmit (3)
+                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
+<3>  860     Yes   INFO: task hung in switchdev_deferred_process_work (2)
+                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
+<4>  590     Yes   INFO: task hung in rtnetlink_rcv_msg
+                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
+<5>  390     Yes   WARNING in kcm_write_msgs
+                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
+<6>  373     Yes   INFO: rcu detected stall in corrupted (4)
+                   https://syzkaller.appspot.com/bug?extid=aa7d098bd6fa788fae8e
+<7>  249     Yes   INFO: rcu detected stall in tc_modify_qdisc
+                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+<8>  240     Yes   BUG: corrupted list in p9_fd_cancelled (2)
+                   https://syzkaller.appspot.com/bug?extid=1d26c4ed77bc6c5ed5e6
+<9>  172     No    INFO: task hung in linkwatch_event (3)
+                   https://syzkaller.appspot.com/bug?extid=d4b2f8282f84f54e87a1
+<10> 154     Yes   WARNING in print_bfs_bug (2)
+                   https://syzkaller.appspot.com/bug?extid=630f83b42d801d922b8b
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
