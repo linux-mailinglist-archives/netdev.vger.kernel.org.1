@@ -1,180 +1,72 @@
-Return-Path: <netdev+bounces-50472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828E37F5E69
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:55:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314197F5E78
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F27D281B92
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:55:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD5A0281CEE
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AA9241E9;
-	Thu, 23 Nov 2023 11:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C53241EC;
+	Thu, 23 Nov 2023 11:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VTEy762o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asew1abr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2D81BF
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:55:43 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507a62d4788so1090944e87.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 03:55:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700740541; x=1701345341; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rEhXyXecSsXMQIg/YxUPDQVBwLqafKsHNHP/Yqj+n9A=;
-        b=VTEy762owftzuyIGOvZXtYoFv1DEzFUGmSh1NycxhyQftzetC8RjjIsinMGLEVvpAF
-         X2Zo9xZvFJAfL+AziMU8UT04owj6tF0Q/5cp3Oo+X6S+agRlclo8SDrsEbEunaK90aKF
-         khbUOdh77V+YfcDIyaHHjcWwrXJZ3yeHIyFe6W6wOMuOoKVXdzB8QG1BYRiB6wqykdls
-         e4s9s8JwfJ+aBUkcV4CeRZfcuAYSFnYPZgUURJVWfGAd51oORLFHVFiY6EyjIlFoXxp9
-         Jtr54zcWjWGUl8EBYxsIMS9xJOQnboNJgO25WJ1NCHmnvCix+62rva+yZHuzArIvkRAZ
-         n+ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700740541; x=1701345341;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rEhXyXecSsXMQIg/YxUPDQVBwLqafKsHNHP/Yqj+n9A=;
-        b=DuiaGFaZDI8waO5nkNKK00Cdl5varv57cXewlrlyY106LPs3WRrKxte1rOB8uByLMe
-         aS93Su3/QkKhBfE8OoTTGAJLhRfLAJS89fT4yF4Av9CMicgkBsjBS4y4j9yuQwL0E5rx
-         4Phd9kfuUi3Hd2Nr9JUhydTAaUjQyeYaQzzQQytXdimLjlyzMc5CdzFHzF5tTKmlode+
-         dzE8gPTUpkMeroJNc5qF275400BX74S9m6iLFBD7fefsAtz3TgUcUm2mNHMNowByySw8
-         8ymX1Rh6SmFzLKE9AYRTj+JULOlkI+dFEQko0+FktetkKJj3R4ugBCDTpN/9kX3r8sBA
-         uQMw==
-X-Gm-Message-State: AOJu0YxdpmGZd5lWPa+M9ndoil2pkYL3m0fZwYwtRuc8BJ02RBnnqQOt
-	ofrY9RgoInSHNev3oDnYK3nRVg==
-X-Google-Smtp-Source: AGHT+IEQmg9QqvwxWaq3S4vi5vqQ2B4nJxRaKyvDHdI7fGHr0Y0QeQwLVtigFPh+zv9FMG5fnt/9Fw==
-X-Received: by 2002:a19:740f:0:b0:500:9f7b:e6a4 with SMTP id v15-20020a19740f000000b005009f7be6a4mr3036004lfe.32.1700740541278;
-        Thu, 23 Nov 2023 03:55:41 -0800 (PST)
-Received: from [172.30.204.221] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id k41-20020a0565123da900b0050aaa64ed60sm170104lfv.54.2023.11.23.03.55.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Nov 2023 03:55:40 -0800 (PST)
-Message-ID: <1e02f4f8-ebd3-4f57-98a9-48d7e08c0ad4@linaro.org>
-Date: Thu, 23 Nov 2023 12:55:38 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15642241E9
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 11:57:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83E33C433C8;
+	Thu, 23 Nov 2023 11:57:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700740654;
+	bh=d1KKFj+DyjKk6+RozV1+DoTTJKQS2amb7hIMgX6LAvM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=asew1abrsIY6gEFKiHpdM4HgeUYNjUYxkfJwcM8AY78HdsjF4c9X1ruoxfVSCYRR0
+	 BijnDVaEp+5V652iMAyaNcFpJTJ83/LaTU6XjfUjCxUN5fRucLY4oL7/vMQBhwEcG0
+	 mdGWod2B+3HjqG9YXstRAHHBUwzhGTC7OcoO1RCfWQ4jI7howUKc7AxJj/HY4m2Aty
+	 HO7bSH0KskPl+uUYUYDHRRSYtfHNjI646+EMzwNl6fhsFAC/jcVlOWgrayEyyndjZb
+	 whWdGZ/h8GS29BhGv0gYhOtXXtVQeH7WET3kL2Sh72T4aBFa0cbAGdd03SwK72sy/4
+	 0XqdT/k64sCiw==
+Date: Thu, 23 Nov 2023 11:57:29 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] igb: Use FIELD_GET() to extract Link Width
+Message-ID: <20231123115729.GA6339@kernel.org>
+References: <20231121123428.20907-1-ilpo.jarvinen@linux.intel.com>
+ <20231121123428.20907-2-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add driver support for
- DWMAC5 fault IRQ Support
-Content-Language: en-US
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
-Cc: kernel@quicinc.com
-References: <cover.1700737841.git.quic_jsuraj@quicinc.com>
- <62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: *
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231121123428.20907-2-ilpo.jarvinen@linux.intel.com>
 
-
-
-On 11/23/23 12:38, Suraj Jaiswal wrote:
-> Add IRQ support to listen HW fault like ECC,DPP,FSM
-> fault and print the fault information in the kernel
-> log.
+On Tue, Nov 21, 2023 at 02:34:26PM +0200, Ilpo Järvinen wrote:
+> Use FIELD_GET() to extract PCIe Negotiated Link Width field instead of
+> custom masking and shifting.
 > 
-> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
->   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
->   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 18 +++++++++++++++++
->   .../ethernet/stmicro/stmmac/stmmac_platform.c | 20 +++++++++++++++++++
->   4 files changed, 41 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> index 6b935922054d..c4821c7ab674 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> @@ -347,6 +347,7 @@ enum request_irq_err {
->   	REQ_IRQ_ERR_SFTY_UE,
->   	REQ_IRQ_ERR_SFTY_CE,
->   	REQ_IRQ_ERR_LPI,
-> +	REQ_IRQ_ERR_SAFETY,
->   	REQ_IRQ_ERR_WOL,
->   	REQ_IRQ_ERR_MAC,
->   	REQ_IRQ_ERR_NO,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index cd7a9768de5f..8893d4b7fa38 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -33,6 +33,7 @@ struct stmmac_resources {
->   	int irq;
->   	int sfty_ce_irq;
->   	int sfty_ue_irq;
-> +	int safety_common_intr;
->   	int rx_irq[MTL_MAX_RX_QUEUES];
->   	int tx_irq[MTL_MAX_TX_QUEUES];
->   };
-> @@ -331,6 +332,7 @@ struct stmmac_priv {
->   	/* XDP BPF Program */
->   	unsigned long *af_xdp_zc_qps;
->   	struct bpf_prog *xdp_prog;
-> +	int safety_common_intr;
-other interrupts use _irq yet you seem to use _intr, plus the
-aforementioned "safety" vs "fault" naming
+> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-[...]
+Thanks, nice to see FIELD_GET() used here.
 
->   
-> +int stmmac_get_fault_intr_config(struct platform_device *pdev, struct stmmac_resources *res)
-> +{
-> +	int ret = 0;
-get rid of ret and return directly
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> +
-> +	res->safety_common_intr = platform_get_irq_byname(pdev, "safety");
-> +
-stray newline?
-
-> +	if (res->safety_common_intr < 0) {
-> +		if (res->safety_common_intr != -EPROBE_DEFER)
-> +			dev_err(&pdev->dev, "safety IRQ configuration information not found\n");
-> +		ret = 1;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->   int stmmac_get_platform_resources(struct platform_device *pdev,
->   				  struct stmmac_resources *stmmac_res)
->   {
-> +	int ret = 0;
-Missing newline between declarations and code
-Unnecessary initialization
-
->   	memset(stmmac_res, 0, sizeof(*stmmac_res));
->   
->   	/* Get IRQ information early to have an ability to ask for deferred
-> @@ -702,6 +718,10 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->   	if (stmmac_res->irq < 0)
->   		return stmmac_res->irq;
->   
-> +	ret = stmmac_get_fault_intr_config(pdev, stmmac_res);
-> +	if (ret)
-> +		dev_err(&pdev->dev, "Fault interrupt not present\n");
-Since you're getting the return value, perhaps the errno should
-be propagated
-
-Konrad
 
