@@ -1,396 +1,119 @@
-Return-Path: <netdev+bounces-50327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A2B7F55E5
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:28:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9859E7F55F4
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 772CF1C20B22
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:28:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49A492815B1
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA86B10E9;
-	Thu, 23 Nov 2023 01:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RaVDXiCX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE4810E9;
+	Thu, 23 Nov 2023 01:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F9A92
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 17:28:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700702931; x=1732238931;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/IDCn4vk4hlNpIMmgf+NBEzfSAq/I2fBO/TCBRwaARI=;
-  b=RaVDXiCXTEQjS+PCWpqC+FtER6Br+PKimEGJx+SKt9m2V8l5fJKx/wPy
-   FU5ox6xrznahKZAHkmJV+r+IMRKaImJd/8OdOfhp1CotYAIiA67sy9xjF
-   Jkak2aOtlKaJM6GGv/4tDfNdSm8gL3zGK4Ps7MFZ6CPh9V46x+cC1CReb
-   A=;
-X-IronPort-AV: E=Sophos;i="6.04,220,1695686400"; 
-   d="scan'208";a="254942793"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 01:28:50 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id 5C2934936F;
-	Thu, 23 Nov 2023 01:28:48 +0000 (UTC)
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:14559]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.8:2525] with esmtp (Farcaster)
- id 59889060-3b17-4ff2-b91f-7c653e1bc250; Thu, 23 Nov 2023 01:28:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 59889060-3b17-4ff2-b91f-7c653e1bc250
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 23 Nov 2023 01:28:42 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.50) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 23 Nov 2023 01:28:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 8/8] tcp: Factorise cookie-dependent fields initialisation in cookie_v[46]_check()
-Date: Wed, 22 Nov 2023 17:25:21 -0800
-Message-ID: <20231123012521.62841-9-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231123012521.62841-1-kuniyu@amazon.com>
-References: <20231123012521.62841-1-kuniyu@amazon.com>
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A18E11F
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 17:38:10 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SbLMn6QQ7zvR7w;
+	Thu, 23 Nov 2023 09:37:41 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 23 Nov 2023 09:38:06 +0800
+Message-ID: <eb7f10cb-ae8d-9f76-46d4-a191cfc544a9@huawei.com>
+Date: Thu, 23 Nov 2023 09:38:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net-next,v5] bonding: return -ENOMEM instead of BUG in
+ alb_upper_dev_walk
+To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>
+CC: <j.vosburgh@gmail.com>, <andy@greyhouse.net>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>
+References: <20231121125805.949940-1-shaozhengchao@huawei.com>
+ <8fc84e79-f5c9-8fbe-1fe8-b23b059f03d0@huawei.com>
+ <f5b7507a4f3f4bff91a92d653762adc0fca33ff3.camel@redhat.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <f5b7507a4f3f4bff91a92d653762adc0fca33ff3.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-We will support arbitrary SYN Cookie with BPF, and then kfunc at
-TC will preallocate reqsk and initialise some fields that should
-not be overwritten later by cookie_v[46]_check().
 
-To simplify the flow in cookie_v[46]_check(), we move such fields'
-initialisation to cookie_tcp_reqsk_alloc() and factorise non-BPF
-SYN Cookie handling into cookie_tcp_check(), where we validate the
-cookie and allocate reqsk, as done by kfunc later.
 
-Note that we set ireq->ecn_ok in two steps, the latter of which will
-be shared by the BPF case.  As cookie_ecn_ok() is one-liner, now
-it's inlined.
+On 2023/11/23 0:16, Paolo Abeni wrote:
+> On Wed, 2023-11-22 at 10:04 +0800, shaozhengchao wrote:
+>>
+>> On 2023/11/21 20:58, Zhengchao Shao wrote:
+>>> If failed to allocate "tags" or could not find the final upper device from
+>>> start_dev's upper list in bond_verify_device_path(), only the loopback
+>>> detection of the current upper device should be affected, and the system is
+>>> no need to be panic.
+>>> So just return -ENOMEM in alb_upper_dev_walk to stop walking.
+>>>
+>>> I also think that the following function calls
+>>> netdev_walk_all_upper_dev_rcu
+>>> ---->>>alb_upper_dev_walk
+>>> ---------->>>bond_verify_device_path
+>>>>  From this way, "end device" can eventually be obtained from "start device"
+>>> in bond_verify_device_path, IS_ERR(tags) could be instead of
+>>> IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
+>>>
+>>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>>> Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+>>> ---
+>>> v5: drop print information, if the memory allocation fails, the mm layer
+>>>       will emit a lot warning comprising the backtrace
+>>> v4: print information instead of warn
+>>> v3: return -ENOMEM instead of zero to stop walk
+>>> v2: use WARN_ON_ONCE instead of WARN_ON
+>>> ---
+>>>    drivers/net/bonding/bond_alb.c | 3 ++-
+>>>    1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+>>> index dc2c7b979656..7edf0fd58c34 100644
+>>> --- a/drivers/net/bonding/bond_alb.c
+>>> +++ b/drivers/net/bonding/bond_alb.c
+>>> @@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
+>>>    	if (netif_is_macvlan(upper) && !strict_match) {
+>>>    		tags = bond_verify_device_path(bond->dev, upper, 0);
+>>>    		if (IS_ERR_OR_NULL(tags))
+>>> -			BUG();
+>>> +			return -ENOMEM;
+>>> +
+>>>    		alb_send_lp_vid(slave, upper->dev_addr,
+>>>    				tags[0].vlan_proto, tags[0].vlan_id);
+>>>    		kfree(tags);
+>> Hi Paolo:
+>> 	I find that v4 has been merged into net-next.
+> 
+> I'm sorry, that was due to PEBKAC here.
+> 
+>> So v5 is not
+>> needed. But should I send another patch to drop that print info?
+> 
+> Yes please, send a follow-up just dropping the print.
+> 
+OK， I will do it today.
+Thanks
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/tcp.h     |  13 ++++--
- net/ipv4/syncookies.c | 106 +++++++++++++++++++++++-------------------
- net/ipv6/syncookies.c |  61 ++++++++++++------------
- 3 files changed, 99 insertions(+), 81 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index d4d0e9763175..973555cb1d3f 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -494,7 +494,10 @@ struct sock *tcp_get_cookie_sock(struct sock *sk, struct sk_buff *skb,
- int __cookie_v4_check(const struct iphdr *iph, const struct tcphdr *th);
- struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb);
- struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
--					    struct sock *sk, struct sk_buff *skb);
-+					    struct sock *sk, struct sk_buff *skb,
-+					    struct tcp_options_received *tcp_opt,
-+					    int mss, u32 tsoff);
-+
- #ifdef CONFIG_SYN_COOKIES
- 
- /* Syncookies use a monotonic timer which increments every 60 seconds.
-@@ -580,8 +583,12 @@ __u32 cookie_v4_init_sequence(const struct sk_buff *skb, __u16 *mss);
- u64 cookie_init_timestamp(struct request_sock *req, u64 now);
- bool cookie_timestamp_decode(const struct net *net,
- 			     struct tcp_options_received *opt);
--bool cookie_ecn_ok(const struct tcp_options_received *opt,
--		   const struct net *net, const struct dst_entry *dst);
-+
-+static inline bool cookie_ecn_ok(const struct net *net, const struct dst_entry *dst)
-+{
-+	return READ_ONCE(net->ipv4.sysctl_tcp_ecn) ||
-+		dst_feature(dst, RTAX_FEATURE_ECN);
-+}
- 
- /* From net/ipv6/syncookies.c */
- int __cookie_v6_check(const struct ipv6hdr *iph, const struct tcphdr *th);
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index 9bca1c026525..beea4d05fafc 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -270,21 +270,6 @@ bool cookie_timestamp_decode(const struct net *net,
- }
- EXPORT_SYMBOL(cookie_timestamp_decode);
- 
--bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
--		   const struct net *net, const struct dst_entry *dst)
--{
--	bool ecn_ok = tcp_opt->rcv_tsecr & TS_OPT_ECN;
--
--	if (!ecn_ok)
--		return false;
--
--	if (READ_ONCE(net->ipv4.sysctl_tcp_ecn))
--		return true;
--
--	return dst_feature(dst, RTAX_FEATURE_ECN);
--}
--EXPORT_SYMBOL(cookie_ecn_ok);
--
- static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
- 				 struct request_sock *req)
- {
-@@ -321,8 +306,12 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
- }
- 
- struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
--					    struct sock *sk, struct sk_buff *skb)
-+					    struct sock *sk, struct sk_buff *skb,
-+					    struct tcp_options_received *tcp_opt,
-+					    int mss, u32 tsoff)
- {
-+	struct inet_request_sock *ireq;
-+	struct tcp_request_sock *treq;
- 	struct request_sock *req;
- 
- 	if (sk_is_mptcp(sk))
-@@ -338,40 +327,36 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
- 		return NULL;
- 	}
- 
-+	ireq = inet_rsk(req);
-+	treq = tcp_rsk(req);
-+
-+	req->mss = mss;
-+	req->ts_recent = tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
-+
-+	ireq->snd_wscale = tcp_opt->snd_wscale;
-+	ireq->tstamp_ok = tcp_opt->saw_tstamp;
-+	ireq->sack_ok = tcp_opt->sack_ok;
-+	ireq->wscale_ok = tcp_opt->wscale_ok;
-+	ireq->ecn_ok = tcp_opt->rcv_tsecr & TS_OPT_ECN;
-+
-+	treq->ts_off = tsoff;
-+
- 	return req;
- }
- EXPORT_SYMBOL_GPL(cookie_tcp_reqsk_alloc);
- 
--/* On input, sk is a listener.
-- * Output is listener if incoming packet would not create a child
-- *           NULL if memory could not be allocated.
-- */
--struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
-+static struct request_sock *cookie_tcp_check(struct net *net, struct sock *sk,
-+					     struct sk_buff *skb)
- {
--	struct ip_options *opt = &TCP_SKB_CB(skb)->header.h4.opt;
--	const struct tcphdr *th = tcp_hdr(skb);
- 	struct tcp_options_received tcp_opt;
--	struct tcp_sock *tp = tcp_sk(sk);
--	struct inet_request_sock *ireq;
--	struct net *net = sock_net(sk);
--	struct tcp_request_sock *treq;
--	struct request_sock *req;
--	struct sock *ret = sk;
--	int full_space, mss;
--	struct flowi4 fl4;
--	struct rtable *rt;
--	__u8 rcv_wscale;
- 	u32 tsoff = 0;
--
--	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
--	    !th->ack || th->rst)
--		goto out;
-+	int mss;
- 
- 	if (tcp_synq_no_recent_overflow(sk))
- 		goto out;
- 
--	mss = __cookie_v4_check(ip_hdr(skb), th);
--	if (mss == 0) {
-+	mss = __cookie_v4_check(ip_hdr(skb), tcp_hdr(skb));
-+	if (!mss) {
- 		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
- 		goto out;
- 	}
-@@ -392,21 +377,44 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	if (!cookie_timestamp_decode(net, &tcp_opt))
- 		goto out;
- 
--	req = cookie_tcp_reqsk_alloc(&tcp_request_sock_ops, sk, skb);
-+	return cookie_tcp_reqsk_alloc(&tcp_request_sock_ops, sk, skb,
-+				      &tcp_opt, mss, tsoff);
-+out:
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+/* On input, sk is a listener.
-+ * Output is listener if incoming packet would not create a child
-+ *           NULL if memory could not be allocated.
-+ */
-+struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
-+{
-+	struct ip_options *opt = &TCP_SKB_CB(skb)->header.h4.opt;
-+	const struct tcphdr *th = tcp_hdr(skb);
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct inet_request_sock *ireq;
-+	struct net *net = sock_net(sk);
-+	struct request_sock *req;
-+	struct sock *ret = sk;
-+	struct flowi4 fl4;
-+	struct rtable *rt;
-+	__u8 rcv_wscale;
-+	int full_space;
-+
-+	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
-+	    !th->ack || th->rst)
-+		goto out;
-+
-+	req = cookie_tcp_check(net, sk, skb);
-+	if (IS_ERR(req))
-+		goto out;
- 	if (!req)
- 		goto out_drop;
- 
- 	ireq = inet_rsk(req);
--	treq = tcp_rsk(req);
--	treq->ts_off		= tsoff;
--	req->mss		= mss;
-+
- 	sk_rcv_saddr_set(req_to_sk(req), ip_hdr(skb)->daddr);
- 	sk_daddr_set(req_to_sk(req), ip_hdr(skb)->saddr);
--	ireq->snd_wscale	= tcp_opt.snd_wscale;
--	ireq->sack_ok		= tcp_opt.sack_ok;
--	ireq->wscale_ok		= tcp_opt.wscale_ok;
--	ireq->tstamp_ok		= tcp_opt.saw_tstamp;
--	req->ts_recent		= tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
- 
- 	/* We throwed the options of the initial SYN away, so we hope
- 	 * the ACK carries the same options again (see RFC1122 4.2.3.8)
-@@ -448,7 +456,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 				  dst_metric(&rt->dst, RTAX_INITRWND));
- 
- 	ireq->rcv_wscale  = rcv_wscale;
--	ireq->ecn_ok = cookie_ecn_ok(&tcp_opt, net, &rt->dst);
-+	ireq->ecn_ok &= cookie_ecn_ok(net, &rt->dst);
- 
- 	ret = tcp_get_cookie_sock(sk, skb, req, &rt->dst);
- 	/* ip_queue_xmit() depends on our flow being setup
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index e0a9220d1536..c8d2ca27220c 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -127,31 +127,18 @@ int __cookie_v6_check(const struct ipv6hdr *iph, const struct tcphdr *th)
- }
- EXPORT_SYMBOL_GPL(__cookie_v6_check);
- 
--struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
-+static struct request_sock *cookie_tcp_check(struct net *net, struct sock *sk,
-+					     struct sk_buff *skb)
- {
--	const struct tcphdr *th = tcp_hdr(skb);
--	struct ipv6_pinfo *np = inet6_sk(sk);
- 	struct tcp_options_received tcp_opt;
--	struct tcp_sock *tp = tcp_sk(sk);
--	struct inet_request_sock *ireq;
--	struct net *net = sock_net(sk);
--	struct tcp_request_sock *treq;
--	struct request_sock *req;
--	struct dst_entry *dst;
--	struct sock *ret = sk;
--	int full_space, mss;
--	__u8 rcv_wscale;
- 	u32 tsoff = 0;
--
--	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
--	    !th->ack || th->rst)
--		goto out;
-+	int mss;
- 
- 	if (tcp_synq_no_recent_overflow(sk))
- 		goto out;
- 
--	mss = __cookie_v6_check(ipv6_hdr(skb), th);
--	if (mss == 0) {
-+	mss = __cookie_v6_check(ipv6_hdr(skb), tcp_hdr(skb));
-+	if (!mss) {
- 		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
- 		goto out;
- 	}
-@@ -172,14 +159,37 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	if (!cookie_timestamp_decode(net, &tcp_opt))
- 		goto out;
- 
--	req = cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops, sk, skb);
-+	return cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops, sk, skb,
-+				      &tcp_opt, mss, tsoff);
-+out:
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
-+{
-+	const struct tcphdr *th = tcp_hdr(skb);
-+	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct inet_request_sock *ireq;
-+	struct net *net = sock_net(sk);
-+	struct request_sock *req;
-+	struct dst_entry *dst;
-+	struct sock *ret = sk;
-+	__u8 rcv_wscale;
-+	int full_space;
-+
-+	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
-+	    !th->ack || th->rst)
-+		goto out;
-+
-+	req = cookie_tcp_check(net, sk, skb);
-+	if (IS_ERR(req))
-+		goto out;
- 	if (!req)
- 		goto out_drop;
- 
- 	ireq = inet_rsk(req);
--	treq = tcp_rsk(req);
- 
--	req->mss = mss;
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
- 
-@@ -198,13 +208,6 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	    ipv6_addr_type(&ireq->ir_v6_rmt_addr) & IPV6_ADDR_LINKLOCAL)
- 		ireq->ir_iif = tcp_v6_iif(skb);
- 
--	ireq->snd_wscale	= tcp_opt.snd_wscale;
--	ireq->sack_ok		= tcp_opt.sack_ok;
--	ireq->wscale_ok		= tcp_opt.wscale_ok;
--	ireq->tstamp_ok		= tcp_opt.saw_tstamp;
--	req->ts_recent		= tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
--	treq->ts_off = tsoff;
--
- 	tcp_ao_syncookie(sk, skb, req, AF_INET6);
- 
- 	/*
-@@ -245,7 +248,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 				  dst_metric(dst, RTAX_INITRWND));
- 
- 	ireq->rcv_wscale = rcv_wscale;
--	ireq->ecn_ok = cookie_ecn_ok(&tcp_opt, net, dst);
-+	ireq->ecn_ok &= cookie_ecn_ok(net, dst);
- 
- 	ret = tcp_get_cookie_sock(sk, skb, req, dst);
- out:
--- 
-2.30.2
-
+Zhengchao Shao
+> Thanks!
+> 
+> Paolo
+> 
+> 
 
