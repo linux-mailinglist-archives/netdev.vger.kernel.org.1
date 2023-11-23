@@ -1,98 +1,99 @@
-Return-Path: <netdev+bounces-50378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EC8F7F57FC
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 007037F5808
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 489DD2817DC
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:01:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A139128148E
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E813C121;
-	Thu, 23 Nov 2023 06:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C90C2D0;
+	Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="M9nsJaVY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzHGGVa8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F7A9A;
-	Wed, 22 Nov 2023 22:00:54 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN5YoMi023177;
-	Wed, 22 Nov 2023 22:00:49 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=7LIJqeeeavxIJlfUGC585oLZh9zz+F/+//rd+x9PIUE=;
- b=M9nsJaVYy0FuGTD6QQQfksTdUkhG/U+l0LhF3dKeJ1FCHiIMHsyJ15BegLfyQn2xgMAo
- eMxBYFPPtI1adqrsK/gWc9M/K2YZYKnMihn5UoqUo6r0Phsdf2s2IcFMxrZTXk/CDgPo
- ZcLgA9hhjJgNFMMEU6uHX8I0kU488IQ9+flJ7q/r7IPQbuH5Ugg49jVyiRbZ/Fs6ToHP
- Gn8kFiRWORDpem45qm2+3FiMG4/WvYRcFmeC8xBLPKue8hiDyD2m94c1i+1Pn0PF68lu
- I1A+Iw0Iczfma/MK1Uk8MQ+ya63BQo4bp+ZPs/meKubFedLtHw0bwsKZPASGsnu7A9qH 6w== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3uhpxn1xkc-11
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 22 Nov 2023 22:00:49 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 22 Nov
- 2023 22:00:05 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 22 Nov 2023 22:00:06 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 561403F708C;
-	Wed, 22 Nov 2023 22:00:01 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net PATCH 5/5] octeontx2-af: Update Tx link register range
-Date: Thu, 23 Nov 2023 11:29:41 +0530
-Message-ID: <20231123055941.19430-6-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20231123055941.19430-1-gakula@marvell.com>
-References: <20231123055941.19430-1-gakula@marvell.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BD9C2C5
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3004FC433C7;
+	Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700719937;
+	bh=DQku18wnqsdYXsZc0AUeywTgE/+0OjpzCh6TUoIK3R8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kzHGGVa8ZYRin6nBAUFhf9FHVV0qh/53tQth5Ke6EHh9h/J8TNkW6IV0l52cE5OC3
+	 cE04o2XyeZTgnrEwqli/L00XKXdQ7nxVQaDn7qJdXKIfVo0s/s0gBL8FKcePNg4IZ4
+	 orJbATwJlHoqAbc7pEl45rRAdtRjxVhdGr2fj6Ir2WZDFP6EFZ9jp43zl3rxY5Lgri
+	 LGqf7H0Xhs3vSdmVEH0JbAs1y7Nk2AIyTXeY5U7noTcGxPIKH0qCRuWTceLk+PzcpC
+	 UIZaLazyvU/ZqT2SOnTXzrMUzL/xGkdaN1SO7dHJpbU25pyJgHAywQw4NWkksfm2Os
+	 ME6kxwoTpu7vg==
+Date: Wed, 22 Nov 2023 22:12:15 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
+Subject: Re: [net 09/15] net/mlx5e: Forbid devlink reload if IPSec rules are
+ offloaded
+Message-ID: <ZV7tP6Xdx93KNuTF@x130>
+References: <20231122014804.27716-1-saeed@kernel.org>
+ <20231122014804.27716-10-saeed@kernel.org>
+ <ZV3GSeNC0Pe3ubhB@nanopsycho>
+ <20231122093546.GA4760@unreal>
+ <ZV3O7dwQMLlNFZp3@nanopsycho>
+ <20231122112832.GB4760@unreal>
+ <20231122195332.1eb22597@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: OOuhbsZQ-kWSDUyPfSIj2UyNxsME2ovc
-X-Proofpoint-GUID: OOuhbsZQ-kWSDUyPfSIj2UyNxsME2ovc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_03,2023-11-22_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231122195332.1eb22597@kernel.org>
 
-On new silicons the TX channels for transmit level has increased.
-This patch fixes the respective register offset range to
-configure the newly added channels.
+On 22 Nov 19:53, Jakub Kicinski wrote:
+>On Wed, 22 Nov 2023 13:28:32 +0200 Leon Romanovsky wrote:
+>> Unfortunately not, we (mlx5) were forced by employer of one of
+>> the netdev maintainers to keep uplink netdev in devlink reload
+>> while we are in eswitch.
+>
+>The way you phrased this makes it sound like employers of netdev
+>maintainers get to exert power over this community.
+>
 
-Fixes: b279bbb3314e ("octeontx2-af: NIX Tx scheduler queue config support")
-Signed-off-by: Rahul Bhansali <rbhansali@marvell.com>
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I think Leon is just misinformed, the mlx5 netdev behavior Leon is
+talking about was already removed and has nothing to do with eswitch,
+and even that was never required by any employer or maintainer,
+sorry for the confusion .. 
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-index b3150f053291..d46ac29adb96 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.c
-@@ -31,8 +31,8 @@ static struct hw_reg_map txsch_reg_map[NIX_TXSCH_LVL_CNT] = {
- 	{NIX_TXSCH_LVL_TL4, 3, 0xFFFF, {{0x0B00, 0x0B08}, {0x0B10, 0x0B18},
- 			      {0x1200, 0x12E0} } },
- 	{NIX_TXSCH_LVL_TL3, 4, 0xFFFF, {{0x1000, 0x10E0}, {0x1600, 0x1608},
--			      {0x1610, 0x1618}, {0x1700, 0x17B0} } },
--	{NIX_TXSCH_LVL_TL2, 2, 0xFFFF, {{0x0E00, 0x0EE0}, {0x1700, 0x17B0} } },
-+			      {0x1610, 0x1618}, {0x1700, 0x17C8} } },
-+	{NIX_TXSCH_LVL_TL2, 2, 0xFFFF, {{0x0E00, 0x0EE0}, {0x1700, 0x17C8} } },
- 	{NIX_TXSCH_LVL_TL1, 1, 0xFFFF, {{0x0C00, 0x0D98} } },
- };
- 
--- 
-2.25.1
+>This is an unacceptable insinuation.
+>
+>DEVLINK_RELOAD_LIMIT_NO_RESET should not cause link loss, sure.
+>Even if Meta required that you implemented that (which it does
+>not, AFAIK) - it's just an upstream API.
+>
+
+We only support this limit for FW_ACTIVATE_ACTION, and has no issue
+in this flow.
+
+Leon's issue is with internal mlx5 uplink implementation where on eswitch
+mode changes we don't unregister the netdev which causes eswitch resource
+leaks with ipsec rules, since we move eswitch to legacy mode on devlink
+reload then the same issue happens on relaod, hence he needs to block it
+in this patch, and we are already discussing a new design to fix devlink
+reload in net-next.
+
+This is Just a bug and has nothing to do with any requirements from anyone.
+
+Thanks.
 
 
