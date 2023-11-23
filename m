@@ -1,135 +1,93 @@
-Return-Path: <netdev+bounces-50446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651407F5D31
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:02:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E197F5D71
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F8F0281A0D
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:02:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D52052819E8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A803C22EE7;
-	Thu, 23 Nov 2023 11:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD7F22EEE;
+	Thu, 23 Nov 2023 11:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BijWvNks"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tljlidVv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6028F1BD;
-	Thu, 23 Nov 2023 03:02:38 -0800 (PST)
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ANAr9W6009461;
-	Thu, 23 Nov 2023 11:02:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=FdozfHkDVrzZihwpfJj8ZM55TKBnM7FMsHV8eXoLC2Y=;
- b=BijWvNksqBaXKz+8Z2aW2FsbOQ4Ssw88CptVYOGFPNuZK6Izz26OH75HnsFo/zViDbqO
- 9f+8I1MZp5sv2j1bUTEeD7zDFSyTn3il85bcIME2pR4slkiS04UZcmOhQqVuZmieBwE6
- GXX80po7+1fiLKUYuNCNJ7dTJUGAtLKhiPXChYSWADpmMdbNSLzsmp+Dd2i1xzU1oa/V
- yD79nHliscCX+q76abPg5jHWWMWe/pOdkWP400UsKIZchRVTNAFlPT9v1Xx1vFCf7Aq/
- UWZL5JHnU2bG2qGpytZi8r0WA1lDglt0L71s/OlHoXs+mv8FTx1cs7AmmfTLCjn8UTbx Cw== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhkfntd2r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 11:02:27 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ANB2Qnt028025
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 11:02:26 GMT
-Received: from [10.253.33.181] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 23 Nov
- 2023 03:02:21 -0800
-Message-ID: <82992471-cb5c-4351-9c19-31347f937940@quicinc.com>
-Date: Thu, 23 Nov 2023 19:02:19 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1D022EE7;
+	Thu, 23 Nov 2023 11:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C5EB5C433C7;
+	Thu, 23 Nov 2023 11:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700737824;
+	bh=OFh6cOOLb8LLtFm5PuV1Wm6e/CoyEQczZ8jI3qPkLmw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tljlidVvYB0khypDT2rYH5AaGw4uN4q/MI23T7Xi5laqwlWG/O6lu7w4rYXYgA1Ji
+	 OyupAjJ9yV9aoGVe5osVWLYfuDLwtAYx+j2ttQsbV8OoQWVYEqvflXVTynV1g9CVp+
+	 K/mqU/zdEb0z1y9iaXfvmvMe9lUNW0pjEcq+ugnx1taiaynq4ckyFkToFkRnlRhgbU
+	 33l1fScKv8SisrdQO/0L7mIckeeED2UjP29RZAqaIofHZZMOcrhhwZiM7SwL2y7uzd
+	 8qVXuRR/WfmQQhcT4g0nfIJgicFCxMSiqgwF73TtLLg3U/DSj3qO2ubR1FALqZo3mA
+	 Nj5jrtX7mxz/Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC764C3959E;
+	Thu, 23 Nov 2023 11:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] net: mdio: ipq4019: Enable the clocks for ipq5332
- platform
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Konrad Dybcio <konrad.dybcio@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-3-quic_luoj@quicinc.com>
- <10dc0fff-fc00-4c1f-97cf-30c5e5e8f983@linaro.org>
- <9acace07-d758-4d5d-8321-de75ee53355d@quicinc.com>
- <187a148d-39af-4000-825d-63ca3e3a23b1@lunn.ch>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <187a148d-39af-4000-825d-63ca3e3a23b1@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: tLNr2KPb3XJbN8kL-veNwyXoQKOHKJuN
-X-Proofpoint-ORIG-GUID: tLNr2KPb3XJbN8kL-veNwyXoQKOHKJuN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_09,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- mlxscore=0 clxscore=1015 spamscore=0 lowpriorityscore=0 adultscore=0
- bulkscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311230078
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next v3 0/5] net: ethernet: renesas: rcar_gen4_ptp: Add V4H
+ support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170073782470.401.3343558436830393692.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Nov 2023 11:10:24 +0000
+References: <20231121155306.515446-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20231121155306.515446-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 11/21/2023 10:04 PM, Andrew Lunn wrote:
-> On Tue, Nov 21, 2023 at 06:28:54PM +0800, Jie Luo wrote:
->>
->>
->> On 11/20/2023 10:22 PM, Konrad Dybcio wrote:
->>> On 15.11.2023 04:25, Luo Jie wrote:
->>>> For the platform ipq5332, the related GCC clocks need to be enabled
->>>> to make the GPIO reset of the MDIO slave devices taking effect.
->>>>
->>>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
->>> [...]
->>>
->>>>    static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
->>>> @@ -212,6 +231,38 @@ static int ipq_mdio_reset(struct mii_bus *bus)
->>>>    	u32 val;
->>>>    	int ret;
->>>> +	/* For the platform ipq5332, there are two uniphy available to connect the
->>>> +	 * ethernet devices, the uniphy gcc clock should be enabled for resetting
->>>> +	 * the connected device such as qca8386 switch or qca8081 PHY effectively.
->>>> +	 */
->>>> +	if (of_device_is_compatible(bus->parent->of_node, "qcom,ipq5332-mdio")) {
->>> Would that not also be taken care of in the phy driver?
->>>
->>> Konrad
->>
->> Hi Konrad,
->> These clocks are the SOC clocks that is not related to the PHY type.
->> no matter what kind of PHY is connected, we also need to configure
->> these clocks.
+On Tue, 21 Nov 2023 16:53:01 +0100 you wrote:
+> Hello,
 > 
-> Hi Jie
+> This small series prepares the rcar_gen4_ptp to be useable both on both
+> R-Car S4 and V4H. The only in-tree driver that make use of this is
+> rswtich on S4. A new Ethernet (R-Car Ethernet TSN) driver for V4H is on
+> it's way that also will make use of rcar_gen4_ptp functionality.
 > 
-> You can avoid lots of these questions by making your commit message
-> better. Assume the reader does not know the clock tree for this
-> device. With a bit of experience, you can guess what reviewers are
-> going to ask, and answer those questions in the commit message.
-> 
->        Andrew
+> [...]
 
-Hi Andrew,
-Got it, will take more attention on the commit message to make the
-code clearly in future patches, thanks for the suggestion.
+Here is the summary with links:
+  - [net-next,v3,1/5] net: ethernet: renesas: rcar_gen4_ptp: Remove incorrect comment
+    https://git.kernel.org/netdev/net-next/c/d73dcff9eb0d
+  - [net-next,v3,2/5] net: ethernet: renesas: rcar_gen4_ptp: Fail on unknown register layout
+    https://git.kernel.org/netdev/net-next/c/9f3995707e35
+  - [net-next,v3,3/5] net: ethernet: renesas: rcar_gen4_ptp: Prepare for shared register layout
+    https://git.kernel.org/netdev/net-next/c/46c361a04635
+  - [net-next,v3,4/5] net: ethernet: renesas: rcar_gen4_ptp: Get clock increment from clock rate
+    https://git.kernel.org/netdev/net-next/c/be5f81d37f79
+  - [net-next,v3,5/5] net: ethernet: renesas: rcar_gen4_ptp: Break out to module
+    https://git.kernel.org/netdev/net-next/c/8c1c66235e03
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
