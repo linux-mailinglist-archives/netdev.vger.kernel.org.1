@@ -1,173 +1,500 @@
-Return-Path: <netdev+bounces-50362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D3C57F570A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:31:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C327F5717
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 04:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8CF28170A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A859F1C20BBD
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969DD8813;
-	Thu, 23 Nov 2023 03:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="41r6vZ8a"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C7E8F57;
+	Thu, 23 Nov 2023 03:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770611AB;
-	Wed, 22 Nov 2023 19:31:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=R2W1eIGoN44WfeZqoSJKCknBFLhg1MSvdghZBej8Tto=; b=41r6vZ8a0N5C3aFfaYIGG3Nt0+
-	w3Wk45OWIBchNx7QWgxcgGk46uyazknOwo6LSarraXU0NkFLrQhUmbSFQejl4OYdVtn+LZGZlV1Zk
-	r/YlMNC4pQdIepOfwnD2IWi1WitSCbjq3+02JW0KXua8igRoE0YY8hYTujInIJaLRFC8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r60QS-000wAv-CM; Thu, 23 Nov 2023 04:30:48 +0100
-Date: Thu, 23 Nov 2023 04:30:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC981B5;
+	Wed, 22 Nov 2023 19:49:08 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AN3mkzR72754270, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AN3mkzR72754270
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Nov 2023 11:48:46 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.32; Thu, 23 Nov 2023 11:48:47 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 23 Nov 2023 11:48:46 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Thu, 23 Nov 2023 11:48:46 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Simon Horman <horms@kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>, Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v11 05/13] net:ethernet:realtek:rtase: Implement hardware configuration function
+Thread-Topic: [PATCH net-next v11 05/13] net:ethernet:realtek:rtase: Implement
+ hardware configuration function
+Thread-Index: AQHaF8h2HvTf1F/vj0i3mzSIlPQ+NLB8uXoAgAqPDBA=
+Date: Thu, 23 Nov 2023 03:48:46 +0000
+Message-ID: <3eef992d8e2440bc96d98bd5b5ce4053@realtek.com>
+References: <20231115133414.1221480-1-justinlai0215@realtek.com>
+ <20231115133414.1221480-6-justinlai0215@realtek.com>
+ <20231116180610.GG109951@vergenet.net>
+In-Reply-To: <20231116180610.GG109951@vergenet.net>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Wed, Nov 22, 2023 at 07:32:22PM +0100, Christian Marangi wrote:
-> On Tue, Nov 21, 2023 at 03:45:42PM +0100, Andrew Lunn wrote:
-> > > > I do think we need somewhere to put package properties. But i don't
-> > > > think phy-mode is such a property. At the moment, i don't have a good
-> > > > example of a package property.
-> > > 
-> > > What about power supplies and reset/enable lines?
-> > 
-> > Yes, good point. I can imagine some packages sharing regulators. Reset
-> > might also be shared, but it makes things messy to handle.
+> On Wed, Nov 15, 2023 at 09:34:06PM +0800, Justin Lai wrote:
+> > Implement rtase_hw_config to set default hardware settings, including
+> > setting interrupt mitigation, tx/rx DMA burst, interframe gap time, rx
+> > packet filter, near fifo threshold and fill descriptor ring and tally
+> > counter address, and enable flow control. When filling the rx
+> > descriptor ring, the first group of queues needs to be processed
+> > separately because the positions of the first group of queues are not
+> > regular with other subsequent groups. The other queues are all newly
+> > added features, but we want to retain the original design. So they
+> > were not put together.
 > >
-> 
-> Sooooo.... Sorry if I insist but I would really love to have something
-> ""stable"" to move this further. (the changes are easy enough so it's
-> really a matter of finding a good DT structure)
-> 
-> Maybe a good idea would be summarize the concern and see what solution
-> was proposed:
-> 
-> Concern list:
-> 1. ethernet-phy-package MUST be placed in mdio node (not in ethernet,
->    the example was wrong anyway) and MUST have an addr
-> 
->    Current example doesn't have an addr. I would prefer this way but
->    no problem in changing this.
-> 
->    Solution:
->      - Add reg to the ethernet-phy-package node with the base address of
->        the PHY package (base address = the first PHY address of the
->        package)
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+>=20
+> Hi Justin,
+>=20
+> some minor feedback from my side.
+>=20
+> * I think that "rtase: " would be a more appropriate prefix
+>   for the patches in this patch-set.
+>=20
+>   Subject: [PATCH net-next vX m/n] rtase: ...
 
-Yes.
+Ok, I will modify this part
+>=20
+> ...
+>=20
+> > diff --git a/drivers/net/ethernet/realtek/rtase/tt.c
+> > b/drivers/net/ethernet/realtek/rtase/tt.c
+>=20
+> ...
+>=20
+> > new file mode 100644
+> > index 000000000000..5ea4d51fcc47
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/realtek/rtase/tt.c
+>=20
+> ...
+>=20
+> > +static void rtase_tx_clear_range(struct rtase_ring *ring, u32 start,
+> > +u32 n) {
+> > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > +     struct net_device *dev =3D tp->dev;
+> > +     struct tx_desc *desc_base =3D ring->desc;
+> > +     u32 i;
+>=20
+> nit: Please consider using reverse xmas tree - longest line to shortest -
+>      for new Networking code.
 
->        We will have a PHY node with the same address of the PHY package
->        node. Each PHY node in the PHY package node will have reg set to
->        the REAL address in the mdio bus.
+Thank you for your review, I will modify it and check if there are other si=
+milar issues
+>=20
+> ...
+>=20
+> > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device
+> > +*dev) {
+> > +     u8 ip_protocol;
+> > +     u32 csum_cmd;
+> > +
+> > +     switch (vlan_get_protocol(skb)) {
+> > +     case htons(ETH_P_IP):
+> > +             csum_cmd =3D TX_IPCS_C;
+> > +             ip_protocol =3D ip_hdr(skb)->protocol;
+> > +             break;
+> > +
+> > +     case htons(ETH_P_IPV6):
+> > +             csum_cmd =3D TX_IPV6F_C;
+> > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
+> > +             break;
+> > +
+> > +     default:
+> > +             ip_protocol =3D IPPROTO_RAW;
+> > +             break;
+>=20
+> If the default branch is taken in this switch statement, then csum_cmd is=
+ used
+> uninitialised below.
+>=20
+> As flagged by a clang-16 W=3D1 build
 
-Basically Yes. I actually think the first sentence is not 100%
-correct. It could be all the package configuration registers are in
-the base address, without an actual PHY. The PHYs then follow at
-addresses above it. I can also imagine a case where the first PHY in
-the package is not used, so its not listed at all. So i think it
-should be "We often have a PHY node with the same address of the PHY
-package node."
+Thanks, I will fix this compiler warning
+>=20
+> > +     }
+> > +
+> > +     if (ip_protocol =3D=3D IPPROTO_TCP)
+> > +             csum_cmd |=3D TX_TCPCS_C;
+> > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
+> > +             csum_cmd |=3D TX_UDPCS_C;
+> > +     else
+> > +             WARN_ON_ONCE(1);
+> > +
+> > +     csum_cmd |=3D u32_encode_bits(skb_transport_offset(skb),
+> > + TCPHO_MASK);
+> > +
+> > +     return csum_cmd;
+> > +}
+> > +
+> > +static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buff *s=
+kb,
+> > +                         u32 opts1, u32 opts2) {
+> > +     const struct skb_shared_info *info =3D skb_shinfo(skb);
+> > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > +     const u8 nr_frags =3D info->nr_frags;
+> > +     struct tx_desc *txd =3D NULL;
+> > +     u32 cur_frag, entry;
+> > +     u64 pkt_len_cnt =3D 0;
+>=20
+> pkt_len_cnt is initialised here...
+>=20
+> > +
+> > +     entry =3D ring->cur_idx;
+> > +     for (cur_frag =3D 0; cur_frag < nr_frags; cur_frag++) {
+> > +             const skb_frag_t *frag =3D &info->frags[cur_frag];
+> > +             dma_addr_t mapping;
+> > +             u32 status, len;
+> > +             void *addr;
+> > +
+> > +             entry =3D (entry + 1) % NUM_DESC;
+> > +
+> > +             txd =3D ring->desc + sizeof(struct tx_desc) * entry;
+> > +             len =3D skb_frag_size(frag);
+> > +             addr =3D skb_frag_address(frag);
+> > +             mapping =3D dma_map_single(&tp->pdev->dev, addr, len,
+> > +                                      DMA_TO_DEVICE);
+> > +
+> > +             if (unlikely(dma_mapping_error(&tp->pdev->dev,
+> mapping))) {
+> > +                     if (unlikely(net_ratelimit()))
+> > +                             netdev_err(tp->dev,
+> > +                                        "Failed to map TX
+> fragments
+> > + DMA!\n");
+> > +
+> > +                     goto err_out;
+> > +             }
+> > +
+> > +             if (((entry + 1) % NUM_DESC) =3D=3D 0)
+> > +                     status =3D (opts1 | len | RING_END);
+> > +             else
+> > +                     status =3D opts1 | len;
+> > +
+> > +             if (cur_frag =3D=3D (nr_frags - 1)) {
+> > +                     ring->skbuff[entry] =3D skb;
+> > +                     status |=3D TX_LAST_FRAG;
+> > +             }
+> > +
+> > +             ring->mis.len[entry] =3D len;
+> > +             txd->addr =3D cpu_to_le64(mapping);
+> > +             txd->opts2 =3D cpu_to_le32(opts2);
+> > +
+> > +             /* make sure the operating fields have been updated */
+> > +             wmb();
+> > +             txd->opts1 =3D cpu_to_le32(status);
+> > +             pkt_len_cnt +=3D len;
+>=20
+> ... and incremented here. But is otherwise unused.
+>=20
+> As flagged by a clang-16 W=3D1 build.
 
-> 3. phy-mode is problematic.
-> 
->    It's an optional value to enforce a specific mode for each PHY in the
->    package. For complex configuration the mode won't be defined.
-> 
->    Solution:
->     - Rename it to package-phy-mode to make it less confusing.
-> 
->     - Add an additional function that PHY package can use to make custom
->       validation on the mode for every PHY attached (in the PHY package).
-> 
->       Would make it less clear but more flexible for complex
->       configuration. Maybe both solution can be implemented and the
->       special function is used if the mode is not defined?
+Thanks, I will remove this redundant code to fix this compiler warning
+>=20
+> > +     }
+> > +
+> > +     return cur_frag;
+> > +
+> > +err_out:
+> > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, cur_frag);
+> > +     return -EIO;
+> > +}
+>=20
+> ...
+>=20
+> > +static void rtase_dump_state(const struct net_device *dev) {
+> > +     const struct rtase_private *tp =3D netdev_priv(dev);
+> > +     const struct rtase_counters *counters;
+> > +     int max_reg_size =3D RTASE_PCI_REGS_SIZE;
+> > +     const struct rtase_ring *ring;
+> > +     u32 dword_rd;
+> > +     int n =3D 0;
+> > +
+> > +     ring =3D &tp->tx_ring[0];
+> > +     netdev_err(dev, "Tx descriptor info:\n");
+> > +     netdev_err(dev, "Tx curIdx =3D 0x%x\n", ring->cur_idx);
+> > +     netdev_err(dev, "Tx dirtyIdx =3D 0x%x\n", ring->dirty_idx);
+> > +     netdev_err(dev, "Tx phyAddr =3D 0x%llx\n", ring->phy_addr);
+> > +
+> > +     ring =3D &tp->rx_ring[0];
+> > +     netdev_err(dev, "Rx descriptor info:\n");
+> > +     netdev_err(dev, "Rx curIdx =3D 0x%x\n", ring->cur_idx);
+> > +     netdev_err(dev, "Rx dirtyIdx =3D 0x%x\n", ring->dirty_idx);
+> > +     netdev_err(dev, "Rx phyAddr =3D 0x%llx\n", ring->phy_addr);
+> > +
+> > +     netdev_err(dev, "Device Registers:\n");
+> > +     netdev_err(dev, "Chip Command =3D 0x%02x\n", rtase_r8(tp,
+> RTASE_CHIP_CMD));
+> > +     netdev_err(dev, "IMR =3D %08x\n", rtase_r32(tp, RTASE_IMR0));
+> > +     netdev_err(dev, "ISR =3D %08x\n", rtase_r32(tp, RTASE_ISR0));
+> > +     netdev_err(dev, "Boot Ctrl Reg(0xE004) =3D %04x\n",
+> > +                rtase_r16(tp, RTASE_BOOT_CTL));
+> > +     netdev_err(dev, "EPHY ISR(0xE014) =3D %04x\n",
+> > +                rtase_r16(tp, RTASE_EPHY_ISR));
+> > +     netdev_err(dev, "EPHY IMR(0xE016) =3D %04x\n",
+> > +                rtase_r16(tp, RTASE_EPHY_IMR));
+> > +     netdev_err(dev, "CLKSW SET REG(0xE018) =3D %04x\n",
+> > +                rtase_r16(tp, RTASE_CLKSW_SET));
+> > +
+> > +     netdev_err(dev, "Dump PCI Registers:\n");
+> > +
+> > +     while (n < max_reg_size) {
+> > +             if ((n % RTASE_DWORD_MOD) =3D=3D 0)
+> > +                     netdev_err(tp->dev, "0x%03x:\n", n);
+> > +
+> > +             pci_read_config_dword(tp->pdev, n, &dword_rd);
+> > +             netdev_err(tp->dev, "%08x\n", dword_rd);
+> > +             n +=3D 4;
+> > +     }
+> > +
+> > +     netdev_err(dev, "Dump tally counter:\n");
+> > +     counters =3D tp->tally_vaddr;
+> > +     rtase_dump_tally_counter(tp);
+> > +
+> > +     netdev_err(dev, "tx_packets %lld\n",
+> > +                le64_to_cpu(counters->tx_packets));
+>=20
+> tx_packets is __le16 not __le64, so I think you want:
+>=20
+>         netdev_err(dev, "rx_missed %d\n",
+>                    le16_to_cpu(counters->rx_missed));
+>=20
+> Likewise for align_errors, tx_aborted, and tx_underun.
+>=20
+> As flagged by Sparse
+>=20
+> > +     netdev_err(dev, "rx_packets %lld\n",
+> > +                le64_to_cpu(counters->rx_packets));
+> > +     netdev_err(dev, "tx_errors %lld\n",
+> > +                le64_to_cpu(counters->tx_errors));
+> > +     netdev_err(dev, "rx_missed %lld\n",
+> > +                le64_to_cpu(counters->rx_missed));
+> > +     netdev_err(dev, "align_errors %lld\n",
+> > +                le64_to_cpu(counters->align_errors));
+> > +     netdev_err(dev, "tx_one_collision %lld\n",
+> > +                le64_to_cpu(counters->tx_one_collision));
+>=20
+> Similarly, tx_one_collision is __le32 not __le64, so I think you want:
+> .
+>         netdev_err(dev, "tx_one_collision %d\n",
+>                    le32_to_cpu(counters->tx_one_collision));
+>=20
+> Likewise for tx_multi_collision, and rx_multicast.
+>=20
+> There area also similar problems in rtase_main.c:rtase_dump_state(), adde=
+d
+> elsewhere in this patch-set.
 
-The description you give is that there are two SERDES, and both could
-be connected to a MAC. What does package-phy-mode represent then? 
+Thank you for your review, I will correct these little endian issues.
+>=20
+> > +     netdev_err(dev, "tx_multi_collision %lld\n",
+> > +                le64_to_cpu(counters->tx_multi_collision));
+> > +     netdev_err(dev, "rx_unicast %lld\n",
+> > +                le64_to_cpu(counters->rx_unicast));
+> > +     netdev_err(dev, "rx_broadcast %lld\n",
+> > +                le64_to_cpu(counters->rx_broadcast));
+> > +     netdev_err(dev, "rx_multicast %lld\n",
+> > +                le64_to_cpu(counters->rx_multicast));
+> > +     netdev_err(dev, "tx_aborted %lld\n",
+> > +                le64_to_cpu(counters->tx_aborted));
+> > +     netdev_err(dev, "tx_underun %lld\n",
+> > +                le64_to_cpu(counters->tx_underun));
+> > +}
+>=20
+> ...
+>=20
+> > +static const char rtase_gstrings[][ETH_GSTRING_LEN] =3D {
+> > +     "tx_packets",
+> > +     "rx_packets",
+> > +     "tx_errors",
+> > +     "rx_errors",
+> > +     "rx_missed",
+> > +     "align_errors",
+> > +     "tx_single_collisions",
+> > +     "tx_multi_collisions",
+> > +     "unicast",
+> > +     "broadcast",
+> > +     "multicast",
+> > +     "tx_aborted",
+> > +     "tx_underrun",
+> > +};
+> > +
+> > +static void rtase_get_strings(struct net_device *dev, u32 stringset,
+> > +u8 *data) {
+> > +     switch (stringset) {
+> > +     case ETH_SS_STATS:
+> > +             memcpy(data, *rtase_gstrings, sizeof(rtase_gstrings));
+>=20
+> Compilers don't think this is seem correct, because *rtase_gsrings is the=
+ first
+> element of that array, rather than the entire array. And thus is only
+> ETH_GSTRING_LEN bytes long, rather than n * ETH_GSTRING_LEN bytes long.
+>=20
+> I think what you want is (compile tested only!):
+>=20
+>                 memcpy(data, rtase_gstrings, sizeof(rtase_gstrings));
+>=20
+> Flagged by a clang-16 W=3D1 build.
 
-Luo Jie patch for the qca8084 seems to have the same issue. It has two
-SERDES/PMA, and both could be connected to the MACs. So it seems like
-QCA devices don't actually fit this model. If we want to describe the
-package link mode, we probably need to list each PMA, and have a
-property in the PMA node indicating what link mode the PMA is
-operating at.
+Thanks for your suggestion, I will fix it.
+>=20
+> > +             break;
+> > +     }
+> > +}
+>=20
+> ...
+>=20
+> > +static int rtase_init_board(struct pci_dev *pdev, struct net_device
+> **dev_out,
+> > +                         void __iomem **ioaddr_out) {
+> > +     struct net_device *dev;
+> > +     void __iomem *ioaddr;
+> > +     int ret =3D -ENOMEM;
+> > +
+> > +     /* dev zeroed in alloc_etherdev */
+> > +     dev =3D alloc_etherdev_mq(sizeof(struct rtase_private),
+> > +                             RTASE_FUNC_TXQ_NUM);
+> > +     if (!dev)
+> > +             goto err_out;
+> > +
+> > +     SET_NETDEV_DEV(dev, &pdev->dev);
+> > +
+> > +     ret =3D pci_enable_device(pdev);
+> > +     if (ret < 0)
+> > +             goto err_out_free_dev;
+> > +
+> > +     /* make sure PCI base addr 1 is MMIO */
+> > +     if (!(pci_resource_flags(pdev, 2) & IORESOURCE_MEM)) {
+> > +             ret =3D -ENODEV;
+> > +             goto err_out_disable;
+> > +     }
+> > +
+> > +     /* check for weird/broken PCI region reporting */
+> > +     if (pci_resource_len(pdev, 2) < RTASE_REGS_SIZE) {
+> > +             ret =3D -ENODEV;
+> > +             goto err_out_disable;
+> > +     }
+> > +
+> > +     ret =3D pci_request_regions(pdev, KBUILD_MODNAME);
+> > +     if (ret < 0)
+> > +             goto err_out_disable;
+> > +
+> > +     if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)))
+> > +             dev->features |=3D NETIF_F_HIGHDMA;
+> > +     else if (dma_set_mask_and_coherent(&pdev->dev,
+> DMA_BIT_MASK(32)))
+> > +             goto err_out_free_res;
+> > +     else
+> > +             dev_info(&pdev->dev, "DMA_BIT_MASK: 32\n");
+> > +
+> > +     pci_set_master(pdev);
+> > +
+> > +     /* ioremap MMIO region */
+> > +     ioaddr =3D ioremap(pci_resource_start(pdev, 2),
+> > +                      pci_resource_len(pdev, 2));
+> > +     if (!ioaddr) {
+> > +             ret =3D -EIO;
+> > +             goto err_out_free_res;
+> > +     }
+> > +
+> > +     *ioaddr_out =3D ioaddr;
+> > +     *dev_out =3D dev;
+> > +     goto out;
+>=20
+> nit: I think it's slightly more idiomatic to simply return 0 here,
+>      and drop the out label below.
 
-At least for the moment, its not clear we actually need this at
-all. It seems like the phy-mode is all we need. The PHY driver should
-know what values are valid per port, and so can validate the value.
+Thanks, I will modify it.
+>=20
+> > +
+> > +err_out_free_res:
+> > +     pci_release_regions(pdev);
+> > +
+> > +err_out_disable:
+> > +     pci_disable_device(pdev);
+> > +
+> > +err_out_free_dev:
+> > +     free_netdev(dev);
+> > +
+> > +err_out:
+> > +     *ioaddr_out =3D NULL;
+> > +     *dev_out =3D NULL;
+> > +
+> > +out:
+> > +     return ret;
+> > +}
+>=20
+> ...
+>=20
+> > diff --git a/drivers/net/ethernet/realtek/rtase/tt.h
+> > b/drivers/net/ethernet/realtek/rtase/tt.h
+> > new file mode 100644
+> > index 000000000000..9239c518c504
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/realtek/rtase/tt.h
+> > @@ -0,0 +1,353 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
+> > +/*
+> > + *  rtase is the Linux device driver released for Realtek Automotive
+> > +Switch
+> > + *  controllers with PCI-Express interface.
+> > + *
+> > + *  Copyright(c) 2023 Realtek Semiconductor Corp.
+> > + */
+> > +
+> > +#ifndef _RTASE_H_
+> > +#define _RTASE_H_
+>=20
+> If the code in tt.h is only used in tt.c, then perhaps the code can simpl=
+y be
+> moved into tt.c.
 
-> 4. Not finding a correct place to put PHY package info.
-> 
->    I'm still convinced the mdio node is the correct place.
->    - PHY package are PHY in bundle so they are actual PHY
->    - We already have in the mdio node special handling (every DSA switch
->      use custom compatible and PHY ID is not used to probe them
->      normally)
->    - Node this way won't be treated as PHY as they won't match the PHY
->      node name pattern and also won't have the compatible pattern for
->      PHY.
-
-We do need a compatible for the package. The kernel is unlikely to use
-it, but the validation tools will. Each package can have its own DT
-properties, so we need a .yaml to describe those properties. So i
-would expect to have a "qca807x-package" compatible, which then lists
-the tx driver strength etc. The PHYs within the package don't need
-compatible, they are just linux PHYs, probed using the same code as
-PHYs outside of a package.
-
-    Andrew
+Sorry, tt.c and tt.h are redundant codes, I will remove them.
+>=20
+> ...
 
