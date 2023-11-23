@@ -1,128 +1,211 @@
-Return-Path: <netdev+bounces-50665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42F9E7F68CB
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:06:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFB9F7F6921
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:54:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5A91F207C9
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 22:06:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D1C328183D
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 22:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581731803D;
-	Thu, 23 Nov 2023 22:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB421E516;
+	Thu, 23 Nov 2023 22:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wvMKqpfS";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jq5aHo+c"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVdZNdRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2585D5A
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:06:27 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out1.suse.de (Postfix) with ESMTP id A2864219F7
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 22:06:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1700777185; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=s4TVVvZtAGGu35ln9PqaSuzP2oIhqIimFPohsIcnljo=;
-	b=wvMKqpfSyWJeZe8PPeFdRYA1Ij11YcnwVW0EK3xQd7buksz0tzBeYxyOCfM0PZ0yEqkxGq
-	LLStt6IBXaqtE02CUit2ylHkQMPvG3hJBTCH9ycoxswDQu0FvlHti2at9Fm5qWLBDHx2h3
-	MfURIKVcWORvgxYi+vYemX/sIl+RsSU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1700777185;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type;
-	bh=s4TVVvZtAGGu35ln9PqaSuzP2oIhqIimFPohsIcnljo=;
-	b=jq5aHo+czaOVBhn1Kp/4uAun5Y8LUGmwGgU1PMu+FraPAG0smlkppllgZwcBZ6Xq2Koc6q
-	DeWb5KiVI94ZmEAA==
-Received: from lion.mk-sys.cz (mkubecek.udp.ovpn2.nue.suse.de [10.163.44.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by relay2.suse.de (Postfix) with ESMTPS id 9786F2C15F
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 22:06:25 +0000 (UTC)
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 6E03A2016B; Thu, 23 Nov 2023 23:06:25 +0100 (CET)
-Date: Thu, 23 Nov 2023 23:06:25 +0100
-From: Michal Kubecek <mkubecek@suse.cz>
-To: netdev@vger.kernel.org
-Subject: ethtool 6.6 released
-Message-ID: <20231123220625.q427zyjaogdmlf6d@lion.mk-sys.cz>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA38D6C
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:53:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700780034;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HgkyQVWNEh0w8FRWOuAxuO8xPZdHyxrc2iTVyvbqtKU=;
+	b=KVdZNdRKx4iLxGkcyZHEGRhbM/26qc2DXXubk7qShFJU3jFD0UhmLn00mr4mcRLMWJpIYU
+	gkxfq0hQF93YZ3VdlVoZ9gK1iIKojry8n6uAt35Nr7aIwI9hHZBR2AB+8/BuYjhUbO3tyE
+	vhB5qVaFlntto3vC7tnvUo2/6wJ5bY8=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43-wdJVMYx5OHqGbOePDcTQrw-1; Thu, 23 Nov 2023 17:53:53 -0500
+X-MC-Unique: wdJVMYx5OHqGbOePDcTQrw-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1f5ce492010so1777628fac.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 14:53:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700780013; x=1701384813;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HgkyQVWNEh0w8FRWOuAxuO8xPZdHyxrc2iTVyvbqtKU=;
+        b=ktkC/LfjBpznKXbuOwgE9N2aEa1XrT0E87+0Hapt4eHFcLeKUlCPqeCayGqrsGQcys
+         mTCthafkiuqd7hHPGjZNVjMchj2W9xH392TBWddw8OdxPD2NEK3Bh9VdJVcBkAWuOxti
+         jKTQFZPAnkFLJO324kwvROXBYPPe+pg1iI/5r5wSH7yYv8A89OiU0rrtXw5Qc6XYOjzU
+         +EHG9JRBDSWWtkPTJhUZF1nMBFT7bRUE0B0pehzgRfTnEjm9/hK5AMKvpZp6BuUxU17z
+         Vr1laj8ZYIeB8R/A6KxlR8V58Zn66XI6vedUU5bdPMZ4vVJq1XqwDa7W7CVTMzeBRMNt
+         8Uhw==
+X-Gm-Message-State: AOJu0YzY1pOG+dT5T3PEyIOlDmcsBHd7XQZs/G6xQ7liEJtlIjuFAr8w
+	rMeH7Kfr0vNq77aGn74r404Jlj/UPcYPVI01etX5/C7LPFmIHqNsYHOA9Spv3tP5tpL/xcWzWA+
+	QoDAPA7jNX45rGjWES8qTUUytXqxhSpZd
+X-Received: by 2002:a05:6870:ebca:b0:1ef:cedd:5c32 with SMTP id cr10-20020a056870ebca00b001efcedd5c32mr998594oab.3.1700780013307;
+        Thu, 23 Nov 2023 14:53:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6HGCbuC2wuf4qW3jUuFH9NOq5sUWsl30jXSKTaMc3yOR1OB7UdxlczqfoO5wGGXUKu8ApVrKHNBUO0CwSip0=
+X-Received: by 2002:a05:6870:ebca:b0:1ef:cedd:5c32 with SMTP id
+ cr10-20020a056870ebca00b001efcedd5c32mr998579oab.3.1700780013047; Thu, 23 Nov
+ 2023 14:53:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qn7fiwcfdbd6vqqj"
-Content-Disposition: inline
-X-Spamd-Bar: ++++++++++++++
-Authentication-Results: smtp-out1.suse.de;
-	dkim=none;
-	dmarc=none;
-	spf=softfail (smtp-out1.suse.de: 149.44.160.134 is neither permitted nor denied by domain of mkubecek@suse.cz) smtp.mailfrom=mkubecek@suse.cz
-X-Rspamd-Server: rspamd1
-X-Spamd-Result: default: False [14.42 / 50.00];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 RWL_MAILSPIKE_GOOD(-1.00)[149.44.160.134:from];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_SPAM_SHORT(3.00)[1.000];
-	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	 PREVIOUSLY_DELIVERED(0.00)[netdev@vger.kernel.org];
-	 TO_DN_NONE(0.00)[];
-	 R_SPF_SOFTFAIL(4.60)[~all];
-	 RCPT_COUNT_ONE(0.00)[1];
-	 DMARC_NA(1.20)[suse.cz];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_SPAM_LONG(3.50)[1.000];
-	 VIOLATED_DIRECT_SPF(3.50)[];
-	 SIGNED_PGP(-2.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_NO_TLS_LAST(0.10)[];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 R_DKIM_NA(2.20)[];
-	 MIME_TRACE(0.00)[0:+,1:+,2:~];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 BAYES_HAM(-0.47)[79.21%]
-X-Spam-Score: 14.42
-X-Rspamd-Queue-Id: A2864219F7
+References: <20231123183835.635210-1-mkp@redhat.com> <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
+From: Mike Pattrick <mkp@redhat.com>
+Date: Thu, 23 Nov 2023 17:53:21 -0500
+Message-ID: <CAHcdBH7h-sq=Gzkan1du3uxx44WibK0yzdnUcZCuw-mp=9OxOg@mail.gmail.com>
+Subject: Re: [PATCH net-next] packet: Account for VLAN_HLEN in csum_start when
+ virtio_net_hdr is enabled
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Mike Pattrick wrote:
+> > Af_packet provides checksum offload offsets to usermode applications
+> > through struct virtio_net_hdr when PACKET_VNET_HDR is enabled on the
+> > socket. For skbuffs with a vlan being sent to a SOCK_RAW socket,
+> > af_packet will include the link level header and so csum_start needs
+> > to be adjusted accordingly.
+>
+> Is this patch based on observing an incorrect offset in a workload,
+> or on code inspection?
 
---qn7fiwcfdbd6vqqj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Based on an incorrect offset in a workload. The setup involved sending
+vxlan traffic though a veth interface configured with a vlan. The
+vnet_hdr's csum_start value was off by 4, and this problem went away
+when the vlan was removed.
 
-Hello,
+I'll take another look at this patch.
 
-ethtool 6.6 has been released.
+>
+> As the referenced patch mentions, VLAN_HLEN adjustment is needed
+> in macvtap because it pulls the vlan header from skb->vlan_tci. At
+> which point skb->csum_start is wrong.
+>
+> "Commit f09e2249c4f5 ("macvtap: restore vlan header on user read")
+>  added this feature to macvtap. Commit 3ce9b20f1971 ("macvtap: Fix
+>  csum_start when VLAN tags are present") then fixed up csum_start."
+>
+> But the commit also mentions "Virtio, packet and uml do not insert
+> the vlan header in the user buffer.". This situation has not changed.
+>
+> Packet sockets may receive packets with VLAN headers present, but
+> unless they were inserted manually before passing to user, as macvtap
+> does, this does not affect csum_start.
+>
+> Packet sockets support reading those skb->vlan_tci stored VLAN
+> headers using AUXDATA.
+>
+> > Fixes: fd3a88625844 ("net: in virtio_net_hdr only add VLAN_HLEN to csum=
+_start if payload holds vlan")
+>
+> The fix should target net, not net-next.
+>
+> > Signed-off-by: Mike Pattrick <mkp@redhat.com>
+> > ---
+> >  net/packet/af_packet.c | 36 ++++++++++++++++++++++++++----------
+> >  1 file changed, 26 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > index a84e00b5904b..f6b602ffe383 100644
+> > --- a/net/packet/af_packet.c
+> > +++ b/net/packet/af_packet.c
+> > @@ -2092,15 +2092,23 @@ static unsigned int run_filter(struct sk_buff *=
+skb,
+> >  }
+> >
+> >  static int packet_rcv_vnet(struct msghdr *msg, const struct sk_buff *s=
+kb,
+> > -                        size_t *len, int vnet_hdr_sz)
+> > +                        size_t *len, int vnet_hdr_sz,
+> > +                        const struct sock *sk)
+> >  {
+> >       struct virtio_net_hdr_mrg_rxbuf vnet_hdr =3D { .num_buffers =3D 0=
+ };
+> > +     int vlan_hlen;
+> >
+> >       if (*len < vnet_hdr_sz)
+> >               return -EINVAL;
+> >       *len -=3D vnet_hdr_sz;
+> >
+> > -     if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)&vnet_h=
+dr, vio_le(), true, 0))
+> > +     if (sk->sk_type =3D=3D SOCK_RAW && skb_vlan_tag_present(skb))
+> > +             vlan_hlen =3D VLAN_HLEN;
+> > +     else
+> > +             vlan_hlen =3D 0;
+> > +
+> > +     if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)&vnet_h=
+dr,
+> > +                                 vio_le(), true, vlan_hlen))
+> >               return -EINVAL;
+> >
+> >       return memcpy_to_msg(msg, (void *)&vnet_hdr, vnet_hdr_sz);
+> > @@ -2368,13 +2376,21 @@ static int tpacket_rcv(struct sk_buff *skb, str=
+uct net_device *dev,
+> >               __set_bit(slot_id, po->rx_ring.rx_owner_map);
+> >       }
+> >
+> > -     if (vnet_hdr_sz &&
+> > -         virtio_net_hdr_from_skb(skb, h.raw + macoff -
+> > -                                 sizeof(struct virtio_net_hdr),
+> > -                                 vio_le(), true, 0)) {
+> > -             if (po->tp_version =3D=3D TPACKET_V3)
+> > -                     prb_clear_blk_fill_status(&po->rx_ring);
+> > -             goto drop_n_account;
+> > +     if (vnet_hdr_sz) {
+> > +             int vlan_hlen;
+> > +
+> > +             if (sk->sk_type =3D=3D SOCK_RAW && skb_vlan_tag_present(s=
+kb))
+> > +                     vlan_hlen =3D VLAN_HLEN;
+> > +             else
+> > +                     vlan_hlen =3D 0;
+> > +
+> > +             if (virtio_net_hdr_from_skb(skb, h.raw + macoff -
+> > +                                         sizeof(struct virtio_net_hdr)=
+,
+> > +                                         vio_le(), true, vlan_hlen)) {
+> > +                     if (po->tp_version =3D=3D TPACKET_V3)
+> > +                             prb_clear_blk_fill_status(&po->rx_ring);
+> > +                     goto drop_n_account;
+> > +             }
+> >       }
+> >
+> >       if (po->tp_version <=3D TPACKET_V2) {
+> > @@ -3464,7 +3480,7 @@ static int packet_recvmsg(struct socket *sock, st=
+ruct msghdr *msg, size_t len,
+> >       packet_rcv_try_clear_pressure(pkt_sk(sk));
+> >
+> >       if (vnet_hdr_len) {
+> > -             err =3D packet_rcv_vnet(msg, skb, &len, vnet_hdr_len);
+> > +             err =3D packet_rcv_vnet(msg, skb, &len, vnet_hdr_len, sk)=
+;
+> >               if (err)
+> >                       goto out_free;
+> >       }
+> > --
+> > 2.40.1
+> >
+>
+>
 
-Home page: https://www.kernel.org/pub/software/network/ethtool/
-Download link:
-https://www.kernel.org/pub/software/network/ethtool/ethtool-6.6.tar.xz
-
-Release notes:
-	* Feature: support for more CMIS transceiver modules (-m)
-	* Fix: fix build on systems with old kernel uapi headers
-
-Michal
-
---qn7fiwcfdbd6vqqj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmVfzN0ACgkQ538sG/LR
-dpXfUgf8Ccbgn1ry0WCCFmqOuMjo8KlrhmB8OTqwQxG5ybqm6BwTSk+2PXzjFTma
-K/lo1RIUXNgDRhrcVZcZVKGYElYe71yqUgQpKysaLzPh7faDnkNzXOjiB012uy7n
-oEB4jNVpexXemlAd/hXvFll6zR+/fnN6FFmhze268wEntTXd+a/E8EswDs/8R3CG
-odqHyq0TR7qn1C8bI2hZjlZ6K0UhiXRJa4LFHVJ5/5JkWlR+fzpr/Uaj8SZb459L
-ZLiItYg1JdWEnd0La8dexUPzIeLNojVqZuCLVROMKdBeiZILgdqNKkbYk+3zTod+
-TV3euEsLOpIDHs43OC9Q/k3sGqmBdA==
-=Ot1m
------END PGP SIGNATURE-----
-
---qn7fiwcfdbd6vqqj--
 
