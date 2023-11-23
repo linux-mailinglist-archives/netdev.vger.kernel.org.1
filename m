@@ -1,124 +1,130 @@
-Return-Path: <netdev+bounces-50541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC947F60B6
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:47:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F757F60CB
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3171E1C2117D
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:47:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69AECB21338
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4B825776;
-	Thu, 23 Nov 2023 13:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B5C2576E;
+	Thu, 23 Nov 2023 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJUnobMR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCsbMuea"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53B69F9
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:53 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-285685530f3so407536a91.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 05:46:53 -0800 (PST)
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE634BA;
+	Thu, 23 Nov 2023 05:50:26 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5cd2f1a198cso7138267b3.0;
+        Thu, 23 Nov 2023 05:50:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700747212; x=1701352012; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rfCpLUY8uRc7ejP0BoGnUPM/LMXmRidgX+2dbabaW1M=;
-        b=hJUnobMRu7GH4SlWNZkc3o749oIYLF1uQGowgzeEgol/NHupoZTOokn5jq61EU5tm/
-         03hujjzo9R0ZbrdBbzN6SiEmSRa6t9E5x4TlVy/RdsWWpSIKxzT+rLnXEjCMGwZB59Ln
-         JoA2mU1o8z7Czc1av4TMKmbSD4z0WCK8UCdGdAbFRnCJoDOdLVgRFdUTze0RQp4PgFQM
-         cyBu3P9dqvlfZ9/cNfFOzMXH+MFeYRZ1t7xMeyRvq9vmYLa0RhAe0RMHG2IoUj9eBMrS
-         lhREqOKuBIVZfvRAyX0c7zwjj3JsRH16garffEt1Mhg1Ti0+cUgi+vCyxD/c6Gtv8AvY
-         BHyQ==
+        d=gmail.com; s=20230601; t=1700747426; x=1701352226; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6HDmUWHoV/d+5kwt+BMpRMCcQ4EU+NPmBrVnqKEpBkk=;
+        b=fCsbMueaAqe4vmewoSW6onWlFPkdA2U7h8HtTHIvasxQCHpbOH41yE81KU0z+UTwfT
+         Q6v6Ixzn3SnDphaewcWX/b5CVS7iRGkd4+PgbrYMFTBp4I1i2TLcIghXOQobf4igitVD
+         VsjKcv3Ez9P3JuWLtAJiPNLOd5uuKBFFKjPNt3h0QEsCZqkDuhqdrAeexZT7iUKtVxuC
+         bJxWmaiuddbgNd8Mmc/r8j/ujlPyDLwj56ItH5UOQmklq4wcaDDlUV4FiTN+p1cYLcVw
+         ylw68GL8/87oG0ke43GUgNufcMHWrue4CFFbJ9Fe4pYALzNtw9DA42Cfb/6VI9CSsi7i
+         g3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700747212; x=1701352012;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rfCpLUY8uRc7ejP0BoGnUPM/LMXmRidgX+2dbabaW1M=;
-        b=ru3vsNnN0/15611oXBQA/RzHORPWKxdZDVGBic0JNWsivcC8JVrbm0QSB+NjisMQHW
-         bJ8ofnxtwqzGZ1OLsfVDlRojUPyBgCsEaxtgR8FVlV7qTaLyOokdw/3M2sOxa0tt5QoG
-         EePLD7sOQf0pAxgj8O4auz56DmO4vL3Pt9ECx6gIFfqxOcg/FxHmUfOCcgc5KGekuuAh
-         /VHSzPPEK2DBmy+dpTwZRMgslpgYY06gmtZPHibPPvv47/4kSp5WkyxDbPhwF8smxRtI
-         QBDHSYHYqmkcfwWSbX3XvETeoncm9uSj1WC7UtPrT8Fq+0Us76D8j3hPrfobKmuPWod2
-         8SMA==
-X-Gm-Message-State: AOJu0YzmabxTf1ug9KeY/CrdtqcOgEgRjyr8H5RNM64bGpF5qfmil3Dy
-	kxZAbZeXYmKZqytTQ9Xwb9ckPJEcyv2xf0RU
-X-Google-Smtp-Source: AGHT+IG95qwWIecwU9lNiOCIXPjFCTg+Z3ZAbo04iCyAWOXqgw4gqzQw32m6M8/bI8BzRc/Z+f+zMQ==
-X-Received: by 2002:a17:90b:1b50:b0:26b:4a9e:3c7e with SMTP id nv16-20020a17090b1b5000b0026b4a9e3c7emr5584461pjb.4.1700747212187;
-        Thu, 23 Nov 2023 05:46:52 -0800 (PST)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 29-20020a17090a195d00b0028328057c67sm1414210pjh.45.2023.11.23.05.46.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 05:46:51 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Florian Westphal <fw@strlen.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Marc Muehlfeld <mmuehlfe@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 10/10] docs: bridge: add other features
-Date: Thu, 23 Nov 2023 21:45:53 +0800
-Message-ID: <20231123134553.3394290-11-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231123134553.3394290-1-liuhangbin@gmail.com>
-References: <20231123134553.3394290-1-liuhangbin@gmail.com>
+        d=1e100.net; s=20230601; t=1700747426; x=1701352226;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6HDmUWHoV/d+5kwt+BMpRMCcQ4EU+NPmBrVnqKEpBkk=;
+        b=Ly75E3m+s6TILhOAXuM8xDQflO2gP111O635uanFSq/gn92Ge3KSyrCqoH4JZ63p9e
+         6C92VpD6WL/+R+PTQKIfiT6bPpvbQ+qhVjS4mgGW8wa709RMu6UE2W+xi/RWpj1qKD+r
+         oM+viHAxovI7+5neqCCo1qRWZF8cECJYuwY+6PlHpCXM59/kT0AhkhhhRIdopVqIMBcC
+         OfaPonhaa9VChjd+7vGntIpVLh1w+/OofOJFhyjaV/jDkw+EMqa9AhVseTxR+S9kgMLF
+         RU2jzrELfjqLo+VKF+zGEafYghsk5F+DQWKCiSvUDk0QWT8LUxV5YpgOZNhIvqpsDumT
+         iryQ==
+X-Gm-Message-State: AOJu0Yyk9sfRcDKhWwFPBh6y0KJ9GklvwFD+X9mzGYsg2bu5RcikNWJQ
+	rvOO8fWPu3Ab2tF0vREBXp1G/Z9D0RbqK4ijqTc=
+X-Google-Smtp-Source: AGHT+IGZwjwRkgSJ7EnlxLUgRSgKWDT8jC/rPzRQg0Kq3WiN+CVcYva0UFJf/nOdcGZASDUiq8QSYhmkdlzne0lzNs4=
+X-Received: by 2002:a25:3409:0:b0:da0:3535:41f4 with SMTP id
+ b9-20020a253409000000b00da0353541f4mr5712007yba.7.1700747426043; Thu, 23 Nov
+ 2023 05:50:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231121151733.2015384-1-tmaimon77@gmail.com> <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch> <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
+ <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
+In-Reply-To: <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
+From: Tomer Maimon <tmaimon77@gmail.com>
+Date: Thu, 23 Nov 2023 15:50:14 +0200
+Message-ID: <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com, edumazet@google.com, 
+	krzysztof.kozlowski+dt@linaro.org, linux-stm32@st-md-mailman.stormreply.com, 
+	benjaminfair@google.com, openbmc@lists.ozlabs.org, joabreu@synopsys.com, 
+	joel@jms.id.au, devicetree@vger.kernel.org, j.neuschaefer@gmx.net, 
+	robh+dt@kernel.org, peppe.cavallaro@st.com, 
+	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com, 
+	venture@google.com, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, 
+	netdev@vger.kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
 
-Add some features that are not appropriate for the existing section to
-the "Others" part of the bridge document.
+Hi Andrew,
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- Documentation/networking/bridge.rst | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+On Wed, 22 Nov 2023 at 20:45, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Nov 22, 2023 at 07:50:57PM +0200, Tomer Maimon wrote:
+> > Hi Andrew,
+> >
+> > Thanks for your comments
+> >
+> > On Tue, 21 Nov 2023 at 18:42, Andrew Lunn <andrew@lunn.ch> wrote:
+> > >
+> > > > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> > > > +                      struct plat_stmmacenet_data *plat_dat)
+> > > > +{
+> > > > +     u16 val;
+> > > > +
+> > > > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> > > > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > +     val |= PCS_RST;
+> > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > +
+> > > > +     while (val & PCS_RST)
+> > > > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > +
+> > > > +     val &= ~(PCS_AN_ENABLE);
+> > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > +}
+> > >
+> > > Is this a licensed PCS implementation? Or home grown? If its been
+> > > licensed from somebody, it maybe should live in driver/net/pcs, so
+> > > others can reuse it when they license the same core.
+>
+> > we are using DWC PCS, I don't see support for DWC PCS and I am not
+> > sure it is supposed to be supported at /drivers/net/pcs
+>
+> I've not followed the naming used by Synopsys. Is DWC PCS the same as
+> XPCS? Does Synopsys have multiple PCS implementations?
+>
+> > I do see a patch set to support DWC PCS but I don't think it answers my needs
+> > https://patchwork.ozlabs.org/project/netdev/patch/1559674736-2190-3-git-send-email-weifeng.voon@intel.com/
+>
+> I _think_ this patch eventually got turned into
+> driver/net/pcs/pcs-xpcs.c
+>
+> What exactly does it not do for you?
+Thanks for pointing me to Synopsys (DWC) PCS in pcs-xpcs.c I need to
+check if the driver follows all our SGMII needs
+>
+>      Andrew
 
-diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-index 772bbe28aefe..54118d9da2a4 100644
---- a/Documentation/networking/bridge.rst
-+++ b/Documentation/networking/bridge.rst
-@@ -274,6 +274,20 @@ So, br_netfilter is only needed if users, for some reason, need to use
- ip(6)tables to filter packets forwarded by the bridge, or NAT bridged
- traffic. For pure link layer filtering, this module isn't needed.
- 
-+Other Features
-+==============
-+
-+The Linux bridge also supports `IEEE 802.11 Proxy ARP
-+<https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=958501163ddd6ea22a98f94fa0e7ce6d4734e5c4>`_,
-+`Media Redundancy Protocol (MRP)
-+<https://lore.kernel.org/netdev/20200426132208.3232-1-horatiu.vultur@microchip.com/>`_,
-+`Media Redundancy Protocol (MRP) LC mode
-+<https://lore.kernel.org/r/20201124082525.273820-1-horatiu.vultur@microchip.com>`_,
-+`IEEE 802.1X port authentication
-+<https://lore.kernel.org/netdev/20220218155148.2329797-1-schultz.hans+netdev@gmail.com/>`_,
-+and `MAC Authentication Bypass (MAB)
-+<https://lore.kernel.org/netdev/20221101193922.2125323-2-idosch@nvidia.com/>`_.
-+
- FAQ
- ===
- 
--- 
-2.41.0
+Best regards,
 
+Tomer
 
