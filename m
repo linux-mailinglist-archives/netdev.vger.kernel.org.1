@@ -1,114 +1,98 @@
-Return-Path: <netdev+bounces-50518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233647F6033
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B063F7F6047
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 14:31:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25F3281DD4
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:27:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67FED281DEA
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E81724B59;
-	Thu, 23 Nov 2023 13:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE1E24A0D;
+	Thu, 23 Nov 2023 13:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SftnxtIJ"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="EI6qt16N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D0F9A;
-	Thu, 23 Nov 2023 05:27:49 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507b9408c61so1159580e87.0;
-        Thu, 23 Nov 2023 05:27:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700746067; x=1701350867; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kIaXLjCHkUTAIQFu51DPbKbv3RKHWgAAWQUBqR3AlJg=;
-        b=SftnxtIJvMpOM2NOYta5KFSDGMuIdrgqte5PIYc1hqpo5Tz8HUs6tC6nmS39HSkg/d
-         qu/llnIgm3lIx/DLvBTm0cA/HZepdIAc9AnDEmtaWfZFvPICBKIx8d5mbk2FFcsL1V4k
-         orc7pUw2frDZtgWvRvFslZfiWUd2QJaK2KbG/Vo4f6/YXfwGBscqQR40aMp8KPnBmv93
-         nEJXZXluV6P2jEGr8OXwGBNDh8W1KRfbq4nPswC7COa73Rtr4UWWfm7F7jkHVQrA4tzz
-         SaP+LeWgqxTU51wTg1gg/0UHDVgjCU+GNJUdmI6hgbt0w7IYNKbk4b/IzpDkHNt5QTv4
-         4QuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700746067; x=1701350867;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kIaXLjCHkUTAIQFu51DPbKbv3RKHWgAAWQUBqR3AlJg=;
-        b=Ft2QwNk+D9FD4HfF1TFB36AYzr4Uzlm/4yxCxgke5jELuaIAkv8HmfAfGAr55o+WAE
-         CZQCPWq/kL3TYQ+Tqzunqne39+UmupPkxENu+UPmCSTFJ/kat9a22k6Gsz3c/3DWOtYk
-         hyJXDFWsChmEF7j3no0cg7fgUyaF8CR2ynXtZROdpIfHAZe5Ky51vS3eR34bRAAI4Utr
-         jD6N/GA1pBYH1XvBtJd1pxXdaR4oXKxUyOZKcCOER4jKOgukw9RlJnuBA5fzxdZwOg6r
-         nQKvsWGkgPpH3tWoqPvpsi86mFsHSW5EVMSw3RLayrrpT2CvGA1bGuFZ0Qs2BDnPMArV
-         4Ecg==
-X-Gm-Message-State: AOJu0Yyo6hyvkTWuYWBv1mWpRlB1KB/Frknj+bgyd/aY1u8ymqrD7d2u
-	IH6iL9J2127lMz0eK+iV1Nn7pMTP5sKV6g==
-X-Google-Smtp-Source: AGHT+IGoN/Woo6INI5guA4F/FORkWZ1i6cKKlQLnR1B29tIdXKUWXGoZy2x1ZJ8DAwqfvUKG4SuoGg==
-X-Received: by 2002:a05:6512:3ca0:b0:509:4587:bdd0 with SMTP id h32-20020a0565123ca000b005094587bdd0mr5173837lfv.7.1700746067158;
-        Thu, 23 Nov 2023 05:27:47 -0800 (PST)
-Received: from threadripper.localdomain (89-186-112-232.pool.digikabel.hu. [89.186.112.232])
-        by smtp.gmail.com with ESMTPSA id g14-20020a170906594e00b009fc6ac28110sm783069ejr.20.2023.11.23.05.27.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 05:27:46 -0800 (PST)
-From: Heiko Schocher <heiko.schocher@gmail.com>
-X-Google-Original-From: Heiko Schocher <hs@denx.de>
-To: netdev@vger.kernel.org
-Cc: Heiko Schocher <hs@denx.de>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: fec: fix probing of fec1 when fec0 is not probed yet
-Date: Thu, 23 Nov 2023 14:27:43 +0100
-Message-Id: <20231123132744.62519-1-hs@denx.de>
-X-Mailer: git-send-email 2.20.1
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B2EBA;
+	Thu, 23 Nov 2023 05:31:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=yW8Xpy7WFdU5emWEMV3cGGEJXXouqKEio/Q7EZwtC1c=; b=EI6qt16NOVBRmU0Oey7ynTU/A+
+	RX/mKHdvJ92qRPF8h6jd0MNuF87iPf6GLGsZSFaVl15A/nx0AVm5U/8hQC5Ocg6WoDztLSlmDZvly
+	1DI2cCpDv5J1wajhAPiD429v58Fao7/0Nh+sQ0SsdIU571Zpfsgw7KZKTG8BHlz7EaR2p8pssT5GL
+	T9w6XWHsS83GjIbSftPriz1RIoaqZTGOhEK3hUdGcrPV1kwZ9w0zJn/HYmcItM9yQjkPofR8ZGa+P
+	m0w6Eloue8zHU5n5Gm3mYyQzas9l+vt3o+Sj7rhFs3ovwLAmB2HSG4fzEvhMmVX77830pGT2/zv0e
+	mtANanFg==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r69nr-000ObS-2l; Thu, 23 Nov 2023 14:31:35 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r69nq-000KQ1-CB; Thu, 23 Nov 2023 14:31:34 +0100
+Subject: Re: [PATCH bpf-next v2 0/3] skmsg: Add the data length in skmsg to
+ SIOCINQ ioctl and rx_queue
+To: Pengcheng Yang <yangpc@wangsu.com>,
+ 'John Fastabend' <john.fastabend@gmail.com>,
+ 'Jakub Sitnicki' <jakub@cloudflare.com>, 'Eric Dumazet'
+ <edumazet@google.com>, 'Jakub Kicinski' <kuba@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <1700565725-2706-1-git-send-email-yangpc@wangsu.com>
+ <6c856222-d103-8149-1cdb-b3e07105f5f8@iogearbox.net>
+ <000001da1dff$223ed4e0$66bc7ea0$@wangsu.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <91ab6f52-c345-540f-703b-844293eda297@iogearbox.net>
+Date: Thu, 23 Nov 2023 14:31:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <000001da1dff$223ed4e0$66bc7ea0$@wangsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27102/Thu Nov 23 09:42:42 2023)
 
-it is possible that fec1 is probed before fec0. On SoCs
-with FEC_QUIRK_SINGLE_MDIO set (which means fec1 uses mii
-from fec0) init of mii fails for fec1 when fec0 is not yet
-probed, as fec0 setups mii bus. In this case fec_enet_mii_init
-for fec1 returns with -ENODEV, and so fec1 never comes up.
+On 11/23/23 12:20 PM, Pengcheng Yang wrote:
+> Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 11/21/23 12:22 PM, Pengcheng Yang wrote:
+>>> When using skmsg redirect, the msg is queued in psock->ingress_msg,
+>>> and the application calling SIOCINQ ioctl will return a readable
+>>> length of 0, and we cannot track the data length of ingress_msg with
+>>> the ss tool.
+>>>
+>>> In this patch set, we added the data length in ingress_msg to the
+>>> SIOCINQ ioctl and the rx_queue of tcp_diag.
+>>>
+>>> v2:
+>>> - Add READ_ONCE()/WRITE_ONCE() on accesses to psock->msg_len
+>>> - Mask out the increment msg_len where its not needed
+>>
+>> Please double check BPF CI, this series might be breaking sockmap selftests :
+>>
+>> https://github.com/kernel-patches/bpf/actions/runs/6922624338/job/18829650043
+> 
+> Is this a misunderstanding?
+> The selftests failure above were run on patch set v1 4 days ago, and this patch v2
+> is the fix for this case.
 
-Return here with -EPROBE_DEFER so interface gets later
-probed again.
-
-Found this on imx8qxp based board, using 2 ethernet interfaces,
-and from time to time, fec1 interface came not up.
-
-Signed-off-by: Heiko Schocher <hs@denx.de>
----
-
- drivers/net/ethernet/freescale/fec_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index c3b7694a7485..d956f95e7a65 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -2445,7 +2445,7 @@ static int fec_enet_mii_init(struct platform_device *pdev)
- 			mii_cnt++;
- 			return 0;
- 		}
--		return -ENOENT;
-+		return -EPROBE_DEFER;
- 	}
- 
- 	bus_freq = 2500000; /* 2.5MHz by default */
--- 
-2.20.1
-
+Indeed looks like there were two CI emails on v2 as well, one pointing to
+failure (which was also linked from patchwork), and one to success, both
+pointing to:
+https://patchwork.kernel.org/project/netdevbpf/list/?series=802821&state=*
+Let me rerun, meanwhile, I placed it back to 'under review'.
 
