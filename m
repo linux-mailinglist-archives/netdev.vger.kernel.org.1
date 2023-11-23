@@ -1,112 +1,187 @@
-Return-Path: <netdev+bounces-50603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4092F7F6467
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:53:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142FC7F646A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:55:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4D6FB20E1A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:53:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 461E51C20BF3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E9B3D39F;
-	Thu, 23 Nov 2023 16:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PSUiqdrN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3D63E485;
+	Thu, 23 Nov 2023 16:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDECBA
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:53:44 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5094727fa67so1451150e87.3
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:53:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700758422; x=1701363222; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9InQJBGSHQE6z+ySU2vBTT+5U+O4Ov6cqbtR8heLbv0=;
-        b=PSUiqdrNl589NiZpnn2+WaqlFch19oEJaOIumfj03iK36cIinbZVsSBSQLCEkscPLX
-         GPQ+LWyUbMkd2lnFY8Oba6ISxYwDk4HM7DFXw/8PZIjk0Vf5iQilUyV+9gkJmjjWmU8W
-         TfHAJXvfkYMpvuapACQ/whI5Bhmpmc1rhOcU8NUbPEaBEfYnWmtaeE6FluisHr3ev3uB
-         VUuZZYIFzjhTLOu9jsYESGnw1J1F9+VYH/tMT6l/b8FqzE+67s2rC7lt+dmQl1q7MAyL
-         e3m6ntMdKS49rnaEt8Rp8fi8XaK9uvii9kQVE8jrJuB1USQg6of+MW6vExsueqGDb6sK
-         UHTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700758422; x=1701363222;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9InQJBGSHQE6z+ySU2vBTT+5U+O4Ov6cqbtR8heLbv0=;
-        b=bKIVETNFUAHtRC45PwWKMbKPCTltrYb/bRc6OAbUTlB3ttAtS/6UDhPYvzVjLvZ93j
-         P5g6u/46oyxu36me516RDOab6wQNRPblwRRNPVjUJzGUlVmpCPI2LInWYaEqV6cxIwni
-         3FfEylE0R3HRgZRZBO+YgiEe+S5DbgpoCGvzpdM8ucfIFlHKohClfh2MfXwjgOt5s+H2
-         AUoi6H99wqV+pppybpJp2ROKsSOulPkRkEX6VLbBm6cByQx+BVXww7TTrRDFUG/YWXMC
-         zEbtgfADulcIPjSlu15S5KwBuyOoGqzEihrqFXxdGz7ReFHm2GqL3I7eUVUNGgpOPsDg
-         6Oug==
-X-Gm-Message-State: AOJu0YzI4J+zha8KMKqtFzqyh0rZ+GHtm7+w6q6QZoCbmJ/bSJwy/EXf
-	Ac0k16qkpMEA3eGtSCpFpHV+E0/0uu5JTy0TNkk=
-X-Google-Smtp-Source: AGHT+IEQB0ui4iEi/u9Z8sjtfBCql0Qrqavv/zQ/94GFUXCf9YopwWjQZn6UXqSKI1ab5KExmbag5w==
-X-Received: by 2002:a05:6512:480f:b0:507:98d0:bec4 with SMTP id eo15-20020a056512480f00b0050798d0bec4mr3938261lfb.54.1700758422443;
-        Thu, 23 Nov 2023 08:53:42 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id w8-20020a170906184800b009fca9484a62sm971388eje.200.2023.11.23.08.53.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 08:53:41 -0800 (PST)
-Date: Thu, 23 Nov 2023 17:53:40 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
-	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org
-Subject: Re: [patch net-next v3 5/9] genetlink: implement release callback
- and free sk_user_data there
-Message-ID: <ZV+DlMsFnTibDbBh@nanopsycho>
-References: <20231120084657.458076-1-jiri@resnulli.us>
- <20231120084657.458076-6-jiri@resnulli.us>
- <20231120185022.78f10188@kernel.org>
- <ZVys11ToRj+oo75s@nanopsycho>
- <20231121095512.089139f9@kernel.org>
- <ZV3KCF7Q2fwZyzg4@nanopsycho>
- <20231122090820.3b139890@kernel.org>
- <ZV8qJ1QX9vz3mfpT@nanopsycho>
- <20231123082408.0c038f30@kernel.org>
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 077AE101;
+	Thu, 23 Nov 2023 08:54:53 -0800 (PST)
+Received: from [192.168.1.103] (178.176.78.136) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 23 Nov
+ 2023 19:54:44 +0300
+Subject: Re: [PATCH 06/13] net: ravb: Let IP specific receive function to
+ interrogate descriptors
+To: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu.Beznea
+	<claudiu.beznea@tuxon.dev>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"p.zabel@pengutronix.de" <p.zabel@pengutronix.de>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, "geert+renesas@glider.be"
+	<geert+renesas@glider.be>, "wsa+renesas@sang-engineering.com"
+	<wsa+renesas@sang-engineering.com>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	"sergei.shtylyov@cogentembedded.com" <sergei.shtylyov@cogentembedded.com>,
+	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>, Masaru Nagai
+	<masaru.nagai.vx@renesas.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120084606.4083194-7-claudiu.beznea.uj@bp.renesas.com>
+ <b626455a-f7a4-2684-725c-c679dd75a515@omp.ru>
+ <TYVPR01MB112791203FFACF4484A9EAC4E86B9A@TYVPR01MB11279.jpnprd01.prod.outlook.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <874ab7c1-19b4-bee1-9473-cfa6e37a8efc@omp.ru>
+Date: Thu, 23 Nov 2023 19:54:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231123082408.0c038f30@kernel.org>
+In-Reply-To: <TYVPR01MB112791203FFACF4484A9EAC4E86B9A@TYVPR01MB11279.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.136 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.136
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Thu, Nov 23, 2023 at 05:24:08PM CET, kuba@kernel.org wrote:
->On Thu, 23 Nov 2023 11:32:07 +0100 Jiri Pirko wrote:
->> In this case, the socket is not opened by kernel, but it is opened by
->> the userspace app.
->> 
->> I basically need to have per-user-sk pointer somewhere I'm not clear why
->> to put it in struct netlink_sock when I can use sk_user_data which is
->> already there. From the usage of this pointer in kernel, I understand
->> this is exactly the reason to have it.
->
->Various people stuck various things in that pointer just because,
->it's a mess. IIUC the initial motivation for it is that someone
->like NFS opens a kernel socket and needs to put private data
->somewhere. A kernel user gets a callback for a socket, like data
->ready, and needs to find their private state.
->
->> Are you afraid of a collision of sk_user_data use with somebody else
->> here? I don't see how that could happen for netlink socket.
->
->Normally upper layer wraps the socket struct in its own struct. 
->Look at the struct nesting for TCP or any other bona fide protocol. 
->genetlink will benefit from having socket state, I bet it wasn't done
->that way from the start because Jamal/Thomas were told to start small.
->
->Please add a properly typed field to the netlink struct, unless you
->have technical reasons not to.
+On 11/23/23 7:48 PM, Biju Das wrote:
+[...]
 
-Okay.
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> ravb_poll() initial code used to interrogate the first descriptor of
+>>> the RX queue in case gptp is false to know if ravb_rx() should be
+>> called.
+>>> This is done for non GPTP IPs. For GPTP IPs the driver PTP specific
+>>
+>>    It's called gPTP, AFAIK.
+>>
+>>> information was used to know if receive function should be called. As
+>>> every IP has it's own receive function that interrogates the RX
+>>> descriptor
+>>
+>>    Its own.
+>>
+>>> list in the same way the ravb_poll() was doing there is no need to
+>>> double check this in ravb_poll(). Removing the code form ravb_poll()
+>>> and
+>>
+>>    From ravb_poll().
+>>
+>>> adjusting ravb_rx_gbeth() leads to a cleaner code.
+>>>
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>> ---
+>>>  drivers/net/ethernet/renesas/ravb_main.c | 18 ++++++------------
+>>>  1 file changed, 6 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c
+>>> b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 588e3be692d3..0fc9810c5e78 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>> @@ -771,12 +771,15 @@ static bool ravb_rx_gbeth(struct net_device *ndev,
+>> int *quota, int q)
+>>>     int limit;
+>>>
+>>>     entry = priv->cur_rx[q] % priv->num_rx_ring[q];
+>>> +   desc = &priv->gbeth_rx_ring[entry];
+>>> +   if (desc->die_dt == DT_FEMPTY)
+>>> +           return false;
+>>> +
+>>
+>>    I don't understand what this buys us, the following *while* loop will
+>> be skipped anyway, and the *for* loop as well, I think... And
+>> ravb_rx_rcar() doesn't have that anyway...
+>>
+>>> @@ -1279,25 +1282,16 @@ static int ravb_poll(struct napi_struct *napi,
+>> int budget)
+>>>     struct net_device *ndev = napi->dev;
+>>>     struct ravb_private *priv = netdev_priv(ndev);
+>>>     const struct ravb_hw_info *info = priv->info;
+>>> -   bool gptp = info->gptp || info->ccc_gac;
+>>> -   struct ravb_rx_desc *desc;
+>>>     unsigned long flags;
+>>>     int q = napi - priv->napi;
+>>>     int mask = BIT(q);
+>>>     int quota = budget;
+>>> -   unsigned int entry;
+>>>
+>>> -   if (!gptp) {
+>>> -           entry = priv->cur_rx[q] % priv->num_rx_ring[q];
+>>> -           desc = &priv->gbeth_rx_ring[entry];
+>>> -   }
+>>>     /* Processing RX Descriptor Ring */
+>>>     /* Clear RX interrupt */
+>>>     ravb_write(ndev, ~(mask | RIS0_RESERVED), RIS0);
+>>> -   if (gptp || desc->die_dt != DT_FEMPTY) {
+>>> -           if (ravb_rx(ndev, &quota, q))
+>>> -                   goto out;
+>>> -   }
+>>
+>>   I don't really understand this code (despite I've AKCed it)...
+>> Biju, could you explain this (well, you tried already but I don't buy it
+>> anymore)?
+> 
+> It was initial version of the driver. Now Claudiu optimized.
+
+   I fail to understand why you had (GBEth-specific) pre-conditions here to call
+ravb_rx()... and involving gPTP only further confused things...
+
+> Cheers,
+> Biju
+
+[...]
+
+MBR, Sergey
 
