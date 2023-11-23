@@ -1,196 +1,242 @@
-Return-Path: <netdev+bounces-50432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7ECA7F5C71
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:36:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 409157F5C90
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:38:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E309281954
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:36:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB849B2108F
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C10021A1D;
-	Thu, 23 Nov 2023 10:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522A5199D1;
+	Thu, 23 Nov 2023 10:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SFtnHsS6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUOnitVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E50D4F;
-	Thu, 23 Nov 2023 02:35:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700735757; x=1732271757;
-  h=message-id:date:subject:to:references:from:in-reply-to:
-   content-transfer-encoding:mime-version;
-  bh=wWXHoVQcals/YCBw84jVw6ynb1Vu6xLviw/6HCtx1Ec=;
-  b=SFtnHsS6ITspowkpCdYNaBky7tvTZSkbbMxh7yOPfBSO+0NvuEzShWLq
-   uZtT15izWb9/kcSpGpWIYdyJAQH7qsirAs+w1TtzZimsytUCm93vz0pDy
-   5tCa0wmwExlaQchjk9NKhfOID9HKSXbntvti8BacN2Ewp1Dr5Mkbwznh6
-   qF/wEnv+h6aIFCr3cs/bTQsugUxYroPUOp75z6PdhLdBOoL79tWCaC3sQ
-   E6M7eXpfs1P2grGi5icprt/wOkQ3YK5ScnuXdLLVaq5NCdmrga6XnaDad
-   uANV4mEQA4fAQEDGnwhb0WmRtaujhnruvNANKzW9wDmb3WgNSwnE56L5e
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="371596276"
-X-IronPort-AV: E=Sophos;i="6.04,221,1695711600"; 
-   d="scan'208";a="371596276"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 02:35:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="770954370"
-X-IronPort-AV: E=Sophos;i="6.04,221,1695711600"; 
-   d="scan'208";a="770954370"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Nov 2023 02:35:56 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 23 Nov 2023 02:35:56 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 23 Nov 2023 02:35:56 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 23 Nov 2023 02:35:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aWUMGpQWRvaL1Leq2UQlDsbRcXCLeIHRt0gswFMkB03WMh8qNptQOos2klyJXWoj6OKYkaHoWCtbgbYP/qw6UfyoP8zenjbkGY9s2qBLTWotRU7ee+uQ4ZlW6FIeY86D38LEYzINFAL3jHE70mnsksAHuL+qlH7PDk98BKwgQk6/elQFfBKju5JJeG8FXDzrEhS1pRIyPbyg1Ddq1ZoBWUVx59QE0LdN1T9YX2PL56SVUlTCzJ+QnluG5sNkrGtT5tMb1u8PpfUnBGX9YiIG+/SjSgR8BH9Kpc9ZXWkPZJM7IzbCmN6bzOkGfNP2BG9UGVpYDZmeisM6LHgbOlK+SA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jXPNcXRJYpiESzB4UWjAnnWTLv1oYBPVw19KVQUkL5U=;
- b=NWK//KuUhofTMLgeF5akouvDhaLW0X5xtQE474Zdic6ijGBT0csi0R6It26/ZRbPY8R4P2wIIRsBydpCpCtWKvNmEHhSYeo6Gjvc28HJxZtvZOq8kdtzjIdRuxKspG8JWYn0cSgbUhpRvTlXLseCQaYj1iLuPkp6k0A8X77T/3xHDEYP/+bTxKEIeQB/ZifgWcpdSK1Vxr7GSQLNH9BvnTP4ZJnFYlMVqqwWeeLqB7lHpqeqe4yazElQZI3CE7tlVOwvOCDYeUHw72GahQMEwJxU7PR/Gyfo4xHDTMMHHLbl6aUOD0NiA3IEySilps5Wo2Gl5l8GThAJOpUBq07s4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SA3PR11MB7436.namprd11.prod.outlook.com (2603:10b6:806:307::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.20; Thu, 23 Nov
- 2023 10:35:48 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.7025.019; Thu, 23 Nov 2023
- 10:35:48 +0000
-Message-ID: <613da551-9983-4f98-b8c7-57bc16d68665@intel.com>
-Date: Thu, 23 Nov 2023 11:35:45 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v3 2/2] octeontx2-pf: TC flower offload support
- for mirror
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Suman Ghosh <sumang@marvell.com>,
-	<sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-	<hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lcherian@marvell.com>, <jerinj@marvell.com>, <horms@kernel.org>
-References: <20231121094346.3621236-1-sumang@marvell.com>
- <20231121094346.3621236-3-sumang@marvell.com>
- <ee30eaa0-2a1f-4dc6-8e03-c2d993eb159a@intel.com>
- <92d95955f66098ce725729243251beacc2823a81.camel@redhat.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <92d95955f66098ce725729243251beacc2823a81.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0175.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b4::9) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4AD10D1;
+	Thu, 23 Nov 2023 02:38:36 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-32df66c691dso484521f8f.3;
+        Thu, 23 Nov 2023 02:38:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700735914; x=1701340714; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3tUVyHGP1WjRDJGX9CdkL5LLVHa/NoNDy1qrQLyl8FI=;
+        b=eUOnitVmU/QEBju5hafZvyPCW2tuBUJej7AXWP6wb24PEhudQHWw5Yi5MjwMIlC9tC
+         tJ7ZGcomqwsC9AExZal6ff7XxcVkQ6NDOjIyVMy5x0TBTd3XH+YGWgqo4P1hyQMRps8W
+         ctbo/Vi4jB8oqIolZJ3Qxgoi7LhibJiHZTymCWW/lgLViZQHQNdlGlALtvas4Y8MXT/q
+         UQhpZKuM9w84xBzv4rd8aih3OAtpmCrABwQ4bCeUvLKFc+V453EPhpxxs4nrGwDpNi5z
+         W5DIuOqisZvCljAyVuP2abs3NL3kGWfjzysgfE8Qe/6ra072qxWHTNkwRgicn9VWLHRE
+         0pkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700735914; x=1701340714;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3tUVyHGP1WjRDJGX9CdkL5LLVHa/NoNDy1qrQLyl8FI=;
+        b=js805RiDoYAgcJ/cBb/rM1ZDEWBtzkqlIn/t98kLbtjvMVxm1E25nja/WOuGsovb9k
+         QVgALAlEeknVpsJ6jrpGRkED9W1y22wmBR+iztkv90q4469NMfRLS1t0fiMYVgQc60m+
+         ienDWOvliU5QTKBpJWa/q87cVdMNw1kdgHRhR/VmLtro80viXbVjgWZv4rJKHqUgCKpc
+         Sd2LvDVNhUwBiD6uiOEsz1xr/fpOm4REhenR6cPLrP0/VbpS7vdFMHKhAvjYocCABJPw
+         OyYpTZ/B2pzzDb73xYXrWQaPJSXkydqQY8u6USrof3REoH5r3I4YMcGpeoMZja4RXHvI
+         nHow==
+X-Gm-Message-State: AOJu0Yzjh4Z0LsPL7IlqVE2VJJDgPqvTX9BG+7UYHblC0H3EYw/2QXWE
+	Mgdd0x7KPO5ftBMA1kDhNSo=
+X-Google-Smtp-Source: AGHT+IGUjvYu+WeYQkp7U08ioiooONMJDQgJFQxfglLmlgoXQt1BuDElx7HSiWi0TffENVRQPMMpjQ==
+X-Received: by 2002:adf:e992:0:b0:332:dfeb:76ab with SMTP id h18-20020adfe992000000b00332dfeb76abmr1048229wrm.60.1700735914167;
+        Thu, 23 Nov 2023 02:38:34 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id w3-20020a5d5443000000b003140f47224csm1287597wrv.15.2023.11.23.02.38.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 02:38:33 -0800 (PST)
+Message-ID: <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
+X-Google-Original-Message-ID: <ZV8qxCbjilsVIoDS@Ansuel-xps.>
+Date: Thu, 23 Nov 2023 11:38:31 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
+ PHY package nodes
+References: <20231120135041.15259-1-ansuelsmth@gmail.com>
+ <20231120135041.15259-4-ansuelsmth@gmail.com>
+ <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+ <20231121144244.GA1682395-robh@kernel.org>
+ <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
+ <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+ <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SA3PR11MB7436:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1cecdb98-ed41-48cc-2813-08dbec0ff536
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5KSsXmcRMp+x1e5I6nMxP3ER1E3MubnGWjEfJkjkPYwpq5o+St/6c98vqrzQVZn9ycwYSFuG5yoQzsaK8Mlh7dZ3146hnpAkD8VUMAJSI9HclnrIf7XfsMB6iGUlm1ZVWpUft5Sx3znVzfeYjGVuj3PudRSjXR7CNZpYlAvpWFkxoGt8X+D3kKv3SCKfncYpUxczk8IbVGG6OlslJWbo/s4Nz3/kh51/SVyuhxOGuBOgrTpTmvdQLSR1LaLEkVvE5UT0pk/okse+S/Xs3AKe6gu0m2wXG/acydK8dh6DoB/upBf2fJ7+TXA/YSoLL24rOgetsI5CoO0Zjv3tiqUpFJu/WgMSpYQGIFNEEICiCNZfvD22YWSeQcWnhvymkz3HwtPHK+Rra4FnHosMDWBb6bIeI4khlq122j4IPcVa3uGh4PsBFLuJ5Yb2YuMkvVpToUSme8FO4gBbsiSL0haayBr9v7Tk6qA9TL0pQoO7NzB/Wt3s1LTTqpH0EQ661/olanEA2smXANdVeN0/XXN3Wm+CcVnzNkGzVj5uhRdlSo4hclMibSkghjA/3s3C6UZo5I+YYRr4Kcvqn5hGf+12F6BhXWOAMHBXNZI7DLsJdfuRJ3Afnw6/k3RUg+OqK7LNk6uGqO2aexEASSfdO6o4ekhnpMJagfLBHqQrPPuuR2E=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(376002)(366004)(39860400002)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(4001150100001)(5660300002)(44832011)(7416002)(4744005)(2906002)(8676002)(41300700001)(8936002)(66556008)(66476007)(316002)(66946007)(110136005)(6666004)(478600001)(6506007)(6486002)(53546011)(31686004)(26005)(2616005)(6512007)(38100700002)(921008)(82960400001)(86362001)(36756003)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWwyNWlya2ZTWmIzV1YwSFY5SVpLa25XbzI0Q1J1OVNpeFpKWHM1cnJNUXRM?=
- =?utf-8?B?M1RUWndoWU5NWFJjTmk4anhSaU1MRGZWQzVTQTYyYXBuWkM1MFJQRStNTTRH?=
- =?utf-8?B?TTZySlYzTnVYaTZNTk52WE8xZ3NoV3pJSWFCWmRaUDdQblhkYUFnYSsrbU1J?=
- =?utf-8?B?dkRkcnYwbWZlSTRhWXc1K3pqNWt0c01Cak56UTZpdjMvYWgvMjlPWUxGbzMw?=
- =?utf-8?B?QVRTS3pEcUNxRzJISk1YTHBPOXIydDYrNW5OWXFQRUlydCttU0huc3lVUXB2?=
- =?utf-8?B?QzJpRkc0SENQdW0wTTl6cjJUdVp2YkpheTVvNnhFbnBLcWczYWJqVnFKbEMv?=
- =?utf-8?B?L2I3bWdod2JqaUVrN0Y4OEk4WlZtR3lDR0FMZ0NiSWtUMjU4cUFUeUVOUFRL?=
- =?utf-8?B?YnlEeEdaSjk5TUdlby9uaGUzNXMvMk1ORE5QWWUxYloxZlAwVjZ2c2I2anJk?=
- =?utf-8?B?SlNYenEzUGk0NjVyYVRlMHgwOWZoMlJtMVRCTEpmYmhJVjd0WGV5OVYrcGlp?=
- =?utf-8?B?cVNFQmZ6bVByTkhPY0NzRW5WLzlSdUNJQkVSSytkNFMzM2dIZ1F1eEQ5NFhU?=
- =?utf-8?B?NWZOSEpjajJoSi93bU9nbUFrZFJsQUxzN25DcHpoM1BsZzJ5d1hVQlMwWUJi?=
- =?utf-8?B?cWpLTHdNZ3V4dmFpZzlCN3hJZGp0bEJaazVnQlV2WlRFTEw3M0wvUUViUEZG?=
- =?utf-8?B?U3A5V3dXbFdWQnRtK010Ullld3VUSUZOU0d0RVRGeFk3SThTRG9qUGJUMTVs?=
- =?utf-8?B?RzNqUXQ0SzVBeCtZb3dvKzk0N05kd09kWnIvYzdlWUpnak81VmdDV3lSMUgv?=
- =?utf-8?B?bUhac3NzRy9nQ0YrZGwvUUtOUEp0UUI3eHB3M0w5aUlWSFd6eWlNMGxBcVM1?=
- =?utf-8?B?RXhVblNndVoxVEJYU1B3YU1ZcUVYT3BkNGpGZUZRQmNta2M1SEMrRGNmZFU3?=
- =?utf-8?B?dlRjOVRWWWN3di9tV2hPQ3VuRHh1L2Zkc1NXT0V5K1ZZOGhRM05KZmFJVDFT?=
- =?utf-8?B?M0NaTjNiVXFtQ0g4MEpnTWtXZGhKK1BQNXdkQzIyRDZ6NXBKZkpIc1F5elJo?=
- =?utf-8?B?UURoUE15aUlUZ3ZEbTdJUW1RM1hYV1NkeTVTMmwyZFkreUs5T2JvcXhjMVd6?=
- =?utf-8?B?bS92OUpGbmdJRWdURlBzdUNIdjdZVTkyNmQ4bzZ2YXJJQ0xXVDh6UTRmWWJn?=
- =?utf-8?B?UEtzN3oyczlOand5bUpxaENIRGRFVFVEdUU0Nysrc1dqMUFiSnIzeU9JZGk4?=
- =?utf-8?B?UnpwdXE4bnh4cmF6S2JyM3JyVlZLUEYxYkQ5Um1vUElTQ3cvWnppczdQWVda?=
- =?utf-8?B?dGxPOWlVWWJGSUMrNEVVQXhWVmtyc0wvc1NzcE1KWXNKaktaUzR0cXAyOTRs?=
- =?utf-8?B?Q1VLVlpIbSsvT0s4NGU2cEtMY1krTjYxNFM0dkc1OVNQdkVEaWlTSG9TQVhY?=
- =?utf-8?B?bGhqRWlQRFkvYXVheW5MS3FNRXJyY3RzVDhFT0VnR2dmWnNmbHVyU3ZyWW95?=
- =?utf-8?B?Y2cxcC9pd0FlQmRsdmRVS3NFbzZoVEppQVo3V0xXTnlzV09uZExYa2xVaWRK?=
- =?utf-8?B?SFQySGZ2YTFNL3R1ZFQzMVl5T2d2bXFTZ2NjbFl0RHRZSUJnazhSZkoxT2kr?=
- =?utf-8?B?KzVKa0tMNE5vRWFNU2owWjc5eUt2NTBBbVpOWmdxa2ZFTTNMNXhDWVcrVkI4?=
- =?utf-8?B?WkQ0WDJ5bjV2c0V1QXByZ3lvN1NUQmpCUHhDQjlnazZCVy80SGlHMHRqcGNr?=
- =?utf-8?B?cG11QlhyZVVqbThkUTJHSytMTHExaURXNDF5Ukg3RlRuMkFYekVoQjdwS2Ri?=
- =?utf-8?B?MzVWVzRWUHg4SkNrVXllOHhmZk1SY3lPZUp4S2hUYlc5UE9BcmsyTkhIWkFu?=
- =?utf-8?B?c2t0T1RQYUprc0JjMDhiMjlxWTJEelZhQThsWFNZY2puYVpSQWEzSXc4Kytn?=
- =?utf-8?B?Y1JTREJHbmhtYStUZUt1RkJib1ZPVzVid3dJYXNPVEZBenM1TFM4MWRaMFdR?=
- =?utf-8?B?c2RCbEhmRHFpc0tycCtONWF4Q2ZjMlRPamtDZk1BSEFxNVNCelBva3g2eEVK?=
- =?utf-8?B?bXNCeWZQTzNpYlc0dVB3MUhsaXRnWlRSRitqcXNpVllVVUsycjA0Y2k2ZU5P?=
- =?utf-8?B?aDVRdkpNWWRSc1d3U0ZjYWJDdzl5ZGNqWnRSekRNZEl0TXV6OUpJZFZZMnFj?=
- =?utf-8?B?M1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1cecdb98-ed41-48cc-2813-08dbec0ff536
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2023 10:35:48.8256
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wRp84kR2oZGSjndbr3MxTcsYAMQsNIPZ/JOW7ntayrw7tnX8i0QqPklcwA+FN3qiOQrddPNyQJ8kKeJrwI5J5RKk0NQSoXky/k9c57hVtJk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7436
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
 
+On Thu, Nov 23, 2023 at 04:30:48AM +0100, Andrew Lunn wrote:
+> On Wed, Nov 22, 2023 at 07:32:22PM +0100, Christian Marangi wrote:
+> > On Tue, Nov 21, 2023 at 03:45:42PM +0100, Andrew Lunn wrote:
+> > > > > I do think we need somewhere to put package properties. But i don't
+> > > > > think phy-mode is such a property. At the moment, i don't have a good
+> > > > > example of a package property.
+> > > > 
+> > > > What about power supplies and reset/enable lines?
+> > > 
+> > > Yes, good point. I can imagine some packages sharing regulators. Reset
+> > > might also be shared, but it makes things messy to handle.
+> > >
+> > 
+> > Sooooo.... Sorry if I insist but I would really love to have something
+> > ""stable"" to move this further. (the changes are easy enough so it's
+> > really a matter of finding a good DT structure)
+> > 
+> > Maybe a good idea would be summarize the concern and see what solution
+> > was proposed:
+> > 
+> > Concern list:
+> > 1. ethernet-phy-package MUST be placed in mdio node (not in ethernet,
+> >    the example was wrong anyway) and MUST have an addr
+> > 
+> >    Current example doesn't have an addr. I would prefer this way but
+> >    no problem in changing this.
+> > 
+> >    Solution:
+> >      - Add reg to the ethernet-phy-package node with the base address of
+> >        the PHY package (base address = the first PHY address of the
+> >        package)
+> 
+> Yes.
+>
 
+Thanks.
 
-On 23.11.2023 11:21, Paolo Abeni wrote:
-> On Tue, 2023-11-21 at 15:48 +0100, Wojciech Drewek wrote:
->>
->> On 21.11.2023 10:43, Suman Ghosh wrote:
->>> This patch extends TC flower offload support for mirroring
->>> ingress/egress traffic to a different PF/VF. Below is an example
->>> command,
->>>
->>> 'tc filter add dev eth1 ingress protocol ip flower src_ip <ip-addr>
->>> skip_sw action mirred ingress mirror dev eth2'
->>>
->>> Signed-off-by: Suman Ghosh <sumang@marvell.com>
->>
->> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> >        We will have a PHY node with the same address of the PHY package
+> >        node. Each PHY node in the PHY package node will have reg set to
+> >        the REAL address in the mdio bus.
 > 
-> Thank you for your review!
+> Basically Yes. I actually think the first sentence is not 100%
+> correct. It could be all the package configuration registers are in
+> the base address, without an actual PHY. The PHYs then follow at
+> addresses above it. I can also imagine a case where the first PHY in
+> the package is not used, so its not listed at all. So i think it
+> should be "We often have a PHY node with the same address of the PHY
+> package node."
 > 
-> Please, additionally try to trim away the irrelevant part of the patch
-> when replying (in this case almost everything). That helps a lot
-> following the discussion, especially on long patches, thanks!
 
-Sure thing.
+Just to add details, also the opposite can happen. Where the last PHY in
+the bundle is used for global configuration but is not defined. This is
+another reason I wanted the global-phy proprerty, having to reference
+them even if they are not used better describe the actual PHY address
+used in the mdio bus. If the PHY is handled internally and omitted in DT
+then people might think that address is not used.
 
+> > 3. phy-mode is problematic.
+> > 
+> >    It's an optional value to enforce a specific mode for each PHY in the
+> >    package. For complex configuration the mode won't be defined.
+> > 
+> >    Solution:
+> >     - Rename it to package-phy-mode to make it less confusing.
+> > 
+> >     - Add an additional function that PHY package can use to make custom
+> >       validation on the mode for every PHY attached (in the PHY package).
+> > 
+> >       Would make it less clear but more flexible for complex
+> >       configuration. Maybe both solution can be implemented and the
+> >       special function is used if the mode is not defined?
 > 
-> @Suman: please retain Wojciech's tag on next revision of this series.
+> The description you give is that there are two SERDES, and both could
+> be connected to a MAC. What does package-phy-mode represent then? 
 > 
-> Cheers,
+> Luo Jie patch for the qca8084 seems to have the same issue. It has two
+> SERDES/PMA, and both could be connected to the MACs. So it seems like
+> QCA devices don't actually fit this model. If we want to describe the
+> package link mode, we probably need to list each PMA, and have a
+> property in the PMA node indicating what link mode the PMA is
+> operating at.
 > 
-> Paolo
+> At least for the moment, its not clear we actually need this at
+> all. It seems like the phy-mode is all we need. The PHY driver should
+> know what values are valid per port, and so can validate the value.
 > 
+
+Just to be more precise qca807x can operate in 3 different mode:
+(this is controlled by the MODE_CFG bits)
+- QSGMII: 5 copper port
+- PSGMII: 5 copper port
+- PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
+
+When mode is set to QSGMII each PHY needs to have the matching mode or
+we have no traffic. It makes it difficult driver side to understand what
+mode should be enforced with all kind of parsing or magic in private
+struct.
+
+Maybe for this specific case would be ok to introduce a simple specific
+proprerty? Like qca,qsgmii_mode ?
+
+> > 4. Not finding a correct place to put PHY package info.
+> > 
+> >    I'm still convinced the mdio node is the correct place.
+> >    - PHY package are PHY in bundle so they are actual PHY
+> >    - We already have in the mdio node special handling (every DSA switch
+> >      use custom compatible and PHY ID is not used to probe them
+> >      normally)
+> >    - Node this way won't be treated as PHY as they won't match the PHY
+> >      node name pattern and also won't have the compatible pattern for
+> >      PHY.
+> 
+> We do need a compatible for the package. The kernel is unlikely to use
+> it, but the validation tools will. Each package can have its own DT
+> properties, so we need a .yaml to describe those properties. So i
+> would expect to have a "qca807x-package" compatible, which then lists
+> the tx driver strength etc. The PHYs within the package don't need
+> compatible, they are just linux PHYs, probed using the same code as
+> PHYs outside of a package.
+>
+
+Since the idea is add OF support for the PHY we also need a generic
+compatible for it.
+
+Is it ok to have something like
+
+compatible = "ethernet-phy-package", "qca807x-phy-package";
+
+With "ethernet-phy-package" a must and "qca807x-phy-package" used only
+if additional property are used.
+
+My current idea was to use select and base everything on the possible
+PHY compatible (and it does work, tested by adding bloat in the DT
+example and seeing if the schema was rejected). Had this idea since the
+compatible would never be used.
+
+-- 
+	Ansuel
 
