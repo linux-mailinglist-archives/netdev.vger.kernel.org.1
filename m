@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-50345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A94887F5668
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:25:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6976F7F5669
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B74B21083
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25EB2280CBC
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20EC440B;
-	Thu, 23 Nov 2023 02:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10471440B;
+	Thu, 23 Nov 2023 02:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+RjT4rS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLJdfhjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B7019D
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 18:25:49 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so284687a12.0
-        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 18:25:49 -0800 (PST)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35DEBC
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 18:25:58 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1ce627400f6so3104895ad.2
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 18:25:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700706349; x=1701311149; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700706358; x=1701311158; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ckz0BT3FoY1fPyVjyQnTnzfq2MM9cj13QlAFuNldDOw=;
-        b=Q+RjT4rSGAOuGcCbA+vGUsxvSxaLTiO/r53jZaqs3HgEYivBV2S91NMPqiTFTF7G5G
-         WCoHcQ575fPrXBJqaKb7/vNqePzsiS+wgWJjgq2xW6JahCZa9eCXXtU6FwL8r+AeXrAZ
-         KqgjRN45obPv14qy28nwwFLczdCfd58pzMdlepegjOaaudpm+Y6tWcfi8Y14ygxXI4j2
-         uoIMN7xifxedC6s1L6SKdLudyDfb2eRk9mHZk/+8v0mnTf/scxyiT1nfeWdffDJDVw3Z
-         2QQzG5RD0vJXip8hwrqoBg3f/AzXB29bsTdp6dLbAclE3WKuZH7OLyD2SUuYCMShf41y
-         OQ/Q==
+        bh=FcUm7sKMXvG8tSKnNWjRclN75lSemXwn0ahaPo3EnXA=;
+        b=cLJdfhjZFud87pOdRqikEag/M5VbPpNF+Ch7xyHIxdBdcJXY+5WG6gO+r28fPUVY8t
+         8GUEGvKLnXNglIR/3oFA3fnd7KbK0ccDAnwZthtSFHBGZTLAKQGE1P0RoYDdKi3X/3Zv
+         4sGkAcntiENeuh+qRpvEJqlJe6iJxOMRhJsUGGFBf80P/NVF2wti7AOs/AHncXvNWgvJ
+         mgy/7MWKAM/sC3VEcR+xA6TI5oxVoYsfNtbkF6iCycDsBlR/GUBbZwuqDeZw+uRu+DO2
+         MFUCVJsjj8heXPWf8cszzjJFzK4xDxQhWysZhF3G69bS9mxmtcdQAQlMp0uv0OLnr3sn
+         dAaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700706349; x=1701311149;
+        d=1e100.net; s=20230601; t=1700706358; x=1701311158;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ckz0BT3FoY1fPyVjyQnTnzfq2MM9cj13QlAFuNldDOw=;
-        b=hwYDlb46QQH1Qg1IZi//Otqukw7VDpUR+vQsYVf2l9zPE6XRh5Yg/0c9PxKRIoouZJ
-         11LlFYsC/QCKX1CXuJRc/ddbdX29xNdFWJQNjRK2arBkN7yLWDxhyI5zQZa+wlNzjWEu
-         Sb+6OYXu/Oq91zkuHx4+TzydtLhAG3Iy5J9ylEbxayNw4iL+VDqjCOHPiTZqyQUjkHGq
-         yXF3BeFfamDCn9a8LDO68nfjPbmTDsG280mMqtYjui41BVrCSZxV/r0mVB9mLS7P0yF2
-         oXVfnzeAcjLFpMIXNREzqtE3ZYA1wbTEfclsEj095P1SudmF8q+a44453xtuirj49/jJ
-         RRfw==
-X-Gm-Message-State: AOJu0YxCw2MKQeMm6jJcZ8guPuqQPeal5OeHnGaj/+5dGcmZx2a/SN9O
-	/xBUj0gZFQMZy9iFcbzWynY=
-X-Google-Smtp-Source: AGHT+IG84g+POiFTa5Vn2S/1Coe2Uvzj3bj8oN8gGe1gdstU/uYpZ3sgW8Hev8enfI1R1Jlq0HKnTA==
-X-Received: by 2002:a05:6a21:3390:b0:16b:80f2:f30c with SMTP id yy16-20020a056a21339000b0016b80f2f30cmr4859501pzb.26.1700706348804;
-        Wed, 22 Nov 2023 18:25:48 -0800 (PST)
+        bh=FcUm7sKMXvG8tSKnNWjRclN75lSemXwn0ahaPo3EnXA=;
+        b=lhnSpwnXfcHT4Jn20pkqQSX9syaWZiNwVi6XyGhJ6ffGkCeHWzAJo/3DSChuYjAKRk
+         4LeHltTuViRrAxpnFaomIw1UXiIidrxUZPyjlZZz7JWIB9taYUojOxiBnyFrALmSWGm/
+         m4AAHgnfWPtaGv0AMbRD5EwjoXnNA5qdoOU/+bIfuE/M4/8EftyWgUjA6Nz4o1M/0AWX
+         umNMvOBgYgSwVBNo9lDmQcxJMAV1RqAZxTAKRZTa3pnt9aFTB6DYioTJNQ5nTWYoBpwD
+         YXjCiiPFWg+nt9XTuVpLduLdX8pjMwA0crSHGzGgPMwNrbbkqwJkAHdnaPm61Aq9d782
+         9Rgg==
+X-Gm-Message-State: AOJu0Yw0ICLgeTJ1DxxQyqUOhAdW6Ry9YClTK5mq88LP8z7H0OeVS9u1
+	E53LxLssn+wrFjG88gMilSY=
+X-Google-Smtp-Source: AGHT+IFiZNDN/L8IVBHtC08TXY6dWV+uBrdTTvHXRrC02gIXt8JsDtvM1M7tudA0hEvkiURg9laLqA==
+X-Received: by 2002:a17:902:d2cd:b0:1cf:6d8c:c8f1 with SMTP id n13-20020a170902d2cd00b001cf6d8cc8f1mr4677075plc.46.1700706358201;
+        Wed, 22 Nov 2023 18:25:58 -0800 (PST)
 Received: from localhost.localdomain ([204.44.110.111])
-        by smtp.gmail.com with ESMTPSA id v11-20020a170902d68b00b001ce6452a741sm32880ply.25.2023.11.22.18.25.41
+        by smtp.gmail.com with ESMTPSA id v11-20020a170902d68b00b001ce6452a741sm32880ply.25.2023.11.22.18.25.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Nov 2023 18:25:47 -0800 (PST)
+        Wed, 22 Nov 2023 18:25:57 -0800 (PST)
 From: Liang Chen <liangchen.linux@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -64,9 +64,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-mm@kvack.org,
 	liangchen.linux@gmail.com
-Subject: [PATCH net-next v2 2/3] page_pool: halve BIAS_MAX for fragment multiple user references
-Date: Thu, 23 Nov 2023 10:25:15 +0800
-Message-Id: <20231123022516.6757-2-liangchen.linux@gmail.com>
+Subject: [PATCH net-next v2 3/3] skbuff: Optimization of SKB coalescing for page pool
+Date: Thu, 23 Nov 2023 10:25:16 +0800
+Message-Id: <20231123022516.6757-3-liangchen.linux@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20231123022516.6757-1-liangchen.linux@gmail.com>
 References: <20231123022516.6757-1-liangchen.linux@gmail.com>
@@ -78,32 +78,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Referring to patch [1], in order to support multiple users referencing the
-same fragment and prevent overflow from pp_ref_count growing, the initial
-value of pp_ref_count is halved, leaving room for pp_ref_count to increment
-before the page is drained.
+In order to address the issues encountered with commit 1effe8ca4e34
+("skbuff: fix coalescing for page_pool fragment recycling"), the
+combination of the following condition was excluded from skb coalescing:
 
-[1]
-https://lore.kernel.org/all/20211009093724.10539-3-linyunsheng@huawei.com/
+from->pp_recycle = 1
+from->cloned = 1
+to->pp_recycle = 1
+
+However, with page pool environments, the aforementioned combination can
+be quite common(ex. NetworkMananger may lead to the additional
+packet_type being registered, thus the cloning). In scenarios with a
+higher number of small packets, it can significantly affect the success
+rate of coalescing. For example, considering packets of 256 bytes size,
+our comparison of coalescing success rate is as follows:
+
+Without page pool: 70%
+With page pool: 13%
+
+Consequently, this has an impact on performance:
+
+Without page pool: 2.57 Gbits/sec
+With page pool: 2.26 Gbits/sec
+
+Therefore, it seems worthwhile to optimize this scenario and enable
+coalescing of this particular combination. To achieve this, we need to
+ensure the correct increment of the "from" SKB page's page pool
+reference count (pp_ref_count).
+
+Following this optimization, the success rate of coalescing measured in
+our environment has improved as follows:
+
+With page pool: 60%
+
+This success rate is approaching the rate achieved without using page
+pool, and the performance has also been improved:
+
+With page pool: 2.52 Gbits/sec
+
+Below is the performance comparison for small packets before and after
+this optimization. We observe no impact to packets larger than 4K.
+
+packet size     before      after       improved
+(bytes)         (Gbits/sec) (Gbits/sec)
+128             1.19        1.27        7.13%
+256             2.26        2.52        11.75%
+512             4.13        4.81        16.50%
+1024            6.17        6.73        9.05%
+2048            14.54       15.47       6.45%
+4096            25.44       27.87       9.52%
 
 Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
 ---
- net/core/page_pool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes from v1:
+- make use of the unified pp fragment and non-fragment api
+---
+ include/net/page_pool/helpers.h | 22 ++++++++++++++++++++++
+ net/core/skbuff.c               | 23 +++++++++++------------
+ 2 files changed, 33 insertions(+), 12 deletions(-)
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index df2a06d7da52..5221b5b11bad 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -26,7 +26,7 @@
- #define DEFER_TIME (msecs_to_jiffies(1000))
- #define DEFER_WARN_INTERVAL (60 * HZ)
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index a6dc9412c9ae..8d2e3495f17d 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -402,4 +402,26 @@ static inline void page_pool_nid_changed(struct page_pool *pool, int new_nid)
+ 		page_pool_update_nid(pool, new_nid);
+ }
  
--#define BIAS_MAX	LONG_MAX
-+#define BIAS_MAX	(LONG_MAX >> 1)
++static inline bool page_pool_is_pp_page(struct page *page)
++{
++	return (page->pp_magic & ~0x3UL) == PP_SIGNATURE;
++}
++
++/**
++ * page_pool_get_frag_ref() - Increase fragment reference count of a page
++ * @page:	page of the fragment on which to increase a reference
++ *
++ * Increase fragment reference count (pp_ref_count) on a page, but if it is
++ * not a page pool page, fallback to increase a reference(_refcount) on a
++ * normal page.
++ */
++static inline void page_pool_get_frag_ref(struct page *page)
++{
++	struct page *head_page = compound_head(page);
++
++	if (likely(page_pool_is_pp_page(head_page)))
++		atomic_long_inc(&head_page->pp_ref_count);
++	else
++		get_page(head_page);
++}
+ #endif /* _NET_PAGE_POOL_HELPERS_H */
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index b157efea5dea..54e6945ead56 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -5764,17 +5764,12 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
+ 		return false;
  
- #ifdef CONFIG_PAGE_POOL_STATS
- /* alloc_stat_inc is intended to be used in softirq context */
+ 	/* In general, avoid mixing page_pool and non-page_pool allocated
+-	 * pages within the same SKB. Additionally avoid dealing with clones
+-	 * with page_pool pages, in case the SKB is using page_pool fragment
+-	 * references (page_pool_alloc_frag()). Since we only take full page
+-	 * references for cloned SKBs at the moment that would result in
+-	 * inconsistent reference counts.
+-	 * In theory we could take full references if @from is cloned and
+-	 * !@to->pp_recycle but its tricky (due to potential race with
+-	 * the clone disappearing) and rare, so not worth dealing with.
++	 * pages within the same SKB. In theory we could take full
++	 * references if @from is cloned and !@to->pp_recycle but its
++	 * tricky (due to potential race with the clone disappearing) and
++	 * rare, so not worth dealing with.
+ 	 */
+-	if (to->pp_recycle != from->pp_recycle ||
+-	    (from->pp_recycle && skb_cloned(from)))
++	if (to->pp_recycle != from->pp_recycle)
+ 		return false;
+ 
+ 	if (len <= skb_tailroom(to)) {
+@@ -5831,8 +5826,12 @@ bool skb_try_coalesce(struct sk_buff *to, struct sk_buff *from,
+ 	/* if the skb is not cloned this does nothing
+ 	 * since we set nr_frags to 0.
+ 	 */
+-	for (i = 0; i < from_shinfo->nr_frags; i++)
+-		__skb_frag_ref(&from_shinfo->frags[i]);
++	if (from->pp_recycle)
++		for (i = 0; i < from_shinfo->nr_frags; i++)
++			page_pool_get_frag_ref(skb_frag_page(&from_shinfo->frags[i]));
++	else
++		for (i = 0; i < from_shinfo->nr_frags; i++)
++			__skb_frag_ref(&from_shinfo->frags[i]);
+ 
+ 	to->truesize += delta;
+ 	to->len += len;
 -- 
 2.31.1
 
