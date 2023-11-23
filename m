@@ -1,233 +1,137 @@
-Return-Path: <netdev+bounces-50470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C04C7F5E61
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:54:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D69E47F5E67
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7CCCB21308
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:54:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1410F1C20F48
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683F8241E9;
-	Thu, 23 Nov 2023 11:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711CA23760;
+	Thu, 23 Nov 2023 11:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="brYy7wS5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="SHyo6OJB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51D8D71;
-	Thu, 23 Nov 2023 03:54:24 -0800 (PST)
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN9OYbK006052;
-	Thu, 23 Nov 2023 11:54:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=6juClkUBmcBTBsnEjdDc22tc/uO5kD0o1qqxtbwZTZM=;
- b=brYy7wS5tpSAFM//RwyK8k4cPK8hpO0zhH8NBPj8G0dMPNzOHtD2gFuhvnLhQ8dJTCD/
- e4d5qxs0xPv4BEXQTfMMMzaLccc5xD4h8pYeLL/M/Ng82JPbu+vaN0AKVFQbJa+yKS4B
- VsxCmO88Vy438Tysk5QzDWvG2f8QT8m/d8RYkgPgZTitQmdkY1JH87ZU2aNxtKC3lYdr
- s1a5iMkcr1pU86CCo33nY/jsDFVXkPTxVuTzChOp2E/ARqEvW1s1UVUpQ+Lv5PSuVuZl
- f+pv89hFhOo1pzypMPmm2jsRIlFYWFgZN866h9TTbIVLmHqBJ0r5b8wAn3Nis3efHo3+ rQ== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uj30x8det-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 11:54:13 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ANBsCQr017544
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 11:54:12 GMT
-Received: from hu-jsuraj-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 23 Nov 2023 03:54:02 -0800
-From: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-To: <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
-        Bhupesh Sharma
-	<bhupesh.sharma@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        "Jose
- Abreu" <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        Prasad Sodagudi
-	<psodagud@quicinc.com>,
-        Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-Subject: [PATCH net-next v3 3/3] net: stmmac: Add driver support for DWMAC5 fault IRQ Support
-Date: Thu, 23 Nov 2023 17:23:22 +0530
-Message-ID: <62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1700737841.git.quic_jsuraj@quicinc.com>
-References: <cover.1700737841.git.quic_jsuraj@quicinc.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD89B2;
+	Thu, 23 Nov 2023 03:55:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mIhaEk2/Bwn/CFdd+w824Ydp0u5k25o2zM0VwFISc9M=; b=SHyo6OJBbSUZtpnYM2fieeibAA
+	gMiVUS679unzKt84r5tzYQJvXeuAsRXysZ91aSIdSRL+o2R9nfXSG1TAqthXo6wFF8PAYaFfrvWgI
+	L1TMd5sKLnSbFSeKQdGSqNpVRNbe7lnUgaD69xDvZ/wEXUGe8KFosRRexlysvfIl+tk01RjkaMJr0
+	4SWlnJHyb1jV8/EyHcluLw+PI+gbsyzouDtYLMLPRa6EtS5STL3h4klTCYpgtf0Iou5pqaSr8MX+K
+	3ysMFgylLNN8fvjh7HNKW5/3YiS23wVzrPIQOBfDXXJfvU6+3xCb45aqZ3A5y5rh1PBokDg6QXpn1
+	rGmGY0vA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40900)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r68If-0001Va-0R;
+	Thu, 23 Nov 2023 11:55:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r68Ig-0006Br-M2; Thu, 23 Nov 2023 11:55:18 +0000
+Date: Thu, 23 Nov 2023 11:55:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Simon Horman <simon.horman@corigine.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v6 2/3] net: dsa: microchip: ksz8: Add function
+ to configure ports with integrated PHYs
+Message-ID: <ZV89pgQlYPxJGZdR@shell.armlinux.org.uk>
+References: <20231123112051.713142-1-o.rempel@pengutronix.de>
+ <20231123112051.713142-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 5_VvBvNuE2tSRiVMMqd0-jtHwH2cF47r
-X-Proofpoint-GUID: 5_VvBvNuE2tSRiVMMqd0-jtHwH2cF47r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_10,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 phishscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311230084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123112051.713142-3-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add IRQ support to listen HW fault like ECC,DPP,FSM
-fault and print the fault information in the kernel
-log.
+On Thu, Nov 23, 2023 at 12:20:50PM +0100, Oleksij Rempel wrote:
+> This patch introduces the function 'ksz8_phy_port_link_up' to the
+> Microchip KSZ8xxx driver. This function is responsible for setting up
+> flow control and duplex settings for the ports that are integrated with
+> PHYs.
+> 
+> The KSZ8795 switch supports asymmetric pause control, which can't be
+> fully utilized since a single bit controls both RX and TX pause. Despite
+> this, the flow control can be adjusted based on the auto-negotiation
+> process, taking into account the capabilities of both link partners.
+> 
+> On the other hand, the KSZ8873's PORT_FORCE_FLOW_CTRL bit can be set by
+> the hardware bootstrap, which ignores the auto-negotiation result.
+> Therefore, even in auto-negotiation mode, we need to ensure that this
+> bit is correctly set.
+> 
+> When auto-negotiation isn't in use, we enforce symmetric pause control
+> for the KSZ8795 switch.
 
-Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
----
- drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 18 +++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 20 +++++++++++++++++++
- 4 files changed, 41 insertions(+)
+This doesn't sound right.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index 6b935922054d..c4821c7ab674 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -347,6 +347,7 @@ enum request_irq_err {
- 	REQ_IRQ_ERR_SFTY_UE,
- 	REQ_IRQ_ERR_SFTY_CE,
- 	REQ_IRQ_ERR_LPI,
-+	REQ_IRQ_ERR_SAFETY,
- 	REQ_IRQ_ERR_WOL,
- 	REQ_IRQ_ERR_MAC,
- 	REQ_IRQ_ERR_NO,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index cd7a9768de5f..8893d4b7fa38 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -33,6 +33,7 @@ struct stmmac_resources {
- 	int irq;
- 	int sfty_ce_irq;
- 	int sfty_ue_irq;
-+	int safety_common_intr;
- 	int rx_irq[MTL_MAX_RX_QUEUES];
- 	int tx_irq[MTL_MAX_TX_QUEUES];
- };
-@@ -331,6 +332,7 @@ struct stmmac_priv {
- 	/* XDP BPF Program */
- 	unsigned long *af_xdp_zc_qps;
- 	struct bpf_prog *xdp_prog;
-+	int safety_common_intr;
- };
- 
- enum stmmac_state {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 8964fc8a955f..2ae4f34444de 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3530,6 +3530,10 @@ static void stmmac_free_irq(struct net_device *dev,
- 		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
- 			free_irq(priv->wol_irq, dev);
- 		fallthrough;
-+	case REQ_IRQ_ERR_SAFETY:
-+		if (priv->safety_common_intr > 0 && priv->safety_common_intr != dev->irq)
-+			free_irq(priv->safety_common_intr, dev);
-+		fallthrough;
- 	case REQ_IRQ_ERR_WOL:
- 		free_irq(dev->irq, dev);
- 		fallthrough;
-@@ -3736,6 +3740,18 @@ static int stmmac_request_irq_single(struct net_device *dev)
- 		}
- 	}
- 
-+	if (priv->safety_common_intr > 0 && priv->safety_common_intr != dev->irq) {
-+		ret = request_irq(priv->safety_common_intr, stmmac_safety_interrupt,
-+				  0, "safety", dev);
-+		if (unlikely(ret < 0)) {
-+			netdev_err(priv->dev,
-+				   "%s: alloc safety failed %d (error: %d)\n",
-+				   __func__, priv->safety_common_intr, ret);
-+			irq_err = REQ_IRQ_ERR_SAFETY;
-+			goto irq_error;
-+		}
-+	}
-+
- 	return 0;
- 
- irq_error:
-@@ -7398,6 +7414,8 @@ int stmmac_dvr_probe(struct device *device,
- 	priv->lpi_irq = res->lpi_irq;
- 	priv->sfty_ce_irq = res->sfty_ce_irq;
- 	priv->sfty_ue_irq = res->sfty_ue_irq;
-+	priv->safety_common_intr = res->safety_common_intr;
-+
- 	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
- 		priv->rx_irq[i] = res->rx_irq[i];
- 	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 1ffde555da47..bae1704d5f4b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -690,9 +690,25 @@ devm_stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- #endif /* CONFIG_OF */
- EXPORT_SYMBOL_GPL(devm_stmmac_probe_config_dt);
- 
-+int stmmac_get_fault_intr_config(struct platform_device *pdev, struct stmmac_resources *res)
-+{
-+	int ret = 0;
-+
-+	res->safety_common_intr = platform_get_irq_byname(pdev, "safety");
-+
-+	if (res->safety_common_intr < 0) {
-+		if (res->safety_common_intr != -EPROBE_DEFER)
-+			dev_err(&pdev->dev, "safety IRQ configuration information not found\n");
-+		ret = 1;
-+	}
-+
-+	return ret;
-+}
-+
- int stmmac_get_platform_resources(struct platform_device *pdev,
- 				  struct stmmac_resources *stmmac_res)
- {
-+	int ret = 0;
- 	memset(stmmac_res, 0, sizeof(*stmmac_res));
- 
- 	/* Get IRQ information early to have an ability to ask for deferred
-@@ -702,6 +718,10 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
- 	if (stmmac_res->irq < 0)
- 		return stmmac_res->irq;
- 
-+	ret = stmmac_get_fault_intr_config(pdev, stmmac_res);
-+	if (ret)
-+		dev_err(&pdev->dev, "Fault interrupt not present\n");
-+
- 	/* On some platforms e.g. SPEAr the wake up irq differs from the mac irq
- 	 * The external wake up irq can be passed through the platform code
- 	 * named as "eth_wake_irq"
+I would suggest that if PORT_FORCE_FLOW_CTRL is cleared, and autoneg is
+disabled, the result will be that flow control will be disabled.
+
+Also, I think PORT_FORCE_FLOW_CTRL should be used in combination with
+permit_pause_to_mac, which you can get at in mac_config() using
+state->pause & MLO_PAUSE_AN.
+
+So, what I would suggest is that in mac_config(), the driver stores
+in its private data something like:
+
+	dev->manual_flow[port] = !(state->pause & MLO_PAUSE_AN);
+
+And then in mac_link_up(), you can examine this, and if manual_flow
+for the port is set _and_ tx_pause is also set, then you can set
+PORT_FORCE_FLOW_CTRL.
+
+I think this will give a better approximation to the intent of the
+user API (assuming symmetric pause only):
+
+Autoneg		Pause Autoneg	rx,tx	PORT_FORCE_FLOW_CTRL
+1		1		x	0
+0		1		x	0 (flow control probably disabled)
+x		0		1	1 (flow control force enabled)
+1		0		0	0 (flow control still depends on
+					   aneg result due to hardware)
+0		0		0	0 (flow control probably disabled)
+
+Whereas, what I think you're proposing is:
+
+Autoneg		Pause Autoneg	rx,tx	PORT_FORCE_FLOW_CTRL
+1		1		x	0
+1		0		x	0 (flow control still depends on
+					   aneg result)
+0		x		1	1 (flow control force enabled)
+0		x		0	0 (flow control probably disabled)
+
+The difference is that flow control can be forced with my suggestion
+when Autoneg is still enabled, but the pause autoneg bit is cleared
+and we want flow control enabled.
+
+Thanks.
+
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
