@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-50601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6597F6464
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:51:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F3A7F6465
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B1F28198C
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:51:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19EFDB20DD4
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96933E46B;
-	Thu, 23 Nov 2023 16:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2533D39F;
+	Thu, 23 Nov 2023 16:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UJakKzA+"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="q2/EgMOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF2810CF
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:51:15 -0800 (PST)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-a03a9009572so140204966b.3
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:51:15 -0800 (PST)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D85A91
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:52:17 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a002562bd8bso211465866b.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:52:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700758274; x=1701363074; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700758336; x=1701363136; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qYKmQ4OvqkfMEXpdSiBMoCLw1RSZ6d3cZjuHGfNHz0o=;
-        b=UJakKzA+CUtRSwXq2wYRZSpwZZND9+/0mvbiRuqsrrxcYBYj+3CUrSZXjUDt/LFq1H
-         kbJzmNkizOIc1UKkkTL3PpddbKIO57DAVNeuiY4lOpv0xpw6eE9+A+PtIBuXhKxY7Ms8
-         WLt19MHfHEYUwTqDvTiLXE5UXr7XMieYwOHj9oRHBvvk2GeXoELp4559P6GSO5O8yBNG
-         hqqpe3yWAJ4eKdI5ccbl4q64EL6hCMx6z8M+2L3fnHDaVGKRVKmZf8qMqsZKH3sHcqXw
-         3/ZYp9Pv0Hx6d97crr4ac9WDKgpK2zwxNOWm46MjSwz5X3hLqy41If0QReBntjdZVurk
-         Z89g==
+        bh=6u3MGS7GDIBFAKs2TxjC217U/5ossQpg1sc+mHVST0I=;
+        b=q2/EgMOVy8rTgFjNF3U1ey7/6ryDi7ExYXbPOI67QuYfowF3NCy4ENC1Sm2wLBlaZ/
+         gGwpSR37Mp1kuYA2Ty9rZfhTZkKLFCPoB6ycZHA1wdM+v5xXmc9IWjDo/uziDW/viZAr
+         S+z/qFIEVjcBAoBDeASTVJfJR2Zw4qBIom5wKbxYkMUc/9/guk0Ucqtsp7wYGvabzyCx
+         kNnTsMrygytxwqveQuKparHjCjFDq8PPx3OK5a0sH+geeXltfqgldT5Fue1pGlHfuvG4
+         WS/gAWJpbjKvMAxzb875nYFpBm9Rc1u/prtNzVMEc4v4lu6EXoTG9mslPAYceC7d38We
+         DD1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700758274; x=1701363074;
+        d=1e100.net; s=20230601; t=1700758336; x=1701363136;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qYKmQ4OvqkfMEXpdSiBMoCLw1RSZ6d3cZjuHGfNHz0o=;
-        b=s9yARlOR/1uWeyka/LUK/pwc+Oj51Jl1iHor5lDnNBQ7TiC9KL+mAM7Jkhj1h2uBVi
-         h+GKnfzrqurDavpPc70O7cSLcIWH4wkcJ0YhYShQzd3awWbD7O8Ch2lJ5hkH4fo8AHZx
-         NwRfYygOU66Jhhe4s/lfXXGLXuzI/zbiPU8WfeNmAtvNthxvj6chdducVjqGM918r+Ve
-         MMrxsN8OmFxFHMlGVTpn08VgWAp4OMiCnWuGO6KzHXMY9lFHyTNXjShy7mEpERfPxpo8
-         8lcfOFr0RIHXwbTE9+Ifw11mviOKqZrmUuqrn9x39gZTtDCqkrDd3KTwqX/AmRpqcgkv
-         zaeA==
-X-Gm-Message-State: AOJu0YygiPr4/nkIDXbKEWjehiGnwl0FuRN8O83943hB5txNWoSdCFeB
-	Er8P9g1oY+ujNncIUxgn7cV49Q==
-X-Google-Smtp-Source: AGHT+IGaPkSs5GhkCywLoY2S+LsJnEJWqWxICYS0NjaZLD8pgt1AqnkNf3f2GPTOPjdDfBl7lMjnFw==
-X-Received: by 2002:a17:907:801d:b0:a04:995b:6a96 with SMTP id ft29-20020a170907801d00b00a04995b6a96mr3498923ejc.26.1700758274070;
-        Thu, 23 Nov 2023 08:51:14 -0800 (PST)
+        bh=6u3MGS7GDIBFAKs2TxjC217U/5ossQpg1sc+mHVST0I=;
+        b=DKa4FeOgf0pho0SYhEZothlMxBK5DgNFc952alJhaHBOwCfOWv3ds7Y2H9DdLPlaf/
+         /NJRhvbNUiE+nUb8k/WA6at7IOxOMDt7wvGwkQhDgKLvl9kwcb8N1Hxv+VkAahlcqqSb
+         ekdvsiYCLbj+/6iaOPVR6U67FZfJ1IKZEB1elbl2iHwBmo+zVTsm0fbJ7mZF76+PT0lm
+         fFbX+MHl35wKUOjoo1Pcu/tJ4XVlv3vQPMQPpL/mPprIkXtVaql6ImpL6Ucfsh7vvTQ5
+         EBcimumBptvPWHjczeh+ltlTgUAkWaiNzsRP1NHt4D2/GQQMsR3ic8xN+fYxNiBq6UxU
+         aINQ==
+X-Gm-Message-State: AOJu0YwFI1EZVccyxaU5+wXQxFzZSQxu8t1INTB4xmLgs7zcTO5kLAAA
+	Bfu7Aj9X5ROndGX8N24Zp5IM9w==
+X-Google-Smtp-Source: AGHT+IE5wzSnZN8BxphK1jGKzqgnJUPar7nbjr8hJ1PKrT+YwSoiBIliOEhOJrPcwQwgArCml2tw/A==
+X-Received: by 2002:a17:906:5308:b0:a01:bd67:d2fb with SMTP id h8-20020a170906530800b00a01bd67d2fbmr2708081ejo.0.1700758335741;
+        Thu, 23 Nov 2023 08:52:15 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id k18-20020a170906579200b009ffe3e82bbasm986337ejq.136.2023.11.23.08.51.13
+        by smtp.gmail.com with ESMTPSA id ks18-20020a170906f85200b009c503bf61c9sm979436ejb.165.2023.11.23.08.52.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 08:51:13 -0800 (PST)
-Date: Thu, 23 Nov 2023 17:51:12 +0100
+        Thu, 23 Nov 2023 08:52:15 -0800 (PST)
+Date: Thu, 23 Nov 2023 17:52:14 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jamal Hadi Salim <hadi@mojatatu.com>
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
@@ -64,7 +64,7 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
 	kernel@mojatatu.com
 Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
  blockcast tc action
-Message-ID: <ZV+DAMUwzW92trVS@nanopsycho>
+Message-ID: <ZV+DPmXrANEh6gF8@nanopsycho>
 References: <20231110214618.1883611-1-victor@mojatatu.com>
  <20231110214618.1883611-5-victor@mojatatu.com>
  <ZV8SnZPBV4if5umR@nanopsycho>
@@ -72,7 +72,7 @@ References: <20231110214618.1883611-1-victor@mojatatu.com>
  <ZV9b0HrM5WespGMW@nanopsycho>
  <CAM0EoMnwAHO_AvEYiL=aTwNBjs29ww075Lq1qwvCwuYtB_Qz7A@mail.gmail.com>
  <ZV9tCT9d7dm7dOeA@nanopsycho>
- <CAAFAkD8G+m6foAjyc==njMw6zzCyRcQKwWaPnhnudVcWBGP0HQ@mail.gmail.com>
+ <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,9 +82,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAFAkD8G+m6foAjyc==njMw6zzCyRcQKwWaPnhnudVcWBGP0HQ@mail.gmail.com>
+In-Reply-To: <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
 
-Thu, Nov 23, 2023 at 05:20:27PM CET, hadi@mojatatu.com wrote:
+Thu, Nov 23, 2023 at 05:21:51PM CET, hadi@mojatatu.com wrote:
 >On Thu, Nov 23, 2023 at 10:17 AM Jiri Pirko <jiri@resnulli.us> wrote:
 >>
 >> Thu, Nov 23, 2023 at 03:38:35PM CET, jhs@mojatatu.com wrote:
@@ -134,23 +134,7 @@ Thu, Nov 23, 2023 at 05:20:27PM CET, hadi@mojatatu.com wrote:
 >> >any sense because once you redirect the packet is gone.
 >>
 >> How is it mirror? It is redirect to multiple, isn't it?
->
->mirror has been used (so far in mirred action and i believe in the
->industry in general) to mean  "send a copy of the packet" - meaning
->you can send to many ports and even when you are done sending to all
->those ports the packet is still in the pipeline and you can continue
->to execute other action on it. Whereas redirect means the packet is
->stolen from the pipeline i.e if you redirect to a port the packet is
->not available to redirect to the next port or for any other action
->after that.
->You could argue a loose interpretation of redirect to a block to mean
->"mirror to all ports on the block but on the last port redirect".
-
-it's stolen from the pipeline, right? That would be redirect from my
-perspective.
-
-
->
+>>
 >>
 >> >
 >> >> >have been two actions. So i feel like adding a block to mirred is
@@ -166,11 +150,6 @@ perspective.
 >>
 >> That does not looks correct at all. Do tc stuff in tc, no?
 >>
->
->We could certainly annotate the dev group via tc but it seems odd ....
->
->cheers,
->jamal
 >>
 >> >...
 >> >
@@ -180,6 +159,22 @@ perspective.
 >>
 >> "blockcasting" to something that is not a block anymore. Not nice.
 >>
+>
+>Sorry, missed this one. Yes blockcasting is no longer appropriate  -
+>perhaps a different action altogether.
+
+mirret redirect? :)
+
+With target of:
+1) dev (the current one)
+2) block
+3) group
+?
+
+
+>
+>cheers,
+>jamal
 >> >
 >> >cheers,
 >> >jamal
