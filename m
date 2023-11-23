@@ -1,116 +1,110 @@
-Return-Path: <netdev+bounces-50343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE73E7F5662
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:23:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28CA7F565F
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E7091C20C0B
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:23:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52F4FB21081
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02AC4418;
-	Thu, 23 Nov 2023 02:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="pOZl2CHy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D9420FE;
+	Thu, 23 Nov 2023 02:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D52B112;
-	Wed, 22 Nov 2023 18:23:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
-	Content-Type; bh=UlxvLHjBs0+KVhlcvFETRh+wWbRujxcqONaLwY9ZXkY=;
-	b=pOZl2CHy15CILlb/xweooyqCmAppWfRvdwQNMDPqEadI6gqKwPiZphD9h5UR6u
-	eI88+VXUshcG0fwFS2LtIEMRk3QuVvjpCex3rfvHpKl9lMcuQZJplkkVnrvjs9UA
-	TIlSnT0E6/HxLUbqeGfm2TzAUUtnK9wuMP72snhyFeb9M=
-Received: from [172.23.69.7] (unknown [121.32.254.149])
-	by zwqz-smtp-mta-g3-0 (Coremail) with SMTP id _____wD3XznVtl5lJaXiCw--.59075S2;
-	Thu, 23 Nov 2023 10:20:07 +0800 (CST)
-Message-ID: <3cfe509b-ca24-47a7-931c-fe620c2dab7c@126.com>
-Date: Thu, 23 Nov 2023 10:20:03 +0800
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9671D112
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 18:21:18 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VwxeXXK_1700706075;
+Received: from 30.221.129.10(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VwxeXXK_1700706075)
+          by smtp.aliyun-inc.com;
+          Thu, 23 Nov 2023 10:21:16 +0800
+Message-ID: <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+Date: Thu, 23 Nov 2023 10:21:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/mlx5e: Fix a race in command alloc flow
-To: Leon Romanovsky <leon@kernel.org>
-Cc: saeedm@nvidia.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jackm@dev.mellanox.co.il,
- ogerlitz@mellanox.com, roland@purestorage.com, eli@mellanox.com,
- dinghui@sangfor.com.cn, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231121115251.588436-1-lishifeng1992@126.com>
- <20231122120245.GC4760@unreal>
-From: Shifeng Li <lishifeng1992@126.com>
-In-Reply-To: <20231122120245.GC4760@unreal>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [question] smc: how to enable SMC_LO feature
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ yuehaibing <yuehaibing@huawei.com>, "Libin (Huawei)"
+ <huawei.libin@huawei.com>, Dust Li <dust.li@linux.alibaba.com>,
+ tonylu_linux <tonylu@linux.alibaba.com>, "D. Wythe"
+ <alibuda@linux.alibaba.com>, guwen@linux.alibaba.com
+References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_____wD3XznVtl5lJaXiCw--.59075S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGryfAF4xGr45WFy8CFW3KFg_yoW5Cw45pr
-	yxGw47AFn5Krsxtrn7Xw4jq3W8J397Kw15GF1v9r1xWwsaya4kAa4Ikr4jg34UX3yjqa47
-	JayDKFy8Xr4fX3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jeD73UUUUU=
-X-CM-SenderInfo: xolvxx5ihqwiqzzsqiyswou0bp/1tbi1xgxr153c3k9gwABsN
 
-On 2023/11/22 20:02, Leon Romanovsky wrote:
-> On Tue, Nov 21, 2023 at 03:52:51AM -0800, Shifeng Li wrote:
->> Fix a cmd->ent use after free due to a race on command entry.
->> Such race occurs when one of the commands releases its last refcount and
->> frees its index and entry while another process running command flush
->> flow takes refcount to this command entry. The process which handles
->> commands flush may see this command as needed to be flushed if the other
->> process allocated a ent->idx but didn't set ent to cmd->ent_arr in
->> cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
->> the spin lock.
->>
->> [70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
->> [70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
->> [70013.081968]
->> [70013.081989] CPU: 26 PID: 1433361 Comm: kworker/26:1 Kdump: loaded Tainted: G           OE     4.19.90-25.17.v2101.osc.sfc.6.10.0.0030.ky10.x86_64+debug #1
->> [70013.082001] Hardware name: SANGFOR 65N32-US/ASERVER-G-2605, BIOS SSSS5203 08/19/2020
->> [70013.082028] Workqueue: events aer_isr
->> [70013.082053] Call Trace:
->> [70013.082067]  dump_stack+0x8b/0xbb
->> [70013.082086]  print_address_description+0x6a/0x270
->> [70013.082102]  kasan_report+0x179/0x2c0
->> [70013.082133]  ? mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
->> [70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
->> [70013.082213]  ? mlx5_cmd_use_polling+0x20/0x20 [mlx5_core]
->> [70013.082223]  ? kmem_cache_free+0x1ad/0x1e0
->> [70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
->> [70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
->> [70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
->> [70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
->> [70013.082390]  ? __pm_runtime_resume+0x58/0x70
->> [70013.082409]  pci_device_remove+0xf3/0x280
->> [70013.082426]  ? pcibios_free_irq+0x10/0x10
->> [70013.082439]  device_release_driver_internal+0x1c3/0x470
->> [70013.082453]  pci_stop_bus_device+0x109/0x160
->> [70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
->> [70013.082485]  pcie_do_fatal_recovery+0x167/0x550
->> [70013.082493]  aer_isr+0x7d2/0x960
->> [70013.082510]  ? aer_get_device_error_info+0x420/0x420
->> [70013.082526]  ? __schedule+0x821/0x2040
->> [70013.082536]  ? strscpy+0x85/0x180
->> [70013.082543]  process_one_work+0x65f/0x12d0
->> [70013.082556]  worker_thread+0x87/0xb50
->> [70013.082563]  ? __kthread_parkme+0x82/0xf0
->> [70013.082569]  ? process_one_work+0x12d0/0x12d0
->> [70013.082571]  kthread+0x2e9/0x3a0
->> [70013.082579]  ? kthread_create_worker_on_cpu+0xc0/0xc0
->> [70013.082592]  ret_from_fork+0x1f/0x40
+
+
+On 2023/11/21 20:14, shaozhengchao wrote:
+> Hi Wen Gu:
+> Currently, I am interested in the SMC_LOOPBACK feature proposed
+> by you. Therefore, I use your patchset[1] to test the SMC_LO feature on
+> my x86_64 environment and kernel is based on linux-next, commit: 5ba73bec5e7b.
+> The test result shows that the smc_lo feature cannot be enabled. Here's
+> my analysis:
 > 
-> I'm curious how did you get this error? I would expect to see some sort
-> of lock in upper level which prevents it.
+> 1. Run the following command to perform the test, and then capture
+> packets on the lo device.
+> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
+> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp --msg-size=64000 -i 127.0.0.1 -t 30
 > 
-Just inject AER unrecoverable error to pci BDF device corresponding to 
-the network card constantly and I get this error.
+> 2. Use Wireshark to open packets. It is found that the VCE port replies with
+> SMC-R-Deline packets.
+> [cid:image001.png@01DA1CB4.F1052C30]
+> 
+> 3. Rx
+> When smc_listen_work invokes smc_listen_v2_check, the VCE port returns
+> a Decline packet because eid_cnt and flag.seid in the received packet are both 0.
+> 
+> 4. Tx
+> In smc_clc_send_proposal,
+> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
+> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
+> 
+> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, seid_enabled is
+> always equal to 0.
+> 
+> So, I must call smc_clc_ueid_add function to increase ueid count?
+> But I don't see where operations can be added, may I missed something?
+> 
 
-Thanks
-> Thanks
+Hi Zhengchao Shao,
 
+Yes. When using SMC-D in non-s390 architecture (like x86 here), A common
+UEID should be set. It can be set by following steps:
+
+- Install smc-tools[1].
+
+- Run # smcd ueid add <ueid> in loopback test environment.
+
+   EID works as an ID to indicate the max communication space of SMC. When SEID is
+   unavailable, an UEID is required.
+
+- Then run the test.
+
+Hope this works for you :)
+
+[1] https://github.com/ibm-s390-linux/smc-tools
+
+Regards,
+Wen Gu
+
+> Could you give me some advice? Thanks very much.
+> 
+> Zhengchao Shao
+> 
+> 
+> [1]link: https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+> 
 
