@@ -1,176 +1,130 @@
-Return-Path: <netdev+bounces-50329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3157F55F7
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:40:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF0C7F5605
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 137291C20B22
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:40:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAEF1C20BB8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB14C10E9;
-	Thu, 23 Nov 2023 01:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A591385;
+	Thu, 23 Nov 2023 01:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1480C1
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 17:39:54 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SbLLG5KPNzrTw2;
-	Thu, 23 Nov 2023 09:36:22 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 23 Nov 2023 09:39:52 +0800
-Message-ID: <04005231-e973-2a6a-35dd-9374218ff63b@huawei.com>
-Date: Thu, 23 Nov 2023 09:39:52 +0800
+Received: from njjs-sys-mailin01.njjs.baidu.com (mx310.baidu.com [180.101.52.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3109812A;
+	Wed, 22 Nov 2023 17:45:39 -0800 (PST)
+Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id E01AB7F000A9;
+	Thu, 23 Nov 2023 09:45:37 +0800 (CST)
+From: Li RongQing <lirongqing@baidu.com>
+To: linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com
+Subject: [PATCH net-next v4] net/smc: remove unneeded atomic operations in smc_tx_sndbuf_nonempty
+Date: Thu, 23 Nov 2023 09:45:37 +0800
+Message-Id: <20231123014537.9786-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.9.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net,v2] ipv4: igmp: fix refcnt uaf issue when receiving
- igmp query packet
-To: Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>
-References: <20231122042936.1831735-1-shaozhengchao@huawei.com>
- <CANn89i+5+UA3bVb_RxpY_fW_7KcFJXjR-SGV29USLZ77psG9fQ@mail.gmail.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <CANn89i+5+UA3bVb_RxpY_fW_7KcFJXjR-SGV29USLZ77psG9fQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
 
+The commit dcd2cf5f2fc0 ("net/smc: add autocorking support") adds an
+atomic variable tx_pushing in smc_connection to make sure only one can
+send to let it cork more and save CDC slot. since smc_tx_pending can be
+called in the soft IRQ without checking sock_owned_by_user() at that
+time, which would cause a race condition because bh_lock_sock() did
+not honor sock_lock()
 
-
-On 2023/11/22 22:13, Eric Dumazet wrote:
-> On Wed, Nov 22, 2023 at 5:17 AM Zhengchao Shao <shaozhengchao@huawei.com> wrote:
->>
->> When I perform the following test operations:
->> 1.ip link add br0 type bridge
->> 2.brctl addif br0 eth0
->> 3.ip addr add 239.0.0.1/32 dev eth0
->> 4.ip addr add 239.0.0.1/32 dev br0
->> 5.ip addr add 224.0.0.1/32 dev br0
->> 6.while ((1))
->>      do
->>          ifconfig br0 up
->>          ifconfig br0 down
->>      done
->> 7.send IGMPv2 query packets to port eth0 continuously. For example,
->> ./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
->> 1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
->>
->> The preceding tests may trigger the refcnt uaf issue of the mc list. The
->> stack is as follows:
->>          refcount_t: addition on 0; use-after-free.
->>          WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate+0x78/0x110
->>          CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #57
->>          RIP: 0010:refcount_warn_saturate+0x78/0x110
->>          Call Trace:
->>          <TASK>
->>          __warn+0x83/0x130
->>          refcount_warn_saturate+0x78/0x110
->>          igmp_start_timer
->>          igmp_mod_timer
->>          igmp_heard_query+0x221/0x690
->>          igmp_rcv+0xea/0x2f0
->>          ip_protocol_deliver_rcu+0x156/0x160
->>          ip_local_deliver_finish+0x77/0xa0
->>          __netif_receive_skb_one_core+0x8b/0xa0
->>          netif_receive_skb_internal+0x80/0xd0
->>          netif_receive_skb+0x18/0xc0
-> 
-> Yet no symbols...
-> 
->>          br_handle_frame_finish+0x340/0x5c0 [bridge]
->>          nf_hook_bridge_pre+0x117/0x130 [bridge]
->>          __netif_receive_skb_core+0x241/0x1090
->>          __netif_receive_skb_list_core+0x13f/0x2e0
->>          __netif_receive_skb_list+0xfc/0x190
->>          netif_receive_skb_list_internal+0x102/0x1e0
->>          napi_gro_receive+0xd7/0x220
->>          e1000_clean_rx_irq+0x1d4/0x4f0 [e1000]
->>          e1000_clean+0x5e/0xe0 [e1000]
->>          __napi_poll+0x2c/0x1b0
->>          net_rx_action+0x2cb/0x3a0
->>          __do_softirq+0xcd/0x2a7
->>          run_ksoftirqd+0x22/0x30
->>          smpboot_thread_fn+0xdb/0x1d0
->>          kthread+0xe2/0x110
->>          ret_from_fork+0x34/0x50
->>          ret_from_fork_asm+0x1a/0x30
->>          </TASK>
->>
->> The root causes are as follows:
->> Thread A                                        Thread B
->> ...                                             netif_receive_skb
->> br_dev_stop                                     ...
->>      br_multicast_leave_snoopers                 ...
->>          __ip_mc_dec_group                       ...
->>              __igmp_group_dropped                igmp_rcv
->>                  igmp_stop_timer                     igmp_heard_query         //ref = 1
->>                  ip_ma_put                               igmp_mod_timer
->>                      refcount_dec_and_test                   igmp_start_timer //ref = 0
->>                          ...                                     refcount_inc //ref increases from 0
->> When the device receives an IGMPv2 Query message, it starts the timer
->> immediately, regardless of whether the device is running. If the device is
->> down and has left the multicast group, it will cause the mc list refcount
->> uaf issue.
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->> ---
->> v2: use cmd "cat messages |/root/linux-next/scripts/decode_stacktrace.sh
->>      /root/linux-next/vmlinux" to get precise stack traces and check whether
->>      the im is destroyed before timer is started.
-> 
-> I do not think you understood the point I made.
-> 
-> Look at commit 9fce92f050f448a ("mptcp: deal with large GSO size")
-> for a good example of what a stack trace should look like.
-> 
-
-Hi Eric:
-	Thank your for your suggestion. I will update the commit
+After commit 6b88af839d20 ("net/smc: don't send in the BH context if
+sock_owned_by_user"), the transmission is deferred to when sock_lock()
+is held by the user. Therefore, we no longer need tx_pending to hold
 message.
 
-Thanks
+So remove atomic variable tx_pushing and its operation, and
+smc_tx_sndbuf_nonempty becomes a wrapper of __smc_tx_sndbuf_nonempty,
+so rename __smc_tx_sndbuf_nonempty back to smc_tx_sndbuf_nonempty
 
-Zhengchao Shao
-> 
->> ---
->>   net/ipv4/igmp.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
->> index 76c3ea75b8dd..efeeca2b1328 100644
->> --- a/net/ipv4/igmp.c
->> +++ b/net/ipv4/igmp.c
->> @@ -216,8 +216,10 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
->>          int tv = get_random_u32_below(max_delay);
->>
->>          im->tm_running = 1;
->> -       if (!mod_timer(&im->timer, jiffies+tv+2))
->> -               refcount_inc(&im->refcnt);
->> +       if (refcount_inc_not_zero(&im->refcnt)) {
->> +               if (mod_timer(&im->timer, jiffies + tv + 2))
->> +                       ip_ma_put(im);
->> +       }
->>   }
->>
->>   static void igmp_gq_start_timer(struct in_device *in_dev)
->> --
->> 2.34.1
->>
-> 
+Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+diff v4: remove atomic variable tx_pushing
+diff v3: improvements in the commit body and comments
+diff v2: fix a typo in commit body and add net-next subject-prefix
+
+ net/smc/smc.h    |  1 -
+ net/smc/smc_tx.c | 30 +-----------------------------
+ 2 files changed, 1 insertion(+), 30 deletions(-)
+
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index e377980..cd51261 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -196,7 +196,6 @@ struct smc_connection {
+ 						 * - dec on polled tx cqe
+ 						 */
+ 	wait_queue_head_t	cdc_pend_tx_wq; /* wakeup on no cdc_pend_tx_wr*/
+-	atomic_t		tx_pushing;     /* nr_threads trying tx push */
+ 	struct delayed_work	tx_work;	/* retry of smc_cdc_msg_send */
+ 	u32			tx_off;		/* base offset in peer rmb */
+ 
+diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
+index 3b0ff3b..214ac3c 100644
+--- a/net/smc/smc_tx.c
++++ b/net/smc/smc_tx.c
+@@ -621,7 +621,7 @@ static int smcd_tx_sndbuf_nonempty(struct smc_connection *conn)
+ 	return rc;
+ }
+ 
+-static int __smc_tx_sndbuf_nonempty(struct smc_connection *conn)
++int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
+ {
+ 	struct smc_sock *smc = container_of(conn, struct smc_sock, conn);
+ 	int rc = 0;
+@@ -655,34 +655,6 @@ static int __smc_tx_sndbuf_nonempty(struct smc_connection *conn)
+ 	return rc;
+ }
+ 
+-int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
+-{
+-	int rc;
+-
+-	/* This make sure only one can send simultaneously to prevent wasting
+-	 * of CPU and CDC slot.
+-	 * Record whether someone has tried to push while we are pushing.
+-	 */
+-	if (atomic_inc_return(&conn->tx_pushing) > 1)
+-		return 0;
+-
+-again:
+-	atomic_set(&conn->tx_pushing, 1);
+-	smp_wmb(); /* Make sure tx_pushing is 1 before real send */
+-	rc = __smc_tx_sndbuf_nonempty(conn);
+-
+-	/* We need to check whether someone else have added some data into
+-	 * the send queue and tried to push but failed after the atomic_set()
+-	 * when we are pushing.
+-	 * If so, we need to push again to prevent those data hang in the send
+-	 * queue.
+-	 */
+-	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing)))
+-		goto again;
+-
+-	return rc;
+-}
+-
+ /* Wakeup sndbuf consumers from process context
+  * since there is more data to transmit. The caller
+  * must hold sock lock.
+-- 
+2.9.4
+
 
