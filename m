@@ -1,157 +1,125 @@
-Return-Path: <netdev+bounces-50309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066F07F550C
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:53:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCC957F552C
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F11BB20DB1
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 23:53:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DD51C20A75
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA351219F5;
-	Wed, 22 Nov 2023 23:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151607F7;
+	Thu, 23 Nov 2023 00:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSvDWi5e"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XQbO/s/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2428E83;
-	Wed, 22 Nov 2023 15:53:32 -0800 (PST)
-Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-58a6ad82b07so188338eaf.2;
-        Wed, 22 Nov 2023 15:53:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700697211; x=1701302011; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ptSuTKQvR9JLLDZ9nZXPY/xCjnt8PeE7nphMGTE2Dq4=;
-        b=SSvDWi5ewE7fJQ/ks1Sd63snWhnGyn7UlXfIPG9W5VMP+fDee2ZzinJ6SCXr7yIH4x
-         nh68IexXrPuJMEv9WDdFQiaRGPnL9XsM34Ok9eh77DQL1v3KGeUNVF2MzzjDw2Rq2Phv
-         ABm8gJkhAr5ajj2RU4cPkLF9+iXL/wtDzJHbNYso9HXJFmO6noPTcv7HzLYyU0nCNfvR
-         /Z2ENoIzwDJKtv/cfL1b58p/aD/tVA+l3C7KBtT0tQ4j+sIs38KLMLKNryBmNsC2f5pN
-         vUjDAgx0gOjK9D7O7hFsqqG7DxhIAJUHADZt8ugNkU0Mv0e/xZ4JpaX9BFBaIguUqawd
-         fyHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700697211; x=1701302011;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ptSuTKQvR9JLLDZ9nZXPY/xCjnt8PeE7nphMGTE2Dq4=;
-        b=Fga1AWEzKq+87vLS2emBqgJmCcCG3z8B+OtS2+Y7VtrSiAcwRs7RkqGE6nhHAHOb51
-         uaBuYmep9ZalIQ6K3djlRGuz0Y+hQtmHD0m+XvxuL71NFCBbaNBCOFxGAX9Slutf95hH
-         UPeFKv0BrH6FoWFr3sG8KWmp2KeiSjer0k5YgLdHpNTFQsWNoxt+twm0HUGMleX2qNcp
-         FLNeMLD55e66b6pbtRy4gTD7cSlgasc5n0Xx0WYBy07HbcmNaAUxFUYZviDU9JW7ykhS
-         mDt2CPNE9prPLWWp81/L3VAfR+wrkqibmaHheUSSbgayPmGiEIKFb+ubpZOEPS2ftgA1
-         CsXw==
-X-Gm-Message-State: AOJu0YyVx4dAOkVND0DJ9Yk6IIOwetHcUnsVWY4W6TvZAiHqmHDhjy/G
-	h8NUg89Vrx/z4ga5FYhCc7w=
-X-Google-Smtp-Source: AGHT+IHSOk8tvELns4MrPKu24TBAdB5OEcSmHvkF79+ccbUgXzfoSTPn1JruJ0RHC4StU9Nq8if0eA==
-X-Received: by 2002:a05:6820:80d:b0:58a:231d:750e with SMTP id bg13-20020a056820080d00b0058a231d750emr4877895oob.1.1700697211305;
-        Wed, 22 Nov 2023 15:53:31 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:5a79:4034:522e:2b90? ([2600:1700:6cf8:1240:5a79:4034:522e:2b90])
-        by smtp.gmail.com with ESMTPSA id o62-20020a4a4441000000b0058a010374e6sm4963ooa.39.2023.11.22.15.53.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 15:53:30 -0800 (PST)
-Message-ID: <11a24655-4d13-4f37-a415-6351477f9912@gmail.com>
-Date: Wed, 22 Nov 2023 15:53:29 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC487E3
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 00:10:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78F69C433C7
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 00:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700698231;
+	bh=2z++ao5Z92LYjEsItcgfxQ/N0za3SceWCo22uU5kZ98=;
+	h=References:In-Reply-To:From:Date:Subject:To:List-Id:Cc:From;
+	b=XQbO/s/P2OxvZcjJcVPmjlTJID7w/7Dzr3dfERWoTdoNRkkV99pSKD8EGSemUlScX
+	 hKBbfTa6Ep+f4yOuAlcNjHjlXHam9pB4f1dgMVK9ITaCareqmfXfRQX0CRrXh/ZP4u
+	 EdO1f6J1ryma4eE9pXWXlEfLA0vBt5qNfnTFYOtLiJhNFpSV8ei6WdfNvq+7/+Dn7l
+	 fUxIjOsxl9r3UnsJtzBW+KYVRQR/ARMXa2Z7xyS6KrrVppevKbYVRcgs2NimDtWW5B
+	 52iydLXL1HkJTu9ewoLAf1xcYVy3HYi0FMFDvjoehAeY+JgAQe35O5WjaJ5dd5z1DZ
+	 AT3lK0FWGTOWg==
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-d9fe0a598d8so343129276.2
+        for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 16:10:31 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy+ofL0EjuA60KFAO/aNF6+t3+r5esmhZZb90glyhelInqS3Dst
+	zTSjp6GtJgbflcfAusMbut+StxNq5vkoKPSlviU=
+X-Google-Smtp-Source: AGHT+IHvCfwEg2pEMmIqxwzrxk78HAkBlqCZL/jXSBSgoBhIXMbDD9apymuUnB1Xp3/3m8HT2/N2QwhYmvubpwsHcFg=
+X-Received: by 2002:a25:374c:0:b0:da3:ab31:ce22 with SMTP id
+ e73-20020a25374c000000b00da3ab31ce22mr4072066yba.2.1700698230669; Wed, 22 Nov
+ 2023 16:10:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v11 10/13] bpf, net: switch to dynamic
- registration
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
-Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
- drosen@google.com
-References: <20231106201252.1568931-1-thinker.li@gmail.com>
- <20231106201252.1568931-11-thinker.li@gmail.com>
- <c2876de6-d726-5a6a-fe65-98c08e7f2b91@linux.dev>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <c2876de6-d726-5a6a-fe65-98c08e7f2b91@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231122173041.3835620-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20231122173041.3835620-1-anthony.l.nguyen@intel.com>
+From: Josh Boyer <jwboyer@kernel.org>
+Date: Wed, 22 Nov 2023 19:10:19 -0500
+X-Gmail-Original-Message-ID: <CA+5PVA5ULYE=b-_O6JjhtPM2zASCzEbcK95eQBfhs=tQSkPhWQ@mail.gmail.com>
+Message-ID: <CA+5PVA5ULYE=b-_O6JjhtPM2zASCzEbcK95eQBfhs=tQSkPhWQ@mail.gmail.com>
+Subject: Re: [linux-firmware v1 0/3][pull request] Intel Wired LAN Firmware
+ Updates 2023-11-22
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Mario Limonciello <superm1@gmail.com>
+Cc: linux-firmware@kernel.org, netdev@vger.kernel.org, 
+	przemyslaw.kitszel@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Nov 22, 2023 at 12:30=E2=80=AFPM Tony Nguyen <anthony.l.nguyen@inte=
+l.com> wrote:
+>
+> Update the various ice DDP packages to the latest versions.
+>
+> Thanks,
+> Tony
+>
+> The following changes since commit 9552083a783e5e48b90de674d4e3bf23bb855a=
+b0:
+>
+>   Merge branch 'robot/pr-0-1700470117' into 'main' (2023-11-20 13:09:23 +=
+0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/firmware.git dev-qu=
+eue
+>
+> for you to fetch changes up to c71fdbc575b79eff31db4ea243f98d5f648f7f0f:
+>
+>   ice: update ice DDP wireless_edge package to 1.3.13.0 (2023-11-22 09:14=
+:39 -0800)
+>
+> ----------------------------------------------------------------
+> Przemek Kitszel (3):
+>       ice: update ice DDP package to 1.3.35.0
+>       ice: update ice DDP comms package to 1.3.45.0
+>       ice: update ice DDP wireless_edge package to 1.3.13.0
 
+Sending a pull request and all of the patches to the list individually
+seems to have confused the automation we have to grab stuff from the
+list.  The first two patches are merged and pushed out:
 
-On 11/9/23 18:19, Martin KaFai Lau wrote:
-> On 11/6/23 12:12 PM, thinker.li@gmail.com wrote:
->> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
->> index 48e97a255945..432c088d4001 100644
->> --- a/include/linux/bpf.h
->> +++ b/include/linux/bpf.h
->> @@ -1643,7 +1643,6 @@ struct bpf_struct_ops_desc {
->>   #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
->>   #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + 
->> POISON_POINTER_DELTA))
->>   const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf 
->> *btf, u32 type_id);
->> -void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
->>   bool bpf_struct_ops_get(const void *kdata);
->>   void bpf_struct_ops_put(const void *kdata);
->>   int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
->> @@ -1689,10 +1688,6 @@ static inline const struct bpf_struct_ops_desc 
->> *bpf_struct_ops_find(struct btf *
->>   {
->>       return NULL;
->>   }
->> -static inline void bpf_struct_ops_init(struct btf *btf,
->> -                       struct bpf_verifier_log *log)
->> -{
->> -}
->>   static inline bool bpf_try_module_get(const void *data, struct 
->> module *owner)
->>   {
->>       return try_module_get(owner);
->> @@ -3232,6 +3227,8 @@ static inline bool bpf_is_subprog(const struct 
->> bpf_prog *prog)
->>   }
->>   #ifdef CONFIG_BPF_JIT
->> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
->> +
->>   enum bpf_struct_ops_state {
->>       BPF_STRUCT_OPS_STATE_INIT,
->>       BPF_STRUCT_OPS_STATE_INUSE,
->> @@ -3243,6 +3240,23 @@ struct bpf_struct_ops_common_value {
->>       refcount_t refcnt;
->>       enum bpf_struct_ops_state state;
->>   };
->> +
->> +/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
->> + * the map's value exposed to the userspace and its btf-type-id is
->> + * stored at the map->btf_vmlinux_value_type_id.
->> + *
->> + */
->> +#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)            \
->> +extern struct bpf_struct_ops bpf_##_name;            \
-> 
-> Is it still needed?
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/75
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/76
 
-No, will remove it.
+but we never got an auto-MR for patch #3, and the pull request MR now
+conflicts because we applied the first two patches in the series from
+the individual patches.
 
-> 
->> +                                \
->> +struct bpf_struct_ops_##_name {                    \
->> +    struct bpf_struct_ops_common_value common;        \
->> +    struct _name data ____cacheline_aligned_in_smp;        \
->> +}
->> +
->> +extern int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc 
->> *st_ops_desc,
->> +                    struct btf *btf,
->> +                    struct bpf_verifier_log *log);
-> 
-> nit. Remove extern.
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/74
 
-Sure!
+Mario or I can fix this up, but in the future it'll just be easier if
+you send either a pull request or individual patches, not both.
 
-> 
->>   #endif /* CONFIG_BPF_JIT */
->>   #endif /* _LINUX_BPF_H */
-> 
+josh
+
+>
+>  WHENCE                                             |   8 ++++----
+>  ...e_comms-1.3.40.0.pkg =3D> ice_comms-1.3.45.0.pkg} | Bin 725428 -> 733=
+736 bytes
+>  ...1.3.10.0.pkg =3D> ice_wireless_edge-1.3.13.0.pkg} | Bin 725428 -> 737=
+832 bytes
+>  .../ice/ddp/{ice-1.3.30.0.pkg =3D> ice-1.3.35.0.pkg} | Bin 692660 -> 692=
+776 bytes
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>  rename intel/ice/ddp-comms/{ice_comms-1.3.40.0.pkg =3D> ice_comms-1.3.45=
+.0.pkg} (89%)
+>  rename intel/ice/ddp-wireless_edge/{ice_wireless_edge-1.3.10.0.pkg =3D> =
+ice_wireless_edge-1.3.13.0.pkg} (88%)
+>  rename intel/ice/ddp/{ice-1.3.30.0.pkg =3D> ice-1.3.35.0.pkg} (88%)
 
