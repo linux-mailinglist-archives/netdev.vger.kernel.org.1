@@ -1,215 +1,121 @@
-Return-Path: <netdev+bounces-50411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D997F5B09
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:26:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C837F5B20
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:36:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE11FB20C1B
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:26:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6578B20D8A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC98208BE;
-	Thu, 23 Nov 2023 09:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416661F19D;
+	Thu, 23 Nov 2023 09:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="IPQY3vK8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Urd7garV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4347DDD;
-	Thu, 23 Nov 2023 01:25:58 -0800 (PST)
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 528061186113;
-	Thu, 23 Nov 2023 12:25:55 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 528061186113
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1700731556; bh=lA6R2xYOxsaucfW0fbUZrtsLYzmnyeXkqpK0MlytNN0=;
-	h=From:To:CC:Subject:Date:From;
-	b=IPQY3vK8Xk6pKBcUeVa4PEQ45sGWgcixKAqzzCXFHr9EoPIuFjGtZ4N1lAlQegP6u
-	 lmL5QlhboKHYEC5+4KBuvsHATBL4awEQSHXCFjtUeyuAkYrHDLNT49f6Nl78UN1dpY
-	 wn/eCi0ttJS/lEv/duHH+fkaA70iYADFsGr+u2MI=
-Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 4F455312FFE4;
-	Thu, 23 Nov 2023 12:25:55 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Paul Moore <paul@paul-moore.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Huw Davies <huw@codeweavers.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-security-module@vger.kernel.org"
-	<linux-security-module@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v2] calipso: Fix memory leak in netlbl_calipso_add_pass()
-Thread-Topic: [PATCH net v2] calipso: Fix memory leak in
- netlbl_calipso_add_pass()
-Thread-Index: AQHaHe8PzUY9PMUIEUGPey0eifO26Q==
-Date: Thu, 23 Nov 2023 09:25:54 +0000
-Message-ID: <20231123092314.91299-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C2B1AE;
+	Thu, 23 Nov 2023 01:36:19 -0800 (PST)
+Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6d64c1155a8so429762a34.2;
+        Thu, 23 Nov 2023 01:36:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700732179; x=1701336979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dQhHNIKfWiIWad6NjUl3O8AGhzuURYHnVhK+SmvQomg=;
+        b=Urd7garV3JSeoh8vnLumPumoZFRb39usTX5jVzYuKhVXZlS0+aJHuQcUNROT8AQ8Ou
+         Vfx6qgDEhgxnVpA+NeRuUDdAf6/pw7Q2JxIXeQ4fcJVoWKqYWpre3Vl91Y7VnBz9TlTK
+         V7oJEGHIpQwS3Z1/t5BvtKCpLBdxgHCGs28VoWOpeXeuvRAQUwOXFXmHT1dgPkIXBlDf
+         mjsg2IQV0nIwi99Jwerpn1+enI3wzh+HMVcviqhObyW4dCW+u8HY2+fvAz/Y+FSTrXy5
+         q8QIPFUyEbIXDcA9VbCI20UhuEmN7ivQLD2kNEfA3O5eeIfW5+4RPeOGEJIsmExRm+25
+         ui/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700732179; x=1701336979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dQhHNIKfWiIWad6NjUl3O8AGhzuURYHnVhK+SmvQomg=;
+        b=nV/wH5ITCGEQckMFPEkwnMRs9GX8etQgu7Igb+v/rU1pibHwYgO2lqT3ZcKoac4qzc
+         dOABTQWj+DdAPEFGcpcMuqiS1pIzGgQ5g1ycJ88wf9fUO17QGC41PJMZ87OryDyN8XWp
+         pvQ6i2/NI+/aBQQGPdZJ68FypW9ZuluHiopN8H9uw2AfN+q/VLcDcBGVE2oMWBFCGrjO
+         Nzyh06JJvrLePamUqq31VTUbyevV4EZbB91bEsd/W0JZV+MLOgN98y0w6ny1dNxcuM3R
+         nakoWY6set7xi4/CymFhCB3Xu/meCWj3XCIA540uLizEMPLpiCk1k+kmQZ+vOap/gxX6
+         4SJg==
+X-Gm-Message-State: AOJu0Yz9Iqit1gxWllkZkU8PyYtp4db+z2c7urR37OTrj96a3cYAJN2c
+	m2HpAEfYpCoWnpAcljUKrOU=
+X-Google-Smtp-Source: AGHT+IEpKb2YEB93s5BEDe/ctdnNVWLRYV7AcKyFu0sGdgnl4YodP6t5BrbO/0iA6SuVCzPswe8etA==
+X-Received: by 2002:a9d:6857:0:b0:6d6:4b8b:baf1 with SMTP id c23-20020a9d6857000000b006d64b8bbaf1mr5427820oto.23.1700732178744;
+        Thu, 23 Nov 2023 01:36:18 -0800 (PST)
+Received: from localhost.localdomain ([74.48.130.204])
+        by smtp.googlemail.com with ESMTPSA id o13-20020a635a0d000000b005a9b20408a7sm922970pgb.23.2023.11.23.01.36.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 01:36:18 -0800 (PST)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net v1] net: stmmac: xgmac: Disable FPE MMC interrupts
+Date: Thu, 23 Nov 2023 17:35:38 +0800
+Message-Id: <20231123093538.2216633-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2023/11/23 07:58:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/11/23 06:11:00 #22507418
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 8bit
 
-If IPv6 support is disabled at boot (ipv6.disable=3D1),
-the calipso_init() -> netlbl_calipso_ops_register() function isn't called,
-and the netlbl_calipso_ops_get() function always returns NULL.
-In this case, the netlbl_calipso_add_pass() function allocates memory
-for the doi_def variable but doesn't free it with the calipso_doi_free().
+Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
+by default") leaves the FPE(Frame Preemption) MMC interrupts enabled.
+Now we disable FPE TX and RX interrupts too.
 
-BUG: memory leak
-unreferenced object 0xffff888011d68180 (size 64):
-  comm "syz-executor.1", pid 10746, jiffies 4295410986 (age 17.928s)
-  hex dump (first 32 bytes):
-    00 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<00000000730d8770>] kmalloc include/linux/slab.h:552 [inline]
-    [<00000000730d8770>] netlbl_calipso_add_pass net/netlabel/netlabel_cali=
-pso.c:76 [inline]
-    [<00000000730d8770>] netlbl_calipso_add+0x22e/0x4f0 net/netlabel/netlab=
-el_calipso.c:111
-    [<0000000002e662c0>] genl_family_rcv_msg_doit+0x22f/0x330 net/netlink/g=
-enetlink.c:739
-    [<00000000a08d6d74>] genl_family_rcv_msg net/netlink/genetlink.c:783 [i=
-nline]
-    [<00000000a08d6d74>] genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink.c:8=
-00
-    [<0000000098399a97>] netlink_rcv_skb+0x14d/0x440 net/netlink/af_netlink=
-.c:2515
-    [<00000000ff7db83b>] genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
-    [<000000000cf53b8c>] netlink_unicast_kernel net/netlink/af_netlink.c:13=
-13 [inline]
-    [<000000000cf53b8c>] netlink_unicast+0x54b/0x800 net/netlink/af_netlink=
-.c:1339
-    [<00000000d78cd38b>] netlink_sendmsg+0x90a/0xdf0 net/netlink/af_netlink=
-.c:1934
-    [<000000008328a57f>] sock_sendmsg_nosec net/socket.c:651 [inline]
-    [<000000008328a57f>] sock_sendmsg+0x157/0x190 net/socket.c:671
-    [<000000007b65a1b5>] ____sys_sendmsg+0x712/0x870 net/socket.c:2342
-    [<0000000083da800e>] ___sys_sendmsg+0xf8/0x170 net/socket.c:2396
-    [<000000004a9b827f>] __sys_sendmsg+0xea/0x1b0 net/socket.c:2429
-    [<0000000061b64d3a>] do_syscall_64+0x30/0x40 arch/x86/entry/common.c:46
-    [<00000000a1265347>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
-
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with Syzkaller
-
-Fixes: cb72d38211ea ("netlabel: Initial support for the CALIPSO netlink pro=
-tocol.")
-Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
+Signed-off-by: Furong Xu <0x1207@gmail.com>
 ---
-v2:
-  - return the error code in netlbl_calipso_add() if the variable calipso_h=
-ops is NULL
-v1: https://lore.kernel.org/all/20231122135242.2779058-1-Ilia.Gavrilov@info=
-tecs.ru/
+ drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- net/netlabel/netlabel_calipso.c | 49 +++++++++++++++++----------------
- 1 file changed, 26 insertions(+), 23 deletions(-)
-
-diff --git a/net/netlabel/netlabel_calipso.c b/net/netlabel/netlabel_calips=
-o.c
-index f1d5b8465217..a07c2216d28b 100644
---- a/net/netlabel/netlabel_calipso.c
-+++ b/net/netlabel/netlabel_calipso.c
-@@ -54,6 +54,28 @@ static const struct nla_policy calipso_genl_policy[NLBL_=
-CALIPSO_A_MAX + 1] =3D {
- 	[NLBL_CALIPSO_A_MTYPE] =3D { .type =3D NLA_U32 },
- };
-=20
-+static const struct netlbl_calipso_ops *calipso_ops;
-+
-+/**
-+ * netlbl_calipso_ops_register - Register the CALIPSO operations
-+ * @ops: ops to register
-+ *
-+ * Description:
-+ * Register the CALIPSO packet engine operations.
-+ *
-+ */
-+const struct netlbl_calipso_ops *
-+netlbl_calipso_ops_register(const struct netlbl_calipso_ops *ops)
-+{
-+	return xchg(&calipso_ops, ops);
-+}
-+EXPORT_SYMBOL(netlbl_calipso_ops_register);
-+
-+static const struct netlbl_calipso_ops *netlbl_calipso_ops_get(void)
-+{
-+	return READ_ONCE(calipso_ops);
-+}
-+
- /* NetLabel Command Handlers
-  */
- /**
-@@ -96,15 +118,18 @@ static int netlbl_calipso_add_pass(struct genl_info *i=
-nfo,
-  *
-  */
- static int netlbl_calipso_add(struct sk_buff *skb, struct genl_info *info)
--
+diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+index ea4910ae0921..cdd7fbde2bfa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+@@ -177,8 +177,10 @@
+ #define MMC_XGMAC_RX_DISCARD_OCT_GB	0x1b4
+ #define MMC_XGMAC_RX_ALIGN_ERR_PKT	0x1bc
+ 
++#define MMC_XGMAC_FPE_TX_INTR_MASK	0x204
+ #define MMC_XGMAC_TX_FPE_FRAG		0x208
+ #define MMC_XGMAC_TX_HOLD_REQ		0x20c
++#define MMC_XGMAC_FPE_RX_INTR_MASK	0x224
+ #define MMC_XGMAC_RX_PKT_ASSEMBLY_ERR	0x228
+ #define MMC_XGMAC_RX_PKT_SMD_ERR	0x22c
+ #define MMC_XGMAC_RX_PKT_ASSEMBLY_OK	0x230
+@@ -352,6 +354,8 @@ static void dwxgmac_mmc_intr_all_mask(void __iomem *mmcaddr)
  {
- 	int ret_val =3D -EINVAL;
- 	struct netlbl_audit audit_info;
-+	const struct netlbl_calipso_ops *ops =3D netlbl_calipso_ops_get();
-=20
- 	if (!info->attrs[NLBL_CALIPSO_A_DOI] ||
- 	    !info->attrs[NLBL_CALIPSO_A_MTYPE])
- 		return -EINVAL;
-=20
-+	if (!ops)
-+		return -EOPNOTSUPP;
-+
- 	netlbl_netlink_auditinfo(&audit_info);
- 	switch (nla_get_u32(info->attrs[NLBL_CALIPSO_A_MTYPE])) {
- 	case CALIPSO_MAP_PASS:
-@@ -363,28 +388,6 @@ int __init netlbl_calipso_genl_init(void)
- 	return genl_register_family(&netlbl_calipso_gnl_family);
+ 	writel(0x0, mmcaddr + MMC_RX_INTR_MASK);
+ 	writel(0x0, mmcaddr + MMC_TX_INTR_MASK);
++	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_TX_INTR_MASK);
++	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_RX_INTR_MASK);
+ 	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_IPC_INTR_MASK);
  }
-=20
--static const struct netlbl_calipso_ops *calipso_ops;
--
--/**
-- * netlbl_calipso_ops_register - Register the CALIPSO operations
-- * @ops: ops to register
-- *
-- * Description:
-- * Register the CALIPSO packet engine operations.
-- *
-- */
--const struct netlbl_calipso_ops *
--netlbl_calipso_ops_register(const struct netlbl_calipso_ops *ops)
--{
--	return xchg(&calipso_ops, ops);
--}
--EXPORT_SYMBOL(netlbl_calipso_ops_register);
--
--static const struct netlbl_calipso_ops *netlbl_calipso_ops_get(void)
--{
--	return READ_ONCE(calipso_ops);
--}
--
- /**
-  * calipso_doi_add - Add a new DOI to the CALIPSO protocol engine
-  * @doi_def: the DOI structure
---=20
-2.39.2
+ 
+-- 
+2.34.1
+
 
