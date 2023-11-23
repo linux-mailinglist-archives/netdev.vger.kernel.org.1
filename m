@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-50427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C407F5C2F
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:21:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46677F5C39
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2340EB20EE8
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:21:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F751281885
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4086F224C2;
-	Thu, 23 Nov 2023 10:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8B8224E8;
+	Thu, 23 Nov 2023 10:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FW7LZry9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c1w5lpwk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45656BC
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 02:21:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700734901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sgtmdSW98J90Kfrs7HiPvT9RZVZuwuMmB0Gp4wHhzs0=;
-	b=FW7LZry9+savVC1KQEIigDUnKjwFpVD/3px2n//2/5iRtkkqPQve1zPM/BUgZzo7T3rMK4
-	I+2bGQKqupH3Cw5eHEqAOzlhkB1Wvo8lLPT8C9OcqRroBhD9bzi04CBqfJVOb/duf4eAWR
-	PBDUg93YdejCk3uImmcgxDfRdQxihqY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-26-ZK3z91azPoWhGsKRoJSaoA-1; Thu, 23 Nov 2023 05:21:40 -0500
-X-MC-Unique: ZK3z91azPoWhGsKRoJSaoA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a03389a0307so9757466b.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 02:21:39 -0800 (PST)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E16F92;
+	Thu, 23 Nov 2023 02:24:17 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-da819902678so706064276.1;
+        Thu, 23 Nov 2023 02:24:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700735056; x=1701339856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MQufmsQMrPSkS7WJd7xjAFVYdq3ncbNsEnifCOHUlJ4=;
+        b=c1w5lpwkBRCalQEcDHdI5znR7E4SfdUccIlrGeuryHTZ9ycpxEMi0dNR743VX7SkRI
+         wsjm1Di/y+kdmxlyV5+mvfCFTajFb8GYpVcU/xvbpFQ5iFMC9xaiTZ6xnr14QuVrZ1hB
+         cnHzD2XlKFASImIzChCPYDKS8aifhwBONlHYZOWOfG4Ph56FXk3TVDZ1EQbjKCgdzXct
+         ufcp5rXl0Jhx+rBhkhyPSFZLry3tPwPyZmTL07UZu4ncO2cmWVkK6yzP+vR4ohaBcAoz
+         Mf+SDCKIgu9PrFan10S/GM6YITkllDZQOhUKKBzr5+f2JqlWOoOom7OmagDIlH/bqC8V
+         uk7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700734899; x=1701339699;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sgtmdSW98J90Kfrs7HiPvT9RZVZuwuMmB0Gp4wHhzs0=;
-        b=aPpbESfnxfyfeqGM/jaCAcJ1ELBpQqutwKtsQ3JYcPUnqQCy0QUz0O66p3o3dUOg0i
-         zJynfdUsdqvRkN4/9sw3ljIsUwqLrOY8NlqtImnGGbZ1DzsbfszSpEPScVj9I2VH1ESO
-         g1nyJOYc0QcjZ/HL4+ghia2lEN0RlXWURrjBDP5vh/23hMnXA4VXlt3Za4s8Bq5G8cKF
-         L2zsSGkqYMzqNkS3T0rn1Z3w0nAwA6dCZseuvYf6mMrJ6T8viQpmhOsWUXWY8PJGBzVL
-         f41lf+97cY9ZQPHEVnxXZ/BurTSgZc++nkAvkzyo0i52L3Kmz/vz63/uW0izPIf7Y2mM
-         /61g==
-X-Gm-Message-State: AOJu0YzeeFOccT2WInMAoWJf7byUIu2RDGbb/a4WJ2xDWraMwhdhF3Tm
-	euPP1eAbOaEYjBoY2FtQXvXfTZMe/yFQVmTD2nq3IxyLxPwOKVcV3huFQXPNuC2k0sm0dY1muVl
-	kQqIjV99ENNQJd2xA
-X-Received: by 2002:a17:906:10cd:b0:a01:8f8c:ea9 with SMTP id v13-20020a17090610cd00b00a018f8c0ea9mr2938367ejv.7.1700734898915;
-        Thu, 23 Nov 2023 02:21:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH9/qQ+NdZJcbqQ0VKAwLvuSjGjtIxOO3YUeVJI75tXFZhR3SCYSFE8g8GINDJP9qeeh8oRbA==
-X-Received: by 2002:a17:906:10cd:b0:a01:8f8c:ea9 with SMTP id v13-20020a17090610cd00b00a018f8c0ea9mr2938353ejv.7.1700734898554;
-        Thu, 23 Nov 2023 02:21:38 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-213.dyn.eolo.it. [146.241.241.213])
-        by smtp.gmail.com with ESMTPSA id ay8-20020a170906d28800b009b928eb8dd3sm587756ejb.163.2023.11.23.02.21.37
+        d=1e100.net; s=20230601; t=1700735056; x=1701339856;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MQufmsQMrPSkS7WJd7xjAFVYdq3ncbNsEnifCOHUlJ4=;
+        b=LgSYqmBqQTOkQax1fnDpCSglxlCu7Std3n2vybwADUutF80yDnIrUCI3jPvkjZgslK
+         xUNcoz7YISrA5VhdAtsqepQLbA9HKJ2Hr7eGSNxXhx9bs1t2nQrC+65iD93WreQf15iB
+         f6bnDb0OL7wQck+1sAdnsLubXl8upcJzXJw4ckq7tF62uwZSiaFKnLjfmZmGs52hBOvf
+         13tEK0U/3RlYY62yn4qVqXJqkuOJWTy7UHBrVA2RO6zzrBYvgkZGXcSyyfR9+oRY4PZ7
+         cuI0R003Ykn0IRLhW9ObJYJZnCLeph70XSFYEm18PCAuovI6lkViJ+qfJAGBFZNpjuQ6
+         joQA==
+X-Gm-Message-State: AOJu0YzJpXUFdO97JKQbzxSqn+pKBanfVs56M1zoIdazOqQ9XLN2V5Iv
+	JedOZmd75KYxEc9xqFHwuh0=
+X-Google-Smtp-Source: AGHT+IENgIG/WZEXSmFCwcoG/xkUbrQpBfoOkPI+26QxfSOl6uNAZx8VFJ+tevbjUvS1yTo6nh0i8g==
+X-Received: by 2002:a25:b309:0:b0:d91:c3fe:6144 with SMTP id l9-20020a25b309000000b00d91c3fe6144mr4983504ybj.3.1700735056068;
+        Thu, 23 Nov 2023 02:24:16 -0800 (PST)
+Received: from localhost ([74.48.130.204])
+        by smtp.gmail.com with ESMTPSA id z6-20020a256646000000b00da0c63aa9f1sm237492ybm.20.2023.11.23.02.24.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 02:21:38 -0800 (PST)
-Message-ID: <92d95955f66098ce725729243251beacc2823a81.camel@redhat.com>
-Subject: Re: [net-next PATCH v3 2/2] octeontx2-pf: TC flower offload support
- for mirror
-From: Paolo Abeni <pabeni@redhat.com>
-To: Wojciech Drewek <wojciech.drewek@intel.com>, Suman Ghosh
- <sumang@marvell.com>, sgoutham@marvell.com, gakula@marvell.com, 
- sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
- edumazet@google.com,  kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  lcherian@marvell.com, jerinj@marvell.com,
- horms@kernel.org
-Date: Thu, 23 Nov 2023 11:21:36 +0100
-In-Reply-To: <ee30eaa0-2a1f-4dc6-8e03-c2d993eb159a@intel.com>
-References: <20231121094346.3621236-1-sumang@marvell.com>
-	 <20231121094346.3621236-3-sumang@marvell.com>
-	 <ee30eaa0-2a1f-4dc6-8e03-c2d993eb159a@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Thu, 23 Nov 2023 02:24:15 -0800 (PST)
+Date: Thu, 23 Nov 2023 18:24:05 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+ <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <xfr@outlook.com>, <rock.xu@nio.com>
+Subject: Re: [PATCH net v1] net: stmmac: xgmac: Disable FPE MMC interrupts
+Message-ID: <20231123182405.00006454@gmail.com>
+In-Reply-To: <2c2d0641-002c-4ce6-9df4-bc633e602721@intel.com>
+References: <20231123093538.2216633-1-0x1207@gmail.com>
+	<2c2d0641-002c-4ce6-9df4-bc633e602721@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2023-11-21 at 15:48 +0100, Wojciech Drewek wrote:
->=20
-> On 21.11.2023 10:43, Suman Ghosh wrote:
-> > This patch extends TC flower offload support for mirroring
-> > ingress/egress traffic to a different PF/VF. Below is an example
-> > command,
-> >=20
-> > 'tc filter add dev eth1 ingress protocol ip flower src_ip <ip-addr>
-> > skip_sw action mirred ingress mirror dev eth2'
-> >=20
-> > Signed-off-by: Suman Ghosh <sumang@marvell.com>
->=20
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+On Thu, 23 Nov 2023 11:17:17 +0100
+Wojciech Drewek <wojciech.drewek@intel.com> wrote:
 
-Thank you for your review!
+> On 23.11.2023 10:35, Furong Xu wrote:
+> > Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
+> > by default") leaves the FPE(Frame Preemption) MMC interrupts enabled.
+> > Now we disable FPE TX and RX interrupts too.  
+> 
+> Hi,
+> Thanks for the patch, one question:
+> Why do we have to disable them?
+> 
 
-Please, additionally try to trim away the irrelevant part of the patch
-when replying (in this case almost everything). That helps a lot
-following the discussion, especially on long patches, thanks!
+The original commit aeb18dd07692 by Jose Abreu says:
 
-@Suman: please retain Wojciech's tag on next revision of this series.
+    MMC interrupts were being enabled, which is not what we want because it
+    will lead to a storm of interrupts that are not handled at all. Fix it
+    by disabling all MMC interrupts for XGMAC.
 
-Cheers,
-
-Paolo
+> > 
+> > Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
+> > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> > index ea4910ae0921..cdd7fbde2bfa 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> > @@ -177,8 +177,10 @@
+> >  #define MMC_XGMAC_RX_DISCARD_OCT_GB	0x1b4
+> >  #define MMC_XGMAC_RX_ALIGN_ERR_PKT	0x1bc
+> >  
+> > +#define MMC_XGMAC_FPE_TX_INTR_MASK	0x204
+> >  #define MMC_XGMAC_TX_FPE_FRAG		0x208
+> >  #define MMC_XGMAC_TX_HOLD_REQ		0x20c
+> > +#define MMC_XGMAC_FPE_RX_INTR_MASK	0x224
+> >  #define MMC_XGMAC_RX_PKT_ASSEMBLY_ERR	0x228
+> >  #define MMC_XGMAC_RX_PKT_SMD_ERR	0x22c
+> >  #define MMC_XGMAC_RX_PKT_ASSEMBLY_OK	0x230
+> > @@ -352,6 +354,8 @@ static void dwxgmac_mmc_intr_all_mask(void __iomem *mmcaddr)
+> >  {
+> >  	writel(0x0, mmcaddr + MMC_RX_INTR_MASK);
+> >  	writel(0x0, mmcaddr + MMC_TX_INTR_MASK);
+> > +	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_TX_INTR_MASK);
+> > +	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_RX_INTR_MASK);
+> >  	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_IPC_INTR_MASK);
+> >  }
+> >    
 
 
