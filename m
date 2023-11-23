@@ -1,129 +1,190 @@
-Return-Path: <netdev+bounces-50391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929F87F5898
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:49:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E5737F58A8
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F4C2817F3
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:48:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B6B1C20AC4
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD10E13ACF;
-	Thu, 23 Nov 2023 06:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE9111CBA;
+	Thu, 23 Nov 2023 06:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Dr8CYgpK"
+	dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b="ie5yd6zc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA7DD65;
-	Wed, 22 Nov 2023 22:48:45 -0800 (PST)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN673xL022428;
-	Thu, 23 Nov 2023 06:48:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=PebG66nNXdJqRLMDAouFU9NILNjxdAS5y+T4OOtpBN0=;
- b=Dr8CYgpKMLiqaOweakIS2D8QR96DMae2UZpoZGHliqBmtHBW9vfLMuS4xD3xo7iRcBzJ
- RtWBmVcG57YDJB0A108xBrLJ+4PYlQ4Ger1JNmlBvQ/MQ+JFu8wGuWulyZtzbFHFZh0m
- 64x8o5Ruk2HprkPdPKXz5sbz4+fPiDmbxmk01nGZnjjiUfjJGpM9eYrxw1he5AbqJ7eo
- oLa2XOZjMPYi/jPVmjpQWKiX6Yq+pXEB8IPxGIpuJTl0vSGBOoyPzKFMiPwZTPYPPUxI
- 3I96LA/J6faqVG4XMQU2uW3FlGyT+eiGBJUPjbT3UDEwuqitphYr5K0UXzKOWjH4v5bl Ig== 
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhr5ps4j0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 06:48:41 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AN6memc023408
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Nov 2023 06:48:40 GMT
-Received: from hu-imrashai-hyd.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 22 Nov 2023 22:48:35 -0800
-From: Imran Shaik <quic_imrashai@quicinc.com>
-To: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>
-CC: Taniya Das <quic_tdas@quicinc.com>,
-        Imran Shaik
-	<quic_imrashai@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Ajit Pandey
-	<quic_ajipan@quicinc.com>,
-        Jagadeesh Kona <quic_jkona@quicinc.com>
-Subject: [PATCH V5 4/4] arm64: dts: qcom: qdu1000: Add ECPRI clock controller
-Date: Thu, 23 Nov 2023 12:17:35 +0530
-Message-ID: <20231123064735.2979802-5-quic_imrashai@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231123064735.2979802-1-quic_imrashai@quicinc.com>
-References: <20231123064735.2979802-1-quic_imrashai@quicinc.com>
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2131.outbound.protection.outlook.com [40.107.20.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28FB7B0;
+	Wed, 22 Nov 2023 22:54:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U0v+ve5CWbl7sEoF/M2AE5s2kCJTH1Z0IDdewUihAI8mty2HCpBuurQ7HIU6ZtdrC9xX9G39y0iWrJf6hBY/BEEO9UvY/Zc+OLtlCZ8/n76pvSbWBdunlsdgFnxcHm6Gl5IUlwrBdW4lHxvFAsMojtK2XqhsKhm8LsS0tlFLiSWB/icIS+c9eZl4R1HrgaKM9J+u52p49kwXzEV9wWdblag2V2UgsDap22ndKBpgNE2WB8iZRnabY41ktOwgu81kPK63N8QqrGm0WxxE7VjORKlWRQALyuhR2mRLRDNDRsk20srzk4QU1CrifNyrAsFRzPPnbmIFzcdKMw07Oas3uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0Ztm5aQl5umJMyGv5QHBoFyn1RQNAHQwCYaNbcFcqI0=;
+ b=SzbAkDX+RlXktRW1UyHyqZtFNFEJjEH2GeljlH6xVuaF85B+rNNBEOC2RXEsXRkn8VBTL2yX6mY/oCigecHj5HA2TIrajoS0U2RbhBnaGox2KaHDDaGss9Uq5Fmt5rdibDkg8XG8wPBBSrw88pEvpzS2N7Kbu6TkdcpE1oiVfXaQfWabL1LX9iGMArWW4Zw/k0YtjrUwagFog4A9H9Rlb78WBbIQwVoj6O/5CbR+LmOA+ynsGLug5wtLQr0tItdXztBMwKzGH9EC3Z2qtxcF33upg/N/jhuxGUpm7sjk+gpnGKoGBEJSsPSQ4LSgHOWaUbPkxXYFOdCz9fUoJBEPSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=dektech.com.au; dmarc=pass action=none
+ header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0Ztm5aQl5umJMyGv5QHBoFyn1RQNAHQwCYaNbcFcqI0=;
+ b=ie5yd6zcTePuQlgPImOU47EiTMWHZUCWCVSIa4Vx56h2km4e8rNhs9cXBoIggwXq9dxfy7k27xEGOeKO8HCBFTMaX/sMscWihO/0f84TAiPtzcffnoz4d8vu7WbACzd9AP75TH9SjjIfYJF7T1rg+u3YAfEVi41F37ETRbuk1Aum6q2HcL/v8P/TnnHP047Vor765ByXihi2OeZJOrpFGRLDWX3Xz0B+REY4ai/gkalzAfH5O50IOGvcFSgMMrp361FP65RyNaRcwty0yZQ2BK7exlR2I+VjgMf9otbpZ2dayE8ktFmlBrLIhFrKICreR1PiHhjZf5XVdV/F0Wy/Fw==
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com (2603:10a6:10:36a::7)
+ by AS8PR05MB7638.eurprd05.prod.outlook.com (2603:10a6:20b:239::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.18; Thu, 23 Nov
+ 2023 06:54:11 +0000
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::c9ed:567d:143e:af2b]) by DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::c9ed:567d:143e:af2b%5]) with mapi id 15.20.7025.017; Thu, 23 Nov 2023
+ 06:54:11 +0000
+From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+To: xu <xu.xin.sc@gmail.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "jmaloy@redhat.com"
+	<jmaloy@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "xu.xin16@zte.com.cn"
+	<xu.xin16@zte.com.cn>, "ying.xue@windriver.com" <ying.xue@windriver.com>,
+	"yang.yang29@zte.com.cn" <yang.yang29@zte.com.cn>
+Subject: RE: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
+ tipc_rcv
+Thread-Topic: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
+ tipc_rcv
+Thread-Index: AQHaHbcmsQ7KURUzRkaicoeZO+zrDrCHRXnwgAAp2oCAAAQK0A==
+Date: Thu, 23 Nov 2023 06:54:11 +0000
+Message-ID:
+ <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+References:
+ <DB9PR05MB9078636E4D78B9F4442898B088B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+ <20231123062205.2038335-1-xu.xin16@zte.com.cn>
+In-Reply-To: <20231123062205.2038335-1-xu.xin16@zte.com.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=dektech.com.au;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR05MB9078:EE_|AS8PR05MB7638:EE_
+x-ms-office365-filtering-correlation-id: d5c51e34-1e96-4941-7211-08dbebf0ff62
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ uDhJICY5Fy2vNXXxC35/YDe2XwlqnHmbajy+4KCYU/5wA5fvTkFw8sL7LClqBAupabnehMgjYD/omLUV19cm6cjItbR3ydPrHlxLb71aenMY02U0YuDVB4ecJZZAHKrFPAPasRv9VwR2fvVXzvMIpvqnBbebe6u7epBF/NrI+kuvHfv7uIzZ2YO6jttvo7toRb4JisfVCAzWT2aF/t6UeVAib6DY47ywSiqCZFP7QzF4VGmVb6CXfAsaUBw7EUT6omWYmEnMADDfqzjRX7NkC0NOaPZLBH1Ra4nNue33b3UyyJnk1WVGbI1SXbS9ekajA7C5j02tG3WbFTEgW25pg0F3AGodDAy2ye/VyJlSqR03rORzl3XH2LbUeQl/yxREW4v0Op752W5CKkS1tXhLzPIP1ed8/99OPRHRe5zG5pXYSSbRKQeBMxcrJhfFkEMgnvogKDQpRW7r4FwllohE5DEbnknDikLjfCOKx7y/1oPhQcaHywKE8zZFHy3XkGOZYeAIb7Kfi/FCraNjBVNlPv3bcf/rqOD5xvr04i/zLkIdgNTv9eyiz6HVQjNfppgjOD4jcq4FGmvromayYzaZrseyNXVWeqIlkmxQD9yc9Wg=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR05MB9078.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(39840400004)(366004)(346002)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(9686003)(7696005)(6506007)(6916009)(71200400001)(83380400001)(8936002)(4326008)(41300700001)(8676002)(52536014)(2906002)(478600001)(5660300002)(316002)(26005)(54906003)(66556008)(64756008)(66446008)(66476007)(66946007)(76116006)(86362001)(33656002)(38100700002)(122000001)(38070700009)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ZP3EMBUIwKNPlOKg/R7WIExGDywlzOqRWDVqXPThxbjs3si3TAFPof6lTJv5?=
+ =?us-ascii?Q?IyZD8oYL4RlD1PeB8RJkzfKUiYNke9OgOYyxGDBJpEu2Ir+Lz8tKy4qq8dbG?=
+ =?us-ascii?Q?y1uFAgiKBjXXJ6Oi3pQDbMSQenh6fnk55/HFrnPgfX7wiIZmHs3OTiiJWYnM?=
+ =?us-ascii?Q?qwf9jMBWQu6QVBtqdWA2PRW0hGLtTQOs6yHTUElCFVdmlTL+SRDakLaOSxB+?=
+ =?us-ascii?Q?Jq+0oyRWKKMW4aGHywxhOBFxLoNGVuaUnTIDX+mEGL+DtdONbPGsnybVEStx?=
+ =?us-ascii?Q?TDpb9t5GleC5GkdO8Y1F5qil2iKGdP0zQ729QvUUZjozRignYV4BGGL4+ubx?=
+ =?us-ascii?Q?sI7gYFWiXCSYfOeZAlOLQlGBYjjLX8C6QCQ/5Tn1jJTIfJinY0DSp5yvJwGR?=
+ =?us-ascii?Q?xo3I6n2RxbS0R/skVHV7jQPLSniYLVUbdxi2VyIKMihpgZaVFSoMLUt3tQ/B?=
+ =?us-ascii?Q?WcCZkhV5jSxoRHYF6f/EexUubV0eUBW+Tq5ElK1sF93OfLLjxcymd2dqRtps?=
+ =?us-ascii?Q?45jsEDjw+SkTmhZiOmZWYuhUbAjavk4A/FmKBz0Uzahain1pQ5NBu1RcwAUU?=
+ =?us-ascii?Q?nXJ+QRcZbG1np4M3ZjkZfVh2WKMD0wp7mJGP3I26xZKb0cPXbRW92BMm8Rtb?=
+ =?us-ascii?Q?qIXoiBVCrkVoovyXKJH2ARu8WwCKDMPsm9O92wvc1Jj2xEpge8i4DygWsU3H?=
+ =?us-ascii?Q?41oXJSOkRfDksExGcMJGWDMNoCAiYl3uwYIfecJ/Iuw41udJheKbJIt9kR9x?=
+ =?us-ascii?Q?7g42Xq8RFdGn/ip0ZfPqxCckvw1nHwLnZJMomXchiViuf9knfJPtly2saYGn?=
+ =?us-ascii?Q?3K1HEZ3hYtsWdoORcoQBI447jkeURkZxrgatlzDXdipkujWUUsVeW8z9YUjH?=
+ =?us-ascii?Q?aNBwnDAUQCwEzfA28KXDt5mxH85oQSLz6LfAZzCsrXEjqO4FD1+/k/Fe+Rmh?=
+ =?us-ascii?Q?DpTast96xbosIq0Hfv7WL4jNcOz8V3emVSGbZXJjAJ44hSBDiO2qxoCG0Qr6?=
+ =?us-ascii?Q?E5w8cXFOdmBsVc+TgGMPA6/8VeAOepBtMB/G2mR1XKEj05dDMcKpNrYkeOhH?=
+ =?us-ascii?Q?abohTu74vYx+iCposu8Vr1fFWaGruiWG9xemjucA0r4wPzNT5RAXvoVwAfy4?=
+ =?us-ascii?Q?8Frwp9H/VE1TXNvpvEoEMUa7x4TDUXjbqOJ6mTJPfPBt0co7kfGhkR058Y8Q?=
+ =?us-ascii?Q?W6AvuQXpRLRj29/3Pp6L49czRpLXwvTeoueemfvaYnqdpaEfBwLP2CCq1shi?=
+ =?us-ascii?Q?6iW0FmmPz+NLZTqgDDf3yRelEzu6y8gniQB3REZ+NPVQ5LQS8B1074uL/6KT?=
+ =?us-ascii?Q?IRo+uZXJdrjKtvVJdEtctToXgg7Gysk2JLUM0lhe0nBhiYpjm5m8GPRD3DHQ?=
+ =?us-ascii?Q?aaQAWUsrTc36mq+46r9+WWdU7xiz56pSQne4cyADebC3ImNRF3HbDZhWI0lR?=
+ =?us-ascii?Q?HTje46NF94IGdfSFmuUDjKKZ7y1hm4FWibQWxAM+se/6mD+dmYzEyQGSHX0S?=
+ =?us-ascii?Q?uDptwY7yMmjVtPigFHQvpgQUdJUjv+L5tA3TzHQMjkv6/eLhRAfd30LjldnW?=
+ =?us-ascii?Q?G/2SRE93O8mj1zupZPvp5evtDoiVsVOa9z2PG2sIBMHPxlu/SrrdzsXJ/yej?=
+ =?us-ascii?Q?lg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Cr1-Y6KOojiFao7kRhi4sgd4fQnxgeW6
-X-Proofpoint-ORIG-GUID: Cr1-Y6KOojiFao7kRhi4sgd4fQnxgeW6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_03,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- phishscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1015 mlxlogscore=845
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311230046
+X-OriginatorOrg: dektech.com.au
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR05MB9078.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5c51e34-1e96-4941-7211-08dbebf0ff62
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2023 06:54:11.2169
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: d2yF0tFyOTFFZVhkH1D4Z1I4VB0MujPuQGEDTOwjyX7AhHagl7XHB5JEMNMu6n9RIc3Giudw7zglI5qJtEtmqdcmohWLLGoAmqhFZTgAvHs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR05MB7638
 
-Add device node for ECPRI clock controller on qcom QDU1000
-and QRU1000 SoCs.
+>>This patch is wrong. le->link and link status must be protected by node l=
+ock. See what happens if tipc_node_timeout() is called, and
+>the link goes down:
+>>tipc_node_timeout()
+>>   tipc_node_link_down()
+>>   {
+>>      struct tipc_link *l =3D le->link;
+>>      ...
+>>      if (delete) {
+>>         kfree(l);
+>>         le->link =3D NULL;
+>>      }
+>>      ...
+>>   }
+>
+>Happy to see your reply. But Why? 'delete' is false from tipc_node_timeout=
+(). Refer to:
+>https://elixir.bootlin.com/linux/v6.7-rc2/source/net/tipc/node.c#L844
+I should have explained it clearly:
+1/ link status must be protected.
+tipc_node_timeout()
+   tipc_node_link_down()
+   {
+      struct tipc_link *l =3D le->link;
+  =20
+      ...
+     __tipc_node_link_down(); <-- link status is referred.=20
+      ...
+     if (delete) {
+        kfree(l);
+        le->link =3D NULL;
+     }
+     ...
+   }
 
-Signed-off-by: Imran Shaik <quic_imrashai@quicinc.com>
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
----
- arch/arm64/boot/dts/qcom/qdu1000.dtsi | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+__tipc_node_link_down()
+{
+    ...
+   if (!l || tipc_link_is_reset(l)) <-- read link status
+    ...
+    tipc_link_reset(l); <--- this function will reset all things related to=
+ link.
+}
 
-diff --git a/arch/arm64/boot/dts/qcom/qdu1000.dtsi b/arch/arm64/boot/dts/qcom/qdu1000.dtsi
-index 1c0e5d271e91..1552b5c119bb 100644
---- a/arch/arm64/boot/dts/qcom/qdu1000.dtsi
-+++ b/arch/arm64/boot/dts/qcom/qdu1000.dtsi
-@@ -381,6 +381,20 @@ gcc: clock-controller@80000 {
- 			#power-domain-cells = <1>;
- 		};
- 
-+		ecpricc: clock-controller@280000 {
-+			compatible = "qcom,qdu1000-ecpricc";
-+			reg = <0x0 0x00280000 0x0 0x31c00>;
-+			clocks = <&rpmhcc RPMH_CXO_CLK>,
-+				 <&gcc GCC_ECPRI_CC_GPLL0_CLK_SRC>,
-+				 <&gcc GCC_ECPRI_CC_GPLL1_EVEN_CLK_SRC>,
-+				 <&gcc GCC_ECPRI_CC_GPLL2_EVEN_CLK_SRC>,
-+				 <&gcc GCC_ECPRI_CC_GPLL3_CLK_SRC>,
-+				 <&gcc GCC_ECPRI_CC_GPLL4_CLK_SRC>,
-+				 <&gcc GCC_ECPRI_CC_GPLL5_EVEN_CLK_SRC>;
-+			#clock-cells = <1>;
-+			#reset-cells = <1>;
-+		};
-+
- 		gpi_dma0: dma-controller@900000  {
- 			compatible = "qcom,qdu1000-gpi-dma", "qcom,sm6350-gpi-dma";
- 			reg = <0x0 0x900000 0x0 0x60000>;
--- 
-2.25.1
+2/ le->link must be protected.
+bearer_disable()
+{
+   ...
+   tipc_node_delete_links(net, bearer_id); <--- this will delete all links.
+   ...
+}
 
+tipc_node_delete_links()
+{
+   ...
+  tipc_node_link_down(n, bearer_id, true);
+   ...
+}
 
