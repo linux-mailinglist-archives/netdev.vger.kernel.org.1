@@ -1,102 +1,115 @@
-Return-Path: <netdev+bounces-50570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D747F624E
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:07:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 405837F6267
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:11:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 945FB281BC0
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:07:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1AA2281B25
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 15:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9992E2E822;
-	Thu, 23 Nov 2023 15:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4B63418D;
+	Thu, 23 Nov 2023 15:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ljBTLiaf"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="ldaRZ7HM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE43D41;
-	Thu, 23 Nov 2023 07:07:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9Ianm+oK/3Nrdav46TrJiBmP/52mNqCzayho+jiWIkU=; b=ljBTLiaf1hJ76JNKk8LoCzMwbV
-	ZcJZ6xDa65NxGWrtUcU+4hzgpRmHVIZ6Fceuf3Ba86xE0awdKaDt9XttJ7Q5OMuZ6zw8weIkusY+o
-	ZacLC42AjFuLQvez3RIj8MXx51Ugy6QIp0O9ZhH0Rw5N/CQ74oOBupwnOruQ313iegow=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r6BIQ-0010N2-G5; Thu, 23 Nov 2023 16:07:14 +0100
-Date: Thu, 23 Nov 2023 16:07:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <6eb2e061-5fcb-434a-ad43-370788075597@lunn.ch>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
- <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
- <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4328ED41;
+	Thu, 23 Nov 2023 07:11:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1700752303; x=1732288303;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vCSREdmF12ciPak77XKfEYKvFPyB+qsBWRT/VsT3I0Q=;
+  b=ldaRZ7HMIdDD20NNTPBtwZjx1uGRuPwaVblZqBnYA4pT8cEI6hj4R9Db
+   VyfDkO252wG+gppwYM0X7gBTG41w8Uu4kPdpKAg4EwwKjX3Fnj74v4ts0
+   c0caHSWmnPXIsqlxEHd2Zl30K/aoJ9T9YNG3oG9hKKmygOEpnH1XWluQr
+   UsoToHGwSFjrDVu/l0Ttp3KqDgL94JJwf80BigM2WXmdzIvfCZxiWMXdy
+   qjMyU9w1bbEwFt9DkIa+TxoXJeupKWLK7cAdbpGy9v5L5sP6RpwyO33gd
+   QQ8LmHmIzw/NQJYOCw3MP1RwCHlzfmci8g3SmQf+d6p+01QPjes2Zo32y
+   w==;
+X-IronPort-AV: E=Sophos;i="6.04,222,1695679200"; 
+   d="scan'208";a="34146043"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 23 Nov 2023 16:11:41 +0100
+Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 119CF280075;
+	Thu, 23 Nov 2023 16:11:41 +0100 (CET)
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: netdev@vger.kernel.org, Heiko Schocher <heiko.schocher@gmail.com>
+Cc: Heiko Schocher <hs@denx.de>, Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>, Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: fec: fix probing of fec1 when fec0 is not probed yet
+Date: Thu, 23 Nov 2023 16:11:40 +0100
+Message-ID: <5992842.lOV4Wx5bFT@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20231123132744.62519-1-hs@denx.de>
+References: <20231123132744.62519-1-hs@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 
-> compatible = "ethernet-phy-package", "qca807x-phy-package";
-> 
-> With "ethernet-phy-package" a must and "qca807x-phy-package" used only
-> if additional property are used.
-> 
-> My current idea was to use select and base everything on the possible
-> PHY compatible (and it does work, tested by adding bloat in the DT
-> example and seeing if the schema was rejected). Had this idea since the
-> compatible would never be used.
+Hello Heiko,
 
-The DT people are unhappy with PHYs don't use compatibles, so
-validation does not work. It probably too late to add compatibles to
-very PHY driver. But this is new development work, we don't have any
-history. So we can add a compatible per package to make the validation
-tools work.
+Am Donnerstag, 23. November 2023, 14:27:43 CET schrieb Heiko Schocher:
+> it is possible that fec1 is probed before fec0. On SoCs
+> with FEC_QUIRK_SINGLE_MDIO set (which means fec1 uses mii
+> from fec0) init of mii fails for fec1 when fec0 is not yet
+> probed, as fec0 setups mii bus. In this case fec_enet_mii_init
+> for fec1 returns with -ENODEV, and so fec1 never comes up.
+>=20
+> Return here with -EPROBE_DEFER so interface gets later
+> probed again.
+>=20
+> Found this on imx8qxp based board, using 2 ethernet interfaces,
+> and from time to time, fec1 interface came not up.
 
-So for parsing the tree in the kernel we look for
-'ethernet-phy-package'. For validating the tree using the yaml tools
-we use the 'qca807x-phy-package'.
+But FEC_QUIRK_SINGLE_MDIO is only set for imx28. How is this related to=20
+imx8qxp?
+Will this also help for imx6ul when fec1 is almost always probed before fec=
+0=20
+due to order of DT nodes?
 
-	   Andrew
+Best regards,
+Alexander
+
+> Signed-off-by: Heiko Schocher <hs@denx.de>
+> ---
+>=20
+>  drivers/net/ethernet/freescale/fec_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c
+> b/drivers/net/ethernet/freescale/fec_main.c index
+> c3b7694a7485..d956f95e7a65 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -2445,7 +2445,7 @@ static int fec_enet_mii_init(struct platform_device
+> *pdev) mii_cnt++;
+>  			return 0;
+>  		}
+> -		return -ENOENT;
+> +		return -EPROBE_DEFER;
+>  	}
+>=20
+>  	bus_freq =3D 2500000; /* 2.5MHz by default */
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
+
 
