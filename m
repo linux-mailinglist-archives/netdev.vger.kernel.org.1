@@ -1,111 +1,69 @@
-Return-Path: <netdev+bounces-50642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2727F66AD
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:53:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D8A7F66BF
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 19:57:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA391C20C1C
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:53:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86629281673
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABF63D970;
-	Thu, 23 Nov 2023 18:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD5D35EFD;
+	Thu, 23 Nov 2023 18:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ebv3spVE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="okzPD7pF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91E624A10;
-	Thu, 23 Nov 2023 18:53:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16118C433CA;
-	Thu, 23 Nov 2023 18:53:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700765588;
-	bh=Y0PegqXIQ7kcn/YOYMXsf/jpB5XlhL7JeuQ0uTx82eQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ebv3spVE6vu1eBUphjcxy5N5+pwIFjshAp8CW9gpkSZJ5LhLDVtXTCCh64ZfSjwd9
-	 jMIZFnD4sXryqZ02RfjwFfanRq2if+MWG0Z45C8nFn7ZQncB0AUhctKt9T+IR7XHqa
-	 0CKXLjW0Rs16Cw9NOz4E2EnU6Vjg3UyyKQZmM0ylz+2ob06qJnzN31W4bAJWDPn3Bm
-	 IrKq9hpsGTeGmVdCzE3XpPF5dWgVFPkIoTNSbMjmv6nC5xNUZYpiPd/CUA+eIFa/3A
-	 VgHImhSpudi3FOLH4GKbTYHth3H9cs9lX+x2lKWy270jnxZN72H1b2T9+sHudUWaG8
-	 aY3cijmN+ABHA==
-Date: Thu, 23 Nov 2023 10:53:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
- Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, netdev@vger.kernel.org,
- deb.chatterjee@intel.com, anjali.singhai@intel.com, Vipin.Jain@amd.com,
- namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
- xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
- bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com,
- mattyk@nvidia.com, dan.daly@intel.com, chris.sommers@keysight.com,
- john.andy.fingerhut@intel.com
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-Message-ID: <20231123105305.7edeab94@kernel.org>
-In-Reply-To: <0d1d37f9-1ef1-4622-409e-a976c8061a41@gmail.com>
-References: <ZV3JJQirPdZpbVIC@nanopsycho>
-	<CAM0EoM=R1H1iGQDZs3m7tY7f++VWzPegvSdt=MfN0wvFXdT+Mg@mail.gmail.com>
-	<ZV5I/F+b5fu58Rlg@nanopsycho>
-	<CAM0EoM=RR6kcdHsGhFNUeDc96rSDa8S7SP7GQOeXrZBN_P7jtQ@mail.gmail.com>
-	<ZV7y9JG0d4id8GeG@nanopsycho>
-	<CAM0EoMkOvEnPmw=0qye9gWAqgbZjaTYZhiho=qmG1x4WiQxkxA@mail.gmail.com>
-	<ZV9U+zsMM5YqL8Cx@nanopsycho>
-	<CAM0EoMnFB0hgcVFj3=QN4114HiQy46uvYJKqa7=p2VqJTwqBsg@mail.gmail.com>
-	<ZV9csgFAurzm+j3/@nanopsycho>
-	<CAM0EoMkgD10dFvgtueDn7wjJTFTQX6_mkA4Kwr04Dnwp+S-u-A@mail.gmail.com>
-	<ZV9vfYy42G0Fk6m4@nanopsycho>
-	<CAM0EoMkC6+hJ0fb9zCU8bcKDjpnz5M0kbKZ=4GGAMmXH4_W8rg@mail.gmail.com>
-	<0d1d37f9-1ef1-4622-409e-a976c8061a41@gmail.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7651B3;
+	Thu, 23 Nov 2023 10:57:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5vDWv3+Vdh2C5jUQTfnkwEb2P2xKkS0YYp9hl8KNogA=; b=okzPD7pF3pX0HtAh0a91/IV1ch
+	J+YSpnJliSZC9AcfeEH3PVD+WQaFZOx9wcgMx0TuAavOW8b3OtZFg2PfnOyKnP2A+/elri5Scewdk
+	h1UYqKEyG1o95yovTg5hLwHHsQlvR6KCVl4wvqvDFnPS0YgCisOZZJg/c4zcH82apVkU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r6Et5-0011Wu-6z; Thu, 23 Nov 2023 19:57:19 +0100
+Date: Thu, 23 Nov 2023 19:57:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net v1] net: stmmac: xgmac: Disable FPE MMC interrupts
+Message-ID: <338001dd-f4d2-46d8-b247-fca1684a0f3e@lunn.ch>
+References: <20231123093538.2216633-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123093538.2216633-1-0x1207@gmail.com>
 
-On Thu, 23 Nov 2023 17:53:42 +0000 Edward Cree wrote:
-> The kernel doesn't like to trust offload blobs from a userspace compiler,
->  because it has no way to be sure that what comes out of the compiler
->  matches the rules/tables/whatever it has in the SW datapath.
-> It's also a support nightmare because it's basically like each user
->  compiling their own device firmware.  
+On Thu, Nov 23, 2023 at 05:35:38PM +0800, Furong Xu wrote:
+> Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
+> by default") leaves the FPE(Frame Preemption) MMC interrupts enabled.
+> Now we disable FPE TX and RX interrupts too.
 
-Practically speaking every high speed NIC runs a huge binary blob of FW.
-First, let's acknowledge that as reality.
+Just adding to Wojciech reply. We should be able to see 'What' a patch
+does by reading the actual change. What is not always obvious is
+'Why?' The commit message should be about the 'Why?", and less about
+the 'What'.
 
-Second, there is no equivalent for arbitrary packet parsing in the
-kernel proper. Offload means take something form the host and put it
-on the device. If there's nothing in the kernel, we can't consider
-the new functionality an offload.
-
-I understand that "we offload SW functionality" is our general policy,
-but we should remember why this policy is in place, and not
-automatically jump to the conclusion.
-
->  At least normally with device firmware the driver side is talking to
->  something with narrow/fixed semantics and went through upstream
->  review, even if the firmware side is still a black box.
-
-We should be buildings things which are useful and open (as in
-extensible by people "from the street"). With that in mind, to me,
-a more practical approach would be to try to figure out a common
-and rigid FW interface for expressing the parsing graph.
-
-But that's an interface going from the binary blob to the kernel.
-
-> Just to prove I'm not playing favourites: this is *also* a problem with
->  eBPF offloads like Nanotubes, and I'm not convinced we have a viable
->  solution yet.
-
-BPF offloads are actual offloads. Config/state is in the kernel,
-you need to pop it out to user space, then prove that it's what
-user intended.
+    Andrew
 
