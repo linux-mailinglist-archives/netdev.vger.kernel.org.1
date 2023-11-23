@@ -1,81 +1,187 @@
-Return-Path: <netdev+bounces-50404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D53D7F5A1D
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:34:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7DA97F5A74
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:48:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A867B20F9A
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 08:34:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F5421F20EC3
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 08:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8898BE3;
-	Thu, 23 Nov 2023 08:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EB119BB8;
+	Thu, 23 Nov 2023 08:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEE9D43
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 00:34:45 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R841e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VwypgXW_1700728482;
-Received: from 30.221.145.52(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VwypgXW_1700728482)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Nov 2023 16:34:43 +0800
-Message-ID: <e1e824ba-78dc-4a65-912d-4ef7f4175a51@linux.alibaba.com>
-Date: Thu, 23 Nov 2023 16:34:40 +0800
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D7410F1;
+	Thu, 23 Nov 2023 00:48:37 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5cca8b559b3so6406287b3.0;
+        Thu, 23 Nov 2023 00:48:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700729317; x=1701334117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=by70aOFOUFhdqOrGLgCt75M9J4tcctz7/cOLhtXw5mU=;
+        b=lXzPxZtVuvJrSuES03OyPnm9QhB6d6thXcwq3c1e0LYE45DzMUwjofnzpgkdSiotGv
+         /KKcXmFiNG9tNjVPTCjp2JLu+wY7vQeEgBk3hz7Ktk/McfN8CsJWl13UlEgOrN30rk4b
+         qecS4uV+lyDaFiCmaXbqvIn6JGIaSUMbKOgHR7Z2xxLCZd3+uXMeXL5y8M27eztHglQT
+         uRM7//6hHLQtcOZ2beWI0r/MXPrW6gc45ub1RnbsyS21sUCkQ4vIML78RX0BfnzGJE6x
+         pkMwIj/Rv2TKhdub1eRljm2FSkJq+pbym0IlPtPQIKknp1gQIIY2yZyU/jG++d5n8Afg
+         u4Bg==
+X-Gm-Message-State: AOJu0YxAl/TK17K90/MdJYyNY/yFNZkAw4u+l+LKhI5q9cc62O9JFP56
+	QDYx2vJmHi2X19MfiHmYS5f4yMm9TsfwfA==
+X-Google-Smtp-Source: AGHT+IFfqLgD/PvjX4VBsW5HH0XBvXMYuE0rRvrIkmWtCcLEBvuo+qyazuZ2iHYY8Jgxj7StMEnofg==
+X-Received: by 2002:a25:6b06:0:b0:d9a:cd62:410c with SMTP id g6-20020a256b06000000b00d9acd62410cmr4853893ybc.4.1700729316791;
+        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
+        by smtp.gmail.com with ESMTPSA id e71-20020a25d34a000000b00da076458395sm214481ybf.43.2023.11.23.00.48.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5cc69df1b9aso6181697b3.3;
+        Thu, 23 Nov 2023 00:48:36 -0800 (PST)
+X-Received: by 2002:a0d:ca90:0:b0:5ca:7a21:7e22 with SMTP id
+ m138-20020a0dca90000000b005ca7a217e22mr5419324ywd.9.1700729315801; Thu, 23
+ Nov 2023 00:48:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 4/4] virtio-net: support rx netdim
-To: Yinjun Zhang <yinjun.zhang@corigine.com>
-Cc: ast@kernel.org, davem@davemloft.net, edumazet@google.com,
- hawk@kernel.org, horms@kernel.org, jasowang@redhat.com,
- john.fastabend@gmail.com, kuba@kernel.org, mst@redhat.com,
- netdev@vger.kernel.org, pabeni@redhat.com,
- virtualization@lists.linux-foundation.org, xuanzhuo@linux.alibaba.com
-References: <c00b526f32d9f9a5cd2e98a212ee5306d6b6d71c.1700478183.git.hengqi@linux.alibaba.com>
- <20231122092939.1005591-1-yinjun.zhang@corigine.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20231122092939.1005591-1-yinjun.zhang@corigine.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com> <20231120084606.4083194-9-claudiu.beznea.uj@bp.renesas.com>
+In-Reply-To: <20231120084606.4083194-9-claudiu.beznea.uj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 23 Nov 2023 09:48:22 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV=2_h2PW9K7zT3Hwqjdk6D2m_Dd09bqHtifAvVTM7Lrw@mail.gmail.com>
+Message-ID: <CAMuHMdV=2_h2PW9K7zT3Hwqjdk6D2m_Dd09bqHtifAvVTM7Lrw@mail.gmail.com>
+Subject: Re: [PATCH 08/13] net: ravb: Rely on PM domain to enable refclk
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, p.zabel@pengutronix.de, 
+	yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com, 
+	biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
+	sergei.shtylyov@cogentembedded.com, mitsuhiro.kimura.kc@renesas.com, 
+	masaru.nagai.vx@renesas.com, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Claudiu,
 
+Thanks for your patch (which seems to have been delayed by 3 days, ouch)!
 
-在 2023/11/22 下午5:29, Yinjun Zhang 写道:
-> On Mon, 20 Nov 2023 20:37:34 +0800, Heng Qi wrote:
-> <...>
->> @@ -2179,6 +2220,7 @@ static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
->>   	virtnet_napi_tx_disable(&vi->sq[qp_index].napi);
->>   	napi_disable(&vi->rq[qp_index].napi);
->>   	xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
->> +	cancel_work_sync(&vi->rq[qp_index].dim.work);
-> I'm not sure, but please check if here may cause deadlock:
->   rtnl_lock held ->
->   .ndo_stop ->
->   virtnet_disable_queue_pair() ->
->   cancel_work_sync() ->
->   virtnet_rx_dim_work() ->
->   rtnl_lock()
+On Thu, Nov 23, 2023 at 5:35=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
+wrote:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>
+> For RZ/G3S and RZ/G2L SoCs the Ethernet's reference clock is part of the
+> Ethernet's power domain. It is controlled though CPG driver that is
+> providing the support for power domain that Ethernet belongs. Thus,
+> to be able to implement runtime PM (at least for RZ/G3S at the moment)
 
-Good catch!
+Why only for RZ/G3S?
 
-I tried using cancel_work() which solves the problem. Additionally I 
-tested the
-scenario of ctrl cmd/.remove/.ndo_stop()/dim_work when there is a lot of 
-concurrency,
-and this can work very well.
+> w/o the need to add clock enable/disable specific calls in runtime PM
+> ops of ravb driver and interfere with other IP specific implementations,
+> add a new variable to struct_hw_info and enable the reference clock
+> based on the value of this variable (the variable states if reference
+> clock is part of the Ethernet's power domain).
+>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Thanks!
+> --- a/drivers/net/ethernet/renesas/ravb.h
+> +++ b/drivers/net/ethernet/renesas/ravb.h
+> @@ -1043,6 +1043,7 @@ struct ravb_hw_info {
+>         unsigned nc_queues:1;           /* AVB-DMAC has RX and TX NC queu=
+es */
+>         unsigned magic_pkt:1;           /* E-MAC supports magic packet de=
+tection */
+>         unsigned half_duplex:1;         /* E-MAC supports half duplex mod=
+e */
+> +       unsigned refclk_in_pd:1;        /* Reference clock is part of a p=
+ower domain. */
+>  };
+>
+>  struct ravb_private {
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ether=
+net/renesas/ravb_main.c
+> index 836fdb4b3bfd..ddd8cd2c0f89 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2502,6 +2502,7 @@ static const struct ravb_hw_info gbeth_hw_info =3D =
+{
+>         .tx_counters =3D 1,
+>         .carrier_counters =3D 1,
+>         .half_duplex =3D 1,
+> +       .refclk_in_pd =3D 1,
+>  };
+>
+>  static const struct of_device_id ravb_match_table[] =3D {
+> @@ -2749,12 +2750,14 @@ static int ravb_probe(struct platform_device *pde=
+v)
+>                 goto out_release;
+>         }
+>
+> -       priv->refclk =3D devm_clk_get_optional(&pdev->dev, "refclk");
+> -       if (IS_ERR(priv->refclk)) {
+> -               error =3D PTR_ERR(priv->refclk);
+> -               goto out_release;
+> +       if (!info->refclk_in_pd) {
+> +               priv->refclk =3D devm_clk_get_optional(&pdev->dev, "refcl=
+k");
+> +               if (IS_ERR(priv->refclk)) {
+> +                       error =3D PTR_ERR(priv->refclk);
+> +                       goto out_release;
+> +               }
+> +               clk_prepare_enable(priv->refclk);
+>         }
+> -       clk_prepare_enable(priv->refclk);
+
+Is this patch really needed? It doesn't hurt to manually enable a
+clock that is also under Runtime PM control.  Clock prepare/enable
+refcounting will take care of that.
 
 >
->>   }
->>   
->>   static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
-> <...>
+>         if (info->gptp_ref_clk) {
+>                 priv->gptp_clk =3D devm_clk_get(&pdev->dev, "gptp");
+> @@ -2869,7 +2872,8 @@ static int ravb_probe(struct platform_device *pdev)
+>         if (info->ccc_gac)
+>                 ravb_ptp_stop(ndev);
+>  out_disable_refclk:
+> -       clk_disable_unprepare(priv->refclk);
+> +       if (!info->refclk_in_pd)
+> +               clk_disable_unprepare(priv->refclk);
+>  out_release:
+>         free_netdev(ndev);
+>  pm_runtime_put:
+> @@ -2890,7 +2894,8 @@ static void ravb_remove(struct platform_device *pde=
+v)
+>         if (info->ccc_gac)
+>                 ravb_ptp_stop(ndev);
+>
+> -       clk_disable_unprepare(priv->refclk);
+> +       if (!info->refclk_in_pd)
+> +               clk_disable_unprepare(priv->refclk);
+>
+>         /* Set reset mode */
+>         ravb_write(ndev, CCC_OPC_RESET, CCC);
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
