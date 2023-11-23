@@ -1,92 +1,108 @@
-Return-Path: <netdev+bounces-50348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB8B7F5683
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:45:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8EA7F56A0
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 03:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 182CD1C20C37
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:45:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B9701C20C38
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 02:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8659017E2;
-	Thu, 23 Nov 2023 02:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F744418;
+	Thu, 23 Nov 2023 02:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="gORI8rUn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XdfIfnjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12A91A8;
-	Wed, 22 Nov 2023 18:45:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1700707547;
-	bh=TEx2hkCoBOjDhspfbnS7KuTYyc0yi6VsIhBcpQ2tTB0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=gORI8rUnblpr9Lw1cfWvbInBtOy2a0x4y6bEn+8EfFGqaUTJwvuALeIOLYlw3MOtm
-	 Lqda1/TgvngfSvT5M96wEpjP6JeAABlJxpMd/l9O91zBIyU651M+SIKM7M9rPKBYRS
-	 aSFYFJIy6+PUjOB2cWAC4SYUWU1uS9t9rMkxl2Cz8UemqHjvl31kfCH+19wsRCsYPo
-	 1Hr90mdP25eYPg0fytn7XqxMfmHxlH7V8ttOZTTEdhOxEEYmH/ntc3zsfp1r9lkJHS
-	 TOMTCscDuqabktBPpL/dz6s3FE3zGvU8V2q5VGzlOO2Wpgm2n0UQObobloLARqWTFX
-	 zPOXCuD4pswMQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SbMtM1MByz4x1R;
-	Thu, 23 Nov 2023 13:45:46 +1100 (AEDT)
-Date: Thu, 23 Nov 2023 13:45:45 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the net-next tree
-Message-ID: <20231123134545.3ce67bd4@canb.auug.org.au>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1375B191;
+	Wed, 22 Nov 2023 18:56:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OquazO1sQ+hlt6OacUFPeKJSQFcf3TbpH59OwUObgWM=; b=XdfIfnjMs+I9Gtt2YRBuDhmDvE
+	sstglqcfCEaaKc4H/4cQ1cJ4OyJiR8/BZYJG4V30j9LTaXp+kdB07rOVdGulo8um3Rka7Q4AbB8XN
+	J48VPuxoeeGD8HzpzAR/AcadbwIKSQKvmEZqiH9Q/4CxbbZ+czYZpG3UjuDWWpda52ac=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5zsi-000vyt-3E; Thu, 23 Nov 2023 03:55:56 +0100
+Date: Thu, 23 Nov 2023 03:55:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 13/14] net: phy: add Qualcom QCA807x driver
+Message-ID: <e3fbd979-06d6-4323-ac13-93a4f7cf1a4d@lunn.ch>
+References: <20231120135041.15259-1-ansuelsmth@gmail.com>
+ <20231120135041.15259-14-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Ud56VJJErToe/mhvryWCuaP";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120135041.15259-14-ansuelsmth@gmail.com>
 
---Sig_/Ud56VJJErToe/mhvryWCuaP
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+ On Mon, Nov 20, 2023 at 02:50:40PM +0100, Christian Marangi wrote:
+> From: Robert Marko <robert.marko@sartura.hr>
+> 
+> This adds driver for the Qualcomm QCA8072 and QCA8075 PHY-s.
+> 
+> They are 2 or 5 port IEEE 802.3 clause 22 compliant 10BASE-Te,
+> 100BASE-TX and 1000BASE-T PHY-s.
+> 
+> They feature 2 SerDes, one for PSGMII or QSGMII connection with
+> MAC, while second one is SGMII for connection to MAC or fiber.
+> 
+> Both models have a combo port that supports 1000BASE-X and
+> 100BASE-FX fiber.
+> 
+> Each PHY inside of QCA807x series has 4 digitally controlled
+> output only pins that natively drive LED-s.
+> But some vendors used these to driver generic LED-s controlled
+> by userspace, so lets enable registering each PHY as GPIO
+> controller and add driver for it.
+> 
+> These are commonly used in Qualcomm IPQ40xx, IPQ60xx and IPQ807x
+> boards.
 
-Hi all,
+You need to justification why this is a whole new driver, rather than
+just extending at803x.c.
 
-After merging the net-next tree, today's linux-next build (htmldocs)
-produced this warning:
+I did a few quick checks. The Downshift code is identical, once you
+take into account the different names. Interrupt handling looks very
+similar.  MDIX looks the same, and Specific status looks similar, etc.
+There are clear differences, but i think there is enough identical
+code you should be sharing it.
 
-include/net/page_pool/types.h:73: warning: Function parameter or member 'ST=
-RUCT_GROUP(' not described in 'page_pool_params'
-
-Introduced by commit
-
-  5027ec19f104 ("net: page_pool: split the page_pool_params into fast and s=
-low")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Ud56VJJErToe/mhvryWCuaP
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmVevNkACgkQAVBC80lX
-0GwPywf/abEsjOtqlmt08zTsQZq4NBY743XvHVD3DcubT43lnsKyFliy2FlGs4mC
-Gu7dcVinO3zHhhD/b/B42xl8FegYMP6S1HSoR47SEzfOvzcEScmyMkmqr7CKywld
-lYhwQ9TD6ISd29YbW1lb5x2ZuuVh8nOGb40bhSDZnucKSoxKXUjWnQDEbicZB71J
-D9DieZIaa4ILuGoZ/LstLKkQUDo/9L+qjc+SE62PlKZNUOg4YrXsVkTHBifGI+tu
-ThZDYQGR/Ms6rqAmrbcDSv0832ElRqWYbi28M6bgbAf2wDTEQk+PidmZQ7RA1vIM
-GnOmvsoGJanCjCsqZwwxKNBAAUdzsg==
-=Xz/B
------END PGP SIGNATURE-----
-
---Sig_/Ud56VJJErToe/mhvryWCuaP--
+     Andrew
 
