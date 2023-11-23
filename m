@@ -1,167 +1,119 @@
-Return-Path: <netdev+bounces-50595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145FD7F6409
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:37:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D103A7F642C
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:41:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 969A7281ACB
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:37:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6E3B1C20C38
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1394B22EF6;
-	Thu, 23 Nov 2023 16:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BE02E82F;
+	Thu, 23 Nov 2023 16:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQMKBqY7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB078DD;
-	Thu, 23 Nov 2023 08:37:32 -0800 (PST)
-Received: from [192.168.1.103] (178.176.78.136) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 23 Nov
- 2023 19:37:28 +0300
-Subject: Re: [PATCH 06/13] net: ravb: Let IP specific receive function to
- interrogate descriptors
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
-	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-7-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <b626455a-f7a4-2684-725c-c679dd75a515@omp.ru>
-Date: Thu, 23 Nov 2023 19:37:27 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87464120
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:41:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700757697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CvhyGiocd9S/WTnrqejrqxwkYC77vaP/alpx7EwV9GM=;
+	b=CQMKBqY7wT4J0kAZuksI3FdYBJE3ux4zCzZ9wotrWA23ciZQ/F1DJCkMwlq3qiWoVU2QP/
+	vTvUuzgMyUH1CvnkEpcUSgew//eqaYedszDzHH8nxGffgOTyL7fxfZxaileU7Y0CKd0BjJ
+	Y4GTzmJqyTVl++C2Of22cmn+JHpX3AY=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-461-NTzPz6xmOp6GxSoMrpSzEw-1; Thu, 23 Nov 2023 11:41:36 -0500
+X-MC-Unique: NTzPz6xmOp6GxSoMrpSzEw-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1f9847123e4so438568fac.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:41:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700757696; x=1701362496;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CvhyGiocd9S/WTnrqejrqxwkYC77vaP/alpx7EwV9GM=;
+        b=TbJHgZ8s3zmGyZEGedkszkb5hNoRhbzJAMcee8d3uNBMlcf8mEUcncI1XEtTydqEgv
+         V8Km0mYgGPgE2Q0fb4wPTxcz6xnjGpvMXEM5uE1c6wt+14QEdhmzB5YgtuzDqCIy8pZ7
+         4cK4MsK3XA6MFr6betYivMMqtNt3LDmpCGKBspFn0acwc5Njj6XBXTUsjWAeSo7XBHvZ
+         aJUb+NAlQeLalsD34jHYz5laXWrsxxhOVL50aUtz1UIoNOkT6+gNtXJFOYdHp96trPNq
+         9u90eeb8Y6ryi+d8gPTprD58QQJPy809+q/c02ClkvA05KnIFbFe2R6Jj9ADGMBAyc3S
+         gB2A==
+X-Gm-Message-State: AOJu0YyQ8an7SdPmvRWcsT2iAxye8IEh7SpnaiOVB/9DFuE+5CcZEIEr
+	xV7P2Exq41c9N827hDt3T1G4c7N+GFT5V1fK2WNYVaSFZzegiBlmTN682ib7axo8L3+X6JvSuiF
+	x+L8hgyPCf5bm1qp7
+X-Received: by 2002:a05:6871:7a0:b0:1e9:8a7e:5893 with SMTP id o32-20020a05687107a000b001e98a7e5893mr7587429oap.5.1700757695790;
+        Thu, 23 Nov 2023 08:41:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+04e1Vh52SolmH+Vji6UaC0k0qOLwcDodNnPANnkt/IexnCF9rxr6HrQ6ayqhb8e6Z3MdsQ==
+X-Received: by 2002:a05:6871:7a0:b0:1e9:8a7e:5893 with SMTP id o32-20020a05687107a000b001e98a7e5893mr7587413oap.5.1700757695521;
+        Thu, 23 Nov 2023 08:41:35 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-213.dyn.eolo.it. [146.241.241.213])
+        by smtp.gmail.com with ESMTPSA id o3-20020ac86d03000000b0041abcc69050sm582431qtt.95.2023.11.23.08.41.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 08:41:35 -0800 (PST)
+Message-ID: <c1f1f869346f4d6fc90eac6d131454b85fa676be.camel@redhat.com>
+Subject: Re: [PATCH] mptcp: fix uninit-value in mptcp_incoming_options
+From: Paolo Abeni <pabeni@redhat.com>
+To: Edward Adam Davis <eadavis@qq.com>, 
+	syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, martineau@kernel.org,
+ matthieu.baerts@tessares.net,  matttbe@kernel.org, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org,  syzkaller-bugs@googlegroups.com
+Date: Thu, 23 Nov 2023 17:41:31 +0100
+In-Reply-To: <tencent_B0E02F1D6C009450E8D6EC06CC6C7B5E6C0A@qq.com>
+References: <000000000000545a26060abf943b@google.com>
+	 <tencent_B0E02F1D6C009450E8D6EC06CC6C7B5E6C0A@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231120084606.4083194-7-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.136
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 11/20/23 11:45 AM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> ravb_poll() initial code used to interrogate the first descriptor of the
-> RX queue in case gptp is false to know if ravb_rx() should be called.
-> This is done for non GPTP IPs. For GPTP IPs the driver PTP specific
-
-   It's called gPTP, AFAIK.
-
-> information was used to know if receive function should be called. As
-> every IP has it's own receive function that interrogates the RX descriptor
-
-   Its own.
-
-> list in the same way the ravb_poll() was doing there is no need to double
-> check this in ravb_poll(). Removing the code form ravb_poll() and
-
-   From ravb_poll().
-
-> adjusting ravb_rx_gbeth() leads to a cleaner code.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On Thu, 2023-11-23 at 09:23 +0800, Edward Adam Davis wrote:
+> Added initialization use_ack to mptcp_parse_option().
+>=20
+> Reported-by: syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 > ---
->  drivers/net/ethernet/renesas/ravb_main.c | 18 ++++++------------
->  1 file changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 588e3be692d3..0fc9810c5e78 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -771,12 +771,15 @@ static bool ravb_rx_gbeth(struct net_device *ndev, int *quota, int q)
->  	int limit;
->  
->  	entry = priv->cur_rx[q] % priv->num_rx_ring[q];
-> +	desc = &priv->gbeth_rx_ring[entry];
-> +	if (desc->die_dt == DT_FEMPTY)
-> +		return false;
-> +
+>  net/mptcp/options.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+> index cd15ec73073e..c53914012d01 100644
+> --- a/net/mptcp/options.c
+> +++ b/net/mptcp/options.c
+> @@ -108,6 +108,7 @@ static void mptcp_parse_option(const struct sk_buff *=
+skb,
+>  			mp_opt->suboptions |=3D OPTION_MPTCP_DSS;
+>  			mp_opt->use_map =3D 1;
+>  			mp_opt->mpc_map =3D 1;
+> +			mp_opt->use_ack =3D 0;
+>  			mp_opt->data_len =3D get_unaligned_be16(ptr);
+>  			ptr +=3D 2;
+>  		}
 
-   I don't understand what this buys us, the following *while* loop will
-be skipped anyway, and the *for* loop as well, I think... And ravb_rx_rcar()
-doesn't have that anyway...
+LGTM, and syzbot tested it.
 
-> @@ -1279,25 +1282,16 @@ static int ravb_poll(struct napi_struct *napi, int budget)
->  	struct net_device *ndev = napi->dev;
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	const struct ravb_hw_info *info = priv->info;
-> -	bool gptp = info->gptp || info->ccc_gac;
-> -	struct ravb_rx_desc *desc;
->  	unsigned long flags;
->  	int q = napi - priv->napi;
->  	int mask = BIT(q);
->  	int quota = budget;
-> -	unsigned int entry;
->  
-> -	if (!gptp) {
-> -		entry = priv->cur_rx[q] % priv->num_rx_ring[q];
-> -		desc = &priv->gbeth_rx_ring[entry];
-> -	}
->  	/* Processing RX Descriptor Ring */
->  	/* Clear RX interrupt */
->  	ravb_write(ndev, ~(mask | RIS0_RESERVED), RIS0);
-> -	if (gptp || desc->die_dt != DT_FEMPTY) {
-> -		if (ravb_rx(ndev, &quota, q))
-> -			goto out;
-> -	}
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-  I don't really understand this code (despite I've AKCed it)...
-Biju, could you explain this (well, you tried already but I don't
-buy it anymore)?
+@Edward: for future similar patches, please add also the=C2=A0tested tag
+from syzbot, will make tracking easier.
 
-> +	if (ravb_rx(ndev, &quota, q))
-> +		goto out;
+Thanks!
 
-   This restores the behavior before:
+Paolo
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3d4e37df882b0f4f28b7223a42492650b71252c5
-
-   So does look correct. :-)
-
-MBR, Sergey
 
