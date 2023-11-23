@@ -1,90 +1,123 @@
-Return-Path: <netdev+bounces-50621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53FAD7F6579
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:32:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0107F658E
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 838EE1C20D08
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:32:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABAB31C20C85
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE80D405E6;
-	Thu, 23 Nov 2023 17:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE6B405E4;
+	Thu, 23 Nov 2023 17:36:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QG0qPjrC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBovVy3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B094B3FB2E;
-	Thu, 23 Nov 2023 17:32:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C6ACC433CA;
-	Thu, 23 Nov 2023 17:32:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700760727;
-	bh=i/UmJQborfV2Bwp12JPQd5IyP+xtuh/1l7Ba+8D7N40=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QG0qPjrCi1vGR1QW7yDLAmOJTyqo5G2UC1ypD9GxicXfMXi2WhY+IkNhfYiQqUoPt
-	 aD3vWrdWv+d/V5d1iUKpY2gIPzqizl601TCaZsedmFaQdLU5Ggc4UdG/D5X3WWd9jP
-	 3hnuBcVVfj3VCgGP5IKrxRoHkYoTZUIsoc2jYZ2dSokGXCDf0TdPvXwGSRWmRi2T5x
-	 qUzVox+a652YHcyIe79BP3RMzjqZ/2EfdpUFaB13aRAHXZeb0nmvjg8Bqe+iyW97IT
-	 795u1ZcLgP3GHPVTL9QgLHK4AJ45ArFF/31/IHnbhMDC7+pMKpK36NY64kL+JwtJB4
-	 GE5TM2vPCXeqg==
-Date: Thu, 23 Nov 2023 09:32:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231123093205.484356fc@kernel.org>
-In-Reply-To: <20231123160056.070f3311@kmaincent-XPS-13-7390>
-References: <20231120190023.ymog4yb2hcydhmua@skbuf>
-	<20231120115839.74ee5492@kernel.org>
-	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
-	<20231120133737.70dde657@kernel.org>
-	<20231120220549.cvsz2ni3wj7mcukh@skbuf>
-	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
-	<20231121094354.635ee8cd@kernel.org>
-	<20231122144453.5eb0382f@kmaincent-XPS-13-7390>
-	<20231122140850.li2mvf6tpo3f2fhh@skbuf>
-	<20231122085000.79f2d14c@kernel.org>
-	<20231122165517.5cqqfor3zjqgyoow@skbuf>
-	<20231122100142.338a2092@kernel.org>
-	<20231123160056.070f3311@kmaincent-XPS-13-7390>
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2AC189;
+	Thu, 23 Nov 2023 09:36:48 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-507975d34e8so1479124e87.1;
+        Thu, 23 Nov 2023 09:36:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700761007; x=1701365807; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pi4hi51KbsBz/5lDxBPTRqeH0lvqU5t1ezozPUrmIy4=;
+        b=mBovVy3vxq6Ng9q9qEEF95RHZ+zrvpCiEukPaykrJgIrADRfRi/fzo2ifaeEa0IS8D
+         Ts9bfqI1Aer+rc/3awiPuOOJF7dSe1GjabPt+t8mBpUl4rphinKS30znSCgc6pyZ8cSV
+         zrCM97xaCfQ35v36ltusF55qPNcjMD9uEAw2PtUm1IEwypmKmBjyms3/vzsXZbtKtVBB
+         2jl+/updNdBcRNbgj2ADFvQQeimklZkKDzOsGk1+yBDUntPYDenV6pfFaPloGRiZNmNL
+         /z2BQwbNkdSaijmlPrGlXaq4AIqKFJxkwS2Zg9R7aCnmEdUygsMGulUaGcQOLanVGKIe
+         XaDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700761007; x=1701365807;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Pi4hi51KbsBz/5lDxBPTRqeH0lvqU5t1ezozPUrmIy4=;
+        b=a7E3VHXQexovC3BMBO9WkSlzt0FJ3IhWiIaDw2zQPZeaNGt/SHRDzkr5sedShZloT2
+         Xn7F/kNyWnAbLnBJKXaNJYJa0SVnPhMNPibBa/bDf1qnX+tAJyyQrv+h4JWFP3EElPjb
+         gxFf4uhlLXeFC496cseSiciUyExdlz1Dv1LUyehQW2pl/fJYWvLskgmOwQc+xhYXoXYT
+         gA2/0E+GWwx+VQH9nykSFlHeZgVw9T4lvnf34fYImuHaT4grzK1RUxs9tENON2qZJbEq
+         DcDp5tJqKmf55SJ3RtQfa1hOrxV6PbdvmCrmeAwGXnFD21qtnxgoc/hQ7vN77WA13XgM
+         fkvg==
+X-Gm-Message-State: AOJu0Yz2h5hTpO4SSQu/CBwPtrZ2HrwgsWNUYSGuNyvmBjhY5Z1nqiAm
+	X/IGIkc2zgO3O5RLsISTx7ZHVmkvke+T3Ezu
+X-Google-Smtp-Source: AGHT+IH4tSm1vlRf/XUPyolwDY+PNijuInx1oB/2b6/CRd5FzNqYU9rEnY6i6lwBXXKaGvGz7lAEyg==
+X-Received: by 2002:a05:6512:2e2:b0:50a:a2da:33ad with SMTP id m2-20020a05651202e200b0050aa2da33admr4946627lfq.20.1700761006417;
+        Thu, 23 Nov 2023 09:36:46 -0800 (PST)
+Received: from localhost.localdomain (109-252-174-150.dynamic.spd-mgts.ru. [109.252.174.150])
+        by smtp.gmail.com with ESMTPSA id u30-20020a056512041e00b0050a7572c9f6sm263643lfk.101.2023.11.23.09.36.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 09:36:46 -0800 (PST)
+From: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+To: Sunil Goutham <sgoutham@marvell.com>
+Cc: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] octeontx2-af: Fix possible buffer overflow
+Date: Thu, 23 Nov 2023 20:36:30 +0300
+Message-Id: <20231123173630.32919-1-elena.salomatkina.cmc@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, 23 Nov 2023 16:00:56 +0100 K=C3=B6ry Maincent wrote:
-> > FTR so far the netdev family is all about SW configuration. We should
-> > probably keep it that way, so it doesn't become ginormous. It's easy
-> > enough to create a new family, if needed. =20
->=20
-> So, do we have a consensus? Vlad, do you agree on putting all under ethto=
-ol?
+A loop in rvu_mbox_handler_nix_bandprof_free() contains
+a break if (idx == MAX_BANDPROF_PER_PFFUNC),
+but if idx may reach MAX_BANDPROF_PER_PFFUNC
+buffer '(*req->prof_idx)[layer]' overflow happens before that check.
 
-If not we can do a vote/poll? Maybe others don't find the configuration
-of timestamping as confusing as me.
+The patch moves the break to the
+beginning of the loop.
+
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: e8e095b3b370 ("octeontx2-af: cn10k: Bandwidth profiles config support").
+Signed-off-by: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 23c2f2ed2fb8..c112c71ff576 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -5505,6 +5505,8 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
+ 
+ 		ipolicer = &nix_hw->ipolicer[layer];
+ 		for (idx = 0; idx < req->prof_count[layer]; idx++) {
++			if (idx == MAX_BANDPROF_PER_PFFUNC)
++				break;
+ 			prof_idx = req->prof_idx[layer][idx];
+ 			if (prof_idx >= ipolicer->band_prof.max ||
+ 			    ipolicer->pfvf_map[prof_idx] != pcifunc)
+@@ -5518,8 +5520,6 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
+ 			ipolicer->pfvf_map[prof_idx] = 0x00;
+ 			ipolicer->match_id[prof_idx] = 0;
+ 			rvu_free_rsrc(&ipolicer->band_prof, prof_idx);
+-			if (idx == MAX_BANDPROF_PER_PFFUNC)
+-				break;
+ 		}
+ 	}
+ 	mutex_unlock(&rvu->rsrc_lock);
+-- 
+2.34.1
+
 
