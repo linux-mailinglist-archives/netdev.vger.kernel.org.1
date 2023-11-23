@@ -1,192 +1,148 @@
-Return-Path: <netdev+bounces-50415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBABC7F5B25
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:38:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC2567F5B47
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 10:41:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50481281757
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:38:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49651F20F16
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 09:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAFF2134B;
-	Thu, 23 Nov 2023 09:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7976222313;
+	Thu, 23 Nov 2023 09:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dh1K/pyj"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CSwvcJOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9A7CB
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 01:38:02 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5bdfbd69bd5so1319306a12.1
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 01:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700732282; x=1701337082; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k2wglZwUZHcHCJL/jDbV5rnVh7myad8gV1yHIMda4RE=;
-        b=Dh1K/pyj0TGNSq3G7IeLBTE7Esap/kzaximcswVhxIPKcglnvxTCc+hw4iueHp1cCp
-         xE6A8D1NtdKAcotnV9dEqX+07I8rytD9YwqGFZmXbVpu8ScrsrDKmyNUDWfI3WWjaYEt
-         zIkUpbZYVHpW/1N27aLDZmERqboARZrzjJY26UsjzWVIsTuLA9s0iH6pDj3zXF2Q80SA
-         b2gEBgxBw0aqp5BmWLBgBW1PoYtUNOvEvrdhDRxlYOUnV1JZQKPvyCBM1UI/0+1Vqrwx
-         IYJJJ/Yc75HN5vKbtX4RC5k6nA4Y4z6mkEcWCP5vUCajcGU5wyaTwK3ZxtCw9fHb4Osy
-         xQSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700732282; x=1701337082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k2wglZwUZHcHCJL/jDbV5rnVh7myad8gV1yHIMda4RE=;
-        b=UCCzWPlTXxcqcqurWV4/en8U72ZFD57o4YusqZzynFf0H8cpZAZiBToLx1g4x2EtIo
-         s1XXta/HUBogJf1PtNJX8qQwwiY3keL3yBudlueLAi3xEYFc4/CwEQ8V2uBzFEG6iWbc
-         JqCVmabIGxu4lZUW2tHukn2aJ5NQRNa+wpsDpMN1H76z6pYYl77aerU08R/UKVtcs6AJ
-         5hcvnJT8N3C/0je51H09RPUXbM973kK4BMvJcpOf5s1QphwDg/SOtEYIbe38WcBnlVa3
-         UgQFF68ef9ks5yfxR6i/IGvHomjzx8DA6M2Oimx/I10iWVPvEw79wi3/XH8iZuABqhyZ
-         NwgQ==
-X-Gm-Message-State: AOJu0Yy/OLw9Jbxs3EdTMr7HXAzqj4tle35jYEMpvZmDs73jLRkfhPtO
-	LtoYFBakIIgcCokn1bAKhgU=
-X-Google-Smtp-Source: AGHT+IHyaymjTlFzwsY8VJM64X5C9ao4FoHpSxN6h+CHI86XYT2+OyZ1q8Mn5JW+NxpVlqkDRlpB2g==
-X-Received: by 2002:a17:90a:d152:b0:280:29df:747e with SMTP id t18-20020a17090ad15200b0028029df747emr2940538pjw.1.1700732281654;
-        Thu, 23 Nov 2023 01:38:01 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 16-20020a17090a191000b0027d0a60b9c9sm1270979pjg.28.2023.11.23.01.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 01:38:01 -0800 (PST)
-Date: Thu, 23 Nov 2023 17:37:53 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net,v3] ipv4: igmp: fix refcnt uaf issue when receiving
- igmp query packet
-Message-ID: <ZV8dcchTFEtrFaXW@Laptop-X1>
-References: <20231123071314.3332069-1-shaozhengchao@huawei.com>
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2071.outbound.protection.outlook.com [40.107.14.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00703D44;
+	Thu, 23 Nov 2023 01:40:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WbV/IpybHVkQx7uP6iBum4ds6m6dZUO4jAQFNgmLCeH+8LxIO1e4dvL0gl5wzsmzOkUz5JaXshG9nlzw6ljiMdT8Wg9+CFnmUlmZkxs56VQxk3AUtrxIiJUkno/oGI/F6LmySeb9FSFVLy4FI/uuYTOibHmi/54i+ZAUcNpXHLO2zadsLqSHazln+oRTl7ZrTEZchjUuorkHrNkp7+8Shg7Td6BeWeGS+NC8ECll3YuEiWXM+dLJCa79GoOCYYSGfY7OWfwi2cwjoDNezAmQ5EF/DdL/Woq39qRRFkB9OY5uhdKdKk0NG5k65e6plBFKjnUhewAmC4BSvl0ODg5soQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ff6i0m2QRlxgMX1rmCLzL/YFPWW9eE1z35hM3+DU5bA=;
+ b=ducL8j0Sur9U5+SV93Jiw/wTeuRpqdt2gifr8kCx+axRKDn88SzaW60/1yyBATbZS2xNNNAr2U1VHK4wDupTsJ6scI37BNsGJ5c4GacbL+x/2bP1CSH5H1hFkmXnfbqonsL2uIA0lV7/I0NWABCxN8P0UjlSMtXy9MgQsgZyIBmsVWBMHwDCy4EeEwCkCm3pt/44Zu47MMoLXw1evWPUYuCSz9V61Z1vbSNacbW3FfYSGzNOIen1CeHQriEtxHivs/PzVSnd2drv3lniuuVZGsCutuP4Wadr7M5Vx49/MOnuVLP3viuKRkrz5WPelRZtda311e4vPMFVmZumPGd91w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ff6i0m2QRlxgMX1rmCLzL/YFPWW9eE1z35hM3+DU5bA=;
+ b=CSwvcJODvda9dHhMge57W5lEIZS5zww6YWBMd8Y3q6zBmK5rQGXkeFJPT4bJN3Q2YhafVJHVzNPcKDBomAi9jBY+wzzHA8qNGweb4404peZCZKdQtL9zDSZAltIp9n4qhXkQTiCJ9+UdGowZYjb1EaqV17zS3bnlvZp+tZkuWQQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by PA4PR04MB9391.eurprd04.prod.outlook.com (2603:10a6:102:2aa::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.12; Thu, 23 Nov
+ 2023 09:40:49 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7046.012; Thu, 23 Nov 2023
+ 09:40:49 +0000
+Date: Thu, 23 Nov 2023 11:40:45 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: enetc: add ethtool::get_channels support
+Message-ID: <20231123094045.bjgo4aqwdydeirgs@skbuf>
+References: <20231122102540.3766699-1-wei.fang@nxp.com>
+ <20231122110120.crs4rh2utjweswsc@skbuf>
+ <AM5PR04MB3139E96BF99E55E563EF71B888B9A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM5PR04MB3139E96BF99E55E563EF71B888B9A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VI1P194CA0027.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:803:3c::16) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231123071314.3332069-1-shaozhengchao@huawei.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PA4PR04MB9391:EE_
+X-MS-Office365-Filtering-Correlation-Id: 36c98aaa-528d-4575-0adb-08dbec08467a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WNwMWcJnaYLikmfkBYxpLX6RGuEf3f/DczZVJynFfbR+aZfvSB4MMQ+AEdkf8AfptwbAHkTbhZHInQiACNGb/Yp2mPdFpn8NksEyxrJmtYDMA4ViakgafljuYFfTrbBHnaj/ZIOyzFHLpR0Jz1G8kEu1D1sSYSGnC4e4iLG4YDbomcId85SCJLYMTzBdXLnqlyFkgTNTIo0da/SD8LWocjBhBdo6IRDH5oQ6EG5KWk+HxHlCZ4BHNVEcdW2d80wS0uCClXcwyrBp1kq/1dL6qT1OnD+2RdFkpntcr2kLliTZ3/BffQSQZ+XLiILoclyaCcbBUvFKeAwKxXefO0RjfnWwJk/SI/L5iQ1xZooqXcKZS1Z0N0lTBy3Fq5Gt9cXNHdd94XCm5JSch+CSC485IM2CvhRSXb6qhV/UTP85UmJqrsSI+KPCRshQ+Wbi7GL/fl7DDPbdZOuhSstOn7Jty6FeDxBbQ2JZ+t76YljA6J4xKoKpDotI/7UBmlT/UcSVOsbUAsQujrNz86x9qT0syqoncOhkQAt6b5HZ1xr+Fjcls1E2QYNFPgQAuUH7Xn0o
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(366004)(376002)(346002)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(41300700001)(44832011)(2906002)(86362001)(6666004)(6862004)(5660300002)(4326008)(316002)(26005)(66556008)(66476007)(6636002)(54906003)(66946007)(6486002)(6506007)(478600001)(8676002)(6512007)(9686003)(1076003)(8936002)(33716001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6D1e0xo9A84rMQ+yXbQdfbJ+heNOSUUlerEp5/1rll2u1bMURkG/LqXUaoc5?=
+ =?us-ascii?Q?LZwZEXRgKCc/XXftVuOj591isd476JWtHpXbHY6JiTCE+cefcW+geRFZeC5B?=
+ =?us-ascii?Q?gkPuKsoyH23cUC2pb+w8tn9paM2TZBsSN/ere+IJoH/lQQEmA8N27YpwHJ9g?=
+ =?us-ascii?Q?xq5XB7pnVS0D7w0F20OhhKLYu0PXdocq8ZJjPV1V9KjEPmHF7yE+kKRMvMYj?=
+ =?us-ascii?Q?AeCIdUaDVaHYBLvCtgKWPP2nsFbx5Gzh4G4hMt9/s0HRRpv0xYgtWcLYCxX3?=
+ =?us-ascii?Q?7DZzrKNs7YBQ5dwez1h/0UQm0qNl+aTeCfYgR9LdCPHnlgKI+fTWOWCbtC68?=
+ =?us-ascii?Q?aABAcArY6qI0nMsUNd7vwjaiKBrhj0hVVwDrkocmYKsGm9VJZkcAMtTnNMAN?=
+ =?us-ascii?Q?UOO3+9Qn/olmPCZvyexL5s9ObGXUica4rZdwi+GaOpkw7qrSj7U0Ou9+G8Kp?=
+ =?us-ascii?Q?EUHpjANDlUO98n4bbfUdaLw7KQHNsOQNnx4YlC9/5JcLoB2VMla/wPK8/fxn?=
+ =?us-ascii?Q?VjZuZXnqmW4ntGL0zPGzxH7KxGgvQl2mChkQL6pwc8qwt3uV3M+Ig6FCE5+k?=
+ =?us-ascii?Q?m0kaB6ZBVP7GqgKAxfMQmiIbA++mxpgdzP/J7Xvc1xZsdbntwsoVf73Eevhj?=
+ =?us-ascii?Q?ENJf4Go/CMpfq+Y0aj+XUGgeF+4QpXBXKyuV+7xM8jm5uGxqpHCNOBvfJvZ1?=
+ =?us-ascii?Q?SfFQ71/mEbrEl163lLVn1GbtEw07tUOfVkhVOKqWjzX9O9y4tavNQIiTDW1b?=
+ =?us-ascii?Q?bryTojPRhUkeUg3eez1Sa/0R8mKXEAx0jfp0kAbY7JW5inZ9NqdXax3hNIm4?=
+ =?us-ascii?Q?YIMQplsTBavrWI1wSXsjNcb5zLncnPfpL/2yxrwQvGCgCYe4g2vs5V0cCIiR?=
+ =?us-ascii?Q?Ht90N0weX5bUE20wvBrkMzov8b6crLf2+l3zE8uFXSTb03o45Py9l1yY3s08?=
+ =?us-ascii?Q?mknr6S//BofW8hC+nXFhjfoJNaECDQUpMpOXaZ4GN2Ywy1xQyooFc83QKgas?=
+ =?us-ascii?Q?yo8fKou62Rt2U1yZSgDeMJBuzrVFzMDOwcPTETFtsQqX113m/HBjvOU1qbRv?=
+ =?us-ascii?Q?cU+oxb3bKJtSmFu6NPpwckBHKV20GPxIA4hsEYeCJP/VjYLd4ByaYFjnNMXw?=
+ =?us-ascii?Q?2u9TQU9UYkJsj1NUz/mwdL8AbDqA2j5dTapi1DpOzqTNnRV1TA6RdVOYnruh?=
+ =?us-ascii?Q?HmSY7B9aNz01TwGxnj84ydbXQZA0nNrm2oxCYVGWm1p5HLio4eJCwvIp1rE0?=
+ =?us-ascii?Q?D3dpdOD3uqO0bltUu40LUf2vinXpSeuOs1lt6maASNcyw+uNSkS2QiZGpu4U?=
+ =?us-ascii?Q?4d4MVxsoktorVO2cQMCw0nujTJ4m5T4CnRXKNX5/OsWS54mx1dU8yki5UL9g?=
+ =?us-ascii?Q?cFXcvlKKEow4+raYPxMz3BFWqd5E6I8bbkJY5z3hWks9cvAE0KFXrz/6mTJg?=
+ =?us-ascii?Q?ZJB9RViBlBBBTV1k8Ey2Du53lzOJn+BQGkBrlgECEFfOk/OiKVYvp9A/AKQE?=
+ =?us-ascii?Q?0aYnT4ur0dliW1oj24Y/FEP2UFO/QuSdoNgFfXtXEDB0rleX0bWsnWkOMne0?=
+ =?us-ascii?Q?htnD3OaPtW75SMXOd+lMzeDX+V7H+Zq9yqyzAzzEwVeaIjsjqP5wbXtG7+8v?=
+ =?us-ascii?Q?Uw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36c98aaa-528d-4575-0adb-08dbec08467a
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2023 09:40:49.1281
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rbeWIfrTDTOoDMEy6N5IaG6dv+/g8BydmemGoNeDY/6A0pMdQAmBgX5zFOhjpQ86rEz8M1ocLwGYEfmvicPY5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9391
 
-On Thu, Nov 23, 2023 at 03:13:14PM +0800, Zhengchao Shao wrote:
-> When I perform the following test operations:
-> 1.ip link add br0 type bridge
-> 2.brctl addif br0 eth0
-> 3.ip addr add 239.0.0.1/32 dev eth0
-> 4.ip addr add 239.0.0.1/32 dev br0
-> 5.ip addr add 224.0.0.1/32 dev br0
-> 6.while ((1))
->     do
->         ifconfig br0 up
->         ifconfig br0 down
->     done
-> 7.send IGMPv2 query packets to port eth0 continuously. For example,
-> ./mausezahn ethX -c 0 "01 00 5e 00 00 01 00 72 19 88 aa 02 08 00 45 00 00
-> 1c 00 01 00 00 01 02 0e 7f c0 a8 0a b7 e0 00 00 01 11 64 ee 9b 00 00 00 00"
+On Thu, Nov 23, 2023 at 04:09:57AM +0200, Wei Fang wrote:
+> > I would suggest finding a way for the user space implementation to not
+> > assume that ETHTOOL_MSG_CHANNELS_GET is implemented by the driver.
 > 
-> The preceding tests may trigger the refcnt uaf issue of the mc list. The
-> stack is as follows:
-> 	refcount_t: addition on 0; use-after-free.
-> 	WARNING: CPU: 21 PID: 144 at lib/refcount.c:25 refcount_warn_saturate (lib/refcount.c:25)
-> 	CPU: 21 PID: 144 Comm: ksoftirqd/21 Kdump: loaded Not tainted 6.7.0-rc1-next-20231117-dirty #80
-> 	Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-> 	RIP: 0010:refcount_warn_saturate (lib/refcount.c:25)
-> 	RSP: 0018:ffffb68f00657910 EFLAGS: 00010286
-> 	RAX: 0000000000000000 RBX: ffff8a00c3bf96c0 RCX: ffff8a07b6160908
-> 	RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff8a07b6160900
-> 	RBP: ffff8a00cba36862 R08: 0000000000000000 R09: 00000000ffff7fff
-> 	R10: ffffb68f006577c0 R11: ffffffffb0fdcdc8 R12: ffff8a00c3bf9680
-> 	R13: ffff8a00c3bf96f0 R14: 0000000000000000 R15: ffff8a00d8766e00
-> 	FS:  0000000000000000(0000) GS:ffff8a07b6140000(0000) knlGS:0000000000000000
-> 	CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> 	CR2: 000055f10b520b28 CR3: 000000039741a000 CR4: 00000000000006f0
-> 	Call Trace:
-> 	<TASK>
-> 	igmp_heard_query (net/ipv4/igmp.c:1068)
-> 	igmp_rcv (net/ipv4/igmp.c:1132)
-> 	ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
-> 	ip_local_deliver_finish (net/ipv4/ip_input.c:234)
-> 	__netif_receive_skb_one_core (net/core/dev.c:5529)
-> 	netif_receive_skb_internal (net/core/dev.c:5729)
-> 	netif_receive_skb (net/core/dev.c:5788)
-> 	br_handle_frame_finish (net/bridge/br_input.c:216)
-> 	nf_hook_bridge_pre (net/bridge/br_input.c:294)
-> 	__netif_receive_skb_core (net/core/dev.c:5423)
-> 	__netif_receive_skb_list_core (net/core/dev.c:5606)
-> 	__netif_receive_skb_list (net/core/dev.c:5674)
-> 	netif_receive_skb_list_internal (net/core/dev.c:5764)
-> 	napi_gro_receive (net/core/gro.c:609)
-> 	e1000_clean_rx_irq (drivers/net/ethernet/intel/e1000/e1000_main.c:4467)
-> 	e1000_clean (drivers/net/ethernet/intel/e1000/e1000_main.c:3805)
-> 	__napi_poll (net/core/dev.c:6533)
-> 	net_rx_action (net/core/dev.c:6735)
-> 	__do_softirq (kernel/softirq.c:554)
-> 	run_ksoftirqd (kernel/softirq.c:913)
-> 	smpboot_thread_fn (kernel/smpboot.c:164)
-> 	kthread (kernel/kthread.c:388)
-> 	ret_from_fork (arch/x86/kernel/process.c:153)
-> 	ret_from_fork_asm (arch/x86/entry/entry_64.S:250)
-> 	</TASK>
-> 
-> The root causes are as follows:
-> Thread A					Thread B
-> ...						netif_receive_skb
-> br_dev_stop					...
->     br_multicast_leave_snoopers			...
->         __ip_mc_dec_group			...
->             __igmp_group_dropped		igmp_rcv
->                 igmp_stop_timer			    igmp_heard_query         //ref = 1
->                 ip_ma_put			        igmp_mod_timer
->                     refcount_dec_and_test	            igmp_start_timer //ref = 0
-> 			...                                     refcount_inc //ref increases from 0
-> When the device receives an IGMPv2 Query message, it starts the timer
-> immediately, regardless of whether the device is running. If the device is
-> down and has left the multicast group, it will cause the mc list refcount
-> uaf issue.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v3: I add some debug info in net/ipv4/igmp.c, the code is as follows.
->     Also I remove strace information started with "?"
->     1063	if (changed) {
->     1064		mdelay(50);
->     1065		printk("%s: indev:%s, im->multiaddr=0x%x, im name:%s\n",
->     1066			__func__, in_dev->dev ? in_dev->dev->name : "NULL", im->multiaddr,
->     1067			im->interface ? im->interface->dev->name : "NULL");
->     1068		igmp_mod_timer(im, max_delay);
->     1069	}
-> v2: use cmd "cat messages |/root/linux-next/scripts/decode_stacktrace.sh
->     /root/linux-next/vmlinux" to get precise stack traces and check whether
->     the im is destroyed before timer is started.
-> ---
->  net/ipv4/igmp.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-> index 76c3ea75b8dd..efeeca2b1328 100644
-> --- a/net/ipv4/igmp.c
-> +++ b/net/ipv4/igmp.c
-> @@ -216,8 +216,10 @@ static void igmp_start_timer(struct ip_mc_list *im, int max_delay)
->  	int tv = get_random_u32_below(max_delay);
->  
->  	im->tm_running = 1;
-> -	if (!mod_timer(&im->timer, jiffies+tv+2))
-> -		refcount_inc(&im->refcnt);
-> +	if (refcount_inc_not_zero(&im->refcnt)) {
-> +		if (mod_timer(&im->timer, jiffies + tv + 2))
-> +			ip_ma_put(im);
-> +	}
->  }
->  
->  static void igmp_gq_start_timer(struct in_device *in_dev)
-> -- 
-> 2.34.1
-> 
+> [Wei] IMO, the issue you encountered is that libbpf will perform an 
+> ETHTOOL_GCHANNELS operation. The issue I encountered is that "ethtool -x"
+> will also perform an ETHTOOL_GCHANNELS operation. Besides, There are other
+> apps that do the same operation as this, so I think it's best for fsl-enetc driver
+> to support querying channels.
+> Because your patch is more reasonable than mine, I think you should submit
+> this patch to upstream separately first.
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+The crucial piece you're omitting is that for ethtool -x, the "get channels"
+operation didn't use to be required, making this new requirement a
+breaking change. The interface between the Linux kernel and applications
+doesn't do that, which is why it's preferable to bring it up with the
+ethtool maintainers and the patch author instead of fixing one driver
+and leaving who knows how many still unfixed (and also the stable
+kernels unfixed for enetc as well).
+
+To be clear, I won't submit the "get_channels" enetc patch for the RFH
+indirection table to keep working. I might resubmit it for other
+reasons, like when I return to the AF_XDP zerocopy work.
 
