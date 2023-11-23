@@ -1,51 +1,69 @@
-Return-Path: <netdev+bounces-50509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE237F5F5C
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:50:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 357177F5F9C
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 13:59:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B0712819E6
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:50:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACECAB2130A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD55622EF6;
-	Thu, 23 Nov 2023 12:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA3824A04;
+	Thu, 23 Nov 2023 12:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cky5QevE"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VHaR3lwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3D814278
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 12:50:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E093FC433C7;
-	Thu, 23 Nov 2023 12:50:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700743837;
-	bh=FGTiolTqE2DDJVOuYCgHW3eC+mUVZ0ruY4vuGK1d2SI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cky5QevEsj9ILwZzg+WLV7jqszwXZx0WPOC7JnUAPbl9/fu9d/XPP+XjnYQ3n56Dr
-	 ymd90mr5H/ry5gJy0pxlqr5LXKqe6lV0j0XH0Q5CiNKuBmP/Ov0SO+yX/yVSvkhFhR
-	 Lp3lRw/BtLTYM+f97GGE2kJkKaQ7CIQUXncYsMkdw9/fIQYVDTTmoVdHHoDX7W38nS
-	 PpiiCc9GohQ7QlDA2CMJPUdxLeDLN/+D51SIFNLrMQMPz39FPsmGbK2+W9UkWKFquP
-	 RsOMTR8yjvbjUzSvNkxRhj3pB+Xn2NT8RgEJyt/eWcUB7Mck6gEuzcS0rvmdXWWCSm
-	 BkMc5hht0VbRw==
-Date: Thu, 23 Nov 2023 12:50:32 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Larysa Zaremba <larysa.zaremba@intel.com>
-Subject: Re: [net-next PATCH v2] net: phy: correctly check soft_reset ret
- ONLY if defined for PHY
-Message-ID: <20231123125032.GD6339@kernel.org>
-References: <20231121135332.1455-1-ansuelsmth@gmail.com>
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5F19E
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 04:59:19 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-548f74348f7so1214184a12.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 04:59:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700744358; x=1701349158; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m3lEDfMbf4/5n8hKchOxqlgfXgkFHsFTDF69zq4AYLI=;
+        b=VHaR3lwaRXGtHyPaeY+ocfdTtejaTa/BcGf03XqFTDnSJp5ED/vsqveJuyQG9HWz/Z
+         yZT4npUH4+MM+suM9P0wHE3CF5nVFp3cu6kh0XzokmM3KM4X7nDz5/ny1Be8pNCnK+Kj
+         sEWXdlz3cRhyhjZ6G4DKZg2862MAD1gasPFFQa42E/gjdInM6JWWDCrfwdjzW0m3t4yv
+         lp0UWfnkEehij6P2FvnorbXwaHuO2goEuJyYktJj+JA/zB6qH1xWRbtCGuGHst2CrKCJ
+         jhdR4CmmW1lI+h3nKs/bSPs+reKMGvz0l3vJAJ+zyKcxPNP1T4nDkxekEA1o+bRkRV5L
+         PBHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700744358; x=1701349158;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m3lEDfMbf4/5n8hKchOxqlgfXgkFHsFTDF69zq4AYLI=;
+        b=brUiUP5CX8WBPaO+qad3PVZFmDF9S8c/7tfo1Y1xNledetUTPO1TrxizYgOkTNtyEX
+         WyyHDzL44oUkkG1V5EFgEAbp4fx4zNdBxzc6p+uMcMSCTS820ftc4vN7UX1C9pPPN9xQ
+         mfYc4YRNp1gOH1ZHzgjPoYBI3NdJASQYP5LITaPoH7r0EMSU/snYtsPiREAf98t5fPiy
+         U3WGzzLAMIUj90Xd6e9eMszko8qlDfzQbG559O9fbOn/9YdPol+f40grm3Z6XsK77kDE
+         VALU4R2METi4pqbuVJeLpEhpqSlTqn1zb55OfSujqqFsFK0tcl01thWf3vJXdnljB5N1
+         xRog==
+X-Gm-Message-State: AOJu0YxQow7oxteIt9BZsAonom4IBGbUDQDGzpES7WTzW39j5lRVKp6i
+	QbGxhFVxDL/H2C/3d2aNHPgF8w==
+X-Google-Smtp-Source: AGHT+IEbbo+OCSVPb1MOZP7avY+hyd5lsGE7mpvnDA3Rh4qtJkO8g2wvOdUN7rUznRa1G2yr+69jZA==
+X-Received: by 2002:a17:906:6958:b0:a03:cde5:e02f with SMTP id c24-20020a170906695800b00a03cde5e02fmr4192652ejs.38.1700744357954;
+        Thu, 23 Nov 2023 04:59:17 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id g1-20020a170906348100b009de3641d538sm747565ejb.134.2023.11.23.04.59.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 04:59:17 -0800 (PST)
+Date: Thu, 23 Nov 2023 13:59:16 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: swarup <swarupkotikalapudi@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next v3] netlink: specs: devlink: add some(not all)
+ missing attributes in devlink.yaml
+Message-ID: <ZV9MpLBwS1ndszzf@nanopsycho>
+References: <20231123100119.148324-1-swarupkotikalapudi@gmail.com>
+ <ZV8lf8L8Me+T7iIW@nanopsycho>
+ <ZV9FnjRH6VTwWaaX@swarup-virtual-machine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,45 +72,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231121135332.1455-1-ansuelsmth@gmail.com>
+In-Reply-To: <ZV9FnjRH6VTwWaaX@swarup-virtual-machine>
 
-On Tue, Nov 21, 2023 at 02:53:32PM +0100, Christian Marangi wrote:
-> Introduced by commit 6e2d85ec0559 ("net: phy: Stop with excessive soft
-> reset").
-> 
-> soft_reset call for phy_init_hw had multiple revision across the years
-> and the implementation goes back to 2014. Originally was a simple call
-> to write the generic PHY reset BIT, it was then moved to a dedicated
-> function. It was then added the option for PHY driver to define their
-> own special way to reset the PHY. Till this change, checking for ret was
-> correct as it was always filled by either the generic reset or the
-> custom implementation. This changed tho with commit 6e2d85ec0559 ("net:
-> phy: Stop with excessive soft reset"), as the generic reset call to PHY
-> was dropped but the ret check was never made entirely optional and
-> dependent whether soft_reset was defined for the PHY driver or not.
-> 
-> Luckly nothing was ever added before the soft_reset call so the ret
-> check (in the case where a PHY didn't had soft_reset defined) although
-> wrong, never caused problems as ret was init 0 at the start of
-> phy_init_hw.
-> 
-> To prevent any kind of problem and to make the function cleaner and more
-> robust, correctly move the ret check if the soft_reset section making it
-> optional and needed only with the function defined.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Thu, Nov 23, 2023 at 01:29:18PM CET, swarupkotikalapudi@gmail.com wrote:
+>On Thu, Nov 23, 2023 at 11:12:15AM +0100, Jiri Pirko wrote:
+>> Thu, Nov 23, 2023 at 11:01:19AM CET, swarupkotikalapudi@gmail.com wrote:
+>> >Add some missing(not all) attributes in devlink.yaml.
+>> >
+>> >Re-generate the related devlink-user.[ch] code.
+>> >
+>> >enum have been given name as devlink_stats(for trap stats)
+>> >and devlink_trap_metadata_type(for trap metadata type)
+>> >
+>> >Test result with trap-get command:
+>> >  $ sudo ./tools/net/ynl/cli.py \
+>> >   --spec Documentation/netlink/specs/devlink.yaml \
+>> >   --do trap-get --json '{"bus-name": "netdevsim", \
+>> >                          "dev-name": "netdevsim1", \
+>> >   "trap-name": "ttl_value_is_too_small"}' --process-unknown
+>> > {'attr-stats': {'rx-bytes': 47918326, 'rx-dropped': 21,
+>> >                'rx-packets': 337453},
+>> > 'bus-name': 'netdevsim',
+>> > 'dev-name': 'netdevsim1',
+>> > 'trap-action': 'trap',
+>> > 'trap-generic': True,
+>> > 'trap-group-name': 'l3_exceptions',
+>> > 'trap-metadata': {'metadata-type-in-port': True},
+>> > 'trap-name': 'ttl_value_is_too_small',
+>> > 'trap-type': 'exception'}
+>> 
+>> 1. You have to maintain 24 hours between submission of one
+>> patch/patchset:
+>> https://www.kernel.org/doc/html/v6.6/process/maintainer-netdev.html
+>> 2. You didn't address my comment to last version
+>> 
+>Hi Jiri,
+>
+>I have read the above link, but missed the constraint
+>of 24 hour gap between patches.
+>I will be careful and not send the patch again within 24 hours.
+>
+>I could not understand your 2nd point.
+>Does it mean i should not include
+>test result e.g. "Test result with trap-get command: ...."
 
-I agree that it is good to only check for ret if it could be
-indicating an error value. And I see that as a bonus we avoid
-a now redundant in the case where phydev->drv->soft_reset is set,
-which is nice.
+Does not make sense to me. If you put it like this, it implicates that
+the trap attributes are the ones you are introducing in this patch.
+However, you introduce much more.
 
-FWIIW, in an ideal world, I think that ret would not be initialised to
-0 at the top of the function, because it's unnecessary, and such
-defensive programming is not in line with how kernel code is done.
 
-In any case, this patch looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+>Or
+>If it is something else, please elabroate more, which helps me to address your comment.
+>
+>I will try to clarify review comment, henceforth before sending new patchset for review.
+>
+>Thanks,
+>Swarup
 
