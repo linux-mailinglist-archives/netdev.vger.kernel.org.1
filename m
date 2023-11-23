@@ -1,99 +1,134 @@
-Return-Path: <netdev+bounces-50379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007037F5808
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:12:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88E97F580F
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:15:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A139128148E
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:12:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58BB0B20A73
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C90C2D0;
-	Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzHGGVa8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FC6C8CE;
+	Thu, 23 Nov 2023 06:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BD9C2C5
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3004FC433C7;
-	Thu, 23 Nov 2023 06:12:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700719937;
-	bh=DQku18wnqsdYXsZc0AUeywTgE/+0OjpzCh6TUoIK3R8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kzHGGVa8ZYRin6nBAUFhf9FHVV0qh/53tQth5Ke6EHh9h/J8TNkW6IV0l52cE5OC3
-	 cE04o2XyeZTgnrEwqli/L00XKXdQ7nxVQaDn7qJdXKIfVo0s/s0gBL8FKcePNg4IZ4
-	 orJbATwJlHoqAbc7pEl45rRAdtRjxVhdGr2fj6Ir2WZDFP6EFZ9jp43zl3rxY5Lgri
-	 LGqf7H0Xhs3vSdmVEH0JbAs1y7Nk2AIyTXeY5U7noTcGxPIKH0qCRuWTceLk+PzcpC
-	 UIZaLazyvU/ZqT2SOnTXzrMUzL/xGkdaN1SO7dHJpbU25pyJgHAywQw4NWkksfm2Os
-	 ME6kxwoTpu7vg==
-Date: Wed, 22 Nov 2023 22:12:15 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
-Subject: Re: [net 09/15] net/mlx5e: Forbid devlink reload if IPSec rules are
- offloaded
-Message-ID: <ZV7tP6Xdx93KNuTF@x130>
-References: <20231122014804.27716-1-saeed@kernel.org>
- <20231122014804.27716-10-saeed@kernel.org>
- <ZV3GSeNC0Pe3ubhB@nanopsycho>
- <20231122093546.GA4760@unreal>
- <ZV3O7dwQMLlNFZp3@nanopsycho>
- <20231122112832.GB4760@unreal>
- <20231122195332.1eb22597@kernel.org>
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91FAF110
+	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 22:15:03 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SbSQs40p5zPpYp;
+	Thu, 23 Nov 2023 14:10:45 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 23 Nov 2023 14:15:01 +0800
+Message-ID: <a6b4b010-ffca-50ea-1296-3e01eacb4f53@huawei.com>
+Date: Thu, 23 Nov 2023 14:15:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231122195332.1eb22597@kernel.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [question] smc: how to enable SMC_LO feature
+To: Wen Gu <guwen@linux.alibaba.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, yuehaibing
+	<yuehaibing@huawei.com>, "Libin (Huawei)" <huawei.libin@huawei.com>, Dust Li
+	<dust.li@linux.alibaba.com>, tonylu_linux <tonylu@linux.alibaba.com>, "D.
+ Wythe" <alibuda@linux.alibaba.com>
+References: <8ac15e20beb54acfae1a35d1603c1827@huawei.com>
+ <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ad29f704-ae79-4c4b-2227-d0fa9a1ceee2@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 
-On 22 Nov 19:53, Jakub Kicinski wrote:
->On Wed, 22 Nov 2023 13:28:32 +0200 Leon Romanovsky wrote:
->> Unfortunately not, we (mlx5) were forced by employer of one of
->> the netdev maintainers to keep uplink netdev in devlink reload
->> while we are in eswitch.
->
->The way you phrased this makes it sound like employers of netdev
->maintainers get to exert power over this community.
->
 
-I think Leon is just misinformed, the mlx5 netdev behavior Leon is
-talking about was already removed and has nothing to do with eswitch,
-and even that was never required by any employer or maintainer,
-sorry for the confusion .. 
 
->This is an unacceptable insinuation.
->
->DEVLINK_RELOAD_LIMIT_NO_RESET should not cause link loss, sure.
->Even if Meta required that you implemented that (which it does
->not, AFAIK) - it's just an upstream API.
->
+On 2023/11/23 10:21, Wen Gu wrote:
+> 
+> 
+> On 2023/11/21 20:14, shaozhengchao wrote:
+>> Hi Wen Gu:
+>> Currently, I am interested in the SMC_LOOPBACK feature proposed
+>> by you. Therefore, I use your patchset[1] to test the SMC_LO feature on
+>> my x86_64 environment and kernel is based on linux-next, commit: 
+>> 5ba73bec5e7b.
+>> The test result shows that the smc_lo feature cannot be enabled. Here's
+>> my analysis:
+>>
+>> 1. Run the following command to perform the test, and then capture
+>> packets on the lo device.
+>> - serv:  smc_run taskset -c <cpu> sockperf sr --tcp
+>> - clnt:  smc_run taskset -c <cpu> sockperf  tp --tcp --msg-size=64000 
+>> -i 127.0.0.1 -t 30
+>>
+>> 2. Use Wireshark to open packets. It is found that the VCE port 
+>> replies with
+>> SMC-R-Deline packets.
+>> [cid:image001.png@01DA1CB4.F1052C30]
+>>
+>> 3. Rx
+>> When smc_listen_work invokes smc_listen_v2_check, the VCE port returns
+>> a Decline packet because eid_cnt and flag.seid in the received packet 
+>> are both 0.
+>>
+>> 4. Tx
+>> In smc_clc_send_proposal,
+>> v2_ext->hdr.eid_cnt = smc_clc_eid_table.ueid_cnt;
+>> v2_ext->hdr.flag.seid = smc_clc_eid_table.seid_enabled;
+>>
+>> When smc_clc_init, ueid_cnt=0, and in the x86_64 environment, 
+>> seid_enabled is
+>> always equal to 0.
+>>
+>> So, I must call smc_clc_ueid_add function to increase ueid count?
+>> But I don't see where operations can be added, may I missed something?
+>>
+> 
+> Hi Zhengchao Shao,
+> 
+> Yes. When using SMC-D in non-s390 architecture (like x86 here), A common
+> UEID should be set. It can be set by following steps:
+> 
+> - Install smc-tools[1].
+> 
+> - Run # smcd ueid add <ueid> in loopback test environment.
+> 
+>    EID works as an ID to indicate the max communication space of SMC. 
+> When SEID is
+>    unavailable, an UEID is required.
+> 
+Hi Wen Gu:
+	Thank you for your reply. This is very useful for me. And I will
+be happy to learn from it.
 
-We only support this limit for FW_ACTIVATE_ACTION, and has no issue
-in this flow.
+Thanks
 
-Leon's issue is with internal mlx5 uplink implementation where on eswitch
-mode changes we don't unregister the netdev which causes eswitch resource
-leaks with ipsec rules, since we move eswitch to legacy mode on devlink
-reload then the same issue happens on relaod, hence he needs to block it
-in this patch, and we are already discussing a new design to fix devlink
-reload in net-next.
-
-This is Just a bug and has nothing to do with any requirements from anyone.
-
-Thanks.
-
+Zhengchao Shao
+> - Then run the test.
+> 
+> Hope this works for you :)
+> 
+> [1] https://github.com/ibm-s390-linux/smc-tools
+> 
+> Regards,
+> Wen Gu
+> 
+>> Could you give me some advice? Thanks very much.
+>>
+>> Zhengchao Shao
+>>
+>>
+>> [1]link: 
+>> https://patchwork.kernel.org/project/netdevbpf/cover/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>
+> 
 
