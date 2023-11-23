@@ -1,191 +1,157 @@
-Return-Path: <netdev+bounces-50381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1227F5812
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:18:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07E277F5818
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 07:21:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91A821C20C29
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:18:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF70A28148E
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 06:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910D8CA47;
-	Thu, 23 Nov 2023 06:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021CBD310;
+	Thu, 23 Nov 2023 06:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="U3e/GsCZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C61110
-	for <netdev@vger.kernel.org>; Wed, 22 Nov 2023 22:18:19 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SbSZt2cXnzQjKt;
-	Thu, 23 Nov 2023 14:17:42 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 23 Nov
- 2023 14:18:17 +0800
-Subject: Re: [PATCH net-next v2 1/3] page_pool: Rename pp_frag_count to
- pp_ref_count
-To: Liang Chen <liangchen.linux@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<hawk@kernel.org>, <ilias.apalodimas@linaro.org>
-CC: <netdev@vger.kernel.org>, <linux-mm@kvack.org>
-References: <20231123022516.6757-1-liangchen.linux@gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <2198afb3-4eaf-f41b-d58d-a7585f308c8c@huawei.com>
-Date: Thu, 23 Nov 2023 14:18:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C618110;
+	Wed, 22 Nov 2023 22:21:18 -0800 (PST)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AN3OtEl031046;
+	Thu, 23 Nov 2023 06:21:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=dTy++ncCkASmzMy2lPTP9AkYMPYSGftpH1MuX9Vynvc=;
+ b=U3e/GsCZ7x7ASxdMfY6xKnb1ghlazriKa/4ovcB8ZnclBcouSflZk+jdn9bqVkXuAb10
+ WfuDg35u6cd/OJ97NOwtfnwfjSX6lp6x4xX1sAktlGBb/gY9iawGbl5A9HoS8Gblc6BS
+ zoqwYIrbS/KXe81+jEAHZ41xEKIBR6BKhAQtpb62NnlYQqh7FdffLkebmeWPT30vjU9R
+ vmw9cVw4NoCeBlyUgnt/7EVxe5s0xOrwOgcAp5TIPFxN7fgjqHzBjdPskMZH+87EVLEJ
+ +vqnFa/wfjLORnKD7wS16oLQyuwNWCuFaxyVjVaGV7afOcvV+6QcXQVzpjg/sti6GKyD vw== 
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhguda4gd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Nov 2023 06:21:14 +0000
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AN6LDW2002723
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Nov 2023 06:21:13 GMT
+Received: from [10.216.46.160] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 22 Nov
+ 2023 22:21:07 -0800
+Message-ID: <6f7ee679-38be-abfd-a71c-d33e15c79c7d@quicinc.com>
+Date: Thu, 23 Nov 2023 11:50:59 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231123022516.6757-1-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH V4 2/4] clk: qcom: branch: Add mem ops support for branch2
+ clocks
+To: Konrad Dybcio <konrad.dybcio@linaro.org>, Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>
+CC: Taniya Das <quic_tdas@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Ajit Pandey
+	<quic_ajipan@quicinc.com>,
+        Jagadeesh Kona <quic_jkona@quicinc.com>
+References: <20231117095558.3313877-1-quic_imrashai@quicinc.com>
+ <20231117095558.3313877-3-quic_imrashai@quicinc.com>
+ <90885d90-2e25-404b-b3a3-13d134801146@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+From: Imran Shaik <quic_imrashai@quicinc.com>
+In-Reply-To: <90885d90-2e25-404b-b3a3-13d134801146@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 7nV9iKCq3kAFyatrqrTlwW4dlkqjIfG_
+X-Proofpoint-ORIG-GUID: 7nV9iKCq3kAFyatrqrTlwW4dlkqjIfG_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_03,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2311230043
 
-On 2023/11/23 10:25, Liang Chen wrote:
-> To support multiple users referencing the same fragment, pp_frag_count is
-> renamed to pp_ref_count to better reflect its actual meaning based on the
-> suggestion from [1].
 
-The renaming looks good to me, some minor nit.
 
-It is good to add a cover-letter using 'git format-patch --cover-letter'
-to explain the overall background or modifications this patchset make when
-there is more than one patch.
-
+On 11/23/2023 1:39 AM, Konrad Dybcio wrote:
 > 
-> [1]
-> http://lore.kernel.org/netdev/f71d9448-70c8-8793-dc9a-0eb48a570300@huawei.com
 > 
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> ---
->  include/linux/mm_types.h        |  2 +-
->  include/net/page_pool/helpers.h | 31 ++++++++++++++++++-------------
->  2 files changed, 19 insertions(+), 14 deletions(-)
+> On 11/17/23 10:55, Imran Shaik wrote:
+>> From: Taniya Das <quic_tdas@quicinc.com>
+>>
+>> Add the support for mem ops implementation to handle the sequence of
+>> enable/disable of the memories in ethernet PHY, prior to enable/disable
+>> of the respective clocks, which helps retain the respecive block's
+>> register contents.
+>>
+>> Signed-off-by: Taniya Das <quic_tdas@quicinc.com>
+>> Signed-off-by: Imran Shaik <quic_imrashai@quicinc.com>
+>> ---
+>>   drivers/clk/qcom/clk-branch.c | 39 +++++++++++++++++++++++++++++++++++
+>>   drivers/clk/qcom/clk-branch.h | 21 +++++++++++++++++++
+>>   2 files changed, 60 insertions(+)
+>>
+>> diff --git a/drivers/clk/qcom/clk-branch.c 
+>> b/drivers/clk/qcom/clk-branch.c
+>> index fc4735f74f0f..61bdd2147bed 100644
+>> --- a/drivers/clk/qcom/clk-branch.c
+>> +++ b/drivers/clk/qcom/clk-branch.c
+>> @@ -1,6 +1,7 @@
+>>   // SPDX-License-Identifier: GPL-2.0
+>>   /*
+>>    * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+>> + * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights 
+>> reserved.
+>>    */
+>>   #include <linux/kernel.h>
+>> @@ -134,6 +135,44 @@ static void clk_branch2_disable(struct clk_hw *hw)
+>>       clk_branch_toggle(hw, false, clk_branch2_check_halt);
+>>   }
+>> +static int clk_branch2_mem_enable(struct clk_hw *hw)
+>> +{
+>> +    struct clk_mem_branch *mem_br = to_clk_mem_branch(hw);
+>> +    struct clk_branch branch = mem_br->branch;
+>> +    const char *name = clk_hw_get_name(&branch.clkr.hw);
+> Bit of a microoptimization, but adding this implicitly in the WARN
+> would only execute clk_hw_get_name when necessary
 > 
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 957ce38768b2..64e4572ef06d 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -125,7 +125,7 @@ struct page {
->  			struct page_pool *pp;
->  			unsigned long _pp_mapping_pad;
->  			unsigned long dma_addr;
-> -			atomic_long_t pp_frag_count;
-> +			atomic_long_t pp_ref_count;
 
-It seems that we may have 4 bytes available for 64 bit arch if we change
-the 'atomic_long_t' to 'refcount_t':)
+Sure, will remove this line and use the clk_hw_get_name implicitly in WARN.
 
->  		};
->  		struct {	/* Tail pages of compound page */
->  			unsigned long compound_head;	/* Bit zero is set */
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index 4ebd544ae977..a6dc9412c9ae 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -29,7 +29,7 @@
->   * page allocated from page pool. Page splitting enables memory saving and thus
->   * avoids TLB/cache miss for data access, but there also is some cost to
->   * implement page splitting, mainly some cache line dirtying/bouncing for
-> - * 'struct page' and atomic operation for page->pp_frag_count.
-> + * 'struct page' and atomic operation for page->pp_ref_count.
->   *
->   * The API keeps track of in-flight pages, in order to let API users know when
->   * it is safe to free a page_pool object, the API users must call
-> @@ -214,61 +214,66 @@ inline enum dma_data_direction page_pool_get_dma_dir(struct page_pool *pool)
->  	return pool->p.dma_dir;
->  }
->  
-> -/* pp_frag_count represents the number of writers who can update the page
-> +/* pp_ref_count represents the number of writers who can update the page
->   * either by updating skb->data or via DMA mappings for the device.
->   * We can't rely on the page refcnt for that as we don't know who might be
->   * holding page references and we can't reliably destroy or sync DMA mappings
->   * of the fragments.
->   *
-> - * When pp_frag_count reaches 0 we can either recycle the page if the page
-> + * pp_ref_count initially corresponds to the number of fragments. However,
-> + * when multiple users start to reference a single fragment, for example in
-> + * skb_try_coalesce, the pp_ref_count will become greater than the number of
-> + * fragments.
-> + *
-> + * When pp_ref_count reaches 0 we can either recycle the page if the page
->   * refcnt is 1 or return it back to the memory allocator and destroy any
->   * mappings we have.
->   */
->  static inline void page_pool_fragment_page(struct page *page, long nr)
->  {
-> -	atomic_long_set(&page->pp_frag_count, nr);
-> +	atomic_long_set(&page->pp_ref_count, nr);
->  }
->  
->  static inline long page_pool_defrag_page(struct page *page, long nr)
->  {
->  	long ret;
->  
-> -	/* If nr == pp_frag_count then we have cleared all remaining
-> +	/* If nr == pp_ref_count then we have cleared all remaining
->  	 * references to the page:
->  	 * 1. 'n == 1': no need to actually overwrite it.
->  	 * 2. 'n != 1': overwrite it with one, which is the rare case
-> -	 *              for pp_frag_count draining.
-> +	 *              for pp_ref_count draining.
->  	 *
->  	 * The main advantage to doing this is that not only we avoid a atomic
->  	 * update, as an atomic_read is generally a much cheaper operation than
->  	 * an atomic update, especially when dealing with a page that may be
-> -	 * partitioned into only 2 or 3 pieces; but also unify the pp_frag_count
-> +	 * partitioned into only 2 or 3 pieces; but also unify the pp_ref_count
-
-Maybe "referenced by only 2 or 3 users" is more appropriate now?
-
->  	 * handling by ensuring all pages have partitioned into only 1 piece
->  	 * initially, and only overwrite it when the page is partitioned into
->  	 * more than one piece.
->  	 */
-> -	if (atomic_long_read(&page->pp_frag_count) == nr) {
-> +	if (atomic_long_read(&page->pp_ref_count) == nr) {
->  		/* As we have ensured nr is always one for constant case using
->  		 * the BUILD_BUG_ON(), only need to handle the non-constant case
-> -		 * here for pp_frag_count draining, which is a rare case.
-> +		 * here for pp_ref_count draining, which is a rare case.
->  		 */
->  		BUILD_BUG_ON(__builtin_constant_p(nr) && nr != 1);
->  		if (!__builtin_constant_p(nr))
-> -			atomic_long_set(&page->pp_frag_count, 1);
-> +			atomic_long_set(&page->pp_ref_count, 1);
->  
->  		return 0;
->  	}
->  
-> -	ret = atomic_long_sub_return(nr, &page->pp_frag_count);
-> +	ret = atomic_long_sub_return(nr, &page->pp_ref_count);
->  	WARN_ON(ret < 0);
->  
-> -	/* We are the last user here too, reset pp_frag_count back to 1 to
-> +	/* We are the last user here too, reset pp_ref_count back to 1 to
->  	 * ensure all pages have been partitioned into 1 piece initially,
->  	 * this should be the rare case when the last two fragment users call
->  	 * page_pool_defrag_page() currently.
-
-Do we need to rename the page_pool_defrag_page() and page_pool_is_last_frag()
-too?
-
->  	 */
->  	if (unlikely(!ret))
-> -		atomic_long_set(&page->pp_frag_count, 1);
-> +		atomic_long_set(&page->pp_ref_count, 1);
->  
->  	return ret;
->  }
+>> +    u32 val;
+>> +    int ret;
+>> +
+>> +    regmap_update_bits(branch.clkr.regmap, mem_br->mem_enable_reg,
+>> +            mem_br->mem_enable_ack_mask, mem_br->mem_enable_ack_mask);
+> It's quite a nit from me, but it would be nice to have the next line 
+> aligned
+> with the opening brace (with a tab size of 8)
 > 
+> Konrad
+
+Sure, will align the lines and post another series.
+
+Thanks,
+Imran
 
