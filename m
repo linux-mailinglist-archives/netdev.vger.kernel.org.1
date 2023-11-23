@@ -1,141 +1,151 @@
-Return-Path: <netdev+bounces-50614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE0697F64F2
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:11:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49217F6504
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 18:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6212B1F20E38
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:11:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F39F81C20D04
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827863FB23;
-	Thu, 23 Nov 2023 17:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jQwXr5Vn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A383FE3D;
+	Thu, 23 Nov 2023 17:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F4CB9
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 09:10:55 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso12385a12.1
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 09:10:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700759453; x=1701364253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ogv27qnGpnnAxgKKa25Ba5uAbjpfBJFgKmK2MewHApc=;
-        b=jQwXr5Vnb2KU/9NXBOIRMloclLQAPkBxu7bUaZjfyYRdbnXSZXqR6eKLuIDJrbo2Tb
-         qFYUY9Z4VUC4cRkgE1Z7W6nTChrbCkV0dlv7sTZYMm9ibDcFs5b3tZaoVCK0Aebab50I
-         po+3G84T1ko8Ov54fPyhoLza+u83JLRA46BmGwfqLf1agUF5QxZGVAEDEoETWARXUYLs
-         Heh19yz1yscf7Lrd/pMG+XRl17eHIM1Ibv6jQ0sl7gpMGMJx7TWiaEKkE8TdsjaKSoB9
-         xbT/mGWGpP76VfmNrE6fI1IcNaq3SE3SlViChE8zsQqofC8R3kPpm18yGDtKJpUYWkx/
-         KuUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700759453; x=1701364253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ogv27qnGpnnAxgKKa25Ba5uAbjpfBJFgKmK2MewHApc=;
-        b=VolqpfFkAansm7W01FAqdKvoFZ8mw/YJ64kZgdJ9KISKRQonq4afA9pZGXcMly6hdq
-         WqHYAeew1PlelO+yd21hQSYJ0JvWlB6ueQ85nvjRETyIzCCpo+BelFr7EP8J949Ug/nL
-         +d2NoDsxqmtOl1XWDqw2URHPo52QVgyuFlAV/hjt9ZHYAOU4s1lDEaKSS9N/+vKQ996J
-         SsVcPsgDy9YATJsOTtnsffTDKTMtVyCVo0bPPpJrAGlmb7yHEcKn5dcrH3YC8xK9O6uj
-         7b/O+l9l2vNIYOchuX4XnRmF4tWpHG39wjqib9g1EAk4qEJenOCfG7AkcIsfbhoka85X
-         vNXA==
-X-Gm-Message-State: AOJu0YzQS+0fs1J8j+LQfFX85gYVoGYUfBc8HxZHEDEvGQoV2AxXRGCs
-	joAKbrbCIpyfRkbyWlAZ6rJZIz1pTiYMpuf0MWwLFQ==
-X-Google-Smtp-Source: AGHT+IH+NzLwsoHeMJPU/+4k0X7JE9s4eC5uLQevGz1P/mYgZuuYwOgCevHH8koTsNTGoxpH0WRBV+Y2+yzTWAgD2z0=
-X-Received: by 2002:a05:6402:541b:b0:544:e2b8:ba6a with SMTP id
- ev27-20020a056402541b00b00544e2b8ba6amr331755edb.3.1700759453346; Thu, 23 Nov
- 2023 09:10:53 -0800 (PST)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A859D68;
+	Thu, 23 Nov 2023 09:15:52 -0800 (PST)
+Received: from [192.168.1.103] (178.176.78.136) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 23 Nov
+ 2023 20:15:44 +0300
+Subject: Re: [PATCH net v2] ravb: Fix races between ravb_tx_timeout_work() and
+ net related ops
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+References: <20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com>
+ <f5421248-3341-a5f7-84e6-c601df470a63@omp.ru>
+ <TYBPR01MB5341061AB0A805D0AF71FBB5D8B1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+ <69392d22-8ade-81aa-72b1-6a4abce8a4a7@omp.ru>
+ <TYBPR01MB5341A4AE46EA9261469C735DD8B0A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+ <29603244-d65a-5ca0-90d4-fdd9f410e180@omp.ru>
+ <TYBPR01MB5341FE9976E52CD8F6509B8ED8B7A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <5028f8cb-7d4e-e026-c4a9-3fabf22a1385@omp.ru>
+Date: Thu, 23 Nov 2023 20:15:44 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <fab4d0949126683a3b6b4e04a9ec088cf9bfdbb1.1700751622.git.pabeni@redhat.com>
-In-Reply-To: <fab4d0949126683a3b6b4e04a9ec088cf9bfdbb1.1700751622.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 Nov 2023 18:10:38 +0100
-Message-ID: <CANn89iJMVCGegZW2JGtfvGJVq1DZsM7dUEOJxfcvWurLSZGvTQ@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: fix mid stream window clamp.
-To: Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Wei Wang <weiwan@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Neil Spring <ntspring@fb.com>, 
-	David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <TYBPR01MB5341FE9976E52CD8F6509B8ED8B7A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 23:48:29
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181514 [Nov 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.136 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.136
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/21/2023 23:54:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 8:06:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-CC Neal and Wei
+Hello!
 
-On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> After the blamed commit below, if the user-space application performs
-> window clamping when tp->rcv_wnd is 0, the TCP socket will never be
-> able to announce a non 0 receive window, even after completely emptying
-> the receive buffer and re-setting the window clamp to higher values.
->
-> Refactor tcp_set_window_clamp() to address the issue: when the user
-> decreases the current clamp value, set rcv_ssthresh according to the
-> same logic used at buffer initialization time.
-> When increasing the clamp value, give the rcv_ssthresh a chance to grow
-> according to previously implemented heuristic.
->
-> Fixes: 3aa7857fe1d7 ("tcp: enable mid stream window clamp")
-> Reported-by: David Gibson <david@gibson.dropbear.id.au>
-> Reported-by: Stefano Brivio <sbrivio@redhat.com>
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> Tested-by: Stefano Brivio <sbrivio@redhat.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+   Sorry for the late reply -- the damn dozen of the AVB patches fell on me this
+Monday... :-/
+
+On 11/17/23 3:07 AM, Yoshihiro Shimoda wrote:
+[...]
+
+>>> In the function(s), since WORK_STRUCT_PENDING_BIT is set, schedule_{delayed_}work()
+>>> will not schedule the work anymore. So, I'll drop a condition netif_running()
+>>> from the ravb_tx_timeout_work().
+>>
+>>   Hm, this caused me to rummage in the work queue code for more time than
+>> I could afford... still not sure what you meant... :-/
+> 
+> I'm sorry for bothering you about this topic...
+> In the v3 patch, the rescheduling code was:
 > ---
->  net/ipv4/tcp.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 53bcc17c91e4..1a9b9064e080 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3368,9 +3368,22 @@ int tcp_set_window_clamp(struct sock *sk, int val)
->                         return -EINVAL;
->                 tp->window_clamp =3D 0;
->         } else {
-> -               tp->window_clamp =3D val < SOCK_MIN_RCVBUF / 2 ?
-> -                       SOCK_MIN_RCVBUF / 2 : val;
-> -               tp->rcv_ssthresh =3D min(tp->rcv_wnd, tp->window_clamp);
-> +               u32 new_rcv_ssthresh, old_window_clamp =3D tp->window_cla=
-mp;
-> +               u32 new_window_clamp =3D val < SOCK_MIN_RCVBUF / 2 ?
-> +                                               SOCK_MIN_RCVBUF / 2 : val=
-;
-> +
-> +               if (new_window_clamp =3D=3D old_window_clamp)
-> +                       return 0;
-> +
-> +               tp->window_clamp =3D new_window_clamp;
-> +               if (new_window_clamp < old_window_clamp) {
-> +                       tp->rcv_ssthresh =3D min(tp->rcv_ssthresh,
-> +                                              new_window_clamp);
-> +               } else {
-> +                       new_rcv_ssthresh =3D min(tp->rcv_wnd, tp->window_=
-clamp);
-> +                       tp->rcv_ssthresh =3D max(new_rcv_ssthresh,
-> +                                              tp->rcv_ssthresh);
-> +               }
->         }
->         return 0;
->  }
+> +	if (!rtnl_trylock()) {
+> +		if (netif_running(ndev))
+> +			schedule_delayed_work(&priv->work, msecs_to_jiffies(10));
+> +		return;
+> +	}
+> ---
+> 
+> However, we can implement this like the following:
+> ---
+> +	if (!rtnl_trylock()) {
+> +		schedule_delayed_work(&priv->work, msecs_to_jiffies(10));
+> +		return;
+> +	}
+> ---
+> 
+> The schedule_{delayed}_work() will not be queued after cancel_{delayed_}work_sync()
+> was called, because WORK_STRUCT_PENDING_BIT was set in cancel_{delayed_}work_sync()
+> like the following:
+> ---
+> cancel_work_sync()
+> -> __cancel_work_timer()
+>   -> try_to_grab_pending()
+>    -> if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, ...)
+> 
+> schedule_work()
+>  -> queue_work()
+>   -> queue_work_on()
+>    -> if (test_and_set_bit(WORK_STRUCT_PENDING_BIT, ...)
 
-It seems there is no provision for SO_RESERVE_MEM
+   You seem to have lost ! here. :-)
 
-I wonder if tcp_adjust_rcv_ssthresh()  could help here ?
+>     -> __queue_work()
 
-Have you considered reverting  3aa7857fe1d7 ("tcp: enable mid stream
-window clamp") ?
+   Ah! Now it makes perfect sense. Sorry, this somehow evaded me... :-/
 
-Thanks.
+> ---
+> 
+> Best regards,
+> Yoshihiro Shimoda
+
+[...]
+
+MBR, Sergey
 
