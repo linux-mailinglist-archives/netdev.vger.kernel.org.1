@@ -1,224 +1,115 @@
-Return-Path: <netdev+bounces-50313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ACD17F5579
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:43:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CEAC7F5583
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 01:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996831C20BAB
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:43:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C88B2815F6
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 00:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C294C15A2;
-	Thu, 23 Nov 2023 00:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF10DEBE;
+	Thu, 23 Nov 2023 00:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAhYVkDN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MJHp2fxj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BEC10E;
-	Wed, 22 Nov 2023 16:43:18 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32daeed7771so202121f8f.3;
-        Wed, 22 Nov 2023 16:43:18 -0800 (PST)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A81F18D;
+	Wed, 22 Nov 2023 16:48:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700700197; x=1701304997; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I4mDM3fOhLxMKv9Qsj/stPbdPgmQsMFznGIuQOD753M=;
-        b=AAhYVkDNOyIif9CmavrWY98Y86DL8k4oXHyIICTLTPAj9elVkBZ1tLDetXk2YZ+13R
-         UCvnB01W5jQR8s2sUMDm1TVemTOY5uqjvUVS2JAWQldwwAwZrOj1M4/pXnyAHTwHWhFw
-         JZPXvJT3Ywvu0srodVY0D6zIwY68ESp3GrWXF8qvRTdYzUfnuPtSyl0f7N8pDEQeKwti
-         OGFni6YSI8V6Ah9lxEfBySkReoT91kKG+x4UB9n3oOFO/BK1dgmmwfVwl0Sgf4LhYvmO
-         SHs48AaSkdUhRHoMLHgrYeJyJasOD3PT+JXOiwsFyGeMXVuuIUyi/47VSnt2Z9vQlmkv
-         gf4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700700197; x=1701304997;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I4mDM3fOhLxMKv9Qsj/stPbdPgmQsMFznGIuQOD753M=;
-        b=YOSK155JLFZseJpEYjJ1ddyUuEEAwQDd5okf24v63C9PjeCw0UJy8L9+dVItJ+4TWY
-         ZGs6IuoG1BBlRdIeiLf7xL9L52Bk2VyWKsLdDkNMJjWYkliDO3P43aZ/HB9uyAARD/3M
-         Koa2oUTlYGHhXRb1Os4pdVv4WTCYu5eXV68ykkjTnZQ7JxOCnlhaDcGFkw56Cmf6yBp2
-         Zx41sWoauX/IFmOWWnH9+AsB2NIZOkKL5AvocwFQOTPtRQvPOwokjw6caawbSEuYtm+I
-         ihdVZuw6SHJKBMDOOp6pyMsKv42IEG73TfgGylXsYn0S90jgZsqdOyWpBuVRamoT7/bR
-         UQ7g==
-X-Gm-Message-State: AOJu0YwNen8GTt81BW5vW2GxVp5uuEnCeQVd6n4s3oVelGk/s65SlqlM
-	Yu9ffR/i9kEAeL3izrCWXLPswUkeQzcoaah3NLM=
-X-Google-Smtp-Source: AGHT+IFaGuLwN1xpFTtgde8hjR8udeumSPNXj31L06f21NbuevuO4pwK/eQWIUQlq/PJPmsAyg32Y1iA4ZTIjeNqURg=
-X-Received: by 2002:a05:6000:128d:b0:332:cc15:6bae with SMTP id
- f13-20020a056000128d00b00332cc156baemr2454118wrx.20.1700700196781; Wed, 22
- Nov 2023 16:43:16 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1700700534; x=1732236534;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qmZdOEoSh54Tr4/Iw1S4mJwwzSQVqWEFdKjcVkgDJF0=;
+  b=MJHp2fxjVH07BlY2RJcOcCyW+L4IfRywBd+YQi44Ng2D/k1mdJ3jTgG0
+   iHLs5Rr2GzgcebgyZJihrAqupdiLXUv2ybBYvdPC3lALpcXwxp9yJRLVS
+   9hmJAB5ALzm40qUzlVfEo2VlO/Ja1v25gBknN/CYJB7pVdzFWeF/K6SIq
+   A=;
+X-IronPort-AV: E=Sophos;i="6.04,220,1695686400"; 
+   d="scan'208";a="45754520"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2023 00:48:51 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id AC08EC1BBB;
+	Thu, 23 Nov 2023 00:48:47 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:58429]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.2:2525] with esmtp (Farcaster)
+ id 96d8e617-d220-4c49-8946-55b7f5d104c9; Thu, 23 Nov 2023 00:48:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 96d8e617-d220-4c49-8946-55b7f5d104c9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Thu, 23 Nov 2023 00:48:45 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.50) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.39;
+ Thu, 23 Nov 2023 00:48:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <martineau@kernel.org>,
+	<matthieu.baerts@tessares.net>, <matttbe@kernel.org>,
+	<mptcp@lists.linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [mptcp?] KMSAN: uninit-value in mptcp_incoming_options
+Date: Wed, 22 Nov 2023 16:48:34 -0800
+Message-ID: <20231123004834.58534-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <000000000000545a26060abf943b@google.com>
+References: <000000000000545a26060abf943b@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120144642.591358648@infradead.org> <20231120154948.708762225@infradead.org>
- <20231122021817.ggym3biyfeksiplo@macbook-pro-49.dhcp.thefacebook.com> <20231122111517.GR8262@noisy.programming.kicks-ass.net>
-In-Reply-To: <20231122111517.GR8262@noisy.programming.kicks-ass.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 22 Nov 2023 16:43:05 -0800
-Message-ID: <CAADnVQLhWFKcxno53zqGtuiWwUcw+TU8gB2eCBRPQC=2y5vrFw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] x86/cfi,bpf: Fix BPF JIT call
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <keescook@chromium.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	linux-arch <linux-arch@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Joao Moreira <joao@overdrivepizza.com>, 
-	Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Wed, Nov 22, 2023 at 3:15=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
-g> wrote:
->
->
-> To be very explicit, let me list all the various forms of function
-> calls:
->
-> Traditional:
->
-> foo:
->   ... code here ...
->   ret
->
-> direct caller:
->
->   call foo
->
-> indirect caller:
->
->   lea foo(%rip), %r11
->   call *%r11
->
-> IBT:
->
-> foo:
->   endbr64
->   ... code here ...
->   ret
->
-> direct caller:
->
->   call foo / call foo+4
->
-> indirect caller:
->
->   lea foo(%rip), %r11
->   ...
->   call *%r11
->
->
-> kCFI:
->
-> __cfi_foo:
->   movl $0x12345678, %rax
->   (11 nops when CALL_PADDING)
-> foo:
->   endbr64 (when also IBT)
->   ... code here ...
->   ret
->
-> direct caller:
->
->   call foo / call foo+4
->
-> indirect caller:
->
->   lea foo(%rip), %r11
->   ...
->   movl $(-0x12345678), %r10d
->   addl -15(%r11), %r10d (or -4 without CALL_PADDING)
->   je 1f
->   ud2
-> 1:call *%r11
->
->
-> FineIBT (builds as kCFI + CALL_PADDING + IBT + RETPOLINE and runtime
-> patches things to look like):
->
-> __cfi_foo:
->   endbr64
->   subl $0x12345678, %r10d
->   jz foo
->   ud2
->   nop
-> foo:
->   osp nop3 (was endbr64)
->   ... code here ...
->   ret
->
-> direct caller:
->
->   call foo / call foo+4
->
-> indirect caller:
->
->   lea foo(%rip), %r11
->   ...
->   movl $0x12345678, %r10d
->   subl $16, %r11
->   nop4
->   call *%r11
+From: syzbot <syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com>
+Date: Wed, 22 Nov 2023 07:43:23 -0800
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    c2d5304e6c64 Merge tag 'platform-drivers-x86-v6.7-2' of gi..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1536e3d4e80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e32016b84cf917ca
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b834a6b2decad004cfa1
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11469724e80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13934aaf680000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/23ea827adf3b/disk-c2d5304e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/0f964ac588f5/vmlinux-c2d5304e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/b061be889285/bzImage-c2d5304e.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com
+> 
+> =====================================================
+> BUG: KMSAN: uninit-value in mptcp_incoming_options+0xc93/0x3a80 net/mptcp/options.c:1197
 
-Got it. That helps a lot!
-You kind of have this comment scattered through arch/x86/kernel/alternative=
-.c
-but having it in one place like above would go a long way.
-Could you please add it to arch/x86/net/bpf_jit_comp.c
-or arch/x86/include/asm/cfi.h next to enum cfi_mode ?
+#syz test git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git c2d5304e6c648ebcf653bace7e51e0e6742e46c8
 
-> > I'm not sure doing cfi_bpf_hash check in JITed code is completely solvi=
-ng the problem.
-> > From bpf_dispatcher_*_func() calling into JITed will work,
-> > but this emit_prologue() is doing the same job for all bpf progs.
-> > Some bpf progs call each other directly and indirectly.
-> > bpf_dispatcher_*_func() -> JITed_BPF_A -> JITed_BPF_B.
-> > A into B can be a direct call (which cfi doesn't care about) and
-> > indirect via emit_bpf_tail_call_indirect()->emit_indirect_jump().
-> > Should we care about fineibt/kcfi there too?
->
-> The way I understood the tail-call thing to work is that it jumps to
-> bpf_prog + X86_TAIL_CALL_OFFSET, we already emit an extra ENDBR there to
-> make this work.
->
-> So the A -> B indirect call is otherwise unadornen and only needs ENDBR.
->
-> Ideally that would use kCFI/FineIBT but since it also skips some of the
-> setup, this gets to be non-trivial, so I've let this be as is.
-
-I see. yeah. The setup is not trivial indeed. Keep as-is is fine.
-
-> So the kCFI thing is 'new' but readily inspected by objdump or godbolt:
->
->   https://godbolt.org/z/sGe18z3ca
->
-> (@Sami, that .Ltmp15 thing, I don't see that in the kernel, what
-> compiler flag makes that go away?)
-
-I also noticed this discrepancy. It doesn't seem to be used.
-Looks weird to spend 8 bytes to store -sizeof(ud2)
-
-> As to FineIBT, that has a big comment in arch/x86/kernel/alternative.c
-> where I rewrite the kCFI thing into FineIBT. I can refer there to avoid
-> duplicating comments, would that work?
-
-Just the above comment somewhere would work.
-I wouldn't worry about duplication. This is tricky stuff.
-When gcc folks get around implementing kcfi they will find it useful too.
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index cd15ec73073e..01066aa7e67d 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -370,6 +370,7 @@ void mptcp_get_options(const struct sk_buff *skb,
+ 
+ 	/* initialize option status */
+ 	mp_opt->suboptions = 0;
++	mp_opt->use_ack = 0;
+ 
+ 	length = (th->doff * 4) - sizeof(struct tcphdr);
+ 	ptr = (const unsigned char *)(th + 1);
 
