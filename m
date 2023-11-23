@@ -1,214 +1,204 @@
-Return-Path: <netdev+bounces-50667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CC1F7F6975
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:11:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101ED7F6996
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:48:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 664531C209E3
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:11:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3417F1C20752
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 23:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B822922F12;
-	Thu, 23 Nov 2023 23:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAEE22F12;
+	Thu, 23 Nov 2023 23:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHjbyV4r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZHf75NC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39ED10C2
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:11:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700781108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=P9UNCPaxva3mocGAduryLu7lxBwmZU5AYOzYsOMnmXM=;
-	b=hHjbyV4rUUzLUGBx3J+slaMZCUVBJQcDF6FlS3jvxrq0P6IkK4QSZKkb0LqDlVI2L0zvha
-	dfwyODGEk/AxcSGJ8xZBuCMoUDNCVtty1qO/OOF9t1WhtpKq19QlC0osgexA+41gbqe/+r
-	UGMUSIOjB4yNBcLRQmk+v1qp9gMbFq0=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-387-mh9ZsBUhOxePyhtqRGsNwA-1; Thu, 23 Nov 2023 18:11:47 -0500
-X-MC-Unique: mh9ZsBUhOxePyhtqRGsNwA-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-77d7a162255so33683685a.2
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:11:47 -0800 (PST)
+Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536FCD6E
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:48:13 -0800 (PST)
+Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-58d12b53293so748858eaf.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 15:48:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700783292; x=1701388092; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=spVCDZuUTyD3E5XOD5V7ruyilndxjuX+URaR0E+3KLw=;
+        b=eZHf75NCSkePmExf6LP2XmxD8nKyW+yYm2n62oH8r6/JvJ4mn/vl2YGcWrD9FBuA9F
+         j0D+CK8t5EdzXWJpVbDgZ4y/UOi1Hof1BJzxqgUMIfJMrW+IC45lP6H1Ejdd9ROIZ5IN
+         tkAf0SPE4mCfMshAq2Ccr3JVsxUtTGH5VSWYN6yH2AMGDO3XNm8HBXUQYyt3EgahKgxK
+         Z56dQhASAXsJVhTEwItwsvHSMrp9A+Khh9ZajaLOEaSJG58o5s/DwhNUf4niY39EQUtH
+         lZvHg3dAh1WgYmaNKkSMOyzNeOWdgf4eWVzwsaqcDyxFZILI5eygLA605c3PYS1xAohc
+         X2/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700781107; x=1701385907;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P9UNCPaxva3mocGAduryLu7lxBwmZU5AYOzYsOMnmXM=;
-        b=dZFsuV48ahr7Qjl7exA7tgi78BQ6F6Djxf9ehopkLIDex0kCq3Hg/cawxbkEQNxoWq
-         yT8ThEX093sbFNadGbFyt6swzHcT7xhivksnEpmjOhyUgyZ36HAcb+z4pccmsxjFH1+g
-         rIotDGdUzO9HEoFG/5E7TUQWmG1/+/hpO4FsD74Fxh0PC7CiY73H36ZBman36gG9K18f
-         098yFaBmquJFvBVWtM2zR69JFiquR5Huqfk0YczyHaxeWkzb6zx4NE92D6wE4l01Dvb2
-         jdkw1vhBx9DkZ23WbI7P7z3SQYUfUQvhELWb8632gn2ajQzna5oA5kKt3in2NKPgBgWw
-         wxng==
-X-Gm-Message-State: AOJu0Yzpn/bK/RWEH4Bgn5fkLlEtjjGbRzeB7PxbabxOcND8d1HyG/pt
-	KmZTx8PQVpXK23o08ncpZJ8j8K8yiSCdP3vRvrbpru+Drf2DaU1ALvz2u3yIxEAiq0YAVrtLPK7
-	ckYu7TLuerZMLY3r3aQYGEbyL
-X-Received: by 2002:a37:ef0a:0:b0:774:3963:41a5 with SMTP id j10-20020a37ef0a000000b00774396341a5mr861407qkk.13.1700781106745;
-        Thu, 23 Nov 2023 15:11:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFMxrwVWCHJx6/IYascYOtLDxEUb/y//Q86zmYh7bcYiqRQIb8m9qm8tKsWhmR/1kPe48ZGdA==
-X-Received: by 2002:a37:ef0a:0:b0:774:3963:41a5 with SMTP id j10-20020a37ef0a000000b00774396341a5mr861389qkk.13.1700781106433;
-        Thu, 23 Nov 2023 15:11:46 -0800 (PST)
-Received: from debian (2a01cb058d23d6009e5da12aee20e435.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9e5d:a12a:ee20:e435])
-        by smtp.gmail.com with ESMTPSA id k18-20020a05620a143200b007743671a41fsm786078qkj.72.2023.11.23.15.11.44
+        d=1e100.net; s=20230601; t=1700783292; x=1701388092;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=spVCDZuUTyD3E5XOD5V7ruyilndxjuX+URaR0E+3KLw=;
+        b=OT4x4glWRFVK1sxZgfyCum5DZl0EidEDg3MAYH55wvslu5FzMtxjEQbRuaugy+mOFv
+         Usg2Fo5jez+2qZffOZJupjxpfMfpSVIgPEOakFEMKf9ArYCgUlKKCXUPdslyRX/FP671
+         KKik0rnCHtJWsqAFU9L+QAWVCrWh8MGTVokEal1GWIgZKxIKq4ywUade5p6cHyMam5J7
+         gjIVB5QoWA7+XbAgdweeZnBzYHGN4ymvKN31xLl4VMyxE46NSbeY5lEF8XU+rNdbB1qe
+         xJcb9fX9v/sE2/w7gThkS/7jr4D0O8RmTJfI0uzUX+B6fyxLH+NEFWcpIesdK3D8LAxJ
+         wObA==
+X-Gm-Message-State: AOJu0YxnOdkESh1oh7BN4Ga+uwe5vGILGnNYL1VdMHoDMHAB7KmAMH0H
+	r0sHbbpA1YcLWAaFy3tvSDM=
+X-Google-Smtp-Source: AGHT+IEa5mH6O364Ei4DK3oqTPF8yoDeAEs/C61WgEPsLL43iB4FCM15dIRAlviMY64IjFGcmJ2eyQ==
+X-Received: by 2002:a05:6359:1781:b0:16b:c8cd:1f05 with SMTP id mb1-20020a056359178100b0016bc8cd1f05mr697415rwb.17.1700783292460;
+        Thu, 23 Nov 2023 15:48:12 -0800 (PST)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id d5-20020ac85345000000b00417f330026bsm830354qto.49.2023.11.23.15.48.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 15:11:45 -0800 (PST)
-Date: Fri, 24 Nov 2023 00:11:42 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH net-next v2] tcp: Dump bound-only sockets in inet_diag.
-Message-ID: <bfb52b5103de808cda022e2d16bac6cf3ef747d6.1700780828.git.gnault@redhat.com>
+        Thu, 23 Nov 2023 15:48:11 -0800 (PST)
+Date: Thu, 23 Nov 2023 18:48:11 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ syzbot <syzkaller@googlegroups.com>, 
+ Mahesh Bandewar <maheshb@google.com>, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <655fe4bb89846_d847b294b1@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANn89i+BhRbK-HfmYzzr37N+E_-6kCeoZU0W8n7V35ERZR4A_A@mail.gmail.com>
+References: <20231109152241.3754521-1-edumazet@google.com>
+ <CAF=yD-KjqkVJ7G_=EpKNRcdvbTujf6E4p1S_mTVQNBt9enOs2w@mail.gmail.com>
+ <CANn89i+BhRbK-HfmYzzr37N+E_-6kCeoZU0W8n7V35ERZR4A_A@mail.gmail.com>
+Subject: Re: [PATCH net] ipvlan: add ipvlan_route_v6_outbound() helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Walk the hashinfo->bhash2 table so that inet_diag can dump TCP sockets
-that are bound but haven't yet called connect() or listen().
+Eric Dumazet wrote:
+> On Thu, Nov 9, 2023 at 7:29=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> =
 
-This allows ss to dump bound-only TCP sockets, together with listening
-sockets (as there's no specific state for bound-only sockets). This is
-similar to the UDP behaviour for which bound-only sockets are already
-dumped by ss -lu.
+> > Do you think that it is an oversight that this function mixes a retur=
+n
+> > of NET_XMIT_DROP/NET_XMIT_SUCCESS with returning the error code
+> > received from deep in the routing stack?
+> >
+> > Either way, this patch preserves that existing behavior, so
+> >
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+> =
 
-The code is inspired by the ->lhash2 loop. However there's no manual
-test of the source port, since this kind of filtering is already
-handled by inet_diag_bc_sk(). Also, a maximum of 16 sockets are dumped
-at a time, to avoid running with bh disabled for too long.
+> I saw this indeed, and chose to leave this as is to ease code review.
+> =
 
-No change is needed for ss. With an IPv4, an IPv6 and an IPv6-only
-socket, bound respectively to 40000, 64000, 60000, the result is:
+> We might send a stand alone patch to return NET_XMIT_DROP instead.
+> =
 
-  $ ss -lt
-  State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess
-  UNCONN 0      0            0.0.0.0:40000      0.0.0.0:*
-  UNCONN 0      0               [::]:60000         [::]:*
-  UNCONN 0      0                  *:64000            *:*
+> Thanks for the review !
 
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
+I took a closer look at this. The short version is that returning
+errno, including this dst->error, from ipvlan_start_xmit is apparently
+valid, to my surprise. If so, there is nothing to do here.
 
-v2:
-  * Use ->bhash2 instead of ->bhash (Kuniyuki Iwashima).
-  * Process no more than 16 sockets at a time (Kuniyuki Iwashima).
+The various callees of ipvlan_start_xmit return a mixture of
+NET_XMIT_SUCCESS, NET_XMIT_DROP, errno (as in this instance, and
+whatever __dev_queue_xmit may return, which is documented as
 
- net/ipv4/inet_diag.c | 88 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 87 insertions(+), 1 deletion(-)
+   Return:      =
 
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 7d0e7aaa71e0..d7fb6a625cb7 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -1077,10 +1077,96 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
- 		s_i = num = s_num = 0;
- 	}
- 
-+/* Process a maximum of SKARR_SZ sockets at a time when walking hash buckets
-+ * with bh disabled.
-+ */
-+#define SKARR_SZ 16
-+
-+	/* Dump bound-only sockets */
-+	if (cb->args[0] == 1) {
-+		if (!(idiag_states & TCPF_CLOSE))
-+			goto skip_bind_ht;
-+
-+		for (i = s_i; i < hashinfo->bhash_size; i++) {
-+			struct inet_bind_hashbucket *ibb;
-+			struct inet_bind2_bucket *tb2;
-+			struct sock *sk_arr[SKARR_SZ];
-+			int num_arr[SKARR_SZ];
-+			int idx, accum, res;
-+
-+resume_bind_walk:
-+			num = 0;
-+			accum = 0;
-+			ibb = &hashinfo->bhash2[i];
-+
-+			spin_lock_bh(&ibb->lock);
-+			inet_bind_bucket_for_each(tb2, &ibb->chain) {
-+				if (!net_eq(ib2_net(tb2), net))
-+					continue;
-+
-+				sk_for_each_bound_bhash2(sk, &tb2->owners) {
-+					struct inet_sock *inet = inet_sk(sk);
-+
-+					if (num < s_num)
-+						goto next_bind;
-+
-+					if (sk->sk_state != TCP_CLOSE ||
-+					    !inet->inet_num)
-+						goto next_bind;
-+
-+					if (r->sdiag_family != AF_UNSPEC &&
-+					    r->sdiag_family != sk->sk_family)
-+						goto next_bind;
-+
-+					if (!inet_diag_bc_sk(bc, sk))
-+						goto next_bind;
-+
-+					if (!refcount_inc_not_zero(&sk->sk_refcnt))
-+						goto next_bind;
-+
-+					num_arr[accum] = num;
-+					sk_arr[accum] = sk;
-+					if (++accum == SKARR_SZ)
-+						goto pause_bind_walk;
-+next_bind:
-+					num++;
-+				}
-+			}
-+pause_bind_walk:
-+			spin_unlock_bh(&ibb->lock);
-+
-+			res = 0;
-+			for (idx = 0; idx < accum; idx++) {
-+				if (res >= 0) {
-+					res = inet_sk_diag_fill(sk_arr[idx],
-+								NULL, skb, cb,
-+								r, NLM_F_MULTI,
-+								net_admin);
-+					if (res < 0)
-+						num = num_arr[idx];
-+				}
-+				sock_gen_put(sk_arr[idx]);
-+			}
-+			if (res < 0)
-+				goto done;
-+
-+			cond_resched();
-+
-+			if (accum == SKARR_SZ) {
-+				s_num = num + 1;
-+				goto resume_bind_walk;
-+			}
-+
-+			s_num = 0;
-+		}
-+skip_bind_ht:
-+		cb->args[0] = 2;
-+		s_i = num = s_num = 0;
-+	}
-+
- 	if (!(idiag_states & ~TCPF_LISTEN))
- 		goto out;
- 
--#define SKARR_SZ 16
- 	for (i = s_i; i <= hashinfo->ehash_mask; i++) {
- 		struct inet_ehash_bucket *head = &hashinfo->ehash[i];
- 		spinlock_t *lock = inet_ehash_lockp(hashinfo, i);
--- 
-2.39.2
+   * 0                          - buffer successfully transmitted
+   * positive qdisc return code - NET_XMIT_DROP etc.
+   * negative errno             - other errors
 
+Since in all cases the skb is consumed, I thought a simple fix for
+this driver might be:
+
+    @@ -232,7 +232,7 @@ static netdev_tx_t ipvlan_start_xmit(struct sk_bu=
+ff *skb,
+            } else {
+                    this_cpu_inc(ipvlan->pcpu_stats->tx_drps);
+            }
+    -       return ret;
+    +       return NETDEV_TX_OK;
+
+Given that the return type of ndo_start_xmit is pretty clear:
+
+    enum netdev_tx {
+            __NETDEV_TX_MIN  =3D INT_MIN,     /* make sure enum is signed=
+ */
+            NETDEV_TX_OK     =3D 0x00,        /* driver took care of pack=
+et */
+            NETDEV_TX_BUSY   =3D 0x10,        /* driver tx path was busy*=
+/
+    };
+    typedef enum netdev_tx netdev_tx_t;
+
+But, the comment above that in netdevice.h states that drivers may
+indeed return other values. There is no strict type checking for enums.
+
+    /*
+     * Transmit return codes: transmit return codes originate from three =
+different
+     * namespaces:
+     *
+     * - qdisc return codes
+     * - driver transmit return codes
+     * - errno values
+     *
+     * Drivers are allowed to return any one of those in their hard_start=
+_xmit()
+     * function. Real network devices commonly used with qdiscs should on=
+ly return
+     * the driver transmit return codes though - when qdiscs are used, th=
+e actual
+     * transmission happens asynchronously, so the value is not propagate=
+d to
+     * higher layers. Virtual network devices transmit synchronously; in =
+this case
+     * the driver transmit return codes are consumed by dev_queue_xmit(),=
+ and all
+     * others are propagated to higher layers.
+     */
+
+The "real network devices" part is implemented by dev_xmit_complete:
+
+    /*
+     * Current order: NETDEV_TX_MASK > NET_XMIT_MASK >=3D 0 is significan=
+t;
+     * hard_start_xmit() return < NET_XMIT_MASK means skb was consumed.
+     */     =
+
+    static inline bool dev_xmit_complete(int rc)
+    {       =
+
+    	/*
+    	 * Positive cases with an skb consumed by a driver:
+    	 * - successful transmission (rc =3D=3D NETDEV_TX_OK)
+    	 * - error while transmitting (rc < 0)
+    	 * - error while queueing to a different device (rc & NET_XMIT_MASK)=
+
+    	 */                      =
+
+    	if (likely(rc < NET_XMIT_MASK))
+    		return true;
+    		=
+
+    	return false;
+    }               =
+
+
+Note that NETDEV_TX_BUSY is > NET_XMIT_MASK.
+
+I suppose the second part refers to the if (q->enqueue) =3D=3D false fall=
+-through
+in __dev_queue_xmit, where __dev_queue_xmit indeed returns rc to its call=
+er.=
 
