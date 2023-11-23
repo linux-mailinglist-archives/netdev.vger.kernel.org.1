@@ -1,124 +1,138 @@
-Return-Path: <netdev+bounces-50454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC9D37F5DAC
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:21:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3D97F5DC2
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 12:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54800B21280
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:21:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FF9CB21287
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 11:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9042F22F11;
-	Thu, 23 Nov 2023 11:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8807822F13;
+	Thu, 23 Nov 2023 11:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKN5IfJO"
 X-Original-To: netdev@vger.kernel.org
-Received: from wangsu.com (unknown [180.101.34.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 418CD1BD;
-	Thu, 23 Nov 2023 03:21:14 -0800 (PST)
-Received: from XMCDN1207038 (unknown [59.61.78.234])
-	by app2 (Coremail) with SMTP id SyJltAAnoxKZNV9lmDJsAA--.28580S2;
-	Thu, 23 Nov 2023 19:20:59 +0800 (CST)
-From: "Pengcheng Yang" <yangpc@wangsu.com>
-To: "'Daniel Borkmann'" <daniel@iogearbox.net>,
-	"'John Fastabend'" <john.fastabend@gmail.com>,
-	"'Jakub Sitnicki'" <jakub@cloudflare.com>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	<bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <1700565725-2706-1-git-send-email-yangpc@wangsu.com> <6c856222-d103-8149-1cdb-b3e07105f5f8@iogearbox.net>
-In-Reply-To: <6c856222-d103-8149-1cdb-b3e07105f5f8@iogearbox.net>
-Subject: Re: [PATCH bpf-next v2 0/3] skmsg: Add the data length in skmsg to SIOCINQ ioctl and rx_queue
-Date: Thu, 23 Nov 2023 19:20:57 +0800
-Message-ID: <000001da1dff$223ed4e0$66bc7ea0$@wangsu.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0281E539;
+	Thu, 23 Nov 2023 11:25:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D26C433C8;
+	Thu, 23 Nov 2023 11:25:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700738748;
+	bh=d2fQ5OUt37NZjXyFL/AztRcqGEHUeRQlVmUFvl3AmKE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qKN5IfJOAUuRmyDj7z/eZH7XCdF2ILc6caa6Ssp+CAb/4p8gvvIIC1Y8qU2oie668
+	 S9f57o1peTZBF13xbfqRin0CBh3TaESNBhcdXlo/qDUVHQ8QB9MzCJgbSrGICSGdHn
+	 RP/0/kIgeEtktseQyMAlVvLvlxJLuFutekQJZvr0fkLFJYDQBoHgYPdAtuByCtgbT8
+	 mPgryIzc6IsxqgGE629So+6RrORm+ufHhzMejpTYpjDpFrMEHZP+tPkMqyfPhbf2vh
+	 r2Bohiiip/bWnG+Bfew7B+g6tRyD74Ds92ZGixObxR+DXlQGfMWPVTnFYQbA3dV+C2
+	 dBd3I6XyPC0EA==
+Date: Thu, 23 Nov 2023 11:25:43 +0000
+From: Lee Jones <lee@kernel.org>
+To: Shiji Yang <yangshiji66@outlook.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Cc: linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jisheng Zhang <jszhang@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4] dt-bindings: leds: add 'internet' and 'signal'
+ function definitions
+Message-ID: <20231123112543.GD1243364@google.com>
+References: <TYAP286MB0315F4D71698370875F58F6EBCAAA@TYAP286MB0315.JPNP286.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQIpjviH4qTFjCB89Pc8Rjk1Q8y5HALF/A0Ur9KtXqA=
-Content-Language: zh-cn
-X-CM-TRANSID:SyJltAAnoxKZNV9lmDJsAA--.28580S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGw4rCw4xCw4rKw43Xr48Xrb_yoW5AFWDpa
-	4DA34UGFWkZa42grsxWr4Igw4Fgr9Iyw45Kr1UWry3CF13uw1F9r4xWayaqr4xGr4rua4j
-	gw4UWFW8J3y5JaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkKb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
-	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r48
-	McIj6xkF7I0En7xvr7AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkIecxEwVAFwVW8KwCF04k20xvY0x0EwIxG
-	rwCF04k20xvE74AGY7Cv6cx26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU5no2U
-	UUUUU==
-X-CM-SenderInfo: p1dqw1nf6zt0xjvxhudrp/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <TYAP286MB0315F4D71698370875F58F6EBCAAA@TYAP286MB0315.JPNP286.PROD.OUTLOOK.COM>
 
-Daniel Borkmann <daniel@iogearbox.net> wrote:
-> On 11/21/23 12:22 PM, Pengcheng Yang wrote:
-> > When using skmsg redirect, the msg is queued in psock->ingress_msg,
-> > and the application calling SIOCINQ ioctl will return a readable
-> > length of 0, and we cannot track the data length of ingress_msg with
-> > the ss tool.
-> >
-> > In this patch set, we added the data length in ingress_msg to the
-> > SIOCINQ ioctl and the rx_queue of tcp_diag.
-> >
-> > v2:
-> > - Add READ_ONCE()/WRITE_ONCE() on accesses to psock->msg_len
-> > - Mask out the increment msg_len where its not needed
+Andrew, Florian,
+
+Thoughts?
+
+On Mon, 06 Nov 2023, Shiji Yang wrote:
+
+> These two types of LEDs are widely used in routers and NICs.
 > 
-> Please double check BPF CI, this series might be breaking sockmap selftests :
+> The 'signal' LED is used to display the wireless signal strength.
+> Usually, there are 3~4 LEDs in one group to indicate the signal
+> strength, similar to the signal icon on a mobile phone.
 > 
-> https://github.com/kernel-patches/bpf/actions/runs/6922624338/job/18829650043
+> The 'internet' LED can indicate whether the device can access a
+> specific server. It's different from 'wan'. 'wan' usually indicates
+> whether the WAN port is connected to the modem (internet services
+> may still be unavailable). But the 'internet' shows if the device
+> can successfully ping servers such as 8.8.8.8 to detect the internet
+> connection status. When the router is running in AP only mode, we
+> can even connect LAN port to the AC/modem to connect to the internet.
+> In this case, the 'internet' LED should be on. On some routers, both
+> 'internet' and 'wan' are available and can be controlled separately.
+> 
+> Signed-off-by: Shiji Yang <yangshiji66@outlook.com>
+> ---
+> 
+> Changes in v2:
+> * Remove the LED name sorting patch as it changes the ABI.
+> * Add "devicetree@vger.kernel.org" to '--to' list.
+>   Thanks to Rob Herring and Krzysztof Kozlowski for letting me know I
+>   can send patch to multiple mailing list at once.
+> 
+> Changes in v3:
+> * Add more information about the new added LEDs.
+> * Remove the missing LED fix as Jisheng Zhang has already sent a
+>   similar one. I should search the mailing list first...
+> 
+> Changes in v4:
+> * Rename 'rssi' LED to more generic name 'signal'. I forgot to update
+>   the source file in v3.
+> 
+> v1:
+> https://lore.kernel.org/all/TYAP286MB0315FE921FF113BF76F7B700BCA0A@TYAP286MB0315.JPNP286.PROD.OUTLOOK.COM/
+> 
+> v2:
+> https://lore.kernel.org/all/TYAP286MB03159A83A77E6FD59F271D9BBCA0A@TYAP286MB0315.JPNP286.PROD.OUTLOOK.COM/
+> 
+> v3:
+> https://lore.kernel.org/all/TYAP286MB0315AE8F62E6AB48E3F9A0DDBCA5A@TYAP286MB0315.JPNP286.PROD.OUTLOOK.COM/
+> 
+>  include/dt-bindings/leds/common.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/include/dt-bindings/leds/common.h b/include/dt-bindings/leds/common.h
+> index 9a0d33d02..f831c5dba 100644
+> --- a/include/dt-bindings/leds/common.h
+> +++ b/include/dt-bindings/leds/common.h
+> @@ -88,6 +88,7 @@
+>  #define LED_FUNCTION_FLASH "flash"
+>  #define LED_FUNCTION_HEARTBEAT "heartbeat"
+>  #define LED_FUNCTION_INDICATOR "indicator"
+> +#define LED_FUNCTION_INTERNET "internet"
+>  #define LED_FUNCTION_LAN "lan"
+>  #define LED_FUNCTION_MAIL "mail"
+>  #define LED_FUNCTION_MTD "mtd"
+> @@ -95,6 +96,7 @@
+>  #define LED_FUNCTION_PROGRAMMING "programming"
+>  #define LED_FUNCTION_RX "rx"
+>  #define LED_FUNCTION_SD "sd"
+> +#define LED_FUNCTION_SIGNAL "signal"
+>  #define LED_FUNCTION_STANDBY "standby"
+>  #define LED_FUNCTION_TORCH "torch"
+>  #define LED_FUNCTION_TX "tx"
+> -- 
+> 2.39.2
 > 
 
-Is this a misunderstanding?
-The selftests failure above were run on patch set v1 4 days ago, and this patch v2
-is the fix for this case.
-
-> [...]
-> Notice: Success: 501/13458, Skipped: 57, Failed: 1
-> Error: #281 sockmap_basic
-> Error: #281/16 sockmap_basic/sockmap skb_verdict fionread
->    Error: #281/16 sockmap_basic/sockmap skb_verdict fionread
->    test_sockmap_skb_verdict_fionread:PASS:open_and_load 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:bpf_prog_attach 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:socket_loopback(s) 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:create_socket_pairs(s) 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:bpf_map_update_elem(c1) 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:xsend(p0) 0 nsec
->    test_sockmap_skb_verdict_fionread:PASS:ioctl(FIONREAD) error 0 nsec
->    test_sockmap_skb_verdict_fionread:FAIL:ioctl(FIONREAD) unexpected ioctl(FIONREAD): actual 512 != expected 256
->    test_sockmap_skb_verdict_fionread:PASS:recv_timeout(c0) 0 nsec
-> Error: #281/18 sockmap_basic/sockmap skb_verdict msg_f_peek
->    Error: #281/18 sockmap_basic/sockmap skb_verdict msg_f_peek
->    test_sockmap_skb_verdict_peek:PASS:open_and_load 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:bpf_prog_attach 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:socket_loopback(s) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:create_pairs(s) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:bpf_map_update_elem(c1) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:xsend(p1) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:recv(c1) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:ioctl(FIONREAD) error 0 nsec
->    test_sockmap_skb_verdict_peek:FAIL:after peek ioctl(FIONREAD) unexpected after peek ioctl(FIONREAD): actual 512 != expected 256
->    test_sockmap_skb_verdict_peek:PASS:recv(p0) 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:ioctl(FIONREAD) error 0 nsec
->    test_sockmap_skb_verdict_peek:PASS:after read ioctl(FIONREAD) 0 nsec
-> Test Results:
->               bpftool: PASS
->   test_progs-no_alu32: FAIL (returned 1)
->              shutdown: CLEAN
-> Error: Process completed with exit code 1.
-
+-- 
+Lee Jones [李琼斯]
 
