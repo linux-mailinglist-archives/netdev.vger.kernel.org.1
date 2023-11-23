@@ -1,202 +1,112 @@
-Return-Path: <netdev+bounces-50602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F3A7F6465
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:52:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4092F7F6467
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 17:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19EFDB20DD4
-	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:52:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4D6FB20E1A
+	for <lists+netdev@lfdr.de>; Thu, 23 Nov 2023 16:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2533D39F;
-	Thu, 23 Nov 2023 16:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3E9B3D39F;
+	Thu, 23 Nov 2023 16:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="q2/EgMOV"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PSUiqdrN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D85A91
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:52:17 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a002562bd8bso211465866b.0
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:52:17 -0800 (PST)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDECBA
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:53:44 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5094727fa67so1451150e87.3
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 08:53:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700758336; x=1701363136; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6u3MGS7GDIBFAKs2TxjC217U/5ossQpg1sc+mHVST0I=;
-        b=q2/EgMOVy8rTgFjNF3U1ey7/6ryDi7ExYXbPOI67QuYfowF3NCy4ENC1Sm2wLBlaZ/
-         gGwpSR37Mp1kuYA2Ty9rZfhTZkKLFCPoB6ycZHA1wdM+v5xXmc9IWjDo/uziDW/viZAr
-         S+z/qFIEVjcBAoBDeASTVJfJR2Zw4qBIom5wKbxYkMUc/9/guk0Ucqtsp7wYGvabzyCx
-         kNnTsMrygytxwqveQuKparHjCjFDq8PPx3OK5a0sH+geeXltfqgldT5Fue1pGlHfuvG4
-         WS/gAWJpbjKvMAxzb875nYFpBm9Rc1u/prtNzVMEc4v4lu6EXoTG9mslPAYceC7d38We
-         DD1A==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700758422; x=1701363222; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9InQJBGSHQE6z+ySU2vBTT+5U+O4Ov6cqbtR8heLbv0=;
+        b=PSUiqdrNl589NiZpnn2+WaqlFch19oEJaOIumfj03iK36cIinbZVsSBSQLCEkscPLX
+         GPQ+LWyUbMkd2lnFY8Oba6ISxYwDk4HM7DFXw/8PZIjk0Vf5iQilUyV+9gkJmjjWmU8W
+         TfHAJXvfkYMpvuapACQ/whI5Bhmpmc1rhOcU8NUbPEaBEfYnWmtaeE6FluisHr3ev3uB
+         VUuZZYIFzjhTLOu9jsYESGnw1J1F9+VYH/tMT6l/b8FqzE+67s2rC7lt+dmQl1q7MAyL
+         e3m6ntMdKS49rnaEt8Rp8fi8XaK9uvii9kQVE8jrJuB1USQg6of+MW6vExsueqGDb6sK
+         UHTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700758336; x=1701363136;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6u3MGS7GDIBFAKs2TxjC217U/5ossQpg1sc+mHVST0I=;
-        b=DKa4FeOgf0pho0SYhEZothlMxBK5DgNFc952alJhaHBOwCfOWv3ds7Y2H9DdLPlaf/
-         /NJRhvbNUiE+nUb8k/WA6at7IOxOMDt7wvGwkQhDgKLvl9kwcb8N1Hxv+VkAahlcqqSb
-         ekdvsiYCLbj+/6iaOPVR6U67FZfJ1IKZEB1elbl2iHwBmo+zVTsm0fbJ7mZF76+PT0lm
-         fFbX+MHl35wKUOjoo1Pcu/tJ4XVlv3vQPMQPpL/mPprIkXtVaql6ImpL6Ucfsh7vvTQ5
-         EBcimumBptvPWHjczeh+ltlTgUAkWaiNzsRP1NHt4D2/GQQMsR3ic8xN+fYxNiBq6UxU
-         aINQ==
-X-Gm-Message-State: AOJu0YwFI1EZVccyxaU5+wXQxFzZSQxu8t1INTB4xmLgs7zcTO5kLAAA
-	Bfu7Aj9X5ROndGX8N24Zp5IM9w==
-X-Google-Smtp-Source: AGHT+IE5wzSnZN8BxphK1jGKzqgnJUPar7nbjr8hJ1PKrT+YwSoiBIliOEhOJrPcwQwgArCml2tw/A==
-X-Received: by 2002:a17:906:5308:b0:a01:bd67:d2fb with SMTP id h8-20020a170906530800b00a01bd67d2fbmr2708081ejo.0.1700758335741;
-        Thu, 23 Nov 2023 08:52:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700758422; x=1701363222;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9InQJBGSHQE6z+ySU2vBTT+5U+O4Ov6cqbtR8heLbv0=;
+        b=bKIVETNFUAHtRC45PwWKMbKPCTltrYb/bRc6OAbUTlB3ttAtS/6UDhPYvzVjLvZ93j
+         P5g6u/46oyxu36me516RDOab6wQNRPblwRRNPVjUJzGUlVmpCPI2LInWYaEqV6cxIwni
+         3FfEylE0R3HRgZRZBO+YgiEe+S5DbgpoCGvzpdM8ucfIFlHKohClfh2MfXwjgOt5s+H2
+         AUoi6H99wqV+pppybpJp2ROKsSOulPkRkEX6VLbBm6cByQx+BVXww7TTrRDFUG/YWXMC
+         zEbtgfADulcIPjSlu15S5KwBuyOoGqzEihrqFXxdGz7ReFHm2GqL3I7eUVUNGgpOPsDg
+         6Oug==
+X-Gm-Message-State: AOJu0YzI4J+zha8KMKqtFzqyh0rZ+GHtm7+w6q6QZoCbmJ/bSJwy/EXf
+	Ac0k16qkpMEA3eGtSCpFpHV+E0/0uu5JTy0TNkk=
+X-Google-Smtp-Source: AGHT+IEQB0ui4iEi/u9Z8sjtfBCql0Qrqavv/zQ/94GFUXCf9YopwWjQZn6UXqSKI1ab5KExmbag5w==
+X-Received: by 2002:a05:6512:480f:b0:507:98d0:bec4 with SMTP id eo15-20020a056512480f00b0050798d0bec4mr3938261lfb.54.1700758422443;
+        Thu, 23 Nov 2023 08:53:42 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id ks18-20020a170906f85200b009c503bf61c9sm979436ejb.165.2023.11.23.08.52.14
+        by smtp.gmail.com with ESMTPSA id w8-20020a170906184800b009fca9484a62sm971388eje.200.2023.11.23.08.53.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 08:52:15 -0800 (PST)
-Date: Thu, 23 Nov 2023 17:52:14 +0100
+        Thu, 23 Nov 2023 08:53:41 -0800 (PST)
+Date: Thu, 23 Nov 2023 17:53:40 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <hadi@mojatatu.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xiyou.wangcong@gmail.com, mleitner@redhat.com, vladbu@nvidia.com,
-	paulb@nvidia.com, pctammela@mojatatu.com, netdev@vger.kernel.org,
-	kernel@mojatatu.com
-Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
- blockcast tc action
-Message-ID: <ZV+DPmXrANEh6gF8@nanopsycho>
-References: <20231110214618.1883611-1-victor@mojatatu.com>
- <20231110214618.1883611-5-victor@mojatatu.com>
- <ZV8SnZPBV4if5umR@nanopsycho>
- <CAM0EoMnwM836zTWJJsLa0QcqByGkcw0dMs8ScW7Cct3aBAQOMw@mail.gmail.com>
- <ZV9b0HrM5WespGMW@nanopsycho>
- <CAM0EoMnwAHO_AvEYiL=aTwNBjs29ww075Lq1qwvCwuYtB_Qz7A@mail.gmail.com>
- <ZV9tCT9d7dm7dOeA@nanopsycho>
- <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org
+Subject: Re: [patch net-next v3 5/9] genetlink: implement release callback
+ and free sk_user_data there
+Message-ID: <ZV+DlMsFnTibDbBh@nanopsycho>
+References: <20231120084657.458076-1-jiri@resnulli.us>
+ <20231120084657.458076-6-jiri@resnulli.us>
+ <20231120185022.78f10188@kernel.org>
+ <ZVys11ToRj+oo75s@nanopsycho>
+ <20231121095512.089139f9@kernel.org>
+ <ZV3KCF7Q2fwZyzg4@nanopsycho>
+ <20231122090820.3b139890@kernel.org>
+ <ZV8qJ1QX9vz3mfpT@nanopsycho>
+ <20231123082408.0c038f30@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
+In-Reply-To: <20231123082408.0c038f30@kernel.org>
 
-Thu, Nov 23, 2023 at 05:21:51PM CET, hadi@mojatatu.com wrote:
->On Thu, Nov 23, 2023 at 10:17 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Thu, Nov 23, 2023 at 03:38:35PM CET, jhs@mojatatu.com wrote:
->> >On Thu, Nov 23, 2023 at 9:04 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> Thu, Nov 23, 2023 at 02:37:13PM CET, jhs@mojatatu.com wrote:
->> >> >On Thu, Nov 23, 2023 at 3:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >>
->> >> >> Fri, Nov 10, 2023 at 10:46:18PM CET, victor@mojatatu.com wrote:
->> >> >> >This action takes advantage of the presence of tc block ports set in the
->> >> >> >datapath and multicasts a packet to ports on a block. By default, it will
->> >> >> >broadcast the packet to a block, that is send to all members of the block except
->> >> >> >the port in which the packet arrived on. However, the user may specify
->> >> >> >the option "tx_type all", which will send the packet to all members of the
->> >> >> >block indiscriminately.
->> >> >> >
->> >> >> >Example usage:
->> >> >> >    $ tc qdisc add dev ens7 ingress_block 22
->> >> >> >    $ tc qdisc add dev ens8 ingress_block 22
->> >> >> >
->> >> >> >Now we can add a filter to broadcast packets to ports on ingress block id 22:
->> >> >> >$ tc filter add block 22 protocol ip pref 25 \
->> >> >> >  flower dst_ip 192.168.0.0/16 action blockcast blockid 22
->> >> >>
->> >> >> Name the arg "block" so it is consistent with "filter add block". Make
->> >> >> sure this is aligned netlink-wise as well.
->> >> >>
->> >> >>
->> >> >> >
->> >> >> >Or if we wish to send to all ports in the block:
->> >> >> >$ tc filter add block 22 protocol ip pref 25 \
->> >> >> >  flower dst_ip 192.168.0.0/16 action blockcast blockid 22 tx_type all
->> >> >>
->> >> >> I read the discussion the the previous version again. I suggested this
->> >> >> to be part of mirred. Why exactly that was not addressed?
->> >> >>
->> >> >
->> >> >I am the one who pushed back (in that discussion). Actions should be
->> >> >small and specific. Like i had said in that earlier discussion it was
->> >> >a mistake to make mirred do both mirror and redirect - they should
->> >>
->> >> For mirror and redirect, I agree. For redirect and redirect, does not
->> >> make much sense. It's just confusing for the user.
->> >>
->> >
->> >Blockcast only emulates the mirror part. I agree redirect doesnt make
->> >any sense because once you redirect the packet is gone.
->>
->> How is it mirror? It is redirect to multiple, isn't it?
->>
->>
->> >
->> >> >have been two actions. So i feel like adding a block to mirred is
->> >> >adding more knobs. We are also going to add dev->group as a way to
->> >> >select what devices to mirror to. Should that be in mirred as well?
->> >>
->> >> I need more details.
->> >>
->> >
->> >You set any port you want to be mirrored to using ip link, example:
->> >ip link set dev $DEV1 group 2
->> >ip link set dev $DEV2 group 2
->>
->> That does not looks correct at all. Do tc stuff in tc, no?
->>
->>
->> >...
->> >
->> >Then you can blockcast:
->> >tc filter add devx protocol ip pref 25 \
->> >  flower dst_ip 192.168.0.0/16 action blockcast group 2
->>
->> "blockcasting" to something that is not a block anymore. Not nice.
->>
+Thu, Nov 23, 2023 at 05:24:08PM CET, kuba@kernel.org wrote:
+>On Thu, 23 Nov 2023 11:32:07 +0100 Jiri Pirko wrote:
+>> In this case, the socket is not opened by kernel, but it is opened by
+>> the userspace app.
+>> 
+>> I basically need to have per-user-sk pointer somewhere I'm not clear why
+>> to put it in struct netlink_sock when I can use sk_user_data which is
+>> already there. From the usage of this pointer in kernel, I understand
+>> this is exactly the reason to have it.
 >
->Sorry, missed this one. Yes blockcasting is no longer appropriate  -
->perhaps a different action altogether.
-
-mirret redirect? :)
-
-With target of:
-1) dev (the current one)
-2) block
-3) group
-?
-
-
+>Various people stuck various things in that pointer just because,
+>it's a mess. IIUC the initial motivation for it is that someone
+>like NFS opens a kernel socket and needs to put private data
+>somewhere. A kernel user gets a callback for a socket, like data
+>ready, and needs to find their private state.
 >
->cheers,
->jamal
->> >
->> >cheers,
->> >jamal
->> >
->> >>
->> >> >
->> >> >cheers,
->> >> >jamal
->> >> >
->> >> >> Instead of:
->> >> >> $ tc filter add block 22 protocol ip pref 25 \
->> >> >>   flower dst_ip 192.168.0.0/16 action blockcast blockid 22
->> >> >> You'd have:
->> >> >> $ tc filter add block 22 protocol ip pref 25 \
->> >> >>   flower dst_ip 192.168.0.0/16 action mirred egress redirect block 22
->> >> >>
->> >> >> I don't see why we need special action for this.
->> >> >>
->> >> >> Regarding "tx_type all":
->> >> >> Do you expect to have another "tx_type"? Seems to me a bit odd. Why not
->> >> >> to have this as "no_src_skip" or some other similar arg, without value
->> >> >> acting as a bool (flag) on netlink level.
->> >> >>
->> >> >>
+>> Are you afraid of a collision of sk_user_data use with somebody else
+>> here? I don't see how that could happen for netlink socket.
+>
+>Normally upper layer wraps the socket struct in its own struct. 
+>Look at the struct nesting for TCP or any other bona fide protocol. 
+>genetlink will benefit from having socket state, I bet it wasn't done
+>that way from the start because Jamal/Thomas were told to start small.
+>
+>Please add a properly typed field to the netlink struct, unless you
+>have technical reasons not to.
+
+Okay.
 
