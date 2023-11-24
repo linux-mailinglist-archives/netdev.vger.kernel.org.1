@@ -1,147 +1,143 @@
-Return-Path: <netdev+bounces-50957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938A67F84D0
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 20:40:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6D57F84DC
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 20:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C7C1C2629C
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 19:40:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EF87B23AA0
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 19:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDA0364BA;
-	Fri, 24 Nov 2023 19:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C8239FF4;
+	Fri, 24 Nov 2023 19:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnEfe2+V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UBNL18Xm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D13B98;
-	Fri, 24 Nov 2023 11:40:21 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54afd43c83cso1166628a12.0;
-        Fri, 24 Nov 2023 11:40:21 -0800 (PST)
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3986398
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 11:46:26 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-35c767a9e76so38845ab.1
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 11:46:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700854820; x=1701459620; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DKrRg2snxExqJdFGigUYh7T7Fc6aEzueP8JRF0HCrTo=;
-        b=jnEfe2+VbZBpN2wMsD3w96vpmbBE2wc2X/QwHv7yt0dtmByK91FIHcgt82ldqDrPrh
-         27bh8nXMj2zU6XTUipw9OiB/9PmqewQNYwSqscxSgwPEswURcJkPuhTtWmgMOAtxb9jN
-         OnH8pL94RXFUb0lc1KPjO+oamHC5n/XrL6mIsvmZ8rLGsN52PSddrj/r3HlQvt+VLg5J
-         xyw8ZvvhrHIzUswjeuEn8A163s4X8JrmG1jHN34/sAbVnx8CGSxwDl32yRaPgrYTSWLS
-         f2S68tS1TdoMfzDLjyXRwrM1UEutnFoCXswaAE+UaPifHNnYGUIMGmwqF+u6wN7CYI0X
-         GbPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700854820; x=1701459620;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1700855185; x=1701459985; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DKrRg2snxExqJdFGigUYh7T7Fc6aEzueP8JRF0HCrTo=;
-        b=LJs8oVlIGs2PGAv9zlxz/hlgpEn+5hyUL5tXmQyt9zsOoWJSk80bEOV5oASbvwRaRv
-         YY58JPGqhSB3YJsHwNlfkONjAABZaD3Na99IvRCIX1vB4fojkoudDOqm2mvOoyO7x24g
-         5uyVT9l9ZZ8gNWM6pAR4Z+8JcM9pDtTRw1hTvQLogcIQe7wKqz004/3u0mwcTUPDPME2
-         ytnDtbbi3gRmEny5lmvqyrv7QvTSdg5NGD5JXMZwkkvsp0KcS0LioYuLegRawkpaYVnA
-         99i2JiIsO4nQqLlcKMijedOfcZN5DYk4aW+QNIHsopPMK7gP4KO6exWxo7N+Yu6umTXi
-         Mmng==
-X-Gm-Message-State: AOJu0YyhosQWHaPAKACqVnkqYKyf4EypDkQ8KReeR75lQPxjcIPEewSF
-	TiQ9X6F2xfj769T6sRcIHq8=
-X-Google-Smtp-Source: AGHT+IGItN29AlffdfAFP+pdBb+pUmXR0qRXvVcejscZr6unZPC/VQI53oWhDMvt4V3MPYz/KIrdxQ==
-X-Received: by 2002:a17:906:f1d4:b0:9fb:f99c:3ea with SMTP id gx20-20020a170906f1d400b009fbf99c03eamr2802823ejb.52.1700854819659;
-        Fri, 24 Nov 2023 11:40:19 -0800 (PST)
-Received: from skbuf ([188.26.185.12])
-        by smtp.gmail.com with ESMTPSA id h25-20020a170906111900b00a0435148ed7sm2464856eja.17.2023.11.24.11.40.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 11:40:19 -0800 (PST)
-Date: Fri, 24 Nov 2023 21:40:16 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <20231124194016.tcmu4w2r7jrnv6mo@skbuf>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
- <20231124165923.p2iozsrnwlogjzua@skbuf>
- <b8981dc4-5db0-4418-b47d-3e763e20beac@lunn.ch>
+        bh=xj3LV0uh4tcYVh+QVdDebQdSeI5pw/VXJnEd0vmrfC4=;
+        b=UBNL18XmfyQr9hxl9uZSj/Uu9yD0QINYBtxB02DqWOWOsSWxMNQoilhhj5K102oiMs
+         5l7KIXgjh2SAZEkcF7u6rKIO38JFVyXufNtrenuAv5DGGbn784r3iDH7PozZfYMIXVfF
+         ubOSTC3K4tSGHiL7x33nDKs03558dr8o0PSkgG/1zCzXNQeC/iMCIS1Ogq6pLAPO0JSN
+         RsYtwObcOWGnCcu3j5Iv60mQE96/xXUFmPd7r2+7Af4+aPVqJ/+t84hOnAuN3ATTTFl/
+         NRGnlRFskfbjwt7xCd0TGDqCeUPY5JyVvvrCl44VW8vJcRJ+cJFYriNljp7oAm5uW1/t
+         Qi0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700855185; x=1701459985;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xj3LV0uh4tcYVh+QVdDebQdSeI5pw/VXJnEd0vmrfC4=;
+        b=CMBxe4v4iSO85uyouDaJubatDFO+70agfq9AjUq2nkQjwH5qdrLa7bExDCsFhB7cvG
+         Ub+p6l/3t+ghFJeI5ebJfet0+gf/ZouaaaubWXlSRYoV7sWB4rK1Eb1MMLRJnf2V13g4
+         396oka4dQmsda8iS58gOpq5KEcatQSUf8QRnzv1AqMudYoCxbSmeb3phf7wbizDUP5PM
+         T4q6qZFG26x6HZcBdfke6HukcUGlaGLpGBw0jeOZU4UO0dOw/dGO8lNYQoTIdWhZtwUf
+         jgwpWML5D9YPzqziS1VGXUa6L2KcH+i9EoIn69sWNAtJ/FIMY2ETTgCoXfA0spzoCOpi
+         2mow==
+X-Gm-Message-State: AOJu0Yy/WJW6ASWkEfLZooYhkU43y8pqtu5+ucgH3UyAt/Ki2k7b1yGm
+	U1/wQEhD7EqiHczR20IUAv63wbADgFKJzoE79k6Wqg==
+X-Google-Smtp-Source: AGHT+IG0dkghPqdI2MPDAlvUTwUJELhT/D90bgFXuX0z+ezsgl0QHdKsWo4WeND0UY3oXfty43OGyCmCyt2JcVWe+rQ=
+X-Received: by 2002:a05:6e02:1a0c:b0:35a:faac:aee0 with SMTP id
+ s12-20020a056e021a0c00b0035afaacaee0mr497567ild.29.1700855185427; Fri, 24 Nov
+ 2023 11:46:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b8981dc4-5db0-4418-b47d-3e763e20beac@lunn.ch>
+References: <20231120220549.cvsz2ni3wj7mcukh@skbuf> <20231121183114.727fb6d7@kmaincent-XPS-13-7390>
+ <20231121094354.635ee8cd@kernel.org> <20231122144453.5eb0382f@kmaincent-XPS-13-7390>
+ <20231122140850.li2mvf6tpo3f2fhh@skbuf> <20231122143618.cqyb45po7bon2xzg@skbuf>
+ <20231122085459.1601141e@kernel.org> <20231122165955.tujcadked5bgqjet@skbuf>
+ <20231122095525.1438eaa3@kernel.org> <CA+FuTSe+SOFciGf+d+e=Co22yZ56gGGkJ0WBbvfT-2P0+Ug8DQ@mail.gmail.com>
+ <20231124172754.tneftor7uobrul5f@skbuf>
+In-Reply-To: <20231124172754.tneftor7uobrul5f@skbuf>
+From: Willem de Bruijn <willemb@google.com>
+Date: Fri, 24 Nov 2023 14:45:46 -0500
+Message-ID: <CA+FuTSc7aEokNcY2sJeDZQe3_iV9ARC_1hov=9-wTzdMAkcayA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Simon Horman <horms@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Mahesh Bandewar <maheshb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 24, 2023 at 07:35:35PM +0100, Andrew Lunn wrote:
-> > I think you are hitting some of the same points I have hit with DSA.
-> > The PHY package could be considered an SoC with lots of peripherals on
-> > it, for which you'd want separate drivers.
-> 
-> At least at the moment, this is not true. The package does just
-> contain PHYs. But it also has some properties which are shared across
-> those PHYs, e.g. reset. 
-> 
-> What you describe might become true in the future. e.g. The LED/GPIO
-> controller is currently part of the PHY, and each PHY has its own. I
-> could however imagine that becomes a block of its own, outside of the
-> PHY address space, and maybe it might want its own class LED
-> driver. Some PHYs have temperature sensors, which could be a package
-> sensor, so could in theory be an individual hwmon driver. However,
-> i've not yet seen such a package.
-> 
-> Do we consider this now? At the moment i don't see an MFD style system
-> is required. We could crystal ball gaze and come up with some
-> requirements, but i would prefer to have some real devices and
-> datasheets. Without them, we will get the requirements wrong.
-> 
-> I also think we are not that far away from it, in terms of DT, if you
-> consider the later comments. I suggested we need a phy package
-> specific compatible. At the moment, it will be ignored by the kernel,
-> the kernel does not need it, it probes the PHYs in the current way,
-> using the ID registers. But it could in future be used to probe a real
-> driver, which could be an MFD style driver. We need to see updated DT
-> binding examples, but i don't see why we cannot slot it in at a later
-> date.
+On Fri, Nov 24, 2023 at 12:28=E2=80=AFPM Vladimir Oltean
+<vladimir.oltean@nxp.com> wrote:
+>
+> Hi Willem,
+>
+> On Wed, Nov 22, 2023 at 01:11:02PM -0500, Willem de Bruijn wrote:
+> > There already is a disconnect between configuring hardware timestamp
+> > generation. Through the ioctl, which is a global admin-only interface.
+> > And requesting timestamps with SO_TIMESTAMPING.
+> >
+> > Today the user of ptp4l already has to know that the admin has
+> > configured the right RX and TX filters. That is no different if
+> > multiple filters can be installed? (PHY for PTP, DMA for everything
+> > else).
+>
+> Are you saying that ptp4l doesn't configure the RX and TX filters by
+> itself, just the admin had to do that? Because it does.
+> https://github.com/richardcochran/linuxptp/blob/master/sk.c#L59
+>
+> I'm not seeing the disconnect. SO_TIMESTAMPING is for the socket,
+> SIOCSHWTSTAMP is for the configuration at the device level.
+>
+> It _is_ different if multiple filters can be installed, because either
+> we let things be (and ptp4l issues the same ioctl which affects the
+> default hwtstamp provider, which may or may not coincide with what we
+> intend), or we teach ptp4l to deal with the multitude of providers that
+> a port may have.
 
-I'm not suggesting to go for MFD right away. Just with a structure that
-is extensible to possibly cover that. For now, a package node with a
-Qualcomm compatible, with the most minimal driver that forwards MDIO
-access to PHY children.
+I see. By disconnect, I meant that the socket option is unprivileged and
+can be set by many processes, while the ioctl is a global privileged
+setting, so must be under control of a single admin.
 
-I can't speak for the future of PHY drivers, since I don't know enough
-about PHYs. I'm just coming from the DSA background where I really wish
-we had this sort of infrastructure earlier. Now I have the SJA1110 which
-still lacks support for the interrupt controller for its integrated
-PHYs, and a bunch of other IP blocks in the package, because it's so
-incredibly hard to make the driver support the old-style and the
-new-style device trees.
+But I did not know that ptp4l can take on both those roles for PTP.
+
+Perhaps multiple SIOCSHWTSTAMP rules can coexist, up to
+one per level:
+
+HWTSTAMP_FILTER_PTP_V2_EVENT, level=3DPHY
+HWTSTAMP_FILTER_ALL, level, level=3DDMA
+
+Then ptp4l can manage all levels except the DMA level. And DMA
+timestamps can be configured independently by another admin.
+
+If only one timestamp can be communicated to the host, the earliest
+match must takes precedence. Jakub pointed out how one device
+handles this by having a separate queue for PHY  timestamped
+packets.
+
+This does not address the issue that packets with different
+precision skb_shinfo(skb)->hwtstamps->hwtstamp may now exist
+in the system. All packets reaching ptp4l sockets must have a high
+resolution source, but there is no explicit annotation to ensure or
+check this. This is fully based on trusting the HWSTAMP_FILTER.
+Expanding the skb infra and cmsg might be follow-on work.
 
