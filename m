@@ -1,122 +1,127 @@
-Return-Path: <netdev+bounces-50853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B41F7F749F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:12:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22D957F74A5
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FC31B20FCC
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:12:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FE01C20CB8
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF1F282D6;
-	Fri, 24 Nov 2023 13:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="hDcOMEHv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206C1286BB;
+	Fri, 24 Nov 2023 13:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDD4D60
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:12:30 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9e1021dbd28so256343866b.3
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:12:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700831549; x=1701436349; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5BsuWnrRcZkkgpQbsgya7ZwPbqHX9xbaQduqsiiJ6x4=;
-        b=hDcOMEHv+mTRewOAL4yoz4VQcwk0R3fdumtqZ8tii+5XyX1jPL8EU06StDIIlXRvJF
-         TxZlxEQvIuTalR4WrLxdKWVVLj4a6Cj/ZR16QqWh9xtO+2wO892uEaq8ss4cZGO502Aw
-         jfP6o5MRx+mkQ+HzgPx9TqvZVfe7Bn+cKd5tGDDyku2Gyr4zQXTu2Fw+gfaWqm7HdkxD
-         2zxA0pqQuhqvoDLBHMioti+NHiuhUbsmyJb+X0PhpSFadeaXKtOfxFW8f99CE3UBcwIC
-         9Q2JRpJHsPKNRJ+hJG0ZCrwP1ud5RrPndAHCVAwjOCLkuY/L+9zqUJszBbp+SeWU8Rb2
-         wW2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700831549; x=1701436349;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5BsuWnrRcZkkgpQbsgya7ZwPbqHX9xbaQduqsiiJ6x4=;
-        b=PirLFRskWc1k9ySqwN6E+gqvnzF/YuEXGrRaPUXdqnnk4dP8kSGghzVxNltyPntKcg
-         ML/kgSdmiJCG8HIIpHJL4TzDyqhOYPEREg41RMYN+4/NbsBErcKgN3FQGBBpraB1iLmz
-         8nHw/wmDNEEhxVCs4tncZO943qJyfmjvDW0WAs7fJFkWdv0dpbyseppLhuqGUkbrGLtX
-         hEPZI0t3THF9h7Mwe7jkFdCbIiT1GJdNUPRvuewxJu8P6n+ytK0AMQs1pLxuAk1DS2G+
-         17GNyBAKPtBsbBiLBa9vVJgE4zWTCYC8oCpKbuTrPOKxVr184sRH1qLiDH9LTFNAf7fy
-         tAhQ==
-X-Gm-Message-State: AOJu0Yz3gUoe/JWzh+A+/dMGVPAQoWlZq5BXj8+7kFtBDpZKsWX81BeV
-	B3e1E9Jgzm6b/yffpPqhkHwZbw==
-X-Google-Smtp-Source: AGHT+IG1XNv/St6TR2faGYpwyWwLdZhAS8Rcz0lbN5LBmVvkGGX/b/PgXPcZBmMTmgKiwxff+p7JWA==
-X-Received: by 2002:a17:906:3386:b0:9b8:b683:5837 with SMTP id v6-20020a170906338600b009b8b6835837mr2215497eja.46.1700831549418;
-        Fri, 24 Nov 2023 05:12:29 -0800 (PST)
-Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
-        by smtp.gmail.com with ESMTPSA id mf12-20020a170906cb8c00b009a13fdc139fsm2045209ejb.183.2023.11.24.05.12.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 05:12:29 -0800 (PST)
-Message-ID: <74f1034a-ee20-b887-e23a-83566e7403a3@blackwall.org>
-Date: Fri, 24 Nov 2023 15:12:27 +0200
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 175D510E7
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:14:23 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.112.120])
+	by gateway (Coremail) with SMTP id _____8Cx5_GuoWBl+5Q8AA--.54368S3;
+	Fri, 24 Nov 2023 21:14:22 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.120])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxE+SroWBlRZ1LAA--.37806S3;
+	Fri, 24 Nov 2023 21:14:20 +0800 (CST)
+Message-ID: <8d82761e-c978-4763-a765-f6e0b57ec6a6@loongson.cn>
+Date: Fri, 24 Nov 2023 21:14:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCHv2 net-next 10/10] docs: bridge: add other features
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/9] net: stmmac: Add Loongson DWGMAC definitions
 Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
- Stephen Hemminger <stephen@networkplumber.org>,
- Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Marc Muehlfeld <mmuehlfe@redhat.com>
-References: <20231123134553.3394290-1-liuhangbin@gmail.com>
- <20231123134553.3394290-11-liuhangbin@gmail.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231123134553.3394290-11-liuhangbin@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
+ dongbiao@loongson.cn, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+References: <cover.1699533745.git.siyanteng@loongson.cn>
+ <87011adcd39f20250edc09ee5d31bda01ded98b5.1699533745.git.siyanteng@loongson.cn>
+ <2e1197f9-22f6-4189-8c16-f9bff897d567@lunn.ch>
+ <df17d5e9-2c61-47e3-ba04-64b7110a7ba6@loongson.cn>
+ <9c2806c7-daaa-4a2d-b69b-245d202d9870@lunn.ch>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <9c2806c7-daaa-4a2d-b69b-245d202d9870@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxE+SroWBlRZ1LAA--.37806S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7WF45WryrCrW7uw1rGw17Arc_yoW8Ar4fp3
+	4UWayUKr48trs5Gw1Iya98Gr95Jr42ya48Ca15Ww1rW345Xw13CF4jkF1xZas8tFW8X3yx
+	Ar40ka15ZrZ5Z3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8RuWPUUUUU==
 
-On 11/23/23 15:45, Hangbin Liu wrote:
-> Add some features that are not appropriate for the existing section to
-> the "Others" part of the bridge document.
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->   Documentation/networking/bridge.rst | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
-> 
-> diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-> index 772bbe28aefe..54118d9da2a4 100644
-> --- a/Documentation/networking/bridge.rst
-> +++ b/Documentation/networking/bridge.rst
-> @@ -274,6 +274,20 @@ So, br_netfilter is only needed if users, for some reason, need to use
->   ip(6)tables to filter packets forwarded by the bridge, or NAT bridged
->   traffic. For pure link layer filtering, this module isn't needed.
->   
-> +Other Features
-> +==============
-> +
-> +The Linux bridge also supports `IEEE 802.11 Proxy ARP
-> +<https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=958501163ddd6ea22a98f94fa0e7ce6d4734e5c4>`_,
-> +`Media Redundancy Protocol (MRP)
-> +<https://lore.kernel.org/netdev/20200426132208.3232-1-horatiu.vultur@microchip.com/>`_,
-> +`Media Redundancy Protocol (MRP) LC mode
-> +<https://lore.kernel.org/r/20201124082525.273820-1-horatiu.vultur@microchip.com>`_,
-> +`IEEE 802.1X port authentication
-> +<https://lore.kernel.org/netdev/20220218155148.2329797-1-schultz.hans+netdev@gmail.com/>`_,
-> +and `MAC Authentication Bypass (MAB)
-> +<https://lore.kernel.org/netdev/20221101193922.2125323-2-idosch@nvidia.com/>`_.
-> +
->   FAQ
->   ===
->   
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+在 2023/11/22 11:39, Andrew Lunn 写道:
+> On Tue, Nov 21, 2023 at 05:55:24PM +0800, Yanteng Si wrote:
+>> Hi Andrew,
+>>
+>> 在 2023/11/12 04:07, Andrew Lunn 写道:
+>>>> +#ifdef	CONFIG_DWMAC_LOONGSON
+>>>> +#define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE_LOONGSON | DMA_INTR_ENA_AIE | \
+>>>> +				DMA_INTR_ENA_FBE | DMA_INTR_ENA_UNE)
+>>>> +#else
+>>>>    #define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE | DMA_INTR_ENA_FBE | \
+>>>>    				DMA_INTR_ENA_UNE)
+>>>> +#endif
+>>> The aim is to produce one kernel which runs on all possible
+>>> variants. So we don't like to see this sort of #ifdef. Please try to
+>>> remove them.
+>> We now run into a tricky problem: we only have a few register
+>> definitions(DMA_XXX_LOONGSON)
+>>
+>> that are not the same as the dwmac1000 register definition.
+> What does DMA_INTR_ENA_AIE_LOONGSON do? This seems like an interrupt
+> mask, and this is enabling an interrupt source? However, i don't see
+> this bit being tested in any interrupt status register? Or is it
+> hiding in one of the other patches?
+
+In general, we split one into two.
+
+the details are as follows：
+
+DMA_INTR_ENA_NIE = DMA_INTR_ENA_NIE_LOONGSON= DMA_INTR_ENA_TX_NIE + 
+DMA_INTR_ENA_RX_NIE
+
+DMA_INTR_ENA_AIE = DMA_INTR_ENA_AIE_LOONGSON= DMA_INTR_ENA_TX_AIE + 
+DMA_INTR_ENA_RX_AIE
+
+DMA_STATUS_NIS = DMA_STATUS_TX_NIS_LOONGSON + DMA_STATUS_RX_NIS_LOONGSON
+
+DMA_STATUS_AIS = DMA_STATUS_TX_AIS_LOONGSON + DMA_STATUS_RX_AIS_LOONGSON
+
+DMA_STATUS_FBI = DMA_STATUS_TX_FBI_LOONGSON + DMA_STATUS_RX_FBI_LOONGSON
+
+
+>
+> This is where lots of small patches, with good descriptions helps.
+
+Ok, thanks for your advice, I will try to split it in the next version.
+
+
+Thanks,
+
+Yanteng
+
+>
+>       Andrew
 
 
