@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-50843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685F37F7467
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:57:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAFF97F746C
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5BB1F20F5C
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:57:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A0DEB21320
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1C224218;
-	Fri, 24 Nov 2023 12:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195DD1EB3D;
+	Fri, 24 Nov 2023 12:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="t9yQIyjz"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PYiI1Z2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88EE10EB
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:56:52 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-507962561adso2816972e87.0
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:56:52 -0800 (PST)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73425D71
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:57:45 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a02c48a0420so266789566b.2
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700830611; x=1701435411; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700830664; x=1701435464; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rG92ncza8H/xKKrxmiicC8DHoaIZVh0dOZXxEq6yuMc=;
-        b=t9yQIyjz1ke4Px8S7GrtOvtalmW8bYsXZhISM3858YHanGqd8DqpXviyolcTsaaUFL
-         97DS+/5sSdnf5ii6iTCpTWazA18sbASFrpOWDLM0GHpbfabQ1WLtW22T+YBZpvIxRAMj
-         jo81Jnsv9/gFJfYWcDZ0RHr9MX8av9Tw2K2wJM3EP47SraeMudzRLni7JMmHc1T7uyfa
-         vinJJjma18DxPeyz9syMhxwY/Abx6O+opB/ug1SNy96xUHxaeryj/hYEZviJbObbG6f2
-         kk8PKdwwWp6as1Qi2+kOLy8GwN+qEOgwb4lolRqTDwdPKCbCEnEms80s/OsJlOfrdWkd
-         69XA==
+        bh=SX5x5ELuf6ChuLLqt96p64WwVg5W1+fo1fRL7j6lPQs=;
+        b=PYiI1Z2LdIp3EQsXDzI7sodQ+JHAoihxmbNSpfqGBD1N5O9Pqu4nmxyEkpMxDhfm1H
+         HlQVqh/8AVj32tztxJTmlxlpCwbo5qSAlcCB/9MX5Ob2OsxplQI1bbPg8Qs7YhFRzdo1
+         K4lzmy563TPCqpzwIy2QFvpm/HUQv0oMG/ysMRGc2gpKOxocCR/bTUPPNQTx+FtNvbq0
+         wlCfnD4+0u8SxP6lhRpO4seumn8azycDAWa8GpVBPgf3oRBH0Gyrm1GboJzd3mRLSIp8
+         rUFTI4cvrH9d3fsVBId7odR/AUMLHSt43LguyX8DcDPe6iV5HlW9sRpuFXzSn2HjpPwQ
+         8R4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700830611; x=1701435411;
+        d=1e100.net; s=20230601; t=1700830664; x=1701435464;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rG92ncza8H/xKKrxmiicC8DHoaIZVh0dOZXxEq6yuMc=;
-        b=fBER5UbEYC5icnwwenzS52OsAhODT1DmJvNmVpfjeQ2+R8QoDk9pgx6jih2VBqxUpa
-         ERrX3n1BKcrh7yd2SkcqOM+pwj0Fdu2iORzIXrIQCM8byoLnkRyVmb4HvbMgzHbVnhCQ
-         vnScEGVdpTjtdiQHQ9JOoHtmaEPtFSg1ocZwnDaOEnxjV8qeV1nJonKQy3XyA2C9FX5Z
-         h57onARUV+f1sZtfP0Uv7gILqZbFy26AyzFn6l23Q0YocoSzizFkl67TvTVuNpHObEzW
-         0/X9D8pFEs/D1w/YrgBtCJXB8Fub2Vvte9UgFHv9OV9Y9UB+f8aV40BqVIWJ1bbm/eBH
-         Q3Og==
-X-Gm-Message-State: AOJu0Yxf/7jsmIRVx74WBiwTbo8XX2HP4w9hCOUKJIcaQ/j2kiSfnBSS
-	cuSxNkBc/oRL2ZpK+p+aP4w7bQ==
-X-Google-Smtp-Source: AGHT+IESEBxr0IlzoXvv4W8LKxnYttIhdaRgdbz17GdPnfu6rRcq1wsMAN72jU6KsHpTAsV5WBKYKQ==
-X-Received: by 2002:a05:6512:2ed:b0:507:9640:f256 with SMTP id m13-20020a05651202ed00b005079640f256mr1636470lfq.36.1700830610753;
-        Fri, 24 Nov 2023 04:56:50 -0800 (PST)
+        bh=SX5x5ELuf6ChuLLqt96p64WwVg5W1+fo1fRL7j6lPQs=;
+        b=FIdq6F2gMkIICyCzDBGckTwEGB+HKwriCdrCMUpBXGqUBuTFQpfQDzrMAjKDUW8xwO
+         a0mQEL+zVRCV5b+uA1s6G/it2NCa6z+AyWSGTRjw/JiSLTthDtRzEX55+jQDcTVRkch1
+         vPmvVGfWcOzupWSf24Txgj9XmBQIcBxEcwWoNH238LZbYgO1FPCZ3yCOqI2jayCi54CB
+         gK1Zd5hHfC/eSwTerYLOjJWrnKI7R+YuHX5GUCgstqZ8LFaQ+aDddq1HdN9rPmUwsVhL
+         uzj2QIquJyoL7M2OR03BbsV1cmMMHAKw2H3g1Kx3JelsSdTn3QhEzAMbMz1zA5O4JEVq
+         hUTw==
+X-Gm-Message-State: AOJu0YytowXcCy5Gh2uJ1IlNQ7fKyTAlrUk4C0Z7zEXVtHIkrcngLCBi
+	iXJVMCDoua9VdVV58Qf0jn6LDQ==
+X-Google-Smtp-Source: AGHT+IFcQJ51Q5qMUPW1adrM+T7pyTMMlf5fbGxzNdafeoqZRPRZmUsl939TuTpykISn5Y3QO+vQow==
+X-Received: by 2002:a17:906:490c:b0:9fe:6762:e2b1 with SMTP id b12-20020a170906490c00b009fe6762e2b1mr1879225ejq.28.1700830663921;
+        Fri, 24 Nov 2023 04:57:43 -0800 (PST)
 Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
-        by smtp.gmail.com with ESMTPSA id w21-20020a170906481500b00977cad140a8sm2028782ejq.218.2023.11.24.04.56.49
+        by smtp.gmail.com with ESMTPSA id ml21-20020a170906cc1500b009e61366a4c3sm2032449ejb.2.2023.11.24.04.57.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 04:56:50 -0800 (PST)
-Message-ID: <9048fa8f-a6a6-e72e-3335-1bd7392ac702@blackwall.org>
-Date: Fri, 24 Nov 2023 14:56:48 +0200
+        Fri, 24 Nov 2023 04:57:43 -0800 (PST)
+Message-ID: <9b969b66-d235-e4e8-7315-94636ac41d4c@blackwall.org>
+Date: Fri, 24 Nov 2023 14:57:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,8 +63,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCHv2 net-next 02/10] net: bridge: add document for
- IFLA_BRPORT enum
+Subject: Re: [PATCHv2 net-next 03/10] net: bridge: add document for bridge
+ sysfs attribute
 Content-Language: en-US
 To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
@@ -77,280 +77,132 @@ Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
  <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
  Marc Muehlfeld <mmuehlfe@redhat.com>
 References: <20231123134553.3394290-1-liuhangbin@gmail.com>
- <20231123134553.3394290-3-liuhangbin@gmail.com>
+ <20231123134553.3394290-4-liuhangbin@gmail.com>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231123134553.3394290-3-liuhangbin@gmail.com>
+In-Reply-To: <20231123134553.3394290-4-liuhangbin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/23/23 15:45, Hangbin Liu wrote:
-> Add document for IFLA_BRPORT enum so we can use it in
+> Although the sysfs interface is deprecated and should not be extended
+> if new options are added. There are still users and admins use this
+> interface to config bridge options. It would help users to know what
+> the meaning of each field. Add correspond netlink enums (as we have
+> document for them) for bridge sysfs attributes, so we can use it in
 > Documentation/networking/bridge.rst.
 > 
 > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > ---
->   include/uapi/linux/if_link.h | 241 +++++++++++++++++++++++++++++++++++
->   1 file changed, 241 insertions(+)
+>   net/bridge/br_sysfs_br.c | 93 ++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 93 insertions(+)
 > 
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index a2973c71c158..7eba6280406b 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -801,11 +801,252 @@ struct ifla_bridge_id {
->   	__u8	addr[6]; /* ETH_ALEN */
->   };
+
+Given sysfs is deprecated, I don't see any value in this patch.
+I'd say just drop it and leave sysfs alone.
+
+> diff --git a/net/bridge/br_sysfs_br.c b/net/bridge/br_sysfs_br.c
+> index ea733542244c..bd9c9b2a7859 100644
+> --- a/net/bridge/br_sysfs_br.c
+> +++ b/net/bridge/br_sysfs_br.c
+> @@ -933,6 +933,99 @@ static ssize_t vlan_stats_per_port_store(struct device *d,
+>   static DEVICE_ATTR_RW(vlan_stats_per_port);
+>   #endif
 >   
 > +/**
-> + * DOC: Bridge mode enum definition
+> + * DOC: Bridge sysfs attributes
 > + *
-> + * @BRIDGE_MODE_HAIRPIN
-> + *   Controls whether traffic may be send back out of the port on which it
-
-"may be sent"
-
-> + *   was received. This option is also called reflective relay mode, and is
-> + *   used to support basic VEPA (Virtual Ethernet Port Aggregator)
-> + *   capabilities. By default, this flag is turned off and the bridge will
-> + *   not forward traffic back out of the receiving port.
+> + * @forward_delay: IFLA_BR_FORWARD_DELAY
+> + *
+> + * @hello_time: IFLA_BR_HELLO_TIME
+> + *
+> + * @max_age: IFLA_BR_MAX_AGE
+> + *
+> + * @ageing_time: IFLA_BR_AGEING_TIME
+> + *
+> + * @stp_state: IFLA_BR_STP_STATE
+> + *
+> + * @group_fwd_mask: IFLA_BR_GROUP_FWD_MASK
+> + *
+> + * @priority: IFLA_BR_PRIORITY
+> + *
+> + * @bridge_id: IFLA_BR_BRIDGE_ID
+> + *
+> + * @root_id: IFLA_BR_ROOT_ID
+> + *
+> + * @root_path_cost: IFLA_BR_ROOT_PATH_COST
+> + *
+> + * @root_port: IFLA_BR_ROOT_PORT
+> + *
+> + * @topology_change: IFLA_BR_TOPOLOGY_CHANGE
+> + *
+> + * @topology_change_detected: IFLA_BR_TOPOLOGY_CHANGE_DETECTED
+> + *
+> + * @hello_timer: IFLA_BR_HELLO_TIMER
+> + *
+> + * @tcn_timer: IFLA_BR_TCN_TIMER
+> + *
+> + * @topology_change_timer: IFLA_BR_TOPOLOGY_CHANGE_TIMER
+> + *
+> + * @gc_timer: IFLA_BR_GC_TIMER
+> + *
+> + * @group_addr: IFLA_BR_GROUP_ADDR
+> + *
+> + * @flush: IFLA_BR_FDB_FLUSH
+> + *
+> + * @no_linklocal_learn: BR_BOOLOPT_NO_LL_LEARN
+> + *
+> + * @multicast_router: IFLA_BR_MCAST_ROUTER
+> + *
+> + * @multicast_snooping: IFLA_BR_MCAST_SNOOPING
+> + *
+> + * @multicast_querier: IFLA_BR_MCAST_QUERIER
+> + *
+> + * @multicast_query_use_ifaddr: IFLA_BR_MCAST_QUERY_USE_IFADDR
+> + *
+> + * @hash_elasticity: IFLA_BR_MCAST_HASH_ELASTICITY
+> + *
+> + * @hash_max: IFLA_BR_MCAST_HASH_MAX
+> + *
+> + * @multicast_last_member_count: IFLA_BR_MCAST_LAST_MEMBER_CNT
+> + *
+> + * @multicast_startup_query_count: IFLA_BR_MCAST_STARTUP_QUERY_CNT
+> + *
+> + * @multicast_last_member_interval: IFLA_BR_MCAST_LAST_MEMBER_INTVL
+> + *
+> + * @multicast_membership_interval: IFLA_BR_MCAST_MEMBERSHIP_INTVL
+> + *
+> + * @multicast_querier_interval: IFLA_BR_MCAST_QUERIER_INTVL
+> + *
+> + * @multicast_query_interval: IFLA_BR_MCAST_QUERY_INTVL
+> + *
+> + * @multicast_query_response_interval: IFLA_BR_MCAST_QUERY_RESPONSE_INTVL
+> + *
+> + * @multicast_startup_query_interval: IFLA_BR_MCAST_STARTUP_QUERY_INTVL
+> + *
+> + * @multicast_stats_enabled: IFLA_BR_MCAST_STATS_ENABLED
+> + *
+> + * @multicast_igmp_version: IFLA_BR_MCAST_IGMP_VERSION
+> + *
+> + * @multicast_mld_version: IFLA_BR_MCAST_MLD_VERSION
+> + *
+> + * @nf_call_iptables: IFLA_BR_NF_CALL_IPTABLES
+> + *
+> + * @nf_call_ip6tables: IFLA_BR_NF_CALL_IP6TABLES
+> + *
+> + * @nf_call_arptables: IFLA_BR_NF_CALL_ARPTABLES
+> + *
+> + * @vlan_filtering: IFLA_BR_VLAN_FILTERING
+> + *
+> + * @vlan_protocol: IFLA_BR_VLAN_PROTOCOL
+> + *
+> + * @default_pvid: IFLA_BR_VLAN_DEFAULT_PVID
+> + *
+> + * @vlan_stats_enabled: IFLA_BR_VLAN_STATS_ENABLED
+> + *
+> + * @vlan_stats_per_port: IFLA_BR_VLAN_STATS_PER_PORT
 > + */
->   enum {
->   	BRIDGE_MODE_UNSPEC,
->   	BRIDGE_MODE_HAIRPIN,
->   };
->   
-> +/**
-> + * DOC: Bridge port enum definition
-> + *
-> + * @IFLA_BRPORT_STATE
-> + *   The operation state of the port. Here are the valid values.
-> + *
-> + *     * 0 - port is in STP *DISABLED* state. Make this port completely
-> + *       inactive for STP. This is also called BPDU filter and could be used
-> + *       to disable STP on an untrusted port, like a leaf virtual device.
-> + *       The traffic forwarding is also stopped on this port.
-> + *     * 1 - port is in STP *LISTENING* state. Only valid if STP is enabled
-> + *       on the bridge. In this state the port listens for STP BPDUs and
-> + *       drops all other traffic frames.
-> + *     * 2 - port is in STP *LEARNING* state. Only valid if STP is enabled on
-> + *       the bridge. In this state the port will accept traffic only for the
-> + *       purpose of updating MAC address tables.
-> + *     * 3 - port is in STP *FORWARDING* state. Port is fully active.
-> + *     * 4 - port is in STP *BLOCKING* state. Only valid if STP is enabled on
-> + *       the bridge. This state is used during the STP election process.
-> + *       In this state, port will only process STP BPDUs.
-> + *
-> + * @IFLA_BRPORT_PRIORITY
-> + *   The STP port priority. The valid values are between 0 and 255.
-> + *
-> + * @IFLA_BRPORT_COST
-> + *   The STP path cost of the port. The valid values are between 1 and 65535.
-> + *
-> + * @IFLA_BRPORT_MODE
-> + *   Set the bridge port mode. See *BRIDGE_MODE_HAIRPIN* for more details.
-> + *
-> + * @IFLA_BRPORT_GUARD
-> + *   Controls whether STP BPDUs will be processed by the bridge port. By
-> + *   default, the flag is turned off to allow BPDU processing. Turning this
-> + *   flag on will disable the bridge port if a STP BPDU packet is received.
-> + *
-> + *   If the bridge has Spanning Tree enabled, hostile devices on the network
-> + *   may send BPDU on a port and cause network failure. Setting *guard on*
-> + *   will detect and stop this by disabling the port. The port will be
-> + *   restarted if the link is brought down, or removed and reattached.
-> + *
-> + * @IFLA_BRPORT_PROTECT
-> + *   Controls whether a given port is allowed to become a root port or not.
-> + *   Only used when STP is enabled on the bridge. By default the flag is off.
-> + *
-> + *   This feature is also called root port guard. If BPDU is received from a
-> + *   leaf (edge) port, it should not be elected as root port. This could
-> + *   be used if using STP on a bridge and the downstream bridges are not fully
-> + *   trusted; this prevents a hostile guest from rerouting traffic.
-> + *
-> + * @IFLA_BRPORT_FAST_LEAVE
-> + *   This flag allows the bridge to immediately stop multicast traffic
-> + *   forwarding on a port that receives an IGMP Leave message. It is only used
-> + *   when IGMP snooping is enabled on the bridge. By default the flag is off.
-> + *
-> + * @IFLA_BRPORT_LEARNING
-> + *   Controls whether a given port will learn *source* MAC addresses from
-> + *   received traffic or not. Also controls whether dynamic FDB entries
-> + *   (which can also be added by software) will be refreshed by incoming
-> + *   traffic. By default this flag is on.
-> + *
-> + * @IFLA_BRPORT_UNICAST_FLOOD
-> + *   Controls whether unicast traffic for which there is no FDB entry will
-> + *   be flooded towards this port. By default this flag is on.
-> + *
-> + * @IFLA_BRPORT_PROXYARP
-> + *   Enable proxy ARP on this port.
-> + *
-> + * @IFLA_BRPORT_LEARNING_SYNC
-> + *   Controls whether a given port will sync MAC addresses learned on device
-> + *   port to bridge FDB.
-> + *
-> + * @IFLA_BRPORT_PROXYARP_WIFI
-> + *   Enable proxy ARP on this port which meets extended requirements by
-> + *   IEEE 802.11 and Hotspot 2.0 specifications.
-> + *
-> + * @IFLA_BRPORT_ROOT_ID
-> + *
-> + * @IFLA_BRPORT_BRIDGE_ID
-> + *
-> + * @IFLA_BRPORT_DESIGNATED_PORT
-> + *
-> + * @IFLA_BRPORT_DESIGNATED_COST
-> + *
-> + * @IFLA_BRPORT_ID
-> + *
-> + * @IFLA_BRPORT_NO
-> + *
-> + * @IFLA_BRPORT_TOPOLOGY_CHANGE_ACK
-> + *
-> + * @IFLA_BRPORT_CONFIG_PENDING
-> + *
-> + * @IFLA_BRPORT_MESSAGE_AGE_TIMER
-> + *
-> + * @IFLA_BRPORT_FORWARD_DELAY_TIMER
-> + *
-> + * @IFLA_BRPORT_HOLD_TIMER
-> + *
-> + * @IFLA_BRPORT_FLUSH
-> + *   Flush bridge ports' fdb dynamic entries.
-> + *
-> + * @IFLA_BRPORT_MULTICAST_ROUTER
-> + *   Configure the port's multicast router presence. A port with
-> + *   a multicast router will receive all multicast traffic.
-> + *   The valid values are:
-> + *
-> + *     * 0 disable multicast routers on this port
-> + *     * 1 let the system detect the presence of routers (default)
-> + *     * 2 permanently enable multicast traffic forwarding on this port
-> + *     * 3 enable multicast routers temporarily on this port, not depending
-> + *         on incoming queries.
-> + *
-> + * @IFLA_BRPORT_PAD
-> + *
-> + * @IFLA_BRPORT_MCAST_FLOOD
-> + *   Controls whether a given port will flood multicast traffic for which
-> + *   there is no MDB entry. By default this flag is on.
-> + *
-> + * @IFLA_BRPORT_MCAST_TO_UCAST
-> + *   Controls whether a given port will replicate packets using unicast
-> + *   instead of multicast. By default this flag is off.
-> + *
-> + *   This is done by copying the packet per host and changing the multicast
-> + *   destination MAC to a unicast one accordingly.
-> + *
-> + *   *mcast_to_unicast* works on top of the multicast snooping feature of the
-> + *   bridge. Which means unicast copies are only delivered to hosts which
-> + *   are interested in unicast and signaled this via IGMP/MLD reports previously.
-> + *
-> + *   This feature is intended for interface types which have a more reliable
-> + *   and/or efficient way to deliver unicast packets than broadcast ones
-> + *   (e.g. WiFi).
-> + *
-> + *   However, it should only be enabled on interfaces where no IGMPv2/MLDv1
-> + *   report suppression takes place. IGMP/MLD report suppression issue is
-> + *   usually overcome by the network daemon (supplicant) enabling AP isolation
-> + *   and by that separating all STAs.
-> + *
-> + *   Delivery of STA-to-STA IP multicast is made possible again by enabling
-> + *   and utilizing the bridge hairpin mode, which considers the incoming port
-> + *   as a potential outgoing port, too (see *BRIDGE_MODE_HAIRPIN* option).
-> + *   Hairpin mode is performed after multicast snooping, therefore leading
-> + *   to only deliver reports to STAs running a multicast router.
-> + *
-> + * @IFLA_BRPORT_VLAN_TUNNEL
-> + *   Controls whether vlan to tunnel mapping is enabled on the port.
-> + *   By default this flag is off.
-> + *
-> + * @IFLA_BRPORT_BCAST_FLOOD
-> + *   Controls flooding of broadcast traffic on the given port. By default
-> + *   this flag is on.
-> + *
-> + * @IFLA_BRPORT_GROUP_FWD_MASK
-> + *   Set the group forward mask. This is a bitmask that is applied to
-> + *   decide whether to forward incoming frames destined to link-local
-> + *   addresses. The addresses of the form are 01:80:C2:00:00:0X (defaults
-> + *   to 0, which means the bridge does not forward any link-local frames
-> + *   coming on this port).
-> + *
-> + * @IFLA_BRPORT_NEIGH_SUPPRESS
-> + *   Controls whether neighbor discovery (arp and nd) proxy and suppression
-> + *   is enabled on the port. By default this flag is off.
-> + *
-> + * @IFLA_BRPORT_ISOLATED
-> + *   Controls whether a given port will be isolated, which means it will be
-> + *   able to communicate with non-isolated ports only. By default this
-> + *   flag is off.
-> + *
-> + * @IFLA_BRPORT_BACKUP_PORT
-> + *   Set a backup port. If the port loses carrier all traffic will be
-> + *   redirected to the configured backup port. Set the value to 0 to disable
-> + *   it.
-> + *
-> + * @IFLA_BRPORT_MRP_RING_OPEN
-> + *
-> + * @IFLA_BRPORT_MRP_IN_OPEN
-> + *
-> + * @IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT
-> + *   The number of per-port EHT hosts limit. The default value is 512.
-> + *   Setting to 0 is not allowed.
-> + *
-> + * @IFLA_BRPORT_MCAST_EHT_HOSTS_CNT
-> + *   The current number of tracked hosts, read only.
-> + *
-> + * @IFLA_BRPORT_LOCKED
-> + *   Controls whether a port will be locked, meaning that hosts behind the
-> + *   port will not be able to communicate through the port unless an FDB
-> + *   entry with the unit's MAC address is in the FDB. The common use case is
-> + *   that hosts are allowed access through authentication with the IEEE 802.1X
-> + *   protocol or based on whitelists. By default this flag is off.
-> + *
-> + *   Please note that secure 802.1X deployments should always use the
-> + *   BR_BOOLOPT_NO_LL_LEARN flag, to not permit the bridge to populate its
-> + *   FDB based on link-local (EAPOL) traffic received on the port.
-> + *
-> + * @IFLA_BRPORT_MAB
-> + *   Controls whether a port will use MAC Authentication Bypass (MAB), a
-> + *   technique through which select MAC addresses may be allowed on a locked
-> + *   port, without using 802.1X authentication. Packets with an unknown source
-> + *   MAC address generates a "locked" FDB entry on the incoming bridge port.
-> + *   The common use case is for user space to react to these bridge FDB
-> + *   notifications and optionally replace the locked FDB entry with a normal
-> + *   one, allowing traffic to pass for whitelisted MAC addresses.
-> + *
-> + *   Setting this flag also requires IFLA_BRPORT_LOCKED and
-> + *   IFLA_BRPORT_LEARNING. IFLA_BRPORT_LOCKED ensures that unauthorized data
-> + *   packets are dropped, and IFLA_BRPORT_LEARNING allows the dynamic FDB
-> + *   entries installed by user space (as replacements for the locked FDB
-> + *   entries) to be refreshed and/or aged out.
-> + *
-> + * @IFLA_BRPORT_MCAST_N_GROUPS
-> + *
-> + * @IFLA_BRPORT_MCAST_MAX_GROUPS
-> + *   Sets the maximum number of MDB entries that can be registered for a
-> + *   given port. Attempts to register more MDB entries at the port than this
-> + *   limit allows will be rejected, whether they are done through netlink
-> + *   (e.g. the bridge tool), or IGMP or MLD membership reports. Setting a
-> + *   limit of 0 disables the limit. The default value is 0.
-> + *
-> + * @IFLA_BRPORT_NEIGH_VLAN_SUPPRESS
-> + *   Controls whether neighbor discovery (arp and nd) proxy and suppression is
-> + *   enabled for a given port. By default this flag is off.
-> + *
-> + *   Note that this option only takes effect when *IFLA_BRPORT_NEIGH_SUPPRESS*
-> + *   is enabled for a given port.
-> + *
-> + * @IFLA_BRPORT_BACKUP_NHID
-> + *   The FDB nexthop object ID to attach to packets being redirected to a
-> + *   backup port that has VLAN tunnel mapping enabled (via the
-> + *   *IFLA_BRPORT_VLAN_TUNNEL* option). Setting a value of 0 (default) has
-> + *   the effect of not attaching any ID.
-> + */
->   enum {
->   	IFLA_BRPORT_UNSPEC,
->   	IFLA_BRPORT_STATE,	/* Spanning tree state     */
+>   static struct attribute *bridge_attrs[] = {
+>   	&dev_attr_forward_delay.attr,
+>   	&dev_attr_hello_time.attr,
 
 
