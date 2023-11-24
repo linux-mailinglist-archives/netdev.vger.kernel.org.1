@@ -1,318 +1,159 @@
-Return-Path: <netdev+bounces-50952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79287F7B4F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 19:03:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6527F7DF5
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 19:28:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FA21281BCC
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:03:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 992B128229D
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0286D381DE;
-	Fri, 24 Nov 2023 18:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA113A8E5;
+	Fri, 24 Nov 2023 18:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="nIA/Aicy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6DiO/qf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505471BD4
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 10:03:28 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a00f67f120aso305220966b.2
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 10:03:28 -0800 (PST)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FB41BC6;
+	Fri, 24 Nov 2023 10:27:21 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-a00a9c6f1e9so324598766b.3;
+        Fri, 24 Nov 2023 10:27:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700849007; x=1701453807; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MndQpVDkv6hGG4LUMDweRAv86F12JwKJYkhf1nWt7WU=;
-        b=nIA/AicyWtzc+b/PGuNEjKX0YX8e8OglS99DRndgvVS4tvduyR2mVLfypKp1i/lZ6O
-         XkqaAQBr5SxM66D6DcoTMQhxgeD39Aeib3CtorGi0VFNQqhFGgdCbcrlX7ML646TS6PO
-         BGuvBD0575Gr5406zrcs6aKHZiAbu5lRn+YfXEbGe9Cmz4L2Sl+E9oUEbMtV2/p50LwR
-         bFtbMtuwXaUMC4BT0imUUP8AUbB3liZFFxOwfp1Id7YMpJ+WheVJ8FpxoHi1LDzokJOp
-         O70okzoB2KCsRxvzY/KR+23G5dT4MCod27ta1YYRPPYI1RVzyN54assKYcvujl0KWwsR
-         gsHw==
+        d=gmail.com; s=20230601; t=1700850439; x=1701455239; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nZE0Duv0jXkYD1Uf9wlPJY0p/L8iUSaCA0xiviM7UDY=;
+        b=J6DiO/qfxLwtBhN82edsegESQt2N/UQVSVzMRnbOi8xSdcK0ZSiiXdV/xRkyiXpw3a
+         fp8lDr48Djyd13MF+yX2Z9pMvOdDEJW/Be4bE1gmxkmSAvNsit9ckM2Aq61mkbN7ITTX
+         JFn8sMRkycOtlcubzoO9pQQb0FfB32hgy7UO1dqt60RPEBr/w5YVDsHl173gOxcSmFBk
+         GKyCc3qjd1fZzceyyhktQCDAcfDB7cog/+Sp3ihkQPH//riZl5IFhkzICERtl6u/Aloz
+         BEd20jzVjB3LG5GZwRQjI4A1wmmStigjv+vRKhniHUpr0IHpMxQvb5kYHWVkCBvAdsX3
+         CxUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700849007; x=1701453807;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MndQpVDkv6hGG4LUMDweRAv86F12JwKJYkhf1nWt7WU=;
-        b=hZvvd2sjeN7ByP6VxhN1GjP2N3LMbRODYsKvHNdprarj744lz4HCYHa63BRbGOZ/RE
-         7D8nyveYux/kbRYfYSkx1p+dkqN9Z0+G2bTCEofkhMqMf+jDSI9rToHsu+auV4voe9du
-         BuztpnmscGG0ZzGU0oq8rWHLKNSU0cuLed2gZEgELjJf+cphtBYKnS/cnN2MGomepf+4
-         gPuNCQPfZmgkDQPPuE1mal3I0fTbAguVGq8WOQVwxghoNqsHee7K6fuuMWDRPvnCOyWx
-         94gKsiVt9AJ8efOSaoRMiMrf5GgowN8AWu5Bfcw5QQLsk/SaWeymx/x+uQMC3S5zeodC
-         +3Bw==
-X-Gm-Message-State: AOJu0Yw7qkqNTv5mWbCOTTK8kgvUQVc5UvXCOE02HlbL/B2cztB975DU
-	UcAkeD0fNy25jTRPbXV2AQFHwg==
-X-Google-Smtp-Source: AGHT+IEm6PNoAISQt/a+CGBHVOqOhz1dJROIbgE/wYFt4624zqFyrSEXjKTBWLcT2L29vYX4yt557g==
-X-Received: by 2002:a17:907:1de1:b0:a00:3512:2e23 with SMTP id og33-20020a1709071de100b00a0035122e23mr2420774ejc.75.1700849005634;
-        Fri, 24 Nov 2023 10:03:25 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.125])
-        by smtp.gmail.com with ESMTPSA id h24-20020a170906591800b009fdc684a79esm2341649ejq.124.2023.11.24.10.03.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 10:03:25 -0800 (PST)
-Message-ID: <e35882ea-c325-4039-bb84-c18b0244dbe0@tuxon.dev>
-Date: Fri, 24 Nov 2023 20:03:23 +0200
+        d=1e100.net; s=20230601; t=1700850439; x=1701455239;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nZE0Duv0jXkYD1Uf9wlPJY0p/L8iUSaCA0xiviM7UDY=;
+        b=PXupsankMVFr16ZntAm3hbXaNIKsLtkENAsQ6RpePyb8mUsLEc3ASRVC+ZRoJmZUJB
+         MnVPoRVAvcpmwXRfQoeYyYX4tMQ6AagT3rK2gL85ASQKDbF7Yx1X9CkKu3X9qoDDeXOp
+         oheKuquEn8RSN4puS5utQAAhf6KkEeNcCG3Q6v1eS/nVvhrp/NrNnpH1TAcFF91sDhpW
+         nj4MCqP4kKOTUeIMtVcXy8SCdE4U3ouou+bl2ka7xMs3yfe/Gi8qdWY4W9sYi35ihoyH
+         JD8QJeyp/yjZsvkNpuPvHYui3uxYidI6qv/6OjMlhZG2jutKcc0oMOAD5SWYbY1I5UbP
+         WmMg==
+X-Gm-Message-State: AOJu0Yyanlsx1XFbsfbCneO5YaC6FrqNvTYhoIPJxFKSU15LX8LJdbc5
+	NtxeZU/5L6cdVhY/MvLEAYE=
+X-Google-Smtp-Source: AGHT+IFuywZgZqeVIukwbFqD8q5mrgqH2bkh0mMo/lbicvHhoDUxK4WwGP+s8nvCyvyHtUVJhgXK6g==
+X-Received: by 2002:a17:906:3fd0:b0:9b2:c583:cd71 with SMTP id k16-20020a1709063fd000b009b2c583cd71mr2509480ejj.50.1700850439417;
+        Fri, 24 Nov 2023 10:27:19 -0800 (PST)
+Received: from skbuf ([188.26.185.12])
+        by smtp.gmail.com with ESMTPSA id k18-20020a170906579200b009ffe3e82bbasm2356276ejq.136.2023.11.24.10.27.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 10:27:19 -0800 (PST)
+Date: Fri, 24 Nov 2023 20:27:15 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
+ PHY package nodes
+Message-ID: <20231124182715.azmi3fwrdg3gfdkj@skbuf>
+References: <20231120135041.15259-1-ansuelsmth@gmail.com>
+ <20231120135041.15259-4-ansuelsmth@gmail.com>
+ <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+ <20231121144244.GA1682395-robh@kernel.org>
+ <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
+ <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+ <20231124165923.p2iozsrnwlogjzua@skbuf>
+ <6560dc65.050a0220.182b5.650c@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/13] net: ravb: Add runtime PM support
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- p.zabel@pengutronix.de, yoshihiro.shimoda.uh@renesas.com,
- geert+renesas@glider.be, wsa+renesas@sang-engineering.com,
- biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
- sergei.shtylyov@cogentembedded.com, mitsuhiro.kimura.kc@renesas.com,
- masaru.nagai.vx@renesas.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
- <04cb07fe-cccc-774a-f14d-763ce7ae7b07@omp.ru>
- <b3456a4d-336c-434d-9fd5-4c87582443cb@tuxon.dev>
- <9af21eb9-6fe1-de3a-f2eb-4493778ebb32@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <9af21eb9-6fe1-de3a-f2eb-4493778ebb32@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6560dc65.050a0220.182b5.650c@mx.google.com>
 
+On Fri, Nov 24, 2023 at 05:25:16PM +0100, Christian Marangi wrote:
+> The main reason is the fact that PHY package are already a thing and API
+> are already there (phy_package_join/leave...) so we just lack any way to
+> support this in DT without using specialized code in the PHY driver.
+> 
+> This is really completing the feature.
 
+Hmm, I see struct phy_package_shared as a mechanism to tell phylib that
+multiple device structures are actually related with each other, because
+the device core, and their parent bus, has no idea. If you're under
+control of the parent bus code and you can probe PHY devices in any
+order you want and do whatever you want before probing them, I don't see
+why you would need struct phy_package_shared any longer? I don't see why
+this feature needs to be completed, if that involves changes to the
+device tree structure. PHY packages assumed no changes to the device
+tree (they rely on a hacky interpretation of the MDIO address AFAIU).
+If we change that basic premise, all implementation options are on the
+table, I think.
 
-On 23.11.2023 21:19, Sergey Shtylyov wrote:
-> On 11/23/23 8:04 PM, claudiu beznea wrote:
-> 
-> [...]
-> 
->>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>
->>>> RZ/G3S supports enabling/disabling clocks for its modules (including
->>>> Ethernet module). For this commit adds runtime PM support which
->>>> relies on PM domain to enable/disable Ethernet clocks.
->>>
->>>    That's not exactly something new in RZ/G3S. The ravb driver has unconditional
->>> RPM calls already in the probe() and remove() methods... 
->>> And the sh_eth driver
->>> has RPM support since 2009...
->>>
->>>> At the end of probe ravb_pm_runtime_put() is called which will turn
->>>
->>>    I'd suggest a shorter name, like ravb_rpm_put() but (looking at this function)
->>> it doesn't seem hardly needed...
-> 
->    Does seem, sorry. :-)
-> 
->>>> off the Ethernet clocks (if no other request arrives at the driver).
->>>> After that if the interface is brought up (though ravb_open()) then
->>>> the clocks remain enabled until interface is brought down (operation
->>>> done though ravb_close()).
->>>>
->>>> If any request arrives to the driver while the interface is down the
->>>> clocks are enabled to serve the request and then disabled.
->>>>
->>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>> ---
->>>>  drivers/net/ethernet/renesas/ravb.h      |  1 +
->>>>  drivers/net/ethernet/renesas/ravb_main.c | 99 ++++++++++++++++++++++--
->>>>  2 files changed, 93 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
->>>> index c2d8d890031f..50f358472aab 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb.h
->>>> +++ b/drivers/net/ethernet/renesas/ravb.h
->>>> @@ -1044,6 +1044,7 @@ struct ravb_hw_info {
->>>>  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */
->>>>  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
->>>>  	unsigned refclk_in_pd:1;	/* Reference clock is part of a power domain. */
->>>> +	unsigned rpm:1;			/* Runtime PM available. */
->>>
->>>    No, I don't think this flag makes any sense. We should support RPM
->>> unconditionally...
-> 
->    If RPM calls work in the probe()/remove() methods, they should work
-> in the ndo_{open|stop}() methods, right?
+> The only reason for the generic "ethernet-phy-package" compatible is to
+> have a solid detection of the node in PHY core. (I assume parsing the
+> node name might be problematic? Or maybe not now that we require adding
+> a reg to it)
 
-It might depend on hardware support... E.g.
+Our opinions seem to differ, but I don't think that the package needs a
+solid detection of the node in the PHY core :) I think phy_devices and
+mdio_devices already cover everything that's necessary to build a
+solution.
 
-I debugged it further the issue I had with this implementation on other
-SoCs and it seems we cannot do RPM for those w/o reworking way the driver
-is configured.
+> Also I don't expect tons of special properties for PHY package, with the
+> current probe/config implementation, a PHY driver have lots of
+> flexibility in all kind of validation.
+> 
+> Consider that the additional global-phys and global-phy-names are
+> already expected to be dropped.
+> (we know the PHY package base address and we can calculate the offset of
+> the global phy from there in the PHY package probe)
+> 
+> And even the phy-mode has been scrapped for more specific solution...
+> (some assumption can be done on probe by checking the PHY mode and set
+> stuff accordingly or even do parsing in the PHY package node as we pass
+> the OF node of the phy package)
+> 
+> The PHY package node would be reduced to a simple compatible (and even
+> this can be dropped) and a reg.
 
-I wiped out the RPM code from this patch and just called:
+So why does it need to be described in DT, at this stage? :)
 
-pm_runtime_put_sync();		// [1]
-usleep_range(300000, 400000);	// [2]
-pm_runtime_get_sync();		// [3]
-
-at the end of ravb_probe(); with this the interfaces fails to work. I
-continue debugging it and interrogated CSR and this returns RESET after
-[3]. I tried to switched it back to configuration mode after [3] but fails
-to restore to a proper working state.
-
-Then continued to debug it further to see what happens on the clock driver.
-The clk enable/disable reaches function at [4] which sets control_regs[reg]
-which is one of the System module stop control registers. Setting this
-activates module standby (AFICT). Switch to reset state on Ethernet IP
-might be backed by note (2) on "Operating Mode Transitions Due to Hardware"
-chapter of the G1H HW manual (which I don't fully understand).
-
-Also, the manual of G1H states from some IPs that register state is
-preserved in standby mode but not for AVB.
-
-[4]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/clk/renesas/renesas-cpg-mssr.c#n190
-
-
+> I feel there is a big chance here to generalize it and prevent any kind
+> of mess with all kind of similar/equal code that just do the same thing.
+> (and we already have an example with the PHY package API usage with
+> every PHY having the same exact pattern for probe/config and nothing
+> describing that the PHY are actually a package in DT)
 > 
->> The reasons I've limited only to RZ/G3S are:
->> 1/ I don't have all the platforms to test it
-> 
->    That's a usual problem with the kernel development...
-> 
->> 2/ on G1H this doesn't work. I tried to debugged it but I don't have a
->>    platform at hand, only remotely, and is hardly to debug once the
->>    ethernet fails to work: probe is working(), open is executed, PHY is
->>    initialized and then TX/RX is not working... don't know why ATM.
-> 
->    That's why we have the long bug fixing period after -rc1...
-
-I prefer to not introduce any bug by intention.
-
-> 
-> [...]
->>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>> index f4634ac0c972..d70ed7e5f7f6 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>> @@ -145,12 +145,41 @@ static void ravb_read_mac_address(struct device_node *np,
-> [...]
->>>> +}
->>>> +
->>>>  static void ravb_mdio_ctrl(struct mdiobb_ctrl *ctrl, u32 mask, int set)
->>>>  {
->>>>  	struct ravb_private *priv = container_of(ctrl, struct ravb_private,
->>>>  						 mdiobb);
->>>> +	int ret;
->>>> +
->>>> +	ret = ravb_pm_runtime_get(priv);
->>>> +	if (ret < 0)
->>>> +		return;
->>>>  
->>>>  	ravb_modify(priv->ndev, PIR, mask, set ? mask : 0);
->>>> +
->>>> +	ravb_pm_runtime_put(priv);
->>>
->>>    Hmm, does this even work? :-/ Do the MDIO bits retain the values while
->>> the AVB core is not clocked or even powered down?
->>
->> This actually is not needed. It's a leftover. I double checked with
->> mii-tools to access the device while the interface is down and the IOCTL is
->> blocked in this case by
->> https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/renesas/ravb_main.c#L2266
-> 
->    Have you tested with ethtool as well?
-> 
->>>    Note that the sh_eth driver has RPM calls in the {read|write}_c{22?45}()
-> 
->    s/?/|/,
-> 
->>> methods which do the full register read/write while the core is powere up
-> 
->    Powered.
-> 
->>> and clocked...
->>>
->>> [...]
->>>> @@ -2064,6 +2107,11 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
->>>>  	struct ravb_private *priv = netdev_priv(ndev);
->>>>  	const struct ravb_hw_info *info = priv->info;
->>>>  	struct net_device_stats *nstats, *stats0, *stats1;
->>>> +	int ret;
->>>> +
->>>> +	ret = ravb_pm_runtime_get(priv);
->>>> +	if (ret < 0)
->>>> +		return NULL;
->>>
->>>    Hm, sh_eth.c doesn't have any RPM calls in this method. Again, do
->>
->> In setups where systemd is enabled, user space calls this method in
->> different stages (e.g. at boot time or when running ifconfig ethX, even if
->> interface is down). W/o runtime resuming here the system will fail to boot.
->>
->> The other approach I wanted to take was to:
->>
->> if (!netif_running(dev))
->> 	return &ndev->stats;
->>
->> But I didn't choose this path as there are some counters updated to nstat
->> only in this function, e.g. nstats->tx_dropped += ravb_read(ndev, TROCR);
->> and wanted an opinion about it.
-> 
->    Have you seen the following commit (that I've already posted for you on
-> IRC)?
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7fa2955ff70ce4532f144d26b8a087095f9c9ffc
-> 
->    Looks like the RPM calls won't do here...
-> 
->>> the hardware counters remain valid across powering the MAC core down?
->>
->> The power domain that the Ethernet clocks of RZ/G3S belong disables the
->> clock and switches the Ethernet module to standby. There is no information
->> in HW manual that the content of registers will be lost.
-> 
->    That's what your current PD driver does... isn't it possible that
-> in some new SoCs the PD would be completely powered off?
-> 
-> [...]
->>>> @@ -2115,11 +2165,18 @@ static void ravb_set_rx_mode(struct net_device *ndev)
->>>>  {
->>>>  	struct ravb_private *priv = netdev_priv(ndev);
->>>>  	unsigned long flags;
->>>> +	int ret;
->>>> +
->>>> +	ret = ravb_pm_runtime_get(priv);
->>>> +	if (ret < 0)
->>>> +		return;
->>>
->>>    Hm, sh_eth.c doesn't have any RPM calls in this method either.
->>> Does changing the promiscous mode have sense for an offlined interface?
->>
->> I've added it for scenarios when the interface is down and user tries to
->> configure it. I don't know to answer your question. W/o RPM resume here
->> user space blocks if tries to access it and interface is down. I can just
->> return if interface is down. Let me know if you prefer this way.
-> 
->    Looking at __dev_set_rx_mode(), the method gets only called when
-> (dev->flags & IFF_UP) is true -- but that contradicts your experience,
-> it seems... However, looking at net/core/dev_addr_lists.c, that function
-> is called from the atomic contexts, so please just return early.
-> 
->>> [...]
->>>> @@ -2187,6 +2244,11 @@ static int ravb_close(struct net_device *ndev)
->>>>  	if (info->nc_queues)
->>>>  		ravb_ring_free(ndev, RAVB_NC);
->>>>  
->>>> +	/* Note that if RPM is enabled on plaforms with ccc_gac=1 this needs to be
->>>
->>>    It's "platforms". :-)
->>>
->>>> skipped and
->>>
->>>    Overly long line?
->>
->> Not more than 100 chars. Do you want it to 80?
-> 
->    Yes, it's not the code, no need to go beyond 80 cols, I think...
-> 
-> [...]
-> 
-> MBR, Sergey
+> Hope it all makes sense to you.
 
