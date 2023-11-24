@@ -1,171 +1,116 @@
-Return-Path: <netdev+bounces-50962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D4267F8546
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:48:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD98F7F8556
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:59:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB941C25DF6
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 20:48:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D410B21C85
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 20:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8C8364C3;
-	Fri, 24 Nov 2023 20:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4AB3A8CD;
+	Fri, 24 Nov 2023 20:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1LcHPJrk"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="TJo54wDK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bi9AtZKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0577C19A3
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 12:48:22 -0800 (PST)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-423a125d23cso81431cf.1
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 12:48:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700858901; x=1701463701; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tFQWMpDN2F24cc/J03f4NVx2U6EwlQXtQnJp1TM3/K8=;
-        b=1LcHPJrkSE6LmyHMrgDoIEpZNHn/ywCyZYHVujYiNCy8y8v5qEqT6rE/drq/47cIwa
-         4yfcCQKfCCfSy+UnOyeX3+nAPOvRqPInA7EJWxm6m1GpsIsdUo733GMKcvRBufgfZjDa
-         Hyi6KwukEDyLeESd6CtwH8oGuWPzbUaN0jrkPf6UfaWubZpx4FX8kBmN7V/DRglmIwl0
-         NPcgFok1JYzrSMZp8Y5sVp4ms/ZycId2UIRAU1OJR5b8YPrarK1ipy/ATnbNqLvc57Mi
-         HVCyuEohN3wMNlt6WJxkBQL9fUlQP85/c6ET6wYrQ2F/fPRcVMOzhQ3/+7fuUsrG992f
-         vKxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700858901; x=1701463701;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tFQWMpDN2F24cc/J03f4NVx2U6EwlQXtQnJp1TM3/K8=;
-        b=ZwlvYl7oewT4Zbes1MSiHh9jRfhz9DZts29jfGbzpNnsPybE3moVke7ZMm+ONZ/bVp
-         it2nZgLm4+uoKkthfJzRlnLAkMcRS+A9hBcWCDvNZQjkmBHbrBGpwHcnXyeHe1ZQowcP
-         5L7bOIa6/g3FeUUvL1vmetB54hv4JwKK9B7XhnLfoGRjBy+tTEgTO7hbUgRJu5YC3RHc
-         X+M8nL+P7Sinx2dS2s4kDyKy3EOnkk07+jIog1WGKbp74ZMpEvjREMon7swxQHGvhoum
-         tQNxNwJ0CI0Nn/LmuhnybuuSRndchhljRU8+3TbRjLa9XfoME4afBSYm6Ofb9qI6zerK
-         Zx0A==
-X-Gm-Message-State: AOJu0YzR9ho6nYWpqn/cMIVHsKpGQL3O3QrQKRn7V7rnQbhLedYMD5aw
-	zNKWJG519iOB1uP6wRRt0FbAay+CnSpDSefUADd2rw==
-X-Google-Smtp-Source: AGHT+IFlw/BprWhMGyCnxPL0swEeuxm4RjdXSiWCk+/jHDaoAAmc3zBMtDvNW474MpL5i9yKSS1/AA2MWkWolILaYOk=
-X-Received: by 2002:ac8:5885:0:b0:421:c8d7:58f1 with SMTP id
- t5-20020ac85885000000b00421c8d758f1mr705562qta.4.1700858900765; Fri, 24 Nov
- 2023 12:48:20 -0800 (PST)
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF0619A3;
+	Fri, 24 Nov 2023 12:59:31 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 7313958049F;
+	Fri, 24 Nov 2023 15:59:27 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Fri, 24 Nov 2023 15:59:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+	1700859567; x=1700866767; bh=LUc6+oAUXdxf0gLuIlkH0gh0571S4Y/6Cb0
+	mYTuCEC4=; b=TJo54wDKCgMuWkoE9drzZDiVLRQhY/GJRZQbHp7h+tibivPtYdz
+	aoy+dD/iB6VH/tHq1lkDZSyBeUiPUKnU+CPUBLH9oDL4UiuE6hzBkHgZdpTaAyMD
+	vGDocwfPKyrAxwD4arpe2BagHsS4TfP6SchUmq7QzlC0tl9WV6mhq4DbdDSaJCkG
+	DiZRzg+Grk2oWd3veN4MrIlJxOdoTv80OKIq9dyWH6G+POItZfygpmv6Hde5rox+
+	VRCqRKdHztbDx/R3ACq9XqwpDs3mJqjXeVXTQV0qz2ku+2/FxPr2IdVbKLyeWSXT
+	z2sPjzPCWFWfQyjSK3eu992T16Pw5NYvfrg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1700859567; x=1700866767; bh=LUc6+oAUXdxf0gLuIlkH0gh0571S4Y/6Cb0
+	mYTuCEC4=; b=Bi9AtZKVEzB6ILE28gGs0V2BjploLrLFm4vL9yieiaAbuReoHKj
+	S60zq3BxmqGOrsPP16zHlbzesBhzij7oshzaUNJtfr8XyXKD7Y/f2gmFQnb1AXiu
+	9yrNXo063xCLmAJehlT5JPFAc6fWKVUQ3DzZcnEinVvimSEOWM5/r08H43JKgk7b
+	tkKSbPHpzmOW7YzvYqwQeYXXntHkpV7cMBehqn2I9KbyZK+enTbdOy4mnTlSfkiC
+	KE2fcCPj8cU+u4o6qVzO2LKoIYF4nPxii4WlldEPSRHxAAy7Ly8EArEnUf0LO8jr
+	VGHpemmpxDrV/SevjcIIHWH6+TnbVtMJmBg==
+X-ME-Sender: <xms:rg5hZWcjngq0PBJ4Yt3DFGUS9mKKrFvQ303LZs4GmU1rdAtZJN3lTg>
+    <xme:rg5hZQO5DdaBzcgYbUGXxPSRLUxCdh55A2W2lv9ITgz-joW-u7JXZaw49hWbn3muY
+    jbX95IOBlzKyjt3EA>
+X-ME-Received: <xmr:rg5hZXjQNJgd0YWEGzNMF92LA72-QPYKp2622RdnvCTjTsQtmF25A1O7OJl6Mv_cHrWUIM8XkOmGmx3seIC6N2roMDcwXiZxmuVx1-51lNdk_015rndatAEDw1Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehhedgudeggecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
+    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
+    eqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueekffelteekkeekgeegffev
+    tddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:rg5hZT__S8VmppWZ-1-GJdLAUH0xp8oh4ZwiDoj9JUI2-36UilZY2w>
+    <xmx:rg5hZSsMBnUp1nRxqwPpVc2fNRielAXeqic28Nl-pai_BQD8lJuvWg>
+    <xmx:rg5hZaFsDEW49cZxHhwMqUFl5AZKUrSxHjmv5j-MR6jvRFD3dAdmSA>
+    <xmx:rw5hZSf9w0z44a0z6VFmEW3z8LJC7RQyr-7597RGS6OlXcFCDjuG1A>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 24 Nov 2023 15:59:25 -0500 (EST)
+Date: Fri, 24 Nov 2023 13:59:24 -0700
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	antony.antony@secunet.com, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v1 7/7] bpf: xfrm: Add selftest for
+ bpf_xdp_get_xfrm_state()
+Message-ID: <rsj2usphrnghq3gnwkbho7rek7ffbgyur4kjuakpfxwu7zqpzw@cj3rmd4gupxq>
+References: <cover.1700676682.git.dxu@dxuuu.xyz>
+ <84111ba0ea652a7013df520c151d40d400401e9c.1700676682.git.dxu@dxuuu.xyz>
+ <CAADnVQKg7-T_g7CFRs62ZDFyR9z=FTxfyXyTe=3_ojGpnvxJ4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120220549.cvsz2ni3wj7mcukh@skbuf> <20231121183114.727fb6d7@kmaincent-XPS-13-7390>
- <20231121094354.635ee8cd@kernel.org> <20231122144453.5eb0382f@kmaincent-XPS-13-7390>
- <20231122140850.li2mvf6tpo3f2fhh@skbuf> <20231122085000.79f2d14c@kernel.org>
- <20231122165517.5cqqfor3zjqgyoow@skbuf> <20231122100142.338a2092@kernel.org>
- <20231123160056.070f3311@kmaincent-XPS-13-7390> <20231123093205.484356fc@kernel.org>
- <20231124154343.sr3ajyueoshke6tn@skbuf> <20231124183431.5d4cc189@kmaincent-XPS-13-7390>
-In-Reply-To: <20231124183431.5d4cc189@kmaincent-XPS-13-7390>
-From: Willem de Bruijn <willemb@google.com>
-Date: Fri, 24 Nov 2023 15:47:43 -0500
-Message-ID: <CA+FuTSfQgqQyBHSgx32Vdnxs4wgMSyB9yEpJTObS5t1iYFcWBA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-To: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
-	Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Simon Horman <horms@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQKg7-T_g7CFRs62ZDFyR9z=FTxfyXyTe=3_ojGpnvxJ4w@mail.gmail.com>
 
-On Fri, Nov 24, 2023 at 12:34=E2=80=AFPM K=C3=B6ry Maincent
-<kory.maincent@bootlin.com> wrote:
->
-> On Fri, 24 Nov 2023 17:43:43 +0200
-> Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
->
-> > On Thu, Nov 23, 2023 at 09:32:05AM -0800, Jakub Kicinski wrote:
-> > > On Thu, Nov 23, 2023 at 04:00:56PM +0100, K=C3=B6ry Maincent wrote:
-> > > > So, do we have a consensus? Vlad, do you agree on putting all under
-> > > > ethtool?
-> > > >
-> > > > ETHTOOL_GET_TS_INFO will be in charge of replacing the SIOCGHWSTAMP
-> > > > implementation. Need to add ETHTOOL_A_TSINFO_PHC_INDEX
-> > > > ETHTOOL_A_TSINFO_QUALIFIER to the request.
-> > > >
-> > > > ETHTOOL_GET_TS_INFO will list all the hwtstamp provider (aka "{phc_=
-index,
-> > > > qualifier}") through the dumpit callback. I will add a filter to be=
- able
-> > > > to list only the hwtstamp provider of one netdev.
-> > > >
-> > > > ETHTOOL_SET_TS_INFO will be in charge of replacing the SIOCSHWSTAMP
-> > > > implementation.
-> > >
-> > > If not we can do a vote/poll? Maybe others don't find the configurati=
-on
-> > > of timestamping as confusing as me.
+Hi Alexei,
+
+On Wed, Nov 22, 2023 at 03:28:16PM -0800, Alexei Starovoitov wrote:
+> On Wed, Nov 22, 2023 at 10:21 AM Daniel Xu <dxu@dxuuu.xyz> wrote:
 > >
-> > If you mean the ETHTOOL_MSG_TSINFO_GET netlink message (ETHTOOL_GET_TS_=
-INFO
-> > is an ioctl), you're saying that you want to move the entire contents o=
-f
-> > SIOCGHWSTAMP there, by making the kernel call ndo_hwtstamp_get() in
-> > addition to the existing __ethtool_get_ts_info()?
->
-> Yes.
->
-> > Yeah, I don't know, I don't have a real objection, I guess it's fine.
-> >
-> > What will be a bit of an "?!" moment for users is when ethtool gains
-> > support for the SIOCGHWSTAMP/SIOCSHWSTAMP netlink replacements, but not
-> > for the original ioctls. So hwstamp_ctl will be able to change timestam=
-ping
-> > configuration, but ethtool wouldn't - all on the same system. Unless
-> > ethtool gains an ioctl fallback for a ioctl that was never down its all=
-ey.
->
-> Yes indeed. Would it break things if both ioctls and netlink can get and =
-set
-> the hwtstamps configuration? It is only configuration. Both happen under
-> rtnl_lock it should be alright.
->
-> The question is which hwtstamp provider will the original ioctls be able =
-to
-> change? Maybe the default one (MAC with phy whitelist) and only this one.
->
-> > But by all means, still hold a poll if you want to. I would vote for
-> > ethtool netlink, not because it's great, just because I don't have a
-> > better alternative to propose.
->
-> If you agree on that choice, let's go. Jakub and your are the most proact=
-ive
-> reviewers in this patch series. Willem you are the timestamping maintaine=
-r do
-> you also agree on this?
+> > +
+> > +       bpf_printk("replay-window %d\n", x->replay_esn->replay_window);
+> 
+> Pls no printk in tests. Find a different way to validate.
 
-I don't have a strong opinion. Ethtool netlink SGTM.
+Ack. I'll migrate the ipsec tunnel tests to test_progs next rev so it
+can use mmaped globals.
 
-For new network configuration we are moving away from ioctl towards
-netlink in general.
-
-Ethtool itself made this move, where the old ioctl way of things
-continues to work, but will no longer be extended.
-
-Since one of the APIs we use already uses ethtool, converting the
-other two there makes sense to me.
-
-I'm not familiar enough with configuring CAN or wireless to know
-whether it would pose a problem for these mentioned cases.
-
-> If anyone have another proposition let them speak now, or forever remain
-> silent! ;)
+Thanks,
+Daniel
 
