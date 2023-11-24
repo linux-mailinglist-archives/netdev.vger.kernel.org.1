@@ -1,131 +1,160 @@
-Return-Path: <netdev+bounces-50671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189E07F69B8
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:20:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E487F69C5
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 166A61C209C8
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:20:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231A6281740
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8AA370;
-	Fri, 24 Nov 2023 00:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2936C394;
+	Fri, 24 Nov 2023 00:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OK1gypCI"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="kRvkrt2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D9010E5;
-	Thu, 23 Nov 2023 16:19:54 -0800 (PST)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-41eae4f0ee6so6453571cf.3;
-        Thu, 23 Nov 2023 16:19:54 -0800 (PST)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD7710D3
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:30 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-50797cf5b69so1895537e87.2
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700785193; x=1701389993; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xRrczTl2dmji0BpEcvz0ytvI2sxamQ/CJSEn/YlePo4=;
-        b=OK1gypCIzXSDDX6WZQfUkip686LfFNu1yKUzifrbEORw63Pouq6niyzuThPUZiUoEJ
-         X4MsRu0oqpeXGKOxjlYT6M7N98i4m/X5IBee5azbW9X4e6vpwt0jKw9Oxi0MjRve7f/p
-         0groLIcFcTxn33WAowBLVG7xzr/34R/c0pouM8XsMkTWJDGlun+aJ9DIb91C38HEDUeP
-         vOepC/xr2ZxCZOiycZSaYut7h7lNlzhYY+ae9JfmTpcf+MehHb9zBv+bixTI3YjKNbNm
-         BxQd1XjL5Ek1WqJSwTCq7EXJ+A3MZsG9iv04D5+w+s6GODgu0/QIQhePNmZe26uqIiX2
-         g63Q==
+        d=arista.com; s=google; t=1700785648; x=1701390448; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8QM/m7UTtv+MC2zusUkJTGgTrqbe8gRAx9REDFyuSU=;
+        b=kRvkrt2ME06+64sbnWjGIGz9OeN3KFbdlPZCk6Htz8uuIVvLqj5G7mXzp4wlNm3bRk
+         QnuhH1Yvx4CzN4NKknKX42dYX99voJKjXarmoW/8SV2PT91kr7JluuO/Ta1BJ1Wul+8S
+         i1cfndvTTlGCopgzie4xQWu6yVpiTDtJPaFjIy5EiQ0kZX2DMCxAmW2P1Qq4FRCfTeiu
+         mMJVerT1bcYdOalTqZbgESxMYt9pKi94hpnX/4dHnXd7KyhknNqrly9GwSo7MjLIX6Vn
+         BTTnzoOxtjk//3hPh8PSbYWkelsNeJxf3t03za17Z47C3nock2n2LtqRGBQWWAjYqnpn
+         vxNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700785193; x=1701389993;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xRrczTl2dmji0BpEcvz0ytvI2sxamQ/CJSEn/YlePo4=;
-        b=vx9SPIqBdVm/MEQ2vVYehGIowSvW0dOv1DV1liEyviJTQhGdupn0fG7deWNoL9k0c6
-         PC8bOPLZhvQ8fN+st3ILnfk7npUQyzuSIBHKzNKPuopc51udYp6SfPBEKJLObPgkcgrt
-         ROcngAMGaDW0Pj87T+kwTVtljj6CsllYmLcZwxIGGLPpIY1YXLfiI9jIcn/nM2XFTFX9
-         pov7eevdbzhlCoZvRDmy6lR+vvD9Pc9ntRFg8OeVJz7yuuBHNlAzltJE8xRPYSyEUr2D
-         4Sb32bKB0J8yQ/Uyy0F+E2ctC1RqTlolyHsRn86lAq8ZPQNRWrN4AcL1h5bKiBMYeL74
-         NeHw==
-X-Gm-Message-State: AOJu0Yyqzmee6ok8vGjFvYhHSwCxpwIL9ESOrh0ixZ8AcnTjEP+CPNtm
-	DsKuOKZRgLGb6/Xcnr2T9Bk=
-X-Google-Smtp-Source: AGHT+IHVVFRNespoWFMVU0o5ntPVQqECOD7INgMy3+lvh/0VVYhjCsDYY8Dug08J1JmSNlupRfZcRA==
-X-Received: by 2002:a05:622a:100d:b0:423:95ae:9b64 with SMTP id d13-20020a05622a100d00b0042395ae9b64mr952868qte.51.1700785193101;
-        Thu, 23 Nov 2023 16:19:53 -0800 (PST)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id t2-20020ac87602000000b00421c272bcbasm849036qtq.11.2023.11.23.16.19.52
+        d=1e100.net; s=20230601; t=1700785648; x=1701390448;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q8QM/m7UTtv+MC2zusUkJTGgTrqbe8gRAx9REDFyuSU=;
+        b=kothmwphc72QbUM5xSXEYrpiesqlvmpAv2Y7QqZI/sua3gpyQzVNN0R4m/RS5SNGnj
+         cBjwo6dTVykUxe4ndp/hGWKPw1OCx6GqyO642WrhQ8c8PZpBjWwxyCl+zmq1h+tJSsKQ
+         0h9FgEcwsSl6zuAkzHaO+XT7XXRdeKU034/iUJ8iChyZHaP/iqq5t7F5az14M5GXPktF
+         UYMhN2tr0yZK8T3RFQKVOTI2I94L5EfCLU97tB78wxATFKqDl/OWphrsXyg7Bw6DJ2ul
+         I+cd4TcsZGZydeLAu8+/2hq7ibG2J7VQbAQJQd7alug5V6rx/SYZP8Z7+/e7J0rugPL6
+         tDiw==
+X-Gm-Message-State: AOJu0YxCytBf9gDpuBclBD9JdDRDgcrRXoFpyxoddw/Vb2YJuHTDw1Fo
+	uwMoCo0n+1rILaMSjS/TaA5FQA==
+X-Google-Smtp-Source: AGHT+IFh+qtjDvYkcbRMFlh/WyRvztcosddBJ2m0H91J1i9G+Zxs4K+RjS13PJvfkM83cKVos7a9uA==
+X-Received: by 2002:a2e:3615:0:b0:2c5:2fa8:716a with SMTP id d21-20020a2e3615000000b002c52fa8716amr689164lja.9.1700785648284;
+        Thu, 23 Nov 2023 16:27:28 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b004094e565e71sm3453230wmo.23.2023.11.23.16.27.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 16:19:52 -0800 (PST)
-Date: Thu, 23 Nov 2023 19:19:52 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Mike Pattrick <mkp@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <655fec28a1c0f_db39d294dc@willemb.c.googlers.com.notmuch>
-In-Reply-To: <655fe8e5b5cf5_d9fc5294a0@willemb.c.googlers.com.notmuch>
-References: <20231123183835.635210-1-mkp@redhat.com>
- <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
- <CAHcdBH7h-sq=Gzkan1du3uxx44WibK0yzdnUcZCuw-mp=9OxOg@mail.gmail.com>
- <655fe8e5b5cf5_d9fc5294a0@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net-next] packet: Account for VLAN_HLEN in csum_start when
- virtio_net_hdr is enabled
+        Thu, 23 Nov 2023 16:27:27 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org,
+	Dmitry Safonov <dima@arista.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 0/7] TCP-AO fixes
+Date: Fri, 24 Nov 2023 00:27:13 +0000
+Message-ID: <20231124002720.102537-1-dima@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Willem de Bruijn wrote:
-> Mike Pattrick wrote:
-> > On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Mike Pattrick wrote:
-> > > > Af_packet provides checksum offload offsets to usermode applicati=
-ons
-> > > > through struct virtio_net_hdr when PACKET_VNET_HDR is enabled on =
-the
-> > > > socket. For skbuffs with a vlan being sent to a SOCK_RAW socket,
-> > > > af_packet will include the link level header and so csum_start ne=
-eds
-> > > > to be adjusted accordingly.
-> > >
-> > > Is this patch based on observing an incorrect offset in a workload,=
+Hi,
 
-> > > or on code inspection?
-> > =
+Changes from v1:
+- Use tcp_can_repair_sock() helper to limit TCP_AO_REPAIR (Eric)
+- Instead of hook to listen() syscall, allow removing current/rnext keys
+  on TCP_LISTEN (addressing Eric's objection)
+- Add sne_lock to protect snd_sne/rcv_sne
+- Don't move used_tcp_ao in struct tcp_request_sock (Eric)
 
-> > Based on an incorrect offset in a workload. The setup involved sendin=
-g
-> > vxlan traffic though a veth interface configured with a vlan. The
-> > vnet_hdr's csum_start value was off by 4, and this problem went away
-> > when the vlan was removed.
-> > =
+I've been working on TCP-AO key-rotation selftests and as a result
+exercised some corner-cases that are not usually met in production.
 
-> > I'll take another look at this patch.
-> =
+Here are a bunch of semi-related fixes:
+- Documentation typo (reported by Markus Elfring)
+- Proper alignment for TCP-AO option in TCP header that has MAC length
+  of non 4 bytes (now a selftest with randomized maclen/algorithm/etc
+  passes)
+- 3 uAPI restricting patches that disallow more things to userspace in
+  order to prevent it shooting itself in any parts of the body
+- SNEs READ_ONCE()/WRITE_ONCE() that went missing by my human factor
+- Avoid storing MAC length from SYN header as SYN-ACK will use
+  rnext_key.maclen (drops an extra check that fails on new selftests)
 
-> This is a vlan device on top of a veth device? On which device and at
-> which point (ingress or egress) are you receiving the packet over the
-> packet socket?
-> =
+Please, consider applying/pulling.
 
-> From a quick glance, in all cases that I see the VLAN tag is kept in
-> skb->vlan_tci, so is never part of the packet payload.
-> =
+The following changes since commit d3fa86b1a7b4cdc4367acacea16b72e0a200b3d7:
 
-> But checksum offload with VXLAN can be non-trivial on its own. If
-> type & SKB_GSO_UDP_TUNNEL_CSUM | SKB_GSO_TUNNEL_REMCSUM, say. Then
-> csum_start will point to the checksum in vxlanhdr.
+  Merge tag 'net-6.7-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-11-23 10:40:13 -0800)
 
-This last statement is incorrect. But SKB_GSO_UDP_TUNNEL_CSUM might
-be relevant to unexpected csum_start.
+are available in the Git repository at:
+
+  git@github.com:0x7f454c46/linux.git tcp-ao-post-merge-v2
+
+for you to fetch changes up to c5e4cecfcdc7f996acae740812d9ab2ebcd90517:
+
+  net/tcp: Don't store TCP-AO maclen on reqsk (2023-11-23 20:54:54 +0000)
+
+----------------------------------------------------------------
+
+Thanks,
+             Dmitry
+
+Cc: David Ahern <dsahern@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Francesco Ruggeri <fruggeri05@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Dmitry Safonov (7):
+  Documentation/tcp: Fix an obvious typo
+  net/tcp: Consistently align TCP-AO option in the header
+  net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
+  net/tcp: Allow removing current/rnext TCP-AO keys on TCP_LISTEN sockets
+  net/tcp: Don't add key with non-matching VRF on connected sockets
+  net/tcp: Add sne_lock to access SNEs
+  net/tcp: Don't store TCP-AO maclen on reqsk
+
+ Documentation/networking/tcp_ao.rst |  2 +-
+ include/linux/tcp.h                 |  8 +---
+ include/net/tcp_ao.h                |  8 +++-
+ net/ipv4/tcp.c                      |  6 +++
+ net/ipv4/tcp_ao.c                   | 57 +++++++++++++++++++----------
+ net/ipv4/tcp_input.c                | 21 +++++++++--
+ net/ipv4/tcp_ipv4.c                 |  4 +-
+ net/ipv4/tcp_minisocks.c            |  2 +-
+ net/ipv4/tcp_output.c               | 15 +++-----
+ net/ipv6/tcp_ipv6.c                 |  2 +-
+ 10 files changed, 81 insertions(+), 44 deletions(-)
+
+
+base-commit: d3fa86b1a7b4cdc4367acacea16b72e0a200b3d7
+-- 
+2.43.0
 
 
