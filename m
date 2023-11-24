@@ -1,100 +1,177 @@
-Return-Path: <netdev+bounces-50863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B927F75BA
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:54:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E097F75E1
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:01:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4E81B214D5
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:54:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0826D2817CD
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC49228E2C;
-	Fri, 24 Nov 2023 13:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4553286BF;
+	Fri, 24 Nov 2023 14:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="KHw3bi9v"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="GOD36E9D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25143171F
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:54:35 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-548f853fc9eso2609507a12.1
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:54:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1700834073; x=1701438873; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z9eHy0dSzicYIzKgQVzxAaUPEW0o6COLRRR+CISGa0o=;
-        b=KHw3bi9vyfIZ/IANzBSmrpqD7ybQmPQlbNd9bKzZ3EQdiR7G8ZKhhlmg5lAVXGEIVi
-         n4H2ZZjvNTac8BYc+6eDodbvA/wbqazVwpLRYG9zeAF7LCGjrX6jKwfozqWjAhsVqjbC
-         E7C+Q+eI4kzSf4AHa7/rWgnDUZYj2bOwd1HAmeVQ6xkEJ9DNymbKVZPKR6tug7Yd20G9
-         Bbkop3m2ANY5Ybfpay/b0rD9PwkjSVQb/pKlmaLAk1BgOpKwwflSGACqXbLQwZb8ecmB
-         1QWkvhP6gOK9Z3rQNQW7cd9LT+YMgzdgxaUNIxPK8bxS9kqLRzMf8LRrAfxdGLzcVx/A
-         MW3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700834073; x=1701438873;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z9eHy0dSzicYIzKgQVzxAaUPEW0o6COLRRR+CISGa0o=;
-        b=LEhe2pD3OB/qjDBcGyOaRcacvtcoIoTnvJZc2F7HQ+A2GRpam+po0Z1dCysH3kf4Ey
-         cLCAnDC7UU9uMN9kiq2eL6zB1ITPrOCPJWQremKuH26igbcCC74AWGF4z6kqeV8Jy1Hr
-         mgq2Pcm11C9F4HLDR2MYbVt6y2XQS4nzLmlGUJN+PO97SVxSn1zJaT01Tly5dUgP1U5S
-         Q/yA9D4EnqDxRLNQmZuswWhTXRddwzBeNBgyD6hXm1upS2V92bi95foFsVne89GB5V/V
-         73l8k9oR6lAUo1fuZ8yBeP847sQ6oG1vBW6wVdCYFeY8Ohgc0FckVEuLVMdLLsiiNDr8
-         bqug==
-X-Gm-Message-State: AOJu0YwfqTAGhgQVXC7OrSc39/oHNtYmUwgUw6FCYsVXlZym6eBtLfrF
-	U9SHHjmFiiperR5xyw0NGqP+6w==
-X-Google-Smtp-Source: AGHT+IECeVHyYjcvdwu9fK7q92eBt+GRWg3vMwoSJ12YV9YONcne+klrN3G9LlX5FElx0hXFwRCs7Q==
-X-Received: by 2002:a17:906:4557:b0:a04:a111:4901 with SMTP id s23-20020a170906455700b00a04a1114901mr2449120ejq.18.1700834073619;
-        Fri, 24 Nov 2023 05:54:33 -0800 (PST)
-Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
-        by smtp.gmail.com with ESMTPSA id bk25-20020a170906b0d900b00a0a2553ec99sm286978ejb.65.2023.11.24.05.54.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 05:54:32 -0800 (PST)
-References: <20231122192452.335312-1-john.fastabend@gmail.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: martin.lau@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf v2 0/2]  sockmap fix for KASAN_VMALLOC and af_unix
-Date: Fri, 24 Nov 2023 14:53:52 +0100
-In-reply-to: <20231122192452.335312-1-john.fastabend@gmail.com>
-Message-ID: <87v89r2r54.fsf@cloudflare.com>
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5893D41;
+	Fri, 24 Nov 2023 06:01:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+	s=s31663417; t=1700834482; x=1701439282; i=wahrenst@gmx.net;
+	bh=2RHDVyt5/moemHHoQmT1rzjjAAaif5thTqOsAXsDqsA=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=GOD36E9DdPyzK/aCP7jRXPcr9XV9PnZFDmtOQbNKcDrM4EYPi6eE5kHup010WlES
+	 mzQUgSJE1hiC4kgj0UPkFd854GUS7ipvVS/mG/hebzWT5HNv0Yvc0TE2I1APxJjgm
+	 hdzNJdm7upVsbnlh+Upws4rj227l1EcPV0jnUZEMtbN+WbHO4amePtFgSXap6vjDm
+	 2gqxswthCfvk40Xu+eILMw5+/TK1mpx3ibvSiorVZlYdD8HfuIQRtH5qHrhxp9IVM
+	 ph8IfnM29hSgTZSWHvR5SqUdN1t2FVG5zbRapFIYzmM/hJ8gg20SW7XwrxmQvll0y
+	 0EPnHZGqACi2mZ2Mnw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M6DWi-1rD8Ru2QNk-006jdo; Fri, 24
+ Nov 2023 15:01:22 +0100
+Message-ID: <bf3dd03e-a1f2-4586-8f00-7003848016aa@gmx.net>
+Date: Fri, 24 Nov 2023 15:01:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4 net] qca_spi: Fix SPI IRQ handling
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231121163004.21232-1-wahrenst@gmx.net>
+ <20231121163004.21232-3-wahrenst@gmx.net>
+ <a24433f86e39cbb45a9606621e01446e7ad6fa53.camel@redhat.com>
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <a24433f86e39cbb45a9606621e01446e7ad6fa53.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:73pD02ceFv9jYjDGVqjxtrTbdmqUspOJI6R9fWjllimsvxhzTBt
+ CQHPuXhJU48lRVcNDMOTloA+++/GnwJmo5uslAKFbzY/we8TPY3Hcb/k0gtd3Sf5Or9rvoa
+ LcACcYrBsEDOEk1d6jbzUmtzftwGQi109uLPl87sMfAPjPVft/mhvTSKtzza3h/7OTnOomH
+ y2vTvvzOiQe2XfRixhqfg==
+UI-OutboundReport: notjunk:1;M01:P0:NJbxcN48qoA=;xJWy61p3j0lBiTHP+UxcxAkrjuT
+ nvxMI8PJwQG2h2GUXmg6qWjgxYTfT23ZjBWqXd7mkka6On5sgsLUBfguCsTPH/M6p2qOcFOuv
+ p/doWmewYhn33f3//+cnk5JZj/mb+Io1ot56d5u0e7m8e9m+azUxTHUUn0ixEpIzdm+qKEsga
+ 4TE3Z63Xg+/LXSag2ATimkQguj8LXLINREfzZhMuxK0cQo+1gaidOA4MOJbUj+EdlyUGl/vB9
+ 0kRTf/YvqnywkBHzo8kby23H07DK7hILxSuVOQaLSXyNlJgruy/PvdWMUIRUzKQiMNZYx4fbB
+ qAL/SWWZSdl0lKFKYHqZpRE7M4QYhIwsgXNz227fdQtz7JQrmMsoTfV3kiQzwa75F5b5ZY5UJ
+ uKROEvPNXQ1vTAQEToS6sGMDPU4NG8AuXfaM5m43Vx4JdK6hkTym7H9sReTWOVmW1MN4I2oEt
+ eCzMrkZWp4LyyNnjNt+3u8eeTxBQgSOQdAAEgREs9TM/WM0ej+sJM7QBE74/wqt9rbDZKnUhb
+ pGzOPoWRiFq9s3cG3nTw/98AbVotFS7plT/6pDsqPT8S9kUAqP3c4vX7GIxfrLynkYJS+CuAa
+ EPb/reV5ZWMtujQFI8uZTgBHlPt3AQ6IBE4bBEuqnB49cITMjNGEWWiWNJsyhVYbPUoIP1nQ7
+ IAcEqrZ6v1NvhPUhmhtUAb+GRz+Mo+rKSxJrzZTUxM7c7m3CQEYR2pfd7a4lNlB/6ikgyXGXC
+ sFK7LupaPsWbGBWzIf4ZLK/OWEY5xjHAN0Qin+k0ySkMMaS4kPs/tQLhCeLIYD55BL4YH3VPh
+ C0u/FhLEPzTZad/+p6gY7Sswlugf+guMry5p6VC830ijupT1X62RglWGNjbLo8TGcZXepCVgK
+ 10OGGT+OlZVvKMEF0fG2gKqJUm3Mlqb02snctwb5Jtk7qVwK0mbtMCq+WpKRYAw6Q7xC4IrqU
+ ydyQew==
 
-On Wed, Nov 22, 2023 at 11:24 AM -08, John Fastabend wrote:
-> The af_unix tests in sockmap_listen causes a splat from KASAN_VMALLOC.
-> Fix it here and include an extra test to catch case where both pairs
-> of the af_unix socket are included in a BPF sockmap.
->
-> Also it seems the test infra is not passing type through correctly when
-> testing unix_inet_redir_to_connected. Unfortunately, the simple fix
-> also caused some CI tests to fail so investigating that now.
->
-> v2: drop changes to dgram side its fine per Jakub's point it graps a
->     reference on the peer socket from each sendmsg.
->
-> John Fastabend (2):
->   bpf: sockmap, af_unix stream sockets need to hold ref for pair sock
->   bpf: sockmap, add af_unix test with both sockets in map
->
->  include/linux/skmsg.h                         |  1 +
->  include/net/af_unix.h                         |  1 +
->  net/core/skmsg.c                              |  2 +
->  net/unix/af_unix.c                            |  2 -
->  net/unix/unix_bpf.c                           |  5 +++
->  .../selftests/bpf/prog_tests/sockmap_listen.c | 39 ++++++++++++++++---
->  .../selftests/bpf/progs/test_sockmap_listen.c |  7 ++++
->  7 files changed, 49 insertions(+), 8 deletions(-)
+Hi Paolo,
 
-Short of the nit pointed out by Yonghong Song:
+Am 23.11.23 um 12:37 schrieb Paolo Abeni:
+> On Tue, 2023-11-21 at 17:30 +0100, Stefan Wahren wrote:
+>> The functions qcaspi_netdev_open/close are responsible of request &
+>> free of the SPI interrupt, which wasn't the best choice. Currently
+>> it's possible to trigger a double free of the interrupt by calling
+>> qcaspi_netdev_close() after qcaspi_netdev_open() has failed.
+>> So let us split IRQ allocation & enabling, so we can take advantage
+>> of a device managed IRQ and also fix the issue.
+>>
+>> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for Q=
+CA7000")
+>> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> The change makes sense, but the changelog is confusing.
+>
+> qcaspi_netdev_close() and qcaspi_netdev_open() are invoked only via
+> ndo_open and ndo_close(), right? So qcaspi_netdev_close() will never be
+> invoked qcaspi_netdev_open(), failure - that is when IFF_UP is not set.
+sorry, i missed to mention an important part. This issue is partly
+connected to patch 3.
+Please look at qcaspi_set_ringparam() which also call ndo_close() and
+ndo_open(). If you only apply patch 3 you could trigger this issue by
+running the following script, interrupt via Strg+C and start again:
 
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
+#!/bin/bash
+
+while [ true ]; do
+ =C2=A0 ethtool -G eth1 tx 8
+ =C2=A0 ethtool -g eth1
+ =C2=A0 ethtool -G eth1 tx 10
+done
+
+
+[=C2=A0=C2=A0 75.713471] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 75.721814] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 76.795239] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 76.815801] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 77.915872] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 77.933982] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 79.036024] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 79.055595] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 80.076223] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 80.097305] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 81.196471] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 81.217351] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 82.316592] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 82.336963] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 83.436864] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 83.461252] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 84.556950] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 84.575897] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 85.677105] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 85.695061] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 86.717215] qcaspi spi1.0 eth1: SPI thread exit
+[=C2=A0=C2=A0 86.739535] qcaspi spi1.0 eth1: SPI thread created
+[=C2=A0=C2=A0 87.837355] qcaspi spi1.0 eth1: SPI thread exit
+<-- Strg + C
+[=C2=A0=C2=A0 87.841072] qcaspi spi1.0 eth1: qcaspi: unable to start kerne=
+l thread.
+root@tarragon:/srv# ./test_ring_fast.sh
+=2D-----------[ cut here ]------------
+WARNING: CPU: 0 PID: 724 at kernel/irq/manage.c:1887 free_irq+0x23c/0x288
+Trying to free already-free IRQ 73
+CPU: 0 PID: 724 Comm: ethtool Not tainted
+6.1.49-chargebyte-00029-g8c38d497af8a-dirty #108
+Hardware name: Freescale i.MX6 Ultralite (Device Tree)
+ =C2=A0unwind_backtrace from show_stack+0x10/0x14
+ =C2=A0show_stack from dump_stack_lvl+0x24/0x2c
+ =C2=A0dump_stack_lvl from __warn+0x74/0xbc
+ =C2=A0__warn from warn_slowpath_fmt+0xc8/0x120
+ =C2=A0warn_slowpath_fmt from free_irq+0x23c/0x288
+ =C2=A0free_irq from qcaspi_netdev_close+0x38/0x5c
+ =C2=A0qcaspi_netdev_close from qcaspi_set_ringparam+0x48/0x90
+ =C2=A0qcaspi_set_ringparam from ethnl_set_rings+0x2dc/0x320
+ =C2=A0ethnl_set_rings from genl_rcv_msg+0x2c4/0x344
+ =C2=A0genl_rcv_msg from netlink_rcv_skb+0x98/0xfc
+ =C2=A0netlink_rcv_skb from genl_rcv+0x20/0x34
+ =C2=A0genl_rcv from netlink_unicast+0x114/0x1a4
+ =C2=A0netlink_unicast from netlink_sendmsg+0x314/0x340
+ =C2=A0netlink_sendmsg from sock_sendmsg_nosec+0x14/0x24
+ =C2=A0sock_sendmsg_nosec from __sys_sendto+0xc4/0xf8
+ =C2=A0__sys_sendto from ret_fast_syscall+0x0/0x54
+Exception stack(0xe115dfa8 to 0xe115dff0)
+dfa0:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b6ed24dc 0000000c 00000003 005c423=
+8 0000002c
+00000000
+dfc0: b6ed24dc 0000000c b6f6a5a0 00000122 00472e04 005c41f0 00436b60
+005c4190
+dfe0: 00000122 bec50b68 b6e5f841 b6dd1ae6
+=2D--[ end trace 0000000000000000 ]---
+>
+> Cheers,
+>
+> Paolo
+>
+
 
