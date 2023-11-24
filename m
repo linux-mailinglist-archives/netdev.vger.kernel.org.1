@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-50905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383747F7810
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8EC7F7813
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688D91C20FDB
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:44:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16A151C20F1E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C5A31754;
-	Fri, 24 Nov 2023 15:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D0733072;
+	Fri, 24 Nov 2023 15:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qam3F906"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="EvJvufEG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E94051BCF
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 07:44:00 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cf80a7be0aso16743575ad.1
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 07:44:00 -0800 (PST)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B213199A
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 07:44:04 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cfae5ca719so1708745ad.0
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 07:44:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700840640; x=1701445440; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700840644; x=1701445444; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=meBAQ3i5bzteTDjsadEVqP3IdyNZUBxruoeAMf+7W4k=;
-        b=qam3F906LMRyLWAhhlGWfMRMmxHneO5O/2B11kLv9M99EnjJsSBqlyeT6HrIQG2ZDi
-         XYNegTrx04O1mZE+NHyQngFQsXa/HUPrlynIF1aOHzQQKIo8TcJzp1K6GqoHqzsnz1g2
-         m+QEr1ilS5wPIJanPxwRPhRksHsUz9EQ+XY/8xH38V2ZCKo2UdT79w5lLlDOm5kpjsTQ
-         2Uwjv2wbpZM4DL96f8EgAwuUcrXJq3WZarkgyPWHywtxZlSP6oDcCco3WpQsxEPAkByd
-         LO1mluHnyFntGE4yBztOSXI1DV8U5qxGTgdCiePbHxRi0wJxOiNDo1TxyJRUXBjhs1AQ
-         HclQ==
+        bh=XxH4h/fUgyjGMKXsAUdrvTbwQh/c4Jyei7tUpRPE518=;
+        b=EvJvufEGOk2ljoM/xXOhxSCw9Ssx7QlYUP4qjwlIzigo8y3MO6y/ipzVHg6zfDd8Wj
+         WtIe8+0NEeczc/8T9VzzpHZSRibjuvgLoYxONFJzloZWWeap0dp9Q/8g3HhczLPjIqIE
+         VF51yzwv9MhRBOc0IZcCOY8rACxuctZqnLUmXeUp2aHKZ3NmInpCLFM4qgUkmQUN+lLk
+         crcSR5GiIfv+1TX4u1tZ9f/aN9MkznY8g/pHbjvB9vBIiiooJPxGYMHPb/Vg1SJ/MSMT
+         ltZdz18AJlF41sI0qEYZrtNgcGalP8LUu0VoRuSqtOb5RPiyaipSu+mDzgRh1z8x8QWJ
+         W/vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700840640; x=1701445440;
+        d=1e100.net; s=20230601; t=1700840644; x=1701445444;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=meBAQ3i5bzteTDjsadEVqP3IdyNZUBxruoeAMf+7W4k=;
-        b=MK9xI6rBkN7hxpAGXoiP6WFKomxu9GZ0df41FuHJxDdnU2fZg+LOFWojNB1KguMN+G
-         wnbf0vfSYm8OURiTSit3EXcd927oFi4LCvI9hCRf0KKGRYd4ko0iPGm1E8ENakT9Zv4a
-         8v6nLan+OkWPvMkaMyVq10Jp/IFJucLbN2dRuhapfxBhCv6WbC90AfYX5a+1uxpwbbei
-         l2HMDr167t66EMQb4iknIWnRzYOjuzws59xjvm92t2co7Cn/1/anABj8woMph7spsrS9
-         8ouGQK69owR2OsGJ7Cxn4xlAwUgINVXX2B4wQZSbXB5kywLl2naz3WsCb/ROKH3KMfF8
-         QFMA==
-X-Gm-Message-State: AOJu0Yz4DE6FLDzcUxteRUTfdzCdZ8/XsHNykN3emrBbrZTts1uhxHqY
-	LGVKrJF2ACjOQI8zXUZjeL6MMQbmtnDV7L8KIng=
-X-Google-Smtp-Source: AGHT+IEI/gV9/wjUMlivgVIkBGWHfGfGb1pfZNnDlb9nUwelvrY0VHUqAQAEdEhIc9BPVn6KNayM2w==
-X-Received: by 2002:a17:902:e752:b0:1cf:6aae:5998 with SMTP id p18-20020a170902e75200b001cf6aae5998mr4296165plf.0.1700840638351;
-        Fri, 24 Nov 2023 07:43:58 -0800 (PST)
+        bh=XxH4h/fUgyjGMKXsAUdrvTbwQh/c4Jyei7tUpRPE518=;
+        b=wUEcU8oYUXDJ7KRz5U5fv9LMVQorR7Vl0TN0PeEIpOJ4izHo8CXYozsTbPsaoDcY3Y
+         mzB73AL7Ux8aB8DjxuQrXXcvqGuHOFX0RKSixQjJpJV/ygU4LyAZBvnGsBYcWGHreCHd
+         wQ6fqlElEq6WDYXgOimrKwivyEKqiY20xAU209sr/yd5APwkbdTlcShhmu4DCIJj50ot
+         nHD8bOooE+whOkba+ih50yTPX9x9/ofIhTeXeBRcjanxv9bky5V6rFLbH0hIdqp5i9Uy
+         ug5hdRzFCSZJZRjQ+Y2k5fpKZHusogcYaCQfgNDpD9maQ1ymk6HxrwGClFHEFMUzmna9
+         mscg==
+X-Gm-Message-State: AOJu0Yw4P9Hpt7rUxH611exFN8MxwzBUHIwNP6FWqHO0OhwdtIS6GMnz
+	hqUVV3AqcC/4K7/8ab2/FKo0y/YqEfwAWIAgT/Y=
+X-Google-Smtp-Source: AGHT+IESTfwIV1Y4e9dxiuOb6Fx6zh8dfzPm+t7NgGLnsuKfIve4gS4FKHwaEbYY0Jg2cMPODWHT/A==
+X-Received: by 2002:a17:902:7d8a:b0:1c9:ca02:645c with SMTP id a10-20020a1709027d8a00b001c9ca02645cmr2977675plm.36.1700840643802;
+        Fri, 24 Nov 2023 07:44:03 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id g6-20020a170902740600b001cf9eac2d3asm1919743pll.118.2023.11.24.07.43.54
+        by smtp.gmail.com with ESMTPSA id g6-20020a170902740600b001cf9eac2d3asm1919743pll.118.2023.11.24.07.44.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 07:43:57 -0800 (PST)
+        Fri, 24 Nov 2023 07:44:03 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -66,9 +66,9 @@ Cc: jhs@mojatatu.com,
 	bpf@vger.kernel.org,
 	llvm@lists.linux.dev,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next 4/5] selftests: tc-testing: cleanup on Ctrl-C
-Date: Fri, 24 Nov 2023 12:42:47 -0300
-Message-Id: <20231124154248.315470-5-pctammela@mojatatu.com>
+Subject: [PATCH net-next 5/5] selftests: tc-testing: remove unused import
+Date: Fri, 24 Nov 2023 12:42:48 -0300
+Message-Id: <20231124154248.315470-6-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231124154248.315470-1-pctammela@mojatatu.com>
 References: <20231124154248.315470-1-pctammela@mojatatu.com>
@@ -80,51 +80,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Cleanup net namespaces and other resources if we get a SIGINT (Ctrl-C).
-As user visible resources are allocated on a per test basis, it's only
-required to catch this condition when (possibly) running tests.
-
-So far calling post_suite is enough to free up anything that might
-linger.
-
-A missing keyword replacement for nsPlugin is also included.
+Remove this leftover from the times we pre-allocated everything
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py | 2 +-
- tools/testing/selftests/tc-testing/tdc.py                 | 6 +++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-index dc7a0597cf44..77b1106b8388 100644
+index 77b1106b8388..bb19b8b76d3b 100644
 --- a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
 +++ b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-@@ -78,7 +78,7 @@ class SubPlugin(TdcPlugin):
-             print('{}.post_suite'.format(self.sub_class))
+@@ -23,8 +23,6 @@ class SubPlugin(TdcPlugin):
+         super().__init__()
  
-         # Make sure we don't leak resources
--        cmd = "$IP -a netns del"
-+        cmd = self._replace_keywords("$IP -a netns del")
+     def pre_suite(self, testcount, testlist):
+-        from itertools import cycle
+-
+         super().pre_suite(testcount, testlist)
  
-         if self.args.verbose > 3:
-             print('_exec_cmd:  command "{}"'.format(cmd))
-diff --git a/tools/testing/selftests/tc-testing/tdc.py b/tools/testing/selftests/tc-testing/tdc.py
-index c5ec861687b6..caeacc691587 100755
---- a/tools/testing/selftests/tc-testing/tdc.py
-+++ b/tools/testing/selftests/tc-testing/tdc.py
-@@ -1018,7 +1018,11 @@ def main():
-     if args.verbose > 2:
-         print('args is {}'.format(args))
- 
--    set_operation_mode(pm, parser, args, remaining)
-+    try:
-+        set_operation_mode(pm, parser, args, remaining)
-+    except KeyboardInterrupt:
-+        # Cleanup on Ctrl-C
-+        pm.call_post_suite(None)
- 
- if __name__ == "__main__":
-     main()
+     def prepare_test(self, test):
 -- 
 2.40.1
 
