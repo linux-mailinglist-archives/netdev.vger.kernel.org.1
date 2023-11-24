@@ -1,410 +1,125 @@
-Return-Path: <netdev+bounces-50841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5A47F7458
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:54:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1623F7F745B
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AB64B211D5
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:54:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C492E1F20F36
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0261A20305;
-	Fri, 24 Nov 2023 12:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEAC91EB3D;
+	Fri, 24 Nov 2023 12:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="E3nZ1VQv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hM/SY68f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19977A2
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:54:20 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a00a9c6f283so268005366b.0
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:54:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700830458; x=1701435258; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P7FLsRcyDg+UPcdFddwVxnsCbR/BiCtH2+u2Kg95pvY=;
-        b=E3nZ1VQvey9l0z40OcjMp+lOjCd2jN+3n1cmfn7V7/D7oRYdDHVekJsCqJVhuci+9l
-         mcxOZoyo0mjw4OFZAMAMDnn3axb0+B9eZ9gkU8I6jEiGOwpD+q6JUdodEzDcp1CIbD4Q
-         6sSxfBpYBdzarf6lk5q5p0yXy/u57PlNY029z3lOIGGgtVD4OFp1qIQ0gCMT8nJdNyWY
-         WNmUsOvCcGScH8V+TsrsE2OWlL71DS+qa5PYqBCDewQLpVW7OMXuouQ9Oesa4zREw1oD
-         aSCTW0qzfW6ww+8UF/ZOzrU9rL1YWFjIRE/R0EQqxwM+XSgVQk/p9wwKMJ/Fi1cANXkC
-         tqTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700830458; x=1701435258;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P7FLsRcyDg+UPcdFddwVxnsCbR/BiCtH2+u2Kg95pvY=;
-        b=v76IK/Cb783zPjIEZmf11w0apaP241ESlnaG7doFDaCAUR5Z2gcb/G5T79wQE1q/pl
-         wR7gwimzNrrYQ7RMU4Bpcgnujfh8LLx4L383lB7QwhM5BzoeeyY9MDBEmA8CdMP4cJHm
-         3TCA3ULbDQblQbhFcW14t3YbOzdRfOvkgk4Qa0iEfH2QAy5mLVcf2hPgTXLizYo4k3LZ
-         NmzPbtwTPzU00Wl+mo1Q46DkRD27xAy8NcFKbJUVUEjbzp5ae4+5/ZrBYj7FYnCGGZDS
-         RZKYcNxB5S/flMXsVMHsW8txcncS7htm/8xSCBqbjmtd+TylXlBYv3HcIkNZ6Kcv5N0p
-         WLnQ==
-X-Gm-Message-State: AOJu0YwaBrOLas71Or2Z/6CoiSAXysFkSJafreoLFOmujjaZ7jCVH3bd
-	DFKqueS8J+uzYIU5eC2jw4PbwA==
-X-Google-Smtp-Source: AGHT+IFki15y1sZcnN0kKLR5rA/c3b5zL9rgM6jxFEpXKlXsS1EL9QSo3lF8tz3RtO479mlauk6Lkg==
-X-Received: by 2002:a17:906:d0d0:b0:9ff:7d76:148c with SMTP id bq16-20020a170906d0d000b009ff7d76148cmr1834778ejb.66.1700830458396;
-        Fri, 24 Nov 2023 04:54:18 -0800 (PST)
-Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
-        by smtp.gmail.com with ESMTPSA id f8-20020a17090624c800b009fd77d78f7fsm2034685ejb.116.2023.11.24.04.54.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 04:54:18 -0800 (PST)
-Message-ID: <0b2f3872-ce4a-df5d-075e-53f6aa256af7@blackwall.org>
-Date: Fri, 24 Nov 2023 14:54:16 +0200
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6F710EB;
+	Fri, 24 Nov 2023 04:55:31 -0800 (PST)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOAgIle000557;
+	Fri, 24 Nov 2023 12:55:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=rC6RkU15cboR+USOp/CKVp8YuHT+GrmeG1v80PFwaZo=;
+ b=hM/SY68f4L4q4ppTo8gtfYUz2Uc8EldmZu+2pWxz73SHGDEtaLhxnmFk9LPTqO3AADU3
+ L+3LbNDrmqSYlnPK4CBHpFylJlfBkKFGxW51DFFpNoiAsu1gsfEvgkCmvdT47jn62wJh
+ AzgWAifXHGrmExq1mlMJzN3rUCEbdZsqFFZe/mAnTnkAKn4hlP6rgvpAE/elaaBuW/O2
+ yW5XjRasxv7d7Aa/lpTYgUEbaYtjKEoIfytqe0Zsq2WEO3kxlXU2GT4WJsRATyvfn/Rv
+ 9/845kSeP6YPpotb2UTlEZ4PqGfptdjkdTUhNCbFcYfBcim70eRKdcetM1D8IxtiwIGz Pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtaek5tt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:55:09 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AOCAvVG024735;
+	Fri, 24 Nov 2023 12:55:09 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtaek5th-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:55:09 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIoMg019001;
+	Fri, 24 Nov 2023 12:55:08 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf93mdfw8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:55:08 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AOCt7Z210420830
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Nov 2023 12:55:07 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6FB5058052;
+	Fri, 24 Nov 2023 12:55:07 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6173458045;
+	Fri, 24 Nov 2023 12:55:06 +0000 (GMT)
+Received: from [9.171.44.206] (unknown [9.171.44.206])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 24 Nov 2023 12:55:06 +0000 (GMT)
+Message-ID: <0c9fe1fd-affb-4f01-bad7-3d41b98280f5@linux.ibm.com>
+Date: Fri, 24 Nov 2023 13:55:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCHv2 net-next 01/10] net: bridge: add document for IFLA_BR
- enum
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
- Stephen Hemminger <stephen@networkplumber.org>,
- Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Marc Muehlfeld <mmuehlfe@redhat.com>
-References: <20231123134553.3394290-1-liuhangbin@gmail.com>
- <20231123134553.3394290-2-liuhangbin@gmail.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231123134553.3394290-2-liuhangbin@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] net/smc: remove unneeded atomic operations in
+ smc_tx_sndbuf_nonempty
+To: Li RongQing <lirongqing@baidu.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, wintera@linux.ibm.com,
+        dust.li@linux.alibaba.com
+References: <20231123014537.9786-1-lirongqing@baidu.com>
+Content-Language: en-GB
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20231123014537.9786-1-lirongqing@baidu.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ksx1VGtMpFwm5NjXN6K_Grplgwv-nnYX
+X-Proofpoint-GUID: 3XOh5lgSG_XQ0EMChBzEW3LKOuGKU82q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 mlxlogscore=906 malwarescore=0 bulkscore=0
+ adultscore=0 suspectscore=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2311240100
 
-On 11/23/23 15:45, Hangbin Liu wrote:
-> Add document for IFLA_BR enum so we can use it in
-> Documentation/networking/bridge.rst.
+
+
+On 23.11.23 02:45, Li RongQing wrote:
+> The commit dcd2cf5f2fc0 ("net/smc: add autocorking support") adds an
+> atomic variable tx_pushing in smc_connection to make sure only one can
+> send to let it cork more and save CDC slot. since smc_tx_pending can be
+> called in the soft IRQ without checking sock_owned_by_user() at that
+> time, which would cause a race condition because bh_lock_sock() did
+> not honor sock_lock()
 > 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> After commit 6b88af839d20 ("net/smc: don't send in the BH context if
+> sock_owned_by_user"), the transmission is deferred to when sock_lock()
+> is held by the user. Therefore, we no longer need tx_pending to hold
+> message.
+> 
+> So remove atomic variable tx_pushing and its operation, and
+> smc_tx_sndbuf_nonempty becomes a wrapper of __smc_tx_sndbuf_nonempty,
+> so rename __smc_tx_sndbuf_nonempty back to smc_tx_sndbuf_nonempty
+> 
+> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
+> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
 > ---
->   include/uapi/linux/if_link.h | 279 +++++++++++++++++++++++++++++++++++
->   1 file changed, 279 insertions(+)
-> 
 
-Hi,
-Generally ok, a few minor nits below...
+To the patch, LGTM! Again, please copy the related subsystem maintainers 
+explicitly!
 
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index 8181ef23a7a2..a2973c71c158 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -461,6 +461,285 @@ enum in6_addr_gen_mode {
->   
->   /* Bridge section */
->   
-> +/**
-> + * DOC: Bridge enum definition
-> + *
-> + * please *note* that the timer values in the following section are expected
-
-Please
-
-> + * in clock_t format, which is seconds multiplied by USER_HZ (generally
-> + * defined as 100).
-> + *
-> + * @IFLA_BR_FORWARD_DELAY
-> + *   The bridge forwarding delay is the time spent in LISTENING state
-> + *   (before moving to LEARNING) and in LEARNING state (before moving
-> + *   to FORWARDING). Only relevant if STP is enabled.
-> + *
-> + *   The valid values are between (2 * USER_HZ) and (30 * USER_HZ).
-> + *   The default value is (15 * USER_HZ).
-> + *
-> + * @IFLA_BR_HELLO_TIME
-> + *   The time between hello packets sent by the bridge, when it is a root
-> + *   bridge or a designated bridge. Only relevant if STP is enabled.
-> + *
-> + *   The valid values are between (1 * USER_HZ) and (10 * USER_HZ).
-> + *   The default value is (2 * USER_HZ).
-> + *
-> + * @IFLA_BR_MAX_AGE
-> + *   The hello packet timeout is the time until another bridge in the
-> + *   spanning tree is assumed to be dead, after reception of its last hello
-> + *   message. Only relevant if STP is enabled.
-> + *
-> + *   The valid values are between (6 * USER_HZ) and (40 * USER_HZ).
-> + *   The default value is (20 * USER_HZ).
-> + *
-> + * @IFLA_BR_AGEING_TIME
-> + *   Configure the bridge's FDB entries aging time. It is the time a MAC
-> + *   address will be kept in the FDB after a packet has been received from
-> + *   that address. After this time has passed, entries are cleaned up.
-> + *   Allow values outside the 802.1 standard specification for special cases:
-> + *
-> + *     * 0 - entry never ages (all permanent)
-> + *     * 1 - entry disappears (no persistence)
-> + *
-> + *   The default value is (300 * USER_HZ).
-> + *
-> + * @IFLA_BR_STP_STATE
-> + *   Turn spanning tree protocol on (*IFLA_BR_STP_STATE* > 0) or off
-> + *   (*IFLA_BR_STP_STATE* == 0) for this bridge.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_PRIORITY
-> + *   set this bridge's spanning tree priority, used during STP root bridge
-
-be consistent when using capital letters to start the description (this 
-one is not)
-
-> + *   election.
-> + *
-> + *   The valid values are between 0 and 65535.
-> + *
-> + * @IFLA_BR_VLAN_FILTERING
-> + *   Turn VLAN filtering on (*IFLA_BR_VLAN_FILTERING* > 0) or off
-> + *   (*IFLA_BR_VLAN_FILTERING* == 0). When disabled, the bridge will not
-> + *   consider the VLAN tag when handling packets.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_VLAN_PROTOCOL
-> + *   Set the protocol used for VLAN filtering.
-> + *
-> + *   The valid values are 0x8100(802.1Q) or 0x88A8(802.1AD). The default value
-> + *   is 0x8100(802.1Q).
-> + *
-> + * @IFLA_BR_GROUP_FWD_MASK
-> + *   The group forwarding mask. This is the bitmask that is applied to
-> + *   decide whether to forward incoming frames destined to link-local
-> + *   addresses (of the form 01:80:C2:00:00:0X).
-> + *
-> + *   The default value is 0, which means the bridge does not forward any
-> + *   link-local frames coming on this port.
-> + *
-> + * @IFLA_BR_ROOT_ID
-> + *   The bridge root id, read only.
-> + *
-> + * @IFLA_BR_BRIDGE_ID
-> + *   The bridge id, read only.
-> + *
-> + * @IFLA_BR_ROOT_PORT
-> + *   The bridge root port, read only.
-> + *
-> + * @IFLA_BR_ROOT_PATH_COST
-> + *   The bridge root path cost, read only.
-> + *
-> + * @IFLA_BR_TOPOLOGY_CHANGE
-> + *   The bridge topology change, read only.
-> + *
-> + * @IFLA_BR_TOPOLOGY_CHANGE_DETECTED
-> + *   The bridge topology change detected, read only.
-> + *
-> + * @IFLA_BR_HELLO_TIMER
-> + *   The bridge hello timer, read only.
-> + *
-> + * @IFLA_BR_TCN_TIMER
-> + *   The bridge tcn timer, read only.
-> + *
-> + * @IFLA_BR_TOPOLOGY_CHANGE_TIMER
-> + *   The bridge topology change timer, read only.
-> + *
-> + * @IFLA_BR_GC_TIMER
-> + *   The bridge gc timer, read only.
-> + *
-> + * @IFLA_BR_GROUP_ADDR
-> + *   set the MAC address of the multicast group this bridge uses for STP.
-
-same here "Set.."
-
-> + *   The address must be a link-local address in standard Ethernet MAC address
-> + *   format. It is an address of the form 01:80:C2:00:00:0X, with X in [0, 4..f].
-> + *
-> + *   The default value is 0.
-> + *
-> + * @IFLA_BR_FDB_FLUSH
-> + *   Flush bridge's fdb dynamic entries.
-> + *
-> + * @IFLA_BR_MCAST_ROUTER
-> + *   Set bridge's multicast router if IGMP snooping is enabled.
-> + *   The valid values are:
-> + *
-> + *     * 0 - disabled.
-> + *     * 1 - automatic (queried).
-> + *     * 2 - permanently enabled.
-> + *
-> + *   The default value is 1.
-> + *
-> + * @IFLA_BR_MCAST_SNOOPING
-> + *   Turn multicast snooping on (*IFLA_BR_MCAST_SNOOPING* > 0) or off
-> + *   (*IFLA_BR_MCAST_SNOOPING* == 0).
-> + *
-> + *   The default value is 1.
-> + *
-> + * @IFLA_BR_MCAST_QUERY_USE_IFADDR
-> + *   whether to use the bridge's own IP address as source address for IGMP
-
-same here, but "whether" doesn't sound good as well, maybe something 
-like "If enabled use the.." or "If set" or "Setting to > 0" etc.
-
-> + *   queries (*IFLA_BR_MCAST_QUERY_USE_IFADDR* > 0) or the default of 0.0.0.0
-> + *   (*IFLA_BR_MCAST_QUERY_USE_IFADDR* == 0).
-> + *
-> + *   The default value is 0.
-
-0 (disabled)
-
-> + *
-> + * @IFLA_BR_MCAST_QUERIER
-> + *   Enable (*IFLA_BR_MULTICAST_QUERIER* > 0) or disable
-> + *   (*IFLA_BR_MULTICAST_QUERIER* == 0) IGMP querier, ie sending of multicast
-> + *   queries by the bridge.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_MCAST_HASH_ELASTICITY
-> + *   Set multicast database hash elasticity, It is the maximum chain length in
-> + *   the multicast hash table. This attribute is *deprecated* and the value
-> + *   is always 16.
-> + *
-> + * @IFLA_BR_MCAST_HASH_MAX
-> + *   Set maximum size of the multicast hash table
-> + *
-> + *   The default value is 4096, the value must be a power of 2.
-> + *
-> + * @IFLA_BR_MCAST_LAST_MEMBER_CNT
-> + *   The Last Member Query Count is the number of Group-Specific Queries
-> + *   sent before the router assumes there are no local members. The Last
-> + *   Member Query Count is also the number of Group-and-Source-Specific
-> + *   Queries sent before the router assumes there are no listeners for a
-> + *   particular source.
-> + *
-> + *   The default value is 2.
-> + *
-> + * @IFLA_BR_MCAST_STARTUP_QUERY_CNT
-> + *   The Startup Query Count is the number of Queries sent out on startup,
-> + *   separated by the Startup Query Interval.
-> + *
-> + *   The default value is 2.
-> + *
-> + * @IFLA_BR_MCAST_LAST_MEMBER_INTVL
-> + *   The Last Member Query Interval is the Max Response Time inserted into
-> + *   Group-Specific Queries sent in response to Leave Group messages, and
-> + *   is also the amount of time between Group-Specific Query messages.
-> + *
-> + *   The default value is (1 * USER_HZ).
-> + *
-> + * @IFLA_BR_MCAST_MEMBERSHIP_INTVL
-> + *   The interval after which the bridge will leave a group, if no membership
-> + *   reports for this group are received.
-> + *
-> + *   The default value is (260 * USER_HZ).
-> + *
-> + * @IFLA_BR_MCAST_QUERIER_INTVL
-> + *   The interval between queries sent by other routers. if no queries are
-> + *   seen after this delay has passed, the bridge will start to send its own
-> + *   queries (as if **IFLA_BR_MCAST_QUERIER_INTVL** was enabled).
-> + *
-> + *   The default value is (255 * USER_HZ).
-> + *
-> + * @IFLA_BR_MCAST_QUERY_INTVL
-> + *   The Query Interval is the interval between General Queries sent by
-> + *   the Querier.
-> + *
-> + *   The default value is (125 * USER_HZ). The minimum value is (1 * USER_HZ).
-> + *
-> + * @IFLA_BR_MCAST_QUERY_RESPONSE_INTVL
-> + *   The Max Response Time used to calculate the Max Resp Code inserted
-> + *   into the periodic General Queries.
-> + *
-> + *   The default value is (10 * USER_HZ).
-> + *
-> + * @IFLA_BR_MCAST_STARTUP_QUERY_INTVL
-> + *   The interval between queries in the startup phase.
-> + *
-> + *   The default value is (125 * USER_HZ) / 4. The minimum value is (1 * USER_HZ).
-> + *
-> + * @IFLA_BR_NF_CALL_IPTABLES
-> + *   Enable (*NF_CALL_IPTABLES* > 0) or disable (*NF_CALL_IPTABLES* == 0)
-> + *   iptables hooks on the bridge.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_NF_CALL_IP6TABLES
-> + *   Enable (*NF_CALL_IP6TABLES* > 0) or disable (*NF_CALL_IP6TABLES* == 0)
-> + *   ip6tables hooks on the bridge.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_NF_CALL_ARPTABLES
-> + *   Enable (*NF_CALL_ARPTABLES* > 0) or disable (*NF_CALL_ARPTABLES* == 0)
-> + *   arptables hooks on the bridge.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_VLAN_DEFAULT_PVID
-> + *   VLAN ID applied to untagged and priority-tagged incoming packets.
-> + *
-> + *   The default value is 1. Set to the special value 0 makes all ports of
-> + *   this bridge not have a PVID by default, which means that they will
-> + *   not accept VLAN-untagged traffic.
-> + *
-> + * @IFLA_BR_PAD
-> + *   Bridge attribute padding type for netlink message.
-> + *
-> + * @IFLA_BR_VLAN_STATS_ENABLED
-> + *   Enable (*IFLA_BR_VLAN_STATS_ENABLED* == 1) or disable
-> + *   (*IFLA_BR_VLAN_STATS_ENABLED* == 0) per-VLAN stats accounting.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_MCAST_STATS_ENABLED
-> + *   Enable (*IFLA_BR_MCAST_STATS_ENABLED* > 0) or disable
-> + *   (*IFLA_BR_MCAST_STATS_ENABLED* == 0) multicast (IGMP/MLD) stats
-> + *   accounting.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_MCAST_IGMP_VERSION
-> + *   Set the IGMP version.
-> + *
-> + *   The valid values are 2 and 3. The default value is 2.
-> + *
-> + * @IFLA_BR_MCAST_MLD_VERSION
-> + *   Set the MLD version.
-> + *
-> + *   The valid values are 1 and 2. The default value is 1.
-> + *
-> + * @IFLA_BR_VLAN_STATS_PER_PORT
-> + *   Enable (*IFLA_BR_VLAN_STATS_PER_PORT* == 1) or disable
-> + *   (*IFLA_BR_VLAN_STATS_PER_PORT* == 0) per-VLAN per-port stats accounting.
-> + *   Can be changed only when there are no port VLANs configured.
-> + *
-> + *   The default value is 0 (disabled).
-> + *
-> + * @IFLA_BR_MULTI_BOOLOPT
-> + *   The multi_boolopt is used to control new boolean options to avoid adding
-> + *   new netlink attributes.
-
-Here you can add which enum to look at for those options.
-
-> + *
-> + * @IFLA_BR_MCAST_QUERIER_STATE
-> + *   Bridge mcast querier states, read only.
-> + *
-> + * @IFLA_BR_FDB_N_LEARNED
-> + *   The number of dynamically learned FDB entries for the current bridge,
-> + *   read only.
-> + *
-> + * @IFLA_BR_FDB_MAX_LEARNED
-> + *   Set the number of max dynamically learned FDB entries for the current
-> + *   bridge.
-> + */
->   enum {
->   	IFLA_BR_UNSPEC,
->   	IFLA_BR_FORWARD_DELAY,
-
+Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
