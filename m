@@ -1,127 +1,187 @@
-Return-Path: <netdev+bounces-50701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A53F7F6C84
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:00:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 703187F6CEC
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1347281485
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8A3281AB3
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D7A3C1E;
-	Fri, 24 Nov 2023 07:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A5C46B5;
+	Fri, 24 Nov 2023 07:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5Ydvlkv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0yqrWDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62728D41;
-	Thu, 23 Nov 2023 23:00:13 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-35beca6d020so5866975ab.0;
-        Thu, 23 Nov 2023 23:00:13 -0800 (PST)
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3401B10C9;
+	Thu, 23 Nov 2023 23:31:39 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id d2e1a72fcca58-6c431b91b2aso1310354b3a.1;
+        Thu, 23 Nov 2023 23:31:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700809212; x=1701414012; darn=vger.kernel.org;
-        h=user-agent:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZXdh8tpsNpRvWJuL2gnv/V4so3ONge/pXC2S/Uan+Xo=;
-        b=Y5Ydvlkvy0p+mnHdojtSk9h8tzqlY7NhcFqSyyBWrkHAUnZvVtabneiYOvA8bqultc
-         NWsdFk/ocHZnVt4VwOkNHA0UK+yn9lm4ROUCU3b5VChtIJLaL5ajD3FSwDvpJxwNaZ8Z
-         oxCbW3P3aOWB59Rfubf8UhbCBtRVO5eBNFenHli2uyITlOXcJnL5rwUK7zhqx8C8YrRq
-         k/K8Hei7dvJ/7EVZRm3j4CcD/+7spCoziBiIWzb16w7hOd1+BbQ7NMhZnM2GHn73RI9R
-         cZ6hNfgCCnB+PgVAcQEb0uwRVKQiCXepwtEQ8qIUoT7x59soCjBElPGIqFj30mfv+sXS
-         qc1A==
+        d=gmail.com; s=20230601; t=1700811099; x=1701415899; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JFxWesjSbh6aPkk26uaeIMhL8HRb0v8T1NPm7HDO0SQ=;
+        b=M0yqrWDI8f1O2KvxkcEuoKyPmoubsykQZaBUPqOq+jVbKCuoz8K4cdd4R/+kOV19El
+         BBw2E6m09mIc4fG7/nQDJMtT5bDeRB8JFR13c9OPmEmyV5GmZEic/X0NPa98U+tqBkUd
+         kX0uDS+HAqG41upl51ZAGt8vsLDW0KgK67wLqZH+/ZLORo/Jkp8FgWlNog6l2dv1OM27
+         tqw81Wr+UIU7eXaWwHqfXmwC2TUW1AUKngzLTJe/kpEEyIdvQzN7QndXbb0LGF+qcSXn
+         m/yFM1uV4Xb+7bOTmPoUgSmwelVBlTUfo9jBPGBBF8YtvirrLXOKi3rYxelEfkgu/vu4
+         VviA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700809213; x=1701414013;
-        h=user-agent:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZXdh8tpsNpRvWJuL2gnv/V4so3ONge/pXC2S/Uan+Xo=;
-        b=rOONgQiotsRLgAyTCJwSEjakQSbEUUCQKDFzzMk+l73Mx7YB5FmupzVLfqiPeiUxEE
-         8Y0IqiE3EQxCbrQdEzHulKBQRRayRo8WbGW1zvudVAY60QB4zrSOq7gFCTgZVYu76CMN
-         0HzNATq8BuxEUilQO8oNb/FpySwpTu62IgUf8W1Orn3A5ig654jq7Ywr+osH2d2GG3Ef
-         p0JiYkHr9UV/5UmaOQx6mQvj20fh0Jshbil5G6DqKhZJ0/ffC5KaFzfS5xjdz69PnngT
-         7hgPiuZ3RIWg5RiMMr3KRAR4j4JWn5aAovNCYbuBqpt6erVADK5LUXDCuFCqXqu+KACP
-         ipvQ==
-X-Gm-Message-State: AOJu0Yz+ELYogypTnS5Qn4wo/1IGLiRyOI7a1dkhqMwesuUg483qSnfG
-	LlTfD38OdH0DGMzm8p+LOXQ=
-X-Google-Smtp-Source: AGHT+IE91gO2XXNpvxMhHuRKUQe2+x8IIaKdsfR1Jfq7+lY6iQTS0rpBqpgRi6EKugVjkqBVsf7RZA==
-X-Received: by 2002:a05:6e02:12e5:b0:35b:4731:15f3 with SMTP id l5-20020a056e0212e500b0035b473115f3mr2294682iln.10.1700809212619;
-        Thu, 23 Nov 2023 23:00:12 -0800 (PST)
-Received: from libra05 ([143.248.188.128])
-        by smtp.gmail.com with ESMTPSA id 16-20020aa79150000000b006c2fcb25c15sm2226501pfi.162.2023.11.23.23.00.08
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 23 Nov 2023 23:00:12 -0800 (PST)
-Date: Fri, 24 Nov 2023 16:00:06 +0900
-From: Yewon Choi <woni9911@gmail.com>
-To: =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: threeearcat@gmail.com
-Subject: xdp/xsk.c: missing read memory barrier in xsk_poll()
-Message-ID: <20231124070005.GA10393@libra05>
+        d=1e100.net; s=20230601; t=1700811099; x=1701415899;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JFxWesjSbh6aPkk26uaeIMhL8HRb0v8T1NPm7HDO0SQ=;
+        b=kh7rQFJDaqqf97hdmx4W/OHzrfxQMitil7C+VnUD8xo9umMynrTZ+M32HnolFuknXc
+         m1CH4O4mXI4unuoOikPrCEyqo/Zu8q/F9ndyj3Z9hJ1witk9BVQOf/GKiEobLoolRypa
+         pwwXGgJEDkROcOmVEk2IRfy8fE412f5FJy/ue/cGuO+XJQ556cGaE965JvU+rnZejyFV
+         uS72rO5VoMfakQGb6l9kMf8ZFrqTHXUHCBGDwDswGdka2iR0C0EnFPx1A2vU0cquM665
+         Ajb6KApcHUCMpSIzt56zllmE+7iUdP7jQNycXmSSGM26E8T8o6fkDZCqaIaEPwdwi5/9
+         pfkg==
+X-Gm-Message-State: AOJu0YwLe/d+vEGUQ4JNeVXxe576g8ieDx+SBfXyvXH7KPhrc+urEQuN
+	KuOnD6DaWHUafgnSf4hly90=
+X-Google-Smtp-Source: AGHT+IEUuxk6O9HR7RzPpWMcDtGQiK9lwkln1/Lk6avSdkpxqUoxV4w6/tPI87i/RCTAESAQaa46lw==
+X-Received: by 2002:a05:6a20:3c8b:b0:187:fbe3:b4d7 with SMTP id b11-20020a056a203c8b00b00187fbe3b4d7mr2227736pzj.9.1700811099268;
+        Thu, 23 Nov 2023 23:31:39 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id s23-20020aa78d57000000b006cbb18865a7sm2279388pfe.154.2023.11.23.23.31.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 23:31:38 -0800 (PST)
+From: xu <xu.xin.sc@gmail.com>
+X-Google-Original-From: xu <xu.xin16@zte.com.cn>
+To: tung.q.nguyen@dektech.com.au
+Cc: davem@davemloft.net,
+	jmaloy@redhat.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	xu.xin.sc@gmail.com,
+	xu.xin16@zte.com.cn,
+	yang.yang29@zte.com.cn,
+	ying.xue@windriver.com,
+	zhang.yunkai@zte.com.cn
+Subject: RE: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in tipc_rcv
+Date: Fri, 24 Nov 2023 07:31:34 +0000
+Message-Id: <20231124073134.2043605-1-xu.xin16@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+References: <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 
-Hello, 
+>>Happy to see your reply. But Why? 'delete' is false from tipc_node_timeout(). Refer to:
+>>https://elixir.bootlin.com/linux/v6.7-rc2/source/net/tipc/node.c#L844
+>I should have explained it clearly:
+>1/ link status must be protected.
+>tipc_node_timeout()
+>   tipc_node_link_down()
+>   {
+>      struct tipc_link *l = le->link;
+>   
+>      ...
+>     __tipc_node_link_down(); <-- link status is referred. 
+>      ...
+>     if (delete) {
+>        kfree(l);
+>        le->link = NULL;
+>     }
+>     ...
+>   }
+>
+>__tipc_node_link_down()
+>{
+>    ...
+>   if (!l || tipc_link_is_reset(l)) <-- read link status
+>    ...
+>    tipc_link_reset(l); <--- this function will reset all things related to link.
+>}
+>
+>2/ le->link must be protected.
+>bearer_disable()
+>{
+>   ...
+>   tipc_node_delete_links(net, bearer_id); <--- this will delete all links.
+>   ...
+>}
+>
+>tipc_node_delete_links()
+>{
+>   ...
+>  tipc_node_link_down(n, bearer_id, true);
+>   ...
+>}
 
-We found some possibility of missing read memory barrier in xsk_poll(),
-so we would like to ask to check it.
+Could we please solve the problem mentioned above by adding spinlock(&le->lock)?
 
-commit e6762c8b adds two smp_rmb() in xsk_mmap(), which are paired with
-smp_wmb() in XDP_UMEM_REG and xsk_init_queue each. The later one is
-added in order to prevent reordering between reading of q and reading
-of q->ring.
-One example in simplied code is:
+For example:
 
-xsk_mmap():
-	if (offset == XDP_PGOFF_RX_RING) {
-		q = READ_ONCE(xs->rx);
-	}
-	...
-	if (!q)
-		return -EINVAL;
+(BTW, I have tested it, with this change, enabling RPS based on tipc port can improve 25% of general throughput)
 
-	/* Matches the smp_wmb() in xsk_init_queue */
-	smp_rmb();
-	...
-	return remap_vmalloc_range(vma, q->ring, 0);
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 3105abe97bb9..470c272d798e 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -1079,12 +1079,16 @@ static void tipc_node_link_down(struct tipc_node *n, int bearer_id, bool delete)
+                __tipc_node_link_down(n, &bearer_id, &xmitq, &maddr);
+        } else {
+                /* Defuse pending tipc_node_link_up() */
++               spin_lock_bh(&le->lock);
+                tipc_link_reset(l);
++               spin_unlock_bh(&le->lock);
+                tipc_link_fsm_evt(l, LINK_RESET_EVT);
+        }
+        if (delete) {
++               spin_lock_bh(&le->lock);
+                kfree(l);
+                le->link = NULL;
++               spin_unlock_bh(&le->lock);
+                n->link_cnt--;
+        }
+        trace_tipc_node_link_down(n, true, "node link down or deleted!");
+@@ -2154,14 +2158,15 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
+        /* Receive packet directly if conditions permit */
+        tipc_node_read_lock(n);
+        if (likely((n->state == SELF_UP_PEER_UP) && (usr != TUNNEL_PROTOCOL))) {
++               tipc_node_read_unlock(n);
+                spin_lock_bh(&le->lock);
+                if (le->link) {
+                        rc = tipc_link_rcv(le->link, skb, &xmitq);
+                        skb = NULL;
+                }
+                spin_unlock_bh(&le->lock);
+-       }
+-       tipc_node_read_unlock(n);
++       } else
++               tipc_node_read_unlock(n);
+ 
+        /* Check/update node state before receiving */
+        if (unlikely(skb)) {
+@@ -2169,12 +2174,13 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
+                        goto out_node_put;
+                tipc_node_write_lock(n);
+                if (tipc_node_check_state(n, skb, bearer_id, &xmitq)) {
++                       tipc_node_write_unlock(n);
+                        if (le->link) {
+                                rc = tipc_link_rcv(le->link, skb, &xmitq);
+                                skb = NULL;
+                        }
+-               }
+-               tipc_node_write_unlock(n);
++               } else
++                       tipc_node_write_unlock(n);
+        }
+ 
+        if (unlikely(rc & TIPC_LINK_UP_EVT))
 
-Also, the similar logic exists in xsk_poll() without smp_rmb().
-
-xsk_poll():
-	...
-	if (xs->rx && !xskq_prod_is_empty(xs->rx))
-		mask |= EPOLLIN | EPOLLRDNORM;
-	if (xs->tx && xsk_tx_writeable(xs))
-		mask |= EPOLLOUT | EPOLLWRNORM;
-
-xskq_prod_is_empty():
-	return READ_ONCE(q->ring->consumer) && ...
-
-To be consistent, I think that smp_rmb() is needed between
-xs->rx and !xsq_prod_is_empty() and the same applies for xs->tx.
-
-Could you check this please?
-If a patch is needed, we will send them.
-
-
-Best Regards,
-Yewon Choi
 
