@@ -1,166 +1,119 @@
-Return-Path: <netdev+bounces-50860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DF87F7568
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:40:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828767F75AB
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D318281F84
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:40:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4D601C208FF
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A7B28E20;
-	Fri, 24 Nov 2023 13:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7222C1BC;
+	Fri, 24 Nov 2023 13:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="mbD6rW59"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="CSlCy3vm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC5A93;
-	Fri, 24 Nov 2023 05:40:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=s31663417; t=1700833234; x=1701438034; i=wahrenst@gmx.net;
-	bh=wDCiSJTXhXpQsFxIqaxtzqUh0f8rh9J+42vGz//6r3g=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=mbD6rW591axLO9nG6RjUecFaWGmMuTdFBcXjDnx8A+sMTuj6ZJm6lPKjPJMJuoPG
-	 cQ0ymjXO19HnByg2TcbooCQMQDe4aFd0INX02weL7dgSIuhmG90qvEKoikqHokh9c
-	 FL3rmSd4LcVR1uxzYIHO7YMroVHWCeN4YxjQCiyFJgdVScWvHxXy7kPBvAsQ5z+Vf
-	 LEI6ayHelbGrMKTLKtXH6NgJidsEDHO+s513YT8D1YL6bi9bz5Iu8xBRFwwoMiDBB
-	 YFQ3lCdX8PfOmMnIlHKDqIT2bnXeBZqHIm9e88A8RjZkydRIRGyWl2JgGWE7XIGcx
-	 QjSWkIK6GmPqYcEq4Q==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mqb1c-1rbAHK2b8y-00meq2; Fri, 24
- Nov 2023 14:40:34 +0100
-Message-ID: <d4385cad-41e2-4adc-99b1-45a5b75a2ad5@gmx.net>
-Date: Fri, 24 Nov 2023 14:40:33 +0100
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019E810C6
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:53:44 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-a00b056ca38so274562666b.2
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:53:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1700834022; x=1701438822; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=bPYBdZ4ItIfXHITMkeTq4Bl+yk6j2zAle2zwSmDGCiE=;
+        b=CSlCy3vmpAK9Xa7vG2XkYYMDhnrzFMUw+MmjZ4KxW/Ey+9J6AuuuLtWeZtUlglp0A2
+         N3UyMGKB1/oXNRpAgYguNX8r8vntT/u5leSwEcJD+nubCnDa2S7kOh4aL6XPLEctDnFP
+         ApbYgL9iqUwI/XWzCJ3i7kwf61KGbg/5aJoT+0MfOW9ocK+M5yKFo6IxRYWxQ6RvSnPR
+         oN/1ZN2iVdpT1ObltM80a7L+N+IZO5gEjgYgT4Ichr8e1IcKqigv5kiTkDMBizekrx4+
+         60P/ZFTj22nTq4EEEBrNgc6XTxrWEHK6XvSH+Te90E41iqyam9ByGhKxMBMl+8NfNxZ9
+         wSHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700834022; x=1701438822;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bPYBdZ4ItIfXHITMkeTq4Bl+yk6j2zAle2zwSmDGCiE=;
+        b=ObpflkgaW5qROt5xCiZOaaVJwOPTBrw1XzJATXjWfPu25+PK+uy4RllAo4tVxNSmWB
+         t1Zw8n3nCUNM7d80Q2FJQI7zTC+LkIbcwHtttvlg8Yep4cWha6mSYFFUmKFHGpCIZNgu
+         15pd3+Xz7PvwPH/E1qWQeCp4ZKLGCBgO+KlNbCAdHboqiIF/Fy6pr60qRHk6yu1ikChF
+         pQDPwUXpsFz8Pt7EWsKIW7tOuPRrY5xYv79m3K9374L86a/rFxhBwUzjqJPBHCayL4fH
+         DkW06ndQnCqrs253kYd4PtP1ePsjl5vFslDv7rOXrlyWpC/n4iJldZ5hJXgDxHOoG6c6
+         PZbw==
+X-Gm-Message-State: AOJu0YxEqXz5ZNimuMeNMZYjiyY5igXnXPnPjxElC0Nap6dhblwOM+kd
+	fWP1t0IXGLdo+nPSy3bWo0bIBQ==
+X-Google-Smtp-Source: AGHT+IHT1u7eoX5hY4Xg63LmKH9zDr2fIVDbIuCFbsbxe+I7C5HM3eY56BlqM8wGTordlZj6XssmTQ==
+X-Received: by 2002:a17:907:9009:b0:9fe:458e:a814 with SMTP id ay9-20020a170907900900b009fe458ea814mr1915902ejc.21.1700834022459;
+        Fri, 24 Nov 2023 05:53:42 -0800 (PST)
+Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
+        by smtp.gmail.com with ESMTPSA id kg16-20020a17090776f000b00a0371c6cc23sm2092349ejc.95.2023.11.24.05.53.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 05:53:41 -0800 (PST)
+References: <20231122192452.335312-1-john.fastabend@gmail.com>
+ <20231122192452.335312-2-john.fastabend@gmail.com>
+ <ZV+07PlDoxrcAn9c@pop-os.localdomain>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, martin.lau@kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf v2 1/2] bpf: sockmap, af_unix stream sockets need to
+ hold ref for pair sock
+Date: Fri, 24 Nov 2023 14:43:24 +0100
+In-reply-to: <ZV+07PlDoxrcAn9c@pop-os.localdomain>
+Message-ID: <87zfz32r6j.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4 net] qca_spi: Fix SPI thread creation
-To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
- Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231121163004.21232-1-wahrenst@gmx.net>
- <20231121163004.21232-2-wahrenst@gmx.net>
- <5327988fc5d02f3352be66b5f0a2ca9a468ef1da.camel@redhat.com>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <5327988fc5d02f3352be66b5f0a2ca9a468ef1da.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:DOYujk5KfdaYRyp81U2Y1DK6veGK5ZiNBC/FBsxTxudFRfwtFvj
- O5RdCgz8/qaP92o9SEfJ360pINm5m03oUL5ETTRIKmXg/y+XAXLDjFj5lNdFvmOU1v+ccA2
- nV1yNrR9pS7pyUo3ZQJ2AG58I3WqUaVem7gDHpjFkDd3FDcruOJPMeRhJ65KRiA6A32oygB
- uYZyBphMSbVNKtEdeSVPQ==
-UI-OutboundReport: notjunk:1;M01:P0:xFBEfOC/kqE=;PB3XY0Mnx/3uowLtM/iMpiY5kva
- 1o9dLlQvXukvrJvwcp5afFJKgZDczmqWRUPS/rybM8hjRcHAKh86pJO1bcA948/RCYKYtlzXR
- oR/LXs+R7K7VoxOdicqj4qTBeBHaVO2NQvYQ8JMDDS/G5i4QMQJjprKFtMf5uNDwiXRk9Ilh2
- EoYj8v4ICvBO6DXDgLbW42Ib5UPoxGdHTu8mO0Smy0bqxmIqJRwSBTaVjKwhfvs3O8zoFTIOR
- TXjvwRolxYqonyf7kHkhr+9b+ZJDEuVSJdFMKpxe1jmCYo6ir3Jlu3s7r4j7/1pLJ0HboiuFW
- X5Guq3E6C6Djg4PtmnhHkgca4N3xxYJUlPG/I2JV1ubCTkHWMf5mAzVCPwLvQFM2rG9VosWne
- UV+RtwwDcLIGvguSiaSqKnsY5zxLfV/XC/v+lHpg8lv0hljDAPaYmRH2Tt4QGPXUwlBO605MB
- JBG/ixuoV7J8TlrYlA2hxtv0UmztIz4I1PVyASKH77tf2sFV8Rr0SBjMBdHqndTIxPu9bpYbo
- Ug3OatU92DmNQjFfyddiHDKnTyWaXY0tnUrGQCC3dvKXNRSu1jdX5vsEIBHU1HeNaJrgCGZ6R
- w4yFXNai/4KH0YXTkFYRg1pjhV5g/1elX9kAs0d9x6F4+r52PFi765JKua9naP/rMMgM3zjmr
- ldA9TrHtA/8qOvYzBeDGQfWH+XYW+4yecpM134sdbwytWiQ0hSskAs6jIHL1xwrH6d7hfZj58
- NikjFPZWac8XLypXQ1AJWroj9z46mcb5Zv7sstgsPqHX/D0QUvz+aJDh13FOx16SQsa95Cq0K
- l6hNrqCJVgOZyoy/zTnxrKLQhDFZRv5gd7JzK1J10N9yO0C009XqQ2c57PotzAtRmwEZ73EgA
- TVmtzUxEWgBypJkVOLNeXjifGum4GZlHry5RMPNDGjLmwYW7lWgZ2kj1B3SEUHrxWSDDmfq+V
- qJ2L+w==
+Content-Type: text/plain
 
-Hi Paolo,
 
-Am 23.11.23 um 12:26 schrieb Paolo Abeni:
-> On Tue, 2023-11-21 at 17:30 +0100, Stefan Wahren wrote:
->> The qca_spi driver create/stop the SPI kernel thread in case
->> of netdev_open/close. This is a big issue because it allows
->> userspace to prevent from restarting the SPI thread after
->> ring parameter changes (e.g. signals which stop the thread).
->> This could be done by terminating a script which changes
->> the ring parameter in a loop.
->>
->> So fix this by moving create/stop of the SPI kernel into
->> the init/uninit ops. The open/close ops could be realized just
->> by 'park/unpark' the SPI kernel thread.
->>
->> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for Q=
-CA7000")
->> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
->> ---
->>   drivers/net/ethernet/qualcomm/qca_spi.c | 35 ++++++++++++++++--------=
--
->>   1 file changed, 23 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/ethe=
-rnet/qualcomm/qca_spi.c
->> index bec723028e96..b11a998b2456 100644
->> --- a/drivers/net/ethernet/qualcomm/qca_spi.c
->> +++ b/drivers/net/ethernet/qualcomm/qca_spi.c
->> @@ -580,6 +580,11 @@ qcaspi_spi_thread(void *data)
->>   	netdev_info(qca->net_dev, "SPI thread created\n");
->>   	while (!kthread_should_stop()) {
->>   		set_current_state(TASK_INTERRUPTIBLE);
->> +		if (kthread_should_park()) {
->> +			kthread_parkme();
->> +			continue;
->> +		}
->> +
->>   		if ((qca->intr_req =3D=3D qca->intr_svc) &&
->>   		    !qca->txr.skb[qca->txr.head])
->>   			schedule();
->> @@ -679,25 +684,17 @@ qcaspi_netdev_open(struct net_device *dev)
->>   	qca->sync =3D QCASPI_SYNC_UNKNOWN;
->>   	qcafrm_fsm_init_spi(&qca->frm_handle);
->>
->> -	qca->spi_thread =3D kthread_run((void *)qcaspi_spi_thread,
->> -				      qca, "%s", dev->name);
->> -
->> -	if (IS_ERR(qca->spi_thread)) {
->> -		netdev_err(dev, "%s: unable to start kernel thread.\n",
->> -			   QCASPI_DRV_NAME);
->> -		return PTR_ERR(qca->spi_thread);
->> -	}
->> -
->>   	ret =3D request_irq(qca->spi_dev->irq, qcaspi_intr_handler, 0,
->>   			  dev->name, qca);
->>   	if (ret) {
->>   		netdev_err(dev, "%s: unable to get IRQ %d (irqval=3D%d).\n",
->>   			   QCASPI_DRV_NAME, qca->spi_dev->irq, ret);
->> -		kthread_stop(qca->spi_thread);
->>   		return ret;
->>   	}
->>
->>   	/* SPI thread takes care of TX queue */
->> +	kthread_unpark(qca->spi_thread);
->> +	wake_up_process(qca->spi_thread);
-> The above looks racy: after 'request_irq()' the interrupt handler can
-> raise an irq before the thread being unparked.
-yes fixing the whole resource allocation issue requires patch 1 and 2
-applied, which should avoid the race. But i didn't want to combine both
-patches to keep it applicable for stable. My thought was that 2 smaller
-patches are more acceptable than a big one.
-
-Should i squash them?
-
-My concern is about the amount of affected devices. The QCA7000 is used
-mostly in EV charging stations and EVs. I don't how many of them use
-this driver.
-
-> Additionally I think you can drop the 'if (qca->spi_thread)' in
-> qcaspi_intr_handler()
-Thanks i will check that for the next version.
+On Thu, Nov 23, 2023 at 12:24 PM -08, Cong Wang wrote:
+> On Wed, Nov 22, 2023 at 11:24:51AM -0800, John Fastabend wrote:
+>> AF_UNIX stream sockets are a paired socket. So sending on one of the pairs
+>> will lookup the paired socket as part of the send operation. It is possible
+>> however to put just one of the pairs in a BPF map. This currently
+>> increments the refcnt on the sock in the sockmap to ensure it is not
+>> free'd by the stack before sockmap cleans up its state and stops any
+>> skbs being sent/recv'd to that socket.
+>> 
+>> But we missed a case. If the peer socket is closed it will be
+>> free'd by the stack. However, the paired socket can still be
+>> referenced from BPF sockmap side because we hold a reference
+>> there. Then if we are sending traffic through BPF sockmap to
+>> that socket it will try to dereference the free'd pair in its
+>> send logic creating a use after free.  And following splat,
 >
-> Cheers,
+> Hmm, how could it pass the SOCK_DEAD test in unix_stream_sendmsg()?
 >
-> Paolo
->
+> 2285                 unix_state_lock(other);
+> 2286
+> 2287                 if (sock_flag(other, SOCK_DEAD) ||
+> 2288                     (other->sk_shutdown & RCV_SHUTDOWN))
+> 2289                         goto pipe_err_free;
 
+The quoted UAF happens after unix_state_unlock(other):
+
+  2285                  unix_state_lock(other);
+  2286
+  2287                  if (sock_flag(other, SOCK_DEAD) ||
+  2288                      (other->sk_shutdown & RCV_SHUTDOWN))
+  2289                          goto pipe_err_free;
+  2290
+  2291                  maybe_add_creds(skb, sock, other);
+  2292                  scm_stat_add(other, skb);
+  2293                  skb_queue_tail(&other->sk_receive_queue, skb);
+  2294                  unix_state_unlock(other);
+  2295                  other->sk_data_ready(other); <-- UAF
+
+Although, I think I saw it happen at unix_state_lock(other) as well.
+
+We don't hold a ref on other, so we're racing with __sock_release /
+unix_release_sock.
 
