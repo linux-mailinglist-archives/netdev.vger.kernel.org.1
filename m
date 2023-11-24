@@ -1,137 +1,156 @@
-Return-Path: <netdev+bounces-50772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C55427F712C
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:17:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE057F7153
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80FD1281737
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:17:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDDF61F20EFA
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DF819443;
-	Fri, 24 Nov 2023 10:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2ED918636;
+	Fri, 24 Nov 2023 10:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJyJbOmO"
+	dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b="cr1a1N9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD5E18026;
-	Fri, 24 Nov 2023 10:16:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F46FC433C8;
-	Fri, 24 Nov 2023 10:16:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700821017;
-	bh=uKHj27pgxPKnUs9P/LiD5S+Q9YM+KGgU4rETYT0qdng=;
-	h=Subject:From:To:Cc:Date:From;
-	b=uJyJbOmOBAibq3lA951l5hET3O2sE8fzfV75AQYGk3H2bxqGz7Xv2SxHJ/DI4YNm/
-	 wNTq1fggFPjfN2hAdKJnMdsvYY27z5uRUlJbKAB19E9N6t8lc/pgjede+HuFQcGAbi
-	 uu04iISyY1d3wEEvV9n5EuHN94Vgv3q08U2fYdJIBuZnbQ7ncb4rrUY/zG0yoggeZ2
-	 9h9s6MFcDBq4EjJ8QRCphmPnrUnSyhKBLfrjL2NExugpifkB3J8oCgeiMSIboO3oh0
-	 j+aPZoaJh86dQC5FJiYPzCzCjhiktBWxW0uCxz0hh4KNQebiN7ROVJrws3+0FwrKBH
-	 MHNOug/BVDNDA==
-Subject: [PATCH net-next] mm/page_pool: catch page_pool memory leaks
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, vbabka@suse.cz
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
- Mel Gorman <mgorman@techsingularity.net>,
- Matthew Wilcox <willy@infradead.org>, kernel-team@cloudflare.com
-Date: Fri, 24 Nov 2023 11:16:52 +0100
-Message-ID: <170082101266.1085481.12199867179160710331.stgit@firesoul>
-User-Agent: StGit/1.5
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2132.outbound.protection.outlook.com [40.107.6.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E87391;
+	Fri, 24 Nov 2023 02:22:32 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cbA32iD7LpTlcymIgYQOk7eoBvfmiWRH3XhxVMUy/m77Ki9M3x+sFiga2a8jHaSjRUyPnrf5mNomChZQHubsnfdsNqIiEGmZpmXuqXWokRMjPUH37Wu4fBFeldddJaavoIMYhtvFbrGoAdGtRUFlU+zXT+HJmfYz014gswuuWRMTaQLN8CNifQ5JJHpOS8jvn1QAAEOg6OSe1s8Scg3nk6xVBXjaNRS3okXhx4OUsb7ZNw6ll+4CdysHaofUOzWteayvCZEkLDFKGlanJOXtJzo+ktoMFCoO2R8mHIh30Q6TP/TEVHPoQn8sNwc/4gI1MMVrE7GbyXbEPBEYcn7Rsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vMzDDo0WZj5j0lI9tOQ88IEubcHAh6ITXOMPJ7Y6/NE=;
+ b=dtG6EFl71+BJDnI9RM4vA0oqOhciJ+7CsleF9V0A3XQ4lRwK//xmLBdPxbo5N5B8VmLgE5zha+PRBt8Egq0pu0Q3sijHKH1Pu7nUtipPQ1v/ek6tRCJ78tiBeHGO3thN+oLe3wZfRSKbHfTXcLBdrArH189432UncSoV/Q5L0mjEoFRtRm0TfEK7o+fsleG4iiFzk9m4U7mbQWq8yy+wE1QyDc9MK2XbtJ04H8cgREqFD98MKdx4UsW6RgZiWkQ+vP7TYjvA9UvXUjceKURo0NdwD3I3kvVKBHMcQ3oMVj38LIa4LRhe67jiXjgSSCIpZzZiM3jZ/WUAHUXwzwuACA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=dektech.com.au; dmarc=pass action=none
+ header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vMzDDo0WZj5j0lI9tOQ88IEubcHAh6ITXOMPJ7Y6/NE=;
+ b=cr1a1N9IexXyrOwxyE8W4y8xuxGKNkl8PeJDc8jN98jb7AbVunEnzpKfq5tsCSx/N5vquV6tK2mlDHPbmn2EC0dO/2bypHTzt0vPr+Yrfvg4pSqSvex5u8+r/TqBL/vUkEHYuSx1n277KelMlfyd0cgsyK9jVzfkQ6aohDa1wm6CcsNAgSQbIOhpprgIWGsBAItZFgTRmxeWSyNGd1uVTNZ2xlHLgLm0KywVjsJrV1h+BMxLRnUI+kePpKyXANRKYogE/CWJhY1Pe8MMuhZ+xuiz6nOMsTLjZ/Q8WyBIe2m4lHGCjTDRlMYIVcX/nPGbXNuC8Iu06msxt1bD5Om47w==
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com (2603:10a6:10:36a::7)
+ by AS8PR05MB8200.eurprd05.prod.outlook.com (2603:10a6:20b:31a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.21; Fri, 24 Nov
+ 2023 10:22:29 +0000
+Received: from DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::c9ed:567d:143e:af2b]) by DB9PR05MB9078.eurprd05.prod.outlook.com
+ ([fe80::c9ed:567d:143e:af2b%5]) with mapi id 15.20.7025.021; Fri, 24 Nov 2023
+ 10:22:29 +0000
+From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+To: xu <xu.xin.sc@gmail.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "jmaloy@redhat.com"
+	<jmaloy@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
+	<tipc-discussion@lists.sourceforge.net>, "xu.xin16@zte.com.cn"
+	<xu.xin16@zte.com.cn>, "yang.yang29@zte.com.cn" <yang.yang29@zte.com.cn>,
+	"ying.xue@windriver.com" <ying.xue@windriver.com>, "zhang.yunkai@zte.com.cn"
+	<zhang.yunkai@zte.com.cn>
+Subject: RE: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
+ tipc_rcv
+Thread-Topic: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
+ tipc_rcv
+Thread-Index:
+ AQHaHbcmsQ7KURUzRkaicoeZO+zrDrCHRXnwgAAp2oCAAAQK0IABobQAgAAL9yCAABqGgIAAB5KQ
+Date: Fri, 24 Nov 2023 10:22:28 +0000
+Message-ID:
+ <DB9PR05MB9078A431986292D93127682A88B8A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+References:
+ <DB9PR05MB9078FE84F8244C627FDCFA2888B8A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+ <20231124094919.2043838-1-xu.xin16@zte.com.cn>
+In-Reply-To: <20231124094919.2043838-1-xu.xin16@zte.com.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=dektech.com.au;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR05MB9078:EE_|AS8PR05MB8200:EE_
+x-ms-office365-filtering-correlation-id: 7b3bb690-c9a2-4fe1-53c3-08dbecd7430e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ xbvd0oUrjqDvBm8gPMGJD3wEWxXBvaIuQGQsnXEheo0uBhKDmnOnnVmSa7xzd7yBuBOZZg8Gp1a94tTTUFHjjUSH6uJBrYia2JPjV3yo9OJglLxMfIgf4k011ThPK+6gEJVCzqXhcpgvPkMqwpoV3qtYSivGKq1ed/8PqKug7d9UQ6ZJ6KHMa1oB6BjNRSbilkSlp0Mpl0S49FPqFBC8IRTfafhYgskGhCLG4WU+8dYu+DFAUKEdXmtXKp7cnjJRMuHisDmn74jt0sVZ76P7FROKZEoCj7sKnbwIf4y6ElwWDxf4gYrLDzEjmOLL3e/CkjuYNpWgQ1ERkopGmc1nuo0aCURkt6tS8ZqjAhVXmXtm+tGs27zjQ7dzH0lHJ9+q5jjwdw9j6LsFcZVACUeio7eFGnUGBZr45IIf8ZB6NSHHYQSUSa9WLTnZ7AK/2vvaMBxVKwiWdu/+Fe6rG97RUFtX6Q7wUUuXHH7BU5xFNoEp/qSBH4Q3XSVmExIdTNORE0xyhAjoREuMjC19Cjju6frfarCy1EY4Fj+KreDUCKDARrPuwCkgVG6Evkq+8tHv/JyE4rYMvdlc92y8DBvmz8Gc7QUtayGTBSvwSNrwvbScOBvxmMu2pImwMDrpT9uq
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR05MB9078.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39840400004)(376002)(346002)(366004)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(26005)(76116006)(33656002)(9686003)(7696005)(6506007)(86362001)(71200400001)(38070700009)(41300700001)(6916009)(316002)(38100700002)(4326008)(54906003)(8936002)(122000001)(66946007)(2906002)(66556008)(66476007)(66446008)(8676002)(4744005)(7416002)(52536014)(64756008)(478600001)(5660300002)(55016003)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?PasGjVfb4Kn9nQzNdrMe13Yabw5KCkp5Oz4dzj3EORwVo77FyVhksL2lgcwl?=
+ =?us-ascii?Q?aC/ST38do0a7Q+malC4xL7sjP/PxHaLrJNbyXZ11R3TasKRKHFaYTiWWE9qq?=
+ =?us-ascii?Q?az71NmK8yzy9Tf/IzLSb39U0yQq+ql0nXgLo1fCaM9vhvE+LfrOxq+MpcZOO?=
+ =?us-ascii?Q?3Rqr0wD9VIJ97xJtyMtZRqZ4SIEXYiN6r6nppXEbzimSKy2kLv4u70zok2BG?=
+ =?us-ascii?Q?ZqE8vF7psLo5huy2yMXrUn0GryZJZOqZrY44ay+E+BRd2sJqq7kb6BcpZf43?=
+ =?us-ascii?Q?HrXFYWn+wlIV+9HdN+ce+Oc/EjFueoVIl2OMeoAI8bCOjRlkN3HL0wQm4Fkt?=
+ =?us-ascii?Q?MijkEMuieJ3+wF/IhfRZFvbcP2Lnsg2CSy8T6ZE3UMqKz3SC5PoR4woEeayA?=
+ =?us-ascii?Q?hSyrujrZU7ccoquhtQWPSrmrvhE6X6mDd3j0BqGFCFBjaGQgCRTkXk3HiGFh?=
+ =?us-ascii?Q?hbfwp7fbwn9U46CXf2zp7gOt3gZ8dqxwqXe/cIvtoTuzeIG9Mwj8DUPfxPhU?=
+ =?us-ascii?Q?fXAuzFEWKvJiDfhGnumeg/0rx41zU8k6gfBufNTXfFI7+7T60Bj6MmBe482V?=
+ =?us-ascii?Q?mUvU7futjKQOXwckkX+sXvOc7pstMmKjetqldI93QYTkbAIACjAL882ubMB+?=
+ =?us-ascii?Q?UJL5VtxOe6m3Qeapk7HfSsqrJrZ9tu0ba6c/ytY4Z4s3QgcMvEXBAQIRcgV1?=
+ =?us-ascii?Q?CzqZz3wiNzcQIbyAvsVP+w6XBua1jr9LWmin5l6nALBMernuJPJY8kqHGG/a?=
+ =?us-ascii?Q?Q+FP08sSH2hRMGeXNRTcao8wk7LcFFejHZ4Lf2rHzBYAjycc8SvRSWt71ULr?=
+ =?us-ascii?Q?M5vpqZHWSm29yMmVTg6R/jRKoVGyb1cgPuZzlpxJGz3vWluFW7O5e414iBlM?=
+ =?us-ascii?Q?kDhM2W9NqotTDUUMf2hbt+muDvjnixadlhVK1A0I9Wo9xiojYxFn5PakuOtp?=
+ =?us-ascii?Q?+/+d6m15LXHk1IrvNchR4z9T0sYDqCME4lCyETKGbKlJN6PJ+mzQD5rmVRg8?=
+ =?us-ascii?Q?LIMtISiT4YaGkk8MKhAuuIEn3J3tj1y8u70UBZVAaOeOiFg9MTw2BII/5z0e?=
+ =?us-ascii?Q?vbuf0AkrsjiPfI/sqfdzmOGpkIxipqyOKJ/8YRui7upjQgt0xw6t9kfvD9pT?=
+ =?us-ascii?Q?K2E6ZfydFbqzWUtLEl4ZD8R6kmwFgS//pRcZnTjL1Vm0a7LngL3+19O9zA0F?=
+ =?us-ascii?Q?t04+GG/jEnXxB5meNs963YNwwoektOMi1VxOw09KWjFf8X1GDOmjNaJthtcr?=
+ =?us-ascii?Q?CszWFNYTBhXbrSNeFhZWzvyp4tIUXfLU/sB38SKBQ5uT/lgyQR0ozR7w0Mzs?=
+ =?us-ascii?Q?VpCwC6WrFqDMkMer/0dSCLUR6OnTuWc1XIbYmrHL2kPHb5vhQ2r+BURcUPfw?=
+ =?us-ascii?Q?oaxNACgYfZtXkIqH4B9WsfZaidBqJIOujtjRA3SP5Nqag7lbbdrLYeZmTOy7?=
+ =?us-ascii?Q?bXLHfXA+3M74uF5xjBYJauagxTvgX74orZjQ5vICZ5KCFMONCs1UOWmI3i2Y?=
+ =?us-ascii?Q?9MNZyjnOV+tGkCzNu6JmecaJQbkps0luv9qhrWIEGzl0MaFmuubHJ/SvlvHp?=
+ =?us-ascii?Q?MnMWMeQKvgyAcK4nyZ5Y0WTg3jMx22Gr7uumwKbgA+Ybi0ht/CZsnB15ZlA1?=
+ =?us-ascii?Q?0Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: dektech.com.au
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR05MB9078.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b3bb690-c9a2-4fe1-53c3-08dbecd7430e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2023 10:22:28.9593
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2VqG+D0Xu6NaeOTi+ImK1QFOYmSyxdGNe0gJ8ZsRaPsmPS8kxadCA8Ssgote5EkmjrLP1Sk/DvTkPmlCiwOCHe8eTBX61Wp1qkfIkicm8qU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR05MB8200
 
-Pages belonging to a page_pool (PP) instance must be freed through the
-PP APIs in-order to correctly release any DMA mappings and release
-refcnt on the DMA device when freeing PP instance. When PP release a
-page (page_pool_release_page) the page->pp_magic value is cleared.
-
-This patch detect a leaked PP page in free_page_is_bad() via
-unexpected state of page->pp_magic value being PP_SIGNATURE.
-
-We choose to report and treat it as a bad page. It would be possible
-to release the page via returning it to the PP instance as the
-page->pp pointer is likely still valid.
-
-Notice this code is only activated when either compiled with
-CONFIG_DEBUG_VM or boot cmdline debug_pagealloc=on, and
-CONFIG_PAGE_POOL.
-
-Reduced example output of leak with PP_SIGNATURE = dead000000000040:
-
- BUG: Bad page state in process swapper/4  pfn:141fa6
- page:000000006dbf8062 refcount:0 mapcount:0 mapping:0000000000000000 index:0x141fa6000 pfn:0x141fa6
- flags: 0x2fffff80000000(node=0|zone=2|lastcpupid=0x1fffff)
- page_type: 0xffffffff()
- raw: 002fffff80000000 dead000000000040 ffff88814888a000 0000000000000000
- raw: 0000000141fa6000 0000000000000001 00000000ffffffff 0000000000000000
- page dumped because: page_pool leak
- [...]
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x32/0x50
-  bad_page+0x70/0xf0
-  free_unref_page_prepare+0x263/0x430
-  free_unref_page+0x34/0x130
-  mlx5e_free_rx_mpwqe+0x190/0x1c0 [mlx5_core]
-  mlx5e_post_rx_mpwqes+0x1ac/0x280 [mlx5_core]
-  mlx5e_napi_poll+0x12b/0x710 [mlx5_core]
-  ? skb_free_head+0x4f/0x90
-  __napi_poll+0x2b/0x1c0
-  net_rx_action+0x27b/0x360
-
-The advantage is the Call Trace directly points to the function
-leaking the PP page, which in this case is an on purpose bug
-introduced into the mlx5 driver to test this code change.
-
-Currently PP will periodically in page_pool_release_retry()
-printk warning "stalled pool shutdown" which cannot be directly
-corrolated to leaking and might as well be a false positive
-due to SKBs being stuck on a socket for an extended period.
-After this patch we should be able to remove this printk.
-
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- mm/page_alloc.c |    7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 733732e7e0ba..37ca4f4b62bf 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -915,6 +915,9 @@ static inline bool page_expected_state(struct page *page,
- 			page_ref_count(page) |
- #ifdef CONFIG_MEMCG
- 			page->memcg_data |
-+#endif
-+#ifdef CONFIG_PAGE_POOL
-+			((page->pp_magic & ~0x3UL) == PP_SIGNATURE) |
- #endif
- 			(page->flags & check_flags)))
- 		return false;
-@@ -941,6 +944,10 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
- #ifdef CONFIG_MEMCG
- 	if (unlikely(page->memcg_data))
- 		bad_reason = "page still charged to cgroup";
-+#endif
-+#ifdef CONFIG_PAGE_POOL
-+	if (unlikely((page->pp_magic & ~0x3UL) == PP_SIGNATURE))
-+		bad_reason = "page_pool leak";
- #endif
- 	return bad_reason;
- }
-
-
+>Why can't use le->lock instead of node's lock to protect it in tipc_link_r=
+cv.
+>
+I have already explained:
+__tipc_node_link_down()
+{
+    ...
+   if (!l || tipc_link_is_reset(l)) <-- read link status
+    ...
+}
+>>What I showed you were just 2 use cases (link reset/delete). There are mo=
+re use cases (netlink, transmit path etc) that need proper
+>locks.
+>
+>The same. We can also add spin_lock_bh(&le->lock) to protect the link in o=
+ther places where it changes the link status in addition to
+>'reset/delete'. Because using node lock to protect the link in tipc_link_r=
+cv is really wasting CPU performance.
+>
+If you want to change current lock policy, you need to submit a complete/co=
+rrect patch. I will acknowledge this patch if I can see a significant impro=
+vement in my test.
 
