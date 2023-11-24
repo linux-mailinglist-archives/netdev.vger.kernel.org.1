@@ -1,203 +1,80 @@
-Return-Path: <netdev+bounces-50679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8147F69D5
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:28:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDB97F69E2
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E6DD1C20B5F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:28:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA516B20D74
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C90644;
-	Fri, 24 Nov 2023 00:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="K61bA4Dj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97666375;
+	Fri, 24 Nov 2023 00:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B1A10E4
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:40 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-332c0c32d19so904188f8f.3
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1700785659; x=1701390459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z+xjuCITs6Hv9gSdP5tkhTp9hyYcojUzFzOsLW1PoYI=;
-        b=K61bA4Dj07U41I/enlM+jFWwgf5GrwH1ZZsyd1msZm96/x39u7ygoXCYPYoJj5HucA
-         gti5mIOWAOYwV9JBm9+Z68v7AFTQz/KLi55mw//W35xKY0XMrHWpBWpn23KsFpGlD9QF
-         zcuH22VrdQLkwmfE66nKKS/BwJYZjcCdMQ0hxKmpV1IvCPbBzzrs7MeCg870+z0z0kXC
-         ygSeO5bjPVSDd5c3whYNUMH0LynueDkPtL6wzUgbKs883uoXYoPMWsfrU6Katf1rzNKa
-         MKSRxLUI7lZLXGw0KZVGbOIODNHtZA0V2jVCY+ALaws0JPplOUQ8y0oEzV/jfHorsGF0
-         UmpA==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334BDC1
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:38:09 -0800 (PST)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cf974e87f9so10818065ad.1
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:38:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700785659; x=1701390459;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z+xjuCITs6Hv9gSdP5tkhTp9hyYcojUzFzOsLW1PoYI=;
-        b=nbL6orj1V+emx4tUbsZGLhlbxrnI5TDKbMiogov8Iy9zwdZ+xU8AZPIGnO3gGcVjSa
-         IsG9HRzdoW1JSVPY4quUrwyKFubbxaGmazED/koFdRb6oVDZx2AzYgXmIpslEbfrQjB5
-         paYOnF3OACdOrX5Uf+WVs8ung3bK260cDdJiIGROJhfFgwkZizmYTfx4XGZ2eeaqeFm1
-         E1w3UsfOlZahh/24YpIUHRf6m0TbpwErxLMKXBJNr6Ecl3HqL0w1gIMwtXh+a5BXCBb0
-         5RLIDwEbJ34LmttcitvKV1h/JVwkEkyDdq5lZQfM1G745Aw6iirB+RBPE97X3Y23/ONu
-         1iyA==
-X-Gm-Message-State: AOJu0Yy9B1lU+vEqRZsm13G8PQClqA4GjKxSgzWa/sssJkxYq8fq8Uq0
-	L8rWq6QKpVQ+ZWUNcm2gmWI+NA==
-X-Google-Smtp-Source: AGHT+IHbSUYFXCRpczlpyhRrAyziYifakMY/lsH2oafyE/3Mz23Zj7iFfIe/KGa4ctGfG+6kMqaOkw==
-X-Received: by 2002:a5d:63d1:0:b0:332:ca10:37f with SMTP id c17-20020a5d63d1000000b00332ca10037fmr643730wrw.43.1700785659176;
-        Thu, 23 Nov 2023 16:27:39 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b004094e565e71sm3453230wmo.23.2023.11.23.16.27.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 16:27:38 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 7/7] net/tcp: Don't store TCP-AO maclen on reqsk
-Date: Fri, 24 Nov 2023 00:27:20 +0000
-Message-ID: <20231124002720.102537-8-dima@arista.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231124002720.102537-1-dima@arista.com>
-References: <20231124002720.102537-1-dima@arista.com>
+        d=1e100.net; s=20230601; t=1700786288; x=1701391088;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VPLTnc8KvHWqsxcIPXp2s7Iad5LW8gL2my2v8cVDRX4=;
+        b=a+OH2tvuf+4tziyLgkJcIaPZyENdr+R4dkCgh5rQQUjRLUQMBa02VqYEw/amccrGHT
+         kJ+6O5sdEjSbz4D/XFsjWfIf+LScOWKUsDWY5M7uxhJFNVBaDNEHC/uwxv7G3NWoeLrr
+         c7CF++iBv971DFuxi84xqwf2q/VfTRCD5ekGuEGJuZ+Adr2ctkExFoJNj5xqlTtbwSkv
+         YseXltuRdnH89QYncHKqgog7FKCi2fMuj09+Ew4nhQ8vlt3BEAKhZTWV4JiM3F+yLh24
+         mfodUGcLtO9rX0/FlOswm5V6jKJbiKvnkn44Dq2/CKk6mJSn2RnTiih1tmJ4egv9xSww
+         a1+A==
+X-Gm-Message-State: AOJu0YycHB9tmX5s7reEp7Oqp9avMmjOHhD+X+iF0pOhfe9eB+k87jQR
+	njYi9g6lWJ9OZ2GVlz6uMeJkkT+9QaBc057ZsmpuupSs5f0X
+X-Google-Smtp-Source: AGHT+IG/i1S1qxSA6e88vsKZWkSX6vhKxjX8h9mxmSMPbbTM6FrVEA9zYJvddT/18F2HyONTerLjCeEBKu6vOEGP/7EgeqRxciue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a17:902:b948:b0:1cc:cc77:94ed with SMTP id
+ h8-20020a170902b94800b001cccc7794edmr247078pls.10.1700786288803; Thu, 23 Nov
+ 2023 16:38:08 -0800 (PST)
+Date: Thu, 23 Nov 2023 16:38:08 -0800
+In-Reply-To: <000000000000f2771905a46374fe@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000954422060adb2aa3@google.com>
+Subject: Re: [syzbot] [net?] possible deadlock in sch_direct_xmit (2)
+From: syzbot <syzbot+e18ac85757292b7baf96@syzkaller.appspotmail.com>
+To: administracion@diocesisdeleon.org, ap420073@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, hdanton@sina.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-This extra check doesn't work for a handshake when SYN segment has
-(current_key.maclen != rnext_key.maclen). It could be amended to
-preserve rnext_key.maclen instead of current_key.maclen, but that
-requires a lookup on listen socket.
+syzbot has bisected this issue to:
 
-Originally, this extra maclen check was introduced just because it was
-cheap. Drop it and convert tcp_request_sock::maclen into boolean
-tcp_request_sock::used_tcp_ao.
+commit 1a33e10e4a95cb109ff1145098175df3113313ef
+Author: Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Sun May 3 05:22:19 2020 +0000
 
-Fixes: 06b22ef29591 ("net/tcp: Wire TCP-AO to request sockets")
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- include/linux/tcp.h   | 8 ++------
- net/ipv4/tcp_ao.c     | 4 ++--
- net/ipv4/tcp_input.c  | 5 +++--
- net/ipv4/tcp_output.c | 9 +++------
- 4 files changed, 10 insertions(+), 16 deletions(-)
+    net: partially revert dynamic lockdep key changes
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 68f3d315d2e1..b646b574b060 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -169,7 +169,7 @@ struct tcp_request_sock {
- #ifdef CONFIG_TCP_AO
- 	u8				ao_keyid;
- 	u8				ao_rcv_next;
--	u8				maclen;
-+	bool				used_tcp_ao;
- #endif
- };
- 
-@@ -180,14 +180,10 @@ static inline struct tcp_request_sock *tcp_rsk(const struct request_sock *req)
- 
- static inline bool tcp_rsk_used_ao(const struct request_sock *req)
- {
--	/* The real length of MAC is saved in the request socket,
--	 * signing anything with zero-length makes no sense, so here is
--	 * a little hack..
--	 */
- #ifndef CONFIG_TCP_AO
- 	return false;
- #else
--	return tcp_rsk(req)->maclen != 0;
-+	return tcp_rsk(req)->used_tcp_ao;
- #endif
- }
- 
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 74db80aeeef3..cfa264c320a7 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -855,7 +855,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 	const struct tcp_ao_hdr *aoh;
- 	struct tcp_ao_key *key;
- 
--	treq->maclen = 0;
-+	treq->used_tcp_ao = false;
- 
- 	if (tcp_parse_auth_options(th, NULL, &aoh) || !aoh)
- 		return;
-@@ -867,7 +867,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 
- 	treq->ao_rcv_next = aoh->keyid;
- 	treq->ao_keyid = aoh->rnext_keyid;
--	treq->maclen = tcp_ao_maclen(key);
-+	treq->used_tcp_ao = true;
- }
- 
- static enum skb_drop_reason
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index fc3c27ce2b73..0135a6c6f600 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -7194,11 +7194,12 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
- 	if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
- 		goto drop_and_release; /* Invalid TCP options */
- 	if (aoh) {
--		tcp_rsk(req)->maclen = aoh->length - sizeof(struct tcp_ao_hdr);
-+		tcp_rsk(req)->used_tcp_ao = true;
- 		tcp_rsk(req)->ao_rcv_next = aoh->keyid;
- 		tcp_rsk(req)->ao_keyid = aoh->rnext_keyid;
-+
- 	} else {
--		tcp_rsk(req)->maclen = 0;
-+		tcp_rsk(req)->used_tcp_ao = false;
- 	}
- #endif
- 	tcp_rsk(req)->snt_isn = isn;
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 93eef1dbbc55..f5ef15e1d9ac 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3720,7 +3720,6 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
- 	if (tcp_rsk_used_ao(req)) {
- #ifdef CONFIG_TCP_AO
- 		struct tcp_ao_key *ao_key = NULL;
--		u8 maclen = tcp_rsk(req)->maclen;
- 		u8 keyid = tcp_rsk(req)->ao_keyid;
- 
- 		ao_key = tcp_sk(sk)->af_specific->ao_lookup(sk, req_to_sk(req),
-@@ -3730,13 +3729,11 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
- 		 * for another peer-matching key, but the peer has requested
- 		 * ao_keyid (RFC5925 RNextKeyID), so let's keep it simple here.
- 		 */
--		if (unlikely(!ao_key || tcp_ao_maclen(ao_key) != maclen)) {
--			u8 key_maclen = ao_key ? tcp_ao_maclen(ao_key) : 0;
--
-+		if (unlikely(!ao_key)) {
- 			rcu_read_unlock();
- 			kfree_skb(skb);
--			net_warn_ratelimited("TCP-AO: the keyid %u with maclen %u|%u from SYN packet is not present - not sending SYNACK\n",
--					     keyid, maclen, key_maclen);
-+			net_warn_ratelimited("TCP-AO: the keyid %u from SYN packet is not present - not sending SYNACK\n",
-+					     keyid);
- 			return NULL;
- 		}
- 		key.ao_key = ao_key;
--- 
-2.43.0
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17cd55af680000
+start commit:   feb9c5e19e91 Merge tag 'for_linus' of git://git.kernel.org..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=142d55af680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=102d55af680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=78013caa620443d6
+dashboard link: https://syzkaller.appspot.com/bug?extid=e18ac85757292b7baf96
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14430eb9f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13738f71f00000
 
+Reported-by: syzbot+e18ac85757292b7baf96@syzkaller.appspotmail.com
+Fixes: 1a33e10e4a95 ("net: partially revert dynamic lockdep key changes")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
