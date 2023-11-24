@@ -1,208 +1,280 @@
-Return-Path: <netdev+bounces-50716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD0D27F6E22
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:29:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124E77F6F20
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0AB91C20A99
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:29:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B12242816BA
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFD0BA38;
-	Fri, 24 Nov 2023 08:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b="O7dFYtEQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674A6524E;
+	Fri, 24 Nov 2023 09:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2128.outbound.protection.outlook.com [40.107.7.128])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64080D48;
-	Fri, 24 Nov 2023 00:29:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XdL7lF0QJc47lkb6jW7WOHVhFXgGptsRou1Z+uPQqQSsAc/ABbBa1ZzCZpbnYLLmSQAX4X/eKrdPlg62io0gXGK1xbz2YKAxTahjLPZAy0xySutGDicVq5tVfZqUzfVgl9Ng+2csEnnyepyN/RdrX4H4WqWEkl9284FkrS2scsyHB7KR/3J5E+ZRkdoqzQZZuvcVum9APMGrWpQA2YK7fHD0m7hOzxJVPoqB2hVymhE4OSUobBhVYn7mbZblWiZW9g9TnVybwMcPksBD7JSacD0cvn7V7DvX/Z8BP6Ppzt0d0Vy7emOCPiAF1qIls/mqpn+oud1e3ADrIjZckvtAcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c74/hMJ+sbadKATYn6/JUfBQhoMdXFwiuOsGLUSfQJE=;
- b=H97PBnO/yV3i6EuL2xhLbZOAmngl0bcYQaPFxhXoSnlvVolDIC+ekl9uDDz5uClrA9woFGk/1EB4C5jg8icWiK95M9gOyAqdjIy1X99AGSmNCaQygZ7vjClLki6EC2HArL5XAmJY3eFDwVya7yV1eqMuX7VgJRD0Y6XaRTZZhBsXe+iodWtiWh3k5rE5DwQoZpnnkCJLajeHa6bhAieF8dg/CYPWJVyXR7qeKaMl3tEiPf1nO80tj79hWQ47v/YF7I1aAR5wL80p9AoItgQ/kPeQxItuEhvXSRm/UxvIR4oP5/vC5NyASAyfN37/bOPOWdTL0D35tFr5I+XbJZzRdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dektech.com.au; dmarc=pass action=none
- header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c74/hMJ+sbadKATYn6/JUfBQhoMdXFwiuOsGLUSfQJE=;
- b=O7dFYtEQFgHYFhm9NZIusMfvEjEZTd6m4/XWj/8z0dUEZ/sIZRLflCBmVwdjqe7gwmCoZlIUhTYFKlsdbiCWd+9AZEQ0E/qdjT0vmtPCE1+bVxiFmMFgtAPyONiMIBHf/Re+iXa3IWQsNeX9vNwi787+9WlRH23N0sV7MgZytjDPhV0VAFqupuRbTUTiBO7hPA7z6nT2undwXDkFj5Q0Zi/pbEBlSYpUM3bAFMn8ASuDeHuYKTWw/MpQknywYN1czeoapFRm46SeCedjPBJaiF0/ytpE6ld/Wbw1kbBETVlhKTMY0jSNHzYnJZkv6aON5tRfw9qdX1DGMBbYQEmTKQ==
-Received: from DB9PR05MB9078.eurprd05.prod.outlook.com (2603:10a6:10:36a::7)
- by PAVPR05MB10448.eurprd05.prod.outlook.com (2603:10a6:102:2f8::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.21; Fri, 24 Nov
- 2023 08:28:56 +0000
-Received: from DB9PR05MB9078.eurprd05.prod.outlook.com
- ([fe80::c9ed:567d:143e:af2b]) by DB9PR05MB9078.eurprd05.prod.outlook.com
- ([fe80::c9ed:567d:143e:af2b%5]) with mapi id 15.20.7025.021; Fri, 24 Nov 2023
- 08:28:56 +0000
-From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
-To: xu <xu.xin.sc@gmail.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "jmaloy@redhat.com"
-	<jmaloy@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "xu.xin16@zte.com.cn"
-	<xu.xin16@zte.com.cn>, "yang.yang29@zte.com.cn" <yang.yang29@zte.com.cn>,
-	"ying.xue@windriver.com" <ying.xue@windriver.com>, "zhang.yunkai@zte.com.cn"
-	<zhang.yunkai@zte.com.cn>
-Subject: RE: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
- tipc_rcv
-Thread-Topic: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in
- tipc_rcv
-Thread-Index: AQHaHbcmsQ7KURUzRkaicoeZO+zrDrCHRXnwgAAp2oCAAAQK0IABobQAgAAL9yA=
-Date: Fri, 24 Nov 2023 08:28:56 +0000
-Message-ID:
- <DB9PR05MB9078FE84F8244C627FDCFA2888B8A@DB9PR05MB9078.eurprd05.prod.outlook.com>
-References:
- <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
- <20231124073134.2043605-1-xu.xin16@zte.com.cn>
-In-Reply-To: <20231124073134.2043605-1-xu.xin16@zte.com.cn>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=dektech.com.au;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR05MB9078:EE_|PAVPR05MB10448:EE_
-x-ms-office365-filtering-correlation-id: 2105a419-9c55-41ab-0b0d-08dbecc766a0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- uOluW3FJBMxsnp7Ln/q93RtzDS4ZUHZkxhDOk1jMScNCjdIc4RYcELhpxuujxOHhlGAMcxLHckpL7zPuW35zjqYN9UTY52Qtfq54OvrKVLCks1ouL6OTU2kkcpUf1D11Kgi1HIZSpdRtG9C/xQy3xkQwLBkW0Dor7LkWQJ2RoBVI0XWFYuSLFyhe67XjF8q0Xod1JWFH9S3j0HLPz6de/KVnBXEVFCEt6y9wiDHKssrmwBH1CZ/eP62innYYc356XWDRfgJuysa9+lQd9lgBY1/j/G61kQC8+P6yVE08dJkBw48H3Eo9y/Tdi4jb8PsPoTJL+LIM7EJr8qLtMkSdRGGYeraYaVV8/GtvPT5q1kb9qrKfEGBZQADm2C7sIcCxVUZmDsNdeZvYQxwlY27sqlWBnmRylh8zkgzCxnBvbjg17m8p9XiHzwHSIljrDsKG6JD+SkGqMhPRD2IQ880TDPlsxTwY/yXB8Kty/0TcdKZ/WIfEbOgLFjEUTcQleort0wmuZ0A2VzrlMInzPe0aj6+CeHJSFRlLl5scvThWqgnk5Bifmkd9VExKT6gdJZpUmdBDTkfQeVjR7JhaJZyPJEvQmOt8xN60A/MV1d18B3OuXXtEjMf2RLb1fLT5dmXl
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR05MB9078.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(396003)(136003)(39840400004)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(38070700009)(478600001)(38100700002)(55016003)(9686003)(71200400001)(6506007)(7696005)(8936002)(52536014)(8676002)(122000001)(4326008)(54906003)(316002)(66946007)(66556008)(66446008)(76116006)(64756008)(6916009)(66476007)(26005)(83380400001)(41300700001)(33656002)(86362001)(7416002)(5660300002)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?scB+IHF2U5YlBF/9AetdJQ13JD9TgB++W/rdSCeHj6/vT3Zq0C1L3cDCWv+5?=
- =?us-ascii?Q?SkcSuZxoOgRMZxcfFqFa289emLjZHB5VNEq9pnMigaHE2/JIjKWBUU8F+emJ?=
- =?us-ascii?Q?9pH/uhPAIWZH0DRUI5219HkWfwAMRZq5NUFIm/2pIDfJvNFCfoeQbSEt4ZzG?=
- =?us-ascii?Q?dwcm63Kjd3tR09UzRTTO6zR3eA5oDDnwgw2l7eMiVTNp1RYEbSTd8f5ZipEe?=
- =?us-ascii?Q?2hieX+LN6POWmJhKvlvt6WBijHOjCczA7CMG08BHyzAeBrvZFBkejzYKNh/H?=
- =?us-ascii?Q?9v7FOqhS9YIKByT6dm0gU/IBbMK/SdDUR16NhHmDSYfO+Ze1JOJFctywHaeY?=
- =?us-ascii?Q?BJ5MLcEnr05RRfbWCWsbpKaOSWvo5Y/L/CWPsbZHr8Hc+1xGhPSlM92K5RA9?=
- =?us-ascii?Q?Y8Cc/vZmmJPk5gPOK/EVz7jilIhwfpMkdqgPHtN6f2tUn6FGj74bC8iQqxRY?=
- =?us-ascii?Q?YtDz9c/z5S2UEOYHf7ugNIBfYMy6oc/14B3V73KWHj7HNc6EyJtiVEXsugO/?=
- =?us-ascii?Q?UfU3RK6rYaB87rr/AN+7fyA1Xcxa6MC2+YbF3rc0ycc2/K1I4OA6/ZhjQwi9?=
- =?us-ascii?Q?3pvGl26PxDd1cfwQifAMaGcPOIlJCyUvZ+ZELMqU9biV+Pbx/fP0ge7b4T+2?=
- =?us-ascii?Q?KPmvBEk7qRN93orw7WCJrEoEgLnmaK7WdCmCHH7qqKJBbHJFhNsOxL2GLAhR?=
- =?us-ascii?Q?3/Jjkjuv7nLNEUv4UJa1vG2XetewBcCqwdGSTQjPsxRD84dFit/HwX0GZ2wt?=
- =?us-ascii?Q?+f0ZtRjSS/I0x6PUrIAa0rTvXgFcHjuftdI9LwWJ06ovPfTuaJlf+MPObh3i?=
- =?us-ascii?Q?5kCNdCUDEiI/0V5jX+Z7M+W8nXx7T7VBjvUjoO05iHTcKTWmExYT5LjUz1Ii?=
- =?us-ascii?Q?kqB4LwuwQpmIdQf6oTI3pE4hQlqQ+/Hhpz3q9d9Upu8eIW2EiQwiUSCFIbDZ?=
- =?us-ascii?Q?CI+Bnr7P2lBgnJFVenRI2HOYxf75sbU9IEH2T8p0Ebclh8CZp4RH1L3D/hwe?=
- =?us-ascii?Q?YG1qESiZy5ULYzvjdBKVlcmsM5xHrNcVcIlk7gKqthSOKSPvrSpXVFTaNFdC?=
- =?us-ascii?Q?BP9vsmedn0ZIHCRnzTNxqJdqEho6Ud7GbHvw6B1bKbylKVRW5qL0k69KUP+U?=
- =?us-ascii?Q?bgRel840liyKn6x8qEyEq7WutGrXVEjEzPoxQd1eSmIhV8/g3rFLEpFYXFYM?=
- =?us-ascii?Q?gKBZFU3n0q+adEiK35vQVD7Y0xTfKwZ+bDFdSi+KxxUNpNN4qkywcrqaBCUB?=
- =?us-ascii?Q?6EETAhGPhxcn4MP/64vN0sN6YZi8/D6hz6sYszJgT5UCuBwG/c442p42wtJe?=
- =?us-ascii?Q?BAO554TJZmFcHp59S8E1FSW/DrpMMjVKJkR5Aa/AUyYp/QVTw8AjOFhjfk2u?=
- =?us-ascii?Q?les/Wti4Y7XvJ70o0rJm5UZ/ckx8PXD43X03tmMN//Ju5EdZj0bV5yH+dQ1X?=
- =?us-ascii?Q?b6TC5N2P16vMVyuB42CI/iS01u8X1fw90jpXgBNUNO8F9uaX5SMen66GflQo?=
- =?us-ascii?Q?D9sFaxWCsWWTcugxmXdCndNHzDzhuEwKnoCcUZVSFp1hNZodeiLMQ/uitO7U?=
- =?us-ascii?Q?BjY+gmFF8dCu+Q7745u8fRd8elIOHNZLLeraabse265TPDdARgTF2keoQKrN?=
- =?us-ascii?Q?hg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1A41BD;
+	Fri, 24 Nov 2023 01:09:05 -0800 (PST)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5cccd2d4c4dso15504097b3.3;
+        Fri, 24 Nov 2023 01:09:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700816944; x=1701421744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FMVmVofscPCswjqH7+PiI4VBRnjaZZqlA6AYpnp6bDY=;
+        b=jEeWS8UtWKMOJZG5BWRGJ3vuxEBQ7ivjwK3qaRUuet/AvZj16jqiEp69nbf+tU+mIp
+         6q3ROHVM/CNuuNZ+iWupE+JdOuCjWRsFyfShSkJDKsOTATZrt7RFqBbP31oEoET87+0t
+         XVH7UXgQV16BUKh1RHlJiwSCiHJTtrepesAPtMgcShO85GlF3H5GvWx1oCuWAxXMusiZ
+         ifmIvLiLKCOf6A+urvPn9o7vGJHebbKrImNhAGphUXS2cY2LdxhiHJuCWfaxm3GyJeCB
+         5wPtU+5HFkvxRNTlF8OFP+TrMYABj+mIqmDzi4MGjnIn9/qmZW4rI/dTe9LCkyo08lvN
+         6RJw==
+X-Gm-Message-State: AOJu0YzUTqS2GdmYWadhTm5kgOz0zis8MqAAQpFC4UKM8mycdHY7QZiL
+	Jiy4ysMkP5rriut0GGVJbIIkBctflSatog==
+X-Google-Smtp-Source: AGHT+IGRHJ/cQ/alKt52kl/2RM+i8rfU4lJJU6GTB1TOt70h3oySn8GBe9PStcnUrdh0DzLxpqW8cQ==
+X-Received: by 2002:a0d:d5d3:0:b0:5ca:697e:ee17 with SMTP id x202-20020a0dd5d3000000b005ca697eee17mr2218553ywd.38.1700816944480;
+        Fri, 24 Nov 2023 01:09:04 -0800 (PST)
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
+        by smtp.gmail.com with ESMTPSA id h125-20020a815383000000b005a7f676f305sm882968ywb.106.2023.11.24.01.09.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Nov 2023 01:09:03 -0800 (PST)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5cd81e76164so10939807b3.1;
+        Fri, 24 Nov 2023 01:09:03 -0800 (PST)
+X-Received: by 2002:a0d:e653:0:b0:5a8:1812:a7ed with SMTP id
+ p80-20020a0de653000000b005a81812a7edmr1770393ywe.15.1700816943381; Fri, 24
+ Nov 2023 01:09:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: dektech.com.au
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR05MB9078.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2105a419-9c55-41ab-0b0d-08dbecc766a0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2023 08:28:56.7117
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ho5WAH3nCSuR8rRCv29TQrJRPlmnZFR66gJNqfdXJnbjmzjZQXevtBHf/gBEDGuUn73ECEMeYlL/BS4PG+OoJyCUPveS/6pxrumjGdIRd4A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR05MB10448
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120070024.4079344-4-claudiu.beznea.uj@bp.renesas.com> <CAMuHMdVMpKVY8WX7dbtHfgnwgePH+i9+2BAumb37sFmqccb44g@mail.gmail.com>
+In-Reply-To: <CAMuHMdVMpKVY8WX7dbtHfgnwgePH+i9+2BAumb37sFmqccb44g@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 24 Nov 2023 10:08:49 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVWvVtFMUe+J9R2ZU8Hi5CGs0NQfwUxitganM85183KkA@mail.gmail.com>
+Message-ID: <CAMuHMdVWvVtFMUe+J9R2ZU8Hi5CGs0NQfwUxitganM85183KkA@mail.gmail.com>
+Subject: Re: [PATCH 03/14] clk: renesas: rzg2l-cpg: Add support for MSTOP
+To: Claudiu <claudiu.beznea@tuxon.dev>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
+	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
+	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
+	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
+	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
+	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->Could we please solve the problem mentioned above by adding spinlock(&le->=
-lock)?
->
+Hi Claudiu,
 
-No, you cannot do that. As I said before, the link status (including l->sta=
-te) needs to be protected by node lock.
-What I showed you were just 2 use cases (link reset/delete). There are more=
- use cases (netlink, transmit path etc) that need proper locks.
+On Thu, Nov 23, 2023 at 5:35=E2=80=AFPM Geert Uytterhoeven <geert@linux-m68=
+k.org> wrote:
+> On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev=
+> wrote:
+> > From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> >
+> > RZ/{G2L, V2L, G3S} based CPG versions have support for saving extra
+> > power when clocks are disabled by activating module standby. This is do=
+ne
+> > though MSTOP specific registers that are part of CPG. Each individual
+> > module have one or more bits associated in one MSTOP register (see tabl=
+e
+> > "Registers for Module Standby Mode" from HW manuals). Hardware manual
+> > associates modules' clocks to one or more MSTOP bits. There are 3 mappi=
+ngs
+> > available (identified by researching RZ/G2L, RZ/G3S, RZ/V2L HW manuals)=
+:
+> >
+> > case 1: N clocks mapped to N MSTOP bits (with N=3D{0, ..., X})
+> > case 2: N clocks mapped to 1 MSTOP bit  (with N=3D{0, ..., X})
+> > case 3: N clocks mapped to M MSTOP bits (with N=3D{0, ..., X}, M=3D{0, =
+..., Y})
+> >
+> > Case 3 has been currently identified on RZ/V2L for VCPL4 module.
+> >
+> > To cover all 3 cases the individual platform drivers will provide to
+> > clock driver MSTOP register offset and associated bits in this register
+> > as a bitmask and the clock driver will apply this bitmask to proper
+> > MSTOP register.
+> >
+> > As most of the modules have more than one clock and these clocks are
+> > mapped to 1 MSTOP bitmap that need to be applied to MSTOP registers,
+> > to avoid switching the module to/out of standby when the module has
+> > enabled/disabled clocks a counter has been associated to each module
+> > (though struct mstop::count) which is incremented/decremented every
+> > time a module's clock is enabled/disabled and the settings to MSTOP
+> > register are applied only when the counter reaches zero (counter zero
+> > means either 1st clock of the module is going to be enabled or all cloc=
+ks
+> > of the module are going to be disabled).
+>
+> Thanks for your patch!
+>
+> > The MSTOP functionality has been instantiated at the moment for RZ/G3S.
+> >
+> > Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
->For example:
+> > --- a/drivers/clk/renesas/rzg2l-cpg.c
+> > +++ b/drivers/clk/renesas/rzg2l-cpg.c
+> > @@ -1177,6 +1177,17 @@ rzg2l_cpg_register_core_clk(const struct cpg_cor=
+e_clk *core,
+> >                 core->name, PTR_ERR(clk));
+> >  }
+> >
+> > +/**
+> > + * struct mstop - MSTOP specific data structure
+> > + * @count: reference counter for MSTOP settings (when zero the setting=
+s
+> > + *        are applied to register)
+> > + * @conf: MSTOP configuration (register offset, setup bits)
+> > + */
+> > +struct mstop {
+> > +       u32 count;
+> > +       u32 conf;
+> > +};
+> > +
+> >  /**
+> >   * struct mstp_clock - MSTP gating clock
+> >   *
+> > @@ -1186,6 +1197,7 @@ rzg2l_cpg_register_core_clk(const struct cpg_core=
+_clk *core,
+> >   * @enabled: soft state of the clock, if it is coupled with another cl=
+ock
+> >   * @priv: CPG/MSTP private data
+> >   * @sibling: pointer to the other coupled clock
+> > + * @mstop: MSTOP configuration
+> >   */
+> >  struct mstp_clock {
+> >         struct clk_hw hw;
+> > @@ -1194,10 +1206,46 @@ struct mstp_clock {
+> >         bool enabled;
+> >         struct rzg2l_cpg_priv *priv;
+> >         struct mstp_clock *sibling;
+> > +       struct mstop *mstop;
+> >  };
+> >
+> >  #define to_mod_clock(_hw) container_of(_hw, struct mstp_clock, hw)
+> >
+> > +/* Need to be called with a lock held to avoid concurent access to mst=
+op->count. */
 >
->(BTW, I have tested it, with this change, enabling RPS based on tipc port =
-can improve 25% of general throughput)
+> concurrent
 >
->diff --git a/net/tipc/node.c b/net/tipc/node.c index 3105abe97bb9..470c272=
-d798e 100644
->--- a/net/tipc/node.c
->+++ b/net/tipc/node.c
->@@ -1079,12 +1079,16 @@ static void tipc_node_link_down(struct tipc_node *=
-n, int bearer_id, bool delete)
->                __tipc_node_link_down(n, &bearer_id, &xmitq, &maddr);
->        } else {
->                /* Defuse pending tipc_node_link_up() */
->+               spin_lock_bh(&le->lock);
->                tipc_link_reset(l);
->+               spin_unlock_bh(&le->lock);
->                tipc_link_fsm_evt(l, LINK_RESET_EVT);
->        }
->        if (delete) {
->+               spin_lock_bh(&le->lock);
->                kfree(l);
->                le->link =3D NULL;
->+               spin_unlock_bh(&le->lock);
->                n->link_cnt--;
->        }
->        trace_tipc_node_link_down(n, true, "node link down or deleted!"); =
-@@ -2154,14 +2158,15 @@ void tipc_rcv(struct net *net,
->struct sk_buff *skb, struct tipc_bearer *b)
->        /* Receive packet directly if conditions permit */
->        tipc_node_read_lock(n);
->        if (likely((n->state =3D=3D SELF_UP_PEER_UP) && (usr !=3D TUNNEL_P=
-ROTOCOL))) {
->+               tipc_node_read_unlock(n);
->                spin_lock_bh(&le->lock);
->                if (le->link) {
->                        rc =3D tipc_link_rcv(le->link, skb, &xmitq);
->                        skb =3D NULL;
->                }
->                spin_unlock_bh(&le->lock);
->-       }
->-       tipc_node_read_unlock(n);
->+       } else
->+               tipc_node_read_unlock(n);
+> > +static void rzg2l_mod_clock_module_set_standby(struct mstp_clock *cloc=
+k,
+> > +                                              bool standby)
+> > +{
+> > +       struct rzg2l_cpg_priv *priv =3D clock->priv;
+> > +       struct mstop *mstop =3D clock->mstop;
+> > +       bool update =3D false;
+> > +       u32 value;
+> > +
+> > +       if (!mstop)
+> > +               return;
+> > +
+> > +       value =3D MSTOP_MASK(mstop->conf) << 16;
+> > +
+> > +       if (standby) {
+> > +               value |=3D MSTOP_MASK(mstop->conf);
+> > +               /* Avoid overflow. */
+> > +               if (mstop->count > 0)
+> > +                       mstop->count--;
 >
->        /* Check/update node state before receiving */
->        if (unlikely(skb)) {
->@@ -2169,12 +2174,13 @@ void tipc_rcv(struct net *net, struct sk_buff *skb=
-, struct tipc_bearer *b)
->                        goto out_node_put;
->                tipc_node_write_lock(n);
->                if (tipc_node_check_state(n, skb, bearer_id, &xmitq)) {
->+                       tipc_node_write_unlock(n);
->                        if (le->link) {
->                                rc =3D tipc_link_rcv(le->link, skb, &xmitq=
-);
->                                skb =3D NULL;
->                        }
->-               }
->-               tipc_node_write_unlock(n);
->+               } else
->+                       tipc_node_write_unlock(n);
->        }
+> Should we add a WARN() here, or is it sufficient to rely on the WARN()
+> in drivers/clk/clk.c:clk_core_disable()?
 >
->        if (unlikely(rc & TIPC_LINK_UP_EVT))
+> > +
+> > +               if (!mstop->count)
+> > +                       update =3D true;
+> > +       } else {
+> > +               if (!mstop->count)
+> > +                       update =3D true;
+> > +
+> > +               /* Avoid overflow. */
+> > +               if (mstop->count + 1 !=3D 0)
+> > +                       mstop->count++;
+>
+> Trying to avoid an overflow won't help much here.  The counter
+> will be wrong afterwards anyway, and when decrementing again later, the
+> module will be put in standby too soon...
+>
+> > +       }
+> > +
+> > +       if (update)
+> > +               writel(value, priv->base + MSTOP_OFF(mstop->conf));
+> > +}
 
+After giving this some more thought, it feels odd to derive the standby
+state of a module from the state of its module clocks, while the latter
+are already controlled through Runtime PM and a Clock Domain.
+
+A first alternative solution could be to drop the GENPD_FLAG_PM_CLK
+flag from the RZ/G2L CPG clock domain, and provide your own
+gpd_dev_ops.start() and .stop() callbacks that take care of both
+module standby and clocks (through pm_clk_{resume,suspend}().
+(See https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/base/power/do=
+main.c#L2093
+for the GENPD_FLAG_PM_CLK case).
+That still leaves you with a need to associate an MSTOP register and
+bitmask with a device through its module clocks.
+
+A second alternative solution could be to increase #power-domain-cells
+from zero to one, and register individual PM Domains for each module,
+and control module standby from the generic_pm_domain.power_{on,off}()
+callbacks.  Devices would specify the module using the power-domains =3D
+<&cpg <id> > property in DT, with <id> one of the to-be-added list of
+modules in include/dt-bindings/clock/r9a08g045-cpg.h.  The RZ/G2L CPG
+driver can handle the mapping from <id> to MSTOP register and bitmask.
+This solution requires updates to DT, but you can keep compatibility
+with old DTBs by only registering the new PM Domains when
+#power-domain-cells is one.
+The extra power saving would only be applicable with new DTBs, though.
+
+Thoughts?
+
+> > --- a/drivers/clk/renesas/rzg2l-cpg.h
+> > +++ b/drivers/clk/renesas/rzg2l-cpg.h
+>
+> > @@ -68,6 +73,10 @@
+> >  #define SEL_PLL6_2     SEL_PLL_PACK(CPG_PL6_ETH_SSEL, 0, 1)
+> >  #define SEL_GPU2       SEL_PLL_PACK(CPG_PL6_SSEL, 12, 1)
+> >
+> > +#define MSTOP(name, bitmask)   ((CPG_##name##_MSTOP) << 16 | (bitmask)=
+)
+>
+> I believe the bitmask is always a single bit.
+> So perhaps let MSTOP() take the bit number instead of the bitmaskl?
+> You can still store BIT(bit) inside the macro.
+
+I was wrong, the N->N or N->M cases need a bitmask.
+
+> > +#define MSTOP_OFF(conf)                ((conf) >> 16)
+> > +#define MSTOP_MASK(conf)       ((conf) & GENMASK(15, 0))
+> > +
+> >  #define EXTAL_FREQ_IN_MEGA_HZ  (24)
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
