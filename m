@@ -1,112 +1,136 @@
-Return-Path: <netdev+bounces-50891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C3A7F77A7
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:24:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85BEA7F77CA
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5270428222E
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:24:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8ADDB21716
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950852C864;
-	Fri, 24 Nov 2023 15:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC7B2E858;
+	Fri, 24 Nov 2023 15:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IhP5DcUu"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F7lhjyWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23882172A;
-	Fri, 24 Nov 2023 07:23:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700839436; x=1732375436;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hjHUasbUvdZyid1X5HvgmpQL0hPNRyInjUAbKjnNwBA=;
-  b=IhP5DcUudeE7JdZfJxS6kIaFYA3ATMgmU30Rst1mxKavhkUbHy4d7wVm
-   6g1i1RlOysSgptmXz6myS5Lsw3S00XnJbFtQFC9O5wumPYa2igtZPdFPa
-   cc/Aj/6U+Vn9w7R0luKH5VLiQtvJMU6RdJS3wlHP3BwyL7Vf+KYLDYmjl
-   RlmL47YhFWvSYAiLZSrSerkJmTLhgSPMKmbMyHHHtWMs46Zb9WhMUna+D
-   LyTJZsxwhTmsVIOFFYdhlqOZ5/sn83Xx0bzVGc3tVS87UGuieQK0vh2Bd
-   7wgJ41DDkXTY4C+85bSGUES2oI5AbUmi0eOCynCupfLRBtXoXvboLUQfu
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="456781780"
-X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
-   d="scan'208";a="456781780"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 07:23:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="1014935597"
-X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
-   d="scan'208";a="1014935597"
-Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 24 Nov 2023 07:23:50 -0800
-Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r6Y20-0002wK-0N;
-	Fri, 24 Nov 2023 15:23:48 +0000
-Date: Fri, 24 Nov 2023 23:23:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	kernel@quicinc.com
-Subject: Re: [PATCH net-next v3 2/3] arm64: dts: qcom: sa8775p: enable Fault
- IRQ
-Message-ID: <202311241629.yh1clHno-lkp@intel.com>
-References: <66690488f08912698301a2c203d7c562798806a2.1700737841.git.quic_jsuraj@quicinc.com>
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBA0172A;
+	Fri, 24 Nov 2023 07:28:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NKaSd8e2N0GZCcN0zGr5JkZTB6j0DuafMfnM2VlttAm6w+gd7tDR6lCCoGwk2gWBoOEVaClwdePv7CpSd2vFKtgyfEvm41n6u+yLLVW335dwdA4nMxoLpGTiKm32hUmhs8fh6BHyTcmWzdnhXxrjMCjoL6dEilkT1xeACGCMMIxGwd4JzRc9l3dzlOl2fx7HOKnI+v8+djMHsd//wxyw/1rhXYPGF4arGVHf6TiMcxePV5NjFaILX6RQfk7P2Smg9IgxLvCBHjbPr7tPns36mOqFMGm5r5Dz+4+7zwBal6NoD/u2dNWRfj2WhOSStID4Yrf0YCiokrw59hfKEbqY3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3MjmsKUvLWjDeJ6NLdD9rS34+oQrztxpGQCVdTKUxxU=;
+ b=dNukqnHJ/6Oh6Z4IsdOWkmI3cWL1Io3o/umY9uGnSDXRd+2Jkf3AB8Qqb8aB55RXqczIGRaqwePt1UYtrkCsikrMJekEVCaM5/Q3/tct8NewfL861e5OUQtF4Xxv6KQSX6pea008M5Uv9d6bzLTbZnU0EvAZVR46JtvU4FZZzeCiroMlRW9Pg1Drt5imjk8siHix38AI5dxx2gRFOTe9SZDNulsyvjsZsqosTSXvGB0a7JFOT9f5w7Zp44fUBJX6WBY6LYa0uEi/4lgmMAnWLHFwirgOnPSm4ew1X8VGhdLJSb55twZ3FiwX10k7JPxn6/UWtZlHkiZ6dPuiKOd8fQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3MjmsKUvLWjDeJ6NLdD9rS34+oQrztxpGQCVdTKUxxU=;
+ b=F7lhjyWE8IhisMDmeeIedTbF4ytqH38SLwF2qf5NygA5mNCtm/l3rNjPykKt0q2DR95eY1K/qKW2XbJUfYyhXGOmjstvBDv+Y8PM0QSrHqkhOGb6McNrlNSZ3zHpbSMv69zxqDxBCvQyF1Hl/7+2hQqRfQ2LE6bfyQ3v+dQSogPga5SMVt+2TG4nyWy/GtMwDEiqx1nrweCrt9dqW8Z+4TIJ8Hx3btL+j9vle09RTJUNSpl/KDvh5ZEUcwaSAHpraB7iSg1clCtjpceNILxafsOC8HDBdk14lrpqmBR/sHLYf9vVCSM2D2f68JrOPHI/Hhyxlnl2B3/3CW2W4uHtEA==
+Received: from MN2PR15CA0008.namprd15.prod.outlook.com (2603:10b6:208:1b4::21)
+ by SA1PR12MB8698.namprd12.prod.outlook.com (2603:10b6:806:38b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.21; Fri, 24 Nov
+ 2023 15:28:25 +0000
+Received: from BL6PEPF0001AB56.namprd02.prod.outlook.com
+ (2603:10b6:208:1b4:cafe::8d) by MN2PR15CA0008.outlook.office365.com
+ (2603:10b6:208:1b4::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26 via Frontend
+ Transport; Fri, 24 Nov 2023 15:28:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB56.mail.protection.outlook.com (10.167.241.8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7025.12 via Frontend Transport; Fri, 24 Nov 2023 15:28:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 24 Nov
+ 2023 07:28:12 -0800
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 24 Nov
+ 2023 07:28:08 -0800
+References: <20231124092736.3673263-1-liuhangbin@gmail.com>
+ <20231124092736.3673263-2-liuhangbin@gmail.com>
+ <87cyvzfagj.fsf@nvidia.com>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+CC: Hangbin Liu <liuhangbin@gmail.com>, <netdev@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Shuah Khan"
+	<shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, Po-Hsu Lin <po-hsu.lin@canonical.com>,
+	Guillaume Nault <gnault@redhat.com>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
+	<bjorn@rivosinc.com>, Ryan Roberts <ryan.roberts@arm.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>, "Luis
+ Chamberlain" <mcgrof@kernel.org>
+Subject: Re: [PATCH net-next 01/38] selftests/net: add lib.sh
+Date: Fri, 24 Nov 2023 16:25:33 +0100
+In-Reply-To: <87cyvzfagj.fsf@nvidia.com>
+Message-ID: <878r6nf9x5.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66690488f08912698301a2c203d7c562798806a2.1700737841.git.quic_jsuraj@quicinc.com>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB56:EE_|SA1PR12MB8698:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7cdf9329-a640-467d-d9f0-08dbed020010
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	w0OosCAfBhPPxjIw9onW4m+QX5v8dG4ga7MmSKEZlXS+fRvbxh8ZHZJneHyPeQeMEwzFPIWN1njFFnO/h+FAcKJ1baWYZFUfsOIUmwTAXFVZHLdI3twR4D2V0PgYSnVzssCRKJ9ZkAaSx4fIeT3hsKRRAJWRKiv3TRS9KqsnF/UbieauxZ032TUsD1gdpRoc1o7NUTk2ETEu3VdU7hYn7WLldAnY8rzS5Yhn+WkDiIH870Mg3aHemmCFi7fMSIge2mdZ1Ay3QB+w3AJnp0+QudMJehkhp7c6qVG71rt34xT25IYIZMqF2awQfCKXbUmNn9mj3nYHtzJEdVwIDFV6mCGjCqZLKlJHFFbSNdZJDI3aM/gfmQNFZhC4GMJ21p0UulxghIiqKNfbX+rBD/RIK6nrisydk5usRe7C1UYtT12f0/EqDsH/uddiaQF/AOwOS71H8r3CrtgmVegxnAr1swX+GF3VscXibqIkVENSqVKVo+MOEHb7tYDSDt30BafFALxq6VRQmdL55lHdoIRB412jCzbAFM4lsPSsa0IajQlzLnEziDkpAAcOTM8bR9opAtHEhAXq0NX3KwGYHYghB3KydpZSKWxyBcP/7pMZ6sny2aE4jz+qi68ucGjuq4O/7CxCP7rcsE0L4BceQoDZe9soylvVlrKRYOTnTinoqtVWxISmGySBESC/fWSGyP9D13DZir3akYecJ3pRn1qMRBTu06qZgqYsE7KphvqZMh1wns78NG8mbydufGepjav2
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(396003)(376002)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(82310400011)(36840700001)(40470700004)(46966006)(36756003)(41300700001)(2616005)(7636003)(356005)(47076005)(16526019)(426003)(336012)(26005)(36860700001)(40480700001)(82740400003)(40460700003)(478600001)(6200100001)(6666004)(316002)(70206006)(70586007)(54906003)(37006003)(2906002)(8936002)(8676002)(4326008)(6862004)(4744005)(86362001)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 15:28:24.8004
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cdf9329-a640-467d-d9f0-08dbed020010
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB56.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8698
 
-Hi Suraj,
 
-kernel test robot noticed the following build errors:
+Petr Machata <petrm@nvidia.com> writes:
 
-[auto build test ERROR on net-next/main]
+> Hangbin Liu <liuhangbin@gmail.com> writes:
+>
+>> +# By default, remove all netns before EXIT.
+>> +cleanup_all_ns()
+>> +{
+>> +	cleanup_ns $NS_LIST
+>> +}
+>> +trap cleanup_all_ns EXIT
+>
+> Hmm, OK, this is a showstopper for inclusion from forwarding/lib.sh,
+> because basically all users of forwarding/lib.sh use the EXIT trap.
+[...]
+> So just ignore the bit about including from forwarding/lib.sh.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Suraj-Jaiswal/dt-bindings-net-qcom-ethqos-add-binding-doc-for-fault-IRQ-for-sa8775p/20231123-202252
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/66690488f08912698301a2c203d7c562798806a2.1700737841.git.quic_jsuraj%40quicinc.com
-patch subject: [PATCH net-next v3 2/3] arm64: dts: qcom: sa8775p: enable Fault IRQ
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20231124/202311241629.yh1clHno-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231124/202311241629.yh1clHno-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311241629.yh1clHno-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> Error: arch/arm64/boot/dts/qcom/sa8775p.dtsi:2344.10-11 syntax error
-   FATAL ERROR: Unable to parse input tree
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Actually I take this back. The cleanup should be invoked from where the
+init was called. I don't think the library should be auto-invoking it,
+the client scripts should. Whether through a trap or otherwise.
 
