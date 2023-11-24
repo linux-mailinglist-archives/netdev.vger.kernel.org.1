@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-50776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520F87F7164
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:28:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA747F7166
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F2A281855
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:28:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501F71C20ED5
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2A51A58A;
-	Fri, 24 Nov 2023 10:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD9C19BD1;
+	Fri, 24 Nov 2023 10:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="F2THoBOt"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qMF8rF/j"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2082.outbound.protection.outlook.com [40.107.8.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10749110
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:28:17 -0800 (PST)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CABC41B6
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:28:19 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JU8EcIuEZV6XBvb911X3ZQMhptsF5GoC3GbC7Jz2O04JfvN/ySRop1h5rloB6Qxl/6EKuVXLhHW+tLk3YkAm31BdmoEL8U4ERzdDiK1DhDn33yM+ua1iTM9HjTO3oMlVzYFbWIAurEP0Z/HD30xT/qxJUZaXVwYuXJ6/fOhl1rniO5DhLpIpS48DQqiWM0/7EjRLt5oFX5vl1Frykm/mVb+Sg8eRvD6uW+KIu07WtiYPl+yFMnZsgdfp2Ey5e1HRsnOmHwW6hiqt4qWbifjMZ0/Oxl0PGgapfLSeiN92wQbwyp8VflimByNfKA4GxGq6mCLZAVcQMsE/YZsd0TLQyg==
+ b=T7gjoTDIUO88n88ULgZxhQpgkZYSLTxGzrnTH2EMl70BKw7rGMzlmGegqfn7GDlsgtErqZRTSL+sHrm7UV4Ceo59lQDF3W5sbjGvYLQbaIJAITMOy07iXkCxCHGM7PrcvTMOUuEAgn/lzI67YilWmXh+/dfpxbqeBrgGagk4J5GqLDvZGRdZ091mRekK/0I56+jY0rqFvttail7GSkldBhl43bezoNSAWDRCgAegIFlzqZuQxUF5LwVPFk0o8xpjz5+1S2rOYSBp6wUFLcGCPWgIIhfI8sIWjMHmMsnhyMLR2VfErctOuA62uyaniNbwLISNqLjktP36C8EgrvX2eQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yGBu4/+oHXvt+fB86WX34Efdv01pKOoP+zc6X9539U4=;
- b=APqu2crtjdF4J72RtQHFOL2SdOcHKn0Lek6VStqclJraPU6lhr7g+9F3uMgY7963F9GWfnY/Q2DJPEMNUspNqmEgflrkJWj7MZJDHjMjoyepKukF7cDM5ORIDvzgSF9n8nP6OLFSAHO9XQKCjR4Uqe2kD8icC6hbeXwXCOAE0U2jaaoyKRg3gWmaadoYfF21wiAfHI4ajH5iGML5pXHoPn8DqhllxEfsTgVU/+HZNJn5RYhS/R7g1sV1dww8p17FPcs4uchBUxK163L+udYK+qfDSDwwWavauUzfMR19T4VVKxBLpJ8FZ++aJTR58hcO9tDaECtB3J6bL+Cj71WM1A==
+ bh=PmSMA/EVv93KJfmF8lrOZLwVdQZyB5RC+o/iViiPK+A=;
+ b=L0w2A22HLp3hNIHOl6I2nE3dS+TXI2XNtXSM/7MOYDoSzR6nonpNH0AM2MDuQo1/ZfLWDHp62NbWYrYHo5woJfKSSLXQN1eURr2xGV7vktoPa5FgjRFUxbF6p4DPFJoQkKwzuCQ52z4ZJQxiiroZjpKILPmKJkOp6pSQsAQFvFGV+j8+ULIgXdXBjmW5M0qFVPhyrF0maeWHi+t5rNfnW7nOPREak+tapDk6YKjR/iuWq3d3O2xyXoimgrTK3/qesMFkhJj1tFf3NDAA85j1kjuxHPzi/UZ81SnlKi2WTaW3gwAqboahDeJJuYCggE32WKNAfOCOiEkRa4Vu93Fl6g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yGBu4/+oHXvt+fB86WX34Efdv01pKOoP+zc6X9539U4=;
- b=F2THoBOtCDkYv1gC8efStL8/IjZLBw4GbQElnZO+3d+wSxZ5O6Vs3RiLQwzyuJTOlzeYFblU3QadvpfcoxjfMUb6V1O4kfyKrcRt2YPqjgnaiRWsQu/IETMmBy2YQn87Eqi967wJO3jWU8HkNGx2SZiR2PPoJuDFx30Gl3PXPAs=
+ bh=PmSMA/EVv93KJfmF8lrOZLwVdQZyB5RC+o/iViiPK+A=;
+ b=qMF8rF/jQ4Z97umifATppXqgN1AuOpF9FNJnJ3vMBIczw0Ujax/h8S8uIGEsnOqELtHJhb0V+UxqeC2XjJ0KGSMSjr6aNXRoBJKpZH2b9cTMc90fccOvKAXCJRtfT8AVSLfl6F05DsUhwYS2du1irU/qs3L3s4aLmAQ/0xE8x/M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
  by AS5PR04MB9856.eurprd04.prod.outlook.com (2603:10a6:20b:678::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.12; Fri, 24 Nov
- 2023 10:28:15 +0000
+ 2023 10:28:17 +0000
 Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
  ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7046.012; Fri, 24 Nov 2023
- 10:28:15 +0000
+ 10:28:17 +0000
 From: Ioana Ciornei <ioana.ciornei@nxp.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -51,16 +51,16 @@ To: davem@davemloft.net,
 Cc: andrew@lunn.ch,
 	netdev@vger.kernel.org,
 	Ioana Ciornei <ioana.ciornei@nxp.com>
-Subject: [PATCH v2 net 1/2] dpaa2-eth: increase the needed headroom to account for alignment
-Date: Fri, 24 Nov 2023 12:28:04 +0200
-Message-Id: <20231124102805.587303-2-ioana.ciornei@nxp.com>
+Subject: [PATCH v2 net 2/2] dpaa2-eth: recycle the RX buffer only after all processing done
+Date: Fri, 24 Nov 2023 12:28:05 +0200
+Message-Id: <20231124102805.587303-3-ioana.ciornei@nxp.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231124102805.587303-1-ioana.ciornei@nxp.com>
 References: <20231124102805.587303-1-ioana.ciornei@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0134.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b9::8) To GV1PR04MB9070.eurprd04.prod.outlook.com
+X-ClientProxiedBy: FR4P281CA0124.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b9::16) To GV1PR04MB9070.eurprd04.prod.outlook.com
  (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,129 +70,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS5PR04MB9856:EE_
-X-MS-Office365-Filtering-Correlation-Id: bccb48b6-1168-4fe3-c0cd-08dbecd8113d
+X-MS-Office365-Filtering-Correlation-Id: 4048a154-653b-42e2-0312-08dbecd81263
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	NbfFZP6jG2evGBe5J3I0ed1gfnCjcgxZSyM1vc/4yk8eR0y25lXB+ExOPMAQEaMFwefJW1Hw4C12ddmmmxYK2kTVfxuDlAGnUkK9UBJgPVSjGVJW0EHEVPvaXsPAqNqlALMcOyObOR0uoZYCoTBYVt7UX7l8kbDFNjLh7EyOMbN+z+Iz+l71aHsu7dJZOuDIRGr+zOho4b62Il+ripRntIYWAj78jK7K7ltv4WDzjYehZXYoXaTGfyZ3Sdct8jvBwYHYoFp4ULKLf6mZAfRYNrlZ5EA5x/Vxg1H198P2QcePHrOGTvyUrO8szq2GnM3znDkmfVV/jTOym4lVgjhaPKDUHQ5oJHKHkqbvOC/u0SBZ5+0OBk/ICLXVljHan7Zfu9ZEnUer25Zmv0h17884YOw2hvYN4rBBi66Fip/WTOAHHvuzaQzGn2ys7MMH8jBvu/7IszJVW2CzTFtV1ejfhEZQJMXOcASA0KrCT2gwUizmzb1KbccaHVIQSwZFjWd0jOsuP0w7SG4BewS8Rx9v86ALkaCg+fSVbvtRQDo40Fg=
+	8NpJ0i0WlJsm/qkijIcYdcgvQBWMKfD7EJF30xJML+m0a3wjU/iZAr1ekM2L+bc+mstw09JW9Iy+b9SwA8sAMU1tDFRj3gbQZPtsjOfSEdnjp5mphznS9OaT7WBy38w2qEh0QmWF9vJAlBgoiD/vtGJa4htsSvQneui+6a47d3G+1XsyrqvgNcJVbpaYZf1L3LCJw5CbrclSJ6M9/eHBRg4pI6t8Ur0Gn6oH6HBYnT6BeuvNW5cf8cujFittqzqGj269mALPoy0WZyEKbUa/YYmpGz9mRbbAHI015ndXio+lLxmfKgxB0tEEMfA39LCjjWHkuVm5yPtSMwcHD+y571d9cTr0q6xNE73R0D64BMEQ8paKEqtJ0w0HtdnepdoFbZbAI2CAooKZIGe4usQckBHXWlJ9i0gEpb5ve7Ch7r0iqYUA8vThnqhO18ddk4g/E0bY2bSq3W48xIaFD9Z6eSNByEznrlRGWGSjnOPJsSjDZotqXMMNMOGnQMRGYIhZ/BSAjBqITcJk629T6GHIHdWqZiQqqiZXSI8AGX0Nhr8mwwCG5JCVETAdP0QACAc/
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(136003)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(66556008)(316002)(5660300002)(66476007)(8676002)(15650500001)(44832011)(8936002)(4326008)(2616005)(966005)(1076003)(26005)(2906002)(478600001)(6486002)(6666004)(6506007)(83380400001)(66946007)(41300700001)(6512007)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(136003)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(66556008)(316002)(5660300002)(66476007)(8676002)(44832011)(8936002)(4326008)(2616005)(1076003)(26005)(2906002)(478600001)(6486002)(6666004)(6506007)(83380400001)(66946007)(41300700001)(6512007)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?teHJJlbJ9r2EUGGMk6jsiN3RoQ7C3NSt4E1iB9AHpIiUjaIJky4Hrr4QC945?=
- =?us-ascii?Q?qAahfWsBLdqNN9DeBRXEOwikcrng6RcncYlSE3UC1iW1t78Ro3jnilv9/eLA?=
- =?us-ascii?Q?17m8yVDz+OGu92/kJvmJSHuCQ3G4yuQkDX9VDGfMrf87lPtq14KQw2Lb34tM?=
- =?us-ascii?Q?k2Pk+gsH3bidIh+OQq7ZljJ2VWQrbxSj3HuVO7Z4oTtRdUC3L62NJy0evZvy?=
- =?us-ascii?Q?+5eyJriCyOlWJlz3WtK8Pun7a1xLW2ce+du3G3HN7nDGBF/+OuR1jSoR9XfD?=
- =?us-ascii?Q?BYJrmxZb+voGc10eIHejBx4aNUTtBsvGlCtsiGF/nKB9tzpKHElLTq/zQ63d?=
- =?us-ascii?Q?0bs7Um5iL4QR6A7vTqMMfojTwxtXL4Og/bKXoctxLTBmXjtPV09F7mnTgrKw?=
- =?us-ascii?Q?ZLPheDUFTZqdEVJNkdI0zo8+wYXkWrW1KYJ+MTvhuKX0iHDk8jabNZ+2XNXY?=
- =?us-ascii?Q?Tx3dYwwk/lwkTKhMr+3BBKs8I5GVH1nmdW86NQ/UU03j7CLrGN6wPhIMqMUQ?=
- =?us-ascii?Q?7bzgE/XGdIiWZLkIaqaKcK+GcGHJNKwfZIFMbAJGrov0w694XEjh5VcH5gpp?=
- =?us-ascii?Q?qD3BDB12d1wCLoLu3xqtgn0r40DAQ6M8qdHEWOKVGsnK/dC+Tz8hhJV/Xx2q?=
- =?us-ascii?Q?lt6+U8w4Mc0027jpPsM33+GWb08pvRRrnXgS3Db/XVLeR7jv29J4CrEI/Jzw?=
- =?us-ascii?Q?NGHzx9pTvoPhIvOOG9XlZSfgf/auhsJig/+VBco8gzQxl9oWixP6QAlGWRyE?=
- =?us-ascii?Q?looYjHutiwGKEnzP3ZeOP3CZS+q6O17rH5h6517XOy5jlSFmwOByJV57QatX?=
- =?us-ascii?Q?Vt+8r1Npf+OvyE0HNvtLl++XCahlHm2qGiRv7sKVLDFyYgosKlElZf/7u+8A?=
- =?us-ascii?Q?QOPfxWGKiiPu1g+Px/PSwuRO8oNVPx7QT18QCY3Wp18tTGBWmIZdfq2yJHPA?=
- =?us-ascii?Q?xp7XtgzBRUDtBe8NGGBwwUNObxvmgQZPDqbhG/uEVNpIqnrzH2F8I9ske8se?=
- =?us-ascii?Q?K5Kx2b6wwo4pIiiu8psCcgM/+Hkw0NcMc8cmybGND6EYMBk6WeN5AeoieSeu?=
- =?us-ascii?Q?gauJVAxzWbjkCCnqmcf4BNl8xj7kvdO3B3ByZVvJjZlJtsekNDy6g+RivJPG?=
- =?us-ascii?Q?RtT71IVGonwKW369By04J/KdQQyrB2GFLnbHm2M727KfgEwAES0yl76wlOTw?=
- =?us-ascii?Q?c0Hqj+cU7Z8zQ80VcxtX9N8VoPMj7dpn6msd6ly8/PUsQ9sAL/r2h84QyiyY?=
- =?us-ascii?Q?u0bPxkRBqnzrsglxeOUURTyAysDWH97gP2NKMpzO+kQIJgWKIAkgpH8O5Z5+?=
- =?us-ascii?Q?SkLpd+/69CcEugXPc2Pt4r+pVG2KqUH/tcLSzgYMq/IC1LxAUCT9OcnrgOcF?=
- =?us-ascii?Q?Q1Bp+Z8Oi3MFJ4YX81pXukzWPfDSGPf5uxnXnI7dXetY1lbJf/v+MVt5Pjo7?=
- =?us-ascii?Q?Cdd4Tx7SH6NUXthO62bkZhCLXll4u1YOGwp14LauIJudv/lL91jyZEFykvty?=
- =?us-ascii?Q?WbO4DGBM8xdt5Fp+1pABmwZJSaYVhI0foDJCcHgTD2UfVBdEzahlaD+4kGl4?=
- =?us-ascii?Q?jq3gC7Yxkj1hfzQrmOg9KOPKcw68HZa4KHoccwkZ?=
+	=?us-ascii?Q?+yoitIHTRV04lscdPn8s3GfddCPdf2mSvQtG4lz/OdmvQehd0F7IB3pT6WzE?=
+ =?us-ascii?Q?GsAPm8Sx/ZqUYPCOxT35DsuiMKASpRAE8znF3keu1fgC6Bd8otd1LqiWUYn+?=
+ =?us-ascii?Q?TzcHjeXLsqUXNtlkT8C3QQuHXyn1qhL+U0ZXe3yb9AplljVBHfTkaxSyBEP6?=
+ =?us-ascii?Q?u+fAwRl0BsqqqMilOJCAHB1LwyqEz2YoAlqpyWNhUvtjj+wZgRKy732P8sVW?=
+ =?us-ascii?Q?8vYGH3dXn8ehYMCqXpQFskZxDVTNaXZsNidLNfjWW+Rq8c4BBLe8kKT0KZVG?=
+ =?us-ascii?Q?49DRnJVgGUK6Da5pCa4Z/zCWqGWa3tocL2bs7MbLG0hK25dEMXrRwj/dU9bR?=
+ =?us-ascii?Q?oI2oxePHkkwLU0OlO2Bue5/tnuA5EZm4KLzwBRfEv0SxcWHo95J7Irl0Dyrc?=
+ =?us-ascii?Q?P1o9tSVe/gnbLcQdYzBUtHf7675k2/w1f7g6cfaFA/i5DnYh1ZpCjpk3SCit?=
+ =?us-ascii?Q?jesocdJqCvi0XIXPzpULT2octKKMaoNNnAEerpd55noecXGormgYS7m3SKGE?=
+ =?us-ascii?Q?hNBPl2qR+MsyKZoHRNdPC2lTcGi8igQcPNforILQYE/734O2IBdrnGfT0FRc?=
+ =?us-ascii?Q?6KPYmSlVTy5wbrPIif0b8LhkZ6dAvi9NfZTprDbn3QcIs7xpcAgx24JlXHdC?=
+ =?us-ascii?Q?5YmfA8PLSeGw7oLpJdmWm8TtCaRtA155NIS2MNNmFBPpR3MF/3g2W6G/FiFp?=
+ =?us-ascii?Q?/idsFCb0otjBDx029q+RZ2UC5+2UA8u5ndCyCvDiBHdGF/+MJQkoTmbyHiw5?=
+ =?us-ascii?Q?YIxWK0NosIh8SBULtTHkCAduvMWlXTyUvs56hlsuH2SIXCrht7T7rrL+3VU2?=
+ =?us-ascii?Q?sW+WSNgYWxlvs4xyr4f8J1ztHMOdsQUoJ4wAwiPx+TQDHAd1PQXL/UulhfrB?=
+ =?us-ascii?Q?h/DxDfzSMbqaHl72MNO9tcjn5GgFbGCwBzkswD8MUR7iSpi/A0c4Us1jY9Lq?=
+ =?us-ascii?Q?eHzOVyIac7/1okzUOUGd0bHVnl+DdAxM6qnf9On5u6r0wqxKFEph1lezkE7+?=
+ =?us-ascii?Q?k6sOHuAUOaXQm+VpuTFruptmi8pnFxg0ed9W1AFLq2OG82Lwlo6cUdbvMMGZ?=
+ =?us-ascii?Q?uGoq1lilPhTXm2UA/De7Kf+m0wCEqHyt81G5hn6ceLcnE6hwF2PlGBlylIgF?=
+ =?us-ascii?Q?fMRkt7s6ETO71Lb/B17fQp6EfopicvD1U7KZ1iUq1kc1SAk9bq9uLd87FpQW?=
+ =?us-ascii?Q?PAdu5VQcM4Hz+/NcGR4QjCTGRZdVhFcXfkDV5Cm1LEzkVRPFH7U94tRQr4aX?=
+ =?us-ascii?Q?NRk+OfToov9ftwxDq+1RcK6nnNK9ImuwM112QjaPwdVFqdQviAEi61ADATOX?=
+ =?us-ascii?Q?UimmMo/v0MMXpkEZf24K69MAS3HrXlKB6xP9qMhcqpE7RYYH8j0Jm2U98PET?=
+ =?us-ascii?Q?sxZkRd35aDMZA3tQiI47TsbVk8J7XcKB/s7BSoJfHlS784/E89hHRV0KRaLG?=
+ =?us-ascii?Q?/ktykOB4u49rHi6bA+rp20RSZwjS/VfrhV6293aCCPtxKpIgJS/+z6ArNeNy?=
+ =?us-ascii?Q?RQEC6sthfC4+zWLYEQo5KYNC+iszi5QXD6NDonGk8bB7beDuJiBLZslWmAkF?=
+ =?us-ascii?Q?0OP7zlUtlr31X4u9oap8+WV6W1gO6kiXcC9jCQCE?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bccb48b6-1168-4fe3-c0cd-08dbecd8113d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4048a154-653b-42e2-0312-08dbecd81263
 X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 10:28:15.1179
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 10:28:17.0111
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wP92I9Z8JaG9NgcNzQWWH6eJI4i8iTMLmIDflDx/0nezTGbGMXSm/Eimz8gLMoUUjKQiUkoNxvf0WbgPKyuRqg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: cyEQs/fDpOkWozJ5ziImbtk72A6ExE+A8Hq1CYWsomGvIcAsbbdXgHT8x+/zq3txcJ9NC+WiDLh1+lbb7qVqrw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9856
 
-Increase the needed headroom to account for a 64 byte alignment
-restriction which, with this patch, we make mandatory on the Tx path.
-The case in which the amount of headroom needed is not available is
-already handled by the driver which instead sends a S/G frame with the
-first buffer only holding the SW and HW annotation areas.
+The blamed commit added support for Rx copybreak. This meant that for
+certain frame sizes, a new skb was allocated and the initial data buffer
+was recycled. Instead of waiting to recycle the Rx buffer only after all
+processing was done on it (like accessing the parse results or timestamp
+information), the code path just went ahead and re-used the buffer right
+away.
 
-Without this patch, we can empirically see data corruption happening
-between Tx and Tx confirmation which sometimes leads to the SW
-annotation area being overwritten.
+This sometimes lead to corrupted HW and SW annotation areas.
+Fix this by delaying the moment when the buffer is recycled.
 
-Since this is an old IP where the hardware team cannot help to
-understand the underlying behavior, we make the Tx alignment mandatory
-for all frames to avoid the crash on Tx conf. Also, remove the comment
-that suggested that this is just an optimization.
-
-This patch also sets the needed_headroom net device field to the usual
-value that the driver would need on the Tx path:
-	- 64 bytes for the software annotation area
-	- 64 bytes to account for a 64 byte aligned buffer address
-
-Fixes: 6e2387e8f19e ("staging: fsl-dpaa2/eth: Add Freescale DPAA2 Ethernet driver")
-Closes: https://lore.kernel.org/netdev/aa784d0c-85eb-4e5d-968b-c8f74fa86be6@gin.de/
+Fixes: 50f826999a80 ("dpaa2-eth: add rx copybreak support")
 Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
 Changes in v2:
-- squashed patches #1 and #2
+- none
 
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 8 ++++----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index 15bab41cee48..774377db0b4b 100644
+index 774377db0b4b..888509cf1f21 100644
 --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
 +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -1073,14 +1073,12 @@ static int dpaa2_eth_build_single_fd(struct dpaa2_eth_priv *priv,
- 	dma_addr_t addr;
+@@ -516,8 +516,6 @@ struct sk_buff *dpaa2_eth_alloc_skb(struct dpaa2_eth_priv *priv,
  
- 	buffer_start = skb->data - dpaa2_eth_needed_headroom(skb);
+ 	memcpy(skb->data, fd_vaddr + fd_offset, fd_length);
+ 
+-	dpaa2_eth_recycle_buf(priv, ch, dpaa2_fd_get_addr(fd));
 -
--	/* If there's enough room to align the FD address, do it.
--	 * It will help hardware optimize accesses.
--	 */
- 	aligned_start = PTR_ALIGN(buffer_start - DPAA2_ETH_TX_BUF_ALIGN,
- 				  DPAA2_ETH_TX_BUF_ALIGN);
- 	if (aligned_start >= skb->head)
- 		buffer_start = aligned_start;
-+	else
-+		return -ENOMEM;
+ 	return skb;
+ }
  
- 	/* Store a backpointer to the skb at the beginning of the buffer
- 	 * (in the private data area) such that we can release it
-@@ -4967,6 +4965,8 @@ static int dpaa2_eth_probe(struct fsl_mc_device *dpni_dev)
- 	if (err)
- 		goto err_dl_port_add;
+@@ -589,6 +587,7 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
+ 	struct rtnl_link_stats64 *percpu_stats;
+ 	struct dpaa2_eth_drv_stats *percpu_extras;
+ 	struct device *dev = priv->net_dev->dev.parent;
++	bool recycle_rx_buf = false;
+ 	void *buf_data;
+ 	u32 xdp_act;
  
-+	net_dev->needed_headroom = DPAA2_ETH_SWA_SIZE + DPAA2_ETH_TX_BUF_ALIGN;
+@@ -618,6 +617,8 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
+ 			dma_unmap_page(dev, addr, priv->rx_buf_size,
+ 				       DMA_BIDIRECTIONAL);
+ 			skb = dpaa2_eth_build_linear_skb(ch, fd, vaddr);
++		} else {
++			recycle_rx_buf = true;
+ 		}
+ 	} else if (fd_format == dpaa2_fd_sg) {
+ 		WARN_ON(priv->xdp_prog);
+@@ -637,6 +638,9 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
+ 		goto err_build_skb;
+ 
+ 	dpaa2_eth_receive_skb(priv, ch, fd, vaddr, fq, percpu_stats, skb);
 +
- 	err = register_netdev(net_dev);
- 	if (err < 0) {
- 		dev_err(dev, "register_netdev() failed\n");
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h
-index bfb6c96c3b2f..834cba8c3a41 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h
-@@ -740,7 +740,7 @@ static inline bool dpaa2_eth_rx_pause_enabled(u64 link_options)
++	if (recycle_rx_buf)
++		dpaa2_eth_recycle_buf(priv, ch, dpaa2_fd_get_addr(fd));
+ 	return;
  
- static inline unsigned int dpaa2_eth_needed_headroom(struct sk_buff *skb)
- {
--	unsigned int headroom = DPAA2_ETH_SWA_SIZE;
-+	unsigned int headroom = DPAA2_ETH_SWA_SIZE + DPAA2_ETH_TX_BUF_ALIGN;
- 
- 	/* If we don't have an skb (e.g. XDP buffer), we only need space for
- 	 * the software annotation area
+ err_build_skb:
 -- 
 2.25.1
 
