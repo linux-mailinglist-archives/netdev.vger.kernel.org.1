@@ -1,136 +1,156 @@
-Return-Path: <netdev+bounces-50892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BEA7F77CA
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:28:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E70697F77CE
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:29:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8ADDB21716
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:28:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77085B211E0
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC7B2E858;
-	Fri, 24 Nov 2023 15:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8692EAED;
+	Fri, 24 Nov 2023 15:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F7lhjyWE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="DEI9u1RI"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBA0172A;
-	Fri, 24 Nov 2023 07:28:28 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NKaSd8e2N0GZCcN0zGr5JkZTB6j0DuafMfnM2VlttAm6w+gd7tDR6lCCoGwk2gWBoOEVaClwdePv7CpSd2vFKtgyfEvm41n6u+yLLVW335dwdA4nMxoLpGTiKm32hUmhs8fh6BHyTcmWzdnhXxrjMCjoL6dEilkT1xeACGCMMIxGwd4JzRc9l3dzlOl2fx7HOKnI+v8+djMHsd//wxyw/1rhXYPGF4arGVHf6TiMcxePV5NjFaILX6RQfk7P2Smg9IgxLvCBHjbPr7tPns36mOqFMGm5r5Dz+4+7zwBal6NoD/u2dNWRfj2WhOSStID4Yrf0YCiokrw59hfKEbqY3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3MjmsKUvLWjDeJ6NLdD9rS34+oQrztxpGQCVdTKUxxU=;
- b=dNukqnHJ/6Oh6Z4IsdOWkmI3cWL1Io3o/umY9uGnSDXRd+2Jkf3AB8Qqb8aB55RXqczIGRaqwePt1UYtrkCsikrMJekEVCaM5/Q3/tct8NewfL861e5OUQtF4Xxv6KQSX6pea008M5Uv9d6bzLTbZnU0EvAZVR46JtvU4FZZzeCiroMlRW9Pg1Drt5imjk8siHix38AI5dxx2gRFOTe9SZDNulsyvjsZsqosTSXvGB0a7JFOT9f5w7Zp44fUBJX6WBY6LYa0uEi/4lgmMAnWLHFwirgOnPSm4ew1X8VGhdLJSb55twZ3FiwX10k7JPxn6/UWtZlHkiZ6dPuiKOd8fQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3MjmsKUvLWjDeJ6NLdD9rS34+oQrztxpGQCVdTKUxxU=;
- b=F7lhjyWE8IhisMDmeeIedTbF4ytqH38SLwF2qf5NygA5mNCtm/l3rNjPykKt0q2DR95eY1K/qKW2XbJUfYyhXGOmjstvBDv+Y8PM0QSrHqkhOGb6McNrlNSZ3zHpbSMv69zxqDxBCvQyF1Hl/7+2hQqRfQ2LE6bfyQ3v+dQSogPga5SMVt+2TG4nyWy/GtMwDEiqx1nrweCrt9dqW8Z+4TIJ8Hx3btL+j9vle09RTJUNSpl/KDvh5ZEUcwaSAHpraB7iSg1clCtjpceNILxafsOC8HDBdk14lrpqmBR/sHLYf9vVCSM2D2f68JrOPHI/Hhyxlnl2B3/3CW2W4uHtEA==
-Received: from MN2PR15CA0008.namprd15.prod.outlook.com (2603:10b6:208:1b4::21)
- by SA1PR12MB8698.namprd12.prod.outlook.com (2603:10b6:806:38b::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.21; Fri, 24 Nov
- 2023 15:28:25 +0000
-Received: from BL6PEPF0001AB56.namprd02.prod.outlook.com
- (2603:10b6:208:1b4:cafe::8d) by MN2PR15CA0008.outlook.office365.com
- (2603:10b6:208:1b4::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26 via Frontend
- Transport; Fri, 24 Nov 2023 15:28:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB56.mail.protection.outlook.com (10.167.241.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7025.12 via Frontend Transport; Fri, 24 Nov 2023 15:28:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 24 Nov
- 2023 07:28:12 -0800
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 24 Nov
- 2023 07:28:08 -0800
-References: <20231124092736.3673263-1-liuhangbin@gmail.com>
- <20231124092736.3673263-2-liuhangbin@gmail.com>
- <87cyvzfagj.fsf@nvidia.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-CC: Hangbin Liu <liuhangbin@gmail.com>, <netdev@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Shuah Khan"
-	<shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
-	<linux-kselftest@vger.kernel.org>, Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Guillaume Nault <gnault@redhat.com>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
-	<bjorn@rivosinc.com>, Ryan Roberts <ryan.roberts@arm.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>, "Luis
- Chamberlain" <mcgrof@kernel.org>
-Subject: Re: [PATCH net-next 01/38] selftests/net: add lib.sh
-Date: Fri, 24 Nov 2023 16:25:33 +0100
-In-Reply-To: <87cyvzfagj.fsf@nvidia.com>
-Message-ID: <878r6nf9x5.fsf@nvidia.com>
+Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEE01727
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 07:29:04 -0800 (PST)
+Received: from eig-obgw-6009a.ext.cloudfilter.net ([10.0.30.184])
+	by cmsmtp with ESMTPS
+	id 6Jc8riILUjtZ36Y7Br6Xht; Fri, 24 Nov 2023 15:29:09 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 6Y74rMPx1BOcc6Y74rIx4C; Fri, 24 Nov 2023 15:29:02 +0000
+X-Authority-Analysis: v=2.4 cv=J+25USrS c=1 sm=1 tr=0 ts=6560c13e
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=yGeM7+xMb5a5VK1DGQx1ew==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=BNY50KLci1gA:10 a=wYkD_t78qR0A:10
+ a=YArfMqtJ7KKBon4Yl2AA:9 a=QEXdDO2ut3YA:10
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=TaoInkAh2k51qqNVjJ8mEGKxHgoSLe6W4K886QPYJ9c=; b=DEI9u1RIERU3SpLf+ZKYclwtwE
+	a1B0c2iDk+Z/PnhZd6ICkvDKvjlyXeDArogw/v50ewvDHwZ4me8RpTaA8r6irG3QTExxr5W3hpgeN
+	jyDQy3iUpa7LhDf88HzzWQPn0joJpMcn38HgkplPElVqQTmDEJ7y+p94hYYMY+jlx4u2Cm5wuKtB5
+	pttWre2tXuCjGKR9yWFYq1XLpSy8xu3Ke/Yvc6l9sMqeYe+qtz1Sr76EWBTeMG2Atj8BRXrSMs898
+	M4by6TxN4WIjHd2cweARSaMPrc4Cku7ZG8018Tfv4Mf1uQlw8iGfwIK+A5ZSrzoiqnXmVdm8NuGMP
+	g3bNJkcQ==;
+Received: from 187.184.157.122.cable.dyn.cableonline.com.mx ([187.184.157.122]:29540 helo=[192.168.0.25])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1r6Y73-000sai-2D;
+	Fri, 24 Nov 2023 09:29:01 -0600
+Message-ID: <7086f60f-9f74-4118-a10c-d98b9c6cc8eb@embeddedor.com>
+Date: Fri, 24 Nov 2023 09:28:48 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB56:EE_|SA1PR12MB8698:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7cdf9329-a640-467d-d9f0-08dbed020010
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	w0OosCAfBhPPxjIw9onW4m+QX5v8dG4ga7MmSKEZlXS+fRvbxh8ZHZJneHyPeQeMEwzFPIWN1njFFnO/h+FAcKJ1baWYZFUfsOIUmwTAXFVZHLdI3twR4D2V0PgYSnVzssCRKJ9ZkAaSx4fIeT3hsKRRAJWRKiv3TRS9KqsnF/UbieauxZ032TUsD1gdpRoc1o7NUTk2ETEu3VdU7hYn7WLldAnY8rzS5Yhn+WkDiIH870Mg3aHemmCFi7fMSIge2mdZ1Ay3QB+w3AJnp0+QudMJehkhp7c6qVG71rt34xT25IYIZMqF2awQfCKXbUmNn9mj3nYHtzJEdVwIDFV6mCGjCqZLKlJHFFbSNdZJDI3aM/gfmQNFZhC4GMJ21p0UulxghIiqKNfbX+rBD/RIK6nrisydk5usRe7C1UYtT12f0/EqDsH/uddiaQF/AOwOS71H8r3CrtgmVegxnAr1swX+GF3VscXibqIkVENSqVKVo+MOEHb7tYDSDt30BafFALxq6VRQmdL55lHdoIRB412jCzbAFM4lsPSsa0IajQlzLnEziDkpAAcOTM8bR9opAtHEhAXq0NX3KwGYHYghB3KydpZSKWxyBcP/7pMZ6sny2aE4jz+qi68ucGjuq4O/7CxCP7rcsE0L4BceQoDZe9soylvVlrKRYOTnTinoqtVWxISmGySBESC/fWSGyP9D13DZir3akYecJ3pRn1qMRBTu06qZgqYsE7KphvqZMh1wns78NG8mbydufGepjav2
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(396003)(376002)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(82310400011)(36840700001)(40470700004)(46966006)(36756003)(41300700001)(2616005)(7636003)(356005)(47076005)(16526019)(426003)(336012)(26005)(36860700001)(40480700001)(82740400003)(40460700003)(478600001)(6200100001)(6666004)(316002)(70206006)(70586007)(54906003)(37006003)(2906002)(8936002)(8676002)(4326008)(6862004)(4744005)(86362001)(7416002)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 15:28:24.8004
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7cdf9329-a640-467d-d9f0-08dbed020010
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB56.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8698
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] Boot crash on v6.7-rc2
+To: Joey Gouly <joey.gouly@arm.com>, linux-hardening@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ Kees Cook <keescook@chromium.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+References: <20231124102458.GB1503258@e124191.cambridge.arm.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20231124102458.GB1503258@e124191.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 187.184.157.122
+X-Source-L: No
+X-Exim-ID: 1r6Y73-000sai-2D
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 187.184.157.122.cable.dyn.cableonline.com.mx ([192.168.0.25]) [187.184.157.122]:29540
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 8
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfC9e6YpICZMBS7tmDkNXq/MQpr0NP/OoV13+HkOQtoAkLnU8RFWe15VShe2IjO1/CvQcjl7KQeVGv6PpPWRQzsUXvmFNHwFAXiiPqKP/fr+ecfnF4p+b
+ Sb1h2hFBBQAW/5awpVg18FE4SpCUUQdcz14pckfeyTpGw5gxBueF2GLkIsSkguFemlNxvD3azqkIPJl6qerzYuMeCzhNFq3GiTY=
+X-Spam-Level: *
 
 
-Petr Machata <petrm@nvidia.com> writes:
 
-> Hangbin Liu <liuhangbin@gmail.com> writes:
->
->> +# By default, remove all netns before EXIT.
->> +cleanup_all_ns()
->> +{
->> +	cleanup_ns $NS_LIST
->> +}
->> +trap cleanup_all_ns EXIT
->
-> Hmm, OK, this is a showstopper for inclusion from forwarding/lib.sh,
-> because basically all users of forwarding/lib.sh use the EXIT trap.
-[...]
-> So just ignore the bit about including from forwarding/lib.sh.
+On 11/24/23 04:24, Joey Gouly wrote:
+> Hi all,
+> 
+> I just hit a boot crash on v6.7-rc2 (arm64, FVP model):
 
-Actually I take this back. The cleanup should be invoked from where the
-init was called. I don't think the library should be auto-invoking it,
-the client scripts should. Whether through a trap or otherwise.
+[..]
+
+> Checking `struct neighbour`:
+> 
+> 	struct neighbour {
+> 		struct neighbour __rcu	*next;
+> 		struct neigh_table	*tbl;
+> 	.. fields ..
+> 		u8			primary_key[0];
+> 	} __randomize_layout;
+> 
+> Due to the `__randomize_layout`, `primary_key` field is being placed before `tbl` (actually it's the same address since it's a 0 length array). That means the memcpy() corrupts the tbl pointer.
+> 
+> I think I just got unlucky with my CONFIG_RANDSTRUCT seed (I can provide it if needed), it doesn't look as if it's a new issue.
+
+It seems the issue is caused by this change that was recently added to -rc2:
+
+commit 1ee60356c2dc ("gcc-plugins: randstruct: Only warn about true flexible arrays")
+
+Previously, one-element and zero-length arrays were treated as true flexible arrays
+(however, they are "fake" flex arrays), and __randomize_layout would leave them
+untouched at the end of the struct; the same for proper C99 flex-array members. But
+after the commit above, that's no longer the case: Only C99 flex-array members will
+behave correctly (remaining untouched at end of the struct), and the other two types
+of arrays will be randomized.
+
+> 
+> I couldn't reproduce directly on v6.6 (the offsets for `tbl` and `primary_key` didn't overlap).
+> However I tried changing the zero-length-array to a flexible one:
+> 
+> 	+	DECLARE_FLEX_ARRAY(u8, primary_key);
+> 	+	u8		primary_key[0];
+> 
+> Then the field offsets ended up overlapping, and I also got the same crash on v6.6.
+
+The right approach is to transform the zero-length array into a C99 flex-array member,
+like this:
+
+diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+index 07022bb0d44d..0d28172193fa 100644
+--- a/include/net/neighbour.h
++++ b/include/net/neighbour.h
+@@ -162,7 +162,7 @@ struct neighbour {
+         struct rcu_head         rcu;
+         struct net_device       *dev;
+         netdevice_tracker       dev_tracker;
+-       u8                      primary_key[0];
++       u8                      primary_key[];
+  } __randomize_layout;
+
+  struct neigh_ops {
+
+--
+Gustavo
 
