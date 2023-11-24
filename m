@@ -1,119 +1,116 @@
-Return-Path: <netdev+bounces-50692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1987F6B97
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:09:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE7D77F6B9A
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920C81C209BA
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:09:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACA4BB20C5B
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2AD23D9;
-	Fri, 24 Nov 2023 05:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C777AA55;
+	Fri, 24 Nov 2023 05:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PL2QT++9"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Zb4XlSxH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEAFD71;
-	Thu, 23 Nov 2023 21:09:08 -0800 (PST)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO4Ha0q013621;
-	Fri, 24 Nov 2023 05:08:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id; s=qcppdkim1;
- bh=izkBQImg/TjzbwWFvoo0zSUxS/DMKyakfBpX5vZNJZY=;
- b=PL2QT++9iBWr/zas7GtBMaI6RaJsAH7ixLByYMkdZPcjhcQL/Df6sdg5pUQJgI6Pi1Cz
- u8xlh6OXwyOkNLHfef/oWKjFoGbywdFlccoT0MBS2RDYwaAr1REyJvP6+y5Dnzaj8hhi
- Gl6INKa6CZuZO+BlCfmONwhuKXTBXB1RCcCIXl8D5x+WVoI2A0Qqgo59jGOME/v1XDPk
- 3XMyPQtHy6GChurvqX4GCfTzbfOeuCKn2P9PPpVtSfmtGDtY8oWU5mu4uCMZV9sLf7AD
- cR/3OTP0cVl3GiTlwtP90kJteNRBdsrWLYuqdYircZom9NlfnCaSdubip3J6LHm3yXmz Fw== 
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhwmearxq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 05:08:34 +0000
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3AO58U1W008057;
-	Fri, 24 Nov 2023 05:08:30 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3uepbkmrdf-1;
-	Fri, 24 Nov 2023 05:08:30 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AO58T5O008052;
-	Fri, 24 Nov 2023 05:08:30 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3AO58Tke008050;
-	Fri, 24 Nov 2023 05:08:29 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id E29925299C4; Fri, 24 Nov 2023 10:38:28 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-        Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH net] net: stmmac: update Rx clk divider for 10M SGMII
-Date: Fri, 24 Nov 2023 10:38:18 +0530
-Message-Id: <20231124050818.1221-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YJ2KeQV5hKZDAsVYZTG0luH-FmCxpuMW
-X-Proofpoint-ORIG-GUID: YJ2KeQV5hKZDAsVYZTG0luH-FmCxpuMW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
- priorityscore=1501 malwarescore=0 mlxlogscore=701 lowpriorityscore=0
- impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311240038
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B26D6E;
+	Thu, 23 Nov 2023 21:09:32 -0800 (PST)
+Received: from [192.168.1.107] (89-186-112-232.pool.digikabel.hu [89.186.112.232])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: hs@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 6617886335;
+	Fri, 24 Nov 2023 06:09:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1700802571;
+	bh=4YBefhqNpH7LZt/7V9zhmWY+xwqF9GTyIUhDbvPuqbk=;
+	h=Reply-To:Subject:To:Cc:References:From:Date:In-Reply-To:From;
+	b=Zb4XlSxHe9J/+9bpf8klpiyoLLd/KnB7G4J9uwuxojT1NZVlp/iR6UpHcc6MnbpYC
+	 rgyYQsps+RbDVAtKX6DJk4qnqsXhvXK0TqO7OYC6yVN2uKaluxy0+N55T8V3iFuaYz
+	 OHLJkAOi++W5w6N2oxVqMLQE/tSbzyoEsD9MroFXn/1T53T6kn5z73cmvUdiM5gBGl
+	 qctEQrTS4Fs4w5G/66yobUrIEzOM4Pi7usYxwSKDGPuyqqzeJs1RFP0gbMUsmc+lZz
+	 TCtYVpaQ2BaHxpd8dU6Qw9ljLAShh8JsBdHMNfPPHl48SroRrukThvsaZsCWVCdHke
+	 oracUzCILJ5Mw==
+Reply-To: hs@denx.de
+Subject: Re: [PATCH] net: fec: fix probing of fec1 when fec0 is not probed yet
+To: Andrew Lunn <andrew@lunn.ch>, Heiko Schocher <heiko.schocher@gmail.com>
+Cc: netdev@vger.kernel.org, Clark Wang <xiaoning.wang@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
+ Paolo Abeni <pabeni@redhat.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Wei Fang <wei.fang@nxp.com>, linux-kernel@vger.kernel.org
+References: <20231123132744.62519-1-hs@denx.de>
+ <132aca53-6570-41a4-b2b2-0907d74f9b31@lunn.ch>
+From: Heiko Schocher <hs@denx.de>
+Message-ID: <307682f4-b691-7198-ba96-454b973bd555@denx.de>
+Date: Fri, 24 Nov 2023 06:09:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <132aca53-6570-41a4-b2b2-0907d74f9b31@lunn.ch>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-SGMII 10MBPS mode needs RX clock divider to avoid drops in Rx.
-Update configure SGMII function with rx clk divider programming.
+Hello Andrew,
 
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 +++
- 1 file changed, 3 insertions(+)
+On 23.11.23 21:09, Andrew Lunn wrote:
+> On Thu, Nov 23, 2023 at 02:27:43PM +0100, Heiko Schocher wrote:
+>> it is possible that fec1 is probed before fec0. On SoCs
+>> with FEC_QUIRK_SINGLE_MDIO set (which means fec1 uses mii
+>> from fec0) init of mii fails for fec1 when fec0 is not yet
+>> probed, as fec0 setups mii bus. In this case fec_enet_mii_init
+>> for fec1 returns with -ENODEV, and so fec1 never comes up.
+>>
+>> Return here with -EPROBE_DEFER so interface gets later
+>> probed again.
+>>
+>> Found this on imx8qxp based board, using 2 ethernet interfaces,
+>> and from time to time, fec1 interface came not up.
+>>
+>> Signed-off-by: Heiko Schocher <hs@denx.de>
+>> ---
+>>
+>>  drivers/net/ethernet/freescale/fec_main.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+>> index c3b7694a7485..d956f95e7a65 100644
+>> --- a/drivers/net/ethernet/freescale/fec_main.c
+>> +++ b/drivers/net/ethernet/freescale/fec_main.c
+>> @@ -2445,7 +2445,7 @@ static int fec_enet_mii_init(struct platform_device *pdev)
+>>  			mii_cnt++;
+>>  			return 0;
+>>  		}
+>> -		return -ENOENT;
+>> +		return -EPROBE_DEFER;
+> 
+> I think this has been tried before.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d3bf42d0fceb..f8c42e91a624 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -34,6 +34,7 @@
- #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
- #define RGMII_CONFIG_PROG_SWAP			BIT(1)
- #define RGMII_CONFIG_DDR_MODE			BIT(0)
-+#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
- 
- /* SDCC_HC_REG_DLL_CONFIG fields */
- #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
-@@ -617,6 +618,8 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- 	case SPEED_10:
- 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
- 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-+		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR, BIT(10) |
-+			      GENMASK(15, 14), RGMII_IO_MACRO_CONFIG);
- 		break;
- 	}
- 
+Oh, wasn;t aware of it...
+
+> Are there any issues with the mii_cnt++; I thought the previous
+> attempt as this had problems with the wrong mdio bus being assigned to
+> fep->mii_bus ? But i could be remembering wrongly.
+
+The problem with returning -ENOENT is, that the probe never called
+again ... with returning -EPROBE_DEFER, the device gets probed
+later again.
+
+bye,
+Heiko
 -- 
-2.17.1
-
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: +49-8142-66989-52   Fax: +49-8142-66989-80   Email: hs@denx.de
 
