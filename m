@@ -1,221 +1,119 @@
-Return-Path: <netdev+bounces-50816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D3C7F73B1
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:22:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB1067F73C1
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:26:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76AFE281259
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:22:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65061281303
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB28D2420D;
-	Fri, 24 Nov 2023 12:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9EC249E2;
+	Fri, 24 Nov 2023 12:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="g3RYpi+B"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Ly2EujlL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C5BD44;
-	Fri, 24 Nov 2023 04:22:42 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIHMi008611;
-	Fri, 24 Nov 2023 12:22:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=HmSY9atPAcdtE0eERT6r8L+jM+d0GuF903wQCeF27tI=;
- b=g3RYpi+Bp7xlrYwudZQVsmqhLjFiKlDjHxw9+svO/mXZ5XOJ0JXzOFbTm/egANxZ+rqk
- tNvIdhjAPoCJ5g222EGGsUuZPBy7e68byPO4aFZz6ggpo3rJl8pzvCycvEwRgIUYGK6e
- eftrHPKdzOYzRLgvXMGThnaPucfKSilkYMLzm/kLA7zk9/G6kUNU7ESwRfrZrHxyMBKn
- 6giNc2TL759ChR8kke8pFh0eUV5eYj4tJzbtdYrf6zsmUrDfhhSpWCsuh6voJpvDvez3
- Q/fKIw7r1o+qxyjygxGnOMlNoYYNbvpE+iNSnrDgEJkevNGbC4UbuWmopJa8j6MNpI82 vA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujuq6r2xx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:22:30 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AOCJBqh010447;
-	Fri, 24 Nov 2023 12:22:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujuq6r2xj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:22:30 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIsbT015944;
-	Fri, 24 Nov 2023 12:22:29 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf8kpdgyt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:22:29 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AOCMQQb46989764
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Nov 2023 12:22:26 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 08E5320040;
-	Fri, 24 Nov 2023 12:22:26 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5D1A820043;
-	Fri, 24 Nov 2023 12:22:24 +0000 (GMT)
-Received: from [9.171.44.235] (unknown [9.171.44.235])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Nov 2023 12:22:24 +0000 (GMT)
-Message-ID: <9bb42e3a-88c1-4ec7-afd9-85e04eb68177@linux.ibm.com>
-Date: Fri, 24 Nov 2023 13:22:24 +0100
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15742D71
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:26:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NJ4pJItto6MO5iPtZbee1r50454UJOBT1TQ8fJJMqok=; b=Ly2EujlL0oRmNrqS/oanmy4DqD
+	WSEBUrvRFxdvt4SFxBUFU6i9ppQHvLtLOAIqB7lUsUPzWl82rTbtVTPpmlTKzTl/y1x6BRurZWZsO
+	Td1OV8Hriugetkx8JQPOm237NgU9oaRHPB8NiOsftGIsLeC5Gop+su/IgfGN1iMGNihUga8N+CfW5
+	j1esv7JSs8Skq4RuzjUQwCjyDxGTaGnt2l8sajNYxY1HabX6sLgcBK3A7Cqo4duB3grq0xmU8FTVS
+	gMuuEsgYBafytaWO4BoLW+v5EvqRnC6xhIclziAjmKmft+H9KcTL+850/JO0Q9+EKc5TzwGievag2
+	3YV5fYdQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37702)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r6VFs-0002rh-38;
+	Fri, 24 Nov 2023 12:25:56 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r6VFu-0007Eg-CP; Fri, 24 Nov 2023 12:25:58 +0000
+Date: Fri, 24 Nov 2023 12:25:58 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 00/10] net: phylink: improve PHY validation
+Message-ID: <ZWCWVtgSsxZUCErJ@shell.armlinux.org.uk>
+References: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net/smc: add sysctl for max conns per lgr
- for SMC-R v2.1
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
-        kgraul@linux.ibm.com, corbet@lwn.net, davem@davemloft.net,
-        kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
-        guwen@linux.alibaba.com, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
- <20231122135258.38746-3-guangguan.wang@linux.alibaba.com>
-From: Jan Karcher <jaka@linux.ibm.com>
-Organization: IBM - Network Linux on Z
-In-Reply-To: <20231122135258.38746-3-guangguan.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AaS3aKng8_tv-Q4yp1AVkoPFmESW3cPL
-X-Proofpoint-GUID: SqGm7dIOLdUxVm_fQb7J9q82VH-UfW7z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 spamscore=0 clxscore=1015 malwarescore=0 mlxscore=0
- phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2311240096
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+Hi,
 
+One of the issues which has concerned me about the rate matching
+implenentation that we have is that phy_get_rate_matching() returns
+whether rate matching will be used for a particular interface, and we
+enquire only for one interface.
 
-On 22/11/2023 14:52, Guangguan Wang wrote:
-> Add a new sysctl: net.smc.smcr_max_conns_per_lgr, which is
-> used to control the preferred max connections per lgr for
-> SMC-R v2.1. The default value of this sysctl is 255, and
-> the acceptable value ranges from 16 to 255.
-> 
-> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Aquantia PHYs can be programmed with the rate matching and interface
+mode settings on a per-media speed basis using the per-speed vendor 1
+global configuration registers.
 
-Hi Guangguan,
-thanks for your Submission.
+Thus, it is possible for the PHY to be configured to use rate matching
+for 10G, 5G, 2.5G with 10GBASE-R, and then SGMII for the remaining
+speeds. Therefore, it clearly doesn't make sense to enquire about rate
+matching for just one interface mode.
 
-Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
+Also, PHYs that change their interfaces are handled sub-optimally, in
+that we validate all the interface modes that the host supports, rather
+than the interface modes that the PHY will use.
 
-> ---
->   Documentation/networking/smc-sysctl.rst |  6 ++++++
->   include/net/netns/smc.h                 |  1 +
->   net/smc/smc_clc.c                       |  5 +++--
->   net/smc/smc_sysctl.c                    | 12 ++++++++++++
->   net/smc/smc_sysctl.h                    |  1 +
->   5 files changed, 23 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
-> index c6ef86ef4c4f..a874d007f2db 100644
-> --- a/Documentation/networking/smc-sysctl.rst
-> +++ b/Documentation/networking/smc-sysctl.rst
-> @@ -65,3 +65,9 @@ smcr_max_links_per_lgr - INTEGER
->   	for SMC-R v2.1 and later.
->   
->   	Default: 2
-> +
-> +smcr_max_conns_per_lgr - INTEGER
-> +	Controls the max number of connections can be added to a SMC-R link group. The
-> +	acceptable value ranges from 16 to 255. Only for SMC-R v2.1 and later.
-> +
-> +	Default: 255
-> diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
-> index da7023587824..fc752a50f91b 100644
-> --- a/include/net/netns/smc.h
-> +++ b/include/net/netns/smc.h
-> @@ -23,5 +23,6 @@ struct netns_smc {
->   	int				sysctl_wmem;
->   	int				sysctl_rmem;
->   	int				sysctl_max_links_per_lgr;
-> +	int				sysctl_max_conns_per_lgr;
->   };
->   #endif
-> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-> index 1f87c8895a27..0fda5156eef0 100644
-> --- a/net/smc/smc_clc.c
-> +++ b/net/smc/smc_clc.c
-> @@ -944,7 +944,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
->   	}
->   	if (smcr_indicated(ini->smc_type_v2)) {
->   		memcpy(v2_ext->roce, ini->smcrv2.ib_gid_v2, SMC_GID_SIZE);
-> -		v2_ext->max_conns = SMC_CONN_PER_LGR_PREFER;
-> +		v2_ext->max_conns = net->smc.sysctl_max_conns_per_lgr;
->   		v2_ext->max_links = net->smc.sysctl_max_links_per_lgr;
->   	}
->   
-> @@ -1191,7 +1191,8 @@ int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
->   		return SMC_CLC_DECL_NOV2EXT;
->   
->   	if (ini->smcr_version & SMC_V2) {
-> -		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns, SMC_CONN_PER_LGR_PREFER);
-> +		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns,
-> +				       net->smc.sysctl_max_conns_per_lgr);
->   		if (ini->max_conns < SMC_CONN_PER_LGR_MIN)
->   			return SMC_CLC_DECL_MAXCONNERR;
->   
-> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-> index 3e9bb921e40a..a5946d1b9d60 100644
-> --- a/net/smc/smc_sysctl.c
-> +++ b/net/smc/smc_sysctl.c
-> @@ -27,6 +27,8 @@ static const int net_smc_wmem_init = (64 * 1024);
->   static const int net_smc_rmem_init = (64 * 1024);
->   static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
->   static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
-> +static int conns_per_lgr_min = SMC_CONN_PER_LGR_MIN;
-> +static int conns_per_lgr_max = SMC_CONN_PER_LGR_MAX;
->   
->   static struct ctl_table smc_table[] = {
->   	{
-> @@ -79,6 +81,15 @@ static struct ctl_table smc_table[] = {
->   		.extra1		= &links_per_lgr_min,
->   		.extra2		= &links_per_lgr_max,
->   	},
-> +	{
-> +		.procname	= "smcr_max_conns_per_lgr",
-> +		.data		= &init_net.smc.sysctl_max_conns_per_lgr,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= &conns_per_lgr_min,
-> +		.extra2		= &conns_per_lgr_max,
-> +	},
->   	{  }
->   };
->   
-> @@ -109,6 +120,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
->   	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
->   	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
->   	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
-> +	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
->   
->   	return 0;
->   
-> diff --git a/net/smc/smc_sysctl.h b/net/smc/smc_sysctl.h
-> index 5783dd7575dd..eb2465ae1e15 100644
-> --- a/net/smc/smc_sysctl.h
-> +++ b/net/smc/smc_sysctl.h
-> @@ -24,6 +24,7 @@ static inline int smc_sysctl_net_init(struct net *net)
->   {
->   	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
->   	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
-> +	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
->   	return 0;
->   }
->   
+This patch series changes the way we validate PHYs, but in order to do
+so, we need to know exactly which interface modes will be used by the
+PHY. So that phylib can convey this information, we add
+"possible_interfaces" to struct phy_device.
+
+possible_interfaces is to be filled in by a phylib driver once the PHY
+is configured (in other words in the PHYs .config_init method) with the
+interface modes that it will switch between. This then allows users of
+phylib to know which interface modes will be used by the PHY.
+
+This allows us to solve both these issues: where possible_interfaces is
+provided, we can validate which ethtool link modes can be supported by
+looking at which interface modes that both the PHY and host support,
+and request rate matching information for each mode.
+
+This should improve the accuracy of the validation.
+
+Sending this out again without RFC as Jie Luo will need it for the
+QCA8084 changes. No changes except to add the attributations already
+received. Thanks!
+
+ drivers/net/phy/aquantia/aquantia.h      |   5 +
+ drivers/net/phy/aquantia/aquantia_main.c |  76 +++++++++++-
+ drivers/net/phy/bcm84881.c               |  12 ++
+ drivers/net/phy/marvell10g.c             | 203 ++++++++++++++++++++-----------
+ drivers/net/phy/phy_device.c             |   2 +
+ drivers/net/phy/phylink.c                | 177 +++++++++++++++++++--------
+ include/linux/phy.h                      |   3 +
+ 7 files changed, 353 insertions(+), 125 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
