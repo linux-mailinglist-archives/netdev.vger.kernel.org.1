@@ -1,108 +1,99 @@
-Return-Path: <netdev+bounces-50941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C7FC7F7A17
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:08:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A5C77F7A2A
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:16:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84ADAB20CC3
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:08:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45F831C2098E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4534C31754;
-	Fri, 24 Nov 2023 17:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BC035F19;
+	Fri, 24 Nov 2023 17:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHxMm9u1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DqWgB3HR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2494831730
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:08:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACDAEC433CA;
-	Fri, 24 Nov 2023 17:08:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700845691;
-	bh=N6eKa6WfMK+P6QxFOZlfSTYYVqTpDOay3TuZvDz49n0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sHxMm9u1mMdx4N1F/JdO5WDKNIARNwK+oEk/f5MTc2gwWWXdnb4XOhlos6fZv0ckr
-	 1py3975fia0mRXMPlQMdjVjKxL53JpgTwcG3rvnHQpCr8BcrM7H6w+zU9dB77D/D5z
-	 83YrmiGMtVn855hQ1ZmWM+NjyvOV6dQVgH+bmtjfwSWXd7FTC9DuqpBVan5Z+TJ44Q
-	 R1HDPglOvv1jfIcHG3Tn7/h/iwhhgXLQvr6Sn3KAE9qLHCGzUkimLx/KpzvilSIitM
-	 PC3BT4wrUiLNAkwnulC5I6OOvqMQiSBXdYaU7qBSDI4r9mygQeqrTHn45pxrxMIH9V
-	 MODQ2dzif3ppw==
-Date: Fri, 24 Nov 2023 17:08:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
-	vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
-	pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net,
-	wizhao@redhat.com, konguyen@redhat.com, jesse.brandeburg@intel.com,
-	sumang@marvell.com, Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 2/2] octeon_ep: get max rx packet length from
- firmware
-Message-ID: <20231124170804.GU50352@kernel.org>
-References: <20231122183435.2510656-1-srasheed@marvell.com>
- <20231122183435.2510656-3-srasheed@marvell.com>
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE0410E7;
+	Fri, 24 Nov 2023 09:16:50 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-41b7ec4cceeso10262791cf.1;
+        Fri, 24 Nov 2023 09:16:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700846210; x=1701451010; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xg82JrfzBfyMPKKSBUKzAJjlyzjnEcy1rIS6yPWPAIc=;
+        b=DqWgB3HRFRa6CcJJ6PanGKae81xoKww8sqiVWcuh7RajQ6uFEzb9ToA4ExBaABQ2wv
+         ANoQyX2a7+7cdFMNYPHI5rFwQnIg9Jbp7/cNCR1tyzsZc/K+TLJn+Oq63o7wCJP1t2dB
+         WOvYD96CnBpEdtyBtJkifqgdIFRUc3fxf/CAq7AQXUSugM6xBDn+vIE12+YEC0c+fahF
+         V37jf32i5FsJMQMCzIZIXVK3NkQF0Jjc1AoxGBg3TGjQo6VpvA0rdUDkq2HqgAJPDt9l
+         o8onqGLgeV7IN7sR/R2epJv23w71g+1HHSa6MV/c+yL/dC4+Jj+t0+H+DdlsDRddoxAp
+         6nBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700846210; x=1701451010;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xg82JrfzBfyMPKKSBUKzAJjlyzjnEcy1rIS6yPWPAIc=;
+        b=tZ/3DxXe7VUty+7+dBu0vd9FpSEnMb+wh8f/IFAn426Yd6YwzemcJU8jzajnI8yunt
+         hHp9CZ03IB5b9neKoxzMFSpgyAav9oYCEaIfP4P2jJ7bGOGPyDzSVefBN7HgtpPolPg1
+         QyFmKegLyMxUe0K333rQDgnen51C4J6bOZsr2JxfuilBmxHXkmjNqDgKoCRaSf/YGY0A
+         E6CakY8rfofLoZu0mYTB7MWUbHXl7d7BQd7HRt9Yl+9vHZRah5AUFsypk7cUqspECHEG
+         Uvg2MhbeTbcmLPp5vIVI2E02pHxRuBx4IBR1CDUf7UKrLGTRQ9ELGesWqXvGbRJaNKPS
+         ygdQ==
+X-Gm-Message-State: AOJu0YzygThEOU27T7rpSvxBLQvPn3TlzlAkgfrrJ1gXCy8M5TU2OKLS
+	AfTSsGEyJPjpxWL30YrrhZbN2Sd9lRY=
+X-Google-Smtp-Source: AGHT+IEk0lodYaHM2GkoX6TloY5EenuGOW0yAp6K9Jyv3l6ywMv0A3UI3Wiq9C5VR4Ik93Q75lmP3Q==
+X-Received: by 2002:a05:6214:419b:b0:67a:ef6:c3d4 with SMTP id ld27-20020a056214419b00b0067a0ef6c3d4mr5406800qvb.26.1700846209891;
+        Fri, 24 Nov 2023 09:16:49 -0800 (PST)
+Received: from willemb.c.googlers.com.com (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id mn23-20020a0562145ed700b0067a0a00b24csm1389278qvb.73.2023.11.24.09.16.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 09:16:49 -0800 (PST)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net 0/4] selftests/net: fix a few small compiler warnings
+Date: Fri, 24 Nov 2023 12:15:18 -0500
+Message-ID: <20231124171645.1011043-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122183435.2510656-3-srasheed@marvell.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 22, 2023 at 10:34:35AM -0800, Shinas Rasheed wrote:
-> Max receive packet length can vary across SoCs, so
-> this needs to be queried from respective firmware and
-> filled by driver. A control net get mtu api should be
-> implemented to do the same.
-> 
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+From: Willem de Bruijn <willemb@google.com>
 
-...
+Observed a clang warning when backporting cmsg_sender.
+Ran the same build against all the .c files under selftests/net.
 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> index 2da00a701df2..423eec5ff3ad 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-> @@ -1307,6 +1307,7 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  {
->  	struct octep_device *octep_dev = NULL;
->  	struct net_device *netdev;
-> +	int max_rx_pktlen;
->  	int err;
->  
->  	err = pci_enable_device(pdev);
-> @@ -1377,8 +1378,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	netdev->hw_features = NETIF_F_SG;
->  	netdev->features |= netdev->hw_features;
-> +
-> +	max_rx_pktlen = octep_ctrl_net_get_mtu(octep_dev, OCTEP_CTRL_NET_INVALID_VFID);
-> +	if (max_rx_pktlen < 0) {
-> +		dev_err(&octep_dev->pdev->dev,
-> +			"Failed to get max receive packet size; err = %d\n", max_rx_pktlen);
-> +		goto register_dev_err;
+This is clang-14 with -Wall
+Which is what tools/testing/selftests/net/Makefile also enables.
 
-Hi Shinas,
+Willem de Bruijn (4):
+  selftests/net: ipsec: fix constant out of range
+  selftests/net: fix a char signedness issue
+  selftests/net: unix: fix unused variable compiler warning
+  selftests/net: mptcp: fix uninitialized variable warnings
 
-This jump will cause this function to return err.  But err is 0 here.
-Perhaps it should be set to a negative error value instead?
+ tools/testing/selftests/net/af_unix/diag_uid.c    |  1 -
+ tools/testing/selftests/net/cmsg_sender.c         |  2 +-
+ tools/testing/selftests/net/ipsec.c               |  4 ++--
+ tools/testing/selftests/net/mptcp/mptcp_connect.c | 11 ++++-------
+ tools/testing/selftests/net/mptcp/mptcp_inq.c     | 11 ++++-------
+ 5 files changed, 11 insertions(+), 18 deletions(-)
 
-> +	}
->  	netdev->min_mtu = OCTEP_MIN_MTU;
-> -	netdev->max_mtu = OCTEP_MAX_MTU;
-> +	netdev->max_mtu = max_rx_pktlen - (ETH_HLEN + ETH_FCS_LEN);
->  	netdev->mtu = OCTEP_DEFAULT_MTU;
->  
->  	err = octep_ctrl_net_get_mac_addr(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
-> -- 
-> 2.25.1
-> 
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
+
 
