@@ -1,248 +1,410 @@
-Return-Path: <netdev+bounces-50840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B767F744E
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:52:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC5A47F7458
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2651FB21729
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:52:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AB64B211D5
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DBB286B2;
-	Fri, 24 Nov 2023 12:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0261A20305;
+	Fri, 24 Nov 2023 12:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="EMn1BsRJ"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="E3nZ1VQv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA230D71;
-	Fri, 24 Nov 2023 04:51:59 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO5PBKA019039;
-	Fri, 24 Nov 2023 04:51:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=RouRC90iUnGmzQEJwDOWvRMGZYb2s/pGqXig6p8hTpM=;
- b=EMn1BsRJRd5QTHko0I0PxxkX0MzCC/rXt+Z0mw1mEGoJUSIFl0bDz9FQuauV8sL5d5D+
- h0xgY4PEVsrM0s+IRZtbI6RKI0zsY9XeiBEMJ00Cg22HJcPVv+43mCoYJV7eBc+G5H0i
- WJZnHIKSKKTIhVtT89WuFg4Ln+gJxjZTaCgLlFMipfbO3dtaC/3z/5LZWRcuCT4M1avF
- yiTcLfvoOPNwnIJfsQEMF7ReqfEkgAtj/21wim8bYNRqt8X2RrLoEado1bJ+XDObbTqj
- jK39CxynPkmpe6llimVsCAo0WQNskYn3tLJNb5c6ZMNsGHsJXzWB+i/FB1TyLAs/eSwI BA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uj7yku09r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 04:51:50 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 24 Nov
- 2023 04:51:49 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 24 Nov 2023 04:51:49 -0800
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id 33F9A3F707B;
-	Fri, 24 Nov 2023 04:51:43 -0800 (PST)
-From: Srujana Challa <schalla@marvell.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <kuba@kernel.org>
-CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <bbrezillon@kernel.org>,
-        <arno@natisbad.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-        <ndabilpuram@marvell.com>, <sgoutham@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
-        <lcherian@marvell.com>, <gakula@marvell.com>, <schalla@marvell.com>
-Subject: [PATCH net-next 10/10] crypto: octeontx2: support setting ctx ilen for inline CPT LF
-Date: Fri, 24 Nov 2023 18:20:47 +0530
-Message-ID: <20231124125047.2329693-11-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231124125047.2329693-1-schalla@marvell.com>
-References: <20231124125047.2329693-1-schalla@marvell.com>
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19977A2
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:54:20 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a00a9c6f283so268005366b.0
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:54:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700830458; x=1701435258; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P7FLsRcyDg+UPcdFddwVxnsCbR/BiCtH2+u2Kg95pvY=;
+        b=E3nZ1VQvey9l0z40OcjMp+lOjCd2jN+3n1cmfn7V7/D7oRYdDHVekJsCqJVhuci+9l
+         mcxOZoyo0mjw4OFZAMAMDnn3axb0+B9eZ9gkU8I6jEiGOwpD+q6JUdodEzDcp1CIbD4Q
+         6sSxfBpYBdzarf6lk5q5p0yXy/u57PlNY029z3lOIGGgtVD4OFp1qIQ0gCMT8nJdNyWY
+         WNmUsOvCcGScH8V+TsrsE2OWlL71DS+qa5PYqBCDewQLpVW7OMXuouQ9Oesa4zREw1oD
+         aSCTW0qzfW6ww+8UF/ZOzrU9rL1YWFjIRE/R0EQqxwM+XSgVQk/p9wwKMJ/Fi1cANXkC
+         tqTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700830458; x=1701435258;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P7FLsRcyDg+UPcdFddwVxnsCbR/BiCtH2+u2Kg95pvY=;
+        b=v76IK/Cb783zPjIEZmf11w0apaP241ESlnaG7doFDaCAUR5Z2gcb/G5T79wQE1q/pl
+         wR7gwimzNrrYQ7RMU4Bpcgnujfh8LLx4L383lB7QwhM5BzoeeyY9MDBEmA8CdMP4cJHm
+         3TCA3ULbDQblQbhFcW14t3YbOzdRfOvkgk4Qa0iEfH2QAy5mLVcf2hPgTXLizYo4k3LZ
+         NmzPbtwTPzU00Wl+mo1Q46DkRD27xAy8NcFKbJUVUEjbzp5ae4+5/ZrBYj7FYnCGGZDS
+         RZKYcNxB5S/flMXsVMHsW8txcncS7htm/8xSCBqbjmtd+TylXlBYv3HcIkNZ6Kcv5N0p
+         WLnQ==
+X-Gm-Message-State: AOJu0YwaBrOLas71Or2Z/6CoiSAXysFkSJafreoLFOmujjaZ7jCVH3bd
+	DFKqueS8J+uzYIU5eC2jw4PbwA==
+X-Google-Smtp-Source: AGHT+IFki15y1sZcnN0kKLR5rA/c3b5zL9rgM6jxFEpXKlXsS1EL9QSo3lF8tz3RtO479mlauk6Lkg==
+X-Received: by 2002:a17:906:d0d0:b0:9ff:7d76:148c with SMTP id bq16-20020a170906d0d000b009ff7d76148cmr1834778ejb.66.1700830458396;
+        Fri, 24 Nov 2023 04:54:18 -0800 (PST)
+Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
+        by smtp.gmail.com with ESMTPSA id f8-20020a17090624c800b009fd77d78f7fsm2034685ejb.116.2023.11.24.04.54.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Nov 2023 04:54:18 -0800 (PST)
+Message-ID: <0b2f3872-ce4a-df5d-075e-53f6aa256af7@blackwall.org>
+Date: Fri, 24 Nov 2023 14:54:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 9gf3XWhcBLLRr11yzdXpEqCDIXsckgrn
-X-Proofpoint-ORIG-GUID: 9gf3XWhcBLLRr11yzdXpEqCDIXsckgrn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCHv2 net-next 01/10] net: bridge: add document for IFLA_BR
+ enum
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Marc Muehlfeld <mmuehlfe@redhat.com>
+References: <20231123134553.3394290-1-liuhangbin@gmail.com>
+ <20231123134553.3394290-2-liuhangbin@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231123134553.3394290-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Nithin Dabilpuram <ndabilpuram@marvell.com>
+On 11/23/23 15:45, Hangbin Liu wrote:
+> Add document for IFLA_BR enum so we can use it in
+> Documentation/networking/bridge.rst.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>   include/uapi/linux/if_link.h | 279 +++++++++++++++++++++++++++++++++++
+>   1 file changed, 279 insertions(+)
+> 
 
-Provide an option in Inline IPsec configure mailbox to configure the
-CPT_AF_LFX_CTL:CTX_ILEN for inline CPT LF attached to CPT RVU PF.
-This is needed to set the ctx ilen to size of inbound SA for
-HW errata IPBUCPT-38756. Not setting this would lead to new context's
-not being fetched.
+Hi,
+Generally ok, a few minor nits below...
 
-Also set FLR_FLUSH in CPT_LF_CTX_CTL for CPT LF's as workaround
-for same errata.
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 8181ef23a7a2..a2973c71c158 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -461,6 +461,285 @@ enum in6_addr_gen_mode {
+>   
+>   /* Bridge section */
+>   
+> +/**
+> + * DOC: Bridge enum definition
+> + *
+> + * please *note* that the timer values in the following section are expected
 
-Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |  2 ++
- .../marvell/octeontx2/otx2_cpt_hw_types.h     |  4 ++-
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 33 +++++++++++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 17 ++++++++++
- .../marvell/octeontx2/otx2_cptpf_mbox.c       |  5 +++
- 5 files changed, 60 insertions(+), 1 deletion(-)
+Please
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index 3caa5245df1d..f8abe3ab15cb 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -59,6 +59,8 @@ struct otx2_cpt_rx_inline_lf_cfg {
- 	u32 credit_th;
- 	u16 bpid;
- 	u32 reserved;
-+	u8 ctx_ilen_valid : 1;
-+	u8 ctx_ilen : 7;
- };
- 
- /*
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-index 06bcf49ee379..7e746a4def86 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-@@ -102,6 +102,7 @@
- #define OTX2_CPT_LF_Q_INST_PTR          (0x110)
- #define OTX2_CPT_LF_Q_GRP_PTR           (0x120)
- #define OTX2_CPT_LF_NQX(a)              (0x400 | (a) << 3)
-+#define OTX2_CPT_LF_CTX_CTL             (0x500)
- #define OTX2_CPT_LF_CTX_FLUSH           (0x510)
- #define OTX2_CPT_LF_CTX_ERR             (0x520)
- #define OTX2_CPT_RVU_FUNC_BLKADDR_SHIFT 20
-@@ -472,7 +473,8 @@ union otx2_cptx_af_lf_ctrl {
- 		u64 cont_err:1;
- 		u64 reserved_11_15:5;
- 		u64 nixtx_en:1;
--		u64 reserved_17_47:31;
-+		u64 ctx_ilen:3;
-+		u64 reserved_17_47:28;
- 		u64 grp:8;
- 		u64 reserved_56_63:8;
- 	} s;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index d7805e672047..571a8ec154e9 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -106,6 +106,33 @@ static int cptlf_set_grp_and_pri(struct otx2_cptlfs_info *lfs,
- 	return ret;
- }
- 
-+static int cptlf_set_ctx_ilen(struct otx2_cptlfs_info *lfs, int ctx_ilen)
-+{
-+	union otx2_cptx_af_lf_ctrl lf_ctrl;
-+	struct otx2_cptlf_info *lf;
-+	int slot, ret = 0;
-+
-+	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		lf = &lfs->lf[slot];
-+
-+		ret = otx2_cpt_read_af_reg(lfs->mbox, lfs->pdev,
-+					   CPT_AF_LFX_CTL(lf->slot),
-+					   &lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+
-+		lf_ctrl.s.ctx_ilen = ctx_ilen;
-+
-+		ret = otx2_cpt_write_af_reg(lfs->mbox, lfs->pdev,
-+					    CPT_AF_LFX_CTL(lf->slot),
-+					    lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+
-+	}
-+	return ret;
-+}
-+
- static void cptlf_hw_init(struct otx2_cptlfs_info *lfs)
- {
- 	/* Disable instruction queues */
-@@ -440,6 +467,12 @@ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_mask, int pri,
- 	if (ret)
- 		goto free_iq;
- 
-+	if (lfs->ctx_ilen_ovrd) {
-+		ret = cptlf_set_ctx_ilen(lfs, lfs->ctx_ilen);
-+		if (ret)
-+			goto free_iq;
-+	}
-+
- 	return 0;
- 
- free_iq:
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-index f6138da945e9..cf4c055c50f4 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-@@ -120,6 +120,8 @@ struct otx2_cptlfs_info {
- 	atomic_t state;         /* LF's state. started/reset */
- 	int blkaddr;            /* CPT blkaddr: BLKADDR_CPT0/BLKADDR_CPT1 */
- 	int global_slot;        /* Global slot across the blocks */
-+	u8 ctx_ilen;
-+	u8 ctx_ilen_ovrd;
- };
- 
- static inline void otx2_cpt_free_instruction_queues(
-@@ -309,6 +311,17 @@ static inline void otx2_cptlf_set_iqueue_exec(struct otx2_cptlf_info *lf,
- 			 OTX2_CPT_LF_INPROG, lf_inprog.u);
- }
- 
-+static inline void otx2_cptlf_set_ctx_flr_flush(struct otx2_cptlf_info *lf)
-+{
-+	u8 blkaddr = lf->lfs->blkaddr;
-+	u64 val;
-+
-+	val = otx2_cpt_read64(lf->lfs->reg_base, blkaddr, lf->slot, OTX2_CPT_LF_CTX_CTL);
-+	val |= BIT_ULL(0);
-+
-+	otx2_cpt_write64(lf->lfs->reg_base, blkaddr, lf->slot, OTX2_CPT_LF_CTX_CTL, val);
-+}
-+
- static inline void otx2_cptlf_enable_iqueue_exec(struct otx2_cptlf_info *lf)
- {
- 	otx2_cptlf_set_iqueue_exec(lf, true);
-@@ -324,6 +337,10 @@ static inline void otx2_cptlf_enable_iqueues(struct otx2_cptlfs_info *lfs)
- 	int slot;
- 
- 	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		/* Enable flush on FLR for Errata */
-+		if (is_dev_cn10kb(lfs->pdev))
-+			otx2_cptlf_set_ctx_flr_flush(&lfs->lf[slot]);
-+
- 		otx2_cptlf_enable_iqueue_exec(&lfs->lf[slot]);
- 		otx2_cptlf_enable_iqueue_enq(&lfs->lf[slot]);
- 	}
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index f7cb4ec74153..fd9632d2de03 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -267,6 +267,9 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 	otx2_cptlf_set_dev_info(&cptpf->lfs, cptpf->pdev, cptpf->reg_base,
- 				&cptpf->afpf_mbox, BLKADDR_CPT0);
- 	cptpf->lfs.global_slot = 0;
-+	cptpf->lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+	cptpf->lfs.ctx_ilen = cfg_req->ctx_ilen;
-+
- 	ret = otx2_inline_cptlf_setup(cptpf, &cptpf->lfs, egrp, num_lfs);
- 	if (ret) {
- 		dev_err(&cptpf->pdev->dev, "Inline CPT0 LF setup failed.\n");
-@@ -279,6 +282,8 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 					cptpf->reg_base, &cptpf->afpf_mbox,
- 					BLKADDR_CPT1);
- 		cptpf->cpt1_lfs.global_slot = num_lfs;
-+		cptpf->cpt1_lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+		cptpf->cpt1_lfs.ctx_ilen = cfg_req->ctx_ilen;
- 		ret = otx2_inline_cptlf_setup(cptpf, &cptpf->cpt1_lfs, egrp, num_lfs);
- 		if (ret) {
- 			dev_err(&cptpf->pdev->dev, "Inline CPT1 LF setup failed.\n");
--- 
-2.25.1
+> + * in clock_t format, which is seconds multiplied by USER_HZ (generally
+> + * defined as 100).
+> + *
+> + * @IFLA_BR_FORWARD_DELAY
+> + *   The bridge forwarding delay is the time spent in LISTENING state
+> + *   (before moving to LEARNING) and in LEARNING state (before moving
+> + *   to FORWARDING). Only relevant if STP is enabled.
+> + *
+> + *   The valid values are between (2 * USER_HZ) and (30 * USER_HZ).
+> + *   The default value is (15 * USER_HZ).
+> + *
+> + * @IFLA_BR_HELLO_TIME
+> + *   The time between hello packets sent by the bridge, when it is a root
+> + *   bridge or a designated bridge. Only relevant if STP is enabled.
+> + *
+> + *   The valid values are between (1 * USER_HZ) and (10 * USER_HZ).
+> + *   The default value is (2 * USER_HZ).
+> + *
+> + * @IFLA_BR_MAX_AGE
+> + *   The hello packet timeout is the time until another bridge in the
+> + *   spanning tree is assumed to be dead, after reception of its last hello
+> + *   message. Only relevant if STP is enabled.
+> + *
+> + *   The valid values are between (6 * USER_HZ) and (40 * USER_HZ).
+> + *   The default value is (20 * USER_HZ).
+> + *
+> + * @IFLA_BR_AGEING_TIME
+> + *   Configure the bridge's FDB entries aging time. It is the time a MAC
+> + *   address will be kept in the FDB after a packet has been received from
+> + *   that address. After this time has passed, entries are cleaned up.
+> + *   Allow values outside the 802.1 standard specification for special cases:
+> + *
+> + *     * 0 - entry never ages (all permanent)
+> + *     * 1 - entry disappears (no persistence)
+> + *
+> + *   The default value is (300 * USER_HZ).
+> + *
+> + * @IFLA_BR_STP_STATE
+> + *   Turn spanning tree protocol on (*IFLA_BR_STP_STATE* > 0) or off
+> + *   (*IFLA_BR_STP_STATE* == 0) for this bridge.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_PRIORITY
+> + *   set this bridge's spanning tree priority, used during STP root bridge
+
+be consistent when using capital letters to start the description (this 
+one is not)
+
+> + *   election.
+> + *
+> + *   The valid values are between 0 and 65535.
+> + *
+> + * @IFLA_BR_VLAN_FILTERING
+> + *   Turn VLAN filtering on (*IFLA_BR_VLAN_FILTERING* > 0) or off
+> + *   (*IFLA_BR_VLAN_FILTERING* == 0). When disabled, the bridge will not
+> + *   consider the VLAN tag when handling packets.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_VLAN_PROTOCOL
+> + *   Set the protocol used for VLAN filtering.
+> + *
+> + *   The valid values are 0x8100(802.1Q) or 0x88A8(802.1AD). The default value
+> + *   is 0x8100(802.1Q).
+> + *
+> + * @IFLA_BR_GROUP_FWD_MASK
+> + *   The group forwarding mask. This is the bitmask that is applied to
+> + *   decide whether to forward incoming frames destined to link-local
+> + *   addresses (of the form 01:80:C2:00:00:0X).
+> + *
+> + *   The default value is 0, which means the bridge does not forward any
+> + *   link-local frames coming on this port.
+> + *
+> + * @IFLA_BR_ROOT_ID
+> + *   The bridge root id, read only.
+> + *
+> + * @IFLA_BR_BRIDGE_ID
+> + *   The bridge id, read only.
+> + *
+> + * @IFLA_BR_ROOT_PORT
+> + *   The bridge root port, read only.
+> + *
+> + * @IFLA_BR_ROOT_PATH_COST
+> + *   The bridge root path cost, read only.
+> + *
+> + * @IFLA_BR_TOPOLOGY_CHANGE
+> + *   The bridge topology change, read only.
+> + *
+> + * @IFLA_BR_TOPOLOGY_CHANGE_DETECTED
+> + *   The bridge topology change detected, read only.
+> + *
+> + * @IFLA_BR_HELLO_TIMER
+> + *   The bridge hello timer, read only.
+> + *
+> + * @IFLA_BR_TCN_TIMER
+> + *   The bridge tcn timer, read only.
+> + *
+> + * @IFLA_BR_TOPOLOGY_CHANGE_TIMER
+> + *   The bridge topology change timer, read only.
+> + *
+> + * @IFLA_BR_GC_TIMER
+> + *   The bridge gc timer, read only.
+> + *
+> + * @IFLA_BR_GROUP_ADDR
+> + *   set the MAC address of the multicast group this bridge uses for STP.
+
+same here "Set.."
+
+> + *   The address must be a link-local address in standard Ethernet MAC address
+> + *   format. It is an address of the form 01:80:C2:00:00:0X, with X in [0, 4..f].
+> + *
+> + *   The default value is 0.
+> + *
+> + * @IFLA_BR_FDB_FLUSH
+> + *   Flush bridge's fdb dynamic entries.
+> + *
+> + * @IFLA_BR_MCAST_ROUTER
+> + *   Set bridge's multicast router if IGMP snooping is enabled.
+> + *   The valid values are:
+> + *
+> + *     * 0 - disabled.
+> + *     * 1 - automatic (queried).
+> + *     * 2 - permanently enabled.
+> + *
+> + *   The default value is 1.
+> + *
+> + * @IFLA_BR_MCAST_SNOOPING
+> + *   Turn multicast snooping on (*IFLA_BR_MCAST_SNOOPING* > 0) or off
+> + *   (*IFLA_BR_MCAST_SNOOPING* == 0).
+> + *
+> + *   The default value is 1.
+> + *
+> + * @IFLA_BR_MCAST_QUERY_USE_IFADDR
+> + *   whether to use the bridge's own IP address as source address for IGMP
+
+same here, but "whether" doesn't sound good as well, maybe something 
+like "If enabled use the.." or "If set" or "Setting to > 0" etc.
+
+> + *   queries (*IFLA_BR_MCAST_QUERY_USE_IFADDR* > 0) or the default of 0.0.0.0
+> + *   (*IFLA_BR_MCAST_QUERY_USE_IFADDR* == 0).
+> + *
+> + *   The default value is 0.
+
+0 (disabled)
+
+> + *
+> + * @IFLA_BR_MCAST_QUERIER
+> + *   Enable (*IFLA_BR_MULTICAST_QUERIER* > 0) or disable
+> + *   (*IFLA_BR_MULTICAST_QUERIER* == 0) IGMP querier, ie sending of multicast
+> + *   queries by the bridge.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_MCAST_HASH_ELASTICITY
+> + *   Set multicast database hash elasticity, It is the maximum chain length in
+> + *   the multicast hash table. This attribute is *deprecated* and the value
+> + *   is always 16.
+> + *
+> + * @IFLA_BR_MCAST_HASH_MAX
+> + *   Set maximum size of the multicast hash table
+> + *
+> + *   The default value is 4096, the value must be a power of 2.
+> + *
+> + * @IFLA_BR_MCAST_LAST_MEMBER_CNT
+> + *   The Last Member Query Count is the number of Group-Specific Queries
+> + *   sent before the router assumes there are no local members. The Last
+> + *   Member Query Count is also the number of Group-and-Source-Specific
+> + *   Queries sent before the router assumes there are no listeners for a
+> + *   particular source.
+> + *
+> + *   The default value is 2.
+> + *
+> + * @IFLA_BR_MCAST_STARTUP_QUERY_CNT
+> + *   The Startup Query Count is the number of Queries sent out on startup,
+> + *   separated by the Startup Query Interval.
+> + *
+> + *   The default value is 2.
+> + *
+> + * @IFLA_BR_MCAST_LAST_MEMBER_INTVL
+> + *   The Last Member Query Interval is the Max Response Time inserted into
+> + *   Group-Specific Queries sent in response to Leave Group messages, and
+> + *   is also the amount of time between Group-Specific Query messages.
+> + *
+> + *   The default value is (1 * USER_HZ).
+> + *
+> + * @IFLA_BR_MCAST_MEMBERSHIP_INTVL
+> + *   The interval after which the bridge will leave a group, if no membership
+> + *   reports for this group are received.
+> + *
+> + *   The default value is (260 * USER_HZ).
+> + *
+> + * @IFLA_BR_MCAST_QUERIER_INTVL
+> + *   The interval between queries sent by other routers. if no queries are
+> + *   seen after this delay has passed, the bridge will start to send its own
+> + *   queries (as if **IFLA_BR_MCAST_QUERIER_INTVL** was enabled).
+> + *
+> + *   The default value is (255 * USER_HZ).
+> + *
+> + * @IFLA_BR_MCAST_QUERY_INTVL
+> + *   The Query Interval is the interval between General Queries sent by
+> + *   the Querier.
+> + *
+> + *   The default value is (125 * USER_HZ). The minimum value is (1 * USER_HZ).
+> + *
+> + * @IFLA_BR_MCAST_QUERY_RESPONSE_INTVL
+> + *   The Max Response Time used to calculate the Max Resp Code inserted
+> + *   into the periodic General Queries.
+> + *
+> + *   The default value is (10 * USER_HZ).
+> + *
+> + * @IFLA_BR_MCAST_STARTUP_QUERY_INTVL
+> + *   The interval between queries in the startup phase.
+> + *
+> + *   The default value is (125 * USER_HZ) / 4. The minimum value is (1 * USER_HZ).
+> + *
+> + * @IFLA_BR_NF_CALL_IPTABLES
+> + *   Enable (*NF_CALL_IPTABLES* > 0) or disable (*NF_CALL_IPTABLES* == 0)
+> + *   iptables hooks on the bridge.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_NF_CALL_IP6TABLES
+> + *   Enable (*NF_CALL_IP6TABLES* > 0) or disable (*NF_CALL_IP6TABLES* == 0)
+> + *   ip6tables hooks on the bridge.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_NF_CALL_ARPTABLES
+> + *   Enable (*NF_CALL_ARPTABLES* > 0) or disable (*NF_CALL_ARPTABLES* == 0)
+> + *   arptables hooks on the bridge.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_VLAN_DEFAULT_PVID
+> + *   VLAN ID applied to untagged and priority-tagged incoming packets.
+> + *
+> + *   The default value is 1. Set to the special value 0 makes all ports of
+> + *   this bridge not have a PVID by default, which means that they will
+> + *   not accept VLAN-untagged traffic.
+> + *
+> + * @IFLA_BR_PAD
+> + *   Bridge attribute padding type for netlink message.
+> + *
+> + * @IFLA_BR_VLAN_STATS_ENABLED
+> + *   Enable (*IFLA_BR_VLAN_STATS_ENABLED* == 1) or disable
+> + *   (*IFLA_BR_VLAN_STATS_ENABLED* == 0) per-VLAN stats accounting.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_MCAST_STATS_ENABLED
+> + *   Enable (*IFLA_BR_MCAST_STATS_ENABLED* > 0) or disable
+> + *   (*IFLA_BR_MCAST_STATS_ENABLED* == 0) multicast (IGMP/MLD) stats
+> + *   accounting.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_MCAST_IGMP_VERSION
+> + *   Set the IGMP version.
+> + *
+> + *   The valid values are 2 and 3. The default value is 2.
+> + *
+> + * @IFLA_BR_MCAST_MLD_VERSION
+> + *   Set the MLD version.
+> + *
+> + *   The valid values are 1 and 2. The default value is 1.
+> + *
+> + * @IFLA_BR_VLAN_STATS_PER_PORT
+> + *   Enable (*IFLA_BR_VLAN_STATS_PER_PORT* == 1) or disable
+> + *   (*IFLA_BR_VLAN_STATS_PER_PORT* == 0) per-VLAN per-port stats accounting.
+> + *   Can be changed only when there are no port VLANs configured.
+> + *
+> + *   The default value is 0 (disabled).
+> + *
+> + * @IFLA_BR_MULTI_BOOLOPT
+> + *   The multi_boolopt is used to control new boolean options to avoid adding
+> + *   new netlink attributes.
+
+Here you can add which enum to look at for those options.
+
+> + *
+> + * @IFLA_BR_MCAST_QUERIER_STATE
+> + *   Bridge mcast querier states, read only.
+> + *
+> + * @IFLA_BR_FDB_N_LEARNED
+> + *   The number of dynamically learned FDB entries for the current bridge,
+> + *   read only.
+> + *
+> + * @IFLA_BR_FDB_MAX_LEARNED
+> + *   Set the number of max dynamically learned FDB entries for the current
+> + *   bridge.
+> + */
+>   enum {
+>   	IFLA_BR_UNSPEC,
+>   	IFLA_BR_FORWARD_DELAY,
 
 
