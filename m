@@ -1,126 +1,119 @@
-Return-Path: <netdev+bounces-50691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EAAB7F6B30
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:15:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1987F6B97
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BC001C20C4F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 04:15:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920C81C209BA
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1071D138C;
-	Fri, 24 Nov 2023 04:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2AD23D9;
+	Fri, 24 Nov 2023 05:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sEfs/Z7X"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PL2QT++9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40173C1E
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:15:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7C1C433C8;
-	Fri, 24 Nov 2023 04:15:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700799342;
-	bh=fEcMc77/7gfRw9SdToE7MqkpAdywNycv2AMRThP2z6M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sEfs/Z7XS4kMslhO3iEOdFin1P40SfpYNJ5UhbFb/GKh1pOs5MSf95vVcrxIqjNGV
-	 9rw+rzwNDUw1Rr216H+EHMqtnm4WVnYdpGZj+VWhcenlj8pCWinWl4F1w7Y2oEoZPz
-	 /B7NvpeAF6/n+8Hl3wI7/u1T6pNsiwit5Oui8X7DmN9HKhARTUpURwPBwSwYSwF6CO
-	 cjKguGN5QRwuPKU9OEmz0C0Vk6bKjmXpNdMsQiOqbxmopOHQRSvwJF8sYzuMZ/aJ+e
-	 B8o2AgGSWJyvaEZQIqD89QZ7I6hIUkd+k6olUwUdY/OJdBlj7NqoH/K5L9E5d5CcFC
-	 eq1RMlgj/kTDw==
-From: Greg Ungerer <gerg@kernel.org>
-To: rmk+kernel@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	Greg Ungerer <gerg@kernel.org>
-Subject: [PATCHv2 2/2] net: dsa: mv88e6xxx: fix marvell 6350 probe crash
-Date: Fri, 24 Nov 2023 14:15:29 +1000
-Message-Id: <20231124041529.3450079-2-gerg@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231124041529.3450079-1-gerg@kernel.org>
-References: <20231124041529.3450079-1-gerg@kernel.org>
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEAFD71;
+	Thu, 23 Nov 2023 21:09:08 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO4Ha0q013621;
+	Fri, 24 Nov 2023 05:08:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id; s=qcppdkim1;
+ bh=izkBQImg/TjzbwWFvoo0zSUxS/DMKyakfBpX5vZNJZY=;
+ b=PL2QT++9iBWr/zas7GtBMaI6RaJsAH7ixLByYMkdZPcjhcQL/Df6sdg5pUQJgI6Pi1Cz
+ u8xlh6OXwyOkNLHfef/oWKjFoGbywdFlccoT0MBS2RDYwaAr1REyJvP6+y5Dnzaj8hhi
+ Gl6INKa6CZuZO+BlCfmONwhuKXTBXB1RCcCIXl8D5x+WVoI2A0Qqgo59jGOME/v1XDPk
+ 3XMyPQtHy6GChurvqX4GCfTzbfOeuCKn2P9PPpVtSfmtGDtY8oWU5mu4uCMZV9sLf7AD
+ cR/3OTP0cVl3GiTlwtP90kJteNRBdsrWLYuqdYircZom9NlfnCaSdubip3J6LHm3yXmz Fw== 
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uhwmearxq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 05:08:34 +0000
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3AO58U1W008057;
+	Fri, 24 Nov 2023 05:08:30 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3uepbkmrdf-1;
+	Fri, 24 Nov 2023 05:08:30 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AO58T5O008052;
+	Fri, 24 Nov 2023 05:08:30 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3AO58Tke008050;
+	Fri, 24 Nov 2023 05:08:29 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id E29925299C4; Fri, 24 Nov 2023 10:38:28 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH net] net: stmmac: update Rx clk divider for 10M SGMII
+Date: Fri, 24 Nov 2023 10:38:18 +0530
+Message-Id: <20231124050818.1221-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: YJ2KeQV5hKZDAsVYZTG0luH-FmCxpuMW
+X-Proofpoint-ORIG-GUID: YJ2KeQV5hKZDAsVYZTG0luH-FmCxpuMW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 mlxlogscore=701 lowpriorityscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311240038
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-As of commit b92143d4420f ("net: dsa: mv88e6xxx: add infrastructure for
-phylink_pcs") probing of a Marvell 88e6350 switch causes a NULL pointer
-de-reference like this example:
+SGMII 10MBPS mode needs RX clock divider to avoid drops in Rx.
+Update configure SGMII function with rx clk divider programming.
 
-    ...
-    mv88e6085 d0072004.mdio-mii:11: switch 0x3710 detected: Marvell 88E6350, revision 2
-    8<--- cut here ---
-    Unable to handle kernel NULL pointer dereference at virtual address 00000000 when read
-    [00000000] *pgd=00000000
-    Internal error: Oops: 5 [#1] ARM
-    Modules linked in:
-    CPU: 0 PID: 8 Comm: kworker/u2:0 Not tainted 6.7.0-rc2-dirty #26
-    Hardware name: Marvell Armada 370/XP (Device Tree)
-    Workqueue: events_unbound deferred_probe_work_func
-    PC is at mv88e6xxx_port_setup+0x1c/0x44
-    LR is at dsa_port_devlink_setup+0x74/0x154
-    pc : [<c057ea24>]    lr : [<c0819598>]    psr: a0000013
-    sp : c184fce0  ip : c542b8f4  fp : 00000000
-    r10: 00000001  r9 : c542a540  r8 : c542bc00
-    r7 : c542b838  r6 : c5244580  r5 : 00000005  r4 : c5244580
-    r3 : 00000000  r2 : c542b840  r1 : 00000005  r0 : c1a02040
-    ...
-
-The Marvell 6350 switch has no SERDES interface and so has no
-corresponding pcs_ops defined for it. But during probing a call is made
-to mv88e6xxx_port_setup() which unconditionally expects pcs_ops to exist -
-though the presence of the pcs_ops->pcs_init function is optional.
-
-Modify code to check for pcs_ops first, before checking for and calling
-pcs_ops->pcs_init. Modify checking and use of pcs_ops->pcs_teardown
-which may potentially suffer the same problem.
-
-Fixes: b92143d4420f ("net: dsa: mv88e6xxx: add infrastructure for phylink_pcs")
-Signed-off-by: Greg Ungerer <gerg@kernel.org>
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v2: apply same change to use of pcs_ops->teardown
-
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index d8a67bf4e595..07a22c74fe81 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3892,7 +3892,8 @@ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
- 	struct mv88e6xxx_chip *chip = ds->priv;
- 	int err;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d3bf42d0fceb..f8c42e91a624 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -34,6 +34,7 @@
+ #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
+ #define RGMII_CONFIG_PROG_SWAP			BIT(1)
+ #define RGMII_CONFIG_DDR_MODE			BIT(0)
++#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
  
--	if (chip->info->ops->pcs_ops->pcs_init) {
-+	if (chip->info->ops->pcs_ops &&
-+	    chip->info->ops->pcs_ops->pcs_init) {
- 		err = chip->info->ops->pcs_ops->pcs_init(chip, port);
- 		if (err)
- 			return err;
-@@ -3907,7 +3908,8 @@ static void mv88e6xxx_port_teardown(struct dsa_switch *ds, int port)
- 
- 	mv88e6xxx_teardown_devlink_regions_port(ds, port);
- 
--	if (chip->info->ops->pcs_ops->pcs_teardown)
-+	if (chip->info->ops->pcs_ops &&
-+	    chip->info->ops->pcs_ops->pcs_teardown)
- 		chip->info->ops->pcs_ops->pcs_teardown(chip, port);
- }
+ /* SDCC_HC_REG_DLL_CONFIG fields */
+ #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
+@@ -617,6 +618,8 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+ 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
++		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR, BIT(10) |
++			      GENMASK(15, 14), RGMII_IO_MACRO_CONFIG);
+ 		break;
+ 	}
  
 -- 
-2.25.1
+2.17.1
 
 
