@@ -1,187 +1,229 @@
-Return-Path: <netdev+bounces-50931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CD77F78DB
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:24:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBC97F78FE
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADCD6B20E24
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:24:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EA091C20919
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8C333CD9;
-	Fri, 24 Nov 2023 16:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5E428DBA;
+	Fri, 24 Nov 2023 16:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TI5cWHmX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpW2GhNg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B97BD41;
-	Fri, 24 Nov 2023 08:24:40 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-7789a4c01easo113924885a.0;
-        Fri, 24 Nov 2023 08:24:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700843079; x=1701447879; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OXuq367Ccm4+D5k3pODmrs76JvxYvWomp+aKIM/G+no=;
-        b=TI5cWHmXa1riHiMFUQtMFmaskaXkgg9yOv5lslt+upNFa7PSOTpFLLoxjsbQIcfwhf
-         4TmQN8suqD75FXESJ5JHD0f/TKnc1aQF3L2LDT5nZetOJEJ7HoBhWieksptHYFwSrGUx
-         hmxEAyvXXCjYMlOuz1yyyGr+INBcfUrhjHJpba/RfsuytZWOXvCuJDPaCprQ8+Hgs5t3
-         pj9Eds8ESI/xC7i0CT0iEA+jD54O0ogO+cem77iEHH8grEAwoFrGF4FTGaasSeQnc/pb
-         X6grry8cO6pVCbMKibCkgwoVSc2j77RYqwxsuSQT41lM0K7l5sXBtFWeycDlANvdy66E
-         4xlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700843079; x=1701447879;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OXuq367Ccm4+D5k3pODmrs76JvxYvWomp+aKIM/G+no=;
-        b=dwa0TeSa324CRUDOitLD9jT3s5iRMONPcXM1RKmE9aEd25OZs02fiBQt+JEqt7zwsc
-         0R91paaoJ+X8H4VQJyWm207EjmoNLfrH8eYwksD01R3E03xkOPAdpkPbK8SKUy0hLOQB
-         dh5JwpvU51+aN8asD9tPlWuhxjV1h0zdskxEmteQqp/YyfnLIpn3sQa6TEpnSy6ePwf4
-         HpxkEuwCaDa5J/FwM/cr3ssjowhcktnLkupbwcAaq5nizHKs0SP3lb0r3jlgl5G8GFdW
-         GArj6RzCrIHirb0iK+VOIO3yYWiDNZOcd3gTgFKEea7CsuazTuYay7HL/sf625tNygPl
-         z9GA==
-X-Gm-Message-State: AOJu0YwX49t67jjrgjqluBrawscJPB7yiXRbmQZjMrPkyi9itUj1Atdg
-	0hTrMCX3Ak6D98PraAKgp28=
-X-Google-Smtp-Source: AGHT+IHsuaReeYZvleTgFrMcuERum0qzKPn/IEj+uARWrAyWURq9ZBKxYYjp6xu84X93cTgBTBgUhw==
-X-Received: by 2002:a05:620a:55b2:b0:77d:5ca7:a6ce with SMTP id vr18-20020a05620a55b200b0077d5ca7a6cemr3487998qkn.28.1700843079420;
-        Fri, 24 Nov 2023 08:24:39 -0800 (PST)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id qs14-20020a05620a394e00b0077d87da84d1sm39091qkn.23.2023.11.24.08.24.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 08:24:39 -0800 (PST)
-Date: Fri, 24 Nov 2023 11:24:38 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mike Pattrick <mkp@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <6560ce46db783_f482f29451@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAHcdBH4aMJwkR7fVP=Brwb-4=gon-pwh0CbjbFxsoEiGj4XjVA@mail.gmail.com>
-References: <20231123183835.635210-1-mkp@redhat.com>
- <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
- <CAHcdBH7h-sq=Gzkan1du3uxx44WibK0yzdnUcZCuw-mp=9OxOg@mail.gmail.com>
- <655fe8e5b5cf5_d9fc5294a0@willemb.c.googlers.com.notmuch>
- <CAHcdBH4aMJwkR7fVP=Brwb-4=gon-pwh0CbjbFxsoEiGj4XjVA@mail.gmail.com>
-Subject: Re: [PATCH net-next] packet: Account for VLAN_HLEN in csum_start when
- virtio_net_hdr is enabled
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4046235F0D;
+	Fri, 24 Nov 2023 16:31:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DCD0C433C7;
+	Fri, 24 Nov 2023 16:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700843460;
+	bh=0m2/cMBcTydjmRWM2kg9Xg3sXuhlmH0zFa0ospNDRBM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qpW2GhNg4EblHnxfauyUbT06NCJY/KQePisvrxpj3Bb0hqiZ9OQAqj2ZX10vIPnm/
+	 7fV725jNxjWCkDAK8WFoBG2ZCuoLURtPDbWYV97BoU1PL61sGBZ/Npasvffl+In+Bo
+	 53GGEWDwJjZVJFpoiPVZv99XLTZtb9VXFJATxD5/+ufBGwCkrH8PJOnUYqsXWHvwEQ
+	 aOjF8HzHhMyBjUAosqaZ+rK96Mif55NMadoGV/ppGVZfcd/VN/XVDEMQdulju5PSGu
+	 9/Mmq2SqYGQpY1LOEM4kFJaw1p6TBIUSEgQv7RpwNNv1Vkw1BzUGU5D362A/BvomHp
+	 7v/HdYqIjRx3Q==
+Date: Fri, 24 Nov 2023 16:30:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231124163054.GQ50352@kernel.org>
+References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
+ <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
 
-Mike Pattrick wrote:
-> On Thu, Nov 23, 2023 at 7:06=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Mike Pattrick wrote:
-> > > On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Mike Pattrick wrote:
-> > > > > Af_packet provides checksum offload offsets to usermode applica=
-tions
-> > > > > through struct virtio_net_hdr when PACKET_VNET_HDR is enabled o=
-n the
-> > > > > socket. For skbuffs with a vlan being sent to a SOCK_RAW socket=
-,
-> > > > > af_packet will include the link level header and so csum_start =
-needs
-> > > > > to be adjusted accordingly.
-> > > >
-> > > > Is this patch based on observing an incorrect offset in a workloa=
-d,
-> > > > or on code inspection?
-> > >
-> > > Based on an incorrect offset in a workload. The setup involved send=
-ing
-> > > vxlan traffic though a veth interface configured with a vlan. The
-> > > vnet_hdr's csum_start value was off by 4, and this problem went awa=
-y
-> > > when the vlan was removed.
-> > >
-> > > I'll take another look at this patch.
-> >
-> > This is a vlan device on top of a veth device? On which device and at=
+On Thu, Nov 16, 2023 at 03:01:41PM +0100, Kory Maincent wrote:
+> Add a new driver for the PD692x0 I2C Power Sourcing Equipment controller.
+> This driver only support i2c communication for now.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-> > which point (ingress or egress) are you receiving the packet over the=
+Hi Kory,
 
-> > packet socket?
-> =
+some minor feedback from my side.
 
-> Just for maximum clarity I'll include the extracted commands below,
-> but roughly there is a vlan device on top of a vxlan device on top of
-> a vlan device on top of a veth, in a namespace.
-> =
+...
 
-> ip netns add at_ns0
-> ip netns exec at_ns0 ip link add dev at_vxlan1 type vxlan remote
-> 172.31.1.100 id 0 dstport 4789
-> ip netns exec at_ns0 ip addr add dev at_vxlan1 10.2.1.1/24
-> ip netns exec at_ns0 ip link set dev at_vxlan1 mtu 1450 up
-> ip link add p0 type veth peer name ovs-p0
-> ethtool -K p0 sg on
-> ethtool -K p0 tso on
-> ip link set p0 netns at_ns0
-> ip link set dev ovs-p0 up
-> ip netns exec at_ns0 ip addr add "172.31.2.1/24" dev p0
-> ip netns exec at_ns0 ip link set dev p0 up
-> ip netns exec at_ns0 ip link add link at_vxlan1 name at_vxlan1.100
-> type vlan proto 802.1q id 100
-> ip netns exec at_ns0 ip link set dev at_vxlan1.100 up
-> ip netns exec at_ns0 ip addr add dev at_vxlan1.100 "10.1.1.1/24"
-> ip netns exec at_ns0 ip link add link p0 name p0.42 type vlan proto 802=
-.1q id 42
-> ip netns exec at_ns0 ip link set dev p0.42 up
-> ip netns exec at_ns0 ip addr add dev p0.42 "172.31.1.1/24"
-> ip addr add "172.31.1.100/24" dev p0
-> ip link set dev p0 up
+> diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
 
-Are these two lines intended to be ovs-p0 rather than p0?
-As p0 lives inside the netns (and already has an address)
+...
 
-> ip netns exec at_ns0 ping 10.1.1.100
-> =
+> +static int
+> +pd692x0_get_of_matrix(struct device *dev,
+> +		      struct matrix port_matrix[PD692X0_MAX_LOGICAL_PORTS])
+> +{
+> +	int ret, i, ports_matrix_size;
+> +	u32 val[PD692X0_MAX_LOGICAL_PORTS * 3];
 
-> An AF_PACKET socket on ovs-p0 receives the incorrect csum_start.
-> Setting up the same with a geneve tunnel and udpcsum enabled produces
-> the same result. Removing vlan 100 also yields an incorrect
-> csum_start. Removing only vlan 42 yields a correct csum_start.
+nit: reverse xmas tree please.
 
-I wonder if a simple checksum offloaded UDP packet sent over a vlan
-directly on top of veth, like .100 has a correct offset before your
-patch, but incorrect offset after.
+...
 
-The issue you are encountering might be that vxlan does not support
-vlan offload, so validate_xmit_vlan will pull the vlan into the
-header with __vlan_hwaccel_push_inside, but this does not adjust
-csum_start. Not sure, but perhaps you can instrument your kernel
-and see where the offset goes wrong. It is not inside the pf_packet
-socket, in any case.
- =
+> +static int pd692x0_fw_write_line(const struct i2c_client *client,
+> +				 const char line[PD692X0_FW_LINE_MAX_SZ],
+> +				 const bool last_line)
+> +{
+> +	int ret;
+> +
+> +	while (*line != 0) {
+> +		ret = i2c_master_send(client, line, 1);
+> +		if (ret < 0)
+> +			return FW_UPLOAD_ERR_RW_ERROR;
+> +		line++;
+> +	}
+> +
+> +	if (last_line) {
+> +		ret = pd692x0_fw_recv_resp(client, 100, "TP\r\n",
+> +					   sizeof("TP\r\n") - 1);
+> +		if (ret)
+> +			return ret;
+> +	} else {
+> +		ret = pd692x0_fw_recv_resp(client, 100, "T*\r\n",
+> +					   sizeof("T*\r\n") - 1);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return FW_UPLOAD_ERR_NONE;
+> +}
 
-> >
-> > From a quick glance, in all cases that I see the VLAN tag is kept in
-> > skb->vlan_tci, so is never part of the packet payload.
-> >
-> > But checksum offload with VXLAN can be non-trivial on its own. If
-> > type & SKB_GSO_UDP_TUNNEL_CSUM | SKB_GSO_TUNNEL_REMCSUM, say. Then
-> > csum_start will point to the checksum in vxlanhdr.
-> >
-> =
+...
 
+> +static enum fw_upload_err pd692x0_fw_write(struct fw_upload *fwl,
+> +					   const u8 *data, u32 offset,
+> +					   u32 size, u32 *written)
+> +{
+> +	struct pd692x0_priv *priv = fwl->dd_handle;
+> +	char line[PD692X0_FW_LINE_MAX_SZ];
+> +	const struct i2c_client *client;
+> +	int ret, i;
+> +	char cmd;
+> +
+> +	client = priv->client;
+> +	priv->fw_state = PD692X0_FW_WRITE;
+> +
+> +	/* Erase */
+> +	cmd = 'E';
+> +	ret = i2c_master_send(client, &cmd, 1);
+> +	if (ret < 0) {
+> +		dev_err(&client->dev,
+> +			"Failed to boot programming mode (%pe)\n",
+> +			ERR_PTR(ret));
+> +		return FW_UPLOAD_ERR_RW_ERROR;
+> +	}
+> +
+> +	ret = pd692x0_fw_recv_resp(client, 100, "TOE\r\n", sizeof("TOE\r\n") - 1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = pd692x0_fw_recv_resp(client, 5000, "TE\r\n", sizeof("TE\r\n") - 1);
+> +	if (ret)
+> +		dev_warn(&client->dev,
+> +			 "Failed to erase internal memory, however still try to write Firmware\n");
+> +
+> +	ret = pd692x0_fw_recv_resp(client, 100, "TPE\r\n", sizeof("TPE\r\n") - 1);
+> +	if (ret)
+> +		dev_warn(&client->dev,
+> +			 "Failed to erase internal memory, however still try to write Firmware\n");
+> +
+> +	if (priv->cancel_request)
+> +		return FW_UPLOAD_ERR_CANCELED;
+> +
+> +	/* Program */
+> +	cmd = 'P';
+> +	ret = i2c_master_send(client, &cmd, sizeof(char));
+> +	if (ret < 0) {
+> +		dev_err(&client->dev,
+> +			"Failed to boot programming mode (%pe)\n",
+> +			ERR_PTR(ret));
+> +		return ret;
+> +	}
+> +
+> +	ret = pd692x0_fw_recv_resp(client, 100, "TOP\r\n", sizeof("TOP\r\n") - 1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	i = 0;
+> +	while (i < size) {
+> +		ret = pd692x0_fw_get_next_line(data, line, size - i);
+> +		if (!ret) {
+> +			ret = FW_UPLOAD_ERR_FW_INVALID;
+> +			goto err;
+> +		}
+> +
+> +		i += ret;
+> +		data += ret;
+> +		if (line[0] == 'S' && line[1] == '0') {
+> +			continue;
+> +		} else if (line[0] == 'S' && line[1] == '7') {
+> +			ret = pd692x0_fw_write_line(client, line, true);
+> +			if (ret)
+> +				goto err;
+> +		} else {
+> +			ret = pd692x0_fw_write_line(client, line, false);
+> +			if (ret)
+> +				goto err;
+> +		}
+> +
+> +		if (priv->cancel_request) {
+> +			ret = FW_UPLOAD_ERR_CANCELED;
+> +			goto err;
+> +		}
+> +	}
+> +	*written = i;
+> +
+> +	msleep(400);
+> +
+> +	return FW_UPLOAD_ERR_NONE;
+> +
+> +err:
+> +	pd692x0_fw_write_line(client, "S7\r\n", true);
 
+gcc-13 (W=1) seems a bit upset about this.
 
+ drivers/net/pse-pd/pd692x0.c: In function 'pd692x0_fw_write':
+ drivers/net/pse-pd/pd692x0.c:861:9: warning: 'pd692x0_fw_write_line' reading 128 bytes from a region of size 5 [-Wstringop-overread]
+   861 |         pd692x0_fw_write_line(client, "S7\r\n", true);
+       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ drivers/net/pse-pd/pd692x0.c:861:9: note: referencing argument 2 of type 'const char[128]'
+ drivers/net/pse-pd/pd692x0.c:642:12: note: in a call to function 'pd692x0_fw_write_line'
+   642 | static int pd692x0_fw_write_line(const struct i2c_client *client,
+       |            ^~~~~~~~~~~~~~~~~~~~~
+
+> +	return ret;
+> +}
+
+...
 
