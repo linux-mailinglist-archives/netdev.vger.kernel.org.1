@@ -1,147 +1,153 @@
-Return-Path: <netdev+bounces-50763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83B6A7F705C
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:49:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F2407F7076
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40FDE281D14
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:49:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 466911F2061B
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D32171D7;
-	Fri, 24 Nov 2023 09:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0AC17983;
+	Fri, 24 Nov 2023 09:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="UZS+8JRd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JCHbIQyp"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193241A5;
-	Fri, 24 Nov 2023 01:48:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=Y6oOg+XyggL3panEJ9dZ3qh6P7m6iqtMQeQ+/73vKtk=; b=UZS+8JRd5hGjDZklNyqijiVqoG
-	QzvTPxvRWOHTUmyR3vZ9VJvGM1f9YgAdkl6lxVrVStTEVbXtFXjzzxiZtEBbJPAXrb1p5GHqxxfBV
-	83lUoWBjWoXQ9ZMfymHJ7XspO64xP8Ug4qFe/TIXv+0VwbP5Bl3wTVoZ2pDKDhDDWnMXfxrrbhdYm
-	XAi9JZKirPuGbBAUs1BJqEyObdZWBGLD/SaUgzRlSqyPF/7zfa2tFsF0fd6vI3/ZjvuqtKDnB/S6n
-	vmopK1nO1JsxToTTLgVhm/He0d9GhLEHGs06OD3B9JS/nAaPoPSxYMxkaX1kS1NNJufgEjTyBjEdl
-	mf4kAvyA==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r6Snv-0008hD-HU; Fri, 24 Nov 2023 10:48:55 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r6Snu-000Gj6-9l; Fri, 24 Nov 2023 10:48:54 +0100
-Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
- send/recv/acked events
-To: Philo Lu <lulie@linux.alibaba.com>, bpf@vger.kernel.org
-Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
- hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org
-References: <20231123030732.111576-1-lulie@linux.alibaba.com>
- <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <72166ea4-cae7-97e2-88fd-e9bde56523fb@iogearbox.net>
-Date: Fri, 24 Nov 2023 10:47:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C484F171D;
+	Fri, 24 Nov 2023 01:50:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700819417; x=1732355417;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WzTWD8+CcHAV0Ch8HWHYlJ+az5wbVKJRj68BrurTJKw=;
+  b=JCHbIQypZ/2KENcCKxczb/SLynZmnmc2zqrCBAPOlttQcN4Y6hGsK62d
+   W2gMTuZV2quAFPIE6pbQsTXl2kJKKyIQnwjNSN2N3ku1xBz+kFzbTDSXH
+   KtilnUo+Sc2a0mqcG1and9cD+iP8RpmhWr9fRn/eh+WNpG1kGsOwa3ekY
+   FJj2a387ns0la3ZGpusM5bOu3RFy7xWLt2/LYRg3l7M/pT9NuUdalp7+w
+   BvzB9xSYFfU9qh6R7ihZNRU9QlQKqa94UDeiPpcFDwnVYBYD/cIwE3DN/
+   yVGT3zzOEHjOyuPH7G74xQr3DKYbIyELoOhSNaRljREe2c4Bbc4QoExTa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="392165234"
+X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
+   d="scan'208";a="392165234"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 01:50:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
+   d="scan'208";a="8921133"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 24 Nov 2023 01:50:15 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r6Sp9-0002Lc-2z;
+	Fri, 24 Nov 2023 09:50:11 +0000
+Date: Fri, 24 Nov 2023 17:49:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
+	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
+Subject: Re: [PATCH net-next v12 12/13] realtek: Update the Makefile and
+ Kconfig in the realtek folder
+Message-ID: <202311241318.bdYlmH2b-lkp@intel.com>
+References: <20231123124313.1398570-13-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27103/Fri Nov 24 09:40:22 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123124313.1398570-13-justinlai0215@realtek.com>
 
-On 11/23/23 1:37 PM, Philo Lu wrote:
-> Sorry, I forgot to cc the maintainers.
-> 
-> On 2023/11/23 11:07, Philo Lu wrote:
->> Add 3 sock_ops operators, namely BPF_SOCK_OPS_DATA_SEND_CB,
->> BPF_SOCK_OPS_DATA_RECV_CB, and BPF_SOCK_OPS_DATA_ACKED_CB. A flag
->> BPF_SOCK_OPS_DATA_EVENT_CB_FLAG is provided to minimize the performance
->> impact. The flag must be explicitly set to enable these callbacks.
->>
->> If the flag is enabled, bpf sock_ops program will be called every time a
->> tcp data packet is sent, received, and acked.
->> BPF_SOCK_OPS_DATA_SEND_CB: call bpf after a data packet is sent.
->> BPF_SOCK_OPS_DATA_RECV_CB: call bpf after a data packet is receviced.
->> BPF_SOCK_OPS_DATA_ACKED_CB: call bpf after a valid ack packet is
->> processed (some sent data are ackknowledged).
->>
->> We use these callbacks for fine-grained tcp monitoring, which collects
->> and analyses every tcp request/response event information. The whole
->> system has been described in SIGMOD'18 (see
->> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
->> achieve this with bpf, we require hooks for data events that call
->> sock_ops bpf (1) when any data packet is sent/received/acked, and (2)
->> after critical tcp state variables have been updated (e.g., snd_una,
->> snd_nxt, rcv_nxt). However, existing sock_ops operators cannot meet our
->> requirements.
->>
->> Besides, these hooks also help to debug tcp when data send/recv/acked.
->>
->> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->> ---
->>   include/net/tcp.h        |  9 +++++++++
->>   include/uapi/linux/bpf.h | 14 +++++++++++++-
->>   net/ipv4/tcp_input.c     |  4 ++++
->>   net/ipv4/tcp_output.c    |  2 ++
->>   4 files changed, 28 insertions(+), 1 deletion(-)
+Hi Justin,
 
-Please also add selftests for the new hooks, and speaking of the latter
-looks like this fails current BPF selftests :
+kernel test robot noticed the following build warnings:
 
-https://github.com/kernel-patches/bpf/actions/runs/6974541866/job/18980491457
+[auto build test WARNING on net-next/main]
 
-Notice: Success: 502/3526, Skipped: 56, Failed: 1
-Error: #348 tcpbpf_user
-   Error: #348 tcpbpf_user
-   test_tcpbpf_user:PASS:open and load skel 0 nsec
-   test_tcpbpf_user:PASS:test__join_cgroup(/tcpbpf-user-test) 0 nsec
-   test_tcpbpf_user:PASS:attach_cgroup(bpf_testcb) 0 nsec
-   run_test:PASS:start_server 0 nsec
-   run_test:PASS:connect_to_fd(listen_fd) 0 nsec
-   run_test:PASS:accept(listen_fd) 0 nsec
-   run_test:PASS:send(cli_fd) 0 nsec
-   run_test:PASS:recv(accept_fd) 0 nsec
-   run_test:PASS:send(accept_fd) 0 nsec
-   run_test:PASS:recv(cli_fd) 0 nsec
-   run_test:PASS:recv(cli_fd) for fin 0 nsec
-   run_test:PASS:recv(accept_fd) for fin 0 nsec
-   verify_result:PASS:event_map 0 nsec
-   verify_result:PASS:bytes_received 0 nsec
-   verify_result:PASS:bytes_acked 0 nsec
-   verify_result:PASS:data_segs_in 0 nsec
-   verify_result:PASS:data_segs_out 0 nsec
-   verify_result:FAIL:bad_cb_test_rv unexpected bad_cb_test_rv: actual 0 != expected 128
-   verify_result:PASS:good_cb_test_rv 0 nsec
-   verify_result:PASS:num_listen 0 nsec
-   verify_result:PASS:num_close_events 0 nsec
-   verify_result:PASS:tcp_save_syn 0 nsec
-   verify_result:PASS:tcp_saved_syn 0 nsec
-   verify_result:PASS:window_clamp_client 0 nsec
-   verify_result:PASS:window_clamp_server 0 nsec
-Test Results:
-              bpftool: PASS
-           test_progs: FAIL (returned 1)
-             shutdown: CLEAN
-Error: Process completed with exit code 1.
+url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/rtase-Add-pci-table-supported-in-this-module/20231123-204759
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231123124313.1398570-13-justinlai0215%40realtek.com
+patch subject: [PATCH net-next v12 12/13] realtek: Update the Makefile and Kconfig in the realtek folder
+config: csky-randconfig-r081-20231124 (https://download.01.org/0day-ci/archive/20231124/202311241318.bdYlmH2b-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231124/202311241318.bdYlmH2b-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311241318.bdYlmH2b-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:2318:12: warning: 'rtase_resume' defined but not used [-Wunused-function]
+    2318 | static int rtase_resume(struct device *device)
+         |            ^~~~~~~~~~~~
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:2305:12: warning: 'rtase_suspend' defined but not used [-Wunused-function]
+    2305 | static int rtase_suspend(struct device *device)
+         |            ^~~~~~~~~~~~~
+
+
+vim +/rtase_resume +2318 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+8f9d7c2677f7dc Justin Lai 2023-11-23  2304  
+da2f11aefe82ee Justin Lai 2023-11-23 @2305  static int rtase_suspend(struct device *device)
+da2f11aefe82ee Justin Lai 2023-11-23  2306  {
+da2f11aefe82ee Justin Lai 2023-11-23  2307  	struct net_device *dev = dev_get_drvdata(device);
+da2f11aefe82ee Justin Lai 2023-11-23  2308  
+da2f11aefe82ee Justin Lai 2023-11-23  2309  	if (netif_running(dev)) {
+da2f11aefe82ee Justin Lai 2023-11-23  2310  		netif_stop_queue(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2311  		netif_device_detach(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2312  		rtase_hw_reset(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2313  	}
+da2f11aefe82ee Justin Lai 2023-11-23  2314  
+da2f11aefe82ee Justin Lai 2023-11-23  2315  	return 0;
+da2f11aefe82ee Justin Lai 2023-11-23  2316  }
+da2f11aefe82ee Justin Lai 2023-11-23  2317  
+da2f11aefe82ee Justin Lai 2023-11-23 @2318  static int rtase_resume(struct device *device)
+da2f11aefe82ee Justin Lai 2023-11-23  2319  {
+da2f11aefe82ee Justin Lai 2023-11-23  2320  	struct net_device *dev = dev_get_drvdata(device);
+da2f11aefe82ee Justin Lai 2023-11-23  2321  	struct rtase_private *tp = netdev_priv(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2322  	int ret;
+da2f11aefe82ee Justin Lai 2023-11-23  2323  
+da2f11aefe82ee Justin Lai 2023-11-23  2324  	/* restore last modified mac address */
+da2f11aefe82ee Justin Lai 2023-11-23  2325  	rtase_rar_set(tp, dev->dev_addr);
+da2f11aefe82ee Justin Lai 2023-11-23  2326  
+da2f11aefe82ee Justin Lai 2023-11-23  2327  	if (!netif_running(dev))
+da2f11aefe82ee Justin Lai 2023-11-23  2328  		goto out;
+da2f11aefe82ee Justin Lai 2023-11-23  2329  
+da2f11aefe82ee Justin Lai 2023-11-23  2330  	rtase_wait_for_quiescence(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2331  
+da2f11aefe82ee Justin Lai 2023-11-23  2332  	rtase_tx_clear(tp);
+da2f11aefe82ee Justin Lai 2023-11-23  2333  	rtase_rx_clear(tp);
+da2f11aefe82ee Justin Lai 2023-11-23  2334  
+da2f11aefe82ee Justin Lai 2023-11-23  2335  	ret = rtase_init_ring(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2336  	if (ret) {
+da2f11aefe82ee Justin Lai 2023-11-23  2337  		netdev_err(dev, "unable to init ring\n");
+da2f11aefe82ee Justin Lai 2023-11-23  2338  		rtase_free_desc(tp);
+da2f11aefe82ee Justin Lai 2023-11-23  2339  		return -ENOMEM;
+da2f11aefe82ee Justin Lai 2023-11-23  2340  	}
+da2f11aefe82ee Justin Lai 2023-11-23  2341  
+da2f11aefe82ee Justin Lai 2023-11-23  2342  	rtase_hw_config(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2343  	/* always link, so start to transmit & receive */
+da2f11aefe82ee Justin Lai 2023-11-23  2344  	rtase_hw_start(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2345  
+da2f11aefe82ee Justin Lai 2023-11-23  2346  	netif_wake_queue(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2347  	netif_device_attach(dev);
+da2f11aefe82ee Justin Lai 2023-11-23  2348  out:
+da2f11aefe82ee Justin Lai 2023-11-23  2349  
+da2f11aefe82ee Justin Lai 2023-11-23  2350  	return 0;
+da2f11aefe82ee Justin Lai 2023-11-23  2351  }
+da2f11aefe82ee Justin Lai 2023-11-23  2352  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
