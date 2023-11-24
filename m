@@ -1,155 +1,98 @@
-Return-Path: <netdev+bounces-50851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 106387F749C
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:11:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE737F749E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 338081C20944
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:11:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178EB1C20D2B
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7939286B1;
-	Fri, 24 Nov 2023 13:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6664B1CAAF;
+	Fri, 24 Nov 2023 13:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IKtdipP5"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="R/NCGz6A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF39C10F3;
-	Fri, 24 Nov 2023 05:11:44 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIFKS008542;
-	Fri, 24 Nov 2023 13:11:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=5IoTUiCxTRIPqYPCKOzSb0u5MJow0CO3WitoRploFwA=;
- b=IKtdipP5X5umVD/CtAI9EQfZH28Z+pie6OzdKras9+AfBwe0YWU2Zec1PBQHWr/3DX7n
- NJamVke+dOJFIrTwpbcPAgvzvHQNw8ry3m4gULxphdwPyIoFzQqRuo1y8rHVquWuOJO9
- WiKSEQXNTZCNE5ECLazgAQcPT2Ep4doQsOK4QWT0MgmAFYmkhxA+i7+82qISZJI2OCm9
- FBWQVVCWj49xbJu7/pMpla8dVzZZ5qZIMPu3Yx9yl36I6mbXRXWQk7eI0Nyr7+Rd+Q5a
- b2GDdOXwrek7uQgvuuqZyCPpWPSE434DjdDeBJWZxaG0iutjSh5DKmKTqfOcmMrVS9Oj Iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujuq6s43x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 13:11:40 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AODB5ul006198;
-	Fri, 24 Nov 2023 13:11:39 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujuq6s43b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 13:11:39 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIoCE018998;
-	Fri, 24 Nov 2023 13:11:38 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf93mdk6r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 13:11:38 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AODBbaT19726940
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Nov 2023 13:11:38 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 96D9E58060;
-	Fri, 24 Nov 2023 13:11:37 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 055A958056;
-	Fri, 24 Nov 2023 13:11:34 +0000 (GMT)
-Received: from [9.171.44.206] (unknown [9.171.44.206])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Nov 2023 13:11:33 +0000 (GMT)
-Message-ID: <30b53b21-40ad-407a-bef7-ddc28f8978e2@linux.ibm.com>
-Date: Fri, 24 Nov 2023 14:11:33 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/7] net/smc: implement SMCv2.1 virtual ISM
- device support
-Content-Language: en-GB
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5XEJB9UbR5achhgrO0-9qVQrsNZgbc6A
-X-Proofpoint-GUID: SXTFhSlAIzL3ucdUb8ZCp0gQhMjXWwoW
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B20F11F
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:12:03 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9fa2714e828so262424466b.1
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 05:12:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1700831522; x=1701436322; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AJHJos/MKkmaxuQUOarNarE5ADwzWf0NrTDPJkxCgW4=;
+        b=R/NCGz6AP3gHPkB4n+2IeCYlQobmwWDxQEF+VC/11p8xDE+vDvevomOZbJFwQu78E/
+         UvubpBEN24udx4VkOWIsIa44syW3y5rn+Cpy935r4Hsq80JgyZm6LVRn75Y8Mab36KY1
+         P0xXz5hDhNJjd4jr0JxdFBHZDBdbXpJP2PaVIVMKrg5+R0t4tQRs+VG0jiCULC0tOeRo
+         4J/fE4/gDwxeEi2O2FDGPMn+KPjPJi8VmEY9YyNGsUZ7+vGPa/cLxscwfisfWucvV0BF
+         9wnZQHAc4UD28LPlxs+IFHwHiH31kmSwrz6ST9FMej+Uqqz4A6e95KVBF2lgUaav9ThG
+         Mgaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700831522; x=1701436322;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AJHJos/MKkmaxuQUOarNarE5ADwzWf0NrTDPJkxCgW4=;
+        b=vYFUPhEyFpPPvYZU+U5DwfYXeJ5kw218aThtgi5Tv5Ew+jw6Qb0oQUkI1cAzOjzRHD
+         ZXBuSVp0S2Mecl1QD4fmHDe+V5Tbr1X5Hj7TjDkEw4zcEuw9M/hBV5gq8TwK73mkDEfh
+         7OTt8m3wQPqsJrUVHq/EHdhDwfkgtGXkUkhonh2Krzv/DGsGVnk3SRvuJcaK2V5Qd7FH
+         FTetjUvNCIr62A81t+UZr5bAe4OIH0tMqFrfXTShLajpCKjGW6JfW7UvOtxPXBrxtXkv
+         hRIb13nXEpC4ZzzmgZjT5t58ihm5H8xiycJzxdV9miiravzfb+WKokOPpJPOxEsOMvOh
+         9Ubw==
+X-Gm-Message-State: AOJu0YxRlL9g48DOjmaPqM3NKZ8pqyBk1x6p2+9r5GlmAv7rHXi7kcEo
+	Ic3mpdBsKfH9ObxHUcYWYqrHzA==
+X-Google-Smtp-Source: AGHT+IELi5L3NUF5zWIffAnBMyk2kO+1j331p0K0QdU0EoCInCMaMQrXk0kvlXsEg8HN5wEC+6MWFw==
+X-Received: by 2002:a17:906:fd4d:b0:a03:8cf4:8762 with SMTP id wi13-20020a170906fd4d00b00a038cf48762mr1880682ejb.37.1700831521875;
+        Fri, 24 Nov 2023 05:12:01 -0800 (PST)
+Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
+        by smtp.gmail.com with ESMTPSA id r17-20020a170906a21100b009ae57888718sm2025665ejy.207.2023.11.24.05.12.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Nov 2023 05:12:01 -0800 (PST)
+Message-ID: <4f6e4b0b-d58b-902a-9f83-9d48a45cd7b3@blackwall.org>
+Date: Fri, 24 Nov 2023 15:12:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 spamscore=0 clxscore=1011 malwarescore=0 mlxscore=0
- phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2311240102
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCHv2 net-next 09/10] docs: bridge: add netfilter doc
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Marc Muehlfeld <mmuehlfe@redhat.com>
+References: <20231123134553.3394290-1-liuhangbin@gmail.com>
+ <20231123134553.3394290-10-liuhangbin@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231123134553.3394290-10-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-On 19.11.23 14:57, Wen Gu wrote:
-> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
-> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
-> OS or hypervisor software, comparable to IBM ISM which is based on platform
-> firmware or hardware.
+On 11/23/23 15:45, Hangbin Liu wrote:
+> Add netfilter part for bridge document.
 > 
-> With the introduction of virtual ISM, SMCv2.1 makes some updates:
-> 
-> - Introduce feature bitmask to indicate supplemental features.
-> - Reserve a range of CHIDs for virtual ISM.
-> - Support extended GIDs (128 bits) in CLC handshake.
-> 
-> So this patch set aims to implement these updates in Linux kernel. And it
-> acts as the first part of the new version of [1].
-> 
-> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
-> 
-> Wen Gu (7):
->    net/smc: Rename some variable 'fce' to 'fce_v2x' for clarity
->    net/smc: support SMCv2.x supplemental features negotiation
->    net/smc: introduce virtual ISM device support feature
->    net/smc: define a reserved CHID range for virtual ISM devices
->    net/smc: compatible with 128-bits extend GID of virtual ISM device
->    net/smc: disable SEID on non-s390 archs where virtual ISM may be used
->    net/smc: manage system EID in SMC stack instead of ISM driver
-> 
->   drivers/s390/net/ism.h     |  6 ---
->   drivers/s390/net/ism_drv.c | 54 +++++++--------------------
->   include/linux/ism.h        |  1 -
->   include/net/smc.h          | 16 +++++---
->   net/smc/af_smc.c           | 68 ++++++++++++++++++++++++++-------
->   net/smc/smc.h              |  7 ++++
->   net/smc/smc_clc.c          | 93 ++++++++++++++++++++++++++++++++--------------
->   net/smc/smc_clc.h          | 22 +++++++----
->   net/smc/smc_core.c         | 30 ++++++++++-----
->   net/smc/smc_core.h         |  8 ++--
->   net/smc/smc_diag.c         |  7 +++-
->   net/smc/smc_ism.c          | 57 ++++++++++++++++++++--------
->   net/smc/smc_ism.h          | 31 +++++++++++++++-
->   net/smc/smc_pnet.c         |  4 +-
->   14 files changed, 269 insertions(+), 135 deletions(-)
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>   Documentation/networking/bridge.rst | 36 +++++++++++++++++++++++++++++
+>   1 file changed, 36 insertions(+)
 > 
 
-Hi Wen Gu,
+Good,
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Just FYI, the review is still on going and some tests on our plateform 
-still need to do. I'll give you my comments as soon as the testing is 
-done. I think it would be at the beginning of next week.
 
-Thanks,
-Wenjia
 
