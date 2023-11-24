@@ -1,184 +1,213 @@
-Return-Path: <netdev+bounces-50903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E167F780A
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:44:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 408A07F7825
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C82521F20F3F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63C651C20A6E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C64E321AD;
-	Fri, 24 Nov 2023 15:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464503172C;
+	Fri, 24 Nov 2023 15:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qZdc2khB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dAUdFUGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2052.outbound.protection.outlook.com [40.107.22.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869151BD9;
-	Fri, 24 Nov 2023 07:43:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JfvnZxnR4bV7U5WwFdg+ymCIpojuNiSc0jFqr0MqBaQvY3OzKj4yhmhZNjuK6Xm3TjVQ2P4W8DbiIP99DRMQMT6PldmiKRgR25+NYBOymT2qMRRtfyn/VNUYJIrzz7rKUDAjPCcUFlbgip/P4UXvSphYe4gN3ZZ9eF0wg8bxxCjQI/CZ4Ok/KZKZLPjuZAupreh7tQbIHH7QDPnBuED80X6FVoC6fejsB5QU2nV3XhK2ilX255+gsP2nyHDtNf/olBzi0G0JlpAujbXKOum0C4+KM9UU6lpa1Z307mBQGeFIfnQDUGCSbbvD+bt7FKSoB+iZrNgvDeP03rf+GFI4ZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LeiRHHOiRlK7tVW0hP0iV4iv4hsQAbvq2O0CB/Ds0rk=;
- b=eWbohEFe9sKhH9b3FEHjIVy4FVXD59jVMFalD6bNbgMIn/+8ihtY1Gn9jw2ZrnvF+86AnOwMpsiDrJSfKhw+AcCS5ze6vq1EhrmxJw/17jbl5W4yQNy5JVCwJ6Tk73kUIGwNxU/0Pg/uRhhEV/eTOZFqctnZ7oGhHfnaqG2sKMLMiDo/wo25gFJBajLuv4Ibacym2LqXtjVZqIYDwBeg0T3w2PNr3pjwr2j8MEXtHSkEKwGtZ4tpekzquI4fATvC9VIWGciP7fZZyxzOy0sa6iJS2i1Q9cirEzEav/lcFhHzFBhLXELGf2UiuHhgdRQ8rqQdoMf5CJ8yLz/g3O4NMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LeiRHHOiRlK7tVW0hP0iV4iv4hsQAbvq2O0CB/Ds0rk=;
- b=qZdc2khBaKBcvQjrtC4mNK7RqxRG4OJrQU7U51zZ1c2NDxID5Yvk5YyN2mxCQb8+Upnr7Q4fHVRyjcF59UKUJRRNr6o6xzLNXOfw+s7CaBd2DJRuvxJ5YyruYf9PsZJ42pIKdMhtDD70NFQ6LFEo99A9xhv1X4IKyYtvpd+lHWQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by GVXPR04MB10071.eurprd04.prod.outlook.com (2603:10a6:150:11a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.14; Fri, 24 Nov
- 2023 15:43:47 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7046.012; Fri, 24 Nov 2023
- 15:43:47 +0000
-Date: Fri, 24 Nov 2023 17:43:43 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231124154343.sr3ajyueoshke6tn@skbuf>
-References: <20231120220549.cvsz2ni3wj7mcukh@skbuf>
- <20231121183114.727fb6d7@kmaincent-XPS-13-7390>
- <20231121094354.635ee8cd@kernel.org>
- <20231122144453.5eb0382f@kmaincent-XPS-13-7390>
- <20231122140850.li2mvf6tpo3f2fhh@skbuf>
- <20231122085000.79f2d14c@kernel.org>
- <20231122165517.5cqqfor3zjqgyoow@skbuf>
- <20231122100142.338a2092@kernel.org>
- <20231123160056.070f3311@kmaincent-XPS-13-7390>
- <20231123093205.484356fc@kernel.org>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231123093205.484356fc@kernel.org>
-X-ClientProxiedBy: AM8P251CA0003.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143131B5;
+	Fri, 24 Nov 2023 07:50:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700841002; x=1732377002;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QbtcaO740tBPAPpBK4rvmbroWz1PJY6JofPTWopFM0w=;
+  b=dAUdFUGdA7WeYmHQwLQi9dR6HM4WGKGIZ2g95z20PiXP4c08x56kEl3p
+   v61pD6WY/CHh5rjwN+jPHnJVLac+nHEQrvOQ5Moxd0OemOOiv9gIrVEr8
+   S4PY6ivQWK27LeLa/BTfs5NX4OSpWc0xq16Ni5osGS7AvvnFdr9ZuhxrU
+   C13v/iFBEltEEhofLOl6pEgtl1k/gTZopo5HDMo7iWhnXB47wmaKEumkS
+   kF8dIkRqWQS8zFDvwSVcrX+ouKKNWerzhc7wlz5GQ8FGKPf7ifwIKLYkq
+   Ce9JdCm6+HJo2vJJIPpYyc4I9qYFiF0ghBvcDVRHM6YzozspN3AUgOw9U
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="389592417"
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="389592417"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 07:50:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="15659739"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa001.jf.intel.com with ESMTP; 24 Nov 2023 07:49:57 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 00/14] net: intel: start The Great Code Dedup + Page Pool for iavf
+Date: Fri, 24 Nov 2023 16:47:18 +0100
+Message-ID: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|GVXPR04MB10071:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed6f69e1-828e-4594-cf7b-08dbed0425f1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	x02+izdP50aUeHGZcyo0+unsFYNaKxsAGj4w4irfIUprv8bAdwisGzMd5PJSqOAUmn8D+Y3rZ+8Q3h6fWbr205SQgEeievREugLlX597Jo7BFOpfOnhQQ38bxnqmM428sWNXfF434e9hQXnf9Qzvk+eXOoQW7FaWMYb+t1OopvIcMr+f3fwYSmPz+90w6PAAx8Ntl7spMA2Eh5R41gIjp3XboNRWIbV46qmQv6EaOzz4COPiCSAfkvtEXng0lMs8WUqEX9tnN0vCJU5srk9aNMGHHTsX6dsH3NllVReyMQsLBEo8NiOSAt6gbU4+Ho5zPff/TRNwg7xLhgZpC9314lo06sc3utauX+9X0fQ/otCwUkl02lDfy00QoCdHUaV/IlwWFMbUW1ZvH1e1MHRrmvi3STtbevTHNTBWt8MjrpUINAFEKsQEtKCihAxuCcSoXZ/ju4drMR8DMbyL7LjyPtzIEtj+amN7yLbK2zXmnVKq2eblZtZ9ZI3Paml6m6xVOCtwrDtMpPHJBVANUXndFQ3DSxHoYFSdSJ7CiM2l7lz6WinwO2pBzu2P5HnKrbTH
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(346002)(39860400002)(396003)(136003)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(478600001)(6486002)(9686003)(6512007)(6666004)(44832011)(6506007)(316002)(66476007)(66946007)(110136005)(54906003)(66556008)(8936002)(4326008)(8676002)(2906002)(33716001)(41300700001)(38100700002)(1076003)(86362001)(7416002)(66574015)(83380400001)(26005)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?X8vUXq4N5btf1Uf1V6huanGX/0PXAOrbY565g8KcQLo/i9J6vUGGJ3dyXm?=
- =?iso-8859-1?Q?UhKQz5nPTdmq4H7/1LMQRNdSCCI6Eu5jPyZoO2sn1zmKBEVkkQX29J8kC5?=
- =?iso-8859-1?Q?c1z5SMkeHBkoSLJTITYCrgYgq9bnUvW/S5dvQn9m4GDWcpR7AoaAuyRgND?=
- =?iso-8859-1?Q?isyY2JlNjyJg+XEbd+Im0znbrOTkVj9SsCAXseyczncm1bDn6Qkne+ahJL?=
- =?iso-8859-1?Q?NOB6js0JDd5kNwQAxdAN3CdDvkVmBYioUZ9FL0oeV7h9/pmi93Njz2wDqa?=
- =?iso-8859-1?Q?IwoZrYlx1BKCYm+A0/quvWoKOE+2JC6z6zVsfCVqZ/8Nx9oThfDWAZLN72?=
- =?iso-8859-1?Q?iDhaYvqNlkapOk++qNTQQEaGf2Lmz1nF5mH8nyItlou2E3mgW/VmeIy3BR?=
- =?iso-8859-1?Q?rKdAdDSVQmBQbtF9LzodxOU9HukIyeGS1LvSr2ld9jHekY+OqbS9gDeyRX?=
- =?iso-8859-1?Q?6sq0omtLteTUwTSLc/EZgOhI9cXC9u5f5REoYyC2/pqPUG0CQ45qn8lVQn?=
- =?iso-8859-1?Q?XtavSCALHbfZpPZzXYboikmjf8ltAxtVxZSiHwHHvsmoaZUAaOqBf6EE+3?=
- =?iso-8859-1?Q?j6gATHc9xfdj1IzfVHW39T7PisUuNF9a7diaR+v39sToB65XEbmylBc2jW?=
- =?iso-8859-1?Q?CulW8o8BowkADnYTNwwVRPyfHd+7pXsESK91n9yXdL/AdL7BQFrnLWL/Li?=
- =?iso-8859-1?Q?EjTYn7MDT0g+/4XXVgEb55RG0YSyrjpJo3GC7wJekSArRkvMoRtdQ7WJHd?=
- =?iso-8859-1?Q?+t1ikB4fJByP03DZoI+lPyNXLXF87iuBGzLYEciKkpqYR6hiOqiwcckjcM?=
- =?iso-8859-1?Q?S+7mvO1m88472xMjFUrl1q0dcnHM4adGBNqE34QUcfic/wsK3EibRc5Eup?=
- =?iso-8859-1?Q?y89fWjMbN4t735NveTOEWPPAxTTpW5YeqODgi0sunQuLgfZt1dVq6Vj66A?=
- =?iso-8859-1?Q?UAQlddrsO2zXhnJ2ZBnNjI6PT81A3OygRVMKXxvsdVppPc9kVOnhzlbBr+?=
- =?iso-8859-1?Q?cpCY3kKczpE0xexNpKSFEXvuhkmcBpqLG1owFY870Qo9laJgAyqAPTQX8y?=
- =?iso-8859-1?Q?kCWlzt6yA0zh+yK63XaUc+5/z5QJpCaprSKK1UP0zUfugPgCrRMKc0N2gy?=
- =?iso-8859-1?Q?6boyYnnIvRWjzJcHgsRebNvFm39NUj+yiD/CMSioM+zekEg1aIEBz72mvS?=
- =?iso-8859-1?Q?MJFFYGF+nnBRIw4ajzT81b2t/xrIkNRXikRk+JYXEwmsmYgA3XHgDit/Tw?=
- =?iso-8859-1?Q?QjnEaoirQCj3nGs6dm/td03A/IWIx/NkuOPdZioyzR/QLBsZSHj3GQlzxo?=
- =?iso-8859-1?Q?X/lTykZ5hveVrE2VmA7p21rCW0MJ6S2VtKYDV04Bhza1kG87xx7aqshI2S?=
- =?iso-8859-1?Q?/+jorblLwcebfR7CjAlhjqINKF9q5Es1RUvl2L+gqqGiZgPl0BLWxlOU/K?=
- =?iso-8859-1?Q?vtC9BH4dHJuX0qB3jHrKhlvPobZZXrKNQ9h1VwXQD6l2Cx4q5ho3KyJQZy?=
- =?iso-8859-1?Q?v4kUFDSNVz5TLuiN7EJ4QE0uCL2cHnirWHen57NkVqfHIRQKJKEsFXgh+K?=
- =?iso-8859-1?Q?J/c5KbSAdy/mNio0Z1TupdRNHWDiiHWuHaOj9VO9JwkzgS4aRDQBr+Iej0?=
- =?iso-8859-1?Q?Citm+srIQKXmQ6btvNIAmcK23QmCMIwPcInihzYaUqA6gu18PkURipXg?=
- =?iso-8859-1?Q?=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed6f69e1-828e-4594-cf7b-08dbed0425f1
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 15:43:47.7484
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Reyokufp86UtbRBlhKrPnVsB8HIDR+apsT5k49hSSU7oczkw8Dktqb04v41UJ4vEjaAja1bPY4V/c8dalVeeFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10071
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 23, 2023 at 09:32:05AM -0800, Jakub Kicinski wrote:
-> On Thu, Nov 23, 2023 at 04:00:56PM +0100, Köry Maincent wrote:
-> > So, do we have a consensus? Vlad, do you agree on putting all under ethtool?
-> > 
-> > ETHTOOL_GET_TS_INFO will be in charge of replacing the SIOCGHWSTAMP
-> > implementation. Need to add ETHTOOL_A_TSINFO_PHC_INDEX
-> > ETHTOOL_A_TSINFO_QUALIFIER to the request.
-> > 
-> > ETHTOOL_GET_TS_INFO will list all the hwtstamp provider (aka "{phc_index,
-> > qualifier}") through the dumpit callback. I will add a filter to be able to
-> > list only the hwtstamp provider of one netdev.
-> > 
-> > ETHTOOL_SET_TS_INFO will be in charge of replacing the SIOCSHWSTAMP
-> > implementation.
-> 
-> If not we can do a vote/poll? Maybe others don't find the configuration
-> of timestamping as confusing as me.
+Here's a two-shot: introduce Intel Ethernet common library (libie) and
+switch iavf to Page Pool. Details are in the commit messages; here's
+a summary:
 
-If you mean the ETHTOOL_MSG_TSINFO_GET netlink message (ETHTOOL_GET_TS_INFO
-is an ioctl), you're saying that you want to move the entire contents of
-SIOCGHWSTAMP there, by making the kernel call ndo_hwtstamp_get() in
-addition to the existing __ethtool_get_ts_info()?
+Not a secret there's a ton of code duplication between two and more Intel
+ethernet modules. Before introducing new changes, which would need to be
+copied over again, start decoupling the already existing duplicate
+functionality into a new module, which will be shared between several
+Intel Ethernet drivers. The first name that came to my mind was
+"libie" -- "Intel Ethernet common library". Also this sounds like
+"lovelie" (-> one word, no "lib I E" pls) and can be expanded as
+"lib Internet Explorer" :P
+The series is only the beginning. From now on, adding every new feature
+or doing any good driver refactoring will remove much more lines than add
+for quite some time. There's a basic roadmap with some deduplications
+planned already, not speaking of that touching every line now asks:
+"can I share this?". The final destination is very ambitious: have only
+one unified driver for at least i40e, ice, iavf, and idpf with a struct
+ops for each generation. That's never gonna happen, right? But you still
+can at least try.
+PP conversion for iavf lands within the same series as these two are tied
+closely. libie will support Page Pool model only, so that a driver can't
+use much of the lib until it's converted. iavf is only the example, the
+rest will eventually be converted soon on a per-driver basis. That is
+when it gets really interesting. Stay tech.
 
-Yeah, I don't know, I don't have a real objection, I guess it's fine.
+Alexander Lobakin (14):
+  page_pool: make sure frag API fields don't span between cachelines
+  page_pool: don't use driver-set flags field directly
+  page_pool: avoid calling no-op externals when possible
+  net: intel: introduce Intel Ethernet common library
+  iavf: kill "legacy-rx" for good
+  iavf: drop page splitting and recycling
+  page_pool: constify some read-only function arguments
+  page_pool: add DMA-sync-for-CPU inline helpers
+  libie: add Rx buffer management (via Page Pool)
+  iavf: pack iavf_ring more efficiently
+  iavf: switch to Page Pool
+  libie: add common queue stats
+  libie: add per-queue Page Pool stats
+  iavf: switch queue stats to libie
 
-What will be a bit of an "?!" moment for users is when ethtool gains
-support for the SIOCGHWSTAMP/SIOCSHWSTAMP netlink replacements, but not
-for the original ioctls. So hwstamp_ctl will be able to change timestamping
-configuration, but ethtool wouldn't - all on the same system. Unless
-ethtool gains an ioctl fallback for a ioctl that was never down its alley.
+ MAINTAINERS                                   |   3 +-
+ drivers/net/ethernet/intel/Kconfig            |   6 +
+ drivers/net/ethernet/intel/Makefile           |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 253 -------
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   1 +
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |   7 -
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  72 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |  88 ---
+ drivers/net/ethernet/intel/iavf/iavf.h        |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 253 -------
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    | 241 +------
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  42 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |   7 -
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 626 ++++--------------
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   | 174 +----
+ drivers/net/ethernet/intel/iavf/iavf_type.h   |  90 ---
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  17 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 316 ---------
+ drivers/net/ethernet/intel/ice/ice_main.c     |   1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  74 +--
+ drivers/net/ethernet/intel/libie/Kconfig      |   9 +
+ drivers/net/ethernet/intel/libie/Makefile     |   7 +
+ drivers/net/ethernet/intel/libie/internal.h   |  20 +
+ drivers/net/ethernet/intel/libie/rx.c         | 188 ++++++
+ drivers/net/ethernet/intel/libie/stats.c      | 190 ++++++
+ include/linux/net/intel/libie/rx.h            | 263 ++++++++
+ include/linux/net/intel/libie/stats.h         | 213 ++++++
+ include/net/page_pool/helpers.h               | 115 +++-
+ include/net/page_pool/types.h                 |  10 +-
+ net/core/page_pool.c                          |  50 +-
+ 30 files changed, 1270 insertions(+), 2069 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libie/Kconfig
+ create mode 100644 drivers/net/ethernet/intel/libie/Makefile
+ create mode 100644 drivers/net/ethernet/intel/libie/internal.h
+ create mode 100644 drivers/net/ethernet/intel/libie/rx.c
+ create mode 100644 drivers/net/ethernet/intel/libie/stats.c
+ create mode 100644 include/linux/net/intel/libie/rx.h
+ create mode 100644 include/linux/net/intel/libie/stats.h
 
-But by all means, still hold a poll if you want to. I would vote for
-ethtool netlink, not because it's great, just because I don't have a
-better alternative to propose.
+---
+Directly to net-next, has non-Intel code changes :p
+
+From v4[0]:
+* make use of Jakub's &page_pool_params split;
+* #01: prevent frag fields from spanning into 2 cachelines after
+  splitting &page_pool_params into fast and slow;
+* #02-03: bring back the DMA sync shortcut, now as a per-page flag
+  (me, Yunsheng);
+* #04: let libie have its own Kconfig to stop further bloating of poor
+  intel/Kconfig;
+* #06: merge page split-reuse-recycle drop into one commit (Alex);
+* #07: decouple constifying of several Page Pool function arguments
+  into a separate commit, constify some more;
+* #09: stop abusing internal PP fields in the driver code (Yunsheng);
+* #09: calculate DMA sync size (::max_len) correctly: within one page,
+  not one buffer (Yunsheng);
+* #10: decouple rearranging &iavf_ring into separate commit, optimize
+  it even more;
+* #11: let the driver get back to the last descriptor to process after
+  an skb allocation fail, don't drop it (Alex);
+* #11: stop touching unrelated stuff like watchdog timeout etc. (Alex);
+* fix "Return:" in the kdoc (now `W=12 C=1` is clean), misc typos.
+
+From v3[1]:
+* base on the latest net-next, update bloat-o-meter and perf stats;
+* split generic PP optimizations into a separate series;
+* drop "optimize hotpath a bunch" commit: a lot of [controversial]
+  changes in one place, worth own series (Alex);
+* 02: pick Rev-by (Alex);
+* 03: move in-place recycling removal here from the dropped patch;
+* 05: new, add libie Rx buffer API separatelly from IAVF changes;
+* 05-06: use new "hybrid" allocation API from[2] to reduce memory usage
+  when a page can fit more than 1 truesize (also asked by David);
+* 06: merge with "always use order-0 page" commit to reduce diffs and
+  simplify things (Alex);
+* 09: fix page_alloc_fail counter.
+
+From v2[3]:
+* 0006: fix page_pool.h include in OcteonTX2 files (Jakub, Patchwork);
+* no functional changes.
+
+From v1[4]:
+* 0006: new (me, Jakub);
+* 0008: give the helpers more intuitive names (Jakub, Ilias);
+*  -^-: also expand their kdoc a bit for the same reason;
+*  -^-: fix kdoc copy-paste issue (Patchwork, Jakub);
+* 0011: drop `inline` from C file (Patchwork, Jakub).
+
+[0] https://lore.kernel.org/netdev/20230705155551.1317583-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[2] https://lore.kernel.org/netdev/20230629120226.14854-1-linyunsheng@huawei.com
+[3] https://lore.kernel.org/netdev/20230525125746.553874-1-aleksander.lobakin@intel.com
+[4] https://lore.kernel.org/netdev/20230516161841.37138-1-aleksander.lobakin@intel.com
+
+-- 
+2.42.0
+
 
