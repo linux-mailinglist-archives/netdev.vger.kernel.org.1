@@ -1,255 +1,117 @@
-Return-Path: <netdev+bounces-50857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075687F74CD
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:20:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E1F7F7550
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 676CAB214CB
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:20:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50767281FBD
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277DD28DB8;
-	Fri, 24 Nov 2023 13:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cwW0+E/b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E81B28E17;
+	Fri, 24 Nov 2023 13:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 950BC1724;
-	Fri, 24 Nov 2023 05:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700832038; x=1732368038;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D6sAom7DCqR1Zyqj6Jdy6bkLwVXib4NKjEjRLqF2SOc=;
-  b=cwW0+E/b/CDSWn2YxcZ3+w3t7cHB9ibez/ry/tuKUxu7XlhCItoK4XAR
-   tQDTwhLJ4fpGa/4dFa1HB+dUyN3/rL8BV3INhkSHcJr4BWDOfyJZj+WgD
-   blQQ+aArXDRzly3mV7rJWR8PS0WP8mAj1yp3rj3/F1BUiY8gKvNthMvj/
-   VSK9DKB2HOrcKIgVAbUTqn7RTg/H7W8eZkAO5Qb6w5m4z4aLYXl0wLXn8
-   KFBitvC1BCgwCl0CQFhxKxZXDU1ff7WWjR0PMWGKke9lFGNEasihhch+y
-   bh9LFXYzD3G6HUaemaeevlBPV0gxmwLyiIoi6c6t7XooGm3cwaNxtrd1P
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="456765084"
-X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
-   d="scan'208";a="456765084"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 05:20:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="767477050"
-X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
-   d="scan'208";a="767477050"
-Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 24 Nov 2023 05:20:09 -0800
-Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r6W6J-0002ng-1e;
-	Fri, 24 Nov 2023 13:20:07 +0000
-Date: Fri, 24 Nov 2023 21:19:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-Subject: Re: [PATCH v2 7/9] clk: qcom: add NSS clock Controller driver for
- Qualcomm IPQ5332
-Message-ID: <202311241420.9uiff44i-lkp@intel.com>
-References: <20231121-ipq5332-nsscc-v2-7-a7ff61beab72@quicinc.com>
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2521FF9;
+	Fri, 24 Nov 2023 05:34:48 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0Vx1k3KH_1700832884;
+Received: from 30.221.129.111(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vx1k3KH_1700832884)
+          by smtp.aliyun-inc.com;
+          Fri, 24 Nov 2023 21:34:46 +0800
+Message-ID: <83d3784e-1fed-36b6-22a8-52995fac429e@linux.alibaba.com>
+Date: Fri, 24 Nov 2023 21:34:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231121-ipq5332-nsscc-v2-7-a7ff61beab72@quicinc.com>
-
-Hi Kathiravan,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 07b677953b9dca02928be323e2db853511305fa9]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Kathiravan-Thirumoorthy/clk-qcom-ipq5332-add-const-qualifier-to-the-clk_init_data-structure/20231121-223615
-base:   07b677953b9dca02928be323e2db853511305fa9
-patch link:    https://lore.kernel.org/r/20231121-ipq5332-nsscc-v2-7-a7ff61beab72%40quicinc.com
-patch subject: [PATCH v2 7/9] clk: qcom: add NSS clock Controller driver for Qualcomm IPQ5332
-config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20231124/202311241420.9uiff44i-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231124/202311241420.9uiff44i-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311241420.9uiff44i-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/clk/qcom/nsscc-ipq5332.c:161:62: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                                                                ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
->> drivers/clk/qcom/nsscc-ipq5332.c:162:2: error: call to undeclared function 'C'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           C(P_UNIPHY0_NSS_RX_CLK, 12.5, 0, 0),
-           ^
-   drivers/clk/qcom/nsscc-ipq5332.c:166:63: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_125[] = {
-                                                                 ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
->> drivers/clk/qcom/nsscc-ipq5332.c:171:64: error: array has incomplete element type 'const struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
-                                                                  ^
-   drivers/clk/qcom/nsscc-ipq5332.c:171:21: note: forward declaration of 'struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
-                       ^
->> drivers/clk/qcom/nsscc-ipq5332.c:172:2: error: call to undeclared function 'FMS'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           FMS(24000000, P_XO, 1, 0, 0),
-           ^
->> drivers/clk/qcom/nsscc-ipq5332.c:173:2: error: call to undeclared function 'FM'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           FM(25000000, ftbl_nss_cc_port1_rx_clk_src_25),
-           ^
->> drivers/clk/qcom/nsscc-ipq5332.c:191:11: error: use of undeclared identifier 'clk_rcg2_fm_ops'; did you mean 'clk_rcg2_ops'?
-                   .ops = &clk_rcg2_fm_ops,
-                           ^~~~~~~~~~~~~~~
-                           clk_rcg2_ops
-   drivers/clk/qcom/clk-rcg.h:170:29: note: 'clk_rcg2_ops' declared here
-   extern const struct clk_ops clk_rcg2_ops;
-                               ^
-   drivers/clk/qcom/nsscc-ipq5332.c:195:62: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_tx_clk_src_25[] = {
-                                                                ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:200:63: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_tx_clk_src_125[] = {
-                                                                 ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:205:64: error: array has incomplete element type 'const struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_tx_clk_src[] = {
-                                                                  ^
-   drivers/clk/qcom/nsscc-ipq5332.c:171:21: note: forward declaration of 'struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:225:11: error: use of undeclared identifier 'clk_rcg2_fm_ops'; did you mean 'clk_rcg2_ops'?
-                   .ops = &clk_rcg2_fm_ops,
-                           ^~~~~~~~~~~~~~~
-                           clk_rcg2_ops
-   drivers/clk/qcom/clk-rcg.h:170:29: note: 'clk_rcg2_ops' declared here
-   extern const struct clk_ops clk_rcg2_ops;
-                               ^
-   drivers/clk/qcom/nsscc-ipq5332.c:229:62: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port2_rx_clk_src_25[] = {
-                                                                ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:234:63: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port2_rx_clk_src_125[] = {
-                                                                 ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:239:64: error: array has incomplete element type 'const struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port2_rx_clk_src[] = {
-                                                                  ^
-   drivers/clk/qcom/nsscc-ipq5332.c:171:21: note: forward declaration of 'struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:259:11: error: use of undeclared identifier 'clk_rcg2_fm_ops'; did you mean 'clk_rcg2_ops'?
-                   .ops = &clk_rcg2_fm_ops,
-                           ^~~~~~~~~~~~~~~
-                           clk_rcg2_ops
-   drivers/clk/qcom/clk-rcg.h:170:29: note: 'clk_rcg2_ops' declared here
-   extern const struct clk_ops clk_rcg2_ops;
-                               ^
-   drivers/clk/qcom/nsscc-ipq5332.c:263:62: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port2_tx_clk_src_25[] = {
-                                                                ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:268:63: error: array has incomplete element type 'const struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port2_tx_clk_src_125[] = {
-                                                                 ^
-   drivers/clk/qcom/nsscc-ipq5332.c:161:21: note: forward declaration of 'struct freq_conf'
-   static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:273:64: error: array has incomplete element type 'const struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port2_tx_clk_src[] = {
-                                                                  ^
-   drivers/clk/qcom/nsscc-ipq5332.c:171:21: note: forward declaration of 'struct freq_multi_tbl'
-   static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
-                       ^
-   drivers/clk/qcom/nsscc-ipq5332.c:293:11: error: use of undeclared identifier 'clk_rcg2_fm_ops'; did you mean 'clk_rcg2_ops'?
-                   .ops = &clk_rcg2_fm_ops,
-                           ^~~~~~~~~~~~~~~
-                           clk_rcg2_ops
-   drivers/clk/qcom/clk-rcg.h:170:29: note: 'clk_rcg2_ops' declared here
-   extern const struct clk_ops clk_rcg2_ops;
-                               ^
-   19 errors generated.
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next 0/7] net/smc: implement SMCv2.1 virtual ISM
+ device support
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
+ <30b53b21-40ad-407a-bef7-ddc28f8978e2@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <30b53b21-40ad-407a-bef7-ddc28f8978e2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-vim +161 drivers/clk/qcom/nsscc-ipq5332.c
 
-   160	
- > 161	static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_25[] = {
- > 162		C(P_UNIPHY0_NSS_RX_CLK, 12.5, 0, 0),
-   163		C(P_UNIPHY0_NSS_RX_CLK, 5, 0, 0),
-   164	};
-   165	
-   166	static const struct freq_conf ftbl_nss_cc_port1_rx_clk_src_125[] = {
-   167		C(P_UNIPHY0_NSS_RX_CLK, 2.5, 0, 0),
-   168		C(P_UNIPHY0_NSS_RX_CLK, 1, 0, 0),
-   169	};
-   170	
- > 171	static const struct freq_multi_tbl ftbl_nss_cc_port1_rx_clk_src[] = {
- > 172		FMS(24000000, P_XO, 1, 0, 0),
- > 173		FM(25000000, ftbl_nss_cc_port1_rx_clk_src_25),
-   174		FMS(78125000, P_UNIPHY0_NSS_RX_CLK, 4, 0, 0),
-   175		FM(125000000, ftbl_nss_cc_port1_rx_clk_src_125),
-   176		FMS(156250000, P_UNIPHY0_NSS_RX_CLK, 2, 0, 0),
-   177		FMS(312500000, P_UNIPHY0_NSS_RX_CLK, 1, 0, 0),
-   178		{ }
-   179	};
-   180	
-   181	static struct clk_rcg2 nss_cc_port1_rx_clk_src = {
-   182		.cmd_rcgr = 0x450,
-   183		.mnd_width = 0,
-   184		.hid_width = 5,
-   185		.parent_map = nss_cc_parent_map_1,
-   186		.freq_multi_tbl = ftbl_nss_cc_port1_rx_clk_src,
-   187		.clkr.hw.init = &(const struct clk_init_data) {
-   188			.name = "nss_cc_port1_rx_clk_src",
-   189			.parent_data = nss_cc_parent_data_1,
-   190			.num_parents = ARRAY_SIZE(nss_cc_parent_data_1),
- > 191			.ops = &clk_rcg2_fm_ops,
-   192		},
-   193	};
-   194	
+On 2023/11/24 21:11, Wenjia Zhang wrote:
+> 
+> 
+> On 19.11.23 14:57, Wen Gu wrote:
+>> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
+>> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
+>> OS or hypervisor software, comparable to IBM ISM which is based on platform
+>> firmware or hardware.
+>>
+>> With the introduction of virtual ISM, SMCv2.1 makes some updates:
+>>
+>> - Introduce feature bitmask to indicate supplemental features.
+>> - Reserve a range of CHIDs for virtual ISM.
+>> - Support extended GIDs (128 bits) in CLC handshake.
+>>
+>> So this patch set aims to implement these updates in Linux kernel. And it
+>> acts as the first part of the new version of [1].
+>>
+>> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>
+>> Wen Gu (7):
+>>    net/smc: Rename some variable 'fce' to 'fce_v2x' for clarity
+>>    net/smc: support SMCv2.x supplemental features negotiation
+>>    net/smc: introduce virtual ISM device support feature
+>>    net/smc: define a reserved CHID range for virtual ISM devices
+>>    net/smc: compatible with 128-bits extend GID of virtual ISM device
+>>    net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+>>    net/smc: manage system EID in SMC stack instead of ISM driver
+>>
+>>   drivers/s390/net/ism.h     |  6 ---
+>>   drivers/s390/net/ism_drv.c | 54 +++++++--------------------
+>>   include/linux/ism.h        |  1 -
+>>   include/net/smc.h          | 16 +++++---
+>>   net/smc/af_smc.c           | 68 ++++++++++++++++++++++++++-------
+>>   net/smc/smc.h              |  7 ++++
+>>   net/smc/smc_clc.c          | 93 ++++++++++++++++++++++++++++++++--------------
+>>   net/smc/smc_clc.h          | 22 +++++++----
+>>   net/smc/smc_core.c         | 30 ++++++++++-----
+>>   net/smc/smc_core.h         |  8 ++--
+>>   net/smc/smc_diag.c         |  7 +++-
+>>   net/smc/smc_ism.c          | 57 ++++++++++++++++++++--------
+>>   net/smc/smc_ism.h          | 31 +++++++++++++++-
+>>   net/smc/smc_pnet.c         |  4 +-
+>>   14 files changed, 269 insertions(+), 135 deletions(-)
+>>
+> 
+> Hi Wen Gu,
+> 
+> Just FYI, the review is still on going and some tests on our plateform still need to do. I'll give you my comments as 
+> soon as the testing is done. I think it would be at the beginning of next week.
+> 
+> Thanks,
+> Wenjia
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Hi Wenjian,
+
+Thank you very much. I appreciate that you help to test them on your platform since I can only test
+them with loopback-ism.
+
+And I am going to send a new version which is rebased to the latest net-next and fix two existing
+comments. If the current tests have not started yet, could you please test based on my upcoming v2 ?
+
+Thanks and regards,
+Wen Gu
 
