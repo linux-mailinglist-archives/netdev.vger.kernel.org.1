@@ -1,78 +1,41 @@
-Return-Path: <netdev+bounces-50683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BE787F6A4E
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 02:56:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BD87F6A5D
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 03:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCA1C1F20ECD
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:56:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F3192817DD
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 02:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321A5625;
-	Fri, 24 Nov 2023 01:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B59659;
+	Fri, 24 Nov 2023 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBZq/bKG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kseKtNN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7D0D7F;
-	Thu, 23 Nov 2023 17:55:55 -0800 (PST)
-Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3b52360cdf0so754784b6e.2;
-        Thu, 23 Nov 2023 17:55:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700790954; x=1701395754; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LyxNW8uNH7iQptXLfUQU9KTeCyjsm7ymwbCx+5iTF1Y=;
-        b=EBZq/bKG94aD7bf8bPErmQ81Q67mZXhKEh8OJmKpxICOZcyzM8xXGqvvaUzPQwq9w4
-         zQbMXChTPldXZiwru6NkNK4KT8LR9i9wIv367u7zg9pBmpAqKvomwhpt1Ty0hVojTSlg
-         p9CdDNSCBT+CygI7V4qe6gldRZW0PFNZ9oraoI2Hvkpf6TVA0VA6SfvZzMPbe/XGYamJ
-         Xj01Z3Jkn+SElgf2Hnf/GV+5mkDgb9vaP9i/XiSH/YCxcKTiai1aktOdtz07Yj1Djp2q
-         PVrv9ijrXCYDRAX3dGNec39AjzxGw19ybPNWvutcOu1ckImvMzACbdY+ilEMopDZzdsW
-         2F4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700790954; x=1701395754;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LyxNW8uNH7iQptXLfUQU9KTeCyjsm7ymwbCx+5iTF1Y=;
-        b=sdUIlyxGQ5XlaWdLkwDpBtBMtljHRE+4pdhTzri38PSsMMWA95cN932wYqgRiXycBx
-         Bc1+cMGcveJ/mc5X8VQNHnTk0Ex2YnkoqWqk9MaFle8EChINQY47JZjeQ5gDKTtO7iMA
-         TGipW6mBVFR0QhKTWhitWst0GA8378yN/nuVEhKrvbrpcu6pISxERCYJZi+A9GA+F45f
-         ATEub0qH15M8AUYSDE95eLTmowvZcq1EqZ3BJ1JEwIW303bgKCwzoDmP+dTzhKEQ+jxb
-         rhYCgq/7l0k1F0gr7GVF9IVJlUtltwo58zuOYjUc4ecPGZOhwWj7vQ31VKe1evCm8154
-         AXLQ==
-X-Gm-Message-State: AOJu0Yzy3hU9z9zaar0N2SzDbdbXsh0Vd2sN1t4X600ACM+F6gd3yjYu
-	g+bAuLxr+/pGIZTBFB36UW4=
-X-Google-Smtp-Source: AGHT+IGjt9vU6cD5V+1YXxif0d29i+KbMwSlR2P7yRUyPFecaEYgEXMOWyJrBq8DeHZsNSvmam5zUg==
-X-Received: by 2002:a54:4587:0:b0:3a9:b9eb:998e with SMTP id z7-20020a544587000000b003a9b9eb998emr1166283oib.51.1700790954616;
-        Thu, 23 Nov 2023 17:55:54 -0800 (PST)
-Received: from localhost.localdomain ([74.48.130.204])
-        by smtp.googlemail.com with ESMTPSA id 9-20020a631049000000b005c1ce3c960bsm1991128pgq.50.2023.11.23.17.55.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 17:55:54 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net v2 1/1] net: stmmac: xgmac: Disable FPE MMC interrupts
-Date: Fri, 24 Nov 2023 09:54:33 +0800
-Message-Id: <20231124015433.2223696-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DED364F;
+	Fri, 24 Nov 2023 02:00:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5817EC433C8;
+	Fri, 24 Nov 2023 02:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700791228;
+	bh=zCLwjlfraemaJl3RDTrYejmiHNAo/kGrRDOfxT5KnVg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kseKtNN4zTiaQ4RcqlasQdG8OPdJCSawu33VRaoMb8SQw/jA0QOh2bUADrjcHTnpV
+	 zMQkqLsHxGMzDfRBIK3qvWs+wc+d63J2br1e0QbYoGK2+coTONLY3UahOgT9pCYJoj
+	 qXOrUiNhxXMLNehC9km0egPdoWXUyduHE9GHoHX+VRIk1VglrV4FH/s8OytLPXM7IG
+	 ijuyD7dZEbTU1qKC/L186m9ce5QnkmvdV4z11Jn7Mqz4GAVnnJqNseIPlueUaMNDJh
+	 BVk2Wzunk0jBKiHCroqWiEDucE6TrJ9IqE6rux89x3X6/R7M9lQ0Od/MrSvmbjQguQ
+	 tUOfI6WFfQoNw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3FC61C595D0;
+	Fri, 24 Nov 2023 02:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,47 +43,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/3] net: rswitch: Fix issues in rswitch_start_xmit()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170079122825.7507.381822979329425043.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Nov 2023 02:00:28 +0000
+References: <20231122051143.3660780-1-yoshihiro.shimoda.uh@renesas.com>
+In-Reply-To: <20231122051143.3660780-1-yoshihiro.shimoda.uh@renesas.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
-Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
-by default") tries to disable MMC interrupts to avoid a storm of
-unhandled interrupts, but leaves the FPE(Frame Preemption) MMC
-interrupts enabled.
-Now we mask FPE TX and RX interrupts to disable all MMC interrupts.
+Hello:
 
-Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
-Changes in v2:
-  - Update commit message, thanks Wojciech and Andrew.
----
- drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-index ea4910ae0921..cdd7fbde2bfa 100644
---- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-@@ -177,8 +177,10 @@
- #define MMC_XGMAC_RX_DISCARD_OCT_GB	0x1b4
- #define MMC_XGMAC_RX_ALIGN_ERR_PKT	0x1bc
- 
-+#define MMC_XGMAC_FPE_TX_INTR_MASK	0x204
- #define MMC_XGMAC_TX_FPE_FRAG		0x208
- #define MMC_XGMAC_TX_HOLD_REQ		0x20c
-+#define MMC_XGMAC_FPE_RX_INTR_MASK	0x224
- #define MMC_XGMAC_RX_PKT_ASSEMBLY_ERR	0x228
- #define MMC_XGMAC_RX_PKT_SMD_ERR	0x22c
- #define MMC_XGMAC_RX_PKT_ASSEMBLY_OK	0x230
-@@ -352,6 +354,8 @@ static void dwxgmac_mmc_intr_all_mask(void __iomem *mmcaddr)
- {
- 	writel(0x0, mmcaddr + MMC_RX_INTR_MASK);
- 	writel(0x0, mmcaddr + MMC_TX_INTR_MASK);
-+	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_TX_INTR_MASK);
-+	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_FPE_RX_INTR_MASK);
- 	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_IPC_INTR_MASK);
- }
- 
+On Wed, 22 Nov 2023 14:11:40 +0900 you wrote:
+> This patch series is based on the latest net.git / main branch.
+> 
+> Changes from v2:
+> https://lore.kernel.org/all/20231122012556.3645840-1-yoshihiro.shimoda.uh@renesas.com/
+> - Keep reverse christmas tree of local variable declarations in patch 1/3.
+> 
+> Changes from v1:
+> https://lore.kernel.org/all/20231121055255.3627949-1-yoshihiro.shimoda.uh@renesas.com/
+> - Separate a patch because fixing 2 issues.
+> - Add fixing wrong type of return value.
+> - Use goto for improving code readability.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/3] net: rswitch: Fix type of ret in rswitch_start_xmit()
+    https://git.kernel.org/netdev/net/c/109b25d13e00
+  - [net,v3,2/3] net: rswitch: Fix return value in rswitch_start_xmit()
+    https://git.kernel.org/netdev/net/c/1aaef8634a20
+  - [net,v3,3/3] net: rswitch: Fix missing dev_kfree_skb_any() in error path
+    https://git.kernel.org/netdev/net/c/782486af9b5b
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
