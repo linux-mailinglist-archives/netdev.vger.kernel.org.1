@@ -1,134 +1,138 @@
-Return-Path: <netdev+bounces-50867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863C97F7626
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:17:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 417107F7689
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 15:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8232B21255
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702D21C2128E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897482C1AE;
-	Fri, 24 Nov 2023 14:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BC52D61D;
+	Fri, 24 Nov 2023 14:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="GPeFmwbC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T5lEMUYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4CC2199D;
-	Fri, 24 Nov 2023 06:17:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=s31663417; t=1700835449; x=1701440249; i=wahrenst@gmx.net;
-	bh=0a7YQ4lsvuCcWSyrWmIaRT00/YgNIgJjYXSSYuJHFSU=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=GPeFmwbCnGKyVHovdOH2ExKNFKgT+XZCcA3mmhb3ymLLMSaM8g6d/aiueuEgp+Xm
-	 jUXqnRefuBftIEXAW0UsEisp9zrnjqTZ+2TAxsRwzn4C1QFVsBawlboaCp8P8msUM
-	 9rohH3DVZ4T3a4aRyMHx9g6Lm5JIp/UeuCXcH08OEDi2mtPdJBKcUa6qOjCZy+NPe
-	 zAsPdlS/0Vmk1pdD3KZLrc4dZpk69Y11vob5z30vC5E9Vdv1ODVv6FVklJtcY8HHl
-	 9P+FTvHAuLX/PxQ08Lx4ayEdcZ43tEnbeC6ez4BLK+O07Q2Lxiaq4oM5+0TiAYOfj
-	 PNbw8qnIIPwYhDLlzg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mv31c-1rO3sf2agK-00qwLX; Fri, 24
- Nov 2023 15:17:29 +0100
-Message-ID: <0d1cf97c-abbe-4a7a-a634-312caa882fad@gmx.net>
-Date: Fri, 24 Nov 2023 15:17:28 +0100
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2247119A8;
+	Fri, 24 Nov 2023 06:40:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700836817; x=1732372817;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/Uxc0d4c4aiMUWgnl/99+3ExpFREygOtI/KFwWyU28A=;
+  b=T5lEMUYvASO9Ieq/q4Syfgrt/7NaS4kz3sqmv/GBozdpMXUxqaHqzrPn
+   Fws9/dpeM7Z8816bzHt0gqqsDLpn3puLcRHbvOI2TfbbtoLR86KefVqF/
+   YOSCVpLwgc2tZS8s8RkuhV1fjBqZlvTfECps2ZKOoS5aoMn5az9EC1ZWx
+   /c7xAflgYncCgl0oe3DUkinZIRZ6xt0zaIRvON2xpvfQDV0XD3JRb2klP
+   062J1JNFjMs1/En5OGxIc+EE6NTMUxDzprYg8FCuU+KRL8Ct3rNpVwWIY
+   78zIYk43cBwNRVyWMcmf569ipaDbFEwQ96h0B6Rs1S+rupfmcJPVk5H+t
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="395249011"
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="395249011"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 06:40:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10904"; a="760975142"
+X-IronPort-AV: E=Sophos;i="6.04,224,1695711600"; 
+   d="scan'208";a="760975142"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 24 Nov 2023 06:40:10 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r6XLi-0002tp-2p;
+	Fri, 24 Nov 2023 14:40:06 +0000
+Date: Fri, 24 Nov 2023 22:39:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Prasad Sodagudi <psodagud@quicinc.com>,
+	Andrew Halaney <ahalaney@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, kernel@quicinc.com
+Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add driver support for
+ DWMAC5 fault IRQ Support
+Message-ID: <202311241513.D6JpHWGg-lkp@intel.com>
+References: <62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4 net] qca_spi: Fix ethtool -G iface tx behavior
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
- Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231121163004.21232-1-wahrenst@gmx.net>
- <20231121163004.21232-4-wahrenst@gmx.net>
- <ea0087881f20dc154ca08a5b748b853246e2b86f.camel@redhat.com>
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <ea0087881f20dc154ca08a5b748b853246e2b86f.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:i2FP/ku1jKnGiHWTItr1bg83wGE9T0yCvG8I54CbMYJ8AODEn9K
- ofuzskXR/046hb1Jn+XMcjfj3PICRu7Zz2sIudKCrQ9doIe4z69YiB98cov9rHooNUAtRFR
- 4HYcBPCco0Eu97CVwyoO23q4oDbzKdpAH9c71C2/dvshqCq8HJ9FddYYMQyO/q7fugTftx6
- 4eLzwAXznEhfmNTC1WEdA==
-UI-OutboundReport: notjunk:1;M01:P0:H4YQHzAewko=;D932sCf0IX8wgn841dEIMW6J1ig
- LW1QK+E0IJv23KyL/XXmnZwe4tNuA/XQ+jeV0RpxF28asO9MRemApQcoM93uvTVnMGDios15j
- XIWcq1MS8WlmhhyOg1lv934jIQXuwmiqBCqJs9tIbGkfrPCX1/To+gmzPu0z6POwYkUjmGvUN
- 1NUhdXefhIhB6ytaFDHnsSP4N7H0uv6IHW2O/7i9K+fJ0kHYvRQQO3rS4ECYYGO0alnHqrrPo
- 0nz2AW5RyhrevKmgtgTK6wdWEcRWR9bDqSjemK6rBRNt//9Kxg8jLYP7ehPLiT2EckBIpMZMQ
- h+k1zcz/WZB2Edc6aqxbWRuLynShW/YaM1wWYdfHPxjF4TEvFhQodzZUb9rXNk0h7HnadvG/+
- oZQTylLDqqugYmIWUvXlmX575+oIfKPl7JXbidp8YeGbm7s4cvZHWPZfXbALo2nK6bTKkDIMl
- Nx1osF4RDZnPg9W6zbQMz7qDScrS0TA6aFV4vA1N0b16gEqIiCaAoDVoZ8TUZ2EBnAwL/0OIT
- eseECf7cswdarh1nL77UJ6WtlVolsmqzIIqyjbJzSbBkcnEc5v+KUNTUVDEP6SDyd4FVBFMce
- dcKqnblFIAh0UQS8P2YGHTcJeL3Xdl+c4dW5jFQH17HsxEZlj+mn2B6S4uPUe7mDfSNrq+1Fz
- HfssF8UejeYxYXXrlSQsKSskQ0ePXuJXb3QRkQlg2Mon4sGMs39ftb0vKE4e60kIEVPkkcL6H
- rhT/1sfT5zrgFYBhb1SBk9+YhVXH2lE1sZXCsoOYsO9TQh5PdWZEKV1uEPC6Aqr/TEmLw9LP7
- 0bXB3UfKtZKdIvinSITgM53ICLzsYZwXYWxXi9gJmMRJuE2Gq6z77bhBe0ZCsw7YHMDOrmlnY
- iuNBh6Ai2UDx8nEMijWL+x8g/2cmWY0nEtc+hhfMDd2sHrOucKaafQbd7M+5nT3CuGrwBfhwY
- 3bKuWwOqXnAY/U1xDDYYKxOS2u4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj@quicinc.com>
 
-Hi Paolo,
+Hi Suraj,
 
-Am 23.11.23 um 12:51 schrieb Paolo Abeni:
-> On Tue, 2023-11-21 at 17:30 +0100, Stefan Wahren wrote:
->> After calling ethtool -g it was not possible to adjust the TX ring size
->> again.
-> Could you please report the exact command sequence that will fail?
-ethtool -g eth1
-ethtool -G eth1 tx 8
->
->
->> The reason for this is that the readonly setting rx_pending get
->> initialized and after that the range check in qcaspi_set_ringparam()
->> fails regardless of the provided parameter. Since there is no adjustabl=
-e
->> RX ring at all, drop it from qcaspi_get_ringparam().
->> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for Q=
-CA7000")
->> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
->> ---
->>   drivers/net/ethernet/qualcomm/qca_debug.c | 2 --
->>   1 file changed, 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/et=
-hernet/qualcomm/qca_debug.c
->> index 6f2fa2a42770..613eb688cba2 100644
->> --- a/drivers/net/ethernet/qualcomm/qca_debug.c
->> +++ b/drivers/net/ethernet/qualcomm/qca_debug.c
->> @@ -252,9 +252,7 @@ qcaspi_get_ringparam(struct net_device *dev, struct=
- ethtool_ringparam *ring,
->>   {
->>   	struct qcaspi *qca =3D netdev_priv(dev);
->>
->> -	ring->rx_max_pending =3D 4;
->>   	ring->tx_max_pending =3D TX_RING_MAX_LEN;
->> -	ring->rx_pending =3D 4;
->>   	ring->tx_pending =3D qca->txr.count;
->>   }
-> I think it's preferable update qcaspi_set_ringparam() to complete
-> successfully when the provided arguments don't change the rx_pending
-> default (4)
+kernel test robot noticed the following build warnings:
 
-Sorry, i didn't get. The whole point is that there is no RX ring at all,
-just a TX ring. During the time of writing this driver, i was under the
-assumption that the driver needs to provide a rx_pending in
-qcaspi_get_ringparam even this is no RX ring. The number 4 represent the
-maximum of 4 packets which can be received at once. But it's not a ring.
+[auto build test WARNING on net-next/main]
 
-Best regards
+url:    https://github.com/intel-lab-lkp/linux/commits/Suraj-Jaiswal/dt-bindings-net-qcom-ethqos-add-binding-doc-for-fault-IRQ-for-sa8775p/20231123-202252
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/62eaaace3713751cb1ecac3163e857737107ca0e.1700737841.git.quic_jsuraj%40quicinc.com
+patch subject: [PATCH net-next v3 3/3] net: stmmac: Add driver support for DWMAC5 fault IRQ Support
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20231124/202311241513.D6JpHWGg-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231124/202311241513.D6JpHWGg-lkp@intel.com/reproduce)
 
-> Cheers,
->
-> Paolo
->
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311241513.D6JpHWGg-lkp@intel.com/
 
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:693:5: warning: no previous prototype for function 'stmmac_get_fault_intr_config' [-Wmissing-prototypes]
+   int stmmac_get_fault_intr_config(struct platform_device *pdev, struct stmmac_resources *res)
+       ^
+   drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:693:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int stmmac_get_fault_intr_config(struct platform_device *pdev, struct stmmac_resources *res)
+   ^
+   static 
+   1 warning generated.
+
+
+vim +/stmmac_get_fault_intr_config +693 drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+
+   692	
+ > 693	int stmmac_get_fault_intr_config(struct platform_device *pdev, struct stmmac_resources *res)
+   694	{
+   695		int ret = 0;
+   696	
+   697		res->safety_common_intr = platform_get_irq_byname(pdev, "safety");
+   698	
+   699		if (res->safety_common_intr < 0) {
+   700			if (res->safety_common_intr != -EPROBE_DEFER)
+   701				dev_err(&pdev->dev, "safety IRQ configuration information not found\n");
+   702			ret = 1;
+   703		}
+   704	
+   705		return ret;
+   706	}
+   707	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
