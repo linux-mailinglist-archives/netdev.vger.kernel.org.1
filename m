@@ -1,174 +1,199 @@
-Return-Path: <netdev+bounces-50804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01AA07F7303
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:46:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08657F7314
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08B8D1C20A13
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EF352809DD
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B0C1D694;
-	Fri, 24 Nov 2023 11:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6CF200A6;
+	Fri, 24 Nov 2023 11:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TOoR3ih9"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZJmvVtq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231BCD68
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 03:46:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700826404; x=1732362404;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dR2GH3J67yFRpECRAVtJ9IGcYqnnlxsqKz1LuSh3PPI=;
-  b=TOoR3ih9TN9fLhuiLiYu5YQfvRtRaelvxCI3cFJwizJdKESF1q1rRZzZ
-   k2Sm2DklXlEJADy4Plh1BY25Su30wd2C/QKhzyZbCCfSgjkKMRAWQXee4
-   Hws/mkrVB51YVBcQjmGK1OmCZkRkfG95aWrcAOvVhA3SblyCCmzUm37B3
-   cJSDe7kBXktaXiQwiM0LVkbdnxlyZDcJiqq4Ai1Y8wiDykn0IboA4PBFb
-   nU6DiPiLCYvSvIz7a83Womb59EvWSmrRZi2l9bQiJQ8yjRZQUAor1AkBf
-   vabUdK02zxU0CVSQP9ytcHU3qe7mjf1vrQ7bDOi9QRpS28G5IwSU5xCA/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10902"; a="423547631"
-X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
-   d="scan'208";a="423547631"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2023 03:46:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,223,1695711600"; 
-   d="scan'208";a="9116118"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Nov 2023 03:46:44 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 24 Nov 2023 03:46:43 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Fri, 24 Nov 2023 03:46:43 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Fri, 24 Nov 2023 03:46:43 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=guFYjgIUpsTH4KKjKWuhbPJ3QZbj0IODJoHwJkNa/5z7R8H70mS7+WuuKScXj1o/hT4rEqPjydILvx1kH8MupKg3Ausxshwf1s1oyB8BCMwsAfMHt7onhCeaaiydZW3qkL9+VM1NTlXf1ZWK6hlSKUhg/TIS0ni3SVhHne9DzSpR/JzSYH59+acv8A+AHFCyMACyxnRqN7AU7LByPmYgkLHZH0ob1ARhOHGGBwi8/0C19/KGNW7HgphBnhc/ohT88Q6ahMb0a1mRcqHXEDl++Gi0D23YSnKMrqWRtLlgFNMZP8u+hkPSmRD/FhO3JctfOSitJKp7e8zNUy1wcYAcUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qalmy9De/UBMqVfXYxtiFtC/3YJRyA3jmm0rydIQUa0=;
- b=e1Df1o2W2axBxnSJZYT2Ds0FCk00v3p6Rw1/hZthAWFP2yS+4aCXNPL/R8GAOVWsxgwE10cHZDamnt2UyA2jVcxogWHX6KWj+2Dn3s+bQ7Yh6PZ0NRRY5mJ+P2Ed6YhW3T4ONXKtX6QI2Ae7gHDqPoePF2RXeuuYf1kA3WYgMLUb95wZ4ykgSdi9F236dNyYApV+4zcB7iekQpNaN6BqbAjrPgep3s98nO013QyA51tvukXWrVSLj6gYSzAou2oeAR0Fa1Od9sIrHzzg6hWc1sXq6LWmtzm0GKbfopIfCfpMtasZZRtuBV6REumAfzgQuq6GRUI+QxFpL7BtV1LhNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by PH0PR11MB5080.namprd11.prod.outlook.com (2603:10b6:510:3f::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.21; Fri, 24 Nov
- 2023 11:46:41 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7025.021; Fri, 24 Nov 2023
- 11:46:41 +0000
-Message-ID: <6a45ca42-c23f-21f0-ccbf-7ea6bb5bd408@intel.com>
-Date: Fri, 24 Nov 2023 12:46:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH iwl-next 1/2] ice: Schedule service task in IRQ top half
-Content-Language: en-US
-To: Karol Kolacinski <karol.kolacinski@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
-	<jesse.brandeburg@intel.com>, Michal Michalik <michal.michalik@intel.com>
-References: <20231124114155.251360-1-karol.kolacinski@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20231124114155.251360-1-karol.kolacinski@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0135.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9e::19) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD9F1A5;
+	Fri, 24 Nov 2023 03:50:09 -0800 (PST)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO8GaX3024034;
+	Fri, 24 Nov 2023 11:49:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=WioykjLZIEzmqvcqqpGNeyMQihVdBnwLtxAN4aQW36M=;
+ b=ZJmvVtq0dWWzfz/PiZ/98+LmAueLy5p1oC/PJ58O5BDGCtJlW4h8P7VAwJD6M69cIy4q
+ OJ15ypy40/seKHpxe2cMhMd+dM4yycLpLbhlPxicz3Z82A2n3xi2DpofUDMJP7zaJ80x
+ mrYmuUU6op/22ygowItD3HD88a9cubzfFhvDExzcaQtWdZzN5m7ZUL1KRPuAJM0rvXdk
+ oo49gtqZqnDgoTlcnbBWDAke/Tznl7xsc27p1rMY6ub18tV+wLbSNLTyY1VjeHLnp4t/
+ bJ7y3ZhK38rjztJtYKEELWJEJVxyky23I5w/trtSWZx+F7I4ZJLXfyryfiEqPJgDyD/6 9A== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ujp8x0wrb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 11:49:38 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AOBnb6B004975
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 11:49:37 GMT
+Received: from [10.253.33.181] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 24 Nov
+ 2023 03:49:30 -0800
+Message-ID: <367c0aea-b110-4e3f-a161-59d27db11188@quicinc.com>
+Date: Fri, 24 Nov 2023 19:49:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|PH0PR11MB5080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3c937630-0e28-4aab-e4a6-08dbece30608
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SEH9NIVnlGAVIORvW76iYQe2UOKZdN3vA6y2sbCs+UHp0YYY6Qcvuu4E24Ya12VyT7CbuzOFqsUL4SQRnO8bv50z8xTMhs4wedUpGT+QMJKIm3cm9WTD1Sww+ntzDlXMKXX4AJSsP3gB7fFtfULhloqmXMJ8I5y6aowCQ+qBi7ABpN83N8pABIUCBzGH4iv64GLjVD78TNT1NZFeBH7oEQrk5ptueISGHN0ekwj+Othj1nCFhTFnNTq6NLVfVpwyQ/W4tXK5rZmlMm0S7hldN4EDaQf3J9hucZ/CVioPHX8Lc35TUKIKWhWQGGMnNRHxAZhKQetrXRqBCGBkJmNR9UZ2gR4ltPY261bZckvxe7/JkebJ3GX330ey84aQVUb5M/TwHHYZML/46wFbOYphx6wipy0iuNQslQlTwlQThvoKn5tJnN3AEpXRAARgmTZcgXMv5vUzsGC8jN9RZrSruwu09VoapFZm5EI7U3camhl/n4eeP7+DIJHje4CbLw9IX2zFKE6Y5237ujJgERyUW+pgS6ZRnDiRABvbQa+lx/2N0cHTwJoOE9PltLykcDTIhRGWCCUDWQ/7Vsm1JlYPm8vfH+eKOwPcSKk5f6gZlNj0oW8CN4dam0NLA1jZi2isHq2bMdxbowZrtqlTJFBjwA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(136003)(39860400002)(396003)(376002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(316002)(66476007)(66946007)(66556008)(478600001)(6486002)(6666004)(5660300002)(41300700001)(36756003)(2906002)(4744005)(8936002)(8676002)(86362001)(4326008)(31696002)(2616005)(82960400001)(26005)(107886003)(83380400001)(53546011)(6506007)(38100700002)(6512007)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OFoxSmZtdlNiS1FJZ09HNFpyK3FPZnFnLzFmZVRyUmVWc0hYOTVBKzRLc1Iw?=
- =?utf-8?B?eHdITnNaV0phTERYZjUxVmpBMkRUak9BNWdseDFjQUZnT3ZrVERwQStoSjV1?=
- =?utf-8?B?WWs2MmdDNHUzelZKM2thU0tIUDV4R3JyL1UvVzNXMllqTFFDQzRUNC9OYkxW?=
- =?utf-8?B?WDNLRklTdG15ZXJxR3d1MDZnbmhJT2p1c0swdmg4cXVCTUVHVWVvQjlHeUhp?=
- =?utf-8?B?NWhvUjNFbGQ4MGtMRW9RUmIvU1h4UTVVdkpvdjdWVEdlWGplcW5mZDYxYU9N?=
- =?utf-8?B?TGtmWVoyaHZRTWJYZTJ4VDdpbUZJbXYwL2RFM0pmQ2h6REJHSTlMSUptWlFt?=
- =?utf-8?B?R2R2TkJoWGJwbHlGUFczZThvS1dNV2djKzJFWTNMME10WEZTcG5tSGR5L0Rh?=
- =?utf-8?B?MldaeVI0Uk9LRTBnZlpwaVMrY3VRZUYxM2R6aElBU3E2M05aOXhLanlsMTJy?=
- =?utf-8?B?ZGg2WlZZZVhYM0VsdExDREY1UVFqa2tmU3Jkd1FWNkY0dlFLemFqRXNiYlhx?=
- =?utf-8?B?eXQ5cEh6dG83TkpHeldJK1hYcE5GU2laTDdVQzNHanN0Tyt3NVprMUd5WGhy?=
- =?utf-8?B?dktwd3pCNUdSNEI1cTJmSlk4QzhxYWh5LzFvK2FHZW05bVJmYnllOWo2b3Z3?=
- =?utf-8?B?TWdUY0xDcHBLNy8rZDFmbG1XY216S1NDV1ZBRWNSOXByUlByOFI5b1FWd3h4?=
- =?utf-8?B?dHgwMitaMnMrQWpzSE5INDZvN3lkLzhxWEZPcE5MVFZTUE9mbU1WQTBQZEVa?=
- =?utf-8?B?SHBCTjlKWHNIQVhRNTVxR29LWmU0MkRaYlFPN3ppdXZCV3NGZG40d2RKQjBv?=
- =?utf-8?B?bGpwSXkrWUV5Tmt3cFNHUS9YYlA5RXdhQW93dzZ6MHdzT2hxT21GRmZPM3Bp?=
- =?utf-8?B?NmozU2lyNDZ4MkFuNmJsOVNINWM5dGtSdTRrbjJsQjNGenFZWm4zTmlKZitL?=
- =?utf-8?B?b2U5YndIVk9pQmJ1d09OWlA4V2ttWC94VjA0N0lWMzV5R0g4ZFdRUTlJSEpO?=
- =?utf-8?B?TXpJN0cwYnNaRjJSeFlEcU0yRzdLQ2hMN2lnQjgrTGVsblFVNU1CVUtsV3Ji?=
- =?utf-8?B?TlVZU3FiUVJUT3luV0k2R3FHSndMWi9aZjR6RXNpZ1E3cDlXcVJjZkU2Z1B1?=
- =?utf-8?B?TjRRditmRjE3b2tmVENoRGJoZVA4ZUtyVFZXa3J0QW1qbjg1ZzI4QnFTbnEv?=
- =?utf-8?B?RUZjK09rK1lBaVR3VlBzTlUyYlJ4ZXlwWFA1aGJHcEU0YUlDOHMzUzM1OE1N?=
- =?utf-8?B?RlRHcHZCNjNLZzYwQjdtamx4SDREZC9GZXQ3V2lMcTdKYUEzdmIranRtbHBh?=
- =?utf-8?B?Q2R1REdIVzlCU09sSy9VSDNVT1FjUWgrcDhlUFcyazkveDEwUjFXQ3VyUWFS?=
- =?utf-8?B?RmxCZnd1Q2Exa1VHeTl4U3hKRHZiZ1RLMG5TQkJJN1BYM2F0RVRpSldtc0NK?=
- =?utf-8?B?VE9GWU05Q0R2Q1BWTWJUS2lKWTdiMytCdElpWTN4bFJzZ3E3UmRWR3lOcWNH?=
- =?utf-8?B?bGlQaC84aE1mODViaEJQMHBKYlZvVmR1VFdJa0Y4K2VpeHFlSE1kQng1NjBu?=
- =?utf-8?B?dDViejZZWDZ2em1HeVZWOVVzTEJwUFdFMTFnMERpTCthbEVjdGF6bkpCTGd1?=
- =?utf-8?B?WFFXZk5wTnI1STNnR2VVUmhjY1cyYzFCN09vUzV0Y0lGbkhpZzhKSUhFWTJn?=
- =?utf-8?B?RFF3Q0VCMEVRbFRXMFRmMHZLT0Y5d2VkMnVWakl2V3puaGxzVGlmY2R4d1lB?=
- =?utf-8?B?U0dEV3orNjB4bWVWaVdnVUQxUHlyMEkvTjIvNFpObzRrSytZQ1c4VDViTWlz?=
- =?utf-8?B?Q0tFZG1kOEpzeDJlT2w1V3IvczR4TnZ1eXRwNlNoekJESm5tNzFJL1RjRTdI?=
- =?utf-8?B?cG45bWdsYkVMVEhPckZpaG1PQ291MlMwQzhjUWdETmZrSXJ5NjlzWE11dFZm?=
- =?utf-8?B?Q0p4VW5aS1ZCaGRjQWtlZlBTZFI0OW9WN2N6Q3h3NUxDalJVRFFlVGZIZ3hF?=
- =?utf-8?B?VWZYbERsT0pRSUNLN3hVYXVqRGZGdFl0THlpSjhyRlpwV0Y0QWR3MlBncjNp?=
- =?utf-8?B?UnpjcEZ0aERIWlc2UjVnU0ppK2piQW1RRUh6bUU0L3RTZTdMbUdWNTJPNEti?=
- =?utf-8?B?aWhwTmFUZU9ldUphUDhIeDNGZ2dZbzVJV2R0RWlvblY4dkVodjAzbit1Y2VH?=
- =?utf-8?Q?auPlz5J8OJwUaDrkHzBp8ec=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c937630-0e28-4aab-e4a6-08dbece30608
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 11:46:40.8194
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0PjgX7sXktPOXUhua2FqXVd6R9vlpKw0/lrmE8RDmL+TonRFeT1KcGwcNJR6RQbNfavaEIGgg4t7lc/NbILFva/1g/OudgZS47gfoMTFNNw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5080
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
+ PHY package nodes
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Rob Herring
+	<robh@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+        Bjorn
+ Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Florian Fainelli
+	<florian.fainelli@broadcom.com>,
+        Broadcom internal kernel review list
+	<bcm-kernel-feedback-list@broadcom.com>,
+        Daniel Golle
+	<daniel@makrotopia.org>,
+        Qingfang Deng <dqfext@gmail.com>,
+        SkyLake Huang
+	<SkyLake.Huang@mediatek.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+        David
+ Epping <david.epping@missinglinkelectronics.com>,
+        Vladimir Oltean
+	<olteanv@gmail.com>,
+        Harini Katakam <harini.katakam@amd.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Robert Marko <robert.marko@sartura.hr>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>
+References: <20231120135041.15259-4-ansuelsmth@gmail.com>
+ <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+ <20231121144244.GA1682395-robh@kernel.org>
+ <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
+ <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
+ <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
+ <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
+ <c697488a-d34c-4c98-b4c7-64aef2fe583f@lunn.ch>
+ <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
+ <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
+ <655fa905.df0a0220.49d9b.7afd@mx.google.com>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <655fa905.df0a0220.49d9b.7afd@mx.google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: jLknTLU7yaNEfTc2et0lNIX_kyygQYkY
+X-Proofpoint-ORIG-GUID: jLknTLU7yaNEfTc2et0lNIX_kyygQYkY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 mlxlogscore=999 clxscore=1011 spamscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311240092
 
-On 11/24/23 12:41, Karol Kolacinski wrote:
-> Schedule service task and EXTTS in the top half to avoid bottom half
-> scheduling if possible, which significantly reduces timestamping delay.
+
+
+On 11/24/2023 3:33 AM, Christian Marangi wrote:
+> On Thu, Nov 23, 2023 at 03:57:58PM +0100, Andrew Lunn wrote:
+>> On Thu, Nov 23, 2023 at 02:35:31PM +0000, Russell King (Oracle) wrote:
+>>> On Thu, Nov 23, 2023 at 03:27:05PM +0100, Andrew Lunn wrote:
+>>>>> Just to be more precise qca807x can operate in 3 different mode:
+>>>>> (this is controlled by the MODE_CFG bits)
+>>>>
+>>>>> - QSGMII: 5 copper port
+>>>>
+>>>> 4 slots over QSGMII, plus the second SERDES is connected to the MAC
+>>>> using SGMII/1000BaseX?
+>>>>
+>>>>> - PSGMII: 5 copper port
+>>>>
+>>>> 5 slots over QSGMII, the second SERDES is idle?
+>>>>
+>>>>> - PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
+>>>>
+>>>> 5 slots over QSGMII, with the second SERDES connected to an SFP cage.
+>>>>
+>>>> Are ports 1-4 always connected to the P/Q SGMII. Its only port 5 which
+>>>> can use the second SERDES?
+>>>
+>>> I think what would really help here is if there was an ascii table to
+>>> describe the configurations, rather than trying to put it into words.
+>>
+>> Yes.
+>>
+>> And also for ipq4019. We need to merge these two threads of
+>> conversation, since in the end they are probably the same driver, same
+>> device tree etc.
+>>
 > 
-> Co-developed-by: Michal Michalik <michal.michalik@intel.com>
-> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice.h      |  1 -
->   drivers/net/ethernet/intel/ice/ice_main.c | 18 ++++++++++--------
->   2 files changed, 10 insertions(+), 9 deletions(-)
+> For everyone that missed Robert response in patch 12 let me quote him
+> also here.
 > 
+> "
+> Hi Andrew,
+> I think that the description is confusing.
+> QCA807x supports 3 different modes:
+> 1. PSGMII (5 copper ports)
+> 2. PSGMII (4 copper ports + 1 combo port)
+> 3. QSGMII+SGMII
+> 
+> So, in case option 2 is selected then the combo port can also be used for
+> 1000Base-X and 100Base-FX modules or copper and it will autodetect the
+> exact media.
+> This is supported via the SFP op-s and I have been using it without issues
+> for a while.
+> 
+> I have not tested option 3 in combination with SFP to the copper
+> module so I cant
+> say whether that works.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+For the option3, the last PHY works on SGMII mode, then it can't be
+used with SFP, only copper is supported in this mode.
 
+>  From what I can gather from the typical usage examples in the
+> datasheet, this QSMII+SGMII
+> mode is basically intended as a backward compatibility thing as only
+> QCA SoC-s have PSGMII
+> support so that you could still use SoC-s with QSGMII and SGMII support only.
+> 
+> So there is no way to control the SerDes-es individually, only the
+> global mode can be changed via
+> the Chip configuration register in the Combo port.
+> 
+> You can see the block diagram of this PHY in this public PDF on page 2[1].
+> 
+> [1] https://content.codico.com/fileadmin/media/download/datasheets/qualcomm/qualcomm_qca8075.pdf
+> "
+> 
 
