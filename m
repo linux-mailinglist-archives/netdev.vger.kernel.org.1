@@ -1,161 +1,147 @@
-Return-Path: <netdev+bounces-50762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B08F7F7053
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:47:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B6A7F705C
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:49:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CFEE1C20ED5
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:47:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40FDE281D14
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 09:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA968171B6;
-	Fri, 24 Nov 2023 09:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D32171D7;
+	Fri, 24 Nov 2023 09:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CKvDX34v"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="UZS+8JRd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CAA0D71;
-	Fri, 24 Nov 2023 01:47:25 -0800 (PST)
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO7j93Y021237;
-	Fri, 24 Nov 2023 09:47:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=ZPXgpnugqVZGKoYb8pnDz47Cff9lnhLDr+ItJWa9BP0=;
- b=CKvDX34v3pYSFKvSejLvOoMkallkW6vB/ysTYKNxV66DhGomXgb2z95XAdt9TLLcoRp6
- 02H3T/LP1DRi3K6kJctxQV182IJOcNfZpbo95tMKxTW+0I8euV32KSuBnYd8GGPUinSv
- ZUKIhQzW0ragJW8ddlsR68bKHIVJ1T+6R7MurZAKXTjtKUnm9B0fcQLMP1wMgDZ2i6my
- +H3Vso8D8mgfqIyIRgPkKIOUTzDjoD/0wla4e1kbVCSBRomMOtzVhbL8X6eZ0s/R2wch
- 51L5mnKIOn9N4kraX0+/zTQaJiKcqPeouAY1OxLmtQ2NQ31FnhRyyTlZtPoWVIqAPK0W qA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uj30xagya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 09:47:11 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AO9lA2G019302
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 09:47:10 GMT
-Received: from [10.253.33.181] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 24 Nov
- 2023 01:47:07 -0800
-Message-ID: <1bd2f3a9-3dd1-4c95-b4e5-c9bf2274f271@quicinc.com>
-Date: Fri, 24 Nov 2023 17:47:04 +0800
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193241A5;
+	Fri, 24 Nov 2023 01:48:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=Y6oOg+XyggL3panEJ9dZ3qh6P7m6iqtMQeQ+/73vKtk=; b=UZS+8JRd5hGjDZklNyqijiVqoG
+	QzvTPxvRWOHTUmyR3vZ9VJvGM1f9YgAdkl6lxVrVStTEVbXtFXjzzxiZtEBbJPAXrb1p5GHqxxfBV
+	83lUoWBjWoXQ9ZMfymHJ7XspO64xP8Ug4qFe/TIXv+0VwbP5Bl3wTVoZ2pDKDhDDWnMXfxrrbhdYm
+	XAi9JZKirPuGbBAUs1BJqEyObdZWBGLD/SaUgzRlSqyPF/7zfa2tFsF0fd6vI3/ZjvuqtKDnB/S6n
+	vmopK1nO1JsxToTTLgVhm/He0d9GhLEHGs06OD3B9JS/nAaPoPSxYMxkaX1kS1NNJufgEjTyBjEdl
+	mf4kAvyA==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r6Snv-0008hD-HU; Fri, 24 Nov 2023 10:48:55 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r6Snu-000Gj6-9l; Fri, 24 Nov 2023 10:48:54 +0100
+Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
+ send/recv/acked events
+To: Philo Lu <lulie@linux.alibaba.com>, bpf@vger.kernel.org
+Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
+ hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, andrii@kernel.org,
+ martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
+ netdev@vger.kernel.org
+References: <20231123030732.111576-1-lulie@linux.alibaba.com>
+ <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <72166ea4-cae7-97e2-88fd-e9bde56523fb@iogearbox.net>
+Date: Fri, 24 Nov 2023 10:47:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <corbet@lwn.net>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>
-References: <20231118062754.2453-1-quic_luoj@quicinc.com>
- <20231118062754.2453-4-quic_luoj@quicinc.com>
- <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
- <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
- <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
- <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
- <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
- <316fb626-4dc3-4540-9cc4-e45840e36f77@quicinc.com>
- <ZVyZ+8Q2eNfAKjO/@shell.armlinux.org.uk>
- <d2ac542c-aae3-49ae-ae2b-9defc4ca98eb@quicinc.com>
- <ZV8+/4eNzLpLzSDG@shell.armlinux.org.uk>
+In-Reply-To: <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <ZV8+/4eNzLpLzSDG@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: aiyM4pSnaDMmdiJAqPYIRFscEDZWJEmM
-X-Proofpoint-GUID: aiyM4pSnaDMmdiJAqPYIRFscEDZWJEmM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 phishscore=0 adultscore=0 clxscore=1015
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311240076
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27103/Fri Nov 24 09:40:22 2023)
 
-
-
-On 11/23/2023 8:01 PM, Russell King (Oracle) wrote:
-> On Thu, Nov 23, 2023 at 06:57:59PM +0800, Jie Luo wrote:
->> On 11/21/2023 7:52 PM, Russell King (Oracle) wrote:
->>> Ultimately, you will need a way to use inband signalling with Cisco
->>> SGMII for 10M/100M/1G speeds, and then switch to 2500base-X when
->>> operating at 2.5G speeds, and that is done via the PHY driver
->>> updating phydev->interface.
->>>
->>> What we do need is some way for the PHY to also tell the PCS/MAC
->>> whether inband should be used. This is something I keep bringing up
->>> and now that we have PCS drivers revised to use the value from
->>> phylink_pcs_neg_mode() _and_ a consistent implementation amongst them
->>> we can now think about signalling to PCS drivers whether inband mode
->>> needs to be turned off when switching between modes.
+On 11/23/23 1:37 PM, Philo Lu wrote:
+> Sorry, I forgot to cc the maintainers.
+> 
+> On 2023/11/23 11:07, Philo Lu wrote:
+>> Add 3 sock_ops operators, namely BPF_SOCK_OPS_DATA_SEND_CB,
+>> BPF_SOCK_OPS_DATA_RECV_CB, and BPF_SOCK_OPS_DATA_ACKED_CB. A flag
+>> BPF_SOCK_OPS_DATA_EVENT_CB_FLAG is provided to minimize the performance
+>> impact. The flag must be explicitly set to enable these callbacks.
 >>
->> Yes, we can switch the interface mode according to the current link
->> speed in the pcs driver.
->> but the issue is that the phy-mode i specified for the PHYLINK,
->> if phy-mode is sgmii, the support capability is limited to maximum
->> capability 1G during the PHYLINK setup and i can't configure it to 2.5G
->> dynamically, if the phy-mode is 2500base-x, then PHY capability will
->> be modified to only support 2.5G, other speeds can't be linked up.
-> 
-> So you need my patches that add "possible_interfaces" to phylib so you
-> can tell phylink that you will be switching between SGMII and
-> 2500base-X. Please see the RFC posting of those patches I sent
-> yesterday and try them out - you will need to modify your phylib
-> driver to fill in phydev->possible_interfaces.
-
-Your patches work on my board, thanks Russell.
-
-> 
->>> There have been patches in the past that allow inband mode to be
->>> queried from phylib, and this is another important component in
->>> properly dealing with PHYs that need to use inband signalling with
->>> Cisco SGMII, but do not support inband signalling when operating at
->>> 2.5G speeds. The problem when operating at 2.5G speed is that the
->>> base-X protocols are normally for use over fibre, which is the media,
->>> and therefore the ethtool Autoneg bit should define whether inband
->>> gets used or not. However, in the case of a PHY using 2500base-X,
->>> the Autoneg bit continues to define whether autonegotiation should
->>> be used on the media, and in this case it's the media side of the
->>> PHY rather than the 2500base-X link.
->>>
->>> So, when using a 2500base-X link to a PHY, we need to disregard the
->>> Autoneg bit, but that then raises the question about how we should
->>> configure it - and one solution to that would be to entire of phylib
->>> what the PHY wants to do. Another is to somehow ask the PCS driver
->>> whether it supports inband signalling at 2500base-X, and resolve
->>> those capabilities.
+>> If the flag is enabled, bpf sock_ops program will be called every time a
+>> tcp data packet is sent, received, and acked.
+>> BPF_SOCK_OPS_DATA_SEND_CB: call bpf after a data packet is sent.
+>> BPF_SOCK_OPS_DATA_RECV_CB: call bpf after a data packet is receviced.
+>> BPF_SOCK_OPS_DATA_ACKED_CB: call bpf after a valid ack packet is
+>> processed (some sent data are ackknowledged).
 >>
->> For the qca808x PHY, when it is linked in 2.5G, the autoneg is also
->> disabled in PCS hardware, so the sgmii+ of qca808x PHY is almost
->> same as 2500base-X.
-> 
-> Not "almost". It _is_ the same. This is the point I've been trying
-> to get across to you. Without inband signalling, 1000base-X and SGMII
-> (when operating at 1G) are _identical_ and entirely compatible.
-> 
-> You've said that your 2.5G "SGMII" mode has inband signalling disabled,
-> and thus it without inband signalling, 2500base-X and this 2.5G mode
-> are again identical and entirely compatible. There's no "almost" about
-> it.
-> 
-> 
-Yes, confirmed with HW guy, they work on the same way.
+>> We use these callbacks for fine-grained tcp monitoring, which collects
+>> and analyses every tcp request/response event information. The whole
+>> system has been described in SIGMOD'18 (see
+>> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
+>> achieve this with bpf, we require hooks for data events that call
+>> sock_ops bpf (1) when any data packet is sent/received/acked, and (2)
+>> after critical tcp state variables have been updated (e.g., snd_una,
+>> snd_nxt, rcv_nxt). However, existing sock_ops operators cannot meet our
+>> requirements.
+>>
+>> Besides, these hooks also help to debug tcp when data send/recv/acked.
+>>
+>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+>> ---
+>>   include/net/tcp.h        |  9 +++++++++
+>>   include/uapi/linux/bpf.h | 14 +++++++++++++-
+>>   net/ipv4/tcp_input.c     |  4 ++++
+>>   net/ipv4/tcp_output.c    |  2 ++
+>>   4 files changed, 28 insertions(+), 1 deletion(-)
+
+Please also add selftests for the new hooks, and speaking of the latter
+looks like this fails current BPF selftests :
+
+https://github.com/kernel-patches/bpf/actions/runs/6974541866/job/18980491457
+
+Notice: Success: 502/3526, Skipped: 56, Failed: 1
+Error: #348 tcpbpf_user
+   Error: #348 tcpbpf_user
+   test_tcpbpf_user:PASS:open and load skel 0 nsec
+   test_tcpbpf_user:PASS:test__join_cgroup(/tcpbpf-user-test) 0 nsec
+   test_tcpbpf_user:PASS:attach_cgroup(bpf_testcb) 0 nsec
+   run_test:PASS:start_server 0 nsec
+   run_test:PASS:connect_to_fd(listen_fd) 0 nsec
+   run_test:PASS:accept(listen_fd) 0 nsec
+   run_test:PASS:send(cli_fd) 0 nsec
+   run_test:PASS:recv(accept_fd) 0 nsec
+   run_test:PASS:send(accept_fd) 0 nsec
+   run_test:PASS:recv(cli_fd) 0 nsec
+   run_test:PASS:recv(cli_fd) for fin 0 nsec
+   run_test:PASS:recv(accept_fd) for fin 0 nsec
+   verify_result:PASS:event_map 0 nsec
+   verify_result:PASS:bytes_received 0 nsec
+   verify_result:PASS:bytes_acked 0 nsec
+   verify_result:PASS:data_segs_in 0 nsec
+   verify_result:PASS:data_segs_out 0 nsec
+   verify_result:FAIL:bad_cb_test_rv unexpected bad_cb_test_rv: actual 0 != expected 128
+   verify_result:PASS:good_cb_test_rv 0 nsec
+   verify_result:PASS:num_listen 0 nsec
+   verify_result:PASS:num_close_events 0 nsec
+   verify_result:PASS:tcp_save_syn 0 nsec
+   verify_result:PASS:tcp_saved_syn 0 nsec
+   verify_result:PASS:window_clamp_client 0 nsec
+   verify_result:PASS:window_clamp_server 0 nsec
+Test Results:
+              bpftool: PASS
+           test_progs: FAIL (returned 1)
+             shutdown: CLEAN
+Error: Process completed with exit code 1.
 
