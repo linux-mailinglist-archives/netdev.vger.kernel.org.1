@@ -1,125 +1,125 @@
-Return-Path: <netdev+bounces-50964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C9E7F855D
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 22:10:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD1BF7F8590
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 22:44:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B511C2326F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:10:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C90CCB213D4
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538873A8CB;
-	Fri, 24 Nov 2023 21:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7163BB3A;
+	Fri, 24 Nov 2023 21:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEn9glMa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWXvRtEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD911990;
-	Fri, 24 Nov 2023 13:10:07 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507a98517f3so3070122e87.0;
-        Fri, 24 Nov 2023 13:10:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700860205; x=1701465005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wVO89DxZvW04y67tvwrlTV9VwiUMtZyXH6adWuhrdRo=;
-        b=HEn9glMa/xrQbKtV9vu9UChqzLaX7oEu+6Py2skf8l02wiNu+ZbBqyzTD2fZEXih/4
-         zfRCy5KoM7+eQpJDRKbnQzeAsqic2ld6ypTRXlkw1NPkxOuo0Lq69GmUzPsqPHUYdE1b
-         aJkT3isN55J7exBkF6pXYUur4QFkQhDM6650X0IVX0Co4TUdwRIZYfjQCedPhUoKQlGY
-         hcQoHV1alB7fhXyAtSLtS3Z6AnOiwlWYdEpeaq7zyFvOV4SYjqBrpM5WOU6usMIMC83B
-         sgZvgAQYJlYe3v3ar3VS3nDdkBIbWzkzlOmL/2+qQf12KgjuzeZGrrHTfR7UKSG5zVIS
-         9MsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700860205; x=1701465005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wVO89DxZvW04y67tvwrlTV9VwiUMtZyXH6adWuhrdRo=;
-        b=ZN/kOwwj5Nyzxy+JIvbB3/b8wEpyWEBv89hdC+xXvZDK+pnua08VqbJcJU/EynuLMC
-         beKZXG6VcDRHiO5vr/+t/VXEMw7TYSL70OQLyezphNznhfBnwWoM70wrPXnEhjHe14J3
-         Fd7NoZDxJrRT1LucwT8j5jgDfa4cW16n9wXSlX150NwZAF6SHygTOM1Sezc1pfuaOtVv
-         iVuLq1LEg94Pjik2DbP6MZBWrMHGmQoRtEuArrtn+r7cT/VAq3LXWSgVSsnm0xfa2ymZ
-         gySSqGhRi2tge9HRulU/Xnt77cHVGmA5/rqLtq8A/5TweCiPYsuKjmt3QcMrUnVf17AC
-         bX9w==
-X-Gm-Message-State: AOJu0YyDGJKNXZ3L4YA8D8N+546drilvjb+I/uBBO+hRazQHBGfaf9iP
-	Ne9utuDTraqP74b1o10vLTs=
-X-Google-Smtp-Source: AGHT+IH3nqShraHW1QykxqsIbDujWXOJ/I+HVxV6vLUEpulinhiUthzPAgbnooun2fEsW0kJTzdWXA==
-X-Received: by 2002:a05:6512:3b87:b0:508:264e:2ded with SMTP id g7-20020a0565123b8700b00508264e2dedmr3889979lfv.38.1700860205071;
-        Fri, 24 Nov 2023 13:10:05 -0800 (PST)
-Received: from localhost.localdomain (109-252-174-150.dynamic.spd-mgts.ru. [109.252.174.150])
-        by smtp.gmail.com with ESMTPSA id e15-20020a19690f000000b0050919538b00sm619326lfc.79.2023.11.24.13.10.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 13:10:04 -0800 (PST)
-From: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
-To: Sunil Goutham <sgoutham@marvell.com>
-Cc: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B147E28DB8
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 21:44:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA25C433C7;
+	Fri, 24 Nov 2023 21:44:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700862263;
+	bh=wKpJU85+z5ti8NPiipuZLx3lXDJJ0hWM9oAvlJ9VuJg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oWXvRtEurXEtLzYXfIcw86epniNt3GJp6VypjuInduAEsShP4jccpaX9De676XYG0
+	 0VKn+RI+zqEDIS9YW+YtX5DbAcn3OTKR+9PHzGEGl4G5k0w4kQ/qvJCkUWLbAGDdi8
+	 CTrQYHNsE2BdxvEiVIDTpDdaZRK+zs0h5yCRHC8CpIn6eBpU+yuXor5OtD/Uf+A20x
+	 FNic7D4ZLHougQlImtadbGn1Z5y0O16rE67B37pJyVMu5k2xdu6T2uiYw3wADxEAkl
+	 KyZjzEJ/Zv7XCnW3u0AlrliLnLfb3dIiPERkSpRMcGqMZ09cH20mbegGLxx6r8v45D
+	 mFc/fEjXllP+w==
+Date: Fri, 24 Nov 2023 21:44:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net] octeontx2-af: Fix possible buffer overflow
-Date: Sat, 25 Nov 2023 00:08:02 +0300
-Message-Id: <20231124210802.109763-1-elena.salomatkina.cmc@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next 7/8] tcp: Factorise cookie-independent fields
+ initialisation in cookie_v[46]_check().
+Message-ID: <20231124214418.GX50352@kernel.org>
+References: <20231123012521.62841-1-kuniyu@amazon.com>
+ <20231123012521.62841-8-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123012521.62841-8-kuniyu@amazon.com>
 
-A loop in rvu_mbox_handler_nix_bandprof_free() contains
-a break if (idx == MAX_BANDPROF_PER_PFFUNC),
-but if idx may reach MAX_BANDPROF_PER_PFFUNC
-buffer '(*req->prof_idx)[layer]' overflow happens before that check.
+On Wed, Nov 22, 2023 at 05:25:20PM -0800, Kuniyuki Iwashima wrote:
+> We will support arbitrary SYN Cookie with BPF, and then some reqsk fields
+> are initialised in kfunc, and others are done in cookie_v[46]_check().
+> 
+> This patch factorises the common part as cookie_tcp_reqsk_init() and
+> calls it in cookie_tcp_reqsk_alloc() to minimise the discrepancy between
+> cookie_v[46]_check().
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/ipv4/syncookies.c | 69 ++++++++++++++++++++++++-------------------
+>  net/ipv6/syncookies.c | 14 ---------
+>  2 files changed, 38 insertions(+), 45 deletions(-)
+> 
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index 1e3783c97e28..9bca1c026525 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -285,10 +285,44 @@ bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
+>  }
+>  EXPORT_SYMBOL(cookie_ecn_ok);
+>  
+> +static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+> +				 struct request_sock *req)
+> +{
+> +	struct inet_request_sock *ireq = inet_rsk(req);
+> +	struct tcp_request_sock *treq = tcp_rsk(req);
+> +	const struct tcphdr *th = tcp_hdr(skb);
+> +
+> +	req->num_retrans = 0;
+> +
+> +	ireq->ir_num = ntohs(th->dest);
+> +	ireq->ir_rmt_port = th->source;
+> +	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
+> +	ireq->ir_mark = inet_request_mark(sk, skb);
+> +
+> +	if (IS_ENABLED(CONFIG_SMC))
+> +		ireq->smc_ok = 0;
+> +
+> +	treq->snt_synack = 0;
+> +	treq->tfo_listener = false;
+> +	treq->txhash = net_tx_rndhash();
+> +	treq->rcv_isn = ntohl(th->seq) - 1;
+> +	treq->snt_isn = ntohl(th->ack_seq) - 1;
+> +	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
+> +	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
 
-The patch moves the break to the
-beginning of the loop.
+Hi Iwashima-san,
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+The line above seems to be duplicated.
 
-Fixes: e8e095b3b370 ("octeontx2-af: cn10k: Bandwidth profiles config support").
-Signed-off-by: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+Other than that, this patch looks good to me.
+
 Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 23c2f2ed2fb8..c112c71ff576 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -5505,6 +5505,8 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
- 
- 		ipolicer = &nix_hw->ipolicer[layer];
- 		for (idx = 0; idx < req->prof_count[layer]; idx++) {
-+			if (idx == MAX_BANDPROF_PER_PFFUNC)
-+				break;
- 			prof_idx = req->prof_idx[layer][idx];
- 			if (prof_idx >= ipolicer->band_prof.max ||
- 			    ipolicer->pfvf_map[prof_idx] != pcifunc)
-@@ -5518,8 +5520,6 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
- 			ipolicer->pfvf_map[prof_idx] = 0x00;
- 			ipolicer->match_id[prof_idx] = 0;
- 			rvu_free_rsrc(&ipolicer->band_prof, prof_idx);
--			if (idx == MAX_BANDPROF_PER_PFFUNC)
--				break;
- 		}
- 	}
- 	mutex_unlock(&rvu->rsrc_lock);
--- 
-2.34.1
 
+> +	treq->req_usec_ts = false;
+> +
+> +#if IS_ENABLED(CONFIG_MPTCP)
+> +	treq->is_mptcp = sk_is_mptcp(sk);
+> +	if (treq->is_mptcp)
+> +		return mptcp_subflow_init_cookie_req(req, sk, skb);
+> +#endif
+> +
+> +	return 0;
+> +}
+
+...
 
