@@ -1,182 +1,122 @@
-Return-Path: <netdev+bounces-50934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAB17F7995
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:42:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864817F799F
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E972281580
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:42:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29506B20F5F
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 16:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2956F2E85B;
-	Fri, 24 Nov 2023 16:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6572135EFB;
+	Fri, 24 Nov 2023 16:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tyz6kbwM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9gId/2Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E817F173D
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 08:42:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700844160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=RrwRzTuMrZE9vgEWEXLUt24jPM0zsHvVGPBzoGtCfrw=;
-	b=Tyz6kbwMw3ed5vhIcN/SBOxNnOVzNEYPlpiUvLWedm3w5JeAQbcgoPSvZqtYCE12lC+fHA
-	Ri0El9I5QeN7C7YIrJeKCuItzsSwv8N8RWjrcj1FVtk/dt+AUANiI7PBKTmFdUhvLWjvzM
-	fxzvzlffK5/FSA4fdr1kZDy9zuvdASE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-99-u27mpJ7LPQal20htICYGbg-1; Fri, 24 Nov 2023 11:42:36 -0500
-X-MC-Unique: u27mpJ7LPQal20htICYGbg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D92B80D721;
-	Fri, 24 Nov 2023 16:42:36 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.226.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1BB6B5028;
-	Fri, 24 Nov 2023 16:42:33 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Harshitha Ramamurthy <harshitha.ramamurthy@intel.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] i40e: Fix kernel crash during macvlan offloading setup
-Date: Fri, 24 Nov 2023 17:42:33 +0100
-Message-ID: <20231124164233.86691-1-ivecera@redhat.com>
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76E70173D
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 08:44:09 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507f1c29f25so2893108e87.1
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 08:44:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700844247; x=1701449047; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HUEQlV1akgro0NpiBVcWNMD/MF3mjN5utVYZWVg8mpo=;
+        b=b9gId/2ZZJaxNXLG6BVzyJIUnRY4Wx0RPr7HJcIgr0GHZ99fKQHuz0q4JuuBbymjWz
+         RF4DkEIZMJS6bl5fwfk1ZRq2i7hX2qN9oAUiqznH8C7GqYaFOPAGcd/uDry1YU+F+6n7
+         2hUB3/kSeKQ/uh04FS2KMjSUorvbCpyJQjYhcwh6JWVjV/1htuoP+ypzEuf2a2UmGzOe
+         FY3O5jjiBc8zySTRRbOBmdk+fwbvQuCD3/owjR67NeMP/6bhxo2mGx8ln+nPeAPsUFXq
+         7exL4GfWr/S0kecrEAHv1O3HM2f87OzHapZt/3YzAhlpCuV5esiCqYcIIudlrOM1AwjR
+         zEhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700844247; x=1701449047;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HUEQlV1akgro0NpiBVcWNMD/MF3mjN5utVYZWVg8mpo=;
+        b=t3WQjtFDEuKzyH+yQnmmqctuHjp+tqhLj4mT8HTusNPDrdBcSWpQ+xzdRzrZd/LmuB
+         O6qxvd/ZePWCwuWkPK6llcawAtNK/oPkKbJRT8JjQeaV7yFs4J70wRnZU5N3V7lxhwwF
+         b9JbqjAflaxKLrbr87FPfcG6hN+MCcbnrf18cKopFFskfnR3EWIc820k+hKgs47/auNI
+         KHNrB+2yIMKk2NO38flk+K0iW/k9gVCJqavnWAwInFc9HNIGvz9m/uLlAXwZ3ag3u+EC
+         x9O3mASGQFcXdj2E/cjdy+pjQoimJw6mpWgDW7WuxM1PrfRQ9ohLQd7wVwi+veetEDhi
+         Etbw==
+X-Gm-Message-State: AOJu0Yxe+wj3t6UIXZ1EXv+HUm81xp7/p2TiU8WMeIPyEX2eW+JIQpL7
+	ZpMPTrKb+KSbyv7iFPSFzDw=
+X-Google-Smtp-Source: AGHT+IG7mYS5i9FUlFLi2exRPiJhglHVJqhrEQiqNFPjsmxmyu8g16972vmZ4BBTPfNejLAjusOhQg==
+X-Received: by 2002:a05:6512:3b8e:b0:505:79f2:5c6c with SMTP id g14-20020a0565123b8e00b0050579f25c6cmr3522794lfv.6.1700844247377;
+        Fri, 24 Nov 2023 08:44:07 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id br36-20020a056512402400b0050810b02cffsm545291lfb.22.2023.11.24.08.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 08:44:06 -0800 (PST)
+Date: Fri, 24 Nov 2023 19:44:03 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yanteng Si <siyanteng@loongson.cn>, hkallweit1@gmail.com, 
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk, 
+	dongbiao@loongson.cn, guyinggang@loongson.cn, netdev@vger.kernel.org, 
+	loongarch@lists.linux.dev, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH v5 3/9] net: stmmac: Add Loongson DWGMAC definitions
+Message-ID: <3amgiylsqdngted6tts6msman54nws3jxvkuq2kcasdqfa5d7j@kxxitnckw2gp>
+References: <cover.1699533745.git.siyanteng@loongson.cn>
+ <87011adcd39f20250edc09ee5d31bda01ded98b5.1699533745.git.siyanteng@loongson.cn>
+ <2e1197f9-22f6-4189-8c16-f9bff897d567@lunn.ch>
+ <df17d5e9-2c61-47e3-ba04-64b7110a7ba6@loongson.cn>
+ <9c2806c7-daaa-4a2d-b69b-245d202d9870@lunn.ch>
+ <8d82761e-c978-4763-a765-f6e0b57ec6a6@loongson.cn>
+ <7dde9b88-8dc5-4a35-a6e3-c56cf673e66d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+In-Reply-To: <7dde9b88-8dc5-4a35-a6e3-c56cf673e66d@lunn.ch>
 
-Function i40e_fwd_add() computes num of created channels and
-num of queues per channel according value of pf->num_lan_msix.
+On Fri, Nov 24, 2023 at 03:51:08PM +0100, Andrew Lunn wrote:
+> > In general, we split one into two.
+> > 
+> > the details are as follows：
+> > 
+> > DMA_INTR_ENA_NIE = DMA_INTR_ENA_NIE_LOONGSON= DMA_INTR_ENA_TX_NIE +
+> > DMA_INTR_ENA_RX_NIE
+> 
+> What does the documentation from Synopsys say about the bit you have
+> used for DMA_INTR_ENA_NIE_LOONGSON? Is it marked as being usable by IP
+> integrators for whatever they want, or is it marked as reserved?
+> 
+> I'm just wondering if we are heading towards a problem when the next
+> version of this IP assigns the bit to mean something else.
 
-This is wrong because the channels are used for subordinated net
-devices that reuse existing queues from parent net device and
-number of existing queue pairs (pf->num_queue_pairs) should be
-used instead.
+That's what I started to figure out in my initial message:
+Link: https://lore.kernel.org/netdev/gxods3yclaqkrud6jxhvcjm67vfp5zmuoxjlr6llcddny7zwsr@473g74uk36xn/
+but Yanteng for some reason ignored all my comments.
 
-E.g.:
-Let's have (pf->num_lan_msix == 32)... Then we reduce number of
-combined queues by ethtool to 8 (so pf->num_queue_pairs == 8).
-i40e_fwd_add() called by macvlan then computes number of macvlans
-channels to be 16 and queues per channel 1 and calls
-i40e_setup_macvlans(). This computes new number of queue pairs
-for PF as:
+Anyway AFAICS this Loongson GMAC has NIE and AIE flags defined differently:
+DW GMAC: NIE - BIT(16) - all non-fatal Tx and Rx errors,
+         AIE - BIT(15) - all fatal Tx, Rx and Bus errors.
+Loongson GMAC: NIE - BIT(18) | BIT(17) - one flag for Tx and another for Rx errors.
+               AIE - BIT(16) | BIT(15) - Tx, Rx and don't know about the Bus errors.
+So the Loongson GMAC has not only NIE/AIE flags re-defined, but
+also get to occupy two reserved in the generic DW GMAC bits: BIT(18) and BIT(17).
 
-num_qps = vsi->num_queue_pairs - (macvlan_cnt * qcnt);
+Moreover Yanteng in his patch defines DMA_INTR_NORMAL as a combination
+of both _generic_ DW and Loongson-specific NIE flags and
+DMA_INTR_ABNORMAL as a combination of both _generic_ DW and
+Loongson-specific AIE flags. At the very least it doesn't look
+correct, since _generic_ DW GMAC NIE flag BIT(16) is defined as a part
+of the Loongson GMAC AIE flags set.
 
-This is evaluated in this case as:
-num_qps = (8 - 16 * 1) = (u16)-8 = 0xFFF8
+-Serge(y)
 
-...and this number is stored vsi->next_base_queue that is used
-during channel creation. This leads to kernel crash.
-
-Fix this bug by computing the number of offloaded macvlan devices
-and no. their queues according the current number of queues instead
-of maximal one.
-
-Reproducer:
-1) Enable l2-fwd-offload
-2) Reduce number of queues
-3) Create macvlan device
-4) Make it up
-
-Result:
-[root@cnb-03 ~]# ethtool -K enp2s0f0np0 l2-fwd-offload on
-[root@cnb-03 ~]# ethtool -l enp2s0f0np0 | grep Combined
-Combined:       32
-Combined:       32
-[root@cnb-03 ~]# ethtool -L enp2s0f0np0 combined 8
-[root@cnb-03 ~]# ip link add link enp2s0f0np0 mac0 type macvlan mode bridge
-[root@cnb-03 ~]# ip link set mac0 up
-...
-[ 1225.686698] i40e 0000:02:00.0: User requested queue count/HW max RSS count:  8/32
-[ 1242.399103] BUG: kernel NULL pointer dereference, address: 0000000000000118
-[ 1242.406064] #PF: supervisor write access in kernel mode
-[ 1242.411288] #PF: error_code(0x0002) - not-present page
-[ 1242.416417] PGD 0 P4D 0
-[ 1242.418950] Oops: 0002 [#1] PREEMPT SMP NOPTI
-[ 1242.423308] CPU: 26 PID: 2253 Comm: ip Kdump: loaded Not tainted 6.7.0-rc1+ #20
-[ 1242.430607] Hardware name: Abacus electric, s.r.o. - servis@abacus.cz Super Server/H12SSW-iN, BIOS 2.4 04/13/2022
-[ 1242.440850] RIP: 0010:i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-[ 1242.448165] Code: 48 89 b3 80 00 00 00 48 89 bb 88 00 00 00 74 3c 31 c9 0f b7 53 16 49 8b b4 24 f0 0c 00 00 01 ca 83 c1 01 0f b7 d2 48 8b 34 d6 <48> 89 9e 18 01 00 00 49 8b b4 24 e8 0c 00 00 48 8b 14 d6 48 89 9a
-[ 1242.466902] RSP: 0018:ffffa4d52cd2f610 EFLAGS: 00010202
-[ 1242.472121] RAX: 0000000000000000 RBX: ffff9390a4ba2e40 RCX: 0000000000000001
-[ 1242.479244] RDX: 000000000000fff8 RSI: 0000000000000000 RDI: ffffffffffffffff
-[ 1242.486370] RBP: ffffa4d52cd2f650 R08: 0000000000000020 R09: 0000000000000000
-[ 1242.493494] R10: 0000000000000000 R11: 0000000100000001 R12: ffff9390b861a000
-[ 1242.500626] R13: 00000000000000a0 R14: 0000000000000010 R15: ffff9390b861a000
-[ 1242.507751] FS:  00007efda536b740(0000) GS:ffff939f4ec80000(0000) knlGS:0000000000000000
-[ 1242.515826] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 1242.521564] CR2: 0000000000000118 CR3: 000000010bd48002 CR4: 0000000000770ef0
-[ 1242.528699] PKRU: 55555554
-[ 1242.531400] Call Trace:
-[ 1242.533846]  <TASK>
-[ 1242.535943]  ? __die+0x20/0x70
-[ 1242.539004]  ? page_fault_oops+0x76/0x170
-[ 1242.543018]  ? exc_page_fault+0x65/0x150
-[ 1242.546942]  ? asm_exc_page_fault+0x22/0x30
-[ 1242.551131]  ? i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-[ 1242.557847]  i40e_setup_channel.part.0+0x5f/0x130 [i40e]
-[ 1242.563167]  i40e_setup_macvlans.constprop.0+0x256/0x420 [i40e]
-[ 1242.569099]  i40e_fwd_add+0xbf/0x270 [i40e]
-[ 1242.573300]  macvlan_open+0x16f/0x200 [macvlan]
-[ 1242.577831]  __dev_open+0xe7/0x1b0
-[ 1242.581236]  __dev_change_flags+0x1db/0x250
-...
-
-Fixes: 1d8d80b4e4ff ("i40e: Add macvlan support on i40e")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index c36535145a41..7bb1f64833eb 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -7981,8 +7981,8 @@ static void *i40e_fwd_add(struct net_device *netdev, struct net_device *vdev)
- 		netdev_info(netdev, "Macvlans are not supported when HW TC offload is on\n");
- 		return ERR_PTR(-EINVAL);
- 	}
--	if (pf->num_lan_msix < I40E_MIN_MACVLAN_VECTORS) {
--		netdev_info(netdev, "Not enough vectors available to support macvlans\n");
-+	if (vsi->num_queue_pairs < I40E_MIN_MACVLAN_VECTORS) {
-+		netdev_info(netdev, "Not enough queues to support macvlans\n");
- 		return ERR_PTR(-EINVAL);
- 	}
- 
-@@ -8000,7 +8000,7 @@ static void *i40e_fwd_add(struct net_device *netdev, struct net_device *vdev)
- 		 * reserve 3/4th of max vectors, then half, then quarter and
- 		 * calculate Qs per macvlan as you go
- 		 */
--		vectors = pf->num_lan_msix;
-+		vectors = vsi->num_queue_pairs;
- 		if (vectors <= I40E_MAX_MACVLANS && vectors > 64) {
- 			/* allocate 4 Qs per macvlan and 32 Qs to the PF*/
- 			q_per_macvlan = 4;
--- 
-2.41.0
-
+> 
+> 	Andrew
 
