@@ -1,77 +1,72 @@
-Return-Path: <netdev+bounces-50702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703187F6CEC
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:31:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7735F7F6CEF
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:35:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8A3281AB3
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F20D1C20D68
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A5C46B5;
-	Fri, 24 Nov 2023 07:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCBB4C8C;
+	Fri, 24 Nov 2023 07:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0yqrWDI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FR4RM+MJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3401B10C9;
-	Thu, 23 Nov 2023 23:31:39 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id d2e1a72fcca58-6c431b91b2aso1310354b3a.1;
-        Thu, 23 Nov 2023 23:31:39 -0800 (PST)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C52D4E
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:15 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cf8c462766so9891715ad.1
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700811099; x=1701415899; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JFxWesjSbh6aPkk26uaeIMhL8HRb0v8T1NPm7HDO0SQ=;
-        b=M0yqrWDI8f1O2KvxkcEuoKyPmoubsykQZaBUPqOq+jVbKCuoz8K4cdd4R/+kOV19El
-         BBw2E6m09mIc4fG7/nQDJMtT5bDeRB8JFR13c9OPmEmyV5GmZEic/X0NPa98U+tqBkUd
-         kX0uDS+HAqG41upl51ZAGt8vsLDW0KgK67wLqZH+/ZLORo/Jkp8FgWlNog6l2dv1OM27
-         tqw81Wr+UIU7eXaWwHqfXmwC2TUW1AUKngzLTJe/kpEEyIdvQzN7QndXbb0LGF+qcSXn
-         m/yFM1uV4Xb+7bOTmPoUgSmwelVBlTUfo9jBPGBBF8YtvirrLXOKi3rYxelEfkgu/vu4
-         VviA==
+        d=gmail.com; s=20230601; t=1700811315; x=1701416115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+jlwNiD5+k6JtqRm4NuTxUsQI8cVUfE9sKvwgru76XA=;
+        b=FR4RM+MJ/9spR8CozLC4Y0zrRD8mXJc0SttnXlLO+tIChDiGW8pxPzCMa8otRROhTG
+         xFDHtQQWakzaA12QvvBTfGftSGAiwsirhakZN2SWkQtzD1TNe0CMUqd5b9wgtB1gTmk+
+         K2Xvi7sl7RFMZvOTQqkASObT9KhQuB8ZevoSJZZWsxAvAVq4j7rIIp5VKkqv+vMj7SOJ
+         1r0+T4gMNNzc5yndPpeuuqhS3Z/3/uNfTEto7VBz0ag9oRVjqOfI2PkBspoy9U7e6Ko2
+         /rBUt/6VlHSb4h8UPi7WO9APs4ftWRytk7l0Ut4gCHdq1w+TSO+FXGLcdLbmAcVr/+Oy
+         tGqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700811099; x=1701415899;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JFxWesjSbh6aPkk26uaeIMhL8HRb0v8T1NPm7HDO0SQ=;
-        b=kh7rQFJDaqqf97hdmx4W/OHzrfxQMitil7C+VnUD8xo9umMynrTZ+M32HnolFuknXc
-         m1CH4O4mXI4unuoOikPrCEyqo/Zu8q/F9ndyj3Z9hJ1witk9BVQOf/GKiEobLoolRypa
-         pwwXGgJEDkROcOmVEk2IRfy8fE412f5FJy/ue/cGuO+XJQ556cGaE965JvU+rnZejyFV
-         uS72rO5VoMfakQGb6l9kMf8ZFrqTHXUHCBGDwDswGdka2iR0C0EnFPx1A2vU0cquM665
-         Ajb6KApcHUCMpSIzt56zllmE+7iUdP7jQNycXmSSGM26E8T8o6fkDZCqaIaEPwdwi5/9
-         pfkg==
-X-Gm-Message-State: AOJu0YwLe/d+vEGUQ4JNeVXxe576g8ieDx+SBfXyvXH7KPhrc+urEQuN
-	KuOnD6DaWHUafgnSf4hly90=
-X-Google-Smtp-Source: AGHT+IEUuxk6O9HR7RzPpWMcDtGQiK9lwkln1/Lk6avSdkpxqUoxV4w6/tPI87i/RCTAESAQaa46lw==
-X-Received: by 2002:a05:6a20:3c8b:b0:187:fbe3:b4d7 with SMTP id b11-20020a056a203c8b00b00187fbe3b4d7mr2227736pzj.9.1700811099268;
-        Thu, 23 Nov 2023 23:31:39 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id s23-20020aa78d57000000b006cbb18865a7sm2279388pfe.154.2023.11.23.23.31.36
+        d=1e100.net; s=20230601; t=1700811315; x=1701416115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+jlwNiD5+k6JtqRm4NuTxUsQI8cVUfE9sKvwgru76XA=;
+        b=MBlp0NlM94hPOsfJRUrqm64SFb2IYV2wjbEkTNk/3kYu/PCl4kwqoAs8YKHOtGnlrI
+         gbokCPQKUOU1XarGRkEon2KahCBXO3e8BzFIeKcqvEyvDmqaKKzFsIbnEVKMcz6NzzSg
+         7Aludp2EKT7vwpFtCmsLnbxnWWcUC/8NcWb1nd0pqAak8iiihotOw7oauV0v8ojcAkc+
+         bl1CxA6avJKz8I2qMooqaryKhyw2cr6qmTEIc9iJAAAeEoPm6hDGA1rjBc6hHPxU4VeO
+         JWzkGx/prTjDs7cWC62n8hKaRPDxKbDDXoIg/oK5hV9mac5EtUyilq4mDxZ2sbP8FQkM
+         euAw==
+X-Gm-Message-State: AOJu0Yz70YbqIYqKJocTaqs4nD+yuBSnVvsV0C36ydYSt6+UjmkJVa62
+	1oRFpFbPk0+JqsUgV83nEok=
+X-Google-Smtp-Source: AGHT+IGMX5SbhmsUS3/IcWWi3CIukpy0RDB9FHPcO3EhyuIowBYeTXuCwImY4Kj0y7HqIoVEZz4xGQ==
+X-Received: by 2002:a17:902:ee82:b0:1cf:96a0:e4eb with SMTP id a2-20020a170902ee8200b001cf96a0e4ebmr1825220pld.37.1700811315296;
+        Thu, 23 Nov 2023 23:35:15 -0800 (PST)
+Received: from localhost.localdomain ([89.187.161.180])
+        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b001b9d7c8f44dsm2499329plg.182.2023.11.23.23.35.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 23:31:38 -0800 (PST)
-From: xu <xu.xin.sc@gmail.com>
-X-Google-Original-From: xu <xu.xin16@zte.com.cn>
-To: tung.q.nguyen@dektech.com.au
-Cc: davem@davemloft.net,
-	jmaloy@redhat.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	xu.xin.sc@gmail.com,
-	xu.xin16@zte.com.cn,
-	yang.yang29@zte.com.cn,
-	ying.xue@windriver.com,
-	zhang.yunkai@zte.com.cn
-Subject: RE: [RFC PATCH] net/tipc: reduce tipc_node lock holding time in tipc_rcv
-Date: Fri, 24 Nov 2023 07:31:34 +0000
-Message-Id: <20231124073134.2043605-1-xu.xin16@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
-References: <DB9PR05MB9078EEC976944CACEC531C1388B9A@DB9PR05MB9078.eurprd05.prod.outlook.com>
+        Thu, 23 Nov 2023 23:35:14 -0800 (PST)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Cc: netdev@vger.kernel.org,
+	linux-mm@kvack.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v3 0/3] skbuff: Optimize SKB coalescing for page pool
+Date: Fri, 24 Nov 2023 15:34:36 +0800
+Message-Id: <20231124073439.52626-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,108 +75,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
->>Happy to see your reply. But Why? 'delete' is false from tipc_node_timeout(). Refer to:
->>https://elixir.bootlin.com/linux/v6.7-rc2/source/net/tipc/node.c#L844
->I should have explained it clearly:
->1/ link status must be protected.
->tipc_node_timeout()
->   tipc_node_link_down()
->   {
->      struct tipc_link *l = le->link;
->   
->      ...
->     __tipc_node_link_down(); <-- link status is referred. 
->      ...
->     if (delete) {
->        kfree(l);
->        le->link = NULL;
->     }
->     ...
->   }
->
->__tipc_node_link_down()
->{
->    ...
->   if (!l || tipc_link_is_reset(l)) <-- read link status
->    ...
->    tipc_link_reset(l); <--- this function will reset all things related to link.
->}
->
->2/ le->link must be protected.
->bearer_disable()
->{
->   ...
->   tipc_node_delete_links(net, bearer_id); <--- this will delete all links.
->   ...
->}
->
->tipc_node_delete_links()
->{
->   ...
->  tipc_node_link_down(n, bearer_id, true);
->   ...
->}
+The combination of the following condition was excluded from skb coalescing:
 
-Could we please solve the problem mentioned above by adding spinlock(&le->lock)?
+from->pp_recycle = 1
+from->cloned = 1
+to->pp_recycle = 1
 
-For example:
+With page pool in use, this combination can be quite common(ex.
+NetworkMananger may lead to the additional packet_type being registered,
+thus the cloning). In scenarios with a higher number of small packets, it
+can significantly affect the success rate of coalescing.
 
-(BTW, I have tested it, with this change, enabling RPS based on tipc port can improve 25% of general throughput)
+This patchset aims to optimize this scenario and enable coalescing of this
+particular combination. That also involves supporting multiple users
+referencing the same fragment of a pp page to accomondate the need to
+increment the "from" SKB page's pp page reference count.
 
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index 3105abe97bb9..470c272d798e 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1079,12 +1079,16 @@ static void tipc_node_link_down(struct tipc_node *n, int bearer_id, bool delete)
-                __tipc_node_link_down(n, &bearer_id, &xmitq, &maddr);
-        } else {
-                /* Defuse pending tipc_node_link_up() */
-+               spin_lock_bh(&le->lock);
-                tipc_link_reset(l);
-+               spin_unlock_bh(&le->lock);
-                tipc_link_fsm_evt(l, LINK_RESET_EVT);
-        }
-        if (delete) {
-+               spin_lock_bh(&le->lock);
-                kfree(l);
-                le->link = NULL;
-+               spin_unlock_bh(&le->lock);
-                n->link_cnt--;
-        }
-        trace_tipc_node_link_down(n, true, "node link down or deleted!");
-@@ -2154,14 +2158,15 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
-        /* Receive packet directly if conditions permit */
-        tipc_node_read_lock(n);
-        if (likely((n->state == SELF_UP_PEER_UP) && (usr != TUNNEL_PROTOCOL))) {
-+               tipc_node_read_unlock(n);
-                spin_lock_bh(&le->lock);
-                if (le->link) {
-                        rc = tipc_link_rcv(le->link, skb, &xmitq);
-                        skb = NULL;
-                }
-                spin_unlock_bh(&le->lock);
--       }
--       tipc_node_read_unlock(n);
-+       } else
-+               tipc_node_read_unlock(n);
- 
-        /* Check/update node state before receiving */
-        if (unlikely(skb)) {
-@@ -2169,12 +2174,13 @@ void tipc_rcv(struct net *net, struct sk_buff *skb, struct tipc_bearer *b)
-                        goto out_node_put;
-                tipc_node_write_lock(n);
-                if (tipc_node_check_state(n, skb, bearer_id, &xmitq)) {
-+                       tipc_node_write_unlock(n);
-                        if (le->link) {
-                                rc = tipc_link_rcv(le->link, skb, &xmitq);
-                                skb = NULL;
-                        }
--               }
--               tipc_node_write_unlock(n);
-+               } else
-+                       tipc_node_write_unlock(n);
-        }
- 
-        if (unlikely(rc & TIPC_LINK_UP_EVT))
+
+Changes from v2:
+- rename a few other functions leaning more towards pp_ref_count managing
+
+Liang Chen (3):
+  page_pool: Rename pp_frag_count to pp_ref_count
+  page_pool: halve BIAS_MAX for fragment multiple user references
+  skbuff: Optimization of SKB coalescing for page pool
+
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
+ include/linux/mm_types.h                      |  2 +-
+ include/net/page_pool/helpers.h               | 67 +++++++++++++------
+ include/net/page_pool/types.h                 |  2 +-
+ net/core/page_pool.c                          | 14 ++--
+ net/core/skbuff.c                             | 23 +++----
+ 6 files changed, 69 insertions(+), 43 deletions(-)
+
+-- 
+2.31.1
 
 
