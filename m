@@ -1,281 +1,222 @@
-Return-Path: <netdev+bounces-50696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F44B7F6BAB
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:27:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797DF7F6BC9
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:51:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABE6D1C209F3
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:27:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B94F9B20DA2
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0D610F7;
-	Fri, 24 Nov 2023 05:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="XAktVogn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAA93FE3;
+	Fri, 24 Nov 2023 05:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE36D4E
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 21:27:32 -0800 (PST)
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ANNw1OX006219
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 21:27:32 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=s2048-2021-q4;
- bh=CiT4B6c7ZOJFVvC6tKwo9o8TSRyH7a/OuA75JOFUggI=;
- b=XAktVognBrd+3s8VXmykuQTGgxKuSva1noAVgqoj2aYIooiEsSmX8wmT2SE3fuWr0gm5
- W0Xtb2zTWDw7/s3xzjsJ/fAkiMG7ZpAvYJ6t4QYChAQ1SGgJLYk84ASVSg6CwNc5Jihs
- iG0oxr3dzFFVCFcm09OT29RC/vI/mKBK73FU3Et2QTWuTmyUme7XZIoUVWBS+Spue44L
- /WMV5C2Ko+dWaiptYhI5kwPPfp75M6laWTsdnmcQuvz6pz8gcDUjfA37oGgJdevpAD46
- 48pkSOUExgS2SUicORhKYZiw/HviXrO9HfCyKisyk912J4QcEEU4ZnSa9CdJjnuaOnwP SQ== 
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2041.outbound.protection.outlook.com [104.47.57.41])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ujguuh6ad-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 21:27:32 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gSPst29Bq/iLGv4A2QZhwkVFiRlgP4vViI/eAb7JOr3jeKYx3zApFlL1XK8+YpOQ3MD7kRno9ZEtxAmoVdy08i2kTAnkTgw8IYNiG3H9+Ef9SOtw1jGpkYcWZmoo/ZHfWv0nwGQGev5zZ8Rr5ZoBIVe5rquFHJ0VX9O0eWwQtAw0vZEySESpw3CRTS+VXQ0BQP7YLBV+291NsJye1Rgj791VNrMCNboA4sqdYaPSA9LU4Gw6WqAdbE8jR+yWJ/w8gklUxOda7s6U2UWAy3QJEdeMFt4NgkRhZQnjOAlCEdbPXuYL0TiFTYQtqqhIS9rblJIRvZbh7s8W/z/J7kEbSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NaD7v2WpQDTB88Vub4ZR/62yB92l2dvHcnfV3Reod64=;
- b=AB8hN5cjKT8qdHppTWZCMc5yP7n1ZfvjPx2AOh8lvgqYT4n4ZMLL1GlnrOATsXbm5ocdmpVZhIj/lmOirsV9p3kw0B8x8RbKW7KkKWEYOFJZLe7HdUTCwxzrHmopw6/UyILp7nQU3fA9i1lAy29PAwiSyDXJt5e61EbVpwT6sRiGjwFhHqvxvQCagNbmduCmPswEd5WvVW0lCYbQCJmnPv1YF4T6pDl4QtsYrZNAvcAO09bYHKIQ6HE8TmgEYsIaTz1Ud04rgLn38UVIY+pB+jZW5RXYrIOU4iXe5StGKf2yY5PUEn50DLmO3nbtLvQTeYpaIwzA92B3n/dhgWQiEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
- dkim=pass header.d=meta.com; arc=none
-Received: from SA1PR15MB5187.namprd15.prod.outlook.com (2603:10b6:806:237::10)
- by DM4PR15MB6273.namprd15.prod.outlook.com (2603:10b6:8:18c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.13; Fri, 24 Nov
- 2023 05:27:29 +0000
-Received: from SA1PR15MB5187.namprd15.prod.outlook.com
- ([fe80::8e8:f2f9:bb50:328a]) by SA1PR15MB5187.namprd15.prod.outlook.com
- ([fe80::8e8:f2f9:bb50:328a%7]) with mapi id 15.20.7025.017; Fri, 24 Nov 2023
- 05:27:29 +0000
-From: Neil Spring <ntspring@meta.com>
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Neal
- Cardwell <ncardwell@google.com>, Wei Wang <weiwan@google.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        David Ahern <dsahern@kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH net] tcp: fix mid stream window clamp.
-Thread-Topic: [PATCH net] tcp: fix mid stream window clamp.
-Thread-Index: AQHaHiFAQHaNVihllUWpFda+BDhZWLCII7IAgAASUgCAAAwXyw==
-Date: Fri, 24 Nov 2023 05:27:28 +0000
-Message-ID: 
- <SA1PR15MB5187F56AEFC6B6A581E056C5A3B9A@SA1PR15MB5187.namprd15.prod.outlook.com>
-References: 
- <fab4d0949126683a3b6b4e04a9ec088cf9bfdbb1.1700751622.git.pabeni@redhat.com>
-	 <CANn89iJMVCGegZW2JGtfvGJVq1DZsM7dUEOJxfcvWurLSZGvTQ@mail.gmail.com>
- <ebb26a4a8a80292423c8cfc965c7b16e2aa4e201.camel@redhat.com>
-In-Reply-To: <ebb26a4a8a80292423c8cfc965c7b16e2aa4e201.camel@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR15MB5187:EE_|DM4PR15MB6273:EE_
-x-ms-office365-filtering-correlation-id: 0d46b1e5-9378-436a-1cba-08dbecae0d0f
-x-fb-source: Internal
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- WXyBXKWBgH68Alcv2IbreVL+NkxvIXs2SObWFOwPQRfaAEE96xiwqBYm3kW26CZ6W6/1GGxJcyVJ/mHYDnLKFXXHCAd4nsdZRkBSoT2TXYcsPOm+xBiwL8SVQ3PnraA29fSsRUSDl23oWzqfIqrSOKQgeYwmkkNHrz4J8wfWyGGWy8JTnxeePfn3BMahBNK6wX404E8h4N1oLsAI78mCpCzO+TllAd5F/L6J0ZSPomHjb6NjmQJEjsMvEMY+tpY9QM/zjKBW/hTvR1LTsPbd6JC3vrbbOm7MdMBlDDqkdTMplWDCuYR5IP8S3mKaDkxnVQ1fjXNGXN6gcoXdd/+51QdtpHoxbrxnhBkHHlFi3YcQ2sYFq6vpCd44krEraRlyBQaDozmXwNw4p/DJvDvanFG2bq6tESEYJucbzu+fM/yFWQ9cXBEfAKSonNypOj4mJC5Y5tm0VqgoShZ6PyAm5+UKGXOEetQTCMF8/vCSiqoZTd0YbkW7Lt8K3PTAAgJ1UVvdNA3kuL1B+3aQ8alkqVYkCM3afpRgrvT2F5MjmcGpEgkcBFU9l2TJ642mmtLD93nJB6sBoc6W3LyRCrH3p99edamV7XdOEEqC0YW+s4qNc4jQwUMAO0XINokqv4qxBKYJZxGNeDwoGm6uRah0ow==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR15MB5187.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(39860400002)(136003)(230922051799003)(230173577357003)(230273577357003)(1800799012)(186009)(64100799003)(451199024)(86362001)(83380400001)(33656002)(38070700009)(122000001)(38100700002)(316002)(66446008)(66946007)(66476007)(54906003)(91956017)(64756008)(66556008)(76116006)(110136005)(4326008)(8676002)(52536014)(8936002)(55016003)(41300700001)(5660300002)(2906002)(4001150100001)(26005)(9686003)(66899024)(71200400001)(478600001)(966005)(6506007)(53546011)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?L2czYWkxczNwTHByNmxVdlRxZFZMS29Qa1hMbGw1SXJ6UWFDaDRMVmV2SHlJ?=
- =?utf-8?B?bFdtUFBTMGpMVjdNc1R3Qk5LdXlUUGhyMk5IQVBJdThNN3EyVGxTbmdva0FN?=
- =?utf-8?B?ajF1cjdhWk96TEhUeUVDeGhBUWRwcloxMys0ZjhvQ1djN3ZhcndxbjYxNzFH?=
- =?utf-8?B?V1h4Ulh6a01LeUVqTXFBVGhuWVNob0tzUTlaTmdreFY2TzM2Y2YyZGV0em5P?=
- =?utf-8?B?VzcvOUw3dkhQc2Jxd2U2VitVR0M0emgwUUlnbEdNM29GMzI2N1pUbStKeUNl?=
- =?utf-8?B?OFMvM1pLbnZ5ODJoT2NiWHRlWHJqOHVVV1BrWERvbktFTmk0VDQzQnFTOWtv?=
- =?utf-8?B?TC9KbC8vcURqcUhZb2RpTmhaNXhkc1o2VHhOSHVBSVZiZSswSVBEWXFtMEU5?=
- =?utf-8?B?TnZNWFB1UFhuS0FuOGdSSjRXT1FJZk80Uk5RTUxiOS9ZY2pNUFpMWkpZaFk0?=
- =?utf-8?B?WEZuVmVTRXNwek84OURMOHBNbnl3dk44QlFsd3pSM3VwQXJoa1RjL0o2aVlX?=
- =?utf-8?B?NmNSOGV3TzlwOFJ6NjYvSXplam9PVmJicGdLWk4wUGxNMFp3S1MzekI1cGdh?=
- =?utf-8?B?TzNoUEVEcWJqNUo4RjFOQlRLU2lkbzAwNE9BbjZLd05kb21PZk5hMExlWjJ4?=
- =?utf-8?B?OG1CaVBxcS80RUZoUm0vRnhUdTV3TUo3dTRYVDEzTnVOTHErVVNOTDgrUVVS?=
- =?utf-8?B?VUpGUTJ5ZlJweU9NQWpTNHJ4eDB5TVpHS3ZvbFdqRFE3WmFQMGRFQ2kyUXIy?=
- =?utf-8?B?UDFUektSL0NUVGs3VnoyMGNpWnhPUkl2bkVnWGx5QTdwdUJkODBZYm03Y1Z1?=
- =?utf-8?B?RCtXdTNuS014enpjWTZIOHFSMTE5UktpSXZ1ekRBTElUdTkxNHdlaDRxU1lv?=
- =?utf-8?B?KzZ5TnBUaGNVTXBqVG9lMmJZSkJFT1JOclZrZ05kaFJrWWJhUHRXNi9tTWxj?=
- =?utf-8?B?ZEZ2ZTdyWGNuSDFCL1pTWThBcWgwbU1vb1JWcVdBamJCbVpKM05hSE1VbWJa?=
- =?utf-8?B?aTh2TkozMkxqc3p5MUJJQlRubGd2cjRmcGpYTnYvaUZ5WGg2d091WUZuSjhF?=
- =?utf-8?B?VXU3T0pHUjlEVG0vUDMxM0NmMjFoV1RjSUZSRW5mT2ZjTCtlbjlxNytVWFdu?=
- =?utf-8?B?K2ROYmZ5UkZLUmgxYnNNbk4vMkl4bUFxSWNSa2JyNXRLaThOOWdOaGM3dU1E?=
- =?utf-8?B?US9SN3E4bk5IVGErbm81YlU5VllxekIrajh4MGtYSkMxTmNCNWFsR1VGNDRm?=
- =?utf-8?B?TDJ1clJsNGtFQm00dU5pb0pkQUNya0lBN01zWVU5NzcycEFkdFRUZjY4Vmkr?=
- =?utf-8?B?WUZacHBSNUVRNVd0aFZ5Z0srQ213WUpGNEQ3VkRGbXpPNzJRaCt2Zms2K0d0?=
- =?utf-8?B?YUltV2hqcFlMVG5wdCtHeVExTStCZFRWNmRESmRDcXhNREpOeTZRbVI5WGdX?=
- =?utf-8?B?ajROZS9pTzdPWmEzOWF3aDdpT3VSZEFON0x6Wk54bUFMM0ZUK0NNdUxqYnpq?=
- =?utf-8?B?NUZ1ZmUxbUdoMHVaZ2g3Uzd1RW5LRjhJTXNRbGNkUkFHK3p6UGp1clFDcHB1?=
- =?utf-8?B?OW01U2ozTWFvMlp6VjVkYW5JdSs0VjNQQm9rL3BHV3JiUVhvZW9vakd2eEdr?=
- =?utf-8?B?UUdBZjRSY3hHeHdMMWxWcURGSnBIOU04WFZRZmk2NXJlTTZnNjROK3BuZlo0?=
- =?utf-8?B?aE4wVlM0cW43b3VITktDUHllUTg1cFV2dkFZSzVleDJ6SFAramI5MVFsM2Zy?=
- =?utf-8?B?Z2NmaDlqV1hNLytEK0xRYTgvRXFKQ0NMWk1iWkRVQUQ1TTVxc3Bzb0NRMVJT?=
- =?utf-8?B?alB6K0RvMVhhRnl0eWZERGQySUlpcWVJc2htMmMxOEhTZXFwMVNNenJDczBl?=
- =?utf-8?B?RjlrdC9naERZb2swN2pZRmlnNGJrK2ZkK0pyYWJSc0h2L3FiZlRzZC9vMXpS?=
- =?utf-8?B?TXBQVVluSmN4VkxEdHFIYXpRV2pjQk9kTXJnN0tDZ0YyQXZ1Lzl5WmtVMDF0?=
- =?utf-8?B?eFVHQm96WEZHV2dNU1BwRDlOUzlsNUQxckJFTTl3UjZDVjFwY0NHZU10eHdv?=
- =?utf-8?B?VnRnN1JvSEFNTnRGOGZDUjF4K3djdDFYbVgvQVQ5VzBaanJoK3R3aFZld216?=
- =?utf-8?Q?gV+g=3D?=
-X-OriginatorOrg: meta.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR15MB5187.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d46b1e5-9378-436a-1cba-08dbecae0d0f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Nov 2023 05:27:29.0023
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UkYOzTbfxSIdVvdZ8q1yjTmOhulwwJKOhZ0ELwQjZWSZo/tgDtW937HGWOruGNGc8uBYOyxzkIgiEZElkBukPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR15MB6273
-X-Proofpoint-GUID: -tzMLAvn6g9o-l7zdwkY4Dyhns_1rdXk
-X-Proofpoint-ORIG-GUID: -tzMLAvn6g9o-l7zdwkY4Dyhns_1rdXk
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-Proofpoint-UnRewURL: 1 URL was un-rewritten
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287F2D6F;
+	Thu, 23 Nov 2023 21:50:51 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Vx0Q5lf_1700805048;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vx0Q5lf_1700805048)
+          by smtp.aliyun-inc.com;
+          Fri, 24 Nov 2023 13:50:49 +0800
+Date: Fri, 24 Nov 2023 13:50:47 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
+	jaka@linux.ibm.com, kgraul@linux.ibm.com, corbet@lwn.net,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com
+Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
+	guwen@linux.alibaba.com, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net/smc: add sysctl for max links per lgr
+ for SMC-R v2.1
+Message-ID: <20231124055047.GJ3323@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
+ <20231122135258.38746-2-guangguan.wang@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231122135258.38746-2-guangguan.wang@linux.alibaba.com>
 
-PiAKPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCj4gRnJvbTogUGFv
-bG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPgo+IFNlbnQ6IFRodXJzZGF5LCBOb3ZlbWJlciAy
-MywgMjAyMyAxMDoxNiBBTQo+IFRvOiBFcmljIER1bWF6ZXQ7IE5lYWwgQ2FyZHdlbGw7IFdlaSBX
-YW5nCj4gQ2M6IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IERhdmlkIFMuIE1pbGxlcjsgRGF2aWQg
-QWhlcm47IEpha3ViIEtpY2luc2tpOyBOZWlsIFNwcmluZzsgRGF2aWQgR2lic29uCj4gU3ViamVj
-dDogUmU6IFtQQVRDSCBuZXRdIHRjcDogZml4IG1pZCBzdHJlYW0gd2luZG93IGNsYW1wLgo+IAo+
-ICEtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tfAo+ICAgVGhpcyBNZXNzYWdlIElzIEZyb20gYW4gRXh0ZXJuYWwgU2VuZGVy
-Cj4gCj4gfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0hCj4gCj4gT24gVGh1LCAyMDIzLTExLTIzIGF0IDE4OjEwICswMTAw
-LCBFcmljIER1bWF6ZXQgd3JvdGU6Cj4gPiBDQyBOZWFsIGFuZCBXZWkKPiA+Cj4gPiBPbiBUaHUs
-IE5vdiAyMywgMjAyMyBhdCA0OjI14oCvUE0gUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29t
-PiB3cm90ZToKPiA+ID4KPiA+ID4gQWZ0ZXIgdGhlIGJsYW1lZCBjb21taXQgYmVsb3csIGlmIHRo
-ZSB1c2VyLXNwYWNlIGFwcGxpY2F0aW9uIHBlcmZvcm1zCj4gPiA+IHdpbmRvdyBjbGFtcGluZyB3
-aGVuIHRwLT5yY3Zfd25kIGlzIDAsIHRoZSBUQ1Agc29ja2V0IHdpbGwgbmV2ZXIgYmUKPiA+ID4g
-YWJsZSB0byBhbm5vdW5jZSBhIG5vbiAwIHJlY2VpdmUgd2luZG93LCBldmVuIGFmdGVyIGNvbXBs
-ZXRlbHkgZW1wdHlpbmcKPiA+ID4gdGhlIHJlY2VpdmUgYnVmZmVyIGFuZCByZS1zZXR0aW5nIHRo
-ZSB3aW5kb3cgY2xhbXAgdG8gaGlnaGVyIHZhbHVlcy4KPiA+ID4KPiA+ID4gUmVmYWN0b3IgdGNw
-X3NldF93aW5kb3dfY2xhbXAoKSB0byBhZGRyZXNzIHRoZSBpc3N1ZTogd2hlbiB0aGUgdXNlcgo+
-ID4gPiBkZWNyZWFzZXMgdGhlIGN1cnJlbnQgY2xhbXAgdmFsdWUsIHNldCByY3Zfc3N0aHJlc2gg
-YWNjb3JkaW5nIHRvIHRoZQo+ID4gPiBzYW1lIGxvZ2ljIHVzZWQgYXQgYnVmZmVyIGluaXRpYWxp
-emF0aW9uIHRpbWUuCj4gPiA+IFdoZW4gaW5jcmVhc2luZyB0aGUgY2xhbXAgdmFsdWUsIGdpdmUg
-dGhlIHJjdl9zc3RocmVzaCBhIGNoYW5jZSB0byBncm93Cj4gPiA+IGFjY29yZGluZyB0byBwcmV2
-aW91c2x5IGltcGxlbWVudGVkIGhldXJpc3RpYy4KPiA+ID4KPiA+ID4gRml4ZXM6IDNhYTc4NTdm
-ZTFkNyAoInRjcDogZW5hYmxlIG1pZCBzdHJlYW0gd2luZG93IGNsYW1wIikKPiA+ID4gUmVwb3J0
-ZWQtYnk6IERhdmlkIEdpYnNvbiA8ZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1Pgo+ID4gPiBS
-ZXBvcnRlZC1ieTogU3RlZmFubyBCcml2aW8gPHNicml2aW9AcmVkaGF0LmNvbT4KPiA+ID4gUmV2
-aWV3ZWQtYnk6IFN0ZWZhbm8gQnJpdmlvIDxzYnJpdmlvQHJlZGhhdC5jb20+Cj4gPiA+IFRlc3Rl
-ZC1ieTogU3RlZmFubyBCcml2aW8gPHNicml2aW9AcmVkaGF0LmNvbT4KPiA+ID4gU2lnbmVkLW9m
-Zi1ieTogUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPgo+ID4gPiAtLS0KPiA+ID4gIG5l
-dC9pcHY0L3RjcC5jIHwgMTkgKysrKysrKysrKysrKysrKy0tLQo+ID4gPiAgMSBmaWxlIGNoYW5n
-ZWQsIDE2IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCj4gPiA+Cj4gPiA+IGRpZmYgLS1n
-aXQgYS9uZXQvaXB2NC90Y3AuYyBiL25ldC9pcHY0L3RjcC5jCj4gPiA+IGluZGV4IDUzYmNjMTdj
-OTFlNC4uMWE5YjkwNjRlMDgwIDEwMDY0NAo+ID4gPiAtLS0gYS9uZXQvaXB2NC90Y3AuYwo+ID4g
-PiArKysgYi9uZXQvaXB2NC90Y3AuYwo+ID4gPiBAQCAtMzM2OCw5ICszMzY4LDIyIEBAIGludCB0
-Y3Bfc2V0X3dpbmRvd19jbGFtcChzdHJ1Y3Qgc29jayAqc2ssIGludCB2YWwpCj4gPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwo+ID4gPiAgICAgICAgICAgICAgICAg
-dHAtPndpbmRvd19jbGFtcCA9IDA7Cj4gPiA+ICAgICAgICAgfSBlbHNlIHsKPiA+ID4gLSAgICAg
-ICAgICAgICAgIHRwLT53aW5kb3dfY2xhbXAgPSB2YWwgPCBTT0NLX01JTl9SQ1ZCVUYgLyAyID8K
-PiA+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgU09DS19NSU5fUkNWQlVGIC8gMiA6IHZhbDsK
-PiA+ID4gLSAgICAgICAgICAgICAgIHRwLT5yY3Zfc3N0aHJlc2ggPSBtaW4odHAtPnJjdl93bmQs
-IHRwLT53aW5kb3dfY2xhbXApOwo+ID4gPiArICAgICAgICAgICAgICAgdTMyIG5ld19yY3Zfc3N0
-aHJlc2gsIG9sZF93aW5kb3dfY2xhbXAgPSB0cC0+d2luZG93X2NsYW1wOwo+ID4gPiArICAgICAg
-ICAgICAgICAgdTMyIG5ld193aW5kb3dfY2xhbXAgPSB2YWwgPCBTT0NLX01JTl9SQ1ZCVUYgLyAy
-ID8KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-U09DS19NSU5fUkNWQlVGIC8gMiA6IHZhbDsKPiA+ID4gKwo+ID4gPiArICAgICAgICAgICAgICAg
-aWYgKG5ld193aW5kb3dfY2xhbXAgPT0gb2xkX3dpbmRvd19jbGFtcCkKPiA+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgcmV0dXJuIDA7Cj4gPiA+ICsKPiA+ID4gKyAgICAgICAgICAgICAgIHRw
-LT53aW5kb3dfY2xhbXAgPSBuZXdfd2luZG93X2NsYW1wOwo+ID4gPiArICAgICAgICAgICAgICAg
-aWYgKG5ld193aW5kb3dfY2xhbXAgPCBvbGRfd2luZG93X2NsYW1wKSB7Cj4gPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgIHRwLT5yY3Zfc3N0aHJlc2ggPSBtaW4odHAtPnJjdl9zc3RocmVzaCwK
-PiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBuZXdf
-d2luZG93X2NsYW1wKTsKPiA+ID4gKyAgICAgICAgICAgICAgIH0gZWxzZSB7Cj4gPiA+ICsgICAg
-ICAgICAgICAgICAgICAgICAgIG5ld19yY3Zfc3N0aHJlc2ggPSBtaW4odHAtPnJjdl93bmQsIHRw
-LT53aW5kb3dfY2xhbXApOwo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICB0cC0+cmN2X3Nz
-dGhyZXNoID0gbWF4KG5ld19yY3Zfc3N0aHJlc2gsCj4gPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgdHAtPnJjdl9zc3RocmVzaCk7Cj4gPiA+ICsgICAg
-ICAgICAgICAgICB9Cj4gPiA+ICAgICAgICAgfQo+ID4gPiAgICAgICAgIHJldHVybiAwOwo+ID4g
-PiAgfQo+ID4KPiA+IEl0IHNlZW1zIHRoZXJlIGlzIG5vIHByb3Zpc2lvbiBmb3IgU09fUkVTRVJW
-RV9NRU0KPiAKPiBJbmRlZWQgSSBkaWQgdGFrZSB0aGF0IGluIGFjY291bnQuCj4gCj4gPiBJIHdv
-bmRlciBpZiB0Y3BfYWRqdXN0X3Jjdl9zc3RocmVzaCgpICBjb3VsZCBoZWxwIGhlcmUgPwo+IAo+
-IEkgZG9uJ3Qga25vdyBob3cgdG8gZml0IGl0IGludG8gdGhlIGFib3ZlLiB0Y3BfYWRqdXN0X3Jj
-dl9zc3RocmVzaCgpCj4gdGVuZHMgdG8gc2hyaW5rIHJjdl9zc3RocmVzaCB0byBsb3cgdmFsdWVz
-IHdoZW4gbm8gbWVtb3J5IGlzIHJlc2VydmVkLgo+IAo+IERlYWxpbmcgZGlyZWN0bHkgd2l0aCBT
-T19SRVNFUlZFX01FTSB3aGVuIHNocmlua2luZyB0aGUgdGhyZXNob2xkIGZlZWxzCj4gZWFzaWVy
-IHRvIG1lLCBzb21ldGhpbmcgYWxpa2U6Cj4gCj4gICAgICAgICAgICAgICAgaWYgKG5ld193aW5k
-b3dfY2xhbXAgPT0gb2xkX3dpbmRvd19jbGFtcCkKPiAgICAgICAgICAgICAgICAgICAgICAgIHJl
-dHVybiAwOwo+IAo+ICAgICAgICAgICAgICAgIHRwLT53aW5kb3dfY2xhbXAgPSBuZXdfd2luZG93
-X2NsYW1wOwo+ICAgICAgICAgICAgICAgIGlmIChuZXdfd2luZG93X2NsYW1wIDwgb2xkX3dpbmRv
-d19jbGFtcCkgewo+ICAgICAgICAgICAgICAgICAgICAgICAgIGludCB1bnVzZWRfbWVtID0gc2tf
-dW51c2VkX3Jlc2VydmVkX21lbShzayk7Cj4gCj4gICAgICAgICAgICAgICAgICAgICAgICAgdHAt
-PnJjdl9zc3RocmVzaCA9IG1pbih0cC0+cmN2X3NzdGhyZXNoLAo+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmV3X3dpbmRvd19jbGFtcCk7Cj4gCj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgaWYgKHVudXNlZF9tZW0pCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB0cC0+cmN2X3NzdGhyZXNoID0gbWF4X3QodTMyLCB0cC0+cmN2X3NzdGhy
-ZXNoLAo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0Y3Bfd2luX2Zy
-b21fc3BhY2Uoc2ssIHVudXNlZF9tZW0pKTsKPiAgICAgICAgICAgICAgICB9IGVsc2Ugewo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgIG5ld19yY3Zfc3N0aHJlc2ggPSBtaW4odHAtPnJjdl93bmQs
-IHRwLT53aW5kb3dfY2xhbXApOwo+ICAgICAgICAgICAgICAgICAgICAgICAgIHRwLT5yY3Zfc3N0
-aHJlc2ggPSBtYXgobmV3X3Jjdl9zc3RocmVzaCwKPiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgdHAtPnJjdl9zc3RocmVzaCk7Cj4gICAgICAgICAgICAgICAg
-fQo+IAo+IFBvc3NpYmx5IHRoZSBiaXRzIHNoYXJlZCB3aXRoIHRjcF9hZGp1c3RfcmN2X3NzdGhy
-ZXNoKCkgY291bGQgYmUKPiBmYWN0b3JlZCBvdXQgaW4gYSBjb21tb24gaGVscGVyLgo+IAo+ID4g
-SGF2ZSB5b3UgY29uc2lkZXJlZCByZXZlcnRpbmcgIDNhYTc4NTdmZTFkNyAoInRjcDogZW5hYmxl
-IG1pZCBzdHJlYW0KPiA+IHdpbmRvdyBjbGFtcCIpID8KPiAKPiAKPiBUaGF0IHdvdWxkIHdvcmss
-IHRvbyBhbmQgd2lsbCBiZSBzaW1wbGVyLgo+IAo+IFRoZSBpc3N1ZSBhdCBoYW5kIHdhcyBub3Rl
-ZCB3aXRoIGFuIGFwcGxpY2F0aW9uIHRoYXQgcmVhbGx5IHdhbnRzIHRvCj4gbGltaXQgdGhlIGFu
-bm91bmNlZCB3aW5kb3c6Cj4gCj4gaHR0cHM6Ly9naXRsYWIuY29tL2RnaWJzb24vcGFzc3QKPiAK
-PiBJIGd1ZXNzIHRvdWNoaW5nIHJjdl9zc3RocmVzaCB3b3VsZCBiZSBhIGJpdCBtb3JlIGVmZmVj
-dGl2ZS4KPiAKPiBOb3QgbXVjaCBtb3JlIGluIHRoZSBlbmQsIGFzIGJvdGggd2luZG93X2NsYW1w
-IGFuZCByY3Zfc3N0aHJlc2ggY2FuCj4gbGF0ZXIgZ3JvdyBkdWUgdG8gcmN2IGJ1ZiBhdXRvLXR1
-bmUuIElkZWFsbHkgd2Ugd291bGQgbGlrZSB0byBwcmV2ZW50Cj4gdGNwX3Jjdl9zcGFjZV9hZGp1
-c3QoKSBmcm9tIHRvdWNoaW5nIHdpbmRvd19jbGFtcCBhZnRlcgo+IFRDUF9XSU5ET1dfQ0xBTVAg
-LSBidXQgdGhhdCBpcyBhbm90aGVyIG1hdHRlci9wYXRjaC4KPiAKPiBUaGFua3MhCj4gCj4gUGFv
-bG8KPiAKClRoZSBwYXRjaCB0byBmaXggdGhlIGJ1ZyB3aGVyZSByY3Zfc3NodGhyZXNoIGlzIHJl
-ZHVjZWQgdG8gemVybyBvbiBhIGZ1bGwgcmVjZWl2ZSB3aW5kb3cgYW5kIGNhbm5vdCByZWNvdmVy
-IGlzOgotdHAtPnJjdl9zc3RocmVzaCA9IG1pbih0cC0+cmN2X3duZCwgdHAtPndpbmRvd19jbGFt
-cCk7Cit0cC0+cmN2X3NzdGhyZXNoID0gbWluKHRwLT5yY3Zfc3N0aHJlc2gsIHRwLT53aW5kb3df
-Y2xhbXApOwoKVGhpcyBjaGFuZ2UgYW5kIHRoZSBwYXRjaCBpbiB0aGlzIHRocmVhZCBiZWhhdmUg
-dGhlIHNhbWUgaW4gdGhlIGZvbGxvd2luZyBwYWNrZXRkcmlsbCB0aGF0IHJlcHJvZHVjZXMgdGhl
-IHByb2JsZW0uICAgCgotbmVpbAoKLS0tCgpgLi4vY29tbW9uL2RlZmF1bHRzLnNoYAoKICAgLy8g
-RXN0YWJsaXNoIGEgY29ubmVjdGlvbi4KICAgIDAgc29ja2V0KC4uLiwgU09DS19TVFJFQU0sIElQ
-UFJPVE9fVENQKSA9IDMKICAgKzAgc2V0c29ja29wdCgzLCBTT0xfU09DS0VULCBTT19SRVVTRUFE
-RFIsIFsxXSwgNCkgPSAwCiAgICswIGJpbmQoMywgLi4uLCAuLi4pID0gMAogICArMCBsaXN0ZW4o
-MywgMSkgPSAwCgogICsuMSA8IFMgMDowKDApIHdpbiAzMjc5MiA8bXNzIDEwMDAsc2Fja09LLG5v
-cCxub3Asbm9wLHdzY2FsZSA4PgogICArMCA+IFMuIDA6MCgwKSBhY2sgMSB3aW4gNjU1MzUgPG1z
-cyAxNDYwLG5vcCxub3Asc2Fja09LLG5vcCx3c2NhbGUgOD4KICArLjEgPCAuIDE6MSgwKSBhY2sg
-MSB3aW4gMzIwCiAgICswIGFjY2VwdCgzLCAuLi4sIC4uLikgPSA0CgogICArMCBzZXRzb2Nrb3B0
-KDQsIFNPTF9TT0NLRVQsIFNPX1JDVkJVRiwgWzY1NTM2XSwgNCkgPSAwCgogICAvLyBDbG9zZSBy
-Y3Zfd25kIHRvIHplcm8KICArLjAxIDwgLiAxOjY0MDAwKDYzOTk5KSBhY2sgMSB3aW4gMzIwCiAg
-ICsuMDQgPiAuIDE6MSgwKSBhY2sgNjQwMDAgd2luIDI0OAogICsuMDEgPCAuIDY0MDAwOjEyODAw
-MCg2NDAwMCkgYWNrIDEgd2luIDMyMAogICAvLyBkZWxheWVkIGFjayB3YWl0aW5nIGZvciB1c2Vy
-IHRvIHJlYWQuCiAgICswLjAyfiswLjE0ID4gLiAxOjEoMCkgYWNrIDEyODAwMCB3aW4gMAoKICAg
-KzAgc2V0c29ja29wdCg0LCBJUFBST1RPX1RDUCwgVENQX1dJTkRPV19DTEFNUCwgWzEyODAwXSwg
-NCkgPSAwCgogICsuMDEgcmVhZCg0LCAuLi4sIDEyOTAwMCkgPSAxMjc5OTkKCiAgIC8vIHJlYWQg
-b3BlbnMgd2luZG93IDsgdGhpcyBpcyB0aGUga2V5IHBhcnQgb2YgdGhlIHRlc3QuCiAgICswID4g
-LiAxOjEoMCkgYWNrIDEyODAwMCB3aW4gNTAKCiAgIC8vIHJhaXNlIGNsYW1wIGZ1cnRoZXIsIGFi
-b3ZlIGJ1ZmZlciBzaXplIHRvIG9ic2VydmUgZ3Jvd3RoCiAgICswIHNldHNvY2tvcHQoNCwgSVBQ
-Uk9UT19UQ1AsIFRDUF9XSU5ET1dfQ0xBTVAsIFsxMjgwMDBdLCA0KSA9IDAKICArLjAxIDwgLiAx
-MjgwMDA6MTQwODAwKDEyODAwKSBhY2sgMSB3aW4gMzIwCiAgICswID4gLiAxOjEoMCkgYWNrIDE0
-MDgwMCB3aW4gMTUwCgogICAvLyBSZWFkIHRvIGNsZWFyIHRoZSByZWNlaXZlIGJ1ZmZlci4KICAr
-LjAxIHJlYWQoNCwgLi4uLCAxMjkwMDApID0gMTI4MDAKCiAgKy4wMSA8IC4gMTQwODAwOjE3MjAw
-MCgzMTIwMCkgYWNrIDEgd2luIDMyMAogICArMCA+IC4gMToxKDApIGFjayAxNzIwMDAgd2luIDM2
-MQoKCg==
+On Wed, Nov 22, 2023 at 09:52:57PM +0800, Guangguan Wang wrote:
+>Add a new sysctl: net.smc.smcr_max_links_per_lgr, which is
+>used to control the preferred max links per lgr for SMC-R
+>v2.1. The default value of this sysctl is 2, and the acceptable
+>value ranges from 1 to 2.
+>
+>Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+
+LGTM
+
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+
+>---
+> Documentation/networking/smc-sysctl.rst |  8 ++++++++
+> include/net/netns/smc.h                 |  1 +
+> net/smc/af_smc.c                        |  2 +-
+> net/smc/smc_clc.c                       | 10 +++++++---
+> net/smc/smc_clc.h                       |  3 ++-
+> net/smc/smc_sysctl.c                    | 12 ++++++++++++
+> net/smc/smc_sysctl.h                    |  1 +
+> 7 files changed, 32 insertions(+), 5 deletions(-)
+>
+>diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
+>index 769149d98773..c6ef86ef4c4f 100644
+>--- a/Documentation/networking/smc-sysctl.rst
+>+++ b/Documentation/networking/smc-sysctl.rst
+>@@ -57,3 +57,11 @@ rmem - INTEGER
+> 	only allowed 512KiB for SMC-R and 1MiB for SMC-D.
+> 
+> 	Default: 64KiB
+>+
+>+smcr_max_links_per_lgr - INTEGER
+>+	Controls the max number of links can be added to a SMC-R link group. Notice that
+>+	the actual number of the links added to a SMC-R link group depends on the number
+>+	of RDMA devices exist in the system. The acceptable value ranges from 1 to 2. Only
+>+	for SMC-R v2.1 and later.
+>+
+>+	Default: 2
+>diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+>index 582212ada3ba..da7023587824 100644
+>--- a/include/net/netns/smc.h
+>+++ b/include/net/netns/smc.h
+>@@ -22,5 +22,6 @@ struct netns_smc {
+> 	int				sysctl_smcr_testlink_time;
+> 	int				sysctl_wmem;
+> 	int				sysctl_rmem;
+>+	int				sysctl_max_links_per_lgr;
+> };
+> #endif
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index da97f946b79b..f8da484efe90 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -2457,7 +2457,7 @@ static void smc_listen_work(struct work_struct *work)
+> 	if (rc)
+> 		goto out_decl;
+> 
+>-	rc = smc_clc_srv_v2x_features_validate(pclc, ini);
+>+	rc = smc_clc_srv_v2x_features_validate(new_smc, pclc, ini);
+> 	if (rc)
+> 		goto out_decl;
+> 
+>diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+>index 8deb46c28f1d..1f87c8895a27 100644
+>--- a/net/smc/smc_clc.c
+>+++ b/net/smc/smc_clc.c
+>@@ -824,6 +824,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+> 	struct smc_clc_smcd_gid_chid *gidchids;
+> 	struct smc_clc_msg_proposal_area *pclc;
+> 	struct smc_clc_ipv6_prefix *ipv6_prfx;
+>+	struct net *net = sock_net(&smc->sk);
+> 	struct smc_clc_v2_extension *v2_ext;
+> 	struct smc_clc_msg_smcd *pclc_smcd;
+> 	struct smc_clc_msg_trail *trl;
+>@@ -944,7 +945,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+> 	if (smcr_indicated(ini->smc_type_v2)) {
+> 		memcpy(v2_ext->roce, ini->smcrv2.ib_gid_v2, SMC_GID_SIZE);
+> 		v2_ext->max_conns = SMC_CONN_PER_LGR_PREFER;
+>-		v2_ext->max_links = SMC_LINKS_PER_LGR_MAX_PREFER;
+>+		v2_ext->max_links = net->smc.sysctl_max_links_per_lgr;
+> 	}
+> 
+> 	pclc_base->hdr.length = htons(plen);
+>@@ -1171,10 +1172,12 @@ int smc_clc_send_accept(struct smc_sock *new_smc, bool srv_first_contact,
+> 	return len > 0 ? 0 : len;
+> }
+> 
+>-int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+>+int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
+>+				      struct smc_clc_msg_proposal *pclc,
+> 				      struct smc_init_info *ini)
+> {
+> 	struct smc_clc_v2_extension *pclc_v2_ext;
+>+	struct net *net = sock_net(&smc->sk);
+> 
+> 	ini->max_conns = SMC_CONN_PER_LGR_MAX;
+> 	ini->max_links = SMC_LINKS_ADD_LNK_MAX;
+>@@ -1192,7 +1195,8 @@ int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+> 		if (ini->max_conns < SMC_CONN_PER_LGR_MIN)
+> 			return SMC_CLC_DECL_MAXCONNERR;
+> 
+>-		ini->max_links = min_t(u8, pclc_v2_ext->max_links, SMC_LINKS_PER_LGR_MAX_PREFER);
+>+		ini->max_links = min_t(u8, pclc_v2_ext->max_links,
+>+				       net->smc.sysctl_max_links_per_lgr);
+> 		if (ini->max_links < SMC_LINKS_ADD_LNK_MIN)
+> 			return SMC_CLC_DECL_MAXLINKERR;
+> 	}
+>diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+>index c5c8e7db775a..89b258cedffe 100644
+>--- a/net/smc/smc_clc.h
+>+++ b/net/smc/smc_clc.h
+>@@ -422,7 +422,8 @@ int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
+> 			 u8 version, u8 *eid, struct smc_init_info *ini);
+> int smc_clc_send_accept(struct smc_sock *smc, bool srv_first_contact,
+> 			u8 version, u8 *negotiated_eid, struct smc_init_info *ini);
+>-int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+>+int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
+>+				      struct smc_clc_msg_proposal *pclc,
+> 				      struct smc_init_info *ini);
+> int smc_clc_clnt_v2x_features_validate(struct smc_clc_first_contact_ext *fce,
+> 				       struct smc_init_info *ini);
+>diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+>index 5cbc18c6e62b..3e9bb921e40a 100644
+>--- a/net/smc/smc_sysctl.c
+>+++ b/net/smc/smc_sysctl.c
+>@@ -25,6 +25,8 @@ static int max_sndbuf = INT_MAX / 2;
+> static int max_rcvbuf = INT_MAX / 2;
+> static const int net_smc_wmem_init = (64 * 1024);
+> static const int net_smc_rmem_init = (64 * 1024);
+>+static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
+>+static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
+> 
+> static struct ctl_table smc_table[] = {
+> 	{
+>@@ -68,6 +70,15 @@ static struct ctl_table smc_table[] = {
+> 		.extra1		= &min_rcvbuf,
+> 		.extra2		= &max_rcvbuf,
+> 	},
+>+	{
+>+		.procname	= "smcr_max_links_per_lgr",
+>+		.data		= &init_net.smc.sysctl_max_links_per_lgr,
+>+		.maxlen		= sizeof(int),
+>+		.mode		= 0644,
+>+		.proc_handler	= proc_dointvec_minmax,
+>+		.extra1		= &links_per_lgr_min,
+>+		.extra2		= &links_per_lgr_max,
+>+	},
+> 	{  }
+> };
+> 
+>@@ -97,6 +108,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
+> 	net->smc.sysctl_smcr_testlink_time = SMC_LLC_TESTLINK_DEFAULT_TIME;
+> 	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
+> 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
+>+	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
+> 
+> 	return 0;
+> 
+>diff --git a/net/smc/smc_sysctl.h b/net/smc/smc_sysctl.h
+>index 0becc11bd2f4..5783dd7575dd 100644
+>--- a/net/smc/smc_sysctl.h
+>+++ b/net/smc/smc_sysctl.h
+>@@ -23,6 +23,7 @@ void __net_exit smc_sysctl_net_exit(struct net *net);
+> static inline int smc_sysctl_net_init(struct net *net)
+> {
+> 	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
+>+	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
+> 	return 0;
+> }
+> 
+>-- 
+>2.24.3 (Apple Git-128)
 
