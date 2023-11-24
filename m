@@ -1,145 +1,90 @@
-Return-Path: <netdev+bounces-50950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0950F7F7A76
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:34:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1013D7F7AC7
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 18:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B5A61C2087F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE69D2818BE
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 17:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5352AF00;
-	Fri, 24 Nov 2023 17:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534BE39FDD;
+	Fri, 24 Nov 2023 17:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NEgPb+vO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxXKU0ra"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B771BC1;
-	Fri, 24 Nov 2023 09:34:38 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3954620005;
-	Fri, 24 Nov 2023 17:34:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700847276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=laVIeNuGyFNN2rVJzpoTnXeNYtbS9ZVvlwtfDxQdzIk=;
-	b=NEgPb+vOyRQ1ywouxZWdYL2UIT0XGQo8B+dEqnidX5Zf5XUSs5CzP59hDWMa/19kgEUU+3
-	XlwIG+5nrVnuOSfJhXCPDGQYfCSjuRuqCcAQrENgGuWkqD2qFKxGiYEEQ073A6N4nx/KD5
-	CijJY2CwV9x0+DVAjbZfUKsb1AbxzXpLuP229W0teCce18Fp3jiYPkPgfbY6yByFBn5GMJ
-	J6gtEPcx1KcrXfDsBArJH2zkti+xFPVEgP90EBFl4873ggMU+qv/KmISx/YC9tJYK4feKG
-	oir2q+YPUObGtB+L03HCeTRDkiHog+Zy+1sWEbD7IMb9Q+y4zxQbRv0GPVLQrA==
-Date: Fri, 24 Nov 2023 18:34:31 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231124183431.5d4cc189@kmaincent-XPS-13-7390>
-In-Reply-To: <20231124154343.sr3ajyueoshke6tn@skbuf>
-References: <20231120220549.cvsz2ni3wj7mcukh@skbuf>
-	<20231121183114.727fb6d7@kmaincent-XPS-13-7390>
-	<20231121094354.635ee8cd@kernel.org>
-	<20231122144453.5eb0382f@kmaincent-XPS-13-7390>
-	<20231122140850.li2mvf6tpo3f2fhh@skbuf>
-	<20231122085000.79f2d14c@kernel.org>
-	<20231122165517.5cqqfor3zjqgyoow@skbuf>
-	<20231122100142.338a2092@kernel.org>
-	<20231123160056.070f3311@kmaincent-XPS-13-7390>
-	<20231123093205.484356fc@kernel.org>
-	<20231124154343.sr3ajyueoshke6tn@skbuf>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FAC39FD7
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:58:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8522BC433C7;
+	Fri, 24 Nov 2023 17:58:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700848716;
+	bh=LY+9y5MHsF+KtKlVmFalF03dxEUBitUaShH1kcZwyMA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AxXKU0rap66ZevMPKcQXRiKXP8J2gYakqTq+nJirZkwzxzF7yy+Ptz6gEJhCuhj5K
+	 FToDAcVdR6P/ccUFnRwU5DJkTLlJXisDEvxzZt3kO6gnYprvRQz9RPvi7grQ+lIK3o
+	 pGAk9+lTCG8uHj+Yl7awdeqyWcFgmbA+zh2wBCeUocMod1Ie2g2pOgvLHh0URQfs15
+	 6pVjgQLYfUd/XJndJN+AMgpWOcxaZUSm1j8yreXCKamp69v6Gmt4S/O7/0eMXLURr/
+	 35gssgI/QUcy96TtBISjX1bxYBv2in8qLIivUrDLfsP7AQ4jVtmMS4+wsBYWWL26yy
+	 xHIIGc6Vgf9kw==
+Date: Fri, 24 Nov 2023 17:58:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH] octeontx2-af: Fix possible buffer overflow
+Message-ID: <20231124175830.GV50352@kernel.org>
+References: <20231123173630.32919-1-elena.salomatkina.cmc@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123173630.32919-1-elena.salomatkina.cmc@gmail.com>
 
-On Fri, 24 Nov 2023 17:43:43 +0200
-Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+On Thu, Nov 23, 2023 at 08:36:30PM +0300, Elena Salomatkina wrote:
+> A loop in rvu_mbox_handler_nix_bandprof_free() contains
+> a break if (idx == MAX_BANDPROF_PER_PFFUNC),
+> but if idx may reach MAX_BANDPROF_PER_PFFUNC
+> buffer '(*req->prof_idx)[layer]' overflow happens before that check.
+> 
+> The patch moves the break to the
+> beginning of the loop.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: e8e095b3b370 ("octeontx2-af: cn10k: Bandwidth profiles config support").
+> Signed-off-by: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
 
-> On Thu, Nov 23, 2023 at 09:32:05AM -0800, Jakub Kicinski wrote:
-> > On Thu, Nov 23, 2023 at 04:00:56PM +0100, K=C3=B6ry Maincent wrote: =20
-> > > So, do we have a consensus? Vlad, do you agree on putting all under
-> > > ethtool?
-> > >=20
-> > > ETHTOOL_GET_TS_INFO will be in charge of replacing the SIOCGHWSTAMP
-> > > implementation. Need to add ETHTOOL_A_TSINFO_PHC_INDEX
-> > > ETHTOOL_A_TSINFO_QUALIFIER to the request.
-> > >=20
-> > > ETHTOOL_GET_TS_INFO will list all the hwtstamp provider (aka "{phc_in=
-dex,
-> > > qualifier}") through the dumpit callback. I will add a filter to be a=
-ble
-> > > to list only the hwtstamp provider of one netdev.
-> > >=20
-> > > ETHTOOL_SET_TS_INFO will be in charge of replacing the SIOCSHWSTAMP
-> > > implementation. =20
-> >=20
-> > If not we can do a vote/poll? Maybe others don't find the configuration
-> > of timestamping as confusing as me. =20
->=20
-> If you mean the ETHTOOL_MSG_TSINFO_GET netlink message (ETHTOOL_GET_TS_IN=
-FO
-> is an ioctl), you're saying that you want to move the entire contents of
-> SIOCGHWSTAMP there, by making the kernel call ndo_hwtstamp_get() in
-> addition to the existing __ethtool_get_ts_info()?
+Thanks Elena,
 
-Yes.
-=20
-> Yeah, I don't know, I don't have a real objection, I guess it's fine.
->=20
-> What will be a bit of an "?!" moment for users is when ethtool gains
-> support for the SIOCGHWSTAMP/SIOCSHWSTAMP netlink replacements, but not
-> for the original ioctls. So hwstamp_ctl will be able to change timestampi=
-ng
-> configuration, but ethtool wouldn't - all on the same system. Unless
-> ethtool gains an ioctl fallback for a ioctl that was never down its alley.
+I agree with your analysis and that this seems to be
+an appropriate fix for the problem.
 
-Yes indeed. Would it break things if both ioctls and netlink can get and set
-the hwtstamps configuration? It is only configuration. Both happen under
-rtnl_lock it should be alright.
+As this is a fix, it should be targeted at the net, as opposed to net-next,
+tree.  Please keep this in mind for future patch submissions.
 
-The question is which hwtstamp provider will the original ioctls be able to
-change? Maybe the default one (MAC with phy whitelist) and only this one.
+	Subject: [PATCH net] ...
 
-> But by all means, still hold a poll if you want to. I would vote for
-> ethtool netlink, not because it's great, just because I don't have a
-> better alternative to propose.
+Link https://docs.kernel.org/process/maintainer-netdev.html
 
-If you agree on that choice, let's go. Jakub and your are the most proactive
-reviewers in this patch series. Willem you are the timestamping maintainer =
-do
-you also agree on this?=20
-If anyone have another proposition let them speak now, or forever remain
-silent! ;)
+The above nit notwithstanding,
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Reviewed-by: Simon Horman <horms@kernel.org>
 
