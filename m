@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-50675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97A0E7F69CB
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:27:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4335B7F69D0
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 01:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51BEF2816DD
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:27:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F00D281752
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 00:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FF8375;
-	Fri, 24 Nov 2023 00:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7F1394;
+	Fri, 24 Nov 2023 00:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="KyTb8XJF"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="kNX70Na8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96FAE10DD
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:34 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32fdc5be26dso789293f8f.2
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:34 -0800 (PST)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D3C310E0
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:36 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32f8441dfb5so931571f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 16:27:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1700785653; x=1701390453; darn=vger.kernel.org;
+        d=arista.com; s=google; t=1700785654; x=1701390454; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dH55LyAvyZzawnq9+CybIblcEgwIvM5k9Dss3KgMZik=;
-        b=KyTb8XJFTur8dPrC3de1g8Vk/S8ze/Uv/lZ9Ot5vHOscxuoGloR0ffhdznpFeJteLy
-         xMQ56X+X3N8xIhQxt/JaW4WVq73I22bhI0CUC/3ZfPKZ+6VxQO8qVS4K/SXTLKM8eHsQ
-         jrpBsB/0nsoJujnM2XDhnZ3euMZ0RfT2n/nuxm0r7gH2aXNJuBy7bKJ55JJFyP8dvG4p
-         d6A0U7KtoOCTjSLJ/nHbILwtCBXzaBTmAC9CyeBN8yWhJ6A4L0CR1u/npMkvGyH+gaYj
-         b98Vfx+3vZ2kP+1VaxlciXo1sDZC71eZbIIdNTq/i0Bi4E6wI1qsNjwOze7EWSerJWkD
-         SEag==
+        bh=H1xPXn0VYaTrAb1Nt5Hiecyvp9SYb9ivj7o6hsBOhvw=;
+        b=kNX70Na8pKjSa3xGst8Rpujm+GWUhvSGTclIDfRRCyNe8VAGiC0kCFDs2LgBC6QAsi
+         PWMlwGHQjC3/9UhgOpfCnlPzbv5+NDyJY3iVHirdie19HeFLHKsh9i8zgZ4eHaSPHSSs
+         6LQjHDwNHnX+P0JXGGG2Rfx/NqwuN/9fxgwmMaGq1aruqptUAM6zZM2Mt6IrXe51po3q
+         6coH0/w8jZrLHxlulDYTy6OLgTPJ4zjybVb6atjr3bOoiIXxlFbTktzWj4cV4v3DWXIw
+         9JwVYh0yZhKk0cUt0NhoYd8alsx5EMEy4yKs16bvC9Wsmg8wsDazytOou2f5CqFFrC2D
+         DuUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700785653; x=1701390453;
+        d=1e100.net; s=20230601; t=1700785654; x=1701390454;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dH55LyAvyZzawnq9+CybIblcEgwIvM5k9Dss3KgMZik=;
-        b=hJ/jwQB6IZ752cIfk6nrbDXy48bFNW97nYCYsHhkqixSLspqpOs6NZ7r3r+32yUwKE
-         P8jNGgg2umFZ4/XSbTNEascVVetR0Y2SN8DH2iSybuXiwOwS3FLbp9p5Bo1COz6N7BiD
-         RXw1k9mWJUnb5scW5aw9cjwGZee/OXvgZgqDg4qLTV0PavjrroRbvEq6PlBaBByecfy3
-         1enxxbcnOuAuY5xM90n5lopxf1RFAN966GnPSX84Ry7qjl3Y8bed/mSPlFlD0ak9Rpfv
-         6X5tB/IgREsTJiiynL+th2rMkLlYDoWMa2wLLb8Hsgws5B5Gh2vpQxwlBP/YgeEw+hwN
-         CXVQ==
-X-Gm-Message-State: AOJu0Yz/6EfCFkGi3ovdXQxUeX18UMx560HVTtZvbi3GavqWBC3uCIbP
-	yxFfGFHWgp/l9qnpujbOlSwHbQ==
-X-Google-Smtp-Source: AGHT+IFT357fLdv+9VPLUo9JyrvYwmlakZqhgzZ1DUTRUDGIr00buQXKS16JWd7Hv3B31+VpUgT0Qg==
-X-Received: by 2002:adf:e6c9:0:b0:32f:e1a2:526a with SMTP id y9-20020adfe6c9000000b0032fe1a2526amr649526wrm.67.1700785653098;
-        Thu, 23 Nov 2023 16:27:33 -0800 (PST)
+        bh=H1xPXn0VYaTrAb1Nt5Hiecyvp9SYb9ivj7o6hsBOhvw=;
+        b=MhMGq0pvnjWDH0JUayNF887RJxA3FunJ9m+RUT5TEd67BXadIKQ6NWvbNs787vs0By
+         GkfSD9pLKDn8Aw33lA3KKJidVTwndPR0BzIgPK7NnuZVcA32EmLDj2MA6Nr+8kFJFWGf
+         D7tCZkgyU1PyNqmc+2ftskGEarPiBDsbqgeYQyMCBbUEeKK1t3tJbk6U4YkOF0+lL+C5
+         hNeQ5UKNDJK2FfPe0noBlVVwdE9z5mzK7z6tri4dhV7eIzuYGerV5cpOtfywpEGz9Lyw
+         dOdEXYwNFCIP2NgaOS32FdTC1AeZuO6TsEAFxwP/j2dAAJZVjP+jo82r8NDCG6ISAndd
+         d12A==
+X-Gm-Message-State: AOJu0Yx52H/6ksO8WrherTojsibXZV2QPOfl03eFtc54L70tBgOm3ViG
+	DSjNVHSe7gdMONpfyvI7x3yDxw==
+X-Google-Smtp-Source: AGHT+IG6PXq1iNo8Vk7aSZGEmmqJsJVa5x8rz0czmMerFM1PyZtMnYrAhUZ5YJhqhvDh+LrGls+v7w==
+X-Received: by 2002:a5d:5488:0:b0:32f:83e4:50e7 with SMTP id h8-20020a5d5488000000b0032f83e450e7mr596208wrv.12.1700785654680;
+        Thu, 23 Nov 2023 16:27:34 -0800 (PST)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b004094e565e71sm3453230wmo.23.2023.11.23.16.27.31
+        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b004094e565e71sm3453230wmo.23.2023.11.23.16.27.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 16:27:32 -0800 (PST)
+        Thu, 23 Nov 2023 16:27:34 -0800 (PST)
 From: Dmitry Safonov <dima@arista.com>
 To: David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
@@ -66,9 +66,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Salam Noureddine <noureddine@arista.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 3/7] net/tcp: Limit TCP_AO_REPAIR to non-listen sockets
-Date: Fri, 24 Nov 2023 00:27:16 +0000
-Message-ID: <20231124002720.102537-4-dima@arista.com>
+Subject: [PATCH v2 4/7] net/tcp: Allow removing current/rnext TCP-AO keys on TCP_LISTEN sockets
+Date: Fri, 24 Nov 2023 00:27:17 +0000
+Message-ID: <20231124002720.102537-5-dima@arista.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231124002720.102537-1-dima@arista.com>
 References: <20231124002720.102537-1-dima@arista.com>
@@ -80,41 +80,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Listen socket is not an established TCP connection, so
-setsockopt(TCP_AO_REPAIR) doesn't have any impact.
+TCP_LISTEN sockets are not connected to any peer, so having
+current_key/rnext_key doesn't make sense.
 
-Restrict this uAPI for listen sockets.
+The userspace may falter over this issue by setting current or rnext
+TCP-AO key before listen() syscall. setsockopt(TCP_AO_DEL_KEY) doesn't
+allow removing a key that is in use (in accordance to RFC 5925), so
+it might be inconvenient to have keys that can be destroyed only with
+listener socket.
 
-Fixes: faadfaba5e01 ("net/tcp: Add TCP_AO_REPAIR")
+Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
- net/ipv4/tcp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/ipv4/tcp_ao.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 53bcc17c91e4..b1fe4eb01829 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3594,6 +3594,10 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case TCP_AO_REPAIR:
-+		if (!tcp_can_repair_sock(sk)) {
-+			err = -EPERM;
-+			break;
-+		}
- 		err = tcp_ao_set_repair(sk, optval, optlen);
- 		break;
- #ifdef CONFIG_TCP_AO
-@@ -4293,6 +4297,8 @@ int do_tcp_getsockopt(struct sock *sk, int level,
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index c8be1d526eac..bf41be6d4721 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -1818,8 +1818,16 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
+ 		if (!new_rnext)
+ 			return -ENOENT;
  	}
- #endif
- 	case TCP_AO_REPAIR:
-+		if (!tcp_can_repair_sock(sk))
-+			return -EPERM;
- 		return tcp_ao_get_repair(sk, optval, optlen);
- 	case TCP_AO_GET_KEYS:
- 	case TCP_AO_INFO: {
+-	if (cmd.del_async && sk->sk_state != TCP_LISTEN)
+-		return -EINVAL;
++	if (sk->sk_state == TCP_LISTEN) {
++		/* Cleaning up possible "stale" current/rnext keys state,
++		 * that may have preserved from TCP_CLOSE, before sys_listen()
++		 */
++		ao_info->current_key = NULL;
++		ao_info->rnext_key = NULL;
++	} else {
++		if (cmd.del_async)
++			return -EINVAL;
++	}
+ 
+ 	if (family == AF_INET) {
+ 		struct sockaddr_in *sin = (struct sockaddr_in *)&cmd.addr;
 -- 
 2.43.0
 
