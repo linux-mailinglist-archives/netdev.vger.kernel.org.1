@@ -1,180 +1,174 @@
-Return-Path: <netdev+bounces-50808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05797F7349
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:02:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190807F735A
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E237C1C20D2E
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:02:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C38BF281DBC
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B37620324;
-	Fri, 24 Nov 2023 12:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938B52376D;
+	Fri, 24 Nov 2023 12:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HfjakhJY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASSOqFUT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A22310E7;
-	Fri, 24 Nov 2023 04:02:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jXK3bax0cfz5rSkvK5+ePqNa/iax3Z0ee0GmtmgkQcE=; b=HfjakhJYxwThKIpbkYB7na4BGn
-	09jJNyocLmM4DTc/n7jVdLxTtyi5M0lY2kAT06SQr+/haeCOIbaf72gz8L9uFnjwocQ76fYhuHpa6
-	njop1sO4aVCJ+tOTlfnDnzGDUq886m8WDWpUfzjH40ooiCrl6OLI55rE8iUN99IEPwTLJ2tUJ8XBv
-	WN+NNiYlDhvoeUF232CwwkcZbT8LmbkDWAiqOm3t5Zi64b7vzksL3S3kO5nfNjM0mnT1FyRUe9jjT
-	P3HgWt8qLR6mZTnEJk3Pn9h6T9fzTkR6xeAlbxAUc669BqQQoMwI3RT3RM19tCezfx2c3U/83tb7V
-	RJh/82gg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42224)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r6Uss-0002pP-25;
-	Fri, 24 Nov 2023 12:02:10 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r6Usp-0007DH-It; Fri, 24 Nov 2023 12:02:07 +0000
-Date: Fri, 24 Nov 2023 12:02:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh@kernel.org>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C7B1EB42;
+	Fri, 24 Nov 2023 12:04:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C12FAC433C7;
+	Fri, 24 Nov 2023 12:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700827484;
+	bh=iYS7ANsuZ6vwOLgQk5XN795HJ5oXfHcHZNUjCJ6SXCw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ASSOqFUTTJHCjKWaYnDmAWOsdJx6xpTr/qPcu1HB+Fm5a/QclWrV0vncK2Q3Q7xX2
+	 aCCX9KBbw2Az9X58fZvG86NOH/nrOeX7BVzsNXr5gajrQU9ziayJ62atPHT8DwDcCc
+	 ahgZtb/ixwvuzDrehPu48aUVx6G2ccUCRb+KcZHUWGGyWnosZcOgffotJMEG6Q3zmg
+	 BKh8HHr1sjhFvHUZ1Iby4sERa66rD1silvF54u1GkmzyyDomzoGyssBaqUowuIrSEm
+	 G36HFkUDw4hjv0/b3iAj4rjrfH4/y0Ks3nDD/1Xr+xB/Qamv83b+9r9W6Jyz43KFdu
+	 6MPuY/CW+rmPA==
+Date: Fri, 24 Nov 2023 12:04:40 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Greg Ungerer <gerg@linux-m68k.org>, Michal Simek <monstr@monstr.eu>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Geoff Levand <geoff@infradead.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <ZWCQv9oaACowJck0@shell.armlinux.org.uk>
-References: <20231121144244.GA1682395-robh@kernel.org>
- <a85d6d0a-1fc9-4c8e-9f91-5054ca902cd1@lunn.ch>
- <655e4939.5d0a0220.d9a9e.0491@mx.google.com>
- <6a030399-b8ed-4e2c-899f-d82eb437aafa@lunn.ch>
- <655f2ba9.5d0a0220.294f3.38d8@mx.google.com>
- <c697488a-d34c-4c98-b4c7-64aef2fe583f@lunn.ch>
- <ZV9jM7ve3Kl6ZxSl@shell.armlinux.org.uk>
- <e32d5c84-7a88-4d9f-868f-98514deae6e9@lunn.ch>
- <655fa905.df0a0220.49d9b.7afd@mx.google.com>
- <367c0aea-b110-4e3f-a161-59d27db11188@quicinc.com>
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+	Helge Deller <deller@gmx.de>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Timur Tabi <timur@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	David Woodhouse <dwmw2@infradead.org>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-trace-kernel@vger.kernel.org, linux-csky@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+	netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	Aishwarya TCV <aishwarya.tcv@arm.com>
+Subject: Re: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Message-ID: <ZWCRWArzbTYUjvon@finisterre.sirena.org.uk>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-16-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="woSdJmrFfLwaS8m2"
 Content-Disposition: inline
-In-Reply-To: <367c0aea-b110-4e3f-a161-59d27db11188@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-
-On Fri, Nov 24, 2023 at 07:49:27PM +0800, Jie Luo wrote:
-> 
-> 
-> On 11/24/2023 3:33 AM, Christian Marangi wrote:
-> > On Thu, Nov 23, 2023 at 03:57:58PM +0100, Andrew Lunn wrote:
-> > > On Thu, Nov 23, 2023 at 02:35:31PM +0000, Russell King (Oracle) wrote:
-> > > > On Thu, Nov 23, 2023 at 03:27:05PM +0100, Andrew Lunn wrote:
-> > > > > > Just to be more precise qca807x can operate in 3 different mode:
-> > > > > > (this is controlled by the MODE_CFG bits)
-> > > > > 
-> > > > > > - QSGMII: 5 copper port
-> > > > > 
-> > > > > 4 slots over QSGMII, plus the second SERDES is connected to the MAC
-> > > > > using SGMII/1000BaseX?
-> > > > > 
-> > > > > > - PSGMII: 5 copper port
-> > > > > 
-> > > > > 5 slots over QSGMII, the second SERDES is idle?
-> > > > > 
-> > > > > > - PSGMII: 4 copper port + 1 combo (that can be both fiber or copper)
-> > > > > 
-> > > > > 5 slots over QSGMII, with the second SERDES connected to an SFP cage.
-> > > > > 
-> > > > > Are ports 1-4 always connected to the P/Q SGMII. Its only port 5 which
-> > > > > can use the second SERDES?
-> > > > 
-> > > > I think what would really help here is if there was an ascii table to
-> > > > describe the configurations, rather than trying to put it into words.
-> > > 
-> > > Yes.
-> > > 
-> > > And also for ipq4019. We need to merge these two threads of
-> > > conversation, since in the end they are probably the same driver, same
-> > > device tree etc.
-> > > 
-> > 
-> > For everyone that missed Robert response in patch 12 let me quote him
-> > also here.
-> > 
-> > "
-> > Hi Andrew,
-> > I think that the description is confusing.
-> > QCA807x supports 3 different modes:
-> > 1. PSGMII (5 copper ports)
-> > 2. PSGMII (4 copper ports + 1 combo port)
-> > 3. QSGMII+SGMII
-> > 
-> > So, in case option 2 is selected then the combo port can also be used for
-> > 1000Base-X and 100Base-FX modules or copper and it will autodetect the
-> > exact media.
-> > This is supported via the SFP op-s and I have been using it without issues
-> > for a while.
-> > 
-> > I have not tested option 3 in combination with SFP to the copper
-> > module so I cant
-> > say whether that works.
-> 
-> For the option3, the last PHY works on SGMII mode, then it can't be
-> used with SFP, only copper is supported in this mode.
-
-So, from what you've written, and looking at the PDF for QCA8075:
-
-		First Serdes mode	Second Serdes mode
-Option 1	PSGMII for copper	Disabled
-		ports 0-4
-Option 2	PSGMII for copper	1000BASE-X / 100BASE-FX
-		ports 0-4
-Option 3	QSGMII for copper	SGMII for
-		ports 0-3		copper port 4
-
-In all cases, ports 0-4 have a copper (baseT/baseTx/baseTe) port
-available.
+In-Reply-To: <20231108125843.3806765-16-arnd@kernel.org>
+X-Cookie: Am I in GRADUATE SCHOOL yet?
 
 
+--woSdJmrFfLwaS8m2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This is a much easier to understand presentation than writing out a
-longwinded description of the three modes. Please include the table
-and the statement below the table in the commit description as that
-is necessary to describe the hardware setup being addressed in these
-patches.
+On Wed, Nov 08, 2023 at 01:58:36PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> The VDSO functions are defined as globals in the kernel sources but inten=
+ded
+> to be called from userspace, so there is no need to declare them in a ker=
+nel
+> side header.
 
-Thanks.
+This is in -next as commit 42874e4eb35bdfc54f8514685e50434098ba4f6c and
+breaks an arm64 defconfig build, the 32 bit vDSO build is broken:
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+/build/stage/linux/arch/arm64/kernel/vdso32/vgettimeofday.c:10:5: error: co=
+nflic
+ting types for =E2=80=98__vdso_clock_gettime=E2=80=99; have =E2=80=98int(cl=
+ockid_t,  struct old_timespec
+32 *)=E2=80=99 {aka =E2=80=98int(int,  struct old_timespec32 *)=E2=80=99}
+   10 | int __vdso_clock_gettime(clockid_t clock,
+      |     ^~~~~~~~~~~~~~~~~~~~
+In file included from /build/stage/linux/arch/arm64/kernel/vdso32/vgettimeo=
+fday.
+c:8:
+/build/stage/linux/include/vdso/gettime.h:16:5: note: previous declaration =
+of =E2=80=98__vdso_clock_gettime=E2=80=99 with type =E2=80=98int(clockid_t,=
+  struct __kernel_timespec *)=E2=80=99 {aka =E2=80=98int(int,  struct __ker=
+nel_timespec *)=E2=80=99}
+   16 | int __vdso_clock_gettime(clockid_t clock, struct __kernel_timespec =
+*ts);
+      |     ^~~~~~~~~~~~~~~~~~~~
+/build/stage/linux/arch/arm64/kernel/vdso32/vgettimeofday.c:28:5: error: co=
+nflicting types for =E2=80=98__vdso_clock_getres=E2=80=99; have =E2=80=98in=
+t(clockid_t,  struct old_timespec32 *)=E2=80=99 {aka =E2=80=98int(int,  str=
+uct old_timespec32 *)=E2=80=99}
+   28 | int __vdso_clock_getres(clockid_t clock_id,
+      |     ^~~~~~~~~~~~~~~~~~~
+/build/stage/linux/include/vdso/gettime.h:15:5: note: previous declaration =
+of =E2=80=98__vdso_clock_getres=E2=80=99 with type =E2=80=98int(clockid_t, =
+ struct __kernel_timespec *)=E2=80=99 {aka =E2=80=98int(int,  struct __kern=
+el_timespec *)=E2=80=99}
+   15 | int __vdso_clock_getres(clockid_t clock, struct __kernel_timespec *=
+res);
+      |     ^~~~~~~~~~~~~~~~~~~
+
+--woSdJmrFfLwaS8m2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVgkVgACgkQJNaLcl1U
+h9Dz9gf/VMa1PvhU/bO1IxdTJVCJWAk44qPipqzqyUg2pLaBosU5v8Dx8eAPyIg0
+DgxKA9Cycd3l3JSSqWIwJ1xEztqi2CvdmV5Ljrml8UqOvqHNPtg16JgCCOZ+Ssww
+82B8fl93C3CmUtTLFx3u3lZRKd7FjyeOiiemekfHvdbZSOn+K6Dk9zvPAE63gI0I
+5m6xp+q1eJ7Uyq7o4kCOnJOo/y9eDGX3lGqOsVQ7bnQAH6Id5y32aplMkStvzLKI
+TrSlxBsnU/wry1msxEbcgmhN2YebA1wWGNC0j6fT4xg0MzuHevZwPTSm/2sK5Exc
+fOQ/QL09MCXtNwNJ3QpItc8VaAFrVQ==
+=sHT7
+-----END PGP SIGNATURE-----
+
+--woSdJmrFfLwaS8m2--
 
