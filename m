@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-50963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD98F7F8556
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:59:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C9E7F855D
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 22:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D410B21C85
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 20:59:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B511C2326F
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 21:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4AB3A8CD;
-	Fri, 24 Nov 2023 20:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538873A8CB;
+	Fri, 24 Nov 2023 21:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="TJo54wDK";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Bi9AtZKV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEn9glMa"
 X-Original-To: netdev@vger.kernel.org
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF0619A3;
-	Fri, 24 Nov 2023 12:59:31 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 7313958049F;
-	Fri, 24 Nov 2023 15:59:27 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Fri, 24 Nov 2023 15:59:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-	1700859567; x=1700866767; bh=LUc6+oAUXdxf0gLuIlkH0gh0571S4Y/6Cb0
-	mYTuCEC4=; b=TJo54wDKCgMuWkoE9drzZDiVLRQhY/GJRZQbHp7h+tibivPtYdz
-	aoy+dD/iB6VH/tHq1lkDZSyBeUiPUKnU+CPUBLH9oDL4UiuE6hzBkHgZdpTaAyMD
-	vGDocwfPKyrAxwD4arpe2BagHsS4TfP6SchUmq7QzlC0tl9WV6mhq4DbdDSaJCkG
-	DiZRzg+Grk2oWd3veN4MrIlJxOdoTv80OKIq9dyWH6G+POItZfygpmv6Hde5rox+
-	VRCqRKdHztbDx/R3ACq9XqwpDs3mJqjXeVXTQV0qz2ku+2/FxPr2IdVbKLyeWSXT
-	z2sPjzPCWFWfQyjSK3eu992T16Pw5NYvfrg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1700859567; x=1700866767; bh=LUc6+oAUXdxf0gLuIlkH0gh0571S4Y/6Cb0
-	mYTuCEC4=; b=Bi9AtZKVEzB6ILE28gGs0V2BjploLrLFm4vL9yieiaAbuReoHKj
-	S60zq3BxmqGOrsPP16zHlbzesBhzij7oshzaUNJtfr8XyXKD7Y/f2gmFQnb1AXiu
-	9yrNXo063xCLmAJehlT5JPFAc6fWKVUQ3DzZcnEinVvimSEOWM5/r08H43JKgk7b
-	tkKSbPHpzmOW7YzvYqwQeYXXntHkpV7cMBehqn2I9KbyZK+enTbdOy4mnTlSfkiC
-	KE2fcCPj8cU+u4o6qVzO2LKoIYF4nPxii4WlldEPSRHxAAy7Ly8EArEnUf0LO8jr
-	VGHpemmpxDrV/SevjcIIHWH6+TnbVtMJmBg==
-X-ME-Sender: <xms:rg5hZWcjngq0PBJ4Yt3DFGUS9mKKrFvQ303LZs4GmU1rdAtZJN3lTg>
-    <xme:rg5hZQO5DdaBzcgYbUGXxPSRLUxCdh55A2W2lv9ITgz-joW-u7JXZaw49hWbn3muY
-    jbX95IOBlzKyjt3EA>
-X-ME-Received: <xmr:rg5hZXjQNJgd0YWEGzNMF92LA72-QPYKp2622RdnvCTjTsQtmF25A1O7OJl6Mv_cHrWUIM8XkOmGmx3seIC6N2roMDcwXiZxmuVx1-51lNdk_015rndatAEDw1Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudehhedgudeggecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enfghrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
-    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
-    eqnecuggftrfgrthhtvghrnheptdfgueeuueekieekgfeiueekffelteekkeekgeegffev
-    tddvjeeuheeuueelfeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
-    hilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:rg5hZT__S8VmppWZ-1-GJdLAUH0xp8oh4ZwiDoj9JUI2-36UilZY2w>
-    <xmx:rg5hZSsMBnUp1nRxqwPpVc2fNRielAXeqic28Nl-pai_BQD8lJuvWg>
-    <xmx:rg5hZaFsDEW49cZxHhwMqUFl5AZKUrSxHjmv5j-MR6jvRFD3dAdmSA>
-    <xmx:rw5hZSf9w0z44a0z6VFmEW3z8LJC7RQyr-7597RGS6OlXcFCDjuG1A>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 24 Nov 2023 15:59:25 -0500 (EST)
-Date: Fri, 24 Nov 2023 13:59:24 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	antony.antony@secunet.com, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, devel@linux-ipsec.org
-Subject: Re: [PATCH ipsec-next v1 7/7] bpf: xfrm: Add selftest for
- bpf_xdp_get_xfrm_state()
-Message-ID: <rsj2usphrnghq3gnwkbho7rek7ffbgyur4kjuakpfxwu7zqpzw@cj3rmd4gupxq>
-References: <cover.1700676682.git.dxu@dxuuu.xyz>
- <84111ba0ea652a7013df520c151d40d400401e9c.1700676682.git.dxu@dxuuu.xyz>
- <CAADnVQKg7-T_g7CFRs62ZDFyR9z=FTxfyXyTe=3_ojGpnvxJ4w@mail.gmail.com>
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD911990;
+	Fri, 24 Nov 2023 13:10:07 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507a98517f3so3070122e87.0;
+        Fri, 24 Nov 2023 13:10:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700860205; x=1701465005; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wVO89DxZvW04y67tvwrlTV9VwiUMtZyXH6adWuhrdRo=;
+        b=HEn9glMa/xrQbKtV9vu9UChqzLaX7oEu+6Py2skf8l02wiNu+ZbBqyzTD2fZEXih/4
+         zfRCy5KoM7+eQpJDRKbnQzeAsqic2ld6ypTRXlkw1NPkxOuo0Lq69GmUzPsqPHUYdE1b
+         aJkT3isN55J7exBkF6pXYUur4QFkQhDM6650X0IVX0Co4TUdwRIZYfjQCedPhUoKQlGY
+         hcQoHV1alB7fhXyAtSLtS3Z6AnOiwlWYdEpeaq7zyFvOV4SYjqBrpM5WOU6usMIMC83B
+         sgZvgAQYJlYe3v3ar3VS3nDdkBIbWzkzlOmL/2+qQf12KgjuzeZGrrHTfR7UKSG5zVIS
+         9MsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700860205; x=1701465005;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wVO89DxZvW04y67tvwrlTV9VwiUMtZyXH6adWuhrdRo=;
+        b=ZN/kOwwj5Nyzxy+JIvbB3/b8wEpyWEBv89hdC+xXvZDK+pnua08VqbJcJU/EynuLMC
+         beKZXG6VcDRHiO5vr/+t/VXEMw7TYSL70OQLyezphNznhfBnwWoM70wrPXnEhjHe14J3
+         Fd7NoZDxJrRT1LucwT8j5jgDfa4cW16n9wXSlX150NwZAF6SHygTOM1Sezc1pfuaOtVv
+         iVuLq1LEg94Pjik2DbP6MZBWrMHGmQoRtEuArrtn+r7cT/VAq3LXWSgVSsnm0xfa2ymZ
+         gySSqGhRi2tge9HRulU/Xnt77cHVGmA5/rqLtq8A/5TweCiPYsuKjmt3QcMrUnVf17AC
+         bX9w==
+X-Gm-Message-State: AOJu0YyDGJKNXZ3L4YA8D8N+546drilvjb+I/uBBO+hRazQHBGfaf9iP
+	Ne9utuDTraqP74b1o10vLTs=
+X-Google-Smtp-Source: AGHT+IH3nqShraHW1QykxqsIbDujWXOJ/I+HVxV6vLUEpulinhiUthzPAgbnooun2fEsW0kJTzdWXA==
+X-Received: by 2002:a05:6512:3b87:b0:508:264e:2ded with SMTP id g7-20020a0565123b8700b00508264e2dedmr3889979lfv.38.1700860205071;
+        Fri, 24 Nov 2023 13:10:05 -0800 (PST)
+Received: from localhost.localdomain (109-252-174-150.dynamic.spd-mgts.ru. [109.252.174.150])
+        by smtp.gmail.com with ESMTPSA id e15-20020a19690f000000b0050919538b00sm619326lfc.79.2023.11.24.13.10.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 13:10:04 -0800 (PST)
+From: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+To: Sunil Goutham <sgoutham@marvell.com>
+Cc: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net] octeontx2-af: Fix possible buffer overflow
+Date: Sat, 25 Nov 2023 00:08:02 +0300
+Message-Id: <20231124210802.109763-1-elena.salomatkina.cmc@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQKg7-T_g7CFRs62ZDFyR9z=FTxfyXyTe=3_ojGpnvxJ4w@mail.gmail.com>
 
-Hi Alexei,
+A loop in rvu_mbox_handler_nix_bandprof_free() contains
+a break if (idx == MAX_BANDPROF_PER_PFFUNC),
+but if idx may reach MAX_BANDPROF_PER_PFFUNC
+buffer '(*req->prof_idx)[layer]' overflow happens before that check.
 
-On Wed, Nov 22, 2023 at 03:28:16PM -0800, Alexei Starovoitov wrote:
-> On Wed, Nov 22, 2023 at 10:21 AM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> >
-> > +
-> > +       bpf_printk("replay-window %d\n", x->replay_esn->replay_window);
-> 
-> Pls no printk in tests. Find a different way to validate.
+The patch moves the break to the
+beginning of the loop.
 
-Ack. I'll migrate the ipsec tunnel tests to test_progs next rev so it
-can use mmaped globals.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Thanks,
-Daniel
+Fixes: e8e095b3b370 ("octeontx2-af: cn10k: Bandwidth profiles config support").
+Signed-off-by: Elena Salomatkina <elena.salomatkina.cmc@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 23c2f2ed2fb8..c112c71ff576 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -5505,6 +5505,8 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
+ 
+ 		ipolicer = &nix_hw->ipolicer[layer];
+ 		for (idx = 0; idx < req->prof_count[layer]; idx++) {
++			if (idx == MAX_BANDPROF_PER_PFFUNC)
++				break;
+ 			prof_idx = req->prof_idx[layer][idx];
+ 			if (prof_idx >= ipolicer->band_prof.max ||
+ 			    ipolicer->pfvf_map[prof_idx] != pcifunc)
+@@ -5518,8 +5520,6 @@ int rvu_mbox_handler_nix_bandprof_free(struct rvu *rvu,
+ 			ipolicer->pfvf_map[prof_idx] = 0x00;
+ 			ipolicer->match_id[prof_idx] = 0;
+ 			rvu_free_rsrc(&ipolicer->band_prof, prof_idx);
+-			if (idx == MAX_BANDPROF_PER_PFFUNC)
+-				break;
+ 		}
+ 	}
+ 	mutex_unlock(&rvu->rsrc_lock);
+-- 
+2.34.1
+
 
