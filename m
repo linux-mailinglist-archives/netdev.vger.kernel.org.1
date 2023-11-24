@@ -1,125 +1,166 @@
-Return-Path: <netdev+bounces-50859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2734E7F755D
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:38:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DF87F7568
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 14:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D799B281FAC
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:38:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D318281F84
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10C9286BF;
-	Fri, 24 Nov 2023 13:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A7B28E20;
+	Fri, 24 Nov 2023 13:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="mbD6rW59"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECADB1B5;
-	Fri, 24 Nov 2023 05:38:00 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0Vx1k4.u_1700833077;
-Received: from 30.221.129.111(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vx1k4.u_1700833077)
-          by smtp.aliyun-inc.com;
-          Fri, 24 Nov 2023 21:37:58 +0800
-Message-ID: <fe82ab3e-fa7f-245b-d7a1-434f30a6c6d4@linux.alibaba.com>
-Date: Fri, 24 Nov 2023 21:37:56 +0800
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC5A93;
+	Fri, 24 Nov 2023 05:40:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+	s=s31663417; t=1700833234; x=1701438034; i=wahrenst@gmx.net;
+	bh=wDCiSJTXhXpQsFxIqaxtzqUh0f8rh9J+42vGz//6r3g=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=mbD6rW591axLO9nG6RjUecFaWGmMuTdFBcXjDnx8A+sMTuj6ZJm6lPKjPJMJuoPG
+	 cQ0ymjXO19HnByg2TcbooCQMQDe4aFd0INX02weL7dgSIuhmG90qvEKoikqHokh9c
+	 FL3rmSd4LcVR1uxzYIHO7YMroVHWCeN4YxjQCiyFJgdVScWvHxXy7kPBvAsQ5z+Vf
+	 LEI6ayHelbGrMKTLKtXH6NgJidsEDHO+s513YT8D1YL6bi9bz5Iu8xBRFwwoMiDBB
+	 YFQ3lCdX8PfOmMnIlHKDqIT2bnXeBZqHIm9e88A8RjZkydRIRGyWl2JgGWE7XIGcx
+	 QjSWkIK6GmPqYcEq4Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mqb1c-1rbAHK2b8y-00meq2; Fri, 24
+ Nov 2023 14:40:34 +0100
+Message-ID: <d4385cad-41e2-4adc-99b1-45a5b75a2ad5@gmx.net>
+Date: Fri, 24 Nov 2023 14:40:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 0/7] net/smc: implement SMCv2.1 virtual ISM
- device support
-From: Wen Gu <guwen@linux.alibaba.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4 net] qca_spi: Fix SPI thread creation
+To: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
- <30b53b21-40ad-407a-bef7-ddc28f8978e2@linux.ibm.com>
- <83d3784e-1fed-36b6-22a8-52995fac429e@linux.alibaba.com>
-In-Reply-To: <83d3784e-1fed-36b6-22a8-52995fac429e@linux.alibaba.com>
+References: <20231121163004.21232-1-wahrenst@gmx.net>
+ <20231121163004.21232-2-wahrenst@gmx.net>
+ <5327988fc5d02f3352be66b5f0a2ca9a468ef1da.camel@redhat.com>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <5327988fc5d02f3352be66b5f0a2ca9a468ef1da.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:DOYujk5KfdaYRyp81U2Y1DK6veGK5ZiNBC/FBsxTxudFRfwtFvj
+ O5RdCgz8/qaP92o9SEfJ360pINm5m03oUL5ETTRIKmXg/y+XAXLDjFj5lNdFvmOU1v+ccA2
+ nV1yNrR9pS7pyUo3ZQJ2AG58I3WqUaVem7gDHpjFkDd3FDcruOJPMeRhJ65KRiA6A32oygB
+ uYZyBphMSbVNKtEdeSVPQ==
+UI-OutboundReport: notjunk:1;M01:P0:xFBEfOC/kqE=;PB3XY0Mnx/3uowLtM/iMpiY5kva
+ 1o9dLlQvXukvrJvwcp5afFJKgZDczmqWRUPS/rybM8hjRcHAKh86pJO1bcA948/RCYKYtlzXR
+ oR/LXs+R7K7VoxOdicqj4qTBeBHaVO2NQvYQ8JMDDS/G5i4QMQJjprKFtMf5uNDwiXRk9Ilh2
+ EoYj8v4ICvBO6DXDgLbW42Ib5UPoxGdHTu8mO0Smy0bqxmIqJRwSBTaVjKwhfvs3O8zoFTIOR
+ TXjvwRolxYqonyf7kHkhr+9b+ZJDEuVSJdFMKpxe1jmCYo6ir3Jlu3s7r4j7/1pLJ0HboiuFW
+ X5Guq3E6C6Djg4PtmnhHkgca4N3xxYJUlPG/I2JV1ubCTkHWMf5mAzVCPwLvQFM2rG9VosWne
+ UV+RtwwDcLIGvguSiaSqKnsY5zxLfV/XC/v+lHpg8lv0hljDAPaYmRH2Tt4QGPXUwlBO605MB
+ JBG/ixuoV7J8TlrYlA2hxtv0UmztIz4I1PVyASKH77tf2sFV8Rr0SBjMBdHqndTIxPu9bpYbo
+ Ug3OatU92DmNQjFfyddiHDKnTyWaXY0tnUrGQCC3dvKXNRSu1jdX5vsEIBHU1HeNaJrgCGZ6R
+ w4yFXNai/4KH0YXTkFYRg1pjhV5g/1elX9kAs0d9x6F4+r52PFi765JKua9naP/rMMgM3zjmr
+ ldA9TrHtA/8qOvYzBeDGQfWH+XYW+4yecpM134sdbwytWiQ0hSskAs6jIHL1xwrH6d7hfZj58
+ NikjFPZWac8XLypXQ1AJWroj9z46mcb5Zv7sstgsPqHX/D0QUvz+aJDh13FOx16SQsa95Cq0K
+ l6hNrqCJVgOZyoy/zTnxrKLQhDFZRv5gd7JzK1J10N9yO0C009XqQ2c57PotzAtRmwEZ73EgA
+ TVmtzUxEWgBypJkVOLNeXjifGum4GZlHry5RMPNDGjLmwYW7lWgZ2kj1B3SEUHrxWSDDmfq+V
+ qJ2L+w==
 
+Hi Paolo,
 
+Am 23.11.23 um 12:26 schrieb Paolo Abeni:
+> On Tue, 2023-11-21 at 17:30 +0100, Stefan Wahren wrote:
+>> The qca_spi driver create/stop the SPI kernel thread in case
+>> of netdev_open/close. This is a big issue because it allows
+>> userspace to prevent from restarting the SPI thread after
+>> ring parameter changes (e.g. signals which stop the thread).
+>> This could be done by terminating a script which changes
+>> the ring parameter in a loop.
+>>
+>> So fix this by moving create/stop of the SPI kernel into
+>> the init/uninit ops. The open/close ops could be realized just
+>> by 'park/unpark' the SPI kernel thread.
+>>
+>> Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for Q=
+CA7000")
+>> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+>> ---
+>>   drivers/net/ethernet/qualcomm/qca_spi.c | 35 ++++++++++++++++--------=
+-
+>>   1 file changed, 23 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/ethe=
+rnet/qualcomm/qca_spi.c
+>> index bec723028e96..b11a998b2456 100644
+>> --- a/drivers/net/ethernet/qualcomm/qca_spi.c
+>> +++ b/drivers/net/ethernet/qualcomm/qca_spi.c
+>> @@ -580,6 +580,11 @@ qcaspi_spi_thread(void *data)
+>>   	netdev_info(qca->net_dev, "SPI thread created\n");
+>>   	while (!kthread_should_stop()) {
+>>   		set_current_state(TASK_INTERRUPTIBLE);
+>> +		if (kthread_should_park()) {
+>> +			kthread_parkme();
+>> +			continue;
+>> +		}
+>> +
+>>   		if ((qca->intr_req =3D=3D qca->intr_svc) &&
+>>   		    !qca->txr.skb[qca->txr.head])
+>>   			schedule();
+>> @@ -679,25 +684,17 @@ qcaspi_netdev_open(struct net_device *dev)
+>>   	qca->sync =3D QCASPI_SYNC_UNKNOWN;
+>>   	qcafrm_fsm_init_spi(&qca->frm_handle);
+>>
+>> -	qca->spi_thread =3D kthread_run((void *)qcaspi_spi_thread,
+>> -				      qca, "%s", dev->name);
+>> -
+>> -	if (IS_ERR(qca->spi_thread)) {
+>> -		netdev_err(dev, "%s: unable to start kernel thread.\n",
+>> -			   QCASPI_DRV_NAME);
+>> -		return PTR_ERR(qca->spi_thread);
+>> -	}
+>> -
+>>   	ret =3D request_irq(qca->spi_dev->irq, qcaspi_intr_handler, 0,
+>>   			  dev->name, qca);
+>>   	if (ret) {
+>>   		netdev_err(dev, "%s: unable to get IRQ %d (irqval=3D%d).\n",
+>>   			   QCASPI_DRV_NAME, qca->spi_dev->irq, ret);
+>> -		kthread_stop(qca->spi_thread);
+>>   		return ret;
+>>   	}
+>>
+>>   	/* SPI thread takes care of TX queue */
+>> +	kthread_unpark(qca->spi_thread);
+>> +	wake_up_process(qca->spi_thread);
+> The above looks racy: after 'request_irq()' the interrupt handler can
+> raise an irq before the thread being unparked.
+yes fixing the whole resource allocation issue requires patch 1 and 2
+applied, which should avoid the race. But i didn't want to combine both
+patches to keep it applicable for stable. My thought was that 2 smaller
+patches are more acceptable than a big one.
 
-On 2023/11/24 21:34, Wen Gu wrote:
-> 
-> 
-> On 2023/11/24 21:11, Wenjia Zhang wrote:
->>
->>
->> On 19.11.23 14:57, Wen Gu wrote:
->>> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
->>> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
->>> OS or hypervisor software, comparable to IBM ISM which is based on platform
->>> firmware or hardware.
->>>
->>> With the introduction of virtual ISM, SMCv2.1 makes some updates:
->>>
->>> - Introduce feature bitmask to indicate supplemental features.
->>> - Reserve a range of CHIDs for virtual ISM.
->>> - Support extended GIDs (128 bits) in CLC handshake.
->>>
->>> So this patch set aims to implement these updates in Linux kernel. And it
->>> acts as the first part of the new version of [1].
->>>
->>> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->>>
->>> Wen Gu (7):
->>>    net/smc: Rename some variable 'fce' to 'fce_v2x' for clarity
->>>    net/smc: support SMCv2.x supplemental features negotiation
->>>    net/smc: introduce virtual ISM device support feature
->>>    net/smc: define a reserved CHID range for virtual ISM devices
->>>    net/smc: compatible with 128-bits extend GID of virtual ISM device
->>>    net/smc: disable SEID on non-s390 archs where virtual ISM may be used
->>>    net/smc: manage system EID in SMC stack instead of ISM driver
->>>
->>>   drivers/s390/net/ism.h     |  6 ---
->>>   drivers/s390/net/ism_drv.c | 54 +++++++--------------------
->>>   include/linux/ism.h        |  1 -
->>>   include/net/smc.h          | 16 +++++---
->>>   net/smc/af_smc.c           | 68 ++++++++++++++++++++++++++-------
->>>   net/smc/smc.h              |  7 ++++
->>>   net/smc/smc_clc.c          | 93 ++++++++++++++++++++++++++++++++--------------
->>>   net/smc/smc_clc.h          | 22 +++++++----
->>>   net/smc/smc_core.c         | 30 ++++++++++-----
->>>   net/smc/smc_core.h         |  8 ++--
->>>   net/smc/smc_diag.c         |  7 +++-
->>>   net/smc/smc_ism.c          | 57 ++++++++++++++++++++--------
->>>   net/smc/smc_ism.h          | 31 +++++++++++++++-
->>>   net/smc/smc_pnet.c         |  4 +-
->>>   14 files changed, 269 insertions(+), 135 deletions(-)
->>>
->>
->> Hi Wen Gu,
->>
->> Just FYI, the review is still on going and some tests on our plateform still need to do. I'll give you my comments as 
->> soon as the testing is done. I think it would be at the beginning of next week.
->>
->> Thanks,
->> Wenjia
-> 
-> Hi Wenjian,
-Wenjia.
+Should i squash them?
 
-Sorry for the typo.
+My concern is about the amount of affected devices. The QCA7000 is used
+mostly in EV charging stations and EVs. I don't how many of them use
+this driver.
 
-> 
-> Thank you very much. I appreciate that you help to test them on your platform since I can only test
-> them with loopback-ism.
-> 
-> And I am going to send a new version which is rebased to the latest net-next and fix two existing
-> comments. If the current tests have not started yet, could you please test based on my upcoming v2 ?
-> 
-> Thanks and regards,
-> Wen Gu
+> Additionally I think you can drop the 'if (qca->spi_thread)' in
+> qcaspi_intr_handler()
+Thanks i will check that for the next version.
+>
+> Cheers,
+>
+> Paolo
+>
+
 
