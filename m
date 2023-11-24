@@ -1,167 +1,152 @@
-Return-Path: <netdev+bounces-50698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DE67F6BD3
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:51:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B847F6C48
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:23:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8C2B281826
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 05:51:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C91341C20829
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 06:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B141B3D92;
-	Fri, 24 Nov 2023 05:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401E85247;
+	Fri, 24 Nov 2023 06:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4G6ZEfi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5D81D6F;
-	Thu, 23 Nov 2023 21:51:35 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0Vx0Jq84_1700805092;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vx0Jq84_1700805092)
-          by smtp.aliyun-inc.com;
-          Fri, 24 Nov 2023 13:51:33 +0800
-Date: Fri, 24 Nov 2023 13:51:32 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
-	jaka@linux.ibm.com, kgraul@linux.ibm.com, corbet@lwn.net,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com
-Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net/smc: add sysctl for max conns per lgr
- for SMC-R v2.1
-Message-ID: <20231124055132.GK3323@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
- <20231122135258.38746-3-guangguan.wang@linux.alibaba.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976B3D64
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 22:23:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700806999;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eBsn2i0nliFo+phWtl46j5XfLoBPy3pcywVKmodl4XE=;
+	b=D4G6ZEfiI7sb7Q1opI0dF4se4oWNvD6soqIsEnaOACGZUZQXUBZ0x8GJigDYTT+2aNiDYp
+	opKEwQs9jPCFjBolRMKhwC1sS0I+Suas7pVNznWHIUdJERZarJbZY80SbIvrMNRoECQIRl
+	GflyqdllodmjuKQIdf6THPq8LtEhjlk=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-335-iIoXWwH-NBunff5-zP2q7A-1; Fri, 24 Nov 2023 01:23:17 -0500
+X-MC-Unique: iIoXWwH-NBunff5-zP2q7A-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b99999614bso1595640a12.0
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 22:23:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700806996; x=1701411796;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eBsn2i0nliFo+phWtl46j5XfLoBPy3pcywVKmodl4XE=;
+        b=qrIRitG0y87D9QRGsmlY2ZTVemkM9smN/QtiYCC9rgrbVuPdmpEK5gpDaW34mQeBCn
+         qkWLIzcuq6fNG6hvz9qJvtNZ9rr7vvKd/RiT4lF59vxevq7ty/onDP5BbTEpjpOi4JRT
+         Qfa9hyPKLlxOdF+d4/w6a91IJDPTE+jUyFw6iz8ENeTOjpBxZZAS0FFGts6KTCOU6fQZ
+         Aip/hCtYAPUc3+cVIm4p5+Nn06QrdddBLjMyX26umFpBuCy1WlrqhU+K++snuq0SU94r
+         1NfSSE/KS1rwipg/K4hmjW2epYokZEV6G1a2hWu1akC090s2RCixQMbBkQckW2N6Li0w
+         ZFbg==
+X-Gm-Message-State: AOJu0YyiFpY33+2oUOELrnALkiKPiIHJBYwYnRcFPvL5Adlp+h1el96V
+	Dk66ZPPDjR6aD1Dx8ac2O9vCwoRzx9A+z4TD+BvgTieBP82mFm/SruQ2LL6A0D2kkTZgB8uZ6hz
+	nYmgqfPPXcJuR5NGgTRBvEFVkzwCCa19+
+X-Received: by 2002:a05:6a21:2711:b0:187:8eca:8dc6 with SMTP id rm17-20020a056a21271100b001878eca8dc6mr1882343pzb.34.1700806996659;
+        Thu, 23 Nov 2023 22:23:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHurVLY0iGJEBlzGiDzqMf52lCg1ORWNYsJKiEEd38ufrVuquai65EsJ4/P9zUrgJnhnYuiGXQnp1IxQ0PULu8=
+X-Received: by 2002:a05:6a21:2711:b0:187:8eca:8dc6 with SMTP id
+ rm17-20020a056a21271100b001878eca8dc6mr1882334pzb.34.1700806996387; Thu, 23
+ Nov 2023 22:23:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122135258.38746-3-guangguan.wang@linux.alibaba.com>
+References: <20231123183835.635210-1-mkp@redhat.com> <655fc32bb506e_d14d4294b3@willemb.c.googlers.com.notmuch>
+ <CAHcdBH7h-sq=Gzkan1du3uxx44WibK0yzdnUcZCuw-mp=9OxOg@mail.gmail.com> <655fe8e5b5cf5_d9fc5294a0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <655fe8e5b5cf5_d9fc5294a0@willemb.c.googlers.com.notmuch>
+From: Mike Pattrick <mkp@redhat.com>
+Date: Fri, 24 Nov 2023 01:23:04 -0500
+Message-ID: <CAHcdBH4aMJwkR7fVP=Brwb-4=gon-pwh0CbjbFxsoEiGj4XjVA@mail.gmail.com>
+Subject: Re: [PATCH net-next] packet: Account for VLAN_HLEN in csum_start when
+ virtio_net_hdr is enabled
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 22, 2023 at 09:52:58PM +0800, Guangguan Wang wrote:
->Add a new sysctl: net.smc.smcr_max_conns_per_lgr, which is
->used to control the preferred max connections per lgr for
->SMC-R v2.1. The default value of this sysctl is 255, and
->the acceptable value ranges from 16 to 255.
+On Thu, Nov 23, 2023 at 7:06=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
->Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
->---
-> Documentation/networking/smc-sysctl.rst |  6 ++++++
-> include/net/netns/smc.h                 |  1 +
-> net/smc/smc_clc.c                       |  5 +++--
-> net/smc/smc_sysctl.c                    | 12 ++++++++++++
-> net/smc/smc_sysctl.h                    |  1 +
-> 5 files changed, 23 insertions(+), 2 deletions(-)
+> Mike Pattrick wrote:
+> > On Thu, Nov 23, 2023 at 4:25=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Mike Pattrick wrote:
+> > > > Af_packet provides checksum offload offsets to usermode application=
+s
+> > > > through struct virtio_net_hdr when PACKET_VNET_HDR is enabled on th=
+e
+> > > > socket. For skbuffs with a vlan being sent to a SOCK_RAW socket,
+> > > > af_packet will include the link level header and so csum_start need=
+s
+> > > > to be adjusted accordingly.
+> > >
+> > > Is this patch based on observing an incorrect offset in a workload,
+> > > or on code inspection?
+> >
+> > Based on an incorrect offset in a workload. The setup involved sending
+> > vxlan traffic though a veth interface configured with a vlan. The
+> > vnet_hdr's csum_start value was off by 4, and this problem went away
+> > when the vlan was removed.
+> >
+> > I'll take another look at this patch.
 >
->diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
->index c6ef86ef4c4f..a874d007f2db 100644
->--- a/Documentation/networking/smc-sysctl.rst
->+++ b/Documentation/networking/smc-sysctl.rst
->@@ -65,3 +65,9 @@ smcr_max_links_per_lgr - INTEGER
-> 	for SMC-R v2.1 and later.
-> 
-> 	Default: 2
->+
->+smcr_max_conns_per_lgr - INTEGER
->+	Controls the max number of connections can be added to a SMC-R link group. The
->+	acceptable value ranges from 16 to 255. Only for SMC-R v2.1 and later.
->+
->+	Default: 255
->diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
->index da7023587824..fc752a50f91b 100644
->--- a/include/net/netns/smc.h
->+++ b/include/net/netns/smc.h
->@@ -23,5 +23,6 @@ struct netns_smc {
-> 	int				sysctl_wmem;
-> 	int				sysctl_rmem;
-> 	int				sysctl_max_links_per_lgr;
->+	int				sysctl_max_conns_per_lgr;
-> };
-> #endif
->diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->index 1f87c8895a27..0fda5156eef0 100644
->--- a/net/smc/smc_clc.c
->+++ b/net/smc/smc_clc.c
->@@ -944,7 +944,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
-> 	}
-> 	if (smcr_indicated(ini->smc_type_v2)) {
-> 		memcpy(v2_ext->roce, ini->smcrv2.ib_gid_v2, SMC_GID_SIZE);
->-		v2_ext->max_conns = SMC_CONN_PER_LGR_PREFER;
->+		v2_ext->max_conns = net->smc.sysctl_max_conns_per_lgr;
-> 		v2_ext->max_links = net->smc.sysctl_max_links_per_lgr;
-> 	}
-> 
->@@ -1191,7 +1191,8 @@ int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
-> 		return SMC_CLC_DECL_NOV2EXT;
-> 
-> 	if (ini->smcr_version & SMC_V2) {
->-		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns, SMC_CONN_PER_LGR_PREFER);
->+		ini->max_conns = min_t(u8, pclc_v2_ext->max_conns,
->+				       net->smc.sysctl_max_conns_per_lgr);
-> 		if (ini->max_conns < SMC_CONN_PER_LGR_MIN)
-> 			return SMC_CLC_DECL_MAXCONNERR;
-> 
->diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
->index 3e9bb921e40a..a5946d1b9d60 100644
->--- a/net/smc/smc_sysctl.c
->+++ b/net/smc/smc_sysctl.c
->@@ -27,6 +27,8 @@ static const int net_smc_wmem_init = (64 * 1024);
-> static const int net_smc_rmem_init = (64 * 1024);
-> static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
-> static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
->+static int conns_per_lgr_min = SMC_CONN_PER_LGR_MIN;
->+static int conns_per_lgr_max = SMC_CONN_PER_LGR_MAX;
-> 
-> static struct ctl_table smc_table[] = {
-> 	{
->@@ -79,6 +81,15 @@ static struct ctl_table smc_table[] = {
-> 		.extra1		= &links_per_lgr_min,
-> 		.extra2		= &links_per_lgr_max,
-> 	},
->+	{
->+		.procname	= "smcr_max_conns_per_lgr",
->+		.data		= &init_net.smc.sysctl_max_conns_per_lgr,
->+		.maxlen		= sizeof(int),
->+		.mode		= 0644,
->+		.proc_handler	= proc_dointvec_minmax,
->+		.extra1		= &conns_per_lgr_min,
->+		.extra2		= &conns_per_lgr_max,
->+	},
-> 	{  }
-> };
-> 
->@@ -109,6 +120,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
-> 	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
-> 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
-> 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->+	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-> 
-> 	return 0;
-> 
->diff --git a/net/smc/smc_sysctl.h b/net/smc/smc_sysctl.h
->index 5783dd7575dd..eb2465ae1e15 100644
->--- a/net/smc/smc_sysctl.h
->+++ b/net/smc/smc_sysctl.h
->@@ -24,6 +24,7 @@ static inline int smc_sysctl_net_init(struct net *net)
-> {
-> 	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
-> 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->+	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-> 	return 0;
-> }
-> 
->-- 
->2.24.3 (Apple Git-128)
+> This is a vlan device on top of a veth device? On which device and at
+> which point (ingress or egress) are you receiving the packet over the
+> packet socket?
+
+Just for maximum clarity I'll include the extracted commands below,
+but roughly there is a vlan device on top of a vxlan device on top of
+a vlan device on top of a veth, in a namespace.
+
+ip netns add at_ns0
+ip netns exec at_ns0 ip link add dev at_vxlan1 type vxlan remote
+172.31.1.100 id 0 dstport 4789
+ip netns exec at_ns0 ip addr add dev at_vxlan1 10.2.1.1/24
+ip netns exec at_ns0 ip link set dev at_vxlan1 mtu 1450 up
+ip link add p0 type veth peer name ovs-p0
+ethtool -K p0 sg on
+ethtool -K p0 tso on
+ip link set p0 netns at_ns0
+ip link set dev ovs-p0 up
+ip netns exec at_ns0 ip addr add "172.31.2.1/24" dev p0
+ip netns exec at_ns0 ip link set dev p0 up
+ip netns exec at_ns0 ip link add link at_vxlan1 name at_vxlan1.100
+type vlan proto 802.1q id 100
+ip netns exec at_ns0 ip link set dev at_vxlan1.100 up
+ip netns exec at_ns0 ip addr add dev at_vxlan1.100 "10.1.1.1/24"
+ip netns exec at_ns0 ip link add link p0 name p0.42 type vlan proto 802.1q =
+id 42
+ip netns exec at_ns0 ip link set dev p0.42 up
+ip netns exec at_ns0 ip addr add dev p0.42 "172.31.1.1/24"
+ip addr add "172.31.1.100/24" dev p0
+ip link set dev p0 up
+ip netns exec at_ns0 ping 10.1.1.100
+
+An AF_PACKET socket on ovs-p0 receives the incorrect csum_start.
+Setting up the same with a geneve tunnel and udpcsum enabled produces
+the same result. Removing vlan 100 also yields an incorrect
+csum_start. Removing only vlan 42 yields a correct csum_start.
+
+>
+> From a quick glance, in all cases that I see the VLAN tag is kept in
+> skb->vlan_tci, so is never part of the packet payload.
+>
+> But checksum offload with VXLAN can be non-trivial on its own. If
+> type & SKB_GSO_UDP_TUNNEL_CSUM | SKB_GSO_TUNNEL_REMCSUM, say. Then
+> csum_start will point to the checksum in vxlanhdr.
+>
+
 
