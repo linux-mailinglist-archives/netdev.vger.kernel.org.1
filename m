@@ -1,128 +1,100 @@
-Return-Path: <netdev+bounces-50810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31657F739A
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:16:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D4A7F739E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 207E91C20B3A
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:16:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60CB22813C0
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0933223772;
-	Fri, 24 Nov 2023 12:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799C62420B;
+	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WTgvnMJv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEr44iVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C47ED43;
-	Fri, 24 Nov 2023 04:16:50 -0800 (PST)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOBGhDj029458;
-	Fri, 24 Nov 2023 12:16:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=x0wjk3MKmZ8cJhls3+GqwgXkgqe2DTRqgyUmRe/fqfg=;
- b=WTgvnMJvgX5GlG0X7GxqOlexpp8UnJ/t53dGprcuMTba3iXwk7yqDHGDndP90DiPAT19
- 4kcOOy/pitFejCxPTgZEEMXMp4k+dIEipuEso5MC+C08c6oabe7UcfwKel3oJMUwOzZr
- 46YjkgzSH4ZCBdzGYKYWUryShHYGxkn2fAAKB8O+ET8fMPkh6zN5CTDBxMtVXFhnhDEl
- bL/gsaw6mt0v8R/Cl/q12l27TvixFf0aQx8c+9rKeKiSHLXH4gYO1A8n4siPge5nshcX
- E/46g9ApUYi0gF8tGIvMYmfbMjw69gsjdSDT1v1RfUh3jbN7CnqO1YPgGlw3wV2edXTy Qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtm11ktd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:16:38 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AOBGkYo030326;
-	Fri, 24 Nov 2023 12:16:38 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtm11kt3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:16:38 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOC4Kv2031812;
-	Fri, 24 Nov 2023 12:16:37 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf8kpdfy1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 24 Nov 2023 12:16:37 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AOCGZv128508704
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 24 Nov 2023 12:16:35 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6A43920043;
-	Fri, 24 Nov 2023 12:16:35 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2C11020040;
-	Fri, 24 Nov 2023 12:16:35 +0000 (GMT)
-Received: from [9.171.54.2] (unknown [9.171.54.2])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 24 Nov 2023 12:16:35 +0000 (GMT)
-Message-ID: <7aca0393-0369-4d03-bbb7-074c9e5ec1d3@linux.ibm.com>
-Date: Fri, 24 Nov 2023 13:16:34 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net/smc: remove unneeded atomic operations in
- smc_tx_sndbuf_nonempty
-To: Li RongQing <lirongqing@baidu.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, dust.li@linux.alibaba.com
-References: <20231123014537.9786-1-lirongqing@baidu.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20231123014537.9786-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BJ85FzkyB7560sVriFkrtmgNf1InTYIf
-X-Proofpoint-ORIG-GUID: CEDOgAARI7unDWRci_6GSWJnGBpHGNn1
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487F1241F7;
+	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 12FDCC433C8;
+	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700828430;
+	bh=UFRH5rcaYhZTd94yrrbN6G28EYOXdfnM0jmlWUNt8pU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gEr44iVTRfWKOQDVQcfmYm08HPPfNsxr2dfuQqiU4GzoS4CqqHHUsJxpIUYOTBKYC
+	 Bl/jg0HPxVoGmTB06yljv2G5UruHye7pRs6z+El+LaDoT1UFYM2m5LJgdVD0+eNJ8l
+	 6n8bFCjAu6qmPi0dPg98OUX4zafydY/P5eIikXq/96hZzUfYeEpmYOlwz2ypnUMZYD
+	 JsCFGvVLs6QJI5S4Bd0ubbltqPRm4qUGugZgTNCnjNfEfaoFX0PE1Be2+g5H0vpiAg
+	 EUh7GF284JV7/3GxMzdbecml5mrJtP/l8GgQ6Hu/aaEn/MOohuUgeZ7i7xiNjvfMWX
+	 9wLWEBpKhlVnw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F05E5E29F40;
+	Fri, 24 Nov 2023 12:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 bulkscore=0 malwarescore=0 mlxlogscore=912
- priorityscore=1501 adultscore=0 clxscore=1015 phishscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311240095
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] net: ipa: add IPA v5.5 support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170082842997.28500.2650195064099739924.git-patchwork-notify@kernel.org>
+Date: Fri, 24 Nov 2023 12:20:29 +0000
+References: <20231122230909.895482-1-elder@linaro.org>
+In-Reply-To: <20231122230909.895482-1-elder@linaro.org>
+To: Alex Elder <elder@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andersson@kernel.org, konrad.dybcio@linaro.org,
+ agross@kernel.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, mka@chromium.org, quic_cpratapa@quicinc.com,
+ quic_avuyyuru@quicinc.com, quic_jponduru@quicinc.com,
+ quic_subashab@quicinc.com, elder@kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 23.11.23 02:45, Li RongQing wrote:
-> The commit dcd2cf5f2fc0 ("net/smc: add autocorking support") adds an
-> atomic variable tx_pushing in smc_connection to make sure only one can
-> send to let it cork more and save CDC slot. since smc_tx_pending can be
-> called in the soft IRQ without checking sock_owned_by_user() at that
-> time, which would cause a race condition because bh_lock_sock() did
-> not honor sock_lock()
+On Wed, 22 Nov 2023 17:09:04 -0600 you wrote:
+> This series adds IPA support for the Qualcomm SM8550 SoC, which uses
+> IPA v5.5.
 > 
-> After commit 6b88af839d20 ("net/smc: don't send in the BH context if
-> sock_owned_by_user"), the transmission is deferred to when sock_lock()
-> is held by the user. Therefore, we no longer need tx_pending to hold
-> message.
+> The first patch adds a new compatible string for the SM8550.  The
+> second cleans up "ipa_reg.h" a bit for consistency.  The third patch
+> adds definitions and some minor code changes related to IPA v5.5.
+> The fourth defines IPA register offsets and fields used for IPA
+> v5.0; most--but not all--register definitions are the same as used
+> in IPA v5.0.  The final patch adds configuration data used for IPA
+> v5.5 (here again this mostly duplicates IPA v5.0 definitions).
 > 
-> So remove atomic variable tx_pushing and its operation, and
-> smc_tx_sndbuf_nonempty becomes a wrapper of __smc_tx_sndbuf_nonempty,
-> so rename __smc_tx_sndbuf_nonempty back to smc_tx_sndbuf_nonempty
-> 
-> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-> Co-developed-by: Dust Li <dust.li@linux.alibaba.com>
-> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
+> [...]
 
-Looks good to me.
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Here is the summary with links:
+  - [net-next,1/5] dt-bindings: net: qcom,ipa: add SM8550 compatible
+    https://git.kernel.org/netdev/net-next/c/dd043b393c85
+  - [net-next,2/5] net: ipa: update IPA version comments in "ipa_reg.h"
+    https://git.kernel.org/netdev/net-next/c/b134b10cf5bb
+  - [net-next,3/5] net: ipa: prepare for IPA v5.5
+    https://git.kernel.org/netdev/net-next/c/b00e190cc200
+  - [net-next,4/5] net: ipa: add IPA v5.5 register definitions
+    https://git.kernel.org/netdev/net-next/c/1bfeafabcd5e
+  - [net-next,5/5] net: ipa: add IPA v5.5 configuration data
+    https://git.kernel.org/netdev/net-next/c/7c5929407620
 
-However I think this time you did not use scripts/get_maintainer.pl [1]
-to determine the correct recipient list for this email.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-[1] https://www.kernel.org/doc/html/v6.3/process/submitting-patches.html#submittingpatches
+
 
