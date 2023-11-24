@@ -1,184 +1,147 @@
-Return-Path: <netdev+bounces-50777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA747F7166
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:28:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA3C7F71AF
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:40:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501F71C20ED5
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:28:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8B4281D5F
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD9C19BD1;
-	Fri, 24 Nov 2023 10:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0525A14F8B;
+	Fri, 24 Nov 2023 10:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qMF8rF/j"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DYcv1TwT"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CABC41B6
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:28:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T7gjoTDIUO88n88ULgZxhQpgkZYSLTxGzrnTH2EMl70BKw7rGMzlmGegqfn7GDlsgtErqZRTSL+sHrm7UV4Ceo59lQDF3W5sbjGvYLQbaIJAITMOy07iXkCxCHGM7PrcvTMOUuEAgn/lzI67YilWmXh+/dfpxbqeBrgGagk4J5GqLDvZGRdZ091mRekK/0I56+jY0rqFvttail7GSkldBhl43bezoNSAWDRCgAegIFlzqZuQxUF5LwVPFk0o8xpjz5+1S2rOYSBp6wUFLcGCPWgIIhfI8sIWjMHmMsnhyMLR2VfErctOuA62uyaniNbwLISNqLjktP36C8EgrvX2eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PmSMA/EVv93KJfmF8lrOZLwVdQZyB5RC+o/iViiPK+A=;
- b=L0w2A22HLp3hNIHOl6I2nE3dS+TXI2XNtXSM/7MOYDoSzR6nonpNH0AM2MDuQo1/ZfLWDHp62NbWYrYHo5woJfKSSLXQN1eURr2xGV7vktoPa5FgjRFUxbF6p4DPFJoQkKwzuCQ52z4ZJQxiiroZjpKILPmKJkOp6pSQsAQFvFGV+j8+ULIgXdXBjmW5M0qFVPhyrF0maeWHi+t5rNfnW7nOPREak+tapDk6YKjR/iuWq3d3O2xyXoimgrTK3/qesMFkhJj1tFf3NDAA85j1kjuxHPzi/UZ81SnlKi2WTaW3gwAqboahDeJJuYCggE32WKNAfOCOiEkRa4Vu93Fl6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PmSMA/EVv93KJfmF8lrOZLwVdQZyB5RC+o/iViiPK+A=;
- b=qMF8rF/jQ4Z97umifATppXqgN1AuOpF9FNJnJ3vMBIczw0Ujax/h8S8uIGEsnOqELtHJhb0V+UxqeC2XjJ0KGSMSjr6aNXRoBJKpZH2b9cTMc90fccOvKAXCJRtfT8AVSLfl6F05DsUhwYS2du1irU/qs3L3s4aLmAQ/0xE8x/M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by AS5PR04MB9856.eurprd04.prod.outlook.com (2603:10a6:20b:678::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.12; Fri, 24 Nov
- 2023 10:28:17 +0000
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7046.012; Fri, 24 Nov 2023
- 10:28:17 +0000
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: andrew@lunn.ch,
-	netdev@vger.kernel.org,
-	Ioana Ciornei <ioana.ciornei@nxp.com>
-Subject: [PATCH v2 net 2/2] dpaa2-eth: recycle the RX buffer only after all processing done
-Date: Fri, 24 Nov 2023 12:28:05 +0200
-Message-Id: <20231124102805.587303-3-ioana.ciornei@nxp.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231124102805.587303-1-ioana.ciornei@nxp.com>
-References: <20231124102805.587303-1-ioana.ciornei@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0124.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b9::16) To GV1PR04MB9070.eurprd04.prod.outlook.com
- (2603:10a6:150:21::14)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F180692
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:39:51 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5441305cbd1so2358161a12.2
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:39:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700822390; x=1701427190; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3CbeSPBGv/93N4a58P9G5/aucfGqzwYdA8+uNojSvY=;
+        b=DYcv1TwT5fs8XfXra8ZEiJCyb+l2cmBxN70cbKCLxIWKC34jBcN6SeAAus/IF+W9VO
+         TuFuMNOR4uWeKHKCEEqy6ULlxfY8gcTeJr4GTdkJprtwz//mTRttXSKBHy97TaZ+oIRV
+         8f6myOv0kbiZLL+HK93CAtzHu8F3SZ3YBkutaaApqvOmNLM95DLuyHjehIZ326Z36bFW
+         TrLd6Dm4EdEhc/kQ65/dDlS8XpJK1x0Wkz/uyA1UosIBTVnZ1iKNZAb7m+tYsAWIPiJm
+         Jx95XcJlHwdRDzjPLH11mnwkvTp676EvG9GZoM6BpyfbCUzT4DcefXK9NMadHlNbmNUo
+         hXNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700822390; x=1701427190;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E3CbeSPBGv/93N4a58P9G5/aucfGqzwYdA8+uNojSvY=;
+        b=VpjBR42o/LRzCo/MTV9bPV04TMnKuMdmYFyiFu2zbnuR4wwnw4UQ/6itojXsqF1IW6
+         SjwV8dOD9IBw4tIUDJM3K52WPzLkd2BiExgH2AFCYSYBU/8lDs0qolMG0pagV+tfXma+
+         HHffBR94dN17NLPr+GGn2GBTOUYIWxX1BgF2+TtsoKTO668DmzRb8IQtWxOyBfBjrZXb
+         mnHMP/MRXhIW6DJ7raEpae/hMIrao8eY4bS7X/A9L80bA/GqFefPog6xTd6bNVx9D9bh
+         uF9WOuUnab6kfF7M4i/gAiKLURKrQvSc0yK3DVmJNPy94EutwaqRuAhghN/YhM6X+vNt
+         vxsA==
+X-Gm-Message-State: AOJu0Yx4rWE3y8yU2xreyp1HWreohMIFC8kSbaXllifMBbtafDaXpM3k
+	Fq4XxaQBKdcov8F+kF5gUpK3LA==
+X-Google-Smtp-Source: AGHT+IHBQS9u0x8xZRIF1tYnmQbgx7Tl8spe3HLfZnEj6pYZl4ExuWUKfoudSxw3WaKk/G1xMy0J/w==
+X-Received: by 2002:a50:9312:0:b0:53e:3b8f:8a58 with SMTP id m18-20020a509312000000b0053e3b8f8a58mr1968390eda.11.1700822390310;
+        Fri, 24 Nov 2023 02:39:50 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id i12-20020a056402054c00b00548851486d8sm1638589edx.44.2023.11.24.02.39.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 02:39:49 -0800 (PST)
+Date: Fri, 24 Nov 2023 11:39:48 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	deb.chatterjee@intel.com, anjali.singhai@intel.com,
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	vladbu@nvidia.com, horms@kernel.org, bpf@vger.kernel.org,
+	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com,
+	dan.daly@intel.com, chris.sommers@keysight.com,
+	john.andy.fingerhut@intel.com
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+Message-ID: <ZWB9dF8/Uk2iP2uy@nanopsycho>
+References: <ZV7y9JG0d4id8GeG@nanopsycho>
+ <CAM0EoMkOvEnPmw=0qye9gWAqgbZjaTYZhiho=qmG1x4WiQxkxA@mail.gmail.com>
+ <ZV9U+zsMM5YqL8Cx@nanopsycho>
+ <CAM0EoMnFB0hgcVFj3=QN4114HiQy46uvYJKqa7=p2VqJTwqBsg@mail.gmail.com>
+ <ZV9csgFAurzm+j3/@nanopsycho>
+ <CAM0EoMkgD10dFvgtueDn7wjJTFTQX6_mkA4Kwr04Dnwp+S-u-A@mail.gmail.com>
+ <ZV9vfYy42G0Fk6m4@nanopsycho>
+ <CAM0EoMkC6+hJ0fb9zCU8bcKDjpnz5M0kbKZ=4GGAMmXH4_W8rg@mail.gmail.com>
+ <0d1d37f9-1ef1-4622-409e-a976c8061a41@gmail.com>
+ <20231123105305.7edeab94@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS5PR04MB9856:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4048a154-653b-42e2-0312-08dbecd81263
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8NpJ0i0WlJsm/qkijIcYdcgvQBWMKfD7EJF30xJML+m0a3wjU/iZAr1ekM2L+bc+mstw09JW9Iy+b9SwA8sAMU1tDFRj3gbQZPtsjOfSEdnjp5mphznS9OaT7WBy38w2qEh0QmWF9vJAlBgoiD/vtGJa4htsSvQneui+6a47d3G+1XsyrqvgNcJVbpaYZf1L3LCJw5CbrclSJ6M9/eHBRg4pI6t8Ur0Gn6oH6HBYnT6BeuvNW5cf8cujFittqzqGj269mALPoy0WZyEKbUa/YYmpGz9mRbbAHI015ndXio+lLxmfKgxB0tEEMfA39LCjjWHkuVm5yPtSMwcHD+y571d9cTr0q6xNE73R0D64BMEQ8paKEqtJ0w0HtdnepdoFbZbAI2CAooKZIGe4usQckBHXWlJ9i0gEpb5ve7Ch7r0iqYUA8vThnqhO18ddk4g/E0bY2bSq3W48xIaFD9Z6eSNByEznrlRGWGSjnOPJsSjDZotqXMMNMOGnQMRGYIhZ/BSAjBqITcJk629T6GHIHdWqZiQqqiZXSI8AGX0Nhr8mwwCG5JCVETAdP0QACAc/
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(136003)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(66556008)(316002)(5660300002)(66476007)(8676002)(44832011)(8936002)(4326008)(2616005)(1076003)(26005)(2906002)(478600001)(6486002)(6666004)(6506007)(83380400001)(66946007)(41300700001)(6512007)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+yoitIHTRV04lscdPn8s3GfddCPdf2mSvQtG4lz/OdmvQehd0F7IB3pT6WzE?=
- =?us-ascii?Q?GsAPm8Sx/ZqUYPCOxT35DsuiMKASpRAE8znF3keu1fgC6Bd8otd1LqiWUYn+?=
- =?us-ascii?Q?TzcHjeXLsqUXNtlkT8C3QQuHXyn1qhL+U0ZXe3yb9AplljVBHfTkaxSyBEP6?=
- =?us-ascii?Q?u+fAwRl0BsqqqMilOJCAHB1LwyqEz2YoAlqpyWNhUvtjj+wZgRKy732P8sVW?=
- =?us-ascii?Q?8vYGH3dXn8ehYMCqXpQFskZxDVTNaXZsNidLNfjWW+Rq8c4BBLe8kKT0KZVG?=
- =?us-ascii?Q?49DRnJVgGUK6Da5pCa4Z/zCWqGWa3tocL2bs7MbLG0hK25dEMXrRwj/dU9bR?=
- =?us-ascii?Q?oI2oxePHkkwLU0OlO2Bue5/tnuA5EZm4KLzwBRfEv0SxcWHo95J7Irl0Dyrc?=
- =?us-ascii?Q?P1o9tSVe/gnbLcQdYzBUtHf7675k2/w1f7g6cfaFA/i5DnYh1ZpCjpk3SCit?=
- =?us-ascii?Q?jesocdJqCvi0XIXPzpULT2octKKMaoNNnAEerpd55noecXGormgYS7m3SKGE?=
- =?us-ascii?Q?hNBPl2qR+MsyKZoHRNdPC2lTcGi8igQcPNforILQYE/734O2IBdrnGfT0FRc?=
- =?us-ascii?Q?6KPYmSlVTy5wbrPIif0b8LhkZ6dAvi9NfZTprDbn3QcIs7xpcAgx24JlXHdC?=
- =?us-ascii?Q?5YmfA8PLSeGw7oLpJdmWm8TtCaRtA155NIS2MNNmFBPpR3MF/3g2W6G/FiFp?=
- =?us-ascii?Q?/idsFCb0otjBDx029q+RZ2UC5+2UA8u5ndCyCvDiBHdGF/+MJQkoTmbyHiw5?=
- =?us-ascii?Q?YIxWK0NosIh8SBULtTHkCAduvMWlXTyUvs56hlsuH2SIXCrht7T7rrL+3VU2?=
- =?us-ascii?Q?sW+WSNgYWxlvs4xyr4f8J1ztHMOdsQUoJ4wAwiPx+TQDHAd1PQXL/UulhfrB?=
- =?us-ascii?Q?h/DxDfzSMbqaHl72MNO9tcjn5GgFbGCwBzkswD8MUR7iSpi/A0c4Us1jY9Lq?=
- =?us-ascii?Q?eHzOVyIac7/1okzUOUGd0bHVnl+DdAxM6qnf9On5u6r0wqxKFEph1lezkE7+?=
- =?us-ascii?Q?k6sOHuAUOaXQm+VpuTFruptmi8pnFxg0ed9W1AFLq2OG82Lwlo6cUdbvMMGZ?=
- =?us-ascii?Q?uGoq1lilPhTXm2UA/De7Kf+m0wCEqHyt81G5hn6ceLcnE6hwF2PlGBlylIgF?=
- =?us-ascii?Q?fMRkt7s6ETO71Lb/B17fQp6EfopicvD1U7KZ1iUq1kc1SAk9bq9uLd87FpQW?=
- =?us-ascii?Q?PAdu5VQcM4Hz+/NcGR4QjCTGRZdVhFcXfkDV5Cm1LEzkVRPFH7U94tRQr4aX?=
- =?us-ascii?Q?NRk+OfToov9ftwxDq+1RcK6nnNK9ImuwM112QjaPwdVFqdQviAEi61ADATOX?=
- =?us-ascii?Q?UimmMo/v0MMXpkEZf24K69MAS3HrXlKB6xP9qMhcqpE7RYYH8j0Jm2U98PET?=
- =?us-ascii?Q?sxZkRd35aDMZA3tQiI47TsbVk8J7XcKB/s7BSoJfHlS784/E89hHRV0KRaLG?=
- =?us-ascii?Q?/ktykOB4u49rHi6bA+rp20RSZwjS/VfrhV6293aCCPtxKpIgJS/+z6ArNeNy?=
- =?us-ascii?Q?RQEC6sthfC4+zWLYEQo5KYNC+iszi5QXD6NDonGk8bB7beDuJiBLZslWmAkF?=
- =?us-ascii?Q?0OP7zlUtlr31X4u9oap8+WV6W1gO6kiXcC9jCQCE?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4048a154-653b-42e2-0312-08dbecd81263
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2023 10:28:17.0111
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cyEQs/fDpOkWozJ5ziImbtk72A6ExE+A8Hq1CYWsomGvIcAsbbdXgHT8x+/zq3txcJ9NC+WiDLh1+lbb7qVqrw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9856
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231123105305.7edeab94@kernel.org>
 
-The blamed commit added support for Rx copybreak. This meant that for
-certain frame sizes, a new skb was allocated and the initial data buffer
-was recycled. Instead of waiting to recycle the Rx buffer only after all
-processing was done on it (like accessing the parse results or timestamp
-information), the code path just went ahead and re-used the buffer right
-away.
+Thu, Nov 23, 2023 at 07:53:05PM CET, kuba@kernel.org wrote:
+>On Thu, 23 Nov 2023 17:53:42 +0000 Edward Cree wrote:
+>> The kernel doesn't like to trust offload blobs from a userspace compiler,
+>>  because it has no way to be sure that what comes out of the compiler
+>>  matches the rules/tables/whatever it has in the SW datapath.
+>> It's also a support nightmare because it's basically like each user
+>>  compiling their own device firmware.  
+>
+>Practically speaking every high speed NIC runs a huge binary blob of FW.
+>First, let's acknowledge that as reality.
 
-This sometimes lead to corrupted HW and SW annotation areas.
-Fix this by delaying the moment when the buffer is recycled.
+True, but I believe we need to diferenciate:
+1) vendor created, versioned, signed binary fw blob
+2) user compiled on demand, blob
 
-Fixes: 50f826999a80 ("dpaa2-eth: add rx copybreak support")
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
-Changes in v2:
-- none
+I look at 2) as on "a configuration" of some sort.
 
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index 774377db0b4b..888509cf1f21 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -516,8 +516,6 @@ struct sk_buff *dpaa2_eth_alloc_skb(struct dpaa2_eth_priv *priv,
- 
- 	memcpy(skb->data, fd_vaddr + fd_offset, fd_length);
- 
--	dpaa2_eth_recycle_buf(priv, ch, dpaa2_fd_get_addr(fd));
--
- 	return skb;
- }
- 
-@@ -589,6 +587,7 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
- 	struct rtnl_link_stats64 *percpu_stats;
- 	struct dpaa2_eth_drv_stats *percpu_extras;
- 	struct device *dev = priv->net_dev->dev.parent;
-+	bool recycle_rx_buf = false;
- 	void *buf_data;
- 	u32 xdp_act;
- 
-@@ -618,6 +617,8 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
- 			dma_unmap_page(dev, addr, priv->rx_buf_size,
- 				       DMA_BIDIRECTIONAL);
- 			skb = dpaa2_eth_build_linear_skb(ch, fd, vaddr);
-+		} else {
-+			recycle_rx_buf = true;
- 		}
- 	} else if (fd_format == dpaa2_fd_sg) {
- 		WARN_ON(priv->xdp_prog);
-@@ -637,6 +638,9 @@ void dpaa2_eth_rx(struct dpaa2_eth_priv *priv,
- 		goto err_build_skb;
- 
- 	dpaa2_eth_receive_skb(priv, ch, fd, vaddr, fq, percpu_stats, skb);
-+
-+	if (recycle_rx_buf)
-+		dpaa2_eth_recycle_buf(priv, ch, dpaa2_fd_get_addr(fd));
- 	return;
- 
- err_build_skb:
--- 
-2.25.1
+>
+>Second, there is no equivalent for arbitrary packet parsing in the
+>kernel proper. Offload means take something form the host and put it
+>on the device. If there's nothing in the kernel, we can't consider
+>the new functionality an offload.
+>
+>I understand that "we offload SW functionality" is our general policy,
+>but we should remember why this policy is in place, and not
+>automatically jump to the conclusion.
 
+It is in place to have well defined SW definition of what devices
+offloads.
+
+
+>
+>>  At least normally with device firmware the driver side is talking to
+>>  something with narrow/fixed semantics and went through upstream
+>>  review, even if the firmware side is still a black box.
+>
+>We should be buildings things which are useful and open (as in
+>extensible by people "from the street"). With that in mind, to me,
+>a more practical approach would be to try to figure out a common
+>and rigid FW interface for expressing the parsing graph.
+
+Hmm, could you elaborate a bit more on this one please?
+
+>
+>But that's an interface going from the binary blob to the kernel.
+>
+>> Just to prove I'm not playing favourites: this is *also* a problem with
+>>  eBPF offloads like Nanotubes, and I'm not convinced we have a viable
+>>  solution yet.
+>
+>BPF offloads are actual offloads. Config/state is in the kernel,
+>you need to pop it out to user space, then prove that it's what
+>user intended.
 
