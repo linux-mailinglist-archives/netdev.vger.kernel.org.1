@@ -1,89 +1,274 @@
-Return-Path: <netdev+bounces-50813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CBA7F73A4
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:20:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F96A7F73AF
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:22:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41C26B214C6
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:20:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6883FB21417
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE9624A06;
-	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1995D24214;
+	Fri, 24 Nov 2023 12:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQYCf04c"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a+qW/hAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E97124214
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FD64C433CA;
-	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700828430;
-	bh=nhW0XLHwkT4zYDPg0hKKpnPSiom39xmsOL6MXhz6RLo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RQYCf04cVEPC3Do5F3KYMxvtWiB8NFm6p5T45DMaVhbxfBFnKnYjXPjYhv1XoWMls
-	 3wfLrf6kjaSo27ceoAp/qGpzj7eGmRK08yFP9l7lsiFuRaXyBIQ89ot3chVBVPV+kt
-	 lQxenbTOmZeDmuy6YprU7XEk1oQJYXJch+h6ZPADmUpVWgRm+nolZFsvedpYUqpRAX
-	 dm2pOY87yEM6C5lVQFXX2pwzPqnQRI7gVyeBNfm1d2ZKAiGZwfl3PKPb1g2UWQPVnt
-	 LjHXlM5deSTKefVEEnHSLDH6oJQXDjapYuCYb5qGOLbP8m3tpscCYuUYIP5O/fLSq/
-	 uhrKQaCzODQZA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 053C1E2A02B;
-	Fri, 24 Nov 2023 12:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EEFD46;
+	Fri, 24 Nov 2023 04:22:36 -0800 (PST)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOAqEBT001145;
+	Fri, 24 Nov 2023 12:22:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MVn8DboT28MvZPXQn5cpVRGsiYl8MrxbQqdWU2PP2dc=;
+ b=a+qW/hAg0aOk8EMBebCvMbC/48JHzRUdTF060JXQBP+8AV6gl7Vi9xverAEhqV4/m6y+
+ QnudYgPEbz0zlSRJVwTgW6i5ObCT6hP4nOOJolPpSrDI6JPRRxaoLjVnsQoWwB27Eqdw
+ GC03t1P1r1mgpKt2ASa0EXMeq4vB9atYkWLw4s+9FFJh/iAaynnumBVoeC8CJ//T2LSO
+ 2VV5n1j1Q89V89hH6DgAFubMBKXiA2YpxViNv2i/NE2MF94ewI5jhkGtL43Bv8cMd8nY
+ OKw7lpqkJxbGmb3hvJxedPskDOdUxwAq5U+6ERztx2Z/mgBJnN4rqqkaG+uEch2RIkUM fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtf3su87-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:22:27 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AOCDB3d010966;
+	Fri, 24 Nov 2023 12:22:26 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ujtf3su7p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:22:26 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AOCIk7i015317;
+	Fri, 24 Nov 2023 12:22:25 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf8005p73-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 12:22:25 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AOCML5d24380110
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Nov 2023 12:22:21 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B2C362004B;
+	Fri, 24 Nov 2023 12:22:21 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1423920040;
+	Fri, 24 Nov 2023 12:22:20 +0000 (GMT)
+Received: from [9.171.44.235] (unknown [9.171.44.235])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 24 Nov 2023 12:22:19 +0000 (GMT)
+Message-ID: <1c843b3d-b7f3-4c84-aa12-b40b5d74a404@linux.ibm.com>
+Date: Fri, 24 Nov 2023 13:22:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] Get max rx packet length and solve
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170082843001.28500.952047846301067356.git-patchwork-notify@kernel.org>
-Date: Fri, 24 Nov 2023 12:20:30 +0000
-References: <20231122183435.2510656-1-srasheed@marvell.com>
-In-Reply-To: <20231122183435.2510656-1-srasheed@marvell.com>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
- vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
- pabeni@redhat.com, horms@kernel.org, kuba@kernel.org, davem@davemloft.net,
- wizhao@redhat.com, konguyen@redhat.com, jesse.brandeburg@intel.com,
- sumang@marvell.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net/smc: add sysctl for max links per lgr
+ for SMC-R v2.1
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, wenjia@linux.ibm.com,
+        kgraul@linux.ibm.com, corbet@lwn.net, davem@davemloft.net,
+        kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
+        guwen@linux.alibaba.com, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20231122135258.38746-1-guangguan.wang@linux.alibaba.com>
+ <20231122135258.38746-2-guangguan.wang@linux.alibaba.com>
+From: Jan Karcher <jaka@linux.ibm.com>
+Organization: IBM - Network Linux on Z
+In-Reply-To: <20231122135258.38746-2-guangguan.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KxgIITNdX0kBz3459lyCp-EJpNlzZiUk
+X-Proofpoint-ORIG-GUID: 8h5SFJxtH_-TlCd8-JIzNsaFQRMMFswG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 spamscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 priorityscore=1501 clxscore=1011 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311240096
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
 
-On Wed, 22 Nov 2023 10:34:33 -0800 you wrote:
-> Patchsets which resolve observed style issues in control net
-> source files, and also implements get mtu control net api
-> to fetch max mtu value from firmware
+On 22/11/2023 14:52, Guangguan Wang wrote:
+> Add a new sysctl: net.smc.smcr_max_links_per_lgr, which is
+> used to control the preferred max links per lgr for SMC-R
+> v2.1. The default value of this sysctl is 2, and the acceptable
+> value ranges from 1 to 2.
 > 
-> Changes:
-> V2:
->   - Introduced a patch to resolve style issues as mentioned in V1
->   - Removed OCTEP_MAX_MTU macro, as it is redundant.
+> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+
+Hi Guangguan,
+thanks for your Submission.
+
+Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
+
+> ---
+>   Documentation/networking/smc-sysctl.rst |  8 ++++++++
+>   include/net/netns/smc.h                 |  1 +
+>   net/smc/af_smc.c                        |  2 +-
+>   net/smc/smc_clc.c                       | 10 +++++++---
+>   net/smc/smc_clc.h                       |  3 ++-
+>   net/smc/smc_sysctl.c                    | 12 ++++++++++++
+>   net/smc/smc_sysctl.h                    |  1 +
+>   7 files changed, 32 insertions(+), 5 deletions(-)
 > 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/2] octeon_ep: Solve style issues in control net files
-    https://git.kernel.org/netdev/net-next/c/e40f4c4e50fc
-  - [net-next,v2,2/2] octeon_ep: get max rx packet length from firmware
-    https://git.kernel.org/netdev/net-next/c/0a5f8534e398
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
+> index 769149d98773..c6ef86ef4c4f 100644
+> --- a/Documentation/networking/smc-sysctl.rst
+> +++ b/Documentation/networking/smc-sysctl.rst
+> @@ -57,3 +57,11 @@ rmem - INTEGER
+>   	only allowed 512KiB for SMC-R and 1MiB for SMC-D.
+>   
+>   	Default: 64KiB
+> +
+> +smcr_max_links_per_lgr - INTEGER
+> +	Controls the max number of links can be added to a SMC-R link group. Notice that
+> +	the actual number of the links added to a SMC-R link group depends on the number
+> +	of RDMA devices exist in the system. The acceptable value ranges from 1 to 2. Only
+> +	for SMC-R v2.1 and later.
+> +
+> +	Default: 2
+> diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+> index 582212ada3ba..da7023587824 100644
+> --- a/include/net/netns/smc.h
+> +++ b/include/net/netns/smc.h
+> @@ -22,5 +22,6 @@ struct netns_smc {
+>   	int				sysctl_smcr_testlink_time;
+>   	int				sysctl_wmem;
+>   	int				sysctl_rmem;
+> +	int				sysctl_max_links_per_lgr;
+>   };
+>   #endif
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index da97f946b79b..f8da484efe90 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -2457,7 +2457,7 @@ static void smc_listen_work(struct work_struct *work)
+>   	if (rc)
+>   		goto out_decl;
+>   
+> -	rc = smc_clc_srv_v2x_features_validate(pclc, ini);
+> +	rc = smc_clc_srv_v2x_features_validate(new_smc, pclc, ini);
+>   	if (rc)
+>   		goto out_decl;
+>   
+> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+> index 8deb46c28f1d..1f87c8895a27 100644
+> --- a/net/smc/smc_clc.c
+> +++ b/net/smc/smc_clc.c
+> @@ -824,6 +824,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>   	struct smc_clc_smcd_gid_chid *gidchids;
+>   	struct smc_clc_msg_proposal_area *pclc;
+>   	struct smc_clc_ipv6_prefix *ipv6_prfx;
+> +	struct net *net = sock_net(&smc->sk);
+>   	struct smc_clc_v2_extension *v2_ext;
+>   	struct smc_clc_msg_smcd *pclc_smcd;
+>   	struct smc_clc_msg_trail *trl;
+> @@ -944,7 +945,7 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>   	if (smcr_indicated(ini->smc_type_v2)) {
+>   		memcpy(v2_ext->roce, ini->smcrv2.ib_gid_v2, SMC_GID_SIZE);
+>   		v2_ext->max_conns = SMC_CONN_PER_LGR_PREFER;
+> -		v2_ext->max_links = SMC_LINKS_PER_LGR_MAX_PREFER;
+> +		v2_ext->max_links = net->smc.sysctl_max_links_per_lgr;
+>   	}
+>   
+>   	pclc_base->hdr.length = htons(plen);
+> @@ -1171,10 +1172,12 @@ int smc_clc_send_accept(struct smc_sock *new_smc, bool srv_first_contact,
+>   	return len > 0 ? 0 : len;
+>   }
+>   
+> -int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+> +int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
+> +				      struct smc_clc_msg_proposal *pclc,
+>   				      struct smc_init_info *ini)
+>   {
+>   	struct smc_clc_v2_extension *pclc_v2_ext;
+> +	struct net *net = sock_net(&smc->sk);
+>   
+>   	ini->max_conns = SMC_CONN_PER_LGR_MAX;
+>   	ini->max_links = SMC_LINKS_ADD_LNK_MAX;
+> @@ -1192,7 +1195,8 @@ int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+>   		if (ini->max_conns < SMC_CONN_PER_LGR_MIN)
+>   			return SMC_CLC_DECL_MAXCONNERR;
+>   
+> -		ini->max_links = min_t(u8, pclc_v2_ext->max_links, SMC_LINKS_PER_LGR_MAX_PREFER);
+> +		ini->max_links = min_t(u8, pclc_v2_ext->max_links,
+> +				       net->smc.sysctl_max_links_per_lgr);
+>   		if (ini->max_links < SMC_LINKS_ADD_LNK_MIN)
+>   			return SMC_CLC_DECL_MAXLINKERR;
+>   	}
+> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+> index c5c8e7db775a..89b258cedffe 100644
+> --- a/net/smc/smc_clc.h
+> +++ b/net/smc/smc_clc.h
+> @@ -422,7 +422,8 @@ int smc_clc_send_confirm(struct smc_sock *smc, bool clnt_first_contact,
+>   			 u8 version, u8 *eid, struct smc_init_info *ini);
+>   int smc_clc_send_accept(struct smc_sock *smc, bool srv_first_contact,
+>   			u8 version, u8 *negotiated_eid, struct smc_init_info *ini);
+> -int smc_clc_srv_v2x_features_validate(struct smc_clc_msg_proposal *pclc,
+> +int smc_clc_srv_v2x_features_validate(struct smc_sock *smc,
+> +				      struct smc_clc_msg_proposal *pclc,
+>   				      struct smc_init_info *ini);
+>   int smc_clc_clnt_v2x_features_validate(struct smc_clc_first_contact_ext *fce,
+>   				       struct smc_init_info *ini);
+> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+> index 5cbc18c6e62b..3e9bb921e40a 100644
+> --- a/net/smc/smc_sysctl.c
+> +++ b/net/smc/smc_sysctl.c
+> @@ -25,6 +25,8 @@ static int max_sndbuf = INT_MAX / 2;
+>   static int max_rcvbuf = INT_MAX / 2;
+>   static const int net_smc_wmem_init = (64 * 1024);
+>   static const int net_smc_rmem_init = (64 * 1024);
+> +static int links_per_lgr_min = SMC_LINKS_ADD_LNK_MIN;
+> +static int links_per_lgr_max = SMC_LINKS_ADD_LNK_MAX;
+>   
+>   static struct ctl_table smc_table[] = {
+>   	{
+> @@ -68,6 +70,15 @@ static struct ctl_table smc_table[] = {
+>   		.extra1		= &min_rcvbuf,
+>   		.extra2		= &max_rcvbuf,
+>   	},
+> +	{
+> +		.procname	= "smcr_max_links_per_lgr",
+> +		.data		= &init_net.smc.sysctl_max_links_per_lgr,
+> +		.maxlen		= sizeof(int),
+> +		.mode		= 0644,
+> +		.proc_handler	= proc_dointvec_minmax,
+> +		.extra1		= &links_per_lgr_min,
+> +		.extra2		= &links_per_lgr_max,
+> +	},
+>   	{  }
+>   };
+>   
+> @@ -97,6 +108,7 @@ int __net_init smc_sysctl_net_init(struct net *net)
+>   	net->smc.sysctl_smcr_testlink_time = SMC_LLC_TESTLINK_DEFAULT_TIME;
+>   	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
+>   	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
+> +	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
+>   
+>   	return 0;
+>   
+> diff --git a/net/smc/smc_sysctl.h b/net/smc/smc_sysctl.h
+> index 0becc11bd2f4..5783dd7575dd 100644
+> --- a/net/smc/smc_sysctl.h
+> +++ b/net/smc/smc_sysctl.h
+> @@ -23,6 +23,7 @@ void __net_exit smc_sysctl_net_exit(struct net *net);
+>   static inline int smc_sysctl_net_init(struct net *net)
+>   {
+>   	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
+> +	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
+>   	return 0;
+>   }
+>   
 
