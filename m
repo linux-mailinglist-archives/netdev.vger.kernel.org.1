@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-50704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CF77F6CF0
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:35:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152C27F6CF1
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 08:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 871C2281AEE
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:35:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90A6DB20FB8
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 07:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FEB95239;
-	Fri, 24 Nov 2023 07:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E887E5247;
+	Fri, 24 Nov 2023 07:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDFqTXps"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LA8rtDH5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5827D6E
-	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:20 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cf5901b4c8so13631525ad.1
-        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:20 -0800 (PST)
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B94F7D4E
+	for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:26 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-280351c32afso1414422a91.1
+        for <netdev@vger.kernel.org>; Thu, 23 Nov 2023 23:35:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700811320; x=1701416120; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700811326; x=1701416126; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GVyM+zZxeeVgQmF9kYV8H8JgVavZaWVSN/+0EvaihZw=;
-        b=lDFqTXps/9569pEILALOlw9RdiCVtLOOXCuM9l3kMA5Iex2iQoljxIste/YGTJpOZM
-         11AVVXEK/vfSLCcTlGd5tRrasR/+8X16+0K+lxqPbHhQfsZaseC99HOC6WNOYujsmmaF
-         2ApB/QOm6VurS77eX3f8/t7tCIbFIepijd0szBlFPN/E/5UQdwLz1hzUMHyK0CqdwmdP
-         MsSrIEYjM9sNyj1IvgLWG71WcsjkEE6YRXT1dypr6+oHvafSSB9bu1fRK9dFMwgwBtDF
-         BWqDGuP1XhCU2BTjAeihR4RMOdSQf1rcozm3eINH/IP8gQTuklPNKPFlxZ0O0wt1/6NP
-         7mfA==
+        bh=1wf42jdW+6K8AfiyHVKHn1gShiAo7E/o6JslnDYKix8=;
+        b=LA8rtDH57cmU9cXm8gNs6G6kFsgPvmHHZcRB77XRmZcJv/9F/eUnHs+aHj/6au/jX9
+         n24+Z3jvIua5VbuhiXhTSCGz9MNpDm+M5RC3/HhNl5uCLck5TyloqFG/81QjR17Ey8lv
+         yX4Uxui8Hwm4XRUol/uGbuaeBW/Wh9tY9+sEoX8X9c11HzDz7Ss1kcveOixWABWzRw9o
+         WsV00wkTHv193aMp0KNJQ7wRCmtPZHGgppl0V+vA4ZlVwjXK4SP1W7QXQ9CyDYMJbGA8
+         ZYnDPoj0vSvPNiRdviZkNBT4c3C4yDaDI9FNCUe7R+kqWpjfX2JJuKaw1nBAZXknavQJ
+         /wgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700811320; x=1701416120;
+        d=1e100.net; s=20230601; t=1700811326; x=1701416126;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GVyM+zZxeeVgQmF9kYV8H8JgVavZaWVSN/+0EvaihZw=;
-        b=kj2EBVGZ/GxExFQbHzQOI05bbqeBHPtA7ndSJqe9jInabVIy5Wo9Mgn/9qwtSaeC3z
-         sOIZQbubZxD9Dp5uJIlKUZwXuonL2Um7Wst8gK8jB86cv6SUhoxLx7kK9gG35wvkBXOp
-         hHjUi1on4iGrtqlJ/Ks/PD8oRp3MFdr/9lUm6l0PI3ee//rxCP4HWrHWjVyepVnb/bOZ
-         TR/AXYBo+oV26FXeApyih4JJJFr7GN9Kdbq7EUt1pjBdpd1veIVFevXAcLho443aqm69
-         G5qUqQvz6FikUje4yWssxuhZVSVL/+7AdqLDiyDt+1coHvPIKYNCY4nRbEKSa0/lCkdy
-         HPfw==
-X-Gm-Message-State: AOJu0YyJ4mYaF0SvPavsfN02UVoE6E3poSJa5iiSjMnOkJ9vGguuuyhL
-	+DRDPhysqh3IiZBdNQFywgM=
-X-Google-Smtp-Source: AGHT+IFW9OW4Chd+eMwjSDquqBSaDDcPEXnyhJCyPdt6UaUVM+1Bexyln3V36mIMM6we2HvXDXpbGQ==
-X-Received: by 2002:a17:902:f60a:b0:1ce:6669:3260 with SMTP id n10-20020a170902f60a00b001ce66693260mr2718379plg.67.1700811320395;
-        Thu, 23 Nov 2023 23:35:20 -0800 (PST)
+        bh=1wf42jdW+6K8AfiyHVKHn1gShiAo7E/o6JslnDYKix8=;
+        b=Q+HkqUgcp+/ljc7QlLyBGOWaGtq64cZ8sorOrZLPNJTrPVXysEfr3fZXSDnP94AnLD
+         FdRxuSdU8btz09bwXHIXApr8LiX57kdg2gb2tDm7T1JiI77xApIl3vOKJhQ/sldixSWr
+         fKj+BHZ3cihNqQfOHmxea2gLIFEv4WyMLU//2QnYU8SPvmznInMPj315eGghhNKrce/h
+         /HX5uXt6aNM6phsCIYEhDlgdX+n0Ol3FkZPLGpWRno1ASaeheaShdfzBQeuF9Pxs9p1y
+         Vox3fCVW8w2qUN3udReiFJbyYwwuWrUAy8vnOWRToSEjeAxbcYIb+mcViBJKD86n1Pkb
+         ePlw==
+X-Gm-Message-State: AOJu0YxiIoemRm0gwz5SkW+2F0GxBoDTZaD09IZMhpqoQ2GSJ/4zTdMh
+	8h/NHqSyITJDQ0w/Sm5ROdg=
+X-Google-Smtp-Source: AGHT+IFqMZHO8+ERbxfOGumOXWVCKIXwMpvkdMGN1wW1029LzQCwFYJqLpbWoY21lciZ/9bahTIfaw==
+X-Received: by 2002:a17:90a:bb95:b0:285:68f3:80c0 with SMTP id v21-20020a17090abb9500b0028568f380c0mr1910144pjr.12.1700811325979;
+        Thu, 23 Nov 2023 23:35:25 -0800 (PST)
 Received: from localhost.localdomain ([89.187.161.180])
-        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b001b9d7c8f44dsm2499329plg.182.2023.11.23.23.35.15
+        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b001b9d7c8f44dsm2499329plg.182.2023.11.23.23.35.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 23:35:19 -0800 (PST)
+        Thu, 23 Nov 2023 23:35:24 -0800 (PST)
 From: Liang Chen <liangchen.linux@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -64,9 +64,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-mm@kvack.org,
 	liangchen.linux@gmail.com
-Subject: [PATCH net-next v3 1/3] page_pool: Rename pp_frag_count to pp_ref_count
-Date: Fri, 24 Nov 2023 15:34:37 +0800
-Message-Id: <20231124073439.52626-2-liangchen.linux@gmail.com>
+Subject: [PATCH net-next v3 2/3] page_pool: halve BIAS_MAX for fragment multiple user references
+Date: Fri, 24 Nov 2023 15:34:38 +0800
+Message-Id: <20231124073439.52626-3-liangchen.linux@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20231124073439.52626-1-liangchen.linux@gmail.com>
 References: <20231124073439.52626-1-liangchen.linux@gmail.com>
@@ -78,232 +78,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To support multiple users referencing the same fragment, pp_frag_count is
-renamed to pp_ref_count to better reflect its actual meaning based on the
-suggestion from [1].
+Referring to patch [1], in order to support multiple users referencing the
+same fragment and prevent overflow from pp_ref_count growing, the initial
+value of pp_ref_count is halved, leaving room for pp_ref_count to increment
+before the page is drained.
 
 [1]
-http://lore.kernel.org/netdev/f71d9448-70c8-8793-dc9a-0eb48a570300@huawei.com
+https://lore.kernel.org/all/20211009093724.10539-3-linyunsheng@huawei.com/
 
 Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
- include/linux/mm_types.h                      |  2 +-
- include/net/page_pool/helpers.h               | 45 ++++++++++---------
- include/net/page_pool/types.h                 |  2 +-
- net/core/page_pool.c                          | 12 ++---
- 5 files changed, 35 insertions(+), 30 deletions(-)
+ net/core/page_pool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 8d9743a5e42c..4454c750733e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -298,8 +298,8 @@ static void mlx5e_page_release_fragmented(struct mlx5e_rq *rq,
- 	u16 drain_count = MLX5E_PAGECNT_BIAS_MAX - frag_page->frags;
- 	struct page *page = frag_page->page;
- 
--	if (page_pool_defrag_page(page, drain_count) == 0)
--		page_pool_put_defragged_page(rq->page_pool, page, -1, true);
-+	if (page_pool_deref_page(page, drain_count) == 0)
-+		page_pool_put_derefed_page(rq->page_pool, page, -1, true);
- }
- 
- static inline int mlx5e_get_rx_frag(struct mlx5e_rq *rq,
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 957ce38768b2..64e4572ef06d 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -125,7 +125,7 @@ struct page {
- 			struct page_pool *pp;
- 			unsigned long _pp_mapping_pad;
- 			unsigned long dma_addr;
--			atomic_long_t pp_frag_count;
-+			atomic_long_t pp_ref_count;
- 		};
- 		struct {	/* Tail pages of compound page */
- 			unsigned long compound_head;	/* Bit zero is set */
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 4ebd544ae977..700f435292e7 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -29,7 +29,7 @@
-  * page allocated from page pool. Page splitting enables memory saving and thus
-  * avoids TLB/cache miss for data access, but there also is some cost to
-  * implement page splitting, mainly some cache line dirtying/bouncing for
-- * 'struct page' and atomic operation for page->pp_frag_count.
-+ * 'struct page' and atomic operation for page->pp_ref_count.
-  *
-  * The API keeps track of in-flight pages, in order to let API users know when
-  * it is safe to free a page_pool object, the API users must call
-@@ -214,69 +214,74 @@ inline enum dma_data_direction page_pool_get_dma_dir(struct page_pool *pool)
- 	return pool->p.dma_dir;
- }
- 
--/* pp_frag_count represents the number of writers who can update the page
-+/* pp_ref_count represents the number of writers who can update the page
-  * either by updating skb->data or via DMA mappings for the device.
-  * We can't rely on the page refcnt for that as we don't know who might be
-  * holding page references and we can't reliably destroy or sync DMA mappings
-  * of the fragments.
-  *
-- * When pp_frag_count reaches 0 we can either recycle the page if the page
-+ * pp_ref_count initially corresponds to the number of fragments. However,
-+ * when multiple users start to reference a single fragment, for example in
-+ * skb_try_coalesce, the pp_ref_count will become greater than the number of
-+ * fragments.
-+ *
-+ * When pp_ref_count reaches 0 we can either recycle the page if the page
-  * refcnt is 1 or return it back to the memory allocator and destroy any
-  * mappings we have.
-  */
- static inline void page_pool_fragment_page(struct page *page, long nr)
- {
--	atomic_long_set(&page->pp_frag_count, nr);
-+	atomic_long_set(&page->pp_ref_count, nr);
- }
- 
--static inline long page_pool_defrag_page(struct page *page, long nr)
-+static inline long page_pool_deref_page(struct page *page, long nr)
- {
- 	long ret;
- 
--	/* If nr == pp_frag_count then we have cleared all remaining
-+	/* If nr == pp_ref_count then we have cleared all remaining
- 	 * references to the page:
- 	 * 1. 'n == 1': no need to actually overwrite it.
- 	 * 2. 'n != 1': overwrite it with one, which is the rare case
--	 *              for pp_frag_count draining.
-+	 *              for pp_ref_count draining.
- 	 *
- 	 * The main advantage to doing this is that not only we avoid a atomic
- 	 * update, as an atomic_read is generally a much cheaper operation than
- 	 * an atomic update, especially when dealing with a page that may be
--	 * partitioned into only 2 or 3 pieces; but also unify the pp_frag_count
-+	 * referenced by only 2 or 3 users; but also unify the pp_ref_count
- 	 * handling by ensuring all pages have partitioned into only 1 piece
- 	 * initially, and only overwrite it when the page is partitioned into
- 	 * more than one piece.
- 	 */
--	if (atomic_long_read(&page->pp_frag_count) == nr) {
-+	if (atomic_long_read(&page->pp_ref_count) == nr) {
- 		/* As we have ensured nr is always one for constant case using
- 		 * the BUILD_BUG_ON(), only need to handle the non-constant case
--		 * here for pp_frag_count draining, which is a rare case.
-+		 * here for pp_ref_count draining, which is a rare case.
- 		 */
- 		BUILD_BUG_ON(__builtin_constant_p(nr) && nr != 1);
- 		if (!__builtin_constant_p(nr))
--			atomic_long_set(&page->pp_frag_count, 1);
-+			atomic_long_set(&page->pp_ref_count, 1);
- 
- 		return 0;
- 	}
- 
--	ret = atomic_long_sub_return(nr, &page->pp_frag_count);
-+	ret = atomic_long_sub_return(nr, &page->pp_ref_count);
- 	WARN_ON(ret < 0);
- 
--	/* We are the last user here too, reset pp_frag_count back to 1 to
-+	/* We are the last user here too, reset pp_ref_count back to 1 to
- 	 * ensure all pages have been partitioned into 1 piece initially,
- 	 * this should be the rare case when the last two fragment users call
--	 * page_pool_defrag_page() currently.
-+	 * page_pool_deref_page() currently.
- 	 */
- 	if (unlikely(!ret))
--		atomic_long_set(&page->pp_frag_count, 1);
-+		atomic_long_set(&page->pp_ref_count, 1);
- 
- 	return ret;
- }
- 
--static inline bool page_pool_is_last_frag(struct page *page)
-+static inline bool page_pool_is_last_ref(struct page *page)
- {
--	/* If page_pool_defrag_page() returns 0, we were the last user */
--	return page_pool_defrag_page(page, 1) == 0;
-+	/* If page_pool_deref_page() returns 0, we were the last user */
-+	return page_pool_deref_page(page, 1) == 0;
- }
- 
- /**
-@@ -301,10 +306,10 @@ static inline void page_pool_put_page(struct page_pool *pool,
- 	 * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
- 	 */
- #ifdef CONFIG_PAGE_POOL
--	if (!page_pool_is_last_frag(page))
-+	if (!page_pool_is_last_ref(page))
- 		return;
- 
--	page_pool_put_defragged_page(pool, page, dma_sync_size, allow_direct);
-+	page_pool_put_derefed_page(pool, page, dma_sync_size, allow_direct);
- #endif
- }
- 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index e1bb92c192de..1c82e87f2577 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -224,7 +224,7 @@ static inline void page_pool_put_page_bulk(struct page_pool *pool, void **data,
- }
- #endif
- 
--void page_pool_put_defragged_page(struct page_pool *pool, struct page *page,
-+void page_pool_put_derefed_page(struct page_pool *pool, struct page *page,
- 				  unsigned int dma_sync_size,
- 				  bool allow_direct);
- 
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index df2a06d7da52..0c6c2b11aabe 100644
+index 0c6c2b11aabe..24b83dfe6968 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -650,8 +650,8 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
- 	return NULL;
- }
+@@ -26,7 +26,7 @@
+ #define DEFER_TIME (msecs_to_jiffies(1000))
+ #define DEFER_WARN_INTERVAL (60 * HZ)
  
--void page_pool_put_defragged_page(struct page_pool *pool, struct page *page,
--				  unsigned int dma_sync_size, bool allow_direct)
-+void page_pool_put_derefed_page(struct page_pool *pool, struct page *page,
-+				unsigned int dma_sync_size, bool allow_direct)
- {
- 	page = __page_pool_put_page(pool, page, dma_sync_size, allow_direct);
- 	if (page && !page_pool_recycle_in_ring(pool, page)) {
-@@ -660,7 +660,7 @@ void page_pool_put_defragged_page(struct page_pool *pool, struct page *page,
- 		page_pool_return_page(pool, page);
- 	}
- }
--EXPORT_SYMBOL(page_pool_put_defragged_page);
-+EXPORT_SYMBOL(page_pool_put_derefed_page);
+-#define BIAS_MAX	LONG_MAX
++#define BIAS_MAX	(LONG_MAX >> 1)
  
- /**
-  * page_pool_put_page_bulk() - release references on multiple pages
-@@ -687,7 +687,7 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
- 		struct page *page = virt_to_head_page(data[i]);
- 
- 		/* It is not the last user for the page frag case */
--		if (!page_pool_is_last_frag(page))
-+		if (!page_pool_is_last_ref(page))
- 			continue;
- 
- 		page = __page_pool_put_page(pool, page, -1, false);
-@@ -729,7 +729,7 @@ static struct page *page_pool_drain_frag(struct page_pool *pool,
- 	long drain_count = BIAS_MAX - pool->frag_users;
- 
- 	/* Some user is still using the page frag */
--	if (likely(page_pool_defrag_page(page, drain_count)))
-+	if (likely(page_pool_deref_page(page, drain_count)))
- 		return NULL;
- 
- 	if (page_ref_count(page) == 1 && !page_is_pfmemalloc(page)) {
-@@ -750,7 +750,7 @@ static void page_pool_free_frag(struct page_pool *pool)
- 
- 	pool->frag_page = NULL;
- 
--	if (!page || page_pool_defrag_page(page, drain_count))
-+	if (!page || page_pool_deref_page(page, drain_count))
- 		return;
- 
- 	page_pool_return_page(pool, page);
+ #ifdef CONFIG_PAGE_POOL_STATS
+ /* alloc_stat_inc is intended to be used in softirq context */
 -- 
 2.31.1
 
