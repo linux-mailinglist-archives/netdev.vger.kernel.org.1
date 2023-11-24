@@ -1,147 +1,134 @@
-Return-Path: <netdev+bounces-50778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA3C7F71AF
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:40:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33DE7F71C9
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 11:41:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8B4281D5F
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:40:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 442F4B2129E
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 10:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0525A14F8B;
-	Fri, 24 Nov 2023 10:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E822F79DC;
+	Fri, 24 Nov 2023 10:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DYcv1TwT"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="iwYrsNlf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F180692
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:39:51 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5441305cbd1so2358161a12.2
-        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 02:39:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700822390; x=1701427190; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E3CbeSPBGv/93N4a58P9G5/aucfGqzwYdA8+uNojSvY=;
-        b=DYcv1TwT5fs8XfXra8ZEiJCyb+l2cmBxN70cbKCLxIWKC34jBcN6SeAAus/IF+W9VO
-         TuFuMNOR4uWeKHKCEEqy6ULlxfY8gcTeJr4GTdkJprtwz//mTRttXSKBHy97TaZ+oIRV
-         8f6myOv0kbiZLL+HK93CAtzHu8F3SZ3YBkutaaApqvOmNLM95DLuyHjehIZ326Z36bFW
-         TrLd6Dm4EdEhc/kQ65/dDlS8XpJK1x0Wkz/uyA1UosIBTVnZ1iKNZAb7m+tYsAWIPiJm
-         Jx95XcJlHwdRDzjPLH11mnwkvTp676EvG9GZoM6BpyfbCUzT4DcefXK9NMadHlNbmNUo
-         hXNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700822390; x=1701427190;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E3CbeSPBGv/93N4a58P9G5/aucfGqzwYdA8+uNojSvY=;
-        b=VpjBR42o/LRzCo/MTV9bPV04TMnKuMdmYFyiFu2zbnuR4wwnw4UQ/6itojXsqF1IW6
-         SjwV8dOD9IBw4tIUDJM3K52WPzLkd2BiExgH2AFCYSYBU/8lDs0qolMG0pagV+tfXma+
-         HHffBR94dN17NLPr+GGn2GBTOUYIWxX1BgF2+TtsoKTO668DmzRb8IQtWxOyBfBjrZXb
-         mnHMP/MRXhIW6DJ7raEpae/hMIrao8eY4bS7X/A9L80bA/GqFefPog6xTd6bNVx9D9bh
-         uF9WOuUnab6kfF7M4i/gAiKLURKrQvSc0yK3DVmJNPy94EutwaqRuAhghN/YhM6X+vNt
-         vxsA==
-X-Gm-Message-State: AOJu0Yx4rWE3y8yU2xreyp1HWreohMIFC8kSbaXllifMBbtafDaXpM3k
-	Fq4XxaQBKdcov8F+kF5gUpK3LA==
-X-Google-Smtp-Source: AGHT+IHBQS9u0x8xZRIF1tYnmQbgx7Tl8spe3HLfZnEj6pYZl4ExuWUKfoudSxw3WaKk/G1xMy0J/w==
-X-Received: by 2002:a50:9312:0:b0:53e:3b8f:8a58 with SMTP id m18-20020a509312000000b0053e3b8f8a58mr1968390eda.11.1700822390310;
-        Fri, 24 Nov 2023 02:39:50 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id i12-20020a056402054c00b00548851486d8sm1638589edx.44.2023.11.24.02.39.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 02:39:49 -0800 (PST)
-Date: Fri, 24 Nov 2023 11:39:48 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Edward Cree <ecree.xilinx@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	deb.chatterjee@intel.com, anjali.singhai@intel.com,
-	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
-	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	vladbu@nvidia.com, horms@kernel.org, bpf@vger.kernel.org,
-	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com,
-	dan.daly@intel.com, chris.sommers@keysight.com,
-	john.andy.fingerhut@intel.com
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-Message-ID: <ZWB9dF8/Uk2iP2uy@nanopsycho>
-References: <ZV7y9JG0d4id8GeG@nanopsycho>
- <CAM0EoMkOvEnPmw=0qye9gWAqgbZjaTYZhiho=qmG1x4WiQxkxA@mail.gmail.com>
- <ZV9U+zsMM5YqL8Cx@nanopsycho>
- <CAM0EoMnFB0hgcVFj3=QN4114HiQy46uvYJKqa7=p2VqJTwqBsg@mail.gmail.com>
- <ZV9csgFAurzm+j3/@nanopsycho>
- <CAM0EoMkgD10dFvgtueDn7wjJTFTQX6_mkA4Kwr04Dnwp+S-u-A@mail.gmail.com>
- <ZV9vfYy42G0Fk6m4@nanopsycho>
- <CAM0EoMkC6+hJ0fb9zCU8bcKDjpnz5M0kbKZ=4GGAMmXH4_W8rg@mail.gmail.com>
- <0d1d37f9-1ef1-4622-409e-a976c8061a41@gmail.com>
- <20231123105305.7edeab94@kernel.org>
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8931B2;
+	Fri, 24 Nov 2023 02:41:30 -0800 (PST)
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AO6ijpT003533;
+	Fri, 24 Nov 2023 10:41:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=I0mFE74+HCAZHSs5OcFV/WmM4ST9H8Z6coVPOaLZ/zg=;
+ b=iwYrsNlf0qflB8nGDpXnQ+T6s4IWkBlHahjYNhQDZjspPcImpVgSM+ssSXBT9M/xHWj1
+ yO3v7EomkXjNRRs738D5h7sH/q3OwudBtHm8gkXSPS1slNKYq+ViUvHUX7LpT+3PBG+O
+ Bm2U7duwJKcFujpFjEaWHApPNsRWy7XxzcXvDNmTbbNoVGnUJ+o8XCjgrLv5HlEHsO6g
+ P0lIVIV2PceGOqujayiH+KnCuwoD4QaBwaOVzHc6IbbkUD3wGI7PPpqas1ZruSvD46pa
+ c0yQbMpGArI6tIdb7myvcWOiAePQ9gMa4hRNLxcbcFEM+keiRIHETNjjHysUyyyQzt98 4w== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ujptr0q17-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 10:41:16 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AOAfGXG028633
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Nov 2023 10:41:16 GMT
+Received: from [10.253.33.181] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 24 Nov
+ 2023 02:41:12 -0800
+Message-ID: <b5e6c55c-af6b-4a29-95bd-389a9323920b@quicinc.com>
+Date: Fri, 24 Nov 2023 18:41:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231123105305.7edeab94@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <corbet@lwn.net>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>
+References: <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
+ <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+ <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
+ <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
+ <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
+ <316fb626-4dc3-4540-9cc4-e45840e36f77@quicinc.com>
+ <ZVyZ+8Q2eNfAKjO/@shell.armlinux.org.uk>
+ <d2ac542c-aae3-49ae-ae2b-9defc4ca98eb@quicinc.com>
+ <ZV8+/4eNzLpLzSDG@shell.armlinux.org.uk>
+ <1bd2f3a9-3dd1-4c95-b4e5-c9bf2274f271@quicinc.com>
+ <ZWByn7HpAmPTP3GJ@shell.armlinux.org.uk>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <ZWByn7HpAmPTP3GJ@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: XdTt8mComxSESH2LtOToWtzuUVmA7tdM
+X-Proofpoint-GUID: XdTt8mComxSESH2LtOToWtzuUVmA7tdM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_15,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ bulkscore=0 mlxscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 mlxlogscore=999 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311240084
 
-Thu, Nov 23, 2023 at 07:53:05PM CET, kuba@kernel.org wrote:
->On Thu, 23 Nov 2023 17:53:42 +0000 Edward Cree wrote:
->> The kernel doesn't like to trust offload blobs from a userspace compiler,
->>  because it has no way to be sure that what comes out of the compiler
->>  matches the rules/tables/whatever it has in the SW datapath.
->> It's also a support nightmare because it's basically like each user
->>  compiling their own device firmware.  
->
->Practically speaking every high speed NIC runs a huge binary blob of FW.
->First, let's acknowledge that as reality.
-
-True, but I believe we need to diferenciate:
-1) vendor created, versioned, signed binary fw blob
-2) user compiled on demand, blob
-
-I look at 2) as on "a configuration" of some sort.
 
 
->
->Second, there is no equivalent for arbitrary packet parsing in the
->kernel proper. Offload means take something form the host and put it
->on the device. If there's nothing in the kernel, we can't consider
->the new functionality an offload.
->
->I understand that "we offload SW functionality" is our general policy,
->but we should remember why this policy is in place, and not
->automatically jump to the conclusion.
-
-It is in place to have well defined SW definition of what devices
-offloads.
-
-
->
->>  At least normally with device firmware the driver side is talking to
->>  something with narrow/fixed semantics and went through upstream
->>  review, even if the firmware side is still a black box.
->
->We should be buildings things which are useful and open (as in
->extensible by people "from the street"). With that in mind, to me,
->a more practical approach would be to try to figure out a common
->and rigid FW interface for expressing the parsing graph.
-
-Hmm, could you elaborate a bit more on this one please?
-
->
->But that's an interface going from the binary blob to the kernel.
->
->> Just to prove I'm not playing favourites: this is *also* a problem with
->>  eBPF offloads like Nanotubes, and I'm not convinced we have a viable
->>  solution yet.
->
->BPF offloads are actual offloads. Config/state is in the kernel,
->you need to pop it out to user space, then prove that it's what
->user intended.
+On 11/24/2023 5:53 PM, Russell King (Oracle) wrote:
+> On Fri, Nov 24, 2023 at 05:47:04PM +0800, Jie Luo wrote:
+>>
+>>
+>> On 11/23/2023 8:01 PM, Russell King (Oracle) wrote:
+>>> On Thu, Nov 23, 2023 at 06:57:59PM +0800, Jie Luo wrote:
+>>>> On 11/21/2023 7:52 PM, Russell King (Oracle) wrote:
+>>>>> Ultimately, you will need a way to use inband signalling with Cisco
+>>>>> SGMII for 10M/100M/1G speeds, and then switch to 2500base-X when
+>>>>> operating at 2.5G speeds, and that is done via the PHY driver
+>>>>> updating phydev->interface.
+>>>>>
+>>>>> What we do need is some way for the PHY to also tell the PCS/MAC
+>>>>> whether inband should be used. This is something I keep bringing up
+>>>>> and now that we have PCS drivers revised to use the value from
+>>>>> phylink_pcs_neg_mode() _and_ a consistent implementation amongst them
+>>>>> we can now think about signalling to PCS drivers whether inband mode
+>>>>> needs to be turned off when switching between modes.
+>>>>
+>>>> Yes, we can switch the interface mode according to the current link
+>>>> speed in the pcs driver.
+>>>> but the issue is that the phy-mode i specified for the PHYLINK,
+>>>> if phy-mode is sgmii, the support capability is limited to maximum
+>>>> capability 1G during the PHYLINK setup and i can't configure it to 2.5G
+>>>> dynamically, if the phy-mode is 2500base-x, then PHY capability will
+>>>> be modified to only support 2.5G, other speeds can't be linked up.
+>>>
+>>> So you need my patches that add "possible_interfaces" to phylib so you
+>>> can tell phylink that you will be switching between SGMII and
+>>> 2500base-X. Please see the RFC posting of those patches I sent
+>>> yesterday and try them out - you will need to modify your phylib
+>>> driver to fill in phydev->possible_interfaces.
+>>
+>> Your patches work on my board, thanks Russell.
+> 
+> Please can you reply to the covering email for that series giving your
+> tested-by? Thanks.
+> 
+Ok.
 
