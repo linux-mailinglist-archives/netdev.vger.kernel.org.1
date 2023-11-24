@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-50817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB1067F73C1
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:26:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECAA7F73C2
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 13:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65061281303
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C244B213C2
+	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 12:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9EC249E2;
-	Fri, 24 Nov 2023 12:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53FA2376D;
+	Fri, 24 Nov 2023 12:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Ly2EujlL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tntoHK3/"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15742D71
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:26:04 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAABCB6
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 04:27:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NJ4pJItto6MO5iPtZbee1r50454UJOBT1TQ8fJJMqok=; b=Ly2EujlL0oRmNrqS/oanmy4DqD
-	WSEBUrvRFxdvt4SFxBUFU6i9ppQHvLtLOAIqB7lUsUPzWl82rTbtVTPpmlTKzTl/y1x6BRurZWZsO
-	Td1OV8Hriugetkx8JQPOm237NgU9oaRHPB8NiOsftGIsLeC5Gop+su/IgfGN1iMGNihUga8N+CfW5
-	j1esv7JSs8Skq4RuzjUQwCjyDxGTaGnt2l8sajNYxY1HabX6sLgcBK3A7Cqo4duB3grq0xmU8FTVS
-	gMuuEsgYBafytaWO4BoLW+v5EvqRnC6xhIclziAjmKmft+H9KcTL+850/JO0Q9+EKc5TzwGievag2
-	3YV5fYdQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37702)
+	bh=zC/jfcnCG06BLzzia+PcDPSaY6kjpC32tyOCy49Eg9U=; b=tntoHK3/hlKUz/ETZlrQn+wm4Y
+	WRHSCG8fVczZCioP7jZtL8cspuLBI/GVB5ThqkxpSlt3AaJFSpkOfikdeCs1nlLovnEUizI3lp1mX
+	66+gE2P7gHXHgVv78Y34ttrAxPovFvOPSlWtM9C6gOhbKrZIFwhH2MUUh67ZmgtEjD9j0U6edhKXW
+	V9yuELqgOn3u54BJMq0FvbSf+KOsCZbI31bMLuvNSfUYEj4ieQmSCdsNsek0LBkqZ3495MUp+k5DL
+	uDfgoJCgjZWdluiMea3A4KBrMZ8YkFCXxpcUdMoTzcv+Mzh1UBlwYIbGV2E+WjctmZKulGsLilFd+
+	sHjFby7A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53184)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1r6VFs-0002rh-38;
-	Fri, 24 Nov 2023 12:25:56 +0000
+	id 1r6VH3-0002rx-1a;
+	Fri, 24 Nov 2023 12:27:09 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r6VFu-0007Eg-CP; Fri, 24 Nov 2023 12:25:58 +0000
-Date: Fri, 24 Nov 2023 12:25:58 +0000
+	id 1r6VH5-0007Eq-Ds; Fri, 24 Nov 2023 12:27:11 +0000
+Date: Fri, 24 Nov 2023 12:27:11 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
@@ -50,8 +50,7 @@ Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
 	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
 	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
 Subject: [PATCH net-next 00/10] net: phylink: improve PHY validation
-Message-ID: <ZWCWVtgSsxZUCErJ@shell.armlinux.org.uk>
-References: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
+Message-ID: <ZWCWn+uNkVLPaQhn@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,7 +59,6 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZV4eolj9AI0b37y6@shell.armlinux.org.uk>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
 Hi,
@@ -103,6 +101,9 @@ This should improve the accuracy of the validation.
 Sending this out again without RFC as Jie Luo will need it for the
 QCA8084 changes. No changes except to add the attributations already
 received. Thanks!
+
+And I'll send the cover message again without threading it to the
+previous series!
 
  drivers/net/phy/aquantia/aquantia.h      |   5 +
  drivers/net/phy/aquantia/aquantia_main.c |  76 +++++++++++-
