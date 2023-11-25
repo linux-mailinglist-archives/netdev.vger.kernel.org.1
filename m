@@ -1,117 +1,178 @@
-Return-Path: <netdev+bounces-51055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E7F7F8CED
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:52:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D543E7F8CF1
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED83B20FF7
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:52:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C172814DB
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31AF2D050;
-	Sat, 25 Nov 2023 17:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB07C2D056;
+	Sat, 25 Nov 2023 17:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="urx7XhfB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="bRBdEzaw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 765A611F;
-	Sat, 25 Nov 2023 09:52:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MdVRObo32aWz8f8kgjwheJhKiMZUR4c7isPKuP93/wU=; b=urx7XhfBX0iP+Qbhwb87KAvF9k
-	oQo7eZJ9HxvOzzfkiRwavlt3zCsDVtFbuWud3BdkXZGJLfR5/GXGMc9qrS2/pEMwWbwvuPnmIhzP8
-	fY9q5+ZtkyA5T7nZGlIaXtmbC9z4j0XzrinGqYFBgcHUiaroB3sgoHUzeWj0JvQC0FTM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r6wos-001Cba-Ao; Sat, 25 Nov 2023 18:51:54 +0100
-Date: Sat, 25 Nov 2023 18:51:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH v2 01/11] net: phy: extend PHY package API
- to support multiple global address
-Message-ID: <a8ce4503-c24d-4d6e-91ec-d03624b31fe0@lunn.ch>
-References: <20231125001127.5674-1-ansuelsmth@gmail.com>
- <20231125001127.5674-2-ansuelsmth@gmail.com>
+Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B979A8
+	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 09:54:39 -0800 (PST)
+Received: from eig-obgw-5006a.ext.cloudfilter.net ([10.0.29.179])
+	by cmsmtp with ESMTPS
+	id 6vE6rr6iDjtZ36wrcrFdTo; Sat, 25 Nov 2023 17:54:44 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id 6wrVr7CSG1J286wrVrYqiE; Sat, 25 Nov 2023 17:54:38 +0000
+X-Authority-Analysis: v=2.4 cv=Tqz1ORbh c=1 sm=1 tr=0 ts=656234de
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=yGeM7+xMb5a5VK1DGQx1ew==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=BNY50KLci1gA:10 a=wYkD_t78qR0A:10
+ a=6mUrkXxl0K-UJ-lciFYA:9 a=QEXdDO2ut3YA:10
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fQ6gkAIpegcRMWjhELvU1rTB6lMBEW1z2DgZ25eNdo0=; b=bRBdEzawFlxZI6RfftSz5OGGHW
+	z0dZeVUJfzQWuG5en1b8FHMQV64h0L/nqbMfs1ICF2ClihuEB5tdHWEllGs2HoSBvakVdJy7EtCJA
+	7VT2d2wrnpYxOr9wx+6w3OB4a5BZ7j/DQJ5ZLnZFvlB4mkA9Sv0rYsIVzFnfLs/z+0fIsx16pkESP
+	EigUzMG5Bj8r7dHO6vR5niEJMExQ6CmE6c9DSrbSaBdwwoWPzPyNcd0ovdbsh682p8kfjh1pCVRtx
+	TWXY/M26fKScoz8f2HLGEe5Lkfx64NI008IBAyBm1U7270CHv3fTSYnXxSCW2jCb/EdqYzAIUqBTG
+	2q6Hu3Wg==;
+Received: from 187.184.157.122.cable.dyn.cableonline.com.mx ([187.184.157.122]:46244 helo=[192.168.0.25])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1r6wrU-001o7P-2I;
+	Sat, 25 Nov 2023 11:54:36 -0600
+Message-ID: <d7294586-04a4-49f7-8f5f-2dd66c8b4cde@embeddedor.com>
+Date: Sat, 25 Nov 2023 11:54:28 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231125001127.5674-2-ansuelsmth@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] Boot crash on v6.7-rc2
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Joey Gouly <joey.gouly@arm.com>, Kees Cook <keescook@chromium.org>,
+ linux-hardening@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>
+References: <20231124102458.GB1503258@e124191.cambridge.arm.com>
+ <7086f60f-9f74-4118-a10c-d98b9c6cc8eb@embeddedor.com>
+Content-Language: en-US
+In-Reply-To: <7086f60f-9f74-4118-a10c-d98b9c6cc8eb@embeddedor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 187.184.157.122
+X-Source-L: No
+X-Exim-ID: 1r6wrU-001o7P-2I
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 187.184.157.122.cable.dyn.cableonline.com.mx ([192.168.0.25]) [187.184.157.122]:46244
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 7
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfCju0naMvUVYlzMAtPh4plDv7sApN0pyIF/MnDqNfH74q5KEzxLncolZXsdLM0NO2V5xAAJEHRzWMVJpgTrToNNoYgRd9aXu+8BW+0z1O+Dh2kqNbtcB
+ EmPWhJvSS8ri4TRVmqVNCQhTRXKC6mihCHME6m32nMBcZncmz26sOMP4hI1bOXnVh99wxyKTtxix/Ohk/UjqVPdqSn14ULomhFE=
+X-Spam-Level: *
 
-On Sat, Nov 25, 2023 at 01:11:17AM +0100, Christian Marangi wrote:
-> Current API for PHY package are limited to single address to configure
-> global settings for the PHY package.
+
+
+On 11/24/23 09:28, Gustavo A. R. Silva wrote:
 > 
-> It was found that some PHY package (for example the qca807x, a PHY
-> package that is shipped with a bundle of 5 PHY) require multiple PHY
-> address to configure global settings. An example scenario is a PHY that
-> have a dedicated PHY for PSGMII/serdes calibrarion and have a specific
-> PHY in the package where the global PHY mode is set and affects every
-> other PHY in the package.
 > 
-> Change the API in the following way:
-> - Make phy_package_join() require a list of address to be passed and the
->   number of address in the list
-> - On shared data init, each address is the list is checked and added to
->   the shared struct.
-> - Make __/phy_package_write/read() require an additional arg that
->   select what global PHY address to use in the provided list.
+> On 11/24/23 04:24, Joey Gouly wrote:
+>> Hi all,
+>>
+>> I just hit a boot crash on v6.7-rc2 (arm64, FVP model):
+> 
+> [..]
+> 
+>> Checking `struct neighbour`:
+>>
+>>     struct neighbour {
+>>         struct neighbour __rcu    *next;
+>>         struct neigh_table    *tbl;
+>>     .. fields ..
+>>         u8            primary_key[0];
+>>     } __randomize_layout;
+>>
+>> Due to the `__randomize_layout`, `primary_key` field is being placed before `tbl` (actually it's the same address since it's a 0 length array). That means the 
+>> memcpy() corrupts the tbl pointer.
+>>
+>> I think I just got unlucky with my CONFIG_RANDSTRUCT seed (I can provide it if needed), it doesn't look as if it's a new issue.
+> 
+> It seems the issue is caused by this change that was recently added to -rc2:
+> 
+> commit 1ee60356c2dc ("gcc-plugins: randstruct: Only warn about true flexible arrays")
+> 
+> Previously, one-element and zero-length arrays were treated as true flexible arrays
+> (however, they are "fake" flex arrays), and __randomize_layout would leave them
+> untouched at the end of the struct; the same for proper C99 flex-array members. But
+> after the commit above, that's no longer the case: Only C99 flex-array members will
+> behave correctly (remaining untouched at end of the struct), and the other two types
+> of arrays will be randomized.
 
-I think this is overly complex.
+mmh... it seems that commit 1ee60356c2dc only prevents one-element arrays from being
+treated as flex arrays, while the code should still keep zero-length arrays untouched:
 
-I would rename struct phy_package_shared addr to base_addr.
-phy_package_join() would then pass the base address of the package,
-which is the same as your reg property for the package in DT.
+         if (typesize == NULL_TREE && TYPE_DOMAIN(fieldtype) != NULL_TREE &&
+             TYPE_MAX_VALUE(TYPE_DOMAIN(fieldtype)) == NULL_TREE)
+                 return true;
 
-I think all current users of devm_phy_package_join() already do pass
-the lowest address in the package, so this should not cause any
-problems. Most drivers even call it base address, rather than cookie,
-which the documentation uses.
+-       if (typesize != NULL_TREE &&
+-           (TREE_CONSTANT(typesize) && (!tree_to_uhwi(typesize) ||
+-            tree_to_uhwi(typesize) == tree_to_uhwi(elemsize))))
+-               return true;
+-
 
-I would then extend __phy_package_read() etc to take an offset, which
-is added to base_addr, and the read is performed on that address. All
-the existing users would pass 0, and your new driver can pass other
-values.
+Sorry about the confusion.
 
-I also think you can split this out from the DT binding. Make it two
-patch sets. One patch set is about extended the package concept to
-allow access to global registers at addresses other than the base. The
-DT patch is about properties which are shared by the package. These
-seems like two mostly orthogonal concepts.
+> 
+>>
+>> I couldn't reproduce directly on v6.6 (the offsets for `tbl` and `primary_key` didn't overlap).
+>> However I tried changing the zero-length-array to a flexible one:
+>>
+>>     +    DECLARE_FLEX_ARRAY(u8, primary_key);
+>>     +    u8        primary_key[0];
+>>
+>> Then the field offsets ended up overlapping, and I also got the same crash on v6.6.
+> 
+> The right approach is to transform the zero-length array into a C99 flex-array member,
+> like this:
+> 
+> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> index 07022bb0d44d..0d28172193fa 100644
+> --- a/include/net/neighbour.h
+> +++ b/include/net/neighbour.h
+> @@ -162,7 +162,7 @@ struct neighbour {
+>          struct rcu_head         rcu;
+>          struct net_device       *dev;
+>          netdevice_tracker       dev_tracker;
+> -       u8                      primary_key[0];
+> +       u8                      primary_key[];
+>   } __randomize_layout;
+> 
+>   struct neigh_ops {
 
-    Andrew
+In any case, I think we still should convert [0] to [ ].
+
+--
+Gustavo
 
