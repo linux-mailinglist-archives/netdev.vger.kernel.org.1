@@ -1,171 +1,79 @@
-Return-Path: <netdev+bounces-51038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C22C7F8C99
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:05:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B15E7F8C9B
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90C162812F2
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:05:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E54D2B20DAE
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8036929438;
-	Sat, 25 Nov 2023 17:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4631288D8;
+	Sat, 25 Nov 2023 17:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KW6PsJPb"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BCC12B
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 09:05:26 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1r6w5W-0000xM-ND; Sat, 25 Nov 2023 18:05:02 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1r6w5U-00BWxZ-3K; Sat, 25 Nov 2023 18:05:00 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 9834E2538FD;
-	Sat, 25 Nov 2023 17:04:59 +0000 (UTC)
-Date: Sat, 25 Nov 2023 18:04:59 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Srinivas Goud <srinivas.goud@amd.com>
-Cc: wg@grandegger.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	p.zabel@pengutronix.de, git@amd.com, michal.simek@xilinx.com,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, appana.durga.rao@xilinx.com,
-	naga.sureshkumar.relli@xilinx.com
-Subject: Re: [PATCH v6 3/3] can: xilinx_can: Add ethtool stats interface for
- ECC errors
-Message-ID: <20231125-distract-upstage-a18902149a63-mkl@pengutronix.de>
-References: <1700910933-23868-1-git-send-email-srinivas.goud@amd.com>
- <1700910933-23868-4-git-send-email-srinivas.goud@amd.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A9CB106
+	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 09:06:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0Nn0goUNoR9PLT6ksI7Ffxr+6QjMrZpmcqAcYurTVZI=; b=KW6PsJPbiREAF0U9eNg8rQH3o/
+	QE/3NZtfLN8gDLAVGYzO7FL31N8ZtHINjqJev6SfLxG7JXcz1t29726QAtISQCmnSdfjtuVFXnJgG
+	6Kws+lLfca6gGGK5EkirgHAmCIWM/JVo0YXUyeFWy1MFHjCjYbkY+irPqwfYrd0zTLvM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r6w6U-001CKV-3o; Sat, 25 Nov 2023 18:06:02 +0100
+Date: Sat, 25 Nov 2023 18:06:02 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 01/10] net: phy: add possible interfaces
+Message-ID: <14c8dbbc-92d1-4d51-9986-a6f2ef1c3e52@lunn.ch>
+References: <ZWCWn+uNkVLPaQhn@shell.armlinux.org.uk>
+ <E1r6VHk-00DDLN-I7@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4jgdzz4e4cfbadnp"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1700910933-23868-4-git-send-email-srinivas.goud@amd.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <E1r6VHk-00DDLN-I7@rmk-PC.armlinux.org.uk>
 
+On Fri, Nov 24, 2023 at 12:27:52PM +0000, Russell King (Oracle) wrote:
+> Add a possible_interfaces member to struct phy_device to indicate which
+> interfaces a clause 45 PHY may switch between depending on the media.
+> This must be populated by the PHY driver by the time the .config_init()
+> method completes according to the PHYs host-side configuration.
+> 
+> For example, the Marvell 88x3310 PHY can switch between 10GBASE-R,
+> 5GBASE-R, 2500BASE-X, and SGMII on the host side depending on the media
+> side speed, so all these interface modes are set in the
+> possible_interfaces member.
+> 
+> This allows phylib users (such as phylink) to know in advance which
+> interface modes to expect, which allows them to appropriately restrict
+> the advertised link modes according to the capabilities of other parts
+> of the link.
+> 
+> Tested-by: Luo Jie <quic_luoj@quicinc.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
---4jgdzz4e4cfbadnp
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-On 25.11.2023 16:45:33, Srinivas Goud wrote:
-> Add ethtool stats interface for reading FIFO 1bit/2bit ECC errors informa=
-tion.
->=20
-> Signed-off-by: Srinivas Goud <srinivas.goud@amd.com>
-> ---
-> Changes in v6:
-> None
->=20
-> Changes in v5:
-> Address review comments
-> Add get_strings and get_sset_count stats interface
-> Use u64 stats helper function
->=20
-> Changes in v4:
-> None
->=20
-> Changes in v3:
-> None
->=20
-> Changes in v2:
-> Add ethtool stats interface
->=20
->  drivers/net/can/xilinx_can.c | 54 ++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 54 insertions(+)
->=20
-> diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-> index c8691a1..40c912b 100644
-> --- a/drivers/net/can/xilinx_can.c
-> +++ b/drivers/net/can/xilinx_can.c
-> @@ -228,6 +228,7 @@ struct xcan_devtype_data {
->   * @transceiver:		Optional pointer to associated CAN transceiver
->   * @rstc:			Pointer to reset control
->   * @ecc_enable:			ECC enable flag
-> + * @stats_lock:			Lock for synchronizing ECC errors stats
->   * @ecc_2bit_rxfifo_cnt:	RXFIFO 2bit ECC count
->   * @ecc_1bit_rxfifo_cnt:	RXFIFO 1bit ECC count
->   * @ecc_2bit_txolfifo_cnt:	TXOLFIFO 2bit ECC count
-> @@ -254,6 +255,7 @@ struct xcan_priv {
->  	struct phy *transceiver;
->  	struct reset_control *rstc;
->  	bool ecc_enable;
-> +	spinlock_t stats_lock; /* Lock for synchronizing ECC errors stats */
->  	u64_stats_t ecc_2bit_rxfifo_cnt;
->  	u64_stats_t ecc_1bit_rxfifo_cnt;
->  	u64_stats_t ecc_2bit_txolfifo_cnt;
-> @@ -347,6 +349,12 @@ static const struct can_tdc_const xcan_tdc_const_can=
-fd2 =3D {
->  	.tdcf_max =3D 0,
->  };
-> =20
-> +static const char xcan_priv_flags_strings[][ETH_GSTRING_LEN] =3D {
-> +	"err-ecc-rx-2-bit", "err-ecc-rx-1-bit",
-> +	"err-ecc-txol-2-bit", "err-ecc-txol-1-bit",
-> +	"err-ecc-txtl-2-bit", "err-ecc-txtl-1-bit",
-> +};
-> +
->  /**
->   * xcan_write_reg_le - Write a value to the device register little endian
->   * @priv:	Driver private data structure
-> @@ -1171,6 +1179,9 @@ static void xcan_err_interrupt(struct net_device *n=
-dev, u32 isr)
-> =20
->  	if (priv->ecc_enable && isr & XCAN_IXR_ECC_MASK) {
->  		u32 reg_rx_ecc, reg_txol_ecc, reg_txtl_ecc;
-> +		unsigned long flags;
-> +
-> +		spin_lock_irqsave(&priv->stats_lock, flags);
-
-The register access doesn't have to be protected by the spinlock, only
-when you touch priv->ecc_*cnt.
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---4jgdzz4e4cfbadnp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmViKTgACgkQvlAcSiqK
-BOiREQgAtl7uFO/XnkgoCkRiMxHvAtvcVrUswBxeFAW76mVjE9V/Hg3V4LQ3vcPV
-Tzt+wM53Wd7FDXJMj6P8qaUrzC2PVrBeqqGb8RoPrEr6pSY/qf2Rj85OJG/xs8RT
-Z0zB4U87ccavRZ4ozzCiVDQ+3eAfQp8RbeUnBFKIQKCnZfVInzvUMG2l+gFTvLjg
-MtXCmOEIhlrFFWSDG1JeeIhXKXBBhGsUqe+sTDOytMlFPnR7h2SLZOsZ5NxgGqGX
-PNYkIMjfiiK57iJmPEo+/opqh7nTw4FFSRrGr9g9RmuveF3uCVLjqOHBLMf0lZTE
-14Pn5JTlqvNMrSOK/jZzgMFmsgCvxA==
-=5s7P
------END PGP SIGNATURE-----
-
---4jgdzz4e4cfbadnp--
+    Andrew
 
