@@ -1,132 +1,200 @@
-Return-Path: <netdev+bounces-51012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B4A7F888C
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 07:02:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA37B7F889A
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 07:15:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 824311C20B9D
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 06:02:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250AFB210F5
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 06:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82194430;
-	Sat, 25 Nov 2023 06:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D3F4435;
+	Sat, 25 Nov 2023 06:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SvFpBoa4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b77ff2OP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE084170B;
-	Fri, 24 Nov 2023 22:02:19 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1ce3084c2d1so20589835ad.3;
-        Fri, 24 Nov 2023 22:02:19 -0800 (PST)
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE611723;
+	Fri, 24 Nov 2023 22:15:48 -0800 (PST)
+Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3b83432ca31so1683316b6e.1;
+        Fri, 24 Nov 2023 22:15:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700892139; x=1701496939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FclhQf3qesEshzQHC5UsLSEyaxrJX7Yi4QUTwlsrBzo=;
-        b=SvFpBoa47fRi2Geddtva6RFAc4RXcc1IV0EhDx4gsyJQHdqDBifQD8OxahCSiWySGY
-         PWJD8WG6iUxC7NooIDXVZv4G1oR/RjG1vCoqLiKRTthM68wwQmnO16B9XuvJs6MtLK1c
-         oe7z54rfeMnk5nCllOhxJncpindbAx4LbTI/zA+j3/2+tXto7WNQMBx2K43+aWD6OvTH
-         w6oxqherCJqJBtxreDqkzdEde52sUvF9SRvW0XkJVjKzjr73zXOn+aHfxONptMfJqG9F
-         bJf8J2HYN2MCOHWhIcSgSwyZkL4BdgqmL0J9TxwoWZJ8Bqofbr2jnuzPqd2LVeTeBL2o
-         l7xQ==
+        d=gmail.com; s=20230601; t=1700892948; x=1701497748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pt0PfJDT3f08sVVp/8Q0IRjtVu02ZOwmgKKrULlYRLU=;
+        b=b77ff2OPt4P/0UMdskPrRxSBt/7A/RBbH008dvXmOKr3HBcMdkHaK0jrO02Thal+db
+         06aEzkTcwrr7dZ+URQBqx2IQpcFxin6oILZbP4lND8Iqj6/xNK0WaFbGv7u1FWp9w2qA
+         n2o5HPDJg2j113P44dk6PmM24FFT+Dk0o7T6q489T5iYj51MpxHLGfvl8UfEiYCgLies
+         ZPIT+92fe/gR6QW/Xvm1ZxsygCeM9E2JMXNDP/Gl/AnadYwZsdwusYjNHQ+Ef7WFU1Ba
+         CvfBM9FPpFk/gfqiF8T0/Zh67CbvlgUKjCyGzwCz11WmewSP8TU5673R4Yy1XF0qmlB7
+         48yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700892139; x=1701496939;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FclhQf3qesEshzQHC5UsLSEyaxrJX7Yi4QUTwlsrBzo=;
-        b=q2jRqWhGCWHcBw/Yl4k/DjCozLZw0st6P07wSrA/rz7ajbagQOhuiC6dhNnY2drwpo
-         g+WCQGUM/+kDR6iwj0eFUKsAZw6zDa8WSf+6WjZ6qDFa8yjD0x4E63Q7pQ48qbJE4IxX
-         n16YyloMXsq7VPZGKJPg1VX4B3jjwmLoVhYS8/+FfmihlB+ZLs1sfGgoFCoVLuInIAnF
-         8osFsxfe3TVzABmtCxYAnYcwkirkxkT3agDDT5O06QRSJnCLjsJWkZqWAaTThZNm91Xa
-         UN2/RJBDnFgPiU+PzkjH5yNf062rPPStw7zqD63rcJp5a+vMEhyj6QSvCCeJLawp9Z5Z
-         Xkmg==
-X-Gm-Message-State: AOJu0YxGGVmqhL5IXhszWWnNbGPxsCDLIfDRW4C/PNEIDNoPGYUt2aqf
-	HS2AqhkfLPfozJTpFPZ78mM=
-X-Google-Smtp-Source: AGHT+IEyIZv6kPKcJuJsdF5mkhJzsr0Y/Z/jY64tcTkX225IcRn/vjh+aCjOupIC+C0YVipqna0Edg==
-X-Received: by 2002:a17:903:2596:b0:1cf:9d88:a0ef with SMTP id jb22-20020a170903259600b001cf9d88a0efmr4177631plb.59.1700892139281;
-        Fri, 24 Nov 2023 22:02:19 -0800 (PST)
-Received: from localhost.localdomain ([74.48.130.204])
-        by smtp.googlemail.com with ESMTPSA id h11-20020a170902f7cb00b001c9c97beb9csm4142059plw.71.2023.11.24.22.02.10
+        d=1e100.net; s=20230601; t=1700892948; x=1701497748;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pt0PfJDT3f08sVVp/8Q0IRjtVu02ZOwmgKKrULlYRLU=;
+        b=u4uAX6H0VBUyaLUXQlA1cnMl3Jm0pNWfpzNS8INBaSNgxAvvlGsZ2PMq3pLePCa+wA
+         jSAOiWx6kMr0fzFQ5JzE32jNZjn7LpH7O6Z3vCp2X7+RIDgqZEmxzQ0aDs42M7lrZiYG
+         bE2YC59kJ431YUKAl/uKlCEG/slO10JIOWtzeuMcyHc6shoZcze/O8kwmXXkqzNdwecZ
+         O62S/tUT/Ne9/nAQhTft1qRMVovVrF+yr1xJdfhg62F7ZvDGaI9FAnUdZtPVDOlcB031
+         j+3d39l5e3Gw6GDU0vmylufLhK8K90wT6sq25MrYXuX7rcWHfMn/TiLd+yJ7xEZjnKFd
+         i45w==
+X-Gm-Message-State: AOJu0YxxEc1CAytYM0m3ufqCO8dscPIOVp7NB4V6IPK6+rbIfBTzhwWX
+	fIAG45RmrzY2iCzVCjqZrCs=
+X-Google-Smtp-Source: AGHT+IFrTu+HMFY2tW90QAa4w1v6C4Hg0ZSYs6mEUVIn4e6O+bbYT5Dep6SV6Oj0Mt53DR8e9mpyKQ==
+X-Received: by 2002:a05:6808:dde:b0:3b8:5df8:be90 with SMTP id g30-20020a0568080dde00b003b85df8be90mr576069oic.53.1700892947775;
+        Fri, 24 Nov 2023 22:15:47 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id v69-20020a638948000000b0056c2f1a2f6bsm4041740pgd.41.2023.11.24.22.15.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 22:02:18 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
+        Fri, 24 Nov 2023 22:15:45 -0800 (PST)
+Date: Sat, 25 Nov 2023 14:15:36 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>
-Subject: [PATCH net v3] net: stmmac: xgmac: Disable FPE MMC interrupts
-Date: Sat, 25 Nov 2023 14:01:26 +0800
-Message-Id: <20231125060126.2328690-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Po-Hsu Lin <po-hsu.lin@canonical.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mark Brown <broonie@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH net-next 01/38] selftests/net: add lib.sh
+Message-ID: <ZWGRCK4D64EfUybp@Laptop-X1>
+References: <20231124092736.3673263-1-liuhangbin@gmail.com>
+ <20231124092736.3673263-2-liuhangbin@gmail.com>
+ <87cyvzfagj.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87cyvzfagj.fsf@nvidia.com>
 
-Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
-by default") tries to disable MMC interrupts to avoid a storm of
-unhandled interrupts, but leaves the FPE(Frame Preemption) MMC
-interrupts enabled, FPE MMC interrupts can cause the same problem.
-Now we mask FPE TX and RX interrupts to disable all MMC interrupts.
+On Fri, Nov 24, 2023 at 03:35:51PM +0100, Petr Machata wrote:
+> 
+> Hangbin Liu <liuhangbin@gmail.com> writes:
+> 
+> > +cleanup_ns()
+> > +{
+> > +	local ns=""
+> > +	local errexit=0
+> > +
+> > +	# disable errexit temporary
+> > +	if [[ $- =~ "e" ]]; then
+> > +		errexit=1
+> > +		set +e
+> > +	fi
+> > +
+> > +	for ns in "$@"; do
+> > +		ip netns delete "${ns}" &> /dev/null
+> > +		busywait 2 "ip netns list | grep -vq $1" &> /dev/null
+> 
+> The grep would get confused by substrings of other names.
+> This should be grep -vq "^$ns$".
 
-Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
-Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
-Changes in v3:
-  - Update commit message, thanks Larysa.
-  - Rename register defines, thanks Serge.
+Thanks. I just thought the ns name would like foo-xxxxxxx, but I forgot this
+is a common function, which maybe called with normal ns name.
 
-Changes in v2:
-  - Update commit message, thanks Wojciech and Andrew.
----
- drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> 
+> > +		if ip netns list | grep -q $1; then
+> 
+> Busywait returns != 0 when the wait condition is not reached within a
+> given time. So it should be possible to roll the duplicated if-grep into
+> the busywait line like so:
+> 
+> 		if ! busywait 2 "ip netns etc."; then
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-index ea4910ae0921..6a7c1d325c46 100644
---- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-@@ -177,8 +177,10 @@
- #define MMC_XGMAC_RX_DISCARD_OCT_GB	0x1b4
- #define MMC_XGMAC_RX_ALIGN_ERR_PKT	0x1bc
- 
-+#define MMC_XGMAC_TX_FPE_INTR_MASK	0x204
- #define MMC_XGMAC_TX_FPE_FRAG		0x208
- #define MMC_XGMAC_TX_HOLD_REQ		0x20c
-+#define MMC_XGMAC_RX_FPE_INTR_MASK	0x224
- #define MMC_XGMAC_RX_PKT_ASSEMBLY_ERR	0x228
- #define MMC_XGMAC_RX_PKT_SMD_ERR	0x22c
- #define MMC_XGMAC_RX_PKT_ASSEMBLY_OK	0x230
-@@ -352,6 +354,8 @@ static void dwxgmac_mmc_intr_all_mask(void __iomem *mmcaddr)
- {
- 	writel(0x0, mmcaddr + MMC_RX_INTR_MASK);
- 	writel(0x0, mmcaddr + MMC_TX_INTR_MASK);
-+	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_TX_FPE_INTR_MASK);
-+	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_FPE_INTR_MASK);
- 	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_IPC_INTR_MASK);
- }
- 
--- 
-2.34.1
+You are right.
+> 
+> > +			echo "Failed to remove namespace $1"
+> > +			return $ksft_skip
+> 
+> This does not restore the errexit.
+> 
+> I think it might be clearest to have this function as a helper, say
+> __cleanup_ns, and then have a wrapper that does the errexit management:
+> 
+> cleanup_ns()
+> {
+> 	local errexit
+> 	local rc
+> 
+> 	# disable errexit temporarily
+> 	if [[ $- =~ "e" ]]; then
+> 		errexit=1
+> 		set +e
+> 	fi
+> 
+> 	__cleanup_ns "$@"
+> 	rc=$?
+> 
+> 	[ $errexit -eq 1 ] && set -e
+> 	return $rc
+> }
+> 
+> If this comes up more often, we can have a helper like
+> with_disabled_errexit or whatever, that does this management and
+> dispatches to "$@", so cleanup_ns() would become:
+> 
+> cleanup_ns()
+> {
+> 	with_disabled_errexit __cleanup_ns "$@"
+> }
 
+Thanks for your suggestion.
+
+> 
+> > +		fi
+> > +	done
+> > +
+> > +	[ $errexit -eq 1 ] && set -e
+> > +	return 0
+> > +}
+> > +
+> > +# By default, remove all netns before EXIT.
+> > +cleanup_all_ns()
+> > +{
+> > +	cleanup_ns $NS_LIST
+> > +}
+> > +trap cleanup_all_ns EXIT
+> 
+> Hmm, OK, this is a showstopper for inclusion from forwarding/lib.sh,
+> because basically all users of forwarding/lib.sh use the EXIT trap.
+> 
+> I wonder if we need something like these push_cleanup / on_exit helpers:
+> 
+> 	https://github.com/pmachata/stuff/blob/master/ptp-test/lib.sh#L15
+
+When I added this, I just want to make sure the netns are cleaned up if the
+client script forgot. I think the client script trap function should
+cover this one, no?
+
+> 
+> But I don't want to force this on your already large patchset :)
+
+Yes, Paolo also told me that this is too large. I will break it to
+2 path set or merge some small patches together for next version.
+
+> So just ignore the bit about including from forwarding/lib.sh.
+
+> Actually I take this back. The cleanup should be invoked from where the
+> init was called. I don't think the library should be auto-invoking it,
+> the client scripts should. Whether through a trap or otherwise.
+
+OK, also makes sense. I will remove this trap.
+
+Thanks for all your comments.
+Hangbin
 
