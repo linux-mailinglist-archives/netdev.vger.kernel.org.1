@@ -1,54 +1,45 @@
-Return-Path: <netdev+bounces-51056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D543E7F8CF1
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:54:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 238947F8D04
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 19:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C172814DB
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:54:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C054D2811A2
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB07C2D056;
-	Sat, 25 Nov 2023 17:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8372DF63;
+	Sat, 25 Nov 2023 18:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="bRBdEzaw"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="nuW/XJFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B979A8
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 09:54:39 -0800 (PST)
-Received: from eig-obgw-5006a.ext.cloudfilter.net ([10.0.29.179])
-	by cmsmtp with ESMTPS
-	id 6vE6rr6iDjtZ36wrcrFdTo; Sat, 25 Nov 2023 17:54:44 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 6wrVr7CSG1J286wrVrYqiE; Sat, 25 Nov 2023 17:54:38 +0000
-X-Authority-Analysis: v=2.4 cv=Tqz1ORbh c=1 sm=1 tr=0 ts=656234de
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=yGeM7+xMb5a5VK1DGQx1ew==:17
- a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
- a=IkcTkHD0fZMA:10 a=BNY50KLci1gA:10 a=wYkD_t78qR0A:10
- a=6mUrkXxl0K-UJ-lciFYA:9 a=QEXdDO2ut3YA:10
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fQ6gkAIpegcRMWjhELvU1rTB6lMBEW1z2DgZ25eNdo0=; b=bRBdEzawFlxZI6RfftSz5OGGHW
-	z0dZeVUJfzQWuG5en1b8FHMQV64h0L/nqbMfs1ICF2ClihuEB5tdHWEllGs2HoSBvakVdJy7EtCJA
-	7VT2d2wrnpYxOr9wx+6w3OB4a5BZ7j/DQJ5ZLnZFvlB4mkA9Sv0rYsIVzFnfLs/z+0fIsx16pkESP
-	EigUzMG5Bj8r7dHO6vR5niEJMExQ6CmE6c9DSrbSaBdwwoWPzPyNcd0ovdbsh682p8kfjh1pCVRtx
-	TWXY/M26fKScoz8f2HLGEe5Lkfx64NI008IBAyBm1U7270CHv3fTSYnXxSCW2jCb/EdqYzAIUqBTG
-	2q6Hu3Wg==;
-Received: from 187.184.157.122.cable.dyn.cableonline.com.mx ([187.184.157.122]:46244 helo=[192.168.0.25])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1r6wrU-001o7P-2I;
-	Sat, 25 Nov 2023 11:54:36 -0600
-Message-ID: <d7294586-04a4-49f7-8f5f-2dd66c8b4cde@embeddedor.com>
-Date: Sat, 25 Nov 2023 11:54:28 -0600
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206E5C5;
+	Sat, 25 Nov 2023 10:18:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1700936285; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=bas6VjemocG8TyCyF8HFuv/zFMao9cFMXTQ7t0cu/27MK9pCEqcIgQWVGbaR5MTM+PIyedsvn7M0bD4q5fyz2PVOhwQVnKQPDkeOqQrTg/QEYCqA1uU7CSIe4WagK7Wkbv7rnddP+fSDWhoSJe9NyQn/cpbw7SXcYzZlYtS5Sfo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1700936285; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=fBDLnuxTYKM5FtsGLDrQ8Mws1yikp+Htr0jXUnTb6CU=; 
+	b=QqLhrmTpThjCTY1ScEMFhXmcoEWOeOodX2HzDuHHsttvLIqb9nrN6jDDdYkU5laZNn3XRj16F6u3f7WgwpznP6qlT4sU6ne/Klflq9wkJcr2rYkXTvDT1bA3HhuetLGzT32TdjfR6yMMCSbAATgDIZqMNVfVlwLg6ng/GI5FEK4=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1700936285;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=fBDLnuxTYKM5FtsGLDrQ8Mws1yikp+Htr0jXUnTb6CU=;
+	b=nuW/XJFoL919srMjhZpfoKnhrZq7X7FZ3zg4Bj8zRsNoar9N47yt79+jjIpv8DP5
+	cG+3nGvo++rwe7EX/54f5iQMP8o9nCt/pQeHwsQfmq4fTabghR0RMTxqWK4pOH9AsE1
+	63ms1e8ZxrmCGzi7jjBipvUVJZbQ0YP11hlbT7gI=
+Received: from [192.168.1.11] (110.226.61.26 [110.226.61.26]) by mx.zoho.in
+	with SMTPS id 1700936284980449.10896378002474; Sat, 25 Nov 2023 23:48:04 +0530 (IST)
+Message-ID: <f0c24608-a74a-40e3-a7b6-7dc7ca285a35@siddh.me>
+Date: Sat, 25 Nov 2023 23:48:02 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,123 +47,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] Boot crash on v6.7-rc2
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Joey Gouly <joey.gouly@arm.com>, Kees Cook <keescook@chromium.org>,
- linux-hardening@vger.kernel.org, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>
-References: <20231124102458.GB1503258@e124191.cambridge.arm.com>
- <7086f60f-9f74-4118-a10c-d98b9c6cc8eb@embeddedor.com>
-Content-Language: en-US
-In-Reply-To: <7086f60f-9f74-4118-a10c-d98b9c6cc8eb@embeddedor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.184.157.122
-X-Source-L: No
-X-Exim-ID: 1r6wrU-001o7P-2I
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187.184.157.122.cable.dyn.cableonline.com.mx ([192.168.0.25]) [187.184.157.122]:46244
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 7
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfCju0naMvUVYlzMAtPh4plDv7sApN0pyIF/MnDqNfH74q5KEzxLncolZXsdLM0NO2V5xAAJEHRzWMVJpgTrToNNoYgRd9aXu+8BW+0z1O+Dh2kqNbtcB
- EmPWhJvSS8ri4TRVmqVNCQhTRXKC6mihCHME6m32nMBcZncmz26sOMP4hI1bOXnVh99wxyKTtxix/Ohk/UjqVPdqSn14ULomhFE=
-X-Spam-Level: *
+To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <0000000000005abf1f060afd76bd@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
+ nfc_alloc_send_skb
+Content-Language: en-US, en-GB, hi-IN
+From: Siddh Raman Pant <code@siddh.me>
+In-Reply-To: <0000000000005abf1f060afd76bd@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-
-
-On 11/24/23 09:28, Gustavo A. R. Silva wrote:
-> 
-> 
-> On 11/24/23 04:24, Joey Gouly wrote:
->> Hi all,
->>
->> I just hit a boot crash on v6.7-rc2 (arm64, FVP model):
-> 
-> [..]
-> 
->> Checking `struct neighbour`:
->>
->>     struct neighbour {
->>         struct neighbour __rcu    *next;
->>         struct neigh_table    *tbl;
->>     .. fields ..
->>         u8            primary_key[0];
->>     } __randomize_layout;
->>
->> Due to the `__randomize_layout`, `primary_key` field is being placed before `tbl` (actually it's the same address since it's a 0 length array). That means the 
->> memcpy() corrupts the tbl pointer.
->>
->> I think I just got unlucky with my CONFIG_RANDSTRUCT seed (I can provide it if needed), it doesn't look as if it's a new issue.
-> 
-> It seems the issue is caused by this change that was recently added to -rc2:
-> 
-> commit 1ee60356c2dc ("gcc-plugins: randstruct: Only warn about true flexible arrays")
-> 
-> Previously, one-element and zero-length arrays were treated as true flexible arrays
-> (however, they are "fake" flex arrays), and __randomize_layout would leave them
-> untouched at the end of the struct; the same for proper C99 flex-array members. But
-> after the commit above, that's no longer the case: Only C99 flex-array members will
-> behave correctly (remaining untouched at end of the struct), and the other two types
-> of arrays will be randomized.
-
-mmh... it seems that commit 1ee60356c2dc only prevents one-element arrays from being
-treated as flex arrays, while the code should still keep zero-length arrays untouched:
-
-         if (typesize == NULL_TREE && TYPE_DOMAIN(fieldtype) != NULL_TREE &&
-             TYPE_MAX_VALUE(TYPE_DOMAIN(fieldtype)) == NULL_TREE)
-                 return true;
-
--       if (typesize != NULL_TREE &&
--           (TREE_CONSTANT(typesize) && (!tree_to_uhwi(typesize) ||
--            tree_to_uhwi(typesize) == tree_to_uhwi(elemsize))))
--               return true;
--
-
-Sorry about the confusion.
-
-> 
->>
->> I couldn't reproduce directly on v6.6 (the offsets for `tbl` and `primary_key` didn't overlap).
->> However I tried changing the zero-length-array to a flexible one:
->>
->>     +    DECLARE_FLEX_ARRAY(u8, primary_key);
->>     +    u8        primary_key[0];
->>
->> Then the field offsets ended up overlapping, and I also got the same crash on v6.6.
-> 
-> The right approach is to transform the zero-length array into a C99 flex-array member,
-> like this:
-> 
-> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-> index 07022bb0d44d..0d28172193fa 100644
-> --- a/include/net/neighbour.h
-> +++ b/include/net/neighbour.h
-> @@ -162,7 +162,7 @@ struct neighbour {
->          struct rcu_head         rcu;
->          struct net_device       *dev;
->          netdevice_tracker       dev_tracker;
-> -       u8                      primary_key[0];
-> +       u8                      primary_key[];
->   } __randomize_layout;
-> 
->   struct neigh_ops {
-
-In any case, I think we still should convert [0] to [ ].
-
---
-Gustavo
+#syz test https://github.com/siddhpant/linux.git lock
 
