@@ -1,73 +1,88 @@
-Return-Path: <netdev+bounces-51062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082B97F8D58
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 19:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A2F67F8D89
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 20:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B54E62813DD
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB54E281459
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 19:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6302E412;
-	Sat, 25 Nov 2023 18:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAF82E839;
+	Sat, 25 Nov 2023 19:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l+5B9Iw4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98E49F7
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 10:54:07 -0800 (PST)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cfa28b5895so19646075ad.3
-        for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 10:54:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700938447; x=1701543247;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A7cwREvOXWT3hEhw9BX2KKETmIIsgJqgxROY2YXvuYQ=;
-        b=ngCvsh6kMfyK/PQcgzZjfgi4lXsGKTN2WOHwcspY/L5St+QnQJ1YkBUPalJht/8/3N
-         iF3600hheC2vjKpoB+zGHH6RhlxSlFej0UoQ+SDLSMamk1/MwUpQqAca/hFJo+wmmmh2
-         rIdnMtzaEnx2c8wTN22hcAbWbfsNrdgS4TIUWYmmdwfQw+wVtuWiTqUfpOL5mUKQCxd1
-         OgQd6TlhH9St9d7SlxzadYT2LsRKjyQO9PlEWRNOJSNM+9TDTlIO1BagPN8IMZJx7QAs
-         QxvBFHsx6xnRFEOGDXBliN0Mi2tVK+3mNb8cF4LcmD+EiGpk72Pfa0gP1PU5SAZ5PLfa
-         dL8w==
-X-Gm-Message-State: AOJu0YwmSKd5ltQfOggPG/KvUUaNECQFwM0s24oo9PdvDeCU67tAUFAT
-	8NetvNgLaiNn05SEMaMuPWKNVfSRp3bUC6YgmH+rDjAc0uYP
-X-Google-Smtp-Source: AGHT+IFsHJbrj8tawgd8wr4MPhqfDgWPYBPTeLiYRW/WvQGOEl2Ay2ZBGg2xxVYCR9Py8gdIg4mUmDJWd0m7IbAMS21Z5zJmBeYT
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24118EA;
+	Sat, 25 Nov 2023 11:02:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DeTdWd/XTowsawKJk8PI2rdL8uwaJxvxyQFH1coInMc=; b=l+5B9Iw4rMpfs+oIP9Jkgxl4WR
+	4mFgWkNXmHfu5hKf+wYzSsMbyleEyb6lfeOvE/SH8TLbiULgFAGFxH1hBuASoyZZsjqzOSh2X+p1D
+	5kNU0hbflmCL1krPgt3tmcdq3gl8vDoiTIa+zzMWQLAVvZsALbLDkVePXv3689RjN+7A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r6xv7-001Cp0-HX; Sat, 25 Nov 2023 20:02:25 +0100
+Date: Sat, 25 Nov 2023 20:02:25 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH v2 01/11] net: phy: extend PHY package API
+ to support multiple global address
+Message-ID: <d349163f-dea9-49d5-9018-7c7a8ddbe311@lunn.ch>
+References: <20231125001127.5674-1-ansuelsmth@gmail.com>
+ <20231125001127.5674-2-ansuelsmth@gmail.com>
+ <a8ce4503-c24d-4d6e-91ec-d03624b31fe0@lunn.ch>
+ <656237d6.5d0a0220.2c3da.d832@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:9a44:b0:1ca:858d:5be7 with SMTP id
- x4-20020a1709029a4400b001ca858d5be7mr1358254plv.3.1700938447221; Sat, 25 Nov
- 2023 10:54:07 -0800 (PST)
-Date: Sat, 25 Nov 2023 10:54:07 -0800
-In-Reply-To: <f0c24608-a74a-40e3-a7b6-7dc7ca285a35@siddh.me>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ee78fb060afe9767@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in nfc_alloc_send_skb
-From: syzbot <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-To: code@siddh.me, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <656237d6.5d0a0220.2c3da.d832@mx.google.com>
 
-Hello,
+> Yes can be detached. Making addr to base_addr would change the thing but
+> can confirm, any user of the API always used the base addr as cookie, so
+> it won't change a thing.
+> 
+> Will have to make the separate commit a dependency to this series but i
+> expect this change to be merged before this RFC is completed. Good idea.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+A change like this can be merged quickly. You can keep the DT package
+as an RFC, we don't yet seem to have a clear concept what it is.
 
-Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         be04e5de lock
-git tree:       https://github.com/siddhpant/linux.git lock
-console output: https://syzkaller.appspot.com/x/log.txt?x=170076d0e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1e6a76f6c7029ca2
-dashboard link: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+	Andrew
 
