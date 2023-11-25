@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-50991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0757F8765
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 02:05:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEE27F876E
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 02:17:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DB6D1C20BE0
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 01:05:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6506B21399
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 01:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE2E631;
-	Sat, 25 Nov 2023 01:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7012A642;
+	Sat, 25 Nov 2023 01:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="h1L3nWHx"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iLlcO9Ro"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B737F19A6
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:05:11 -0800 (PST)
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9651D19A3
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:16:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700874312; x=1732410312;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5xDi2pPo540mrnBAhcSewcUy8mvPNqge0pJ5pnaN7qc=;
-  b=h1L3nWHx8L4gBV7D1/BuDRI8PASHXgcPOM4dfQsZUGqAMVMbRavxXFUB
-   37Yw54tyfJiITRZqbim97G3tkOVMzX4lEAnlVwtIDTb7hgHFt4cEJxc97
-   ZXKGLmO6EjheP0gKYwB/lijNidxPdRAd76a1zgohYoAS0X4T/dNLSzWHz
-   s=;
+  t=1700875019; x=1732411019;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RX/n6F/KAUoOV2FRP7i4W/NJ/9A4hYx59HOJgROcRXI=;
+  b=iLlcO9RoYuSbuxrR8Bapo8SaTsQpc2HlhmNxMCOOYHBsJhSql0czt2C3
+   IkunuSdD8upCL/g6i6ERD2NZmhmcbbyz6KidobB2U1cjt0wm0M7uLzdaO
+   KDrOScfFsvYfQBSZ44PLoRl0HiC30c+Tu49okEVH9cmTtoXvF+A92SFoH
+   c=;
 X-IronPort-AV: E=Sophos;i="6.04,224,1695686400"; 
-   d="scan'208";a="254745663"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2023 01:05:09 +0000
+   d="scan'208";a="364820839"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2023 01:16:57 +0000
 Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id 2EFEB4944C;
-	Sat, 25 Nov 2023 01:05:06 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:1549]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.167:2525] with esmtp (Farcaster)
- id c24b662a-3f70-449d-9eac-d551464fa96b; Sat, 25 Nov 2023 01:05:06 +0000 (UTC)
-X-Farcaster-Flow-ID: c24b662a-3f70-449d-9eac-d551464fa96b
+	by email-inbound-relay-iad-1e-m6i4x-a65ebc6e.us-east-1.amazon.com (Postfix) with ESMTPS id D114F68DBB;
+	Sat, 25 Nov 2023 01:16:54 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:40013]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.99:2525] with esmtp (Farcaster)
+ id a93e4d59-d91b-49c1-9a05-9816e3162fae; Sat, 25 Nov 2023 01:16:54 +0000 (UTC)
+X-Farcaster-Flow-ID: a93e4d59-d91b-49c1-9a05-9816e3162fae
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Sat, 25 Nov 2023 01:05:03 +0000
+ 15.2.1118.39; Sat, 25 Nov 2023 01:16:53 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Sat, 25 Nov 2023 01:05:00 +0000
+ 15.2.1118.39; Sat, 25 Nov 2023 01:16:51 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <horms@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 7/8] tcp: Factorise cookie-independent fields initialisation in cookie_v[46]_check().
-Date: Fri, 24 Nov 2023 17:04:52 -0800
-Message-ID: <20231125010452.70914-1-kuniyu@amazon.com>
+CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 0/8] tcp: Clean up and refactor cookie_v[46]_check().
+Date: Fri, 24 Nov 2023 17:16:30 -0800
+Message-ID: <20231125011638.72056-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231124214418.GX50352@kernel.org>
-References: <20231124214418.GX50352@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,86 +65,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-From: Simon Horman <horms@kernel.org>
-Date: Fri, 24 Nov 2023 21:44:18 +0000
-> On Wed, Nov 22, 2023 at 05:25:20PM -0800, Kuniyuki Iwashima wrote:
-> > We will support arbitrary SYN Cookie with BPF, and then some reqsk fields
-> > are initialised in kfunc, and others are done in cookie_v[46]_check().
-> > 
-> > This patch factorises the common part as cookie_tcp_reqsk_init() and
-> > calls it in cookie_tcp_reqsk_alloc() to minimise the discrepancy between
-> > cookie_v[46]_check().
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/ipv4/syncookies.c | 69 ++++++++++++++++++++++++-------------------
-> >  net/ipv6/syncookies.c | 14 ---------
-> >  2 files changed, 38 insertions(+), 45 deletions(-)
-> > 
-> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> > index 1e3783c97e28..9bca1c026525 100644
-> > --- a/net/ipv4/syncookies.c
-> > +++ b/net/ipv4/syncookies.c
-> > @@ -285,10 +285,44 @@ bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
-> >  }
-> >  EXPORT_SYMBOL(cookie_ecn_ok);
-> >  
-> > +static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
-> > +				 struct request_sock *req)
-> > +{
-> > +	struct inet_request_sock *ireq = inet_rsk(req);
-> > +	struct tcp_request_sock *treq = tcp_rsk(req);
-> > +	const struct tcphdr *th = tcp_hdr(skb);
-> > +
-> > +	req->num_retrans = 0;
-> > +
-> > +	ireq->ir_num = ntohs(th->dest);
-> > +	ireq->ir_rmt_port = th->source;
-> > +	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
-> > +	ireq->ir_mark = inet_request_mark(sk, skb);
-> > +
-> > +	if (IS_ENABLED(CONFIG_SMC))
-> > +		ireq->smc_ok = 0;
-> > +
-> > +	treq->snt_synack = 0;
-> > +	treq->tfo_listener = false;
-> > +	treq->txhash = net_tx_rndhash();
-> > +	treq->rcv_isn = ntohl(th->seq) - 1;
-> > +	treq->snt_isn = ntohl(th->ack_seq) - 1;
-> > +	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
-> > +	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
-> 
-> Hi Iwashima-san,
-> 
-> The line above seems to be duplicated.
+This is a preparation series for upcoming arbitrary SYN Cookie
+support with BPF. [0]
 
-Ah good catch.
-I'll fix it in v2.
+There are slight differences between cookie_v[46]_check().  Such a
+discrepancy caused an issue in the past, and BPF SYN Cookie support
+will add more churn.
 
-Thanks for your review!
+The primary purpose of this series is to clean up and refactor
+cookie_v[46]_check() to minimise such discrepancies and make the
+BPF series easier to review.
 
-pw-bot: cr
+[0]: https://lore.kernel.org/netdev/20231121184245.69569-1-kuniyu@amazon.com/
 
 
-> 
-> Other than that, this patch looks good to me.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> 
-> > +	treq->req_usec_ts = false;
-> > +
-> > +#if IS_ENABLED(CONFIG_MPTCP)
-> > +	treq->is_mptcp = sk_is_mptcp(sk);
-> > +	if (treq->is_mptcp)
-> > +		return mptcp_subflow_init_cookie_req(req, sk, skb);
-> > +#endif
-> > +
-> > +	return 0;
-> > +}
-> 
+Changes:
+  v2:
+    Patch 7: Remove duplicated treq->syn_tos init (Simon Horman)
+
+  v1: https://lore.kernel.org/netdev/20231123012521.62841-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (8):
+  tcp: Clean up reverse xmas tree in cookie_v[46]_check().
+  tcp: Cache sock_net(sk) in cookie_v[46]_check().
+  tcp: Clean up goto labels in cookie_v[46]_check().
+  tcp: Don't pass cookie to __cookie_v[46]_check().
+  tcp: Don't initialise tp->tsoffset in tcp_get_cookie_sock().
+  tcp: Move TCP-AO bits from cookie_v[46]_check() to tcp_ao_syncookie().
+  tcp: Factorise cookie-independent fields initialisation in
+    cookie_v[46]_check().
+  tcp: Factorise cookie-dependent fields initialisation in
+    cookie_v[46]_check()
+
+ include/linux/netfilter_ipv6.h   |   8 +-
+ include/net/tcp.h                |  22 ++--
+ include/net/tcp_ao.h             |   6 +-
+ net/core/filter.c                |  15 +--
+ net/ipv4/syncookies.c            | 215 ++++++++++++++++---------------
+ net/ipv4/tcp_ao.c                |  16 ++-
+ net/ipv6/syncookies.c            | 108 +++++++---------
+ net/netfilter/nf_synproxy_core.c |   4 +-
+ 8 files changed, 198 insertions(+), 196 deletions(-)
+
+-- 
+2.30.2
+
 
