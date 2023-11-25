@@ -1,108 +1,220 @@
-Return-Path: <netdev+bounces-50977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004BC7F86AC
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 00:26:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E767F872B
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 01:35:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC37B282337
-	for <lists+netdev@lfdr.de>; Fri, 24 Nov 2023 23:26:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30669B213F0
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 00:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C873C49D;
-	Fri, 24 Nov 2023 23:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11CF390;
+	Sat, 25 Nov 2023 00:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uGtbsMYs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mI3gHBup"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5E91990;
-	Fri, 24 Nov 2023 15:26:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZEmM+x5c4j9E2iYripoWJxHgYv7R98NUEa31meAyb3E=; b=uGtbsMYszf8pdWOAfR2MhpRlqV
-	24g92f2VFULf7WTq8BWo5l/3XruHQvZr13mP5OFmGelaM3YxeSSS2yBBygiKA74EJKa+qbEbmA040
-	u+t3KbeEDYIYMnJpUxJM0BZ6o/TFnIExVIRCdKpQOVZq3vDeASDU6zGVIgO/6OMynBis=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r6fYP-0018wU-SA; Sat, 25 Nov 2023 00:25:45 +0100
-Date: Sat, 25 Nov 2023 00:25:45 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Conor Dooley <conor@kernel.org>
-Cc: Javier Carrasco <javier.carrasco@wolfvision.net>,
-	"David S. Miller" <davem@davemloft.net>,
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9597E1739;
+	Fri, 24 Nov 2023 16:35:18 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4079ed65471so18195865e9.1;
+        Fri, 24 Nov 2023 16:35:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700872517; x=1701477317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4gJ4dsCN4jAp0Z6B7bPy+5n1kCmEg5zx74BRyzkdzqY=;
+        b=mI3gHBupx0YHxrwWjKumjVfCxqFu1IUNqrUD4mb6DuSBwePyTRtfEpzTQiX+GqVAIS
+         QqntuKY3I5O2sZW7TezFnboTlH7lbDndObmaLNEVtdU3YlPsbWVLmwDr1jIMEOb5EUt2
+         nWU/dcO4axu2BAAZkpUZAWnzkTW/qb3KTmOrJyWdYdRSx6agjjZwIeX23Zf1bRS8sB5t
+         KtL2kwq1Bd9wg8J52awxx2OJDzcAVEzrh7YHjtlCmCQl1u7RVAe/2yZSyjQTgeU05V93
+         u8xgYhUUV8/oZZJLmbu2Uvg3g9MEKN/dVM5KK1QmMPQZ6rVknREDpgNINbokuEOn4FPw
+         w+XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700872517; x=1701477317;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4gJ4dsCN4jAp0Z6B7bPy+5n1kCmEg5zx74BRyzkdzqY=;
+        b=JWXDqXmJ3EryJUbvPO16nF+hssKv+/hFLNdjj5oonwh4NMXfoW3ESI2fwYOlNA+ryE
+         UJwREOR53wwQjZm92BSwxbAhdOoStF2lV3dXJB6fWqZ7Ix8Ggmeh7sxZN37kkgB+MBJu
+         TDiX8YhOCxCwB2VWLmbSgYYZns/H8ejI1eM7S1ndXp3iyfYu8LS7xxp2JNy8wV+2GtCk
+         9Lu/q5GyB4hOTjMNCHCt9N4QGK4STtTO0qjdOxYL/7Q/iSHHAqkDYe8txyoUgy+wjmSx
+         hJ9gXvA9o4FHymjplDmrCUdCcHBIilQRkRRT8EjT+G6rvFyTAjEq2IUJv1QClcG2l9ED
+         Ihkw==
+X-Gm-Message-State: AOJu0YwKbenQCG3Hu+9QQ0P7uCqt8sSYWaRMRYBnRumZHYnAvuU2lFwC
+	FsNvMrczZpUv3xl+cWnggzA=
+X-Google-Smtp-Source: AGHT+IEynPKBI7IwnMHpc9o110PkJqJCiDc1zB8vkXfce7EMPEhPFPGlhNEmKHM/SQm8OexRWAI3Ag==
+X-Received: by 2002:a05:600c:1914:b0:40b:3803:e4c6 with SMTP id j20-20020a05600c191400b0040b3803e4c6mr3641836wmq.8.1700872516754;
+        Fri, 24 Nov 2023 16:35:16 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id u13-20020a05600c00cd00b00405718cbeadsm4268005wmm.1.2023.11.24.16.35.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 16:35:16 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	David Wu <david.wu@rock-chips.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH RFC WIP 1/2] dt-bindings: net: rockchip-dwmac: add
- rockchip,phy-wol property
-Message-ID: <42c5c174-e7f2-4323-8db0-0db1ede39ec5@lunn.ch>
-References: <20231123-dwmac-rk_phy_wol-v1-0-bf4e718081b9@wolfvision.net>
- <20231123-dwmac-rk_phy_wol-v1-1-bf4e718081b9@wolfvision.net>
- <20231123-operable-frustrate-6c71ab0dafbf@spud>
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [net-next RFC PATCH v2 00/11] net: phy: Support DT PHY package
+Date: Sat, 25 Nov 2023 01:11:16 +0100
+Message-Id: <20231125001127.5674-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231123-operable-frustrate-6c71ab0dafbf@spud>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 23, 2023 at 05:20:48PM +0000, Conor Dooley wrote:
-> On Thu, Nov 23, 2023 at 01:14:13PM +0100, Javier Carrasco wrote:
-> > This property defines if PHY WOL is preferred. If it is not defined, MAC
-> > WOL will be preferred instead.
-> > 
-> > Signed-off-by: Javier Carrasco <javier.carrasco@wolfvision.net>
-> > ---
-> >  Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-> > index 70bbc4220e2a..fc4b02a5a375 100644
-> > --- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-> > @@ -91,6 +91,12 @@ properties:
-> >        The phandle of the syscon node for the peripheral general register file.
-> >      $ref: /schemas/types.yaml#/definitions/phandle
-> >  
-> > +  rockchip,phy-wol:
-> > +    type: boolean
-> > +    description:
-> > +      If present, indicates that PHY WOL is preferred. MAC WOL is preferred
-> > +      otherwise.
-> 
-> Although I suspect this isn't, it sounds like software policy. What
-> attribute of the hardware determines which is preferred?
+Idea of this big series is to introduce the concept of PHY package in DT
+and generalize the support of it by PHY driver.
 
-I tend to agree, its a software policy. Doing WoL in the PHY should be
-the preferred solution, because it allows the MAC to be powered off,
-saving more power. If the PHY does not implement it, then the MAC
-should be used.
+The concept of PHY package is nothing new and is already a thing in the
+kernel with the API phy_package_join/leave/read/write.
 
-It should be possible for the MAC driver to pass the WoL settings to
-the PHY, and if it returns EOPNOTSUPP, or maybe EINVAL, implement the
-WoL in the MAC.
+The main idea of those API is to permit the PHY to have a shared global
+data and to run probe/config only once for the PHY package. There are
+various example of this already in the kernel with the mscc, bcm54140
+mediatek ge and micrle driver and they all follow the same pattern.
 
-This might be a behaviour change, depending on the MAC driver. So i
-could imaging a less risk tolerant developers wanting a knob to enable
-this. However, if done correctly, using the PHY instead of the MAC
-should not be visible from the users perspective.
+What is currently lacking is describing this in DT and better reference
+the PHY in charge of global configuration of the PHY package. For the
+already present PHY, the implementation is simple enough with only one
+PHY having the required regs to apply global configuration.
 
-    Andrew
+This can be ok for simple PHY package but some Qcom PHY package on
+""modern"" SoC have more complex implementation. One example is the PHY
+for qca807x where some global regs are present in the so-called "combo"
+port and everything about psgmii calibration is placed in a 5th port in
+the PHY package.
+
+Given these additional thing, the original phy_package API are extended
+with support for multiple global PHY for configuration. Each PHY driver
+will have an enum of the ID for the global PHY to reference and is
+required to pass to the read/write function.
+
+On top of this, it's added correct DT support for describing PHY
+package.
+
+One example is this:
+
+        ethernet-phy-package@0 {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            reg = <0>;
+
+            ethernet-phy@1 {
+              compatible = "ethernet-phy-ieee802.3-c22";
+              reg = <1>;
+            };
+
+            phy4: ethernet-phy@4 {
+              compatible = "ethernet-phy-ieee802.3-c22";
+              reg = <4>;
+            };
+        };
+
+The mdio parse functions are changed to address for this additional
+special node, the function is changed to simply detect this node and
+search also in this.
+
+If this is detected phy core will join each PHY present in the node and
+use (if defined) the additional info in the PHY driver to probe/config
+once the PHY package.
+
+I hope this implementation is clean enough as I expect more and more of
+these configuration to appear in the future.
+
+(For Andrew, we are looking intro making this in at803x PHY driver and see
+what functions can be reused, idea is to move the driver to a dedicated
+directory and create something like at803x-common.c as the at803x PHY
+driver is too bloated and splitting it it's a better approach)
+
+Changes v2:
+- Drop compatible "ethernet-phy-package", use node name prefix matching
+  instead
+- Improve DT example
+- Add reg for ethernet-phy-package
+- Drop phy-mode for ethernet-phy-package
+- Drop patch for generalization of phy-mode
+- Drop global-phy property (handle internally to the PHY driver)
+- Rework OF phy package code and PHY driver to handle base address
+- Fix missing of_node_put
+- Add some missing docs for added variables in struct
+- Move some define from dt-bindings include to PHY driver
+- Handle qsgmii validation in PHY driver
+- Fix wrong include for gpiolib
+- Drop reduntant version.h include
+
+Christian Marangi (9):
+  net: phy: extend PHY package API to support multiple global address
+  dt-bindings: net: document ethernet PHY package nodes
+  net: phy: add initial support for PHY package in DT
+  net: phy: add support for shared priv data size for PHY package in DT
+  net: phy: add support for driver specific PHY package probe/config
+  net: phy: move mmd_phy_indirect to generic header
+  net: phy: add support for PHY package MMD read/write
+  dt-bindings: net: Document Qcom QCA807x PHY package
+  net: phy: qca807x: Add support for configurable LED
+
+Robert Marko (2):
+  dt-bindings: net: add QCA807x PHY defines
+  net: phy: add Qualcom QCA807x driver
+
+ .../bindings/net/ethernet-phy-package.yaml    |   66 +
+ .../devicetree/bindings/net/qcom,qca807x.yaml |  148 ++
+ drivers/net/mdio/of_mdio.c                    |   68 +-
+ drivers/net/phy/Kconfig                       |    7 +
+ drivers/net/phy/Makefile                      |    1 +
+ drivers/net/phy/bcm54140.c                    |   23 +-
+ drivers/net/phy/mdio_bus.c                    |   35 +-
+ drivers/net/phy/mediatek-ge-soc.c             |   11 +-
+ drivers/net/phy/micrel.c                      |   13 +-
+ drivers/net/phy/mscc/mscc.h                   |    7 +
+ drivers/net/phy/mscc/mscc_main.c              |   16 +-
+ drivers/net/phy/phy-core.c                    |   14 -
+ drivers/net/phy/phy_device.c                  |  165 +-
+ drivers/net/phy/qca807x.c                     | 1324 +++++++++++++++++
+ include/dt-bindings/net/qcom-qca807x.h        |   30 +
+ include/linux/phy.h                           |  170 ++-
+ 16 files changed, 1996 insertions(+), 102 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/qcom,qca807x.yaml
+ create mode 100644 drivers/net/phy/qca807x.c
+ create mode 100644 include/dt-bindings/net/qcom-qca807x.h
+
+-- 
+2.40.1
+
 
