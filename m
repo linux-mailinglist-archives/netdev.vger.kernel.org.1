@@ -1,91 +1,139 @@
-Return-Path: <netdev+bounces-51007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E0E7F885C
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 05:56:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 278C87F8863
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 05:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899C91C20B9B
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 04:56:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 206D9B213E1
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 04:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F8F814;
-	Sat, 25 Nov 2023 04:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66ABECA;
+	Sat, 25 Nov 2023 04:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gv+OSwCy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819E81707;
-	Fri, 24 Nov 2023 20:56:48 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1r6kiU-0002Af-1d;
-	Sat, 25 Nov 2023 04:56:31 +0000
-Date: Sat, 25 Nov 2023 04:56:20 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Eric Woudstra <ericwouds@gmail.com>, John Crispin <john@phrozen.org>
-Subject: [PATCH net] net: phylink: set phy_state interface when attaching SFP
-Message-ID: <8abed37d01d427bf9d27a157860c54375c994ea1.1700887953.git.daniel@makrotopia.org>
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8EEC1710;
+	Fri, 24 Nov 2023 20:58:32 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3b2df2fb611so1664384b6e.0;
+        Fri, 24 Nov 2023 20:58:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700888312; x=1701493112; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=H7+G6kTUsYcf2EuznU9nGg+6a0PiyVvvTpJ6OmKLYnU=;
+        b=gv+OSwCylABvUN1LZmQTP/j0ybV6RsGST6j1x6ms/zskLT0z0jxfvYCEgvZ35M5r03
+         CpH+jo+oDTuraekfbR+QJRyWrk9wZZ1oh0PUgQqgX37p0fpUx+gXgTnVq5y0Sf7a6LS3
+         92RnmPiQSNt5KioNIRoLhZz/OkirU9NXcpgXKV5meR7iVpp1K1BV3ltVfPAPhNBOxX6X
+         bf6W1PScs/xTC13BCoBlPfXrymrmAiottmNI7CrbZmLDZ+95rJ1K2rkBzjebXCsW+WHp
+         6W/v31gr94vHGRZyZ3nhIAN3GnvqIdwEZxYTcN6ObWe1PrHPC4yMIhwLQaDiPfxOyczk
+         KHCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700888312; x=1701493112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H7+G6kTUsYcf2EuznU9nGg+6a0PiyVvvTpJ6OmKLYnU=;
+        b=oSdDpPOIs0puZKUxX3WjgPJCQDxhB1hZbTzQDio8kKzJ/VLolt9fR0y4vunGsktsIJ
+         JReTR4YKbi3nZI8uJsXHSyWlz0VNc1CWSyuQtnAlL5gWFsbKQF9P0+eSXS65F0HiA0cz
+         NZvl83HxuIuELDqFG+VobdzQx9h2sSP0VrcCvvRaLpDDa3B8exNg0s9X5s1VYzIlHob6
+         WiGsVpNdA0fdCuLiPuIN0A1H2S0vzRw0qTyxEWYZ5WCcONmJ9M8IzmHfyyeQPwlTTxlX
+         gbyeLyXPAjOwDtTucRPFurf5cfLGloFbocNht2m14F4qxBkvR8ruVIJtjGKX1z5DH/3j
+         mV9Q==
+X-Gm-Message-State: AOJu0Yw1WCO/7ZY/mpTBz++5JT8XFjgT7/3/lY/2BYYdedYh4FN8uDB2
+	sdnsblqpec+upfqQz0zOSoc=
+X-Google-Smtp-Source: AGHT+IFeTSL/V+P+KPM4Qgxl19x/Ka79WuZ6Y2vXNvWEwWRybB7C/6fG5QLOW4EjPMH7qokAspkoSg==
+X-Received: by 2002:a05:6808:13c2:b0:3b8:3e4d:605e with SMTP id d2-20020a05680813c200b003b83e4d605emr7298648oiw.42.1700888311914;
+        Fri, 24 Nov 2023 20:58:31 -0800 (PST)
+Received: from google.com ([2620:15c:9d:2:8b5c:82d0:578f:d0])
+        by smtp.gmail.com with ESMTPSA id fd39-20020a056a002ea700b006cb7b0c2503sm3703306pfb.95.2023.11.24.20.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Nov 2023 20:58:31 -0800 (PST)
+Date: Fri, 24 Nov 2023 20:58:28 -0800
+From: "dmitry.torokhov@gmail.com" <dmitry.torokhov@gmail.com>
+To: Alexey Makhalov <amakhalov@vmware.com>
+Cc: Simon Horman <horms@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"dave.hansen@linux.intel.co" <dave.hansen@linux.intel.co>,
+	"bp@alien8.d" <bp@alien8.d>, Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Zack Rusin <zackr@vmware.com>,
+	Tim Merrifield <timothym@vmware.com>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"airlied@gmail.com" <airlied@gmail.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"mripard@kernel.org" <mripard@kernel.org>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+	Linux-graphics-maintainer <Linux-graphics-maintainer@vmware.com>,
+	Pv-drivers <Pv-drivers@vmware.com>, Nadav Amit <namit@vmware.com>,
+	Ajay Kaher <akaher@vmware.com>, Jeff Sipek <jsipek@vmware.com>
+Subject: Re: [PATCH 4/6] input/vmmouse: Use vmware_hypercall API
+Message-ID: <ZWF-9DmwakJBonmf@google.com>
+References: <20231122233058.185601-1-amakhalov@vmware.com>
+ <20231122233058.185601-5-amakhalov@vmware.com>
+ <20231124194646.GW50352@kernel.org>
+ <A64E0517-57D9-47DF-8DD8-040EE6843246@vmware.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <A64E0517-57D9-47DF-8DD8-040EE6843246@vmware.com>
 
-Assume 'usxgmii' being set as initial interface mode in DTS. Now plug
-a 2.5GBase-T SFP module with exposed PHY. Currently this results in
-a rather bizare situation:
+On Sat, Nov 25, 2023 at 01:22:58AM +0000, Alexey Makhalov wrote:
+> On Nov 24, 2023, at 11:46 AM, Simon Horman <horms@kernel.org> wrote:
+> > 
+> > On Wed, Nov 22, 2023 at 03:30:49PM -0800, Alexey Makhalov wrote:
+> >> Switch from VMWARE_HYPERCALL macro to vmware_hypercall API.
+> >> Eliminate arch specific code. No functional changes intended.
+> >> 
+> >> Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
+> > 
+> > Hi Alexey,
+> > 
+> > it is not strictly related to this patch, but I notice than an x86_64
+> > allmodconfig build with W=1 using gcc-13 fails to compile this file.
+> > 
+> > It appears that the problem relates to both priv->phys and
+> > psmouse->ps2dev.serio->phys being 32 bytes.
+> > 
+> > 
+> > drivers/input/mouse/vmmouse.c: In function ‘vmmouse_init’:
+> > drivers/input/mouse/vmmouse.c:455:53: error: ‘/input1’ directive output may be truncated writing 7 bytes into a region of size between 1 and 32 [-Werror=format-truncation=]
+> >  455 |         snprintf(priv->phys, sizeof(priv->phys), "%s/input1",
+> >      |                                                     ^~~~~~~
+> > drivers/input/mouse/vmmouse.c:455:9: note: ‘snprintf’ output between 8 and 39 bytes into a destination of size 32
+> >  455 |         snprintf(priv->phys, sizeof(priv->phys), "%s/input1",
+> >      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >  456 |                  psmouse->ps2dev.serio->phys);
+> >      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > ...
+> 
+> Hi Simon, thanks for reporting the issue.
+> Zack, please take a look.
 
-RTL8221B-VB-CG 2.5Gbps PHY (C45) i2c:sfp1-wan:11: rtl822x_c45_get_features: supported=00,00000000,00008000,000080ef
-mtk_soc_eth 15100000.ethernet eth2: requesting link mode phy/2500base-x with support 00,00000000,00008000,0000e0ef
-mtk_soc_eth 15100000.ethernet eth2: switched to phy/2500base-x link mode   <<< !!!!!!
-mtk_soc_eth 15100000.ethernet eth2: major config usxgmii    <<< !!!!!!
-mtk_soc_eth 15100000.ethernet eth2: phylink_mac_config: mode=phy/usxgmii/none adv=00,00000000,00000000,00000000 pause=00
-mtk_soc_eth 15100000.ethernet eth2: PHY [i2c:sfp1-wan:11] driver [RTL8221B-VB-CG 2.5Gbps PHY (C45)] (irq=POLL)
-mtk_soc_eth 15100000.ethernet eth2: phy: 2500base-x setting supported 00,00000000,00008000,0000e0ef advertising 00,00000000,00008000,0000e0ef
+We want the truncation behavior and we do not want GCC to make noise
+about these, that is why "format-truncation" is explicitly disabled for
+normal compiles. I guess we should exclude it even when we compile with
+W=1 instead of doing pointless changes in the drivers.
 
-Then the link seemingly comes up (but is dead) because no subsequent
-call to phylink_major_config actually configured MAC and PCS for
-2500base-x mode.
+Thanks.
 
-This is because phylink_mac_initial_config() considers
-pl->phy_state.interface if in MLO_AN_PHY mode while
-phylink_sfp_set_config() only sets pl->link_config.interface.
-
-Also set pl->phy_state.interface in phylink_sfp_set_config().
-
-Fixes: 31eb8907aa5b ("net: phylink: allow attaching phy for SFP modules on 802.3z mode")
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/phy/phylink.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index aa842634d5c2c..21ef77e4fe720 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3056,6 +3056,7 @@ static void phylink_sfp_set_config(struct phylink *pl, u8 mode,
- 	    pl->link_config.interface != state->interface) {
- 		pl->cur_link_an_mode = mode;
- 		pl->link_config.interface = state->interface;
-+		pl->phy_state.interface = state->interface;
- 
- 		changed = true;
- 
 -- 
-2.42.1
-
+Dmitry
 
