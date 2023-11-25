@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-50998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-50999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C1A7F8777
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 02:19:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCA257F8778
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 02:20:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFAE7281ECE
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 01:19:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E686B21402
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 01:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265B1818;
-	Sat, 25 Nov 2023 01:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBA07F9;
+	Sat, 25 Nov 2023 01:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="J//PoPFt"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Gf5HHR9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3E919A6
-	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:19:27 -0800 (PST)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE6119A7
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 17:20:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700875168; x=1732411168;
+  t=1700875201; x=1732411201;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Dd6cDOU35IF8grVIDrKQh/Oyp+p+HkKylU/UqXLxeXM=;
-  b=J//PoPFt/KbogcM6J2qMNqL3dnKPNkXBaqPxQDrlOs4OZNocSFcvCzgJ
-   RkHuijvxQBtfOCPiE65OCRx/Mc8CFIeljxVM0GF2myWEHB8h2sDTIcitr
-   daNvNs3WKL8qwQ3lfG/R+orEaQOTZruYQF2yje1chGWktWwAz+ca6UC0A
-   A=;
+  bh=r20a8ApCSuNVDBfr6IGmwrjAB5HseSRop6ljuegHde4=;
+  b=Gf5HHR9lgjD4Kvvt9Sm21b5RHoqdKMJRdPVZbND75YsdvHyGnC7P7m4M
+   sZ4iKVYztzEolw+6E8f8VALJLfAKJZ6ov0nMZOg/rlBtrClG5svjAQpQZ
+   NDKHLILq4DlENxrSlCcCB3FQI5y+04lRSOv3QkTmDNd2l4RkeifTcVN+O
+   0=;
 X-IronPort-AV: E=Sophos;i="6.04,224,1695686400"; 
-   d="scan'208";a="254747038"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2023 01:19:27 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id 6F8E48047A;
-	Sat, 25 Nov 2023 01:19:24 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:44988]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.99:2525] with esmtp (Farcaster)
- id 45cfb076-2aae-4344-b6f9-8a468cb562de; Sat, 25 Nov 2023 01:19:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 45cfb076-2aae-4344-b6f9-8a468cb562de
+   d="scan'208";a="686327816"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2023 01:19:55 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com (Postfix) with ESMTPS id 4FBD740E50;
+	Sat, 25 Nov 2023 01:19:53 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:23748]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.242:2525] with esmtp (Farcaster)
+ id bb956122-b1e8-4a0c-8022-57f478233bcd; Sat, 25 Nov 2023 01:19:52 +0000 (UTC)
+X-Farcaster-Flow-ID: bb956122-b1e8-4a0c-8022-57f478233bcd
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Sat, 25 Nov 2023 01:19:22 +0000
+ 15.2.1118.39; Sat, 25 Nov 2023 01:19:47 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Sat, 25 Nov 2023 01:19:20 +0000
+ 15.2.1118.39; Sat, 25 Nov 2023 01:19:45 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 6/8] tcp: Move TCP-AO bits from cookie_v[46]_check() to tcp_ao_syncookie().
-Date: Fri, 24 Nov 2023 17:16:36 -0800
-Message-ID: <20231125011638.72056-7-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 7/8] tcp: Factorise cookie-independent fields initialisation in cookie_v[46]_check().
+Date: Fri, 24 Nov 2023 17:16:37 -0800
+Message-ID: <20231125011638.72056-8-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231125011638.72056-1-kuniyu@amazon.com>
 References: <20231125011638.72056-1-kuniyu@amazon.com>
@@ -67,205 +67,187 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
+X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-We initialise treq->af_specific in cookie_tcp_reqsk_alloc() so that
-we can look up a key later in tcp_create_openreq_child().
+We will support arbitrary SYN Cookie with BPF, and then some reqsk fields
+are initialised in kfunc, and others are done in cookie_v[46]_check().
 
-Initially, that change was added for MD5 by commit ba5a4fdd63ae ("tcp:
-make sure treq->af_specific is initialized"), but it has not been used
-since commit d0f2b7a9ca0a ("tcp: Disable header prediction for MD5
-flow.").
-
-Now, treq->af_specific is used only by TCP-AO, so, we can move that
-initialisation into tcp_ao_syncookie().
-
-In addition to that, l3index in cookie_v[46]_check() is only used for
-tcp_ao_syncookie(), so let's move it as well.
-
-While at it, we move down tcp_ao_syncookie() in cookie_v4_check() so
-that it will be called after security_inet_conn_request() to make
-functions order consistent with cookie_v6_check().
+This patch factorises the common part as cookie_tcp_reqsk_init() and
+calls it in cookie_tcp_reqsk_alloc() to minimise the discrepancy between
+cookie_v[46]_check().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- include/net/tcp.h     |  1 -
- include/net/tcp_ao.h  |  6 ++----
- net/ipv4/syncookies.c | 16 ++++------------
- net/ipv4/tcp_ao.c     | 16 ++++++++++++++--
- net/ipv6/syncookies.c |  7 ++-----
- 5 files changed, 22 insertions(+), 24 deletions(-)
+v2: Remove duplicated init of treq->syn_tos.
+---
+ net/ipv4/syncookies.c | 68 +++++++++++++++++++++++--------------------
+ net/ipv6/syncookies.c | 14 ---------
+ 2 files changed, 37 insertions(+), 45 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index cc7143a781da..d4d0e9763175 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -494,7 +494,6 @@ struct sock *tcp_get_cookie_sock(struct sock *sk, struct sk_buff *skb,
- int __cookie_v4_check(const struct iphdr *iph, const struct tcphdr *th);
- struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb);
- struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
--					    const struct tcp_request_sock_ops *af_ops,
- 					    struct sock *sk, struct sk_buff *skb);
- #ifdef CONFIG_SYN_COOKIES
- 
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index b56be10838f0..4d900ef8dfc3 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -265,8 +265,7 @@ void tcp_ao_established(struct sock *sk);
- void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb);
- void tcp_ao_connect_init(struct sock *sk);
- void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
--		      struct tcp_request_sock *treq,
--		      unsigned short int family, int l3index);
-+		      struct request_sock *req, unsigned short int family);
- #else /* CONFIG_TCP_AO */
- 
- static inline int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
-@@ -277,8 +276,7 @@ static inline int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
- }
- 
- static inline void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
--				    struct tcp_request_sock *treq,
--				    unsigned short int family, int l3index)
-+				    struct request_sock *req, unsigned short int family)
- {
- }
- 
 diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index de051eb08db8..1e3783c97e28 100644
+index 1e3783c97e28..f4bcd4822fe0 100644
 --- a/net/ipv4/syncookies.c
 +++ b/net/ipv4/syncookies.c
-@@ -286,9 +286,7 @@ bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
+@@ -285,10 +285,43 @@ bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
+ }
  EXPORT_SYMBOL(cookie_ecn_ok);
  
++static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
++				 struct request_sock *req)
++{
++	struct inet_request_sock *ireq = inet_rsk(req);
++	struct tcp_request_sock *treq = tcp_rsk(req);
++	const struct tcphdr *th = tcp_hdr(skb);
++
++	req->num_retrans = 0;
++
++	ireq->ir_num = ntohs(th->dest);
++	ireq->ir_rmt_port = th->source;
++	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
++	ireq->ir_mark = inet_request_mark(sk, skb);
++
++	if (IS_ENABLED(CONFIG_SMC))
++		ireq->smc_ok = 0;
++
++	treq->snt_synack = 0;
++	treq->tfo_listener = false;
++	treq->txhash = net_tx_rndhash();
++	treq->rcv_isn = ntohl(th->seq) - 1;
++	treq->snt_isn = ntohl(th->ack_seq) - 1;
++	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
++	treq->req_usec_ts = false;
++
++#if IS_ENABLED(CONFIG_MPTCP)
++	treq->is_mptcp = sk_is_mptcp(sk);
++	if (treq->is_mptcp)
++		return mptcp_subflow_init_cookie_req(req, sk, skb);
++#endif
++
++	return 0;
++}
++
  struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
--					    const struct tcp_request_sock_ops *af_ops,
--					    struct sock *sk,
--					    struct sk_buff *skb)
-+					    struct sock *sk, struct sk_buff *skb)
+ 					    struct sock *sk, struct sk_buff *skb)
  {
- 	struct tcp_request_sock *treq;
+-	struct tcp_request_sock *treq;
  	struct request_sock *req;
-@@ -303,9 +301,6 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
  
- 	treq = tcp_rsk(req);
- 
--	/* treq->af_specific might be used to perform TCP_MD5 lookup */
--	treq->af_specific = af_ops;
--
- 	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
- 	treq->req_usec_ts = false;
- 
-@@ -345,7 +340,6 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	struct rtable *rt;
- 	__u8 rcv_wscale;
- 	u32 tsoff = 0;
--	int l3index;
- 
- 	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
- 	    !th->ack || th->rst)
-@@ -376,8 +370,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	if (!cookie_timestamp_decode(net, &tcp_opt))
- 		goto out;
- 
--	req = cookie_tcp_reqsk_alloc(&tcp_request_sock_ops,
--				     &tcp_request_sock_ipv4_ops, sk, skb);
-+	req = cookie_tcp_reqsk_alloc(&tcp_request_sock_ops, sk, skb);
+ 	if (sk_is_mptcp(sk))
+@@ -299,22 +332,10 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
  	if (!req)
- 		goto out_drop;
+ 		return NULL;
  
-@@ -406,9 +399,6 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 
- 	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
- 
--	l3index = l3mdev_master_ifindex_by_index(net, ireq->ir_iif);
--	tcp_ao_syncookie(sk, skb, treq, AF_INET, l3index);
+-	treq = tcp_rsk(req);
 -
+-	treq->syn_tos = TCP_SKB_CB(skb)->ip_dsfield;
+-	treq->req_usec_ts = false;
+-
+-#if IS_ENABLED(CONFIG_MPTCP)
+-	treq->is_mptcp = sk_is_mptcp(sk);
+-	if (treq->is_mptcp) {
+-		int err = mptcp_subflow_init_cookie_req(req, sk, skb);
+-
+-		if (err) {
+-			reqsk_free(req);
+-			return NULL;
+-		}
++	if (cookie_tcp_reqsk_init(sk, skb, req)) {
++		reqsk_free(req);
++		return NULL;
+ 	}
+-#endif
+ 
+ 	return req;
+ }
+@@ -376,28 +397,15 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	ireq = inet_rsk(req);
+ 	treq = tcp_rsk(req);
+-	treq->rcv_isn		= ntohl(th->seq) - 1;
+-	treq->snt_isn		= ntohl(th->ack_seq) - 1;
+ 	treq->ts_off		= tsoff;
+-	treq->txhash		= net_tx_rndhash();
+ 	req->mss		= mss;
+-	ireq->ir_num		= ntohs(th->dest);
+-	ireq->ir_rmt_port	= th->source;
+ 	sk_rcv_saddr_set(req_to_sk(req), ip_hdr(skb)->daddr);
+ 	sk_daddr_set(req_to_sk(req), ip_hdr(skb)->saddr);
+-	ireq->ir_mark		= inet_request_mark(sk, skb);
+ 	ireq->snd_wscale	= tcp_opt.snd_wscale;
+ 	ireq->sack_ok		= tcp_opt.sack_ok;
+ 	ireq->wscale_ok		= tcp_opt.wscale_ok;
+ 	ireq->tstamp_ok		= tcp_opt.saw_tstamp;
+ 	req->ts_recent		= tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
+-	treq->snt_synack	= 0;
+-	treq->tfo_listener	= false;
+-
+-	if (IS_ENABLED(CONFIG_SMC))
+-		ireq->smc_ok = 0;
+-
+-	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
+ 
  	/* We throwed the options of the initial SYN away, so we hope
  	 * the ACK carries the same options again (see RFC1122 4.2.3.8)
- 	 */
-@@ -417,6 +407,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	if (security_inet_conn_request(sk, skb, req))
- 		goto out_free;
+@@ -409,8 +417,6 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
  
-+	tcp_ao_syncookie(sk, skb, req, AF_INET);
-+
- 	req->num_retrans = 0;
+ 	tcp_ao_syncookie(sk, skb, req, AF_INET);
  
+-	req->num_retrans = 0;
+-
  	/*
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 7696417d0640..c4cd1e09eb6b 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -844,18 +844,30 @@ static struct tcp_ao_key *tcp_ao_inbound_lookup(unsigned short int family,
- }
- 
- void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
--		      struct tcp_request_sock *treq,
--		      unsigned short int family, int l3index)
-+		      struct request_sock *req, unsigned short int family)
- {
-+	struct tcp_request_sock *treq = tcp_rsk(req);
- 	const struct tcphdr *th = tcp_hdr(skb);
- 	const struct tcp_ao_hdr *aoh;
- 	struct tcp_ao_key *key;
-+	int l3index;
-+
-+	/* treq->af_specific is used to perform TCP_AO lookup
-+	 * in tcp_create_openreq_child().
-+	 */
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (family == AF_INET6)
-+		treq->af_specific = &tcp_request_sock_ipv6_ops;
-+	else
-+#endif
-+		treq->af_specific = &tcp_request_sock_ipv4_ops;
- 
- 	treq->maclen = 0;
- 
- 	if (tcp_parse_auth_options(th, NULL, &aoh) || !aoh)
- 		return;
- 
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), inet_rsk(req)->ir_iif);
- 	key = tcp_ao_inbound_lookup(family, sk, skb, -1, aoh->keyid, l3index);
- 	if (!key)
- 		/* Key not found, continue without TCP-AO */
+ 	 * We need to lookup the route here to get at the correct
+ 	 * window size. We should better make sure that the window size
 diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index 18c2e3c1677b..12b1809245f9 100644
+index 12b1809245f9..e0a9220d1536 100644
 --- a/net/ipv6/syncookies.c
 +++ b/net/ipv6/syncookies.c
-@@ -142,7 +142,6 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	int full_space, mss;
- 	__u8 rcv_wscale;
- 	u32 tsoff = 0;
--	int l3index;
+@@ -178,11 +178,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
  
- 	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
- 	    !th->ack || th->rst)
-@@ -173,8 +172,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	if (!cookie_timestamp_decode(net, &tcp_opt))
- 		goto out;
+ 	ireq = inet_rsk(req);
+ 	treq = tcp_rsk(req);
+-	treq->tfo_listener = false;
  
--	req = cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops,
--				     &tcp_request_sock_ipv6_ops, sk, skb);
-+	req = cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops, sk, skb);
- 	if (!req)
- 		goto out_drop;
+ 	req->mss = mss;
+-	ireq->ir_rmt_port = th->source;
+-	ireq->ir_num = ntohs(th->dest);
+ 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
+ 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
  
-@@ -218,8 +216,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+@@ -196,31 +193,20 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+ 		ireq->pktopts = skb;
+ 	}
+ 
+-	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
+ 	/* So that link locals have meaning */
+ 	if (!sk->sk_bound_dev_if &&
+ 	    ipv6_addr_type(&ireq->ir_v6_rmt_addr) & IPV6_ADDR_LINKLOCAL)
+ 		ireq->ir_iif = tcp_v6_iif(skb);
+ 
+-	ireq->ir_mark = inet_request_mark(sk, skb);
+-
+-	req->num_retrans = 0;
+ 	ireq->snd_wscale	= tcp_opt.snd_wscale;
+ 	ireq->sack_ok		= tcp_opt.sack_ok;
+ 	ireq->wscale_ok		= tcp_opt.wscale_ok;
+ 	ireq->tstamp_ok		= tcp_opt.saw_tstamp;
+ 	req->ts_recent		= tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
+-	treq->snt_synack	= 0;
+-	treq->rcv_isn = ntohl(th->seq) - 1;
+-	treq->snt_isn = ntohl(th->ack_seq) - 1;
  	treq->ts_off = tsoff;
- 	treq->txhash = net_tx_rndhash();
+-	treq->txhash = net_tx_rndhash();
  
--	l3index = l3mdev_master_ifindex_by_index(net, ireq->ir_iif);
--	tcp_ao_syncookie(sk, skb, treq, AF_INET6, l3index);
-+	tcp_ao_syncookie(sk, skb, req, AF_INET6);
+ 	tcp_ao_syncookie(sk, skb, req, AF_INET6);
  
- 	if (IS_ENABLED(CONFIG_SMC))
- 		ireq->smc_ok = 0;
+-	if (IS_ENABLED(CONFIG_SMC))
+-		ireq->smc_ok = 0;
+-
+ 	/*
+ 	 * We need to lookup the dst_entry to get the correct window size.
+ 	 * This is taken from tcp_v6_syn_recv_sock.  Somebody please enlighten
 -- 
 2.30.2
 
