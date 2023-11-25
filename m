@@ -1,117 +1,108 @@
-Return-Path: <netdev+bounces-51032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7657F8C05
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 16:23:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA907F8C6F
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09A02B20ED3
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 15:23:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3B3BB20FF3
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 16:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A8328DB8;
-	Sat, 25 Nov 2023 15:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC8D1C01;
+	Sat, 25 Nov 2023 16:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jisgnSV1"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B29FF
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 07:23:36 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-250-cWnaHxeJP3Kxzg3QHFqbUw-1; Sat, 25 Nov 2023 15:23:32 +0000
-X-MC-Unique: cWnaHxeJP3Kxzg3QHFqbUw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 25 Nov
- 2023 15:23:49 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sat, 25 Nov 2023 15:23:49 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Kent Overstreet' <kent.overstreet@linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Thomas Graf <tgraf@suug.ch>, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: RE: [PATCH] rhashtable: Better error message on allocation failure
-Thread-Topic: [PATCH] rhashtable: Better error message on allocation failure
-Thread-Index: AQHaHmlAOmj1d1ASnU6F5GtzDO5q0LCLKOWA
-Date: Sat, 25 Nov 2023 15:23:49 +0000
-Message-ID: <36bcdab2dae7429d9c2162879d0a3f9a@AcuMS.aculab.com>
-References: <20231123235949.421106-1-kent.overstreet@linux.dev>
-In-Reply-To: <20231123235949.421106-1-kent.overstreet@linux.dev>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C9B1A6;
+	Sat, 25 Nov 2023 08:34:27 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3APGUF86003778;
+	Sat, 25 Nov 2023 08:34:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=TEkupid8sBlLpSL/3VjNIN1K1+OhyKNF+UyoG9pF3cc=;
+ b=jisgnSV1dx2kCVFd0y+QYuj+MWrEqT+Xho0eLKpQn6i+eDFgtnF4q9fMV7iIjkX1S3ln
+ gbmZKrK2bVCsjUgrFw9iO8jYqNtWtU4wzQgKfjT5YUjDiwooWfC7L+/XITz145LE0vnk
+ vUexBCoy42Vr9Vx8gL7dH0INxEdxcbftAXnztkFWL/bD22lZzxU7LeSPMpK7zR0EHqXb
+ PaafgWObufiVlw/s543M8aYz+H9KG0Lh+3wKSwpEvvK6EUfVc3z7beFsl7Z95t52Dcu2
+ 7EeCsKeCtgz6SEMOplapxGez49+7Jqlz7/VqKNsIgH1UD6r4bDSyX+clH5sv/JdKg3zP ug== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ukhauga5v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sat, 25 Nov 2023 08:34:16 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 25 Nov
+ 2023 08:34:14 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sat, 25 Nov 2023 08:34:14 -0800
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id 265325C68EA;
+	Sat, 25 Nov 2023 08:34:10 -0800 (PST)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [PATCH net] octeontx2-pf: Fix adding mbox work queue entry when num_vfs > 64
+Date: Sat, 25 Nov 2023 22:04:02 +0530
+Message-ID: <1700930042-5400-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: hfRqkjpy2dM6dk8JfR1WPjA2bU5zDA_a
+X-Proofpoint-GUID: hfRqkjpy2dM6dk8JfR1WPjA2bU5zDA_a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-25_16,2023-11-22_01,2023-05-22_02
 
-From: Kent Overstreet
-> Sent: 24 November 2023 00:00
->=20
-> Memory allocation failures print backtraces by default, but when we're
-> running out of a rhashtable worker the backtrace is useless - it doesn't
-> tell us which hashtable the allocation failure was for.
->=20
-> This adds a dedicated warning that prints out functions from the
-> rhashtable params, which will be a bit more useful.
->=20
-> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-> Cc: Thomas Graf <tgraf@suug.ch>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  lib/rhashtable.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> index 6ae2ba8e06a2..d3fce9c8989a 100644
-> --- a/lib/rhashtable.c
-> +++ b/lib/rhashtable.c
-> @@ -360,9 +360,14 @@ static int rhashtable_rehash_alloc(struct rhashtable=
- *ht,
->=20
->  =09ASSERT_RHT_MUTEX(ht);
->=20
-> -=09new_tbl =3D bucket_table_alloc(ht, size, GFP_KERNEL);
-> -=09if (new_tbl =3D=3D NULL)
-> +=09new_tbl =3D bucket_table_alloc(ht, size, GFP_KERNEL|__GFP_NOWARN);
-> +=09if (new_tbl =3D=3D NULL) {
-> +=09=09WARN("rhashtable bucket table allocation failure for %ps",
+From: Geetha sowjanya <gakula@marvell.com>
 
-Won't WARN() be a panic on systems with PANICK_ON_WARN set?
+When more than 64 VFs are enabled for a PF then mbox communication
+between VF and PF is not working as mbox work queueing for few VFs
+are skipped due to wrong calculation of VF numbers.
 
-> +=09=09     (void *) ht->p.hashfn ?:
-> +=09=09     (void *) ht->p.obj_hashfn ?:
-> +=09=09     (void *) ht->p.obj_cmpfn);
+Fixes: d424b6c02415 ("octeontx2-pf: Enable SRIOV and added VF mbox handling")
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-That layout is horrid (and I bet checkpatch complains).
-You only actually need one (void *) cast on the RH value:
-=09=09=09ht->p.hashfn ?: ht->p.obj_hashfn ?: (void *)ht->p.obj_cmpfn
-
-=09David
-
-
->  =09=09return -ENOMEM;
-> +=09}
->=20
->  =09err =3D rhashtable_rehash_attach(ht, old_tbl, new_tbl);
->  =09if (err)
-> --
-> 2.42.0
->=20
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index ba95ac9..6d56fc1 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -566,7 +566,9 @@ static irqreturn_t otx2_pfvf_mbox_intr_handler(int irq, void *pf_irq)
+ 		otx2_write64(pf, RVU_PF_VFPF_MBOX_INTX(1), intr);
+ 		otx2_queue_work(mbox, pf->mbox_pfvf_wq, 64, vfs, intr,
+ 				TYPE_PFVF);
+-		vfs -= 64;
++		if (intr)
++			trace_otx2_msg_interrupt(mbox->mbox.pdev, "VF(s) to PF", intr);
++		vfs = 64;
+ 	}
+ 
+ 	intr = otx2_read64(pf, RVU_PF_VFPF_MBOX_INTX(0));
+@@ -574,7 +576,8 @@ static irqreturn_t otx2_pfvf_mbox_intr_handler(int irq, void *pf_irq)
+ 
+ 	otx2_queue_work(mbox, pf->mbox_pfvf_wq, 0, vfs, intr, TYPE_PFVF);
+ 
+-	trace_otx2_msg_interrupt(mbox->mbox.pdev, "VF(s) to PF", intr);
++	if (intr)
++		trace_otx2_msg_interrupt(mbox->mbox.pdev, "VF(s) to PF", intr);
+ 
+ 	return IRQ_HANDLED;
+ }
+-- 
+2.7.4
 
 
