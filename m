@@ -1,77 +1,70 @@
-Return-Path: <netdev+bounces-51013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA37B7F889A
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 07:15:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8D57F88BF
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 08:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250AFB210F5
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 06:15:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F181C20AA8
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 07:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D3F4435;
-	Sat, 25 Nov 2023 06:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E409B17C3;
+	Sat, 25 Nov 2023 07:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b77ff2OP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PZFeVsy4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE611723;
-	Fri, 24 Nov 2023 22:15:48 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3b83432ca31so1683316b6e.1;
-        Fri, 24 Nov 2023 22:15:48 -0800 (PST)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1954EE4
+	for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 23:10:27 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-4079ed65582so17645435e9.1
+        for <netdev@vger.kernel.org>; Fri, 24 Nov 2023 23:10:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700892948; x=1701497748; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pt0PfJDT3f08sVVp/8Q0IRjtVu02ZOwmgKKrULlYRLU=;
-        b=b77ff2OPt4P/0UMdskPrRxSBt/7A/RBbH008dvXmOKr3HBcMdkHaK0jrO02Thal+db
-         06aEzkTcwrr7dZ+URQBqx2IQpcFxin6oILZbP4lND8Iqj6/xNK0WaFbGv7u1FWp9w2qA
-         n2o5HPDJg2j113P44dk6PmM24FFT+Dk0o7T6q489T5iYj51MpxHLGfvl8UfEiYCgLies
-         ZPIT+92fe/gR6QW/Xvm1ZxsygCeM9E2JMXNDP/Gl/AnadYwZsdwusYjNHQ+Ef7WFU1Ba
-         CvfBM9FPpFk/gfqiF8T0/Zh67CbvlgUKjCyGzwCz11WmewSP8TU5673R4Yy1XF0qmlB7
-         48yg==
+        d=linaro.org; s=google; t=1700896225; x=1701501025; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XNICJpc4r6LblTrWTCdIMPSQfd/ZQpwwACbiJ1cgEKc=;
+        b=PZFeVsy4Jsezz1xBP+w52IKE0gdeWm5CVjln09yimhYdYdb3k/b1CF9zDnPY3rgIAe
+         MQbpOkPTwzyceWDdRTAFugVkrarW7R+GTCC2jAsaihSYYNuV9MooV+Yu0r0rtwX/8d2P
+         RxPuho74ODEPk4TTnmxwnsTxq9oWTVf2oVoIsdFUpl7BskzkEp5WDxFBVnDCbovW16av
+         iuVpPo7ihGM6+7mK5ArphN2mqwqA+vQf6hqYfbquzJ/CN8s75CJaVRV8hrrSfDxzIzHi
+         WXdtl/gn2WcvmlE+m2c8AdvvPdegLMgT1qGrh/HlkDa3OqKb6didG2Cg+d6bn/iefClB
+         Adbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700892948; x=1701497748;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pt0PfJDT3f08sVVp/8Q0IRjtVu02ZOwmgKKrULlYRLU=;
-        b=u4uAX6H0VBUyaLUXQlA1cnMl3Jm0pNWfpzNS8INBaSNgxAvvlGsZ2PMq3pLePCa+wA
-         jSAOiWx6kMr0fzFQ5JzE32jNZjn7LpH7O6Z3vCp2X7+RIDgqZEmxzQ0aDs42M7lrZiYG
-         bE2YC59kJ431YUKAl/uKlCEG/slO10JIOWtzeuMcyHc6shoZcze/O8kwmXXkqzNdwecZ
-         O62S/tUT/Ne9/nAQhTft1qRMVovVrF+yr1xJdfhg62F7ZvDGaI9FAnUdZtPVDOlcB031
-         j+3d39l5e3Gw6GDU0vmylufLhK8K90wT6sq25MrYXuX7rcWHfMn/TiLd+yJ7xEZjnKFd
-         i45w==
-X-Gm-Message-State: AOJu0YxxEc1CAytYM0m3ufqCO8dscPIOVp7NB4V6IPK6+rbIfBTzhwWX
-	fIAG45RmrzY2iCzVCjqZrCs=
-X-Google-Smtp-Source: AGHT+IFrTu+HMFY2tW90QAa4w1v6C4Hg0ZSYs6mEUVIn4e6O+bbYT5Dep6SV6Oj0Mt53DR8e9mpyKQ==
-X-Received: by 2002:a05:6808:dde:b0:3b8:5df8:be90 with SMTP id g30-20020a0568080dde00b003b85df8be90mr576069oic.53.1700892947775;
-        Fri, 24 Nov 2023 22:15:47 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id v69-20020a638948000000b0056c2f1a2f6bsm4041740pgd.41.2023.11.24.22.15.41
+        d=1e100.net; s=20230601; t=1700896225; x=1701501025;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XNICJpc4r6LblTrWTCdIMPSQfd/ZQpwwACbiJ1cgEKc=;
+        b=Am4npUcZ0Dih2tZI1Z9N+2F5n0aQYfVr7hoKgSNANkafkdZPMoE5IlsIZLMfh+uvJX
+         JYW4W52X2LPgHufVRUvmj/7F5bMy/O1eoZfCeKK9ANGk5eLbZtEBzt1Ny/b+tH1nL7rR
+         7lcRyl/kQYaatn3PCCFuTYsIWtzC2MZs7uuWDqcxiPvKoF6tW3OwUtW6M7YZkeVeOodv
+         t+cCdWrydr242bjozQHAo+TN6yOZ6z/0RgSraVp5uHbVfZsQK/mMLrhc2rZ9CIjD+jqY
+         jCXs0CDiJp0c6dGF00XkWyKxIcrXPpsgASyxf4bXv24x0iyAmj0kuW8SbS3g4bJik1F5
+         x7nw==
+X-Gm-Message-State: AOJu0YxhVKcImniZdGtFRxnSdDLnzxU9C2M4rdMEnuxPZ/1sdvpwguKI
+	DJxV6K55lb1PUh3PiRrkSX2cAQ==
+X-Google-Smtp-Source: AGHT+IG3aRFbV+p/718t8bopeYgOMMA73KlLymKurOaoTU365U9M+kCYVd8NEIZNVSrrMGbi5qVa1A==
+X-Received: by 2002:a05:600c:4507:b0:40b:338b:5f10 with SMTP id t7-20020a05600c450700b0040b338b5f10mr4374487wmo.32.1700896225412;
+        Fri, 24 Nov 2023 23:10:25 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id je19-20020a05600c1f9300b004083729fc14sm7647760wmb.20.2023.11.24.23.10.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Nov 2023 22:15:45 -0800 (PST)
-Date: Sat, 25 Nov 2023 14:15:36 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Mark Brown <broonie@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH net-next 01/38] selftests/net: add lib.sh
-Message-ID: <ZWGRCK4D64EfUybp@Laptop-X1>
-References: <20231124092736.3673263-1-liuhangbin@gmail.com>
- <20231124092736.3673263-2-liuhangbin@gmail.com>
- <87cyvzfagj.fsf@nvidia.com>
+        Fri, 24 Nov 2023 23:10:25 -0800 (PST)
+From: Dan Carpenter <dan.carpenter@linaro.org>
+X-Google-Original-From: Dan Carpenter <dan.carpenter@oracle.com>
+Date: Sat, 25 Nov 2023 10:10:22 +0300
+To: oe-kbuild@lists.linux.dev,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, linus.walleij@linaro.org,
+	alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
+Message-ID: <78a4a47d-cde1-4c2c-999c-6f76b5fa9c87@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,121 +73,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87cyvzfagj.fsf@nvidia.com>
+In-Reply-To: <20231117235140.1178-3-luizluca@gmail.com>
 
-On Fri, Nov 24, 2023 at 03:35:51PM +0100, Petr Machata wrote:
-> 
-> Hangbin Liu <liuhangbin@gmail.com> writes:
-> 
-> > +cleanup_ns()
-> > +{
-> > +	local ns=""
-> > +	local errexit=0
-> > +
-> > +	# disable errexit temporary
-> > +	if [[ $- =~ "e" ]]; then
-> > +		errexit=1
-> > +		set +e
-> > +	fi
-> > +
-> > +	for ns in "$@"; do
-> > +		ip netns delete "${ns}" &> /dev/null
-> > +		busywait 2 "ip netns list | grep -vq $1" &> /dev/null
-> 
-> The grep would get confused by substrings of other names.
-> This should be grep -vq "^$ns$".
+Hi Luiz,
 
-Thanks. I just thought the ns name would like foo-xxxxxxx, but I forgot this
-is a common function, which maybe called with normal ns name.
+kernel test robot noticed the following build warnings:
 
-> 
-> > +		if ip netns list | grep -q $1; then
-> 
-> Busywait returns != 0 when the wait condition is not reached within a
-> given time. So it should be possible to roll the duplicated if-grep into
-> the busywait line like so:
-> 
-> 		if ! busywait 2 "ip netns etc."; then
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Angelo-Daros-de-Luca/net-dsa-realtek-create-realtek-common/20231118-075444
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231117235140.1178-3-luizluca%40gmail.com
+patch subject: [net-next 2/2] net: dsa: realtek: load switch variants on demand
+config: mips-randconfig-r081-20231121 (https://download.01.org/0day-ci/archive/20231125/202311251132.QKdGl71R-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231125/202311251132.QKdGl71R-lkp@intel.com/reproduce)
 
-You are right.
-> 
-> > +			echo "Failed to remove namespace $1"
-> > +			return $ksft_skip
-> 
-> This does not restore the errexit.
-> 
-> I think it might be clearest to have this function as a helper, say
-> __cleanup_ns, and then have a wrapper that does the errexit management:
-> 
-> cleanup_ns()
-> {
-> 	local errexit
-> 	local rc
-> 
-> 	# disable errexit temporarily
-> 	if [[ $- =~ "e" ]]; then
-> 		errexit=1
-> 		set +e
-> 	fi
-> 
-> 	__cleanup_ns "$@"
-> 	rc=$?
-> 
-> 	[ $errexit -eq 1 ] && set -e
-> 	return $rc
-> }
-> 
-> If this comes up more often, we can have a helper like
-> with_disabled_errexit or whatever, that does this management and
-> dispatches to "$@", so cleanup_ns() would become:
-> 
-> cleanup_ns()
-> {
-> 	with_disabled_errexit __cleanup_ns "$@"
-> }
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <error27@gmail.com>
+| Closes: https://lore.kernel.org/r/202311251132.QKdGl71R-lkp@intel.com/
 
-Thanks for your suggestion.
+smatch warnings:
+drivers/net/dsa/realtek/realtek-smi.c:418 realtek_smi_probe() warn: passing zero to 'PTR_ERR'
 
-> 
-> > +		fi
-> > +	done
-> > +
-> > +	[ $errexit -eq 1 ] && set -e
-> > +	return 0
-> > +}
-> > +
-> > +# By default, remove all netns before EXIT.
-> > +cleanup_all_ns()
-> > +{
-> > +	cleanup_ns $NS_LIST
-> > +}
-> > +trap cleanup_all_ns EXIT
-> 
-> Hmm, OK, this is a showstopper for inclusion from forwarding/lib.sh,
-> because basically all users of forwarding/lib.sh use the EXIT trap.
-> 
-> I wonder if we need something like these push_cleanup / on_exit helpers:
-> 
-> 	https://github.com/pmachata/stuff/blob/master/ptp-test/lib.sh#L15
+vim +/PTR_ERR +418 drivers/net/dsa/realtek/realtek-smi.c
 
-When I added this, I just want to make sure the netns are cleaned up if the
-client script forgot. I think the client script trap function should
-cover this one, no?
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  398  static int realtek_smi_probe(struct platform_device *pdev)
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  399  {
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  400  	struct device *dev = &pdev->dev;
+f5f119077b1cd6 drivers/net/dsa/realtek/realtek-smi-core.c Luiz Angelo Daros de Luca 2022-01-28  401  	struct realtek_priv *priv;
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  402  	int ret;
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  403  
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  404  	priv = realtek_common_probe(dev, realtek_smi_regmap_config,
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  405  				    realtek_smi_nolock_regmap_config);
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  406  	if (IS_ERR(priv))
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  407  		return PTR_ERR(priv);
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  408  
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  409  	/* Fetch MDIO pins */
+f5f119077b1cd6 drivers/net/dsa/realtek/realtek-smi-core.c Luiz Angelo Daros de Luca 2022-01-28  410  	priv->mdc = devm_gpiod_get_optional(dev, "mdc", GPIOD_OUT_LOW);
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  411  	if (IS_ERR(priv->mdc)) {
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  412  		ret = PTR_ERR(priv->mdc);
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  413  		goto err_variant_put;
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  414  	}
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  415  
+f5f119077b1cd6 drivers/net/dsa/realtek/realtek-smi-core.c Luiz Angelo Daros de Luca 2022-01-28  416  	priv->mdio = devm_gpiod_get_optional(dev, "mdio", GPIOD_OUT_LOW);
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  417  	if (IS_ERR(priv->mdio)) {
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17 @418  		ret = PTR_ERR(priv->mdc);
 
-> 
-> But I don't want to force this on your already large patchset :)
+s/mdc/mdio/.
 
-Yes, Paolo also told me that this is too large. I will break it to
-2 path set or merge some small patches together for next version.
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  419  		goto err_variant_put;
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  420  	}
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  421  
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  422  	priv->setup_interface = realtek_smi_setup_mdio;
+217d45f6e61f5d drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  423  	priv->write_reg_noack = realtek_smi_write_reg_noack;
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  424  
+f5f119077b1cd6 drivers/net/dsa/realtek/realtek-smi-core.c Luiz Angelo Daros de Luca 2022-01-28  425  	ret = priv->ops->detect(priv);
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  426  	if (ret) {
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  427  		dev_err(dev, "unable to detect switch\n");
+7e61e799f3f92c drivers/net/dsa/realtek/realtek-smi.c      Luiz Angelo Daros de Luca 2023-11-17  428  		goto err_variant_put;
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  429  	}
+d8652956cf37c5 drivers/net/dsa/realtek-smi.c              Linus Walleij             2018-07-14  430  
 
-> So just ignore the bit about including from forwarding/lib.sh.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
-> Actually I take this back. The cleanup should be invoked from where the
-> init was called. I don't think the library should be auto-invoking it,
-> the client scripts should. Whether through a trap or otherwise.
-
-OK, also makes sense. I will remove this trap.
-
-Thanks for all your comments.
-Hangbin
 
