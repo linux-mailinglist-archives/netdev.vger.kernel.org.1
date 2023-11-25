@@ -1,318 +1,226 @@
-Return-Path: <netdev+bounces-51036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DE1E7F8C7C
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:37:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A13297F8C8D
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13436B20FE6
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 16:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2C121C20AFC
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 16:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6046512B65;
-	Sat, 25 Nov 2023 16:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E65286B3;
+	Sat, 25 Nov 2023 16:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DBSkmMGt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PWoDYCaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19022102;
-	Sat, 25 Nov 2023 08:37:21 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3APGRR3u000576;
-	Sat, 25 Nov 2023 08:37:14 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=7tmkG0aI1txbuxYrmeLbYXWmRe/JkhuRiN6AadLW224=;
- b=DBSkmMGtevQ+FNQibs9OKXGIjI8s4OxdeupuFYRCX4rtyYWmth5RR39bJ06VV0AwnTT9
- JIWRfPngYchi0NFonMVM/FoQanM0jprONNFNKlswgi1twILHArgqPbC2TYGsdMfbG3Ex
- CtZcJlRwu8duA4SBNtpFQmg3VgaPy2xdYAri388KdImpjVjttUHX45n/C4PfJWckgk/X
- 3Ah4eZilKPvjXPvu5gfC/LHVrBNK+0jcX2Ys5GQQKTYAb3Zu4cDL5tSGGqoKIytVidSd
- E9fyCDJM/3eYs0QJ6dIfhSsp6+XNzXBB1/hDDaFio1I45+XAeJ9L2cLGX2pc/sE8SYof Fg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ukhaugab5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sat, 25 Nov 2023 08:37:14 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 25 Nov
- 2023 08:37:11 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sat, 25 Nov 2023 08:37:11 -0800
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id C6D305C68EA;
-	Sat, 25 Nov 2023 08:37:08 -0800 (PST)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [PATCH net] octeontx2-pf: Restore TC ingress police rules when interface is up
-Date: Sat, 25 Nov 2023 22:06:57 +0530
-Message-ID: <1700930217-5707-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB8FCAA;
+	Sat, 25 Nov 2023 08:50:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qDrMZoJgPuorTOeOShLAAzI7/GxpWs/Y4O/DPqFLxBM=; b=PWoDYCafbAUSdVULNpIWQ24Wmd
+	oDGhE67ZDkbL8VSibIyKsjVwSgemiCTE6w/TQRsPpFiy4k+odfppobwNAkOiRBBV31TbgYqJ0uTpO
+	EMxlDzEBwi6R9N6c1GJkLF3bNk106KvANzWGiNiSUG5TcyrMkY5/TzXvF9Js6t16OU28=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r6vr8-001CHy-Pr; Sat, 25 Nov 2023 17:50:10 +0100
+Date: Sat, 25 Nov 2023 17:50:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Subject: Re: [PATCH net-next] net: phy: mdio_device: Reset device only when
+ necessary
+Message-ID: <37250e69-93f4-422f-bb4f-55a1d2238dcd@lunn.ch>
+References: <20231121-net-phy-reset-once-v1-1-37c960b6336c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: BP6lt8wtjnEZ4mbJTMgQmRttvLU0eWyx
-X-Proofpoint-GUID: BP6lt8wtjnEZ4mbJTMgQmRttvLU0eWyx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-25_16,2023-11-22_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231121-net-phy-reset-once-v1-1-37c960b6336c@redhat.com>
 
-TC ingress policer rules depends on interface receive queue
-contexts since the bandwidth profiles are attached to RQ
-contexts. When an interface is brought down all the queue
-contexts are freed. This in turn frees bandwidth profiles in
-hardware causing ingress police rules non-functional after
-the interface is brought up. Fix this by applying all the ingress
-police rules config to hardware in otx2_open. Also allow
-adding ingress rules only when interface is running
-since no contexts exist for the interface when it is down.
+On Tue, Nov 21, 2023 at 04:10:37PM -0600, Andrew Halaney wrote:
+> Currently the phy reset sequence is as shown below for a
+> devicetree described mdio phy on boot:
+> 
+> 1. Assert the phy_device's reset as part of registering
+> 2. Deassert the phy_device's reset as part of registering
+> 3. Deassert the phy_device's reset as part of phy_probe
+> 4. Deassert the phy_device's reset as part of phy_hw_init
+> 
+> The extra two deasserts include waiting the deassert delay afterwards,
+> which is adding unnecessary delay.
+> 
+> Here's some snipped tracing output using the following command line
+> params "trace_event=gpio:* trace_options=stacktrace" illustrating
+> the reset handling and where its coming from:
+> 
+>     /* Assert */
+>        systemd-udevd-283     [002] .....     6.780434: gpio_value: 544 set 0
+>        systemd-udevd-283     [002] .....     6.783849: <stack trace>
+>      => gpiod_set_raw_value_commit
+>      => gpiod_set_value_nocheck
+>      => gpiod_set_value_cansleep
+>      => mdio_device_reset
+>      => mdiobus_register_device
+>      => phy_device_register
+>      => fwnode_mdiobus_phy_device_register
+>      => fwnode_mdiobus_register_phy
+>      => __of_mdiobus_register
+>      => stmmac_mdio_register
+>      => stmmac_dvr_probe
+>      => stmmac_pltfr_probe
+>      => devm_stmmac_pltfr_probe
+>      => qcom_ethqos_probe
+>      => platform_probe
+> 
+>     /* Deassert */
+>        systemd-udevd-283     [002] .....     6.802480: gpio_value: 544 set 1
+>        systemd-udevd-283     [002] .....     6.805886: <stack trace>
+>      => gpiod_set_raw_value_commit
+>      => gpiod_set_value_nocheck
+>      => gpiod_set_value_cansleep
+>      => mdio_device_reset
+>      => phy_device_register
+>      => fwnode_mdiobus_phy_device_register
+>      => fwnode_mdiobus_register_phy
+>      => __of_mdiobus_register
+>      => stmmac_mdio_register
+>      => stmmac_dvr_probe
+>      => stmmac_pltfr_probe
+>      => devm_stmmac_pltfr_probe
+>      => qcom_ethqos_probe
+>      => platform_probe
+> 
+>     /* Deassert */
+>        systemd-udevd-283     [002] .....     6.882601: gpio_value: 544 set 1
+>        systemd-udevd-283     [002] .....     6.886014: <stack trace>
+>      => gpiod_set_raw_value_commit
+>      => gpiod_set_value_nocheck
+>      => gpiod_set_value_cansleep
+>      => mdio_device_reset
+>      => phy_probe
+>      => really_probe
+>      => __driver_probe_device
+>      => driver_probe_device
+>      => __device_attach_driver
+>      => bus_for_each_drv
+>      => __device_attach
+>      => device_initial_probe
+>      => bus_probe_device
+>      => device_add
+>      => phy_device_register
+>      => fwnode_mdiobus_phy_device_register
+>      => fwnode_mdiobus_register_phy
+>      => __of_mdiobus_register
+>      => stmmac_mdio_register
+>      => stmmac_dvr_probe
+>      => stmmac_pltfr_probe
+>      => devm_stmmac_pltfr_probe
+>      => qcom_ethqos_probe
+>      => platform_probe
+> 
+>     /* Deassert */
+>       NetworkManager-477     [000] .....     7.023144: gpio_value: 544 set 1
+>       NetworkManager-477     [000] .....     7.026596: <stack trace>
+>      => gpiod_set_raw_value_commit
+>      => gpiod_set_value_nocheck
+>      => gpiod_set_value_cansleep
+>      => mdio_device_reset
+>      => phy_init_hw
+>      => phy_attach_direct
+>      => phylink_fwnode_phy_connect
+>      => __stmmac_open
+>      => stmmac_open
+> 
+> There's a lot of paths where the device is getting its reset
+> asserted and deasserted. Let's track the state and only actually
+> do the assert/deassert when it changes.
 
-Fixes: 68fbff68dbea ("octeontx2-pf: Add police action for TC flower")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c |   3 +
- .../ethernet/marvell/octeontx2/nic/otx2_common.h   |   2 +
- .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   2 +
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c   | 120 ++++++++++++++++-----
- 4 files changed, 102 insertions(+), 25 deletions(-)
+This only talks about GPIOs. There is also support for a linux reset
+controller. It is getting turned on/off as many times. You should
+mention this.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-index a4a258d..c1c99d7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-@@ -450,6 +450,9 @@ int cn10k_set_ipolicer_rate(struct otx2_nic *pfvf, u16 profile,
- 	aq->prof.pebs_mantissa = 0;
- 	aq->prof_mask.pebs_mantissa = 0xFF;
- 
-+	aq->prof.hl_en = 0;
-+	aq->prof_mask.hl_en = 1;
-+
- 	/* Fill AQ info */
- 	aq->qidx = profile;
- 	aq->ctype = NIX_AQ_CTYPE_BANDPROF;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index e7c69b5..0691030 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -1070,6 +1070,8 @@ int otx2_init_tc(struct otx2_nic *nic);
- void otx2_shutdown_tc(struct otx2_nic *nic);
- int otx2_setup_tc(struct net_device *netdev, enum tc_setup_type type,
- 		  void *type_data);
-+void otx2_tc_apply_ingress_police_rules(struct otx2_nic *nic);
-+
- /* CGX/RPM DMAC filters support */
- int otx2_dmacflt_get_max_cnt(struct otx2_nic *pf);
- int otx2_dmacflt_add(struct otx2_nic *pf, const u8 *mac, u32 bit_pos);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ba95ac9..d624be6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1870,6 +1870,8 @@ int otx2_open(struct net_device *netdev)
- 	if (pf->flags & OTX2_FLAG_DMACFLTR_SUPPORT)
- 		otx2_dmacflt_reinstall_flows(pf);
- 
-+	otx2_tc_apply_ingress_police_rules(pf);
-+
- 	err = otx2_rxtx_enable(pf, true);
- 	/* If a mbox communication error happens at this point then interface
- 	 * will end up in a state such that it is in down state but hardware
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 8a5e398..db1e0e0 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -47,6 +47,9 @@ struct otx2_tc_flow {
- 	bool				is_act_police;
- 	u32				prio;
- 	struct npc_install_flow_req	req;
-+	u64				rate;
-+	u32				burst;
-+	bool				is_pps;
- };
- 
- static void otx2_get_egress_burst_cfg(struct otx2_nic *nic, u32 burst,
-@@ -284,21 +287,10 @@ static int otx2_tc_egress_matchall_delete(struct otx2_nic *nic,
- 	return err;
- }
- 
--static int otx2_tc_act_set_police(struct otx2_nic *nic,
--				  struct otx2_tc_flow *node,
--				  struct flow_cls_offload *f,
--				  u64 rate, u32 burst, u32 mark,
--				  struct npc_install_flow_req *req, bool pps)
-+static int otx2_tc_act_set_hw_police(struct otx2_nic *nic,
-+				     struct otx2_tc_flow *node)
- {
--	struct netlink_ext_ack *extack = f->common.extack;
--	struct otx2_hw *hw = &nic->hw;
--	int rq_idx, rc;
--
--	rq_idx = find_first_zero_bit(&nic->rq_bmap, hw->rx_queues);
--	if (rq_idx >= hw->rx_queues) {
--		NL_SET_ERR_MSG_MOD(extack, "Police action rules exceeded");
--		return -EINVAL;
--	}
-+	int rc;
- 
- 	mutex_lock(&nic->mbox.lock);
- 
-@@ -308,23 +300,17 @@ static int otx2_tc_act_set_police(struct otx2_nic *nic,
- 		return rc;
- 	}
- 
--	rc = cn10k_set_ipolicer_rate(nic, node->leaf_profile, burst, rate, pps);
-+	rc = cn10k_set_ipolicer_rate(nic, node->leaf_profile,
-+				     node->burst, node->rate, node->is_pps);
- 	if (rc)
- 		goto free_leaf;
- 
--	rc = cn10k_map_unmap_rq_policer(nic, rq_idx, node->leaf_profile, true);
-+	rc = cn10k_map_unmap_rq_policer(nic, node->rq, node->leaf_profile, true);
- 	if (rc)
- 		goto free_leaf;
- 
- 	mutex_unlock(&nic->mbox.lock);
- 
--	req->match_id = mark & 0xFFFFULL;
--	req->index = rq_idx;
--	req->op = NIX_RX_ACTIONOP_UCAST;
--	set_bit(rq_idx, &nic->rq_bmap);
--	node->is_act_police = true;
--	node->rq = rq_idx;
--
- 	return 0;
- 
- free_leaf:
-@@ -336,6 +322,39 @@ static int otx2_tc_act_set_police(struct otx2_nic *nic,
- 	return rc;
- }
- 
-+static int otx2_tc_act_set_police(struct otx2_nic *nic,
-+				  struct otx2_tc_flow *node,
-+				  struct flow_cls_offload *f,
-+				  u64 rate, u32 burst, u32 mark,
-+				  struct npc_install_flow_req *req, bool pps)
-+{
-+	struct netlink_ext_ack *extack = f->common.extack;
-+	struct otx2_hw *hw = &nic->hw;
-+	int rq_idx, rc;
-+
-+	rq_idx = find_first_zero_bit(&nic->rq_bmap, hw->rx_queues);
-+	if (rq_idx >= hw->rx_queues) {
-+		NL_SET_ERR_MSG_MOD(extack, "Police action rules exceeded");
-+		return -EINVAL;
-+	}
-+
-+	req->match_id = mark & 0xFFFFULL;
-+	req->index = rq_idx;
-+	req->op = NIX_RX_ACTIONOP_UCAST;
-+
-+	node->is_act_police = true;
-+	node->rq = rq_idx;
-+	node->burst = burst;
-+	node->rate = rate;
-+	node->is_pps = pps;
-+
-+	rc = otx2_tc_act_set_hw_police(nic, node);
-+	if (!rc)
-+		set_bit(rq_idx, &nic->rq_bmap);
-+
-+	return rc;
-+}
-+
- static int otx2_tc_parse_actions(struct otx2_nic *nic,
- 				 struct flow_action *flow_action,
- 				 struct npc_install_flow_req *req,
-@@ -1044,6 +1063,11 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
- 	}
- 
- 	if (flow_node->is_act_police) {
-+		__clear_bit(flow_node->rq, &nic->rq_bmap);
-+
-+		if (nic->flags & OTX2_FLAG_INTF_DOWN)
-+			goto free_mcam_flow;
-+
- 		mutex_lock(&nic->mbox.lock);
- 
- 		err = cn10k_map_unmap_rq_policer(nic, flow_node->rq,
-@@ -1059,11 +1083,10 @@ static int otx2_tc_del_flow(struct otx2_nic *nic,
- 				   "Unable to free leaf bandwidth profile(%d)\n",
- 				   flow_node->leaf_profile);
- 
--		__clear_bit(flow_node->rq, &nic->rq_bmap);
--
- 		mutex_unlock(&nic->mbox.lock);
- 	}
- 
-+free_mcam_flow:
- 	otx2_del_mcam_flow_entry(nic, flow_node->entry, NULL);
- 	otx2_tc_update_mcam_table(nic, flow_cfg, flow_node, false);
- 	kfree_rcu(flow_node, rcu);
-@@ -1083,6 +1106,11 @@ static int otx2_tc_add_flow(struct otx2_nic *nic,
- 	if (!(nic->flags & OTX2_FLAG_TC_FLOWER_SUPPORT))
- 		return -ENOMEM;
- 
-+	if (nic->flags & OTX2_FLAG_INTF_DOWN) {
-+		NL_SET_ERR_MSG_MOD(extack, "Interface not initialized");
-+		return -EINVAL;
-+	}
-+
- 	if (flow_cfg->nr_flows == flow_cfg->max_flows) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Free MCAM entry not available to add the flow");
-@@ -1442,3 +1470,45 @@ void otx2_shutdown_tc(struct otx2_nic *nic)
- 	otx2_destroy_tc_flow_list(nic);
- }
- EXPORT_SYMBOL(otx2_shutdown_tc);
-+
-+static void otx2_tc_config_ingress_rule(struct otx2_nic *nic,
-+					struct otx2_tc_flow *node)
-+{
-+	struct npc_install_flow_req *req;
-+
-+	if (otx2_tc_act_set_hw_police(nic, node))
-+		return;
-+
-+	mutex_lock(&nic->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_npc_install_flow(&nic->mbox);
-+	if (!req)
-+		goto err;
-+
-+	memcpy(req, &node->req, sizeof(struct npc_install_flow_req));
-+
-+	if (otx2_sync_mbox_msg(&nic->mbox))
-+		netdev_err(nic->netdev,
-+			   "Failed to install MCAM flow entry for ingress rule");
-+err:
-+	mutex_unlock(&nic->mbox.lock);
-+}
-+
-+void otx2_tc_apply_ingress_police_rules(struct otx2_nic *nic)
-+{
-+	struct otx2_flow_config *flow_cfg = nic->flow_cfg;
-+	struct otx2_tc_flow *node;
-+
-+	/* If any ingress policer rules exist for the interface then
-+	 * apply those rules. Ingress policer rules depend on bandwidth
-+	 * profiles linked to the receive queues. Since no receive queues
-+	 * exist when interface is down, ingress policer rules are stored
-+	 * and configured in hardware after all receive queues are allocated
-+	 * in otx2_open.
-+	 */
-+	list_for_each_entry(node, &flow_cfg->flow_list_tc, list) {
-+		if (node->is_act_police)
-+			otx2_tc_config_ingress_rule(nic, node);
-+	}
-+}
-+EXPORT_SYMBOL(otx2_tc_apply_ingress_police_rules);
--- 
-2.7.4
+Now, lets compare the GPIO and the reset controller:
 
+static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
+{
+        /* Deassert the optional reset signal */
+        mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
+                                                 "reset", GPIOD_OUT_LOW);
+        if (IS_ERR(mdiodev->reset_gpio))
+                return PTR_ERR(mdiodev->reset_gpio);
+
+        if (mdiodev->reset_gpio)
+                gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
+
+        return 0;
+}
+
+static int mdiobus_register_reset(struct mdio_device *mdiodev)
+{
+        struct reset_control *reset;
+
+        reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
+        if (IS_ERR(reset))
+                return PTR_ERR(reset);
+
+        mdiodev->reset_ctrl = reset;
+
+        return 0;
+}
+
+For the GPIO controller, its clear what state it is in, because the
+get call sets it to GPIOD_OUT_LOW. The reset controller however does
+not have a clear state, we just get a reference to it.
+
+But:
+
+in mdiobus_register_device() we have:
+
+                err = mdiobus_register_reset(mdiodev);
+                if (err)
+                        return err;
+
+                /* Assert the reset signal */
+                mdio_device_reset(mdiodev, 1);
+
+suggesting the reset controller might have the opposite state to the
+GPIO?
+
+> diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+> index 044828d081d2..d2b9e62edaaa 100644
+> --- a/drivers/net/phy/mdio_device.c
+> +++ b/drivers/net/phy/mdio_device.c
+> @@ -122,6 +122,9 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
+>  	if (!mdiodev->reset_gpio && !mdiodev->reset_ctrl)
+>  		return;
+>  
+> +	if (mdiodev->reset_state == value)
+> +		return;
+> +
+
+mdiodev is set to all 0 at creation time, and the GPIO is also set to
+LOW when we get it. However, what about the reset controller?
+
+I think it would be better to initialize reset_state to -1, indicating
+we have no idea what the state is, and always perform the first reset
+to ensure we are into a know state for both GPIO and the reset
+controller.
+
+	Andrew
 
