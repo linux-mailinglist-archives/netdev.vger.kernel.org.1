@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-51046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F497F8CAA
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:15:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8BB7F8CAE
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 18:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A677528110C
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:15:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD5B7281394
+	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 17:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD31429439;
-	Sat, 25 Nov 2023 17:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F262C84D;
+	Sat, 25 Nov 2023 17:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zB2WNWCu"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="qGfDUrpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88445106
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 09:15:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3qpd86IOyW8DxDk9KPMIaP4sX9XO4YDtR3Ognfw5fv4=; b=zB2WNWCuveeRszL8p2fQv8skYS
-	DLih/x6pXstlk68KeI3EbrxHI/fZibJQ/Taz8Qzchv7t9uERqlh8DVx5+RGmEj1WpKG+xZMls1zUn
-	Ke9ieH1oFokUeC3EiPUBXYu2sk0/C7VlG4xpoThbTdL+OkSjMUvIV6Mwl50jJ9fA1EHE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r6wFO-001CRT-2Q; Sat, 25 Nov 2023 18:15:14 +0100
-Date: Sat, 25 Nov 2023 18:15:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 09/10] net: phylink: split out PHY validation
- from phylink_bringup_phy()
-Message-ID: <9685533d-9cd1-4c0e-afa1-c63f354f97a8@lunn.ch>
-References: <ZWCWn+uNkVLPaQhn@shell.armlinux.org.uk>
- <E1r6VIQ-00DDM9-LK@rmk-PC.armlinux.org.uk>
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93431B6;
+	Sat, 25 Nov 2023 09:17:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1700932654; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=dPhaBVAFZasjjGxq7ujaojaqxTLtmlSUMVh3qKjIbnzn6plXixbuHgN9o8IrzoQfUOHOJo+DFeLiMT3fCbPzaFLShipnYl84AdPSlps3YEwQGb76P02ititV7VV0+lh8zzFWaI9X9eV02fSmXqNyyNv9utj0EaaxGt9fuxO6n8M=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1700932654; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=fBDLnuxTYKM5FtsGLDrQ8Mws1yikp+Htr0jXUnTb6CU=; 
+	b=bC0HLIW7REAPtn5AhksSUEwk8U3M4GFw5agGIXDNY7owAI1DTKmEWShcsa332nGHtytutEwbkkzp8bbZ72tTanPjUakFhYCvrgMMUub0203B9xiqHf6gtyl4wAFqTtddEBptKNYGQp++/ByXZbAJ5Wy0xsXRddEUtQUFLhisQUU=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1700932654;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=fBDLnuxTYKM5FtsGLDrQ8Mws1yikp+Htr0jXUnTb6CU=;
+	b=qGfDUrpJHG4dvV6EDaqb1+TmZ7QBB8diSout/SOszTrc/1zuqkYeiW+Uqgu9ePB9
+	aLT7OSgR0UQYe7dJCER8EDebAntIgFU7HjCcPMXsJZlHpH/05qcuCBTVii0Ym0WnzYN
+	vks/Zv/dcUoDbc9pQgdPf744dabbIr48wOsSR4FU=
+Received: from [192.168.1.11] (110.226.61.26 [110.226.61.26]) by mx.zoho.in
+	with SMTPS id 1700932653544242.58251468981325; Sat, 25 Nov 2023 22:47:33 +0530 (IST)
+Message-ID: <8aa60891-cd52-42c0-b9a2-594d69b133fd@siddh.me>
+Date: Sat, 25 Nov 2023 22:47:30 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1r6VIQ-00DDM9-LK@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <000000000000cb112e0609b419d3@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
+ nfc_alloc_send_skb
+Content-Language: en-US, en-GB, hi-IN
+From: Siddh Raman Pant <code@siddh.me>
+In-Reply-To: <000000000000cb112e0609b419d3@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Fri, Nov 24, 2023 at 12:28:34PM +0000, Russell King (Oracle) wrote:
-> When bringing up a PHY, we need to work out which ethtool link modes it
-> should support and advertise. Clause 22 PHYs operate in a single
-> interface mode, which can be easily dealt with. However, clause 45 PHYs
-> tend to switch interface mode depending on the media. We need more
-> flexible validation at this point, so this patch splits out that code
-> in preparation to changing it.
-> 
-> Tested-by: Luo Jie <quic_luoj@quicinc.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+#syz test https://github.com/siddhpant/linux.git lock
 
