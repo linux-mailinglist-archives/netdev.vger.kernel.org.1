@@ -1,150 +1,157 @@
-Return-Path: <netdev+bounces-51145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543F97F9532
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 21:14:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF237F9535
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 21:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 889AC1C20363
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 20:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AA191C208DF
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 20:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502C112E52;
-	Sun, 26 Nov 2023 20:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF5112E6B;
+	Sun, 26 Nov 2023 20:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ueru7SR3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6fZkzUN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8ADE4
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 12:13:57 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4083dbc43cfso24103345e9.3
-        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 12:13:57 -0800 (PST)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9EB3E4;
+	Sun, 26 Nov 2023 12:14:25 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40b4746ae51so117485e9.2;
+        Sun, 26 Nov 2023 12:14:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701029635; x=1701634435; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cgXuzPLRR1R2XgHzgPCXM17r7JpL85lamt0xt6Skc5w=;
-        b=Ueru7SR3v7ReyeTPHowSvzxVuh5RAPINDaCjpJQh58eDArdMtXco2nM397bZdtu8Wz
-         iyFuEvr5e/QLf6cEmqisPS0scnX+1VRiOjdeKWyde15qZEy8XQ+xF1D9SrxR4mWBrlXf
-         eztZ+nIhAphM7r2JkTRUow6qoY7jgx1M7g+CQ7kaxpB35DA8LvlBTic9XVcIP/ZfKOlX
-         ecILs3v+kN8bqKGg5HYTeqlDhrtTlseCO0bu4ECqH2++ad1GQtRf1Bq3+1S1MG5qrTL+
-         /13HMDBq0u1dIOjX7TFsJkdwCYS1TqEZZe3VmrOUtd9FrtARxERaNj3mCwyCKdYKbqp6
-         edDA==
+        d=gmail.com; s=20230601; t=1701029664; x=1701634464; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Yp72lr6ldBtEgxHJc2cyITFerBaMZB0y6t1H7uYo/wE=;
+        b=N6fZkzUNCHBgaL2WqAH/H8+bY2Z3t7DuPx7ayZ0Ju5p0K/2CpRhTsl4UPcB2qR7ULN
+         iWTsJpyFluJRDuf7I4GwYEfcPzATDuYY/qt1p7FORbNayY17deOAAij2GSPetxjk5Uay
+         uZhfdwUtHzV3WDHR+t3OLPqKqSmTNV2DBtKSGWFRQnZbZZQN4n1UD+BM2QfWacHLLbZ9
+         l02azx2una8LJdA5jVtqMjCPQy+WkDYZZ6ePA9M1ikF0MLyjfKJK5zCcpu+CBxGyanCo
+         ETWw9xIjeqbzDV677vRXYfBlJRysXJgPSAW8i2uSO2NK/bWQIaf8eqfxhNAgKa2JCKjX
+         SDLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701029635; x=1701634435;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cgXuzPLRR1R2XgHzgPCXM17r7JpL85lamt0xt6Skc5w=;
-        b=COMhgo4u3CWSzKk+wT5CREVGl234ilumcIMd/xtdjOV4/dHXb/NELJV5FmGxwOJ2A0
-         wlQN0dYCttAWzfRAguA63cG2vt6h7Bk5a1/3pb6URALTbJZwx1Nh+yXrz1a8CeOSDPjM
-         mndaBwaKVX784ONz6u0JitExN2Y0tDuASboGU4Fzscxful49DKZPQ64g4/WXSbyLoRpq
-         wQgbX7pi63TYHXmXUslfXc6nw/jGuVD3s/imGZX03ctOhWYv90/I/njVoRlAIVmz2b3i
-         M+Kqm01tpyjVQ0tVG7I7Qqic9zuPk/2QTmw5mF+hW8mcEVy2b2FzVF9W01M4LBdnWjHE
-         dR0A==
-X-Gm-Message-State: AOJu0YzqkvZIwhyfbB2Ee7uE9SwNEMdH+pnw/oWVMTWKr5979j5gyWvP
-	P7LNG/4pzPsQsMpbSIELY3E=
-X-Google-Smtp-Source: AGHT+IEluu8qwa6ykSlK6EZSKSagPQFbQFr8tZaB75XM4mgLTOa3fcvU2gST6n2bpJo4FOY3bHy6wQ==
-X-Received: by 2002:a05:600c:a0b:b0:407:7e7a:6017 with SMTP id z11-20020a05600c0a0b00b004077e7a6017mr7056008wmp.11.1701029634695;
-        Sun, 26 Nov 2023 12:13:54 -0800 (PST)
-Received: from ?IPV6:2a01:c23:c42d:f800:9d4a:26da:56c3:eb86? (dynamic-2a01-0c23-c42d-f800-9d4a-26da-56c3-eb86.c23.pool.telefonica.de. [2a01:c23:c42d:f800:9d4a:26da:56c3:eb86])
-        by smtp.googlemail.com with ESMTPSA id o18-20020adf8b92000000b00332e8dd713fsm7863795wra.74.2023.11.26.12.13.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 12:13:54 -0800 (PST)
-Message-ID: <2df3e6cd-cf4d-4c22-849f-0e4e9651ff6f@gmail.com>
-Date: Sun, 26 Nov 2023 21:13:54 +0100
+        d=1e100.net; s=20230601; t=1701029664; x=1701634464;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yp72lr6ldBtEgxHJc2cyITFerBaMZB0y6t1H7uYo/wE=;
+        b=UV/kgFJ+6eDWLiQpNm5LQ2ruzmKwK9qy+jJTN/LlFXW4bcLNk28sVGRn4mxJUY50an
+         EvR4ehGI6nVfcgARskgs3mNSgn+U4Z/GVuEBQRFtO9m/BIGuI5kO7Pz5P5oPQ1s1Wgjf
+         K/qaMRkDGVkjoFJBAmauMbP0q/XKpHlUaixqu6po9vAI4O+vPA1iLRJVe4pF34uKNhhY
+         EZS8B8hWgWSBSXstzmfUkiLbwF2B5pMTpTN1c3KbcbugnIrsnc4j6tfgOahHJ/uEQXp2
+         J2dt6C4K+zSTlMwn6tWob94Xy48nKnAH+eV+Fd/yx56zdgQm7TBRm8Lzswel3Q/Lbf0z
+         l4mA==
+X-Gm-Message-State: AOJu0YzGhMVEoBGfN4DWv2pcn7nwp5uEL43noN7obREPhlL8asPji5vs
+	SON1Faeh4m89YN55qFA6+jA=
+X-Google-Smtp-Source: AGHT+IEXnfDuJsDjgnbQlSmje39O1/E0Rx1OURxqJsPw3DCqHQh4XLMDSWdKw0b6oNENL8GA2lMg9w==
+X-Received: by 2002:a05:600c:21c7:b0:40a:4c7e:6f37 with SMTP id x7-20020a05600c21c700b0040a4c7e6f37mr6639703wmj.20.1701029663842;
+        Sun, 26 Nov 2023 12:14:23 -0800 (PST)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id jg28-20020a05600ca01c00b004063cd8105csm12025666wmb.22.2023.11.26.12.14.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 12:14:22 -0800 (PST)
+Message-ID: <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
+Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
+ CO-RE relocations
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Yonghong Song <yonghong.song@linux.dev>, Alexei Starovoitov
+	 <alexei.starovoitov@gmail.com>
+Cc: Daniel Xu <dxu@dxuuu.xyz>, Shuah Khan <shuah@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>,  antony.antony@secunet.com, Mykola Lysenko
+ <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, bpf
+ <bpf@vger.kernel.org>, "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+ devel@linux-ipsec.org, Network Development <netdev@vger.kernel.org>
+Date: Sun, 26 Nov 2023 22:14:21 +0200
+In-Reply-To: <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
+References: <cover.1700676682.git.dxu@dxuuu.xyz>
+	 <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
+	 <0f210cef-c6e9-41c1-9ba8-225f046435e5@linux.dev>
+	 <CAADnVQ+sEsUyNYPeZyOf2PcCnxOvOqw4bUuAuMofCU14szTGvg@mail.gmail.com>
+	 <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
+Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] r8169: prevent potential deadlock in rtl8169_close
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <1ec5982e-a68d-4837-af56-619e87a59741@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <1ec5982e-a68d-4837-af56-619e87a59741@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 25.11.2023 18:25, Heiner Kallweit wrote:
-> ndo_stop() is RTNL-protected by net core, and the worker function takes
-> RTNL as well. Therefore we will deadlock when trying to execute a
-> pending work synchronously. To fix this execute any pending work
-> asynchronously. This will do no harm because netif_running() is false
-> in ndo_stop(), and therefore the work function is effectively a no-op.
-> 
-> Fixes: abe5fc42f9ce ("r8169: use RTNL to protect critical sections")
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 0aed99a20..0ee3579ce 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -4603,7 +4603,7 @@ static int rtl8169_close(struct net_device *dev)
->  	rtl8169_down(tp);
->  	rtl8169_rx_clear(tp);
->  
-> -	cancel_work_sync(&tp->wk.work);
-> +	cancel_work(&tp->wk.work);
->  
->  	free_irq(tp->irq, tp);
->  
+On Sat, 2023-11-25 at 20:22 -0800, Yonghong Song wrote:
+[...]
+> --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> @@ -6,7 +6,10 @@
+>    * modify it under the terms of version 2 of the GNU General Public
+>    * License as published by the Free Software Foundation.
+>    */
+> -#define BPF_NO_PRESERVE_ACCESS_INDEX
+> +#if __has_attribute(preserve_static_offset)
+> +struct __attribute__((preserve_static_offset)) erspan_md2;
+> +struct __attribute__((preserve_static_offset)) erspan_metadata;
+> +#endif
+>   #include "vmlinux.h"
+[...]
+>   int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
+> @@ -174,9 +177,13 @@ int erspan_set_tunnel(struct __sk_buff *skb)
+>          __u8 hwid =3D 7;
+>  =20
+>          md.version =3D 2;
+> +#if __has_attribute(preserve_static_offset)
+>          md.u.md2.dir =3D direction;
+>          md.u.md2.hwid =3D hwid & 0xf;
+>          md.u.md2.hwid_upper =3D (hwid >> 4) & 0x3;
+> +#else
+> +       /* Change bit-field store to byte(s)-level stores. */
+> +#endif
+>   #endif
+>  =20
+>          ret =3D bpf_skb_set_tunnel_opt(skb, &md, sizeof(md));
+>=20
+> =3D=3D=3D=3D
+>=20
+> Eduard, could you double check whether this is a valid use case
+> to solve this kind of issue with preserve_static_offset attribute?
 
-I noticed there's a potential issue with my approach.
-So I have to rework this, please do not apply.
+Tbh I'm not sure. This test passes with preserve_static_offset
+because it suppresses preserve_access_index. In general clang
+translates bitfield access to a set of IR statements like:
+
+  C:
+    struct foo {
+      unsigned _;
+      unsigned a:1;
+      ...
+    };
+    ... foo->a ...
+
+  IR:
+    %a =3D getelementptr inbounds %struct.foo, ptr %0, i32 0, i32 1
+    %bf.load =3D load i8, ptr %a, align 4
+    %bf.clear =3D and i8 %bf.load, 1
+    %bf.cast =3D zext i8 %bf.clear to i32
+
+With preserve_static_offset the getelementptr+load are replaced by a
+single statement which is preserved as-is till code generation,
+thus load with align 4 is preserved.
+
+On the other hand, I'm not sure that clang guarantees that load or
+stores used for bitfield access would be always aligned according to
+verifier expectations.
+
+I think we should check if there are some clang knobs that prevent
+generation of unaligned memory access. I'll take a look.
 
