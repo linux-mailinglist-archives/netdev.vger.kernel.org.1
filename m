@@ -1,118 +1,163 @@
-Return-Path: <netdev+bounces-51079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D767F905D
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:46:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D6C17F9076
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:35:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21F01C20A4F
-	for <lists+netdev@lfdr.de>; Sat, 25 Nov 2023 23:46:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B80DDB2102C
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA637315A9;
-	Sat, 25 Nov 2023 23:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DEC81F;
+	Sun, 26 Nov 2023 00:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LclWgNdL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D32KG8WI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC27B115
-	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 15:46:15 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5b383b4184fso30453957b3.1
-        for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 15:46:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700955975; x=1701560775; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+hFIt0HmR86o9B8NpKYxKa6/Sz6hTZOcUx/vMSf/X6U=;
-        b=LclWgNdLtUgCrUPOz6lD3ZYZbcpRee6fMR/vU7nM6ALljxSs+nHiAPxhdn0PSNQZ45
-         /NzJnENKNul8QwZ4M1RQ7s0pimQ3Lyorza8qzPmfwh4RidoNcR7x+Y80Ej9GAuRwtAGk
-         /d1OCBYf7mwpEB/V6QDEefCokgH5kAnZhj7uR3EN6fBiHei/FTXD7ItT9NfbkbpEuoC0
-         Vw7trBQZltdFgxdbJhBeHceIL8ZFrdvKP4r3VZYkEuS6dln94oMLpsCAz+mq1iO3YNfr
-         aO0nTRHE+eQghND6Cn6/18oymsAEMKzgBRArZ9Fto2kz0mFMF8DoW2mYPEurvAVC5/bg
-         Q0UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700955975; x=1701560775;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+hFIt0HmR86o9B8NpKYxKa6/Sz6hTZOcUx/vMSf/X6U=;
-        b=uusZW4ctxeGx3sz1E0Z0ACRUXDaU4H9V9216VMuMnKOv9qIgae8BMDickVnBkUretY
-         kIDgH0vBiSWdvTkkAZawz2tLu9GlqZYRSj13S0mZffW6GeVc6g1qjVkJJKBAHYC1yNQf
-         lmhUqf95AhhCLEwlf1Kba29KsOM1+jGJhXFQrX98TPc4yS52s8nhDi3MMhxxjhQJZL6B
-         lrHTjwtrnSM4PGJwghzn4N8BXUh435pvktiG8+tj5xzu45xQhtUB7vFleXGM9lGgfpDK
-         UZaDjS1OB89KHSLd+/Vqk8fqSAB3lfVFcAnockBE1RPDmNCN75kMFZf8P5cN4AYlBh0E
-         3+KA==
-X-Gm-Message-State: AOJu0YwB+i9AWU1JineUev3ACcAQn1RD+ZcT21y4/Ze5OujDrAnpxv0V
-	udlWSSLQKQ6Nxea7r8BmbBKaDfNTHdEDtZgFeG15lg==
-X-Google-Smtp-Source: AGHT+IG60g3mNV47IlwttcnDH+atQvnMLJ1evmHoV/+jZ4ba2ng+5GbfULZhB+H2t82HBju/xWOk1HvQPjPv5o1XktY=
-X-Received: by 2002:a0d:fcc2:0:b0:59f:b0d9:5df2 with SMTP id
- m185-20020a0dfcc2000000b0059fb0d95df2mr8159218ywf.0.1700955974890; Sat, 25
- Nov 2023 15:46:14 -0800 (PST)
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154E8182
+	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 16:34:52 -0800 (PST)
+Message-ID: <eb34b5e0-caf0-472a-99fa-77b43cfce56e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700958888;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s/ZPoKiZbkIfm1dDuAoTcnp78skWk0ipL2jJQiXwSIE=;
+	b=D32KG8WIWSBlHoBw7qhYyejBIRSZr+xdqovTapw2Vt6keOmhtykzSweeRHG0kTVlyIwyNo
+	P2ayW2Bgvur9fHVvNA+qnJGp0E9Rkloz5zbiNgzzKESB1UBtAKg3lZALqHBjehuWlQRlBg
+	HSB3WDuzyt6JS4FtcRXcea9ZIrbWyuI=
+Date: Sat, 25 Nov 2023 16:34:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231123-mv88e6xxx-leds-v1-1-3c379b3d23fb@linaro.org> <c8c821f8-e170-44b3-a3f9-207cf7cb70e2@lunn.ch>
-In-Reply-To: <c8c821f8-e170-44b3-a3f9-207cf7cb70e2@lunn.ch>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 26 Nov 2023 00:46:03 +0100
-Message-ID: <CACRpkdY+T8Rqg_irkLNvAC+o_QfwO2N+eB9X-y24t34_9Rg3ww@mail.gmail.com>
-Subject: Re: [PATCH RFC] net: dsa: mv88e6xxx: Support LED control
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Christian Marangi <ansuelsmth@gmail.com>, Tim Harvey <tharvey@gateworks.com>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH ipsec-next v1 5/7] bpf: selftests: test_tunnel: Use
+ vmlinux.h declarations
+Content-Language: en-GB
+To: Daniel Xu <dxu@dxuuu.xyz>, shuah@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, ast@kernel.org, steffen.klassert@secunet.com,
+ antony.antony@secunet.com, alexei.starovoitov@gmail.com
+Cc: mykolal@fb.com, martin.lau@linux.dev, song@kernel.org,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devel@linux-ipsec.org, netdev@vger.kernel.org
+References: <cover.1700676682.git.dxu@dxuuu.xyz>
+ <c5f6a6686e1472e17014f5d015c8dacade9f053e.1700676682.git.dxu@dxuuu.xyz>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <c5f6a6686e1472e17014f5d015c8dacade9f053e.1700676682.git.dxu@dxuuu.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 23, 2023 at 5:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 
-> What i would really like to see happen is that the DSA core handles
-> the registration of the LEDs, similar to how phylib does. The DT
-> binding should be identical for all DSA devices, so there is no need
-> for each driver to do its own parsing.
+On 11/22/23 1:20 PM, Daniel Xu wrote:
+> vmlinux.h declarations are more ergnomic, especially when working with
+> kfuncs. The uapi headers are often incomplete for kfunc definitions.
 >
-> There are some WIP patches at
+> Co-developed-by: Antony Antony <antony.antony@secunet.com>
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ---
+>   .../selftests/bpf/progs/bpf_tracing_net.h     |  1 +
+>   .../selftests/bpf/progs/test_tunnel_kern.c    | 48 ++++---------------
+>   2 files changed, 9 insertions(+), 40 deletions(-)
 >
-> https://github.com/lunn/linux.git leds-offload-support-reduced-auto-netde=
-v
->
-> which implement this. Feel free to make use of them.
+> diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
+> index 0b793a102791..1bdc680b0e0e 100644
+> --- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
+> +++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
+> @@ -26,6 +26,7 @@
+>   #define IPV6_AUTOFLOWLABEL	70
+>   
+>   #define TC_ACT_UNSPEC		(-1)
+> +#define TC_ACT_OK		0
+>   #define TC_ACT_SHOT		2
+>   
+>   #define SOL_TCP			6
+> diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> index f66af753bbbb..3065a716544d 100644
+> --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> @@ -6,62 +6,30 @@
+>    * modify it under the terms of version 2 of the GNU General Public
+>    * License as published by the Free Software Foundation.
+>    */
+> -#include <stddef.h>
+> -#include <string.h>
+> -#include <arpa/inet.h>
+> -#include <linux/bpf.h>
+> -#include <linux/if_ether.h>
+> -#include <linux/if_packet.h>
+> -#include <linux/if_tunnel.h>
+> -#include <linux/ip.h>
+> -#include <linux/ipv6.h>
+> -#include <linux/icmp.h>
+> -#include <linux/types.h>
+> -#include <linux/socket.h>
+> -#include <linux/pkt_cls.h>
+> -#include <linux/erspan.h>
+> -#include <linux/udp.h>
+> +#include "vmlinux.h"
+>   #include <bpf/bpf_helpers.h>
+>   #include <bpf/bpf_endian.h>
+> +#include "bpf_kfuncs.h"
+> +#include "bpf_tracing_net.h"
+>   
+>   #define log_err(__ret) bpf_printk("ERROR line:%d ret:%d\n", __LINE__, __ret)
+>   
+> -#define VXLAN_UDP_PORT 4789
+> +#define VXLAN_UDP_PORT		4789
+> +#define ETH_P_IP		0x0800
+> +#define PACKET_HOST		0
+> +#define TUNNEL_CSUM		bpf_htons(0x01)
+> +#define TUNNEL_KEY		bpf_htons(0x04)
+>   
+>   /* Only IPv4 address assigned to veth1.
+>    * 172.16.1.200
+>    */
+>   #define ASSIGNED_ADDR_VETH1 0xac1001c8
+>   
+> -struct geneve_opt {
+> -	__be16	opt_class;
+> -	__u8	type;
+> -	__u8	length:5;
+> -	__u8	r3:1;
+> -	__u8	r2:1;
+> -	__u8	r1:1;
+> -	__u8	opt_data[8]; /* hard-coded to 8 byte */
+> -};
+> -
+>   struct vxlanhdr {
+>   	__be32 vx_flags;
+>   	__be32 vx_vni;
+>   } __attribute__((packed));
 
-Oh it's quite a lot of patches, I really cannot drive that because there ar=
-e
-so many things about them that I don't understand the thinking behind...
-But I like what I see!
+In my particular setup, I have struct vxlanhdr defined in vmlinux.h so
+I hit a compilation failure.
 
-While I defined the bits a bit differently, some of it looks similar enough=
-.
-
-> > +/* Entries are listed in selector order */
-> > +static const struct mv88e6xxx_led_hwconfig mv88e6xxx_led_hwconfigs[] =
-=3D {
->
-> You need to be careful with naming. These are probably specific to the
-> 6352. Different switches probably have different capabilities. So it
-> would be good to have the names reflect the switch family they are
-> valid for.
-
-OK I'll try to name them like such.
-
-> When we come to add support for other switch families, i wounder how
-> tables like this scale. Is there some things which can be shared, if
-> we break the table up? I need to check the data sheets.
-
-We will see I guess. It falls back to the whole question of whether
-supporting all variants in a single module is even scaling. So far
-it does I guess? One day the MV88E6xxx may need to be broken
-into submodules.
-
-Yours,
-Linus Walleij
+>   
+> -struct vxlan_metadata {
+> -	__u32     gbp;
+> -};
+> -
+> -struct bpf_fou_encap {
+> -	__be16 sport;
+> -	__be16 dport;
+> -};
+> -
+> -enum bpf_fou_encap_type {
+> -	FOU_BPF_ENCAP_FOU,
+> -	FOU_BPF_ENCAP_GUE,
+> -};
+> -
+>   int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
+>   			  struct bpf_fou_encap *encap, int type) __ksym;
+>   int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
 
