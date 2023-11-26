@@ -1,549 +1,211 @@
-Return-Path: <netdev+bounces-51097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C637F90D4
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 02:54:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D317F9118
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 04:05:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9960E1C20CC2
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:54:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41D86B20ED5
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 03:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E731378;
-	Sun, 26 Nov 2023 01:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4A21FB0;
+	Sun, 26 Nov 2023 03:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwDHoJ53"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="fKHDb2P3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF94612D;
-	Sat, 25 Nov 2023 17:54:04 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4079ed65582so21063185e9.1;
-        Sat, 25 Nov 2023 17:54:04 -0800 (PST)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5F9D3
+	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 19:04:57 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9fa2714e828so425994666b.1
+        for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 19:04:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700963643; x=1701568443; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zx613whbRcvHwJRu+KDlj3qWu/B2xTU9Sffj+PGCEg4=;
-        b=dwDHoJ53cNEtpFJnxmg8sZfq4Dy5JyMzr49Mu9iZKsT/Sz7nnrhQ9w2SJrt6Vy8su8
-         JoQaBWcjBHZ03OLrHXk5hI3ccibjp7zDqLzcDb5JRtozWH1zIv/X1tNIA1PFpPAttny+
-         zMj5dFMQ9B4h6ND04mvSU58IvScmrUanyZpP0pdX8+V9KzwmFVMZgnFzpnGcH1XbB2pL
-         D/Ir9QK2EGWCzRqrkmbl5UcJOlRPa8VmLifU/U5qodpGqKP/iys34Wj3kPcaNxf78bXq
-         TDKVH6R05sQUYvrE0aZcZIiX0yPsQgWD2fPELBtTfME1g7uUanb3PmCaEcTP7gJoT7XV
-         FSbA==
+        d=linux-foundation.org; s=google; t=1700967895; x=1701572695; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rkaMoHrFlZfVMg+m4s+x5AD3GeehE8yA2Qqsd3VE908=;
+        b=fKHDb2P3A5H/08NFkefR28i53gh/+NjqO03sqYQBmUmCxLiYG6Ge7S+KR87Rx7UAAH
+         6xkhQHfGyBHxPFbJp9fieJS87JemWHboaIQU9NKggYUPRmgoU2ipSFHcp53aUPQpjifa
+         gKH4tiavdI07m6kIHn0mtkB7KI5kyCWBiG9ro=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700963643; x=1701568443;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zx613whbRcvHwJRu+KDlj3qWu/B2xTU9Sffj+PGCEg4=;
-        b=WNeaLvetpeuirxYUnC3CSKaBsJlqhi92u/h8RJfduqUefPdXs8fgZ4fAzE3iRe+Vgu
-         AMTIHL6odsfD7hBdiA+FSu2EKhv/H5JEBQLke+lgtP+WBzz0k7Wh78twQZo0MsCZCVzt
-         LTKMsThtMF/F/Rh1UXuOkzVXV1E14wPLSi3knza+R7Y+evWaHXSBVT9DRQ8S19lBmiqS
-         kjOr3K/P10ddC9O9qwWlWjUo9g1QVfknvnmUKJZS+PZhIh3NmahYxNXa/J+epRc07TmT
-         4ai9638AQfbjzThHAiUVkDcuJOId0PvXWrLtVKy94GwkZ5mcMxE4gBsrMFxn7Obdaj31
-         2/fQ==
-X-Gm-Message-State: AOJu0Yx9Ca+W/79E7FglfbA/vGkdzOcIkIyMjMMfoiIWdrvu9b5z17AI
-	oRUC6l60lRk4gHqn0LqhkIs=
-X-Google-Smtp-Source: AGHT+IEppVdgFBdrmKPjDgzJlLd5FpI40ucsVwSm9OSTRl19LbUuF+6d7eHsWRDkMx/3j4fENS/p6A==
-X-Received: by 2002:a05:600c:1c12:b0:407:612b:91fb with SMTP id j18-20020a05600c1c1200b00407612b91fbmr2059247wms.30.1700963643104;
-        Sat, 25 Nov 2023 17:54:03 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id p34-20020a05600c1da200b00406408dc788sm9875344wms.44.2023.11.25.17.54.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Nov 2023 17:54:02 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [net-next PATCH RFC v3 8/8] net: phy: qca807x: Add support for configurable LED
-Date: Sun, 26 Nov 2023 02:53:46 +0100
-Message-Id: <20231126015346.25208-9-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231126015346.25208-1-ansuelsmth@gmail.com>
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1700967895; x=1701572695;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rkaMoHrFlZfVMg+m4s+x5AD3GeehE8yA2Qqsd3VE908=;
+        b=h9Pff/B94kfYHJkx3I2fSlHB9L5Eqfxn62L8UyhSA2twCRejYguYkQemthb6htfTFu
+         QgCQ+VV9Dof0KHWmpGX0EjXFWCrSOTt6jOlj0f+Mmz59mh5wGFeKLnL4261zlwr4nUAd
+         vWYtw/rKDPwFYNQeazuqtXHPYzbVT5r0TaRWXLXuvdUfnTM3mL65Ze137+7W0sE7xxAx
+         y+fyXOq+q8GPoB5Zi7YxkVoABhGTJeAQgiXd2Ra8zg77H0A5dRcXNpYsS2EemN7fe224
+         Xo/Dg+OoiOSJhQr2+L5x6WZpDXSH6E+RfDd2WtvLsl4Ow6XJ9VyDQDZRMfKhDVfDwExa
+         Y14A==
+X-Gm-Message-State: AOJu0Yz9WCU4m6ettaX9NIzTZCjmWfKWVfzdvQrGj8Zkjcn4E9GQGYUv
+	icScsKeDsD0uQud7lT4xI4k3O6KwdjeDWt4JE0oyzg==
+X-Google-Smtp-Source: AGHT+IHGtaQ1jj5k3o0H79xso+28UxEwwMMKj1xcdDYxW8LOLWrFxePkxbv1LwmHGgQLGLb9QIsUJw==
+X-Received: by 2002:a17:906:5187:b0:a0d:3a70:11e3 with SMTP id y7-20020a170906518700b00a0d3a7011e3mr851494ejk.63.1700967895153;
+        Sat, 25 Nov 2023 19:04:55 -0800 (PST)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id k13-20020a17090632cd00b009ca522853ecsm4107600ejk.58.2023.11.25.19.04.54
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Nov 2023 19:04:54 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-54a95657df3so4468730a12.0
+        for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 19:04:54 -0800 (PST)
+X-Received: by 2002:a50:99dc:0:b0:53e:7d60:58bb with SMTP id
+ n28-20020a5099dc000000b0053e7d6058bbmr5738755edb.27.1700967893714; Sat, 25
+ Nov 2023 19:04:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 25 Nov 2023 19:04:36 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+Message-ID: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+Subject: Aquantia ethernet driver suspend/resume issues
+To: Igor Russkikh <irusskikh@marvell.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000147411060b057306"
 
-QCA8072/5 have up to 2 LEDs attached for PHY.
+--000000000000147411060b057306
+Content-Type: text/plain; charset="UTF-8"
 
-LEDs can be configured to be ON/hw blink or be set to HW control.
+Ok, so this is pretty random, but I ended up replacing my main SSD
+today, and decided that I'll just do a clean re-install and copy my
+user data over from my old SSD. As a result of all that, my ethernet
+cable ended up in a random ethernet port when I reconnected
+everything, and because of the system reinstall I ended up with
+suspend-at-idle on by default (which I very much don't want, but I
+only noticed after it happened).
 
-Hw blink mode is set to blink at 4Hz or 250ms.
+And it turns out that suspend/resume *really* doesn't work on the
+Aquantia ethernet driver, which is where the cable happened to be.
 
-PHY can support both copper (TP) or fiber (FIBRE) kind and supports
-different HW control modes based on the port type.
+First you get an allocation failure at resume:
 
-HW control modes supported for netdev trigger for copper ports are:
-- LINK_10
-- LINK_100
-- LINK_1000
-- TX
-- RX
-- FULL_DUPLEX
-- HALF_DUPLEX
+  kworker/u256:41: page allocation failure: order:6,
+mode:0x40d00(GFP_NOIO|__GFP_COMP|__GFP_ZERO),
+nodemask=(null),cpuset=/,mems_allowed=0
+  CPU: 58 PID: 11654 Comm: kworker/u256:41 Not tainted
+  Workqueue: events_unbound async_run_entry_fn
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x47/0x60
+   warn_alloc+0x165/0x1e0
+   __alloc_pages_slowpath.constprop.0+0xcd4/0xd90
+   __alloc_pages+0x32d/0x350
+   __kmalloc_large_node+0x73/0x130
+   __kmalloc+0xc3/0x150
+   aq_ring_alloc+0x22/0xb0 [atlantic]
+   aq_vec_ring_alloc+0xee/0x1a0 [atlantic]
+   aq_nic_init+0x118/0x1d0 [atlantic]
+   atl_resume_common+0x40/0xd0 [atlantic]
+   ...
 
-HW control modes supported for netdev trigger for fiber ports are:
-- LINK_100
-- LINK_1000
-- TX
-- RX
-- FULL_DUPLEX
-- HALF_DUPLEX
+and immediately after that we get
 
-LED support conflicts with GPIO controller feature and must be disabled
-if gpio-controller is used for the PHY.
+  trying to free invalid coherent area: 000000006fb35228
+  WARNING: CPU: 58 PID: 11654 at kernel/dma/remap.c:65
+dma_common_free_remap+0x2d/0x40
+  CPU: 58 PID: 11654 Comm: kworker/u256:41 Not tainted 6.5.6-300.fc39.x86_64 #1
+  Workqueue: events_unbound async_run_entry_fn
+  Call Trace:
+   <TASK>
+   __iommu_dma_free+0xe8/0x100
+   aq_ring_alloc+0xa4/0xb0 [atlantic]
+   aq_vec_ring_alloc+0xee/0x1a0 [atlantic]
+   aq_nic_init+0x118/0x1d0 [atlantic]
+   atl_resume_common+0x40/0xd0 [atlantic]
+   ...
+  atlantic 0000:44:00.0: PM: dpm_run_callback():
+pci_pm_resume+0x0/0xf0 returns -12
+  atlantic 0000:44:00.0: PM: failed to resume async: error -12
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/qca807x.c | 382 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 375 insertions(+), 7 deletions(-)
+and now the slab cache is corrupt and the system is dead.
 
-diff --git a/drivers/net/phy/qca807x.c b/drivers/net/phy/qca807x.c
-index be039d6de1fb..3c11b39ebe7e 100644
---- a/drivers/net/phy/qca807x.c
-+++ b/drivers/net/phy/qca807x.c
-@@ -79,17 +79,60 @@
- #define QCA807X_MMD7_1000BASE_T_POWER_SAVE_PER_CABLE_LENGTH	0x801a
- #define QCA807X_CONTROL_DAC_MASK				GENMASK(2, 0)
- 
-+#define QCA807X_MMD7_LED_GLOBAL				0x8073
-+#define QCA807X_LED_BLINK_1				GENMASK(11, 6)
-+#define QCA807X_LED_BLINK_2				GENMASK(5, 0)
-+/* Values are the same for both BLINK_1 and BLINK_2 */
-+#define QCA807X_LED_BLINK_FREQ_MASK			GENMASK(5, 3)
-+#define QCA807X_LED_BLINK_FREQ_2HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x0)
-+#define QCA807X_LED_BLINK_FREQ_4HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x1)
-+#define QCA807X_LED_BLINK_FREQ_8HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x2)
-+#define QCA807X_LED_BLINK_FREQ_16HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x3)
-+#define QCA807X_LED_BLINK_FREQ_32HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x4)
-+#define QCA807X_LED_BLINK_FREQ_64HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x5)
-+#define QCA807X_LED_BLINK_FREQ_128HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x6)
-+#define QCA807X_LED_BLINK_FREQ_256HZ			FIELD_PREP(QCA807X_LED_BLINK_FREQ_MASK, 0x7)
-+#define QCA807X_LED_BLINK_DUTY_MASK			GENMASK(2, 0)
-+#define QCA807X_LED_BLINK_DUTY_50_50			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x0)
-+#define QCA807X_LED_BLINK_DUTY_75_25			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x1)
-+#define QCA807X_LED_BLINK_DUTY_25_75			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x2)
-+#define QCA807X_LED_BLINK_DUTY_33_67			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x3)
-+#define QCA807X_LED_BLINK_DUTY_67_33			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x4)
-+#define QCA807X_LED_BLINK_DUTY_17_83			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x5)
-+#define QCA807X_LED_BLINK_DUTY_83_17			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x6)
-+#define QCA807X_LED_BLINK_DUTY_8_92			FIELD_PREP(QCA807X_LED_BLINK_DUTY_MASK, 0x7)
- #define QCA807X_MMD7_LED_100N_1				0x8074
- #define QCA807X_MMD7_LED_100N_2				0x8075
- #define QCA807X_MMD7_LED_1000N_1			0x8076
- #define QCA807X_MMD7_LED_1000N_2			0x8077
--#define QCA807X_LED_TXACT_BLK_EN_2			BIT(10)
--#define QCA807X_LED_RXACT_BLK_EN_2			BIT(9)
--#define QCA807X_LED_GT_ON_EN_2				BIT(6)
--#define QCA807X_LED_HT_ON_EN_2				BIT(5)
--#define QCA807X_LED_BT_ON_EN_2				BIT(4)
--#define QCA807X_GPIO_FORCE_EN				BIT(15)
--#define QCA807X_GPIO_FORCE_MODE_MASK			GENMASK(14, 13)
-+/* Values are the same for LED1 and LED2 */
-+/* Values for control 1 */
-+#define QCA807X_LED_COPPER_ON_BLINK_MASK		GENMASK(12, 0)
-+#define QCA807X_LED_FDX_ON_EN				BIT(12)
-+#define QCA807X_LED_HDX_ON_EN				BIT(11)
-+#define QCA807X_LED_TXACT_BLK_EN			BIT(10)
-+#define QCA807X_LED_RXACT_BLK_EN			BIT(9)
-+#define QCA807X_LED_GT_ON_EN				BIT(6)
-+#define QCA807X_LED_HT_ON_EN				BIT(5)
-+#define QCA807X_LED_BT_ON_EN				BIT(4)
-+/* Values for control 2 */
-+#define QCA807X_LED_FORCE_EN				BIT(15)
-+#define QCA807X_LED_FORCE_MODE_MASK			GENMASK(14, 13)
-+#define QCA807X_LED_FORCE_BLINK_1			FIELD_PREP(QCA807X_LED_FORCE_MODE_MASK, 0x3)
-+#define QCA807X_LED_FORCE_BLINK_2			FIELD_PREP(QCA807X_LED_FORCE_MODE_MASK, 0x2)
-+#define QCA807X_LED_FORCE_ON				FIELD_PREP(QCA807X_LED_FORCE_MODE_MASK, 0x1)
-+#define QCA807X_LED_FORCE_OFF				FIELD_PREP(QCA807X_LED_FORCE_MODE_MASK, 0x0)
-+#define QCA807X_LED_FIBER_ON_BLINK_MASK			GENMASK(11, 1)
-+#define QCA807X_LED_FIBER_TXACT_BLK_EN			BIT(10)
-+#define QCA807X_LED_FIBER_RXACT_BLK_EN			BIT(9)
-+#define QCA807X_LED_FIBER_FDX_ON_EN			BIT(6)
-+#define QCA807X_LED_FIBER_HDX_ON_EN			BIT(5)
-+#define QCA807X_LED_FIBER_1000BX_ON_EN			BIT(2)
-+#define QCA807X_LED_FIBER_100FX_ON_EN			BIT(1)
-+
-+/* Some device repurpose the LED as GPIO out */
-+#define QCA807X_GPIO_FORCE_EN				QCA807X_LED_FORCE_EN
-+#define QCA807X_GPIO_FORCE_MODE_MASK			QCA807X_LED_FORCE_MODE_MASK
- 
- #define QCA807X_INTR_ENABLE				0x12
- #define QCA807X_INTR_STATUS				0x13
-@@ -350,6 +393,320 @@ static int qca807x_cable_test_start(struct phy_device *phydev)
- 	return ret;
- }
- 
-+static int qca807x_led_parse_netdev(struct phy_device *phydev, unsigned long rules,
-+				    u16 *offload_trigger)
-+{
-+	/* Parsing specific to netdev trigger */
-+	switch (phydev->port) {
-+	case PORT_TP:
-+		if (test_bit(TRIGGER_NETDEV_TX, &rules))
-+			*offload_trigger |= QCA807X_LED_TXACT_BLK_EN;
-+		if (test_bit(TRIGGER_NETDEV_RX, &rules))
-+			*offload_trigger |= QCA807X_LED_RXACT_BLK_EN;
-+		if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-+			*offload_trigger |= QCA807X_LED_BT_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+			*offload_trigger |= QCA807X_LED_HT_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+			*offload_trigger |= QCA807X_LED_GT_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_HALF_DUPLEX, &rules))
-+			*offload_trigger |= QCA807X_LED_HDX_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_FULL_DUPLEX, &rules))
-+			*offload_trigger |= QCA807X_LED_FDX_ON_EN;
-+		break;
-+	case PORT_FIBRE:
-+		if (test_bit(TRIGGER_NETDEV_TX, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_TXACT_BLK_EN;
-+		if (test_bit(TRIGGER_NETDEV_RX, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_RXACT_BLK_EN;
-+		if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_100FX_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_1000BX_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_HALF_DUPLEX, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_HDX_ON_EN;
-+		if (test_bit(TRIGGER_NETDEV_FULL_DUPLEX, &rules))
-+			*offload_trigger |= QCA807X_LED_FIBER_FDX_ON_EN;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (rules && !*offload_trigger)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int qca807x_led_hw_control_enable(struct phy_device *phydev, u8 index)
-+{
-+	int val, reg, ret;
-+
-+	switch (index) {
-+	case 0:
-+		reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		reg = QCA807X_MMD7_LED_1000N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
-+	val &= ~QCA807X_LED_FORCE_EN;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, reg, val);
-+
-+	return ret;
-+}
-+
-+static int qca807x_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	u16 offload_trigger = 0;
-+
-+	if (index > 1)
-+		return -EINVAL;
-+
-+	return qca807x_led_parse_netdev(phydev, rules, &offload_trigger);
-+}
-+
-+static int qca807x_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				      unsigned long rules)
-+{
-+	int val, ret, copper_reg, fibre_reg;
-+	u16 offload_trigger = 0;
-+
-+	switch (index) {
-+	case 0:
-+		copper_reg = QCA807X_MMD7_LED_100N_1;
-+		fibre_reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		copper_reg = QCA807X_MMD7_LED_1000N_1;
-+		fibre_reg = QCA807X_MMD7_LED_1000N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	ret = qca807x_led_parse_netdev(phydev, rules, &offload_trigger);
-+	if (ret)
-+		return ret;
-+
-+	ret = qca807x_led_hw_control_enable(phydev, index);
-+	if (ret)
-+		return ret;
-+
-+	switch (phydev->port) {
-+	case PORT_TP:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, copper_reg);
-+		val &= ~QCA807X_LED_COPPER_ON_BLINK_MASK;
-+		val |= offload_trigger;
-+		ret = phy_write_mmd(phydev, MDIO_MMD_AN, copper_reg, val);
-+		break;
-+	case PORT_FIBRE:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, fibre_reg);
-+		val &= ~QCA807X_LED_FIBER_ON_BLINK_MASK;
-+		val |= offload_trigger;
-+		ret = phy_write_mmd(phydev, MDIO_MMD_AN, fibre_reg, val);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
-+static bool qca807x_led_hw_control_status(struct phy_device *phydev, u8 index)
-+{
-+	int val, reg;
-+
-+	switch (index) {
-+	case 0:
-+		reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		reg = QCA807X_MMD7_LED_1000N_2;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
-+
-+	return !(val & QCA807X_LED_FORCE_EN);
-+}
-+
-+static int qca807x_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				      unsigned long *rules)
-+{
-+	int val, copper_reg, fibre_reg;
-+
-+	switch (index) {
-+	case 0:
-+		copper_reg = QCA807X_MMD7_LED_100N_1;
-+		fibre_reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		copper_reg = QCA807X_MMD7_LED_1000N_1;
-+		fibre_reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* Check if we have hw control enabled */
-+	if (qca807x_led_hw_control_status(phydev, index))
-+		return -EINVAL;
-+
-+	/* Parsing specific to netdev trigger */
-+	switch (phydev->port) {
-+	case PORT_TP:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, copper_reg);
-+		if (val & QCA807X_LED_TXACT_BLK_EN)
-+			set_bit(TRIGGER_NETDEV_TX, rules);
-+		if (val & QCA807X_LED_RXACT_BLK_EN)
-+			set_bit(TRIGGER_NETDEV_RX, rules);
-+		if (val & QCA807X_LED_BT_ON_EN)
-+			set_bit(TRIGGER_NETDEV_LINK_10, rules);
-+		if (val & QCA807X_LED_HT_ON_EN)
-+			set_bit(TRIGGER_NETDEV_LINK_100, rules);
-+		if (val & QCA807X_LED_GT_ON_EN)
-+			set_bit(TRIGGER_NETDEV_LINK_1000, rules);
-+		if (val & QCA807X_LED_HDX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
-+		if (val & QCA807X_LED_FDX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
-+		break;
-+	case PORT_FIBRE:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, fibre_reg);
-+		if (val & QCA807X_LED_FIBER_TXACT_BLK_EN)
-+			set_bit(TRIGGER_NETDEV_TX, rules);
-+		if (val & QCA807X_LED_FIBER_RXACT_BLK_EN)
-+			set_bit(TRIGGER_NETDEV_RX, rules);
-+		if (val & QCA807X_LED_FIBER_100FX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_LINK_100, rules);
-+		if (val & QCA807X_LED_FIBER_1000BX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_LINK_1000, rules);
-+		if (val & QCA807X_LED_FIBER_HDX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
-+		if (val & QCA807X_LED_FIBER_FDX_ON_EN)
-+			set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int qca807x_led_hw_control_reset(struct phy_device *phydev, u8 index)
-+{
-+	int val, copper_reg, fibre_reg, ret;
-+
-+	switch (index) {
-+	case 0:
-+		copper_reg = QCA807X_MMD7_LED_100N_1;
-+		fibre_reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		copper_reg = QCA807X_MMD7_LED_1000N_1;
-+		fibre_reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (phydev->port) {
-+	case PORT_TP:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, copper_reg);
-+		val &= ~QCA807X_LED_COPPER_ON_BLINK_MASK;
-+		ret = phy_write_mmd(phydev, MDIO_MMD_AN, copper_reg, val);
-+		break;
-+	case PORT_FIBRE:
-+		val = phy_read_mmd(phydev, MDIO_MMD_AN, fibre_reg);
-+		val &= ~QCA807X_LED_FIBER_ON_BLINK_MASK;
-+		ret = phy_write_mmd(phydev, MDIO_MMD_AN, fibre_reg, val);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return ret;
-+}
-+
-+static int qca807x_led_brightness_set(struct phy_device *phydev,
-+				      u8 index, enum led_brightness value)
-+{
-+	int val, ret;
-+	u16 reg;
-+
-+	switch (index) {
-+	case 0:
-+		reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		reg = QCA807X_MMD7_LED_1000N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* If we are setting off the LED reset any hw control rule */
-+	if (!value) {
-+		ret = qca807x_led_hw_control_reset(phydev, index);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
-+	val &= ~(QCA807X_LED_FORCE_EN | QCA807X_LED_FORCE_MODE_MASK);
-+	val |= QCA807X_LED_FORCE_EN;
-+	if (value)
-+		val |= QCA807X_LED_FORCE_ON;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, reg, val);
-+
-+	return ret;
-+}
-+
-+static int qca807x_led_blink_set(struct phy_device *phydev, u8 index,
-+				 unsigned long *delay_on,
-+				 unsigned long *delay_off)
-+{
-+	int val, ret;
-+	u16 reg;
-+
-+	switch (index) {
-+	case 0:
-+		reg = QCA807X_MMD7_LED_100N_2;
-+		break;
-+	case 1:
-+		reg = QCA807X_MMD7_LED_1000N_2;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* Set blink to 50% off, 50% on at 4Hz by default */
-+	val = phy_read_mmd(phydev, MDIO_MMD_AN, QCA807X_MMD7_LED_GLOBAL);
-+	val &= ~(QCA807X_LED_BLINK_FREQ_MASK | QCA807X_LED_BLINK_DUTY_MASK);
-+	val |= QCA807X_LED_BLINK_FREQ_4HZ | QCA807X_LED_BLINK_DUTY_50_50;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, QCA807X_MMD7_LED_GLOBAL, val);
-+
-+	/* We use BLINK_1 for normal blinking */
-+	val = phy_read_mmd(phydev, MDIO_MMD_AN, reg);
-+	val &= ~(QCA807X_LED_FORCE_EN | QCA807X_LED_FORCE_MODE_MASK);
-+	val |= QCA807X_LED_FORCE_EN | QCA807X_LED_FORCE_BLINK_1;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_AN, reg, val);
-+
-+	/* We set blink to 4Hz, aka 250ms */
-+	*delay_on = 250 / 2;
-+	*delay_off = 250 / 2;
-+
-+	return ret;
-+}
-+
- #ifdef CONFIG_GPIOLIB
- static int qca807x_gpio_get_direction(struct gpio_chip *gc, unsigned int offset)
- {
-@@ -739,6 +1096,12 @@ static int qca807x_probe(struct phy_device *phydev)
- 			ret = qca807x_gpio(phydev);
- 			if (ret)
- 				return ret;
-+
-+			phydev->drv->led_brightness_set = NULL;
-+			phydev->drv->led_blink_set = NULL;
-+			phydev->drv->led_hw_is_supported = NULL;
-+			phydev->drv->led_hw_control_set = NULL;
-+			phydev->drv->led_hw_control_get = NULL;
- 		}
- 	}
- 
-@@ -926,6 +1289,11 @@ static struct phy_driver qca807x_drivers[] = {
- 		.suspend	= genphy_suspend,
- 		.cable_test_start	= qca807x_cable_test_start,
- 		.cable_test_get_status	= qca807x_cable_test_get_status,
-+		.led_brightness_set = qca807x_led_brightness_set,
-+		.led_blink_set = qca807x_led_blink_set,
-+		.led_hw_is_supported = qca807x_led_hw_is_supported,
-+		.led_hw_control_set = qca807x_led_hw_control_set,
-+		.led_hw_control_get = qca807x_led_hw_control_get,
- 		/* PHY package define */
- 		.phy_package_priv_data_size = sizeof(struct qca807x_shared_priv),
- 		.phy_package_probe_once = qca807x_phy_package_probe_once,
--- 
-2.40.1
+My *guess* is that what is going on is that when the kcalloc() failued
+(because it tries to allocate a large area, and it has only been
+tested at boot-time when it succeeds),  we end up doing that
 
+  err_exit:
+        if (err < 0) {
+                aq_ring_free(self);
+                self = NULL;
+        }
+
+but aq_ring_free() does
+
+        kfree(self->buff_ring);
+
+        if (self->dx_ring)
+                dma_free_coherent(aq_nic_get_dev(self->aq_nic),
+                                  self->size * self->dx_size, self->dx_ring,
+                                  self->dx_ring_pa);
+
+and notice how it will free the dx_ring even though it was never
+allocated! I suspect dc_ring is  non-zero because it was allocated
+earlier, but the suspend free'd it - but never cleared the pointer.
+
+That "never cleared the pointer on free" is true for buff_ring too,
+but the aq_ring_alloc() did
+
+        self->buff_ring =
+                kcalloc(self->size, sizeof(struct aq_ring_buff_s), GFP_KERNEL);
+
+so when that failed, at least it re-initialized that part to NULL, so
+we just had a kfree(NULL) which is fine.
+
+Anyway, I suspect a fix for the fatal error might be something like
+the attached, but I think the *root* of the problem is how the
+aquantia driver tried to allocate a humongous buff_ring with kmalloc,
+which really doesn't work.  You can see that "order:6", ie we're
+talking an allocation > 100kB, and in low-memory situations that kind
+of kmalloc space simply isn't available. It *will* fail.
+
+Again, during boot you'll probably never see any issues. During
+suspend/resume it very much does not work.
+
+In general, suspend/resume should *not* do big memory management
+things. It should probably have never free'd the old data structure,
+and it most definitely cannot try to allocate a big new data structure
+in resume.
+
+To make matters worse, it looks like there's not just *one* of those
+big allocations, there's multiple ones, both for RX and TX. But I
+didn't look much more closely.
+
+I don't know what the right fix is, but *one* fix would certainly be
+to not tear everything down at suspend time, only to build it up again
+at resume.
+
+And please please please don't double-free things randomly (if that is
+what was going on, but it does look like it was).
+
+           Linus
+
+--000000000000147411060b057306
+Content-Type: text/x-patch; charset="US-ASCII"; name="patch.diff"
+Content-Disposition: attachment; filename="patch.diff"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lpevtqap0>
+X-Attachment-Id: f_lpevtqap0
+
+IGRyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0bGFudGljL2FxX3JpbmcuYyB8IDUgKysr
+Ky0KIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRpZmYg
+LS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9yaW5nLmMg
+Yi9kcml2ZXJzL25ldC9ldGhlcm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9yaW5nLmMKaW5kZXgg
+NGRlMjJlZWQwOTlhLi40NzJjN2MwOGJmZWQgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L2V0aGVy
+bmV0L2FxdWFudGlhL2F0bGFudGljL2FxX3JpbmcuYworKysgYi9kcml2ZXJzL25ldC9ldGhlcm5l
+dC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9yaW5nLmMKQEAgLTkzMiwxMSArOTMyLDE0IEBAIHZvaWQg
+YXFfcmluZ19mcmVlKHN0cnVjdCBhcV9yaW5nX3MgKnNlbGYpCiAJCXJldHVybjsKIAogCWtmcmVl
+KHNlbGYtPmJ1ZmZfcmluZyk7CisJc2VsZi0+YnVmZl9yaW5nID0gTlVMTDsKIAotCWlmIChzZWxm
+LT5keF9yaW5nKQorCWlmIChzZWxmLT5keF9yaW5nKSB7CiAJCWRtYV9mcmVlX2NvaGVyZW50KGFx
+X25pY19nZXRfZGV2KHNlbGYtPmFxX25pYyksCiAJCQkJICBzZWxmLT5zaXplICogc2VsZi0+ZHhf
+c2l6ZSwgc2VsZi0+ZHhfcmluZywKIAkJCQkgIHNlbGYtPmR4X3JpbmdfcGEpOworCQlzZWxmLT5k
+eF9yaW5nID0gTlVMTDsKKwl9CiB9CiAKIHVuc2lnbmVkIGludCBhcV9yaW5nX2ZpbGxfc3RhdHNf
+ZGF0YShzdHJ1Y3QgYXFfcmluZ19zICpzZWxmLCB1NjQgKmRhdGEpCg==
+--000000000000147411060b057306--
 
