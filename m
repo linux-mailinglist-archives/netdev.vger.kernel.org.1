@@ -1,225 +1,71 @@
-Return-Path: <netdev+bounces-51156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC6D7F95D1
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:36:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D737F95DE
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 485D0280D34
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:36:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8ECA1C20445
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5D2DDC4;
-	Sun, 26 Nov 2023 22:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC6F14F6D;
+	Sun, 26 Nov 2023 22:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TX8xd2iW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24BF9E3;
-	Sun, 26 Nov 2023 14:35:59 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1r7NjA-0002M0-22;
-	Sun, 26 Nov 2023 22:35:49 +0000
-Date: Sun, 26 Nov 2023 22:35:45 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RESEND net-next 2/2] dt-bindings: net: dsa:
- mediatek,mt7530: document MDIO-bus
-Message-ID: <ZWPIQW1JA3rsvAzm@makrotopia.org>
-References: <6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org>
- <9aec0fe0cb676b76132c388bb3ead46f596a6e6e.1691246461.git.daniel@makrotopia.org>
- <dcb981b9-b435-c0e5-8e47-d66add207fdc@arinc9.com>
- <20230808121707.chona7hakapp6whe@skbuf>
- <44fde617-1159-4961-84c4-372fe265fbd8@arinc9.com>
- <20230809220102.t3dqw7iojez5xsq3@skbuf>
- <3f262579-eec1-4b21-9b18-1d1d612e715b@arinc9.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E791426A
+	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 22:43:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCF55C433C8;
+	Sun, 26 Nov 2023 22:43:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701038582;
+	bh=2/TIuJ8i2Ec6W/NnOlqVE/hhJF/TnCLKXHPzUunPx3c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TX8xd2iWi8ZaV5O8TNTqMEOt4UOKPkIr8MnJobGU8WMqRIVm8U5bddo7XYcyt0m6K
+	 Vs7dWcLQlKnRO+e7l4w7Hf6I3N58eYrs+fQWQfbs3KFeijIfC7jcs7ej4bLHfVaH/5
+	 OZYceXtOAZBxqWdFj8hRh94J8iT1yQISpme0VmqbX4Vs0zIMZeYLvEnYWp77DFiYp6
+	 frCdNgRqhrUaLwr3NGYbgWzCklTuNvZliU7Cf5KupdptoyEKpfM/jdIDcJoNcuEVCM
+	 O7CxGXgJpdqHx/kptHnLkH+M4+bk+lrQKNe3i/NWqHtR14qwCd3JLoJmgIZcWaGf2z
+	 yS3WL6NY3EF+A==
+Date: Sun, 26 Nov 2023 14:43:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shakeel Butt <shakeelb@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, dsahern@gmail.com, dtatulea@nvidia.com,
+ willemb@google.com
+Subject: Re: [PATCH net-next v3 00/13] net: page_pool: add netlink-based
+ introspection
+Message-ID: <20231126144300.18a05ea7@kernel.org>
+In-Reply-To: <20231125205724.wkxkpnuknj5bf6c4@google.com>
+References: <20231122034420.1158898-1-kuba@kernel.org>
+	<20231125205724.wkxkpnuknj5bf6c4@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3f262579-eec1-4b21-9b18-1d1d612e715b@arinc9.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Aug 12, 2023 at 01:45:29AM +0300, Arınç ÜNAL wrote:
-> On 10.08.2023 01:01, Vladimir Oltean wrote:
-> > [...]
-> > Since commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus"), DSA as a
-> > framework also supports auto-creating an internal MDIO bus based on the
-> > presence of the "mdio" node name, so I guess it makes sense for the
-> > "mdio" to appear in the generic dsa.yaml if there's nothing else that's
-> > special about it.
+On Sat, 25 Nov 2023 20:57:24 +0000 Shakeel Butt wrote:
+> > $ ./page-pool
+> >     eth0[2]	page pools: 10 (zombies: 0)
+> > 		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
+> > 		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)  
 > 
-> I agree with this. I've done this which works. It's even found a port
-> node with the ethernet property missing, as it should've.
+> Hi Jakub, I am wondering if you considered to expose these metrics
+> through meminfo/vmstat as well, is that a bad idea or is this/netlink
+> more of a preference?
 
-Are you planning to complete/submit your work below?
-I'm asking because being able to reference the PHYs on the internal
-MDIO bus is mandatory on MT7988 which requires calibration data from
-NVMEM for each PHY, so supporting MT7988 depends on the associated
-driver change[1].
-
-[1]: https://patchwork.kernel.org/project/netdevbpf/patch/6eb1b7b8dbc3a4b14becad15f0707d4f624ee18b.1691246461.git.daniel@makrotopia.org/
-
-
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> index ec74a660beda..03ccedbc49dc 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> @@ -31,6 +31,24 @@ properties:
->        (single device hanging off a CPU port) must not specify this property
->      $ref: /schemas/types.yaml#/definitions/uint32-array
-> +  mdio:
-> +    description: The internal MDIO bus of the switch
-> +    $ref: /schemas/net/mdio.yaml#
-> +
-> +if:
-> +  required: [ mdio ]
-> +then:
-> +  patternProperties:
-> +    "^(ethernet-)?ports$":
-> +      patternProperties:
-> +        "^(ethernet-)?port@[0-9]+$":
-> +          if:
-> +            not:
-> +              required: [ ethernet ]
-> +          then:
-> +            required:
-> +              - phy-handle
-> +
->  additionalProperties: true
->  $defs:
-> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-> index 8d7e878b84dc..fe1e2008995d 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
-> @@ -78,6 +78,16 @@ examples:
->              };
->      };
-> +    macb1 {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            fixed-link {
-> +                    speed = <1000>;
-> +                    full-duplex;
-> +            };
-> +    };
-> +
->      spi {
->              #address-cells = <1>;
->              #size-cells = <0>;
-> @@ -138,6 +148,7 @@ examples:
->                                      phy-mode = "rgmii";
->                                      tx-internal-delay-ps = <2000>;
->                                      rx-internal-delay-ps = <2000>;
-> +                                    ethernet = <&macb0>;
->                                      fixed-link {
->                                              speed = <1000>;
-> diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> index cfd69c2604ea..f600e65fc990 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> @@ -6,9 +6,6 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Realtek switches for unmanaged switches
-> -allOf:
-> -  - $ref: dsa.yaml#/$defs/ethernet-ports
-> -
->  maintainers:
->    - Linus Walleij <linus.walleij@linaro.org>
-> @@ -95,37 +92,41 @@ properties:
->        - '#address-cells'
->        - '#interrupt-cells'
-> -  mdio:
-> -    $ref: /schemas/net/mdio.yaml#
-> -    unevaluatedProperties: false
-> -
-> -    properties:
-> -      compatible:
-> -        const: realtek,smi-mdio
-> -
-> -if:
-> -  required:
-> -    - reg
-> -
-> -then:
-> -  $ref: /schemas/spi/spi-peripheral-props.yaml#
-> -  not:
-> -    required:
-> -      - mdc-gpios
-> -      - mdio-gpios
-> -      - mdio
-> -
-> -  properties:
-> -    mdc-gpios: false
-> -    mdio-gpios: false
-> -    mdio: false
-> -
-> -else:
-> -  required:
-> -    - mdc-gpios
-> -    - mdio-gpios
-> -    - mdio
-> -    - reset-gpios
-> +allOf:
-> +  - $ref: dsa.yaml#/$defs/ethernet-ports
-> +  - if:
-> +      required: [ mdio ]
-> +    then:
-> +      properties:
-> +        mdio:
-> +          properties:
-> +            compatible:
-> +              const: realtek,smi-mdio
-> +
-> +          required:
-> +            - compatible
-> +
-> +  - if:
-> +      required:
-> +        - reg
-> +    then:
-> +      $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +      not:
-> +        required:
-> +          - mdc-gpios
-> +          - mdio-gpios
-> +          - mdio
-> +
-> +      properties:
-> +        mdc-gpios: false
-> +        mdio-gpios: false
-> +        mdio: false
-> +    else:
-> +      required:
-> +        - mdc-gpios
-> +        - mdio-gpios
-> +        - mdio
-> +        - reset-gpios
->  required:
->    - compatible
-> 
+If that's net-namespaced we can add the basics there. We'll still need
+the netlink interface, tho, it's currently per-interface and per-queue
+(simplifying a bit). But internally the recycling stats are also
+per-CPU, which could be of interest at some stage.
 
