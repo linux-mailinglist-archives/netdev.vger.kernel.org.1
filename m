@@ -1,178 +1,130 @@
-Return-Path: <netdev+bounces-51154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C077F95A6
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:03:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 167E47F95B0
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:09:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CA54B20A12
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5981280C5B
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E5513AE9;
-	Sun, 26 Nov 2023 22:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E4113FE2;
+	Sun, 26 Nov 2023 22:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSeRrCqM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOZQrHU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86923B6
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:03:32 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso5000814e87.2
-        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:03:32 -0800 (PST)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468E3ED;
+	Sun, 26 Nov 2023 14:09:20 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-332fd78fa9dso405745f8f.3;
+        Sun, 26 Nov 2023 14:09:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701036211; x=1701641011; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ehizfuJcaNy5BocPviYBa3smn2vL3NxPRSmbYMfGmbw=;
-        b=FSeRrCqM2hDNmeMLNOMH05KVtfYLg83Gn7bmHesHvm1RI/XbJm8z+dvpKQdkIuVdAZ
-         z3TKqgB3mO2BkQ9+bAzWd38/4RcqOp1F3PsFZjK0x3hor3IgNAdGT+jID2NjZZv+/AJO
-         4+fIE9t8qxvGxl3t8yLcfdNoyogaUfX2A4eC2uNT+N9LjI6CxvF/TQbi8r6uZa7ZlMOd
-         2wN//GTkJjK1BPi53zgNgyWQr8clETg9VnK3ZR9yI5P8FexnSapZCntUtKTV6t/84ZRz
-         yq5K5LrXaI3HRRLOc0LV6ozDuQ2Facndd98M8Ey2DMJ3p+Ml6pFS5v35DnOIH1WjBmI2
-         D2yA==
+        d=gmail.com; s=20230601; t=1701036559; x=1701641359; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TgD7s06JjVP8cEZohf4eaBr5zl/6fuWipDfeZojH3Cs=;
+        b=dOZQrHU/N4sBGwr24OWrEgfy0UqNCts/N3N9bIWYS5GtixVXRDp+K15OhmXnUBu9An
+         H5PMJ6z923ZtJygymbXGTFeJnmyFjWAmGxvKdF24e4Ze248P8x5aOZ+2qREk2w8KvZBF
+         HyVdb65QUSgKr3W3TGpwlINloxlJwLzGftLN/qTfsf/KLAbCaF/2Kli8yG65TbbV/15S
+         0ckMjqIcXw0Y4PU7gPM3tXYB1qLIWB1JitAKbH5JT1lpwCYbYlz0hjcKY5NwF7ruMr39
+         iaz1UviH9NB8lAzmxawCbP7YLWwEoCRYxmYPFro7ss32YeopLybk9vgnXf6y5UxkRX3x
+         5L+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701036211; x=1701641011;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ehizfuJcaNy5BocPviYBa3smn2vL3NxPRSmbYMfGmbw=;
-        b=xMxeYf80izU8m/YW2kweOR3CuxPJFEn9dxc1wRsBTpqY5qqI2C+qyMjQxPTvd0p1iY
-         glmR7jXG/9Ix8eNuIzak9tksagrasnYqfylXLE8vuDc+vtGfdyYvtK1hmgDpMp7c/dBH
-         qNIcT5kynPMQDdBLzSa3H9qHxGjZsYQtlXyO5H2sPV8nWjKVLrlWwgh1kjqhXjzIn6wE
-         ApFVH7qizKbqW8QCs0fHZf/yfRJAwS+KphBBzGu7ysfq1FmgrXHNn2w/6j/o4hESf/Jq
-         KxsrkMtVNFb7CKB/PrSiHDLxpiZX4PCp8h8ZwebJEOHclrjfbkRXKAJ/dgdwHdDYIBAl
-         scvw==
-X-Gm-Message-State: AOJu0YyKbchAgJOil9eF7KE6Xq/i50u9hTHWdB0IjR6wnj4mLAs9sijC
-	c5VGL0fTmRvTJKEYLn/Okg0=
-X-Google-Smtp-Source: AGHT+IHIzYKYWtVD4fQsBzXYQQVQsy9hXQRMScIV5qhID0H2kxfLwVaX+8yTcF1VAulA+qoc35VTCw==
-X-Received: by 2002:a19:5207:0:b0:503:3278:3221 with SMTP id m7-20020a195207000000b0050332783221mr6185332lfb.69.1701036210324;
-        Sun, 26 Nov 2023 14:03:30 -0800 (PST)
-Received: from ?IPV6:2a01:c23:c42d:f800:9d4a:26da:56c3:eb86? (dynamic-2a01-0c23-c42d-f800-9d4a-26da-56c3-eb86.c23.pool.telefonica.de. [2a01:c23:c42d:f800:9d4a:26da:56c3:eb86])
-        by smtp.googlemail.com with ESMTPSA id c70-20020a509fcc000000b0054b3ead7c5dsm1384684edf.76.2023.11.26.14.03.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 14:03:29 -0800 (PST)
-Message-ID: <829bf5ad-5497-42b0-9e3c-9680588f8f8c@gmail.com>
-Date: Sun, 26 Nov 2023 23:03:29 +0100
+        d=1e100.net; s=20230601; t=1701036559; x=1701641359;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TgD7s06JjVP8cEZohf4eaBr5zl/6fuWipDfeZojH3Cs=;
+        b=Evsz7jwadEaGmMa5xRrw1QvxiSc+OxDRBn+BSYQznBpvkpB1m9tPXoK20eV/Zf4x5f
+         kV8MGem9dTSTvAzdMV85qpMcXHkr485unMl+yCXVgMzY1kvkVYSj35THaX0wm2ENMi8X
+         v4/dU1jVmiFal3KD+54kBsT8w+JtEA0CCIrpqsM762F9I3Fl9WrhO6KfkWs3u48MFNoa
+         +PJHUN/ZwtVbT6CM7xpGfhdKjAuHMv1aHcqBfPXpbQNrcEmfV21Suf+etYpvi1iiG+ot
+         mr3tIvIj192hAPev33reIO99q+1YYcMbfMAfArLSyW2kYLsAxlK3xJApUc2TIxbNCrEu
+         Q+oQ==
+X-Gm-Message-State: AOJu0Yzaf4bNOHiyDvcIk2StCRk3DvDkrbWDBb597E2KQlcu+aks7GBs
+	fqIXbhzMrZbOZ1uLa7/OPPI=
+X-Google-Smtp-Source: AGHT+IF/weuraeT4gREw41hnQVk/EcFUAjBWWs4sobrwdP8aML9tLcfOApj8nQcBDziT1LekP/vmTw==
+X-Received: by 2002:a5d:4607:0:b0:32f:7649:2648 with SMTP id t7-20020a5d4607000000b0032f76492648mr6819352wrq.46.1701036558369;
+        Sun, 26 Nov 2023 14:09:18 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id v17-20020a05600c445100b0040b3d33ab55sm7411173wmn.47.2023.11.26.14.09.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 14:09:18 -0800 (PST)
+Message-ID: <6563c20e.050a0220.6de54.6c62@mx.google.com>
+X-Google-Original-Message-ID: <ZWPCCwrZrZ45zN96@Ansuel-xps.>
+Date: Sun, 26 Nov 2023 23:09:15 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tim Harvey <tharvey@gateworks.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC] net: dsa: mv88e6xxx: Support LED control
+References: <20231123-mv88e6xxx-leds-v1-1-3c379b3d23fb@linaro.org>
+ <c8c821f8-e170-44b3-a3f9-207cf7cb70e2@lunn.ch>
+ <CACRpkdY+T8Rqg_irkLNvAC+o_QfwO2N+eB9X-y24t34_9Rg3ww@mail.gmail.com>
+ <4bd8642c-988f-4b99-944a-da573d0ef2c3@lunn.ch>
+ <CACRpkdYp76UK3uC=3JrbZ5MhPRn7CkAbO1fezrSCNfDqobjZww@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] r8169: fix deadlock on RTL8125 in jumbo mtu mode
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Ian Chen <free122448@hotmail.com>
-References: <caf6a487-ef8c-4570-88f9-f47a659faf33@gmail.com>
- <c66a65f0-7d45-4bdd-9387-9f0b8bb06eef@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <c66a65f0-7d45-4bdd-9387-9f0b8bb06eef@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACRpkdYp76UK3uC=3JrbZ5MhPRn7CkAbO1fezrSCNfDqobjZww@mail.gmail.com>
 
-On 26.11.2023 21:14, Heiner Kallweit wrote:
-> On 26.11.2023 19:36, Heiner Kallweit wrote:
->> The original change results in a deadlock if jumbo mtu mode is used.
->> Reason is that the phydev lock is held when rtl_reset_work() is called
->> here, and rtl_jumbo_config() calls phy_start_aneg() which also tries
->> to acquire the phydev lock. Fix this by calling rtl_reset_work()
->> asynchronously.
->>
->> Fixes: 621735f59064 ("r8169: fix rare issue with broken rx after link-down on RTL8125")
->> Reported-by: Ian Chen <free122448@hotmail.com>
->> Tested-by: Ian Chen <free122448@hotmail.com>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  drivers/net/ethernet/realtek/r8169_main.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index 0ee3579ce..e32cc3279 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -575,6 +575,7 @@ struct rtl8169_tc_offsets {
->>  enum rtl_flag {
->>  	RTL_FLAG_TASK_ENABLED = 0,
->>  	RTL_FLAG_TASK_RESET_PENDING,
->> +	RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
->>  	RTL_FLAG_TASK_TX_TIMEOUT,
->>  	RTL_FLAG_MAX
->>  };
->> @@ -4494,6 +4495,8 @@ static void rtl_task(struct work_struct *work)
->>  reset:
->>  		rtl_reset_work(tp);
->>  		netif_wake_queue(tp->dev);
->> +	} else if (test_and_clear_bit(RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE, tp->wk.flags)) {
->> +		rtl_reset_work(tp);
->>  	}
->>  out_unlock:
->>  	rtnl_unlock();
->> @@ -4527,7 +4530,7 @@ static void r8169_phylink_handler(struct net_device *ndev)
->>  	} else {
->>  		/* In few cases rx is broken after link-down otherwise */
->>  		if (rtl_is_8125(tp))
->> -			rtl_reset_work(tp);
->> +			rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE);
->>  		pm_runtime_idle(d);
->>  	}
->>  
+On Sun, Nov 26, 2023 at 09:11:28PM +0100, Linus Walleij wrote:
+> On Sun, Nov 26, 2023 at 5:45 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > On Sun, Nov 26, 2023 at 12:46:03AM +0100, Linus Walleij wrote:
+> > > On Thu, Nov 23, 2023 at 5:13 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > >
+> > > > What i would really like to see happen is that the DSA core handles
+> > > > the registration of the LEDs, similar to how phylib does. The DT
+> > > > binding should be identical for all DSA devices, so there is no need
+> > > > for each driver to do its own parsing.
+> > > >
+> > > > There are some WIP patches at
+> > > >
+> > > > https://github.com/lunn/linux.git leds-offload-support-reduced-auto-netdev
+> > > >
+> > > > which implement this. Feel free to make use of them.
+> > >
+> > > Oh it's quite a lot of patches, I really cannot drive that because there are
+> > > so many things about them that I don't understand the thinking behind...
+> > > But I like what I see!
+> >
+> > O.K. Let me dust them off, rebase them on net-next and see what is
+> > missing.
 > 
-> I noticed there's a potential issue with my approach.
-> So I have to rework this, please do not apply.
+> Thanks Andrew, appreciated!
 > 
-The mentioned issue has an impact on patch "r8169: prevent potential deadlock
-in rtl8169_close" only. The patch here can remain as it is and is ready to be
-applied. Sorry for the noise.
+> I'll be happy to rebuild it on top of what you put as the baseline,
+> hopefully it will help Christian with the qca8k support as well?
+>
 
+Sure thing. I can test and see if I have problem with the generic
+approach.
+
+> > You have some fibre things i don't have. I don't have a
+> > machine with fibre so i cannot test that.
+> 
+> I can test that, the way I check for its presence is through device tree looking
+> for an "sfp" phandle, AFAICT I don't see that the hardware can tell be
+> when there
+> is a fiber connected, but alas I don't have any datasheet.
+> 
+> Yours,
+> Linus Walleij
+
+-- 
+	Ansuel
 
