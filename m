@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-51153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B297F95A4
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:01:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C077F95A6
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF375B20A13
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:01:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CA54B20A12
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 22:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2094A12E7A;
-	Sun, 26 Nov 2023 22:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E5513AE9;
+	Sun, 26 Nov 2023 22:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnRSkyCa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSeRrCqM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF38ED
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:01:05 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c8879a1570so45688181fa.1
-        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:01:05 -0800 (PST)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86923B6
+	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:03:32 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso5000814e87.2
+        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 14:03:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701036064; x=1701640864; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fLolSPB5H7QqOGhBkL4OSYIgvi+A6pwnnY7/sywTEAY=;
-        b=hnRSkyCaGvw3Jvc0kDXptIslut1TLYyoAI1Z4+lwJQKOZP3TAU0kdpmPm1dkj3pjzf
-         Ri6EAdApQlnL91zCKetwicQCrjuS07aslyh6FyRgggHQaEqRT+9vlXnM5h5mcISvTnyv
-         OlQcA6HtKL9uMSqnMiPnl1SQIFIYgNBguyayNZb3M6nS6iO4Pn3WC26H/JDG8R79fivg
-         gnHWhoCUOgif89AXFGqF0LQ8J02PTIXPj5lkNmwf0YxjaUyOqmghJbaFCirzRL5uy0l1
-         QN852zQMccTKwprN8LdstJIwslknW4jSxGX3UN1Q9H4gbeeALhXSUrUEdTJCxzRFQWlX
-         Grnw==
+        d=gmail.com; s=20230601; t=1701036211; x=1701641011; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ehizfuJcaNy5BocPviYBa3smn2vL3NxPRSmbYMfGmbw=;
+        b=FSeRrCqM2hDNmeMLNOMH05KVtfYLg83Gn7bmHesHvm1RI/XbJm8z+dvpKQdkIuVdAZ
+         z3TKqgB3mO2BkQ9+bAzWd38/4RcqOp1F3PsFZjK0x3hor3IgNAdGT+jID2NjZZv+/AJO
+         4+fIE9t8qxvGxl3t8yLcfdNoyogaUfX2A4eC2uNT+N9LjI6CxvF/TQbi8r6uZa7ZlMOd
+         2wN//GTkJjK1BPi53zgNgyWQr8clETg9VnK3ZR9yI5P8FexnSapZCntUtKTV6t/84ZRz
+         yq5K5LrXaI3HRRLOc0LV6ozDuQ2Facndd98M8Ey2DMJ3p+Ml6pFS5v35DnOIH1WjBmI2
+         D2yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701036064; x=1701640864;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLolSPB5H7QqOGhBkL4OSYIgvi+A6pwnnY7/sywTEAY=;
-        b=P0zgac+IILoZDqkj3jQp7eoY2xtgcFV2SRD1JaqVhmkow+GPUYdVyPYsOiAytIOsYl
-         7JS9ryRhYcr6/Ty2ovJo+rHVWgbGzXnznKi/bKp53TIuKmnq2puKIRjD1wuktUYi4ZKa
-         WVh5QhdrXJ0U0L0zbTYHzpfOyGKkToH4w5gvZRyAAmbJaKh64SIot/0KsVUCS20g8Kdu
-         nticIehAt7A/KVISHav1/zx4EgtpOZ1bOUkMfNIu9R6qv00ncALqX9i5OVVzaTxDqFHo
-         ervBZSlwedb9jArgLD5Z7H2emrHPW1Q7SzOglTvYkCt2ABalsUZjtiDUd4ryP5djxCxT
-         yZtg==
-X-Gm-Message-State: AOJu0YzyWsNs1ENtMKNLvH8Pd4AVQfzTnjo7guz0v+TGECsGZs4WslSa
-	zOBtxm+YUW/JPE5X5iDLiRw=
-X-Google-Smtp-Source: AGHT+IFhgdSWATKO+ivjyF+SqkVgDh6mIOAr8ULjFgXSQuN/Uk9DNmGWKPQQR7unL5GnCOsFdaV1/w==
-X-Received: by 2002:a2e:87cd:0:b0:2bf:7fad:229b with SMTP id v13-20020a2e87cd000000b002bf7fad229bmr6406941ljj.37.1701036063369;
-        Sun, 26 Nov 2023 14:01:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701036211; x=1701641011;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ehizfuJcaNy5BocPviYBa3smn2vL3NxPRSmbYMfGmbw=;
+        b=xMxeYf80izU8m/YW2kweOR3CuxPJFEn9dxc1wRsBTpqY5qqI2C+qyMjQxPTvd0p1iY
+         glmR7jXG/9Ix8eNuIzak9tksagrasnYqfylXLE8vuDc+vtGfdyYvtK1hmgDpMp7c/dBH
+         qNIcT5kynPMQDdBLzSa3H9qHxGjZsYQtlXyO5H2sPV8nWjKVLrlWwgh1kjqhXjzIn6wE
+         ApFVH7qizKbqW8QCs0fHZf/yfRJAwS+KphBBzGu7ysfq1FmgrXHNn2w/6j/o4hESf/Jq
+         KxsrkMtVNFb7CKB/PrSiHDLxpiZX4PCp8h8ZwebJEOHclrjfbkRXKAJ/dgdwHdDYIBAl
+         scvw==
+X-Gm-Message-State: AOJu0YyKbchAgJOil9eF7KE6Xq/i50u9hTHWdB0IjR6wnj4mLAs9sijC
+	c5VGL0fTmRvTJKEYLn/Okg0=
+X-Google-Smtp-Source: AGHT+IHIzYKYWtVD4fQsBzXYQQVQsy9hXQRMScIV5qhID0H2kxfLwVaX+8yTcF1VAulA+qoc35VTCw==
+X-Received: by 2002:a19:5207:0:b0:503:3278:3221 with SMTP id m7-20020a195207000000b0050332783221mr6185332lfb.69.1701036210324;
+        Sun, 26 Nov 2023 14:03:30 -0800 (PST)
 Received: from ?IPV6:2a01:c23:c42d:f800:9d4a:26da:56c3:eb86? (dynamic-2a01-0c23-c42d-f800-9d4a-26da-56c3-eb86.c23.pool.telefonica.de. [2a01:c23:c42d:f800:9d4a:26da:56c3:eb86])
-        by smtp.googlemail.com with ESMTPSA id w8-20020a170906184800b009fca9484a62sm4894113eje.200.2023.11.26.14.01.02
+        by smtp.googlemail.com with ESMTPSA id c70-20020a509fcc000000b0054b3ead7c5dsm1384684edf.76.2023.11.26.14.03.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 14:01:02 -0800 (PST)
-Message-ID: <12395867-1d17-4cac-aa7d-c691938fcddf@gmail.com>
-Date: Sun, 26 Nov 2023 23:01:02 +0100
+        Sun, 26 Nov 2023 14:03:29 -0800 (PST)
+Message-ID: <829bf5ad-5497-42b0-9e3c-9680588f8f8c@gmail.com>
+Date: Sun, 26 Nov 2023 23:03:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,13 +63,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] r8169: fix deadlock on RTL8125 in jumbo mtu mode
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net] r8169: prevent potential deadlock in rtl8169_close
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Ian Chen <free122448@hotmail.com>
+References: <caf6a487-ef8c-4570-88f9-f47a659faf33@gmail.com>
+ <c66a65f0-7d45-4bdd-9387-9f0b8bb06eef@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -112,48 +116,63 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+In-Reply-To: <c66a65f0-7d45-4bdd-9387-9f0b8bb06eef@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-ndo_stop() is RTNL-protected by net core, and the worker function takes
-RTNL as well. Therefore we will deadlock when trying to execute a
-pending work synchronously. To fix this execute any pending work
-asynchronously. This will do no harm because netif_running() is false
-in ndo_stop(), and therefore the work function is effectively a no-op.
-However we have to ensure that no task is running or pending after
-rtl_remove_one(), therefore add a call to cancel_work_sync().
+On 26.11.2023 21:14, Heiner Kallweit wrote:
+> On 26.11.2023 19:36, Heiner Kallweit wrote:
+>> The original change results in a deadlock if jumbo mtu mode is used.
+>> Reason is that the phydev lock is held when rtl_reset_work() is called
+>> here, and rtl_jumbo_config() calls phy_start_aneg() which also tries
+>> to acquire the phydev lock. Fix this by calling rtl_reset_work()
+>> asynchronously.
+>>
+>> Fixes: 621735f59064 ("r8169: fix rare issue with broken rx after link-down on RTL8125")
+>> Reported-by: Ian Chen <free122448@hotmail.com>
+>> Tested-by: Ian Chen <free122448@hotmail.com>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  drivers/net/ethernet/realtek/r8169_main.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>> index 0ee3579ce..e32cc3279 100644
+>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>> @@ -575,6 +575,7 @@ struct rtl8169_tc_offsets {
+>>  enum rtl_flag {
+>>  	RTL_FLAG_TASK_ENABLED = 0,
+>>  	RTL_FLAG_TASK_RESET_PENDING,
+>> +	RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
+>>  	RTL_FLAG_TASK_TX_TIMEOUT,
+>>  	RTL_FLAG_MAX
+>>  };
+>> @@ -4494,6 +4495,8 @@ static void rtl_task(struct work_struct *work)
+>>  reset:
+>>  		rtl_reset_work(tp);
+>>  		netif_wake_queue(tp->dev);
+>> +	} else if (test_and_clear_bit(RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE, tp->wk.flags)) {
+>> +		rtl_reset_work(tp);
+>>  	}
+>>  out_unlock:
+>>  	rtnl_unlock();
+>> @@ -4527,7 +4530,7 @@ static void r8169_phylink_handler(struct net_device *ndev)
+>>  	} else {
+>>  		/* In few cases rx is broken after link-down otherwise */
+>>  		if (rtl_is_8125(tp))
+>> -			rtl_reset_work(tp);
+>> +			rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE);
+>>  		pm_runtime_idle(d);
+>>  	}
+>>  
+> 
+> I noticed there's a potential issue with my approach.
+> So I have to rework this, please do not apply.
+> 
+The mentioned issue has an impact on patch "r8169: prevent potential deadlock
+in rtl8169_close" only. The patch here can remain as it is and is ready to be
+applied. Sorry for the noise.
 
-Fixes: abe5fc42f9ce ("r8169: use RTNL to protect critical sections")
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- add call to cancel_work_sync() in rtl_remove_one()
----
- drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 0aed99a20..dd04c6358 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4603,7 +4603,7 @@ static int rtl8169_close(struct net_device *dev)
- 	rtl8169_down(tp);
- 	rtl8169_rx_clear(tp);
- 
--	cancel_work_sync(&tp->wk.work);
-+	cancel_work(&tp->wk.work);
- 
- 	free_irq(tp->irq, tp);
- 
-@@ -4837,6 +4837,8 @@ static void rtl_remove_one(struct pci_dev *pdev)
- 	if (pci_dev_run_wake(pdev))
- 		pm_runtime_get_noresume(&pdev->dev);
- 
-+	cancel_work_sync(&tp->wk.work);
-+
- 	unregister_netdev(tp->dev);
- 
- 	if (tp->dash_type != RTL_DASH_NONE)
--- 
-2.43.0
 
