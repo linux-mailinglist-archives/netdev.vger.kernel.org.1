@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-51171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3723C7F964C
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:08:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5E7B7F964D
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:09:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66A0280D8D
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:08:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC9D280D9A
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEE418028;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2ACE18B10;
 	Sun, 26 Nov 2023 23:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5gn6yDA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDqGcmZD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6E6F18AF8
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 23:08:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF305C433CA;
-	Sun, 26 Nov 2023 23:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FCE182B9
+	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 23:08:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 812F4C4163C;
+	Sun, 26 Nov 2023 23:08:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701040103;
-	bh=+spaqklg5sxeuQpW2m0NHELuHNX9ly8ClKaeNFNJtWo=;
+	s=k20201202; t=1701040104;
+	bh=Vbg0fwi9bLNMzv6/rZl8FnMtiYhFfmNKcMcOpmfqz7M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P5gn6yDAUpWZtFDLW9O/6JUfHrFKVbLrvkoW8nk/XZ47liCV7JD7K+pnomL6yaQ4s
-	 68+f2w45lKua/hxGdjRVuBA9J4u4019gkOX6lvSmnJIyDvi33iN0OOBh38GF3U64p6
-	 rSPIw1Tf7hczkpbzbTqXUH6NbVKYtfZUzsoL+t1P/09QdbKRdQIBdGHa1k7Cx8phR0
-	 kyti4nSdHJD35P3FIoK3jaQa2x4FuVvTrRLDzux7dOdlM4/ozfNqJJ/UcvnbhFBBel
-	 7qg3Iw53mwps191dE0mBWGMEvXsvB5kaHstP5A1y416IUWT/FRhyyW4wH6U0OK8iK3
-	 poVV4fmpQo/lg==
+	b=DDqGcmZDTgej5iaX2q2/ANmnBzYgSPWME5MdyvpZX1siEeZ7eZ9GlflcgloLCqy7a
+	 0Ld8ZkotLpZleyAF+nul14n367yh52kex6EVhjBrgGy7oPWGRWZ+EVM3TM682LMSCh
+	 wX0SKCDAgZdkw86vjH3I7KjUh9LBzdWZahtYo7q39fiOzT0yDsfZaRQm46rNNS1jfp
+	 7hYC0HbzaLZOqU0F8JeeUMKsf2d0LYY91y4qUr3mpdc8t3BMalOKJEsil39cIum1Dt
+	 hyc4jq6RKV42n4lKMZFHOCQyS/XLcW/B9oilkcTKVtqFuB2ZJS7OxWJ2aRSoYGTBsw
+	 /hgbSZVELGzcg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc: netdev@vger.kernel.org,
 	almasrymina@google.com,
 	shakeelb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v4 10/13] net: page_pool: report when page pool was destroyed
-Date: Sun, 26 Nov 2023 15:07:37 -0800
-Message-ID: <20231126230740.2148636-11-kuba@kernel.org>
+Subject: [PATCH net-next v4 11/13] net: page_pool: expose page pool stats via netlink
+Date: Sun, 26 Nov 2023 15:07:38 -0800
+Message-ID: <20231126230740.2148636-12-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231126230740.2148636-1-kuba@kernel.org>
 References: <20231126230740.2148636-1-kuba@kernel.org>
@@ -59,140 +59,456 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Report when page pool was destroyed. Together with the inflight
-/ memory use reporting this can serve as a replacement for the
-warning about leaked page pools we currently print to dmesg.
+Dump the stats into netlink. More clever approaches
+like dumping the stats per-CPU for each CPU individually
+to see where the packets get consumed can be implemented
+in the future.
 
-Example output for a fake leaked page pool using some hacks
-in netdevsim (one "live" pool, and one "leaked" on the same dev):
+A trimmed example from a real (but recently booted system):
 
 $ ./cli.py --no-schema --spec netlink/specs/netdev.yaml \
-           --dump page-pool-get
-[{'id': 2, 'ifindex': 3},
- {'id': 1, 'ifindex': 3, 'destroyed': 133, 'inflight': 1}]
+           --dump page-pool-stats-get
+[{'info': {'id': 19, 'ifindex': 2},
+  'alloc-empty': 48,
+  'alloc-fast': 3024,
+  'alloc-refill': 0,
+  'alloc-slow': 48,
+  'alloc-slow-high-order': 0,
+  'alloc-waive': 0,
+  'recycle-cache-full': 0,
+  'recycle-cached': 0,
+  'recycle-released-refcnt': 0,
+  'recycle-ring': 0,
+  'recycle-ring-full': 0},
+ {'info': {'id': 18, 'ifindex': 2},
+  'alloc-empty': 66,
+  'alloc-fast': 11811,
+  'alloc-refill': 35,
+  'alloc-slow': 66,
+  'alloc-slow-high-order': 0,
+  'alloc-waive': 0,
+  'recycle-cache-full': 1145,
+  'recycle-cached': 6541,
+  'recycle-released-refcnt': 0,
+  'recycle-ring': 1275,
+  'recycle-ring-full': 0},
+ {'info': {'id': 17, 'ifindex': 2},
+  'alloc-empty': 73,
+  'alloc-fast': 62099,
+  'alloc-refill': 413,
+...
 
-Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/netdev.yaml | 13 +++++++++++++
- include/net/page_pool/types.h           |  1 +
- include/uapi/linux/netdev.h             |  1 +
- net/core/page_pool.c                    |  1 +
- net/core/page_pool_priv.h               |  1 +
- net/core/page_pool_user.c               | 12 ++++++++++++
- 6 files changed, 29 insertions(+)
+ Documentation/netlink/specs/netdev.yaml |  78 ++++++++++++++++++
+ Documentation/networking/page_pool.rst  |  10 ++-
+ include/net/page_pool/helpers.h         |   8 +-
+ include/uapi/linux/netdev.h             |  19 +++++
+ net/core/netdev-genl-gen.c              |  32 ++++++++
+ net/core/netdev-genl-gen.h              |   7 ++
+ net/core/page_pool.c                    |   2 +-
+ net/core/page_pool_user.c               | 103 ++++++++++++++++++++++++
+ 8 files changed, 250 insertions(+), 9 deletions(-)
 
 diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index b76623ff2932..b5f715cf9e06 100644
+index b5f715cf9e06..20f75b7d3240 100644
 --- a/Documentation/netlink/specs/netdev.yaml
 +++ b/Documentation/netlink/specs/netdev.yaml
-@@ -127,6 +127,18 @@ name: netdev
-         type: uint
-         doc: |
-           Amount of memory held by inflight pages.
+@@ -139,6 +139,59 @@ name: netdev
+           "re-attached", they are just waiting to disappear.
+           Attribute is absent if Page Pool has not been detached, and
+           can still be used to allocate new memory.
++  -
++    name: page-pool-info
++    subset-of: page-pool
++    attributes:
 +      -
-+        name: detach-time
++        name: id
++      -
++        name: ifindex
++  -
++    name: page-pool-stats
++    doc: |
++      Page pool statistics, see docs for struct page_pool_stats
++      for information about individual statistics.
++    attributes:
++      -
++        name: info
++        doc: Page pool identifying information.
++        type: nest
++        nested-attributes: page-pool-info
++      -
++        name: alloc-fast
 +        type: uint
-+        doc: |
-+          Seconds in CLOCK_BOOTTIME of when Page Pool was detached by
-+          the driver. Once detached Page Pool can no longer be used to
-+          allocate memory.
-+          Page Pools wait for all the memory allocated from them to be freed
-+          before truly disappearing. "Detached" Page Pools cannot be
-+          "re-attached", they are just waiting to disappear.
-+          Attribute is absent if Page Pool has not been detached, and
-+          can still be used to allocate new memory.
++        value: 8 # reserve some attr ids in case we need more metadata later
++      -
++        name: alloc-slow
++        type: uint
++      -
++        name: alloc-slow-high-order
++        type: uint
++      -
++        name: alloc-empty
++        type: uint
++      -
++        name: alloc-refill
++        type: uint
++      -
++        name: alloc-waive
++        type: uint
++      -
++        name: recycle-cached
++        type: uint
++      -
++        name: recycle-cache-full
++        type: uint
++      -
++        name: recycle-ring
++        type: uint
++      -
++        name: recycle-ring-full
++        type: uint
++      -
++        name: recycle-released-refcnt
++        type: uint
  
  operations:
    list:
-@@ -178,6 +190,7 @@ name: netdev
-             - napi-id
-             - inflight
-             - inflight-mem
-+            - detach-time
-       dump:
-         reply: *pp-reply
+@@ -212,6 +265,31 @@ name: netdev
+       notify: page-pool-get
+       mcgrp: page-pool
        config-cond: page-pool
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index 7e47d7bb2c1e..ac286ea8ce2d 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -193,6 +193,7 @@ struct page_pool {
- 	/* User-facing fields, protected by page_pools_lock */
- 	struct {
- 		struct hlist_node list;
-+		u64 detach_time;
- 		u32 napi_id;
- 		u32 id;
- 	} user;
++    -
++      name: page-pool-stats-get
++      doc: Get page pool statistics.
++      attribute-set: page-pool-stats
++      do:
++        request:
++          attributes:
++            - info
++        reply: &pp-stats-reply
++          attributes:
++            - info
++            - alloc-fast
++            - alloc-slow
++            - alloc-slow-high-order
++            - alloc-empty
++            - alloc-refill
++            - alloc-waive
++            - recycle-cached
++            - recycle-cache-full
++            - recycle-ring
++            - recycle-ring-full
++            - recycle-released-refcnt
++      dump:
++        reply: *pp-stats-reply
++      config-cond: page-pool-stats
+ 
+ mcast-groups:
+   list:
+diff --git a/Documentation/networking/page_pool.rst b/Documentation/networking/page_pool.rst
+index 60993cb56b32..9d958128a57c 100644
+--- a/Documentation/networking/page_pool.rst
++++ b/Documentation/networking/page_pool.rst
+@@ -41,6 +41,11 @@ Architecture overview
+                           |   Fast cache    |     |  ptr-ring cache  |
+                           +-----------------+     +------------------+
+ 
++Monitoring
++==========
++Information about page pools on the system can be accessed via the netdev
++genetlink family (see Documentation/netlink/specs/netdev.yaml).
++
+ API interface
+ =============
+ The number of pools created **must** match the number of hardware queues
+@@ -107,8 +112,9 @@ page_pool_get_stats() and structures described below are available.
+ It takes a  pointer to a ``struct page_pool`` and a pointer to a struct
+ page_pool_stats allocated by the caller.
+ 
+-The API will fill in the provided struct page_pool_stats with
+-statistics about the page_pool.
++Older drivers expose page pool statistics via ethtool or debugfs.
++The same statistics are accessible via the netlink netdev family
++in a driver-independent fashion.
+ 
+ .. kernel-doc:: include/net/page_pool/types.h
+    :identifiers: struct page_pool_recycle_stats
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 4ebd544ae977..7dc65774cde5 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -55,16 +55,12 @@
+ #include <net/page_pool/types.h>
+ 
+ #ifdef CONFIG_PAGE_POOL_STATS
++/* Deprecated driver-facing API, use netlink instead */
+ int page_pool_ethtool_stats_get_count(void);
+ u8 *page_pool_ethtool_stats_get_strings(u8 *data);
+ u64 *page_pool_ethtool_stats_get(u64 *data, void *stats);
+ 
+-/*
+- * Drivers that wish to harvest page pool stats and report them to users
+- * (perhaps via ethtool, debugfs, or another mechanism) can allocate a
+- * struct page_pool_stats call page_pool_get_stats to get stats for the specified pool.
+- */
+-bool page_pool_get_stats(struct page_pool *pool,
++bool page_pool_get_stats(const struct page_pool *pool,
+ 			 struct page_pool_stats *stats);
+ #else
+ static inline int page_pool_ethtool_stats_get_count(void)
 diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 26ae5bdd3187..756410274120 100644
+index 756410274120..2b37233e00c0 100644
 --- a/include/uapi/linux/netdev.h
 +++ b/include/uapi/linux/netdev.h
-@@ -70,6 +70,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_NAPI_ID,
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
-+	NETDEV_A_PAGE_POOL_DETACH_TIME,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
+@@ -76,6 +76,24 @@ enum {
  	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_PAGE_POOL_STATS_INFO = 1,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST = 8,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
++	NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL,
++	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT,
++
++	__NETDEV_A_PAGE_POOL_STATS_MAX,
++	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+@@ -85,6 +103,7 @@ enum {
+ 	NETDEV_CMD_PAGE_POOL_ADD_NTF,
+ 	NETDEV_CMD_PAGE_POOL_DEL_NTF,
+ 	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
++	NETDEV_CMD_PAGE_POOL_STATS_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index 47fb5e1b6369..dccd8c3a141e 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -16,6 +16,17 @@ static const struct netlink_range_validation netdev_a_page_pool_id_range = {
+ 	.max	= 4294967295ULL,
+ };
+ 
++static const struct netlink_range_validation netdev_a_page_pool_ifindex_range = {
++	.min	= 1ULL,
++	.max	= 2147483647ULL,
++};
++
++/* Common nested types */
++const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1] = {
++	[NETDEV_A_PAGE_POOL_ID] = NLA_POLICY_FULL_RANGE(NLA_UINT, &netdev_a_page_pool_id_range),
++	[NETDEV_A_PAGE_POOL_IFINDEX] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_page_pool_ifindex_range),
++};
++
+ /* NETDEV_CMD_DEV_GET - do */
+ static const struct nla_policy netdev_dev_get_nl_policy[NETDEV_A_DEV_IFINDEX + 1] = {
+ 	[NETDEV_A_DEV_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
+@@ -28,6 +39,13 @@ static const struct nla_policy netdev_page_pool_get_nl_policy[NETDEV_A_PAGE_POOL
+ };
+ #endif /* CONFIG_PAGE_POOL */
+ 
++/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
++#ifdef CONFIG_PAGE_POOL_STATS
++static const struct nla_policy netdev_page_pool_stats_get_nl_policy[NETDEV_A_PAGE_POOL_STATS_INFO + 1] = {
++	[NETDEV_A_PAGE_POOL_STATS_INFO] = NLA_POLICY_NESTED(netdev_page_pool_info_nl_policy),
++};
++#endif /* CONFIG_PAGE_POOL_STATS */
++
+ /* Ops table for netdev */
+ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	{
+@@ -56,6 +74,20 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.flags	= GENL_CMD_CAP_DUMP,
+ 	},
+ #endif /* CONFIG_PAGE_POOL */
++#ifdef CONFIG_PAGE_POOL_STATS
++	{
++		.cmd		= NETDEV_CMD_PAGE_POOL_STATS_GET,
++		.doit		= netdev_nl_page_pool_stats_get_doit,
++		.policy		= netdev_page_pool_stats_get_nl_policy,
++		.maxattr	= NETDEV_A_PAGE_POOL_STATS_INFO,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd	= NETDEV_CMD_PAGE_POOL_STATS_GET,
++		.dumpit	= netdev_nl_page_pool_stats_get_dumpit,
++		.flags	= GENL_CMD_CAP_DUMP,
++	},
++#endif /* CONFIG_PAGE_POOL_STATS */
+ };
+ 
+ static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index 738097847100..649e4b46eccf 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -11,11 +11,18 @@
+ 
+ #include <uapi/linux/netdev.h>
+ 
++/* Common nested types */
++extern const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1];
++
+ int netdev_nl_dev_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ int netdev_nl_page_pool_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_page_pool_get_dumpit(struct sk_buff *skb,
+ 				   struct netlink_callback *cb);
++int netdev_nl_page_pool_stats_get_doit(struct sk_buff *skb,
++				       struct genl_info *info);
++int netdev_nl_page_pool_stats_get_dumpit(struct sk_buff *skb,
++					 struct netlink_callback *cb);
+ 
+ enum {
+ 	NETDEV_NLGRP_MGMT,
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 566390759294..a821fb5fe054 100644
+index a821fb5fe054..3d0938a60646 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -953,6 +953,7 @@ void page_pool_destroy(struct page_pool *pool)
- 	if (!page_pool_release(pool))
- 		return;
- 
-+	page_pool_detached(pool);
- 	pool->defer_start = jiffies;
- 	pool->defer_warn  = jiffies + DEFER_WARN_INTERVAL;
- 
-diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
-index 72fb21ea1ddc..90665d40f1eb 100644
---- a/net/core/page_pool_priv.h
-+++ b/net/core/page_pool_priv.h
-@@ -6,6 +6,7 @@
- s32 page_pool_inflight(const struct page_pool *pool, bool strict);
- 
- int page_pool_list(struct page_pool *pool);
-+void page_pool_detached(struct page_pool *pool);
- void page_pool_unlist(struct page_pool *pool);
- 
- #endif
+@@ -71,7 +71,7 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
+  * is passed to this API which is filled in. The caller can then report
+  * those stats to the user (perhaps via ethtool, debugfs, etc.).
+  */
+-bool page_pool_get_stats(struct page_pool *pool,
++bool page_pool_get_stats(const struct page_pool *pool,
+ 			 struct page_pool_stats *stats)
+ {
+ 	int cpu = 0;
 diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 2db71e718485..bd5ca94f683f 100644
+index bd5ca94f683f..1426434a7e15 100644
 --- a/net/core/page_pool_user.c
 +++ b/net/core/page_pool_user.c
-@@ -134,6 +134,10 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 			 inflight * refsz))
- 		goto err_cancel;
-+	if (pool->user.detach_time &&
-+	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_DETACH_TIME,
-+			 pool->user.detach_time))
-+		goto err_cancel;
+@@ -5,6 +5,7 @@
+ #include <linux/xarray.h>
+ #include <net/net_debug.h>
+ #include <net/page_pool/types.h>
++#include <net/page_pool/helpers.h>
+ #include <net/sock.h>
  
- 	genlmsg_end(rsp, hdr);
- 
-@@ -219,6 +223,14 @@ int page_pool_list(struct page_pool *pool)
+ #include "page_pool_priv.h"
+@@ -106,6 +107,108 @@ netdev_nl_page_pool_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
  	return err;
  }
  
-+void page_pool_detached(struct page_pool *pool)
++static int
++page_pool_nl_stats_fill(struct sk_buff *rsp, const struct page_pool *pool,
++			const struct genl_info *info)
 +{
-+	mutex_lock(&page_pools_lock);
-+	pool->user.detach_time = ktime_get_boottime_seconds();
-+	netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_CHANGE_NTF);
-+	mutex_unlock(&page_pools_lock);
++#ifdef CONFIG_PAGE_POOL_STATS
++	struct page_pool_stats stats = {};
++	struct nlattr *nest;
++	void *hdr;
++
++	if (!page_pool_get_stats(pool, &stats))
++		return 0;
++
++	hdr = genlmsg_iput(rsp, info);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	nest = nla_nest_start(rsp, NETDEV_A_PAGE_POOL_STATS_INFO);
++
++	if (nla_put_uint(rsp, NETDEV_A_PAGE_POOL_ID, pool->user.id) ||
++	    (pool->slow.netdev->ifindex != LOOPBACK_IFINDEX &&
++	     nla_put_u32(rsp, NETDEV_A_PAGE_POOL_IFINDEX,
++			 pool->slow.netdev->ifindex)))
++		goto err_cancel_nest;
++
++	nla_nest_end(rsp, nest);
++
++	if (nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST,
++			 stats.alloc_stats.fast) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
++			 stats.alloc_stats.slow) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
++			 stats.alloc_stats.slow_high_order) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
++			 stats.alloc_stats.empty) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
++			 stats.alloc_stats.refill) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
++			 stats.alloc_stats.waive) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
++			 stats.recycle_stats.cached) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
++			 stats.recycle_stats.cache_full) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING,
++			 stats.recycle_stats.ring) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL,
++			 stats.recycle_stats.ring_full) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT,
++			 stats.recycle_stats.released_refcnt))
++		goto err_cancel_msg;
++
++	genlmsg_end(rsp, hdr);
++
++	return 0;
++err_cancel_nest:
++	nla_nest_cancel(rsp, nest);
++err_cancel_msg:
++	genlmsg_cancel(rsp, hdr);
++	return -EMSGSIZE;
++#else
++	GENL_SET_ERR_MSG(info, "kernel built without CONFIG_PAGE_POOL_STATS");
++	return -EOPNOTSUPP;
++#endif
 +}
 +
- void page_pool_unlist(struct page_pool *pool)
- {
- 	mutex_lock(&page_pools_lock);
++int netdev_nl_page_pool_stats_get_doit(struct sk_buff *skb,
++				       struct genl_info *info)
++{
++	struct nlattr *tb[ARRAY_SIZE(netdev_page_pool_info_nl_policy)];
++	struct nlattr *nest;
++	int err;
++	u32 id;
++
++	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_PAGE_POOL_STATS_INFO))
++		return -EINVAL;
++
++	nest = info->attrs[NETDEV_A_PAGE_POOL_STATS_INFO];
++	err = nla_parse_nested(tb, ARRAY_SIZE(tb) - 1, nest,
++			       netdev_page_pool_info_nl_policy,
++			       info->extack);
++	if (err)
++		return err;
++
++	if (NL_REQ_ATTR_CHECK(info->extack, nest, tb, NETDEV_A_PAGE_POOL_ID))
++		return -EINVAL;
++	if (tb[NETDEV_A_PAGE_POOL_IFINDEX]) {
++		NL_SET_ERR_MSG_ATTR(info->extack,
++				    tb[NETDEV_A_PAGE_POOL_IFINDEX],
++				    "selecting by ifindex not supported");
++		return -EINVAL;
++	}
++
++	id = nla_get_uint(tb[NETDEV_A_PAGE_POOL_ID]);
++
++	return netdev_nl_page_pool_get_do(info, id, page_pool_nl_stats_fill);
++}
++
++int netdev_nl_page_pool_stats_get_dumpit(struct sk_buff *skb,
++					 struct netlink_callback *cb)
++{
++	return netdev_nl_page_pool_get_dump(skb, cb, page_pool_nl_stats_fill);
++}
++
+ static int
+ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
+ 		  const struct genl_info *info)
 -- 
 2.42.0
 
