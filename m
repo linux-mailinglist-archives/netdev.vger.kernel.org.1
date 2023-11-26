@@ -1,156 +1,129 @@
-Return-Path: <netdev+bounces-51085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA017F9086
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:52:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C06287F908F
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:54:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 763CFB20DBD
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:52:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436A0B20DC4
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C0E7FD;
-	Sun, 26 Nov 2023 00:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1386817;
+	Sun, 26 Nov 2023 00:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVPidKDW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmRFj+VF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB3DE111;
-	Sat, 25 Nov 2023 16:52:22 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cfafe3d46bso9818855ad.0;
-        Sat, 25 Nov 2023 16:52:22 -0800 (PST)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B4B4DB;
+	Sat, 25 Nov 2023 16:54:40 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-32faea0fa1fso1704294f8f.1;
+        Sat, 25 Nov 2023 16:54:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700959942; x=1701564742; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jYTSrTsSLNTK87pARSM7aa15YibQdHjX2daicCB5u8E=;
-        b=eVPidKDWhQWDrf0LvUaA3fVCJ+vBrmR0hfssC00O+WEPoiwGfSxpbPUouFJ+my2mQC
-         rtzxoh+BqMn3qhdWZug+TM4oGoyhyAebQDKzcDuPaz4fqit97uTg/8pLkS608YQKjjRL
-         rUbHn9fJe1pO45Dkt+pet41MGi6wcrUVH2n1YlQOYPk0B0bT+U42FJXxMmh2DdjLrfrj
-         rlY1JC6WSIDSqVU7ZZkHyC2skSRlkouiBCnksVH3gYAI2u9a0gbayCTKeuFTG8VgLQeG
-         Pe72Zei9qkx7iympaOe26fyRgt9CQ4Ni3vVYuC3HGB7XWIAvwAHqjk7UGQTiaVF+kys3
-         Hesg==
+        d=gmail.com; s=20230601; t=1700960079; x=1701564879; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltQclqkFj/xMu+b5r26yFK5pByVqHfoEcMFbjZo3yyo=;
+        b=jmRFj+VF6EEwKk/TBQbY0YwlDC+T6ru+aoU9/dzVGcV2A43P6S09e1Z0bmdlvZTyua
+         3r4l7S/PKKNa0UMNEBGKo5mvAN3VY+g+507z2PWxtP9kKVlIFLNxchs2r+S1BFLIx4iV
+         GgTCyxC3L+fXgGA8n4OcXSNydNWVX+LVVZu0lLjmqCzmuKpqmv7kMGi+6zfNa6F0rGUP
+         qRh9qG+8OG6H15LsFk6UbZscclkRi7SsEOrw/cpFzumARkBeuQX0kIK8wWhDtUT8CZBQ
+         w3o8dWu5xXQfSQ0PE+4+2QNFf6Jzvm3wSJvmMrgkgOtYmbkaNWGbY18NoxxkixgUyINW
+         hvZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700959942; x=1701564742;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jYTSrTsSLNTK87pARSM7aa15YibQdHjX2daicCB5u8E=;
-        b=dpgiC+C7/IpwcNHMR0Qcg6zOsQQYQruG3Ro1HtxWv1U33Lx+jm6byMWvEml9geoJIG
-         02N2FCsitzAIh4oazxm1O951ODs3e7pM0yKoDTaxVUSDykeUxj+f70LZa53MWSUexwIv
-         kZz/sENnqYnaE54AMby6jfjRGU0hZj3kqOJwfSX5FRXabEYyyiZSqTUIRxDmTIYMmKuI
-         COQf+996Jj1aJrRbaQZDnx2RAiSEaFhf6Goh5mACXz5tUl453IGFkolSkLm2rMAGxW/i
-         LOlr0Zeh7W6zw3E2S6LqHCSJio0pGnXqQF5wX/WpFd44nddw3BNql21pS5t0VI+n28kc
-         ThuA==
-X-Gm-Message-State: AOJu0Yxd+UJ71kFKa+UKmtHM4oRvVppClaZaMZ/vCHgLYihlMK2U/Jtr
-	wqWNJ4HNXxUjuxvBKHZgCdI=
-X-Google-Smtp-Source: AGHT+IG7hjKm1eHsdZULnTyvGPKdJfIC+LDluam+q6m0OG903M33tjQVK0+tHJQnEBwETZNqgwha+A==
-X-Received: by 2002:a17:902:dacc:b0:1cf:a70b:39b7 with SMTP id q12-20020a170902dacc00b001cfa70b39b7mr7337613plx.43.1700959942274;
-        Sat, 25 Nov 2023 16:52:22 -0800 (PST)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id d8-20020a170902654800b001c61acd5bd2sm5648965pln.112.2023.11.25.16.52.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Nov 2023 16:52:21 -0800 (PST)
-Message-ID: <637891aa-19fa-4f13-9ed2-f2e14a4b1ee2@gmail.com>
-Date: Sat, 25 Nov 2023 16:52:19 -0800
+        d=1e100.net; s=20230601; t=1700960079; x=1701564879;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ltQclqkFj/xMu+b5r26yFK5pByVqHfoEcMFbjZo3yyo=;
+        b=vrITdbEAJrjUTodEXPZuo64uZQYp3h+TPj0c4NuzNMHmXEaXaKmHIRmFsZS8qGOpqZ
+         f21bPWCVPZ751J4R7FTXO5jQG4pKy8fzlAeIA8jXk1m9USkeuLKO1QVpDgRdPQMEABnu
+         ke5y3z52Fg6MgMcokkN+5kkNDgHsszZDJphUzOQ0XOQ34XbhSEs5F3ZMC2Q9nm8o32rm
+         WjSavQ6/kX5Lmr5uoP+REp50fz+Y/6srTC2FPnRawMRbawPVx7uknqT3JwVB5B6fBPn9
+         0dUDsvx24fpDjIQZ3AbUWipT67lgC98LBXuvsevzMd3h/V5RDBVOcvvDJQ/8uvhzXiF+
+         oVUg==
+X-Gm-Message-State: AOJu0YzX8D0jSlZr1EjKGp9UT9wfVjTN9qXZpL8it+Iz1wO5Kj9C6uFu
+	scu8rkA0cPyKD2pkAZKXHLk=
+X-Google-Smtp-Source: AGHT+IF6snv08s8f4PF01FYyHM35UwJIJcI1gHOezRjJ0Gt00iosgCCUSDl8L8jpLsuCa7fHPwHxNg==
+X-Received: by 2002:a05:6000:1001:b0:332:f9e8:ce15 with SMTP id a1-20020a056000100100b00332f9e8ce15mr736780wrx.4.1700960078599;
+        Sat, 25 Nov 2023 16:54:38 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id j7-20020adfb307000000b00332e7f9e2a8sm5894567wrd.68.2023.11.25.16.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Nov 2023 16:54:38 -0800 (PST)
+Message-ID: <6562974e.df0a0220.242f6.337e@mx.google.com>
+X-Google-Original-Message-ID: <ZWKXS_NZePy80ytW@Ansuel-xps.>
+Date: Sun, 26 Nov 2023 01:54:35 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 3/3] net: phy: add support for PHY package MMD
+ read/write
+References: <20231126003748.9600-1-ansuelsmth@gmail.com>
+ <20231126003748.9600-3-ansuelsmth@gmail.com>
+ <637891aa-19fa-4f13-9ed2-f2e14a4b1ee2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 3/3] net: phy: add support for PHY package MMD
- read/write
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- David Epping <david.epping@missinglinkelectronics.com>,
- Harini Katakam <harini.katakam@amd.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231126003748.9600-1-ansuelsmth@gmail.com>
- <20231126003748.9600-3-ansuelsmth@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231126003748.9600-3-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <637891aa-19fa-4f13-9ed2-f2e14a4b1ee2@gmail.com>
 
-
-
-On 11/25/2023 4:37 PM, Christian Marangi wrote:
-> Some PHY in PHY package may require to read/write MMD regs to correctly
-> configure the PHY package.
+On Sat, Nov 25, 2023 at 04:52:19PM -0800, Florian Fainelli wrote:
 > 
-> Add support for these additional required function in both lock and no
-> lock variant.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->   include/linux/phy.h | 74 +++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 74 insertions(+)
+> On 11/25/2023 4:37 PM, Christian Marangi wrote:
+> > Some PHY in PHY package may require to read/write MMD regs to correctly
+> > configure the PHY package.
+> > 
+> > Add support for these additional required function in both lock and no
+> > lock variant.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >   include/linux/phy.h | 74 +++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 74 insertions(+)
+> > 
+> > diff --git a/include/linux/phy.h b/include/linux/phy.h
+> > index 984bca9a82f4..1799133c8387 100644
+> > --- a/include/linux/phy.h
+> > +++ b/include/linux/phy.h
+> > @@ -2067,6 +2067,80 @@ static inline int __phy_package_write(struct phy_device *phydev,
+> >   	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
+> >   }
+> > +static inline int phy_package_read_mmd(struct phy_device *phydev,
+> > +				       unsigned int addr_offset, int devad,
+> > +				       u32 regnum)
+> > +{
+> > +	struct phy_package_shared *shared = phydev->shared;
+> > +	struct mii_bus *bus = phydev->mdio.bus;
+> > +	int addr, val;
+> > +
+> > +	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
+> > +		return -EIO;
 > 
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index 984bca9a82f4..1799133c8387 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -2067,6 +2067,80 @@ static inline int __phy_package_write(struct phy_device *phydev,
->   	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
->   }
->   
-> +static inline int phy_package_read_mmd(struct phy_device *phydev,
-> +				       unsigned int addr_offset, int devad,
-> +				       u32 regnum)
-> +{
-> +	struct phy_package_shared *shared = phydev->shared;
-> +	struct mii_bus *bus = phydev->mdio.bus;
-> +	int addr, val;
-> +
-> +	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
-> +		return -EIO;
+> You might be off by one here, should not that >= PHY_MAX_ADDR here and
+> below?
 
-You might be off by one here, should not that >= PHY_MAX_ADDR here and 
-below?
+Thanks for the review. Yes PHY_MAX_ADDR is 32 so I should use >=.
+
+(interesting choice to use 32 instead of 31 as MAX, guess an old mistake)
+
 -- 
-Florian
+	Ansuel
 
