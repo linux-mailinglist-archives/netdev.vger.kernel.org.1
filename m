@@ -1,211 +1,212 @@
-Return-Path: <netdev+bounces-51089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD397F90A2
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 02:14:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81CDB7F90B4
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 02:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D26E281381
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:14:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBD3FB20F24
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3736ECF;
-	Sun, 26 Nov 2023 01:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2355410F4;
+	Sun, 26 Nov 2023 01:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="El8plglo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPz0iXiC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DA4FD;
-	Sat, 25 Nov 2023 17:14:20 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cf8b35a6dbso21890845ad.0;
-        Sat, 25 Nov 2023 17:14:19 -0800 (PST)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44D0C6;
+	Sat, 25 Nov 2023 17:53:54 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-40b397793aaso11005245e9.0;
+        Sat, 25 Nov 2023 17:53:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700961259; x=1701566059; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P/y64aIIFuJQcFEqdYvuTbOB4txWgZi66KcW7TCOECw=;
-        b=El8plglo4ap3FzYBX6SXv1taVv4p09poHkJuqJtPnYPIyQxv5d3lzhjiJEBZVKbu8e
-         aPct6x7GzgiJNkhJM76X20/pHaTRMwZ6CCiWo5gXvyfq5p4SUfr40KylLKNhK5j5YoQk
-         QL1jcI3PAhUUH33jHSuYPU/CYiamemnammy7lXq/lJAJhWCXpj2dnOQmP0lbso7Um1G0
-         HcfqCtWuSdOOTkoKZ3IzUpSiUykVpVb230xdP89dWGecjqs34la5Vn0vFu97vne7Ucvb
-         Ik9c2f5KFCDwRDNl4WH/lAdLusksx2RdmYqkMmDu8VUCXoBJjFRjAR2pHxYcq8U5QMI0
-         M6gw==
+        d=gmail.com; s=20230601; t=1700963633; x=1701568433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZxXzgcsFa66c5DTc1V1SpwFIJNBC3WpXhfBHmJYop4=;
+        b=YPz0iXiC/zijDmdGZbPgyzGACqJAMshiuIeznudECVJIlrHOmEZErKQ3MvoqHaj6sc
+         QAyRYbe70d33aIULf/2CxCXQlS37DI86Uowx4fsN0z0dTIKpwjzMRZvG+bJRivxPHnG6
+         DuUpY5f/Z/SuJIzbnIXfyMOgHeMGYmRL2BLNIX+pGOYUYM4b5Fowa1lb2QrrqEZY2WaF
+         a2lpC2Sr6da3lwpwdABDIIg9f7eS1rJlYa8YevXw5xEM0aR2OoMotvHUJIcD5DRHDo3/
+         /ZXjc+CuPT9V/vJmlDKJvtrnv9RLCYoUTKL6rOsuoue8IahVvz7w78AYuKPQIzJFl1Ow
+         ew9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700961259; x=1701566059;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P/y64aIIFuJQcFEqdYvuTbOB4txWgZi66KcW7TCOECw=;
-        b=MZZigTg5fHclKgD2tmUvsCFM9aCWySnmA2j82fBpAW5hQJuy17P8gFsAgxWTATc1VV
-         V69nnnwvur8JujpPrZCMLz/biFP/Ggx+rbx1ptl5r6zEx7Z1eSD3FZ0FHmTCYKF4+05d
-         7JKL+L7fEgv2yu6W5PvShHCe0fxiPKHJVW/OjZpDDLNSGWD4/+eussAykRXcerrBmkAs
-         90pGYlotUxwWb9y6wnS3ifJJKueYuG+jlgmyFaxU4hhkgceUFoenAuP5yk9xO0GQwPaD
-         3/BdXz/7dBYzlX1PtKGWs1IeuccS+2v6lLOCOY6KPolWodu9Ev7Ne27g+UINUfLRZMuT
-         7aRQ==
-X-Gm-Message-State: AOJu0YzGp9yKsFLa1ONLnPD5Bf+Y2/aikX+Zo10btcI03THANf5a6W33
-	gl6OJlYALAiY/7AYwuEmVBQ=
-X-Google-Smtp-Source: AGHT+IGYQo4PLQcBfKODLgFJ6Bq3Wx1172kTCKprXL8fq4ot6eMl4+dVLhKl8+q/JgIhv6Qcdx8g+Q==
-X-Received: by 2002:a17:902:e744:b0:1cf:bd98:633b with SMTP id p4-20020a170902e74400b001cfbd98633bmr1779707plf.64.1700961259410;
-        Sat, 25 Nov 2023 17:14:19 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id z7-20020a170903018700b001c55db80b14sm5509190plg.221.2023.11.25.17.14.17
+        d=1e100.net; s=20230601; t=1700963633; x=1701568433;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZxXzgcsFa66c5DTc1V1SpwFIJNBC3WpXhfBHmJYop4=;
+        b=kpZZZewHWa1XHC+NQDbjaWGPvZYxZprO7mAypyrraJzus8sBpUXYoAcKbxbs1nVN4i
+         /oRFvvW8qjrBXh9ARzhLuGQl4qwtsP5fH9jzkMXm6szlSR0D3tCoB4l0NNAQTxIWn/9f
+         LEEaFZ14SryR0hMiORfCb+2IY5vF4vj9c+Bcsog3tyVRpqzRT++wlY1yzDwq9lQeEWdT
+         jUSK6hruAQ6Tf07zjQTN5VUT5wDMH+Zb4dTWVnHhKeFFDJxEGmFwb6oalWmvU9nDcqTd
+         9A0BQ+AY9Zkqw0svVkF1v041MEybKRKn/0ga1rKSQW/xXsVTvx9526MlROEpONRqbXWj
+         +S0Q==
+X-Gm-Message-State: AOJu0YyNb62FYsgY+Y9K8XP/V2u7V28M5gE1k2SZmM93TTzRxCHqjJs3
+	Bj4Sk+Rd94gzOyxau+9puHk=
+X-Google-Smtp-Source: AGHT+IF3zWcXt6J8ONHbVNqsmKNBZ78aaiUYHOj1FlStaqQ7aY4b1MwjHFFZQlrITxUlZaQzKLppnw==
+X-Received: by 2002:a05:600c:4311:b0:40b:3de0:8e1a with SMTP id p17-20020a05600c431100b0040b3de08e1amr4388812wme.8.1700963633053;
+        Sat, 25 Nov 2023 17:53:53 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id p34-20020a05600c1da200b00406408dc788sm9875344wms.44.2023.11.25.17.53.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Nov 2023 17:14:18 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 922CF10205C41; Sun, 26 Nov 2023 08:14:15 +0700 (WIB)
-Date: Sun, 26 Nov 2023 08:14:15 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Joey Gouly <joey.gouly@arm.com>,
-	Linux Kernel Hardening <linux-hardening@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regression@lists.linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
+        Sat, 25 Nov 2023 17:53:52 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>
-Subject: Re: [BUG] Boot crash on v6.7-rc2
-Message-ID: <ZWKb56E2kKngcWW5@archie.me>
-References: <20231124102458.GB1503258@e124191.cambridge.arm.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [net-next PATCH RFC v3 0/8] net: phy: Support DT PHY package
+Date: Sun, 26 Nov 2023 02:53:38 +0100
+Message-Id: <20231126015346.25208-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5Hmfvs539k+85674"
-Content-Disposition: inline
-In-Reply-To: <20231124102458.GB1503258@e124191.cambridge.arm.com>
+Content-Transfer-Encoding: 8bit
 
+This depends on another series for PHY package API change. [1]
 
---5Hmfvs539k+85674
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Idea of this big series is to introduce the concept of PHY package in DT
+and generalize the support of it by PHY driver.
 
-On Fri, Nov 24, 2023 at 10:24:58AM +0000, Joey Gouly wrote:
-> Hi all,
->=20
-> I just hit a boot crash on v6.7-rc2 (arm64, FVP model):
->=20
-> [    1.418845] Unable to handle kernel NULL pointer dereference at virtua=
-l address 0000000000000517
-> [    1.418855] Mem abort info:
-> [    1.418860]   ESR =3D 0x0000000096000004
-> [    1.418867]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-> [    1.418876]   SET =3D 0, FnV =3D 0
-> [    1.418882]   EA =3D 0, S1PTW =3D 0
-> [    1.418889]   FSC =3D 0x04: level 0 translation fault
-> [    1.418897] Data abort info:
-> [    1.418902]   ISV =3D 0, ISS =3D 0x00000004, ISS2 =3D 0x00000000
-> [    1.418910]   CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
-> [    1.418919]   GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
-> [    1.418928] user pgtable: 4k pages, 48-bit VAs, pgdp=3D0000000881835000
-> [    1.418938] [0000000000000517] pgd=3D0000000000000000, p4d=3D000000000=
-0000000
-> [    1.418952] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
-> [    1.418961] Modules linked in:
-> [    1.418969] CPU: 0 PID: 8 Comm: kworker/0:0 Tainted: G                =
-T  6.7.0-rc2-dirty #4191 40d10cdc812c74fd5dc5d91e2452ff6f1e5f4b4a
-> [    1.418984] Hardware name: FVP Base RevC (DT)
-> [    1.418992] Workqueue: mld mld_ifc_work
-> [    1.419003] pstate: 101402005 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTY=
-PE=3D--)
-> [    1.419016] pc : ___neigh_create+0x790/0x9c8
-> [    1.419028] lr : ___neigh_create+0x270/0x9c8
-> [    1.419041] sp : ffff8000800c3a20
-> [    1.419048] x29: ffff8000800c3a20 x28: ffffd7c64c921078 x27: ffff00080=
-188bd50
-> [    1.419066] x26: ffff00080183a30c x25: ffff00080188bda0 x24: ffff00080=
-183a300
-> [    1.419084] x23: 0000000000000000 x22: 0000000000000010 x21: ffff00080=
-188bcc0
-> [    1.419102] x20: 0000000000000000 x19: ffff0008003ef000 x18: 000000000=
-0000014
-> [    1.419119] x17: 00000000cf0f2572 x16: 0000000080faa78d x15: 00000000b=
-79921ac
-> [    1.419137] x14: ffff00087ff332c0 x13: 1600000000000000 x12: 000000000=
-00002ff
-> [    1.419155] x11: 000000007c2c4dbd x10: 0000000000000003 x9 : 000000000=
-0000000
-> [    1.419172] x8 : ffff00080188bd80 x7 : 00000000be3df655 x6 : 00000000f=
-1691d6f
-> [    1.419190] x5 : 000000007c2c4dbd x4 : 0000000000000000 x3 : 000000008=
-eb8ab5b
-> [    1.419207] x2 : 000000000000050f x1 : 000000000000001d x0 : 000000000=
-00002ff
-> [    1.419225] Call trace:
-> [    1.419230]  ___neigh_create+0x790/0x9c8
-> [    1.419243]  __neigh_create+0x18/0x20
-> [    1.419255]  ip6_finish_output2+0x5f8/0x8c4
-> [    1.419267]  ip6_finish_output+0x1f0/0x258
-> [    1.419279]  ip6_output+0x70/0x1cc
-> [    1.419291]  NF_HOOK.constprop.0+0x4c/0xd8
-> [    1.419302]  mld_sendpack+0x1b4/0x394
-> [    1.419313]  mld_ifc_work+0x1d4/0x4b4
->=20
-> I tracked it down to the following line in net/core/neighbour.c ___neigh_=
-create:
-> 	memcpy(n->primary_key, pkey, key_len);
->=20
-> I did this by surrounding the memcpy with BUG():
-> 	BUG_ON(n->tbl !=3D tbl);
-> 	memcpy(n->primary_key, pkey, key_len);
-> 	BUG_ON(n->tbl !=3D tbl);
->=20
-> And it was crashing on the second one.
->=20
-> Checking `struct neighbour`:
->=20
-> 	struct neighbour {
-> 		struct neighbour __rcu	*next;
-> 		struct neigh_table	*tbl;
-> 	.. fields ..
-> 		u8			primary_key[0];
-> 	} __randomize_layout;
->=20
-> Due to the `__randomize_layout`, `primary_key` field is being placed befo=
-re `tbl` (actually it's the same address since it's a 0 length array). That=
- means the memcpy() corrupts the tbl pointer.
->=20
-> I think I just got unlucky with my CONFIG_RANDSTRUCT seed (I can provide =
-it if needed), it doesn't look as if it's a new issue.
->=20
-> I couldn't reproduce directly on v6.6 (the offsets for `tbl` and `primary=
-_key` didn't overlap).
-> However I tried changing the zero-length-array to a flexible one:
->=20
-> 	+	DECLARE_FLEX_ARRAY(u8, primary_key);
-> 	+	u8		primary_key[0];
->=20
-> Then the field offsets ended up overlapping, and I also got the same cras=
-h on v6.6.
->=20
+The concept of PHY package is nothing new and is already a thing in the
+kernel with the API phy_package_join/leave/read/write.
 
-Thanks for the well-handled regression report. I'm adding it to regzbot
-for tracking:
+The main idea of those API is to permit the PHY to have a shared global
+data and to run probe/config only once for the PHY package. There are
+various example of this already in the kernel with the mscc, bcm54140
+mediatek ge and micrle driver and they all follow the same pattern.
 
-#regzbot ^introduced: 1ee60356c2dca9
-#regzbot title: Boot crash caused by true flexible array warning
-#regzbot fix: neighbour: Fix __randomize_layout crash in struct neighbour
+What is currently lacking is describing this in DT and better reference
+the PHY in charge of global configuration of the PHY package. For the
+already present PHY, the implementation is simple enough with only one
+PHY having the required regs to apply global configuration.
 
---=20
-An old man doll... just what I always wanted! - Clara
+This can be ok for simple PHY package but some Qcom PHY package on
+""modern"" SoC have more complex implementation. One example is the PHY
+for qca807x where some global regs are present in the so-called "combo"
+port and everything about psgmii calibration is placed in a 5th port in
+the PHY package.
 
---5Hmfvs539k+85674
-Content-Type: application/pgp-signature; name="signature.asc"
+Given these additional thing, the original phy_package API are extended
+with support for multiple global PHY for configuration. Each PHY driver
+will have an enum of the ID for the global PHY to reference and is
+required to pass to the read/write function.
 
------BEGIN PGP SIGNATURE-----
+On top of this, it's added correct DT support for describing PHY
+package.
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZWKb4wAKCRD2uYlJVVFO
-o3v8AQCzt7rgIarKQqzj/B/2EhfxNDrdWb72QbQTgt3iu7rZfAEAw5hbmG8YNctp
-YSjTe8uJ2MlH9+1YPx3hqxUFlr4Fogw=
-=/ICY
------END PGP SIGNATURE-----
+One example is this:
 
---5Hmfvs539k+85674--
+        ethernet-phy-package@0 {
+            compatible = "ethernet-phy-package";
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            reg = <0>;
+            qcom,package-mode = "qsgmii";
+
+            ethernet-phy@1 {
+              reg = <1>;
+            };
+
+            phy4: ethernet-phy@4 {
+              reg = <4>;
+            };
+        };
+
+The mdio parse functions are changed to address for this additional
+special node, the function is changed to simply detect this node and
+search also in this.
+
+If this is detected phy core will join each PHY present in the node and
+use (if defined) the additional info in the PHY driver to probe/config
+once the PHY package.
+
+I hope this implementation is clean enough as I expect more and more of
+these configuration to appear in the future.
+
+(For Andrew, we are looking intro making this in at803x PHY driver and see
+what functions can be reused, idea is to move the driver to a dedicated
+directory and create something like at803x-common.c as the at803x PHY
+driver is too bloated and splitting it it's a better approach)
+
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/20231126003748.9600-1-ansuelsmth@gmail.com/
+
+Changes v3:
+- Add back compatible implementation
+- Detach patch that can be handled separately (phy_package_mmd, 
+  phy_package extended)
+- Rework code to new simplified implementation with base addr + offset
+- Improve documentation with additional info and description
+Changes v2:
+- Drop compatible "ethernet-phy-package", use node name prefix matching
+  instead
+- Improve DT example
+- Add reg for ethernet-phy-package
+- Drop phy-mode for ethernet-phy-package
+- Drop patch for generalization of phy-mode
+- Drop global-phy property (handle internally to the PHY driver)
+- Rework OF phy package code and PHY driver to handle base address
+- Fix missing of_node_put
+- Add some missing docs for added variables in struct
+- Move some define from dt-bindings include to PHY driver
+- Handle qsgmii validation in PHY driver
+- Fix wrong include for gpiolib
+- Drop reduntant version.h include
+
+Christian Marangi (6):
+  dt-bindings: net: document ethernet PHY package nodes
+  net: phy: add initial support for PHY package in DT
+  net: phy: add support for shared priv data size for PHY package in DT
+  net: phy: add support for driver specific PHY package probe/config
+  dt-bindings: net: Document Qcom QCA807x PHY package
+  net: phy: qca807x: Add support for configurable LED
+
+Robert Marko (2):
+  dt-bindings: net: add QCA807x PHY defines
+  net: phy: add Qualcom QCA807x driver
+
+ .../bindings/net/ethernet-phy-package.yaml    |   75 +
+ .../devicetree/bindings/net/qcom,qca807x.yaml |  136 ++
+ drivers/net/mdio/of_mdio.c                    |   68 +-
+ drivers/net/phy/Kconfig                       |    7 +
+ drivers/net/phy/Makefile                      |    1 +
+ drivers/net/phy/mdio_bus.c                    |   35 +-
+ drivers/net/phy/phy_device.c                  |   54 +
+ drivers/net/phy/qca807x.c                     | 1315 +++++++++++++++++
+ include/dt-bindings/net/qcom-qca807x.h        |   30 +
+ include/linux/phy.h                           |   27 +
+ 10 files changed, 1719 insertions(+), 29 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/qcom,qca807x.yaml
+ create mode 100644 drivers/net/phy/qca807x.c
+ create mode 100644 include/dt-bindings/net/qcom-qca807x.h
+
+-- 
+2.40.1
+
 
