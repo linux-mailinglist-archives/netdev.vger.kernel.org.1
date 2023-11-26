@@ -1,56 +1,78 @@
-Return-Path: <netdev+bounces-51174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E1A7F964F
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:09:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AB27F96A6
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 526D51C20895
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:09:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 317FA280DEE
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 23:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56BD18AEE;
-	Sun, 26 Nov 2023 23:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BFF171D2;
+	Sun, 26 Nov 2023 23:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyEWEUO0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHNRa5P+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8932218C24
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 23:08:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D312EC43391;
-	Sun, 26 Nov 2023 23:08:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701040105;
-	bh=CT7fr29e50thwW+E27fOpZRPavaaH4776yYk/mQ9T3M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NyEWEUO0FzR9ziFjyqSHjUOBW4kCd4NdZ8WheAgt/et51Hc2hqrhjL3V7oXxP4H3a
-	 TD+IV313RPIEbuvP9NdXfNsOOBGvPd2FrDJXeJhbYsqIZBTzPzMtqevIf3MLiY+fYg
-	 e5VVqHPGNvFfOw0GrgarNBVRd56dOOb/1OiC90fFV4oubfsxBf/MxB8r49tq7xzuj7
-	 8IGXOqi9cmLOt+nwD28X3M4wvSmGhvLaFkGhEPUofvPGxm3FkoAAg0zFqFDCatXwrr
-	 jZYO6mYjLWyiO75rorWcqh0CTZO6M51oMC7bBrjFrcBRMe99fN3+sCI1m3MfnzlHVk
-	 m9WjNYKIgIULw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	dsahern@gmail.com,
-	dtatulea@nvidia.com,
-	willemb@google.com,
-	almasrymina@google.com,
-	shakeelb@google.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v4 13/13] tools: ynl: add sample for getting page-pool information
-Date: Sun, 26 Nov 2023 15:07:40 -0800
-Message-ID: <20231126230740.2148636-14-kuba@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231126230740.2148636-1-kuba@kernel.org>
-References: <20231126230740.2148636-1-kuba@kernel.org>
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E97BF;
+	Sun, 26 Nov 2023 15:51:56 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40b479ec4a3so787375e9.2;
+        Sun, 26 Nov 2023 15:51:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701042714; x=1701647514; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqVEiehGB93HQ19d7TI9TDkVLe/UWdQF1ND0VBnLrHk=;
+        b=GHNRa5P+3/OqwKMgXNB8PTtuZUk1bpiWWk1ZYcXtSgcVbsUWZbrMOTRd1ruW0HchCi
+         b7Q+FzWkPYCa+HyE3xIvluDe6HuStT1HyuoICcacjUTR8ka9GhYFaEwsXIID8+1Vyji1
+         bGbRN5yDtoWhjMgTkbVkDC4XV0HiBYKGkMIPLSRFe5huvp2mR7RlWlcmX2kpWMpHeX0X
+         7YogQVQ+k79DjN5S/VBdqPMrRAYzaw+32EBYAzmB/07fSzCSOGZZ3veuITGV3GEAZJth
+         oFprUbreg6gCKR3buIE7MD/UGQJy1/tZFGOJh+1QswoU0oq4Zl6F4cKuTSqIBxjwE3ey
+         wDLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701042714; x=1701647514;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqVEiehGB93HQ19d7TI9TDkVLe/UWdQF1ND0VBnLrHk=;
+        b=FK3Wpqy/b8RTrQ0BpdUsxuT9mmF31zyFISCsHLFQgefIfEF6GDkoOMEKBzW0d+jMiX
+         LChgUSSn+vB6u9ioge2+DhBHEAOTAITr693hVyQmISO3MLen9gnllsjdf0xJkCoVyNts
+         jFQ02ygH8tPm76kZbtpyzBqPJNjnxLWbINB1ONaSx5UqKL5z/18mMvvVzDstMLEozFEX
+         5g37bZLObBzPtyMndn966GSLSLszJX81BfJXMEq7xRtYT6K+VHcWyqEcuGTrS6HuyLAj
+         MdoKzmA45dPcMnAdvh+48fz6/r4mCeRdqL/kTO4CKP93jEvgJS+AN/myJt56Ma3QeJD9
+         H3cA==
+X-Gm-Message-State: AOJu0YyQkUUqPJUHCAN8miti3UPIDmYQ2XKdvlPu9nqWBthCWZS4rnRT
+	4N8zwfKa5X7zzWC5olcTeko=
+X-Google-Smtp-Source: AGHT+IEuERgJ3Qp9kYfoyEeW0rG5YgMuOv2R5JnryymgDer25tFHq/UBBkArqAt8O2QqeI3J8oEnnw==
+X-Received: by 2002:a05:600c:3110:b0:3f5:fff8:d4f3 with SMTP id g16-20020a05600c311000b003f5fff8d4f3mr7381079wmo.7.1701042714126;
+        Sun, 26 Nov 2023 15:51:54 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id m4-20020a05600c4f4400b0040b3dbb5c93sm1202151wmq.1.2023.11.26.15.51.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 15:51:53 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH v2 1/4] net: phy: extend PHY package API to support multiple global address
+Date: Mon, 27 Nov 2023 00:51:38 +0100
+Message-Id: <20231126235141.17996-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,921 +81,338 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Regenerate the tools/ code after netdev spec changes.
+Current API for PHY package are limited to single address to configure
+global settings for the PHY package.
 
-Add sample to query page-pool info in a concise fashion:
+It was found that some PHY package (for example the qca807x, a PHY
+package that is shipped with a bundle of 5 PHY) requires multiple PHY
+address to configure global settings. An example scenario is a PHY that
+have a dedicated PHY for PSGMII/serdes calibrarion and have a specific
+PHY in the package where the global PHY mode is set and affects every
+other PHY in the package.
 
-$ ./page-pool
-    eth0[2]	page pools: 10 (zombies: 0)
-		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
-		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
+Change the API in the following way:
+- Change phy_package_join() to take the base addr of the PHY package
+  instead of the global PHY addr.
+- Make __/phy_package_write/read() require an additional arg that
+  select what global PHY address to use by passing the offset from the
+  base addr passed on phy_package_join().
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Each user of this API is updated to follow this new implementation
+following a pattern where an enum is defined to declare the offset of the
+addr.
+
+We also drop the check if shared is defined as any user of the
+phy_package_read/write is expected to use phy_package_join first. Misuse
+of this will correctly trigger a kernel panic for NULL pointer
+exception.
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- tools/include/uapi/linux/netdev.h     |  36 +++
- tools/net/ynl/generated/netdev-user.c | 419 ++++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h | 171 +++++++++++
- tools/net/ynl/lib/ynl.h               |   2 +-
- tools/net/ynl/samples/.gitignore      |   1 +
- tools/net/ynl/samples/Makefile        |   2 +-
- tools/net/ynl/samples/page-pool.c     | 147 +++++++++
- 7 files changed, 776 insertions(+), 2 deletions(-)
- create mode 100644 tools/net/ynl/samples/page-pool.c
+Changes v2:
+- Make kernel panic if shared is not init (bugged scenario)
+- Fix some confusing comments
 
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 2943a151d4f1..2b37233e00c0 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -64,16 +64,52 @@ enum {
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
- };
+ drivers/net/phy/bcm54140.c       | 16 +++++++++----
+ drivers/net/phy/mscc/mscc.h      |  5 ++++
+ drivers/net/phy/mscc/mscc_main.c |  4 ++--
+ drivers/net/phy/phy_device.c     | 35 ++++++++++++++-------------
+ include/linux/phy.h              | 41 +++++++++++++++++++-------------
+ 5 files changed, 63 insertions(+), 38 deletions(-)
+
+diff --git a/drivers/net/phy/bcm54140.c b/drivers/net/phy/bcm54140.c
+index d43076592f81..2eea3d09b1e6 100644
+--- a/drivers/net/phy/bcm54140.c
++++ b/drivers/net/phy/bcm54140.c
+@@ -128,6 +128,10 @@
+ #define BCM54140_DEFAULT_DOWNSHIFT 5
+ #define BCM54140_MAX_DOWNSHIFT 9
  
-+enum {
-+	NETDEV_A_PAGE_POOL_ID = 1,
-+	NETDEV_A_PAGE_POOL_IFINDEX,
-+	NETDEV_A_PAGE_POOL_NAPI_ID,
-+	NETDEV_A_PAGE_POOL_INFLIGHT,
-+	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
-+	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+
-+	__NETDEV_A_PAGE_POOL_MAX,
-+	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
++enum bcm54140_global_phy {
++	BCM54140_BASE_ADDR = 0,
 +};
 +
-+enum {
-+	NETDEV_A_PAGE_POOL_STATS_INFO = 1,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST = 8,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT,
+ struct bcm54140_priv {
+ 	int port;
+ 	int base_addr;
+@@ -429,11 +433,13 @@ static int bcm54140_base_read_rdb(struct phy_device *phydev, u16 rdb)
+ 	int ret;
+ 
+ 	phy_lock_mdio_bus(phydev);
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_ADDR, rdb);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_ADDR, rdb);
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = __phy_package_read(phydev, MII_BCM54XX_RDB_DATA);
++	ret = __phy_package_read(phydev, BCM54140_BASE_ADDR,
++				 MII_BCM54XX_RDB_DATA);
+ 
+ out:
+ 	phy_unlock_mdio_bus(phydev);
+@@ -446,11 +452,13 @@ static int bcm54140_base_write_rdb(struct phy_device *phydev,
+ 	int ret;
+ 
+ 	phy_lock_mdio_bus(phydev);
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_ADDR, rdb);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_ADDR, rdb);
+ 	if (ret < 0)
+ 		goto out;
+ 
+-	ret = __phy_package_write(phydev, MII_BCM54XX_RDB_DATA, val);
++	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
++				  MII_BCM54XX_RDB_DATA, val);
+ 
+ out:
+ 	phy_unlock_mdio_bus(phydev);
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 7a962050a4d4..6a3d8a754eb8 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -416,6 +416,11 @@ struct vsc8531_private {
+  * gpio_lock: used for PHC operations. Common for all PHYs as the load/save GPIO
+  * is shared.
+  */
 +
-+	__NETDEV_A_PAGE_POOL_STATS_MAX,
-+	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
++enum vsc85xx_global_phy {
++	VSC88XX_BASE_ADDR = 0,
 +};
 +
- enum {
- 	NETDEV_CMD_DEV_GET = 1,
- 	NETDEV_CMD_DEV_ADD_NTF,
- 	NETDEV_CMD_DEV_DEL_NTF,
- 	NETDEV_CMD_DEV_CHANGE_NTF,
-+	NETDEV_CMD_PAGE_POOL_GET,
-+	NETDEV_CMD_PAGE_POOL_ADD_NTF,
-+	NETDEV_CMD_PAGE_POOL_DEL_NTF,
-+	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
-+	NETDEV_CMD_PAGE_POOL_STATS_GET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+ struct vsc85xx_shared_private {
+ 	struct mutex gpio_lock;
  };
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 4171f01d34e5..6f74ce0ab1aa 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -711,7 +711,7 @@ int phy_base_write(struct phy_device *phydev, u32 regnum, u16 val)
+ 		dump_stack();
+ 	}
  
- #define NETDEV_MCGRP_MGMT	"mgmt"
-+#define NETDEV_MCGRP_PAGE_POOL	"page-pool"
- 
- #endif /* _UAPI_LINUX_NETDEV_H */
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index b5ffe8cd1144..a7b7019d00f1 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -18,6 +18,11 @@ static const char * const netdev_op_strmap[] = {
- 	[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf",
- 	[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf",
- 	[NETDEV_CMD_DEV_CHANGE_NTF] = "dev-change-ntf",
-+	[NETDEV_CMD_PAGE_POOL_GET] = "page-pool-get",
-+	[NETDEV_CMD_PAGE_POOL_ADD_NTF] = "page-pool-add-ntf",
-+	[NETDEV_CMD_PAGE_POOL_DEL_NTF] = "page-pool-del-ntf",
-+	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] = "page-pool-change-ntf",
-+	[NETDEV_CMD_PAGE_POOL_STATS_GET] = "page-pool-stats-get",
- };
- 
- const char *netdev_op_str(int op)
-@@ -59,6 +64,16 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
+-	return __phy_package_write(phydev, regnum, val);
++	return __phy_package_write(phydev, VSC88XX_BASE_ADDR, regnum, val);
  }
  
- /* Policies */
-+struct ynl_policy_attr netdev_page_pool_info_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_info_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_MAX,
-+	.table = netdev_page_pool_info_policy,
-+};
-+
- struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
- 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
- 	[NETDEV_A_DEV_PAD] = { .name = "pad", .type = YNL_PT_IGNORE, },
-@@ -72,7 +87,85 @@ struct ynl_policy_nest netdev_dev_nest = {
- 	.table = netdev_dev_policy,
- };
+ /* phydev->bus->mdio_lock should be locked when using this function */
+@@ -722,7 +722,7 @@ int phy_base_read(struct phy_device *phydev, u32 regnum)
+ 		dump_stack();
+ 	}
  
-+struct ynl_policy_attr netdev_page_pool_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+	[NETDEV_A_PAGE_POOL_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_INFLIGHT] = { .name = "inflight", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_INFLIGHT_MEM] = { .name = "inflight-mem", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_DETACH_TIME] = { .name = "detach-time", .type = YNL_PT_UINT, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_MAX,
-+	.table = netdev_page_pool_policy,
-+};
-+
-+struct ynl_policy_attr netdev_page_pool_stats_policy[NETDEV_A_PAGE_POOL_STATS_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_STATS_INFO] = { .name = "info", .type = YNL_PT_NEST, .nest = &netdev_page_pool_info_nest, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST] = { .name = "alloc-fast", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW] = { .name = "alloc-slow", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER] = { .name = "alloc-slow-high-order", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY] = { .name = "alloc-empty", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL] = { .name = "alloc-refill", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE] = { .name = "alloc-waive", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED] = { .name = "recycle-cached", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL] = { .name = "recycle-cache-full", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING] = { .name = "recycle-ring", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL] = { .name = "recycle-ring-full", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT] = { .name = "recycle-released-refcnt", .type = YNL_PT_UINT, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_stats_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_STATS_MAX,
-+	.table = netdev_page_pool_stats_policy,
-+};
-+
- /* Common nested types */
-+void netdev_page_pool_info_free(struct netdev_page_pool_info *obj)
-+{
-+}
-+
-+int netdev_page_pool_info_put(struct nlmsghdr *nlh, unsigned int attr_type,
-+			      struct netdev_page_pool_info *obj)
-+{
-+	struct nlattr *nest;
-+
-+	nest = mnl_attr_nest_start(nlh, attr_type);
-+	if (obj->_present.id)
-+		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, obj->id);
-+	if (obj->_present.ifindex)
-+		mnl_attr_put_u32(nlh, NETDEV_A_PAGE_POOL_IFINDEX, obj->ifindex);
-+	mnl_attr_nest_end(nlh, nest);
-+
-+	return 0;
-+}
-+
-+int netdev_page_pool_info_parse(struct ynl_parse_arg *yarg,
-+				const struct nlattr *nested)
-+{
-+	struct netdev_page_pool_info *dst = yarg->data;
-+	const struct nlattr *attr;
-+
-+	mnl_attr_for_each_nested(attr, nested) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.id = 1;
-+			dst->id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* ============== NETDEV_CMD_DEV_GET ============== */
- /* NETDEV_CMD_DEV_GET - do */
- void netdev_dev_get_req_free(struct netdev_dev_get_req *req)
-@@ -197,6 +290,314 @@ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp)
- 	free(rsp);
+-	return __phy_package_read(phydev, regnum);
++	return __phy_package_read(phydev, VSC88XX_BASE_ADDR, regnum);
  }
  
-+/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_GET - do */
-+void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req)
-+{
-+	free(req);
-+}
-+
-+void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp)
-+{
-+	free(rsp);
-+}
-+
-+int netdev_page_pool_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
-+{
-+	struct netdev_page_pool_get_rsp *dst;
-+	struct ynl_parse_arg *yarg = data;
-+	const struct nlattr *attr;
-+
-+	dst = yarg->data;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.id = 1;
-+			dst->id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_NAPI_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.napi_id = 1;
-+			dst->napi_id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.inflight = 1;
-+			dst->inflight = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT_MEM) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.inflight_mem = 1;
-+			dst->inflight_mem = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_DETACH_TIME) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.detach_time = 1;
-+			dst->detach_time = mnl_attr_get_uint(attr);
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+struct netdev_page_pool_get_rsp *
-+netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_page_pool_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
-+	ys->req_policy = &netdev_page_pool_nest;
-+	yrs.yarg.rsp_policy = &netdev_page_pool_nest;
-+
-+	if (req->_present.id)
-+		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, req->id);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_page_pool_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_page_pool_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - dump */
-+void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp)
-+{
-+	struct netdev_page_pool_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_page_pool_get_list *
-+netdev_page_pool_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_page_pool_get_list);
-+	yds.cb = netdev_page_pool_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
-+	yds.rsp_policy = &netdev_page_pool_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_page_pool_get_list_free(yds.first);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - notify */
-+void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp)
-+{
-+	free(rsp);
-+}
-+
-+/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
-+void
-+netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req)
-+{
-+	netdev_page_pool_info_free(&req->info);
-+	free(req);
-+}
-+
-+void
-+netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp)
-+{
-+	netdev_page_pool_info_free(&rsp->info);
-+	free(rsp);
-+}
-+
-+int netdev_page_pool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
-+					 void *data)
-+{
-+	struct netdev_page_pool_stats_get_rsp *dst;
-+	struct ynl_parse_arg *yarg = data;
-+	const struct nlattr *attr;
-+	struct ynl_parse_arg parg;
-+
-+	dst = yarg->data;
-+	parg.ys = yarg->ys;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_STATS_INFO) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.info = 1;
-+
-+			parg.rsp_policy = &netdev_page_pool_info_nest;
-+			parg.data = &dst->info;
-+			if (netdev_page_pool_info_parse(&parg, attr))
-+				return MNL_CB_ERROR;
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_fast = 1;
-+			dst->alloc_fast = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_slow = 1;
-+			dst->alloc_slow = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_slow_high_order = 1;
-+			dst->alloc_slow_high_order = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_empty = 1;
-+			dst->alloc_empty = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_refill = 1;
-+			dst->alloc_refill = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_waive = 1;
-+			dst->alloc_waive = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_cached = 1;
-+			dst->recycle_cached = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_cache_full = 1;
-+			dst->recycle_cache_full = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_ring = 1;
-+			dst->recycle_ring = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_ring_full = 1;
-+			dst->recycle_ring_full = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_released_refcnt = 1;
-+			dst->recycle_released_refcnt = mnl_attr_get_uint(attr);
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+struct netdev_page_pool_stats_get_rsp *
-+netdev_page_pool_stats_get(struct ynl_sock *ys,
-+			   struct netdev_page_pool_stats_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_page_pool_stats_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
-+	ys->req_policy = &netdev_page_pool_stats_nest;
-+	yrs.yarg.rsp_policy = &netdev_page_pool_stats_nest;
-+
-+	if (req->_present.info)
-+		netdev_page_pool_info_put(nlh, NETDEV_A_PAGE_POOL_STATS_INFO, &req->info);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_page_pool_stats_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_page_pool_stats_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
-+void
-+netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp)
-+{
-+	struct netdev_page_pool_stats_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		netdev_page_pool_info_free(&rsp->obj.info);
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_page_pool_stats_get_list *
-+netdev_page_pool_stats_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_page_pool_stats_get_list);
-+	yds.cb = netdev_page_pool_stats_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
-+	yds.rsp_policy = &netdev_page_pool_stats_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_page_pool_stats_get_list_free(yds.first);
-+	return NULL;
-+}
-+
- static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 	[NETDEV_CMD_DEV_ADD_NTF] =  {
- 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
-@@ -216,6 +617,24 @@ static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 		.policy		= &netdev_dev_nest,
- 		.free		= (void *)netdev_dev_get_ntf_free,
- 	},
-+	[NETDEV_CMD_PAGE_POOL_ADD_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
-+	[NETDEV_CMD_PAGE_POOL_DEL_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
-+	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
- };
- 
- const struct ynl_family ynl_netdev_family =  {
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index 4fafac879df3..4093602c9b6c 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -21,6 +21,16 @@ const char *netdev_xdp_act_str(enum netdev_xdp_act value);
- const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
- 
- /* Common nested types */
-+struct netdev_page_pool_info {
-+	struct {
-+		__u32 id:1;
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u64 id;
-+	__u32 ifindex;
-+};
-+
- /* ============== NETDEV_CMD_DEV_GET ============== */
- /* NETDEV_CMD_DEV_GET - do */
- struct netdev_dev_get_req {
-@@ -87,4 +97,165 @@ struct netdev_dev_get_ntf {
- 
- void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp);
- 
-+/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_GET - do */
-+struct netdev_page_pool_get_req {
-+	struct {
-+		__u32 id:1;
-+	} _present;
-+
-+	__u64 id;
-+};
-+
-+static inline struct netdev_page_pool_get_req *
-+netdev_page_pool_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_page_pool_get_req));
-+}
-+void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req);
-+
-+static inline void
-+netdev_page_pool_get_req_set_id(struct netdev_page_pool_get_req *req, __u64 id)
-+{
-+	req->_present.id = 1;
-+	req->id = id;
-+}
-+
-+struct netdev_page_pool_get_rsp {
-+	struct {
-+		__u32 id:1;
-+		__u32 ifindex:1;
-+		__u32 napi_id:1;
-+		__u32 inflight:1;
-+		__u32 inflight_mem:1;
-+		__u32 detach_time:1;
-+	} _present;
-+
-+	__u64 id;
-+	__u32 ifindex;
-+	__u64 napi_id;
-+	__u64 inflight;
-+	__u64 inflight_mem;
-+	__u64 detach_time;
-+};
-+
-+void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp);
-+
-+/*
-+ * Get / dump information about Page Pools.
-+(Only Page Pools associated with a net_device can be listed.)
-+
-+ */
-+struct netdev_page_pool_get_rsp *
-+netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req);
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - dump */
-+struct netdev_page_pool_get_list {
-+	struct netdev_page_pool_get_list *next;
-+	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp);
-+
-+struct netdev_page_pool_get_list *
-+netdev_page_pool_get_dump(struct ynl_sock *ys);
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - notify */
-+struct netdev_page_pool_get_ntf {
-+	__u16 family;
-+	__u8 cmd;
-+	struct ynl_ntf_base_type *next;
-+	void (*free)(struct netdev_page_pool_get_ntf *ntf);
-+	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp);
-+
-+/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
-+struct netdev_page_pool_stats_get_req {
-+	struct {
-+		__u32 info:1;
-+	} _present;
-+
-+	struct netdev_page_pool_info info;
-+};
-+
-+static inline struct netdev_page_pool_stats_get_req *
-+netdev_page_pool_stats_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_page_pool_stats_get_req));
-+}
-+void
-+netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req);
-+
-+static inline void
-+netdev_page_pool_stats_get_req_set_info_id(struct netdev_page_pool_stats_get_req *req,
-+					   __u64 id)
-+{
-+	req->_present.info = 1;
-+	req->info._present.id = 1;
-+	req->info.id = id;
-+}
-+static inline void
-+netdev_page_pool_stats_get_req_set_info_ifindex(struct netdev_page_pool_stats_get_req *req,
-+						__u32 ifindex)
-+{
-+	req->_present.info = 1;
-+	req->info._present.ifindex = 1;
-+	req->info.ifindex = ifindex;
-+}
-+
-+struct netdev_page_pool_stats_get_rsp {
-+	struct {
-+		__u32 info:1;
-+		__u32 alloc_fast:1;
-+		__u32 alloc_slow:1;
-+		__u32 alloc_slow_high_order:1;
-+		__u32 alloc_empty:1;
-+		__u32 alloc_refill:1;
-+		__u32 alloc_waive:1;
-+		__u32 recycle_cached:1;
-+		__u32 recycle_cache_full:1;
-+		__u32 recycle_ring:1;
-+		__u32 recycle_ring_full:1;
-+		__u32 recycle_released_refcnt:1;
-+	} _present;
-+
-+	struct netdev_page_pool_info info;
-+	__u64 alloc_fast;
-+	__u64 alloc_slow;
-+	__u64 alloc_slow_high_order;
-+	__u64 alloc_empty;
-+	__u64 alloc_refill;
-+	__u64 alloc_waive;
-+	__u64 recycle_cached;
-+	__u64 recycle_cache_full;
-+	__u64 recycle_ring;
-+	__u64 recycle_ring_full;
-+	__u64 recycle_released_refcnt;
-+};
-+
-+void
-+netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp);
-+
-+/*
-+ * Get page pool statistics.
-+ */
-+struct netdev_page_pool_stats_get_rsp *
-+netdev_page_pool_stats_get(struct ynl_sock *ys,
-+			   struct netdev_page_pool_stats_get_req *req);
-+
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
-+struct netdev_page_pool_stats_get_list {
-+	struct netdev_page_pool_stats_get_list *next;
-+	struct netdev_page_pool_stats_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void
-+netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp);
-+
-+struct netdev_page_pool_stats_get_list *
-+netdev_page_pool_stats_get_dump(struct ynl_sock *ys);
-+
- #endif /* _LINUX_NETDEV_GEN_H */
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index e974378e3b8c..075d868f3b57 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -239,7 +239,7 @@ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
- #ifndef MNL_HAS_AUTO_SCALARS
- static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
+ u32 vsc85xx_csr_read(struct phy_device *phydev,
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 478126f6b5bc..424cbb13de13 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1648,20 +1648,22 @@ EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
+ /**
+  * phy_package_join - join a common PHY group
+  * @phydev: target phy_device struct
+- * @addr: cookie and PHY address for global register access
++ * @base_addr: cookie and base PHY address of PHY package for offset
++ *   calculation of global register access
+  * @priv_size: if non-zero allocate this amount of bytes for private data
+  *
+  * This joins a PHY group and provides a shared storage for all phydevs in
+  * this group. This is intended to be used for packages which contain
+  * more than one PHY, for example a quad PHY transceiver.
+  *
+- * The addr parameter serves as a cookie which has to have the same value
+- * for all members of one group and as a PHY address to access generic
+- * registers of a PHY package. Usually, one of the PHY addresses of the
+- * different PHYs in the package provides access to these global registers.
++ * The base_addr parameter serves as cookie which has to have the same values
++ * for all members of one group and as the base PHY address of the PHY package
++ * for offset calculation to access generic registers of a PHY package.
++ * Usually, one of the PHY addresses of the different PHYs in the package
++ * provides access to these global registers.
+  * The address which is given here, will be used in the phy_package_read()
+- * and phy_package_write() convenience functions. If your PHY doesn't have
+- * global registers you can just pick any of the PHY addresses.
++ * and phy_package_write() convenience functions as base and added to the
++ * passed offset in those functions.
+  *
+  * This will set the shared pointer of the phydev to the shared storage.
+  * If this is the first call for a this cookie the shared storage will be
+@@ -1671,17 +1673,17 @@ EXPORT_SYMBOL_GPL(phy_driver_is_genphy_10g);
+  * Returns < 1 on error, 0 on success. Esp. calling phy_package_join()
+  * with the same cookie but a different priv_size is an error.
+  */
+-int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size)
++int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size)
  {
--	if (mnl_attr_get_len(attr) == 4)
-+	if (mnl_attr_get_payload_len(attr) == 4)
- 		return mnl_attr_get_u32(attr);
- 	return mnl_attr_get_u64(attr);
+ 	struct mii_bus *bus = phydev->mdio.bus;
+ 	struct phy_package_shared *shared;
+ 	int ret;
+ 
+-	if (addr < 0 || addr >= PHY_MAX_ADDR)
++	if (base_addr < 0 || base_addr >= PHY_MAX_ADDR)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&bus->shared_lock);
+-	shared = bus->shared[addr];
++	shared = bus->shared[base_addr];
+ 	if (!shared) {
+ 		ret = -ENOMEM;
+ 		shared = kzalloc(sizeof(*shared), GFP_KERNEL);
+@@ -1693,9 +1695,9 @@ int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size)
+ 				goto err_free;
+ 			shared->priv_size = priv_size;
+ 		}
+-		shared->addr = addr;
++		shared->base_addr = base_addr;
+ 		refcount_set(&shared->refcnt, 1);
+-		bus->shared[addr] = shared;
++		bus->shared[base_addr] = shared;
+ 	} else {
+ 		ret = -EINVAL;
+ 		if (priv_size && priv_size != shared->priv_size)
+@@ -1733,7 +1735,7 @@ void phy_package_leave(struct phy_device *phydev)
+ 		return;
+ 
+ 	if (refcount_dec_and_mutex_lock(&shared->refcnt, &bus->shared_lock)) {
+-		bus->shared[shared->addr] = NULL;
++		bus->shared[shared->base_addr] = NULL;
+ 		mutex_unlock(&bus->shared_lock);
+ 		kfree(shared->priv);
+ 		kfree(shared);
+@@ -1752,7 +1754,8 @@ static void devm_phy_package_leave(struct device *dev, void *res)
+  * devm_phy_package_join - resource managed phy_package_join()
+  * @dev: device that is registering this PHY package
+  * @phydev: target phy_device struct
+- * @addr: cookie and PHY address for global register access
++ * @base_addr: cookie and base PHY address of PHY package for offset
++ *   calculation of global register access
+  * @priv_size: if non-zero allocate this amount of bytes for private data
+  *
+  * Managed phy_package_join(). Shared storage fetched by this function,
+@@ -1760,7 +1763,7 @@ static void devm_phy_package_leave(struct device *dev, void *res)
+  * phy_package_join() for more information.
+  */
+ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+-			  int addr, size_t priv_size)
++			  int base_addr, size_t priv_size)
+ {
+ 	struct phy_device **ptr;
+ 	int ret;
+@@ -1770,7 +1773,7 @@ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+ 	if (!ptr)
+ 		return -ENOMEM;
+ 
+-	ret = phy_package_join(phydev, addr, priv_size);
++	ret = phy_package_join(phydev, base_addr, priv_size);
+ 
+ 	if (!ret) {
+ 		*ptr = phydev;
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e5f1f41e399c..51702e349d83 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -327,7 +327,8 @@ struct mdio_bus_stats {
+ 
+ /**
+  * struct phy_package_shared - Shared information in PHY packages
+- * @addr: Common PHY address used to combine PHYs in one package
++ * @base_addr: Base PHY address of PHY package used to combine PHYs
++ *   in one package and for offset calculation of phy_package_read/write
+  * @refcnt: Number of PHYs connected to this shared data
+  * @flags: Initialization of PHY package
+  * @priv_size: Size of the shared private data @priv
+@@ -338,7 +339,7 @@ struct mdio_bus_stats {
+  * phy_package_leave().
+  */
+ struct phy_package_shared {
+-	int addr;
++	int base_addr;
+ 	refcount_t refcnt;
+ 	unsigned long flags;
+ 	size_t priv_size;
+@@ -1972,10 +1973,10 @@ int phy_ethtool_get_link_ksettings(struct net_device *ndev,
+ int phy_ethtool_set_link_ksettings(struct net_device *ndev,
+ 				   const struct ethtool_link_ksettings *cmd);
+ int phy_ethtool_nway_reset(struct net_device *ndev);
+-int phy_package_join(struct phy_device *phydev, int addr, size_t priv_size);
++int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size);
+ void phy_package_leave(struct phy_device *phydev);
+ int devm_phy_package_join(struct device *dev, struct phy_device *phydev,
+-			  int addr, size_t priv_size);
++			  int base_addr, size_t priv_size);
+ 
+ int __init mdio_bus_init(void);
+ void mdio_bus_exit(void);
+@@ -1998,46 +1999,54 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+ 		       struct kernel_hwtstamp_config *config,
+ 		       struct netlink_ext_ack *extack);
+ 
+-static inline int phy_package_read(struct phy_device *phydev, u32 regnum)
++static inline int phy_package_read(struct phy_device *phydev,
++				   unsigned int addr_offset, u32 regnum)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return mdiobus_read(phydev->mdio.bus, shared->addr, regnum);
++	return mdiobus_read(phydev->mdio.bus, addr, regnum);
  }
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 2aae60c4829f..49637b26c482 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -1,3 +1,4 @@
- ethtool
- devlink
- netdev
-+page-pool
-\ No newline at end of file
-diff --git a/tools/net/ynl/samples/Makefile b/tools/net/ynl/samples/Makefile
-index 3dbb106e87d9..1afefc266b7a 100644
---- a/tools/net/ynl/samples/Makefile
-+++ b/tools/net/ynl/samples/Makefile
-@@ -18,7 +18,7 @@ include $(wildcard *.d)
  
- all: $(BINS)
+-static inline int __phy_package_read(struct phy_device *phydev, u32 regnum)
++static inline int __phy_package_read(struct phy_device *phydev,
++				     unsigned int addr_offset, u32 regnum)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
  
--$(BINS): ../lib/ynl.a ../generated/protos.a
-+$(BINS): ../lib/ynl.a ../generated/protos.a $(SRCS)
- 	@echo -e '\tCC sample $@'
- 	@$(COMPILE.c) $(CFLAGS_$@) $@.c -o $@.o
- 	@$(LINK.c) $@.o -o $@  $(LDLIBS)
-diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
-new file mode 100644
-index 000000000000..18d359713469
---- /dev/null
-+++ b/tools/net/ynl/samples/page-pool.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE
-+
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <ynl.h>
-+
-+#include <net/if.h>
-+
-+#include "netdev-user.h"
-+
-+struct stat {
-+	unsigned int ifc;
-+
-+	struct {
-+		unsigned int cnt;
-+		size_t refs, bytes;
-+	} live[2];
-+
-+	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
-+};
-+
-+struct stats_array {
-+	unsigned int i, max;
-+	struct stat *s;
-+};
-+
-+static struct stat *find_ifc(struct stats_array *a, unsigned int ifindex)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < a->i; i++) {
-+		if (a->s[i].ifc == ifindex)
-+			return &a->s[i];
-+	}
-+
-+	a->i++;
-+	if (a->i == a->max) {
-+		a->max *= 2;
-+		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
-+	}
-+	a->s[i].ifc = ifindex;
-+	return &a->s[i];
-+}
-+
-+static void count(struct stat *s, unsigned int l,
-+		  struct netdev_page_pool_get_rsp *pp)
-+{
-+	s->live[l].cnt++;
-+	if (pp->_present.inflight)
-+		s->live[l].refs += pp->inflight;
-+	if (pp->_present.inflight_mem)
-+		s->live[l].bytes += pp->inflight_mem;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct netdev_page_pool_stats_get_list *pp_stats;
-+	struct netdev_page_pool_get_list *pools;
-+	struct stats_array a = {};
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return 1;
-+	}
-+
-+	a.max = 128;
-+	a.s = calloc(a.max, sizeof(*a.s));
-+	if (!a.s)
-+		goto err_close;
-+
-+	pools = netdev_page_pool_get_dump(ys);
-+	if (!pools)
-+		goto err_free;
-+
-+	ynl_dump_foreach(pools, pp) {
-+		struct stat *s = find_ifc(&a, pp->ifindex);
-+
-+		count(s, 1, pp);
-+		if (pp->_present.destroyed)
-+			count(s, 0, pp);
-+	}
-+	netdev_page_pool_get_list_free(pools);
-+
-+	pp_stats = netdev_page_pool_stats_get_dump(ys);
-+	if (!pp_stats)
-+		goto err_free;
-+
-+	ynl_dump_foreach(pp_stats, pp) {
-+		struct stat *s = find_ifc(&a, pp->info.ifindex);
-+
-+		if (pp->_present.alloc_fast)
-+			s->alloc_fast += pp->alloc_fast;
-+		if (pp->_present.alloc_slow)
-+			s->alloc_slow += pp->alloc_slow;
-+		if (pp->_present.recycle_ring)
-+			s->recycle_ring += pp->recycle_ring;
-+		if (pp->_present.recycle_cached)
-+			s->recycle_cache += pp->recycle_cached;
-+	}
-+	netdev_page_pool_stats_get_list_free(pp_stats);
-+
-+	for (unsigned int i = 0; i < a.i; i++) {
-+		char ifname[IF_NAMESIZE];
-+		struct stat *s = &a.s[i];
-+		const char *name;
-+		double recycle;
-+
-+		if (!s->ifc) {
-+			name = "<orphan>\t";
-+		} else {
-+			name = if_indextoname(s->ifc, ifname);
-+			if (name)
-+				printf("%8s", name);
-+			printf("[%d]\t", s->ifc);
-+		}
-+
-+		printf("page pools: %u (zombies: %u)\n",
-+		       s->live[1].cnt, s->live[0].cnt);
-+		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
-+		       s->live[1].refs, s->live[1].bytes,
-+		       s->live[0].refs, s->live[0].bytes);
-+
-+		/* We don't know how many pages are sitting in cache and ring
-+		 * so we will under-count the recycling rate a bit.
-+		 */
-+		recycle = (double)(s->recycle_ring + s->recycle_cache) /
-+			(s->alloc_fast + s->alloc_slow) * 100;
-+		printf("\t\trecycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)\n",
-+		       recycle, s->alloc_slow, s->alloc_fast,
-+		       s->recycle_ring, s->recycle_cache);
-+	}
-+
-+	ynl_sock_destroy(ys);
-+	return 0;
-+
-+err_free:
-+	free(a.s);
-+err_close:
-+	fprintf(stderr, "YNL: %s\n", ys->err.msg);
-+	ynl_sock_destroy(ys);
-+	return 2;
-+}
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return __mdiobus_read(phydev->mdio.bus, shared->addr, regnum);
++	return __mdiobus_read(phydev->mdio.bus, addr, regnum);
+ }
+ 
+ static inline int phy_package_write(struct phy_device *phydev,
+-				    u32 regnum, u16 val)
++				    unsigned int addr_offset, u32 regnum,
++				    u16 val)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return mdiobus_write(phydev->mdio.bus, shared->addr, regnum, val);
++	return mdiobus_write(phydev->mdio.bus, addr, regnum, val);
+ }
+ 
+ static inline int __phy_package_write(struct phy_device *phydev,
+-				      u32 regnum, u16 val)
++				      unsigned int addr_offset, u32 regnum,
++				      u16 val)
+ {
+ 	struct phy_package_shared *shared = phydev->shared;
++	int addr = shared->base_addr + addr_offset;
+ 
+-	if (!shared)
++	if (addr >= PHY_MAX_ADDR)
+ 		return -EIO;
+ 
+-	return __mdiobus_write(phydev->mdio.bus, shared->addr, regnum, val);
++	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
+ }
+ 
+ static inline bool __phy_package_set_once(struct phy_device *phydev,
 -- 
-2.42.0
+2.40.1
 
 
