@@ -1,186 +1,115 @@
-Return-Path: <netdev+bounces-51083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C0D7F907C
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:38:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D607F9084
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 01:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72AB51C20C2B
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:38:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2C83B20F90
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 00:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7FB1111;
-	Sun, 26 Nov 2023 00:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA11A5A;
+	Sun, 26 Nov 2023 00:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqCtQy9x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ajEzRZqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E6C182;
-	Sat, 25 Nov 2023 16:37:59 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-332d2b6a84cso2118174f8f.0;
-        Sat, 25 Nov 2023 16:37:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700959077; x=1701563877; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1uPUXkFTFTY3wjyppF4kZdPmBYcUNyv8eWABZcZLvEU=;
-        b=dqCtQy9xgG5eo3lWyOVCPujrfXvDkvzHwAlLoMtWgFom2c5zBciE+6ta28FmYAnjJj
-         7ynfMKXA5WCJBakigtwReQJoECIGerjMcZsngMUdoC+iDWpsh5Fy1y6Iu8yqiW1A6yA+
-         SCQjcp7F/Hxm9v+YwG8Jlkm3BNAntfTrlDFzqR+rvjiPXHkAiGeuxIXGhhuYTmzPC4wY
-         qUY84+Cc4N23AvCdwRhh7Hbmmu0Hn/expUrGqZsDLbbGSNiiebgLxXTZtM1r0Bpgxgj2
-         Ha6+ObIxcvBeElM0cvgodvjm4qwj3YPOrKPlFMSHWmRH89SlL8I7eDBoulU5xDhqhlpG
-         4/8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700959077; x=1701563877;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1uPUXkFTFTY3wjyppF4kZdPmBYcUNyv8eWABZcZLvEU=;
-        b=a41u3qlvnBbMgnr1tRXZFw2JMupn7d9Pm3z7AON4cVrjfosrojSiZIfzNsgQZY0I4g
-         LFS1O42slvIBLdq3bPUyAVf271N3i+0nNOK7DdFgrVqf81jYGBHB3ioACt+n1PcuZ8U6
-         TGP/bA1wnmxXoEkFF8M9V5y4bS8TMm0ijQSbrfqT8xZg+JRVd77cR1b94ZUtK7zB8bLS
-         4CPrsLumBvNUFUOWb3ZE1k94RjBLbCCFUPI5Bc2C4kqMsPw3aA/k5QVdlU1dHSYVCT23
-         qk4Se03QM5EfarHwHIv82PYBT4DXkTlW9qi/SUt0NbySwWxjAtiNf9sfMzt2LYfdjd1l
-         g3nA==
-X-Gm-Message-State: AOJu0YzcvZtXNizTBFgZU9WKE3ulrA8IUoXeiNu8JInDYncpNn6lyxKv
-	4Bgo9taZBhkb6tLt8gim6l0=
-X-Google-Smtp-Source: AGHT+IFbjCVaPkKuump1gsxBNZe2guiftP25Uvws8RLzuh7OnwNLqC2X/9V7y2UNRbD1wave5mjM+w==
-X-Received: by 2002:adf:fd48:0:b0:332:e9f7:9a99 with SMTP id h8-20020adffd48000000b00332e9f79a99mr4703218wrs.43.1700959077474;
-        Sat, 25 Nov 2023 16:37:57 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id v19-20020adfd053000000b0032f9688ea48sm7735249wrh.10.2023.11.25.16.37.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Nov 2023 16:37:57 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH 3/3] net: phy: add support for PHY package MMD read/write
-Date: Sun, 26 Nov 2023 01:37:48 +0100
-Message-Id: <20231126003748.9600-3-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231126003748.9600-1-ansuelsmth@gmail.com>
-References: <20231126003748.9600-1-ansuelsmth@gmail.com>
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ba])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 395B0133
+	for <netdev@vger.kernel.org>; Sat, 25 Nov 2023 16:52:01 -0800 (PST)
+Message-ID: <0f210cef-c6e9-41c1-9ba8-225f046435e5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700959920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NPg+/Q1bfdSOekshqxIavDgK/xM+ZX8z48MtbsXRZC0=;
+	b=ajEzRZqYRvm0a8tqOnR9BhAiabu7ctEBf1vosMXD+gbq/fKZPgDo0ZHXLOCxYbD5mxFGHC
+	QmdB4wjhWfSaaTgEpk5zg7m9Sh7NKSRDEOhPDFGzLruUks42SOo8suBz1ZY032FYOGZ6cf
+	SbdeooZLsqotxux1If0H6Y/nxbnhHzQ=
+Date: Sat, 25 Nov 2023 16:51:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
+ CO-RE relocations
+Content-Language: en-GB
+To: Daniel Xu <dxu@dxuuu.xyz>, shuah@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, ast@kernel.org, steffen.klassert@secunet.com,
+ antony.antony@secunet.com, alexei.starovoitov@gmail.com,
+ Eddy Z <eddyz87@gmail.com>
+Cc: mykolal@fb.com, martin.lau@linux.dev, song@kernel.org,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devel@linux-ipsec.org, netdev@vger.kernel.org
+References: <cover.1700676682.git.dxu@dxuuu.xyz>
+ <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Some PHY in PHY package may require to read/write MMD regs to correctly
-configure the PHY package.
 
-Add support for these additional required function in both lock and no
-lock variant.
+On 11/22/23 1:20 PM, Daniel Xu wrote:
+> Switching to vmlinux.h definitions seems to make the verifier very
+> unhappy with bitfield accesses. The error is:
+>
+>      ; md.u.md2.dir = direction;
+>      33: (69) r1 = *(u16 *)(r2 +11)
+>      misaligned stack access off (0x0; 0x0)+-64+11 size 2
+>
+> It looks like disabling CO-RE relocations seem to make the error go
+> away.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- include/linux/phy.h | 74 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+Thanks for reporting. I did some preliminary investigation and the
+failure is due to that we do not support CORE-based bitfield store
+yet. Besides disabling CORE-relocation as in this patch, there
+are a few ways to do this:
+   - Change the code to avoid bitfield store and use 1/2/4/8 byte(s)
+     store. A little bit ugly but it should work.
+   - Use to-be-supported 'preserve_static_offset'
+     (https://reviews.llvm.org/D133361)
+     to preserve the offset. This might work (I didn't
+     try it yet).
+   - Eduard did some early study trying to remove CORE attribute
+     (preserve_access_index) from UAPI structures. In this particular
+     case, erspan_metadata is in /usr/include/linux/erspan.h.
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 984bca9a82f4..1799133c8387 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2067,6 +2067,80 @@ static inline int __phy_package_write(struct phy_device *phydev,
- 	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
- }
- 
-+static inline int phy_package_read_mmd(struct phy_device *phydev,
-+				       unsigned int addr_offset, int devad,
-+				       u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr, val;
-+
-+	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	addr = shared->base_addr + addr_offset;
-+
-+	phy_lock_mdio_bus(phydev);
-+	mmd_phy_indirect(bus, addr, devad, regnum);
-+	val = __mdiobus_read(bus, addr, MII_MMD_DATA);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return val;
-+}
-+
-+static inline int __phy_package_read_mmd(struct phy_device *phydev,
-+					 unsigned int addr_offset, int devad,
-+					 u32 regnum)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr;
-+
-+	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	addr = shared->base_addr + addr_offset;
-+	mmd_phy_indirect(bus, addr, devad, regnum);
-+	return __mdiobus_read(bus, addr, MII_MMD_DATA);
-+}
-+
-+static inline int phy_package_write_mmd(struct phy_device *phydev,
-+					unsigned int addr_offset, int devad,
-+					u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr, ret;
-+
-+	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	addr = shared->base_addr + addr_offset;
-+
-+	phy_lock_mdio_bus(phydev);
-+	mmd_phy_indirect(bus, addr, devad, regnum);
-+	ret = __mdiobus_write(bus, addr, MII_MMD_DATA, val);
-+	phy_unlock_mdio_bus(phydev);
-+
-+	return ret;
-+}
-+
-+static inline int __phy_package_write_mmd(struct phy_device *phydev,
-+					  unsigned int addr_offset, int devad,
-+					  u32 regnum, u16 val)
-+{
-+	struct phy_package_shared *shared = phydev->shared;
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr;
-+
-+	if (!shared || shared->base_addr + addr_offset > PHY_MAX_ADDR)
-+		return -EIO;
-+
-+	addr = shared->base_addr + addr_offset;
-+	mmd_phy_indirect(bus, addr, devad, regnum);
-+	return __mdiobus_write(bus, addr, MII_MMD_DATA, val);
-+}
-+
- static inline bool __phy_package_set_once(struct phy_device *phydev,
- 					  unsigned int b)
- {
--- 
-2.40.1
+We will also investigate whether we could store bitfield store
+directly with CORE.
 
+>
+> Co-developed-by: Antony Antony <antony.antony@secunet.com>
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ---
+>   tools/testing/selftests/bpf/progs/test_tunnel_kern.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> index 3065a716544d..ec7e04e012ae 100644
+> --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+> @@ -6,6 +6,7 @@
+>    * modify it under the terms of version 2 of the GNU General Public
+>    * License as published by the Free Software Foundation.
+>    */
+> +#define BPF_NO_PRESERVE_ACCESS_INDEX
+
+This is a temporary workaround and hopefully we can lift it in the
+near future. Please add a comment here with prefix 'Workaround' to
+explain why this is needed and later on we can earliy search the
+keyword and remember to tackle this.
+
+>   #include "vmlinux.h"
+>   #include <bpf/bpf_helpers.h>
+>   #include <bpf/bpf_endian.h>
 
