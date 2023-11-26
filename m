@@ -1,45 +1,56 @@
-Return-Path: <netdev+bounces-51127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026667F9474
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 18:14:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7616B7F9478
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 18:15:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B561B1F20EE7
-	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 17:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D6428114C
+	for <lists+netdev@lfdr.de>; Sun, 26 Nov 2023 17:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020BDDDC3;
-	Sun, 26 Nov 2023 17:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D377DDD5;
+	Sun, 26 Nov 2023 17:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tuBhHgzH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+aU8f2I"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EB6FA;
-	Sun, 26 Nov 2023 09:14:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RdIudcP1oq+zY0g0sLYUC7kZO/VnWzdwxsQtDjsyiRc=; b=tuBhHgzHAWCR9J7VB1MLndQiOS
-	NFt9FRodtLaiMV9YtxlaGS7AVtZWczMGvGgF0IoA7r6udEpOv47CUqQANYeQfI4YrtS929nMgJhK2
-	hISLUT79kWfZMaYjumXdY7TV2/Vy0h/zrAjWd5JsMqDF7OOH1p5n/tnN03WISoW215/U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r7Ihf-001GDJ-Fc; Sun, 26 Nov 2023 18:13:55 +0100
-Date: Sun, 26 Nov 2023 18:13:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: nicolas.ferre@microchip.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, jgarzik@pobox.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: macb: Unregister nedev before MDIO bus in remove
-Message-ID: <086fc661-0974-4bb6-a8ae-daa9d53361d9@lunn.ch>
-References: <20231126141046.3505343-1-claudiu.beznea@tuxon.dev>
- <20231126141046.3505343-3-claudiu.beznea@tuxon.dev>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B0146A2;
+	Sun, 26 Nov 2023 17:15:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042C9C433C8;
+	Sun, 26 Nov 2023 17:15:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701018911;
+	bh=guVv+SEh7voPe2lgiNwr2YxQ6n/2ttB7Jl8kD59Z9ns=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n+aU8f2Idan4hvme0PSqL3UB30oSCZAmsROFTkYB/x0oz55+PioQdveGhsSpyB+Gg
+	 Ao02FxaGghJ3KJ9k6uMouBvIG+e6m5I9yhuCU6LuLmWqcADv4G8U8eL4aJkNDC+YIQ
+	 XTdpCGoRdeH4I8wO8UqaqbCwhVMaWBYwsOawfO8tEhgNcuMfGhJg/uhgMqpa8yrtzh
+	 ZhwqGJa8nuLGjvB2npGydeEeoFvI7a4ppFq1Bcimv+M0bu6Ha+Qc4etfv5GmVwf+4a
+	 RySa2qmCM4qyuWUPqwNhsyDGpZsf/s6mepEecEp6iJr8e1PdDanUDJI/K1kawrvGQW
+	 4xrhLrBAWJLZw==
+Date: Sun, 26 Nov 2023 17:15:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: longli@linuxonhyperv.com
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: Re: [Patch v1 2/4] RDMA/mana_ib: create and process EQ events
+Message-ID: <20231126171504.GC84723@kernel.org>
+References: <1700709010-22042-1-git-send-email-longli@linuxonhyperv.com>
+ <1700709010-22042-3-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,33 +59,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231126141046.3505343-3-claudiu.beznea@tuxon.dev>
+In-Reply-To: <1700709010-22042-3-git-send-email-longli@linuxonhyperv.com>
 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index cebae0f418f2..73d041af3de1 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -5165,11 +5165,11 @@ static void macb_remove(struct platform_device *pdev)
+On Wed, Nov 22, 2023 at 07:10:08PM -0800, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> Before the software can create an RDMA adapter handle with SoC, it needs to
+> create EQs for processing SoC events from RDMA device. Because MSI-X
+> vectors are shared between MANA Ethernet device and RDMA device, this
+> patch adds support to share EQs on MSI-X vectors and creates management
+> EQ for RDMA device.
+> 
+> Signed-off-by: Long Li <longli@microsoft.com>
+
+...
+
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+
+...
+
+> -static void mana_gd_deregiser_irq(struct gdma_queue *queue)
+> +static void mana_gd_deregister_irq(struct gdma_queue *queue)
+>  {
+>  	struct gdma_dev *gd = queue->gdma_dev;
+>  	struct gdma_irq_context *gic;
+>  	struct gdma_context *gc;
+>  	struct gdma_resource *r;
+>  	unsigned int msix_index;
+> +	struct gdma_queue *eq;
+>  	unsigned long flags;
+> +	struct list_head *p;
 >  
->  	if (dev) {
->  		bp = netdev_priv(dev);
-> +		unregister_netdev(dev);
->  		phy_exit(bp->sgmii_phy);
->  		mdiobus_unregister(bp->mii_bus);
->  		mdiobus_free(bp->mii_bus);
+>  	gc = gd->gdma_context;
+>  	r = &gc->msix_resource;
+> @@ -505,14 +507,24 @@ static void mana_gd_deregiser_irq(struct gdma_queue *queue)
+>  	if (WARN_ON(msix_index >= gc->num_msix_usable))
+>  		return;
 >  
-> -		unregister_netdev(dev);
->  		tasklet_kill(&bp->hresp_err_tasklet);
+> +	spin_lock_irqsave(&r->lock, flags);
+> +
+>  	gic = &gc->irq_contexts[msix_index];
+> -	gic->handler = NULL;
+> -	gic->arg = NULL;
+> +	list_for_each_rcu(p, &gic->eq_list) {
+> +		eq = list_entry(p, struct gdma_queue, entry);
+
+Hi Long Li,
+
+Sparse complains a bit about this construction:
+
+ .../gdma_main.c:513:9: error: incompatible types in comparison expression (different address spaces):
+ .../gdma_main.c:513:9:    struct list_head [noderef] __rcu *
+ .../gdma_main.c:513:9:    struct list_head *
+ .../gdma_main.c:513:9: error: incompatible types in comparison expression (different address spaces):
+ .../gdma_main.c:513:9:    struct list_head [noderef] __rcu *
+ .../gdma_main.c:513:9:    struct list_head *
+
+Perhaps using list_for_each_entry_rcu() is appropriate here.
 
 
-I don't know this driver...
+> +		if (queue == eq) {
+> +			list_del(&eq->entry);
+> +			synchronize_rcu();
+> +			break;
+> +		}
+> +	}
+>  
+> -	spin_lock_irqsave(&r->lock, flags);
+> -	bitmap_clear(r->map, msix_index, 1);
+> -	spin_unlock_irqrestore(&r->lock, flags);
+> +	if (list_empty(&gic->eq_list)) {
+> +		gic->handler = NULL;
+> +		bitmap_clear(r->map, msix_index, 1);
+> +	}
+>  
+> +	spin_unlock_irqrestore(&r->lock, flags);
+>  	queue->eq.msix_index = INVALID_PCI_MSIX_INDEX;
+>  }
+>  
 
-What does this tasklet do? Is it safe for it to run after the netdev
-is unregistered, and the PHY and the mdio bus is gone? Maybe this
-tasklet_kill should be after the interrupt is disabled, but before the
-netdev is unregistered?
-
-If you have one bug here, there might be others.
-
-	Andrew
+...
 
