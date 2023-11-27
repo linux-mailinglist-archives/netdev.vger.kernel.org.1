@@ -1,207 +1,178 @@
-Return-Path: <netdev+bounces-51305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B287FA0B9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:18:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E56837FA11A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48952812FE
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:18:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDA83B20DD8
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD19B2D616;
-	Mon, 27 Nov 2023 13:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5C22EB0F;
+	Mon, 27 Nov 2023 13:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aH7cXdUf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LJeG2cWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2043.outbound.protection.outlook.com [40.107.102.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B8718B
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:17:59 -0800 (PST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17C491;
+	Mon, 27 Nov 2023 05:29:23 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H3gm/xSCd/mwOtQtFs+b2eDoLV3viqZAP6afuA5zCRtL3onNufnxaqMvZvm7KYAddAZg1Oh48Gll3kTFwRPNGyB1wlwnRMjXjhS6GSCi643HpPQSUCIfKqiAw6g+JRVcnyzIfm8MFugMH/THrkZ+NDT+zX5/FRDiDVdB/HoyIHpwVXGmuvOFjesX3mSbd+4gWko1aKU7pjUXOKxpVGyB4kdx+x6PQg1idOS1oPBUIwHplGDFZxcMb8M4uwx6n9iAthQaXlmH2jBe1zkvCBS0C5w4+gQi5GpCnR/+Ozq45Yp1cSGen2o9OWFInXuA1s77llolQ5xJ5KtG4VWfumdBUA==
+ b=XvedOg7JyELroDurQOp1DFYAKdq/JJAboSyqFiPoaShuWf2KA/TEEdist+Bn/g3tPVBbd3J8znqxDECJzqqEXQCNu1U19bRjj6W3+cUppH+p21D8pU4x6pSQo+dDf9XEVYqzOEHy4QaZLb6MvRqpaxvGbnBHK73nznrlIHmA6CdG5DrzmfpYkbTyDKM3PZ3OWw1OK1GMp6C1ufeDGH3sv6T6fusB3ttOZpnlWvlFM7XQAcj0XT7vl4Cldlr0SoeV43XAvM1qwEh+iuY0GLVPnqj58SEgHZhIeWa6y3bDN0+eZJLkP8UNFDe9NkTEw1RpjcO9+cZTPXm3tSbm4hVfwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=POyqEmEV+a6JvD4q17W8Fxxfri53i5zTzOHnGhxwByg=;
- b=eVKzA0MYdSTsbcNQY7XVAYkwtd0t0v8MqwypjeBW92MU/jcfcUgSJL8yJgdtiW7d9q6mV0GEWAsUsvNeDr7hb2L2EbWsP2+vHzYtZvzHpPqUnvHMzeJwpWrxHv0VaXhj7SK2uq7FZoJtwmTwQlCfgLhXmWzsMgwboRXE6SWymJZ5XF7B1am6AQeGKrgyZvFtnvyeM/l8gBAAyYAtCzOXWKjlCsbB32Vft5CIxJfFuk5yV4bsAN7foZk7YuhmPZraWwMGqcFLc2FviQJF1PE/1MREzUTMjvGR+7LmVSPf25vxO0IeISeu1GY1IvR66qW2fWqDtmFJAxS18mxSSL2rVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=kk89eI99pWaDAwDwDPT3JxQC/MfwIytQZmRoXyJhDq8=;
+ b=cdDPT2E06uNdrDSZBGAYDjY7XT5LyLcMmqIOIf2veOq7SPcZrK3exw4m1vJWkgdyEOCerxXVjOqn5B7HmLFitn1KwSbNBdLcywfNyzh6y/X+w/oU2t1P9fApbmEgp6IVV3xJ5vTEp1p049S8l14lc0fa+4E8/lOv4S/dPMvUPB3HZ85AsYBXtX8RcDoFm3PzPCCvnLUWF6Dt+bzIkd+eCvyiUG60IBszuIQbGDeSyQuWx/fnHisaezblh1DJyxSKv6Fms5/oh2XpeMVXHKTjfkGIEMuxT7wbOCBJ7SlZJrtKBZcrm8hJRAVJrcCaPanqG2FyjklLSE5nWhdH3+D9aA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=POyqEmEV+a6JvD4q17W8Fxxfri53i5zTzOHnGhxwByg=;
- b=aH7cXdUfczQyChaoY/N2A7W1iwedfi933AQP5UsXLyGNLJymfWai8UD/akWgH90sF98lLXObTvi7M89gMB3HXIFWVNbbiVcggdciWIn3aq60QRutwssS3ioOsRO9EQ/odJEocxEEEz2sHygm+4W1hGx4a+cLLHeB6ABqiB4ZiGS0J3blunp6yARTEz+Kmn3lY+H+x23ZSo68mdxCiBwO3xYa0Zsxfdgh2uR5Pm2tauXgDvNLyOmy5vbzN+K4OTD6Ddp9M8DfVDdmJK6XXskuQwtMUIVMVVHOGRjTdzAvzwP7b9rjzu41lWKZKLyIiblZJluxZ7oBCOu5p3j6WuW9EQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by PH7PR12MB7987.namprd12.prod.outlook.com (2603:10b6:510:27c::21) with
+ bh=kk89eI99pWaDAwDwDPT3JxQC/MfwIytQZmRoXyJhDq8=;
+ b=LJeG2cWsvpOQdV3owhIKBrTgkTjDxSzoAI32qNhcbV2PqNcdJdBJ/Ds9/BH+6erS4TklV0lGIrwhG/aZcUHiEf+5HX9JyfTJ9Q5l+3bGD6sojtlJCLTMM1eU/iYhXq6dF5op1JRllUUx9kuYMpNp8aNqvN0qOrHvW17z5fgD5eElBY+f6cPPu4EfC+oUzeBzQqFYc5ELiLzgIlXxIcyMhn3Eo1vMCa9FHyXZDpUDBJy6BvYer6fyJJxlWSAjkdh7pz+bRBmWR24AlkWcCBllzHTp/i+yBxIQZRftKrP2UpIRPTofiidtUj0XsUavaryTOV+/XXoHML12X6zBlFrzrg==
+Received: from CY5PR14CA0014.namprd14.prod.outlook.com (2603:10b6:930:2::27)
+ by PH0PR12MB5420.namprd12.prod.outlook.com (2603:10b6:510:e8::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Mon, 27 Nov
- 2023 13:17:55 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::eb39:938e:7503:c21e%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
- 13:17:54 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
- aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
- ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
- galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
- pabeni@redhat.com
-Subject: Re: [PATCH v20 02/20] netlink: add new family to manage ULP_DDP
- enablement and stats
-In-Reply-To: <ZV98IyA3LSsk2BXs@nanopsycho>
-References: <20231122134833.20825-1-aaptel@nvidia.com>
- <20231122134833.20825-3-aaptel@nvidia.com> <ZV98IyA3LSsk2BXs@nanopsycho>
-Date: Mon, 27 Nov 2023 15:17:50 +0200
-Message-ID: <253cyvvjpxd.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0328.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::7) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+ 2023 13:29:21 +0000
+Received: from CY4PEPF0000E9D1.namprd03.prod.outlook.com
+ (2603:10b6:930:2:cafe::29) by CY5PR14CA0014.outlook.office365.com
+ (2603:10b6:930:2::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.28 via Frontend
+ Transport; Mon, 27 Nov 2023 13:29:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D1.mail.protection.outlook.com (10.167.241.144) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.17 via Frontend Transport; Mon, 27 Nov 2023 13:29:20 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 27 Nov
+ 2023 05:29:08 -0800
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 27 Nov
+ 2023 05:29:04 -0800
+References: <20231124092736.3673263-1-liuhangbin@gmail.com>
+ <20231124092736.3673263-2-liuhangbin@gmail.com>
+ <87cyvzfagj.fsf@nvidia.com> <ZWGRCK4D64EfUybp@Laptop-X1>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: Petr Machata <petrm@nvidia.com>, <netdev@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, Po-Hsu Lin <po-hsu.lin@canonical.com>,
+	Guillaume Nault <gnault@redhat.com>, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
+	<bjorn@rivosinc.com>, Ryan Roberts <ryan.roberts@arm.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>, "Luis
+ Chamberlain" <mcgrof@kernel.org>
+Subject: Re: [PATCH net-next 01/38] selftests/net: add lib.sh
+Date: Mon, 27 Nov 2023 14:19:08 +0100
+In-Reply-To: <ZWGRCK4D64EfUybp@Laptop-X1>
+Message-ID: <87bkbfe34x.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH7PR12MB7987:EE_
-X-MS-Office365-Filtering-Correlation-Id: da66a0c0-51cf-4635-a2f2-08dbef4b43a9
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D1:EE_|PH0PR12MB5420:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30edee7a-17a9-4e24-3f1f-08dbef4cdd00
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	c3+T9ikzAB6UMQlfqOGwUoJqsW/6zGVNuHt+s6AxHDsMn/IPHxAIevDjvornZwJIZShCYhQ+C08zgBWnc3zz9zm6dnx4Z4BNOcZYOJ6wcQx94ebgvj+h0J09FXgv2ZDj+BhArQ8uK9Qa3wYO77hLJSb85vi9/DDRFmUPt3xKTALMpuM42LrwoX0FdNxcQlhpaZoIfyDWMEQrHns3Rc34vCARKoh1TcIbGksjcBWfZ8odOy6815CEdyEHV3k/Gquzmo10jj06WFN4yOV5itkPJpP7e4E9xCwuDikYeA4t1Mo7SMd+qQtUS6MorH8LrFA6+Hct4EOUAHSzIsdW8HoelMtk71pdYFA0Pva06DTJeqzOn4RslJ+tzsQyJqg0xwCfsFWvPK1+w9anWJk8d1R9FFCDdE8QD5o0N+CxMgIj5TN+cQ3qefJ0LUchxxy9+r4jDbuXjKhwfBopRZcIy+hV/up95BAWLj1ogO5hZmNEwDIqv0DQ4WKco4RcKQR4Bn4vjYPgrzA1XneXqe8LC42kjnoiZ3Zq+3t57ZQxLadncN4NBkzvMHDWtyE9EgMFmnxs
+	NnU5yPksfwQ5EjwRHbEIeNfHL9kWX5/96zd5UlX1Pe80nwLhSj+QIu52IAGckheMywPjcWMxvQptzG7n2O03b+OVAvP++Rcpn0+FzfMJxca0+85RKILeQ4Xbuq4k/rId5sL1uIw9DVRmkLh4tMDp8e/S1DQnZN0VOe67OAW7pMpBEjHS13ZO7HeUT7YwtkZM4afHXsklgEg1triv6ahRN7fTKak1Pi5xP4O1s1gwkv7K4EgRbO2f7QUHTaIDpoFyHv+vut0RtVW0lMhIbOO+ekLlKdtK900heynpW2Un8mY18KCPLxUbHUS4EBMJtB4Q3+L2rc2tPlOptTNi8GcXX/cC30YbNiKSVn7I4ERzoEhkzDHMaAOVpJ5dEDVkthtm90smOhF0shQITHqy3uCLJMSbC3EpnmQUuVoThU4e/OYDRetIVQ7QyBTdR5EuT1G32vpOcT2VK+jg7mQpWAzscho9a1iVSgejKVnzR9Dc4K8WOyWnBCwWcCPyjpKXoaYg8N6nIOxc5V9jt/gm6LR/STfS960JoMTWyjAzoleJN7OfR1jyNxO8KPnndop37h7eFqvXaWOdHQ7qH+X/D+nHSCqDdAnTME8tGijBIqT8VEzit2QSexpI8gv0xOG+eDxa6piPqT52IuWYor9mLUsGvv9R1FgCuvh7j8XJWkfVbr2zlf5NjNvuCmMcNImW+zbTlp8H+OPbjUipcZzGPpTFkr3dMTW4b+jIAohXalrRq9/7VwceNs9S8FAwTeSiA0juIKr1m9z7nC9g9psjmXXRrQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(39860400002)(376002)(396003)(346002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6666004)(8936002)(8676002)(4326008)(6512007)(6506007)(66476007)(66556008)(66946007)(6916009)(316002)(6486002)(478600001)(2906002)(36756003)(38100700002)(41300700001)(86362001)(26005)(2616005)(83380400001)(7416002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?iC+nFZzHg8VAhmPOnLojHwWOtAiaJNFK7RHGEaaB4E4SVYR05VlRfCQQdYS5?=
- =?us-ascii?Q?ph1N9jWNA8V61xwC0dw5UeDfSWn8Bjqxa+DE74FK71qDhmkBZ4IG9dkL/NCS?=
- =?us-ascii?Q?+tDOohDsB5AMXQFrwehn0VmbGzpUDZ3QzngMKXYZGfuDKUGLtzbNZPIP3ktg?=
- =?us-ascii?Q?i31ROQtFXk+WOAoYgIejjnFOEvr+sQ5fc29iewWK52RTcNi3AngltzhP9NnV?=
- =?us-ascii?Q?2WMUiuqtfHplLl++uT4GEKmDz/r6UsVeAXRV9CrGM9fKJLibvcanmnFEcZof?=
- =?us-ascii?Q?3DIafK29UFemzV7whcGZ++T1UT8De5kgXBPwSBLEX9BdhZ4EZPbznJ5I3n7f?=
- =?us-ascii?Q?Iwx+kosaYQqpjp2YwYi3Y/y56jOToCtFD8+W5youSExEleoG0GoKlWIIJxta?=
- =?us-ascii?Q?4dyGQCtGMo5n132a/Hkbkafm2AJwz0oFdJ6dDjGSe0CJULXss++13ZJEpywF?=
- =?us-ascii?Q?Fh80ONHn98zBeuVIuRJlw22T0a9blyreMs6dCtgaf6M1EPreXuoUaANPAmBA?=
- =?us-ascii?Q?4vYYRsa2SYqbtVcg0cfEULQ6ZZ9pbcFRqq/wuiaYjEjxikvyEEdegeMbRwib?=
- =?us-ascii?Q?gceR3MkxC5d+25STvpvEE7wjfsIyAGbUI6eDSyEr5I35FkwPVzWB30PV2qPn?=
- =?us-ascii?Q?Y4W4GD4zVcRj4O6aTLIi3PI4ibyTNuDNVp0Mit3oQw7CjN1QqQ0YS167eAP/?=
- =?us-ascii?Q?G2LiSsM4UHIzRyO4e1Fmdpw5EflV+EXlm4PhiS+0jYHJ/RDUSAlybccie2gO?=
- =?us-ascii?Q?OphsF241Nu3lVe7bAD2VMil8lW3xwM3sNMnVJxw22GqWEtkjdogTG0v2C6Um?=
- =?us-ascii?Q?+2rxq/Ty+hQqJPL2nPHHTKREvd8jrFWteJGvxpo0W1/vzLfw4N+Kc9Bw02k0?=
- =?us-ascii?Q?6+cL0mfsFjUH7LO3H0x+08450KHq5Yfe5uf568vNRoAv8A+ERshJ1nM6yTv3?=
- =?us-ascii?Q?XF0V9hNj0dnXkRUzCd+yw4CQZDBplT/RKbUHsN5ZXjs/gwyTRARu5/IaH0Za?=
- =?us-ascii?Q?E9PHm/PgJJD7T9fEr9fbkk8ycFRvGkgJJCyP5JZGqLyBRRmy39Qvk1Qt5qnc?=
- =?us-ascii?Q?OkXK56drraJn9w8y0cuTjZvujYgI/put5lbLRd360OR3tKPO2K0ku0OL8bv8?=
- =?us-ascii?Q?7cIyOrq74ffDldJ4NBSzJ4s+Eg/Ey5s5p9dDzCblCOKXo/YzZ6AHFnJLcFFS?=
- =?us-ascii?Q?cStS+SdHW3cdyQpoKw7pxwxNaKPk1oUjh0O+8Ln5OomzZ6pjMIMfwHUp2jON?=
- =?us-ascii?Q?aA6FA+oiH5PjyfAT/Tk3UmkyqmuWdOA5RXVdegZGXhk1zv//ePGdS49VxzJW?=
- =?us-ascii?Q?aY4Tf0CbyDC1kOrxhClpIeZwLLO+rzY4A0e25PCzeImg0SlvQfbzJGyz4VKz?=
- =?us-ascii?Q?parIhXgTZLsRABHCFnCmuG6SK5/7o5I97LOuAnxZ2FvegEogtZoX8se2WZCK?=
- =?us-ascii?Q?WlLDsry3DiZdVFPkXlquVlnH/pJkO1F+it9kasrC41ug6E6uetxwRHE09vMf?=
- =?us-ascii?Q?C2RjmhQHjyGkZSak7XX7TUOtjdGZDy4bXywyGH2f6y8FTuHo5y5iJEZ72mOi?=
- =?us-ascii?Q?zvs/jDMPEjPc8MoIbD0P012I3t6EMIkslYUD3AgY?=
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(230922051799003)(1800799012)(451199024)(64100799003)(82310400011)(186009)(46966006)(40470700004)(36840700001)(36860700001)(36756003)(82740400003)(356005)(7636003)(40460700003)(86362001)(316002)(6916009)(54906003)(8936002)(8676002)(41300700001)(70586007)(70206006)(966005)(478600001)(4326008)(5660300002)(7416002)(2906002)(47076005)(40480700001)(426003)(336012)(16526019)(26005)(2616005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da66a0c0-51cf-4635-a2f2-08dbef4b43a9
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 13:17:54.2409
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 13:29:20.5984
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30edee7a-17a9-4e24-3f1f-08dbef4cdd00
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xXdQSLNs/By0xPDI45uqVWoz4RaV6/LQ68OGAgVde6iJ9LG8iaVbUXatZiDE3LwOLcCrU3fkDvLOK5T+UnHXaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7987
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5420
 
-Jiri Pirko <jiri@resnulli.us> writes:
-> Overall looks good to me, couple of nits below, take it or leave it.
 
-Glad to hear. We will send v21 with the changes below.
-Hopefully we can get a RB or Ack on this patch.
+Hangbin Liu <liuhangbin@gmail.com> writes:
 
->>+
->>+      ctx->ifindex = nla_get_u32(info->attrs[ULP_DDP_A_CAPS_IFINDEX]);
+> On Fri, Nov 24, 2023 at 03:35:51PM +0100, Petr Machata wrote:
+>> 
+>> Hangbin Liu <liuhangbin@gmail.com> writes:
+>> 
+>> > +		fi
+>> > +	done
+>> > +
+>> > +	[ $errexit -eq 1 ] && set -e
+>> > +	return 0
+>> > +}
+>> > +
+>> > +# By default, remove all netns before EXIT.
+>> > +cleanup_all_ns()
+>> > +{
+>> > +	cleanup_ns $NS_LIST
+>> > +}
+>> > +trap cleanup_all_ns EXIT
+>> 
+>> Hmm, OK, this is a showstopper for inclusion from forwarding/lib.sh,
+>> because basically all users of forwarding/lib.sh use the EXIT trap.
+>> 
+>> I wonder if we need something like these push_cleanup / on_exit helpers:
+>> 
+>> 	https://github.com/pmachata/stuff/blob/master/ptp-test/lib.sh#L15
 >
-> You don't need to store ifindex. You have ctx->dev->ifindex with the
-> same value.
+> When I added this, I just want to make sure the netns are cleaned up if the
+> client script forgot. I think the client script trap function should
+> cover this one, no?
 
-Ok, we will remove it from the context.
+So the motivation makes sense. But in general, invoking cleanup from the
+same abstraction layer that acquired the resource, makes the code easier
+to analyze. And in particular here that we are talking about traps,
+which are a global resource, and one that the client might well want to
+use for their own management. The client should be using the trap
+instead of the framework.
 
->>+      switch (cmd) {
->>+      case ULP_DDP_CMD_CAPS_GET:
->>+      case ULP_DDP_CMD_CAPS_SET:
->>+      case ULP_DDP_CMD_CAPS_SET_NTF:
+The framework might expose APIs to allow clients to register cleanups
+etc., which the framework itself is then free to use of course, for
+resources that it itself has acquired. But even with these APIs in place
+I think it would be better if the client that acquires a resource also
+schedules its release. (Though it's not as clear-cut in that case.)
+
+>> 
+>> But I don't want to force this on your already large patchset :)
 >
-> Hmm, you never call ulp_ddp_prepare_context() with
-> ULP_DDP_CMD_CAPS_SET_NTF. Perhaps just warn if this case is hit. IDK.
-
-While that is true it also reflects what the payload is and it mirrors
-ulp_ddp_reply_size(). We will keep it as is.
-
->>+static int ulp_ddp_write_reply(struct sk_buff *rsp,
->>+                             struct ulp_ddp_reply_context *ctx,
->>+                             int cmd,
->>+                             const struct genl_info *info)
->>+{
->>+      ctx->hdr = genlmsg_iput(rsp, info);
+> Yes, Paolo also told me that this is too large. I will break it to
+> 2 path set or merge some small patches together for next version.
 >
-> Interesting, you use "hdr" just in this fuction. Why isn't it a local
-> variable?
-
-Good point, we will make it a local variable.
-
->>+      ret = ulp_ddp_write_reply(rsp, ctx, ULP_DDP_CMD_CAPS_GET, info);
->>+      if (ret < 0)
+>> So just ignore the bit about including from forwarding/lib.sh.
 >
-> You mix "if (ret)" and "if (ret < 0)" in this code, I don't see any of
-> the functions return positive value on success, so you can make it
-> consistent to "if (ret)".
+>> Actually I take this back. The cleanup should be invoked from where the
+>> init was called. I don't think the library should be auto-invoking it,
+>> the client scripts should. Whether through a trap or otherwise.
+>
+> OK, also makes sense. I will remove this trap.
+>
+> Thanks for all your comments.
+> Hangbin
 
-Ok, we will change the checks to "if (ret)" and change
-ulp_ddp_apply_bits() return the notify flag via an input parameter.
-
->>+
->>+      if (ulp_ddp_write_reply(ntf, ctx, ULP_DDP_CMD_CAPS_SET_NTF, &info)) {
->
-> Always use "ret" variable to store return value before you check it.
-
-Ok.
-
->>+
->>+      rsp = genlmsg_new(ulp_ddp_reply_size(ULP_DDP_CMD_STATS_GET), GFP_KERNEL);
->>+      if (!rsp)
->>+              return -EMSGSIZE;
->>+
->>+      wanted = nla_get_u64(info->attrs[ULP_DDP_A_CAPS_WANTED]);
->
-> nla_get_uint()
->
->
->>+      wanted_mask = nla_get_u64(info->attrs[ULP_DDP_A_CAPS_WANTED_MASK]);
->
-> nla_get_uint()
->
-
-Ok.
-
->
->>+
->>+      ret = ulp_ddp_apply_bits(ctx, &wanted, &wanted_mask, info);
->
->         ret = ulp_ddp_apply_bits(ctx, &wanted, &wanted_mask, info,
->                                  &notify);
->
-> Would be a bit cleaner to read perhaps.
-
-True, we will change it to that.
-
-Thanks
 
