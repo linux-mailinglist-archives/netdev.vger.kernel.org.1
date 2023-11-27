@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-51195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706427F983A
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 05:21:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C47B7F983D
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 05:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2119B20910
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 04:21:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAD5F280AAE
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 04:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0BA46BC;
-	Mon, 27 Nov 2023 04:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AD153A0;
+	Mon, 27 Nov 2023 04:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="krmkDBPh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blH7YA0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBDCF0
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 20:21:47 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a02d91ab199so510500066b.0
-        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 20:21:46 -0800 (PST)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8480F0
+	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 20:22:16 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5484ef5e3d2so4868794a12.3
+        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 20:22:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701058905; x=1701663705; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701058935; x=1701663735; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vsv7V/+CFL/XESr1bE2Qe/WX9Bo+trNfwMKc9YwhQsc=;
-        b=krmkDBPh9ihJhi8Z0MIW2qZQJDtxNg03wkUXANwkcOjq1GfwLCO7bPluvXMEfMvuCP
-         tHZdErPr9VGdkV0il9sSYA2toVpmJ3rCCddCsSdEHvHIh+dE0DZxe9GQZAq5TOsV8hAj
-         nUZhMECRzy2GiozXibyyaJXFpJGHZCvzPCRZRQvheGPBMcIKXLgV6P5tW5cDmZoC4UZ9
-         JsZjwPs1E1vzoMmA9scZEQBdUde4IqPbh1iMkmQ1ILsC96B9+FdX7shXqNW1VliuZrjl
-         H14ykZu1HQ9sNAQDyVpmmu3Uarfa69Nq/lUOvAy1O4w4bSvMVvrKkaVxaW8kTGFd1gGn
-         IOJg==
+        bh=49lWzY5XsjADwKty6dy2uWq7Mp+xzIHwxWbgErKH5RI=;
+        b=blH7YA0qx2nkXShpvkXcMrYmJN6ygHHIiXFw8++4kzCEIBMLlo51HCdtSC4IPugbyb
+         UjzlEs4x4MuuJiuN1I6y3VqGRLq7Lpuz9L4hZV7h3/15HWR0de3KnC7B8b5ZqaUfCjUY
+         GBr/ZhamZrjtfXvJqBMUdYRPOi1nqEekvBLzRNaIpNFNFjQMN4KFEPdzIcfL6tWIbux7
+         2hsuUuaN4g4mspDoJbVN35/WpUlhqztIYOWryUfQFW/a3E9UIVCr8ktOGNlue75JVcLt
+         uJJGogQ92A5/MLikqCPV+Tpd+obtG9L7WlQEXu6k+Ou4swQ95xGvDR0DAsd4Fl3FfKqK
+         RIRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701058905; x=1701663705;
+        d=1e100.net; s=20230601; t=1701058935; x=1701663735;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vsv7V/+CFL/XESr1bE2Qe/WX9Bo+trNfwMKc9YwhQsc=;
-        b=Anid6ZIQ4UWyI4pVWWybUt3MyPLKVG8wuD677KDKWYVTuZz/aIVYnT3cUtQ9oFRf8I
-         oUP25TMmp0OMsCdNA4YfVXDqYjyQk5AAegpvYIwewRJzprpupl8xh66NziY66oWPiKDe
-         j5WI3LZGdMly3nWz1sdEsnoTYlaaqYQxBEF3SduVfy7PeKKu0TIj6q2tx73cKed99+Bj
-         hgR4AlWqbzRjk7AIVZekXtfIQM17xwMjqfVjjRantpIm/1wI6oOkyfm+MZQd7+qnNTql
-         Bp3pRSOLbNpm72/OiH7Z0U0nMvM1wSe+YvzXoV3r7MwakurHE2m1rqt1yGV+ZeZogD1U
-         c8UA==
-X-Gm-Message-State: AOJu0YzvFtE14iV91hd2jETNLhyrIzamX4fq8rQGzDJeZfKafxgj8GBn
-	zFjb2HIQOSaW9E8IggvJ6F794NYYTW2hYPqrgbc=
-X-Google-Smtp-Source: AGHT+IG/szwsRgL8UUwXgmTwWcL7KFdHiJr+LufYok/M2MBcFRmqPQIg8QF1WLoo9gtXWATdG4HQTwbVwpWsTPvZGVs=
-X-Received: by 2002:a17:906:590e:b0:a04:837e:a955 with SMTP id
- h14-20020a170906590e00b00a04837ea955mr6958384ejq.32.1701058905255; Sun, 26
- Nov 2023 20:21:45 -0800 (PST)
+        bh=49lWzY5XsjADwKty6dy2uWq7Mp+xzIHwxWbgErKH5RI=;
+        b=CpB1DKyiFVZAla2QdfggDF9BTTarQgIxqvQC5lFA/CHydeenPLnimqh+t9C2j0CEOY
+         8LBpKTTqR9KBdBmtWuB+24ZcIC2yEBKBOOTk5N5+nw1MN20QQK2m4kfKpsNKVCoaPaPC
+         sYCrGAo3I7i0hfVsVLJChF7nLY+gkWCJ7NPNU1DJf5E5Xtqkx+EwWIPWq400zbmjfQF4
+         dk0Uq2USN1L5jNIVowQLjjA3kXDOeoK03IJHiVH9Y9jmovpi0GpM7z2ChAZT3eL7FwWP
+         QQspCsHUC+xgdJdHRWnuC7QEsJiCxAM5Tsn6IX+vFOgsmkkW1Qa0x1dREQO+AwbR5+jx
+         q6Ug==
+X-Gm-Message-State: AOJu0YzQjNd8GnVrbllwG2z9t4+YF6gNxyRtTM3ye6QIHT/9TnEbYaXE
+	HQAkiV2waCmaIRaClajEWkN/cjXmvlZORbx22T8=
+X-Google-Smtp-Source: AGHT+IGYyL89Nx2uLUsND9lmHCFnvT5aiPjbam5lSNpyum8obkASqpsCKEFqC0/TEkUPZB9jAPsBMFyttPDsR+8wSUo=
+X-Received: by 2002:a17:906:abd5:b0:a10:b3ba:1942 with SMTP id
+ kq21-20020a170906abd500b00a10b3ba1942mr295768ejb.27.1701058935457; Sun, 26
+ Nov 2023 20:22:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,12 +57,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20231124073439.52626-1-liangchen.linux@gmail.com>
- <20231124073439.52626-2-liangchen.linux@gmail.com> <a45e4183-3ac3-2853-810a-63c7277d6318@huawei.com>
-In-Reply-To: <a45e4183-3ac3-2853-810a-63c7277d6318@huawei.com>
+ <20231124073439.52626-3-liangchen.linux@gmail.com> <ed236fc1-fa6d-5ffc-54db-2c44448ea5fd@huawei.com>
+In-Reply-To: <ed236fc1-fa6d-5ffc-54db-2c44448ea5fd@huawei.com>
 From: Liang Chen <liangchen.linux@gmail.com>
-Date: Mon, 27 Nov 2023 12:21:32 +0800
-Message-ID: <CAKhg4tL6TQD+xABr_hd6knQrMwfWjPm_L_SUuJ1WLaBbpss+0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] page_pool: Rename pp_frag_count to pp_ref_count
+Date: Mon, 27 Nov 2023 12:22:02 +0800
+Message-ID: <CAKhg4tJSaGAj07pysE_234zK_cy9b59pBET66EdCLuRS7CfZQg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] page_pool: halve BIAS_MAX for fragment
+ multiple user references
 To: Yunsheng Lin <linyunsheng@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
@@ -70,58 +71,26 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 25, 2023 at 7:53=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+On Sat, Nov 25, 2023 at 8:01=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
 m> wrote:
 >
 > On 2023/11/24 15:34, Liang Chen wrote:
 >
-> >  static inline void page_pool_fragment_page(struct page *page, long nr)
+> The title seems a little hard for me to understand, but the description
+> below does seem clear to me, so LGTM.
 >
-> It seems page_pool_fragment_page() might not be a appropriate name too?
->
-> Perhaps it might be better to grep defrag/frag to see if there is other
-> function name might need changing.
+> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
 >
 
-Our understanding is that the concept of fragmenting exists before the
-page is drained, and all related functions should retain their current
-names. However, once the page is drained, its management shifts to
-being governed by pp_ref_count, and there's no longer a need to
-consider fragmentation. Therefore, all functions associated with that
-lifecycle stage of a pp page will be renamed. With that in mind, the
-following functions have been renamed.
+Thanks! I will change the title to "halve BIAS_MAX for multiple user
+references of a fragment"
 
-page_pool_defrag_page -> page_pool_deref_page
-page_pool_is_last_frag -> page_pool_is_last_ref
-page_pool_put_defragged_page -> page_pool_put_derefed_page
 
-> >  {
-> > -     atomic_long_set(&page->pp_frag_count, nr);
-> > +     atomic_long_set(&page->pp_ref_count, nr);
-> >  }
-> >
-> > -static inline long page_pool_defrag_page(struct page *page, long nr)
-> > +static inline long page_pool_deref_page(struct page *page, long nr)
->
-> page_pool_defrag_page() related function is called by mlx5 driver directl=
-y,
-> we need to change it to use the new function too.
->
-
-Yeah, that change is right at the start of the patch.
-
-> I assume that deref is short for dereference? According to:
->
-> https://stackoverflow.com/questions/4955198/what-does-dereferencing-a-poi=
-nter-mean-in-c-c
->
-> 'dereferencing means accessing the value from a certain memory location
-> against which that pointer is pointing'.
->
-> So I am not sure if 'deref' is the right word here as I am not a native
-> english speaker, But it seems 'unref' is more appropriate here if we mirr=
-or
-> the napi_frag_unref() function name?
-
-That sounds better to me as well. Thanks!
+> > Referring to patch [1], in order to support multiple users referencing =
+the
+> > same fragment and prevent overflow from pp_ref_count growing, the initi=
+al
+> > value of pp_ref_count is halved, leaving room for pp_ref_count to incre=
+ment
+> > before the page is drained.
 
