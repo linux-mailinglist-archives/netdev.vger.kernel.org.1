@@ -1,101 +1,71 @@
-Return-Path: <netdev+bounces-51485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDB87FADA2
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 23:42:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D597FADAB
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 23:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7D0281ADD
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:42:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885821C209E3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAFD46458;
-	Mon, 27 Nov 2023 22:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6529C4652A;
+	Mon, 27 Nov 2023 22:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="Qz4dPqUC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARaL7WEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBDC0A5
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:42:16 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507a0907896so6249077e87.2
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:42:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1701124935; x=1701729735; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YOZIDCSlIizVR0CsIQ1T7xinPGLNwnVXG2YClpqXvIw=;
-        b=Qz4dPqUCX5kedrJpQ/uX0bsMOCnUtJBgXB3cuHOZAsm6G5E8wdxoiWZWjksD8V2q5W
-         NyE9RYRAwbZvmZpipgSp4LInrr0yLRDgPftwWSyFofzF4zeltB8McNDIYQph3xnMoLQM
-         fUpLzCJ/Db6UsMwVRYtJn89HdviqjjtrmkivIikmhwegNrQZ54Ha993OcMCP7TPlxnO0
-         RYHrS5O3UlhnB+9hv1mH/zQVB2hRh9ntoPZXfVN18/UhCdHVIo0S7IpLFzRapwmUWmFS
-         SgEj37rDDhKHMZXMJSqRHjDexGj4TbJcHKuEOIrxk+jDAwQwpjTnMCjnyYvsY2eDuUct
-         2kDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701124935; x=1701729735;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YOZIDCSlIizVR0CsIQ1T7xinPGLNwnVXG2YClpqXvIw=;
-        b=tqNPRgLapyVyBuyAklIA0Hip5fE6ydcV1UAH+hkLP1bGe7BEjQX7uDf/FPsAag/CjI
-         +X5IWGkP5U7lQMe3hjaECWDd0lWcUvEgckvREe2cR4xO7oWD6em8b+gz93JYsDnpjg1n
-         XoNoov7m1UmOR2HFyrdLB1Z4rm4DoMULkEfMwJQg9hUz2agnPEytHZ0GpOYq4eJMEkNl
-         9Rqsl3nEf9cYEMj7ExYMC6m/5+T4rCYgclQt1eAtJfw8pC2ewg3HrOeTpy+Efq0236Bw
-         aVFUv1wlFGOsscxHNxQfXBYA0qz1Vwq2ekgEkcprv47IofI/a8rQBveQ/hoMCigo1c0G
-         ELvw==
-X-Gm-Message-State: AOJu0Yx51gFyiyu0NXmZ8qzCmwDvyv4+xrFaL+EUSQeOefuIcG51MLOK
-	bLDnyMwxPoMj9M2Qlt1BTdHnbYDuFBCQ7/3ALWFC4A==
-X-Google-Smtp-Source: AGHT+IGefKY9i4E/NBdXhjH+bgiLq/wjRp0I5F9qSdopkiafqosQCZ1wKFxqUUO+pMVsO3+OCZeL8qLr8jOBdX41yqI=
-X-Received: by 2002:a05:6512:69:b0:50b:aabe:7948 with SMTP id
- i9-20020a056512006900b0050baabe7948mr5474205lfo.53.1701124935170; Mon, 27 Nov
- 2023 14:42:15 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48095374CE
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 22:46:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CF29C433C7;
+	Mon, 27 Nov 2023 22:46:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701125187;
+	bh=8Bb8ROMKoO/5URW/h0GeuG8/4JBlEDL8LweLQ0JKFNg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ARaL7WEeG7jniC1uoKrIl0EU86q+Tow4JxYdNklRJwC6x0bAyZbZLwETbiy6ka+bt
+	 BGGFrtPTK152GaVRJ9mt1PsKMPv5UeVRovgoKaWY3pO3Am/vitBmuy1a1DlJf8HipE
+	 vudl59WrlOBo8VJ7Hz4KMLSdHrR6KyZoxBCnlKY9RolbvgXn3nSi1W/6mGlXSo0XMp
+	 E7H20hcMBbPTBCOc6qSJ2Y/N2crKkxkWPEbPGqP+VKWGemSIdLQllLYu7p6/jkhz1z
+	 //m2TPaA0E34BLYJOEp8WEzxSqnauwlPK4QNOI5GYFckMhhi32VFZdMoNt/1lQqhVG
+	 zBb8BzjK5eHOQ==
+Date: Mon, 27 Nov 2023 14:46:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+ johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+ amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org
+Subject: Re: [patch net-next v4 5/9] genetlink: introduce per-sock family
+ private pointer storage
+Message-ID: <20231127144626.0abb7260@kernel.org>
+In-Reply-To: <20231123181546.521488-6-jiri@resnulli.us>
+References: <20231123181546.521488-1-jiri@resnulli.us>
+	<20231123181546.521488-6-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231127182057.1081138-1-sdf@google.com>
-In-Reply-To: <20231127182057.1081138-1-sdf@google.com>
-From: Quentin Monnet <quentin@isovalent.com>
-Date: Mon, 27 Nov 2023 22:42:03 +0000
-Message-ID: <CACdoK4Jg_DffjRz72_Zsg3wCUs5eMAn+Jo61tMUVQvPNqM4pBw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 1/2] bpftool: mark orphaned programs during
- prog show
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 27 Nov 2023 at 18:21, Stanislav Fomichev <sdf@google.com> wrote:
->
-> Commit ef01f4e25c17 ("bpf: restore the ebpf program ID for BPF_AUDIT_UNLOAD
-> and PERF_BPF_EVENT_PROG_UNLOAD") stopped removing program's id from
-> idr when the offloaded/bound netdev goes away. I was supposed to
-> take a look and check in [0], but apparently I did not.
->
-> Martin points out it might be useful to keep it that way for
-> observability sake, but we at least need to mark those programs as
-> unusable.
->
-> Mark those programs as 'orphaned' and keep printing the list when
-> we encounter ENODEV.
->
-> 0: unspec  tag 0000000000000000
->         xlated 0B  not jited  memlock 4096B  orphaned
->
-> [0]: https://lore.kernel.org/all/CAKH8qBtyR20ZWAc11z1-6pGb3Hd47AQUTbE_cfoktG59TqaJ7Q@mail.gmail.com/
->
-> v3:
-> * use two spaces for "  orphaned" (Quentin)
->
-> Cc: netdev@vger.kernel.org
-> Fixes: ef01f4e25c17 ("bpf: restore the ebpf program ID for BPF_AUDIT_UNLOAD and PERF_BPF_EVENT_PROG_UNLOAD")
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
+On Thu, 23 Nov 2023 19:15:42 +0100 Jiri Pirko wrote:
+> +	void __rcu		*priv;
 
-Reviewed-by: Quentin Monnet <quentin@isovalent.com>
+How many times did I say "typed struct" in the feedback to the broken
+v3 of this series? You complain so much about people not addressing
+feedback you've given them, it's really hypocritical.
 
-Thanks!
+Put the xarray pointer here directly. Plus a lock to protect the init.
+
+The size of the per-family struct should be in family definition,
+allocation should happen on first get automatically. Family definition
+should also hold a callback to how the data is going to be freed.
+-- 
+pw-bot: cr
 
