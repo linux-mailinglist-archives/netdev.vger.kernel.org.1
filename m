@@ -1,116 +1,288 @@
-Return-Path: <netdev+bounces-51390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C44E7FA7F0
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:28:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CDBC7FA7F1
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BECC1C20ADE
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:28:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2C13B20D46
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C762F381B2;
-	Mon, 27 Nov 2023 17:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD273381A8;
+	Mon, 27 Nov 2023 17:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nF/gRJ8x"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="OmXuQxO3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AA085;
-	Mon, 27 Nov 2023 09:28:22 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E4FC14000B;
-	Mon, 27 Nov 2023 17:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701106101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cgRUTwLXcNd58EG84hnaXaWLqxXMccudnE3zQ48EYVQ=;
-	b=nF/gRJ8xfx+oSU3Q8tKHoRZUEPdMORtKkZXe1y9wvSBw1LzUXyhzdMd5avFCzZ6iaSZTzh
-	ygc0xDl00VLDGTbWbG1KcXy06Iutu8rta3w9rAU+rXz4piOf8BXP0hGyEHjgjOyjmhA1GF
-	6O8IJKtjly+NQEmAwu3BpvxS2eqbh68CSdriYdPRAh7aEuj2pG4NUbv44RtfAZAt/qBzPj
-	oQ1Ml6uEn44cMzzyEIWj2acon53DwEflAJU7sKnLoBnZAPg7L3SHUmXyrzKu5PM3sSzGa9
-	7GXGLwAoxlF+Z62ykJgSjmfRN23UTP/cRg8QvZgN0HMNZusvH6N617R1QRttWQ==
-Date: Mon, 27 Nov 2023 18:28:19 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <20231127182819.11ee98d2@kmaincent-XPS-13-7390>
-In-Reply-To: <cde6c19f-01ba-4f6c-9e73-00e4789fb69c@lunn.ch>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
-	<20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
-	<45694d77-bcf8-4377-9aa0-046796de8d74@lunn.ch>
-	<20231122174828.7625d7f4@kmaincent-XPS-13-7390>
-	<cde6c19f-01ba-4f6c-9e73-00e4789fb69c@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA1CD2
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 09:29:39 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AR9KXll019855;
+	Mon, 27 Nov 2023 09:29:32 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=content-type :
+ message-id : date : mime-version : subject : to : cc : references : from :
+ in-reply-to; s=pfpt0220; bh=sU9TfIdg323TO4VWbqedtZO32YdDoJboj7ZnODISszk=;
+ b=OmXuQxO3GR4hciFRysQeXCAjfmv7Nj+M3CKyzt6DrCbDS7t1fz63jPHxwuvi8iC3dMyM
+ 2471d/wkBQ1hasUiTgM+p57k/OHbtESLE3SACuD1HXPjZl8NPc5WwJDCx6cjZPtT0lWx
+ fAeBzjqbI7bIEf3QPLRj7hwirWVSU9FyUyc1AJQ/4irz00L+AFLDBd5SfM0t3Uc5Auwn
+ 7cVd79SY4/hjwPhkdK0y28zlYv4KJKbpmnKc8GiggChLkmotRd5XHfQS8AlMDIJr/4p6
+ xMJJ6SVChy/y/PkfLJ83bGWT5y3QezsN/tCfnenWMSfD63oD4z6chWAYFjIu5HxPZrE3 WA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3umrcu9jtn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 09:29:23 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 27 Nov
+ 2023 09:29:22 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 27 Nov 2023 09:29:21 -0800
+Received: from [10.193.38.189] (unknown [10.193.38.189])
+	by maili.marvell.com (Postfix) with ESMTP id 8E5893F7080;
+	Mon, 27 Nov 2023 09:29:20 -0800 (PST)
+Content-Type: multipart/mixed;
+	boundary="------------i4iPRkVxBnGsUgDfTc8WylpD"
+Message-ID: <cf6e78b6-e4e2-faab-f8c6-19dc462b1d74@marvell.com>
+Date: Mon, 27 Nov 2023 18:29:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>
+References: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+Content-Language: en-US
+From: Igor Russkikh <irusskikh@marvell.com>
+In-Reply-To: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+X-Proofpoint-GUID: wyNqU543H905z4o5V9NRwJzApSway2AE
+X-Proofpoint-ORIG-GUID: wyNqU543H905z4o5V9NRwJzApSway2AE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-27_16,2023-11-27_01,2023-05-22_02
 
-On Wed, 22 Nov 2023 18:11:25 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+--------------i4iPRkVxBnGsUgDfTc8WylpD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-> > > Is the firmware in Motorola SREC format? I thought the kernel had a
-> > > helper for that, but a quick search did not find it. So maybe i'm
-> > > remembering wrongly. But it seems silly for every driver to implement
-> > > an SREC parser. =20
-> >=20
-> > Oh, I didn't know this format. =20
->=20
-> Its often used in small deeply embedded systems. Microcontrollers,
-> rather than something which can run Linux.
->=20
-> > The firmware seems indeed to match this format
-> > specification.
-> > I found two reference of this Firmware format in the kernel:
-> > https://elixir.bootlin.com/linux/v6.5.7/source/sound/soc/codecs/zl38060=
-.c#L178
-> > https://elixir.bootlin.com/linux/v6.5.7/source/drivers/staging/wlan-ng/=
-prism2fw.c
-> > =20
->=20
-> Ah, all inside a header file. Probably why i missed it. But ihex is
-> not SREC. ihex came from Intel. SREC from Motorola.
->=20
-> So i would follow the basic flow in include/linux/ihex.h, add an
-> include/linux/srec.h but adapt it for SREC.
+Hi Linus,
 
-In fact the ihex.h header is only adding the ihex_validate_fw and the
-request_ihex_firmware functions. In my case I do not use request firmware b=
-ut
-sysfs firmware loader. I could add srec_validate_fw but I am already
-checking the firmware during the flashing process due to its special flashi=
-ng
-process.
-I could not treat the firmware to one blob to be send. Each byte need to be
-send in one i2c messages and at the end of eaxch line we need to wait a "\r=
-\n"
-(within 30ms) before sending next line. Yes, it takes time to be flashed!
+> and now the slab cache is corrupt and the system is dead.
+> 
+> My *guess* is that what is going on is that when the kcalloc() failued
+> (because it tries to allocate a large area, and it has only been
+> tested at boot-time when it succeeds),  we end up doing that
 
-Do you see generic helper that I could add?=20
+You are probably right root causing the issue here, and the bad thing is
+that direct fix will not solve the problem.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+I'm trying to repro this on my side with some artificially increased structure
+sizes, but no success so far.
+
+Datapath initialization in driver requires normally 8 vectors each having rx/tx
+pair of rings, in total making 8*(4096+2048)*64 = ~ 3Mb of memory.
+
+...
+
+> Anyway, I suspect a fix for the fatal error might be something like
+> the attached, but I think the *root* of the problem is how the
+> aquantia driver tried to allocate a humongous buff_ring with kmalloc,
+> which really doesn't work.  You can see that "order:6", ie we're
+> talking an allocation > 100kB, and in low-memory situations that kind
+> of kmalloc space simply isn't available. It *will* fail.
+
+Correct.
+It seems after some series of pm-related changes the driver logic was changed to always
+reinit full sw structures during suspend/resume, which is obviously an overkill.
+
+...
+
+> 
+> I don't know what the right fix is, but *one* fix would certainly be
+> to not tear everything down at suspend time, only to build it up again
+> at resume.
+> 
+> And please please please don't double-free things randomly (if that is
+> what was going on, but it does look like it was).
+
+You are right its also a potential double free problem (may be not manifesting),
+but aq_ring_free is being called from "same level" aq_ring_alloc, but also then
+from aq_ring_tx_alloc caller error handler.
+
+Attached is my draft patch to improve that.
+
+Still looking into the bigger problem of fixing suspend/resume.
+
+Thanks
+  Igor
+
+--------------i4iPRkVxBnGsUgDfTc8WylpD
+Content-Type: text/plain; charset="UTF-8";
+	name="0001-net-atlantic-fixed-double-free-on-reinit.patch"
+Content-Disposition: attachment;
+	filename="0001-net-atlantic-fixed-double-free-on-reinit.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbSBkNzUzYmEzYmM1ZDE4ZjAyMTM4MzNkYTdjZWJhMzA5N2Q4ZGIwMjdhIE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBJZ29yIFJ1c3NraWtoIDxpcnVzc2tpa2hAbWFydmVs
+bC5jb20+CkRhdGU6IE1vbiwgMjcgTm92IDIwMjMgMTY6MDk6MDUgKzAxMDAKU3ViamVjdDog
+W1BBVENIXSBuZXQ6IGF0bGFudGljOiBmaXhlZCBkb3VibGUgZnJlZSBvbiByZWluaXQKCi0t
+LQogLi4uL25ldC9ldGhlcm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9wdHAuYyAgIHwgMTcg
+KystLS0tCiAuLi4vbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0bGFudGljL2FxX3JpbmcuYyAg
+fCA2MCArKysrKystLS0tLS0tLS0tLS0tCiAuLi4vbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0
+bGFudGljL2FxX3JpbmcuaCAgfCAxOCArKystLS0KIC4uLi9uZXQvZXRoZXJuZXQvYXF1YW50
+aWEvYXRsYW50aWMvYXFfdmVjLmMgICB8IDIyICsrKystLS0KIDQgZmlsZXMgY2hhbmdlZCwg
+NDIgaW5zZXJ0aW9ucygrKSwgNzUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVy
+cy9uZXQvZXRoZXJuZXQvYXF1YW50aWEvYXRsYW50aWMvYXFfcHRwLmMgYi9kcml2ZXJzL25l
+dC9ldGhlcm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9wdHAuYwppbmRleCA4MGI0NDA0M2U2
+YzUuLjE4MTQzNzVmZWNlZSAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvYXF1
+YW50aWEvYXRsYW50aWMvYXFfcHRwLmMKKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvYXF1
+YW50aWEvYXRsYW50aWMvYXFfcHRwLmMKQEAgLTk1Myw4ICs5NTMsNiBAQCBpbnQgYXFfcHRw
+X3JpbmdfYWxsb2Moc3RydWN0IGFxX25pY19zICphcV9uaWMpCiB7CiAJc3RydWN0IGFxX3B0
+cF9zICphcV9wdHAgPSBhcV9uaWMtPmFxX3B0cDsKIAl1bnNpZ25lZCBpbnQgdHhfcmluZ19p
+ZHgsIHJ4X3JpbmdfaWR4OwotCXN0cnVjdCBhcV9yaW5nX3MgKmh3dHM7Ci0Jc3RydWN0IGFx
+X3JpbmdfcyAqcmluZzsKIAlpbnQgZXJyOwogCiAJaWYgKCFhcV9wdHApCkBAIC05NjIsMjcg
+Kzk2MCwyNCBAQCBpbnQgYXFfcHRwX3JpbmdfYWxsb2Moc3RydWN0IGFxX25pY19zICphcV9u
+aWMpCiAKIAl0eF9yaW5nX2lkeCA9IGFxX3B0cF9yaW5nX2lkeChhcV9uaWMtPmFxX25pY19j
+ZmcudGNfbW9kZSk7CiAKLQlyaW5nID0gYXFfcmluZ190eF9hbGxvYygmYXFfcHRwLT5wdHBf
+dHgsIGFxX25pYywKKwllcnIgPSBhcV9yaW5nX3R4X2FsbG9jKCZhcV9wdHAtPnB0cF90eCwg
+YXFfbmljLAogCQkJCXR4X3JpbmdfaWR4LCAmYXFfbmljLT5hcV9uaWNfY2ZnKTsKLQlpZiAo
+IXJpbmcpIHsKLQkJZXJyID0gLUVOT01FTTsKKwlpZiAoZXJyKSB7CiAJCWdvdG8gZXJyX2V4
+aXQ7CiAJfQogCiAJcnhfcmluZ19pZHggPSBhcV9wdHBfcmluZ19pZHgoYXFfbmljLT5hcV9u
+aWNfY2ZnLnRjX21vZGUpOwogCi0JcmluZyA9IGFxX3JpbmdfcnhfYWxsb2MoJmFxX3B0cC0+
+cHRwX3J4LCBhcV9uaWMsCisJZXJyID0gYXFfcmluZ19yeF9hbGxvYygmYXFfcHRwLT5wdHBf
+cngsIGFxX25pYywKIAkJCQlyeF9yaW5nX2lkeCwgJmFxX25pYy0+YXFfbmljX2NmZyk7Ci0J
+aWYgKCFyaW5nKSB7Ci0JCWVyciA9IC1FTk9NRU07CisJaWYgKGVycikgewogCQlnb3RvIGVy
+cl9leGl0X3B0cF90eDsKIAl9CiAKLQlod3RzID0gYXFfcmluZ19od3RzX3J4X2FsbG9jKCZh
+cV9wdHAtPmh3dHNfcngsIGFxX25pYywgUFRQX0hXU1RfUklOR19JRFgsCisJZXJyID0gYXFf
+cmluZ19od3RzX3J4X2FsbG9jKCZhcV9wdHAtPmh3dHNfcngsIGFxX25pYywgUFRQX0hXU1Rf
+UklOR19JRFgsCiAJCQkJICAgICBhcV9uaWMtPmFxX25pY19jZmcucnhkcywKIAkJCQkgICAg
+IGFxX25pYy0+YXFfbmljX2NmZy5hcV9od19jYXBzLT5yeGRfc2l6ZSk7Ci0JaWYgKCFod3Rz
+KSB7Ci0JCWVyciA9IC1FTk9NRU07CisJaWYgKGVycikgewogCQlnb3RvIGVycl9leGl0X3B0
+cF9yeDsKIAl9CiAKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlh
+L2F0bGFudGljL2FxX3JpbmcuYyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0
+bGFudGljL2FxX3JpbmcuYwppbmRleCA0ZGUyMmVlZDA5OWEuLjI0MTQ3MmU1NmViMiAxMDA2
+NDQKLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvYXF1YW50aWEvYXRsYW50aWMvYXFfcmlu
+Zy5jCisrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0bGFudGljL2FxX3Jp
+bmcuYwpAQCAtMTMyLDggKzEzMiw4IEBAIHN0YXRpYyBpbnQgYXFfZ2V0X3J4cGFnZXMoc3Ry
+dWN0IGFxX3JpbmdfcyAqc2VsZiwgc3RydWN0IGFxX3JpbmdfYnVmZl9zICpyeGJ1ZikKIAly
+ZXR1cm4gMDsKIH0KIAotc3RhdGljIHN0cnVjdCBhcV9yaW5nX3MgKmFxX3JpbmdfYWxsb2Mo
+c3RydWN0IGFxX3JpbmdfcyAqc2VsZiwKLQkJCQkgICAgICAgc3RydWN0IGFxX25pY19zICph
+cV9uaWMpCitzdGF0aWMgaW50IGFxX3JpbmdfYWxsb2Moc3RydWN0IGFxX3JpbmdfcyAqc2Vs
+ZiwKKwkJCSBzdHJ1Y3QgYXFfbmljX3MgKmFxX25pYykKIHsKIAlpbnQgZXJyID0gMDsKIApA
+QCAtMTU2LDQ2ICsxNTYsMjkgQEAgc3RhdGljIHN0cnVjdCBhcV9yaW5nX3MgKmFxX3Jpbmdf
+YWxsb2Moc3RydWN0IGFxX3JpbmdfcyAqc2VsZiwKIGVycl9leGl0OgogCWlmIChlcnIgPCAw
+KSB7CiAJCWFxX3JpbmdfZnJlZShzZWxmKTsKLQkJc2VsZiA9IE5VTEw7CiAJfQogCi0JcmV0
+dXJuIHNlbGY7CisJcmV0dXJuIGVycjsKIH0KIAotc3RydWN0IGFxX3JpbmdfcyAqYXFfcmlu
+Z190eF9hbGxvYyhzdHJ1Y3QgYXFfcmluZ19zICpzZWxmLAoraW50IGFxX3JpbmdfdHhfYWxs
+b2Moc3RydWN0IGFxX3JpbmdfcyAqc2VsZiwKIAkJCQkgICBzdHJ1Y3QgYXFfbmljX3MgKmFx
+X25pYywKIAkJCQkgICB1bnNpZ25lZCBpbnQgaWR4LAogCQkJCSAgIHN0cnVjdCBhcV9uaWNf
+Y2ZnX3MgKmFxX25pY19jZmcpCiB7Ci0JaW50IGVyciA9IDA7Ci0KIAlzZWxmLT5hcV9uaWMg
+PSBhcV9uaWM7CiAJc2VsZi0+aWR4ID0gaWR4OwogCXNlbGYtPnNpemUgPSBhcV9uaWNfY2Zn
+LT50eGRzOwogCXNlbGYtPmR4X3NpemUgPSBhcV9uaWNfY2ZnLT5hcV9od19jYXBzLT50eGRf
+c2l6ZTsKIAotCXNlbGYgPSBhcV9yaW5nX2FsbG9jKHNlbGYsIGFxX25pYyk7Ci0JaWYgKCFz
+ZWxmKSB7Ci0JCWVyciA9IC1FTk9NRU07Ci0JCWdvdG8gZXJyX2V4aXQ7Ci0JfQotCi1lcnJf
+ZXhpdDoKLQlpZiAoZXJyIDwgMCkgewotCQlhcV9yaW5nX2ZyZWUoc2VsZik7Ci0JCXNlbGYg
+PSBOVUxMOwotCX0KLQotCXJldHVybiBzZWxmOworCXJldHVybiBhcV9yaW5nX2FsbG9jKHNl
+bGYsIGFxX25pYyk7CiB9CiAKLXN0cnVjdCBhcV9yaW5nX3MgKmFxX3JpbmdfcnhfYWxsb2Mo
+c3RydWN0IGFxX3JpbmdfcyAqc2VsZiwKLQkJCQkgICBzdHJ1Y3QgYXFfbmljX3MgKmFxX25p
+YywKLQkJCQkgICB1bnNpZ25lZCBpbnQgaWR4LAotCQkJCSAgIHN0cnVjdCBhcV9uaWNfY2Zn
+X3MgKmFxX25pY19jZmcpCitpbnQgYXFfcmluZ19yeF9hbGxvYyhzdHJ1Y3QgYXFfcmluZ19z
+ICpzZWxmLAorCQkgICAgIHN0cnVjdCBhcV9uaWNfcyAqYXFfbmljLAorCQkgICAgIHVuc2ln
+bmVkIGludCBpZHgsCisJCSAgICAgc3RydWN0IGFxX25pY19jZmdfcyAqYXFfbmljX2NmZykK
+IHsKLQlpbnQgZXJyID0gMDsKLQogCXNlbGYtPmFxX25pYyA9IGFxX25pYzsKIAlzZWxmLT5p
+ZHggPSBpZHg7CiAJc2VsZi0+c2l6ZSA9IGFxX25pY19jZmctPnJ4ZHM7CkBAIC0yMTcsMjIg
+KzIwMCwxMCBAQCBzdHJ1Y3QgYXFfcmluZ19zICphcV9yaW5nX3J4X2FsbG9jKHN0cnVjdCBh
+cV9yaW5nX3MgKnNlbGYsCiAJCXNlbGYtPnRhaWxfc2l6ZSA9IDA7CiAJfQogCi0Jc2VsZiA9
+IGFxX3JpbmdfYWxsb2Moc2VsZiwgYXFfbmljKTsKLQlpZiAoIXNlbGYpIHsKLQkJZXJyID0g
+LUVOT01FTTsKLQkJZ290byBlcnJfZXhpdDsKLQl9Ci0KLWVycl9leGl0OgotCWlmIChlcnIg
+PCAwKSB7Ci0JCWFxX3JpbmdfZnJlZShzZWxmKTsKLQkJc2VsZiA9IE5VTEw7Ci0JfQotCi0J
+cmV0dXJuIHNlbGY7CisJcmV0dXJuIGFxX3JpbmdfYWxsb2Moc2VsZiwgYXFfbmljKTsKIH0K
+IAotc3RydWN0IGFxX3JpbmdfcyAqCitpbnQKIGFxX3JpbmdfaHd0c19yeF9hbGxvYyhzdHJ1
+Y3QgYXFfcmluZ19zICpzZWxmLCBzdHJ1Y3QgYXFfbmljX3MgKmFxX25pYywKIAkJICAgICAg
+dW5zaWduZWQgaW50IGlkeCwgdW5zaWduZWQgaW50IHNpemUsIHVuc2lnbmVkIGludCBkeF9z
+aXplKQogewpAQCAtMjUwLDEwICsyMjEsMTAgQEAgYXFfcmluZ19od3RzX3J4X2FsbG9jKHN0
+cnVjdCBhcV9yaW5nX3MgKnNlbGYsIHN0cnVjdCBhcV9uaWNfcyAqYXFfbmljLAogCQkJCQkg
+ICBHRlBfS0VSTkVMKTsKIAlpZiAoIXNlbGYtPmR4X3JpbmcpIHsKIAkJYXFfcmluZ19mcmVl
+KHNlbGYpOwotCQlyZXR1cm4gTlVMTDsKKwkJcmV0dXJuIC1FTk9NRU07CiAJfQogCi0JcmV0
+dXJuIHNlbGY7CisJcmV0dXJuIDA7CiB9CiAKIGludCBhcV9yaW5nX2luaXQoc3RydWN0IGFx
+X3JpbmdfcyAqc2VsZiwgY29uc3QgZW51bSBhdGxfcmluZ190eXBlIHJpbmdfdHlwZSkKQEAg
+LTkzMiwxMSArOTAzLDE0IEBAIHZvaWQgYXFfcmluZ19mcmVlKHN0cnVjdCBhcV9yaW5nX3Mg
+KnNlbGYpCiAJCXJldHVybjsKIAogCWtmcmVlKHNlbGYtPmJ1ZmZfcmluZyk7CisJc2VsZi0+
+YnVmZl9yaW5nID0gTlVMTDsKIAotCWlmIChzZWxmLT5keF9yaW5nKQorCWlmIChzZWxmLT5k
+eF9yaW5nKSB7CiAJCWRtYV9mcmVlX2NvaGVyZW50KGFxX25pY19nZXRfZGV2KHNlbGYtPmFx
+X25pYyksCiAJCQkJICBzZWxmLT5zaXplICogc2VsZi0+ZHhfc2l6ZSwgc2VsZi0+ZHhfcmlu
+ZywKIAkJCQkgIHNlbGYtPmR4X3JpbmdfcGEpOworCQlzZWxmLT5keF9yaW5nID0gTlVMTDsK
+Kwl9CiB9CiAKIHVuc2lnbmVkIGludCBhcV9yaW5nX2ZpbGxfc3RhdHNfZGF0YShzdHJ1Y3Qg
+YXFfcmluZ19zICpzZWxmLCB1NjQgKmRhdGEpCmRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9l
+dGhlcm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9yaW5nLmggYi9kcml2ZXJzL25ldC9ldGhl
+cm5ldC9hcXVhbnRpYS9hdGxhbnRpYy9hcV9yaW5nLmgKaW5kZXggMGE2YzM0NDM4YzFkLi4w
+MGZiZWNjYzE2YzggMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlh
+L2F0bGFudGljL2FxX3JpbmcuaAorKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9hcXVhbnRp
+YS9hdGxhbnRpYy9hcV9yaW5nLmgKQEAgLTE4MywxNCArMTgzLDE0IEBAIHN0YXRpYyBpbmxp
+bmUgdW5zaWduZWQgaW50IGFxX3JpbmdfYXZhaWxfZHgoc3RydWN0IGFxX3JpbmdfcyAqc2Vs
+ZikKIAkJc2VsZi0+c3dfaGVhZCAtIHNlbGYtPnN3X3RhaWwgLSAxKTsKIH0KIAotc3RydWN0
+IGFxX3JpbmdfcyAqYXFfcmluZ190eF9hbGxvYyhzdHJ1Y3QgYXFfcmluZ19zICpzZWxmLAot
+CQkJCSAgIHN0cnVjdCBhcV9uaWNfcyAqYXFfbmljLAotCQkJCSAgIHVuc2lnbmVkIGludCBp
+ZHgsCi0JCQkJICAgc3RydWN0IGFxX25pY19jZmdfcyAqYXFfbmljX2NmZyk7Ci1zdHJ1Y3Qg
+YXFfcmluZ19zICphcV9yaW5nX3J4X2FsbG9jKHN0cnVjdCBhcV9yaW5nX3MgKnNlbGYsCi0J
+CQkJICAgc3RydWN0IGFxX25pY19zICphcV9uaWMsCi0JCQkJICAgdW5zaWduZWQgaW50IGlk
+eCwKLQkJCQkgICBzdHJ1Y3QgYXFfbmljX2NmZ19zICphcV9uaWNfY2ZnKTsKK2ludCBhcV9y
+aW5nX3R4X2FsbG9jKHN0cnVjdCBhcV9yaW5nX3MgKnNlbGYsCisJCSAgICAgc3RydWN0IGFx
+X25pY19zICphcV9uaWMsCisJCSAgICAgdW5zaWduZWQgaW50IGlkeCwKKwkJICAgICBzdHJ1
+Y3QgYXFfbmljX2NmZ19zICphcV9uaWNfY2ZnKTsKK2ludCBhcV9yaW5nX3J4X2FsbG9jKHN0
+cnVjdCBhcV9yaW5nX3MgKnNlbGYsCisJCSAgICAgc3RydWN0IGFxX25pY19zICphcV9uaWMs
+CisJCSAgICAgdW5zaWduZWQgaW50IGlkeCwKKwkJICAgICBzdHJ1Y3QgYXFfbmljX2NmZ19z
+ICphcV9uaWNfY2ZnKTsKIAogaW50IGFxX3JpbmdfaW5pdChzdHJ1Y3QgYXFfcmluZ19zICpz
+ZWxmLCBjb25zdCBlbnVtIGF0bF9yaW5nX3R5cGUgcmluZ190eXBlKTsKIHZvaWQgYXFfcmlu
+Z19yeF9kZWluaXQoc3RydWN0IGFxX3JpbmdfcyAqc2VsZik7CkBAIC0yMDcsNyArMjA3LDcg
+QEAgaW50IGFxX3JpbmdfcnhfY2xlYW4oc3RydWN0IGFxX3JpbmdfcyAqc2VsZiwKIAkJICAg
+ICBpbnQgYnVkZ2V0KTsKIGludCBhcV9yaW5nX3J4X2ZpbGwoc3RydWN0IGFxX3JpbmdfcyAq
+c2VsZik7CiAKLXN0cnVjdCBhcV9yaW5nX3MgKmFxX3JpbmdfaHd0c19yeF9hbGxvYyhzdHJ1
+Y3QgYXFfcmluZ19zICpzZWxmLAoraW50IGFxX3JpbmdfaHd0c19yeF9hbGxvYyhzdHJ1Y3Qg
+YXFfcmluZ19zICpzZWxmLAogCQlzdHJ1Y3QgYXFfbmljX3MgKmFxX25pYywgdW5zaWduZWQg
+aW50IGlkeCwKIAkJdW5zaWduZWQgaW50IHNpemUsIHVuc2lnbmVkIGludCBkeF9zaXplKTsK
+IHZvaWQgYXFfcmluZ19od3RzX3J4X2NsZWFuKHN0cnVjdCBhcV9yaW5nX3MgKnNlbGYsIHN0
+cnVjdCBhcV9uaWNfcyAqYXFfbmljKTsKZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVy
+bmV0L2FxdWFudGlhL2F0bGFudGljL2FxX3ZlYy5jIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQv
+YXF1YW50aWEvYXRsYW50aWMvYXFfdmVjLmMKaW5kZXggZjVkYjFjNDRlOWI5Li5kODExMTA2
+ODYyZmYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0bGFu
+dGljL2FxX3ZlYy5jCisrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2FxdWFudGlhL2F0bGFu
+dGljL2FxX3ZlYy5jCkBAIC0xMzYsMTAgKzEzNiw5IEBAIGludCBhcV92ZWNfcmluZ19hbGxv
+YyhzdHJ1Y3QgYXFfdmVjX3MgKnNlbGYsIHN0cnVjdCBhcV9uaWNfcyAqYXFfbmljLAogCQlj
+b25zdCB1bnNpZ25lZCBpbnQgaWR4X3JpbmcgPSBBUV9OSUNfQ0ZHX1RDVkVDMlJJTkcoYXFf
+bmljX2NmZywKIAkJCQkJCQkJICAgIGksIGlkeCk7CiAKLQkJcmluZyA9IGFxX3JpbmdfdHhf
+YWxsb2MoJnNlbGYtPnJpbmdbaV1bQVFfVkVDX1RYX0lEXSwgYXFfbmljLAotCQkJCQlpZHhf
+cmluZywgYXFfbmljX2NmZyk7Ci0JCWlmICghcmluZykgewotCQkJZXJyID0gLUVOT01FTTsK
+KwkJcmluZyA9ICZzZWxmLT5yaW5nW2ldW0FRX1ZFQ19UWF9JRF07CisJCWVyciA9IGFxX3Jp
+bmdfdHhfYWxsb2MocmluZywgYXFfbmljLCBpZHhfcmluZywgYXFfbmljX2NmZyk7CisJCWlm
+IChlcnIpIHsKIAkJCWdvdG8gZXJyX2V4aXQ7CiAJCX0KIApAQCAtMTQ3LDI0ICsxNDYsMjMg
+QEAgaW50IGFxX3ZlY19yaW5nX2FsbG9jKHN0cnVjdCBhcV92ZWNfcyAqc2VsZiwgc3RydWN0
+IGFxX25pY19zICphcV9uaWMsCiAKIAkJYXFfbmljX3NldF90eF9yaW5nKGFxX25pYywgaWR4
+X3JpbmcsIHJpbmcpOwogCi0JCWlmICh4ZHBfcnhxX2luZm9fcmVnKCZzZWxmLT5yaW5nW2ld
+W0FRX1ZFQ19SWF9JRF0ueGRwX3J4cSwKKwkJcmluZyA9ICZzZWxmLT5yaW5nW2ldW0FRX1ZF
+Q19SWF9JRF07CisJCWlmICh4ZHBfcnhxX2luZm9fcmVnKCZyaW5nLT54ZHBfcnhxLAogCQkJ
+CSAgICAgYXFfbmljLT5uZGV2LCBpZHgsCiAJCQkJICAgICBzZWxmLT5uYXBpLm5hcGlfaWQp
+IDwgMCkgewogCQkJZXJyID0gLUVOT01FTTsKIAkJCWdvdG8gZXJyX2V4aXQ7CiAJCX0KLQkJ
+aWYgKHhkcF9yeHFfaW5mb19yZWdfbWVtX21vZGVsKCZzZWxmLT5yaW5nW2ldW0FRX1ZFQ19S
+WF9JRF0ueGRwX3J4cSwKKwkJaWYgKHhkcF9yeHFfaW5mb19yZWdfbWVtX21vZGVsKCZyaW5n
+LT54ZHBfcnhxLAogCQkJCQkgICAgICAgTUVNX1RZUEVfUEFHRV9TSEFSRUQsIE5VTEwpIDwg
+MCkgewotCQkJeGRwX3J4cV9pbmZvX3VucmVnKCZzZWxmLT5yaW5nW2ldW0FRX1ZFQ19SWF9J
+RF0ueGRwX3J4cSk7CisJCQl4ZHBfcnhxX2luZm9fdW5yZWcoJnJpbmctPnhkcF9yeHEpOwog
+CQkJZXJyID0gLUVOT01FTTsKIAkJCWdvdG8gZXJyX2V4aXQ7CiAJCX0KIAotCQlyaW5nID0g
+YXFfcmluZ19yeF9hbGxvYygmc2VsZi0+cmluZ1tpXVtBUV9WRUNfUlhfSURdLCBhcV9uaWMs
+Ci0JCQkJCWlkeF9yaW5nLCBhcV9uaWNfY2ZnKTsKLQkJaWYgKCFyaW5nKSB7Ci0JCQl4ZHBf
+cnhxX2luZm9fdW5yZWcoJnNlbGYtPnJpbmdbaV1bQVFfVkVDX1JYX0lEXS54ZHBfcnhxKTsK
+LQkJCWVyciA9IC1FTk9NRU07CisJCWVyciA9IGFxX3JpbmdfcnhfYWxsb2MocmluZywgYXFf
+bmljLCBpZHhfcmluZywgYXFfbmljX2NmZyk7CisJCWlmIChlcnIpIHsKKwkJCXhkcF9yeHFf
+aW5mb191bnJlZygmcmluZy0+eGRwX3J4cSk7CiAJCQlnb3RvIGVycl9leGl0OwogCQl9CiAK
+LS0gCjIuMjUuMQoK
+
+--------------i4iPRkVxBnGsUgDfTc8WylpD--
 
