@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-51265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FAEA7F9DF5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6078E7F9DFF
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:57:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B09B91C20C90
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:55:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91A9A1C20AFC
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F0218B16;
-	Mon, 27 Nov 2023 10:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8D818C11;
+	Mon, 27 Nov 2023 10:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NRopKwnj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a2H1a6Wm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF44F5
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:54:59 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a0bdf4eeb46so212326366b.3
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:54:59 -0800 (PST)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82386F5
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:57:11 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-548f853fc9eso5298485a12.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:57:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701082498; x=1701687298; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1701082630; x=1701687430; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=WnQPbOZXxEWr4lClcQw+8oO+1btM++U+LkIgPPZht7M=;
-        b=NRopKwnjFrIw18Re7mmzyjqIqsixrQkshliyAm2j0cBrD/DDunrts2DYcq1l1lTxHZ
-         Eq4CJtwlaXzE7PL8HRxgApO+A2X/rv5UH9AIN1Gb5tdyllHCOE6CwXNcsXCXLTfm6X3c
-         mSsZaDa8vkzNg/LuBERUyxgA9HY3IypNRnG9t4jaR3l+6npRXiwvTJoZlwgWWeCHHbF+
-         5W3ABHw4M0raeSDEUV7dQGSkWYq5izdEknljsuKMJZmO8V8o6sXVQig1a3GIlDfF+FSg
-         vGCpRRcfugTCTfQhSCZx6zjdlcYQwXZRdQiEdciGyEH+rCM6jYjtxxJpuXWIHteVOEls
-         kDgw==
+        bh=7MN5u2WgORMLmPcaLnqq0UVMeuRAW+YeC7FQHMCUhwI=;
+        b=a2H1a6WmWpdrHMsESSXXqhcyQQIp7hea+6qN5QrmN3K1DkWUxwQOczkiLCoE4Zftvr
+         NvDqLoHDY5g0iGTep6Wzzv5tkn8Z1CWAUZihKtgept3tFHFrkiuhA5wy7cZvseHQtj9l
+         OfKxI4yp56fN7PzkJVNWhbg986kmlwnw91YMX7tE0H4uDBd7pKHWx38L8Zsmc2EI/oEu
+         FZdMWmJQA89LPatolj7PBoGdocGqwl1EJhJqGzrmppxDWeiffN2Pb6iQKjmjenC08bqs
+         5R//0iHTlUlVLzNPl72xR3GbMETlQHm2p49KcYk41YHVVDbqtx6BCYQiGsKTjoL4uvdy
+         fEaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701082498; x=1701687298;
+        d=1e100.net; s=20230601; t=1701082630; x=1701687430;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WnQPbOZXxEWr4lClcQw+8oO+1btM++U+LkIgPPZht7M=;
-        b=rRAugS2Ts73LjdOu8mmMVgRMM4VgObl4EDKcwjyQdihRqFWYU/kiryOAYWNgFosE9t
-         3Q52mpUEqxkZ1Wto8gSFMTRn7Ook3szGd/9jCF5k/8Vln3GXgj7gJlHjy6KhHivZDyX7
-         vo3IsGp1R0WiCz9DwPOfumnlA8nFhqihXvePzHK6P95YWSZ/JdX179jTNG5y90ExYoKT
-         Pub0fot/HPyBI5mkuglhvOFpFWSOxkqRkSO+LwnBiFGMyBAF6fkMyoEj4TnSjVXLa7WJ
-         wb6agBtPmCqdNq/IoXNCU7Bopn8/1NTDKK7gLsIDa0tfELh2e7NrTtH7aXg0+unuDLKr
-         mNkg==
-X-Gm-Message-State: AOJu0YxiFkkYlDlUYXKFXrUU9eCFMIR20SwxKzrC9GtcmCCn7siOMRly
-	Dx+Cw60jRL42yXDexTm1l8c0wQ==
-X-Google-Smtp-Source: AGHT+IEfdUndKg8gXMMwuwRAK1WFYZ8aNdUnFFjNnl6n7FF1vlXLGz/L6806LkHmeyuOyMsHvSD7Vw==
-X-Received: by 2002:a17:906:2189:b0:a08:a6d6:eb7e with SMTP id 9-20020a170906218900b00a08a6d6eb7emr6030433eju.21.1701082498405;
-        Mon, 27 Nov 2023 02:54:58 -0800 (PST)
+        bh=7MN5u2WgORMLmPcaLnqq0UVMeuRAW+YeC7FQHMCUhwI=;
+        b=XEjYsQb/ovWUHQlRhIj96Asm2DNHToshgJbbDT01l5eq1scpvm4Z++ngOlbLIblNpJ
+         0KNRlfiGz7yHbtcGroPFq6sMKeHhcL4MdQ9tpN09UHGMGV1OLqzd/WEpXrnBSWXTMsFQ
+         BZ11WfVzfVPPalKTTfvjy63cs5iGOssCNjpSswCWVctP6WaXyGeMXN4cN+gNyUj/nIxx
+         fDOhJsuo/+o9U2VKf5qyDt52cGGKSpLSmf4Q1N6Gq4wrTFec8bEeq/utHD0EECK9j3Wi
+         ouWahRSlf2nzkFRq7IyNLmueuG9DLuQujJ7CSkOPF/Tip3ogDtxBTRiZ/ehRrytcmgBg
+         uI4A==
+X-Gm-Message-State: AOJu0YwcNYwbn9BYkFWENvVsdhkOFPqtfQn4Z/9Zxq8MiIBFc8/HK2uH
+	Pvj6NBg4Sd04MosDNXbb1oKqaA==
+X-Google-Smtp-Source: AGHT+IFf3n2kZZmN6+iDUok+nSOwCWwjKn7Zpmbx9Ltfne9Z76BuS5U11jC/1C2vES6Kt4n//F5Xeg==
+X-Received: by 2002:a17:906:2d3:b0:a0c:582a:c5ad with SMTP id 19-20020a17090602d300b00a0c582ac5admr3169074ejk.77.1701082630030;
+        Mon, 27 Nov 2023 02:57:10 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.223.109])
-        by smtp.gmail.com with ESMTPSA id gg6-20020a170906e28600b00a090b36d618sm4349192ejb.60.2023.11.27.02.54.57
+        by smtp.gmail.com with ESMTPSA id u3-20020a17090626c300b009a5f1d15644sm5515634ejc.119.2023.11.27.02.57.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 02:54:58 -0800 (PST)
-Message-ID: <fb2dc37a-daae-4db9-bf34-aeeb4ec4ff86@linaro.org>
-Date: Mon, 27 Nov 2023 11:54:56 +0100
+        Mon, 27 Nov 2023 02:57:09 -0800 (PST)
+Message-ID: <c51aa08d-944f-4d91-9cd0-c8a6ff6ceace@linaro.org>
+Date: Mon, 27 Nov 2023 11:57:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,15 +62,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] nfc: Do not send datagram if socket state isn't
- LLCP_BOUND
+Subject: Re: [PATCH 4/4] nfc: llcp_sock_sendmsg: Reformat code to make the
+ smaller block indented
 Content-Language: en-US
 To: Siddh Raman Pant <code@siddh.me>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <cover.1700943019.git.code@siddh.me>
- <ff2e1639a591e413ce95eb64dea85751292c0be0.1700943019.git.code@siddh.me>
+ <f5e1fc8131923c50d08fa30eb7136f32ddafe37d.1700943019.git.code@siddh.me>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -116,20 +116,47 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <ff2e1639a591e413ce95eb64dea85751292c0be0.1700943019.git.code@siddh.me>
+In-Reply-To: <f5e1fc8131923c50d08fa30eb7136f32ddafe37d.1700943019.git.code@siddh.me>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 25/11/2023 21:26, Siddh Raman Pant wrote:
-> As we know we cannot send the datagram (state can be set to LLCP_CLOSED
-> by nfc_llcp_socket_release()), there is no need to proceed further.
+> The block for datagram sending is a significantly bigger chunk of the
+> function compared to the other scenario.
 > 
-> Thus, bail out early from llcp_sock_sendmsg().
+> Thus, put the significantly smaller block inside the if-block.
 > 
-> Signed-off-by: Siddh Raman Pant <code@siddh.me>
 
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>  
+> +	if (sk->sk_state != LLCP_BOUND) {
+>  		release_sock(sk);
+> -
+> -		return nfc_llcp_send_ui_frame(llcp_sock, addr->dsap, addr->ssap,
+> -					      msg, len);
+> +		return -ENOTCONN;
+>  	}
+>  
+> -	if (sk->sk_state != LLCP_CONNECTED) {
+> +	DECLARE_SOCKADDR(struct sockaddr_nfc_llcp *, addr, msg->msg_name);
+
+No, this code is not readable. I don't think this change helps in anything.
+
+> +
+> +	if (msg->msg_namelen < sizeof(*addr)) {
+>  		release_sock(sk);
+> -		return -ENOTCONN;
+> +		return -EINVAL;
+>  	}
+>  
+>  	release_sock(sk);
+>  
+> -	return nfc_llcp_send_i_frame(llcp_sock, msg, len);
+> +	return nfc_llcp_send_ui_frame(llcp_sock, addr->dsap, addr->ssap,
+> +				      msg, len);
+> +
+
+Stray blank line.
 
 
 Best regards,
