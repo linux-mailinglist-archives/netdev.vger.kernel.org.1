@@ -1,128 +1,127 @@
-Return-Path: <netdev+bounces-51205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 455F97F98F7
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:56:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E7E7F990D
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 07:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A7BD1C208DF
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 05:56:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EB5B280DC1
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E835698;
-	Mon, 27 Nov 2023 05:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5546FA1;
+	Mon, 27 Nov 2023 06:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GQjpePUq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NcDNmv5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7628F;
-	Sun, 26 Nov 2023 21:56:12 -0800 (PST)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AR5sFHh018175;
-	Mon, 27 Nov 2023 05:55:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=nlI8cWTeXYFoG1oJvZ938PdClUylpLDMRPsO/tEC1cM=;
- b=GQjpePUqxxgqZwJVWHz0ocJe30he/L4gpdtZY+v3MqtiSVNfWAqrdc08ao+73dAC4D6W
- kwJ1brNbaNnBDpFn2BWXzFgvZr2g5xK8N/Xz7h3O75pK3rvQSzFY2ZjuNto7cSgLebwv
- c+c8vLyXPccDgic09MbYt4FRhyYTvydbBZ7NFeJJjwDZePkj8KnT+psk5EY2Q0wFk2Iq
- tB/xfv5DiuI9NaCr+sXSu2cZj0O5Ckndj9Y18Q3hMH6kNCXWgwk4HoiGi0WutCKulcJe
- ibz3dvaI9u3TSwkEJcbG62EeXmzKq99/kT4XBvK2MFnC1oGLedRrDqwVH+2ITnzSGXZv wg== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uk9adk9kp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 05:55:47 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AR5tkoW021046
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 05:55:46 GMT
-Received: from [10.216.37.62] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sun, 26 Nov
- 2023 21:55:38 -0800
-Message-ID: <47c9eb95-ff6a-4432-a7ef-1f3ebf6f593f@quicinc.com>
-Date: Mon, 27 Nov 2023 11:25:34 +0530
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F06E4
+	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 22:04:44 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6be0277c05bso3218003b3a.0
+        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 22:04:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701065084; x=1701669884; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+OTyuBSj00HpTGxowPCMZHFCFh0gtzlFv4DUNhcakBU=;
+        b=NcDNmv5RGkJuCuAWvYueIFED9469qfyC/NZK0KmFMqrQDUZi3hRp+mFhJ4uzUMCr7z
+         um3dSPQ/v9UKdVYsOqA/wz3stagQlmVU3ts66q8IXjeaS2RE9kFSE7iL89g2S2XBWgZN
+         tl4EAqZ2c+aRbr6HJSgpqrce8S87s45kIpx+qQswiDMa/Kh5JWc2nEnldBJ6zo60C7l6
+         sq/wINj3X7Aim9r6bxDGGAoheeW9CSpeRQAbzsSImuAOVisEoT8Edh3akqC4AgImpcTV
+         DgCaQCAspD+BlgUQocpSEgYDyufrzpsjZYL0/hm0R5KZVw1PQD5QbH2iDPS9cfpK3qOX
+         q5aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701065084; x=1701669884;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+OTyuBSj00HpTGxowPCMZHFCFh0gtzlFv4DUNhcakBU=;
+        b=if+L+MVux5NCruzYrXw4Su+B7cAB6svEGrT4qGO8xWDfsJZDE72jlz/8e8PXpr8t8V
+         wmPlx21JjTibydJHGh/4GuRPu83qBKzi1pfs4MO3QrHqTwqTUaBuBmnsExL8WOZqZH80
+         RIbYOHjWvrFiQK/6zIdlEoQYJ4/1myh5hmclWWGXKF5uI7EvxhHjBmTjhunRbgIae8qf
+         77jtS4+jYOLv2YGolt9aCvst5TBdGZW1NzxWiLcpVuUVQmmB5ilQ9jVDzZ/XY96ILZnz
+         l59j/QlEGK6b8b/EAYSQloYSfuCVzO9Q9fPWYS71NVH7/IdVbRpdi6jNAFRX6rERmxb0
+         ywMg==
+X-Gm-Message-State: AOJu0YwJPwD3gJN5N87j4vVZ/enu7AohM+xFUCYs8PmiNvq2enDK52+H
+	HxXNGrncZXkKQ/Zx2KQPVMp8
+X-Google-Smtp-Source: AGHT+IG/i+PnOVkzEH5tF9cNXhmaOkhMuwMasrzxUa0Df7G1z+bvbR/u7fIVg0ojsgJH6yM2ZEehSA==
+X-Received: by 2002:aa7:88ce:0:b0:6cb:6ab1:564c with SMTP id k14-20020aa788ce000000b006cb6ab1564cmr10324719pff.10.1701065084286;
+        Sun, 26 Nov 2023 22:04:44 -0800 (PST)
+Received: from thinkpad ([103.28.246.157])
+        by smtp.gmail.com with ESMTPSA id c16-20020aa78c10000000b006905f6bfc37sm6460850pfd.31.2023.11.26.22.04.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 22:04:43 -0800 (PST)
+Date: Mon, 27 Nov 2023 11:34:39 +0530
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	loic.poulain@linaro.org
+Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
+Message-ID: <20231127060439.GA2505@thinkpad>
+References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
+ <20230607094922.43106896@kernel.org>
+ <20230607171153.GA109456@thinkpad>
+ <20230607104350.03a51711@kernel.org>
+ <20230608123720.GC5672@thinkpad>
+ <20231117070602.GA10361@thinkpad>
+ <20231117162638.7cdb3e7d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: update Rx clk divider for 10M SGMII
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
-References: <20231124050818.1221-1-quic_snehshah@quicinc.com>
- <ZWBo5EKjkffNOqkQ@shell.armlinux.org.uk>
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <ZWBo5EKjkffNOqkQ@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: m6oG0PAYAdRoiQlI4f-kSCLeC0qZhmxp
-X-Proofpoint-GUID: m6oG0PAYAdRoiQlI4f-kSCLeC0qZhmxp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-27_03,2023-11-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- clxscore=1011 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- phishscore=0 bulkscore=0 mlxlogscore=933 adultscore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311270039
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231117162638.7cdb3e7d@kernel.org>
 
-You are right here for GENMASK(15,14) | BIT(10). I am using this to create a field value.I will switch to FIELD_PREP as that seems like a better way to do this.
+On Fri, Nov 17, 2023 at 04:26:38PM -0800, Jakub Kicinski wrote:
+> On Fri, 17 Nov 2023 12:36:02 +0530 Manivannan Sadhasivam wrote:
+> > Sorry to revive this old thread, this discussion seems to have fell through the
+> > cracks...
+> 
+> It did not fall thru the cracks, you got a nack. Here it is in a more
+> official form:
+> 
+> Nacked-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> Please make sure you keep this tag and CC me if you ever post any form
+> of these patches again.
 
-This field programming is required only for 10M speed in for SGMII mode. other speeds are agnostic to this field. Hence we are programming it always when SGMII link comes up in 10M mode. init driver data for ethqos is common for sgmii and rgmii. As this fix is specific to SGMII we can't add this to init driver data.
+Thanks for the NACK. Could you please respond to my reply justifying this driver
+(the part you just snipped)? I'm posting it below:
 
-On 11/24/2023 2:42 PM, Russell King (Oracle) wrote:
-> On Fri, Nov 24, 2023 at 10:38:18AM +0530, Sneh Shah wrote:
->>  #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
->>  #define RGMII_CONFIG_PROG_SWAP			BIT(1)
->>  #define RGMII_CONFIG_DDR_MODE			BIT(0)
->> +#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
-> 
-> So you're saying here that this is a 9 bit field...
-> 
->> @@ -617,6 +618,8 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
->>  	case SPEED_10:
->>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
->>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
->> +		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR, BIT(10) |
->> +			      GENMASK(15, 14), RGMII_IO_MACRO_CONFIG);
-> 
-> ... and then you use GENMASK(15,14) | BIT(10) here to set bits in that
-> bitfield. If there are multiple bitfields, then these should be defined
-> separately and the mask built up.
-> 
-> I suspect that they aren't, and you're using this to generate a _value_
-> that has bits 5, 4, and 0 set for something that really takes a _value_.
-> So, FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 0x31) or
-> FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 49) would be entirely correct
-> here.
-> 
-> The next concern I have is that you're only doing this for SPEED_10.
-> If it needs to be programmed for SPEED_10 to work, and not any of the
-> other speeds, isn't this something that can be done at initialisation
-> time? If it has to be done depending on the speed, then don't you need
-> to do this for each speed with an appropriate value?
-> 
+> As I explained above, other interfaces also expose this kind of functionality
+> between host and the device. One of the credible usecase with this driver is
+> sharing the network connectivity available in either host or the device with the
+> other end.
+>
+> To make it clear, we have 2 kind of channels exposed by MHI for networking.
+>
+> 1. IP_SW0
+> 2. IP_HW0
+>
+> IP_SW0 is useful in scenarios I explained above and IP_HW0 is purely used to
+> provide data connectivity to the host machines with the help of modem IP in the
+> device. And the host side stack is already well supported in mainline. With the
+> proposed driver, Linux can run on the device itself and it will give Qcom a
+> chance to get rid of their proprietary firmware used on the PCIe endpoint
+> devices like modems, etc...
+
+I think you made up your mind that this driver is exposing the network interface
+to the firmware on the device. I ought to clearify that the device running this
+driver doesn't necessarily be a modem but a PCIe endpoint instance that uses the
+netdev exposed by this driver to share data connectivity with another device.
+
+This concept is not new and being supported by other protocols such as Virtio
+etc...
+
+- Mani
+-- 
+மணிவண்ணன் சதாசிவம்
 
