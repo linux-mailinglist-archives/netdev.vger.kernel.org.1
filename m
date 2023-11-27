@@ -1,81 +1,156 @@
-Return-Path: <netdev+bounces-51346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95E87FA427
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:10:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933207FA443
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:19:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 638962817B3
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:10:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECB82B210A9
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2C731A73;
-	Mon, 27 Nov 2023 15:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C4831A73;
+	Mon, 27 Nov 2023 15:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DrZZL3v/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6PrzDkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D7DE4;
-	Mon, 27 Nov 2023 07:10:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CMxAbeP9zP9Pf1RjhRBAQNd8InGAbFxmlxKVc+wxsAM=; b=DrZZL3v/zZcNYXD0zQKz85lPF7
-	jvZmd+ICIL0GduqeXveIgY9DgUNRZpjDB7+7fIatZm1fztwQ7WJzNTh+isMzZho3R+PX+6Sn/dHus
-	8wfjf/snVyKSwskWtWqD+rdRKf4QfHmX+jNXFXPuBHN2X4WtuL8FRvca6jNDdcoMNlEwUxI9RfBoI
-	AN4W7kcyvIhPZjP4KRMeIsK/H1LForVuJdo+jSQGHk1HKGfyhjPM1jWxNbxJBHc4fUqZqwFpLNMHe
-	LUN2GInjfipAaNxBtXBCxEy6UDabIVBHv9GZEjWg69QyNqCAppiWktzLClpvDKFJKVAeEuKqVjqDY
-	quaJZGhw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54294)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7dFp-000621-2I;
-	Mon, 27 Nov 2023 15:10:33 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7dFr-00020n-Mz; Mon, 27 Nov 2023 15:10:35 +0000
-Date: Mon, 27 Nov 2023 15:10:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v7 0/3] Fine-Tune Flow Control and Speed
- Configurations in Microchip KSZ8xxx DSA Driver
-Message-ID: <ZWSxa4cgh/eMLCQA@shell.armlinux.org.uk>
-References: <20231127145101.3039399-1-o.rempel@pengutronix.de>
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DCCAA;
+	Mon, 27 Nov 2023 07:19:27 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-db4050e68f3so4007067276.0;
+        Mon, 27 Nov 2023 07:19:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701098367; x=1701703167; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VIKMvlIRYtS1WvbUoM+vWJ1z9I2GYsx2bfxFTfmC+TQ=;
+        b=B6PrzDkNSGflIGyKxT6lJSOQZtl1VH+4eiypVM5zl6cxjK23Wu2q3XJoL02SsBwr8T
+         tG5rUCL+N435lbKfNLuwQzM9kkp22+OqmqSoS/RQLuESSO9QDwyHCsdyYja060omGwzY
+         IV0DGMss6fZt2LCYzx+7kzq6Pnmw5UGgUgUoyWDl5YCO30EVZOEp69vFTHGKzLBAqFpd
+         a2cWE9Az84mPzYdX0BZAGPpVFenUGhI4pyE6TFE5AHHb9RktbvLxCWPrslOos9qox1oq
+         EY5v4iCAuV8blJQC2bx+/rYlLI3G9MKDhP48+TtHa/UyX/n2e54ArFdB2RQQDiTh2eJa
+         c2zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701098367; x=1701703167;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VIKMvlIRYtS1WvbUoM+vWJ1z9I2GYsx2bfxFTfmC+TQ=;
+        b=PKNIZUTCGlVrHyGL9wh0SpeZx9laWJA/LwnOcNNTbiOKAW+BRLnihbKVgcx+892VIx
+         yvOSQE0FUZ6l3c56lWhOdnOQwL0xxHyfn1JLQlbWHq1hF7TBi9doiMXogMTruhxyD8GQ
+         AklyggB8qKLHe7aGGXcgDr0apdTkO5ZfAkYZwlrtBwqzrKeGUdgJIkdmWsYn/PhdrFsC
+         fEdliWz/GivdlqrQyKU4v+8Ctwv4F0qLPP9I+VflecCd0i3/q5SE3p6gefp1rMMfhHI1
+         p77jODzFwYV/h+tYieRSqS6RnOfDBW9bG09X5Zsp2wgDNXKt0knZK4B4E3M9qWUJpRKC
+         y2BQ==
+X-Gm-Message-State: AOJu0YyjwNgrsfuhjhNul3djBBh96C/XCqQ6ohod5LEm26UZ6XyCkE1n
+	BUJpvoRF+5jjxxjVBNfuOIF5cBmRmaVeA8TszEI=
+X-Google-Smtp-Source: AGHT+IE/rFqsV0KKN1gYLmgiErQUf25fY8S0FvfOygtZwLf5Ah7JOJcfJbDXf3oSBTUYCLBu/J8CZ1DTNOo/phyIfOI=
+X-Received: by 2002:a25:4b02:0:b0:db0:23d8:780 with SMTP id
+ y2-20020a254b02000000b00db023d80780mr9466434yba.60.1701098366826; Mon, 27 Nov
+ 2023 07:19:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127145101.3039399-1-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com> <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch> <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
+ <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch> <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
+In-Reply-To: <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
+From: Tomer Maimon <tmaimon77@gmail.com>
+Date: Mon, 27 Nov 2023 17:19:15 +0200
+Message-ID: <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com, edumazet@google.com, 
+	krzysztof.kozlowski+dt@linaro.org, linux-stm32@st-md-mailman.stormreply.com, 
+	benjaminfair@google.com, openbmc@lists.ozlabs.org, joabreu@synopsys.com, 
+	joel@jms.id.au, devicetree@vger.kernel.org, j.neuschaefer@gmx.net, 
+	robh+dt@kernel.org, peppe.cavallaro@st.com, 
+	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com, 
+	venture@google.com, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, 
+	netdev@vger.kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 27, 2023 at 03:50:58PM +0100, Oleksij Rempel wrote:
-> changes v7:
-> - make pause configuration depend on MLO_PAUSE_AN
-> - use duplex == DUPLEX_HALF
+Hi Andrew,
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+I took a look at the xpcs driver and the stmmac driver and it doesn't
+cover NPCM use.
 
-Thanks for addressing my feedback!
+in the NPCM case the stmmac ID=0x37 therefore the driver is linked to DWMAC1000
+https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/hwif.c#L139
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+to enable the xpcs, the stmmac should support xgmac or gmac4 and in
+the NPCM is support only gmac.
+https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L555
+https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L573
+
+and the most important thing is that the XPCS is handled through an
+indirect register access and not through MDIO. the MDIO is connected
+to the external PHY and not to the XPCS.
+
+In that case, I think the best way to handle the XPCS is through the
+NPCM glue layer, what do you think?
+
+Thanks,
+
+Tomer
+
+On Thu, 23 Nov 2023 at 15:50, Tomer Maimon <tmaimon77@gmail.com> wrote:
+>
+> Hi Andrew,
+>
+> On Wed, 22 Nov 2023 at 20:45, Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Wed, Nov 22, 2023 at 07:50:57PM +0200, Tomer Maimon wrote:
+> > > Hi Andrew,
+> > >
+> > > Thanks for your comments
+> > >
+> > > On Tue, 21 Nov 2023 at 18:42, Andrew Lunn <andrew@lunn.ch> wrote:
+> > > >
+> > > > > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> > > > > +                      struct plat_stmmacenet_data *plat_dat)
+> > > > > +{
+> > > > > +     u16 val;
+> > > > > +
+> > > > > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> > > > > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > > +     val |= PCS_RST;
+> > > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > > +
+> > > > > +     while (val & PCS_RST)
+> > > > > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > > +
+> > > > > +     val &= ~(PCS_AN_ENABLE);
+> > > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > > > +}
+> > > >
+> > > > Is this a licensed PCS implementation? Or home grown? If its been
+> > > > licensed from somebody, it maybe should live in driver/net/pcs, so
+> > > > others can reuse it when they license the same core.
+> >
+> > > we are using DWC PCS, I don't see support for DWC PCS and I am not
+> > > sure it is supposed to be supported at /drivers/net/pcs
+> >
+> > I've not followed the naming used by Synopsys. Is DWC PCS the same as
+> > XPCS? Does Synopsys have multiple PCS implementations?
+> >
+> > > I do see a patch set to support DWC PCS but I don't think it answers my needs
+> > > https://patchwork.ozlabs.org/project/netdev/patch/1559674736-2190-3-git-send-email-weifeng.voon@intel.com/
+> >
+> > I _think_ this patch eventually got turned into
+> > driver/net/pcs/pcs-xpcs.c
+> >
+> > What exactly does it not do for you?
+> Thanks for pointing me to Synopsys (DWC) PCS in pcs-xpcs.c I need to
+> check if the driver follows all our SGMII needs
+> >
+> >      Andrew
+>
+> Best regards,
+>
+> Tomer
 
