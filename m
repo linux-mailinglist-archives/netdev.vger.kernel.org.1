@@ -1,156 +1,135 @@
-Return-Path: <netdev+bounces-51347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933207FA443
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:19:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C5B7FA4C0
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECB82B210A9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE095B20FEC
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C4831A73;
-	Mon, 27 Nov 2023 15:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E65328BA;
+	Mon, 27 Nov 2023 15:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6PrzDkN"
+	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="TdaqAdOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DCCAA;
-	Mon, 27 Nov 2023 07:19:27 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-db4050e68f3so4007067276.0;
-        Mon, 27 Nov 2023 07:19:27 -0800 (PST)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377B2C3
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 07:30:38 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-507a3b8b113so5700316e87.0
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 07:30:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701098367; x=1701703167; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIKMvlIRYtS1WvbUoM+vWJ1z9I2GYsx2bfxFTfmC+TQ=;
-        b=B6PrzDkNSGflIGyKxT6lJSOQZtl1VH+4eiypVM5zl6cxjK23Wu2q3XJoL02SsBwr8T
-         tG5rUCL+N435lbKfNLuwQzM9kkp22+OqmqSoS/RQLuESSO9QDwyHCsdyYja060omGwzY
-         IV0DGMss6fZt2LCYzx+7kzq6Pnmw5UGgUgUoyWDl5YCO30EVZOEp69vFTHGKzLBAqFpd
-         a2cWE9Az84mPzYdX0BZAGPpVFenUGhI4pyE6TFE5AHHb9RktbvLxCWPrslOos9qox1oq
-         EY5v4iCAuV8blJQC2bx+/rYlLI3G9MKDhP48+TtHa/UyX/n2e54ArFdB2RQQDiTh2eJa
-         c2zQ==
+        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1701099036; x=1701703836; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0nEvDUTA+VvuaYc5IvEcHoTln/14hfyXc63Vrf+U23o=;
+        b=TdaqAdOHGHRUQIQ58Zzi1ivA/gkcWgUKlHkgv2qJRjAfz0y1u6k2xlua3CjJeQMnCN
+         jAm7bQuvGMU5gTCbNwLI2n4XMuWJR6iHumE009SlERLd+8eI40jXcL4ZVd9jaD/yipbY
+         A/7LEA+EHylsqz9MxCV7O/e0YKqelB7ktAHP93NJ9s8m/V2KawJpUj02pbqb8Fh6cxgB
+         +iFVNha29qee0qGnEIOBhmtOR6rjVZwosdWjAqq8pGednvkjMGlZoLKoGGIlcGD3Ncs+
+         JbfGSs0YlAgflFyd7TDU9yZH3SW3xTSVsK7YVfIxOabqry2641OjInXswVtmGnfLp6SV
+         o3tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701098367; x=1701703167;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VIKMvlIRYtS1WvbUoM+vWJ1z9I2GYsx2bfxFTfmC+TQ=;
-        b=PKNIZUTCGlVrHyGL9wh0SpeZx9laWJA/LwnOcNNTbiOKAW+BRLnihbKVgcx+892VIx
-         yvOSQE0FUZ6l3c56lWhOdnOQwL0xxHyfn1JLQlbWHq1hF7TBi9doiMXogMTruhxyD8GQ
-         AklyggB8qKLHe7aGGXcgDr0apdTkO5ZfAkYZwlrtBwqzrKeGUdgJIkdmWsYn/PhdrFsC
-         fEdliWz/GivdlqrQyKU4v+8Ctwv4F0qLPP9I+VflecCd0i3/q5SE3p6gefp1rMMfhHI1
-         p77jODzFwYV/h+tYieRSqS6RnOfDBW9bG09X5Zsp2wgDNXKt0knZK4B4E3M9qWUJpRKC
-         y2BQ==
-X-Gm-Message-State: AOJu0YyjwNgrsfuhjhNul3djBBh96C/XCqQ6ohod5LEm26UZ6XyCkE1n
-	BUJpvoRF+5jjxxjVBNfuOIF5cBmRmaVeA8TszEI=
-X-Google-Smtp-Source: AGHT+IE/rFqsV0KKN1gYLmgiErQUf25fY8S0FvfOygtZwLf5Ah7JOJcfJbDXf3oSBTUYCLBu/J8CZ1DTNOo/phyIfOI=
-X-Received: by 2002:a25:4b02:0:b0:db0:23d8:780 with SMTP id
- y2-20020a254b02000000b00db023d80780mr9466434yba.60.1701098366826; Mon, 27 Nov
- 2023 07:19:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701099036; x=1701703836;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0nEvDUTA+VvuaYc5IvEcHoTln/14hfyXc63Vrf+U23o=;
+        b=mOSSoGhvlQ9d+cEeD81mFT6jVHAr6WcnE/K1VREFsaajiGtNzuWkWWXT3HoyNHPPhh
+         7+1I3uJ9bel7u7wPecr/Oi+fDd2A9FVaQNr2Z6FIDi6t48BtwAQEMWmWsNXscoQEfwA+
+         AcNGFBWzj+0RIwhV9xru37lH5JMusHc3Jgq4yFuB7s6zc+AJniVOgq2HGPWiEPhw8TXE
+         GCxV9enjQYMeAqfXyLbzEN66iIVvpkxjX9sw7Wzfkihuwe1uh/aMYhH1ZmuNz6s1Podh
+         zV5HlAJVPHOtomrp1EKbLZJD/iaZGf94EHqWtB84DsG1eKqABD7jEPT7+Q+WtaDYjdjH
+         P+kA==
+X-Gm-Message-State: AOJu0YwTS8MGXqzeXcsUz3J/ZBGh1HZufBDKfxwxRYEvvMVzxE10O/ki
+	2EblhlkTp8IABxW6Cxz/SF4JoA==
+X-Google-Smtp-Source: AGHT+IFIdQDsSEv3RzXM31ZIHh3gafChRm3GIc3+5CtX1YMLD/gJ44pyECWYXqOtlO0mWzBletRSiA==
+X-Received: by 2002:a05:6512:31ce:b0:50b:aedd:6d53 with SMTP id j14-20020a05651231ce00b0050baedd6d53mr4159551lfe.62.1701099036331;
+        Mon, 27 Nov 2023 07:30:36 -0800 (PST)
+Received: from debian ([185.117.107.42])
+        by smtp.gmail.com with ESMTPSA id x5-20020a19f605000000b0050aa491e86esm1510684lfe.83.2023.11.27.07.30.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 07:30:35 -0800 (PST)
+Date: Mon, 27 Nov 2023 16:30:33 +0100
+From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] net: microchip_t1s: additional phy support and
+ collision detect handling
+Message-ID: <ZWS2GYBGGZg2MS0d@debian>
+References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
+ <d79803b5-60ec-425b-8c5c-3e96ff351e09@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121151733.2015384-1-tmaimon77@gmail.com> <20231121151733.2015384-3-tmaimon77@gmail.com>
- <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch> <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
- <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch> <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
-In-Reply-To: <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
-From: Tomer Maimon <tmaimon77@gmail.com>
-Date: Mon, 27 Nov 2023 17:19:15 +0200
-Message-ID: <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com, edumazet@google.com, 
-	krzysztof.kozlowski+dt@linaro.org, linux-stm32@st-md-mailman.stormreply.com, 
-	benjaminfair@google.com, openbmc@lists.ozlabs.org, joabreu@synopsys.com, 
-	joel@jms.id.au, devicetree@vger.kernel.org, j.neuschaefer@gmx.net, 
-	robh+dt@kernel.org, peppe.cavallaro@st.com, 
-	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com, 
-	venture@google.com, linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com, 
-	netdev@vger.kernel.org, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d79803b5-60ec-425b-8c5c-3e96ff351e09@lunn.ch>
 
-Hi Andrew,
+On Mon, Nov 27, 2023 at 02:58:32PM +0100, Andrew Lunn wrote:
+> > Collision detection
+> > This has been tested on a setup where one ARM system with a LAN8650
+> > mac-phy is daisy-chained to 8 mcus using lan8670 phys. Without the patch we
+> > were limited to really short cables, about 1m per node, but we were
+> > still getting a lot of connection drops.
+> > With the patch we could increase the total cable length to at least 40M.
+> 
+> Did you do any testing of collision detection enabled, PLCA disabled?
+> 
 
-I took a look at the xpcs driver and the stmmac driver and it doesn't
-cover NPCM use.
+In our dev system we've only tested with PLCA enabled, bit too tricky
+changing internals on the microcontrollers.
+But I have a lot of usb eval dongles that I can test with.
 
-in the NPCM case the stmmac ID=0x37 therefore the driver is linked to DWMAC1000
-https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/hwif.c#L139
+> You say you think this is noise related. But the noise should be the
+> same with or without PLCA. I'm just thinking maybe collision detection
+> is just plain broken and should always be disabled?
+> 
 
-to enable the xpcs, the stmmac should support xgmac or gmac4 and in
-the NPCM is support only gmac.
-https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L555
-https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L573
+I don't have access to the equipment to measure noise or reflections,
+I've looked at the link with an oscilloscope and it looked fine to me.
+The reason I'm mentioning noise is just me parroting the datasheet, for
+context I'll quote the footnote here
 
-and the most important thing is that the XPCS is handled through an
-indirect register access and not through MDIO. the MDIO is connected
-to the external PHY and not to the XPCS.
+"No physical collisions will occur when all nodes in a mixing segment are properly
+configured for PLCA operation. As a result, for improved performance in high noise
+environments where false collisions may be detected leading to dropped packets, it is
+recommended that the user write this bit to a ‘0’ to disable collision detection when PLCA
+is enabled. When collision detection is disabled, the PLCA reconciliation sublayer will still
+assert logical collisions to the MAC as part of normal operation."
+LAN8650 datasheet 11.5.51
 
-In that case, I think the best way to handle the XPCS is through the
-NPCM glue layer, what do you think?
+> I've not read much about T1S, but if we assume it is doing good old
+> fashioned CSMA/CD, with short cables the CS bit works well and the CD
+> is less important. CD was needed when you have 1000m cable, and you
+> can fit 64 bytes on the 1000m cable. So always turning of CD might be
+> appropriate.
+> 
+> 	Andrew
 
-Thanks,
+As you assume when PLCA is disabled the phy runs in CSMA/CD mode.
 
-Tomer
+I'll do some tests with both PLCA and CD off/disabled. My thinking is that a
+adequate test bench would look like
 
-On Thu, 23 Nov 2023 at 15:50, Tomer Maimon <tmaimon77@gmail.com> wrote:
->
-> Hi Andrew,
->
-> On Wed, 22 Nov 2023 at 20:45, Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Wed, Nov 22, 2023 at 07:50:57PM +0200, Tomer Maimon wrote:
-> > > Hi Andrew,
-> > >
-> > > Thanks for your comments
-> > >
-> > > On Tue, 21 Nov 2023 at 18:42, Andrew Lunn <andrew@lunn.ch> wrote:
-> > > >
-> > > > > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
-> > > > > +                      struct plat_stmmacenet_data *plat_dat)
-> > > > > +{
-> > > > > +     u16 val;
-> > > > > +
-> > > > > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
-> > > > > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > > > > +     val |= PCS_RST;
-> > > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > > > > +
-> > > > > +     while (val & PCS_RST)
-> > > > > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > > > > +
-> > > > > +     val &= ~(PCS_AN_ENABLE);
-> > > > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
-> > > > > +}
-> > > >
-> > > > Is this a licensed PCS implementation? Or home grown? If its been
-> > > > licensed from somebody, it maybe should live in driver/net/pcs, so
-> > > > others can reuse it when they license the same core.
-> >
-> > > we are using DWC PCS, I don't see support for DWC PCS and I am not
-> > > sure it is supposed to be supported at /drivers/net/pcs
-> >
-> > I've not followed the naming used by Synopsys. Is DWC PCS the same as
-> > XPCS? Does Synopsys have multiple PCS implementations?
-> >
-> > > I do see a patch set to support DWC PCS but I don't think it answers my needs
-> > > https://patchwork.ozlabs.org/project/netdev/patch/1559674736-2190-3-git-send-email-weifeng.voon@intel.com/
-> >
-> > I _think_ this patch eventually got turned into
-> > driver/net/pcs/pcs-xpcs.c
-> >
-> > What exactly does it not do for you?
-> Thanks for pointing me to Synopsys (DWC) PCS in pcs-xpcs.c I need to
-> check if the driver follows all our SGMII needs
-> >
-> >      Andrew
->
-> Best regards,
->
-> Tomer
+* 3-4 nodes (depending on how many usb ports and dongles I have)
+* run iperf with long cables and CSMA/CD
+* run iperf with long cables and CMSA/No CD
+
+I'll report back the results. Anything you'd like to add/focus on with
+evaluation?
+
+Ramón
 
