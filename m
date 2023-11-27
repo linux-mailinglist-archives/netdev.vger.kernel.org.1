@@ -1,370 +1,292 @@
-Return-Path: <netdev+bounces-51349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715DA7FA4C9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:33:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 047217FA4E8
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:39:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBB52B20A63
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:33:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA5272816A3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6567F328BA;
-	Mon, 27 Nov 2023 15:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A5D34550;
+	Mon, 27 Nov 2023 15:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGJlKf5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from janet.servers.dxld.at (mail.servers.dxld.at [IPv6:2001:678:4d8:200::1a57])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A89E594;
-	Mon, 27 Nov 2023 07:33:36 -0800 (PST)
-Received: janet.servers.dxld.at; Mon, 27 Nov 2023 16:33:15 +0100
-From: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
-Subject: [PATCH net-next v2] wireguard: Add netlink attrs for binding to address and netdev
-Date: Mon, 27 Nov 2023 16:33:06 +0100
-Message-Id: <20231127153306.1975792-1-dxld@darkboxed.org>
-X-Mailer: git-send-email 2.39.2
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A787C192;
+	Mon, 27 Nov 2023 07:39:08 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507a3b8b113so5714710e87.0;
+        Mon, 27 Nov 2023 07:39:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701099547; x=1701704347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V3MQBUG01fxHiGLZ4D7RmeDwk6VeH03hCF588rTXboM=;
+        b=GGJlKf5xyhW1yFHSDhi6sOvu7ZBdC41xhbCWaEllRiLPDeMHv0GHGvpkmzWY05/8Ya
+         GvsdlKkQO/SjWbz3VXz86WEtE6OFwcGfDpHGszwAXmbMjAEcXhGjXi4g6WBe115sGNTf
+         9j5jgIWCnRzCANSjdAkQKWqWRGSRZ7rGweUvjhWWLX7Qmb1/sv3sh3e89nb9OpRQFQsp
+         yIpDlyI4N8l4Ls73DGNvyD6wCAZ1ytTRBG6aLrZxms6J3PbItzu2eUiB9SubdPiqbJLi
+         xp7ZSt+0dB4nvNRyGUFbn7q4g6wxYzhB/R64p6F7NlcqCWCJxkHr6fG3uhgCZV3k5brr
+         kOXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701099547; x=1701704347;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V3MQBUG01fxHiGLZ4D7RmeDwk6VeH03hCF588rTXboM=;
+        b=Qxaa51CiiY1zpv/mes9ghQ7o2y2EXLWfHh38j9Deo1QRmXu9lBj71JYmLbRx8rx2OX
+         jXCQWOINIGc1B6sFVebL8yAC5tuikNVyk+s+9pSv9dmU8uVKHJ1o6QsxKL4Gp6XRhkYW
+         YITA1XdZs8YStB/JLKCsGNf0aV9mjdyC7GZJ9287U7Cxw54v7YFyP8pE2xSQZI1h8x8o
+         WKWB93/DEu73qXkiPc3yc8AVKBuUhsC2TrLFS7/gHgmovwfdXJLGBeATr924wp+FJmbS
+         JjeNKScf1clh3BAXn68LD/ERvMxTNpuOOnPe6Wh53CM/rS1LcEx8lt2H+SBg94vQZREN
+         tTlw==
+X-Gm-Message-State: AOJu0YxLhXObUNU7WaxebbLsS47Ii8uQRlfz1uvuTznKRuxYHuADLdO4
+	8svz2CMmhTHyfZ620f4ztcs=
+X-Google-Smtp-Source: AGHT+IFS4D+nbq8NG4hVN8bh4KPf05QnjYsBVob0KVmVQHPVDSlBpA7GtIVTgx+fdLgHUOVHsJ/zFg==
+X-Received: by 2002:ac2:4c46:0:b0:50b:ae1f:ecd8 with SMTP id o6-20020ac24c46000000b0050bae1fecd8mr3848780lfk.41.1701099546495;
+        Mon, 27 Nov 2023 07:39:06 -0800 (PST)
+Received: from ran.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id j14-20020a056000124e00b00333085ceca5sm984650wrx.64.2023.11.27.07.39.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 07:39:06 -0800 (PST)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+To: richardcochran@gmail.com,
+	reibax@gmail.com,
+	davem@davemloft.net,
+	rrameshbabu@nvidia.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	maheshb@google.com,
+	maimon.sagi@gmail.com
+Subject: [PATCH v2] posix-timers: add multi_clock_gettime system call
+Date: Mon, 27 Nov 2023 17:39:01 +0200
+Message-Id: <20231127153901.6399-1-maimon.sagi@gmail.com>
+X-Mailer: git-send-email 2.26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Multihomed hosts may want to run distinct wg tunnels across all their
-uplinks for redundant connectivity. Currently this entails picking
-different ports for each wg tunnel since we allow only binding to the
-wildcard address. Sharing a single port-number for all uplink
-connections (but bound to a particular IP/netdev) simplifies managment
-considerably.
+ Some user space applications need to read some clocks.
+ Each read requires moving from user space to kernel space.
+ This asymmetry causes the measured offset to have a significant error.
 
-A closely related use-case that also touches the socket binding code is
-having a wg socket be part of a VRF. This mirrors how we support socket and
-wg device in distinct namespaces. To make using VRFs with wg easy we want
-to be able to bind to a particular device as this will cause the kernel to
-automatically route all outgoing packets with the VRF's routing table
-and (in the default udp_l3mdev_accept=0 config) only accept packets from
-interfaces in the VRF without the need for netfilter rules.
+ Introduce a new system call multi_clock_gettime, which can be used to measure
+ the offset between multiple clocks, from variety of types: PHC, virtual PHC
+ and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+ The offset includes the total time that the driver needs to read the clock
+ timestamp.
 
-While users can currently use VRFs for wg tunnel traffic by configuring
-fwmark ip-rules and setting sysctl udp_l3mdev_accept=1 (with or without
-additional nft filtering) this is at best a cludge. When VRF membership
-changes it becomes a major hassle to keep ip-rules up to date.
+ New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
+ Supported clocks IDs: PHC, virtual PHC and various system clocks.
+ Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
+ The system call returns n_clocks timestamps for each measurement:
+ - clock 0 timestamp
+ - ...
+ - clock n timestamp
 
-Signed-off-by: Daniel Gröber <dxld@darkboxed.org>
+Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 ---
-Changes in v2:
- - Fix building without CONFIG_IPV6
+ Addressed comments from:
+ - Richard Cochran : https://www.spinics.net/lists/netdev/msg951723.html
+          
+ Changes since version 1:
+ - Change multi PHC ioctl implamantation into systemcall.
+ 
+ arch/x86/entry/syscalls/syscall_32.tbl |  1 +
+ arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+ include/linux/posix-timers.h           | 24 ++++++++++
+ include/linux/syscalls.h               |  3 +-
+ include/uapi/asm-generic/unistd.h      | 12 ++++-
+ kernel/sys_ni.c                        |  1 +
+ kernel/time/posix-timers.c             | 62 ++++++++++++++++++++++++++
+ 7 files changed, 102 insertions(+), 2 deletions(-)
 
- drivers/net/wireguard/device.c  |  4 +--
- drivers/net/wireguard/device.h  |  3 +-
- drivers/net/wireguard/netlink.c | 56 ++++++++++++++++++++++++++++-----
- drivers/net/wireguard/socket.c  | 41 +++++++++++++++---------
- drivers/net/wireguard/socket.h  |  3 +-
- include/uapi/linux/wireguard.h  |  6 ++++
- 6 files changed, 88 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index deb9636b0ecf..ec28f5021791 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -48,7 +48,7 @@ static int wg_open(struct net_device *dev)
- 		dev_v6->cnf.addr_gen_mode = IN6_ADDR_GEN_MODE_NONE;
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index c8fac5205803..070efd266e7e 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -461,3 +461,4 @@
+ 454	i386	futex_wake		sys_futex_wake
+ 455	i386	futex_wait		sys_futex_wait
+ 456	i386	futex_requeue		sys_futex_requeue
++457	i386	multi_clock_gettime		sys_multi_clock_gettime32
+\ No newline at end of file
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index 8cb8bf68721c..f790330244bb 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -378,6 +378,7 @@
+ 454	common	futex_wake		sys_futex_wake
+ 455	common	futex_wait		sys_futex_wait
+ 456	common	futex_requeue		sys_futex_requeue
++457	common	multi_clock_gettime		sys_multi_clock_gettime
  
- 	mutex_lock(&wg->device_update_lock);
--	ret = wg_socket_init(wg, wg->incoming_port);
-+	ret = wg_socket_init(wg, wg->port_cfg);
- 	if (ret < 0)
- 		goto out;
- 	list_for_each_entry(peer, &wg->peer_list, peer_list) {
-@@ -249,7 +249,7 @@ static void wg_destruct(struct net_device *dev)
- 	rtnl_unlock();
- 	mutex_lock(&wg->device_update_lock);
- 	rcu_assign_pointer(wg->creating_net, NULL);
--	wg->incoming_port = 0;
-+	memzero_explicit(&wg->port_cfg, sizeof(wg->port_cfg));
- 	wg_socket_reinit(wg, NULL, NULL);
- 	/* The final references are cleared in the below calls to destroy_workqueue. */
- 	wg_peer_remove_all(wg);
-diff --git a/drivers/net/wireguard/device.h b/drivers/net/wireguard/device.h
-index 43c7cebbf50b..ac4092d8c9d0 100644
---- a/drivers/net/wireguard/device.h
-+++ b/drivers/net/wireguard/device.h
-@@ -17,6 +17,7 @@
- #include <linux/mutex.h>
- #include <linux/net.h>
- #include <linux/ptr_ring.h>
-+#include <net/udp_tunnel.h>
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/include/linux/posix-timers.h b/include/linux/posix-timers.h
+index d607f51404fc..426a45441ab5 100644
+--- a/include/linux/posix-timers.h
++++ b/include/linux/posix-timers.h
+@@ -260,4 +260,28 @@ void set_process_cpu_timer(struct task_struct *task, unsigned int clock_idx,
+ int update_rlimit_cpu(struct task_struct *task, unsigned long rlim_new);
  
- struct wg_device;
- 
-@@ -53,7 +54,7 @@ struct wg_device {
- 	atomic_t handshake_queue_len;
- 	unsigned int num_peers, device_update_gen;
- 	u32 fwmark;
--	u16 incoming_port;
-+	struct udp_port_cfg port_cfg;
- };
- 
- int wg_device_init(void);
-diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
-index e220d761b1f2..cfc4f92d3dba 100644
---- a/drivers/net/wireguard/netlink.c
-+++ b/drivers/net/wireguard/netlink.c
-@@ -26,6 +26,8 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
- 	[WGDEVICE_A_PUBLIC_KEY]		= NLA_POLICY_EXACT_LEN(NOISE_PUBLIC_KEY_LEN),
- 	[WGDEVICE_A_FLAGS]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
-+	[WGDEVICE_A_LISTEN_ADDR]	= NLA_POLICY_MIN_LEN(sizeof(struct in_addr)),
-+	[WGDEVICE_A_LISTEN_IFINDEX]	= { .type = NLA_U32 },
- 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_PEERS]		= { .type = NLA_NESTED }
- };
-@@ -230,11 +232,22 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 	if (!ctx->next_peer) {
- 		if (nla_put_u16(skb, WGDEVICE_A_LISTEN_PORT,
--				wg->incoming_port) ||
-+				ntohs(wg->port_cfg.local_udp_port)) ||
-+		    nla_put_u32(skb, WGDEVICE_A_LISTEN_IFINDEX, wg->port_cfg.bind_ifindex) ||
- 		    nla_put_u32(skb, WGDEVICE_A_FWMARK, wg->fwmark) ||
- 		    nla_put_u32(skb, WGDEVICE_A_IFINDEX, wg->dev->ifindex) ||
- 		    nla_put_string(skb, WGDEVICE_A_IFNAME, wg->dev->name))
- 			goto out;
-+	        if (wg->port_cfg.family == AF_INET &&
-+		    nla_put_in_addr(skb, WGDEVICE_A_LISTEN_ADDR,
-+				    wg->port_cfg.local_ip.s_addr))
-+				goto out;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	        if (wg->port_cfg.family == AF_INET6 &&
-+		    nla_put_in6_addr(skb, WGDEVICE_A_LISTEN_ADDR,
-+				     &wg->port_cfg.local_ip6))
-+				goto out;
-+#endif
- 
- 		down_read(&wg->static_identity.lock);
- 		if (wg->static_identity.has_identity) {
-@@ -311,19 +324,49 @@ static int wg_get_device_done(struct netlink_callback *cb)
- 	return 0;
- }
- 
--static int set_port(struct wg_device *wg, u16 port)
-+static int set_port_cfg(struct wg_device *wg, struct nlattr **attrs)
- {
- 	struct wg_peer *peer;
-+	struct udp_port_cfg port_cfg = {
-+		.family = AF_UNSPEC,
-+	};
+ void posixtimer_rearm(struct kernel_siginfo *info);
 +
-+	if (attrs[WGDEVICE_A_LISTEN_PORT])
-+		port_cfg.local_udp_port =
-+			htons(nla_get_u16(attrs[WGDEVICE_A_LISTEN_PORT]));
-+	if (attrs[WGDEVICE_A_LISTEN_ADDR]) {
-+		union {
-+			struct in_addr addr4;
-+			struct in6_addr addr6;
-+		} *u_addr = nla_data(attrs[WGDEVICE_A_LISTEN_ADDR]);
-+		size_t len = nla_len(attrs[WGDEVICE_A_LISTEN_ADDR]);
-+		if (len == sizeof(struct in_addr)) {
-+			port_cfg.family = AF_INET;
-+			port_cfg.local_ip = u_addr->addr4;
-+		} else if (len == sizeof(struct in6_addr)) {
-+#if IS_ENABLED(CONFIG_IPV6)
-+			port_cfg.family = AF_INET6;
-+			port_cfg.local_ip6 = u_addr->addr6;
-+#else
-+			return -EAFNOSUPPORT;
-+#endif
++#define MULTI_PTP_MAX_CLOCKS 12 /* Max number of clocks */
++#define MULTI_PTP_MAX_SAMPLES 10 /* Max allowed offset measurement samples. */
 +
-+		}
-+	}
-+	if (attrs[WGDEVICE_A_LISTEN_IFINDEX]) {
-+		port_cfg.bind_ifindex =
-+			nla_get_u32(attrs[WGDEVICE_A_LISTEN_IFINDEX]);
-+	}
- 
--	if (wg->incoming_port == port)
-+	if (memcmp(&port_cfg, &wg->port_cfg, sizeof(port_cfg)) == 0)
- 		return 0;
- 	list_for_each_entry(peer, &wg->peer_list, peer_list)
- 		wg_socket_clear_peer_endpoint_src(peer);
- 	if (!netif_running(wg->dev)) {
--		wg->incoming_port = port;
-+		wg->port_cfg = port_cfg;
- 		return 0;
- 	}
--	return wg_socket_init(wg, port);
-+	return wg_socket_init(wg, port_cfg);
- }
- 
- static int set_allowedip(struct wg_peer *peer, struct nlattr **attrs)
-@@ -531,8 +574,7 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	if (info->attrs[WGDEVICE_A_LISTEN_PORT]) {
--		ret = set_port(wg,
--			nla_get_u16(info->attrs[WGDEVICE_A_LISTEN_PORT]));
-+		ret = set_port_cfg(wg, info->attrs);
- 		if (ret)
- 			goto out;
- 	}
-diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
-index 0414d7a6ce74..47bb46e0cdd9 100644
---- a/drivers/net/wireguard/socket.c
-+++ b/drivers/net/wireguard/socket.c
-@@ -346,7 +346,7 @@ static void set_sock_opts(struct socket *sock)
- 	sk_set_memalloc(sock->sk);
- }
- 
--int wg_socket_init(struct wg_device *wg, u16 port)
-+int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port_cfg)
- {
- 	struct net *net;
- 	int ret;
-@@ -356,12 +356,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 		.encap_rcv = wg_receive
- 	};
- 	struct socket *new4 = NULL, *new6 = NULL;
--	struct udp_port_cfg port4 = {
--		.family = AF_INET,
--		.local_ip.s_addr = htonl(INADDR_ANY),
--		.local_udp_port = htons(port),
--		.use_udp_checksums = true
--	};
-+	struct udp_port_cfg port4;
- #if IS_ENABLED(CONFIG_IPV6)
- 	int retries = 0;
- 	struct udp_port_cfg port6 = {
-@@ -373,6 +368,23 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	};
++struct __ptp_multi_clock_get {
++	unsigned int n_clocks; /* Desired number of clocks. */
++	unsigned int n_samples; /* Desired number of measurements per clock. */
++	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
++	/*
++	 * Array of list of n_clocks clocks time samples n_samples times.
++	 */
++	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
++};
++
++struct __ptp_multi_clock_get32 {
++	unsigned int n_clocks; /* Desired number of clocks. */
++	unsigned int n_samples; /* Desired number of measurements per clock. */
++	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
++	/*
++	 * Array of list of n_clocks clocks time samples n_samples times.
++	 */
++	struct  old_timespec32 ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
++};
++
  #endif
- 
-+	if (port_cfg.family == AF_UNSPEC) {
-+		port4 = (struct udp_port_cfg) {
-+			.family = AF_INET,
-+			.local_ip.s_addr = htonl(INADDR_ANY),
-+			.local_udp_port = port_cfg.local_udp_port,
-+			.use_udp_checksums = true
-+		};
-+	} else {
-+		port4 = port_cfg;
-+		port4.use_udp_checksums = true;
-+		if (IS_ENABLED(CONFIG_IPV6) && port_cfg.family == AF_INET6) {
-+			port4.use_udp6_tx_checksums = true;
-+			port4.use_udp6_rx_checksums = true;
-+			port4.ipv6_v6only = true;
-+		}
-+	}
-+
- 	rcu_read_lock();
- 	net = rcu_dereference(wg->creating_net);
- 	net = net ? maybe_get_net(net) : NULL;
-@@ -380,10 +392,6 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	if (unlikely(!net))
- 		return -ENONET;
- 
--#if IS_ENABLED(CONFIG_IPV6)
--retry:
--#endif
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index fd9d12de7e92..afcf68e83d63 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -1161,7 +1161,8 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
+ 			unsigned long prot, unsigned long flags,
+ 			unsigned long fd, unsigned long pgoff);
+ asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
 -
- 	ret = udp_sock_create(net, &port4, &new4);
- 	if (ret < 0) {
- 		pr_err("%s: Could not create IPv4 socket\n", wg->dev->name);
-@@ -392,13 +400,18 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	set_sock_opts(new4);
- 	setup_udp_tunnel_sock(net, new4, &cfg);
++asmlinkage long sys_multi_clock_gettime(struct __ptp_multi_clock_get __user * ptp_multi_clk_get);
++asmlinkage long sys_multi_clock_gettime32(struct __ptp_multi_clock_get32 __user * ptp_multi_clk_get);
  
-+	if (port_cfg.family != AF_UNSPEC)
-+		goto reinit;
+ /*
+  * Not a real system call, but a placeholder for syscalls which are
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index 756b013fb832..3ebcaa052650 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -829,8 +829,18 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
+ #define __NR_futex_requeue 456
+ __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
+ 
++#if defined(__ARCH_WANT_TIME32_SYSCALLS) || __BITS_PER_LONG != 32
++#define __NR_multi_clock_gettime 457
++__SC_3264(__NR_multi_clock_gettime, sys_multi_clock_gettime32, sys_multi_clock_gettime)
++#endif
 +
- #if IS_ENABLED(CONFIG_IPV6)
-+retry:
- 	if (ipv6_mod_enabled()) {
- 		port6.local_udp_port = inet_sk(new4->sk)->inet_sport;
- 		ret = udp_sock_create(net, &port6, &new6);
- 		if (ret < 0) {
- 			udp_tunnel_sock_release(new4);
--			if (ret == -EADDRINUSE && !port && retries++ < 100)
-+			if (ret == -EADDRINUSE && !port_cfg.local_udp_port &&
-+			    retries++ < 100)
- 				goto retry;
- 			pr_err("%s: Could not create IPv6 socket\n",
- 			       wg->dev->name);
-@@ -409,6 +422,8 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	}
++#if defined(__SYSCALL_COMPAT) || __BITS_PER_LONG == 32
++#define __NR_multi_clock_gettime64 458
++__SYSCALL(__NR_multi_clock_gettime64, sys_multi_clock_gettime)
++#endif
++
+ #undef __NR_syscalls
+-#define __NR_syscalls 457
++#define __NR_syscalls 459
+ 
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
+index e1a6e3c675c0..8ed1c22f40ac 100644
+--- a/kernel/sys_ni.c
++++ b/kernel/sys_ni.c
+@@ -335,6 +335,7 @@ COND_SYSCALL(ppoll_time32);
+ COND_SYSCALL_COMPAT(ppoll_time32);
+ COND_SYSCALL(utimensat_time32);
+ COND_SYSCALL(clock_adjtime32);
++COND_SYSCALL(multi_clock_gettime32);
+ 
+ /*
+  * The syscalls below are not found in include/uapi/asm-generic/unistd.h
+diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
+index b924f0f096fa..517558af2479 100644
+--- a/kernel/time/posix-timers.c
++++ b/kernel/time/posix-timers.c
+@@ -1426,6 +1426,68 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
+ 
  #endif
  
-+reinit:
-+	wg->port_cfg = port_cfg;
- 	wg_socket_reinit(wg, new4->sk, new6 ? new6->sk : NULL);
- 	ret = 0;
- out:
-@@ -428,8 +443,6 @@ void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
- 				lockdep_is_held(&wg->socket_update_lock));
- 	rcu_assign_pointer(wg->sock4, new4);
- 	rcu_assign_pointer(wg->sock6, new6);
--	if (new4)
--		wg->incoming_port = ntohs(inet_sk(new4)->inet_sport);
- 	mutex_unlock(&wg->socket_update_lock);
- 	synchronize_net();
- 	sock_free(old4);
-diff --git a/drivers/net/wireguard/socket.h b/drivers/net/wireguard/socket.h
-index bab5848efbcd..1532a263c518 100644
---- a/drivers/net/wireguard/socket.h
-+++ b/drivers/net/wireguard/socket.h
-@@ -10,8 +10,9 @@
- #include <linux/udp.h>
- #include <linux/if_vlan.h>
- #include <linux/if_ether.h>
-+#include <net/udp_tunnel.h>
- 
--int wg_socket_init(struct wg_device *wg, u16 port);
-+int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port);
- void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
- 		      struct sock *new6);
- int wg_socket_send_buffer_to_peer(struct wg_peer *peer, void *data,
-diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
-index ae88be14c947..240d1c850dfd 100644
---- a/include/uapi/linux/wireguard.h
-+++ b/include/uapi/linux/wireguard.h
-@@ -28,6 +28,8 @@
-  *    WGDEVICE_A_PRIVATE_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
-  *    WGDEVICE_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
-  *    WGDEVICE_A_LISTEN_PORT: NLA_U16
-+ *    WGDEVICE_A_LISTEN_ADDR : NLA_MIN_LEN(struct sockaddr), struct sockaddr_in or struct sockaddr_in6
-+ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
-  *    WGDEVICE_A_FWMARK: NLA_U32
-  *    WGDEVICE_A_PEERS: NLA_NESTED
-  *        0: NLA_NESTED
-@@ -82,6 +84,8 @@
-  *                      peers should be removed prior to adding the list below.
-  *    WGDEVICE_A_PRIVATE_KEY: len WG_KEY_LEN, all zeros to remove
-  *    WGDEVICE_A_LISTEN_PORT: NLA_U16, 0 to choose randomly
-+ *    WGDEVICE_A_LISTEN_ADDR : struct sockaddr_in or struct sockaddr_in6.
-+ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
-  *    WGDEVICE_A_FWMARK: NLA_U32, 0 to disable
-  *    WGDEVICE_A_PEERS: NLA_NESTED
-  *        0: NLA_NESTED
-@@ -157,6 +161,8 @@ enum wgdevice_attribute {
- 	WGDEVICE_A_LISTEN_PORT,
- 	WGDEVICE_A_FWMARK,
- 	WGDEVICE_A_PEERS,
-+	WGDEVICE_A_LISTEN_ADDR,
-+	WGDEVICE_A_LISTEN_IFINDEX,
- 	__WGDEVICE_A_LAST
- };
- #define WGDEVICE_A_MAX (__WGDEVICE_A_LAST - 1)
++SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
++{
++	const struct k_clock *kc;
++	struct timespec64 kernel_tp;
++	struct __ptp_multi_clock_get multi_clk_get;
++	int error;
++	unsigned int i, j;
++
++	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
++		return -EFAULT;
++
++	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
++		return -EINVAL;
++	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
++		return -EINVAL;
++
++	for (j = 0; j < multi_clk_get.n_samples; j++) {
++		for (i = 0; i < multi_clk_get.n_clocks; i++) {
++			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
++			if (!kc)
++				return -EINVAL;
++			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
++			if (!error && put_timespec64(&kernel_tp, (struct __kernel_timespec __user *)
++						     &ptp_multi_clk_get->ts[j][i]))
++				error = -EFAULT;
++		}
++	}
++
++	return error;
++}
++
++SYSCALL_DEFINE1(multi_clock_gettime32, struct __ptp_multi_clock_get32 __user *, ptp_multi_clk_get)
++{
++	const struct k_clock *kc;
++	struct timespec64 kernel_tp;
++	struct __ptp_multi_clock_get multi_clk_get;
++	int error;
++	unsigned int i, j;
++
++	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
++		return -EFAULT;
++
++	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
++		return -EINVAL;
++	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
++		return -EINVAL;
++
++	for (j = 0; j < multi_clk_get.n_samples; j++) {
++		for (i = 0; i < multi_clk_get.n_clocks; i++) {
++			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
++			if (!kc)
++				return -EINVAL;
++			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
++			if (!error && put_old_timespec32(&kernel_tp, (struct old_timespec32 __user *)
++							&ptp_multi_clk_get->ts[j][i]))
++				error = -EFAULT;
++		}
++	}
++
++	return error;
++}
++
+ static const struct k_clock clock_realtime = {
+ 	.clock_getres		= posix_get_hrtimer_res,
+ 	.clock_get_timespec	= posix_get_realtime_timespec,
 -- 
-2.39.2
+2.26.3
 
 
