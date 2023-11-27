@@ -1,126 +1,185 @@
-Return-Path: <netdev+bounces-51363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BF57FA555
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:55:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A781B7FA56B
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BB481C209E3
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:55:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45E9FB210C5
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5EC347A0;
-	Mon, 27 Nov 2023 15:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648D9347D3;
+	Mon, 27 Nov 2023 15:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IkA3SKIV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KeHHAhdK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB80A92;
-	Mon, 27 Nov 2023 07:55:02 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3b861a3be3eso1181966b6e.0;
-        Mon, 27 Nov 2023 07:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701100502; x=1701705302; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+99aoCcs4VcRRjnd4ABIm3+igMsBj2nosPKDWuod+R8=;
-        b=IkA3SKIVW4Hsa1eRfeI9QDNPojKONP3L/sOGYrMjDuTR2L7Rh8ihNriu69lJHnQQUK
-         4ZqqL39E37+YAQZ7NGvd+G5HKBHZ3NLvSO4fK04dvfyRCWZbRDMWPfrchqtvW+gPQ5nt
-         iwvkNtMeynjdwiA9yA5P0c+vX1iDXppdhqSV4FwYUh1tCsksEeV7UuUbZggylMwoCNy9
-         +k8bwwGQVBix3y9jLfaZze1OFWEdnAAsjkVppXR+oLJjSS6sSM2xpAgBmOjJE+yHrzGv
-         5QSmYAgh3J8btaJCExdZGPgR8P/7iYoE2O3wO9EcfGJLYyUqpv2rDkxE8P7j0zrFl+Us
-         SHdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701100502; x=1701705302;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+99aoCcs4VcRRjnd4ABIm3+igMsBj2nosPKDWuod+R8=;
-        b=oPeIx5A2FUMiK9QJZ3AQ8CouW/efabC7wqIYlOqmJkn4ers6NlInN7n4GjzMT5MepM
-         bsnlNwr5noRNZJj3kifvYrNwRFMHbIHaDQnhFsLFzsJonvRaoMntbmdm0mVZbu/dMSLZ
-         3X+Kf/E4EjdyYp7SCY45qQt14tC8gO2d14Aq8WZZqODwwQ8167RLw31YOsTES5yZ3cSJ
-         IPzwYRTesIOk+l7XWtV9BJsxeN71K7G8A4ju0t02iytDPoRruystFvQQToucwD19dBrZ
-         SuLWP+sCE+0El8t5HJmGJd2QFpDd/Y8pZF8TmryAertPh2kKB5t1ygMfy9OdOiumaLiF
-         u2Qw==
-X-Gm-Message-State: AOJu0Yy/F49m3MUyaNNxtn1r2jhpQEPlCfZCKjDoZ+UUdmzwxSziga5T
-	HOKhR9gmtzlZ4lnKIeDlITk=
-X-Google-Smtp-Source: AGHT+IGpJjATOQuoZq9OiDhL4fJxgNVSZh3aegQLNrGHTmQ3rNYq18czjkieYGRC2vNFrGRE0IOlYQ==
-X-Received: by 2002:a05:6808:3c9:b0:3b8:6380:e9ec with SMTP id o9-20020a05680803c900b003b86380e9ecmr6593757oie.55.1701100501957;
-        Mon, 27 Nov 2023 07:55:01 -0800 (PST)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id du3-20020a05621409a300b0067a2bda64a3sm2369426qvb.2.2023.11.27.07.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 07:55:01 -0800 (PST)
-Date: Mon, 27 Nov 2023 10:55:01 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Shigeru Yoshida <syoshida@redhat.com>, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Shigeru Yoshida <syoshida@redhat.com>
-Message-ID: <6564bbd5580de_8a1ac29481@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231126151652.372783-1-syoshida@redhat.com>
-References: <20231126151652.372783-1-syoshida@redhat.com>
-Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in
- ipgre_xmit()
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1993B4;
+	Mon, 27 Nov 2023 07:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/x+K0NohDOju58WZmfchmXWiIvrloK7WVCcvOl3plTM=; b=KeHHAhdKhbHXQbBQZBTXeU04DU
+	2L+5oNvqRgW8p15KQLGI0HmNhiXLoWa5eRi5tfOJ1NilEdyoU36JZrDuqefdREEd1/zmYwR4NPec2
+	EYj2j7Z5FNoym+r68w6KCUcBEKxTO0Hza9OHNOlnKvT+iiSCbL0G55/9m23FQlDIAnk6pHyzFpqtm
+	apTNcHm5ZXA4YYnRjKvK4nDV5nQTPhCpxZEeexKOIeY5zLbxdkUY0k3/fdCjH5S6RgKA9SteH31Qo
+	YFhm20KUKy6/Tna/RJSXxJ1mEmWCJ2JOoY+qFhrRl/l6TXcoW2lwwyJTW0MEquJqX+hREB/YB0YOM
+	vmDgHwzA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49996)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r7e04-00068P-2v;
+	Mon, 27 Nov 2023 15:58:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r7e03-00022H-C0; Mon, 27 Nov 2023 15:58:19 +0000
+Date: Mon, 27 Nov 2023 15:58:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tomer Maimon <tmaimon77@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, alexandre.torgue@foss.st.com,
+	peppe.cavallaro@st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, avifishman70@gmail.com,
+	tali.perry1@gmail.com, joel@jms.id.au, andrew@codeconstruct.com.au,
+	venture@google.com, yuenn@google.com, benjaminfair@google.com,
+	j.neuschaefer@gmx.net, openbmc@lists.ozlabs.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+Message-ID: <ZWS8m66LrrRQpbLO@shell.armlinux.org.uk>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+ <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <ZVzQh9ykusyknGgP@shell.armlinux.org.uk>
+ <CAP6Zq1gzAhp9BZNX1MOozUfQc82Vi_S==on5_nOfVfpvtgnN2g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAP6Zq1gzAhp9BZNX1MOozUfQc82Vi_S==on5_nOfVfpvtgnN2g@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Shigeru Yoshida wrote:
-> In ipgre_xmit(), skb_pull() may fail even if pskb_inet_may_pull() returns
-> true. For example, applications can create a malformed packet that causes
-> this problem with PF_PACKET.
-
-It may fail because because pskb_inet_may_pull does not account for
-tunnel->hlen.
-
-Is that what you are referring to with malformed packet? Can you
-eloborate a bit on in which way the packet has to be malformed to
-reach this?
-
-FYI: I had a quick look at the IPv6 equivalent code.
-ip6gre_tunnel_xmit is sufficiently different. It makes sense that this
-is an IPv4 only patch.
-
-> This patch fixes the problem by dropping skb and returning from the
-> function if skb_pull() fails.
+On Wed, Nov 22, 2023 at 07:23:28PM +0200, Tomer Maimon wrote:
+> Hi Russell,
 > 
-> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
->  net/ipv4/ip_gre.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Thanks for your comments.
 > 
-> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-> index 22a26d1d29a0..95efa97cb84b 100644
-> --- a/net/ipv4/ip_gre.c
-> +++ b/net/ipv4/ip_gre.c
-> @@ -643,7 +643,8 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
->  		/* Pull skb since ip_tunnel_xmit() needs skb->data pointing
->  		 * to gre header.
->  		 */
-> -		skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
-> +		if (!skb_pull(skb, tunnel->hlen + sizeof(struct iphdr)))
-> +			goto free_skb;
->  		skb_reset_mac_header(skb);
->  
->  		if (skb->ip_summed == CHECKSUM_PARTIAL &&
-> -- 
-> 2.41.0
-> 
+> On Tue, 21 Nov 2023 at 17:45, Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Tue, Nov 21, 2023 at 05:17:33PM +0200, Tomer Maimon wrote:
+> > > Add Nuvoton NPCM BMC SoCs support to STMMAC dwmac driver.
+> > >
+> > > And modify MAINTAINERS to add a new F: entry for this driver.
+> > >
+> > > Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
+> >
+> > A few comments on this...
+> >
+> > > +#define IND_AC_BA_REG                0x1FE
+> > > +#define SR_MII_CTRL          0x3E0000
+> > > +
+> > > +#define PCS_SR_MII_CTRL_REG  0x0
+> > > +#define PCS_SPEED_SELECT6    BIT(6)
+> > > +#define PCS_AN_ENABLE                BIT(12)
+> > > +#define PCS_SPEED_SELECT13   BIT(13)
+> > > +#define PCS_RST                      BIT(15)
+> >
+> > include/uapi/linux/mii.h:
+> >
+> > #define BMCR_SPEED1000          0x0040  /* MSB of Speed (1000)         */
+> > #define BMCR_ANENABLE           0x1000  /* Enable auto negotiation     */
+> > #define BMCR_SPEED100           0x2000  /* Select 100Mbps              */
+> > #define BMCR_RESET              0x8000  /* Reset to default state      */
+> >
+> > Look familiar? Maybe use the standard definitions for a standardised
+> > register?
+> >
+> > > +void npcm_dwmac_pcs_init(struct npcm_dwmac *dwmac, struct device *dev,
+> > > +                      struct plat_stmmacenet_data *plat_dat)
+> > > +{
+> > > +     u16 val;
+> > > +
+> > > +     iowrite16((u16)(SR_MII_CTRL >> 9), dwmac->reg + IND_AC_BA_REG);
+> > > +     val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +     val |= PCS_RST;
+> > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +
+> > > +     while (val & PCS_RST)
+> > > +             val = ioread16(dwmac->reg + PCS_SR_MII_CTRL_REG);
+> >
+> > What if the PCS never clears its reset bit? Maybe use
+> > read_poll_timeout() ?
+> >
+> > > +
+> > > +     val &= ~(PCS_AN_ENABLE);
+> > > +     iowrite16(val, dwmac->reg + PCS_SR_MII_CTRL_REG);
+> > > +}
+> >
+> > Also, maybe it's time to require new stmmac platform support to start
+> > making use of the phylink PCS support rather than continuing to code its
+> > own?
+> >
+> > I notice, however, that you always disable inband signalling - please
+> > explain why. Also, what protocol does the PCS use when communicating
+> > with the PHY?
+> With disable inband signalling you mean disable auto negotiation?
 
+Over a SGMII, 1000base-X, USXGMII etc link, there is an inband
+signalling method. Whether it is "auto negotiation" depends on your
+point of view.
 
+With 1000base-X, it is "auto negotiation" because the two link partners
+advertise their abilities, and resolve the operational link parameters.
+In essence, there is a negotiation between both ends.
+
+In the case of e.g. Cisco SGMII, "auto negotiation" is a total misnomer.
+There is no "negotiation". The SGMII PHY side re-purposes the 1000base-X
+inband 16-bit control word to inform the MAC about the negotiated
+speed and duplex settings, and the MAC can only say "yes thank you for
+that" back to the PHY. There is no "and this is what I'm doing" to it.
+So there's no "negotiation" in SGMII.
+
+So, I prefer using "inband signalling" because that more accurately
+describes both of these situations, whereas "auto negotiation" does
+not.
+
+Note also that whenever I see "SGMII", that means Cisco's SGMII,
+which is 1000base-X modified by Cisco, and doesn't include the IEEE
+802.3 1000base-X.
+
+> if
+> yes it is because the PCS sgmii is connected to the external phy AN
+> and is not working between the PCS and external phy.
+
+What if the external PHY wants to use Cisco SGMII inband signalling?
+
+> accessing the PCS registers is indirect. The top 13 bits (bits 21-9)
+> of the offset have to be written to Indirect Access Base register
+> bits 12:0 before indirectly accessing the target register with the
+> offset of the bottom 9 bits (8:0) of the offset
+
+I'm not sure how this connects with my email. I asked what protocol
+is used between the PCS and PHY, and I _think_ you've said that it's
+Cisco SGMII.
+
+Please give details of which PHY is being used - I'd like to know
+more about why the inband signalling isn't being used.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
