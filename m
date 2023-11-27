@@ -1,105 +1,195 @@
-Return-Path: <netdev+bounces-51385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBE67FA7AD
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:10:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F8657FA7D3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:16:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10A35B20B3D
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:10:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D11F28169F
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5C93714E;
-	Mon, 27 Nov 2023 17:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MamGkzfV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0782731A7F;
+	Mon, 27 Nov 2023 17:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3782C10F6;
-	Mon, 27 Nov 2023 09:10:41 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40b402c36c4so15542215e9.1;
-        Mon, 27 Nov 2023 09:10:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701105039; x=1701709839; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZawHlo7ihhM3P7f9lODEcARYXH4Ryf9ttNMsaPKDZC0=;
-        b=MamGkzfV1OL3RpdeEG/qMYioQ8sBNxg1NxYeE7XPkAmpSDQV7b9ch5O9fLBVqBUXGr
-         zzFSmUyQNVaZoBF4KL4xSCit/8ogK0lJHAxIxjv2bhWO3waWqq4adQRwVvnCTGhXRtjd
-         BrJKrG1d5Vxsze9XV2DHgySgtIlQDwpt725cXZh320l1dn5bTV8xKaUYyW7mC7gMgA5Q
-         zJQJVzLxyfbXGxKBzzVaATkvg2j3fRJtXXpAqFmdmMOzwem5e2JFZXoTqaHn7kQZ83lS
-         8cuYpbUMPffXq0IIXKs4eLVc2rwUrI8++AVle2x4ZuD+Baw4KC+e4ek5kr7UcGvasxs+
-         WErA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701105039; x=1701709839;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZawHlo7ihhM3P7f9lODEcARYXH4Ryf9ttNMsaPKDZC0=;
-        b=bClpk35j37rvvmoLTGKTasyVOVCR/enryrRBXk5YY09zL39jNmL18efwNfy4trTMy2
-         PB+iviViIUUhGcFNvKJnD7YpJicwsF9vOMphLgeyX8Yykcvt4q5v2zB0qCNW5FktKEfx
-         I0dTTAzxPVz99vWGjL1CceIwbzvbOKQQgJajuN5eC4uLeuuxbLfk2Uc02yNyRGM0FUI3
-         6QLcwo85vyVxVgvugHQet0ZyReFHi8FRgAAPslHxM6neTuLU78+0G8OK2aorhU3zimu5
-         bTgsR3kIHgWOmc6dqXkn6sXd/XQ0PlxeFSF3QoVh41TDy5qAuwO+oBWTqXqhjFtLzDOY
-         f6jw==
-X-Gm-Message-State: AOJu0YwjZ8PwveQLeVQyRke0b4z8K7OgRGFj5csPsoovqcgE50cK0AHX
-	fuoT2rFbpUISyY50721Oqyo=
-X-Google-Smtp-Source: AGHT+IHlqMryunqFzONkDzsQFOB5kDNnfitWeCTrN8xajEwOus2AtFtoco9WJWnQMWq1yvnHkERF9w==
-X-Received: by 2002:adf:f48d:0:b0:32f:7901:c462 with SMTP id l13-20020adff48d000000b0032f7901c462mr8879689wro.3.1701105039278;
-        Mon, 27 Nov 2023 09:10:39 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id o3-20020a5d6843000000b00332fd9b2b52sm4700440wrw.104.2023.11.27.09.10.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 09:10:38 -0800 (PST)
-Subject: Re: [PATCH net-next v6 1/7] net: ethtool: pass ethtool_rxfh to
- get/set_rxfh ethtool ops
-To: Jakub Kicinski <kuba@kernel.org>, Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, corbet@lwn.net,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, vladimir.oltean@nxp.com,
- andrew@lunn.ch, horms@kernel.org, mkubecek@suse.cz,
- willemdebruijn.kernel@gmail.com, gal@nvidia.com, alexander.duyck@gmail.com,
- linux-doc@vger.kernel.org, Igor Bagnucki <igor.bagnucki@intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>
-References: <20231120205614.46350-1-ahmed.zaki@intel.com>
- <20231120205614.46350-2-ahmed.zaki@intel.com>
- <20231121152906.2dd5f487@kernel.org>
- <4945c089-3817-47b2-9a02-2532995d3a46@intel.com>
- <20231127085552.396f9375@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <81014d9d-4642-6a6b-2a44-02229cd734f9@gmail.com>
-Date: Mon, 27 Nov 2023 17:10:37 +0000
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867DBAF;
+	Mon, 27 Nov 2023 09:16:12 -0800 (PST)
+Received: from [192.168.1.103] (178.176.78.85) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 27 Nov
+ 2023 20:16:03 +0300
+Subject: Re: [PATCH 6/6] net: ravb: Keep reverse order of operations in
+ ravb_remove()
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <geert+renesas@glider.be>,
+	<wsa+renesas@sang-engineering.com>, <robh@kernel.org>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<mitsuhiro.kimura.kc@renesas.com>, <masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231127090426.3761729-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231127090426.3761729-7-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <716b433e-5e0c-4353-ea39-12cb4f3d50c4@omp.ru>
+Date: Mon, 27 Nov 2023 20:16:03 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231127085552.396f9375@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+In-Reply-To: <20231127090426.3761729-7-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/27/2023 17:01:00
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181625 [Nov 27 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.85 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.85
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/27/2023 17:06:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/27/2023 3:21:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 27/11/2023 16:55, Jakub Kicinski wrote:
-> BTW, Ed, this series will conflict with your RSS context rework.
-> Not sure if it is on your radar.
+On 11/27/23 12:04 PM, Claudiu wrote:
 
-Yep, I had noticed.  Was wondering how the removal of the old
- [sg]et_rxfh_context functions would interact with my new API,
- which has three ops (create/modify/delete) and thus can't
- really be wedged into the [sg]et_rxfh() like that.
-Tbh I'd rather move in the direction of using the new API (and
- associated state-in-core) for everything, even context 0, so
- that the behaviour is consistent between default and custom
- contexts for NICs that support the latter.  Not 100% sure how
- exactly that would work in practice yet though; drivers are
- currently responsible for populating ctx 0 (indir, key, etc)
- at probe time so how do you read that state into the core?
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> On RZ/G3S SMARC Carrier II board having RGMII connections b/w Ethernet
+> MACs and PHYs it has been discovered that doing unbind/bind for ravb
+> driver in a loop leads to wrong speed and duplex for Ethernet links and
+> broken connectivity (the connectivity cannot be restored even with
+> bringing interface down/up). Before doing unbind/bind the Ethernet
+> interfaces were configured though systemd. The sh instructions used to
+> do unbind/bind were:
+> 
+> $ cd /sys/bus/platform/drivers/ravb/
+> $ while :; do echo 11c30000.ethernet > unbind ; \
+>   echo 11c30000.ethernet > bind; done
+> 
+> It has been discovered that there is a race b/w IOCTLs initialized by
+> systemd at the response of success binding and the
+> "ravb_write(ndev, CCC_OPC_RESET, CCC)" instruction in ravb_remove() as
 
-And I promise v5 of the rework is coming eventually, bosses
- just keep prioritising everything but this :(
+   s/instruction/call/, perhaps?
+
+> follows:
+> 
+> 1/ as a result of bind success the user space open/configures the
+>    interfaces tough an IOCTL; the following stack trace has been
+>    identified on RZ/G3S:
+> 
+> Call trace:
+> dump_backtrace+0x9c/0x100
+> show_stack+0x20/0x38
+> dump_stack_lvl+0x48/0x60
+> dump_stack+0x18/0x28
+> ravb_open+0x70/0xa58
+> __dev_open+0xf4/0x1e8
+> __dev_change_flags+0x198/0x218
+> dev_change_flags+0x2c/0x80
+> devinet_ioctl+0x640/0x708
+> inet_ioctl+0x1e4/0x200
+> sock_do_ioctl+0x50/0x108
+> sock_ioctl+0x240/0x358
+> __arm64_sys_ioctl+0xb0/0x100
+> invoke_syscall+0x50/0x128
+> el0_svc_common.constprop.0+0xc8/0xf0
+> do_el0_svc+0x24/0x38
+> el0_svc+0x34/0xb8
+> el0t_64_sync_handler+0xc0/0xc8
+> el0t_64_sync+0x190/0x198
+> 
+> 2/ this call may execute concurrently with ravb_remove() as the
+>    unbind/bind operation was executed in a loop
+> 3/ if the operation mode is changed to RESET (though
+
+   Through?
+
+>    ravb_write(ndev, CCC_OPC_RESET, CCC) instruction in ravb_remove())
+
+   s/instruction/call/, perhaps?
+
+>    while the above ravb_open() is in progress it may lead to MAC
+>    (or PHY, or MAC-PHY connection, the right point hasn't been identified
+>    at the moment) to be broken, thus the Ethernet connectivity fails to
+>    restore.
+> 
+> The simple fix for this is to move ravb_write(ndev, CCC_OPC_RESET, CCC))
+> after unregister_netdev() to avoid resetting the controller while the
+> netdev interface is still registered.
+> 
+> To avoid future issues in ravb_remove(), the patch follows the proper order
+> of operations in ravb_remove(): reverse order compared with ravb_probe().
+> This avoids described races as the IOCTLs as well as unregister_netdev()
+> (called now at the beginning of ravb_remove()) calls rtnl_lock() before
+> continuing and IOCTLs check (though devinet_ioctl()) if device is still
+> registered just after taking the lock:
+> 
+> int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
+> {
+> 	// ...
+> 
+>         rtnl_lock();
+> 
+>         ret = -ENODEV;
+>         dev = __dev_get_by_name(net, ifr->ifr_name);
+>         if (!dev)
+>                 goto done;
+> 
+> 	// ...
+> done:
+>         rtnl_unlock();
+> out:
+>         return ret;
+> }
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+   Sorry for overlooking this race (and other bugs) when prepping
+the driver for upstream!
+
+MBR, Sergey
 
