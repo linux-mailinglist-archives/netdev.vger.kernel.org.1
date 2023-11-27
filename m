@@ -1,164 +1,170 @@
-Return-Path: <netdev+bounces-51464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107247FAB1E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B8D7FAB80
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBA372819F5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:16:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD3C5281B3D
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A08245BF8;
-	Mon, 27 Nov 2023 20:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFD645C15;
+	Mon, 27 Nov 2023 20:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpsWOSmu"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OLIfQE55"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B501B6
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:16:12 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-3316a4bc37dso3078602f8f.2
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:16:12 -0800 (PST)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB8DF1BCC
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:28:32 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1cc79f73e58so832265ad.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:28:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701116171; x=1701720971; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=k5Var6gny1UNwpGrfUvt6fzTFskp9r0c678Wgo3QFHU=;
-        b=hpsWOSmuQaKyZsQ42vHxDOboPBzdU4Jh02LPZukSRQa2yI1Ox7m4iX8gzCjCjQZt+1
-         rO8xUzp3StYSdpIG+CgG7mQRvWM9l/Nr+5lqW9Ve4rBRdGzUuFQ23csCAAs3z/JkeB9x
-         +0K6OPMYbb+wIM2p8+62MLSHTaeyiOyh8rXWo2M5xyqHpfotpoQr/LSBOqSrOFKYh9J9
-         Bpo8cf+LBxtHDfwuisCvT2eZW9wHH87qgsC8OONVJJh5NcwyshE0DIgnoTPaBNSvpGxj
-         Uro7zcv+Zn1SCWAzY0Ox59h7YT4aJDrg2ChXXXJgKfWdAQLQoQnQQDQglnq+6ZQLuA3a
-         yf8A==
+        d=chromium.org; s=google; t=1701116912; x=1701721712; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v5+LvDr2MpWna/CQNtxbOeulzzg8qdiriAAeLwiRcQk=;
+        b=OLIfQE55f9sLqJ7pV9I5G00HvBBOdCoHRbBM5WYN3klE1oRxswvyYwc5zQ8mwwMn5M
+         Vlx6fP5z5Lk0SwNHAMXq8T1JYGTNr4SnfmNyQntd10xM5tBoClkDDazHkM8CZa5FUDHo
+         FFrdCM32s36EUUcTcZiGigYvjKs1A61hL2WI4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701116171; x=1701720971;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k5Var6gny1UNwpGrfUvt6fzTFskp9r0c678Wgo3QFHU=;
-        b=KETS//F6QAXQUXkcrSbAWeoVu51mQioNSura8ocN9mlaaTYQ1BDippxBzg8TYg4yTS
-         fScfWi7RVTEYr4QQqJbnoYQcU9HuqUrPeFgB8DzlLjjMY3j9XUtukerYsYS9fThv++iM
-         iZuMXRKgLJ1qfMrf9Cq44H5ld1+7VB4Jt1lREUUgh5I35l9JmBdD2NVDujH4USCzt4qj
-         Yg3l8kXH407robbuBhsVTdIZzlBDyJSzs+DX60AWGGkvty/FUlR5rJXqSA42lftpCkIF
-         SHPKqjOacn9ApcsVr885uSOFZoXbchhM2bHhERn/1hOFaI2k5bUqnbp/zxV7X4BqqU6l
-         DdjA==
-X-Gm-Message-State: AOJu0YwuKdAVQ7mfoo+NXBk86iN66olUG2IdvEdSi+bzEsdp/9kZqzwv
-	atzf4vuBzVUeWWUEnoijH1AE5Lo87rE=
-X-Google-Smtp-Source: AGHT+IEq4QKDOpELrfzoMtcsszZzWa5fQjdTGPLXl2VgnIg5L4R8pcOaW6ftA0zaAvLyTtgF5eAj1w==
-X-Received: by 2002:adf:e28a:0:b0:333:950:a1d2 with SMTP id v10-20020adfe28a000000b003330950a1d2mr514192wri.42.1701116170633;
-        Mon, 27 Nov 2023 12:16:10 -0800 (PST)
-Received: from ?IPV6:2a01:c23:b815:5700:a463:59a7:865f:2563? (dynamic-2a01-0c23-b815-5700-a463-59a7-865f-2563.c23.pool.telefonica.de. [2a01:c23:b815:5700:a463:59a7:865f:2563])
-        by smtp.googlemail.com with ESMTPSA id t4-20020a0560001a4400b0032d9337e7d1sm12903699wry.11.2023.11.27.12.16.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 12:16:10 -0800 (PST)
-Message-ID: <57076c05-3730-40d1-ab9a-5334b263e41a@gmail.com>
-Date: Mon, 27 Nov 2023 21:16:10 +0100
+        d=1e100.net; s=20230601; t=1701116912; x=1701721712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v5+LvDr2MpWna/CQNtxbOeulzzg8qdiriAAeLwiRcQk=;
+        b=AWdGUNz098R1dGhE2rHnMfqytQrODFL9ouF84kuYYOiIS/mBlAHVMJlBOcUDmMuB/M
+         8vrmkV4dUPLcjB3Igu9v2dTwi6hqBGypUYrc2Ha+eTeiPe0RgeGoyOqkBatVt0/cEj8B
+         nFXqolj+B4dv4NX24B15f0XUCactycbpOB1dfK4GMUL24pCIL8pAxhJ0RnT2X+FTl69k
+         DocX+0Wgl3lg919RDhKITiwDOnTDcQfnfNg5WFXt5S9pYiuzTscdlCc9y0o/xFy1G/NQ
+         cFnU5qZ2WDOgz8xcewrpjRktiKU26C1tH1Sjcuo4GI5ec5NcU9TF5MQ14AvcB8mPn1C/
+         cQ6g==
+X-Gm-Message-State: AOJu0Yxsd8239nwEdN6vvJRNB8YHhYghXviqqy4SJrhKAeI5m9hyq9IP
+	4m7ZJpteawxH5mH9SA8AnzXox8mGmCrjUmNAvzxM+g==
+X-Google-Smtp-Source: AGHT+IGLQQUkLIQlrE1cQRRNrLITzOJTPYT2iEhTFWC1VzJ4c69+VDRcvNaay6jRLYhoDwDQCZ7qG+pSOvFQD3jDafc=
+X-Received: by 2002:a17:902:d2d1:b0:1cf:d21a:ebcc with SMTP id
+ n17-20020a170902d2d100b001cfd21aebccmr265559plc.23.1701116912069; Mon, 27 Nov
+ 2023 12:28:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: remove multicast filter limit
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231127175736.5738-1-hau@realtek.com> <20231127175736.5738-2-hau@realtek.com>
+ <a5f89071-f93b-4a30-a0c5-f9dfda68367c@gmail.com>
+In-Reply-To: <a5f89071-f93b-4a30-a0c5-f9dfda68367c@gmail.com>
+From: Grant Grundler <grundler@chromium.org>
+Date: Mon, 27 Nov 2023 12:28:21 -0800
+Message-ID: <CANEJEGtRk85senQ3fVhV9Ek9U+Pf5NER0_gBexHEkMaUz+vDgg@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] r8169: enable rtl8125b pause slot
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, grundler@chromium.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Once upon a time, when r8169 was new, the multicast filter limit code
-was copied from RTL8139 driver. There the filter limit is even
-user-configurable.
-The filtering is hash-based and we don't have perfect filtering.
-Actually the mc filtering on RTL8125 still seems to be the same
-as used on 8390/NE2000. So it's not clear to me which benefit it
-should bring when switching to all-multi mode once a certain number
-of filter bits is set. More the opposite: Filtering out at least
-some unwanted mc traffic is better than no filtering.
-Also the available chip documentation doesn't mention any restriction.
-Therefore remove the filter limit.
+On Mon, Nov 27, 2023 at 12:03=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.=
+com> wrote:
+>
+> On 27.11.2023 18:57, ChunHao Lin wrote:
+> > When FIFO reach near full state, device will issue pause frame.
+> > If pause slot is enabled(set to 1), in this time, device will issue
+> > pause frame once. But if pause slot is disabled(set to 0), device
+> > will keep sending pause frames until FIFO reach near empty state.
+> >
+> > When pause slot is disabled, if there is no one to handle receive
+> > packets (ex. unexpected shutdown), device FIFO will reach near full
+> > state and keep sending pause frames. That will impact entire local
+> > area network.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+The comment is correct but should mention that this is true after a
+suspend. In other words, when an idle device goes into a lower power
+state, eventually the NIC will start blasting PAUSE frames on the
+local network.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index dbc5c9d35..0aed99a20 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -56,10 +56,6 @@
- #define FIRMWARE_8125A_3	"rtl_nic/rtl8125a-3.fw"
- #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
- 
--/* Maximum number of multicast addresses to filter (vs. Rx-all-multicast).
--   The RTL chips use a 64 element hash table based on the Ethernet CRC. */
--#define	MC_FILTER_LIMIT	32
--
- #define TX_DMA_BURST	7	/* Maximum PCI burst, '7' is unlimited */
- #define InterFrameGap	0x03	/* 3 means InterFrameGap = the shortest one */
- 
-@@ -2597,8 +2593,7 @@ static void rtl_set_rx_mode(struct net_device *dev)
- 		rx_mode |= AcceptAllPhys;
- 	} else if (!(dev->flags & IFF_MULTICAST)) {
- 		rx_mode &= ~AcceptMulticast;
--	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
--		   dev->flags & IFF_ALLMULTI ||
-+	} else if (dev->flags & IFF_ALLMULTI ||
- 		   tp->mac_version == RTL_GIGA_MAC_VER_35) {
- 		/* accept all multicasts */
- 	} else if (netdev_mc_empty(dev)) {
--- 
-2.43.0
+I was able to reproduce the problem very easily with a recent
+Chromebox (not Chromebook) in developer mode running a test image (and
+v5.10 kernel):
+1) ping -f $CHROMEBOX (from workstation on same local network)
+2) run "powerd_dbus_suspend" from command line on the $CHROMEBOX
+3) ping $ROUTER (wait until ping fails from workstation)
 
+Takes about ~20-30 seconds after step 2 for the local network to stop worki=
+ng.
+At that point, tcpdump from the workstation is full of PAUSE frames.
 
+I did not check that WOL still works.
+
+The exact patches I used on chromeos-5.10 kernel branch are publicly
+visible here:
+    https://chromium-review.googlesource.com/c/chromiumos/third_party/kerne=
+l/+/5056381
+
+> > In this patch default enable pause slot to prevent this kind of
+> > situation.
+> >
+> Can this change have any side effect? I'm asking because apparently
+> the hw engineers had a reason to make the behavior configurable.
+>
+> > Fixes: f1bce4ad2f1c ("r8169: add support for RTL8125")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: ChunHao Lin <hau@realtek.com>
+
+Tested-by: Grant Grundler <grundler@chromium.org>
+Reviewed-by: Grant Grundler <grundler@chromiuim.org>
+
+(adding my reviewed-by to indicate I think the code is fine... I
+appreciate Heiner asking for better comments though.)
+
+cheers,
+grant
+
+> > ---
+> >  drivers/net/ethernet/realtek/r8169_main.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/et=
+hernet/realtek/r8169_main.c
+> > index 295366a85c63..473b3245754f 100644
+> > --- a/drivers/net/ethernet/realtek/r8169_main.c
+> > +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> > @@ -196,6 +196,7 @@ enum rtl_registers {
+> >                                       /* No threshold before first PCI =
+xfer */
+> >  #define      RX_FIFO_THRESH                  (7 << RXCFG_FIFO_SHIFT)
+> >  #define      RX_EARLY_OFF                    (1 << 11)
+> > +#define      RX_PAUSE_SLOT_ON                (1 << 11)
+>
+> Depending on the chip version this bit has different meanings. Therefore =
+it
+> would be good to add a comment that RX_PAUSE_SLOT_ON is specific to RTL81=
+25B.
+>
+> >  #define      RXCFG_DMA_SHIFT                 8
+> >                                       /* Unlimited maximum PCI burst. *=
+/
+> >  #define      RX_DMA_BURST                    (7 << RXCFG_DMA_SHIFT)
+> > @@ -2305,9 +2306,13 @@ static void rtl_init_rxcfg(struct rtl8169_privat=
+e *tp)
+> >       case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_53:
+> >               RTL_W32(tp, RxConfig, RX128_INT_EN | RX_MULTI_EN | RX_DMA=
+_BURST | RX_EARLY_OFF);
+> >               break;
+> > -     case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
+> > +     case RTL_GIGA_MAC_VER_61:
+> >               RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
+> >               break;
+> > +     case RTL_GIGA_MAC_VER_63:
+> > +             RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
+> > +                     RX_PAUSE_SLOT_ON);
+> > +             break;
+> >       default:
+> >               RTL_W32(tp, RxConfig, RX128_INT_EN | RX_DMA_BURST);
+> >               break;
+>
 
