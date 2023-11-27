@@ -1,284 +1,210 @@
-Return-Path: <netdev+bounces-51258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6507F9D99
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:33:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 646A57F9DB7
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDEFBB20DA7
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:33:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 878581C20CD2
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECF11864A;
-	Mon, 27 Nov 2023 10:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D265ED2EE;
+	Mon, 27 Nov 2023 10:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kK1Y7YEy"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yqMwMqm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A3410F;
-	Mon, 27 Nov 2023 02:33:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701081210; x=1732617210;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=hDyB3lKO0AlbP36eEmVTI2W17eAgM9sOxY9iAkcuNk8=;
-  b=kK1Y7YEyDINWhGAClAohfK4WrZewJSfcqV2P/j041pacvOemfT+8YGdu
-   hkVzgSa1I7L/Y9IvhmRUoUCTzi61KjtJ7qIfxtpybdfKlGEH13X7pd6TJ
-   Eug6oWYgiBvBNCY6MptjnwDlZ1zkrpR+JBAIoVrn3CveKVoFWGe/u2BH9
-   6uJZBqL2N8tjiE2KjLNMFtSi6+8wrZ0Eji1cuiid/BZWeYhLGhZYDG2OQ
-   wKy8aDnS92Ewa//0BjLLAe83t0DSsAD2m6BiW22KMBvgHOgooeLjf9fPe
-   CFRKwh7jiY0jaqNipFG0IOvJVmc2ygNXSA7DcbLdyWKIWrkbpMItGDwP9
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="372836757"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="372836757"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 02:33:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="771882371"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="771882371"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2023 02:33:30 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 27 Nov 2023 02:33:30 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 27 Nov 2023 02:33:29 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 27 Nov 2023 02:33:29 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 27 Nov 2023 02:33:29 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NEGjwmXHGsWfPLbtc0iEe0yF3AKcvmBedA4y8vsCZbHx5eUs0vkyoVxft2RlGkyMwwp+kC7K8uYTkccda1IFWarZZwVaceJF3xCASWY3lLID4ae/6v6VUwIB/rX6L2M+Pk/4d1xL1E+2j0Nq5YWFxyTc4lY9V7AnPoEbhykgbOJGzvseKMce/RJfYC09am8tIxofhviVf1jq/MJMH1W2Y9kpI0lnbgOT0BgEiaXhhOHZ+mFxxfY7NXQ5yslqkbtGNMoVVhIkOIpG0LavZ/LBuX7OzTJoqTCwgu7ADuf0/BkqNvImtMFY0fKPbEbuTJziyS4G6q0+G4D2sbbCHAoM8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bi/JuR5foWYnX1rA7rXtvvummW5LpfIhW6vRc/t8xpQ=;
- b=bB5rb1Z1RyYRU1PHOt7rR27CTRY3bo+lam2qE+MgXMUeSBjDBS6RM2YdMuAwUN/Rpb9pEsGzQuHYuig6z3SyMg+tv7HMgeIkKkqQte0Hx5Mby0y/fMEOcHoO3S4qcqDNsVaIQyNJiMyknDa5dzfLIqSWs4bwUAleSpOfqjlYhy8Ivxbm6zLlJ9H07dG/Fo8SV25U+oaTmDt6wAXsCUd22h76m7blREEVgCu55a/TsBFuJEUyKSHQf4BH1TQDzRHphSTlSJvQctdlzamyHTVoL+Y0tEJU5Z50gGEYHf4Gz3x8itor+sPCtbmZoOCR+xvaaKPdJDmak46Oe6xejxeBHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by MW4PR11MB6738.namprd11.prod.outlook.com (2603:10b6:303:20c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Mon, 27 Nov
- 2023 10:33:27 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
- 10:33:27 +0000
-Message-ID: <d1e672e3-c306-40e1-a8bd-0468b3ea4856@intel.com>
-Date: Mon, 27 Nov 2023 11:33:20 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] i40e: Fix kernel crash during macvlan offloading
- setup
-Content-Language: en-US
-To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Harshitha Ramamurthy <harshitha.ramamurthy@intel.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>, "moderated list:INTEL ETHERNET
- DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
-	<linux-kernel@vger.kernel.org>
-References: <20231124164233.86691-1-ivecera@redhat.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <20231124164233.86691-1-ivecera@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0073.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1f::17) To PH0PR11MB5782.namprd11.prod.outlook.com
- (2603:10b6:510:147::11)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662BA191
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:38:20 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a02cc476581so536613066b.2
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:38:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701081499; x=1701686299; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y1M3FyjEd1+wYJ9VaDcWQDDFv+gyP4VNkOiJ3KwZCro=;
+        b=yqMwMqm0y/unH1A6XWpYrGGkeL6VxWUjAZhwxGCxGAqL6mhmpffrjQ1nxPe6Hoc868
+         CVvzgCcfkASOX7UOkqXnVfk7vbMThXHmNqmU7ac1gUUb/gz3dKI/lh0DljcP+rDfTKcM
+         6yG4cGIA0mok0E+htbGWk/x5P/8+2OaoYm4dI0fbJgq7T7WgA9qIhqFQv+rRU5tsChPf
+         7bUs7xH+JG2Xe6TF4Q4n6Wz6h53P2DlsfVMbZtORbnlzmLUut9JOD68Q122CW/HekJy0
+         k5UsxGOamruPvo0Uj2w7lPAU4ewytfBr083jXV2+zYOZhqBkRE1YmO9ph8JnSmcajR5Z
+         diqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701081499; x=1701686299;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y1M3FyjEd1+wYJ9VaDcWQDDFv+gyP4VNkOiJ3KwZCro=;
+        b=P/o3POIN9ihsLD9DoLy4i0wcsu+yYlUn++lWjPiGqrzDeZ2roOccJQUcpGpY8VATtc
+         exsEzfrrrByx1/iY/66GZFDJmIaJrf7qZesQum+3DKPO0wbS7SBHJpt1Q/tirDiHKtLC
+         WVjmCR8FshrTB6gLgAkN/FfMiBkju/8WsUNtLs0t7S+Lf1jQBKWKEAw58e17sECkZX6W
+         fEYEkAKQiaXycVVEEBIPNDxSmQ+4Ynl9rgqZUhw6Yp3MnxY71mxNO7uOTDShfByh8KFj
+         1miuGhVOj1RVKOS//oFjbq9Qw/e+0NmYlR5uomiBn8Pqnce5xrhgutx0Nd4eo+8uX3pB
+         yLAQ==
+X-Gm-Message-State: AOJu0YxwfUBjmjTM2WUT2jeMh9OpDd0An8m0ZXVLyO0UWAOkvm4KoLyk
+	nelYNoy+jZy0kJSJGyPtrwRwUA==
+X-Google-Smtp-Source: AGHT+IHyCDEQKt9WcsRJsakMLLaJICDYP2kpu94TcaXHaZX5cfNoR94qpJbzpHMYearEbT5A3aAI+w==
+X-Received: by 2002:a17:906:39c9:b0:9f3:18f8:475b with SMTP id i9-20020a17090639c900b009f318f8475bmr7822058eje.62.1701081498848;
+        Mon, 27 Nov 2023 02:38:18 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.109])
+        by smtp.gmail.com with ESMTPSA id e8-20020a170906080800b009fdc15b5304sm5544618ejd.102.2023.11.27.02.38.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 02:38:18 -0800 (PST)
+Message-ID: <0c35dd80-8062-4f1b-9127-8a5cb2deca40@linaro.org>
+Date: Mon, 27 Nov 2023 11:38:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|MW4PR11MB6738:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63b8865a-2a29-4836-ddb7-08dbef3449c4
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R8ZjazWCiVxBPPH1KBkNeMGoxXH9YHKHK0/QG7qrW5QinFXHzCha5NLlFlHCLskkBSfGC1LtPduR+vO2Bp8q+dk+pC2oi4QQsXec18EY+vLIsQvmW6aX0P+jmkW+69a7IR++Hc12/f6YEl6JM4EY40SRdujvag8ufgdaGQo6SK/YJQ6XLMjT0z+cusa6lon6IuD2zh8GvQ99D+IaiZii9xk1oqoNPDkUp5BS9fquKdGN2BMo1ZKGIOd/hS8y3F6+/pezpMlyn99pffXlxNTxG/USgL7kLmgC+HJc7SZ2N/CCOzqQpw2ItjbO8QzgzMAJh/7LApdCjBgLwDNumJKyFyn09GQnzhQfOOkLV3hc2qf3qb+r9ay02MhvdGN4ghwJ9B6bOwQbkwX2SgrAldac5yJrWNAVz5FeeD0mfq2IySMdzpbuEWNix3r5utmyRbVsBfEVFt53zcYJjs+lzeATW6rIJnipFcKxgRKVvs/4CkATj2wj9hJ5UZti/w/uMKCgQ2tlH2Qz1J5DjcaL1fxZRjTGZ6ok99Tz/ZVeG7ZSAjX8ekACPTJD4UBJkgAc0x4ynfdzGzYiUxl3DhVS7SCWm4znZCnEhFEaZhHcncGHIFNDvyBDek2otbdChMLYDzW4AbDCGK9nWvQYw//wnKWOgg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(346002)(39860400002)(376002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(44832011)(4326008)(5660300002)(41300700001)(31686004)(26005)(8936002)(8676002)(2906002)(478600001)(6666004)(6506007)(6512007)(53546011)(2616005)(38100700002)(83380400001)(316002)(54906003)(66476007)(66556008)(66946007)(6486002)(82960400001)(86362001)(36756003)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VlBqam80d2FHemJoN0JCRy94aXA3T2lWZmk4MzZBZDFIYzhVNHl6K1ZKSWtL?=
- =?utf-8?B?R0tYaFRyRzdKQmJGbWNEYnd6d2pYcWh1d2psQWlaZzVUc0JCdDQrdkZvTE1x?=
- =?utf-8?B?dEtWaDRDclFMMGxpeFpHSEV4cm1uRjN5RUp1S0IxMWFVZUpwdHlMOGdtZXlO?=
- =?utf-8?B?UzBSSzVyU3R6S253bDZmVUVwRS9Ua3ltNVNzRFFadGcwdERUN2ZwNGF1SGRJ?=
- =?utf-8?B?aUlXbEtyVEVRd1FEUlZPNUkxVVN6WVlhSjF5NER2b1F2QnJXdnRGRWd3cGsw?=
- =?utf-8?B?OFFHUWE0N1Vqc2ZaYXhyMzR4UmljMSsxdVVMcWFaSlVpZ0tjOXBSUGF5V3cw?=
- =?utf-8?B?R3d3ZlZZcGNWZUxXWlZQcnAzTGxPbjcvQkIveC9RbWlNSFpTSjUvNlJpbHBU?=
- =?utf-8?B?QlRPTmNGUkxBVVNnay9lQzNsL21KVlZoQmw4OXdoRWE3WG5BWko4TFV2M2lp?=
- =?utf-8?B?MUh5Ny81ZUNaaUlQNDNKR2dCVkRicUFWTnlvS3ZDMXVnV3dEb1JReEdCMi8w?=
- =?utf-8?B?RldES1NadjdqVXVBOXJTNEd3NHhmd3NQTGo3T1JqSXRrWkprM3dOTFp5M2cw?=
- =?utf-8?B?Uk9TaFJ1ZWFBdGlRK0ZXOEQ3cmRkcXRLeTZQSU1QRFhMNDk1MmpGSmpGUmVD?=
- =?utf-8?B?eHFrTEVmMmlFTTB0c0VZbGJGZnBUamFvQmF6Ryt1Sk91R0JVV2tkMVJJL21M?=
- =?utf-8?B?YVEyLzFZa1MxTFVPcmg4T0c0NHhGK0kzSFVHZGNuWkM5S3RDYWo0TzNGbHA0?=
- =?utf-8?B?UFlnN3RlZDl0djFZdE5Fb1JONDh2ekQ0anFIVllFL1pMRjYxOFFVTXRhU2RU?=
- =?utf-8?B?THVUZmU5KzU0ajNyNCsvbG1WWnJpSTlxMGZ4eHJDd0ozVnVMMndFd1ZBWlpn?=
- =?utf-8?B?anl0MWo1V0pmUDNqK3NGSTBRczNhUi9qM3F2VHpHbnloRzJEMzczN1FZQWwr?=
- =?utf-8?B?VG1nN3ZnVkZzY0ZRYnlmTVJwV3NPdmhsM2lCUlBrVFFKTDZRTStrTkttSFgx?=
- =?utf-8?B?a0lKM2hMTHpGNUlvMUFqeG81OGRqbm42amlPa0FEYzhkT1J3N2E0bWcyVTlM?=
- =?utf-8?B?N1phcmF3OWs5Z3dhQy9QZjlhdUg2M3RFa2tLc01TT0ZoMEZZYmNySnV5NXVU?=
- =?utf-8?B?dHlRNDEvenJaUlliSHBVYyt4amhHVGxZNTRCL2ZoellZVmNFUUFPY2Nwbk1t?=
- =?utf-8?B?cUJqdTg3MG1wZ2MvcHhIK0hsWTVlaGhaK2txVFovOUJ4V2xaZDg5Y3p1aUhP?=
- =?utf-8?B?eWMzUGhXOEpXaW1PV1ZrVDVPMUJNdTdPM1lZVmx4TlpCSHphK1ZmK0N6RjlZ?=
- =?utf-8?B?Tk5YcHMwWUlWL0pmd3NYNDFMM2g2Mzc0Q2V2eTZoZXdUODNkS3FCN1pFMmJD?=
- =?utf-8?B?Q1dianJjVzM3U0RlQ3lsTnVweTlZWVBGVGxQMjZsZXR6bmVIUGk4YityWWRE?=
- =?utf-8?B?VGZGb3JMQkZmSE9qSkhxU2tDQkJVemFzVU96M05BR2VuOW56cGJZNmVJRll1?=
- =?utf-8?B?L1J0UlMxcS9ZRjVCeFRxZlk2T3VTMVNjSFlwb0VBUStLRkRwT1dKc3JqbzRv?=
- =?utf-8?B?Y1QvbmFYRExmYmtPaEc3TlFMT3UyakNnVk9XYzZMdS9ybmM0Zy91Mmg5c2pX?=
- =?utf-8?B?SCtENmY3cndWR3djajNHSVJnQjUvZGJNQU55bVFtNGlSSjFIRFF3eE5sR1Zh?=
- =?utf-8?B?a1kwTjBBK200U0Zzdnd4STdPZDFrNmREd1BMdHJjZUpwYnc1NWhQOFUwREww?=
- =?utf-8?B?cTZZSURaMnNvMmVaS2xVTmJIakdiejVMS09PN1hBUjRwZlB6a3cwdC9RZUtX?=
- =?utf-8?B?TWV5MDhpb3FmS004emRhNWRoUHBYa1o4TENJNVpHMk83LzdYanl1QVFwUEF0?=
- =?utf-8?B?bVVObVRNb09QUEw2SzJVMkNFY1VXUmdsSDBMeVZNb2dMWisvSncvcGJhWGw5?=
- =?utf-8?B?T0dMQklWVjRFelR4M2djVk52cXRuaXgwL0MyUWx2S2h0bFl3a2VoRzdIRndi?=
- =?utf-8?B?WDc4dmg2Mk00bjk3ZEp3aE80OG1KMmg2RGJzdFhCTTBNa3BybCsxTUozaUFO?=
- =?utf-8?B?dVpUNXliaVlvME9EQlQwWHk5S2FjdUF2NkRGTXJPVlljYTZSRHUwUm9HeVJ6?=
- =?utf-8?B?R0UwSXpzc0xoUjllZXRsOVhROEI5RlIzNjVEYVpjR0JpNTBPSkIvMnVVMUtK?=
- =?utf-8?B?SVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63b8865a-2a29-4836-ddb7-08dbef3449c4
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5782.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 10:33:27.1486
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xnxFz7WNmvhtKk+eMPnSu5GrexPGz4cB0VAY9v1YECXw3mG02BCsCTfRsEWjDe6PBczrGDez12xuPvWOcuUjA6aM/tutTEG914otVcFAKes=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6738
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] nfc: Protect access to nfc_dev in an llcp_sock with a
+ rwlock
+Content-Language: en-US
+To: Siddh Raman Pant <code@siddh.me>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+References: <cover.1700943019.git.code@siddh.me>
+ <7c198c2aa08b34045b8f9e0afe3d0b3bf5802180.1700943019.git.code@siddh.me>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <7c198c2aa08b34045b8f9e0afe3d0b3bf5802180.1700943019.git.code@siddh.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 25/11/2023 21:26, Siddh Raman Pant wrote:
+> llcp_sock_sendmsg() calls nfc_llcp_send_ui_frame(), which accesses the
+> nfc_dev from the llcp_sock for getting the headroom and tailroom needed
+> for skb allocation.
 
+This path should have reference to nfc device: nfc_get_device(). Why is
+this not sufficient?
 
-On 24.11.2023 17:42, Ivan Vecera wrote:
-> Function i40e_fwd_add() computes num of created channels and
-> num of queues per channel according value of pf->num_lan_msix.
 > 
-> This is wrong because the channels are used for subordinated net
-> devices that reuse existing queues from parent net device and
-> number of existing queue pairs (pf->num_queue_pairs) should be
-> used instead.
+> Parallely, the nfc_dev can be freed via the nfc_unregister_device()
+> codepath (nfc_release() being called due to the class unregister in
+> nfc_exit()), leading to the UAF reported by Syzkaller.
 > 
-> E.g.:
-> Let's have (pf->num_lan_msix == 32)... Then we reduce number of
-> combined queues by ethtool to 8 (so pf->num_queue_pairs == 8).
-> i40e_fwd_add() called by macvlan then computes number of macvlans
-> channels to be 16 and queues per channel 1 and calls
-> i40e_setup_macvlans(). This computes new number of queue pairs
-> for PF as:
+> We have the following call tree before freeing:
 > 
-> num_qps = vsi->num_queue_pairs - (macvlan_cnt * qcnt);
+> nfc_unregister_device()
+> 	-> nfc_llcp_unregister_device()
+> 		-> local_cleanup()
+> 			-> nfc_llcp_socket_release()
 > 
-> This is evaluated in this case as:
-> num_qps = (8 - 16 * 1) = (u16)-8 = 0xFFF8
+> nfc_llcp_socket_release() sets the state of sockets to LLCP_CLOSED,
+> and this is encountered necessarily before any freeing of nfc_dev.
+
+Sorry, I don't understand. What is encountered before freeing?
+
 > 
-> ...and this number is stored vsi->next_base_queue that is used
-> during channel creation. This leads to kernel crash.
+> Thus, add a rwlock in struct llcp_sock to synchronize access to
+> nfc_dev. nfc_dev in an llcp_sock will be NULLed in a write critical
+> section when socket state has been set to closed. Thus, we can avoid
+> the UAF by bailing out from a read critical section upon seeing NULL.
 > 
-> Fix this bug by computing the number of offloaded macvlan devices
-> and no. their queues according the current number of queues instead
-> of maximal one.
+> Since this is repeated multiple times in nfc_llcp_socket_release(),
+> extract the behaviour into a new function.
 > 
-> Reproducer:
-> 1) Enable l2-fwd-offload
-> 2) Reduce number of queues
-> 3) Create macvlan device
-> 4) Make it up
-> 
-> Result:
-> [root@cnb-03 ~]# ethtool -K enp2s0f0np0 l2-fwd-offload on
-> [root@cnb-03 ~]# ethtool -l enp2s0f0np0 | grep Combined
-> Combined:       32
-> Combined:       32
-> [root@cnb-03 ~]# ethtool -L enp2s0f0np0 combined 8
-> [root@cnb-03 ~]# ip link add link enp2s0f0np0 mac0 type macvlan mode bridge
-> [root@cnb-03 ~]# ip link set mac0 up
-> ...
-> [ 1225.686698] i40e 0000:02:00.0: User requested queue count/HW max RSS count:  8/32
-> [ 1242.399103] BUG: kernel NULL pointer dereference, address: 0000000000000118
-> [ 1242.406064] #PF: supervisor write access in kernel mode
-> [ 1242.411288] #PF: error_code(0x0002) - not-present page
-> [ 1242.416417] PGD 0 P4D 0
-> [ 1242.418950] Oops: 0002 [#1] PREEMPT SMP NOPTI
-> [ 1242.423308] CPU: 26 PID: 2253 Comm: ip Kdump: loaded Not tainted 6.7.0-rc1+ #20
-> [ 1242.430607] Hardware name: Abacus electric, s.r.o. - servis@abacus.cz Super Server/H12SSW-iN, BIOS 2.4 04/13/2022
-> [ 1242.440850] RIP: 0010:i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-> [ 1242.448165] Code: 48 89 b3 80 00 00 00 48 89 bb 88 00 00 00 74 3c 31 c9 0f b7 53 16 49 8b b4 24 f0 0c 00 00 01 ca 83 c1 01 0f b7 d2 48 8b 34 d6 <48> 89 9e 18 01 00 00 49 8b b4 24 e8 0c 00 00 48 8b 14 d6 48 89 9a
-> [ 1242.466902] RSP: 0018:ffffa4d52cd2f610 EFLAGS: 00010202
-> [ 1242.472121] RAX: 0000000000000000 RBX: ffff9390a4ba2e40 RCX: 0000000000000001
-> [ 1242.479244] RDX: 000000000000fff8 RSI: 0000000000000000 RDI: ffffffffffffffff
-> [ 1242.486370] RBP: ffffa4d52cd2f650 R08: 0000000000000020 R09: 0000000000000000
-> [ 1242.493494] R10: 0000000000000000 R11: 0000000100000001 R12: ffff9390b861a000
-> [ 1242.500626] R13: 00000000000000a0 R14: 0000000000000010 R15: ffff9390b861a000
-> [ 1242.507751] FS:  00007efda536b740(0000) GS:ffff939f4ec80000(0000) knlGS:0000000000000000
-> [ 1242.515826] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1242.521564] CR2: 0000000000000118 CR3: 000000010bd48002 CR4: 0000000000770ef0
-> [ 1242.528699] PKRU: 55555554
-> [ 1242.531400] Call Trace:
-> [ 1242.533846]  <TASK>
-> [ 1242.535943]  ? __die+0x20/0x70
-> [ 1242.539004]  ? page_fault_oops+0x76/0x170
-> [ 1242.543018]  ? exc_page_fault+0x65/0x150
-> [ 1242.546942]  ? asm_exc_page_fault+0x22/0x30
-> [ 1242.551131]  ? i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-> [ 1242.557847]  i40e_setup_channel.part.0+0x5f/0x130 [i40e]
-> [ 1242.563167]  i40e_setup_macvlans.constprop.0+0x256/0x420 [i40e]
-> [ 1242.569099]  i40e_fwd_add+0xbf/0x270 [i40e]
-> [ 1242.573300]  macvlan_open+0x16f/0x200 [macvlan]
-> [ 1242.577831]  __dev_open+0xe7/0x1b0
-> [ 1242.581236]  __dev_change_flags+0x1db/0x250
-> ...
-> 
-> Fixes: 1d8d80b4e4ff ("i40e: Add macvlan support on i40e")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
+> Signed-off-by: Siddh Raman Pant <code@siddh.me>
 > ---
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  net/nfc/llcp.h          |  1 +
+>  net/nfc/llcp_commands.c | 27 ++++++++++++++++++++++++---
+>  net/nfc/llcp_core.c     | 31 +++++++++++++++++++------------
+>  net/nfc/llcp_sock.c     |  2 ++
+>  4 files changed, 46 insertions(+), 15 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index c36535145a41..7bb1f64833eb 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -7981,8 +7981,8 @@ static void *i40e_fwd_add(struct net_device *netdev, struct net_device *vdev)
->  		netdev_info(netdev, "Macvlans are not supported when HW TC offload is on\n");
->  		return ERR_PTR(-EINVAL);
->  	}
-> -	if (pf->num_lan_msix < I40E_MIN_MACVLAN_VECTORS) {
-> -		netdev_info(netdev, "Not enough vectors available to support macvlans\n");
-> +	if (vsi->num_queue_pairs < I40E_MIN_MACVLAN_VECTORS) {
-> +		netdev_info(netdev, "Not enough queues to support macvlans\n");
->  		return ERR_PTR(-EINVAL);
->  	}
+> diff --git a/net/nfc/llcp.h b/net/nfc/llcp.h
+> index d8345ed57c95..800cbe8e3d6b 100644
+> --- a/net/nfc/llcp.h
+> +++ b/net/nfc/llcp.h
+> @@ -102,6 +102,7 @@ struct nfc_llcp_local {
+>  struct nfc_llcp_sock {
+>  	struct sock sk;
+>  	struct nfc_dev *dev;
+> +	rwlock_t rw_dev_lock;
+
+I dislike the idea of introducing the third (!!!) lock here. It looks
+like a bandaid for this one particular problem.
+
+>  	struct nfc_llcp_local *local;
+>  	u32 target_idx;
+>  	u32 nfc_protocol;
+> diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
+> index 39c7c59bbf66..b132830bc206 100644
+> --- a/net/nfc/llcp_commands.c
+> +++ b/net/nfc/llcp_commands.c
+> @@ -315,13 +315,24 @@ static struct sk_buff *llcp_allocate_pdu(struct nfc_llcp_sock *sock,
+>  {
+>  	struct sk_buff *skb;
+>  	int err, headroom, tailroom;
+> +	unsigned long irq_flags;
 >  
-> @@ -8000,7 +8000,7 @@ static void *i40e_fwd_add(struct net_device *netdev, struct net_device *vdev)
->  		 * reserve 3/4th of max vectors, then half, then quarter and
->  		 * calculate Qs per macvlan as you go
->  		 */
-> -		vectors = pf->num_lan_msix;
-> +		vectors = vsi->num_queue_pairs;
->  		if (vectors <= I40E_MAX_MACVLANS && vectors > 64) {
->  			/* allocate 4 Qs per macvlan and 32 Qs to the PF*/
->  			q_per_macvlan = 4;
+>  	if (sock->ssap == 0)
+>  		return NULL;
+>  
+> +	read_lock_irqsave(&sock->rw_dev_lock, irq_flags);
+> +
+> +	if (!sock->dev) {
+> +		read_unlock_irqrestore(&sock->rw_dev_lock, irq_flags);
+> +		pr_err("NFC device does not exit\n");
+
+exist?
+
+
+
+Best regards,
+Krzysztof
+
 
