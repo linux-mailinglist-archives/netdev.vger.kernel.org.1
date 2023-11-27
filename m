@@ -1,522 +1,207 @@
-Return-Path: <netdev+bounces-51303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB2D7FA069
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:16:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B287FA0B9
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:18:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BEDF281338
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:16:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48952812FE
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F0A2CCDA;
-	Mon, 27 Nov 2023 13:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD19B2D616;
+	Mon, 27 Nov 2023 13:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="REgXrkmo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aH7cXdUf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAF816429;
-	Mon, 27 Nov 2023 13:16:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C42C4C433C7;
-	Mon, 27 Nov 2023 13:16:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701090970;
-	bh=h/UapjLhG0TnA+GOIIYsega+vdZ9Jtg0+Tzwur09/eo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=REgXrkmo8zgxz/quppot1HYFagMuwmcoq+b1Q22Hak2LvB/ELseDd/oH03b5FSVXE
-	 SLhUXWcK8Y4Y6OqOInmHW5jWyHCuQOgV2MlGuYg36KUzXzU3OXYDU42PPTHx8epw2v
-	 Au2M/dc38dlMTGh7UL3cz+AM30Op799Kuxh6QKYWK/uUX2EGfEvmSnOJZdC+YIJkUU
-	 rYF2/GfdRZCQ1UstxPeqIKxHAmFe5KblBJXsDAhBgO9py64ct5NrenVLvbZIgdcmN8
-	 EeVgC7c3ElMuVwzfcsRvjUn+9T8ZN9OwaE/pqx8yJNnCT2IXGC10yA0W0en6nBUjnr
-	 hPUuAVYJE4pmg==
-Date: Mon, 27 Nov 2023 18:46:06 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH 2/8] phy: add driver for MediaTek pextp 10GE SerDes
- PHY
-Message-ID: <ZWSWltcNRQ5XcBdc@matsya>
-References: <cover.1699565880.git.daniel@makrotopia.org>
- <0b112d39251b35b5d7975833ad6b4ab4717c029a.1699565880.git.daniel@makrotopia.org>
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2043.outbound.protection.outlook.com [40.107.102.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B8718B
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:17:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H3gm/xSCd/mwOtQtFs+b2eDoLV3viqZAP6afuA5zCRtL3onNufnxaqMvZvm7KYAddAZg1Oh48Gll3kTFwRPNGyB1wlwnRMjXjhS6GSCi643HpPQSUCIfKqiAw6g+JRVcnyzIfm8MFugMH/THrkZ+NDT+zX5/FRDiDVdB/HoyIHpwVXGmuvOFjesX3mSbd+4gWko1aKU7pjUXOKxpVGyB4kdx+x6PQg1idOS1oPBUIwHplGDFZxcMb8M4uwx6n9iAthQaXlmH2jBe1zkvCBS0C5w4+gQi5GpCnR/+Ozq45Yp1cSGen2o9OWFInXuA1s77llolQ5xJ5KtG4VWfumdBUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=POyqEmEV+a6JvD4q17W8Fxxfri53i5zTzOHnGhxwByg=;
+ b=eVKzA0MYdSTsbcNQY7XVAYkwtd0t0v8MqwypjeBW92MU/jcfcUgSJL8yJgdtiW7d9q6mV0GEWAsUsvNeDr7hb2L2EbWsP2+vHzYtZvzHpPqUnvHMzeJwpWrxHv0VaXhj7SK2uq7FZoJtwmTwQlCfgLhXmWzsMgwboRXE6SWymJZ5XF7B1am6AQeGKrgyZvFtnvyeM/l8gBAAyYAtCzOXWKjlCsbB32Vft5CIxJfFuk5yV4bsAN7foZk7YuhmPZraWwMGqcFLc2FviQJF1PE/1MREzUTMjvGR+7LmVSPf25vxO0IeISeu1GY1IvR66qW2fWqDtmFJAxS18mxSSL2rVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=POyqEmEV+a6JvD4q17W8Fxxfri53i5zTzOHnGhxwByg=;
+ b=aH7cXdUfczQyChaoY/N2A7W1iwedfi933AQP5UsXLyGNLJymfWai8UD/akWgH90sF98lLXObTvi7M89gMB3HXIFWVNbbiVcggdciWIn3aq60QRutwssS3ioOsRO9EQ/odJEocxEEEz2sHygm+4W1hGx4a+cLLHeB6ABqiB4ZiGS0J3blunp6yARTEz+Kmn3lY+H+x23ZSo68mdxCiBwO3xYa0Zsxfdgh2uR5Pm2tauXgDvNLyOmy5vbzN+K4OTD6Ddp9M8DfVDdmJK6XXskuQwtMUIVMVVHOGRjTdzAvzwP7b9rjzu41lWKZKLyIiblZJluxZ7oBCOu5p3j6WuW9EQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by PH7PR12MB7987.namprd12.prod.outlook.com (2603:10b6:510:27c::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Mon, 27 Nov
+ 2023 13:17:55 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::eb39:938e:7503:c21e]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::eb39:938e:7503:c21e%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
+ 13:17:54 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+ aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH v20 02/20] netlink: add new family to manage ULP_DDP
+ enablement and stats
+In-Reply-To: <ZV98IyA3LSsk2BXs@nanopsycho>
+References: <20231122134833.20825-1-aaptel@nvidia.com>
+ <20231122134833.20825-3-aaptel@nvidia.com> <ZV98IyA3LSsk2BXs@nanopsycho>
+Date: Mon, 27 Nov 2023 15:17:50 +0200
+Message-ID: <253cyvvjpxd.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0328.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:eb::7) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b112d39251b35b5d7975833ad6b4ab4717c029a.1699565880.git.daniel@makrotopia.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH7PR12MB7987:EE_
+X-MS-Office365-Filtering-Correlation-Id: da66a0c0-51cf-4635-a2f2-08dbef4b43a9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	c3+T9ikzAB6UMQlfqOGwUoJqsW/6zGVNuHt+s6AxHDsMn/IPHxAIevDjvornZwJIZShCYhQ+C08zgBWnc3zz9zm6dnx4Z4BNOcZYOJ6wcQx94ebgvj+h0J09FXgv2ZDj+BhArQ8uK9Qa3wYO77hLJSb85vi9/DDRFmUPt3xKTALMpuM42LrwoX0FdNxcQlhpaZoIfyDWMEQrHns3Rc34vCARKoh1TcIbGksjcBWfZ8odOy6815CEdyEHV3k/Gquzmo10jj06WFN4yOV5itkPJpP7e4E9xCwuDikYeA4t1Mo7SMd+qQtUS6MorH8LrFA6+Hct4EOUAHSzIsdW8HoelMtk71pdYFA0Pva06DTJeqzOn4RslJ+tzsQyJqg0xwCfsFWvPK1+w9anWJk8d1R9FFCDdE8QD5o0N+CxMgIj5TN+cQ3qefJ0LUchxxy9+r4jDbuXjKhwfBopRZcIy+hV/up95BAWLj1ogO5hZmNEwDIqv0DQ4WKco4RcKQR4Bn4vjYPgrzA1XneXqe8LC42kjnoiZ3Zq+3t57ZQxLadncN4NBkzvMHDWtyE9EgMFmnxs
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(39860400002)(376002)(396003)(346002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6666004)(8936002)(8676002)(4326008)(6512007)(6506007)(66476007)(66556008)(66946007)(6916009)(316002)(6486002)(478600001)(2906002)(36756003)(38100700002)(41300700001)(86362001)(26005)(2616005)(83380400001)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?iC+nFZzHg8VAhmPOnLojHwWOtAiaJNFK7RHGEaaB4E4SVYR05VlRfCQQdYS5?=
+ =?us-ascii?Q?ph1N9jWNA8V61xwC0dw5UeDfSWn8Bjqxa+DE74FK71qDhmkBZ4IG9dkL/NCS?=
+ =?us-ascii?Q?+tDOohDsB5AMXQFrwehn0VmbGzpUDZ3QzngMKXYZGfuDKUGLtzbNZPIP3ktg?=
+ =?us-ascii?Q?i31ROQtFXk+WOAoYgIejjnFOEvr+sQ5fc29iewWK52RTcNi3AngltzhP9NnV?=
+ =?us-ascii?Q?2WMUiuqtfHplLl++uT4GEKmDz/r6UsVeAXRV9CrGM9fKJLibvcanmnFEcZof?=
+ =?us-ascii?Q?3DIafK29UFemzV7whcGZ++T1UT8De5kgXBPwSBLEX9BdhZ4EZPbznJ5I3n7f?=
+ =?us-ascii?Q?Iwx+kosaYQqpjp2YwYi3Y/y56jOToCtFD8+W5youSExEleoG0GoKlWIIJxta?=
+ =?us-ascii?Q?4dyGQCtGMo5n132a/Hkbkafm2AJwz0oFdJ6dDjGSe0CJULXss++13ZJEpywF?=
+ =?us-ascii?Q?Fh80ONHn98zBeuVIuRJlw22T0a9blyreMs6dCtgaf6M1EPreXuoUaANPAmBA?=
+ =?us-ascii?Q?4vYYRsa2SYqbtVcg0cfEULQ6ZZ9pbcFRqq/wuiaYjEjxikvyEEdegeMbRwib?=
+ =?us-ascii?Q?gceR3MkxC5d+25STvpvEE7wjfsIyAGbUI6eDSyEr5I35FkwPVzWB30PV2qPn?=
+ =?us-ascii?Q?Y4W4GD4zVcRj4O6aTLIi3PI4ibyTNuDNVp0Mit3oQw7CjN1QqQ0YS167eAP/?=
+ =?us-ascii?Q?G2LiSsM4UHIzRyO4e1Fmdpw5EflV+EXlm4PhiS+0jYHJ/RDUSAlybccie2gO?=
+ =?us-ascii?Q?OphsF241Nu3lVe7bAD2VMil8lW3xwM3sNMnVJxw22GqWEtkjdogTG0v2C6Um?=
+ =?us-ascii?Q?+2rxq/Ty+hQqJPL2nPHHTKREvd8jrFWteJGvxpo0W1/vzLfw4N+Kc9Bw02k0?=
+ =?us-ascii?Q?6+cL0mfsFjUH7LO3H0x+08450KHq5Yfe5uf568vNRoAv8A+ERshJ1nM6yTv3?=
+ =?us-ascii?Q?XF0V9hNj0dnXkRUzCd+yw4CQZDBplT/RKbUHsN5ZXjs/gwyTRARu5/IaH0Za?=
+ =?us-ascii?Q?E9PHm/PgJJD7T9fEr9fbkk8ycFRvGkgJJCyP5JZGqLyBRRmy39Qvk1Qt5qnc?=
+ =?us-ascii?Q?OkXK56drraJn9w8y0cuTjZvujYgI/put5lbLRd360OR3tKPO2K0ku0OL8bv8?=
+ =?us-ascii?Q?7cIyOrq74ffDldJ4NBSzJ4s+Eg/Ey5s5p9dDzCblCOKXo/YzZ6AHFnJLcFFS?=
+ =?us-ascii?Q?cStS+SdHW3cdyQpoKw7pxwxNaKPk1oUjh0O+8Ln5OomzZ6pjMIMfwHUp2jON?=
+ =?us-ascii?Q?aA6FA+oiH5PjyfAT/Tk3UmkyqmuWdOA5RXVdegZGXhk1zv//ePGdS49VxzJW?=
+ =?us-ascii?Q?aY4Tf0CbyDC1kOrxhClpIeZwLLO+rzY4A0e25PCzeImg0SlvQfbzJGyz4VKz?=
+ =?us-ascii?Q?parIhXgTZLsRABHCFnCmuG6SK5/7o5I97LOuAnxZ2FvegEogtZoX8se2WZCK?=
+ =?us-ascii?Q?WlLDsry3DiZdVFPkXlquVlnH/pJkO1F+it9kasrC41ug6E6uetxwRHE09vMf?=
+ =?us-ascii?Q?C2RjmhQHjyGkZSak7XX7TUOtjdGZDy4bXywyGH2f6y8FTuHo5y5iJEZ72mOi?=
+ =?us-ascii?Q?zvs/jDMPEjPc8MoIbD0P012I3t6EMIkslYUD3AgY?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da66a0c0-51cf-4635-a2f2-08dbef4b43a9
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 13:17:54.2409
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xXdQSLNs/By0xPDI45uqVWoz4RaV6/LQ68OGAgVde6iJ9LG8iaVbUXatZiDE3LwOLcCrU3fkDvLOK5T+UnHXaQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7987
 
-On 09-11-23, 21:51, Daniel Golle wrote:
-> Add driver for MediaTek's pextp 10 Gigabit/s Ethernet SerDes PHY which
-> can be found in the MT7988 SoC.
-> 
-> The PHY can operates only in PHY_MODE_ETHERNET, the submode is one of
-> PHY_INTERFACE_MODE_* corresponding to the supported modes:
-> 
->  * USXGMII
->  * 10GBase-R
->  * 5GBase-R
->  * 2500Base-X
->  * 1000Base-X
->  * Cisco SGMII (MAC side)
-> 
-> In order to work-around a performance issue present on the first of
-> two PEXTP present in MT7988 special tuning is applied which can be
-> selected by adding the mediatek,usxgmii-performance-errata property to
-> the device tree node.
-> 
-> There is no documentation what-so-ever for the pextp registers and
-> this driver is based on a GPL licensed implementation found in
-> MediaTek's SDK.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  MAINTAINERS                          |   1 +
->  drivers/phy/mediatek/Kconfig         |  11 +
->  drivers/phy/mediatek/Makefile        |   1 +
->  drivers/phy/mediatek/phy-mtk-pextp.c | 355 +++++++++++++++++++++++++++
->  4 files changed, 368 insertions(+)
->  create mode 100644 drivers/phy/mediatek/phy-mtk-pextp.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7b151710e8c58..6499acd8f3874 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13527,6 +13527,7 @@ L:	netdev@vger.kernel.org
->  S:	Maintained
->  F:	drivers/net/phy/mediatek-ge-soc.c
->  F:	drivers/net/phy/mediatek-ge.c
-> +F:	drivers/phy/mediatek/phy-mediatek-pextp.c
->  
->  MEDIATEK I2C CONTROLLER DRIVER
->  M:	Qii Wang <qii.wang@mediatek.com>
-> diff --git a/drivers/phy/mediatek/Kconfig b/drivers/phy/mediatek/Kconfig
-> index 3125ecb5d119f..a7749a6d96541 100644
-> --- a/drivers/phy/mediatek/Kconfig
-> +++ b/drivers/phy/mediatek/Kconfig
-> @@ -13,6 +13,17 @@ config PHY_MTK_PCIE
->  	  callback for PCIe GEN3 port, it supports software efuse
->  	  initialization.
->  
-> +config PHY_MTK_PEXTP
-> +	tristate "MediaTek PEXTP Driver"
-> +	depends on ARCH_MEDIATEK || COMPILE_TEST
-> +	depends on OF && OF_ADDRESS
-> +	depends on HAS_IOMEM
-> +	select GENERIC_PHY
-> +	help
-> +	  Say 'Y' here to add support for MediaTek pextp PHY driver.
-> +	  The driver provides access to the Ethernet SerDes PHY supporting
-> +	  various 1GE, 2.5GE, 5GE and 10GE modes.
-> +
->  config PHY_MTK_TPHY
->  	tristate "MediaTek T-PHY Driver"
->  	depends on ARCH_MEDIATEK || COMPILE_TEST
-> diff --git a/drivers/phy/mediatek/Makefile b/drivers/phy/mediatek/Makefile
-> index c9a50395533eb..ca60c7b9b02ac 100644
-> --- a/drivers/phy/mediatek/Makefile
-> +++ b/drivers/phy/mediatek/Makefile
-> @@ -8,6 +8,7 @@ obj-$(CONFIG_PHY_MTK_PCIE)		+= phy-mtk-pcie.o
->  obj-$(CONFIG_PHY_MTK_TPHY)		+= phy-mtk-tphy.o
->  obj-$(CONFIG_PHY_MTK_UFS)		+= phy-mtk-ufs.o
->  obj-$(CONFIG_PHY_MTK_XSPHY)		+= phy-mtk-xsphy.o
-> +obj-$(CONFIG_PHY_MTK_PEXTP)		+= phy-mtk-pextp.o
->  
->  phy-mtk-hdmi-drv-y			:= phy-mtk-hdmi.o
->  phy-mtk-hdmi-drv-y			+= phy-mtk-hdmi-mt2701.o
-> diff --git a/drivers/phy/mediatek/phy-mtk-pextp.c b/drivers/phy/mediatek/phy-mtk-pextp.c
-> new file mode 100644
-> index 0000000000000..272bff4f37a96
-> --- /dev/null
-> +++ b/drivers/phy/mediatek/phy-mtk-pextp.c
-> @@ -0,0 +1,355 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/* MediaTek 10GE SerDes PHY driver
-> + *
-> + * Copyright (c) 2023 Daniel Golle <daniel@makrotopia.org>
-> + * based on mtk_usxgmii.c found in MediaTek's SDK released under GPL-2.0
-> + * Copyright (c) 2022 MediaTek Inc.
-> + * Author: Henry Yen <henry.yen@mediatek.com>
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/device.h>
-> +#include <linux/netdevice.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/of.h>
-> +#include <linux/io.h>
-> +#include <linux/clk.h>
-> +#include <linux/reset.h>
-> +#include <linux/phy.h>
-> +#include <linux/phy/phy.h>
-> +
-> +struct mtk_pextp_phy {
-> +	void __iomem		*base;
-> +	struct device		*dev;
-> +	struct reset_control	*reset;
-> +	struct clk		*clk;
-> +	bool			da_war;
-> +};
-> +
-> +static inline bool mtk_interface_mode_is_xgmii(phy_interface_t interface)
-> +{
-> +	switch (interface) {
-> +	case PHY_INTERFACE_MODE_INTERNAL:
-> +	case PHY_INTERFACE_MODE_USXGMII:
-> +	case PHY_INTERFACE_MODE_10GBASER:
-> +	case PHY_INTERFACE_MODE_5GBASER:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static void mtk_pextp_setup(struct mtk_pextp_phy *pextp, phy_interface_t interface)
-> +{
-> +	bool is_10g = (interface == PHY_INTERFACE_MODE_10GBASER ||
-> +		       interface == PHY_INTERFACE_MODE_USXGMII);
-> +	bool is_2p5g = (interface == PHY_INTERFACE_MODE_2500BASEX);
-> +	bool is_5g = (interface == PHY_INTERFACE_MODE_5GBASER);
-> +
-> +	dev_dbg(pextp->dev, "setting up for mode %s\n", phy_modes(interface));
-> +
-> +	/* Setup operation mode */
-> +	if (is_10g)
-> +		iowrite32(0x00C9071C, pextp->base + 0x9024);
+Jiri Pirko <jiri@resnulli.us> writes:
+> Overall looks good to me, couple of nits below, take it or leave it.
 
-what are these magic numbers? also lower case hex values pls
+Glad to hear. We will send v21 with the changes below.
+Hopefully we can get a RB or Ack on this patch.
 
-> +	else
-> +		iowrite32(0x00D9071C, pextp->base + 0x9024);
-> +
-> +	if (is_5g)
-> +		iowrite32(0xAAA5A5AA, pextp->base + 0x2020);
-> +	else
-> +		iowrite32(0xAA8585AA, pextp->base + 0x2020);
-> +
-> +	if (is_2p5g || is_5g || is_10g) {
-> +		iowrite32(0x0C020707, pextp->base + 0x2030);
-> +		iowrite32(0x0E050F0F, pextp->base + 0x2034);
-> +		iowrite32(0x00140032, pextp->base + 0x2040);
-> +	} else {
-> +		iowrite32(0x0C020207, pextp->base + 0x2030);
-> +		iowrite32(0x0E05050F, pextp->base + 0x2034);
-> +		iowrite32(0x00200032, pextp->base + 0x2040);
-> +	}
-> +
-> +	if (is_2p5g || is_10g)
-> +		iowrite32(0x00C014AA, pextp->base + 0x50F0);
-> +	else if (is_5g)
-> +		iowrite32(0x00C018AA, pextp->base + 0x50F0);
-> +	else
-> +		iowrite32(0x00C014BA, pextp->base + 0x50F0);
-> +
-> +	if (is_5g) {
-> +		iowrite32(0x3777812B, pextp->base + 0x50E0);
-> +		iowrite32(0x005C9CFF, pextp->base + 0x506C);
-> +		iowrite32(0x9DFAFAFA, pextp->base + 0x5070);
-> +		iowrite32(0x273F3F3F, pextp->base + 0x5074);
-> +		iowrite32(0xA8883868, pextp->base + 0x5078);
-> +		iowrite32(0x14661466, pextp->base + 0x507C);
-> +	} else {
-> +		iowrite32(0x3777C12B, pextp->base + 0x50E0);
-> +		iowrite32(0x005F9CFF, pextp->base + 0x506C);
-> +		iowrite32(0x9D9DFAFA, pextp->base + 0x5070);
-> +		iowrite32(0x27273F3F, pextp->base + 0x5074);
-> +		iowrite32(0xA7883C68, pextp->base + 0x5078);
-> +		iowrite32(0x11661166, pextp->base + 0x507C);
-> +	}
-> +
-> +	if (is_2p5g || is_10g) {
-> +		iowrite32(0x0E000AAF, pextp->base + 0x5080);
-> +		iowrite32(0x08080D0D, pextp->base + 0x5084);
-> +		iowrite32(0x02030909, pextp->base + 0x5088);
-> +	} else if (is_5g) {
-> +		iowrite32(0x0E001ABF, pextp->base + 0x5080);
-> +		iowrite32(0x080B0D0D, pextp->base + 0x5084);
-> +		iowrite32(0x02050909, pextp->base + 0x5088);
-> +	} else {
-> +		iowrite32(0x0E000EAF, pextp->base + 0x5080);
-> +		iowrite32(0x08080E0D, pextp->base + 0x5084);
-> +		iowrite32(0x02030B09, pextp->base + 0x5088);
-> +	}
-> +
-> +	if (is_5g) {
-> +		iowrite32(0x0C000000, pextp->base + 0x50E4);
-> +		iowrite32(0x04000000, pextp->base + 0x50E8);
-> +	} else {
-> +		iowrite32(0x0C0C0000, pextp->base + 0x50E4);
-> +		iowrite32(0x04040000, pextp->base + 0x50E8);
-> +	}
-> +
-> +	if (is_2p5g || mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x0F0F0C06, pextp->base + 0x50EC);
-> +	else
-> +		iowrite32(0x0F0F0606, pextp->base + 0x50EC);
-> +
-> +	if (is_5g) {
-> +		iowrite32(0x50808C8C, pextp->base + 0x50A8);
-> +		iowrite32(0x18000000, pextp->base + 0x6004);
-> +	} else {
-> +		iowrite32(0x506E8C8C, pextp->base + 0x50A8);
-> +		iowrite32(0x18190000, pextp->base + 0x6004);
-> +	}
-> +
-> +	if (is_10g)
-> +		iowrite32(0x01423342, pextp->base + 0x00F8);
-> +	else if (is_5g)
-> +		iowrite32(0x00A132A1, pextp->base + 0x00F8);
-> +	else if (is_2p5g)
-> +		iowrite32(0x009C329C, pextp->base + 0x00F8);
-> +	else
-> +		iowrite32(0x00FA32FA, pextp->base + 0x00F8);
-> +
-> +	/* Force SGDT_OUT off and select PCS */
-> +	if (mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x80201F20, pextp->base + 0x00F4);
-> +	else
-> +		iowrite32(0x80201F21, pextp->base + 0x00F4);
-> +
-> +	/* Force GLB_CKDET_OUT */
-> +	iowrite32(0x00050C00, pextp->base + 0x0030);
-> +
-> +	/* Force AEQ on */
-> +	iowrite32(0x02002800, pextp->base + 0x0070);
-> +	ndelay(1020);
-> +
-> +	/* Setup DA default value */
-> +	iowrite32(0x00000020, pextp->base + 0x30B0);
-> +	iowrite32(0x00008A01, pextp->base + 0x3028);
-> +	iowrite32(0x0000A884, pextp->base + 0x302C);
-> +	iowrite32(0x00083002, pextp->base + 0x3024);
-> +	if (mtk_interface_mode_is_xgmii(interface)) {
-> +		iowrite32(0x00022220, pextp->base + 0x3010);
-> +		iowrite32(0x0F020A01, pextp->base + 0x5064);
-> +		iowrite32(0x06100600, pextp->base + 0x50B4);
-> +		if (interface == PHY_INTERFACE_MODE_USXGMII)
-> +			iowrite32(0x40704000, pextp->base + 0x3048);
-> +		else
-> +			iowrite32(0x47684100, pextp->base + 0x3048);
-> +	} else {
-> +		iowrite32(0x00011110, pextp->base + 0x3010);
-> +		iowrite32(0x40704000, pextp->base + 0x3048);
-> +	}
-> +
-> +	if (!mtk_interface_mode_is_xgmii(interface) && !is_2p5g)
-> +		iowrite32(0x0000C000, pextp->base + 0x3064);
-> +
-> +	if (interface == PHY_INTERFACE_MODE_USXGMII) {
-> +		iowrite32(0xA8000000, pextp->base + 0x3050);
-> +		iowrite32(0x000000AA, pextp->base + 0x3054);
-> +	} else if (mtk_interface_mode_is_xgmii(interface)) {
-> +		iowrite32(0x00000000, pextp->base + 0x3050);
-> +		iowrite32(0x00000000, pextp->base + 0x3054);
-> +	} else {
-> +		iowrite32(0xA8000000, pextp->base + 0x3050);
-> +		iowrite32(0x000000AA, pextp->base + 0x3054);
-> +	}
-> +
-> +	if (mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x00000F00, pextp->base + 0x306C);
-> +	else if (is_2p5g)
-> +		iowrite32(0x22000F00, pextp->base + 0x306C);
-> +	else
-> +		iowrite32(0x20200F00, pextp->base + 0x306C);
-> +
-> +	if (interface == PHY_INTERFACE_MODE_10GBASER && pextp->da_war)
-> +		iowrite32(0x0007B400, pextp->base + 0xA008);
-> +
-> +	if (mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x00040000, pextp->base + 0xA060);
-> +	else
-> +		iowrite32(0x00050000, pextp->base + 0xA060);
-> +
-> +	if (is_10g)
-> +		iowrite32(0x00000001, pextp->base + 0x90D0);
-> +	else if (is_5g)
-> +		iowrite32(0x00000003, pextp->base + 0x90D0);
-> +	else if (is_2p5g)
-> +		iowrite32(0x00000005, pextp->base + 0x90D0);
-> +	else
-> +		iowrite32(0x00000007, pextp->base + 0x90D0);
-> +
-> +	/* Release reset */
-> +	iowrite32(0x0200E800, pextp->base + 0x0070);
-> +	usleep_range(150, 500);
-> +
-> +	/* Switch to P0 */
-> +	iowrite32(0x0200C111, pextp->base + 0x0070);
-> +	ndelay(1020);
-> +	iowrite32(0x0200C101, pextp->base + 0x0070);
-> +	usleep_range(15, 50);
-> +
-> +	if (mtk_interface_mode_is_xgmii(interface)) {
-> +		/* Switch to Gen3 */
-> +		iowrite32(0x0202C111, pextp->base + 0x0070);
-> +	} else {
-> +		/* Switch to Gen2 */
-> +		iowrite32(0x0201C111, pextp->base + 0x0070);
-> +	}
-> +	ndelay(1020);
-> +	if (mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x0202C101, pextp->base + 0x0070);
-> +	else
-> +		iowrite32(0x0201C101, pextp->base + 0x0070);
-> +	usleep_range(100, 500);
-> +	iowrite32(0x00000030, pextp->base + 0x30B0);
-> +	if (mtk_interface_mode_is_xgmii(interface))
-> +		iowrite32(0x80201F00, pextp->base + 0x00F4);
-> +	else
-> +		iowrite32(0x80201F01, pextp->base + 0x00F4);
-> +
-> +	iowrite32(0x30000000, pextp->base + 0x3040);
-> +	usleep_range(400, 1000);
-> +}
-> +
-> +static int mtk_pextp_set_mode(struct phy *phy, enum phy_mode mode, int submode)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +
-> +	if (mode != PHY_MODE_ETHERNET)
-> +		return -EINVAL;
-> +
-> +	switch (submode) {
-> +	case PHY_INTERFACE_MODE_1000BASEX:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_5GBASER:
-> +	case PHY_INTERFACE_MODE_10GBASER:
-> +	case PHY_INTERFACE_MODE_USXGMII:
-> +		mtk_pextp_setup(pextp, submode);
-> +		return 0;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
-> +static int mtk_pextp_reset(struct phy *phy)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +
-> +	reset_control_assert(pextp->reset);
-> +	usleep_range(100, 500);
-> +	reset_control_deassert(pextp->reset);
-> +	mdelay(10);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mtk_pextp_power_on(struct phy *phy)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +
-> +	return clk_prepare_enable(pextp->clk);
-> +}
-> +
-> +static int mtk_pextp_power_off(struct phy *phy)
-> +{
-> +	struct mtk_pextp_phy *pextp = phy_get_drvdata(phy);
-> +
-> +	clk_disable_unprepare(pextp->clk);
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct phy_ops mtk_pextp_ops = {
-> +	.power_on	= mtk_pextp_power_on,
-> +	.power_off	= mtk_pextp_power_off,
-> +	.set_mode	= mtk_pextp_set_mode,
-> +	.reset		= mtk_pextp_reset,
-> +	.owner		= THIS_MODULE,
-> +};
-> +
-> +static int mtk_pextp_probe(struct platform_device *pdev)
-> +{
-> +	struct device_node *np = pdev->dev.of_node;
-> +	struct phy_provider *phy_provider;
-> +	struct mtk_pextp_phy *pextp;
-> +	struct phy *phy;
-> +
-> +	if (!np)
-> +		return -ENODEV;
-> +
-> +	pextp = devm_kzalloc(&pdev->dev, sizeof(*pextp), GFP_KERNEL);
-> +	if (!pextp)
-> +		return -ENOMEM;
-> +
-> +	pextp->base = devm_of_iomap(&pdev->dev, np, 0, NULL);
-> +	if (!pextp->base)
-> +		return -EIO;
-> +
-> +	pextp->dev = &pdev->dev;
-> +	pextp->clk = devm_clk_get(&pdev->dev, NULL);
-> +	if (IS_ERR(pextp->clk))
-> +		return PTR_ERR(pextp->clk);
-> +
-> +	pextp->reset = devm_reset_control_get_exclusive(&pdev->dev, NULL);
-> +	if (IS_ERR(pextp->reset))
-> +		return PTR_ERR(pextp->reset);
-> +
-> +	pextp->da_war = of_property_read_bool(np, "mediatek,usxgmii-performance-errata");
-> +
-> +	phy = devm_phy_create(&pdev->dev, NULL, &mtk_pextp_ops);
-> +	if (IS_ERR(phy))
-> +		return PTR_ERR(phy);
-> +
-> +	phy_set_drvdata(phy, pextp);
-> +
-> +	phy_provider = devm_of_phy_provider_register(&pdev->dev, of_phy_simple_xlate);
-> +
-> +	return PTR_ERR_OR_ZERO(phy_provider);
-> +}
-> +
-> +static const struct of_device_id mtk_pextp_match[] = {
-> +	{ .compatible = "mediatek,mt7988-xfi-pextp", },
-> +	{ }
-> +};
-> +MODULE_DEVICE_TABLE(of, mtk_pextp_match);
-> +
-> +static struct platform_driver mtk_pextp_driver = {
-> +	.probe = mtk_pextp_probe,
-> +	.driver = {
-> +		.name = "mtk-pextp",
-> +		.of_match_table = mtk_pextp_match,
-> +	},
-> +};
-> +module_platform_driver(mtk_pextp_driver);
-> +
-> +MODULE_DESCRIPTION("MediaTek pextp SerDes PHY driver");
-> +MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
-> +MODULE_LICENSE("GPL");
-> -- 
-> 2.42.1
+>>+
+>>+      ctx->ifindex = nla_get_u32(info->attrs[ULP_DDP_A_CAPS_IFINDEX]);
+>
+> You don't need to store ifindex. You have ctx->dev->ifindex with the
+> same value.
 
--- 
-~Vinod
+Ok, we will remove it from the context.
+
+>>+      switch (cmd) {
+>>+      case ULP_DDP_CMD_CAPS_GET:
+>>+      case ULP_DDP_CMD_CAPS_SET:
+>>+      case ULP_DDP_CMD_CAPS_SET_NTF:
+>
+> Hmm, you never call ulp_ddp_prepare_context() with
+> ULP_DDP_CMD_CAPS_SET_NTF. Perhaps just warn if this case is hit. IDK.
+
+While that is true it also reflects what the payload is and it mirrors
+ulp_ddp_reply_size(). We will keep it as is.
+
+>>+static int ulp_ddp_write_reply(struct sk_buff *rsp,
+>>+                             struct ulp_ddp_reply_context *ctx,
+>>+                             int cmd,
+>>+                             const struct genl_info *info)
+>>+{
+>>+      ctx->hdr = genlmsg_iput(rsp, info);
+>
+> Interesting, you use "hdr" just in this fuction. Why isn't it a local
+> variable?
+
+Good point, we will make it a local variable.
+
+>>+      ret = ulp_ddp_write_reply(rsp, ctx, ULP_DDP_CMD_CAPS_GET, info);
+>>+      if (ret < 0)
+>
+> You mix "if (ret)" and "if (ret < 0)" in this code, I don't see any of
+> the functions return positive value on success, so you can make it
+> consistent to "if (ret)".
+
+Ok, we will change the checks to "if (ret)" and change
+ulp_ddp_apply_bits() return the notify flag via an input parameter.
+
+>>+
+>>+      if (ulp_ddp_write_reply(ntf, ctx, ULP_DDP_CMD_CAPS_SET_NTF, &info)) {
+>
+> Always use "ret" variable to store return value before you check it.
+
+Ok.
+
+>>+
+>>+      rsp = genlmsg_new(ulp_ddp_reply_size(ULP_DDP_CMD_STATS_GET), GFP_KERNEL);
+>>+      if (!rsp)
+>>+              return -EMSGSIZE;
+>>+
+>>+      wanted = nla_get_u64(info->attrs[ULP_DDP_A_CAPS_WANTED]);
+>
+> nla_get_uint()
+>
+>
+>>+      wanted_mask = nla_get_u64(info->attrs[ULP_DDP_A_CAPS_WANTED_MASK]);
+>
+> nla_get_uint()
+>
+
+Ok.
+
+>
+>>+
+>>+      ret = ulp_ddp_apply_bits(ctx, &wanted, &wanted_mask, info);
+>
+>         ret = ulp_ddp_apply_bits(ctx, &wanted, &wanted_mask, info,
+>                                  &notify);
+>
+> Would be a bit cleaner to read perhaps.
+
+True, we will change it to that.
+
+Thanks
 
