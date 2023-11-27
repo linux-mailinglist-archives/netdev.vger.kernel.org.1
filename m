@@ -1,215 +1,118 @@
-Return-Path: <netdev+bounces-51323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBBE7FA1F9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:05:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1A47FA1FC
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92CC0280C7D
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:05:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33A0128107E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D29A30CE1;
-	Mon, 27 Nov 2023 14:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7AF30F83;
+	Mon, 27 Nov 2023 14:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gjghdP8Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F86D53;
-	Mon, 27 Nov 2023 06:05:27 -0800 (PST)
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-da7ea62e76cso4099961276.3;
-        Mon, 27 Nov 2023 06:05:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701093926; x=1701698726;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aTj1qOn2URWkEUmhUQIMd0foeBHpt1BN+DxS+Iel4g=;
-        b=WjaF6+0g2TDIYFBd8Z4tP2qCqGZFFNjsGFLA5wQZBjb1GZXlFTYkIwp8UbiCk1/Uxw
-         jgYvlNaWXXJEec1nm76SShzTq/Jype405bcBUicuKNKOtrvgwVEVW3QepQWGP2ZCvmVD
-         4bqK+pgddP6bHu4BSZVTrjr7fpl48ERoTcMkhG2sQTEbbPIIv8rGOQ5hurkDZj2rk3Cc
-         1hbbJKxXXwnbVMN2LJLGT9cMwEIVl0JXki81HN3qKuAPS4YFuC4gheToKKv8VEx7F7v4
-         v406mKlTsvXs8U9IDa0BdZyHYS4Z24N/+4rt2gHoXfcLFuLplEahdHeuJwLyulf5qBu0
-         QmAA==
-X-Gm-Message-State: AOJu0Yy/QyzLDB1GKo/XGn5JV18PqfISZDRfNnbNEGpHmMR3W2pFA3FS
-	ZgrZrJHbT5avd2bT37aasWbz05d0DCs4sg==
-X-Google-Smtp-Source: AGHT+IGgKi1Ar5OehazzazaT0YVsN+pl2Hak3plw8cleutWivO/CWf5oyGH8dT05jgR1u2whyMZhyA==
-X-Received: by 2002:a25:69d2:0:b0:db4:47e1:4081 with SMTP id e201-20020a2569d2000000b00db447e14081mr10722099ybc.7.1701093926422;
-        Mon, 27 Nov 2023 06:05:26 -0800 (PST)
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com. [209.85.128.178])
-        by smtp.gmail.com with ESMTPSA id f188-20020a25cfc5000000b00da10d9e96cesm3072889ybg.35.2023.11.27.06.05.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 06:05:25 -0800 (PST)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5cc55b82ee5so39374177b3.2;
-        Mon, 27 Nov 2023 06:05:25 -0800 (PST)
-X-Received: by 2002:a81:ac5b:0:b0:5d0:b0e7:929e with SMTP id
- z27-20020a81ac5b000000b005d0b0e7929emr1798621ywj.42.1701093925277; Mon, 27
- Nov 2023 06:05:25 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22112F87F
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:06:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C2A3C433C9
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701093981;
+	bh=BmuSE7ZaTnrcYNfLlPXtccWvlof7sMxV8qH4uZPkv8U=;
+	h=References:In-Reply-To:From:Date:Subject:To:List-Id:Cc:From;
+	b=gjghdP8QjzXnAQrZOI8uOZ/qIMhBMMRWwDC0YSWgK9z+X8GhIlrBlZ5ztAW6zUZk4
+	 n6O1u2AWU+CFaadaYlrpB2UbG9XceHQKHBI1PPv4Xbh/u377/owi6nLG0LDiDlfFiA
+	 mqomkYKZJIwbj4UGpq/0MTZtuGt8mv2m+MTTMQ1Wa6U1TOJEj0hA8HtmggQFP4xFZE
+	 IdR4U+2WPEY/umN8R4HdjKqY0HIBvpvVYszM0XX9ZTRTsDE6Rpb5esoNGr1lNTv9yo
+	 VpEU7V7MZ2BQTMOuLQAZC/oyNFdOFaBtwMEwhHh9r8WC33CFQ3k6a3yRgtl2oRDIS9
+	 hdf5pjpadNsOA==
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5cc589c0b90so42369797b3.2
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 06:06:21 -0800 (PST)
+X-Gm-Message-State: AOJu0YxmVq9ihbBTh9yFhN8Aee6wtNmfVx9NHQxvy8auLSxoMtwq/UyJ
+	iyBw4SyiBiPjDu+bEQwfDxb2HabeDwCvIx3cEI4=
+X-Google-Smtp-Source: AGHT+IGTZ6UEKvlqQWDyg5eno14eao8w1c0u8ZnRaTU1IIVNiEllou3Y4ol4rc1zECA0MbzzJwB0Oz2cddT3Fz9unTk=
+X-Received: by 2002:a0d:fcc3:0:b0:5cc:765e:f4fe with SMTP id
+ m186-20020a0dfcc3000000b005cc765ef4femr6499419ywf.27.1701093980317; Mon, 27
+ Nov 2023 06:06:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
- <04cb07fe-cccc-774a-f14d-763ce7ae7b07@omp.ru> <b3456a4d-336c-434d-9fd5-4c87582443cb@tuxon.dev>
- <9af21eb9-6fe1-de3a-f2eb-4493778ebb32@omp.ru> <e35882ea-c325-4039-bb84-c18b0244dbe0@tuxon.dev>
-In-Reply-To: <e35882ea-c325-4039-bb84-c18b0244dbe0@tuxon.dev>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 27 Nov 2023 15:05:13 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVCRXYKtcwaC=v-HhJW-PLV-zhj_3GmeU6Vu1JOK_eu0Q@mail.gmail.com>
-Message-ID: <CAMuHMdVCRXYKtcwaC=v-HhJW-PLV-zhj_3GmeU6Vu1JOK_eu0Q@mail.gmail.com>
-Subject: Re: [PATCH 13/13] net: ravb: Add runtime PM support
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, p.zabel@pengutronix.de, 
-	yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com, 
-	biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	sergei.shtylyov@cogentembedded.com, mitsuhiro.kimura.kc@renesas.com, 
-	masaru.nagai.vx@renesas.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231122173041.3835620-1-anthony.l.nguyen@intel.com> <CA+5PVA5ULYE=b-_O6JjhtPM2zASCzEbcK95eQBfhs=tQSkPhWQ@mail.gmail.com>
+In-Reply-To: <CA+5PVA5ULYE=b-_O6JjhtPM2zASCzEbcK95eQBfhs=tQSkPhWQ@mail.gmail.com>
+From: Josh Boyer <jwboyer@kernel.org>
+Date: Mon, 27 Nov 2023 09:06:09 -0500
+X-Gmail-Original-Message-ID: <CA+5PVA6FrzEy1RSMnHA_xixdOZDF19VZcuC1O9bMhdH39OXLRA@mail.gmail.com>
+Message-ID: <CA+5PVA6FrzEy1RSMnHA_xixdOZDF19VZcuC1O9bMhdH39OXLRA@mail.gmail.com>
+Subject: Re: [linux-firmware v1 0/3][pull request] Intel Wired LAN Firmware
+ Updates 2023-11-22
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Mario Limonciello <superm1@gmail.com>, linux-firmware@kernel.org, netdev@vger.kernel.org, 
+	przemyslaw.kitszel@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Claudiu,
-
-On Sat, Nov 25, 2023 at 12:00=E2=80=AFAM claudiu beznea
-<claudiu.beznea@tuxon.dev> wrote:
-> On 23.11.2023 21:19, Sergey Shtylyov wrote:
-> > On 11/23/23 8:04 PM, claudiu beznea wrote:
-> >>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >>>
-> >>>> RZ/G3S supports enabling/disabling clocks for its modules (including
-> >>>> Ethernet module). For this commit adds runtime PM support which
-> >>>> relies on PM domain to enable/disable Ethernet clocks.
-> >>>
-> >>>    That's not exactly something new in RZ/G3S. The ravb driver has un=
-conditional
-> >>> RPM calls already in the probe() and remove() methods...
-> >>> And the sh_eth driver
-> >>> has RPM support since 2009...
-> >>>
-> >>>> At the end of probe ravb_pm_runtime_put() is called which will turn
-> >>>
-> >>>    I'd suggest a shorter name, like ravb_rpm_put() but (looking at th=
-is function)
-> >>>> off the Ethernet clocks (if no other request arrives at the driver).
-> >>>> After that if the interface is brought up (though ravb_open()) then
-> >>>> the clocks remain enabled until interface is brought down (operation
-> >>>> done though ravb_close()).
-> >>>>
-> >>>> If any request arrives to the driver while the interface is down the
-> >>>> clocks are enabled to serve the request and then disabled.
-> >>>>
-> >>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-
-> >>>> --- a/drivers/net/ethernet/renesas/ravb.h
-> >>>> +++ b/drivers/net/ethernet/renesas/ravb.h
-> >>>> @@ -1044,6 +1044,7 @@ struct ravb_hw_info {
-> >>>>    unsigned magic_pkt:1;           /* E-MAC supports magic packet de=
-tection */
-> >>>>    unsigned half_duplex:1;         /* E-MAC supports half duplex mod=
-e */
-> >>>>    unsigned refclk_in_pd:1;        /* Reference clock is part of a p=
-ower domain. */
-> >>>> +  unsigned rpm:1;                 /* Runtime PM available. */
-> >>>
-> >>>    No, I don't think this flag makes any sense. We should support RPM
-> >>> unconditionally...
+On Wed, Nov 22, 2023 at 7:10=E2=80=AFPM Josh Boyer <jwboyer@kernel.org> wro=
+te:
+>
+> On Wed, Nov 22, 2023 at 12:30=E2=80=AFPM Tony Nguyen <anthony.l.nguyen@in=
+tel.com> wrote:
 > >
-> >    If RPM calls work in the probe()/remove() methods, they should work
-> > in the ndo_{open|stop}() methods, right?
->
-> It might depend on hardware support... E.g.
->
-> I debugged it further the issue I had with this implementation on other
-> SoCs and it seems we cannot do RPM for those w/o reworking way the driver
-> is configured.
->
-> I wiped out the RPM code from this patch and just called:
->
-> pm_runtime_put_sync();          // [1]
-> usleep_range(300000, 400000);   // [2]
-> pm_runtime_get_sync();          // [3]
->
-> at the end of ravb_probe(); with this the interfaces fails to work. I
-> continue debugging it and interrogated CSR and this returns RESET after
-> [3]. I tried to switched it back to configuration mode after [3] but fail=
-s
-> to restore to a proper working state.
->
-> Then continued to debug it further to see what happens on the clock drive=
-r.
-> The clk enable/disable reaches function at [4] which sets control_regs[re=
-g]
-> which is one of the System module stop control registers. Setting this
-> activates module standby (AFICT). Switch to reset state on Ethernet IP
-> might be backed by note (2) on "Operating Mode Transitions Due to Hardwar=
-e"
-> chapter of the G1H HW manual (which I don't fully understand).
-
-You mean 37A.3.1.3 (2) "Transition during power-off by module standby"?
-
-    The AVB-DMAC completes the bus master access in progress,
-    and then shifts to reset mode. At this time, the operating mode
-    configuration bits in the AVB-DMAC mode register (CCC.OPC) are
-    set to B'00.
-
-"reset mode" could be interpreted as "register contents are reset (lost)".
-However, the R-Car Gen3 documentation contains the same paragraph,
-and register contents are known not to be lost...
-
-37.7.2 for Ether ("sh-eth") states:
-
-    After returning from the standby state, the ether should be reset
-and initialized.
-
-Sergey: does sh_eth.c really reinitialize the hardware completely after
-pm_runtime_get_sync()?
-
-> Also, the manual of G1H states from some IPs that register state is
-> preserved in standby mode but not for AVB.
-
-Indeed, AFAIK all modules on SH/R-Mobile, R-Car, and RZ/G SoCs keep
-their register contents when in standby-mode (module standby enabled).
-On modules in a (not always-on) power area (e.g. SH/R-Mobile), register
-contents are lost when the power area is powered down.
-So I'd be surprised if EtherAVB behaves differently.  Of course that
-is still possible, there are big difference between EtherAVB in R-Car
-Gen2 and RZ/G1, and the revision found in later SoC families.
-
-> >> The reasons I've limited only to RZ/G3S are:
-> >> 1/ I don't have all the platforms to test it
+> > Update the various ice DDP packages to the latest versions.
 > >
-> >    That's a usual problem with the kernel development...
+> > Thanks,
+> > Tony
 > >
-> >> 2/ on G1H this doesn't work. I tried to debugged it but I don't have a
-> >>    platform at hand, only remotely, and is hardly to debug once the
-> >>    ethernet fails to work: probe is working(), open is executed, PHY i=
-s
-> >>    initialized and then TX/RX is not working... don't know why ATM.
+> > The following changes since commit 9552083a783e5e48b90de674d4e3bf23bb85=
+5ab0:
 > >
-> >    That's why we have the long bug fixing period after -rc1...
+> >   Merge branch 'robot/pr-0-1700470117' into 'main' (2023-11-20 13:09:23=
+ +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/firmware.git dev-=
+queue
+> >
+> > for you to fetch changes up to c71fdbc575b79eff31db4ea243f98d5f648f7f0f=
+:
+> >
+> >   ice: update ice DDP wireless_edge package to 1.3.13.0 (2023-11-22 09:=
+14:39 -0800)
+> >
+> > ----------------------------------------------------------------
+> > Przemek Kitszel (3):
+> >       ice: update ice DDP package to 1.3.35.0
+> >       ice: update ice DDP comms package to 1.3.45.0
+> >       ice: update ice DDP wireless_edge package to 1.3.13.0
 >
-> I prefer to not introduce any bug by intention.
+> Sending a pull request and all of the patches to the list individually
+> seems to have confused the automation we have to grab stuff from the
+> list.  The first two patches are merged and pushed out:
+>
+> https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/75
+> https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/76
+>
+> but we never got an auto-MR for patch #3, and the pull request MR now
+> conflicts because we applied the first two patches in the series from
+> the individual patches.
+>
+> https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/74
+>
+> Mario or I can fix this up, but in the future it'll just be easier if
+> you send either a pull request or individual patches, not both.
 
-Iff register contents are lost on RZ/G1H, I'd rather add
-an extra clk_prepare_enable(priv->clk) to ravb_probe() on
-"renesas,etheravb-rcar-gen2"....
+The third patch is now merged and pushed out.
 
-Gr{oetje,eeting}s,
+https://gitlab.com/kernel-firmware/linux-firmware/-/merge_requests/85
 
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+josh
 
