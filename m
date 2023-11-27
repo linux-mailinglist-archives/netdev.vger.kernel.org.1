@@ -1,136 +1,227 @@
-Return-Path: <netdev+bounces-51458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50DD7FAAC5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:00:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF57A7FAAD0
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DEB61C20D49
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:00:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E9A5B20EBB
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DB245971;
-	Mon, 27 Nov 2023 20:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE2A45971;
+	Mon, 27 Nov 2023 20:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="RnR7cdl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f206.google.com (mail-pf1-f206.google.com [209.85.210.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB34C1B6
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:00:34 -0800 (PST)
-Received: by mail-pf1-f206.google.com with SMTP id d2e1a72fcca58-6cc08c794d6so3838303b3a.1
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 12:00:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701115234; x=1701720034;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0azJOGAh/8a7Fh8R1J/n4CdyDJCzGiGb4P2qXnwNlWM=;
-        b=WE/NqwdOh3Hg9fKW8vTeWgFUT0dxJ4yQv7BJ6Aw4qi6ZV8TmP2Bi0JiIaoIgOxGkKK
-         ObonY9yGvH/h4k3AURJEx8gNoIpsJsxP6PajkCzCJAbuEz+r0naVV1XS9l/fqwJPne+3
-         uPETklWN/sRvv1056AU1VV0ar6zHo4bJgMDAgN/2hAJy+a/h5f6qrpjDXHbc3ytGtnwc
-         Uhf4BFsHPbRdVv25bjr17drGrA1qswd0FiejbWLt+f4McRNUtKEcx5bxsGZxGabtU6nS
-         0K2l4RDNEgKyxYsl0le/D2Ba76hZvicS6NZexbxENOcE5RdbBmKKQ2nbs5NbKMOHARgC
-         cnJg==
-X-Gm-Message-State: AOJu0Yxvjy/kW5nzUfFMty60H5JLoqkqOr0dGsCMrq/RsFkjfkf0EVYn
-	tJWbprq8BZaE3DZWKlZ7SCkRuqJLrgbqYEdXe1ad0bTcSFfc
-X-Google-Smtp-Source: AGHT+IHNoJt0YUyhpCusf9hCXy75ow1nLdqPVsVbiF8vBXGxrNh9GsR41ZAU7pS+gaeWhE5A0RY6Qkn8qo1uo+OU2GBJsW8A1gSL
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2055.outbound.protection.outlook.com [40.92.22.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF811B5;
+	Mon, 27 Nov 2023 12:01:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cvge2IdQoPC0HJneSL5gdjiTYFQQ1gYl4G/RH20dVKnXHMBIJxJ7ShRa6z88+GdVZzyLl2QVH4QRL4IFCqXknHZoJoXqrfKB/AhkyTwGD/8R8Di//dqVN2IscpF6rnK0+HnwctikxeTvR6U3FDzXbBfIFTz6piQxz8oG9cr5HASN/E7vkOM8TypQJipOlTp0mPDwGrJETJyivNf7DxJSC2eLxrQFv5c1JqJD5OxdrV3ht1w+G8wfR/YFWDbYqtTjK+DOl9q8EcLg9VxaNJfQXfoopSIO9vLrB9FSmtke/CwCJX0eXF2sK8LEHzFN6NxCdIoRtEdJ7R5q9gKRQp1a6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3DS7SA2dzesZs+ZgRdGiou4fuD9fyrTboQgSAc/evv8=;
+ b=OaJ9/hKaflBu7iaCGHwcB+ka3RyDCnYs0QZd56sXTmIdhTlCui5OSVwSlyBOTdSbs5dtEnIf7i7mPu5zyRFvvghhZ2LFA/OgwAF0MPzRXK7JZ8941YgcaYmGDUgfuOjJHv1gK3WZovkoILurgKdl7WLELUi+KHavluVdx8qSNxTI6WbY5kzk1Vbeg2yMXKJI7lRtT4Tv4tqlfmtlxdc3V1whtNGq/IM8we/Vw+4n6Xk2ayVu+IOjkoVZIbG1ptErlhBxN1KTCyoC4UKqzmRgjVxtuoo+5+n2XIxaNGZZol5Yk3NeGViGgJbt6K9d84UnxBtxOWAoabRtalbakqUY1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3DS7SA2dzesZs+ZgRdGiou4fuD9fyrTboQgSAc/evv8=;
+ b=RnR7cdl7XrF7Wun8Q0FWwJ/eeIBjELgxzMUey9nwDim280saPy+OoGs6KgD45lKzGTDgrM33xzMGoGG8Q1DrRVNETTuWnK2QvTZtUNQLU8G4xg8BcjjzeL4O63HDzwgQYw8EQ7lgu5vwpUlryy9v7AKKhGjDfONFVX547RkmbWSborYx3KEtLgJ7ryiPgg6kLD09wDwsxH7ESXtrV7jitf9/ue3naiGdn/QCvbASFadm6xWw50EB+yB/vbrENiJGrzQDPzm3htaauC7YPre8jh0zSiO1fliibw2EnXx+wRTPwWQHmMEXOepZ5Nxa/Sk7MZKOwS2iLpKEDspe0bvLUQ==
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com (2603:10b6:510:2a5::8)
+ by MW4PR03MB6442.namprd03.prod.outlook.com (2603:10b6:303:121::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.21; Mon, 27 Nov
+ 2023 20:01:46 +0000
+Received: from PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8]) by PH7PR03MB7064.namprd03.prod.outlook.com
+ ([fe80::9ca4:4c22:a89:9a8%7]) with mapi id 15.20.7046.015; Mon, 27 Nov 2023
+ 20:01:46 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com,
+	lee@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net-next 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for the measured external offset
+Date: Mon, 27 Nov 2023 15:01:29 -0500
+Message-ID:
+ <PH7PR03MB706497752B942B2C33C45E58A0BDA@PH7PR03MB7064.namprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [GxQEKU/rJfdO+ywWq22A99tg8I4ZOX8M]
+X-ClientProxiedBy: YQBPR0101CA0220.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:67::17) To PH7PR03MB7064.namprd03.prod.outlook.com
+ (2603:10b6:510:2a5::8)
+X-Microsoft-Original-Message-ID: <20231127200130.719-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:3911:b0:6c3:9efc:6833 with SMTP id
- fh17-20020a056a00391100b006c39efc6833mr3281206pfb.2.1701115234323; Mon, 27
- Nov 2023 12:00:34 -0800 (PST)
-Date: Mon, 27 Nov 2023 12:00:34 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000439664060b27c19b@google.com>
-Subject: [syzbot] [wireless?] WARNING in __cfg80211_bss_update
-From: syzbot <syzbot+9c67d243461f9800f17b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR03MB7064:EE_|MW4PR03MB6442:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60fd37d1-342e-49f0-da77-08dbef83af08
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	EzbY219ZeovDxVIVFonw8+9FbtJ65/1r+r1NfF3pNZBkauZg8CSyyv2JatZVALVj/RYpWG6dGgP6cCe52RBvKMTkoYipsDdeAbMOV1tfnBDM1wGvuAyV01wWDnViFR2Iw9nG4Ry73Ap5YFhIhGigfLZ/XALc+vqdZ/8UjrltuG6EdXm0SHMVIxxMyjTND+r6WeR1edpo2RLtbm29JLWYpkYSibpg+BLNeVm92IogR5Ylxi4P0WIG9nWP+vUKXV6bcbkUni0X5pUs64oW8EGuXzTOYRvZzNNo5YMzc6BROph/VIiLr9CluzoKPqu+/ZdZP+GcomTBtV7k3Nd/DN+WgQ+gj9LYFfysc9AjtgC7/KflvVo46w/gdHJWiSMgg4uV0zmkmI15nxfivSLOF2kgaTi+RcyTpSzXzZvL5O6nYRWn8jCFQgiaDgoihRnq+6EBFyFEYToVylUTt4sGIjLSnfMV1H46moiVDXfj5Thj7OPlQApQT2K6ZNgF4CDwSkgndWIt6pKre2zGQJg09vZ4Uakkz+ZMAGqnqWiNRNJLnHYNSqXSPAk2SQ+n3P0RhOTx
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+tfQBSwGtlSwq8BAEVpRwzTwK7vSTWnO86dxtU4BQJ9Gsuddyh9kmqkjoYUz?=
+ =?us-ascii?Q?/sXdGdLoGuGwg5vrhDaP6LLQhD6oepZaG5Kl+OEhPMLIrh8mSSVvgt/yLqoS?=
+ =?us-ascii?Q?I2/QprsFBjmgMLhRv31oh3iLX/No0+Q9sPWuMe1ojdoUi1XfOslaeeDAybKP?=
+ =?us-ascii?Q?/dMvypmoJtRKD7XiLm6FbzekR6mZLy5Kljvk4uEg4054aZPLpjvbud++arue?=
+ =?us-ascii?Q?1QvgGpOmDuMP34AyhzAJj3aHboihgU63Mr5R0VKTeeHiKAUSYwlXU6fz5CUp?=
+ =?us-ascii?Q?LYFvS8YDLeCto17jyEDImN0dWRBXyJx5Hj1qcZIVPL+aS0GHa0aHEWM6K6CR?=
+ =?us-ascii?Q?ZhQBy6scPoeYPD7RV2mLDXK3zbCR2giIDS1FSKIRNXMbumEBGsdWIqcSak4k?=
+ =?us-ascii?Q?Ea9owbvkiHiPrEkkos3EdoIFyHBlxwtoLZv//dVfhbsDp08+D7MctsgBcIVr?=
+ =?us-ascii?Q?UVJ5yQpTIwavT2Gwqlilw+v3jHmUufKWfh87uUiJOTaKsZmg3b7m4b53WQjh?=
+ =?us-ascii?Q?msBM7MpgzCINYXLlmp5i9rBFv1YLoCIWZScxAJK/GA0aHWucFj3Q6iz0khkb?=
+ =?us-ascii?Q?KaUn54hY92wAi6JBJKJx8qfxhv5JXcA4EXeHqGn57xfPQtKF6N9XyQiK7UIu?=
+ =?us-ascii?Q?I3j40ZPb76Z+eL6qKTrGcu/RAWcFgFrZp7sV+rGXIF8r5aFz25XhAvSYw7To?=
+ =?us-ascii?Q?VCBnknBcJNBwfWmlpC1pKNSb8RbVJRQzzfq+NDwPxFfcn01GfpxIORYCSKBW?=
+ =?us-ascii?Q?DEM5zlK0VswSEuHL9uwGbuOy4vFgyNaSW82x5qfOSs8SZ17/gNTziE4WHgL/?=
+ =?us-ascii?Q?gsUPFDMomaoZmID+udxzGej5CRSWIVPN2of9WTUjtj2VwGCGWPV9HRx7BzVU?=
+ =?us-ascii?Q?mxOd/r79Z5aXmKQ8hphGAHC9NZBnKL0YiT0srEZ2GY6zL4V9mqjyVWxfYkls?=
+ =?us-ascii?Q?+kslIUvV80ElwYithEnG8qGEgQEf9tHcbN8z0NThD/J4+hW8/DE9WJt+fP1K?=
+ =?us-ascii?Q?PXmpQQy7qxtp5rt5uA9kJZDkrzkw/vSUvETWaVplX34yweCPcV2XwKivjy3E?=
+ =?us-ascii?Q?Uzy4dRy/4a1ScRZ+2snV/jReE6x37L77fd2SkkCKhtdmmvPheqwoKmn76jrr?=
+ =?us-ascii?Q?cWt6NRQtGaVk0kFVn+Xiro80tWeeJS/1vwzY5Pl7FsI94x94ZvLL/yiF4Z5f?=
+ =?us-ascii?Q?Jq3UMueb/XYlX4F2gLCmHAL32pHuEi1hJZ8NTw=3D=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-685f7.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60fd37d1-342e-49f0-da77-08dbef83af08
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR03MB7064.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 20:01:46.5644
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR03MB6442
 
-Hello,
+From: Min Li <min.li.xe@renesas.com>
 
-syzbot found the following issue on:
+This change is for the PHC devices that can measure the phase offset
+between PHC signal and the external signal, such as the 1PPS signal of
+GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+the existing ptp_extts_event so that application such as ts2phc can
+poll the external offset the same way as extts. Hence, ts2phc can use
+the offset to achieve the alignment between PHC and the external signal
+by the help of either SW or HW filters.
 
-HEAD commit:    9b6de136b5f0 Merge tag 'loongarch-fixes-6.7-1' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=118a257ce80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f2a9d08825f82ef3
-dashboard link: https://syzkaller.appspot.com/bug?extid=9c67d243461f9800f17b
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/25ab52a5f324/disk-9b6de136.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/324f600af6eb/vmlinux-9b6de136.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7f3148d7c5fb/bzImage-9b6de136.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9c67d243461f9800f17b@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 1522 at net/wireless/scan.c:1692 cfg80211_combine_bsses net/wireless/scan.c:1692 [inline]
-WARNING: CPU: 1 PID: 1522 at net/wireless/scan.c:1692 __cfg80211_bss_update+0x1cbc/0x24b0 net/wireless/scan.c:1877
-Modules linked in:
-CPU: 1 PID: 1522 Comm: kworker/u4:5 Not tainted 6.7.0-rc2-syzkaller-00029-g9b6de136b5f0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:cfg80211_combine_bsses net/wireless/scan.c:1692 [inline]
-RIP: 0010:__cfg80211_bss_update+0x1cbc/0x24b0 net/wireless/scan.c:1877
-Code: ff df 48 c1 ea 03 80 3c 02 00 0f 85 d5 02 00 00 48 b8 22 01 00 00 00 00 ad de 49 89 44 24 18 e9 02 f3 ff ff e8 05 21 b1 f7 90 <0f> 0b 90 e9 34 f0 ff ff e8 f7 20 b1 f7 48 8d 7b 98 e8 4e 73 ff ff
-RSP: 0018:ffffc90005307568 EFLAGS: 00010283
-RAX: 0000000000000ddf RBX: 0000000000000003 RCX: ffffc900146de000
-RDX: 0000000000040000 RSI: ffffffff89d6692b RDI: 0000000000000000
-RBP: ffff88807781e068 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000000000 R12: ffff88801ea9e800
-R13: ffff88807781e000 R14: dffffc0000000000 R15: 0000000000000005
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b31723000 CR3: 000000002993c000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- cfg80211_inform_single_bss_frame_data+0x768/0xf30 net/wireless/scan.c:2905
- cfg80211_inform_bss_frame_data+0xbf/0x290 net/wireless/scan.c:2936
- ieee80211_bss_info_update+0x300/0x8f0 net/mac80211/scan.c:205
- ieee80211_rx_bss_info net/mac80211/ibss.c:1098 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1577 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x1973/0x3120 net/mac80211/ibss.c:1604
- ieee80211_iface_process_skb net/mac80211/iface.c:1589 [inline]
- ieee80211_iface_work+0xa67/0xda0 net/mac80211/iface.c:1643
- cfg80211_wiphy_work+0x24e/0x330 net/wireless/core.c:435
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2630
- process_scheduled_works kernel/workqueue.c:2703 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-
+Signed-off-by: Min Li <min.li.xe@renesas.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/ptp/ptp_clock.c          | 12 +++++++++---
+ include/linux/ptp_clock_kernel.h |  3 +++
+ include/uapi/linux/ptp_clock.h   |  9 +++++++--
+ 3 files changed, 19 insertions(+), 5 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3134568af622..17aacdf37561 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -48,14 +48,19 @@ static void enqueue_external_timestamp(struct timestamp_event_queue *queue,
+ 	s64 seconds;
+ 	u32 remainder;
+ 
+-	seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
++	if (src->type != PTP_CLOCK_EXTOFF)
++		seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
+ 
+ 	spin_lock_irqsave(&queue->lock, flags);
+ 
+ 	dst = &queue->buf[queue->tail];
+ 	dst->index = src->index;
+-	dst->t.sec = seconds;
+-	dst->t.nsec = remainder;
++	if (src->type != PTP_CLOCK_EXTOFF) {
++		dst->t.sec = seconds;
++		dst->t.nsec = remainder;
++	} else {
++		dst->offset_ns = src->offset;
++	}
+ 
+ 	if (!queue_free(queue))
+ 		queue->head = (queue->head + 1) % PTP_MAX_TIMESTAMPS;
+@@ -416,6 +421,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
++	case PTP_CLOCK_EXTOFF:
+ 		/* Enqueue timestamp on selected queues */
+ 		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index 1ef4e0f9bd2a..6e4b8206c7d0 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -200,6 +200,7 @@ struct ptp_clock;
+ enum ptp_clock_events {
+ 	PTP_CLOCK_ALARM,
+ 	PTP_CLOCK_EXTTS,
++	PTP_CLOCK_EXTOFF,
+ 	PTP_CLOCK_PPS,
+ 	PTP_CLOCK_PPSUSR,
+ };
+@@ -210,6 +211,7 @@ enum ptp_clock_events {
+  * @type:  One of the ptp_clock_events enumeration values.
+  * @index: Identifies the source of the event.
+  * @timestamp: When the event occurred (%PTP_CLOCK_EXTTS only).
++ * @offset:    When the event occurred (%PTP_CLOCK_EXTOFF only).
+  * @pps_times: When the event occurred (%PTP_CLOCK_PPSUSR only).
+  */
+ 
+@@ -218,6 +220,7 @@ struct ptp_clock_event {
+ 	int index;
+ 	union {
+ 		u64 timestamp;
++		s64 offset;
+ 		struct pps_event_time pps_times;
+ 	};
+ };
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index da700999cad4..17ecbe755f26 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -32,6 +32,7 @@
+ #define PTP_RISING_EDGE    (1<<1)
+ #define PTP_FALLING_EDGE   (1<<2)
+ #define PTP_STRICT_FLAGS   (1<<3)
++#define PTP_EXT_OFFSET     (1<<4)
+ #define PTP_EXTTS_EDGES    (PTP_RISING_EDGE | PTP_FALLING_EDGE)
+ 
+ /*
+@@ -40,7 +41,8 @@
+ #define PTP_EXTTS_VALID_FLAGS	(PTP_ENABLE_FEATURE |	\
+ 				 PTP_RISING_EDGE |	\
+ 				 PTP_FALLING_EDGE |	\
+-				 PTP_STRICT_FLAGS)
++				 PTP_STRICT_FLAGS |	\
++				 PTP_EXT_OFFSET)
+ 
+ /*
+  * flag fields valid for the original PTP_EXTTS_REQUEST ioctl.
+@@ -228,7 +230,10 @@ struct ptp_pin_desc {
+ #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+ 
+ struct ptp_extts_event {
+-	struct ptp_clock_time t; /* Time event occured. */
++	union {
++		struct ptp_clock_time t; /* Time event occured. */
++		__s64 offset_ns;         /* Offset event occured */
++	};
+ 	unsigned int index;      /* Which channel produced the event. */
+ 	unsigned int flags;      /* Reserved for future use. */
+ 	unsigned int rsv[2];     /* Reserved for future use. */
+-- 
+2.39.2
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
