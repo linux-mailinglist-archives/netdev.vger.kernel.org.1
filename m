@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-51453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D7A7FA9DB
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:08:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5321A7FA9CF
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDBF81C20B3D
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:08:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7626E1C20E00
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314D5405F0;
-	Mon, 27 Nov 2023 19:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62CF93DBAF;
+	Mon, 27 Nov 2023 19:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8627DD59
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:07:49 -0800 (PST)
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 3ARIBk6X010897
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:07:48 -0800
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by m0001303.ppops.net (PPS) with ESMTPS id 3umcn65xeb-5
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEAD7D59
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:12 -0800 (PST)
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ARIBnJ5004525
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:12 -0800
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3umsc8ucxj-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:07:48 -0800
-Received: from twshared9518.03.prn6.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:12 -0800
+Received: from twshared29647.38.frc1.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 27 Nov 2023 11:07:42 -0800
+ 15.1.2507.34; Mon, 27 Nov 2023 11:04:38 -0800
 Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
 	id 9F17E3C35FC04; Mon, 27 Nov 2023 11:04:30 -0800 (PST)
 From: Andrii Nakryiko <andrii@kernel.org>
@@ -50,8 +50,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: fVYyo_RgnLjIf7vK2NVx1NR4JcuadeZJ
-X-Proofpoint-ORIG-GUID: fVYyo_RgnLjIf7vK2NVx1NR4JcuadeZJ
+X-Proofpoint-GUID: 4lx_yrwp8UmRyv3b4v2L6bEE9ae50-Jn
+X-Proofpoint-ORIG-GUID: 4lx_yrwp8UmRyv3b4v2L6bEE9ae50-Jn
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-27_17,2023-11-27_01,2023-05-22_02
