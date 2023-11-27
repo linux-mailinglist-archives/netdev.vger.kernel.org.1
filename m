@@ -1,72 +1,70 @@
-Return-Path: <netdev+bounces-51297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7494A7FA01A
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:56:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED46A7FA028
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:59:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 301B7280FDF
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:56:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AAB41C20DB7
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEB01E503;
-	Mon, 27 Nov 2023 12:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3620428DC8;
+	Mon, 27 Nov 2023 12:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="S1DniDLT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LpMOW/YG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AD9D5D
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 04:56:49 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-332e40315bdso2606686f8f.1
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 04:56:49 -0800 (PST)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC4A3D53
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 04:59:22 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40b2ddab817so29121325e9.3
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 04:59:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701089808; x=1701694608; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NEf2W9HVAu8+hPgepU8QEn+aP0YP/hRRlau1psXDcOQ=;
-        b=S1DniDLTlznKlWxXR9kvxbUlfT78OF7PNZbTxEOvCtTq9MR25lXASv5K3UUJnf1x21
-         6CO/imCJOdTrLptscDoIHWJ9llVMctqxttXk91F7nT1VxenRcoyeAf3pV7IVhcXdt36r
-         T/pz9X3XJrM1fQgbjLscz7bjEfmhCpZa9CVee8mSnEJynv3vMjOov217uPkCsyHtMaF5
-         oK3JKUKBxLSr/4BpUpM/Fqr13zPoLqA5RjnhI8l5BI5HJRTuATCAKUJQyU126xxuUAwl
-         +Ax7W+ESt0MXVkpr53+UCMeUPEP2gdOjIZ/s7A7ydKSPj7a2WWcv8nviacq5N9LIz7YW
-         mL1Q==
+        d=linaro.org; s=google; t=1701089961; x=1701694761; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DRj3ngvYtPvtc5FEEk7h4ztZGX7+EQPAdDUCG9vRzv4=;
+        b=LpMOW/YG2v0DljirQFL9XPD8hAAkDfl4swmY11JCDro4b+EESzXcQLEjHbdLIVQWUW
+         YYmrLWmw5B31zLAPT8SeBf7t0qpKdfBarSoJkCjiL/cDR5GDt/wNuQeSE+02TQmv87MT
+         cT07S2LGBTxcANBewq9T15oGbkKHvNDtdBkyJCytHcHAAHHTa3yJgs53xPdzXo6SbbEb
+         0EB049zBZbfF3/cfTwC1V5e9qdhCzOycRK/ar8ooCIdnBmSf2rIDasYtPlGdKAYx+MeY
+         VbDAW2GzYzyuq2cChuLKaKfAVzxwvH+XrRvAoDP1lLH+sdZvBvhN7nJEBqh8h7lxB+5H
+         /n7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701089808; x=1701694608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NEf2W9HVAu8+hPgepU8QEn+aP0YP/hRRlau1psXDcOQ=;
-        b=GYBY2Jw8971P1V4IEORyEf00nMWILqcXjxVPP8TxJXDUpfsR14smCOry0T4PpoYMp0
-         KnyAd7XfVHLkpRw0H+E4hlh2MhzNUrT6tadgIAEIIKpaHzfbvAmaG0at56aG2YnS5gxU
-         RAjq3o8qQC/dpBObZYfEuGc8Jpwj/0XFNOB+C1l71bGakQitasv+E4CVWcfbC7GlIzR6
-         Wq5Ki2/1EZwv8E1ewd7nE2W6MX5EKrQlUhGfLP8vqZxH1LzHIT/8Yt/XJ4QaoUjwUApr
-         x9Mjy9rCjjelLBzJ77OwoNDGhcNjCxPdeFrVAW36K44wXCfWRxzYyfclbhUU+SfN64tr
-         EyHQ==
-X-Gm-Message-State: AOJu0Ywm8trv1ZOepGMS6O/kT1eaXT4QcuQe9fgWr+b1lKqfRKVlC8Pi
-	C3ZW/RlUrD7WBxaY+WOv3MVFUA==
-X-Google-Smtp-Source: AGHT+IGeza9G0oQaRe8nmCceRda38iPpvvBPTLUQZ4XMi+Il200hIV9lwPpzcanGu5Mw9LfQVIG8Lw==
-X-Received: by 2002:adf:fc4f:0:b0:332:ec48:a132 with SMTP id e15-20020adffc4f000000b00332ec48a132mr6262001wrs.53.1701089807885;
-        Mon, 27 Nov 2023 04:56:47 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id s7-20020a5d5107000000b00332c6a52040sm11878612wrt.100.2023.11.27.04.56.47
+        d=1e100.net; s=20230601; t=1701089961; x=1701694761;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DRj3ngvYtPvtc5FEEk7h4ztZGX7+EQPAdDUCG9vRzv4=;
+        b=fShxwYgJCa9vCGTE2u2DXyk0N0tyzebpGtmyDGr+FX7mAzGK/UHnbyscHxLt5xsXIb
+         GakKOaAzP3Du5nTyJlk3s76gAY98jOQGiKS1VxSgP9JvFBUzb3zFFAkxg12qVWz1BO84
+         Av4PggsGQ60yV+jwy9SLjqBJ9nZaHzrCJjihqek2TBRnXZ1k6jo2uP7fw11muBzbcypw
+         jFeewlokLf2T3GSCM5L+SyF0uCjqcuort9F2H2x2Youp3tOtS4E+DqEq+RHpt/dJynQb
+         Pg20wvPiN9WLxVRznmu1JO1dNgMsk2+T+Ydvmk+wSgXDAmttH8yn8Oou00xqt4Pp7YLX
+         bh9Q==
+X-Gm-Message-State: AOJu0YwMqvR2vrxzNL9H0H6AOXM9IvU4WMAymMm2nJQUNqOI/yaNDghg
+	RVvjW4jYArLuFWa9nki52qyGVw==
+X-Google-Smtp-Source: AGHT+IHJtodRZ08aYWurZAtbiXoTBbYnCPB2mvDlNqTf9TMmij8nAPXOfQYZ2vPvAtAt7uU8pnTz1Q==
+X-Received: by 2002:a5d:5234:0:b0:332:f61a:631c with SMTP id i20-20020a5d5234000000b00332f61a631cmr3952666wra.24.1701089961198;
+        Mon, 27 Nov 2023 04:59:21 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id w3-20020a5d5443000000b003140f47224csm11960469wrv.15.2023.11.27.04.59.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 04:56:47 -0800 (PST)
-Date: Mon, 27 Nov 2023 13:56:46 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
-	jhs@mojatatu.com, johannes@sipsolutions.net,
-	andriy.shevchenko@linux.intel.com, amritha.nambiar@intel.com,
-	sdf@google.com, horms@kernel.org
-Subject: Re: [patch net-next v4 8/9] devlink: add a command to set
- notification filter and use it for multicasts
-Message-ID: <ZWSSDpE9QtJmx1Nj@nanopsycho>
-References: <20231123181546.521488-1-jiri@resnulli.us>
- <20231123181546.521488-9-jiri@resnulli.us>
- <98ece061-f21d-bc21-815a-19f34584f268@intel.com>
- <ZWSQtw/w7HvK4wzx@nanopsycho>
+        Mon, 27 Nov 2023 04:59:20 -0800 (PST)
+Date: Mon, 27 Nov 2023 15:59:17 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Piotr Raczynski <piotr.raczynski@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] ice: fix error code in ice_eswitch_attach()
+Message-ID: <e0349ee5-76e6-4ff4-812f-4aa0d3f76ae7@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,39 +73,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZWSQtw/w7HvK4wzx@nanopsycho>
+X-Mailer: git-send-email haha only kidding
 
-Mon, Nov 27, 2023 at 01:51:03PM CET, jiri@resnulli.us wrote:
->Mon, Nov 27, 2023 at 01:30:04PM CET, przemyslaw.kitszel@intel.com wrote:
->>On 11/23/23 19:15, Jiri Pirko wrote:
->>> From: Jiri Pirko <jiri@nvidia.com>
+Set the "err" variable on this error path.
 
-[...]
+Fixes: fff292b47ac1 ("ice: add VF representors one by one")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 3f80e2081e5d..ca118bc37e44 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -669,8 +669,10 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
+ 	ice_eswitch_stop_reprs(pf);
+ 
+ 	repr = ice_repr_add_vf(vf);
+-	if (IS_ERR(repr))
++	if (IS_ERR(repr)) {
++		err = PTR_ERR(repr);
+ 		goto err_create_repr;
++	}
+ 
+ 	err = ice_eswitch_setup_repr(pf, repr);
+ 	if (err)
+-- 
+2.42.0
 
->>>   static inline void devlink_nl_notify_send(struct devlink *devlink,
->>>   					  struct sk_buff *msg)
->>>   {
->>> -	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
->>> -				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
->>> +	struct devlink_obj_desc desc;
->>
->>`= {};` would wipe out the need for memset().
->
->True. If there is going to be a respin, I'll change this.
-
-On a second thought, since the next patch adds couple more users of
-devlink_nl_obj_desc_init(), I prefer to leave the zeroing there.
-
-
->
->
->>
->>> +
->>> +	devlink_nl_obj_desc_init(&desc, devlink);
->>> +	devlink_nl_notify_send_desc(devlink, msg, &desc);
->>>   }
->>>   /* Notify */
->>
->>[snip]
 
