@@ -1,126 +1,115 @@
-Return-Path: <netdev+bounces-51220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400C27F9BEE
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:40:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87F67F9BF3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:41:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED7D7280E2F
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 08:40:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 263E71C208CD
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 08:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BEBD275;
-	Mon, 27 Nov 2023 08:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F185ED281;
+	Mon, 27 Nov 2023 08:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="C2BtYh9y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKEHT8lC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA08182;
-	Mon, 27 Nov 2023 00:40:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5IBxJUyumk6/mKDWskjGhd0clOsoL+q4Mz9y2RERiQ8=; b=C2BtYh9yswivE/kuyvVCd51YWc
-	TBZFrc0S2cJ0/S7mtr5axjCOuLrJm7Sd8TcEQLjwSOxvvUXoqyIF9rZWjKMjCz1yV7YBtza3apSJZ
-	6aqRRB6V1VLobG26Qs4lVG3VMa9dI72LzU9M7Fk6cEmq6+56yqIuXpcUYHKNdWPk3mngYbqkYU2II
-	dFm7ViUx11fSe/bDwhv15gFJsQbVGJCa5CEUAbSNkbSSk9FQDxsXJvS7idTiQF8D4/6k9yZ+gkTCi
-	N/gFa5D0dqhZJ0XCeiFUSEBV/J0ixdCYRIk07oRp5iBBBJwLEY19tHcNX3AQLhx+EyvQfCAMmKeKE
-	OaitSy0w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41536)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7X9c-0005Ur-1U;
-	Mon, 27 Nov 2023 08:39:44 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7X9b-0001le-53; Mon, 27 Nov 2023 08:39:43 +0000
-Date: Mon, 27 Nov 2023 08:39:43 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
-Subject: Re: [PATCH net] net: stmmac: update Rx clk divider for 10M SGMII
-Message-ID: <ZWRVz05Gb4oALDnf@shell.armlinux.org.uk>
-References: <20231124050818.1221-1-quic_snehshah@quicinc.com>
- <ZWBo5EKjkffNOqkQ@shell.armlinux.org.uk>
- <47c9eb95-ff6a-4432-a7ef-1f3ebf6f593f@quicinc.com>
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FBF182
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 00:41:20 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cfc2bcffc7so6013685ad.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 00:41:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701074480; x=1701679280; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uA+NyLywCHNJM2L1yigaSz+qISoqnMqQkC+s56gSPmI=;
+        b=RKEHT8lC6ze3ySaNAvNoZDjhRYS4MgyevXvICElQWcQ3MfgFqVglyeeHYktJ26denR
+         km3c1K1cLYTZpkeubv5FiqWmI2xp0GvNNZaqXQVJ2T8Uvd7XVp/yEeBZdFGGxEaVVe5W
+         EkFSVhu/AlQzlZhlodUtpFAf7//nCOHhjsCsbW8UZ6pNH/L3pESoyXDc5MJOsdGLhO/s
+         8/SNk7T6Tsjvp9zMg7w093+LU79voHa+gayz1/2ZDT9zQziGZEOsIlUUMhRdD4wFHMyC
+         QXndyWcZzCr6kkNsQ9N9BZa3+i7GE5LcnuYfRH2me13fk75u781d1QcHicgWBz8DCUl0
+         /jgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701074480; x=1701679280;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uA+NyLywCHNJM2L1yigaSz+qISoqnMqQkC+s56gSPmI=;
+        b=MFSjXHj2LdJY8c5VGxdSIRRoH2KlLLP1VMxHprQsT696JcP12MA+YMiJp6wckQMCs5
+         1Uu3mHp0/oR7MAScB0jpvN+MyWIg9nspkmgbCDKAY0139WJxq+rZTnv9GlcYjKs+4l6q
+         UGyVlaaLLhkOIBVwDWXbmKsd1FrCzbKZoSyTKsX7zCHwkPLIBRI+q0XDGu1FHuzDmpow
+         87lPEGrJa5//j3j0yCjyIf54Iw1xZLhTr5OijPpktCBBke/KIkY2v8Ip5pb76dGiyMu9
+         8lgQt81y7bv10Kf/Bn3D+u1joO55SmSl0mNhGu1luBSj9bxjnlElFUeRNiZ4iKcTLTrx
+         lX5g==
+X-Gm-Message-State: AOJu0Yz+YHb5GsKKd/Cs3CeaiYrBW8q30Xg9LEVNWOj5Js5EMjKID29Y
+	SwltO4PppUfQYSgZ6t4XliE=
+X-Google-Smtp-Source: AGHT+IEspSRKCEQlT9C6CVArofq5q13nH7/QMAh7OXabeyyYAFL0r9PEbfDsw5J/kiEVt0XVCC9eFA==
+X-Received: by 2002:a17:902:968f:b0:1cc:446c:770c with SMTP id n15-20020a170902968f00b001cc446c770cmr7401754plp.33.1701074480005;
+        Mon, 27 Nov 2023 00:41:20 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([103.7.29.31])
+        by smtp.gmail.com with ESMTPSA id iy15-20020a170903130f00b001b896686c78sm7675722plb.66.2023.11.27.00.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 00:41:19 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH iwl-next] i40e: remove fake support of rx-frames-irq
+Date: Mon, 27 Nov 2023 16:41:09 +0800
+Message-Id: <20231127084109.44235-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <47c9eb95-ff6a-4432-a7ef-1f3ebf6f593f@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-Please reply _inline_ rather than at the top of the message, just like
-every other email that is sent in the Linux community. It is actually
-the _Internet_ standard way of replying, before people like Microsoft
-encouraged your broken style.
+From: Jason Xing <kernelxing@tencent.com>
 
-Also wrapping the text of your message makes it easier.
+Since we never support this feature for I40E driver, we don't have to
+display the value when using 'ethtool -c eth0'.
 
-On Mon, Nov 27, 2023 at 11:25:34AM +0530, Sneh Shah wrote:
-> On 11/24/2023 2:42 PM, Russell King (Oracle) wrote:
-> > On Fri, Nov 24, 2023 at 10:38:18AM +0530, Sneh Shah wrote:
-> >>  #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
-> >>  #define RGMII_CONFIG_PROG_SWAP			BIT(1)
-> >>  #define RGMII_CONFIG_DDR_MODE			BIT(0)
-> >> +#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
-> > 
-> > So you're saying here that this is a 9 bit field...
-> > 
-> >> @@ -617,6 +618,8 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
-> >>  	case SPEED_10:
-> >>  		val |= ETHQOS_MAC_CTRL_PORT_SEL;
-> >>  		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-> >> +		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR, BIT(10) |
-> >> +			      GENMASK(15, 14), RGMII_IO_MACRO_CONFIG);
-> > 
-> > ... and then you use GENMASK(15,14) | BIT(10) here to set bits in that
-> > bitfield. If there are multiple bitfields, then these should be defined
-> > separately and the mask built up.
-> > 
-> > I suspect that they aren't, and you're using this to generate a _value_
-> > that has bits 5, 4, and 0 set for something that really takes a _value_.
-> > So, FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 0x31) or
-> > FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 49) would be entirely correct
-> > here.
-> 
-> You are right here for GENMASK(15,14) | BIT(10). I am using this to create a field value.I will switch to FIELD_PREP as that seems like a better way to do this.
+Before this patch applied, the rx-frames-irq is 256 which is consistent
+with tx-frames-irq. Apparently it could mislead users.
 
-So this is a "nice" example of taking the use of GENMASK() and BIT() to
-an inappropriate case.
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> > The next concern I have is that you're only doing this for SPEED_10.
-> > If it needs to be programmed for SPEED_10 to work, and not any of the
-> > other speeds, isn't this something that can be done at initialisation
-> > time? If it has to be done depending on the speed, then don't you need
-> > to do this for each speed with an appropriate value?
-> 
-> This field programming is required only for 10M speed in for SGMII mode. other speeds are agnostic to this field. Hence we are programming it always when SGMII link comes up in 10M mode. init driver data for ethqos is common for sgmii and rgmii. As this fix is specific to SGMII we can't add this to init driver data.
-
-I wasn't referring to adding it to driver data. I was asking whether it
-could be done in the initialisation path.
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+index eb9a7b32af73..2a0a12a79aa3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+@@ -2895,7 +2895,6 @@ static int __i40e_get_coalesce(struct net_device *netdev,
+ 	struct i40e_vsi *vsi = np->vsi;
+ 
+ 	ec->tx_max_coalesced_frames_irq = vsi->work_limit;
+-	ec->rx_max_coalesced_frames_irq = vsi->work_limit;
+ 
+ 	/* rx and tx usecs has per queue value. If user doesn't specify the
+ 	 * queue, return queue 0's value to represent.
+@@ -3029,7 +3028,7 @@ static int __i40e_set_coalesce(struct net_device *netdev,
+ 	struct i40e_pf *pf = vsi->back;
+ 	int i;
+ 
+-	if (ec->tx_max_coalesced_frames_irq || ec->rx_max_coalesced_frames_irq)
++	if (ec->tx_max_coalesced_frames_irq)
+ 		vsi->work_limit = ec->tx_max_coalesced_frames_irq;
+ 
+ 	if (queue < 0) {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.37.3
+
 
