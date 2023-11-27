@@ -1,215 +1,172 @@
-Return-Path: <netdev+bounces-51372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7ED7FA641
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:22:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94EA67FA64A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB98C280BD9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:22:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B388280A9A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836EE364BC;
-	Mon, 27 Nov 2023 16:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D999835882;
+	Mon, 27 Nov 2023 16:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SZE0xwCr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DpmHL43u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F475CE;
-	Mon, 27 Nov 2023 08:22:14 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AR9KK9Q019284;
-	Mon, 27 Nov 2023 08:22:07 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=JAUDcv4VDo0xvJS6AezwUUOpI6SIUT4nFGCzu3rflmA=;
- b=SZE0xwCrV2SPruFvXl5ID4WnE83XBhXoxyaRZpBtJOKZE2OLB0qdyYv0Go6T3MN3t4TO
- aq3APWBY/L05BRf/BGEYMCSBt/H4tt0cTj+mZXa+GBkMDSILd/A2T08NVv+gCJzKMao0
- +bBOVhUXd/+gDGm2lvN4koE3S93vdWIXaSOlXG9ilH0TbjhwAOcumFSWZeqMGGnTPNAb
- MUtHV0fOOR+IFx28696h/PFpK1+SJk4LeoXXt+QrBmXvY3vlAZPzpACBp91PG2Ie38qr
- cDUll7KpcLLe8VmIK+c8b4Wbskk2SFE7A1iBQCZsTs8LatZr/TeSG0/juGxeplUyvzRs eQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3umrcu99s3-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 27 Nov 2023 08:21:51 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 27 Nov
- 2023 08:21:44 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 27 Nov 2023 08:21:44 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id AD6D73F7057;
-	Mon, 27 Nov 2023 08:21:44 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>
-Subject: [PATCH net-next v1 2/2] octeon_ep: support OCTEON CN98 devices
-Date: Mon, 27 Nov 2023 08:21:35 -0800
-Message-ID: <20231127162135.2529363-3-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231127162135.2529363-1-srasheed@marvell.com>
-References: <20231127162135.2529363-1-srasheed@marvell.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 983CCCE;
+	Mon, 27 Nov 2023 08:24:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701102253; x=1732638253;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pC7ItqT/Jt4iS7s9ERZY/cmKPTThT+AoQzduxjDNxRI=;
+  b=DpmHL43uEC5iig03TbDmR9SeUeB3yF2KADIf+VN9w+dAovg7paDf0Bz5
+   8/jHtoHxGcCoEZcgfbYtmMZiVx1Z/hoyc9+Kt0Y+2vohDH+jKphJbYdS1
+   kiNKdQLAZJIoJOD5UAQiwHDAullM/genLLE3C8+/GIo5PTxRd8Ta+H7/T
+   DoNwwvoiz89prewYvHo31i+UgBI8FXlDABgvzq2xPSaAehmXF3R5nIWcT
+   wD0fACm58twjP3cgqCfTSrgXWcYJ+2HPDqA42t2RyWy3Y63UJTorNAy9W
+   z17rmgcPtQXE5C8sbA0ypUse2Q/s6Zg2xw+hnpDz5JjUFmjQ5gKaEubSF
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="478930176"
+X-IronPort-AV: E=Sophos;i="6.04,231,1695711600"; 
+   d="scan'208";a="478930176"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 08:23:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="912137668"
+X-IronPort-AV: E=Sophos;i="6.04,231,1695711600"; 
+   d="scan'208";a="912137668"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2023 08:23:58 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 27 Nov 2023 08:23:57 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 27 Nov 2023 08:23:57 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 27 Nov 2023 08:23:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eadu8yfhWVWF8DFQrm4Tebrztzdtty3XXFeJWNTwojTx+vk38BBcBEFS1aaec3ITANNW4ljFQenTCiWMetFZSDUdWtaGAGBnB9keT0TJAB2MnoWHJodp0EEPa24kB/QE1ueDSAHJsxdWyf+PyomUeNc4iJFbMvzQJ6sOwJ1aEr6TsmslgGtgsq9uAmx3DpBTi4HFbW389igAxk0IlywfOekD69CGJYTlGpKbWOPdUbodBpZN65XrOGlBBUGDPI8BRikw2u2HHlwIORE8UpKrV2mOp1Y0rRnCy5uNNTB2usEaYduRtY5sEvM+BHKAB8yyLRMjLjINRKv/Q7JYcxztlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3w3v5hRA4nb6NnML8ycBRVtuaT1zcFyz8OjR12ATRmc=;
+ b=G5dv84T1SgOnYlHpJk0DFajSPE3SmqNmwSGJaZ0k/f+1wVLqoR09y9GdfyOVMr107nxogJvbr6pLbauxTFfUwQqjXFeYtvZk+wPTMsPn3wmayzJxKJu0thj+UFBZJjvPy6Y+gwCk6poGEG/hUNcAqUl1+7hY92Z7UnE0Og0Rod5JRtbTdsWr+lglqjbcZDJ3hR1F3z3yXb7cDZHfwjAKKFwv9nRr/Ox255aRfq/KEmJJS1R0TV3L3af+CYZJUSeoDSHmYodFALF67Ky9zbSQqVZfP4W2iHekUKhERH48bMRKsroYJ+Dl/iq6hneF/LltEyKcKgXxDwdHOQitsCFVFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BY5PR11MB4257.namprd11.prod.outlook.com (2603:10b6:a03:1ca::32)
+ by PH0PR11MB7564.namprd11.prod.outlook.com (2603:10b6:510:288::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Mon, 27 Nov
+ 2023 16:23:55 +0000
+Received: from BY5PR11MB4257.namprd11.prod.outlook.com
+ ([fe80::dc55:8434:8e81:bcb5]) by BY5PR11MB4257.namprd11.prod.outlook.com
+ ([fe80::dc55:8434:8e81:bcb5%4]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
+ 16:23:55 +0000
+From: "Bahadur, Sachin" <sachin.bahadur@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH iwl-net v4] ice: Block PF reinit if attached to bond
+Thread-Topic: [PATCH iwl-net v4] ice: Block PF reinit if attached to bond
+Thread-Index: AQHaIPe/QZ4HasPNt0KtTZtgr5dQa7CN6caAgABvukA=
+Date: Mon, 27 Nov 2023 16:23:55 +0000
+Message-ID: <BY5PR11MB42574D2A64F2C4E42400213A96BDA@BY5PR11MB4257.namprd11.prod.outlook.com>
+References: <20231127060512.1283336-1-sachin.bahadur@intel.com>
+ <ZWRkN12fhENyN4PY@nanopsycho>
+In-Reply-To: <ZWRkN12fhENyN4PY@nanopsycho>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR11MB4257:EE_|PH0PR11MB7564:EE_
+x-ms-office365-filtering-correlation-id: 5f26fd20-b81a-4355-57d3-08dbef654047
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xHAKS8AicNtX3DF1214ZOLy7Y9DafZTWvTXcN/PzArG92+j/rFt+ZTJGFVSzmkJx1UBY6vTbH5xUIsefvb2+wwyHtlf9OVWkd0N0cE03ZRLDo0Tbf1EypYOTBRhZGpNESYTJeOlHm2Y6HIDU9WR3tS5Gpt51zYxyqjF6yiDuMZb6a/kiCQ56MlcHiqjN1CeiYL4rjwSLSZvwqj360BMvQQZ0+bKjnyQxGkHpcpvhLF4ydyBIAvu3JulhJnyjiMSC05gWIRA0b3nqWoqbx7YjTnH99q16gnrc8TqSZIRSacHfCpH/RY2kjWwQjj2tRipqRmcqe2EcUjU05wE2rNDeIVvFCHzdn0hG9RP4p7F9rHS5H88heWd6fgoci7lLersma0V0Xi4HmTuYyK8n+ENQAsRyyUTlBOgcy3yvushQh8giNDIuCWgSuDnJtTTMQ2POV31Y97Gg306cyef67tHy4NiOPU2h50SYKeuktrklv6Xco5Zrup6M4Ib9CUKc6PvtbilCddgECt1YwLRrd7uvI2AQ/SFz+hime2ULr4vlTdHnRyWWjTw+ht93cyzJyPm2QKuPz8a0SruO93PwiKZLmbZNEDqPzR7inw5xBuFhq9lMPPafsyxkD3dJgYHrnkQR
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4257.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(39860400002)(366004)(396003)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(71200400001)(4326008)(8676002)(8936002)(52536014)(7696005)(9686003)(6506007)(66476007)(66556008)(66946007)(66446008)(76116006)(54906003)(6916009)(316002)(478600001)(2906002)(122000001)(55016003)(4744005)(33656002)(38100700002)(41300700001)(38070700009)(86362001)(26005)(82960400001)(83380400001)(5660300002)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?M6LccqGjd8+StQSegge3vgeVMtJb7NS28YEF3rwCdofYZKV/j7TxBNfZB/R0?=
+ =?us-ascii?Q?cUigj1bJbRO75AXJwxJUTsxm+JIS1oN/tycOGSemXbM2SpCuetNT+BgWLCAj?=
+ =?us-ascii?Q?n36bYdJGIJwvfHfKAJjyhJ0z5ffPUlBf4SH240uEU7zNViOXnWhs2lLet/P3?=
+ =?us-ascii?Q?QwaMd8wyF49L3rQndxhYfGTXwp/2gwa+oAIQfpmYeyGdrF4K8UJCp+WGtqOo?=
+ =?us-ascii?Q?DJ6Jc3ElZRlA7sMPbVJ9kQ/438iNduDn3x7WFU9h+MZ8pcQxx7Dwl/Zn1yMd?=
+ =?us-ascii?Q?mMKyVDm1vafkM3foA/oBnzJCuUVQ/lRgwq1h690P/ZVcJ6NHuNqlA3NL4TI1?=
+ =?us-ascii?Q?hVGV4AiE3Uc8iDDTH6oIWKUZNVM0Nurx2eaPt54ChPOF/WrzC/WjVLOcDJJU?=
+ =?us-ascii?Q?bwxsJREwf2sdn+ZCNxeNX1x/AeMfNBqRogCPVQpwiePh1QCwnNtsaIeGcnXQ?=
+ =?us-ascii?Q?z3sfTV4CB3BFGbh2jdxtNqZXgI4HJCnMJHZzKDIIzd6Q1dyW5S/YkwPS1Bm1?=
+ =?us-ascii?Q?DD5Q2BKiZ/Y5gy8gcVpoKimfwjdoZJATCuEhmdEl8Bq4Oa72LF7TA1yGE4/Q?=
+ =?us-ascii?Q?D/ncDoJajKfM4dsaYqdJVyeJxLm/G2s5UJI9zEhQxEp/DUEw/I1etOdLLUA7?=
+ =?us-ascii?Q?6SxoAT5GUywf/L157TWauYNYM4UUMaw2ccIVoIXWJ3rTZzPBZ/gFsyKNnsnC?=
+ =?us-ascii?Q?HxKk6XJRzxlntOSHxM7bdlKL+9pqMK9fBQzCqf5YLnS7MwH9IzKaWBgjvQ1o?=
+ =?us-ascii?Q?Krpa0mnoeq62Sf6bwen0BEr1xUrY8RZm8MaWZfS5migg+C0PPUXrrGY6GE/D?=
+ =?us-ascii?Q?jfOyed3yZS34lVyS5/5hF9l2LvPWFnd99do/mDwpB5GC1zLQdNFyalq4Vyvt?=
+ =?us-ascii?Q?+bCLh8q0Rhkm9WttwE9bG/yCV0IAxUwRC0OkI+cfe29u4XUCnazCIgshoYsO?=
+ =?us-ascii?Q?EdeZJAbBN/PDEapmosjeH15pRnyzqkGWdnvJcfKUEdC23Fbs5aS2S3ROGrW1?=
+ =?us-ascii?Q?H0/kuUL22b+zrHM74YNjEWbbm9ADFewpSmMHwbKeFwRTXp5AN/DZTGzgXU3r?=
+ =?us-ascii?Q?mia0WEauZx96xwVtCH+u1PuM7te1Ui4sDRlxO0PtryXwdtBRDfoLdbyFIk4m?=
+ =?us-ascii?Q?Ey8SrifGY1FIk/8GrdIMCNt3YA2/VgoXNtcGyY4RIXMer+EEoXhvG8n6l2bW?=
+ =?us-ascii?Q?xvw/Qb2A3gf8cssbpM7zuvnwH2wH2fwv1XcuYxwIv/MIHftKhoWnJ9FOK1Ed?=
+ =?us-ascii?Q?L0bIRP0ZLCW8C7ahHYF3Q9JCGDnVt/pbzPAvV75eAH/pU2rGzG7SMlI8ADHi?=
+ =?us-ascii?Q?ksFEdPQ6KfaKYCEcdILP5uDC1PIkl+M3zGBEgB+p4OCaoEsSNuJw7bMnbALB?=
+ =?us-ascii?Q?XbT3znbMnOpAVY+zgEnzkbuGOFlTn3RrYA49kDJvLlWUmrV765Cr6Q4TlBpF?=
+ =?us-ascii?Q?EP481qsFoV8Pcp9NN/7rYMtCl62vaLKVOW2AuTyzdmjH7hNFEqR8y3GdPkh0?=
+ =?us-ascii?Q?jkyzFrxqUvg6mu/cHIbIablczdZNvNs6nBCxWOiK1riF2sEK3zohQYC7XyvT?=
+ =?us-ascii?Q?2M8cuaPvwuahVllAu2ohsuJN9nRoKjuWh6zm9VZf?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 3RmG_6v_C-bj018YO_8XiWH3winv3Ovu
-X-Proofpoint-ORIG-GUID: 3RmG_6v_C-bj018YO_8XiWH3winv3Ovu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-27_14,2023-11-27_01,2023-05-22_02
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4257.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f26fd20-b81a-4355-57d3-08dbef654047
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Nov 2023 16:23:55.1779
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vBpw8b9/2EJoPlCzZIroC9fTj1xZiJUgIxQ5bGmD6LmLh4c8Hzr9zNsY80oY7kuVtzwJsaLe3YnbdQw2h/M99olmNhv2P++TguIIqE271cY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7564
+X-OriginatorOrg: intel.com
 
-Add PCI Endpoint NIC support for Octeon CN98 devices.
-CN98 devices are part of Octeon 9 family products with
-similar PCI NIC characteristics to CN93, already supported
-driver.
+=20
+> Nack. Remove the netdev during re-init, that would solve your issue.
+> Looks like some checks are needed to be added in devlink code to make sur=
+e
+> drivers behave properly. I'm on in.
 
-Add CN98 card to the device id table, as well
-as support differences in the register fields and
-certain usage scenarios such as unload.
+Sure. This fix should apply to all drivers. Adding it in devlink makes more
+sense. I am not a devlink expert, so I hope you or someone else can
+help with it.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
- .../ethernet/marvell/octeon_ep.rst            |  1 +
- .../marvell/octeon_ep/octep_cn9k_pf.c         | 24 +++++++++++++++----
- .../ethernet/marvell/octeon_ep/octep_main.c   |  4 ++++
- .../ethernet/marvell/octeon_ep/octep_main.h   |  1 +
- .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  4 ++++
- 5 files changed, 30 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeon_ep.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeon_ep.rst
-index 613a818d5db6..c96d262b30be 100644
---- a/Documentation/networking/device_drivers/ethernet/marvell/octeon_ep.rst
-+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeon_ep.rst
-@@ -22,6 +22,7 @@ EndPoint NIC.
- Supported Devices
- =================
- Currently, this driver support following devices:
-+ * Network controller: Cavium, Inc. Device b100
-  * Network controller: Cavium, Inc. Device b200
-  * Network controller: Cavium, Inc. Device b400
-  * Network controller: Cavium, Inc. Device b900
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-index d4ee2454675b..8baabd07e91f 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-@@ -216,9 +216,15 @@ static void octep_init_config_cn93_pf(struct octep_device *oct)
- 	conf->sriov_cfg.vf_srn = CN93_SDP_EPF_RINFO_SRN(val);
- 
- 	val = octep_read_csr64(oct, CN93_SDP_MAC_PF_RING_CTL(oct->pcie_port));
--	conf->pf_ring_cfg.srn =  CN93_SDP_MAC_PF_RING_CTL_SRN(val);
--	conf->pf_ring_cfg.max_io_rings = CN93_SDP_MAC_PF_RING_CTL_RPPF(val);
--	conf->pf_ring_cfg.active_io_rings = conf->pf_ring_cfg.max_io_rings;
-+	if (oct->chip_id == OCTEP_PCI_DEVICE_ID_CN98_PF) {
-+		conf->pf_ring_cfg.srn =  CN98_SDP_MAC_PF_RING_CTL_SRN(val);
-+		conf->pf_ring_cfg.max_io_rings = CN98_SDP_MAC_PF_RING_CTL_RPPF(val);
-+		conf->pf_ring_cfg.active_io_rings = conf->pf_ring_cfg.max_io_rings;
-+	} else {
-+		conf->pf_ring_cfg.srn =  CN93_SDP_MAC_PF_RING_CTL_SRN(val);
-+		conf->pf_ring_cfg.max_io_rings = CN93_SDP_MAC_PF_RING_CTL_RPPF(val);
-+		conf->pf_ring_cfg.active_io_rings = conf->pf_ring_cfg.max_io_rings;
-+	}
- 	dev_info(&pdev->dev, "pf_srn=%u rpvf=%u nvfs=%u rppf=%u\n",
- 		 conf->pf_ring_cfg.srn, conf->sriov_cfg.active_rings_per_vf,
- 		 conf->sriov_cfg.active_vfs, conf->pf_ring_cfg.active_io_rings);
-@@ -578,6 +584,13 @@ static irqreturn_t octep_ioq_intr_handler_cn93_pf(void *data)
- 	return IRQ_HANDLED;
- }
- 
-+/* soft reset of 98xx */
-+static int octep_soft_reset_cn98_pf(struct octep_device *oct)
-+{
-+	dev_info(&oct->pdev->dev, "CN98XX: skip soft reset\n");
-+	return 0;
-+}
-+
- /* soft reset of 93xx */
- static int octep_soft_reset_cn93_pf(struct octep_device *oct)
- {
-@@ -806,7 +819,10 @@ void octep_device_setup_cn93_pf(struct octep_device *oct)
- 	oct->hw_ops.misc_intr_handler = octep_misc_intr_handler_cn93_pf;
- 	oct->hw_ops.rsvd_intr_handler = octep_rsvd_intr_handler_cn93_pf;
- 	oct->hw_ops.ioq_intr_handler = octep_ioq_intr_handler_cn93_pf;
--	oct->hw_ops.soft_reset = octep_soft_reset_cn93_pf;
-+	if (oct->chip_id == OCTEP_PCI_DEVICE_ID_CN98_PF)
-+		oct->hw_ops.soft_reset = octep_soft_reset_cn98_pf;
-+	else
-+		oct->hw_ops.soft_reset = octep_soft_reset_cn93_pf;
- 	oct->hw_ops.reinit_regs = octep_reinit_regs_cn93_pf;
- 
- 	oct->hw_ops.enable_interrupts = octep_enable_interrupts_cn93_pf;
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 423eec5ff3ad..1a24b3d3cce6 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -22,6 +22,7 @@ struct workqueue_struct *octep_wq;
- 
- /* Supported Devices */
- static const struct pci_device_id octep_pci_id_tbl[] = {
-+	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CN98_PF)},
- 	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CN93_PF)},
- 	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CNF95N_PF)},
- 	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CN10KA_PF)},
-@@ -1147,6 +1148,8 @@ static void octep_ctrl_mbox_task(struct work_struct *work)
- static const char *octep_devid_to_str(struct octep_device *oct)
- {
- 	switch (oct->chip_id) {
-+	case OCTEP_PCI_DEVICE_ID_CN98_PF:
-+		return "CN98XX";
- 	case OCTEP_PCI_DEVICE_ID_CN93_PF:
- 		return "CN93XX";
- 	case OCTEP_PCI_DEVICE_ID_CNF95N_PF:
-@@ -1197,6 +1200,7 @@ int octep_device_setup(struct octep_device *oct)
- 	dev_info(&pdev->dev, "chip_id = 0x%x\n", pdev->device);
- 
- 	switch (oct->chip_id) {
-+	case OCTEP_PCI_DEVICE_ID_CN98_PF:
- 	case OCTEP_PCI_DEVICE_ID_CN93_PF:
- 	case OCTEP_PCI_DEVICE_ID_CNF95N_PF:
- 		dev_info(&pdev->dev, "Setting up OCTEON %s PF PASS%d.%d\n",
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-index e2fe8b28eb0e..e1b4b2af618e 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-@@ -18,6 +18,7 @@
- #define  OCTEP_PCIID_CN93_PF  0xB200177d
- #define  OCTEP_PCIID_CN93_VF  0xB203177d
- 
-+#define  OCTEP_PCI_DEVICE_ID_CN98_PF 0xB100
- #define  OCTEP_PCI_DEVICE_ID_CN93_PF 0xB200
- #define  OCTEP_PCI_DEVICE_ID_CN93_VF 0xB203
- 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-index 0a43983e9101..2e20a39d89af 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-@@ -362,6 +362,10 @@
- #define    CN93_SDP_MAC_PF_RING_CTL_SRN(val)   (((val) >> 8) & 0xFF)
- #define    CN93_SDP_MAC_PF_RING_CTL_RPPF(val)  (((val) >> 16) & 0x3F)
- 
-+#define    CN98_SDP_MAC_PF_RING_CTL_NPFS(val)  (((val) >> 48) & 0xF)
-+#define    CN98_SDP_MAC_PF_RING_CTL_SRN(val)   ((val) & 0xFF)
-+#define    CN98_SDP_MAC_PF_RING_CTL_RPPF(val)  (((val) >> 32) & 0x3F)
-+
- /* Number of non-queue interrupts in CN93xx */
- #define    CN93_NUM_NON_IOQ_INTR    16
- 
--- 
-2.25.1
-
+>=20
+>=20
+> >+			return -EBUSY;
+> >+		}
+> > 		ice_unload(pf);
+> > 		return 0;
+> > 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+> >--
+> >2.25.1
+> >
+> >
 
