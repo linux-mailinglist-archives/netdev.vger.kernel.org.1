@@ -1,195 +1,156 @@
-Return-Path: <netdev+bounces-51386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8657FA7D3
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:16:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319207FA7DA
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D11F28169F
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:16:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D86A4281608
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0782731A7F;
-	Mon, 27 Nov 2023 17:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3073B37179;
+	Mon, 27 Nov 2023 17:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fA4VXGQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867DBAF;
-	Mon, 27 Nov 2023 09:16:12 -0800 (PST)
-Received: from [192.168.1.103] (178.176.78.85) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 27 Nov
- 2023 20:16:03 +0300
-Subject: Re: [PATCH 6/6] net: ravb: Keep reverse order of operations in
- ravb_remove()
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <geert+renesas@glider.be>,
-	<wsa+renesas@sang-engineering.com>, <robh@kernel.org>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<mitsuhiro.kimura.kc@renesas.com>, <masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231127090426.3761729-1-claudiu.beznea.uj@bp.renesas.com>
- <20231127090426.3761729-7-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <716b433e-5e0c-4353-ea39-12cb4f3d50c4@omp.ru>
-Date: Mon, 27 Nov 2023 20:16:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8B4189
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 09:20:14 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-332fd78fa9dso953452f8f.3
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 09:20:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701105612; x=1701710412; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ltPV5wJpDHhxNQTBDRpiKw9/jf5mjTGr9mK1u9JuiMM=;
+        b=fA4VXGQ18b8DtFuSVKllrbxcGFZfp9/H9MEjnumz43d9IVD0W4ZmPTwk2+0eD9qVvf
+         QE5OKC5gvozIHhg6zD7bYlwTNoMc7FI89Vv+h9g3GzT/gxwpAJt9vfqsoJF+c/8mdKl0
+         tDf2fmpN/RJ4wAp7qeCBU7+0VeYPP4iB8vlIxSi961glyyEPw9ErsP5OI38tnDcJtFw+
+         TJJ+WI857iYBLqLkeyuHY2rPnlhjgpF4IQvorrnL6IPKKvVAIHSjnQiBbTB7V/LSJ/li
+         YjwvzUz+d+6Dozxa1rPRHkrCX63BR66MyDcKtLxqleipOUbPKvXTM1nbSkd4wtcRuA4D
+         ODQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701105612; x=1701710412;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltPV5wJpDHhxNQTBDRpiKw9/jf5mjTGr9mK1u9JuiMM=;
+        b=CiGn5gYAUl/VD8UoC/fFrtUAzKJoWSygqUd4yvWvooZ6eAy0Rflfu8lC7Ptm8vdQ/W
+         4PxZd/scntkH3WWqjLVO6pWRFVQZ/DFkLOiCEAeLk8wBGVRIURFB0gP2SI5WAl2qHgKn
+         GhhbcdFqrAecU+xmjiOyckXmjn9o+Pt3msTX8gE+OcLverfX6N6TqAf9JIyuYNNcxF3H
+         xegKBTV2hVd6l4lvUIfBdHePXcRlm34dgoqM3KwuQl3TJRsf9Ssc0rbyOAYxmT+jQzfX
+         9eukGI1zIyct4IdPdOB23YA9sW9dduFt1iHhjCgPyzlr6pzjNMQ6fEnFVv5Vih8/EKUy
+         TV/w==
+X-Gm-Message-State: AOJu0YxOoVXbtG9UmEPreZLwiSPKZwynRWRRhBfFF0YC+r5jEegZO3CE
+	s9RWXD7xwmVQGtEFtP9OIvY=
+X-Google-Smtp-Source: AGHT+IGaEQQ7Zskblfyyd8KloGi+9diiN+mIAFq//3gvpKwGzrIcJSNANpeNmEr7mSllWBSEijuG9Q==
+X-Received: by 2002:a05:6000:181b:b0:332:ca1e:679f with SMTP id m27-20020a056000181b00b00332ca1e679fmr8646186wrh.52.1701105612042;
+        Mon, 27 Nov 2023 09:20:12 -0800 (PST)
+Received: from ?IPV6:2a01:c23:b815:5700:a463:59a7:865f:2563? (dynamic-2a01-0c23-b815-5700-a463-59a7-865f-2563.c23.pool.telefonica.de. [2a01:c23:b815:5700:a463:59a7:865f:2563])
+        by smtp.googlemail.com with ESMTPSA id w12-20020adfee4c000000b00332f82265b7sm6359293wro.20.2023.11.27.09.20.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 09:20:11 -0800 (PST)
+Message-ID: <c65873a3-7394-4107-99a7-83f20030779c@gmail.com>
+Date: Mon, 27 Nov 2023 18:20:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231127090426.3761729-7-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
 Content-Language: en-US
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: improve handling task scheduling
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/27/2023 17:01:00
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181625 [Nov 27 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.85 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.85
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/27/2023 17:06:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/27/2023 3:21:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 11/27/23 12:04 PM, Claudiu wrote:
+If we know that the task is going to be a no-op, don't even schedule it.
+And remove the check for netif_running() in the worker function, the
+check for flag RTL_FLAG_TASK_ENABLED is sufficient. Note that we can't
+remove the check for flag RTL_FLAG_TASK_ENABLED in the worker function
+because we have no guarantee when it will be executed.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> On RZ/G3S SMARC Carrier II board having RGMII connections b/w Ethernet
-> MACs and PHYs it has been discovered that doing unbind/bind for ravb
-> driver in a loop leads to wrong speed and duplex for Ethernet links and
-> broken connectivity (the connectivity cannot be restored even with
-> bringing interface down/up). Before doing unbind/bind the Ethernet
-> interfaces were configured though systemd. The sh instructions used to
-> do unbind/bind were:
-> 
-> $ cd /sys/bus/platform/drivers/ravb/
-> $ while :; do echo 11c30000.ethernet > unbind ; \
->   echo 11c30000.ethernet > bind; done
-> 
-> It has been discovered that there is a race b/w IOCTLs initialized by
-> systemd at the response of success binding and the
-> "ravb_write(ndev, CCC_OPC_RESET, CCC)" instruction in ravb_remove() as
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-   s/instruction/call/, perhaps?
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index b74d7cc50..91d9dc5a7 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2228,6 +2228,9 @@ u16 rtl8168h_2_get_adc_bias_ioffset(struct rtl8169_private *tp)
+ 
+ static void rtl_schedule_task(struct rtl8169_private *tp, enum rtl_flag flag)
+ {
++	if (!test_bit(RTL_FLAG_TASK_ENABLED, tp->wk.flags))
++		return;
++
+ 	set_bit(flag, tp->wk.flags);
+ 	schedule_work(&tp->wk.work);
+ }
+@@ -4468,8 +4471,7 @@ static void rtl_task(struct work_struct *work)
+ 
+ 	rtnl_lock();
+ 
+-	if (!netif_running(tp->dev) ||
+-	    !test_bit(RTL_FLAG_TASK_ENABLED, tp->wk.flags))
++	if (!test_bit(RTL_FLAG_TASK_ENABLED, tp->wk.flags))
+ 		goto out_unlock;
+ 
+ 	if (test_and_clear_bit(RTL_FLAG_TASK_TX_TIMEOUT, tp->wk.flags)) {
+-- 
+2.43.0
 
-> follows:
-> 
-> 1/ as a result of bind success the user space open/configures the
->    interfaces tough an IOCTL; the following stack trace has been
->    identified on RZ/G3S:
-> 
-> Call trace:
-> dump_backtrace+0x9c/0x100
-> show_stack+0x20/0x38
-> dump_stack_lvl+0x48/0x60
-> dump_stack+0x18/0x28
-> ravb_open+0x70/0xa58
-> __dev_open+0xf4/0x1e8
-> __dev_change_flags+0x198/0x218
-> dev_change_flags+0x2c/0x80
-> devinet_ioctl+0x640/0x708
-> inet_ioctl+0x1e4/0x200
-> sock_do_ioctl+0x50/0x108
-> sock_ioctl+0x240/0x358
-> __arm64_sys_ioctl+0xb0/0x100
-> invoke_syscall+0x50/0x128
-> el0_svc_common.constprop.0+0xc8/0xf0
-> do_el0_svc+0x24/0x38
-> el0_svc+0x34/0xb8
-> el0t_64_sync_handler+0xc0/0xc8
-> el0t_64_sync+0x190/0x198
-> 
-> 2/ this call may execute concurrently with ravb_remove() as the
->    unbind/bind operation was executed in a loop
-> 3/ if the operation mode is changed to RESET (though
-
-   Through?
-
->    ravb_write(ndev, CCC_OPC_RESET, CCC) instruction in ravb_remove())
-
-   s/instruction/call/, perhaps?
-
->    while the above ravb_open() is in progress it may lead to MAC
->    (or PHY, or MAC-PHY connection, the right point hasn't been identified
->    at the moment) to be broken, thus the Ethernet connectivity fails to
->    restore.
-> 
-> The simple fix for this is to move ravb_write(ndev, CCC_OPC_RESET, CCC))
-> after unregister_netdev() to avoid resetting the controller while the
-> netdev interface is still registered.
-> 
-> To avoid future issues in ravb_remove(), the patch follows the proper order
-> of operations in ravb_remove(): reverse order compared with ravb_probe().
-> This avoids described races as the IOCTLs as well as unregister_netdev()
-> (called now at the beginning of ravb_remove()) calls rtnl_lock() before
-> continuing and IOCTLs check (though devinet_ioctl()) if device is still
-> registered just after taking the lock:
-> 
-> int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
-> {
-> 	// ...
-> 
->         rtnl_lock();
-> 
->         ret = -ENODEV;
->         dev = __dev_get_by_name(net, ifr->ifr_name);
->         if (!dev)
->                 goto done;
-> 
-> 	// ...
-> done:
->         rtnl_unlock();
-> out:
->         return ret;
-> }
-> 
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-   Sorry for overlooking this race (and other bugs) when prepping
-the driver for upstream!
-
-MBR, Sergey
 
