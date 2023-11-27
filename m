@@ -1,117 +1,271 @@
-Return-Path: <netdev+bounces-51232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421177F9C56
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:05:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02FA07F9C5F
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:08:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEC5B28143E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:05:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21F211C20D0C
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B56134AA;
-	Mon, 27 Nov 2023 09:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BC5134BF;
+	Mon, 27 Nov 2023 09:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="sNcgMdc+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxGTuOln"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E267019BD
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 01:05:01 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-a00b056ca38so524363066b.2
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 01:05:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701075900; x=1701680700; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HI0TOtQb9c447DbOQLQ1/RG9mFnY5yOZxPwrai0TcrQ=;
-        b=sNcgMdc+JCKXIKSMPFi6NUk/N15L2yczsAzRIJsgqu0S5aOv1m8G6qIpAFiX8tMjVC
-         4Wy8HhQDJ879kYAUKR+zPMNels22XSb3JzaUFxs2ZfCKcxEbvsivLWPY1ihbVXI2nw0q
-         fa+YldVKngt8Ze08ZAkTmoU5Q3wIfQren2nY0/aTfEZNoBntbpRr/BmKKK+11CBiq+Ou
-         3GwmEOMRz42Fc10SLihyW3D4wbdBrpKWt1b9PPDPgWbw3hgCT/LQpmi9vwoBwsXLHQZ9
-         S3VA4peeeURBmD9DdudAEHZM/aJQ9ZnLTRQziZhiu5+R5h6j3xB67KKcl503gFv10SAX
-         Mkow==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45DAA125
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 01:08:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701076085;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8UzLKe3MZHXpdSNSglco220DD3bo0944FEKr1A6zn/8=;
+	b=LxGTuOln4vVQBSqpU2N0awh9MXWz4R/NxBQgA349dvvkFcYghrNNKoWWvfRu/UOCh1MoRU
+	5ZY7kZiSog1M3NvVZTccvbflYoDSasBrFE2VeMjkkMfmSGvphCZKvQxhfXIuaNAPtJ4CWc
+	g30PmBLH92cWeecbUhzVT0fALBAcItA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-532-P86R6iKfOCSNOeGdJAo7Jw-1; Mon, 27 Nov 2023 04:08:03 -0500
+X-MC-Unique: P86R6iKfOCSNOeGdJAo7Jw-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a02344944f5so68421166b.0
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 01:08:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701075900; x=1701680700;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HI0TOtQb9c447DbOQLQ1/RG9mFnY5yOZxPwrai0TcrQ=;
-        b=Ftu9AU4Gt7SfIU2oVSiPRAJnFd2gz2q6syeU9DDn1qA78kxwjDl1LeoEynn6H9ox08
-         5ZoUjsIHdgXF+njXPOz1GmGPnzyA79uidXDuoLS36osuPQ+55n0r4wqLlb90xDKoFaMB
-         c0ih9T0RBDnmXRvD+0n1HOMo2z0D6FeMT+UCO7RES+CZ0vjUzcrWtAAyjUpcIeOIK0S2
-         qDHON0WN4ueZE01zKh+muaB4i+Wqbh4AxI5pxzVkhXBGXEZmaoXd/x6VeIVGLjz33ykX
-         2TDIETC8Iufztot3FmSlDjOuORhbanOEBSWf87GvxiDWf8/39LhUKGQ/TemRx2P9PLAl
-         9fow==
-X-Gm-Message-State: AOJu0YxoqCNhkkMPB8dGnT1aHXttthwLeDjAEKL7Z9oHnq2dMADvxVwX
-	7hiPPBByK7LquRSmqJdOajIFWw==
-X-Google-Smtp-Source: AGHT+IGMN9QxP+tvYaW8enwn4HK0hNu5SbKLzvuHC5a2fj6GapL9xeT02R6kafwcgd/VY4ZU0ooFsg==
-X-Received: by 2002:a17:906:9d05:b0:9ff:6257:1b4c with SMTP id fn5-20020a1709069d0500b009ff62571b4cmr6439371ejc.37.1701075900268;
-        Mon, 27 Nov 2023 01:05:00 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id j10-20020a170906050a00b009fc54390966sm5508751eja.145.2023.11.27.01.04.59
+        d=1e100.net; s=20230601; t=1701076082; x=1701680882;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8UzLKe3MZHXpdSNSglco220DD3bo0944FEKr1A6zn/8=;
+        b=Mp6n/dNf2ZSQf9H3n4AEf5kgWHrCW75yPHqKeAqBvm72w4PtNRJ4ywr+seo+aVLekv
+         Cq45rvtA7eJHvK4O5ZxM450nGMBgmL3rBs0bWt19oc8BO10PYQWXLsyCL3Gw5eV9ejWV
+         f7sm6D2J8G6/5FWZVxjMiRLtfLM1t2ubwkMMYft0UdBxAvpDyuYAciNxKkoBJ5SAgVdE
+         7c362LQF+oxn66oGMusIn3qIOWnDh8YKZF6Ur6pmmb14UhYNayRQ7rI61RRSjnRSYAKb
+         ZItW8R9oi7xhl2anFp15yXt5m5XqhrM5fQe9PmUH5n84HP5gG98n3ARpr5613Z7gbFQ2
+         B1zw==
+X-Gm-Message-State: AOJu0Yzkf5pMeIjpvWxFXJ7Oaw4QS4NCW2emaXu3mhNgLc1suAahNNUZ
+	kSaJERHTbskiUkGUZij5XvYexc3ZrI5yi6LcW+cQpVER0NoVTV7yiXcDC9+ZENvlZbjee7ByzSq
+	qp3k4Gmx3Yko6Z+IN
+X-Received: by 2002:a17:906:f807:b0:9d0:51d4:4dc6 with SMTP id kh7-20020a170906f80700b009d051d44dc6mr6686835ejb.2.1701076082640;
+        Mon, 27 Nov 2023 01:08:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYqbx6PiDPnvS3tr7Qk3o+tZ1tS7gUn06WfMqd9DfKx40Agce7Xti/RXxgVPS5PgH9purh8w==
+X-Received: by 2002:a17:906:f807:b0:9d0:51d4:4dc6 with SMTP id kh7-20020a170906f80700b009d051d44dc6mr6686809ejb.2.1701076082258;
+        Mon, 27 Nov 2023 01:08:02 -0800 (PST)
+Received: from gerbillo.redhat.com (host-87-11-7-253.retail.telecomitalia.it. [87.11.7.253])
+        by smtp.gmail.com with ESMTPSA id p18-20020a1709061b5200b009b9a1714524sm5540847ejg.12.2023.11.27.01.08.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 01:04:59 -0800 (PST)
-Date: Mon, 27 Nov 2023 10:04:58 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	David Christensen <drc@linux.vnet.ibm.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Paul Menzel <pmenzel@molgen.mpg.de>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 00/14] net: intel: start The Great Code Dedup
- + Page Pool for iavf
-Message-ID: <ZWRbusSZ4v0SuWmF@nanopsycho>
-References: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
+        Mon, 27 Nov 2023 01:08:01 -0800 (PST)
+Message-ID: <df0620741383dd4506d478a5a7adcb8b8f63fd67.camel@redhat.com>
+Subject: Re: [PATCH v2 net-next 2/4] af_unix: Return struct unix_sock from
+ unix_get_socket().
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Ivan Babrou <ivan@cloudflare.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>,  netdev@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ io-uring@vger.kernel.org
+Date: Mon, 27 Nov 2023 10:08:00 +0100
+In-Reply-To: <20231123014747.66063-3-kuniyu@amazon.com>
+References: <20231123014747.66063-1-kuniyu@amazon.com>
+	 <20231123014747.66063-3-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
 
-Fri, Nov 24, 2023 at 04:47:18PM CET, aleksander.lobakin@intel.com wrote:
->Here's a two-shot: introduce Intel Ethernet common library (libie) and
->switch iavf to Page Pool. Details are in the commit messages; here's
->a summary:
->
->Not a secret there's a ton of code duplication between two and more Intel
->ethernet modules. Before introducing new changes, which would need to be
->copied over again, start decoupling the already existing duplicate
->functionality into a new module, which will be shared between several
->Intel Ethernet drivers. The first name that came to my mind was
->"libie" -- "Intel Ethernet common library". Also this sounds like
->"lovelie" (-> one word, no "lib I E" pls) and can be expanded as
->"lib Internet Explorer" :P
->The series is only the beginning. From now on, adding every new feature
->or doing any good driver refactoring will remove much more lines than add
->for quite some time. There's a basic roadmap with some deduplications
->planned already, not speaking of that touching every line now asks:
->"can I share this?". The final destination is very ambitious: have only
->one unified driver for at least i40e, ice, iavf, and idpf with a struct
->ops for each generation. That's never gonna happen, right? But you still
->can at least try.
->PP conversion for iavf lands within the same series as these two are tied
->closely. libie will support Page Pool model only, so that a driver can't
->use much of the lib until it's converted. iavf is only the example, the
->rest will eventually be converted soon on a per-driver basis. That is
->when it gets really interesting. Stay tech.
+On Wed, 2023-11-22 at 17:47 -0800, Kuniyuki Iwashima wrote:
+> Currently, unix_get_socket() returns struct sock, but after calling
+> it, we always cast it to unix_sk().
+>=20
+> Let's return struct unix_sock from unix_get_socket().
+>=20
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/linux/io_uring.h |  4 ++--
+>  include/net/af_unix.h    |  2 +-
+>  io_uring/io_uring.c      |  5 +++--
+>  net/unix/garbage.c       | 19 +++++++------------
+>  net/unix/scm.c           | 26 +++++++++++---------------
+>  5 files changed, 24 insertions(+), 32 deletions(-)
+>=20
+> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+> index aefb73eeeebf..be16677f0e4c 100644
+> --- a/include/linux/io_uring.h
+> +++ b/include/linux/io_uring.h
+> @@ -54,7 +54,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long l=
+en, int rw,
+>  			      struct iov_iter *iter, void *ioucmd);
+>  void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t re=
+s2,
+>  			unsigned issue_flags);
+> -struct sock *io_uring_get_socket(struct file *file);
+> +struct unix_sock *io_uring_get_socket(struct file *file);
+>  void __io_uring_cancel(bool cancel_all);
+>  void __io_uring_free(struct task_struct *tsk);
+>  void io_uring_unreg_ringfd(void);
+> @@ -111,7 +111,7 @@ static inline void io_uring_cmd_do_in_task_lazy(struc=
+t io_uring_cmd *ioucmd,
+>  			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>  {
+>  }
+> -static inline struct sock *io_uring_get_socket(struct file *file)
+> +static inline struct unix_sock *io_uring_get_socket(struct file *file)
+>  {
+>  	return NULL;
+>  }
+> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> index 5a8a670b1920..c628d30ceb19 100644
+> --- a/include/net/af_unix.h
+> +++ b/include/net/af_unix.h
+> @@ -14,7 +14,7 @@ void unix_destruct_scm(struct sk_buff *skb);
+>  void io_uring_destruct_scm(struct sk_buff *skb);
+>  void unix_gc(void);
+>  void wait_for_unix_gc(void);
+> -struct sock *unix_get_socket(struct file *filp);
+> +struct unix_sock *unix_get_socket(struct file *filp);
+>  struct sock *unix_peer_get(struct sock *sk);
+> =20
+>  #define UNIX_HASH_MOD	(256 - 1)
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index ed254076c723..daed897f5975 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -177,13 +177,14 @@ static struct ctl_table kernel_io_uring_disabled_ta=
+ble[] =3D {
+>  };
+>  #endif
+> =20
+> -struct sock *io_uring_get_socket(struct file *file)
+> +struct unix_sock *io_uring_get_socket(struct file *file)
+>  {
+>  #if defined(CONFIG_UNIX)
+>  	if (io_is_uring_fops(file)) {
+>  		struct io_ring_ctx *ctx =3D file->private_data;
+> =20
+> -		return ctx->ring_sock->sk;
+> +		if (ctx->ring_sock->sk)
+> +			return unix_sk(ctx->ring_sock->sk);
+>  	}
+>  #endif
+>  	return NULL;
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index db1bb99bb793..4d634f5f6a55 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -105,20 +105,15 @@ static void scan_inflight(struct sock *x, void (*fu=
+nc)(struct unix_sock *),
+> =20
+>  			while (nfd--) {
+>  				/* Get the socket the fd matches if it indeed does so */
+> -				struct sock *sk =3D unix_get_socket(*fp++);
+> +				struct unix_sock *u =3D unix_get_socket(*fp++);
+> =20
+> -				if (sk) {
+> -					struct unix_sock *u =3D unix_sk(sk);
+> +				/* Ignore non-candidates, they could have been added
+> +				 * to the queues after starting the garbage collection
+> +				 */
+> +				if (u && test_bit(UNIX_GC_CANDIDATE, &u->gc_flags)) {
+> +					hit =3D true;
+> =20
+> -					/* Ignore non-candidates, they could
+> -					 * have been added to the queues after
+> -					 * starting the garbage collection
+> -					 */
+> -					if (test_bit(UNIX_GC_CANDIDATE, &u->gc_flags)) {
+> -						hit =3D true;
+> -
+> -						func(u);
+> -					}
+> +					func(u);
+>  				}
+>  			}
+>  			if (hit && hitlist !=3D NULL) {
+> diff --git a/net/unix/scm.c b/net/unix/scm.c
+> index 4b3979272a81..36ce8fed9acc 100644
+> --- a/net/unix/scm.c
+> +++ b/net/unix/scm.c
+> @@ -21,9 +21,8 @@ EXPORT_SYMBOL(gc_inflight_list);
+>  DEFINE_SPINLOCK(unix_gc_lock);
+>  EXPORT_SYMBOL(unix_gc_lock);
+> =20
+> -struct sock *unix_get_socket(struct file *filp)
+> +struct unix_sock *unix_get_socket(struct file *filp)
+>  {
+> -	struct sock *u_sock =3D NULL;
+>  	struct inode *inode =3D file_inode(filp);
+> =20
+>  	/* Socket ? */
+> @@ -34,12 +33,13 @@ struct sock *unix_get_socket(struct file *filp)
+> =20
+>  		/* PF_UNIX ? */
+>  		if (s && ops && ops->family =3D=3D PF_UNIX)
+> -			u_sock =3D s;
+> -	} else {
+> -		/* Could be an io_uring instance */
+> -		u_sock =3D io_uring_get_socket(filp);
+> +			return unix_sk(s);
+> +
+> +		return NULL;
+>  	}
+> -	return u_sock;
+> +
+> +	/* Could be an io_uring instance */
+> +	return io_uring_get_socket(filp);
+>  }
+>  EXPORT_SYMBOL(unix_get_socket);
+> =20
+> @@ -48,13 +48,11 @@ EXPORT_SYMBOL(unix_get_socket);
+>   */
+>  void unix_inflight(struct user_struct *user, struct file *fp)
+>  {
+> -	struct sock *s =3D unix_get_socket(fp);
+> +	struct unix_sock *u =3D unix_get_socket(fp);
+> =20
+>  	spin_lock(&unix_gc_lock);
+> =20
+> -	if (s) {
+> -		struct unix_sock *u =3D unix_sk(s);
+> -
+> +	if (u) {
+>  		if (!u->inflight) {
+>  			BUG_ON(!list_empty(&u->link));
+>  			list_add_tail(&u->link, &gc_inflight_list);
+> @@ -71,13 +69,11 @@ void unix_inflight(struct user_struct *user, struct f=
+ile *fp)
+> =20
+>  void unix_notinflight(struct user_struct *user, struct file *fp)
+>  {
+> -	struct sock *s =3D unix_get_socket(fp);
+> +	struct unix_sock *u =3D unix_get_socket(fp);
+> =20
+>  	spin_lock(&unix_gc_lock);
+> =20
+> -	if (s) {
+> -		struct unix_sock *u =3D unix_sk(s);
+> -
+> +	if (u) {
+>  		BUG_ON(!u->inflight);
+>  		BUG_ON(list_empty(&u->link));
+> =20
 
-The world would not be the same without intel driver duplicates :/
+Adding the io_uring peoples to the recipient list for awareness. I
+guess this deserves an explicit ack from them.
 
-Out of curiosity, what changed? I always thought this is
-done for sake of easier out of tree driver development and old device
-support dropping.
+Cheers,
+
+Paolo
+
+
 
