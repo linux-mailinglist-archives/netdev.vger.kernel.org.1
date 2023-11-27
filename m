@@ -1,203 +1,127 @@
-Return-Path: <netdev+bounces-51359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF1D7FA519
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:46:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED867FA522
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D56FB20FE5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:46:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B3EB2816A9
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D049934561;
-	Mon, 27 Nov 2023 15:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2B734561;
+	Mon, 27 Nov 2023 15:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SUstPTet"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n9iaFImX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B46BE;
-	Mon, 27 Nov 2023 07:46:33 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-77d72aeae3bso185192485a.1;
-        Mon, 27 Nov 2023 07:46:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701099993; x=1701704793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dQn+nfZn0k/15RIKJDHqgnJW9L0h46ZKz5egxGpypNQ=;
-        b=SUstPTetz14ro4nwubtkhYV06yNDCybYDllFysqH97d+WsC4pmZI+oThkRoHCVD4wC
-         qNkftg3UmeUWSrAnELIiW8MMNrgQp/sSx1zWcXHerglCgXGE8qN7mkeoq7+ZP2tEV7uG
-         awqNaLBzdbQWsWi0XzXNcWkwCzmu/jgMmatKMyIDLXwwMOEJHhgC2iDi4K9Q6G61Ne1W
-         G8aYkdqddYnWsS1uN9WhnI+wqhQPYyRy/+Lxg7cMxzz/fZAoQerE+eaR6NAfA59O86fR
-         +NPHH9ZNObIlWHRPxlGyFSiWD8RCJiqxThTETAxalnq4pnv+0U9FmkoChoezgpbbJgOm
-         eqQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701099993; x=1701704793;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dQn+nfZn0k/15RIKJDHqgnJW9L0h46ZKz5egxGpypNQ=;
-        b=EK5NdKaRS5IPJbM6JAYl3pZCy9s+ul0NntR4coDVz3Z7tMOE3x55vlxVkXjVofvJ4B
-         RJq/ADA/rcBdWPTRd5BoFdOfC6LO86NtbKBnKDI2wIonBV24bft8Zk5lGkA0wFDJiEuV
-         VhicbOaM+4n6cc1HSrVIOc4Zp6nCbqKDvlKvdH5HPhoVTk0iHhejKrVitQul8cJ1CiCd
-         YQpiYcvk1IEyimLpNtChRYkBFTZwhcwarYRDSL6N7xSyPW3rlsKWi+jNtRDpAVM+fO4z
-         MADmZeMGPEIwUjGoUmhgfX6bqiNGaH6XVQF5mJRyWuaqscE0rFy3FMZTFTAtCycxBJFN
-         OLlA==
-X-Gm-Message-State: AOJu0Yzx+ms/ZU7IIBhGsJZXIpyuomkdrE7d1pZJwsxTvPAqIjdAkfPB
-	kJ4nICHWjOZb7m7VlKhZo+A=
-X-Google-Smtp-Source: AGHT+IE3MaWwPx811HWE6Z1JCLCB7GQvQMZYVYPljdxgpiA3wP6Lhn644czcnNQd2UEdF76Ej2je9Q==
-X-Received: by 2002:a05:620a:4895:b0:777:457:34be with SMTP id ea21-20020a05620a489500b00777045734bemr12809491qkb.24.1701099992822;
-        Mon, 27 Nov 2023 07:46:32 -0800 (PST)
-Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id g12-20020a05620a13cc00b0077580becd52sm3781679qkl.103.2023.11.27.07.46.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 07:46:32 -0800 (PST)
-Date: Mon, 27 Nov 2023 10:46:32 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- linux-kselftest@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>, 
- Florian Westphal <fw@strlen.de>, 
- MPTCP Upstream <mptcp@lists.linux.dev>
-Message-ID: <6564b9d831e24_8a1ac29498@willemb.c.googlers.com.notmuch>
-In-Reply-To: <7418fa0c-c0c2-4615-ba55-f148ceb82328@kernel.org>
-References: <20231124171645.1011043-1-willemdebruijn.kernel@gmail.com>
- <20231124171645.1011043-5-willemdebruijn.kernel@gmail.com>
- <7418fa0c-c0c2-4615-ba55-f148ceb82328@kernel.org>
-Subject: Re: [PATCH net 4/4] selftests/net: mptcp: fix uninitialized variable
- warnings
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951AFBE;
+	Mon, 27 Nov 2023 07:48:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=svOT1Ab/ZzY/i1DkMPg/q3PvUAlQ9TMeZEgdR1xeIck=; b=n9iaFImXGrlemMfVNe1O1oYwG+
+	m2MiS3GRpBOlJMg3MBA6xyk7/IJBnTv6BKn+fcSGug/QQKY8w10C6MXHGWzI6Lu4v0rmU9Bg2u4os
+	C9fpQsKfkFALcRzeGWLajGLy6lVynVQ0sv+Yl5HyuYUUnUX67WhMv4YEMj2OvBS1wZICYjx+Hb9jz
+	/nTFc4am1zkaVS1l4PHTZMH+uiI0l2MR+xa+0v2AisBrVREmkLJNJ47QApNSRkW+HANCHhROxmXuU
+	TuIQQj2RDf8aUlixNL95cSJL9z10RUyyu5tt9bks9VRLXSslLcbVx8Ddyr+NISk+uCJJ8yTxa3rBm
+	TmczTHNA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46976)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r7dpn-00066b-0L;
+	Mon, 27 Nov 2023 15:47:43 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r7dpn-000223-1L; Mon, 27 Nov 2023 15:47:43 +0000
+Date: Mon, 27 Nov 2023 15:47:42 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH 5/8] dt-bindings: net: pcs: add bindings for MediaTek
+ USXGMII PCS
+Message-ID: <ZWS6Hl2tZ0MPj+OL@shell.armlinux.org.uk>
+References: <cover.1699565880.git.daniel@makrotopia.org>
+ <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Matthieu Baerts wrote:
-> Hi Willem,
-> 
-> (+ cc MPTCP list)
-> 
-> On 24/11/2023 18:15, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
-> > 
-> > Same init_rng() in both tests. The function reads /dev/urandom to
-> > initialize srand(). In case of failure, it falls back onto the
-> > entropy in the uninitialized variable. Not sure if this is on purpose.
-> > But failure reading urandom should be rare, so just fail hard. While
-> > at it, convert to getrandom(). Which man 4 random suggests is simpler
-> > and more robust.
-> > 
-> >     mptcp_inq.c:525:6:
-> >     mptcp_connect.c:1131:6:
-> > 
-> >     error: variable 'foo' is used uninitialized
-> >     whenever 'if' condition is false
-> >     [-Werror,-Wsometimes-uninitialized]
-> 
-> Thank you for the patch!
-> 
-> It looks good to me:
-> 
-> Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
-> 
-> > Fixes: 048d19d444be ("mptcp: add basic kselftest for mptcp")
-> > Fixes: b51880568f20 ("selftests: mptcp: add inq test case")
-> > Cc: Florian Westphal <fw@strlen.de>
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > 
-> > ----
-> > 
-> > When input is randomized because this is expected to meaningfully
-> > explore edge cases, should we also add
-> > 1. logging the random seed to stdout and
-> > 2. adding a command line argument to replay from a specific seed
-> > I can do this in net-next, if authors find it useful in this case.
-> 
-> I think we should have done that from the beginning, otherwise we cannot
-> easily reproduce these edge cases. To be honest, I don't think this
-> technique helped to find bugs, and it was probably used here as a good
-> habit to increase the coverage. But on the other hand, we might not
-> realise some inputs are randomised and can cause instabilities in the
-> tests because we don't print anything about that.
-> 
-> So I would say that the minimal thing to do is to log the random seed.
-> But it might not be that easy to do, for example 'mptcp_connect' is used
-> a lot of time by the .sh scripts: printing this seed number each time
-> 'mptcp_connect' is started will "flood" the logs. Maybe we should only
-> print that at the end, in case of errors: e.g. in xerror() and
-> die_perror() for example, but I see 'exit(1)' is directly used in other
-> places...
-> 
-> That's more code to change, but if it is still OK for you to do that,
-> please also note that you will need to log this to stderr: mptcp_connect
-> prints what has been received from the other peer to stdout.
-> 
-> Because it is more than just adding a 'printf()', I just created a
-> ticket in our bug tracker, so anybody can look at that and check all the
-> details about that:
-> 
-> https://github.com/multipath-tcp/mptcp_net-next/issues/462
+On Thu, Nov 09, 2023 at 09:51:47PM +0000, Daniel Golle wrote:
+> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
+> it in order to configure and monitor the Ethernet SerDes link in
+> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
+> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
+> interface modes are also available.
 
-Thanks for the detailed feedback, Matthieu!
+I think this binding is based on the implementation than on hardware.
 
-Another option to avoid flooding the logs might be to choose a pseudo
-random number in the script and pass the explicit value mptcp_connect.
+What I believe you have is this setup:
 
-I haven't looked closely, but for transport layer tests it is likely
-that the payload is entirely ignored. Bar perhaps checksum coverage.
-If it does not increase code coverage, randomization can also just be
-turned off.
- 
-> > ---
-> >  tools/testing/selftests/net/mptcp/mptcp_connect.c | 11 ++++-------
-> >  tools/testing/selftests/net/mptcp/mptcp_inq.c     | 11 ++++-------
-> >  2 files changed, 8 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-> > index c7f9ebeebc2c5..d2043ec3bf6d6 100644
-> > --- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
-> > +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-> 
-> (...)
-> 
-> > @@ -1125,15 +1126,11 @@ int main_loop_s(int listensock)
-> >  
-> >  static void init_rng(void)
-> >  {
-> > -	int fd = open("/dev/urandom", O_RDONLY);
-> >  	unsigned int foo;
-> >  
-> > -	if (fd > 0) {
-> 
-> I just realised that here, we could have fd == 0 which is a valid value.
-> I don't think we would have that when executing the selftests, but
-> that's another reason to change this :)
-> 
-> > -		int ret = read(fd, &foo, sizeof(foo));
-> > -
-> > -		if (ret < 0)
-> > -			srand(fd + foo);
-> > -		close(fd);
-> > +	if (getrandom(&foo, sizeof(foo), 0) == -1) {
-> > +		perror("getrandom");
-> > +		exit(1);
-> >  	}
-> >  
-> >  	srand(foo);
-> 
-> Cheers,
-> Matt
+        .---- LynxI PCS ----.
+MAC ---+                     +--- PEXTP --- world
+        `--- USXGMII PCS ---'
 
+You are representing the PEXTP as a separate entity in DT, but then
+you're representing the LynxI PCS and the USXGMII PCS as a single
+block, which seems to be how you've decided to implement it.
 
+Given that the LynxI PCS is already in use elsewhere in the Mediatek
+range, I suggest that the LynxI PCS is one block of IP, and the USXGMII
+PCS is a separate block of IP.
+
+1) Would it not be better to model the two PCS seperately?
+
+2) The addition of the SGMII reset needs more information - is this
+   controlling a reset for the LynxI block? If so, it should be part
+   of a LynxI PCS binding.
+
+3) The PEXTP is presumably a separate block which can be shared between
+   several devices - for example, the LynxI, USXGMII, and probably SATA
+   and PCIe as well. From the 802.3's network model, the PEXTP is the
+   PMA/PMD.
+
+   From the point of view of 802.3's model, a network interface has
+   various layers such as the MAC, PCS and PMA/PMD, and sitting above
+   these layers is the management of the system. Rather than chasing
+   the data flow (which in a network device can be complex) wouldn't
+   it be better to continue with the 802.3 model as we are doing with
+   other devices, rather than trying to go with a new approach here?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
