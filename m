@@ -1,195 +1,166 @@
-Return-Path: <netdev+bounces-51481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7777FAD6C
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 23:24:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9FE7FAD85
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 23:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7251228175C
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:24:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23B23B21232
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F060448CD4;
-	Mon, 27 Nov 2023 22:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297F45C05;
+	Mon, 27 Nov 2023 22:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HoughhNr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AwxDQvYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816DC1FE5
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:24:29 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bba1dd05fso15568e87.0
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 14:24:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701123868; x=1701728668; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6VLrEUvqHC0YBPwbIr6G0BEQgOpSxxPm3byO5bHjsjw=;
-        b=HoughhNrKmoY7GrvfvgRDFN74XE+IA9HWCQWreAlocXqfN1eVqGukGrrQSC07CQAk7
-         z5ANHYpzZ+pI7Po78Z8Jhfpgk64Z+cNvw0XYwcT9PDGDtTLkZbbZC2oisP5S4R1P26DA
-         vlhzCl79vxDHN2+JdAKAumyINLqVlmqcAGqsxD+lImOYIhYuUh0QBVL2u752QIvJSv75
-         JFkoqLP6eXJmM216yp7pOPub35dNq0Y89JwKbpJErVf3qqAasRAoMIFY+vxy5Cd/B1ga
-         e39WPtuXNUbcd86WJC3c7pg7iZ2CyKUWQlIHWgfml7yaM/jsuXKam9diZpfkEGLLhP2v
-         KvHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701123868; x=1701728668;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6VLrEUvqHC0YBPwbIr6G0BEQgOpSxxPm3byO5bHjsjw=;
-        b=mXIRWn8mhrnqvB8DMPC4ePW20ol9Mg05lE6vXfBOUzv3R1BJjWtuHhMJImF7Igcj37
-         JsaCPbJ+tRwZ702nh8HogBnQM3pJEahyl8CDG5UvzdPWR/1iDSjK0yYNxqHunlJopJVt
-         V42/Z+AigUQtHlUom1cNqI5y+cdHVPXoVmCbEazGwQQlE2ZeY9X0BYZky+zhsiM8gKIQ
-         pWp186dNGSri7H4SrJ7irrIWcm/zGQSf035Mf9NmUUizzppRsiM/KA3c5FYR1wEVVdIk
-         p3ppS0fphFmNItAhzAwJ6xZQkEbCuiAguO8wLqLkcM69wePFRwU914Bq+8FMjvmgoTAj
-         xmjw==
-X-Gm-Message-State: AOJu0YxseMA4460+xHX+7eav9JrQC5vkBTuKrmT+k7H1GtI06rC2Y2Hq
-	tYwysY44Wd7dpur958shgId0R6s3w5wmjFnurpA=
-X-Google-Smtp-Source: AGHT+IFtl4rzEkwogQ2yBM0isaoao/8/3oVPveCVna6Xco3l9EhmrDAs805nFzGq+aPf54Gkrpe5her/Yyj1bm7OIKc=
-X-Received: by 2002:a05:6512:400d:b0:503:38fe:4590 with SMTP id
- br13-20020a056512400d00b0050338fe4590mr9359020lfb.60.1701123867396; Mon, 27
- Nov 2023 14:24:27 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A8F136;
+	Mon, 27 Nov 2023 14:34:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701124470; x=1732660470;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ts77A1VNiEc2CT8sAwLfGF3duEMUZ+i3j/tFM1XLqJM=;
+  b=AwxDQvYheNxk5PpJM9MeOtrqnj9g/dSOdAT7gTLTpWmgBhn+78TQzU8P
+   TI7POBG2RBEGlOPDxcSfcOH1fxGn62RASKcydoefKVNEYvh9c+W7uNy8s
+   oellzRYzPwKBaCRLWb2Vg3o4C9hdR9b3hlwPjgdwk0KtD/SV0Huo6Brhl
+   N5jddgLxB0CiFpTbxT31jfez1rvyLIEYnmACdJRZXOMM5L86/ksT53DwF
+   EEvevC119a6/1NqDpmGLPQkLzIQ1H9qw1Ujpaf/4eRcb6ihWws+qbEHpa
+   HLEz3N4/zQMBtvpaCc9l4AUBSB2zgehg66UTyL+5yavkNpbhO5FmbP7xq
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="392557646"
+X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
+   d="scan'208";a="392557646"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 14:34:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="1099898612"
+X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
+   d="scan'208";a="1099898612"
+Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 27 Nov 2023 14:34:27 -0800
+Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r7kBN-0006j2-0f;
+	Mon, 27 Nov 2023 22:34:25 +0000
+Date: Tue, 28 Nov 2023 06:33:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, s.shtylyov@omp.ru,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: Re: [PATCH net-next 8/9] net: rswitch: Add jumbo frames handling for
+ TX
+Message-ID: <202311280447.HzrM7Jdd-lkp@intel.com>
+References: <20231127115334.3670790-9-yoshihiro.shimoda.uh@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117235140.1178-1-luizluca@gmail.com> <20231117235140.1178-3-luizluca@gmail.com>
- <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org> <20231120134818.e2k673xsjec5scy5@skbuf>
- <b304af68-7ce1-49b5-ab62-5473970e618f@kernel.org> <CAJq09z5nOnwtL_rOsmReimt+76uRreDiOW_+9r==YJXF4+2tYg@mail.gmail.com>
- <95381a84-0fd0-4f57-88e4-1ed31d282eee@kernel.org> <7afdc7d6-1382-48c0-844b-790dcb49fdc2@kernel.org>
- <CAJq09z5uVjjE1k2ugVGctsUvn5yLwLQAM6u750Z4Sz7cyW5rVQ@mail.gmail.com> <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
-In-Reply-To: <vcq6qsx64ulmhflxm4vji2zelr2xj5l7o35anpq3csxasbiffe@xlugnyxbpyyg>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 27 Nov 2023 19:24:16 -0300
-Message-ID: <CAJq09z4ZdB9L7ksuN0b+N-LCv+zOvM+5Q9iWXccGN3w54EN1_Q@mail.gmail.com>
-Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-To: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, "linus.walleij@linaro.org" <linus.walleij@linaro.org>, 
-	Vladimir Oltean <olteanv@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"andrew@lunn.ch" <andrew@lunn.ch>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"arinc.unal@arinc9.com" <arinc.unal@arinc9.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127115334.3670790-9-yoshihiro.shimoda.uh@renesas.com>
 
-Hi Alvin,
+Hi Yoshihiro,
 
-> > 4) Introduce a realtek-common module, a module for each interface,
-> > both repeating the compatible strings for all families, and expect the
-> > family module to be already loaded.
->
-> The kernel should be able to autoload. Skip.
->
-> > 5) Introduce a realtek-common module, a module for each interface,
-> > both repeating the compatible strings for all families, and request
-> > the family module to be loaded (the last patch in this series).
->
-> I had reservations before about this approach and I think I am not
-> the only one. Let's consider the other options.
+kernel test robot noticed the following build warnings:
 
-I'm not sure if getting/putting a module is a problem or if I can
-request it when missing. I would like some options on that specific
-topic from the experts. It seems to happen in many places, even in DSA
-tag code.
+[auto build test WARNING on net/main]
+[cannot apply to net-next/main linus/master horms-ipvs/master v6.7-rc3]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> > 6) Introduce a realtek-common module, merging everything from
-> > realtek-smi and realtek-mdio but the driver declarations and implement
-> > each family as a single module that works both as a platform and an
-> > mdio driver.
-> > 7) Introduce a realtek-common module, merging everything from
-> > realtek-smi and realtek-mdio but the driver declarations and create
-> > two modules for each family as real drivers, repeating the compatible
-> > strings on each family (e.g., {rtl8366rb, rtl8365mb}_{smi,mdio}.ko).
->
-> Yeah, something like this. Roughly I think we want:
+url:    https://github.com/intel-lab-lkp/linux/commits/Yoshihiro-Shimoda/net-rswitch-Drop-unused-argument-return-value/20231127-195705
+base:   net/main
+patch link:    https://lore.kernel.org/r/20231127115334.3670790-9-yoshihiro.shimoda.uh%40renesas.com
+patch subject: [PATCH net-next 8/9] net: rswitch: Add jumbo frames handling for TX
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20231128/202311280447.HzrM7Jdd-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231128/202311280447.HzrM7Jdd-lkp@intel.com/reproduce)
 
-Just to be sure, you are suggesting something like 6), not 7), right?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311280447.HzrM7Jdd-lkp@intel.com/
 
-> - generic boilerplate probe/remove and regmap setup code in
->   realtek-common.c
-> - interface code in realtek-{smi,mdio}.c
-> - chip variant code in rtl8365mb.c and rtl8366rb.c
->
-> The module dependencies only need to go upwards, i.e.:
->
->        realtek-common
->          ^       ^
->          |       |  use symbols realtek_common_probe()
->          |       |              realtek_common_remove()
->          |       |
->  realtek-smi   realtek-mdio
->       ^   ^     ^   ^
->       |   |     |   |  use symbols realtek_mdio_probe()
->       |    \   /    |              realtek_mdio_remove()
->       |     \ /     |
->       |      X      |  or symbols realtek_smi_probe()
->       |     / \     |             realtek_smi_remove()
->       |    /   \    |
->       |   /     \   |  or both
->       |  /       \  |
->   rtl8365mb     rtl8366rb
+All warnings (new ones prefixed by >>):
 
-It makes sense to turn rtl8365mb/rtl8366rb into both a platform and an
-MDIO driver, similar to the merge between realtek-mdio/realtek-smi
-Vladmir suggested before, with a custom module_init/exit doing the
-job. I didn't invest too much time thinking about how data structures
-would fit in this new model. realtek_priv would probably be allocated
-by the variant modules with little left for interface to probe/setup.
+>> drivers/net/ethernet/renesas/rswitch.c:1680:42: warning: variable 'dma_addr' is uninitialized when used here [-Wuninitialized]
+    1680 |         if (dma_mapping_error(ndev->dev.parent, dma_addr))
+         |                                                 ^~~~~~~~
+   drivers/net/ethernet/renesas/rswitch.c:1663:21: note: initialize the variable 'dma_addr' to silence this warning
+    1663 |         dma_addr_t dma_addr, dma_addr_orig;
+         |                            ^
+         |                             = 0
+   1 warning generated.
 
-> The setup_interface function pointer is only needed for SMI, and
-> currently the chip interface drivers are the ones calling it. It is kind
-> of ugly that this gets passed all the way up, copied into realtek_priv,
-> and then called all the way down again... there is probably a more
-> elegant solution. I am mainly trying to illustrate how to handle the
-> module knot you are trying to unpick.
 
-The "realtek_smi_setup_mdio()" used in setup_interface isn't really
-necessary (like it happens in realtek-mdio). It could be used (or not)
-by both interfaces. The "realtek,smi-mdio" compatible string is
-misleading, indicating it might be something specific to the SMI
-interface HW while it is just how the driver was implemented. A
-"realtek,slave_mdio" or "realtek,user_mii" would be better.
+vim +/dma_addr +1680 drivers/net/ethernet/renesas/rswitch.c
 
-I believe the strange relations between realtek interface modules and
-variants tend to go away if we put things in the right place. The
-probe will happen mostly in common and variant modules, leaving just a
-minor probe job for the interface module called from the variant
-driver (using pre/post approach) or from common (using a
-realtek_interface_ops). Anyway, I'll leave the discussion of who calls
-who after we settle the role of each module.
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1658  
+8e0aa1ff44ca30b Nathan Chancellor 2022-11-03  1659  static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1660  {
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1661  	struct rswitch_device *rdev = netdev_priv(ndev);
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1662  	struct rswitch_gwca_queue *gq = rdev->tx_queue;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1663  	dma_addr_t dma_addr, dma_addr_orig;
+109b25d13e00543 Yoshihiro Shimoda 2023-11-22  1664  	netdev_tx_t ret = NETDEV_TX_OK;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1665  	struct rswitch_ext_desc *desc;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1666  	unsigned int i, nr_desc;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1667  	u8 die_dt;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1668  	u16 len;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1669  
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1670  	nr_desc = (skb->len - 1) / RSWITCH_DESC_BUF_SIZE + 1;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1671  	if (rswitch_get_num_cur_queues(gq) >= gq->ring_size - nr_desc) {
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1672  		netif_stop_subqueue(ndev, 0);
+a60caf039e96d80 Yoshihiro Shimoda 2023-05-29  1673  		return NETDEV_TX_BUSY;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1674  	}
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1675  
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1676  	if (skb_put_padto(skb, ETH_ZLEN))
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1677  		return ret;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1678  
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1679  	dma_addr_orig = dma_map_single(ndev->dev.parent, skb->data, skb->len, DMA_TO_DEVICE);
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22 @1680  	if (dma_mapping_error(ndev->dev.parent, dma_addr))
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1681  		goto err_kfree;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1682  
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1683  	gq->skbs[gq->cur] = skb;
+e0e4f789171ba70 Yoshihiro Shimoda 2023-11-27  1684  	gq->unmap_addrs[gq->cur] = dma_addr;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1685  
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1686  	/* DT_FSTART should be set at last. So, this is reverse order. */
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1687  	for (i = nr_desc; i-- > 0; ) {
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1688  		desc = &gq->tx_ring[rswitch_next_queue_index(gq, true, i)];
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1689  		die_dt = rswitch_ext_desc_get_die_dt(nr_desc, i);
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1690  		dma_addr = dma_addr_orig + i * RSWITCH_DESC_BUF_SIZE;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1691  		len = rswitch_ext_desc_get_len(die_dt, skb->len);
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1692  		if (!rswitch_ext_desc_set(rdev, skb, desc, dma_addr, len, die_dt))
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1693  			goto err_unmap;
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1694  	}
+33f5d733b589031 Yoshihiro Shimoda 2023-02-09  1695  
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1696  	wmb();	/* gq->cur must be incremented after die_dt was set */
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1697  
+9ce54e0ed5479a1 Yoshihiro Shimoda 2023-11-27  1698  	gq->cur = rswitch_next_queue_index(gq, true, nr_desc);
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1699  	rswitch_modify(rdev->addr, GWTRC(gq->index), 0, BIT(gq->index % 32));
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1700  
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1701  	return ret;
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1702  
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1703  err_unmap:
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1704  	dma_unmap_single(ndev->dev.parent, dma_addr, skb->len, DMA_TO_DEVICE);
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1705  
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1706  err_kfree:
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1707  	dev_kfree_skb_any(skb);
+782486af9b5b764 Yoshihiro Shimoda 2023-11-22  1708  
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1709  	return ret;
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1710  }
+3590918b5d07aa5 Yoshihiro Shimoda 2022-10-31  1711  
 
-The most likely proposal is to convert both variant modules from a
-subdriver code into a both platform(for SMI) and mdio driver. Probe
-will use both realtek_<interface>_probe() and realtek_common_probe()
-when appropriated. Variants will call the interface and not the other
-way around.
-
-> > Solutions 1, 2, and 3 may use more resources than needed. My test
-> > device, for example, cannot handle them. Solution 7 is similar to the
-> > examples I found in the kernel. Solutions 1 and 6 are the only ones
-> > not repeating the same compatible strings in different modules, if
-> > that's a problem.
->
-> You will have noticed that with the above solution, the chip variant
-> modules will invariably require both interface modules to be loaded if
-> the kernel is built with both REALTEK_SMI and REALTEK_MDIO. I hope that
-> your resource-constrained system has enough headroom to accommodate
-> that. If not then I am afraid you might simply be out of luck.
-
-I wouldn't say it will invariably require both interface modules to be
-loaded. The dynamic load would be much simpler if variants request the
-interface module as we only have two (at most 3 with a future
-realtek-spi) modules. We would just need to call a
-realtek_interface_get() and realtek_interface_put() on each respective
-probe. The module names will be well-known with no issues with
-module_alias.
-
-Thanks for your help, Alvin. I'll wait for a couple of more days for
-others to manifest.
-
-Regards,
-
-Luiz
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
