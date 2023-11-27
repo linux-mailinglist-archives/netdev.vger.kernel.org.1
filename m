@@ -1,142 +1,244 @@
-Return-Path: <netdev+bounces-51419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706B07FA980
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:01:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15D5B7FA982
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BE5E2817B0
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:01:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C16762816E4
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B70374CD;
-	Mon, 27 Nov 2023 19:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6113DB82;
+	Mon, 27 Nov 2023 19:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y/sEQiol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B35D4D;
-	Mon, 27 Nov 2023 11:01:25 -0800 (PST)
-Received: from [192.168.1.103] (31.173.82.188) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 27 Nov
- 2023 22:01:17 +0300
-Subject: Re: [PATCH 13/13] net: ravb: Add runtime PM support
-To: Geert Uytterhoeven <geert@linux-m68k.org>, claudiu beznea
-	<claudiu.beznea@tuxon.dev>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
-	<masaru.nagai.vx@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Claudiu
- Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
- <04cb07fe-cccc-774a-f14d-763ce7ae7b07@omp.ru>
- <b3456a4d-336c-434d-9fd5-4c87582443cb@tuxon.dev>
- <9af21eb9-6fe1-de3a-f2eb-4493778ebb32@omp.ru>
- <e35882ea-c325-4039-bb84-c18b0244dbe0@tuxon.dev>
- <CAMuHMdVCRXYKtcwaC=v-HhJW-PLV-zhj_3GmeU6Vu1JOK_eu0Q@mail.gmail.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <ec9b6604-839f-d31f-59c6-72367804d06a@omp.ru>
-Date: Mon, 27 Nov 2023 22:01:16 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC2B131
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:22 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da03390793fso5041437276.3
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701111801; x=1701716601; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lU3G4rk+luvHLpEU8JIhFSL/F60CLPC8jZKTfFv2YrM=;
+        b=Y/sEQiolqDZtKvekUSEs1Tf2RMwSnh1qkVz2ewwUo0hp8ndovMX6/FYTLOY6H9V7EN
+         uVMktKUiCGeaznNQimSkwi+O3VxYZ8XhuMLEaoRN6hSbBmHbeKKsiWbE7ct683MgB0Dd
+         8jUz1kDbnudg58/sKaEwsYkfptvp+B6Cwb3Dfz04X+v0VZdHCbdM4cY94oY+eBnvagxm
+         rvq2db8cxUJ2HVcURg+Qoom0up5vUNA57yJNtIag9fxyd3cW50lu2ChBjPgUltYlDs1l
+         cYVS/BafXF933D8DrQnOe6cq/c8YZ+QjdMY0bC7838RXC9Z9bu3iYU/B5YBW6yRJadnd
+         HdGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701111801; x=1701716601;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lU3G4rk+luvHLpEU8JIhFSL/F60CLPC8jZKTfFv2YrM=;
+        b=ffL4ptus8pcckuthN8v3uE/EnAheDjbF7HRn1heFEMZGKcTppfSyRzATRtPhtSuxDr
+         RjQyUu3G0tUhA9vVRJe970z/BXZBNtVJqe7OJlV0w167VBDUcgRFs+IcdCehLZ5mdbhe
+         OR3Wjt06cjRXudSC2R2WfSU3NT8IF3wDv3rq2xuTvAq8MI1ebML2UhRL1m2ONlnihR+V
+         J3sjIFIlSc5WJlS4RkE1c18eeyIY8wn3JRTv+tQ7UyzKkj1w3I8o6q271p0uvTy21F1/
+         YioG9pKAL6y43TOZc4bxxlPA+t8S2u6ojDjgBxrRj37rP9tzRi2XgM5/1jssXivofWVS
+         8zGg==
+X-Gm-Message-State: AOJu0YxgGKFnDwycA4yvix5VZCuagnqnREFkdJxKf4qzsA7hwPAs4jlQ
+	SE6EZaLuEhxIDg9msoFQKu3Uf1U=
+X-Google-Smtp-Source: AGHT+IFeByzxXLBxhw3aGO9csheT1p5jgyH0Bj9dQbhDEsILAceytCN4NNRS+GZoPw0XNlOYpJVnRHg=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:d157:0:b0:daf:be4f:489d with SMTP id
+ i84-20020a25d157000000b00dafbe4f489dmr379298ybg.1.1701111801355; Mon, 27 Nov
+ 2023 11:03:21 -0800 (PST)
+Date: Mon, 27 Nov 2023 11:03:06 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMuHMdVCRXYKtcwaC=v-HhJW-PLV-zhj_3GmeU6Vu1JOK_eu0Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/27/2023 18:45:24
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181629 [Nov 27 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_all_Bitcoin, text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.188 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.188
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/27/2023 18:53:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/27/2023 4:12:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
+Message-ID: <20231127190319.1190813-1-sdf@google.com>
+Subject: [PATCH bpf-next v6 00/13] xsk: TX metadata
+From: Stanislav Fomichev <sdf@google.com>
+To: bpf@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
+	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
+	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
+	hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org, 
+	xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/27/23 5:05 PM, Geert Uytterhoeven wrote:
+This series implements initial TX metadata (offloads) for AF_XDP.
+See patch #2 for the main implementation and mlx5/stmmac ones for the
+example on how to consume the metadata on the device side.
 
-[...]
->>>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>>
->>>>>> RZ/G3S supports enabling/disabling clocks for its modules (including
->>>>>> Ethernet module). For this commit adds runtime PM support which
->>>>>> relies on PM domain to enable/disable Ethernet clocks.
->>>>>
->>>>>    That's not exactly something new in RZ/G3S. The ravb driver has unconditional
->>>>> RPM calls already in the probe() and remove() methods...
->>>>> And the sh_eth driver
->>>>> has RPM support since 2009...
->>>>>
->>>>>> At the end of probe ravb_pm_runtime_put() is called which will turn
->>>>>
->>>>>    I'd suggest a shorter name, like ravb_rpm_put() but (looking at this function)
->>>>>> off the Ethernet clocks (if no other request arrives at the driver).
->>>>>> After that if the interface is brought up (though ravb_open()) then
->>>>>> the clocks remain enabled until interface is brought down (operation
->>>>>> done though ravb_close()).
->>>>>>
->>>>>> If any request arrives to the driver while the interface is down the
->>>>>> clocks are enabled to serve the request and then disabled.
->>>>>>
->>>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Starting with two types of offloads:
+- request TX timestamp (and write it back into the metadata area)
+- request TX checksum offload
 
-[...]
+Changes since v5:
+- preserve xsk_tx_metadata flags across tx and completion by moving
+  them out of 'request' union (Jesper)
+- fix xdp_metadata checksum failure in big endian (Alexei)
+- add SPDX to xdp-rx-metadata.rst (Simon)
 
-> Sergey: does sh_eth.c really reinitialize the hardware completely after
-> pm_runtime_get_sync()?
+v5: https://lore.kernel.org/bpf/20231102225837.1141915-1-sdf@google.com/
 
-   Well, even with the original Magnus' commit that added the RPM support (bcd5149ded6b2edbf3732fa1483600a716b1cba6) it wasn't so -- sh_eth_open()
-indeed seemed to re-init everything (but not TSU!) but sh_eth_get_stats()
-surely didn't (the RPM calls there have been removed since); other RPM
-"wrappers" have been added to the driver methods since -- which also
-don't init anything... thus the comment in sh_eth_runtime_nop(() seems
-to be wrong from the very start...
+Performance (mlx5):
 
-[...]
+I've implemented a small xskgen tool to try to saturate single tx queue:
+https://github.com/fomichev/xskgen/tree/master
 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
+Here are the performance numbers with some analysis.
 
-MBR, Sergey
+1. Baseline. Running with commit eb62e6aef940 ("Merge branch 'bpf:
+Support bpf_get_func_ip helper in uprobes'"), nothing from this series:
+
+- with 1400 bytes of payload: 98 gbps, 8 mpps
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189130 sec, 98.357623 gbps 8.409509 mpps
+
+- with 200 bytes of payload: 49 gbps, 23 mpps
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.422235 sec, 49.640921 gbps 23.683645 mpps
+
+2. Adding single commit that supports reserving tx_metadata_len
+   changes nothing numbers-wise.
+
+- baseline for 1400
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189247 sec, 98.347946 gbps 8.408682 mpps
+
+- baseline for 200
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.421248 sec, 49.756913 gbps 23.738985 mpps
+
+3. Adding -M flag causes xskgen to reserve the metadata and fill it, but
+   doesn't set XDP_TX_METADATA descriptor option.
+
+- new baseline for 1400 (with only filling the metadata)
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188767 sec, 98.387657 gbps 8.412077 mpps
+
+- new baseline for 200 (with only filling the metadata)
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.410213 sec, 51.095407 gbps 24.377579 mpps
+(the numbers go sligtly up here, not really sure why, maybe some cache-related
+side-effects?
+
+4. Next, I'm running the same test but with the commit that adds actual
+   general infra to parse XDP_TX_METADATA (but no driver support).
+   Essentially applying "xsk: add TX timestamp and TX checksum offload support"
+   from this series. Numbers are the same.
+
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188430 sec, 98.415557 gbps 8.414463 mpps
+
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.411559 sec, 50.928299 gbps 24.297853 mpps
+
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188723 sec, 98.391299 gbps 8.412389 mpps
+
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.411240 sec, 50.968131 gbps 24.316856 mpps
+
+5. Now, for the most interesting part, I'm adding mlx5 driver support.
+   The mpps for 200 bytes case goes down from 23 mpps to 19 mpps, but
+   _only_ when I enable the metadata. This looks like a side effect
+   of me pushing extra metadata pointer via mlx5e_xdpi_fifo_push.
+   Hence, this part is wrapped into 'if (xp_tx_metadata_enabled)'
+   to not affect the existing non-metadata use-cases. Since this is not
+   regressing existing workloads, I'm not spending any time trying to
+   optimize it more (and leaving it up to mlx owners to purse if
+   they see any good way to do it).
+
+- same baseline
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189434 sec, 98.332484 gbps 8.407360 mpps
+
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.425254 sec, 49.288821 gbps 23.515659 mpps
+
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189528 sec, 98.324714 gbps 8.406696 mpps
+
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519085 sec, 40.379260 gbps 19.264914 mpps
+
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189329 sec, 98.341165 gbps 8.408102 mpps
+
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519929 sec, 40.313713 gbps 19.233642 mpps
+
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+
+Song Yoong Siang (1):
+  net: stmmac: Add Tx HWTS support to XDP ZC
+
+Stanislav Fomichev (12):
+  xsk: Support tx_metadata_len
+  xsk: Add TX timestamp and TX checksum offload support
+  tools: ynl: Print xsk-features from the sample
+  net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+  xsk: Document tx_metadata_len layout
+  xsk: Validate xsk_tx_metadata flags
+  xsk: Add option to calculate TX checksum in SW
+  selftests/xsk: Support tx_metadata_len
+  selftests/bpf: Add csum helpers
+  selftests/bpf: Add TX side to xdp_metadata
+  selftests/bpf: Convert xdp_hw_metadata to XDP_USE_NEED_WAKEUP
+  selftests/bpf: Add TX side to xdp_hw_metadata
+
+ Documentation/netlink/specs/netdev.yaml       |  19 +-
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/xdp-rx-metadata.rst  |   2 +
+ Documentation/networking/xsk-tx-metadata.rst  |  79 ++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  72 +++++-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  11 +-
+ .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  17 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  12 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  64 ++++-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  14 +-
+ include/net/xdp_sock.h                        | 111 +++++++++
+ include/net/xdp_sock_drv.h                    |  34 +++
+ include/net/xsk_buff_pool.h                   |   8 +
+ include/uapi/linux/if_xdp.h                   |  47 +++-
+ include/uapi/linux/netdev.h                   |  16 ++
+ net/core/netdev-genl.c                        |  13 +-
+ net/xdp/xdp_umem.c                            |  11 +-
+ net/xdp/xsk.c                                 |  56 ++++-
+ net/xdp/xsk_buff_pool.c                       |   2 +
+ net/xdp/xsk_queue.h                           |  19 +-
+ tools/include/uapi/linux/if_xdp.h             |  61 ++++-
+ tools/include/uapi/linux/netdev.h             |  16 ++
+ tools/net/ynl/generated/netdev-user.c         |  19 ++
+ tools/net/ynl/generated/netdev-user.h         |   3 +
+ tools/net/ynl/samples/netdev.c                |  10 +-
+ tools/testing/selftests/bpf/network_helpers.h |  43 ++++
+ .../selftests/bpf/prog_tests/xdp_metadata.c   |  33 ++-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 235 ++++++++++++++++--
+ tools/testing/selftests/bpf/xsk.c             |   3 +
+ tools/testing/selftests/bpf/xsk.h             |   1 +
+ 33 files changed, 969 insertions(+), 70 deletions(-)
+ create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+
+-- 
+2.43.0.rc1.413.gea7ed67945-goog
+
 
