@@ -1,224 +1,134 @@
-Return-Path: <netdev+bounces-51243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A2D7F9D0E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:03:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10297F9D11
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31B381C20A16
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:03:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FAF328122E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A80217734;
-	Mon, 27 Nov 2023 10:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8023E17997;
+	Mon, 27 Nov 2023 10:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yWWws5U8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QoehxWlt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3009EE1;
-	Mon, 27 Nov 2023 02:02:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6gn5d7KUQfLRFLOyvCIufG4QhOPBca0kxJGMueryZQ0=; b=yWWws5U864Dp22dYB1WTv/gwrf
-	vqdL8UM518iqSuLd6KgN8/JQBROV/eybM1E7XguQw477cPHp4nYVLjI40Qu/9VBCSXXAjyyCZWeM1
-	eUJFVOuQnZ1r20jw8g5qsh9kisKUBVQhDKuE0MgzMn2S7pOO1NEmZnYEjMDH5srVHrSTEVUGEO+uF
-	UpWBzBQcbS/4Y8NNaTMv2l/DreyEzRxgFNyejTEa32vWaNGOziB9ahh+tjAiN+itqd/RXqSYcVOJ8
-	21ZYuqePg7DSgcvXHDDq5Ln5cXdVw3Fgk5r7lzCCtRkX3Nx8IwmFnORm/qjnC8yR/qNM50BJHx95r
-	BG4AXsgQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47392)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7YS3-0005bE-0f;
-	Mon, 27 Nov 2023 10:02:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7YS3-0001oA-PQ; Mon, 27 Nov 2023 10:02:51 +0000
-Date: Mon, 27 Nov 2023 10:02:51 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [net-next PATCH v2] net: phy: aquantia: drop wrong endianness
- conversion for addr and CRC
-Message-ID: <ZWRpS9CL5OarIOkA@shell.armlinux.org.uk>
-References: <20231127002924.22384-1-ansuelsmth@gmail.com>
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D469E1
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:04:15 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-a013d22effcso543415166b.2
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:04:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701079454; x=1701684254; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=us7osMNMgnJYmXq+xayvypNXjK4HQHSHPKAZ405gJgk=;
+        b=QoehxWltFnbNOgwndvhHG4hD/adYQvU6Nlf3A4P8Np+qQG6RMPjfJEak9LjjMw3Bhx
+         EkIRu6faYatwMdQkqVZkbjbMcjQPTU6xF4EqHsnGRoMCbSHcH5xPU6gc/uTJTcY0CWpc
+         6egWAb/1bAlrFSN2q6wZWtG2sxhbwkKWb3Nu3r3885KjIG3RmeDWvlcE8vLCDRJt2OIv
+         95Tap1VuvgZfJV62ygY/9KRuaamw6bgAW9gR9m3LTRtPbTl95ggoI+icgS/wLeIS46Hr
+         0PDiCkr8z6lhLFymq23zZMdTZy3t/n3PpwNPxYKyiPM/sBADNV8r6eWdWhYTr5knZuSl
+         j0Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701079454; x=1701684254;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=us7osMNMgnJYmXq+xayvypNXjK4HQHSHPKAZ405gJgk=;
+        b=c+4Pszc7UFOmRQiHtAtz4xfdaWono+xdhRdwKhM/6oNTF7w+PwDBEXk+aiQFhtACG1
+         8QvIl6+M0tC0TcwtEZLJlPHFKKpLmdsTTR3sa53+ZfKF4BB5HTTj2MtPvIHAUfyZxdPn
+         5p5NG4ztIO1Entte8a+fNKj71rcwwAPlSwmI512tt2veKwcbZDHwZWc53J9t/3S3N9xv
+         6+ChkOrMJ3OTw6rsVet2j1s9abX6yA+6B/tnUDG0LKm+Vpti74wG8zE/9mfyYYex0V5d
+         GZBZ+/ilvt3O6oUooV/kxJS26WxTeAz7jJ4aaIbPvZ2BU4XqEOllyX/zRyVB5nuq1JUp
+         /I3Q==
+X-Gm-Message-State: AOJu0YyJB9zsvzp7Fh6C0P5w3el+Kd8INKl08XDJSj6xE2Jr000InGqD
+	u/2c0viz36nlxUtnWSMyESRB32SrABxXL4VAADnGFg==
+X-Google-Smtp-Source: AGHT+IF0tGFTNodQJtUR7c/jFeN16sbV1wZaHUK1uRDlY4kcioXd9bn6XxaR3tmKT0CQgHMyD0UCUQ==
+X-Received: by 2002:a17:907:a0d6:b0:9fe:324b:f70a with SMTP id hw22-20020a170907a0d600b009fe324bf70amr9243235ejc.63.1701079454101;
+        Mon, 27 Nov 2023 02:04:14 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.109])
+        by smtp.gmail.com with ESMTPSA id u3-20020a17090626c300b009a5f1d15644sm5468086ejc.119.2023.11.27.02.04.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 02:04:13 -0800 (PST)
+Message-ID: <979513c7-849b-4740-b5b1-e0d5d3d4030c@linaro.org>
+Date: Mon, 27 Nov 2023 11:04:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127002924.22384-1-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] Fix UAF caused by racing datagram sending and freeing
+ of nfc_dev
+Content-Language: en-US
+To: Siddh Raman Pant <code@siddh.me>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1700943019.git.code@siddh.me>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <cover.1700943019.git.code@siddh.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 27, 2023 at 01:29:24AM +0100, Christian Marangi wrote:
-> On further testing on BE target with kernel test robot, it was notice
-> that the endianness conversion for addr and CRC in fw_load_memory was
-> wrong and actually not needed. Values in define doesn't get converted
-> and are passed as is and hardcoded values are already in what the PHY
-> require, that is LE.
+On 25/11/2023 21:26, Siddh Raman Pant wrote:
+> (This patchset should be applied in order as changes are dependent.)
 > 
-> Use get_unaligned_le32 instead of get_unaligned for FW data word load to
-> correctly convert data in the correct order to follow system endian.
-> 
-> Also drop the cpu_to_be32 for CRC calculation as it's wrong and use
-> get_unaligned_be32 instead. The word is taken from firmware and is
-> always LE, the mailbox will emit a BE CRC from BE word hence the
-> word needs to be swapped on u8 to u32 cast on LE system.
-> This is needed as crc_ccitt_false will recast u32 to u8 and read order
-> changes between BE and LE system. By using get_unaligned_be32, word is
-> swapped only when needed resulting in the correct CRC calculated.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202311210414.sEJZjlcD-lkp@intel.com/
-> Fixes: e93984ebc1c8 ("net: phy: aquantia: add firmware load support")
-> Tested-by: Robert Marko <robimarko@gmail.com> # ipq8072 LE device
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v2:
-> - Add further explaination in commit description
-> - Fix wrong CRC conversion and swap only when needed
-> 
->  drivers/net/phy/aquantia/aquantia_firmware.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
-> index c5f292b1c4c8..c12e8a3acb77 100644
-> --- a/drivers/net/phy/aquantia/aquantia_firmware.c
-> +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
-> @@ -93,9 +93,9 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
->  	u16 crc = 0, up_crc;
->  	size_t pos;
->  
-> -	/* PHY expect addr in LE */
-> -	addr = (__force u32)cpu_to_le32(addr);
-> -
-> +	/* PHY expect addr in LE. Hardcoded addr in defines are
-> +	 * already in this format.
-> +	 */
 
-Please fix this comment. No, the address is not in LE. You program the
-address into a register in the PHY. Bit 0 of the register is bit 0 of
-the data field on the MDIO bus, and bit 0 of the value passed to
-phy_write_mmd() which is in CPU endian. Bit 15 of the register is bit
-15 of the data field on the MDIO bus, which is bit 15 of the value
-passed to phy_write_mmd().
+Fixes should be independent of reformat and refactorings. Please add
+necessary Fixes tags and decouple the non-fixes part of patchset.
 
-So the talk of "LE" here is meaningless. Please stop over-complicating
-this.
+Also, don't forget about net-next patch subject.
 
->  	phy_write_mmd(phydev, MDIO_MMD_VEND1,
->  		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
->  		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
-> @@ -113,7 +113,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
->  		u32 word;
->  
->  		/* FW data is always stored in little-endian */
-> -		word = get_unaligned((const u32 *)(data + pos));
-> +		word = get_unaligned_le32((const u32 *)(data + pos));
+Best regards,
+Krzysztof
 
-This comment is appropriate, and get_unaligned_le32() is correct.
-
->  
->  		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE5,
->  			      VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(word));
-> @@ -125,10 +125,10 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
->  			      VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE);
->  
->  		/* calculate CRC as we load data to the mailbox.
-> -		 * We convert word to big-endian as PHY is BE and mailbox will
-> +		 * We read word as big-endian as PHY is BE and mailbox will
->  		 * return a BE CRC.
-
-Is that true (about returning a BE CRC) ?
-
->  		 */
-> -		word = (__force u32)cpu_to_be32(word);
-> +		word = get_unaligned_be32((const u32 *)(data + pos));
->  		crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
->  	}
-
-And you _still_ haven't taken on board my issue with this, sigh. No,
-this will be subject to variation in result from CPU endianness.
-
-For the sake of your education on the first point, do this:
-
-	u16 le_crc = 0, be_crc = 0, up_crc;
-
-...
-		le_crc = crc_ccitt_false(le_crc, (u8 *)&word, sizeof(word));
-		word = get_unaligned_be32((const u32 *)(data + pos));
-		be_crc = crc_ccitt_false(be_crc, (u8 *)&word, sizeof(word));
-	}
-
-	printk("le_crc=0x%04x be_crc=0x%04x\n", le_crc, be_crc);
-
-What you will find is that the two CRCs are _totally_ different - not
-just different in endian, but different in value as well. The endianness
-of the input data does not simply change the endianness of the resulting
-CRC, it will change the value.
-
-So, returning a "BE CRC" has no bearing on whether the data passed to
-the CRC function needs to be in big endian order or not.
-
-On the second point, as I have stated numerous times, and it seems I'm
-not getting anywhere with:
-
-
-	u32 word;
-	int i;
-	u8 *p;
-
-	word = 0x01020304;
-
-	p = (u8 *)&word;
-
-	for (i = 0; i < sizeof(word); i++)
-		printf("p[%d] = %02x\n", i, p[i]);
-
-on little endian machines will print:
-
-p[0] = 0x01
-p[1] = 0x02
-p[2] = 0x03
-p[3] = 0x04
-
-but on big endian machines will print:
-
-p[0] = 0x04
-p[1] = 0x03
-p[2] = 0x02
-p[3] = 0x01
-
-The order in which you provide the bytes to a CRC function will change
-the CRC value. So, the endianness of the machine/CPU your code will be
-running on will change the resulting CRC.
-
-Your code is buggy.
-
-I've given you solutions to it, but you are very resistant to these
-suggestions.
-
-I know endianness can be difficult to those who don't understand it,
-but I've described it numerous times, complete with code examples to
-show how things change - including for the above issue. It seems I'm
-demonstrably waiting my time because it's having very little effect.
-
-Therefore, quite simply, NAK to this patch.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
