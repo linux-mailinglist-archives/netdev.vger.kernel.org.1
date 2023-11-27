@@ -1,103 +1,107 @@
-Return-Path: <netdev+bounces-51312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C2D7FA110
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:28:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BD247FA12E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:37:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAF81F20CD5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:28:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E01D6B20C64
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CCA2EAF9;
-	Mon, 27 Nov 2023 13:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073502F87F;
+	Mon, 27 Nov 2023 13:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JRzzzBUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4091D4B
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:27:58 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1r7beF-0001b0-KC; Mon, 27 Nov 2023 14:27:39 +0100
-Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1r7beE-00BxH9-MI; Mon, 27 Nov 2023 14:27:38 +0100
-Received: from pza by lupine with local (Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1r7beE-000DEU-1v;
-	Mon, 27 Nov 2023 14:27:38 +0100
-Message-ID: <9b3cdf0da11d59579cbf3ffe959c2a4ebba5672d.camel@pengutronix.de>
-Subject: Re: [RFC PATCH 8/8] net: ethernet: mtk_eth_soc: add paths and
- SerDes modes for MT7988
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Daniel Golle <daniel@makrotopia.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
- Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- John Crispin <john@phrozen.org>,  Sean Wang <sean.wang@mediatek.com>, Mark
- Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,  AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,  Russell King
- <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>,
- netdev@vger.kernel.org,  devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org,  linux-phy@lists.infradead.org
-Date: Mon, 27 Nov 2023 14:27:38 +0100
-In-Reply-To: <cad139116f916ae4f63d3df9900835af3f6b5cd2.1699565880.git.daniel@makrotopia.org>
-References: <cover.1699565880.git.daniel@makrotopia.org>
-	 <cad139116f916ae4f63d3df9900835af3f6b5cd2.1699565880.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F90B8;
+	Mon, 27 Nov 2023 05:37:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dCgnYA2BHI8R6kOuu4v1Rr1eB4wzNkIiBg2MOXwz+BY=; b=JRzzzBURcil9rlFybupVTuue/j
+	mpbF6lr8Dcw5ofoEFFGxD5Qh9rXJY8GaHgh5vRr2xC8FrVhiZfvcKPIi+W76VSd0plT6ieKlZwQnK
+	QF7ihjEeC42ugiVrnAQ2E5G3JcsJrx9A7KCqcmU58xyTbzoI6JgCab42kz8g1eaZAKTU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r7bnx-001LUS-N5; Mon, 27 Nov 2023 14:37:41 +0100
+Date: Mon, 27 Nov 2023 14:37:41 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n_N=2ERodriguez?= <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: microchip_t1s: add support for LAN867x Rev.C1
+Message-ID: <f25ed798-e116-4f6f-ad3c-5060c7d540d0@lunn.ch>
+References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
+ <20231127104045.96722-3-ramon.nordin.rodriguez@ferroamp.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127104045.96722-3-ramon.nordin.rodriguez@ferroamp.se>
 
-On Do, 2023-11-09 at 21:52 +0000, Daniel Golle wrote:
-> MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
-> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
-> 2500Base-X, 1000Base-X and Cisco SGMII interface modes.
->=20
-> Implement support for configuring for the new paths to SerDes interfaces
-> and the internal 2.5G PHY.
->=20
-> Add USXGMII PCS driver for 10GBase-R, 5GBase-R and USXGMII mode, and
-> setup the new PHYA on MT7988 to access the also still existing old
-> LynxI PCS for 1000Base-X, 2500Base-X and Cisco SGMII PCS interface
-> modes.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-[...]
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/et=
-hernet/mediatek/mtk_eth_soc.h
-> index 9ae3b8a71d0e6..ba5998ef7965e 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-> @@ -15,6 +15,7 @@
->  #include <linux/u64_stats_sync.h>
->  #include <linux/refcount.h>
->  #include <linux/phylink.h>
-> +#include <linux/reset.h>
+>  #define PHY_ID_LAN867X_REVB1 0x0007C162
+> +#define PHY_ID_LAN867X_REVC1 0x0007C164
 
-I can't see what this is required for?
+So there is a gap in the revisions. Maybe a B2 exists?
 
-regards
-Philipp
+> +static int lan867x_revc1_read_fixup_value(struct phy_device *phydev, u16 addr)
+> +{
+> +	int regval;
+> +	/* The AN pretty much just states 'trust us' regarding these magic vals */
+> +	const u16 magic_or = 0xE0;
+> +	const u16 magic_reg_mask = 0x1F;
+> +	const u16 magic_check_mask = 0x10;
+
+Reverse christmass tree please. Longest first, shorted last.
+
+> +	regval = lan865x_revb0_indirect_read(phydev, addr);
+> +	if (regval < 0)
+> +		return regval;
+> +
+> +	regval &= magic_reg_mask;
+> +
+> +	return (regval & magic_check_mask) ? regval | magic_or : regval;
+> +}
+> +
+> +static int lan867x_revc1_config_init(struct phy_device *phydev)
+> +{
+> +	int err;
+> +	int regval;
+> +	u16 override0;
+> +	u16 override1;
+> +	const u16 override_addr0 = 0x4;
+> +	const u16 override_addr1 = 0x8;
+> +	const u8 index_to_override0 = 2;
+> +	const u8 index_to_override1 = 3;
+
+Same here.
+
+> +
+> +	err = lan867x_wait_for_reset_complete(phydev);
+> +	if (err)
+> +		return err;
+> +
+> +	/* The application note specifies a super convenient process
+> +	 * where 2 of the fixup regs needs a write with a value that is
+> +	 * a modified result of another reg read.
+> +	 * Enjoy the magic show.
+> +	 */
+
+I really do hope that by revision D1 they get the firmware sorted out
+so none of this undocumented magic is needed.
+
+	Andrew
 
