@@ -1,178 +1,152 @@
-Return-Path: <netdev+bounces-51180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32FB17F96B5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 01:05:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DFAB7F96D2
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 01:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55F5D1C20831
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:05:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07CDC280D7A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 00:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59034362;
-	Mon, 27 Nov 2023 00:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63525362;
+	Mon, 27 Nov 2023 00:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="NaulhuTw";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IddQoC+7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKQFC30U"
 X-Original-To: netdev@vger.kernel.org
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99351FB;
-	Sun, 26 Nov 2023 16:04:57 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 8E18F5807BE;
-	Sun, 26 Nov 2023 19:04:53 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Sun, 26 Nov 2023 19:04:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm3; t=1701043493; x=1701050693; bh=UG
-	Nk44U4jmXOJ/AcIH3TlGvpqXW3QFjzprbde8gLJZU=; b=NaulhuTwyiNqIMbSl8
-	cyVa+7RWp/OPWxg3O6P76LZYVLpu1kn9SSue+Gawi6CCJnxzv/34X+Dje+wkdcH1
-	f8LbXnkQwglIhjYZ5xLYDHHiXJejykMtIaKkvynrpBp806WZFNj1LAlKuObSyZhx
-	yBXlqxjT6mkV+9AlVfDMXlXc+3pvahR790j3p7HWy4LXsLquJbbGhI0IBPPtvwkk
-	m06RNfkcOqs46d46Op1KamrJp9AFX8G2XRjcSUZ6whvllI9SdGkV45OEdy7KStJb
-	l7/BlGCzViVsjjzLmFhXKj5mc6sx1w8CCxCV1VAFj8d64QeWkPOwH/TUNcUN+cj4
-	Z4Fw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1701043493; x=1701050693; bh=UGNk44U4jmXOJ
-	/AcIH3TlGvpqXW3QFjzprbde8gLJZU=; b=IddQoC+7h+piTRX4O77oxs63wgeJ/
-	qQnXeFocUrafGEluooWeaacpsCbDVfmdZuE4tsjVFdeVqbb5pBhzuOIjeP8npVRu
-	rIveoi2kbsn9DsEuo98IuOaOda6yDqAHriusUOrL/l0e72i6Nn9UkmlHN6DPGKZZ
-	lpopZKJC7so4PuhVBw0ANM3hoH3xpte6LkxKztaZTx+dPA496kw//3jrzxW8F6ZF
-	mna5ObqhhpOf88uguLewL6PNO15mHOs8bpMYXVB6LfWRmRbKxnXzrRwau+yIvQ3W
-	SAHtD0C6guqpxbuH+2NfaKPBFSUxLropKwdtGyEDIDPvaOgNbjzwy8XHA==
-X-ME-Sender: <xms:JN1jZYB8lkRG4HvbGfVVyl63D6gCGn9Vy6pqBUHi1bZaXcEVSOdFGA>
-    <xme:JN1jZage5HU5HK2QOTcsYn1zmUjds4J1h2TBFXRg0qHFZvInr-sJ3n0iUzhka-3rx
-    QbjlCDDn-m1u86J_Q>
-X-ME-Received: <xmr:JN1jZblV7A9gPrV_VYyDnqvA5U1eL2YjD67We8yizuvZfUeJJKItobc6vEA0YDfmfB-48OZoRIU96Vb5x8T6iNb-KD-kbfdmqv717jjKQfjxsHmEj1YDFtJIiTQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeitddgudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddt
-    tddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepvdefkeetuddufeeigedtheefffekuedukeehudffudfffffg
-    geeitdetgfdvhfdvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:JN1jZewhFNYrH3CWZo3e6cDOkL-r3TE0Y62hP4FPt5KiaEMaV6VPhg>
-    <xmx:JN1jZdQ94GZwV7HD3rNVtmbhQWKh6EvZgaR4qqWYMnrJSZSSakv0Aw>
-    <xmx:JN1jZZZnXZ1yJmMlvYfD_FqJhTP2Fpd4oOmFJLWNmdMHC0IjITNloA>
-    <xmx:Jd1jZeSaCF8iY51kKfXZA8wE1Q39ayvlE32l--qTjttdD6eITauZIA>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 26 Nov 2023 19:04:50 -0500 (EST)
-Date: Sun, 26 Nov 2023 18:04:49 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: Yonghong Song <yonghong.song@linux.dev>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	antony.antony@secunet.com, Mykola Lysenko <mykolal@fb.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, devel@linux-ipsec.org, 
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
- CO-RE relocations
-Message-ID: <uc5fv3keghefszuvono7aclgtjtgjnnia3i54ynejmyrs42ser@bwdpq5gmuvub>
-References: <cover.1700676682.git.dxu@dxuuu.xyz>
- <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
- <0f210cef-c6e9-41c1-9ba8-225f046435e5@linux.dev>
- <CAADnVQ+sEsUyNYPeZyOf2PcCnxOvOqw4bUuAuMofCU14szTGvg@mail.gmail.com>
- <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
- <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C21F0;
+	Sun, 26 Nov 2023 16:29:40 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b3e2f8ec5so13275655e9.1;
+        Sun, 26 Nov 2023 16:29:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701044979; x=1701649779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DcFK3Yx/QJzJGb4Zmy6oTVxw1trZEcqb4ZIR/f9ub9Q=;
+        b=hKQFC30UIayOeZXvEVmqCFwKlHxR6t5H5FgNSDtOlDbIlohCM7ensc4jWJOWvZ5Vh5
+         5z6vr9Mzl6dJL3rT19Hd2BUCKPXyTtg7GjkhvPoh6Zt7XuguPGNJWrZy5vm5nRpf0hS2
+         xs6kY8sj6304tNaAkAwD43+JdLfZvXFWwORvyMQzbJTQepK8kI9Yt7BNyU6u2E6qX352
+         6La0wlzbraFspunXwMS9U1Rz0fZLcOW8PQROPVIz0QjTHJS918VsFY3LlSqHDUi9b+Gc
+         5DGUh7zsBiMF95IFjvtWdv5sTP4AnRT7ISpn4SdtCP+I8DBOunc+EFUtQj6tPbM8ebNs
+         QqgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701044979; x=1701649779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DcFK3Yx/QJzJGb4Zmy6oTVxw1trZEcqb4ZIR/f9ub9Q=;
+        b=YrZ/E/FGGU9Gs6/sMW60KmpiU171w5kdMsOmdbZXujrptotjrw1ALgKHSLRvac4QLR
+         j8hRX5mXZjTjpDW8W9jlycwIuLDzlWo83wgjchIsRak0UKbqhSdkRxcHhj+cusomeUFe
+         suqGJXgYK0UZN829BnwqxjZJ0MG4e7JUDEV+lFF6zbhfWknk7N3anjEptkWzVv3Q/P4C
+         g/yn8EvNQaaE7jzZYuYJm9OAlzEVd3PWXxTC3TrRtoKHsDllldT+gF/uCM/oqPn/xWsW
+         oirmZWxxNn2+6fzjV1kXkbb9qV1As6mm6RcHtlANW77G0PF5J11Ds/zXHvyRW2UgmlVs
+         1K6g==
+X-Gm-Message-State: AOJu0YzjI++T8Re8iDbAt9XGA+Dxpgurt+wJ9i5MX5hWIgq7MOXEryuT
+	UETQUb3dLHeQjkZb+zLBDbA=
+X-Google-Smtp-Source: AGHT+IH0uBaB84sBRQtoWIfccLD7ghqlg8zpRMgxbcaK9sc6DFlpjLI23tKsMbLa2qjtf4jbMPK3yA==
+X-Received: by 2002:a05:600c:1d24:b0:408:3696:3d51 with SMTP id l36-20020a05600c1d2400b0040836963d51mr7524526wms.4.1701044978625;
+        Sun, 26 Nov 2023 16:29:38 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id i12-20020a05600c354c00b004060f0a0fd5sm11738625wmq.13.2023.11.26.16.29.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Nov 2023 16:29:38 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: kernel test robot <lkp@intel.com>
+Subject: [net-next PATCH v2] net: phy: aquantia: drop wrong endianness conversion for addr and CRC
+Date: Mon, 27 Nov 2023 01:29:24 +0100
+Message-Id: <20231127002924.22384-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On further testing on BE target with kernel test robot, it was notice
+that the endianness conversion for addr and CRC in fw_load_memory was
+wrong and actually not needed. Values in define doesn't get converted
+and are passed as is and hardcoded values are already in what the PHY
+require, that is LE.
 
-On Sun, Nov 26, 2023 at 10:14:21PM +0200, Eduard Zingerman wrote:
-> On Sat, 2023-11-25 at 20:22 -0800, Yonghong Song wrote:
-> [...]
-> > --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-> > +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-> > @@ -6,7 +6,10 @@
-> >    * modify it under the terms of version 2 of the GNU General Public
-> >    * License as published by the Free Software Foundation.
-> >    */
-> > -#define BPF_NO_PRESERVE_ACCESS_INDEX
-> > +#if __has_attribute(preserve_static_offset)
-> > +struct __attribute__((preserve_static_offset)) erspan_md2;
-> > +struct __attribute__((preserve_static_offset)) erspan_metadata;
-> > +#endif
-> >   #include "vmlinux.h"
-> [...]
-> >   int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
-> > @@ -174,9 +177,13 @@ int erspan_set_tunnel(struct __sk_buff *skb)
-> >          __u8 hwid = 7;
-> >   
-> >          md.version = 2;
-> > +#if __has_attribute(preserve_static_offset)
-> >          md.u.md2.dir = direction;
-> >          md.u.md2.hwid = hwid & 0xf;
-> >          md.u.md2.hwid_upper = (hwid >> 4) & 0x3;
-> > +#else
-> > +       /* Change bit-field store to byte(s)-level stores. */
-> > +#endif
-> >   #endif
-> >   
-> >          ret = bpf_skb_set_tunnel_opt(skb, &md, sizeof(md));
-> > 
-> > ====
-> > 
-> > Eduard, could you double check whether this is a valid use case
-> > to solve this kind of issue with preserve_static_offset attribute?
-> 
-> Tbh I'm not sure. This test passes with preserve_static_offset
-> because it suppresses preserve_access_index. In general clang
-> translates bitfield access to a set of IR statements like:
-> 
->   C:
->     struct foo {
->       unsigned _;
->       unsigned a:1;
->       ...
->     };
->     ... foo->a ...
-> 
->   IR:
->     %a = getelementptr inbounds %struct.foo, ptr %0, i32 0, i32 1
->     %bf.load = load i8, ptr %a, align 4
->     %bf.clear = and i8 %bf.load, 1
->     %bf.cast = zext i8 %bf.clear to i32
-> 
-> With preserve_static_offset the getelementptr+load are replaced by a
-> single statement which is preserved as-is till code generation,
-> thus load with align 4 is preserved.
-> 
-> On the other hand, I'm not sure that clang guarantees that load or
-> stores used for bitfield access would be always aligned according to
-> verifier expectations.
-> 
-> I think we should check if there are some clang knobs that prevent
-> generation of unaligned memory access. I'll take a look.
+Use get_unaligned_le32 instead of get_unaligned for FW data word load to
+correctly convert data in the correct order to follow system endian.
 
-Is there a reason to prefer fixing in compiler? I'm not opposed to it,
-but the downside to compiler fix is it takes years to propagate and
-sprinkles ifdefs into the code.
+Also drop the cpu_to_be32 for CRC calculation as it's wrong and use
+get_unaligned_be32 instead. The word is taken from firmware and is
+always LE, the mailbox will emit a BE CRC from BE word hence the
+word needs to be swapped on u8 to u32 cast on LE system.
+This is needed as crc_ccitt_false will recast u32 to u8 and read order
+changes between BE and LE system. By using get_unaligned_be32, word is
+swapped only when needed resulting in the correct CRC calculated.
 
-Would it be possible to have an analogue of BPF_CORE_READ_BITFIELD()?
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202311210414.sEJZjlcD-lkp@intel.com/
+Fixes: e93984ebc1c8 ("net: phy: aquantia: add firmware load support")
+Tested-by: Robert Marko <robimarko@gmail.com> # ipq8072 LE device
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v2:
+- Add further explaination in commit description
+- Fix wrong CRC conversion and swap only when needed
 
-Thanks,
-Daniel
+ drivers/net/phy/aquantia/aquantia_firmware.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
+index c5f292b1c4c8..c12e8a3acb77 100644
+--- a/drivers/net/phy/aquantia/aquantia_firmware.c
++++ b/drivers/net/phy/aquantia/aquantia_firmware.c
+@@ -93,9 +93,9 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+ 	u16 crc = 0, up_crc;
+ 	size_t pos;
+ 
+-	/* PHY expect addr in LE */
+-	addr = (__force u32)cpu_to_le32(addr);
+-
++	/* PHY expect addr in LE. Hardcoded addr in defines are
++	 * already in this format.
++	 */
+ 	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+ 		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
+ 		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
+@@ -113,7 +113,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+ 		u32 word;
+ 
+ 		/* FW data is always stored in little-endian */
+-		word = get_unaligned((const u32 *)(data + pos));
++		word = get_unaligned_le32((const u32 *)(data + pos));
+ 
+ 		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE5,
+ 			      VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(word));
+@@ -125,10 +125,10 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+ 			      VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE);
+ 
+ 		/* calculate CRC as we load data to the mailbox.
+-		 * We convert word to big-endian as PHY is BE and mailbox will
++		 * We read word as big-endian as PHY is BE and mailbox will
+ 		 * return a BE CRC.
+ 		 */
+-		word = (__force u32)cpu_to_be32(word);
++		word = get_unaligned_be32((const u32 *)(data + pos));
+ 		crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
+ 	}
+ 
+-- 
+2.40.1
+
 
