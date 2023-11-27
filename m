@@ -1,125 +1,154 @@
-Return-Path: <netdev+bounces-51448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71487FA9CB
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:07:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A55C27FA9D4
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 621B1280A4D
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:07:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 129F5B214C1
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627DA4654E;
-	Mon, 27 Nov 2023 19:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D773B3DB96;
+	Mon, 27 Nov 2023 19:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZzWwV2o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D192F131
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:03 -0800 (PST)
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ARIBfII015041
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:03 -0800
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3umxpm96r1-16
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:06:03 -0800
-Received: from twshared15991.38.frc1.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 27 Nov 2023 11:04:51 -0800
-Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
-	id 11BE13C35FC69; Mon, 27 Nov 2023 11:04:45 -0800 (PST)
-From: Andrii Nakryiko <andrii@kernel.org>
-To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
-        <brauner@kernel.org>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-        <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
-Subject: [PATCH v11 bpf-next 17/17] bpf,selinux: allocate bpf_security_struct per BPF token
-Date: Mon, 27 Nov 2023 11:04:09 -0800
-Message-ID: <20231127190409.2344550-18-andrii@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231127190409.2344550-1-andrii@kernel.org>
-References: <20231127190409.2344550-1-andrii@kernel.org>
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B9AD5F;
+	Mon, 27 Nov 2023 11:07:38 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-67a0d865738so22666106d6.1;
+        Mon, 27 Nov 2023 11:07:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701112057; x=1701716857; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LLe8zyLFZgO8E8/Xnv13NYYU8sH315XPm4/jwQIsx+4=;
+        b=PZzWwV2oj9t4f9gXMxV7ANLZhWB9ZWl45Dw4IGuT1sw6Ff922vh4TNet81EiZTvmjs
+         9ichYeqbgqX3q9jpA8qVXtJTom+b5a+sxzj42O7XCajJvjDezMv8fzMDEzBrG4F74q9h
+         oX23YPD5fHN9K3AuE7Lj2PDjfgE7ahBrrsm77p0DYx4eb9fbsCcSejuSQeaq1jpX/q0u
+         iY6bTUkxCPCZe06V08Lc+3+GUX021pOrRjJ3FpGZsIgbhbB8YEO1/R8sYuL1fjHLKHQO
+         V1fd7VOAZui36p7nCVTHGkLLX46hLR+OP4HkdvRzqoT56OCJ2NIhFlyUMiRRVoHpyzR/
+         mUIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701112057; x=1701716857;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LLe8zyLFZgO8E8/Xnv13NYYU8sH315XPm4/jwQIsx+4=;
+        b=cuY59jxMt5wtBP49AU41b5T3OfDGg6rHQQT154pM9F8ZJ/qcEsjMNLwRFliCOOVFz1
+         uCal7davnBOJFfHErXyFF1VTpKtYgPYXUdH48K0OW2OYzDJ8udQWplYwchBfSKoM8PO5
+         COrO66wa/3aj6Hwa6QB58o0uFfLZcWQH5hacHSQy5lgjDFKQ3oCCsasSDPxCodfWCwcc
+         qFdbzBoxy2YAgnSKVuPLhCbfj1wfOAYUY9TJx0FsrgYSlx5EeBRzC6V2dJpcpHXScPiO
+         Tsrao4NHvMxu9XUZZygxEZsgFX/CkYo8kVOzHw/6nDxYWRaNFC4e9ZHTQma3l7nzIoUC
+         w5jg==
+X-Gm-Message-State: AOJu0YzmMaobueepDMngR/VjCi3GqdmxNKdm06pNUUUKQ0fD89ZLGF8D
+	6UpYuScn5MiKAtBPVQIWIp0=
+X-Google-Smtp-Source: AGHT+IEyqrTPi4tcihQ0aoHUT5WqvQaE8Tn+OoHt+F0iQ9j+N9Jc8CvmwCHU5aTxqcYjik3V7Ca4CQ==
+X-Received: by 2002:ad4:5b8b:0:b0:67a:1d5c:5486 with SMTP id 11-20020ad45b8b000000b0067a1d5c5486mr13406845qvp.36.1701112057624;
+        Mon, 27 Nov 2023 11:07:37 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id ph3-20020a0562144a4300b0067a4b5f4269sm752417qvb.141.2023.11.27.11.07.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 11:07:36 -0800 (PST)
+Message-ID: <44a4e759-02fc-4015-90a8-c41eb7cb3dc1@gmail.com>
+Date: Mon, 27 Nov 2023 11:07:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: frKtdoLhNsv3y2A_O14W2obvImyVkmaF
-X-Proofpoint-ORIG-GUID: frKtdoLhNsv3y2A_O14W2obvImyVkmaF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-27_17,2023-11-27_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ
+ affinity on HT cores
+Content-Language: en-US
+To: Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
+ <haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
+ "sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
+ "leon@kernel.org" <leon@kernel.org>,
+ "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ Paul Rosswurm <paulros@microsoft.com>
+References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <20231121154841.7fc019c8@kernel.org>
+ <PUZP153MB0788476CD22D5AA2ECDC11ABCCBDA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <PUZP153MB0788476CD22D5AA2ECDC11ABCCBDA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Utilize newly added bpf_token_create/bpf_token_free LSM hooks to
-allocate struct bpf_security_struct for each BPF token object in
-SELinux. This just follows similar pattern for BPF prog and map.
+On 11/27/23 01:36, Souradeep Chakrabarti wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Jakub Kicinski <kuba@kernel.org>
+>> Sent: Wednesday, November 22, 2023 5:19 AM
+>> To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+>> Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+>> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+>> <decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
+>> pabeni@redhat.com; Long Li <longli@microsoft.com>;
+>> sharmaajay@microsoft.com; leon@kernel.org; cai.huoqing@linux.dev;
+>> ssengar@linux.microsoft.com; vkuznets@redhat.com; tglx@linutronix.de; linux-
+>> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linux-rdma@vger.kernel.org; Souradeep Chakrabarti
+>> <schakrabarti@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>
+>> Subject: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ affinity on
+>> HT cores
+>>
+>> On Tue, 21 Nov 2023 05:54:37 -0800 Souradeep Chakrabarti wrote:
+>>> Existing MANA design assigns IRQ to every CPUs, including sibling
+>>> hyper-threads in a core. This causes multiple IRQs to work on same CPU
+>>> and may reduce the network performance with RSS.
+>>>
+>>> Improve the performance by adhering the configuration for RSS, which
+>>> assigns IRQ on HT cores.
+>>
+>> Drivers should not have to carry 120 LoC for something as basic as spreading IRQs.
+>> Please take a look at include/linux/topology.h and if there's nothing that fits your
+>> needs there - add it. That way other drivers can reuse it.
+> Because of the current design idea, it is easier to keep things inside
+> the mana driver code here. As the idea of IRQ distribution here is :
+> 1)Loop through interrupts to assign CPU
+> 2)Find non sibling online CPU from local NUMA and assign the IRQs
+> on them.
+> 3)If number of IRQs is more than number of non-sibling CPU in that
+> NUMA node, then assign on sibling CPU of that node.
+> 4)Keep doing it till all the online CPUs are used or no more IRQs.
+> 5)If all CPUs in that node are used, goto next NUMA node with CPU.
+> Keep doing 2 and 3.
+> 6) If all CPUs in all NUMA nodes are used, but still there are IRQs
+> then wrap over from first local NUMA node and continue
+> doing 2, 3 4 till all IRQs are assigned.
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
----
- security/selinux/hooks.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+You are describing the logic of what is done by the driver which is not 
+responding to Jakub's comment. His request is to consider coming up with 
+at least a somewhat usable and generic helper for other drivers to use.
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 002351ab67b7..1501e95366a1 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6828,6 +6828,29 @@ static void selinux_bpf_prog_free(struct bpf_prog =
-*prog)
- 	prog->aux->security =3D NULL;
- 	kfree(bpfsec);
- }
-+
-+static int selinux_bpf_token_create(struct bpf_token *token, union bpf_a=
-ttr *attr,
-+				    struct path *path)
-+{
-+	struct bpf_security_struct *bpfsec;
-+
-+	bpfsec =3D kzalloc(sizeof(*bpfsec), GFP_KERNEL);
-+	if (!bpfsec)
-+		return -ENOMEM;
-+
-+	bpfsec->sid =3D current_sid();
-+	token->security =3D bpfsec;
-+
-+	return 0;
-+}
-+
-+static void selinux_bpf_token_free(struct bpf_token *token)
-+{
-+	struct bpf_security_struct *bpfsec =3D token->security;
-+
-+	token->security =3D NULL;
-+	kfree(bpfsec);
-+}
- #endif
-=20
- struct lsm_blob_sizes selinux_blob_sizes __ro_after_init =3D {
-@@ -7183,6 +7206,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- 	LSM_HOOK_INIT(bpf_prog, selinux_bpf_prog),
- 	LSM_HOOK_INIT(bpf_map_free, selinux_bpf_map_free),
- 	LSM_HOOK_INIT(bpf_prog_free, selinux_bpf_prog_free),
-+	LSM_HOOK_INIT(bpf_token_free, selinux_bpf_token_free),
- #endif
-=20
- #ifdef CONFIG_PERF_EVENTS
-@@ -7241,6 +7265,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- #ifdef CONFIG_BPF_SYSCALL
- 	LSM_HOOK_INIT(bpf_map_create, selinux_bpf_map_create),
- 	LSM_HOOK_INIT(bpf_prog_load, selinux_bpf_prog_load),
-+	LSM_HOOK_INIT(bpf_token_create, selinux_bpf_token_create),
- #endif
- #ifdef CONFIG_PERF_EVENTS
- 	LSM_HOOK_INIT(perf_event_alloc, selinux_perf_event_alloc),
---=20
-2.34.1
+This also begs the obvious question: why is all of this in the kernel in 
+the first place? What could not be accomplished by an initramfs/ramdisk 
+with minimal user-space responsible for parsing the system node(s) 
+topology and CPU and assign interrupts accordingly?
+
+We all like when things "automagically" work but this is conflating 
+mechanism (supporting interrupt affinities) with policy (assigning 
+affinities based upon work load) and that never flies really well.
+-- 
+Florian
 
 
