@@ -1,146 +1,111 @@
-Return-Path: <netdev+bounces-51394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DBB87FA84F
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:51:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089117FA86A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:57:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6079D1C20904
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:51:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69055B20F4E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5C73A8FA;
-	Mon, 27 Nov 2023 17:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F0F3BB36;
+	Mon, 27 Nov 2023 17:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pBe5UHLK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UfbNmY3D"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC31E198;
-	Mon, 27 Nov 2023 09:50:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aKnp6lQA48cKSw6XZs1BqDy52P7agehpGOmotj33qiQq/Nw6pZHyNVrEpuuvevhEs+QtvLZyGflsK202Y/Xhz6TgFonzBblirKpdAFV4S1AIvoFFj1mei5UxIf0jTENc+JunIg8pYff4baLRmHETBhkMOcW4uEZPFA9lQil6J0HNK9H2ihrSJ0ME3k6shnSK3FrWZBDleUihcnUV0By6uHHVZZCnLllYw/umWcath7JBQ4T6RE+D/+KxUDjV2hBZuK/z2V/nXqfRMaV4ZVjwGw2NGM99bo+MbpNUNYN/Yv235ojfWA/fvstSMycBXTelN4PU4NBokqyHH9Clk890LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GY0wcNBWy4I2Z3rdShI5IWJUs0AYRuNoQfDwT9AkH3c=;
- b=KJfXxdyNuIf0W7xePZfYKkYy2rWKIzw2swnfeN5z0wwQ9XXzHLNDOPs9k3AXtBAg0NjI5AG1xWeGgUPVcm17gT1GH9QLdQkD9Mlzs4eOZWVKCENeBXKpIOB4Cvuir8bR3zFEgqmsXK7tFmylZiEYPQ0FX219YFqLs4fRhxd3iGwTEnxv9wOP7cQ4ZTE96gMBFvAH0ahJwujTYdkx2erNW1qJv0/HdZrbQomZXSlx4VoFhm0CXrNI9rFm0Hvg6qAUicw1D1x8QlbVw7y0UJmcVDtECgx9aPpUvcFefzbhObO2UHAFuOJJjAm8AcLnuHrV4vaDi4liMBiCJle/D4KZQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GY0wcNBWy4I2Z3rdShI5IWJUs0AYRuNoQfDwT9AkH3c=;
- b=pBe5UHLKJBzdmQeEU4GeDkRm61gVIZYrRYHas2Ub9Z5z8YqlXnLMSr1O9tf1DWTu4XsGLt0GeCMbkYrASxUhpLrLfud+S59ikQ1HpzWLB8i203wZEVITOKKywc54pzjjt01DjWUNQ+ClQmm4R/j6bFARFqnIfk3XxFon2ns20sTcyL3Xl+qyWzA/D9avw8j/fXLcDsvtGC+hutLGlmD+qVi1lLsQJ/0neWOr5ClAExOfuJfErMN+qAh+fFPpSzKVLbt7YLaja9sr/LtOaReTZglhyPYTQ/pUUik2Gm7APAZXO1uwPNDLJqDiOOyeqjrlN6no3v9m20BmQwmKlhuaXw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CH3PR12MB8331.namprd12.prod.outlook.com (2603:10b6:610:12f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Mon, 27 Nov
- 2023 17:50:55 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ab86:edf7:348:d117]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ab86:edf7:348:d117%3]) with mapi id 15.20.7025.022; Mon, 27 Nov 2023
- 17:50:55 +0000
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com,  lee@kernel.org,
-  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,  Min Li
- <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v5 1/1] ptp: clockmatrix: support 32-bit
- address space
-References: <PH7PR03MB7064DBC8094260993E1B524BA0B8A@PH7PR03MB7064.namprd03.prod.outlook.com>
-Date: Mon, 27 Nov 2023 09:50:47 -0800
-In-Reply-To: <PH7PR03MB7064DBC8094260993E1B524BA0B8A@PH7PR03MB7064.namprd03.prod.outlook.com>
-	(Min Li's message of "Fri, 24 Nov 2023 15:20:23 -0500")
-Message-ID: <87fs0r84qw.fsf@nvidia.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0190.namprd03.prod.outlook.com
- (2603:10b6:a03:2ef::15) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF4A12C
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 09:57:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1701107823; x=1732643823;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=45mU2Zxm9HBcAp8gHlB5IiaQJ9jodamTV+PylKigDDU=;
+  b=UfbNmY3DsFtVv5t/bKbJL2nlLmKhE6Z12KL3YctKQLtjzMV8wOX2g5y2
+   mwg6wgeM7O/5JQjwfUDbsFRC7wTIvQ0hqR3WRmW0yTZ2vIZiUUzK/oPly
+   dkC6KX9wB4Eq8DgUzIjrw5Ykfiw+I8yClOmCacH3RG1oEsHRnamCxo/Ia
+   o=;
+X-IronPort-AV: E=Sophos;i="6.04,231,1695686400"; 
+   d="scan'208";a="168569045"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 17:57:00 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 66202A0FEC;
+	Mon, 27 Nov 2023 17:56:58 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:46833]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.167:2525] with esmtp (Farcaster)
+ id ba5a46ef-d0c2-4aed-8c2a-f7822352985b; Mon, 27 Nov 2023 17:56:57 +0000 (UTC)
+X-Farcaster-Flow-ID: ba5a46ef-d0c2-4aed-8c2a-f7822352985b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Mon, 27 Nov 2023 17:56:57 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Mon, 27 Nov 2023 17:56:54 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnault@redhat.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <mkubecek@suse.cz>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2] tcp: Dump bound-only sockets in inet_diag.
+Date: Mon, 27 Nov 2023 09:56:43 -0800
+Message-ID: <20231127175643.28505-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <ZWTRLVuFF+575qrI@debian>
+References: <ZWTRLVuFF+575qrI@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CH3PR12MB8331:EE_
-X-MS-Office365-Filtering-Correlation-Id: 40c78e5a-b32c-4862-d2b0-08dbef716772
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	kuE+o/JRswkicDAQQrPDRxalpsY8SZgx+F15+fF2UXaBqy2KufmX9l0K8F2Mz7eIq08dGPCKTCKkHPEyQ8sOc2+v+/VQP08S4O43TgIRSgrkuxSzc0s8msDmDb5Gs5qxroySWIyMYlkDITJhcMC4RPT54CForvT3kYnwx8CS7lU8kzHpsqd7Uu34NDiOd+DjhW9bp8e8fVvwjAVztdwO7oRzjbHFGJjD1vNexUm7WMwerARt/gsWXjKyp0e5nk805Jj6llXckVtS+hY78rzIunJIgUWF/swEZ/Tfhnrzba8Y6pm4D9L0wP2/6rflyeHmOsB9j33SkzcvGtk2l6U30xewwtypVlJGXiAuWepyyKLS2p+s2siMJ5nRghzPLe8f1PSp+ZDEFSqbAW5xQ7qvR3JRBRR8IG6ZQNWLeUymMIlg5eCZruuVKHyR35nNfTlMxHVG8/XlfmeaMjxSPN8Gh7f29QHD4lV3RHA+bXtwPMUuulP8ZlqzsN6MXUIxjOCWKiTuJy04CodwpZszmjnkFjhVdXp8SlblBoFKjzb+H8UFAK4CvOSoKuF1aDBwtVgK
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(346002)(136003)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6666004)(45080400002)(8936002)(8676002)(4326008)(6512007)(6506007)(66556008)(66476007)(66946007)(6916009)(316002)(6486002)(478600001)(2906002)(4744005)(36756003)(38100700002)(41300700001)(86362001)(26005)(2616005)(83380400001)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AiN3567Ixssfgc+sFdOp3E8xXxbg5cd6fdaGSzL+uKEbHsxO07J2geMhWCEM?=
- =?us-ascii?Q?M6PqL44fam0Ov+RRVNqUg4DzpgRwr6P6pJIIn+RG46YQ3VG/bNCAzlqiDSIW?=
- =?us-ascii?Q?9c3NLbsgCA5RxUc8kmkCX+LPIljTfYBOhPooz3QTFhIIS/jGfu2PShiXbMLS?=
- =?us-ascii?Q?lArsR5FcbMhJh/4TIl6gaF1CmB5wUGnZkl4FhOBU3BBhhh6HPIziLbgAHTwl?=
- =?us-ascii?Q?k5FaL3kKPwmswoD8LZB4ZN2mafMT6lNnvnr9Sd967ZB4uzBYCEgZB7RBRXDp?=
- =?us-ascii?Q?ECM8i3VtEk/jRAosCrxCwXLZ74lGg0IW9sWlQOfn5DoD8wtefIWr565lHPRr?=
- =?us-ascii?Q?lAXaKR5etSk5IAHtJZZ1Dy6DvXz2kH2eR1/q4PBrucrsCfisDgQjWm+C2ql1?=
- =?us-ascii?Q?9BKvdSnWI9khBbNQV9P/TFmxP3Qthvmud9ikiVO6J4QbrOCfMYkGBxcLD//2?=
- =?us-ascii?Q?dT1ve7dKHEC9W3teb4Eupq6/lZH9Il1Gq5AqFrPApIJocnvTRHo1vOWu6DZn?=
- =?us-ascii?Q?AYZFUSJDiIt6ITP3lug/41XokML0NUvJKCOQ1ZIrXw1r+sy/1dAOzxefh3mC?=
- =?us-ascii?Q?zML6cfWgE9KVdmKVFUKXs1Mor8ZjsJ03VcMU3qSjGN25P6wJ/sgk33uQiBpO?=
- =?us-ascii?Q?vQLg+D5hCDNve/fjydktEz9X+iSeVwCCVo3PJgPsKIVaH8Xwy2fvTzyhZ9fw?=
- =?us-ascii?Q?7k/c8oWIZ3A5IlJ24/pvNIr65I0DdwNYRCnzasiBRDCcanwGBpcnvgdK+2My?=
- =?us-ascii?Q?xvOhGydGRLS8m0eHeq797VQxss2IoMMVvvIuMcBF9qpjYzqZO5DCH+Rd7uXI?=
- =?us-ascii?Q?AIyVD7TsDOyM/shSLgv/KzHDUIRREJ9hp+wIvBGVLIpOklSFC5fjtI7Sq8+h?=
- =?us-ascii?Q?AQVgwR0cE21InrUpDr5UraYGdvL/5PfNqsj5Ip9Awo6PaM5vVS0RzbzGLT7H?=
- =?us-ascii?Q?x7BsTF/kS/g73QAdpRzzKq3nj492Q02VuvJCwgeB7BHTnzjQnTAIB1jCgw7u?=
- =?us-ascii?Q?3Piujm+pfJvBcUjJPbha9Uo+/BB4mViIME+BEp2WG7gotvzv8oas5SKS20zC?=
- =?us-ascii?Q?KzTT6DgMvvEtyK4DgSNccw0R8MJg+hyzrvUF8oSqO7lAB+yXKcf3FIpilDBY?=
- =?us-ascii?Q?ZAFNFgR4f07rDU7p/RhdmKqx9wjpS6Wkvp1dnSfGbG7ZBJ+jpAHibIIiyRwh?=
- =?us-ascii?Q?3JyC8Zeg7OZ28Mi0yW28XDJa9YXSjx0oyeKUvHl/LuzZdomAOa0JYml2rJ6r?=
- =?us-ascii?Q?/EKv++2riSwgMRbHXA5X6+Vax2xjdyjijkpZkYRjn2YYe7vJ0c1V/xrhw/ja?=
- =?us-ascii?Q?RAI7iEqQfC+M+xZumoXbAPGBSNz/y7ckMqACef2H/8F5I5CWEeQI9QJkU5ft?=
- =?us-ascii?Q?gGzMIIyWrKTvLOe3HlFdRnCOHb8X0xcgpNXg7UcqJjzoj6cc0CRvNKgusduc?=
- =?us-ascii?Q?BvIyq6xYun2gPoN60glpaFe2HAn6FqFNM0jmwK3TBGG+9Ii7xq2Tv2tK6mek?=
- =?us-ascii?Q?7gkTOBFMQaKa0kmaItcpsCYLpnmj77qCNpqr+FW3kmHHPZTKP5EzDi6cwC2X?=
- =?us-ascii?Q?y88Z7E/FGWNskSClKf5uQkAQujVXoupXq3PtO10QFb3B1668ppaM6ix/T+qb?=
- =?us-ascii?Q?OQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40c78e5a-b32c-4862-d2b0-08dbef716772
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 17:50:55.0478
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XZsi6eovg2DFK086zZ9ifiO+0fTwicI7H5tJ+e7owZk5wsuBCqH6jisDZOh3KOIG91sjdEqOxfStH3RH+qHE6w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8331
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On Fri, 24 Nov, 2023 15:20:23 -0500 Min Li <lnimi@hotmail.com> wrote:
-> From: Min Li <min.li.xe@renesas.com>
->
-> We used to assume 0x2010xxxx address. Now that
-> we need to access 0x2011xxxx address, we need
-> to support read/write the whole 32-bit address space.
->
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
-> - Drop MAX_ABS_WRITE_PHASE_PICOSECONDS advised by Rahul
-> - Apply SCSR_ADDR to scrach register in idtcm_load_firmware advised by Simon
-> - Apply u32 to base in idtcm_output_enable advised by Simon
-> - Correct sync_ctrl0/1 parameter position for idtcm_write advised by Simon
-> - Restore adjphase function suggested by Rahul
->
->  drivers/ptp/ptp_clockmatrix.c    |  69 ++--
->  drivers/ptp/ptp_clockmatrix.h    |  32 +-
->  include/linux/mfd/idt8a340_reg.h | 542 ++++++++++++++++---------------
->  3 files changed, 329 insertions(+), 314 deletions(-)
->
+From: Guillaume Nault <gnault@redhat.com>
+Date: Mon, 27 Nov 2023 18:26:05 +0100
+> On Fri, Nov 24, 2023 at 05:39:42PM -0800, Kuniyuki Iwashima wrote:
+> > > +			spin_lock_bh(&ibb->lock);
+> > > +			inet_bind_bucket_for_each(tb2, &ibb->chain) {
+> > > +				if (!net_eq(ib2_net(tb2), net))
+> > > +					continue;
+> > > +
+> > > +				sk_for_each_bound_bhash2(sk, &tb2->owners) {
+> > > +					struct inet_sock *inet = inet_sk(sk);
+> > > +
+> > > +					if (num < s_num)
+> > > +						goto next_bind;
+> > > +
+> > > +					if (sk->sk_state != TCP_CLOSE ||
+> > > +					    !inet->inet_num)
+> > > +						goto next_bind;
+> > > +
+> > > +					if (r->sdiag_family != AF_UNSPEC &&
+> > > +					    r->sdiag_family != sk->sk_family)
+> > > +						goto next_bind;
+> > > +
+> > > +					if (!inet_diag_bc_sk(bc, sk))
+> > > +						goto next_bind;
+> > > +
+> > > +					if (!refcount_inc_not_zero(&sk->sk_refcnt))
+> > > +						goto next_bind;
+> > 
+> > I guess this is copied from the ehash code below, but could
+> > refcount_inc_not_zero() fail for bhash2 under spin_lock_bh() ?
+> 
+> My understanding is that it can't fail, but I prefered to keep the test
+> to be on the safe side.
+> 
+> I can post a v3 using a plain sock_hold(), if you prefer.
 
-Looks good to me.
-
-Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+I prefer sock_hold() because refcount_inc_not_zero() implies that it could
+fail and is confusing if it never fails.
 
