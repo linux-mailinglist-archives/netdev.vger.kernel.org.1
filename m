@@ -1,100 +1,111 @@
-Return-Path: <netdev+bounces-51405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC517FA8C1
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:18:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B45C7FA8C3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A8862816C6
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:18:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581FD1C20945
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 18:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8F03C49B;
-	Mon, 27 Nov 2023 18:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CEC3C49C;
+	Mon, 27 Nov 2023 18:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jy7zGHbe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfDGvv4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DEDF194;
-	Mon, 27 Nov 2023 10:18:03 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77bb668d941so250320685a.3;
-        Mon, 27 Nov 2023 10:18:03 -0800 (PST)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B23219A;
+	Mon, 27 Nov 2023 10:18:30 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50baa7cdf6dso2968748e87.0;
+        Mon, 27 Nov 2023 10:18:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701109082; x=1701713882; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GsGTK2OLrJvt6juuRuNX910QuTvJRVdp20QBvxaUol8=;
-        b=Jy7zGHbeLZ6JmXbg/ir6ai/0xBw+9Z9azAzDaQSGny1u6wADGXkfSn1JFAWDJAKpPT
-         A4nfL8r8y4uv0gdHQq/LFuKaROeINOQdMp18nbiiIvufsSdL9aFwBLCDv3EtfcpIgHwl
-         vqXS2FGjRjlZJhHwal31PF7fMZmulyJMt2lzIEd/odkyWh4ApY+ER5XrIGr+vnocW09p
-         /00g7/WxGFC9kXfFLVi6xi7hNk39bL3Xsj9VPec+yvi1gzQRVs+d+q4p/CSzdxvzvEQ2
-         OiywoXHZD3KGKOt0a6XGGdDjXiI2NMtXw0n5CKsQHAD2YJtYIMsPxfGu0Xl9QOhwF9UX
-         EnFg==
+        d=gmail.com; s=20230601; t=1701109109; x=1701713909; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jo6SKwc0bY8i8SUjlRjEpXwXn1ruEfDXTADvoI5y4Tk=;
+        b=kfDGvv4HehLGMVOnFACiCBZJJAPVGppf7LezHDGbPARluIPVU3IVsBsALaGKqU+WKQ
+         KU6Ppj5C+Ksxz+JdLvrpHvZsDuJqmhV4Fhz30U+mvdbmkIAP1sMLKZXfS5EsNjB0EX27
+         rAjAR4jTqI/qtQ3VdQsfl04Gr8y+2MV3Jb2yLjHjg0DoibPFWaorpUaVoh7hg6QBUZIn
+         RqdZZWB83Gm2OwP7w4s+obEsHJ/talAY/Ai3OjafUWPvW6CosBEQ6Zk71UcFWYdQGYbs
+         aFcI4jIDQ2DzCrPkFQG6Bz69DCd7WShVqg414D4p+nKo/4DSwQxvduuRuHVT4mP7xvEP
+         vBsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701109082; x=1701713882;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GsGTK2OLrJvt6juuRuNX910QuTvJRVdp20QBvxaUol8=;
-        b=lY3CDwwdF7Q4ujl1gqb/s+D54rsQS/8SN9WiWiuER4/5FvKk5ji2nmH6FyxS0oie5e
-         bKSRf2p41/1fbGxW5nkigY8J6WFR/easLDsvlcDwUwke33FJ4XnInKjzWGFGwTLfuIWK
-         acZ+DHlNJKl6W1r7EOhRt/kjm8ldJoel9DkO/aVMle4ZkTH7tpTQt+H2ZxmImgaQd3kt
-         kD3HkED54pXryvN8QX2TpLHyEtFEfwmtTw/vRiJuZ+SvvDV7vIIgLiPuLRI6VotdGC0Z
-         Y/hdbcQuQGkXsAoUwfmwL/1lGDgpHD5BL5Asgvtga1NABO91smR5CFKL+eUO00ROcRh4
-         TSXg==
-X-Gm-Message-State: AOJu0Yy9yA4s6drx+d6jrH0NrfIvuQSLPXI+SzIqZTsn5dqvICI7rVHl
-	ANnQp2j34x3EXCT6dy4tqsw=
-X-Google-Smtp-Source: AGHT+IG4L7etcA53wVQ832m9RBkpQABd3veCfryBv515K5QPpHsAyNH6MFRI+Y/ArlwZr6Gf6ulUdg==
-X-Received: by 2002:ad4:4211:0:b0:671:8df:38f5 with SMTP id k17-20020ad44211000000b0067108df38f5mr14722219qvp.20.1701109082239;
-        Mon, 27 Nov 2023 10:18:02 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id ee5-20020a0562140a4500b0067a22a8564fsm2872202qvb.140.2023.11.27.10.17.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Nov 2023 10:18:01 -0800 (PST)
-Message-ID: <8494d7b2-fe52-483e-9d2d-534040054315@gmail.com>
-Date: Mon, 27 Nov 2023 10:17:58 -0800
+        d=1e100.net; s=20230601; t=1701109109; x=1701713909;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jo6SKwc0bY8i8SUjlRjEpXwXn1ruEfDXTADvoI5y4Tk=;
+        b=VweKnb6i3QsVSZQYe+fIOuyQP1Edrk2Tp2rGnhxuUVIR4Dc5yk3SiGPlt3EzOrIpmZ
+         SEr7QmR5OK9t7pmARma4rp1X2Z0nI6Cfc5nugAl7F/qQftlqzwlABrTOr0wfhGOHpbx/
+         CSwOZqL2yPErNm8FlYn/9+VZEqteUJP4Hw3jEC1ZQrgmo8ksBuQO6RddmXjwwRG603zp
+         +HNVXrf14Ljao+zTmUcslh5GjfLGIi1b9PS3ypmN6M36M3k52psOmCOdRhWzXQgLn+j/
+         a6DtIy5GEbeShs6dpNCQi5vjLvM9dzxWCeAPesdAH+jTYMdd9VTJy2qV2MAv+Zvo6qvh
+         LVzQ==
+X-Gm-Message-State: AOJu0Yz7XUUAMCgov0B6oSBegO0FVB47xV2jdkIx8cBxuwNb1QZxmP2H
+	Sac/1+7tefEMvvgU+u6C1ovBu60O36VlpP7RIx4=
+X-Google-Smtp-Source: AGHT+IHbvd9iyISjPAtVPzH7AFlFRQZGO/trLwfpSepF8cc826O3Jh5693WAfIpFxBMigSXJ0/jOl6h9J6g07yvqZn0=
+X-Received: by 2002:a19:6d0a:0:b0:50a:10a6:1448 with SMTP id
+ i10-20020a196d0a000000b0050a10a61448mr6893129lfc.59.1701109108576; Mon, 27
+ Nov 2023 10:18:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/3] net: dsa: microchip: ksz8: Make flow
- control, speed, and duplex on CPU port configurable
-Content-Language: en-US
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Simon Horman <simon.horman@corigine.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com
-References: <20231127145101.3039399-1-o.rempel@pengutronix.de>
- <20231127145101.3039399-2-o.rempel@pengutronix.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231127145101.3039399-2-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231110034838.1295764-1-andrii@kernel.org> <20231110034838.1295764-4-andrii@kernel.org>
+ <20231127-anvertrauen-geldhahn-08f009fe1af1@brauner>
+In-Reply-To: <20231127-anvertrauen-geldhahn-08f009fe1af1@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 27 Nov 2023 10:18:16 -0800
+Message-ID: <CAEf4BzZnumK6bzsP70EAZTeMmSYjbFkZSa0FNxX=wjC9+D2t0g@mail.gmail.com>
+Subject: Re: [PATCH v10 bpf-next 03/17] bpf: introduce BPF token object
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/27/23 06:50, Oleksij Rempel wrote:
-> Allow flow control, speed, and duplex settings on the CPU port to be
-> configurable. Previously, the speed and duplex relied on default switch
-> values, which limited flexibility. Additionally, flow control was
-> hardcoded and only functional in duplex mode. This update enhances the
-> configurability of these parameters.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Mon, Nov 27, 2023 at 8:05=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> > +     if (path.mnt->mnt_root !=3D path.dentry) {
+>
+> You want to verify that you can only create tokens from the root of the
+> bpffs mount. So for
+>
+>   sudo mount -t bpf bpf /mnt
+>
+> you want bpf tokens to be creatable from:
+>
+>   fd =3D open("/mnt")
+>
+> or from bind-mounts of the fs root:
+>
+>   sudo mount --bind /mnt /srv
+>   fd =3D open("/srv")
+>
+> but not from
+>
+>   sudo mount --bind /mnt/foo /opt
+>   fd =3D open("/opt")
+>
+> But I think your current check allows for that because if you bind-mount
+> /mnt/foo to /opt then fd =3D open("/opt")
+>
+>   path.mnt->mnt_root =3D=3D foo and path.dentry =3D=3D foo
+>
+> I think
+>
+> path.dentry !=3D path.mnt->mnt_sb->s_root
+>
+> should give you what you want.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
+Ah, subtle difference (for me :)). Yes, I'd like the actual root of
+bpffs to be used, will adjust the check, thanks!
 
