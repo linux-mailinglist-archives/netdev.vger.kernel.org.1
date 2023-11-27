@@ -1,126 +1,266 @@
-Return-Path: <netdev+bounces-51478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9117FAC98
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:32:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C037FACAC
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:41:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96075281BB5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:32:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 925BF1C20B4F
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2152546459;
-	Mon, 27 Nov 2023 21:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EA746528;
+	Mon, 27 Nov 2023 21:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mypgcsMM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iXVDmnsu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5E7131;
-	Mon, 27 Nov 2023 13:32:39 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a0bdf4eeb46so312673066b.3;
-        Mon, 27 Nov 2023 13:32:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701120758; x=1701725558; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=W/1uSzXDfGGBJQhktgQcNYFDx6Quw5SgU4SWdrjub/w=;
-        b=mypgcsMMNggtuV9bW2/YnBKFa7upRp8gWnNMYqJwu0p6+UOuuv6BnTBFcNdW1zBLsc
-         ZIqWj3tESlJeGVfwZfSp1H0r1U3Csqp1M84sikaQ80RKZLTagy1vftXeoi7ljIdfBqgU
-         yxAMsPEzL3pFHRsTF+6Xgs4Mlzm79SJgYo9aQFYdnaenaXjaHi2w+uRRiwEctpZUVTUK
-         HdzmRfPswq2XmKHTDDTMCji24snRwp9E0XhjXeaJhVXmape+BusMYSP/wXBOry0qLOgx
-         fYPLY5AsLzoVezZPlnPXfI7hlNM5JjzUiFIQUc+n7StMZmpqy4V2BDLTabJrjb88lfX+
-         r7SQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFF9D4D
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 13:41:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701121294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ugEp/hLecd5KQ5c4t4XeynNt6sPelGpeH0b4Y4oF5aY=;
+	b=iXVDmnsuIWCqrUOkDuSQWDY5kGgFtqsokp3VnDpytgar1N/oXiO4UVKK783zqfna/wRaeF
+	JsI6s2kws1WDjxV+BOvzH+SMGDQRNdngoOpjZhzZKRa4UMZSB9QwT0+lxvmr8vkkQaHN56
+	C8l4VyBynk5FSqHWCT067LbxOmzvA2E=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-hzCkZX9rMumtB-D3OBEw2Q-1; Mon, 27 Nov 2023 16:41:32 -0500
+X-MC-Unique: hzCkZX9rMumtB-D3OBEw2Q-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-423afeb1cbcso21748481cf.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 13:41:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701120758; x=1701725558;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/1uSzXDfGGBJQhktgQcNYFDx6Quw5SgU4SWdrjub/w=;
-        b=FeKMbURmP9juaeuHq0t0fEWjiF0Nm9jbhPxoekZ6BNqVHlFthm81gtgcZf0v2VTvme
-         KH4s4CMI7JY9CLkD/fqaKcHgiUVUF8giQ2Go2Ez52I2ikHf3WzCysYj/42UI/EZKEbit
-         ZyDWrdjW0/qtT0hm7XiDgY0vm3dlSotwRfXY9/zR5OEB3imFnThbPU4DrZoYvPVckt6w
-         Wbipbmd5QmDDex8LZE7CW+ULQhxz0ZFiKkNaMBBpWAycw621WrUc7cdAJKZbYOO4nin6
-         ONn//Z/RlnOatqkpmK8VEDeH0MPd9kJ8qVrkK4IUvI7Xhp+igGGuixGyPmlguZj0ROr7
-         6EIw==
-X-Gm-Message-State: AOJu0YxxKf+DjolOaxx8PwG/qKkv7HODA1Zuj0AmrLBhFnSaWOMCNlwL
-	2NlmzPJcvckF/v3DLps82hw=
-X-Google-Smtp-Source: AGHT+IGiLRdPfMRCVg9ZEFSpMdpp/TzdZZxtg0wo3DlOFoWnGAfTT/GaVGLjZGSYXUHwDj1D6qqoJA==
-X-Received: by 2002:a17:906:4e81:b0:a0e:3a22:af5 with SMTP id v1-20020a1709064e8100b00a0e3a220af5mr1303801eju.77.1701120757825;
-        Mon, 27 Nov 2023 13:32:37 -0800 (PST)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id 3-20020a170906018300b00a0a8b2b74ddsm4087917ejb.154.2023.11.27.13.32.35
+        d=1e100.net; s=20230601; t=1701121292; x=1701726092;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ugEp/hLecd5KQ5c4t4XeynNt6sPelGpeH0b4Y4oF5aY=;
+        b=NIhxW3OhxlVGNNcyqnVGNyYID/d1yOJsOW1mfnESsfjgmptzPo/m0Kz7Rr5k+UneTA
+         auK9ItW/8fM1iFlIlhdhzIHva5fH8q/qcPuBtKxokRhDDl2sT7np0SWLJLz6CCPFpzQ0
+         iKg/LfuGt3/mDrSRCoFyIGjTpkEPGI0lUjpjroST30FWW4FWqftiDHkMr0Scq9BEki5t
+         27OCRtcbho+jIi38H8LUNGyhCAjhHVfnqlE+q2yJOznQG1LyPnMJtDLrYFE4nqPjldcz
+         kdup3V7qLMX+KybY67RTzOYU9aZAGSFU50VpiQ6Q8EL6kArDlRYHneEB/r7jfgFB+rK3
+         Q22A==
+X-Gm-Message-State: AOJu0YzxsZLUqr7XGMYXuOyK++XFJw9nUX4mEIi1fcD2ubG3Hu1pDNrN
+	Lly9mphfvuxtj0s0zBqGq+soSoeQgQIk2xsgFIDQv6ylM0gy7pvyi9CFDqcrmpYvC6nDRAYx9db
+	zC5C2EGllWVc7ifmc
+X-Received: by 2002:ac8:5f4a:0:b0:423:708a:778c with SMTP id y10-20020ac85f4a000000b00423708a778cmr16196907qta.64.1701121291875;
+        Mon, 27 Nov 2023 13:41:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFslalZ3Mm+d5FKflLZmRPLPS2RzI4BH08Nj76UeXPXcTvFLHPJ3GE721G5hx2gALP2UW2rYQ==
+X-Received: by 2002:ac8:5f4a:0:b0:423:708a:778c with SMTP id y10-20020ac85f4a000000b00423708a778cmr16196890qta.64.1701121291626;
+        Mon, 27 Nov 2023 13:41:31 -0800 (PST)
+Received: from [192.168.1.165] ([2600:1700:1ff0:d0e0::37])
+        by smtp.gmail.com with ESMTPSA id z15-20020ac8454f000000b00419732075b4sm4032574qtn.84.2023.11.27.13.41.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 13:32:37 -0800 (PST)
-Message-ID: <f4777af7e0b47b41760da5f291a7535c7006adf9.camel@gmail.com>
-Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
- CO-RE relocations
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>, Yonghong Song <yonghong.song@linux.dev>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, antony.antony@secunet.com, Mykola Lysenko
- <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, bpf
- <bpf@vger.kernel.org>,  "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
- devel@linux-ipsec.org, Network Development <netdev@vger.kernel.org>
-Date: Mon, 27 Nov 2023 23:32:35 +0200
-In-Reply-To: <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
-References: <cover.1700676682.git.dxu@dxuuu.xyz>
-	 <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
-	 <0f210cef-c6e9-41c1-9ba8-225f046435e5@linux.dev>
-	 <CAADnVQ+sEsUyNYPeZyOf2PcCnxOvOqw4bUuAuMofCU14szTGvg@mail.gmail.com>
-	 <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
-	 <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
-	 <uc5fv3keghefszuvono7aclgtjtgjnnia3i54ynejmyrs42ser@bwdpq5gmuvub>
-	 <0535eb913f1a0c2d3c291478fde07e0aa2b333f1.camel@gmail.com>
-	 <42f9bf0d-695a-412d-bea5-cb7036fa7418@linux.dev>
-	 <a5a84482-13ef-47d8-bf07-8017060a5d64@linux.dev>
-	 <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+        Mon, 27 Nov 2023 13:41:31 -0800 (PST)
+From: Andrew Halaney <ahalaney@redhat.com>
+Date: Mon, 27 Nov 2023 15:41:10 -0600
+Subject: [PATCH net-next v2] net: phy: mdio_device: Reset device only when
+ necessary
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231127-net-phy-reset-once-v2-1-448e8658779e@redhat.com>
+X-B4-Tracking: v=1; b=H4sIAPUMZWUC/32NwQ7CIBBEf6XZs2vYJanWk/9heqh0FQ5CA4S0a
+ frvIh/gbSYz82aHJNFJglu3Q5Tikgu+Gj51YOzk34Jurh5YsSZiQi8ZF7thlFRV8EaQhDXr4cq
+ TKKjDJcrLrQ36gF/fy5phrIl1KYe4tbdCLf8HLoSE+mKGXj17rXtzjzLbKZ9N+MB4HMcXHbWAI
+ 78AAAA=
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
+ Andrew Halaney <ahalaney@redhat.com>
+X-Mailer: b4 0.12.3
 
-On Mon, 2023-11-27 at 14:45 -0600, Daniel Xu wrote:
-[...]
-> IIUC uapi structs look the same in BTF as any other struct.
+Currently the phy reset sequence is as shown below for a
+devicetree described mdio phy on boot:
 
-Yes, and all share preserve_access_index attribute because of the way
-attribute push/pop directives are generated in vmlinux.h.
+1. Assert the phy_device's reset as part of registering
+2. Deassert the phy_device's reset as part of registering
+3. Deassert the phy_device's reset as part of phy_probe
+4. Deassert the phy_device's reset as part of phy_hw_init
 
-> Just wondering, though: will bpftool be able to generate the appropriate
-> annotations for uapi structs?=20
+The extra two deasserts include waiting the deassert delay afterwards,
+which is adding unnecessary delay.
 
-The problem is that there is no easy way to identify if structure is
-uapi in DWARF (from which BTF is generated).
-One way to do this:
-- modify pahole to check DW_AT_decl_file for each struct DWARF entry
-  and generate some special decl tag in BTF;
-- modify bpftool to interpret this tag as a marker to not generate
-  preserve_access_index for a structure.
+This applies to both possible types of resets (reset controller
+reference and a reset gpio) that can be used.
 
-The drawback is that such behavior hardcodes some kernel specific
-assumptions both in pahole and in bpftool. It also remains to be seen
-if DW_AT_decl_file tags are consistent.
+Here's some snipped tracing output using the following command line
+params "trace_event=gpio:* trace_options=stacktrace" illustrating
+the reset handling and where its coming from:
 
-It might be the case that allowing excessive CO-RE relocations is a
-better option. (And maybe tweak something about bitfield access
-generation to avoid such issues as in this thread).
+    /* Assert */
+       systemd-udevd-283     [002] .....     6.780434: gpio_value: 544 set 0
+       systemd-udevd-283     [002] .....     6.783849: <stack trace>
+     => gpiod_set_raw_value_commit
+     => gpiod_set_value_nocheck
+     => gpiod_set_value_cansleep
+     => mdio_device_reset
+     => mdiobus_register_device
+     => phy_device_register
+     => fwnode_mdiobus_phy_device_register
+     => fwnode_mdiobus_register_phy
+     => __of_mdiobus_register
+     => stmmac_mdio_register
+     => stmmac_dvr_probe
+     => stmmac_pltfr_probe
+     => devm_stmmac_pltfr_probe
+     => qcom_ethqos_probe
+     => platform_probe
 
-Thanks,
-Eduard
+    /* Deassert */
+       systemd-udevd-283     [002] .....     6.802480: gpio_value: 544 set 1
+       systemd-udevd-283     [002] .....     6.805886: <stack trace>
+     => gpiod_set_raw_value_commit
+     => gpiod_set_value_nocheck
+     => gpiod_set_value_cansleep
+     => mdio_device_reset
+     => phy_device_register
+     => fwnode_mdiobus_phy_device_register
+     => fwnode_mdiobus_register_phy
+     => __of_mdiobus_register
+     => stmmac_mdio_register
+     => stmmac_dvr_probe
+     => stmmac_pltfr_probe
+     => devm_stmmac_pltfr_probe
+     => qcom_ethqos_probe
+     => platform_probe
+
+    /* Deassert */
+       systemd-udevd-283     [002] .....     6.882601: gpio_value: 544 set 1
+       systemd-udevd-283     [002] .....     6.886014: <stack trace>
+     => gpiod_set_raw_value_commit
+     => gpiod_set_value_nocheck
+     => gpiod_set_value_cansleep
+     => mdio_device_reset
+     => phy_probe
+     => really_probe
+     => __driver_probe_device
+     => driver_probe_device
+     => __device_attach_driver
+     => bus_for_each_drv
+     => __device_attach
+     => device_initial_probe
+     => bus_probe_device
+     => device_add
+     => phy_device_register
+     => fwnode_mdiobus_phy_device_register
+     => fwnode_mdiobus_register_phy
+     => __of_mdiobus_register
+     => stmmac_mdio_register
+     => stmmac_dvr_probe
+     => stmmac_pltfr_probe
+     => devm_stmmac_pltfr_probe
+     => qcom_ethqos_probe
+     => platform_probe
+
+    /* Deassert */
+      NetworkManager-477     [000] .....     7.023144: gpio_value: 544 set 1
+      NetworkManager-477     [000] .....     7.026596: <stack trace>
+     => gpiod_set_raw_value_commit
+     => gpiod_set_value_nocheck
+     => gpiod_set_value_cansleep
+     => mdio_device_reset
+     => phy_init_hw
+     => phy_attach_direct
+     => phylink_fwnode_phy_connect
+     => __stmmac_open
+     => stmmac_open
+
+There's a lot of paths where the device is getting its reset
+asserted and deasserted. Let's track the state and only actually
+do the assert/deassert when it changes.
+
+Reported-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+---
+Changes in v2:
+- Mention the reset controller in the commit message (Andrew Lunn)
+- Make the initial reset_state unknown (so we always ensure the reset
+  gpio and controller end up in the same state) instead of
+  assuming they're both out of reset after acquiring them (Andrew Lunn)
+- Link to v1: https://lore.kernel.org/r/20231121-net-phy-reset-once-v1-1-37c960b6336c@redhat.com
+---
+ drivers/net/phy/mdio_device.c | 6 ++++++
+ drivers/net/phy/phy_device.c  | 1 +
+ include/linux/mdio.h          | 1 +
+ 3 files changed, 8 insertions(+)
+
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index 044828d081d2..73f6539b9e50 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -62,6 +62,7 @@ struct mdio_device *mdio_device_create(struct mii_bus *bus, int addr)
+ 	mdiodev->device_remove = mdio_device_remove;
+ 	mdiodev->bus = bus;
+ 	mdiodev->addr = addr;
++	mdiodev->reset_state = -1;
+ 
+ 	dev_set_name(&mdiodev->dev, PHY_ID_FMT, bus->id, addr);
+ 
+@@ -122,6 +123,9 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
+ 	if (!mdiodev->reset_gpio && !mdiodev->reset_ctrl)
+ 		return;
+ 
++	if (mdiodev->reset_state == value)
++		return;
++
+ 	if (mdiodev->reset_gpio)
+ 		gpiod_set_value_cansleep(mdiodev->reset_gpio, value);
+ 
+@@ -135,6 +139,8 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
+ 	d = value ? mdiodev->reset_assert_delay : mdiodev->reset_deassert_delay;
+ 	if (d)
+ 		fsleep(d);
++
++	mdiodev->reset_state = value;
+ }
+ EXPORT_SYMBOL(mdio_device_reset);
+ 
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 478126f6b5bc..843ce2479736 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -654,6 +654,7 @@ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
+ 	mdiodev->flags = MDIO_DEVICE_FLAG_PHY;
+ 	mdiodev->device_free = phy_mdio_device_free;
+ 	mdiodev->device_remove = phy_mdio_device_remove;
++	mdiodev->reset_state = -1;
+ 
+ 	dev->speed = SPEED_UNKNOWN;
+ 	dev->duplex = DUPLEX_UNKNOWN;
+diff --git a/include/linux/mdio.h b/include/linux/mdio.h
+index 007fd9c3e4b6..79ceee3c8673 100644
+--- a/include/linux/mdio.h
++++ b/include/linux/mdio.h
+@@ -38,6 +38,7 @@ struct mdio_device {
+ 	/* Bus address of the MDIO device (0-31) */
+ 	int addr;
+ 	int flags;
++	int reset_state;
+ 	struct gpio_desc *reset_gpio;
+ 	struct reset_control *reset_ctrl;
+ 	unsigned int reset_assert_delay;
+
+---
+base-commit: 48bbaf8b793e0770798519f8ee1ea2908ff0943a
+change-id: 20231121-net-phy-reset-once-1e2323982ae0
+
+Best regards,
+-- 
+Andrew Halaney <ahalaney@redhat.com>
+
 
