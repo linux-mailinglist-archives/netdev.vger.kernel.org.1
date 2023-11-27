@@ -1,115 +1,75 @@
-Return-Path: <netdev+bounces-51379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF237FA6A8
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:40:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A827FA6B9
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB5D1B20F0A
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC7D28194C
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226B931A60;
-	Mon, 27 Nov 2023 16:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D63282EC;
+	Mon, 27 Nov 2023 16:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wwin34v/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A09FFD2;
-	Mon, 27 Nov 2023 08:40:05 -0800 (PST)
-Received: from [192.168.1.103] (178.176.78.85) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 27 Nov
- 2023 19:39:54 +0300
-Subject: Re: [PATCH 1/6] net: ravb: Check return value of
- reset_control_deassert()
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<yoshihiro.shimoda.uh@renesas.com>, <geert+renesas@glider.be>,
-	<wsa+renesas@sang-engineering.com>, <robh@kernel.org>,
-	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<mitsuhiro.kimura.kc@renesas.com>, <masaru.nagai.vx@renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231127090426.3761729-1-claudiu.beznea.uj@bp.renesas.com>
- <20231127090426.3761729-2-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <f18806b7-8172-749e-6820-cd30b71d7dbd@omp.ru>
-Date: Mon, 27 Nov 2023 19:39:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38D237155;
+	Mon, 27 Nov 2023 16:46:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3125C433C8;
+	Mon, 27 Nov 2023 16:46:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701103600;
+	bh=mLe0gFKTqc2ujYOMWLzEWOwtQZ7yEtsKOX/Y3ZtEMag=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wwin34v/rl5inaqew20VFCHFgxSa6Qt9c8J8qo0GJjHmEnoW5QaxK4lVbkHvWbcgz
+	 fu8MIvmt8oWoJDDn6vj0EmPXWzL3JiN3lxC1i3Ny98TsmLDOSRFujU3ArdsZcL9z2d
+	 jDYWBRglHz+hqXxgdXEAljEbc3M3GpYGSO02/sw08F1Pu/URQ699q3Z3PRa+p4U+J6
+	 JIk8OliHVqMQ/NxgKNLxBGv2cRXM4Cj1sru2SYGXPR05xu8ZMKPzMJAgZ3/9XZGfJA
+	 DEPLk8ONqHa3OZo4aFMU7ZgPipPEZOfNynOjDQE6iQnoZcwAcTkYDXvE5pG3cQkRuw
+	 WDEhCsYD+mTjA==
+Date: Mon, 27 Nov 2023 08:46:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, loic.poulain@linaro.org
+Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
+Message-ID: <20231127084639.6be47207@kernel.org>
+In-Reply-To: <20231127060439.GA2505@thinkpad>
+References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
+	<20230607094922.43106896@kernel.org>
+	<20230607171153.GA109456@thinkpad>
+	<20230607104350.03a51711@kernel.org>
+	<20230608123720.GC5672@thinkpad>
+	<20231117070602.GA10361@thinkpad>
+	<20231117162638.7cdb3e7d@kernel.org>
+	<20231127060439.GA2505@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231127090426.3761729-2-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/27/2023 16:22:08
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181625 [Nov 27 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.85 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.85 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.85
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/27/2023 16:25:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/27/2023 3:21:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 11/27/23 12:04 PM, Claudiu wrote:
+On Mon, 27 Nov 2023 11:34:39 +0530 Manivannan Sadhasivam wrote:
+> I think you made up your mind that this driver is exposing the network interface
+> to the firmware on the device. I ought to clearify that the device running this
+> driver doesn't necessarily be a modem but a PCIe endpoint instance that uses the
+> netdev exposed by this driver to share data connectivity with another device.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> reset_control_deassert() could return an error. Some devices cannot work
-> if reset signal de-assert operation fails.
+Doesn't matter how many legit use cases you can come up with.
+Using netdev as a device comm channel is something I am
+fundamentally opposed to.
 
-   Well, I think all devices can't work if the reset line is connected at all. :-)
+> This concept is not new and being supported by other protocols such as Virtio
+> etc...
 
-> To avoid this check the return
-> code of reset_control_deassert() in ravb_probe() and take proper action.
-
-   I'd also mention moving of the free_netdev() call...
-
-> Fixes: 0d13a1a464a0 ("ravb: Add reset support")
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+Yes. Use virtio, please.
 
