@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-51307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3C27FA0D5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:22:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511467FA0E6
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196961C203B0
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:22:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F028C1F20EE5
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC812DF7E;
-	Mon, 27 Nov 2023 13:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D282E408;
+	Mon, 27 Nov 2023 13:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="Jl9qpnhM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="HCmfkdpm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A92D4D
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:22:24 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6291A5
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:22:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
 	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
 	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=qBhdL/vRTfAcxaKskMBkoUwGK86JCGcXwMFn+lpRuXw=; b=Jl9qpnhMzQ3Uz9ViHYpxDvT25h
-	4E7lQ++UjxcLJs1nttv8eyCTnh3Kr2gq8hhQ3i/n5MEOpEjO3gsa4l/iVPpaocuE28C8ick0tNxg/
-	lhbkANtZ/3Lpeze8S9xOp+0KgqyybxzSki35sxHpm5WaOLbVvj9ViBY89i9+faaTEAsZJAC2XnU08
-	9NIAldzaxbYUNLB9H1Rbf55rsrvPTDjskKyaX18bARnMQCrdzNLjffcKjaSWPHrAOpPlAaQNBiPQz
-	zfoJa5WtfbDAjd3cNRsM5K2pwIHlQZsgd3nz1bqKSlOc4w1fxlQMnKFP15VUa6G6JHziFxU91yGik
-	DfYsfLrA==;
-Received: from [192.168.1.4] (port=38633 helo=SH-EX2013.helmholz.local)
+	bh=8Wu8wYKy/yf0l+UtfT5Dhb2NiOkWRL+Q3S7J8pRxlU0=; b=HCmfkdpmtjehEo0efXZW/nklvO
+	mIfHmn9P9q39hXuh3xj/bCld10aGq5M98QPxuQGcfzp9SEXzZ3KR0iTBavEA6XmsKXBof641wDqWx
+	xWyjXza92vDpHKqDAunvUGKG9Q7o0ahWNErADv/o+yV2JyPG7B7yVVo9ee/leKffvce3o2MuZvvA+
+	1cbdWMGUBM9R6V73mDSZzwcVmNp65AxyFqM0lKcZmMEuksa7qtpNmIt1qCciUTpEa1vECvGsFQoEr
+	s28voF/oSMK9n+b9YGZlHk81dfHjMJ1UgRx8lSEWELemlnQyK6WsHvsVDulACAaBJzvBnV/FJRvlF
+	o6I0d9AQ==;
+Received: from [192.168.1.4] (port=38641 helo=SH-EX2013.helmholz.local)
 	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
 	(Exim 4.96)
 	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1r7bXn-0008TS-03;
-	Mon, 27 Nov 2023 14:20:59 +0100
+	id 1r7bXo-0008TV-03;
+	Mon, 27 Nov 2023 14:21:00 +0100
 Received: from linuxdev.helmholz.local (192.168.6.7) by
  SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Mon, 27 Nov 2023 14:20:58 +0100
+ 15.0.1497.48; Mon, 27 Nov 2023 14:20:59 +0100
 From: Ante Knezic <ante.knezic@helmholz.de>
 To: <netdev@vger.kernel.org>
 CC: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
@@ -47,9 +47,9 @@ CC: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <marex@denx.de>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<UNGLinuxDriver@microchip.com>, Ante Knezic <ante.knezic@helmholz.de>
-Subject: [PATCH net-next v6 1/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
-Date: Mon, 27 Nov 2023 14:20:42 +0100
-Message-ID: <7f1f89010743a06c4880fd224149ea495fe32512.1701091042.git.ante.knezic@helmholz.de>
+Subject: [PATCH net-next v6 2/2] net: dsa: microchip: add property to select internal RMII reference clock
+Date: Mon, 27 Nov 2023 14:20:43 +0100
+Message-ID: <6be97f0b1554b666894c0d74da4ebd384da441c4.1701091042.git.ante.knezic@helmholz.de>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <cover.1701091042.git.ante.knezic@helmholz.de>
 References: <cover.1701091042.git.ante.knezic@helmholz.de>
@@ -64,69 +64,98 @@ X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
  SH-EX2013.helmholz.local (192.168.1.4)
 X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
 
-Add documentation for selecting reference rmii clock on KSZ88X3 devices
+Microchip KSZ8863/KSZ8873 have the ability to select between internal
+and external RMII reference clock. By default, reference clock
+needs to be provided via REFCLKI_3 pin. If required, device can be
+setup to provide RMII clock internally so that REFCLKI_3 pin can be
+left unconnected.
+Add a new "microchip,rmii-clk-internal" property which will set
+RMII clock reference to internal. If property is not set, reference
+clock needs to be provided externally.
+
+While at it, move the ksz8795_cpu_interface_select() to
+ksz8_config_cpu_port() to get a cleaner call path for cpu port.
 
 Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
 ---
- .../devicetree/bindings/net/dsa/microchip,ksz.yaml | 38 +++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+ drivers/net/dsa/microchip/ksz8795.c     | 29 +++++++++++++++++++++++------
+ drivers/net/dsa/microchip/ksz8795_reg.h |  3 +++
+ 2 files changed, 26 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-index b3029c64d0d5..6fd482f2656b 100644
---- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-@@ -11,7 +11,6 @@ maintainers:
-   - Woojung Huh <Woojung.Huh@microchip.com>
+diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
+index 4bf4d67557dc..9fd2be9c4022 100644
+--- a/drivers/net/dsa/microchip/ksz8795.c
++++ b/drivers/net/dsa/microchip/ksz8795.c
+@@ -1358,6 +1358,9 @@ static void ksz8795_cpu_interface_select(struct ksz_device *dev, int port)
+ {
+ 	struct ksz_port *p = &dev->ports[port];
  
- allOf:
--  - $ref: dsa.yaml#/$defs/ethernet-ports
-   - $ref: /schemas/spi/spi-peripheral-props.yaml#
- 
- properties:
-@@ -78,6 +77,43 @@ required:
-   - compatible
-   - reg
- 
-+if:
-+  not:
-+    properties:
-+      compatible:
-+        enum:
-+          - microchip,ksz8863
-+          - microchip,ksz8873
-+then:
-+  $ref: dsa.yaml#/$defs/ethernet-ports
-+else:
-+  patternProperties:
-+    "^(ethernet-)?ports$":
-+      patternProperties:
-+        "^(ethernet-)?port@[0-2]$":
-+          $ref: dsa-port.yaml#
-+          properties:
-+            microchip,rmii-clk-internal:
-+              $ref: /schemas/types.yaml#/definitions/flag
-+              description:
-+                When ksz88x3 is acting as clock provier (via REFCLKO) it
-+                can select between internal and external RMII reference
-+                clock. Internal reference clock means that the clock for
-+                the RMII of ksz88x3 is provided by the ksz88x3 internally
-+                and the REFCLKI pin is unconnected. For the external
-+                reference clock, the clock needs to be fed back to ksz88x3
-+                via REFCLKI.
-+                If microchip,rmii-clk-internal is set, ksz88x3 will provide
-+                rmii reference clock internally, otherwise reference clock
-+                should be provided externally.
-+          if:
-+            not:
-+              required: [ ethernet ]
-+          then:
-+            properties:
-+              microchip,rmii-clk-internal: false
-+          unevaluatedProperties: false
++	if (!ksz_is_ksz87xx(dev))
++		return;
 +
- unevaluatedProperties: false
+ 	if (!p->interface && dev->compat_interface) {
+ 		dev_warn(dev->dev,
+ 			 "Using legacy switch \"phy-mode\" property, because it is missing on port %d node. "
+@@ -1391,18 +1394,29 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ 	/* enable 802.1p priority */
+ 	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_ENABLE, true);
  
- examples:
+-	if (cpu_port) {
+-		if (!ksz_is_ksz88x3(dev))
+-			ksz8795_cpu_interface_select(dev, port);
+-
++	if (cpu_port)
+ 		member = dsa_user_ports(ds);
+-	} else {
++	else
+ 		member = BIT(dsa_upstream_port(ds, port));
+-	}
+ 
+ 	ksz8_cfg_port_member(dev, port, member);
+ }
+ 
++static void ksz88x3_config_rmii_clk(struct ksz_device *dev)
++{
++	struct dsa_port *cpu_dp = dsa_to_port(dev->ds, dev->cpu_port);
++	bool rmii_clk_internal;
++
++	if (!ksz_is_ksz88x3(dev))
++		return;
++
++	rmii_clk_internal = of_property_read_bool(cpu_dp->dn,
++						  "microchip,rmii-clk-internal");
++
++	ksz_cfg(dev, KSZ88X3_REG_FVID_AND_HOST_MODE,
++		KSZ88X3_PORT3_RMII_CLK_INTERNAL, rmii_clk_internal);
++}
++
+ void ksz8_config_cpu_port(struct dsa_switch *ds)
+ {
+ 	struct ksz_device *dev = ds->priv;
+@@ -1419,6 +1433,9 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+ 
+ 	ksz8_port_setup(dev, dev->cpu_port, true);
+ 
++	ksz8795_cpu_interface_select(dev, dev->cpu_port);
++	ksz88x3_config_rmii_clk(dev);
++
+ 	for (i = 0; i < dev->phy_port_cnt; i++) {
+ 		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
+ 	}
+diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
+index 3c9dae53e4d8..beca974e0171 100644
+--- a/drivers/net/dsa/microchip/ksz8795_reg.h
++++ b/drivers/net/dsa/microchip/ksz8795_reg.h
+@@ -22,6 +22,9 @@
+ #define KSZ8863_GLOBAL_SOFTWARE_RESET	BIT(4)
+ #define KSZ8863_PCS_RESET		BIT(0)
+ 
++#define KSZ88X3_REG_FVID_AND_HOST_MODE  0xC6
++#define KSZ88X3_PORT3_RMII_CLK_INTERNAL BIT(3)
++
+ #define REG_SW_CTRL_0			0x02
+ 
+ #define SW_NEW_BACKOFF			BIT(7)
 -- 
 2.11.0
 
