@@ -1,127 +1,109 @@
-Return-Path: <netdev+bounces-51360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED867FA522
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:48:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0AD27FA525
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B3EB2816A9
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:48:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56C201F2094E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2B734561;
-	Mon, 27 Nov 2023 15:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A6334574;
+	Mon, 27 Nov 2023 15:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="n9iaFImX"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wQxhADxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951AFBE;
-	Mon, 27 Nov 2023 07:48:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=svOT1Ab/ZzY/i1DkMPg/q3PvUAlQ9TMeZEgdR1xeIck=; b=n9iaFImXGrlemMfVNe1O1oYwG+
-	m2MiS3GRpBOlJMg3MBA6xyk7/IJBnTv6BKn+fcSGug/QQKY8w10C6MXHGWzI6Lu4v0rmU9Bg2u4os
-	C9fpQsKfkFALcRzeGWLajGLy6lVynVQ0sv+Yl5HyuYUUnUX67WhMv4YEMj2OvBS1wZICYjx+Hb9jz
-	/nTFc4am1zkaVS1l4PHTZMH+uiI0l2MR+xa+0v2AisBrVREmkLJNJ47QApNSRkW+HANCHhROxmXuU
-	TuIQQj2RDf8aUlixNL95cSJL9z10RUyyu5tt9bks9VRLXSslLcbVx8Ddyr+NISk+uCJJ8yTxa3rBm
-	TmczTHNA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46976)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7dpn-00066b-0L;
-	Mon, 27 Nov 2023 15:47:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7dpn-000223-1L; Mon, 27 Nov 2023 15:47:43 +0000
-Date: Mon, 27 Nov 2023 15:47:42 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH 5/8] dt-bindings: net: pcs: add bindings for MediaTek
- USXGMII PCS
-Message-ID: <ZWS6Hl2tZ0MPj+OL@shell.armlinux.org.uk>
-References: <cover.1699565880.git.daniel@makrotopia.org>
- <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C04BE
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 07:49:01 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5cc66213a34so43762557b3.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 07:49:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701100141; x=1701704941; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8OZ/zaPHTOHquaBYH+lbkY1d97Oatm6ySFdaXiL8Dhc=;
+        b=wQxhADxJ3YePrynaIdGX6XyhjcqrN5oAYHmr0uiWS18I1PmgQXT/oMzrQIJYIqKkd4
+         4M76Oh1Bsn5n9a71RJzdsQcDUE6dLYQtJS5NZuYgit/q6zR6GDHKkF3F3evJ/+tc1Bo8
+         5bduubZaE2q2IFMsQbzElbeb3iKv+1xbIqZi1Leobv/x//EP1ksADJfgohudy47E8XHj
+         bRsDIb6ha16k3gRjBz/jpEIEMQhCIqU/L3jDZAZOPLQBhWUXI+hV6xMvedO7Njq3nY1j
+         QK1t4a6Is06m1uI0EUcPdrQss5Mp7BsBk/tPCdlFeFArMXdi3mNYLV7Yi3nGWzBeajWm
+         kIAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701100141; x=1701704941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8OZ/zaPHTOHquaBYH+lbkY1d97Oatm6ySFdaXiL8Dhc=;
+        b=LDLW5umDkuz1CP4qbBrZuSd8CE0BYuxBmgVdMyORcWcZCEGq+WStWdagsThy6pE8o0
+         7VrBqxEkiFXBSKYt5aUfWKvS4f8Rz3m5HV1mWznwYf0czIWekm/3NZF/xshwGUAxH9Va
+         xWjSOA0HGsbaVq2YqBKk0asOEHdcVwgT0IJ8b/9c2RyqHnnNXk55rxYiOYkJzNaVycb5
+         9ZVCjFtn4Ihnh8IzI56f3DoL3gI6si7pVK2qYdx0NMalF4idnVzg8CaAjBDw0DBjFgDF
+         MdwwjJcY4iwrAygW+NG4+uQ9wpEldbjQT00L/hPHRg/Gwh4U/7+S4+ks8xSbH/AocLi/
+         BQxg==
+X-Gm-Message-State: AOJu0YxgpwQJ0YNkX5UJrhKmS0tB5fKxZXCA31o8CxvBBpKwCHJo+m3o
+	/snGnLIdEtEo8Uh+57kmt2/aqa2shVmUuwTr0uU2ww==
+X-Google-Smtp-Source: AGHT+IFlXI+XiNqcLAO9Li2OL/ymYfkxPzPfv7uyjeBxX3DjN83glydtRLaPL6pFsqlmWBZulq3Mf1wcsj0hqhBji2o=
+X-Received: by 2002:a81:5c05:0:b0:5ce:4dfb:bce8 with SMTP id
+ q5-20020a815c05000000b005ce4dfbbce8mr11984339ywb.7.1701100140920; Mon, 27 Nov
+ 2023 07:49:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231124154248.315470-1-pctammela@mojatatu.com>
+In-Reply-To: <20231124154248.315470-1-pctammela@mojatatu.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 27 Nov 2023 10:48:49 -0500
+Message-ID: <CAM0EoMmcPw85tQCMkg6XiMA2B3b8bkLS2TVCvxC_jrwVcdNJVw@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/5] selftests: tc-testing: updates and cleanups
+ for tdc
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 09, 2023 at 09:51:47PM +0000, Daniel Golle wrote:
-> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
-> it in order to configure and monitor the Ethernet SerDes link in
-> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
-> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
-> interface modes are also available.
+On Fri, Nov 24, 2023 at 10:43=E2=80=AFAM Pedro Tammela <pctammela@mojatatu.=
+com> wrote:
+>
+> Address the recommendations from the previous series and cleanup some
+> leftovers.
+>
+> Pedro Tammela (5):
+>   selftests: tc-testing: remove buildebpf plugin
+>   selftests: tc-testing: remove unnecessary time.sleep
+>   selftests: tc-testing: prefix iproute2 functions with "ipr2"
+>   selftests: tc-testing: cleanup on Ctrl-C
+>   selftests: tc-testing: remove unused import
+>
+>  tools/testing/selftests/tc-testing/Makefile   |  29 +-------
+>  tools/testing/selftests/tc-testing/README     |   2 -
+>  .../testing/selftests/tc-testing/action-ebpf  | Bin 0 -> 856 bytes
+>  .../tc-testing/plugin-lib/buildebpfPlugin.py  |  67 ------------------
+>  .../tc-testing/plugin-lib/nsPlugin.py         |  20 +++---
+>  .../tc-testing/tc-tests/actions/bpf.json      |  14 ++--
+>  .../tc-testing/tc-tests/filters/bpf.json      |  10 ++-
+>  tools/testing/selftests/tc-testing/tdc.py     |  11 ++-
+>  tools/testing/selftests/tc-testing/tdc.sh     |   2 +-
+>  9 files changed, 25 insertions(+), 130 deletions(-)
+>  create mode 100644 tools/testing/selftests/tc-testing/action-ebpf
+>  delete mode 100644 tools/testing/selftests/tc-testing/plugin-lib/buildeb=
+pfPlugin.py
 
-I think this binding is based on the implementation than on hardware.
+For the patch series:
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-What I believe you have is this setup:
+cheers,
+jamal
 
-        .---- LynxI PCS ----.
-MAC ---+                     +--- PEXTP --- world
-        `--- USXGMII PCS ---'
-
-You are representing the PEXTP as a separate entity in DT, but then
-you're representing the LynxI PCS and the USXGMII PCS as a single
-block, which seems to be how you've decided to implement it.
-
-Given that the LynxI PCS is already in use elsewhere in the Mediatek
-range, I suggest that the LynxI PCS is one block of IP, and the USXGMII
-PCS is a separate block of IP.
-
-1) Would it not be better to model the two PCS seperately?
-
-2) The addition of the SGMII reset needs more information - is this
-   controlling a reset for the LynxI block? If so, it should be part
-   of a LynxI PCS binding.
-
-3) The PEXTP is presumably a separate block which can be shared between
-   several devices - for example, the LynxI, USXGMII, and probably SATA
-   and PCIe as well. From the 802.3's network model, the PEXTP is the
-   PMA/PMD.
-
-   From the point of view of 802.3's model, a network interface has
-   various layers such as the MAC, PCS and PMA/PMD, and sitting above
-   these layers is the management of the system. Rather than chasing
-   the data flow (which in a network device can be complex) wouldn't
-   it be better to continue with the 802.3 model as we are doing with
-   other devices, rather than trying to go with a new approach here?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> --
+> 2.40.1
+>
 
