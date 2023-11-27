@@ -1,91 +1,80 @@
-Return-Path: <netdev+bounces-51223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78DB77F9BFD
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:44:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158647F9C3E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA6211C208A5
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 08:44:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B55F01F207CE
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 09:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A97D534;
-	Mon, 27 Nov 2023 08:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178B910A24;
+	Mon, 27 Nov 2023 09:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BhCfOJN+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YFJP0TGh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC16183;
-	Mon, 27 Nov 2023 00:44:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WA1izUMF049A+uaOpu99QoR6RRA3zCpzmZ7zrTZEUrY=; b=BhCfOJN+3BuUwuenz7TV/mQ1Jk
-	IuNW9a/5L2VfSpwOGLEoxqyXKwrXZbLRR8948VsH+P7OpWq+H1j8fKuKj2PFzuLBpnEOGJWMzf9C4
-	g75/PZFBjeFvZl3jxJKvY28sqJ00e+/V1oDrxXFmTRgFyRyaHIcPmsgD9KrCDQaKtirefRSXQwDBG
-	sPbmTQ/acpEW+rjrNRiT4VYMcYSiCde63vzxwxbsHV8i1AzrN6DDRaYlvlp3KozUrRp0zZ3hOzigX
-	eLS8cFC7Qytd25rqkSg7Yqy4gD2nUAbU8zw9W7mZQiTW8POItIxrqy9ML89LMPGwJaY9Xdc+RChyd
-	dmuqOVpQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40150)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7XDf-0005VP-0Q;
-	Mon, 27 Nov 2023 08:43:55 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7XDe-0001ll-KJ; Mon, 27 Nov 2023 08:43:54 +0000
-Date: Mon, 27 Nov 2023 08:43:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Luo Jie <quic_luoj@quicinc.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v6 1/6] net: phy: introduce core support for phy-mode =
- "10g-qxgmii"
-Message-ID: <ZWRWylzfCLu2XXHy@shell.armlinux.org.uk>
-References: <20231126060732.31764-1-quic_luoj@quicinc.com>
- <20231126060732.31764-2-quic_luoj@quicinc.com>
- <f97fd2f0-3e39-4de0-8b1c-f333a0f56a7f@lunn.ch>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17EA912F
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 01:04:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701075859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=piML3Mid1NWxeF+rFETYzTPt2JomB1OniMRw7lokn98=;
+	b=YFJP0TGhx2eEhignO2WOE2KdNZ5XvJXhJpcM47x7bAXiT/VdNC6ICvnDUx9L8lxonLcMOA
+	xviifeGyDLTDmR9E32GfCC2xEvIqMKZ6qVG45Z9AYGJDPAgdDKDupfvKDrclfs07lMlP0+
+	EGk4ibc+CH1ixUOQK8R3IVuiCtJixP4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-XqktnsTiM5WdgFevyW0t4Q-1; Mon,
+ 27 Nov 2023 04:04:15 -0500
+X-MC-Unique: XqktnsTiM5WdgFevyW0t4Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2E68D1C06EC9;
+	Mon, 27 Nov 2023 09:04:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 20E47C1596F;
+	Mon, 27 Nov 2023 09:04:14 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20231122214447.675768-1-jannh@google.com>
+References: <20231122214447.675768-1-jannh@google.com>
+To: Jann Horn <jannh@google.com>
+Cc: dhowells@redhat.com, Boris Pismenny <borisp@nvidia.com>,
+    John Fastabend <john.fastabend@gmail.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S.
+ Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] tls: fix NULL deref on tls_sw_splice_eof() with empty record
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f97fd2f0-3e39-4de0-8b1c-f333a0f56a7f@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1508420.1701075853.1@warthog.procyon.org.uk>
+Date: Mon, 27 Nov 2023 09:04:13 +0000
+Message-ID: <1508421.1701075853@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Sun, Nov 26, 2023 at 06:20:16PM +0100, Andrew Lunn wrote:
-> On Sun, Nov 26, 2023 at 02:07:27PM +0800, Luo Jie wrote:
-> >  	switch (interface) {
-> >  	case PHY_INTERFACE_MODE_USXGMII:
-> > -		caps |= MAC_10000FD | MAC_5000FD | MAC_2500FD;
-> > +		caps |= MAC_10000FD | MAC_5000FD;
-> > +		fallthrough;
-> 
-> This change seems to refer to the second paragraph, where as the rest
-> of the code is about the first. Or does splitting this cause a bisect
-> problem?
+Jann Horn <jannh@google.com> wrote:
 
-I'm not sure what you're referring to here, and by over-trimming the
-context, this probably gives an insight into a misunderstanding.
+> +	/* same checks as in tls_sw_push_pending_record() */
 
-This hunk (and the next) does _not_ change what USXGMII ends up with.
-It moves MAC_2500FD to be under the 10G_QXGMII case from the USXGMII
-case, and we will _fallthrough_ from the USXGMII case into thte
-10G_QXGMII case. So, USXGMII still ends up with MAC_2500FD.
+Wouldn't it be better to say what you're checking rather than referring off to
+another function that might one day disappear or be renamed?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+David
+
 
