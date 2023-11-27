@@ -1,405 +1,126 @@
-Return-Path: <netdev+bounces-51477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717167FAC80
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:23:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9117FAC98
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 22:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B84D281BAE
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:23:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96075281BB5
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 21:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5C346433;
-	Mon, 27 Nov 2023 21:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2152546459;
+	Mon, 27 Nov 2023 21:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mxbiDf5b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mypgcsMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27419137
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 13:23:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701120229; x=1732656229;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=f3E5ZkGaZvOHyu6n2If/exu6ifWRLB4lFXfZXtQCCFk=;
-  b=mxbiDf5bbd/sEulEyMxZ2IHEAUHCpnhF82+LxnEEwsvpAxj3cjPmL5/a
-   +K7dpYMFhskyn1JT3CLt3CSb2a+rkXP5oHQ08P3HGcfkRyQa4LP1C9S9e
-   mOVgDszCybv1fUgxHWpySD1z2Wzgp2XPRh/QlGQwS7A/NzMEAWW6zeEBo
-   8l2bykVvgg7CTAPOg/SxFU3rFB3BbukRGRVp3zCfa21PtklL08xPSmLh/
-   UwqFCoB2zh5TAdN5hzSU0b4Ns0lTYy2zq3wpO1GHSxmEjoRrfNlw43T41
-   ufrjt3Iet1pTl8zaI0zktIScT2CYONhECCr94I8Ve8r9xyom030NPcQKQ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="389945445"
-X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
-   d="scan'208";a="389945445"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 13:23:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
-   d="scan'208";a="9905775"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Nov 2023 13:23:48 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Dave Ertman <david.m.ertman@intel.com>,
-	anthony.l.nguyen@intel.com,
-	carolyn.wyborny@intel.com,
-	daniel.machon@microchip.com,
-	maciej.fijalkowski@intel.com,
-	jay.vosburgh@canonical.com,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net v2] ice: Fix VF Reset paths when interface in a failed over aggregate
-Date: Mon, 27 Nov 2023 13:23:38 -0800
-Message-ID: <20231127212340.1137657-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5E7131;
+	Mon, 27 Nov 2023 13:32:39 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a0bdf4eeb46so312673066b.3;
+        Mon, 27 Nov 2023 13:32:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701120758; x=1701725558; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=W/1uSzXDfGGBJQhktgQcNYFDx6Quw5SgU4SWdrjub/w=;
+        b=mypgcsMMNggtuV9bW2/YnBKFa7upRp8gWnNMYqJwu0p6+UOuuv6BnTBFcNdW1zBLsc
+         ZIqWj3tESlJeGVfwZfSp1H0r1U3Csqp1M84sikaQ80RKZLTagy1vftXeoi7ljIdfBqgU
+         yxAMsPEzL3pFHRsTF+6Xgs4Mlzm79SJgYo9aQFYdnaenaXjaHi2w+uRRiwEctpZUVTUK
+         HdzmRfPswq2XmKHTDDTMCji24snRwp9E0XhjXeaJhVXmape+BusMYSP/wXBOry0qLOgx
+         fYPLY5AsLzoVezZPlnPXfI7hlNM5JjzUiFIQUc+n7StMZmpqy4V2BDLTabJrjb88lfX+
+         r7SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701120758; x=1701725558;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/1uSzXDfGGBJQhktgQcNYFDx6Quw5SgU4SWdrjub/w=;
+        b=FeKMbURmP9juaeuHq0t0fEWjiF0Nm9jbhPxoekZ6BNqVHlFthm81gtgcZf0v2VTvme
+         KH4s4CMI7JY9CLkD/fqaKcHgiUVUF8giQ2Go2Ez52I2ikHf3WzCysYj/42UI/EZKEbit
+         ZyDWrdjW0/qtT0hm7XiDgY0vm3dlSotwRfXY9/zR5OEB3imFnThbPU4DrZoYvPVckt6w
+         Wbipbmd5QmDDex8LZE7CW+ULQhxz0ZFiKkNaMBBpWAycw621WrUc7cdAJKZbYOO4nin6
+         ONn//Z/RlnOatqkpmK8VEDeH0MPd9kJ8qVrkK4IUvI7Xhp+igGGuixGyPmlguZj0ROr7
+         6EIw==
+X-Gm-Message-State: AOJu0YxxKf+DjolOaxx8PwG/qKkv7HODA1Zuj0AmrLBhFnSaWOMCNlwL
+	2NlmzPJcvckF/v3DLps82hw=
+X-Google-Smtp-Source: AGHT+IGiLRdPfMRCVg9ZEFSpMdpp/TzdZZxtg0wo3DlOFoWnGAfTT/GaVGLjZGSYXUHwDj1D6qqoJA==
+X-Received: by 2002:a17:906:4e81:b0:a0e:3a22:af5 with SMTP id v1-20020a1709064e8100b00a0e3a220af5mr1303801eju.77.1701120757825;
+        Mon, 27 Nov 2023 13:32:37 -0800 (PST)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id 3-20020a170906018300b00a0a8b2b74ddsm4087917ejb.154.2023.11.27.13.32.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 13:32:37 -0800 (PST)
+Message-ID: <f4777af7e0b47b41760da5f291a7535c7006adf9.camel@gmail.com>
+Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
+ CO-RE relocations
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Daniel Xu <dxu@dxuuu.xyz>, Yonghong Song <yonghong.song@linux.dev>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, antony.antony@secunet.com, Mykola Lysenko
+ <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, bpf
+ <bpf@vger.kernel.org>,  "open list:KERNEL SELFTEST FRAMEWORK"
+ <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+ devel@linux-ipsec.org, Network Development <netdev@vger.kernel.org>
+Date: Mon, 27 Nov 2023 23:32:35 +0200
+In-Reply-To: <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
+References: <cover.1700676682.git.dxu@dxuuu.xyz>
+	 <391d524c496acc97a8801d8bea80976f58485810.1700676682.git.dxu@dxuuu.xyz>
+	 <0f210cef-c6e9-41c1-9ba8-225f046435e5@linux.dev>
+	 <CAADnVQ+sEsUyNYPeZyOf2PcCnxOvOqw4bUuAuMofCU14szTGvg@mail.gmail.com>
+	 <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
+	 <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
+	 <uc5fv3keghefszuvono7aclgtjtgjnnia3i54ynejmyrs42ser@bwdpq5gmuvub>
+	 <0535eb913f1a0c2d3c291478fde07e0aa2b333f1.camel@gmail.com>
+	 <42f9bf0d-695a-412d-bea5-cb7036fa7418@linux.dev>
+	 <a5a84482-13ef-47d8-bf07-8017060a5d64@linux.dev>
+	 <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
+Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Dave Ertman <david.m.ertman@intel.com>
+On Mon, 2023-11-27 at 14:45 -0600, Daniel Xu wrote:
+[...]
+> IIUC uapi structs look the same in BTF as any other struct.
 
-There is an error when an interface has the following conditions:
-- PF is in an aggregate (bond)
-- PF has VFs created on it
-- bond is in a state where it is failed-over to the secondary interface
-- A VF reset is issued on one or more of those VFs
+Yes, and all share preserve_access_index attribute because of the way
+attribute push/pop directives are generated in vmlinux.h.
 
-The issue is generated by the originating PF trying to rebuild or
-reconfigure the VF resources.  Since the bond is failed over to the
-secondary interface the queue contexts are in a modified state.
+> Just wondering, though: will bpftool be able to generate the appropriate
+> annotations for uapi structs?=20
 
-To fix this issue, have the originating interface reclaim its resources
-prior to the tear-down and rebuild or reconfigure.  Then after the process
-is complete, move the resources back to the currently active interface.
+The problem is that there is no easy way to identify if structure is
+uapi in DWARF (from which BTF is generated).
+One way to do this:
+- modify pahole to check DW_AT_decl_file for each struct DWARF entry
+  and generate some special decl tag in BTF;
+- modify bpftool to interpret this tag as a marker to not generate
+  preserve_access_index for a structure.
 
-There are multiple paths that can be used depending on what triggered the
-event, so create a helper function to move the queues and use paired calls
-to the helper (back to origin, process, then move back to active interface)
-under the same lag_mutex lock.
+The drawback is that such behavior hardcodes some kernel specific
+assumptions both in pahole and in bpftool. It also remains to be seen
+if DW_AT_decl_file tags are consistent.
 
-Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV on bonded interface")
-Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
-v2:
-- Created helper functions to avoid replicating code
-- Changed to use list_for_each_entry_safe()
+It might be the case that allowing excessive CO-RE relocations is a
+better option. (And maybe tweak something about bitfield access
+generation to avoid such issues as in this thread).
 
-v1: https://lore.kernel.org/netdev/20231115211242.1747810-1-anthony.l.nguyen@intel.com/
-
- drivers/net/ethernet/intel/ice/ice_lag.c      | 122 +++++++++++-------
- drivers/net/ethernet/intel/ice/ice_lag.h      |   1 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  20 +++
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  25 ++++
- 4 files changed, 118 insertions(+), 50 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index cd065ec48c87..280994ee5933 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -569,6 +569,50 @@ ice_lag_move_vf_node_tc(struct ice_lag *lag, u8 oldport, u8 newport,
- 		dev_dbg(dev, "Problem restarting traffic for LAG node move\n");
- }
- 
-+/**
-+ * ice_lag_build_netdev_list - populate the lag struct's netdev list
-+ * @lag: local lag struct
-+ * @ndlist: pointer to netdev list to populate
-+ */
-+static void ice_lag_build_netdev_list(struct ice_lag *lag,
-+				      struct ice_lag_netdev_list *ndlist)
-+{
-+	struct ice_lag_netdev_list *nl;
-+	struct net_device *tmp_nd;
-+
-+	INIT_LIST_HEAD(&ndlist->node);
-+	rcu_read_lock();
-+	for_each_netdev_in_bond_rcu(lag->upper_netdev, tmp_nd) {
-+		nl = kzalloc(sizeof(*nl), GFP_ATOMIC);
-+		if (!nl)
-+			break;
-+
-+		nl->netdev = tmp_nd;
-+		list_add(&nl->node, &ndlist->node);
-+	}
-+	rcu_read_unlock();
-+	lag->netdev_head = &ndlist->node;
-+}
-+
-+/**
-+ * ice_lag_destroy_netdev_list - free lag struct's netdev list
-+ * @lag: pointer to local lag struct
-+ * @ndlist: pointer to lag struct netdev list
-+ */
-+static void ice_lag_destroy_netdev_list(struct ice_lag *lag,
-+					struct ice_lag_netdev_list *ndlist)
-+{
-+	struct ice_lag_netdev_list *entry, *n;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_safe(entry, n, &ndlist->node, node) {
-+		list_del(&entry->node);
-+		kfree(entry);
-+	}
-+	rcu_read_unlock();
-+	lag->netdev_head = NULL;
-+}
-+
- /**
-  * ice_lag_move_single_vf_nodes - Move Tx scheduling nodes for single VF
-  * @lag: primary interface LAG struct
-@@ -597,7 +641,6 @@ ice_lag_move_single_vf_nodes(struct ice_lag *lag, u8 oldport, u8 newport,
- void ice_lag_move_new_vf_nodes(struct ice_vf *vf)
- {
- 	struct ice_lag_netdev_list ndlist;
--	struct list_head *tmp, *n;
- 	u8 pri_port, act_port;
- 	struct ice_lag *lag;
- 	struct ice_vsi *vsi;
-@@ -621,38 +664,15 @@ void ice_lag_move_new_vf_nodes(struct ice_vf *vf)
- 	pri_port = pf->hw.port_info->lport;
- 	act_port = lag->active_port;
- 
--	if (lag->upper_netdev) {
--		struct ice_lag_netdev_list *nl;
--		struct net_device *tmp_nd;
--
--		INIT_LIST_HEAD(&ndlist.node);
--		rcu_read_lock();
--		for_each_netdev_in_bond_rcu(lag->upper_netdev, tmp_nd) {
--			nl = kzalloc(sizeof(*nl), GFP_ATOMIC);
--			if (!nl)
--				break;
--
--			nl->netdev = tmp_nd;
--			list_add(&nl->node, &ndlist.node);
--		}
--		rcu_read_unlock();
--	}
--
--	lag->netdev_head = &ndlist.node;
-+	if (lag->upper_netdev)
-+		ice_lag_build_netdev_list(lag, &ndlist);
- 
- 	if (ice_is_feature_supported(pf, ICE_F_SRIOV_LAG) &&
- 	    lag->bonded && lag->primary && pri_port != act_port &&
- 	    !list_empty(lag->netdev_head))
- 		ice_lag_move_single_vf_nodes(lag, pri_port, act_port, vsi->idx);
- 
--	list_for_each_safe(tmp, n, &ndlist.node) {
--		struct ice_lag_netdev_list *entry;
--
--		entry = list_entry(tmp, struct ice_lag_netdev_list, node);
--		list_del(&entry->node);
--		kfree(entry);
--	}
--	lag->netdev_head = NULL;
-+	ice_lag_destroy_netdev_list(lag, &ndlist);
- 
- new_vf_unlock:
- 	mutex_unlock(&pf->lag_mutex);
-@@ -679,6 +699,29 @@ static void ice_lag_move_vf_nodes(struct ice_lag *lag, u8 oldport, u8 newport)
- 			ice_lag_move_single_vf_nodes(lag, oldport, newport, i);
- }
- 
-+/**
-+ * ice_lag_move_vf_nodes_cfg - move vf nodes outside LAG netdev event context
-+ * @lag: local lag struct
-+ * @src_prt: lport value for source port
-+ * @dst_prt: lport value for destination port
-+ *
-+ * This function is used to move nodes during an out-of-netdev-event situation,
-+ * primarily when the driver needs to reconfigure or recreate resources.
-+ *
-+ * Must be called while holding the lag_mutex to avoid lag events from
-+ * processing while out-of-sync moves are happening.  Also, paired moves,
-+ * such as used in a reset flow, should both be called under the same mutex
-+ * lock to avoid changes between start of reset and end of reset.
-+ */
-+void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8 dst_prt)
-+{
-+	struct ice_lag_netdev_list ndlist;
-+
-+	ice_lag_build_netdev_list(lag, &ndlist);
-+	ice_lag_move_vf_nodes(lag, src_prt, dst_prt);
-+	ice_lag_destroy_netdev_list(lag, &ndlist);
-+}
-+
- #define ICE_LAG_SRIOV_CP_RECIPE		10
- #define ICE_LAG_SRIOV_TRAIN_PKT_LEN	16
- 
-@@ -2051,7 +2094,6 @@ void ice_lag_rebuild(struct ice_pf *pf)
- {
- 	struct ice_lag_netdev_list ndlist;
- 	struct ice_lag *lag, *prim_lag;
--	struct list_head *tmp, *n;
- 	u8 act_port, loc_port;
- 
- 	if (!pf->lag || !pf->lag->bonded)
-@@ -2063,21 +2105,7 @@ void ice_lag_rebuild(struct ice_pf *pf)
- 	if (lag->primary) {
- 		prim_lag = lag;
- 	} else {
--		struct ice_lag_netdev_list *nl;
--		struct net_device *tmp_nd;
--
--		INIT_LIST_HEAD(&ndlist.node);
--		rcu_read_lock();
--		for_each_netdev_in_bond_rcu(lag->upper_netdev, tmp_nd) {
--			nl = kzalloc(sizeof(*nl), GFP_ATOMIC);
--			if (!nl)
--				break;
--
--			nl->netdev = tmp_nd;
--			list_add(&nl->node, &ndlist.node);
--		}
--		rcu_read_unlock();
--		lag->netdev_head = &ndlist.node;
-+		ice_lag_build_netdev_list(lag, &ndlist);
- 		prim_lag = ice_lag_find_primary(lag);
- 	}
- 
-@@ -2107,13 +2135,7 @@ void ice_lag_rebuild(struct ice_pf *pf)
- 
- 	ice_clear_rdma_cap(pf);
- lag_rebuild_out:
--	list_for_each_safe(tmp, n, &ndlist.node) {
--		struct ice_lag_netdev_list *entry;
--
--		entry = list_entry(tmp, struct ice_lag_netdev_list, node);
--		list_del(&entry->node);
--		kfree(entry);
--	}
-+	ice_lag_destroy_netdev_list(lag, &ndlist);
- 	mutex_unlock(&pf->lag_mutex);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.h b/drivers/net/ethernet/intel/ice/ice_lag.h
-index 9557e8605a07..ede833dfa658 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.h
-@@ -65,4 +65,5 @@ int ice_init_lag(struct ice_pf *pf);
- void ice_deinit_lag(struct ice_pf *pf);
- void ice_lag_rebuild(struct ice_pf *pf);
- bool ice_lag_is_switchdev_running(struct ice_pf *pf);
-+void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8 dst_prt);
- #endif /* _ICE_LAG_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index aca1f2ea5034..b7ae09952156 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -829,12 +829,16 @@ static void ice_notify_vf_reset(struct ice_vf *vf)
- int ice_reset_vf(struct ice_vf *vf, u32 flags)
- {
- 	struct ice_pf *pf = vf->pf;
-+	struct ice_lag *lag;
- 	struct ice_vsi *vsi;
-+	u8 act_prt, pri_prt;
- 	struct device *dev;
- 	int err = 0;
- 	bool rsd;
- 
- 	dev = ice_pf_to_dev(pf);
-+	act_prt = ICE_LAG_INVALID_PORT;
-+	pri_prt = pf->hw.port_info->lport;
- 
- 	if (flags & ICE_VF_RESET_NOTIFY)
- 		ice_notify_vf_reset(vf);
-@@ -845,6 +849,17 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 		return 0;
- 	}
- 
-+	lag = pf->lag;
-+	mutex_lock(&pf->lag_mutex);
-+	if (lag && lag->bonded && lag->primary) {
-+		act_prt = lag->active_port;
-+		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
-+		    lag->upper_netdev)
-+			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
-+		else
-+			act_prt = ICE_LAG_INVALID_PORT;
-+	}
-+
- 	if (flags & ICE_VF_RESET_LOCK)
- 		mutex_lock(&vf->cfg_lock);
- 	else
-@@ -937,6 +952,11 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 	if (flags & ICE_VF_RESET_LOCK)
- 		mutex_unlock(&vf->cfg_lock);
- 
-+	if (lag && lag->bonded && lag->primary &&
-+	    act_prt != ICE_LAG_INVALID_PORT)
-+		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	mutex_unlock(&pf->lag_mutex);
-+
- 	return err;
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index cdf17b1e2f25..de11b3186bd7 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -1603,9 +1603,24 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 	    (struct virtchnl_vsi_queue_config_info *)msg;
- 	struct virtchnl_queue_pair_info *qpi;
- 	struct ice_pf *pf = vf->pf;
-+	struct ice_lag *lag;
- 	struct ice_vsi *vsi;
-+	u8 act_prt, pri_prt;
- 	int i = -1, q_idx;
- 
-+	lag = pf->lag;
-+	mutex_lock(&pf->lag_mutex);
-+	act_prt = ICE_LAG_INVALID_PORT;
-+	pri_prt = pf->hw.port_info->lport;
-+	if (lag && lag->bonded && lag->primary) {
-+		act_prt = lag->active_port;
-+		if (act_prt != pri_prt && act_prt != ICE_LAG_INVALID_PORT &&
-+		    lag->upper_netdev)
-+			ice_lag_move_vf_nodes_cfg(lag, act_prt, pri_prt);
-+		else
-+			act_prt = ICE_LAG_INVALID_PORT;
-+	}
-+
- 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states))
- 		goto error_param;
- 
-@@ -1729,6 +1744,11 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 		}
- 	}
- 
-+	if (lag && lag->bonded && lag->primary &&
-+	    act_prt != ICE_LAG_INVALID_PORT)
-+		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	mutex_unlock(&pf->lag_mutex);
-+
- 	/* send the response to the VF */
- 	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_VSI_QUEUES,
- 				     VIRTCHNL_STATUS_SUCCESS, NULL, 0);
-@@ -1743,6 +1763,11 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 				vf->vf_id, i);
- 	}
- 
-+	if (lag && lag->bonded && lag->primary &&
-+	    act_prt != ICE_LAG_INVALID_PORT)
-+		ice_lag_move_vf_nodes_cfg(lag, pri_prt, act_prt);
-+	mutex_unlock(&pf->lag_mutex);
-+
- 	ice_lag_move_new_vf_nodes(vf);
- 
- 	/* send the response to the VF */
--- 
-2.41.0
-
+Thanks,
+Eduard
 
