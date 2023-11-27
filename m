@@ -1,106 +1,120 @@
-Return-Path: <netdev+bounces-51381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85B2A7FA6BC
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:46:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 502E97FA6C3
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 17:47:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E88B0B2130C
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:46:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF630B21200
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41422F866;
-	Mon, 27 Nov 2023 16:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHvTLHVO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B9628E2B;
+	Mon, 27 Nov 2023 16:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A942928E04
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:46:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1B86C433C8;
-	Mon, 27 Nov 2023 16:46:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701103604;
-	bh=fBXkpMFA9S/5p32o9jFsYCv1lzUrDzQObofJV4PDyds=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fHvTLHVOKpushLJOsi2d3zCV/LY8agHtoqdPXGkpLG4rQ1VSwGL0OE2VziNre+sSE
-	 eNUYVR6vE1NLcx4GnZ+/J31yRdhiP4ZNvN80OSeyDAWsdAeUe6ovl2pr6FlCnL7Zh6
-	 x0nVsHE5ECQhb/2oLt1KIPpuuQeR4vXJWVKP8n9XLyt/dpiSlAK8Zsx7T048FiZ4vK
-	 jO3VsRap/dBqZZ2cN6SpPD+7rWm66JfqlgqVdLiu19ZfVu/WmhhEMOUU2tVqLjPOBm
-	 UIlcCWBzucqhqNTOb1oISbPhw+3n835BaJYSA37VlkcJyXt7PEFu2LgXWOddKvZ+0/
-	 165qaMSiteFfw==
-Date: Mon, 27 Nov 2023 16:46:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	Michal Michalik <michal.michalik@intel.com>
-Subject: Re: [PATCH iwl-next 1/2] ice: Schedule service task in IRQ top half
-Message-ID: <20231127164640.GF84723@kernel.org>
-References: <20231124114155.251360-1-karol.kolacinski@intel.com>
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E065D60;
+	Mon, 27 Nov 2023 08:47:16 -0800 (PST)
+Received: from [192.168.1.103] (178.176.78.85) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 27 Nov
+ 2023 19:47:12 +0300
+Subject: Re: [PATCH 2/6] net: ravb: Use pm_runtime_resume_and_get()
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <geert+renesas@glider.be>,
+	<wsa+renesas@sang-engineering.com>, <robh@kernel.org>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<mitsuhiro.kimura.kc@renesas.com>, <masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231127090426.3761729-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231127090426.3761729-3-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <de5891bc-63ab-aa57-01de-510e5d53eb1b@omp.ru>
+Date: Mon, 27 Nov 2023 19:47:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231124114155.251360-1-karol.kolacinski@intel.com>
+In-Reply-To: <20231127090426.3761729-3-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/27/2023 16:34:05
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 181625 [Nov 27 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.85
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/27/2023 16:37:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/27/2023 3:21:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Fri, Nov 24, 2023 at 12:41:54PM +0100, Karol Kolacinski wrote:
-> Schedule service task and EXTTS in the top half to avoid bottom half
-> scheduling if possible, which significantly reduces timestamping delay.
+On 11/27/23 12:04 PM, Claudiu wrote:
+
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> Co-developed-by: Michal Michalik <michal.michalik@intel.com>
-> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice.h      |  1 -
->  drivers/net/ethernet/intel/ice/ice_main.c | 18 ++++++++++--------
->  2 files changed, 10 insertions(+), 9 deletions(-)
+> pm_runtime_get_sync() may return an error. In case it returns with an error
+> dev->power.usage_count needs to be decremented. pm_runtime_resume_and_get()
+> takes care of this. Thus use it.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> index 3ea33947b878..d5a8da0c02c3 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -517,7 +517,6 @@ enum ice_pf_flags {
->  };
->  
->  enum ice_misc_thread_tasks {
-> -	ICE_MISC_THREAD_EXTTS_EVENT,
->  	ICE_MISC_THREAD_TX_TSTAMP,
->  	ICE_MISC_THREAD_NBITS		/* must be last */
->  };
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index 1f159b4362ec..6b91ec6f420d 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -3078,6 +3078,7 @@ static void ice_ena_misc_vector(struct ice_pf *pf)
->  static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
->  {
->  	struct ice_pf *pf = (struct ice_pf *)data;
-> +	irqreturn_t ret = IRQ_HANDLED;
->  	struct ice_hw *hw = &pf->hw;
->  	struct device *dev;
->  	u32 oicr, ena_mask;
-> @@ -3161,6 +3162,8 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
->  		ena_mask &= ~PFINT_OICR_TSYN_TX_M;
->  		if (ice_ptp_pf_handles_tx_interrupt(pf))
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Hi Karol,
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-it seems that a trailing '{' is missing from the line above.
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 50c4c79be035..cd3474168452 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -2876,6 +2878,7 @@ static int ravb_probe(struct platform_device *pdev)
+>  	clk_disable_unprepare(priv->refclk);
+>  out_release:
+>  	pm_runtime_put(&pdev->dev);
+> +out_runtime_disable:
 
->  			set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
-> +			ret = IRQ_WAKE_THREAD;
-> +		}
->  	}
->  
->  	if (oicr & PFINT_OICR_TSYN_EVNT_M) {
+   I'd suggest a shorter name, like out_rpm_disable...
 
-...
+>  	pm_runtime_disable(&pdev->dev);
+>  	reset_control_assert(rstc);
+>  out_free_netdev:
+> 
+
+[...]
+
+MBR, Sergey
 
