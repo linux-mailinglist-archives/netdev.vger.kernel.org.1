@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-51288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679FE7F9F6E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:20:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 206567F9F81
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E09E0B20BCF
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8A528156F
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534CE1DDCF;
-	Mon, 27 Nov 2023 12:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYVnsgfu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D231DFC1;
+	Mon, 27 Nov 2023 12:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233D51DFC1;
-	Mon, 27 Nov 2023 12:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93D7AC433C9;
-	Mon, 27 Nov 2023 12:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701087625;
-	bh=2xL/uJq6qI8TQ3qq2PiEINw1Ueax4X6ay/YZyvpjaWI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tYVnsgfuHt1Z2m4uLjWHgJmiqHaFj0WJ6yLBScYenEScmFpLZxk7nGC8pct1Cn4om
-	 f8+6yCkpwuv3nyo0Pz5Okc03wFiZbSH5Nbo8DcQvtiJfW1Gmu3QsnH25pQ9m+EOyh+
-	 oIxhBcyisB41B8n3phJyKyfy+HtjEwbjgSBSsaXa7EErWQrITQsnCUuPZOHJx2sS+d
-	 T9+V3pDxMWIYVKRFkIDItYG8rbszq47W0FwpSNlHEjQrGbH+KuynX/OZGIyeVmilTS
-	 OQUAlPwK+cSgQF5iAKoX9i8kePY01KCG/Eu+EBIBXj4vxw6W6hQ6VLkl2rPsA+kufB
-	 V6HD1jVgXIJfw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 786E7E1F66D;
-	Mon, 27 Nov 2023 12:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8B9C13A;
+	Mon, 27 Nov 2023 04:24:23 -0800 (PST)
+X-IronPort-AV: E=Sophos;i="6.04,230,1695654000"; 
+   d="scan'208";a="188255212"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 27 Nov 2023 21:24:22 +0900
+Received: from localhost.localdomain (unknown [10.166.13.99])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id DEFC04009414;
+	Mon, 27 Nov 2023 21:24:22 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net v4] ravb: Fix races between ravb_tx_timeout_work() and net related ops
+Date: Mon, 27 Nov 2023 21:24:20 +0900
+Message-Id: <20231127122420.3706751-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,48 +44,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net :mana :Add remaining GDMA stats for MANA to ethtool
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170108762548.32093.15380933168923149331.git-patchwork-notify@kernel.org>
-Date: Mon, 27 Nov 2023 12:20:25 +0000
-References: <1700830950-803-1-git-send-email-shradhagupta@linux.microsoft.com>
-In-Reply-To: <1700830950-803-1-git-send-email-shradhagupta@linux.microsoft.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, sharmaajay@microsoft.com,
- leon@kernel.org, tglx@linutronix.de, bigeasy@linutronix.de,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, mikelley@microsoft.com,
- shradhagupta@microsoft.com
 
-Hello:
+Fix races between ravb_tx_timeout_work() and functions of net_device_ops
+and ethtool_ops by using rtnl_trylock() and rtnl_unlock(). Note that
+since ravb_close() is under the rtnl lock and calls cancel_work_sync(),
+ravb_tx_timeout_work() should calls rtnl_trylock(). Otherwise, a deadlock
+may happen in ravb_tx_timeout_work() like below:
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+CPU0			CPU1
+			ravb_tx_timeout()
+			schedule_work()
+...
+__dev_close_many()
+// Under rtnl lock
+ravb_close()
+cancel_work_sync()
+// Waiting
+			ravb_tx_timeout_work()
+			rtnl_lock()
+			// This is possible to cause a deadlock
 
-On Fri, 24 Nov 2023 05:02:30 -0800 you wrote:
-> Extend performance counter stats in 'ethtool -S <interface>'
-> for MANA VF to include all GDMA stat counter.
-> 
-> Tested-on: Ubuntu22
-> Testcases:
-> 1. LISA testcase:
-> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-Synthetic
-> 2. LISA testcase:
-> PERF-NETWORK-TCP-THROUGHPUT-MULTICONNECTION-NTTTCP-SRIOV
-> 
-> [...]
+If rtnl_trylock() fails, rescheduling the work with sleep for 1 msec.
 
-Here is the summary with links:
-  - net :mana :Add remaining GDMA stats for MANA to ethtool
-    https://git.kernel.org/netdev/net-next/c/e1df5202e879
+Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+Changes from v3:
+https://lore.kernel.org/all/20231115022644.2316961-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on v2 patch. This means that delayed work is not used.
+ - Add rescheduling the work if rtnl_trylock() fails.
+ - Drop Reviewed-by tags because implementation was changed.
 
-You are awesome, thank you!
+Changes from v2:
+https://lore.kernel.org/netdev/20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com/
+ - Add rescheduling if rtnl_trylock() fails and the netif is still running
+   and update commit description for it.
+ - Add Reviewed-by tags.
+
+ drivers/net/ethernet/renesas/ravb_main.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index c70cff80cc99..7c007ecd3ff6 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1874,6 +1874,12 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+ 	struct net_device *ndev = priv->ndev;
+ 	int error;
+ 
++	if (!rtnl_trylock()) {
++		usleep_range(1000, 2000);
++		schedule_work(&priv->work);
++		return;
++	}
++
+ 	netif_tx_stop_all_queues(ndev);
+ 
+ 	/* Stop PTP Clock driver */
+@@ -1907,7 +1913,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+ 		 */
+ 		netdev_err(ndev, "%s: ravb_dmac_init() failed, error %d\n",
+ 			   __func__, error);
+-		return;
++		goto out_unlock;
+ 	}
+ 	ravb_emac_init(ndev);
+ 
+@@ -1917,6 +1923,9 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+ 		ravb_ptp_init(ndev, priv->pdev);
+ 
+ 	netif_tx_start_all_queues(ndev);
++
++out_unlock:
++	rtnl_unlock();
+ }
+ 
+ /* Packet transmit function for Ethernet AVB */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
