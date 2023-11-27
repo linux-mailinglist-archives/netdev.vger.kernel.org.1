@@ -1,54 +1,57 @@
-Return-Path: <netdev+bounces-51207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2CE7F990E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 07:05:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FDF7F9914
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 07:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1880E280DE7
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D8D7B20A15
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F256ADE;
-	Mon, 27 Nov 2023 06:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C0053BA;
+	Mon, 27 Nov 2023 06:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DV7ku2DI"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="L+dcO/bv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE31D13D;
-	Sun, 26 Nov 2023 22:05:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701065119; x=1732601119;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jl2n3DOTd1DIka9IKBM+HJnvzYRs320kDKrmGMGFtSM=;
-  b=DV7ku2DI0sYRh0xc32QFihO9/M4fFD51OQzJa7I7SLSO/mK33Jcisb7y
-   KqMag0Xcnq6c3+GpYDmk7YzxkEdttrHmQk9C9ego3B+AxLX3ktS/Y7OmR
-   6I1CHlzovNt/4QXDNXsv54EdhiYygwduNmeZ2zZ1fjFeM4CIYtgnJsJAb
-   G1IiK19qinE+QUN8IU5qAWb2szfc2Wc6VOsfr3RPyeypkb0MXLZtpx1ae
-   eHrfo1PvdiS89m+En22mS/8dGzJdjg79bVn+oZd/Psr1KD4YVQFz+Y8PE
-   1NOMXE8Q+ZXLB1hIUf3B/hFMtTXJQEnvx2ZY1Rgi9EsedwLC5y/YL6hLj
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="11341583"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="11341583"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 22:05:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10906"; a="717933496"
-X-IronPort-AV: E=Sophos;i="6.04,230,1695711600"; 
-   d="scan'208";a="717933496"
-Received: from sbahadur1-bxdsw.sj.intel.com ([10.232.237.139])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2023 22:05:17 -0800
-From: Sachin Bahadur <sachin.bahadur@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v4] ice: Block PF reinit if attached to bond
-Date: Sun, 26 Nov 2023 22:05:12 -0800
-Message-Id: <20231127060512.1283336-1-sachin.bahadur@intel.com>
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9790E4;
+	Sun, 26 Nov 2023 22:05:52 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AR0QDrE014892;
+	Sun, 26 Nov 2023 22:05:46 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : subject
+ : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=u31IBT9Ogw/i12krm24f2e68EWynIQHq66FbOqTZMEo=;
+ b=L+dcO/bvY5ySIoQWcfrnYvG8SQHTyR5wcr8fNT2pHUgLdlUeSNmwJtXDPmwLhpNXDLsj
+ zmfUqzPGXuXHHZQmtNGYXl1eLkLL2fwIZfVOgDqSNOQdWvVp3OCd7pfM/XlSNXRi/zjg
+ r/lZTuSaRGuGbudDn3KWlu4oQFXCmi1B3biXyQZ2KIdZ0DdVvUrk2AvAB0jgXBbTxK3t
+ fL9NXN1eIbXNqzPNggzY56DBOgbniRMf8ZkHDaWTuec+7aWwQ7UOtY1aJ3y8IOpNJr0+
+ 5Are2Y634lab3pDF13uIY1AzN4enBUzbpiY9VRRG7WlIwQzgUA4Bt51JjWroK0By1/8H BQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ukf5x3s2c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 26 Nov 2023 22:05:46 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 26 Nov
+ 2023 22:05:45 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 26 Nov 2023 22:05:44 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id DD9F43F7055;
+	Sun, 26 Nov 2023 22:05:40 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>,
+        <naveenm@marvell.com>
+Subject: [net PATCH v2] octeontx2-pf: Fix updation of adaptive interrupt coalescing
+Date: Mon, 27 Nov 2023 11:35:38 +0530
+Message-ID: <20231127060538.3780111-1-sumang@marvell.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -57,35 +60,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: N2TjlSe4MzvHhydGjJUosqXtlGC1G91C
+X-Proofpoint-ORIG-GUID: N2TjlSe4MzvHhydGjJUosqXtlGC1G91C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-27_03,2023-11-22_01,2023-05-22_02
 
-PF interface part of Bond should not allow driver reinit via devlink. Bond
-config will be lost due to PF reinit. PF needs to be re-added to Bond
-after PF reinit. ice_devlink_reload_down is called before PF driver reinit.
-If PF is attached to bond, ice_devlink_reload_down returns error.
+From: Naveen Mamindlapalli <naveenm@marvell.com>
 
-Fixes: trailer
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Sachin Bahadur <sachin.bahadur@intel.com>
+The current adaptive interrupt coalescing code updates only rx
+packet stats for dim algorithm. This patch fixes that and also
+updates tx packet stats which will be useful when there is
+only tx traffic. Also moved configuring hardware adaptive
+interrupt setting to driver dim callback.
+
+Fixes: 6e144b47f560 ("octeontx2-pf: Add support for adaptive interrupt coalescing")
+Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
 ---
- drivers/net/ethernet/intel/ice/ice_devlink.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2 changes:
+- Missed adding the fixes tag in v1. Added the same in v2.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index f4e24d11ebd0..5fe88e949b09 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -457,6 +457,10 @@ ice_devlink_reload_down(struct devlink *devlink, bool netns_change,
- 					   "Remove all VFs before doing reinit\n");
- 			return -EOPNOTSUPP;
- 		}
-+		if (pf->lag && pf->lag->bonded) {
-+			NL_SET_ERR_MSG_MOD(extack, "Remove all associated Bonds before doing reinit");
-+			return -EBUSY;
-+		}
- 		ice_unload(pf);
- 		return 0;
- 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
---
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  9 +++++++++
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 20 +++++++++----------
+ 2 files changed, 19 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index ba95ac913274..6c0e0e2c235b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1685,6 +1685,14 @@ static void otx2_do_set_rx_mode(struct otx2_nic *pf)
+ 	mutex_unlock(&pf->mbox.lock);
+ }
+ 
++static void otx2_set_irq_coalesce(struct otx2_nic *pfvf)
++{
++	int cint;
++
++	for (cint = 0; cint < pfvf->hw.cint_cnt; cint++)
++		otx2_config_irq_coalescing(pfvf, cint);
++}
++
+ static void otx2_dim_work(struct work_struct *w)
+ {
+ 	struct dim_cq_moder cur_moder;
+@@ -1700,6 +1708,7 @@ static void otx2_dim_work(struct work_struct *w)
+ 		CQ_TIMER_THRESH_MAX : cur_moder.usec;
+ 	pfvf->hw.cq_ecount_wait = (cur_moder.pkts > NAPI_POLL_WEIGHT) ?
+ 		NAPI_POLL_WEIGHT : cur_moder.pkts;
++	otx2_set_irq_coalesce(pfvf);
+ 	dim->state = DIM_START_MEASURE;
+ }
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 6ee15f3c25ed..4d519ea833b2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -512,11 +512,18 @@ static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_p
+ {
+ 	struct dim_sample dim_sample;
+ 	u64 rx_frames, rx_bytes;
++	u64 tx_frames, tx_bytes;
+ 
+ 	rx_frames = OTX2_GET_RX_STATS(RX_BCAST) + OTX2_GET_RX_STATS(RX_MCAST) +
+ 		OTX2_GET_RX_STATS(RX_UCAST);
+ 	rx_bytes = OTX2_GET_RX_STATS(RX_OCTS);
+-	dim_update_sample(pfvf->napi_events, rx_frames, rx_bytes, &dim_sample);
++	tx_bytes = OTX2_GET_TX_STATS(TX_OCTS);
++	tx_frames = OTX2_GET_TX_STATS(TX_UCAST);
++
++	dim_update_sample(pfvf->napi_events,
++			  rx_frames + tx_frames,
++			  rx_bytes + tx_bytes,
++			  &dim_sample);
+ 	net_dim(&cq_poll->dim, dim_sample);
+ }
+ 
+@@ -558,16 +565,9 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
+ 		if (pfvf->flags & OTX2_FLAG_INTF_DOWN)
+ 			return workdone;
+ 
+-		/* Check for adaptive interrupt coalesce */
+-		if (workdone != 0 &&
+-		    ((pfvf->flags & OTX2_FLAG_ADPTV_INT_COAL_ENABLED) ==
+-		     OTX2_FLAG_ADPTV_INT_COAL_ENABLED)) {
+-			/* Adjust irq coalese using net_dim */
++		/* Adjust irq coalese using net_dim */
++		if (pfvf->flags & OTX2_FLAG_ADPTV_INT_COAL_ENABLED)
+ 			otx2_adjust_adaptive_coalese(pfvf, cq_poll);
+-			/* Update irq coalescing */
+-			for (i = 0; i < pfvf->hw.cint_cnt; i++)
+-				otx2_config_irq_coalescing(pfvf, i);
+-		}
+ 
+ 		if (unlikely(!filled_cnt)) {
+ 			struct refill_work *work;
+-- 
 2.25.1
 
 
