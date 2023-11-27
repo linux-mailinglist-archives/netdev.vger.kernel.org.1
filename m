@@ -1,252 +1,134 @@
-Return-Path: <netdev+bounces-51256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DC07F9D89
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:29:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F8A7F9D90
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF459B20DFB
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:29:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFA6128135E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EE418C2D;
-	Mon, 27 Nov 2023 10:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6A916404;
+	Mon, 27 Nov 2023 10:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="swBkuCWb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJTg5lcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91DE18F;
-	Mon, 27 Nov 2023 02:28:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D4LKMGfu3vGb06v+qMKxpuoG3Cge/Rdbe2tiLHyGSpwAgnTtu+OWxjXUtTjtt+WTX1SnjHgUZzTFt7eV4S8Uga04KkjKAiTEbpQg2Aqk7V5hoXX2by3Vgm3l84K95/23tYXZjhzvlTfByIWuBEuB+8TZKXolTT44H3ph8C1QQf4WrkZvaTpXXt/9CCdI79dGRx5njgYyVKxDMB/bIKW0CBFYUK4dHIkZ0nVRiF6fMTm5Qea0/2BT+tJ4bn+hWPcpqL9yOqbyQCbpSCAISTtkARDPO5PyoKUaTSYUpnwp/kdf1Dbr8BMXFKoCD1bqpNECHBNNIMH6eq6lqnuxuvqyRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/EIallbDZQqPnj4t5E2adbK7o25+8EmHC2146XW0dC8=;
- b=W0takx2sCeM1fWg1h+VvlAj1wsmnGM8TW/86fUS+1DL0uJo3WRclBPyhMibRnkqtmWvW4vy5wrQEbrE+pcX+kei6NTBlSSF92qQsVRZ2kTrxNVfmbyrr1tUGoG0I2pjg3u01BPeVDg6a58preF9AX02rG26Ol3d0O57SYV9gBLz2tCaJrDXpXRBdNmvNRIjVCux5Ck14aNU6oU8l3uQ1+RGceFVzmX7LYWX8OY/n4/LtmfQcDTgk/cVxMvTpZZnLgvlfoWS62323YbiyIljxaWpOqwpmkb8ftyWBFL0Mf7W7axW8tYn7ZmbFDjOxE/RL9XZ278HwJ70CsbN5l7Qh1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=grandegger.com smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/EIallbDZQqPnj4t5E2adbK7o25+8EmHC2146XW0dC8=;
- b=swBkuCWbOfDoN5qYtncOIpPjtmWq6KwrVnqnKShJlkW4H04ZcwQGG+rbPSDmLaTdZNaHSqq49B7tSM/fbE6F/7UecomCwU7bL2iFdWKecljciPyZ9hjwrrMExR8iIkxF5uEf23XmCzihqTzQMZ9qNYfcI44z0VyUeY2sKJhr2Bs=
-Received: from SN4PR0501CA0002.namprd05.prod.outlook.com
- (2603:10b6:803:40::15) by DS0PR12MB7728.namprd12.prod.outlook.com
- (2603:10b6:8:13a::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Mon, 27 Nov
- 2023 10:28:47 +0000
-Received: from SA2PEPF000015CA.namprd03.prod.outlook.com
- (2603:10b6:803:40:cafe::60) by SN4PR0501CA0002.outlook.office365.com
- (2603:10b6:803:40::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.21 via Frontend
- Transport; Mon, 27 Nov 2023 10:28:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF000015CA.mail.protection.outlook.com (10.167.241.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7046.17 via Frontend Transport; Mon, 27 Nov 2023 10:28:47 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 27 Nov
- 2023 04:28:46 -0600
-Received: from xhdvnc205.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.34 via Frontend
- Transport; Mon, 27 Nov 2023 04:28:42 -0600
-From: Srinivas Goud <srinivas.goud@amd.com>
-To: <wg@grandegger.com>, <mkl@pengutronix.de>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <p.zabel@pengutronix.de>
-CC: <git@amd.com>, <michal.simek@xilinx.com>, <linux-can@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<appana.durga.rao@xilinx.com>, Srinivas Goud <srinivas.goud@amd.com>
-Subject: [PATCH v7 3/3] can: xilinx_can: Add ethtool stats interface for ECC errors
-Date: Mon, 27 Nov 2023 15:58:15 +0530
-Message-ID: <1701080895-1475-4-git-send-email-srinivas.goud@amd.com>
-X-Mailer: git-send-email 2.1.1
-In-Reply-To: <1701080895-1475-1-git-send-email-srinivas.goud@amd.com>
-References: <1701080895-1475-1-git-send-email-srinivas.goud@amd.com>
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2951BE1;
+	Mon, 27 Nov 2023 02:32:15 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-5094727fa67so5764256e87.3;
+        Mon, 27 Nov 2023 02:32:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701081133; x=1701685933; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6EkO/+jvJxUqXrykI1sSA6OiaE4jGEfZVrMxpcuLqiw=;
+        b=gJTg5lcNRAiqs8jB4UvZOC3yjOZkOKEXnV3HXuvAnY65VgfXev0x9/KH5QNFIhJ3SE
+         Fp834eeQfgl+96UomKXnABD/i7fId8vII7Gyt6Gi+LiT7lkpO8IEfxAZ7vJFU3HOitzK
+         667j1hYtNi8WAIAHrmlWlMX7MQ/wrjCsl8IP8PZIFTsfu+g9aXkR/rdtuJkQPcRHrwmv
+         xzUDpGnxi532Fr6paKteeXAHmUsmRL+w5lwFmGeLy8LGQ+JY1QwoGMVcs3prIrxwt+e/
+         CKPmwM6KczLoAM2JGweDA4meoZjy7/S++m5bb9jyCMtrtZ4vpScYU2mYztPwzjau2/xo
+         LEgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701081133; x=1701685933;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6EkO/+jvJxUqXrykI1sSA6OiaE4jGEfZVrMxpcuLqiw=;
+        b=AtpUFy1VsDNj07uwNLQ6hTAGK6dCr2tOfZBCZMbJvAC6/CuJ7Cy5dxi5PPXbmtNK3Q
+         K4wLCwM8OjDOhvvcYxarCmxUmzo/8wgs5/ffoII82jezB4vbX7lydHJaXji9URXLZyFt
+         D8k/oJerMAQhNp4lwGJvEwgDFd5IXwlfghAUEoYBZaD02pbbtPGH77nPSnAi+gV7AO4C
+         El0vCyz176IPQZ+cJ/ssTbz8imKnfrnRw9K1VOCOGjiOnBEjH/4NYzghDZFdzeMi0yKj
+         udU++L9V36jP9N+x3q6+vxyuckwpFaaHxfA024K0WIuIGuGOf0J+4hwoU4Fa4wca/PfJ
+         CGbA==
+X-Gm-Message-State: AOJu0YwN3+qn0shQZQRFwl2QFMTBy37lj3O5NTdOVknHFbgaKjJHjBM6
+	7VEHVs+nQd8GHnk+5o7CjJRYII7T3n6Tmw==
+X-Google-Smtp-Source: AGHT+IE3b9c6E7V+MSu9Q2L64S7DO8nOwRZHa34LOV/mGICVyRrnTHJnOY2V9EscGgi3JRfPWtGEdw==
+X-Received: by 2002:a05:6512:2343:b0:509:455c:9e3d with SMTP id p3-20020a056512234300b00509455c9e3dmr5108404lfu.18.1701081133118;
+        Mon, 27 Nov 2023 02:32:13 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id z20-20020a056512309400b0050aa9cfc238sm1438739lfd.89.2023.11.27.02.32.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 02:32:12 -0800 (PST)
+Date: Mon, 27 Nov 2023 13:32:10 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com, 
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: Re: [PATCH net v3] net: stmmac: xgmac: Disable FPE MMC interrupts
+Message-ID: <4zucnqqunr6rb6k2g4737ksma4r6q5eizopvmvnmeyrhd4pio2@cism5prdsxmq>
+References: <20231125060126.2328690-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CA:EE_|DS0PR12MB7728:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56915305-e7d0-4fbc-1a16-08dbef33a3ee
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	0HVssA89sIUbMIosQB87c4w8CGKtqJAa4LEKrIP/u63I43pU6aWdu+W4sqqV2rgZS4DQ0xNTvyNmmABXjPDgpxIQ70mUoYsvwv7vpsdcMJ4aMgD6N4hLVrPqSzYHf2G47fCfhUiFPqyolWGA6g1zUPV+GoAQWVtb4V09vfddk94UiwXu0XwdG3At4V746OiCJBpHG2BWTArvr2yMan9nDEwFVFz3/k2dRjVIqc226NzevckuWn5xsGxq59XMIkEsEKm3gC2hZ2HDasbFky3iPoGDWvnoHzGwA/4v3uqCnWUy08Njhp9U9GifVvPfz0JbUYTAI6ZDMUdw22E8c+evwR2K7MIhh8PX8C8NgOeuOyRuIc02VBWZjzBk+knljlZF/MU2XRasjAkH6Er8aO9RWoySx4LD+ZF7i87Y1d6hqZEdUAYCWIJ6iPor2xfux9nuVvLPHQg5a0VaCKyVzR16XP8yADpM73PDjGoq//87ENH4M7uFrQf66wXKoSLbKgxFAgVHB1Y0AC2+BVAlBEQUZYspCi1TGNCa0L2ZuTG1OvYyciDHslg43k65tN6Gmbpljg36GNieTKZ4sXB/FUezIdxVxunekuo4cFGg3UhZIvNpm+9cEx/hfe4Dw+5NKHoAkF1BUw6z/+sLL/I3EVwU8InXRZUd9p7Dl+Aw4sLjiWCeG39wK/e+WDws84jY8vAuC4r5k9kQn+v8D2zKJ53kueygV00+2uYPzmFyhdeGuiLkwkUGvR4AQ4+Q5kdgGqK6mywALgDRfg9Chx5SapA53Ls20+yQPAFbZBtJHMdGbvw=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(39860400002)(396003)(136003)(230922051799003)(1800799012)(82310400011)(186009)(64100799003)(451199024)(40470700004)(46966006)(36840700001)(41300700001)(36756003)(921008)(86362001)(81166007)(36860700001)(356005)(47076005)(2906002)(83380400001)(5660300002)(82740400003)(7416002)(426003)(336012)(26005)(44832011)(2616005)(40480700001)(6666004)(8676002)(4326008)(8936002)(40460700003)(478600001)(110136005)(70206006)(70586007)(54906003)(316002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 10:28:47.5093
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56915305-e7d0-4fbc-1a16-08dbef33a3ee
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015CA.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7728
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231125060126.2328690-1-0x1207@gmail.com>
 
-Add ethtool stats interface for reading FIFO 1bit/2bit ECC errors information.
+On Sat, Nov 25, 2023 at 02:01:26PM +0800, Furong Xu wrote:
+> Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
+> by default") tries to disable MMC interrupts to avoid a storm of
+> unhandled interrupts, but leaves the FPE(Frame Preemption) MMC
+> interrupts enabled, FPE MMC interrupts can cause the same problem.
+> Now we mask FPE TX and RX interrupts to disable all MMC interrupts.
+> 
+> Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
+> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> ---
+> Changes in v3:
+>   - Update commit message, thanks Larysa.
+>   - Rename register defines, thanks Serge.
 
-Signed-off-by: Srinivas Goud <srinivas.goud@amd.com>
----
-Changes in v7:
-Update with spinlock only for stats counters
+The fix looking good now. Thanks!
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-Changes in v6:
-None
+-Serge(y)
 
-Changes in v5:
-Address review comments
-Add get_strings and get_sset_count stats interface
-Use u64 stats helper function
-
-Changes in v4:
-None
-
-Changes in v3:
-None
-
-Changes in v2:
-Add ethtool stats interface
-
- drivers/net/can/xilinx_can.c | 54 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
-
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index c8691a1..80b0586 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -228,6 +228,7 @@ struct xcan_devtype_data {
-  * @transceiver:		Optional pointer to associated CAN transceiver
-  * @rstc:			Pointer to reset control
-  * @ecc_enable:			ECC enable flag
-+ * @stats_lock:			Lock for synchronizing ECC errors stats
-  * @ecc_2bit_rxfifo_cnt:	RXFIFO 2bit ECC count
-  * @ecc_1bit_rxfifo_cnt:	RXFIFO 1bit ECC count
-  * @ecc_2bit_txolfifo_cnt:	TXOLFIFO 2bit ECC count
-@@ -254,6 +255,7 @@ struct xcan_priv {
- 	struct phy *transceiver;
- 	struct reset_control *rstc;
- 	bool ecc_enable;
-+	spinlock_t stats_lock; /* Lock for synchronizing ECC errors stats */
- 	u64_stats_t ecc_2bit_rxfifo_cnt;
- 	u64_stats_t ecc_1bit_rxfifo_cnt;
- 	u64_stats_t ecc_2bit_txolfifo_cnt;
-@@ -347,6 +349,12 @@ static const struct can_tdc_const xcan_tdc_const_canfd2 = {
- 	.tdcf_max = 0,
- };
- 
-+static const char xcan_priv_flags_strings[][ETH_GSTRING_LEN] = {
-+	"err-ecc-rx-2-bit", "err-ecc-rx-1-bit",
-+	"err-ecc-txol-2-bit", "err-ecc-txol-1-bit",
-+	"err-ecc-txtl-2-bit", "err-ecc-txtl-1-bit",
-+};
-+
- /**
-  * xcan_write_reg_le - Write a value to the device register little endian
-  * @priv:	Driver private data structure
-@@ -1171,6 +1179,7 @@ static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
- 
- 	if (priv->ecc_enable && isr & XCAN_IXR_ECC_MASK) {
- 		u32 reg_rx_ecc, reg_txol_ecc, reg_txtl_ecc;
-+		unsigned long flags;
- 
- 		reg_rx_ecc = priv->read_reg(priv, XCAN_RXFIFO_ECC_OFFSET);
- 		reg_txol_ecc = priv->read_reg(priv, XCAN_TXOLFIFO_ECC_OFFSET);
-@@ -1182,6 +1191,8 @@ static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
- 		priv->write_reg(priv, XCAN_ECC_CFG_OFFSET, XCAN_ECC_CFG_REECRX_MASK |
- 				XCAN_ECC_CFG_REECTXOL_MASK | XCAN_ECC_CFG_REECTXTL_MASK);
- 
-+		spin_lock_irqsave(&priv->stats_lock, flags);
-+
- 		if (isr & XCAN_IXR_E2BERX_MASK) {
- 			u64_stats_add(&priv->ecc_2bit_rxfifo_cnt,
- 				      FIELD_GET(XCAN_ECC_2BIT_CNT_MASK, reg_rx_ecc));
-@@ -1211,6 +1222,8 @@ static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
- 			u64_stats_add(&priv->ecc_1bit_txtlfifo_cnt,
- 				      FIELD_GET(XCAN_ECC_1BIT_CNT_MASK, reg_txtl_ecc));
- 		}
-+
-+		spin_unlock_irqrestore(&priv->stats_lock, flags);
- 	}
- 
- 	if (cf.can_id) {
-@@ -1637,6 +1650,44 @@ static int xcan_get_auto_tdcv(const struct net_device *ndev, u32 *tdcv)
- 	return 0;
- }
- 
-+static void xcan_get_strings(struct net_device *ndev, u32 stringset, u8 *buf)
-+{
-+	switch (stringset) {
-+	case ETH_SS_STATS:
-+		memcpy(buf, &xcan_priv_flags_strings,
-+		       sizeof(xcan_priv_flags_strings));
-+	}
-+}
-+
-+static int xcan_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return ARRAY_SIZE(xcan_priv_flags_strings);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static void xcan_get_ethtool_stats(struct net_device *ndev,
-+				   struct ethtool_stats *stats, u64 *data)
-+{
-+	struct xcan_priv *priv = netdev_priv(ndev);
-+	unsigned long flags;
-+	int i = 0;
-+
-+	spin_lock_irqsave(&priv->stats_lock, flags);
-+
-+	data[i++] = u64_stats_read(&priv->ecc_2bit_rxfifo_cnt);
-+	data[i++] = u64_stats_read(&priv->ecc_1bit_rxfifo_cnt);
-+	data[i++] = u64_stats_read(&priv->ecc_2bit_txolfifo_cnt);
-+	data[i++] = u64_stats_read(&priv->ecc_1bit_txolfifo_cnt);
-+	data[i++] = u64_stats_read(&priv->ecc_2bit_txtlfifo_cnt);
-+	data[i++] = u64_stats_read(&priv->ecc_1bit_txtlfifo_cnt);
-+
-+	spin_unlock_irqrestore(&priv->stats_lock, flags);
-+}
-+
- static const struct net_device_ops xcan_netdev_ops = {
- 	.ndo_open	= xcan_open,
- 	.ndo_stop	= xcan_close,
-@@ -1646,6 +1697,9 @@ static const struct net_device_ops xcan_netdev_ops = {
- 
- static const struct ethtool_ops xcan_ethtool_ops = {
- 	.get_ts_info = ethtool_op_get_ts_info,
-+	.get_strings = xcan_get_strings,
-+	.get_sset_count = xcan_get_sset_count,
-+	.get_ethtool_stats = xcan_get_ethtool_stats,
- };
- 
- /**
--- 
-2.1.1
-
+> 
+> Changes in v2:
+>   - Update commit message, thanks Wojciech and Andrew.
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> index ea4910ae0921..6a7c1d325c46 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> @@ -177,8 +177,10 @@
+>  #define MMC_XGMAC_RX_DISCARD_OCT_GB	0x1b4
+>  #define MMC_XGMAC_RX_ALIGN_ERR_PKT	0x1bc
+>  
+> +#define MMC_XGMAC_TX_FPE_INTR_MASK	0x204
+>  #define MMC_XGMAC_TX_FPE_FRAG		0x208
+>  #define MMC_XGMAC_TX_HOLD_REQ		0x20c
+> +#define MMC_XGMAC_RX_FPE_INTR_MASK	0x224
+>  #define MMC_XGMAC_RX_PKT_ASSEMBLY_ERR	0x228
+>  #define MMC_XGMAC_RX_PKT_SMD_ERR	0x22c
+>  #define MMC_XGMAC_RX_PKT_ASSEMBLY_OK	0x230
+> @@ -352,6 +354,8 @@ static void dwxgmac_mmc_intr_all_mask(void __iomem *mmcaddr)
+>  {
+>  	writel(0x0, mmcaddr + MMC_RX_INTR_MASK);
+>  	writel(0x0, mmcaddr + MMC_TX_INTR_MASK);
+> +	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_TX_FPE_INTR_MASK);
+> +	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_FPE_INTR_MASK);
+>  	writel(MMC_DEFAULT_MASK, mmcaddr + MMC_XGMAC_RX_IPC_INTR_MASK);
+>  }
+>  
+> -- 
+> 2.34.1
+> 
+> 
 
