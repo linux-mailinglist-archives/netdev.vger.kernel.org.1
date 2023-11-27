@@ -1,69 +1,103 @@
-Return-Path: <netdev+bounces-51311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE4F7FA10D
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:27:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C2D7FA110
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27F3D1F20620
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:27:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAF81F20CD5
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167F42E632;
-	Mon, 27 Nov 2023 13:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NZkV9Olf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CCA2EAF9;
+	Mon, 27 Nov 2023 13:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9E08E;
-	Mon, 27 Nov 2023 05:27:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=JXdr956Iretu3y/Ma2B3JghS9ObBnt1CPoKuAApnoLg=; b=NZ
-	kV9OlfNYngKjrO2DJgO0Tyf3Y1ZVNgqMtA1wN/oLDE8Z0FbIcLt1pM2KADK6T6OPkELJXPD34CnEh
-	C9QMua6EWvRACi+tg89CUQI5khgSxmf0d5LegBJoubWtctBOLqtcs4lD0wh9ojUewpNvoUxZ8yjYb
-	KyZqdgV9gms4O1c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r7bdz-001LPJ-6P; Mon, 27 Nov 2023 14:27:23 +0100
-Date: Mon, 27 Nov 2023 14:27:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Ram=F3n_N=2ERodriguez?= <ramon.nordin.rodriguez@ferroamp.se>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: microchip_t1s: refactor reset functionality
-Message-ID: <3d45c394-7b3d-4dbb-b85e-9fadea8ba1b0@lunn.ch>
-References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
- <20231127104045.96722-2-ramon.nordin.rodriguez@ferroamp.se>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4091D4B
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 05:27:58 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1r7beF-0001b0-KC; Mon, 27 Nov 2023 14:27:39 +0100
+Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1r7beE-00BxH9-MI; Mon, 27 Nov 2023 14:27:38 +0100
+Received: from pza by lupine with local (Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1r7beE-000DEU-1v;
+	Mon, 27 Nov 2023 14:27:38 +0100
+Message-ID: <9b3cdf0da11d59579cbf3ffe959c2a4ebba5672d.camel@pengutronix.de>
+Subject: Re: [RFC PATCH 8/8] net: ethernet: mtk_eth_soc: add paths and
+ SerDes modes for MT7988
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Daniel Golle <daniel@makrotopia.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+ Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ John Crispin <john@phrozen.org>,  Sean Wang <sean.wang@mediatek.com>, Mark
+ Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,  AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,  Russell King
+ <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>,
+ netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org,  linux-phy@lists.infradead.org
+Date: Mon, 27 Nov 2023 14:27:38 +0100
+In-Reply-To: <cad139116f916ae4f63d3df9900835af3f6b5cd2.1699565880.git.daniel@makrotopia.org>
+References: <cover.1699565880.git.daniel@makrotopia.org>
+	 <cad139116f916ae4f63d3df9900835af3f6b5cd2.1699565880.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231127104045.96722-2-ramon.nordin.rodriguez@ferroamp.se>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Nov 27, 2023 at 11:40:43AM +0100, Ramón N.Rodriguez wrote:
-> From: Ramón Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-> 
-> This commit moves the reset functionality for lan867x from the revb1
-> init function to a separate function. The intention with this minor
-> refactor is to prepare for adding support for lan867x rev C1.
-> 
-> Signed-off-by: Ramón Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+On Do, 2023-11-09 at 21:52 +0000, Daniel Golle wrote:
+> MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
+> connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
+> 2500Base-X, 1000Base-X and Cisco SGMII interface modes.
+>=20
+> Implement support for configuring for the new paths to SerDes interfaces
+> and the internal 2.5G PHY.
+>=20
+> Add USXGMII PCS driver for 10GBase-R, 5GBase-R and USXGMII mode, and
+> setup the new PHYA on MT7988 to access the also still existing old
+> LynxI PCS for 1000Base-X, 2500Base-X and Cisco SGMII PCS interface
+> modes.
+>=20
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+[...]
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/et=
+hernet/mediatek/mtk_eth_soc.h
+> index 9ae3b8a71d0e6..ba5998ef7965e 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> @@ -15,6 +15,7 @@
+>  #include <linux/u64_stats_sync.h>
+>  #include <linux/refcount.h>
+>  #include <linux/phylink.h>
+> +#include <linux/reset.h>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I can't see what this is required for?
 
-    Andrew
+regards
+Philipp
 
