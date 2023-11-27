@@ -1,110 +1,93 @@
-Return-Path: <netdev+bounces-51251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7677F9D62
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:25:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4137F9D77
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 11:28:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27F7BB20C7E
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:25:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F521B20DAE
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 10:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2314E18AEE;
-	Mon, 27 Nov 2023 10:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B666718AF4;
+	Mon, 27 Nov 2023 10:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgzldBHU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QTQALexX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588C0135
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:25:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701080735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZA1nFhs0OclwFV+JNDde8LIxfs9r7hNs3Xy7sP4jpzY=;
-	b=UgzldBHUs0jkyZsnH5ObnRnHjz1dj/GjeJYRYCFZZT1blRuUX5mucjlvZQCjXy1nyZMpN0
-	b1cXhtq/aWsDKluYAOMkmE6MywGvcvrs0DujDMcnmRloPVAG/m1hC0AbQmzPm1+WQv6sQp
-	fvlMfXlJSe9EYWiVoVT4mOWuzK6IBrY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-EXgywoG7OrixT34GhpVxAw-1; Mon, 27 Nov 2023 05:25:33 -0500
-X-MC-Unique: EXgywoG7OrixT34GhpVxAw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9fe081ac4b8so83340966b.1
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 02:25:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701080732; x=1701685532;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZA1nFhs0OclwFV+JNDde8LIxfs9r7hNs3Xy7sP4jpzY=;
-        b=bYUp9TZSKiqSI+jo/kwTzns4wkF74U05cbWztp8tPMRjwtiUi23WVe8TgBs7m7AHCV
-         hCpWczMYu4/4I5YyaLWjfMB8kGLiXJpG1fM7RonqoWK3yRtUzS1YjE6/9s+ZRnGtDhpc
-         F5kwDYSSlPXqhblbtFKg5SGf1gkHwKHXyVLDAPpJ9mYlUyzww28p5gX75Shc+pYGjzMw
-         WJvP/qRZ84o6KwVJu/0K0Am46RDCzt0ptGLp5fGvinO4JcUQ/dFX2DHqrxdK3b+/NW6g
-         u+A2UHzlmtYTnJEUXHx3ThNawzEdRfZbuH3FQ5qjJPDkvy4WkWNnUj2GbzacoaAZ4KGp
-         Fe1g==
-X-Gm-Message-State: AOJu0YyPv+bztpj3eso34mrh5pPIETVqmAsAzfkSOLK1IMFIOJzl+ePW
-	YhM006wKnnOA//ZSSYq1u0x1atKUEi4YoDS2SRxfxeKgbUUbIyIAvtXTc1RjjD3VwWrgVu5mb+6
-	LGCsbr56pBvaRZTl+
-X-Received: by 2002:a17:906:5a8f:b0:a00:1acf:6fd2 with SMTP id l15-20020a1709065a8f00b00a001acf6fd2mr6782657ejq.6.1701080732575;
-        Mon, 27 Nov 2023 02:25:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGeKcndtCLYR26j5o6+zmpQ6DyJAi6+l0R/Qa4rCze0PYyzY5W87VbdL2kbGHS3jOSujk9NTQ==
-X-Received: by 2002:a17:906:5a8f:b0:a00:1acf:6fd2 with SMTP id l15-20020a1709065a8f00b00a001acf6fd2mr6782643ejq.6.1701080732204;
-        Mon, 27 Nov 2023 02:25:32 -0800 (PST)
-Received: from gerbillo.redhat.com (host-87-11-7-253.retail.telecomitalia.it. [87.11.7.253])
-        by smtp.gmail.com with ESMTPSA id m12-20020a1709062acc00b009c3828fec06sm5430486eje.81.2023.11.27.02.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 02:25:31 -0800 (PST)
-Message-ID: <f5a633a8fb4fa0d4375d90e7c3797b016f494711.camel@redhat.com>
-Subject: Re: [PATCH] net: make config lines follow common pattern
-From: Paolo Abeni <pabeni@redhat.com>
-To: Lukas Bulwahn <lukas.bulwahn@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Simon Horman <horms@verge.net.au>, Julian Anastasov
- <ja@ssi.bg>,  Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
- <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- netdev@vger.kernel.org, lvs-devel@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Mon, 27 Nov 2023 11:25:30 +0100
-In-Reply-To: <20231123111256.10757-1-lukas.bulwahn@gmail.com>
-References: <20231123111256.10757-1-lukas.bulwahn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE7AEA;
+	Mon, 27 Nov 2023 02:27:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3juK1mRN9IHZs49VX2tDFfNWRrH8ez7Xl+6AFxH3QDc=; b=QTQALexXzmeIletbhOMnhISn5s
+	umwuXSRQhFnKzuHs/VC1UFKGna71cN9+j55XOnv/8Ndy+0B9BVsPssK3vNjoHveJMfeaTtrhQ4j2N
+	fHd20O9ZbQdyf7LlI1xg5A1iEJpJQX64/GCVETR7Y2/rDaqdbkukPhK6VVIx6gqYfjNULPuRzGztX
+	njJELWoKBCuONZh6O4/yelYYazEFbmt1b0iG4kFU9tllVUHiiWBetp7Nm8cY0eEbn/QLHksiyMOY+
+	TXOVD5+tsGzaz3r7A3j013eyH037j0fKb0lfWqYUpC6kUsTJRftY3DMXdNHQOirITtP+dHGny4P8U
+	3Uzjtqxw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33832)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r7Yq6-0005ed-0c;
+	Mon, 27 Nov 2023 10:27:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r7Yq7-0001pZ-C5; Mon, 27 Nov 2023 10:27:43 +0000
+Date: Mon, 27 Nov 2023 10:27:43 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gan Yi Fang <yi.fang.gan@intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>
+Subject: Re: [PATCH net 1/1] net: phylink: Add module_exit()
+Message-ID: <ZWRvHw13l41HkciJ@shell.armlinux.org.uk>
+References: <20231127101603.807593-1-yi.fang.gan@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127101603.807593-1-yi.fang.gan@intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 2023-11-23 at 12:12 +0100, Lukas Bulwahn wrote:
-> The Kconfig parser is quite relaxed when parsing config definition lines.
-> However, there are just a few config definition lines that do not follow
-> the common regular expression 'config [0-9A-Z]', i.e., there are only a f=
-ew
-> cases where config is not followed by exactly one whitespace.
->=20
-> To simplify life for kernel developers that use basic regular expressions
-> to find and extract kernel configs, make all config lines follow this
-> common pattern.
->=20
-> No functional change, just helpful stylistic clean-up.
->=20
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+On Mon, Nov 27, 2023 at 06:16:03PM +0800, Gan Yi Fang wrote:
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 25c19496a336..7121503c9259 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -3724,7 +3724,10 @@ static int __init phylink_init(void)
+>  	return 0;
+>  }
+>  
+> +static void __exit phylink_exit(void){}
 
-IMHO this is a bit too much noise for a small gain: simple REs can
-match all the existing patterns with 100% accuracy.
+Please format that as:
 
-I think this should be dropped.
+static void __exit phylink_exit(void)
+{
+}
 
-Cheers,
+and move it _after_ module_init().
 
-Paolo
+Thanks.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
