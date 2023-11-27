@@ -1,60 +1,49 @@
-Return-Path: <netdev+bounces-51209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDAD37F991A
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 07:11:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381457F991D
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 07:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7242BB20A09
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:11:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241CF1C20944
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 06:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD35747F;
-	Mon, 27 Nov 2023 06:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C2879E5;
+	Mon, 27 Nov 2023 06:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="Uh1l1gXP"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mrDBRmM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F84E1
-	for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 22:11:20 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-a00a9d677fcso516967066b.0
-        for <netdev@vger.kernel.org>; Sun, 26 Nov 2023 22:11:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1701065479; x=1701670279; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SHtEQi8g8hzQmGEKqbL9kvJSOxbU+L25q3WrEMfx6eQ=;
-        b=Uh1l1gXPo7uM8iGaJofaS8/4NydXffpDdIQmWcgijf7grcElrxTzECzpDTQawXa/oI
-         m1fK4P03WRWJydU808yf9q1hOn5AB1LJA8ownmlo9Wvy4rIkruhdOEg6I4fUlbqUHWkW
-         iEfYFznnlUlvkcISwAQus/jYl3gqEP8XdwUpEfC7bysajtxxUfDu0Jh+wUCLiMUF3sGK
-         0o4eeAL0enBGO4c87vfPqmt0HWF76WBAzDgA0AMNGuuFH6hctNsXJNLTPEtr5QuNfWna
-         3RAU3HhgNM98WYp327BTbCb6wZ4dKrI7zSkYnyPLufEeDdEJxoKsN3OPEskD1iPXfJqC
-         2I/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701065479; x=1701670279;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SHtEQi8g8hzQmGEKqbL9kvJSOxbU+L25q3WrEMfx6eQ=;
-        b=BkWFV/HJu31yvfqqpok7UttXtoA4RwhF5OIDG1NAOxm4aDLnDcaWLGhAR/AinnYd8K
-         7BJgKbNGknuw/ovISbifkIPziC2d7VUMF+8HIIOQjFvexAT2YfSn+tykjzpAvGtSvovx
-         pDvGkhuFnb9z1yCFyxLqEJbsbF7weSYnPhCHMFpKjHENZAxf5eGXaSfJXzUd8ZoDBhjQ
-         BtiLkdgnIyfySCVRqgwNVDI+rXYeEPhm9gXvhjW+zuB2FHMlfzQig2IHiiFkmHlOBYAw
-         +9jvt0xz99P2ePKQC6IjcEi4oQtj8Kir/KpKoRWK9YTHZrN34ZuWl1d6t87q0dEZy4+U
-         6V9A==
-X-Gm-Message-State: AOJu0Yz+Wuj07H9EAFtJOhnDq4kiJITWewo56Fo5P12VLKZifdYl7Zpr
-	+ZOU9cutHp5LONq3dOBBS2lMJg==
-X-Google-Smtp-Source: AGHT+IHDT8N++R7ZLkzcyLrDWB71eEFcl94wuhPsn7nZeHq/4nGrhvFaJXjkUFoAUv4VU1TMjwiX9g==
-X-Received: by 2002:a17:907:1255:b0:9de:32bb:fa95 with SMTP id wc21-20020a170907125500b009de32bbfa95mr5686417ejb.35.1701065479311;
-        Sun, 26 Nov 2023 22:11:19 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.125])
-        by smtp.gmail.com with ESMTPSA id 20-20020a170906319400b00a097c5162b0sm3840401ejy.87.2023.11.26.22.11.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Nov 2023 22:11:18 -0800 (PST)
-Message-ID: <7ea4c3fe-a911-4161-af13-7f1d55def7e3@tuxon.dev>
-Date: Mon, 27 Nov 2023 08:11:17 +0200
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A33AE1;
+	Sun, 26 Nov 2023 22:12:50 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AR263eq015676;
+	Mon, 27 Nov 2023 06:12:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=Nw//Q0T2ItPW3xNVWkuPhtnEwG+agGNfwZ8OqqbER20=;
+ b=mrDBRmM4W5BJJ/RSJMrSSZWtX2600J7lqT6+tPcBO04E4iZJYGBnHPJ+Ghf3EJ2gMSc+
+ vG5zwZit2gtQRyVmK2SRKtxo0eYfSYIyFNQpjU1AD6D3ZYfDuLJZCOtFrNHmcBi28EsE
+ yUC/3+4l1xmfqEdkTpstxa9ZrOH4SuRohg/Obv8z2QdUuERkvrrLuk3kMHiIEx4zeCRw
+ xhy5W4RBjkxJ1QLN8tuU/+MZJ1fAWkq8Kg5as/pmiRPh2QcZ9ZUe2ARnI5FbygdaGlxH
+ zpczCysdzm1io+zxnBB7fD7vfLWQM0/qqOEjUyROIfNBLYOgKYHqsF/gQ7rJubx7VryO Ew== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uk7xmbew3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 06:12:31 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AR6CUCX020583
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 06:12:30 GMT
+Received: from [10.253.33.46] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sun, 26 Nov
+ 2023 22:12:27 -0800
+Message-ID: <826700de-ed89-4ed9-b225-e0453ecbfd3f@quicinc.com>
+Date: Mon, 27 Nov 2023 14:12:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,65 +51,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: macb: Unregister nedev before MDIO bus in remove
-Content-Language: en-US
+Subject: Re: [PATCH v6 1/6] net: phy: introduce core support for phy-mode =
+ "10g-qxgmii"
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: nicolas.ferre@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, hkallweit1@gmail.com,
- linux@armlinux.org.uk, jgarzik@pobox.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231126141046.3505343-1-claudiu.beznea@tuxon.dev>
- <20231126141046.3505343-3-claudiu.beznea@tuxon.dev>
- <086fc661-0974-4bb6-a8ae-daa9d53361d9@lunn.ch>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <086fc661-0974-4bb6-a8ae-daa9d53361d9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231126060732.31764-1-quic_luoj@quicinc.com>
+ <20231126060732.31764-2-quic_luoj@quicinc.com>
+ <f97fd2f0-3e39-4de0-8b1c-f333a0f56a7f@lunn.ch>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <f97fd2f0-3e39-4de0-8b1c-f333a0f56a7f@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: LpBQzuSRG-iAGm7WdZcBygis0OlOfSLD
+X-Proofpoint-GUID: LpBQzuSRG-iAGm7WdZcBygis0OlOfSLD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-27_03,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ mlxlogscore=800 clxscore=1015 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311270041
 
 
 
-On 26.11.2023 19:13, Andrew Lunn wrote:
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
->> index cebae0f418f2..73d041af3de1 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -5165,11 +5165,11 @@ static void macb_remove(struct platform_device *pdev)
->>  
->>  	if (dev) {
->>  		bp = netdev_priv(dev);
->> +		unregister_netdev(dev);
->>  		phy_exit(bp->sgmii_phy);
->>  		mdiobus_unregister(bp->mii_bus);
->>  		mdiobus_free(bp->mii_bus);
->>  
->> -		unregister_netdev(dev);
->>  		tasklet_kill(&bp->hresp_err_tasklet);
+On 11/27/2023 1:20 AM, Andrew Lunn wrote:
+> On Sun, Nov 26, 2023 at 02:07:27PM +0800, Luo Jie wrote:
+>> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+>>
+>> 10G-QXGMII is a MAC-to-PHY interface defined by the USXGMII multiport
+>> specification. It uses the same signaling as USXGMII, but it multiplexes
+>> 4 ports over the link, resulting in a maximum speed of 2.5G per port.
+>>
+>> Some in-tree SoCs like the NXP LS1028A use "usxgmii" when they mean
+>> either the single-port USXGMII or the quad-port 10G-QXGMII variant, and
+>> they could get away just fine with that thus far. But there is a need to
+>> distinguish between the 2 as far as SerDes drivers are concerned.
 > 
-> 
-> I don't know this driver...
-> 
-> What does this tasklet do? 
+> Can this is split into two patches?
 
-It handles bus errors that my happens while DMA fetches data from system
-memory. It re-initializes the TX/RX, DMA buffers, clear interrupts,
-stop/start all tx queues.
-
-> Is it safe for it to run after the netdev
-> is unregistered, and the PHY and the mdio bus is gone? 
-
-Not really, as it accesses netdev specific data.
-
-> Maybe this
-> tasklet_kill should be after the interrupt is disabled, but before the
-> netdev is unregistered?
-
-That would be a better place, indeed.
-
-Thank you,
-Claudiu Beznea
+This patch is a single logical for introducing the mode 10g-qxgmii,
+looks it's better to keep it within a single patch.
 
 > 
-> If you have one bug here, there might be others.
+>>   	switch (interface) {
+>>   	case PHY_INTERFACE_MODE_USXGMII:
+>> -		caps |= MAC_10000FD | MAC_5000FD | MAC_2500FD;
+>> +		caps |= MAC_10000FD | MAC_5000FD;
+>> +		fallthrough;
+> 
+> This change seems to refer to the second paragraph, where as the rest
+> of the code is about the first. Or does splitting this cause a bisect
+> problem?
 > 
 > 	Andrew
+
+Since the caps change is related to the new added interface mode
+10g-qxgmii, it is reasonable to keep the changes integrated here.
+
 
