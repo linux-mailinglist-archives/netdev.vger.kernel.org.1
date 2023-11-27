@@ -1,130 +1,217 @@
-Return-Path: <netdev+bounces-51321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98A37FA1DF
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:02:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99C27FA1F2
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07F501C20EE4
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:02:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB1C31C20E37
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 14:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5930E30D05;
-	Mon, 27 Nov 2023 14:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C079330F83;
+	Mon, 27 Nov 2023 14:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="lvw+6FxY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lhPJ4hUJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45C44232
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 06:02:43 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-507ad511315so5892920e87.0
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 06:02:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1701093762; x=1701698562; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uh8MG/fcScS4zGx1w1Y666LV3WqtJtCJW99b8yZPGeU=;
-        b=lvw+6FxYVAJcVDXhAwCe/s9ZxNHS8sF1SM/r+F8nmyCxt6kggKelzzoVhdrYZypeGh
-         ZUrPlACn2bhGk/rchjr6SSV5u5KgvbkMR5AVxEk2vG8YmK6qc460vKxl5jxXdZRQg2yq
-         VzOO+lmVMmU7F2py/GETYiesAsPCKaXiA2FdQoPr3Mp2zJKOtGx4dLxDaC4ZPV7R2X9y
-         x3zy0X+wPtx9H7N986+Ie20LJDu3lX2AVrxtBi4l2xOHeG9M/nKyEvsU5BDT2Nl223J+
-         HT2YcZ5m1KC6818QSROQFoDBaBgTy+BRGInPT0bEDNXR9/YBiC6/0yUD84abdeDn2nrK
-         L5bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701093762; x=1701698562;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uh8MG/fcScS4zGx1w1Y666LV3WqtJtCJW99b8yZPGeU=;
-        b=cJLQUW36u0Kxn428R3BV0Z2+rzPjmMhWd0seFYYSsJ+bEWze9hFiIk3be9mIn7xDtw
-         Fv1pj+pJkj23AC+BPks5+KF37VfnKZhhyuXWbp4ILQah30mYerMH6Vpcb1shK1fq1Lqk
-         NNqY41ACgO7IjzP4eDOs+CwyIsJtKsru8O47PcyuvE1g4Xe9HeN8E315pxjCfEgx9h3E
-         CSwMW3c5f9MryuJJ+w8WBsyivJyxSWMQyhoa+IXFQlW8B8v9f7LOzZjbQctWyARZifWn
-         1zh/WQvkw5Fbk5aqMqHFChImYHL7+MInX5YMIsApExOBNRePNJC9u7tjOjhZnAGRygWd
-         WSgQ==
-X-Gm-Message-State: AOJu0Yyqc+olqhC2jSWjomzkpPi24lA6qWChJ8ZKCS+b9KVyn5hVLAfa
-	AjkrOsdJOkVBRPvx5DdzHmPIMQ==
-X-Google-Smtp-Source: AGHT+IFj52P0DIEx0c9vj7QT0YARpPDlM/qFv1+NoeWnzCQ9HCNWjkCgkmNnLJMpwF9gtUU6vrpmNA==
-X-Received: by 2002:a05:6512:2389:b0:506:899d:1994 with SMTP id c9-20020a056512238900b00506899d1994mr7071586lfv.52.1701093761408;
-        Mon, 27 Nov 2023 06:02:41 -0800 (PST)
-Received: from debian ([185.117.107.42])
-        by smtp.gmail.com with ESMTPSA id u4-20020a056512128400b0050ab696bfaasm1486122lfs.3.2023.11.27.06.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 06:02:40 -0800 (PST)
-Date: Mon, 27 Nov 2023 15:02:39 +0100
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: microchip_t1s: add support for LAN867x Rev.C1
-Message-ID: <ZWShfwyqO-JkqVgI@debian>
-References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
- <20231127104045.96722-3-ramon.nordin.rodriguez@ferroamp.se>
- <f25ed798-e116-4f6f-ad3c-5060c7d540d0@lunn.ch>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1575C49F5;
+	Mon, 27 Nov 2023 06:04:14 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ARDfPeC020065;
+	Mon, 27 Nov 2023 14:04:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=S4Tp0kxCaMHnRHT1GJrDl8TCv/MjeeTlTcvoJVFJlTg=;
+ b=lhPJ4hUJfOwm6emHKlTuqa489O+uqe4KES7BUQ4oWgfqEL75fEJ+BR05JS9iXr3or6CZ
+ NNQhiixgwxyMp5K07gCJNhpjk70DruJE/Ny2Y+6g/5ejwkschP8Fkz1vSFXkZYNmj9cO
+ adj3lqpFpc14hyQF+T4YnnvD8pQ7xYLejRq+PP4HZnIcH/LUuaBKGMiMdGAM8W+cU4je
+ lww4EZn7jaX7u1OF0YkcZCSvtzJRnjn7vhYOQVHS+IObfnpvVy0j61NKYEQr6OC127+9
+ VC7KzEAshC7F9DNyWpeKd4uHejlfaloIao/M16Ul6F1xDDt3jmg/DkrtAmt9V3RhQH9H pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3umufpa6kt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 14:04:11 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ARDfhbQ022126;
+	Mon, 27 Nov 2023 14:04:11 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3umufpa6k0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 14:04:10 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ARBYTRv025052;
+	Mon, 27 Nov 2023 14:04:10 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwfjrp4j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 27 Nov 2023 14:04:09 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ARE479211403924
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 27 Nov 2023 14:04:07 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 11A8220040;
+	Mon, 27 Nov 2023 14:04:07 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47DFC2004E;
+	Mon, 27 Nov 2023 14:04:06 +0000 (GMT)
+Received: from [9.171.23.51] (unknown [9.171.23.51])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 27 Nov 2023 14:04:06 +0000 (GMT)
+Message-ID: <48732f15-64bf-4bb7-8b88-95263a99cf6a@linux.ibm.com>
+Date: Mon, 27 Nov 2023 15:04:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f25ed798-e116-4f6f-ad3c-5060c7d540d0@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 7/7] net/smc: manage system EID in SMC stack
+ instead of ISM driver
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1700836935-23819-1-git-send-email-guwen@linux.alibaba.com>
+ <1700836935-23819-8-git-send-email-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1700836935-23819-8-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fJDrBNokjRlIYL3rtNsZN4dw69qn_1ni
+X-Proofpoint-ORIG-GUID: xSbd2aPQt7CNLtD5NBNNiINtRVyy21Is
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-27_11,2023-11-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ bulkscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311270096
 
-On Mon, Nov 27, 2023 at 02:37:41PM +0100, Andrew Lunn wrote:
-> >  #define PHY_ID_LAN867X_REVB1 0x0007C162
-> > +#define PHY_ID_LAN867X_REVC1 0x0007C164
+
+
+On 24.11.23 15:42, Wen Gu wrote:
+> The System EID (SEID) is an internal EID that is used by the SMCv2
+> software stack that has a predefined and constant value representing
+> the s390 physical machine that the OS is executing on. So it should
+> be managed by SMC stack instead of ISM driver and be consistent for
+> all ISMv2 device (including virtual ISM devices) on s390 architecture.
 > 
-> So there is a gap in the revisions. Maybe a B2 exists?
+> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
 
-The datasheet lists A0, B1 and C1, seems like Microchip removes the
-application notes for old revisions, so no way that I can see to add the
-init-fixup for A0.
-
-I'm guessing there is a rev.c0 that was never released to the public.
-
-> > +	const u16 magic_or = 0xE0;
-> > +	const u16 magic_reg_mask = 0x1F;
-> > +	const u16 magic_check_mask = 0x10;
-> 
-> Reverse christmass tree please. Longest first, shorted last.
-
-My bad, I was just thinking 'christmas tree' forgot about the reverse.
-I'll fix that.
-
-> > +	int err;
-> > +	int regval;
-> > +	u16 override0;
-> > +	u16 override1;
-> > +	const u16 override_addr0 = 0x4;
-> > +	const u16 override_addr1 = 0x8;
-> > +	const u8 index_to_override0 = 2;
-> > +	const u8 index_to_override1 = 3;
-> 
-> Same here.
-I'll fix this.
+Yes, this is what I had in mind. Thank you Wen Gu.
+[...]
 
 > 
-> > +
-> > +	err = lan867x_wait_for_reset_complete(phydev);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	/* The application note specifies a super convenient process
-> > +	 * where 2 of the fixup regs needs a write with a value that is
-> > +	 * a modified result of another reg read.
-> > +	 * Enjoy the magic show.
-> > +	 */
-> 
-> I really do hope that by revision D1 they get the firmware sorted out
-> so none of this undocumented magic is needed.
-> 
-> 	Andrew
+> diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
+> index 70c5bbd..49ccbd68 100644
+> --- a/drivers/s390/net/ism.h
+> +++ b/drivers/s390/net/ism.h
 
-Really do hope so.. 
+Please remove ISM_IDENT_MASK from drivers/s390/net/ism.h
+[...]
+
+> --- a/drivers/s390/net/ism_drv.c
+> +++ b/drivers/s390/net/ism_drv.c
+> @@ -36,6 +36,7 @@
+[...]
+> -static void ism_create_system_eid(void)
+> -{
+> -	struct cpuid id;
+> -	u16 ident_tail;
+> -	char tmp[5];
+> -
+> -	get_cpu_id(&id);
+> -	ident_tail = (u16)(id.ident & ISM_IDENT_MASK);
+> -	snprintf(tmp, 5, "%04X", ident_tail);
+> -	memcpy(&SYSTEM_EID.serial_number, tmp, 4);
+> -	snprintf(tmp, 5, "%04X", id.machine);
+> -	memcpy(&SYSTEM_EID.type, tmp, 4);
+> -}
+> -
+[...]
+> @@ -560,7 +535,7 @@ static int ism_dev_init(struct ism_dev *ism)
+>  
+>  	if (!ism_add_vlan_id(ism, ISM_RESERVED_VLANID))
+>  		/* hardware is V2 capable */
+> -		ism_create_system_eid();
+> +		ism_v2_capable = true;
+>  
+
+Please assign 'false' in the else path.
+This is required here for backwards compatibility. Hardware that only supports v1,
+will reject ISM_RESERVED_VLANID.
+
+[...]
+
+
+> --- a/net/smc/smc_ism.c
+> +++ b/net/smc/smc_ism.c
+[...]
+> @@ -70,6 +91,11 @@ bool smc_ism_is_v2_capable(void)
+>  	return smc_ism_v2_capable;
+>  }
+>  
+> +void smc_ism_set_v2_capable(void)
+> +{
+> +	smc_ism_v2_capable = true;
+> +}
+> +
+>  /* Set a connection using this DMBE. */
+>  void smc_ism_set_conn(struct smc_connection *conn)
+>  {
+> @@ -431,14 +457,8 @@ static void smcd_register_dev(struct ism_dev *ism)
+>  
+>  	mutex_lock(&smcd_dev_list.mutex);
+>  	if (list_empty(&smcd_dev_list.list)) {
+> -		u8 *system_eid = NULL;
+> -
+> -		system_eid = smcd->ops->get_system_eid();
+> -		if (smcd->ops->supports_v2()) {
+> -			smc_ism_v2_capable = true;
+> -			memcpy(smc_ism_v2_system_eid, system_eid,
+> -			       SMC_MAX_EID_LEN);
+> -		}
+> +		if (smcd->ops->supports_v2())
+> +			smc_ism_set_v2_capable();
+
+I don't see the benefit in declaring smc_ism_set_v2_capable() and exporting it in smc_ism.h,
+when it is used only once and only here. 
+Why don't you just set 
+	smc_ism_v2_capable = true;
+here?
+
+[...]
+> diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
+> index 0e5e563..6903cd5 100644
+> --- a/net/smc/smc_ism.h
+> +++ b/net/smc/smc_ism.h
+> @@ -16,6 +16,7 @@
+>  #include "smc.h"
+>  
+>  #define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
+> +#define SMC_ISM_IDENT_MASK		0x00FFFF
+>  
+[...]
+> @@ -45,6 +52,7 @@ int smc_ism_register_dmb(struct smc_link_group *lgr, int buf_size,
+>  void smc_ism_get_system_eid(u8 **eid);
+>  u16 smc_ism_get_chid(struct smcd_dev *dev);
+>  bool smc_ism_is_v2_capable(void);
+> +void smc_ism_set_v2_capable(void);
+>  int smc_ism_init(void);
+>  void smc_ism_exit(void);
+>  int smcd_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
 
