@@ -1,126 +1,206 @@
-Return-Path: <netdev+bounces-51289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 206567F9F81
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:24:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 324CB7F9F8E
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 13:29:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8A528156F
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:24:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EE70281568
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 12:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D231DFC1;
-	Mon, 27 Nov 2023 12:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9F71DFEF;
+	Mon, 27 Nov 2023 12:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faBhkNcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8B9C13A;
-	Mon, 27 Nov 2023 04:24:23 -0800 (PST)
-X-IronPort-AV: E=Sophos;i="6.04,230,1695654000"; 
-   d="scan'208";a="188255212"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 27 Nov 2023 21:24:22 +0900
-Received: from localhost.localdomain (unknown [10.166.13.99])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id DEFC04009414;
-	Mon, 27 Nov 2023 21:24:22 +0900 (JST)
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH net v4] ravb: Fix races between ravb_tx_timeout_work() and net related ops
-Date: Mon, 27 Nov 2023 21:24:20 +0900
-Message-Id: <20231127122420.3706751-1-yoshihiro.shimoda.uh@renesas.com>
-X-Mailer: git-send-email 2.25.1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBCD16416;
+	Mon, 27 Nov 2023 12:29:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7A0C433C7;
+	Mon, 27 Nov 2023 12:29:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701088192;
+	bh=PiZRO1SG/+v1197piJzNlutqwuYFIV33BwcNtwlceR0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=faBhkNcZ6Lg/lPlwJkGVkf3gt1DsbP3fiUtDbFqMmIyD2CIwYudF9I0yiGyWoAMPv
+	 TjAYJcfSgZRj/d0qxaQHXWaNM57CBqaJ1XYTvzWx3mazA38R3CdI2wPqbrpHZxFRE7
+	 Azdz6Po2DlfhUxh+Rps/mC/ZpCgmG6iXTnkTXiUApJc4Pmbpq+7ztNhBt1PMuY9VTy
+	 smsJmhIq3gttUpuc0LXpq4ctPcgTWysTNZ52hI9zK8qaJdTIFD5Jm/D4D5/wEU9s3D
+	 SD8ohFDDCw4jv8xTjusc8v/a6AoOvDI+K2P7Keq0B10Zyium49wr6Ym+JPKe4tiGCQ
+	 u3sC8dSwwrEmQ==
+Message-ID: <7418fa0c-c0c2-4615-ba55-f148ceb82328@kernel.org>
+Date: Mon, 27 Nov 2023 13:29:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/4] selftests/net: mptcp: fix uninitialized variable
+ warnings
+Content-Language: en-GB, fr-BE
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux-kselftest@vger.kernel.org,
+ Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
+ MPTCP Upstream <mptcp@lists.linux.dev>
+References: <20231124171645.1011043-1-willemdebruijn.kernel@gmail.com>
+ <20231124171645.1011043-5-willemdebruijn.kernel@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+In-Reply-To: <20231124171645.1011043-5-willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix races between ravb_tx_timeout_work() and functions of net_device_ops
-and ethtool_ops by using rtnl_trylock() and rtnl_unlock(). Note that
-since ravb_close() is under the rtnl lock and calls cancel_work_sync(),
-ravb_tx_timeout_work() should calls rtnl_trylock(). Otherwise, a deadlock
-may happen in ravb_tx_timeout_work() like below:
+Hi Willem,
 
-CPU0			CPU1
-			ravb_tx_timeout()
-			schedule_work()
-...
-__dev_close_many()
-// Under rtnl lock
-ravb_close()
-cancel_work_sync()
-// Waiting
-			ravb_tx_timeout_work()
-			rtnl_lock()
-			// This is possible to cause a deadlock
+(+ cc MPTCP list)
 
-If rtnl_trylock() fails, rescheduling the work with sleep for 1 msec.
+On 24/11/2023 18:15, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
+> 
+> Same init_rng() in both tests. The function reads /dev/urandom to
+> initialize srand(). In case of failure, it falls back onto the
+> entropy in the uninitialized variable. Not sure if this is on purpose.
+> But failure reading urandom should be rare, so just fail hard. While
+> at it, convert to getrandom(). Which man 4 random suggests is simpler
+> and more robust.
+> 
+>     mptcp_inq.c:525:6:
+>     mptcp_connect.c:1131:6:
+> 
+>     error: variable 'foo' is used uninitialized
+>     whenever 'if' condition is false
+>     [-Werror,-Wsometimes-uninitialized]
 
-Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
----
-Changes from v3:
-https://lore.kernel.org/all/20231115022644.2316961-1-yoshihiro.shimoda.uh@renesas.com/
- - Based on v2 patch. This means that delayed work is not used.
- - Add rescheduling the work if rtnl_trylock() fails.
- - Drop Reviewed-by tags because implementation was changed.
+Thank you for the patch!
 
-Changes from v2:
-https://lore.kernel.org/netdev/20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com/
- - Add rescheduling if rtnl_trylock() fails and the netif is still running
-   and update commit description for it.
- - Add Reviewed-by tags.
+It looks good to me:
 
- drivers/net/ethernet/renesas/ravb_main.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index c70cff80cc99..7c007ecd3ff6 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1874,6 +1874,12 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 	struct net_device *ndev = priv->ndev;
- 	int error;
- 
-+	if (!rtnl_trylock()) {
-+		usleep_range(1000, 2000);
-+		schedule_work(&priv->work);
-+		return;
-+	}
-+
- 	netif_tx_stop_all_queues(ndev);
- 
- 	/* Stop PTP Clock driver */
-@@ -1907,7 +1913,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 		 */
- 		netdev_err(ndev, "%s: ravb_dmac_init() failed, error %d\n",
- 			   __func__, error);
--		return;
-+		goto out_unlock;
- 	}
- 	ravb_emac_init(ndev);
- 
-@@ -1917,6 +1923,9 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 		ravb_ptp_init(ndev, priv->pdev);
- 
- 	netif_tx_start_all_queues(ndev);
-+
-+out_unlock:
-+	rtnl_unlock();
- }
- 
- /* Packet transmit function for Ethernet AVB */
--- 
-2.25.1
+> Fixes: 048d19d444be ("mptcp: add basic kselftest for mptcp")
+> Fixes: b51880568f20 ("selftests: mptcp: add inq test case")
+> Cc: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> 
+> ----
+> 
+> When input is randomized because this is expected to meaningfully
+> explore edge cases, should we also add
+> 1. logging the random seed to stdout and
+> 2. adding a command line argument to replay from a specific seed
+> I can do this in net-next, if authors find it useful in this case.
 
+I think we should have done that from the beginning, otherwise we cannot
+easily reproduce these edge cases. To be honest, I don't think this
+technique helped to find bugs, and it was probably used here as a good
+habit to increase the coverage. But on the other hand, we might not
+realise some inputs are randomised and can cause instabilities in the
+tests because we don't print anything about that.
+
+So I would say that the minimal thing to do is to log the random seed.
+But it might not be that easy to do, for example 'mptcp_connect' is used
+a lot of time by the .sh scripts: printing this seed number each time
+'mptcp_connect' is started will "flood" the logs. Maybe we should only
+print that at the end, in case of errors: e.g. in xerror() and
+die_perror() for example, but I see 'exit(1)' is directly used in other
+places...
+
+That's more code to change, but if it is still OK for you to do that,
+please also note that you will need to log this to stderr: mptcp_connect
+prints what has been received from the other peer to stdout.
+
+Because it is more than just adding a 'printf()', I just created a
+ticket in our bug tracker, so anybody can look at that and check all the
+details about that:
+
+https://github.com/multipath-tcp/mptcp_net-next/issues/462
+
+> ---
+>  tools/testing/selftests/net/mptcp/mptcp_connect.c | 11 ++++-------
+>  tools/testing/selftests/net/mptcp/mptcp_inq.c     | 11 ++++-------
+>  2 files changed, 8 insertions(+), 14 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+> index c7f9ebeebc2c5..d2043ec3bf6d6 100644
+> --- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+> +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+
+(...)
+
+> @@ -1125,15 +1126,11 @@ int main_loop_s(int listensock)
+>  
+>  static void init_rng(void)
+>  {
+> -	int fd = open("/dev/urandom", O_RDONLY);
+>  	unsigned int foo;
+>  
+> -	if (fd > 0) {
+
+I just realised that here, we could have fd == 0 which is a valid value.
+I don't think we would have that when executing the selftests, but
+that's another reason to change this :)
+
+> -		int ret = read(fd, &foo, sizeof(foo));
+> -
+> -		if (ret < 0)
+> -			srand(fd + foo);
+> -		close(fd);
+> +	if (getrandom(&foo, sizeof(foo), 0) == -1) {
+> +		perror("getrandom");
+> +		exit(1);
+>  	}
+>  
+>  	srand(foo);
+
+Cheers,
+Matt
 
