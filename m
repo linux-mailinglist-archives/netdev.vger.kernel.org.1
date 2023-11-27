@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-51427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4205A7FA990
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:04:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D5A17FA991
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 20:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4AA1B21165
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:04:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 428CEB2129A
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 19:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E823FB37;
-	Mon, 27 Nov 2023 19:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57173DBAF;
+	Mon, 27 Nov 2023 19:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4PvLDmPl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eIVjk+U+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF435131
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:34 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-285b77f7e1fso2110532a91.0
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:34 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF3BD5F
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:37 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cbfcf3ae48so37019227b3.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 11:03:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701111814; x=1701716614; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701111816; x=1701716616; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=99qVGEnNEQZ0Ub6NY42NFhmi4pNAJrO1wmYriAMOllE=;
-        b=4PvLDmPlZoP9x2c6EE2CeEQ3xJyFqpq6tQvQHcwqsSu+B/DfaRPrOQBCug46/nuEWA
-         MgUMsufYSklRmUVJ6D4Wj+vyYaipVEQUZA8ywZA/lpSq6hpyOCoUymPkGdimBYSayN1T
-         ZcjaiSX00TcWVKDGfLaz3lU7uqtsYcN06/zrWp4G2XVdCkQrmmD3kdB6dM3qB95sNTK7
-         9p05aAWOcIP59u6e6Wo0pjsQliIEt3huBacaL1fiSFNlAzlWmhR7xfUzplsp6z0Usuxp
-         gvHgvfR8vxkp432D9lk3iuTVDiTuIFwDUuKi5CAUA6+Ke7hhAmtmvgXdxTmwtLDRhbm9
-         AI+A==
+        bh=5QvtONr4OjbkhkoDPQ2air09KCE/816l/OMoWhPA4kI=;
+        b=eIVjk+U+yo/SqZViQJPge6E0rN5WX+uhQLx/l7vgSwVKN0AnzOYHnTlY8nkzOCmMvZ
+         A0RANphhj1LIwgJed2pmCoiVvMzrNAhoUxjH90FiFk9vtxsypWjLHBdsBEvX7F7FLA+C
+         MYtWIHc+wUFkXO2QlRPCj0ILMlnUIqbAi9gz9nqkljMqOQG0hUW1xNwx9K4BBfWjR82Q
+         lPNSPy7Tx2Wk7OYzjkDcBwE1H9S8JtnHvf1byasA8bYFFo7OZOTXitdj37BHaGdWi0CT
+         LwSEXUM+UI/x/TAbJaylJ/3aJ5lwXsQu9cC6tBFFDfz7GFDxf4Mgj8jiZgIk19Gi81uH
+         9ixg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701111814; x=1701716614;
+        d=1e100.net; s=20230601; t=1701111816; x=1701716616;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=99qVGEnNEQZ0Ub6NY42NFhmi4pNAJrO1wmYriAMOllE=;
-        b=UV8h85D1UIMEJvoMMwLXLeElEcr9Pn0vkh0c0pBSIyZsb5QhsmaaSoQj2f3d2fnvhB
-         /7eG0tpNBu0gF7aFqSOniyADs6tKNKOaQyDxj4NoHUfx/lj3PP8xjB1jcOxO6HqHf3Ee
-         dnHIwg9968XaeFS2p0cvEbkqHboSZ8ASLnwo/wW4bMmUDj0v9hYWCjZ6l7DunUVFz+mO
-         cpnYlfcgbC2MtlT36bnKIeAET+TXJDszLnHMgC3z9FsUuRJ3k0it7V0nAWowg7tmwbaD
-         JvE8/6/wVXvJcBhjNh4FveCPEMMI8AJceAp+w8HL6v9bKBmjX13iyWbN//IERtzYKaRr
-         oOqw==
-X-Gm-Message-State: AOJu0Yzxp2mo3wCnNySJWCF25KMckVrUMXBR53JX4atCYFflGXqB7NDo
-	BMFq49++5OvXPdtVyvu47z9Lbhg=
-X-Google-Smtp-Source: AGHT+IF4LeF4F6ujUaxMms+ifKigtIl1GqgRBxF8gPMPkhkgaMo0syeBjyEJ09ROh5SanlMUaHBbGMU=
+        bh=5QvtONr4OjbkhkoDPQ2air09KCE/816l/OMoWhPA4kI=;
+        b=JvqtXY/Wx5PjvePkS2/oIdX3fSdUB/VPg+w77Kqp3V8RlHUNvehcmBjskxQnQyZAZr
+         puxX8B7h9OzdqVYIl+xKNp9nK/jXd46Mih2+UhLX8ygsjcP53B63s5p/DxDSCrUMbr3h
+         +v6veryxvt53dgk7o5krA9QkGRPNWyFo5lzamZuwrhW3AvxH3kVljHgtfm/3Mvsnj1Uj
+         OCfVIVieyNggJyTJErjsywODZNaRFd0e53I53DfFX1LfFTgwSyFTw01L4Hv4yTGxyWA7
+         tf7/Cxl0cp38pIcztd8xohI0D4IerrPZFIUhzSIIA22XvTg9lQTKyGE+fdExlsSe/JGS
+         /b5Q==
+X-Gm-Message-State: AOJu0YxY9CRcnBeMF5wE2vMw734iO3if2b5l5341sJj7v/9GkcXtiwUG
+	zBduSTCILMtmEO2AcW+28Rn6Ue0=
+X-Google-Smtp-Source: AGHT+IF7uTKY5e37aqevUScyDnyGHkG7JIEfn64W34mnrvyLoyNqrtOGVcerCTq7PO979xB+WpnVmmA=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:90a:ee8d:b0:27d:2cf5:7eb1 with SMTP id
- i13-20020a17090aee8d00b0027d2cf57eb1mr2904712pjz.4.1701111814269; Mon, 27 Nov
- 2023 11:03:34 -0800 (PST)
-Date: Mon, 27 Nov 2023 11:03:13 -0800
+ (user=sdf job=sendgmr) by 2002:a05:690c:844:b0:5cc:ba30:bcd1 with SMTP id
+ bz4-20020a05690c084400b005ccba30bcd1mr487498ywb.3.1701111816186; Mon, 27 Nov
+ 2023 11:03:36 -0800 (PST)
+Date: Mon, 27 Nov 2023 11:03:14 -0800
 In-Reply-To: <20231127190319.1190813-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231127190319.1190813-1-sdf@google.com>
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <20231127190319.1190813-8-sdf@google.com>
-Subject: [PATCH bpf-next v6 07/13] xsk: Validate xsk_tx_metadata flags
+Message-ID: <20231127190319.1190813-9-sdf@google.com>
+Subject: [PATCH bpf-next v6 08/13] xsk: Add option to calculate TX checksum in SW
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -72,80 +72,146 @@ Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
 	xdp-hints@xdp-project.net
 Content-Type: text/plain; charset="UTF-8"
 
-Accept only the flags that the kernel knows about to make
-sure we can extend this field in the future. Note that only
-in XDP_COPY mode we propagate the error signal back to the user
-(via sendmsg). For zerocopy mode we silently skip the metadata
-for the descriptors that have wrong flags (since we process
-the descriptors deep in the driver).
+For XDP_COPY mode, add a UMEM option XDP_UMEM_TX_SW_CSUM
+to call skb_checksum_help in transmit path. Might be useful
+to debugging issues with real hardware. I also use this mode
+in the selftests.
 
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- include/net/xdp_sock_drv.h | 23 ++++++++++++++++++++++-
- net/xdp/xsk.c              |  4 ++++
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ Documentation/networking/xsk-tx-metadata.rst | 9 +++++++++
+ include/net/xsk_buff_pool.h                  | 1 +
+ include/uapi/linux/if_xdp.h                  | 8 +++++++-
+ net/xdp/xdp_umem.c                           | 7 ++++++-
+ net/xdp/xsk.c                                | 6 ++++++
+ net/xdp/xsk_buff_pool.c                      | 1 +
+ tools/include/uapi/linux/if_xdp.h            | 8 +++++++-
+ 7 files changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index e2558ac3e195..81e02de3f453 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -165,12 +165,28 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- 	return xp_raw_get_data(pool, addr);
+diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
+index 4f376560b23f..97ecfa480d00 100644
+--- a/Documentation/networking/xsk-tx-metadata.rst
++++ b/Documentation/networking/xsk-tx-metadata.rst
+@@ -50,6 +50,15 @@ packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
+ bit in the ``options`` field. Also note that in a multi-buffer packet
+ only the first chunk should carry the metadata.
+ 
++Software TX Checksum
++====================
++
++For development and testing purposes its possible to pass
++``XDP_UMEM_TX_SW_CSUM`` flag to ``XDP_UMEM_REG`` UMEM registration call.
++In this case, when running in ``XDK_COPY`` mode, the TX checksum
++is calculated on the CPU. Do not enable this option in production because
++it will negatively affect performance.
++
+ Querying Device Capabilities
+ ============================
+ 
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index 97f5cc10d79e..8d48d37ab7c0 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -83,6 +83,7 @@ struct xsk_buff_pool {
+ 	bool uses_need_wakeup;
+ 	bool dma_need_sync;
+ 	bool unaligned;
++	bool tx_sw_csum;
+ 	void *addrs;
+ 	/* Mutual exclusion of the completion ring in the SKB mode. Two cases to protect:
+ 	 * NAPI TX thread and sendmsg error paths in the SKB destructor callback and when
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 95de66d5a26c..d31698410410 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -33,7 +33,13 @@
+ #define XDP_USE_SG	(1 << 4)
+ 
+ /* Flags for xsk_umem_config flags */
+-#define XDP_UMEM_UNALIGNED_CHUNK_FLAG (1 << 0)
++#define XDP_UMEM_UNALIGNED_CHUNK_FLAG	(1 << 0)
++
++/* Force checksum calculation in software. Can be used for testing or
++ * working around potential HW issues. This option causes performance
++ * degradation and only works in XDP_COPY mode.
++ */
++#define XDP_UMEM_TX_SW_CSUM		(1 << 1)
+ 
+ struct sockaddr_xdp {
+ 	__u16 sxdp_family;
+diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+index 946a687fb8e8..caa340134b0e 100644
+--- a/net/xdp/xdp_umem.c
++++ b/net/xdp/xdp_umem.c
+@@ -148,6 +148,11 @@ static int xdp_umem_account_pages(struct xdp_umem *umem)
+ 	return 0;
  }
  
-+#define XDP_TXMD_FLAGS_VALID ( \
-+		XDP_TXMD_FLAGS_TIMESTAMP | \
-+		XDP_TXMD_FLAGS_CHECKSUM | \
++#define XDP_UMEM_FLAGS_VALID ( \
++		XDP_UMEM_UNALIGNED_CHUNK_FLAG | \
++		XDP_UMEM_TX_SW_CSUM | \
 +	0)
 +
-+static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
-+{
-+	return !(meta->flags & ~XDP_TXMD_FLAGS_VALID);
-+}
-+
- static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
+ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
  {
-+	struct xsk_tx_metadata *meta;
-+
- 	if (!pool->tx_metadata_len)
- 		return NULL;
+ 	bool unaligned_chunks = mr->flags & XDP_UMEM_UNALIGNED_CHUNK_FLAG;
+@@ -167,7 +172,7 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
+ 		return -EINVAL;
+ 	}
  
--	return xp_raw_get_data(pool, addr) - pool->tx_metadata_len;
-+	meta = xp_raw_get_data(pool, addr) - pool->tx_metadata_len;
-+	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
-+		return NULL; /* no way to signal the error to the user */
-+
-+	return meta;
- }
+-	if (mr->flags & ~XDP_UMEM_UNALIGNED_CHUNK_FLAG)
++	if (mr->flags & ~XDP_UMEM_FLAGS_VALID)
+ 		return -EINVAL;
  
- static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
-@@ -332,6 +348,11 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- 	return NULL;
- }
- 
-+static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
-+{
-+	return false;
-+}
-+
- static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
- {
- 	return NULL;
+ 	if (!unaligned_chunks && !is_power_of_2(chunk_size))
 diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index e83ade32f1fd..d66ba9d6154f 100644
+index d66ba9d6154f..281d49b4fca4 100644
 --- a/net/xdp/xsk.c
 +++ b/net/xdp/xsk.c
-@@ -728,6 +728,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+@@ -744,6 +744,12 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 				skb->csum_start = hr + meta->request.csum_start;
+ 				skb->csum_offset = meta->request.csum_offset;
+ 				skb->ip_summed = CHECKSUM_PARTIAL;
++
++				if (unlikely(xs->pool->tx_sw_csum)) {
++					err = skb_checksum_help(skb);
++					if (err)
++						goto free_err;
++				}
  			}
+ 		}
+ 	}
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 386eddcdf837..4f6f538a5462 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -86,6 +86,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+ 	pool->umem = umem;
+ 	pool->addrs = umem->addrs;
+ 	pool->tx_metadata_len = umem->tx_metadata_len;
++	pool->tx_sw_csum = umem->flags & XDP_UMEM_TX_SW_CSUM;
+ 	INIT_LIST_HEAD(&pool->free_list);
+ 	INIT_LIST_HEAD(&pool->xskb_list);
+ 	INIT_LIST_HEAD(&pool->xsk_tx_list);
+diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
+index d0882edc1642..638c606dfa74 100644
+--- a/tools/include/uapi/linux/if_xdp.h
++++ b/tools/include/uapi/linux/if_xdp.h
+@@ -33,7 +33,13 @@
+ #define XDP_USE_SG	(1 << 4)
  
- 			meta = buffer - xs->pool->tx_metadata_len;
-+			if (unlikely(!xsk_buff_valid_tx_metadata(meta))) {
-+				err = -EINVAL;
-+				goto free_err;
-+			}
+ /* Flags for xsk_umem_config flags */
+-#define XDP_UMEM_UNALIGNED_CHUNK_FLAG (1 << 0)
++#define XDP_UMEM_UNALIGNED_CHUNK_FLAG	(1 << 0)
++
++/* Force checksum calculation in software. Can be used for testing or
++ * working around potential HW issues. This option causes performance
++ * degradation and only works in XDP_COPY mode.
++ */
++#define XDP_UMEM_TX_SW_CSUM		(1 << 1)
  
- 			if (meta->flags & XDP_TXMD_FLAGS_CHECKSUM) {
- 				if (unlikely(meta->request.csum_start +
+ struct sockaddr_xdp {
+ 	__u16 sxdp_family;
 -- 
 2.43.0.rc1.413.gea7ed67945-goog
 
