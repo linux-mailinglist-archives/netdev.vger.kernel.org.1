@@ -1,217 +1,370 @@
-Return-Path: <netdev+bounces-51350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A97D7FA4D4
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:36:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 715DA7FA4C9
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 16:33:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEEFBB20E51
-	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:36:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBB52B20A63
+	for <lists+netdev@lfdr.de>; Mon, 27 Nov 2023 15:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AAB34550;
-	Mon, 27 Nov 2023 15:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="SFZT0582"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6567F328BA;
+	Mon, 27 Nov 2023 15:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2067.outbound.protection.outlook.com [40.107.20.67])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C2A18E;
-	Mon, 27 Nov 2023 07:35:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nNyN5qY5hO7rqy2coWv7BCaFcVGtAhUWadBx3YHVnAAj4NGTRf1tqyxdTRwtTtFYyVqdaMDvq4MsLZDdNwpnoKUMScgtdxqzqpXKfxOIvh/6g62biGUNCxisyn70FID2lcdSQ9DCWk5mIcYaQI+Q9Ntc0eFxkljRLatD20Sq6gLeoeq9cSes7j4EgcA+9d5yJ7mj0zFFkSu0AIvlqZ66ZWHtqDSpZNkaRAYmAbqP6dS19EjRJbXCKCYjIRJDXSkSx7+aGhhaW7mmxYcUKbAI0T3Z+Gf7qy/e4LuDpbsdFMDluL3ca3Dj551y4PupMDCUdQQU8yefuz1Faau089dnKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mykukmwqw1C/8rLGmGVNA+RCw9YlZlHbkBIs/hRJERw=;
- b=loFQGPNnB9a8lP2Yrm5bmzos2419spbQ773ziRs4MB+RjMA9HeS0IkA3w6KPohaP2ACzFccJKPwn6qv7UJ7hXW7pSD3aNcluGtqgVsZX+xxoW/tqDWG03lzObsohJ5DGfUYRaq/KlNHckQW29gCGU48zVupXXVmDxjkcU7UosHdESAHv2mWNMM53xdwy2PJo4fIM3MrFcHtokk0sUbvzstOYgsxPVJKAfzFHnXOxqcwuU5lVaMqHixi+883V8b5wngeDMeb1tjkQ3iiUEUn99jFGx/KdJBQhJdEJt/KlcBlezfK+efX16Ikjsap/poj0+CNXP1NNATpveZCxPeu+lA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 195.60.68.100) smtp.rcpttodomain=analog.com smtp.mailfrom=axis.com;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mykukmwqw1C/8rLGmGVNA+RCw9YlZlHbkBIs/hRJERw=;
- b=SFZT0582vhcbtxkSi1bEkudxnOLctOos47Xnw8uTIw7lPylwZFXF4D7ZgxbJto0fNSgtNpxH/fDzzuSmeGhpmfwrOnaPO1opOBy6uwvNxB++VkUR+CLunsR6a89xdnozyvChZjpTQ/uafzUcHOPUPmBta/HprmR1oFNWkCdE+Ho=
-Received: from AS9PR06CA0398.eurprd06.prod.outlook.com (2603:10a6:20b:461::17)
- by PA4PR02MB7006.eurprd02.prod.outlook.com (2603:10a6:102:be::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.28; Mon, 27 Nov
- 2023 15:35:56 +0000
-Received: from AMS0EPF000001B5.eurprd05.prod.outlook.com
- (2603:10a6:20b:461:cafe::3c) by AS9PR06CA0398.outlook.office365.com
- (2603:10a6:20b:461::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.28 via Frontend
- Transport; Mon, 27 Nov 2023 15:35:56 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=axis.com;
-Received-SPF: Fail (protection.outlook.com: domain of axis.com does not
- designate 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com;
-Received: from mail.axis.com (195.60.68.100) by
- AMS0EPF000001B5.mail.protection.outlook.com (10.167.16.169) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7046.17 via Frontend Transport; Mon, 27 Nov 2023 15:35:55 +0000
-Received: from se-mail02w.axis.com (10.20.40.8) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 27 Nov
- 2023 16:35:55 +0100
-Received: from se-intmail01x.se.axis.com (10.0.5.60) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Mon, 27 Nov 2023 16:35:55 +0100
-Received: from pc45945-2140.se.axis.com (pc45945-2140.se.axis.com [10.88.125.80])
-	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 4E726EC35;
-	Mon, 27 Nov 2023 16:35:55 +0100 (CET)
-Received: by pc45945-2140.se.axis.com (Postfix, from userid 10564)
-	id 5E5B774FBB39; Mon, 27 Nov 2023 16:35:55 +0100 (CET)
-From: Vincent Whitchurch <vincent.whitchurch@axis.com>
-Date: Mon, 27 Nov 2023 16:31:39 +0100
-Subject: [PATCH net-next] net: phy: adin: allow control of Fast Link Down
+Received: from janet.servers.dxld.at (mail.servers.dxld.at [IPv6:2001:678:4d8:200::1a57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A89E594;
+	Mon, 27 Nov 2023 07:33:36 -0800 (PST)
+Received: janet.servers.dxld.at; Mon, 27 Nov 2023 16:33:15 +0100
+From: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
+Subject: [PATCH net-next v2] wireguard: Add netlink attrs for binding to address and netdev
+Date: Mon, 27 Nov 2023 16:33:06 +0100
+Message-Id: <20231127153306.1975792-1-dxld@darkboxed.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20231127-adin-fld-v1-1-797f6423fd48@axis.com>
-X-B4-Tracking: v=1; b=H4sIAFq2ZGUC/x3MQQqAIBBA0avErBtQI6SuEi1MpxqIKTRCkO6et
- Hzw+QUSRaYEY1Mg0sOJT6nQbQN+d7IRcqgGo0yntbHoAguuR0CvrPHdYgfXO6j5FWnl/K8mELp
- RKN8wv+8HsnCvxmQAAAA=
-To: Michael Hennerich <michael.hennerich@analog.com>, Andrew Lunn
-	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@axis.com>, Vincent Whitchurch <vincent.whitchurch@axis.com>
-X-Mailer: b4 0.12.3
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001B5:EE_|PA4PR02MB7006:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5666e1b7-e313-4d29-094b-08dbef5e8c0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5dAcCU/YETZ4SlgkHTwP0T448erYys3IWXr9IUw/YHoX4MAeVzcOziDHoW5m6Fqwa0YHzdig944YMvJqPF2NtB8gOTBeo++xe2tpffypAohz1S4FIdznh/hwxrH2y1/i6l6JWqqVvdFN3T8OvxFeguram6DsiLvIcumDGT0a52AdMR7AM7G04/7+HM5mbXlBdZ7CGcA6IjlHSEHLB6672Mm/cgEpbJr0RGMMkGr1cv81MdMHX5eticWv4SeWT/QFuGe7lrDsrf+jQUBuIsHIqZBcQBLkw9TIkR3FrKM0Nytz/znbKKUlrybp8wuLwkPOhMasKksXpFYqX1z/diSKlbtNQizzJIH6uiP/tslwSN1UMRFG1wD7IIestcMbtrWo1TUtuOElS5ydLTUl5A4YdNfK4Nran/O5tZhbbwrbzQ3R/mk+XxSLR5qtRWvfWLGe76c5uZ7fmmzIGrF6xPt+xvWUKnz8YP5MT8J6olzmTgqZ8TEChZKBvUHsjdCYya7lhBUdmtOo76lamcJXP+xp1j2GVQ26Sz+6veHj96VQ98W0djLF+0N6qsG5DEUtiRs8vM5SkleAWTXTVgV1bw9SMWdOoQeLbzwYxnFoSAJ70U+lmo/cGHk0ui1mqltruW3iS+RY65j2m6sinw9LlLypJyeFi+Fwzg/Fd0uL8EBvJ2k9LiZf0w827E+Pv4JYeAuuDZQE3pAm7H9UQjDjeepyCC0NwTrp2u4ymkCjDCcBT68aGOo2lvG7kspjCaF8mi+wV6l2rhG+iMbGy1Rm5Bs1tg==
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(136003)(376002)(346002)(230922051799003)(186009)(64100799003)(451199024)(82310400011)(1800799012)(36840700001)(46966006)(40470700004)(40460700003)(107886003)(2616005)(26005)(6666004)(8936002)(4326008)(336012)(6266002)(426003)(82740400003)(8676002)(7416002)(44832011)(5660300002)(86362001)(478600001)(70206006)(70586007)(110136005)(316002)(42186006)(54906003)(36860700001)(83380400001)(356005)(47076005)(81166007)(41300700001)(2906002)(40480700001)(36756003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2023 15:35:55.8307
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5666e1b7-e313-4d29-094b-08dbef5e8c0c
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001B5.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR02MB7006
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add support to allow Fast Link Down (aka "Enhanced link detection") to
-be controlled via the ETHTOOL_PHY_FAST_LINK_DOWN tunable.  These PHYs
-have this feature enabled by default.
+Multihomed hosts may want to run distinct wg tunnels across all their
+uplinks for redundant connectivity. Currently this entails picking
+different ports for each wg tunnel since we allow only binding to the
+wildcard address. Sharing a single port-number for all uplink
+connections (but bound to a particular IP/netdev) simplifies managment
+considerably.
 
-Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+A closely related use-case that also touches the socket binding code is
+having a wg socket be part of a VRF. This mirrors how we support socket and
+wg device in distinct namespaces. To make using VRFs with wg easy we want
+to be able to bind to a particular device as this will cause the kernel to
+automatically route all outgoing packets with the VRF's routing table
+and (in the default udp_l3mdev_accept=0 config) only accept packets from
+interfaces in the VRF without the need for netfilter rules.
+
+While users can currently use VRFs for wg tunnel traffic by configuring
+fwmark ip-rules and setting sysctl udp_l3mdev_accept=1 (with or without
+additional nft filtering) this is at best a cludge. When VRF membership
+changes it becomes a major hassle to keep ip-rules up to date.
+
+Signed-off-by: Daniel Gröber <dxld@darkboxed.org>
 ---
- drivers/net/phy/adin.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+Changes in v2:
+ - Fix building without CONFIG_IPV6
 
-diff --git a/drivers/net/phy/adin.c b/drivers/net/phy/adin.c
-index 134637584a83..2e1a46e121d9 100644
---- a/drivers/net/phy/adin.c
-+++ b/drivers/net/phy/adin.c
-@@ -68,6 +68,24 @@
- #define ADIN1300_EEE_CAP_REG			0x8000
- #define ADIN1300_EEE_ADV_REG			0x8001
- #define ADIN1300_EEE_LPABLE_REG			0x8002
-+
-+#define ADIN1300_FLD_EN_REG			0x8E27
-+#define   ADIN1300_FLD_PCS_ERR_100_EN		BIT(7)
-+#define   ADIN1300_FLD_PCS_ERR_1000_EN		BIT(6)
-+#define   ADIN1300_FLD_SLCR_OUT_STUCK_100_EN	BIT(5)
-+#define   ADIN1300_FLD_SLCR_OUT_STUCK_1000_EN	BIT(4)
-+#define   ADIN1300_FLD_SLCR_IN_ZDET_100_EN	BIT(3)
-+#define   ADIN1300_FLD_SLCR_IN_ZDET_1000_EN	BIT(2)
-+#define   ADIN1300_FLD_SLCR_IN_INVLD_100_EN	BIT(1)
-+#define   ADIN1300_FLD_SLCR_IN_INVLD_1000_EN	BIT(0)
-+/* These bits are the ones which are enabled by default. */
-+#define ADIN1300_FLD_EN_ON	\
-+	(ADIN1300_FLD_SLCR_OUT_STUCK_100_EN | \
-+	 ADIN1300_FLD_SLCR_OUT_STUCK_1000_EN | \
-+	 ADIN1300_FLD_SLCR_IN_ZDET_100_EN | \
-+	 ADIN1300_FLD_SLCR_IN_ZDET_1000_EN | \
-+	 ADIN1300_FLD_SLCR_IN_INVLD_1000_EN)
-+
- #define ADIN1300_CLOCK_STOP_REG			0x9400
- #define ADIN1300_LPI_WAKE_ERR_CNT_REG		0xa000
+ drivers/net/wireguard/device.c  |  4 +--
+ drivers/net/wireguard/device.h  |  3 +-
+ drivers/net/wireguard/netlink.c | 56 ++++++++++++++++++++++++++++-----
+ drivers/net/wireguard/socket.c  | 41 +++++++++++++++---------
+ drivers/net/wireguard/socket.h  |  3 +-
+ include/uapi/linux/wireguard.h  |  6 ++++
+ 6 files changed, 88 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index deb9636b0ecf..ec28f5021791 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -48,7 +48,7 @@ static int wg_open(struct net_device *dev)
+ 		dev_v6->cnf.addr_gen_mode = IN6_ADDR_GEN_MODE_NONE;
  
-@@ -416,6 +434,37 @@ static int adin_set_edpd(struct phy_device *phydev, u16 tx_interval)
- 			  val);
+ 	mutex_lock(&wg->device_update_lock);
+-	ret = wg_socket_init(wg, wg->incoming_port);
++	ret = wg_socket_init(wg, wg->port_cfg);
+ 	if (ret < 0)
+ 		goto out;
+ 	list_for_each_entry(peer, &wg->peer_list, peer_list) {
+@@ -249,7 +249,7 @@ static void wg_destruct(struct net_device *dev)
+ 	rtnl_unlock();
+ 	mutex_lock(&wg->device_update_lock);
+ 	rcu_assign_pointer(wg->creating_net, NULL);
+-	wg->incoming_port = 0;
++	memzero_explicit(&wg->port_cfg, sizeof(wg->port_cfg));
+ 	wg_socket_reinit(wg, NULL, NULL);
+ 	/* The final references are cleared in the below calls to destroy_workqueue. */
+ 	wg_peer_remove_all(wg);
+diff --git a/drivers/net/wireguard/device.h b/drivers/net/wireguard/device.h
+index 43c7cebbf50b..ac4092d8c9d0 100644
+--- a/drivers/net/wireguard/device.h
++++ b/drivers/net/wireguard/device.h
+@@ -17,6 +17,7 @@
+ #include <linux/mutex.h>
+ #include <linux/net.h>
+ #include <linux/ptr_ring.h>
++#include <net/udp_tunnel.h>
+ 
+ struct wg_device;
+ 
+@@ -53,7 +54,7 @@ struct wg_device {
+ 	atomic_t handshake_queue_len;
+ 	unsigned int num_peers, device_update_gen;
+ 	u32 fwmark;
+-	u16 incoming_port;
++	struct udp_port_cfg port_cfg;
+ };
+ 
+ int wg_device_init(void);
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+index e220d761b1f2..cfc4f92d3dba 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -26,6 +26,8 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
+ 	[WGDEVICE_A_PUBLIC_KEY]		= NLA_POLICY_EXACT_LEN(NOISE_PUBLIC_KEY_LEN),
+ 	[WGDEVICE_A_FLAGS]		= { .type = NLA_U32 },
+ 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
++	[WGDEVICE_A_LISTEN_ADDR]	= NLA_POLICY_MIN_LEN(sizeof(struct in_addr)),
++	[WGDEVICE_A_LISTEN_IFINDEX]	= { .type = NLA_U32 },
+ 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
+ 	[WGDEVICE_A_PEERS]		= { .type = NLA_NESTED }
+ };
+@@ -230,11 +232,22 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ 	if (!ctx->next_peer) {
+ 		if (nla_put_u16(skb, WGDEVICE_A_LISTEN_PORT,
+-				wg->incoming_port) ||
++				ntohs(wg->port_cfg.local_udp_port)) ||
++		    nla_put_u32(skb, WGDEVICE_A_LISTEN_IFINDEX, wg->port_cfg.bind_ifindex) ||
+ 		    nla_put_u32(skb, WGDEVICE_A_FWMARK, wg->fwmark) ||
+ 		    nla_put_u32(skb, WGDEVICE_A_IFINDEX, wg->dev->ifindex) ||
+ 		    nla_put_string(skb, WGDEVICE_A_IFNAME, wg->dev->name))
+ 			goto out;
++	        if (wg->port_cfg.family == AF_INET &&
++		    nla_put_in_addr(skb, WGDEVICE_A_LISTEN_ADDR,
++				    wg->port_cfg.local_ip.s_addr))
++				goto out;
++#if IS_ENABLED(CONFIG_IPV6)
++	        if (wg->port_cfg.family == AF_INET6 &&
++		    nla_put_in6_addr(skb, WGDEVICE_A_LISTEN_ADDR,
++				     &wg->port_cfg.local_ip6))
++				goto out;
++#endif
+ 
+ 		down_read(&wg->static_identity.lock);
+ 		if (wg->static_identity.has_identity) {
+@@ -311,19 +324,49 @@ static int wg_get_device_done(struct netlink_callback *cb)
+ 	return 0;
  }
  
-+static int adin_get_fast_down(struct phy_device *phydev, u8 *msecs)
-+{
-+	int reg;
-+
-+	reg = phy_read_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_FLD_EN_REG);
-+	if (reg < 0)
-+		return reg;
-+
-+	if (reg & ADIN1300_FLD_EN_ON)
-+		*msecs = ETHTOOL_PHY_FAST_LINK_DOWN_ON;
-+	else
-+		*msecs = ETHTOOL_PHY_FAST_LINK_DOWN_OFF;
-+
-+	return 0;
-+}
-+
-+static int adin_set_fast_down(struct phy_device *phydev, const u8 *msecs)
-+{
-+	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_ON)
-+		return phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
-+					ADIN1300_FLD_EN_REG,
-+					ADIN1300_FLD_EN_ON);
-+
-+	if (*msecs == ETHTOOL_PHY_FAST_LINK_DOWN_OFF)
-+		return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
-+					  ADIN1300_FLD_EN_REG,
-+					  ADIN1300_FLD_EN_ON);
-+
-+	return -EINVAL;
-+}
-+
- static int adin_get_tunable(struct phy_device *phydev,
- 			    struct ethtool_tunable *tuna, void *data)
+-static int set_port(struct wg_device *wg, u16 port)
++static int set_port_cfg(struct wg_device *wg, struct nlattr **attrs)
  {
-@@ -424,6 +473,8 @@ static int adin_get_tunable(struct phy_device *phydev,
- 		return adin_get_downshift(phydev, data);
- 	case ETHTOOL_PHY_EDPD:
- 		return adin_get_edpd(phydev, data);
-+	case ETHTOOL_PHY_FAST_LINK_DOWN:
-+		return adin_get_fast_down(phydev, data);
- 	default:
- 		return -EOPNOTSUPP;
+ 	struct wg_peer *peer;
++	struct udp_port_cfg port_cfg = {
++		.family = AF_UNSPEC,
++	};
++
++	if (attrs[WGDEVICE_A_LISTEN_PORT])
++		port_cfg.local_udp_port =
++			htons(nla_get_u16(attrs[WGDEVICE_A_LISTEN_PORT]));
++	if (attrs[WGDEVICE_A_LISTEN_ADDR]) {
++		union {
++			struct in_addr addr4;
++			struct in6_addr addr6;
++		} *u_addr = nla_data(attrs[WGDEVICE_A_LISTEN_ADDR]);
++		size_t len = nla_len(attrs[WGDEVICE_A_LISTEN_ADDR]);
++		if (len == sizeof(struct in_addr)) {
++			port_cfg.family = AF_INET;
++			port_cfg.local_ip = u_addr->addr4;
++		} else if (len == sizeof(struct in6_addr)) {
++#if IS_ENABLED(CONFIG_IPV6)
++			port_cfg.family = AF_INET6;
++			port_cfg.local_ip6 = u_addr->addr6;
++#else
++			return -EAFNOSUPPORT;
++#endif
++
++		}
++	}
++	if (attrs[WGDEVICE_A_LISTEN_IFINDEX]) {
++		port_cfg.bind_ifindex =
++			nla_get_u32(attrs[WGDEVICE_A_LISTEN_IFINDEX]);
++	}
+ 
+-	if (wg->incoming_port == port)
++	if (memcmp(&port_cfg, &wg->port_cfg, sizeof(port_cfg)) == 0)
+ 		return 0;
+ 	list_for_each_entry(peer, &wg->peer_list, peer_list)
+ 		wg_socket_clear_peer_endpoint_src(peer);
+ 	if (!netif_running(wg->dev)) {
+-		wg->incoming_port = port;
++		wg->port_cfg = port_cfg;
+ 		return 0;
  	}
-@@ -437,6 +488,8 @@ static int adin_set_tunable(struct phy_device *phydev,
- 		return adin_set_downshift(phydev, *(const u8 *)data);
- 	case ETHTOOL_PHY_EDPD:
- 		return adin_set_edpd(phydev, *(const u16 *)data);
-+	case ETHTOOL_PHY_FAST_LINK_DOWN:
-+		return adin_set_fast_down(phydev, data);
- 	default:
- 		return -EOPNOTSUPP;
+-	return wg_socket_init(wg, port);
++	return wg_socket_init(wg, port_cfg);
+ }
+ 
+ static int set_allowedip(struct wg_peer *peer, struct nlattr **attrs)
+@@ -531,8 +574,7 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
  	}
-
----
-base-commit: e1df5202e879bce09845ac62bae30206e1edfb80
-change-id: 20231127-adin-fld-c072c3b79a5a
-
-Best regards,
+ 
+ 	if (info->attrs[WGDEVICE_A_LISTEN_PORT]) {
+-		ret = set_port(wg,
+-			nla_get_u16(info->attrs[WGDEVICE_A_LISTEN_PORT]));
++		ret = set_port_cfg(wg, info->attrs);
+ 		if (ret)
+ 			goto out;
+ 	}
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
+index 0414d7a6ce74..47bb46e0cdd9 100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -346,7 +346,7 @@ static void set_sock_opts(struct socket *sock)
+ 	sk_set_memalloc(sock->sk);
+ }
+ 
+-int wg_socket_init(struct wg_device *wg, u16 port)
++int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port_cfg)
+ {
+ 	struct net *net;
+ 	int ret;
+@@ -356,12 +356,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 		.encap_rcv = wg_receive
+ 	};
+ 	struct socket *new4 = NULL, *new6 = NULL;
+-	struct udp_port_cfg port4 = {
+-		.family = AF_INET,
+-		.local_ip.s_addr = htonl(INADDR_ANY),
+-		.local_udp_port = htons(port),
+-		.use_udp_checksums = true
+-	};
++	struct udp_port_cfg port4;
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	int retries = 0;
+ 	struct udp_port_cfg port6 = {
+@@ -373,6 +368,23 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 	};
+ #endif
+ 
++	if (port_cfg.family == AF_UNSPEC) {
++		port4 = (struct udp_port_cfg) {
++			.family = AF_INET,
++			.local_ip.s_addr = htonl(INADDR_ANY),
++			.local_udp_port = port_cfg.local_udp_port,
++			.use_udp_checksums = true
++		};
++	} else {
++		port4 = port_cfg;
++		port4.use_udp_checksums = true;
++		if (IS_ENABLED(CONFIG_IPV6) && port_cfg.family == AF_INET6) {
++			port4.use_udp6_tx_checksums = true;
++			port4.use_udp6_rx_checksums = true;
++			port4.ipv6_v6only = true;
++		}
++	}
++
+ 	rcu_read_lock();
+ 	net = rcu_dereference(wg->creating_net);
+ 	net = net ? maybe_get_net(net) : NULL;
+@@ -380,10 +392,6 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 	if (unlikely(!net))
+ 		return -ENONET;
+ 
+-#if IS_ENABLED(CONFIG_IPV6)
+-retry:
+-#endif
+-
+ 	ret = udp_sock_create(net, &port4, &new4);
+ 	if (ret < 0) {
+ 		pr_err("%s: Could not create IPv4 socket\n", wg->dev->name);
+@@ -392,13 +400,18 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 	set_sock_opts(new4);
+ 	setup_udp_tunnel_sock(net, new4, &cfg);
+ 
++	if (port_cfg.family != AF_UNSPEC)
++		goto reinit;
++
+ #if IS_ENABLED(CONFIG_IPV6)
++retry:
+ 	if (ipv6_mod_enabled()) {
+ 		port6.local_udp_port = inet_sk(new4->sk)->inet_sport;
+ 		ret = udp_sock_create(net, &port6, &new6);
+ 		if (ret < 0) {
+ 			udp_tunnel_sock_release(new4);
+-			if (ret == -EADDRINUSE && !port && retries++ < 100)
++			if (ret == -EADDRINUSE && !port_cfg.local_udp_port &&
++			    retries++ < 100)
+ 				goto retry;
+ 			pr_err("%s: Could not create IPv6 socket\n",
+ 			       wg->dev->name);
+@@ -409,6 +422,8 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 	}
+ #endif
+ 
++reinit:
++	wg->port_cfg = port_cfg;
+ 	wg_socket_reinit(wg, new4->sk, new6 ? new6->sk : NULL);
+ 	ret = 0;
+ out:
+@@ -428,8 +443,6 @@ void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
+ 				lockdep_is_held(&wg->socket_update_lock));
+ 	rcu_assign_pointer(wg->sock4, new4);
+ 	rcu_assign_pointer(wg->sock6, new6);
+-	if (new4)
+-		wg->incoming_port = ntohs(inet_sk(new4)->inet_sport);
+ 	mutex_unlock(&wg->socket_update_lock);
+ 	synchronize_net();
+ 	sock_free(old4);
+diff --git a/drivers/net/wireguard/socket.h b/drivers/net/wireguard/socket.h
+index bab5848efbcd..1532a263c518 100644
+--- a/drivers/net/wireguard/socket.h
++++ b/drivers/net/wireguard/socket.h
+@@ -10,8 +10,9 @@
+ #include <linux/udp.h>
+ #include <linux/if_vlan.h>
+ #include <linux/if_ether.h>
++#include <net/udp_tunnel.h>
+ 
+-int wg_socket_init(struct wg_device *wg, u16 port);
++int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port);
+ void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
+ 		      struct sock *new6);
+ int wg_socket_send_buffer_to_peer(struct wg_peer *peer, void *data,
+diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
+index ae88be14c947..240d1c850dfd 100644
+--- a/include/uapi/linux/wireguard.h
++++ b/include/uapi/linux/wireguard.h
+@@ -28,6 +28,8 @@
+  *    WGDEVICE_A_PRIVATE_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+  *    WGDEVICE_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
+  *    WGDEVICE_A_LISTEN_PORT: NLA_U16
++ *    WGDEVICE_A_LISTEN_ADDR : NLA_MIN_LEN(struct sockaddr), struct sockaddr_in or struct sockaddr_in6
++ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
+  *    WGDEVICE_A_FWMARK: NLA_U32
+  *    WGDEVICE_A_PEERS: NLA_NESTED
+  *        0: NLA_NESTED
+@@ -82,6 +84,8 @@
+  *                      peers should be removed prior to adding the list below.
+  *    WGDEVICE_A_PRIVATE_KEY: len WG_KEY_LEN, all zeros to remove
+  *    WGDEVICE_A_LISTEN_PORT: NLA_U16, 0 to choose randomly
++ *    WGDEVICE_A_LISTEN_ADDR : struct sockaddr_in or struct sockaddr_in6.
++ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
+  *    WGDEVICE_A_FWMARK: NLA_U32, 0 to disable
+  *    WGDEVICE_A_PEERS: NLA_NESTED
+  *        0: NLA_NESTED
+@@ -157,6 +161,8 @@ enum wgdevice_attribute {
+ 	WGDEVICE_A_LISTEN_PORT,
+ 	WGDEVICE_A_FWMARK,
+ 	WGDEVICE_A_PEERS,
++	WGDEVICE_A_LISTEN_ADDR,
++	WGDEVICE_A_LISTEN_IFINDEX,
+ 	__WGDEVICE_A_LAST
+ };
+ #define WGDEVICE_A_MAX (__WGDEVICE_A_LAST - 1)
 -- 
-Vincent Whitchurch <vincent.whitchurch@axis.com>
+2.39.2
 
 
