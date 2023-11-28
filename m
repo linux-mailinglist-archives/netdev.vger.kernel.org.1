@@ -1,94 +1,116 @@
-Return-Path: <netdev+bounces-51842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030E07FC67C
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:58:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E95D47FC6B4
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:06:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF644287649
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:58:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6BEC28309C
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668B142AA2;
-	Tue, 28 Nov 2023 20:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996DA44398;
+	Tue, 28 Nov 2023 21:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oV48eUKn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dyDhiu1t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEF34437C;
-	Tue, 28 Nov 2023 20:58:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 592C3C433C7;
-	Tue, 28 Nov 2023 20:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F2F44366;
+	Tue, 28 Nov 2023 21:06:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBDC5C433C9;
+	Tue, 28 Nov 2023 21:06:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701205089;
-	bh=UX5C2qgBjiUo8YBuIWLh8l0BZcz0KqX1PVlM2d6g/Hs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oV48eUKntnEzVvcv9ghdk4dk2660mtkgGC0Rq09ovnIQzNbwC5LzvTjX/pzHoS/w3
-	 lLE7UZJsygtUY9+gFwrkTl/tIUufnO5J+XaoPSeACsp5uhGSjr3NZlsIcqT6IMqBMt
-	 mUdIRT8gLBx/KVa/AsVZ5XPeuU4n/mlHj24sCUS3EfVqaO+1fYX0ZHIekyUhVvl1rw
-	 yJSvsUyC6LHCwm9kfTJPE/ezpij/gexK4CA3CSIK2r4EyQMTDlPD7Ff11jVcLUm388
-	 Kf/Ejt8CDzUL0EfvfRoTI7fZgHwjeouX3YFeY+AbNe63iOFcohuGQRLioe/DbznTix
-	 OpVa7ZM6cd+3Q==
-Date: Tue, 28 Nov 2023 12:58:08 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, loic.poulain@linaro.org
-Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
-Message-ID: <20231128125808.7a5f0028@kernel.org>
-In-Reply-To: <CAA8EJppL0YHHjHj=teCnAwPDkNhwR1EWYuLPnDue1QdfZ3RS_w@mail.gmail.com>
-References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
-	<20230607094922.43106896@kernel.org>
-	<20230607171153.GA109456@thinkpad>
-	<20230607104350.03a51711@kernel.org>
-	<20230608123720.GC5672@thinkpad>
-	<20231117070602.GA10361@thinkpad>
-	<20231117162638.7cdb3e7d@kernel.org>
-	<20231127060439.GA2505@thinkpad>
-	<20231127084639.6be47207@kernel.org>
-	<CAA8EJppL0YHHjHj=teCnAwPDkNhwR1EWYuLPnDue1QdfZ3RS_w@mail.gmail.com>
+	s=k20201202; t=1701205584;
+	bh=VF+FqZDwC1y4zaNtTATkaYq4JV+XiOLwLQAQ5id2JQw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dyDhiu1tR/k04EBFPd6vrsXtq/mrug4hKe43nvPKWEkVWg1Yay3OSKTIJtT7yruF0
+	 Pkzgfjrh7oRuOmfJ0HeP+NjpHtkZbqMx/FaQkmXglNIzF7d2LpWqhwzsRvRalNR34i
+	 YqrcRIIzSlde31yAgrPVkUNGjtIgSRsM0qdWYqm7Y0xFmzZHLeZ7+W1z5OzN/76foo
+	 VewVtqkNsfJSSkl/ga0XWNdO4JCvvAPEv9U/ogHeW+aV3wCCZIRUQ5gWy2cYlWX+Qv
+	 6XkI/NTBOAx9Cvd3/o+0QcIf3OPf54dGwnX+M7IhUjNs0dVWJ1pnHoqWe63wdjoDpO
+	 +xFOK9/kewGOA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 02/40] usb: aqc111: check packet for fixup for true limit
+Date: Tue, 28 Nov 2023 16:05:08 -0500
+Message-ID: <20231128210615.875085-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231128210615.875085-1-sashal@kernel.org>
+References: <20231128210615.875085-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.3
+Content-Transfer-Encoding: 8bit
 
-On Tue, 28 Nov 2023 22:35:50 +0200 Dmitry Baryshkov wrote:
-> Also, please excuse me if this was already answered, just for my understanding:
-> - If we limit functionality to just networking channels which are used
-> to pass IP data between host and EP, will that be accepted?
+From: Oliver Neukum <oneukum@suse.com>
 
-That's too hard to enforce. We have 200+ drivers, we can't carefully
-review every single line of code to make sure you stick to the "just
-networking" promise you make us. Plus the next guy will come and tell
-us "but you let the company X do it".
+[ Upstream commit ccab434e674ca95d483788b1895a70c21b7f016a ]
 
-> - If we were to implement the PCIe networking card running Linux (e.g.
-> using Freescale PowerQUICC or Cavium Octeon chips), would you also be
-> opposed to implementing the EP side of the link as the netdev?
+If a device sends a packet that is inbetween 0
+and sizeof(u64) the value passed to skb_trim()
+as length will wrap around ending up as some very
+large value.
 
-Yes.
+The driver will then proceed to parse the header
+located at that position, which will either oops or
+process some random value.
 
-It's very tempting to reuse existing code, written for traffic to build
-a control channel. This becomes painful because:
- - the lifetime rules for interfaces to configure vs to pass traffic 
-   are different, which inevitably leads to bugs in common code,
- - the use cases are different, which leads to hacks / abuse,
-   and then it's a lot harder for us to refactor and optimize core 
-   code / data structures,
- - IDK how "channel to talk to FW" fits with the normal IP stack...
+The fix is to check against sizeof(u64) rather than
+0, which the driver currently does. The issue exists
+since the introduction of the driver.
 
-The "FW channel netdevs" exist for decades now, and are very popular
-with middle box SDKs, I know. Your choices are:
- - keep the code out of tree,
- - use a generic interface with a strong standard definition, like
-   virtio, and expect that no customizations will be allowed.
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/usb/aqc111.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
+index a017e9de2119d..7b8afa589a53c 100644
+--- a/drivers/net/usb/aqc111.c
++++ b/drivers/net/usb/aqc111.c
+@@ -1079,17 +1079,17 @@ static int aqc111_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 	u16 pkt_count = 0;
+ 	u64 desc_hdr = 0;
+ 	u16 vlan_tag = 0;
+-	u32 skb_len = 0;
++	u32 skb_len;
+ 
+ 	if (!skb)
+ 		goto err;
+ 
+-	if (skb->len == 0)
++	skb_len = skb->len;
++	if (skb_len < sizeof(desc_hdr))
+ 		goto err;
+ 
+-	skb_len = skb->len;
+ 	/* RX Descriptor Header */
+-	skb_trim(skb, skb->len - sizeof(desc_hdr));
++	skb_trim(skb, skb_len - sizeof(desc_hdr));
+ 	desc_hdr = le64_to_cpup((u64 *)skb_tail_pointer(skb));
+ 
+ 	/* Check these packets */
+-- 
+2.42.0
+
 
