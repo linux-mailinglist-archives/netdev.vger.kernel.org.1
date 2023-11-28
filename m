@@ -1,41 +1,37 @@
-Return-Path: <netdev+bounces-51524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5E37FB015
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 03:30:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214CA7FB021
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 03:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C0D61C20ACB
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 02:30:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1D37281CCB
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 02:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5C91365;
-	Tue, 28 Nov 2023 02:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zun06cJe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B3FED3;
+	Tue, 28 Nov 2023 02:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C913A101C1;
-	Tue, 28 Nov 2023 02:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 25B22C433C7;
-	Tue, 28 Nov 2023 02:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701138626;
-	bh=r8crOTWaWJVGmeWmi01DxTtqJ1RRSVd7emnIHX8ckak=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zun06cJekM/LWUbxsvOKL68y7HlC9QyOYWwqKFVT0tQHk9FxAIh85ovWnhlFAx8tk
-	 3KGxwjHRVMKv5ws/XNPm2WkD8ae9UHKnXpswuT0kQ4YDcPDDlskBdCDl8wn4KqYqso
-	 5qM1m2i+mbhk9q8dl3ealNM/GSONv3DW9ezmeE5PRatEk9C+m++orb4l0R42vLJdyY
-	 nYQC5bgb6FliG0WqABDnS191MVZh4XCzSf/1rtAnQJut1rOw+X0bzuRBuqBRITVUuk
-	 8n9Q71kSqA+SDAeDvfrHlh6TmMHFr+QkV7+wF+LvYNqrGq7qCPWy4RzfTm1MRXhhJY
-	 BsnD0L88lyfqQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05525E11F68;
-	Tue, 28 Nov 2023 02:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from smtpout6.r2.mail-out.ovh.net (smtpout6.r2.mail-out.ovh.net [54.36.141.6])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDFC1AE
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 18:34:41 -0800 (PST)
+Received: from ex4.mail.ovh.net (unknown [10.110.115.156])
+	by mo511.mail-out.ovh.net (Postfix) with ESMTPS id 0B08526EF5;
+	Tue, 28 Nov 2023 02:34:38 +0000 (UTC)
+Received: from bf-dev-miffies.localdomain (92.184.96.55) by
+ DAG10EX1.indiv4.local (172.16.2.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 28 Nov 2023 03:31:16 +0100
+From: Quentin Deslandes <qde@naccy.de>
+To: <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [PATCH 0/3] ss: pretty-printing BPF socket-local storage
+Date: Mon, 27 Nov 2023 18:30:55 -0800
+Message-ID: <20231128023058.53546-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,47 +39,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3 1/2] bpftool: mark orphaned programs during prog
- show
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170113862601.1467.14103892622059549472.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Nov 2023 02:30:26 +0000
-References: <20231127182057.1081138-1-sdf@google.com>
-In-Reply-To: <20231127182057.1081138-1-sdf@google.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: CAS12.indiv4.local (172.16.1.12) To DAG10EX1.indiv4.local
+ (172.16.2.91)
+X-Ovh-Tracer-Id: 5890426840063340200
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrudeivddggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfgtihesthekredtredttdenucfhrhhomhepsfhuvghnthhinhcuffgvshhlrghnuggvshcuoehquggvsehnrggttgihrdguvgeqnecuggftrfgrthhtvghrnhepfeduteevveeluedvvedtieegleefveetjeeukeeigefgtdekudeuheduudegfeefnecukfhppeduvdejrddtrddtrddupdelvddrudekgedrleeirdehheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehquggvsehnrggttgihrdguvgeqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdgushgrhhgvrhhnsehgmhgrihhlrdgtohhmpdhmrghrthhinhdrlhgruheskhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehuddupdhmohguvgepshhmthhpohhuth
 
-Hello:
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
 
-On Mon, 27 Nov 2023 10:20:56 -0800 you wrote:
-> Commit ef01f4e25c17 ("bpf: restore the ebpf program ID for BPF_AUDIT_UNLOAD
-> and PERF_BPF_EVENT_PROG_UNLOAD") stopped removing program's id from
-> idr when the offloaded/bound netdev goes away. I was supposed to
-> take a look and check in [0], but apparently I did not.
-> 
-> Martin points out it might be useful to keep it that way for
-> observability sake, but we at least need to mark those programs as
-> unusable.
-> 
-> [...]
+The first patch fixes a bug where the "Process" column would always be
+printed on ss' output, even if --processes/-p is not used.
 
-Here is the summary with links:
-  - [bpf-next,v3,1/2] bpftool: mark orphaned programs during prog show
-    https://git.kernel.org/bpf/bpf-next/c/876843ce1e48
-  - [bpf-next,v3,2/2] selftests/bpf: update test_offload to use new orphaned property
-    https://git.kernel.org/bpf/bpf-next/c/cf9791631027
+Patch #2 requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in a dedicated column.
 
-You are awesome, thank you!
+Patch #3 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  2960280             0 [...]
+    map_id: 259 [
+        (struct my_sk_storage) {
+            .field_hh = (char)127,
+            .<anon> = (union <anon>) {
+                .a = (int)0,
+                .b = (int)0,
+            },
+        },
+    ]
+
+Quentin Deslandes (3):
+  ss: prevent "Process" column from being printed unless requested
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+
+ misc/ss.c | 822 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 818 insertions(+), 4 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
