@@ -1,52 +1,50 @@
-Return-Path: <netdev+bounces-51847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AAF7FC6BD
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:06:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D56CF7FC6F5
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:07:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E631BB229EC
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:06:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F4AA1C21103
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C39C42A8B;
-	Tue, 28 Nov 2023 21:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E2844C6E;
+	Tue, 28 Nov 2023 21:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUWKB/Ev"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gp1b/mMH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C01044366;
-	Tue, 28 Nov 2023 21:06:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A163C43391;
-	Tue, 28 Nov 2023 21:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1581E44367;
+	Tue, 28 Nov 2023 21:07:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C88C43395;
+	Tue, 28 Nov 2023 21:07:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701205587;
-	bh=9ytLVkmHZqvhfNXT/1h9vXWCr39HinFs1JKWjyuBsgg=;
+	s=k20201202; t=1701205645;
+	bh=q4zuJqnRTMKFKpaQD3b9M8K0vV9uChLcAW1eHYiIYr0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EUWKB/EvZSdranSeWkj3qv0jRl1NsnXnHx4GpG6Y1leyYQx9sDbOWbipKYYUTMiA5
-	 tTqRUBVenr2hKJoKS3Hy4Z6ZSfRGQJVTI2OprxAE6JkvhjH1qeyFk2DyUwBmgeoBoY
-	 P+ThFK+jrYwqouMP5G6B1ee+XRKhJSjATbnttaLmul/MzzzvJSdTNI/UeaC1lqcB+W
-	 hz446MDNT4Bg6AnDz2DCTJ9LO0kg0xqFrkg63Q+WeG6dulPd33atqUZhJdPQQOJqZ6
-	 zs4iKUJVS+aHeFPk0rNNPlHAx+Op8m+ceNsBtcMK2UtwUvcgEt+zd1dSc0sbHqJdDO
-	 qsAWxnmb8NCmQ==
+	b=Gp1b/mMHfw4pShS6Zc5WQlygErjHMMwmTADMvGhP8GD0hhtz0ZOSbllcwKMF+EyvW
+	 WWH/gR0nEpTazByZExORqhU4bxsEULpshdJJmXPo+8M4OchMyRX7reDbdbWUCOBGdk
+	 s6nmsz+XJGa5E2a4+IA3OreKsqc7o5ynI17kk5X3L9BgSKBqqNZP7X5EkRrTILJ7Ca
+	 KM4OhIpf44wLHWvAwdvDsR1uEiLRfgTT7uV388KdP6JQxPkXR9jFaAP4xxGl6Wnt1S
+	 8JYV2Hy3QxvrjbWbu7xM4f3PzaiHvoDS2qZL35HJx5WImKWelhHJMILAMwnji1Jn56
+	 y+MY5tFFV70Dw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 6.6 04/40] rxrpc: Fix some minor issues with bundle tracing
-Date: Tue, 28 Nov 2023 16:05:10 -0500
-Message-ID: <20231128210615.875085-4-sashal@kernel.org>
+Cc: Nguyen Dinh Phi <phind.uet@gmail.com>,
+	syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	bongsu.jeon@samsung.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 32/40] nfc: virtual_ncidev: Add variable to check if ndev is running
+Date: Tue, 28 Nov 2023 16:05:38 -0500
+Message-ID: <20231128210615.875085-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231128210615.875085-1-sashal@kernel.org>
 References: <20231128210615.875085-1-sashal@kernel.org>
@@ -61,78 +59,62 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.3
 Content-Transfer-Encoding: 8bit
 
-From: David Howells <dhowells@redhat.com>
+From: Nguyen Dinh Phi <phind.uet@gmail.com>
 
-[ Upstream commit 0c3bd086d12d185650d095a906662593ec607bd0 ]
+[ Upstream commit 84d2db91f14a32dc856a5972e3f0907089093c7a ]
 
-Fix some superficial issues with the tracing of rxrpc_bundle structs,
-including:
+syzbot reported an memory leak that happens when an skb is add to
+send_buff after virtual nci closed.
+This patch adds a variable to track if the ndev is running before
+handling new skb in send function.
 
- (1) Set the debug_id when the bundle is allocated rather than when it is
-     set up so that the "NEW" trace line displays the correct bundle ID.
-
- (2) Show the refcount when emitting the "FREE" traceline.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
+Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
+Reported-by: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/00000000000075472b06007df4fb@google.com
+Reviewed-by: Bongsu Jeon
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/rxrpc/conn_client.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/nfc/virtual_ncidev.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/net/rxrpc/conn_client.c b/net/rxrpc/conn_client.c
-index 981ca5b98bcb9..1d95f8bc769fa 100644
---- a/net/rxrpc/conn_client.c
-+++ b/net/rxrpc/conn_client.c
-@@ -73,6 +73,7 @@ static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
- static struct rxrpc_bundle *rxrpc_alloc_bundle(struct rxrpc_call *call,
- 					       gfp_t gfp)
- {
-+	static atomic_t rxrpc_bundle_id;
- 	struct rxrpc_bundle *bundle;
+diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+index b027be0b0b6ff..590b038e449e5 100644
+--- a/drivers/nfc/virtual_ncidev.c
++++ b/drivers/nfc/virtual_ncidev.c
+@@ -26,10 +26,14 @@ struct virtual_nci_dev {
+ 	struct mutex mtx;
+ 	struct sk_buff *send_buff;
+ 	struct wait_queue_head wq;
++	bool running;
+ };
  
- 	bundle = kzalloc(sizeof(*bundle), gfp);
-@@ -85,6 +86,7 @@ static struct rxrpc_bundle *rxrpc_alloc_bundle(struct rxrpc_call *call,
- 		bundle->upgrade		= test_bit(RXRPC_CALL_UPGRADE, &call->flags);
- 		bundle->service_id	= call->dest_srx.srx_service;
- 		bundle->security_level	= call->security_level;
-+		bundle->debug_id	= atomic_inc_return(&rxrpc_bundle_id);
- 		refcount_set(&bundle->ref, 1);
- 		atomic_set(&bundle->active, 1);
- 		INIT_LIST_HEAD(&bundle->waiting_calls);
-@@ -105,7 +107,8 @@ struct rxrpc_bundle *rxrpc_get_bundle(struct rxrpc_bundle *bundle,
- 
- static void rxrpc_free_bundle(struct rxrpc_bundle *bundle)
+ static int virtual_nci_open(struct nci_dev *ndev)
  {
--	trace_rxrpc_bundle(bundle->debug_id, 1, rxrpc_bundle_free);
-+	trace_rxrpc_bundle(bundle->debug_id, refcount_read(&bundle->ref),
-+			   rxrpc_bundle_free);
- 	rxrpc_put_peer(bundle->peer, rxrpc_peer_put_bundle);
- 	key_put(bundle->key);
- 	kfree(bundle);
-@@ -239,7 +242,6 @@ static bool rxrpc_may_reuse_conn(struct rxrpc_connection *conn)
-  */
- int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
- {
--	static atomic_t rxrpc_bundle_id;
- 	struct rxrpc_bundle *bundle, *candidate;
- 	struct rxrpc_local *local = call->local;
- 	struct rb_node *p, **pp, *parent;
-@@ -306,7 +308,6 @@ int rxrpc_look_up_bundle(struct rxrpc_call *call, gfp_t gfp)
- 	}
++	struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
++
++	vdev->running = true;
+ 	return 0;
+ }
  
- 	_debug("new bundle");
--	candidate->debug_id = atomic_inc_return(&rxrpc_bundle_id);
- 	rb_link_node(&candidate->local_node, parent, pp);
- 	rb_insert_color(&candidate->local_node, &local->client_bundles);
- 	call->bundle = rxrpc_get_bundle(candidate, rxrpc_bundle_get_client_call);
+@@ -40,6 +44,7 @@ static int virtual_nci_close(struct nci_dev *ndev)
+ 	mutex_lock(&vdev->mtx);
+ 	kfree_skb(vdev->send_buff);
+ 	vdev->send_buff = NULL;
++	vdev->running = false;
+ 	mutex_unlock(&vdev->mtx);
+ 
+ 	return 0;
+@@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
+ 	struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+ 
+ 	mutex_lock(&vdev->mtx);
+-	if (vdev->send_buff) {
++	if (vdev->send_buff || !vdev->running) {
+ 		mutex_unlock(&vdev->mtx);
+ 		kfree_skb(skb);
+ 		return -1;
 -- 
 2.42.0
 
