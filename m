@@ -1,302 +1,92 @@
-Return-Path: <netdev+bounces-51918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68237FCAEA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:35:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88C87FCAEB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA2851C20B2A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:35:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A319283015
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892E55B5BE;
-	Tue, 28 Nov 2023 23:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0B35B5BE;
+	Tue, 28 Nov 2023 23:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ajn513uH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BP3r3WIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [IPv6:2001:41d0:203:375::aa])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774DD197
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:35:35 -0800 (PST)
-Message-ID: <9f1b0310-25c5-4791-a825-e67cd59fea18@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701214533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mV7vct0LbFclU1P3KGydTmgKT/t1omR3pm0cLucjshQ=;
-	b=Ajn513uHnsFcPxqIQl4kHvQRtWv16Be2IEsOEItZDO3tgcB/Y1f8JsVpJBHAQwCDatQfyo
-	RAQmYLLn3Y7T0vNlcTR7MKSSf2s0L67sjOR2CMGoYfSvZUOWW5HqOGD0Lm6+Q6qMkit3rt
-	yjg5AEkPyHOcfbV9eVfv5WZT9KWFoQU=
-Date: Tue, 28 Nov 2023 15:35:27 -0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9ED0197
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701214645; x=1732750645;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=EGEixHtQb1+ZHIfzVRxJRAfvWyXmF6jAq+s8NNkM3sU=;
+  b=BP3r3WIb5eOeAiFgiFkaLqMPhZZt17xdRXen0PZLsmJCvAi8dkv0oRvm
+   j2uhHOCMSvvLlhrIeMtW7w/7uOPg4twp2UlQ4No9s0HQflwlSo8xjZ0rv
+   cqjRxG1OTHf/n9I0brJQcIu1VceJzqWfnzc3UWJ/XmCrZ8Xb9oP36N2fz
+   fBO/5aJCW/CciFE0Ub42hEPGySmZNH//vrN6emUprh6VB+qD+Av3R2sXv
+   CpmECrPMc3WdE2h3IewWXH5J4/a480JHeqKzYjS14FxWvW3USRCFjqZBn
+   i9ec2oPs1UmZuPu8rUvfTKI3QS93FTN4B7DynD2kdwvhmoMDYFaP0X74h
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="479250764"
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="479250764"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 15:37:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
+   d="scan'208";a="10253019"
+Received: from ticela-or-268.amr.corp.intel.com (HELO vcostago-mobl3) ([10.212.190.61])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 15:37:25 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>
+Subject: Re: [PATCH net-next 0/5] igc: ethtool: Check VLAN TCI mask
+In-Reply-To: <20231128074849.16863-1-kurt@linutronix.de>
+References: <20231128074849.16863-1-kurt@linutronix.de>
+Date: Tue, 28 Nov 2023 15:37:24 -0800
+Message-ID: <87bkbdsb4b.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/3] ss: add support for BPF socket-local storage
-Content-Language: en-US
-To: Quentin Deslandes <qde@naccy.de>
-Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
- <martin.lau@kernel.org>, netdev@vger.kernel.org
-References: <20231128023058.53546-1-qde@naccy.de>
- <20231128023058.53546-3-qde@naccy.de>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231128023058.53546-3-qde@naccy.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-On 11/27/23 6:30 PM, Quentin Deslandes wrote:
-> diff --git a/misc/ss.c b/misc/ss.c
-> index 09dc1f37..5b255ce3 100644
-> --- a/misc/ss.c
-> +++ b/misc/ss.c
-> @@ -51,6 +51,11 @@
->   #include <linux/tls.h>
->   #include <linux/mptcp.h>
->   
-> +#ifdef HAVE_LIBBPF
-> +#include <bpf/bpf.h>
-> +#include <bpf/libbpf.h>
-> +#endif
-> +
->   #if HAVE_RPC
->   #include <rpc/rpc.h>
->   #include <rpc/xdr.h>
-> @@ -101,6 +106,7 @@ enum col_id {
->   	COL_RADDR,
->   	COL_RSERV,
->   	COL_PROC,
-> +	COL_SKSTOR,
->   	COL_EXT,
->   	COL_MAX
->   };
-> @@ -130,6 +136,7 @@ static struct column columns[] = {
->   	{ ALIGN_RIGHT,	"Peer Address:",	" ",	0, 0, 0 },
->   	{ ALIGN_LEFT,	"Port",			"",	0, 0, 0 },
->   	{ ALIGN_LEFT,	"Process",		"",	0, 0, 0 },
-> +	{ ALIGN_LEFT,	"Socket storage",	"",	1, 0, 0 },
->   	{ ALIGN_LEFT,	"",			"",	0, 0, 0 },
->   };
->   
-> @@ -3368,6 +3375,222 @@ static void parse_diag_msg(struct nlmsghdr *nlh, struct sockstat *s)
->   	memcpy(s->remote.data, r->id.idiag_dst, s->local.bytelen);
->   }
->   
-> +#ifdef HAVE_LIBBPF
-> +
-> +#define MAX_NR_BPF_MAP_ID_OPTS 32
-> +
-> +struct btf;
-> +
-> +static struct bpf_map_opts {
-> +	unsigned int nr_maps;
-> +	struct bpf_sk_storage_map_info {
-> +		unsigned int id;
-> +		int fd;
-> +	} maps[MAX_NR_BPF_MAP_ID_OPTS];
-> +	bool show_all;
-> +	struct btf *kernel_btf;
-> +} bpf_map_opts;
-> +
-> +static void bpf_map_opts_mixed_error(void)
-> +{
-> +	fprintf(stderr,
-> +		"ss: --bpf-maps and --bpf-map-id cannot be used together\n");
-> +}
-> +
-> +static int bpf_map_opts_add_all(void)
-> +{
-> +	unsigned int i;
-> +	unsigned int fd;
-> +	uint32_t id = 0;
-> +	int r;
-> +
-> +	if (bpf_map_opts.nr_maps) {
-> +		bpf_map_opts_mixed_error();
-> +		return -1;
-> +	}
-> +
-> +	while (1) {
-> +		struct bpf_map_info info = {};
-> +		uint32_t len = sizeof(info);
-> +
-> +		r = bpf_map_get_next_id(id, &id);
-> +		if (r) {
-> +			if (errno == ENOENT)
-> +				break;
-> +
-> +			fprintf(stderr, "ss: failed to fetch BPF map ID\n");
-> +			goto err;
-> +		}
-> +
-> +		fd = bpf_map_get_fd_by_id(id);
-> +		if (fd == -1) {
+Kurt Kanzenbach <kurt@linutronix.de> writes:
 
-The map might be gone. Check for errno == -ENOENT and "continue;" instead of 
-"goto err;".
+> Hi,
+>
+> currently it is possible to configure receive queue assignment using the VLAN
+> TCI field with arbitrary masks. However, the hardware only supports steering
+> either by full TCI or the priority (PCP) field. In case a wrong mask is given by
+> the user the driver will silently convert it into a PCP filter which is not
+> desired. Therefore, add a check for it.
+>
+> Patches #1 to #4 are minor things found along the way.
+>
 
-> +			fprintf(stderr, "ss: cannot get fd for BPF map ID %u%s\n",
-> +				id, errno == EPERM ?
-> +				": missing root permissions, CAP_BPF, or CAP_SYS_ADMIN" : "");
-> +			goto err;
-> +		}
-> +
-> +		r = bpf_obj_get_info_by_fd(fd, &info, &len);
-> +		if (r) {
-> +			fprintf(stderr, "ss: failed to get info for BPF map ID %u\n",
-> +				id);
-> +			close(fd);
-> +			goto err;
-> +		}
-> +
-> +		if (info.type != BPF_MAP_TYPE_SK_STORAGE) {
-> +			close(fd);
-> +			continue;
-> +		}
-> +
-> +		if (bpf_map_opts.nr_maps == MAX_NR_BPF_MAP_ID_OPTS) {
-> +			fprintf(stderr, "ss: too many (> %u) BPF socket-local storage maps found, skipping map ID %u\n",
-> +				MAX_NR_BPF_MAP_ID_OPTS, id);
-> +			close(fd);
-> +			continue;
-> +		}
-> +
-> +		bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
-> +		bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
+Some very minor things: patches 2,3 and 4 have extra long lines in their
+commit messages that checkpatch.pl doesn't seem to like.
 
-Not sure how the ss takes care of the fd/memory resources before process exit.
+Patches 4 and 5 read more like fixes to me. I think they could be
+proposed to -net, as they contain fixes to user visible issues. Do you
+think that makes sense?
 
-May be the fd(s) need a close() at some point?
+As for the code, feel free to add my Ack to the series:
 
-> +	}
-> +
-> +	bpf_map_opts.show_all = true;
-> +
-> +	return 0;
-> +
-> +err:
-> +	for (i = 0; i < bpf_map_opts.nr_maps; ++i)
-> +		close(bpf_map_opts.maps[i].fd);
-> +
-> +	return -1;
-> +}
-> +
-> +static int bpf_map_opts_add_id(const char *optarg)
-> +{
-> +	struct bpf_map_info info = {};
-> +	uint32_t len = sizeof(info);
-> +	size_t optarg_len;
-> +	unsigned long id;
-> +	unsigned int i;
-> +	char *end;
-> +	int fd;
-> +	int r;
-> +
-> +	if (bpf_map_opts.show_all) {
-> +		bpf_map_opts_mixed_error();
-> +		return -1;
-> +	}
-> +
-> +	optarg_len = strlen(optarg);
-> +	id = strtoul(optarg, &end, 0);
-> +	if (end != optarg + optarg_len || id == 0 || id > UINT32_MAX) {
-
-id >= INT32_MAX
-
-> +		fprintf(stderr, "ss: invalid BPF map ID %s\n", optarg);
-> +		return -1;
-> +	}
-> +
-> +	for (i = 0; i < bpf_map_opts.nr_maps; i++) {
-> +		if (bpf_map_opts.maps[i].id == id)
-> +			return 0;
-> +	}
-> +
-> +	if (bpf_map_opts.nr_maps == MAX_NR_BPF_MAP_ID_OPTS) {
-> +		fprintf(stderr, "ss: too many (> %u) BPF socket-local storage maps found, skipping map ID %lu\n",
-> +			MAX_NR_BPF_MAP_ID_OPTS, id);
-> +		return 0;
-> +	}
-> +
-> +	fd = bpf_map_get_fd_by_id(id);
-> +	if (fd == -1) {
-> +		fprintf(stderr, "ss: cannot get fd for BPF map ID %lu%s\n",
-> +			id, errno == EPERM ?
-> +			": missing root permissions, CAP_BPF, or CAP_SYS_ADMIN" : "");
-> +		return -1;
-> +	}
-> +
-> +	r = bpf_obj_get_info_by_fd(fd, &info, &len);
-> +	if (r) {
-> +		fprintf(stderr, "ss: failed to get info for BPF map ID %lu\n", id);
-> +		close(fd);
-> +		return -1;
-> +	}
-> +
-> +	if (info.type != BPF_MAP_TYPE_SK_STORAGE) {
-> +		fprintf(stderr, "ss: BPF map with ID %s has type '%s', expecting 'sk_storage'\n",
-> +			optarg, libbpf_bpf_map_type_str(info.type));
-> +		close(fd);
-> +		return -1;
-> +	}
-> +
-> +	bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
-> +	bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
-> +
-> +	return 0;
-> +}
-> +
-> +static inline bool bpf_map_opts_is_enabled(void)
-> +{
-> +	return bpf_map_opts.nr_maps;
-> +}
-> +
-> +static struct rtattr *bpf_map_opts_alloc_rta(void)
-> +{
-> +	size_t total_size = RTA_LENGTH(RTA_LENGTH(sizeof(int)) * bpf_map_opts.nr_maps);
-> +	struct rtattr *stgs_rta, *fd_rta;
-> +	unsigned int i;
-> +	void *buf;
-> +
-> +	stgs_rta = malloc(RTA_LENGTH(0));
-
-stgs_rta is malloc()-ed here.
-
-> +	stgs_rta->rta_len = RTA_LENGTH(0);
-> +	stgs_rta->rta_type = INET_DIAG_REQ_SK_BPF_STORAGES | NLA_F_NESTED;
-> +
-> +	buf = malloc(total_size);
-> +	if (!buf)
-> +		return NULL;
-> +
-> +	stgs_rta = buf;
-
-and then overwriteen by buf. doesn't look right.
-
-> +	stgs_rta->rta_type = INET_DIAG_REQ_SK_BPF_STORAGES | NLA_F_NESTED;
-> +	stgs_rta->rta_len = total_size;
-> +
-> +	buf = RTA_DATA(stgs_rta);
-> +	for (i = 0; i < bpf_map_opts.nr_maps; i++) {
-> +		int *fd;
-> +
-> +		fd_rta = buf;
-> +		fd_rta->rta_type = SK_DIAG_BPF_STORAGE_REQ_MAP_FD;
-> +		fd_rta->rta_len = RTA_LENGTH(sizeof(int));
-> +
-> +		fd = RTA_DATA(fd_rta);
-> +		*fd = bpf_map_opts.maps[i].fd;
-> +
-> +		buf += fd_rta->rta_len;
-> +	}
-> +
-> +	return stgs_rta;
-> +}
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
 
+Cheers,
+-- 
+Vinicius
 
