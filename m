@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-51501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE497FAF02
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:27:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C592D7FAF01
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64CA6B21228
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:27:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 823422810BA
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E952AA35;
-	Tue, 28 Nov 2023 00:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF0B7F4;
+	Tue, 28 Nov 2023 00:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rIrpXgXI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qOBU2jKi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD75C1
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:27:22 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-daee86e2d70so5942009276.0
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:27:22 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36CC1B1
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:27:24 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5cb92becbf6so72920547b3.2
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:27:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701131241; x=1701736041; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701131244; x=1701736044; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kekvBZIjgx8B5SHHHMl/JjBecTTdofRLTOShhgmahqU=;
-        b=rIrpXgXIw8aAAxedCzO8X2MnVTbXt0YZ85pVLOi4ahoTTlqA1s3DQLbwi3/wqvDQnG
-         h2ypjzhXaAKFL7x4DE4zp7wSghb+06wNP92j7krcinlTir+3ABmo8TjI8N33WH98Lg1Q
-         X4tgWzZ9npkv8fJ3/L6pMLjOo3YFr98YuNqsPXtDZOXn0uTrY5u9rC+XY/a4v/FrvZJ9
-         3YYdheufOOvJ2ix5XSu4/qAimR0kMQXC0OeYYgxQNHrcgXrIspg27mnRB7upBz9g7tGh
-         TB32uFtGwWyzgcP/f2Dqaki/Ch4NhUnAqH7niB/kDHM/IxXysmqWyvdj3H3bETvw8gEx
-         yH/w==
+        bh=Re5mrkQDhsmsBqEX/isMp/hVwh4xSdN/Lox5QrdMG60=;
+        b=qOBU2jKinFzgaPEHxaJfe41F624KCMs++r0koVCoSIttPz8VqTZplqFAIk6ZEvxrKT
+         QMngF+T0rI92WZEso1EqD/vBKLzCLpQjW5AnqoWTouPKNBlVwjrVjBd/N+9srXyb4xUa
+         D6/bC7QNKBaRhG4ihnQmXS7MwmvW5KS8Wb14ZO29brny7mzrgrcTUS3hyiLVnpZVyHE4
+         WUP8V8QkkFXReU5SGaadiC/WibRAntKfmfDaOODly87bb5hRCsrFFvLgP4VJ66EDOood
+         fVtPXdUubOwEuAZgplZoB5eJZLUAHo06wnNGZpPIXnlD3DnuG3MkUM7Sn4ohRpSf/kYr
+         i9vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701131241; x=1701736041;
+        d=1e100.net; s=20230601; t=1701131244; x=1701736044;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kekvBZIjgx8B5SHHHMl/JjBecTTdofRLTOShhgmahqU=;
-        b=oTvPHyx5nKZNBYAMVSEnrjCHxVS7P5Fp4hWX0Shve2rZ6IjW6DetJk7nwOd0kzMRKx
-         jj9u2R0nQGHp4fxyZm+s75mpD3KPCgf0IAfO2jnAaXvokOeVOxWHrHHNQi9DmoAHzUeA
-         McBrom83Y9YH+rJ7IVdaD/zKzWu01YnDp46UtriwsUhPFL6BI2dbro1S2diN3h2Kemy/
-         Vzz285cwj/GHhAMl2mx8U6kq1SZKUx5RPxEvtZJ0jlM4wZAT9BUpKlGSkGYP/B7YSkDw
-         HYabVPyNtntl9XA09nAkL4a6j1WYTlqkVaNPwJoqjDVi7IMOneHo1twUAuoihcrm4aIL
-         WBRA==
-X-Gm-Message-State: AOJu0YzZ/eleVeF3WDcmQekh3OUGMjKRl7IDkfWyhFxcCC64PcVrksvs
-	ATzs9qVfeuT3MMwqBkWU3jY75Prz12itdkgE6shb3RdI8OA1Cjxeh5J+mtZQVU41/q0IGqGcCHm
-	DgYxQtXRVBlrjgE1jLHgbcZdK2CrBKCTsNRj63v+tfLna7tnqWkTLUstEFvMp1voI
-X-Google-Smtp-Source: AGHT+IF+VYh18iez2e0dTFhqxypcKofIu1kgfuCV72Cv8cTSUAgjbCIz5Av8rr5ZC9uMheAKFogk5VSvT+uj
+        bh=Re5mrkQDhsmsBqEX/isMp/hVwh4xSdN/Lox5QrdMG60=;
+        b=rOtKLO7fRWEe+o+YkHOnDwBwzjUqoGuQcgmKcTAv+Ff4/j+g16ZpBzuSZWahsQlzm/
+         JImyU8CyuAyX6L9sX1Ks4HSXeVhft7Gi+fApcY2/PWIxgTb3m3p8nhgskIuPAjgBaJF9
+         N8y85Av9KLbovDNd31tBB0ZT2+z140VoMUWhZ9hTMiHoaOZ7+7zr4eH78y2OtEFT8YZN
+         FJsjtiQFZQIa4v8tkfWefp6iYHENuaeN1z/IQx0ixAdFDmBo+rGbrQbaK/JMeEKkzwMX
+         I3cvzTIKfEz9tBaQl49w4xF+AZ6lWSg0NWtPQ98DkSkuMbBA0Vb+QpW1eOztz4AHikhT
+         Ia2A==
+X-Gm-Message-State: AOJu0YxI7usMIKK/6BHPgwuIfwBAtiVJ3tV9JrHZ0Ll5hP2a6D50I6Hk
+	NvL58S4SQbGQyMjzttZg0LOtPPq3VvT9llfzJFMkg7eYj5/VZhyVPc7PQZ9Nhecy2n9e9Uvnv2J
+	GEvpk7jGjGLuM7fF7wUJ1X1YIO7laEoZD5lfV0OeqUAc8E7Qp5VBLrE4CNT0aFwP7
+X-Google-Smtp-Source: AGHT+IEzKG48RUQbySYjUN8Jw+eoWQEXFZD6O5//zOPMY9y71ZkaF4Ew5IgLGo/glvrfUYP/x+6DZz3rIPjl
 X-Received: from jfraker202.plv.corp.google.com ([2620:15c:11c:202:19d5:f826:3460:9345])
- (user=jfraker job=sendgmr) by 2002:a25:3d44:0:b0:db3:fa34:50b0 with SMTP id
- k65-20020a253d44000000b00db3fa3450b0mr423367yba.4.1701131241575; Mon, 27 Nov
- 2023 16:27:21 -0800 (PST)
-Date: Mon, 27 Nov 2023 16:26:44 -0800
+ (user=jfraker job=sendgmr) by 2002:a05:690c:3105:b0:5cc:4276:1c6b with SMTP
+ id fb5-20020a05690c310500b005cc42761c6bmr372945ywb.4.1701131243881; Mon, 27
+ Nov 2023 16:27:23 -0800 (PST)
+Date: Mon, 27 Nov 2023 16:26:45 -0800
 In-Reply-To: <20231128002648.320892-1-jfraker@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,124 +60,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231128002648.320892-1-jfraker@google.com>
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <20231128002648.320892-2-jfraker@google.com>
-Subject: [PATCH net-next 1/5] gve: Perform adminq allocations through a dma_pool.
+Message-ID: <20231128002648.320892-3-jfraker@google.com>
+Subject: [PATCH net-next 2/5] gve: Deprecate adminq_pfn for pci revision 0x1.
 From: John Fraker <jfraker@google.com>
 To: netdev@vger.kernel.org
 Cc: John Fraker <jfraker@google.com>, Jordan Kimbrough <jrkim@google.com>, 
 	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This allows the adminq to be smaller than a page, paving the way for
-non 4k page support. This is to support platforms where PAGE_SIZE
-is not 4k, such as some ARM platforms.
+adminq_pfn assumes a page size of 4k, causing this mechanism to break in
+kernels compiled with different page sizes. A new PCI device revision was
+needed for the device to be able to communicate with the driver how to
+set up the admin queue prior to having access to the admin queue.
 
 Signed-off-by: Jordan Kimbrough <jrkim@google.com>
 Signed-off-by: John Fraker <jfraker@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h        |  4 ++++
- drivers/net/ethernet/google/gve/gve_adminq.c | 28 ++++++++++++++++++----------
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/google/gve/gve_adminq.c   | 48 ++++++++++++++++++++++++++++-----------
+ drivers/net/ethernet/google/gve/gve_register.h |  9 ++++++++
+ 2 files changed, 44 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 0d1e681be..abc0c708b 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -8,6 +8,7 @@
- #define _GVE_H_
- 
- #include <linux/dma-mapping.h>
-+#include <linux/dmapool.h>
- #include <linux/netdevice.h>
- #include <linux/pci.h>
- #include <linux/u64_stats_sync.h>
-@@ -41,6 +42,8 @@
- #define NIC_TX_STATS_REPORT_NUM	0
- #define NIC_RX_STATS_REPORT_NUM	4
- 
-+#define GVE_ADMINQ_BUFFER_SIZE 4096
-+
- #define GVE_DATA_SLOT_ADDR_PAGE_MASK (~(PAGE_SIZE - 1))
- 
- /* PTYPEs are always 10 bits. */
-@@ -672,6 +675,7 @@ struct gve_priv {
- 	/* Admin queue - see gve_adminq.h*/
- 	union gve_adminq_command *adminq;
- 	dma_addr_t adminq_bus_addr;
-+	struct dma_pool *adminq_pool;
- 	u32 adminq_mask; /* masks prod_cnt to adminq size */
- 	u32 adminq_prod_cnt; /* free-running count of AQ cmds executed */
- 	u32 adminq_cmd_fail; /* free-running count of AQ cmds failed */
 diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 79db7a6d4..d3f3a0152 100644
+index d3f3a0152..f81ed6f62 100644
 --- a/drivers/net/ethernet/google/gve/gve_adminq.c
 +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -194,12 +194,19 @@ gve_process_device_options(struct gve_priv *priv,
+@@ -225,9 +225,20 @@ int gve_adminq_alloc(struct device *dev, struct gve_priv *priv)
+ 	priv->adminq_get_ptype_map_cnt = 0;
  
- int gve_adminq_alloc(struct device *dev, struct gve_priv *priv)
- {
--	priv->adminq = dma_alloc_coherent(dev, PAGE_SIZE,
--					  &priv->adminq_bus_addr, GFP_KERNEL);
--	if (unlikely(!priv->adminq))
-+	priv->adminq_pool = dma_pool_create("adminq_pool", dev,
-+					    GVE_ADMINQ_BUFFER_SIZE, 0, 0);
-+	if (unlikely(!priv->adminq_pool))
- 		return -ENOMEM;
-+	priv->adminq = dma_pool_alloc(priv->adminq_pool, GFP_KERNEL,
-+				      &priv->adminq_bus_addr);
-+	if (unlikely(!priv->adminq)) {
-+		dma_pool_destroy(priv->adminq_pool);
-+		return -ENOMEM;
+ 	/* Setup Admin queue with the device */
+-	iowrite32be(priv->adminq_bus_addr / PAGE_SIZE,
+-		    &priv->reg_bar0->adminq_pfn);
+-
++	if (priv->pdev->revision < 0x1) {
++		iowrite32be(priv->adminq_bus_addr / PAGE_SIZE,
++			    &priv->reg_bar0->adminq_pfn);
++	} else {
++		iowrite16be(GVE_ADMINQ_BUFFER_SIZE,
++			    &priv->reg_bar0->adminq_length);
++#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
++		iowrite32be(priv->adminq_bus_addr >> 32,
++			    &priv->reg_bar0->adminq_base_address_hi);
++#endif
++		iowrite32be(priv->adminq_bus_addr,
++			    &priv->reg_bar0->adminq_base_address_lo);
++		iowrite32be(GVE_DRIVER_STATUS_RUN_MASK, &priv->reg_bar0->driver_status);
 +	}
- 
--	priv->adminq_mask = (PAGE_SIZE / sizeof(union gve_adminq_command)) - 1;
-+	priv->adminq_mask =
-+		(GVE_ADMINQ_BUFFER_SIZE / sizeof(union gve_adminq_command)) - 1;
- 	priv->adminq_prod_cnt = 0;
- 	priv->adminq_cmd_fail = 0;
- 	priv->adminq_timeouts = 0;
-@@ -251,7 +258,8 @@ void gve_adminq_free(struct device *dev, struct gve_priv *priv)
- 	if (!gve_get_admin_queue_ok(priv))
- 		return;
- 	gve_adminq_release(priv);
--	dma_free_coherent(dev, PAGE_SIZE, priv->adminq, priv->adminq_bus_addr);
-+	dma_pool_free(priv->adminq_pool, priv->adminq, priv->adminq_bus_addr);
-+	dma_pool_destroy(priv->adminq_pool);
- 	gve_clear_admin_queue_ok(priv);
+ 	gve_set_admin_queue_ok(priv);
+ 	return 0;
  }
+@@ -237,16 +248,27 @@ void gve_adminq_release(struct gve_priv *priv)
+ 	int i = 0;
  
-@@ -778,8 +786,8 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 	u16 mtu;
+ 	/* Tell the device the adminq is leaving */
+-	iowrite32be(0x0, &priv->reg_bar0->adminq_pfn);
+-	while (ioread32be(&priv->reg_bar0->adminq_pfn)) {
+-		/* If this is reached the device is unrecoverable and still
+-		 * holding memory. Continue looping to avoid memory corruption,
+-		 * but WARN so it is visible what is going on.
+-		 */
+-		if (i == GVE_MAX_ADMINQ_RELEASE_CHECK)
+-			WARN(1, "Unrecoverable platform error!");
+-		i++;
+-		msleep(GVE_ADMINQ_SLEEP_LEN);
++	if (priv->pdev->revision < 0x1) {
++		iowrite32be(0x0, &priv->reg_bar0->adminq_pfn);
++		while (ioread32be(&priv->reg_bar0->adminq_pfn)) {
++			/* If this is reached the device is unrecoverable and still
++			 * holding memory. Continue looping to avoid memory corruption,
++			 * but WARN so it is visible what is going on.
++			 */
++			if (i == GVE_MAX_ADMINQ_RELEASE_CHECK)
++				WARN(1, "Unrecoverable platform error!");
++			i++;
++			msleep(GVE_ADMINQ_SLEEP_LEN);
++		}
++	} else {
++		iowrite32be(GVE_DRIVER_STATUS_RESET_MASK, &priv->reg_bar0->driver_status);
++		while (!(ioread32be(&priv->reg_bar0->device_status)
++				& GVE_DEVICE_STATUS_DEVICE_IS_RESET)) {
++			if (i == GVE_MAX_ADMINQ_RELEASE_CHECK)
++				WARN(1, "Unrecoverable platform error!");
++			i++;
++			msleep(GVE_ADMINQ_SLEEP_LEN);
++		}
+ 	}
+ 	gve_clear_device_rings_ok(priv);
+ 	gve_clear_device_resources_ok(priv);
+diff --git a/drivers/net/ethernet/google/gve/gve_register.h b/drivers/net/ethernet/google/gve/gve_register.h
+index fb655463c..8e72b9700 100644
+--- a/drivers/net/ethernet/google/gve/gve_register.h
++++ b/drivers/net/ethernet/google/gve/gve_register.h
+@@ -18,11 +18,20 @@ struct gve_registers {
+ 	__be32	adminq_event_counter;
+ 	u8	reserved[3];
+ 	u8	driver_version;
++	__be32	adminq_base_address_hi;
++	__be32	adminq_base_address_lo;
++	__be16	adminq_length;
+ };
  
- 	memset(&cmd, 0, sizeof(cmd));
--	descriptor = dma_alloc_coherent(&priv->pdev->dev, PAGE_SIZE,
--					&descriptor_bus, GFP_KERNEL);
-+	descriptor = dma_pool_alloc(priv->adminq_pool, GFP_KERNEL,
-+				    &descriptor_bus);
- 	if (!descriptor)
- 		return -ENOMEM;
- 	cmd.opcode = cpu_to_be32(GVE_ADMINQ_DESCRIBE_DEVICE);
-@@ -787,7 +795,8 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 						cpu_to_be64(descriptor_bus);
- 	cmd.describe_device.device_descriptor_version =
- 			cpu_to_be32(GVE_ADMINQ_DEVICE_DESCRIPTOR_VERSION);
--	cmd.describe_device.available_length = cpu_to_be32(PAGE_SIZE);
-+	cmd.describe_device.available_length =
-+		cpu_to_be32(GVE_ADMINQ_BUFFER_SIZE);
- 
- 	err = gve_adminq_execute_cmd(priv, &cmd);
- 	if (err)
-@@ -868,8 +877,7 @@ int gve_adminq_describe_device(struct gve_priv *priv)
- 				      dev_op_jumbo_frames, dev_op_dqo_qpl);
- 
- free_device_descriptor:
--	dma_free_coherent(&priv->pdev->dev, PAGE_SIZE, descriptor,
--			  descriptor_bus);
-+	dma_pool_free(priv->adminq_pool, descriptor, descriptor_bus);
- 	return err;
- }
- 
+ enum gve_device_status_flags {
+ 	GVE_DEVICE_STATUS_RESET_MASK		= BIT(1),
+ 	GVE_DEVICE_STATUS_LINK_STATUS_MASK	= BIT(2),
+ 	GVE_DEVICE_STATUS_REPORT_STATS_MASK	= BIT(3),
++	GVE_DEVICE_STATUS_DEVICE_IS_RESET	= BIT(4),
++};
++
++enum gve_driver_status_flags {
++	GVE_DRIVER_STATUS_RUN_MASK		= BIT(0),
++	GVE_DRIVER_STATUS_RESET_MASK		= BIT(1),
+ };
+ #endif /* _GVE_REGISTER_H_ */
 -- 
 2.43.0.rc1.413.gea7ed67945-goog
 
