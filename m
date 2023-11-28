@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-51800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135807FC361
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 19:35:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA4F7FC380
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 19:38:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44E701C20B88
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:35:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F5161C20C63
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870C930347;
-	Tue, 28 Nov 2023 18:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8D037D11;
+	Tue, 28 Nov 2023 18:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nY1qftFv"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="XIMrjsr4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B13001A5
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 10:35:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701196512; x=1732732512;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3XrKzGgorsTXEq5Z259hGATFbw7UsEoW85mUltUx3Mc=;
-  b=nY1qftFvhLYCF76JyXih1Ljh3PozvyB6a0eSy4Bdfxa9JdjwN4mFknLO
-   Ah/HuKofMpabY7i7n4MFqc6O3tn/Et4nvlEMVtcvquJf5uH+scljZgcUx
-   hK/IwyZ1L86Y8qvN8/v6w0BqVoKFr0fA+bRgG+qDast/J+dOA85ATpRGu
-   U3vrT6q5Znj0+4w+snvyGll/T9QXTv63/FlyJ4Q0J3hU+lDCGm7qnMWIG
-   1ejx/CPygUwYWHbGRfPTf19hYzG/9V0PZyUcTYkA9KGJ7w+U54dNHXyAS
-   8n2prb7oeFT0fGaHA0786mb57Y3mXKgZ2J/fEfrnPuLfq1wJ4+bYyl5LO
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="390142834"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="390142834"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 10:35:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="803027246"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="803027246"
-Received: from sbahadur1-bxdsw.sj.intel.com ([10.232.237.139])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 10:35:12 -0800
-From: Sachin Bahadur <sachin.bahadur@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
-Subject: [PATCH iwl-next v1] ice: Print NIC FW version during init
-Date: Tue, 28 Nov 2023 10:35:05 -0800
-Message-Id: <20231128183505.1338736-1-sachin.bahadur@intel.com>
-X-Mailer: git-send-email 2.25.1
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6FEDE
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 10:38:03 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5484ef5e3d2so7559976a12.3
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 10:38:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1701196682; x=1701801482; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8DwRGEPfz1X093s5ICMQwVtUB8eba3JYShlmbbCybPs=;
+        b=XIMrjsr4mnbG0OT7LSqkRp8R7Kjq7I2sxiMDGFsjQUvteWOU95Xs0T+W9OX488EbbW
+         EKFYC+pNzA93v5GdgP+TAQB2eqsTooqRcPKY5TZMbKsz92/JdQXLuH3cnWh434mx6zOs
+         Mipwrsk2fTrdMIl/y1IDeceBu7+S42TCcOTxM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701196682; x=1701801482;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8DwRGEPfz1X093s5ICMQwVtUB8eba3JYShlmbbCybPs=;
+        b=ZY6xZkeXbNGaLLdbhDAmeP0vT0THsQZcFZH3ZiylZx8+PxRhk9Y0DNULjiLI8onqm4
+         TARDaITLVMzmuq3jmfcidtD5JMBY8bKfXjCaq9KSBIoKhoWN15k+6koQVhveeeBnxws1
+         a4wRxcj5tQaPbDdxsRq2S9L65X2hdVp6lAxvpj1NJqG1UP4kwvJB4gd5QKMixgj7PZYy
+         cGZXk+s0jLDqDKh3IGtpaKvyRqzB8J5d6JhuVt9498uLa2g8NN3kgf0kGfBt7kt9LRmy
+         lLqNgkAT0xUVuL5jOBvVtm5yiLUMfyqch8iD7IsQgKS7MQmQ2FXxzXBku26uAAwA5TFW
+         9Epw==
+X-Gm-Message-State: AOJu0YwtbKCcv2DkAKHytCIYgVrI2zeX/C2iHi6ub881QldBMa2S0Pp2
+	35ASQu7tIgOGKYl21vuExG4ihI63IE705MBMPN1Vu/S7
+X-Google-Smtp-Source: AGHT+IHOnNWLO0VeUyFnI2y7En9YzP/z/eQSLiaDHYilw3rvfezXl9cFeIBdEYRRJA3lb3eRdc9M9A==
+X-Received: by 2002:a17:906:dfcf:b0:a04:937a:f8b0 with SMTP id jt15-20020a170906dfcf00b00a04937af8b0mr11404726ejc.28.1701196681962;
+        Tue, 28 Nov 2023 10:38:01 -0800 (PST)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
+        by smtp.gmail.com with ESMTPSA id s16-20020a170906455000b009fd7bcd9054sm2456201ejq.147.2023.11.28.10.38.01
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 10:38:01 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-548f853fc9eso7582211a12.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 10:38:01 -0800 (PST)
+X-Received: by 2002:a17:906:d7:b0:a16:88e8:2de7 with SMTP id
+ 23-20020a17090600d700b00a1688e82de7mr1294528eji.23.1701196681241; Tue, 28 Nov
+ 2023 10:38:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+ <cf6e78b6-e4e2-faab-f8c6-19dc462b1d74@marvell.com> <CAHk-=whLsdX=Kr010LiM2smEu2rC3Hedwmuxtcp0pYtZvFj+=A@mail.gmail.com>
+ <f1673f31-b1b4-2c50-92ff-c6b5e247586f@marvell.com>
+In-Reply-To: <f1673f31-b1b4-2c50-92ff-c6b5e247586f@marvell.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 28 Nov 2023 10:37:44 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whDMAXiJ7E_KQFnDRmYzD-Mt803LMEwzSTA4D-fngGdSA@mail.gmail.com>
+Message-ID: <CAHk-=whDMAXiJ7E_KQFnDRmYzD-Mt803LMEwzSTA4D-fngGdSA@mail.gmail.com>
+Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
+To: Igor Russkikh <irusskikh@marvell.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Print NIC FW version during PF initialization. FW version in dmesg is used
-to identify and isolate issues. Particularly useful when dmesg is read
-after reboot.
+On Tue, 28 Nov 2023 at 09:54, Igor Russkikh <irusskikh@marvell.com> wrote:
+>
+> Thats already with the patch applied, so no panic and next "ifconfig up" recovers the device state.
 
-Reviewed-by: Pawel Kaminski <pawel.kaminski@intel.com>
-Signed-off-by: Sachin Bahadur <sachin.bahadur@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Ack. At least it's recoverable, I had to reboot the machine when it
+happened to me (and am very happy that at least all the logs made it
+to disk).
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 1f159b4362ec..71d3d8cfdd1d 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4568,6 +4568,12 @@ static int ice_init_dev(struct ice_pf *pf)
- 		dev_err(dev, "ice_init_hw failed: %d\n", err);
- 		return err;
- 	}
-+	dev_info(dev, "fw %u.%u.%u api %u.%u.%u nvm %u.%u 0x%08x %u.%u.%u\n",
-+		 hw->fw_maj_ver, hw->fw_min_ver, hw->fw_patch, hw->api_maj_ver,
-+		 hw->api_min_ver, hw->api_patch, hw->flash.nvm.major,
-+		 hw->flash.nvm.minor, hw->flash.nvm.eetrack,
-+		 hw->flash.orom.major, hw->flash.orom.build,
-+		 hw->flash.orom.patch);
- 
- 	/* Some cards require longer initialization times
- 	 * due to necessity of loading FW from an external source.
--- 
-2.25.1
+> I will submit a bugfix patch for that solution, but will also continue looking into suspend/resume refactoring.
 
+Thanks,
+
+                   Linus
 
