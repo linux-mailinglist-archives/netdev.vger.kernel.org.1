@@ -1,96 +1,129 @@
-Return-Path: <netdev+bounces-51877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C0C7FC9D2
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:46:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB547FC9DA
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B1F1C20D3A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:46:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EDA9B21567
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C96156F6;
-	Tue, 28 Nov 2023 22:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FkTvYSA5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28CA481C4;
+	Tue, 28 Nov 2023 22:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD8E19B4
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:46:11 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6c398717726so5144469b3a.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:46:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701211571; x=1701816371; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KQD4qLJxXNQxzPigoQ69HS2i8COqOs2Rgp/cwXr/MWk=;
-        b=FkTvYSA5dF/4g//hLkbocWlRKlOrnRQH63VXfnGo+pAU4NdFjfJeIa+Wkryfi51a0J
-         W8jJ0ZhrY4DNbyeDoHPttdJVXDzzhsFJYwiIdq/kS9KKQ+z+dM1VdeQQnMcv3ko0bUko
-         5329f3TWixBDLlFNKXST1DZDxy2YcVVA5PYL7eAl5/P/RoKA3kpCQGxXTgyCIRxZRV6w
-         O+LrgWuQVywu0+2xHTs+igyF0TuO5UriighUccs5UKsamn0x8RV9WlnNkH56YHngBr2z
-         1Cb4JYocLzsuLB+tfZISqJ8Vu+IJoPwhfs6qMKpmNru2g+6mgk7DFzeN0+BceGen7jXc
-         8GeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701211571; x=1701816371;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KQD4qLJxXNQxzPigoQ69HS2i8COqOs2Rgp/cwXr/MWk=;
-        b=Msvmzc7coY2dTDxS8i2FD4ac15ArjgMblrPwIChVBaMDjATzQyTo5FadFupKLFrB+Q
-         C+qG+wQAjHlUL/vpmyPXPmi3aVz/jKQZTst5qPH835DqbkgbszpJSgGeCTCht2Xk8kLC
-         SoeJRB4abTcJoCdhHCdYZJaIgXSyMgy3f6EupJV3l5EwETVisnefSAjLpghNHX6a+uxl
-         XMNCiR9nE6JnefsEMr3NAAWITnj1M3pkSlMXODbLkwg81xVMyVLeXkPKPoTJS0kPUq6f
-         5b+7W4PJKjxo2RXKZ6BHd1XsNUsKFAi+2Paap3QOS9xgv7Rf4lWB8e2ixeu1gWS8I3+g
-         THXQ==
-X-Gm-Message-State: AOJu0YyR5xa1pNAqbobxWwO4px2Ekx41xpj1ZJiHBLdN+kpVG6xuPB8q
-	6a04N1dRgMDwMumPGH5GxNbPfA==
-X-Google-Smtp-Source: AGHT+IG5NsfH3yF5JVNudbx0qkM9if//rca+LfcKZpS1uE9SldtHzAd2errg/dX+A52G+ZR0VhVqjg==
-X-Received: by 2002:a05:6a20:4418:b0:18b:37b4:cb6b with SMTP id ce24-20020a056a20441800b0018b37b4cb6bmr17411628pzb.27.1701211571330;
-        Tue, 28 Nov 2023 14:46:11 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id t43-20020aa78fab000000b006c9c0705b5csm9349304pfs.48.2023.11.28.14.46.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 14:46:11 -0800 (PST)
-Date: Tue, 28 Nov 2023 14:46:09 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel
- <idosch@idosch.org>, Nikolay Aleksandrov <razor@blackwall.org>, Roopa
- Prabhu <roopa@nvidia.com>, Florian Westphal <fw@strlen.de>, Andrew Lunn
- <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld
- <mmuehlfe@redhat.com>
-Subject: Re: [PATCHv3 net-next 01/10] docs: bridge: update doc format to rst
-Message-ID: <20231128144609.08b4275b@hermes.local>
-In-Reply-To: <20231128084943.637091-2-liuhangbin@gmail.com>
-References: <20231128084943.637091-1-liuhangbin@gmail.com>
-	<20231128084943.637091-2-liuhangbin@gmail.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5330819B0;
+	Tue, 28 Nov 2023 14:47:09 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C1F11FB;
+	Tue, 28 Nov 2023 14:47:56 -0800 (PST)
+Received: from [10.57.71.132] (unknown [10.57.71.132])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C40BF3F6C4;
+	Tue, 28 Nov 2023 14:47:00 -0800 (PST)
+Message-ID: <8e1961c9-0359-4450-82d8-2b2fcb2c5557@arm.com>
+Date: Tue, 28 Nov 2023 22:46:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/16] iommu/io-pgtable-arm-v7s: use page allocation
+ function provided by iommu-pages.h
+Content-Language: en-GB
+To: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
+ alex.williamson@redhat.com, alim.akhtar@samsung.com, alyssa@rosenzweig.io,
+ asahi@lists.linux.dev, baolu.lu@linux.intel.com, bhelgaas@google.com,
+ cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
+ dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
+ iommu@lists.linux.dev, jasowang@redhat.com, jernej.skrabec@gmail.com,
+ jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, kevin.tian@intel.com,
+ krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-rockchip@lists.infradead.org,
+ linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+ linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st,
+ mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com,
+ netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org,
+ samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev,
+ thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com,
+ vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org,
+ will@kernel.org, yu-cheng.yu@intel.com
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-6-pasha.tatashin@soleen.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20231128204938.1453583-6-pasha.tatashin@soleen.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 28 Nov 2023 16:49:34 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On 2023-11-28 8:49 pm, Pasha Tatashin wrote:
+> Convert iommu/io-pgtable-arm-v7s.c to use the new page allocation functions
+> provided in iommu-pages.h.
+> 
+> Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
+> ---
+>   drivers/iommu/io-pgtable-arm-v7s.c | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/iommu/io-pgtable-arm-v7s.c b/drivers/iommu/io-pgtable-arm-v7s.c
+> index 75f244a3e12d..3d494ca1f671 100644
+> --- a/drivers/iommu/io-pgtable-arm-v7s.c
+> +++ b/drivers/iommu/io-pgtable-arm-v7s.c
+> @@ -34,6 +34,7 @@
+>   #include <linux/types.h>
+>   
+>   #include <asm/barrier.h>
+> +#include "iommu-pages.h"
+>   
+>   /* Struct accessors */
+>   #define io_pgtable_to_data(x)						\
+> @@ -255,7 +256,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
+>   		 GFP_KERNEL : ARM_V7S_TABLE_GFP_DMA;
+>   
+>   	if (lvl == 1)
+> -		table = (void *)__get_free_pages(gfp_l1 | __GFP_ZERO, get_order(size));
+> +		table = iommu_alloc_pages(gfp_l1, get_order(size));
+>   	else if (lvl == 2)
+>   		table = kmem_cache_zalloc(data->l2_tables, gfp);
 
-> The current bridge kernel doc is too old. It only pointed to the
-> linuxfoundation wiki page which lacks of the new features.
-> 
-> Here let's start the new bridge document and put all the bridge info
-> so new developers and users could catch up the last bridge status soon.
-> 
-> In this patch, Convert the doc to rst format. Add bridge brief introduction,
-> FAQ and contact info.
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Is it really meaningful to account the L1 table which is always 
+allocated upon initial creation, yet not the L2 tables which are 
+allocated in use?
 
-Should also reference and borrow definitions from the IEEE 802.1D standard.
+Thanks,
+Robin.
+
+> @@ -283,6 +284,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
+>   	}
+>   	if (lvl == 2)
+>   		kmemleak_ignore(table);
+> +
+>   	return table;
+>   
+>   out_unmap:
+> @@ -290,7 +292,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
+>   	dma_unmap_single(dev, dma, size, DMA_TO_DEVICE);
+>   out_free:
+>   	if (lvl == 1)
+> -		free_pages((unsigned long)table, get_order(size));
+> +		iommu_free_pages(table, get_order(size));
+>   	else
+>   		kmem_cache_free(data->l2_tables, table);
+>   	return NULL;
+> @@ -306,8 +308,9 @@ static void __arm_v7s_free_table(void *table, int lvl,
+>   	if (!cfg->coherent_walk)
+>   		dma_unmap_single(dev, __arm_v7s_dma_addr(table), size,
+>   				 DMA_TO_DEVICE);
+> +
+>   	if (lvl == 1)
+> -		free_pages((unsigned long)table, get_order(size));
+> +		iommu_free_pages(table, get_order(size));
+>   	else
+>   		kmem_cache_free(data->l2_tables, table);
+>   }
 
