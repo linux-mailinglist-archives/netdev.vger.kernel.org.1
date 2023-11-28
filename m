@@ -1,119 +1,126 @@
-Return-Path: <netdev+bounces-51875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5AA37FC991
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:34:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A16A97FC9C5
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A9EB1C20FFE
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:34:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542062830CE
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77475026D;
-	Tue, 28 Nov 2023 22:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E3A1640C;
+	Tue, 28 Nov 2023 22:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XrgSoy+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BFEF219A4;
-	Tue, 28 Nov 2023 14:34:01 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B808B1FB;
-	Tue, 28 Nov 2023 14:34:48 -0800 (PST)
-Received: from [10.57.71.132] (unknown [10.57.71.132])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E2B473F6C4;
-	Tue, 28 Nov 2023 14:33:44 -0800 (PST)
-Message-ID: <d99e0d4a-94a9-482b-b5b5-833cba518b86@arm.com>
-Date: Tue, 28 Nov 2023 22:33:42 +0000
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD14719B1
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:44:02 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1d00689f5c8so7745415ad.3
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:44:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701211442; x=1701816242; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sAa4aZwEAz/pdNTEjQNN1fkhZj4LqrtvUzLeLg+TUjQ=;
+        b=XrgSoy+Kqi967rwb1fdg3Zn2SabPnu/rzrPynnuGGNJNKNa33MmWyZdA7pPRbj+9N2
+         0UFbKtfYSW80eE89e4RCP5CUDtoKq2B/OJw9Q93yYw+zAF1PxU4bpqwKLlHvf0UteW8L
+         QW0t+Vwl461LCuzGqlk99BSWvt/Ctcjk5wjr0mkAgcD/lRB/3WqkesMa9tBzvcJy5Xey
+         66/oMNT/rSYjr2QnFY/lzGh28gtGvaGM9BhiQTt6F3j23cTJjNu2puBIT5sOC26mN6H9
+         Ct1XOUBaf35NLzWv/TDGBby6diIL0JMaM77vYBJlkpZJx/RyH+WxdeQ4ivPWQmf/6p6C
+         XgjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701211442; x=1701816242;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sAa4aZwEAz/pdNTEjQNN1fkhZj4LqrtvUzLeLg+TUjQ=;
+        b=pKNkfVJdb1DZqC0iRA4Hri4PINa/NA/Vz/Jm3mPmQYpZpHj/MkRaVOwvn1LyQEFAQi
+         l6+L73yf9B+9uYF8G1klMa/+O47UHMHfBuJs9CvJpiHr3stDH+kns6BJpK8XPK0hj3AG
+         k6p38lcO3qks9HedHWf8zbgNFDB0CuaiKelNqO7MnZlOwQBwL5gp4Tqwnc0XlifnuUx2
+         O9nIl1pH/UVk/+RWokx6W6v7DAFP3KXkNztVXTqsNMCCaEalzVbSCSvHMlDYUrzsnoPz
+         5DEFLrd3Xx971Bam3qnrsR8Fzw8XwcXIGR+3DyWg8EYtEYuMejtdvmpGubCOoVeORsMF
+         5EhA==
+X-Gm-Message-State: AOJu0YwYm7kp/k91UQuWoPkgpN9w9gglFZAfBoFlFgJxD0+kC7ESfPWv
+	ZCBTnDN2wbARaJ1zZAxkRxgb4NBi88R/gLHAIDE=
+X-Google-Smtp-Source: AGHT+IEp/UvTapmKEkhyW74XCwAR+Bmlh06wJ7uxkg7nOq07xAkhXwCFPhVlUBwMe+TFnVUN4OR/VA==
+X-Received: by 2002:a17:902:e80e:b0:1cf:daca:2b5e with SMTP id u14-20020a170902e80e00b001cfdaca2b5emr7984404plg.38.1701211442035;
+        Tue, 28 Nov 2023 14:44:02 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id f18-20020a170902ce9200b001cff026df52sm2322407plg.221.2023.11.28.14.44.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 14:44:01 -0800 (PST)
+Date: Tue, 28 Nov 2023 14:43:59 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Quentin Deslandes <qde@naccy.de>
+Cc: <netdev@vger.kernel.org>, David Ahern <dsahern@gmail.com>, Martin KaFai
+ Lau <martin.lau@kernel.org>
+Subject: Re: [PATCH 0/3] ss: pretty-printing BPF socket-local storage
+Message-ID: <20231128144359.36108a3d@hermes.local>
+In-Reply-To: <20231128023058.53546-1-qde@naccy.de>
+References: <20231128023058.53546-1-qde@naccy.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/16] iommu/dma: use page allocation function provided by
- iommu-pages.h
-To: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
- alex.williamson@redhat.com, alim.akhtar@samsung.com, alyssa@rosenzweig.io,
- asahi@lists.linux.dev, baolu.lu@linux.intel.com, bhelgaas@google.com,
- cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
- dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
- iommu@lists.linux.dev, jasowang@redhat.com, jernej.skrabec@gmail.com,
- jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, kevin.tian@intel.com,
- krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-rockchip@lists.infradead.org,
- linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
- linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st,
- mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com,
- netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org,
- samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev,
- thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com,
- vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org,
- will@kernel.org, yu-cheng.yu@intel.com
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-7-pasha.tatashin@soleen.com>
-Content-Language: en-GB
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20231128204938.1453583-7-pasha.tatashin@soleen.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2023-11-28 8:49 pm, Pasha Tatashin wrote:
-> Convert iommu/dma-iommu.c to use the new page allocation functions
-> provided in iommu-pages.h.
+On Mon, 27 Nov 2023 18:30:55 -0800
+Quentin Deslandes <qde@naccy.de> wrote:
 
-These have nothing to do with IOMMU pagetables, they are DMA buffers and 
-they belong to whoever called the corresponding dma_alloc_* function.
-
-Thanks,
-Robin.
-
-> Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
-> ---
->   drivers/iommu/dma-iommu.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
+> BPF allows programs to store socket-specific data using
+> BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+> and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+> using the INET_DIAG mechanism.
 > 
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 85163a83df2f..822adad464c2 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -31,6 +31,7 @@
->   #include <linux/vmalloc.h>
->   
->   #include "dma-iommu.h"
-> +#include "iommu-pages.h"
->   
->   struct iommu_dma_msi_page {
->   	struct list_head	list;
-> @@ -874,7 +875,7 @@ static dma_addr_t __iommu_dma_map(struct device *dev, phys_addr_t phys,
->   static void __iommu_dma_free_pages(struct page **pages, int count)
->   {
->   	while (count--)
-> -		__free_page(pages[count]);
-> +		__iommu_free_page(pages[count]);
->   	kvfree(pages);
->   }
->   
-> @@ -912,7 +913,8 @@ static struct page **__iommu_dma_alloc_pages(struct device *dev,
->   			order_size = 1U << order;
->   			if (order_mask > order_size)
->   				alloc_flags |= __GFP_NORETRY;
-> -			page = alloc_pages_node(nid, alloc_flags, order);
-> +			page = __iommu_alloc_pages_node(nid, alloc_flags,
-> +							order);
->   			if (!page)
->   				continue;
->   			if (order)
-> @@ -1572,7 +1574,7 @@ static void *iommu_dma_alloc_pages(struct device *dev, size_t size,
->   
->   	page = dma_alloc_contiguous(dev, alloc_size, gfp);
->   	if (!page)
-> -		page = alloc_pages_node(node, gfp, get_order(alloc_size));
-> +		page = __iommu_alloc_pages_node(node, gfp, get_order(alloc_size));
->   	if (!page)
->   		return NULL;
->   
+> Currently, ss doesn't request the socket-local data, this patch aims to
+> fix this.
+> 
+> The first patch fixes a bug where the "Process" column would always be
+> printed on ss' output, even if --processes/-p is not used.
+> 
+> Patch #2 requests the socket-local data for the requested map ID
+> (--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+> in a dedicated column.
+> 
+> Patch #3 uses libbpf and BTF to pretty print the map's content, like
+> `bpftool map dump` would do.
+> 
+> While I think it makes sense for ss to provide the socket-local storage
+> content for the sockets, it's difficult to conciliate the column-based
+> output of ss and having readable socket-local data. Hence, the
+> socket-local data is printed in a readable fashion over multiple lines
+> under its socket statistics, independently of the column-based approach.
+> 
+> Here is an example of ss' output with --bpf-maps:
+> [...]
+> ESTAB                  2960280             0 [...]
+>     map_id: 259 [
+>         (struct my_sk_storage) {
+>             .field_hh = (char)127,
+>             .<anon> = (union <anon>) {
+>                 .a = (int)0,
+>                 .b = (int)0,
+>             },
+>         },
+>     ]
+> 
+> Quentin Deslandes (3):
+>   ss: prevent "Process" column from being printed unless requested
+>   ss: add support for BPF socket-local storage
+>   ss: pretty-print BPF socket-local storage
+> 
+>  misc/ss.c | 822 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 818 insertions(+), 4 deletions(-)
+
+
+Useful, but ss is growing into a huge monolithic program and may need some
+refactoring. Also, this cries out for a json output format. Which ss doesn't
+have yet.
 
