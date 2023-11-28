@@ -1,59 +1,67 @@
-Return-Path: <netdev+bounces-51495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9C47FAEDE
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:09:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1CDB7FAEE3
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8981C20C40
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:09:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67ADD28186E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DC937B;
-	Tue, 28 Nov 2023 00:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A78E36B;
+	Tue, 28 Nov 2023 00:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HnwPnhLt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yf7EBsop"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF328192;
-	Mon, 27 Nov 2023 16:09:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ns3R255gsALDi2Q2TyvQsGBPXsb0MIEuzdoPy5X6KnI=; b=HnwPnhLtC1NJ6kLr+65/SGM542
-	v59VSZsTZ7cRCCvbFw41KMq0xkqFLbduLGZ4qO5R3PnQ3Wm/G5Vd/vcR5CXbWVc8vbiTdq4W1WT4L
-	Ke6HQCCTY50pF+kV4hyxACfpkCj4yw+AV42r3oz4N9T3oJPI5wx8xRTDIQoX1NBaN7Cs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r7lfO-001OlF-5C; Tue, 28 Nov 2023 01:09:30 +0100
-Date: Tue, 28 Nov 2023 01:09:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rob Herring <robh@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <afacaa4c-c3b1-41ae-aa14-d91efd6ac2d3@lunn.ch>
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
- <20231126015346.25208-2-ansuelsmth@gmail.com>
- <20231127221611.GA4023452-robh@kernel.org>
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14771B1;
+	Mon, 27 Nov 2023 16:12:01 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cf974e87d9so7042725ad.1;
+        Mon, 27 Nov 2023 16:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701130321; x=1701735121; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v2cp0hCV3ukeXzrGKrc9yDyHnZlZPc+ZpdONAR2TiuI=;
+        b=Yf7EBsopxpGqYHff2Y9+XDRga7aTmDoGrmfLWjiml81uwsKH3XeGP5uYwTVbdzjyFm
+         DjRkBonS+qNUmBWEdpH2ItHsfXYy6y8GtrhHpTWps2jL7QN0v+j85zrvOk019ZQ2uDnZ
+         Or1I8Wo5TQhF1nlgrCKddy5MfV8wGyKaGh9YQXiaSjkcGSn7KgSNZxr1EDVIPfL8Mi0r
+         ftqP06WCf7cF4t1Pl3VuaJU8Ner2MSrphvhN4wHVwVVq64Y3dnWbrMRErPWTjcgezQtj
+         sZznPjmwZUtWGkCoKRMZNXDtljgYCG3Fx6pcvSuIzCtjvHbHj8Ba6S49JK6yKXm2h58j
+         j1Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701130321; x=1701735121;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v2cp0hCV3ukeXzrGKrc9yDyHnZlZPc+ZpdONAR2TiuI=;
+        b=d2YRu2vrMkhJvvkkRpljW3TSdDNI/B4P3/HgQuYuC3CcUsiUKVc5UjgzgvKSD2RJRJ
+         GvYdxtx/5LHv33x8IC4shG/qkhWKolcE9feSXIoVwuxVxZs587BTH899sFenQxfjhg/1
+         Sj7ObikQgvUragcNqD3xG1IhbhEajir6zurswxTMVlytRSGR5sIdJrdMx+P6p0yms0x3
+         qqI6od6aSZWf1aZ7kTvHIoIBfUdZigVpexL2H2GizL1jZmaFMQm8gckU/a1yOXVNRdIz
+         qvKi2Kb+gVGGa8YwbZJzWxeZRfNCM1myrA5RA7kpSrANbzE42EBXhXHkYFzmy6JM0sPy
+         1vbw==
+X-Gm-Message-State: AOJu0YwVucrjwP3AuOyGmlq1gHDw14PSIQN4hwVciY+oPdYWJe4QXUAe
+	UduiKPKdlnMfBWoiRJAesog=
+X-Google-Smtp-Source: AGHT+IHwEE6OZJkKu6cjd4labT8nhAMbaFsJBc/61pTVrwTlM5Oo8b5TPo9PljIBG5q1IjiUNainmA==
+X-Received: by 2002:a17:902:f683:b0:1cf:c680:f37f with SMTP id l3-20020a170902f68300b001cfc680f37fmr6781580plg.2.1701130321121;
+        Mon, 27 Nov 2023 16:12:01 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id x5-20020a170902ec8500b001cfa718039bsm6739204plg.216.2023.11.27.16.12.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Nov 2023 16:12:00 -0800 (PST)
+Date: Mon, 27 Nov 2023 16:11:58 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: reibax@gmail.com, davem@davemloft.net, rrameshbabu@nvidia.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	maheshb@google.com, Thomas Gleixner <tglx@linutronix.de>,
+	John Stultz <jstultz@google.com>
+Subject: Re: [PATCH v2] posix-timers: add multi_clock_gettime system call
+Message-ID: <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
+References: <20231127153901.6399-1-maimon.sagi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,57 +70,230 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231127221611.GA4023452-robh@kernel.org>
+In-Reply-To: <20231127153901.6399-1-maimon.sagi@gmail.com>
 
-> > +    description:
-> > +      The base ID number for the PHY package.
-> > +      Commonly the ID of the first PHY in the PHY package.
-> > +
-> > +      Some PHY in the PHY package might be not defined but
-> > +      still exist on the device (just not attached to anything).
-> > +      The reg defined in the PHY package node might differ and
-> > +      the related PHY might be not defined.
-> > +
-> > +  '#address-cells':
-> > +    const: 1
-> > +
-> > +  '#size-cells':
-> > +    const: 0
+On Mon, Nov 27, 2023 at 05:39:01PM +0200, Sagi Maimon wrote:
+>  Some user space applications need to read some clocks.
+>  Each read requires moving from user space to kernel space.
+>  This asymmetry causes the measured offset to have a significant error.
+
+Adding time/clock gurus (jstultz, tglx) on CC for visibility...
+
+Thanks,
+Richard
+
+
 > 
-> You are implementing a secondary MDIO bus within this node. It needs a 
-> $ref to mdio.yaml instead of defining the bus again implicitly.
-
-This is where i think this is questionable. It is not implemented in
-the kernel as a secondary bus. The devices within this container are
-just devices on the MDIO bus. The value of reg inside the container
-and outside the container refer to the same bus.
-
-However, i do agree about referring to mdio.yaml inside the container.
-
-> > +patternProperties:
-> > +  ^ethernet-phy(@[a-f0-9]+)?$:
-> > +    $ref: ethernet-phy.yaml#
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +
-> > +additionalProperties: true
-> > +
-> > +examples:
-> > +  - |
-> > +    mdio {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +
-> > +        ethernet-phy-package@16 {
-> > +            #address-cells = <1>;
-> > +            #size-cells = <0>;
-> > +            compatible = "ethernet-phy-package";
-
-Christian, this needs a specific compatible to the
-package. e.g. 'qca807x-package', and that needs its own .yaml file
-indicating what properties this package can have.
-
-	   Andrew
+>  Introduce a new system call multi_clock_gettime, which can be used to measure
+>  the offset between multiple clocks, from variety of types: PHC, virtual PHC
+>  and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+>  The offset includes the total time that the driver needs to read the clock
+>  timestamp.
+> 
+>  New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
+>  Supported clocks IDs: PHC, virtual PHC and various system clocks.
+>  Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
+>  The system call returns n_clocks timestamps for each measurement:
+>  - clock 0 timestamp
+>  - ...
+>  - clock n timestamp
+> 
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> ---
+>  Addressed comments from:
+>  - Richard Cochran : https://www.spinics.net/lists/netdev/msg951723.html
+>           
+>  Changes since version 1:
+>  - Change multi PHC ioctl implamantation into systemcall.
+>  
+>  arch/x86/entry/syscalls/syscall_32.tbl |  1 +
+>  arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+>  include/linux/posix-timers.h           | 24 ++++++++++
+>  include/linux/syscalls.h               |  3 +-
+>  include/uapi/asm-generic/unistd.h      | 12 ++++-
+>  kernel/sys_ni.c                        |  1 +
+>  kernel/time/posix-timers.c             | 62 ++++++++++++++++++++++++++
+>  7 files changed, 102 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+> index c8fac5205803..070efd266e7e 100644
+> --- a/arch/x86/entry/syscalls/syscall_32.tbl
+> +++ b/arch/x86/entry/syscalls/syscall_32.tbl
+> @@ -461,3 +461,4 @@
+>  454	i386	futex_wake		sys_futex_wake
+>  455	i386	futex_wait		sys_futex_wait
+>  456	i386	futex_requeue		sys_futex_requeue
+> +457	i386	multi_clock_gettime		sys_multi_clock_gettime32
+> \ No newline at end of file
+> diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+> index 8cb8bf68721c..f790330244bb 100644
+> --- a/arch/x86/entry/syscalls/syscall_64.tbl
+> +++ b/arch/x86/entry/syscalls/syscall_64.tbl
+> @@ -378,6 +378,7 @@
+>  454	common	futex_wake		sys_futex_wake
+>  455	common	futex_wait		sys_futex_wait
+>  456	common	futex_requeue		sys_futex_requeue
+> +457	common	multi_clock_gettime		sys_multi_clock_gettime
+>  
+>  #
+>  # Due to a historical design error, certain syscalls are numbered differently
+> diff --git a/include/linux/posix-timers.h b/include/linux/posix-timers.h
+> index d607f51404fc..426a45441ab5 100644
+> --- a/include/linux/posix-timers.h
+> +++ b/include/linux/posix-timers.h
+> @@ -260,4 +260,28 @@ void set_process_cpu_timer(struct task_struct *task, unsigned int clock_idx,
+>  int update_rlimit_cpu(struct task_struct *task, unsigned long rlim_new);
+>  
+>  void posixtimer_rearm(struct kernel_siginfo *info);
+> +
+> +#define MULTI_PTP_MAX_CLOCKS 12 /* Max number of clocks */
+> +#define MULTI_PTP_MAX_SAMPLES 10 /* Max allowed offset measurement samples. */
+> +
+> +struct __ptp_multi_clock_get {
+> +	unsigned int n_clocks; /* Desired number of clocks. */
+> +	unsigned int n_samples; /* Desired number of measurements per clock. */
+> +	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
+> +	/*
+> +	 * Array of list of n_clocks clocks time samples n_samples times.
+> +	 */
+> +	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
+> +};
+> +
+> +struct __ptp_multi_clock_get32 {
+> +	unsigned int n_clocks; /* Desired number of clocks. */
+> +	unsigned int n_samples; /* Desired number of measurements per clock. */
+> +	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
+> +	/*
+> +	 * Array of list of n_clocks clocks time samples n_samples times.
+> +	 */
+> +	struct  old_timespec32 ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
+> +};
+> +
+>  #endif
+> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+> index fd9d12de7e92..afcf68e83d63 100644
+> --- a/include/linux/syscalls.h
+> +++ b/include/linux/syscalls.h
+> @@ -1161,7 +1161,8 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
+>  			unsigned long prot, unsigned long flags,
+>  			unsigned long fd, unsigned long pgoff);
+>  asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
+> -
+> +asmlinkage long sys_multi_clock_gettime(struct __ptp_multi_clock_get __user * ptp_multi_clk_get);
+> +asmlinkage long sys_multi_clock_gettime32(struct __ptp_multi_clock_get32 __user * ptp_multi_clk_get);
+>  
+>  /*
+>   * Not a real system call, but a placeholder for syscalls which are
+> diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+> index 756b013fb832..3ebcaa052650 100644
+> --- a/include/uapi/asm-generic/unistd.h
+> +++ b/include/uapi/asm-generic/unistd.h
+> @@ -829,8 +829,18 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
+>  #define __NR_futex_requeue 456
+>  __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
+>  
+> +#if defined(__ARCH_WANT_TIME32_SYSCALLS) || __BITS_PER_LONG != 32
+> +#define __NR_multi_clock_gettime 457
+> +__SC_3264(__NR_multi_clock_gettime, sys_multi_clock_gettime32, sys_multi_clock_gettime)
+> +#endif
+> +
+> +#if defined(__SYSCALL_COMPAT) || __BITS_PER_LONG == 32
+> +#define __NR_multi_clock_gettime64 458
+> +__SYSCALL(__NR_multi_clock_gettime64, sys_multi_clock_gettime)
+> +#endif
+> +
+>  #undef __NR_syscalls
+> -#define __NR_syscalls 457
+> +#define __NR_syscalls 459
+>  
+>  /*
+>   * 32 bit systems traditionally used different
+> diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
+> index e1a6e3c675c0..8ed1c22f40ac 100644
+> --- a/kernel/sys_ni.c
+> +++ b/kernel/sys_ni.c
+> @@ -335,6 +335,7 @@ COND_SYSCALL(ppoll_time32);
+>  COND_SYSCALL_COMPAT(ppoll_time32);
+>  COND_SYSCALL(utimensat_time32);
+>  COND_SYSCALL(clock_adjtime32);
+> +COND_SYSCALL(multi_clock_gettime32);
+>  
+>  /*
+>   * The syscalls below are not found in include/uapi/asm-generic/unistd.h
+> diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
+> index b924f0f096fa..517558af2479 100644
+> --- a/kernel/time/posix-timers.c
+> +++ b/kernel/time/posix-timers.c
+> @@ -1426,6 +1426,68 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
+>  
+>  #endif
+>  
+> +SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
+> +{
+> +	const struct k_clock *kc;
+> +	struct timespec64 kernel_tp;
+> +	struct __ptp_multi_clock_get multi_clk_get;
+> +	int error;
+> +	unsigned int i, j;
+> +
+> +	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
+> +		return -EFAULT;
+> +
+> +	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
+> +		return -EINVAL;
+> +	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
+> +		return -EINVAL;
+> +
+> +	for (j = 0; j < multi_clk_get.n_samples; j++) {
+> +		for (i = 0; i < multi_clk_get.n_clocks; i++) {
+> +			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
+> +			if (!kc)
+> +				return -EINVAL;
+> +			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
+> +			if (!error && put_timespec64(&kernel_tp, (struct __kernel_timespec __user *)
+> +						     &ptp_multi_clk_get->ts[j][i]))
+> +				error = -EFAULT;
+> +		}
+> +	}
+> +
+> +	return error;
+> +}
+> +
+> +SYSCALL_DEFINE1(multi_clock_gettime32, struct __ptp_multi_clock_get32 __user *, ptp_multi_clk_get)
+> +{
+> +	const struct k_clock *kc;
+> +	struct timespec64 kernel_tp;
+> +	struct __ptp_multi_clock_get multi_clk_get;
+> +	int error;
+> +	unsigned int i, j;
+> +
+> +	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
+> +		return -EFAULT;
+> +
+> +	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
+> +		return -EINVAL;
+> +	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
+> +		return -EINVAL;
+> +
+> +	for (j = 0; j < multi_clk_get.n_samples; j++) {
+> +		for (i = 0; i < multi_clk_get.n_clocks; i++) {
+> +			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
+> +			if (!kc)
+> +				return -EINVAL;
+> +			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
+> +			if (!error && put_old_timespec32(&kernel_tp, (struct old_timespec32 __user *)
+> +							&ptp_multi_clk_get->ts[j][i]))
+> +				error = -EFAULT;
+> +		}
+> +	}
+> +
+> +	return error;
+> +}
+> +
+>  static const struct k_clock clock_realtime = {
+>  	.clock_getres		= posix_get_hrtimer_res,
+>  	.clock_get_timespec	= posix_get_realtime_timespec,
+> -- 
+> 2.26.3
+> 
 
