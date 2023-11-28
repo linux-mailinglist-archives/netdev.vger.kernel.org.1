@@ -1,263 +1,114 @@
-Return-Path: <netdev+bounces-51654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827717FB996
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:45:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E16E7FB99D
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3620E1F20F7A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD68B281EF6
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26714F880;
-	Tue, 28 Nov 2023 11:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11104F883;
+	Tue, 28 Nov 2023 11:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XqjEpgkc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6TSC6Nd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 426A6D62;
-	Tue, 28 Nov 2023 03:45:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701171918; x=1732707918;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7qYyCP8MhKknRBAyUu6IhgiQV29YDWwg8zFyW7waXmY=;
-  b=XqjEpgkcfCC/B82th3XBoW0FhUG10EVmqnsFPzZnbVmZtmKEix/Jzzia
-   iL3y24NGDvo8J3q6L+56BFEoTKr3L2M1Q0K2wA4uL+t+XcaGy/3ViOKZo
-   kfxrat3e9WWWmSCJZnoUZzfIEFz4iOSP7KREeFp2ZUWzKjASIdJa1R/3C
-   h2/ZL4VXTmPGs6WNBTTTElSnsrTaxM7GJXi0X+QiuqU+kmY22NkmIHuCE
-   /SpIjSOQINYKBwcvoYs+bXxCJaFR/fsgckIYXA/ZOcATY+YJqHDck9IlW
-   dqpNfPq4JTl17Zq/YD1i8W0hm6Xm15bhm9I3Eo7De4+TIMOvoAeIW2MPf
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="391777739"
-X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
-   d="scan'208";a="391777739"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 03:45:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="772281741"
-X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
-   d="scan'208";a="772281741"
-Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 28 Nov 2023 03:45:15 -0800
-Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r7wWe-0007WJ-3D;
-	Tue, 28 Nov 2023 11:45:13 +0000
-Date: Tue, 28 Nov 2023 19:45:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
-	reibax@gmail.com, davem@davemloft.net, rrameshbabu@nvidia.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	maheshb@google.com, maimon.sagi@gmail.com
-Subject: Re: [PATCH v2] posix-timers: add multi_clock_gettime system call
-Message-ID: <202311281817.puU0ujYG-lkp@intel.com>
-References: <20231127153901.6399-1-maimon.sagi@gmail.com>
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B9BD56;
+	Tue, 28 Nov 2023 03:47:57 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-5c1f8b0c149so3531471a12.3;
+        Tue, 28 Nov 2023 03:47:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701172077; x=1701776877; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=P3miOdRF8CVqoKdjsClbnFzB/CKQ8+AB4xxyVwupsac=;
+        b=f6TSC6NdEADf9wk8hDPSQXkzH2lhKzkiPM2jt8kqttBgLj1dw6SsNDg2ocvLbPaTwl
+         4KZt1SMFb6izY+xuFhcdVdeKYK+WsKM3uZXCISy2jdf+2AsO57A1U8kV7RPITYyPx2k9
+         nhR+QSeQGsPTh2mG/uL2maNf4g6SaKpJerZbv89evFDzVQOseE5LzU+ku/NmUJchmwj2
+         /c32sSyiTZNxGPx6bUNLyHwkLGi2NLhOhTMWcFacCa7sWt6ojLKuaiLfsNnf+C7xmUx8
+         OJVJnzFvEAalkxnZD4ocLbyMcWAyroZlY3B94HTCcpNFKav0tiGdWYeKBPb6b7aSeDXM
+         9utg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701172077; x=1701776877;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P3miOdRF8CVqoKdjsClbnFzB/CKQ8+AB4xxyVwupsac=;
+        b=py6aM5UhwGZ4HhcHACgjfQRtH4GT6XzBX7QD9Jxg6qQzOc8HPsv4t6Up2A2heRbBbW
+         sIKdoaV7Gl6U5qYgP6HX6iuR/AqsHoWjWPajh5Dffx5OizMq+ZVD/wMU/x1bVsnhS28e
+         4oFuPOuEUpDY7xv5wLXuTZTqwPH/BLZunD2WsBeWF72tPM+WLm6O9WAlUsnUdzebm1BC
+         abB3O6LvAPV0FFdQYvurqL+cN2qdUCEGmpzYN+JdGsCoqQXQcmGX460fEo+hM6XckqWA
+         SoxvElvEmvBd2SseL102feHI3Dr6oal+zRZX/d1C6yaKjd+4lkb1Zh99nfrteUg4y9q2
+         sH1g==
+X-Gm-Message-State: AOJu0Yw1i8gkzYZBLx5UU3WF1kd7bf6H6hpwHu0OV6ruv64NIA8RJ+UV
+	2bnyUhbKV2lRH9a9R4WYxOhhfsgYq5xPm/zpX94=
+X-Google-Smtp-Source: AGHT+IEJDz+a7w4MmU1QcbLhcfRSij8f9BClowYOaPWqb0FDEI3GQrhi4bbaoMYafN+B5LLAZLAKf6DFN6neXD0aQUA=
+X-Received: by 2002:a17:90b:1c8b:b0:285:6943:eca2 with SMTP id
+ oo11-20020a17090b1c8b00b002856943eca2mr14359531pjb.29.1701172077284; Tue, 28
+ Nov 2023 03:47:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127153901.6399-1-maimon.sagi@gmail.com>
+References: <20231117100958.425354-1-robimarko@gmail.com> <ZVdgmpvI+F4ClNmG@shell.armlinux.org.uk>
+In-Reply-To: <ZVdgmpvI+F4ClNmG@shell.armlinux.org.uk>
+From: Robert Marko <robimarko@gmail.com>
+Date: Tue, 28 Nov 2023 12:47:46 +0100
+Message-ID: <CAOX2RU7izQLrHQsTK9cFYEGtoE9=xOVTx64o7w-JZpg-+wYvuA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: phy: aquantia: validate PHY mode on AQR107
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Sagi,
+On Fri, 17 Nov 2023 at 13:46, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Fri, Nov 17, 2023 at 11:09:48AM +0100, Robert Marko wrote:
+> > The Aquantia driver is not setting the PHY mode itself, but it does however
+> > still check if the PHY mode set in DTS is one of the supported modes.
+> >
+> > However, the set PHY mode does not have to match the actual one, so lets
+> > add update the PHY mode during .config_init and warn if they differ.
+>
+> This looks completely wrong to me. These PHYs can be configured to
+> change their MAC-facing interface mode according to the media negotiated
+> speed, but you are only checking that _if_ the media is up, then the
+> interface that has resulted from that negotiation matches what is in
+> DTS. That could be dependent on the link partner, so what works for a
+> platform when connected to one link partner may issue your "info"-level
+> warning when connected to a different link partner.
+>
+> So no, this to me looks completely wrong.
+>
+> You need to check the VEND1_GLOBAL_CFG_* registers, and determine from
+> those what interface mode(s) will be used, and then use that to validate
+> the mode.
+>
+> It just so happens that...
+>
+> http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=f7b531ee8855f81d267a8a42c44da51576f48daf
+> http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=f55389aa5d11da8a32dfd65a1b98049878ce09f0
+>
+> builds a bitmap that can then be tested to check this. Whether the
+> above is entirely correct or not, I can't really say, I don't have
+> enough information on this PHY.
 
-kernel test robot noticed the following build warnings:
+Hi,
+Yeah, I get the issue now.
 
-[auto build test WARNING on arnd-asm-generic/master]
-[also build test WARNING on tip/timers/core linus/master v6.7-rc3]
-[cannot apply to tip/x86/asm next-20231128]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Nice, those got merged into net-next, so I will iterate by using those.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sagi-Maimon/posix-timers-add-multi_clock_gettime-system-call/20231128-000215
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git master
-patch link:    https://lore.kernel.org/r/20231127153901.6399-1-maimon.sagi%40gmail.com
-patch subject: [PATCH v2] posix-timers: add multi_clock_gettime system call
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20231128/202311281817.puU0ujYG-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231128/202311281817.puU0ujYG-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311281817.puU0ujYG-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from kernel/time/posix-timers.c:13:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from kernel/time/posix-timers.c:13:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from kernel/time/posix-timers.c:13:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> kernel/time/posix-timers.c:1429:1: warning: stack frame size (2040) exceeds limit (1024) in '__se_sys_multi_clock_gettime' [-Wframe-larger-than]
-    1429 | SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
-         | ^
-   include/linux/syscalls.h:219:36: note: expanded from macro 'SYSCALL_DEFINE1'
-     219 | #define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
-         |                                    ^
-   include/linux/syscalls.h:230:2: note: expanded from macro 'SYSCALL_DEFINEx'
-     230 |         __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
-         |         ^
-   include/linux/syscalls.h:249:18: note: expanded from macro '__SYSCALL_DEFINEx'
-     249 |         asmlinkage long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))  \
-         |                         ^
-   <scratch space>:122:1: note: expanded from here
-     122 | __se_sys_multi_clock_gettime
-         | ^
->> kernel/time/posix-timers.c:1460:1: warning: stack frame size (2040) exceeds limit (1024) in '__se_sys_multi_clock_gettime32' [-Wframe-larger-than]
-    1460 | SYSCALL_DEFINE1(multi_clock_gettime32, struct __ptp_multi_clock_get32 __user *, ptp_multi_clk_get)
-         | ^
-   include/linux/syscalls.h:219:36: note: expanded from macro 'SYSCALL_DEFINE1'
-     219 | #define SYSCALL_DEFINE1(name, ...) SYSCALL_DEFINEx(1, _##name, __VA_ARGS__)
-         |                                    ^
-   include/linux/syscalls.h:230:2: note: expanded from macro 'SYSCALL_DEFINEx'
-     230 |         __SYSCALL_DEFINEx(x, sname, __VA_ARGS__)
-         |         ^
-   include/linux/syscalls.h:249:18: note: expanded from macro '__SYSCALL_DEFINEx'
-     249 |         asmlinkage long __se_sys##name(__MAP(x,__SC_LONG,__VA_ARGS__))  \
-         |                         ^
-   <scratch space>:147:1: note: expanded from here
-     147 | __se_sys_multi_clock_gettime32
-         | ^
-   14 warnings generated.
-
-
-vim +/__se_sys_multi_clock_gettime +1429 kernel/time/posix-timers.c
-
-  1428	
-> 1429	SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
-  1430	{
-  1431		const struct k_clock *kc;
-  1432		struct timespec64 kernel_tp;
-  1433		struct __ptp_multi_clock_get multi_clk_get;
-  1434		int error;
-  1435		unsigned int i, j;
-  1436	
-  1437		if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
-  1438			return -EFAULT;
-  1439	
-  1440		if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
-  1441			return -EINVAL;
-  1442		if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
-  1443			return -EINVAL;
-  1444	
-  1445		for (j = 0; j < multi_clk_get.n_samples; j++) {
-  1446			for (i = 0; i < multi_clk_get.n_clocks; i++) {
-  1447				kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
-  1448				if (!kc)
-  1449					return -EINVAL;
-  1450				error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
-  1451				if (!error && put_timespec64(&kernel_tp, (struct __kernel_timespec __user *)
-  1452							     &ptp_multi_clk_get->ts[j][i]))
-  1453					error = -EFAULT;
-  1454			}
-  1455		}
-  1456	
-  1457		return error;
-  1458	}
-  1459	
-> 1460	SYSCALL_DEFINE1(multi_clock_gettime32, struct __ptp_multi_clock_get32 __user *, ptp_multi_clk_get)
-  1461	{
-  1462		const struct k_clock *kc;
-  1463		struct timespec64 kernel_tp;
-  1464		struct __ptp_multi_clock_get multi_clk_get;
-  1465		int error;
-  1466		unsigned int i, j;
-  1467	
-  1468		if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
-  1469			return -EFAULT;
-  1470	
-  1471		if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
-  1472			return -EINVAL;
-  1473		if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
-  1474			return -EINVAL;
-  1475	
-  1476		for (j = 0; j < multi_clk_get.n_samples; j++) {
-  1477			for (i = 0; i < multi_clk_get.n_clocks; i++) {
-  1478				kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
-  1479				if (!kc)
-  1480					return -EINVAL;
-  1481				error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
-  1482				if (!error && put_old_timespec32(&kernel_tp, (struct old_timespec32 __user *)
-  1483								&ptp_multi_clk_get->ts[j][i]))
-  1484					error = -EFAULT;
-  1485			}
-  1486		}
-  1487	
-  1488		return error;
-  1489	}
-  1490	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Regards,
+Robert
+>
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
