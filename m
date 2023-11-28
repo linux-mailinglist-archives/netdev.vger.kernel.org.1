@@ -1,85 +1,92 @@
-Return-Path: <netdev+bounces-51777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F15517FC02C
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:21:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0E67FC042
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:26:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E8141C20A42
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:21:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F6A0B21470
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E595B5BE;
-	Tue, 28 Nov 2023 17:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79AF5C8FE;
+	Tue, 28 Nov 2023 17:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tcMRcUo3"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AKK5qcPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACF954BE0
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 17:20:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D412CC433C8;
-	Tue, 28 Nov 2023 17:20:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701192057;
-	bh=puusfip924NnsGJF8uNMJlJWB/vurJEyppEM+n1Lj8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tcMRcUo3ib8lMWDBEiKlESJpOBqLmCMzpGbDnyYHxYJiJVVG6EO9LB+uIsMNP6riu
-	 yorYOJJEnjNEGL+E7gIqFRLj+pagLLcb/GTBSlAtxMk1xiFU4lXGf1WSlHjn4GHR2L
-	 BP3z/4Urpe631EF7o8pKT2NYTcGKvnNNHQkW20MC/6AnyA4S4pcUkQwhP5URZbEWIv
-	 7VZcnvkisjHDfggVetzKkTGOGJpQEL1F2qu0EY7vq+4yNrDM5i4BsdgiPkESRTzwxS
-	 U7s+VyKoIBxJE8kh7FK9LA5aK+DxXeSZZAq3ER+G88Aq/F7gRTpSljY3zx7ugE314m
-	 2kWTYk0Nscnpw==
-Date: Tue, 28 Nov 2023 17:20:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, gakula@marvell.com, hkelam@marvell.com
-Subject: Re: [PATCH net] octeontx2-pf: Add missing mutex lock in
- otx2_get_pauseparam
-Message-ID: <20231128172053.GA43811@kernel.org>
-References: <1700930141-5568-1-git-send-email-sbhatta@marvell.com>
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC96E6;
+	Tue, 28 Nov 2023 09:26:45 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D5DAB60005;
+	Tue, 28 Nov 2023 17:26:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701192404;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bng8R5x/Jmq2SVxmDJwMSiwsK4vhqKDM3h6nqdBSV2s=;
+	b=AKK5qcPcfM1hiW5bzr3BhkVuOFr724YPqPa74JpMexXiVIIJB8NpxTTx5iws+jqvFTmzKe
+	spY8WrOUXoem/qgXMTVJ2910ttXabpuTGG70MuZp5z5dxN99O4e0PcyVI/8CNzzDK7J3J+
+	f1Zgd3K6cWN3DTLrkCj/pNHcg7nRF4dfaeQNz016qiFh4vNszeVlCdrSOvDdlNoqgYpm+P
+	PD2N/3MCCql4071pAIpf1BRkJqTYm5tzprPYWkJlAj48bvJt3/Ccm5L5qbSZHuUsIAO+QB
+	6lOA9DMmFQYoQQaanpr3Z9ceucEwY881QiV9dW3Fe1r0jcmn2fr9WOQ1UX6MmA==
+Date: Tue, 28 Nov 2023 18:26:41 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Simon Horman <horms@kernel.org>,
+ linux-stm32@st-md-mailman.stormreply.com, alexis.lothore@bootlin.com
+Subject: Re: [PATCH net] net: stmmac: dwmac-socfpga: Don't access SGMII
+ adapter when not available
+Message-ID: <20231128182641.7e2363c0@device.home>
+In-Reply-To: <50d318fd-a82c-4756-a349-682b867c0b8b@lunn.ch>
+References: <20231128094538.228039-1-maxime.chevallier@bootlin.com>
+	<50d318fd-a82c-4756-a349-682b867c0b8b@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1700930141-5568-1-git-send-email-sbhatta@marvell.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Sat, Nov 25, 2023 at 10:05:41PM +0530, Subbaraya Sundeep wrote:
-> All the mailbox messages sent to AF needs to be guarded
-> by mutex lock. Add the missing lock in otx2_get_pauseparam
-> function.
+Hi Andrew,
+
+On Tue, 28 Nov 2023 17:37:30 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> On Tue, Nov 28, 2023 at 10:45:37AM +0100, Maxime Chevallier wrote:
+> > The SGMII adapter isn't present on all dwmac-socfpga implementations.
+> > Make sure we don't try to configure it if we don't have this adapter.  
 > 
-> Fixes: 75f36270990c ("octeontx2-pf: Support to enable/disable pause frames via ethtool")
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> If it does not exist, why even try to call socfpga_sgmii_config()?
+> 
+> It seems like this test needs moving up the call stack. socfpga_gen5_set_phy_mode():
+> 
+> 	if (phymode == PHY_INTERFACE_MODE_SGMII)
+> 		if (dwmac->sgmii_adapter_base)
+> 			socfpga_sgmii_config(dwmac, true);
+> 		else
+> 			return -EINVAL;
 
-Hi,
+I don't have access to a platform with the SGMII adapter available, but
+my understanding is that we shouldn't error-out when we don't have the
+adapter, as some other component (like the lynx PCS) might be there to
+handle that mode.
 
-I am wondering if the call to otx2_nix_config_bp()
-in otx2_dcbnl_ieee_setpfc() also needs to be protected by mbox.lock.
+However you have a valid point in that we might want to check if we
+have either an SGMII adapter or a PCS, and if we have none of these we
+error-out. Thanks for the suggestion, I'll address that :)
 
-And although not strictly related to this patch, while looking over this, I
-noticed that in otx2_init_hw_resources() it appears that &mbox->lock may be
-unlocked twice in some error paths.
-
-e.g.
-	/* Init Auras and pools used by NIX RQ, for free buffer ptrs */
-	err = otx2_rq_aura_pool_init(pf);
-	if (err) {
-		mutex_unlock(&mbox->lock);
-		goto err_free_nix_lf;
-	}
-	...
-err_free_nix_lf:
-	mutex_lock(&mbox->lock);
-	...
-
-...
+Maxime
 
