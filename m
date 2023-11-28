@@ -1,143 +1,127 @@
-Return-Path: <netdev+bounces-51509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3BD7FAF2C
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:40:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1557FAF39
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D2041C20A33
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:40:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C87281B4E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130E564B;
-	Tue, 28 Nov 2023 00:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845851390;
+	Tue, 28 Nov 2023 00:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="VmzBZg6C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IvzUw73L"
 X-Original-To: netdev@vger.kernel.org
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5842FD45;
-	Mon, 27 Nov 2023 16:40:51 -0800 (PST)
-Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id EBEE06602F33;
-	Tue, 28 Nov 2023 00:40:46 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1701132049;
-	bh=h7YSTfO06hlkQSwOKq0bWn+ONs0St86lF+pU8MQKvuI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VmzBZg6CWKaixb4KhvHQgi7BX64H30ILpSwJn84YmYWZ/X9EQUVAtEmmGPbQpqjCJ
-	 HlT7k94u4qqZtBcttWVg+gCoMWQfTU58LRK9PgNINlDI92FYyfON2ZP2c7zMhbFGUq
-	 VtsKwOMjNIUtJW6ZTM6LsA6pmm6EnetWS5jxDZ6wPURQsBAzHiCw+prW9MpZHFbbgx
-	 D2IA6oWvtQXonHcb96Ec7wfwr49e/9EQCZ1huEjNJI0s2tbgruvzMtdY8cO8/g5kRd
-	 IUJOvu14Vz0cBTusg/X8G9ZIeIgdyGUPNFETVGWOlhz5XnDIp9Z88xnPCahH5UHD8F
-	 DW51oTFSIXKvQ==
-Message-ID: <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
-Date: Tue, 28 Nov 2023 02:40:43 +0200
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68381AA
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:46:17 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so3325e9.1
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701132376; x=1701737176; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nX5y/+1xsJTb3d79j1A2vz0g1fgyzJ3hfPEMuJD84tQ=;
+        b=IvzUw73L7c2geiXIEtp9BCl9QFFc8dWOtLEjEsF9vQYoyjfqhHpJdnmBxObwwjtKnv
+         x9JGyplzbszEisFC6iYLkA/qex0Lnx1f552SKz24+HhsreCDPuL0HvZClsOdepKIOk10
+         mQmHXo5SQtVkjKIQz+Sp5GsoomQQCNmwOV6ncF3Gy7pxRLNVYF1uF5mBjq6MVICxiCY+
+         ZglnRT8r6NKzFZTwudmZdls+ZIRYcvjCFRqKIuh802uP3fUjGh05CLw/1sUC2M0rsjM+
+         AX9x0d2iFPbF2BYbj5Ymfwk8abweg/S8XHAT/U9kKpx3Ou63W7lRq2Eztq0PNFVnSA88
+         cRaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701132376; x=1701737176;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nX5y/+1xsJTb3d79j1A2vz0g1fgyzJ3hfPEMuJD84tQ=;
+        b=eV8aipQhXzyxT9tQma8CGeW5uNWXKe1OEcbrr1b74Vb4RfMrnHd0SlNf52/xcTD33Y
+         XeWEmXIRM/TRMVl7A8SFdqB6bXYGSbYw0iHehCEJFaKcMBV71S4W/XEFcfQPxH9Y5zbH
+         baXjUxMHO+7bQCQWxF+sw7q+eA/lSPoiR022glFzOA6Ye7uiz0seFSC/OEjV5U09RsLU
+         HWQp+hENi61No4d9F15eh49RvSQCp0kEF2dLvhaycN4h88xQFEvnF9rForqtVHiluAW6
+         4yuGYgm6N3WUbVGzUaPXmj8SxULVRhWXLW+TQKvSbafYZr3G3+Lg4yWoQ3iiLkQAFu35
+         B1QQ==
+X-Gm-Message-State: AOJu0YzqVKlpWHOPI8d8I4Lp7sGl+Rx8JtCEIZo6iNPsFzsh0wLO9r1B
+	xmr0XW2pYTtwSzzBKwUlQ5I18X3lOGOV/l2kA52N
+X-Google-Smtp-Source: AGHT+IHTKx4qq0PtLWDhHqHYKuaX+k8K9wvvHKuyFFO0SY4Z0hFF7OwkyFrnm5b4J924iJAGZbl02apJHFMUQmMyzxE=
+X-Received: by 2002:a05:600c:3b13:b0:40a:483f:f828 with SMTP id
+ m19-20020a05600c3b1300b0040a483ff828mr731991wms.4.1701132375913; Mon, 27 Nov
+ 2023 16:46:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
- beaglev-starlight: Enable gmac
-To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
- <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
-Content-Language: en-US
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231127153901.6399-1-maimon.sagi@gmail.com> <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
+In-Reply-To: <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
+From: John Stultz <jstultz@google.com>
+Date: Mon, 27 Nov 2023 16:46:03 -0800
+Message-ID: <CANDhNCq=iV2_1bzaP=BYuUwJtNsQBdjuYqUUtsiLc-MCNURJ6w@mail.gmail.com>
+Subject: Re: [PATCH v2] posix-timers: add multi_clock_gettime system call
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Sagi Maimon <maimon.sagi@gmail.com>, reibax@gmail.com, davem@davemloft.net, 
+	rrameshbabu@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	maheshb@google.com, Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/26/23 23:10, Emil Renner Berthing wrote:
-> Cristian Ciocaltea wrote:
->> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
->> RGMII-ID.
->>
->> TODO: Verify if manual adjustment of the RX internal delay is needed. If
->> yes, add the mdio & phy sub-nodes.
-> 
-> Sorry for being late here. I've tested that removing the mdio and phy nodes on
-> the the Starlight board works fine, but the rx-internal-delay-ps = <900>
-> property not needed on any of my VisionFive V1 boards either. 
+On Mon, Nov 27, 2023 at 4:12=E2=80=AFPM Richard Cochran
+<richardcochran@gmail.com> wrote:
+>
+> On Mon, Nov 27, 2023 at 05:39:01PM +0200, Sagi Maimon wrote:
+> >  Some user space applications need to read some clocks.
+> >  Each read requires moving from user space to kernel space.
+> >  This asymmetry causes the measured offset to have a significant error.
+>
+> Adding time/clock gurus (jstultz, tglx) on CC for visibility...
+>
 
-No problem, thanks a lot for taking the time to help with the testing!
+Thanks for the heads up! (though, "guru" is just the noise I make
+standing up these days)
 
-> So I wonder why you need that on your board
+> >  Introduce a new system call multi_clock_gettime, which can be used to =
+measure
+> >  the offset between multiple clocks, from variety of types: PHC, virtua=
+l PHC
+> >  and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+> >  The offset includes the total time that the driver needs to read the c=
+lock
+> >  timestamp.
 
-I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
-rgmii rx delay") in your tree, hence I you please confirm the tests were
-done with that commit reverted?
+This last bit about "offset includes the total time that the driver
+needs to read the clock" is a bit confusing. It seems to suggest there
+would be start/stop bookend timestamps so you could bound how long it
+took to read all the clocks, but I don't see that in the patch.
 
-> Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
-> you still set it to "rgmii-id", so which is it?
+> >  New system call allows the reading of a list of clocks - up to PTP_MAX=
+_CLOCKS.
+> >  Supported clocks IDs: PHC, virtual PHC and various system clocks.
+> >  Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
+> >  The system call returns n_clocks timestamps for each measurement:
+> >  - clock 0 timestamp
+> >  - ...
+> >  - clock n timestamp
+> >
+> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 
-Please try with "rgmii-id" first. I added "rgmii-txid" to have a
-fallback solution in case the former cannot be used.
+Overally, while I understand the intent, I'm pretty hesitant on it
+(and "__ptp_multi_clock_get multi_clk_get" has me squinting to find
+the actual space amongst all the underscores :).
 
-> You've alse removed the phy reset gpio on the Starlight board:
-> 
->   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
-> 
-> Why?
+If the overhead of reading clockids individually is too much, it seems
+like the next thing will be folks wanting to export multiple raw
+hardware counter values so the counter->ns transformation doesn't get
+inbetween each hw clock read, which this interface wouldn't solve, so
+we'd have to add yet another interface.
 
-I missed this in v1 as the gmac handling was done exclusively in
-jh7100-common. Thanks for noticing!
+Also, I wonder if trying to get multiple clocks in one read seems
+similar to something uio_ring might help with? Though I can't say I'm
+very savvy with uio_ring. Have folks looked into that?
 
->>
->> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
->> ---
->>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->> index 7cda3a89020a..d3f4c99d98da 100644
->> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->> @@ -11,3 +11,8 @@ / {
->>  	model = "BeagleV Starlight Beta";
->>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
->>  };
->> +
->> +&gmac {
->> +	phy-mode = "rgmii-id";
->> +	status = "okay";
->> +};
-> 
-> Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
-> so why can't these be set in the jh7100-common.dtsi?
-
-I wasn't sure "rgmii-id" can be used for both boards and I didn't want
-to unconditionally enable gmac on Starlight before getting a
-confirmation that this actually works.
-
-If there is no way to make it working with "rgmii-id" (w/ or w/o
-adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
-
-Thanks,
-Cristian
+thanks
+-john
 
