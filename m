@@ -1,86 +1,84 @@
-Return-Path: <netdev+bounces-51816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28DFE7FC53E
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:24:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDB57FC544
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFF83B215CB
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:23:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEF9B1C20F1A
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6097D40BFC;
-	Tue, 28 Nov 2023 20:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F944F882;
+	Tue, 28 Nov 2023 20:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="erFzEYNo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AI+3OrOW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AFD19AB;
-	Tue, 28 Nov 2023 12:23:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=OZx/da2wVl9ApR87F5Ow4/cPqWOdBxBeVYndGfDi8EA=; b=er
-	FzEYNorKXpOTjfwSwBGe6lvaCpgtLUR/uznDjygjZT8iETer0Jbz9WWq2OEB///M1n7pIq3jspbpL
-	fqCe8TNdoPZQFol9eGB83ybH7BiEvWJcBqDjfn+a83qiUDY4Q0/Cs2aZEYfpGR4h82GILS4pe7fIu
-	aZq6kbsLBg9hpCY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r84cQ-001UQC-8r; Tue, 28 Nov 2023 21:23:42 +0100
-Date: Tue, 28 Nov 2023 21:23:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vincent Whitchurch <vincent.whitchurch@axis.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel@axis.com
-Subject: Re: [PATCH net-next] net: phy: adin: allow control of Fast Link Down
-Message-ID: <b16f4344-815c-429f-b3b5-58715b32e1db@lunn.ch>
-References: <20231127-adin-fld-v1-1-797f6423fd48@axis.com>
- <452f1e1c-1afd-4a36-bf60-11b7de291d2f@lunn.ch>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB7D46BAE;
+	Tue, 28 Nov 2023 20:24:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBCE8C433C7;
+	Tue, 28 Nov 2023 20:24:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701203074;
+	bh=AxZmt6ng+cjEW/8ifHbtAk94LDFE5Mh7uTAVhNosjrA=;
+	h=In-Reply-To:References:Subject:From:To:Date:From;
+	b=AI+3OrOWNKfQ4WaArgVY2zE3iQgt2mmwbWLoqzyj6bk3hFwZwi7oVmN5iR8Q6vqgV
+	 AGplDW3Kj9cNGKv//2OTPuVXRAhvDF3RIorjKHVpGbEv4QFzY02cPHj3u7avWd9kM8
+	 h9MQFqIPSMBisM4Dwn7Bx1XEYY9b+QSUCLXKpXRqHUwXCZEY+isJn4mii2/tyJx3uy
+	 6bwXIx0HA7o3493ViblidvG1NQb3071cXrTGY4UaAIxCpGn5QRblfZB1PiRU0Zu/KB
+	 fq1brk+hB0ov3M0wWnXJ6nwLVSpGCJPiIriInlLL12KXG1s9Rd/H50ZuztbjxTNoHW
+	 JEbrHvo5/OA0Q==
+Message-ID: <21095bde37a8090686dfb372e5fffa58.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <452f1e1c-1afd-4a36-bf60-11b7de291d2f@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <cb983f0d30f019120cf49f24efb655cf794084d3.1700498124.git.daniel@makrotopia.org>
+References: <b277c5f084ff35849efb8250510b2536053d1316.1700498124.git.daniel@makrotopia.org> <cb983f0d30f019120cf49f24efb655cf794084d3.1700498124.git.daniel@makrotopia.org>
+Subject: Re: [PATCH v2 3/4] clk: mediatek: Add pcw_chg_shift control
+From: Stephen Boyd <sboyd@kernel.org>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Chen-Yu Tsai <wenst@chromium.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	David S.Miller <davem@davemloft.net>,
+	Edward-JW Yang <edward-jw.yang@mediatek.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Garmin.Chang <Garmin.Chang@mediatek.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	James Liao <jamesjj.liao@mediatek.com>,
+	Jianhui Zhao <zhaojh329@gmail.com>,
+	Johnson Wang <johnson.wang@mediatek.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Sam Shih <sam.shih@mediatek.com>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-m@web.codeaurora.org,
+	ediatek@lists.infradead.org, netdev@vger.kernel.org
+Date: Tue, 28 Nov 2023 12:24:31 -0800
+User-Agent: alot/0.10
 
-On Tue, Nov 28, 2023 at 09:18:00PM +0100, Andrew Lunn wrote:
-> On Mon, Nov 27, 2023 at 04:31:39PM +0100, Vincent Whitchurch wrote:
-> > Add support to allow Fast Link Down (aka "Enhanced link detection") to
-> > be controlled via the ETHTOOL_PHY_FAST_LINK_DOWN tunable.  These PHYs
-> > have this feature enabled by default.
-> > 
-> > Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> Is there anything in the datasheet about how fast it is? It would be
-> nice to return the number of milliseconds, if its known.
+Quoting Daniel Golle (2023-11-20 09:19:05)
+> Introduce pcw_chg_shfit control to optionally use that instead of the
+> hardcoded PCW_CHG_MASK macro.
+> This will needed for clocks on the MT7988 SoC.
+>=20
+> Signed-off-by: Sam Shih <sam.shih@mediatek.com>
 
-Datasheet says:
+Is Sam Shih the author? This has the wrong From: line then.
 
- If enhanced link detection is enabled (it is enabled by default), the
- ADIN1300 typically reacts to a break in the cable within 10 μs and
- indicates link down via the LINK_ST pin. If enhanced link detection
- is not enabled, the ADIN1300 follows the IEEE standard, and in
- 100BASE-TX, it can take more than either 350 ms or 750 ms in
- 1000BASE-T, depending if the PHY is 1000BASE-T master or 1000BASE-T
- slave.
-
-10uS is closer to 0ms and 1ms, so ETHTOOL_PHY_FAST_LINK_DOWN_ON == 0
-is right.
-
-   Andrew
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
