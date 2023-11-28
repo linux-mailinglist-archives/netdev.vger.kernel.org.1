@@ -1,130 +1,174 @@
-Return-Path: <netdev+bounces-51663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287C37FB9D3
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 13:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E861D7FB9E2
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 13:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49BC21C213D3
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:02:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23CE91C20E1D
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CEB4F8A6;
-	Tue, 28 Nov 2023 12:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC074F8A8;
+	Tue, 28 Nov 2023 12:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JfClEpIQ"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="HIdGdYur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976D095
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 04:02:49 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-a04196fc957so775554666b.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 04:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701172968; x=1701777768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ceta966qggbmFy2XPjDd3e7R7EPGhd2AQuN4GWtaJVc=;
-        b=JfClEpIQYJc8FQFTbccYEcmjU4UTe++t8V8JWYwBkD+v8+y8joBMZWSnQr1rfQ015D
-         LtM2HJTn8chKMIXw23VUb6MB9yOfoxER/NZs2CxXkhy+xxMLBo13myknR+bB1lmxpFhH
-         nDjmCtDDFqNzpDfQyMGq1JKgkNlgG0havdz4aw+AGIKn/klgaRnuM1CX/UEBh9nTofNK
-         WiVcuyg1imOmVxWJOGSaPz29u8LFsJSbB7iepykmWhm0AZ+csuwWzZd3wHD2wvciJTnW
-         gNzAuOOl55u0fQvkBFEuNKqdpOi5rcVuaZByhMISV573s5F9cIbp5qkkfFuD9bkogrAC
-         guUg==
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31EFE183
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 04:08:23 -0800 (PST)
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id D272544434
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 12:08:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1701173301;
+	bh=iOZrwSPmspp94JeIuHB4gK1Gx/cQjCpWhXKzSprsIjI=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=HIdGdYurwvY4jLzjhJ5FG3GlajPU4BhpSs13VcRRfDnBRdy5qBzXacJu4SeeEje37
+	 3/tPWTxTdQ4kP5lS8lgzbsqUdogzvw0k87bBb1fbuAKhu6mzXj2R5dq9L0rAWRnfbU
+	 T+tLmc9NF5OOoymiSZ9F58B5l4SLJbkWo+ogKIc001zuZOsU83BEEjRQ3+AgYdiVXw
+	 6bAQi/Fn7oK6xXOc/saZ2PrZdCTU7K1df/WT7BuN6xoBEucInMaB09YfDuj0ItiPNf
+	 Og3+vA1Ix0WZ3qhxtAz23OX4jRSkVnBqo5xwBN1nRUlTBtFEqVtxSs1zYPbbPXTnw8
+	 yBxIJakdNVv8Q==
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67a3bbd9510so26280806d6.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 04:08:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701172968; x=1701777768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ceta966qggbmFy2XPjDd3e7R7EPGhd2AQuN4GWtaJVc=;
-        b=uqW+dNB+qxyOOKDshgFpQXrLLPiu5IPUYP6DvbfuzgCz0FP6Y8CDHJoxb7IPtaampQ
-         /Gs6FL4V15PLQfWWzcw3i6V6+qI+Mc9db+xYzJT5HVpukYTewGLjos9m1qEGY2JY9pT2
-         FVxPJ0G+V36Uj0++eZ3kqD8cCErjdCagjFh7wnIHpFbRY9upVDK1eGJtmDtpih8MuwOw
-         DEep/0fwhl862mn/7AWedNd1UKbH5nWO1DKkR0X1fPxNqFr2Ugj6lQkzQCVZXw0fl3WT
-         O0qkqW6ztAW02CZ1H+zmzEycJGyTwQvRw65z1p3ldGDNx1wQTYp2rZIkfDoV/byBqkGF
-         re7Q==
-X-Gm-Message-State: AOJu0YzsiMpoSBaSZbdtMbWsmJUZO5oP2AnuPA8h0nyzSz5VUl/YKz/6
-	eP8DaZ0r6hhf9N3kliC2FzQhcA==
-X-Google-Smtp-Source: AGHT+IEd6UJ56oPGSfaPuxtUCzjocRrjTW+fEjwaR2G3Ckwvd7kPd5Lf0JbCi+RYtJIiWBo5p4fwAg==
-X-Received: by 2002:a17:906:6d4d:b0:9dd:57dd:ef16 with SMTP id a13-20020a1709066d4d00b009dd57ddef16mr10558179ejt.43.1701172967997;
-        Tue, 28 Nov 2023 04:02:47 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id w24-20020a170906481800b009920e9a3a73sm6743018ejq.115.2023.11.28.04.02.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 04:02:47 -0800 (PST)
-Date: Tue, 28 Nov 2023 13:02:46 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
-Subject: Re: [net 09/15] net/mlx5e: Forbid devlink reload if IPSec rules are
- offloaded
-Message-ID: <ZWXW5o9XIb0RHpkb@nanopsycho>
-References: <20231122014804.27716-1-saeed@kernel.org>
- <20231122014804.27716-10-saeed@kernel.org>
- <ZV3GSeNC0Pe3ubhB@nanopsycho>
- <20231122093546.GA4760@unreal>
- <ZV3O7dwQMLlNFZp3@nanopsycho>
- <20231122112832.GB4760@unreal>
+        d=1e100.net; s=20230601; t=1701173300; x=1701778100;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iOZrwSPmspp94JeIuHB4gK1Gx/cQjCpWhXKzSprsIjI=;
+        b=WH7okAVusDhwb17CNRBRyt/W4VJWEhDsiLvONazKxysq5xg6f7CWRCTh7bN9GQXPLM
+         cr30cm0vZaW9Tp6In0MFESWcxSpjeHMDdTYlEEqeHNH/jLHos4xDm7wtDl6iiew9HtTU
+         7IfnQ8NTGC96BIsdAjGEK1tOd6xX8v0s82OAuATcOr58GRPfJfL67yiEA+kqQmsJJ4up
+         kJsFCtDVflNaY9l8r3q5EjgGo4tR8dzGsSNfL8+WClqfwUMbZjAW7aFRFOAllvU/SdmA
+         bt5wNNG1LQBtMXIxgozUx2lDzS74Yc/LOj+452KFPOmXEKOkoYR8GlOv41z0XleySbS/
+         ps9g==
+X-Gm-Message-State: AOJu0YzsqUyj1agwpVBGDg9US8F/b8y4VZei5B9RJhnMLlVEShYgLHIg
+	Ia+jOCI3WmzeqE+EYa2y9Hb6rNn19av6uwE7h6g20fU/YHPGXEm68IBBh88hAaOtyPalYnK9j53
+	22dPOWg+DUtnYHcIPlU5wRvLZQDBdHIzBJi03cKvHrgsCdc3Zxg==
+X-Received: by 2002:a0c:c788:0:b0:67a:4bb0:693a with SMTP id k8-20020a0cc788000000b0067a4bb0693amr5088407qvj.55.1701173299942;
+        Tue, 28 Nov 2023 04:08:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGBEBEjzW+Uph8+AZgkvAUsq8GnJE2nUXrDjraYHJF2flj0Zg8LkQf+0YqL9hF83A1yoS4DqWVvh0w1JaGFdxE=
+X-Received: by 2002:a0c:c788:0:b0:67a:4bb0:693a with SMTP id
+ k8-20020a0cc788000000b0067a4bb0693amr5088373qvj.55.1701173299631; Tue, 28 Nov
+ 2023 04:08:19 -0800 (PST)
+Received: from 348282803490 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 28 Nov 2023 13:08:18 +0100
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+In-Reply-To: <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com> <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231122112832.GB4760@unreal>
+Mime-Version: 1.0
+Date: Tue, 28 Nov 2023 13:08:18 +0100
+Message-ID: <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Content-Type: text/plain; charset="UTF-8"
 
-Wed, Nov 22, 2023 at 12:28:32PM CET, leon@kernel.org wrote:
->On Wed, Nov 22, 2023 at 10:50:37AM +0100, Jiri Pirko wrote:
->> Wed, Nov 22, 2023 at 10:35:46AM CET, leon@kernel.org wrote:
->> >On Wed, Nov 22, 2023 at 10:13:45AM +0100, Jiri Pirko wrote:
->> >> Wed, Nov 22, 2023 at 02:47:58AM CET, saeed@kernel.org wrote:
->> >> >From: Jianbo Liu <jianbol@nvidia.com>
-
-[...]
-
-
->while we are in eswitch. It is skipped in lines 1556-1558:
+Cristian Ciocaltea wrote:
+> On 11/26/23 23:10, Emil Renner Berthing wrote:
+> > Cristian Ciocaltea wrote:
+> >> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+> >> RGMII-ID.
+> >>
+> >> TODO: Verify if manual adjustment of the RX internal delay is needed. If
+> >> yes, add the mdio & phy sub-nodes.
+> >
+> > Sorry for being late here. I've tested that removing the mdio and phy nodes on
+> > the the Starlight board works fine, but the rx-internal-delay-ps = <900>
+> > property not needed on any of my VisionFive V1 boards either.
 >
->  1548 static void
->  1549 mlx5e_vport_rep_unload(struct mlx5_eswitch_rep *rep)
->  1550 {
->  1551         struct mlx5e_rep_priv *rpriv = mlx5e_rep_to_rep_priv(rep);
->  1552         struct net_device *netdev = rpriv->netdev;
->  1553         struct mlx5e_priv *priv = netdev_priv(netdev);
->  1554         void *ppriv = priv->ppriv;
->  1555
->  1556         if (rep->vport == MLX5_VPORT_UPLINK) {
->  1557                 mlx5e_vport_uplink_rep_unload(rpriv);
->  1558                 goto free_ppriv;
->  1559         }
-
-Uplink netdev is created and destroyed by a different code:
-mlx5e_probe()
-mlx5e_remove()
-
-According to my testing. The uplink netdev is properly removed and
-re-added during reload-reinit. What am I missing?
-
-
-
->  1560
->  1561         unregister_netdev(netdev);
->  1562         mlx5e_rep_vnic_reporter_destroy(priv);
->  1563         mlx5e_detach_netdev(priv);
->  1564         priv->profile->cleanup(priv);
->  1565         mlx5e_destroy_netdev(priv);
->  1566 free_ppriv:
->  1567         kvfree(ppriv); /* mlx5e_rep_priv */
->  1568 }
+> No problem, thanks a lot for taking the time to help with the testing!
 >
+> > So I wonder why you need that on your board
+>
+> I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
+> rgmii rx delay") in your tree, hence I you please confirm the tests were
+> done with that commit reverted?
+>
+> > Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
+> > you still set it to "rgmii-id", so which is it?
+>
+> Please try with "rgmii-id" first. I added "rgmii-txid" to have a
+> fallback solution in case the former cannot be used.
 
-[...]
+Ah, I see. Sorry I should have read up on the whole thread. Yes, the Starlight
+board with the Microchip phy works with "rgmii-id" as is. And you're right,
+with "rgmii-id" my VF1 needs the rx-internal-delay-ps = <900> property too.
 
+>
+> > You've alse removed the phy reset gpio on the Starlight board:
+> >
+> >   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
+> >
+> > Why?
+>
+> I missed this in v1 as the gmac handling was done exclusively in
+> jh7100-common. Thanks for noticing!
+>
+> >>
+> >> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> >> ---
+> >>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
+> >>  1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+> >> index 7cda3a89020a..d3f4c99d98da 100644
+> >> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+> >> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+> >> @@ -11,3 +11,8 @@ / {
+> >>  	model = "BeagleV Starlight Beta";
+> >>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
+> >>  };
+> >> +
+> >> +&gmac {
+> >> +	phy-mode = "rgmii-id";
+> >> +	status = "okay";
+> >> +};
+> >
+> > Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
+> > so why can't these be set in the jh7100-common.dtsi?
+>
+> I wasn't sure "rgmii-id" can be used for both boards and I didn't want
+> to unconditionally enable gmac on Starlight before getting a
+> confirmation that this actually works.
+>
+> If there is no way to make it working with "rgmii-id" (w/ or w/o
+> adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
+
+Yeah, I don't exactly know the difference, but both boards seem to work fine
+with "rgmii-id", so if that is somehow better and/or more correct let's just go
+with that.
+
+Thanks!
+/Emil
+
+>
+> Thanks,
+> Cristian
 
