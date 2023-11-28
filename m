@@ -1,82 +1,145 @@
-Return-Path: <netdev+bounces-51717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B0A7FBD9F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:02:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6425E7FBD9D
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A90B9B20E72
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 873171C20EA3
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0D1584DB;
-	Tue, 28 Nov 2023 15:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BX0kvlCs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51CA5C8F3;
+	Tue, 28 Nov 2023 15:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4348719A7
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:02:13 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40b4fac45dbso20225e9.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:02:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701183731; x=1701788531; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XfZqAfnng9q1Ub5AUgJfpewVHPray9107z1f3h+rAkc=;
-        b=BX0kvlCsP9P8eO20cskyU4MmPGMwzcURijUl956tmMI25H0uaNt5TVHzxJnSX8ddXJ
-         mk4/cfafHU76XZ2xrdOlqfMGXdPrwGn103cLvDLu7vy8GR+zjvMXJphZIyrsxMrCsmDg
-         5yqjB13rA1KQ1Qqz6Xxpz3E9c1ZNfLwtFuM+nilo8VNzKobtZCs6kCHBf/8H2MqqKUs6
-         9ZyCO2QTEW1xCbs99NJ6OJS6HmmSjWe22W50eMorUDwQJW6lhlQEqXmApYbvP8mBpHMs
-         dV+77xAW1Ur8RdZv7Cj4+j0Bo68TEYns88LJphIC444KE0Z4rqS4BA4w14N60WLziC/b
-         D1FA==
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755C310C;
+	Tue, 28 Nov 2023 07:02:06 -0800 (PST)
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3b8382b8f5aso3454058b6e.0;
+        Tue, 28 Nov 2023 07:02:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701183731; x=1701788531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XfZqAfnng9q1Ub5AUgJfpewVHPray9107z1f3h+rAkc=;
-        b=ZLSMi8n3VDq8BE5SPYeSTJ+sgI/ANKYfEwbPKCPDYv4SOFYd1wGEgiHmwJJn8CK0zI
-         zzG9PlZFK93hb+WvuECxfCTOfs9oneha4qdEDDaj3qvOy+au2/NzV9gmHa1lSJKL/d5D
-         VVLO6FNG34G4xGLq3L2rp31rhFKkhKShJSjdbgWRkn/HlkFNuvLXI422t3M9IleDfJEJ
-         J9YXta4CaUSGIeoZimXRPG6ebNWMYt5d5FWU3illzFbmh2aNhRJ6m3HKc5UpejTnCqyC
-         8ogsu4RfjFprj2x9D7j3pAUAXimq4pVvCwezfFXyWxJiuwTyPEwoNHXFeJcSGUzwfobv
-         oniA==
-X-Gm-Message-State: AOJu0YxvhE+lL3Zr9FW2voxQL+j7xAgYE+mHhSrM1jGDnBIOur100uKW
-	Eo2uU5vVjGsOe3pV6yWgjzEgiULC4VzPctpYxKhApQ==
-X-Google-Smtp-Source: AGHT+IHg1J/eUuMXAGVdOOKH1uR5DmaLvFGw1h/PPEyUEwXPFfz92sV+mfZwqJsSlxrJjSUxT80vpuNYjiZAW5sEAao=
-X-Received: by 2002:a05:600c:818:b0:40b:4355:a04b with SMTP id
- k24-20020a05600c081800b0040b4355a04bmr334051wmp.6.1701183731386; Tue, 28 Nov
- 2023 07:02:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701183725; x=1701788525;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IWiVW1Tj7aQ56Epxxc+8Fc1eCMFReni5f+36Hxx0HAU=;
+        b=Fu3J2EvT9YSaFxHgrdDBJKPc+4jakCdgE1k+I35kcU+oSv0MBkIjXCfo9omiZkRbyA
+         KlKe/KVYI2CRXKqBmtZB87x0AEBB2jijvTbAuAHb7g8jLPBLea8vP8lcn34ZTbTRXJaQ
+         PmS1q4MKTiVm0/DZinqBLH5DQ0df2529udcQIuoSYxknPOa+xDl0FdFI6LfGz671HY40
+         PUdpiG7QWYYvIQu3p1ePRUDqbp1PmEtCbV92vZLiPloJOTBFjLMVw0XNj/Q0cVCMihfh
+         dSLves/FSEfVcb4gR87wWP3LTxOlrQg/GwDGVgiEfOGi6/RP0iviZkjNVajmvBX4fSwq
+         7x7A==
+X-Gm-Message-State: AOJu0YzFuhvi9uY+Ky5SzcgQQVuICeMOlcWEqRbQOxjwa+RkBxHlvghw
+	dZCU7+jKVG39uVrutUVpcg==
+X-Google-Smtp-Source: AGHT+IEeLzPRwuhWLu/lFo1HqvMvDm3Ulpwlen9Y4ezRuH348Sgi+IzPCxqC07eSOVGL9ia1tTiC6Q==
+X-Received: by 2002:a05:6808:1188:b0:3b2:f27a:8a52 with SMTP id j8-20020a056808118800b003b2f27a8a52mr18433036oil.41.1701183725601;
+        Tue, 28 Nov 2023 07:02:05 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id ay9-20020a056808300900b003b8388ffaffsm1852220oib.41.2023.11.28.07.02.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 07:02:05 -0800 (PST)
+Received: (nullmailer pid 3274715 invoked by uid 1000);
+	Tue, 28 Nov 2023 15:02:03 -0000
+Date: Tue, 28 Nov 2023 09:02:03 -0600
+From: Rob Herring <robh@kernel.org>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, marex@denx.de, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v6 1/2] dt-bindings: net: microchip,ksz:
+ document microchip,rmii-clk-internal
+Message-ID: <20231128150203.GA3264915-robh@kernel.org>
+References: <cover.1701091042.git.ante.knezic@helmholz.de>
+ <7f1f89010743a06c4880fd224149ea495fe32512.1701091042.git.ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231125011638.72056-1-kuniyu@amazon.com> <20231125011638.72056-2-kuniyu@amazon.com>
-In-Reply-To: <20231125011638.72056-2-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Nov 2023 16:02:00 +0100
-Message-ID: <CANn89iKLABAG2OgtseuE8pHicmeO-kWe4kzq8ythurRUkGwX0g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 1/8] tcp: Clean up reverse xmas tree in cookie_v[46]_check().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f1f89010743a06c4880fd224149ea495fe32512.1701091042.git.ante.knezic@helmholz.de>
 
-On Sat, Nov 25, 2023 at 2:17=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We will grow and cut the xmas tree in cookie_v[46]_check().
-> This patch cleans it up to make later patches tidy.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On Mon, Nov 27, 2023 at 02:20:42PM +0100, Ante Knezic wrote:
+> Add documentation for selecting reference rmii clock on KSZ88X3 devices
+> 
+> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> ---
+>  .../devicetree/bindings/net/dsa/microchip,ksz.yaml | 38 +++++++++++++++++++++-
+>  1 file changed, 37 insertions(+), 1 deletion(-)
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+You forgot Conor's ack.
+
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> index b3029c64d0d5..6fd482f2656b 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> @@ -11,7 +11,6 @@ maintainers:
+>    - Woojung Huh <Woojung.Huh@microchip.com>
+>  
+>  allOf:
+> -  - $ref: dsa.yaml#/$defs/ethernet-ports
+>    - $ref: /schemas/spi/spi-peripheral-props.yaml#
+>  
+>  properties:
+> @@ -78,6 +77,43 @@ required:
+>    - compatible
+>    - reg
+>  
+> +if:
+> +  not:
+> +    properties:
+> +      compatible:
+> +        enum:
+> +          - microchip,ksz8863
+> +          - microchip,ksz8873
+> +then:
+> +  $ref: dsa.yaml#/$defs/ethernet-ports
+> +else:
+> +  patternProperties:
+> +    "^(ethernet-)?ports$":
+> +      patternProperties:
+> +        "^(ethernet-)?port@[0-2]$":
+> +          $ref: dsa-port.yaml#
+> +          properties:
+> +            microchip,rmii-clk-internal:
+> +              $ref: /schemas/types.yaml#/definitions/flag
+> +              description:
+> +                When ksz88x3 is acting as clock provier (via REFCLKO) it
+> +                can select between internal and external RMII reference
+> +                clock. Internal reference clock means that the clock for
+> +                the RMII of ksz88x3 is provided by the ksz88x3 internally
+> +                and the REFCLKI pin is unconnected. For the external
+> +                reference clock, the clock needs to be fed back to ksz88x3
+> +                via REFCLKI.
+> +                If microchip,rmii-clk-internal is set, ksz88x3 will provide
+> +                rmii reference clock internally, otherwise reference clock
+> +                should be provided externally.
+
+> +          if:
+> +            not:
+> +              required: [ ethernet ]
+> +          then:
+> +            properties:
+> +              microchip,rmii-clk-internal: false
+
+This can be expressed as:
+
+dependencies:
+  microchip,rmii-clk-internal: [ethernet]
+
+
+> +          unevaluatedProperties: false
+
+Move this under the $ref.
+
+> +
+>  unevaluatedProperties: false
+>  
+>  examples:
+> -- 
+> 2.11.0
+> 
 
