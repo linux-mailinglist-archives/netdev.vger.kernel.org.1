@@ -1,92 +1,117 @@
-Return-Path: <netdev+bounces-51919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88C87FCAEB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:37:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3D17FCAF0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A319283015
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:37:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A00E41C20AD8
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0B35B5BE;
-	Tue, 28 Nov 2023 23:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41BA57333;
+	Tue, 28 Nov 2023 23:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BP3r3WIb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LKo/aF2a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9ED0197
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:37:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701214645; x=1732750645;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=EGEixHtQb1+ZHIfzVRxJRAfvWyXmF6jAq+s8NNkM3sU=;
-  b=BP3r3WIb5eOeAiFgiFkaLqMPhZZt17xdRXen0PZLsmJCvAi8dkv0oRvm
-   j2uhHOCMSvvLlhrIeMtW7w/7uOPg4twp2UlQ4No9s0HQflwlSo8xjZ0rv
-   cqjRxG1OTHf/n9I0brJQcIu1VceJzqWfnzc3UWJ/XmCrZ8Xb9oP36N2fz
-   fBO/5aJCW/CciFE0Ub42hEPGySmZNH//vrN6emUprh6VB+qD+Av3R2sXv
-   CpmECrPMc3WdE2h3IewWXH5J4/a480JHeqKzYjS14FxWvW3USRCFjqZBn
-   i9ec2oPs1UmZuPu8rUvfTKI3QS93FTN4B7DynD2kdwvhmoMDYFaP0X74h
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="479250764"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="479250764"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 15:37:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="10253019"
-Received: from ticela-or-268.amr.corp.intel.com (HELO vcostago-mobl3) ([10.212.190.61])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 15:37:25 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>
-Subject: Re: [PATCH net-next 0/5] igc: ethtool: Check VLAN TCI mask
-In-Reply-To: <20231128074849.16863-1-kurt@linutronix.de>
-References: <20231128074849.16863-1-kurt@linutronix.de>
-Date: Tue, 28 Nov 2023 15:37:24 -0800
-Message-ID: <87bkbdsb4b.fsf@intel.com>
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D8051B4
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:42:19 -0800 (PST)
+Message-ID: <d1cb4093-f20a-45c7-bfe3-5be6fd93c844@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701214937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/yaHcPbfeFenCF7sC9OA/U4qnbo3vk8i3ly7RzBTiB4=;
+	b=LKo/aF2aasXoesaAOoEM+w1D5Iyyy2K3DOKgYO8QFchJCPvZtXjcJbP1/TEa6frcAFyyq9
+	P1x60C76Y4MsT3E4OVDIMw19JEW8vr5ZenayxPqPQFFpnWtDdE1Mv+yanl4YObiVnnXmA7
+	toUjcuZkowaXVCpbwRwf7R4LsK3piME=
+Date: Tue, 28 Nov 2023 15:42:15 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH 3/3] ss: pretty-print BPF socket-local storage
+Content-Language: en-US
+To: Quentin Deslandes <qde@naccy.de>
+Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
+ <martin.lau@kernel.org>, netdev@vger.kernel.org
+References: <20231128023058.53546-1-qde@naccy.de>
+ <20231128023058.53546-4-qde@naccy.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231128023058.53546-4-qde@naccy.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Kurt Kanzenbach <kurt@linutronix.de> writes:
+On 11/27/23 6:30 PM, Quentin Deslandes wrote:
+> +static int bpf_maps_opts_load_btf(struct bpf_map_info *info, struct btf **btf)
+> +{
+> +	if (info->btf_vmlinux_value_type_id) {
+> +		if (!bpf_map_opts.kernel_btf) {
+> +			bpf_map_opts.kernel_btf = libbpf_find_kernel_btf();
+> +			if (!bpf_map_opts.kernel_btf) {
+> +				fprintf(stderr, "ss: failed to load kernel BTF\n");
+> +				return -1;
+> +			}
+> +		}
+> +
+> +		*btf = bpf_map_opts.kernel_btf;
+> +	} else if (info->btf_value_type_id) {
+> +		*btf = btf__load_from_kernel_by_id(info->btf_id);
+> +		if (!*btf) {
+> +			fprintf(stderr, "ss: failed to load BTF for map ID %u\n",
+> +				info->id);
+> +			return -1;
+> +		}
+> +	} else {
+> +		*btf = NULL;
+> +	}
+> +
+> +	return 0;
+> +}
 
-> Hi,
->
-> currently it is possible to configure receive queue assignment using the VLAN
-> TCI field with arbitrary masks. However, the hardware only supports steering
-> either by full TCI or the priority (PCP) field. In case a wrong mask is given by
-> the user the driver will silently convert it into a PCP filter which is not
-> desired. Therefore, add a check for it.
->
-> Patches #1 to #4 are minor things found along the way.
->
+[ ... ]
 
-Some very minor things: patches 2,3 and 4 have extra long lines in their
-commit messages that checkpatch.pl doesn't seem to like.
+> +static void out_bpf_sk_storage(int map_id, const void *data, size_t len,
+> +	out_prefix_t *prefix)
+> +{
+> +	uint32_t type_id;
+> +	struct bpf_sk_storage_map_info *map_info;
+> +
+> +	map_info = bpf_map_opts_get_info(map_id);
+> +	if (!map_info) {
+> +		OUT_P(prefix, "map_id: %d: missing map info", map_id);
+> +		return;
+> +	}
+> +
+> +	if (map_info->info.value_size != len) {
+> +		OUT_P(prefix, "map_id: %d: invalid value size, expecting %u, got %lu\n",
+> +			map_id, map_info->info.value_size, len);
+> +		return;
+> +	}
+> +
+> +	type_id = map_info->info.btf_vmlinux_value_type_id ?: map_info->info.btf_value_type_id;
 
-Patches 4 and 5 read more like fixes to me. I think they could be
-proposed to -net, as they contain fixes to user visible issues. Do you
-think that makes sense?
+sk_storage does not use info.btf_vmlinux_value_type_id, so no need to handle 
+this case. Only info.btf_value_type_id is used.
 
-As for the code, feel free to add my Ack to the series:
+> +
+> +	OUT_P(prefix, "map_id: %d [\n", map_id);
+> +	out_prefix_push(prefix);
+> +
+> +	out_btf_dump_type(map_info->btf, 0, type_id, data, len, prefix);
+> +
+> +	out_prefix_pop(prefix);
+> +	OUT_P(prefix, "]");
+> +}
+> +
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-
-Cheers,
--- 
-Vinicius
 
