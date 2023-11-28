@@ -1,124 +1,154 @@
-Return-Path: <netdev+bounces-51635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244007FB83C
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:42:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B4A7FB843
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524F71C20F67
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:42:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F00C5282AA2
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9354E18C08;
-	Tue, 28 Nov 2023 10:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCcJ3ZwP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986D418C08;
+	Tue, 28 Nov 2023 10:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F3E10E
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:42:08 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a03a900956dso998278866b.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:42:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701168127; x=1701772927; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DozXjJqnuFuq9pSAH2N19zU2gp9mW0B1YAvriLiF6cc=;
-        b=MCcJ3ZwPTy8jR7IoVOfoZ9Gah9ndN2m9u5AQoKXMqVJvZzXsSlz0Zrm4JcoXGUdB0M
-         f5GU1VVOmrpE8NEzBx3NHPHtYXAtI/HIkKFe4HjA7MHn0UyPLWcqmQtVRJFSABC6ruC9
-         Dub5HcTFeVm+PsQi3gaRejPe2z2XcTHCcCcLsxtjpJLA/4SL+fLvYK0Nonmbw3Nm40dj
-         8RVaHbx5B0RGkajpf3xRzToeyGHtg6K/ivk7VarOAGXGMPEggP3DQVXzxqBkwEinrdvE
-         7nXys+My8TZmx5qjNDIg2BQaDbomMO9iLWYT+c8jqtvXXTGOOgTJy/thYT50ZFNCjAzn
-         yskg==
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B866A1BD1
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:42:56 -0800 (PST)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2c9b57f87f3so929091fa.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:42:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701168127; x=1701772927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DozXjJqnuFuq9pSAH2N19zU2gp9mW0B1YAvriLiF6cc=;
-        b=f7hA97xfYdJeMDTT0YHaKp4oYyKKsK+wEcZt1+G4GA+m4eCxjoAwU58/d+9hreQ538
-         9gYJbxWSeAWJvdCwpJUzy7dUL1JfCB9rE1qw+oVtwMn7hD6Y9vWy25XNzuA6UC+GkT/H
-         dozDFwzvvpwqw0gCm0d9C34nPYwcLsxa64e9ug+KRFNRBX/6qexBEQKSr9AzWHXIioPG
-         15rqnRuTC+Dxywmk1MNrOUUvf1UiEMGp9WNq2Wg3fhepvw//RPJMYeA8h3Y04YU0vcMY
-         Ih4HlF74O/WeJQqVpMYUyFQxaJyavgP3fwAVbNmr6mTvSZMcx7KdInOddEjnYOBAN0dg
-         mnkA==
-X-Gm-Message-State: AOJu0Yy008dut9BD4ve9TBFhyWqK4Zhq6w73oqf7LhyhRtrSjP3dTm4i
-	hTpcMMrWtwovu+RxVN4VyAtyCu1MLuk9FPpGN2g=
-X-Google-Smtp-Source: AGHT+IGTZIrZa1Lt+/Q5jBFS7D8yaTtRM40DmOkXoDVWsRHMms0pfIOn0To7U9cqouW4Zr2K3C7ygQY9DmN0WRNbSSU=
-X-Received: by 2002:a17:906:c791:b0:9ad:8a96:ad55 with SMTP id
- cw17-20020a170906c79100b009ad8a96ad55mr16600400ejb.14.1701168126895; Tue, 28
- Nov 2023 02:42:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701168175; x=1701772975;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YKVzGvl+LlWimuqcFatkZrJ/6x3ko69rmC3lpZC3FlM=;
+        b=kSyNAcKq696ewXfhmOIdlB7LMRqr/j0QylPL0jCEAICJhzC2ACqDcih48SFDrbeBxd
+         WburkjutEmYWu8Z2mUdAGG5jgT/13F4WBzTPkyHX10zwkUa/NBZnkx5Fp01C5QOenYnB
+         pD2+U666fIDgYLxFNaThKpEsrVnbo1/jiCsyglMK6Xu51jLkuOnodREpb3YlBHlRe7DL
+         Wfwfw3e9k/CrdarFiaKE/TxA1PW3ucgWrHA0rVU9zH2JkpWCDWdPdMTabSCLCvX1YtJj
+         FXYqWzRO8kaDaDzn8yy2PewfONw0Gjd6Xr0XC5oaNX+Aq4XhHsQaAM54s/qiwUgILtIx
+         2D8w==
+X-Gm-Message-State: AOJu0YwqN5oxtV5zBKfntV5dgAdngqZ2XbDDBpSaupqAxsEg3XkZIHCo
+	d/feATmh6Pew8XjC4khJHJ0=
+X-Google-Smtp-Source: AGHT+IHXqUOVAr2hEym0ib8T1psOwVqNhwmvdtSEWIcqlpLG702FVoysQYOEl62vAw3KRlfkq0+w6Q==
+X-Received: by 2002:a2e:5404:0:b0:2c8:38b2:2c33 with SMTP id i4-20020a2e5404000000b002c838b22c33mr8507107ljb.3.1701168174702;
+        Tue, 28 Nov 2023 02:42:54 -0800 (PST)
+Received: from [192.168.64.177] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id m8-20020a05600c4f4800b0040b347d90d0sm17643343wmq.12.2023.11.28.02.42.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 02:42:54 -0800 (PST)
+Message-ID: <bc6ec871-de51-477a-b27f-4d516e5bc3e1@grimberg.me>
+Date: Tue, 28 Nov 2023 12:42:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231124073439.52626-1-liangchen.linux@gmail.com>
- <20231124073439.52626-4-liangchen.linux@gmail.com> <d26decd3-7235-c4ce-f083-16a52d15ff1c@huawei.com>
- <CAKhg4tKtsDgaNkmcH8RXVTVq_c2-SOxZTsTDTw_KH5FZ+sZuBQ@mail.gmail.com> <288af908-eed4-7ba0-17d5-2c7fb2c87233@huawei.com>
-In-Reply-To: <288af908-eed4-7ba0-17d5-2c7fb2c87233@huawei.com>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Tue, 28 Nov 2023 18:41:54 +0800
-Message-ID: <CAKhg4tKr5FZyeMq0+dyKQydgeE4WrEimhpxv_nVoqqY96YWK3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] skbuff: Optimization of SKB coalescing
- for page pool
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	netdev@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v20 07/20] nvme-tcp: RX DDGST offload
+Content-Language: en-US
+To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Yoray Zack <yorayz@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ borisp@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
+References: <20231122134833.20825-1-aaptel@nvidia.com>
+ <20231122134833.20825-8-aaptel@nvidia.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20231122134833.20825-8-aaptel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 27, 2023 at 6:48=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2023/11/27 12:23, Liang Chen wrote:
-> > On Sat, Nov 25, 2023 at 8:16=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> >>
-> >> On 2023/11/24 15:34, Liang Chen wrote:
-> >>
-> >> ...
-> >>
-> >>> --- a/include/net/page_pool/helpers.h
-> >>> +++ b/include/net/page_pool/helpers.h
-> >>> @@ -402,4 +402,26 @@ static inline void page_pool_nid_changed(struct =
-page_pool *pool, int new_nid)
-> >>>               page_pool_update_nid(pool, new_nid);
-> >>>  }
-> >>>
-> >>> +static inline bool page_pool_is_pp_page(struct page *page)
-> >>> +{
-> >>
-> >> We have a page->pp_magic checking in napi_pp_put_page() in skbuff.c al=
-ready,
-> >> it seems better to move it to skbuff.c or skbuff.h and use it for
-> >> napi_pp_put_page() too, as we seem to have chosen to demux the page_po=
-ol
-> >> owned page and non-page_pool owned page handling in the skbuff core.
-> >>
-> >> If we move it to skbuff.c or skbuff.h, we might need a better prefix t=
-han
-> >> page_pool_* too.
-> >>
-> >
-> > How about keeping the 'page_pool_is_pp_page' function in 'helper.h'
-> > and letting 'skbbuff.c' use it? It seems like the function's logic is
-> > better suited to be internal to the page pool, and it might be needed
-> > outside of 'skbuff.c' in the future.
->
-> Yes, we can always extend it outside of 'skbuff' if there is a need in
-> the future.
->
-> For now, maybe it makes more sense to export as litte as possible in the
-> .h file mirroring the napi_pp_put_page().
->
 
-Sure. will be done in v4. Thanks!
 
-> > .
-> >
+On 11/22/23 15:48, Aurelien Aptel wrote:
+> From: Yoray Zack <yorayz@nvidia.com>
+> 
+> Enable rx side of DDGST offload when supported.
+> 
+> At the end of the capsule, check if all the skb bits are on, and if not
+> recalculate the DDGST in SW and check it.
+> 
+> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
+> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
+> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
+> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
+> Signed-off-by: Shai Malin <smalin@nvidia.com>
+> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> ---
+>   drivers/nvme/host/tcp.c | 84 ++++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 79 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index 680d909eb3fb..5537f04a62fd 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -141,6 +141,7 @@ enum nvme_tcp_queue_flags {
+>   	NVME_TCP_Q_LIVE		= 1,
+>   	NVME_TCP_Q_POLLING	= 2,
+>   	NVME_TCP_Q_OFF_DDP	= 3,
+> +	NVME_TCP_Q_OFF_DDGST_RX = 4,
+>   };
+>   
+>   enum nvme_tcp_recv_state {
+> @@ -178,6 +179,7 @@ struct nvme_tcp_queue {
+>   	 *   is pending (ULP_DDP_RESYNC_PENDING).
+>   	 */
+>   	atomic64_t		resync_tcp_seq;
+> +	bool			ddp_ddgst_valid;
+>   #endif
+>   
+>   	/* send state */
+> @@ -360,6 +362,33 @@ nvme_tcp_get_ddp_netdev_with_limits(struct nvme_tcp_ctrl *ctrl)
+>   	return netdev;
+>   }
+>   
+> +static inline bool nvme_tcp_ddp_ddgst_ok(struct nvme_tcp_queue *queue)
+> +{
+> +	return queue->ddp_ddgst_valid;
+> +}
+> +
+> +static inline void nvme_tcp_ddp_ddgst_update(struct nvme_tcp_queue *queue,
+> +					     struct sk_buff *skb)
+> +{
+> +	if (queue->ddp_ddgst_valid)
+> +		queue->ddp_ddgst_valid = skb_is_ulp_crc(skb);
+> +}
+> +
+> +static void nvme_tcp_ddp_ddgst_recalc(struct ahash_request *hash,
+> +				      struct request *rq,
+> +				      __le32 *ddgst)
+> +{
+> +	struct nvme_tcp_request *req;
+> +
+> +	if (!rq)
+> +		return;
+
+How is this even possible? And what happens down the road if this is
+indeed a null rq?
+
+> +
+> +	req = blk_mq_rq_to_pdu(rq);
+> +	ahash_request_set_crypt(hash, req->ddp.sg_table.sgl, (u8 *)ddgst,
+> +				req->data_len);
+> +	crypto_ahash_digest(hash);
+> +}
+> +
+>   static bool nvme_tcp_resync_request(struct sock *sk, u32 seq, u32 flags);
+>   static void nvme_tcp_ddp_teardown_done(void *ddp_ctx);
+>   static const struct ulp_ddp_ulp_ops nvme_tcp_ddp_ulp_ops = {
+> @@ -430,6 +459,8 @@ static void nvme_tcp_setup_ddp(struct nvme_tcp_queue *queue,
+>   static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
+>   {
+>   	struct ulp_ddp_config config = {.type = ULP_DDP_NVME};
+> +	bool offload_ddgst_rx = ulp_ddp_is_cap_active(queue->ctrl->ddp_netdev,
+> +						      ULP_DDP_CAP_NVME_TCP_DDGST_RX);
+
+Not sure a local variable is needed here.
 
