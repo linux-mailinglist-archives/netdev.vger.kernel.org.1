@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-51588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67E87FB4C2
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:50:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5574C7FB4C5
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82F822814E7
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A082F28112F
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D44519BA7;
-	Tue, 28 Nov 2023 08:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82EC19BA7;
+	Tue, 28 Nov 2023 08:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPN7G0yZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/tkVR+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031C2AA
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:08 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6cd8ce7bf7fso1882267b3a.0
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:07 -0800 (PST)
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79720A7
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:12 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6cbe5b6ec62so4137370b3a.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701161407; x=1701766207; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=d6jxsJU6hCFNidlpzv7Q9HkCZpEhz6RIrVX8MfVKe0k=;
-        b=QPN7G0yZZjuxxOa7veTG86yG+Df1caz8A7VfJURODmfDnsrOWR4tAJRDKKxvBkYOMU
-         V+HJQv2CKX2XqptGn06mNzUl9RQIOXPGsOozu9KaYiHPrdRIsaqpauvyPhua16PAqLdk
-         +Gs/yhwsSnILlle5fkbPIFs/LGRzLe8Yoj6AiCz+LiGSbg2mhM+Yncp29IOJofpd8xhI
-         rvU1gw64gTrae9AU3nLBfvtiPy1iTYeUetQxQdGS2TS0M3f3L0X4MFS0+opk0W7uO/+K
-         kCm77M3GiqS9EAKuCpukbqNbCzbJZ2yrLb4dBKBCUqLhGlrLRuZf3y4qsUbQtxjrGow+
-         w/Aw==
+        d=gmail.com; s=20230601; t=1701161411; x=1701766211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IacZAzLju3D9+KaX6gJPJ/9NzActBkRpe8J66DiTOxs=;
+        b=m/tkVR+R6Z8CxyLQHlCBxhkuex/QmS5/X/ZM1hSyV1VcbcdbfF09ccdWUPll/jE426
+         a240P3xXB9589RRqtmV0kAroJaVTWmwsudMfz88IZxUIhhvHvlYucob+Du51FJfxdpM6
+         eDURqJ37M/kZo1aoqn3hEtChnT4q5tdV7gcADo01cUmuSsUJZT3Be1NMN30zPekmima/
+         q4m6dl59ah9Z2SUpfVmNY2StGicizFJZ985iJHy4hTuWAHSvfuNRQxKdk4XstcvAFHG0
+         BfaO1JA3a+VELIFXbx4nYKHY866t5ckGzTRepV/SdaHiOg+Q3bfM0jTTfJmUDXk3hl7Z
+         8vJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701161407; x=1701766207;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d6jxsJU6hCFNidlpzv7Q9HkCZpEhz6RIrVX8MfVKe0k=;
-        b=LMz8IyrBZT4KeognrqJEynh3X33KFKQpkG2BBBNaA2gqA3phfBbBPrlslLTXZdBaiV
-         4kSU6VqfgmjCbIcE2yfoGxYQFABdewcIqqORTBtsrj9W8NOeHmN2F/s3W03jKud93vdZ
-         n7pJr/7kNehUW5zjOVaBWDlie7RJx/QwpaGtZOy29jooxOnsuriB0ZkLz+IwerXm4RUS
-         +r59zsAl+tivd1pjsAIxqPt0LU1itRTKKvVEt9HuSfWOt2kJ9BFtBDHxPyATUGF/rN/y
-         o4fLN+tB5XoaFR/YtT1mGcSqVsQ7A52Gxq6nemZiOesuOb21yyFjEmOdOm+OTSv9q36V
-         5zaQ==
-X-Gm-Message-State: AOJu0YylTCAF6H3l2dJKLB2EfGNH5GyOoeXO7JvCjP/rFZDe9sbdZAIB
-	7Fgz86RVNu81lK2fLxVIQbgLyU9hlEf/Kbty
-X-Google-Smtp-Source: AGHT+IGxxf7YRrBQc+q2yUdhqqhzOJKN9vhdydp+WhLmjQuiGwXYgM+jgA4Ch4fB6zbZ7q2TWfZyjg==
-X-Received: by 2002:a05:6a00:2da7:b0:6be:4789:97ba with SMTP id fb39-20020a056a002da700b006be478997bamr14187841pfb.3.1701161406720;
-        Tue, 28 Nov 2023 00:50:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701161411; x=1701766211;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IacZAzLju3D9+KaX6gJPJ/9NzActBkRpe8J66DiTOxs=;
+        b=vVqtIZm8TAf9tKGVD58ei1BuIMiuNywcQ8AIaI0XiAuiBF27/24pmm12OZI+Rl5U5D
+         q7MOaCe6dNX6fQf2xC6xaHmageFMUUVRpqzRmVRmGHKFpCqmZ/692ggDWw+168zg4Z1/
+         XNzVdudAvD3xnEqnKDd9a/rR0q8y7LLXy3wHrKtkjAeUGwi9FkW74sIjd2sxDUVDvtCW
+         LBfI5L7oIVvVLhv0kilg3JNTJAHBm2E7yIu8eq9nKae5mwtOq+BBDXr9Bt5hzL3uTCkJ
+         ll8Vbhuyi8JFsiCpC+WVPVd3rbLb679N4bsUuYUEL20dE+/NAxCBR3wIutkiAcR5AMdE
+         3eIg==
+X-Gm-Message-State: AOJu0YxoZC8dseESFFFa/2+wkgBBkp5G/YsgdZN20+GIfegbALG9q/eW
+	uoSQA80xa1Kld4eBjZ2fsDD0Vjn1hadjaZYQ
+X-Google-Smtp-Source: AGHT+IGlALMz0glr/FaO4pxwKz/mgtPKXljR57aosieNTZriNKUDK4yBWJHRxBOyfqkCLCPzTmBNng==
+X-Received: by 2002:a05:6a00:27ab:b0:6be:265:1bf6 with SMTP id bd43-20020a056a0027ab00b006be02651bf6mr15867223pfb.32.1701161411311;
+        Tue, 28 Nov 2023 00:50:11 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d25-20020aa78159000000b006cbae51f335sm8766513pfn.144.2023.11.28.00.50.01
+        by smtp.gmail.com with ESMTPSA id d25-20020aa78159000000b006cbae51f335sm8766513pfn.144.2023.11.28.00.50.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 00:50:05 -0800 (PST)
+        Tue, 28 Nov 2023 00:50:10 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -70,10 +71,12 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Marc Muehlfeld <mmuehlfe@redhat.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 00/10] Doc: update bridge doc
-Date: Tue, 28 Nov 2023 16:49:33 +0800
-Message-ID: <20231128084943.637091-1-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 01/10] docs: bridge: update doc format to rst
+Date: Tue, 28 Nov 2023 16:49:34 +0800
+Message-ID: <20231128084943.637091-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231128084943.637091-1-liuhangbin@gmail.com>
+References: <20231128084943.637091-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,44 +91,72 @@ linuxfoundation wiki page which lacks of the new features.
 Here let's start the new bridge document and put all the bridge info
 so new developers and users could catch up the last bridge status soon.
 
-v2 -> v3:
-- Split the bridge doc update and adding kAPI/uAPI field to 2 part (Nikolay Aleksandrov)
-- Update bridge and bridge enum descriptions (Nikolay Aleksandrov)
-- Add user space stp help for STP doc (Vladimir Oltean)
+In this patch, Convert the doc to rst format. Add bridge brief introduction,
+FAQ and contact info.
 
-v1 -> v2:
-- Update bridge and bridge port enum descriptions (Vladimir Oltean)
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ Documentation/networking/bridge.rst | 45 ++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
 
-RFCv3 -> v1:
-- Fix up various typos, grammar and technical issues (Nikolay Aleksandrov)
-
-RFCv2 -> RFCv3:
-- Update netfilter part (Florian Westphal)
-- Break the one large patch in to multiparts for easy reviewing. Please tell
-  me if I break it too much.. (Nikolay Aleksandrov)
-- Update the description of each enum and doc (Nikolay Aleksandrov)
-- Add more descriptions for STP/Multicast/VLAN.
-
-RFCv1 -> RFCv2:
-- Drop the python tool that generate iproute man page from kernel doc
-
-Hangbin Liu (10):
-  docs: bridge: update doc format to rst
-  net: bridge: add document for IFLA_BR enum
-  net: bridge: add document for IFLA_BRPORT enum
-  docs: bridge: Add kAPI/uAPI fields
-  docs: bridge: add STP doc
-  docs: bridge: add VLAN doc
-  docs: bridge: add multicast doc
-  docs: bridge: add switchdev doc
-  docs: bridge: add netfilter doc
-  docs: bridge: add other features
-
- Documentation/networking/bridge.rst | 317 ++++++++++++++++-
- include/uapi/linux/if_link.h        | 521 ++++++++++++++++++++++++++++
- net/bridge/br_private.h             |   2 +
- 3 files changed, 830 insertions(+), 10 deletions(-)
-
+diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
+index c859f3c1636e..de112e92a305 100644
+--- a/Documentation/networking/bridge.rst
++++ b/Documentation/networking/bridge.rst
+@@ -4,18 +4,43 @@
+ Ethernet Bridging
+ =================
+ 
+-In order to use the Ethernet bridging functionality, you'll need the
+-userspace tools.
++Introduction
++============
+ 
+-Documentation for Linux bridging is on:
+-   https://wiki.linuxfoundation.org/networking/bridge
++A bridge is a way to connect multiple Ethernet segments together in a protocol
++independent way. Packets are forwarded based on Layer 2 destination Ethernet
++address, rather than IP address (like a router). Since forwarding is done
++at Layer 2, all Layer 3 protocols can pass through a bridge transparently.
+ 
+-The bridge-utilities are maintained at:
+-   git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bridge-utils.git
++FAQ
++===
+ 
+-Additionally, the iproute2 utilities can be used to configure
+-bridge devices.
++What does a bridge do?
++----------------------
+ 
+-If you still have questions, don't hesitate to post to the mailing list 
+-(more info https://lists.linux-foundation.org/mailman/listinfo/bridge).
++A bridge transparently forwards traffic between multiple network interfaces.
++In plain English this means that a bridge connects two or more physical
++Ethernet networks, to form one larger (logical) Ethernet network.
+ 
++Is it L3 protocol independent?
++------------------------------
++
++Yes. The bridge sees all frames, but it *uses* only L2 headers/information.
++As such, the bridging functionality is protocol independent, and there should
++be no trouble forwarding IPX, NetBEUI, IP, IPv6, etc.
++
++Contact Info
++============
++
++The code is currently maintained by Roopa Prabhu <roopa@nvidia.com> and
++Nikolay Aleksandrov <razor@blackwall.org>. Bridge bugs and enhancements
++are discussed on the linux-netdev mailing list netdev@vger.kernel.org and
++bridge@lists.linux-foundation.org.
++
++The list is open to anyone interested: http://vger.kernel.org/vger-lists.html#netdev
++
++External Links
++==============
++
++The old Documentation for Linux bridging is on:
++https://wiki.linuxfoundation.org/networking/bridge
 -- 
 2.41.0
 
