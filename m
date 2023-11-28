@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-51639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1697FB8C1
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:00:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023F07FB90E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B9D1C20925
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20D6282C16
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882E04A9BE;
-	Tue, 28 Nov 2023 11:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LFFLS0Xz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489C74F1E4;
+	Tue, 28 Nov 2023 11:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA3049F92
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 11:00:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5A0DC433CA;
-	Tue, 28 Nov 2023 11:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701169226;
-	bh=QOg3KVTER4epeAO54p/axbPEeNoukAl/3jVlyfyz5pA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LFFLS0Xz8X0pIlB57Xsfgt90E0QExzL9hJa7HWEiUpc/HddEdCCyjz71sgEgiJCOc
-	 GOEC22grZxMqOGDRg3tSAi1xhuQgzATZwyFefdVM9ucxBp+PJ32S7suBas2iy72Z4s
-	 xc4ZHLzkfPU1O/4Ru/wkKxQLcQfiKsRmpMw/XMuJlvhoxCJkbAY0rQz5dTqjsBAjFu
-	 1yv3HBx0s3ZVuu1l+JePwYNYUBvmSbLZ9Q7ocrQ1nz587G+oLXJs81jaNAXEWarh23
-	 eDcPkd1CnJ+Otl2VBGnqrFK5W0I663nqwFD66RQwpDnIX6dzY8+7CVxpTJbSH/czjC
-	 tVT1Qxlnf1zeg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C79DCC39562;
-	Tue, 28 Nov 2023 11:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD5C0D45;
+	Tue, 28 Nov 2023 03:10:34 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B019C15;
+	Tue, 28 Nov 2023 03:11:22 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 431303F73F;
+	Tue, 28 Nov 2023 03:10:33 -0800 (PST)
+Date: Tue, 28 Nov 2023 11:10:28 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bill Wendling <morbo@google.com>, Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] neighbour: Fix __randomize_layout crash in struct
+ neighbour
+Message-ID: <20231128111028.GA2382233@e124191.cambridge.arm.com>
+References: <ZWJoRsJGnCPdJ3+2@work>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: stmmac: xgmac: Disable FPE MMC interrupts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170116922581.4807.10674635347082642377.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Nov 2023 11:00:25 +0000
-References: <20231125060126.2328690-1-0x1207@gmail.com>
-In-Reply-To: <20231125060126.2328690-1-0x1207@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: davem@davemloft.net, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, jpinto@synopsys.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- xfr@outlook.com, rock.xu@nio.com, larysa.zaremba@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWJoRsJGnCPdJ3+2@work>
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 25 Nov 2023 14:01:26 +0800 you wrote:
-> Commit aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts
-> by default") tries to disable MMC interrupts to avoid a storm of
-> unhandled interrupts, but leaves the FPE(Frame Preemption) MMC
-> interrupts enabled, FPE MMC interrupts can cause the same problem.
-> Now we mask FPE TX and RX interrupts to disable all MMC interrupts.
+On Sat, Nov 25, 2023 at 03:33:58PM -0600, Gustavo A. R. Silva wrote:
+> Previously, one-element and zero-length arrays were treated as true
+> flexible arrays, even though they are actually "fake" flex arrays.
+> The __randomize_layout would leave them untouched at the end of the
+> struct, similarly to proper C99 flex-array members.
 > 
-> Fixes: aeb18dd07692 ("net: stmmac: xgmac: Disable MMC interrupts by default")
-> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> However, this approach changed with commit 1ee60356c2dc ("gcc-plugins:
+> randstruct: Only warn about true flexible arrays"). Now, only C99
+> flexible-array members will remain untouched at the end of the struct,
+> while one-element and zero-length arrays will be subject to randomization.
 > 
-> [...]
+> Fix a `__randomize_layout` crash in `struct neighbour` by transforming
+> zero-length array `primary_key` into a proper C99 flexible-array member.
+> 
+> Fixes: 1ee60356c2dc ("gcc-plugins: randstruct: Only warn about true flexible arrays")
+> Closes: https://lore.kernel.org/linux-hardening/20231124102458.GB1503258@e124191.cambridge.arm.com/
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>  include/net/neighbour.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> index 07022bb0d44d..0d28172193fa 100644
+> --- a/include/net/neighbour.h
+> +++ b/include/net/neighbour.h
+> @@ -162,7 +162,7 @@ struct neighbour {
+>  	struct rcu_head		rcu;
+>  	struct net_device	*dev;
+>  	netdevice_tracker	dev_tracker;
+> -	u8			primary_key[0];
+> +	u8			primary_key[];
+>  } __randomize_layout;
+>  
+>  struct neigh_ops {
 
-Here is the summary with links:
-  - [net,v3] net: stmmac: xgmac: Disable FPE MMC interrupts
-    https://git.kernel.org/netdev/net/c/e54d628a2721
+Fixes the crash for me!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Tested-by: Joey Gouly <joey.gouly@arm.com>
 
