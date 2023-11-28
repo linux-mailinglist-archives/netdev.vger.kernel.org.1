@@ -1,87 +1,112 @@
-Return-Path: <netdev+bounces-51721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDE97FBDB8
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:09:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 424927FBDBF
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396E22828AA
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:09:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F00FF281AE1
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DFF5CD09;
-	Tue, 28 Nov 2023 15:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1702D5CD17;
+	Tue, 28 Nov 2023 15:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJaOZf5Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pS9KXWrI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918D5D64
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:09:23 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso9409a12.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:09:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701184162; x=1701788962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=feGXB/rdpG9TDF6nNl8jQntxhUa7qIZYHR5IrUl/VUc=;
-        b=mJaOZf5Yc26c08HymnIiiZey4VdV09L9d1LgKe4EEc8jlKmqwwacDgF6nfccX9+xEh
-         WJCJmKLg1HnU5U+R+3xZ33CN//6z+poIFr6c8daQTXcQdjH+cdvZKzIWj2C+HlMEgQIl
-         7+DcBYjvrQbYvdIgW91a4RJg0juf9qumnf5NiCXeMIOzQCtJjHk0Hl1gi3fea+E9SE4Q
-         TKiG4I33RerJgbt+mLPj5VlOh7q6D9FwYfy75jzJeoEFqNYTwbiofGPVNF6wcYXt0RJx
-         YGaXzweG+UsbkEzvB+kHbXllQr38DoYkOI+n+bYrHYYy66f15wKOayjMECWsaFn6s6EM
-         Tpww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701184162; x=1701788962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=feGXB/rdpG9TDF6nNl8jQntxhUa7qIZYHR5IrUl/VUc=;
-        b=okBwKcfGue8lptNpCAZVzpvgsXyikcbKx3gicg3zQCJS3Uh0SD5y7Spr5bWKof5GAK
-         HhHqRZgI4hmuDrH3D3Y8cvH8f0sq08gmhQ8CpSOv+yAsS7JdjtTx/za71/5yF866/wTL
-         LQ1hOTxGK6YrYKk+NlyEeM3DBabsSbUiRhe15yoXwS5PZQ4kK/WSBPdGU/ymIrU2Oyhq
-         sSPuwheM1Z8eq9E1Q5JYNapgj+AHulVPdsXrSBx55aXOpqZUB1AMMmqVsM/iZmoV79xB
-         N1Sw4CtHnoul9ZzN94NX73e6BHET1nJwNDhmBlcbPwlcELonlnZ2X+cnZLjgec0GzxA7
-         UnlA==
-X-Gm-Message-State: AOJu0YxagS9oVPqjLANTlrzBtYF8LCuSI8cRawfoFUHPK8SWj2S3gX4Z
-	nUfi/gyGufeXBnTgMcanipwWGfxtwRs12LERvHeUMQ==
-X-Google-Smtp-Source: AGHT+IEnOBVrLQpLXtuvTXbsNy0Ta38lUsRvrZeJH8igXtbmpjO9sDxmbGEMP04yO2gSASOUBLEb8mS7gMlfble0VY8=
-X-Received: by 2002:a05:6402:3510:b0:54b:2abd:ad70 with SMTP id
- b16-20020a056402351000b0054b2abdad70mr409711edd.7.1701184161821; Tue, 28 Nov
- 2023 07:09:21 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1595C081
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:10:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D37D6C433C9;
+	Tue, 28 Nov 2023 15:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701184227;
+	bh=ypxTtCyXWgfFA9YBmaYcWg4oS4uF6KU1B/4hQ/kcalI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pS9KXWrIpGE5ADHef1Z9BTb9gBe+LmalNu5AN4TfIb4f+YbzZ35aZ48UdIsQM8t8r
+	 VsKOp/gtdezdQB061o4xdzp+kDQyF6DlXa9mIrXsG5GEEcWhZe9aPNdvVezvpQO4yQ
+	 OwmpSARgKi3NScmXfj+9hIc9CoHkzjq0uwC3vxQCGPQgCQrnZ9AoqFDaJuruslWX7D
+	 FxWN5kbfEEIYkbCKf4ZRndpFTO5ETfnGOycGSUxC//gx/slfSUsEwA4Axd0xnS/HlP
+	 JFe6FrLVkTE8h0h3YCApAm9jwtEjlxuWt98ITgnu+PSlAAPCR1BXx1LveoWWmQH6c1
+	 EIALncoE8//4g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5383C39562;
+	Tue, 28 Nov 2023 15:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231125011638.72056-1-kuniyu@amazon.com> <20231125011638.72056-4-kuniyu@amazon.com>
-In-Reply-To: <20231125011638.72056-4-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Nov 2023 16:09:10 +0100
-Message-ID: <CANn89iKE310bPya+40rapCzbmKei_3mEy3MS2y2aY0t=RowUVg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 3/8] tcp: Clean up goto labels in cookie_v[46]_check().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 00/13] net: page_pool: add netlink-based
+ introspection
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170118422773.21698.10391322196700008288.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Nov 2023 15:10:27 +0000
+References: <20231126230740.2148636-1-kuba@kernel.org>
+In-Reply-To: <20231126230740.2148636-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org,
+ dsahern@gmail.com, dtatulea@nvidia.com, willemb@google.com,
+ almasrymina@google.com, shakeelb@google.com
 
-On Sat, Nov 25, 2023 at 2:18=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We will support arbitrary SYN Cookie with BPF, and then reqsk
-> will be preallocated before cookie_v[46]_check().
->
-> Depending on how validation fails, we send RST or just drop skb.
->
-> To make the error handling easier, let's clean up goto labels.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
+Hello:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 26 Nov 2023 15:07:27 -0800 you wrote:
+> We recently started to deploy newer kernels / drivers at Meta,
+> making significant use of page pools for the first time.
+> We immediately run into page pool leaks both real and false positive
+> warnings. As Eric pointed out/predicted there's no guarantee that
+> applications will read / close their sockets so a page pool page
+> may be stuck in a socket (but not leaked) forever. This happens
+> a lot in our fleet. Most of these are obviously due to application
+> bugs but we should not be printing kernel warnings due to minor
+> application resource leaks.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v4,01/13] net: page_pool: factor out uninit
+    https://git.kernel.org/netdev/net-next/c/23cfaf67ba5d
+  - [net-next,v4,02/13] net: page_pool: id the page pools
+    https://git.kernel.org/netdev/net-next/c/f17c69649c69
+  - [net-next,v4,03/13] net: page_pool: record pools per netdev
+    https://git.kernel.org/netdev/net-next/c/083772c9f972
+  - [net-next,v4,04/13] net: page_pool: stash the NAPI ID for easier access
+    https://git.kernel.org/netdev/net-next/c/02b3de80c5f8
+  - [net-next,v4,05/13] eth: link netdev to page_pools in drivers
+    https://git.kernel.org/netdev/net-next/c/7cc9e6d77f85
+  - [net-next,v4,06/13] net: page_pool: add nlspec for basic access to page pools
+    https://git.kernel.org/netdev/net-next/c/839ff60df3ab
+  - [net-next,v4,07/13] net: page_pool: implement GET in the netlink API
+    https://git.kernel.org/netdev/net-next/c/950ab53b77ab
+  - [net-next,v4,08/13] net: page_pool: add netlink notifications for state changes
+    https://git.kernel.org/netdev/net-next/c/d2ef6aa077bd
+  - [net-next,v4,09/13] net: page_pool: report amount of memory held by page pools
+    https://git.kernel.org/netdev/net-next/c/7aee8429eedd
+  - [net-next,v4,10/13] net: page_pool: report when page pool was destroyed
+    https://git.kernel.org/netdev/net-next/c/69cb4952b6f6
+  - [net-next,v4,11/13] net: page_pool: expose page pool stats via netlink
+    https://git.kernel.org/netdev/net-next/c/d49010adae73
+  - [net-next,v4,12/13] net: page_pool: mute the periodic warning for visible page pools
+    https://git.kernel.org/netdev/net-next/c/be0096676e23
+  - [net-next,v4,13/13] tools: ynl: add sample for getting page-pool information
+    https://git.kernel.org/netdev/net-next/c/637567e4a3ef
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
