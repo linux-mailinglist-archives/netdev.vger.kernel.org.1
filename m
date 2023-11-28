@@ -1,49 +1,60 @@
-Return-Path: <netdev+bounces-51563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675F37FB280
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:17:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F567FB28D
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9882C1C209DF
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 07:17:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF199281C41
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 07:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C050912E42;
-	Tue, 28 Nov 2023 07:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C862412E4D;
+	Tue, 28 Nov 2023 07:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HvKJb6X7"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="g07ucgNF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 432E7D4B;
-	Mon, 27 Nov 2023 23:17:10 -0800 (PST)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AS5TPPG009575;
-	Tue, 28 Nov 2023 07:16:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=x6K4f+OPEftNFmuo369lliTD2CG6kzo5gCB7A0J1JUo=;
- b=HvKJb6X7jfrCJ/jBEjfvG8idvHVgOGLW7sSR/9XkZ0XgfAQT2dCVwQ3FlgMr1zHLv7Bd
- k0Qde/VsA4P1krjzB+vDDfFRQR8SvjZADITqwI105hwueMJ+zKEpm/nn75DmzHyMTING
- IYcE+45JEvFLVj56O2vwP3bBiGmKYglh6nbdia0QuOSSxG6YwxkaYodcUm+uDAgxrtNK
- D8havENIU+ItbQVt9xTRMg/Ue8UqryiMsW8sMJbLLcbHS3vorLCA1I78mcNvo1Sk2dsI
- FJiwC1SDa22bRSdxSJbhUiMgQBo69znm/hwWorBvcPDFhGvhY6KStjUB/F33Mpih2Pas Qg== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3umt632mk1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Nov 2023 07:16:52 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AS7GpMj014522
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Nov 2023 07:16:51 GMT
-Received: from [10.253.72.234] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 27 Nov
- 2023 23:16:47 -0800
-Message-ID: <9c4c1fe7-5d71-4bb2-8b92-f4e9a136e93d@quicinc.com>
-Date: Tue, 28 Nov 2023 15:16:45 +0800
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C277FD4B
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 23:19:25 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40b4a8db314so5108725e9.3
+        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 23:19:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1701155964; x=1701760764; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0O6zkzqcbMXlk51y4qrd5QMvvb/RA7s3YqrHm2H8b8s=;
+        b=g07ucgNF2LPg6dltMpU375rif5bDG3ZExzY2cjdjiTWV81RIsfMliqyICRuenVzTUh
+         wn/e3ZyRmb8i+q17MdQnTkThENDaO9WdJOqa+tA/gcffCL9rriCgnOp0SWEwc2ywIXtM
+         usxiPKh69JpcZEYyoXXCgoZxLMAKwID+xUu/BV1sFUSJujKC1iHiqVuDlNEHUhnZVtTb
+         hu4KwMYA6PTnfV2+tPQ3XjiOG0YYHf/KcSKg1VQsoo9jdk+RvKKYlhicCAtASjhW/WNI
+         o/FE93WJ9T0MtmNjgfZLDsPzbY4zqkgBlfyZlGkyqW1FEgYbepp+h8D0ibLwcgjhYIoS
+         H2/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701155964; x=1701760764;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0O6zkzqcbMXlk51y4qrd5QMvvb/RA7s3YqrHm2H8b8s=;
+        b=GOrZY17Wmyz0BQ9vg45DpucF3qojL8cjuDaZaFoFLwfi+DGGETASyEKzWsEiPp+zER
+         5/teMZVKgNHF+aFF03sx9OfWvhQsoaXR5PrKGa7NUtOIBEx3h6EwkB+w7CJOq4W7k3l7
+         h5IPqeMhRwtgehsWwhUDLL4sfxeBGePU0rVg4c6xaaJ/hR1ItbMMdmo5IzdIHNl+lL5e
+         sLBs2Fa2RdRb0zWC7JJe/IVtcr2jFxk4v2V0U5hPjRURfmO/BjwOUofkIHIC748Igiz5
+         udZ8xvofUp4m7j9cPvZiVnciK/io0lJIQS40BO1cNde/OqmqS+uf4lHD5uzA0Q/6CKYV
+         M9ow==
+X-Gm-Message-State: AOJu0Yxi+1IqRFu7+H+/jFZ11fN2ArBs2Poo3jIukxCWl1WFgezwgY4h
+	gH+UzTLgbpW7I4mgMldVTgjXxQ==
+X-Google-Smtp-Source: AGHT+IF5taK0NZHqg4xe1+c8aXbHW/UIOdJy182/wWh13QjbphEIYyGBNwkaFNNSrctEIo5miCp7kg==
+X-Received: by 2002:a05:600c:3b16:b0:40b:4007:11f1 with SMTP id m22-20020a05600c3b1600b0040b400711f1mr6444085wms.11.1701155964070;
+        Mon, 27 Nov 2023 23:19:24 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.125])
+        by smtp.gmail.com with ESMTPSA id s9-20020a05600c45c900b0040b3829eb50sm14869836wmo.20.2023.11.27.23.19.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Nov 2023 23:19:23 -0800 (PST)
+Message-ID: <20811ebf-04e0-4196-9d0e-bd46a88065dd@tuxon.dev>
+Date: Tue, 28 Nov 2023 09:19:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,81 +62,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/6] net: phy: at803x: add QCA8084 ethernet phy support
+Subject: Re: [PATCH 1/6] net: ravb: Check return value of
+ reset_control_deassert()
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231126060732.31764-1-quic_luoj@quicinc.com>
- <20231126060732.31764-4-quic_luoj@quicinc.com>
- <0b22dd51-417c-436d-87ce-7ebc41185860@lunn.ch>
- <f0604c25-87a7-497a-8884-7a779ee7a2f5@quicinc.com>
- <8e4046dd-813c-4766-83fb-c54a700caf31@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <8e4046dd-813c-4766-83fb-c54a700caf31@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de,
+ yoshihiro.shimoda.uh@renesas.com, geert+renesas@glider.be,
+ wsa+renesas@sang-engineering.com, robh@kernel.org,
+ biju.das.jz@bp.renesas.com, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ mitsuhiro.kimura.kc@renesas.com, masaru.nagai.vx@renesas.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231127090426.3761729-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231127090426.3761729-2-claudiu.beznea.uj@bp.renesas.com>
+ <b23a5e0c-cc55-b7b2-a6dc-1eac0a674814@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <b23a5e0c-cc55-b7b2-a6dc-1eac0a674814@omp.ru>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: sQivrcbt6sr1381r_AlFHt39Y1KM7cWh
-X-Proofpoint-ORIG-GUID: sQivrcbt6sr1381r_AlFHt39Y1KM7cWh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-28_05,2023-11-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=734 bulkscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 clxscore=1015 impostorscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311280055
 
 
 
-On 11/27/2023 9:22 PM, Andrew Lunn wrote:
-> On Mon, Nov 27, 2023 at 02:21:46PM +0800, Jie Luo wrote:
->>
->>
->> On 11/27/2023 1:31 AM, Andrew Lunn wrote:
->>>> +		/* There are two PCSs available for QCA8084, which support the
->>>> +		 * following interface modes.
->>>> +		 *
->>>> +		 * 1. PHY_INTERFACE_MODE_10G_QXGMII utilizes PCS1 for all
->>>> +		 * available 4 ports, which is for all link speeds.
->>>> +		 *
->>>> +		 * 2. PHY_INTERFACE_MODE_2500BASEX utilizes PCS0 for the
->>>> +		 * fourth port, which is only for the link speed 2500M same
->>>> +		 * as QCA8081.
->>>> +		 *
->>>> +		 * 3. PHY_INTERFACE_MODE_SGMII utilizes PCS0 for the fourth
->>>> +		 * port, which is for the link speed 10M, 100M and 1000M same
->>>> +		 * as QCA8081.
->>>> +		 */
->>>
->>> How are these 3 modes configured? I don't see any software
->>> configuration of this in these drivers. Can it only by configured by
->>> strapping?
->>
->> The interface mode is passed in the .config_init, which is configured
->> by the PCS driver, the hardware register is located in the PCS, this
->> driver will be pushed later.
+On 27.11.2023 18:39, Sergey Shtylyov wrote:
+> On 11/27/23 12:04 PM, Claudiu wrote:
 > 
-> Is this the same as how the syqca807x works? Can the PCS driver be
-> shared by these two drivers?
+>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> reset_control_deassert() could return an error. Some devices cannot work
+>> if reset signal de-assert operation fails.
+> 
+>    Well, I think all devices can't work if the reset line is connected at all. :-)
 
-I am not sure syqca807x, would you point me the code path of this driver?
+I was thinking at the fact that the de-assert support was added just 2
+years ago, while the driver seems to be ~8 years old.
 
 > 
-> What i don't like at the moment is that we have two driver
-> developments going on at once for hardware which seems very similar,
-> but no apparent cooperation?
+>> To avoid this check the return
+>> code of reset_control_deassert() in ravb_probe() and take proper action.
 > 
-> 	Andrew
+>    I'd also mention moving of the free_nedev() call...
 
-The PCS of qca8084 is the PHY PCS, which should be new PCS driver,
-in the previous chips, we don't have this kind of PHY PCS.
+ok
+
+> 
+>> Fixes: 0d13a1a464a0 ("ravb: Add reset support")
+>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> 
+> [...]
+> 
+> MBR, Sergey
 
