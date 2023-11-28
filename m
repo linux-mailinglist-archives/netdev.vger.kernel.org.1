@@ -1,108 +1,115 @@
-Return-Path: <netdev+bounces-51601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F8B7FB4FD
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:57:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511DE7FB500
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:58:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACBE61F20F5F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:57:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E44F281370
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3339199CF;
-	Tue, 28 Nov 2023 08:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D348D1EB3F;
+	Tue, 28 Nov 2023 08:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ferroamp-se.20230601.gappssmtp.com header.i=@ferroamp-se.20230601.gappssmtp.com header.b="BykxVZt3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMZ0Vrsl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E146138
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:57:41 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50baa3e5c00so3934936e87.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:57:41 -0800 (PST)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C73F4;
+	Tue, 28 Nov 2023 00:58:14 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54a945861c6so7133404a12.3;
+        Tue, 28 Nov 2023 00:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ferroamp-se.20230601.gappssmtp.com; s=20230601; t=1701161860; x=1701766660; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nZ5f4xCIO2ZXm2cUVIZd9fOfVKkANnuLxl9JfSDH3H4=;
-        b=BykxVZt3ADcr/JfZmgteC6QClsl4e0+e/lD8tk1ttdCiE2NhUj1i91XVxlakBisFAR
-         NyFmWPeUm6xalZUM9K7w+d74hw6yBaCNzco+VL+8CPDT5QL4cONU8Z1t/fonepBwiF5X
-         eE9847dKF8noCvO83/g5gEpTfLIL+O+h2XlmgAkGXyk0j57HEFbvdcgu0LaZqD+AFXLn
-         s0gVIreJKHntV4YmTwVrS41djxJSNSNnR4TSvvK4mKNFav0JHhkdtAcOOLlSJyuQSoRW
-         8Qmz+nGgFGbVnhXCm76lfQFGxPx5LUi7yxUQM7yv3dbX1wW++RTN7THv10KExg/SAV6n
-         Pwww==
+        d=gmail.com; s=20230601; t=1701161893; x=1701766693; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7eThDWl/p719tUnMNV7tBdoRpTLwA6GR+r/kwIo8Uvw=;
+        b=QMZ0VrslsocHnaDUxbJ9hJ1Mi8HVpLisOjj7iB+jmbmTLVo9/9BOTF/ZSm4MzXmDPv
+         t/6bqlWbqVULF5K1CB3KX8xUlFju9Holt0MDX05h8JoyKvZ98jtS7CS9GmzWo1o8El5z
+         8MmZRmAyLaxX6TPb2crEVMXVCKiKav6xD/9VK5b/NvlLVMyRVbr4+ooc2+NkG+1plGvr
+         6w6Hy2GPzieTzIX2yyXq9cU6TR2/N3GqUfKBNc731s+iKrDEqpYh9o5T9fvdFe65zijt
+         BHpWV5uuJpNkKSBIYdzkKilP+Oi4G3yx2SOsKDKX4RGPsbzmpto1gl+LSsZxIfgqfHec
+         FcQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701161860; x=1701766660;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nZ5f4xCIO2ZXm2cUVIZd9fOfVKkANnuLxl9JfSDH3H4=;
-        b=Yayo4gKGwvB0+Z3zrUwPsJWJlHJDaTq90QSMXdANy8TbpQ2lWOE+FymbbA5tYUV3Vv
-         CH/fH2DzENAQRPmo/oE3KOWgwn248a17BsDn8qOuAVcHWnIPPyUd6Y60xY3W3dDP+O1l
-         1/UbwrYPAYxusgrzaIs3/W6h7KE/RLJ9KPnGf84zdEHVhj9+AukTDk/FEQbrINbL5L87
-         BTbUZ2Joa+hb5iVVMBM9TpaZ0MLba/pfzrYVCp+NVw4Oh0s79k/ucr9Ys05s2CwcA95c
-         E/phrfBh8H7DPNx1Sh3Vjk0EgamEtJ7yUHsG8hnr8zDfHMRWyIcjb5T1udtCpEOdTQ/E
-         Xcag==
-X-Gm-Message-State: AOJu0Yxl65TGwY+X8DLlFV+QS8PzGO3gp4ExTyIAL6AGNHvp+zH6UD9p
-	GfeJYZi3Vv4xxS18Yrsr4/PbOQ==
-X-Google-Smtp-Source: AGHT+IF34nWU7hOhaSOTP7wYX7j9yWUCipg9dusjDeaF8bjTmFBJ66VMTNPJbpiQ+ehJdbpDj763XQ==
-X-Received: by 2002:a19:5e03:0:b0:507:a003:57a2 with SMTP id s3-20020a195e03000000b00507a00357a2mr5918449lfb.52.1701161859761;
-        Tue, 28 Nov 2023 00:57:39 -0800 (PST)
-Received: from debian ([185.117.107.42])
-        by smtp.gmail.com with ESMTPSA id y26-20020ac2447a000000b0050aaaa33204sm1776147lfl.64.2023.11.28.00.57.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 00:57:39 -0800 (PST)
-Date: Tue, 28 Nov 2023 09:57:35 +0100
-From: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] net: microchip_t1s: additional phy support and
- collision detect handling
-Message-ID: <ZWWrf4svgQc8x1PU@debian>
-References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
- <d79803b5-60ec-425b-8c5c-3e96ff351e09@lunn.ch>
- <ZWS2GYBGGZg2MS0d@debian>
- <270f74c0-4a1d-4a82-a77c-0e8a8982e80f@lunn.ch>
+        d=1e100.net; s=20230601; t=1701161893; x=1701766693;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7eThDWl/p719tUnMNV7tBdoRpTLwA6GR+r/kwIo8Uvw=;
+        b=veuMsuEFbbdIjaB+Pq7BcSJxLXAGLqKIEIMTr8qgFZzLkdr1t2Tu0xQB1wDy1wb2Na
+         k9gGu9k1VV/4pBb9rKvz3J3vdzQftMHxe+sLhnXukjr78JWBYHjWGyBwyeSDSKN6sKDO
+         LA1OTP0bVcHgW6jcegAJ+HY9PRUGIf4kPoa92XWiCV/GpHDjbFOnUJJ+CCgPc2ageVuU
+         mwkVM/tuMsEIHeF4UuRp2bAgBr80WOMa+jX18HKz75YXFLeVjVpteYCZknRXFqgdus61
+         uZO2Yg1QME4plStx8aByiJYnpljixJ1oIltMxXnb0+K4XuKdcxMJYO5QZnSjhkT8PQ3I
+         9C1w==
+X-Gm-Message-State: AOJu0Yz5ARoskIiZn3+GWKOHd49Epzvjp2Dh653yx9mYcDfQPNaJodHR
+	RxL9J5I8cu2VqFT1Q+xvF+U=
+X-Google-Smtp-Source: AGHT+IFR5RnA5vAR+1Mvjlycnu2h0GtN0a4lFsYU5ANWlySGynJdKlWATFHR8EF2K/rPwT6dWGJYig==
+X-Received: by 2002:a05:6402:290b:b0:54b:9817:bf91 with SMTP id ee11-20020a056402290b00b0054b9817bf91mr1811570edb.7.1701161892405;
+        Tue, 28 Nov 2023 00:58:12 -0800 (PST)
+Received: from [172.27.56.182] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id e7-20020a056402104700b00542db304680sm6058243edu.63.2023.11.28.00.58.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 00:58:12 -0800 (PST)
+Message-ID: <3d3b6a1f-40b6-45b5-a899-d01acb91213d@gmail.com>
+Date: Tue, 28 Nov 2023 10:58:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <270f74c0-4a1d-4a82-a77c-0e8a8982e80f@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5e: fix a potential double-free in
+ fs_any_create_groups
+Content-Language: en-US
+To: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Zhengchao Shao <shaozhengchao@huawei.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, Simon Horman <horms@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Aya Levin <ayal@nvidia.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
+References: <20231128082812.24483-1-dinghao.liu@zju.edu.cn>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20231128082812.24483-1-dinghao.liu@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 27, 2023 at 05:03:54PM +0100, Andrew Lunn wrote:
-> > * 3-4 nodes (depending on how many usb ports and dongles I have)
-> > * run iperf with long cables and CSMA/CD
-> > * run iperf with long cables and CMSA/No CD
-> > 
-> > I'll report back the results. Anything you'd like to add/focus on with
-> > evaluation?
+
+
+On 28/11/2023 10:28, Dinghao Liu wrote:
+> When kcalloc() for ft->g succeeds but kvzalloc() for in fails,
+> fs_any_create_groups() will free ft->g. However, its caller
+> fs_any_create_table() will free ft->g again through calling
+> mlx5e_destroy_flow_table(), which will lead to a double-free.
+> Fix this by removing the kfree(ft->g) in fs_any_create_groups().
 > 
-> Humm, thinking about how CSMA/CD works...
+> Fixes: 0f575c20bf06 ("net/mlx5e: Introduce Flow Steering ANY API")
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c | 1 -
+>   1 file changed, 1 deletion(-)
 > 
-> Maybe look at what counters the MAC provides. Does it have collisions
-> and bad FCS? A collision should result in a bad FCS, if you are not
-> using CD. So if things are working correctly, the count for CD should
-> move to FCS if you turn CD off. If CD is falsely triggering, FCS as a
-> % should not really change, but you probably get more frames over the
-> link?
-> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+> index be83ad9db82a..b222d23bfb9a 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+> @@ -434,7 +434,6 @@ static int fs_any_create_groups(struct mlx5e_flow_table *ft)
+>   	ft->g = kcalloc(MLX5E_FS_UDP_NUM_GROUPS, sizeof(*ft->g), GFP_KERNEL);
+>   	in = kvzalloc(inlen, GFP_KERNEL);
+>   	if  (!in || !ft->g) {
+> -		kfree(ft->g);
+>   		kvfree(in);
+>   		return -ENOMEM;
+>   	}
 
-That is some really cool input, I have to do some datasheet digging and
-hacking. I'll try to set everything up today, tomorrow I can hang in
-the lab after hours and test things out!
-
-Partihban suggested that Microchips support might be able to help with
-testing, might give them a ping soon as I a solid plan.
-
-Really appreciate the insight! 
-R
+Function fs_any_create_groups should not return failure without cleaning 
+itself up. This is not the right fix.
+Freeing ft->g and setting it to NULL will do it, and will avoid the 
+double free.
 
