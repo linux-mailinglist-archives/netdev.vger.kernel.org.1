@@ -1,91 +1,115 @@
-Return-Path: <netdev+bounces-51626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160FA7FB6FA
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:17:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1410F7FB5BC
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C39F8282A91
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:17:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E4E91C210C3
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD5D4D5BB;
-	Tue, 28 Nov 2023 10:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC0746457;
+	Tue, 28 Nov 2023 09:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pxP9Rk3n"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sjtn6l7z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8B18131
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:17:04 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so7503a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:17:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701166623; x=1701771423; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rSU7RiW9kWBySWNiApnuifnrREcbeWKU+jp6ylDsDY8=;
-        b=pxP9Rk3n1G6JKdm2gTnTegccDt2874mVCg5qOudKJYHXhe4caA+XcYKc3scvBWLmXA
-         6SQrKOjD+l0VTl7U91SmldI+WOG955eGR5cfT0w/w3GXXenepMMHO0bX86PmR0c3Zepp
-         3OURCBe2/n2CMVBQHT2xJefzDncPUom7+lvQP7vJFw5GUlnX7THCsHdQOJQyaIVj6Eux
-         iQmryZXEhXARRAD4wUFgpKyakiw4XDp8R6lYm0cNjyGRTFRYyO4AWORrgTjV0VcjXN3+
-         paFGrxrDuOyuTdWrVgl59/7Qx6oiEYVUpgGsndVX5nXM30HtHh2f0nVcTIju+zM/r+k7
-         b5Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701166623; x=1701771423;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rSU7RiW9kWBySWNiApnuifnrREcbeWKU+jp6ylDsDY8=;
-        b=VqKecTf/DliRZQiBrkhCYIlOBrd8+tTfkKPPsTpaDMzosaFoaWOUtCHlMh5ivqHukT
-         7sq9KCaupvf5KYaoppOrQVo3lu6JPaZXfkQF/v8JdD96MfvT8w2uHe/q+xn0LVHTjyoM
-         IlkBJ4gWq5rXTphdpSIQjRg3rdpLBt2MHxYYtlulM1uXo6XXGsz1+r3d37Wn9hpvUybN
-         fKX7WpRhcPZkg5JiEZR6D7NgWmChuh5pI+RJ5v0oTdEpOjLaFT8JQPn5EbH79MWsWHaP
-         mQFTGsARwWj4ICOUnMralgywOnCV9Zjp4zIUITN3FupmeCGIwtKuE6a9dPBQVRCH9RYL
-         RMkw==
-X-Gm-Message-State: AOJu0YwbJisqRJAEV/YZcj5J5COiIrdm8Ec1Oo2E2r8jUlxTnn88kURs
-	yC4PlFfUJVk3xlRg2wnFE06nYuka1ma1IPwQmz0qHA==
-X-Google-Smtp-Source: AGHT+IHT21jrQA74w70vM2ZUlNPGfY7/KwZ2rB5qBpso7Yf59WKnCAYV1L8QVi/xNhNSJ9geHs5ZQxAFG/36oypU70Y=
-X-Received: by 2002:a05:6402:3510:b0:54b:2abd:ad70 with SMTP id
- b16-20020a056402351000b0054b2abdad70mr366833edd.7.1701166622845; Tue, 28 Nov
- 2023 02:17:02 -0800 (PST)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE405D0;
+	Tue, 28 Nov 2023 01:26:42 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 14305E000C;
+	Tue, 28 Nov 2023 09:26:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701163601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7SWqqO2Y/xiO+TRt8YQW+yLQIPdt2LTdZoHMxmm1Ics=;
+	b=Sjtn6l7zR30mQxJLlA3aYzk9WnLTcPBVw0DYsqorv2X4Go8xgOK4V3aCzIINxp+nkLGQK5
+	Ayse/f/Mse7tHbDjEPE+MPdWmz3bMf42OLOslD8lN5W9elEuudOQOBJjNrD+tiwAbEWIAr
+	SCTRi+QfaZVk0WJipImlHqNLPfi9dC88hjVDTFMScwVwr1vaJ5aeZQD3WVaCxQPTF2Ikz1
+	dlK4suG6cJLtk01cHyNVpoT0H7VlPB0VGUwvyIScf/5+mKM+5Bfq0T+bA2rNwRtCJDAFRP
+	Jp/kVUBaLItB12epGtBbbim4dhUuRLuNfhMK3eet1bJq29qppvLkNdVT6MzFIA==
+Date: Tue, 28 Nov 2023 11:20:37 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Simon Horman <horms@kernel.org>,
+ linux-stm32@st-md-mailman.stormreply.com, alexis.lothore@bootlin.com
+Subject: Re: [PATCH net] net: stmmac: dwmac-socfpga: Don't access SGMII
+ adapter when not available
+Message-ID: <20231128112037.21e2d5aa@device.home>
+In-Reply-To: <20231128101841.627fc97e@windsurf>
+References: <20231128094538.228039-1-maxime.chevallier@bootlin.com>
+	<20231128101841.627fc97e@windsurf>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231125011638.72056-1-kuniyu@amazon.com>
-In-Reply-To: <20231125011638.72056-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Nov 2023 11:16:51 +0100
-Message-ID: <CANn89iKyna3dhjaJ2fGaZtdd0JooQQ8j4b7r0Oo2g_axiutJ3A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/8] tcp: Clean up and refactor cookie_v[46]_check().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Sat, Nov 25, 2023 at 2:16=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> This is a preparation series for upcoming arbitrary SYN Cookie
-> support with BPF. [0]
->
-> There are slight differences between cookie_v[46]_check().  Such a
-> discrepancy caused an issue in the past, and BPF SYN Cookie support
-> will add more churn.
->
-> The primary purpose of this series is to clean up and refactor
-> cookie_v[46]_check() to minimise such discrepancies and make the
-> BPF series easier to review.
->
-> [0]: https://lore.kernel.org/netdev/20231121184245.69569-1-kuniyu@amazon.=
-com/
->
+Hello Thomas,
 
-I am back to wrk, and will review this series today, thanks !
+On Tue, 28 Nov 2023 10:18:41 +0100
+Thomas Petazzoni <thomas.petazzoni@bootlin.com> wrote:
+
+> On Tue, 28 Nov 2023 10:45:37 +0100
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> 
+> > The SGMII adapter isn't present on all dwmac-socfpga implementations.
+> > Make sure we don't try to configure it if we don't have this adapter.
+> > 
+> > Fixes: 5d1f3fe7d2d5 ("net: stmmac: dwmac-sogfpga: use the lynx pcs driver")
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > index ba2ce776bd4d..ae120792e1b6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> > @@ -243,7 +243,8 @@ static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
+> >  {
+> >  	u16 val = enable ? SGMII_ADAPTER_ENABLE : SGMII_ADAPTER_DISABLE;
+> >  
+> > -	writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
+> > +	if (dwmac->sgmii_adapter_base)
+> > +		writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
+> >  }
+> >  
+> >  static int socfpga_set_phy_mode_common(int phymode, u32 *val)  
+> 
+> Reviewed-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+> 
+> As a follow-up improvement, there's an open-coded version of
+> socfpga_sgmii_config() in socfpga_dwmac_fix_mac_speed(), which could be
+> rewritten as such:
+> 
+> 	socfpga_sgmii_config(dwmac, false);
+>
+> 	if (splitter_base) {
+> 		val = readl(splitter_base + EMAC_SPLITTER_CTRL_REG);
+> 		val &= ~EMAC_SPLITTER_CTRL_SPEED_MASK;
+ [...]
+
+I did saw this, but as this is merely a non-functional rework, I'd
+like to target this to net-next, so I'll wait for the fix to land and
+follow-up with this rework indeed.
+
+Thanks for the review,
+
+Maxime
 
