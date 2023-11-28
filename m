@@ -1,136 +1,195 @@
-Return-Path: <netdev+bounces-51627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A857FB70C
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C697FB7B9
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:27:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 932AAB213AF
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:21:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF206B23118
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641014E1D4;
-	Tue, 28 Nov 2023 10:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65A34EB52;
+	Tue, 28 Nov 2023 10:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="de3wIVJh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bO0k2nPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4403FE4;
-	Tue, 28 Nov 2023 02:21:48 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b472f99a0so13439635e9.3;
-        Tue, 28 Nov 2023 02:21:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701166906; x=1701771706; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=doZxVarw4yWuYz9GLd1CkeNGgwRvUrOLU0u2bie84jA=;
-        b=de3wIVJhO9Ovv0sSo7Klp4C3HtICepzp7wOUxa/udqSt36vfCy1Td48enGjG0+QTdg
-         fgbBm5zqamjVW5hGoeUT5N89pg+/fjHox5rDXiFXOnfR2eroEjw47/oPVgdXFlrWIGYy
-         dH4/s6eIquzLOFh+uIhMx/ed1RUlX5s2VypPSZ+x3NHtgOzcXnxb5uky13uc8C6w2KdX
-         MGkbzKB47OckHDp8quKThQE9AsOyzkMd77kgTYxGyevWroOKtrZGEMB/kvXBme6Uphem
-         rMzhMBtjrOb2m9HYpncNXkVFro5NOvW+peVXPXCJpJFVmucE48TMuGJnI9Ty0shj893b
-         fD9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701166906; x=1701771706;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=doZxVarw4yWuYz9GLd1CkeNGgwRvUrOLU0u2bie84jA=;
-        b=Y+EeUbD0cwBW+LbG4npiewZyiP7k9aNygKoZL6pOLGRhC+hWP/3EYNO7n48YyYEqxD
-         mqtxnt1wjmhr5S4DUPYXH0Z4ZyjeGcdFIeTu9TFDszAwoVJDT4v0l25sCDy59am0Na+U
-         jzqHIn2WXu6bfNbpDfdtqyPEph7Gpf6GouvXY5yJcmC7qVkNOYXRwdck2P/7WSiBIy6q
-         14aVj8IISG45nnV71qZVJiu09YowM9KKKx4e4GBzgjUo8NximMA9zVDEck/sXux596Y4
-         CgP77+ITAnBAN8QsUl/0NTHQupi+hVBcNutK+RPB/2eyMRw4ytWKYHCFKc3M43yl+17G
-         qGHQ==
-X-Gm-Message-State: AOJu0YwinHqnhEAlU6lHmE/frykqSEZ47hy3Y/EvsE0ZaMsbFgdVL7wJ
-	DAIt0Ep6m/bwfIdgJ3gkNZm58rqQ1Fe58w==
-X-Google-Smtp-Source: AGHT+IEViRgEV2pMIv6kyvj4s1ko5EpvSZDqRr/sFKlgMMcYYCvm9fSuVqeyovLGpF7jZ9b4Q2lVeQ==
-X-Received: by 2002:a05:600c:1f93:b0:40b:3dc0:1ff with SMTP id je19-20020a05600c1f9300b0040b3dc001ffmr7878883wmb.6.1701166905801;
-        Tue, 28 Nov 2023 02:21:45 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:804c:ab2b:6aea:3a2d])
-        by smtp.gmail.com with ESMTPSA id w21-20020a05600c475500b0040b2976eb02sm16852740wmo.10.2023.11.28.02.21.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 02:21:44 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  corbet@lwn.net,  leitao@debian.org,
-  linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: netlink: link to family documentations
- from spec info
-In-Reply-To: <20231127205642.2293153-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Mon, 27 Nov 2023 12:56:42 -0800")
-Date: Tue, 28 Nov 2023 10:21:30 +0000
-Message-ID: <m2leai89g5.fsf@gmail.com>
-References: <20231127205642.2293153-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8A13A88;
+	Tue, 28 Nov 2023 02:27:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701167224; x=1732703224;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sX9CZb2J1tZ9gU0FByM4qZfFQlsRDLGB61h1oRxrXCs=;
+  b=bO0k2nPhi4nnQ5TNHzUBj7LSXBmdNHwD3k7Q+nlSWLBueekhfaDmx+fA
+   l7vhhWEoHkT/eM28axliP0h2lKvKrPh812cvINOkFw3lIKSj4Rd7thRzb
+   2BydGKFtD3E0Chg+UYS18HU52B5tCt4tjl8PqbhR2VYTjkZbuEWomsTYy
+   Zn7EYmbiveJRXFwFOccYqQ7ZI0pam6uvLvR16hM8+etpvy2XgnuKZlCGU
+   wCeRkQ8zAdWQkrv0u8+siDS7sUACKycgKxGQkfABPiiFlIeohGMk60pGd
+   Sq2MAhNhCqXQ+58n+CVqlYK9rLfDzt8/6MgLc3j9CRP3kKYCgRmGvjPYx
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="396799541"
+X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
+   d="scan'208";a="396799541"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 02:27:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="802929661"
+X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
+   d="scan'208";a="802929661"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Nov 2023 02:27:04 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 28 Nov 2023 02:27:03 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Tue, 28 Nov 2023 02:27:03 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Tue, 28 Nov 2023 02:27:02 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=by0+wjQO4EsnLuqACc7XvbU1RoLnPa5F5DyEp8B0jRjBvZecHRJa+gsEr7NNLcK4aVx4jsL4xAAoUag/UeHwAcMgwkgPzBI0tS1kDRtafJPbIDFvPJJD93+Ucuacr9s/nmSVZNfltQ212yYwUk3Na5W+UjOKtObiezHXyE9OCpMI8uoCrpXiAfKXQihKbrb8eEGe6gaJX0uWk6VUTIOjp/0jGZbAP/nQ7pKbQz8TBwFu4mnEoTvuH0d3skcpHx2kABK09usjEXFd4bg+J826wIrOkeIezSqSnmYuX+D7wrSa2yo/22W3S95SIGyJhmhfpgxqXtF9q0zwNjyHTbkt4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1hqnTyfbdXbgXXAOs1pptlst8+X6ZHNSiCHRQljUKgQ=;
+ b=EqkGfo1V2751NfCEO2EafCqL2qKcZmAqQOVTDXRSlLUFM206DNqF1UDZGDIN5+6Gu3Mga2hqQ/yNqrrK0kTgqfQFdY7K24DPylmT7w+l+3uQuKaiKt0y6yOTxKVHX/DAXudCXVnCBhmXxJOV7cQHdmjzl0CtZQayWKuJpu7TqbLKKPHBJb6o+cbLsiMPJPlG46FFbkUWcX4zpJJX2YOdaNzmP8KjsZ1mCn0B2dQqLdct7ibGuN31tM2/6phVGWjWP6tUEv2hIWHLiOsDCox5kHJBATgZfYkiLlT1SG/ecRo8XDEIaoU486vd6LazcNAjh6fpDpsxg2gNPoJ38NCXQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
+ by SA3PR11MB7612.namprd11.prod.outlook.com (2603:10b6:806:31b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Tue, 28 Nov
+ 2023 10:27:00 +0000
+Received: from BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
+ ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
+ 10:27:00 +0000
+Message-ID: <344baee8-16ce-88ce-ad51-609fc70f38ed@intel.com>
+Date: Tue, 28 Nov 2023 11:26:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH iwl-net v4] ice: Block PF reinit if attached to bond
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, "Bahadur, Sachin"
+	<sachin.bahadur@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20231127060512.1283336-1-sachin.bahadur@intel.com>
+ <ZWRkN12fhENyN4PY@nanopsycho>
+ <BY5PR11MB42574D2A64F2C4E42400213A96BDA@BY5PR11MB4257.namprd11.prod.outlook.com>
+ <ZWWYx18w2BnLyAZL@nanopsycho>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <ZWWYx18w2BnLyAZL@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0151.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:98::14) To BYAPR11MB3672.namprd11.prod.outlook.com
+ (2603:10b6:a03:fa::30)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SA3PR11MB7612:EE_
+X-MS-Office365-Filtering-Correlation-Id: f2d1ac2b-6e2a-4daf-a1a2-08dbeffc8ea1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vUxqK2IIJHi2CyW/GG7zQsnT2dhdjoh/mDR9SvPdEbZCO+fxrtdIMSJtT3qRlWBgRGBEeH4tT0Prl9MvFN21IxWLEWOafsTz9C8/URTB0QgLhxlTs+ZcHmS9pA8IX2rcNmPkYAs5Lvh8yj1vJhrI2i76qbo1BU9Ek9Allu7P3KMR0hjJcj6R4j7knJ0nQW5Jpez0EkCfeWVlSFJFoOWWHezgBvTZ4FothKR7lozNoWGO5s454JU634uajnkIL0gGAuATKAELcRGb6dUTOxoys3JSiSFedQ8o5fNbOHgRxQaS3pno8poS17DoL/Brf6g7Oin+fQ7dzheaSbbtGiRhWH3UZqHLEXGGi3ZXv6/uZubOm1ekvFC6wyamNh65gTJx7LDJo3u+CrmBoh3bzbOAfe82Q2V06BVjm+rZt/UMuT31wytKUZ6bg7vxlk2ks5kspsaZHwXRJ4RV8Jsi9q+6VCvu/fDAkGOJRQv/gHjmBfN5nbf+BOa7w/lQrRPz8UwyCJQVFiMGW4yZNNQHKWNyra5k90pLV3C94gqXsFDUAhfStxim7dd5pAdBB+J6zRkGa2glYJNlJCNVyVK/u98gn/dFDMHqDRc+aU6YmVwjSszUTRNrh2+RxXrj5I2Doy2Krz4IvcDZMZ664ArAB6Tmpg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(39860400002)(136003)(396003)(346002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(38100700002)(41300700001)(36756003)(31686004)(4744005)(83380400001)(5660300002)(82960400001)(26005)(86362001)(2616005)(2906002)(66476007)(6512007)(53546011)(6506007)(8936002)(31696002)(6666004)(8676002)(4326008)(6486002)(478600001)(6636002)(66556008)(110136005)(54906003)(66946007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bUhQZzQ2K1ZzQmJmcmhpL2FoWW9KMW5TeGZoYWtoQ3BNenArWjRZN2o0T2Ni?=
+ =?utf-8?B?YlI2dzAzQmMyWGUzYU9yOUJ3bHlkUEd4ZFZFUmR3NkxVVThBdmFQbm1QOUF0?=
+ =?utf-8?B?c3Rndnk0YUdYOEYvTFpVMTB4Nmtra1dxZlc3dXJxUms3QVRnK2ZQRE03L1M5?=
+ =?utf-8?B?eFZnSUtabkl2MHhGNTFlajh6UGY4MEUzd2F5Qk9BeFErM2hyOHZSRzM4QUI0?=
+ =?utf-8?B?MkpRaE1xVCtVSmZSM0FsWG5hNHhva0tFMDErNzRlV2Z5NnRFdnpCL0ZmbCt2?=
+ =?utf-8?B?Q0doNUx0ZU1aRFJDNjJsNC81YnlWeUV4dHEwdjNqakZSL09jWTQ1Q3VKbDVi?=
+ =?utf-8?B?UTE4bWRsdHk0R1pIZ0ZMRyt3ek1RWmFaeTdOTXJib05VMUFCb2xyc2o5b2E0?=
+ =?utf-8?B?M2pLdXRSd1l6UzI0K25tL21Gb2kySnl0d05TTUpUQnNSNGZhWEF4RGl1b0FF?=
+ =?utf-8?B?YVExc1piczArTjdvSk5kYnlnK3JEZkZnZ3Nab0h0VHdBdjJwOTRZM2xHeC82?=
+ =?utf-8?B?MWlwUFh6aEYzTEVhZzljdUt5bGJDamJXaVRveDZQQ3lyWG5Da0p0aS9FS0J4?=
+ =?utf-8?B?SlJqZzhEcE5CejdNaS9xaVgwNlkvOGNlQ2hrYlRzWXJGVkZwMU9DdmZHNnhZ?=
+ =?utf-8?B?YWdxeTh5OG40amhTaFZQcllBc1NndHM2TS9HNnAwVjg0c3VoeVVjRHl4aEd2?=
+ =?utf-8?B?Mkx1MlArVERwemF5UmtFQ0NTbUdZNGMxSGlQTVRNWTNGbW5aZW5xUlRPSzgw?=
+ =?utf-8?B?cXhmb1kxYnZudXdoQ1c0UEtzTVliaWNtU1ZMY3BsUzg3SUpNb3ptTUc1V2ZG?=
+ =?utf-8?B?cjhuRG5hR1VhdWhzRGNpM1V2ZnpUMWlTejZidE9RQmd0N0V0eFYwb1AzOHFj?=
+ =?utf-8?B?aEZaaFROcGFUd2N0ckhPNy9heXdUekRaUHFaRE12bXRTcndMUVM0b0xTSnp6?=
+ =?utf-8?B?Z2ZpMjBUSnllaVI2NlpsSlRQTU9PNm1hMEhwRTQ2Q2thZEN0QjFqOTNqSU1R?=
+ =?utf-8?B?SjVZQmw1eWgwME9oY1JmbGR2cG9EU0VIYTJ2MTdmQmgvVUxRZFdpRFN1bjJH?=
+ =?utf-8?B?QnZzbnBjUGY0RmpEeTZOMW5lTUFVVHp2d3NXdlNaNjl4ZTVYd2lPSWpMWkJK?=
+ =?utf-8?B?ZXozSDhuOVRxYUxORE9kNERSZXhBZFNJNXpTdU4zU2ZoZWEvNHRWUzZMeTZs?=
+ =?utf-8?B?dHJVejhUQ2FINVJTQ0VsUGJZcWJDamJkTnZ4eFNJdUJ4M3dvNWw0cE1NUGFJ?=
+ =?utf-8?B?UUtnWFEvODJxcjhldTZxdXVBakFhY2R5Mi83SHVKVitrb1Y0akJXZlhja3NN?=
+ =?utf-8?B?ZjR2bWxuNWVQV0RGRzYwOHhLUUJvbE5jZUxpTHRBMkQrd2dPbXF6V2lBd2Vk?=
+ =?utf-8?B?V0xyekNONXJ2eEhvbC83dmlNL05PNkZYcEs4aHJrb1diWkJnd1h6ZWdodlJO?=
+ =?utf-8?B?NTRLMFVqMU41UGtoYzBIQWVEeGhWTkVvOEhQM2pKaXhNU1ZsQVMxSHNnVHRJ?=
+ =?utf-8?B?d3BPNkhFZWU2SGxVMHp2dzUwcS9rWmVlSk1DdGFCUWp3U2gwMEtGQW5EQmxW?=
+ =?utf-8?B?ZDFISHFSMUQrUC9weXhYNy8xa2lFcGJ2clQxNy9heUZHWDlORHNDdUlsdTNT?=
+ =?utf-8?B?NmFTU3V5UHNBNXQxUTVZSkJGN0VUdlZjT0FzcXZXRjJFR0dBZVVtclBoY2ta?=
+ =?utf-8?B?aWhYNHlpK1Z3YUhJb1ZSVGwxV3NMQWN2aDlFSUF0S0t6OW5IV2x2eWUrTkRB?=
+ =?utf-8?B?azFXUGhwNW5NeW5UeEdFS0R4VGxpQ3lyR3VKM3JtYUVWdmdKbFZQN2RuQWdz?=
+ =?utf-8?B?QzA2ZGs4aGh5Qi9QSlVrSWkveUVCK0tKZVpyL21waVd2dFB2RkNkc1ZqVjBi?=
+ =?utf-8?B?YTdWc29Kam11eldteG5hTGdHcHQxQ09DV0VLTU1nNWJVM0VwSHpCYU05MzdK?=
+ =?utf-8?B?VlBLQ0htbnEzZVYzZlFxVzlZVHloWU84Q28rODVxTDdyZmJ3RGZzUjRLbzhJ?=
+ =?utf-8?B?Y1BIZzhPVlptdHRuWVA5WWRnczg5cG9odUNPTjFCRWlhTkw2M3ZrbmpsRnFM?=
+ =?utf-8?B?Y2pYaE9aUUpuV3EzUmhudXVzNVNTSTJCTGUwVjRlZ3FQTGZSNlN4b0VYS2w1?=
+ =?utf-8?B?RXRuUC8yWUJLZkhDUE51V21qYUlJNk1uS1MzbWtTNy9IdmZ3YmtGMmZSak0z?=
+ =?utf-8?B?d2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2d1ac2b-6e2a-4daf-a1a2-08dbeffc8ea1
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 10:27:00.8043
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OWeWaNlUzOezj25IOHwiwwx229s0sns3pgS8VrlBkiCJuytbbHmFx8A6QGXsZZaqpap4j6Bd8T9o5D+CifjWW6KYoLJwDngNTArBvXYEYpc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7612
+X-OriginatorOrg: intel.com
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On 11/28/23 08:37, Jiri Pirko wrote:
+> Mon, Nov 27, 2023 at 05:23:55PM CET, sachin.bahadur@intel.com wrote:
+>>
+>>> Nack. Remove the netdev during re-init, that would solve your issue.
+>>> Looks like some checks are needed to be added in devlink code to make sure
+>>> drivers behave properly. I'm on in.
+>>
+>> Sure. This fix should apply to all drivers. Adding it in devlink makes more
+>> sense. I am not a devlink expert, so I hope you or someone else can
+>> help with it.
+> 
+> No, you misunderstood. I'll just add a check-warn in devlink for case
+> when port exists during reload. You need to fix it in your driver.
 
-> To increase the chances of people finding the rendered docs
-> add a link to specs.rst. Add a label in the generated index.rst
-> and while at it adjust the title a little bit.
+Having a message in log that reminds devs would be useful, thanks!
 
-It might be useful to also link to the rendered docs directly from the
-"Netlink Handbook" at Documentation/userspace-api/netlink/index.rst?
+> 
+>>
+>>>
+>>>
+>>>> +			return -EBUSY;
+>>>> +		}
+>>>> 		ice_unload(pf);
+>>>> 		return 0;
+>>>> 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+>>>> --
+>>>> 2.25.1
+>>>>
+>>>>
+> 
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: corbet@lwn.net
-> CC: leitao@debian.org
-> CC: linux-doc@vger.kernel.org
-> ---
->  Documentation/userspace-api/netlink/specs.rst | 2 +-
->  tools/net/ynl/ynl-gen-rst.py                  | 8 +++++++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/userspace-api/netlink/specs.rst b/Documentation/userspace-api/netlink/specs.rst
-> index c1b951649113..1b50d97d8d7c 100644
-> --- a/Documentation/userspace-api/netlink/specs.rst
-> +++ b/Documentation/userspace-api/netlink/specs.rst
-> @@ -15,7 +15,7 @@ kernel headers directly.
->  Internally kernel uses the YAML specs to generate:
->  
->   - the C uAPI header
-> - - documentation of the protocol as a ReST file
-> + - documentation of the protocol as a ReST file - see :ref:`Documentation/networking/netlink_spec/index.rst <specs>`
->   - policy tables for input attribute validation
->   - operation tables
->  
-> diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
-> index b6292109e236..2c0b80071bcd 100755
-> --- a/tools/net/ynl/ynl-gen-rst.py
-> +++ b/tools/net/ynl/ynl-gen-rst.py
-> @@ -122,6 +122,11 @@ SPACE_PER_LEVEL = 4
->      return "\n".join(lines)
->  
->  
-> +def rst_label(title) -> str:
-> +    """Return a formatted label"""
-> +    return f".. _{title}:\n\n"
-> +
-> +
->  # Parsers
->  # =======
->  
-> @@ -349,7 +354,8 @@ SPACE_PER_LEVEL = 4
->      lines = []
->  
->      lines.append(rst_header())
-> -    lines.append(rst_title("Netlink Specification"))
-> +    lines.append(rst_label("specs"))
-> +    lines.append(rst_title("Netlink Family Specifications"))
->      lines.append(rst_toctree(1))
->  
->      index_dir = os.path.dirname(output)
 
