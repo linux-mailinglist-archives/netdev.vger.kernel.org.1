@@ -1,103 +1,84 @@
-Return-Path: <netdev+bounces-51506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2807FAF0B
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:30:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A426C7FAF0E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877CB280FC8
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:30:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45A2CB2135F
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ADD87E;
-	Tue, 28 Nov 2023 00:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83AB337C;
+	Tue, 28 Nov 2023 00:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bbRTvQC+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDCZNjjo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE251A2;
-	Mon, 27 Nov 2023 16:30:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RXJUdpNEWT2fSRqZk39lN7kLn1cO7XXum10Kr+b8hjY=; b=bbRTvQC+J9K35PMLvA3Fco0upj
-	MXvAojVmeMrAECfyRQc8vr4zJyenwbw1Aq9RVLf+xuTx1nDokvAvv+jB4Q+m1xMBedxW2YYu/gD+O
-	bg8gkORBNviUZkOVH9FgDPBXzSSfTkta8T90HtZC9wcOFK4jLQb1Da3edMOC6eLS64kc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r7lzM-001Ou7-Jn; Tue, 28 Nov 2023 01:30:08 +0100
-Date: Tue, 28 Nov 2023 01:30:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next PATCH RFC v3 6/8] dt-bindings: net: Document Qcom
- QCA807x PHY package
-Message-ID: <19605736-0f67-4593-a9ae-0e5c4578648f@lunn.ch>
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
- <20231126015346.25208-7-ansuelsmth@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F151868;
+	Tue, 28 Nov 2023 00:30:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DB978C433C7;
+	Tue, 28 Nov 2023 00:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701131425;
+	bh=vvlWHcsM4/SnjvyCTszDFZQxVvZewd1+ZaeHoVX7W0I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nDCZNjjoPsJ0GfDQK3qooiKcKPEwU0bCLxFWO1Wh/NZUGtpB8VgipB3VmAPD2L27A
+	 fuO0Vmi8kzAOthHPJUBRdDKftgg3o9cpr7JuNbssbNLkDhKc46C78ZwaeRBqJWUS4r
+	 2gQAEdNEHRAMDYP406PIpB8+oHESacoPcxBTttncKvpBieAoY+ORUHodKjy1majZxK
+	 0jpecfFbn5g8apsUTNPH0U6MYGSGWt7+iZw4VJqBc9/Q4bAK6fPn/U9SVW79cQ6tI9
+	 1c3KWRBTHT0Tlfa3ni14Yc1Y3B9dzP6ZTp3qku3NDf6MZ7WyfsQJmSgYHm2ajqY5NW
+	 JIsx/D5gsds9g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B9764E11F68;
+	Tue, 28 Nov 2023 00:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231126015346.25208-7-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v2] netkit: Reject IFLA_NETKIT_PEER_INFO in
+ netkit_change_link
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170113142575.7037.13597155992811223763.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Nov 2023 00:30:25 +0000
+References: <e86a277a1e8d3b19890312779e42f790b0605ea4.1701115314.git.daniel@iogearbox.net>
+In-Reply-To: <e86a277a1e8d3b19890312779e42f790b0605ea4.1701115314.git.daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: martin.lau@linux.dev, razor@blackwall.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, kuba@kernel.org
 
-> +$ref: ethernet-phy-package.yaml#
-> +
-> +properties:
-> +  qcom,package-mode:
-> +    enum:
-> +      - qsgmii
-> +      - psgmii
-> +
-> +  qcom,tx-driver-strength:
-> +    description: set the TX Amplifier value in mv.
-> +      If not defined, 600mw is set by default.
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [140, 160, 180, 200, 220,
-> +           240, 260, 280, 300, 320,
-> +           400, 500, 600]
+Hello:
 
-This is O.K, you are describing package properties, even if i don't
-agree about qcom,package-mode.
+This patch was applied to bpf/bpf.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-> +patternProperties:
-> +  ^ethernet-phy(@[a-f0-9]+)?$:
-> +    $ref: ethernet-phy.yaml#
-> +
-> +    properties:
-> +      gpio-controller:
-> +        description: set the output lines as GPIO instead of LEDs
-> +        type: boolean
-> +
-> +      '#gpio-cells':
-> +        description: number of GPIO cells for the PHY
-> +        const: 2
+On Mon, 27 Nov 2023 21:05:33 +0100 you wrote:
+> The IFLA_NETKIT_PEER_INFO attribute can only be used during device
+> creation, but not via changelink callback. Hence reject it there.
+> 
+> Fixes: 35dfaad7188c ("netkit, bpf: Add bpf programmable net device")
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-But now you are describing PHY properties. These belong on a .yaml of
-its own, just like qca,ar803x.yaml defines properties for the AR803x
-PHY.
+Here is the summary with links:
+  - [bpf,v2] netkit: Reject IFLA_NETKIT_PEER_INFO in netkit_change_link
+    https://git.kernel.org/bpf/bpf/c/0bad281d0ecd
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
