@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-51657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C724C7FB9B8
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E1E37FB9B9
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A50661C2118F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9B71C21429
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716F24F88D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2494F893;
 	Tue, 28 Nov 2023 11:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rLNYPgYr"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AWwnA3sv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214CDD5B
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 03:52:59 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-a06e59384b6so684114666b.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 03:52:59 -0800 (PST)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0952D59
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 03:53:00 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54b7ef7f4d5so2348529a12.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 03:53:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701172377; x=1701777177; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LJrWe358mK58kVo7CaN547zoZT1GFXJuf0FS9nGOahA=;
-        b=rLNYPgYrE9/JL4f6SV+nLiu1RnD7FQQPyYNsTMhYHk7LtvGAWsztLM2u3+ysP4Ds/J
-         ic3EFqdQPgTqosW7MPwtZ4ljJt5N5kCUHi050ZsgxY7C2aDwN505tP8jH4snYCZwo6sV
-         XJqivctpmsv3LzF/Zonq62zw33h9CwA4KxSBmj92/IBL26txmGX50hscrxQtyqmdpFmo
-         CjbSDJFucIxzJ3HJmwc+l9RJ14a+bHD7iDxgwEMIgfYvhjA4pGveIeBzbdY1M/psGMlV
-         S16Z6WghujdYzQ5odKBOZmt2KtbYjGsMKtc/8Z+DCS9qGi9elrsmqXGHdDR4vTOdE+G0
-         1bIw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701172379; x=1701777179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qw+m6CFKiuP2LUdst29B2QrGUSKYe0PfmKWYdtVxuZI=;
+        b=AWwnA3sv5kMbRt+do9FmPRyMCMnYQremLEyvgQNNIrCau3E5srBDYTj7CocNb8Pqlj
+         YB1UyAIi9fS+wmz4X9Ha/eLifMsQwYY/YPrTsquAh8XxkGLXCxSH+VOSxZwOK0V1RP6l
+         5XG2ESZADXDEMpvKr8RpmmYVEeGVBFsV6UcYVA9cAWrMKZmI4N2la5GXS30gbG19eCKT
+         518Em8znyvfteuik3Do/wnNzb7s+dCSpEm5N89wqAlu0qU3SlPL1M1h5bb2MK6UwhFX3
+         H2eTVQaqdE46WEy9nn7tOSwhC8Vj3kJSUx0n3W33zZZ0/5sBQ3CYASuJ85g+DqLu04ZI
+         Jyag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701172377; x=1701777177;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LJrWe358mK58kVo7CaN547zoZT1GFXJuf0FS9nGOahA=;
-        b=imkj0G4fZs/6EtzHkFPy5uMEYItF1RQCbc39ZIw4KOqqKxowQhVK19GXMED5YXtREV
-         nidY4kMAJNSauM3zbAF+GKzyYJgQe14I51x0L8QYTYlXinv4HBxKxxoHPY7oTjJP9gwo
-         GpEiBBv+erDcN3voDxByHOyLFchTg3IdPTswXjvwa7UKl07NMatTG7ydba5dfIhfMQ4e
-         5cU2FD99+RCOzzUFGHeObmfwNBrbzHckQ82yw135JY7HBBz7Q5q2Pt6ITDGoyrMMYqBx
-         am09lcukc6Ii9UXG5WsqxYzaRX6GB7KQCHa+g6kMGCqnThkEAzgOxm1+FeC6W46PKxOn
-         2NFQ==
-X-Gm-Message-State: AOJu0YzKVqjfiXzoJXr3+Z6ILj2ceuT4NNRnwMIK1TmFKalHED/ApDNH
-	iqLtWebSF+OxeiLZZ+/NI/0HMQv/X9xO9x13sRBJAg==
-X-Google-Smtp-Source: AGHT+IE4SH2Duwa1v85wArd5yshIjNW1kNpYIzZluIkzU+5rkuhbpjGh7YdOCS1hhCh0o5ZF5AnQtA==
-X-Received: by 2002:a17:907:1608:b0:a10:9722:97d3 with SMTP id cw8-20020a170907160800b00a10972297d3mr3909629ejd.0.1701172377473;
-        Tue, 28 Nov 2023 03:52:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701172379; x=1701777179;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qw+m6CFKiuP2LUdst29B2QrGUSKYe0PfmKWYdtVxuZI=;
+        b=NxsYvLfZGzoFu1LaFWHO8tadnlAFUR4eqXB+ZnkxtfDQdOqChVuiOsLcxHpgWfPAB5
+         4wdrqhumAfLahkpec6FkYK72otghBSWvSRAq1SvvnGp1gzO67egBekDvUjHlq0kFLByT
+         VlUGzHYZd85wDeSTPWlkCM3i2nOzOJO0n4pE8Db7d7pWqIQRjbW/00tzcu825c+hqb+P
+         9CbPl5dX3JcZOhFQdtkBRME3qhph6jsqAkHabeaVadPAzBGRtvuO8K5kttPlfgFmvAC4
+         aGRQH9PIRzyfJzn7UUMAFQFT1TnfRfm92nlzgrmCZJL9aYPYC5rC2szo2eiGIOhzNwOJ
+         V4KQ==
+X-Gm-Message-State: AOJu0Yx+Ak/dlUfhGsH4tqgf4eQls+Xq32LE7ihCzRrgoGegiP0Pwqg5
+	dey/FLbsmVyRuVhPbScmokUtA/xNnQBF6tTCtmyz7g==
+X-Google-Smtp-Source: AGHT+IFzlVdU3T4UMtg9tMWkCt8o8bpI+xqIeawq8azmYeVdyrdDyiyZmUzGbRkFRK6r5mau+ZcleA==
+X-Received: by 2002:a17:906:5299:b0:a00:8706:c82e with SMTP id c25-20020a170906529900b00a008706c82emr11714351ejm.18.1701172379066;
+        Tue, 28 Nov 2023 03:52:59 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id hz19-20020a1709072cf300b009a168ab6ee2sm6682784ejc.164.2023.11.28.03.52.56
+        by smtp.gmail.com with ESMTPSA id j24-20020a170906411800b009a193a5acffsm6743485ejk.121.2023.11.28.03.52.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 03:52:56 -0800 (PST)
+        Tue, 28 Nov 2023 03:52:58 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -62,10 +63,12 @@ Cc: kuba@kernel.org,
 	corbet@lwn.net,
 	sachin.bahadur@intel.com,
 	przemyslaw.kitszel@intel.com
-Subject: [patch net-next 0/2] devlink: warn about existing entities during reload-reinit
-Date: Tue, 28 Nov 2023 12:52:53 +0100
-Message-ID: <20231128115255.773377-1-jiri@resnulli.us>
+Subject: [patch net-next 1/2] Documentation: devlink: extend reload-reinit description
+Date: Tue, 28 Nov 2023 12:52:54 +0100
+Message-ID: <20231128115255.773377-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231128115255.773377-1-jiri@resnulli.us>
+References: <20231128115255.773377-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,21 +79,38 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Recently there has been a couple of attempts from drivers to block
-devlink reload in certain situations. Turned out, the drivers do not
-properly tear down ports and related netdevs during reload.
+Be more explicit about devlink entities that may stay and that have to
+be removed during reload reinit action.
 
-To address this, add couple of checks to be done during devlink reload
-reinit action. Also, extend documentation to be more explicit.
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ Documentation/networking/devlink/devlink-reload.rst | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Jiri Pirko (2):
-  Documentation: devlink: extend reload-reinit description
-  devlink: warn about existing entities during reload-reinit
-
- .../networking/devlink/devlink-reload.rst        | 13 +++++++++++--
- net/devlink/dev.c                                | 16 +++++++++++++++-
- 2 files changed, 26 insertions(+), 3 deletions(-)
-
+diff --git a/Documentation/networking/devlink/devlink-reload.rst b/Documentation/networking/devlink/devlink-reload.rst
+index 505d22da027d..2fb0269b2054 100644
+--- a/Documentation/networking/devlink/devlink-reload.rst
++++ b/Documentation/networking/devlink/devlink-reload.rst
+@@ -22,8 +22,17 @@ By default ``driver_reinit`` action is selected.
+    * - ``driver-reinit``
+      - Devlink driver entities re-initialization, including applying
+        new values to devlink entities which are used during driver
+-       load such as ``devlink-params`` in configuration mode
+-       ``driverinit`` or ``devlink-resources``
++       load which are:
++
++       * ``devlink-params`` in configuration mode ``driverinit``
++       * ``devlink-resources``
++
++       Other devlink entities may stay over the re-initialization:
++
++       * ``devlink-health-reporter``
++       * ``devlink-region``
++
++       The rest of the devlink entities have to be removed and readded.
+    * - ``fw_activate``
+      - Firmware activate. Activates new firmware if such image is stored and
+        pending activation. If no limitation specified this action may involve
 -- 
 2.41.0
 
