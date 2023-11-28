@@ -1,129 +1,95 @@
-Return-Path: <netdev+bounces-51878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB547FC9DA
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF457FC9DD
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EDA9B21567
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:47:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 350B5B21723
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28CA481C4;
-	Tue, 28 Nov 2023 22:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5B25027A;
+	Tue, 28 Nov 2023 22:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="SLr7cxs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5330819B0;
-	Tue, 28 Nov 2023 14:47:09 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C1F11FB;
-	Tue, 28 Nov 2023 14:47:56 -0800 (PST)
-Received: from [10.57.71.132] (unknown [10.57.71.132])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C40BF3F6C4;
-	Tue, 28 Nov 2023 14:47:00 -0800 (PST)
-Message-ID: <8e1961c9-0359-4450-82d8-2b2fcb2c5557@arm.com>
-Date: Tue, 28 Nov 2023 22:46:59 +0000
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093311990
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:47:12 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cbe6d514cdso5026338b3a.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:47:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701211631; x=1701816431; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vd3hkm7N4zMrSZZSV9Az6JzA6RfKWL5wxF0E2CszxGM=;
+        b=SLr7cxs2uGlPYoUhtmhPxszlEXATrzCaeCOMyVJ70Yv31u3vk/vfhL4QYmfR+AuKB0
+         qRVDC0SAUGvWSFPDW/vE/hoHITar734V0bu9jiC8xhqytphfd+3K/cEV4j5s7L8TA1Wq
+         Zmi8/SEF5Dbkiz3+iSbszfBTxKlY/PdIEuvBXyI8125X7b0+vBRkXeB0bN4RLVuJix0a
+         nwfwuaB2LpFZdJ7jzOSmDpb37McvvYYVy60vy8emL78bB+CTR4dPFJEc+SxpUnOFrOmx
+         ZQfaz5t/z744OZko8cHFj+Vv6lRcrzbbKJFs1WBGmv9TczXdOpuMZeufm0eC0mwdqEVB
+         kxOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701211631; x=1701816431;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vd3hkm7N4zMrSZZSV9Az6JzA6RfKWL5wxF0E2CszxGM=;
+        b=xJofrwQOs4R3sBswlgdXHV+6rw/LcHMKON5IQ0Cle2oDCs1faSzzIIxlNFVIbFx39a
+         dUZdiaKpK0q5xujJbBbwIngvAOwLGdB4PVzwhOqnk0mbPXK3vcXKXkQ1r2AeobiNrTuU
+         D6SDttCdI2NVsu4F3OnMlQF6ap9CRZgFOuizC/JqSm6ClfjU/FSf3IpfNOAUgxHy5UzS
+         0lo0wz5fIiP2oE4hodilVnQga8nmCaTsPDD4L3HlQCw+XqJ2yXibO6EkDBpr/BSfkHDa
+         UPwW1GTqQINnqdKcAwsgSQus5ZlUYtjWAqNQko6JbvIXy8ZnrGK6lUO/UbWLjbqdViVj
+         EsDg==
+X-Gm-Message-State: AOJu0YwKuH6CFV7Rh1R15RtZJYvFZw9Z4pzCqVJiEtasHb7nFRFOeo2K
+	raYZgU8naBY1XJdu8xcyoqiTog==
+X-Google-Smtp-Source: AGHT+IGQLOfw8W3oIOoJOuydcgamHILSyHU6y+vO0hdPhmqA2Ro3z9FmN9k+ZA9amC7qF71sR5bVPA==
+X-Received: by 2002:a05:6a00:2909:b0:68c:69ca:2786 with SMTP id cg9-20020a056a00290900b0068c69ca2786mr16719561pfb.34.1701211631495;
+        Tue, 28 Nov 2023 14:47:11 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id r10-20020aa78b8a000000b006cbb3512266sm9438024pfd.1.2023.11.28.14.47.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 14:47:11 -0800 (PST)
+Date: Tue, 28 Nov 2023 14:47:09 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, David
+ Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel
+ <idosch@idosch.org>, Nikolay Aleksandrov <razor@blackwall.org>, Roopa
+ Prabhu <roopa@nvidia.com>, Florian Westphal <fw@strlen.de>, Andrew Lunn
+ <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld
+ <mmuehlfe@redhat.com>
+Subject: Re: [PATCHv3 net-next 04/10] docs: bridge: Add kAPI/uAPI fields
+Message-ID: <20231128144709.3c6ae4b3@hermes.local>
+In-Reply-To: <20231128084943.637091-5-liuhangbin@gmail.com>
+References: <20231128084943.637091-1-liuhangbin@gmail.com>
+	<20231128084943.637091-5-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/16] iommu/io-pgtable-arm-v7s: use page allocation
- function provided by iommu-pages.h
-Content-Language: en-GB
-To: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
- alex.williamson@redhat.com, alim.akhtar@samsung.com, alyssa@rosenzweig.io,
- asahi@lists.linux.dev, baolu.lu@linux.intel.com, bhelgaas@google.com,
- cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
- dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
- iommu@lists.linux.dev, jasowang@redhat.com, jernej.skrabec@gmail.com,
- jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, kevin.tian@intel.com,
- krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-rockchip@lists.infradead.org,
- linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
- linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st,
- mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com,
- netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org,
- samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev,
- thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com,
- vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org,
- will@kernel.org, yu-cheng.yu@intel.com
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-6-pasha.tatashin@soleen.com>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20231128204938.1453583-6-pasha.tatashin@soleen.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2023-11-28 8:49 pm, Pasha Tatashin wrote:
-> Convert iommu/io-pgtable-arm-v7s.c to use the new page allocation functions
-> provided in iommu-pages.h.
-> 
-> Signed-off-by: Pasha Tatashin <pasha.tatashin@soleen.com>
-> ---
->   drivers/iommu/io-pgtable-arm-v7s.c | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/iommu/io-pgtable-arm-v7s.c b/drivers/iommu/io-pgtable-arm-v7s.c
-> index 75f244a3e12d..3d494ca1f671 100644
-> --- a/drivers/iommu/io-pgtable-arm-v7s.c
-> +++ b/drivers/iommu/io-pgtable-arm-v7s.c
-> @@ -34,6 +34,7 @@
->   #include <linux/types.h>
->   
->   #include <asm/barrier.h>
-> +#include "iommu-pages.h"
->   
->   /* Struct accessors */
->   #define io_pgtable_to_data(x)						\
-> @@ -255,7 +256,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
->   		 GFP_KERNEL : ARM_V7S_TABLE_GFP_DMA;
->   
->   	if (lvl == 1)
-> -		table = (void *)__get_free_pages(gfp_l1 | __GFP_ZERO, get_order(size));
-> +		table = iommu_alloc_pages(gfp_l1, get_order(size));
->   	else if (lvl == 2)
->   		table = kmem_cache_zalloc(data->l2_tables, gfp);
+On Tue, 28 Nov 2023 16:49:37 +0800
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Is it really meaningful to account the L1 table which is always 
-allocated upon initial creation, yet not the L2 tables which are 
-allocated in use?
-
-Thanks,
-Robin.
-
-> @@ -283,6 +284,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
->   	}
->   	if (lvl == 2)
->   		kmemleak_ignore(table);
+>  
+> +Bridge kAPI
+> +===========
 > +
->   	return table;
->   
->   out_unmap:
-> @@ -290,7 +292,7 @@ static void *__arm_v7s_alloc_table(int lvl, gfp_t gfp,
->   	dma_unmap_single(dev, dma, size, DMA_TO_DEVICE);
->   out_free:
->   	if (lvl == 1)
-> -		free_pages((unsigned long)table, get_order(size));
-> +		iommu_free_pages(table, get_order(size));
->   	else
->   		kmem_cache_free(data->l2_tables, table);
->   	return NULL;
-> @@ -306,8 +308,9 @@ static void __arm_v7s_free_table(void *table, int lvl,
->   	if (!cfg->coherent_walk)
->   		dma_unmap_single(dev, __arm_v7s_dma_addr(table), size,
->   				 DMA_TO_DEVICE);
+> +Here are some core structures of bridge code.
 > +
->   	if (lvl == 1)
-> -		free_pages((unsigned long)table, get_order(size));
-> +		iommu_free_pages(table, get_order(size));
->   	else
->   		kmem_cache_free(data->l2_tables, table);
->   }
+> +.. kernel-doc:: net/bridge/br_private.h
+> +   :identifiers: net_bridge_vlan
+
+Add a reminder that kAPI is unstable, and can be changed at any time.
+
 
