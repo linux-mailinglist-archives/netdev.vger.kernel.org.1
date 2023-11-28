@@ -1,128 +1,191 @@
-Return-Path: <netdev+bounces-51770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 000F47FBF17
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:19:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E277FBF23
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:23:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 972B6B213D5
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:19:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26F61B212C2
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBDF37D39;
-	Tue, 28 Nov 2023 16:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D3237D3D;
+	Tue, 28 Nov 2023 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uu4ot+Y+"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lsnjgYK+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D4B182;
-	Tue, 28 Nov 2023 08:19:18 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-5079f6efd64so7633953e87.2;
-        Tue, 28 Nov 2023 08:19:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701188356; x=1701793156; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AeC86zbCGJVSk79IhGKH9GShZbi811qqEA24Z7ghM0M=;
-        b=Uu4ot+Y+/yr6anfulEW9FJBZ/sZefqjz76MNgQ7GsoYMn6wK3Lzb7+gP4b/4RopvHv
-         +bTQLNod+CC2soIujByj+Q54uSjmZXqU59jubqO8XxeDkq3/iKXDTsjUDrHRepgmfafp
-         m6czn/C0LdooY3a93n0yMIB+HEzddn3bPn5jZcM46EnyGg4F1MRI9wddH46Z+F2CpaZ1
-         O0gLL9O9LQOQq6vMDSeTNHuojKk+F0Pd9VZn9CFXudT0fTa+MZh+vsbXZU4V06kIQuIx
-         GZMvoBrNolhhsLzzGbCQhyfn36BViO5bRtD19ydnD8H1aNLaJDSl2taJ9gngN3zcVx7r
-         p6ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701188356; x=1701793156;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AeC86zbCGJVSk79IhGKH9GShZbi811qqEA24Z7ghM0M=;
-        b=kRLnyB2vxbeW/RHNzNmruPnnD4oFXgHBigfM6egHn3+Io07nn0SixvEhHZ53E3LsdJ
-         LRXgKJEKpLdY8ZYvzQA+OMA2vjLBEVi5MhFQlQ0DiQsqrocNb2NJ7pFe1L9n/WuIpK6b
-         9DApDp125KMbyrrJsl5tzhcFmWBWEA3aJBvbSSTIlWoo/28Qv/yYT6uc75S7ikP0vsVI
-         YBFkQ/cu8v5jDFEJRSsUoyLh5AFQ55/pZTMNIyCBccVBOBHc8gfy2Pd46Br2G54xoVSe
-         R+EF/7MnNzhAML+L91qCaVCLF9dN3G/7CYTce9kZn3AXu5qqOU7a9Nv/c64AM5o6PrX5
-         Lrkw==
-X-Gm-Message-State: AOJu0Yz2aDtlqozyIoQpfhkaicNPF0/bXqeyaKn2hGrXq6EIE17fD1bQ
-	Nv+euAhf/Rq/w9flCqhpYsU=
-X-Google-Smtp-Source: AGHT+IGMma2vgs85Y0T7461/0MipHE1/19RTn/0fiyXlqiyumPPE/1qzpnDwgkRnEwkYX001zMdDPQ==
-X-Received: by 2002:a05:6512:2245:b0:50a:40b6:2d37 with SMTP id i5-20020a056512224500b0050a40b62d37mr13159186lfu.40.1701188356322;
-        Tue, 28 Nov 2023 08:19:16 -0800 (PST)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id i14-20020a05640200ce00b0054866f0c1b8sm6386704edu.69.2023.11.28.08.19.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 08:19:15 -0800 (PST)
-Message-ID: <b9f63218d934b8048ccdafa8e2c27f9929e344a6.camel@gmail.com>
-Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
- CO-RE relocations
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>, Yonghong Song <yonghong.song@linux.dev>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, antony.antony@secunet.com, Mykola Lysenko
- <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, bpf
- <bpf@vger.kernel.org>,  "open list:KERNEL SELFTEST FRAMEWORK"
- <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
- devel@linux-ipsec.org, Network Development <netdev@vger.kernel.org>
-Date: Tue, 28 Nov 2023 18:19:08 +0200
-In-Reply-To: <p6qdiwnuglz7ry6hsssruf3w6n3tnavglya3iampors7eb4ac6@nonyetjx2zvc>
-References: 
-	<CAADnVQ+sEsUyNYPeZyOf2PcCnxOvOqw4bUuAuMofCU14szTGvg@mail.gmail.com>
-	 <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
-	 <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
-	 <uc5fv3keghefszuvono7aclgtjtgjnnia3i54ynejmyrs42ser@bwdpq5gmuvub>
-	 <0535eb913f1a0c2d3c291478fde07e0aa2b333f1.camel@gmail.com>
-	 <42f9bf0d-695a-412d-bea5-cb7036fa7418@linux.dev>
-	 <a5a84482-13ef-47d8-bf07-8017060a5d64@linux.dev>
-	 <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
-	 <53jaqi72ef4gynyafxidl5veb54kfs7dttxezkarwg75t7szd4@cvfg5pc7pyum>
-	 <f68c01d6-bf6b-4b76-8b20-53e9f4a61fcd@linux.dev>
-	 <p6qdiwnuglz7ry6hsssruf3w6n3tnavglya3iampors7eb4ac6@nonyetjx2zvc>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F2E182;
+	Tue, 28 Nov 2023 08:23:04 -0800 (PST)
+Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id DAFFE66072E7;
+	Tue, 28 Nov 2023 16:23:00 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1701188582;
+	bh=666NilPgh2cGqwRIcXHKPf9AcNh0vwxR/Iqn1L5sqb8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lsnjgYK+g1qRAB2aDuzr8WoG7wZywNHXoduL7tX6p+91qSinQ62uOUzJB7OT7VHxj
+	 XRcKqjzgCK7Of0lzGH00qmUUFAqzSimzHZhvdfyFp29/bkjwX2KrLbyqHegsEUu9FS
+	 tswQPzqI2Ka7qOMvV/c2HxAmgnnpc/hU06tKO/BdB62KNJhhzQS7dfDwAUm1lEYSH0
+	 nE643NFCTyWKHqvj/6sv5F6zd0sjdzR3zi9WFSghJn/eTFk1beP3HUOOcgxxij9Z0w
+	 hLbjjJuyJ7NfzImFYfbxBHzwGVLDNeumWx34edFDQtHXiw4Tn1LZRodYx/hMMIG4NJ
+	 tSxeou+Ck4sZw==
+Message-ID: <5395f3ce-f9ec-474b-b145-5f62a3b7c4fc@collabora.com>
+Date: Tue, 28 Nov 2023 18:22:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
+Content-Language: en-US
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
+ <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
+ <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
+ <054bbf2a-e7ba-40bf-8f8b-f0e0e9b396c6@collabora.com>
+ <CAJM55Z9+j6CmfjNkPLCk1DR3EBuEMspsRtNvygDbPWJDCytQpw@mail.gmail.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <CAJM55Z9+j6CmfjNkPLCk1DR3EBuEMspsRtNvygDbPWJDCytQpw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2023-11-28 at 10:13 -0600, Daniel Xu wrote:
-[...]
-> > One thing for sure is memory layout of bitfields should be the same
-> > for both clang and gcc as it is determined by C standard. Register
-> > representation and how to manipulate could be different for different
-> > compilers.
->=20
-> I was reading this thread:
-> https://github.com/Lora-net/LoRaMac-node/issues/697. It's obviously not
-> authoritative, but they sure sound confident!
->=20
-> I think I've also heard it before a long time ago when I was working on
-> adding bitfield support to bpftrace.
->=20
->=20
-> [...]
+On 11/28/23 18:09, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+>> On 11/28/23 14:08, Emil Renner Berthing wrote:
+>>> Cristian Ciocaltea wrote:
+>>>> On 11/26/23 23:10, Emil Renner Berthing wrote:
+>>>>> Cristian Ciocaltea wrote:
+>>>>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+>>>>>> RGMII-ID.
+>>>>>>
+>>>>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
+>>>>>> yes, add the mdio & phy sub-nodes.
+>>>>>
+>>>>> Sorry for being late here. I've tested that removing the mdio and phy nodes on
+>>>>> the the Starlight board works fine, but the rx-internal-delay-ps = <900>
+>>>>> property not needed on any of my VisionFive V1 boards either.
+>>>>
+>>>> No problem, thanks a lot for taking the time to help with the testing!
+>>>>
+>>>>> So I wonder why you need that on your board
+>>>>
+>>>> I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
+>>>> rgmii rx delay") in your tree, hence I you please confirm the tests were
+>>>> done with that commit reverted?
+>>>>
+>>>>> Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
+>>>>> you still set it to "rgmii-id", so which is it?
+>>>>
+>>>> Please try with "rgmii-id" first. I added "rgmii-txid" to have a
+>>>> fallback solution in case the former cannot be used.
+>>>
+>>> Ah, I see. Sorry I should have read up on the whole thread. Yes, the Starlight
+>>> board with the Microchip phy works with "rgmii-id" as is. And you're right,
+>>> with "rgmii-id" my VF1 needs the rx-internal-delay-ps = <900> property too.
+>>
+>> That's great, we have now a pretty clear indication that this uncommon behavior
+>> stems from the Motorcomm PHY, and *not* from GMAC.
+>>
+>>>>
+>>>>> You've alse removed the phy reset gpio on the Starlight board:
+>>>>>
+>>>>>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
+>>>>>
+>>>>> Why?
+>>>>
+>>>> I missed this in v1 as the gmac handling was done exclusively in
+>>>> jh7100-common. Thanks for noticing!
+>>>>
+>>>>>>
+>>>>>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>>>>>> ---
+>>>>>>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
+>>>>>>  1 file changed, 5 insertions(+)
+>>>>>>
+>>>>>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>>>> index 7cda3a89020a..d3f4c99d98da 100644
+>>>>>> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>>>> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>>>> @@ -11,3 +11,8 @@ / {
+>>>>>>  	model = "BeagleV Starlight Beta";
+>>>>>>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
+>>>>>>  };
+>>>>>> +
+>>>>>> +&gmac {
+>>>>>> +	phy-mode = "rgmii-id";
+>>>>>> +	status = "okay";
+>>>>>> +};
+>>>>>
+>>>>> Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
+>>>>> so why can't these be set in the jh7100-common.dtsi?
+>>>>
+>>>> I wasn't sure "rgmii-id" can be used for both boards and I didn't want
+>>>> to unconditionally enable gmac on Starlight before getting a
+>>>> confirmation that this actually works.
+>>>>
+>>>> If there is no way to make it working with "rgmii-id" (w/ or w/o
+>>>> adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
+>>>
+>>> Yeah, I don't exactly know the difference, but both boards seem to work fine
+>>> with "rgmii-id", so if that is somehow better and/or more correct let's just go
+>>> with that.
+>>
+>> As Andrew already pointed out, going with "rgmii-id" would be the recommended
+>> approach, as this passes the responsibility of adding both TX and RX delays to
+>> the PHY.  "rgmii-txid" requires the MAC to handle the RX delay, which might
+>> break the boards having a conformant (aka well-behaving) PHY.  For some reason
+>> the Microchip PHY seems to work fine in both cases, but that's most likely an
+>> exception, as other PHYs might expose a totally different and undesired
+>> behavior.
+>>
+>> I will prepare a v3 soon, and will drop the patches you have already submitted
+>> as part of [1].
+> 
+> Sounds good. Then what's missing for ethernet to work is just the clock patches:
+> https://github.com/esmil/linux/commit/b5abe1cb3815765739aff7949deed6f65b952c4a
+> https://github.com/esmil/linux/commit/3a7a423b15a9f796586cbbdc37010d2b83ff2367
+> 
+> You can either include those as part of your patch series enabling ethernet, or
+> they can be submitted separately with the audio clocks. Either way is
+> fine by me.
 
-Here is a citation from ISO/IEC 9899:201x (C11 standard) =C2=A76.7.2.1
-(Structure and union specifiers), paragraph 11 (page 114 in my pdf):
+I can cherry-pick them, but so far I couldn't identify any networking
+related issues if those patches are not applied. Could it be something
+specific to Starlight board only?
 
-> An implementation may allocate any addressable storage unit large
-> enough to hold a bit- field. If enough space remains, a bit-field
-> that immediately follows another bit-field in a structure shall be
-> packed into adjacent bits of the same unit. If insufficient space
-> remains, whether a bit-field that does not fit is put into the next
-> unit or overlaps adjacent units is implementation-defined. The order
-> of allocation of bit-fields within a unit (high-order to low-order
-> or low-order to high-order) is implementation-defined. The alignment
-> of the addressable storage unit is unspecified.
+> /Emil
+> 
+>>
+>> Thanks again for your support,
+>> Cristian
+>>
+>> [1]: https://lore.kernel.org/all/20231126232746.264302-1-emil.renner.berthing@canonical.com/
 
