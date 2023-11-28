@@ -1,190 +1,436 @@
-Return-Path: <netdev+bounces-51631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725727FB7EE
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:33:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0FB7FB7F8
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 11:35:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2FA1B20C23
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:33:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE62C1C21230
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DD74E638;
-	Tue, 28 Nov 2023 10:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A58812B7F;
+	Tue, 28 Nov 2023 10:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mLAwhnCf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btzT3ZKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7445E10CB;
-	Tue, 28 Nov 2023 02:33:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701167627; x=1732703627;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=eepklXo5P6VHBaxb5lxpB6wpWCHTLosvN66mvFflj74=;
-  b=mLAwhnCfAl4ddOgOucgNmq2Fdit2H3pdnJmueLHE87wVwdyCPMkPGP8E
-   Xh1DiSBHpFuBtX8O0mezHBgsnzM3WFytbtKQv/Qu8N+g4Z3PXFjCeqFbx
-   Xe0enY868l9BmOxE5puMI314thBmITjM5pPmd2kau7Wsq1xOSxTLaxPYG
-   wqr95CWpWsn4jX4PJlSl9lBxrxAauUK1VuCgQq2CXhjIcLFrQ7CK8xmx/
-   Fv+hwozHhgmWv2XrRIHkE8Dn57O4jT1birH9O2GGYPTGB2Qzzp23IY95U
-   aIfwQoYBCDmoxfBtnU2GQ2X0RAha9mYX8YUAolD1M5k70f7Vvesq3/7JU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="457227036"
-X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
-   d="scan'208";a="457227036"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 02:33:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="744852410"
-X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
-   d="scan'208";a="744852410"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Nov 2023 02:33:46 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 28 Nov 2023 02:33:45 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 28 Nov 2023 02:33:45 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 28 Nov 2023 02:33:45 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DoF0sgDasBDhpBKGy8u0WSX7p2LdWJfhHjJGCfcX+9EjtmFvsDgQbMt+9mtxc5YI7d3S4CUJlNvPaqd1njRAwr9opYLzw9WdlHmcFy4gbDzl71NGeQ4r5c4bmYW8aaEe3NjMiajD8HDcuYVzOP8Q1H5mFSV8d+mDBRYY2q6Ms10MgaK8pWJe+1jPYDSFwY+nhGwfapXHKY5RJBEWlBARCYyHJBbYStdZbh67uFwRGVm18LLE8iH7nBpivvp+xqKJEWQAx39T7xnaZzaDG2z019Jiuh4IRtsTjSiPtXxL54zgt6soVKBwbf0t9EOJLFiPlnSQSSN43SKpTCap1fTFXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=De9Yf7GHRQntkA/1ls39lwtol2zw1jl+/rKC/MjM9i8=;
- b=C8/jr3J7wrWOvGeBS1Tvt03M0t1SwoxYflA7SkZS6TrvZPrw1bqo1t+b10l+JuwN5ZsNl2n/PY4itXMsc9xB7DdeqI5fNq0xDNUocDOGkfzQYVznVfiX8QZMgLOatNuP1399k+j/zKz+WphS9rKByKQuDVeuqNqrrueJ7EZ4+Yhjwp0Xq99xRajq7EIspW5B46iGbRwdEo1tAbJPWf4nCO+4Kl27diHrunWkRLoCsSDsUP+oG67SY2RVLKyfXYNcsRqWcWTWhb3hGsp3+ilx8P5cFVzlGlCUjfxeExd7LeKz99OQ8+8MSd/BbyUxKhUfZrBdymbIeFeJrmC3TpP7HA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by IA1PR11MB6370.namprd11.prod.outlook.com (2603:10b6:208:3ae::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Tue, 28 Nov
- 2023 10:33:38 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::f37d:cbd6:9df8:d06d]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::f37d:cbd6:9df8:d06d%7]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
- 10:33:38 +0000
-Date: Tue, 28 Nov 2023 11:33:31 +0100
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Magnus Karlsson <magnus.karlsson@gmail.com>, "Willem
- de Bruijn" <willemdebruijn.kernel@gmail.com>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	John Fastabend <john.fastabend@gmail.com>, Aleksander Lobakin
-	<aleksander.lobakin@intel.com>
-Subject: Re: [PATCH bpf-next v3 0/2] Allow data_meta size > 32
-Message-ID: <ZWXB+8FQenT6717+@lzaremba-mobl.ger.corp.intel.com>
-References: <20231127183216.269958-1-larysa.zaremba@intel.com>
- <2fcc90b1-deeb-487f-b6e6-c649bee2e8a8@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2fcc90b1-deeb-487f-b6e6-c649bee2e8a8@kernel.org>
-X-ClientProxiedBy: WA1P291CA0019.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:19::23) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E230219AB
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:35:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701167702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GUINC5In7VLgCGEEsir3sJSmOoPhchWXEwxWfS2e2Ok=;
+	b=btzT3ZKsbtJnv7lT7D7Gd3V2EksSth0c3zMee0alI/M54Ke8jl8+QEQJkpr56UsCSeqRSi
+	hPj4WNYYf6ojeZbhE8/+7dAzmkm3BoS//ou7r9YVp9j6F2Soo9fdgkqxfdoQVtwbb9Mh47
+	IL3NjAOLPtyDKaJRBOVcALtONnlHHpg=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-88-jK24jRBGMoqTwMJtM14eyA-1; Tue, 28 Nov 2023 05:34:59 -0500
+X-MC-Unique: jK24jRBGMoqTwMJtM14eyA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a114c906c08so26176866b.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 02:34:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701167698; x=1701772498;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GUINC5In7VLgCGEEsir3sJSmOoPhchWXEwxWfS2e2Ok=;
+        b=lRUYapDCM/fwqtF0Rauu6FFKaOgfMsov+lUayzH+3YQfT0Q30AI3xqVr82xF9vRbL6
+         BBwm8lkTy05axQABYXZUyymSh8C9q0MyvDkKBE4wDhhzLZ9BtJY5MPHN6UAlQeZmzfYG
+         5MZ4qlGQEGNoJItgg8/4BJN/F23f8oH9acOzzzeHdlgEELZikZ7uLWtgo3vksyc4SmE8
+         Muyx1hHBffKoVZww0qdv8tzeuGz/txoaCS8R4Uf+8HogOOIdEwVKfWTMGRcOtRDTNJj1
+         6UtbFs1XptcajY3dXBBAwV3waT5xc5tFcxQl3OpdyQwfrXrMVe4DBt2WjOvNFBFfuVVW
+         bN2A==
+X-Gm-Message-State: AOJu0Yxv5RDBudJKgGp9d4BJI3gaWEgOir2qF9S3j6TJ1NHPkRhKvmv8
+	feO+dFBAiJQtfDgIlJK85TeaP1iQFAEn3b03//0TrWH1ke0bEP0Tn8S9kKbJyb/L05hKpz+mAd6
+	5ePOI+tTnexwgatD8
+X-Received: by 2002:a17:906:eb01:b0:a00:1acf:6fe5 with SMTP id mb1-20020a170906eb0100b00a001acf6fe5mr9349578ejb.1.1701167698632;
+        Tue, 28 Nov 2023 02:34:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHAgfgNyqRl51J39YfJnedSEPIkT9/1+7MwQoxlCNcVccN2ZvcpQFOZcDFulUzQzD9cg51GcA==
+X-Received: by 2002:a17:906:eb01:b0:a00:1acf:6fe5 with SMTP id mb1-20020a170906eb0100b00a001acf6fe5mr9349569ejb.1.1701167698241;
+        Tue, 28 Nov 2023 02:34:58 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-249-156.dyn.eolo.it. [146.241.249.156])
+        by smtp.gmail.com with ESMTPSA id jt13-20020a170906ca0d00b0099c53c4407dsm6619669ejb.78.2023.11.28.02.34.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 02:34:57 -0800 (PST)
+Message-ID: <c656e270bec67c2d7c99c42249b8cc890bec22f9.camel@redhat.com>
+Subject: Re: [PATCH v2 net-next 8/8] tcp: Factorise cookie-dependent fields
+ initialisation in cookie_v[46]_check()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+  netdev@vger.kernel.org
+Date: Tue, 28 Nov 2023 11:34:56 +0100
+In-Reply-To: <20231125011638.72056-9-kuniyu@amazon.com>
+References: <20231125011638.72056-1-kuniyu@amazon.com>
+	 <20231125011638.72056-9-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|IA1PR11MB6370:EE_
-X-MS-Office365-Filtering-Correlation-Id: 67244343-66dd-42dd-d5e2-08dbeffd7b4f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RilpswJL0i0PmxBXNCNzDmLGPS60hqByldZhK80i3mwBcwuIJOulm1L8uQMNILkGrcVs+CSh7ljESI2Jvn/QKFJN2L5p1IcyD0/aUpIlLm27frQDSHi1R+ClP5v8cyiHtO2KS+XgqUcw5dTUiSmQvshc0ZURWQBInBzRyvR3R6pmP1oMTcklAESoEzIHvZFT0MvUTZONxFE+twuQHAmR0Ep/oQmjGKdIBeEVnNqAV4bPZ02PT3qOPZwkYN2XmRoYwgBy26ZPv0Wr47pfZhUOvc89z8RC6DUh6P9iNa7A72nkpjehUzo/or1JcjPhGTeTS1jmQZ2aohUR+aZafBwdyCS+C2ijP3MGnhTNOYPdREqdMiFouqK41D6RgZ1rH1FKu0axrI8VrGAe114REc4LpZalfyWZ8Kw/G7LrBppJTAwLzN988k/cZUfy+s1YBzQP7pcmX8UZYH50lPYk/M8CHVml55TanX3iGAvx4LOI32EV0byz7zJrfXY6iFSQMmtCjPAJaf//s9BuZZk8PV28+8IPKQxJf/TR8ASyRdIG1xX3ZaA2VZXnU2ySVFKynopm
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(346002)(376002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(53546011)(478600001)(26005)(6666004)(6506007)(6512007)(5660300002)(107886003)(83380400001)(2906002)(7416002)(4326008)(41300700001)(54906003)(66476007)(66556008)(66946007)(316002)(6486002)(6916009)(44832011)(8676002)(8936002)(38100700002)(86362001)(82960400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tqQyd2n1ZAkcJRAgsaxP0EYT9rUNYaT9qNuT4L20OSNN1Ulb18An3l2EPcls?=
- =?us-ascii?Q?hYpurkzIKbDokOEf/1ZnlkOiW3DN5L7DPjPBAY5ZGguqZvl5IjWdgFPFYxWI?=
- =?us-ascii?Q?m6WKdWTEUQmyQdhFWjQhkxU8Y9DCerIZQfbTy76IIoXhgzIlZoqf0/87XOud?=
- =?us-ascii?Q?XjdS9AmHAMjlfARgllU1f+fpSWX4UG+wAXXWvBRpmn8MjaPLCG+W8McpYfgA?=
- =?us-ascii?Q?RPKmeYYfJmeARLt7L+I0/+ln0MnlIrZOeKHv4frmy4q96iXYFXW48zGax+GK?=
- =?us-ascii?Q?8aiT7TFUX/GJg7jbtfYvo9S4DObw8mpjNE6IC/5KMDoRIwZjSXfQ3dyVihOE?=
- =?us-ascii?Q?S7FBKde+CrnrW4N38y3b5r/8reHvLH/ugPB6OfsuxFSUD6cX2Me3TfgRs5EW?=
- =?us-ascii?Q?3Nl8wADNjEumob3dc8ehriDNgh0itEcQnNVAoI9qrw8XIlG/H275ahLuy7Uy?=
- =?us-ascii?Q?sRonF8fbSPydswzuakVPQJXLX0uEHtdmx8rP7M2peuuSS8B/BC7XXh8VNMSl?=
- =?us-ascii?Q?MXYCwklWdfDS5tOBkj7gV3Zq2aANKTonup2SvOOfYS4Vfw5RgbSH1QW/nbww?=
- =?us-ascii?Q?O765Z0oKhTJLtITRNhN4XhKsbZw0y+Izv5NBcgBB419YZJPKr9U4FZNNdhTc?=
- =?us-ascii?Q?2/1fDllnc0l7fq1SrZvJns0tag/GnoGUGFkB2XlKZ7PawyBVOCEe74yJWf53?=
- =?us-ascii?Q?9rc+znUJXmerjU7NftUy5K4NvK5COHme00U+KnOxPf1w1u8NjYfVqz/SouZd?=
- =?us-ascii?Q?DBrOMe6YbSSxFrdK/er2QBcy3ZFf2XIdtMUsYWhe1v4IImLkKCiQB3yvf/rr?=
- =?us-ascii?Q?FcvvEQVMH5MZ/cDay44BgDS7PbnWPSW99of9cph7Hcxeni7RUj6vZy4v690j?=
- =?us-ascii?Q?eF1oQeLcT+gtT3RRfNyCSgsBjRnK1GnkMfH+fflohLFXVDrrHLLSPpJK+ycP?=
- =?us-ascii?Q?LrYyyKcqu3iQuP13tUXth9dsXZtUIYeKJ10mHVuAp7p2sxPpSy7Sg/Qth2lS?=
- =?us-ascii?Q?/9nnL5twmVjBjMyVZgyg6+MKGC5/uln08UiPTGO6j5xryvswzyNisFgP1vVJ?=
- =?us-ascii?Q?6TtnhZhzp/HViWTbWdlMxhdoM0oO+eleCtk4knC5CPJEUj846TA4JCszILDb?=
- =?us-ascii?Q?eIaHh7o7bh9PTOmFG01evPOrv12ImzIpz1TpJ1aBt+EJEuXZAbiutSOpv5rH?=
- =?us-ascii?Q?MbM/Sd49omOGH6cIo373kg99L1DJQEwGWS4wznHjDRponQ86tdUkvmumwsm/?=
- =?us-ascii?Q?JXsq3sMwqu/zz8b5koF/OaENwn7+oc0GM1t4fsv9nFfi6LztOlKWTKC0RHPW?=
- =?us-ascii?Q?lOr4WO8G4UzfCnMJJY8Xkx9D1rP75Pd7AowTKeJ5QKW1X4/VjTiIsjt/2li7?=
- =?us-ascii?Q?ZQ/0XYN8rhEXFdgOyxlkn4rZSU0TSjA1UzomDy4htmK7zlig8KEftN03LYI3?=
- =?us-ascii?Q?cfhNvEBPEWa9fu9uczXPtWNyjKppBrMQZvo8NaK8QZb7Cg9xOvU1RjrTC7eu?=
- =?us-ascii?Q?rrUB76zD7X+aMLzvdSxJtIgIoFD3/TiQVn/u8uCd1c3gHmMTKWBviJCEhYON?=
- =?us-ascii?Q?FMUM5xmiGCpY4YnItpUQ99yKyvjHnFTSd1L2dqN+dGm3ewWHzE8bOXDhsKJ9?=
- =?us-ascii?Q?uA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67244343-66dd-42dd-d5e2-08dbeffd7b4f
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 10:33:37.8473
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EOQEoFINzD5EKboXuOcrEyBLpnJqy2NkTt2xrZnS0JVnD/NOqHcGifHbuWlxivhVxsF+cewuM2t1oboCBc0sS8E9Tok+v+5AABIxa5KY4GU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6370
-X-OriginatorOrg: intel.com
 
-On Tue, Nov 28, 2023 at 11:26:59AM +0100, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 11/27/23 19:32, Larysa Zaremba wrote:
-> > Currently, there is no reason for data_meta to be limited to 32 bytes.
-> > Loosen this limitation and make maximum meta size 252.
-> 
-> First I though you made a type here with 252 bytes, but then I remembered
-> the 4 byte alignment.
-> I think commit message should elaborate on why 252 bytes.
->
+Hi,
 
-You are right, will do.
- 
-> > 
-> > Also, modify the selftest, so test_xdp_context_error does not complain
-> > about the unexpected success.
-> > 
-> > v2->v3:
-> > * Fix main patch author
-> > * Add selftests path
-> > 
-> > v1->v2:
-> > * replace 'typeof(metalen)' with the actual type
-> > 
-> > Aleksander Lobakin (1):
-> >    net, xdp: allow metadata > 32
-> > 
-> > Larysa Zaremba (1):
-> >    selftests/bpf: increase invalid metadata size
-> > 
-> >   include/linux/skbuff.h                              | 13 ++++++++-----
-> >   include/net/xdp.h                                   |  7 ++++++-
-> >   .../selftests/bpf/prog_tests/xdp_context_test_run.c |  4 ++--
-> >   3 files changed, 16 insertions(+), 8 deletions(-)
-> > 
+On Fri, 2023-11-24 at 17:16 -0800, Kuniyuki Iwashima wrote:
+> We will support arbitrary SYN Cookie with BPF, and then kfunc at
+> TC will preallocate reqsk and initialise some fields that should
+> not be overwritten later by cookie_v[46]_check().
+>=20
+> To simplify the flow in cookie_v[46]_check(), we move such fields'
+> initialisation to cookie_tcp_reqsk_alloc() and factorise non-BPF
+> SYN Cookie handling into cookie_tcp_check(), where we validate the
+> cookie and allocate reqsk, as done by kfunc later.
+>=20
+> Note that we set ireq->ecn_ok in two steps, the latter of which will
+> be shared by the BPF case.  As cookie_ecn_ok() is one-liner, now
+> it's inlined.
+>=20
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+>  include/net/tcp.h     |  13 ++++--
+>  net/ipv4/syncookies.c | 106 +++++++++++++++++++++++-------------------
+>  net/ipv6/syncookies.c |  61 ++++++++++++------------
+>  3 files changed, 99 insertions(+), 81 deletions(-)
+>=20
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index d4d0e9763175..973555cb1d3f 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -494,7 +494,10 @@ struct sock *tcp_get_cookie_sock(struct sock *sk, st=
+ruct sk_buff *skb,
+>  int __cookie_v4_check(const struct iphdr *iph, const struct tcphdr *th);
+>  struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb);
+>  struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_op=
+s *ops,
+> -					    struct sock *sk, struct sk_buff *skb);
+> +					    struct sock *sk, struct sk_buff *skb,
+> +					    struct tcp_options_received *tcp_opt,
+> +					    int mss, u32 tsoff);
+> +
+>  #ifdef CONFIG_SYN_COOKIES
+> =20
+>  /* Syncookies use a monotonic timer which increments every 60 seconds.
+> @@ -580,8 +583,12 @@ __u32 cookie_v4_init_sequence(const struct sk_buff *=
+skb, __u16 *mss);
+>  u64 cookie_init_timestamp(struct request_sock *req, u64 now);
+>  bool cookie_timestamp_decode(const struct net *net,
+>  			     struct tcp_options_received *opt);
+> -bool cookie_ecn_ok(const struct tcp_options_received *opt,
+> -		   const struct net *net, const struct dst_entry *dst);
+> +
+> +static inline bool cookie_ecn_ok(const struct net *net, const struct dst=
+_entry *dst)
+> +{
+> +	return READ_ONCE(net->ipv4.sysctl_tcp_ecn) ||
+> +		dst_feature(dst, RTAX_FEATURE_ECN);
+> +}
+> =20
+>  /* From net/ipv6/syncookies.c */
+>  int __cookie_v6_check(const struct ipv6hdr *iph, const struct tcphdr *th=
+);
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index f4bcd4822fe0..5be12f186c26 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -270,21 +270,6 @@ bool cookie_timestamp_decode(const struct net *net,
+>  }
+>  EXPORT_SYMBOL(cookie_timestamp_decode);
+> =20
+> -bool cookie_ecn_ok(const struct tcp_options_received *tcp_opt,
+> -		   const struct net *net, const struct dst_entry *dst)
+> -{
+> -	bool ecn_ok =3D tcp_opt->rcv_tsecr & TS_OPT_ECN;
+> -
+> -	if (!ecn_ok)
+> -		return false;
+> -
+> -	if (READ_ONCE(net->ipv4.sysctl_tcp_ecn))
+> -		return true;
+> -
+> -	return dst_feature(dst, RTAX_FEATURE_ECN);
+> -}
+> -EXPORT_SYMBOL(cookie_ecn_ok);
+> -
+>  static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+>  				 struct request_sock *req)
+>  {
+> @@ -320,8 +305,12 @@ static int cookie_tcp_reqsk_init(struct sock *sk, st=
+ruct sk_buff *skb,
+>  }
+> =20
+>  struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_op=
+s *ops,
+> -					    struct sock *sk, struct sk_buff *skb)
+> +					    struct sock *sk, struct sk_buff *skb,
+> +					    struct tcp_options_received *tcp_opt,
+> +					    int mss, u32 tsoff)
+>  {
+> +	struct inet_request_sock *ireq;
+> +	struct tcp_request_sock *treq;
+>  	struct request_sock *req;
+> =20
+>  	if (sk_is_mptcp(sk))
+> @@ -337,40 +326,36 @@ struct request_sock *cookie_tcp_reqsk_alloc(const s=
+truct request_sock_ops *ops,
+>  		return NULL;
+>  	}
+> =20
+> +	ireq =3D inet_rsk(req);
+> +	treq =3D tcp_rsk(req);
+> +
+> +	req->mss =3D mss;
+> +	req->ts_recent =3D tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
+> +
+> +	ireq->snd_wscale =3D tcp_opt->snd_wscale;
+> +	ireq->tstamp_ok =3D tcp_opt->saw_tstamp;
+> +	ireq->sack_ok =3D tcp_opt->sack_ok;
+> +	ireq->wscale_ok =3D tcp_opt->wscale_ok;
+> +	ireq->ecn_ok =3D tcp_opt->rcv_tsecr & TS_OPT_ECN;
+> +
+> +	treq->ts_off =3D tsoff;
+> +
+>  	return req;
+>  }
+>  EXPORT_SYMBOL_GPL(cookie_tcp_reqsk_alloc);
+> =20
+> -/* On input, sk is a listener.
+> - * Output is listener if incoming packet would not create a child
+> - *           NULL if memory could not be allocated.
+> - */
+> -struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+> +static struct request_sock *cookie_tcp_check(struct net *net, struct soc=
+k *sk,
+> +					     struct sk_buff *skb)
+>  {
+> -	struct ip_options *opt =3D &TCP_SKB_CB(skb)->header.h4.opt;
+> -	const struct tcphdr *th =3D tcp_hdr(skb);
+>  	struct tcp_options_received tcp_opt;
+> -	struct tcp_sock *tp =3D tcp_sk(sk);
+> -	struct inet_request_sock *ireq;
+> -	struct net *net =3D sock_net(sk);
+> -	struct tcp_request_sock *treq;
+> -	struct request_sock *req;
+> -	struct sock *ret =3D sk;
+> -	int full_space, mss;
+> -	struct flowi4 fl4;
+> -	struct rtable *rt;
+> -	__u8 rcv_wscale;
+>  	u32 tsoff =3D 0;
+> -
+> -	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+> -	    !th->ack || th->rst)
+> -		goto out;
+> +	int mss;
+> =20
+>  	if (tcp_synq_no_recent_overflow(sk))
+>  		goto out;
+> =20
+> -	mss =3D __cookie_v4_check(ip_hdr(skb), th);
+> -	if (mss =3D=3D 0) {
+> +	mss =3D __cookie_v4_check(ip_hdr(skb), tcp_hdr(skb));
+> +	if (!mss) {
+>  		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
+>  		goto out;
+>  	}
+> @@ -391,21 +376,44 @@ struct sock *cookie_v4_check(struct sock *sk, struc=
+t sk_buff *skb)
+>  	if (!cookie_timestamp_decode(net, &tcp_opt))
+>  		goto out;
+> =20
+> -	req =3D cookie_tcp_reqsk_alloc(&tcp_request_sock_ops, sk, skb);
+> +	return cookie_tcp_reqsk_alloc(&tcp_request_sock_ops, sk, skb,
+> +				      &tcp_opt, mss, tsoff);
+> +out:
+> +	return ERR_PTR(-EINVAL);
+> +}
+> +
+> +/* On input, sk is a listener.
+> + * Output is listener if incoming packet would not create a child
+> + *           NULL if memory could not be allocated.
+> + */
+> +struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	struct ip_options *opt =3D &TCP_SKB_CB(skb)->header.h4.opt;
+> +	const struct tcphdr *th =3D tcp_hdr(skb);
+> +	struct tcp_sock *tp =3D tcp_sk(sk);
+> +	struct inet_request_sock *ireq;
+> +	struct net *net =3D sock_net(sk);
+> +	struct request_sock *req;
+> +	struct sock *ret =3D sk;
+> +	struct flowi4 fl4;
+> +	struct rtable *rt;
+> +	__u8 rcv_wscale;
+> +	int full_space;
+> +
+> +	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+> +	    !th->ack || th->rst)
+> +		goto out;
+> +
+> +	req =3D cookie_tcp_check(net, sk, skb);
+> +	if (IS_ERR(req))
+> +		goto out;
+>  	if (!req)
+>  		goto out_drop;
+> =20
+>  	ireq =3D inet_rsk(req);
+> -	treq =3D tcp_rsk(req);
+> -	treq->ts_off		=3D tsoff;
+> -	req->mss		=3D mss;
+> +
+>  	sk_rcv_saddr_set(req_to_sk(req), ip_hdr(skb)->daddr);
+>  	sk_daddr_set(req_to_sk(req), ip_hdr(skb)->saddr);
+> -	ireq->snd_wscale	=3D tcp_opt.snd_wscale;
+> -	ireq->sack_ok		=3D tcp_opt.sack_ok;
+> -	ireq->wscale_ok		=3D tcp_opt.wscale_ok;
+> -	ireq->tstamp_ok		=3D tcp_opt.saw_tstamp;
+> -	req->ts_recent		=3D tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
+> =20
+>  	/* We throwed the options of the initial SYN away, so we hope
+>  	 * the ACK carries the same options again (see RFC1122 4.2.3.8)
+> @@ -447,7 +455,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct =
+sk_buff *skb)
+>  				  dst_metric(&rt->dst, RTAX_INITRWND));
+> =20
+>  	ireq->rcv_wscale  =3D rcv_wscale;
+> -	ireq->ecn_ok =3D cookie_ecn_ok(&tcp_opt, net, &rt->dst);
+> +	ireq->ecn_ok &=3D cookie_ecn_ok(net, &rt->dst);
+> =20
+>  	ret =3D tcp_get_cookie_sock(sk, skb, req, &rt->dst);
+>  	/* ip_queue_xmit() depends on our flow being setup
+> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+> index e0a9220d1536..c8d2ca27220c 100644
+> --- a/net/ipv6/syncookies.c
+> +++ b/net/ipv6/syncookies.c
+> @@ -127,31 +127,18 @@ int __cookie_v6_check(const struct ipv6hdr *iph, co=
+nst struct tcphdr *th)
+>  }
+>  EXPORT_SYMBOL_GPL(__cookie_v6_check);
+> =20
+> -struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+> +static struct request_sock *cookie_tcp_check(struct net *net, struct soc=
+k *sk,
+> +					     struct sk_buff *skb)
+>  {
+> -	const struct tcphdr *th =3D tcp_hdr(skb);
+> -	struct ipv6_pinfo *np =3D inet6_sk(sk);
+>  	struct tcp_options_received tcp_opt;
+> -	struct tcp_sock *tp =3D tcp_sk(sk);
+> -	struct inet_request_sock *ireq;
+> -	struct net *net =3D sock_net(sk);
+> -	struct tcp_request_sock *treq;
+> -	struct request_sock *req;
+> -	struct dst_entry *dst;
+> -	struct sock *ret =3D sk;
+> -	int full_space, mss;
+> -	__u8 rcv_wscale;
+>  	u32 tsoff =3D 0;
+> -
+> -	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+> -	    !th->ack || th->rst)
+> -		goto out;
+> +	int mss;
+> =20
+>  	if (tcp_synq_no_recent_overflow(sk))
+>  		goto out;
+> =20
+> -	mss =3D __cookie_v6_check(ipv6_hdr(skb), th);
+> -	if (mss =3D=3D 0) {
+> +	mss =3D __cookie_v6_check(ipv6_hdr(skb), tcp_hdr(skb));
+> +	if (!mss) {
+>  		__NET_INC_STATS(net, LINUX_MIB_SYNCOOKIESFAILED);
+>  		goto out;
+>  	}
+> @@ -172,14 +159,37 @@ struct sock *cookie_v6_check(struct sock *sk, struc=
+t sk_buff *skb)
+>  	if (!cookie_timestamp_decode(net, &tcp_opt))
+>  		goto out;
+> =20
+> -	req =3D cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops, sk, skb);
+> +	return cookie_tcp_reqsk_alloc(&tcp6_request_sock_ops, sk, skb,
+> +				      &tcp_opt, mss, tsoff);
+> +out:
+> +	return ERR_PTR(-EINVAL);
+> +}
+> +
+> +struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+> +{
+> +	const struct tcphdr *th =3D tcp_hdr(skb);
+> +	struct ipv6_pinfo *np =3D inet6_sk(sk);
+> +	struct tcp_sock *tp =3D tcp_sk(sk);
+> +	struct inet_request_sock *ireq;
+> +	struct net *net =3D sock_net(sk);
+> +	struct request_sock *req;
+> +	struct dst_entry *dst;
+> +	struct sock *ret =3D sk;
+> +	__u8 rcv_wscale;
+> +	int full_space;
+> +
+> +	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+> +	    !th->ack || th->rst)
+> +		goto out;
+> +
+> +	req =3D cookie_tcp_check(net, sk, skb);
+> +	if (IS_ERR(req))
+> +		goto out;
+>  	if (!req)
+>  		goto out_drop;
+> =20
+>  	ireq =3D inet_rsk(req);
+> -	treq =3D tcp_rsk(req);
+> =20
+> -	req->mss =3D mss;
+>  	ireq->ir_v6_rmt_addr =3D ipv6_hdr(skb)->saddr;
+>  	ireq->ir_v6_loc_addr =3D ipv6_hdr(skb)->daddr;
+> =20
+> @@ -198,13 +208,6 @@ struct sock *cookie_v6_check(struct sock *sk, struct=
+ sk_buff *skb)
+>  	    ipv6_addr_type(&ireq->ir_v6_rmt_addr) & IPV6_ADDR_LINKLOCAL)
+>  		ireq->ir_iif =3D tcp_v6_iif(skb);
+> =20
+> -	ireq->snd_wscale	=3D tcp_opt.snd_wscale;
+> -	ireq->sack_ok		=3D tcp_opt.sack_ok;
+> -	ireq->wscale_ok		=3D tcp_opt.wscale_ok;
+> -	ireq->tstamp_ok		=3D tcp_opt.saw_tstamp;
+> -	req->ts_recent		=3D tcp_opt.saw_tstamp ? tcp_opt.rcv_tsval : 0;
+> -	treq->ts_off =3D tsoff;
+> -
+>  	tcp_ao_syncookie(sk, skb, req, AF_INET6);
+> =20
+>  	/*
+> @@ -245,7 +248,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct =
+sk_buff *skb)
+>  				  dst_metric(dst, RTAX_INITRWND));
+> =20
+>  	ireq->rcv_wscale =3D rcv_wscale;
+> -	ireq->ecn_ok =3D cookie_ecn_ok(&tcp_opt, net, dst);
+> +	ireq->ecn_ok &=3D cookie_ecn_ok(net, dst);
+
+Nice cleanup! IMHO looks very good. But deserves Eric's explicit ack, I
+think ;)
+
+The only question I have (out of sheer curiosity, no change requested
+here) is:
+
+have you considered leaving the 'ecn_ok' initialization unchanged
+(looks a little cleaner as a single step init)? Is that for later's
+patch sake? (I haven't looked at them yet).
+
+Cheers,
+
+Paolo
+
 
