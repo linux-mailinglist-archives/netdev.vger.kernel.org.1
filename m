@@ -1,65 +1,86 @@
-Return-Path: <netdev+bounces-51788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD8D7FC09A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:50:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B96597FC0AF
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:54:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 759BAB20D10
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:50:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71E43282BE8
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6355739AEC;
-	Tue, 28 Nov 2023 17:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96915B5D6;
+	Tue, 28 Nov 2023 17:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EbnNwH/X"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="FgQ9rBAe";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wGBILsJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F008DC;
-	Tue, 28 Nov 2023 09:50:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701193834; x=1732729834;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=FHQ7x5YlyO03fAtFmbz0hZlnhaEwXt8ecRdrQKklMuw=;
-  b=EbnNwH/XsmAQUFrBIPW5kc8LTTxAJO3intXbKWOu5Qd6lXuqyE2IWJ4l
-   zR+cLxFkKl7ClD1Ut1tMT0Xc1y0eeR2cpXWx2YmRHfLqeReJsqcU/r++S
-   bo22+X9/dfqFL7I2xqbdsc6HNgbflxrCoWxZVU+ElH1dlHd44HTzwou5B
-   y0XhUw5I/ARyTy+ERkisty1IR3+1P50B3iJAaq9iCTkAMu43cGeH/UIE9
-   tAzhK/w4JnWtEsHUfV3Q9kePjK+UysgSk6uM6Oz0hiGKgeSHT/13nLY0P
-   8OKlSpt/75BhwXqBbB34IO/MXznVb4SFyoD6J25oPWLimo/Z2phI559ej
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="372352359"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="372352359"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 09:50:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="744972833"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="744972833"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga006.jf.intel.com with ESMTP; 28 Nov 2023 09:50:30 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id E33F723E; Tue, 28 Nov 2023 19:50:28 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306541710;
+	Tue, 28 Nov 2023 09:54:50 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailout.nyi.internal (Postfix) with ESMTP id 412505C009E;
+	Tue, 28 Nov 2023 12:54:49 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Tue, 28 Nov 2023 12:54:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm3; t=1701194089; x=1701280489; bh=FjP7ejQHFE
+	0z5ThOzRjLFxTQyIGpyVo9B05Q7w9eZpE=; b=FgQ9rBAeNZ0btzk/wx2ncsWp2b
+	BPP5CDQ4I/RCQbLrznq924GuHcyGIMqctjjpp6uoWU9q8UjoxE+xxIYQddVUchvY
+	6YZjofdT/M6Hq0TuisenRa6IpRtLTo2x1sQ3lOZ/UVn3s8wQ87wTXREV4I0t8HYp
+	nTccLEz/aqTV1OJhj4khRZegn3sQsquOXqboNoyBxWrcQjpIvlkOG8/PQqBXoU0o
+	s1FK5XUPvg6oK+BmAXg6KzSdknDtAgDz8LSLEYH6dh+/l/VHxnXoMNhOBHOt5ce4
+	cHanTViTMcbo/6t9hN4MZxsNc7P13zfoVs/FDgYJZTAlpWEgdUKVia9eouxA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1701194089; x=1701280489; bh=FjP7ejQHFE0z5
+	ThOzRjLFxTQyIGpyVo9B05Q7w9eZpE=; b=wGBILsJv5W9f56TAXM2r7CI+wXMWD
+	JvFjad2ohIJAt/u1QplnXAhblqkIdF1VR4O1V6QZLtDF64ItOs3S5QsOj/gVZ3sF
+	GfpCk+cTuRpQ5PrsYBTjZOcfFnEKNK4E8mKEJf6SkK0iHC7wweeHiK2xiJqkAhE0
+	uIG5GtXnd5mPvDOcR/pG8Dsz/6qiH2FqB7eBrE8vo+omtFPuVKiDNxloJKpe+16A
+	tReIJafyFoXBS+bQFZP1vT9hOeZuIg/y6wOZZ6/uUa1/NptiZwA30ahA5Wdapad7
+	XInR5E0ftzStOY/gRpYK+aYDgiiwdmurfuH0EijVrX9Ahz0hndEnJvvRA==
+X-ME-Sender: <xms:aClmZdV7vjRDSM3dt7DkssVxQwZmtBinoVL74hKtUn-ZPxmyVN-Pdg>
+    <xme:aClmZdkzrr52FbHDzFLmL5QeTST_QswrhwZ01orZq8xpiGEPzc8x8GaYRMuvHPfVZ
+    nf2hiXEtqAserWoAA>
+X-ME-Received: <xmr:aClmZZZhLaSaM1LBCFyRU2Q0gJM4NSy3pDAmY4ZCa2AFWWgO_vTfoeEN4hxqkvDW-VE1ArvBn-w1vfiUdxu1ZiZk5Ox_3cZ1k9A5brf--IoKsw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeifedguddthecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculddvfedmnecujfgurhephf
+    fvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegu
+    gihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeikeehudegteevuddthf
+    eilefhjefgueeuueffveevheeggfeufeejfeeuudekfeenucffohhmrghinhepihgvthhf
+    rdhorhhgpdhgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:aClmZQW9Kvw_AMEAedzkZ0LSJsdAnmhXAOHwwaO2vGMj01BwffF50w>
+    <xmx:aClmZXm95JbzU-5jv4sLIMJIpKtCv46YIAxoC0HnF0sBIt5kJMCN7A>
+    <xmx:aClmZdf-Edw2xh3eU1gk7PujVulbGZjoXOox7RjzA9UR9Jeybkdjjw>
+    <xmx:aSlmZQgprf94_masvagbmK85pqD_LJYUEmm7PcBXA-TKlBL4upIzMw>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Nov 2023 12:54:47 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: netdev@vger.kernel.org,
+	llvm@lists.linux.dev,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] net: dsa: sja1105: Use units.h instead of the copy of a definition
-Date: Tue, 28 Nov 2023 19:50:27 +0200
-Message-ID: <20231128175027.394754-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	steffen.klassert@secunet.com,
+	antony.antony@secunet.com,
+	alexei.starovoitov@gmail.com,
+	yonghong.song@linux.dev,
+	eddyz87@gmail.com
+Cc: devel@linux-ipsec.org
+Subject: [PATCH ipsec-next v2 0/6] Add bpf_xdp_get_xfrm_state() kfunc
+Date: Tue, 28 Nov 2023 10:54:20 -0700
+Message-ID: <cover.1701193577.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,35 +89,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-BYTES_PER_KBIT is defined in units.h, use that definition.
+This patchset adds two kfunc helpers, bpf_xdp_get_xfrm_state() and
+bpf_xdp_xfrm_state_release() that wrap xfrm_state_lookup() and
+xfrm_state_put(). The intent is to support software RSS (via XDP) for
+the ongoing/upcoming ipsec pcpu work [0]. Recent experiments performed
+on (hopefully) reproducible AWS testbeds indicate that single tunnel
+pcpu ipsec can reach line rate on 100G ENA nics.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/dsa/sja1105/sja1105_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Note this patchset only tests/shows generic xfrm_state access. The
+"secret sauce" (if you can really even call it that) involves accessing
+a soon-to-be-upstreamed pcpu_num field in xfrm_state. Early example is
+available here [1].
 
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index 74cee39d73df..6646f7fb0f90 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -21,6 +21,8 @@
- #include <linux/if_bridge.h>
- #include <linux/if_ether.h>
- #include <linux/dsa/8021q.h>
-+#include <linux/units.h>
-+
- #include "sja1105.h"
- #include "sja1105_tas.h"
- 
-@@ -2138,7 +2140,6 @@ static void sja1105_bridge_leave(struct dsa_switch *ds, int port,
- 	sja1105_bridge_member(ds, port, bridge, false);
- }
- 
--#define BYTES_PER_KBIT (1000LL / 8)
- /* Port 0 (the uC port) does not have CBS shapers */
- #define SJA1110_FIXED_CBS(port, prio) ((((port) - 1) * SJA1105_NUM_TC) + (prio))
- 
+[0]: https://datatracker.ietf.org/doc/draft-ietf-ipsecme-multi-sa-performance/03/
+[1]: https://github.com/danobi/xdp-tools/blob/e89a1c617aba3b50d990f779357d6ce2863ecb27/xdp-bench/xdp_redirect_cpumap.bpf.c#L385-L406
+
+Changes from v1:
+* Move xfrm tunnel tests to test_progs
+* Fix writing to opts->error when opts is invalid
+* Use __bpf_kfunc_start_defs()
+* Remove unused vxlanhdr definition
+* Add and use BPF_CORE_WRITE_BITFIELD() macro
+* Make series bisect clean
+
+Changes from RFCv2:
+* Rebased to ipsec-next
+* Fix netns leak
+
+Changes from RFCv1:
+* Add Antony's commit tags
+* Add KF_ACQUIRE and KF_RELEASE semantics
+
+
+Daniel Xu (6):
+  bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
+  bpf: xfrm: Add bpf_xdp_xfrm_state_release() kfunc
+  libbpf: Add BPF_CORE_WRITE_BITFIELD() macro
+  bpf: selftests: test_tunnel: Use vmlinux.h declarations
+  bpf: selftests: Move xfrm tunnel test to test_progs
+  bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
+
+ include/net/xfrm.h                            |   9 +
+ net/xfrm/Makefile                             |   1 +
+ net/xfrm/xfrm_policy.c                        |   2 +
+ net/xfrm/xfrm_state_bpf.c                     | 128 +++++++++++++++
+ tools/lib/bpf/bpf_core_read.h                 |  36 ++++
+ .../selftests/bpf/prog_tests/test_tunnel.c    | 155 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/test_tunnel_kern.c    | 138 +++++++++-------
+ tools/testing/selftests/bpf/test_tunnel.sh    |  92 -----------
+ 9 files changed, 412 insertions(+), 150 deletions(-)
+ create mode 100644 net/xfrm/xfrm_state_bpf.c
+
 -- 
-2.43.0.rc1.1.gbec44491f096
+2.42.1
 
 
