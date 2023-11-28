@@ -1,103 +1,89 @@
-Return-Path: <netdev+bounces-51604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E9E7FB51A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:00:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2046F7FB4C4
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 144E0280E79
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1141C210C7
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1F8358AA;
-	Tue, 28 Nov 2023 09:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76301D54E;
+	Tue, 28 Nov 2023 08:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="whC9yfCx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Biez3ElI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66ED2138;
-	Tue, 28 Nov 2023 01:00:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+Kqd0ZZyXT9nJQi9dwXBehSCo6NOmmyqnNaiHd+uCVU=; b=whC9yfCx0Udo9iFHwXHWMOFPVR
-	V5pix6ulLuyYpHr+vYNyG5y5shQMv5R56u/HNcczCtE12sF417Sh5VoAau4XYBvP0ucOKbg+cBHGY
-	skbfXPYP+CDqWw3kHXC7uK/b+gcwsV7YjmeGv/th7SdJnMW7aSQAf3+0fU+5hcindJuh+Ogh4WWVa
-	XEgCpz3IU8sANK+HWysINamznqtYNEEsT9zCxnc0ypRQ+aqWtVHMza67VPg2b25bHLPQA4u6WbNh6
-	c1LaLqoqViolzvrgpCaTyQHSYKtevKB6iSLJEgcHZ56MoXMq5OsbFxJZdzLD3Qs7kLTrFenybszgR
-	ngb0hEJg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39606)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r7txG-0006zt-20;
-	Tue, 28 Nov 2023 09:00:30 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r7txF-0002oc-FO; Tue, 28 Nov 2023 09:00:29 +0000
-Date: Tue, 28 Nov 2023 09:00:29 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, corbet@lwn.net, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v6 3/6] net: phy: at803x: add QCA8084 ethernet phy support
-Message-ID: <ZWWsLf/w82N0vwBq@shell.armlinux.org.uk>
-References: <20231126060732.31764-1-quic_luoj@quicinc.com>
- <20231126060732.31764-4-quic_luoj@quicinc.com>
- <0b22dd51-417c-436d-87ce-7ebc41185860@lunn.ch>
- <f0604c25-87a7-497a-8884-7a779ee7a2f5@quicinc.com>
- <8e4046dd-813c-4766-83fb-c54a700caf31@lunn.ch>
- <9c4c1fe7-5d71-4bb2-8b92-f4e9a136e93d@quicinc.com>
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91230E7;
+	Tue, 28 Nov 2023 00:50:09 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2A138C0011;
+	Tue, 28 Nov 2023 08:50:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701161408;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qYJnE4Z1r7jKRPOrGAwXhHc797bbl+1US3cszB9aa9E=;
+	b=Biez3ElIDFQtKoAoSEC77AQXzKbt7Ch1XeZiVYhh0NXtG9v9GlfxXJMHUGbOSfb77LUOcn
+	3R+0msBidXWkzyP/oA03LjO59JoGEB8nwVxWQhzryO7/3lBgdfOGe+ccmpFTRzo+6Hyh/S
+	GD+Y3ayQHKYfSpqkoEeBAFW7jASzaG7FBLQy3BcrLGsrxmfREYLffgYMaUk3magZpde8IY
+	Jpkm3fVUL0fUT7BMlooYuZIqQDCRhLrK/p3fM+xSrJ+AkeIXExE94qMn2452ctDbzk7VWP
+	2n/LDss+hsxqQFoi5sfx/ccHyQ5hgvuoH436OaEzpLi2b4pI+5FaKvrDAG795Q==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	alexis.lothore@bootlin.com
+Subject: [PATCH net] net: stmmac: dwmac-socfpga: Don't access SGMII adapter when not available
+Date: Tue, 28 Nov 2023 10:45:37 +0100
+Message-ID: <20231128094538.228039-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c4c1fe7-5d71-4bb2-8b92-f4e9a136e93d@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Nov 28, 2023 at 03:16:45PM +0800, Jie Luo wrote:
-> > > The interface mode is passed in the .config_init, which is configured
-> > > by the PCS driver, the hardware register is located in the PCS, this
-> > > driver will be pushed later.
-> > 
-> > Is this the same as how the syqca807x works? Can the PCS driver be
-> > shared by these two drivers?
-> 
-> I am not sure syqca807x, would you point me the code path of this driver?
-> 
-> > 
-> > What i don't like at the moment is that we have two driver
-> > developments going on at once for hardware which seems very similar,
-> > but no apparent cooperation?
-> > 
-> > 	Andrew
-> 
-> The PCS of qca8084 is the PHY PCS, which should be new PCS driver,
-> in the previous chips, we don't have this kind of PHY PCS.
+The SGMII adapter isn't present on all dwmac-socfpga implementations.
+Make sure we don't try to configure it if we don't have this adapter.
 
-No. PCS drivers are for MAC-side PCS drivers, not PHY-side PCS drivers.
+Fixes: 5d1f3fe7d2d5 ("net: stmmac: dwmac-sogfpga: use the lynx pcs driver")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-                     +-------------
-		     |     PHY
-MAC---PCS --- link --- PCS --- ...
-       ^             |  ^
-       |	     +--|----------
-  For this PCS          |
-                  Not for this PCS
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index ba2ce776bd4d..ae120792e1b6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -243,7 +243,8 @@ static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
+ {
+ 	u16 val = enable ? SGMII_ADAPTER_ENABLE : SGMII_ADAPTER_DISABLE;
+ 
+-	writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
++	if (dwmac->sgmii_adapter_base)
++		writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
+ }
+ 
+ static int socfpga_set_phy_mode_common(int phymode, u32 *val)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.42.0
+
 
