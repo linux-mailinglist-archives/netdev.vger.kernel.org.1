@@ -1,115 +1,123 @@
-Return-Path: <netdev+bounces-51602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511DE7FB500
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:58:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797AD7FB510
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:59:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E44F281370
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:58:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC880B20CA2
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D348D1EB3F;
-	Tue, 28 Nov 2023 08:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC5A1946E;
+	Tue, 28 Nov 2023 08:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMZ0Vrsl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Or6/DZxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C73F4;
-	Tue, 28 Nov 2023 00:58:14 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54a945861c6so7133404a12.3;
-        Tue, 28 Nov 2023 00:58:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701161893; x=1701766693; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7eThDWl/p719tUnMNV7tBdoRpTLwA6GR+r/kwIo8Uvw=;
-        b=QMZ0VrslsocHnaDUxbJ9hJ1Mi8HVpLisOjj7iB+jmbmTLVo9/9BOTF/ZSm4MzXmDPv
-         t/6bqlWbqVULF5K1CB3KX8xUlFju9Holt0MDX05h8JoyKvZ98jtS7CS9GmzWo1o8El5z
-         8MmZRmAyLaxX6TPb2crEVMXVCKiKav6xD/9VK5b/NvlLVMyRVbr4+ooc2+NkG+1plGvr
-         6w6Hy2GPzieTzIX2yyXq9cU6TR2/N3GqUfKBNc731s+iKrDEqpYh9o5T9fvdFe65zijt
-         BHpWV5uuJpNkKSBIYdzkKilP+Oi4G3yx2SOsKDKX4RGPsbzmpto1gl+LSsZxIfgqfHec
-         FcQQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B74FE4
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:59:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701161979;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60UWT9hpYV2opT9b3jKpL7Vb/AVEC0x3aT0U6GS5l4k=;
+	b=Or6/DZxocGgXuJy2jlJ/i8J1qZmFEfgZ/+1J6GhVwYRSGZtQ+qjHSjJcdkxoRt4qSL62p2
+	dnc2qBIWmf1yP0aZ0bAl70MBBWPCJX1LG1646KSuSDWvwDkfe6xtQSnMWOVO0kfUEJC+Pl
+	NUsXQbcN/ql69aiI+KO0PLuLYlPrp4w=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-16X0ud6zOXOmd2y4eP3R-Q-1; Tue, 28 Nov 2023 03:59:37 -0500
+X-MC-Unique: 16X0ud6zOXOmd2y4eP3R-Q-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a03389a0307so73167166b.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:59:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701161893; x=1701766693;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eThDWl/p719tUnMNV7tBdoRpTLwA6GR+r/kwIo8Uvw=;
-        b=veuMsuEFbbdIjaB+Pq7BcSJxLXAGLqKIEIMTr8qgFZzLkdr1t2Tu0xQB1wDy1wb2Na
-         k9gGu9k1VV/4pBb9rKvz3J3vdzQftMHxe+sLhnXukjr78JWBYHjWGyBwyeSDSKN6sKDO
-         LA1OTP0bVcHgW6jcegAJ+HY9PRUGIf4kPoa92XWiCV/GpHDjbFOnUJJ+CCgPc2ageVuU
-         mwkVM/tuMsEIHeF4UuRp2bAgBr80WOMa+jX18HKz75YXFLeVjVpteYCZknRXFqgdus61
-         uZO2Yg1QME4plStx8aByiJYnpljixJ1oIltMxXnb0+K4XuKdcxMJYO5QZnSjhkT8PQ3I
-         9C1w==
-X-Gm-Message-State: AOJu0Yz5ARoskIiZn3+GWKOHd49Epzvjp2Dh653yx9mYcDfQPNaJodHR
-	RxL9J5I8cu2VqFT1Q+xvF+U=
-X-Google-Smtp-Source: AGHT+IFR5RnA5vAR+1Mvjlycnu2h0GtN0a4lFsYU5ANWlySGynJdKlWATFHR8EF2K/rPwT6dWGJYig==
-X-Received: by 2002:a05:6402:290b:b0:54b:9817:bf91 with SMTP id ee11-20020a056402290b00b0054b9817bf91mr1811570edb.7.1701161892405;
-        Tue, 28 Nov 2023 00:58:12 -0800 (PST)
-Received: from [172.27.56.182] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id e7-20020a056402104700b00542db304680sm6058243edu.63.2023.11.28.00.58.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 00:58:12 -0800 (PST)
-Message-ID: <3d3b6a1f-40b6-45b5-a899-d01acb91213d@gmail.com>
-Date: Tue, 28 Nov 2023 10:58:04 +0200
+        d=1e100.net; s=20230601; t=1701161976; x=1701766776;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=60UWT9hpYV2opT9b3jKpL7Vb/AVEC0x3aT0U6GS5l4k=;
+        b=C/eZHTbRDKp66Z6IfFqy9JWoQFrahYmPhCiiM3KUSZ4q6a9KvDz4BbVaDlyIaSKhmu
+         bXcD5Rf3B5IRoWt3bgE1IHbW16+ZTU3UHHwPXmCGJIqphGqvKLVIKCft3JgvrTpzqMkZ
+         nD+Qz9H+KwNMKxDopea3Zi5B9rS89sz/7V4i+6O78BaSpEIntKcYPsZYG2p8+EcdHR61
+         5vaz4yDM1z9eZMF7z183X1rdMIGF/qfm7nz6XYCxaSW7ZMmcCzaLk85kAhaiEwjezPLV
+         tKCMpdxZriz/cXw0iY5MRZj4/KIT7Kyo/XRlSJkAeVGReDdMnSY9D19Ce3kfpO/pPuL7
+         JCNQ==
+X-Gm-Message-State: AOJu0YwQN5GKJnTNlAEYVaXt8FSlhp+K4agr4fkUptAUHvE7J8u72hmc
+	YAIcwy1vu8vaDbmkdZxdVUxMqR/NqjLjiOFx+8Dtag6y/ITZzG2EBqSOffZEcdURlD0lSEpPlF1
+	XLM+SNMiJVfw2G8CI
+X-Received: by 2002:a17:906:7e0d:b0:a11:5a4c:6548 with SMTP id e13-20020a1709067e0d00b00a115a4c6548mr3111502ejr.7.1701161976652;
+        Tue, 28 Nov 2023 00:59:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGa6pz4f0Q9MMs7R29ydDBOIYcEP9Z0L1TlcUrM055p0HvsZw1mpK+lLRkGtiaTc6dnzMQ/5g==
+X-Received: by 2002:a17:906:7e0d:b0:a11:5a4c:6548 with SMTP id e13-20020a1709067e0d00b00a115a4c6548mr3111483ejr.7.1701161976282;
+        Tue, 28 Nov 2023 00:59:36 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-249-156.dyn.eolo.it. [146.241.249.156])
+        by smtp.gmail.com with ESMTPSA id v13-20020a170906564d00b00a0ac350f807sm4456416ejr.212.2023.11.28.00.59.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 00:59:35 -0800 (PST)
+Message-ID: <829107c3e007af0b0e040748f39873d838785dce.camel@redhat.com>
+Subject: Re: [PATCH net] tcp: fix mid stream window clamp.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Neil Spring <ntspring@meta.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Wei Wang <weiwan@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller"
+	 <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
+	 <kuba@kernel.org>, David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 28 Nov 2023 09:59:34 +0100
+In-Reply-To: <SA1PR15MB51870B8E934E9132044CE58DA3BDA@SA1PR15MB5187.namprd15.prod.outlook.com>
+References: 
+	<fab4d0949126683a3b6b4e04a9ec088cf9bfdbb1.1700751622.git.pabeni@redhat.com>
+	 <CANn89iJMVCGegZW2JGtfvGJVq1DZsM7dUEOJxfcvWurLSZGvTQ@mail.gmail.com>
+	 <ebb26a4a8a80292423c8cfc965c7b16e2aa4e201.camel@redhat.com>
+	 <SA1PR15MB5187F56AEFC6B6A581E056C5A3B9A@SA1PR15MB5187.namprd15.prod.outlook.com>
+	 <3f549b4f1402ea17d56c292d3a1f85be3e2b7d89.camel@redhat.com>
+	 <SA1PR15MB51870B8E934E9132044CE58DA3BDA@SA1PR15MB5187.namprd15.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5e: fix a potential double-free in
- fs_any_create_groups
-Content-Language: en-US
-To: Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Zhengchao Shao <shaozhengchao@huawei.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, Simon Horman <horms@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Aya Levin <ayal@nvidia.com>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20231128082812.24483-1-dinghao.liu@zju.edu.cn>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20231128082812.24483-1-dinghao.liu@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+
+On Mon, 2023-11-27 at 22:59 +0000, Neil Spring wrote:
+>=20
+> Would the following address the concern? =20
+>=20
+> tp->rcv_ssthresh =3D min(max(tp->rcv_ssthresh, tp->rcv_wnd), tp-
+> >window_clamp);
+>=20
+> (that is, rcv_sshthresh must be no greater than window_clamp, but
+> otherwise it can keep the larger of its current value or the last
+> advertised window.)
+>=20
+> I believe this addresses both problem cases (transient tiny clamp;
+> closed window when clamping) and passes (slightly less picky)
+> packetdrill tests.
+
+Note that the above is basically the patch I submitted (it yields the
+same values).
+
+Yes, it addresses the issue.
+
+But it does not address Eric's concerns reported in this thread.
+
+It's unclear to me if the more involved approach proposed here:
+
+https://lore.kernel.org/netdev/ebb26a4a8a80292423c8cfc965c7b16e2aa4e201.cam=
+el@redhat.com/
+
+would be ok?
+
+Thanks!
+
+Paolo
 
 
-
-On 28/11/2023 10:28, Dinghao Liu wrote:
-> When kcalloc() for ft->g succeeds but kvzalloc() for in fails,
-> fs_any_create_groups() will free ft->g. However, its caller
-> fs_any_create_table() will free ft->g again through calling
-> mlx5e_destroy_flow_table(), which will lead to a double-free.
-> Fix this by removing the kfree(ft->g) in fs_any_create_groups().
-> 
-> Fixes: 0f575c20bf06 ("net/mlx5e: Introduce Flow Steering ANY API")
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
-> index be83ad9db82a..b222d23bfb9a 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
-> @@ -434,7 +434,6 @@ static int fs_any_create_groups(struct mlx5e_flow_table *ft)
->   	ft->g = kcalloc(MLX5E_FS_UDP_NUM_GROUPS, sizeof(*ft->g), GFP_KERNEL);
->   	in = kvzalloc(inlen, GFP_KERNEL);
->   	if  (!in || !ft->g) {
-> -		kfree(ft->g);
->   		kvfree(in);
->   		return -ENOMEM;
->   	}
-
-Function fs_any_create_groups should not return failure without cleaning 
-itself up. This is not the right fix.
-Freeing ft->g and setting it to NULL will do it, and will avoid the 
-double free.
 
