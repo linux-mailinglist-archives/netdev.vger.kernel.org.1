@@ -1,73 +1,181 @@
-Return-Path: <netdev+bounces-51519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E647FAFF9
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 03:15:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A86997FB005
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 03:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F1131F20F53
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 02:15:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB901C20998
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 02:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46A84C7B;
-	Tue, 28 Nov 2023 02:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BCD4C7D;
+	Tue, 28 Nov 2023 02:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEw0olYp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kTQ7BsLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D6020E5;
-	Tue, 28 Nov 2023 02:15:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7249CC433C7;
-	Tue, 28 Nov 2023 02:15:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701137729;
-	bh=XfJwlAwJtcgZM2kH0vH5xqAnbMPT8rha/PkVQK+7j9M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uEw0olYpKxEmA/M0Qq5UT/ckq6DKdhxOr/lbSRS7jI8DWBNYFiGzEb9s3541kpcqG
-	 vLIXH7B0JZEl75RiD/3nN/OQiE34CbZqG6QpvJ5l7kZY4DDTEuIXbUWjUKw3qo3SrL
-	 9lpub5+3MNRtSt0X/sNEAxiIWgulV+RRLuc55Y97yhfUDnEj1ZnOPWnyOw6X7et/fx
-	 ZS0YDkbs+FJeUk6iAPCIgkqHifW/ZjjoBxDi8Te8LKGSpNmmP0zGhjQfR6pcPU9fJi
-	 lwcWXCqENtfCmlsQGC0igjBNjg16lY8DA2+kh+0F4WNGp0EU//WQU0rdmRrT0FOLup
-	 GqWpNEc5MAiEA==
-Date: Mon, 27 Nov 2023 18:15:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- llvm@lists.linux.dev, Davide Caratti <dcaratti@redhat.com>
-Subject: Re: [PATCH net-next 1/5] selftests: tc-testing: remove buildebpf
- plugin
-Message-ID: <20231127181527.1101e015@kernel.org>
-In-Reply-To: <20231124154248.315470-2-pctammela@mojatatu.com>
-References: <20231124154248.315470-1-pctammela@mojatatu.com>
-	<20231124154248.315470-2-pctammela@mojatatu.com>
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8191DC3
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 18:20:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1701138007; x=1732674007;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=nw3wNUSRAnAUXRzYdytswAuLdnSynr3qa4/uS+Z/0Ww=;
+  b=kTQ7BsLduLwj/ueZWMeMy2XzshWEPXsqvAG2Z4GC4bq6nRE7GpoNRLJi
+   R2v4n0aBNFa27wfOseG7LvfL0wvKfBW4VlRiw6/2rWjoabTCPUIOSHo0R
+   rBroUffXiiXYNU8Y0/iLRjwWbMAzYszk6QDfMWnSeaq7R2w3d1GlA99Cr
+   0=;
+X-IronPort-AV: E=Sophos;i="6.04,232,1695686400"; 
+   d="scan'208";a="365238398"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 02:20:06 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com (Postfix) with ESMTPS id A06F740A69;
+	Tue, 28 Nov 2023 02:20:04 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:31470]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.37:2525] with esmtp (Farcaster)
+ id 0872ebc4-30be-4833-a1a5-8ae2b0c2a371; Tue, 28 Nov 2023 02:20:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 0872ebc4-30be-4833-a1a5-8ae2b0c2a371
+Received: from EX19D047UWB002.ant.amazon.com (10.13.138.34) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Tue, 28 Nov 2023 02:20:03 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D047UWB002.ant.amazon.com (10.13.138.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Tue, 28 Nov 2023 02:20:03 +0000
+Received: from dev-dsk-ipman-2a-ee5dfd20.us-west-2.amazon.com (10.2.12.57) by
+ mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP Server id
+ 15.2.1118.39 via Frontend Transport; Tue, 28 Nov 2023 02:20:03 +0000
+Received: by dev-dsk-ipman-2a-ee5dfd20.us-west-2.amazon.com (Postfix, from userid 5809936)
+	id 359294C1B; Tue, 28 Nov 2023 02:20:03 +0000 (UTC)
+Date: Tue, 28 Nov 2023 02:20:03 +0000
+From: Ivan Pang <ipman@amazon.com>
+To: Skyler =?iso-8859-1?Q?M=E4ntysaari?= <sm+lists@skym.fi>
+CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, Jordan Crouse <jorcrous@amazon.com>
+Subject: Re: [Intel-wired-lan] The difference between linux kernel driver and
+ FreeBSD's with Intel X533
+Message-ID: <20231128021958.GA93203@dev-dsk-ipman-2a-ee5dfd20.us-west-2.amazon.com>
+Mail-Followup-To: Skyler =?iso-8859-1?Q?M=E4ntysaari?= <sm+lists@skym.fi>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	Jordan Crouse <jorcrous@amazon.com>
+References: <ee7f6320-0742-65d4-7411-400d55daebf8@skym.fi>
+ <994cebfe-c97a-4e11-8dad-b3c589e9f094@intel.com>
+ <c526d946-2779-434b-b8ec-423a48f71e36@skym.fi>
+ <6e48c3ba-8d17-41db-ca8d-0a7881d122c9@intel.com>
+ <4330a47e-aa31-4248-9d9d-95c54f74cdd9@app.fastmail.com>
+ <10804893-d035-4ac9-86f0-161257922be7@app.fastmail.com>
+ <03c9e8a4-5adc-4293-a720-fe4342ed723b@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <03c9e8a4-5adc-4293-a720-fe4342ed723b@app.fastmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Precedence: Bulk
 
-On Fri, 24 Nov 2023 12:42:44 -0300 Pedro Tammela wrote:
-> diff --git a/tools/testing/selftests/tc-testing/Makefile b/tools/testing/selftests/tc-testing/Makefile
-> index b1fa2e177e2f..e8b3dde4fa16 100644
-> --- a/tools/testing/selftests/tc-testing/Makefile
-> +++ b/tools/testing/selftests/tc-testing/Makefile
-> @@ -1,31 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -include ../../../scripts/Makefile.include
->  
-> -top_srcdir = $(abspath ../../../..)
-> -APIDIR := $(top_scrdir)/include/uapi
-> -TEST_GEN_FILES = action.o
-> +TEST_PROGS += ./tdc.sh
+On Wed, Oct 18, 2023 at 09:50:35PM +0300, Skyler Mäntysaari wrote:
+> On Tue, Oct 10, 2023, at 03:39, Skyler Mäntysaari wrote:
+> > On Tue, Oct 10, 2023, at 02:50, Skyler Mäntysaari wrote:
+> >> On Mon, Oct 9, 2023, at 18:33, Jesse Brandeburg wrote:
+> >>> On 10/4/2023 10:08 AM, Skyler Mäntysaari wrote:
+> >>>>>> Hi there,
+> >>>>>>
+> >>>>>> It seems that for reasons unknown to me, my Intel X533 based 10G SFP+
+> >>>>>> doesn't want to work with kernel 6.1.55 in VyOS 1.4 nor Debian 12 but
+> >>>>>> it does in OPNsense which is based on FreeBSD 13.2.
+> >>>>>>
+> >>>>>> How would I go about debugging this properly? Both sides see light,
+> >>>>>> but no link unless I'm using FreeBSD.
+> >>>> https://forum.vyos.io/t/10g-sfp-trouble-with-linking-intel-x553/12253/11?u=samip537
+> >>>
+> >>> Hi Skyler,
+> >>>
+> >>> Response from Intel team:
+> >>>
+> >>> In the ethtool -m output pasted I see TX and RX optical power is fine.
+> >>> Could you request fault status on both sides? Just want to check if link
+> >>> is down because we are at local-fault or link partner is at local-fault.
+> >>>
+> >>> rmmod ixgbe
+> >>> modprobe ixgbe
+> >>> ethtool -S eth0 | grep fault
+> >>>
+> >>> Since it is 10G, if our side TX is ON (power level says it is) then we
+> >>> should expect link partner RX to be locked so cannot be at Local Fault.
+> >>>
+> >>> Skyler, please gather that ethtool -S data for us.
+> >>>
+> >>> Jesse
+> >>>
+> >>>
+> >>>
+> >>> 
+> >>
+> >> Hi Jesse,
+> >>
+> >> As the other side of the link is an Juniper, I'm not quite sure how I 
+> >> would gather the same data from it as it doesn't have ethtool?
+> >>
+> >> I have also somewhat given up hope on it working on VyOS and instead I 
+> >> am using OPNsense for the moment but I still have VyOS installed as 
+> >> well.
+> >>
+> >> Skyler
+> >
+> > Hi Jesse,
+> >
+> > I did verify that the grep doesn't yield any results on the VyOS box 
+> > and all of the data returned has an value of 0. Paste of which is here: 
+> > https://p.kapsi.fi/?4a82cedb4f4801ec#DcEgFMFK7cH13EqypsY4ZaHS5taeA1zXevmmTSVW3P9x
+> >
+> > I really think something weird is going on with the driver in Linux as 
+> > otherwise the same exact config on Juniper wouldn't work there either. 
+> > The VyOS box also says that it's unable to modify autoneg settings, or 
+> > speed/duplex of the interface.
+> >
+> > Skyler
+> 
+> It has been  verified that the driver in kernel version 5.4.255 seems to work aka 1.3 VyOS.  Post from another user in the same thread about it: https://forum.vyos.io/t/10g-sfp-trouble-with-linking-intel-x553/12253/46
+> 
+> I have also verified that the out-of-tree ixgbe driver does work, but in-kernel doesn't in kernel 6.1.58.
+> 
+> Please share these findings with the correct Intel team so that this could be fixed.
+> 
+> - Skyler
+> 
 
-nit: could you try to remove the ./ prefix, as a follow up? 
-     I think it's not necessary and it confuses one of patchwork checks.
+Hi Skyler, Jesse,
+
+I came across this very similar issue when upgrading our networking gear
+from kernel 5.15 to 6.1. Our 10G link fails with the in-tree 6.1 ixgbe
+driver but works with the out-of-tree 5.x versions. I found that my link
+issues were related to this commit:
+
+ixgbe: Manual AN-37 for troublesome link partners for X550 SFI
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.1.63&id=565736048bd5f9888990569993c6b6bfdf6dcb6d
+
+Specifically, our 10G link works when both sides of the fiber are
+running the in-tree 6.1 ixgbe driver with this autonegotiation change.
+Our link also works when both sides are running the 5.x ixgbe drivers
+without this commit. It fails, however, when only one side has this
+commit. Our current setup compiles the in-tree 6.1 ixgbe driver with
+this commit reverted, for compatibility with our varying hardware.
+
+I would appreciate it if anyone can cross-check my claim with their
+hardware as well. Also, would anyone be able to help explain what some
+of those registers and reg_val being written are doing?
+
+-Ivan
+
 
