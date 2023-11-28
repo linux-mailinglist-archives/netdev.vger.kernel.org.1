@@ -1,265 +1,194 @@
-Return-Path: <netdev+bounces-51797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2927FC0C1
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:55:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7F97FC0AD
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 18:54:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CEA01C20AF9
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:55:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52F811C20A88
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF1041C74;
-	Tue, 28 Nov 2023 17:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6FE39AF9;
+	Tue, 28 Nov 2023 17:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="fYxIriBq";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ESXHxqeR"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BIK3H3gl"
 X-Original-To: netdev@vger.kernel.org
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7E21BEE;
-	Tue, 28 Nov 2023 09:55:01 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 4D4DA5808A6;
-	Tue, 28 Nov 2023 12:55:01 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Tue, 28 Nov 2023 12:55:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1701194101; x=
-	1701201301; bh=pRzLMeVRPt+MUHCng+m1tZ8fgrKzg19ebGP/3BAFCkA=; b=f
-	YxIriBqXmmHg8j6KtUAs/3OPkhsMO0klMHNjwrU/YJyLjr00tiMG9XQmCnDsf/zB
-	3EC1PlMzxU50eN8WfT8AobHniog8ctqc3x3GyPBzkwJx/kfXKEITLaBCdT+S2DHS
-	GbUf0lAilvzSd3fq8bO+GQi6jVBFkeweD3A5xYdgVtT4ELoxWrfwR59lkQ+T/XIW
-	W4DzQlpiTxN1diMkRGCDwvknGKHpI0aQ5lEogRKPm+jtAkLJE8CHCasSvF7HYe8W
-	H3wuoAdU2fhdyl0pkVnqmQfgsLzvBGSoA86BDKq8ORwIYi+UB8d1WUy2uV3e2a30
-	ucsHILT89/jVCEGsLNj4w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1701194101; x=
-	1701201301; bh=pRzLMeVRPt+MUHCng+m1tZ8fgrKzg19ebGP/3BAFCkA=; b=E
-	SXHxqeRf/J/HiMLdJB5LjmNYaN5GEguqEdhdlUMuSlu6zsAXw4+zHC1vjTWsPiOn
-	pr06G6jucT4jVQ9ywbfgJDFcDDjOoD5+NNQnqnvPJUrGzYpaWt9vj8aHfG3NRtR+
-	J5bs9bzj0mr4sz7VCvihnX+tngfsQo0eC1vC9C9Qjw8xFrNAbX7tX+Tue1Y7Wv4Z
-	mjR0PIWdeYyRwfjO93cTPWC+jMc11kTHdsl/eQ4TW8bG6Udz4+LXah/b0tUXVXfm
-	9OREeT5jyEROAIEo2xbaua96MRSTLE0iTvlgam87Pri9yZTvWK7wnkhWA8y/7Eg/
-	QBCxRqOsWkcHVpT8+gHnA==
-X-ME-Sender: <xms:dSlmZWowACGY5zciQXmiOYkwKC3Q6N_kkHlO9_6RX8mpH55SI4t4OA>
-    <xme:dSlmZUr1QQ4N6MOUS_U3p15ap0a_Lp8O0XujUAROeG6byi07grDDSnZYk71CyZlji
-    Ubk6If2aUIS4ssyXg>
-X-ME-Received: <xmr:dSlmZbNEDpjdQlx2-0D-_KYQbBQUmJzNAQjnlP3IVu7SoIw3jR5l1gJt2825YGJPNNn1UAZjs8W43eQNux1lp09rNV_pC9WAShhcTYsz23ZNlA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeifedguddthecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephf
-    fvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcu
-    oegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduie
-    ekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhi
-    iigvpedvnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:dSlmZV5-s2N4K6uXL_1iopFu6ouxabwtnLbfEDRVMm9Q7yhbSnAzdQ>
-    <xmx:dSlmZV4G4fVvBcy_aITFyy2jh9II6jU7P_d05xWYaJtG9956ar0B7A>
-    <xmx:dSlmZVjGFsD-k_sRvyy8xYAi5HSQXZDBbdoo9GkkqgAHDmfRkG5v-A>
-    <xmx:dSlmZUJSrdTrjh4WJ2cOh1swIaNpO_apQTXeOAov5ihqXza0DCoB_w>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 28 Nov 2023 12:54:59 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: kuba@kernel.org,
-	john.fastabend@gmail.com,
-	davem@davemloft.net,
-	shuah@kernel.org,
-	hawk@kernel.org,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com,
-	alexei.starovoitov@gmail.com,
-	yonghong.song@linux.dev,
-	eddyz87@gmail.com
-Cc: martin.lau@linux.dev,
-	song@kernel.org,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: [PATCH ipsec-next v2 6/6] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-Date: Tue, 28 Nov 2023 10:54:26 -0700
-Message-ID: <85d3bf6440c6fd3b7b007d044da9b78ccc1dbda4.1701193577.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <cover.1701193577.git.dxu@dxuuu.xyz>
-References: <cover.1701193577.git.dxu@dxuuu.xyz>
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86DE1B5
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 09:54:39 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ASFjLsi019454;
+	Tue, 28 Nov 2023 09:54:33 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pfpt0220;
+ bh=+zG/Z4VFJWpA3WRnB5MJgTqHXyEhI6kQ7vWZ6o8scKQ=;
+ b=BIK3H3gl6A+i23iON6d2TYdmLwAEICWRkZ0gUPjHR92FBv/w4PAsYlRHhnMPxZeI+icv
+ KzgCfU83fPJx/2UiiClRaYGgumT8jG8oUwO5u1uRDmeSXlb3BQgw6QvOnQ10xsy/Nh8S
+ sMq55/1SJmUpnxDVTsbvDgF0jZhMLVgDfm9ETklDC0wKfsZndahqxBa0UTGm6BOadIZ5
+ hK/hDa5vhFgq1RmDFaX3F84BrPhOStfhXfxo5gS4OJ0UHw++lxw7jNB0xQnL6okZCVzj
+ SA3w4VgtJq1CbaEWgC4X2QVmR3w1DRJhTwzCbuJu3/pqA/KEcPvDm2G0yY1m4Cb728E4 xg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3una4djcgh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 28 Nov 2023 09:54:33 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 Nov
+ 2023 09:54:31 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 28 Nov 2023 09:54:31 -0800
+Received: from [10.193.38.189] (unknown [10.193.38.189])
+	by maili.marvell.com (Postfix) with ESMTP id 5BC763F7057;
+	Tue, 28 Nov 2023 09:54:29 -0800 (PST)
+Message-ID: <f1673f31-b1b4-2c50-92ff-c6b5e247586f@marvell.com>
+Date: Tue, 28 Nov 2023 18:54:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>
+References: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
+ <cf6e78b6-e4e2-faab-f8c6-19dc462b1d74@marvell.com>
+ <CAHk-=whLsdX=Kr010LiM2smEu2rC3Hedwmuxtcp0pYtZvFj+=A@mail.gmail.com>
+From: Igor Russkikh <irusskikh@marvell.com>
+In-Reply-To: <CAHk-=whLsdX=Kr010LiM2smEu2rC3Hedwmuxtcp0pYtZvFj+=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: sk24g-f_4XqorBJnFKgUsZTYSKyH0A2B
+X-Proofpoint-ORIG-GUID: sk24g-f_4XqorBJnFKgUsZTYSKyH0A2B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-28_19,2023-11-27_01,2023-05-22_02
 
-This commit extends test_tunnel selftest to test the new XDP xfrm state
-lookup kfunc.
 
-Co-developed-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../selftests/bpf/prog_tests/test_tunnel.c    | 20 ++++++--
- .../selftests/bpf/progs/test_tunnel_kern.c    | 51 +++++++++++++++++++
- 2 files changed, 67 insertions(+), 4 deletions(-)
+On 11/27/2023 7:02 PM, Linus Torvalds wrote:
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-index 3bcb6f96b9b5..54308afb3cdc 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-@@ -278,7 +278,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 1 mode tunnel "
-+			"spi %d reqid 1 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -292,7 +292,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 2 mode tunnel "
-+			"spi %d reqid 2 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -313,7 +313,7 @@ static int add_xfrm_tunnel(void)
- 	 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 1 mode tunnel "
-+		    "spi %d reqid 1 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -325,7 +325,7 @@ static int add_xfrm_tunnel(void)
- 	/* root -> at_ns0 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 2 mode tunnel "
-+		    "spi %d reqid 2 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -628,8 +628,10 @@ static void test_xfrm_tunnel(void)
- {
- 	DECLARE_LIBBPF_OPTS(bpf_tc_hook, tc_hook,
- 			    .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_xdp_attach_opts, opts);
- 	struct test_tunnel_kern *skel = NULL;
- 	struct nstoken *nstoken;
-+	int xdp_prog_fd;
- 	int tc_prog_fd;
- 	int ifindex;
- 	int err;
-@@ -654,6 +656,14 @@ static void test_xfrm_tunnel(void)
- 	if (attach_tc_prog(&tc_hook, tc_prog_fd, -1))
- 		goto done;
- 
-+	/* attach xdp prog to tunnel dev */
-+	xdp_prog_fd = bpf_program__fd(skel->progs.xfrm_get_state_xdp);
-+	if (!ASSERT_GE(xdp_prog_fd, 0, "bpf_program__fd"))
-+		goto done;
-+	err = bpf_xdp_attach(ifindex, xdp_prog_fd, XDP_FLAGS_REPLACE, &opts);
-+	if (!ASSERT_OK(err, "bpf_xdp_attach"))
-+		goto done;
-+
- 	/* ping from at_ns0 namespace test */
- 	nstoken = open_netns("at_ns0");
- 	err = test_ping(AF_INET, IP4_ADDR_TUNL_DEV1);
-@@ -667,6 +677,8 @@ static void test_xfrm_tunnel(void)
- 		goto done;
- 	if (!ASSERT_EQ(skel->bss->xfrm_remote_ip, 0xac100164, "remote_ip"))
- 		goto done;
-+	if (!ASSERT_EQ(skel->bss->xfrm_replay_window, 42, "replay_window"))
-+		goto done;
- 
- done:
- 	delete_xfrm_tunnel();
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3a59eb9c34de..c0dd38616562 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -30,6 +30,10 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap) __ksym;
-+struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
-+		       u32 opts__sz) __ksym;
-+void bpf_xdp_xfrm_state_release(struct xfrm_state *x) __ksym;
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_ARRAY);
-@@ -950,4 +954,51 @@ int xfrm_get_state(struct __sk_buff *skb)
- 	return TC_ACT_OK;
- }
- 
-+volatile int xfrm_replay_window = 0;
-+
-+SEC("xdp")
-+int xfrm_get_state_xdp(struct xdp_md *xdp)
-+{
-+	struct bpf_xfrm_state_opts opts = {};
-+	struct xfrm_state *x = NULL;
-+	struct ip_esp_hdr *esph;
-+	struct bpf_dynptr ptr;
-+	u8 esph_buf[8] = {};
-+	u8 iph_buf[20] = {};
-+	struct iphdr *iph;
-+	u32 off;
-+
-+	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
-+		goto out;
-+
-+	off = sizeof(struct ethhdr);
-+	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
-+	if (!iph || iph->protocol != IPPROTO_ESP)
-+		goto out;
-+
-+	off += sizeof(struct iphdr);
-+	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
-+	if (!esph)
-+		goto out;
-+
-+	opts.netns_id = BPF_F_CURRENT_NETNS;
-+	opts.daddr.a4 = iph->daddr;
-+	opts.spi = esph->spi;
-+	opts.proto = IPPROTO_ESP;
-+	opts.family = AF_INET;
-+
-+	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
-+	if (!x || opts.error)
-+		goto out;
-+
-+	if (!x->replay_esn)
-+		goto out;
-+
-+	xfrm_replay_window = x->replay_esn->replay_window;
-+out:
-+	if (x)
-+		bpf_xdp_xfrm_state_release(x);
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.42.1
+> 
+> So I suspect that one reason I triggered the problem was simply
+> because the suspend/resume happened while I walked away from the
+> computer when it was copying a few hundred gig of data from the old
+> SSD (over USB, so not hugely fast).
 
+...
+
+> Also, make sure you don't have ridiculous amounts of memory in your
+> machine.  I've got "only" 64GB in mine, which is small for a big
+> machine, and presumably a lot of it was used for buffer cache, and I'm
+> not sure what the device suspend/resume ordering was (ie disk might be
+> resumed after ethernet).
+
+With these details in mind I was able to repro this within seconds on my 16Gb machine,
+basically by doing a stress in parallel:
+
+    stress -m 2000 --vm-bytes 20M --vm-hang 10 --backoff 1000
+
+    while true; do sudo ifconfig enp1s0 down; sudo ifconfig enp1s0 up; done
+
+in 5-10 seconds I get
+
+[  859.536856] atlantic 0000:01:00.0 enp1s0: aq_ring_alloc[6](0x30000)
+[  859.563153] warn_alloc: 1 callbacks suppressed
+[  859.563156] ifconfig: page allocation failure: order:5, mode:0x40dc0(GFP_KERNEL|__GFP_COMP|__GFP_ZERO), nodemask=(null),cpuset=/,mems_allowed=0
+[  859.563163] CPU: 13 PID: 48544 Comm: ifconfig Tainted: G           OE      6.7.0-rc2igor1+ #1
+[  859.563165] Hardware name: ASUS System Product Name/PRIME Z590-P, BIOS 1017 07/12/2021
+[  859.563166] Call Trace:
+[  859.563168]  <TASK>
+[  859.563170]  dump_stack_lvl+0x48/0x70
+[  859.563175]  dump_stack+0x10/0x20
+[  859.563177]  warn_alloc+0x119/0x190
+[  859.563180]  ? __alloc_pages_direct_compact+0xae/0x1f0
+[  859.563183]  __alloc_pages_slowpath.constprop.0+0xd1a/0xdd0
+[  859.563188]  __alloc_pages+0x304/0x350
+[  859.563192]  ? aq_ring_alloc+0x29/0xe0 [atlantic]
+[  859.563207]  __kmalloc_large_node+0x7f/0x140
+[  859.563210]  __kmalloc+0xc9/0x140
+[  859.563212]  aq_ring_alloc+0x29/0xe0 [atlantic]
+[  859.563221]  aq_ring_rx_alloc+0x7d/0x90 [atlantic]
+[  859.563230]  aq_vec_ring_alloc+0xab/0x170 [atlantic]
+[  859.563241]  aq_nic_init+0x11c/0x1e0 [atlantic]
+[  859.563250]  aq_ndev_open+0x20/0x90 [atlantic]
+[  859.563259]  __dev_open+0xe9/0x190
+[  859.563261]  __dev_change_flags+0x18c/0x1f0
+[  859.563263]  dev_change_flags+0x26/0x70
+[  859.563265]  devinet_ioctl+0x602/0x760
+[  859.563268]  inet_ioctl+0x167/0x190
+[  859.563269]  ? sk_ioctl+0x4b/0x110
+[  859.563271]  ? inet_ioctl+0x95/0x190
+[  859.563273]  sock_do_ioctl+0x44/0xf0
+[  859.563274]  ? __check_object_size+0x51/0x2d0
+[  859.563277]  ? _copy_to_user+0x25/0x40
+[  859.563279]  sock_ioctl+0xf7/0x300
+[  859.563280]  __x64_sys_ioctl+0x95/0xd0
+[  859.563283]  do_syscall_64+0x5c/0xe0
+[  859.563286]  ? exit_to_user_mode_prepare+0x45/0x1a0
+[  859.563289]  ? syscall_exit_to_user_mode+0x34/0x50
+[  859.563291]  ? do_syscall_64+0x6b/0xe0
+[  859.563293]  ? do_syscall_64+0x6b/0xe0
+[  859.563295]  ? syscall_exit_to_user_mode+0x34/0x50
+[  859.563296]  ? __x64_sys_openat+0x20/0x30
+[  859.563298]  ? do_syscall_64+0x6b/0xe0
+[  859.563300]  ? syscall_exit_to_user_mode+0x34/0x50
+[  859.563301]  ? __x64_sys_read+0x1a/0x20
+[  859.563303]  ? do_syscall_64+0x6b/0xe0
+[  859.563305]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+[  859.563307] RIP: 0033:0x7f98499df3ab
+[  859.563309] Code: 0f 1e fa 48 8b 05 e5 7a 0d 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d b5 7a 0d 00 f7 d8 64 89 01 48
+[  859.563310] RSP: 002b:00007fffba955138 EFLAGS: 00000202 ORIG_RAX: 0000000000000010
+[  859.563312] RAX: ffffffffffffffda RBX: 00007fffba955140 RCX: 00007f98499df3ab
+[  859.563313] RDX: 00007fffba955140 RSI: 0000000000008914 RDI: 0000000000000004
+[  859.563314] RBP: 00007fffba9551f0 R08: 0000000000000008 R09: 0000000000000001
+[  859.563315] R10: 0000000000000011 R11: 0000000000000202 R12: 0000000000000041
+[  859.563316] R13: 00007fffba9554e8 R14: 0000000000000000 R15: 0000000000000000
+[  859.563318]  </TASK>
+[  859.563319] Mem-Info:
+[  859.563320] active_anon:14091 inactive_anon:3805083 isolated_anon:2336
+                active_file:4601 inactive_file:5452 isolated_file:3
+                unevictable:2258 dirty:56 writeback:0
+                slab_reclaimable:35879 slab_unreclaimable:42730
+                mapped:8485 shmem:2635 pagetables:35066
+                sec_pagetables:0 bounce:0
+                kernel_misc_reclaimable:0
+                free:56673 free_pcp:0 free_cma:0
+[  859.563323] Node 0 active_anon:56364kB inactive_anon:15220332kB active_file:18404kB inactive_file:21808kB unevictable:9032kB isolated(anon):9344kB isolated(file):12kB mapped:33940kB dirty:224kB writeback:0kB shmem:10540kB shmem_thp:0kB shmem_pmdmapped:0kB anon_thp:0kB writeback_tmp:0kB kernel_stack:42592kB pagetables:140264kB sec_pagetables:0kB all_unreclaimable? no
+[  859.563326] Node 0 DMA free:13308kB boost:0kB min:64kB low:80kB high:96kB reserved_highatomic:0KB active_anon:0kB inactive_anon:0kB active_file:0kB inactive_file:0kB unevictable:0kB writepending:0kB present:15992kB managed:15360kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
+[  859.563329] lowmem_reserve[]: 0 2305 15744 15744 15744
+[  859.563332] Node 0 DMA32 free:63608kB boost:0kB min:9884kB low:12352kB high:14820kB reserved_highatomic:0KB active_anon:16kB inactive_anon:2330560kB active_file:88kB inactive_file:36kB unevictable:0kB writepending:8kB present:2467796kB managed:2401988kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
+[  859.563335] lowmem_reserve[]: 0 0 13439 13439 13439
+[  859.563338] Node 0 Normal free:149776kB boost:90112kB min:147740kB low:162144kB high:176548kB reserved_highatomic:2048KB active_anon:56024kB inactive_anon:12889984kB active_file:19608kB inactive_file:22216kB unevictable:9032kB writepending:0kB present:14098432kB managed:13769880kB mlocked:0kB bounce:0kB free_pcp:0kB local_pcp:0kB free_cma:0kB
+[  859.563342] lowmem_reserve[]: 0 0 0 0 0
+[  859.563344] Node 0 DMA: 1*4kB (U) 1*8kB (U) 1*16kB (U) 1*32kB (U) 1*64kB (U) 1*128kB (U) 1*256kB (U) 1*512kB (U) 0*1024kB 2*2048kB (UM) 2*4096kB (M) = 13308kB
+[  859.563353] Node 0 DMA32: 2*4kB (UM) 2*8kB (UM) 5*16kB (M) 5*32kB (UM) 6*64kB (UM) 17*128kB (UM) 22*256kB (UM) 4*512kB (UM) 6*1024kB (UM) 11*2048kB (UM) 6*4096kB (UM) = 63752kB
+[  859.563362] Node 0 Normal: 7073*4kB (UMEH) 1922*8kB (UMEH) 756*16kB (UMEH) 464*32kB (UMEH) 830*64kB (UMEH) 197*128kB (UMH) 6*256kB (MH) 0*512kB 0*1024kB 0*2048kB 0*4096kB = 150484kB
+[  859.563371] Node 0 hugepages_total=0 hugepages_free=0 hugepages_surp=0 hugepages_size=1048576kB
+[  859.563373] Node 0 hugepages_total=0 hugepages_free=0 hugepages_surp=0 hugepages_size=2048kB
+[  859.563374] 23673 total pagecache pages
+[  859.563374] 11582 pages in swap cache
+[  859.563375] Free swap  = 7137276kB
+[  859.563375] Total swap = 8003580kB
+[  859.563376] 4145555 pages RAM
+[  859.563376] 0 pages HighMem/MovableOnly
+[  859.563377] 98748 pages reserved
+[  859.563378] 0 pages hwpoisoned
+[  859.563379] atlantic 0000:01:00.0 enp1s0: aq_ring_alloc[6](0x18000)
+[  859.563381] atlantic 0000:01:00.0 enp1s0: aq_ring_alloc[6] FAILURE =============================
+[  859.563388] atlantic 0000:01:00.0 enp1s0: device open failure
+[  860.996946] atlantic 0000:01:00.0 enp1s0: aq_ring_alloc[0](0x30000)
+[  860.996961] atlantic 0000:01:00.0 enp1s0: aq_ring_alloc[0](0x18000)
+
+Thats already with the patch applied, so no panic and next "ifconfig up" recovers the device state.
+
+I will submit a bugfix patch for that solution, but will also continue looking into suspend/resume refactoring.
+
+Thanks,
+  Igor
 
