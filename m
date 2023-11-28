@@ -1,91 +1,94 @@
-Return-Path: <netdev+bounces-51608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 131DB7FB55F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:15:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF3C7FB56C
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453BF1C21082
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:15:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D7DAB2149F
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755943DB9E;
-	Tue, 28 Nov 2023 09:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6090F3DBA0;
+	Tue, 28 Nov 2023 09:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QStgAznL"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id E6F05AB;
-	Tue, 28 Nov 2023 01:15:42 -0800 (PST)
-Received: from dinghao.liu$zju.edu.cn ( [10.190.69.212] ) by
- ajax-webmail-mail-app3 (Coremail) ; Tue, 28 Nov 2023 17:15:03 +0800
- (GMT+08:00)
-Date: Tue, 28 Nov 2023 17:15:03 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: dinghao.liu@zju.edu.cn
-To: "Tariq Toukan" <ttoukan.linux@gmail.com>
-Cc: "Saeed Mahameed" <saeedm@nvidia.com>, 
-	"Leon Romanovsky" <leon@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Zhengchao Shao" <shaozhengchao@huawei.com>, 
-	"Rahul Rameshbabu" <rrameshbabu@nvidia.com>, 
-	"Simon Horman" <horms@kernel.org>, 
-	"Tariq Toukan" <tariqt@nvidia.com>, "Aya Levin" <ayal@nvidia.com>, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/mlx5e: fix a potential double-free in
- fs_any_create_groups
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <3d3b6a1f-40b6-45b5-a899-d01acb91213d@gmail.com>
-References: <20231128082812.24483-1-dinghao.liu@zju.edu.cn>
- <3d3b6a1f-40b6-45b5-a899-d01acb91213d@gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746F5E1;
+	Tue, 28 Nov 2023 01:17:00 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50bb83d9e17so791846e87.0;
+        Tue, 28 Nov 2023 01:17:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701163018; x=1701767818; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KuVLms5BWA9Q8drtT5YNvH/NrAcRxGd6vrSVCMoHoQs=;
+        b=QStgAznLt/p24+n/D4ikPTJDLagV1HgLRBwZjw8nGaWQI/kP2Np0QpTxXhDGX/HeoY
+         A/x2QwHjbEmtuvl0RRbRA7cXWKacdW03ncoDQCWfWBWRBhv9g7QKiRDA9WXm5qF3bVAr
+         rbK45omBODJM4b8gfHVBiHrGn8sTw00zMIRIRtfJ101mCrLgv2ZDbOZymlH2QprnFrzb
+         o6MOj1GWuoBrvgj9nA7/IAYH3wTcmAva50XdFKAl6fkhESkB7Y+zabp23gncB8uCEIjx
+         TBoq1x6FAWpKRHdb3vPetD6FX+3dbQHZyhtQ4PUEKuQq36WfvuhYAgwrfqw2A7Czkzt5
+         VyfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701163018; x=1701767818;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KuVLms5BWA9Q8drtT5YNvH/NrAcRxGd6vrSVCMoHoQs=;
+        b=Oe3Yc0mEsgpF8FEiCzJw1XApJvicKdX+Fp41nrKhLc7OTzv13i4V6Z+i2QuoWanNlI
+         5aDhZ2xNYlbX5q+hlRnTO2ZKFTMGe+bs+kG88I752OhUGTEf1HHuDGByfYWGUWotEd7n
+         bk/oVPdnpnzBCLSSUkLIMt46j8Qq/KAVqdpPb5wusqVlTnAvfmYHgDiAtbPu2tBGbXzR
+         p5HCYzuGjCbonEtgNtNbpP0CTej1koqkncCBhtqtAXbw4rpezexXi2lZ+5Ovg8Zwyce8
+         31C2kzcs6ODIKiqAEeDpA7R/IPelfnSuEAooj2vxZ/LqwH7nLG/FMo7A7HabZmSukdmb
+         UuNQ==
+X-Gm-Message-State: AOJu0Yzm8znlKiOGclyJUFqYsyyswqUtQCED1eW9RdZjBcQA60FBG7It
+	8y/c63Gel3si5h9SydvSuqF4ZAedAG0=
+X-Google-Smtp-Source: AGHT+IGVzoTN/BfYeY1Syu5a6jrpj7Wy0oziLOX4g1frZ2SZAw3OlWZZ/Fa3cqu/7/rNs6Cmh5Tvgw==
+X-Received: by 2002:a2e:2245:0:b0:2c9:9fbf:52b1 with SMTP id i66-20020a2e2245000000b002c99fbf52b1mr4771502lji.13.1701163018251;
+        Tue, 28 Nov 2023 01:16:58 -0800 (PST)
+Received: from [192.168.1.103] ([178.176.72.137])
+        by smtp.gmail.com with ESMTPSA id b1-20020a05651c032100b002bfff335ca1sm1654829ljp.79.2023.11.28.01.16.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 01:16:57 -0800 (PST)
+Subject: Re: [PATCH net-next 8/9] net: rswitch: Add jumbo frames handling for
+ TX
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, s.shtylyov@omp.ru,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <20231127115334.3670790-1-yoshihiro.shimoda.uh@renesas.com>
+ <20231127115334.3670790-9-yoshihiro.shimoda.uh@renesas.com>
+From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Message-ID: <3bd98e56-825a-79fa-06f5-3f90c86809d7@gmail.com>
+Date: Tue, 28 Nov 2023 12:16:56 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <18fac281.ae29.18c1535e9b4.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgB37o2Zr2Vlprk0AA--.5162W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgsIBmVfIgMaAQAgsn
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+In-Reply-To: <20231127115334.3670790-9-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 
-PiAKPiBPbiAyOC8xMS8yMDIzIDEwOjI4LCBEaW5naGFvIExpdSB3cm90ZToKPiA+IFdoZW4ga2Nh
-bGxvYygpIGZvciBmdC0+ZyBzdWNjZWVkcyBidXQga3Z6YWxsb2MoKSBmb3IgaW4gZmFpbHMsCj4g
-PiBmc19hbnlfY3JlYXRlX2dyb3VwcygpIHdpbGwgZnJlZSBmdC0+Zy4gSG93ZXZlciwgaXRzIGNh
-bGxlcgo+ID4gZnNfYW55X2NyZWF0ZV90YWJsZSgpIHdpbGwgZnJlZSBmdC0+ZyBhZ2FpbiB0aHJv
-dWdoIGNhbGxpbmcKPiA+IG1seDVlX2Rlc3Ryb3lfZmxvd190YWJsZSgpLCB3aGljaCB3aWxsIGxl
-YWQgdG8gYSBkb3VibGUtZnJlZS4KPiA+IEZpeCB0aGlzIGJ5IHJlbW92aW5nIHRoZSBrZnJlZShm
-dC0+ZykgaW4gZnNfYW55X2NyZWF0ZV9ncm91cHMoKS4KPiA+IAo+ID4gRml4ZXM6IDBmNTc1YzIw
-YmYwNiAoIm5ldC9tbHg1ZTogSW50cm9kdWNlIEZsb3cgU3RlZXJpbmcgQU5ZIEFQSSIpCj4gPiBT
-aWduZWQtb2ZmLWJ5OiBEaW5naGFvIExpdSA8ZGluZ2hhby5saXVAemp1LmVkdS5jbj4KPiA+IC0t
-LQo+ID4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZW4vZnNfdHRf
-cmVkaXJlY3QuYyB8IDEgLQo+ID4gICAxIGZpbGUgY2hhbmdlZCwgMSBkZWxldGlvbigtKQo+ID4g
-Cj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3Jl
-L2VuL2ZzX3R0X3JlZGlyZWN0LmMgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1
-L2NvcmUvZW4vZnNfdHRfcmVkaXJlY3QuYwo+ID4gaW5kZXggYmU4M2FkOWRiODJhLi5iMjIyZDIz
-YmZiOWEgMTAwNjQ0Cj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1
-L2NvcmUvZW4vZnNfdHRfcmVkaXJlY3QuYwo+ID4gKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQv
-bWVsbGFub3gvbWx4NS9jb3JlL2VuL2ZzX3R0X3JlZGlyZWN0LmMKPiA+IEBAIC00MzQsNyArNDM0
-LDYgQEAgc3RhdGljIGludCBmc19hbnlfY3JlYXRlX2dyb3VwcyhzdHJ1Y3QgbWx4NWVfZmxvd190
-YWJsZSAqZnQpCj4gPiAgIAlmdC0+ZyA9IGtjYWxsb2MoTUxYNUVfRlNfVURQX05VTV9HUk9VUFMs
-IHNpemVvZigqZnQtPmcpLCBHRlBfS0VSTkVMKTsKPiA+ICAgCWluID0ga3Z6YWxsb2MoaW5sZW4s
-IEdGUF9LRVJORUwpOwo+ID4gICAJaWYgICghaW4gfHwgIWZ0LT5nKSB7Cj4gPiAtCQlrZnJlZShm
-dC0+Zyk7Cj4gPiAgIAkJa3ZmcmVlKGluKTsKPiA+ICAgCQlyZXR1cm4gLUVOT01FTTsKPiA+ICAg
-CX0KPiAKPiBGdW5jdGlvbiBmc19hbnlfY3JlYXRlX2dyb3VwcyBzaG91bGQgbm90IHJldHVybiBm
-YWlsdXJlIHdpdGhvdXQgY2xlYW5pbmcgCj4gaXRzZWxmIHVwLiBUaGlzIGlzIG5vdCB0aGUgcmln
-aHQgZml4Lgo+IEZyZWVpbmcgZnQtPmcgYW5kIHNldHRpbmcgaXQgdG8gTlVMTCB3aWxsIGRvIGl0
-LCBhbmQgd2lsbCBhdm9pZCB0aGUgCj4gZG91YmxlIGZyZWUuCgpUaGFua3MgZm9yIHlvdXIgYWR2
-aWNlISBJIHdpbGwgcmVzZW5kIGEgbmV3IHBhdGNoIHNvb24uCgpSZWdhcmRzLApEaW5naGFv
+On 11/27/23 2:53 PM, Yoshihiro Shimoda wrote:
+
+> If the driver would like to transmit a jumbo frame like 2KiB or more,
+> it should be split into multiple queues. In near the future, to support
+
+   In the near future, you mean (again)?
+
+> this, add handling specific descriptor types F{START,MID,END}. However,
+> such jumbo frames will not happen yet because the maximum MTU size is
+> still default for now.
+> 
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[...]
+
+MBR, Sergey
 
