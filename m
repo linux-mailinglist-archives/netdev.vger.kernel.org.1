@@ -1,191 +1,81 @@
-Return-Path: <netdev+bounces-51771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E277FBF23
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:23:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9A97FBF2B
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26F61B212C2
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45EAC282821
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D3237D3D;
-	Tue, 28 Nov 2023 16:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C80E3526B;
+	Tue, 28 Nov 2023 16:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="lsnjgYK+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFWHfHx5"
 X-Original-To: netdev@vger.kernel.org
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F2E182;
-	Tue, 28 Nov 2023 08:23:04 -0800 (PST)
-Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id DAFFE66072E7;
-	Tue, 28 Nov 2023 16:23:00 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1701188582;
-	bh=666NilPgh2cGqwRIcXHKPf9AcNh0vwxR/Iqn1L5sqb8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lsnjgYK+g1qRAB2aDuzr8WoG7wZywNHXoduL7tX6p+91qSinQ62uOUzJB7OT7VHxj
-	 XRcKqjzgCK7Of0lzGH00qmUUFAqzSimzHZhvdfyFp29/bkjwX2KrLbyqHegsEUu9FS
-	 tswQPzqI2Ka7qOMvV/c2HxAmgnnpc/hU06tKO/BdB62KNJhhzQS7dfDwAUm1lEYSH0
-	 nE643NFCTyWKHqvj/6sv5F6zd0sjdzR3zi9WFSghJn/eTFk1beP3HUOOcgxxij9Z0w
-	 hLbjjJuyJ7NfzImFYfbxBHzwGVLDNeumWx34edFDQtHXiw4Tn1LZRodYx/hMMIG4NJ
-	 tSxeou+Ck4sZw==
-Message-ID: <5395f3ce-f9ec-474b-b145-5f62a3b7c4fc@collabora.com>
-Date: Tue, 28 Nov 2023 18:22:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EFA37D29
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:27:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5D12C433C8;
+	Tue, 28 Nov 2023 16:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701188834;
+	bh=aK3/21f9RdYQmcl78FRdiNXVmir4FYYt7jy6fX2hIpg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XFWHfHx5ueIQ0Tg3EIGPSyC7hgzi/Jb+ytpkcUDYu3ppS3nmkvWds7wqI9z7dRVcv
+	 wqtgM/4geSq5d9Dx57DkPryfc0Vc9TbJX/wQEFuyy2COHIBYEkUBcuA+fgB6McUwG2
+	 79TqcJTuYyZwXlkF/fFa+C2B/W+atrX2ecSTWUMLJBiIAbnu1dqxZYGSepbOM7leei
+	 2Ati39yHhzabrAgw7BSTTAAEXsiX4tMvaBrM59ZFYGkFQ0iBScxMDL/qVwsGKMqJOk
+	 j71ETCHZKJgvr6s+ESmFYnqXHFJUZVAbz/7YJ28YU9GfDhOMwUoIYyN/Ye9bKwCalj
+	 Ra9G7fV0xue1w==
+Date: Tue, 28 Nov 2023 08:27:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
+ <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
+ "egallen@redhat.com" <egallen@redhat.com>, "mschmidt@redhat.com"
+ <mschmidt@redhat.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "horms@kernel.org" <horms@kernel.org>, "davem@davemloft.net"
+ <davem@davemloft.net>, "wizhao@redhat.com" <wizhao@redhat.com>,
+ "konguyen@redhat.com" <konguyen@redhat.com>, Veerasenareddy Burru
+ <vburru@marvell.com>, Sathesh B Edara <sedara@marvell.com>, Eric Dumazet
+ <edumazet@google.com>
+Subject: Re: [EXT] Re: [PATCH net-next v1 1/2] octeon_ep: implement device
+ unload control net API
+Message-ID: <20231128082712.223c4590@kernel.org>
+In-Reply-To: <PH0PR18MB4734281BD887FD9AFD64B2DEC7BCA@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20231127162135.2529363-1-srasheed@marvell.com>
+	<20231127162135.2529363-2-srasheed@marvell.com>
+	<20231127184306.68c2d517@kernel.org>
+	<PH0PR18MB4734281BD887FD9AFD64B2DEC7BCA@PH0PR18MB4734.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
- beaglev-starlight: Enable gmac
-Content-Language: en-US
-To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
- <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
- <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
- <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
- <054bbf2a-e7ba-40bf-8f8b-f0e0e9b396c6@collabora.com>
- <CAJM55Z9+j6CmfjNkPLCk1DR3EBuEMspsRtNvygDbPWJDCytQpw@mail.gmail.com>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <CAJM55Z9+j6CmfjNkPLCk1DR3EBuEMspsRtNvygDbPWJDCytQpw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 11/28/23 18:09, Emil Renner Berthing wrote:
-> Cristian Ciocaltea wrote:
->> On 11/28/23 14:08, Emil Renner Berthing wrote:
->>> Cristian Ciocaltea wrote:
->>>> On 11/26/23 23:10, Emil Renner Berthing wrote:
->>>>> Cristian Ciocaltea wrote:
->>>>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
->>>>>> RGMII-ID.
->>>>>>
->>>>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
->>>>>> yes, add the mdio & phy sub-nodes.
->>>>>
->>>>> Sorry for being late here. I've tested that removing the mdio and phy nodes on
->>>>> the the Starlight board works fine, but the rx-internal-delay-ps = <900>
->>>>> property not needed on any of my VisionFive V1 boards either.
->>>>
->>>> No problem, thanks a lot for taking the time to help with the testing!
->>>>
->>>>> So I wonder why you need that on your board
->>>>
->>>> I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
->>>> rgmii rx delay") in your tree, hence I you please confirm the tests were
->>>> done with that commit reverted?
->>>>
->>>>> Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
->>>>> you still set it to "rgmii-id", so which is it?
->>>>
->>>> Please try with "rgmii-id" first. I added "rgmii-txid" to have a
->>>> fallback solution in case the former cannot be used.
->>>
->>> Ah, I see. Sorry I should have read up on the whole thread. Yes, the Starlight
->>> board with the Microchip phy works with "rgmii-id" as is. And you're right,
->>> with "rgmii-id" my VF1 needs the rx-internal-delay-ps = <900> property too.
->>
->> That's great, we have now a pretty clear indication that this uncommon behavior
->> stems from the Motorcomm PHY, and *not* from GMAC.
->>
->>>>
->>>>> You've alse removed the phy reset gpio on the Starlight board:
->>>>>
->>>>>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
->>>>>
->>>>> Why?
->>>>
->>>> I missed this in v1 as the gmac handling was done exclusively in
->>>> jh7100-common. Thanks for noticing!
->>>>
->>>>>>
->>>>>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
->>>>>> ---
->>>>>>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
->>>>>>  1 file changed, 5 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->>>>>> index 7cda3a89020a..d3f4c99d98da 100644
->>>>>> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->>>>>> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
->>>>>> @@ -11,3 +11,8 @@ / {
->>>>>>  	model = "BeagleV Starlight Beta";
->>>>>>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
->>>>>>  };
->>>>>> +
->>>>>> +&gmac {
->>>>>> +	phy-mode = "rgmii-id";
->>>>>> +	status = "okay";
->>>>>> +};
->>>>>
->>>>> Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
->>>>> so why can't these be set in the jh7100-common.dtsi?
->>>>
->>>> I wasn't sure "rgmii-id" can be used for both boards and I didn't want
->>>> to unconditionally enable gmac on Starlight before getting a
->>>> confirmation that this actually works.
->>>>
->>>> If there is no way to make it working with "rgmii-id" (w/ or w/o
->>>> adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
->>>
->>> Yeah, I don't exactly know the difference, but both boards seem to work fine
->>> with "rgmii-id", so if that is somehow better and/or more correct let's just go
->>> with that.
->>
->> As Andrew already pointed out, going with "rgmii-id" would be the recommended
->> approach, as this passes the responsibility of adding both TX and RX delays to
->> the PHY.  "rgmii-txid" requires the MAC to handle the RX delay, which might
->> break the boards having a conformant (aka well-behaving) PHY.  For some reason
->> the Microchip PHY seems to work fine in both cases, but that's most likely an
->> exception, as other PHYs might expose a totally different and undesired
->> behavior.
->>
->> I will prepare a v3 soon, and will drop the patches you have already submitted
->> as part of [1].
+On Tue, 28 Nov 2023 04:22:11 +0000 Shinas Rasheed wrote:
+> > On Mon, 27 Nov 2023 08:21:34 -0800 Shinas Rasheed wrote:  
+> > > Device unload control net function should inform firmware  
+> > 
+> > What is "control net" again?  
 > 
-> Sounds good. Then what's missing for ethernet to work is just the clock patches:
-> https://github.com/esmil/linux/commit/b5abe1cb3815765739aff7949deed6f65b952c4a
-> https://github.com/esmil/linux/commit/3a7a423b15a9f796586cbbdc37010d2b83ff2367
-> 
-> You can either include those as part of your patch series enabling ethernet, or
-> they can be submitted separately with the audio clocks. Either way is
-> fine by me.
+> Control net is just a software layer which is used by the host driver
+> as well as the firmware to communicate with each other, given in the
+> source file octep_ctrl_net.c and the corresponding octep_ctrl_net.h
+> interface, which is already part of upstreamed driver.
 
-I can cherry-pick them, but so far I couldn't identify any networking
-related issues if those patches are not applied. Could it be something
-specific to Starlight board only?
+Yes, I think it went in before I had time to nack it.
+I'm strongly against using the IP stack to talk to FW,
+if you read the ML you would know it.
 
-> /Emil
-> 
->>
->> Thanks again for your support,
->> Cristian
->>
->> [1]: https://lore.kernel.org/all/20231126232746.264302-1-emil.renner.berthing@canonical.com/
+No new patches to octep_ctrl_net will be accepted.
 
