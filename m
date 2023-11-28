@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-51736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8222E7FBE82
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:51:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D197FBE84
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:51:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BEFC2825AB
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:51:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1BA8282577
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9856A1E4B2;
-	Tue, 28 Nov 2023 15:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3A35B5C4;
+	Tue, 28 Nov 2023 15:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aXHsChTJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="K/2iF04b"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2074.outbound.protection.outlook.com [40.107.243.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D641BE
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:51:30 -0800 (PST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB32A90
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:51:34 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AK8Q2+OghuBjYqvobwTRjYkwPtq45sEIwt0kGXa0bjVEecVSydTMaSHRCTvs2dUy1TduCjCIGz7c4kstA4bwl11kCQfYd9LAL47wbqZo2uR7wNzK7Om3UA7pupqeFNgzl4n+f36dokE7fNxxmEHpSoAYlNIICBta3heMzdMRWdTGa2a8/0aQxYBOv8z9OVMNx3IxP70shKaZxXHJZz78AnZkYdJmoBxcIMjXUhoqkLrBa22qf51eFnbQi2tYZ9z0oK3GJibQIarQM1s+fvIIwVJYjWpi/B/xJQZM2dtdXkZL081WzV6NnaLtL15aTSADoDabWfB9u5AP3GKbgeuSBw==
+ b=OlqiHvLaWLh76R8QUl88I+kiPjJWNqS8VpFW9pH39oNC86sRu2WVsbsPPDe6z8HHkK/3bEgMw6Os+8E79Q8rdq4CPth529RZdiwBEnHK78j7M4zVmNbZ1L4ztC+o0ESN2HMuYM7ApCW+GY+1iCgl8oYqIZQr8HJgV70u8ydw4w66PI9oUSBr3qBriQHmqc2+RiD7R9o+QHdOohZM/qXxIjJpU+MsLukv+xRODMhZeiVCHIlj4AkpXce9Ulj95T6kL0Sq/WyefX+HReuUBlM586qMTGi3RGGIFlnF3qIkcowAJ39xVZCorhAXaaC95TbrsDAwQqdlusFh6PteNHRP9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O3EuImfDo5ARo9t58j/tHIcEM690dx2aON3cnI/jiio=;
- b=lzG/YapFfvywRz7VzZM6h0xZvbdMn9WX5CXhxA551Sns9UpMzzDK0xknw+l7R/Luu89GE0+YS4T05byGpWxUUAlbJyHxgtBQzey8Bwfz54qGKF6HfZZfBZYLpHzVX7yxBM7c8He3+LmSWBmdMb7R6DrCFow7/9bPyiSNDGxVAtGF1q4A4Gxklg45Y0s21xLlWbJMibjrCOmXkyPyfgzw37w7nUNfelK7zAdvmmTWx9sk4ELWHHWMMBU5I9RGnzE9eZoSqNZRW0GqpC+nTUDVt2Y8xcYVv5tmEEROalR+aXEjwIpO4elqXfY7hZ68cw5ZWvKaEkg0HJhVg70tdfekyw==
+ bh=iTs2nsXrEnxj6dv62R6C0UZzV5W5of6+6wLi+7HaEKk=;
+ b=WI33FC4P1h2/XHBwFIpZDRdQYrcFDEQljXPIB0zDNZh2JrBwvG7AkiOs2IeBqUUrbDE6UeEyJnFadtNcQ/GEqUsR3KunOPtfibpotX0z3XaC4seRrZsRjVU9IzJCqlPDrxo7u5iFIJxrchC0LWCoppYrNv56q/ghiImt2lz63YIBI7XR7q2H3wcAEzHvDVHx5NjTL7El5afGuq6wySpE0ws6Opm7snjTEYYFTcNYn5AHV+P2Sz0gl9ly05lHtL8Sd/ioVwbM28xIRYpnRDX990VbJ65H+/ANgfoEUvYLYBviQuzSwcEG8zOyCzs0rs2ALJZx+kPsW8rwS7uHV57iyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3EuImfDo5ARo9t58j/tHIcEM690dx2aON3cnI/jiio=;
- b=aXHsChTJwqBPd82BMMgaNDxaoZWtbUWvzHb8uj21pG3x5CtOLuqe3+/hRy54nm81h06IFZ8mw+xzv7kaNLs6UejOn1qC7Svx5fC6fT76WfjHpIykT7JrsmvtT7oFhEhPNIVak8vDqJmiB2M/BVIB3BCV80RI494+rd6iIGeoXx7szHthHTT65d3KZlE5AvhLbvEH7DylyneJfTyTENVctvb9Ex5CtqRWetUrcx/MBJnd8ekMjvkUZeA1oZ6zKO+ULW2LqCTJCtZKFZ612EGkKjXNPcoZ4XS3+vcAhNdrQK0yOT/FL05637yRD4xVxwH1Al/RQWDO38qsDO8YupMzVQ==
-Received: from MW2PR2101CA0020.namprd21.prod.outlook.com (2603:10b6:302:1::33)
- by SJ2PR12MB8062.namprd12.prod.outlook.com (2603:10b6:a03:4c8::22) with
+ bh=iTs2nsXrEnxj6dv62R6C0UZzV5W5of6+6wLi+7HaEKk=;
+ b=K/2iF04bg8K3/WPFZQjg604YiLbeo6+lh+NhA5eJ/uSL+LMVBERaaAgW14MDYqWRv2px/6d2iBZPXyDXjnFiNMERPQYy4QdRvYhRt81ahUimQ5pBB7xIV1h/EOq8VMHQeG872UurpxfCpJCXCvCxUgGr0XKWgQoImfmM989f5D3jgPwP1Bau+cgk4NE9222lfdKVv0wzzw8HdgBuYJ14gTVQh9fDG9fBShim4ifjEw7PTsTrBISSooTwQeW7XBPgmbk6U9Q+dXiiAormXctTn6NFJEYkORk8+EnLPdPBBmPkixBlFsyqi40n5TjErSyGWehPQYvfdVyanqBgiZI1lA==
+Received: from SJ0PR03CA0026.namprd03.prod.outlook.com (2603:10b6:a03:33a::31)
+ by IA0PR12MB8253.namprd12.prod.outlook.com (2603:10b6:208:402::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Tue, 28 Nov
- 2023 15:51:27 +0000
-Received: from CO1PEPF000044F4.namprd05.prod.outlook.com
- (2603:10b6:302:1:cafe::e5) by MW2PR2101CA0020.outlook.office365.com
- (2603:10b6:302:1::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.3 via Frontend
- Transport; Tue, 28 Nov 2023 15:51:26 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Tue, 28 Nov
+ 2023 15:51:29 +0000
+Received: from CO1PEPF000044F0.namprd05.prod.outlook.com
+ (2603:10b6:a03:33a:cafe::63) by SJ0PR03CA0026.outlook.office365.com
+ (2603:10b6:a03:33a::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29 via Frontend
+ Transport; Tue, 28 Nov 2023 15:51:29 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -51,26 +51,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000044F4.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ CO1PEPF000044F0.mail.protection.outlook.com (10.167.241.70) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7046.17 via Frontend Transport; Tue, 28 Nov 2023 15:51:26 +0000
+ 15.20.7046.17 via Frontend Transport; Tue, 28 Nov 2023 15:51:29 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 28 Nov
- 2023 07:51:12 -0800
+ 2023 07:51:15 -0800
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 28 Nov
- 2023 07:51:10 -0800
+ 2023 07:51:13 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
  Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 02/17] mlxsw: spectrum_fid: Rename FID ops, families, arrays
-Date: Tue, 28 Nov 2023 16:50:35 +0100
-Message-ID: <96b6da5439bb662fa86e795bbcec9dc3ccfa59fd.1701183892.git.petrm@nvidia.com>
+Subject: [PATCH net-next 03/17] mlxsw: spectrum_fid: Split a helper out of mlxsw_sp_fid_flood_table_mid()
+Date: Tue, 28 Nov 2023 16:50:36 +0100
+Message-ID: <fd41c66a1df4df6499d3da34f40e7b9efa15bc3e.1701183892.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1701183891.git.petrm@nvidia.com>
 References: <cover.1701183891.git.petrm@nvidia.com>
@@ -86,216 +86,82 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F4:EE_|SJ2PR12MB8062:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4dc78973-b007-4144-13b4-08dbf029e0f5
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F0:EE_|IA0PR12MB8253:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a6869a0-12ee-43bc-b4d0-08dbf029e2f0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	cuMEymy5OTj6JdHuN6HKFQpslYCnXKykAosVfPvNsqBdBouLN7dZaTucth5laPCaw/4K31T2kE64uWVNgIkQkqIRbbon5uTV/mRjxj8eP5FO2F9L1sCdY189VkJ6rvgjckFEgcj5KCOcaZckwlpQqOG4ToUDFK8ds4wzWxbITdLzusmoOoF1Yepc2MMUXPWwREx7gsfBt4Z+pviEyVwPxaS81dHgsPZZtYbD+ED80IM27Gze5m/ZZrm20tiUxiT1ECLXBxrZ0FwqEA0/ddiMeF0AzbZodjYw+BuUiTznmqKZ9J6hrL1wh7JxQgcxjRuiUKl24pYFNlKhzELYRTFbFbyVQi1zLJt3w6zO0asCa4rynDQq4QfCZ6Nz2sV3wUKcwMXUFX1IfnDy1fUyhDdlG2ql5tEd/auvi7dHqJ8e3UYOW5lffe7/RjVFAX5uQUxWGlntVgi/FwtdLPCNuUZPox29LyGRAl7Rfl6eYHLNW4poSGYe0bZhb5VXqSyZfxDZ+wZnivLFdhmkhrKNSmBY8okqbPcAkZXyEfQZzsBAnesK+NF/Mp2ZygTADds2X4kydwZkG2f/Pbukr9F2uZzGP2j7eRRnao8ztbZc3Or//SQi8GEwcRMuW7G8h4mWUmosHnBsK/HOumFMIm319SA3/Lmxh2IZ5y6gYb+gdeFRPKptvJe5sYTLIPWX7RG4tfIP8pq4hbAZDBPStvRt36AZQKfXFVF4Rc25NeevecZj63gxaYcyWGZIFb1do+Q8gPZH
+	Q8/tYzttCAIWdmYdgZVQItr6G42JUmpdRjKki1qTsoPjNxlWF9KGdF4X/LRqM3mQEzR/1p6TnLSEYc2guzcekfBdeJv02JNzJQqrbhAgYwAZ0re5m9aEX9K9Oc6bM2BQhPfXPQHWai9IrI0WeLA2G5KGtfkzcQIiIEYMzLAD+xigtpSsdev76wYtoPUWxIdYlqnNkmmEmcV96m/x6gH9p93um5kb0mrIp/gd/VxzGTdhEAT4lI9r3/gVDPIIgv5sepVPEraVAq3VED+qW1dsY48rYaMKaZlYLJA9w2F1hRBQYYLdlQQHqs5hB5Bk4CCS3ps0zgMl4d3AjJhzbf7kicodLSi0CFvdWQ2rVyRZJ3SgeW4+0I6kxC3Gbmed6PhRkjZbHC/V5uPQ+N5rrQRI8aDSsTfs6UTWwiAWZhhycyc3kN2QH9I319wAkxVMrxAp5++VyVzR8hbWUGKPsdKeSXqFoTMgX9AFrjOf3zmu2fcfagCZXGyiztBHEav3gfAVaM5VxA7RVrLZ7vYT6hr3++t6CwTGGDubJxG2BsLv+yexJLnfhF6eTDgdP5dDdYnvUXJkYwQyIWkgMIaznZPinkExsQCwUzSTKK28IDev3FNxeFbbd/Av7smJWmxvW8Nb7nKsX0h5fNbX6VOrumB/Hl7P9chKaNa9N3tFf0iao5PZL4tNDv6L4x7lsPT2fkOimjeDDjOqIwXgl/+QqVro2d7yGgvHg014qnmgMA2DyCaxCzJwyJe66Uq1Pni11oYw
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(39860400002)(136003)(376002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(82310400011)(36840700001)(40470700004)(46966006)(6666004)(8676002)(4326008)(8936002)(478600001)(54906003)(110136005)(316002)(40460700003)(47076005)(356005)(7636003)(36756003)(40480700001)(41300700001)(86362001)(107886003)(70586007)(26005)(2906002)(36860700001)(2616005)(426003)(83380400001)(16526019)(70206006)(82740400003)(5660300002)(336012);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(376002)(346002)(396003)(230922051799003)(82310400011)(1800799012)(186009)(64100799003)(451199024)(40470700004)(36840700001)(46966006)(40480700001)(40460700003)(36860700001)(110136005)(54906003)(70206006)(70586007)(316002)(6666004)(478600001)(2616005)(107886003)(16526019)(26005)(5660300002)(2906002)(4326008)(8676002)(8936002)(86362001)(426003)(336012)(83380400001)(82740400003)(7636003)(47076005)(356005)(36756003)(41300700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 15:51:26.0759
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 15:51:29.3870
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4dc78973-b007-4144-13b4-08dbf029e0f5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a6869a0-12ee-43bc-b4d0-08dbf029e2f0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F4.namprd05.prod.outlook.com
+	CO1PEPF000044F0.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8062
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8253
 
-Currently, mlxsw always uses a "controlled" flood mode on all Nvidia
-Spectrum generations. The following patches will however introduce a
-possibility to run a "CFF" (for Compressed FID Flooding) mode on newer
-machines, if the FW supports it.
+In future patches, for CFF flood mode support, we will need a way to
+determine a PGT base dynamically, as an op. Therefore, for symmetry,
+split out a helper, mlxsw_sp_fid_pgt_base_ctl(), that determines a PGT base
+in the controlled mode as well.
 
-To reflect that, label all FID ops, FID families and FID family arrays with
-a _ctl suffix. This will make it clearer what is what when the CFF families
-are introduced in later patches.
-
-Keep the dummy family intact. Since the dummy family has no flood tables
-in either CTL or CFF mode, there are no flood-mode-specific callbacks.
-
-Additionally, add a remark at two fields that they are only relevant when
-flood mode is not CFF.
+Now that the helper is available, use it in mlxsw_sp_fid_flood_table_init()
+which currently invokes the FID->MID helper to that end.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- .../ethernet/mellanox/mlxsw/spectrum_fid.c    | 48 ++++++++++---------
- 1 file changed, 25 insertions(+), 23 deletions(-)
+ .../net/ethernet/mellanox/mlxsw/spectrum_fid.c  | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
-index fc55ba781bca..d92c44c6ffbf 100644
+index d92c44c6ffbf..96cedc241bf2 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
-@@ -71,7 +71,7 @@ static const struct rhashtable_params mlxsw_sp_fid_vni_ht_params = {
- 
- struct mlxsw_sp_flood_table {
- 	enum mlxsw_sp_flood_type packet_type;
--	enum mlxsw_flood_table_type table_type;
-+	enum mlxsw_flood_table_type table_type;	/* For flood_mode!=CFF. */
- 	int table_index;
- };
- 
-@@ -109,7 +109,7 @@ struct mlxsw_sp_fid_family {
- 	enum mlxsw_sp_rif_type rif_type;
- 	const struct mlxsw_sp_fid_ops *ops;
- 	struct mlxsw_sp *mlxsw_sp;
--	bool flood_rsp;
-+	bool flood_rsp;	/* For flood_mode!=CFF. */
- 	enum mlxsw_reg_bridge_type bridge_type;
- 	u16 pgt_base;
- 	bool smpe_index_valid;
-@@ -1068,7 +1068,7 @@ mlxsw_sp_fid_8021d_vid_to_fid_rif_update(const struct mlxsw_sp_fid *fid,
- 	return 0;
+@@ -328,15 +328,22 @@ mlxsw_sp_fid_family_pgt_size(const struct mlxsw_sp_fid_family *fid_family)
+ 	return num_fids * fid_family->nr_flood_tables;
  }
  
--static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_8021d_ops = {
-+static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_8021d_ops_ctl = {
- 	.setup			= mlxsw_sp_fid_8021d_setup,
- 	.configure		= mlxsw_sp_fid_8021d_configure,
- 	.deconfigure		= mlxsw_sp_fid_8021d_deconfigure,
-@@ -1120,8 +1120,10 @@ mlxsw_sp_fid_8021q_fdb_clear_offload(const struct mlxsw_sp_fid *fid,
- 	br_fdb_clear_offload(nve_dev, mlxsw_sp_fid_8021q_vid(fid));
- }
- 
--static void mlxsw_sp_fid_rfid_setup(struct mlxsw_sp_fid *fid, const void *arg)
-+static void mlxsw_sp_fid_rfid_setup_ctl(struct mlxsw_sp_fid *fid,
-+					const void *arg)
++static u16
++mlxsw_sp_fid_pgt_base_ctl(const struct mlxsw_sp_fid_family *fid_family,
++			  const struct mlxsw_sp_flood_table *flood_table)
++{
++	u16 num_fids;
++
++	num_fids = mlxsw_sp_fid_family_num_fids(fid_family);
++	return fid_family->pgt_base + num_fids * flood_table->table_index;
++}
++
+ static u16
+ mlxsw_sp_fid_flood_table_mid(const struct mlxsw_sp_fid_family *fid_family,
+ 			     const struct mlxsw_sp_flood_table *flood_table,
+ 			     u16 fid_offset)
  {
-+	/* In controlled mode, the FW takes care of FID placement. */
- 	fid->fid_offset = 0;
+-	u16 num_fids;
+-
+-	num_fids = mlxsw_sp_fid_family_num_fids(fid_family);
+-	return fid_family->pgt_base + num_fids * flood_table->table_index +
++	return mlxsw_sp_fid_pgt_base_ctl(fid_family, flood_table) +
+ 	       fid_offset;
  }
  
-@@ -1248,8 +1250,8 @@ mlxsw_sp_fid_rfid_vid_to_fid_rif_update(const struct mlxsw_sp_fid *fid,
- 	return 0;
- }
+@@ -1671,7 +1678,7 @@ mlxsw_sp_fid_flood_table_init(struct mlxsw_sp_fid_family *fid_family,
+ 	u16 mid_base;
+ 	int err, i;
  
--static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_rfid_ops = {
--	.setup			= mlxsw_sp_fid_rfid_setup,
-+static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_rfid_ops_ctl = {
-+	.setup			= mlxsw_sp_fid_rfid_setup_ctl,
- 	.configure		= mlxsw_sp_fid_rfid_configure,
- 	.deconfigure		= mlxsw_sp_fid_rfid_deconfigure,
- 	.index_alloc		= mlxsw_sp_fid_rfid_index_alloc,
-@@ -1405,7 +1407,7 @@ mlxsw_sp_fid_8021q_port_vid_unmap(struct mlxsw_sp_fid *fid,
- 		__mlxsw_sp_fid_port_vid_map(fid, local_port, vid, false);
- }
+-	mid_base = mlxsw_sp_fid_flood_table_mid(fid_family, flood_table, 0);
++	mid_base = mlxsw_sp_fid_pgt_base_ctl(fid_family, flood_table);
  
--static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_8021q_ops = {
-+static const struct mlxsw_sp_fid_ops mlxsw_sp_fid_8021q_ops_ctl = {
- 	.setup			= mlxsw_sp_fid_8021q_setup,
- 	.configure		= mlxsw_sp_fid_8021q_configure,
- 	.deconfigure		= mlxsw_sp_fid_8021q_deconfigure,
-@@ -1447,7 +1449,7 @@ static const struct mlxsw_sp_fid_family mlxsw_sp1_fid_8021q_family = {
- 	.flood_tables		= mlxsw_sp_fid_8021d_flood_tables,
- 	.nr_flood_tables	= ARRAY_SIZE(mlxsw_sp_fid_8021d_flood_tables),
- 	.rif_type		= MLXSW_SP_RIF_TYPE_VLAN,
--	.ops			= &mlxsw_sp_fid_8021q_ops,
-+	.ops			= &mlxsw_sp_fid_8021q_ops_ctl,
- 	.flood_rsp              = false,
- 	.bridge_type            = MLXSW_REG_BRIDGE_TYPE_0,
- 	.smpe_index_valid	= false,
-@@ -1461,7 +1463,7 @@ static const struct mlxsw_sp_fid_family mlxsw_sp1_fid_8021d_family = {
- 	.flood_tables		= mlxsw_sp_fid_8021d_flood_tables,
- 	.nr_flood_tables	= ARRAY_SIZE(mlxsw_sp_fid_8021d_flood_tables),
- 	.rif_type		= MLXSW_SP_RIF_TYPE_FID,
--	.ops			= &mlxsw_sp_fid_8021d_ops,
-+	.ops			= &mlxsw_sp_fid_8021d_ops_ctl,
- 	.bridge_type            = MLXSW_REG_BRIDGE_TYPE_1,
- 	.smpe_index_valid       = false,
- };
-@@ -1475,13 +1477,13 @@ static const struct mlxsw_sp_fid_family mlxsw_sp1_fid_dummy_family = {
- 	.smpe_index_valid       = false,
- };
- 
--static const struct mlxsw_sp_fid_family mlxsw_sp_fid_rfid_family = {
-+static const struct mlxsw_sp_fid_family mlxsw_sp_fid_rfid_family_ctl = {
- 	.type			= MLXSW_SP_FID_TYPE_RFID,
- 	.fid_size		= sizeof(struct mlxsw_sp_fid),
- 	.start_index		= MLXSW_SP_RFID_START,
- 	.end_index		= MLXSW_SP_RFID_END,
- 	.rif_type		= MLXSW_SP_RIF_TYPE_SUBPORT,
--	.ops			= &mlxsw_sp_fid_rfid_ops,
-+	.ops			= &mlxsw_sp_fid_rfid_ops_ctl,
- 	.flood_rsp              = true,
- 	.smpe_index_valid       = false,
- };
-@@ -1490,10 +1492,10 @@ static const struct mlxsw_sp_fid_family *mlxsw_sp1_fid_family_arr[] = {
- 	[MLXSW_SP_FID_TYPE_8021Q]	= &mlxsw_sp1_fid_8021q_family,
- 	[MLXSW_SP_FID_TYPE_8021D]	= &mlxsw_sp1_fid_8021d_family,
- 	[MLXSW_SP_FID_TYPE_DUMMY]	= &mlxsw_sp1_fid_dummy_family,
--	[MLXSW_SP_FID_TYPE_RFID]	= &mlxsw_sp_fid_rfid_family,
-+	[MLXSW_SP_FID_TYPE_RFID]	= &mlxsw_sp_fid_rfid_family_ctl,
- };
- 
--static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021q_family = {
-+static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021q_family_ctl = {
- 	.type			= MLXSW_SP_FID_TYPE_8021Q,
- 	.fid_size		= sizeof(struct mlxsw_sp_fid_8021q),
- 	.start_index		= MLXSW_SP_FID_8021Q_START,
-@@ -1501,13 +1503,13 @@ static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021q_family = {
- 	.flood_tables		= mlxsw_sp_fid_8021d_flood_tables,
- 	.nr_flood_tables	= ARRAY_SIZE(mlxsw_sp_fid_8021d_flood_tables),
- 	.rif_type		= MLXSW_SP_RIF_TYPE_VLAN,
--	.ops			= &mlxsw_sp_fid_8021q_ops,
-+	.ops			= &mlxsw_sp_fid_8021q_ops_ctl,
- 	.flood_rsp              = false,
- 	.bridge_type            = MLXSW_REG_BRIDGE_TYPE_0,
- 	.smpe_index_valid	= true,
- };
- 
--static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021d_family = {
-+static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021d_family_ctl = {
- 	.type			= MLXSW_SP_FID_TYPE_8021D,
- 	.fid_size		= sizeof(struct mlxsw_sp_fid_8021d),
- 	.start_index		= MLXSW_SP_FID_8021D_START,
-@@ -1515,7 +1517,7 @@ static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_8021d_family = {
- 	.flood_tables		= mlxsw_sp_fid_8021d_flood_tables,
- 	.nr_flood_tables	= ARRAY_SIZE(mlxsw_sp_fid_8021d_flood_tables),
- 	.rif_type		= MLXSW_SP_RIF_TYPE_FID,
--	.ops			= &mlxsw_sp_fid_8021d_ops,
-+	.ops			= &mlxsw_sp_fid_8021d_ops_ctl,
- 	.bridge_type            = MLXSW_REG_BRIDGE_TYPE_1,
- 	.smpe_index_valid       = true,
- };
-@@ -1529,11 +1531,11 @@ static const struct mlxsw_sp_fid_family mlxsw_sp2_fid_dummy_family = {
- 	.smpe_index_valid       = false,
- };
- 
--static const struct mlxsw_sp_fid_family *mlxsw_sp2_fid_family_arr[] = {
--	[MLXSW_SP_FID_TYPE_8021Q]	= &mlxsw_sp2_fid_8021q_family,
--	[MLXSW_SP_FID_TYPE_8021D]	= &mlxsw_sp2_fid_8021d_family,
-+static const struct mlxsw_sp_fid_family *mlxsw_sp2_fid_family_arr_ctl[] = {
-+	[MLXSW_SP_FID_TYPE_8021Q]	= &mlxsw_sp2_fid_8021q_family_ctl,
-+	[MLXSW_SP_FID_TYPE_8021D]	= &mlxsw_sp2_fid_8021d_family_ctl,
- 	[MLXSW_SP_FID_TYPE_DUMMY]	= &mlxsw_sp2_fid_dummy_family,
--	[MLXSW_SP_FID_TYPE_RFID]	= &mlxsw_sp_fid_rfid_family,
-+	[MLXSW_SP_FID_TYPE_RFID]	= &mlxsw_sp_fid_rfid_family_ctl,
- };
- 
- static struct mlxsw_sp_fid *mlxsw_sp_fid_lookup(struct mlxsw_sp *mlxsw_sp,
-@@ -1877,12 +1879,12 @@ const struct mlxsw_sp_fid_core_ops mlxsw_sp1_fid_core_ops = {
- 	.fini = mlxsw_sp_fids_fini,
- };
- 
--static int mlxsw_sp2_fids_init(struct mlxsw_sp *mlxsw_sp)
-+static int mlxsw_sp2_fids_init_ctl(struct mlxsw_sp *mlxsw_sp)
- {
--	return mlxsw_sp_fids_init(mlxsw_sp, mlxsw_sp2_fid_family_arr);
-+	return mlxsw_sp_fids_init(mlxsw_sp, mlxsw_sp2_fid_family_arr_ctl);
- }
- 
- const struct mlxsw_sp_fid_core_ops mlxsw_sp2_fid_core_ops = {
--	.init = mlxsw_sp2_fids_init,
-+	.init = mlxsw_sp2_fids_init_ctl,
- 	.fini = mlxsw_sp_fids_fini,
- };
+ 	sfgc_packet_types = mlxsw_sp_packet_type_sfgc_types[packet_type];
+ 	for (i = 0; i < MLXSW_REG_SFGC_TYPE_MAX; i++) {
 -- 
 2.41.0
 
