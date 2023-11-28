@@ -1,78 +1,86 @@
-Return-Path: <netdev+bounces-51815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE3DA7FC534
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:22:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DFE7FC53E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:24:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49D57B215E5
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:22:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFF83B215CB
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C408A41C76;
-	Tue, 28 Nov 2023 20:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6097D40BFC;
+	Tue, 28 Nov 2023 20:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ncbc7Kqm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="erFzEYNo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD37F83;
-	Tue, 28 Nov 2023 12:22:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701202949; x=1732738949;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=5a9+cqvWMbcyuzJdN5sdcVcbsN9zqY5j2FPt3BXfm2g=;
-  b=ncbc7Kqm3VCMyFtoy5HrLbz/Uz/jCx2q606hGeenVljx0PulAxq4iivG
-   EmHnS7iZbA6q9bD2R19B0zV0rZ+DtAKZUQ3yPmlrL7MH08nkHQ454PQVh
-   6IYt6x+sQa3eqjEGy/nKD2kd4Uz8BoJGjKxk+SwtSHcUi5vYs5uUzrulw
-   +L2IURIQvDGNpAI2OpVcAaGMfb3SDrYrFNkoFPG64rPDrkWfCEEm6G4Es
-   W7dwAAhxIq+BmhdAnFJBoLlvnJyowIuv5jhT7F0Q5lQLsR9/ZnKGyr3qz
-   ArQkEUvjCzjgqPr4ONRc9sQyPY4w7tztTb2vcOAWnLW9WnluwwwWezwZq
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="424166467"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="424166467"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 12:22:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="17036986"
-Received: from ticela-or-268.amr.corp.intel.com (HELO vcostago-mobl3) ([10.212.190.61])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 12:22:28 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] net/sched: cbs: Use units.h instead of
- the copy of a definition
-In-Reply-To: <20231128174813.394462-1-andriy.shevchenko@linux.intel.com>
-References: <20231128174813.394462-1-andriy.shevchenko@linux.intel.com>
-Date: Tue, 28 Nov 2023 12:22:27 -0800
-Message-ID: <87h6l5sk58.fsf@intel.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AFD19AB;
+	Tue, 28 Nov 2023 12:23:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=OZx/da2wVl9ApR87F5Ow4/cPqWOdBxBeVYndGfDi8EA=; b=er
+	FzEYNorKXpOTjfwSwBGe6lvaCpgtLUR/uznDjygjZT8iETer0Jbz9WWq2OEB///M1n7pIq3jspbpL
+	fqCe8TNdoPZQFol9eGB83ybH7BiEvWJcBqDjfn+a83qiUDY4Q0/Cs2aZEYfpGR4h82GILS4pe7fIu
+	aZq6kbsLBg9hpCY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r84cQ-001UQC-8r; Tue, 28 Nov 2023 21:23:42 +0100
+Date: Tue, 28 Nov 2023 21:23:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vincent Whitchurch <vincent.whitchurch@axis.com>
+Cc: Michael Hennerich <michael.hennerich@analog.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@axis.com
+Subject: Re: [PATCH net-next] net: phy: adin: allow control of Fast Link Down
+Message-ID: <b16f4344-815c-429f-b3b5-58715b32e1db@lunn.ch>
+References: <20231127-adin-fld-v1-1-797f6423fd48@axis.com>
+ <452f1e1c-1afd-4a36-bf60-11b7de291d2f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <452f1e1c-1afd-4a36-bf60-11b7de291d2f@lunn.ch>
 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> writes:
+On Tue, Nov 28, 2023 at 09:18:00PM +0100, Andrew Lunn wrote:
+> On Mon, Nov 27, 2023 at 04:31:39PM +0100, Vincent Whitchurch wrote:
+> > Add support to allow Fast Link Down (aka "Enhanced link detection") to
+> > be controlled via the ETHTOOL_PHY_FAST_LINK_DOWN tunable.  These PHYs
+> > have this feature enabled by default.
+> > 
+> > Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+> Is there anything in the datasheet about how fast it is? It would be
+> nice to return the number of milliseconds, if its known.
 
-> BYTES_PER_KBIT is defined in units.h, use that definition.
->
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
+Datasheet says:
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+ If enhanced link detection is enabled (it is enabled by default), the
+ ADIN1300 typically reacts to a break in the cable within 10 μs and
+ indicates link down via the LINK_ST pin. If enhanced link detection
+ is not enabled, the ADIN1300 follows the IEEE standard, and in
+ 100BASE-TX, it can take more than either 350 ms or 750 ms in
+ 1000BASE-T, depending if the PHY is 1000BASE-T master or 1000BASE-T
+ slave.
 
+10uS is closer to 0ms and 1ms, so ETHTOOL_PHY_FAST_LINK_DOWN_ON == 0
+is right.
 
--- 
-Vinicius
+   Andrew
 
