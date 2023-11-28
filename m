@@ -1,109 +1,172 @@
-Return-Path: <netdev+bounces-51731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E987FBE5F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:45:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 159477FBE6E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:48:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42A311C209AD
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:45:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5204281583
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F031E4A5;
-	Tue, 28 Nov 2023 15:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D83E1E4AC;
+	Tue, 28 Nov 2023 15:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bGDAMmLz"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="WZ1m+bv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C161410CB
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:45:18 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40b4fac45dbso24085e9.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 07:45:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701186317; x=1701791117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kMlTXLe3YT0HN8OLrVDdKacmpyuKedWEwgUQDcdRML0=;
-        b=bGDAMmLzhchCXdh3satbTP1wvUf90PxCT8GYdxw9Uxx1xvBHtoochoAkNsUpldhRV2
-         lwSfqf2EDOR6PzPdRd6DATlbksDOntILc0JwP2zseoUHKv1x47/ArmKzM9zDl/fUvnoV
-         1AUuFdW10Y9jarOkygvGweNvw6SPYn13M7D8QhdWB6wQ7x3dJ5k84NOGD57Bswwiezx8
-         J97PDo2X8SoONsdkk341ZuUtuMQVEkwXSbUibOir8oiflgs3GII/ljTddHF1b5kD2UvD
-         W2ifK9es8vHMwGBIjoONzHAXTStM2oQ/NA7V4btclEseM/iPRO90HB7QGxwOmucUJV1b
-         SZOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701186317; x=1701791117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kMlTXLe3YT0HN8OLrVDdKacmpyuKedWEwgUQDcdRML0=;
-        b=OXlv6+dKz+9LgiPzGTBdr38GvaEIqAn9v+CBKRC/FXo1wMEABcXgwbErlzPap7WF5Q
-         bktDtVje7HHltFk9B9iVxD1WxN7BmDwI/qWw2yF0ZVS4jOLnR8pxoNrtXjWBYk0+PFjT
-         EbJM4SuSHWgW+UDOziMYOLMUnOZSxyd1wsQvrH7X/vUvv5xr+c9XlbaXWTH/jeD1Kr3h
-         qLfXPrU0nDFRc1IRBcm7UXG9yejeWV4zLIEcSr2oynungphYll5/siFIouHVuRdbx26m
-         OYpBgO535/+2p6OhtK/R2wYPLKJUsndlCABRUIKUDmtQzUheTlWJnDPXpFs9KnRQJciA
-         wgBQ==
-X-Gm-Message-State: AOJu0YwoOyY87ImPc9sxu8D7K5oxaP11FlZ/v3v6qFKnSo5uFDH8TY+g
-	cb2JW9W7zWd8F/QBrpNYZpR+gn31IRMJDC1pgG4fe7cRLQ/mQHe8nKo=
-X-Google-Smtp-Source: AGHT+IF+9oitYNKpBeMPvzm+CiIMJPvo97+FEfqii/v/7kE9+U7pvcoMnIMSNamP9TDr6yY1OhIUHSpu+5W3Fp7VSxE=
-X-Received: by 2002:a05:600c:3c83:b0:40b:2ec6:2a87 with SMTP id
- bg3-20020a05600c3c8300b0040b2ec62a87mr781446wmb.5.1701186316610; Tue, 28 Nov
- 2023 07:45:16 -0800 (PST)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F3D10CB;
+	Tue, 28 Nov 2023 07:48:00 -0800 (PST)
+Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 044FB66072A4;
+	Tue, 28 Nov 2023 15:47:56 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1701186478;
+	bh=Vl9zpAwbMrEUnNNnWPnj5b4a/P1lPAcyNOVXcUWIhSQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WZ1m+bv3Q0Jy/chYrN3+dL6SjUX316Z3dvRGEOz4Z2BNnoEIB8lbkgymUNP1nB+DY
+	 yBt948VB2I8zNuO1IADb9n7TxWTa9EHrVxKKDplAGyoFlNciITQ0Q8yW3VnhzeUzD7
+	 sWQLNGT0RAW2oFegXZAlnU0fP7FLNYj+o0/lMm41osUFrCQUv35dADby9b1MMFmVos
+	 UrkWS3AyWavs3NLKUwXuoDzW5zqFSo5DDsQiEwdX8D0mBA8c4DxP4Qu8gM22+jZeLW
+	 Uq3/uRu+1s1+JMOdQK44JYhcUxIj4pzfBcyAOSGSgHedjE/N0rnKFVk0u7NsGkLyz9
+	 fO+ArihKVLK3A==
+Message-ID: <054bbf2a-e7ba-40bf-8f8b-f0e0e9b396c6@collabora.com>
+Date: Tue, 28 Nov 2023 17:47:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231126151652.372783-1-syoshida@redhat.com>
-In-Reply-To: <20231126151652.372783-1-syoshida@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Nov 2023 16:45:05 +0100
-Message-ID: <CANn89iKcstKYWoqUCXHO__7PfVRMFNnN5nRQVCTAADvFbcJRww@mail.gmail.com>
-Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in ipgre_xmit()
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
+Content-Language: en-US
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
+ <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com>
+ <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 26, 2023 at 4:17=E2=80=AFPM Shigeru Yoshida <syoshida@redhat.co=
-m> wrote:
->
-> In ipgre_xmit(), skb_pull() may fail even if pskb_inet_may_pull() returns
-> true. For example, applications can create a malformed packet that causes
-> this problem with PF_PACKET.
->
-> This patch fixes the problem by dropping skb and returning from the
-> function if skb_pull() fails.
->
-> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
->  net/ipv4/ip_gre.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-> index 22a26d1d29a0..95efa97cb84b 100644
-> --- a/net/ipv4/ip_gre.c
-> +++ b/net/ipv4/ip_gre.c
-> @@ -643,7 +643,8 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
->                 /* Pull skb since ip_tunnel_xmit() needs skb->data pointi=
-ng
->                  * to gre header.
->                  */
-> -               skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
-> +               if (!skb_pull(skb, tunnel->hlen + sizeof(struct iphdr)))
-> +                       goto free_skb;
->                 skb_reset_mac_header(skb);
->
->                 if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL &&
-> --
+On 11/28/23 14:08, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+>> On 11/26/23 23:10, Emil Renner Berthing wrote:
+>>> Cristian Ciocaltea wrote:
+>>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+>>>> RGMII-ID.
+>>>>
+>>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
+>>>> yes, add the mdio & phy sub-nodes.
+>>>
+>>> Sorry for being late here. I've tested that removing the mdio and phy nodes on
+>>> the the Starlight board works fine, but the rx-internal-delay-ps = <900>
+>>> property not needed on any of my VisionFive V1 boards either.
+>>
+>> No problem, thanks a lot for taking the time to help with the testing!
+>>
+>>> So I wonder why you need that on your board
+>>
+>> I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
+>> rgmii rx delay") in your tree, hence I you please confirm the tests were
+>> done with that commit reverted?
+>>
+>>> Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
+>>> you still set it to "rgmii-id", so which is it?
+>>
+>> Please try with "rgmii-id" first. I added "rgmii-txid" to have a
+>> fallback solution in case the former cannot be used.
+> 
+> Ah, I see. Sorry I should have read up on the whole thread. Yes, the Starlight
+> board with the Microchip phy works with "rgmii-id" as is. And you're right,
+> with "rgmii-id" my VF1 needs the rx-internal-delay-ps = <900> property too.
 
+That's great, we have now a pretty clear indication that this uncommon behavior
+stems from the Motorcomm PHY, and *not* from GMAC.
+ 
+>>
+>>> You've alse removed the phy reset gpio on the Starlight board:
+>>>
+>>>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
+>>>
+>>> Why?
+>>
+>> I missed this in v1 as the gmac handling was done exclusively in
+>> jh7100-common. Thanks for noticing!
+>>
+>>>>
+>>>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>>>> ---
+>>>>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
+>>>>  1 file changed, 5 insertions(+)
+>>>>
+>>>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>> index 7cda3a89020a..d3f4c99d98da 100644
+>>>> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
+>>>> @@ -11,3 +11,8 @@ / {
+>>>>  	model = "BeagleV Starlight Beta";
+>>>>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
+>>>>  };
+>>>> +
+>>>> +&gmac {
+>>>> +	phy-mode = "rgmii-id";
+>>>> +	status = "okay";
+>>>> +};
+>>>
+>>> Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
+>>> so why can't these be set in the jh7100-common.dtsi?
+>>
+>> I wasn't sure "rgmii-id" can be used for both boards and I didn't want
+>> to unconditionally enable gmac on Starlight before getting a
+>> confirmation that this actually works.
+>>
+>> If there is no way to make it working with "rgmii-id" (w/ or w/o
+>> adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
+> 
+> Yeah, I don't exactly know the difference, but both boards seem to work fine
+> with "rgmii-id", so if that is somehow better and/or more correct let's just go
+> with that.
 
-I have syszbot reports with an actual repro for this one.
+As Andrew already pointed out, going with "rgmii-id" would be the recommended
+approach, as this passes the responsibility of adding both TX and RX delays to
+the PHY.  "rgmii-txid" requires the MAC to handle the RX delay, which might
+break the boards having a conformant (aka well-behaving) PHY.  For some reason
+the Microchip PHY seems to work fine in both cases, but that's most likely an
+exception, as other PHYs might expose a totally different and undesired
+behavior.
 
-I do not think your patch is correct, something should be fixed
-earlier (before we hit this point)
+I will prepare a v3 soon, and will drop the patches you have already submitted
+as part of [1].
+
+Thanks again for your support, 
+Cristian
+
+[1]: https://lore.kernel.org/all/20231126232746.264302-1-emil.renner.berthing@canonical.com/
 
