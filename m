@@ -1,93 +1,85 @@
-Return-Path: <netdev+bounces-51807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97DA7FC422
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:19:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391DC7FC43F
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 20:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3AA51C20B17
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 19:19:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85571F20F66
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 19:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3002946BA5;
-	Tue, 28 Nov 2023 19:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783A346BAE;
+	Tue, 28 Nov 2023 19:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CVzIkbW8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgOfmyA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DF410EC
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 11:18:59 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ASFjL4h019454;
-	Tue, 28 Nov 2023 11:18:54 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pfpt0220;
- bh=kMFp97RzjQhufj56WtcUPJlGyUuOsiaQ8ftBz5LtOIk=;
- b=CVzIkbW81x6hLp7RU9D6u6Dfipr32kMbwXznnIau7J3MNwRMV6idlwZfj2iz/mKh7cnv
- bAhXTBAnLctJQwWM7W3Cs8VOWA6yJdHgfTZ4ov/kjFOxdfZBEXe62dpJcgQYvwkaIrqp
- 6aHfIEbbkTm0VycXSVFefgMcZ2fgQzmY0YPZVcenkPFoEvAJSJQIfdGHXRt0Luzf+y4F
- BEoMKMJXhWlqpveOt/1ELW0a2IDEbj1tzWcf88NaxC2h0gR9rmtHvZiWTJnl2EJ7qtrd
- oqaohJlfg5uUjD3rPuOAGgr6AsdFe06SOdGy/f9MFp8k7+uVM6+EKuzwpZEXXD1TRFDj vw== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3una4djqej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 28 Nov 2023 11:18:53 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 Nov
- 2023 11:18:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 28 Nov 2023 11:18:51 -0800
-Received: from [10.193.38.189] (unknown [10.193.38.189])
-	by maili.marvell.com (Postfix) with ESMTP id 35E313F705F;
-	Tue, 28 Nov 2023 11:18:50 -0800 (PST)
-Message-ID: <9852ab3e-52ce-d55a-8227-c22f6294c61a@marvell.com>
-Date: Tue, 28 Nov 2023 20:18:49 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7EB319A6
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 11:27:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701199628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4rB3L8l5l9FR9JfGIti32cmRKxP1LOBDg+O8vN5tWC0=;
+	b=VgOfmyA3Zmm6NCvs/UGHB+6xp5B9qnVA/j7AFC51u6hCUNqn0pCZIVW28EAgN29wDwRO1t
+	sWl4LFUeqA0AoECNAVF1pTXRNZfwqzo0e52Gewpw9OF9mn97uAPjOLUJ6CzfQwYYqnz4ux
+	8Oc259B9OHZ66YG2taQsZqry6bMlSM4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-597-Qb1rLaw6O72PPcCLCr2Y6w-1; Tue, 28 Nov 2023 14:27:06 -0500
+X-MC-Unique: Qb1rLaw6O72PPcCLCr2Y6w-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-54af782f653so2968204a12.3
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 11:27:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701199625; x=1701804425;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4rB3L8l5l9FR9JfGIti32cmRKxP1LOBDg+O8vN5tWC0=;
+        b=bfGBSxzA5WtPJcZ5heWDX2lWA4wlVyC3T0AQ+W6j8QR53D4+3n9SIdMOtJrMsTLeiE
+         jDO5SaE3b/U5rbowh7Fk5v0EGY5BC8X5flxsbMERaB/H8KR9Jk60YsYe4r1zzXAa8WWv
+         pfQiNYXzOSMw5+K1XlFbQsudvW+UES88aTT0k0176p35KNNAJOUCQ5wuJYK2swjFihdh
+         QF6VLP1OPG07Z72aJUL87ZKRtZ7WohO5RyfM2QSerejUREe8aLvC93MtEbZmirzW9/VU
+         J1abTIANlGOPtri5L6lnJa6tGGzJ9iKjWygh2Z4vgU7BBNS6lRQrrYTwwyFyVhRpdcEM
+         pRZQ==
+X-Gm-Message-State: AOJu0YxftwR9LCbZvy+NNEhZEZ7uFgHHDoUVtJ2Ph0e5OXRGO1USWq3V
+	kj85aTk8i6u7q69fxWezvuWRUK7Wu5DFHdQ64fApV19ZxBVnPj3B37bK4spwVXqIlDZEJSAiaZe
+	9IDcEIvTZ/bdpWO/fRXPYV053JCrfTzXY
+X-Received: by 2002:a50:8a85:0:b0:54b:bb7a:d6fb with SMTP id j5-20020a508a85000000b0054bbb7ad6fbmr1322095edj.16.1701199625841;
+        Tue, 28 Nov 2023 11:27:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHYVFkt2s5l3Ee8VCXIYdecpMrMNyNxVD0tkeA+yyXcY/1VNaZWAI8sr+kyRrM6ZDE5cg8hNskX/ygf4F0hOe8=
+X-Received: by 2002:a50:8a85:0:b0:54b:bb7a:d6fb with SMTP id
+ j5-20020a508a85000000b0054bbb7ad6fbmr1322077edj.16.1701199625509; Tue, 28 Nov
+ 2023 11:27:05 -0800 (PST)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 28 Nov 2023 11:27:04 -0800
+From: Marcelo Ricardo Leitner <mleitner@redhat.com>
+References: <20231128160631.663351-1-pctammela@mojatatu.com> <20231128160631.663351-2-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Netdev
-	<netdev@vger.kernel.org>
-References: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
- <cf6e78b6-e4e2-faab-f8c6-19dc462b1d74@marvell.com>
- <20231127145945.0d8120fb@kernel.org>
-From: Igor Russkikh <irusskikh@marvell.com>
-In-Reply-To: <20231127145945.0d8120fb@kernel.org>
+In-Reply-To: <20231128160631.663351-2-pctammela@mojatatu.com>
+Date: Tue, 28 Nov 2023 11:27:04 -0800
+Message-ID: <CALnP8ZZWua5iodkML7v02yOLtoCzBmkG8POig577M7m=fy7+Tg@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 1/4] net/sched: act_api: rely on rcu in tcf_idr_check_alloc
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, vladbu@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: cEHFraV7Wn1NNHL7S9tqQKUnHu5db4IY
-X-Proofpoint-ORIG-GUID: cEHFraV7Wn1NNHL7S9tqQKUnHu5db4IY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-28_21,2023-11-27_01,2023-05-22_02
 
+On Tue, Nov 28, 2023 at 01:06:28PM -0300, Pedro Tammela wrote:
+> Instead of relying only on the idrinfo->lock mutex for
+> bind/alloc logic, rely on a combination of rcu + mutex + atomics
+> to better scale the case where multiple rtnl-less filters are
+> binding to the same action object.
 
-On 11/27/2023 11:59 PM, Jakub Kicinski wrote:
+LGTM
 
-> Another option you can consider is lowering the default ring size.
-> If I'm looking right you default to 4k descriptors for Tx.
-> Is it based on real life experience?
-
-Probably reducing default will help - but again not 100%.
-
-I remember these numbers where chosen mainly to show up good 10Gbps
-line speed in tests, like iperf udp/tcp flood. But these of course
-artificial.
-
-For sure "normal" user can survive even with lower digits.
-
-Thanks
-  Igor
 
