@@ -1,80 +1,66 @@
-Return-Path: <netdev+bounces-51669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C727D7FB9F2
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 13:12:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937107FB9FE
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 13:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81168282664
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:12:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A98CA1C20DC0
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 12:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505224F8B5;
-	Tue, 28 Nov 2023 12:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3A54F893;
+	Tue, 28 Nov 2023 12:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvmZhmfJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bJ65ZEwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B70AD56;
-	Tue, 28 Nov 2023 04:12:14 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-332fd81fc8dso1703523f8f.3;
-        Tue, 28 Nov 2023 04:12:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701173533; x=1701778333; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=50dfb3OF2cAlmCtU+EgqKKElMGY5/1S4fCVfmkUTn2s=;
-        b=GvmZhmfJ7YNRnl397X+KttTFQWoljVe7KveeDtuuZMEDpZIA0GBa64BTRs0dZ0Lykg
-         7jySTq9r7Rp78aCh04ingBrQ+QZsBnh6XbeqLYBO8Y+aJ1jQ19VELYhTYF+nKuviZtqj
-         VlPd4M0vcZ/PSn4B8lbcnPBPFSgvWKC7JLEDFALn7Z2bNyoKd49YI1+0OxnJb0zTft65
-         AWJZWy7TOQlBpdfW2iL3zDTDC+RfsFA6v5ULN2zBzBiyTI3iFwrjVWVQKMzKaYWapzAn
-         o5uB/E/dv2WDk8/UMDUfSUZDqhEVZeKe88mYFjAoGOlI+yqa/BjA1Fz5Kq7sUEdHl+Nj
-         99FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701173533; x=1701778333;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=50dfb3OF2cAlmCtU+EgqKKElMGY5/1S4fCVfmkUTn2s=;
-        b=gUi70M3ngizdvKn+nff8S34V9H+UMzR4ucawwt3/tkElOVTJ44yJ3ui04My+Dfpg7B
-         80A2Zn+Zt7F7aaDbJo3f6pNTyacOb1IklsRthqxa3cUuHSrCwspSVTkS2pCOH0nFMwHQ
-         FW6VxP+Z+lb1+gmo5enkGGfSplfjozdiUjhPuwrgYdnEf2OnZR0tPGIHXUYyyP+wO/eA
-         zwjDy1hUOFiqFzPjH0zwpYiW6V/aGB+9LfjwZTNqIvX/oI2Chd6NUaw0Y0dzUfXGWvJD
-         k486lCOV9GtDRBOlqUZAHVSKtSCgtUQvhutuV7j8VJuk3eeIR34BTq2L5l7zkMw/+37+
-         8wFw==
-X-Gm-Message-State: AOJu0YwqAqK06nbURxwGeRdiPtKELhtu2QCTFGYTEtmW/CsfPRHdZDAT
-	VaDHuLpyNf9kOKPcmXfCEB4=
-X-Google-Smtp-Source: AGHT+IG8mOQKUjlQFp9zkVxQeOhCiybq8qLw7QScYhjZo4dYddCYSOR9yvSaselcI1oPVf6lMqLfjg==
-X-Received: by 2002:a5d:58f3:0:b0:333:b8a:8ea7 with SMTP id f19-20020a5d58f3000000b003330b8a8ea7mr1448395wrd.49.1701173532821;
-        Tue, 28 Nov 2023 04:12:12 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id df2-20020a5d5b82000000b0032fbe5b1e45sm14569599wrb.61.2023.11.28.04.12.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 04:12:12 -0800 (PST)
-Message-ID: <6565d91c.5d0a0220.d1112.eb85@mx.google.com>
-X-Google-Original-Message-ID: <ZWXZGg0PFotGsizp@Ansuel-xps.>
-Date: Tue, 28 Nov 2023 13:12:10 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A0D95;
+	Tue, 28 Nov 2023 04:22:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2AMt7jp7zrGQ1Hr3T3kEt4MJP2MZsgNYKWbkaVlt5lk=; b=bJ65ZEwGSH2/MC2OoHkcrz4GcS
+	d+gmN9w5J4sSugxSmgc44OC9HhFr5Gp145bwfaOcSUcRMdonH1ZRdHT2it78kzD4P5BTf2tm7g9BY
+	9e5Q5zqZHhZDb6kwhBJf4X22sCAOM4qNehy+hvPCYuA8oKQR5St65HLa6xr+el5C9w5Kyx5jVii5d
+	5lEMPCxbd9wv6rz3A95i1PUbfBw+wDDpQTaaTsCFHqPF7TNQIZedX7f1SfAOA4Uti+qPV+px7CddW
+	6O9FEWcVE7w+GOiqfArHIdSwncoehFRgPuI0rqhC263cnhEfI5KEPT6JmLxZ/wBEs5AcLIKssDQxN
+	N7yFTKTQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47282)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r7x6V-0007HZ-2S;
+	Tue, 28 Nov 2023 12:22:15 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r7x6U-0002wn-Ib; Tue, 28 Nov 2023 12:22:14 +0000
+Date: Tue, 28 Nov 2023 12:22:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	David Epping <david.epping@missinglinkelectronics.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	Harini Katakam <harini.katakam@amd.com>,
 	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 4/4] net: phy: add support for PHY package
- MMD read/write
+Subject: Re: [net-next PATCH v2 3/4] net: phy: restructure
+ __phy_write/read_mmd to helper and phydev user
+Message-ID: <ZWXbdjOCKxJFyXJK@shell.armlinux.org.uk>
 References: <20231126235141.17996-1-ansuelsmth@gmail.com>
- <20231126235141.17996-4-ansuelsmth@gmail.com>
- <43255cdd-9e1e-472a-9263-04db0259b3cb@lunn.ch>
+ <20231126235141.17996-3-ansuelsmth@gmail.com>
+ <d3747eda-7109-4d53-82fa-9df3f8d71f62@lunn.ch>
+ <6565d8d6.5d0a0220.5f8f1.b9d7@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,55 +69,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <43255cdd-9e1e-472a-9263-04db0259b3cb@lunn.ch>
+In-Reply-To: <6565d8d6.5d0a0220.5f8f1.b9d7@mx.google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Nov 28, 2023 at 01:51:05AM +0100, Andrew Lunn wrote:
-> On Mon, Nov 27, 2023 at 12:51:41AM +0100, Christian Marangi wrote:
-> > Some PHY in PHY package may require to read/write MMD regs to correctly
-> > configure the PHY package.
+On Tue, Nov 28, 2023 at 01:11:00PM +0100, Christian Marangi wrote:
+> On Tue, Nov 28, 2023 at 01:46:10AM +0100, Andrew Lunn wrote:
+> > On Mon, Nov 27, 2023 at 12:51:40AM +0100, Christian Marangi wrote:
+> > > Restructure phy_write_mmd and phy_read_mmd to implement generic helper
+> > > for direct mdiobus access for mmd and use these helper for phydev user.
+> > > 
+> > > This is needed in preparation of PHY package API that requires generic
+> > > access to the mdiobus and are deatched from phydev struct but instead
+> > > access them based on PHY package base_addr and offsets.
 > > 
-> > Add support for these additional required function in both lock and no
-> > lock variant.
-> > 
-> > It's possible to set is_c45 bool for phy_package_read/write to true to
-> > access mmd regs for accessing C45 PHY in PHY package for global
-> > configuration.
+> > Why is this all going into the header file?
+> >
 > 
-> I would just use phydev->is_c45. I would be very surprised if you have
-> a package with some PHYs being only C22 and some C45.
->
+> Was following the pattern done by phy_package_read/write.
+> 
+> Considering those API are not single function call... I wonder if those
+> should be moved in phy_core.c instead of static inline them in the
+> header.
 
-Was being more careful about this. Ok will base everything on phydev.
-Maybe will add a comment that we assume the entire package is C22 or
-C45.
-
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> > Changes v2:
-> > - Rework to use newly introduced helper
-> > - Add common check for regnum and devad
-> > 
-> >  include/linux/phy.h | 78 +++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 78 insertions(+)
-> > 
-> > diff --git a/include/linux/phy.h b/include/linux/phy.h
-> > index 96f6f34be051..3e507bd2c3b4 100644
-> > --- a/include/linux/phy.h
-> > +++ b/include/linux/phy.h
-> > @@ -2085,6 +2085,84 @@ static inline int __phy_package_write(struct phy_device *phydev,
-> >  	return __mdiobus_write(phydev->mdio.bus, addr, regnum, val);
-> >  }
-> >  
-> > +static inline int phy_package_read_mmd(struct phy_device *phydev,
-> > +				       unsigned int addr_offset, bool is_c45,
-> > +				       int devad, u32 regnum)
-> > +{
-> 
-> I also don't know why this should be in the header file?
-> 
->   Andrew
+phy_package_{read,write} are simple affairs - one test and a call
+to a function. That makes them fairly small. The proposed new
+functions aren't small, which means that we get a load of code each
+time they're used. Therefore, it's better that they're out of line.
 
 -- 
-	Ansuel
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
