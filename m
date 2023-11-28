@@ -1,194 +1,238 @@
-Return-Path: <netdev+bounces-51775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0D47FBF9E
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:51:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91947FBFCF
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:57:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6451C20D1F
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:51:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58F93B215F4
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BBF58AD8;
-	Tue, 28 Nov 2023 16:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9699021A02;
+	Tue, 28 Nov 2023 16:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PWH8WZVQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V/IMqR+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BECFD4B;
-	Tue, 28 Nov 2023 08:51:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701190297; x=1732726297;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8AcFphvl2r/ylBqtrwuLKB5ZrrRetYuVVCN3CKStIUs=;
-  b=PWH8WZVQ7BuEbXrR2QqjyAydWXadF6ZKJluaPN3BXLLtEsoDgZG0z+Bf
-   JLSU/JJDl5IU+a6kxuGWUl+pHWs4i/hecxS+kplxsr6yCvsysp3XUaTrG
-   UUP5oL3VL8KvUNUdwGEyyI0/T35hv/pcHwJKU0i7V+6U2ldDAisdAcLLt
-   NLtEB9ZzZXudv0q1Mm3ZMJpAzWWDqJu/UoSqgqFsoepQv9vhZa1ezvK+B
-   +NszGLHIAQCp2UtUxtA7D4gjN38L36yEiPJwy8UiQ+9aQbUfPYupHNucu
-   q9cc95URqE8av5E8jF5G8mLtqDrYket7zHE5ZXp18Rygfd1jxNhcjlFTL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="457294125"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="457294125"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 08:51:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="859479761"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="859479761"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Nov 2023 08:51:36 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 28 Nov 2023 08:51:35 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 28 Nov 2023 08:51:35 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 28 Nov 2023 08:51:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ylg+57am85xTYG4JqPdoFLrOwn7wrNtGeKU/nASFeyT+HOpWNMxbjEla+WV1L0Gfz7XAwgm/XxzskWfJz6TZp3fDXxYnrNvFLDGzCZXlpTxNjlsQwpJ55nODjT6mgXCFTINCXhqB5zK6lIMMGAeGmUGFwjlfhPiZmiafP1qjiLXu9iaNLjOYEnEZUwaWtZ4V5TvGEwKb0kw22CByep0DyyK6e2wfqc6Sa90cy7a+v3TdzMA9PtCIc87D2h3kaMa6bK11+xg43VaF0buO66ug7UErATR4T25mcXk1bgj8trh57b2OTyrmJDKBNnnQKkxjMEIbPLgIH/g7DhGfsYONzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mY5ukfyoKrrNpK3YRsrjbKa4tcBSX7C/03E8YOMUEHg=;
- b=ZCrVvKS58WZ1SosaM0sgM45xMkHw05Otjaqj9Nx4DgI0XXeQZILwQW1tQJL2RWjE8SXQdDZkvX9W4XSnf4Yrv+VyZK1L5fGlI/5+RGg+TKL4kJ84GSuFaHXqRdI28IJQ7KHI/G28wUGGECO4WTKnrt7LqILu6YDUH1NvGUVYrEk5VrPnxNu/af7EK8qyIqSoU/L70mcIWR30ahQlrBknx0jzViN+LBl6Y9kjrGEvrepapQO5xUOIEUeGB5Se6/oYYnhC0MZFEAjbUCby5sU72G0YKDB/ZfjSC8Q70tE+RqMbk6tgfAxKvKuQn2/OflXgI0G6pfhzEtSmmoR2iC0UVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by SA2PR11MB5019.namprd11.prod.outlook.com (2603:10b6:806:f8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 28 Nov
- 2023 16:51:33 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
- 16:51:33 +0000
-Message-ID: <9a65e703-3476-4584-bec0-8f41198d840f@intel.com>
-Date: Tue, 28 Nov 2023 17:50:57 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 03/14] page_pool: avoid calling no-op
- externals when possible
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Yunsheng Lin <linyunsheng@huawei.com>, Christoph Hellwig <hch@lst.de>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Michal Kubiak
-	<michal.kubiak@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, David Christensen
-	<drc@linux.vnet.ibm.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, <netdev@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>
-References: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
- <20231124154732.1623518-4-aleksander.lobakin@intel.com>
- <6bd14aa9-fa65-e4f6-579c-3a1064b2a382@huawei.com>
- <a1a0c27f-f367-40e7-9dc2-9421b4b6379a@intel.com>
- <20231127101720.282862f6@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20231127101720.282862f6@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0195.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a4::7) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D8710F0
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 08:57:10 -0800 (PST)
+Message-ID: <b48de6ea-6ebc-4690-a6fb-5803549d29a7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701190624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uCoZVP9p+mWxUhxPz450EOpQNcQZHZe8k+JQNdrOq+4=;
+	b=V/IMqR+5MvetGHQkAH2tR4eCGlycsSCxnHVBwlL2yv8P9Z1D92e/CghKCudtjCYV42WxFZ
+	bFi7c9hfFC3tyzi3L92/UipOwcEU2Wlc4fHczhmT7gyAVQhKWbuztFUP+JcQv6VJceXtbj
+	qI39oB+YScNGWNd3KAxE4O/Z6qh9xR4=
+Date: Tue, 28 Nov 2023 08:56:55 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA2PR11MB5019:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7c4cecd-b54d-4c93-932e-08dbf032471f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YuMBBaXAm6Yxkn7F2GXLQ5DaqQdAX9/Lke2YJfbw/uwL8llZ0xZyOWZAJsGTyr7ER/ypkUgi5sacKWc4Wgf+/FLJ1V0Sbkpq58+ojn+Y1f27b6lObTYEZ+uxNGPFJSv/lZ3zQdaupuYaMNj95Ayzc2PHsqK0psCycdl+9oibq5JrFA1dUlGvmbRz0Gfvl4EjGcH0HoghV5VRK2XMgYrePSZxBOQspRZMQIWhFYG+dQoCCq7p9bTjOj3nAnGKbNlNKtCqnvtPdS7KK5mvqTnsaWcb12bIy/+1lwmwlIjDFCuE3upfLM7BdpoRpptHgeEKUyMNR2E9i1Nv7aP/yOy4shA6CP+ez5EyhNvIaiZguxd3l7Yi96UKZqV/ZGezc2V/QBcreoRWPQfhNjRTGV50KcFXmo5svkDMc+Y/jMmQq34m/n/XenHmKkGFqeUAnXO47oeGHLbVFtL+LDIZ0opYyMGSnKTIn7AxG2ajA0tKiCCxzKuUk1nwW1tg+qyGNxbwJYYKQHXZ7HTmDUHkT9AtZejyucpBIXVbPjUv2xgfMhgEiBFIf0tjS0OttvfnNZHBFuu3Gg3YSoxgnXI8JD0U8yUaYIPzhsdWtJGmiKpyAIAGTde+c8l+4/4uLmwKX4j/BK2/Y0wV212gcR0dwzs03Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(366004)(346002)(39860400002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(316002)(2616005)(6512007)(6666004)(31696002)(86362001)(6506007)(36756003)(26005)(6486002)(478600001)(38100700002)(82960400001)(6916009)(66476007)(66946007)(66556008)(54906003)(5660300002)(7416002)(2906002)(4744005)(41300700001)(4326008)(31686004)(8676002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MUxDWFJkYlBaUEdNZThyT1FGYzNUNXZTbWhYMm9EUVVjYTRTVzYyelhaUkg4?=
- =?utf-8?B?K1o1ZEdnNFhCVTY4MmJOR3pKNURONnlNbFJCWmd4QlVLOHF5azRJazl2RnY1?=
- =?utf-8?B?OElsbW44Y1JVSnhCQzArZEcxT0toSDhQMjl5VUUreVVMcHZaZ2U1VnhYcUxj?=
- =?utf-8?B?dlJkYkx0SUpDc1gyVUc1MnFON1JDVkMrMUFYbEZ6VENEM01uTitITWRyNGJh?=
- =?utf-8?B?Njl6YzhQMENlMVZmRGVYckJKRjdSUXFJVG1Cd2RSaXF1bld6MFFOOHNNYkla?=
- =?utf-8?B?UVpYMFNhaVgramhseStIZzNOVmc1RUwwai9VL1U2UWlUc0VpOGhqRkRDUEda?=
- =?utf-8?B?bXVuSDZuTDBYRS9LRHowLzg2d01qNFFxVGJ4OVQxWnErWnZlMnMzYm5USUp3?=
- =?utf-8?B?YnczblBoYlhNSE1rKzlodXUvQWtmbk4rZmx6NkhLZHpZV1BYeE1WNTBxaHYz?=
- =?utf-8?B?WFh4UWZQTVB1cjFIU09CYXp0TWJURGxKWlFud0tqYUZnckZFY0FOaitRaUxH?=
- =?utf-8?B?enhPNlYrQ1h3M0VMZ3QyOFZXTjgwMXV2Rlc5RE1kWnlwb0dFa1VyeWFVVjFo?=
- =?utf-8?B?NmlGandUWERWdTJ1WVBQaEFDWGdDYkJJNXE5WWFSQkExUlI4d1d1L2NLOGRG?=
- =?utf-8?B?T09EYjNrSnRHVXErMU04NEZNWWt6M0hteDlwNDdKcGt0VWhTRmdTVVZpN1NI?=
- =?utf-8?B?dkI3Qk4wTzhmV0tZOFZSdVBPdFN6VmpkWVEyOWZnc0tQTGFsZWU0R3pQbVMz?=
- =?utf-8?B?NEI5SjkvZGZOaVlnWmpUTHY1eTdzQW56Q2RQR1dWaFc1d2YxSHVxd3pUUlI1?=
- =?utf-8?B?MU5Cb05RWVJ1RTcvUHZrNURPdkJjMFhuSTFIM2pidGJ0cUVSS2dOdmozK242?=
- =?utf-8?B?SmxhOTJjNDZ4cGsySGJCSVZYNkg3aDVVRlVxbk83a3c2NkRQcW4yNXN0c1p2?=
- =?utf-8?B?QTBrWXoyalYyUUZTY3dPYTZ4VnBIWmgrQUc3dGRSTjVXRzNnVnNMMmVtc2Qv?=
- =?utf-8?B?Vm1wZjJmMDR1YkVRSm9vS2tIS1hUKzJYZXZjejdYOFFxMWUvM3h4OFlVOXF4?=
- =?utf-8?B?amhNQUtrd0pVcXBtSTR2UHQyL3NsVFM2MUJSOVJiL1BkajFMeXhPTnlCRy92?=
- =?utf-8?B?Y2VrbzVKakZ3RzdBQ3U4WDBjNVlnVXd0cGcxNXBLTkk4N2ZaZURPa0NuMmpt?=
- =?utf-8?B?ZmFtQ2hhZ2RKY3VNZnBWYjN5ZFFpN1ZqQlI1S0VFNEdQWDVJVktYU3krbWpE?=
- =?utf-8?B?a1VJSk0rYjZ4NmZOdHhZbGVSMEh2dy9WTkIvc3M1V2ViK2tNdk9MWGxyYkVS?=
- =?utf-8?B?bWlFOEYrRzR0dGxXbEZKcGw3WG5xTS9sZEJHK2dOWGpzME40SnAvZnZkM1la?=
- =?utf-8?B?SDVjeDhLR0w1RldCZnNpeVVPWWlTbkVmM3l0UHc2eC9WbWliby9XZmdjb2R1?=
- =?utf-8?B?RUJVVHNOQ0ttRHBSWHBrblRTSGZZTlVWL1l4ampMWE1XSVc4L2J3OW1WSmVx?=
- =?utf-8?B?Z2d0NUwwZCt0Y2ZkN0wyWFBIUzJkUXowVHhMd2dTSUEzVlJYSGpoTHV0L2dn?=
- =?utf-8?B?T3NzRS8wZHU0azNFQVo3SVNLVFY0eEhJRmhEUStWSWtTR1JGQU0za2M0Tk5o?=
- =?utf-8?B?SWd4VUVIZ1NhZFVRK28vaTR6TGJPTnhYTmx0MHFBckZzTStzeU9IUTNTQ2tv?=
- =?utf-8?B?WGQzUTEzZy9XTWU2Qi9MTCt6OFp3dEpZZ3VRRW9HdlpHVEJWbFZ3TENWRGhX?=
- =?utf-8?B?M0NyWEZYOWIzUDQ5WjJxMnZ6NENIV29rOGU3YzBZSWMzaUt0NEwxSzJnbDla?=
- =?utf-8?B?Z1ZGMy92L1MzdjhqSjlKYXQ0Um9GR0hpWG5rQ2Qxb2M0SWlHTU5jNjNJTDd5?=
- =?utf-8?B?ZmlaeG1SaG8wbCtWdzcwcTFrOXNoZlVrZDdIWmR0MER0N1VBcWRaLzh5U053?=
- =?utf-8?B?aS9BVkVPSnhrUTRCV1RxTlBUQTBsamx4cFZSMDNBUHpMS2s2VW4zNWVhalpx?=
- =?utf-8?B?b1p1bUNnWUZkUGhnKzZuWWRLOENlWXh6M2orbGlHOUVqOG4rbnhDdFBqaTRD?=
- =?utf-8?B?QUpFRkY3cFVLUFpXbDhPZE1tSElyckp1UkVCMGRqZ1hJYjhuakU2cHFQT1d3?=
- =?utf-8?B?dFpOTituNjlnWHQwTU5EZFdTMmx1N25nTnRuNTRHMUxXU1N4c0JWS0ptUXBP?=
- =?utf-8?B?NlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7c4cecd-b54d-4c93-932e-08dbf032471f
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 16:51:33.7749
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XnpQJZ0eyorwBPfo1ll6kMGT/nGzTA99sNY0zFxKyN8Se0zMjY/Et96Y2zULT3+ThLubZARWUp9gBYxkAnUhYL+96O0M5edbTi5eqLTKd/k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5019
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH ipsec-next v1 6/7] bpf: selftests: test_tunnel: Disable
+ CO-RE relocations
+Content-Language: en-GB
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Eduard Zingerman <eddyz87@gmail.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Steffen Klassert <steffen.klassert@secunet.com>, antony.antony@secunet.com,
+ Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Song Liu <song@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ bpf <bpf@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, devel@linux-ipsec.org,
+ Network Development <netdev@vger.kernel.org>
+References: <3ec6c068-7f95-419a-a0ae-a901f95e4838@linux.dev>
+ <18e43cdf65e7ba0d8f6912364fbc5b08a6928b35.camel@gmail.com>
+ <uc5fv3keghefszuvono7aclgtjtgjnnia3i54ynejmyrs42ser@bwdpq5gmuvub>
+ <0535eb913f1a0c2d3c291478fde07e0aa2b333f1.camel@gmail.com>
+ <42f9bf0d-695a-412d-bea5-cb7036fa7418@linux.dev>
+ <a5a84482-13ef-47d8-bf07-8017060a5d64@linux.dev>
+ <xehp2qvy5cyaairbnfhem4hvbsl26blo4zzu7z6ywbp26jcwyn@hgp3v2q4ud7o>
+ <53jaqi72ef4gynyafxidl5veb54kfs7dttxezkarwg75t7szd4@cvfg5pc7pyum>
+ <f68c01d6-bf6b-4b76-8b20-53e9f4a61fcd@linux.dev>
+ <p6qdiwnuglz7ry6hsssruf3w6n3tnavglya3iampors7eb4ac6@nonyetjx2zvc>
+ <idvgqkzzlq7lcnx52wzi5o2los2wcvwgt2qtpvko3go3kaggnk@s55os4akwb7d>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <idvgqkzzlq7lcnx52wzi5o2los2wcvwgt2qtpvko3go3kaggnk@s55os4akwb7d>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Mon, 27 Nov 2023 10:17:20 -0800
 
-> On Mon, 27 Nov 2023 15:32:19 +0100 Alexander Lobakin wrote:
->>> Sorry for not remembering the suggestion:(  
+On 11/28/23 11:17 AM, Daniel Xu wrote:
+> On Tue, Nov 28, 2023 at 10:13:50AM -0600, Daniel Xu wrote:
+>> On Mon, Nov 27, 2023 at 08:06:01PM -0800, Yonghong Song wrote:
+>>> On 11/27/23 7:01 PM, Daniel Xu wrote:
+>>>> On Mon, Nov 27, 2023 at 02:45:11PM -0600, Daniel Xu wrote:
+>>>>> On Sun, Nov 26, 2023 at 09:53:04PM -0800, Yonghong Song wrote:
+>>>>>> On 11/27/23 12:44 AM, Yonghong Song wrote:
+>>>>>>> On 11/26/23 8:52 PM, Eduard Zingerman wrote:
+>>>>>>>> On Sun, 2023-11-26 at 18:04 -0600, Daniel Xu wrote:
+>>>>>>>> [...]
+>>>>>>>>>> Tbh I'm not sure. This test passes with preserve_static_offset
+>>>>>>>>>> because it suppresses preserve_access_index. In general clang
+>>>>>>>>>> translates bitfield access to a set of IR statements like:
+>>>>>>>>>>
+>>>>>>>>>>      C:
+>>>>>>>>>>        struct foo {
+>>>>>>>>>>          unsigned _;
+>>>>>>>>>>          unsigned a:1;
+>>>>>>>>>>          ...
+>>>>>>>>>>        };
+>>>>>>>>>>        ... foo->a ...
+>>>>>>>>>>
+>>>>>>>>>>      IR:
+>>>>>>>>>>        %a = getelementptr inbounds %struct.foo, ptr %0, i32 0, i32 1
+>>>>>>>>>>        %bf.load = load i8, ptr %a, align 4
+>>>>>>>>>>        %bf.clear = and i8 %bf.load, 1
+>>>>>>>>>>        %bf.cast = zext i8 %bf.clear to i32
+>>>>>>>>>>
+>>>>>>>>>> With preserve_static_offset the getelementptr+load are replaced by a
+>>>>>>>>>> single statement which is preserved as-is till code generation,
+>>>>>>>>>> thus load with align 4 is preserved.
+>>>>>>>>>>
+>>>>>>>>>> On the other hand, I'm not sure that clang guarantees that load or
+>>>>>>>>>> stores used for bitfield access would be always aligned according to
+>>>>>>>>>> verifier expectations.
+>>>>>>>>>>
+>>>>>>>>>> I think we should check if there are some clang knobs that prevent
+>>>>>>>>>> generation of unaligned memory access. I'll take a look.
+>>>>>>>>> Is there a reason to prefer fixing in compiler? I'm not opposed to it,
+>>>>>>>>> but the downside to compiler fix is it takes years to propagate and
+>>>>>>>>> sprinkles ifdefs into the code.
+>>>>>>>>>
+>>>>>>>>> Would it be possible to have an analogue of BPF_CORE_READ_BITFIELD()?
+>>>>>>>> Well, the contraption below passes verification, tunnel selftest
+>>>>>>>> appears to work. I might have messed up some shifts in the macro,
+>>>>>>>> though.
+>>>>>>> I didn't test it. But from high level it should work.
+>>>>>>>
+>>>>>>>> Still, if clang would peek unlucky BYTE_{OFFSET,SIZE} for a particular
+>>>>>>>> field access might be unaligned.
+>>>>>>> clang should pick a sensible BYTE_SIZE/BYTE_OFFSET to meet
+>>>>>>> alignment requirement. This is also required for BPF_CORE_READ_BITFIELD.
+>>>>>>>
+>>>>>>>> ---
+>>>>>>>>
+>>>>>>>> diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+>>>>>>>> b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+>>>>>>>> index 3065a716544d..41cd913ac7ff 100644
+>>>>>>>> --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+>>>>>>>> +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+>>>>>>>> @@ -9,6 +9,7 @@
+>>>>>>>>     #include "vmlinux.h"
+>>>>>>>>     #include <bpf/bpf_helpers.h>
+>>>>>>>>     #include <bpf/bpf_endian.h>
+>>>>>>>> +#include <bpf/bpf_core_read.h>
+>>>>>>>>     #include "bpf_kfuncs.h"
+>>>>>>>>     #include "bpf_tracing_net.h"
+>>>>>>>>     @@ -144,6 +145,38 @@ int ip6gretap_get_tunnel(struct __sk_buff *skb)
+>>>>>>>>         return TC_ACT_OK;
+>>>>>>>>     }
+>>>>>>>>     +#define BPF_CORE_WRITE_BITFIELD(s, field, new_val) ({            \
+>>>>>>>> +    void *p = (void *)s + __CORE_RELO(s, field, BYTE_OFFSET);    \
+>>>>>>>> +    unsigned byte_size = __CORE_RELO(s, field, BYTE_SIZE);        \
+>>>>>>>> +    unsigned lshift = __CORE_RELO(s, field, LSHIFT_U64); \
+>>>>>>>> +    unsigned rshift = __CORE_RELO(s, field, RSHIFT_U64); \
+>>>>>>>> +    unsigned bit_size = (rshift - lshift);                \
+>>>>>>>> +    unsigned long long nval, val, hi, lo;                \
+>>>>>>>> +                                    \
+>>>>>>>> +    asm volatile("" : "=r"(p) : "0"(p));                \
+>>>>>>> Use asm volatile("" : "+r"(p)) ?
+>>>>>>>
+>>>>>>>> +                                    \
+>>>>>>>> +    switch (byte_size) {                        \
+>>>>>>>> +    case 1: val = *(unsigned char *)p; break;            \
+>>>>>>>> +    case 2: val = *(unsigned short *)p; break;            \
+>>>>>>>> +    case 4: val = *(unsigned int *)p; break;            \
+>>>>>>>> +    case 8: val = *(unsigned long long *)p; break;            \
+>>>>>>>> +    }                                \
+>>>>>>>> +    hi = val >> (bit_size + rshift);                \
+>>>>>>>> +    hi <<= bit_size + rshift;                    \
+>>>>>>>> +    lo = val << (bit_size + lshift);                \
+>>>>>>>> +    lo >>= bit_size + lshift;                    \
+>>>>>>>> +    nval = new_val;                            \
+>>>>>>>> +    nval <<= lshift;                        \
+>>>>>>>> +    nval >>= rshift;                        \
+>>>>>>>> +    val = hi | nval | lo;                        \
+>>>>>>>> +    switch (byte_size) {                        \
+>>>>>>>> +    case 1: *(unsigned char *)p      = val; break;            \
+>>>>>>>> +    case 2: *(unsigned short *)p     = val; break;            \
+>>>>>>>> +    case 4: *(unsigned int *)p       = val; break;            \
+>>>>>>>> +    case 8: *(unsigned long long *)p = val; break;            \
+>>>>>>>> +    }                                \
+>>>>>>>> +})
+>>>>>>> I think this should be put in libbpf public header files but not sure
+>>>>>>> where to put it. bpf_core_read.h although it is core write?
+>>>>>>>
+>>>>>>> But on the other hand, this is a uapi struct bitfield write,
+>>>>>>> strictly speaking, CORE write is really unnecessary here. It
+>>>>>>> would be great if we can relieve users from dealing with
+>>>>>>> such unnecessary CORE writes. In that sense, for this particular
+>>>>>>> case, I would prefer rewriting the code by using byte-level
+>>>>>>> stores...
+>>>>>> or preserve_static_offset to clearly mean to undo bitfield CORE ...
+>>>>> Ok, I will do byte-level rewrite for next revision.
+>>>> [...]
+>>>>
+>>>> This patch seems to work: https://pastes.dxuuu.xyz/0glrf9 .
+>>>>
+>>>> But I don't think it's very pretty. Also I'm seeing on the internet that
+>>>> people are saying the exact layout of bitfields is compiler dependent.
+>>> Any reference for this (exact layout of bitfields is compiler dependent)?
+>>>
+>>>> So I am wondering if these byte sized writes are correct. For that
+>>>> matter, I am wondering how the GCC generated bitfield accesses line up
+>>>> with clang generated BPF bytecode. Or why uapi contains a bitfield.
+>>> One thing for sure is memory layout of bitfields should be the same
+>>> for both clang and gcc as it is determined by C standard. Register
+>>> representation and how to manipulate could be different for different
+>>> compilers.
+>> I was reading this thread:
+>> https://github.com/Lora-net/LoRaMac-node/issues/697. It's obviously not
+>> authoritative, but they sure sound confident!
 >>
->> In the previous versions of this change I used a global flag per whole
->> page_pool, just like XSk does for the whole XSk buff pool, then you
->> proposed to use the lowest bit of ::dma_addr and store it per page, so
->> that it would be more granular/precise. I tested it and it doesn't
->> perform worse than global, but in some cases may be beneficial.
-> 
-> FWIW I'd vote to stick to per-page pool. You seem to handle the
-> sizeof(dma_addr_t) > sizeof(long) case correctly but the code is
-> growing in complexity, providing no known/measurable benefit.
-> We can always do this later but for now it seems like a premature
-> optimization to me.
+>> I think I've also heard it before a long time ago when I was working on
+>> adding bitfield support to bpftrace.
+> Wikipedia [0] also claims this:
+>
+>          The layout of bit fields in a C struct is
+>          implementation-defined. For behavior that remains predictable
+>          across compilers, it may be preferable to emulate bit fields
+>          with a primitive and bit operators:
+>
+> [0]: https://en.wikipedia.org/wiki/Bit_field#C_programming_language
 
-Yeah, this also seems more logical and optimal to me. Will wait a bit
-for a possible reply from Chris and then send the next rev.
+Thanks for the informaiton. I am truely not aware of bit field layout
+could be different for different compilers. Does this mean source
+level bitfield manipulation may not work?
 
-Thanks,
-Olek
+uapi has bitfield is okay. compiler should do the right thing to
+do load/store in bitfields. Also, the networking bitfields are
+related memory layout transferring on the wire. Its memory
+layout is determined (although little/big endian interpresentation
+is different).
+
+BPF_CORE_WRITE_BITFIELD 'should' also be okay since the offset/size
+etc. is gotten from the compiler internals (from dwarf in more
+precise term).
+
+So looks like BPF_CORE_WRITE_BITFIELD is the way to go.
+Please use it then.
+
+
+
 
