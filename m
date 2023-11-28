@@ -1,108 +1,86 @@
-Return-Path: <netdev+bounces-51889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8485C7FCA8C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:08:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512DE7FCA96
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22900B21655
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:08:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C93AAB213E2
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB43C57331;
-	Tue, 28 Nov 2023 23:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F07A57316;
+	Tue, 28 Nov 2023 23:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="L2M2Qprf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzrGOSga"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524421A5
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:08:49 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-423dcd5e86bso5791391cf.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:08:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1701212928; x=1701817728; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwfH1boRaqUSm7vYG/zdQBuuZhpN21nmfcJNTWlLUDE=;
-        b=L2M2Qprf4E13EmuQfMCiF96aDL6KRUKn30A8AJ9b64X816aPXJAY9oxw7B1ln8iZHi
-         48FDR+YptH8ftAV2+eOX/vl7Oe5bDpdaafnB96VWxqu5tkeNY7SunuexF2cs/fzyj/PF
-         52SOZGEcxMRPEPkYoIZQOTGi2wnFe8v/w1oF10w6RQwekK+EzxkxlYt0qcfzwiJQts+H
-         2tMU1YUY+TjpQSYKZH1l+OlSp3m7dzueKnbvTL7NXjfpV4JEEkxClWrtUUf4jcXVj6jt
-         e7sejvPKLZx1EPf+lDFFwqdwpKQonrOaiVG5Lue0KJdEEO6Oz2qRGuU1t6eH92/gwk6X
-         Cj3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701212928; x=1701817728;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZwfH1boRaqUSm7vYG/zdQBuuZhpN21nmfcJNTWlLUDE=;
-        b=JCCg6R4Xxj68Wi3oJHAOTo+pt8i7gFyiMl0NsYnLjGqgYT3WAp5z7OtUqrf/ltxSyf
-         Rw77NDy6AmQYv1uEQY1/YUoi6oyHes9ycuvKOcEbeXvqDp1+HvVJ2ryFhdD3tWaDm/6s
-         Mcl2R12+qqbTGa4AuHfu5wh5LmupUBFVWE3vhztRrIB8XcDQQbfDpIEihuMm9oO3xwzV
-         bkW9QWpPrEG0mXHGw0Hst4qLWOTKPiaDfvXw0TBTWaB9fBlBTvAH6CQ4YvWysIpltnlu
-         JF73C3Ftf0A3JkGQjp6VwcDYpZIguhsPcZOxZurW6QHRbjib9MpZbhKcXPpEEdHpYU2a
-         IQnw==
-X-Gm-Message-State: AOJu0Yx2+VwQTeG8XAXmNHfIMHlQLP2OAa58JBEyK8+wNCTA2aeHqBFi
-	+y+ziRpULOCwccDO5EiAsDzhnkzSf6QvlhaaHRjlkQ==
-X-Google-Smtp-Source: AGHT+IH+DSzeg4H32kbSmeDdX42LwmFTBbiExz1cQ9Spo9pVMTh9OFSxf1oX9/Sr0tuUo1qYELK4l02okd8aqJLSMys=
-X-Received: by 2002:a05:622a:d2:b0:423:7f91:3a17 with SMTP id
- p18-20020a05622a00d200b004237f913a17mr22124861qtw.21.1701212928489; Tue, 28
- Nov 2023 15:08:48 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0852140BF1;
+	Tue, 28 Nov 2023 23:10:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB78C433C7;
+	Tue, 28 Nov 2023 23:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701213029;
+	bh=hOvPICTHCMGIggNE4RN58Am2oDfVbGfBjHWQRSMRYxk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nzrGOSgapTj35SLsT3qSDoLK4aJHuInx0TEn1D34sFbXsGKUxBnNI1FUTS8ngIvqq
+	 jX3WHmphiXxTqf0oMk0fPAN4j4wPWBgbD5OTLPFXewBFgGIT3rKhK5nKWYfp3Pq/AC
+	 ZZOn3PDW9qvZZY3g11VDoyjuC5coQE361TGvY4JyIKLAO/Ta3P8n4djt0Ilu36Gbqe
+	 ZYrAdT/vD5qg1dUXc/HVsHaNZjFm4UGkZ+4Z94hXKkS6/1qFc+O74XHF87C8o0FKiP
+	 izasnkofXevNzf6K/XRHZ9SmZ9u02rKLG9rLUaP4Dq/OHxBK5bkuh09h5/89S331pg
+	 3MTUEt2+vSPIg==
+Date: Tue, 28 Nov 2023 15:10:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ bpf@vger.kernel.org, hawk@kernel.org, toke@redhat.com
+Subject: Re: [PATCH net-next] xdp: add multi-buff support for xdp running in
+ generic mode
+Message-ID: <20231128151028.168e7a13@kernel.org>
+In-Reply-To: <ZWZpUaYbgMELGtL8@lore-desk>
+References: <c928f7c698de070b33d38f230081fd4f993f2567.1701128026.git.lorenzo@kernel.org>
+	<ZWYjcNlo7RAX8M0T@lore-desk>
+	<20231128105145.7b39db7d@kernel.org>
+	<ZWZpUaYbgMELGtL8@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-7-pasha.tatashin@soleen.com> <d99e0d4a-94a9-482b-b5b5-833cba518b86@arm.com>
- <CA+CK2bDswtrqiOMt3+0LBb0+7nJY9aBpzZdsmrWRzy9WxBqKEg@mail.gmail.com> <79c397ee-b71b-470e-9184-401b4b96a0d2@arm.com>
-In-Reply-To: <79c397ee-b71b-470e-9184-401b4b96a0d2@arm.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Tue, 28 Nov 2023 18:08:11 -0500
-Message-ID: <CA+CK2bDZUHSLWB=ec6Jdjbi+y6fD8=j96bK-kPHYKc1uiVLZWw@mail.gmail.com>
-Subject: Re: [PATCH 06/16] iommu/dma: use page allocation function provided by iommu-pages.h
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
-	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
-	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
-	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
-	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
-	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, 
-	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
-	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
-	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
-	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
-	samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev, 
-	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com, 
-	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org, 
-	will@kernel.org, yu-cheng.yu@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > This is true, however, we want to account and observe the pages
-> > allocated by IOMMU subsystem for DMA buffers, as they are essentially
-> > unmovable locked pages. Should we separate IOMMU memory from KVM
-> > memory all together and add another field to /proc/meminfo, something
-> > like "iommu -> iommu pagetable and dma memory", or do we want to
-> > export DMA memory separately from IOMMU page tables?
->
-> These are not allocated by "the IOMMU subsystem", they are allocated by
-> the DMA API. Even if you want to claim that a driver pinning memory via
-> iommu_dma_ops is somehow different from the same driver pinning the same
-> amount of memory via dma-direct when iommu.passthrough=1, it's still
-> nonsense because you're failing to account the pages which iommu_dma_ops
-> gets from CMA, dma_common_alloc_pages(), dynamic SWIOTLB, the various
-> pools, and so on.
+On Tue, 28 Nov 2023 23:27:29 +0100 Lorenzo Bianconi wrote:
+> > Yes, don't we allow writes to fragments in XDP based on the assumption
+> > that it runs on Rx so that paged data must not be zero copy?
+> > bpf_xdp_store_bytes() doesn't seem to have any checks which would
+> > stop it from writing fragments, as far as I can see.  
+> 
+> do you mean in the skb use-case we could write to fragments (without copying
+> them) if the skb is not cloned and the paged area is not 'zero-copied'?
 
-I see, IOMMU variants are used only for discontiguous allocations, and
-the common ones are defined outside of driver/iommu. Alright, I can
-remove all the changes for all no-page table related IOMMU
-allocations.
+The zero-copy thing is a red herring. If application uses
+sendpage/sendfile/splice the frag may be a page cache page
+of a file. Or something completely read only.
 
-Pasha
+IIUC you're trying to avoid the copy if the prog is mbuf capable.
+So I was saying that can't work for forms of XDP which actually 
+deal with skbs. But that wasn't really your question, sorry :)
+
+> With respect to this patch it would mean we can rely on pskb_expand_head() to
+> reallocate the skb and to covert it to a xdp_buff and we do not need to explicitly
+> reallocate fragments as we currently do for veth in veth_convert_skb_to_xdp_buff() [0].
+> Is my understanding correct or am I missing something?
+
+The difference is that pskb_expand_head() will give you a linear skb,
+potentially triggering an order 5 allocation. Expensive and likely to
+fail under memory pressure.
+
+veth_convert_skb_to_xdp_buff() tries to allocate pages, and keep
+the skb fragmented.
 
