@@ -1,217 +1,743 @@
-Return-Path: <netdev+bounces-51561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A164B7FB226
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 07:52:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D75B7FB310
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:45:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49931C20B10
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 06:52:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1286D1F20EE1
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 07:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F18101D8;
-	Tue, 28 Nov 2023 06:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="twGYYFfH";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="sw7K64iR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60FD13AF5;
+	Tue, 28 Nov 2023 07:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD25EA;
-	Mon, 27 Nov 2023 22:52:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1701154366; x=1732690366;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=lntXxvO0J6m2wHobU4AB8DoRuRhc8RU/SqNI10cEUtE=;
-  b=twGYYFfHzZlwo5dYvvZQGZPp6JWW79Wjs3emMlhqo06SKA855oU+VNOb
-   NBE8Eez8eEaWJ4ypXaTm1Jr4nG1Iv3cB+N5MZw3HuppleCWy8mRdUGFbn
-   7QQSevLXJHYb/vnX5y7HfPJJY2e4jdG8KqZ6QL9LDmBbj6elDJ0vI9BOL
-   9I3ibsVwELt4XCdvdMe+KHzUAv7dxjLbSeB37GuhttVzGNUpq0BEy9w5J
-   bHWOW6MkG9wrPB4yPHasR8G+/N2w8GWsf7WqMwXrEsFfx2Vj/uNM4HgNo
-   ZOmcQLc7U6/A7CyxeFds7G/IudcHwrtbO5xNZ4Ln0oW4uMrHwTh7QJu5E
-   w==;
-X-CSE-ConnectionGUID: 356L9FM4STKd+NocMLP5zw==
-X-CSE-MsgGUID: hh5ePo/3QZyNtiN0EwFP4w==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.04,233,1695711600"; 
-   d="scan'208";a="179516497"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Nov 2023 23:52:45 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 27 Nov 2023 23:52:29 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Mon, 27 Nov 2023 23:52:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PL0qa0cHG5le1bmmFj2rHq/i2M09moJX2M+aTzapiisEIvTUmQR0IKpmmJpb2CMIFexJcT8HVzDQzkjC57gtQAHqhPWVIJMpTqmT+Cy+431af9KYMC72nZvCi0B86PFNqQ9igiPJedSTHqmnk47iLriZMhYvppwIalvoXqizCqCfBamcDLRITQC6XjOqY72SFSMa3BJpFY+x3blTeTvSoXEyXMA5I4Jd37wCjKqU/aONa9DQ9sAYeIe8rnxpM67EQTesIHswqrBoKxICFG2UicM8vurNrJTXXPQohop8SZ0UQrW6o8pzTPZM8ojYM1HFqNNqSZRQbRrWry5au7gNlw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lntXxvO0J6m2wHobU4AB8DoRuRhc8RU/SqNI10cEUtE=;
- b=WyP+veBc5dYOLFOF+kh2KXj5L8lCLaIrffMIaYnNw6iqCAb3MNgZJJ3U36djXTjAhTcQWpfafHHaAR5zuYAHddk8cNSPvohjpWX95dGDdwK/l3qpljqgS0hl6iB6/r0X3/QxCfrE4rXOB/1sLgXcJDpyYtLEmj5nGbTtAnPDKZqMUaYAxHGzs+VkSE/VpBbSC7p3ndA0TToz2dPdveWwrnUYEfhrV6+EfPgN37ZG5oZqT0eftoiAhodmtGU5rytThavnq74Hcj5ANE4meOqGZ14YjXU/RCo0AeuHBja2zToB5llBHnP/aq5j2ZRaMG3jiK0RC9GXAi4ECkslJ8kWXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lntXxvO0J6m2wHobU4AB8DoRuRhc8RU/SqNI10cEUtE=;
- b=sw7K64iRsDqoLO0AbigVh7AU7ZfzaO3lysCLRyiwFbrhQux9fJ/qvVfFmsybB3e7RA3UdAksbKTaOs1kRtEomq3gEoVELhE+vT7wJCVN9UdmyMTnD2R2OVGVNHVBp7c0X+mNL5GNa7MdmpTjNdgr4SJ0E2MvdUeSQVx/Lwoq0pGlUTzHCZ779BrFUfwjTwb6N7d7nV6Rh4mx70E81mRLybmZzX3H/5T3BEq/RIaYCCIlySV6JFQmuVxxo8eo5B6XWggWl0yPVHS94Kz71CjbuhaHLHXzZS8YJtQvmxkzjazgovnA9/7aHryKdv8owckz8MlxTa3esaMZyOko0/Kdkw==
-Received: from DM6PR11MB3532.namprd11.prod.outlook.com (2603:10b6:5:70::25) by
- CH3PR11MB7323.namprd11.prod.outlook.com (2603:10b6:610:152::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7025.28; Tue, 28 Nov 2023 06:52:25 +0000
-Received: from DM6PR11MB3532.namprd11.prod.outlook.com
- ([fe80::ba6d:cd09:d24:48de]) by DM6PR11MB3532.namprd11.prod.outlook.com
- ([fe80::ba6d:cd09:d24:48de%6]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
- 06:52:25 +0000
-From: <Parthiban.Veerasooran@microchip.com>
-To: <ramon.nordin.rodriguez@ferroamp.se>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/3] net: microchip_t1s: conditional collision detection
-Thread-Topic: [PATCH 3/3] net: microchip_t1s: conditional collision detection
-Thread-Index: AQHaIR5wk3YgliVBQEuBhfUZ1bg7VLCOU2UAgAAJDICAAPAzgA==
-Date: Tue, 28 Nov 2023 06:52:24 +0000
-Message-ID: <2125cc12-1785-4a49-91c3-6479b0f4044b@microchip.com>
-References: <20231127104045.96722-1-ramon.nordin.rodriguez@ferroamp.se>
- <20231127104045.96722-4-ramon.nordin.rodriguez@ferroamp.se>
- <142ce54c-108c-45b4-b886-ce3ca45df9fe@microchip.com>
- <ZWTEqXAwxIK1pSHo@debian>
-In-Reply-To: <ZWTEqXAwxIK1pSHo@debian>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB3532:EE_|CH3PR11MB7323:EE_
-x-ms-office365-filtering-correlation-id: 1cbd47e9-eb01-473f-16fb-08dbefde93ae
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1n9sDJA7BrAHOMztullVMtlLG/90qXk6AaFjjrkiAswwskuLyjI+1damEH/O7Qm9zn/m3HoZyCxPSTF4Ze8L0o7v7PydPPO3IKPvq7kaNRDK1t7CDCnyScpycbqQSExcYZ85TSuiRM023D/MLWTC0PS1aJvNX/2Ftj9JiW8xQLeN4xjZVDTHdbowZmtb4NnX2QIe3XqzmC838fsIEuqy0N7MnI2JkxgvK0scmT5xoNnMWxxEEk/JPu5hW6u1WtkvGTqMHGXYWHjW2/kpY/rnEYUVeICeiacNWRaEp6fuZ8CLVBA8mk+9eP288KMsnoYN0orR+mqfU5K/rpCyp4aVgcqDUsPdp29SSgzyTq9jzyF7Lhr2amLWneOUv+nsYMPFh+lRrArEDXhap79f+73w3rT8XgMpSphs6u9tDZemDhzol+vhPN17MwQvWQ8upQR2vlEE3DH/yc4gbXw1WsN7A33mm55BekWplrFuabIBdDvn6kDWelMQb6jwXvLU8Vm8gIkaU0PSSMCoVFbfC/AKYRwbkRk6wo5Kv0XJjy3l6ps7ueHGgL9mnQcDa3u4dAgpW+Bb0s8ZMxtOBEcrfgw8EIu1LCqXLeyWb1z6lSP9620Wvs6CyovSU21uqT4Ixo/Ti7qui6H6wZU1mTIlKbZUH4v6qT2hvNiXP3lmKOMk2NBnlkl0t/f5zb+Vm7zIO7r0b4tBf4R7sGKOHOXgp8fG9Dr4QJ6FNVhdaG2KPNG218u7TVeFbmO31sLDxuSaPN+E
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3532.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(396003)(39860400002)(136003)(230273577357003)(230173577357003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(31686004)(41300700001)(66899024)(31696002)(71200400001)(86362001)(5660300002)(2906002)(7416002)(83380400001)(38070700009)(76116006)(8936002)(4326008)(66476007)(66556008)(8676002)(66446008)(66946007)(54906003)(64756008)(6916009)(122000001)(966005)(91956017)(6486002)(2616005)(53546011)(316002)(26005)(6512007)(36756003)(66574015)(38100700002)(6506007)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UGpUVWVBQWFuNys3MmJVNWl0Rkg2cFMycGVYUE5yeTlZeUZvUXAzNFVhbUZY?=
- =?utf-8?B?NGRmVlEyMDVVZEpGWHowNStoRi9TUWRxY3ljZCtSZmYwQVI2Vk1iQ0RBa25t?=
- =?utf-8?B?WXZCNTFnTUc0L2pyNFYrZG5KdklpRTFjR0tVTXBlcmpudEsrZ3FtbkZoS2lw?=
- =?utf-8?B?VlMzNVcwZ09iT2lqWkpOWTdVbkpYYzArMU1OR2lFYXQ1Y0ZQZHBySUVxL0ZF?=
- =?utf-8?B?cFJyU084eCtRSFZweW03b0JuMW1vTWxxVTZKNHprczFHemM2SW1sUE1qcGtR?=
- =?utf-8?B?KzE2QVJHT3BRWkFyQXZYajY0UjROeHoyUWhJejNocHRySEkwSVFSOFRWYksv?=
- =?utf-8?B?ZDdUOEJEZWMxNmgvaFJqYUFJWG1zRS9QdUdOZ0tjU3RtRGVyWGZia21NQXJD?=
- =?utf-8?B?S0VrMWkwdmZlVnlwQWczMlFpQmQ5SlpSK0dlcWlkemxOWllmeGNwa0xuQTFZ?=
- =?utf-8?B?cVRlREpLbDYwN1pLb2xzYjBpY2VjSkExK0tvR2plaFpaMXpmMmprYndzUUYw?=
- =?utf-8?B?QkdaTXdjRDVSTFdzbUVBSmhVRzRKRkM5WlQwSWUrd1pHa3ZwQ3BiMzRZSUhJ?=
- =?utf-8?B?am1NYTZ6ei85WDd1bkVpQnZ1aGtualQ5RmJuOVBMZ29QTnVRcDdOZ1JGcytS?=
- =?utf-8?B?R2FIbVV6WCs4bmxkWXFsRUh4YXhNemhyVEZXV2RVbms3OW5Vd3NLSWpJWmRn?=
- =?utf-8?B?SEJxSlh6cmlOd3MwME0ySGZpb3dkWVNNdklmcFAxd3B5dytUbjJrajgvOVd6?=
- =?utf-8?B?VExUdi9zTXNuT2xFL3M2RGZwMW5VcStPcFR1dkhrRXRHekdSL2h4Z1FiMEhM?=
- =?utf-8?B?V1FKYkM0VzdmbVZNYy93UC9NR1ZzdXVtTmxwTTVEU3hxT0k3WThnWCtpWVNH?=
- =?utf-8?B?M0wvZC95eGFQZk8yYUU1VDl0aG5zaTJwZ3Nzckhpd2RWWkh3VHpOVEZvello?=
- =?utf-8?B?UGhPeDBoc2xwNHZWaHI0OFExY2MzS0s1ZVVYa3pETklCamhTVVZIMzhla1Qy?=
- =?utf-8?B?S0M4YnVDVWZxZUVibzY0ZmM3OGp2bWRWaDJYeGFyRVFRTG1xRjY4NUFHdEo4?=
- =?utf-8?B?U1FXSEdRY2doall4bUhOWGtRdEtyd1pKYTQzUWRpNnNHQ3R2Vis0cU1adXI0?=
- =?utf-8?B?OFYwVG4vMVVxYzNjejVBRHUrbWxzU2JQbGQ0czM3SEE5WHkzWmVHWm8vYklw?=
- =?utf-8?B?RHVXcVUvS2VYeVFENjk3OU1SWmtIL3V3VTZ4T0UyN3dNSFhEaTNUNXdmVVZC?=
- =?utf-8?B?ZWJhNFlvWXFoempDTzByWkx6U3lXTVpWbG41YkJKUW5tazZ5aVlhNmdSZmp0?=
- =?utf-8?B?WDlab2JVSSsyT2x2RHpLWGl4YmhPbTduQzJlQ0JlTDNocHZVMkJUWXo3N1du?=
- =?utf-8?B?dEwveUorcTV4bVB4WHdQS1FyYlg0d1ZoOWkyejhWSnRnUXNqbFRuZlBzcG9F?=
- =?utf-8?B?NTNaaGUrWCtMeUUrR05VUkdOYTZ6aTVwZnVBZC9CZXE3b01SR2prN1c5R1ZZ?=
- =?utf-8?B?UVh6cER1ajIzeUZoUUtqTkcxYkJNUXJaa1dFL1UwNTV3Nm1ETmZzbEdzRkFZ?=
- =?utf-8?B?YlpERmk3MDQ3eTIwZjZZZkkwNGtvRGh2T1hONHZCUVhzK2VCSXMyYkVlbHZD?=
- =?utf-8?B?U1lzTG1MeWxEaWI5QjJqbi9uU3o4cjk5QUY5TlB0dmE5azlCN284Wm1IRzZk?=
- =?utf-8?B?SkcvZmFQMjZMaHBvTURhb25tMjd4U1VlOFYzb0ZUN3l2ckdZUFJ5ZTJwQ0Y2?=
- =?utf-8?B?Slh1azhIRGJiM2lyOUczc0RndUo5YWxjM09KdnhxL0w2VGFJTmZXd1FHMjR6?=
- =?utf-8?B?cE1Walo0Z0xqQnpnM1Y2ekZiclBnSlR3bFhTUFNvdi9jczB1a0phUGJHcEl4?=
- =?utf-8?B?ejVlK05ib2Qyc0E3RlROWUkxYmc0TjJ4ME1Qdzk2a2lIQUhiVVBtdVNVSlpC?=
- =?utf-8?B?UlhnVlUzQWh1UDhBRjdQYU1WTitkeTJuV2xWN1ZLRkZLZ2xEbzB0aXlCcjhp?=
- =?utf-8?B?Y3g4Rlk5bVIrNUtJdHBod2tWVmE3ZlZCWWxtSE5PR2NUZXNLaHY1WHU1S1gz?=
- =?utf-8?B?eU1CWlF5dVp4Wnh0bGVSd3hmc2ZOKzYyMFJnSGxLaGs2WGQzdkZCSEp3WWRW?=
- =?utf-8?B?U3lweG5vWllBTkFPcjl1bnMzNTF4d3I3N2R3LzhVRE41bkVjNFNFRjdaaWhH?=
- =?utf-8?Q?P4KNUWSvhO5nRCh/KXsWnSk=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F85C1CB09546624093EAC7AE83C952C0@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+X-Greylist: delayed 12603 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 27 Nov 2023 23:45:25 PST
+Received: from 7.mo547.mail-out.ovh.net (7.mo547.mail-out.ovh.net [46.105.53.191])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0FDBD4D
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 23:45:25 -0800 (PST)
+Received: from ex4.mail.ovh.net (unknown [10.109.143.210])
+	by mo547.mail-out.ovh.net (Postfix) with ESMTPS id 4139920245;
+	Tue, 28 Nov 2023 02:35:38 +0000 (UTC)
+Received: from bf-dev-miffies.localdomain (92.184.96.55) by
+ DAG10EX1.indiv4.local (172.16.2.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 28 Nov 2023 03:32:15 +0100
+From: Quentin Deslandes <qde@naccy.de>
+To: <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [PATCH 3/3] ss: pretty-print BPF socket-local storage
+Date: Mon, 27 Nov 2023 18:30:58 -0800
+Message-ID: <20231128023058.53546-4-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231128023058.53546-1-qde@naccy.de>
+References: <20231128023058.53546-1-qde@naccy.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3532.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1cbd47e9-eb01-473f-16fb-08dbefde93ae
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2023 06:52:24.2458
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HlgRfmmQ2sD0FW6tjtqi20+IEcVyyhbdOQWcpX6wbr11DLV9HtJowM4pXIoVqVcxKlLchL0aHk7KzvVVep3j6LqdjJHcqOypj9yGckOePWOSULwFJVQWJex/P8sLvaCy
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7323
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CAS12.indiv4.local (172.16.1.12) To DAG10EX1.indiv4.local
+ (172.16.2.91)
+X-Ovh-Tracer-Id: 5907033864805805736
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrudeivddggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfgtihesthekredtredttdenucfhrhhomhepsfhuvghnthhinhcuffgvshhlrghnuggvshcuoehquggvsehnrggttgihrdguvgeqnecuggftrfgrthhtvghrnheptdehffefgeevleejudehkeeigeegheeffefhleettdehtdehffduffduleetvedtnecuffhomhgrihhnpehnrhgpmhgrphhsrdhiugdpnhhrpghmrghpshdrihhnfhhonecukfhppeduvdejrddtrddtrddupdelvddrudekgedrleeirdehheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehquggvsehnrggttgihrdguvgeqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdgushgrhhgvrhhnsehgmhgrihhlrdgtohhmpdhmrghrthhinhdrlhgruheskhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehgeejpdhmohguvgepshhmthhpohhuth
 
-SGksDQoNCk9uIDI3LzExLzIzIDEwOjAyIHBtLCBSYW3Ds24gTm9yZGluIFJvZHJpZ3VleiB3cm90
-ZToNCj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1l
-bnRzIHVubGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiBPbiBNb24sIE5v
-diAyNywgMjAyMyBhdCAwNDowMDoxOFBNICswMDAwLCBQYXJ0aGliYW4uVmVlcmFzb29yYW5AbWlj
-cm9jaGlwLmNvbSB3cm90ZToNCj4+IEhpLA0KPj4NCj4+IFRoaXMgaW1wbGVtZW50YXRpb24gd2Fz
-IGludHJvZHVjZWQgaW4gdGhlIGJlbG93IHBhdGNoIGl0c2VsZi4NCj4+DQo+PiBodHRwczovL2xv
-cmUua2VybmVsLm9yZy9uZXRkZXYvMjAyMzA0MjYyMDUwNDkueGxmcWx1endjdmxtNmloaEBzb2Z0
-LWRldjMtMS9ULyNtOWE1MmI2YzAzYjdmYTYzN2Y3MGFlZDMwNmI1MGI0NDI1OTBlMjRhMw0KPj4N
-Cj4gDQo+IEJ1dCB0aGUgY2hhbmdlIHdhcyBkcm9wcGVkIGluIHRoYXQgcGF0Y2hzZXQgcmlnaHQ/
-IEl0J3Mgbm90IHByZXNlbnQgaW4NCj4gbmV0ZGV2LW5leHQuDQpZZXMsIGl0IHdhcyBkcm9wcGVk
-LiBUaGUgcmVhc29uIHdoeSBJIGdhdmUgdGhpcyBpbmZvIGlzLCB5b3UgbWVudGlvbmVkIA0KaW4g
-dGhlIGNvdmVyIGxldHRlciB0aGF0IGl0IHRvb2sgc29tZSB0aW1lIGZvciB5b3UgdG8gZmluZCB0
-aGlzIGluIHRoZSANCmRhdGFzaGVldC4NCj4gDQo+PiBBcyBpdCBpcyByZWNvbW1lbmRlZCB0byBk
-byBpdCBpbiBhIHNlcGFyYXRlIHBhdGNoIGFuZCBhbHNvIHRoZQ0KPj4gZGF0YXNoZWV0cyBvZiBM
-QU44NjdYIFJldi5CMSBhbmQgTEFOODY1WCBSZXYuQjAgaW50ZXJuYWwgUEhZIGhhdmUgdGhlc2UN
-Cj4+IHJlZ2lzdGVyIGlzIHJlc2VydmVkLCB3ZSB3ZXJlIHdvcmtpbmcgZm9yIGEgZmVhc2libGUg
-c29sdXRpb24gdG8NCj4+IGRlc2NyaWJlIHRoaXMgZm9yIGN1c3RvbWVyIGFuZCBtYWlubGluZS4g
-QnkgdGhlIHRpbWUgbWFueSBvdGhlciB0aGluZ3MNCj4+IG1lc3NlZCB1cCBhbmQgY291bGRuJ3Qg
-cmVhY2ggdGhlIG1haW5saW5lIG9uIHRpbWUuDQo+Pg0KPiANCj4gRmFyIGFzIEkgY2FuIHRlbGwg
-J2NvbGxpc2lvbiBkZXRlY3QnIGlzIGRlc2NyaWJlZCBpbiB0aGUgZm9sbG93aW5nDQo+IHNlY3Rp
-b25zIG9mIHJlc3BlY3RpdmUgZGF0YXNoZWV0Og0KPiANCj4gKiAxMS41LjUxIC0gTEFOODY1MA0K
-PiAqIDUuNC40OCAgLSBMQU44NjcwDQo+IA0KPiBUaGUgcmVzdCBvZiB0aGUgYml0cyBhcmUgcmVz
-ZXJ2ZWQgdGhvdWdoLiBUaGUgY2hhbmdlIEkgcHJvcG9zZSBvbmx5DQo+IG1hbmlwdWxhdGUgdGhl
-IGRvY3VtZW50ZWQgKGJpdCAxNSkgY29sbGlzaW9uIGJpdC4NCj4gDQo+IElzIHlvdXIgcG9pbnQg
-dGhhdCB0aGUgbGFuODY3MCBkYXRhc2hlZXQgaXMgb25seSB2YWxpZCBmb3IgcmV2LmMgYW5kIG5v
-dA0KPiByZXYuYj8NCkl0IGlzIHZhbGlkIGZvciByZXYuYjEgYXMgd2VsbCBidXQgdGhlIGN1cnJl
-bnQgZGF0YXNoZWV0IGZvciByZXYuYzEgDQpkb2Vzbid0IHNob3cgdGhhdCBpbmZvLg0KPiANCj4g
-QW5kcmV3IHN1Z2dlc3RlZCBvbiB0aGUgY292ZXIgbGV0dGVyIHRoYXQgaXQgYmUgaW50ZXJlc3Rp
-bmcgdG8gbG9vayBhdA0KPiBjb21wbGV0bHkgZGlzYWJsaW5nIGNvbGxpc2lvbiBkZXRlY3QsIGFu
-eSBzdHJpbmdzIHlvdSBjYW4gcHVsbCBhdA0KPiBNaWNyb2NoaXAgdG8gaW52ZXN0aWdhdGUgdGhh
-dD8NClVuZm9ydHVuYXRlbHkgSSBjYW4ndCBjb21taXQgYW55dGhpbmcgZnJvbSBteSBzaWRlIGFz
-IHdlIGFyZSBvY2N1cGllZCANCndpdGggb3RoZXIgYWN0aXZpdGllcy4gQnV0IGRlZmluaXRlbHkg
-SSB3aWxsIHRyeSBteSBsZXZlbCBiZXN0IGlmIHRpbWUgDQpwZXJtaXRzLiBBbHRlcm5hdGl2ZWx5
-IHlvdSBjYW4gY29udGFjdCBvdXIgTWljcm9jaGlwIGN1c3RvbWVyIHN1cHBvcnQgDQp0ZWFtIGlm
-IHlvdSBhcmUgaW50ZXJlc3RlZCB0byBkbyB0aGlzIHRlc3RpbmcgYXQgTWljcm9jaGlwLg0KPiBB
-bHNvIGFueSBpbnB1dCBvbiBteSBzdWdnZXN0ZWQgdGVzdGluZyBtZXRob2RvbG9neSBpcyBtb3Jl
-IHRoYW4gd2VsY29tZS4NCj4gDQo+PiBXZSBhbHNvIGltcGxlbWVudGVkIExBTjg2N1ggUmV2LkMx
-IHN1cHBvcnQgYWxyZWFkeSBpbiB0aGUgZHJpdmVyIGFuZA0KPj4gcHVibGlzaGVkIGluIG91ciBw
-cm9kdWN0IHNpdGUgYW5kIGluIHRoZSBwcm9jZXNzIG9mIHByZXBhcmluZyBtYWlubGluZQ0KPj4g
-cGF0Y2hlcy4gQnV0IHVuZm9ydHVuYXRlbHkgaXQgdG9vayBsaXR0bGUgbW9yZSB0aW1lIHRvIG1h
-a2UgaXQuDQo+Pg0KPj4gaHR0cHM6Ly93dzEubWljcm9jaGlwLmNvbS9kb3dubG9hZHMvYWVtRG9j
-dW1lbnRzL2RvY3VtZW50cy9BSVMvUHJvZHVjdERvY3VtZW50cy9Db2RlRXhhbXBsZXMvRVZCLUxB
-Tjg2NzAtVVNCX0xpbnV4X0RyaXZlcl8xdjAuemlwDQo+IA0KPiBJJ20gYXdhcmUsIHdlJ3ZlIGJl
-ZW4gdXNpbmcgYSBkZXJpdmF0aXZlIG9mIHRoYXQgd29yayBhdCBmZXJyb2FtcCBmb3INCj4gZGV2
-ZWxvcG1lbnQuIEJ1dCBpdCdzIGJlZW4gZHJpdmluZyBtZSBudXRzLCBiZWluZyB0aGUgJ3QxcyBn
-dXknIGF0IHdvcmssDQo+IGFuZCBtYWludGFpbmluZyBvdXQgb2YgdHJlZSBkcml2ZXJzIGZvciB3
-ZWlyZCBkZXYgYm94ZXMuDQo+IA0KPiBJdCdzIG5vdCBteSBpbnRlbnRpb24gdG8gYmVhdCB5b3Ug
-dG8gdGhlIHB1bmNoLCBJIGp1c3Qgd2FudCBhIG1haW5saW5lZA0KPiBkcml2ZXIgc28gdGhhdCBJ
-IGNhbiBzcGVuZCBsZXNzIG9mIG15IHRpbWUgb24gcGx1bWJpbmcuDQpJIGNvbXBsZXRlbHkgdW5k
-ZXJzdGFuZC4gQWxzbyBpdCB3YXMgbm90IG15IGludGVudGlvbiB0b28uIEp1c3QgdG8gbGV0IA0K
-eW91IGtub3cgd2h5IGl0IGlzIGRlbGF5ZWQgaW4gcmVhY2hpbmcgbWFpbmxpbmUgYW5kIGEgcXVp
-Y2sgcmVmZXJlbmNlIA0KZm9yIHRoZSBleGlzdGluZyBpbXBsZW1lbnRhdGlvbi4gRW5qb3khDQoN
-CkJlc3QgcmVnYXJkcywNClBhcnRoaWJhbiBWDQo+IA0KPj4NCj4+IEFueXdheSwgdGhhbmsgeW91
-IGZvciB0aGUgc3VwcG9ydC4gR29vZCBsdWNrIQ0KPiANCj4gTGlrZXdpc2UhDQo+IFINCg0K
+ss is able to print the map ID(s) for which a given socket has BPF
+socket-local storage defined (using --bpf-maps or --bpf-map-id=). However,
+the actual content of the map remains hidden.
+
+This change aims to pretty-print the socket-local storage content following
+the socket details, similar to what `bpftool map dump` would do. The exact
+output format is inspired by drgn, while the BTF data processing is similar
+to bpftool's.
+
+ss will print the map's content in a best-effort fashion: BTF types that can
+be printed will be displayed, while types that are not yet supported
+(e.g. BTF_KIND_VAR) will be replaced by a placeholder. For readability
+reasons, the --oneline option is not compatible with this change.
+
+The new out_prefix_t type is introduced to ease the printing of compound
+types (e.g. structs, unions), it defines the prefix to print before the actual
+value to ensure the output is properly indented. COL_SKSTOR's header is
+replaced with an empty string, as it doesn't need to be printed anymore;
+it's used as a "virtual" column to refer to the socket-local storage dump,
+which will be printed under the socket information. The column's width is
+fixed to 1, so it doesn't mess up ss' output.
+
+ss' output remains unchanged unless --bpf-maps or --bpf-map-id= is used,
+in which case each socket containing BPF local storage will be followed by
+the content of the storage before the next socket's info is displayed.
+
+Signed-off-by: Quentin Deslandes <qde@naccy.de>
+---
+ misc/ss.c | 558 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 551 insertions(+), 7 deletions(-)
+
+diff --git a/misc/ss.c b/misc/ss.c
+index 5b255ce3..545e5475 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -51,8 +51,13 @@
+ #include <linux/tls.h>
+ #include <linux/mptcp.h>
+ 
++#ifdef HAVE_LIBBPF
++#include <linux/btf.h>
++#endif
++
+ #ifdef HAVE_LIBBPF
+ #include <bpf/bpf.h>
++#include <bpf/btf.h>
+ #include <bpf/libbpf.h>
+ #endif
+ 
+@@ -136,7 +141,7 @@ static struct column columns[] = {
+ 	{ ALIGN_RIGHT,	"Peer Address:",	" ",	0, 0, 0 },
+ 	{ ALIGN_LEFT,	"Port",			"",	0, 0, 0 },
+ 	{ ALIGN_LEFT,	"Process",		"",	0, 0, 0 },
+-	{ ALIGN_LEFT,	"Socket storage",	"",	1, 0, 0 },
++	{ ALIGN_LEFT,	"",			"",	1, 0, 0 },
+ 	{ ALIGN_LEFT,	"",			"",	0, 0, 0 },
+ };
+ 
+@@ -1212,6 +1217,9 @@ static void render_calc_width(void)
+ 		 */
+ 		c->width = min(c->width, screen_width);
+ 
++		if (c == &columns[COL_SKSTOR])
++			c->width = 1;
++
+ 		if (c->width)
+ 			first = 0;
+ 	}
+@@ -3386,6 +3394,8 @@ static struct bpf_map_opts {
+ 	struct bpf_sk_storage_map_info {
+ 		unsigned int id;
+ 		int fd;
++		struct bpf_map_info info;
++		struct btf *btf;
+ 	} maps[MAX_NR_BPF_MAP_ID_OPTS];
+ 	bool show_all;
+ 	struct btf *kernel_btf;
+@@ -3397,6 +3407,32 @@ static void bpf_map_opts_mixed_error(void)
+ 		"ss: --bpf-maps and --bpf-map-id cannot be used together\n");
+ }
+ 
++static int bpf_maps_opts_load_btf(struct bpf_map_info *info, struct btf **btf)
++{
++	if (info->btf_vmlinux_value_type_id) {
++		if (!bpf_map_opts.kernel_btf) {
++			bpf_map_opts.kernel_btf = libbpf_find_kernel_btf();
++			if (!bpf_map_opts.kernel_btf) {
++				fprintf(stderr, "ss: failed to load kernel BTF\n");
++				return -1;
++			}
++		}
++
++		*btf = bpf_map_opts.kernel_btf;
++	} else if (info->btf_value_type_id) {
++		*btf = btf__load_from_kernel_by_id(info->btf_id);
++		if (!*btf) {
++			fprintf(stderr, "ss: failed to load BTF for map ID %u\n",
++				info->id);
++			return -1;
++		}
++	} else {
++		*btf = NULL;
++	}
++
++	return 0;
++}
++
+ static int bpf_map_opts_add_all(void)
+ {
+ 	unsigned int i;
+@@ -3412,6 +3448,7 @@ static int bpf_map_opts_add_all(void)
+ 	while (1) {
+ 		struct bpf_map_info info = {};
+ 		uint32_t len = sizeof(info);
++		struct btf *btf;
+ 
+ 		r = bpf_map_get_next_id(id, &id);
+ 		if (r) {
+@@ -3450,8 +3487,18 @@ static int bpf_map_opts_add_all(void)
+ 			continue;
+ 		}
+ 
++		r = bpf_maps_opts_load_btf(&info, &btf);
++		if (r) {
++			fprintf(stderr, "ss: failed to get BTF data for BPF map ID: %u\n",
++				id);
++			close(fd);
++			goto err;
++		}
++
+ 		bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
+-		bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps].fd = fd;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps].info = info;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps++].btf = btf;
+ 	}
+ 
+ 	bpf_map_opts.show_all = true;
+@@ -3470,6 +3517,7 @@ static int bpf_map_opts_add_id(const char *optarg)
+ 	struct bpf_map_info info = {};
+ 	uint32_t len = sizeof(info);
+ 	size_t optarg_len;
++	struct btf *btf;
+ 	unsigned long id;
+ 	unsigned int i;
+ 	char *end;
+@@ -3521,12 +3569,34 @@ static int bpf_map_opts_add_id(const char *optarg)
+ 		return -1;
+ 	}
+ 
++	r = bpf_maps_opts_load_btf(&info, &btf);
++	if (r) {
++		fprintf(stderr, "ss: failed to get BTF data for BPF map ID: %lu\n",
++			id);
++		return -1;
++	}
++
+ 	bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
+-	bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps].fd = fd;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps].info = info;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps++].btf = btf;
+ 
+ 	return 0;
+ }
+ 
++static const struct bpf_sk_storage_map_info *bpf_map_opts_get_info(
++	unsigned int map_id)
++{
++	unsigned int i;
++
++	for (i = 0; i < bpf_map_opts.nr_maps; ++i) {
++		if (bpf_map_opts.maps[i].id == map_id)
++			return &bpf_map_opts.maps[i];
++	}
++
++	return NULL;
++}
++
+ static inline bool bpf_map_opts_is_enabled(void)
+ {
+ 	return bpf_map_opts.nr_maps;
+@@ -3568,10 +3638,472 @@ static struct rtattr *bpf_map_opts_alloc_rta(void)
+ 	return stgs_rta;
+ }
+ 
++#define OUT_PREFIX_LEN 65
++
++/* Print a prefixed formatted string. Used to dump BPF socket-local storage
++ * nested structures properly. */
++#define OUT_P(p, fmt, ...) out("%s" fmt, *(p), ##__VA_ARGS__)
++
++typedef char(out_prefix_t)[OUT_PREFIX_LEN];
++
++static void out_prefix_push(out_prefix_t *prefix)
++{
++	size_t len = strlen(*prefix);
++
++	if (len + 5 > OUT_PREFIX_LEN)
++		return;
++
++	strncpy(&(*prefix)[len], "    ", 5);
++}
++
++static void out_prefix_pop(out_prefix_t *prefix)
++{
++	size_t len = strlen(*prefix);
++
++	if (len < 4)
++		return;
++
++	(*prefix)[len - 4] = '\0';
++}
++
++static inline const char *btf_typename_or_fallback(const struct btf *btf,
++	unsigned int name_off)
++{
++	static const char *fallback = "<invalid name_off>";
++	static const char *anon = "<anon>";
++	const char *typename;
++
++	typename = btf__name_by_offset(btf, name_off);
++	if (!typename)
++		return fallback;
++
++	if (strcmp(typename, "") == 0)
++		return anon;
++
++	return typename;
++}
++
++static void out_btf_int128(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	uint64_t high, low;
++	const char *typename;
++
++#ifdef __BIG_ENDIAN_BITFIELD
++	high = *(uint64_t *)data;
++	low = *(uint64_t *)(data + 8);
++#else
++	high = *(uint64_t *)(data + 8);
++	low = *(uint64_t *)data;
++#endif
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (high == 0)
++		OUT_P(prefix, "(%s)0x%lx,\n", typename, low);
++	else
++		OUT_P(prefix, "(%s)0x%lx%016lx,\n", typename, high, low);
++}
++
++#define BITS_PER_BYTE_MASKED(bits) ((bits) & 7)
++#define BITS_ROUNDDOWN_BYTES(bits) ((bits) >> 3)
++#define BITS_ROUNDUP_BYTES(bits) \
++	(BITS_ROUNDDOWN_BYTES(bits) + !!BITS_PER_BYTE_MASKED(bits))
++
++static void out_btf_bitfield(const struct btf *btf, const struct btf_type *type,
++	uint32_t bitfield_offset, uint8_t bitfield_size, const void *data,
++	out_prefix_t *prefix)
++{
++	int left_shift_bits, right_shift_bits;
++	uint64_t high, low;
++	uint64_t print_num[2] = {};
++	int bits_to_copy;
++	const char *typename;
++
++	bits_to_copy = bitfield_offset + bitfield_size;
++	memcpy(print_num, data, BITS_ROUNDUP_BYTES(bits_to_copy));
++
++	right_shift_bits = 128 - bitfield_size;
++#if defined(__BIG_ENDIAN_BITFIELD)
++	high = print_num[0];
++	low = print_num[1];
++	left_shift_bits = bitfield_offset;
++#elif defined(__LITTLE_ENDIAN_BITFIELD)
++	high = print_num[1];
++	low = print_num[0];
++	left_shift_bits = 128 - bits_to_copy;
++#else
++#error neither big nor little endian
++#endif
++
++	/* shake out un-needed bits by shift/or operations */
++	if (left_shift_bits >= 64) {
++		high = low << (left_shift_bits - 64);
++		low = 0;
++	} else {
++		high = (high << left_shift_bits) | (low >> (64 - left_shift_bits));
++		low = low << left_shift_bits;
++	}
++
++	if (right_shift_bits >= 64) {
++		low = high >> (right_shift_bits - 64);
++		high = 0;
++	} else {
++		low = (low >> right_shift_bits) | (high << (64 - right_shift_bits));
++		high = high >> right_shift_bits;
++	}
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (high == 0) {
++		OUT_P(prefix, "(%s:%d)0x%lx,\n", typename, bitfield_size, low);
++	} else {
++		OUT_P(prefix, "(%s:%d)0x%lx%016lx,\n", typename, bitfield_size,
++		high, low);
++	}
++}
++
++static void out_btf_int(const struct btf *btf, const struct btf_type *type,
++	uint32_t bit_offset, const void *data, out_prefix_t *prefix)
++{
++	uint32_t *int_type = (uint32_t *)(type + 1);
++	uint32_t nbits = BTF_INT_BITS(*int_type);
++	const char *typename;
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (bit_offset || BTF_INT_OFFSET(*int_type) ||
++		BITS_PER_BYTE_MASKED(nbits)) {
++		out_btf_bitfield(btf, type, BTF_INT_OFFSET(*int_type), nbits,
++			data, prefix);
++		return;
++	}
++
++	if (nbits == 128) {
++		out_btf_int128(btf, type, data, prefix);
++		return;
++	}
++
++	switch (BTF_INT_ENCODING(*int_type)) {
++	case 0:
++		if (BTF_INT_BITS(*int_type) == 64)
++			OUT_P(prefix, "(%s)%lu,\n", typename, *(uint64_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 32)
++			OUT_P(prefix, "(%s)%u,\n", typename, *(uint32_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 16)
++			OUT_P(prefix, "(%s)%hu,\n", typename, *(uint16_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 8)
++			OUT_P(prefix, "(%s)%hhu,\n", typename, *(uint8_t *)data);
++		else
++			OUT_P(prefix, "<invalid unsigned int type>,");
++		break;
++	case BTF_INT_SIGNED:
++		if (BTF_INT_BITS(*int_type) == 64)
++			OUT_P(prefix, "(%s)%ld,\n", typename, *(int64_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 32)
++			OUT_P(prefix, "(%s)%d,\n", typename, *(int32_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 16)
++			OUT_P(prefix, "(%s)%hd,\n", typename, *(int16_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 8)
++			OUT_P(prefix, "(%s)%hhd,\n", typename, *(int8_t *)data);
++		else
++			OUT_P(prefix, "<invalid signed int type>,");
++		break;
++	case BTF_INT_CHAR:
++		OUT_P(prefix, "(%s)0x%hhx,\n", typename, *(char *)data);
++		break;
++	case BTF_INT_BOOL:
++		OUT_P(prefix, "(%s)%s,\n", typename,
++			*(bool *)data ? "true" : "false");
++		break;
++	default:
++		OUT_P(prefix, "<unknown type>,\n");
++		break;
++	}
++}
++
++static void out_btf_ptr(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	unsigned long value = *(unsigned long *)data;
++	int actual_type_id;
++	const struct btf_type *actual_type;
++	const char *typename = NULL;
++
++	actual_type_id = btf__resolve_type(btf, type->type);
++	if (actual_type_id > 0) {
++		actual_type = btf__type_by_id(btf, actual_type_id);
++		if (actual_type)
++			typename = btf__name_by_offset(btf, actual_type->name_off);
++	}
++
++	typename = typename ? : "void";
++
++	OUT_P(prefix, "(%s *)%p,\n", typename, (void *)value);
++}
++
++static void out_btf_dump_type(const struct btf *btf, int bit_offset,
++	uint32_t type_id, const void *data, size_t len, out_prefix_t *prefix);
++
++static void out_btf_array(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_array *array = (struct btf_array *)(type + 1);
++	const struct btf_type *elem_type;
++	long long elem_size;
++
++	elem_type = btf__type_by_id(btf, array->type);
++	if (!elem_type) {
++		OUT_P(prefix, "<invalid type_id %u>,\n", array->type);
++		return;
++	}
++
++	elem_size = btf__resolve_size(btf, array->type);
++	if (elem_size < 0) {
++		OUT_P(prefix, "<can't resolve size for type_id %u>,\n", array->type);
++		return;
++	}
++
++	for (int i = 0; i < array->nelems; ++i) {
++		out_btf_dump_type(btf, 0, array->type, data + i * elem_size,
++			elem_size, prefix);
++	}
++}
++
++static void out_btf_struct(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	struct btf_member *member = (struct btf_member *)(type + 1);
++	const struct btf_type *member_type;
++	const void *member_data;
++	out_prefix_t prefix_override = {};
++	unsigned int i;
++
++	for (i = 0; i < BTF_INFO_VLEN(type->info); i++) {
++		uint32_t bitfield_offset = member[i].offset;
++		uint32_t bitfield_size = 0;
++
++		if (BTF_INFO_KFLAG(type->info)) {
++			/* If btf_type.info.kind_flag is set, then
++			 * btf_member.offset is composed of:
++			 *      bitfield_offset << 24 | bitfield_size
++			 */
++			bitfield_size = BTF_MEMBER_BITFIELD_SIZE(bitfield_offset);
++			bitfield_offset = BTF_MEMBER_BIT_OFFSET(bitfield_offset);
++		}
++
++		OUT_P(prefix, ".%s = ",
++			btf_typename_or_fallback(btf, member[i].name_off));
++
++		/* The prefix has to be overwritten as this function prints the
++		 * field's name, so we don't print the prefix once here before
++		 * the name, then again in out_btf_bitfield() or out_btf_int()
++		 * before printing the actual value on the same line. */
++
++		member_type = btf__type_by_id(btf, member[i].type);
++		if (!member_type) {
++			OUT_P(&prefix_override, "<invalid type_id %u>,\n",
++				member[i].type);
++			return;
++		}
++
++		member_data = data + BITS_ROUNDDOWN_BYTES(bitfield_offset);
++		bitfield_offset = BITS_PER_BYTE_MASKED(bitfield_offset);
++
++		if (bitfield_size) {
++			out_btf_bitfield(btf, member_type, bitfield_offset,
++				bitfield_size, member_data, &prefix_override);
++		} else {
++			out_btf_dump_type(btf, bitfield_offset, member[i].type,
++				member_data, 0, &prefix_override);
++		}
++	}
++}
++
++static void out_btf_enum(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_enum *enums = (struct btf_enum *)(type + 1);
++	int64_t value;
++	unsigned int i;
++
++	switch (type->size) {
++	case 8:
++		value = *(int64_t *)data;
++		break;
++	case 4:
++		value = *(int32_t *)data;
++		break;
++	case 2:
++		value = *(int16_t*)data;
++		break;
++	case 1:
++		value = *(int8_t *)data;
++		break;
++	default:
++		OUT_P(prefix, "<invalid type size %u>,\n", type->size);
++		return;
++	}
++
++	for (i = 0; BTF_INFO_VLEN(type->info); ++i) {
++		if (value == enums[i].val) {
++			OUT_P(prefix, "(enum %s)%s\n",
++				btf_typename_or_fallback(btf, type->name_off),
++				btf_typename_or_fallback(btf, enums[i].name_off));
++			return;
++		}
++	}
++}
++
++static void out_btf_enum64(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_enum64 *enums = (struct btf_enum64 *)(type + 1);
++	uint32_t lo32, hi32;
++	uint64_t value;
++	unsigned int i;
++
++	value = *(uint64_t *)data;
++	lo32 = (uint32_t)value;
++	hi32 = value >> 32;
++
++	for (i = 0; i < BTF_INFO_VLEN(type->info); i++) {
++		if (lo32 == enums[i].val_lo32 && hi32 == enums[i].val_hi32) {
++			OUT_P(prefix, "(enum %s)%s\n",
++				btf_typename_or_fallback(btf, type->name_off),
++				btf__name_by_offset(btf, enums[i].name_off));
++			return;
++		}
++	}
++}
++
++static out_prefix_t out_global_prefix = {};
++
++static void out_btf_dump_type(const struct btf *btf, int bit_offset,
++	uint32_t type_id, const void *data, size_t len, out_prefix_t *prefix)
++{
++	const struct btf_type *type;
++	out_prefix_t *global_prefix = &out_global_prefix;
++
++	if (!btf) {
++		OUT_P(prefix, "<missing BTF information>,\n");
++		return;
++	}
++
++	type = btf__type_by_id(btf, type_id);
++	if (!type) {
++		OUT_P(prefix, "<invalid type_id %u>,\n", type_id);
++		return;
++	}
++
++	switch (BTF_INFO_KIND(type->info)) {
++	case BTF_KIND_UNION:
++	case BTF_KIND_STRUCT:
++		OUT_P(prefix, "(%s %s) {\n",
++			BTF_INFO_KIND(type->info) == BTF_KIND_STRUCT ? "struct" : "union",
++			btf_typename_or_fallback(btf, type->name_off));
++
++		out_prefix_push(global_prefix);
++		out_btf_struct(btf, type, data, global_prefix);
++		out_prefix_pop(global_prefix);
++		OUT_P(global_prefix, "},\n");
++		break;
++	case BTF_KIND_ARRAY:
++		{
++			struct btf_array *array = (struct btf_array *)(type + 1);
++			const struct btf_type *content_type = btf__type_by_id(btf, array->type);
++
++			if (!content_type) {
++				OUT_P(prefix, "<invalid type_id %u>,\n", array->type);
++				return;
++			}
++
++			OUT_P(prefix, "(%s[]) {\n",
++				btf_typename_or_fallback(btf, content_type->name_off));
++			out_prefix_push(global_prefix);
++			out_btf_array(btf, type, data, global_prefix);
++			out_prefix_pop(global_prefix);
++			OUT_P(global_prefix, "},\n");
++		}
++		break;
++	case BTF_KIND_TYPEDEF:
++	case BTF_KIND_VOLATILE:
++	case BTF_KIND_CONST:
++	case BTF_KIND_RESTRICT:
++		{
++			int actual_type_id = btf__resolve_type(btf, type_id);
++
++			if (actual_type_id < 0) {
++				OUT_P(prefix, "<invalid type_id %u>,\n", type_id);
++				return;
++			}
++
++			return out_btf_dump_type(btf, 0, actual_type_id, data,
++				len, prefix);
++		}
++		break;
++	case BTF_KIND_INT:
++		out_btf_int(btf, type, bit_offset, data, prefix);
++		break;
++	case BTF_KIND_PTR:
++		out_btf_ptr(btf, type, data, prefix);
++		break;
++	case BTF_KIND_ENUM:
++		out_btf_enum(btf, type, data, prefix);
++		break;
++	case BTF_KIND_ENUM64:
++		out_btf_enum64(btf, type, data, prefix);
++		break;
++	case BTF_KIND_FWD:
++		OUT_P(prefix, "<forward kind invalid>,\n");
++		break;
++	case BTF_KIND_UNKN:
++		OUT_P(prefix, "<unknown>,\n");
++		break;
++	case BTF_KIND_VAR:
++	case BTF_KIND_DATASEC:
++	default:
++		OUT_P(prefix, "<unsupported kind %u>,\n",
++			BTF_INFO_KIND(type->info));
++		break;
++	}
++}
++
++static void out_bpf_sk_storage(int map_id, const void *data, size_t len,
++	out_prefix_t *prefix)
++{
++	uint32_t type_id;
++	struct bpf_sk_storage_map_info *map_info;
++
++	map_info = bpf_map_opts_get_info(map_id);
++	if (!map_info) {
++		OUT_P(prefix, "map_id: %d: missing map info", map_id);
++		return;
++	}
++
++	if (map_info->info.value_size != len) {
++		OUT_P(prefix, "map_id: %d: invalid value size, expecting %u, got %lu\n",
++			map_id, map_info->info.value_size, len);
++		return;
++	}
++
++	type_id = map_info->info.btf_vmlinux_value_type_id ?: map_info->info.btf_value_type_id;
++
++	OUT_P(prefix, "map_id: %d [\n", map_id);
++	out_prefix_push(prefix);
++
++	out_btf_dump_type(map_info->btf, 0, type_id, data, len, prefix);
++
++	out_prefix_pop(prefix);
++	OUT_P(prefix, "]");
++}
++
+ static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
+ {
+-	struct rtattr *tb[SK_DIAG_BPF_STORAGE_MAX + 1], *bpf_stg;
+-	unsigned int rem;
++	struct rtattr *tb[SK_DIAG_BPF_STORAGE_MAX+1], *bpf_stg;
++	out_prefix_t *global_prefix = &out_global_prefix;
++	unsigned int rem, map_id;
++	struct rtattr *value;
+ 
+ 	for (bpf_stg = RTA_DATA(bpf_stgs), rem = RTA_PAYLOAD(bpf_stgs);
+ 		RTA_OK(bpf_stg, rem); bpf_stg = RTA_NEXT(bpf_stg, rem)) {
+@@ -3583,8 +4115,15 @@ static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
+ 			(struct rtattr *)bpf_stg);
+ 
+ 		if (tb[SK_DIAG_BPF_STORAGE_MAP_ID]) {
+-			out("map_id:%u",
+-				rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]));
++			out("\n");
++
++			map_id = rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]);
++			value = tb[SK_DIAG_BPF_STORAGE_MAP_VALUE];
++
++			out_prefix_push(global_prefix);
++			out_bpf_sk_storage(map_id, RTA_DATA(value),
++				RTA_PAYLOAD(value), global_prefix);
++			out_prefix_pop(global_prefix);
+ 		}
+ 	}
+ }
+@@ -5978,6 +6517,11 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	if (oneline && (bpf_map_opts.nr_maps || bpf_map_opts.show_all)) {
++		fprintf(stderr, "ss: --oneline, --bpf-maps, and --bpf-map-id are incompatible\n");
++		exit(-1);
++	}
++
+ 	if (show_processes || show_threads || show_proc_ctx || show_sock_ctx)
+ 		user_ent_hash_build();
+ 
+-- 
+2.43.0
+
 
