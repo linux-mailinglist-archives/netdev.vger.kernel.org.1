@@ -1,110 +1,98 @@
-Return-Path: <netdev+bounces-51710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D90637FBD31
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:51:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72BFC7FBD49
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 15:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1605B1C20CBA
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 14:51:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E643282E59
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 14:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF5B5B5C4;
-	Tue, 28 Nov 2023 14:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4405C062;
+	Tue, 28 Nov 2023 14:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pGA1AxnE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WgHfHB3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6682D5D
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 06:51:13 -0800 (PST)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5cca00db7f0so55820817b3.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 06:51:13 -0800 (PST)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470C61735
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 06:54:13 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1cfaf05db73so157225ad.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 06:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701183073; x=1701787873; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701183253; x=1701788053; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mtKmT2DzohXXoeUBiHE1NcptmxFv6Dlq3tIhE5fHNKY=;
-        b=pGA1AxnEi0vbxlKeQTOZmHBhbdAZg/XT8T/uVzs6SlTOCS/gE09/1JHaHENUP8BHvw
-         916kqWzTq4du3rRsYUDSkMsQBjPh9uy/YkqA80Fsq80SFqKtgx997MrvEtxQpPjkogt9
-         lx445AtC7C9M2jnZgQhmpS+C9s3lXBsqldeMwOBu3RodutPKgzlCx+OkI8cz1389e63P
-         S/11yo5yDQTzAnMDfqxW2Rgn3ScLkTvFa3bhIuQdJug0OGgY5l3WjTNVG6P9E1s8ZwI5
-         L3RF42wP0Z9nsIDoU3/Rh53QEhjdPSYHuYloEHQQMHH/hrPNiaARB/DA2sVjxbDEauUu
-         YxlQ==
+        bh=Vsh2mMUKOXR8rABG0J7/JCsvNsJy41xjQD3uPT5bxQQ=;
+        b=WgHfHB3gtR4cQNfCXmT6g5D69yDeXnejdR9BJtKnJkXs8TBpaYH7O/2KKBSFlhsKui
+         lmUVfK4uoM2Fn9M5TbUcyzZ2zCKz+sz2sM2svN8wAPJOaaQ+asuUVSrzi5WHn/lbFu9f
+         806fxUWYtNJ3SnAAEJ3IFeATf/fFl/gJxZRYZcBxw2In+eoY3y96YqgXG0WnBBdZaVLL
+         Ab9PdDVnHJvuGfnG/Kv3cBPn/L+w4V1MMgDxTFV3gaEhzqLjUTvwa5MdNBPKCgoPIKTr
+         GKyZ8u5lWFTP4+cJGmFdJP/cRUDEVVsDq0oLU7MlkXVtSq3h0EGpq6zYe9rTY2Htq+iq
+         RB7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701183073; x=1701787873;
+        d=1e100.net; s=20230601; t=1701183253; x=1701788053;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mtKmT2DzohXXoeUBiHE1NcptmxFv6Dlq3tIhE5fHNKY=;
-        b=rlXct/1u8Fu+sJwnyQKIgKBfZVVdIukCnz4+s//fCMpMnlKKIDnEP3YQIO51LeUZv+
-         4XbfyPU9xOvNZpeSSPNyWpZQinVAommlkrbbuSSFZvP32lNXGO03tj4WqMQA03Shz/8o
-         vN3+V4lgNKbRkVVbXTe+aRgfN8ZW3XWLPvSKYh1vvMdCFsezUQAzNiAkMo5ECawAgBjS
-         EOzkvWSenaWVrVWbiWpDk6WfMXQ44zUdtnQY4cB6C2bMXK9CNatc7Ce4ehSjnAu6+I16
-         9dSi1C30x8WpljGZQXH8ZODSqeJ3zQGa56jNFzMqM2os6nzMGUENpsY70f4QwfecYIzG
-         fa8g==
-X-Gm-Message-State: AOJu0YyUAmDnBv6LPiwF4/tYDVncne51AWQUN6HuJj6oCd86TXRKBfp9
-	zS+lbLdqOMir2fmgP4s6Bu1PhANFaB0oBlbTvaH+og==
-X-Google-Smtp-Source: AGHT+IFicSzJpbzDad6aZAB4TqQT3PWofoExEOGqMaEEhn64uKOyh66vKgcpu9+rbTZ3JgFvV5lGar3bJdV2yzjDIas=
-X-Received: by 2002:a05:690c:2d87:b0:5ce:98c8:df07 with SMTP id
- er7-20020a05690c2d8700b005ce98c8df07mr11919406ywb.26.1701183073137; Tue, 28
- Nov 2023 06:51:13 -0800 (PST)
+        bh=Vsh2mMUKOXR8rABG0J7/JCsvNsJy41xjQD3uPT5bxQQ=;
+        b=vlYZahjCVgeP2PWMaV5hXLBKTX7cpD6VtOUomGfzUy8iQGfaKnS3SNxIq6bDHuKTkd
+         Yy33d8hWAeMIToUZJ67UoJC6F8B6orv8ONNp7OVgfygLGSqIzRj+Qw9Daqb1Jzg/2J2Y
+         Ivn/0XjPUeOW8q4GIkzVcGNVuG+Ny8FkyQl8LwG1iPzFlCXx+vlKCzJHpdb+iF41HGSJ
+         jz4CR+qa51Bk8wz80TEgxBtrozgnSjlThTc2kxmNOtwZyp9S97XkeFjGsHdcmrXmQQFm
+         X2soER+TyJW37BGg9r0sB4ECzWUJ3MDwEr4o9BQrG5zm1qjBbPUOw/6F/OsF9xNOjpIK
+         32EQ==
+X-Gm-Message-State: AOJu0YwAiGICa+43sluwbJGZ8jyITeVvT+4NMMCogSSZ4tI8fD2xXQsa
+	wRqRfLQvNcusLhWOGZSDAuMzR5gwdJz9I186zAKdoA==
+X-Google-Smtp-Source: AGHT+IGa7uI6oT3u3fJpJBJLDKtUv6BkE/bZhI/Oz3lcbQXkUrx2pktUUQxDz/STXFo5kafOwENu7BifWcNK7JUsFF0=
+X-Received: by 2002:a17:903:4d1:b0:1cf:a032:aeff with SMTP id
+ jm17-20020a17090304d100b001cfa032aeffmr891111plb.11.1701183252371; Tue, 28
+ Nov 2023 06:54:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128132534.258459-1-herve.codina@bootlin.com>
- <17b2f126-f6a4-431c-9e72-56a9c2932a88@sirena.org.uk> <CACRpkda5VMuXccwSBd-DBkM4W7A1E+UfZwBxWqtqxZzKjrqY4A@mail.gmail.com>
- <511c83d1-d77f-4ac0-927e-91070787bc34@sirena.org.uk>
-In-Reply-To: <511c83d1-d77f-4ac0-927e-91070787bc34@sirena.org.uk>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 28 Nov 2023 15:51:01 +0100
-Message-ID: <CACRpkdYmN4318b1wXwUOeFjPN0S2w8M9FpXHOs3LtFa+XoTxVw@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Add support for framer infrastructure and PEF2256 framer
-To: Mark Brown <broonie@kernel.org>
-Cc: Herve Codina <herve.codina@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <00000000000029fce7060ad196ad@google.com> <20231124182844.3d304412@kernel.org>
+In-Reply-To: <20231124182844.3d304412@kernel.org>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Tue, 28 Nov 2023 15:54:00 +0100
+Message-ID: <CANp29Y77rtNrUgQA9HKcB3=bt8FrhbqUSnbZJi3_OGmTpSda6A@mail.gmail.com>
+Subject: Re: [syzbot] Monthly net report (Nov 2023)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot <syzbot+listaba4d9d9775b9482e752@syzkaller.appspotmail.com>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 28, 2023 at 3:41=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
-te:
-> On Tue, Nov 28, 2023 at 03:26:56PM +0100, Linus Walleij wrote:
-> > On Tue, Nov 28, 2023 at 3:03=E2=80=AFPM Mark Brown <broonie@kernel.org>=
- wrote:
+On Sat, Nov 25, 2023 at 3:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> > > If this gets applied it'd be good to get a signed tag based off Linus=
-'
-> > > tree so things that depend on it can be pulled into other trees (eg, =
-the
-> > > ASoC mapping for the framer).
+> On Thu, 23 Nov 2023 05:12:23 -0800 syzbot wrote:
+> > <8>  240     Yes   BUG: corrupted list in p9_fd_cancelled (2)
+> >                    https://syzkaller.appspot.com/bug?extid=3D1d26c4ed77=
+bc6c5ed5e6
 >
-> > Do you mean my pin control tree or the big penguins tree? :D
-> > (I'm guessing mine.)
+> One nit - p9 is not really net.
+
+At least it's not reflected in MAINTAINERS:
+
+$ ./scripts/get_maintainer.pl --nom --nor ./net/9p/
+v9fs@lists.linux.dev (open list:9P FILE SYSTEM)
+netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
+linux-kernel@vger.kernel.org (open list)
+
+Maybe it could be worth it to add "X: net/9p/" to "NETWORKING [GENERAL]"?
+Syzbot would then eventually also pick up the change.
+
+--=20
+Aleksandr
+
 >
-> I actually meant mainline there.
-
-Ah based off, not residing in. My bad.
-
-> > I thought this thing would be merged primarily into the networking
-> > tree, and I don't know if they do signed tags, I usually create an
-> > immutable branch but that should work just as fine I guess.
+> Thanks again for restarting the reports!
 >
-> Right, I'd expect a signed tag on the immutable branch - it's generally
-> helpful to avoid confusion about the branch actually being immutable.
-
-Makes sense, best to create that in the netdev tree if possible
-I guess.
-
-Yours,
-Linus Walleij
 
