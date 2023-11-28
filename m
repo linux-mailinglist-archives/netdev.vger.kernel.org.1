@@ -1,202 +1,126 @@
-Return-Path: <netdev+bounces-51497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580FE7FAEE5
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:16:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE5A7FAEF3
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837AC1C20A04
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:16:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADDF11C20A71
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8705636C;
-	Tue, 28 Nov 2023 00:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310DB7EB;
+	Tue, 28 Nov 2023 00:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="afUkGzCX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hW0dZeRH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 417151B1
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:15:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701130557; x=1732666557;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=eg5Ei2n6dao9SYBJ/2r6EUjDxL1Y9wvvcWlwMc7aU0Q=;
-  b=afUkGzCXAX/XMShZhZk1WEsGLfEnInznyewswfVJJS6k5qOnIOrSnSnG
-   ED0x/CrwNnU77IltT279VfK063j7kfy1sDST9I1FsF+K87gtxUM517w8L
-   yhgeUsUFJ7cVw+4PjVIDfZ3kaH3Mbs44AzxNyeDRMTX2QTGsrlVrXOce3
-   yAFfbjUN7Rgvr0IWAXIXp2NPc9ZFzI8c9yrR/4z00mRBEU8EsRkisiELX
-   QNH/Gb6XMEG7XQoQbZnmtT5SZEAIIgqJOIWfr/P2b90cFv+TzPfQpjw8d
-   kApXwfGSU8XWTKzrjRfiYUCJXszkapghBZLW/SkRu7gwldklRb44b8n1x
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="11513918"
-X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
-   d="scan'208";a="11513918"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 16:15:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="797409244"
-X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
-   d="scan'208";a="797409244"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2023 16:15:55 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 27 Nov 2023 16:15:54 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 27 Nov 2023 16:15:54 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 27 Nov 2023 16:15:54 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RZfMZ3uBdlEe0D8xdYeGcnUFB4J2Cm5z4FPpoiWmGmmmo3MKs5T6RdQYDUAtMT0WfZBBtgqrgh+9no8Qdf3L3X0nupDAverrbbMQqAaClysaC0pHK0nP4VBcckFJEOvPHdjOGwU+mfc6/9YTaaGEjwsLf0fgMzixINKDlBpx93pk8fprCYhB8InJifuRtvq75/Y9R8NQfLxPcVQRok/MpYwY4CuVuvAQcyrEexPz4RBdcxoqR7CpIS2stcYN8pltHrSl2c6IzWrZvxDE7XTy9Q83ushvORmRq8dEGpFz0vxl12SAhbxENNk4m8G+9xdHpKxheo0tQbupWKXKFTfSpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=el4psocP/UHRkOFJrb1//G6n8AFNBXwZKegqA45kDeY=;
- b=ff9f0np7qfY/+kJ7CsVus1PQHu3/Pa1xKflcbqrLNn2E7XARzbXDdtlM1ycfMqkb4t+bv8xIIgDTfODv1pFl0m5UYMliOpUlnCLsepScSyZk7AlejDxRDYy16lELCrVaJSxAiHzUNEPbMhkKKDNLNz2CUnILfcQ6c9HRT7IHRpko1J2ui3e1uBhMyGV6qHQyJmMy8s0PWNCu/rmZHFdZTqIbN5Wb5s5IyRAJ3qUrOmPvvq4GRDYUFbekjJDicFAOj4pou4aUFbPoPHKBd9+gYbiGwOddi3vC37QEp8m6yWpFnha18f0UVsbWnPJsBe2hwEHnIL9GgdmnEnS6Mt7/Rw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3175.namprd11.prod.outlook.com (2603:10b6:a03:7c::23)
- by SA2PR11MB5145.namprd11.prod.outlook.com (2603:10b6:806:113::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 28 Nov
- 2023 00:15:52 +0000
-Received: from BYAPR11MB3175.namprd11.prod.outlook.com
- ([fe80::124:ae3c:93d1:981b]) by BYAPR11MB3175.namprd11.prod.outlook.com
- ([fe80::124:ae3c:93d1:981b%7]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
- 00:15:52 +0000
-Message-ID: <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
-Date: Mon, 27 Nov 2023 16:15:47 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Jiri Pirko <jiri@resnulli.us>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
-	<qi.z.zhang@intel.com>, Wenjun Wu <wenjun1.wu@intel.com>,
-	<maxtram95@gmail.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, <pabeni@redhat.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
- <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
- <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
- <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
- <ZOcBEt59zHW9qHhT@nanopsycho>
- <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
- <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
- <20231118084843.70c344d9@kernel.org>
- <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
- <20231122192201.245a0797@kernel.org>
-Content-Language: en-US
-From: "Zhang, Xuejun" <xuejun.zhang@intel.com>
-In-Reply-To: <20231122192201.245a0797@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0164.namprd03.prod.outlook.com
- (2603:10b6:303:8d::19) To BYAPR11MB3175.namprd11.prod.outlook.com
- (2603:10b6:a03:7c::23)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178151B1;
+	Mon, 27 Nov 2023 16:20:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3rCiSJ0JteV9fXbkXFk1duODECuXLFBCy7Ih056e2Wc=; b=hW0dZeRHACO/frHZ9YnX3eoLtx
+	ZG4ktbt2J7QdboYO3eTqrtkBibe95L41acOPNsXyHMn18Tcb4nOT/FUxsSZ4TCrDrEGGdm3h96IKk
+	dUWHSEb2dcLSLRLxSlaIuQDe25Ra/l8MSE+VbSNVoGi8Q3oHYvX4dFWWcxVE1XmvLONU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r7lpj-001OoV-D5; Tue, 28 Nov 2023 01:20:11 +0100
+Date: Tue, 28 Nov 2023 01:20:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next PATCH RFC v3 0/8] net: phy: Support DT PHY package
+Message-ID: <a29b1106-87a6-4ea2-bb1d-9858f9ab425b@lunn.ch>
+References: <20231126015346.25208-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3175:EE_|SA2PR11MB5145:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a57de07-9b7d-420f-bf2d-08dbefa72e6e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FGX5r9pew1o3Sq3U5Fpv+QRgqGGm7nkmbFgftJH5e8r08SYHihLPghA1BCnCHOwwjfOD/2y9XM+Zx1kO7+Hk9y+V9NArobm6ciqNQWZHO91fIVh4CEw7m33UZpFFYTlOeUSCV4oobTrWMPIzv4AwRLgG715BOysX8r6A04xaaCTUKSgyLAAT7cdZ04TM9/7yUWfcrVta72pJHXpRwjoPTW10A+JjF5ahL6caCMqYHy3VWxVVXT/rfQMJFXbv2SkMU4J7ozvZJQk+MObJ4EO43gVKdGYIBt2fAuGU4kPtMNnQ8xJZxjnKNL+k3gDCwJDr9+GirirYDi/eAW/jCGLH7FFb1u2sNopxYOTWC1gVRBuCD6zvSQpDE8Agze86VndT8uj+Ycn9KRUPZyygHT/LeVY4oszAs4FZthk74iwTlxdUEjvgAGFx9KcVD2XvVQKOI/A/1dx5HI5Il1y5dFVN7oSpaWMusi93oQpRQnCLrQ1uLaJWKrt2A8j9v35qe5iVcHvVOt4yQlVQvN8d2lUwt7mpBNqF0YMlZTc29rUYqPVuWXzJVF5JBhdiNEjledsbmyDEi4jiF5kRhd5mlxZAgyWUu5hGB5NRcYp5IJ8bEYpn3eNCZWmAhKvQqBQO8sRPQwagc+EUSds8jG9XJ35nLg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3175.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(376002)(39860400002)(366004)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(38100700002)(36756003)(82960400001)(86362001)(31696002)(54906003)(316002)(6916009)(66556008)(66476007)(8936002)(8676002)(41300700001)(66946007)(6512007)(53546011)(6666004)(6506007)(478600001)(6486002)(4326008)(5660300002)(2906002)(31686004)(26005)(2616005)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VHVxd2E0Uyt2ZXdXaXVrZHhiZTA0ZUVMaVlBYUJwSnJMalJteVB6cmJBWUo1?=
- =?utf-8?B?d3p1aHRJcS9tclJvZ3ZZOVF4L1BreTd0YlM4ODZ3TVhlQkZHTWlpVGhwZ3lv?=
- =?utf-8?B?cXdQSW9BTEpzcWtQQWlqdEJrK3ZzbFc3WnhlVTJXOVFrNENkME9iUk9aVEtP?=
- =?utf-8?B?YlE5L0xVckg5VnFyQkw4OTU1TUdpMjU2bWlCWU1pVFZ3a0xqaS83TENjdG42?=
- =?utf-8?B?TVUrWTBGQmRNVHpLeVMwMWxuOEU3Qk1EU1g0aFY3a2RXc3k5aGRXbGZuTGxR?=
- =?utf-8?B?dnBNNXlRMnpHSEhieE9nZkNWT0NFTlBiR2ppdXVkUUc0REowbWNEVDVhSi91?=
- =?utf-8?B?VEdtK3lKaVp5bDRUSWNoSGNNdGFSc1JhV0V6dFRTMmRsS00rOHhsWlMxTUtu?=
- =?utf-8?B?bE13UmxRT011UlBhWUtoeWVDVXkrYjE3QWVLOTFWL3lSalBTR3pDaUhqUlll?=
- =?utf-8?B?TnNGb0lJUFlWQlJVdEhuSFMyMG1aZDNTUE5SK3c1eW4vRzdvUXgzQVMweUw4?=
- =?utf-8?B?eXdZamt4dFZINzhGYkIyYVdtT3pqZDVDTFdmbE96Uk5JbTQvZ3hOTURHZ1Vw?=
- =?utf-8?B?K1g3SDVGcWEwWGJ4SWF0K3J6eUZtcHBLbXROSjgvcDg0TTVkTHFsWCtRMDYz?=
- =?utf-8?B?SUdmNk8wUU9Qc3ZxMmplL21Ib2F0aWN3OC9RMEtqU2FvbVBlazFMY2FGMmN0?=
- =?utf-8?B?cWhrRGI3bVNxZDl3U3k5M3dlaFVsK2hCcllHZ2tUZGFhS2s0amtoazMrcUMz?=
- =?utf-8?B?NXZUdnFtSWNjV1RPRWpLTlFsbENPL0dBRmJCSVcxNitlSW5ReG5PdFV2bFZZ?=
- =?utf-8?B?akhwYlk4aGhlUEw4cWx3UG52bDZTL3BMS1RFaEFkME55dm1sa0FTTVBVdC92?=
- =?utf-8?B?NExGQzNZdmd3S0c4WVNGVU9BamliLzZ1dUFvbnE0TFgwNWJnTTRUWFNIUUJz?=
- =?utf-8?B?N3o0dzlnVTFjQWZ3dFo2aGRHRnYzTHd4RWhZMWlwTDhBQ2I4S1cvMTlHRjJq?=
- =?utf-8?B?MWZNMEpidVl4ODJ3QVJqRC9GK1JlbFR3WUxGeWdhVUwxWHRwWUxCUTUrNmFl?=
- =?utf-8?B?VWZtaVhwbnNuZDB3WGdVMU1sOEJMNlo2T0VmODJtbWIyeGtrS21XdXhuMWkr?=
- =?utf-8?B?T0hzalNUOVBDcmZmajNZMWdxem1UZ2FqeE0rU3U0UEdXSE9zUFNTR1Z6Ry9u?=
- =?utf-8?B?UGdpdGhOenZKY2ZsU2grZDh6emZHNmVyQzAwTklySGpPVE1oMzNRUVlsckwz?=
- =?utf-8?B?RDNXeVdzYzRYb3k3TElvdlFNZ29DOE1Pb1cvUnQzb1pFTHRzdkRiZVVNT2Jr?=
- =?utf-8?B?Q09vSjdwRnFuMERiMGNwUHd5YmNhY2N4VWF2SVNkY1hWM0MrVVd1SHF6Ukhk?=
- =?utf-8?B?enQ5Mzg3aDFyc3prSHFCRks0UWoybXQ3Wmp2YjZMejMzbFFBNURiemZKVkNr?=
- =?utf-8?B?MkxCTEQvTUNsWFdBQ1RNZFNYZzZ5cmFuU0Q3YzluN29hdDVqODhSMHoxbEZv?=
- =?utf-8?B?WDZJT1Z3aG1kK3A1eUpraktCNGJRRkJEN0tYYURnNEtaSEhmYmhzRmVzWmZt?=
- =?utf-8?B?WHloTmMwWlRsQUVQaWJBcXBLYmR4WmRMM2NPZU91cGxnOGEyMzcra2pmcngz?=
- =?utf-8?B?ajZqdDhlbGpCVnM2SzdPaldKK1A5T2tNRnl6WWwzeU1PQ0hVWkd6YlBYLzcx?=
- =?utf-8?B?UDBzdlplZUlwQ1FORFpuWEs2YmpEQ21vK2FtK3ZSQkxKcWZ0akVNeFdlRjVW?=
- =?utf-8?B?MElqQWthekkySXQ2Zmg3M3NCOUV0SEtyL0hWLzZZNTJkZlVyclpKL1AwN0ZY?=
- =?utf-8?B?SWltcVFqdzBUUGpMdm52ZlNJZDhjUERnM1RDZXFqNWgrbHFkeDVxaVYySDJh?=
- =?utf-8?B?VjdqdmRONlQzSU55K25FZFE3enRlaDBUYXZBekR4bHdieUt4UzY4ckJXNzVB?=
- =?utf-8?B?dXUydjhxa0tiS0daTEdGZER5NUczTHFNbUxyVXVpZ1FQT1gyOVNTamJpSTM0?=
- =?utf-8?B?SUVBaU1CcW9GcFR4dDQ0dFVWWDZoaXdJU2JzcmpWRjhMc1VSMVF1cFh4Q3pN?=
- =?utf-8?B?NnNsdWlsOHlQMkdmMHo2bDdwTHd3NUU4VlZqdXkvU09mNkJ0TEd0WXI5Nmxy?=
- =?utf-8?Q?ZpFe/Dqa/TlMZDPx8WBRd+t2H?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a57de07-9b7d-420f-bf2d-08dbefa72e6e
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3175.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 00:15:52.1965
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q6/PWOsRkygPFzYiMlMzfJHHXMx4krIESBZzBsxLs3oPY46Bwk+eiQgx3canG5KgRIvXEjfPtUiHuTywSNV/oA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5145
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231126015346.25208-1-ansuelsmth@gmail.com>
 
+On Sun, Nov 26, 2023 at 02:53:38AM +0100, Christian Marangi wrote:
+> This depends on another series for PHY package API change. [1]
+> 
+> Idea of this big series is to introduce the concept of PHY package in DT
+> and generalize the support of it by PHY driver.
+> 
+> The concept of PHY package is nothing new and is already a thing in the
+> kernel with the API phy_package_join/leave/read/write.
+> 
+> The main idea of those API is to permit the PHY to have a shared global
+> data and to run probe/config only once for the PHY package. There are
+> various example of this already in the kernel with the mscc, bcm54140
+> mediatek ge and micrle driver and they all follow the same pattern.
+> 
+> What is currently lacking is describing this in DT and better reference
+> the PHY in charge of global configuration of the PHY package. For the
+> already present PHY, the implementation is simple enough with only one
+> PHY having the required regs to apply global configuration.
+> 
+> This can be ok for simple PHY package but some Qcom PHY package on
+> ""modern"" SoC have more complex implementation. One example is the PHY
+> for qca807x where some global regs are present in the so-called "combo"
+> port and everything about psgmii calibration is placed in a 5th port in
+> the PHY package.
+> 
+> Given these additional thing, the original phy_package API are extended
+> with support for multiple global PHY for configuration. Each PHY driver
+> will have an enum of the ID for the global PHY to reference and is
+> required to pass to the read/write function.
 
-On 11/22/2023 7:22 PM, Jakub Kicinski wrote:
-> On Wed, 22 Nov 2023 14:19:14 -0800 Zhang, Xuejun wrote:
->> The proposed API would incur net/core and driver changes as follows
->> a) existing drivers with ndo_set_tx_maxrate support upgraded to use new
->> ndo_set_tx_rate
->> b) net sysfs (replacing ndo_set_maxrate with ndo_set_tx_rate with
->> minrate and burst set to 0, -1 means ignore)
->> c) Keep the existing /sys/class/net/ethx/queues/tx_nn/tx_maxrate as it
->> is currently
->> d) Add sysfs entry as /sys/class/net/ethx/queues/tx_nn/tx_minrate &
->> /sys/class/net/ethx/queues/tx_nn/burst
-> You described extending the sysfs API (which the ndo you mention
-> is for) and nothing about converging the other existing APIs.
-This is extension of ndo_set_tx_maxrate to include per queue parameters 
-of tx_minrate and burst.
+Please update the text. As far as i see, a lot of this is not relevant
+for this patch set. phy_package_join() etc has no relation to DT,
+since the driver knows how many devices are in its package, it knows
+its base address, etc.
 
-devlink rate api includes tx_maxrate and tx_minrate, it is intended for 
-port rate configurations.
+The DT is only about properties which are shared by all PHYs within
+the package, e.g reset, regulators, maybe the MODE_CFG register for
+this particular PHY package.
 
-With regarding to tc mqprio, it is being used to configure queue group 
-per tc.
+> 
+> On top of this, it's added correct DT support for describing PHY
+> package.
+> 
+> One example is this:
+> 
+>         ethernet-phy-package@0 {
+>             compatible = "ethernet-phy-package";
 
-For sriov ndo ndo_set_vf_rate, that has been used for overall VF rate 
-configuration, not for queue based rate configuration.
+This needs a compatible for this particular PHY package.
 
-It seems there are differences on intent of the aforementioned APIs.
+>             #address-cells = <1>;
+>             #size-cells = <0>;
+> 
+>             reg = <0>;
+>             qcom,package-mode = "qsgmii";
 
-Our use case here is to allow user (i.e @ uAPI) to configure tx rates of 
-max rate & min rate per VF queue.Hence we are inclined to 
-ndo_set_tx_maxrate extension.
+This property it not useful. Why PCA does it apply to, when there are
+two? It makes much more sense to describe the overall configuration
+mode, from which you can derive what interface mode each port should
+be using, and thus validate the phy-mode in DT.
 
+   Andrew
 
