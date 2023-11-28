@@ -1,201 +1,244 @@
-Return-Path: <netdev+bounces-51764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F2B7FBEFD
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:09:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1647FBF06
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 17:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C0E0B20D66
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:09:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD28828212A
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 16:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8327637D17;
-	Tue, 28 Nov 2023 16:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5FC37D20;
+	Tue, 28 Nov 2023 16:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="MO+W63+c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gXwkuVa3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EFC10CA
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 08:09:44 -0800 (PST)
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3142B3F888
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:09:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1701187783;
-	bh=pEKPe8cq8iCO+hKEkwpNbBcU/bv+bYZjuOAiUbbFTmw=;
-	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=MO+W63+cRGwvaE4iadeXs8g6lSdXYD0uaCAJFP2OmR646Nqa/dG88manE8XLAcFNv
-	 KNcD/k2aU9C4JeT1ogIenMQViV/yEX/bht/ONCcz7ThG0c7aPjpyBTASrUYC8jaL1w
-	 H0nrgwvZo3u3mpfzVilsNRYKdv6VKBJhnSqqXHumbWcLpiDOjjClndlSEnatXcCEGR
-	 w16TLE9arWTrZgUptVl3W7qjQXAfRBAip7XOQOa5Qf0/P0LWQ1ZuyC8cjxhtX9mehE
-	 0VjUJLxDfqNrWPzkcJAOzngL7N5DPWwosAeChUdlydiDguwswKbh8pflel0siTkWN3
-	 xSEk2QSQBNNfA==
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-677fb25cfe5so67509146d6.3
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 08:09:43 -0800 (PST)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FF410C
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 08:13:31 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so13536a12.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 08:13:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701188010; x=1701792810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6HAiJaJ81nPkAx4TWzWQNYYGYBn6gKBuQc3mNIcpl1w=;
+        b=gXwkuVa3pel40mtND5RY6TFEPpIE4+1Edrd7itN/I5Y8ygCnQA961C8Poc2uFsoTPm
+         L10Ml49G6dA+z0H7mai1l8wHi1Q0FfgxExk/+MQQsEotO9mIuxM+MpZQ7q7JvYKHhXpG
+         cktM+SXIRcvy3eLO/r+f3dm0GgQTjgB7rHjKGXnaPITrGzVo5AmN6+i2vm6RWjcXgTLV
+         XtvU5KjSuJaUkaYtxQJCJoRc3PEAjRL099+4jxt1LtvNSTPJYsVZ8fXxY0bzO+XOfUxG
+         5yaR7NjxT1kY3Z+UtNyWgzJ5sUyOblA/5pZ00YIANq4Owx42JcYTngFMCTUEROgqCcFw
+         +7yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701187782; x=1701792582;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pEKPe8cq8iCO+hKEkwpNbBcU/bv+bYZjuOAiUbbFTmw=;
-        b=MbToeM/dYNOx1gsWhIFWZ1Ahxa5ujLKVpj1snq51LZrlLZKmlK4ZaiCyPSDCvkL4DW
-         l34F51up1pxzt+H2zghkDZ+zTOLbrLsO+vbnNo9aJweb6hnfiEFltlpZPRZSeW7i7XJH
-         Hmv/bTJEVjMYB8Olp1Od/arG8DaInFXBi7nQD7yBs0fwSgjoaF0zRlh4lg3QxIiSrdY+
-         ZLMebh1AKymDDGve9WLVSDvXBJbIMvRoev8FesLafmDdvEL/py5NUnmN05irsMEPmVyF
-         QszG7H61Z3KFXvgJuHmv7xVNWn4VtpY5Ilp6T5/YN+AdGcKsI8oBsJLteq+7+EvCFFBf
-         ibmQ==
-X-Gm-Message-State: AOJu0YzJ+jaiMbTZTQn+IohVCRHEBE2If0ZJlAGnfhA+WTwM2QT5ASii
-	VOAljQnxb43sg16tQR00wHChrI752OTfYG9oxoDxLa/bGiXlXk0oObfJ+YDlajSVUHd8PXuG+xr
-	s9kw1ncjjdhxRxj1fKu2WCj41AqtD4oSIakYCNv4GlfuNrkdt2g==
-X-Received: by 2002:ad4:5144:0:b0:67a:3863:d126 with SMTP id g4-20020ad45144000000b0067a3863d126mr10046207qvq.44.1701187782201;
-        Tue, 28 Nov 2023 08:09:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGBKpSSFbtesM/25uZwKIDezsMT1jPt3i9azPNVI4N4TMfmDOkXhoCn8EiGeenreU73yagsK6uZPTXiBRU8kPg=
-X-Received: by 2002:ad4:5144:0:b0:67a:3863:d126 with SMTP id
- g4-20020ad45144000000b0067a3863d126mr10046174qvq.44.1701187781933; Tue, 28
- Nov 2023 08:09:41 -0800 (PST)
-Received: from 348282803490 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 28 Nov 2023 17:09:41 +0100
-From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-In-Reply-To: <054bbf2a-e7ba-40bf-8f8b-f0e0e9b396c6@collabora.com>
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
- <CAJM55Z9e=vjGKNnmURN15mvXo2bVd3igBA-3puF9q7eh5hiP+A@mail.gmail.com>
- <2f06ce36-0dc1-495e-b6a6-318951a53e8d@collabora.com> <CAJM55Z8vkMbqXY5sS2o4cLi8ow-JQTcXU9=uYMBSykwd4ppExw@mail.gmail.com>
- <054bbf2a-e7ba-40bf-8f8b-f0e0e9b396c6@collabora.com>
+        d=1e100.net; s=20230601; t=1701188010; x=1701792810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6HAiJaJ81nPkAx4TWzWQNYYGYBn6gKBuQc3mNIcpl1w=;
+        b=aF6jUGNUcq5UdNCf20gq+JoWsfQrxQf64/ic5XiNjkYhU0cR0frd4MKLv9LzIvZqda
+         kcQ6epekmPd17ZIkOUCUljfHB8dQilMQtnR2etvtoiv1F0i4NBsSC70oAOCETwIPx2Y/
+         msZKa/1OAwrcf0q4A8qzZty7Dbyr7XHTUxgRv7OjY5U/2Y2BM2kzigjZ5cqs/mn/IqA+
+         jz5UnaP/CbhhabdzL8WAhpq6o2gV9E2ghY2AIHeEEy8g//QW0YA0qSAnVIhycPiNVp/w
+         Itd1wCbrv8Y/gYvNdgF20pVoN+qpAZcuQjgkO3oYrOBpjHbzxMIqsxmj4FoDlzt+ai5R
+         MHAQ==
+X-Gm-Message-State: AOJu0YwSiSlnKYEDdikBnf6wJy4GQbNkQFgzcHI2cHmPazM8th72frVw
+	fkOA2PugfhgsUgvNlNQxC/ulROp1YeSAtiB1a+/MuVyVtYYb7tcpa5JZJQ==
+X-Google-Smtp-Source: AGHT+IEiirBI/2XlMdNDeM06+b78jtscApyohz83EpRau/0BtARpdn73o9VamOU1GWSFta4sUvO2UISrBrOlO8dIgcU=
+X-Received: by 2002:a05:6402:430e:b0:54b:67da:b2f with SMTP id
+ m14-20020a056402430e00b0054b67da0b2fmr399570edc.7.1701188010040; Tue, 28 Nov
+ 2023 08:13:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Tue, 28 Nov 2023 17:09:41 +0100
-Message-ID: <CAJM55Z9+j6CmfjNkPLCk1DR3EBuEMspsRtNvygDbPWJDCytQpw@mail.gmail.com>
-Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
- beaglev-starlight: Enable gmac
-To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+MIME-Version: 1.0
+References: <20231126151652.372783-1-syoshida@redhat.com> <CANn89iKcstKYWoqUCXHO__7PfVRMFNnN5nRQVCTAADvFbcJRww@mail.gmail.com>
+ <9daf8509e39cd20d9d806afdb425ad43af037f8d.camel@redhat.com> <CANn89iKO-5nwPAUtOzqRfqLhK77kgQB7Ep33rwFM+hgNKARLEw@mail.gmail.com>
+In-Reply-To: <CANn89iKO-5nwPAUtOzqRfqLhK77kgQB7Ep33rwFM+hgNKARLEw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 Nov 2023 17:13:16 +0100
+Message-ID: <CANn89iL0rj6zJYar9wwM3hGGwd60z_rZF6FoR47X4CYyiOt-VQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in ipgre_xmit()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Shigeru Yoshida <syoshida@redhat.com>, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Cristian Ciocaltea wrote:
-> On 11/28/23 14:08, Emil Renner Berthing wrote:
-> > Cristian Ciocaltea wrote:
-> >> On 11/26/23 23:10, Emil Renner Berthing wrote:
-> >>> Cristian Ciocaltea wrote:
-> >>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
-> >>>> RGMII-ID.
-> >>>>
-> >>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
-> >>>> yes, add the mdio & phy sub-nodes.
-> >>>
-> >>> Sorry for being late here. I've tested that removing the mdio and phy nodes on
-> >>> the the Starlight board works fine, but the rx-internal-delay-ps = <900>
-> >>> property not needed on any of my VisionFive V1 boards either.
-> >>
-> >> No problem, thanks a lot for taking the time to help with the testing!
-> >>
-> >>> So I wonder why you need that on your board
-> >>
-> >> I noticed you have a patch 70ca054e82b5 ("net: phy: motorcomm: Disable
-> >> rgmii rx delay") in your tree, hence I you please confirm the tests were
-> >> done with that commit reverted?
-> >>
-> >>> Also in the driver patch you add support for phy-mode = "rgmii-txid", but here
-> >>> you still set it to "rgmii-id", so which is it?
-> >>
-> >> Please try with "rgmii-id" first. I added "rgmii-txid" to have a
-> >> fallback solution in case the former cannot be used.
+On Tue, Nov 28, 2023 at 5:05=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Nov 28, 2023 at 4:51=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> > Ah, I see. Sorry I should have read up on the whole thread. Yes, the Starlight
-> > board with the Microchip phy works with "rgmii-id" as is. And you're right,
-> > with "rgmii-id" my VF1 needs the rx-internal-delay-ps = <900> property too.
->
-> That's great, we have now a pretty clear indication that this uncommon behavior
-> stems from the Motorcomm PHY, and *not* from GMAC.
->
-> >>
-> >>> You've alse removed the phy reset gpio on the Starlight board:
-> >>>
-> >>>   snps,reset-gpios = <&gpio 63 GPIO_ACTIVE_LOW>
-> >>>
-> >>> Why?
-> >>
-> >> I missed this in v1 as the gmac handling was done exclusively in
-> >> jh7100-common. Thanks for noticing!
-> >>
-> >>>>
-> >>>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-> >>>> ---
-> >>>>  arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts | 5 +++++
-> >>>>  1 file changed, 5 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
-> >>>> index 7cda3a89020a..d3f4c99d98da 100644
-> >>>> --- a/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
-> >>>> +++ b/arch/riscv/boot/dts/starfive/jh7100-beaglev-starlight.dts
-> >>>> @@ -11,3 +11,8 @@ / {
-> >>>>  	model = "BeagleV Starlight Beta";
-> >>>>  	compatible = "beagle,beaglev-starlight-jh7100-r0", "starfive,jh7100";
-> >>>>  };
-> >>>> +
-> >>>> +&gmac {
-> >>>> +	phy-mode = "rgmii-id";
-> >>>> +	status = "okay";
-> >>>> +};
-> >>>
-> >>> Lastly the phy-mode and status are the same for the VF1 and Starlight boards,
-> >>> so why can't these be set in the jh7100-common.dtsi?
-> >>
-> >> I wasn't sure "rgmii-id" can be used for both boards and I didn't want
-> >> to unconditionally enable gmac on Starlight before getting a
-> >> confirmation that this actually works.
-> >>
-> >> If there is no way to make it working with "rgmii-id" (w/ or w/o
-> >> adjusting rx-internal-delay-ps), than we should switch to "rgmii-txid".
+> > On Tue, 2023-11-28 at 16:45 +0100, Eric Dumazet wrote:
+> > > On Sun, Nov 26, 2023 at 4:17=E2=80=AFPM Shigeru Yoshida <syoshida@red=
+hat.com> wrote:
+> > > >
+> > > > In ipgre_xmit(), skb_pull() may fail even if pskb_inet_may_pull() r=
+eturns
+> > > > true. For example, applications can create a malformed packet that =
+causes
+> > > > this problem with PF_PACKET.
+> > > >
+> > > > This patch fixes the problem by dropping skb and returning from the
+> > > > function if skb_pull() fails.
+> > > >
+> > > > Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
+> > > > Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> > > > ---
+> > > >  net/ipv4/ip_gre.c | 3 ++-
+> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+> > > > index 22a26d1d29a0..95efa97cb84b 100644
+> > > > --- a/net/ipv4/ip_gre.c
+> > > > +++ b/net/ipv4/ip_gre.c
+> > > > @@ -643,7 +643,8 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *s=
+kb,
+> > > >                 /* Pull skb since ip_tunnel_xmit() needs skb->data =
+pointing
+> > > >                  * to gre header.
+> > > >                  */
+> > > > -               skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
+> > > > +               if (!skb_pull(skb, tunnel->hlen + sizeof(struct iph=
+dr)))
+> > > > +                       goto free_skb;
+> > > >                 skb_reset_mac_header(skb);
+> > > >
+> > > >                 if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL &&
+> > > > --
+> > >
+> > >
+> > > I have syszbot reports with an actual repro for this one.
 > >
-> > Yeah, I don't exactly know the difference, but both boards seem to work fine
-> > with "rgmii-id", so if that is somehow better and/or more correct let's just go
-> > with that.
+> > Could you please share them? I could not find easily the reports in
+> > https://syzkaller.appspot.com/upstream
 >
-> As Andrew already pointed out, going with "rgmii-id" would be the recommended
-> approach, as this passes the responsibility of adding both TX and RX delays to
-> the PHY.  "rgmii-txid" requires the MAC to handle the RX delay, which might
-> break the boards having a conformant (aka well-behaving) PHY.  For some reason
-> the Microchip PHY seems to work fine in both cases, but that's most likely an
-> exception, as other PHYs might expose a totally different and undesired
-> behavior.
+> Stack trace looks like the following:
 >
-> I will prepare a v3 soon, and will drop the patches you have already submitted
-> as part of [1].
+> skbuff: skb_under_panic: text:ffffffff845f50a0 len:920 put:20
+> head:ffff888171931000 data:ffff888171930ff8 tail:0x390 end:0x680
+> dev:gre4
+> ------------[ cut here ]------------
+> kernel BUG at net/core/skbuff.c:120 !
+> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+> CPU: 0 PID: 12705 Comm: kworker/0:0 Not tainted
+> 6.1.43-syzkaller-00022-g8f46c3493178 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine,
+> BIOS Google 10/09/2023
+> Workqueue: mld mld_ifc_work
+> RIP: 0010:skb_panic net/core/skbuff.c:120 [inline]
+> RIP: 0010:skb_under_panic+0x14c/0x150 net/core/skbuff.c:130
+> Code: 60 98 da 85 48 c7 c6 05 6b 2f 86 48 8b 55 c0 8b 4d d4 44 8b 45
+> d0 4c 8b 4d c8 53 41 55 41 54 41 57 e8 fc db f4 00 48 83 c4 20 <0f> 0b
+> 66 90 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 18 41
+> RSP: 0018:ffffc9000551f0a0 EFLAGS: 00010286
+> RAX: 0000000000000087 RBX: ffff888162226000 RCX: 98ecdd4da3f28000
+> RDX: 0000000000000000 RSI: 0000000000000400 RDI: 0000000000000000
+> RBP: ffffc9000551f0e0 R08: ffffffff815a9ea5 R09: fffff52000aa3dad
+> R10: 0000000000000000 R11: dffffc0000000001 R12: 0000000000000390
+> R13: 0000000000000680 R14: dffffc0000000000 R15: ffff888171930ff8
+> FS: 0000000000000000(0000) GS:ffff8881f7000000(0000) knlGS:00000000000000=
+00
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000001b2f421000 CR3: 000000010f5a3000 CR4: 00000000003506b0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> skb_push+0xf3/0x120 net/core/skbuff.c:2181
+> iptunnel_xmit+0x2d0/0x940 net/ipv4/ip_tunnel_core.c:67
+> ip_tunnel_xmit+0x218f/0x2ae0 net/ipv4/ip_tunnel.c:813
+> __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+> ipgre_xmit+0x7ac/0xaa0 net/ipv4/ip_gre.c:661
+> __netdev_start_xmit include/linux/netdevice.h:4908 [inline]
+> netdev_start_xmit include/linux/netdevice.h:4922 [inline]
+> xmit_one net/core/dev.c:3602 [inline]
+> dev_hard_start_xmit+0x1de/0x630 net/core/dev.c:3618
+> __dev_queue_xmit+0x18c0/0x3700 net/core/dev.c:4268
+> dev_queue_xmit include/linux/netdevice.h:3076 [inline]
+> neigh_direct_output+0x17/0x20 net/core/neighbour.c:1592
+> neigh_output include/net/neighbour.h:552 [inline]
+> ip6_finish_output2+0x104a/0x1820 net/ipv6/ip6_output.c:134
+> __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+> ip6_finish_output+0x5d9/0xb60 net/ipv6/ip6_output.c:206
+> NF_HOOK_COND include/linux/netfilter.h:294 [inline]
+> ip6_output+0x1f7/0x4d0 net/ipv6/ip6_output.c:227
+> dst_output include/net/dst.h:444 [inline]
+> NF_HOOK include/linux/netfilter.h:305 [inline]
+> mld_sendpack+0x803/0xe40 net/ipv6/mcast.c:1820
+> mld_send_cr net/ipv6/mcast.c:2121 [inline]
+> mld_ifc_work+0x7dc/0xba0 net/ipv6/mcast.c:2653
+> process_one_work+0x73d/0xcb0 kernel/workqueue.c:2299
+> worker_thread+0xa60/0x1260 kernel/workqueue.c:2446
+> kthread+0x26d/0x300 kernel/kthread.c:376
+> ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+> </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:skb_panic net/core/skbuff.c:120 [inline]
+> RIP: 0010:skb_under_panic+0x14c/0x150 net/core/skbuff.c:130
+> Code: 60 98 da 85 48 c7 c6 05 6b 2f 86 48 8b 55 c0 8b 4d d4 44 8b 45
+> d0 4c 8b 4d c8 53 41 55 41 54 41 57 e8 fc db f4 00 48 83 c4 20 <0f> 0b
+> 66 90 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 18 41
+> RSP: 0018:ffffc9000551f0a0 EFLAGS: 00010286
+> RAX: 0000000000000087 RBX: ffff888162226000 RCX: 98ecdd4da3f28000
+> RDX: 0000000000000000 RSI: 0000000000000400 RDI: 0000000000000000
+> RBP: ffffc9000551f0e0 R08: ffffffff815a9ea5 R09: fffff52000aa3dad
+> R10: 0000000000000000 R11: dffffc0000000001 R12: 0000000000000390
+> R13: 0000000000000680 R14: dffffc0000000000 R15: ffff888171930ff8
+> FS: 0000000000000000(0000) GS:ffff8881f7000000(0000) knlGS:00000000000000=
+00
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000001b2f421000 CR3: 000000010f5a3000 CR4: 00000000003506b0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Sounds good. Then what's missing for ethernet to work is just the clock patches:
-https://github.com/esmil/linux/commit/b5abe1cb3815765739aff7949deed6f65b952c4a
-https://github.com/esmil/linux/commit/3a7a423b15a9f796586cbbdc37010d2b83ff2367
+It looks like the repro I had was fixed by "#syz fix: bonding: stop
+the device in bond_setup_by_slave()"
 
-You can either include those as part of your patch series enabling ethernet, or
-they can be submitted separately with the audio clocks. Either way is
-fine by me.
+(I am not sure, I have to double check)
 
-/Emil
-
->
-> Thanks again for your support,
-> Cristian
->
-> [1]: https://lore.kernel.org/all/20231126232746.264302-1-emil.renner.berthing@canonical.com/
+# See https://goo.gl/kgGztJ for information about syzkaller reproducers.
+#{"repeat":true,"procs":1,"slowdown":1,"sandbox":"","sandbox_arg":0,"close_=
+fds":false}
+socket$inet(0x2, 0x2, 0x0)
+r0 =3D socket(0x200000000000011, 0x4000000000080002, 0x0)
+r1 =3D socket$netlink(0x10, 0x3, 0x0)
+r2 =3D socket$netlink(0x10, 0x3, 0x0)
+r3 =3D socket(0x10, 0x803, 0x0)
+sendmsg$NL80211_CMD_CRIT_PROTOCOL_START(r3, &(0x7f0000000580)=3D{0x0,
+0x0, &(0x7f0000000540)=3D{0x0, 0x1c}}, 0x0)
+getsockname$packet(r3, &(0x7f0000000600)=3D{0x11, 0x0, <r4=3D>0x0, 0x1,
+0x0, 0x6, @broadcast}, &(0x7f0000000080)=3D0x14)
+sendmsg$nl_route(r2, &(0x7f0000000040)=3D{0x0, 0x0,
+&(0x7f0000000000)=3D{&(0x7f0000000340)=3DANY=3D[@ANYBLOB=3D"3c0000001000850=
+600002000fe612233ca000800",
+@ANYRES32=3Dr4, @ANYBLOB=3D"2377f29e252155b21c0012000c000100626f6e640000000=
+00c000200080001000134e7307075a7cc6d2dba6e4dce25f18968dd3d6f77199cd06d7a4cfc=
+dc99dcfd5ec3f3e3d98be8a8bac2dcc414b58dda48b3ea35411d5b112c26f31b352982f55be=
+446b3dd47e435954252213828ba98a1bc363278f8bd13ad746bb8edad619162f5d1892e9fa4=
+2e4fe2b60f5fe2bb963f08d6696820ade9cff2b2deb91ce5657168a90dc5230e33b8c26cd92=
+5c31366a2ae339f12ba8966be1439cec635b08c0a97490b133a5b7360b59347833fc95a7bf3=
+dc9bc64741de1a6e83c9bdfdfd0baabec981099bb3dbd64a7e7979cfb7935affbcda49190b7=
+ec9bc1e89d6ccedec20f91b571e6fc049ba82821b26ca4f85f4b03f70b176b43de915bec76e=
+405bce49a4b46ec745b51f36282916b77d7f913a6afd6813df2c"],
+0x3c}}, 0x0)
+sendmsg$nl_route(r1, &(0x7f0000000240)=3D{0x0, 0x0,
+&(0x7f0000000180)=3D{&(0x7f0000000780)=3D@newlink=3D{0x58, 0x10, 0xffffff1f=
+,
+0x0, 0x0, {0x0, 0x0, 0x0, 0x0, 0x800}, [@IFLA_LINKINFO=3D{0x28, 0x12,
+0x0, 0x1, @gre=3D{{0x8}, {0x1c, 0x2, 0x0, 0x1, [@IFLA_GRE_LOCAL=3D{0x8,
+0x6, @broadcast}, @IFLA_GRE_TOS=3D{0x5, 0x9, 0x8}, @IFLA_GRE_OKEY=3D{0x8,
+0x5, 0x8}]}}}, @IFLA_MASTER=3D{0x8, 0xa, r4}, @IFLA_GROUP=3D{0x8, 0x1b,
+0x8000}]}, 0x58}}, 0x4004000)
+bind$packet(r0, &(0x7f00000000c0)=3D{0x11, 0x0, r4, 0x1, 0x0, 0x6, @remote}=
+, 0x14)
+sendmsg$nl_route(r0, &(0x7f0000000300)=3D{0x0, 0x0, &(0x7f00000002c0)=3D{0x=
+0}}, 0x0)
 
