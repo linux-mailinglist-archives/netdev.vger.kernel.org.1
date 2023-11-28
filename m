@@ -1,93 +1,113 @@
-Return-Path: <netdev+bounces-51880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBDA7FC9E3
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:48:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 647487FC9EA
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:50:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EB33B20E1A
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:48:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1F08B21617
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A85E41C8D;
-	Tue, 28 Nov 2023 22:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8CB5024A;
+	Tue, 28 Nov 2023 22:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dTYqMrVJ"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="SDn0Lz4Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96CCA19B7
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:48:43 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-5c21e185df5so4375933a12.1
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:48:43 -0800 (PST)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCFF01990
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:50:38 -0800 (PST)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-42033328ad0so33848761cf.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 14:50:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701211723; x=1701816523; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=soleen.com; s=google; t=1701211838; x=1701816638; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hHKRs45eJKVxg7G2rJaXhGHBdlJA8xFGmL8opE691K4=;
-        b=dTYqMrVJVW4a8jhySDGsr1kfy0XV279YzHChH6L0XBkKBAlD7w6SJMoVPzvIyzSmpr
-         TxWZzgOMrgHuLXCySkhkji2OmsNcUHsizUjS8rlTDOhe+rEsqjYj4pdh0vnqJmAWSN8j
-         EYU+cWOKEQ+CPpiFzJV023Ase6GlBwfc9fvIuPRcDrGQncwNZs/XzXqkeU8AfMEdoiqY
-         rC8rE0CRsN5N0boGBzwK9Ua3n6nlFqTrn2AowJx0+L7E+W/aFE81MrPxk28gLtBk7hNq
-         zl0cHPPG44U/E4eAvCPVwjqY5IJsntOIJVG7yrErqsXJtJ4YKjJakRc0CfxwQhDsVQo6
-         +S7w==
+        bh=dCerhjjG9KrYi0TXMgF4xJvZ7AQK4ONjRJhrC9AuZik=;
+        b=SDn0Lz4Zx0o9l2XkQP0XKmwmFDlTmHaDCTD5x0qdN/sTaQ3Y/lJv8Ff7k9fi8b0cnV
+         X2O65KSloS0sB9E4E7G95iSaoSwD+hD1v6iix54nGZlqoyijw8cdxzbAPU2Nk+OFVXl/
+         8dHRFpOzdc9X0xbNry2XPYUDF/4Ec42YvcghfKK1mHTPGBwCX0cLjfRpuJspxTy+vd02
+         PJzFKkf+d+4JbYq4yikWJneP+mNltRecirfSjOxS/jiZBYry3+90ylg0/HIPQ8h/cWii
+         2rwARbyJKrA+9KV/lF6jK0mls5cSDaSAm7W8Nv+++5Gy475nlEr6RCJx5CJh1FMdLkte
+         Vr8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701211723; x=1701816523;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1701211838; x=1701816638;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hHKRs45eJKVxg7G2rJaXhGHBdlJA8xFGmL8opE691K4=;
-        b=LYIlaP1J3Fbpwc3G6YLLjkskQ/AtSnJoJzHu8Zt4nwSBfsXzob2Pr58S/TNdxqbO0I
-         oDtqxpd2GsNHKXK4XZPCWiVNgE8+CYgatpB+038RMLKEAXLqAkImkzP0DcIvhpXyAoyF
-         dFWqLipzVhcJN0gJHp8TlOQUZxid+TReojkGyYMbH0Kmp+Raojkf/DQge3ldsOZIOjMW
-         bd26POdk2LQm0UX3QzJGN/lywSEwXl+cGO9eycFN9WUd1Lo0kPBCnZCMJroa3EuGkVbC
-         yQ24ORHSK5C9Jwxd10lgE2jZ++jTRVM/u/GKB0DBHhwAwZryAsDPfUSgjQ7zPk9XLtCZ
-         JETQ==
-X-Gm-Message-State: AOJu0YwGbfo7NqBogflxDpttGW/9UtRi58zc9T47yxjGfN3f2B7qgv2+
-	oEslkV3It4PyWVpZR/kHGwDxAw==
-X-Google-Smtp-Source: AGHT+IH6OuxTpVSdy4LwRZ8Bus1I/2Vo+p4o3K6aSv6TPa4nIX6flEeNcc5vDgdXg4by9q8nXvDZ8A==
-X-Received: by 2002:a05:6a21:3606:b0:18a:e4fe:3b8b with SMTP id yg6-20020a056a21360600b0018ae4fe3b8bmr15761079pzb.19.1701211723119;
-        Tue, 28 Nov 2023 14:48:43 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 4-20020a17090a1a0400b0027b168cb011sm10592629pjk.56.2023.11.28.14.48.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 14:48:42 -0800 (PST)
-Date: Tue, 28 Nov 2023 14:48:40 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ido Schimmel
- <idosch@idosch.org>, Nikolay Aleksandrov <razor@blackwall.org>, Roopa
- Prabhu <roopa@nvidia.com>, Florian Westphal <fw@strlen.de>, Andrew Lunn
- <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld
- <mmuehlfe@redhat.com>
-Subject: Re: [PATCHv3 net-next 05/10] docs: bridge: add STP doc
-Message-ID: <20231128144840.5d3ced05@hermes.local>
-In-Reply-To: <20231128084943.637091-6-liuhangbin@gmail.com>
-References: <20231128084943.637091-1-liuhangbin@gmail.com>
-	<20231128084943.637091-6-liuhangbin@gmail.com>
+        bh=dCerhjjG9KrYi0TXMgF4xJvZ7AQK4ONjRJhrC9AuZik=;
+        b=NCUz6LwARY8gxy44eBOdLRRRGRWSP0biJgJEUKC220uEpuh8K1bS8ZlI4SLo6AQZsR
+         9XeX9fvMJp+3Yh0f3Bm3/DppXi1zRNG6LyP5W5c2lgQjgH3TrUBX6Rq5WWuA2KasAUuy
+         CS+fQZiqEBX5eESrr4DQ3jnH6/xXZF6eD4mJgLZnCMOhKmaTpZmrLzAn2cixCODTO+12
+         1hkKsXksICSAbxBgCFQL3EuQ6wy5Bx1Qe0AgmYAIjGYBHq6B5x98v7W1saD+MRmtKKsG
+         b29Mn9ShAQSJhxqQJ70F0P+Zid5f1WYOzWjow+448EHLHLDVC1biWTELdr1Fj3VK83a4
+         k36g==
+X-Gm-Message-State: AOJu0YxkTjnIuD2WPPJ01sWMGVNVWYD+cpjKupEzCir42KijnNiBJd7/
+	cs8NzqwALKEJj3NMO5WsSTubLVPuf25VxUikTRCsWg==
+X-Google-Smtp-Source: AGHT+IFxEAQBwk403dZeGueHLhec0OT/vzBcOBPxuj+Prssp33QGReImzhYCBhKzogO690G6BVR/8UVJbn/fn+bRF6c=
+X-Received: by 2002:a05:622a:10f:b0:423:78b4:d136 with SMTP id
+ u15-20020a05622a010f00b0042378b4d136mr24659151qtw.54.1701211837930; Tue, 28
+ Nov 2023 14:50:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-7-pasha.tatashin@soleen.com> <d99e0d4a-94a9-482b-b5b5-833cba518b86@arm.com>
+In-Reply-To: <d99e0d4a-94a9-482b-b5b5-833cba518b86@arm.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Tue, 28 Nov 2023 17:50:01 -0500
+Message-ID: <CA+CK2bDswtrqiOMt3+0LBb0+7nJY9aBpzZdsmrWRzy9WxBqKEg@mail.gmail.com>
+Subject: Re: [PATCH 06/16] iommu/dma: use page allocation function provided by iommu-pages.h
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
+	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
+	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
+	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
+	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
+	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, 
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev, 
+	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com, 
+	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org, 
+	will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 28 Nov 2023 16:49:38 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Tue, Nov 28, 2023 at 5:34=E2=80=AFPM Robin Murphy <robin.murphy@arm.com>=
+ wrote:
+>
+> On 2023-11-28 8:49 pm, Pasha Tatashin wrote:
+> > Convert iommu/dma-iommu.c to use the new page allocation functions
+> > provided in iommu-pages.h.
+>
+> These have nothing to do with IOMMU pagetables, they are DMA buffers and
+> they belong to whoever called the corresponding dma_alloc_* function.
 
-> +STP is a Layer 2 protocol that operates at the Data Link Layer of the OSI
-> +model. It was originally developed as IEEE 802.1D and has since evolved into
-> +multiple versions, including Rapid Spanning Tree Protocol (RSTP) and
-> +`Multiple Spanning Tree Protocol (MSTP)
-> +<https://lore.kernel.org/netdev/20220316150857.2442916-1-tobias@waldekranz.com/>`_.
-> +
+Hi Robin,
 
-Last time I checked, IEEE folded RSTP into the standard in 2004.
-https://en.wikipedia.org/wiki/IEEE_802.1D
+This is true, however, we want to account and observe the pages
+allocated by IOMMU subsystem for DMA buffers, as they are essentially
+unmovable locked pages. Should we separate IOMMU memory from KVM
+memory all together and add another field to /proc/meminfo, something
+like "iommu -> iommu pagetable and dma memory", or do we want to
+export DMA memory separately from IOMMU page tables?
+
+Since, I included DMA memory, I specifically removed mentioning of
+IOMMU page tables in the most of places, and only report it as IOMMU
+memory. However, since it is still bundled together with SecPageTables
+it can be confusing.
+
+Pasha
 
