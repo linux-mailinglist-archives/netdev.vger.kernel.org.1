@@ -1,299 +1,202 @@
-Return-Path: <netdev+bounces-51496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1CDB7FAEE3
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:12:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580FE7FAEE5
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:16:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67ADD28186E
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:12:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837AC1C20A04
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A78E36B;
-	Tue, 28 Nov 2023 00:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8705636C;
+	Tue, 28 Nov 2023 00:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yf7EBsop"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="afUkGzCX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14771B1;
-	Mon, 27 Nov 2023 16:12:01 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cf974e87d9so7042725ad.1;
-        Mon, 27 Nov 2023 16:12:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701130321; x=1701735121; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v2cp0hCV3ukeXzrGKrc9yDyHnZlZPc+ZpdONAR2TiuI=;
-        b=Yf7EBsopxpGqYHff2Y9+XDRga7aTmDoGrmfLWjiml81uwsKH3XeGP5uYwTVbdzjyFm
-         DjRkBonS+qNUmBWEdpH2ItHsfXYy6y8GtrhHpTWps2jL7QN0v+j85zrvOk019ZQ2uDnZ
-         Or1I8Wo5TQhF1nlgrCKddy5MfV8wGyKaGh9YQXiaSjkcGSn7KgSNZxr1EDVIPfL8Mi0r
-         ftqP06WCf7cF4t1Pl3VuaJU8Ner2MSrphvhN4wHVwVVq64Y3dnWbrMRErPWTjcgezQtj
-         sZznPjmwZUtWGkCoKRMZNXDtljgYCG3Fx6pcvSuIzCtjvHbHj8Ba6S49JK6yKXm2h58j
-         j1Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701130321; x=1701735121;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v2cp0hCV3ukeXzrGKrc9yDyHnZlZPc+ZpdONAR2TiuI=;
-        b=d2YRu2vrMkhJvvkkRpljW3TSdDNI/B4P3/HgQuYuC3CcUsiUKVc5UjgzgvKSD2RJRJ
-         GvYdxtx/5LHv33x8IC4shG/qkhWKolcE9feSXIoVwuxVxZs587BTH899sFenQxfjhg/1
-         Sj7ObikQgvUragcNqD3xG1IhbhEajir6zurswxTMVlytRSGR5sIdJrdMx+P6p0yms0x3
-         qqI6od6aSZWf1aZ7kTvHIoIBfUdZigVpexL2H2GizL1jZmaFMQm8gckU/a1yOXVNRdIz
-         qvKi2Kb+gVGGa8YwbZJzWxeZRfNCM1myrA5RA7kpSrANbzE42EBXhXHkYFzmy6JM0sPy
-         1vbw==
-X-Gm-Message-State: AOJu0YwVucrjwP3AuOyGmlq1gHDw14PSIQN4hwVciY+oPdYWJe4QXUAe
-	UduiKPKdlnMfBWoiRJAesog=
-X-Google-Smtp-Source: AGHT+IHwEE6OZJkKu6cjd4labT8nhAMbaFsJBc/61pTVrwTlM5Oo8b5TPo9PljIBG5q1IjiUNainmA==
-X-Received: by 2002:a17:902:f683:b0:1cf:c680:f37f with SMTP id l3-20020a170902f68300b001cfc680f37fmr6781580plg.2.1701130321121;
-        Mon, 27 Nov 2023 16:12:01 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id x5-20020a170902ec8500b001cfa718039bsm6739204plg.216.2023.11.27.16.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 16:12:00 -0800 (PST)
-Date: Mon, 27 Nov 2023 16:11:58 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: reibax@gmail.com, davem@davemloft.net, rrameshbabu@nvidia.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	maheshb@google.com, Thomas Gleixner <tglx@linutronix.de>,
-	John Stultz <jstultz@google.com>
-Subject: Re: [PATCH v2] posix-timers: add multi_clock_gettime system call
-Message-ID: <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
-References: <20231127153901.6399-1-maimon.sagi@gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 417151B1
+	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:15:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701130557; x=1732666557;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eg5Ei2n6dao9SYBJ/2r6EUjDxL1Y9wvvcWlwMc7aU0Q=;
+  b=afUkGzCXAX/XMShZhZk1WEsGLfEnInznyewswfVJJS6k5qOnIOrSnSnG
+   ED0x/CrwNnU77IltT279VfK063j7kfy1sDST9I1FsF+K87gtxUM517w8L
+   yhgeUsUFJ7cVw+4PjVIDfZ3kaH3Mbs44AzxNyeDRMTX2QTGsrlVrXOce3
+   yAFfbjUN7Rgvr0IWAXIXp2NPc9ZFzI8c9yrR/4z00mRBEU8EsRkisiELX
+   QNH/Gb6XMEG7XQoQbZnmtT5SZEAIIgqJOIWfr/P2b90cFv+TzPfQpjw8d
+   kApXwfGSU8XWTKzrjRfiYUCJXszkapghBZLW/SkRu7gwldklRb44b8n1x
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="11513918"
+X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
+   d="scan'208";a="11513918"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2023 16:15:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10907"; a="797409244"
+X-IronPort-AV: E=Sophos;i="6.04,232,1695711600"; 
+   d="scan'208";a="797409244"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Nov 2023 16:15:55 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 27 Nov 2023 16:15:54 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 27 Nov 2023 16:15:54 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 27 Nov 2023 16:15:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RZfMZ3uBdlEe0D8xdYeGcnUFB4J2Cm5z4FPpoiWmGmmmo3MKs5T6RdQYDUAtMT0WfZBBtgqrgh+9no8Qdf3L3X0nupDAverrbbMQqAaClysaC0pHK0nP4VBcckFJEOvPHdjOGwU+mfc6/9YTaaGEjwsLf0fgMzixINKDlBpx93pk8fprCYhB8InJifuRtvq75/Y9R8NQfLxPcVQRok/MpYwY4CuVuvAQcyrEexPz4RBdcxoqR7CpIS2stcYN8pltHrSl2c6IzWrZvxDE7XTy9Q83ushvORmRq8dEGpFz0vxl12SAhbxENNk4m8G+9xdHpKxheo0tQbupWKXKFTfSpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=el4psocP/UHRkOFJrb1//G6n8AFNBXwZKegqA45kDeY=;
+ b=ff9f0np7qfY/+kJ7CsVus1PQHu3/Pa1xKflcbqrLNn2E7XARzbXDdtlM1ycfMqkb4t+bv8xIIgDTfODv1pFl0m5UYMliOpUlnCLsepScSyZk7AlejDxRDYy16lELCrVaJSxAiHzUNEPbMhkKKDNLNz2CUnILfcQ6c9HRT7IHRpko1J2ui3e1uBhMyGV6qHQyJmMy8s0PWNCu/rmZHFdZTqIbN5Wb5s5IyRAJ3qUrOmPvvq4GRDYUFbekjJDicFAOj4pou4aUFbPoPHKBd9+gYbiGwOddi3vC37QEp8m6yWpFnha18f0UVsbWnPJsBe2hwEHnIL9GgdmnEnS6Mt7/Rw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3175.namprd11.prod.outlook.com (2603:10b6:a03:7c::23)
+ by SA2PR11MB5145.namprd11.prod.outlook.com (2603:10b6:806:113::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Tue, 28 Nov
+ 2023 00:15:52 +0000
+Received: from BYAPR11MB3175.namprd11.prod.outlook.com
+ ([fe80::124:ae3c:93d1:981b]) by BYAPR11MB3175.namprd11.prod.outlook.com
+ ([fe80::124:ae3c:93d1:981b%7]) with mapi id 15.20.7025.022; Tue, 28 Nov 2023
+ 00:15:52 +0000
+Message-ID: <e662dca5-84e4-4f7b-bfa3-50bce30c697c@intel.com>
+Date: Mon, 27 Nov 2023 16:15:47 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
+ devlink rate support'
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Jiri Pirko <jiri@resnulli.us>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<qi.z.zhang@intel.com>, Wenjun Wu <wenjun1.wu@intel.com>,
+	<maxtram95@gmail.com>, "Chittim, Madhu" <madhu.chittim@intel.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, <pabeni@redhat.com>
+References: <20230727021021.961119-1-wenjun1.wu@intel.com>
+ <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
+ <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
+ <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
+ <ZOcBEt59zHW9qHhT@nanopsycho>
+ <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
+ <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
+ <20231118084843.70c344d9@kernel.org>
+ <3d60fabf-7edf-47a2-9b95-29b0d9b9e236@intel.com>
+ <20231122192201.245a0797@kernel.org>
+Content-Language: en-US
+From: "Zhang, Xuejun" <xuejun.zhang@intel.com>
+In-Reply-To: <20231122192201.245a0797@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0164.namprd03.prod.outlook.com
+ (2603:10b6:303:8d::19) To BYAPR11MB3175.namprd11.prod.outlook.com
+ (2603:10b6:a03:7c::23)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127153901.6399-1-maimon.sagi@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3175:EE_|SA2PR11MB5145:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a57de07-9b7d-420f-bf2d-08dbefa72e6e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FGX5r9pew1o3Sq3U5Fpv+QRgqGGm7nkmbFgftJH5e8r08SYHihLPghA1BCnCHOwwjfOD/2y9XM+Zx1kO7+Hk9y+V9NArobm6ciqNQWZHO91fIVh4CEw7m33UZpFFYTlOeUSCV4oobTrWMPIzv4AwRLgG715BOysX8r6A04xaaCTUKSgyLAAT7cdZ04TM9/7yUWfcrVta72pJHXpRwjoPTW10A+JjF5ahL6caCMqYHy3VWxVVXT/rfQMJFXbv2SkMU4J7ozvZJQk+MObJ4EO43gVKdGYIBt2fAuGU4kPtMNnQ8xJZxjnKNL+k3gDCwJDr9+GirirYDi/eAW/jCGLH7FFb1u2sNopxYOTWC1gVRBuCD6zvSQpDE8Agze86VndT8uj+Ycn9KRUPZyygHT/LeVY4oszAs4FZthk74iwTlxdUEjvgAGFx9KcVD2XvVQKOI/A/1dx5HI5Il1y5dFVN7oSpaWMusi93oQpRQnCLrQ1uLaJWKrt2A8j9v35qe5iVcHvVOt4yQlVQvN8d2lUwt7mpBNqF0YMlZTc29rUYqPVuWXzJVF5JBhdiNEjledsbmyDEi4jiF5kRhd5mlxZAgyWUu5hGB5NRcYp5IJ8bEYpn3eNCZWmAhKvQqBQO8sRPQwagc+EUSds8jG9XJ35nLg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3175.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(376002)(39860400002)(366004)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(38100700002)(36756003)(82960400001)(86362001)(31696002)(54906003)(316002)(6916009)(66556008)(66476007)(8936002)(8676002)(41300700001)(66946007)(6512007)(53546011)(6666004)(6506007)(478600001)(6486002)(4326008)(5660300002)(2906002)(31686004)(26005)(2616005)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VHVxd2E0Uyt2ZXdXaXVrZHhiZTA0ZUVMaVlBYUJwSnJMalJteVB6cmJBWUo1?=
+ =?utf-8?B?d3p1aHRJcS9tclJvZ3ZZOVF4L1BreTd0YlM4ODZ3TVhlQkZHTWlpVGhwZ3lv?=
+ =?utf-8?B?cXdQSW9BTEpzcWtQQWlqdEJrK3ZzbFc3WnhlVTJXOVFrNENkME9iUk9aVEtP?=
+ =?utf-8?B?YlE5L0xVckg5VnFyQkw4OTU1TUdpMjU2bWlCWU1pVFZ3a0xqaS83TENjdG42?=
+ =?utf-8?B?TVUrWTBGQmRNVHpLeVMwMWxuOEU3Qk1EU1g0aFY3a2RXc3k5aGRXbGZuTGxR?=
+ =?utf-8?B?dnBNNXlRMnpHSEhieE9nZkNWT0NFTlBiR2ppdXVkUUc0REowbWNEVDVhSi91?=
+ =?utf-8?B?VEdtK3lKaVp5bDRUSWNoSGNNdGFSc1JhV0V6dFRTMmRsS00rOHhsWlMxTUtu?=
+ =?utf-8?B?bE13UmxRT011UlBhWUtoeWVDVXkrYjE3QWVLOTFWL3lSalBTR3pDaUhqUlll?=
+ =?utf-8?B?TnNGb0lJUFlWQlJVdEhuSFMyMG1aZDNTUE5SK3c1eW4vRzdvUXgzQVMweUw4?=
+ =?utf-8?B?eXdZamt4dFZINzhGYkIyYVdtT3pqZDVDTFdmbE96Uk5JbTQvZ3hOTURHZ1Vw?=
+ =?utf-8?B?K1g3SDVGcWEwWGJ4SWF0K3J6eUZtcHBLbXROSjgvcDg0TTVkTHFsWCtRMDYz?=
+ =?utf-8?B?SUdmNk8wUU9Qc3ZxMmplL21Ib2F0aWN3OC9RMEtqU2FvbVBlazFMY2FGMmN0?=
+ =?utf-8?B?cWhrRGI3bVNxZDl3U3k5M3dlaFVsK2hCcllHZ2tUZGFhS2s0amtoazMrcUMz?=
+ =?utf-8?B?NXZUdnFtSWNjV1RPRWpLTlFsbENPL0dBRmJCSVcxNitlSW5ReG5PdFV2bFZZ?=
+ =?utf-8?B?akhwYlk4aGhlUEw4cWx3UG52bDZTL3BMS1RFaEFkME55dm1sa0FTTVBVdC92?=
+ =?utf-8?B?NExGQzNZdmd3S0c4WVNGVU9BamliLzZ1dUFvbnE0TFgwNWJnTTRUWFNIUUJz?=
+ =?utf-8?B?N3o0dzlnVTFjQWZ3dFo2aGRHRnYzTHd4RWhZMWlwTDhBQ2I4S1cvMTlHRjJq?=
+ =?utf-8?B?MWZNMEpidVl4ODJ3QVJqRC9GK1JlbFR3WUxGeWdhVUwxWHRwWUxCUTUrNmFl?=
+ =?utf-8?B?VWZtaVhwbnNuZDB3WGdVMU1sOEJMNlo2T0VmODJtbWIyeGtrS21XdXhuMWkr?=
+ =?utf-8?B?T0hzalNUOVBDcmZmajNZMWdxem1UZ2FqeE0rU3U0UEdXSE9zUFNTR1Z6Ry9u?=
+ =?utf-8?B?UGdpdGhOenZKY2ZsU2grZDh6emZHNmVyQzAwTklySGpPVE1oMzNRUVlsckwz?=
+ =?utf-8?B?RDNXeVdzYzRYb3k3TElvdlFNZ29DOE1Pb1cvUnQzb1pFTHRzdkRiZVVNT2Jr?=
+ =?utf-8?B?Q09vSjdwRnFuMERiMGNwUHd5YmNhY2N4VWF2SVNkY1hWM0MrVVd1SHF6Ukhk?=
+ =?utf-8?B?enQ5Mzg3aDFyc3prSHFCRks0UWoybXQ3Wmp2YjZMejMzbFFBNURiemZKVkNr?=
+ =?utf-8?B?MkxCTEQvTUNsWFdBQ1RNZFNYZzZ5cmFuU0Q3YzluN29hdDVqODhSMHoxbEZv?=
+ =?utf-8?B?WDZJT1Z3aG1kK3A1eUpraktCNGJRRkJEN0tYYURnNEtaSEhmYmhzRmVzWmZt?=
+ =?utf-8?B?WHloTmMwWlRsQUVQaWJBcXBLYmR4WmRMM2NPZU91cGxnOGEyMzcra2pmcngz?=
+ =?utf-8?B?ajZqdDhlbGpCVnM2SzdPaldKK1A5T2tNRnl6WWwzeU1PQ0hVWkd6YlBYLzcx?=
+ =?utf-8?B?UDBzdlplZUlwQ1FORFpuWEs2YmpEQ21vK2FtK3ZSQkxKcWZ0akVNeFdlRjVW?=
+ =?utf-8?B?MElqQWthekkySXQ2Zmg3M3NCOUV0SEtyL0hWLzZZNTJkZlVyclpKL1AwN0ZY?=
+ =?utf-8?B?SWltcVFqdzBUUGpMdm52ZlNJZDhjUERnM1RDZXFqNWgrbHFkeDVxaVYySDJh?=
+ =?utf-8?B?VjdqdmRONlQzSU55K25FZFE3enRlaDBUYXZBekR4bHdieUt4UzY4ckJXNzVB?=
+ =?utf-8?B?dXUydjhxa0tiS0daTEdGZER5NUczTHFNbUxyVXVpZ1FQT1gyOVNTamJpSTM0?=
+ =?utf-8?B?SUVBaU1CcW9GcFR4dDQ0dFVWWDZoaXdJU2JzcmpWRjhMc1VSMVF1cFh4Q3pN?=
+ =?utf-8?B?NnNsdWlsOHlQMkdmMHo2bDdwTHd3NUU4VlZqdXkvU09mNkJ0TEd0WXI5Nmxy?=
+ =?utf-8?Q?ZpFe/Dqa/TlMZDPx8WBRd+t2H?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a57de07-9b7d-420f-bf2d-08dbefa72e6e
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3175.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2023 00:15:52.1965
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q6/PWOsRkygPFzYiMlMzfJHHXMx4krIESBZzBsxLs3oPY46Bwk+eiQgx3canG5KgRIvXEjfPtUiHuTywSNV/oA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5145
+X-OriginatorOrg: intel.com
 
-On Mon, Nov 27, 2023 at 05:39:01PM +0200, Sagi Maimon wrote:
->  Some user space applications need to read some clocks.
->  Each read requires moving from user space to kernel space.
->  This asymmetry causes the measured offset to have a significant error.
 
-Adding time/clock gurus (jstultz, tglx) on CC for visibility...
+On 11/22/2023 7:22 PM, Jakub Kicinski wrote:
+> On Wed, 22 Nov 2023 14:19:14 -0800 Zhang, Xuejun wrote:
+>> The proposed API would incur net/core and driver changes as follows
+>> a) existing drivers with ndo_set_tx_maxrate support upgraded to use new
+>> ndo_set_tx_rate
+>> b) net sysfs (replacing ndo_set_maxrate with ndo_set_tx_rate with
+>> minrate and burst set to 0, -1 means ignore)
+>> c) Keep the existing /sys/class/net/ethx/queues/tx_nn/tx_maxrate as it
+>> is currently
+>> d) Add sysfs entry as /sys/class/net/ethx/queues/tx_nn/tx_minrate &
+>> /sys/class/net/ethx/queues/tx_nn/burst
+> You described extending the sysfs API (which the ndo you mention
+> is for) and nothing about converging the other existing APIs.
+This is extension of ndo_set_tx_maxrate to include per queue parameters 
+of tx_minrate and burst.
 
-Thanks,
-Richard
+devlink rate api includes tx_maxrate and tx_minrate, it is intended for 
+port rate configurations.
 
+With regarding to tc mqprio, it is being used to configure queue group 
+per tc.
 
-> 
->  Introduce a new system call multi_clock_gettime, which can be used to measure
->  the offset between multiple clocks, from variety of types: PHC, virtual PHC
->  and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
->  The offset includes the total time that the driver needs to read the clock
->  timestamp.
-> 
->  New system call allows the reading of a list of clocks - up to PTP_MAX_CLOCKS.
->  Supported clocks IDs: PHC, virtual PHC and various system clocks.
->  Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
->  The system call returns n_clocks timestamps for each measurement:
->  - clock 0 timestamp
->  - ...
->  - clock n timestamp
-> 
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> ---
->  Addressed comments from:
->  - Richard Cochran : https://www.spinics.net/lists/netdev/msg951723.html
->           
->  Changes since version 1:
->  - Change multi PHC ioctl implamantation into systemcall.
->  
->  arch/x86/entry/syscalls/syscall_32.tbl |  1 +
->  arch/x86/entry/syscalls/syscall_64.tbl |  1 +
->  include/linux/posix-timers.h           | 24 ++++++++++
->  include/linux/syscalls.h               |  3 +-
->  include/uapi/asm-generic/unistd.h      | 12 ++++-
->  kernel/sys_ni.c                        |  1 +
->  kernel/time/posix-timers.c             | 62 ++++++++++++++++++++++++++
->  7 files changed, 102 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-> index c8fac5205803..070efd266e7e 100644
-> --- a/arch/x86/entry/syscalls/syscall_32.tbl
-> +++ b/arch/x86/entry/syscalls/syscall_32.tbl
-> @@ -461,3 +461,4 @@
->  454	i386	futex_wake		sys_futex_wake
->  455	i386	futex_wait		sys_futex_wait
->  456	i386	futex_requeue		sys_futex_requeue
-> +457	i386	multi_clock_gettime		sys_multi_clock_gettime32
-> \ No newline at end of file
-> diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-> index 8cb8bf68721c..f790330244bb 100644
-> --- a/arch/x86/entry/syscalls/syscall_64.tbl
-> +++ b/arch/x86/entry/syscalls/syscall_64.tbl
-> @@ -378,6 +378,7 @@
->  454	common	futex_wake		sys_futex_wake
->  455	common	futex_wait		sys_futex_wait
->  456	common	futex_requeue		sys_futex_requeue
-> +457	common	multi_clock_gettime		sys_multi_clock_gettime
->  
->  #
->  # Due to a historical design error, certain syscalls are numbered differently
-> diff --git a/include/linux/posix-timers.h b/include/linux/posix-timers.h
-> index d607f51404fc..426a45441ab5 100644
-> --- a/include/linux/posix-timers.h
-> +++ b/include/linux/posix-timers.h
-> @@ -260,4 +260,28 @@ void set_process_cpu_timer(struct task_struct *task, unsigned int clock_idx,
->  int update_rlimit_cpu(struct task_struct *task, unsigned long rlim_new);
->  
->  void posixtimer_rearm(struct kernel_siginfo *info);
-> +
-> +#define MULTI_PTP_MAX_CLOCKS 12 /* Max number of clocks */
-> +#define MULTI_PTP_MAX_SAMPLES 10 /* Max allowed offset measurement samples. */
-> +
-> +struct __ptp_multi_clock_get {
-> +	unsigned int n_clocks; /* Desired number of clocks. */
-> +	unsigned int n_samples; /* Desired number of measurements per clock. */
-> +	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-> +	/*
-> +	 * Array of list of n_clocks clocks time samples n_samples times.
-> +	 */
-> +	struct  __kernel_timespec ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
-> +};
-> +
-> +struct __ptp_multi_clock_get32 {
-> +	unsigned int n_clocks; /* Desired number of clocks. */
-> +	unsigned int n_samples; /* Desired number of measurements per clock. */
-> +	const clockid_t clkid_arr[MULTI_PTP_MAX_CLOCKS]; /* list of clock IDs */
-> +	/*
-> +	 * Array of list of n_clocks clocks time samples n_samples times.
-> +	 */
-> +	struct  old_timespec32 ts[MULTI_PTP_MAX_SAMPLES][MULTI_PTP_MAX_CLOCKS];
-> +};
-> +
->  #endif
-> diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-> index fd9d12de7e92..afcf68e83d63 100644
-> --- a/include/linux/syscalls.h
-> +++ b/include/linux/syscalls.h
-> @@ -1161,7 +1161,8 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
->  			unsigned long prot, unsigned long flags,
->  			unsigned long fd, unsigned long pgoff);
->  asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
-> -
-> +asmlinkage long sys_multi_clock_gettime(struct __ptp_multi_clock_get __user * ptp_multi_clk_get);
-> +asmlinkage long sys_multi_clock_gettime32(struct __ptp_multi_clock_get32 __user * ptp_multi_clk_get);
->  
->  /*
->   * Not a real system call, but a placeholder for syscalls which are
-> diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-> index 756b013fb832..3ebcaa052650 100644
-> --- a/include/uapi/asm-generic/unistd.h
-> +++ b/include/uapi/asm-generic/unistd.h
-> @@ -829,8 +829,18 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
->  #define __NR_futex_requeue 456
->  __SYSCALL(__NR_futex_requeue, sys_futex_requeue)
->  
-> +#if defined(__ARCH_WANT_TIME32_SYSCALLS) || __BITS_PER_LONG != 32
-> +#define __NR_multi_clock_gettime 457
-> +__SC_3264(__NR_multi_clock_gettime, sys_multi_clock_gettime32, sys_multi_clock_gettime)
-> +#endif
-> +
-> +#if defined(__SYSCALL_COMPAT) || __BITS_PER_LONG == 32
-> +#define __NR_multi_clock_gettime64 458
-> +__SYSCALL(__NR_multi_clock_gettime64, sys_multi_clock_gettime)
-> +#endif
-> +
->  #undef __NR_syscalls
-> -#define __NR_syscalls 457
-> +#define __NR_syscalls 459
->  
->  /*
->   * 32 bit systems traditionally used different
-> diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-> index e1a6e3c675c0..8ed1c22f40ac 100644
-> --- a/kernel/sys_ni.c
-> +++ b/kernel/sys_ni.c
-> @@ -335,6 +335,7 @@ COND_SYSCALL(ppoll_time32);
->  COND_SYSCALL_COMPAT(ppoll_time32);
->  COND_SYSCALL(utimensat_time32);
->  COND_SYSCALL(clock_adjtime32);
-> +COND_SYSCALL(multi_clock_gettime32);
->  
->  /*
->   * The syscalls below are not found in include/uapi/asm-generic/unistd.h
-> diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
-> index b924f0f096fa..517558af2479 100644
-> --- a/kernel/time/posix-timers.c
-> +++ b/kernel/time/posix-timers.c
-> @@ -1426,6 +1426,68 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
->  
->  #endif
->  
-> +SYSCALL_DEFINE1(multi_clock_gettime, struct __ptp_multi_clock_get __user *, ptp_multi_clk_get)
-> +{
-> +	const struct k_clock *kc;
-> +	struct timespec64 kernel_tp;
-> +	struct __ptp_multi_clock_get multi_clk_get;
-> +	int error;
-> +	unsigned int i, j;
-> +
-> +	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
-> +		return -EFAULT;
-> +
-> +	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
-> +		return -EINVAL;
-> +	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
-> +		return -EINVAL;
-> +
-> +	for (j = 0; j < multi_clk_get.n_samples; j++) {
-> +		for (i = 0; i < multi_clk_get.n_clocks; i++) {
-> +			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
-> +			if (!kc)
-> +				return -EINVAL;
-> +			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
-> +			if (!error && put_timespec64(&kernel_tp, (struct __kernel_timespec __user *)
-> +						     &ptp_multi_clk_get->ts[j][i]))
-> +				error = -EFAULT;
-> +		}
-> +	}
-> +
-> +	return error;
-> +}
-> +
-> +SYSCALL_DEFINE1(multi_clock_gettime32, struct __ptp_multi_clock_get32 __user *, ptp_multi_clk_get)
-> +{
-> +	const struct k_clock *kc;
-> +	struct timespec64 kernel_tp;
-> +	struct __ptp_multi_clock_get multi_clk_get;
-> +	int error;
-> +	unsigned int i, j;
-> +
-> +	if (copy_from_user(&multi_clk_get, ptp_multi_clk_get, sizeof(multi_clk_get)))
-> +		return -EFAULT;
-> +
-> +	if (multi_clk_get.n_samples > MULTI_PTP_MAX_SAMPLES)
-> +		return -EINVAL;
-> +	if (multi_clk_get.n_clocks > MULTI_PTP_MAX_CLOCKS)
-> +		return -EINVAL;
-> +
-> +	for (j = 0; j < multi_clk_get.n_samples; j++) {
-> +		for (i = 0; i < multi_clk_get.n_clocks; i++) {
-> +			kc = clockid_to_kclock(multi_clk_get.clkid_arr[i]);
-> +			if (!kc)
-> +				return -EINVAL;
-> +			error = kc->clock_get_timespec(multi_clk_get.clkid_arr[i], &kernel_tp);
-> +			if (!error && put_old_timespec32(&kernel_tp, (struct old_timespec32 __user *)
-> +							&ptp_multi_clk_get->ts[j][i]))
-> +				error = -EFAULT;
-> +		}
-> +	}
-> +
-> +	return error;
-> +}
-> +
->  static const struct k_clock clock_realtime = {
->  	.clock_getres		= posix_get_hrtimer_res,
->  	.clock_get_timespec	= posix_get_realtime_timespec,
-> -- 
-> 2.26.3
-> 
+For sriov ndo ndo_set_vf_rate, that has been used for overall VF rate 
+configuration, not for queue based rate configuration.
+
+It seems there are differences on intent of the aforementioned APIs.
+
+Our use case here is to allow user (i.e @ uAPI) to configure tx rates of 
+max rate & min rate per VF queue.Hence we are inclined to 
+ndo_set_tx_maxrate extension.
+
 
