@@ -1,125 +1,203 @@
-Return-Path: <netdev+bounces-51862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B997FC7BD
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:12:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469D17FC802
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 22:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C77482870CE
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:12:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676151C21033
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 21:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D697E5730D;
-	Tue, 28 Nov 2023 21:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2443C44C92;
+	Tue, 28 Nov 2023 21:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbVS0KHV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xMdoy6v8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B617A481CA;
-	Tue, 28 Nov 2023 21:10:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5552BC433D9;
-	Tue, 28 Nov 2023 21:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701205832;
-	bh=B7qsX0Cgj835Nh17nN8mHPa2v+TWscXT3LQ8F9QnaQs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gbVS0KHVTzRgMpM9MvMYMhcQSZc7jJLMVRdPVFV4ga4MXdoge+mx2Jh8ow1ZxGYBY
-	 pFmv0STry/lIywJ/d7UnYM1HbCAROjM0En28j6s42WVp5YhZXi+42tQ4ZCAHNrx+Oi
-	 DeMcEWCN8jtlYzcVMdumQSqtvy9R9yWOWHuotnWNqp16VYe02nrVFfIDl0/2MNAlE1
-	 Y4jfOgXIaz4RqUi1t7t/HLZWEdnlJLB6G2JjxbYZmeBVh+JDLH1X4RukNozPrq1hj+
-	 fmNuZm/pFlDwStK1S02THV7EszmNpnznjdlpIpFvoHcMOoTarM23+zi65lt6tc0gt4
-	 Kh5y/4LUvdnmQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Lech Perczak <lech.perczak@gmail.com>,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 7/7] net: usb: qmi_wwan: claim interface 4 for ZTE MF290
-Date: Tue, 28 Nov 2023 16:10:17 -0500
-Message-ID: <20231128211018.877548-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231128211018.877548-1-sashal@kernel.org>
-References: <20231128211018.877548-1-sashal@kernel.org>
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3A31FD6
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 13:34:36 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-a0b7f793b8aso488841266b.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 13:34:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701207274; x=1701812074; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8NXFzGfhAzOfJO06Gf5RsXFoYKrXmtsSvTLzk7MbcCk=;
+        b=xMdoy6v8aONvzbxVZVbvsNHKhhEcVO5ng7K2kXcJRvCiRiwgTT+F/dPw1hDwAA6ZJD
+         n4Wo+FXvn5yepI6+S3O8JR0X5quxazx074nCIA6eRtLJS9w4Od9Wyrq9uvdUwFtCB97X
+         yD56oIcoZQ7UXlZfq6VfJcsTujL/PFoI/xfjXpoKz+7CI1bgMiKCj+KRFvUp9Ut6OFCI
+         kBeE/mjpvW/hhnpm21zuGWcy5uG5Adq2eW2yFUV5qTPjMQbkW9xCYYL7J+laRBUbbFL/
+         n+EbzsH7rpns82J1RJAJ0QS1mU/DOAeesKiZ114pRYCHXkI/dxIKuZdmp7Oob4X8oqhM
+         Pz+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701207274; x=1701812074;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8NXFzGfhAzOfJO06Gf5RsXFoYKrXmtsSvTLzk7MbcCk=;
+        b=EG9jUhgFVlIqsKG7R4KnA2FGAxMgGDZ98oXRjC14liwVbWXHt4SjaerjtqlSr2N5Nt
+         Bed/i0fntKZ0Vzct34HtAASdmf4ft35vav4HBempdpmIGoTVSb4u9cFBM+OdG1nuGP2u
+         KWqtIQneYoZAm2gtDcDOaP7R3cXH/2jrYVziYAQlShTe2hSuB4Z2mBJGvMph4ecy4g00
+         wi+wMulVDnyZgGNa+Pe3SkWKIzmCwUyErxXGDUh72d43cY4GeahsHreOBDOwXZFRNfJl
+         +8I52IbYZIqXQz8KcC1yEQAfhUPUhGcVGEKvplBVyRt0MBuJ13uLcuR1I5iqb8byhP3M
+         qFzQ==
+X-Gm-Message-State: AOJu0Yz+OtrwnT5ztMVysAuwQtHhiQWt6yNSHxOmlfn+ghNFLyVbSw2U
+	Qy+TX7oDHHgRb9Cu7ews1b6phOmq+uVmOkTwxYIfsw==
+X-Google-Smtp-Source: AGHT+IFrrdaJl+8CDzGqIseL+lJ7M7KDt9GszVwJUOFBD/DHsSLfgFwP8+NKKfkfsTtyJyGUtnD8OJJylXlFpNkSb5g=
+X-Received: by 2002:a17:906:b248:b0:a04:cc0e:ff3b with SMTP id
+ ce8-20020a170906b24800b00a04cc0eff3bmr12465188ejb.27.1701207274446; Tue, 28
+ Nov 2023 13:34:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.331
-Content-Transfer-Encoding: 8bit
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+In-Reply-To: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Tue, 28 Nov 2023 13:33:55 -0800
+Message-ID: <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+Subject: Re: [PATCH 00/16] IOMMU memory observability
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
+	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
+	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
+	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
+	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
+	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, 
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	robin.murphy@arm.com, samuel@sholland.org, suravee.suthikulpanit@amd.com, 
+	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org, 
+	tomas.mudrunka@gmail.com, vdumpa@nvidia.com, virtualization@lists.linux.dev, 
+	wens@csie.org, will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Lech Perczak <lech.perczak@gmail.com>
+On Tue, Nov 28, 2023 at 12:49=E2=80=AFPM Pasha Tatashin
+<pasha.tatashin@soleen.com> wrote:
+>
+> From: Pasha Tatashin <tatashin@google.com>
+>
+> IOMMU subsystem may contain state that is in gigabytes. Majority of that
+> state is iommu page tables. Yet, there is currently, no way to observe
+> how much memory is actually used by the iommu subsystem.
+>
+> This patch series solves this problem by adding both observability to
+> all pages that are allocated by IOMMU, and also accountability, so
+> admins can limit the amount if via cgroups.
+>
+> The system-wide observability is using /proc/meminfo:
+> SecPageTables:    438176 kB
+>
+> Contains IOMMU and KVM memory.
+>
+> Per-node observability:
+> /sys/devices/system/node/nodeN/meminfo
+> Node N SecPageTables:    422204 kB
+>
+> Contains IOMMU and KVM memory memory in the given NUMA node.
+>
+> Per-node IOMMU only observability:
+> /sys/devices/system/node/nodeN/vmstat
+> nr_iommu_pages 105555
+>
+> Contains number of pages IOMMU allocated in the given node.
 
-[ Upstream commit 99360d9620f09fb8bc15548d855011bbb198c680 ]
+Does it make sense to have a KVM-only entry there as well?
 
-Interface 4 is used by for QMI interface in stock firmware of MF28D, the
-router which uses MF290 modem. Rebind it to qmi_wwan after freeing it up
-from option driver.
-The proper configuration is:
+In that case, if SecPageTables in /proc/meminfo is found to be
+suspiciously high, it should be easy to tell which component is
+contributing most usage through vmstat. I understand that users can do
+the subtraction, but we wouldn't want userspace depending on that, in
+case a third class of "secondary" page tables emerges that we want to
+add to SecPageTables. The in-kernel implementation can do the
+subtraction for now if it makes sense though.
 
-Interface mapping is:
-0: QCDM, 1: (unknown), 2: AT (PCUI), 2: AT (Modem), 4: QMI
-
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=19d2 ProdID=0189 Rev= 0.00
-S:  Manufacturer=ZTE, Incorporated
-S:  Product=ZTE LTE Technologies MSM
-C:* #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=4ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=4ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=4ms
-I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
-E:  Ad=84(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=4ms
-I:* If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
-E:  Ad=86(I) Atr=03(Int.) MxPS=  64 Ivl=2ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=4ms
-
-Cc: Bjørn Mork <bjorn@mork.no>
-Signed-off-by: Lech Perczak <lech.perczak@gmail.com>
-Link: https://lore.kernel.org/r/20231117231918.100278-3-lech.perczak@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 880aa7f6a779c..c6a1129d6274e 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1242,6 +1242,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_FIXED_INTF(0x19d2, 0x0168, 4)},
- 	{QMI_FIXED_INTF(0x19d2, 0x0176, 3)},
- 	{QMI_FIXED_INTF(0x19d2, 0x0178, 3)},
-+	{QMI_FIXED_INTF(0x19d2, 0x0189, 4)},    /* ZTE MF290 */
- 	{QMI_FIXED_INTF(0x19d2, 0x0191, 4)},	/* ZTE EuFi890 */
- 	{QMI_FIXED_INTF(0x19d2, 0x0199, 1)},	/* ZTE MF820S */
- 	{QMI_FIXED_INTF(0x19d2, 0x0200, 1)},
--- 
-2.42.0
-
+>
+> Accountability: using sec_pagetables cgroup-v2 memory.stat entry.
+>
+> With the change, iova_stress[1] stops as limit is reached:
+>
+> # ./iova_stress
+> iova space:     0T      free memory:   497G
+> iova space:     1T      free memory:   495G
+> iova space:     2T      free memory:   493G
+> iova space:     3T      free memory:   491G
+>
+> stops as limit is reached.
+>
+> This series encorporates suggestions that came from the discussion
+> at LPC [2].
+>
+> [1] https://github.com/soleen/iova_stress
+> [2] https://lpc.events/event/17/contributions/1466
+>
+> Pasha Tatashin (16):
+>   iommu/vt-d: add wrapper functions for page allocations
+>   iommu/amd: use page allocation function provided by iommu-pages.h
+>   iommu/io-pgtable-arm: use page allocation function provided by
+>     iommu-pages.h
+>   iommu/io-pgtable-dart: use page allocation function provided by
+>     iommu-pages.h
+>   iommu/io-pgtable-arm-v7s: use page allocation function provided by
+>     iommu-pages.h
+>   iommu/dma: use page allocation function provided by iommu-pages.h
+>   iommu/exynos: use page allocation function provided by iommu-pages.h
+>   iommu/fsl: use page allocation function provided by iommu-pages.h
+>   iommu/iommufd: use page allocation function provided by iommu-pages.h
+>   iommu/rockchip: use page allocation function provided by iommu-pages.h
+>   iommu/sun50i: use page allocation function provided by iommu-pages.h
+>   iommu/tegra-smmu: use page allocation function provided by
+>     iommu-pages.h
+>   iommu: observability of the IOMMU allocations
+>   iommu: account IOMMU allocated memory
+>   vhost-vdpa: account iommu allocations
+>   vfio: account iommu allocations
+>
+>  Documentation/admin-guide/cgroup-v2.rst |   2 +-
+>  Documentation/filesystems/proc.rst      |   4 +-
+>  drivers/iommu/amd/amd_iommu.h           |   8 -
+>  drivers/iommu/amd/init.c                |  91 +++++-----
+>  drivers/iommu/amd/io_pgtable.c          |  13 +-
+>  drivers/iommu/amd/io_pgtable_v2.c       |  20 +-
+>  drivers/iommu/amd/iommu.c               |  13 +-
+>  drivers/iommu/dma-iommu.c               |   8 +-
+>  drivers/iommu/exynos-iommu.c            |  14 +-
+>  drivers/iommu/fsl_pamu.c                |   5 +-
+>  drivers/iommu/intel/dmar.c              |  10 +-
+>  drivers/iommu/intel/iommu.c             |  47 ++---
+>  drivers/iommu/intel/iommu.h             |   2 -
+>  drivers/iommu/intel/irq_remapping.c     |  10 +-
+>  drivers/iommu/intel/pasid.c             |  12 +-
+>  drivers/iommu/intel/svm.c               |   7 +-
+>  drivers/iommu/io-pgtable-arm-v7s.c      |   9 +-
+>  drivers/iommu/io-pgtable-arm.c          |   7 +-
+>  drivers/iommu/io-pgtable-dart.c         |  37 ++--
+>  drivers/iommu/iommu-pages.h             | 231 ++++++++++++++++++++++++
+>  drivers/iommu/iommufd/iova_bitmap.c     |   6 +-
+>  drivers/iommu/rockchip-iommu.c          |  14 +-
+>  drivers/iommu/sun50i-iommu.c            |   7 +-
+>  drivers/iommu/tegra-smmu.c              |  18 +-
+>  drivers/vfio/vfio_iommu_type1.c         |   8 +-
+>  drivers/vhost/vdpa.c                    |   3 +-
+>  include/linux/mmzone.h                  |   5 +-
+>  mm/vmstat.c                             |   3 +
+>  28 files changed, 415 insertions(+), 199 deletions(-)
+>  create mode 100644 drivers/iommu/iommu-pages.h
+>
+> --
+> 2.43.0.rc2.451.g8631bc7472-goog
+>
+>
 
