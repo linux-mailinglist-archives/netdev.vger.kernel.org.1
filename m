@@ -1,127 +1,74 @@
-Return-Path: <netdev+bounces-51510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC1557FAF39
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:46:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F26547FAF3B
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 01:46:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16C87281B4E
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:46:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5588B21053
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 00:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845851390;
-	Tue, 28 Nov 2023 00:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D1F64B;
+	Tue, 28 Nov 2023 00:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IvzUw73L"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wOrTyuob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68381AA
-	for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:46:17 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so3325e9.1
-        for <netdev@vger.kernel.org>; Mon, 27 Nov 2023 16:46:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701132376; x=1701737176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nX5y/+1xsJTb3d79j1A2vz0g1fgyzJ3hfPEMuJD84tQ=;
-        b=IvzUw73L7c2geiXIEtp9BCl9QFFc8dWOtLEjEsF9vQYoyjfqhHpJdnmBxObwwjtKnv
-         x9JGyplzbszEisFC6iYLkA/qex0Lnx1f552SKz24+HhsreCDPuL0HvZClsOdepKIOk10
-         mQmHXo5SQtVkjKIQz+Sp5GsoomQQCNmwOV6ncF3Gy7pxRLNVYF1uF5mBjq6MVICxiCY+
-         ZglnRT8r6NKzFZTwudmZdls+ZIRYcvjCFRqKIuh802uP3fUjGh05CLw/1sUC2M0rsjM+
-         AX9x0d2iFPbF2BYbj5Ymfwk8abweg/S8XHAT/U9kKpx3Ou63W7lRq2Eztq0PNFVnSA88
-         cRaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701132376; x=1701737176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nX5y/+1xsJTb3d79j1A2vz0g1fgyzJ3hfPEMuJD84tQ=;
-        b=eV8aipQhXzyxT9tQma8CGeW5uNWXKe1OEcbrr1b74Vb4RfMrnHd0SlNf52/xcTD33Y
-         XeWEmXIRM/TRMVl7A8SFdqB6bXYGSbYw0iHehCEJFaKcMBV71S4W/XEFcfQPxH9Y5zbH
-         baXjUxMHO+7bQCQWxF+sw7q+eA/lSPoiR022glFzOA6Ye7uiz0seFSC/OEjV5U09RsLU
-         HWQp+hENi61No4d9F15eh49RvSQCp0kEF2dLvhaycN4h88xQFEvnF9rForqtVHiluAW6
-         4yuGYgm6N3WUbVGzUaPXmj8SxULVRhWXLW+TQKvSbafYZr3G3+Lg4yWoQ3iiLkQAFu35
-         B1QQ==
-X-Gm-Message-State: AOJu0YzqVKlpWHOPI8d8I4Lp7sGl+Rx8JtCEIZo6iNPsFzsh0wLO9r1B
-	xmr0XW2pYTtwSzzBKwUlQ5I18X3lOGOV/l2kA52N
-X-Google-Smtp-Source: AGHT+IHTKx4qq0PtLWDhHqHYKuaX+k8K9wvvHKuyFFO0SY4Z0hFF7OwkyFrnm5b4J924iJAGZbl02apJHFMUQmMyzxE=
-X-Received: by 2002:a05:600c:3b13:b0:40a:483f:f828 with SMTP id
- m19-20020a05600c3b1300b0040a483ff828mr731991wms.4.1701132375913; Mon, 27 Nov
- 2023 16:46:15 -0800 (PST)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77085D6D;
+	Mon, 27 Nov 2023 16:46:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tPsB2hWA3Oc577a+cgExHeE0rQjVhZlCmuxB4d3ag6Y=; b=wOrTyuobaJiBkDDEN+3GnJb9Gj
+	khoMngUKyPMKlVGbsfyCinioYWK0Liy4RVI0/Noz7xvcBvdK128h9OAY0vlKvfQpTRb03Oi9dJFK9
+	/ppp2Ers5rvwGbJhiODR3FSIcr9/87gXJjP/7n93H5gGoTD/zHSh4MjQ4wDbEHbEfDlY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r7mEs-001Oyh-FN; Tue, 28 Nov 2023 01:46:10 +0100
+Date: Tue, 28 Nov 2023 01:46:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v2 3/4] net: phy: restructure
+ __phy_write/read_mmd to helper and phydev user
+Message-ID: <d3747eda-7109-4d53-82fa-9df3f8d71f62@lunn.ch>
+References: <20231126235141.17996-1-ansuelsmth@gmail.com>
+ <20231126235141.17996-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231127153901.6399-1-maimon.sagi@gmail.com> <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
-In-Reply-To: <ZWUwTnWEHipJqHnk@hoboy.vegasvil.org>
-From: John Stultz <jstultz@google.com>
-Date: Mon, 27 Nov 2023 16:46:03 -0800
-Message-ID: <CANDhNCq=iV2_1bzaP=BYuUwJtNsQBdjuYqUUtsiLc-MCNURJ6w@mail.gmail.com>
-Subject: Re: [PATCH v2] posix-timers: add multi_clock_gettime system call
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Sagi Maimon <maimon.sagi@gmail.com>, reibax@gmail.com, davem@davemloft.net, 
-	rrameshbabu@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	maheshb@google.com, Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231126235141.17996-3-ansuelsmth@gmail.com>
 
-On Mon, Nov 27, 2023 at 4:12=E2=80=AFPM Richard Cochran
-<richardcochran@gmail.com> wrote:
->
-> On Mon, Nov 27, 2023 at 05:39:01PM +0200, Sagi Maimon wrote:
-> >  Some user space applications need to read some clocks.
-> >  Each read requires moving from user space to kernel space.
-> >  This asymmetry causes the measured offset to have a significant error.
->
-> Adding time/clock gurus (jstultz, tglx) on CC for visibility...
->
+On Mon, Nov 27, 2023 at 12:51:40AM +0100, Christian Marangi wrote:
+> Restructure phy_write_mmd and phy_read_mmd to implement generic helper
+> for direct mdiobus access for mmd and use these helper for phydev user.
+> 
+> This is needed in preparation of PHY package API that requires generic
+> access to the mdiobus and are deatched from phydev struct but instead
+> access them based on PHY package base_addr and offsets.
 
-Thanks for the heads up! (though, "guru" is just the noise I make
-standing up these days)
+Why is this all going into the header file?
 
-> >  Introduce a new system call multi_clock_gettime, which can be used to =
-measure
-> >  the offset between multiple clocks, from variety of types: PHC, virtua=
-l PHC
-> >  and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
-> >  The offset includes the total time that the driver needs to read the c=
-lock
-> >  timestamp.
-
-This last bit about "offset includes the total time that the driver
-needs to read the clock" is a bit confusing. It seems to suggest there
-would be start/stop bookend timestamps so you could bound how long it
-took to read all the clocks, but I don't see that in the patch.
-
-> >  New system call allows the reading of a list of clocks - up to PTP_MAX=
-_CLOCKS.
-> >  Supported clocks IDs: PHC, virtual PHC and various system clocks.
-> >  Up to PTP_MAX_SAMPLES times (per clock) in a single system call read.
-> >  The system call returns n_clocks timestamps for each measurement:
-> >  - clock 0 timestamp
-> >  - ...
-> >  - clock n timestamp
-> >
-> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-
-Overally, while I understand the intent, I'm pretty hesitant on it
-(and "__ptp_multi_clock_get multi_clk_get" has me squinting to find
-the actual space amongst all the underscores :).
-
-If the overhead of reading clockids individually is too much, it seems
-like the next thing will be folks wanting to export multiple raw
-hardware counter values so the counter->ns transformation doesn't get
-inbetween each hw clock read, which this interface wouldn't solve, so
-we'd have to add yet another interface.
-
-Also, I wonder if trying to get multiple clocks in one read seems
-similar to something uio_ring might help with? Though I can't say I'm
-very savvy with uio_ring. Have folks looked into that?
-
-thanks
--john
+	Andrew
 
