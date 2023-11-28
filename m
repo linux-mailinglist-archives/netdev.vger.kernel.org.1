@@ -1,89 +1,115 @@
-Return-Path: <netdev+bounces-51916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D7A7FCADB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:31:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFAE7FCAE4
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:33:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9EF11C20CBF
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:31:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62AF9282FCB
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 23:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F83558AC2;
-	Tue, 28 Nov 2023 23:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C4A5C3DD;
+	Tue, 28 Nov 2023 23:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NQzUHNNU"
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="hAjmDOgU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 852EB19B2;
-	Tue, 28 Nov 2023 15:31:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lFBU8IhjZL/WEnPoZ4ruJNwwW8kAAIaljT/PQim0kSI=; b=NQzUHNNU2uQcmDwAFa9P8JXdwa
-	KNs/FBr7pBpV7mPRdpVrUqxZCBMEyFoOseyV8MTcUfSUhveQNlolMDdvVLSvC8bBzEDReKfzyD/0j
-	Hu0XLDi+Ya19v1nH1zbhS3I0Qtqxkz7nXdL2x5xZEqdENrxvAEB79yCS74JHy16q+anU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r87Y1-001VRR-9G; Wed, 29 Nov 2023 00:31:21 +0100
-Date: Wed, 29 Nov 2023 00:31:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tomer Maimon <tmaimon77@gmail.com>
-Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com,
-	edumazet@google.com, krzysztof.kozlowski+dt@linaro.org,
-	linux-stm32@st-md-mailman.stormreply.com, benjaminfair@google.com,
-	openbmc@lists.ozlabs.org, joabreu@synopsys.com, joel@jms.id.au,
-	devicetree@vger.kernel.org, j.neuschaefer@gmx.net,
-	robh+dt@kernel.org, peppe.cavallaro@st.com,
-	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com,
-	venture@google.com, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	davem@davemloft.net
-Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
-Message-ID: <a551aefa-777d-4fd3-b1a5-086dc3e62646@lunn.ch>
-References: <20231121151733.2015384-1-tmaimon77@gmail.com>
- <20231121151733.2015384-3-tmaimon77@gmail.com>
- <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
- <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
- <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
- <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
- <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D7519B5
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:32:58 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-423e6615f24so1423831cf.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 15:32:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google; t=1701214377; x=1701819177; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T5E8YxJ+6DFizX8w/tjdr1Q20AjeSOztly1v+T84HO0=;
+        b=hAjmDOgURwcCKRyzsQ2r9G/hrW5XB5oPAgH+truRdM7Ubd9bwhx+SUNOk769wz6aTr
+         VYfsuUmPAUDpDhIramOnNZVkmzbTcE1UjeRmD5rqVTIW9Q/tz+C/MvLNj9eOiZz8qsGp
+         +W6GO2qUsEaJy2fEIylTKL+Xx1ZDQQkwQ0zT405NTPg3borX7TjETTNniEkz183RclQt
+         60Kvw5avLZcFCPd2vHJhiHAi7jNEPvFiNyGXUg6AxM1NyQ95U51usNeoyOM0Xz4qTxwS
+         9F58JT1vDhwM60ZIjXHSSHHZeWT5IrJ4U3G7m2fIhWwODX7PcRzchcRkIZ7xRhpL3pFh
+         TUNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701214377; x=1701819177;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T5E8YxJ+6DFizX8w/tjdr1Q20AjeSOztly1v+T84HO0=;
+        b=nC+aGWaTsJPIVUD0ZfSi5P8aWxAm3AYl1ey6Up5GJ6ngc9lEZAAYvkdYd4e4VPLZ7s
+         QAMwkOPLRWKi+8ufISDmI+NC2wBgrAMA9qcwlqaR5E3/bHSPyTlJOhnq+aNooIDcsKxy
+         r4FjOeWcrbd7BWqlzNtIkuVvqocEKZxR3+84j8/AeRacla09+hmxGsG1JNRq3GZvbsRa
+         CvTWITuFQb/9nqifvel6vjaH9eAQyDbWRPkHCbRO1X/SzpbNKxT6nCgC18mtoQkExtly
+         RiovW28qAHVs34x9Ant9/7Vb04AX6hJiDQw1wPsiGd1frsCN5rd1zIxhXTObrMNTXRbV
+         7LJA==
+X-Gm-Message-State: AOJu0Yx8fD5aIoLWjyDWlMB6MXKv+wA4X/gucYPYBEO4XeRVsdrknAp2
+	uqGarYe7eRf2soTxF2szbv2NN8q0Sc/zviRlkeKcRw==
+X-Google-Smtp-Source: AGHT+IEOuxWHhR77aLWnHKpzlrX1TcnL7YFPpFLtYSrpaVGNIqLOq9dSsp5P0HO6NZm9ZocGV6nook5EATgkphMBWlk=
+X-Received: by 2002:ac8:5c06:0:b0:419:a2c6:820e with SMTP id
+ i6-20020ac85c06000000b00419a2c6820emr19578443qti.12.1701214377257; Tue, 28
+ Nov 2023 15:32:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-6-pasha.tatashin@soleen.com> <8e1961c9-0359-4450-82d8-2b2fcb2c5557@arm.com>
+ <CA+CK2bDFAi1+397fd4cYetUgmHxqE2hUG4fa2m9Fi3weykQdpA@mail.gmail.com> <6f9ff0aa-7713-4de1-869e-4725828942e4@arm.com>
+In-Reply-To: <6f9ff0aa-7713-4de1-869e-4725828942e4@arm.com>
+From: Pasha Tatashin <pasha.tatashin@soleen.com>
+Date: Tue, 28 Nov 2023 18:32:20 -0500
+Message-ID: <CA+CK2bDKaXqemr2Hp=MRxxMB_=AoRnUK_D2SGm9cDkKa+JaT7A@mail.gmail.com>
+Subject: Re: [PATCH 05/16] iommu/io-pgtable-arm-v7s: use page allocation
+ function provided by iommu-pages.h
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
+	alim.akhtar@samsung.com, alyssa@rosenzweig.io, asahi@lists.linux.dev, 
+	baolu.lu@linux.intel.com, bhelgaas@google.com, cgroups@vger.kernel.org, 
+	corbet@lwn.net, david@redhat.com, dwmw2@infradead.org, hannes@cmpxchg.org, 
+	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
+	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, joro@8bytes.org, 
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	samuel@sholland.org, suravee.suthikulpanit@amd.com, sven@svenpeter.dev, 
+	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com, 
+	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org, 
+	will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 27, 2023 at 05:19:15PM +0200, Tomer Maimon wrote:
-> Hi Andrew,
-> 
-> I took a look at the xpcs driver and the stmmac driver and it doesn't
-> cover NPCM use.
-> 
-> in the NPCM case the stmmac ID=0x37 therefore the driver is linked to DWMAC1000
-> https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/hwif.c#L139
-> 
-> to enable the xpcs, the stmmac should support xgmac or gmac4 and in
-> the NPCM is support only gmac.
-> https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L555
-> https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c#L573
-> 
-> and the most important thing is that the XPCS is handled through an
-> indirect register access and not through MDIO. the MDIO is connected
-> to the external PHY and not to the XPCS.
+On Tue, Nov 28, 2023 at 6:08=E2=80=AFPM Robin Murphy <robin.murphy@arm.com>=
+ wrote:
+>
+> On 2023-11-28 10:55 pm, Pasha Tatashin wrote:
+> >>>                kmem_cache_free(data->l2_tables, table);
+> >
+> > We only account page allocations, not subpages, however, this is
+> > something I was surprised about this particular architecture of why do
+> > we allocate l2 using kmem ? Are the second level tables on arm v7s
+> > really sub-page in size?
+>
+> Yes, L2 tables are 1KB, so the kmem_cache could still quite easily end
+> up consuming significantly more memory than the L1 table, which is
+> usually 16KB (but could potentially be smaller depending on the config,
+> or up to 64KB with the Mediatek hacks).
 
-What really matters here is, is the PCS hardware block you have an
-XPCS? We don't want two drivers for the same block of hardware. 
+I am OK removing support for this architecture, or keeping only info
+for L1, I do not think there is a reason to worry about sub-page
+accounting only for v7s.
 
-MDIO vs indirect register access can be solved with a bit of
-layering. That is not a reason to write a second driver.
+Pasha
 
-	Andrew
+>
+> Thanks,
+> Robin.
 
