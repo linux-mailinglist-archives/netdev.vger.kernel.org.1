@@ -1,89 +1,94 @@
-Return-Path: <netdev+bounces-51589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2046F7FB4C4
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:50:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8A87FB532
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 10:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1141C210C7
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E702B20CEB
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76301D54E;
-	Tue, 28 Nov 2023 08:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4F7374CE;
+	Tue, 28 Nov 2023 09:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Biez3ElI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DdRpIuSD"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91230E7;
-	Tue, 28 Nov 2023 00:50:09 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2A138C0011;
-	Tue, 28 Nov 2023 08:50:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701161408;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qYJnE4Z1r7jKRPOrGAwXhHc797bbl+1US3cszB9aa9E=;
-	b=Biez3ElIDFQtKoAoSEC77AQXzKbt7Ch1XeZiVYhh0NXtG9v9GlfxXJMHUGbOSfb77LUOcn
-	3R+0msBidXWkzyP/oA03LjO59JoGEB8nwVxWQhzryO7/3lBgdfOGe+ccmpFTRzo+6Hyh/S
-	GD+Y3ayQHKYfSpqkoEeBAFW7jASzaG7FBLQy3BcrLGsrxmfREYLffgYMaUk3magZpde8IY
-	Jpkm3fVUL0fUT7BMlooYuZIqQDCRhLrK/p3fM+xSrJ+AkeIXExE94qMn2452ctDbzk7VWP
-	2n/LDss+hsxqQFoi5sfx/ccHyQ5hgvuoH436OaEzpLi2b4pI+5FaKvrDAG795Q==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	alexis.lothore@bootlin.com
-Subject: [PATCH net] net: stmmac: dwmac-socfpga: Don't access SGMII adapter when not available
-Date: Tue, 28 Nov 2023 10:45:37 +0100
-Message-ID: <20231128094538.228039-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.42.0
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42360D4E;
+	Tue, 28 Nov 2023 01:06:42 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50abb83866bso7000735e87.3;
+        Tue, 28 Nov 2023 01:06:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701162400; x=1701767200; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2TtVT9r6Ap3lfSrLlJlyUkvyevyK8TC9uXcXi9Em2ck=;
+        b=DdRpIuSDjUEvliC0MrWNGdzlBgvv+ozex/jhSKx9S4a8PDJgfnde+LQiUWf9bF92yr
+         dy/1Z9FmGK0s3CG6lFU5TgFdFLPwEMoWpF6l07muF6ZROIbVV9hUNgaTtqz+a9KZlEdI
+         4LBrow/yL8SJTejJboPnADd3nwyLUCeDCIBZG8a+yCWjThMeOC3nOMukYpAaZXsrXN1g
+         PXRAw4KeVhooj+30HDuXGYj2MU6LwmXGKKumBh4Cm/oZriERDigyyUrU9W780vfzB+VX
+         UZjtJ4yYg+3zrkxPcbnzNgAm39vvI3+VGHNy++5zkRM12n0GWwgp59p9RruBa7KHXlg8
+         iP8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701162400; x=1701767200;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2TtVT9r6Ap3lfSrLlJlyUkvyevyK8TC9uXcXi9Em2ck=;
+        b=VYMGgfsAi7uJvDQXs7qW4CtfxNkEOW9cAKUQcutNej93tCUrlyZtE0CTuFadKYzA59
+         3YjbEryVxW1MvVXh7wEAaQ5WKoeVZZ44d0AHkzcYtBZPnf3svkqQVFlERfhH3uoVpJIU
+         SaCdlTLSo42FblvsmM20t3ser335qw/ORDxq1B4kBaoAy094xBRsdN27t5GjslIksdfy
+         xKsNW1YFt4SibiN4SXtHck0c89JuEZaX3oNKcVTn2txB9kfIOctbqxdeVeKYDKBEu1GH
+         5Tmb/RJ7dEwMwIh9zo6vYjkvKFa8GpSONxLcEO9tzA1/wGQT3J/C2hFvlhG6VeHKK2QH
+         sFrg==
+X-Gm-Message-State: AOJu0YzmEgKv9kCMp3Q3uSwT1v2yVbIMha+Wq6RpNH7ismiyvpMyZTIH
+	MA9WafTSOgwz7HxlMzpECQf7amahQWA=
+X-Google-Smtp-Source: AGHT+IEks0iYLKuPkU+ZqjROCRlZBcpTEHp1SOXzfxZ3Rs3N9Trq5Cn99U9xniHpg6RrI4W/7v+hFg==
+X-Received: by 2002:a05:6512:3e05:b0:50a:7868:d3c5 with SMTP id i5-20020a0565123e0500b0050a7868d3c5mr12720377lfv.0.1701162399842;
+        Tue, 28 Nov 2023 01:06:39 -0800 (PST)
+Received: from [192.168.1.103] ([178.176.72.137])
+        by smtp.gmail.com with ESMTPSA id br3-20020a056512400300b0050aabfb8807sm1788245lfb.4.2023.11.28.01.06.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Nov 2023 01:06:39 -0800 (PST)
+Subject: Re: [PATCH net-next 4/9] net: rswitch: Add unmap_addrs instead of dma
+ address in each desc
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, s.shtylyov@omp.ru,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+References: <20231127115334.3670790-1-yoshihiro.shimoda.uh@renesas.com>
+ <20231127115334.3670790-5-yoshihiro.shimoda.uh@renesas.com>
+From: Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Message-ID: <39248b92-3439-c1ed-e4f5-9f1f61fada34@gmail.com>
+Date: Tue, 28 Nov 2023 12:06:37 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+In-Reply-To: <20231127115334.3670790-5-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 
-The SGMII adapter isn't present on all dwmac-socfpga implementations.
-Make sure we don't try to configure it if we don't have this adapter.
+On 11/27/23 2:53 PM, Yoshihiro Shimoda wrote:
 
-Fixes: 5d1f3fe7d2d5 ("net: stmmac: dwmac-sogfpga: use the lynx pcs driver")
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> If the driver would like to transmit a jumbo frame like 2KiB or more,
+> it should be split into multiple queues. In near the future, to support
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index ba2ce776bd4d..ae120792e1b6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -243,7 +243,8 @@ static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enable)
- {
- 	u16 val = enable ? SGMII_ADAPTER_ENABLE : SGMII_ADAPTER_DISABLE;
- 
--	writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
-+	if (dwmac->sgmii_adapter_base)
-+		writew(val, dwmac->sgmii_adapter_base + SGMII_ADAPTER_CTRL_REG);
- }
- 
- static int socfpga_set_phy_mode_common(int phymode, u32 *val)
--- 
-2.42.0
+   In the near future, you mean?
 
+> this, add unmap_addrs array to unmap dma mapping address instead of dma
+> address in each TX descriptor because the descriptors may not have
+> the top dma address.
+> 
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[...]
+
+MBR, Sergey
 
