@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-51596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE537FB4CC
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:50:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718467FB4D1
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 09:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B159C1C21086
-	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6D0BB2132E
+	for <lists+netdev@lfdr.de>; Tue, 28 Nov 2023 08:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DAF1DDCF;
-	Tue, 28 Nov 2023 08:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BF21DA2C;
+	Tue, 28 Nov 2023 08:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4efwJ4A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V65OTZ6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19337E7
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:40 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6b7f0170d7bso4879921b3a.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:40 -0800 (PST)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F838E7
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:44 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b20577ef7bso4505230b3a.3
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 00:50:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701161439; x=1701766239; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701161443; x=1701766243; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ND75AnxP9o6edoo6d0k++1k4h8vC8KMUihiX/v8OTos=;
-        b=J4efwJ4AGZopp/4qD+seEQzYv7NfWnmaxEg/tWT5U6T7OrRDbeo/92JtgzYzOLwt6n
-         49WDUxzDVkZshqQYD9Q8q864qPPCTH5TsI0NDzOE9Vdn6dbHOkB9xFWHMh+N+9fdaEtx
-         tIldED9lkrYVnjw50srHSnPt7CTi8eEut/q9sN/GeauO4yaymSU1AOZP1jCl8MgTUx2L
-         tYTu49hGnx294/Mf5k1pkBhaLfPV47r3Ss4t+RyzP52lfidZxj7QPXWl3ZnIV0MH6k0+
-         4REx6j8yJsI6ykgIVxTQp5VW7VVosYpD8Aj6/Zx8I/8E1nQ3d0wEaartkhxLVyR0VwL1
-         eSJA==
+        bh=u15oyv4jQ5hr1Ec1G7FfFNQfq84tvttpwKNWquVokdU=;
+        b=V65OTZ6mZ9Q7xsEI4qoijexWD8zwd23Rl8fngTw1toqjBW+xDYHbq20AaqLzY+8PmF
+         E9OpeU2/fvnjlx+yGtyWLECyAEDKrnCjawoD4HLVccYQMvOQJ1QGgttuznA5aBzoUghH
+         sJEq19B1H7g24DT1Adiv0+GIXvwNU0eKaO5WbLp20dit3TNY9x5SFcGDlX6wsmQTU1Rq
+         hdPJ/ed1J5CCn6uOI+dZZOQDG/vjOWyOzGVF7Ms/NxcYkpa5/GEbhJt/9Lk6nF+hlPgN
+         dQb30PQ5W7AzrA78sCV/K65IB1sy3sGvbd4GL9ZCGSRh8ZNoYq7+E233jANfimQAe/d8
+         fNGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701161439; x=1701766239;
+        d=1e100.net; s=20230601; t=1701161443; x=1701766243;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ND75AnxP9o6edoo6d0k++1k4h8vC8KMUihiX/v8OTos=;
-        b=on3H4DFK/hGXTFjnezTIyXwxcaOzNiGQpiOhjAGuq9QI8Uwmzejy3ZWDbzk0oelT7N
-         CqYIPWnGjYZb9fvGxJvtvv/p00hB05NE7xJSnl3oHtKBTLQ/Ji9eYYakJRr84HeYueu1
-         XuQ7MUcfMgfdQUHylvZIEW3lG3bKYzYcHazxkdSFvz7JHTulwaAiBnMu0ZEEr7WcO1VO
-         aoA4iBDjKTAyEDsndpIpn9g//GTMVuxJh3YxFIoewKUouA9m1ltip9t3xzNzhInG1ND/
-         JuhImQCHEhutkkMmNWUEYbiwITbjYH2mLo4/DFqXoUo01wA3otDYqdu7j3lz28XQiNus
-         Jy/Q==
-X-Gm-Message-State: AOJu0YwXBf4fWSoH6hFUnm3uy+zldhMIbfks6AZTWMI+Sedipau3Sqqp
-	vRLJuqBeGDPRcslrEyrQgpdGxf3bWoj00KOR
-X-Google-Smtp-Source: AGHT+IEDwdl4H1SNovDrvpQEXVl5l+VHekDEpF015DN0iW9aHqkhuD+NMbHIMclVsligRuJJnY3NJA==
-X-Received: by 2002:a05:6a00:8f0c:b0:6cc:298:eb30 with SMTP id ji12-20020a056a008f0c00b006cc0298eb30mr15668799pfb.29.1701161438859;
-        Tue, 28 Nov 2023 00:50:38 -0800 (PST)
+        bh=u15oyv4jQ5hr1Ec1G7FfFNQfq84tvttpwKNWquVokdU=;
+        b=UiFL9QCj57UsJ5G2CNaaojTrUDuftnJmPnA40zVFsvVS0/mrMcwMBx2sD6EXydIVEU
+         efBqsbilqsBbd/k7J/PtfBUI6kbq2h++CQOEQHFaQHpEv6MNQRpudRNjhuc+SAboNmq6
+         neWMND+Z+stuXQIrGIJzNozkP/0mw8jGqrxaaUia7qgCatE7Nowz54TTCrptyivnPGK5
+         I5W35trwi9VKoxGoaZeOakfiTynXloY4vrwh+6YyevxAR9ftNaK3cKEi8EjfSfZm7Fj7
+         3MwRR125vmOZZuYcCq5K9lRQMkqhknO1eyHgvBmLok8KZYxyWQLJ9T2eWvEHkzKjCcDZ
+         QnmQ==
+X-Gm-Message-State: AOJu0YwVeCcUQ3Ta11WO7J8nH+KGVL0aDMgEhGZtpj4u8hrIW7QBJygD
+	a4To5zjBb5LViPeUy2sbgBRJ1JRH8drasjKq
+X-Google-Smtp-Source: AGHT+IGp3jchBNq6XdVu3VqVhw6NEUEBTIwKHvzWYtsrvgL3MxmAA6V0vtFAcgB2+NqOR0GqmidEpQ==
+X-Received: by 2002:a05:6a00:2787:b0:6bd:f760:6ab1 with SMTP id bd7-20020a056a00278700b006bdf7606ab1mr16465855pfb.14.1701161443460;
+        Tue, 28 Nov 2023 00:50:43 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d25-20020aa78159000000b006cbae51f335sm8766513pfn.144.2023.11.28.00.50.34
+        by smtp.gmail.com with ESMTPSA id d25-20020aa78159000000b006cbae51f335sm8766513pfn.144.2023.11.28.00.50.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 00:50:38 -0800 (PST)
+        Tue, 28 Nov 2023 00:50:43 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -71,9 +71,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Marc Muehlfeld <mmuehlfe@redhat.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 07/10] docs: bridge: add multicast doc
-Date: Tue, 28 Nov 2023 16:49:40 +0800
-Message-ID: <20231128084943.637091-8-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 08/10] docs: bridge: add switchdev doc
+Date: Tue, 28 Nov 2023 16:49:41 +0800
+Message-ID: <20231128084943.637091-9-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231128084943.637091-1-liuhangbin@gmail.com>
 References: <20231128084943.637091-1-liuhangbin@gmail.com>
@@ -85,76 +85,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add multicast part for bridge document.
+Add switchdev part for bridge document.
 
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/networking/bridge.rst | 55 +++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ Documentation/networking/bridge.rst | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-index 764d44c93c65..956583d2a184 100644
+index 956583d2a184..3b82cf52bfec 100644
 --- a/Documentation/networking/bridge.rst
 +++ b/Documentation/networking/bridge.rst
-@@ -161,6 +161,61 @@ on a bridge is disabled by default. After enabling VLAN filtering on a bridge,
- it will start forwarding frames to appropriate destinations based on their
- destination MAC address and VLAN tag (both must match).
+@@ -216,6 +216,24 @@ which is disabled by default but can be enabled. And `Multicast Router Discovery
+ <https://lore.kernel.org/netdev/20190121062628.2710-1-linus.luessing@c0d3.blue/>`_,
+ which help identify the location of multicast routers.
  
-+Multicast
++Switchdev
 +=========
 +
-+The Linux bridge driver has multicast support allowing it to process Internet
-+Group Management Protocol (IGMP) or Multicast Listener Discovery (MLD)
-+messages, and to efficiently forward multicast data packets. The bridge
-+driver support IGMPv2/IGMPv3 and MLDv1/MLDv2.
++Linux Bridge Switchdev is a feature in the Linux kernel that extends the
++capabilities of the traditional Linux bridge to work more efficiently with
++hardware switches that support switchdev. With Linux Bridge Switchdev, certain
++networking functions like forwarding, filtering, and learning of Ethernet
++frames can be offloaded to a hardware switch. This offloading reduces the
++burden on the Linux kernel and CPU, leading to improved network performance
++and lower latency.
 +
-+Multicast snooping
-+------------------
++To use Linux Bridge Switchdev, you need hardware switches that support the
++switchdev interface. This means that the switch hardware needs to have the
++necessary drivers and functionality to work in conjunction with the Linux
++kernel.
 +
-+Multicast snooping is a networking technology that allows network switches
-+to intelligently manage multicast traffic within a local area network (LAN).
-+
-+The switch maintains a multicast group table, which records the association
-+between multicast group addresses and the ports where hosts have joined these
-+groups. The group table is dynamically updated based on the IGMP/MLD messages
-+received. With the multicast group information gathered through snooping, the
-+switch optimizes the forwarding of multicast traffic. Instead of blindly
-+broadcasting the multicast traffic to all ports, it sends the multicast
-+traffic based on the destination MAC address only to ports which have joined
-+the respective destination multicast group.
-+
-+When created, the Linux bridge devices have multicast snooping enabled by
-+default. It maintains a Multicast forwarding database (MDB) which keeps track
-+of port and group relationships.
-+
-+IGMPv3/MLDv2 EHT support
-+------------------------
-+
-+The Linux bridge supports IGMPv3/MLDv2 EHT (Explicit Host Tracking), which
-+was added by `474ddb37fa3a ("net: bridge: multicast: add EHT allow/block handling")
-+<https://lore.kernel.org/netdev/20210120145203.1109140-1-razor@blackwall.org/>`_
-+
-+The explicit host tracking enables the device to keep track of each
-+individual host that is joined to a particular group or channel. The main
-+benefit of the explicit host tracking in IGMP is to allow minimal leave
-+latencies when a host leaves a multicast group or channel.
-+
-+The length of time between a host wanting to leave and a device stopping
-+traffic forwarding is called the IGMP leave latency. A device configured
-+with IGMPv3 or MLDv2 and explicit tracking can immediately stop forwarding
-+traffic if the last host to request to receive traffic from the device
-+indicates that it no longer wants to receive traffic. The leave latency
-+is thus bound only by the packet transmission latencies in the multiaccess
-+network and the processing time in the device.
-+
-+Other multicast features
-+------------------------
-+The Linux bridge also supports `per-VLAN multicast snooping
-+<https://lore.kernel.org/netdev/20210719170637.435541-1-razor@blackwall.org/>`_,
-+which is disabled by default but can be enabled. And `Multicast Router Discovery
-+<https://lore.kernel.org/netdev/20190121062628.2710-1-linus.luessing@c0d3.blue/>`_,
-+which help identify the location of multicast routers.
++Please see the :ref:`switchdev` document for more details.
 +
  FAQ
  ===
