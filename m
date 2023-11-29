@@ -1,111 +1,167 @@
-Return-Path: <netdev+bounces-52128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB9FB7FD6A2
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:21:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 352737FD6E6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CD17B20F97
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:21:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DF66B216A6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E388C1DA40;
-	Wed, 29 Nov 2023 12:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF510134A4;
+	Wed, 29 Nov 2023 12:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bdOxlM7R"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="cTa+qq/U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E65610C0
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:21:47 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cc79f73e58so153595ad.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:21:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701260507; x=1701865307; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o56Www3Q+AtcE90gXDvz5NG1arQEXkGu3aDX+2U5OVg=;
-        b=bdOxlM7RAmZg1OpHSkxKL864stOnjSKxyFqjmE/WlnPxNyFC7g42HGDP4cMHYkLffb
-         0k4QxcxvxbTlEzyGKHtnI+7gZJ5wLKDoXq8yp0ULCcvGL47hz56N3MfVhE8eB3xGeKJD
-         qYy2dYDFb5y3Eusd1ekO/5foZ6rK0zLcJ0I+7K7beTdw66aCpcHpLMYXZq3eOAg1Oh7C
-         fhzemgMWrOYv/k+80Zd4SciI6Rm+zPCRjNFhTbkNRJqbigzsBta1OE8JsV4pyZhXimEa
-         sOUpFpflN/YTWIj7K0w35aD3lYXPlVvSjFKPuy+l2NnHOIX40CJ1OEut/F+ImBS0aqjl
-         n7qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701260507; x=1701865307;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o56Www3Q+AtcE90gXDvz5NG1arQEXkGu3aDX+2U5OVg=;
-        b=I0voUbW2E56fOL6FkThYTR5gK82lToD9mQJrh79GbXIXbus35ypnBxBPImfh3G0XUR
-         lCTSbeG4xcs9zSXoxBDwvwMQ3kssZpeBuyAmmKHMORmSeZ34XBm+ExpfU8y0q/jIUlo5
-         nuVn+vt0MGW2Cmc/We6obwle9Ohu00KQ4CAdm2pncTG6o1W14r5SPVVzkKdTVJ0AHN2f
-         VqnFSeUDYiSqjZg3b49LxT29OtUx1DFTKPjAFDF+0pC7LczJyRGgWmxwr9kVGjglfFMG
-         LBICDUV39uiSC7o/HB6SgVjjfTsWja3RPa3HAXvDRubug+c4vQP2hxmHtB8Ygt6iRPpd
-         gLeQ==
-X-Gm-Message-State: AOJu0YwA0i9tYElKiFH4GgPgcZsBWde1Clca9GWuS6Ut105TV3JI8JhJ
-	i97FfuzGAOjsQdTsew4EsVJSelxd7QtXh9M1631kyw==
-X-Google-Smtp-Source: AGHT+IGijv2oaXJrsz4eOoB3TmX4ovkG0ibEUz+P5TLts7xACNH5qB3XKWndGchQRopwNv8LdczoZIB5sx6elgIxlsM=
-X-Received: by 2002:a17:902:fc44:b0:1d0:220b:f254 with SMTP id
- me4-20020a170902fc4400b001d0220bf254mr21736plb.14.1701260506633; Wed, 29 Nov
- 2023 04:21:46 -0800 (PST)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2050.outbound.protection.outlook.com [40.107.7.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78081D4A
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:38:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NVWxsAPzbiqkbg/FGgM7XhaHUwF3Y11KRZUspBaqNdHC+SH/3GE7LhvAhDvKAIg1ss6gJTwRMG6bBcWObkNYzrQbWSHoBqMeJCHls/reYbX/pLNirzT1I9TNeVsI3+mszOhgvnid/Hq2rKQnSnQydpz2kIL14tYPcnPMJKahiXYrQOv8YJMw+qcFu9uBl8UeCWivwkd9tqGgiuwkC4hOgvdzSjhMVxLl63B/AHbLfxUyZqCe/xHUyjk9jGT9OHAI48mvSxXHstfAOrWxW045K73LpZ07oTlGNiH2RcR++5r7rO9jpQy/6IAag3z+pqa9rYVSx8ml0CRjSJP5MOjJ5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5ol2WTLvjy/VKOicQXryLtMK0iWdj8PwDAKwupG+ZII=;
+ b=ef6/GWG3rG1bflpQnwlS0FZQACDS4ckBYeCFdUYI14HmtQ21zh2F4CtOWfAtOyTy4G2MSmzx7PXav8Owojeb+t/72iCFGP3UZZtiKXbcbgat9QaKc0s2qJx+f2mFKTCjJSpSWxZsedsZkaJmMxkvjbHQqred+fqWDL7dRDRbhsmkEM6jXgPj//fA9R9xS+YCaAzEyzW/TZOfzzVlx8WAotnc/pWhIS0153brZ2vLsVp8dQ/uAlyoV0V7Zjed2Oia+6Z3EdtGUTgCxwtCEcNU8aJYSIzPxznRK0UzjHIn+gUcMbwg8yJkjsBsxUl1bQd/N5UAdYKt95aczrDwH6MFGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5ol2WTLvjy/VKOicQXryLtMK0iWdj8PwDAKwupG+ZII=;
+ b=cTa+qq/UWUCt5Ux0ZrelESinw1zYQQrjb4Z1zeXHG6Men+wXzQevUQCY77+AZEVOw1ixFvfja1Eu5Vfgi1O8JRsJJxTFoq3/16xHQkeuu1iM2tTWiLwitWscPcy/SYxRlDNytcNRzDX+01Ml8znE2p1ePnm9zKh5v86Itb0016o=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS1PR04MB9382.eurprd04.prod.outlook.com (2603:10a6:20b:4da::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.21; Wed, 29 Nov
+ 2023 12:38:22 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
+ 12:38:22 +0000
+Date: Wed, 29 Nov 2023 14:38:19 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev <netdev@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/8] DSA LED infrastructure, mv88e6xxx and
+ QCA8K
+Message-ID: <20231129123819.zrm25eieeuxndr2r@skbuf>
+References: <20231128232135.358638-1-andrew@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231128232135.358638-1-andrew@lunn.ch>
+X-ClientProxiedBy: VI1PR06CA0171.eurprd06.prod.outlook.com
+ (2603:10a6:803:c8::28) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000d9483d060901f460@google.com> <0000000000006547d3060b498385@google.com>
-In-Reply-To: <0000000000006547d3060b498385@google.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Wed, 29 Nov 2023 13:21:35 +0100
-Message-ID: <CANp29Y4NLk4jd8zhN-VjXWtrDSWbS=Y-ADGxrmboKU+KH2hMPw@mail.gmail.com>
-Subject: Re: [syzbot] [perf?] general protection fault in inherit_task_group
-To: syzbot <syzbot+756fe9affda890e892ae@syzkaller.appspotmail.com>
-Cc: acme@kernel.org, adrian.hunter@intel.com, 
-	alexander.shishkin@linux.intel.com, bpf@vger.kernel.org, irogers@google.com, 
-	jolsa@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, mark.rutland@arm.com, mingo@kernel.org, 
-	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS1PR04MB9382:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7efd723f-c72b-4d7a-64f9-08dbf0d812ff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PJA2v5gq8ayeHpy9buUmN8l0hWO6SogxDNAkujHzxbaNupc9ktzSkd2tldG1IJOhPPrSqQiDlw47nUR4UcFOxZzcKROXlp9eV2w/142iFpapIU+uvjjyyOqmdAvlhuMc+AZdTM0gyhWDLkLhQP4YaZ4sLQJwnC9Q2NMNoASouFzJUchrogSH4tYmWfuVnBE7kSsBEIih0CDkKeBb2pWHOMQR6hUjhT94Hc+jktr/phfOXLZ4pPTyZ0w85ygLzcdNuESB4JWZKKd20mmTCRNLfpBxQ+RNDh0clTCndMnOg3UXQmWYzRKHkMJtS8Wr7cl6TjiZkuGVOCSrkLfja0N7Lr6neYOKWB213Wbpo8gncyepcTmpQUD2+YLCwlv5mITf4QubKR8jWMuv40GZuJwP23NT62UF5BQGWoFb1JVjtMiCMlZMO7wGQxcR3ufFHM/uXoDlSU1uBfyazUT2wJA4o54RnityuI4ouJ8u1dNiptsx/TU2YD+mLmzM4pk3IBz/ipUsTlqx77RyGhtoFBTJAYurYiVQQ+pPmv98HXYwBQ4jekZSxcl4WzleyaAP/0l5x0A9TTLNn9qwbqplS0zoVBq+IkSgzFjlk4Hpyv+lT7o=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(136003)(346002)(366004)(396003)(39860400002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(26005)(1076003)(6512007)(9686003)(86362001)(38100700002)(6486002)(54906003)(5660300002)(966005)(41300700001)(2906002)(6666004)(6506007)(478600001)(4326008)(66476007)(8676002)(316002)(8936002)(6916009)(33716001)(66946007)(66556008)(44832011)(32563001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?0sCzslOtllvLfye+f2hDMR4XIyqNOLInMP7BeBYK8lDH/Ri3+uAYIFgJElTb?=
+ =?us-ascii?Q?FqxzeAMKMmThvgc2OlBVksU/iQN33Q8QEQa5oJzci6F0NFwvAOvXl938oBWh?=
+ =?us-ascii?Q?vd106D3WSbZMQvy5Ub5foN3cLkFhGmapX9KV81qKuaYjJOX23QiRkeKRihUr?=
+ =?us-ascii?Q?xaNjmlMCQgGpQO5t67z3ENkS355QBP02ItHzFc0/Iyknyk1FnjavRAmFYWeJ?=
+ =?us-ascii?Q?WabYG13AfqqxDduXCeuBtsEhcRQ2c9nL8y1LefVwsfwc/AJJMMOSKamz+6xB?=
+ =?us-ascii?Q?Z0D58PLDDay89EXrLZF5PiwlmcAdPM4KIoxyeS6qqrNrsvE7g3H0wl1cRlQ0?=
+ =?us-ascii?Q?DSEeOlENJGbSmOZyLEK3Blq5tgFGgNf9BiKmwxU/3oPNbaZad/mLjGY2iXEE?=
+ =?us-ascii?Q?M+DNJ8LL+zTgQJvobkzEhepYlWt4qu4engBEfpQ9xLp9RrBNm7GbggxH8kh9?=
+ =?us-ascii?Q?RsKJ5SaFSg9U8mS99fjnVqU65u4vudA8K3qh0rBT5QsmCluWWoCMFrPk+n74?=
+ =?us-ascii?Q?dujFhjAQkMqhnLMWq58EvjNu/y3eCASZ/juxGmFTwJylOzqrnioZJWQSmtNM?=
+ =?us-ascii?Q?aeBe3QXkmPK3X8cccB167NK1GMI9M6nINE26tXtVBxd3Bd5OUNVJDIdU0cWC?=
+ =?us-ascii?Q?47bu9jJy5wPcGUWfO+2m3x2XghC1/EZPRbu471fZmQIfHxAIgxmVCnZRxPK8?=
+ =?us-ascii?Q?yd6vGR6JmEXKz42/NL5Z6m/oYKCXG2hxkR4Hj8FWQAWWGbcMcBqVzz1e+BsE?=
+ =?us-ascii?Q?eI+7akBlrqTrMv8mT+iPssoLYiuK3we8JMNz8WnsKPKXdtKXjV1PWocOQCYP?=
+ =?us-ascii?Q?bGpJrZC5jujrreQv2BosJcXXtrAKdTDmAKZReAZnOMp4hkJEyNvUFAspl6DA?=
+ =?us-ascii?Q?XQxcBNo5/Gb9tFZ4Vj/TzIRY9YXQJH1Z+AVCUKlsqTvBwBKB5ognopw6nogo?=
+ =?us-ascii?Q?/47PIN6I9SrjBPpSR/oUn+Tw13H9ql4DMwekR37MjXuJ3Ds+6oKXpB/k7C4/?=
+ =?us-ascii?Q?NByNR7FT44pVztpYo0myE5+OUzpZaq8S+BBk95OsXg285HZbWVKeJ/gKPyng?=
+ =?us-ascii?Q?/YbQOzSEe1aCGGQfyIgoztn8i5tZRPq01oOi+FNYdVpYbtMMmht7YyaVupjg?=
+ =?us-ascii?Q?r5LN2WBH+I6hRr3elT6Om8vFzSGN2/tVdhPyK+hFpgEMYGLHujJKfFFOQ4/n?=
+ =?us-ascii?Q?kYgyZb4HKgDzM4/sg9s1er9aXWkjY8X8bUt0oG/7xze8FoXuAVRBlwJrg1dQ?=
+ =?us-ascii?Q?bV+2MecYfXv6PgXRKuFg+788hgbFWmL8aVdpjZ6kb//KORtolWlrqXm/u/nE?=
+ =?us-ascii?Q?Y6iaVEI2X4w8zjYCt5pznShFfUwXWw6raj3rcRgYhYIyASgKnaZLo6ZLOckz?=
+ =?us-ascii?Q?i6sFuoojiD9oak5d6HrZV/LinVLahzEFP/aCQj1xm2juuYezDgiljPHvGygo?=
+ =?us-ascii?Q?0PVCH9tq/F4eAlWRrd8K2F/B8aAL69KT94qp8toYuqoquITq+KsbBkmRezTM?=
+ =?us-ascii?Q?xkWC5a+Lmggc0U0Dc8xgY8kAOtxTHiQErb6T4EXarXYAFR+fediOd9UPu1bI?=
+ =?us-ascii?Q?bGg6FIbzwKpCLXh6S9BdWELwKWkE+6rt6zsKIetoenW+Yqwqkzl+dcLJO+v9?=
+ =?us-ascii?Q?ow=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7efd723f-c72b-4d7a-64f9-08dbf0d812ff
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 12:38:22.6777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QjtiPHvVdRACP5N7Ua1vCns+FdOXWeqQ+OSP8aZ7EaByDR8+OQF0bhF6aVh69pAc0mXQeePFY0Zg7PfNN9gy0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9382
 
-On Wed, Nov 29, 2023 at 1:17=E2=80=AFPM syzbot
-<syzbot+756fe9affda890e892ae@syzkaller.appspotmail.com> wrote:
->
-> syzbot suspects this issue was fixed by commit:
->
-> commit a71ef31485bb51b846e8db8b3a35e432cc15afb5
-> Author: Peter Zijlstra <peterz@infradead.org>
-> Date:   Tue Oct 24 09:42:21 2023 +0000
->
->     perf/core: Fix potential NULL deref
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D17172162e8=
-0000
-> start commit:   6808918343a8 net: bridge: fill in MODULE_DESCRIPTION()
-> git tree:       bpf-next
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D429fa76d04cf3=
-93c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D756fe9affda890e=
-892ae
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12db572b680=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10839a1b68000=
-0
->
-> If the result looks correct, please mark the issue as fixed by replying w=
-ith:
->
-> #syz fix: perf/core: Fix potential NULL deref
+Hi Andrew,
 
-#syz fix: perf/core: Fix potential NULL deref
+On Wed, Nov 29, 2023 at 12:21:27AM +0100, Andrew Lunn wrote:
+> This patchset extends the DSA core to add support for port LEDs being
+> controlled via sys/class/leds, and offloading blinking via
+> ledtrig-netdev. The core parses the device tree binding, and registers
+> LEDs. The DSA switch ops structure is extended with the needed
+> functions.
+> 
+> The mv88e6xxx support is partially added. Support for setting the
+> brightness and blinking is provided, but offloading of blinking is not
+> yet available. To demonstrate this, the wrt1900ac device tree is
+> extended with LEDs.
+> 
+> The existing QCA8K code is refactored to make use of this shared code.
+> 
+> RFC:
+> 
+> Linus, can you rework your code into this for offloading blinking ?
+> And test with ports 5 & 6.
+> 
+> Christian: Please test QCA8K. I would not be surprised if there is an
+> off-by-one.
+> 
+> This code can also be found in
+> 
+> https://github.com/lunn/ v6.7-rc2-net-next-mv88e6xxx-leds
 
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
->
-> --
+I am disappointed to see the dsa_switch_ops API polluted with odds and
+ends which have nothing to do with Ethernet-connected Ethernet switches
+(DSA's focus).
+
+Looking at the code, I don't see why dsa_port_leds_setup() cannot be
+rebranded as library code usable by any netdev driver and which bypasses DSA.
+Individual DSA switch drivers could call it directly while providing
+their struct device for the port, and a smaller ops structure for the
+cdev. But more importantly, other non-DSA drivers could do the same.
+
+I think it comes as no surprise that driver authors prefer using the DSA
+API as their first choice even for technically non-DSA switches, seeing
+how we tend to cram all sorts of unrelated stuff into the monolithic
+struct dsa_switch_ops, and how that makes the API attractive. But then
+we push them away from DSA for valid reasons, and they end up copying
+its support code word for word.
+
+Maybe this sounds a bit harsh, but NACK from me for the approach.
 
