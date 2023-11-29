@@ -1,161 +1,167 @@
-Return-Path: <netdev+bounces-52075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A6087FD364
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:58:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC7C7FD36E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C858E282AC8
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:58:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E9A5B2134B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428EF18E25;
-	Wed, 29 Nov 2023 09:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GC2U2U9i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E7618E20;
+	Wed, 29 Nov 2023 10:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26421AD;
-	Wed, 29 Nov 2023 01:58:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701251925; x=1732787925;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KucyGOqn1JyY5SGZU0/6/92QdqJqjUgPNGv4D39cu0s=;
-  b=GC2U2U9inwPhS8hiZZKKEXCAF306qghe0/6TiJj+iTfgSFeNPy7QIUKa
-   7+GQznJgKFDlDMlSXqKS5bngfUWAgq3OVpR1c8SR42h6MAmZZscABVmye
-   +vgXfBCBKSfZF0YE8aXkW/EXaaHi4UkrKEOhAbqOF+xGhxPjE6N2q2D/d
-   V76nEHmQqjVpZSN/HgYHmoZuJJW8MHgXavSS+wm/FhHWBFInESNiXfNfI
-   S2AM3weLY0tLsERBqCusKJ3RwFqqbThCtWDWRwaohzEcR9xlqubSm6gu7
-   sGKKCkHyKMlYhuXU+TzSXH7YhA0adxLdPnO89PrC7c4nrefguY9shxhDG
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="383530941"
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="383530941"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:58:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="10276578"
-Received: from hongyuni-mobl.ccr.corp.intel.com (HELO [10.238.2.21]) ([10.238.2.21])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:58:32 -0800
-Message-ID: <6d3e9993-4d5a-47fc-aef5-d6c14dee4621@linux.intel.com>
-Date: Wed, 29 Nov 2023 17:58:20 +0800
+Received: from mail-pf1-x447.google.com (mail-pf1-x447.google.com [IPv6:2607:f8b0:4864:20::447])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD0DA1990
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:00:33 -0800 (PST)
+Received: by mail-pf1-x447.google.com with SMTP id d2e1a72fcca58-6cbb3512511so10338647b3a.0
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:00:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701252033; x=1701856833;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D+gLU1PEjcnVbI1lTHXd2F7SerEErbEsGZaA3ZecShs=;
+        b=rklcRQmfEisPK7XTB16ccugjkgZ7Pkuk+OWTXKW+UcV0jukIj2sVtu9XgdC1sVVFk6
+         TM9seYWUD8gwzrosrVbNCIkqXhY3HSxhUHH93FkrQmYpGyzFQ2tWUtxxwMNPCWF4Wzpb
+         RonFS2YbpTgFPEb120bXVNHw1K5DZ4SqUE7TX/h9aXcrTk9meFtQ9bSLdgST8PGxNCf7
+         z8IZ2S3WVa/p7TpMsDi34kbTXUlbkivMfCgRL2E1QiJou3elzfCj2fcJMLwJT+S3pQ/F
+         S2if1D7lj0ZvVjxexJSLhfy4KokyVtF2SU1GvQ1M0KbFKZutWRNBX2ufsvbCFa98WYGX
+         QGZw==
+X-Gm-Message-State: AOJu0YxxrGnegBR7fUVtQfgvBu3DKtZoyDU5Iw4j/uqd+qylXdqV5Pse
+	dkKtYtoNbxE0/f2E19WpFg6v57DQ6NpuIF1xkYzxBZU+9pLK
+X-Google-Smtp-Source: AGHT+IF3hxeemmz5wFyvk36PF448oFL7YPymotkK6RnVTwDH/BeArh47p4VtdfBdC3uuvFnscvGWs5bnEirm9DC6qRkZ6WiXxX/s
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] virtio: features
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, Linus Torvalds
- <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, eperezma@redhat.com, jasowang@redhat.com,
- shannon.nelson@amd.com, yuanyaogoog@chromium.org, yuehaibing@huawei.com,
- kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alexander.shishkin@linux.intel.com
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
- <20231129044651-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
-In-Reply-To: <20231129044651-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6a00:3a29:b0:6c6:a6f9:a3 with SMTP id
+ fj41-20020a056a003a2900b006c6a6f900a3mr4800805pfb.5.1701252033394; Wed, 29
+ Nov 2023 02:00:33 -0800 (PST)
+Date: Wed, 29 Nov 2023 02:00:33 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001fc0bf060b479b58@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in ipgre_xmit
+From: syzbot <syzbot+2cb7b1bd08dc77ae7f89@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    18d46e76d7c2 Merge tag 'for-6.7-rc3-tag' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1412e7e8e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f711bc2a7eb1db25
+dashboard link: https://syzkaller.appspot.com/bug?extid=2cb7b1bd08dc77ae7f89
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cb96093de792/disk-18d46e76.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/630ca4e2d778/vmlinux-18d46e76.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/65573a727973/bzImage-18d46e76.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2cb7b1bd08dc77ae7f89@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+BUG: KMSAN: uninit-value in ipgre_xmit+0xdc2/0xe20 net/ipv4/ip_gre.c:662
+ __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+ ipgre_xmit+0xdc2/0xe20 net/ipv4/ip_gre.c:662
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3545 [inline]
+ dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3561
+ __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4346
+ dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+ __bpf_tx_skb net/core/filter.c:2133 [inline]
+ __bpf_redirect_no_mac net/core/filter.c:2163 [inline]
+ __bpf_redirect+0xdd7/0x1600 net/core/filter.c:2186
+ ____bpf_clone_redirect net/core/filter.c:2457 [inline]
+ bpf_clone_redirect+0x328/0x470 net/core/filter.c:2429
+ ___bpf_prog_run+0x2180/0xdb80 kernel/bpf/core.c:1958
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2199
+ bpf_dispatcher_nop_func include/linux/bpf.h:1196 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ bpf_test_run+0x482/0xb00 net/bpf/test_run.c:423
+ bpf_prog_test_run_skb+0x14e5/0x1f20 net/bpf/test_run.c:1045
+ bpf_prog_test_run+0x6af/0xac0 kernel/bpf/syscall.c:4040
+ __sys_bpf+0x649/0xd60 kernel/bpf/syscall.c:5401
+ __do_sys_bpf kernel/bpf/syscall.c:5487 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5485 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5485
+ do_syscall_32_irqs_on arch/x86/entry/common.c:164 [inline]
+ __do_fast_syscall_32+0xa2/0x100 arch/x86/entry/common.c:230
+ do_fast_syscall_32+0x37/0x70 arch/x86/entry/common.c:255
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:293
+ entry_SYSENTER_compat_after_hwframe+0x70/0x7a
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ pskb_expand_head+0x226/0x1a00 net/core/skbuff.c:2098
+ skb_ensure_writable+0x3d3/0x460 net/core/skbuff.c:5958
+ __bpf_try_make_writable net/core/filter.c:1662 [inline]
+ bpf_try_make_writable net/core/filter.c:1668 [inline]
+ bpf_try_make_head_writable net/core/filter.c:1676 [inline]
+ ____bpf_clone_redirect net/core/filter.c:2451 [inline]
+ bpf_clone_redirect+0x17f/0x470 net/core/filter.c:2429
+ ___bpf_prog_run+0x2180/0xdb80 kernel/bpf/core.c:1958
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2199
+ bpf_dispatcher_nop_func include/linux/bpf.h:1196 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ bpf_test_run+0x482/0xb00 net/bpf/test_run.c:423
+ bpf_prog_test_run_skb+0x14e5/0x1f20 net/bpf/test_run.c:1045
+ bpf_prog_test_run+0x6af/0xac0 kernel/bpf/syscall.c:4040
+ __sys_bpf+0x649/0xd60 kernel/bpf/syscall.c:5401
+ __do_sys_bpf kernel/bpf/syscall.c:5487 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5485 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5485
+ do_syscall_32_irqs_on arch/x86/entry/common.c:164 [inline]
+ __do_fast_syscall_32+0xa2/0x100 arch/x86/entry/common.c:230
+ do_fast_syscall_32+0x37/0x70 arch/x86/entry/common.c:255
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:293
+ entry_SYSENTER_compat_after_hwframe+0x70/0x7a
+
+CPU: 1 PID: 8859 Comm: syz-executor.2 Not tainted 6.7.0-rc3-syzkaller-00024-g18d46e76d7c2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+=====================================================
 
 
-On 2023/11/29 17:47, Michael S. Tsirkin wrote:
-> On Wed, Nov 29, 2023 at 05:03:50PM +0800, Ning, Hongyu wrote:
->>
->>
->> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
->>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
->>>
->>>     Linux 6.5 (2023-08-27 14:49:51 -0700)
->>>
->>> are available in the Git repository at:
->>>
->>>     https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
->>>
->>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
->>>
->>>     virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
->>>
->>> ----------------------------------------------------------------
->>> virtio: features
->>>
->>> a small pull request this time around, mostly because the
->>> vduse network got postponed to next relase so we can be sure
->>> we got the security store right.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>
->>> ----------------------------------------------------------------
->>> Eugenio Pérez (4):
->>>         vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
->>>         vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
->>>         vdpa: add get_backend_features vdpa operation
->>>         vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
->>>
->>> Jason Wang (1):
->>>         virtio_vdpa: build affinity masks conditionally
->>>
->>> Xuan Zhuo (12):
->>>         virtio_ring: check use_dma_api before unmap desc for indirect
->>>         virtio_ring: put mapping error check in vring_map_one_sg
->>>         virtio_ring: introduce virtqueue_set_dma_premapped()
->>>         virtio_ring: support add premapped buf
->>>         virtio_ring: introduce virtqueue_dma_dev()
->>>         virtio_ring: skip unmap for premapped
->>>         virtio_ring: correct the expression of the description of virtqueue_resize()
->>>         virtio_ring: separate the logic of reset/enable from virtqueue_resize
->>>         virtio_ring: introduce virtqueue_reset()
->>>         virtio_ring: introduce dma map api for virtqueue
->>>         virtio_ring: introduce dma sync api for virtqueue
->>>         virtio_net: merge dma operations when filling mergeable buffers
->>
->> Hi,
->> above patch (upstream commit 295525e29a5b) seems causing a virtnet related
->> Call Trace after WARNING from kernel/dma/debug.c.
->>
->> details (log and test setup) tracked in
->> https://bugzilla.kernel.org/show_bug.cgi?id=218204
->>
->> it's recently noticed in a TDX guest testing since v6.6.0 release cycle and
->> can still be reproduced in latest v6.7.0-rc3.
->>
->> as local bisects results show, above WARNING and Call Trace is linked with
->> this patch, do you mind to take a look?
-> 
-> Does your testing tree include the fixup
-> 5720c43d5216b5dbd9ab25595f7c61e55d36d4fc ?
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-yes, it's included:
-5720c43d5216 virtio_net: fix the missing of the dma cpu sync
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
->>>
->>> Yuan Yao (1):
->>>         virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
->>>
->>> Yue Haibing (1):
->>>         vdpa/mlx5: Remove unused function declarations
->>>
->>>    drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
->>>    drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
->>>    drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
->>>    drivers/vhost/vdpa.c               |  15 +-
->>>    drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
->>>    drivers/virtio/virtio_vdpa.c       |  17 +-
->>>    include/linux/vdpa.h               |   4 +
->>>    include/linux/virtio.h             |  22 ++
->>>    include/uapi/linux/vhost_types.h   |   4 +
->>>    9 files changed, 625 insertions(+), 90 deletions(-)
->>>
-> 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
