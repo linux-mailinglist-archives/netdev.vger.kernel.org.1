@@ -1,92 +1,130 @@
-Return-Path: <netdev+bounces-52020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDDCA7FCF80
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:57:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABC77FCFB9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 149F6B20E23
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 06:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 662161C209C1
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69087101DF;
-	Wed, 29 Nov 2023 06:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8D5101C9;
+	Wed, 29 Nov 2023 07:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="g7e52XAc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MshA/nZs"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B460A170B;
-	Tue, 28 Nov 2023 22:57:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=o+ruwW4g+vXqotGBgvYVAqikIMr9ZibjwJBBiNvt/1o=;
-	t=1701241037; x=1702450637; b=g7e52XAcp8k3t9kvrSac43LUO1SRdqmfhXd72w+/xEuTcHk
-	pzwfKFwWO0FN0B7iYep1cUzxkAV8nm/sEpC3FX5tjfgPPn5oKr8zWt3VVzH0GiVqO+8ZZtL41jC4x
-	d1s5BdS0JuhTy7pVOOskemXDdO/vN8VsFDZxvZXR/0yAhEI7zEcW1kWccZ5X1+U4PSMo0zTByVBya
-	0oGWhMloJS3dfwff4+rrn6DUUq0dqv39gU5CRukXazfErw5/mrm45UuCjfkjEEPgUrQWPn47P8vzn
-	vulqDmIXftJK3p7dp0VD/m4Cjxpz8UtNZcPTtgI/vyp/Z+WLn4bVB0TY/YMyVDCQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r8EVQ-00000008Y6r-2148;
-	Wed, 29 Nov 2023 07:57:08 +0100
-Message-ID: <6c7765f13b715e67637438c6dffaa5a369758519.camel@sipsolutions.net>
-Subject: Re: [PATCH] wifi: mac80211: sband's null check should precede params
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Edward Adam Davis <eadavis@qq.com>, 
-	syzbot+62d7eef57b09bfebcd84@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
- llvm@lists.linux.dev, nathan@kernel.org, ndesaulniers@google.com, 
- netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
-  trix@redhat.com
-Date: Wed, 29 Nov 2023 07:57:07 +0100
-In-Reply-To: <tencent_0CCA1979CFA30DC8A5CF8DDC92365DCE5D07@qq.com>
-References: <000000000000efc64705ff8286a1@google.com>
-	 <tencent_0CCA1979CFA30DC8A5CF8DDC92365DCE5D07@qq.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBB91710
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:08:38 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-a013d22effcso856065066b.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:08:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701241717; x=1701846517; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nuvuUMTlyK81QlR7/R4I+To/jaHQwOiJ0V8+2WOZipM=;
+        b=MshA/nZsj4sUvuYzcB1BIzy1gPl50j4fprorMUCkXqjwh33zyfv090gBzubAOZwBrl
+         eVfn3M81LqOkqFtUMJwhWnqJAn2dgUSTCpdXnh3JgT+CqnDVgl5mrABpakDPq0/E1Dw9
+         KYWzp1iBXMTxZcSknt+GV1fuqUdvaZFLHj2DXFTId23CC6A0v06FCRUyYdHEbwIuhZmI
+         eQnZdIWHoQwq6SFoW4JZoxlse1sS1p6CgbXTtHmHaa/Xrd+x5uYLI1hEFW+vkM8/IMMM
+         RCFGaHXild7p04SqdHW0uHFV6DmvH72rRlm8xW4I/wgG7vTs78f7AZzaR1+jqGa/vstA
+         2DSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701241717; x=1701846517;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nuvuUMTlyK81QlR7/R4I+To/jaHQwOiJ0V8+2WOZipM=;
+        b=rLnCp9TWbENMpg/bpOqQOmhGdSD8UMJnpIrnKf7I4pzcSj304aHe1kCFo5OLVDoKl3
+         097tD0BESXSl91tBFtTFcGrdlOfEKnVhG51Gers4w3BDV9151bP9pRx3jb256iw7kR7X
+         v+EG6Cw+34Y2warbX7ZnKRDQqfKg83LX7LMF8Ua9KF58jzZ9KAiDikhP1ZLO1lHlV8Yh
+         J69GzxnJ3HETQUUmiOOuA7DW2eUOpGihrKD/ZXANwUzOG9760b5xuvBcvBd1qphwxxbs
+         ooowUqxz/2qTCmW+5lmI0hUaBs0fw5mhCLl0qxxin/GKueyNovJMrKguP2XA1EXLT1fF
+         jp0Q==
+X-Gm-Message-State: AOJu0YyaRmlXUsgJg1SrJtQVtDuy0WSf8gNiiksGJemJn6vG+7w4mdV/
+	qIjvPMMZ/HtQ1MAPIs72wFr+rZ43f0PHWsu+os/IAg0lAaw=
+X-Google-Smtp-Source: AGHT+IFJDQkuDlh+FjWcnfs01grtLcYECj9VOlgqUTv6QhB6owAzWe309QEm8nvYaV8pkisonGKVjZF6aCm5fh4Ym9c=
+X-Received: by 2002:a17:906:5293:b0:9bf:63b2:b6e2 with SMTP id
+ c19-20020a170906529300b009bf63b2b6e2mr12456418ejm.26.1701241716505; Tue, 28
+ Nov 2023 23:08:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+References: <20231129031201.32014-1-liangchen.linux@gmail.com>
+ <20231129031201.32014-4-liangchen.linux@gmail.com> <844dc02a-3559-5a53-943d-28f772670879@huawei.com>
+In-Reply-To: <844dc02a-3559-5a53-943d-28f772670879@huawei.com>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Wed, 29 Nov 2023 15:08:24 +0800
+Message-ID: <CAKhg4tJ4vFpsO+=JMCboan==JsKhEjGDVeBk=cM+BmVO+xqFNg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 3/4] skbuff: Add a function to check if a page
+ belongs to page_pool
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	netdev@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2023-11-29 at 13:48 +0800, Edward Adam Davis wrote:
->=20
-> [Analysis]
-> When ieee80211_get_link_sband() fails to find a valid sband and first che=
-cks=20
-> for params in sta_link_apply_parameters(), it will return 0 due to new_li=
-nk=20
-> being 0, which will lead to an incorrect process after sta_apply_paramete=
-rs().
->=20
-> [Fix]
-> First obtain sband and perform a non null check before checking the param=
-s.
+On Wed, Nov 29, 2023 at 11:40=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.c=
+om> wrote:
+>
+> On 2023/11/29 11:12, Liang Chen wrote:
+> > Wrap code for checking if a page is a page_pool page into a
+> > function for better readability and ease of reuse.
+> >
+> > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> > ---
+> >  net/core/skbuff.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index b157efea5dea..310207389f51 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -890,6 +890,11 @@ static void skb_clone_fraglist(struct sk_buff *skb=
+)
+> >               skb_get(list);
+> >  }
+> >
+> > +static inline bool skb_frag_is_pp_page(struct page *page)
+>
+> I am not sure about the 'skb_frag' part, But I am not able to come
+> up with a better name too:)
+>
 
-Not sure I can even disagree with that analysis, it seems right, but ...
+So, let's leave it there for now:)
+> Also, Generally, 'inline' is not really encouraged in c file in
+> the networking unless there is a clear justification as the compiler
+> can make better decision about whether inlining most of the time.
+>
 
-> +	if (!link || !link_sta)
-> +		return -EINVAL;
-> +
-> +	sband =3D ieee80211_get_link_sband(link);
-> +	if (!sband)
-> +		return -EINVAL;
-> +
->  	/*
->  	 * If there are no changes, then accept a link that doesn't exist,
->  	 * unless it's a new link.
+Sure. will remove 'inline' in v5.
 
-There's a comment here which is clearly not true after this change,
-since you've already returned for !link_sta?
-
-johannes
+> Other than the 'inlining' part, LGTM.
+> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
+>
+> > +{
+> > +     return (page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE;
+> > +}
+> > +
+> >  #if IS_ENABLED(CONFIG_PAGE_POOL)
+> >  bool napi_pp_put_page(struct page *page, bool napi_safe)
+> >  {
+> > @@ -905,7 +910,7 @@ bool napi_pp_put_page(struct page *page, bool napi_=
+safe)
+> >        * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+> >        * to avoid recycling the pfmemalloc page.
+> >        */
+> > -     if (unlikely((page->pp_magic & ~0x3UL) !=3D PP_SIGNATURE))
+> > +     if (unlikely(!skb_frag_is_pp_page(page)))
+> >               return false;
+> >
+> >       pp =3D page->pp;
+> >
 
