@@ -1,211 +1,149 @@
-Return-Path: <netdev+bounces-52039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4223A7FD192
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:02:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054E87FD1A2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAE0E1F20EFA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:02:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E65AB20DA1
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20712B8F;
-	Wed, 29 Nov 2023 09:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA375101F3;
+	Wed, 29 Nov 2023 09:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ClaKvL5N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IMYbGbEk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2512A194
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 01:01:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701248513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
-	b=ClaKvL5NKcIJgeEC7015ezw7q4HePsEijIejXfOJ97W+Qr5y0WcnRTI6zSU1e8sQylIk2l
-	aeMsuE8eGzIDEtCv3kmpfFRgtnllXzzYqp31Lap885DRhTBoYq2M/DfuJeYBDuOkkouoNF
-	bUTTdCPdLSQoRHunR/znG1K8ccUIBhU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-haorilHxN_O4NwO3cb4_GA-1; Wed, 29 Nov 2023 04:01:51 -0500
-X-MC-Unique: haorilHxN_O4NwO3cb4_GA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-333127fecf9so865402f8f.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 01:01:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701248510; x=1701853310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
-        b=MJetFG0ZWc7zfT1jSzkW6ZCQtolUExIZoZ+9DZ8k4RMcHfHqBAIPsOxlAbximShhXv
-         tDOP0FMD99yoGqv8QpD6lA6X45VqmCHwoN/ldfVZgL2dImrAS8zzxCJ7tsJwfSVaZcG+
-         +0r7n/u7P4YSaVVrOlj+EnBu7BaPdyvAhXxZdg04ktqN0cIQP+Vgvy1ytAvTDVP/u1QA
-         Wb01haV8ppBg646hgAzqSom0plIpE3yODlQnlFKKY7AbI9PKbSpGKG924CYgCZ8BOVJi
-         ZbUjg+S3JVRorPB4Lm/6Kcsi786jMCNfOcuUL+JklxloBQ8up3zJeEC3sLHDo0CZiv3K
-         ErJA==
-X-Gm-Message-State: AOJu0YyMZZnMfr5VzGVqqYe/rvVMa5Ez0aSQ9LxjUULolizEr/A0F6M3
-	/NDWmSkYIxdbIEmzzi2+2Q4HKBE2HAXYwVK/YIA2/l1VaHDf0MkF0TjZgOeQfxaQmTVTijvEjJu
-	FlmV38gi94hXAk4XN
-X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788932wra.26.1701248510228;
-        Wed, 29 Nov 2023 01:01:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFP2F6dczPE089a3r9AZSuxONM+6MsCslUykG0rwB+wpDrF0PpgPS4SUfoLewfpzCdrG2iGkA==
-X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788889wra.26.1701248509534;
-        Wed, 29 Nov 2023 01:01:49 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
-        by smtp.gmail.com with ESMTPSA id c14-20020a056000104e00b00332f95ab44esm10548348wrx.57.2023.11.29.01.01.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 01:01:48 -0800 (PST)
-Date: Wed, 29 Nov 2023 10:01:43 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 2/3] virtio/vsock: send credit update during
- setting SO_RCVLOWAT
-Message-ID: <etuukjyedcdvkdxsql5qquvla6tuaaayph7vj2jdskqjwmkmoy@h2hkgjfyawyi>
-References: <20231122180510.2297075-1-avkrasnov@salutedevices.com>
- <20231122180510.2297075-3-avkrasnov@salutedevices.com>
+X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 01:05:11 PST
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 540C818D;
+	Wed, 29 Nov 2023 01:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701248711; x=1732784711;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=woZ8E+l0CNEPRBPUKxmoG/NfRBBDwznN1n7mx/aFQJ4=;
+  b=IMYbGbEkuHyASOA3qPIgCXATXSKhRqMzsO9DtW+LdrRjgonxEvYLiNaJ
+   Z8aEa9vpSicr8dABhsp/dXjMxuaX7MO/9RTc3JlOZnB0ljR7dthUA7E6P
+   NUnnijU/dRi5KWTQvhfb4nKOlnSb9Bt/xL/nwHA2z8vZ2p4xsFJ3+Y0ES
+   wYWIxt4V9wngovhlFtsmWhr3pIFQJU15vrwUsTMryNU4Wu5rk+6LbcilG
+   NEZoD1/FOM0izxsUF5ZLxbfp1YueyPQBXF3Gdkifzjx8DRpuOHh+RBO+k
+   huKT7bgWzMSkNEHJ+WCKZ2PCZ4BxwaCYMD7JST8N/DRYWeOi4qM3lOTGb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="25403"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="25403"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:04:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="718678539"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="718678539"
+Received: from hongyuni-mobl.ccr.corp.intel.com (HELO [10.238.2.21]) ([10.238.2.21])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 01:04:04 -0800
+Message-ID: <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
+Date: Wed, 29 Nov 2023 17:03:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231122180510.2297075-3-avkrasnov@salutedevices.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] virtio: features
+To: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, eperezma@redhat.com, jasowang@redhat.com,
+ shannon.nelson@amd.com, yuanyaogoog@chromium.org, yuehaibing@huawei.com,
+ kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alexander.shishkin@linux.intel.com
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
+In-Reply-To: <20230903181338-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 22, 2023 at 09:05:09PM +0300, Arseniy Krasnov wrote:
->Send credit update message when SO_RCVLOWAT is updated and it is bigger
->than number of bytes in rx queue. It is needed, because 'poll()' will
->wait until number of bytes in rx queue will be not smaller than
->SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
->for tx/rx is possible: sender waits for free space and receiver is
->waiting data in 'poll()'.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> Changelog:
-> v1 -> v2:
->  * Update commit message by removing 'This patch adds XXX' manner.
->  * Do not initialize 'send_update' variable - set it directly during
->    first usage.
->
-> drivers/vhost/vsock.c                   |  2 ++
-> include/linux/virtio_vsock.h            |  1 +
-> net/vmw_vsock/virtio_transport.c        |  2 ++
-> net/vmw_vsock/virtio_transport_common.c | 28 +++++++++++++++++++++++++
-> net/vmw_vsock/vsock_loopback.c          |  2 ++
-> 5 files changed, 35 insertions(+)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index f75731396b7e..ecfa5c11f5ee 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
->
-> 		.read_skb = virtio_transport_read_skb,
->+
->+		.set_rcvlowat             = virtio_transport_set_rcvlowat
 
-Since now we don't set it anymore in the callback, what about following
-the notify_* callbacks and rename it in `notify_set_rcvlowat`?
 
-Eventually I think we can rename it in the previous patch.
+On 2023/9/4 6:13, Michael S. Tsirkin wrote:
+> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
+> 
+>    Linux 6.5 (2023-08-27 14:49:51 -0700)
+> 
+> are available in the Git repository at:
+> 
+>    https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> 
+>    virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
+> 
+> ----------------------------------------------------------------
+> virtio: features
+> 
+> a small pull request this time around, mostly because the
+> vduse network got postponed to next relase so we can be sure
+> we got the security store right.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Eugenio Pérez (4):
+>        vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+>        vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
+>        vdpa: add get_backend_features vdpa operation
+>        vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> 
+> Jason Wang (1):
+>        virtio_vdpa: build affinity masks conditionally
+> 
+> Xuan Zhuo (12):
+>        virtio_ring: check use_dma_api before unmap desc for indirect
+>        virtio_ring: put mapping error check in vring_map_one_sg
+>        virtio_ring: introduce virtqueue_set_dma_premapped()
+>        virtio_ring: support add premapped buf
+>        virtio_ring: introduce virtqueue_dma_dev()
+>        virtio_ring: skip unmap for premapped
+>        virtio_ring: correct the expression of the description of virtqueue_resize()
+>        virtio_ring: separate the logic of reset/enable from virtqueue_resize
+>        virtio_ring: introduce virtqueue_reset()
+>        virtio_ring: introduce dma map api for virtqueue
+>        virtio_ring: introduce dma sync api for virtqueue
+>        virtio_net: merge dma operations when filling mergeable buffers
 
-> 	},
->
-> 	.send_pkt = vhost_transport_send_pkt,
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index ebb3ce63d64d..97dc1bebc69c 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
-> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
-> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
-> int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
->+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val);
-> #endif /* _LINUX_VIRTIO_VSOCK_H */
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index af5bab1acee1..cf3431189d0c 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -539,6 +539,8 @@ static struct virtio_transport virtio_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
->
-> 		.read_skb = virtio_transport_read_skb,
->+
->+		.set_rcvlowat             = virtio_transport_set_rcvlowat
-> 	},
->
-> 	.send_pkt = virtio_transport_send_pkt,
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index f6dc896bf44c..4acee21b4350 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1684,6 +1684,34 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
->
->+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val)
->+{
->+	struct virtio_vsock_sock *vvs = vsk->trans;
->+	bool send_update;
->+
->+	spin_lock_bh(&vvs->rx_lock);
->+
->+	/* If number of available bytes is less than new
->+	 * SO_RCVLOWAT value, kick sender to send more
->+	 * data, because sender may sleep in its 'send()'
->+	 * syscall waiting for enough space at our side.
->+	 */
+Hi,
+above patch (upstream commit 295525e29a5b) seems causing a virtnet 
+related Call Trace after WARNING from kernel/dma/debug.c.
 
-Let's try to use at least the full 80 characters so we can reduce the
-lines in this comment block.
+details (log and test setup) tracked in 
+https://bugzilla.kernel.org/show_bug.cgi?id=218204
 
->+	send_update = vvs->rx_bytes < val;
->+
->+	spin_unlock_bh(&vvs->rx_lock);
->+
->+	if (send_update) {
->+		int err;
->+
->+		err = virtio_transport_send_credit_update(vsk);
->+		if (err < 0)
->+			return err;
->+	}
->+
->+	return 0;
->+}
->+EXPORT_SYMBOL_GPL(virtio_transport_set_rcvlowat);
->+
-> MODULE_LICENSE("GPL v2");
-> MODULE_AUTHOR("Asias He");
-> MODULE_DESCRIPTION("common code for virtio vsock");
->diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
->index 048640167411..388c157f6633 100644
->--- a/net/vmw_vsock/vsock_loopback.c
->+++ b/net/vmw_vsock/vsock_loopback.c
->@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
->
-> 		.read_skb = virtio_transport_read_skb,
->+
->+		.set_rcvlowat             = virtio_transport_set_rcvlowat
-> 	},
->
-> 	.send_pkt = vsock_loopback_send_pkt,
->-- 
->2.25.1
->
+it's recently noticed in a TDX guest testing since v6.6.0 release cycle 
+and can still be reproduced in latest v6.7.0-rc3.
 
+as local bisects results show, above WARNING and Call Trace is linked 
+with this patch, do you mind to take a look?
+
+> 
+> Yuan Yao (1):
+>        virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+> 
+> Yue Haibing (1):
+>        vdpa/mlx5: Remove unused function declarations
+> 
+>   drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+>   drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+>   drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+>   drivers/vhost/vdpa.c               |  15 +-
+>   drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
+>   drivers/virtio/virtio_vdpa.c       |  17 +-
+>   include/linux/vdpa.h               |   4 +
+>   include/linux/virtio.h             |  22 ++
+>   include/uapi/linux/vhost_types.h   |   4 +
+>   9 files changed, 625 insertions(+), 90 deletions(-)
+> 
 
