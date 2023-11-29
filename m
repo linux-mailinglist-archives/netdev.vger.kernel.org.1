@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-52228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6987FDEF7
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F427FDF09
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:04:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF1341C20B8D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0FD282CC9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FD55AB81;
-	Wed, 29 Nov 2023 17:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507D15C08B;
+	Wed, 29 Nov 2023 18:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PH46EBt/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="in+YGbXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4019790
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:59:33 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so555a12.0
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:59:33 -0800 (PST)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BA790;
+	Wed, 29 Nov 2023 10:04:41 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40b4f60064eso238815e9.1;
+        Wed, 29 Nov 2023 10:04:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701280772; x=1701885572; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z/jSiKm5mFkB2ZNc7YYsPmOJjp6MJIABZm4Gv8dPzkk=;
-        b=PH46EBt/ap/QWNe506pDAOitZBC8BKClHJLixqd45kpMk+oeWEcx3AXcfvfFjxRJC+
-         ptbVAWs5mI+ugyVbBm9ILXXTbFbSx2NF6OP5WxFWSpuj+tsZopqj6sYB3qdNIJeZwtJr
-         Z1gLUAQYms0/WClHZQZzdt2L5+r0vLt+hac/iwJrYD1YZbumJhSOewhyADdHfcwVtLbV
-         eHfz5lvUSVjvWmWZiIfzda6g1dSPK7s7odMzF36gJvPvU1om9RqfuyChZdnnJnisSGp+
-         rW76K2BjwAAWsfCq+eYQITl5P5h65pGrZEzDO786+jmdfhhIwhtBEyv5RH0Ve9vduH02
-         iwUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701280772; x=1701885572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1701281080; x=1701885880; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=z/jSiKm5mFkB2ZNc7YYsPmOJjp6MJIABZm4Gv8dPzkk=;
-        b=oxIn8QAx1ReGAkul29ikANVyYuzENz0oSvbAudYjxqoqN9Y6X+norbKHmywLaWNoZP
-         ckoNRsIr4jkDVzw+36moqy608SpOrht/LU93K7TMSVOhDM8JrMEimHLmkxIQnnCLngnA
-         kaXun28mBQOb3LxoDt+w8xP0Limd9yAzj5TiEgnDaSLOeFcqgdlfFko/zc9LRJJwUIOJ
-         LE1eV57qn6SYyQIuPK2AGkphGAC8tjZQG0zcLzEyc31yNIkdLOlVtVvewxx8lMMG1TbJ
-         8WQ1KJkT74mSh6EQUZhVAdV+jhVw5aC0oaSFmqunZw9kHAVVwnPpcDf1X3X+kBxffGJA
-         onSw==
-X-Gm-Message-State: AOJu0Yz1YTdMtjCdheg7qVkI1a+ThhdliFT7CxOafI/VwHb9O3CsIk8Z
-	QmiJ9RGB0+mJ+vCGyqPZXz2WsaD6DJb9HoSiCeHUwA==
-X-Google-Smtp-Source: AGHT+IFubBI3AdUyh37+c03u4Vq4LdQHkQzxaQl5Tp48/hIuT++8ht4v/IrYluW4g2LWpq9S4266Hf8CDfRrNFtOrTY=
-X-Received: by 2002:a05:6402:430e:b0:54b:67da:b2f with SMTP id
- m14-20020a056402430e00b0054b67da0b2fmr632179edc.7.1701280771486; Wed, 29 Nov
- 2023 09:59:31 -0800 (PST)
+        bh=QZLzQ7Dj1ScTKkfZpKniwF/WkNtkEi2sNjddLCuEIwg=;
+        b=in+YGbXs+NYP1jnSZIj5Vo9T8HJdftf4z1QQSYDwaZEgUa8Kwwhmqc2Z1uA5yIw+8z
+         rmHpW77cTrT1ZUQI2OujBV2HuzpfibtEu2Dn+KAGSn88f/W++DUO5Uu8eJM1vtsLSyD7
+         3auJpcErW/6WECcZ1CWJK4uYhT9Ic8IpknKqkDzutk29Uxcqov8dGdRvXuNNT1eiQZK/
+         Num36O1ZXVOTwDobVIp+axfnjPhlQY8m57s5jsZ8eFXPtQhkIjH+1Mn9P4Flcd3+8HhQ
+         2oLMtobDWHU+/gEthGv+410mogttHjQjpYo57ZmUHYS8+0bb8dbt2A57eYjVzGgnBbEl
+         CMYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701281080; x=1701885880;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QZLzQ7Dj1ScTKkfZpKniwF/WkNtkEi2sNjddLCuEIwg=;
+        b=JUqo7fS0sKRh8UMoufy/oR8rCvrs1+SVydn50gcLjd+EVoc5Aqx7789zM5pKhZW2UZ
+         GCgigHwR1oH3BcwlAERY3yAfQ7NWBDThMx5ISFXQ3Vt2/kDTaYZL8/xRtBmiJqMlgnva
+         3Rx5NXg9os280rwMtzRhyXYKc9fJ5tm6tRk+W+90z616WC4v961fHS1ThqDRAhbHWvch
+         GtbKuGiO4G0d35Sz8R8g+CLyOn52vV95WLyPKvJ153jJ1Ip6iYeSeHlOP3OoudaLEXEP
+         HK02qO5thlW8D4E/iY7NButqfyUfoCcyEiiunGe+6Fo3qrRete3ghKT6VBV0K9c39NQC
+         YS8A==
+X-Gm-Message-State: AOJu0Yx08tngYmwax/RYE5yRp7z6F23mZe2T4r2u74aIxe9FIWZcGioF
+	J+32eifaHv1wVKgqVHCnPV0=
+X-Google-Smtp-Source: AGHT+IGGelJRxSuDYh6LBV/x6XyCK6GA9EDLykUoHoVze6v/OEDVVgOTIVyRMMd8AxDWzzQWiDcfAw==
+X-Received: by 2002:a05:600c:3ca0:b0:40b:37d9:b646 with SMTP id bg32-20020a05600c3ca000b0040b37d9b646mr11575831wmb.3.1701281079877;
+        Wed, 29 Nov 2023 10:04:39 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id n4-20020a05600c3b8400b0040b40468c98sm2941544wms.10.2023.11.29.10.04.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 10:04:39 -0800 (PST)
+Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
+ Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, kernel-team
+ <kernel-team@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Sitnicki <jakub@cloudflare.com>
+References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
+ <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
+ <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net> <87fs0qj61x.fsf@toke.dk>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
+Date: Wed, 29 Nov 2023 18:04:38 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129165721.337302-1-dima@arista.com> <20231129165721.337302-6-dima@arista.com>
-In-Reply-To: <20231129165721.337302-6-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Nov 2023 18:59:20 +0100
-Message-ID: <CANn89iLLsTUu1k0pBDYNX8LX0z+JGr12OaC-zu94WcR8WbErUA@mail.gmail.com>
-Subject: Re: [PATCH v4 5/7] net/tcp: Don't add key with non-matching VRF on
- connected sockets
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87fs0qj61x.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 5:57=E2=80=AFPM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> If the connection was established, don't allow adding TCP-AO keys that
-> don't match the peer. Currently, there are checks for ip-address
-> matching, but L3 index check is missing. Add it to restrict userspace
-> shooting itself somewhere.
->
-> Yet, nothing restricts the CAP_NET_RAW user from trying to shoot
-> themselves by performing setsockopt(SO_BINDTODEVICE) or
-> setsockopt(SO_BINDTOIFINDEX) over an established TCP-AO connection.
-> So, this is just "minimum effort" to potentially save someone's
-> debugging time, rather than a full restriction on doing weird things.
->
-> Fixes: 248411b8cb89 ("net/tcp: Wire up l3index to TCP-AO")
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+On 28/11/2023 14:39, Toke Høiland-Jørgensen wrote:
+> I'm not quite sure what should be the semantics of that, though. I.e.,
+> if you are trying to aggregate two packets that have the flag set, which
+> packet do you take the value from? What if only one packet has the flag
+> set? Or should we instead have a "metadata_xdp_only" flag that just
+> prevents the skb metadata field from being set entirely? Or would both
+> be useful?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Sounds like what's actually needed is bpf progs inside the GRO engine
+ to implement the metadata "protocol" prepare and coalesce callbacks?
+
+-ed
 
