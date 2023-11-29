@@ -1,116 +1,145 @@
-Return-Path: <netdev+bounces-51932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C41887FCBBC
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:48:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F9F7FCC14
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49BA6B20E81
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:48:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C2F283354
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67884641;
-	Wed, 29 Nov 2023 00:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFC110E7;
+	Wed, 29 Nov 2023 00:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FATAqp4w"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NBZBGb/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B65219A7
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:48:05 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-a011e9bf336so848785666b.3
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:48:05 -0800 (PST)
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655DB170B
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6d81fc0ad6eso2084652a34.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1701218884; x=1701823684; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iaa+Dox3hT8QcVOg/pT6Q2EDMDBwckjrJyfcKus7y+g=;
-        b=FATAqp4wm7I98eBUsuNxMflqiSfo4Gx+SjYfp97aT3A0D4s8ykHesP22iS2eZRee5+
-         Fd7GcVbl5cmyYBdjHrHZ64V7ZYQagRtbyrth2B7zQzF9CS0KmQnRwMvwc6q1Q0FVUVwv
-         L8zIyVNuOIxGo/6cZOzvpe8c9rujL6ZQhCbggwZNX2sMyTJZaeMCUJNxasgcoueb7a9L
-         gO2L50Lbx1LonvtCX9TpTihOFusKmVyJBzvi1gEZhco7qfwsr8NYiC+AtDJjsDOW9MFl
-         DAr/p/3BiJlSAnu/tLbzNEnsqREWaowp88b9Bu1vqV7FPAbr90wD7o8QvcDkZBurFpDe
-         2bTA==
+        d=ziepe.ca; s=google; t=1701219291; x=1701824091; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
+        b=NBZBGb/8+4eEITunAzUMzigxc8uz6j8Dg75wyZQthgQUON4ZqrN+peLBlg8XoqnyxL
+         VzfbbSiO2lV6MNm9UL5EY3n8AZSt0kSidXdfjXdCir/k5UuGgrvCx6BJzGmE0WpMrqAg
+         scj6RRezMFx8SkhZqpj/Zz8ZGtyuCss6g3c/ywM4zwBSg1maf2tINNcQJOgAz7bA2zXp
+         KgKhrCTKmkjAsmCBk96zKknUm3+Q3dRWHkyW9UO5fKyYTAfTmbkzkWCTNEbDyVa8Y2HG
+         451mq05zv3EOdmPVl+h/+cRaKbiHjyXaeZgbzOMoKFUqItjWAfFRqXT0AUSxxcAymGRF
+         7SPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701218884; x=1701823684;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iaa+Dox3hT8QcVOg/pT6Q2EDMDBwckjrJyfcKus7y+g=;
-        b=Zw680svBWGS89UhLpKhpchEkspQoeOIwDTGRTCB8gwwk2EARag7C+IW47kChOm4qMN
-         MbZ9VsI/sLZr5a9PGoCOsYOJxQBJgtmFsoaUR9skINxdvfX0lxaV0WDG8uDRDYjZKpzq
-         v3KjmJSythUOIbdUvzk5B7fKkuQhIsFsHR9/Iaq3z2RTpOJ2CuFfkmEod7y6SWZNbLGE
-         aWThvR/lm1m4Ee978WlUVd3yIXzoaLAIK32jHA3TR4byDRyQFuGbLBtwdxbb60z+7gA/
-         ZZ+yjVjdYxYKjnxyAP+xnpKQ0TaXhV4U+yxSy2bw4vfXXd57mabAfgL88xg5BZfbFngD
-         vRPA==
-X-Gm-Message-State: AOJu0YyRxkzjNl0SaqN5sAZcxxxjeFGj7WLtvOxxBf6KtbzUPTQlyk4p
-	jbdBTDuTy3+nGlhjjz16jk6OLJOklR/0xFJhpowL3Q==
-X-Google-Smtp-Source: AGHT+IFG8fUBMR0v96CCXIzn8hCmnUS2wpmK2clfM5T5+t1eW7K8bhuSM66eS0Nc0lzUbM4rK2mDWEurezmTYUrxPjE=
-X-Received: by 2002:a17:906:41b:b0:9b2:982e:339a with SMTP id
- d27-20020a170906041b00b009b2982e339amr12791640eja.22.1701218883905; Tue, 28
- Nov 2023 16:48:03 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701219291; x=1701824091;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
+        b=uGJ/xz9SoMBESn6vbKokXjlvd7Z+myeiLPSi1Zwe/lYhiMH7xk7eV6TtP9ELMi+Phr
+         JAeZ0xiw1OTEB0TK7IWOkw3ScC9hgiWVWINSTfqyyKr3zh7eJ71J7dgkVGeq9FJ3vfU9
+         X/RBfGTaIyuQ2Pdb4HwkNeqoOXoTZPqIPu4eIXTHQqzM7ZxYe71a/0F2r8PJwm7tDZ+b
+         Z/G2eSifqQpUhcEJ8lc5NRmLzASqofqmFhcQLFmgZP761zN+UEbWl9nWcg5xltp+4ipC
+         3joh1sHNi8QVdRmtFzEaGvvWtz0raAaEtHILHRpRfMr/rTpHtGyX2/YJCim+8Qp+WW5F
+         49sw==
+X-Gm-Message-State: AOJu0YyslHKt4hMquyux2ZJgu5Zqxk0q7fjCJqqPr40rftEND4Z3vfs8
+	qPVg+Vgsz3aQzHrH7zQpiOTcHQ==
+X-Google-Smtp-Source: AGHT+IGKiwEuykqxh29J1y1VqvKSA4pC1uEUHtE7SoQBvdHo0iXpRqPiFg8DX/ZmKtSwphh/2Jx77g==
+X-Received: by 2002:a05:6870:c690:b0:1fa:2f8:c734 with SMTP id cv16-20020a056870c69000b001fa02f8c734mr16951479oab.5.1701219291679;
+        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
+        by smtp.gmail.com with ESMTPSA id b1-20020a056830344100b006d81e704023sm945291otu.2.2023.11.28.16.54.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1r88qo-005kIY-2m;
+	Tue, 28 Nov 2023 20:54:50 -0400
+Date: Tue, 28 Nov 2023 20:54:50 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
+	alex.williamson@redhat.com, alim.akhtar@samsung.com,
+	alyssa@rosenzweig.io, asahi@lists.linux.dev,
+	baolu.lu@linux.intel.com, bhelgaas@google.com,
+	cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
+	dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
+	iommu@lists.linux.dev, jasowang@redhat.com,
+	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org,
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
+	marcan@marcan.st, mhiramat@kernel.org, mst@redhat.com,
+	m.szyprowski@samsung.com, netdev@vger.kernel.org,
+	paulmck@kernel.org, rdunlap@infradead.org, robin.murphy@arm.com,
+	samuel@sholland.org, suravee.suthikulpanit@amd.com,
+	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org,
+	tomas.mudrunka@gmail.com, vdumpa@nvidia.com,
+	virtualization@lists.linux.dev, wens@csie.org, will@kernel.org,
+	yu-cheng.yu@intel.com
+Subject: Re: [PATCH 00/16] IOMMU memory observability
+Message-ID: <20231129005450.GH1312390@ziepe.ca>
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+ <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
+ <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com>
+ <20231128235214.GD1312390@ziepe.ca>
+ <CAJD7tkbbq6bHtPn7yE3wSS693OSthh1eBDvF-_MWZfDMXDYPKw@mail.gmail.com>
+ <20231129002826.GG1312390@ziepe.ca>
+ <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231123014747.66063-1-kuniyu@amazon.com>
-In-Reply-To: <20231123014747.66063-1-kuniyu@amazon.com>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Tue, 28 Nov 2023 16:47:52 -0800
-Message-ID: <CABWYdi2SEatfsR7ZeL=iOvqyhcae3b3NPp1+=mQySNoa671KvQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/4] af_unix: Random improvements for GC.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
 
-On Wed, Nov 22, 2023 at 5:48=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> If more than 16000 inflight AF_UNIX sockets exist on a host, each
-> sendmsg() will be forced to wait for unix_gc() even if a process
-> is not sending any FD.
->
-> This series tries not to impose such a penalty on sane users.
->
->
-> Changes:
->   v2:
->     Patch 4: Fix build error when CONFIG_UNIX=3Dn (kernel test robot)
->
->   v1: https://lore.kernel.org/netdev/20231122013629.28554-1-kuniyu@amazon=
-.com/
->
->
-> Kuniyuki Iwashima (4):
->   af_unix: Do not use atomic ops for unix_sk(sk)->inflight.
->   af_unix: Return struct unix_sock from unix_get_socket().
->   af_unix: Run GC on only one CPU.
->   af_unix: Try to run GC async.
->
->  include/linux/io_uring.h |  4 +-
->  include/net/af_unix.h    |  6 +--
->  include/net/scm.h        |  1 +
->  io_uring/io_uring.c      |  5 ++-
->  net/core/scm.c           |  5 +++
->  net/unix/af_unix.c       | 10 +++--
->  net/unix/garbage.c       | 84 ++++++++++++++++++----------------------
->  net/unix/scm.c           | 34 ++++++++--------
->  8 files changed, 74 insertions(+), 75 deletions(-)
->
-> --
-> 2.30.2
->
+On Tue, Nov 28, 2023 at 04:30:27PM -0800, Yosry Ahmed wrote:
+> On Tue, Nov 28, 2023 at 4:28 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >
+> > On Tue, Nov 28, 2023 at 04:25:03PM -0800, Yosry Ahmed wrote:
+> >
+> > > > > Right, but as I mention above, if userspace starts depending on this
+> > > > > equation, we won't be able to add any more classes of "secondary" page
+> > > > > tables to SecPageTables. I'd like to avoid that if possible. We can do
+> > > > > the subtraction in the kernel.
+> > > >
+> > > > What Sean had suggested was that SecPageTables was always intended to
+> > > > account all the non-primary mmu memory used by page tables. If this is
+> > > > the case we shouldn't be trying to break it apart into finer
+> > > > counters. These are big picture counters, not detailed allocation by
+> > > > owner counters.
+> > >
+> > > Right, I agree with that, but if SecPageTables includes page tables
+> > > from multiple sources, and it is observed to be suspiciously high, the
+> > > logical next step is to try to find the culprit, right?
+> >
+> > You can make that case already, if it is high wouldn't you want to
+> > find the exact VMM process that was making it high?
+> >
+> > It is a sign of fire, not a detailed debug tool.
+> 
+> Fair enough. We can always add separate counters later if needed,
+> potentially under KVM stats to get more fine-grained details as you
+> mentioned.
+> 
+> I am only worried about users subtracting the iommu-only counter to
+> get a KVM counter. We should at least document that  SecPageTables may
+> be expanded to include other sources later to avoid that.
 
-LGTM. Not sure if reviewed-by is warranted from me, but you can at
-least take tested-by.
+Well, we just broke it already, anyone thinking it was only kvm
+counters is going to be sad now :) As I understand it was already
+described to be more general that kvm so probably nothing to do really
 
-Tested-by: Ivan Babrou <ivan@cloudflare.com>
-
-Thank you for working on it.
+Jason
 
