@@ -1,88 +1,251 @@
-Return-Path: <netdev+bounces-52206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4827FDDDF
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:02:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1848F7FDF74
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:42:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E71CB20E63
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:02:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BB011C20AA0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A4D3B78E;
-	Wed, 29 Nov 2023 17:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA493529C;
+	Wed, 29 Nov 2023 18:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wAb8pb0x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k3teRwIz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BAEDB6
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:02:19 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40b422a274dso87875e9.0
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:02:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701277338; x=1701882138; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gLapLfMiK02kYDh1bquJqUL8gsBXcNy1X+KHQGHXYD0=;
-        b=wAb8pb0xsD//iIrmeWbbXmp2q9DzNfsuu/lcvy8xzxcNGgm1rSpIQY9pCQCSBrG5nQ
-         rp0QwEpP/kteaC6dyvu7F26mTSmrs6itvFzrtGstmpWaQikLZf/EWtY2bf79v+xnXIbk
-         cohBUH9Fp8XNxTJVZbEI9VLyE6iNlTyLVSLjjisUa0OZL905jR6Hp97HYPWL4BT82rxw
-         j2S6AbmKDlGKp+WNDcZHRpjuGUaOMN2MIQdBobC4mL4xTBmFd57QLuKczRSRTVLpdXu9
-         kTDc+xtvutNX5uPKkFw0tz6HJjxOcdaediU0qNDp8kSoNg3qtwG6NUx3rl9HV4S3Fbob
-         LaWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701277338; x=1701882138;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gLapLfMiK02kYDh1bquJqUL8gsBXcNy1X+KHQGHXYD0=;
-        b=N3lg7BcpF4IMfcrZ1BRv44QZImgsg36bgXMj6QbP/EbG8UhwAJaMHKpnFMXAFeLRT7
-         VqN76PsGURWFVSh5XYyUuEw6f9ix09dH+6r5rq9Gz7ShHq3OkO895Ocrnu2mwAEKMsks
-         juULuoPxRpt8/Qx+I3+MR7UsRNFhnF4u36vlHCOZ1cEm0azIY27EUzYOatMDOgOQr1MV
-         EM3IDYHH5zk+XJLjlawK7WrWj9a1VG3AajKV6mmhSjSq+eepLyTVyBsI9PGc3CMHJtHo
-         cEJlNKHXN4Je/kV9PfDNe8FlYABDyGlEFuzvzGOl86/YabXThN1S9ZwSx8ZbaJA1zX7H
-         W+yA==
-X-Gm-Message-State: AOJu0YyROSnC4o7r5Tk42VdYHkpHFY+5+suNL0kyn3gPsCHudZfN/BQP
-	umjbfWt8rhJfJoARlfCYrTlgXtujlNFda9zOhkTR7A==
-X-Google-Smtp-Source: AGHT+IFBkpteu493p6KGhPWnWumYPbA4E84jTO/ph6gkjrWloQemnVn+ZZ7IdYxics91NQxE3ePslWlS5OqrF/dxV1k=
-X-Received: by 2002:a05:600c:3c83:b0:3f4:fb7:48d4 with SMTP id
- bg3-20020a05600c3c8300b003f40fb748d4mr949555wmb.3.1701277337573; Wed, 29 Nov
- 2023 09:02:17 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1712E12C
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:41:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701283316; x=1732819316;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FuM6+pB8IDds+B7QD+pku6Po3IZK41UrFEWqjt8/w94=;
+  b=k3teRwIztb0kLdbb7o+0JYhvgL331OZEUtVHvI9xF4ZXdBPL3fLkEEWi
+   PQMU6Lopq2imDCrPJcpMG/90RiINQeIkvS7GWMvpywKsESfiqWF+3Vgxr
+   XK7yi0h/qpjOavA40M5Om2W/OKRXFeE2uoEe0PLvwVNyHBT5nXaC7WxaW
+   nH0PwOQrQ/jRHlW5zGGwu0uGbtSNE1kS8osMyPpy7jq/L/5++tFhRoaZl
+   DIiucrPsKzy3BbPUq7LMT5yVXFQVO/R9QxegGH54HhabHJXFSCumo1gnd
+   Y6kQR3Rhf//RTuWgKgkoVT1CluE0s4wauNH35K+AUHQb6RbJC0/xdQuAV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="193022"
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="193022"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 10:41:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="772776470"
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="772776470"
+Received: from fedora-sys-rao.jf.intel.com (HELO f37-upstream-rao..) ([10.166.5.220])
+  by fmsmga007.fm.intel.com with ESMTP; 29 Nov 2023 10:41:54 -0800
+From: Ranganatha Rao <ranganatha.rao@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Slawomir Laba <slawomirx.laba@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Ranganatha Rao <ranganatha.rao@intel.com>
+Subject: [PATCH iwl-net, v2] iavf: Fix iavf_shutdown to call iavf_remove instead iavf_close
+Date: Wed, 29 Nov 2023 10:35:26 -0500
+Message-ID: <20231129153526.57912-1-ranganatha.rao@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129165721.337302-1-dima@arista.com> <20231129165721.337302-3-dima@arista.com>
-In-Reply-To: <20231129165721.337302-3-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Nov 2023 18:02:03 +0100
-Message-ID: <CANn89iLr53_W2183MU97Eqd9A4sZp7M_kEB79sLp+1pPa7pFcA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] net/tcp: Consistently align TCP-AO option in the header
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 5:57=E2=80=AFPM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> Currently functions that pre-calculate TCP header options length use
-> unaligned TCP-AO header + MAC-length for skb reservation.
-> And the functions that actually write TCP-AO options into skb do align
-> the header. Nothing good can come out of this for ((maclen % 4) !=3D 0).
->
-> Provide tcp_ao_len_aligned() helper and use it everywhere for TCP
-> header options space calculations.
->
-> Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+From: Slawomir Laba <slawomirx.laba@intel.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Make the flow for pci shutdown be the same to the pci remove.
+
+iavf_shutdown was implementing an incomplete version
+of iavf_remove. It misses several calls to the kernel like
+iavf_free_misc_irq, iavf_reset_interrupt_capability, iounmap
+that might break the system on reboot or hibernation.
+
+Implement the call of iavf_remove directly in iavf_shutdown to
+close this gap.
+
+Fixes below error messages (dmesg) during shutdown stress tests -
+[685814.900917] ice 0000:88:00.0: MAC 02:d0:5f:82:43:5d does not exist for
+ VF 0
+[685814.900928] ice 0000:88:00.0: MAC 33:33:00:00:00:01 does not exist for
+VF 0
+
+Reproduction:
+
+1. Create one VF interface:
+echo 1 > /sys/class/net/<interface_name>/device/sriov_numvfs
+
+2. Run live dmesg on the host:
+dmesg -wH
+
+3. On SUT, script below steps into vf_namespace_assignment.sh
+
+<#!/bin/sh> // Remove <>. Git removes # line
+if=<VF name> (edit this per VF name)
+loop=0
+
+while true; do
+
+echo test round $loop
+let loop++
+
+ip netns add ns$loop
+ip link set dev $if up
+ip link set dev $if netns ns$loop
+ip netns exec ns$loop ip link set dev $if up
+ip netns exec ns$loop ip link set dev $if netns 1
+ip netns delete ns$loop
+
+done
+
+4. Run the script for at least 1000 iterations on SUT:
+./vf_namespace_assignment.sh
+
+Expected result:
+No errors in dmesg.
+
+Fixes: 129cf89e5856 ("iavf: rename functions and structs to new name")
+Signed-off-by: Slawomir Laba <slawomirx.laba@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Co-authored-by: Ranganatha Rao <ranganatha.rao@intel.com>
+Signed-off-by: Ranganatha Rao <ranganatha.rao@intel.com>
+
+---
+v2: Add reproduction steps in commit log
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 72 ++++++---------------
+ 1 file changed, 21 insertions(+), 51 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index c862ebcd2e39..3c177dcd3b38 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -276,27 +276,6 @@ void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
+ 	kfree(mem->va);
+ }
+ 
+-/**
+- * iavf_lock_timeout - try to lock mutex but give up after timeout
+- * @lock: mutex that should be locked
+- * @msecs: timeout in msecs
+- *
+- * Returns 0 on success, negative on failure
+- **/
+-static int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
+-{
+-	unsigned int wait, delay = 10;
+-
+-	for (wait = 0; wait < msecs; wait += delay) {
+-		if (mutex_trylock(lock))
+-			return 0;
+-
+-		msleep(delay);
+-	}
+-
+-	return -1;
+-}
+-
+ /**
+  * iavf_schedule_reset - Set the flags and schedule a reset event
+  * @adapter: board private structure
+@@ -4825,34 +4804,6 @@ int iavf_process_config(struct iavf_adapter *adapter)
+ 	return 0;
+ }
+ 
+-/**
+- * iavf_shutdown - Shutdown the device in preparation for a reboot
+- * @pdev: pci device structure
+- **/
+-static void iavf_shutdown(struct pci_dev *pdev)
+-{
+-	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
+-	struct net_device *netdev = adapter->netdev;
+-
+-	netif_device_detach(netdev);
+-
+-	if (netif_running(netdev))
+-		iavf_close(netdev);
+-
+-	if (iavf_lock_timeout(&adapter->crit_lock, 5000))
+-		dev_warn(&adapter->pdev->dev, "%s: failed to acquire crit_lock\n", __func__);
+-	/* Prevent the watchdog from running. */
+-	iavf_change_state(adapter, __IAVF_REMOVE);
+-	adapter->aq_required = 0;
+-	mutex_unlock(&adapter->crit_lock);
+-
+-#ifdef CONFIG_PM
+-	pci_save_state(pdev);
+-
+-#endif
+-	pci_disable_device(pdev);
+-}
+-
+ /**
+  * iavf_probe - Device Initialization Routine
+  * @pdev: PCI device information struct
+@@ -5063,16 +5014,21 @@ static int __maybe_unused iavf_resume(struct device *dev_d)
+  **/
+ static void iavf_remove(struct pci_dev *pdev)
+ {
+-	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
+ 	struct iavf_fdir_fltr *fdir, *fdirtmp;
+ 	struct iavf_vlan_filter *vlf, *vlftmp;
+ 	struct iavf_cloud_filter *cf, *cftmp;
+ 	struct iavf_adv_rss *rss, *rsstmp;
+ 	struct iavf_mac_filter *f, *ftmp;
++	struct iavf_adapter *adapter;
+ 	struct net_device *netdev;
+ 	struct iavf_hw *hw;
+ 
+-	netdev = adapter->netdev;
++	/* Don't proceed with remove if netdev is already freed */
++	netdev = pci_get_drvdata(pdev);
++	if (!netdev)
++		return;
++
++	adapter = iavf_pdev_to_adapter(pdev);
+ 	hw = &adapter->hw;
+ 
+ 	if (test_and_set_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section))
+@@ -5184,11 +5140,25 @@ static void iavf_remove(struct pci_dev *pdev)
+ 
+ 	destroy_workqueue(adapter->wq);
+ 
++	pci_set_drvdata(pdev, NULL);
++
+ 	free_netdev(netdev);
+ 
+ 	pci_disable_device(pdev);
+ }
+ 
++/**
++ * iavf_shutdown - Shutdown the device in preparation for a reboot
++ * @pdev: pci device structure
++ **/
++static void iavf_shutdown(struct pci_dev *pdev)
++{
++	iavf_remove(pdev);
++
++	if (system_state == SYSTEM_POWER_OFF)
++		pci_set_power_state(pdev, PCI_D3hot);
++}
++
+ static SIMPLE_DEV_PM_OPS(iavf_pm_ops, iavf_suspend, iavf_resume);
+ 
+ static struct pci_driver iavf_driver = {
+-- 
+2.41.0
+
 
