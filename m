@@ -1,114 +1,236 @@
-Return-Path: <netdev+bounces-52090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B007FD3FE
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:20:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 776EE7FD402
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 554ADB21747
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:20:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07CCCB21B3D
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEE11A71B;
-	Wed, 29 Nov 2023 10:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A369C1B277;
+	Wed, 29 Nov 2023 10:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3AOIADvn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WEWbk3oa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B074310D3
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:38 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso7554a12.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701253237; x=1701858037; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7K1pgVBMcYU7bzXRB07o7wfGLOUjRgQ7TJnPk6wf/gY=;
-        b=3AOIADvnRiYriVRDTSFSO2B2RvMcVCtqRjEmLdJr5qB3nVWlSaOkPeuHDSEwUpu+jC
-         dPUJndixGYxzuTsVgnBuYy+EGEY6CZFRHfqsDiC1LCCTB1zgJFAOQ1RiDk28uhEzxyvV
-         ZmaMv4VtvCeusyNQ11+7XNophrZZNIDejqLHVoIE0DWqN6MKmCGbCB76FgZFArt6Oiz5
-         8BqYbXCDTnvsLVpScI/AnoMRkWKHipeUCmbOcHqzUoGJbIN98+49hQGuBNjlQGtWwBPG
-         dDyZRnqVUf8GgQMcf/vdwyy3vYZH4tDBBW0m3gQTz6V/1OF4XryLciAsANJS12G1TI28
-         KJzg==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E966310C4
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701253247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8eOgmnDcAOuHVjx4FQ/wfnS7taAjkRaDPrb33RzRzvo=;
+	b=WEWbk3oaS/uvhHoWMBHBXQT7sPEOKzSG333zV5NGiq9C90X50hXsNKy5xrintIwYu3LJhh
+	7MmgryIYBBjCuv/WlDcZIHz989BzYx6OnhxB2IRhBGnSP1C8nSIMMn35TXuDY6sGhEJ69g
+	HvMgpRv3weM6eBInrbeTPQaJn06gxlE=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-270-uQijtEOaOAiPBHE9r-6LMw-1; Wed, 29 Nov 2023 05:20:45 -0500
+X-MC-Unique: uQijtEOaOAiPBHE9r-6LMw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50aa8fbf1e6so6972668e87.2
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701253237; x=1701858037;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7K1pgVBMcYU7bzXRB07o7wfGLOUjRgQ7TJnPk6wf/gY=;
-        b=dj3DwhueYU18QuqAxXmRh1IY1mJ7AGiqZN+gUlhXPPx0+wzKtmNlMYZazsJgO4ig4B
-         rLeKa9JXVsmT9W4Npz+wZByLVmQsQV9leeLAxW/ndozKgrHTbSxLEptwP29hDbRt/kel
-         LQpfYWEsPGyuVYxBiLSxc8hYrWPiH0xLXXyeomzJ1YdIOIIar6a6MspA6hlLmx0NoWTc
-         hWuqXsLMrNDz4ANpn3uz1M2ldwcME3Am430lecxWSrUvwV3Ndwkt1EoHlXh+siLTqCRE
-         q9mytXgPpPU0VyWrfwLSO2DqVNcwf64oFngFczmuELFkipl8bOtSri/msUf6n7iNDodi
-         a9vg==
-X-Gm-Message-State: AOJu0Yxr8pofmxrHMjDHoX/tX4cdNpn82qYaUo8EI+7Mmy8ofcUM/kxE
-	mhw+92EEjmE2BGbNJHaSE1Gpko65MiOrWrBvjl1xmQ==
-X-Google-Smtp-Source: AGHT+IEQ1VgbC/IrwvosnReucCncdwhWEjHxRSdOlIpq5n/GqVXvvu3RjRWJTUhbdCq9uGBSc4k2Tyz1O22kneqJrak=
-X-Received: by 2002:a05:6402:88d:b0:54b:221d:ee1c with SMTP id
- e13-20020a056402088d00b0054b221dee1cmr578543edy.5.1701253236925; Wed, 29 Nov
- 2023 02:20:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701253243; x=1701858043;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8eOgmnDcAOuHVjx4FQ/wfnS7taAjkRaDPrb33RzRzvo=;
+        b=mtEJrisxj4QMnnjFJzZxCJsibpabwVqa5BtGp84h5XmOulEbm5RZwLGB8BUztqYcL+
+         CHoH4SrCNzmmFhdxAGG76Oa56CgyJ31PIx8TwL1rOYyiPRrBpDNfGlOdhOxH3AOKOMBI
+         vIUEYZwiw12HejMXEiRyOL/rIun683ftjAE+DWx0Uu+wJa9emp/zmeisDKa0DmbMOP7H
+         LdIKDukwNjAeuuPcyoTsXLrfSuf8n5vgl5eT0rWlrkMZbPC/AGP8SBc0E3bVgL/cb7Wn
+         3fKXAXFLG+cQSzmIW4ekZkRhuulGlufgotishaKSYLANfaloXmxYNIf+/s7DdQ9Qf+DR
+         e/Wg==
+X-Gm-Message-State: AOJu0YwyyLyXMqUT1IDvUpeLJu4jq7X4iYwD6WuRfOMmfJK5PAh0/LQD
+	pAthnoupBYwARAa1Yuu3NvvLe5fO6E6kQjKtU4RtF5BSVeUwbK/FUU/wRDn/UgtfcYNRwiI7Owp
+	rh2pg99OST1aKXjmcHPtif1ZG4i3p4WkL
+X-Received: by 2002:a05:6512:220a:b0:507:cb04:59d4 with SMTP id h10-20020a056512220a00b00507cb0459d4mr12336121lfu.8.1701253243245;
+        Wed, 29 Nov 2023 02:20:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHo6suNvwReIN0wIUEmAKInanQPmGpK3eFZ68I+bpu7dfH9YCETv8WG6Wc9xZCDDfErzyYtBX/TPf0eCASyd2Y=
+X-Received: by 2002:a05:6512:220a:b0:507:cb04:59d4 with SMTP id
+ h10-20020a056512220a00b00507cb0459d4mr12336107lfu.8.1701253242868; Wed, 29
+ Nov 2023 02:20:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129022924.96156-1-kuniyu@amazon.com> <20231129022924.96156-9-kuniyu@amazon.com>
-In-Reply-To: <20231129022924.96156-9-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Nov 2023 11:20:25 +0100
-Message-ID: <CANn89iJ+0D1KdUBQ-f-ac5XqZFPH3KN1P_7y-jafK4a4WVkTqQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 8/8] tcp: Factorise cookie-dependent fields
- initialisation in cookie_v[46]_check()
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com> <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
+ <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
+In-Reply-To: <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 29 Nov 2023 18:20:31 +0800
+Message-ID: <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: features
+To: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com, 
+	Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com, 
+	yuanyaogoog@chromium.org, yuehaibing@huawei.com, 
+	kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com, 
+	alexander.shishkin@linux.intel.com
+Content-Type: multipart/mixed; boundary="0000000000003705f2060b47e303"
+
+--0000000000003705f2060b47e303
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 29, 2023 at 3:33=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
+On Wed, Nov 29, 2023 at 6:12=E2=80=AFPM Ning, Hongyu
+<hongyu.ning@linux.intel.com> wrote:
 >
-> We will support arbitrary SYN Cookie with BPF, and then kfunc at
-> TC will preallocate reqsk and initialise some fields that should
-> not be overwritten later by cookie_v[46]_check().
 >
-> To simplify the flow in cookie_v[46]_check(), we move such fields'
-> initialisation to cookie_tcp_reqsk_alloc() and factorise non-BPF
-> SYN Cookie handling into cookie_tcp_check(), where we validate the
-> cookie and allocate reqsk, as done by kfunc later.
+> On 2023/11/29 17:16, Jason Wang wrote:
+> > On Wed, Nov 29, 2023 at 5:05=E2=80=AFPM Ning, Hongyu
+> > <hongyu.ning@linux.intel.com> wrote:
+> >>
+> >>
+> >>
+> >> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
+> >>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817c=
+c0bc2c:
+> >>>
+> >>>     Linux 6.5 (2023-08-27 14:49:51 -0700)
+> >>>
+> >>> are available in the Git repository at:
+> >>>
+> >>>     https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tag=
+s/for_linus
+> >>>
+> >>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9=
+ab:
+> >>>
+> >>>     virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023=
+-09-03 18:10:24 -0400)
+> >>>
+> >>> ----------------------------------------------------------------
+> >>> virtio: features
+> >>>
+> >>> a small pull request this time around, mostly because the
+> >>> vduse network got postponed to next relase so we can be sure
+> >>> we got the security store right.
+> >>>
+> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >>>
+> >>> ----------------------------------------------------------------
+> >>> Eugenio P=C3=A9rez (4):
+> >>>         vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+> >>>         vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend f=
+eature
+> >>>         vdpa: add get_backend_features vdpa operation
+> >>>         vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> >>>
+> >>> Jason Wang (1):
+> >>>         virtio_vdpa: build affinity masks conditionally
+> >>>
+> >>> Xuan Zhuo (12):
+> >>>         virtio_ring: check use_dma_api before unmap desc for indirect
+> >>>         virtio_ring: put mapping error check in vring_map_one_sg
+> >>>         virtio_ring: introduce virtqueue_set_dma_premapped()
+> >>>         virtio_ring: support add premapped buf
+> >>>         virtio_ring: introduce virtqueue_dma_dev()
+> >>>         virtio_ring: skip unmap for premapped
+> >>>         virtio_ring: correct the expression of the description of vir=
+tqueue_resize()
+> >>>         virtio_ring: separate the logic of reset/enable from virtqueu=
+e_resize
+> >>>         virtio_ring: introduce virtqueue_reset()
+> >>>         virtio_ring: introduce dma map api for virtqueue
+> >>>         virtio_ring: introduce dma sync api for virtqueue
+> >>>         virtio_net: merge dma operations when filling mergeable buffe=
+rs
+> >>
+> >> Hi,
+> >> above patch (upstream commit 295525e29a5b) seems causing a virtnet
+> >> related Call Trace after WARNING from kernel/dma/debug.c.
+> >>
+> >> details (log and test setup) tracked in
+> >> https://bugzilla.kernel.org/show_bug.cgi?id=3D218204
+> >>
+> >> it's recently noticed in a TDX guest testing since v6.6.0 release cycl=
+e
+> >> and can still be reproduced in latest v6.7.0-rc3.
+> >>
+> >> as local bisects results show, above WARNING and Call Trace is linked
+> >> with this patch, do you mind to take a look?
+> >
+> > Looks like virtqueue_dma_sync_single_range_for_cpu() use
+> > DMA_BIDIRECTIONAL unconditionally.
+> >
+> > We should use dir here.
+> >
+> > Mind to try?
+> >
+> > Thanks
+> >
 >
-> Note that we set ireq->ecn_ok in two steps, the latter of which will
-> be shared by the BPF case.  As cookie_ecn_ok() is one-liner, now
-> it's inlined.
+> sure, but what I see in the code
+> virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
+> probably I misunderstood your point?
 >
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
+> Please let me know any patch/setting to try here.
+
+Something like attached.  (Not even compiling test).
+
+Thanks
+
+>
+>
+> >>
+> >>>
+> >>> Yuan Yao (1):
+> >>>         virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+> >>>
+> >>> Yue Haibing (1):
+> >>>         vdpa/mlx5: Remove unused function declarations
+> >>>
+> >>>    drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+> >>>    drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+> >>>    drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+> >>>    drivers/vhost/vdpa.c               |  15 +-
+> >>>    drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++=
++++++++-----
+> >>>    drivers/virtio/virtio_vdpa.c       |  17 +-
+> >>>    include/linux/vdpa.h               |   4 +
+> >>>    include/linux/virtio.h             |  22 ++
+> >>>    include/uapi/linux/vhost_types.h   |   4 +
+> >>>    9 files changed, 625 insertions(+), 90 deletions(-)
+> >>>
+> >>
+> >
 >
 
+--0000000000003705f2060b47e303
+Content-Type: application/octet-stream; 
+	name="0001-virtio_ring-fix-DMA-dir-during-sync.patch"
+Content-Disposition: attachment; 
+	filename="0001-virtio_ring-fix-DMA-dir-during-sync.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lpjm8ipj0>
+X-Attachment-Id: f_lpjm8ipj0
 
->                                   dst_metric(dst, RTAX_INITRWND));
->
->         ireq->rcv_wscale =3D rcv_wscale;
-> -       ireq->ecn_ok =3D cookie_ecn_ok(&tcp_opt, net, dst);
-> +       ireq->ecn_ok &=3D cookie_ecn_ok(net, dst);
+RnJvbSBmZjVhNTQwMmExMjA5Y2FjNzNhNGIwZTdjMTkzNzM3ODhiNDE3N2Y5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPgpEYXRl
+OiBXZWQsIDI5IE5vdiAyMDIzIDE3OjE0OjE1ICswODAwClN1YmplY3Q6IFtQQVRDSF0gdmlydGlv
+X3Jpbmc6IGZpeCBETUEgZGlyIGR1cmluZyBzeW5jCkNvbnRlbnQtdHlwZTogdGV4dC9wbGFpbgoK
+U2lnbmVkLW9mZi1ieTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4KLS0tCiBkcml2
+ZXJzL3ZpcnRpby92aXJ0aW9fcmluZy5jIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
+aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0aW8vdmlydGlv
+X3JpbmcuYyBiL2RyaXZlcnMvdmlydGlvL3ZpcnRpb19yaW5nLmMKaW5kZXggODFlY2IyOWM4OGYx
+Li45MWQ4Njk4MTQzNzMgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvdmlydGlvL3ZpcnRpb19yaW5nLmMK
+KysrIGIvZHJpdmVycy92aXJ0aW8vdmlydGlvX3JpbmcuYwpAQCAtMzIyMCw3ICszMjIwLDcgQEAg
+dm9pZCB2aXJ0cXVldWVfZG1hX3N5bmNfc2luZ2xlX3JhbmdlX2Zvcl9jcHUoc3RydWN0IHZpcnRx
+dWV1ZSAqX3ZxLAogCQlyZXR1cm47CiAKIAlkbWFfc3luY19zaW5nbGVfcmFuZ2VfZm9yX2NwdShk
+ZXYsIGFkZHIsIG9mZnNldCwgc2l6ZSwKLQkJCQkgICAgICBETUFfQklESVJFQ1RJT05BTCk7CisJ
+CQkJICAgICAgZGlyKTsKIH0KIEVYUE9SVF9TWU1CT0xfR1BMKHZpcnRxdWV1ZV9kbWFfc3luY19z
+aW5nbGVfcmFuZ2VfZm9yX2NwdSk7CiAKLS0gCjIuNDIuMAoK
+--0000000000003705f2060b47e303--
 
-nit: presumably this cookie_ecn_ok() call could be factorized if done
-from tcp_get_cookie_sock()
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-
-No need for another version.
-
->
->         ret =3D tcp_get_cookie_sock(sk, skb, req, dst);
->  out:
-> --
-> 2.30.2
->
 
