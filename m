@@ -1,114 +1,89 @@
-Return-Path: <netdev+bounces-52151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D8F7FD9DB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:42:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7F47FDA37
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F18F1C20B94
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 14:42:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A943D28270E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 14:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EC0210EC;
-	Wed, 29 Nov 2023 14:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1307332C87;
+	Wed, 29 Nov 2023 14:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SOG6x1sX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0EA130;
-	Wed, 29 Nov 2023 06:42:27 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VxOO2AH_1701268943;
-Received: from 30.39.190.97(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VxOO2AH_1701268943)
-          by smtp.aliyun-inc.com;
-          Wed, 29 Nov 2023 22:42:24 +0800
-Message-ID: <aa83bf32-789f-fec2-ea42-74b0ae05426e@linux.alibaba.com>
-Date: Wed, 29 Nov 2023 22:42:23 +0800
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09579D66
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:46:19 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3331974c2ceso432258f8f.0
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:46:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701269177; x=1701873977; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nd+VQEsmPtHaYSb1sOLGm0Al9pG0egJ+AOLDXMlu3rM=;
+        b=SOG6x1sXBHI7S26lZAOMg6nVsU+SNfUGavs60TcLCSw6TFwePtnZ0dpLTFBqzCDy/9
+         gG9RkmYEFv4LUkfSB7NLOd1M75xlpIPNXI1YkaYTst4UouyuLZ2q99tMwiWGd+L3EE5b
+         Q2Qr/3+pLxmKh32gVIYYDxlwGpsEK4OHxgqKGZUrkKQrLfaQuUjRNc1ilSOZXfdvoYUb
+         WmZSyau02fKoYW/qqmxurd04yu8j/b8OPLaa8fBkA/7B39vnXvAlJcIwJASvQehHsLB7
+         28vcL5V+ZaifJLDUXCDeRp0HGVa2XPEkYY0EFCALdwtThhvoKmIu6gJ5di60m/S6fdOY
+         kwDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701269177; x=1701873977;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nd+VQEsmPtHaYSb1sOLGm0Al9pG0egJ+AOLDXMlu3rM=;
+        b=qyP6IQ4pnyF+24Qw/c3TmTO+L0vVcITxbvfSJ2tAInLBHNFNTPIj7Azgs84zd4wsDW
+         y9N/5p/R+WXzbpOjbCqc4wnEeKdpFaYGskCdWG9g3U+ffRKV6d925k1WPxB+9xky5rAT
+         zoFAXx3Qqb1tAb7gbKDHC1Qz39nm2M0p7J9DlzN9O7GfHen5+c/HokR1z4uPzAG+G3Yy
+         41X8AJjgvXnI3059r1uzIq06sjIkW1WDpXwOm98lYtCzqOeuss4iELjVWUz8wsOriEf7
+         LKnQFHQlxfqY4reLPZ7Q/1Blu2rq+CeZq1vzuPyhsPg69eD7IF2UEm4Z3W8DJ6idjV3B
+         2I4w==
+X-Gm-Message-State: AOJu0YxEPcWEjb6z9tgUXeTinMh5ZxHzEJFHeVfB+A3Yt15PkjTUFT1H
+	mvCpnBNRLoLpS/MTSdmkdXPjnA==
+X-Google-Smtp-Source: AGHT+IHMfC/TMg42FfmkshICRVT1hjVwYATg+xYlrzW0rfu23OrjUared67K3VuHF8exg5tGm7Dj2w==
+X-Received: by 2002:a5d:4b83:0:b0:332:eeba:ee8b with SMTP id b3-20020a5d4b83000000b00332eebaee8bmr9123355wrt.24.1701269177321;
+        Wed, 29 Nov 2023 06:46:17 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id j15-20020adfff8f000000b00332f02123d2sm13085865wrr.54.2023.11.29.06.46.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 06:46:16 -0800 (PST)
+Date: Wed, 29 Nov 2023 15:46:15 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, corbet@lwn.net
+Subject: Re: [patch net-next] docs: netlink: add NLMSG_DONE message format
+ for doit actions
+Message-ID: <ZWdOtzoBHiRY53y9@nanopsycho>
+References: <20231128151916.780588-1-jiri@resnulli.us>
+ <20231128073059.314ed76b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net] net/netfilter: bpf: avoid leakage of skb
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org
-References: <1701252962-63418-1-git-send-email-alibuda@linux.alibaba.com>
- <20231129131846.GC27744@breakpoint.cc>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20231129131846.GC27744@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231128073059.314ed76b@kernel.org>
 
-
-
-On 11/29/23 9:18 PM, Florian Westphal wrote:
-> D. Wythe <alibuda@linux.alibaba.com> wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> A malicious eBPF program can interrupt the subsequent processing of
->> a skb by returning an exceptional retval, and no one will be responsible
->> for releasing the very skb.
-> How?  The bpf verifier is supposed to reject nf bpf programs that
-> return a value other than accept or drop.
+Tue, Nov 28, 2023 at 04:30:59PM CET, kuba@kernel.org wrote:
+>On Tue, 28 Nov 2023 16:19:16 +0100 Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> In case NLMSG_DONE message is sent as a reply to doit action, multiple
+>> kernel implementation do not send anything else than struct nlmsghdr.
+>> Add this note to the Netlink intro documentation.
 >
-> If this is a real bug, please also figure out why
-> 006c0e44ed92 ("selftests/bpf: add missing netfilter return value and ctx access tests")
-> failed to catch it.
+>You mean when the reply has F_MULTI set, correct?
 
-Hi Florian,
-
-You are right, i make a mistake.. , it's not a bug..
-
-And my origin intention was to allow ebpf progs to return NF_STOLEN, we 
-are trying to modify some netfilter modules via ebpf,
-and some scenarios require the use of NF_STOLEN, but from your 
-description, it seems that at least currently,
-you do not want to return NF_STOLEN, until there is a helper for 
-sonsume_skb(), right ?
-
-Again, very sorry to bother you.
-
-Best wishes,
-D. Wythe.
-
->> Moreover, normal programs can also have the demand to return NF_STOLEN,
-> No, this should be disallowed already.
->
->>   net/netfilter/nf_bpf_link.c | 19 ++++++++++++++++++-
->>   1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
->> index e502ec0..03c47d6 100644
->> --- a/net/netfilter/nf_bpf_link.c
->> +++ b/net/netfilter/nf_bpf_link.c
->> @@ -12,12 +12,29 @@ static unsigned int nf_hook_run_bpf(void *bpf_prog, struct sk_buff *skb,
->>   				    const struct nf_hook_state *s)
->>   {
->>   	const struct bpf_prog *prog = bpf_prog;
->> +	unsigned int verdict;
->>   	struct bpf_nf_ctx ctx = {
->>   		.state = s,
->>   		.skb = skb,
->>   	};
->>   
->> -	return bpf_prog_run(prog, &ctx);
->> +	verdict = bpf_prog_run(prog, &ctx);
->> +	switch (verdict) {
->> +	case NF_STOLEN:
->> +		consume_skb(skb);
->> +		fallthrough;
-> This can't be right.  STOLEN really means STOLEN (free'd,
-> redirected, etc, "skb" MUST be "leaked".
->
-> Which is also why the bpf program is not allowed to return it.
-
-
+Well, that would be ideal. However, that flag is parallel to NLMSG_DONE.
+I see that at least drivers/connector/connector.c does not set this flag
+when sending NLMSG_DONE type.
 
 
