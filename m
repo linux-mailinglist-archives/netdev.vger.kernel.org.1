@@ -1,82 +1,154 @@
-Return-Path: <netdev+bounces-52125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71447FD66D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:17:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633707FD671
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3492834EF
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:17:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A6F21F20FA2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9693E1DA37;
-	Wed, 29 Nov 2023 12:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB8B1DA29;
+	Wed, 29 Nov 2023 12:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="cOH9FW2K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com [209.85.215.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A153410C9
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:17:05 -0800 (PST)
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5c604d8e6f5so881545a12.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:17:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701260225; x=1701865025;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vm0iiEEDW67QXAU5hmtno74YGdHPjqHpci2ImvBkZog=;
-        b=Y7QFVi9mkOf3tMAb0UgAXbrDZAmwrRZ9vhfJtua7ZCAiefv+qSgQbnPeem/bbDvSOB
-         OgUPLjLLj/Ka3riynxVc3QbWUKOeK/oBBck8CmNB8AWezV7CaS1oeLTEtbdzGUTUVamC
-         7EFOod9hUCWBoAFPDMl0h/z0/XrRST8PKdjiDQ4hrlkviwgJiVyY5p8Y/ROEWARIp8sp
-         1Bob7/riuem5Gjqmg+Be65laGp4nafzF/IXGgy+S1NGZx0UVVWcfbhLcZwqfZDzlI+J+
-         o2hkwcqOk8w/a0rYe1UF3mupsxRb61AiKIT9SKusWV0j0wFSwdm8tixFF05rE/9nL5pm
-         et4w==
-X-Gm-Message-State: AOJu0YwT3PIz+ufSeJb8oMjkQnwMVnAp5bW/sF/chsB85NHjQGM+90PV
-	CLtd8UDOP4HNZJLXiMc3Mcibn1rtyfIJL46vL/FmyaLPw6dd
-X-Google-Smtp-Source: AGHT+IHm5egSj7drq/h6+tM2rakLRXVKiS/fewy4S6Rq3VCjTdYJQzjNbgFLIYLHh4HPavMnmoOq+9UCKki4IZlbNFEDmoS03isK
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13395D48;
+	Wed, 29 Nov 2023 04:17:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1701260270; bh=u/kJJE/vqyJTMGmEfzpylHMc8Ysza3g9cZpru6QlCt4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=cOH9FW2KbVieeZs21foehTn2sQypjF/MeBlr4OFAgzMZv7rmtvt0K+yT6Fc1XcmFN
+	 gF99K9qDst7ccSZCEH0/BvF1ASdzIqjxXOdmVgOjvCLnUuxM3rLGLb7o+178bvhVgi
+	 4a270iyQQ7XWEhkbrUZw7buNgjQxezbot0l1aClo=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrszc5-1.qq.com (NewEsmtp) with SMTP
+	id 46E1989A; Wed, 29 Nov 2023 20:17:46 +0800
+X-QQ-mid: xmsmtpt1701260266tji7ldykr
+Message-ID: <tencent_DE67FF86DB92ED465489A36ECD2EDDCC8C06@qq.com>
+X-QQ-XMAILINFO: OKkKo7I1HxIew+Fm4chwnma/C0iyoMaFP3nfP6kENcQxQTB+XEQKuQqDbnMI5h
+	 fWSDST1Rcuh/BFu5Bi62sqczUSoUm3S9Gw65b1jUnKHdYzePvQjvgUJ2nS7mm4kV5nN1IwKWNtP/
+	 rHRLoaxT8jsVbFyDBdKfLVyQd80W6zhcVcxeNayuyQLyB0djcZxTgDs3FOx6xFgLNnRIo4WWCRj8
+	 G6k+KiAK3qn+6Tr6NxDUu3J4kq08p0GzgTvBAEEkbNDVgSoJ7yLMZR5jjtUuPO4NRQOa/2kkY53k
+	 n1KNRW9JZOZtXNyEfZ3QydGnoTviZrsMARqE5stH7R2+G5JRDuVPpAkXBKGsWr/YFlfGsALYY5lM
+	 OLQMOiVmQ7I/1Q/7ULlwZtZpBKT3z8yvr6Yme8UewWHneSi1I0CqTFfYZCXnaJixKR60rwL7dzR2
+	 ERPXoknDOMu4AcCg5RAgSS/sKVcJlntBb1+okNN9np3xwkXZ2avgLxfILzDV9FLEPP+d4mDd1pKa
+	 NyWxpq4jFHuwRHMBN9nLTXdXCjZI3rtxc8h3of2kgvepGl1D0qR5ecfAGnhNk/PJu8StwGfl28lQ
+	 soYaU1+pHV9AFA/BUhq9kelxTelXi3NlKU8qcmw1soldrk3UKzFkHtiWpFZrL0mwV07XwPYoLJCn
+	 Urj4ZdU3ohNsHsW39wSzPCdOoD82xCF2xTUTrRmiyyDdx457znILnYYD38mlNgl1ULAZKo6wxTSl
+	 Z5YBUGamT79LsIWS1zFyPuoQOVWDrePyMQ9KP1CYisSsxekw88m6XmVXHf4+oIqpFw+NFBIEL2Gs
+	 5J8daFDZNfxiu0cg3wPTS3rbXS5He/3JPPT1L6jSELKW0VA2D/GAFEQ60WeBD0lNmu/Hc5kG5pBX
+	 FZiuEkjNTs6tt5PYBe8GFtHwEC5rurSJDRQXfSvNgh3vlL7JreqE20i+1GMc7pStkP2QHvlkBjOx
+	 bLOSRYowIkkWmsiZPZWxOFAjr1aUEGzgEKgSGDdhGJvnh/9GAF2SogXPh6AdyO
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev,
+	nathan@kernel.org,
+	ndesaulniers@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+62d7eef57b09bfebcd84@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	trix@redhat.com
+Subject: [PATCH V2] wifi: mac80211: check if the existing link config remains unchanged
+Date: Wed, 29 Nov 2023 20:17:47 +0800
+X-OQ-MSGID: <20231129121746.4051185-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <52e6ba0affb1648edd3ffd25fb6d8199a39a2f51.camel@sipsolutions.net>
+References: <52e6ba0affb1648edd3ffd25fb6d8199a39a2f51.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:2b86:b0:27d:e40a:96d3 with SMTP id
- u6-20020a17090a2b8600b0027de40a96d3mr3758871pjd.2.1701260225232; Wed, 29 Nov
- 2023 04:17:05 -0800 (PST)
-Date: Wed, 29 Nov 2023 04:17:05 -0800
-In-Reply-To: <000000000000d9483d060901f460@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006547d3060b498385@google.com>
-Subject: Re: [syzbot] [perf?] general protection fault in inherit_task_group
-From: syzbot <syzbot+756fe9affda890e892ae@syzkaller.appspotmail.com>
-To: acme@kernel.org, adrian.hunter@intel.com, 
-	alexander.shishkin@linux.intel.com, bpf@vger.kernel.org, irogers@google.com, 
-	jolsa@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, mark.rutland@arm.com, mingo@kernel.org, 
-	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Level: **
+Content-Transfer-Encoding: 8bit
 
-syzbot suspects this issue was fixed by commit:
+[Syz report]
+WARNING: CPU: 1 PID: 5067 at net/mac80211/rate.c:48 rate_control_rate_init+0x540/0x690 net/mac80211/rate.c:48
+Modules linked in:
+CPU: 1 PID: 5067 Comm: syz-executor413 Not tainted 6.7.0-rc3-syzkaller-00014-gdf60cee26a2e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:rate_control_rate_init+0x540/0x690 net/mac80211/rate.c:48
+Code: 48 c7 c2 00 46 0c 8c be 08 03 00 00 48 c7 c7 c0 45 0c 8c c6 05 70 79 0b 05 01 e8 1b a0 6f f7 e9 e0 fd ff ff e8 61 b3 8f f7 90 <0f> 0b 90 e9 36 ff ff ff e8 53 b3 8f f7 e8 5e 0b 78 f7 31 ff 89 c3
+RSP: 0018:ffffc90003c57248 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff888016bc4000 RCX: ffffffff89f7d519
+RDX: ffff888076d43b80 RSI: ffffffff89f7d6df RDI: 0000000000000005
+RBP: ffff88801daaae20 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000001
+R13: 0000000000000000 R14: ffff888020030e20 R15: ffff888078f08000
+FS:  0000555556b94380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005fdeb8 CR3: 0000000076d22000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ sta_apply_auth_flags.constprop.0+0x4b7/0x510 net/mac80211/cfg.c:1674
+ sta_apply_parameters+0xaf1/0x16c0 net/mac80211/cfg.c:2002
+ ieee80211_add_station+0x3fa/0x6c0 net/mac80211/cfg.c:2068
+ rdev_add_station net/wireless/rdev-ops.h:201 [inline]
+ nl80211_new_station+0x13ba/0x1a70 net/wireless/nl80211.c:7603
+ genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:972
+ genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+ genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-commit a71ef31485bb51b846e8db8b3a35e432cc15afb5
-Author: Peter Zijlstra <peterz@infradead.org>
-Date:   Tue Oct 24 09:42:21 2023 +0000
+[Analysis]
+It is inappropriate to make a link configuration change judgment on an 
+non-existent and non new link.
 
-    perf/core: Fix potential NULL deref
+[Fix]
+Quickly exit when there is a existent link and the link configuration has not 
+changed.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17172162e80000
-start commit:   6808918343a8 net: bridge: fill in MODULE_DESCRIPTION()
-git tree:       bpf-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=429fa76d04cf393c
-dashboard link: https://syzkaller.appspot.com/bug?extid=756fe9affda890e892ae
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12db572b680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10839a1b680000
+Fixes: b303835dabe0 ("wifi: mac80211: accept STA changes without link changes")
+Reported-and-tested-by: syzbot+62d7eef57b09bfebcd84@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/mac80211/cfg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-If the result looks correct, please mark the issue as fixed by replying with:
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 606b1b2e4123..d0b5a5dd7410 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -1788,10 +1788,10 @@ static int sta_link_apply_parameters(struct ieee80211_local *local,
+ 					  lockdep_is_held(&local->hw.wiphy->mtx));
+ 
+ 	/*
+-	 * If there are no changes, then accept a link that doesn't exist,
++	 * If there are no changes, then accept a link that exist,
+ 	 * unless it's a new link.
+ 	 */
+-	if (params->link_id < 0 && !new_link &&
++	if (params->link_id >= 0 && !new_link &&
+ 	    !params->link_mac && !params->txpwr_set &&
+ 	    !params->supported_rates_len &&
+ 	    !params->ht_capa && !params->vht_capa &&
+-- 
+2.43.0
 
-#syz fix: perf/core: Fix potential NULL deref
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
