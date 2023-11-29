@@ -1,275 +1,165 @@
-Return-Path: <netdev+bounces-52204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301B57FDDCF
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:59:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C347FDDD2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:59:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D920D28259B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:59:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68D07B20DF2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136CD32C87;
-	Wed, 29 Nov 2023 16:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1BD39875;
+	Wed, 29 Nov 2023 16:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZI3HVQI"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="TtSHTWMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA09210C3;
-	Wed, 29 Nov 2023 08:59:07 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40b4f60064eso17004705e9.1;
-        Wed, 29 Nov 2023 08:59:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701277146; x=1701881946; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BOfb4QUnr3jYEHugyY71tdfEezoV7AI3GfOfIzO0Gg8=;
-        b=HZI3HVQITfyKwUqMCrrIRQud4WNxawjzuqGWlwea31+1EBh43VYgd54BCtb+152VtM
-         /+/h/aAJp6Ig6ZQJrwCmwJ1ugxEdXcsW6fG2KCdfGs7+cF8MQQqDC26EZsKob1vzJUE1
-         BbWJeP5CKIwOEba5iTxaxOR435gFfu1A2RbdenTLlaYehVGnwn2i5x6EkWMJfDlWLKiO
-         Lp9I+SAWoOQzcw7GIQ8COC8usAoOuLaWmExqzHhCalNYdOAbcupAVjW7r+1GiA8y9WNO
-         SEDC9+AMcezhF4hiZa217CV24pMZXk+QUed3K2U5+R2tgovLKt3c/7XiPBmxjvHDyUWw
-         5FZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701277146; x=1701881946;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BOfb4QUnr3jYEHugyY71tdfEezoV7AI3GfOfIzO0Gg8=;
-        b=oKhvRjEZkoc9jzdm/jj57+JgZXEcFomLwE3nWzPzXpKqUIKTgzjL4qGRo6BqwZViNq
-         Pbeu5f0oZHLl5s/1gnUI/O3fRyhTCsQNGwXDZ+o4TvofxZESg2KDIxbW+J+k3dScJbvc
-         Y1w5goR4YZgOwTlE7N+XNlVLaHLlqQwJqdBGfWdCkoZA7SWQmrQ/6Ux0eYAzDdvDQXPU
-         ZBXEKIwb/oRJR6H81RIzNOy8+KCp7tGMBvVQcFGEeMPlUYkR70BZB6TZj9s3x2wlUEid
-         hczQkdLVoOuMwN+RzMNElzyirq/VMHMmOHNzavvJ2vdYbE35JxnAIlrmzL8DdD+56mhg
-         DFWw==
-X-Gm-Message-State: AOJu0Yze5wtIRe2htpgWUGVsUIAAFEh1NcoXdZWaVnH2jb0oRrphWHiO
-	3d8EfG0PN9ioeyT2jXKkQrIboQLV5vAGZQ==
-X-Google-Smtp-Source: AGHT+IGQtns4j8/Ahi1fstWxcuVWc8JuyIpdfN54lYXjzgNg19SQQsD3ajr2bIfSXG90ojpfmM+XqA==
-X-Received: by 2002:a05:600c:4fd0:b0:40b:5401:f02 with SMTP id o16-20020a05600c4fd000b0040b54010f02mr1566980wmq.32.1701277146025;
-        Wed, 29 Nov 2023 08:59:06 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:1c53:9d4e:6a62:308f])
-        by smtp.gmail.com with ESMTPSA id u19-20020a05600c139300b0040b540ff0a5sm2486600wmf.19.2023.11.29.08.59.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 08:59:05 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,
-  donald.hunter@redhat.com
-Subject: Re: [RFC PATCH net-next v1 0/6] tools/net/ynl: Add dynamic selector
- for options attrs
-In-Reply-To: <20231129080943.01d81902@kernel.org> (Jakub Kicinski's message of
-	"Wed, 29 Nov 2023 08:09:43 -0800")
-Date: Wed, 29 Nov 2023 16:58:57 +0000
-Message-ID: <m2bkbc8pim.fsf@gmail.com>
-References: <20231129101159.99197-1-donald.hunter@gmail.com>
-	<20231129080943.01d81902@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from outbound.mail.protection.outlook.com (mail-tycjpn01on2132.outbound.protection.outlook.com [40.107.114.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492DF8E;
+	Wed, 29 Nov 2023 08:59:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CRDQFa6Eo9lQA2aDJyPpjlJnI/U8uMsXrbEfGBAH2P5p3KUzYyn4jxA/TkmSDSIlUO7cwuTFh1aedm0KJ1gKgE4EQ2P+dq8B3c4Iy2K1OoXIIKH2WhW5ShViPuJN1dp06I/VYPvobm5vNjqwOPLGh8epaPctvCb4ubfI7+V8tdJhRI38xEUOY7WXI9oDdZn1ioYjfj48k3eukz1cwZgPgMY/7gfz/GA3XMjhJkG8kq0GoxvdqKwj9ha4qnArPJEozVi7vZSVxL4he3aME4p+5yK9AL4MyCI2oLPUr2hd7fvf+zOj9r6tlIzaKHHRKwHKhu5ZfYQ0UNnC6Oh6VoW10Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vr2qbv4BxNahfi/sO4DUapzZ02iRnP5BN7600Q9k88g=;
+ b=aHsv3ieHMYlKZu9tPCAbPvqrrNnM2d40KdfxB8mGSzZxeQjCk5x1VoQwokAT16d7De9Mr88HPBMvodTI9JosYWOnQJq84uXtCoZ5Cq+3/AvgjUrgJsd/0JU/WDO8S7s2gZ2S2TYJpOMf8W7iOwPk/GHdolI7d0L4+XKDvBnKPlAZYXQPmUwRASOwgKiFjHT+JZKDR9/t7gO+4AeiwdRbJoEIJEcGQ2rpjjE4ivkS//zHZ4ajWbW9Jmjztnddf3ict0k0139LLt9IZp9ATOAmhNfVMJClrY1Zv06KbMSasG1m/+5lRXkNre2cIsf2YKmGI7wzmnGfYL2UMlTXHutR3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vr2qbv4BxNahfi/sO4DUapzZ02iRnP5BN7600Q9k88g=;
+ b=TtSHTWMe4ZRNGFkDwG5EIa3SAtu6LuM2GJvOFihvkIREKE+cnki/UXzEn/rRqcszGCCZl1OWRuzHbANdDYU9eVRvnHkfc1nktVOr5F/39x794NnuVBX426BTJ96yLjBdUbTZn0W4/WPUU3hNRa1EOBMSyXb2icNNjiPkvHYJemw=
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com (2603:1096:604:101::7)
+ by TYWPR01MB11342.jpnprd01.prod.outlook.com (2603:1096:400:3f5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Wed, 29 Nov
+ 2023 16:59:41 +0000
+Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::74da:640b:b793:14df]) by OS3PR01MB6593.jpnprd01.prod.outlook.com
+ ([fe80::74da:640b:b793:14df%4]) with mapi id 15.20.7046.023; Wed, 29 Nov 2023
+ 16:59:38 +0000
+From: Min Li <min.li.xe@renesas.com>
+To: Jakub Kicinski <kuba@kernel.org>, Min Li <lnimi@hotmail.com>
+CC: "richardcochran@gmail.com" <richardcochran@gmail.com>, "lee@kernel.org"
+	<lee@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for
+ the measured external offset
+Thread-Topic: [PATCH net-next 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for
+ the measured external offset
+Thread-Index: AQHaIWyQveJbeWs2hEyyQBk1KXKTxrCQrbCAgADY6EA=
+Date: Wed, 29 Nov 2023 16:59:38 +0000
+Message-ID:
+ <OS3PR01MB65932F46E55E38E3DDB938C9BA83A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+References:
+ <PH7PR03MB706497752B942B2C33C45E58A0BDA@PH7PR03MB7064.namprd03.prod.outlook.com>
+ <20231128195811.06bd301d@kernel.org>
+In-Reply-To: <20231128195811.06bd301d@kernel.org>
+Accept-Language: en-CA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OS3PR01MB6593:EE_|TYWPR01MB11342:EE_
+x-ms-office365-filtering-correlation-id: 92226e55-9c55-45a3-2398-08dbf0fc926f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ e64C9lfrXjGc+/XVkxAOA+YbyjjCFTV7v5KK2ybK+CyDliUf5JlCnx4JNOyriPyevII+bWLEh0mDbB33SuvJwzfVnn4RJsdvNG56HimFZLfHgC2FR/gV29G0ZIIZhk/jaL4MRHnpmH3+gFt2XHGt293d8kh357S2cs8T+moCJ72TEJmafhde2SjeGmi0Gtrwgp5oKtmMXJ721U8s/9ehjCZCQxIwAGLOKJAr7soKMMB3p+idTFB6KbT4tSU4GD9R12LucQTPJD4HQJugwJWG/05LUNDFIjYKEqUAof1w1pbFmXRwFdpmxgap11I4NfYq6Gi6s5t5ZAf1FBOzm8FIZpKrIVFa2y5UNi8GtOAOVgVjbnazfYIKoSTwVdIpm5nwRJ9fpROaFiF+7Jg8f5ustRFZr86VMAwBwQdunLIbdPIOAuxq84NiuDljqXb9HRQaseB8vSdusGxqJWlX94X3jlF8VWW6i08jhZnT3ptepL3pWhbHr8YfjP4N7srwXhhRq3R/EMNslA7ezIm04XxpVO7hv7fzpW357YqpDmduHwgcLV3kZ+cvjyn+NeR1bUehT0CJcdyTU19yUDiEL1kvtnx4snnboAJ4v5V2Q8hZqUnKhTJK8BCu0ujiXvNulFjnxQJK7a++L5V2koDCx0i2yFRRyJc9cUKgXA7x/iuIMKg=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6593.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(136003)(376002)(396003)(366004)(230173577357003)(230273577357003)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(71200400001)(9686003)(26005)(478600001)(7696005)(55236004)(5660300002)(2906002)(83380400001)(53546011)(110136005)(8676002)(52536014)(76116006)(8936002)(66946007)(6506007)(54906003)(64756008)(66446008)(66476007)(66556008)(4326008)(316002)(122000001)(38100700002)(33656002)(86362001)(41300700001)(38070700009)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?efa0NDWp2M2NbreGYVIbsr4RP39moDTlyxTbVDPA16Rs9XgysbpF0CvBqgZy?=
+ =?us-ascii?Q?yffSCZKB2aW/5G19dKnAGJBRriyR4w1l72rjw3udd5iSfdVc+jTpqaeQXUp8?=
+ =?us-ascii?Q?9y9SZrHj34iukrohb81CMkbr+3oioyFAY08hTAtFqvAUqffR3hQ1FCrd+/Ig?=
+ =?us-ascii?Q?1/yaL7LZOzgmJNyPla4WWmWf853Z9pr/Z9MduUdX+8By9jUPKVjGb0O+g9P+?=
+ =?us-ascii?Q?b03XSjRz6bYK4Zt2a1WVsQqtqZMkIayvAmxBScY2OnNdO4raNs+F7EiFK8ED?=
+ =?us-ascii?Q?ykb1WTdhIfrVgHczfgnn4UDNPDp3rFj+ZNOariohTShHhXNdu+QJIISE9K0F?=
+ =?us-ascii?Q?FiAlu2hoybMvkFdVDihG7WfBwijszMlsYTfqM/sdcvRkquAEFYtr7uA5neeO?=
+ =?us-ascii?Q?o0b6FjNNSMMjU2O6tfTQdYSMFxy1P5DgZ2aZxHeYwf6goAV6+wsv1/qCUAO6?=
+ =?us-ascii?Q?QLQzlgjREFY7z/tWuTj/6/rl9QAotzhHTWGx5rnxrTwcd+LeWgiLzIP3A5IH?=
+ =?us-ascii?Q?denkbgxgojZYNHXxnZEqpLZqY0Y7iIzV7SzC/TIdMZ/3L6wRZD6kBdwSv5zV?=
+ =?us-ascii?Q?hFj3GBET7df/X6vZmjG/op7rPZy+fNnxZ1jxRikfZ/tBlaosh1MN+Yhixt86?=
+ =?us-ascii?Q?oAF8i//MrJuFmwyOX9eeBZ5AIekgMfgsVFr1gjuE+cSMXgPivZhCIpThKLLr?=
+ =?us-ascii?Q?2wKLBvZp6CuugTB1jkSEv50D/y9mBxz88OnztN1ooC2DyeaZ0GesrnPpA051?=
+ =?us-ascii?Q?GpDY4ZW5XD7Yu8H41zEuWAh+16eTYUPUrWPTHU7dc4JypNuE2Ug+JEd91Mdg?=
+ =?us-ascii?Q?70Zukz0oTVVjwM/zndgh3rXl9UocqYPtf2Ofy0VJaVJn6g4e5x9vsviyddjo?=
+ =?us-ascii?Q?KV5kmirnOF/RkoduQfTfmeJUGId3p6X+/KeETPQRGKeuaXfM9j1bqwMXyG7w?=
+ =?us-ascii?Q?oUaI7B9fLsp7C99cOm+kEO/Ykxd+QyTtJNL33SmzsFrUSSZcc0r2TA8uBIJX?=
+ =?us-ascii?Q?jfzjm6e4EAr2swlIA+pOPDYybxd0jiCLpzAtsXC3h2Is7WZjZv/xsVqs9X73?=
+ =?us-ascii?Q?RAhaMSyiwzxeOL1ALdMm34Gxkd426+Ly6W+nOfPOz44U7ZKiTKlKynBrxB4f?=
+ =?us-ascii?Q?rVmq5COhvhv2HXkTRO+MNibjwKJi2L7BWx4g/RmCnTTHv+aK45vcHaMSUaQ3?=
+ =?us-ascii?Q?+h4En/4Pd64Zfe2iuUGEidHzp/cU1zbyzmwifeC/pWAOawf4eWB/Qp340JUl?=
+ =?us-ascii?Q?qwdaIp+WBNc6gtEH9J/KO2yFq32iNSaS+k4WmH0PN7/Dtt5gU/N0G3hKV0Ut?=
+ =?us-ascii?Q?SiL8bcux6iRqxSOAGKm2w/rW7pMiXVBewwVQKjWHJx54zlHH9W3zsqKjgAxc?=
+ =?us-ascii?Q?ERegpthsg1aEKwfhQHZQOd5xLuouoHIxCgPfoNgiSNVhod7Gn3jwcUwMHwCY?=
+ =?us-ascii?Q?l/U6v6sG9/CHFfFDGx9XyiK7cMoXejpl9GYlyS/cZTJuLUig4t6YpW+y8vsZ?=
+ =?us-ascii?Q?5uWN8muEioflE79CN9ohvv5Q8EeoXibd7XOyXGiIFMCDFEBe6Q9iMMRkOpc2?=
+ =?us-ascii?Q?u4Bm91gU3qUI/gDTP/lN0+69t5ElyFIE+kQgLw/E?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-OriginatorOrg: renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6593.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92226e55-9c55-45a3-2398-08dbf0fc926f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Nov 2023 16:59:38.1836
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: K/i1eipRNlp490ZFD0+kVLSMwQVah3iI45GHM4/8cZBLg2Y6swbO1Rq8HM9/BuTigWxzyQNfL5Vu6PB5qHJsyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWPR01MB11342
 
-Jakub Kicinski <kuba@kernel.org> writes:
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: November 28, 2023 10:58 PM
+> To: Min Li <lnimi@hotmail.com>
+> Cc: richardcochran@gmail.com; lee@kernel.org; linux-
+> kernel@vger.kernel.org; netdev@vger.kernel.org; Min Li
+> <min.li.xe@renesas.com>
+> Subject: Re: [PATCH net-next 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
+> for the measured external offset
+>=20
+> On Mon, 27 Nov 2023 15:01:29 -0500 Min Li wrote:
+> > This change is for the PHC devices that can measure the phase offset
+> > between PHC signal and the external signal, such as the 1PPS signal of
+> > GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+> > the existing ptp_extts_event so that application such as ts2phc can
+> > poll the external offset the same way as extts. Hence, ts2phc can use
+> > the offset to achieve the alignment between PHC and the external
+> > signal by the help of either SW or HW filters.
+>=20
+> Does not apply to net-next.
 
-> On Wed, 29 Nov 2023 10:11:53 +0000 Donald Hunter wrote:
->> This patchset adds a dynamic selector mechanism to YNL for kind-specific
->> options attributes. I am sending this as an RFC solicit feedback on a
->> couple of issues before I complete the patchset.
->
-> Exciting stuff!
->  
->> I started adding this feature for the rt_link spec which is monomorphic,
->> i.e. the kind-specific 'data' attribute is always a nest. The selector
->> looked like this:
->> 
->>   -
->>     name: data
->>     type: dynamic
->>     selector:
->>       attribute: kind
->>       list:
->>         -
->>           value: bridge
->>           nested-attributes: linkinfo-bridge-attrs
->>         -
->>           value: erspan
->>           nested-attributes: linkinfo-gre-attrs
->
-> It's kinda moot given your discovery below :(, but FWIW this is very
-> close to what I've been thinking.
->
-> After some pondering I thought it'd be better to structure it just
-> a bit differently:
->
->  -
->    name: data
->    type: poly-nest
->    selector: kind    # which attr carries the key
->
-> that's it for the attr, and then in attr-set I'd add a "key":
->
->  -
->    name: linkinfo-bridge-attrs
->    poly-key: bridge
->
-> putting the key on the attr set is worse if we ever need to "key"
-> the same attr set with different selectors, but it makes the attr
-> definition a lot smaller. And in practice I didn't expect us
-> to ever need keying into one attr set with different selectors. 
-> If we did - we could complicate it later, but start simple.
+Hi Jakub
 
-rt_link shares attribute-sets between different kinds of link so I think
-that rules out putting the key on the attribute-set. I think we may also
-see reuse across stats attribute sets in tc.
+I submitted an RFC last week and Richard was asking me to submit it togethe=
+r with a driver change as an example to implement it. Below is
+Richard's quote
 
-FWIW I initially considered avoiding a selector list by using a template
-to generate the attribute set name, but that broke pretty quickly.
+"Yes, the new option must wait for a driver that implements it.  Can you ma=
+ke a patch series where the driver change appears in the second patch?"
 
->> ...
->> I now see a few possible ways forward and would like feedback on the
->> preferred approach:
->> 
->> 1. Simplify the current patchset to implement fixed-header & nest
->>    support in the dynamic selector. This would leave existing
->>    fixed-header support for messages unchanged. We could drop the 'type'
->>    field.
->> 
->>    -
->>      value: netem
->>      fixed-header: tc-netem-qopt
->>      nested-attributes: tc-netem-attrs
->> 
->> 2. Keep the 'type' field and support for the 'binary' type which is
->>    useful for specifying nests with unknown attribute spaces. An
->>    alternative would be to default to 'binary' behaviour if there is no
->>    selector entry.
->> 
->> 3. Refactor the existing fixed-header support to be an optional part of
->>    all attribute sets instead of just messages (in legacy and raw specs)
->>    and dynamic attribute nests (in raw specs).
->> 
->>    attribute-sets:
->>      -
->>        name: tc-netem-attrs
->>        fixed-header: tc-netem-qopt
->>        attributes:
->
-> Reading this makes me feel like netem wants to be a "sub-message"?
-> It has a fixed header followed by attrs, that's quite message-like.
+But the driver that I submitted is a brand new PHC driver. So I don't know =
+if it is appropriate to separate them to net and net-next? Because the driv=
+er
+change depends on the this patch.
 
-Yeah, I guess we could call it sub-message because it's not a pure nest
-and the different name makes it an explicitly netlink-raw concept.
+Min
 
-> Something along the lines of 1 makes most sense to me, but can we
-> put the "selector ladder" out-of-line? I'm worried that the attr
-> definition will get crazy long.
-
-It seems reasonable to pull the selector list out of line because
-they do get big, e.g. over 100 lines for tc "options".
-
-My preference is 1, probably including a fallback to "binary" if there
-is no selector match.
-
-> attribute-sets:
->   -
->     name: outside-attrs
->     attributes:
->       ...
->       -
->          name: kind
->          type: string
->       -
->          name: options
->          type: sub-message
->          sub-type: inside-msg  # reuse sub-type or new property?
->          selector: kind
->     ...
->   -
->     name: inside-attrs:
->     attributes: 
->       ...
->
-> sub-messages:
->   list:
->     -
->       name: inside-msg
->       formats: # not a great name?..
->         -
->           value: some-value
->           fixed-header: struct-name
->         -
->           value: other-value
->           fixed-header: struct-name-two
->           nested-attributes: inside-attrs
->         -
->           value: another-one
->           nested-attributes: inside-attrs
->     -
->       name: different-inside-msg
->       ...
->
-> operations:
->   ...
->
-> At least that's what comes to my mind after reading the problem
-> description. Does it make sense?
-
-I think that once you have broken out to a sub-message, they're no
-longer "nested-attributes" and we should maybe reuse "attribute-set".
-
-I don't think we can reuse "sub-type" because the schema for it is the
-set of netlink type names, not a free string. Maybe we add "sub-message"
-instead? So how about this:
-
-attribute-sets:
-  -
-    name: outside-attrs
-    attributes:
-      ...
-      -
-         name: kind
-         type: string
-      -
-         name: options
-         type: sub-message
-         sub-message: inside-msg
-         selector: kind
-    ...
-  -
-    name: inside-attrs:
-    attributes:
-      ...
-
-sub-messages:
-  -
-    name: inside-msg
-    formats:
-      -
-        value: some-value
-        fixed-header: struct-name
-      -
-        value: other-value
-        fixed-header: struct-name-two
-        attribute-set: inside-attrs
-      -
-        value: another-one
-        attribute-set: inside-attrs
-  -
-    name: different-inside-msg
-    ...
-
-operations:
-  ...
-
-I cannot think of a better name than "formats" so happy to go with that.
-Did you want an explicit "list:" in the yaml schema?
-
-Thanks,
-Donald.
 
