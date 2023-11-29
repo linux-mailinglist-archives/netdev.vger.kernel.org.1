@@ -1,173 +1,130 @@
-Return-Path: <netdev+bounces-52258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D1437FE09E
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:58:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA4A7FE0B5
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 21:03:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 369C7282722
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF2B2831AF
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D618A5EE78;
-	Wed, 29 Nov 2023 19:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AB95EE92;
+	Wed, 29 Nov 2023 20:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="D68pgc9B"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="KlNzTNzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF43F12F
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 11:58:04 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7b3854d7270so3155739f.3
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 11:58:04 -0800 (PST)
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDADD66
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:03:08 -0800 (PST)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1f9decb7446so42081fac.2
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:03:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1701287884; x=1701892684; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T7FtbM3uCv3lCJgze8i3ailyZ7n1KeZA4b7KaXBphuU=;
-        b=D68pgc9B5OHrjD1qFxlZF5KKwZTpaFtOuDdem9vOAEmj3woSoMeR9kx7SxpaJvVF/r
-         UPdhWf0zPl8gFwtp6eMkDL3nu8HqNhn+OJT4QujIvh+vhbfS2PUXJTPS8IDfYXleUtZV
-         TiTEN8WhpRJK67In+WzADbn6+HWJrS7O5IiV457RvkAvucMxjtKSLqLZx42wMc5U4z9B
-         SunoMmnH+FoA9I69ULeUb6E02yQgVaVJExKtprI4Zo/8A86ffnwiEIbbp6O0u5J1ACd8
-         cd8TY7djoThD15bz3B4mnTjzQL/84P7VX7I6pIDtNqgze05roCP3gHoHk+MBUH7qu8u4
-         HBRg==
+        d=ziepe.ca; s=google; t=1701288187; x=1701892987; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oFOuz3/DxdhVTy2MXC00IZ5cc+fO6ZXycOtXt73BBek=;
+        b=KlNzTNzvrho3FAS6n7EIxzUiMs/vl/iQeM0QDdJkEjtS4cSXhxLsY19IKKemyE5A8c
+         /pBj/iSWEDglOfunWlf+rdxaJq+x/0XQl2Uyk0fvUDk791ilQsfe3HWXbzEdTcPALQYT
+         g/aVLcaMnYCLRD0rV7sQjULwgL1hR6Mof3bYBxvaj15JF5qBtmWF1oZoLuW6nV61s14i
+         6Vv7dedA5rotbHw71gnDEqtcDlEZHcwb60BySZC5ronuR3Bgo8ZxfPNuWFpbzwzjfrl8
+         4iUwrdOUO0FZwchQlhgUQOM8pS0h/OjsOZO84JlsBH6vV81K0Acx+0eXA8xhOgLX23XK
+         6w2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701287884; x=1701892684;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7FtbM3uCv3lCJgze8i3ailyZ7n1KeZA4b7KaXBphuU=;
-        b=a+Pr3BDbU5j7Qsc8ibHYdb33tevJT54KxI6UdTTRoiG9IHpE9+GOLDx/6RQ7k6I1XK
-         czD0sNplqBBpq32YK9h5hkyJYcZ/bNVnxBBbk6qeelUI8e0fwp+CYfnp55nhxTiVzr+g
-         UIf3z6lF1kd8TroN4ZBO8HbjErQg9PokGKpfVTkJucS8LpOUD4BtM1plOVAUXhDpKztO
-         EaSurfZxNk+fFVzkA+RcCooUovtUEDVDt/p0k1db3qUvhv2AthJ6L38i9hvIX0LMw9o0
-         U7f76dLMrxEFlpPaxgEZvq3PjIuMPg42eEJpfAj/+3loNQ9MmIzccs1fGGjOWdeRq3no
-         3p5Q==
-X-Gm-Message-State: AOJu0YwCliGDw4YSkejKMhPBv/azWXFd4FiXqpeWNvGh2slJLEAPCaZI
-	NzgarI9UCDzFWhObnizs72Muig==
-X-Google-Smtp-Source: AGHT+IFiWuChYLAco5nOc66G1w6cYTjkov1Hu0LQyJZMR3/WFUC6rwA2Or451TlBtWEZwd6p/yyBWQ==
-X-Received: by 2002:a5d:81d3:0:b0:7b3:b726:b57f with SMTP id t19-20020a5d81d3000000b007b3b726b57fmr9983661iol.19.1701287884069;
-        Wed, 29 Nov 2023 11:58:04 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id v5-20020a02b905000000b0045458b7b4fcsm3601107jan.171.2023.11.29.11.58.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 11:58:03 -0800 (PST)
-Message-ID: <137ab4f7-80af-4e00-a5bb-b1d4f4c75a67@arista.com>
-Date: Wed, 29 Nov 2023 19:57:53 +0000
+        d=1e100.net; s=20230601; t=1701288187; x=1701892987;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oFOuz3/DxdhVTy2MXC00IZ5cc+fO6ZXycOtXt73BBek=;
+        b=MXNpoXYNgZXaoBJmqIQYjqlI+7nfXaulO7H17HtwArkhFQ8vVvqvAeWWa106296qoU
+         Jj0cXFL7ml+CC5vhGh2MBuqlzPEG9+VByxoovy2/dUUNVFmCX6N+ajZDMs5MMWpfmUO9
+         KcH3eiWqM/O4AZZaWiHlcnXBSevr53PbwJuJX8w0Su2knaNO5sQzRof0GYobVji/C+bo
+         kQxXtQ4Bh7WpYrO4C7KZ9dpsdcShgGeC6/wCoXEi+CSvXk34ptEpfRH8vgrliocjtyav
+         TY+QmIRJuolLkazMi0r3h51m9fwkz5GmmE3C0YBO37qoeZdw4/u7H+fynIjtz3EZLJs5
+         e5sA==
+X-Gm-Message-State: AOJu0YyrSBTREsfidCFEKrOrWRgFK77G8wBGa7DiIwclVuZFHHz9ycfj
+	x14c6b+1RkAnUq61rH+pDGrqpA==
+X-Google-Smtp-Source: AGHT+IHhptM9jGiKnASdRwicfnuRd8rDMhOAWz7BQW7PJi3eFPiHvWovE7BfQ4zpeMeNVsilXqTyVQ==
+X-Received: by 2002:a05:6870:6c0b:b0:1f9:571e:f80f with SMTP id na11-20020a0568706c0b00b001f9571ef80fmr27454829oab.13.1701288187396;
+        Wed, 29 Nov 2023 12:03:07 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
+        by smtp.gmail.com with ESMTPSA id s12-20020a056830438c00b006ce2f0818d3sm2098526otv.22.2023.11.29.12.03.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 12:03:06 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1r8Qm1-005pNS-Mg;
+	Wed, 29 Nov 2023 16:03:05 -0400
+Date: Wed, 29 Nov 2023 16:03:05 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Pasha Tatashin <pasha.tatashin@soleen.com>
+Cc: Robin Murphy <robin.murphy@arm.com>, akpm@linux-foundation.org,
+	alex.williamson@redhat.com, alim.akhtar@samsung.com,
+	alyssa@rosenzweig.io, asahi@lists.linux.dev,
+	baolu.lu@linux.intel.com, bhelgaas@google.com,
+	cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
+	dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
+	iommu@lists.linux.dev, jasowang@redhat.com,
+	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org,
+	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
+	marcan@marcan.st, mhiramat@kernel.org, mst@redhat.com,
+	m.szyprowski@samsung.com, netdev@vger.kernel.org,
+	paulmck@kernel.org, rdunlap@infradead.org, samuel@sholland.org,
+	suravee.suthikulpanit@amd.com, sven@svenpeter.dev,
+	thierry.reding@gmail.com, tj@kernel.org, tomas.mudrunka@gmail.com,
+	vdumpa@nvidia.com, virtualization@lists.linux.dev, wens@csie.org,
+	will@kernel.org, yu-cheng.yu@intel.com
+Subject: Re: [PATCH 08/16] iommu/fsl: use page allocation function provided
+ by iommu-pages.h
+Message-ID: <20231129200305.GI1312390@ziepe.ca>
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <20231128204938.1453583-9-pasha.tatashin@soleen.com>
+ <1c6156de-c6c7-43a7-8c34-8239abee3978@arm.com>
+ <CA+CK2bCOtwZxTUS60PHOQ3szXdCzau7OpopgFEbbC6a9Frxafg@mail.gmail.com>
+ <20231128235037.GC1312390@ziepe.ca>
+ <52de3aca-41b1-471e-8f87-1a77de547510@arm.com>
+ <CA+CK2bCcfS1Fo8RvTeGXj_ejPRX9--sh5Jz8nzhkZnut4juDmg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20231129165721.337302-1-dima@arista.com>
- <20231129165721.337302-7-dima@arista.com>
- <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
- <df55eb1d-b63a-4652-8103-d2bd7b5d7eda@arista.com>
- <CANn89iLZx-SiV0BqHkEt9vS4LZzDxW2omvfOvNX6XWSRPFs7sw@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iLZx-SiV0BqHkEt9vS4LZzDxW2omvfOvNX6XWSRPFs7sw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+CK2bCcfS1Fo8RvTeGXj_ejPRX9--sh5Jz8nzhkZnut4juDmg@mail.gmail.com>
 
-On 11/29/23 18:34, Eric Dumazet wrote:
-> On Wed, Nov 29, 2023 at 7:14 PM Dmitry Safonov <dima@arista.com> wrote:
->>
->> On 11/29/23 18:09, Eric Dumazet wrote:
->>> On Wed, Nov 29, 2023 at 5:57 PM Dmitry Safonov <dima@arista.com> wrote:
->>>>
->>>> RFC 5925 (6.2):
->>>>> TCP-AO emulates a 64-bit sequence number space by inferring when to
->>>>> increment the high-order 32-bit portion (the SNE) based on
->>>>> transitions in the low-order portion (the TCP sequence number).
->>>>
->>>> snd_sne and rcv_sne are the upper 4 bytes of extended SEQ number.
->>>> Unfortunately, reading two 4-bytes pointers can't be performed
->>>> atomically (without synchronization).
->>>>
->>>> In order to avoid locks on TCP fastpath, let's just double-account for
->>>> SEQ changes: snd_una/rcv_nxt will be lower 4 bytes of snd_sne/rcv_sne.
->>>>
->>>
->>> This will not work on 32bit kernels ?
->>
->> Yeah, unsure if there's someone who wants to run BGP on 32bit box, so at
->> this moment it's already limited:
->>
->> config TCP_AO
->>         bool "TCP: Authentication Option (RFC5925)"
->>         select CRYPTO
->>         select TCP_SIGPOOL
->>         depends on 64BIT && IPV6 != m # seq-number extension needs WRITE_ONCE(u64)
->>
+On Wed, Nov 29, 2023 at 02:45:03PM -0500, Pasha Tatashin wrote:
+
+> > same kind of big systems where IOMMU pagetables would be of any concern.
+> > I believe some of the some of the "serious" NICs can easily run up
+> > hundreds of megabytes if not gigabytes worth of queues, SKB pools, etc.
+> > - would you propose accounting those too?
 > 
-> Oh well, this seems quite strange to have such a limitation.
+> Yes. Any kind of kernel memory that is proportional to the workload
+> should be accountable. Someone is using those resources compared to
+> the idling system, and that someone should be charged.
 
-I guess so. On the other side, it seems that there aren't many
-non-hobbyist 32bit platforms: ia32 compatible layer will even be limited
-with a boot parameter/compile option. Maybe I'm not aware of, but it
-seems that arm64/ppc64/risc-v/x86_64 are the ones everyone interested in
-these days.
+There is a difference between charged and accounted
 
-> 
->> Probably, if there will be a person who is interested in this, it can
->> get a spinlock for !CONFIG_64BIT.
-> 
-> 
->>
->>> Unless ao->snd_sne and ao->rcv_sneare only read/written under the
->>> socket lock (and in this case no READ_ONCE()/WRITE_ONCE() should be
->>> necessary)
->>
-> 
-> You have not commented on where these are read without the socket lock held ?
+You should be running around adding GFP_KERNEL_ACCOUNT, yes. I already
+did a bunch of that work. Split that out from this series and send it
+to the right maintainers.
 
-Sorry for missing this, the SNEs are used with this helper
-tcp_ao_compute_sne(), so these places are (in square brackets AFAICS,
-there is a chance that I miss something obvious from your message):
+Adding a counter for allocations and showing in procfs is a very
+different question. IMHO that should not be done in micro, the
+threshold to add a new counter should be high.
 
-- tcp_v4_send_reset() => tcp_ao_prepare_reset() [rcu_read_lock()]
-- __tcp_transmit_skb() => tcp_ao_transmit_skb() [TX softirq]
-- tcp_v4_rcv() => tcp_inbound_ao_hash() [RX softirq]
+There is definately room for a generic debugging feature to break down
+GFP_KERNEL_ACCOUNT by owernship somehow. Maybe it can already be done
+with BPF. IDK
 
-
-> tcp_ao_get_repair() can lock the socket.
-
-It can, sure.
-
-> In TW state, I guess these values can not be changed ?
-
-Currently, they are considered constant on TW. The incoming segments are
-not verified on twsk (so no need for SNEs). And from ACK side not
-expecting SEQ roll-over (tcp_ao_compute_sne() is not called) - this may
-change, but not quite critical it seems.
-
-If we go with this patch in question, I'll have to update this:
-:		key.sne = READ_ONCE(ao_info->snd_sne);
-(didn't adjust it for higher-bytes shift)
-
-> I think you can remove all these READ_ONCE()/WRITE_ONCE() which are not needed,
-> or please add a comment if they really are.
-
-Not sure if I answered above..
-
-> Then, you might be able to remove the 64BIT dependency ...
-
-At this moment I fail to imagine anyone running BGP + TCP-AO on 32bit
-kernel. I may be wrong, for sure.
-
-Thanks,
-             Dmitry
-
+Jason
 
