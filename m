@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-52066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19D47FD31E
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:47:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1097FD335
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF595B2153B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:47:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 556C71C20F2E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86E214F8A;
-	Wed, 29 Nov 2023 09:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC6218C30;
+	Wed, 29 Nov 2023 09:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iUAEW4W+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd2TBOwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89341990;
-	Wed, 29 Nov 2023 01:47:22 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-332cb136335so4503999f8f.0;
-        Wed, 29 Nov 2023 01:47:22 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CCE1999;
+	Wed, 29 Nov 2023 01:49:17 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40b4f6006d5so11365845e9.1;
+        Wed, 29 Nov 2023 01:49:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701251241; x=1701856041; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701251356; x=1701856156; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tmdrAkRlA6xplH27jHLiMRC8wSQ2FJ2TlbcW+1L16+w=;
-        b=iUAEW4W+7JXlTtIRoJoNaa7MYDn2tcTvU7hEJRHTSo0jfX18hprMT1wSwZ6I324hgD
-         bpaXg2Nwr4rxir8mXFxyuEIR//SmfV68J+THGc4Q+Jb4RvrtzNpOVRJ7N4Ff26Fq9YSr
-         hNErokaEqo2UDR92SK6VAUqo5NactGnMRSQ/m1+/m8ru+vpsTQ1acNcUYvQKsRZAK1pL
-         kaLCfth3WSOPYvLgoNAWN9q1m++cCkdZjS364Xjqf3mz/8DALiR1/HZN7QxI8dB5CIgv
-         kamO2s/1cuyssflV708I2M4VJA4+DuHb7HawNvWoZT5RsqCPk5IoRu0fmLSggTffXOnI
-         NdFQ==
+        bh=66nT2oOs9hwRfLJpvpIoPxs492CUA1F2zIY8oJPXmF8=;
+        b=Zd2TBOwQHSmbB8+X0oM5/RE/K3oUYtzuY4EvalJa+k3yg79HjiN8ZX0CRRFDwRRvFJ
+         I8DnZncj+3ZBI1DHi5OBLSYR8mO90AJXTUQleWQJAxvbGpvkit6tK0HQtwIo7FUd+CId
+         D/Tq/NWMjBbhvJBjQtxF/qB5lQNQx8D2VB5r1R6bwL3DgUFsYn3plxz7DDzzTBlc6Peo
+         RMycnZdxf9RoAJs5hhSC4KoaEhi9XjxlnTsUR2MvBpYMis3H/0bD5IbOnnKCJCMKn/7l
+         4lDj6T2W22lug6bORAYDdZplzOavuWmjwmKmyCjNXfXqVXea+Cv6zMDPuClnpkv/Qt4D
+         NJAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701251241; x=1701856041;
+        d=1e100.net; s=20230601; t=1701251356; x=1701856156;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tmdrAkRlA6xplH27jHLiMRC8wSQ2FJ2TlbcW+1L16+w=;
-        b=Cn+AfzRILjJX4eiS+leiIg1Cqzlgldt/J3qF8SndRfVRWa0+3BVRpjQU6t4GJqehnm
-         v5uY7EvZ9mm23wUHXDSLjjoPH7c9Puh6+Iu/djK+mTSz+EXFxagaZUYZclIyn42he79W
-         e3PZpuvhkVGADOpZ8XxnhTcnSKxL1UZHLYalO5fSZiBSxcBvownswi1S+NWEMUBKuLkC
-         bHT/H8lM7REQWilNzfwKuHjnEL6jI+FiKBth9bjPPFl3Y+EXLsfxaon6s1pxf8ZAdlgv
-         WbxcflLVjPhouiLrvPImFP+bLXvScs03cNJjP+x1z4+Ar0APu4bLPRr4cZO1m4+1RF5y
-         akgw==
-X-Gm-Message-State: AOJu0Yyf6ABppgswVoOq/jn/40MniLKGbpn06dF81omXQqG9E2Gc+HJi
-	O2U488PCrSN38jo9K+DOZKU=
-X-Google-Smtp-Source: AGHT+IFJIqqbIUVybyut0c5TBzi+/U/vvyAeknC6of2fayv2tmhNnbjyqNCL5wYYuMVDFqEuA8CmOg==
-X-Received: by 2002:a5d:4cc1:0:b0:332:f8d2:640f with SMTP id c1-20020a5d4cc1000000b00332f8d2640fmr7644053wrt.39.1701251241124;
-        Wed, 29 Nov 2023 01:47:21 -0800 (PST)
+        bh=66nT2oOs9hwRfLJpvpIoPxs492CUA1F2zIY8oJPXmF8=;
+        b=FebaUCfOrCjGiBmQus9x2MtdHJ2eCTJ4iO2LMZQTBTDF/pX/s3/jW115PuavXEIdZn
+         vtFwbQvtU9po6QvVgKQPKs7ALLEXknPIJ7FdYH6k8JWHfQGZAcaMczic+8PeE/3s6Tby
+         BH+sGBp+qqyhAbi/evgZU9yRcU+gPSyTuAEO7M4VWBCL1uKfErJDzxUBaZHLi+dmV97U
+         p8/9OkW51CX4GYvRLtTF51Vzz/rgKAy7XnfuLD3LcCxDCL13yxFBWio7fXd9lPGQncao
+         W1yv2ZX66k4ND492/TFwMcj+Nd9aGh9WoXTKYSQADMmkpV2T3NO+wgHG8Q6YtMd0M319
+         hFqA==
+X-Gm-Message-State: AOJu0Yzx3xDr764VwIjyKCSyatoszr5UKrUQO/KYb6Jv9W55iEV0xRb3
+	6yZcQJZyNSFfs2zBojPvjY4J2HZxPSI=
+X-Google-Smtp-Source: AGHT+IF54aFHBaIN3vElNqQGOxBoZOqFtZLyaSwx1V6rMit1/UE0qnBNSDtEZmCBE5S7pqM8G1ohQw==
+X-Received: by 2002:a05:600c:524a:b0:40b:4ba1:c502 with SMTP id fc10-20020a05600c524a00b0040b4ba1c502mr3602156wmb.37.1701251355650;
+        Wed, 29 Nov 2023 01:49:15 -0800 (PST)
 Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id s11-20020adfeccb000000b003316b38c625sm17429283wro.99.2023.11.29.01.47.20
+        by smtp.gmail.com with ESMTPSA id q7-20020a05600c46c700b0040b4110f548sm1592873wmo.23.2023.11.29.01.49.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 01:47:20 -0800 (PST)
-Message-ID: <656708a8.df0a0220.28d76.9307@mx.google.com>
-X-Google-Original-Message-ID: <ZWcIpjkrL6vJMZCy@Ansuel-xps.>
-Date: Wed, 29 Nov 2023 10:47:18 +0100
+        Wed, 29 Nov 2023 01:49:15 -0800 (PST)
+Message-ID: <6567091b.050a0220.44fc8.41fb@mx.google.com>
+X-Google-Original-Message-ID: <ZWcJGQEvH-9H2f6p@Ansuel-xps.>
+Date: Wed, 29 Nov 2023 10:49:13 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
@@ -66,11 +66,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Konrad Dybcio <konrad.dybcio@linaro.org>,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 08/14] net: phy: at803x: drop specific PHY id
- check from cable test functions
+Subject: Re: [net-next PATCH 09/14] net: phy: at803x: remove specific qca808x
+ check from at803x functions
 References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-9-ansuelsmth@gmail.com>
- <ZWcGn7KVSpsN/1Ee@shell.armlinux.org.uk>
+ <20231129021219.20914-10-ansuelsmth@gmail.com>
+ <ZWcHzAXyIl++F1Sm@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,30 +79,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZWcGn7KVSpsN/1Ee@shell.armlinux.org.uk>
+In-Reply-To: <ZWcHzAXyIl++F1Sm@shell.armlinux.org.uk>
 
-On Wed, Nov 29, 2023 at 09:38:39AM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 29, 2023 at 03:12:13AM +0100, Christian Marangi wrote:
-> > @@ -1310,10 +1302,6 @@ static int at803x_cable_test_start(struct phy_device *phydev)
+On Wed, Nov 29, 2023 at 09:43:40AM +0000, Russell King (Oracle) wrote:
+> On Wed, Nov 29, 2023 at 03:12:14AM +0100, Christian Marangi wrote:
+> > Remove specific qca808x check from at803x generic functions.
+> > 
+> > While this cause a bit of code duplication, this is needed in
+> > preparation for splitting the driver per PHY family and detaching
+> > qca808x specific bits from the at803x driver.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  drivers/net/phy/at803x.c | 107 ++++++++++++++++++++++++++-------------
+> >  1 file changed, 71 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> > index 8f5878ccb1a8..475b96165f45 100644
+> > --- a/drivers/net/phy/at803x.c
+> > +++ b/drivers/net/phy/at803x.c
+> > @@ -1043,24 +1043,6 @@ static int at803x_config_aneg(struct phy_device *phydev)
 > >  	 */
-> >  	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
-> >  	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
-> > -	if (phydev->phy_id != ATH9331_PHY_ID &&
-> > -	    phydev->phy_id != ATH8032_PHY_ID &&
-> > -	    phydev->phy_id != QCA9561_PHY_ID)
-> > -		phy_write(phydev, MII_CTRL1000, 0);
-> ...
-> > +static int at8031_cable_test_start(struct phy_device *phydev)
-> > +{
-> > +	at803x_cable_test_start(phydev);
-> > +	phy_write(phydev, MII_CTRL1000, 0);
+> >  	ret = 0;
 > 
-> I don't think this is a safe change - same reasons as given on a
-> previous patch. You can't randomly reorder register writes like this.
->
+> Doesn't this become unnecessary?
+> >  
+> > -	if (phydev->drv->phy_id == QCA8081_PHY_ID) {
+> > -		int phy_ctrl = 0;
+> > -
+> > -		/* The reg MII_BMCR also needs to be configured for force mode, the
+> > -		 * genphy_config_aneg is also needed.
+> > -		 */
+> > -		if (phydev->autoneg == AUTONEG_DISABLE)
+> > -			genphy_c45_pma_setup_forced(phydev);
+> > -
+> > -		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->advertising))
+> > -			phy_ctrl = MDIO_AN_10GBT_CTRL_ADV2_5G;
+> > -
+> > -		ret = phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
+> > -				MDIO_AN_10GBT_CTRL_ADV2_5G, phy_ctrl);
+> > -		if (ret < 0)
+> > -			return ret;
+> > -	}
+> > -
+> >  	return __genphy_config_aneg(phydev, ret);
+> 
+> ... since you can just call genphy_config_aneg() here now?
+> 
+> > @@ -1845,6 +1815,47 @@ static int qca8327_suspend(struct phy_device *phydev)
+> >  	return qca83xx_suspend(phydev);
+> >  }
+> >  
+> > +static int qca808x_config_aneg(struct phy_device *phydev)
+> > +{
+> > +	int phy_ctrl = 0;
+> > +	int ret;
+> > +
+> > +	ret = at803x_config_mdix(phydev, phydev->mdix_ctrl);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	/* Changes of the midx bits are disruptive to the normal operation;
+> > +	 * therefore any changes to these registers must be followed by a
+> > +	 * software reset to take effect.
+> > +	 */
+> > +	if (ret == 1) {
+> > +		ret = genphy_soft_reset(phydev);
+> > +		if (ret < 0)
+> > +			return ret;
+> > +	}
+> > +
+> > +	/* Do not restart auto-negotiation by setting ret to 0 defautly,
+> > +	 * when calling __genphy_config_aneg later.
+> > +	 */
+> > +	ret = 0;
+> > +
+> > +	/* The reg MII_BMCR also needs to be configured for force mode, the
+> > +	 * genphy_config_aneg is also needed.
+> > +	 */
+> > +	if (phydev->autoneg == AUTONEG_DISABLE)
+> > +		genphy_c45_pma_setup_forced(phydev);
+> > +
+> > +	if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->advertising))
+> > +		phy_ctrl = MDIO_AN_10GBT_CTRL_ADV2_5G;
+> > +
+> > +	ret = phy_modify_mmd_changed(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
+> > +				     MDIO_AN_10GBT_CTRL_ADV2_5G, phy_ctrl);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	return __genphy_config_aneg(phydev, ret);
+> > +}
+> 
+> ... but is it _really_ worth duplicating the entire function just to
+> deal with the QCA8081 difference? On balance, I think the original code
+> is better.
+> 
+> Overall, I'm getting the impression that you have a mental hang-up about
+> drivers checking the PHY ID in their method drivers... there's
+> absolutely nothing wrong with that. When the result of trying to
+> eliminate those results in bloating a driver, then the cleanup is not
+> a cleanup anymore, it creates bloat and makes future maintenance
+> harder.
 
-Actually for this the order is keeped. Generic function is called and
-for at8031 MII_CTRL1000 is called on top of that.
+For some AT803x ID it might be O.K. but here we are mixing all kind of
+thing and you already noticing the state of this driver with the priv
+changes. Again it's all to facilitate the last 2 patch of this series.
+
+> 
+> Sorry, but no, I don't like this patch.
 
 -- 
 	Ansuel
