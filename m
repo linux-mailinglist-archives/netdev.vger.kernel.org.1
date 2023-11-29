@@ -1,285 +1,146 @@
-Return-Path: <netdev+bounces-52032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E5267FD04B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:04:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C203B7FD051
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6DBD282138
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:04:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3E0B1C20A0F
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82E4111B9;
-	Wed, 29 Nov 2023 08:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3FF111B9;
+	Wed, 29 Nov 2023 08:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZoV1jvO"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="FCi+/4Wh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040FAD40;
-	Wed, 29 Nov 2023 00:03:59 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3316bb1303bso4069433f8f.0;
-        Wed, 29 Nov 2023 00:03:58 -0800 (PST)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2112.outbound.protection.outlook.com [40.107.92.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F361BC6
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 00:04:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TIYy2VmndQn9w856UlX4pflAj18MeTvkGgNztOrSTL/1N9Ko5sky25B/9wLSyrRjmaCMvODyMAtSSs/TR0auPFGB+IT1rhB65ywzsR1G+/nCQeEPnUBOUBkVIb+fd4J1Y3QBhUYy+UavK6I/FRv2JYngjB8J1Q0Q9jl2WHlYcF2phMfXEMBeBcfjoy+kk5owkC1uY1/jEq0q/ukoBn8Vf6XjD7DuqkHVrncXfQ0EJEs9PzVmczs/SDApT5Lf/uCZ1ylMOw9dnMRKpJHpu1Cl1YalFb3iIber6K6QdflvKvY8RGc09MjlWQdjkRU63zISusWJ6U1hKzlNEXOKMDWQDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NB5JU6HldYZFZZj54m1KweonKUfmoQUalP5pLwBYKsw=;
+ b=Mp+NQVguXl7uQWu/eqYprDPsvFL9KS1k6NDRAVfj0hOzwnMaGqHJ6x4MRXo/LuxgWoL+wmbbf1zdFCe72Tr+io3yjNc65p9OroHVURv9g36zFpvVOSBqrTFn4bQyKXR0+Ru/VPP5zMMIbGmhziH1ehQMbyEVjmKWGrUbiTHhLQ+9zytrv8AtInZoPDevvh9UXiPgtvH6Cv8zZQs8/CNx8dH1CliAtFch+cg3bYtvJtHEkuBQZ8wXj2xkUnP+vN3ps6HEWWNeBznFQ69ol9ch39pmphSj8ChwEUKxzaYxaCC/sQM/m3kFX5iQGjbma5BJBn4Sh9srYjiqXjPa4JrD7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701245037; x=1701849837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6tCLJ/jVqe6TXVz3o3+XM+/lnuZw/4bsc+XLTHNKEH8=;
-        b=MZoV1jvOo9XKmH1ZclLgxoT7K+zY7wBhapQPdnbVnSd+heRPFGYEFq1ZoXmHY42hOd
-         iY2lFOcmAEIdsZdgiDMoosedtW+XcPu8stY+SHpIyY6lP2tzdCwchVsFGHHZjXGz2TSs
-         nN0IX5HASNfWIDqO34OF10tOyLrP96YGkkDZNfidgLrhVbbNInBPkJBQZn2s2YAZHfcr
-         +XxoErs+i4hE5n0pBcwIq1P2uAMImee4LUgE9RvDr6M+VEnfatJkUiCM7UCas56Ozi3w
-         yjvj1HqyVCOqkfGFmL7elenKyQOROo7JiygvKWJTmSNcDdenUdnB0ehLVK8k6UqFC8ht
-         3bkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701245037; x=1701849837;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6tCLJ/jVqe6TXVz3o3+XM+/lnuZw/4bsc+XLTHNKEH8=;
-        b=t7xjscFktn8WhJHlj3xkVVleyp17cdTgr4pAhGGetRpIllvc30nxdMawxx+4W0yTDN
-         jvZZc7rOlkVN1Y3RGkWB8pW2HWz9S8xl0EPDGXTmSi0AwJKJ+yxUHbO3acTdh2AfuqN2
-         PdfZ1G82wr//kSqB/+e/VbEzMX3o1wKkQxjrdTsI4ByQ281O1djN4LeFDu5middnULMO
-         wxL4JYbsNQYdWjAd79lYUfUmOqnlHUwLqNWS0Tqt3H4Jvox6gCL7Zv8lj+P3wwPGxsqr
-         0bwWeYhX+hPwzxOnUZVdhq/xV8RWS7K7oIoN5yWND4oG5uXhU5l7Bh98KVkC7HRlhkxP
-         5xNQ==
-X-Gm-Message-State: AOJu0YyJzreM5h8EI2EU7/RzON2rno4l2nNRmv3KxAK5ntCHhH6hIDup
-	xCHIW65tP44mU3vDhxjPWZA=
-X-Google-Smtp-Source: AGHT+IGGno1Qo79s9qlJ38kRJ1/OdER2w3lCHCMDkAd0IhuoBz20QtT8frLZKPS/GMCw9H4KpUKJMw==
-X-Received: by 2002:a5d:668d:0:b0:332:d3bc:2819 with SMTP id l13-20020a5d668d000000b00332d3bc2819mr12531017wru.69.1701245037063;
-        Wed, 29 Nov 2023 00:03:57 -0800 (PST)
-Received: from ?IPV6:2a01:c22:7b29:900:b864:e4c2:5a1b:bc9d? (dynamic-2a01-0c22-7b29-0900-b864-e4c2-5a1b-bc9d.c22.pool.telefonica.de. [2a01:c22:7b29:900:b864:e4c2:5a1b:bc9d])
-        by smtp.googlemail.com with ESMTPSA id o14-20020a5d4a8e000000b00332e073f12bsm17060492wrq.19.2023.11.29.00.03.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 00:03:56 -0800 (PST)
-Message-ID: <7cfd7a10-53d4-45a8-908c-39459b1f8b1a@gmail.com>
-Date: Wed, 29 Nov 2023 09:03:56 +0100
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NB5JU6HldYZFZZj54m1KweonKUfmoQUalP5pLwBYKsw=;
+ b=FCi+/4Wh3kuAOASjzQQaSHAIvMZbBQLYKoKpjZ5WDfY8u7fqkZmz2QhH2r5CLakqNtpZXM9ugSGm0XjdBOtSsNH9EDKhB5N9/SrUQWRQgmlH9lecBUiEoGHL707e6no+aP1+T/Nt+43l+1g6vO2SnGuIepsh6ybDCowtT+8NdG0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by MW4PR13MB5909.namprd13.prod.outlook.com (2603:10b6:303:1b4::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29; Wed, 29 Nov
+ 2023 08:04:35 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::d3c0:fa39:cb9e:a536]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::d3c0:fa39:cb9e:a536%7]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
+ 08:04:35 +0000
+From: Louis Peens <louis.peens@corigine.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yinjun Zhang <yinjun.zhang@corigine.com>,
+	netdev@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: [PATCH net-next] nfp: ethtool: expose transmit SO_TIMESTAMPING capability
+Date: Wed, 29 Nov 2023 10:04:13 +0200
+Message-Id: <20231129080413.83789-1-louis.peens@corigine.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: JNAP275CA0009.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::14)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH] leds: trigger: netdev: fix RTNL handling to prevent potential
- deadlock
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Christian Marangi <ansuelsmth@gmail.com>, Pavel Machek <pavel@ucw.cz>,
- Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|MW4PR13MB5909:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03aae3b9-b8e2-42f7-0870-08dbf0b1d330
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	VWeMWfnE8Tlm/v+XXAJ+lL/bFpl9RtsMjrTFcj4GP2/qIcR4HrcHRfAVD57fM9tI5oukgNpbglyMOo5z/C6gZPZCrat/sNQolMX3sB5NuRjvIPUR2IhwzeuUiZbpJzqyVQcDs//HdowkHii8UXmMEHiberrvuTDVoSwipjw8pP2ZLuZ3KtAGOaFqvHG1Sy0O5orfRLbN2TpOzTgxXfJUPAzz68afEWk1fUI0jU+6dXjSUQGtQM74rhawdWEoshvWU2dCdq5nODl7mlqCKi10kg4NgieQm/XPYVSyYtQnxLFAgwAXQda41tOiZvAObO/cjnlMhkhRlrb9N+5DW4FNVjIp6RbDx9Rgx+thzvRohdWfv7y5tLCMq6FXbEtRyIiTfIhFCu40yez0Yf64QDmOiWQ1uFBu1yWWDLl7+Vh95jg67qaayulen/XYATBhL9VME8McS5JEQunb3zEiCncaYWA7eLA6c+rvHevwmt0KtzHgSwaRPUyggeaCihe1GARY2W+HTK+TOZMNBZeMIBggNABuPCmkC3IYnXCUrC5lQMEoNYBQhw8pYQdgBmR1N3rNS2gT3KBOStlyusSuS/Up0CLO0bLvBx2gy087/RewvwoaISzWWzAYPYGwJuCFne5KunG5bgxrmYJBixcFXThsqhQVehezqQ1B55ZVN6CwlDA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(39830400003)(136003)(366004)(376002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(41300700001)(38100700002)(38350700005)(36756003)(1076003)(4744005)(5660300002)(2906002)(44832011)(26005)(86362001)(107886003)(2616005)(6512007)(6506007)(52116002)(6666004)(8676002)(4326008)(8936002)(478600001)(6486002)(316002)(66476007)(66556008)(110136005)(66946007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xYC04fAQHtw+y7gpL3qu21RTxRcq0gvkXtxEr6aSK9bUPt8XHEF4OLsstvrm?=
+ =?us-ascii?Q?km9b8qFqGQYTDpmwMHmjctPCEjkXDxpTDVLhmwWwYjvr4bWcgC8hORGCBb+Y?=
+ =?us-ascii?Q?alZptevbOugwjPGNcepiIptoQ78UjABvFCazxzi3eyrtyQByzrE0eSCc0j51?=
+ =?us-ascii?Q?gMfA/Apr0YCxbcFNqvWQNBhuhvTi6KbU+vgxMX0LK4TwLuKPGQ6oJBlJEMjY?=
+ =?us-ascii?Q?zKc3MjDiKng1SHcy4sSQ+BBrzlGJgedLOawuMx9+0R8KgH/Er1LCgM+GVkwX?=
+ =?us-ascii?Q?Wey68MSSslKgFUoHUPNRxFRF+oXJeyDjzcN0LIJnVd2CTNcZvZ7bSJlvo2q4?=
+ =?us-ascii?Q?jXWhbKBFKadGEckwqNWOj4fonRdUa95UOSMh0YkSvYapWPFQAiXnbOlvdz/P?=
+ =?us-ascii?Q?SoyZXFNugg04ELDvadnFaUDsCvFkZ9wpAGw8/c7u+ci3OnIzyffKYr+RcQsU?=
+ =?us-ascii?Q?1ihTTK+Aa+QR7e0L0NsmMhCigOoIOQjz4quhmavNzIc+kaZ4/zNYAmznSdVd?=
+ =?us-ascii?Q?NodOKlT/xbUrXvrLiH0LJJJvCEXlQipBoOfGL4Voium1l1WONaC97izdlp72?=
+ =?us-ascii?Q?nvsg1qE5g1zfXE4QLoaz1KDCelCwzA2EKNrPDnZc7SegXAMOP+IkmEN2z5n0?=
+ =?us-ascii?Q?CoMLtbrf6SRtGJWrwEsRDmmePlIErBGJN7hdXsw6VYb/pWE1xXsf7QGTvHqy?=
+ =?us-ascii?Q?HFX9MYaIV2fkT30k2E8ITDhOGlbV1hY4C08wBdUm0YLKXDqGlVnDqEAYGxeH?=
+ =?us-ascii?Q?egodSF/13BDJ4CPXVQ9SvsHyVRZzQjuTDGqw0GNF65pE9T8A92UuUMCXWsLS?=
+ =?us-ascii?Q?0WAkg1A2yEhpSu6YM1MmnVIyoZlxFhPahF/1NV0Uc8k5CF0VPLCK7a/tdg2I?=
+ =?us-ascii?Q?cKr527gB6/vb5l/1DMu20coFtpPIZTNIJzt1yEK8COXcV6TwEOq7MhgljFZ2?=
+ =?us-ascii?Q?eiqdX2ImHEDEjZOJpDQSxjQKjeJRYznS/GDRbRMcBZL6cX8DgR8081ebX3lE?=
+ =?us-ascii?Q?ZXKvFleg21v54iscE+PHrpuF+8+B/osjL4JIbGTBuMTcwKHB0Wbz9sRKxL8g?=
+ =?us-ascii?Q?sl1MYf1E0synP59q3x3RY7I+1hftCnBf96mbo8aYaiB9JHdKHzERG3I/QGae?=
+ =?us-ascii?Q?E41NZtt2yUBsS9gBSyt3tXbj5pNm3cEwLP7AwXhD0IMo7JFojvT3C0MxVtMF?=
+ =?us-ascii?Q?MIY/yVhEiCpQ+5y9D7vcpCdObQy6IEN+rY16tvFCMRRATqqspwhfQHNwCnNL?=
+ =?us-ascii?Q?ZK2dU79mWeq1AuaLDVgIWq0/FkRMVKW6tGjG8k2WLtPN8SULCPG53I6zL3nN?=
+ =?us-ascii?Q?vEXfXLvvJk6LiQYpvvW5WOHy4kqs3FTrkgBGhfIEtpeIcanSb8sn/pQ7XZ1v?=
+ =?us-ascii?Q?CyNDCEXbpGnOB22KRrhJcmZI3H8Pc2oXrapYLkACv4G1PGf4BtZrHgkj1umy?=
+ =?us-ascii?Q?wpbD5Afq0RWWOcvMB9NIqNxu08m5uT4Lh+gqX95jRQ52++sLwaIs66pftZ5X?=
+ =?us-ascii?Q?hUHlW+gDqEFY2EqlOtw8tdmX9Mb4hbuEk66Nz//3JBntUdHThflt+65eLAYi?=
+ =?us-ascii?Q?gVuGH28CifuO6JqZguhfzIWKOzCMw0TKCwpJxK+dv4xRb55Y6KxXlasg8lGe?=
+ =?us-ascii?Q?Tg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03aae3b9-b8e2-42f7-0870-08dbf0b1d330
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 08:04:34.9822
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NlewdoCLoDpj2rIskF8V3qxSh/VhRXqLjQEFPwNg3DzAcmLBKaWtonau9Rct4ChRHZLXbpRTIMfMIYp4eX6r56cY954jXg4MN/IMfvgEIOg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5909
 
-When working on LED support for r8169 I got the following lockdep
-warning. Easiest way to prevent this scenario seems to be to take
-the RTNL lock before the trigger_data lock in set_device_name().
+From: Yinjun Zhang <yinjun.zhang@corigine.com>
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.7.0-rc2-next-20231124+ #2 Not tainted
-------------------------------------------------------
-bash/383 is trying to acquire lock:
-ffff888103aa1c68 (&trigger_data->lock){+.+.}-{3:3}, at: netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
+NFP always supports software time stamping of tx, now expose
+the capability through ethtool ops.
 
-but task is already holding lock:
-ffffffff8cddf808 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock+0x12/0x20
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (rtnl_mutex){+.+.}-{3:3}:
-       __mutex_lock+0x9b/0xb50
-       mutex_lock_nested+0x16/0x20
-       rtnl_lock+0x12/0x20
-       set_device_name+0xa9/0x120 [ledtrig_netdev]
-       netdev_trig_activate+0x1a1/0x230 [ledtrig_netdev]
-       led_trigger_set+0x172/0x2c0
-       led_trigger_write+0xf1/0x140
-       sysfs_kf_bin_write+0x5d/0x80
-       kernfs_fop_write_iter+0x15d/0x210
-       vfs_write+0x1f0/0x510
-       ksys_write+0x6c/0xf0
-       __x64_sys_write+0x14/0x20
-       do_syscall_64+0x3f/0xf0
-       entry_SYSCALL_64_after_hwframe+0x6c/0x74
-
--> #0 (&trigger_data->lock){+.+.}-{3:3}:
-       __lock_acquire+0x1459/0x25a0
-       lock_acquire+0xc8/0x2d0
-       __mutex_lock+0x9b/0xb50
-       mutex_lock_nested+0x16/0x20
-       netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
-       call_netdevice_register_net_notifiers+0x5a/0x100
-       register_netdevice_notifier+0x85/0x120
-       netdev_trig_activate+0x1d4/0x230 [ledtrig_netdev]
-       led_trigger_set+0x172/0x2c0
-       led_trigger_write+0xf1/0x140
-       sysfs_kf_bin_write+0x5d/0x80
-       kernfs_fop_write_iter+0x15d/0x210
-       vfs_write+0x1f0/0x510
-       ksys_write+0x6c/0xf0
-       __x64_sys_write+0x14/0x20
-       do_syscall_64+0x3f/0xf0
-       entry_SYSCALL_64_after_hwframe+0x6c/0x74
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(rtnl_mutex);
-                               lock(&trigger_data->lock);
-                               lock(rtnl_mutex);
-  lock(&trigger_data->lock);
-
- *** DEADLOCK ***
-
-8 locks held by bash/383:
- #0: ffff888103ff33f0 (sb_writers#3){.+.+}-{0:0}, at: ksys_write+0x6c/0xf0
- #1: ffff888103aa1e88 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x114/0x210
- #2: ffff8881036f1890 (kn->active#82){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x11d/0x210
- #3: ffff888108e2c358 (&led_cdev->led_access){+.+.}-{3:3}, at: led_trigger_write+0x30/0x140
- #4: ffffffff8cdd9e10 (triggers_list_lock){++++}-{3:3}, at: led_trigger_write+0x75/0x140
- #5: ffff888108e2c270 (&led_cdev->trigger_lock){++++}-{3:3}, at: led_trigger_write+0xe3/0x140
- #6: ffffffff8cdde3d0 (pernet_ops_rwsem){++++}-{3:3}, at: register_netdevice_notifier+0x1c/0x120
- #7: ffffffff8cddf808 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock+0x12/0x20
-
-stack backtrace:
-CPU: 0 PID: 383 Comm: bash Not tainted 6.7.0-rc2-next-20231124+ #2
-Hardware name: Default string Default string/Default string, BIOS ADLN.M6.SODIMM.ZB.CY.015 08/08/2023
-Call Trace:
- <TASK>
- dump_stack_lvl+0x5c/0xd0
- dump_stack+0x10/0x20
- print_circular_bug+0x2dd/0x410
- check_noncircular+0x131/0x150
- __lock_acquire+0x1459/0x25a0
- lock_acquire+0xc8/0x2d0
- ? netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
- __mutex_lock+0x9b/0xb50
- ? netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
- ? __this_cpu_preempt_check+0x13/0x20
- ? netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
- ? __cancel_work_timer+0x11c/0x1b0
- ? __mutex_lock+0x123/0xb50
- mutex_lock_nested+0x16/0x20
- ? mutex_lock_nested+0x16/0x20
- netdev_trig_notify+0xec/0x190 [ledtrig_netdev]
- call_netdevice_register_net_notifiers+0x5a/0x100
- register_netdevice_notifier+0x85/0x120
- netdev_trig_activate+0x1d4/0x230 [ledtrig_netdev]
- led_trigger_set+0x172/0x2c0
- ? preempt_count_add+0x49/0xc0
- led_trigger_write+0xf1/0x140
- sysfs_kf_bin_write+0x5d/0x80
- kernfs_fop_write_iter+0x15d/0x210
- vfs_write+0x1f0/0x510
- ksys_write+0x6c/0xf0
- __x64_sys_write+0x14/0x20
- do_syscall_64+0x3f/0xf0
- entry_SYSCALL_64_after_hwframe+0x6c/0x74
-RIP: 0033:0x7f269055d034
-Code: c7 00 16 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 80 3d 35 c3 0d 00 00 74 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 48 89 54 24 18 48
-RSP: 002b:00007ffddb7ef748 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 00007f269055d034
-RDX: 0000000000000007 RSI: 000055bf5f4af3c0 RDI: 0000000000000001
-RBP: 000055bf5f4af3c0 R08: 0000000000000073 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000007
-R13: 00007f26906325c0 R14: 00007f269062ff20 R15: 0000000000000000
- </TASK>
-
-Fixes: f42c437acc55 ("leds: trigger: netdev: add additional specific link speed mode")
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
+Signed-off-by: Louis Peens <louis.peens@corigine.com>
 ---
- drivers/leds/trigger/ledtrig-netdev.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index e358e77e4..4dbcb2573 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -226,6 +226,11 @@ static int set_device_name(struct led_netdev_data *trigger_data,
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+index 776bee2efd35..200b3588363c 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+@@ -2502,6 +2502,7 @@ static const struct ethtool_ops nfp_net_ethtool_ops = {
+ 	.set_pauseparam		= nfp_port_set_pauseparam,
+ 	.get_pauseparam		= nfp_port_get_pauseparam,
+ 	.set_phys_id		= nfp_net_set_phys_id,
++	.get_ts_info		= ethtool_op_get_ts_info,
+ };
  
- 	cancel_delayed_work_sync(&trigger_data->work);
- 
-+	/*
-+	 * Take RTNL lock before trigger_data lock to prevent potential
-+	 * deadlock with netdev notifier registration.
-+	 */
-+	rtnl_lock();
- 	mutex_lock(&trigger_data->lock);
- 
- 	if (trigger_data->net_dev) {
-@@ -245,16 +250,14 @@ static int set_device_name(struct led_netdev_data *trigger_data,
- 	trigger_data->carrier_link_up = false;
- 	trigger_data->link_speed = SPEED_UNKNOWN;
- 	trigger_data->duplex = DUPLEX_UNKNOWN;
--	if (trigger_data->net_dev != NULL) {
--		rtnl_lock();
-+	if (trigger_data->net_dev)
- 		get_device_state(trigger_data);
--		rtnl_unlock();
--	}
- 
- 	trigger_data->last_activity = 0;
- 
- 	set_baseline_state(trigger_data);
- 	mutex_unlock(&trigger_data->lock);
-+	rtnl_unlock();
- 
- 	return 0;
- }
+ const struct ethtool_ops nfp_port_ethtool_ops = {
 -- 
-2.43.0
+2.34.1
 
 
