@@ -1,98 +1,109 @@
-Return-Path: <netdev+bounces-52229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F427FDF09
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:04:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B45837FDF0D
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:05:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0FD282CC9
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:04:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5EFB1C20BD8
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507D15C08B;
-	Wed, 29 Nov 2023 18:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AC25C3C0;
+	Wed, 29 Nov 2023 18:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="in+YGbXs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RlikZ1NK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BA790;
-	Wed, 29 Nov 2023 10:04:41 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40b4f60064eso238815e9.1;
-        Wed, 29 Nov 2023 10:04:41 -0800 (PST)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE4CCAF;
+	Wed, 29 Nov 2023 10:04:58 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b479ec4a3so112505e9.2;
+        Wed, 29 Nov 2023 10:04:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701281080; x=1701885880; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QZLzQ7Dj1ScTKkfZpKniwF/WkNtkEi2sNjddLCuEIwg=;
-        b=in+YGbXs+NYP1jnSZIj5Vo9T8HJdftf4z1QQSYDwaZEgUa8Kwwhmqc2Z1uA5yIw+8z
-         rmHpW77cTrT1ZUQI2OujBV2HuzpfibtEu2Dn+KAGSn88f/W++DUO5Uu8eJM1vtsLSyD7
-         3auJpcErW/6WECcZ1CWJK4uYhT9Ic8IpknKqkDzutk29Uxcqov8dGdRvXuNNT1eiQZK/
-         Num36O1ZXVOTwDobVIp+axfnjPhlQY8m57s5jsZ8eFXPtQhkIjH+1Mn9P4Flcd3+8HhQ
-         2oLMtobDWHU+/gEthGv+410mogttHjQjpYo57ZmUHYS8+0bb8dbt2A57eYjVzGgnBbEl
-         CMYw==
+        d=gmail.com; s=20230601; t=1701281097; x=1701885897; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H4jESqZmpMEPxH+fuQOnMVYUEdrJMqMVfKBMqgWEv/A=;
+        b=RlikZ1NKQOUHfhO4FvxmJPFCBoClwaV/5E1rnnzrJTT92aT+8bJdaE71xffxRpL0O9
+         Z2PrIi6dIyIUW9Gg4Bk7yigYEMy+SS7u7F5sjOpCOuQbO65RCpp0njHRP2ywUltAMJyn
+         z+9ypAlWYshgWz1y7uHm52NyvNNXpwdXqGoZMVTR1OZOyolXZtRA6Bhtu5ckiOJg34In
+         fZ8ghtC4ETA+sQ+p9Mr5p2tfvfrrBtJBclHAJXI/ZHupjlAf8uejGXsWnqES7gtjzvg3
+         dD1JXUrdWau46Xda0aYLLU2oEcvZGTxeRMwofYfE92bCjBiLm35ydZY7W+xxHrKEyiPz
+         rRdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701281080; x=1701885880;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QZLzQ7Dj1ScTKkfZpKniwF/WkNtkEi2sNjddLCuEIwg=;
-        b=JUqo7fS0sKRh8UMoufy/oR8rCvrs1+SVydn50gcLjd+EVoc5Aqx7789zM5pKhZW2UZ
-         GCgigHwR1oH3BcwlAERY3yAfQ7NWBDThMx5ISFXQ3Vt2/kDTaYZL8/xRtBmiJqMlgnva
-         3Rx5NXg9os280rwMtzRhyXYKc9fJ5tm6tRk+W+90z616WC4v961fHS1ThqDRAhbHWvch
-         GtbKuGiO4G0d35Sz8R8g+CLyOn52vV95WLyPKvJ153jJ1Ip6iYeSeHlOP3OoudaLEXEP
-         HK02qO5thlW8D4E/iY7NButqfyUfoCcyEiiunGe+6Fo3qrRete3ghKT6VBV0K9c39NQC
-         YS8A==
-X-Gm-Message-State: AOJu0Yx08tngYmwax/RYE5yRp7z6F23mZe2T4r2u74aIxe9FIWZcGioF
-	J+32eifaHv1wVKgqVHCnPV0=
-X-Google-Smtp-Source: AGHT+IGGelJRxSuDYh6LBV/x6XyCK6GA9EDLykUoHoVze6v/OEDVVgOTIVyRMMd8AxDWzzQWiDcfAw==
-X-Received: by 2002:a05:600c:3ca0:b0:40b:37d9:b646 with SMTP id bg32-20020a05600c3ca000b0040b37d9b646mr11575831wmb.3.1701281079877;
-        Wed, 29 Nov 2023 10:04:39 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id n4-20020a05600c3b8400b0040b40468c98sm2941544wms.10.2023.11.29.10.04.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 10:04:39 -0800 (PST)
-Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
-To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
- Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, kernel-team
- <kernel-team@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Jakub Sitnicki <jakub@cloudflare.com>
-References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
- <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
- <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net> <87fs0qj61x.fsf@toke.dk>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
-Date: Wed, 29 Nov 2023 18:04:38 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1701281097; x=1701885897;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H4jESqZmpMEPxH+fuQOnMVYUEdrJMqMVfKBMqgWEv/A=;
+        b=wobf5WiCmaa1Hg6A1oyEOzVdXvU6E5zyeu3Kur8x9O5xq0RBSb0oNQFrirvI6zoGQp
+         ZXu3rZjqeGsJmjczXbzUNf9zIaLatFSG7uP2ywo3HJqhFNXu8KBzZc1+UyVuBxLkPokI
+         qgGfccxEZ9iPKqIYBOitxU4jSCFgf3o2VUSlL1CEBeMYdqdtVQb6fM52fErJsXeRP0dT
+         java1npC2aP2mQwq7q28EBaDnPcucn8J6Meb9KaqPCdqpyW3zuUgkfqMdzy9EJ0IBgOI
+         1SkuqF0dXO5m1UuREFB6Iss6XU6cZGdMZ19R+BkGV5iwL90GOgLb273AAhdLs9GJJxRG
+         VWtg==
+X-Gm-Message-State: AOJu0YxJ2Yyt/3BH9nw312GKzWkXGABnk0QZNO4Goji+1tdMg1UISO/L
+	NrNbaZizYFtWn8wIHUMiwuo=
+X-Google-Smtp-Source: AGHT+IFLTA4R08YIGhe/kznCDigznewvoiILsXBmrSH8RS0rlFq3qOqKk2onvEvKnhtWK2lDpBB5QQ==
+X-Received: by 2002:a05:600c:1c9d:b0:40b:3933:f994 with SMTP id k29-20020a05600c1c9d00b0040b3933f994mr15197936wms.25.1701281096993;
+        Wed, 29 Nov 2023 10:04:56 -0800 (PST)
+Received: from skbuf ([188.26.185.12])
+        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b003fc0505be19sm3054640wmb.37.2023.11.29.10.04.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 10:04:56 -0800 (PST)
+Date: Wed, 29 Nov 2023 20:04:53 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH net-next v9 4/5] dt-bindings: marvell: Rewrite MV88E6xxx
+ in schema
+Message-ID: <20231129180453.2bkmvuxihtp3yeyz@skbuf>
+References: <20231127-marvell-88e6152-wan-led-v9-0-272934e04681@linaro.org>
+ <20231127-marvell-88e6152-wan-led-v9-4-272934e04681@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87fs0qj61x.fsf@toke.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127-marvell-88e6152-wan-led-v9-4-272934e04681@linaro.org>
 
-On 28/11/2023 14:39, Toke Høiland-Jørgensen wrote:
-> I'm not quite sure what should be the semantics of that, though. I.e.,
-> if you are trying to aggregate two packets that have the flag set, which
-> packet do you take the value from? What if only one packet has the flag
-> set? Or should we instead have a "metadata_xdp_only" flag that just
-> prevents the skb metadata field from being set entirely? Or would both
-> be useful?
+On Mon, Nov 27, 2023 at 04:43:07PM +0100, Linus Walleij wrote:
+> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
+> in YAML schema.
+> 
+> The current text binding says:
+>   WARNING: This binding is currently unstable. Do not program it into a
+>   FLASH never to be changed again. Once this binding is stable, this
+>   warning will be removed.
+> 
+> Well that never happened before we switched to YAML markup,
+> we can't have it like this, what about fixing the mess?
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
 
-Sounds like what's actually needed is bpf progs inside the GRO engine
- to implement the metadata "protocol" prepare and coalesce callbacks?
-
--ed
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
