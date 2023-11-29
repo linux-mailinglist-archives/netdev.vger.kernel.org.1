@@ -1,123 +1,120 @@
-Return-Path: <netdev+bounces-52037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D746A7FD112
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:39:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8337D7FD156
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1217CB2157A
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:39:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D65E282B98
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6092F107BE;
-	Wed, 29 Nov 2023 08:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4615C125B1;
+	Wed, 29 Nov 2023 08:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UEU0yful"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="kkgmX/J+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415671FCC
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 00:39:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701247145;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xJX93Tpg94woqfZUkMv1QEDU9HKHF+FZ0rIOC151TyA=;
-	b=UEU0yful4qYwSSiFCoVJjpPYIXjnPqCiyZ4Wd2nCyklUfM2gbh9bJQQdFSOlWCiRa983Vp
-	YH19ScB9t7r6lNsGXRMEA9nSfyhYhDsUNregi7A6f/TLS/B87XC7R3ZaZZPGir5a1Qishs
-	9T1Yw5UitkqXxw50cbBRJf/RhCFU0kE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-N3n6YeDTM3eGVsVLDaEKmQ-1; Wed, 29 Nov 2023 03:39:00 -0500
-X-MC-Unique: N3n6YeDTM3eGVsVLDaEKmQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6287C852ACB;
-	Wed, 29 Nov 2023 08:38:59 +0000 (UTC)
-Received: from [10.45.225.216] (unknown [10.45.225.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 89F9D36E4;
-	Wed, 29 Nov 2023 08:38:41 +0000 (UTC)
-Message-ID: <63bd858a-fe07-4eda-9835-d999e2905860@redhat.com>
-Date: Wed, 29 Nov 2023 09:38:40 +0100
+Received: from out203-205-221-209.mail.qq.com (out203-205-221-209.mail.qq.com [203.205.221.209])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B86E0BC;
+	Wed, 29 Nov 2023 00:48:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1701247730; bh=Xk1r4MKViKZ7+K/uenq6FuE6+PsSkXPe5XNBpnfJRBI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=kkgmX/J+PTZp/WExqwS73Yz2yenr8IWZtGcpa17s8EcOj/b/vKT5X95/USw68gE2V
+	 gc/Ju8SGrXdWiOWm14pVzpIS5axq1QlWTgrVnQ5xVocRyv+BthC0GzJrFK0f320b3Y
+	 +rQTkTTbmrtLzTrrbmZ7e+AvQAB02kdPb/qEjp94=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id C2D3D61D; Wed, 29 Nov 2023 16:48:45 +0800
+X-QQ-mid: xmsmtpt1701247725tk0ncglh8
+Message-ID: <tencent_6E9CA7EF46E452C90650899D2ECFEEFE4C06@qq.com>
+X-QQ-XMAILINFO: OZZSS56D9fAjWVaB4PHNJb8tsTqNPxKnsmpxg/CWpO1uIz/88+WpUBbId7L5Mf
+	 JCB41rIfjxdNfx/YEReganC6bVYF565SBtQaTWRbgHiSfo4g2dpz6OiOCQNO7U3IuN4/YV5r6iwx
+	 h/NmRHfIgkxRnJJjooXW5DwDNb1WXenPRVBwo8OvoXT4kl6M21LVslH4cFX4DiOFeXI7F4DwGNfC
+	 AAD9Vk+oY7f3Z9p834tHGTMlR5NO+a+77NkETksN7kXVnQL5MfrKb7OVKwohB8e3MflXd+f/+RhL
+	 MSQ9TLhSK/p9gjUOZoGXVJu6xUzufamFhU8RfWo4obqZk3nikaFioex2+SZ6ag8Dpzy2SKDmorCL
+	 2pq/4Zgz+pRWMjNLwBT2vE2FrWs2qvmR0/IZM3LlKuX4GBsfFE3lsLcT97c17bOsZ2dekThBq8lK
+	 1GbcKZJoDIrpfzjwlfLpofh7pd7ehQakDwSPrOQhzfY0Bwa0pQgAH0pIGnO7OK7rIzcYdZlUK7C9
+	 4F1Nx3cOhhwmMDMKQpWw1ttUW3I2FYXhsL5oXHumAAnFGLPgGLOpWNgJZBuN/MtapDhwyo5TY4BJ
+	 0zGjRK4JcoRUHa77S6jSJiEMkfS+gPYfrYprp/E4WRoUYUg3SQDyB7uulquZFK8aYjTWFA4PiSTS
+	 yWq9ndILBFpt4yxOxIqaBflSEUdNpmQsVrCJKurw16gd3KWydZdk61gNINTdUoXGp1n2IoxoxYyM
+	 2fKM7j+TQ0VJXixi/ZpTBDkiZolZcsXg1yNKcKoXslnmwkMY9yvhxUeZoIz70OOCxFW4UNOAeiKy
+	 WULJxJMhoZKzVF475Sgz/QVBWaxW9qNOzUhKmMyuz3yEDFDWFPzUe2FPNiV9Bncmw0knFQvis3RQ
+	 rbVJY9SsbiNcOs8kM09pD6b5RL2K9biCTDNXxt3S9rfZacvCbWN9RHpPZ6OjoaLroE17E8l5zq5z
+	 777jVfBaWAHPwWFqSUjw==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	llvm@lists.linux.dev,
+	nathan@kernel.org,
+	ndesaulniers@google.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+62d7eef57b09bfebcd84@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	trix@redhat.com
+Subject: Re: [PATCH] wifi: mac80211: sband's null check should precede params
+Date: Wed, 29 Nov 2023 16:48:46 +0800
+X-OQ-MSGID: <20231129084845.3875870-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <56d8b3b9099d3935a7b53e976fa998f06fbfd9a5.camel@sipsolutions.net>
+References: <56d8b3b9099d3935a7b53e976fa998f06fbfd9a5.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/5] i40e: Fix broken support for floating VEBs
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>, oe-kbuild@lists.linux.dev,
- intel-wired-lan@lists.osuosl.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- Jacob Keller <jacob.e.keller@intel.com>,
- Wojciech Drewek <wojciech.drewek@intel.com>, Simon Horman
- <horms@kernel.org>, mschmidt@redhat.com, netdev@vger.kernel.org
-References: <25111205-a895-46a2-b53f-49e29ba41b16@suswa.mountain>
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <25111205-a895-46a2-b53f-49e29ba41b16@suswa.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
 
-On 27. 11. 23 9:43, Dan Carpenter wrote:
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14720
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14721  	pf = veb->pf;
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14722
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14723  	/* find the
-> remaining VSI and check for extras */
-> 0aab77d67d37d09 Ivan Vecera      2023-11-24  14724  	
-> i40e_pf_for_each_vsi(pf, i, vsi_it)
-> 0aab77d67d37d09 Ivan Vecera      2023-11-24  14725  		if
-> (vsi_it->uplink_seid == veb->seid) {
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14726  			if
-> (vsi_it->flags & I40E_VSI_FLAG_VEB_OWNER)
-> 0aab77d67d37d09 Ivan Vecera      2023-11-24  14727  				vsi = vsi_it;
+On Wed, 29 Nov 2023 09:33:23 +0100, Johannes Berg wrote:
+> > > > [Analysis]
+> > > > When ieee80211_get_link_sband() fails to find a valid sband and first checks
+> > > > for params in sta_link_apply_parameters(), it will return 0 due to new_link
+> > > > being 0, which will lead to an incorrect process after sta_apply_parameters().
+> > > > 
+> > > > [Fix]
+> > > > First obtain sband and perform a non null check before checking the params.
+> > > 
+> > > Not sure I can even disagree with that analysis, it seems right, but ...
+> > > 
+> > > > +	if (!link || !link_sta)
+> > > > +		return -EINVAL;
+> > > > +
+> > > > +	sband = ieee80211_get_link_sband(link);
+> > > > +	if (!sband)
+> > > > +		return -EINVAL;
+> > > > +
+> > > >  	/*
+> > > >  	 * If there are no changes, then accept a link that doesn't exist,
+> > > >  	 * unless it's a new link.
+> > > 
+> > > There's a comment here which is clearly not true after this change,
+> > > since you've already returned for !link_sta?
+> > No, after applying my patch, it will return due to !sband.
+> > 
 > 
-> Do we always find a vsi?  Presumably, yes, but it's not obvious just
-> from reading this function.
+> Right, OK, but the way I read the comment (now) is that it wanted to
+> accept it in that case?
+> 
+> That said, I just threw the patch into our internal testing machinery
+> quickly (probably has more MLO tests than upstream hostap for now), and
+> it worked just fine ...
+> 
+> Maybe we should just remove the comment?
+Do you mean to delete the comments below?
+   3         /*
+   2          * If there are no changes, then accept a link that doesn't exist,
+   1          * unless it's a new link.
+1800          */
 
-Yes, if the VEB has uplink (veb->uplink_seid != 0) then it has to have a 
-downlink VSI that owns it (vsi->flags has I40E_VSI_FLAG_VEB_OWNER set)
-
-Ivan
-
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14728  			n++;
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14729  		}
-> 0aab77d67d37d09 Ivan Vecera      2023-11-24  14730
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14731  	/* Floating VEB has
->   to be empty and regular one must have
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14732  	 * single owner
-> VSI.
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14733  	 */
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14734  	if
-> ((veb->uplink_seid && n != 1) || (!veb->uplink_seid
-> && n != 0)) {
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14735  		
-> dev_info(&pf->pdev->dev,
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14736  			 "can't remove
-> VEB %d with %d VSIs left\n",
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14737  			 veb->seid,
-> n);
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14738  		return;
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14739  	}
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14740
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24  14741  	/* For regular VEB
-> move the owner VSI to uplink VEB */
-> 41c445ff0f482bb Jesse Brandeburg 2013-09-11  14742  	if
-> (veb->uplink_seid) {
-> 93a1bc91a1ccc5a Ivan Vecera      2023-11-24 @14743  		vsi->flags
-> &= ~I40E_VSI_FLAG_VEB_OWNER;
+Edward
 
 
