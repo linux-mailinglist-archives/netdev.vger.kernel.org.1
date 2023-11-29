@@ -1,120 +1,126 @@
-Return-Path: <netdev+bounces-51927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C9817FCB3E
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:20:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDAA87FCB45
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACEDB1C20AD0
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:20:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08C811C20EDB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D43371;
-	Wed, 29 Nov 2023 00:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D5B10E7;
+	Wed, 29 Nov 2023 00:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndgQ/cB4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZyFGy8xp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF2019A6
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:20:15 -0800 (PST)
-Received: by mail-il1-x134.google.com with SMTP id e9e14a558f8ab-35c9bca5600so12440275ab.3
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:20:15 -0800 (PST)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B37D19AA
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:25:44 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54ba86ae133so1721482a12.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:25:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701217214; x=1701822014; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o0Xg8/pl4Dz8DLjOzEcU1I6i5X3gqvOGHmn8Uja8rq8=;
-        b=ndgQ/cB4R1wcDvdrWAzVEkP6y9dBAsFzhV/TU0vKb0xXNoNwoLDBu97AXmtZdokq+g
-         y7LzX0GgeXq+7T3JdqxQ1TNy8I1Mi1sjlJRY7MJh4Ya2Qsyv1XFTssgJro3+J3+hx9WR
-         /GrgbnGK/7NzdCP4eff+/1f3vZRpI20WROZOnzSCCAulEh/FW+nBoI5Z3OTumSo5lhTY
-         xmPmtPUPXfhPJK5kqhn6BdRnxRarLzAoKd5PACqS8q4WzfLIFW5O1L3zooljFl17CUy9
-         e68EQhzrYhB5xOOboNwrEU2q1GVC3vn1d6sd45Bjhr4DV03raSFBzADI/1bKVJml/zHY
-         nkSQ==
+        d=google.com; s=20230601; t=1701217542; x=1701822342; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s79KKQuQOw+McryaEibHTjOFNeepmOvGc+6XuFBzp3c=;
+        b=ZyFGy8xp8qD5QI9QwPDb+IhsSZRWf8AzRGUswbI12YDGc1xvIH0g+wLgQbCQ0MgByE
+         7JaxlJ6LDrvTwD5v2u1BaaPpBH5R5YUNgb5xQN5Swj0XVMeLoAtP4ZQrlwUAhmY6b1f4
+         lo4P74/huqLxXg4rQSkXW1y86RBYbZxCN4heVivo9RjTVn5xV88cmdZGNrBjexsDtvSV
+         5HnfHukhNDWtzilONZrFm5fU8R7ZF8dU9NcWUXLUD8PtyHJZZPAj804uzq7F30DAe528
+         xZNvGBU8xFyPrK3MZMejmdtbek7u0XA2xivLK10lXoEkODunFDDID+jqCIfmSYQFelmQ
+         DpfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701217214; x=1701822014;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o0Xg8/pl4Dz8DLjOzEcU1I6i5X3gqvOGHmn8Uja8rq8=;
-        b=lpXOlwP5kt1dOBkOVH0OWbQj4ASSxmkBSXdTUnP40o74N17u9FDk2/QothioDDbA28
-         1rK835EuTmck9TTwXgOZpI2xnPabw8hUZx6NOmrLrNaBYHqcRr/vwdEaa9EIFyhiwM+y
-         Y47Y7nmFUr/6b9VZJqWJQafurSi2kPPyzTk3nsgYNGywVWKrW6C7zBp33u+70w8C7iwf
-         OCnhq4p35P/OtU6btxGzOwwwZEngc/eV/Htx5nHnLmyxP8YjJTDzRtkPJijKX2SS1BzO
-         X6Jvsk85LCRMy17ybby07a2E87KLgxg6zxPyvtVvumLPQCNSg3/spCENNUK7shA+nx2d
-         MMuA==
-X-Gm-Message-State: AOJu0YxlH4uzUcQdsos2zd1h+MlOoN4VTaZsPMGazxZ3BCdyTrIVmnx+
-	BbL3DLYmauikAKfHSXASh6rnqAQSRTE=
-X-Google-Smtp-Source: AGHT+IEryOIiTb9LN8REttwq+bawNWgOSRrWoaOzCoOEgO/HSqc5oDDjemXFYxb19MS2fp1idcYc/g==
-X-Received: by 2002:a92:c689:0:b0:35c:a5c2:3958 with SMTP id o9-20020a92c689000000b0035ca5c23958mr11290860ilg.22.1701217214548;
-        Tue, 28 Nov 2023 16:20:14 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:3d85:e988:5190:b96c? ([2601:282:1e82:2350:3d85:e988:5190:b96c])
-        by smtp.googlemail.com with ESMTPSA id di5-20020a056e021f8500b0035d2fc4ce47sm19990ilb.9.2023.11.28.16.20.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 16:20:13 -0800 (PST)
-Message-ID: <b41c7f20-34f4-4644-9e7a-a94cc47a8228@gmail.com>
-Date: Tue, 28 Nov 2023 17:20:13 -0700
+        d=1e100.net; s=20230601; t=1701217542; x=1701822342;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s79KKQuQOw+McryaEibHTjOFNeepmOvGc+6XuFBzp3c=;
+        b=VPhDWx6gKai6NJyMKPEw8CC3axd0jjpG5hw58MXruS4VqXKICAvP6Iez7Yh7dM8cQ0
+         Dk1yNGMGWNfBP4o48JQY4gfKmAZu1C63nCe+lk9UPL0nPtM83uncZzdzv7reXfcMhlOb
+         dzBNAFvJBwYz8Lbhip0bwCL5CUh7dn3KRooS5RQv95krS6ckENV5t592Hosn/98Oe+xS
+         fIieOjU6x42pwkUDFhUkocO9L4JultWRnGFJ9MJqZwyVaQS/Eg4SXaPJJe06EwH6BKHr
+         qv+Ody3B1bdtletZfU4ayfOw75lN+vHE+FNUbxnGmsLUige9pn/5QNyJ5SAiHNzYWFXc
+         g+rA==
+X-Gm-Message-State: AOJu0YwNbn8IbsSQLpKF+te+8gLkVVVg9scjnlBuEJxL9AgdC3WmwGOP
+	G9YAYHJ7p4EKD8rAOGcx//YYOGViDUjDsKeqmDQMwQ==
+X-Google-Smtp-Source: AGHT+IFhvJD8pcFDSUkXj7rCXo1krioxrjZU+Fh9ydxhF7LIckb5ecLVgf1lGuB42STpvzRSm1nEjeoSzXAsfJKhmOQ=
+X-Received: by 2002:a17:906:1091:b0:a0c:c09f:65fe with SMTP id
+ u17-20020a170906109100b00a0cc09f65femr7312731eju.38.1701217542589; Tue, 28
+ Nov 2023 16:25:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] ss: prevent "Process" column from being printed
- unless requested
-Content-Language: en-US
-To: Quentin Deslandes <qde@naccy.de>, netdev@vger.kernel.org
-Cc: Martin KaFai Lau <martin.lau@kernel.org>
-References: <20231128023058.53546-1-qde@naccy.de>
- <20231128023058.53546-2-qde@naccy.de>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20231128023058.53546-2-qde@naccy.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
+ <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
+ <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
+ <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com> <20231128235214.GD1312390@ziepe.ca>
+In-Reply-To: <20231128235214.GD1312390@ziepe.ca>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Tue, 28 Nov 2023 16:25:03 -0800
+Message-ID: <CAJD7tkbbq6bHtPn7yE3wSS693OSthh1eBDvF-_MWZfDMXDYPKw@mail.gmail.com>
+Subject: Re: [PATCH 00/16] IOMMU memory observability
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org, 
+	alex.williamson@redhat.com, alim.akhtar@samsung.com, alyssa@rosenzweig.io, 
+	asahi@lists.linux.dev, baolu.lu@linux.intel.com, bhelgaas@google.com, 
+	cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com, 
+	dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de, 
+	iommu@lists.linux.dev, jasowang@redhat.com, jernej.skrabec@gmail.com, 
+	jonathanh@nvidia.com, joro@8bytes.org, kevin.tian@intel.com, 
+	krzysztof.kozlowski@linaro.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-rockchip@lists.infradead.org, 
+	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com, marcan@marcan.st, 
+	mhiramat@kernel.org, mst@redhat.com, m.szyprowski@samsung.com, 
+	netdev@vger.kernel.org, paulmck@kernel.org, rdunlap@infradead.org, 
+	robin.murphy@arm.com, samuel@sholland.org, suravee.suthikulpanit@amd.com, 
+	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org, 
+	tomas.mudrunka@gmail.com, vdumpa@nvidia.com, virtualization@lists.linux.dev, 
+	wens@csie.org, will@kernel.org, yu-cheng.yu@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/27/23 7:30 PM, Quentin Deslandes wrote:
-> Commit 5883c6eba517 ("ss: show header for --processes/-p") added
-> "Process" to the list of columns printed by ss. However, the "Process"
-> header is now printed even if --processes/-p is not used.
-> 
-> This change aims to fix this by moving the COL_PROC column ID to the same
-> index as the corresponding column structure in the columns array, and
-> enabling it if --processes/-p is used.
-> 
-> Signed-off-by: Quentin Deslandes <qde@naccy.de>
-> ---
->  misc/ss.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/misc/ss.c b/misc/ss.c
-> index 9438382b..09dc1f37 100644
-> --- a/misc/ss.c
-> +++ b/misc/ss.c
-> @@ -100,8 +100,8 @@ enum col_id {
->  	COL_SERV,
->  	COL_RADDR,
->  	COL_RSERV,
-> -	COL_EXT,
->  	COL_PROC,
-> +	COL_EXT,
->  	COL_MAX
->  };
->  
-> @@ -5795,6 +5795,9 @@ int main(int argc, char *argv[])
->  	if (ssfilter_parse(&current_filter.f, argc, argv, filter_fp))
->  		usage();
->  
-> +	if (!show_processes)
-> +		columns[COL_PROC].disabled = 1;
-> +
->  	if (!(current_filter.dbs & (current_filter.dbs - 1)))
->  		columns[COL_NETID].disabled = 1;
->  
+On Tue, Nov 28, 2023 at 3:52=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
+e:
+>
+> On Tue, Nov 28, 2023 at 03:03:30PM -0800, Yosry Ahmed wrote:
+> > > Yes, another counter for KVM could be added. On the other hand KVM
+> > > only can be computed by subtracting one from another as there are onl=
+y
+> > > two types of secondary page tables, KVM and IOMMU:
+> > >
+> > > /sys/devices/system/node/node0/meminfo
+> > > Node 0 SecPageTables:    422204 kB
+> > >
+> > >  /sys/devices/system/node/nodeN/vmstat
+> > > nr_iommu_pages 105555
+> > >
+> > > KVM only =3D SecPageTables - nr_iommu_pages * PAGE_SIZE / 1024
+> > >
+> >
+> > Right, but as I mention above, if userspace starts depending on this
+> > equation, we won't be able to add any more classes of "secondary" page
+> > tables to SecPageTables. I'd like to avoid that if possible. We can do
+> > the subtraction in the kernel.
+>
+> What Sean had suggested was that SecPageTables was always intended to
+> account all the non-primary mmu memory used by page tables. If this is
+> the case we shouldn't be trying to break it apart into finer
+> counters. These are big picture counters, not detailed allocation by
+> owner counters.
 
-this one should go into main as a bug fix. Resubmit as a standalone
-patch with:
+Right, I agree with that, but if SecPageTables includes page tables
+from multiple sources, and it is observed to be suspiciously high, the
+logical next step is to try to find the culprit, right?
 
-Fixes: 5883c6eba517 ("ss: show header for --processes/-p")
+>
+> Jason
 
