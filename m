@@ -1,128 +1,139 @@
-Return-Path: <netdev+bounces-52177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CAB77FDBBA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:42:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267387FDBBF
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDD0D282891
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:42:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C32EB20D1C
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D891238F86;
-	Wed, 29 Nov 2023 15:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311B738FBB;
+	Wed, 29 Nov 2023 15:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Qu+XOJqt"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="T6buNzm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93808D7F
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:42:10 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b552deba0so4850665e9.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:42:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1701272529; x=1701877329; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BAAXjfMF22wmNcQ+s0IdrozkzcalgKiO4M1qR7njTVA=;
-        b=Qu+XOJqtH2wUCFR346HMDrgW5TYqA6wK9HntzV2tp0ytB3Ix5wbF6is+znjSyAPS8o
-         yef3Mqon+uSMjf4KzOh9gQdp0HeHHkwHgQ8AaqUBl74OkLMEC4PxqIEU9mhGYwPDlGHP
-         BoLh5DxI3KZW8mxOPQ8AJFjB4+iMdYjDrVzftOogXWm2Ua+zOFsHjLVU95JrD9vkXxPK
-         cC2VE3zNkAh1KpeOgWoTyybz+lX0leOHeGRrDOUmgfBdq06cp6PmwZjNF3g0J9wUX8wl
-         UNcuRScP4U4qD4OJWO2bM3WlLEU44FBa18IfjrI/MyfJiDfj8uQ6+lwWs1MzQ2AnavLJ
-         T1GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701272529; x=1701877329;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAAXjfMF22wmNcQ+s0IdrozkzcalgKiO4M1qR7njTVA=;
-        b=Pj6fwQJWNwceHsllinr1pT0xQyFREIBjgIx/zoLjBCBHUm5abiDwQOSFAzjSsee88Q
-         r9VgW5fWryFGnLcGz22svBf2Hq8KO51PcNEq/rVAarui15ZOgAAGhBooZyo2Nn0nQTSi
-         o52gKCpCD1zvd5bLuQU2Bw+fnZruf8qHov7pTfLjjdGbfMKJw4lLDBOGmfeVQlJTI35q
-         9r4yeZcRv2PAcZNsAE137cFzuvAXmmv+mKhAnKlGy+oblpfPLXRIB/0lpzRmuVyEft68
-         gtR8jZtdLOQNE9QKxXH0TybLvuYS44qiOmT0oo+/dprZtVr3JDWwr1KQE066g6d1rXYS
-         8btQ==
-X-Gm-Message-State: AOJu0YyAk3jYHZAbl8wi7nsiyc99twct/CxV6vzq0EZWAdMk/oCZT/bH
-	g0tZkjXdOCipIydp8q+CZWq0+g==
-X-Google-Smtp-Source: AGHT+IH4TzrRfDgsZod0caVz5r8wR1GQWm/j6x+x3almVBQZsjsddYvc+zPovzCXLzvr/SkYpPf2cg==
-X-Received: by 2002:a05:600c:4e8b:b0:40b:4c1a:f5b2 with SMTP id f11-20020a05600c4e8b00b0040b4c1af5b2mr4370574wmq.35.1701272528922;
-        Wed, 29 Nov 2023 07:42:08 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id e10-20020a056000194a00b003330b139fa5sm5316980wry.30.2023.11.29.07.42.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 07:42:08 -0800 (PST)
-Message-ID: <30fe685f-d09b-48b7-840d-9d19d6c183db@arista.com>
-Date: Wed, 29 Nov 2023 15:42:02 +0000
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2063.outbound.protection.outlook.com [40.107.22.63])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93E0D48
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:43:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QDLdPaYLJ0jN6wi+96WZhX9Ivj8TihDiIuzxIc+AzrZYfGZrR5rKPuv3GpS8RoIHOkvJ2nMOnFuo78HarZCToeClOwmMr5mZUWyDVunmuqh8878HwHcIe/BhvmE6c4OTdvqTlX+oep1mnthbLNlYsXmbTrpVGBJDc5dNz4t9UNyphjOONy+AvFB512p/af5kF0YxeL1uSI78VJwe+eW1CjXZz7NUcQHF/FBbD5sK986A+v/CG7ha/dEz7WzdyakxgEvh1E3mhAYTzqnVVMh4mJzAvGVkAs//yuZdwrhXvbEJFcpD/scHdeMme6gXd5QXDOvlMiOzCDFySFQ3RsoOJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wDOp4ECtEixxrXRSGBWIcS85t0xOBVUzUjfDruGr/iU=;
+ b=cgJcolahgkiJOYU2L8BIr874hAeiOQVJsiHFOcXZ52UGiy5gl12P2Y38toLXbtH4r37InYXONb0ciX1OAznFPVRBxQ9s/HaXY3TfsgJzYEuD1ee0QmaGDhgW3ueLCNTirs5P9VI/HUKDm/Jf3Fd+4/leHiGnhS6lUtWRFEOw33mCxZKs8o+SSDdOJgX6P83iPjZBZCA0/dmNZN0ca1bSO3/bgMOrWDIb3i+gRSvXMo3MhGQ7jiu1WY3uzVHRZNziJB5ZyBRbVEJcaybguELJWJRxj2ndhxZrLWIiSrSgvRkVlUSNOnklY9l/rWQbuNQAMpRsVV5hM2exy8lKKSN72g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wDOp4ECtEixxrXRSGBWIcS85t0xOBVUzUjfDruGr/iU=;
+ b=T6buNzm4gYxr2tKRXwl2iIKWJ10h9sgl2GFy/hIPZekNgyJ1Xlxcvpb/8xuCurBu0Nt6Km3BMqlHAqUYEou8ftzhADlNpnx5cDW/LRtiu3HfPbAEQMLQBfa/nCb332fvGGJTcyEJgNPCyiBXXD+ZnnyEfItsOFPL1zPY+2sE2t0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DB8PR04MB6826.eurprd04.prod.outlook.com (2603:10a6:10:11d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Wed, 29 Nov
+ 2023 15:43:39 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
+ 15:43:39 +0000
+Date: Wed, 29 Nov 2023 17:43:36 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev <netdev@vger.kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH RFC net-next 0/8] DSA LED infrastructure, mv88e6xxx and
+ QCA8K
+Message-ID: <20231129154336.bm4nx2pwycufbejj@skbuf>
+References: <20231128232135.358638-1-andrew@lunn.ch>
+ <20231129123819.zrm25eieeuxndr2r@skbuf>
+ <a0f8aad6-badc-49dc-a6c2-32a7a3cee863@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0f8aad6-badc-49dc-a6c2-32a7a3cee863@lunn.ch>
+X-ClientProxiedBy: FR3P281CA0118.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a3::13) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/7] net/tcp: Don't add key with non-matching VRF on
- connected sockets
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>
-References: <20231128205749.312759-1-dima@arista.com>
- <20231128205749.312759-6-dima@arista.com>
- <eb9a46a5-d074-445a-9e18-514ef78395d7@kernel.org>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <eb9a46a5-d074-445a-9e18-514ef78395d7@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DB8PR04MB6826:EE_
+X-MS-Office365-Filtering-Correlation-Id: f949ad1c-4f45-48d5-dc5d-08dbf0f1f4f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	aSplyot6iTr1TxZAiXS3RJy6gSqQOfegbvRDjUIm1EgFcFZ73xGolNEDPrMPYWp6AQYppWMqLfP304G59c2l9Ntafu+pfaYH1CJGXaYQXcdvUuMV1B6Niri5mc9l94483xiVLooBtJCwJNHP+m1qCaLMje6Zwx9ATKcvyu3giP/jCgdQsm4N5SMaT6RmkPigJSuuAY4VULFqCnNhMHQvyJf1p03IkUvnLfYYnPJYpyq3COijYMrY+pjsGdCG//Y3LvUeIVI1q75AhzEG6t+9n/P9uWyVXYBfZyShqR7/8SAah4E+cI7SRCoZ1/Xk25jPaKStwvvS3+hvoPj+9rB9et5dWisxagWmJp4uqQDL5G00qRLRvW4529lDXWFfHdUjWPjoC+cqTD7H4s14oRXSJX8G88Cq3aTciZrMFP6olEvkwKk2sCWJnVLjQOqQoiBzzPAUC4kKj7Q+EMo1ogk7nBybaCFNhRZ6dqR75O4s+JmWSgUVPUyRahMRuLggKsKDE/JUKk4sjr/0hBav0MmuVJBNdfhA61XsmwA02CC+0+dhsE2mo/Mfnq4hGdAh5u9eVmdfOGKaCRl/zn7q2sjLusM9t2ZU0in43DgOY9Vq62g=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(366004)(396003)(136003)(39860400002)(346002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(6506007)(6666004)(6512007)(9686003)(44832011)(5660300002)(4326008)(8676002)(478600001)(6486002)(8936002)(41300700001)(6916009)(66946007)(54906003)(66476007)(66556008)(1076003)(33716001)(38100700002)(26005)(4744005)(86362001)(316002)(2906002)(32563001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?I83N3AW/K7Vub8hiHR/1Gg+KSGZN5CCssf4hOHeoBJTWdYWfx9mS72fiPoXh?=
+ =?us-ascii?Q?DcCCQF2nbA35TLf5tvWlOZ/yxUWaIuvWekwP60MVuKGMa51gq5l4bLlMcdWP?=
+ =?us-ascii?Q?XzDfvg4dxyh4WDKcHSVK+IFIDopZwzlmbG109rrWys962bmFXjI1al70or7X?=
+ =?us-ascii?Q?El+TG7Cw6Zepcs0G884e4KYfVAr5363GeSpOMUrvE0IBuAp+rhagwSUdxDs+?=
+ =?us-ascii?Q?4raFB/mqzVP0V+AypmMxbWIpdhlnkkLo4PbSnlczLFNviCZRp9UJX52pany9?=
+ =?us-ascii?Q?Uf997RmW1y6Wb72bC0cZh2+pflPbhqEmzKZaOQHU23n3A4Tyq56v87hlwJNY?=
+ =?us-ascii?Q?FDed+af+qOVJ3IvFkaw+t+SMVGmscv3DfoDTbfGHa7SQgOIPTuWTpA9PReED?=
+ =?us-ascii?Q?t7iXv6ZaLmZCIitXdOUYBtytyVoVwnGPqxOK7sXmZJmMts6KmpWW+JS3JZwg?=
+ =?us-ascii?Q?W1qwiTbEKwPL+kUumZlgiRAsjeIK04gu8Plt9FUQtQ/SFNjnZeSGyeq0Ka/U?=
+ =?us-ascii?Q?rTsj2PPsd2cazI0BzQUbiLJdJzEJgbaZlLeRhTLvntt71Vif/mOh+dXrkPD5?=
+ =?us-ascii?Q?xsqrZaC/RnFbhi8E6FqyRlPWy6W+X6viud9ohy+JomdVC0FQGovnoEqAb6dB?=
+ =?us-ascii?Q?f3viMqYc4uAfYTscAFoMnSzAX28CdsPQceV+AYxJgxoFKiS9MaNUiOPizQ/8?=
+ =?us-ascii?Q?p82td+qQDU86ENtCWg/mGbGVKi3rzOMAaY2JrfZKFhu74dRcom96wtZZVKRH?=
+ =?us-ascii?Q?nfARQi4EX4IyckQ4zTIT6sbkjoGKsbaEq3N0IBy4mNxh+BnysxmSSSAtvlc3?=
+ =?us-ascii?Q?4hWPs9oXvVeS26BEwcWsqORIddd7hF6tPZZVL+0YUwByQ4qqD+mXhA27LFyu?=
+ =?us-ascii?Q?W94FqTZRALtnT4lGF+xwtBd6NntHnRZ6DuV1FpUjpV5gT/w0fOBAbsFEN4k4?=
+ =?us-ascii?Q?/1Ywq0yYdlL4LPsxGhfPgGNhKA9ihgpLhVZUAJpchQaEGObD9M3c6yuJg3jI?=
+ =?us-ascii?Q?UqCw+G4b19rHdJRyomihx3/eeoUpkNxJ11M0W/gpM4DCEmuPjnsm6+6t6Eeu?=
+ =?us-ascii?Q?ORdPORmeAKvda2rhwyqtbP99ukCws1Xeczl3TIhuErL6Mtf4l9/oLEbvmeJ8?=
+ =?us-ascii?Q?1i7R1tcAPLp45zvsg25wvXltxjH0xlBciIXh3XQZUO46pwruVscmfIGLfVMs?=
+ =?us-ascii?Q?mes9MeOBAwWLh1q4HzXa9ObkNlErd9+1qCjlJoilGU1cuQfXDp02JAq/XBeI?=
+ =?us-ascii?Q?9pFO4UCT1B1pWn8evIMpQ/Y6/oJVv0Vp8WUl5UfoGRzVM4UWyluMQr3KESC8?=
+ =?us-ascii?Q?MPxcwwagt/FO/3jKOaQeoqrqFZCwUBdLSOPHchojlFcqrV84iUVMhVDe7hu4?=
+ =?us-ascii?Q?mNf8BCJbfkAQ7Ebtq93h5EuSzN0oHtbvcxytBxUelIXxBcvpwIF6AtxGL5s+?=
+ =?us-ascii?Q?WwRh3zJ3VGPIgjBO4LMIGz2TymLiON1Qg/CWgAlUBQdgyUyPw8TpOX6kk84d?=
+ =?us-ascii?Q?JJBLT5xfiyS5H/J61BZAW1FQkvRppAHeQXUdaRGI/uD5KPjyfmOI/C2LwM+O?=
+ =?us-ascii?Q?chw2NpAahrqMSZ6gwy5b9D/ctPanLeE0UnH2vlH9nd3le4I1xjnIB9ZE+GsS?=
+ =?us-ascii?Q?/g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f949ad1c-4f45-48d5-dc5d-08dbf0f1f4f4
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 15:43:39.2005
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1ajV9BDtPPJfXpEOR9f/dNN+98z3UKjp0yZt/CFWayz046EUmV9L7FB09xmNSAjSmu97MvTl9j9QyHgZqvHFtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6826
 
-Hi David,
-
-On 11/29/23 01:34, David Ahern wrote:
-> On 11/28/23 1:57 PM, Dmitry Safonov wrote:
->> If the connection was established, don't allow adding TCP-AO keys that
->> don't match the peer. Currently, there are checks for ip-address
->> matching, but L3 index check is missing. Add it to restrict userspace
+On Wed, Nov 29, 2023 at 04:13:00PM +0100, Andrew Lunn wrote:
+> O.K, i need to think about this.
 > 
-> you say L3 index check is missing - add it. yet ...
+> What is not obvious to me at the moment is how we glue the bits
+> together. I don't want each DSA driver having to parse the DSA part of
+> the DT representation. So the DSA core needs to call into this library
+> while parsing the DT to create the LEDs. We also need an ops structure
+> in the DSA driver which this library can use. We then need to
+> associate the ops structure the driver has with the LEDs the DSA core
+> creates in the library. Maybe we can use ds->dev as a cookie.
 > 
->> shooting itself somewhere.
->>
->> Fixes: 248411b8cb89 ("net/tcp: Wire up l3index to TCP-AO")
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
->> ---
->>  net/ipv4/tcp_ao.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
->> index bf41be6d4721..2d000e275ce7 100644
->> --- a/net/ipv4/tcp_ao.c
->> +++ b/net/ipv4/tcp_ao.c
->> @@ -1608,6 +1608,9 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
->>  		if (!dev || !l3index)
->>  			return -EINVAL;
->>  
->> +		if (!((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)))
->> +			return -EINVAL;
-> 
-> ... this is checking socket state.
+> Before i get too deep into code, i will post the basic API idea for a
+> quick review.
 
-Right you are, it should have been under check for
-: if (bound_dev_if != cmd.ifindex)
-
-Currently it's warning for all sockets (which can be re-bound), but for
-sockets in the connected state it doesn't make sense as the key lookup
-is not expecting non peer-matching key post connect()/accept().
-
-In this patch version the check will restrict adding a key on a
-connected socket with VRF regardless if it's matching the bound VRF.
-Will fix!
-
-Thanks for spotting this,
-             Dmitry
-
+What is the DSA portion of the DT representation? I see "leds" goes
+under the generic ethernet-controller.yaml.
 
