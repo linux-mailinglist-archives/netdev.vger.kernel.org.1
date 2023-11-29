@@ -1,194 +1,124 @@
-Return-Path: <netdev+bounces-52100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0BF7FD4A4
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:46:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A14F97FD4C6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3F95B20DB6
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:46:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B3CF282852
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30AC1B27E;
-	Wed, 29 Nov 2023 10:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EE91BDC6;
+	Wed, 29 Nov 2023 10:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7KWoYHa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AUbTjfhm"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 02:46:41 PST
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C9BD73;
-	Wed, 29 Nov 2023 02:46:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701254801; x=1732790801;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rbU00ZlSBNX0l3gHoeLVRwt3IFr67F4reSXWY6JN9vE=;
-  b=O7KWoYHaT3sMySUX9cVthzatsqsct3Zq+zBp3zmr6xVVzwW4tcHrZWkE
-   W/GKh1HPYXBP/SHDPys7PBYt+c8q6h5WYJGzcLk+sSwwYe8GA34/KIYm5
-   cREhpMxFZwyNUIoL5Ah0Xq0RPKMIlESAFX8a6pq+8gVHnI/zjg/GObSjX
-   PtMZLwmNsRuHKyXWh9x0Y8obs/bflb4DFg6QT46VaX7jXxrLhmyCIFKe4
-   6+FcOdkS4xkZELRsSccuHUFO++JgZ9xkxP+jkvqEPOPLOESOUabrxVhLc
-   U4HJsIOiUxOZozDz1VEDF2P0J2IlVZPrbAWNMbm7jmlwSsaeMcdBaBl/v
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="29567"
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="29567"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:45:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="859781936"
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="859781936"
-Received: from hongyuni-mobl.ccr.corp.intel.com (HELO [10.238.2.21]) ([10.238.2.21])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:45:34 -0800
-Message-ID: <f37cb55a-6fc8-4e21-8789-46d468325eea@linux.intel.com>
-Date: Wed, 29 Nov 2023 18:45:32 +0800
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B77618E;
+	Wed, 29 Nov 2023 02:57:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=l+Tefq0nz5EH41YlbLMWvc0l+B0AxxVpnMBag7nlEWA=; b=AUbTjfhmCmKVpyxLLuBUXlxvXC
+	ua2ELfzCFUeFc/3SlTg/RWAAGHaTU78jKhIajF99NkVfsOGXf36qzg3iWqVJOwIW8NJBW82C82BmF
+	x84ngs+diS2eNKOZLDLNWrTMUQDz8YFYcyYr5UWkN4Y9AG8u17E1iZ+IjFkkJEa7jxFGbA1F+gWs9
+	OqNMiHi0P3VrIEl1RJWtrijDGNJsqBQRJNxYE09dma/qxFw5RglxUCGhikVnzp5cSYcxdY6RBhnG1
+	MF3S6hLc7wtaCNY1rHhcoMFz8dnOPArVepakRF9rQgxgjpoNsdQZDyZ04SMwVFnx1VnmIlnFpmGAg
+	KWdDVjAw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54884)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r8IFy-0000BN-2I;
+	Wed, 29 Nov 2023 10:57:26 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r8IG0-0003va-8C; Wed, 29 Nov 2023 10:57:28 +0000
+Date: Wed, 29 Nov 2023 10:57:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 08/14] net: phy: at803x: drop specific PHY id
+ check from cable test functions
+Message-ID: <ZWcZGO1HWxJnzPrk@shell.armlinux.org.uk>
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-9-ansuelsmth@gmail.com>
+ <ZWcGn7KVSpsN/1Ee@shell.armlinux.org.uk>
+ <656708a8.df0a0220.28d76.9307@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] virtio: features
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com,
- Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com,
- yuanyaogoog@chromium.org, yuehaibing@huawei.com,
- kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alexander.shishkin@linux.intel.com
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
- <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
- <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
- <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
-Content-Language: en-US
-From: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
-In-Reply-To: <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <656708a8.df0a0220.28d76.9307@mx.google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-On 2023/11/29 18:20, Jason Wang wrote:
-> On Wed, Nov 29, 2023 at 6:12 PM Ning, Hongyu
-> <hongyu.ning@linux.intel.com> wrote:
->>
->>
->> On 2023/11/29 17:16, Jason Wang wrote:
->>> On Wed, Nov 29, 2023 at 5:05 PM Ning, Hongyu
->>> <hongyu.ning@linux.intel.com> wrote:
->>>>
->>>>
->>>>
->>>> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
->>>>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
->>>>>
->>>>>      Linux 6.5 (2023-08-27 14:49:51 -0700)
->>>>>
->>>>> are available in the Git repository at:
->>>>>
->>>>>      https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
->>>>>
->>>>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
->>>>>
->>>>>      virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
->>>>>
->>>>> ----------------------------------------------------------------
->>>>> virtio: features
->>>>>
->>>>> a small pull request this time around, mostly because the
->>>>> vduse network got postponed to next relase so we can be sure
->>>>> we got the security store right.
->>>>>
->>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>>>
->>>>> ----------------------------------------------------------------
->>>>> Eugenio Pérez (4):
->>>>>          vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
->>>>>          vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
->>>>>          vdpa: add get_backend_features vdpa operation
->>>>>          vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
->>>>>
->>>>> Jason Wang (1):
->>>>>          virtio_vdpa: build affinity masks conditionally
->>>>>
->>>>> Xuan Zhuo (12):
->>>>>          virtio_ring: check use_dma_api before unmap desc for indirect
->>>>>          virtio_ring: put mapping error check in vring_map_one_sg
->>>>>          virtio_ring: introduce virtqueue_set_dma_premapped()
->>>>>          virtio_ring: support add premapped buf
->>>>>          virtio_ring: introduce virtqueue_dma_dev()
->>>>>          virtio_ring: skip unmap for premapped
->>>>>          virtio_ring: correct the expression of the description of virtqueue_resize()
->>>>>          virtio_ring: separate the logic of reset/enable from virtqueue_resize
->>>>>          virtio_ring: introduce virtqueue_reset()
->>>>>          virtio_ring: introduce dma map api for virtqueue
->>>>>          virtio_ring: introduce dma sync api for virtqueue
->>>>>          virtio_net: merge dma operations when filling mergeable buffers
->>>>
->>>> Hi,
->>>> above patch (upstream commit 295525e29a5b) seems causing a virtnet
->>>> related Call Trace after WARNING from kernel/dma/debug.c.
->>>>
->>>> details (log and test setup) tracked in
->>>> https://bugzilla.kernel.org/show_bug.cgi?id=218204
->>>>
->>>> it's recently noticed in a TDX guest testing since v6.6.0 release cycle
->>>> and can still be reproduced in latest v6.7.0-rc3.
->>>>
->>>> as local bisects results show, above WARNING and Call Trace is linked
->>>> with this patch, do you mind to take a look?
->>>
->>> Looks like virtqueue_dma_sync_single_range_for_cpu() use
->>> DMA_BIDIRECTIONAL unconditionally.
->>>
->>> We should use dir here.
->>>
->>> Mind to try?
->>>
->>> Thanks
->>>
->>
->> sure, but what I see in the code
->> virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
->> probably I misunderstood your point?
->>
->> Please let me know any patch/setting to try here.
+On Wed, Nov 29, 2023 at 10:47:18AM +0100, Christian Marangi wrote:
+> On Wed, Nov 29, 2023 at 09:38:39AM +0000, Russell King (Oracle) wrote:
+> > On Wed, Nov 29, 2023 at 03:12:13AM +0100, Christian Marangi wrote:
+> > > @@ -1310,10 +1302,6 @@ static int at803x_cable_test_start(struct phy_device *phydev)
+> > >  	 */
+> > >  	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
+> > >  	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
+> > > -	if (phydev->phy_id != ATH9331_PHY_ID &&
+> > > -	    phydev->phy_id != ATH8032_PHY_ID &&
+> > > -	    phydev->phy_id != QCA9561_PHY_ID)
+> > > -		phy_write(phydev, MII_CTRL1000, 0);
+> > ...
+> > > +static int at8031_cable_test_start(struct phy_device *phydev)
+> > > +{
+> > > +	at803x_cable_test_start(phydev);
+> > > +	phy_write(phydev, MII_CTRL1000, 0);
+> > 
+> > I don't think this is a safe change - same reasons as given on a
+> > previous patch. You can't randomly reorder register writes like this.
+> >
 > 
-> Something like attached.  (Not even compiling test).
-> 
-> Thanks
-> 
+> Actually for this the order is keeped. Generic function is called and
+> for at8031 MII_CTRL1000 is called on top of that.
 
-Oh, this patch works, WARNING and Call Trace are no more reproduced in 
-the same Linux Guest Kernel setup.
+Okay, but I don't like it. I would prefer this to be:
 
->>
->>
->>>>
->>>>>
->>>>> Yuan Yao (1):
->>>>>          virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
->>>>>
->>>>> Yue Haibing (1):
->>>>>          vdpa/mlx5: Remove unused function declarations
->>>>>
->>>>>     drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
->>>>>     drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
->>>>>     drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
->>>>>     drivers/vhost/vdpa.c               |  15 +-
->>>>>     drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
->>>>>     drivers/virtio/virtio_vdpa.c       |  17 +-
->>>>>     include/linux/vdpa.h               |   4 +
->>>>>     include/linux/virtio.h             |  22 ++
->>>>>     include/uapi/linux/vhost_types.h   |   4 +
->>>>>     9 files changed, 625 insertions(+), 90 deletions(-)
->>>>>
->>>>
->>>
->>
+static void at803x_cable_test_autoneg(struct phy_device *phydev)
+{
+	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
+	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
+}
+
+static int at803x_cable_test_start(struct phy_device *phydev)
+{
+	at803x_cable_test_autoneg(phydev);
+	return 0;
+}
+
+static int at8031_cable_test_start(struct phy_device *phydev)
+{
+	at803x_cable_test_autoneg(phydev);
+	phy_write(phydev, MII_CTRL1000, 0);
+	return 0;
+}
+
+which makes it more explicit what is going on here. Also a comment
+above the function stating that it's for AR8031 _and_ AR8035 would
+be useful.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
