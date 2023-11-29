@@ -1,74 +1,89 @@
-Return-Path: <netdev+bounces-52186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DD1A7FDD37
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:36:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B457FDD60
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE9CD1C20925
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:36:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F998282122
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024BF1DDC9;
-	Wed, 29 Nov 2023 16:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23191208DD;
+	Wed, 29 Nov 2023 16:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SHwLc83A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gD5TvGLG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF5E10A;
-	Wed, 29 Nov 2023 08:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/uA+miTA801VQdKq+GBxddcU5PJHZsukphpTgK8YoY4=; b=SHwLc83AK8f9IfCTZ36S5HrTsG
-	uqXoGnzas3y9+cCSqbs161QB4oCl58vd5OqjDuCor9mOJpHUgkWIgra4Fdhvl89tNlp/IDC+NV/Ws
-	uYiyszlEgjOFZRn+Gt0/1d6B9U3epFrUd4XMcB7rdsKRgbJHBCgDxixjBgCYhHxqd0/w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r8NYI-001adv-7A; Wed, 29 Nov 2023 17:36:42 +0100
-Date: Wed, 29 Nov 2023 17:36:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
- activate if hw-controlled
-Message-ID: <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
-References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E473B2BB
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7737BC433C8;
+	Wed, 29 Nov 2023 16:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701276026;
+	bh=q29AkF9tXA/foVh9Ri+FNMBQN6a+ESC5ka9D43gXBBQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gD5TvGLGgUX8WyZEztZkOxPo7Q9WobZKPPefsBSI5e3EozjAL7jIfd+ngpYEl/U7y
+	 Jejh92LfC5RKEYP2bq7QfHzog9A4C7gEIcSvv7y/wWLPdpjpPk3xHahnAZiCB/aCsg
+	 8RP5T0swEmCX5jyKt6xMIQGNplixgd5js4qqxJFIBeQ8ucgYAaykEt95Bgyl6Z4BGm
+	 EvuAbt0yuXSqB4/DO/6XUZ09KMr0BNb2lSzJsT1Kl+jHULQctrTnbihX72Hy/FAwwS
+	 fIPOs3fTMT0kc6LutWabCPOAnDN6nJL0cVSI8lYVYV0Jm3Ig5KRLSYCkCG+6XXMupd
+	 a5oOa27PucyCw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6077FDFAA81;
+	Wed, 29 Nov 2023 16:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] gve: Add support for non-4k page sizes.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170127602638.9321.9127222835180364530.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Nov 2023 16:40:26 +0000
+References: <20231128002648.320892-1-jfraker@google.com>
+In-Reply-To: <20231128002648.320892-1-jfraker@google.com>
+To: John Fraker <jfraker@google.com>
+Cc: netdev@vger.kernel.org
 
-On Wed, Nov 29, 2023 at 11:41:51AM +0100, Heiner Kallweit wrote:
-> The current codes uses the sw_control path in set_baseline_state() when
-> called from netdev_trig_activate() even if we're hw-controlled. This
-> may result in errors when led_set_brightness() is called because we may
-> not have set_brightness led ops (if hw doesn't support setting a LED
-> to ON).
+Hello:
 
-Not having software on/off control of the LED is a problem. It breaks
-the whole concept of offloading/accelerating. If we cannot control the
-LED, there is nothing to accelerate. What do we do when the user
-selects a configuration which is not supported by the hardware? The
-API is not atomic, you cannot set multiple things at once. So the user
-might be trying to get from one offloadable configuration to another
-offloadable configuration, but needs to go via an configuration which
-is not offloadable. Do we return -EOPNOTSUPP?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Before we accept patches like this, we need to discuss the concept of
-how we support LEDs which cannot be controlled in software.
+On Mon, 27 Nov 2023 16:26:43 -0800 you wrote:
+> This patch series adds support for non-4k page sizes to the driver. Prior
+> to this patch series, the driver assumes a 4k page size in many small
+> ways, and will crash in a kernel compiled for a different page size.
+> 
+> This changeset aims to be a minimal changeset that unblocks certain arm
+> platforms with large page sizes.
+> 
+> [...]
 
-    Andrew
+Here is the summary with links:
+  - [net-next,1/5] gve: Perform adminq allocations through a dma_pool.
+    https://git.kernel.org/netdev/net-next/c/955f4d3bf0a4
+  - [net-next,2/5] gve: Deprecate adminq_pfn for pci revision 0x1.
+    https://git.kernel.org/netdev/net-next/c/8ae980d24195
+  - [net-next,3/5] gve: Remove obsolete checks that rely on page size.
+    https://git.kernel.org/netdev/net-next/c/ce260cb114bb
+  - [net-next,4/5] gve: Add page size register to the register_page_list command.
+    https://git.kernel.org/netdev/net-next/c/513072fb4bf8
+  - [net-next,5/5] gve: Remove dependency on 4k page size.
+    https://git.kernel.org/netdev/net-next/c/da7d4b42caf1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
