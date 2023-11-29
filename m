@@ -1,109 +1,85 @@
-Return-Path: <netdev+bounces-52054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5087FD24F
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:21:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF1C7FD267
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75B60282D8E
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:20:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C5BBB20D56
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AAC1401E;
-	Wed, 29 Nov 2023 09:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FA113FFC;
+	Wed, 29 Nov 2023 09:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HVu+f2bE"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D907C1BE1
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 01:20:48 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-74-amRDmBUvP_G8wy38RWpp2g-1; Wed, 29 Nov 2023 09:20:45 +0000
-X-MC-Unique: amRDmBUvP_G8wy38RWpp2g-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
- 2023 09:20:48 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 29 Nov 2023 09:20:48 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Jakub Kicinski' <kuba@kernel.org>, Kent Overstreet
-	<kent.overstreet@linux.dev>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Thomas Graf
-	<tgraf@suug.ch>, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: RE: [PATCH] rhashtable: Better error message on allocation failure
-Thread-Topic: [PATCH] rhashtable: Better error message on allocation failure
-Thread-Index: AQHaImnu8lfoNsJ1T0CBXnMobWGrXLCRAwSw
-Date: Wed, 29 Nov 2023 09:20:48 +0000
-Message-ID: <bc3b04ef968647a789431f482cc8246f@AcuMS.aculab.com>
-References: <20231123235949.421106-1-kent.overstreet@linux.dev>
-	<36bcdab2dae7429d9c2162879d0a3f9a@AcuMS.aculab.com>
-	<20231128173536.35ff7e9c@kernel.org>
-	<20231129015705.54zmp3xpqxfmo2fx@moria.home.lan>
- <20231128181520.6245fa88@kernel.org>
-In-Reply-To: <20231128181520.6245fa88@kernel.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15E7D1;
+	Wed, 29 Nov 2023 01:24:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=G4bCQrf3b4dFN8whVTh98EHUKTMfE9BJ7Wt9mKQxa5k=; b=HVu+f2bEHnsILXXMm2Duw47Le4
+	3/KNkNmnz4cHkZVCeCoShtgRTJ95odiiewzOzvLekguui33VTiiC52500bEdrjxAhg9yLME9KENdu
+	dPqUEXL4yc35hiyJs6rqkrvMzwbCt+aWMp/On8B9ThKpfm+Wf4tOIlIpCGP1zmUANzvjB9NHAVtjJ
+	KJzNosIR5ZFmf5X43ISfV9svHUDVj+byX7bBStniuPKs+BwL+8xfDeYC80zzLWrGaxA/9deMb25MW
+	iNlZq3y7biZ01VJNEPx27Uy2NyY7arNPPbIGLN+sKX8XFuyHdVtNL2a1GHEUIQY+56sWEedffuUQX
+	f6YjH/ZQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56646)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r8Go4-0008Sh-1X;
+	Wed, 29 Nov 2023 09:24:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r8Go4-0003rL-V6; Wed, 29 Nov 2023 09:24:32 +0000
+Date: Wed, 29 Nov 2023 09:24:32 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 02/14] net: phy: at803x: move disable WOL for
+ 8031 from probe to config
+Message-ID: <ZWcDUJY8rM6uApO1@shell.armlinux.org.uk>
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231129021219.20914-3-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jakub Kicinski
-> Sent: 29 November 2023 02:15
->=20
-> On Tue, 28 Nov 2023 20:57:05 -0500 Kent Overstreet wrote:
-> > > Yes, that's problematic :(
-> > > Let's leave out the GFP_NOWARN and add a pr_warn() instead of
-> > > the WARN()?
-> >
-> > pr_warn() instead of WARN() is fine, but the stack trace from
-> > warn_alloc() will be entirely useless.
-> >
-> > Perhaps if we had a GFP flag to just suppress the backtrace in
-> > warn_alloc() - we could even stash a backtrace in the rhashtable at
-> > rhashtable_init() time, if we want to print out a more useful one.
->=20
-> Interesting idea, up to you how far down the rabbit hole you're
-> willing to go, really :)
->=20
-> Stating the obvious but would be good to add to the commit message,
-> if you decide to implement this, how many rht instances there are
-> on a sample system, IOW how much memory we expect the stacks to burn.
+On Wed, Nov 29, 2023 at 03:12:07AM +0100, Christian Marangi wrote:
+> Probe should be used only for DT parsing and allocate required priv, it
+> shouldn't touch regs, there is config_init for that.
 
-It's not really memory, just 'junk' in the console buffer.
-But completely supressing the traceback from warn_alloc() (et al)
-would give absolutely no indication of what failed.
-You wouldn't even know it was a call from rhashtable().
+I'm not sure where you get that idea from. PHY driver probe() functions
+are permitted to access registers to do any setup that they wish to.
 
-Actually I'd have thought the traceback would show where the hash table
-was being allocated - which would (mostly) tell you which one.
-(Unless they were being allocated by a worker thread - which seems unlikely=
-.)
+config_init() is to configure the PHY for use with the network
+interface.
 
-IIRC the traceback includes the cpu registers (and code??) they probably
-are noise for 'controlled' errors like kmalloc failing.
+I think this patch is just noise rather than a cleanup.
 
-Is the whole extra trace really worthwhile at all?
-How often does kmalloc() really fail?
-Although if the code recovers by using a smaller table then maybe
-that might be worth a trace instead of the one from kmalloc().
-
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
