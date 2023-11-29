@@ -1,128 +1,118 @@
-Return-Path: <netdev+bounces-52112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863727FD56F
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:22:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286717FD58E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40EB6282A5C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:22:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9E31F20F17
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B9D1C69A;
-	Wed, 29 Nov 2023 11:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CF01B279;
+	Wed, 29 Nov 2023 11:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AqYmxBs4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsKM1MmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202ED10C2;
-	Wed, 29 Nov 2023 03:22:10 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT5mUWY021197;
-	Wed, 29 Nov 2023 03:22:03 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=goRdS9UMaJBeT5oWbOCmVW3K6Sjac2xOWln0Bp2z3kY=;
- b=AqYmxBs47KVWy0F4VBI7EWs78M5VEc73Rdn/h+4EdcKYzmjwjMKXOFA38K5BZwVM3jdf
- BlUtxq0MucMcaRBDFb7jL+4EMLOgI8MjYtRW0Jo2jphZhu750v+0imszfcx6fBEs6kDO
- +Xj9Nrh4l7A+HDF6Oi7uxRtM6xHJeS0Mvg8YdMALYiwRQKsypoJ+w72aXjzHHQ1TgSvh
- WuQFiSmTTjQRfyBBJynH4PZx5E6Gh8qq1s3ICQIptw1qjFREEvvXeABDsZLqx4PtUaiL
- tMvAe/cnUF4Zw+eDDABlgqrvK+T7RiJOI7OgWPjs6/TXxGcSj/YyGroBEDBNqEdoWiUC UQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3unn86b0rq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 29 Nov 2023 03:22:02 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
- 2023 03:22:00 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 29 Nov 2023 03:22:00 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id A52B93F7043;
-	Wed, 29 Nov 2023 03:21:56 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <jerinj@marvell.com>, <pbhagavatula@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH] octeontx2-af: cn10k: Increase outstanding LMTST transactions
-Date: Wed, 29 Nov 2023 16:51:55 +0530
-Message-ID: <20231129112155.9967-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7EF51BCA
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:24:27 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cfc34b6890so6142255ad.1
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:24:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701257067; x=1701861867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EJmCJbg2unIrLNyB6mMQhrpmPKGl/tPs30r44BnRYC8=;
+        b=TsKM1MmO8e898JXtd3j4n5050rsRiZaF1hosxfZJ0AHuclSuFor63915OKHT6wyolb
+         U0L4tcQtgsjhussjiZiiWwMplBPx20Ls172MZAtwi/p8CZWAfrHlvq4dwQHH+4RL6kYo
+         EDQPZYHjcjOdT4bzkCbb+a7Zkbk96UsoNq8QxZQT+mhcv22auEQ0OOK8wCPKZG2PsDNu
+         3eoMa7U2yCl17KIZw08MzJ7p4KU8JPbujKMhs9PVeNKPFCbKYFi7I3covXZAZ2T5scYJ
+         FNZ4gPbSNWL+/AlG+q4UxUEGi3rxl95bdrem8zbgzAYqp6UQKqHZckTAacKKn59KCggu
+         MJow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701257067; x=1701861867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EJmCJbg2unIrLNyB6mMQhrpmPKGl/tPs30r44BnRYC8=;
+        b=g9IEqXQANsVjSZhxgZ2dE2YPp3McJBoNTy629xFwsxgvVskL4RGSSrdMKER2XLfDJy
+         NTVa3Ryk9qqj7VJlHEAcAkD2LO99rwL+H/MLDgB+UXKA5hewehXEpdSHhcl0vO6QJiCM
+         bcBOwbg4wpmwcEatv6L1ATqRy4ZC/84eovOeE+lIg4V+WsOVd50RHfS8ZsGVTJtxYlZR
+         somQJ5n+u+ozQkGBNT3qgle9ZbZ14hVek3pCS2uRAp5xXgP7ZVtfSQxfpt3axYapo7xJ
+         VIvrT+cavfiKc9LPq+RdjgGoghkFQaLsAWZNw5CWPQQfAhTeSPezCglCclwSEugsvJGZ
+         Zx6Q==
+X-Gm-Message-State: AOJu0Yxy9ozZPbmFN5R9vKsm4schQ1qSdJAUoEQHJbPvVoyU+r5dovB0
+	o6kLlgAX36eZ7+S3MLR7JOQ=
+X-Google-Smtp-Source: AGHT+IHPtrhNJElGFoSlRRa9htkiJw1G/4qkpCx/tap9I0jADSqFFRW2wIC64qNCuihA28nOdgoLXg==
+X-Received: by 2002:a17:902:f68e:b0:1cf:a0b7:c68b with SMTP id l14-20020a170902f68e00b001cfa0b7c68bmr26693689plg.8.1701257067202;
+        Wed, 29 Nov 2023 03:24:27 -0800 (PST)
+Received: from localhost.localdomain ([89.187.161.180])
+        by smtp.gmail.com with ESMTPSA id c6-20020a170902c1c600b001cfd0ed1604sm5460710plc.87.2023.11.29.03.24.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 03:24:26 -0800 (PST)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Cc: netdev@vger.kernel.org,
+	linux-mm@kvack.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v5 0/4] skbuff: Optimize SKB coalescing for page pool
+Date: Wed, 29 Nov 2023 19:23:00 +0800
+Message-Id: <20231129112304.67836-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: jxezCW60v_vy7GIaYNQeW7MqtHlOe9Rv
-X-Proofpoint-GUID: jxezCW60v_vy7GIaYNQeW7MqtHlOe9Rv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-29_09,2023-11-29_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
 
-From: Pavan Nikhilesh <pbhagavatula@marvell.com>
+The combination of the following condition was excluded from skb coalescing:
 
-Currently the number of outstanding store transactions issued by AP as
-a part of LMTST operation is set to 1 i.e default value.
-This patch set to max supported value to increase the performance.
+from->pp_recycle = 1
+from->cloned = 1
+to->pp_recycle = 1
 
-Signed-off-by: Pavan Nikhilesh <pbhagavatula@marvell.com>
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu.c       | 3 +++
- drivers/net/ethernet/marvell/octeontx2/af/rvu.h       | 1 +
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c | 9 +++++++++
- 3 files changed, 13 insertions(+)
+With page pool in use, this combination can be quite common(ex.
+NetworkMananger may lead to the additional packet_type being registered,
+thus the cloning). In scenarios with a higher number of small packets, it
+can significantly affect the success rate of coalescing.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index 22c395c7d040..14bb91b98f97 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -935,6 +935,9 @@ static int rvu_setup_hw_resources(struct rvu *rvu)
- 	hw->total_vfs = (cfg >> 20) & 0xFFF;
- 	hw->max_vfs_per_pf = (cfg >> 40) & 0xFF;
- 
-+	if (!is_rvu_otx2(rvu))
-+		rvu_apr_block_cn10k_init(rvu);
-+
- 	/* Init NPA LF's bitmap */
- 	block = &hw->block[BLKADDR_NPA];
- 	if (!block->implemented)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index c4d999ef5ab4..6546cc489d7e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -940,6 +940,7 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw);
- 
- /* CN10K RVU - LMT*/
- void rvu_reset_lmt_map_tbl(struct rvu *rvu, u16 pcifunc);
-+void rvu_apr_block_cn10k_init(struct rvu *rvu);
- 
- #ifdef CONFIG_DEBUG_FS
- void rvu_dbg_init(struct rvu *rvu);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-index 0e74c5a2231e..93fedabfe31e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-@@ -559,3 +559,12 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
- 	cfg |= BIT_ULL(1) | BIT_ULL(2);
- 	rvu_write64(rvu, blkaddr, NIX_AF_CFG, cfg);
- }
-+
-+void rvu_apr_block_cn10k_init(struct rvu *rvu)
-+{
-+	u64 reg;
-+
-+	reg = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_CFG);
-+	reg |= 0xFULL << 35;
-+	rvu_write64(rvu, BLKADDR_APR, APR_AF_LMT_CFG, reg);
-+}
+This patchset aims to optimize this scenario and enable coalescing of this
+particular combination. That also involves supporting multiple users
+referencing the same fragment of a pp page to accomondate the need to
+increment the "from" SKB page's pp page reference count.
+
+Changes from v4:
+- remove 'inline'
+- rename skb_pp_get_frag_ref to skb_pp_frag_ref
+- use page_ref_inc instead of get_page
+- add helper to increase pp_ref_count in page_pool/helpers.h
+
+
+Liang Chen (4):
+  page_pool: Rename pp_frag_count to pp_ref_count
+  page_pool: halve BIAS_MAX for multiple user references of a fragment
+  skbuff: Add a function to check if a page belongs to page_pool
+  skbuff: Optimization of SKB coalescing for page pool
+
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  4 +-
+ include/linux/mm_types.h                      |  2 +-
+ include/net/page_pool/helpers.h               | 50 +++++++++++--------
+ include/net/page_pool/types.h                 |  2 +-
+ net/core/page_pool.c                          | 14 +++---
+ net/core/skbuff.c                             | 48 +++++++++++++-----
+ 6 files changed, 76 insertions(+), 44 deletions(-)
+
 -- 
-2.25.1
+2.31.1
 
 
