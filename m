@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45837FDF0D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:05:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF297FDF12
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:07:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5EFB1C20BD8
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:05:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66D08B211B7
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AC25C3C0;
-	Wed, 29 Nov 2023 18:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B225C3C0;
+	Wed, 29 Nov 2023 18:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RlikZ1NK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Viv2jJJ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE4CCAF;
-	Wed, 29 Nov 2023 10:04:58 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b479ec4a3so112505e9.2;
-        Wed, 29 Nov 2023 10:04:58 -0800 (PST)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C34AA8;
+	Wed, 29 Nov 2023 10:06:51 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-409299277bbso135015e9.2;
+        Wed, 29 Nov 2023 10:06:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701281097; x=1701885897; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701281210; x=1701886010; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H4jESqZmpMEPxH+fuQOnMVYUEdrJMqMVfKBMqgWEv/A=;
-        b=RlikZ1NKQOUHfhO4FvxmJPFCBoClwaV/5E1rnnzrJTT92aT+8bJdaE71xffxRpL0O9
-         Z2PrIi6dIyIUW9Gg4Bk7yigYEMy+SS7u7F5sjOpCOuQbO65RCpp0njHRP2ywUltAMJyn
-         z+9ypAlWYshgWz1y7uHm52NyvNNXpwdXqGoZMVTR1OZOyolXZtRA6Bhtu5ckiOJg34In
-         fZ8ghtC4ETA+sQ+p9Mr5p2tfvfrrBtJBclHAJXI/ZHupjlAf8uejGXsWnqES7gtjzvg3
-         dD1JXUrdWau46Xda0aYLLU2oEcvZGTxeRMwofYfE92bCjBiLm35ydZY7W+xxHrKEyiPz
-         rRdQ==
+        bh=WP/VskNJd0LA4E1Mk07bsXVasJaRqm4qXuSnlHideFE=;
+        b=Viv2jJJ14cnHsSiQMdm1UCPNoju6w1pIshvNP6BEWSaN3RSOoa9mQyjakwA4bgBSyg
+         6Mg4K1CS6Y/D/g3yaNS4mm+yFkCzz79WdiFAex+Dl8mgLPL5voskWEbOlQTDfkld2+oe
+         0Edxx+M/3b9f1twkAJCtMcNfiavOOI1y+sl0cGTY8hHeoNT405g8Z2xBPGIucs6nPgsK
+         9Y0IRnKlFVatmU3WncOStZK7KonitVI6hdDKL0X+F80yxO1Fv2s77Efk7a95/c1PM5vq
+         uVx7EtYL5QIcx4TkqlZXodnp5DlXsJKSTqKqzVIXDL9vrDzpKfoHYy5HILkF0WDNY4if
+         TybQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701281097; x=1701885897;
+        d=1e100.net; s=20230601; t=1701281210; x=1701886010;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H4jESqZmpMEPxH+fuQOnMVYUEdrJMqMVfKBMqgWEv/A=;
-        b=wobf5WiCmaa1Hg6A1oyEOzVdXvU6E5zyeu3Kur8x9O5xq0RBSb0oNQFrirvI6zoGQp
-         ZXu3rZjqeGsJmjczXbzUNf9zIaLatFSG7uP2ywo3HJqhFNXu8KBzZc1+UyVuBxLkPokI
-         qgGfccxEZ9iPKqIYBOitxU4jSCFgf3o2VUSlL1CEBeMYdqdtVQb6fM52fErJsXeRP0dT
-         java1npC2aP2mQwq7q28EBaDnPcucn8J6Meb9KaqPCdqpyW3zuUgkfqMdzy9EJ0IBgOI
-         1SkuqF0dXO5m1UuREFB6Iss6XU6cZGdMZ19R+BkGV5iwL90GOgLb273AAhdLs9GJJxRG
-         VWtg==
-X-Gm-Message-State: AOJu0YxJ2Yyt/3BH9nw312GKzWkXGABnk0QZNO4Goji+1tdMg1UISO/L
-	NrNbaZizYFtWn8wIHUMiwuo=
-X-Google-Smtp-Source: AGHT+IFLTA4R08YIGhe/kznCDigznewvoiILsXBmrSH8RS0rlFq3qOqKk2onvEvKnhtWK2lDpBB5QQ==
-X-Received: by 2002:a05:600c:1c9d:b0:40b:3933:f994 with SMTP id k29-20020a05600c1c9d00b0040b3933f994mr15197936wms.25.1701281096993;
-        Wed, 29 Nov 2023 10:04:56 -0800 (PST)
+        bh=WP/VskNJd0LA4E1Mk07bsXVasJaRqm4qXuSnlHideFE=;
+        b=sA04V7+YxfPptJlgNhhAxtcjMv/7Ylz3v7WfPsUhb4zyfHuLttBfPt5NjkBf+Qkdng
+         UYKmr8LDC1O+Q4MP2RtG2xwHSzo8aJMfbDaFj6oG/JEERK+F/bLMuUoXl0T8RpZJIqZ+
+         6eSEV0KV9Apyrh7kIYdxXMtwfdroJzHrDVMozyaCkkCe08a0PQPnBN+L87DjSuxeWRd9
+         Epa9nd03t5f19RE6vgUIU9sfDnCcl/988fZkVoZMCIiYfr7kVNE7+MWKkn9tnBZjQJm5
+         Co7B0E7erGJ/LnDG0VM1mWiIn3O+bajIPUhtNk6X9Q9GLHxI8KnNBaIWo2sN0IN0KoX/
+         tXcA==
+X-Gm-Message-State: AOJu0YyDfuMMclNTgB1tcUsE6MoPlk1kmEDHEyAEmLPD+buJFEY6w6AY
+	ztj+gh0UYTXm1iggP8JMpLI=
+X-Google-Smtp-Source: AGHT+IGCqKmEQmXCHAhNv3R9Y7f8whXFQ6c5b+m19lU3XNKj7aXxtJJZw2vSzghtWrgTqB2kFIERSg==
+X-Received: by 2002:a05:600c:188a:b0:40b:5021:f057 with SMTP id x10-20020a05600c188a00b0040b5021f057mr3307729wmp.11.1701281209422;
+        Wed, 29 Nov 2023 10:06:49 -0800 (PST)
 Received: from skbuf ([188.26.185.12])
-        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b003fc0505be19sm3054640wmb.37.2023.11.29.10.04.55
+        by smtp.gmail.com with ESMTPSA id d18-20020a05600c34d200b0040b2b38a1fasm3101035wmq.4.2023.11.29.10.06.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 10:04:56 -0800 (PST)
-Date: Wed, 29 Nov 2023 20:04:53 +0200
+        Wed, 29 Nov 2023 10:06:45 -0800 (PST)
+Date: Wed, 29 Nov 2023 20:06:42 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Linus Walleij <linus.walleij@linaro.org>
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -70,13 +70,14 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Rob Herring <robh@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH net-next v9 4/5] dt-bindings: marvell: Rewrite MV88E6xxx
- in schema
-Message-ID: <20231129180453.2bkmvuxihtp3yeyz@skbuf>
+	Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH net-next v9 3/5] dt-bindings: net: ethernet-switch:
+ Accept special variants
+Message-ID: <20231129180642.q5ybndg5fp5c4udg@skbuf>
 References: <20231127-marvell-88e6152-wan-led-v9-0-272934e04681@linaro.org>
- <20231127-marvell-88e6152-wan-led-v9-4-272934e04681@linaro.org>
+ <20231127-marvell-88e6152-wan-led-v9-0-272934e04681@linaro.org>
+ <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
+ <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,25 +86,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231127-marvell-88e6152-wan-led-v9-4-272934e04681@linaro.org>
+In-Reply-To: <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
+ <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
 
-On Mon, Nov 27, 2023 at 04:43:07PM +0100, Linus Walleij wrote:
-> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
-> in YAML schema.
+On Mon, Nov 27, 2023 at 04:43:06PM +0100, Linus Walleij wrote:
+> Accept special node naming variants for Marvell switches with
+> special node names as ABI.
 > 
-> The current text binding says:
->   WARNING: This binding is currently unstable. Do not program it into a
->   FLASH never to be changed again. Once this binding is stable, this
->   warning will be removed.
+> This is maybe not the prettiest but it avoids special-casing
+> the Marvell MV88E6xxx bindings by copying a lot of generic
+> binding code down into that one binding just to special-case
+> these unfixable nodes.
 > 
-> Well that never happened before we switched to YAML markup,
-> we can't have it like this, what about fixing the mess?
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > Reviewed-by: Rob Herring <robh@kernel.org>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
+
+Not great, not terrible.
 
 Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
