@@ -1,50 +1,48 @@
-Return-Path: <netdev+bounces-52252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEF07FE05A
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:36:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B2B7FE05B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:36:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B540B21191
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:36:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF2B2825E3
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D675EE6F;
-	Wed, 29 Nov 2023 19:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9835EE7D;
+	Wed, 29 Nov 2023 19:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qws1/eYA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7T8Lksd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B265EE6B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6C25EE79
 	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 19:36:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0FEAC433CB;
-	Wed, 29 Nov 2023 19:36:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64211C433CC;
+	Wed, 29 Nov 2023 19:36:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701286587;
-	bh=P1BoJ0mtHfkZSveD/M1JKXhg6UwGCu9uN0Id4fIXOno=;
+	bh=HJkAwUzCcHSDpmbt076xC64L/HORRKbuLH/E0PEtH8c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qws1/eYAmC1Ciu3YphVILSxbqEnTLvtR/mT36JUdQUIv7WFEVFKANdirWm5oBRVCp
-	 pufdUf6WP+i9vPNEEtjM+9I3lR9htsL2I7sOcVDy1hE8TXZ1ssj7eNxKWsk23Avuuq
-	 01hkgGntCUj02EBSNgehNkjrTAP5+0v2O0sQbfWd6g8DsfYLBScoeTSm55tzG8ujWs
-	 4YAdzYxmfippBttmzVQM8Qz4YVKCPjIzNtVVdGcMaL1hyNC3kedyOmNgjZRRi9otYz
-	 Nu58TRH2YjIuY/+lUFetpleAFjugQjSL/G5KqPkV5X8/vNxqyf6lBbTX1CGdNDPYiu
-	 3c9clooPpG2KA==
+	b=T7T8LksdtOeA6WJuM89EqPTbPnJgxM0UlNrnrB6Hgny8yofiIfXJVbXnOwQu8nrtu
+	 z2k330LnGtiW/r/qFGek/Yf17rSDJXhB5mAEgQnV2Sv5MUNx7pj91Rkseoh0XQ+ZAG
+	 tpUNjZNQvw0e+tqkAuuQqr1el6OBCLuewdlu3aQAzCXeg9thSyUqgHzirurURcDZEc
+	 ZN7FTXgQgwDN0V++/3NPSMKEZhpVbQAzhM7T6Jyp3zwh3ZZzYZem9180hJt9X42VsW
+	 tvaetWcgSR3c/X2BkQYJyBCc3BeB8nXnqDfrtsUOXvDKibjYVpx5pL6NeydzTVd8bK
+	 UZk6ssiRT4Txw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	willemb@google.com,
-	sdf@google.com
-Subject: [PATCH net-next 2/4] tools: ynl: make sure we use local headers for page-pool
-Date: Wed, 29 Nov 2023 11:36:20 -0800
-Message-ID: <20231129193622.2912353-3-kuba@kernel.org>
+	sdf@google.com,
+	willemb@google.com
+Subject: [PATCH net-next 3/4] tools: ynl: order building samples after generated code
+Date: Wed, 29 Nov 2023 11:36:21 -0800
+Message-ID: <20231129193622.2912353-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231129193622.2912353-1-kuba@kernel.org>
 References: <20231129193622.2912353-1-kuba@kernel.org>
@@ -54,43 +52,37 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Building samples generates the following warning:
+Parallel builds of ynl:
 
-  In file included from page-pool.c:11:
-  generated/netdev-user.h:21:45: warning: ‘enum netdev_xdp_rx_metadata’ declared inside parameter list will not be visible outside of this definition or declaration
-   21 | const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
-      |                                             ^~~~~~~~~~~~~~~~~~~~~~
+  make -C tools/net/ynl/ -j 4
 
-Our magic way of including uAPI headers assumes the sample
-name matches the family name. We need to copy the flags over.
+don't work correctly right now. samples get handled before
+generated, so build of samples does not notice that protos.a
+has changed. Order samples to be last.
 
-Fixes: 637567e4a3ef ("tools: ynl: add sample for getting page-pool information")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: hawk@kernel.org
-CC: john.fastabend@gmail.com
-CC: willemb@google.com
 CC: sdf@google.com
+CC: willemb@google.com
 ---
- tools/net/ynl/samples/Makefile | 2 ++
+ tools/net/ynl/Makefile | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/tools/net/ynl/samples/Makefile b/tools/net/ynl/samples/Makefile
-index 1afefc266b7a..28bdb1557a54 100644
---- a/tools/net/ynl/samples/Makefile
-+++ b/tools/net/ynl/samples/Makefile
-@@ -18,6 +18,8 @@ include $(wildcard *.d)
+diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+index d664b36deb5b..da1aa10bbcc3 100644
+--- a/tools/net/ynl/Makefile
++++ b/tools/net/ynl/Makefile
+@@ -4,6 +4,8 @@ SUBDIRS = lib generated samples
  
- all: $(BINS)
+ all: $(SUBDIRS)
  
-+CFLAGS_page-pool=$(CFLAGS_netdev)
++samples: | lib generated
 +
- $(BINS): ../lib/ynl.a ../generated/protos.a $(SRCS)
- 	@echo -e '\tCC sample $@'
- 	@$(COMPILE.c) $(CFLAGS_$@) $@.c -o $@.o
+ $(SUBDIRS):
+ 	@if [ -f "$@/Makefile" ] ; then \
+ 		$(MAKE) -C $@ ; \
 -- 
 2.43.0
 
