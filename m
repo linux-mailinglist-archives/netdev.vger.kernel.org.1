@@ -1,148 +1,112 @@
-Return-Path: <netdev+bounces-51976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518B67FCD08
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:43:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE177FCD10
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93906B21482
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:43:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DEEEB210C2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8564A627;
-	Wed, 29 Nov 2023 02:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D595A29;
+	Wed, 29 Nov 2023 02:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UqstxKz5"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="z3Og+i3l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E4F1707;
-	Tue, 28 Nov 2023 18:43:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701225788; x=1732761788;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XslR35BlM3Il/whuQ1UUnmJy8Unfm8S9xb1YMnw6Ni4=;
-  b=UqstxKz5ihZPNY3qY2c4VDzwMTw4VmDbzILZWbSU+wOqfKzBaPAbc+/i
-   f7YXWeX4CIo1/snoT0+mWefIDZ3dCQu1SOoBMQWxlj9pe/z9QE3+Acp0q
-   obg3LdxwTo9Yx5gjb8zZvZhlRfcR81+u28v8BZ8yTwbgGzcyOsqWNz99X
-   BBFm44f3jqFjg2kBaYIeARRXQUkEcFSumyzJQxEF/L3k283bfOVwrw1Ek
-   g/7mCUeHkqdwmB/GygMceDmIK0dvzl9x+Fuo57m8AUo+1e1oWF31g7Rzn
-   1qImWhkUWRDrnq44v0VSg4ZCiv1vLF0w6OMAQz2Ex8DNkLHiE39deU+hL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="372449081"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="372449081"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 18:43:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="745107845"
-X-IronPort-AV: E=Sophos;i="6.04,234,1695711600"; 
-   d="scan'208";a="745107845"
-Received: from lkp-server01.sh.intel.com (HELO d584ee6ebdcc) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 28 Nov 2023 18:43:05 -0800
-Received: from kbuild by d584ee6ebdcc with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r8AXX-0008Sk-1D;
-	Wed, 29 Nov 2023 02:43:03 +0000
-Date: Wed, 29 Nov 2023 10:40:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Fastabend <john.fastabend@gmail.com>, martin.lau@kernel.org,
-	jakub@cloudflare.com
-Cc: oe-kbuild-all@lists.linux.dev, john.fastabend@gmail.com,
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf v3 2/2] bpf: sockmap, add af_unix test with both
- sockets in map
-Message-ID: <202311290745.tAZIyCyC-lkp@intel.com>
-References: <20231128155515.9302-3-john.fastabend@gmail.com>
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DF41735
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 18:47:36 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6c320a821c4so5441882b3a.2
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 18:47:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701226055; x=1701830855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IXCf82/z1ruojcbqnGD4qR/1vYZRBRQtlqOSPY1eXUI=;
+        b=z3Og+i3lQ4xKqaJXNfonCfFToD/ejWPmVJinrWbOCOGH8PWHEcXffkB8XDQqOWieDH
+         g0nt696EAIOzunLFn8EnyjJTbxoanUFeyQSf14kuuRcyn5L2EbIEEVhS4NUeQ6VWQw6U
+         pslqf9qZuZJbXQVTbFJJTswYaXxF4KLmIzL7OkRfwoXlDR+nP+IkvC2BlaVQgyKsicSX
+         JX2iuC99VfSewHwMf5RuI6XQtY6iySDu56qgI0ZIaBWPiMyO63a16DjRt0nwQ8HgCqrp
+         c9ukug6S9g8czL9qkApFOp0mF0BgrefH8YY1uNYfWQ+tRJRK0E/syD7BK3hAH+zx8AfK
+         Vs/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701226055; x=1701830855;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IXCf82/z1ruojcbqnGD4qR/1vYZRBRQtlqOSPY1eXUI=;
+        b=hYEZtKiuLD+/Dr6V1oSzxehpnlG8DsSMfEPA0lYlJ2wjN5qqziCBga/lvPlnLkATBj
+         +D74yfvv3K6hxXM86nitwGreBRufuuHbbOR7jww38Oc7bXPT+5nDz1JhlWzlPotXPdW9
+         PsOKZSufQxpYF+RhyXEbsr94PNkN/K2PLEY3n/dC7mmYzAOwcARSDvqD4ebbS7f4kCKB
+         FsNhpk8ie1CQ02/n87EgIufwXYIYlv4m0pyB749wvtwXhb15KAyxF+k1zU1sVS7aHxEQ
+         OfM1h0VMclDgl/9IMjYxa8mgA4erb7qTQL5DsdX5Z4whXopCnm1Lp5JRHBsbIQ1hPDbt
+         P8DQ==
+X-Gm-Message-State: AOJu0YzC3yz7fUVRiwee9c1qlywPKRnjWaaTajZo5ZS4Pqi5M8vUKKMk
+	TwJBtqkhiIXK5Jz6nYSw8Eo8pw==
+X-Google-Smtp-Source: AGHT+IEYN33+oEE8z0o76kZXB011SH7F0Kfpjiz4M4bD3Um2laYdts+lJMKrC6zrZuKqwr4bR971Sw==
+X-Received: by 2002:a05:6a20:3d07:b0:18c:4105:9aa8 with SMTP id y7-20020a056a203d0700b0018c41059aa8mr15342292pzi.51.1701226055436;
+        Tue, 28 Nov 2023 18:47:35 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id ju12-20020a170903428c00b001bbb8d5166bsm11042697plb.123.2023.11.28.18.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 18:47:35 -0800 (PST)
+Date: Tue, 28 Nov 2023 18:47:33 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: =?UTF-8?B?5L2V5pWP57qi?= <heminhong@kylinos.cn>
+Cc: Petr Machata <petrm@nvidia.com>, netdev <netdev@vger.kernel.org>
+Subject: Re: =?UTF-8?B?5Zue5aSNOg==?= Re: [PATCH] iproute2: prevent memory
+ leak on error return
+Message-ID: <20231128184733.6fc8247e@hermes.local>
+In-Reply-To: <o2sj4kvm3n-o2v307ppr8@nsmail7.0.0--kylin--1>
+References: <o2sj4kvm3n-o2v307ppr8@nsmail7.0.0--kylin--1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231128155515.9302-3-john.fastabend@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi John,
+On Wed, 29 Nov 2023 10:26:37 +0800
+=E4=BD=95=E6=95=8F=E7=BA=A2 <heminhong@kylinos.cn> wrote:
 
-kernel test robot noticed the following build errors:
+> Friendly ping. I think this patch was forgotten.
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
+> ----
+>=20
+> =C2=A0
+>=20
+>=20
+>=20
+> =E4=B8=BB=E3=80=80=E9=A2=98=EF=BC=9ARe: [PATCH] iproute2: prevent memory =
+leak on error return
+> =E6=97=A5=E3=80=80=E6=9C=9F=EF=BC=9A2023-11-15 18:37
+> =E5=8F=91=E4=BB=B6=E4=BA=BA=EF=BC=9APetr Machata
+> =E6=94=B6=E4=BB=B6=E4=BA=BA=EF=BC=9A=E4=BD=95=E6=95=8F=E7=BA=A2;
+>=20
+>=20
+> heminhong writes:
+>=20
+> > When rtnl_statsdump_req_filter() or rtnl_dump_filter() failed to proces=
+s,
+> > just return will cause memory leak.
+> >
+> > Signed-off-by: heminhong
+>=20
+> Reviewed-by: Petr Machata
+>=20
 
-[auto build test ERROR on bpf/master]
+Please check your repo?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Fastabend/bpf-sockmap-af_unix-stream-sockets-need-to-hold-ref-for-pair-sock/20231128-235707
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
-patch link:    https://lore.kernel.org/r/20231128155515.9302-3-john.fastabend%40gmail.com
-patch subject: [PATCH bpf v3 2/2] bpf: sockmap, add af_unix test with both sockets in map
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231129/202311290745.tAZIyCyC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311290745.tAZIyCyC-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   tools/testing/selftests/bpf/prog_tests/sockmap_listen.c: In function 'pairs_redir_to_connected':
->> tools/testing/selftests/bpf/prog_tests/sockmap_listen.c:1355:13: error: 'nop_madfd' undeclared (first use in this function); did you mean 'nop_mapfd'?
-    1355 |         if (nop_madfd >= 0) {
-         |             ^~~~~~~~~
-         |             nop_mapfd
-   tools/testing/selftests/bpf/prog_tests/sockmap_listen.c:1355:13: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +1355 tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-
-  1338	
-  1339	static void pairs_redir_to_connected(int cli0, int peer0, int cli1, int peer1,
-  1340					     int sock_mapfd, int nop_mapfd,
-  1341					     int verd_mapfd, enum redir_mode mode)
-  1342	{
-  1343		const char *log_prefix = redir_mode_str(mode);
-  1344		unsigned int pass;
-  1345		int err, n;
-  1346		u32 key;
-  1347		char b;
-  1348	
-  1349		zero_verdict_count(verd_mapfd);
-  1350	
-  1351		err = add_to_sockmap(sock_mapfd, peer0, peer1);
-  1352		if (err)
-  1353			return;
-  1354	
-> 1355		if (nop_madfd >= 0) {
-  1356			err = add_to_sockmap(nop_mapfd, cli0, cli1);
-  1357			if (err)
-  1358				return;
-  1359		}
-  1360	
-  1361		n = write(cli1, "a", 1);
-  1362		if (n < 0)
-  1363			FAIL_ERRNO("%s: write", log_prefix);
-  1364		if (n == 0)
-  1365			FAIL("%s: incomplete write", log_prefix);
-  1366		if (n < 1)
-  1367			return;
-  1368	
-  1369		key = SK_PASS;
-  1370		err = xbpf_map_lookup_elem(verd_mapfd, &key, &pass);
-  1371		if (err)
-  1372			return;
-  1373		if (pass != 1)
-  1374			FAIL("%s: want pass count 1, have %d", log_prefix, pass);
-  1375	
-  1376		n = recv_timeout(mode == REDIR_INGRESS ? peer0 : cli0, &b, 1, 0, IO_TIMEOUT_SEC);
-  1377		if (n < 0)
-  1378			FAIL_ERRNO("%s: recv_timeout", log_prefix);
-  1379		if (n == 0)
-  1380			FAIL("%s: incomplete recv", log_prefix);
-  1381	}
-  1382	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+https://github.com/iproute2/iproute2/commit/2c3ebb2ae08a634615e56303d784ddb=
+366e47f04
 
