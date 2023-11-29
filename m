@@ -1,190 +1,198 @@
-Return-Path: <netdev+bounces-52018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878217FCEF9
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:18:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A45767FCF15
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CC56B2160B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 06:18:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4350B21769
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 06:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40AB6DF47;
-	Wed, 29 Nov 2023 06:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09EEB5668;
+	Wed, 29 Nov 2023 06:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hE5uJWt8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jqcrY24A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30841BD
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 22:18:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701238729; x=1732774729;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XSxGiWLuW2YH/KNH88NhaSPwZiA79OqTc3dHOZ8lp7A=;
-  b=hE5uJWt8lza4vbohKQmPea9AzhBkHFTeCp2glSdJ2Aub6cTL0WbEAds7
-   NzpuwSx00pc+xcDAsa710gx8fVR8G4bTgEtunsGS88T4zYhW/m84vUgGb
-   D0QC2g18rEqww63dGBz+qnzfYShRJViDJGrDd2yAs/hrls6ECQ+lj4fnv
-   TA8fFLmzABXfKqtfklk/yPjORfTd0PNPPYSgVYNEhB62b7jGk5Z1eEfzK
-   cqU5u/sIz0GQlEZV5ETYdCqKFlYy3jFND3hsjHtXlpfuoh4PazpL4tl0S
-   7IOMRcSm622WwqhIA7HJ1GxZJnu65jJKAKbu5OcuSdzPODxzEV2ZaBdg0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="395923993"
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="395923993"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Nov 2023 22:18:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="1100382569"
-X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
-   d="scan'208";a="1100382569"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Nov 2023 22:18:45 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 28 Nov 2023 22:18:43 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 28 Nov 2023 22:18:43 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 28 Nov 2023 22:18:42 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 28 Nov 2023 22:18:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RfDvOBd3eYcmabl0E56s40s/xrJ4rT48AHvr2fOtCC4Sijo1PRjEfguhlK5oeQtRIfXIjmXauexeZRLjgIWgvTmHxbDZ75n3xRbiDGFrxso1y8IrR3YUzEthpuHGMhj5HzM3NUu5phOl0ZSp0rxtXNjvSY8bKZ+pRi6sAAys0j34hKg4tx5MZ9/D/Gr4reMZUw077nY5ME8j3+TNg+r4jS4Cs9xB9+xUpOtThZOykFri29vTEAHSVCKAilp1H6ols8e3T/+3IpBG9qYoBH5JINv5Ph9GlMlhUvjXhxXkKHumSgC2x2UNYHNZS5Qg9HCqVUI5dqyO41kL3KsQycBMjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8C1KhRP8j1hsqm1I+INoItsIwf0+yOAPCCIrsvsh9Vw=;
- b=mfo0gW5tgI28Nuv6QkGUiYLnJ3gXcJZHrmZdxvr1vJuq0G95wjn/4WgbqubP1ekjocMLANLuL8twbaFPPej7TA16f5A16GfDKnRBhQyHNVHKOIEuAc8hoqkDU67mUwW2d0kmez/JaO4olxcUpz+D3lZ9O0VhvSm3qdTF1rzLy4AOaIPjmaUu17a5/d4cVR5dWucUpMgbEPHtucwvGKpNo7VuA9VYGvoDDvmD8rYt57ejlAJcaDH5yGJnGgfyT6KgPMZalXtRl39Ld8N7MJVZDHqCKiAoDNmAuqNnFZEdgj6PmJqCGoVT7yWkHdGLVvhid/oSTGFsmTMPps6+4OUpeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SN6PR11MB3133.namprd11.prod.outlook.com (2603:10b6:805:d2::14)
- by DS0PR11MB7878.namprd11.prod.outlook.com (2603:10b6:8:f6::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Wed, 29 Nov
- 2023 06:18:41 +0000
-Received: from SN6PR11MB3133.namprd11.prod.outlook.com
- ([fe80::adde:1fc4:3c66:de86]) by SN6PR11MB3133.namprd11.prod.outlook.com
- ([fe80::adde:1fc4:3c66:de86%3]) with mapi id 15.20.7025.022; Wed, 29 Nov 2023
- 06:18:41 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Jason
- Xing" <kernelxing@tencent.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next] i40e: remove fake support of
- rx-frames-irq
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] i40e: remove fake support of
- rx-frames-irq
-Thread-Index: AQHaIQ2MUmuoJb8dqE2ESOTlOoVg2LCQ1V8g
-Date: Wed, 29 Nov 2023 06:18:40 +0000
-Message-ID: <SN6PR11MB3133FAA05C62573FA32DD0B2BD83A@SN6PR11MB3133.namprd11.prod.outlook.com>
-References: <20231127084109.44235-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20231127084109.44235-1-kerneljasonxing@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR11MB3133:EE_|DS0PR11MB7878:EE_
-x-ms-office365-filtering-correlation-id: 87447e13-bb2b-4cb7-4964-08dbf0a3081e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: NbeLChxZZSOh0caL+E6DB9AGOUawIjgHT7vJ5NFyN3eonhquT9LEFYimUCoAvG3u4piV2ksocGAW67GQsGgYRxaglAfyNww6fNbTGNnBY6A2J5yx3Iq3TAIdwKEP0N8M//Vy5X86dSsa/9/te/oEEXVfWGCBRxz78Y0Tz0i8vN5V93v3VAlzfc8xfAuTiX9dg/RJ0cwl5hOZWs7GaXwGugh9HkQs05uG3pEEw+o1PYiW2IlGB79etMXI3y7BGfUu5lrikI97MHFdAKpnZvHD9C3viQPG0S+wgCm/V0E/GA0AxBMudis++HesD8El9zqxlx0OjPNez2OCqZyH3zk5Q74fpg70RoPScNBD2R+o6TFt1+TL8dl91USsAPJdLTFP272xfADu8S4+68O1bBQLkw5SjpJwkgju9n/3XqzSRC8P4bICF9LGuNd/jk9ATim+kRJ34vvWOxY29/kAcvZig7av129vdH2JNETJYF9o40aI/F4W6LD4gNKpIp68bYj4uAefGTiAu4hvSHrCVgwb90Vx/TqINEkcjhPz+KFcbc+LJRWCGJ016VFEqanPJ4/HDUcmg5maatImG7n+X/7SVBtebB5Rx/2ZhINa0+TDvK7k2Nwuc4fOW97FS36VOWlq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3133.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(39860400002)(376002)(366004)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(64756008)(66446008)(66476007)(54906003)(66556008)(55016003)(316002)(76116006)(110136005)(52536014)(66946007)(8936002)(8676002)(4326008)(478600001)(5660300002)(4744005)(71200400001)(83380400001)(86362001)(82960400001)(2906002)(26005)(53546011)(33656002)(9686003)(41300700001)(122000001)(38100700002)(38070700009)(6506007)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xX3U+I2uP5jlmTpWsigueLG4SfIMrT9GhKgoenTB3bZDyom7uxN7kxAUeJtA?=
- =?us-ascii?Q?q/vqre447bWyLyhY7PaUVgEWfJKiJZPMzilibsS2LQ+O2Rw2WsGfyhh1VCZv?=
- =?us-ascii?Q?iT1DVO1yHqozLJhSoO3Diw47TxqzkKfwXWGNCGWVmHAXoDtPesq5xAxQ0cOJ?=
- =?us-ascii?Q?LBv3eWI0GbFNdYOOBGmqh+HJR5PTY4DvcYez2COietKFzIOrsPgVdlhqPFco?=
- =?us-ascii?Q?fpOHyTKCgwQCdwkAPgBUDqP9LuEbtmHnYeK6N2JCOyArSbZzVUOK5Xdf8IyR?=
- =?us-ascii?Q?jMtW7H/zfoFUX5bVeG9q6bg1Q+OWnZOFtIWxMEfl5Rrs65SH3jyjID/ToA2A?=
- =?us-ascii?Q?E0+MrKPW/u0CaSeB8XtBRRXyjKeNNXg0u/oWuSpnSk6Atag+9TJd1u1rYPYR?=
- =?us-ascii?Q?rKvDVBHyeyCuonDROjJq1jbXXKzwFoBUEUIAoJVszKtqe4x11+7eNAxq5uLm?=
- =?us-ascii?Q?tbyP+JWvqnvhlb0qrF7kump0Svrr6C3K1cqKk/XS++diFG0X6q+tZMmvjq6U?=
- =?us-ascii?Q?GpgyWtLAU+rTgBy0dRaZdHKTV9WNsODjFM5OC7lM2euZe1TnMGUx9g0ghp4Z?=
- =?us-ascii?Q?Ay0BE7Q0m20Lh5cQd5X9yAU/lkt+eRSR51KC5crifHjaJAFlJQEZxCeZu8Lm?=
- =?us-ascii?Q?WmeFY8TEIsAYdeMOl9x2ev6LjVLnDK/P6LM7M8tZ1q4GP0tRYsnCErvGZOqH?=
- =?us-ascii?Q?7jC98tr5Zi7+k0Zv0p9cQkqapTDqPRs8wrrtKj+v5t2KcleHg/7rTIhrcSZ5?=
- =?us-ascii?Q?kkWsrG3COW7+Ib9kLlZgzfeGkhzzef+OPIgqmHZahjDC+vXLokeGgK1sz1ED?=
- =?us-ascii?Q?SkS+75fsIeUuEKvLTLpWtpSCw51kKVyg4hdaykswtpS2yepm2PHpzfb+tzBw?=
- =?us-ascii?Q?GMeQGPkZU5ZAfSVTBgYP8ujKfOtKyQm2VSbmjEny+aZzy60LRE9ugftg8OGW?=
- =?us-ascii?Q?/IrsH856LsB/XQc2wAv6zJPUQ04T6hmK1wRtaUGUSe5L0qGPHWgarN8xIned?=
- =?us-ascii?Q?YFL2OOvfABG/IFnT0r3TSJf+OcOB/gCDL3KZhIKwNsGiw7Ss+YS7IEGHYivx?=
- =?us-ascii?Q?8u/UHVqTotE/E/FcWhDWgmgVps4FISJVMu9IFc7FNcy7qu28DTZgvq3WAeat?=
- =?us-ascii?Q?VpjNnGaulcg4ClmEB6Qw1Hd+cPdYv4AK07YhrNkpp2nc4nzhItGOdKu+MLs6?=
- =?us-ascii?Q?5XdH+IcsHac+Ce8VWD1XI+IrQ5GPFsgsxI0WHDve+ANxA+ApfIoL/Iv4xUD9?=
- =?us-ascii?Q?oFPBLiNOhNhSOM/IU7E2NrLT5u17ZeHBGKCHkMM18jjy+NNUvOXVjCu8oHyo?=
- =?us-ascii?Q?Zwc7Lt9oD7Kpg10cY9i+QsTVfLG0m1Uh+zhSHY4Wv4Vk3o0Pf2NAdY68p6yW?=
- =?us-ascii?Q?cMDSfqf50NQe2BquFMcIaImCNKfLzSGQOUz6Vq7X+5nWeRjGq0Q6oLJ2knJ2?=
- =?us-ascii?Q?6yLTS3Qdq+LopW18GGisapfzIAj3M4JifIhOa8HE2UzUTDjg6r6DI+usGhK6?=
- =?us-ascii?Q?EKQrgXp0p94RjByLUA56wEii7FkFCcx01c7MlsfHNsC+JNf+a+GZgga+b9ny?=
- =?us-ascii?Q?HJr5rVgLn0qolyoG3WZ+DXZXvFQEgyvA4qkZXORtcEJsZQgAy85yHbbD51dI?=
- =?us-ascii?Q?hZAIY1v7EyvjogRf5IWFZWA=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8147198;
+	Tue, 28 Nov 2023 22:31:33 -0800 (PST)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT6Rr0G003878;
+	Wed, 29 Nov 2023 06:31:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=SUZRHLlSRdF3IEamOtrEvhT6fD/d+NFPZWKQqCzpmbA=;
+ b=jqcrY24AZWqR+CF9jnuvLLNVfL/dj+NKnK+BKSQlsvRD9WXLWyTduGByOaivyNpZWHen
+ CVv1xD+KUkRLJqsyE5fszAQB8DVigbgjHakMQlgLHAku4fyudxgzy52aW7mF/V8Izbvq
+ qXdReb5nbMph+fnCy3Cb6uox/ZvKn2lA5xM2gSYhcAxPxfYVieXFJ13XYqCqKKJR5bFy
+ wpmtLZVjF8Qpaahlxqu61jW+b78V3n44ErH3+VRrMvJ03poyWolGYbikVUIW1/EEBxUZ
+ MMgMcrjL8Q+ngW0zx31r6g1fLEumly+mhF6LYnEsxNxt6J6sJ8bGuvXZCem5t0lbihQO aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up02381tx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 06:31:05 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AT6UMA8009948;
+	Wed, 29 Nov 2023 06:31:04 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up02381tf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 06:31:04 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT5G5sb028329;
+	Wed, 29 Nov 2023 06:31:04 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukv8nng8y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 06:31:03 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AT6V1e845744780
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Nov 2023 06:31:02 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D55EA2004D;
+	Wed, 29 Nov 2023 06:31:01 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ABBC820040;
+	Wed, 29 Nov 2023 06:31:01 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.203.35])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 29 Nov 2023 06:31:01 +0000 (GMT)
+Date: Wed, 29 Nov 2023 07:31:01 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
+        jasowang@redhat.com
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <ZWbapeL34Z8AMR5f@DESKTOP-2CCOB1S.>
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
+ <20231117123759.GP8262@noisy.programming.kicks-ass.net>
+ <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
+ <ZVyt4UU9+XxunIP7@DESKTOP-2CCOB1S.>
+ <20231122100016.GO8262@noisy.programming.kicks-ass.net>
+ <6564a012.c80a0220.adb78.f0e4SMTPIN_ADDED_BROKEN@mx.google.com>
+ <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3133.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87447e13-bb2b-4cb7-4964-08dbf0a3081e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Nov 2023 06:18:40.9449
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ymVRu0Wm0vFtRPU7m7AwHB5RYr5rgCgmQG7xZBzfkLwu4FIeMryya9CUZyEd+NDYZT3fs38qG5G7JQeVHzmBBJpJCNBmAI1uUfbHNnsncoJXVyKdTXNcuih4l2B/oGBl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7878
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4110c79-d64f-49bd-9f69-0a94369b5e86@bytedance.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MWQRo9A2y_8bYd4lGwrLhaqCYQTrINad
+X-Proofpoint-GUID: mTSe3wItw0uj9WgQnE43wzWgGLmNSKJT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_03,2023-11-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ bulkscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311290046
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
-ason Xing
-> Sent: Monday, November 27, 2023 2:11 PM
-> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
-thony.l.nguyen@intel.com>; davem@davemloft.net; edumazet@google.com; kuba@k=
-ernel.org; pabeni@redhat.com
-> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; kerneljason=
-xing@gmail.com; Jason Xing <kernelxing@tencent.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next] i40e: remove fake support of =
-rx-frames-irq
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Since we never support this feature for I40E driver, we don't have to
-> display the value when using 'ethtool -c eth0'.
->
-> Before this patch applied, the rx-frames-irq is 256 which is consistent
-> with tx-frames-irq. Apparently it could mislead users.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
+On Tue, Nov 28, 2023 at 04:55:11PM +0800, Abel Wu wrote:
+> On 11/27/23 9:56 PM, Tobias Huschle Wrote:
+> > On Wed, Nov 22, 2023 at 11:00:16AM +0100, Peter Zijlstra wrote:
+> > > On Tue, Nov 21, 2023 at 02:17:21PM +0100, Tobias Huschle wrote:
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+[...]
 
+> > - At depth 4, the cgroup shows the observed vruntime value which is smaller
+> >    by a factor of 20, but depth 0 seems to be running with values of the
+> >    correct magnitude.
+> 
+> A child is running means its parent also being the cfs->curr, but
+> not vice versa if there are more than one child.
+> 
+> > - cgroup at depth 0 has zero lag, with higher depth, there are large lag
+> >    values (as observed 606.338267 onwards)
+> 
+> These values of se->vlag means 'run this entity to parity' to avoid
+> excess context switch, which is what RUN_TO_PARITY does, or nothing
+> when !RUN_TO_PARITY. In short, se->vlag is not vlag when se->on_rq.
+> 
+
+Thanks for clarifying that. This makes things clearer to me.
+
+> > 
+> > Now the following occurs, triggered by the vhost:
+> > - The kworker gets placed again with:
+> >                      vruntime      deadline
+> >     cgroup        56117619190   57650477291 -> depth 0, last known value
+> >     kworker       56117885776   56120885776 -> lag of -725
+> > - vhost continues executing and updates its vruntime accordingly, here
+> >    I would need to enhance the trace to also print the vruntimes of the
+> >    parent sched_entities to see the progress of their vruntime/deadline/lag
+> >    values as well
+> > - It is a bit irritating that the EEVDF algorithm would not pick the kworker
+> >    over the cgroup as its deadline is smaller.
+> >    But, the kworker has negative lag, which might cause EEVDF to not pick
+> >    the kworker.
+> >    The cgroup at depth 0 has no lag, all deeper layers have a significantly
+> >    positve lag (last known values, might have changed in the meantime).
+> >    At this point I would see the option that the vhost task is stuck
+> >    somewhere or EEVDF just does not see the kworker as a eligible option.
+> 
+> IMHO such lag should not introduce that long delay. Can you run the
+> test again with NEXT_BUDDY disabled?
+
+I added a trace event to the next buddy path, it does not get triggered, so I'd 
+assume that no buddies are selected.
+
+> 
+> > 
+> > - Once the vhost is migrated off the cpu, the update_entity_lag function
+> >    works with the following values at 606.467022: sched_update
+> >    For the cgroup at depth 0
+> >    - vruntime = 57104166665 --> this is in line with the amount of new timeslices
+> >                                 vhost got assigned while the kworker was waiting
+> >    - vlag     =   -62439022 --> the scheduler knows that the cgroup was
+> >                                 overconsuming, but no runtime for the kworker
+> >    For the cfs_rq we have
+> >    - min_vruntime =  56117885776 --> this matches the vruntime of the kworker
+> >    - avg_vruntime = 161750065796 --> this is rather large in comparison, but I
+> >                                      might access this value at a bad time
+> 
+> Use avg_vruntime() instead.
+
+Fair.
+
+[...]
+
+> > 
+> > ######################### full trace #########################
+> > 
+> > sched_bestvnode: v=vruntime,d=deadline,l=vlag,md=min_deadline,dp=depth
+> > --> during __pick_eevdf, prints values for best and the first node loop variable, second loop is never executed
+> > 
+> > sched_place/sched_update: sev=se->vruntime,sed=se->deadline,sev=se->vlag,avg=cfs_rq->avg_vruntime,min=cfs_rq->min_vruntime
+> 
+> It would be better replace cfs_rq->avg_vruntime with avg_vruntime().
+> Although we can get real @avg by (vruntime + vlag), I am not sure
+> vlag (@lag in trace) is se->vlag or the local variable in the place
+> function which is scaled and no longer be the true vlag.
+> 
+
+Oh my bad, sev is the vlag value of the sched_entity, lag is the local variable.
+
+[...]
+
+> >      vhost-2931-2953    [013] d....   606.338313: sched_wakeup: comm=kworker/13:1 pid=168 prio=120 target_cpu=013
+> > --> kworker set to runnable, but vhost keeps on executing
+> 
+> What are the weights of the two entities?
+
+I'll do another run and look at those values.
+
+[...]
 
