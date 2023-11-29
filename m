@@ -1,135 +1,193 @@
-Return-Path: <netdev+bounces-52133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0EA17FD712
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:48:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E807FD71C
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3C81C209A8
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:48:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23DF9B20CC9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F261D52E;
-	Wed, 29 Nov 2023 12:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FC611CA8;
+	Wed, 29 Nov 2023 12:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bxkMzhdk"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D02A95;
-	Wed, 29 Nov 2023 04:48:24 -0800 (PST)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3ATClVJf92763797, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3ATClVJf92763797
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 29 Nov 2023 20:47:32 +0800
-Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Wed, 29 Nov 2023 20:47:32 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 29 Nov 2023 20:47:31 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Wed, 29 Nov 2023 20:47:31 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Douglas Anderson <dianders@chromium.org>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-CC: Laura Nao <laura.nao@collabora.com>, Edward Hill <ecgh@chromium.org>,
-        Alan
- Stern <stern@rowland.harvard.edu>,
-        Grant Grundler <grundler@chromium.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        Simon Horman
-	<horms@kernel.org>,
-        =?iso-8859-1?Q?Bj=F8rn_Mork?= <bjorn@mork.no>,
-        Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net v2 2/5] r8152: Add RTL8152_INACCESSIBLE checks to more loops
-Thread-Topic: [PATCH net v2 2/5] r8152: Add RTL8152_INACCESSIBLE checks to
- more loops
-Thread-Index: AQHaIkOFTo2WdNHKX0+EoLHKjZ89lbCRNJBw
-Date: Wed, 29 Nov 2023 12:47:31 +0000
-Message-ID: <d6f843b90b7146059332c82159ba79ff@realtek.com>
-References: <20231128133811.net.v2.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
- <20231128133811.net.v2.2.I79c8a6c8cafd89979af5407d77a6eda589833dca@changeid>
-In-Reply-To: <20231128133811.net.v2.2.I79c8a6c8cafd89979af5407d77a6eda589833dca@changeid>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8263310C3;
+	Wed, 29 Nov 2023 04:50:18 -0800 (PST)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATCgY8c029708;
+	Wed, 29 Nov 2023 12:50:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : from : subject : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EzA4WwZlpTwtLpc5qn5yjI1HnJlLlVE5vgC5PGKaOBM=;
+ b=bxkMzhdklcpQFW3l91VpLaA8ddFD/8n0EfkLQxnljtCN9YXAJr4LXfElHz3o/IcoMYQE
+ 0+Y3GBmvkhW+3n5DwX2aOO1iOoLKmTTagqZWfTTt1OwHTMX2MYp5UDMXBcQsvFLmrx0n
+ ihIURn8y02UODoCX6ncOcGsHKgD2I9VK/HMLpJkZbIZSto0WhU9axCC98HvPnimfo7Jw
+ IM/W/htJbco8MHDAwHM8wNdIL1GW/cl/xE7TIgTpuBMx+gZlfo1xSRYY1ZTcLdtBAoM8
+ QS+sBS8vQJOk0H3eTgNnUsZdWhHA1BP8S+5xiKq5yAXoqgMbK4gkkARXyQpaYlKyP1Wr qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up5hn09b5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 12:50:15 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3ATChIZT032157;
+	Wed, 29 Nov 2023 12:50:14 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3up5hn099h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 12:50:14 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATB4D6r018149;
+	Wed, 29 Nov 2023 12:50:13 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukv8nq77u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 12:50:13 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3ATCoCKF17826364
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 29 Nov 2023 12:50:12 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 37EA158065;
+	Wed, 29 Nov 2023 12:50:12 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3830C58063;
+	Wed, 29 Nov 2023 12:50:09 +0000 (GMT)
+Received: from [9.171.77.152] (unknown [9.171.77.152])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 29 Nov 2023 12:50:09 +0000 (GMT)
+Message-ID: <298442c7-40f0-42ab-b5cb-07603d8689f5@linux.ibm.com>
+Date: Wed, 29 Nov 2023 13:50:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla Thunderbird
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+Subject: Re: [PATCH net-next v2 1/7] net/smc: Rename some variable 'fce' to
+ 'fce_v2x' for clarity
+To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1700836935-23819-1-git-send-email-guwen@linux.alibaba.com>
+ <1700836935-23819-2-git-send-email-guwen@linux.alibaba.com>
+Content-Language: en-GB
+In-Reply-To: <1700836935-23819-2-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2r_HYvL8MltjZR7VOzGrzQ4JLhEgCung
+X-Proofpoint-GUID: diyUylKDQAoWfFRPB-qKbn5Dw4u8iuRo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_09,2023-11-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 mlxscore=0 impostorscore=0
+ bulkscore=0 phishscore=0 mlxlogscore=999 suspectscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311290096
 
-Douglas Anderson <dianders@chromium.org>
-> Sent: Wednesday, November 29, 2023 5:38 AM
-[...]
-> @@ -3000,6 +3000,8 @@ static void rtl8152_nic_reset(struct r8152 *tp)
->                 ocp_write_byte(tp, MCU_TYPE_PLA, PLA_CR, CR_RST);
->=20
->                 for (i =3D 0; i < 1000; i++) {
-> +                       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                               return;
->                         if (!(ocp_read_byte(tp, MCU_TYPE_PLA, PLA_CR) & C=
-R_RST))
->                                 break;
->                         usleep_range(100, 400);
-> @@ -3329,6 +3331,8 @@ static void rtl_disable(struct r8152 *tp)
->         rxdy_gated_en(tp, true);
->=20
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
 
-I think you have to replace return with break.
-Otherwise, rtl_stop_rx() wouldn't be called.
-And, you may free the memory which is using, when rtl8152_close () is calle=
-d.
 
->                 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL=
-);
->                 if ((ocp_data & FIFO_EMPTY) =3D=3D FIFO_EMPTY)
->                         break;
-> @@ -3336,6 +3340,8 @@ static void rtl_disable(struct r8152 *tp)
->         }
->=20
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
+On 24.11.23 15:42, Wen Gu wrote:
+> Rename some smc_clc_first_contact_ext_v2x type variables to 'fce_v2x'
+> to distinguish them from smc_clc_first_contact_ext type variables.
+> 
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+>   net/smc/smc_clc.c | 26 +++++++++++++-------------
+>   1 file changed, 13 insertions(+), 13 deletions(-)
+> 
+> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+> index 0fda515..c41a249 100644
+> --- a/net/smc/smc_clc.c
+> +++ b/net/smc/smc_clc.c
+> @@ -418,15 +418,15 @@ static bool smc_clc_msg_prop_valid(struct smc_clc_msg_proposal *pclc)
+>   	return true;
+>   }
+>   
+> -static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce,
+> +static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce_v2x,
+>   			    struct smc_init_info *ini)
 
-Same as above.
-
->                 if (ocp_read_word(tp, MCU_TYPE_PLA, PLA_TCR0) & TCR0_TX_E=
-MPTY)
->                         break;
->                 usleep_range(1000, 2000);
-> @@ -5499,6 +5505,8 @@ static void wait_oob_link_list_ready(struct r8152 *=
-tp)
->         int i;
->=20
->         for (i =3D 0; i < 1000; i++) {
-> +               if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-> +                       return;
->                 ocp_data =3D ocp_read_byte(tp, MCU_TYPE_PLA, PLA_OOB_CTRL=
-);
->                 if (ocp_data & LINK_LIST_READY)
->                         break;
-> --
-
-Best Regards,
-Hayes
-
+Since this function is only used by v2.x, IMO, this function name could 
+also be changed to e.g. smc_clc_fill_fce_v2x.
+>   {
+> -	int ret = sizeof(*fce);
+> +	int ret = sizeof(*fce_v2x);
+>   
+> -	memset(fce, 0, sizeof(*fce));
+> -	fce->fce_v2_base.os_type = SMC_CLC_OS_LINUX;
+> -	fce->fce_v2_base.release = ini->release_nr;
+> -	memcpy(fce->fce_v2_base.hostname, smc_hostname, sizeof(smc_hostname));
+> +	memset(fce_v2x, 0, sizeof(*fce_v2x));
+> +	fce_v2x->fce_v2_base.os_type = SMC_CLC_OS_LINUX;
+> +	fce_v2x->fce_v2_base.release = ini->release_nr;
+> +	memcpy(fce_v2x->fce_v2_base.hostname, smc_hostname, sizeof(smc_hostname));
+>   	if (ini->is_smcd && ini->release_nr < SMC_RELEASE_1) {
+>   		ret = sizeof(struct smc_clc_first_contact_ext);
+>   		goto out;
+> @@ -434,8 +434,8 @@ static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce,
+>   
+>   	if (ini->release_nr >= SMC_RELEASE_1) {
+>   		if (!ini->is_smcd) {
+> -			fce->max_conns = ini->max_conns;
+> -			fce->max_links = ini->max_links;
+> +			fce_v2x->max_conns = ini->max_conns;
+> +			fce_v2x->max_links = ini->max_links;
+>   		}
+>   	}
+>   
+> @@ -1003,8 +1003,8 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
+>   				       int first_contact, u8 version,
+>   				       u8 *eid, struct smc_init_info *ini)
+>   {
+> +	struct smc_clc_first_contact_ext_v2x fce_v2x;
+>   	struct smc_connection *conn = &smc->conn;
+> -	struct smc_clc_first_contact_ext_v2x fce;
+>   	struct smc_clc_msg_accept_confirm *clc;
+>   	struct smc_clc_fce_gid_ext gle;
+>   	struct smc_clc_msg_trail trl;
+> @@ -1037,7 +1037,7 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
+>   				memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
+>   			len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
+>   			if (first_contact) {
+> -				fce_len = smc_clc_fill_fce(&fce, ini);
+> +				fce_len = smc_clc_fill_fce(&fce_v2x, ini);
+>   				len += fce_len;
+>   			}
+>   			clc_v2->hdr.length = htons(len);
+> @@ -1083,9 +1083,9 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
+>   				memcpy(clc_v2->r1.eid, eid, SMC_MAX_EID_LEN);
+>   			len = SMCR_CLC_ACCEPT_CONFIRM_LEN_V2;
+>   			if (first_contact) {
+> -				fce_len = smc_clc_fill_fce(&fce, ini);
+> +				fce_len = smc_clc_fill_fce(&fce_v2x, ini);
+>   				len += fce_len;
+> -				fce.fce_v2_base.v2_direct = !link->lgr->uses_gateway;
+> +				fce_v2x.fce_v2_base.v2_direct = !link->lgr->uses_gateway;
+>   				if (clc->hdr.type == SMC_CLC_CONFIRM) {
+>   					memset(&gle, 0, sizeof(gle));
+>   					gle.gid_cnt = ini->smcrv2.gidlist.len;
+> @@ -1112,7 +1112,7 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
+>   						SMCR_CLC_ACCEPT_CONFIRM_LEN) -
+>   				   sizeof(trl);
+>   	if (version > SMC_V1 && first_contact) {
+> -		vec[i].iov_base = &fce;
+> +		vec[i].iov_base = &fce_v2x;
+>   		vec[i++].iov_len = fce_len;
+>   		if (!conn->lgr->is_smcd) {
+>   			if (clc->hdr.type == SMC_CLC_CONFIRM) {
 
