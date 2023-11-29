@@ -1,141 +1,200 @@
-Return-Path: <netdev+bounces-52103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABC07FD4DB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:04:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E937FD4E3
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B78282852
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:04:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A39291C20917
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AD01BDE1;
-	Wed, 29 Nov 2023 11:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PqNEvVpW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21181BDC9;
+	Wed, 29 Nov 2023 11:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C2E95;
-	Wed, 29 Nov 2023 03:04:09 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40b4f6006d5so11968395e9.1;
-        Wed, 29 Nov 2023 03:04:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701255848; x=1701860648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rjk+/1D9AF+cQ5xDbcmA1MBP/vuhlv65HDhCtKVSoZk=;
-        b=PqNEvVpW911WnIT3JULjB3wgDwpK5ePh+wNSB/GmLnEWH5osYydhpBvsbQ7/Xz5ocH
-         dc1pRYehdHP34IIxLKWnIdSZQvpF5/k9/9LizgWR/vCDrynO0khPxNsOvtB5FavVVXxn
-         QCaav1jar7DjpwuVnqW4zHZJ8QqG6xX3KUvI44aWStupV1hpXK7hXkf78Dnk5hj6qW+u
-         MEX2nw/5mB9MYjLyyeDNaUwzJbdBg1Wa0QkEEEWcy4twANRwlDTCSsr0ugk7MWyIz9dS
-         /96OyLGVbvRQJjYMNhb8v2EaLvkKYAKz914EBjUYoTRdJzmLjQc+YqHpJ81clQWLwUHh
-         4N3g==
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5169710F0
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:06:30 -0800 (PST)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6cdce6455c5so1160983b3a.2
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:06:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701255848; x=1701860648;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rjk+/1D9AF+cQ5xDbcmA1MBP/vuhlv65HDhCtKVSoZk=;
-        b=CZdtv/P88MJHWt3eFVf4ghsBXNWjcrtDB3gKuTxGh1bWsfb17P0r8/unxqooJGPoJY
-         TxPksoLVzXrVexAqAkAQUerf9odN1TjCHSK9DPv7TwypeWtyhmKDRKq26IQ8ehvdvcp8
-         vUiTlUL/IAzoizPfeNussjbdWvCOqyWR8jsJJZvSZA6uMsSjRqf8FOr6ViWgLJ5JFfsq
-         +joKQ2ypCoTkhOQalpDvBe2sGPDe3GidY1eArPseQ0BIfcTmVBSoXA+uYJRbFuFJkvsf
-         BrxeqB0QuRfMC7Z2W4UGYP9v3vXt6hYAJb5gcgO11bMUI8uh3UQZu/tKaqvPIV60vgnz
-         e2Iw==
-X-Gm-Message-State: AOJu0YyNS4pJo5Y2TfDg4Nf78oaqnuhx92Wdl5GAfosgR58LQy6z+IxB
-	fsA2gnWtehnFHDUD/gRqtXg=
-X-Google-Smtp-Source: AGHT+IEBAvm1wqVWEUe9pB+o21b32WHVSL4QBMcx54XwI8du9Wk6l+5lAsEg+hPmovN1+6jfSLOv/g==
-X-Received: by 2002:a05:600c:5125:b0:40b:3dae:1ff6 with SMTP id o37-20020a05600c512500b0040b3dae1ff6mr8791416wms.14.1701255847651;
-        Wed, 29 Nov 2023 03:04:07 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id q4-20020adfea04000000b003296b488961sm17464741wrm.31.2023.11.29.03.04.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 03:04:07 -0800 (PST)
-Message-ID: <65671aa7.df0a0220.2a628.a3b9@mx.google.com>
-X-Google-Original-Message-ID: <ZWcapJKrMLLmIVZS@Ansuel-xps.>
-Date: Wed, 29 Nov 2023 12:04:04 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 08/14] net: phy: at803x: drop specific PHY id
- check from cable test functions
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-9-ansuelsmth@gmail.com>
- <ZWcGn7KVSpsN/1Ee@shell.armlinux.org.uk>
- <656708a8.df0a0220.28d76.9307@mx.google.com>
- <ZWcZGO1HWxJnzPrk@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1701255990; x=1701860790;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FNcMZRfK5zgSkYRxKm3IWkMVA602J70U7t3gF/kWgv4=;
+        b=QtZCpPm6TIX3BfngIsLBbGV0XH37SdpUyvplRNKfKLiXqktiWfEK7o3E2FjJDUo3ZJ
+         FItJ9xRCBMLiAF8422VgflLRlsT+OKxFimmbusoN//COsngND0vz5843BfIE1+LnP8mQ
+         c4yG5Mj4MFXO+5GY4qpJCielYSWlqIUd0pIvLPUQrrCqvkbAWqOHC+7+eEtdR6WTLmQn
+         X2nyaZ7dXVVArWIFDrNTuJaq2PIyPZj0bd8jlYFTdbGLDi7Hf5+v9WtWqmFn0XFbbAf9
+         dLopGV7UR/Cy678zwIaljsfTEzsApzuzOQvIsZsDoF233vwaJMYUtJ2we+Prl6dOW02B
+         mt0w==
+X-Gm-Message-State: AOJu0YyMoj+okNmbrOoXGRIbhe8fhjQKsA+b6HnGg9E0Xk5bkL45bm2s
+	xj+PnfzmNIIzB7OOCpK+HVh/0yBFmafQN0wYPztUbOejipbN
+X-Google-Smtp-Source: AGHT+IHLfffse4jQx6iaFyv9C9sBzR07d1OYb6/VHpbXbAfl3ZqbHaYlCF1JQUmbinqk2/Pj5vL7v1xqWzSgyXkJlzUltP9FsDHe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWcZGO1HWxJnzPrk@shell.armlinux.org.uk>
+X-Received: by 2002:a05:6a00:3929:b0:6c6:aaa4:5da8 with SMTP id
+ fh41-20020a056a00392900b006c6aaa45da8mr5057045pfb.3.1701255989866; Wed, 29
+ Nov 2023 03:06:29 -0800 (PST)
+Date: Wed, 29 Nov 2023 03:06:29 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f2b6b0060b488674@google.com>
+Subject: [syzbot] [net?] general protection fault in page_pool_unlist
+From: syzbot <syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com>
+To: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 29, 2023 at 10:57:28AM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 29, 2023 at 10:47:18AM +0100, Christian Marangi wrote:
-> > On Wed, Nov 29, 2023 at 09:38:39AM +0000, Russell King (Oracle) wrote:
-> > > On Wed, Nov 29, 2023 at 03:12:13AM +0100, Christian Marangi wrote:
-> > > > @@ -1310,10 +1302,6 @@ static int at803x_cable_test_start(struct phy_device *phydev)
-> > > >  	 */
-> > > >  	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
-> > > >  	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
-> > > > -	if (phydev->phy_id != ATH9331_PHY_ID &&
-> > > > -	    phydev->phy_id != ATH8032_PHY_ID &&
-> > > > -	    phydev->phy_id != QCA9561_PHY_ID)
-> > > > -		phy_write(phydev, MII_CTRL1000, 0);
-> > > ...
-> > > > +static int at8031_cable_test_start(struct phy_device *phydev)
-> > > > +{
-> > > > +	at803x_cable_test_start(phydev);
-> > > > +	phy_write(phydev, MII_CTRL1000, 0);
-> > > 
-> > > I don't think this is a safe change - same reasons as given on a
-> > > previous patch. You can't randomly reorder register writes like this.
-> > >
-> > 
-> > Actually for this the order is keeped. Generic function is called and
-> > for at8031 MII_CTRL1000 is called on top of that.
-> 
-> Okay, but I don't like it. I would prefer this to be:
-> 
-> static void at803x_cable_test_autoneg(struct phy_device *phydev)
-> {
-> 	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
-> 	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
-> }
-> 
-> static int at803x_cable_test_start(struct phy_device *phydev)
-> {
-> 	at803x_cable_test_autoneg(phydev);
-> 	return 0;
-> }
-> 
-> static int at8031_cable_test_start(struct phy_device *phydev)
-> {
-> 	at803x_cable_test_autoneg(phydev);
-> 	phy_write(phydev, MII_CTRL1000, 0);
-> 	return 0;
-> }
-> 
-> which makes it more explicit what is going on here. Also a comment
-> above the function stating that it's for AR8031 _and_ AR8035 would
-> be useful.
->
+Hello,
 
-Much cleaner thanks for the hint!
+syzbot found the following issue on:
 
--- 
-	Ansuel
+HEAD commit:    a379972973a8 Merge branch 'net-page_pool-add-netlink-based..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1421b7ece80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=abf6d5a82dab01fe
+dashboard link: https://syzkaller.appspot.com/bug?extid=f9f8efb58a4db2ca98d0
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=117d9e64e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16826ec4e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fc5f22d6faa1/disk-a3799729.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e535e5c28162/vmlinux-a3799729.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/32eefbbcadbb/bzImage-a3799729.xz
+
+The issue was bisected to:
+
+commit 083772c9f972dcc248913b52a0dec1025baa1e16
+Author: Jakub Kicinski <kuba@kernel.org>
+Date:   Sun Nov 26 23:07:30 2023 +0000
+
+    net: page_pool: record pools per netdev
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10c72162e80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12c72162e80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14c72162e80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com
+Fixes: 083772c9f972 ("net: page_pool: record pools per netdev")
+
+Illegal XDP return value 4294946546 on prog  (id 2) dev N/A, expect packet loss!
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 5064 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkaller-00533-ga379972973a8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
+RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
+RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
+Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 f0 06 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
+RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
+RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
+R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
+R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
+FS:  000055555717a380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000002555398 CR3: 0000000025044000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __page_pool_destroy net/core/page_pool.c:851 [inline]
+ page_pool_release+0x507/0x6b0 net/core/page_pool.c:891
+ page_pool_destroy+0x1ac/0x4c0 net/core/page_pool.c:956
+ xdp_test_run_teardown net/bpf/test_run.c:216 [inline]
+ bpf_test_run_xdp_live+0x1578/0x1af0 net/bpf/test_run.c:388
+ bpf_prog_test_run_xdp+0x827/0x1530 net/bpf/test_run.c:1254
+ bpf_prog_test_run kernel/bpf/syscall.c:4041 [inline]
+ __sys_bpf+0x11bf/0x4920 kernel/bpf/syscall.c:5402
+ __do_sys_bpf kernel/bpf/syscall.c:5488 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5486 [inline]
+ __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5486
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f616195a4a9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe858ce5c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007ffe858ce798 RCX: 00007f616195a4a9
+RDX: 0000000000000048 RSI: 0000000020000340 RDI: 000000000000000a
+RBP: 00007f61619cd610 R08: 0000000000000000 R09: 00007ffe858ce798
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffe858ce788 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
+RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
+RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
+Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 f0 06 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
+RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
+RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
+R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
+R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
+FS:  000055555717a380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2640df1b10 CR3: 0000000025044000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	df 48 89             	fisttps -0x77(%rax)
+   3:	fa                   	cli
+   4:	48 c1 ea 03          	shr    $0x3,%rdx
+   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   c:	0f 85 90 00 00 00    	jne    0xa2
+  12:	4c 8b a3 f0 06 00 00 	mov    0x6f0(%rbx),%r12
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	4c 89 e2             	mov    %r12,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	75 68                	jne    0x98
+  30:	48 85 ed             	test   %rbp,%rbp
+  33:	49 89 2c 24          	mov    %rbp,(%r12)
+  37:	74 24                	je     0x5d
+  39:	e8 1b ca 07 f9       	call   0xf907ca59
+  3e:	48                   	rex.W
+  3f:	8d                   	.byte 0x8d
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
