@@ -1,199 +1,173 @@
-Return-Path: <netdev+bounces-52257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D5F7FE07C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:52:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1437FE09E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:58:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 050B6B210B1
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:52:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 369C7282722
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4D75EE78;
-	Wed, 29 Nov 2023 19:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D618A5EE78;
+	Wed, 29 Nov 2023 19:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="UzEraR6U"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="D68pgc9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from GBR01-LO4-obe.outbound.protection.outlook.com (mail-lo4gbr01on2091.outbound.protection.outlook.com [40.107.122.91])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF60B12F;
-	Wed, 29 Nov 2023 11:51:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a/5KIlnpQXEloe/zINoaTja3eHQ3HL+TaebwtSZwhlOdxEE1liqv/NJrEWXoSi5WIsS1+pQoltHZDODMplp4FjUndtg1ydPB4OCtKCftdJzRXyMg/8UphJ4m+BVmXkQGIPDdJRR0H8zYUOuZN9ce8XQSs+NhkYIrnBomkqNXXG6265W7/rxvFOQAcltAZ6Oyjze8g78762AzdGsuAziXtDQPgvfU85of1tGK6SlaEmoeMwGlClczGijjEfXKkvQSHBFotF3izEdQuzjbsd9Zcd+c/P8y+qG6OR+cm7r1+BGBAkFUl0KwoK3THAZKKhG0b4STrvM1ALddG/OOehK3Rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PWas+LkLT23m2THUxnsP+3eiESrni88ERQIa4tvDsZ4=;
- b=CCmuLiZMU0DZptoyf7a0S4x9XkdQlrrvOi0ktcDQH0Mv+OMi53EvR7OO++ojW708891p2567v/vDpfFTBVRKcSkS1mZGrfz/+qSj12eaNQk2yoBp98hRcl/bJHScYT+ajGoKpFAD+25MNtwFG+at4FfOphi7P6+iNmkt/9/ptVtT834f7OhBOrrig8lXZLYNHTyeHVaLl2SpxpTdryS/CTSGEMquKUBmZhxooOxrK+VBsow49y1AuIiTg30Znep4hi6pPPTDhywQ3xAe0BHah2ZDeBrh4EtSMjhdsIjLbcShmmfE39sYmIO/pUCUXrIhmbanI92XZoZviQe4VIjDog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PWas+LkLT23m2THUxnsP+3eiESrni88ERQIa4tvDsZ4=;
- b=UzEraR6UcfEqIlRDHCGGFygkgCIpEBBkvcCBVHgIKbPHT39IAUJ7NvQerRE+Ym4RIYJkUECattY4o1sFfPOKOxQsHitSrGwga6JK65zqvpK+z/UZ5zbBPX9unbC7gC5Hla86H5I5xRjDY/yxTPCNNh3iewOUIaN3xlPJ9VjA5NE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
- by LO6P265MB6015.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:2a4::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Wed, 29 Nov
- 2023 19:51:50 +0000
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::ec07:aa7e:ffbc:ba47]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::ec07:aa7e:ffbc:ba47%4]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
- 19:51:50 +0000
-Date: Wed, 29 Nov 2023 19:51:45 +0000
-From: Gary Guo <gary@garyguo.net>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
- wedsonaf@gmail.com, aliceryhl@google.com, boqun.feng@gmail.com
-Subject: Re: [PATCH net-next v8 1/4] rust: core abstractions for network PHY
- drivers
-Message-ID: <20231129195145.69ff5cf6.gary@garyguo.net>
-In-Reply-To: <20231123050412.1012252-2-fujita.tomonori@gmail.com>
-References: <20231123050412.1012252-1-fujita.tomonori@gmail.com>
- <20231123050412.1012252-2-fujita.tomonori@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO0P265CA0009.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:355::20) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:253::10)
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF43F12F
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 11:58:04 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7b3854d7270so3155739f.3
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 11:58:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1701287884; x=1701892684; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T7FtbM3uCv3lCJgze8i3ailyZ7n1KeZA4b7KaXBphuU=;
+        b=D68pgc9B5OHrjD1qFxlZF5KKwZTpaFtOuDdem9vOAEmj3woSoMeR9kx7SxpaJvVF/r
+         UPdhWf0zPl8gFwtp6eMkDL3nu8HqNhn+OJT4QujIvh+vhbfS2PUXJTPS8IDfYXleUtZV
+         TiTEN8WhpRJK67In+WzADbn6+HWJrS7O5IiV457RvkAvucMxjtKSLqLZx42wMc5U4z9B
+         SunoMmnH+FoA9I69ULeUb6E02yQgVaVJExKtprI4Zo/8A86ffnwiEIbbp6O0u5J1ACd8
+         cd8TY7djoThD15bz3B4mnTjzQL/84P7VX7I6pIDtNqgze05roCP3gHoHk+MBUH7qu8u4
+         HBRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701287884; x=1701892684;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T7FtbM3uCv3lCJgze8i3ailyZ7n1KeZA4b7KaXBphuU=;
+        b=a+Pr3BDbU5j7Qsc8ibHYdb33tevJT54KxI6UdTTRoiG9IHpE9+GOLDx/6RQ7k6I1XK
+         czD0sNplqBBpq32YK9h5hkyJYcZ/bNVnxBBbk6qeelUI8e0fwp+CYfnp55nhxTiVzr+g
+         UIf3z6lF1kd8TroN4ZBO8HbjErQg9PokGKpfVTkJucS8LpOUD4BtM1plOVAUXhDpKztO
+         EaSurfZxNk+fFVzkA+RcCooUovtUEDVDt/p0k1db3qUvhv2AthJ6L38i9hvIX0LMw9o0
+         U7f76dLMrxEFlpPaxgEZvq3PjIuMPg42eEJpfAj/+3loNQ9MmIzccs1fGGjOWdeRq3no
+         3p5Q==
+X-Gm-Message-State: AOJu0YwCliGDw4YSkejKMhPBv/azWXFd4FiXqpeWNvGh2slJLEAPCaZI
+	NzgarI9UCDzFWhObnizs72Muig==
+X-Google-Smtp-Source: AGHT+IFiWuChYLAco5nOc66G1w6cYTjkov1Hu0LQyJZMR3/WFUC6rwA2Or451TlBtWEZwd6p/yyBWQ==
+X-Received: by 2002:a5d:81d3:0:b0:7b3:b726:b57f with SMTP id t19-20020a5d81d3000000b007b3b726b57fmr9983661iol.19.1701287884069;
+        Wed, 29 Nov 2023 11:58:04 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id v5-20020a02b905000000b0045458b7b4fcsm3601107jan.171.2023.11.29.11.58.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 11:58:03 -0800 (PST)
+Message-ID: <137ab4f7-80af-4e00-a5bb-b1d4f4c75a67@arista.com>
+Date: Wed, 29 Nov 2023 19:57:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|LO6P265MB6015:EE_
-X-MS-Office365-Filtering-Correlation-Id: 863c488f-471d-4fc7-9569-08dbf114a0db
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	I+IxAifIyvCz7Q/gZ0AaYyKv0z4bQPrCnGbHxLlD10e03CxuYwyG3JetIbwQuxa38MdkyXISOepdE2mNOSdPZJeWDpoEwKcybABXqDR7HV/34fmUYpTBwC16zjCpiQSZ+VNDknTug1+8TjiZpQfOnVDIRv1cpmI9ccNNkmwrtaBD5mxin9GMSWbKKKiWHWgwUsdkl9MZ4z4OBHvToD/mQffz+hSTxqBNoSnYv1lXdVHdbNMzOSfP1s2zG+YJPpaJBcGiB0FDfZAHvgqij+WbrqR5OFyVv2gcLDISUmAuxqenuGrsEnJtfYODvyukEDcx69zYaO1ubzxr7Qhqyayj7pLcuKCybnHwzT1s9abr/Uo6JNNpVqQcPm3LWJYoV39KcIPFvxFjko7h38u6o2NqC8HQaJ4kpPqijRqcErYh1PuwF+WYGf8/I4VJHaUxe+x+gkNz8iAM2O+BCiTzDYjEe/GYSRuweuGXf6bm4IY0TlFyqIIYLRRPeivWcevi4QWnSrsZdH7D4tmlvh4tzqY8pDpgFbZkZE1R1R5ToGb9dWF3QYSNlXfzQTSLtTTVChQB2UdbqwwxumT0R1xG4I0goW+8HK3LOlkJ1g2Tkgu5M2oz1VpmlJhpm9AAFlx2HhFE
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(346002)(39830400003)(136003)(376002)(396003)(366004)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(478600001)(6512007)(6486002)(2616005)(1076003)(6506007)(6666004)(83380400001)(7416002)(2906002)(5660300002)(41300700001)(6916009)(66476007)(66556008)(66946007)(8676002)(8936002)(316002)(4326008)(38100700002)(36756003)(86362001)(202311291699003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ua+6udRjLQtLz4epOA4pz4JvJBDXbTttmtm94L5BTB4DHnqwxEueX7tJEbT+?=
- =?us-ascii?Q?IJNRcPhO5UZNmfhhk9+YDN4Dv0VnBLti3x4okgdReyOAJn8+7fluWVrtc2Yg?=
- =?us-ascii?Q?nmeIy6ZPnBWoNCZePOsLUZatRkCn1WG4oSkk+yDhl1xLsaD9dwPg5LLEQrVb?=
- =?us-ascii?Q?pdIY3Paz0QbOZNKzmRHz25RO/wckOH+ee3iQn8301Gxdv9u2BkyRccgebBp5?=
- =?us-ascii?Q?ZXFityISG8IeFl9UuzsvbB1mER1w2ncNegwrjPyIuOYRDVIkV7sSwcpyTWi0?=
- =?us-ascii?Q?aE3+M2Es6PCytz27sDkZNPVX059njyExCDGdQ5TfFiO6ncUl1muhrv9KDLFP?=
- =?us-ascii?Q?fhClkKV4ZJA2zmgtNPyl19wud7/hpSWRd0w6v2UpLiTKsK9Q+Y9W+gpHuGFD?=
- =?us-ascii?Q?u8Msn/OxpKc0fG7Creu41hb9pln4nSccZ96dFG3i8IzzTe1xp2LNe1f2VCqN?=
- =?us-ascii?Q?E6JI8P8OIOCMdNSxVFYBUCLAQHoEJFJa7PNoowPU0ejcLv4sumTh2eckk48+?=
- =?us-ascii?Q?yzzZetl+aUXYepjGFhm9gXv7bcwcoGthkhyRxLica5LRApIDGf6UE7IB+ydy?=
- =?us-ascii?Q?Zat3SadgxbZcDOw4BEMB6mhodmynz8I5jhofUz8h6EwOCJml256f1mbu9vN4?=
- =?us-ascii?Q?ojRnVzJCFu4AcF/PCl5/58XKfV0v2jGkXwjS0CLZsoiuCxoXBZ276zEwoVMG?=
- =?us-ascii?Q?ogwwbwd+BVIwA0CrXPXIREWx5sNVhdX9GupXTwmPmCkX6HILuuisewN1aYF4?=
- =?us-ascii?Q?rDpEQyGpEENAQjUBKyQerHnKymNi1pe4xWsaPu1O3ty3snbcij1mYiLnsmmu?=
- =?us-ascii?Q?+M7rY+EX+9xMGWMpxraU6nVGEhVMenbWDrF9xDjSnAEX3MTEqk2SHWS7Jtvz?=
- =?us-ascii?Q?CUCYoZgMHs0WMDwPHb47dOiYVWmLgQsVTjbsg4Ga8VdDHAsifpnKRhcpNA0S?=
- =?us-ascii?Q?eU8BfCM+Zx2VZftlVEKBasfCncMPXoSy78GdLWQ/HaLq9VT86ngSDhmN+q0d?=
- =?us-ascii?Q?ssr3tifkkRERXnDT0ahkaUhl4EJvPUOjkgo8lVDCn1hfYfRvg/muEf896Dtc?=
- =?us-ascii?Q?bVq7G/IF+lgnLmedrv0i3UUlwKngHTnfkl73/6VIMfK+/WCiBOA0aJKz4OF8?=
- =?us-ascii?Q?Yr6NDOpWsgVuyxongbSnhdufryxWY6wPi+E2nNXtuWGntIg32lO4QgTnt8Sg?=
- =?us-ascii?Q?X4kY0fpnERm6yw12ZstRoE8UYQsSCT4BK22FMekgl40ZdCvqFAkg9hr3cEEr?=
- =?us-ascii?Q?yEJS/dlkljNNMND/1tO3TgZ26IdEHnpG7qxw3jo6ky4nfTvAoJfbcGcb163O?=
- =?us-ascii?Q?j3rz+AFYVECU0G7A1Sv+gzI4kkrBYnUetcMkazZBX6dRfAqcSFPubcoDUM/o?=
- =?us-ascii?Q?ep+oYN1KRgKcLXqAPCbGJ3vxXTByIhmLcDm2LQ7haxRZ7yRGVkVPGf3q8ddx?=
- =?us-ascii?Q?mRV7qP6orfi2bVnZxiQwdgZpdzAoHD4Uz+nxU++Sqhl2PeYNbw4mC7nip7Db?=
- =?us-ascii?Q?rA9O4t2O+/8X2BMLuFFnrE+tpsEx5VE3rHTFBRplut0WdNMGNeJR4HYv+N03?=
- =?us-ascii?Q?urwUkwqWlxADw0IKJeN51ltMgQwU5S/bGZZ9ZmR6A/7+AurgFN4sV/LGAl8A?=
- =?us-ascii?Q?Q75ohKkcRwgnDZWKIOMsEvZfzS+D6/0tRxPMKqOpjPZ9?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 863c488f-471d-4fc7-9569-08dbf114a0db
-X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 19:51:50.5586
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: waice1deavzXy3HA1sSv/244dbV2O3t4cOLELggAQC5cklJBgoMpmxFiR7HaWzutHijU05jatwyQeFXQFB2b+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO6P265MB6015
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Francesco Ruggeri <fruggeri05@gmail.com>,
+ Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+References: <20231129165721.337302-1-dima@arista.com>
+ <20231129165721.337302-7-dima@arista.com>
+ <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
+ <df55eb1d-b63a-4652-8103-d2bd7b5d7eda@arista.com>
+ <CANn89iLZx-SiV0BqHkEt9vS4LZzDxW2omvfOvNX6XWSRPFs7sw@mail.gmail.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <CANn89iLZx-SiV0BqHkEt9vS4LZzDxW2omvfOvNX6XWSRPFs7sw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 23 Nov 2023 14:04:09 +0900
-FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+On 11/29/23 18:34, Eric Dumazet wrote:
+> On Wed, Nov 29, 2023 at 7:14 PM Dmitry Safonov <dima@arista.com> wrote:
+>>
+>> On 11/29/23 18:09, Eric Dumazet wrote:
+>>> On Wed, Nov 29, 2023 at 5:57 PM Dmitry Safonov <dima@arista.com> wrote:
+>>>>
+>>>> RFC 5925 (6.2):
+>>>>> TCP-AO emulates a 64-bit sequence number space by inferring when to
+>>>>> increment the high-order 32-bit portion (the SNE) based on
+>>>>> transitions in the low-order portion (the TCP sequence number).
+>>>>
+>>>> snd_sne and rcv_sne are the upper 4 bytes of extended SEQ number.
+>>>> Unfortunately, reading two 4-bytes pointers can't be performed
+>>>> atomically (without synchronization).
+>>>>
+>>>> In order to avoid locks on TCP fastpath, let's just double-account for
+>>>> SEQ changes: snd_una/rcv_nxt will be lower 4 bytes of snd_sne/rcv_sne.
+>>>>
+>>>
+>>> This will not work on 32bit kernels ?
+>>
+>> Yeah, unsure if there's someone who wants to run BGP on 32bit box, so at
+>> this moment it's already limited:
+>>
+>> config TCP_AO
+>>         bool "TCP: Authentication Option (RFC5925)"
+>>         select CRYPTO
+>>         select TCP_SIGPOOL
+>>         depends on 64BIT && IPV6 != m # seq-number extension needs WRITE_ONCE(u64)
+>>
+> 
+> Oh well, this seems quite strange to have such a limitation.
 
-> +    /// Reads a given C22 PHY register.
-> +    // This function reads a hardware register and updates the stats so takes `&mut self`.
-> +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
-> +        let phydev = self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        let ret = unsafe {
-> +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.addr, regnum.into())
-> +        };
-> +        if ret < 0 {
-> +            Err(Error::from_errno(ret))
-> +        } else {
-> +            Ok(ret as u16)
-> +        }
-> +    }
-> +
-> +    /// Writes a given C22 PHY register.
-> +    pub fn write(&mut self, regnum: u16, val: u16) -> Result {
-> +        let phydev = self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        to_result(unsafe {
-> +            bindings::mdiobus_write((*phydev).mdio.bus, (*phydev).mdio.addr, regnum.into(), val)
-> +        })
-> +    }
+I guess so. On the other side, it seems that there aren't many
+non-hobbyist 32bit platforms: ia32 compatible layer will even be limited
+with a boot parameter/compile option. Maybe I'm not aware of, but it
+seems that arm64/ppc64/risc-v/x86_64 are the ones everyone interested in
+these days.
 
-`read` and `write` are not very distinctive names, especially when
-`read_paged` exists.
+> 
+>> Probably, if there will be a person who is interested in this, it can
+>> get a spinlock for !CONFIG_64BIT.
+> 
+> 
+>>
+>>> Unless ao->snd_sne and ao->rcv_sneare only read/written under the
+>>> socket lock (and in this case no READ_ONCE()/WRITE_ONCE() should be
+>>> necessary)
+>>
+> 
+> You have not commented on where these are read without the socket lock held ?
 
-Maybe `mdio_{read,write}`?
+Sorry for missing this, the SNEs are used with this helper
+tcp_ao_compute_sne(), so these places are (in square brackets AFAICS,
+there is a chance that I miss something obvious from your message):
 
-> +/// Defines certain other features this PHY supports (like interrupts).
-> +///
-> +/// These flag values are used in [`Driver::FLAGS`].
-> +pub mod flags {
-> +    /// PHY is internal.
-> +    pub const IS_INTERNAL: u32 = bindings::PHY_IS_INTERNAL;
-> +    /// PHY needs to be reset after the refclk is enabled.
-> +    pub const RST_AFTER_CLK_EN: u32 = bindings::PHY_RST_AFTER_CLK_EN;
-> +    /// Polling is used to detect PHY status changes.
-> +    pub const POLL_CABLE_TEST: u32 = bindings::PHY_POLL_CABLE_TEST;
-> +    /// Don't suspend.
-> +    pub const ALWAYS_CALL_SUSPEND: u32 = bindings::PHY_ALWAYS_CALL_SUSPEND;
-> +}
-> +
-> +/// An adapter for the registration of a PHY driver.
-> +struct Adapter<T: Driver> {
-> +    _p: PhantomData<T>,
-> +}
-> +
-> +impl<T: Driver> Adapter<T> {
-> +    /// # Safety
-> +    ///
-> +    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
-> +    unsafe extern "C" fn soft_reset_callback(
-> +        phydev: *mut bindings::phy_device,
-> +    ) -> core::ffi::c_int {
-> +        from_result(|| {
-> +            // SAFETY: This callback is called only in contexts
-> +            // where we hold `phy_device->lock`, so the accessors on
-> +            // `Device` are okay to call.
-> +            let dev = unsafe { Device::from_raw(phydev) };
-> +            T::soft_reset(dev)?;
+- tcp_v4_send_reset() => tcp_ao_prepare_reset() [rcu_read_lock()]
+- __tcp_transmit_skb() => tcp_ao_transmit_skb() [TX softirq]
+- tcp_v4_rcv() => tcp_inbound_ao_hash() [RX softirq]
 
-Usually we want type safety by to the callback typed access to the
-device's driver-private data, rather than just give it an arbitrary
-`Device`. Any reason not to similar things here?
 
-> +            Ok(0)
-> +        })
-> +    }
-> +}
-> +
+> tcp_ao_get_repair() can lock the socket.
+
+It can, sure.
+
+> In TW state, I guess these values can not be changed ?
+
+Currently, they are considered constant on TW. The incoming segments are
+not verified on twsk (so no need for SNEs). And from ACK side not
+expecting SEQ roll-over (tcp_ao_compute_sne() is not called) - this may
+change, but not quite critical it seems.
+
+If we go with this patch in question, I'll have to update this:
+:		key.sne = READ_ONCE(ao_info->snd_sne);
+(didn't adjust it for higher-bytes shift)
+
+> I think you can remove all these READ_ONCE()/WRITE_ONCE() which are not needed,
+> or please add a comment if they really are.
+
+Not sure if I answered above..
+
+> Then, you might be able to remove the 64BIT dependency ...
+
+At this moment I fail to imagine anyone running BGP + TCP-AO on 32bit
+kernel. I may be wrong, for sure.
+
+Thanks,
+             Dmitry
+
 
