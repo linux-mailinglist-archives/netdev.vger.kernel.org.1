@@ -1,92 +1,124 @@
-Return-Path: <netdev+bounces-52287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271627FE24D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:49:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCFA7FE253
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:50:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B79A4B211BE
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 21:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D14F81C20AAF
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 21:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0337861FA4;
-	Wed, 29 Nov 2023 21:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95FD6166B;
+	Wed, 29 Nov 2023 21:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="HJAXN7iB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RxWmbGqK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65842B0
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 13:49:47 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-423871dc183so1465711cf.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 13:49:47 -0800 (PST)
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFB19A;
+	Wed, 29 Nov 2023 13:50:15 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-35aa6107e9fso372285ab.0;
+        Wed, 29 Nov 2023 13:50:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google; t=1701294586; x=1701899386; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpfJU5sAguyt0/G2iahMIWT2bpNq5anO26/F530wIyY=;
-        b=HJAXN7iBuM+uFe3zpc3uYLzvOrZnIW7Rgobqx2d537etXTr6TuiIL3TGjesui2UVtu
-         ym9h1km+8brtg4+qvFbTJ/KGkB99nz+J6BlPVefUjP75DT0T/iqdEU+11sUDRcgH3HJ7
-         +4Klj115UftA0kmoj7LInHKSZYOWoxkXk74aDAVJeXJYH/g4lbTzhcqpJfAn+0kxnqI6
-         6ZIMCtFpmruYQfbTX7FbF8JoNHYNSbkrGeodxLLP4hU6ZiF/yZoFz3lefYVEoGFGYl6I
-         zYtXzMAoNccvxhAZjunXzc3FpJAW2TyZSzZiRTwxPfJkj2eXwSkRa9IMyH1vfOM/YI6j
-         7icA==
+        d=gmail.com; s=20230601; t=1701294615; x=1701899415; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xbQ5NefzltYUPy1o8ufNnSbjtnJIggsw/UqQG6B5axM=;
+        b=RxWmbGqK0ngqBWCV85GKZkdgflFHxV9TA6MzL4CJj0Ai9lDgvGWS8zfUR59W/+ZKF3
+         PJCbqjW0MYXVJqA2lECMV+nKC6xsW46UDYlM6zqyn6dDnQ74ZgSIhpaSiuOBv/p5YROu
+         m4mNfV7SOV/v6pxkgkgWWnm2nN7/9ryF5nQ0YZY1NHgJesYIktEc78R29/bPMSuuRGgo
+         osn9XKzCWWAehcrVtEQixXFX7oCNU6sSLg664DToJ6YLJRZfPRqMPvI01TpOA18uJz8z
+         xmDJBfFGjTiI6fwAafwwbwgOprPiT3F5/8w5PlEGJ9pnKnZsmdYInqlSlMgR1mWltBGs
+         jA9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701294586; x=1701899386;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cpfJU5sAguyt0/G2iahMIWT2bpNq5anO26/F530wIyY=;
-        b=r1mkGV+JFc+AxvqqQ6wkjNigr9DvfZcSBt48nRmUjrNiAPpXnvDbmvOnsMW52OOOwO
-         qoG9HVIniQ1H6IGBjC29N2z5I4uxmdviWlDB7icmGrYSC4Sy+riudKG/xFvdY2wp08P+
-         eMqxxYJTIlYImRFJpUjU+pdcXMaE6MT2KDLV2kyeNAUCYv+yuQH5ct9jpnTUVURuIo3o
-         17gOqmSh56R1zIlM63F3fN+q8SI62v+72Xv4xZ1g4lB1y0IdamGtjq+u4ccsI5BtnJIJ
-         kP9uomZehFc8CD1VxH0yz/MGIpIEHAN8MvIss2FfGEMhMiuNLWrIwlZel6O7rJUQwR3k
-         oITQ==
-X-Gm-Message-State: AOJu0Yx1zk1l/nRro++8n43laxn+n/cHFGNfXBoXhzolvmc3uVroI08k
-	2MC4kmYkrOfpj3DoIGchvpPfRVN79qL2INY5EFvhsg==
-X-Google-Smtp-Source: AGHT+IHQGnPttzbf2bAdb5gwZpT0Nh8amOSeNRZF+eb1/SrYiR5d7rhV+9FkDuUK6ClQ83baR1dhxHx1LVYRiRyKJoI=
-X-Received: by 2002:a05:622a:34c:b0:41e:213d:3c8e with SMTP id
- r12-20020a05622a034c00b0041e213d3c8emr22630747qtw.32.1701294586528; Wed, 29
- Nov 2023 13:49:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701294615; x=1701899415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xbQ5NefzltYUPy1o8ufNnSbjtnJIggsw/UqQG6B5axM=;
+        b=N2Nq7s0XpECwrVw1FyywwgHzvNucN+LE7A7/KILGY/KHTjBKinQMcVilE+8IvCQmRq
+         LoOT80c5uag9QOk0b+RKXzoRi16h14PhGhtCUhJEoJLrCxz2afzCS08VnCDLi7ERXi2V
+         nB0TieTIx0UdRyIJ1PYq+CJ7gaytJ864YfCCZ7gZiwpHVYXEG6aCC85LJdX35tVLbWLd
+         AyLPY3bxoL5wcqxpYwx/ANlnAzvoe/kplP61zjesvd5xrC2TOtNkM2FPdRWU5jrInW0/
+         78pEUys7fy6LihHeYV3Xm/lIk/9rkNNNiXHClgu+smUtPJDlunxzvlhTswzFPomAyE8O
+         5A7w==
+X-Gm-Message-State: AOJu0Yzo82gCxP63G6RqiMC/zzDY285QZSMvpIOfN6u+Qxnpy9d+/U9p
+	J582DU2cfLNzcA2r04Ieg10XJJ68X1yqBV0rf8w=
+X-Google-Smtp-Source: AGHT+IF30V6G4GwzpvoxEIoV3/jdEPHOsYdgmv/1z3/SR0znziDufDsk1Hh9qUknxYbOZv8J6P0gGyC52urWFrkCSJQ=
+X-Received: by 2002:a92:cd8c:0:b0:35c:c47d:f57c with SMTP id
+ r12-20020a92cd8c000000b0035cc47df57cmr14631346ilb.20.1701294615112; Wed, 29
+ Nov 2023 13:50:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <20231128204938.1453583-5-pasha.tatashin@soleen.com> <ca7a025d-8154-4509-b8ab-2a17e53ccbef@app.fastmail.com>
-In-Reply-To: <ca7a025d-8154-4509-b8ab-2a17e53ccbef@app.fastmail.com>
-From: Pasha Tatashin <pasha.tatashin@soleen.com>
-Date: Wed, 29 Nov 2023 16:49:10 -0500
-Message-ID: <CA+CK2bB-TMCgpjvuXRigNaaA2Zmj=r3PHTQMaqs5W-9FkE3roQ@mail.gmail.com>
-Subject: Re: [PATCH 04/16] iommu/io-pgtable-dart: use page allocation function
- provided by iommu-pages.h
-To: Janne Grunau <j@jannau.net>
-Cc: akpm@linux-foundation.org, alex.williamson@redhat.com, 
-	alim.akhtar@samsung.com, Alyssa Rosenzweig <alyssa@rosenzweig.io>, asahi@lists.linux.dev, 
-	Lu Baolu <baolu.lu@linux.intel.com>, bhelgaas@google.com, cgroups@vger.kernel.org, 
-	corbet@lwn.net, david@redhat.com, David Woodhouse <dwmw2@infradead.org>, hannes@cmpxchg.org, 
-	heiko@sntech.de, iommu@lists.linux.dev, jasowang@redhat.com, 
-	jernej.skrabec@gmail.com, jgg@ziepe.ca, jonathanh@nvidia.com, 
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>, krzysztof.kozlowski@linaro.org, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org, 
-	linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	lizefan.x@bytedance.com, Hector Martin <marcan@marcan.st>, mhiramat@kernel.org, 
-	mst@redhat.com, m.szyprowski@samsung.com, netdev@vger.kernel.org, 
-	paulmck@kernel.org, rdunlap@infradead.org, 
-	Robin Murphy <robin.murphy@arm.com>, samuel@sholland.org, suravee.suthikulpanit@amd.com, 
-	Sven Peter <sven@svenpeter.dev>, thierry.reding@gmail.com, tj@kernel.org, 
-	tomas.mudrunka@gmail.com, vdumpa@nvidia.com, virtualization@lists.linux.dev, 
-	wens@csie.org, Will Deacon <will@kernel.org>, yu-cheng.yu@intel.com
+References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com> <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
+In-Reply-To: <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Date: Wed, 29 Nov 2023 22:50:05 +0100
+Message-ID: <CAFSsGVvBfvkotAd+p++bzca4Km8pHVzNJEGV6CAjYULVOWuD2Q@mail.gmail.com>
+Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
+ activate if hw-controlled
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, 
+	Christian Marangi <ansuelsmth@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Reviewed-by: Janne Grunau <j@jannau.net>
+On Wed, Nov 29, 2023 at 5:36=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Nov 29, 2023 at 11:41:51AM +0100, Heiner Kallweit wrote:
+> > The current codes uses the sw_control path in set_baseline_state() when
+> > called from netdev_trig_activate() even if we're hw-controlled. This
+> > may result in errors when led_set_brightness() is called because we may
+> > not have set_brightness led ops (if hw doesn't support setting a LED
+> > to ON).
+>
+> Not having software on/off control of the LED is a problem. It breaks
+> the whole concept of offloading/accelerating. If we cannot control the
+> LED, there is nothing to accelerate. What do we do when the user
+> selects a configuration which is not supported by the hardware? The
+> API is not atomic, you cannot set multiple things at once. So the user
+> might be trying to get from one offloadable configuration to another
+> offloadable configuration, but needs to go via an configuration which
+> is not offloadable. Do we return -EOPNOTSUPP?
+>
+The point you raise with the non-atomic API is completely valid,
+however I think it's
+not directly related to this patch. Here it's about a validated hw-control =
+path.
+So I think the patch is still valid.
 
-Thank you,
-Pasha
+> Before we accept patches like this, we need to discuss the concept of
+> how we support LEDs which cannot be controlled in software.
+>
+RTL8168 LED control allows to switch between different hw triggers. I
+was under the
+assumption that this is not uncommon.
+In order to deal with the non-atomic issue we have to set
+trigger_data->mode to the
+resulting new mode, based on what the user set. Question is what we show to=
+ the
+user. If we show nothing, then he will expect the new mode to be active.
+If we show an error, then he may assume that his input had no effect.
+So we may have to show technically an OK, plus a message that his input has=
+ been
+stored, but is not supported by hw.
+
+
+
+
+
+
+
+
+>     Andrew
+
+Heiner
 
