@@ -1,236 +1,109 @@
-Return-Path: <netdev+bounces-52091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776EE7FD402
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:21:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0EC7FD40B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07CCCB21B3D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:21:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DF261C20A26
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A369C1B277;
-	Wed, 29 Nov 2023 10:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D0A19BC2;
+	Wed, 29 Nov 2023 10:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WEWbk3oa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HwI4cCLt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E966310C4
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701253247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8eOgmnDcAOuHVjx4FQ/wfnS7taAjkRaDPrb33RzRzvo=;
-	b=WEWbk3oaS/uvhHoWMBHBXQT7sPEOKzSG333zV5NGiq9C90X50hXsNKy5xrintIwYu3LJhh
-	7MmgryIYBBjCuv/WlDcZIHz989BzYx6OnhxB2IRhBGnSP1C8nSIMMn35TXuDY6sGhEJ69g
-	HvMgpRv3weM6eBInrbeTPQaJn06gxlE=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-270-uQijtEOaOAiPBHE9r-6LMw-1; Wed, 29 Nov 2023 05:20:45 -0500
-X-MC-Unique: uQijtEOaOAiPBHE9r-6LMw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50aa8fbf1e6so6972668e87.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:20:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701253243; x=1701858043;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8eOgmnDcAOuHVjx4FQ/wfnS7taAjkRaDPrb33RzRzvo=;
-        b=mtEJrisxj4QMnnjFJzZxCJsibpabwVqa5BtGp84h5XmOulEbm5RZwLGB8BUztqYcL+
-         CHoH4SrCNzmmFhdxAGG76Oa56CgyJ31PIx8TwL1rOYyiPRrBpDNfGlOdhOxH3AOKOMBI
-         vIUEYZwiw12HejMXEiRyOL/rIun683ftjAE+DWx0Uu+wJa9emp/zmeisDKa0DmbMOP7H
-         LdIKDukwNjAeuuPcyoTsXLrfSuf8n5vgl5eT0rWlrkMZbPC/AGP8SBc0E3bVgL/cb7Wn
-         3fKXAXFLG+cQSzmIW4ekZkRhuulGlufgotishaKSYLANfaloXmxYNIf+/s7DdQ9Qf+DR
-         e/Wg==
-X-Gm-Message-State: AOJu0YwyyLyXMqUT1IDvUpeLJu4jq7X4iYwD6WuRfOMmfJK5PAh0/LQD
-	pAthnoupBYwARAa1Yuu3NvvLe5fO6E6kQjKtU4RtF5BSVeUwbK/FUU/wRDn/UgtfcYNRwiI7Owp
-	rh2pg99OST1aKXjmcHPtif1ZG4i3p4WkL
-X-Received: by 2002:a05:6512:220a:b0:507:cb04:59d4 with SMTP id h10-20020a056512220a00b00507cb0459d4mr12336121lfu.8.1701253243245;
-        Wed, 29 Nov 2023 02:20:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHo6suNvwReIN0wIUEmAKInanQPmGpK3eFZ68I+bpu7dfH9YCETv8WG6Wc9xZCDDfErzyYtBX/TPf0eCASyd2Y=
-X-Received: by 2002:a05:6512:220a:b0:507:cb04:59d4 with SMTP id
- h10-20020a056512220a00b00507cb0459d4mr12336107lfu.8.1701253242868; Wed, 29
- Nov 2023 02:20:42 -0800 (PST)
+X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 02:24:17 PST
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D11EBA
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:24:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701253458; x=1732789458;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=v1nCldua3WBiSnVPuy5LnS6E/cq1uTZoCreErVFP1p4=;
+  b=HwI4cCLtLDrCwtBxcElGkpduGGE1v8H3fuuDeC89sVPSn3p7GlRn/Xcn
+   5uGxBU77SnIoqXoPl7u7pr5NZvMVwr62uSOgj61G6L0a7nAG3SFlN0uNc
+   aWbtGGlN7aA13qQGORpG7kZ3iNxt2chIx0NlKVuX6Ls1YJV8jLhUgu5xI
+   AVLZH+dbV6QMwioIjvaK73/lOefGSa4ep2zAK3AwysrhtJ6hHcJMq3Pjx
+   fAz5J2WxsIryVzLLeP+1vx2MS5GGLorO9F5TMaE/mpQdWYFDIkdi/ZHhs
+   FLAK5CUZ0vQ4KWpAxffIZm78HJRy5yWMzx5eDW95Tnuj6DXbMPDQL9Vrl
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="121480"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="121480"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:23:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="718712474"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="718712474"
+Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
+  by orsmga003.jf.intel.com with ESMTP; 29 Nov 2023 02:23:12 -0800
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: [PATCH iwl-net v2] i40e:Fix filter input checks to prevent config with invalid values
+Date: Wed, 29 Nov 2023 11:23:11 +0100
+Message-Id: <20231129102311.2780151-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com> <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
- <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
-In-Reply-To: <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 29 Nov 2023 18:20:31 +0800
-Message-ID: <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: features
-To: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com, 
-	Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com, 
-	yuanyaogoog@chromium.org, yuehaibing@huawei.com, 
-	kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com, 
-	alexander.shishkin@linux.intel.com
-Content-Type: multipart/mixed; boundary="0000000000003705f2060b47e303"
+Content-Transfer-Encoding: 8bit
 
---0000000000003705f2060b47e303
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
 
-On Wed, Nov 29, 2023 at 6:12=E2=80=AFPM Ning, Hongyu
-<hongyu.ning@linux.intel.com> wrote:
->
->
-> On 2023/11/29 17:16, Jason Wang wrote:
-> > On Wed, Nov 29, 2023 at 5:05=E2=80=AFPM Ning, Hongyu
-> > <hongyu.ning@linux.intel.com> wrote:
-> >>
-> >>
-> >>
-> >> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
-> >>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817c=
-c0bc2c:
-> >>>
-> >>>     Linux 6.5 (2023-08-27 14:49:51 -0700)
-> >>>
-> >>> are available in the Git repository at:
-> >>>
-> >>>     https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tag=
-s/for_linus
-> >>>
-> >>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9=
-ab:
-> >>>
-> >>>     virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023=
--09-03 18:10:24 -0400)
-> >>>
-> >>> ----------------------------------------------------------------
-> >>> virtio: features
-> >>>
-> >>> a small pull request this time around, mostly because the
-> >>> vduse network got postponed to next relase so we can be sure
-> >>> we got the security store right.
-> >>>
-> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >>>
-> >>> ----------------------------------------------------------------
-> >>> Eugenio P=C3=A9rez (4):
-> >>>         vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
-> >>>         vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend f=
-eature
-> >>>         vdpa: add get_backend_features vdpa operation
-> >>>         vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-> >>>
-> >>> Jason Wang (1):
-> >>>         virtio_vdpa: build affinity masks conditionally
-> >>>
-> >>> Xuan Zhuo (12):
-> >>>         virtio_ring: check use_dma_api before unmap desc for indirect
-> >>>         virtio_ring: put mapping error check in vring_map_one_sg
-> >>>         virtio_ring: introduce virtqueue_set_dma_premapped()
-> >>>         virtio_ring: support add premapped buf
-> >>>         virtio_ring: introduce virtqueue_dma_dev()
-> >>>         virtio_ring: skip unmap for premapped
-> >>>         virtio_ring: correct the expression of the description of vir=
-tqueue_resize()
-> >>>         virtio_ring: separate the logic of reset/enable from virtqueu=
-e_resize
-> >>>         virtio_ring: introduce virtqueue_reset()
-> >>>         virtio_ring: introduce dma map api for virtqueue
-> >>>         virtio_ring: introduce dma sync api for virtqueue
-> >>>         virtio_net: merge dma operations when filling mergeable buffe=
-rs
-> >>
-> >> Hi,
-> >> above patch (upstream commit 295525e29a5b) seems causing a virtnet
-> >> related Call Trace after WARNING from kernel/dma/debug.c.
-> >>
-> >> details (log and test setup) tracked in
-> >> https://bugzilla.kernel.org/show_bug.cgi?id=3D218204
-> >>
-> >> it's recently noticed in a TDX guest testing since v6.6.0 release cycl=
-e
-> >> and can still be reproduced in latest v6.7.0-rc3.
-> >>
-> >> as local bisects results show, above WARNING and Call Trace is linked
-> >> with this patch, do you mind to take a look?
-> >
-> > Looks like virtqueue_dma_sync_single_range_for_cpu() use
-> > DMA_BIDIRECTIONAL unconditionally.
-> >
-> > We should use dir here.
-> >
-> > Mind to try?
-> >
-> > Thanks
-> >
->
-> sure, but what I see in the code
-> virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
-> probably I misunderstood your point?
->
-> Please let me know any patch/setting to try here.
+Prevent VF from configuring filters with unsupported actions or use
+REDIRECT action with invalid tc number. Current checks could cause
+out of bounds access on PF side.
 
-Something like attached.  (Not even compiling test).
+Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
+Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+v1->v2 add 'Fixes:' tag into commit message
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thanks
-
->
->
-> >>
-> >>>
-> >>> Yuan Yao (1):
-> >>>         virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
-> >>>
-> >>> Yue Haibing (1):
-> >>>         vdpa/mlx5: Remove unused function declarations
-> >>>
-> >>>    drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
-> >>>    drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
-> >>>    drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
-> >>>    drivers/vhost/vdpa.c               |  15 +-
-> >>>    drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++=
-+++++++-----
-> >>>    drivers/virtio/virtio_vdpa.c       |  17 +-
-> >>>    include/linux/vdpa.h               |   4 +
-> >>>    include/linux/virtio.h             |  22 ++
-> >>>    include/uapi/linux/vhost_types.h   |   4 +
-> >>>    9 files changed, 625 insertions(+), 90 deletions(-)
-> >>>
-> >>
-> >
->
-
---0000000000003705f2060b47e303
-Content-Type: application/octet-stream; 
-	name="0001-virtio_ring-fix-DMA-dir-during-sync.patch"
-Content-Disposition: attachment; 
-	filename="0001-virtio_ring-fix-DMA-dir-during-sync.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lpjm8ipj0>
-X-Attachment-Id: f_lpjm8ipj0
-
-RnJvbSBmZjVhNTQwMmExMjA5Y2FjNzNhNGIwZTdjMTkzNzM3ODhiNDE3N2Y5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKYXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPgpEYXRl
-OiBXZWQsIDI5IE5vdiAyMDIzIDE3OjE0OjE1ICswODAwClN1YmplY3Q6IFtQQVRDSF0gdmlydGlv
-X3Jpbmc6IGZpeCBETUEgZGlyIGR1cmluZyBzeW5jCkNvbnRlbnQtdHlwZTogdGV4dC9wbGFpbgoK
-U2lnbmVkLW9mZi1ieTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4KLS0tCiBkcml2
-ZXJzL3ZpcnRpby92aXJ0aW9fcmluZy5jIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
-aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0aW8vdmlydGlv
-X3JpbmcuYyBiL2RyaXZlcnMvdmlydGlvL3ZpcnRpb19yaW5nLmMKaW5kZXggODFlY2IyOWM4OGYx
-Li45MWQ4Njk4MTQzNzMgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvdmlydGlvL3ZpcnRpb19yaW5nLmMK
-KysrIGIvZHJpdmVycy92aXJ0aW8vdmlydGlvX3JpbmcuYwpAQCAtMzIyMCw3ICszMjIwLDcgQEAg
-dm9pZCB2aXJ0cXVldWVfZG1hX3N5bmNfc2luZ2xlX3JhbmdlX2Zvcl9jcHUoc3RydWN0IHZpcnRx
-dWV1ZSAqX3ZxLAogCQlyZXR1cm47CiAKIAlkbWFfc3luY19zaW5nbGVfcmFuZ2VfZm9yX2NwdShk
-ZXYsIGFkZHIsIG9mZnNldCwgc2l6ZSwKLQkJCQkgICAgICBETUFfQklESVJFQ1RJT05BTCk7CisJ
-CQkJICAgICAgZGlyKTsKIH0KIEVYUE9SVF9TWU1CT0xfR1BMKHZpcnRxdWV1ZV9kbWFfc3luY19z
-aW5nbGVfcmFuZ2VfZm9yX2NwdSk7CiAKLS0gCjIuNDIuMAoK
---0000000000003705f2060b47e303--
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 3f99eb1..031b15c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -3521,16 +3521,16 @@ static int i40e_validate_cloud_filter(struct i40e_vf *vf,
+ 	bool found = false;
+ 	int bkt;
+ 
+-	if (!tc_filter->action) {
++	if (tc_filter->action != VIRTCHNL_ACTION_TC_REDIRECT) {
+ 		dev_info(&pf->pdev->dev,
+-			 "VF %d: Currently ADq doesn't support Drop Action\n",
+-			 vf->vf_id);
++			 "VF %d: ADQ doesn't support this action (%d)\n",
++			 vf->vf_id, tc_filter->action);
+ 		goto err;
+ 	}
+ 
+ 	/* action_meta is TC number here to which the filter is applied */
+ 	if (!tc_filter->action_meta ||
+-	    tc_filter->action_meta > I40E_MAX_VF_VSI) {
++	    tc_filter->action_meta > vf->num_tc) {
+ 		dev_info(&pf->pdev->dev, "VF %d: Invalid TC number %u\n",
+ 			 vf->vf_id, tc_filter->action_meta);
+ 		goto err;
+-- 
+2.25.1
 
 
