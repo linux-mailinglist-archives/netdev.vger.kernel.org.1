@@ -1,75 +1,154 @@
-Return-Path: <netdev+bounces-52162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE447FDAB0
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:02:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BFB27FDACB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66A89B210F9
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:02:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2759A2827C5
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1F63714B;
-	Wed, 29 Nov 2023 15:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB0337178;
+	Wed, 29 Nov 2023 15:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="WEf+Zd0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B836A3;
-	Wed, 29 Nov 2023 07:02:04 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R451e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VxOW.jE_1701270121;
-Received: from 30.39.190.97(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VxOW.jE_1701270121)
-          by smtp.aliyun-inc.com;
-          Wed, 29 Nov 2023 23:02:02 +0800
-Message-ID: <d8262b12-3ac9-8608-fc6f-d48c33a4225e@linux.alibaba.com>
-Date: Wed, 29 Nov 2023 23:02:01 +0800
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C577ADD;
+	Wed, 29 Nov 2023 07:08:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=t5xLtxOy4hbrpxKCfhc7jQx0EfqgpSIA0JLhwnMSArI=; t=1701270499; x=1702480099; 
+	b=WEf+Zd0nMDBX5NNu5ZLTosZWJdEhHfik6AdvfU77zWVvhFPSNtHCHEMy1tilzLSb+qd9liy28II
+	E65dZG0t5hhIQvyjhw09MJMBe85VNrjmYRD4fVUTSbKMZyktQ3DScdgYQZF/k6/MFIEtdptTUP5JM
+	wgaELxC14tKIlt2Y/33OcQ6lRa48YuGxr7PY4AuAwMQnHVYtaXwKW7PdIno1D0NqhMWaYN3xdeOpK
+	VwQ0R0D+y/6RzE0UFqHRzghe9HSr1txdsWOchi5oru1CssUzBDltG4qxSMFAjab/dWchj9LUfh/fq
+	Ws9FRyVAtBIl6t6Qza8hR5yPr0qyKG/0OrOQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1r8MAj-00000008lYo-36Yx;
+	Wed, 29 Nov 2023 16:08:17 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: pull-request: wireless-2023-11-29
+Date: Wed, 29 Nov 2023 16:04:24 +0100
+Message-ID: <20231129150809.31083-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net] net/netfilter: bpf: avoid leakage of skb
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org
-References: <1701252962-63418-1-git-send-email-alibuda@linux.alibaba.com>
- <20231129131846.GC27744@breakpoint.cc>
- <aa83bf32-789f-fec2-ea42-74b0ae05426e@linux.alibaba.com>
- <20231129144736.GB24754@breakpoint.cc>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20231129144736.GB24754@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
+
+Hi,
+
+Here's the first wireless pull request, see below.
+
+Now that I'm actually preparing this, I'm having second
+thoughts on the debugfs lockdep change, since that's a
+new 'feature' of sorts, pointing out the deadlocks. I had
+that in to actually sort of prove the fix worked, though
+I also tested that another way, Greg ACK'ed it, and then
+I didn't think about it again. I guess I could revert it
+back out, but it doesn't revert cleanly. Lockdep only.
+
+Also there was a fortify build problem report on the CQM
+fix that we haven't been able to make sense of, and yet
+the CQM fix is the one thing we'd rather have in soon as
+it broke quite a few users... Asked Kees about it too,
+but no response yet (it was only this morning.)
+
+If that seems OK for now, please pull. Otherwise let me
+know if I should revert the debugfs lockdep, and/or wait
+for the CQM/fortify issue to get resolved.
+
+Thanks,
+johannes
 
 
 
-On 11/29/23 10:47 PM, Florian Westphal wrote:
-> D. Wythe <alibuda@linux.alibaba.com> wrote:
->> And my origin intention was to allow ebpf progs to return NF_STOLEN, we are
->> trying to modify some netfilter modules via ebpf,
->> and some scenarios require the use of NF_STOLEN, but from your description,
-> NF_STOLEN can only be supported via a trusted helper, as least as far as
-> I understand.
->
-> Otherwise verifier would have to guarantee that any branch that returns
-> NF_STOLEN has released the skb, or passed it to a function that will
-> release the skb in the near future.
+The following changes since commit 55c900477f5b3897d9038446f72a281cae0efd86:
 
-Thank you very much for your help. I now understand the difficulty here.
-The verifier cannot determine whether the consume_skb() was executed or not,
-when the return value  goes to NF_STOLEN.
+  net: fill in MODULE_DESCRIPTION()s under drivers/net/ (2023-10-28 11:29:28 +0100)
 
-We may use NF_DROP at first, it won't be make much difference for us now.
+are available in the Git repository at:
 
-Also, do you have any plans to support this helper?
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-11-29
 
-Best wishes,
-D. Wythe
+for you to fetch changes up to 4ded3bfe1db655367642aadba91aee770cbab317:
+
+  wifi: mac80211: use wiphy locked debugfs for sdata/link (2023-11-27 11:25:09 +0100)
+
+----------------------------------------------------------------
+wireless fixes:
+ - debugfs had a deadlock (removal vs. use of files),
+   fixes going through wireless ACKed by Greg
+ - support for HT STAs on 320 MHz channels, even if it's
+   not clear that should ever happen (that's 6 GHz), best
+   not to WARN()
+ - fix for the previous CQM fix that broke most cases
+ - various wiphy locking fixes
+ - various small driver fixes
+
+----------------------------------------------------------------
+Ben Greear (1):
+      wifi: mac80211: handle 320 MHz in ieee80211_ht_cap_ie_to_sta_ht_cap
+
+Dan Carpenter (1):
+      wifi: iwlwifi: mvm: fix an error code in iwl_mvm_mld_add_sta()
+
+Johannes Berg (9):
+      wifi: cfg80211: fix CQM for non-range use
+      wifi: cfg80211: lock wiphy mutex for rfkill poll
+      wifi: cfg80211: hold wiphy mutex for send_interface
+      debugfs: fix automount d_fsdata usage
+      debugfs: annotate debugfs handlers vs. removal with lockdep
+      debugfs: add API to allow debugfs operations cancellation
+      wifi: cfg80211: add locked debugfs wrappers
+      wifi: mac80211: use wiphy locked debugfs helpers for agg_status
+      wifi: mac80211: use wiphy locked debugfs for sdata/link
+
+Lorenzo Bianconi (1):
+      wifi: mt76: mt7925: fix typo in mt7925_init_he_caps
+
+Michael-CY Lee (1):
+      wifi: avoid offset calculation on NULL pointer
+
+Ming Yen Hsieh (1):
+      wifi: mt76: mt7921: fix 6GHz disabled by the missing default CLC config
+
+Oldřich Jedlička (1):
+      wifi: mac80211: do not pass AP_VLAN vif pointer to drivers during flush
+
+ drivers/net/wireless/ath/ath9k/Kconfig           |   4 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c |   4 +-
+ drivers/net/wireless/mediatek/mt76/mt7921/mcu.c  |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/main.c |   4 +-
+ fs/debugfs/file.c                                | 100 ++++++++++++++
+ fs/debugfs/inode.c                               |  71 ++++++++--
+ fs/debugfs/internal.h                            |  21 ++-
+ include/linux/debugfs.h                          |  19 +++
+ include/linux/ieee80211.h                        |   4 +-
+ include/net/cfg80211.h                           |  46 +++++++
+ net/mac80211/Kconfig                             |   2 +-
+ net/mac80211/debugfs_netdev.c                    | 150 ++++++++++++++-------
+ net/mac80211/debugfs_sta.c                       |  74 ++++++-----
+ net/mac80211/driver-ops.h                        |   9 +-
+ net/mac80211/ht.c                                |   1 +
+ net/wireless/core.c                              |   6 +-
+ net/wireless/core.h                              |   1 +
+ net/wireless/debugfs.c                           | 160 +++++++++++++++++++++++
+ net/wireless/nl80211.c                           |  55 +++++---
+ 19 files changed, 614 insertions(+), 118 deletions(-)
 
