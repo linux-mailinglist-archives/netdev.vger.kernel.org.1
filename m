@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-52245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDB97FDF6D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:40:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 668927FDF9B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43216282544
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:40:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 958341C20CA6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D821A3399B;
-	Wed, 29 Nov 2023 18:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D813B790;
+	Wed, 29 Nov 2023 18:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvPAMN9l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbGxp2bL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E541B133
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:40:53 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9fffa4c4f43so10456866b.3
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:40:53 -0800 (PST)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF48712C
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:46:19 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-332fd78fa9dso75451f8f.3
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:46:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701283252; x=1701888052; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701283578; x=1701888378; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZczDnUJK3Tlk8LitBnvF9jlH240bcLj70zET4pTVZ1Y=;
-        b=dvPAMN9lvEU0h4ZacSIML0WQ5z5UQsQndwIrS1MCA0Fzy2L2wP+VPm4F8KuukRxozn
-         Jgp5BOlS9cCiUBttFV8tpwK9vQqQJejQTWypvtiGTA29Imxatr0W6kEdenYKGm5N4ha5
-         PAPnUvXjHnseJbJb+15bYQiQD8xAMFZiuCSnJQ1GSLHAL7BKU/5dwx27QJ6LtkG7Po4J
-         AOqR1+0p3pgjhLfppBD99F24TBSNyvGtjfNFJe19xgQSNwgvXhmcD/wype1Qw3Qx9sMQ
-         dFc2xDRg7cUZjKY+AV4bBDdhVidEzbNVfPW6gc6vchaoM7jxXG29WmC3k212igqbFy3L
-         yRpA==
+        bh=Cz+YINCm92INLOu3aEeoy2EI1iBVQPQ3Um2AX7lVQTk=;
+        b=MbGxp2bLRnhvN04vKZVVWe2+h1GAOW5B8UUJl3NzG/t0qdGKcly3MXswPVnNOweX50
+         Ze4+yw/8sCetT3tjxXPIeSvVfS2YVj4POqSn30hqxUwd6Mv95+68Xe3t++WRL78ny09P
+         EFbGv8fPpiDYsP6o4/QhRNHqhEoGRLw9ynyTx6I7gRkA6JFVjA4LcX4nIjCBH/AVOj/I
+         WvAP+Kq4Q7239EHcQPiKjioZDduMzQG1VStpJ76MZo1gRdz/zsB6SZ2WdfOYSHCE2w4a
+         mF7OSI4j5hzvke9ZPYu6s/qMv8zZQFvV9RfRxBTtcUGcUzzVEanVBvwk6lpGnH/Fx1BS
+         eKtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701283252; x=1701888052;
+        d=1e100.net; s=20230601; t=1701283578; x=1701888378;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZczDnUJK3Tlk8LitBnvF9jlH240bcLj70zET4pTVZ1Y=;
-        b=q89MGYHGK5+rwUI3hdYtBU02BHSSTCgQ/f/tl7nXZPAIcf9fFUwxarlpzW73cK3XBG
-         Jd00NzoHk7T4vUuNt6cSMLckzcmQHMrEsMXeRiXKVgknBYCiHK7lqTasLOi6vS27Xrdd
-         8Q9HdwVqg0kx0nT7+3EuIr7SPtXtGMysvQlFMUDxBG5Hgbm7cXUX+/PHVr5D2xzM7K7w
-         kA0ICFTIpm3lq8erCLwKjYfvNzMZX5nduI72iULR4T9j/Zc+6VJS7hJn18ztxjoCEdod
-         G/NPbRZ3r1wipVUKKDWO1X94GPSOUaZTGswMuxJ2pcX0Vx4jkvLWSNxzEtuzRIjmUToh
-         rxMg==
-X-Gm-Message-State: AOJu0YzwtHCVc7RBuQyZzNcpaxa6m8FRY4gnWBYnomDkiPfxPcT3xGNZ
-	z0Inm2be7TxZ4cfaFOqrPc4=
-X-Google-Smtp-Source: AGHT+IFZKivQSWNjSyvesdNWpq+FcFrQ02/ogazPdAE94dlNnPe02oq0WFuWF0+PgBrLuvnQWzOp+Q==
-X-Received: by 2002:a17:906:cb8e:b0:a0d:6bc6:4811 with SMTP id mf14-20020a170906cb8e00b00a0d6bc64811mr10287702ejb.37.1701283251857;
-        Wed, 29 Nov 2023 10:40:51 -0800 (PST)
+        bh=Cz+YINCm92INLOu3aEeoy2EI1iBVQPQ3Um2AX7lVQTk=;
+        b=ctcnZJyGcIRy8pCAzwW/kZy1jTg+oCmfMWTTuyIJ5jnnIH+y24ZMycHqwvnsiyMQ4+
+         lRWVu5thEL1/n++k4DTKRqq4kHDA8THdh+GPsnDRraaLvs2KKlsyZ9fhguvgbxTA1V1k
+         SP/WGODNeX0Vu2yL36B+8wDEOnn1at5GlV2oIRBTLY4LKt+43v2lb7CL7t+CJI0q8IHh
+         qUlBbOO845ovlmHxuNMmGjoUThE7KGzTeb/scJKA6nKGlJ1W7JYQCZ9wlABO6CpOgNnz
+         uQdrkGJ6b8MKkGe/NuewamqMd2jOxxPCAQgQlbAjPFwhIPFRZvJxELLaQIbOnwDO/KKF
+         JP7w==
+X-Gm-Message-State: AOJu0YzUsPOh+kI2Q6yCo5hjvP10nLE7X9hTkr76JN/7v278axmNcNMf
+	8r8UE1tVz8aG+G1suSNT6mE=
+X-Google-Smtp-Source: AGHT+IEX/rZBz2WEDEb8RGrJa8yuLzGI7I68tWl1Y/OUWBFj5bymkdM0B1fUv85h0hvgQ+Wif4Kc3A==
+X-Received: by 2002:a5d:4607:0:b0:32f:7649:2648 with SMTP id t7-20020a5d4607000000b0032f76492648mr13595798wrq.46.1701283577963;
+        Wed, 29 Nov 2023 10:46:17 -0800 (PST)
 Received: from skbuf ([188.26.185.12])
-        by smtp.gmail.com with ESMTPSA id ks20-20020a170906f85400b009db53aa4f7bsm8120920ejb.28.2023.11.29.10.40.49
+        by smtp.gmail.com with ESMTPSA id f10-20020a5d568a000000b00332f95ab451sm11929990wrv.58.2023.11.29.10.46.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 10:40:50 -0800 (PST)
-Date: Wed, 29 Nov 2023 20:40:48 +0200
+        Wed, 29 Nov 2023 10:46:17 -0800 (PST)
+Date: Wed, 29 Nov 2023 20:46:14 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Ido Schimmel <idosch@idosch.org>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+	Roopa Prabhu <roopa@nvidia.com>, Florian Westphal <fw@strlen.de>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld <mmuehlfe@redhat.com>
-Subject: Re: [PATCHv3 net-next 06/10] docs: bridge: add VLAN doc
-Message-ID: <20231129184048.k3fdtu7va6sewpqt@skbuf>
+Subject: Re: [PATCHv3 net-next 05/10] docs: bridge: add STP doc
+Message-ID: <20231129184614.ue47bujrivspjuks@skbuf>
 References: <20231128084943.637091-1-liuhangbin@gmail.com>
- <20231128084943.637091-1-liuhangbin@gmail.com>
- <20231128084943.637091-7-liuhangbin@gmail.com>
- <20231128084943.637091-7-liuhangbin@gmail.com>
+ <20231128084943.637091-6-liuhangbin@gmail.com>
+ <20231128144840.5d3ced05@hermes.local>
+ <ZWbrnK9VKczMrCMb@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,15 +80,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231128084943.637091-7-liuhangbin@gmail.com>
- <20231128084943.637091-7-liuhangbin@gmail.com>
+In-Reply-To: <ZWbrnK9VKczMrCMb@Laptop-X1>
 
-On Tue, Nov 28, 2023 at 04:49:39PM +0800, Hangbin Liu wrote:
-> Add VLAN part for bridge document.
-> 
-> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
+On Wed, Nov 29, 2023 at 03:43:24PM +0800, Hangbin Liu wrote:
+> 802.1D is expected to be officially withdrawn in 2022.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+2022 is in the past.
 
