@@ -1,154 +1,142 @@
-Return-Path: <netdev+bounces-52164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFB27FDACB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:08:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD8C7FDAC3
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2759A2827C5
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:08:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58BE21C2040B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB0337178;
-	Wed, 29 Nov 2023 15:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B8637158;
+	Wed, 29 Nov 2023 15:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="WEf+Zd0n"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mfT2Ohpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C577ADD;
-	Wed, 29 Nov 2023 07:08:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=t5xLtxOy4hbrpxKCfhc7jQx0EfqgpSIA0JLhwnMSArI=; t=1701270499; x=1702480099; 
-	b=WEf+Zd0nMDBX5NNu5ZLTosZWJdEhHfik6AdvfU77zWVvhFPSNtHCHEMy1tilzLSb+qd9liy28II
-	E65dZG0t5hhIQvyjhw09MJMBe85VNrjmYRD4fVUTSbKMZyktQ3DScdgYQZF/k6/MFIEtdptTUP5JM
-	wgaELxC14tKIlt2Y/33OcQ6lRa48YuGxr7PY4AuAwMQnHVYtaXwKW7PdIno1D0NqhMWaYN3xdeOpK
-	VwQ0R0D+y/6RzE0UFqHRzghe9HSr1txdsWOchi5oru1CssUzBDltG4qxSMFAjab/dWchj9LUfh/fq
-	Ws9FRyVAtBIl6t6Qza8hR5yPr0qyKG/0OrOQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r8MAj-00000008lYo-36Yx;
-	Wed, 29 Nov 2023 16:08:17 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: pull-request: wireless-2023-11-29
-Date: Wed, 29 Nov 2023 16:04:24 +0100
-Message-ID: <20231129150809.31083-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.43.0
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C64B5BE
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:07:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H5EcjFHMxmi30vH0co1C0p7jkiKskK1q6yNIEzInGl6Z0Bz5C8rVx090rLEsnIvwhfwmzeyTAUNG8CIQEppXGZBvZSCZM1ABkOy28/bHbH6ofrHYIAN0EKB2cGcQI7Q1nfPCs7t+qFdcDbMMfw5Xw/e8/dZjqhD6tPPYRAZMC4mlnrbRc7+8PIDSn4qf0OONMAI/sxyyslMmMLzQEioBtfGOyf4ujZLAWp+SUVUzWQPZ3hddvdPmRZKH9k29E0f3udcv40fuaiaVwj/fLL3TK87Ekm0O65K5vDydZduIb6zNPyd01J7jcjLnhVECukQ+R85+3MAIK7A+TiA7ltYCBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/Ml4Cw4fbebVZ3SrMWLXwZiuWNxdVuzotxFCDH8EO3k=;
+ b=NZFzfsN70+z5AtqZY1Jkm9fwB2RzChXZLbvWvxymi8XdGxqm4Vdw0j5nePbm3l7k/WNbXY8uNq4ogNG0k1b65yNRe6J7bAJYWJP+g8iANg607Fz0ngEMxc4BHhUL5VxXwOUAiG1jvPhcvY8cTp5oIUnkq8/NVben+6Fd658SULFkjbPF3wkCFIs1GrRvQMZdVQWkHmv5F7yOooqfv7ePHmRpGXvavuS3X2m1GG9jG4SdyrI8xZ7Uwi22Y8orPyTm7hd62rMUjwB8UJXoChlYRAzOw0CUMei6swOIbxtlCVl9eIsXNxh4hVt9sP2ydGDlWwDN/nOqKRTsIp+zU0gJ4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/Ml4Cw4fbebVZ3SrMWLXwZiuWNxdVuzotxFCDH8EO3k=;
+ b=mfT2OhpoqMw+q1n4sqHU+02iLpICoo0OUgJEhaHcf2EWFj9Sa5e7r8drT1a9us/RtW/VSzYAJz+2QeqAwfZKVO4++ovPpmjIqtrxTQGhhncSQiEEJY4zJQ1CuvWMpQdT9Km5KmkLl7tRncmj3iZg3zYorBMmmLPG6RMYJApoMnPuSjvC+9+509q334lRquRcPQqcY8LFpKYwgzvUKOXEDuMWm1dfK6U2YdAELdKj/Eiy+EqUNRt1EOtgWuZdEArig0wwN41latq/lh6DP/KhiprvLrui1geR+3duCZZNwIwYg8Bd5s3iXu0kn7IMjV4qxurLsqI9u2J2SkBUTlOc4w==
+Received: from BYAPR01CA0005.prod.exchangelabs.com (2603:10b6:a02:80::18) by
+ SA3PR12MB9198.namprd12.prod.outlook.com (2603:10b6:806:39f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Wed, 29 Nov
+ 2023 15:07:10 +0000
+Received: from MWH0EPF000989E6.namprd02.prod.outlook.com
+ (2603:10b6:a02:80:cafe::71) by BYAPR01CA0005.outlook.office365.com
+ (2603:10b6:a02:80::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.29 via Frontend
+ Transport; Wed, 29 Nov 2023 15:07:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000989E6.mail.protection.outlook.com (10.167.241.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.17 via Frontend Transport; Wed, 29 Nov 2023 15:07:10 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 29 Nov
+ 2023 07:06:53 -0800
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Wed, 29 Nov 2023 07:06:51 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mkubecek@suse.cz>, <is@datarespons.no>, <mlxsw@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH ethtool] ethtool: Fix SFF-8472 transceiver module identification
+Date: Wed, 29 Nov 2023 17:06:12 +0200
+Message-ID: <20231129150612.334560-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-malware-bazaar: not-scanned
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E6:EE_|SA3PR12MB9198:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1332ff4-fa12-4363-0e31-08dbf0ecdc99
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	VtY7Nkqz41HtrlrQoy95Yx1OZcxyTD9PoWlaY9epuCTQkohluFczFfW0JWull5NHPPAqKsed0Ry5GrK4NeaZSExEgpceJ16nPETHEwiZd//IoFYiObKnKMcTuGKJE+UgvdNR1Io9XHiwdBWYL/2V2061f4ysR8ujJmg3jlovCyjmW2zBSoxF5jLNGhdowvSQDQKlM10oMEvy8cUfhesDJIIDcFfaTJIDhyPbCRpQetFqVrwlBUayVSVpXbY/+Dcx16H0cBKW7gPBZ9AaQoTLGW52rjpUCo2kaDD0ntf+qwVdl+4jmaOHBgcHiHbTttS/C7oKI5VQ/9IMQyOy6jjC3QLT+4cq2b/dnqSfIprGU7O+mHrA5bRTxLXPDW2hOHk9sM+9vAKQoXbNrCwKGfJvawBfaXO+IcpQ/2JkVOo+VstwF5uB+4olUSDdD69OFeHOqJkf5O58kLVwTL3qzJC3mY5xtit3Zhng2+viRqViS9ULx67mghZSJXbE1I7f2TFGFuthjbAcK2K6BQr2fLFESCURRQV4Bazydssvaz8i6G2gkx2zCKVK2m0HTMYrhERyZxT8O4b3nEAJsGX6psQ404F8OkjolkME7sbdlQhtY7R7Jb1AqlR0mAf1nKC+tCUob++1i5gKk2Mp4Z6NAQHnsGmVbaA9eiaBKW+ZHlY4Sus0ZaDH9vf0AayfiHAV/OhcDDAv/+hn4tepuSveHzWfdBvnpEeAyNKmWOWgxn8A4twDXREHqnqf/CHoKSKCOziAZ4hyiYois1/f2KPAn4g/lZbJU7KAMut6FiZjey4stHs=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(39860400002)(396003)(376002)(230922051799003)(64100799003)(186009)(82310400011)(1800799012)(451199024)(40470700004)(36840700001)(46966006)(40460700003)(478600001)(2616005)(426003)(6666004)(107886003)(336012)(1076003)(45080400002)(16526019)(26005)(47076005)(36860700001)(2906002)(83380400001)(41300700001)(70206006)(8676002)(70586007)(966005)(8936002)(6916009)(54906003)(4326008)(316002)(7636003)(356005)(82740400003)(5660300002)(86362001)(36756003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 15:07:10.5460
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1332ff4-fa12-4363-0e31-08dbf0ecdc99
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E6.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9198
 
-Hi,
+According to table 5-1 in SFF-8472 Rev. 12.4, the Identifier Values for
+"GBIC" (01h) and "Module soldered to motherboard (ex: SFF)" (02h) are
+supported by the specification in addition to the current one.
+Therefore, adjust ethtool to invoke the SFF-8079 parser for them, which
+will in turn invoke the SFF-8472 parser if the transceiver module
+supports digital diagnostic monitoring.
 
-Here's the first wireless pull request, see below.
+Without this patch, the EEPROM contents of such transceiver modules will
+be hex dumped instead of being parsed and printed in a human readable
+format.
 
-Now that I'm actually preparing this, I'm having second
-thoughts on the debugfs lockdep change, since that's a
-new 'feature' of sorts, pointing out the deadlocks. I had
-that in to actually sort of prove the fix worked, though
-I also tested that another way, Greg ACK'ed it, and then
-I didn't think about it again. I guess I could revert it
-back out, but it doesn't revert cleanly. Lockdep only.
+Fixes: 25b64c66f58d ("ethtool: Add netlink handler for getmodule (-m)")
+Reported-by: Ivar Simensen <is@datarespons.no>
+Closes: https://lore.kernel.org/netdev/AM0PR03MB5938EE1722EF2C75112B86F5B9B9A@AM0PR03MB5938.eurprd03.prod.outlook.com/
+Tested-by: Ivar Simensen <is@datarespons.no>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ netlink/module-eeprom.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Also there was a fortify build problem report on the CQM
-fix that we haven't been able to make sense of, and yet
-the CQM fix is the one thing we'd rather have in soon as
-it broke quite a few users... Asked Kees about it too,
-but no response yet (it was only this morning.)
+diff --git a/netlink/module-eeprom.c b/netlink/module-eeprom.c
+index 09ad58011d2a..fe02c5ab2b65 100644
+--- a/netlink/module-eeprom.c
++++ b/netlink/module-eeprom.c
+@@ -216,6 +216,8 @@ static int eeprom_parse(struct cmd_context *ctx)
+ 
+ 	switch (request.data[0]) {
+ #ifdef ETHTOOL_ENABLE_PRETTY_DUMP
++	case SFF8024_ID_GBIC:
++	case SFF8024_ID_SOLDERED_MODULE:
+ 	case SFF8024_ID_SFP:
+ 		return sff8079_show_all_nl(ctx);
+ 	case SFF8024_ID_QSFP:
+-- 
+2.40.1
 
-If that seems OK for now, please pull. Otherwise let me
-know if I should revert the debugfs lockdep, and/or wait
-for the CQM/fortify issue to get resolved.
-
-Thanks,
-johannes
-
-
-
-The following changes since commit 55c900477f5b3897d9038446f72a281cae0efd86:
-
-  net: fill in MODULE_DESCRIPTION()s under drivers/net/ (2023-10-28 11:29:28 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-11-29
-
-for you to fetch changes up to 4ded3bfe1db655367642aadba91aee770cbab317:
-
-  wifi: mac80211: use wiphy locked debugfs for sdata/link (2023-11-27 11:25:09 +0100)
-
-----------------------------------------------------------------
-wireless fixes:
- - debugfs had a deadlock (removal vs. use of files),
-   fixes going through wireless ACKed by Greg
- - support for HT STAs on 320 MHz channels, even if it's
-   not clear that should ever happen (that's 6 GHz), best
-   not to WARN()
- - fix for the previous CQM fix that broke most cases
- - various wiphy locking fixes
- - various small driver fixes
-
-----------------------------------------------------------------
-Ben Greear (1):
-      wifi: mac80211: handle 320 MHz in ieee80211_ht_cap_ie_to_sta_ht_cap
-
-Dan Carpenter (1):
-      wifi: iwlwifi: mvm: fix an error code in iwl_mvm_mld_add_sta()
-
-Johannes Berg (9):
-      wifi: cfg80211: fix CQM for non-range use
-      wifi: cfg80211: lock wiphy mutex for rfkill poll
-      wifi: cfg80211: hold wiphy mutex for send_interface
-      debugfs: fix automount d_fsdata usage
-      debugfs: annotate debugfs handlers vs. removal with lockdep
-      debugfs: add API to allow debugfs operations cancellation
-      wifi: cfg80211: add locked debugfs wrappers
-      wifi: mac80211: use wiphy locked debugfs helpers for agg_status
-      wifi: mac80211: use wiphy locked debugfs for sdata/link
-
-Lorenzo Bianconi (1):
-      wifi: mt76: mt7925: fix typo in mt7925_init_he_caps
-
-Michael-CY Lee (1):
-      wifi: avoid offset calculation on NULL pointer
-
-Ming Yen Hsieh (1):
-      wifi: mt76: mt7921: fix 6GHz disabled by the missing default CLC config
-
-Oldřich Jedlička (1):
-      wifi: mac80211: do not pass AP_VLAN vif pointer to drivers during flush
-
- drivers/net/wireless/ath/ath9k/Kconfig           |   4 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c |   4 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mcu.c  |   1 +
- drivers/net/wireless/mediatek/mt76/mt7925/main.c |   4 +-
- fs/debugfs/file.c                                | 100 ++++++++++++++
- fs/debugfs/inode.c                               |  71 ++++++++--
- fs/debugfs/internal.h                            |  21 ++-
- include/linux/debugfs.h                          |  19 +++
- include/linux/ieee80211.h                        |   4 +-
- include/net/cfg80211.h                           |  46 +++++++
- net/mac80211/Kconfig                             |   2 +-
- net/mac80211/debugfs_netdev.c                    | 150 ++++++++++++++-------
- net/mac80211/debugfs_sta.c                       |  74 ++++++-----
- net/mac80211/driver-ops.h                        |   9 +-
- net/mac80211/ht.c                                |   1 +
- net/wireless/core.c                              |   6 +-
- net/wireless/core.h                              |   1 +
- net/wireless/debugfs.c                           | 160 +++++++++++++++++++++++
- net/wireless/nl80211.c                           |  55 +++++---
- 19 files changed, 614 insertions(+), 118 deletions(-)
 
