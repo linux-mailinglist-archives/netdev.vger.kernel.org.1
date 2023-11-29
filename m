@@ -1,129 +1,96 @@
-Return-Path: <netdev+bounces-52226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601AD7FDEE7
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:53:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D6997FDEE9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 021E4B21021
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:53:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CF451C20B02
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F57E5AB81;
-	Wed, 29 Nov 2023 17:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B2158AA5;
+	Wed, 29 Nov 2023 17:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NyNO2pnG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jtQC21zV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D4E122
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:53:39 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54b0c368d98so182a12.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:53:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701280418; x=1701885218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nolkjQeTKUPpQU0aMQBGDG9EPk/umeej7VkDw1waIR8=;
-        b=NyNO2pnGt3/BL7hYXF9eBUkgH9vSo4B+3yM3JGVs3nUTp2jvSViBFJ4kRP/8miKJ14
-         KZQa2q+jWYsZVWWSloxgAeprUeJm4WDC8wpEoHRYQtM9sr5pstOpBObLldRuV4CToM2V
-         fnbgyO6g1jtIuN0YSEt7XLsJr+fXNiQhK4F8M5HVg8TJsCWzdNMsPpnKlGjOLPkE1wiV
-         CJbmOta+QrN4rfZgHHnnQ4bu7aclpLy1kP9ZzFfbvoR6sLdqON6ufrmQ6Ev2ClIEvgK2
-         l0Q4qgilABvyPcxtIwwbAO6CrptTOvw5sslreynqesIYm5gC2aMShJ7KXHZxf8SUt8wS
-         oz6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701280418; x=1701885218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nolkjQeTKUPpQU0aMQBGDG9EPk/umeej7VkDw1waIR8=;
-        b=ouv62G+8Ahfu0jcWKMxOLJlnNyvbNBhQg3EvWNhNIeYXTS3lIaBZzjQtygs7HbQvaY
-         ayWO0jpvMopROvydOgScVme/Q71v0Obr/7GWhbFedu4/Py6sW+htf2lXnymJ19Bc+buX
-         UjUtCo8td8Z2mrvkqk0ho7M5D91a7G/6egwswOFNhhNL1jPvQgSImEmIpk3YXE9z59AU
-         UmTAo07EAR/AOLdEJCI6wlU+SApD5ip6mJzrtr2090hOauolBKU1E6WM7HEXabrcgMv5
-         y2Kxpxuc6IB8J0HsOLnAv+OCI6oI8uKz1CPQEq8aVE77TRY7SDy/kO+SGwHJkXGV1B4M
-         uOzw==
-X-Gm-Message-State: AOJu0YwX1MGy0idpglbHBocJIUPeVXXAuKwCsLj4nPppFDHp5/BWorKY
-	Ddsb+X808R0IkyE0qJYDWyF78Q6/n+K6G4AvgAr6OQ==
-X-Google-Smtp-Source: AGHT+IGZcOv7ZQLL12mB+17qgert2qyz+y6OZwNvXyJtI5UtexLrW6LRiiAPvulcoSl1BmeutGldHuWTQhcIW9ifMFY=
-X-Received: by 2002:a05:6402:430e:b0:54b:67da:b2f with SMTP id
- m14-20020a056402430e00b0054b67da0b2fmr630112edc.7.1701280417472; Wed, 29 Nov
- 2023 09:53:37 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914A784
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:56:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701280574; x=1732816574;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cfyFMyY66E8uYlmk8SQXuQsg3lTBZ8/i8g/y5BK0ZXE=;
+  b=jtQC21zVjcPEVrhlqTxNl/WnupNBIZiw1wPIoTHa18/kUcG7asXOXSJA
+   HzZFx/JdZLZr5KU6keFFqSF7XqiHihaqeSVXEqDeXwKeNOvTj055XWJ0Z
+   ML3RnSunpVmRw/w40t6grk0pl7QV2ZA6M7OO64bluccrYIL163Y6Y5HaF
+   Du9eFjLWY2sGEt32ajP+W2KKpllwq5ZwyR4kJ5aI05AXriQ87vF6x9lgX
+   tjNWAjWf45BtAz2DmgX27ALH0Ay2gW7vOQp9PUfUw5MJrp0TF9n8KiRq9
+   lqaDjmCxpNbMwQhjMbEhizSDogT/9tSto7euIj3d5TAtSYZD3oNyqlDI+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="479404728"
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="479404728"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 09:56:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="797990593"
+X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
+   d="scan'208";a="797990593"
+Received: from sbahadur1-bxdsw.sj.intel.com ([10.232.237.139])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 09:56:13 -0800
+From: Sachin Bahadur <sachin.bahadur@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-next v2] ice: Print NIC FW version during init
+Date: Wed, 29 Nov 2023 09:56:04 -0800
+Message-Id: <20231129175604.1374020-1-sachin.bahadur@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129165721.337302-1-dima@arista.com> <20231129165721.337302-5-dima@arista.com>
-In-Reply-To: <20231129165721.337302-5-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Nov 2023 18:53:26 +0100
-Message-ID: <CANn89i+Ln+d6fci8T1MWwACZGS-RE+DfOvQ1kvejGowtiYhofw@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] net/tcp: Allow removing current/rnext TCP-AO keys
- on TCP_LISTEN sockets
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 5:57=E2=80=AFPM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> TCP_LISTEN sockets are not connected to any peer, so having
-> current_key/rnext_key doesn't make sense.
+Print NIC FW version during PF initialization. FW version in dmesg is used
+to identify and isolate issues. Particularly useful when dmesg is read
+after reboot.
 
-I do not understand this patch.
+Example log from dmesg:
+ice 0000:ca:00.0: fw 6.2.9 api 1.7.9 nvm 3.32 0x8000d83e 1.3146.0
 
-This seems that the clearing should happen at disconnect time, from
-tcp_disconnect() ?
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Pawel Kaminski <pawel.kaminski@intel.com>
+Signed-off-by: Sachin Bahadur <sachin.bahadur@intel.com>
+---
+v1->v2: Added example log message
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Why forcing user to set a socket option to clear these fields ?
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 1f159b4362ec..71d3d8cfdd1d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4568,6 +4568,12 @@ static int ice_init_dev(struct ice_pf *pf)
+ 		dev_err(dev, "ice_init_hw failed: %d\n", err);
+ 		return err;
+ 	}
++	dev_info(dev, "fw %u.%u.%u api %u.%u.%u nvm %u.%u 0x%08x %u.%u.%u\n",
++		 hw->fw_maj_ver, hw->fw_min_ver, hw->fw_patch, hw->api_maj_ver,
++		 hw->api_min_ver, hw->api_patch, hw->flash.nvm.major,
++		 hw->flash.nvm.minor, hw->flash.nvm.eetrack,
++		 hw->flash.orom.major, hw->flash.orom.build,
++		 hw->flash.orom.patch);
 
->
-> The userspace may falter over this issue by setting current or rnext
-> TCP-AO key before listen() syscall. setsockopt(TCP_AO_DEL_KEY) doesn't
-> allow removing a key that is in use (in accordance to RFC 5925), so
-> it might be inconvenient to have keys that can be destroyed only with
-> listener socket.
->
-> Fixes: 4954f17ddefc ("net/tcp: Introduce TCP_AO setsockopt()s")
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  net/ipv4/tcp_ao.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-> index c8be1d526eac..bf41be6d4721 100644
-> --- a/net/ipv4/tcp_ao.c
-> +++ b/net/ipv4/tcp_ao.c
-> @@ -1818,8 +1818,16 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigne=
-d short int family,
->                 if (!new_rnext)
->                         return -ENOENT;
->         }
-> -       if (cmd.del_async && sk->sk_state !=3D TCP_LISTEN)
-> -               return -EINVAL;
-> +       if (sk->sk_state =3D=3D TCP_LISTEN) {
-> +               /* Cleaning up possible "stale" current/rnext keys state,
-> +                * that may have preserved from TCP_CLOSE, before sys_lis=
-ten()
-> +                */
-> +               ao_info->current_key =3D NULL;
-> +               ao_info->rnext_key =3D NULL;
-> +       } else {
-> +               if (cmd.del_async)
-> +                       return -EINVAL;
-> +       }
->
->         if (family =3D=3D AF_INET) {
->                 struct sockaddr_in *sin =3D (struct sockaddr_in *)&cmd.ad=
-dr;
-> --
-> 2.43.0
->
+ 	/* Some cards require longer initialization times
+ 	 * due to necessity of loading FW from an external source.
+--
+2.25.1
+
 
