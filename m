@@ -1,131 +1,167 @@
-Return-Path: <netdev+bounces-52096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D557FD469
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:38:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5CA7FD487
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:42:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 958F228340C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:38:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92E64B20E36
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B6119BDC;
-	Wed, 29 Nov 2023 10:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8731427A;
+	Wed, 29 Nov 2023 10:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aC/TSEwY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LINjY8N4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB94C1BE8;
-	Wed, 29 Nov 2023 02:38:01 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b34563987so4416105e9.1;
-        Wed, 29 Nov 2023 02:38:01 -0800 (PST)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A1BD54;
+	Wed, 29 Nov 2023 02:41:53 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-332e56363adso4098469f8f.3;
+        Wed, 29 Nov 2023 02:41:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701254280; x=1701859080; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YVL5H5p6npDvqHk3KuIbfLoOW3Jt9rDFhXjL2FY1/7A=;
-        b=aC/TSEwYg2ct+BswmB+zs6laCh3+AXJQaAaLOjfV9uLb0AfxUfjW/a++6FaRDcJguh
-         c4hjXMbYGywmEkHwWMfoE8fdAhnLWT5B8taaqx3CLE1fnznXEUVGM/OgGsOT0ZFqxQVW
-         j7iccUW11F4x7XscRR/eLDoj5xjrNghytZ8tXFA5c9BbPIFawKrZyDXyviIxSCClPnPO
-         v94gqrSn8ZLNNm0UI05WmuliYLSJcEZzzJU/oGt5IgRbFoBy8UjNC4wB/B9wjUrQtyYN
-         y/FddduyWAWonMVwPqdKC1YJOJKMuZgraduvrKVYZm5mBGFBVCPVFEZ01Uhfx5cowcul
-         SRUQ==
+        d=gmail.com; s=20230601; t=1701254512; x=1701859312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7H4B/924HyaoRAFkIk6lK/E+N1uo+pxAmQC4iccDwXA=;
+        b=LINjY8N4Suva11owmw4ZDE0lxU+0ggW7NT+HvCxr+oUIEO5G8bLf2mXHN0ysflKjFl
+         V89goo4lhy0iPIZxlc7TckwXSu2EMSPwqKSHg7QlSfg/vqCCkUFZjpHGJCJtNjfvONqo
+         GzOGMTmtNPzktGnRFmxXgFmgzctp4eYiYfV+4SuknkmSLmZDCMkIWNKqA52JxcPz3KnG
+         +gjd+nY5QFnIT5K+v6a/iJZhSlzamgQ9AwTk69cjZsIr7982TKEoOEqywEvoy5xkT8BC
+         Wnh/SHGx0Y0Ya6s696anUhvnJ+sEg/ga/s/uOMXGSzHJGX1ujttJ+kwpJ7JhTo2L9net
+         fkpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701254280; x=1701859080;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YVL5H5p6npDvqHk3KuIbfLoOW3Jt9rDFhXjL2FY1/7A=;
-        b=to6MUvXz28dbD6oYEP7qIdD4rDe2kaJV15EXPW9a+VaP177UO4otfhzlgTrm0pIq0T
-         v9OBHcXnwXs5CujIBz2Xk+WEY28qSGEb+B/5Q+diWnwYdzZO0m1+GXnz//TAUdU2GmR4
-         gps51hSlm8qdkLGdBSDcdyQvGn9OXzYW2MZgL5Kn3cdlGp8vhWJ4/uPz318YnLkBv4Wb
-         40hAxBRO3FazwhlVsHCbae4xVft7BMT+pqImnEbyI7mAJs48K6Zp1uqE7+GRjWLe7O6A
-         7OaXHTWDYbXaBdSFSt08bjEt4yYkQ3+STF9dZk9dQzldIat2l7ijGuDvGZWt+ntPuhA5
-         nPUA==
-X-Gm-Message-State: AOJu0YxwrccsGRTvnh34jGRAHL1Cap3glZdun4w+l3j4HXlnfOsVQvK7
-	DDigWcAePhULzRvpoUyMZGo=
-X-Google-Smtp-Source: AGHT+IGodQG0XJPz39Mx5TxzQu6q/QOj+i059+FByFuRGFamgl53a/rgDV/3RkLMIJYMXDWblGiZYA==
-X-Received: by 2002:a05:600c:138d:b0:40b:2afd:1a9 with SMTP id u13-20020a05600c138d00b0040b2afd01a9mr18428597wmf.15.1701254280093;
-        Wed, 29 Nov 2023 02:38:00 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id j7-20020a05600c190700b0040b43da0bbasm1711731wmq.30.2023.11.29.02.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 02:37:59 -0800 (PST)
-Message-ID: <65671487.050a0220.dae78.45f0@mx.google.com>
-X-Google-Original-Message-ID: <ZWcUhLK8BdDYhRwc@Ansuel-xps.>
-Date: Wed, 29 Nov 2023 11:37:56 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 13/14] net: phy: qcom: deatch qca83xx PHY driver
- from at803x
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-14-ansuelsmth@gmail.com>
- <ZWcJ/OgC1+cbFvhk@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1701254512; x=1701859312;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7H4B/924HyaoRAFkIk6lK/E+N1uo+pxAmQC4iccDwXA=;
+        b=VnijzAo8fuSFr7eT9Xeag7tGf/gR9zBbnMzki8spIdbbdbQhMEegbFlg8mrLJlo/zI
+         UCIqiJev77RpiBjM3QssLj7YNm4I8Q4KZOBlYotSusZQ2emj2sNv2KH5iT8brtW5JdE0
+         fJLT+FT/QlYoJImoqUns9wBUdUbxk1FGNB9/ii/q6lrrB232sRVKm6fg+A4ib6Vcgbhk
+         NxNfV9G4Pd6qurTkXKBxdmHEb9/07JNlPLc+y6ZHqiSl9YE1ifKLk2yM2IdZDbV1VDhg
+         6XnDTFkALPB0dNlSnBXp4Mh5D3ypktgBey0JsUr5R3oZtQC7x5ng/pLteu+YaNCfVnNs
+         5nPQ==
+X-Gm-Message-State: AOJu0YyVoyVduea++hPqgEhbfleuNpRK8FwkA2LG6IXemDlCS8N+lqug
+	5ImtyRRBEteS+QhzXNXv1BE=
+X-Google-Smtp-Source: AGHT+IGncGGAwBxF9KtE8pI1EFG5C0hP4V62tWSOJygxtujlh83Qi7ncVbU5KOFYUXN/NiJnwS2rgg==
+X-Received: by 2002:a05:6000:1544:b0:333:156:bf00 with SMTP id 4-20020a056000154400b003330156bf00mr6485520wry.30.1701254512184;
+        Wed, 29 Nov 2023 02:41:52 -0800 (PST)
+Received: from ?IPV6:2a01:c22:7b29:900:d9e3:6657:95d9:170f? (dynamic-2a01-0c22-7b29-0900-d9e3-6657-95d9-170f.c22.pool.telefonica.de. [2a01:c22:7b29:900:d9e3:6657:95d9:170f])
+        by smtp.googlemail.com with ESMTPSA id o16-20020a056000011000b0032196c508e3sm3953839wrx.53.2023.11.29.02.41.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 02:41:51 -0800 (PST)
+Message-ID: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
+Date: Wed, 29 Nov 2023 11:41:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWcJ/OgC1+cbFvhk@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH] leds: trigger: netdev: skip setting baseline state in
+ activate if hw-controlled
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 29, 2023 at 09:53:00AM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 29, 2023 at 03:12:18AM +0100, Christian Marangi wrote:
-> > diff --git a/drivers/net/phy/qcom/Makefile b/drivers/net/phy/qcom/Makefile
-> > index 6a68da8aaa7b..43e4d14df8ea 100644
-> > --- a/drivers/net/phy/qcom/Makefile
-> > +++ b/drivers/net/phy/qcom/Makefile
-> > @@ -1,2 +1,3 @@
-> >  # SPDX-License-Identifier: GPL-2.0
-> > -obj-$(CONFIG_AT803X_PHY)	+= at803x.o
-> > +obj-$(CONFIG_AT803X_PHY)	+= at803x.o common.o
-> > +obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o common.o
-> 
-> These PHY drivers can be built as modules. You will end up with several
-> modules - at803x.ko, qca83xx.ko and common.ko. You don't mark any
-> functions in common.c as exported, no module license, no author, no
-> description. common.ko is way too generic a name as well.
-> 
-> Please think about this more and test building these drivers as a
-> module.
->
+The current codes uses the sw_control path in set_baseline_state() when
+called from netdev_trig_activate() even if we're hw-controlled. This
+may result in errors when led_set_brightness() is called because we may
+not have set_brightness led ops (if hw doesn't support setting a LED
+to ON).
 
-Had some fear about this...
+Therefore set trigger_data->hw_control = true before calling
+set_device_name() from netdev_trig_activate(). In this call chain we
+have to prevent set_baseline_state() from being called, because this
+would call hw_control_set(). Use led_cdev->trigger_data == NULL as
+indicator for being called from netdev_trig_activate().
 
-What would be the preferred way for this?
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/leds/trigger/ledtrig-netdev.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Having a .ko that EXPORT symbol or making the PHY driver .ko to compile
-the common.o in it?
-
-Honestly I would like the second option since I would prefer not to
-create a .ko with shared function and EXPORT lots of symbols. On SoC it's
-expected to have only one of the PHY (at max 2 when the qca807x PHY will
-be implemented, with the at808x also present) so the size increase is
-minimal.
-
-(just to be more clear, talking about this makefile implementation)
-
-at803x-objs			+= common.o
-obj-$(CONFIG_AT803X_PHY)	+= at803x.o
-qca83xx-objs			+= common.o
-obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o
-qca808x-objs			+= common.o
-obj-$(CONFIG_QCA808X_PHY)	+= qca808x.o
-
-For name of common.c, is qcom_ethphy_common.c a better name?
-
+diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+index 7ed2d0b64..b58396600 100644
+--- a/drivers/leds/trigger/ledtrig-netdev.c
++++ b/drivers/leds/trigger/ledtrig-netdev.c
+@@ -251,7 +251,11 @@ static int set_device_name(struct led_netdev_data *trigger_data,
+ 
+ 	trigger_data->last_activity = 0;
+ 
+-	set_baseline_state(trigger_data);
++	/* skip if we're called from netdev_trig_activate() and hw_control is true */
++	if (!trigger_data->hw_control ||
++	    led_get_trigger_data(trigger_data->led_cdev))
++		set_baseline_state(trigger_data);
++
+ 	mutex_unlock(&trigger_data->lock);
+ 	rtnl_unlock();
+ 
+@@ -568,8 +572,8 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
+ 		if (dev) {
+ 			const char *name = dev_name(dev);
+ 
+-			set_device_name(trigger_data, name, strlen(name));
+ 			trigger_data->hw_control = true;
++			set_device_name(trigger_data, name, strlen(name));
+ 
+ 			rc = led_cdev->hw_control_get(led_cdev, &mode);
+ 			if (!rc)
 -- 
-	Ansuel
+2.43.0
+
 
