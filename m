@@ -1,122 +1,152 @@
-Return-Path: <netdev+bounces-52184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B9917FDD2A
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:36:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3837FDD30
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:36:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B42601F20FD3
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:36:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAF181F20FFA
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D128E3A29A;
-	Wed, 29 Nov 2023 16:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3934E2CCB8;
+	Wed, 29 Nov 2023 16:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jI6fKFKY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rL07mS8k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9DF374CF;
-	Wed, 29 Nov 2023 16:36:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DC2C433C7;
-	Wed, 29 Nov 2023 16:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACA93B2A8
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:36:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25C80C433CD;
+	Wed, 29 Nov 2023 16:36:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701275765;
-	bh=f8jHdiXtK0L6HqAZSe4jGsEUD2I+G2hBQQOeTpUpJIs=;
+	s=k20201202; t=1701275783;
+	bh=A7BJ51eiIq0oseXAXQNOdBOnkeZz+OdO53eDCW5R7a8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jI6fKFKYgwzcCQx2665BPIhcLP1s3fNPvATmDdh3hEjhzSYnERjqriRAevqnzF9S1
-	 xDQdrf1yNNbPIzn02LIfhfyvKr84Ro1leWnM+LJAstkVCXguAMRFHKyx8P95JfMy4/
-	 GLYVg46uVVHtXs8qA7f3H5LaA7wGVTW/ulADVuPl7zfoC2BLN3Y/EL2wWksxuY27S+
-	 V5LxqeqsBs8im0EAAEA+gDJnwyId+fP+kM0zi+4gr10+tku2XKqJEm4MUbjwN/4WP/
-	 o3++QrvovggeqMdYeckVquAfnfysFIPwGqVBTMyIYNbLOBWqpNL503v9yAhaMu/EZJ
-	 oLGJqp4iB3fDQ==
-Date: Wed, 29 Nov 2023 17:36:01 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	bpf@vger.kernel.org, hawk@kernel.org, toke@redhat.com
-Subject: Re: [PATCH net-next] xdp: add multi-buff support for xdp running in
- generic mode
-Message-ID: <ZWdocaE6A801wwpd@lore-desk>
-References: <c928f7c698de070b33d38f230081fd4f993f2567.1701128026.git.lorenzo@kernel.org>
- <ZWYjcNlo7RAX8M0T@lore-desk>
- <20231128105145.7b39db7d@kernel.org>
- <ZWZpUaYbgMELGtL8@lore-desk>
- <20231128151028.168e7a13@kernel.org>
+	b=rL07mS8k2km6o+L9eBym7jYJReNZiTGLInC/lcQf6rKvzupd5XM/gKjazZFymUbdd
+	 tSdARz1U0x5v+7Hki0KJ9eXqh3J7vWYCgart2MKtzWs2jOhTowndCsN1y9ZgOlU+Go
+	 pLuyMwSWh7doF+HMFKmiWTbuZZbU/GrVKa7NvJNlUSBU1ORwU9Tifcv03tMlrrWECB
+	 juUaHIJ9z4nPDSuFPpX6V6jiqUN0sF/6MGVhrXv5z5GgmY7491mclNGThhrcXmKcA9
+	 tn4rOjJmQzUUWDA28jNyHS49oYokCSeStoE9XGH6nnyzUrUH24hUcp4mKtbR/Ww7wG
+	 vprbZOHCYp/zQ==
+Date: Wed, 29 Nov 2023 16:36:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Harshitha Ramamurthy <harshitha.ramamurthy@intel.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH iwl-net] i40e: Fix kernel crash during macvlan offloading
+ setup
+Message-ID: <20231129163618.GD43811@kernel.org>
+References: <20231124164233.86691-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="8Q0WNh2/oIryI2km"
-Content-Disposition: inline
-In-Reply-To: <20231128151028.168e7a13@kernel.org>
-
-
---8Q0WNh2/oIryI2km
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231124164233.86691-1-ivecera@redhat.com>
 
-> On Tue, 28 Nov 2023 23:27:29 +0100 Lorenzo Bianconi wrote:
-> > > Yes, don't we allow writes to fragments in XDP based on the assumption
-> > > that it runs on Rx so that paged data must not be zero copy?
-> > > bpf_xdp_store_bytes() doesn't seem to have any checks which would
-> > > stop it from writing fragments, as far as I can see. =20
-> >=20
-> > do you mean in the skb use-case we could write to fragments (without co=
-pying
-> > them) if the skb is not cloned and the paged area is not 'zero-copied'?
->=20
-> The zero-copy thing is a red herring. If application uses
-> sendpage/sendfile/splice the frag may be a page cache page
-> of a file. Or something completely read only.
+On Fri, Nov 24, 2023 at 05:42:33PM +0100, Ivan Vecera wrote:
+> Function i40e_fwd_add() computes num of created channels and
+> num of queues per channel according value of pf->num_lan_msix.
+> 
+> This is wrong because the channels are used for subordinated net
+> devices that reuse existing queues from parent net device and
+> number of existing queue pairs (pf->num_queue_pairs) should be
+> used instead.
+> 
+> E.g.:
+> Let's have (pf->num_lan_msix == 32)... Then we reduce number of
+> combined queues by ethtool to 8 (so pf->num_queue_pairs == 8).
+> i40e_fwd_add() called by macvlan then computes number of macvlans
+> channels to be 16 and queues per channel 1 and calls
+> i40e_setup_macvlans(). This computes new number of queue pairs
+> for PF as:
+> 
+> num_qps = vsi->num_queue_pairs - (macvlan_cnt * qcnt);
+> 
+> This is evaluated in this case as:
+> num_qps = (8 - 16 * 1) = (u16)-8 = 0xFFF8
+> 
+> ...and this number is stored vsi->next_base_queue that is used
+> during channel creation. This leads to kernel crash.
+> 
+> Fix this bug by computing the number of offloaded macvlan devices
+> and no. their queues according the current number of queues instead
+> of maximal one.
+> 
+> Reproducer:
+> 1) Enable l2-fwd-offload
+> 2) Reduce number of queues
+> 3) Create macvlan device
+> 4) Make it up
+> 
+> Result:
+> [root@cnb-03 ~]# ethtool -K enp2s0f0np0 l2-fwd-offload on
+> [root@cnb-03 ~]# ethtool -l enp2s0f0np0 | grep Combined
+> Combined:       32
+> Combined:       32
+> [root@cnb-03 ~]# ethtool -L enp2s0f0np0 combined 8
+> [root@cnb-03 ~]# ip link add link enp2s0f0np0 mac0 type macvlan mode bridge
+> [root@cnb-03 ~]# ip link set mac0 up
+> ...
+> [ 1225.686698] i40e 0000:02:00.0: User requested queue count/HW max RSS count:  8/32
+> [ 1242.399103] BUG: kernel NULL pointer dereference, address: 0000000000000118
+> [ 1242.406064] #PF: supervisor write access in kernel mode
+> [ 1242.411288] #PF: error_code(0x0002) - not-present page
+> [ 1242.416417] PGD 0 P4D 0
+> [ 1242.418950] Oops: 0002 [#1] PREEMPT SMP NOPTI
+> [ 1242.423308] CPU: 26 PID: 2253 Comm: ip Kdump: loaded Not tainted 6.7.0-rc1+ #20
+> [ 1242.430607] Hardware name: Abacus electric, s.r.o. - servis@abacus.cz Super Server/H12SSW-iN, BIOS 2.4 04/13/2022
+> [ 1242.440850] RIP: 0010:i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
+> [ 1242.448165] Code: 48 89 b3 80 00 00 00 48 89 bb 88 00 00 00 74 3c 31 c9 0f b7 53 16 49 8b b4 24 f0 0c 00 00 01 ca 83 c1 01 0f b7 d2 48 8b 34 d6 <48> 89 9e 18 01 00 00 49 8b b4 24 e8 0c 00 00 48 8b 14 d6 48 89 9a
+> [ 1242.466902] RSP: 0018:ffffa4d52cd2f610 EFLAGS: 00010202
+> [ 1242.472121] RAX: 0000000000000000 RBX: ffff9390a4ba2e40 RCX: 0000000000000001
+> [ 1242.479244] RDX: 000000000000fff8 RSI: 0000000000000000 RDI: ffffffffffffffff
+> [ 1242.486370] RBP: ffffa4d52cd2f650 R08: 0000000000000020 R09: 0000000000000000
+> [ 1242.493494] R10: 0000000000000000 R11: 0000000100000001 R12: ffff9390b861a000
+> [ 1242.500626] R13: 00000000000000a0 R14: 0000000000000010 R15: ffff9390b861a000
+> [ 1242.507751] FS:  00007efda536b740(0000) GS:ffff939f4ec80000(0000) knlGS:0000000000000000
+> [ 1242.515826] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 1242.521564] CR2: 0000000000000118 CR3: 000000010bd48002 CR4: 0000000000770ef0
+> [ 1242.528699] PKRU: 55555554
+> [ 1242.531400] Call Trace:
+> [ 1242.533846]  <TASK>
+> [ 1242.535943]  ? __die+0x20/0x70
+> [ 1242.539004]  ? page_fault_oops+0x76/0x170
+> [ 1242.543018]  ? exc_page_fault+0x65/0x150
+> [ 1242.546942]  ? asm_exc_page_fault+0x22/0x30
+> [ 1242.551131]  ? i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
+> [ 1242.557847]  i40e_setup_channel.part.0+0x5f/0x130 [i40e]
+> [ 1242.563167]  i40e_setup_macvlans.constprop.0+0x256/0x420 [i40e]
+> [ 1242.569099]  i40e_fwd_add+0xbf/0x270 [i40e]
+> [ 1242.573300]  macvlan_open+0x16f/0x200 [macvlan]
+> [ 1242.577831]  __dev_open+0xe7/0x1b0
+> [ 1242.581236]  __dev_change_flags+0x1db/0x250
+> ...
+> 
+> Fixes: 1d8d80b4e4ff ("i40e: Add macvlan support on i40e")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-ack, thx for pointing this out. It is clear now :)
+Thanks Ivan,
 
->=20
-> IIUC you're trying to avoid the copy if the prog is mbuf capable.
-> So I was saying that can't work for forms of XDP which actually=20
-> deal with skbs. But that wasn't really your question, sorry :)
->=20
-> > With respect to this patch it would mean we can rely on pskb_expand_hea=
-d() to
-> > reallocate the skb and to covert it to a xdp_buff and we do not need to=
- explicitly
-> > reallocate fragments as we currently do for veth in veth_convert_skb_to=
-_xdp_buff() [0].
-> > Is my understanding correct or am I missing something?
->=20
-> The difference is that pskb_expand_head() will give you a linear skb,
-> potentially triggering an order 5 allocation. Expensive and likely to
-> fail under memory pressure.
+I agree with the analysis and that the problem was introduced by the cited
+patch.
 
-ack
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->=20
-> veth_convert_skb_to_xdp_buff() tries to allocate pages, and keep
-> the skb fragmented.
-
-I will rework the patch using this approach.
-
-Regards,
-Lorenzo
-
---8Q0WNh2/oIryI2km
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZWdocQAKCRA6cBh0uS2t
-rJbpAP9NAjCMUjE3ul7ctYWcJ8TfWWkyKiWJ2evilcmu8dHL5AEAnK+gZBK1MWJS
-vrNrfS4qaf0g/Z8njp/YnL2B9OT37A4=
-=zRnU
------END PGP SIGNATURE-----
-
---8Q0WNh2/oIryI2km--
 
