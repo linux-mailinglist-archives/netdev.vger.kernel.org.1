@@ -1,104 +1,132 @@
-Return-Path: <netdev+bounces-52311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C217FE44D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:48:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4998E7FE451
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:49:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3EA61C20AD2
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:48:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07C551F20CDB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D106247A65;
-	Wed, 29 Nov 2023 23:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92E847A67;
+	Wed, 29 Nov 2023 23:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aD+38mP1"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="aDhigzmU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7D510C2
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 15:48:09 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5cbcfdeaff3so3886477b3.0
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 15:48:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701301688; x=1701906488; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8NC6M2ahDfb9yS4fB5Q2Q+a00sO+bDPDpamRwcY9YLA=;
-        b=aD+38mP1iM/plI0hGvH3dGQS52CPlKoKbO4PMJo/AmyeUl2TIlWBULyltUFKGoWWf7
-         HUGxY4c9Q7DMbb/+zGPqkHtGLaKSxHWJ1/FmliSr37UW8gjUkoNTk9VA8SP2vK03RlRX
-         Gp4SXEeVjwMjZvs0ET0r6wo69a6nMpuCdKFzU87/P5MueoSHmv6UrPrfzeFVIP8A08qV
-         PdYONByItjb5h56ORzselTUXlaKkvJsx/f4oj4XW2fV+wQqdYz/fA6Sn+085SAAQzsMh
-         Ztaz6J4hRsPt0bRvuvsofpcStc8UmmJu3Mn0Y64+JEGYNR+GFwvfFpoMeI1BeYFakXP/
-         76MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701301688; x=1701906488;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8NC6M2ahDfb9yS4fB5Q2Q+a00sO+bDPDpamRwcY9YLA=;
-        b=fvWVq6+5YMUWeeXmt5utDjbM0RxtU94xrw9rX1r+n3JWgcFThwYIDCMwgbOk1lYeg/
-         D1QZBtSODNXFFpRqhIop3vh9iU2sA1mRX3hY0bczeGCZCdcQ4vBiix2HaUHbctzddDcx
-         j7SCgG9lA5Fm1ua/PJYkZiWpllb3AubJFA9w7WCAnWdvnaQ54i3Q4XgC0Sb73tsCktP/
-         cKAX1MXnM4GPh6V/7CqXv6cRDekrFii9TVBovjo+c8M6zkJhrECXgDU4dEy9P9sW4nu6
-         5GXCn7o2LwIYtve06ebGTLDhnxbXjcjSHxQeFUtHWloAW73NFyUl9BolLohcbkzLH6e1
-         BxqA==
-X-Gm-Message-State: AOJu0YyxVFK6hZdQaKx3kB+wzCuaJ7jy9i//zQfVyla3bLBVd9KeljBu
-	sSwTSSLBbvGjZe9UF+IKTUhrG0KZNPrNlVKLG/HQFg==
-X-Google-Smtp-Source: AGHT+IGzlwg1krhw5pbVNhYB2NjkVGjZzcfur4zemp/oS30saYoyeiLUMK8+JztsH4TSXvGe0Lk04Zetks3pQ6ZN/O4=
-X-Received: by 2002:a0d:c582:0:b0:5d0:aa04:7b76 with SMTP id
- h124-20020a0dc582000000b005d0aa047b76mr12450890ywd.20.1701301688590; Wed, 29
- Nov 2023 15:48:08 -0800 (PST)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFC884;
+	Wed, 29 Nov 2023 15:49:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+1mG0n8jEXMUcbRRUHaIgbHxu7jhjROAA37nRQGORFk=; b=aDhigzmUxV4IfAJ4blEFYKvVr5
+	ZzgxRzd79xhkuRexHNy5IkpHrNiZs49snGzhq64X9FpTlCADJKQREPaNotNs1c85V3E5W5aSEUcY1
+	+Zyd/b7nn4xaNEdg5khHzpYVI1xHbO27Se3j28WcY+tS8GBKO6hmEYcxGXWwpYI0X8eUsO8f/q4q4
+	SlFwyrEo3eveVfnNlYt4VjyXTro69oRR66KwOt02ppuClHpe/GAvHRHD5pwwRie6VejQ1RGdIPIrh
+	upv5/M+qvBOlzUzJrPq/RKMSLFcPLjma1WQVElh5Qr9mataO7aalvkMllyIj565WM8Fu5wfXynqN9
+	yCPGVNrw==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r8UIv-000Atx-CP; Thu, 30 Nov 2023 00:49:17 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2023-11-30
+Date: Thu, 30 Nov 2023 00:49:16 +0100
+Message-Id: <20231129234916.16128-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129222424.910148-1-pctammela@mojatatu.com>
-In-Reply-To: <20231129222424.910148-1-pctammela@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 29 Nov 2023 18:47:56 -0500
-Message-ID: <CAM0EoMk=oU8PRQoN79ccnVcqcsX9PgcZf+qucr+ni7JNAhmPTg@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/4] selftests: tc-testing: more tdc updates
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27108/Wed Nov 29 09:40:15 2023)
 
-On Wed, Nov 29, 2023 at 5:24=E2=80=AFPM Pedro Tammela <pctammela@mojatatu.c=
-om> wrote:
->
-> Follow-up on a feedback from Jakub and random cleanups from related
-> net/sched patches
->
-> Pedro Tammela (4):
->   selftests: tc-testing: remove spurious nsPlugin usage
->   selftests: tc-testing: remove spurious './' from Makefile
->   selftests: tc-testing: rename concurrency.json to flower.json
->   selftests: tc-testing: remove filters/tests.json
->
->  tools/testing/selftests/tc-testing/Makefile   |   2 +-
->  .../filters/{concurrency.json =3D> flower.json} |  98 +++++++++++++
->  .../tc-testing/tc-tests/filters/matchall.json |  23 ++++
->  .../tc-testing/tc-tests/filters/tests.json    | 129 ------------------
->  4 files changed, 122 insertions(+), 130 deletions(-)
->  rename tools/testing/selftests/tc-testing/tc-tests/filters/{concurrency.=
-json =3D> flower.json} (65%)
->  delete mode 100644 tools/testing/selftests/tc-testing/tc-tests/filters/t=
-ests.json
->
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-For the patchset:
+The following pull-request contains BPF updates for your *net* tree.
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+We've added 5 non-merge commits during the last 7 day(s) which contain
+a total of 10 files changed, 66 insertions(+), 15 deletions(-).
 
-cheers,
-jamal
-> --
-> 2.40.1
->
+The main changes are:
+
+1) Fix AF_UNIX splat from use after free in BPF sockmap, from John Fastabend.
+
+2) Fix a syzkaller splat in netdevsim by properly handling offloaded programs (and
+   not device-bound ones), from Stanislav Fomichev.
+
+3) Fix bpf_mem_cache_alloc_flags() to initialize the allocation hint, from Hou Tao.
+
+4) Fix netkit by rejecting IFLA_NETKIT_PEER_INFO in changelink, from Daniel Borkmann.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Jakub Kicinski, Jakub Sitnicki, Nikolay Aleksandrov, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit d3fa86b1a7b4cdc4367acacea16b72e0a200b3d7:
+
+  Merge tag 'net-6.7-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-11-23 10:40:13 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 51354f700d400e55b329361e1386b04695e6e5c1:
+
+  bpf, sockmap: Add af_unix test with both sockets in map (2023-11-30 00:25:25 +0100)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Daniel Borkmann (1):
+      netkit: Reject IFLA_NETKIT_PEER_INFO in netkit_change_link
+
+Hou Tao (1):
+      bpf: Add missed allocation hint for bpf_mem_cache_alloc_flags()
+
+John Fastabend (2):
+      bpf, sockmap: af_unix stream sockets need to hold ref for pair sock
+      bpf, sockmap: Add af_unix test with both sockets in map
+
+Stanislav Fomichev (1):
+      netdevsim: Don't accept device bound programs
+
+ drivers/net/netdevsim/bpf.c                        |  4 +-
+ drivers/net/netkit.c                               |  6 +++
+ include/linux/skmsg.h                              |  1 +
+ include/net/af_unix.h                              |  1 +
+ kernel/bpf/memalloc.c                              |  2 +
+ net/core/skmsg.c                                   |  2 +
+ net/unix/af_unix.c                                 |  2 -
+ net/unix/unix_bpf.c                                |  5 +++
+ .../selftests/bpf/prog_tests/sockmap_listen.c      | 51 +++++++++++++++++-----
+ .../selftests/bpf/progs/test_sockmap_listen.c      |  7 +++
+ 10 files changed, 66 insertions(+), 15 deletions(-)
 
