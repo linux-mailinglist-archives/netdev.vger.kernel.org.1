@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2DF87FD3AB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:12:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C527FD3AD
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADEC6282BB1
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7CB282E5F
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F5719BAE;
-	Wed, 29 Nov 2023 10:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B7E1A5BC;
+	Wed, 29 Nov 2023 10:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQqEkhOi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4NgSl9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 455B2E1;
-	Wed, 29 Nov 2023 02:12:35 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b552deba0so1659005e9.1;
-        Wed, 29 Nov 2023 02:12:35 -0800 (PST)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A0DD7F;
+	Wed, 29 Nov 2023 02:12:36 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-332cb136335so4520963f8f.0;
+        Wed, 29 Nov 2023 02:12:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701252753; x=1701857553; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701252754; x=1701857554; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vnVO+XG5c6orDmPhNlnDUKCa0vfQLqdJ0lxbJhkoXw8=;
-        b=dQqEkhOietnylAHFpZT20w/7wqjDEd6b8zJ9ehzDOTJzUafR6esy3519bDxueMum0y
-         T68Xn19Gmyuy30p2rQCxFPN2x9LD7qGF0KnT9Lwx8qezeJUzzs0bkOy/DJRg8cIfi3cD
-         8XC3AAQXr/JeD2KfWarmSsMiKa3f2lbd95fBwnxMzwCGh528gdLV3CqAOev4kSdmlEkt
-         46NpNBNuKFXzfbWpLeYpaSNZroZH19t4lf9u+Bl9Soa/wAPVnksI4sB8Oemdz1C1JZY8
-         715Kt2f2GES/l9H89LfAI/GrVJXzHCMVBAdPV0UL7UH5Vb9am4jhr9Oz9mcUuLZNSdoG
-         AI1A==
+        bh=2yWoSEmRIuqlmSxP7Kp9u1Gyx2u43lx1c7DNGAxn/Dc=;
+        b=N4NgSl9vOM+lZ8JrS7qZ96avTIQrGUSEHZPa4a0NX5ZajQJrIFzQizVkN9I9VEIvUr
+         /TcpH/Acpavp9KGxptE4OV5gg7Yo2QHBAmte0n5tNewKw5gsF7yBi9UNG+KBlS7yhABh
+         KSqRyZm2VyZRfRiaEkk03Y7vs0FpRtQ5LiZWENuLrXAL2NiuqpxAaziCiZ17BUxAhQz9
+         OCHiPsk+hhrPauXp4a84ViEJxTw1L7Z3d5LHzKPX7kiguvuvamKEPGeirQxws9iQZkpQ
+         8tofP7yvXFUfpRI2uLnBePcGc8qf1mADawZAo70Y5sGicmk9e6AKS8sCEOKpjDLxkrCa
+         OmPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701252753; x=1701857553;
+        d=1e100.net; s=20230601; t=1701252754; x=1701857554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vnVO+XG5c6orDmPhNlnDUKCa0vfQLqdJ0lxbJhkoXw8=;
-        b=g8b8JAsVZ2RrM2LuCUjN881ToxXoADFsi6GSjhEw8YOD0gqIV2dj3ThredCYhx+gdH
-         MTNwoEr1GO2kXqnAmh01Yik8UMzOlOQ6cJeoJuRuMJIJ9AcT4gCXiGC4OqKE+ynAnTVx
-         iQzxbtctC9JMlhPIMtlShVtPCeEmHMserVwkkQm7O3/azVBf9MN/VRuHwKOHU7qxPIO5
-         EoGqBr2HjTMk/yGkPvgYbddvlu30++BDopjDMCdEg5EDjXnOHsx9YyBQ7O89w3HKDKBN
-         yLHTatjo9x37XX+AO5dk5RZ6yh6LWFVMntw0ma289dQag+ndaxZjIwt4C5JLy1dV4/Js
-         GGNg==
-X-Gm-Message-State: AOJu0YwqSh51CPZczQfQ3LT1/bzvGKEug6fH4Ly/eBhb6jTPsyAnu0Xi
-	SU8vVHmDv9m6uYz6BROyXeqe1klQYJyFtA==
-X-Google-Smtp-Source: AGHT+IHiCiTnro+tWPMZSmaLUtqWNNA9LWwe1Pn+OOPV8cN6cElVkDBwZrUwYvHhKRfpFgIgrqgAkA==
-X-Received: by 2002:a5d:5045:0:b0:332:f895:f58f with SMTP id h5-20020a5d5045000000b00332f895f58fmr8178889wrt.2.1701252753016;
-        Wed, 29 Nov 2023 02:12:33 -0800 (PST)
+        bh=2yWoSEmRIuqlmSxP7Kp9u1Gyx2u43lx1c7DNGAxn/Dc=;
+        b=mjT6FYGEx5q5AlvepJXDyGDAy9JIfK1x/K5uhfTaQGlmCzCB9wapqxcMxsqRs/M7Rx
+         PQmPCDH06Gh7QK29O1+abFmKHZdnk0mJ2F0eb5rac1u/n/pDso+rgSCy98a8VP7cAG8D
+         wTO8kjacc8RlTLmcemXA4etC19KAqA00764P3UPZLD+eETF1+pxq5nnbvuh1wYaDF77E
+         HVFpAZ/ASo9ZFZfSygyFcWSnr3VIZVVtUAV3PZhWYFv9egWSp+cjCaIg4N8JJYatjq6p
+         aE+QrEuaKp9yRvJEatGLTYBdNyYNlNoGd5DGK+r3wDbVw/JeIEm/vEeJNQZK9EksHU1G
+         hEyw==
+X-Gm-Message-State: AOJu0YxMLTNrQFhnF/hL2NregxTMXSp4d2GG5BnHKeL6yMC/nXY6tHUq
+	8pNEyve5KFyRS0QP0dtFIou71rW4z63BCA==
+X-Google-Smtp-Source: AGHT+IGhaObCzarZG9YqZ4pTQOaRxnkjKHamCuHB7ICDeB68d4Wtu4eFjW5ONT5EuBl6IMBhl7pK8Q==
+X-Received: by 2002:a5d:488f:0:b0:333:19b:d32e with SMTP id g15-20020a5d488f000000b00333019bd32emr5566097wrq.56.1701252754365;
+        Wed, 29 Nov 2023 02:12:34 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:648d:8c5c:f210:5d75])
-        by smtp.gmail.com with ESMTPSA id k24-20020a5d5258000000b00332d04514b9sm17296877wrc.95.2023.11.29.02.12.32
+        by smtp.gmail.com with ESMTPSA id k24-20020a5d5258000000b00332d04514b9sm17296877wrc.95.2023.11.29.02.12.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 02:12:32 -0800 (PST)
+        Wed, 29 Nov 2023 02:12:33 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -63,9 +63,9 @@ To: netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [RFC PATCH net-next v1 1/6] doc/netlink: Add bitfield32, s8, s16 to the netlink-raw schema
-Date: Wed, 29 Nov 2023 10:11:54 +0000
-Message-ID: <20231129101159.99197-2-donald.hunter@gmail.com>
+Subject: [RFC PATCH net-next v1 2/6] doc/netlink: Add a nest selector to netlink-raw schema
+Date: Wed, 29 Nov 2023 10:11:55 +0000
+Message-ID: <20231129101159.99197-3-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231129101159.99197-1-donald.hunter@gmail.com>
 References: <20231129101159.99197-1-donald.hunter@gmail.com>
@@ -77,30 +77,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The netlink-raw schema was not updated when bitfield32 was added
-to the genetlink-legacy schema. It is needed for rtnetlink families.
+Add a 'dynamic' attribute type with a selector that declares how to
+choose the attribute-space for nested attributes. Use the value of
+another attribute as the selector key. For example if the following
+attribute has already been decoded:
 
-s8 and s16 were also missing.
+  { "kind": "gre" }
+
+then the following selector:
+
+  selector:
+    attribute: kind
+    list:
+      -
+        value: bridge
+        type: nest
+        nested-attributes: linkinfo-bridge-attrs
+      -
+        value: gre
+        type: nest
+        nested-attributes: linkinfo-gre-attrs
+      -
+        value: geneve
+        type: nest
+        nested-attributes: linkinfo-geneve-attrs
+
+would decode the value as nested attributes, using the
+'linkinfo-gre-attrs' attribute space.
+
+This approach was chosen so that different value types can be handled by
+the same selector, allowing a mix of e.g. nest, struct and binary.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/netlink-raw.yaml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Documentation/netlink/netlink-raw.yaml | 38 +++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index 775cce8c548a..ad5395040765 100644
+index ad5395040765..62061e180f8f 100644
 --- a/Documentation/netlink/netlink-raw.yaml
 +++ b/Documentation/netlink/netlink-raw.yaml
-@@ -200,7 +200,8 @@ properties:
-                 type: string
-               type: &attr-type
+@@ -202,7 +202,7 @@ properties:
                  description: The netlink attribute type
--                enum: [ unused, pad, flag, binary, u8, u16, u32, u64, s32, s64,
-+                enum: [ unused, pad, flag, binary, bitfield32,
-+                        u8, u16, u32, u64, s8, s16, s32, s64,
-                         string, nest, array-nest, nest-type-value ]
+                 enum: [ unused, pad, flag, binary, bitfield32,
+                         u8, u16, u32, u64, s8, s16, s32, s64,
+-                        string, nest, array-nest, nest-type-value ]
++                        string, nest, array-nest, nest-type-value, dynamic ]
                doc:
                  description: Documentation of the attribute.
+                 type: string
+@@ -261,6 +261,42 @@ properties:
+                 description: Name of the struct type used for the attribute.
+                 type: string
+               # End genetlink-legacy
++              # Start netlink-raw
++              selector:
++                description:
++                  Map of attribute definitions for dynamic selection of type
++                  specific attribute spaces.
++                type: object
++                required: [ attribute, list ]
++                additionalProperties: false
++                properties:
++                  attribute:
++                    description:
++                      Name of the attribute that contains the type identifier
++                      string.
++                    type: string
++                  list:
++                    type: array
++                    items:
++                      type: object
++                      required: [ value, type ]
++                      additionalProperties: false
++                      properties:
++                        value:
++                          description: Type identifier string to match.
++                          type: string
++                        type:
++                          description: The netlink attribute type.
++                          enum: [ binary, nest ]
++                        nested-attributes:
++                          description:
++                            Name of the sub-space used inside the attribute.
++                          type: string
++                        struct:
++                          description:
++                            Name of the struct type used for the attribute.
++                          type: string
++              # End netlink-raw
+ 
+       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
+       dependencies:
 -- 
 2.42.0
 
