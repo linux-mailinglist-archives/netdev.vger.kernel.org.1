@@ -1,176 +1,120 @@
-Return-Path: <netdev+bounces-52107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C0D7FD51D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:10:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 897247FD534
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC135283419
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:10:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 445A22834DD
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922B21C293;
-	Wed, 29 Nov 2023 11:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38A81C688;
+	Wed, 29 Nov 2023 11:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="y2gR150y"
+	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="LhDt/KJY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3403870;
-	Wed, 29 Nov 2023 03:10:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YfbqNB0CSJ6Qo6PdmwlFhaVlRDIWz/dogsCs+Dm58g4=; b=y2gR150yQLnzMOMKIPv9SJ66tl
-	sfJA7Sy7yHPkzdG1eNfWrQqXQtJK95cXPT0G/3jOhni8VF6rR2n6l3I8J/aUR5O0tGb0+IMGfyyMg
-	HOKdMWCFz9MfqfOzO8A3LWiHHcXj1cjPAMuDSwBQBtR4PlkVE+g6/NTGNVjuxlFiUJPVkSs8jscC4
-	hjlIUtkbKhcWsFp8x3UQk/xFRTBEv7CyuWLV2r37ZJuCbFjggqabpSzFjOQ/aTp8W+idNJsiIX1Do
-	C8bZjztEbtvwsFYXwNxuOiIY+N1/dd4LYnH/bXyBUO0CtU9MiXL0rwxN1SoXAG1KTgYvAvr4M64yS
-	NZLv1Tvw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41132)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r8IS1-0000D8-1c;
-	Wed, 29 Nov 2023 11:09:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r8IS3-0003wg-I5; Wed, 29 Nov 2023 11:09:55 +0000
-Date: Wed, 29 Nov 2023 11:09:55 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4341BCB
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:12:28 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bc811d12fso255059e87.1
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:12:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1701256346; x=1701861146; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tBMSQm5F8pVmCnY/bulP3HFHAamG32fRwIoKJs27D7o=;
+        b=LhDt/KJYw6iJrjl+36Jb6fpaURgg2sqMGaWLM89TPpVvCjePTpSVIzAScRz5328HiO
+         0yXnBxJKsk6d0OTSPQ2T3OdaTEiDvNoaAyLyW/LBm79UKb2Bh/9cUH1hCZt0VlPkzPwA
+         o9TVUTEz5AmTVpUkpnJ841pCA7Tog8wd1UaEz1tPx6ZbPTCmKdPDum6KRbDrK+hqcxK9
+         QIDMl6lstx0TqePOqb08tLHcYK2XBjtHKIcB04RstaTBTDlgPAIEwlAtlBAI5k68N5UG
+         G6NyEP7x3oCYavJmwSOETRclPBmJmHjWbro+KnTUz0vzi21BeRPaRR1Mx17U15NRzNa6
+         WYuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701256346; x=1701861146;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tBMSQm5F8pVmCnY/bulP3HFHAamG32fRwIoKJs27D7o=;
+        b=g5i3gBBYP4sF9ZCuMs+GsfIPbI0a0zW3jF33K5wnzKXw/jrnvuyGB+Pkaa+JcYKWYi
+         pG/DWYrjJuA2Ve8x5zRE0DfoQima5471TnhMfDt4f9i5gvuTvwgkeRoPE3WrOiKEGmOL
+         jyev/dYuN+rOX78APoCgBSa7BygqkiBm7wUQXXFj3nGkGr9LYZwiQDcsnHIFHyP3NTlF
+         5KyvZvE7CmPbw6B+Nhx0LJ3MqL+MjeosSQ/1YNez2Bxg9c18WiN4d/X047vdhaNAdKtP
+         I5ZxyXWIZ2Abh6tDyJlZP74dhwQtfsUSq0c5OR1/nMxDjrtNRYsUoSTAzp1uFGei1Qwu
+         SWnw==
+X-Gm-Message-State: AOJu0Yyzdu35m6LvQy7FTl2OLmYfYhHq5JB/zhnoFu3R8Vc9bUo9x0Ta
+	wywni6jtHBuasRUos8TiJvj91Q==
+X-Google-Smtp-Source: AGHT+IGNT5IaHDF9qu71qNnqkrMg5xBAwZ03ypHava9eT1qI2m4YDP4NiX0bzUB8Wdai+vJna1ndQA==
+X-Received: by 2002:a19:5207:0:b0:509:4530:e7fb with SMTP id m7-20020a195207000000b005094530e7fbmr11074662lfb.32.1701256345479;
+        Wed, 29 Nov 2023 03:12:25 -0800 (PST)
+Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
+        by smtp.googlemail.com with ESMTPSA id z2-20020a5d4402000000b003331a5b8df0sm1028816wrq.6.2023.11.29.03.12.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 03:12:25 -0800 (PST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 02/14] net: phy: at803x: move disable WOL for
- 8031 from probe to config
-Message-ID: <ZWccA6Kjiz7/3F6R@shell.armlinux.org.uk>
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-3-ansuelsmth@gmail.com>
- <ZWcDUJY8rM6uApO1@shell.armlinux.org.uk>
- <65670622.050a0220.4c0d0.3ee9@mx.google.com>
- <ZWcWN4kRRPBA9ZG6@shell.armlinux.org.uk>
- <65671a75.050a0220.53874.4dd1@mx.google.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [net-next] net: ethernet: renesas: rcar_gen4_ptp: Depend on PTP_1588_CLOCK
+Date: Wed, 29 Nov 2023 12:11:42 +0100
+Message-ID: <20231129111142.3322667-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65671a75.050a0220.53874.4dd1@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 12:03:14PM +0100, Christian Marangi wrote:
-> On Wed, Nov 29, 2023 at 10:45:11AM +0000, Russell King (Oracle) wrote:
-> > On Wed, Nov 29, 2023 at 10:36:31AM +0100, Christian Marangi wrote:
-> > > On Wed, Nov 29, 2023 at 09:24:32AM +0000, Russell King (Oracle) wrote:
-> > > > On Wed, Nov 29, 2023 at 03:12:07AM +0100, Christian Marangi wrote:
-> > > > > Probe should be used only for DT parsing and allocate required priv, it
-> > > > > shouldn't touch regs, there is config_init for that.
-> > > > 
-> > > > I'm not sure where you get that idea from. PHY driver probe() functions
-> > > > are permitted to access registers to do any setup that they wish to.
-> > > > 
-> > > > config_init() is to configure the PHY for use with the network
-> > > > interface.
-> > > > 
-> > > > I think this patch is just noise rather than a cleanup.
-> > > >
-> > > 
-> > > I got it from here [1]
-> > > 
-> > > Also on every other driver probe was always used for allocation and
-> > > parsing so why deviates from this pattern here?
-> > 
-> > Untrue.
-> > 
-> > bcm54140_enable_monitoring() is called from bcm54140_probe_once()
-> > which in turn is called from bcm54140_probe().
-> > 
-> > dp83869_probe() calls dp83869_config_init(), rightly or wrongly.
-> > 
-> > lxt973_probe() fixes up the BMCR.
-> > 
-> > mv3310_probe() configures power-down modes, modifying registers.
-> > 
-> > mt7988_phy_probe() calls mt7988_phy_fix_leds_polarities() which
-> > modifies registers.
-> > 
-> > lan8814_probe() calls lan8814_ptp_init() which does a whole load of
-> > register writes.
-> > 
-> > lan88xx_probe() configures LEDs via register writes.
-> > 
-> > yt8521_probe() configures clocks via register modification.
-> > 
-> > I'm afraid this means your comment is demonstrably false.
-> >
-> 
-> Don't want to start a discussion and thanks a lot for pointing this
-> out. This is really to talk about this and not contradict you.
-> 
-> Yes it's not true, and I was wrong but still I watch other driver
-> outside PHY and normally probe should not do that kind of stuff.
-> (even the comments describing the use in phy.h doesn't say that it
-> should be used for configuring the PHY only once on discovery)
-> 
-> Watching some of the thing, I feel all of this is done in probe as it's
-> not called again on software reset (as it will call config_init again).
-> 
-> This looks like there is a missing feature here and maybe a chance to
-> improve this?
-> 
-> Wonder if adding an additional OP would be beneficial to this?
-> Was thinking to something like
-> 
-> .config_once ?
-> 
-> And add some comments that it's called only on PHY discovery?
-> It would be put right after the probe call in phy_core.
-> 
-> > > Also I think it was wrong from the start as on reset I think WoL is
-> > > not disabled again. (probe is not called)
-> > 
-> > On hardware reset, the 1588 register will re-enable the WoL pin, but
-> > that needs a hardware reset of the PHY to happen after probe() is
-> > called.
-> > 
-> > However, phy_probe() will only assert the reset signal _if_ an error
-> > occured during probing, not if probing was successful. So, a successful
-> > probe of this driver will not cause a hardware reset.
-> > 
-> > Also, hardware reset is optional. Do you know whether the platforms
-> > that use the separate WoL pin which this 1588 register controls also
-> > wire the reset signal such that it can be controlled by Linux?
-> > Probably not.
-> > 
-> > So, this register write will not be cleared by a hardware reset after
-> > a successful probe.
-> >
-> 
-> I just checked Datasheet, on HW reset it's enabled again and on SW reset
-> value is retained. So yes it must stay in probe as it will cause side
-> effect if WoL get enabled after... Really hope the config_once thing is
-> OK since it will make things much cleaner.
+When breaking out the Gen4 gPTP support to its own module the dependency
+on the PTP_1588_CLOCK framework was left as optional and only stated for
+the driver using the module. This leads to issues when doing
+COMPILE_TEST of RENESAS_GEN4_PTP separately and PTP_1588_CLOCK is built
+as a module and the other as a built-in. Add an explicit depend on
+PTP_1588_CLOCK.
 
-The phylib comment deviates from standard practice elsewhere in the
-kernel, where it is totally fine to do hardware setup in the probe()
-function. So I would suggest just updating the comment on probe() to
-remove the idea that one shouldn't be doing this. I think it's totally
-fine to be doing setup in probe().
+While at it remove the optional support for PTP_1588_CLOCK from
+RENESAS_ETHER_SWITCH as the driver unconditionally calls the Gen4 gPTP
+module and thus also requires the PTP_1588_CLOCK framework.
 
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 8c1c66235e03 ("net: ethernet: renesas: rcar_gen4_ptp: Break out to module")
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+ drivers/net/ethernet/renesas/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
+index 733cbb6eb3ed..d6136fe5c206 100644
+--- a/drivers/net/ethernet/renesas/Kconfig
++++ b/drivers/net/ethernet/renesas/Kconfig
+@@ -40,7 +40,7 @@ config RAVB
+ config RENESAS_ETHER_SWITCH
+ 	tristate "Renesas Ethernet Switch support"
+ 	depends on ARCH_RENESAS || COMPILE_TEST
+-	depends on PTP_1588_CLOCK_OPTIONAL
++	depends on PTP_1588_CLOCK
+ 	select CRC32
+ 	select MII
+ 	select PHYLINK
+@@ -50,6 +50,7 @@ config RENESAS_ETHER_SWITCH
+ 
+ config RENESAS_GEN4_PTP
+ 	tristate "Renesas R-Car Gen4 gPTP support" if COMPILE_TEST
++	depends on PTP_1588_CLOCK
+ 	select CRC32
+ 	select MII
+ 	select PHYLIB
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.42.1
+
 
