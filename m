@@ -1,102 +1,92 @@
-Return-Path: <netdev+bounces-51984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D987FCD58
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:18:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876DF7FCD60
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:21:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07A27B21530
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:18:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8F7E1C20AD0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3896525B;
-	Wed, 29 Nov 2023 03:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6131B611F;
+	Wed, 29 Nov 2023 03:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9F6219AD;
-	Tue, 28 Nov 2023 19:17:53 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Sg4Cc5t3JzShPM;
-	Wed, 29 Nov 2023 11:13:32 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 29 Nov
- 2023 11:17:51 +0800
-Subject: Re: [PATCH net-next v5 03/14] page_pool: avoid calling no-op
- externals when possible
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Christoph Hellwig
-	<hch@lst.de>
-CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Michal Kubiak
-	<michal.kubiak@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, David Christensen
-	<drc@linux.vnet.ibm.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Paul Menzel
-	<pmenzel@molgen.mpg.de>, <netdev@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
- <20231124154732.1623518-4-aleksander.lobakin@intel.com>
- <6bd14aa9-fa65-e4f6-579c-3a1064b2a382@huawei.com>
- <a1a0c27f-f367-40e7-9dc2-9421b4b6379a@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <534e7752-38a9-3e7e-cb04-65789712fb66@huawei.com>
-Date: Wed, 29 Nov 2023 11:17:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D88C1A3;
+	Tue, 28 Nov 2023 19:21:32 -0800 (PST)
+X-QQ-mid:Yeas6t1701228047t219t56462
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.129.197])
+X-QQ-SSF:00400000000000F0FSF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 7162815512428122592
+To: <netdev@vger.kernel.org>,
+	<edumazet@google.com>,
+	<davem@davemloft.net>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>
+Cc: <mengyuanlou@net-swift.com>,
+	<stable@vger.kernel.org>
+References: <20231128095928.1083292-1-jiawenwu@trustnetic.com>
+In-Reply-To: <20231128095928.1083292-1-jiawenwu@trustnetic.com>
+Subject: RE: [PATCH net] net: libwx: fix memory leak on msix entry
+Date: Wed, 29 Nov 2023 11:20:46 +0800
+Message-ID: <021601da2273$0b2fb3f0$218f1bd0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a1a0c27f-f367-40e7-9dc2-9421b4b6379a@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH5aDw+1SXoC4hvnhNOqLFHdiN9PrBSFUvw
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-On 2023/11/27 22:32, Alexander Lobakin wrote:
+Cc: stable@vger.kernel.org
+
+> -----Original Message-----
+> From: Jiawen Wu <jiawenwu@trustnetic.com>
+> Sent: Tuesday, November 28, 2023 5:59 PM
+> To: netdev@vger.kernel.org; edumazet@google.com; davem@davemloft.net; kuba@kernel.org; pabeni@redhat.com
+> Cc: mengyuanlou@net-swift.com; Jiawen Wu <jiawenwu@trustnetic.com>
+> Subject: [PATCH net] net: libwx: fix memory leak on msix entry
 > 
-> Chris, any thoughts on a global flag for skipping DMA syncs ladder?
-
-It seems there was one already in the past:
-
-https://lore.kernel.org/netdev/7c55a4d7-b4aa-25d4-1917-f6f355bd722e@arm.com/T/
-
+> Since pci_free_irq_vectors() set pdev->msix_enabled as 0 in the
+> calling of pci_msix_shutdown(), wx->msix_entries is never freed.
+> Reordering the lines to fix the memory leak.
 > 
->>
->>
-
->>> +static inline bool page_pool_set_dma_addr(const struct page_pool *pool,
->>> +					  struct page *page,
->>> +					  dma_addr_t addr)
->>>  {
->>> +	unsigned long val = addr;
->>> +
->>> +	if (unlikely(!addr)) {
->>> +		page->dma_addr = 0;
->>> +		return true;
->>> +	}
->>
->> The above seems unrelated change?
+> Fixes: 3f703186113f ("net: libwx: Add irq flow functions")
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Related. We use page_put_set_dma_addr() to clear ::dma_addr as well
-> (grep for it in page_pool.c). In this case, we don't want
-> dma_need_sync() to be called as we explicitly pass zero. This check
-> zeroes the field and exits as quickly as possible.
-
-The question seems to be about if we need to ensure the LSB of
-page->dma_addr is not set when page_pool releases a page back to page
-allocator?
-
-> In case with the call mentioned above, zero is a compile-time constant
-> there, so that this little branch will be inlined with the rest dropped.
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> index 2823861e5a92..a5a50b5a8816 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> @@ -1972,11 +1972,11 @@ void wx_reset_interrupt_capability(struct wx *wx)
+>  	if (!pdev->msi_enabled && !pdev->msix_enabled)
+>  		return;
 > 
-
+> -	pci_free_irq_vectors(wx->pdev);
+>  	if (pdev->msix_enabled) {
+>  		kfree(wx->msix_entries);
+>  		wx->msix_entries = NULL;
+>  	}
+> +	pci_free_irq_vectors(wx->pdev);
+>  }
+>  EXPORT_SYMBOL(wx_reset_interrupt_capability);
+> 
+> --
+> 2.27.0
+> 
 
 
