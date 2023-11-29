@@ -1,120 +1,270 @@
-Return-Path: <netdev+bounces-52108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897247FD534
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:12:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389EB7FD53B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 445A22834DD
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 380571C21102
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38A81C688;
-	Wed, 29 Nov 2023 11:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60371C2A6;
+	Wed, 29 Nov 2023 11:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="LhDt/KJY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="051IbZTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4341BCB
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:12:28 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bc811d12fso255059e87.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:12:27 -0800 (PST)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D318330F2
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:14:23 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so41165e9.1
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:14:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1701256346; x=1701861146; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBMSQm5F8pVmCnY/bulP3HFHAamG32fRwIoKJs27D7o=;
-        b=LhDt/KJYw6iJrjl+36Jb6fpaURgg2sqMGaWLM89TPpVvCjePTpSVIzAScRz5328HiO
-         0yXnBxJKsk6d0OTSPQ2T3OdaTEiDvNoaAyLyW/LBm79UKb2Bh/9cUH1hCZt0VlPkzPwA
-         o9TVUTEz5AmTVpUkpnJ841pCA7Tog8wd1UaEz1tPx6ZbPTCmKdPDum6KRbDrK+hqcxK9
-         QIDMl6lstx0TqePOqb08tLHcYK2XBjtHKIcB04RstaTBTDlgPAIEwlAtlBAI5k68N5UG
-         G6NyEP7x3oCYavJmwSOETRclPBmJmHjWbro+KnTUz0vzi21BeRPaRR1Mx17U15NRzNa6
-         WYuQ==
+        d=google.com; s=20230601; t=1701256462; x=1701861262; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sl2+HiAfY+wXH9mng/vAjeUNiutQNXWgRrqe3HQnyfQ=;
+        b=051IbZTPPkjWTSWULPN+FU/kg1ZyXVE9y0xB+VvmzpuubXaN6Ejh+XLJE4dtk01HqL
+         0IUQ31sn2U8px2kJ5jcOH0jt7113VQhl6zG9g41Vr5xh8BWBsYGgvUGuWkwutrh1wMgD
+         yZf6u2q9eXahGAhs2EafbZC5f0vkSVfhtP6hchWhE3P7ac/SpET8CxWj+EGMmNY79VRB
+         edrj+ZCI0pSNrcNWFeo4Jhi+2fDTSW8tstKopwxII7nLWPLnpKuXksVgy+kAGzX+K/ll
+         VuJ4Pza3eP7kyKSq2NclTpmeTmXB2czm5yw2opfNb21xbSD/g4IzT/YZNgeNKIGvxuRp
+         r8VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701256346; x=1701861146;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tBMSQm5F8pVmCnY/bulP3HFHAamG32fRwIoKJs27D7o=;
-        b=g5i3gBBYP4sF9ZCuMs+GsfIPbI0a0zW3jF33K5wnzKXw/jrnvuyGB+Pkaa+JcYKWYi
-         pG/DWYrjJuA2Ve8x5zRE0DfoQima5471TnhMfDt4f9i5gvuTvwgkeRoPE3WrOiKEGmOL
-         jyev/dYuN+rOX78APoCgBSa7BygqkiBm7wUQXXFj3nGkGr9LYZwiQDcsnHIFHyP3NTlF
-         5KyvZvE7CmPbw6B+Nhx0LJ3MqL+MjeosSQ/1YNez2Bxg9c18WiN4d/X047vdhaNAdKtP
-         I5ZxyXWIZ2Abh6tDyJlZP74dhwQtfsUSq0c5OR1/nMxDjrtNRYsUoSTAzp1uFGei1Qwu
-         SWnw==
-X-Gm-Message-State: AOJu0Yyzdu35m6LvQy7FTl2OLmYfYhHq5JB/zhnoFu3R8Vc9bUo9x0Ta
-	wywni6jtHBuasRUos8TiJvj91Q==
-X-Google-Smtp-Source: AGHT+IGNT5IaHDF9qu71qNnqkrMg5xBAwZ03ypHava9eT1qI2m4YDP4NiX0bzUB8Wdai+vJna1ndQA==
-X-Received: by 2002:a19:5207:0:b0:509:4530:e7fb with SMTP id m7-20020a195207000000b005094530e7fbmr11074662lfb.32.1701256345479;
-        Wed, 29 Nov 2023 03:12:25 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
-        by smtp.googlemail.com with ESMTPSA id z2-20020a5d4402000000b003331a5b8df0sm1028816wrq.6.2023.11.29.03.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 03:12:25 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [net-next] net: ethernet: renesas: rcar_gen4_ptp: Depend on PTP_1588_CLOCK
-Date: Wed, 29 Nov 2023 12:11:42 +0100
-Message-ID: <20231129111142.3322667-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.42.1
+        d=1e100.net; s=20230601; t=1701256462; x=1701861262;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sl2+HiAfY+wXH9mng/vAjeUNiutQNXWgRrqe3HQnyfQ=;
+        b=D+Z7+B6pjZ7E9JeCKTyqCM53e0lQ+YJcLeGHCHKYDRb0K+l9yCAE556KZA/0kCTUZD
+         2iRNh4dhi3CLBb0eHq5bbxuYfxoNcGEGxmygVCBME+OCnRI9JJlvCTDpimx9KzeIBgXf
+         6SrLf1uEouS11QNXz933dQYwUiLoOntngpr5u7Jyum0GPHZIJeQSfi8d1ZEVSKWPVUKZ
+         cf9zlvmUdzZoXAz6FTzO/glKQBlx8aYWApdYNY9A3gNbRRgT+98x/5mg1GViTvNeuUyp
+         OovQS833fVif2xB2pXsDBP+MZi+PeHE3nielCdjBCCGIcW8/7i1r5AUUGHk1LtJEBN3d
+         t1kA==
+X-Gm-Message-State: AOJu0YyW/LLqkqjiMtnwcaTpoIUjDdCq6R79rZIHlvZN9Igc1OYCFd9k
+	VSSd52OnDr1dWFHQ8vYhgsRV8aaXTN5EiQgmqyaKkQ==
+X-Google-Smtp-Source: AGHT+IGO5/Eh6vVQRAIYpQfdsdkyOHSiG/a4zsIoH/Q1ysZ/oS5Tu+2TLdcyhamvkIoB0fpAKBzlu3PTn92aZVaMou4=
+X-Received: by 2002:a05:600c:1d26:b0:40b:4221:4085 with SMTP id
+ l38-20020a05600c1d2600b0040b42214085mr483951wms.1.1701256461620; Wed, 29 Nov
+ 2023 03:14:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <000000000000f2b6b0060b488674@google.com>
+In-Reply-To: <000000000000f2b6b0060b488674@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Nov 2023 12:14:07 +0100
+Message-ID: <CANn89i+6BuZA6AjocG_0zTkD1u=pNgZc_DpZMO=yUN=S1cHS3w@mail.gmail.com>
+Subject: Re: [syzbot] [net?] general protection fault in page_pool_unlist
+To: syzbot <syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com>
+Cc: almasrymina@google.com, davem@davemloft.net, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When breaking out the Gen4 gPTP support to its own module the dependency
-on the PTP_1588_CLOCK framework was left as optional and only stated for
-the driver using the module. This leads to issues when doing
-COMPILE_TEST of RENESAS_GEN4_PTP separately and PTP_1588_CLOCK is built
-as a module and the other as a built-in. Add an explicit depend on
-PTP_1588_CLOCK.
+On Wed, Nov 29, 2023 at 12:06=E2=80=AFPM syzbot
+<syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    a379972973a8 Merge branch 'net-page_pool-add-netlink-base=
+d..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D1421b7ece8000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dabf6d5a82dab0=
+1fe
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Df9f8efb58a4db2c=
+a98d0
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D117d9e64e80=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D16826ec4e8000=
+0
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/fc5f22d6faa1/dis=
+k-a3799729.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/e535e5c28162/vmlinu=
+x-a3799729.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/32eefbbcadbb/b=
+zImage-a3799729.xz
+>
+> The issue was bisected to:
+>
+> commit 083772c9f972dcc248913b52a0dec1025baa1e16
+> Author: Jakub Kicinski <kuba@kernel.org>
+> Date:   Sun Nov 26 23:07:30 2023 +0000
+>
+>     net: page_pool: record pools per netdev
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D10c72162e8=
+0000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D12c72162e8=
+0000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D14c72162e8000=
+0
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com
+> Fixes: 083772c9f972 ("net: page_pool: record pools per netdev")
+>
+> Illegal XDP return value 4294946546 on prog  (id 2) dev N/A, expect packe=
+t loss!
+> general protection fault, probably for non-canonical address 0xdffffc0000=
+000000: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> CPU: 0 PID: 5064 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkaller-00=
+533-ga379972973a8 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 11/10/2023
+> RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
+> RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
+> RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
+> Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 f0 0=
+6 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75=
+ 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
+> RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
+> RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
+> RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
+> R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
+> R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
+> FS:  000055555717a380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000002555398 CR3: 0000000025044000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __page_pool_destroy net/core/page_pool.c:851 [inline]
+>  page_pool_release+0x507/0x6b0 net/core/page_pool.c:891
+>  page_pool_destroy+0x1ac/0x4c0 net/core/page_pool.c:956
+>  xdp_test_run_teardown net/bpf/test_run.c:216 [inline]
+>  bpf_test_run_xdp_live+0x1578/0x1af0 net/bpf/test_run.c:388
+>  bpf_prog_test_run_xdp+0x827/0x1530 net/bpf/test_run.c:1254
+>  bpf_prog_test_run kernel/bpf/syscall.c:4041 [inline]
+>  __sys_bpf+0x11bf/0x4920 kernel/bpf/syscall.c:5402
+>  __do_sys_bpf kernel/bpf/syscall.c:5488 [inline]
+>  __se_sys_bpf kernel/bpf/syscall.c:5486 [inline]
+>  __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5486
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> RIP: 0033:0x7f616195a4a9
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffe858ce5c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+> RAX: ffffffffffffffda RBX: 00007ffe858ce798 RCX: 00007f616195a4a9
+> RDX: 0000000000000048 RSI: 0000000020000340 RDI: 000000000000000a
+> RBP: 00007f61619cd610 R08: 0000000000000000 R09: 00007ffe858ce798
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007ffe858ce788 R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
+> RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
+> RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
+> Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 f0 0=
+6 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75=
+ 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
+> RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
+> RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
+> RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
+> R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
+> R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
+> FS:  000055555717a380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f2640df1b10 CR3: 0000000025044000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess):
+>    0:   df 48 89                fisttps -0x77(%rax)
+>    3:   fa                      cli
+>    4:   48 c1 ea 03             shr    $0x3,%rdx
+>    8:   80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1)
+>    c:   0f 85 90 00 00 00       jne    0xa2
+>   12:   4c 8b a3 f0 06 00 00    mov    0x6f0(%rbx),%r12
+>   19:   48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
+>   20:   fc ff df
+>   23:   4c 89 e2                mov    %r12,%rdx
+>   26:   48 c1 ea 03             shr    $0x3,%rdx
+> * 2a:   80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1) <-- trapping in=
+struction
+>   2e:   75 68                   jne    0x98
+>   30:   48 85 ed                test   %rbp,%rbp
+>   33:   49 89 2c 24             mov    %rbp,(%r12)
+>   37:   74 24                   je     0x5d
+>   39:   e8 1b ca 07 f9          call   0xf907ca59
+>   3e:   48                      rex.W
+>   3f:   8d                      .byte 0x8d
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-While at it remove the optional support for PTP_1588_CLOCK from
-RENESAS_ETHER_SWITCH as the driver unconditionally calls the Gen4 gPTP
-module and thus also requires the PTP_1588_CLOCK framework.
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: 8c1c66235e03 ("net: ethernet: renesas: rcar_gen4_ptp: Break out to module")
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
- drivers/net/ethernet/renesas/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.gi=
+t
+main
 
-diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
-index 733cbb6eb3ed..d6136fe5c206 100644
---- a/drivers/net/ethernet/renesas/Kconfig
-+++ b/drivers/net/ethernet/renesas/Kconfig
-@@ -40,7 +40,7 @@ config RAVB
- config RENESAS_ETHER_SWITCH
- 	tristate "Renesas Ethernet Switch support"
- 	depends on ARCH_RENESAS || COMPILE_TEST
--	depends on PTP_1588_CLOCK_OPTIONAL
-+	depends on PTP_1588_CLOCK
- 	select CRC32
- 	select MII
- 	select PHYLINK
-@@ -50,6 +50,7 @@ config RENESAS_ETHER_SWITCH
- 
- config RENESAS_GEN4_PTP
- 	tristate "Renesas R-Car Gen4 gPTP support" if COMPILE_TEST
-+	depends on PTP_1588_CLOCK
- 	select CRC32
- 	select MII
- 	select PHYLIB
--- 
-2.42.1
+```
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 1426434a7e1587797da92f3199c0012559b51271..07becd4eceddcd4be9e5bea6479=
+f8ffd16dac851
+100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -339,7 +339,8 @@ void page_pool_unlist(struct page_pool *pool)
+        mutex_lock(&page_pools_lock);
+        netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_DEL_NTF);
+        xa_erase(&page_pools, pool->user.id);
+-       hlist_del(&pool->user.list);
++       if (!hlist_unhashed(&pool->user.list))
++               hlist_del(&pool->user.list);
+        mutex_unlock(&page_pools_lock);
+ }
 
+```
 
