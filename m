@@ -1,63 +1,76 @@
-Return-Path: <netdev+bounces-51947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6108A7FCC95
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:11:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6BC7FCCA0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 03:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBB71B2148D
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:11:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9031C21005
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FC21854;
-	Wed, 29 Nov 2023 02:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DA11854;
+	Wed, 29 Nov 2023 02:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Kdrc11qv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8My24x8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D7819AB
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 18:11:27 -0800 (PST)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D0D919BA;
+	Tue, 28 Nov 2023 18:12:30 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-332e58d4219so3614548f8f.0;
+        Tue, 28 Nov 2023 18:12:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701223888; x=1732759888;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S22GXXiMOiKF+ft2aFZsy6VSm5KeQdoL0mFC1vMoTCc=;
-  b=Kdrc11qvo75zfouVG3ENbKpB2W3ZNlP3S9GhX6Ao3OfSy1o8gJWOjfwR
-   3/7djmq5Gpducrs6p+DTY0kmxNP9gdZOMfA74LSKV3CzDkvK01tFuZIAf
-   lub9LD3lY3vzaw2lNF/vPMt/MlVcMCejLqsY/Uqckad2zo9cKBFLrYO6H
-   I=;
-X-IronPort-AV: E=Sophos;i="6.04,234,1695686400"; 
-   d="scan'208";a="256133177"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:11:26 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-44b6fc51.us-west-2.amazon.com (Postfix) with ESMTPS id E5D7EA0B81;
-	Wed, 29 Nov 2023 02:11:24 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:3188]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.37:2525] with esmtp (Farcaster)
- id acd1c3a6-75f3-42a0-ab43-c634bda07a72; Wed, 29 Nov 2023 02:11:24 +0000 (UTC)
-X-Farcaster-Flow-ID: acd1c3a6-75f3-42a0-ab43-c634bda07a72
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Wed, 29 Nov 2023 02:11:24 +0000
-Received: from 88665a182662.ant.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 29 Nov 2023 02:11:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <horms@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v2 net-next 8/8] tcp: Factorise cookie-dependent fields initialisation in cookie_v[46]_check()
-Date: Tue, 28 Nov 2023 18:11:12 -0800
-Message-ID: <20231129021112.94372-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iKBaD+4GyZfee58VikB+MPmOS4uUy4dh1taER9PgB7sdQ@mail.gmail.com>
-References: <CANn89iKBaD+4GyZfee58VikB+MPmOS4uUy4dh1taER9PgB7sdQ@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1701223949; x=1701828749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tgQ89J9c3uszO6o9xy/pNVP40wp2tzxLJEUGDYsTDYE=;
+        b=k8My24x8PwzpoY62fB8a5q3uwG2mIwFnmYIIeXcKua6nk0U0IzMAQ2AUcpb8A7E3Ke
+         qAer8gMDRO9Jl2y7VG4IAihOK/KWTPsPsM8CMIfG/J2ZxUTA9xlUvzBf4DH6K4TcKeBH
+         4vwnafTr4m2SE3HAJALTz0HnCYNIztxgBENFM4ivkDoV5bvRSeXrHtXWjPJ1GTkht7JR
+         F0F6HiV3cB/ihk3Q4/Wi8TMU9z2gQTpm6d3CkYTUAColJtWPSI96jfFawcJqE3zV1vOb
+         +km3/enWob58YjFGgFJZvD6ZFydDSiRgk5my+Yoq26zYEc0PPvINQW8uOFriBX/Mvg6C
+         P6zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701223949; x=1701828749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tgQ89J9c3uszO6o9xy/pNVP40wp2tzxLJEUGDYsTDYE=;
+        b=ljZMBMtl5l3GOTfV3zsSnX+NYcgweJUMa34ODBCdcgIu0h2sIwYX6Y5vV/7On7/+7M
+         +G1RbiqFt5iH7LfIzAE5d3se4DMSJJAWrs8yDG4/0TzEbPg8HeWGVIDbxA37WbxjiTbX
+         l133hLZH0YcJ6nC3qKTR63SdxrcuInLDwPsKFi6kuP2i48w4wV0+7Xby9QQytw5X57v5
+         gpVH9gxa+NZ6z1BTBog272u2tlm2DHK6g3UCNjmin4HAB1CeuaiZxeTtVV37TCQdzGOr
+         G7WMMWQoWrLnYrK9YrjaT9S9YtJjc9NFgPVV0xMbIIqElq7eqIo7eVDgNYOjzoAF/W6z
+         APvA==
+X-Gm-Message-State: AOJu0Yx8wh9jxgrTsAZb1HAYqoAB/2IaT+3hQvrDtazOdMoYgRIwgfWW
+	3gyJneEzEwKNL1IcPPlxgNQ=
+X-Google-Smtp-Source: AGHT+IEA84J4BUwzgt6ri/sglZvQdT1+cylXfse8HAFnt5lCUSSK60IYq+Yui4VAWkUvtaDu+Io28Q==
+X-Received: by 2002:adf:ee90:0:b0:333:ed:82e7 with SMTP id b16-20020adfee90000000b0033300ed82e7mr5949287wro.10.1701223948601;
+        Tue, 28 Nov 2023 18:12:28 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id b19-20020a05600c4e1300b0040648217f4fsm321406wmq.39.2023.11.28.18.12.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Nov 2023 18:12:28 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH 00/14] net: phy: at803x: cleanup + split
+Date: Wed, 29 Nov 2023 03:12:05 +0100
+Message-Id: <20231129021219.20914-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,38 +78,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Nov 2023 16:42:38 +0100
-> > @@ -337,40 +326,36 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
-> >                 return NULL;
-> >         }
-> >
-> > +       ireq = inet_rsk(req);
-> > +       treq = tcp_rsk(req);
-> > +
-> > +       req->mss = mss;
-> > +       req->ts_recent = tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
-> > +
-> > +       ireq->snd_wscale = tcp_opt->snd_wscale;
-> > +       ireq->tstamp_ok = tcp_opt->saw_tstamp;
-> > +       ireq->sack_ok = tcp_opt->sack_ok;
-> > +       ireq->wscale_ok = tcp_opt->wscale_ok;
-> > +       ireq->ecn_ok = tcp_opt->rcv_tsecr & TS_OPT_ECN;
-> 
-> I doubt this will do what you/we want, because ireq->ecn is not a
-> bool, it is a one bit field
-> and TS_OPT_ECN != 1.
-> 
-> I would have used instead :
-> 
->  ireq->ecn_ok = !!(tcp_opt->rcv_tsecr & TS_OPT_ECN);
+The intention of this big series is to try to cleanup and split
+the big at803x PHY driver.
 
-Ah exactly, it was buggy.  I'll fix it in v3.
+It currently have 3 different family of PHY in it. at803x, qca83xx
+and qca808x.
 
-Thanks for catching!
+The current codebase required lots of cleanup and reworking to
+make the split possible as currently there is a greater use of
+adding special function matching the phy_id.
+
+This has been reworked to make the function actually generic
+and make the change only in more specific one. The result
+is the addition of micro additional function but that is for good
+as it massively simplify splitting the driver later.
+
+The main bonus of this cleanup is creating smaller PHY drivers
+since they won't have all the bloat of unused functions or
+extra condition (especially all the stuff related to regulators
+that are only handled by the at8031 PHY)
+
+Consider that this is all in preparation for the addition of
+qca807x PHY driver that will also uso some of the functions of
+at803x.
+
+New Kconfig are introduced for the split PHY driver as they are
+now built as separate PHY drivers.
+
+Christian Marangi (14):
+  net: phy: at803x: fix passing the wrong reference for config_intr
+  net: phy: at803x: move disable WOL for 8031 from probe to config
+  net: phy: at803x: raname hw_stats functions to qca83xx specific name
+  net: phy: at803x: move qca83xx stats out of generic at803x_priv struct
+  net: phy: at803x: move qca83xx specific check in dedicated functions
+  net: phy: at803x: move at8031 specific data out of generic at803x_priv
+  net: phy: at803x: move at8035 specific DT parse to dedicated probe
+  net: phy: at803x: drop specific PHY id check from cable test functions
+  net: phy: at803x: remove specific qca808x check from at803x functions
+  net: phy: at803x: drop usless probe for qca8081 PHY
+  net: phy: at803x: make specific status mask more generic
+  net: phy: move at803x PHY driver to dedicated directory
+  net: phy: qcom: deatch qca83xx PHY driver from at803x
+  net: phy: qcom: detach qca808x PHY driver from at803x
+
+ drivers/net/phy/Kconfig        |    7 +-
+ drivers/net/phy/Makefile       |    2 +-
+ drivers/net/phy/at803x.c       | 2248 --------------------------------
+ drivers/net/phy/qcom/Kconfig   |   17 +
+ drivers/net/phy/qcom/Makefile  |    4 +
+ drivers/net/phy/qcom/at803x.c  | 1222 +++++++++++++++++
+ drivers/net/phy/qcom/common.c  |  351 +++++
+ drivers/net/phy/qcom/qca808x.c |  550 ++++++++
+ drivers/net/phy/qcom/qca83xx.c |  275 ++++
+ drivers/net/phy/qcom/qcom.h    |  124 ++
+ 10 files changed, 2545 insertions(+), 2255 deletions(-)
+ delete mode 100644 drivers/net/phy/at803x.c
+ create mode 100644 drivers/net/phy/qcom/Kconfig
+ create mode 100644 drivers/net/phy/qcom/Makefile
+ create mode 100644 drivers/net/phy/qcom/at803x.c
+ create mode 100644 drivers/net/phy/qcom/common.c
+ create mode 100644 drivers/net/phy/qcom/qca808x.c
+ create mode 100644 drivers/net/phy/qcom/qca83xx.c
+ create mode 100644 drivers/net/phy/qcom/qcom.h
+
+-- 
+2.40.1
+
 
