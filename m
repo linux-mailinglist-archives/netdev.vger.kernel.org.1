@@ -1,182 +1,187 @@
-Return-Path: <netdev+bounces-52262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4D77FE0CA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 21:10:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE2C7FE116
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 21:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8BD5282E64
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:10:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA748B20F3D
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 20:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727355EE88;
-	Wed, 29 Nov 2023 20:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3DB39869;
+	Wed, 29 Nov 2023 20:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="He8RRbwi"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C1BD67
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:10:13 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1r8Qsm-0000Zw-0Q;
-	Wed, 29 Nov 2023 20:10:05 +0000
-Date: Wed, 29 Nov 2023 20:10:01 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	hawk@kernel.org, ilias.apalodimas@linaro.org, dsahern@gmail.com,
-	dtatulea@nvidia.com, willemb@google.com, almasrymina@google.com,
-	shakeelb@google.com
-Subject: Re: [PATCH net-next v4 00/13] net: page_pool: add netlink-based
- introspection
-Message-ID: <ZWeamcTq9kv0oGd4@makrotopia.org>
-References: <20231126230740.2148636-1-kuba@kernel.org>
- <170118422773.21698.10391322196700008288.git-patchwork-notify@kernel.org>
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C934991
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:33:24 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50bc7706520so345110e87.3
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:33:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1701290003; x=1701894803; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=46xP1QCom/WAaNZ9fuKB6h13iTyemZVYBjsuExY6WTc=;
+        b=He8RRbwiwhToZQNUBecgP9tsr5QLtzZ8jQy3gcks07nYKLkJA2uu4eUrTYbW/GxLGo
+         pO16MkIs31n5RWY4cZ6QDk089MeN/py0Ayc2ST6PG/kepvrcQ0rxiokuGZXPWhE3n7FC
+         9jBmIHVg1r/8+lVNIZMQTNIuLMPXai1QzZYwCDm5jzm4zppoCGXXb4mqFkM33JMqaB3H
+         3NqnacaK9mlS/a/uQiAr0V2giFwjczNrqqbcIw8XqjgHWDm8eYPAzUVtbYO2m2bTvuRB
+         DYOhdgVf9VivU5yB1q5gUWBui4VaMmff7CsDcEUA1noiea2WaNhDgVGruVhe6UeoJmFQ
+         z8KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701290003; x=1701894803;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=46xP1QCom/WAaNZ9fuKB6h13iTyemZVYBjsuExY6WTc=;
+        b=NqMV3hCJ98rUsqhUr9gYI9/P2O3gi5dr+N8oKaFtTjPQLQahZ8t6sDJYQb8wNf4ueN
+         WcOfoQgvo3TLlopfWq1cTvQaOjAMGrCf0zvTfDB08k/rGkOndhU+wDsTmmU7dreMg4SS
+         ZxzIIhEYDKZm9C3nrn/ErwdxO4mds0eg03J+8/KwhsMwlEOvmv/PG6dEHDU4ceyzAjxF
+         TEBdQKpLD6EQAb8WeF7Pu91k5vnPX0/ftBzzILoWfCD9WEM368wfwk7jNpIXk8rg1/KK
+         r2f300pBVg1DwBZF0MVMyMoLYiWIVKY0ySLjz5qT4tJYch2Ym7pyjKhGhzKkOoqQ+MT9
+         FQFw==
+X-Gm-Message-State: AOJu0YxEB1vmnYF7L2wRV9dDOe6WEmiHbh/cvmyBiS0q75xcSrg+brW5
+	WV1/sq4YMA6S3Npbpai8JO1b9FIrwBQv3OsnJCWk3g==
+X-Google-Smtp-Source: AGHT+IEpIfaZayxeuIAJ2jm0MZ78Fojwk6nvNQ8nXSd58Wm3XwB+5iFh5Trma5MfQ63AwAjOt71OFw==
+X-Received: by 2002:a19:f50a:0:b0:50b:c89f:65d1 with SMTP id j10-20020a19f50a000000b0050bc89f65d1mr1244490lfb.40.1701290002981;
+        Wed, 29 Nov 2023 12:33:22 -0800 (PST)
+Received: from cloudflare.com (79.184.129.107.ipv4.supernova.orange.pl. [79.184.129.107])
+        by smtp.gmail.com with ESMTPSA id dm22-20020a05640222d600b0054be3528e40sm699580edb.80.2023.11.29.12.33.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 12:33:22 -0800 (PST)
+References: <a4f5b61c9cd44eada41d8f09d3848806@AcuMS.aculab.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 'Jakub Kicinski'
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Stephen
+ Hemminger <stephen@networkplumber.org>, Eric Dumazet
+ <edumazet@google.com>, 'David Ahern' <dsahern@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] ipv4: Use READ/WRITE_ONCE() for IP
+ local_port_range
+Date: Wed, 29 Nov 2023 21:17:25 +0100
+In-reply-to: <a4f5b61c9cd44eada41d8f09d3848806@AcuMS.aculab.com>
+Message-ID: <87r0k82tbi.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <170118422773.21698.10391322196700008288.git-patchwork-notify@kernel.org>
+Content-Type: text/plain
 
-Hi Paolo,
+Hey David,
 
-after the merge of this series to linux-next I'm seeing a new crash
-during boot.
-It can absolutely be that this is a bug in the Ethernet driver I'm
-working on though which only got exposed now. While I'm figuring it
-out I thought it'd still be good to let you know.
+On Wed, Nov 29, 2023 at 07:26 PM GMT, David Laight wrote:
+> Commit 227b60f5102cd added a seqlock to ensure that the low and high
+> port numbers were always updated together.
+> This is overkill because the two 16bit port numbers can be held in
+> a u32 and read/written in a single instruction.
+>
+> More recently 91d0b78c5177f added support for finer per-socket limits.
+> The user-supplied value is 'high << 16 | low' but they are held
+> separately and the socket options protected by the socket lock.
+>
+> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
+> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
+> always updated together.
+>
+> Change (the now trival) inet_get_local_port_range() to a static inline
+> to optimise the calling code.
+> (In particular avoiding returning integers by reference.)
+>
+> Signed-off-by: David Laight <david.laight@aculab.com>
+> ---
 
+Regarding the per-socket changes - we don't expect contention on sock
+lock between inet_stream_connect / __inet_bind, where we grab it and
+eventually call inet_sk_get_local_port_range, and sockopt handlers, do
+we?
 
-[   15.626854] Unable to handle kernel access to user memory outside uaccess routines at virtual address 0000000000000000
-[   15.637571] Mem abort info:
-[   15.640361]   ESR = 0x0000000096000045
-[   15.644115]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   15.649431]   SET = 0, FnV = 0
-[   15.652485]   EA = 0, S1PTW = 0
-[   15.655622]   FSC = 0x05: level 1 translation fault
-[   15.660494] Data abort info:
-[   15.663374]   ISV = 0, ISS = 0x00000045, ISS2 = 0x00000000
-[   15.668855]   CM = 0, WnR = 1, TnD = 0, TagAccess = 0
-[   15.673904]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[   15.679210] user pgtable: 4k pages, 39-bit VAs, pgdp=00000001055e6000
-[   15.685647] [0000000000000000] pgd=0800000105680003, p4d=0800000105680003, pud=0800000105680003, pmd=0000000000000000
-[   15.696265] Internal error: Oops: 0000000096000045 [#1] SMP
-[   15.701826] Modules linked in: option nft_fib_inet nf_flow_table_inet cdc_mbim wireguard usb_wwan qmi_wwan nft_reject_ipv6 nft_reject_ipv4 nft_reject_inet nft_reject nft_redir nft_quota nft_numgen nft_nat nft_masq nft_log nft_limit nfs
-[   15.702009]  uas usb_storage leds_gpio xhci_plat_hcd xhci_pci xhci_mtk_hcd xhci_hcd usbcore usb_common mii
-[   15.801633] CPU: 0 PID: 3294 Comm: netifd Tainted: G           O       6.7.0-rc3-next-20231129+ #0
-[   15.810579] Hardware name: Bananapi BPI-R4 (DT)
-[   15.815097] pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   15.822047] pc : page_pool_unlist+0x40/0x74
-[   15.826227] lr : page_pool_unlist+0x38/0x74
-[   15.830400] sp : ffffffc0868639d0
-[   15.833703] x29: ffffffc0868639d0 x28: ffffff80c5e5c800 x27: 0000000000000000
-[   15.840829] x26: 0000000000000001 x25: ffffffc080bab958 x24: ffffffc080a28f68
-[   15.847954] x23: ffffffc08071e61c x22: 0000000000000000 x21: 0000000000000000
-[   15.855078] x20: ffffffc080d48740 x19: ffffff80c199a800 x18: 0000000000000000
-[   15.862203] x17: ffffffc07eafc000 x16: ffffffc080000000 x15: 0000007fd42c1f68
-[   15.869328] x14: ffffff80c011c8c0 x13: 0123837901209924 x12: ffffff80c32e2cc0
-[   15.876453] x11: ffffff80c199d000 x10: 0000000000000002 x9 : 0000000000000001
-[   15.883577] x8 : 0000000000000238 x7 : 0000000000000000 x6 : 0000000000000000
-[   15.890702] x5 : 0000000000000000 x4 : ffffff80c06b86c8 x3 : 0000000000000000
-[   15.897826] x2 : 0000000000000000 x1 : ffffff80c199ae00 x0 : 0000000000000000
-[   15.904951] Call trace:
-[   15.907386]  page_pool_unlist+0x40/0x74
-[   15.911211]  page_pool_release+0x1f8/0x270
-[   15.915300]  page_pool_destroy+0xa4/0x160
-[   15.919300]  mtk_rx_clean+0x1a4/0x200
-[   15.922955]  mtk_dma_free+0x150/0x234
-[   15.926607]  mtk_stop+0x320/0x3b0
-[   15.929913]  __dev_close_many+0xb4/0x114
-[   15.933826]  __dev_change_flags+0x11c/0x18c
-[   15.938000]  dev_change_flags+0x20/0x64
-[   15.941827]  dev_ifsioc+0x204/0x4b8
-[   15.945307]  dev_ioctl+0x144/0x4b4
-[   15.948700]  sock_ioctl+0x1c8/0x44c
-[   15.952180]  __arm64_sys_ioctl+0x520/0xf78
-[   15.956268]  invoke_syscall.constprop.0+0x4c/0xdc
-[   15.960964]  do_el0_svc+0x3c/0xb8
-[   15.964269]  el0_svc+0x18/0x4c
-[   15.967315]  el0t_64_sync_handler+0xf8/0x124
-[   15.971575]  el0t_64_sync+0x150/0x154
-[   15.975229] Code: 9100e280 9409349f 91180261 a9430820 (f9000040) 
-[   15.981310] ---[ end trace 0000000000000000 ]---
-[   15.987456] pstore: backend (ramoops) writing error (-28)
-[   15.992843] Kernel panic - not syncing: Oops: Fatal exception
-[   15.998576] SMP: stopping secondary CPUs
-[   16.002489] Kernel Offset: disabled
-[   16.005965] CPU features: 0x0,00000000,40000000,2100400b
-[   16.011264] Memory Limit: none
-[   16.015862] Rebooting in 3 seconds..
-PANIC at PC : 0x000000004300490c
+The motivation is not super clear for me for that of the changes.
 
+>  include/net/inet_sock.h         |  5 +----
+>  include/net/ip.h                |  7 ++++++-
+>  include/net/netns/ipv4.h        |  3 +--
+>  net/ipv4/af_inet.c              |  4 +---
+>  net/ipv4/inet_connection_sock.c | 29 ++++++++++------------------
+>  net/ipv4/ip_sockglue.c          | 34 ++++++++++++++++-----------------
+>  net/ipv4/sysctl_net_ipv4.c      | 12 ++++--------
+>  7 files changed, 40 insertions(+), 54 deletions(-)
+>
+> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> index 74db6d97cae1..ebf71410aa2b 100644
+> --- a/include/net/inet_sock.h
+> +++ b/include/net/inet_sock.h
+> @@ -234,10 +234,7 @@ struct inet_sock {
+>  	int			uc_index;
+>  	int			mc_index;
+>  	__be32			mc_addr;
+> -	struct {
+> -		__u16 lo;
+> -		__u16 hi;
+> -	}			local_port_range;
+> +	u32			local_port_range;
 
-Cheers
+Nit: This field would benefit from a similar comment as you have added to
+local_ports.range ("/* high << 16 | low */"), now that it is no longer
+obvious how to interpret the contents.
 
+>  
+>  	struct ip_mc_socklist __rcu	*mc_list;
+>  	struct inet_cork_full	cork;
 
-Daniel
+[...]
 
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+> index 394a498c2823..1a45d41f8b39 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -117,34 +117,25 @@ bool inet_rcv_saddr_any(const struct sock *sk)
 
+[...]
 
-On Tue, Nov 28, 2023 at 03:10:27PM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
-> 
-> This series was applied to netdev/net-next.git (main)
-> by Paolo Abeni <pabeni@redhat.com>:
-> 
-> On Sun, 26 Nov 2023 15:07:27 -0800 you wrote:
-> > We recently started to deploy newer kernels / drivers at Meta,
-> > making significant use of page pools for the first time.
-> > We immediately run into page pool leaks both real and false positive
-> > warnings. As Eric pointed out/predicted there's no guarantee that
-> > applications will read / close their sockets so a page pool page
-> > may be stuck in a socket (but not leaked) forever. This happens
-> > a lot in our fleet. Most of these are obviously due to application
-> > bugs but we should not be printing kernel warnings due to minor
-> > application resource leaks.
-> > 
-> > [...]
-> 
-> Here is the summary with links:
->   - [net-next,v4,01/13] net: page_pool: factor out uninit
->     https://git.kernel.org/netdev/net-next/c/23cfaf67ba5d
->   - [net-next,v4,02/13] net: page_pool: id the page pools
->     https://git.kernel.org/netdev/net-next/c/f17c69649c69
->   - [net-next,v4,03/13] net: page_pool: record pools per netdev
->     https://git.kernel.org/netdev/net-next/c/083772c9f972
->   - [net-next,v4,04/13] net: page_pool: stash the NAPI ID for easier access
->     https://git.kernel.org/netdev/net-next/c/02b3de80c5f8
->   - [net-next,v4,05/13] eth: link netdev to page_pools in drivers
->     https://git.kernel.org/netdev/net-next/c/7cc9e6d77f85
->   - [net-next,v4,06/13] net: page_pool: add nlspec for basic access to page pools
->     https://git.kernel.org/netdev/net-next/c/839ff60df3ab
->   - [net-next,v4,07/13] net: page_pool: implement GET in the netlink API
->     https://git.kernel.org/netdev/net-next/c/950ab53b77ab
->   - [net-next,v4,08/13] net: page_pool: add netlink notifications for state changes
->     https://git.kernel.org/netdev/net-next/c/d2ef6aa077bd
->   - [net-next,v4,09/13] net: page_pool: report amount of memory held by page pools
->     https://git.kernel.org/netdev/net-next/c/7aee8429eedd
->   - [net-next,v4,10/13] net: page_pool: report when page pool was destroyed
->     https://git.kernel.org/netdev/net-next/c/69cb4952b6f6
->   - [net-next,v4,11/13] net: page_pool: expose page pool stats via netlink
->     https://git.kernel.org/netdev/net-next/c/d49010adae73
->   - [net-next,v4,12/13] net: page_pool: mute the periodic warning for visible page pools
->     https://git.kernel.org/netdev/net-next/c/be0096676e23
->   - [net-next,v4,13/13] tools: ynl: add sample for getting page-pool information
->     https://git.kernel.org/netdev/net-next/c/637567e4a3ef
-> 
-> You are awesome, thank you!
-> -- 
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
-> 
-> 
-> 
+>  void inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high)
+>  {
+>  	const struct inet_sock *inet = inet_sk(sk);
+>  	const struct net *net = sock_net(sk);
+>  	int lo, hi, sk_lo, sk_hi;
+> +	u32 sk_range;
+>  
+>  	inet_get_local_port_range(net, &lo, &hi);
+>  
+> -	sk_lo = inet->local_port_range.lo;
+> -	sk_hi = inet->local_port_range.hi;
+> +	sk_range = READ_ONCE(inet->local_port_range);
+> +	if (unlikely(sk_range)) {
+> +		sk_lo = sk_range & 0xffff;
+> +		sk_hi = sk_range >> 16;
+>  
+> -	if (unlikely(lo <= sk_lo && sk_lo <= hi))
+> -		lo = sk_lo;
+> -	if (unlikely(lo <= sk_hi && sk_hi <= hi))
+> -		hi = sk_hi;
+> +		if (unlikely(lo <= sk_lo && sk_lo <= hi))
+> +			lo = sk_lo;
+> +		if (unlikely(lo <= sk_hi && sk_hi <= hi))
+> +			hi = sk_hi;
+> +	}
+
+Actually when we know that sk_range is set, the above two branches
+become likely. It will be usually so that the set per-socket port range
+narrows down the per-netns port range.
+
+These checks exist only in case the per-netns port range has been
+reconfigured after per-socket port range has been set. The per-netns one
+always takes precedence.
+
+>  
+>  	*low = lo;
+>  	*high = hi;
+
+[...]
 
