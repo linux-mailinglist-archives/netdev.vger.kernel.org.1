@@ -1,137 +1,194 @@
-Return-Path: <netdev+bounces-52099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2300D7FD49B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:45:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0BF7FD4A4
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2FFA281015
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:45:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3F95B20DB6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DB71B27C;
-	Wed, 29 Nov 2023 10:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30AC1B27E;
+	Wed, 29 Nov 2023 10:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H25kcB76"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7KWoYHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 487FFDC;
-	Wed, 29 Nov 2023 02:45:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YMZbFDkVfTDJmmFleew3bSBW/TgAopadhMfWD+sdhRI=; b=H25kcB76uRDwpD9uumTQrwD225
-	oQOhBWUD8B+lalPyUeG3K89C5RvR3/eyoSod6l2OyvYdmq5Qq48N8EsaHtXPyyGGUdhMsOba2zW5B
-	QKrS8SkafmsIvjRdblNjVFqdP2BDjk+odROj3xJ0SHzmWUvnSr4PVekR1/gr2rsdNU5lauajagElV
-	ubswMItB7H6TUq3lbmXL3HXcL/UBPCD3TzxAAitwiSh6MhTPVNDeOf/2JDGhRMvGHLX7KjgSmZI70
-	2IXAdns5BRdjLeLzz7VXp0jF6QU0pfQyYhDpFLFuf5A4/1rVCs5wtgsFD26Fd8AIySe/ZV6HT71p+
-	a9a9j54w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35654)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r8I46-0000AU-1E;
-	Wed, 29 Nov 2023 10:45:10 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r8I47-0003vH-5M; Wed, 29 Nov 2023 10:45:11 +0000
-Date: Wed, 29 Nov 2023 10:45:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 02/14] net: phy: at803x: move disable WOL for
- 8031 from probe to config
-Message-ID: <ZWcWN4kRRPBA9ZG6@shell.armlinux.org.uk>
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-3-ansuelsmth@gmail.com>
- <ZWcDUJY8rM6uApO1@shell.armlinux.org.uk>
- <65670622.050a0220.4c0d0.3ee9@mx.google.com>
+X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 02:46:41 PST
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C9BD73;
+	Wed, 29 Nov 2023 02:46:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701254801; x=1732790801;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rbU00ZlSBNX0l3gHoeLVRwt3IFr67F4reSXWY6JN9vE=;
+  b=O7KWoYHaT3sMySUX9cVthzatsqsct3Zq+zBp3zmr6xVVzwW4tcHrZWkE
+   W/GKh1HPYXBP/SHDPys7PBYt+c8q6h5WYJGzcLk+sSwwYe8GA34/KIYm5
+   cREhpMxFZwyNUIoL5Ah0Xq0RPKMIlESAFX8a6pq+8gVHnI/zjg/GObSjX
+   PtMZLwmNsRuHKyXWh9x0Y8obs/bflb4DFg6QT46VaX7jXxrLhmyCIFKe4
+   6+FcOdkS4xkZELRsSccuHUFO++JgZ9xkxP+jkvqEPOPLOESOUabrxVhLc
+   U4HJsIOiUxOZozDz1VEDF2P0J2IlVZPrbAWNMbm7jmlwSsaeMcdBaBl/v
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="29567"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="29567"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:45:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="859781936"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="859781936"
+Received: from hongyuni-mobl.ccr.corp.intel.com (HELO [10.238.2.21]) ([10.238.2.21])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:45:34 -0800
+Message-ID: <f37cb55a-6fc8-4e21-8789-46d468325eea@linux.intel.com>
+Date: Wed, 29 Nov 2023 18:45:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65670622.050a0220.4c0d0.3ee9@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] virtio: features
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, xuanzhuo@linux.alibaba.com,
+ Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com,
+ yuanyaogoog@chromium.org, yuehaibing@huawei.com,
+ kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+ alexander.shishkin@linux.intel.com
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com>
+ <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
+ <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com>
+ <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
+Content-Language: en-US
+From: "Ning, Hongyu" <hongyu.ning@linux.intel.com>
+In-Reply-To: <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 10:36:31AM +0100, Christian Marangi wrote:
-> On Wed, Nov 29, 2023 at 09:24:32AM +0000, Russell King (Oracle) wrote:
-> > On Wed, Nov 29, 2023 at 03:12:07AM +0100, Christian Marangi wrote:
-> > > Probe should be used only for DT parsing and allocate required priv, it
-> > > shouldn't touch regs, there is config_init for that.
-> > 
-> > I'm not sure where you get that idea from. PHY driver probe() functions
-> > are permitted to access registers to do any setup that they wish to.
-> > 
-> > config_init() is to configure the PHY for use with the network
-> > interface.
-> > 
-> > I think this patch is just noise rather than a cleanup.
-> >
+
+On 2023/11/29 18:20, Jason Wang wrote:
+> On Wed, Nov 29, 2023 at 6:12 PM Ning, Hongyu
+> <hongyu.ning@linux.intel.com> wrote:
+>>
+>>
+>> On 2023/11/29 17:16, Jason Wang wrote:
+>>> On Wed, Nov 29, 2023 at 5:05 PM Ning, Hongyu
+>>> <hongyu.ning@linux.intel.com> wrote:
+>>>>
+>>>>
+>>>>
+>>>> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
+>>>>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
+>>>>>
+>>>>>      Linux 6.5 (2023-08-27 14:49:51 -0700)
+>>>>>
+>>>>> are available in the Git repository at:
+>>>>>
+>>>>>      https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+>>>>>
+>>>>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+>>>>>
+>>>>>      virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
+>>>>>
+>>>>> ----------------------------------------------------------------
+>>>>> virtio: features
+>>>>>
+>>>>> a small pull request this time around, mostly because the
+>>>>> vduse network got postponed to next relase so we can be sure
+>>>>> we got the security store right.
+>>>>>
+>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>>
+>>>>> ----------------------------------------------------------------
+>>>>> Eugenio Pérez (4):
+>>>>>          vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+>>>>>          vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
+>>>>>          vdpa: add get_backend_features vdpa operation
+>>>>>          vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+>>>>>
+>>>>> Jason Wang (1):
+>>>>>          virtio_vdpa: build affinity masks conditionally
+>>>>>
+>>>>> Xuan Zhuo (12):
+>>>>>          virtio_ring: check use_dma_api before unmap desc for indirect
+>>>>>          virtio_ring: put mapping error check in vring_map_one_sg
+>>>>>          virtio_ring: introduce virtqueue_set_dma_premapped()
+>>>>>          virtio_ring: support add premapped buf
+>>>>>          virtio_ring: introduce virtqueue_dma_dev()
+>>>>>          virtio_ring: skip unmap for premapped
+>>>>>          virtio_ring: correct the expression of the description of virtqueue_resize()
+>>>>>          virtio_ring: separate the logic of reset/enable from virtqueue_resize
+>>>>>          virtio_ring: introduce virtqueue_reset()
+>>>>>          virtio_ring: introduce dma map api for virtqueue
+>>>>>          virtio_ring: introduce dma sync api for virtqueue
+>>>>>          virtio_net: merge dma operations when filling mergeable buffers
+>>>>
+>>>> Hi,
+>>>> above patch (upstream commit 295525e29a5b) seems causing a virtnet
+>>>> related Call Trace after WARNING from kernel/dma/debug.c.
+>>>>
+>>>> details (log and test setup) tracked in
+>>>> https://bugzilla.kernel.org/show_bug.cgi?id=218204
+>>>>
+>>>> it's recently noticed in a TDX guest testing since v6.6.0 release cycle
+>>>> and can still be reproduced in latest v6.7.0-rc3.
+>>>>
+>>>> as local bisects results show, above WARNING and Call Trace is linked
+>>>> with this patch, do you mind to take a look?
+>>>
+>>> Looks like virtqueue_dma_sync_single_range_for_cpu() use
+>>> DMA_BIDIRECTIONAL unconditionally.
+>>>
+>>> We should use dir here.
+>>>
+>>> Mind to try?
+>>>
+>>> Thanks
+>>>
+>>
+>> sure, but what I see in the code
+>> virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
+>> probably I misunderstood your point?
+>>
+>> Please let me know any patch/setting to try here.
 > 
-> I got it from here [1]
+> Something like attached.  (Not even compiling test).
 > 
-> Also on every other driver probe was always used for allocation and
-> parsing so why deviates from this pattern here?
+> Thanks
+> 
 
-Untrue.
+Oh, this patch works, WARNING and Call Trace are no more reproduced in 
+the same Linux Guest Kernel setup.
 
-bcm54140_enable_monitoring() is called from bcm54140_probe_once()
-which in turn is called from bcm54140_probe().
-
-dp83869_probe() calls dp83869_config_init(), rightly or wrongly.
-
-lxt973_probe() fixes up the BMCR.
-
-mv3310_probe() configures power-down modes, modifying registers.
-
-mt7988_phy_probe() calls mt7988_phy_fix_leds_polarities() which
-modifies registers.
-
-lan8814_probe() calls lan8814_ptp_init() which does a whole load of
-register writes.
-
-lan88xx_probe() configures LEDs via register writes.
-
-yt8521_probe() configures clocks via register modification.
-
-I'm afraid this means your comment is demonstrably false.
-
-> Also I think it was wrong from the start as on reset I think WoL is
-> not disabled again. (probe is not called)
-
-On hardware reset, the 1588 register will re-enable the WoL pin, but
-that needs a hardware reset of the PHY to happen after probe() is
-called.
-
-However, phy_probe() will only assert the reset signal _if_ an error
-occured during probing, not if probing was successful. So, a successful
-probe of this driver will not cause a hardware reset.
-
-Also, hardware reset is optional. Do you know whether the platforms
-that use the separate WoL pin which this 1588 register controls also
-wire the reset signal such that it can be controlled by Linux?
-Probably not.
-
-So, this register write will not be cleared by a hardware reset after
-a successful probe.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>>
+>>
+>>>>
+>>>>>
+>>>>> Yuan Yao (1):
+>>>>>          virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+>>>>>
+>>>>> Yue Haibing (1):
+>>>>>          vdpa/mlx5: Remove unused function declarations
+>>>>>
+>>>>>     drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+>>>>>     drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+>>>>>     drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+>>>>>     drivers/vhost/vdpa.c               |  15 +-
+>>>>>     drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
+>>>>>     drivers/virtio/virtio_vdpa.c       |  17 +-
+>>>>>     include/linux/vdpa.h               |   4 +
+>>>>>     include/linux/virtio.h             |  22 ++
+>>>>>     include/uapi/linux/vhost_types.h   |   4 +
+>>>>>     9 files changed, 625 insertions(+), 90 deletions(-)
+>>>>>
+>>>>
+>>>
+>>
 
