@@ -1,28 +1,28 @@
-Return-Path: <netdev+bounces-52078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D776A7FD388
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:05:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71677FD38A
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9346128297B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0C11C210E9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA3819464;
-	Wed, 29 Nov 2023 10:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B56B19471;
+	Wed, 29 Nov 2023 10:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6081BDB;
-	Wed, 29 Nov 2023 02:05:22 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0VxNrNao_1701252319;
-Received: from 30.221.128.123(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0VxNrNao_1701252319)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A271AD;
+	Wed, 29 Nov 2023 02:05:32 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0VxNrNbH_1701252320;
+Received: from 30.221.128.123(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0VxNrNbH_1701252320)
           by smtp.aliyun-inc.com;
-          Wed, 29 Nov 2023 18:05:20 +0800
-Message-ID: <23c4b05e-1ffe-466f-bcfa-ae345d5bc90d@linux.alibaba.com>
-Date: Wed, 29 Nov 2023 18:05:16 +0800
+          Wed, 29 Nov 2023 18:05:30 +0800
+Message-ID: <1bcd4871-7403-41d9-8ae6-4df4878d9275@linux.alibaba.com>
+Date: Wed, 29 Nov 2023 18:05:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -32,26 +32,26 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
  send/recv/acked events
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
+To: Martin KaFai Lau <martin.lau@linux.dev>
 Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
  alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
  hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, song@kernel.org, yonghong.song@linux.dev,
  john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
  haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 References: <20231123030732.111576-1-lulie@linux.alibaba.com>
  <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
- <72166ea4-cae7-97e2-88fd-e9bde56523fb@iogearbox.net>
+ <3aa60895-c149-4cac-a09a-169abbe4e2f5@linux.dev>
 From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <72166ea4-cae7-97e2-88fd-e9bde56523fb@iogearbox.net>
+In-Reply-To: <3aa60895-c149-4cac-a09a-169abbe4e2f5@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
-On 2023/11/24 17:47, Daniel Borkmann wrote:
-> On 11/23/23 1:37 PM, Philo Lu wrote:
+On 2023/11/29 08:33, Martin KaFai Lau wrote:
+> On 11/23/23 4:37 AM, Philo Lu wrote:
 >> Sorry, I forgot to cc the maintainers.
 >>
 >> On 2023/11/23 11:07, Philo Lu wrote:
@@ -79,22 +79,17 @@ On 2023/11/24 17:47, Daniel Borkmann wrote:
 >>> requirements.
 >>>
 >>> Besides, these hooks also help to debug tcp when data send/recv/acked.
->>>
->>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->>> ---
->>>   include/net/tcp.h        |  9 +++++++++
->>>   include/uapi/linux/bpf.h | 14 +++++++++++++-
->>>   net/ipv4/tcp_input.c     |  4 ++++
->>>   net/ipv4/tcp_output.c    |  2 ++
->>>   4 files changed, 28 insertions(+), 1 deletion(-)
 >
-> Please also add selftests for the new hooks, and speaking of the latter
-> looks like this fails current BPF selftests :
->
-> https://github.com/kernel-patches/bpf/actions/runs/6974541866/job/18980491457 
->
->
+> This all sounds like a tracing use case. Why tracepoint is not used 
+> instead?
 
-We will add selftests in the next version. The current selftests fail just
-because of the new flag added, and we can also fix this in the next version.
+Yes, our use case is pure tracing. We add hooks to sockops because we 
+also use
+other ops like BPF_SOCK_OPS_STATE_CB. Thus, sockops seems a natural solution
+for us.
+
+We can also use tracepoint (with sockops) instead. So we think which to use
+depends on your opinions. Many thanks.
+
+
 
