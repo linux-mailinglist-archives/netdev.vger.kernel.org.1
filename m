@@ -1,151 +1,148 @@
-Return-Path: <netdev+bounces-52295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D817FE2C6
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:12:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5F47FE2DB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:17:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24C8CB20EAB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:12:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 389F01C20B95
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219A04CB5B;
-	Wed, 29 Nov 2023 22:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F8A3B181;
+	Wed, 29 Nov 2023 22:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Vbu2ZQ+C"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OjVaYLAy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327E3A8
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:12:22 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-332fd78fa9dso182049f8f.3
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:12:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1701295940; x=1701900740; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QsfiiCh2t+d8frhzsf+fjDEcC/TtScnOnSIQNlDuEFI=;
-        b=Vbu2ZQ+CUo4c4tHkKXzCJC6yiiKbQe3fCMgf1Ek0Ah8FR74C3lqzi8/USu+zgVII+w
-         8hzbQYnjeKxnJxcBUz6nWafs/hMF3i2TbP2sIXq1xgHZ8X1iudRbWtsP7HtmVlZyoUpI
-         Xcd8/HNqSby/Xg75SQGFpplcgry/kH8XPAASV4Z0CvOuUFG8hV5uPTjAtSURKcxJvcKg
-         Xscm14PI2oHUf2iA2cN1IeW2iuy0DUTC/PtF1iWzxDzVHvrFOcoK0b8Y0sXJQuDOQ08n
-         X1O1Cem9bTQAokPxfcXYje0fGnkX20BO+DjJg39hLYep75agark500uG2ZAjvjELhaNz
-         CjJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701295940; x=1701900740;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsfiiCh2t+d8frhzsf+fjDEcC/TtScnOnSIQNlDuEFI=;
-        b=tRemMKr6qOYJdQOWayTsUoNv+1KmJMVKyWT3tLOScKsmMNbVkd6S7Ix7A08CqmfdfL
-         Aem9XwLVnpXPixP96n7oAvglHu5wCFUXxie5L9Ojpd8mHQ0eCK5VSe0Olo7Rl8GkMAN9
-         3fnR17tqUv3Gl3Agt81xyG8zly1zh9CVmPLf3wegevRHRE5cqqqyAje/yDAp4lmAFmxy
-         WtsGzZFfv+nKrtzrekQMceWE4aDriWT71fRlpdTe+2K9VNRnZ6i5bjGZEpp+BEjhVmRh
-         tFBtir9Ph6ei84fGduDslOAoFB2gc+nvAzLSghpsYgziTkryYDFFfDqLR0JBH6Uo0PwN
-         4NqA==
-X-Gm-Message-State: AOJu0Yw85WihZT2M4yAYXASa/vh4inxh/kxb+oSASmSaqm9lxZKOEf4T
-	1UyZwKYRICm7M87EOO6ZGjnxoQ==
-X-Google-Smtp-Source: AGHT+IGQLX3W0cIOgoVCWLck+JywOx3atXXdqIfcrELeP5HlGMpHrXHv5v+/8U8U1rtlPI3vV9qceg==
-X-Received: by 2002:a5d:4d42:0:b0:333:1cc8:4182 with SMTP id a2-20020a5d4d42000000b003331cc84182mr1224453wru.64.1701295940589;
-        Wed, 29 Nov 2023 14:12:20 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id t10-20020adff60a000000b003316db2d48dsm5614477wrp.34.2023.11.29.14.12.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 14:12:20 -0800 (PST)
-Message-ID: <d0ee7676-6665-4e47-8e06-1d4d168c3421@arista.com>
-Date: Wed, 29 Nov 2023 22:12:13 +0000
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 539B5A3;
+	Wed, 29 Nov 2023 14:17:40 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id A96B720B74C0; Wed, 29 Nov 2023 14:17:39 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A96B720B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701296259;
+	bh=Zsx1oRRDG0ud+KYg27YMp0ZwJzk7FpHaUGfDgfFevRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OjVaYLAyvGNrgGT5XdUkbanydr+2zb91Ww6pBQ5v7UdvypeSsJzEFiwbBN4YUcoFd
+	 iRxOfYUrSOzPaW6u8WICfgphPuL+DCUWLY0RuJKcwQcuRJaa9zIdMunYSLQCHHaTLV
+	 34olHXNtIiUoYZircMeYAoW1H3Tphn9/XH4vo8ys=
+Date: Wed, 29 Nov 2023 14:17:39 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ
+ affinity on HT cores
+Message-ID: <20231129221739.GA20858@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <20231121154841.7fc019c8@kernel.org>
+ <PUZP153MB0788476CD22D5AA2ECDC11ABCCBDA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <20231127100639.5f2f3d3e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20231129165721.337302-1-dima@arista.com>
- <20231129165721.337302-7-dima@arista.com>
- <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
- <df55eb1d-b63a-4652-8103-d2bd7b5d7eda@arista.com>
- <CANn89iLZx-SiV0BqHkEt9vS4LZzDxW2omvfOvNX6XWSRPFs7sw@mail.gmail.com>
- <137ab4f7-80af-4e00-a5bb-b1d4f4c75a67@arista.com>
- <CANn89iLfvOp+xpoFzsKojQs2SuCy+qL6PANj8Z04MwYaH31moA@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iLfvOp+xpoFzsKojQs2SuCy+qL6PANj8Z04MwYaH31moA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231127100639.5f2f3d3e@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 11/29/23 21:01, Eric Dumazet wrote:
-> On Wed, Nov 29, 2023 at 8:58 PM Dmitry Safonov <dima@arista.com> wrote:
->> On 11/29/23 18:34, Eric Dumazet wrote:
-[..]
->>> You have not commented on where these are read without the socket lock held ?
->>
->> Sorry for missing this, the SNEs are used with this helper
->> tcp_ao_compute_sne(), so these places are (in square brackets AFAICS,
->> there is a chance that I miss something obvious from your message):
->>
->> - tcp_v4_send_reset() => tcp_ao_prepare_reset() [rcu_read_lock()]
->> - __tcp_transmit_skb() => tcp_ao_transmit_skb() [TX softirq]
->> - tcp_v4_rcv() => tcp_inbound_ao_hash() [RX softirq]
+On Mon, Nov 27, 2023 at 10:06:39AM -0800, Jakub Kicinski wrote:
+> On Mon, 27 Nov 2023 09:36:38 +0000 Souradeep Chakrabarti wrote:
+> > easier to keep things inside the mana driver code here
 > 
-> All these should/must have the socket lock held !
-> 
-> Or reading tcp_sk(sk)->rcv_nxt would be racy anyway (note the lack of
-> READ_ONCE() on it)
+> Easier for who? Upstream we care about consistency and maintainability
+> across all drivers.
+I am refactoring the code and putting some of the changes in topology.h
+and in nodemask.h. I am sharing the proposed change here for those two
+files. Please let me know if they are acceptable.
 
-For fairness, post this patch rcv_next is not read anymore (SNEs are
-updated in parallel).
+Added a new helper to iterate on numa nodes with cpu and start from a 
+particular node, instead of first node. This helps when we want to
+iterate from the local numa node.
 
+diff --git a/include/linux/nodemask.h b/include/linux/nodemask.h
+index 8d07116caaf1..6e4528376164 100644
+--- a/include/linux/nodemask.h
++++ b/include/linux/nodemask.h
+@@ -392,6 +392,15 @@ static inline void __nodes_fold(nodemask_t *dstp, const nodemask_t *origp,
+        for ((node) = 0; (node) < 1 && !nodes_empty(mask); (node)++)
+ #endif /* MAX_NUMNODES */
 
-> I think you need more work to make sure this is done correctly.
++#if MAX_NUMNODES > 1
++#define for_each_node_next_mask(node_start, node_next, mask)           \
++       for ((node_next) = (node_start);                                \
++            (node_next) < MAX_NUMNODES;                                \
++            (node_next) = next_node((node_next), (mask)))
++#else
++#define for_each_node_next_mask(node_start, node_next, mask)   \
++       for_each_node_mask(node_next, mask)
++#endif
+ /*
+  * Bitmasks that are kept for all the nodes.
+  */
+@@ -440,6 +449,8 @@ static inline int num_node_state(enum node_states state)
 
-Sure.
+ #define for_each_node_state(__node, __state) \
+        for_each_node_mask((__node), node_states[__state])
++#define for_each_node_next_state(__node_start, __node_next, __state) \
++       for_each_node_next_mask((__node_start), (__node_next), node_states[__state])
 
-> ie tcp_inbound_hash() should be called from tcp_v4_do_rcv() after the
-> bh_lock_sock_nested() and sock_owned_by_user() checks.
+ #define first_online_node      first_node(node_states[N_ONLINE])
+ #define first_memory_node      first_node(node_states[N_MEMORY])
+@@ -489,7 +500,8 @@ static inline int num_node_state(enum node_states state)
 
-But than my concern would be that any incoming segment will cause
-contention for the time of signature verification. That potentially may
-create DoS.
+ #define for_each_node_state(node, __state) \
+        for ( (node) = 0; (node) == 0; (node) = 1)
+-
++#define for_each_node_next_state(node, next_node, _state) \
++       for_each_node_state(node, __state)
+ #define first_online_node      0
+ #define first_memory_node      0
+ #define next_online_node(nid)  (MAX_NUMNODES)
+@@ -535,6 +547,8 @@ static inline int node_random(const nodemask_t *maskp)
 
-If this patch is ugly enough to be not acceptable, would
-bh_lock_sock_nested() around reading SNEs + rcv_nxt/snd_una sound better?
+ #define for_each_node(node)       for_each_node_state(node, N_POSSIBLE)
+ #define for_each_online_node(node) for_each_node_state(node, N_ONLINE)
++#define for_each_online_node_next(node, next_node)  \
++                                 for_each_node_next_state(node, next_node, N_ONLINE)
 
-Let me add some information, that is lacking in patch message, but may
-be critical to avoid misunderstanding:
+ /*
+  * For nodemask scratch area.
+diff --git a/include/linux/topology.h b/include/linux/topology.h
+index 52f5850730b3..a06b16e5a955 100644
+--- a/include/linux/topology.h
++++ b/include/linux/topology.h
+@@ -43,6 +43,9 @@
+        for_each_online_node(node)                      \
+                if (nr_cpus_node(node))
 
-Note that the code doesn't need precise SEQ numbers, but it needs a
-consistent SNE+SEQ pair to detect the moment of SEQ number rolling over.
-So, that tcp_ao_compute_sne() will be able to use decremented SNE for a
-delayed/retransmitted segment and to use incremented SNE for a new
-segment post-rollover. So, technically, it just needs a correct SNE.
-Which is computed based on what was "cached" SEQ for that "cached" SNE
-and what is the SEQ from the skb.
++#define for_each_next_node_with_cpus(node, next_node)  \
++               for_each_online_node_next(node, next_node)      \
++               if (nr_cpus_node(next_node))
+ int arch_update_cpu_topology(void);
 
-As tcp window size is smaller than 2 GB, the valid segment to be
-verified or signed won't be far away from this consistent number, that
-is to be used by tcp_ao_compute_sne().
-
-Technically, if the SNE+SEQ "cached" pair is inconsistent (which
-unlikely but may happen _prior_ to this patch): i.e. SNE from
-pre-rollover and SEQ is post-rollover, tcp_ao_compute_sne() will
-incorrectly increment/decrement the SNE that is used for
-signing/verification of the TCP segment. In result the segment will fail
-verification and will be retransmitted again.
-As it's unlikely race that may happen on SEQ rollover (once in 4GB) and
-TCP-AO connection won't break, but survives after the retransmission, I
-don't think it was noticed on testing.
-
-Thanks,
-             Dmitry
-
+ /* Conform to ACPI 2.0 SLIT distance definitions */
 
