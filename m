@@ -1,120 +1,211 @@
-Return-Path: <netdev+bounces-52038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8337D7FD156
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:49:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4223A7FD192
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:02:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D65E282B98
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:49:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAE0E1F20EFA
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 09:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4615C125B1;
-	Wed, 29 Nov 2023 08:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20712B8F;
+	Wed, 29 Nov 2023 09:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="kkgmX/J+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ClaKvL5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-209.mail.qq.com (out203-205-221-209.mail.qq.com [203.205.221.209])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B86E0BC;
-	Wed, 29 Nov 2023 00:48:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1701247730; bh=Xk1r4MKViKZ7+K/uenq6FuE6+PsSkXPe5XNBpnfJRBI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kkgmX/J+PTZp/WExqwS73Yz2yenr8IWZtGcpa17s8EcOj/b/vKT5X95/USw68gE2V
-	 gc/Ju8SGrXdWiOWm14pVzpIS5axq1QlWTgrVnQ5xVocRyv+BthC0GzJrFK0f320b3Y
-	 +rQTkTTbmrtLzTrrbmZ7e+AvQAB02kdPb/qEjp94=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
-	id C2D3D61D; Wed, 29 Nov 2023 16:48:45 +0800
-X-QQ-mid: xmsmtpt1701247725tk0ncglh8
-Message-ID: <tencent_6E9CA7EF46E452C90650899D2ECFEEFE4C06@qq.com>
-X-QQ-XMAILINFO: OZZSS56D9fAjWVaB4PHNJb8tsTqNPxKnsmpxg/CWpO1uIz/88+WpUBbId7L5Mf
-	 JCB41rIfjxdNfx/YEReganC6bVYF565SBtQaTWRbgHiSfo4g2dpz6OiOCQNO7U3IuN4/YV5r6iwx
-	 h/NmRHfIgkxRnJJjooXW5DwDNb1WXenPRVBwo8OvoXT4kl6M21LVslH4cFX4DiOFeXI7F4DwGNfC
-	 AAD9Vk+oY7f3Z9p834tHGTMlR5NO+a+77NkETksN7kXVnQL5MfrKb7OVKwohB8e3MflXd+f/+RhL
-	 MSQ9TLhSK/p9gjUOZoGXVJu6xUzufamFhU8RfWo4obqZk3nikaFioex2+SZ6ag8Dpzy2SKDmorCL
-	 2pq/4Zgz+pRWMjNLwBT2vE2FrWs2qvmR0/IZM3LlKuX4GBsfFE3lsLcT97c17bOsZ2dekThBq8lK
-	 1GbcKZJoDIrpfzjwlfLpofh7pd7ehQakDwSPrOQhzfY0Bwa0pQgAH0pIGnO7OK7rIzcYdZlUK7C9
-	 4F1Nx3cOhhwmMDMKQpWw1ttUW3I2FYXhsL5oXHumAAnFGLPgGLOpWNgJZBuN/MtapDhwyo5TY4BJ
-	 0zGjRK4JcoRUHa77S6jSJiEMkfS+gPYfrYprp/E4WRoUYUg3SQDyB7uulquZFK8aYjTWFA4PiSTS
-	 yWq9ndILBFpt4yxOxIqaBflSEUdNpmQsVrCJKurw16gd3KWydZdk61gNINTdUoXGp1n2IoxoxYyM
-	 2fKM7j+TQ0VJXixi/ZpTBDkiZolZcsXg1yNKcKoXslnmwkMY9yvhxUeZoIz70OOCxFW4UNOAeiKy
-	 WULJxJMhoZKzVF475Sgz/QVBWaxW9qNOzUhKmMyuz3yEDFDWFPzUe2FPNiV9Bncmw0knFQvis3RQ
-	 rbVJY9SsbiNcOs8kM09pD6b5RL2K9biCTDNXxt3S9rfZacvCbWN9RHpPZ6OjoaLroE17E8l5zq5z
-	 777jVfBaWAHPwWFqSUjw==
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Edward Adam Davis <eadavis@qq.com>
-To: johannes@sipsolutions.net
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	llvm@lists.linux.dev,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+62d7eef57b09bfebcd84@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	trix@redhat.com
-Subject: Re: [PATCH] wifi: mac80211: sband's null check should precede params
-Date: Wed, 29 Nov 2023 16:48:46 +0800
-X-OQ-MSGID: <20231129084845.3875870-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <56d8b3b9099d3935a7b53e976fa998f06fbfd9a5.camel@sipsolutions.net>
-References: <56d8b3b9099d3935a7b53e976fa998f06fbfd9a5.camel@sipsolutions.net>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2512A194
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 01:01:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701248513;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
+	b=ClaKvL5NKcIJgeEC7015ezw7q4HePsEijIejXfOJ97W+Qr5y0WcnRTI6zSU1e8sQylIk2l
+	aeMsuE8eGzIDEtCv3kmpfFRgtnllXzzYqp31Lap885DRhTBoYq2M/DfuJeYBDuOkkouoNF
+	bUTTdCPdLSQoRHunR/znG1K8ccUIBhU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-haorilHxN_O4NwO3cb4_GA-1; Wed, 29 Nov 2023 04:01:51 -0500
+X-MC-Unique: haorilHxN_O4NwO3cb4_GA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-333127fecf9so865402f8f.2
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 01:01:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701248510; x=1701853310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zwc9ieluISalwFh3TyYZ4gcQacsA94sf6qSa2kEUESI=;
+        b=MJetFG0ZWc7zfT1jSzkW6ZCQtolUExIZoZ+9DZ8k4RMcHfHqBAIPsOxlAbximShhXv
+         tDOP0FMD99yoGqv8QpD6lA6X45VqmCHwoN/ldfVZgL2dImrAS8zzxCJ7tsJwfSVaZcG+
+         +0r7n/u7P4YSaVVrOlj+EnBu7BaPdyvAhXxZdg04ktqN0cIQP+Vgvy1ytAvTDVP/u1QA
+         Wb01haV8ppBg646hgAzqSom0plIpE3yODlQnlFKKY7AbI9PKbSpGKG924CYgCZ8BOVJi
+         ZbUjg+S3JVRorPB4Lm/6Kcsi786jMCNfOcuUL+JklxloBQ8up3zJeEC3sLHDo0CZiv3K
+         ErJA==
+X-Gm-Message-State: AOJu0YyMZZnMfr5VzGVqqYe/rvVMa5Ez0aSQ9LxjUULolizEr/A0F6M3
+	/NDWmSkYIxdbIEmzzi2+2Q4HKBE2HAXYwVK/YIA2/l1VaHDf0MkF0TjZgOeQfxaQmTVTijvEjJu
+	FlmV38gi94hXAk4XN
+X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788932wra.26.1701248510228;
+        Wed, 29 Nov 2023 01:01:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFP2F6dczPE089a3r9AZSuxONM+6MsCslUykG0rwB+wpDrF0PpgPS4SUfoLewfpzCdrG2iGkA==
+X-Received: by 2002:adf:b1d5:0:b0:332:c441:70aa with SMTP id r21-20020adfb1d5000000b00332c44170aamr13788889wra.26.1701248509534;
+        Wed, 29 Nov 2023 01:01:49 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id c14-20020a056000104e00b00332f95ab44esm10548348wrx.57.2023.11.29.01.01.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 01:01:48 -0800 (PST)
+Date: Wed, 29 Nov 2023 10:01:43 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <etuukjyedcdvkdxsql5qquvla6tuaaayph7vj2jdskqjwmkmoy@h2hkgjfyawyi>
+References: <20231122180510.2297075-1-avkrasnov@salutedevices.com>
+ <20231122180510.2297075-3-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231122180510.2297075-3-avkrasnov@salutedevices.com>
 
-On Wed, 29 Nov 2023 09:33:23 +0100, Johannes Berg wrote:
-> > > > [Analysis]
-> > > > When ieee80211_get_link_sband() fails to find a valid sband and first checks
-> > > > for params in sta_link_apply_parameters(), it will return 0 due to new_link
-> > > > being 0, which will lead to an incorrect process after sta_apply_parameters().
-> > > > 
-> > > > [Fix]
-> > > > First obtain sband and perform a non null check before checking the params.
-> > > 
-> > > Not sure I can even disagree with that analysis, it seems right, but ...
-> > > 
-> > > > +	if (!link || !link_sta)
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	sband = ieee80211_get_link_sband(link);
-> > > > +	if (!sband)
-> > > > +		return -EINVAL;
-> > > > +
-> > > >  	/*
-> > > >  	 * If there are no changes, then accept a link that doesn't exist,
-> > > >  	 * unless it's a new link.
-> > > 
-> > > There's a comment here which is clearly not true after this change,
-> > > since you've already returned for !link_sta?
-> > No, after applying my patch, it will return due to !sband.
-> > 
-> 
-> Right, OK, but the way I read the comment (now) is that it wanted to
-> accept it in that case?
-> 
-> That said, I just threw the patch into our internal testing machinery
-> quickly (probably has more MLO tests than upstream hostap for now), and
-> it worked just fine ...
-> 
-> Maybe we should just remove the comment?
-Do you mean to delete the comments below?
-   3         /*
-   2          * If there are no changes, then accept a link that doesn't exist,
-   1          * unless it's a new link.
-1800          */
+On Wed, Nov 22, 2023 at 09:05:09PM +0300, Arseniy Krasnov wrote:
+>Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>than number of bytes in rx queue. It is needed, because 'poll()' will
+>wait until number of bytes in rx queue will be not smaller than
+>SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>for tx/rx is possible: sender waits for free space and receiver is
+>waiting data in 'poll()'.
+>
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> Changelog:
+> v1 -> v2:
+>  * Update commit message by removing 'This patch adds XXX' manner.
+>  * Do not initialize 'send_update' variable - set it directly during
+>    first usage.
+>
+> drivers/vhost/vsock.c                   |  2 ++
+> include/linux/virtio_vsock.h            |  1 +
+> net/vmw_vsock/virtio_transport.c        |  2 ++
+> net/vmw_vsock/virtio_transport_common.c | 28 +++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  2 ++
+> 5 files changed, 35 insertions(+)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index f75731396b7e..ecfa5c11f5ee 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
 
-Edward
+Since now we don't set it anymore in the callback, what about following
+the notify_* callbacks and rename it in `notify_set_rcvlowat`?
+
+Eventually I think we can rename it in the previous patch.
+
+> 	},
+>
+> 	.send_pkt = vhost_transport_send_pkt,
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index ebb3ce63d64d..97dc1bebc69c 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+> int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val);
+> #endif /* _LINUX_VIRTIO_VSOCK_H */
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index af5bab1acee1..cf3431189d0c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -539,6 +539,8 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
+> 	},
+>
+> 	.send_pkt = virtio_transport_send_pkt,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index f6dc896bf44c..4acee21b4350 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1684,6 +1684,34 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>
+>+int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	bool send_update;
+>+
+>+	spin_lock_bh(&vvs->rx_lock);
+>+
+>+	/* If number of available bytes is less than new
+>+	 * SO_RCVLOWAT value, kick sender to send more
+>+	 * data, because sender may sleep in its 'send()'
+>+	 * syscall waiting for enough space at our side.
+>+	 */
+
+Let's try to use at least the full 80 characters so we can reduce the
+lines in this comment block.
+
+>+	send_update = vvs->rx_bytes < val;
+>+
+>+	spin_unlock_bh(&vvs->rx_lock);
+>+
+>+	if (send_update) {
+>+		int err;
+>+
+>+		err = virtio_transport_send_credit_update(vsk);
+>+		if (err < 0)
+>+			return err;
+>+	}
+>+
+>+	return 0;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_set_rcvlowat);
+>+
+> MODULE_LICENSE("GPL v2");
+> MODULE_AUTHOR("Asias He");
+> MODULE_DESCRIPTION("common code for virtio vsock");
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 048640167411..388c157f6633 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+>
+> 		.read_skb = virtio_transport_read_skb,
+>+
+>+		.set_rcvlowat             = virtio_transport_set_rcvlowat
+> 	},
+>
+> 	.send_pkt = vsock_loopback_send_pkt,
+>-- 
+>2.25.1
+>
 
 
