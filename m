@@ -1,55 +1,46 @@
-Return-Path: <netdev+bounces-52185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D3837FDD30
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:36:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DD1A7FDD37
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAF181F20FFA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:36:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE9CD1C20925
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3934E2CCB8;
-	Wed, 29 Nov 2023 16:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024BF1DDC9;
+	Wed, 29 Nov 2023 16:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rL07mS8k"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SHwLc83A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACA93B2A8
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:36:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25C80C433CD;
-	Wed, 29 Nov 2023 16:36:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701275783;
-	bh=A7BJ51eiIq0oseXAXQNOdBOnkeZz+OdO53eDCW5R7a8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rL07mS8k2km6o+L9eBym7jYJReNZiTGLInC/lcQf6rKvzupd5XM/gKjazZFymUbdd
-	 tSdARz1U0x5v+7Hki0KJ9eXqh3J7vWYCgart2MKtzWs2jOhTowndCsN1y9ZgOlU+Go
-	 pLuyMwSWh7doF+HMFKmiWTbuZZbU/GrVKa7NvJNlUSBU1ORwU9Tifcv03tMlrrWECB
-	 juUaHIJ9z4nPDSuFPpX6V6jiqUN0sF/6MGVhrXv5z5GgmY7491mclNGThhrcXmKcA9
-	 tn4rOjJmQzUUWDA28jNyHS49oYokCSeStoE9XGH6nnyzUrUH24hUcp4mKtbR/Ww7wG
-	 vprbZOHCYp/zQ==
-Date: Wed, 29 Nov 2023 16:36:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Harshitha Ramamurthy <harshitha.ramamurthy@intel.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iwl-net] i40e: Fix kernel crash during macvlan offloading
- setup
-Message-ID: <20231129163618.GD43811@kernel.org>
-References: <20231124164233.86691-1-ivecera@redhat.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF5E10A;
+	Wed, 29 Nov 2023 08:36:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/uA+miTA801VQdKq+GBxddcU5PJHZsukphpTgK8YoY4=; b=SHwLc83AK8f9IfCTZ36S5HrTsG
+	uqXoGnzas3y9+cCSqbs161QB4oCl58vd5OqjDuCor9mOJpHUgkWIgra4Fdhvl89tNlp/IDC+NV/Ws
+	uYiyszlEgjOFZRn+Gt0/1d6B9U3epFrUd4XMcB7rdsKRgbJHBCgDxixjBgCYhHxqd0/w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r8NYI-001adv-7A; Wed, 29 Nov 2023 17:36:42 +0100
+Date: Wed, 29 Nov 2023 17:36:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
+ activate if hw-controlled
+Message-ID: <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
+References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,95 +49,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231124164233.86691-1-ivecera@redhat.com>
+In-Reply-To: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
 
-On Fri, Nov 24, 2023 at 05:42:33PM +0100, Ivan Vecera wrote:
-> Function i40e_fwd_add() computes num of created channels and
-> num of queues per channel according value of pf->num_lan_msix.
-> 
-> This is wrong because the channels are used for subordinated net
-> devices that reuse existing queues from parent net device and
-> number of existing queue pairs (pf->num_queue_pairs) should be
-> used instead.
-> 
-> E.g.:
-> Let's have (pf->num_lan_msix == 32)... Then we reduce number of
-> combined queues by ethtool to 8 (so pf->num_queue_pairs == 8).
-> i40e_fwd_add() called by macvlan then computes number of macvlans
-> channels to be 16 and queues per channel 1 and calls
-> i40e_setup_macvlans(). This computes new number of queue pairs
-> for PF as:
-> 
-> num_qps = vsi->num_queue_pairs - (macvlan_cnt * qcnt);
-> 
-> This is evaluated in this case as:
-> num_qps = (8 - 16 * 1) = (u16)-8 = 0xFFF8
-> 
-> ...and this number is stored vsi->next_base_queue that is used
-> during channel creation. This leads to kernel crash.
-> 
-> Fix this bug by computing the number of offloaded macvlan devices
-> and no. their queues according the current number of queues instead
-> of maximal one.
-> 
-> Reproducer:
-> 1) Enable l2-fwd-offload
-> 2) Reduce number of queues
-> 3) Create macvlan device
-> 4) Make it up
-> 
-> Result:
-> [root@cnb-03 ~]# ethtool -K enp2s0f0np0 l2-fwd-offload on
-> [root@cnb-03 ~]# ethtool -l enp2s0f0np0 | grep Combined
-> Combined:       32
-> Combined:       32
-> [root@cnb-03 ~]# ethtool -L enp2s0f0np0 combined 8
-> [root@cnb-03 ~]# ip link add link enp2s0f0np0 mac0 type macvlan mode bridge
-> [root@cnb-03 ~]# ip link set mac0 up
-> ...
-> [ 1225.686698] i40e 0000:02:00.0: User requested queue count/HW max RSS count:  8/32
-> [ 1242.399103] BUG: kernel NULL pointer dereference, address: 0000000000000118
-> [ 1242.406064] #PF: supervisor write access in kernel mode
-> [ 1242.411288] #PF: error_code(0x0002) - not-present page
-> [ 1242.416417] PGD 0 P4D 0
-> [ 1242.418950] Oops: 0002 [#1] PREEMPT SMP NOPTI
-> [ 1242.423308] CPU: 26 PID: 2253 Comm: ip Kdump: loaded Not tainted 6.7.0-rc1+ #20
-> [ 1242.430607] Hardware name: Abacus electric, s.r.o. - servis@abacus.cz Super Server/H12SSW-iN, BIOS 2.4 04/13/2022
-> [ 1242.440850] RIP: 0010:i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-> [ 1242.448165] Code: 48 89 b3 80 00 00 00 48 89 bb 88 00 00 00 74 3c 31 c9 0f b7 53 16 49 8b b4 24 f0 0c 00 00 01 ca 83 c1 01 0f b7 d2 48 8b 34 d6 <48> 89 9e 18 01 00 00 49 8b b4 24 e8 0c 00 00 48 8b 14 d6 48 89 9a
-> [ 1242.466902] RSP: 0018:ffffa4d52cd2f610 EFLAGS: 00010202
-> [ 1242.472121] RAX: 0000000000000000 RBX: ffff9390a4ba2e40 RCX: 0000000000000001
-> [ 1242.479244] RDX: 000000000000fff8 RSI: 0000000000000000 RDI: ffffffffffffffff
-> [ 1242.486370] RBP: ffffa4d52cd2f650 R08: 0000000000000020 R09: 0000000000000000
-> [ 1242.493494] R10: 0000000000000000 R11: 0000000100000001 R12: ffff9390b861a000
-> [ 1242.500626] R13: 00000000000000a0 R14: 0000000000000010 R15: ffff9390b861a000
-> [ 1242.507751] FS:  00007efda536b740(0000) GS:ffff939f4ec80000(0000) knlGS:0000000000000000
-> [ 1242.515826] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1242.521564] CR2: 0000000000000118 CR3: 000000010bd48002 CR4: 0000000000770ef0
-> [ 1242.528699] PKRU: 55555554
-> [ 1242.531400] Call Trace:
-> [ 1242.533846]  <TASK>
-> [ 1242.535943]  ? __die+0x20/0x70
-> [ 1242.539004]  ? page_fault_oops+0x76/0x170
-> [ 1242.543018]  ? exc_page_fault+0x65/0x150
-> [ 1242.546942]  ? asm_exc_page_fault+0x22/0x30
-> [ 1242.551131]  ? i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e]
-> [ 1242.557847]  i40e_setup_channel.part.0+0x5f/0x130 [i40e]
-> [ 1242.563167]  i40e_setup_macvlans.constprop.0+0x256/0x420 [i40e]
-> [ 1242.569099]  i40e_fwd_add+0xbf/0x270 [i40e]
-> [ 1242.573300]  macvlan_open+0x16f/0x200 [macvlan]
-> [ 1242.577831]  __dev_open+0xe7/0x1b0
-> [ 1242.581236]  __dev_change_flags+0x1db/0x250
-> ...
-> 
-> Fixes: 1d8d80b4e4ff ("i40e: Add macvlan support on i40e")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+On Wed, Nov 29, 2023 at 11:41:51AM +0100, Heiner Kallweit wrote:
+> The current codes uses the sw_control path in set_baseline_state() when
+> called from netdev_trig_activate() even if we're hw-controlled. This
+> may result in errors when led_set_brightness() is called because we may
+> not have set_brightness led ops (if hw doesn't support setting a LED
+> to ON).
 
-Thanks Ivan,
+Not having software on/off control of the LED is a problem. It breaks
+the whole concept of offloading/accelerating. If we cannot control the
+LED, there is nothing to accelerate. What do we do when the user
+selects a configuration which is not supported by the hardware? The
+API is not atomic, you cannot set multiple things at once. So the user
+might be trying to get from one offloadable configuration to another
+offloadable configuration, but needs to go via an configuration which
+is not offloadable. Do we return -EOPNOTSUPP?
 
-I agree with the analysis and that the problem was introduced by the cited
-patch.
+Before we accept patches like this, we need to discuss the concept of
+how we support LEDs which cannot be controlled in software.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+    Andrew
 
