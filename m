@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-51999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789D17FCDC8
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:17:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 371017FCDC9
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D8F283232
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:17:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C3B21788
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FF26D1B;
-	Wed, 29 Nov 2023 04:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B816FBB;
+	Wed, 29 Nov 2023 04:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKU+Nswa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OvDKg07U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF841AE
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 20:16:14 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cb74a527ceso5114503b3a.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 20:16:14 -0800 (PST)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8253F19A
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 20:16:44 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6cbd24d9557so380348b3a.1
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 20:16:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701231374; x=1701836174; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701231404; x=1701836204; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0djUqqpqj4ShspuED+gg3eCM21ekyo3+W+XJDeDKV0=;
-        b=CKU+Nswanb9EChlgq4r3FAadRf5OgPeGx3JiZynQkfV7dYOZQjVa9tN1xO5Qt996DM
-         Lx32pk3duTBaCL8oFtLc3yoMiTj/kiTeTExh0SzpNTWrjKw6nxefG+9TSZRwHg8m3WOz
-         xKxMBEVXMREb3jHXWCXK5GD5KRtjEy5hVaZ8QLNVShdBPObWMUUmtoqL7V1ldlnM7Pup
-         ebKt2s1iokH2qjDbUIeXKM6EeCdvnr2cPeyxURVk8WqyBOdKHPt36T1TNDN4y62c7SkP
-         VKdcpNSkU3mfPtWr9Gzwl97IurxBbTm9EXzYr+wOJmZjSlmw70O9olep+2g9Ehbao6Pq
-         VQlw==
+        bh=EVYTrIC1CQzttv4ryAk/kFVSdoQI8D7BLDZQ7D06TLM=;
+        b=OvDKg07U/r2luab4MB5zdO3oOYAjm4fe12wbPdgqzbVamUE0cFOk2V/HiYypPM7L+p
+         k06fGiU2dsf0zjmKfm4dQBVeihBIO8We+nr1eoibCDxazt++908VN6yNJkk0e37Qltod
+         g2bg6yIZC9iZy7ZYbY+T3qKIGyChJcs7v1V+34w7PXnqFUZz8kgBbKxC9AIq5BvD9knX
+         XO612l/rMt0nplJ6xEcv8P9+z/IlosayMfrdw+1cyouKH9hz+gjzUSFkbB1HkccohsOT
+         7WQ30tuu8HN5oDUWcsWr2ZrrcH7SP/cSZFp+8vf6ULUQxCPDi03nzgD4krFpZns4/pgf
+         EwkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701231374; x=1701836174;
+        d=1e100.net; s=20230601; t=1701231404; x=1701836204;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0djUqqpqj4ShspuED+gg3eCM21ekyo3+W+XJDeDKV0=;
-        b=LZLwCl277Ik8CGg5dVIPbCFdE3MhPpy0+viv4IGWF1vRo9RFZeYvj9EyoUQEWH6/Jh
-         qSRtzkmMhFR8ol/V+W7ZO/xkVsWWA9vyo/gTm8B+0vFpHCfCgi5XvbH+vq347LKs43id
-         h5jO6dGNm/ji7lbW9ZaLjTw8wuCSy0LkOLRgMtAjvxDkbmTBU4me19znNBzpnP73PxSF
-         Yw0m/H6Ft/F5VrPS6bTNNU0iQWdo86QYOK82jcxdYES5RHl8UcwSWbLhodmjXl+eKbXh
-         nEXSip8ogRf7ICvX4Bbr0x34CtHPRarwurhNXjHOpIZXfyi72h+WXe0tU5MQvrmhm6jX
-         Ty8A==
-X-Gm-Message-State: AOJu0Ywq3XWmL1q60rKiZUdgACtt2hqTFydIVXRgfcmYH1rHtG2ma0IH
-	xnUH40cSYNEbKNHnS1m9eMw=
-X-Google-Smtp-Source: AGHT+IHN8YrQ1j8HtXD+3cVqOjK1ncnme8Cj0rIBh82Dx6Bkc9SYFc+Aw71+CrOQBQnKcurBPCaViQ==
-X-Received: by 2002:a05:6a00:2d1b:b0:6c6:1648:5ac6 with SMTP id fa27-20020a056a002d1b00b006c616485ac6mr18486931pfb.5.1701231374004;
-        Tue, 28 Nov 2023 20:16:14 -0800 (PST)
+        bh=EVYTrIC1CQzttv4ryAk/kFVSdoQI8D7BLDZQ7D06TLM=;
+        b=lv9AfDFMoDeteyHznP6v900HpE4arUj216bVlhOdNGD5Q6jeUzn5HMhtOI0mZlzmMJ
+         07fdzyjH2WuPWUv6m/UnWciDV7Wz95FDLMt3lshvBGHjPm9Nu1e7AqHRNvvocJUr/Qt8
+         A0T/+YR15wG2BnAQQyvWobdpv3soHBjd4MdT0/sN2gfKV8TqFxrIRJ1ckSdF07EV1OQ3
+         xGMQOO/NIK+0nWOIrHU090SB2NJeuB7RLBNWh69t3nrqcvT8rCf2zSEyorge9HCSXKTf
+         RakUET1BZnIDyiSXQH+TFfZI8oCtzuJ/HCgAgshKAOmWg6xy9GcYjaW8Cn91Jy/XXJ16
+         tbyw==
+X-Gm-Message-State: AOJu0Yz6bEnQ0cqr1MqmOuZBBimY4DmgY8zxnuuHI5uqIebW+BXbrIYN
+	1hFx6kTI0The/YWzB9d+594=
+X-Google-Smtp-Source: AGHT+IH5pv/VUuj3eG7nkmeESH+phLKlyXQMhZRvWveWzbs3mprBpZygH3Zn2kd5uyRcyQr3XqOvYQ==
+X-Received: by 2002:a05:6a20:3c9f:b0:187:e3a5:b35d with SMTP id b31-20020a056a203c9f00b00187e3a5b35dmr21110386pzj.13.1701231403941;
+        Tue, 28 Nov 2023 20:16:43 -0800 (PST)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id ey25-20020a056a0038d900b006c06804cd39sm9756133pfb.153.2023.11.28.20.16.11
+        by smtp.gmail.com with ESMTPSA id ey25-20020a056a0038d900b006c06804cd39sm9756133pfb.153.2023.11.28.20.16.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 20:16:12 -0800 (PST)
-Message-ID: <848ad666-8f3e-43f2-8cb9-ee22f961beda@gmail.com>
-Date: Tue, 28 Nov 2023 20:16:11 -0800
+        Tue, 28 Nov 2023 20:16:42 -0800 (PST)
+Message-ID: <6015d7bd-a24e-4412-a7b7-11f8fdf61403@gmail.com>
+Date: Tue, 28 Nov 2023 20:16:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,7 +62,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 net-next 08/10] docs: bridge: add switchdev doc
+Subject: Re: [PATCHv3 net-next 01/10] docs: bridge: update doc format to rst
 Content-Language: en-US
 To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
@@ -75,7 +75,7 @@ Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
  Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
  Marc Muehlfeld <mmuehlfe@redhat.com>
 References: <20231128084943.637091-1-liuhangbin@gmail.com>
- <20231128084943.637091-9-liuhangbin@gmail.com>
+ <20231128084943.637091-2-liuhangbin@gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -110,17 +110,22 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231128084943.637091-9-liuhangbin@gmail.com>
+In-Reply-To: <20231128084943.637091-2-liuhangbin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 11/28/2023 12:49 AM, Hangbin Liu wrote:
-> Add switchdev part for bridge document.
+> The current bridge kernel doc is too old. It only pointed to the
+> linuxfoundation wiki page which lacks of the new features.
 > 
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Here let's start the new bridge document and put all the bridge info
+> so new developers and users could catch up the last bridge status soon.
+> 
+> In this patch, Convert the doc to rst format. Add bridge brief introduction,
+> FAQ and contact info.
+> 
 > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
