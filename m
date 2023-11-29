@@ -1,86 +1,137 @@
-Return-Path: <netdev+bounces-52167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DC37FDAE2
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:13:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5707FDAEC
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01EF1282919
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:13:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37EB8B2126B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C6437173;
-	Wed, 29 Nov 2023 15:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641E2374CE;
+	Wed, 29 Nov 2023 15:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KBu4vmPw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZiidgwEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1F6BE
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:13:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6Ao1fcAglahOTQZ4bf214WWSEO/4jJRkgGDt+9cTqLU=; b=KBu4vmPweonlauaslQW5EmUM4x
-	6lNr0lXxIjzqXJWtMc/hjZuwdgqyiGpsHhCkXqsPhpZuYK7EeP60UsSKO9UXYzJYqMlykJWHgE8R2
-	QSS3OuhBHDYrKj3ZDTkbL/ZL8uuPOTJ06t1+h+VIe0MG4yMkF6jEgAxWDSAX72rwvgWc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r8MFI-001aDL-Pn; Wed, 29 Nov 2023 16:13:00 +0100
-Date: Wed, 29 Nov 2023 16:13:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev <netdev@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/8] DSA LED infrastructure, mv88e6xxx and
- QCA8K
-Message-ID: <a0f8aad6-badc-49dc-a6c2-32a7a3cee863@lunn.ch>
-References: <20231128232135.358638-1-andrew@lunn.ch>
- <20231129123819.zrm25eieeuxndr2r@skbuf>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965D5A3
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:16:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701270985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OcpkJmyvNj3eShS3c+JKZr285NS0S6mgXrW8UfGiu30=;
+	b=ZiidgwEqT1ZqJ3SNSxS1Olw7kEe54m6ZhAdv1bgNZUtfsR0/TdbbpOkJ7zYHD+9kcCnNU+
+	zdt6eBrxcZoo1ipPwksQkibGmRX/X0prxWUKov1FakElWTdHEWT9OCGruvB20tr35fErTO
+	W8J1+Zb9ipSfgB/NLvSDjTudoKvrYk8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-386-_OovbazvNDybf2Px3T3cDw-1; Wed,
+ 29 Nov 2023 10:16:23 -0500
+X-MC-Unique: _OovbazvNDybf2Px3T3cDw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16A723821344;
+	Wed, 29 Nov 2023 15:16:23 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0BF06502E;
+	Wed, 29 Nov 2023 15:16:20 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: jtornosm@redhat.com
+Subject: [PATCH] net: usb: ax88179_178a: avoid failed operations when device is disconnected
+Date: Wed, 29 Nov 2023 16:16:11 +0100
+Message-ID: <20231129151618.455618-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231129123819.zrm25eieeuxndr2r@skbuf>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-> I am disappointed to see the dsa_switch_ops API polluted with odds and
-> ends which have nothing to do with Ethernet-connected Ethernet switches
-> (DSA's focus).
-> 
-> Looking at the code, I don't see why dsa_port_leds_setup() cannot be
-> rebranded as library code usable by any netdev driver and which bypasses DSA.
-> Individual DSA switch drivers could call it directly while providing
-> their struct device for the port, and a smaller ops structure for the
-> cdev. But more importantly, other non-DSA drivers could do the same.
-> 
-> I think it comes as no surprise that driver authors prefer using the DSA
-> API as their first choice even for technically non-DSA switches, seeing
-> how we tend to cram all sorts of unrelated stuff into the monolithic
-> struct dsa_switch_ops, and how that makes the API attractive. But then
-> we push them away from DSA for valid reasons, and they end up copying
-> its support code word for word.
+When the device is disconnected we get the following messages showing
+failed operations:
+Nov 28 20:22:11 localhost kernel: usb 2-3: USB disconnect, device number 2
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: unregister 'ax88179_178a' usb-0000:02:00.0-3, ASIX AX88179 USB 3.0 Gigabit Ethernet
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: Failed to read reg index 0x0002: -19
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: Failed to write reg index 0x0002: -19
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0002: -19
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0001: -19
+Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0002: -19
 
-O.K, i need to think about this.
+The reason is that although the device is detached, normal stop and
+unbind operations are commanded. Avoid these unnecessary operations
+when the device is detached (state is USB_STATE_NOTATTACHED) so as
+not to get the error messages.
 
-What is not obvious to me at the moment is how we glue the bits
-together. I don't want each DSA driver having to parse the DSA part of
-the DT representation. So the DSA core needs to call into this library
-while parsing the DT to create the LEDs. We also need an ops structure
-in the DSA driver which this library can use. We then need to
-associate the ops structure the driver has with the LEDs the DSA core
-creates in the library. Maybe we can use ds->dev as a cookie.
+Fixes: e2ca90c276e1f ("ax88179_178a: ASIX AX88179_178A USB 3.0/2.0 to gigabit ethernet adapter driver")
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+---
+ drivers/net/usb/ax88179_178a.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-Before i get too deep into code, i will post the basic API idea for a
-quick review.
-
-	Andrew
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index 4ea0e155bb0d..e78d555dd95e 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -1308,16 +1308,18 @@ static void ax88179_unbind(struct usbnet *dev, struct usb_interface *intf)
+ 	struct ax88179_data *ax179_data = dev->driver_priv;
+ 	u16 tmp16;
+ 
+-	/* Configure RX control register => stop operation */
+-	tmp16 = AX_RX_CTL_STOP;
+-	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &tmp16);
++	if (dev->udev->state != USB_STATE_NOTATTACHED) {
++		/* Configure RX control register => stop operation */
++		tmp16 = AX_RX_CTL_STOP;
++		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_RX_CTL, 2, 2, &tmp16);
+ 
+-	tmp16 = 0;
+-	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_CLK_SELECT, 1, 1, &tmp16);
++		tmp16 = 0;
++		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_CLK_SELECT, 1, 1, &tmp16);
+ 
+-	/* Power down ethernet PHY */
+-	tmp16 = 0;
+-	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, &tmp16);
++		/* Power down ethernet PHY */
++		tmp16 = 0;
++		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, &tmp16);
++	}
+ 
+ 	kfree(ax179_data);
+ }
+@@ -1663,11 +1665,13 @@ static int ax88179_stop(struct usbnet *dev)
+ {
+ 	u16 tmp16;
+ 
+-	ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++	if (dev->udev->state != USB_STATE_NOTATTACHED) {
++		ax88179_read_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
+ 			 2, 2, &tmp16);
+-	tmp16 &= ~AX_MEDIUM_RECEIVE_EN;
+-	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
++		tmp16 &= ~AX_MEDIUM_RECEIVE_EN;
++		ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_MEDIUM_STATUS_MODE,
+ 			  2, 2, &tmp16);
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.43.0
 
 
