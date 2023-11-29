@@ -1,126 +1,140 @@
-Return-Path: <netdev+bounces-52110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1EF7FD548
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:15:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACC637FD561
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC3542826F2
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:15:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 675592816A4
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4AE1C290;
-	Wed, 29 Nov 2023 11:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5600E1C691;
+	Wed, 29 Nov 2023 11:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ahoKKx1D";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="q3RVPLeK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gtxB7VB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C131FDC
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:15:51 -0800 (PST)
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1701256550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ojjqn6RAZ7dRmbhoMLtsEoETVpSbscfP7NVTUIt6ulI=;
-	b=ahoKKx1DqT1QhEA5R3lCjFX38Wdn0ZEENUvdMdpGsqVwb7c+HArWuoSVzrmz6dEH0ZpiEj
-	2/TwjG4Y2z81vv9FaSIa3qNgoLEAGcDqLnZA245E8KcR6/bUEIJ5yvWISxh/NK8Lef2VaO
-	XWQg/3vmbR9co6nwWjnS8QUaAVW7jWq+JKY3sj2yuXQQt+1cM3dX86cEoqDwj7oBPnYwgB
-	NL8Blu64b4hOBjDK3ZDceBKd1Ul9+2d81XghyS7fb5KY0kJngbIv2h/1DikVBvI1105Ep5
-	/kvJxmVyoP97l0vXBDHHQNtwpY6AQpEdWcvb8mkM+v1tTdPFPI8k0sIBiyafhw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1701256550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ojjqn6RAZ7dRmbhoMLtsEoETVpSbscfP7NVTUIt6ulI=;
-	b=q3RVPLeKPyDyIvMyMW+C3YL4d1utIhR2gP28DadJEIrBWZmq9FuPkjn1+7p3CWQBx3ZkAq
-	pA23Xn2t70NWf5Bw==
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/5] igc: ethtool: Check VLAN TCI mask
-In-Reply-To: <87bkbdsb4b.fsf@intel.com>
-References: <20231128074849.16863-1-kurt@linutronix.de>
- <87bkbdsb4b.fsf@intel.com>
-Date: Wed, 29 Nov 2023 12:15:47 +0100
-Message-ID: <87leagstcs.fsf@kurt>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CDBA19A0;
+	Wed, 29 Nov 2023 03:20:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Q8knBHNUB47p0a/O/J6xt0btYrSCCH1NFcpf4y3y7cY=; b=gtxB7VB/UW1nkc7GLjWcekjVa9
+	yu59M9K5jGvQR2fjICCptyi7yDEUl+DT0Bl8Xp2RR3urMxh1gYX0knY2zXkezNO7g4r1yYcl89AFT
+	Yg5NBlmAtFdFSAeBwagYO0XLg+aAdIfzhwt9beC3ruuimef+sFFVTWzGpwdSgjGcmWKXyjyPuzgAC
+	A5vgkbDZbQ0SFrsFSrnQZk/rOFZUYIFfurnTNYBC2MFdie+wH44jarjJzqqU7maVKj/pAy29HDAhd
+	a3IR92vUdX0h9aFjTW1LsPjKRpXO9KJSwqUmR5BP0qu3V/0B/aRMHHf1iAQYA/CBxjcOEGo50GxWl
+	sgNvOzjA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53758)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r8IcC-0000GA-19;
+	Wed, 29 Nov 2023 11:20:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r8IcD-0003wy-TV; Wed, 29 Nov 2023 11:20:25 +0000
+Date: Wed, 29 Nov 2023 11:20:25 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 13/14] net: phy: qcom: deatch qca83xx PHY driver
+ from at803x
+Message-ID: <ZWceeQFBSZD1hzSk@shell.armlinux.org.uk>
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-14-ansuelsmth@gmail.com>
+ <ZWcJ/OgC1+cbFvhk@shell.armlinux.org.uk>
+ <65671487.050a0220.dae78.45f0@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65671487.050a0220.dae78.45f0@mx.google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
---=-=-=
-Content-Type: text/plain
+On Wed, Nov 29, 2023 at 11:37:56AM +0100, Christian Marangi wrote:
+> On Wed, Nov 29, 2023 at 09:53:00AM +0000, Russell King (Oracle) wrote:
+> > On Wed, Nov 29, 2023 at 03:12:18AM +0100, Christian Marangi wrote:
+> > > diff --git a/drivers/net/phy/qcom/Makefile b/drivers/net/phy/qcom/Makefile
+> > > index 6a68da8aaa7b..43e4d14df8ea 100644
+> > > --- a/drivers/net/phy/qcom/Makefile
+> > > +++ b/drivers/net/phy/qcom/Makefile
+> > > @@ -1,2 +1,3 @@
+> > >  # SPDX-License-Identifier: GPL-2.0
+> > > -obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+> > > +obj-$(CONFIG_AT803X_PHY)	+= at803x.o common.o
+> > > +obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o common.o
+> > 
+> > These PHY drivers can be built as modules. You will end up with several
+> > modules - at803x.ko, qca83xx.ko and common.ko. You don't mark any
+> > functions in common.c as exported, no module license, no author, no
+> > description. common.ko is way too generic a name as well.
+> > 
+> > Please think about this more and test building these drivers as a
+> > module.
+> >
+> 
+> Had some fear about this...
+> 
+> What would be the preferred way for this?
+> 
+> Having a .ko that EXPORT symbol or making the PHY driver .ko to compile
+> the common.o in it?
 
-On Tue Nov 28 2023, Vinicius Costa Gomes wrote:
-> Kurt Kanzenbach <kurt@linutronix.de> writes:
->
->> Hi,
->>
->> currently it is possible to configure receive queue assignment using the VLAN
->> TCI field with arbitrary masks. However, the hardware only supports steering
->> either by full TCI or the priority (PCP) field. In case a wrong mask is given by
->> the user the driver will silently convert it into a PCP filter which is not
->> desired. Therefore, add a check for it.
->>
->> Patches #1 to #4 are minor things found along the way.
->>
->
-> Some very minor things: patches 2,3 and 4 have extra long lines in their
-> commit messages that checkpatch.pl doesn't seem to like.
+I think the former, otherwise we end up with common.o duplicated in
+each module, which becomes unnecessary bloat. This is how the Broadcom
+stuff (which also has a "library") does it.
 
-OK. checkpatch wants 75 chars per line. These patches have 80 set. I'll
-adjust it.
+> Honestly I would like the second option since I would prefer not to
+> create a .ko with shared function and EXPORT lots of symbols. On SoC it's
+> expected to have only one of the PHY (at max 2 when the qca807x PHY will
+> be implemented, with the at808x also present) so the size increase is
+> minimal.
+> 
+> (just to be more clear, talking about this makefile implementation)
+> 
+> at803x-objs			+= common.o
+> obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+> qca83xx-objs			+= common.o
+> obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o
+> qca808x-objs			+= common.o
+> obj-$(CONFIG_QCA808X_PHY)	+= qca808x.o
 
->
-> Patches 4 and 5 read more like fixes to me. I think they could be
-> proposed to -net, as they contain fixes to user visible issues. Do you
-> think that makes sense?
+That won't work - the -objs needs to list the corresponding .o file
+as well, and it needs to be a different name (you can't do this:
 
-Probably yes. I'll sent them to -net instead. Fixes tags would be:
+qca808x-objs			+= common.o qca808x.o
 
- - Patch 4: 2b477d057e33 ("igc: Integrate flex filter into ethtool ops")
- - Patch 5: 7991487ecb2d ("igc: Allow for Flex Filters to be installed")
+it has to be something like:
 
->
-> As for the code, feel free to add my Ack to the series:
->
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->
+qca808x-phy-objs		+= common.o qca808x.o
+obj-$(CONFIG_QCA808X_PHY)	+= qca808x-phy.o
 
-Thanks,
-Kurt
+However, I don't like this because it means each module ends up with
+a copy of common.o in it.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+> For name of common.c, is qcom_ethphy_common.c a better name?
 
------BEGIN PGP SIGNATURE-----
+or qcom-phy-lib.c which follows what we have for Broadcom.
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmVnHWMTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzguX7D/9QOX6/YZWQUibiAo/cINtmbD3KxNNW
-IX0gBMf+y3vcEhM0tUI0BQqraMaxuPYZpYZqyTch+Tew2NzPcSazAx5/Ijvzve53
-WI+U2DqRlo0ow3KY/shXX0pTR8sCvqPRGzZ1hqPR2vbnqai87TBSz4rD/jcGob+9
-7sND2eYDy50zt25St9kPqCj23UEE6G6b/uH0Pqm0zNeCaX+Z4tV4fZJ+MHgnjweF
-xa9QOSLxfgBACEZO6XtKbFYOX8CdVLN/dDD48dQZYzXxmFlH6qKgIXNbXLTLtaMb
-exC5Au75iZJT78UiFS6bIBtfke4yMDvpf0e6DRStfYdBjJ71QVuMpXe5Kc4cSagH
-FvZcll0OBreKWRCPA9K797m5KZoi7Mky8CBdRMXPMoZ2D0X+zJ1tu91tGHCh9Vnb
-10gsM1zl4uTB421dpSDqBI2LtbkGhIpH/id5JaaluI7yv4QP4w2ksA++39rZ1fMy
-ax+TM64bFx7VoCtupb/WRBXwjgk25eressB83mb45k3ZHxPa27aZcKcthNNjySwh
-mQ0OCcVzKi0/M81rKzXJ6O/I9iLATh+Eb10nzwlbrR4IfnwPa7yhePdzGtbZKpH2
-fqFl/1LyA4K+GHEMmsessAVSxu1pmZ2ixW7gOgkSyieHXNbp3ZftHwZW65WRPksp
-BHv9pHHT6jsX0Q==
-=M4Tk
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
