@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A6FE7FE31F
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:25:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B717A7FE322
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 252802821AC
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:25:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B727E1C20BDC
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 22:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03823B1B6;
-	Wed, 29 Nov 2023 22:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CC93B1B0;
+	Wed, 29 Nov 2023 22:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="e3Wfw5lx"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="HTTWBMfc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D94198B
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:24:49 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1d01c45ffebso3140825ad.1
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:24:49 -0800 (PST)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1054E1998
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:24:53 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1cf8e569c35so2990595ad.0
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 14:24:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701296689; x=1701901489; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701296692; x=1701901492; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nkjwf60hOQWmCO9wJUuBcwdkxaN20yzfTfsYdyEt6b4=;
-        b=e3Wfw5lx9+Z9mcTqPC5ur7+2t/bdm86ClSLUqmv+rk8LfKhOhwEuXIEDWF3bOKv4al
-         whUn1CL7QXRq0j1D4cehIZgvLWZcC60Z89YOB1W5pb2C1Nv99rNHuhAKjD2b48TT+Vsq
-         5qRojGKwmk4HnimwS1hMK8+vkW6oR1xaJ67S07dAw0sG8HPSdPy0t3H4z4LKUa1l3Zo4
-         nw/O6lDOLtrZgx/WH/ogv1Syr6o6CcZFx2IAXughjfXwPnXt5RnXkKeojgdQS780jsK9
-         DcOolm3f23uG1ARO26NqSMr6Afof+mk717R8elQDLl8+uMmOdQsXXAAHaVwbtinHJsfQ
-         +pwA==
+        bh=gNtH+1gH2lQm382ulpsqNWzj+X2PY2b5el3VSQomhZc=;
+        b=HTTWBMfc/OUinqxGqWkjD6Se5fRaj4PP6fdUBm7V75lmhsaikMpNUsmBBGku7h+b6R
+         p6Jt1j1ubn7Gitu/7V0eXn0q9yXQlFOTZMsm5zlzt7NTgW7E2Mt6YdMkLCcooZtP2T19
+         G73JTqZswUiT0bn+Zt8lQncc39U9hVUnvHvt9q8nn3qSrPUQTuSvhCfCQpQQHm85y18L
+         PzCIbRUOF76eQEL3d5ZYBbvPa9Jj8Uxx1uYtfZCIy7LYkHoBTxil0L+0IJdItcmSYab7
+         EH2RdNoj9Lp4geu7aHpo8a2kbupxV9X9H8y1qoK7xgJvTxGURXAzLm7/BV1HEOAyQwTT
+         CwGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701296689; x=1701901489;
+        d=1e100.net; s=20230601; t=1701296692; x=1701901492;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Nkjwf60hOQWmCO9wJUuBcwdkxaN20yzfTfsYdyEt6b4=;
-        b=Y+m6N1ybMTwTqXwAXig1wqTqWd4PzsDXqBdWfWHo+MKunwIsUicSDYlVrccADKUX2C
-         Hz8WHEeYhTe9f6nvV605gNJuwJoaJN9sxestYkKHoaHoHGGZVOIoENiW/tfw22l23YYf
-         JUtuvpJo0AJOsb+y2wKW35gQC2t10NPYJtzPj/yLClgh6Lu7rKaMJkXJMqQact5eqku/
-         nuj9oTLGdLM9rxfKRIjtDoeTgV9eoeaXjiuxEzKECrfSHNv4HnwNXZXTigaD3581ZeQ+
-         xvWk3ljgMD/yM5hu7+/L0xKrgCV93fE2j4al0a+sawciN0zjgHusbFHQa4qhJqGg1BbJ
-         w0vA==
-X-Gm-Message-State: AOJu0Yz/6ni5K62PORqKBZdYOdBtq0G7+3vm2eocH1wgNseIM3A0C2fb
-	09rY3U1RxtM/Bg7in2pegfgancdXKGuGw2U4w5w=
-X-Google-Smtp-Source: AGHT+IGpZNbjdUjvjMHf2+Bo0Y2uskqFlYzxCP56cmcZoiUvM/fR6Dh5tXuBNfRJ7dEB7q25WMWekA==
-X-Received: by 2002:a17:902:e54b:b0:1ce:6589:d1c0 with SMTP id n11-20020a170902e54b00b001ce6589d1c0mr25126311plf.46.1701296689128;
-        Wed, 29 Nov 2023 14:24:49 -0800 (PST)
+        bh=gNtH+1gH2lQm382ulpsqNWzj+X2PY2b5el3VSQomhZc=;
+        b=RvpG67lYA1/gJU7KAkkiJhhNrEWx8K36y8Z6qU6A/E8qHym0TlsS5yQXBUePcqMMlD
+         jP/Lge/igHkKJ6OfQyYJnBTwrMIGIeJk5IVSbcSorpymmRo/884ireJbmd9sJcH6XL1t
+         SusEANljkp+poXl11muK31r3kBIVMCFWtgP0jyC8FwY7QHx+13XLFc+ldrq3SvK6ReD/
+         QhZ944ZZh0aROrIpRYgqG0WNq0nWsCgiPvxI3Wy54FxsbDZj7NTQ9Bic5QNMicNf/G5L
+         EVj4Yo21qi+x0C8PaQKxg1hpA96CalTpgfaK1cPCw9iY1cDvBOuUt1CDJB5YKvNLsfFt
+         beMQ==
+X-Gm-Message-State: AOJu0Yy2qu4WPgTqHjDfHIWw68YS1r6tm3c6gchnE3XsgJ7m4mC9sbx4
+	B2woNfUCAbeK3oKKh17+4KkWjC482tnWfA6t7cY=
+X-Google-Smtp-Source: AGHT+IGNDlKoqxcERG5pvxOUvytNKG9IcyHtmVrHI/OJz23zoAESqtSMxMD2v3XzETpmZeTUNhas3w==
+X-Received: by 2002:a17:902:f68e:b0:1cf:9bd1:aaea with SMTP id l14-20020a170902f68e00b001cf9bd1aaeamr24256867plg.11.1701296692249;
+        Wed, 29 Nov 2023 14:24:52 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id l8-20020a170902f68800b001cfb971edf2sm8663697plg.13.2023.11.29.14.24.46
+        by smtp.gmail.com with ESMTPSA id l8-20020a170902f68800b001cfb971edf2sm8663697plg.13.2023.11.29.14.24.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 14:24:48 -0800 (PST)
+        Wed, 29 Nov 2023 14:24:51 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	jiri@resnulli.us,
 	linux-kselftest@vger.kernel.org,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next 1/4] selftests: tc-testing: remove spurious nsPlugin usage
-Date: Wed, 29 Nov 2023 19:24:21 -0300
-Message-Id: <20231129222424.910148-2-pctammela@mojatatu.com>
+Subject: [PATCH net-next 2/4] selftests: tc-testing: remove spurious './' from Makefile
+Date: Wed, 29 Nov 2023 19:24:22 -0300
+Message-Id: <20231129222424.910148-3-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231129222424.910148-1-pctammela@mojatatu.com>
 References: <20231129222424.910148-1-pctammela@mojatatu.com>
@@ -78,38 +78,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Tests using DEV2 should not be run in a dedicated net namespace,
-and in parallel, as this device cannot be shared.
+Patchwork CI didn't like the extra './', so remove it.
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- .../selftests/tc-testing/tc-tests/filters/tests.json        | 6 ------
- 1 file changed, 6 deletions(-)
+ tools/testing/selftests/tc-testing/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/tests.json b/tools/testing/selftests/tc-testing/tc-tests/filters/tests.json
-index 361235ad574b..4598f1d330fe 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/filters/tests.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/filters/tests.json
-@@ -48,9 +48,6 @@
-             "filter",
-             "flower"
-         ],
--        "plugins": {
--                "requires": "nsPlugin"
--        },
-         "setup": [
-             "$TC qdisc add dev $DEV2 ingress",
-             "./tdc_batch.py $DEV2 $BATCH_FILE --share_action -n 1000000"
-@@ -72,9 +69,6 @@
-             "filter",
-             "flower"
-         ],
--        "plugins": {
--                "requires": "nsPlugin"
--        },
-         "setup": [
-             "$TC qdisc add dev $DEV2 ingress",
-             "$TC filter add dev $DEV2 protocol ip prio 1 ingress flower dst_mac e4:11:22:11:4a:51 src_mac e4:11:22:11:4a:50 ip_proto tcp src_ip 1.1.1.1 dst_ip 2.2.2.2 action drop"
+diff --git a/tools/testing/selftests/tc-testing/Makefile b/tools/testing/selftests/tc-testing/Makefile
+index e8b3dde4fa16..9153e3428a77 100644
+--- a/tools/testing/selftests/tc-testing/Makefile
++++ b/tools/testing/selftests/tc-testing/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-TEST_PROGS += ./tdc.sh
++TEST_PROGS += tdc.sh
+ TEST_FILES := action-ebpf tdc*.py Tdc*.py plugins plugin-lib tc-tests scripts
+ 
+ include ../lib.mk
 -- 
 2.40.1
 
