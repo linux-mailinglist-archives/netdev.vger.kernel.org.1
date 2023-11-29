@@ -1,109 +1,96 @@
-Return-Path: <netdev+bounces-52158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECEEA7FDA97
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE47B7FDAA4
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:59:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A63D82827CA
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 14:57:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A71728293C
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 14:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751A135282;
-	Wed, 29 Nov 2023 14:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23E0358A4;
+	Wed, 29 Nov 2023 14:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="YZxqsLud"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCoAhfm/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5FA6BE
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:57:35 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-2860f7942b0so1313066a91.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:57:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701269855; x=1701874655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kXSeOFPgJ5Yf4vZ8pS4vm34bWmRtSnH5F/wZFrP0th8=;
-        b=YZxqsLudXnjzzGp84639PdUlF5bt3f7I/8S9iNLDAQpQY9HZZZpYsCKqIYB1nWTsdz
-         tpG/SLWXH5KYoecD7hYD3pNlHam4yWlWMkGagjqYr2qm2MLq9jbblUGPLJw9d5UCUGqZ
-         HIe/NuU7pQkGuRglO1HPRaYXGHW5iDokGvvlzpPS2wAn4aImRwFbqGcUUib+0F6LjucX
-         lVWQglte/TKGrZu17h9kTiAUrFgTSuaKXtBq2rQfmFPmJ73DPK4OegmiHdaX9Wd3yO7X
-         3rHVtN5ayRY7i5BGtbiBvzAbASbSonBpjYr+cTgirVVZ7VuZvd/3Ehe1LtLFHorXpahg
-         AAeA==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1D7BD
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:59:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701269950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MI2wXYD1dHy0biP40vAHd/lkz+ijx91uo3bdYG08BTA=;
+	b=jCoAhfm/JcxyGA4jvYRzFOgJyutvZi2q343EBlSB36uOLxBeW8cAm0TrD2n+Z3bp0/nyvT
+	+ZKAkWYXBoF8D5jEZQqdS1QAmc7OrYyFxptsrxtnfncLF5Hws0TGO/pJuF3il8E1nJLho9
+	kO7J0SWJZhrC6LQJRJLByZSRkVjmk6Q=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-sO-JTBowNmy9EIe1_o7a_w-1; Wed, 29 Nov 2023 09:59:09 -0500
+X-MC-Unique: sO-JTBowNmy9EIe1_o7a_w-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-332dfa77997so4698318f8f.0
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 06:59:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701269855; x=1701874655;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kXSeOFPgJ5Yf4vZ8pS4vm34bWmRtSnH5F/wZFrP0th8=;
-        b=uT6JGNKlU/7DOO+Z2zxe+b6AYYn/DKpnl8QCfbxrfoyHzSYHtWkrygck+yiQRHu1yX
-         wDTWg7/M+pvgkqw9TRIIPr/8c+gCyGdrxitNJ0WMFSjzsgo2R2us2q/jwe4FXqkOnEnW
-         xyOFVGcfhFyoLhixO81MaJzZP7hrmAHoh+nE6+JoelYZXErEqjsP85lknsT08Qye36cn
-         xTzx8WoI1jh6y9fQFFGOBAMDQgS6wXiY4aSKz+Q3nH1hjystN5iRkoEH40P5fWOYLNTH
-         6ySxiakEKHZNwfy6tTPHMqOMlcbaU/vMUi4iFTSqxat805K4gpMIzPDMo6fc12v1TQaj
-         Dlww==
-X-Gm-Message-State: AOJu0Yw9UrCe/+hRpQNq+chm/4H1YkUh8Ae5kxo09j39ACcVkaifN+SQ
-	AzjvbS6g+aYMe0zkhmXzGwOSeRy5qo38V2M4G3M=
-X-Google-Smtp-Source: AGHT+IHTm/hXF6EDBnmUJcAJJ4XVcYcsDEDvJrneFCbT+h2gV1MUpUZj5ulB8mg4bABK/4wm//5NMg==
-X-Received: by 2002:a17:90b:3b43:b0:285:940a:b9c0 with SMTP id ot3-20020a17090b3b4300b00285940ab9c0mr18013730pjb.35.1701269854978;
-        Wed, 29 Nov 2023 06:57:34 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 23-20020a17090a035700b00283a0b0fd39sm1070313pjf.53.2023.11.29.06.57.34
-        for <netdev@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1701269948; x=1701874748;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MI2wXYD1dHy0biP40vAHd/lkz+ijx91uo3bdYG08BTA=;
+        b=pB+zqWFa866IE0SjwXsh0wKu744P8RiPBa1vOO/4VGxGNg0OKBMzMEawMxAHyK9evc
+         Irrr44uRGARMA6MpK83JNGs+fXkDOVzTw+vd4Cy2E4EbgGVipCEYQXyQrQtkepDGB5pT
+         /MOYxYvSRDHcNa0qctE8FLyKUtWIrw7Bow+uRdLNUWJwKdOEWuFlUmJsLd7b+dlligf1
+         Jd4p34MO9WRdzwdbeTnbzMenR0OqNmDDGKH0IToBDCRQvvgJONN4TDGhbN4fmUquHKsm
+         UjnJuWj5fWTjFdNn2xr/0M91+6On2/aeEks3vFftLD4FDDjMIgyy7h1J+9MFMSsLI+qV
+         aYfA==
+X-Gm-Message-State: AOJu0YxONKuAMzyUivthlI5jnf+unjVCB9XvSmoS4h+DtbVJM3vW/5KI
+	lV9fwtk/cCTxt+XJ2uMisezoaO98mU3t37jOI2iiDDb2zccOZiyg01dbYHwp3LjC2NPDJqThDGq
+	lxMC3csYkxcjHigtm
+X-Received: by 2002:adf:eb41:0:b0:333:727:2ff5 with SMTP id u1-20020adfeb41000000b0033307272ff5mr5590104wrn.9.1701269948084;
+        Wed, 29 Nov 2023 06:59:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFmMigrMbu6mymybp1KFy8Po2HEeHonkXFHl9UM+Rm947CoT67bByrDPdYVKwxNSrc1C5AKsA==
+X-Received: by 2002:adf:eb41:0:b0:333:727:2ff5 with SMTP id u1-20020adfeb41000000b0033307272ff5mr5590083wrn.9.1701269947721;
+        Wed, 29 Nov 2023 06:59:07 -0800 (PST)
+Received: from redhat.com ([2.55.57.48])
+        by smtp.gmail.com with ESMTPSA id j7-20020adfb307000000b00332e7f9e2a8sm16187336wrd.68.2023.11.29.06.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 06:57:34 -0800 (PST)
-Date: Wed, 29 Nov 2023 06:57:33 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: Fw: [Bug 218205] New: kernel 6.6.3 NULL pointer dereference send
- UDP
-Message-ID: <20231129065733.6f14ac4f@hermes.local>
+        Wed, 29 Nov 2023 06:59:07 -0800 (PST)
+Date: Wed, 29 Nov 2023 09:59:03 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Zhu Yanjun <yanjun.zhu@linux.dev>
+Cc: Liang Chen <liangchen.linux@gmail.com>, jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, xuanzhuo@linux.alibaba.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	pabeni@redhat.com, alexander.duyck@gmail.com
+Subject: Re: [PATCH net-next 2/5] virtio_net: Add page_pool support to
+ improve performance
+Message-ID: <20231129095825-mutt-send-email-mst@kernel.org>
+References: <20230526054621.18371-1-liangchen.linux@gmail.com>
+ <20230526054621.18371-2-liangchen.linux@gmail.com>
+ <c745f67e-91e6-4a32-93f2-dc715056eb51@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c745f67e-91e6-4a32-93f2-dc715056eb51@linux.dev>
+
+On Wed, Nov 29, 2023 at 10:50:57PM +0800, Zhu Yanjun wrote:
+> 在 2023/5/26 13:46, Liang Chen 写道:
 
 
-
-Begin forwarded message:
-
-Date: Wed, 29 Nov 2023 09:10:57 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 218205] New: kernel 6.6.3 NULL pointer dereference send UDP
-
-
-https://bugzilla.kernel.org/show_bug.cgi?id=218205
-
-            Bug ID: 218205
-           Summary: kernel 6.6.3 NULL pointer dereference send UDP
-           Product: Networking
-           Version: 2.5
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: IPV4
-          Assignee: stephen@networkplumber.org
-          Reporter: netolish@gmail.com
-        Regression: No
-
-Created attachment 305506
-  --> https://bugzilla.kernel.org/attachment.cgi?id=305506&action=edit  
-NULL pointer error log
-
-In new 6.6.3 kernel on Gentoo during start chronyd kernel NULL pointer message
-is show and after a while system hangs-up with kernel panic. 6.6.2 version
-works fine.
+what made you respond to a patch from May, now?
 
 -- 
-You may reply to this email to add a comment.
+MST
 
-You are receiving this mail because:
-You are the assignee for the bug.
 
