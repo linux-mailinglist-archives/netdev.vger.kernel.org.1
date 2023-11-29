@@ -1,164 +1,128 @@
-Return-Path: <netdev+bounces-52113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C70FF7FD58C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:24:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 863727FD56F
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BB972833FF
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:24:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40EB6282A5C
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421361C6B5;
-	Wed, 29 Nov 2023 11:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B9D1C69A;
+	Wed, 29 Nov 2023 11:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eik0joN0"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AqYmxBs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E627295;
-	Wed, 29 Nov 2023 03:24:13 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40b4744d603so26045895e9.2;
-        Wed, 29 Nov 2023 03:24:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701257052; x=1701861852; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yda9H0vxzx9rV+4Nca5ZgoQ7TxEqfzsFC4Xox7G06Tc=;
-        b=eik0joN0my9LeKo79nZkyqQ85UAiLMjTZIQgzdO7tEJzSoI3ynWsXYwbqT5uwib2s1
-         ZVg9tcT5+64E+tA4E9qUEaEmWE735Io4y7WVYMsVIo44i0bQWAfqfnXQRaL7GMgeZGl6
-         n0ZHt64xWkrZSIjYMTCSLgrDiiCxw6aLf4ff2el9kLyvnXsSfVkY3mbX3bb0F9olzUgB
-         SXClO/P3CtnIwkOG8nVRtGTdyJlAqhggW8Haewaca5SB+scccr7aI3lTxRPZRToAcbrt
-         /afsTfDe/dIzCDetH6MDxAFVao7BCMQ5WXuIyQDhnJ/OMGlP2pNh7ZIPogh4/GyFjmz9
-         nwUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701257052; x=1701861852;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yda9H0vxzx9rV+4Nca5ZgoQ7TxEqfzsFC4Xox7G06Tc=;
-        b=iX+IkumYsdTmM4feOItPD9XAMNwR7EAda0n3OptgiHm5tsj6OvDdia5L/uBJWze+ug
-         78JVX2SmkMIj4fMiGrcdh6VUvk+syt4zJ33oOPxpDLJw8rasfdje4X0IAghsWQ5Wsj8N
-         ocIm0AaLduzvK7gKXku9Z5ZOlfgcqmchzDBzy1WfJZ9zaHVTMD4e2P2kkfRqD8VU7rGZ
-         JRe/ZV/3oFUaqvC3CgDc912z0FthDok3lynikHfIKoUIZHmM8iLTaLC7L4D4j9Ja8Oei
-         Gz0JgdAIp4Y0DpC5G4SpWV0qVTqzxfRGV5knOh1J1eu5UlfKPeRooBKtXgHLDIAqlSpo
-         1YoA==
-X-Gm-Message-State: AOJu0Yw1pBAkZ0+ymD130WRDTjZV8IGXL2SkQADa3dm/Xww4Gz2EI5og
-	BfpHh22YTd1edZnEwu5mpc4=
-X-Google-Smtp-Source: AGHT+IFlNRMxJcfO/JzysNNt2mOPKzqEQFGeunyY0WXd5lkMyJrG6wDUsIGhdoRtbZs+GxtoTKmANQ==
-X-Received: by 2002:a05:600c:4f4b:b0:404:6ed9:98d1 with SMTP id m11-20020a05600c4f4b00b004046ed998d1mr10709229wmq.41.1701257052093;
-        Wed, 29 Nov 2023 03:24:12 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id t13-20020a05600c198d00b003feea62440bsm1838172wmq.43.2023.11.29.03.24.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 03:24:11 -0800 (PST)
-Message-ID: <65671f5b.050a0220.83136.4ea5@mx.google.com>
-X-Google-Original-Message-ID: <ZWcexG3vpimM3e2u@Ansuel-xps.>
-Date: Wed, 29 Nov 2023 12:21:40 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 13/14] net: phy: qcom: deatch qca83xx PHY driver
- from at803x
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-14-ansuelsmth@gmail.com>
- <ZWcJ/OgC1+cbFvhk@shell.armlinux.org.uk>
- <65671487.050a0220.dae78.45f0@mx.google.com>
- <ZWceeQFBSZD1hzSk@shell.armlinux.org.uk>
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202ED10C2;
+	Wed, 29 Nov 2023 03:22:10 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT5mUWY021197;
+	Wed, 29 Nov 2023 03:22:03 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=goRdS9UMaJBeT5oWbOCmVW3K6Sjac2xOWln0Bp2z3kY=;
+ b=AqYmxBs47KVWy0F4VBI7EWs78M5VEc73Rdn/h+4EdcKYzmjwjMKXOFA38K5BZwVM3jdf
+ BlUtxq0MucMcaRBDFb7jL+4EMLOgI8MjYtRW0Jo2jphZhu750v+0imszfcx6fBEs6kDO
+ +Xj9Nrh4l7A+HDF6Oi7uxRtM6xHJeS0Mvg8YdMALYiwRQKsypoJ+w72aXjzHHQ1TgSvh
+ WuQFiSmTTjQRfyBBJynH4PZx5E6Gh8qq1s3ICQIptw1qjFREEvvXeABDsZLqx4PtUaiL
+ tMvAe/cnUF4Zw+eDDABlgqrvK+T7RiJOI7OgWPjs6/TXxGcSj/YyGroBEDBNqEdoWiUC UQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3unn86b0rq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 03:22:02 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
+ 2023 03:22:00 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 29 Nov 2023 03:22:00 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id A52B93F7043;
+	Wed, 29 Nov 2023 03:21:56 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <pbhagavatula@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH] octeontx2-af: cn10k: Increase outstanding LMTST transactions
+Date: Wed, 29 Nov 2023 16:51:55 +0530
+Message-ID: <20231129112155.9967-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWceeQFBSZD1hzSk@shell.armlinux.org.uk>
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: jxezCW60v_vy7GIaYNQeW7MqtHlOe9Rv
+X-Proofpoint-GUID: jxezCW60v_vy7GIaYNQeW7MqtHlOe9Rv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_09,2023-11-29_01,2023-05-22_02
 
-On Wed, Nov 29, 2023 at 11:20:25AM +0000, Russell King (Oracle) wrote:
-> On Wed, Nov 29, 2023 at 11:37:56AM +0100, Christian Marangi wrote:
-> > On Wed, Nov 29, 2023 at 09:53:00AM +0000, Russell King (Oracle) wrote:
-> > > On Wed, Nov 29, 2023 at 03:12:18AM +0100, Christian Marangi wrote:
-> > > > diff --git a/drivers/net/phy/qcom/Makefile b/drivers/net/phy/qcom/Makefile
-> > > > index 6a68da8aaa7b..43e4d14df8ea 100644
-> > > > --- a/drivers/net/phy/qcom/Makefile
-> > > > +++ b/drivers/net/phy/qcom/Makefile
-> > > > @@ -1,2 +1,3 @@
-> > > >  # SPDX-License-Identifier: GPL-2.0
-> > > > -obj-$(CONFIG_AT803X_PHY)	+= at803x.o
-> > > > +obj-$(CONFIG_AT803X_PHY)	+= at803x.o common.o
-> > > > +obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o common.o
-> > > 
-> > > These PHY drivers can be built as modules. You will end up with several
-> > > modules - at803x.ko, qca83xx.ko and common.ko. You don't mark any
-> > > functions in common.c as exported, no module license, no author, no
-> > > description. common.ko is way too generic a name as well.
-> > > 
-> > > Please think about this more and test building these drivers as a
-> > > module.
-> > >
-> > 
-> > Had some fear about this...
-> > 
-> > What would be the preferred way for this?
-> > 
-> > Having a .ko that EXPORT symbol or making the PHY driver .ko to compile
-> > the common.o in it?
-> 
-> I think the former, otherwise we end up with common.o duplicated in
-> each module, which becomes unnecessary bloat. This is how the Broadcom
-> stuff (which also has a "library") does it.
-> 
-> > Honestly I would like the second option since I would prefer not to
-> > create a .ko with shared function and EXPORT lots of symbols. On SoC it's
-> > expected to have only one of the PHY (at max 2 when the qca807x PHY will
-> > be implemented, with the at808x also present) so the size increase is
-> > minimal.
-> > 
-> > (just to be more clear, talking about this makefile implementation)
-> > 
-> > at803x-objs			+= common.o
-> > obj-$(CONFIG_AT803X_PHY)	+= at803x.o
-> > qca83xx-objs			+= common.o
-> > obj-$(CONFIG_QCA83XX_PHY)	+= qca83xx.o
-> > qca808x-objs			+= common.o
-> > obj-$(CONFIG_QCA808X_PHY)	+= qca808x.o
-> 
-> That won't work - the -objs needs to list the corresponding .o file
-> as well, and it needs to be a different name (you can't do this:
-> 
-> qca808x-objs			+= common.o qca808x.o
-> 
-> it has to be something like:
-> 
-> qca808x-phy-objs		+= common.o qca808x.o
-> obj-$(CONFIG_QCA808X_PHY)	+= qca808x-phy.o
-> 
-> However, I don't like this because it means each module ends up with
-> a copy of common.o in it.
-> 
+From: Pavan Nikhilesh <pbhagavatula@marvell.com>
 
-Ok will do the .ko library approach np.
+Currently the number of outstanding store transactions issued by AP as
+a part of LMTST operation is set to 1 i.e default value.
+This patch set to max supported value to increase the performance.
 
-> > For name of common.c, is qcom_ethphy_common.c a better name?
-> 
-> or qcom-phy-lib.c which follows what we have for Broadcom.
->
+Signed-off-by: Pavan Nikhilesh <pbhagavatula@marvell.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c       | 3 +++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h       | 1 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c | 9 +++++++++
+ 3 files changed, 13 insertions(+)
 
-Think we have to add some reference that it's about ethernet somewhere.
-
-There are already lots of qcom-phy .ko outside net/ 
-
-qcom-ethphy-lib.c ?
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 22c395c7d040..14bb91b98f97 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -935,6 +935,9 @@ static int rvu_setup_hw_resources(struct rvu *rvu)
+ 	hw->total_vfs = (cfg >> 20) & 0xFFF;
+ 	hw->max_vfs_per_pf = (cfg >> 40) & 0xFF;
+ 
++	if (!is_rvu_otx2(rvu))
++		rvu_apr_block_cn10k_init(rvu);
++
+ 	/* Init NPA LF's bitmap */
+ 	block = &hw->block[BLKADDR_NPA];
+ 	if (!block->implemented)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index c4d999ef5ab4..6546cc489d7e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -940,6 +940,7 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw);
+ 
+ /* CN10K RVU - LMT*/
+ void rvu_reset_lmt_map_tbl(struct rvu *rvu, u16 pcifunc);
++void rvu_apr_block_cn10k_init(struct rvu *rvu);
+ 
+ #ifdef CONFIG_DEBUG_FS
+ void rvu_dbg_init(struct rvu *rvu);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+index 0e74c5a2231e..93fedabfe31e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+@@ -559,3 +559,12 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
+ 	cfg |= BIT_ULL(1) | BIT_ULL(2);
+ 	rvu_write64(rvu, blkaddr, NIX_AF_CFG, cfg);
+ }
++
++void rvu_apr_block_cn10k_init(struct rvu *rvu)
++{
++	u64 reg;
++
++	reg = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_CFG);
++	reg |= 0xFULL << 35;
++	rvu_write64(rvu, BLKADDR_APR, APR_AF_LMT_CFG, reg);
++}
 -- 
-	Ansuel
+2.25.1
+
 
