@@ -1,95 +1,105 @@
-Return-Path: <netdev+bounces-52079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71677FD38A
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:05:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D767FD399
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:09:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0C11C210E9
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:05:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9433FB213D5
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 10:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B56B19471;
-	Wed, 29 Nov 2023 10:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0938199A5;
+	Wed, 29 Nov 2023 10:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z9xRroiV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A271AD;
-	Wed, 29 Nov 2023 02:05:32 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0VxNrNbH_1701252320;
-Received: from 30.221.128.123(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0VxNrNbH_1701252320)
-          by smtp.aliyun-inc.com;
-          Wed, 29 Nov 2023 18:05:30 +0800
-Message-ID: <1bcd4871-7403-41d9-8ae6-4df4878d9275@linux.alibaba.com>
-Date: Wed, 29 Nov 2023 18:05:29 +0800
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7733AE1
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 02:09:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701252576; x=1732788576;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fcXVVs2hlViGP6v0YIAXDTaYl5u9PA6AXiePriwmiyU=;
+  b=Z9xRroiV5PHwtHlpn9ylB6WsNdi1LNtn7ClkmP8gqJbNA/n8icABsruJ
+   0jDqqCBkSqTqcr1wKzw1ibiGiSAiP9Re3cyegw0NgHuOsZHGiN7UgOgt2
+   Dr6ngGlruTELg1XLi/Ye8Uf2cOjojVjg0eNf5Atkm1erfWZgYeF3v+8T4
+   lBpyViPXi0pzkNJ5FPWsdEf/EViSxHYvNZG/MDipWRe9WBbMoqShP9YNN
+   u++XGue0EF/gWGNIkJVn5YFzMGyDkCTEgUCHpBKnjDBTM6gnWRh5BKnYE
+   yKYR8bGn/NnfXgMl94vjkwWoGx6J6BD/BPnjkL66QXbwYtxTr3U5sTiMx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="372503088"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="372503088"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 02:09:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10908"; a="1016218517"
+X-IronPort-AV: E=Sophos;i="6.04,235,1695711600"; 
+   d="scan'208";a="1016218517"
+Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
+  by fmsmga006.fm.intel.com with ESMTP; 29 Nov 2023 02:09:34 -0800
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: [PATCH iwl-net v1] i40e:Fix filter input checks to prevent config with invalid values
+Date: Wed, 29 Nov 2023 11:09:33 +0100
+Message-Id: <20231129100933.2753577-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
- send/recv/acked events
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
- hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20231123030732.111576-1-lulie@linux.alibaba.com>
- <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
- <3aa60895-c149-4cac-a09a-169abbe4e2f5@linux.dev>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <3aa60895-c149-4cac-a09a-169abbe4e2f5@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
 
-On 2023/11/29 08:33, Martin KaFai Lau wrote:
-> On 11/23/23 4:37 AM, Philo Lu wrote:
->> Sorry, I forgot to cc the maintainers.
->>
->> On 2023/11/23 11:07, Philo Lu wrote:
->>> Add 3 sock_ops operators, namely BPF_SOCK_OPS_DATA_SEND_CB,
->>> BPF_SOCK_OPS_DATA_RECV_CB, and BPF_SOCK_OPS_DATA_ACKED_CB. A flag
->>> BPF_SOCK_OPS_DATA_EVENT_CB_FLAG is provided to minimize the performance
->>> impact. The flag must be explicitly set to enable these callbacks.
->>>
->>> If the flag is enabled, bpf sock_ops program will be called every 
->>> time a
->>> tcp data packet is sent, received, and acked.
->>> BPF_SOCK_OPS_DATA_SEND_CB: call bpf after a data packet is sent.
->>> BPF_SOCK_OPS_DATA_RECV_CB: call bpf after a data packet is receviced.
->>> BPF_SOCK_OPS_DATA_ACKED_CB: call bpf after a valid ack packet is
->>> processed (some sent data are ackknowledged).
->>>
->>> We use these callbacks for fine-grained tcp monitoring, which collects
->>> and analyses every tcp request/response event information. The whole
->>> system has been described in SIGMOD'18 (see
->>> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
->>> achieve this with bpf, we require hooks for data events that call
->>> sock_ops bpf (1) when any data packet is sent/received/acked, and (2)
->>> after critical tcp state variables have been updated (e.g., snd_una,
->>> snd_nxt, rcv_nxt). However, existing sock_ops operators cannot meet our
->>> requirements.
->>>
->>> Besides, these hooks also help to debug tcp when data send/recv/acked.
->
-> This all sounds like a tracing use case. Why tracepoint is not used 
-> instead?
+Prevent VF from configuring filters with unsupported actions or use
+REDIRECT action with invalid tc number. Current checks could cause
+out of bounds access on PF side.
 
-Yes, our use case is pure tracing. We add hooks to sockops because we 
-also use
-other ops like BPF_SOCK_OPS_STATE_CB. Thus, sockops seems a natural solution
-for us.
+Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-We can also use tracepoint (with sockops) instead. So we think which to use
-depends on your opinions. Many thanks.
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 3f99eb1..031b15c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -3521,16 +3521,16 @@ static int i40e_validate_cloud_filter(struct i40e_vf *vf,
+ 	bool found = false;
+ 	int bkt;
+ 
+-	if (!tc_filter->action) {
++	if (tc_filter->action != VIRTCHNL_ACTION_TC_REDIRECT) {
+ 		dev_info(&pf->pdev->dev,
+-			 "VF %d: Currently ADq doesn't support Drop Action\n",
+-			 vf->vf_id);
++			 "VF %d: ADQ doesn't support this action (%d)\n",
++			 vf->vf_id, tc_filter->action);
+ 		goto err;
+ 	}
+ 
+ 	/* action_meta is TC number here to which the filter is applied */
+ 	if (!tc_filter->action_meta ||
+-	    tc_filter->action_meta > I40E_MAX_VF_VSI) {
++	    tc_filter->action_meta > vf->num_tc) {
+ 		dev_info(&pf->pdev->dev, "VF %d: Invalid TC number %u\n",
+ 			 vf->vf_id, tc_filter->action_meta);
+ 		goto err;
+-- 
+2.25.1
 
 
