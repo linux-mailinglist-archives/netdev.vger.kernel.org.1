@@ -1,318 +1,272 @@
-Return-Path: <netdev+bounces-51940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2F947FCC6B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:46:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA897FCC6E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54710282E9F
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:46:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6641C20A70
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF901C10;
-	Wed, 29 Nov 2023 01:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B65F1FB2;
+	Wed, 29 Nov 2023 01:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8l/5MtN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpYedhFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D888EF5
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 17:46:40 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40b479ec4a3so21034285e9.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 17:46:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701222399; x=1701827199; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YQ2z3pGciakTQjJqBAZU1TopphOvMpeMz2DgGH+vYJw=;
-        b=K8l/5MtNsyYLlsauCqVVcl/k1gyTObuxM9X8gvCXwI5hJUErvUICntyhYy9LyzqFgs
-         chZuLMM7iMkOE8s953WLJ5Mt+XyPfqFtN5wXEoCMa2v6Bl+cMOqfWu0NMFQ8QvjZsLhP
-         lbM2RKUBhupie1ubku0yQg1XOxLuffKrUfMqRk/FucPBRFlDeTOnGhjBybOaPCy4/A63
-         RoIqvWFWsSK/XCDI8Y8L/w6wqP6Pm52EVX1vJzxeOvDGMd6JaT6B00QSgfdzQidyURQZ
-         kv+fbim4ZsRt9H9O02EriWQkYsRRsyW69lxjVqFQ9onGgikqSEN1LUlRfdbR38+cFQZQ
-         BmyQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100CD1BE
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 17:51:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701222673;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cLLM+EHuQYt9L5vF7q4+i6iLVhWI2heiCS5DH48CB7I=;
+	b=hpYedhFUZckVwElGzvYcVIiDAcS9HYa0vWYTkOdOvWEcKtF1TQD07U0gRG8tOJP8a2IsDx
+	mT8HifdXDMdGb/RwVjOeMOAu3iQZfqRGXIkC2qHmLHVOI7xZzb83Rncf2GrtDbrPkFD+6p
+	h7d1XIGGSm0oJTDJw9bYSBKWDlAL338=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-IfN0V8LON4OnNC_bBuPMUQ-1; Tue, 28 Nov 2023 20:51:11 -0500
+X-MC-Unique: IfN0V8LON4OnNC_bBuPMUQ-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1cfb5baa409so53266715ad.3
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 17:51:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701222399; x=1701827199;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YQ2z3pGciakTQjJqBAZU1TopphOvMpeMz2DgGH+vYJw=;
-        b=j4LIX5CM1NDfVWy8RyvVtfgvrLxslRQvhbiJZL7Y81rsG9rGs/Ok1weF7X/Yl17n2d
-         yXFhuD2UsDbenX3065eono+5N6qvm9alz6ddcXVYbTrAHskVQ7w6xUdcHX4JD3VtLGRh
-         fIdOtWCFD8/ClVckujCWaB0dX/IVBlIIYhhvqJXIor0CdVrSYIZVtqQATKiu+1olgDRw
-         67ZUTYk+16XqWW9pssmjxBkBYQ4nD3Y3n9uEo0R8M9H8xvHUcEd349sDhZiVKgLKVHD5
-         9c0E0HqNLdhJHmqI+iCgYW5PwVODrs30OmzJuBkUbOENlhrzC5sIpqGPtvVIezwgyqWR
-         rVbQ==
-X-Gm-Message-State: AOJu0YwBY86Fr1IUl8QUYHYI41SyKiZUN5Ws/schlkX/baDlBsas/5/K
-	MRx48Z23LNnGiBOFLFqQYDc=
-X-Google-Smtp-Source: AGHT+IGCmRxb5Wi1JzeQVc4tUTkozdM19JKFK9W1CDV1Hy7Ur4U6F1yR5MX6pSrPXeR1hGFMkKwoxA==
-X-Received: by 2002:a05:600c:4f90:b0:40a:4c7e:6f3e with SMTP id n16-20020a05600c4f9000b0040a4c7e6f3emr13605725wmq.21.1701222398989;
-        Tue, 28 Nov 2023 17:46:38 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id m16-20020a05600c4f5000b0040b349c91acsm283742wmq.16.2023.11.28.17.46.38
+        d=1e100.net; s=20230601; t=1701222671; x=1701827471;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cLLM+EHuQYt9L5vF7q4+i6iLVhWI2heiCS5DH48CB7I=;
+        b=xMUx5IHjIEaIKUFt279wgbUe1vJ5LFMVlcP7421w8N2+/Q432BIzwvSIc7m/8G4T1j
+         XEV8eRDEUxFiqy+sdCij4vlX1e66oy65MGD3TdIQi8Hn5MBA8A0OZf376ifONR16eaAV
+         GmHfu9I1aSysIeobnqXxcmgUGpEFKGMGM8lwayCZF7e/QdukSgJpYHPp4hxxci8zfzo3
+         LzKow9ywKZko6J/+gVUmGTEH/hRsAsHNOxzcYSOtnBWDN05izOvdJBhoFV44gfTn3nC7
+         eadOFRitU+6w3GEC3ULSwn6GdBeMI6rP44N9zyprrf83xa1K09qYHg3YCH696VNXOVRH
+         Lg7w==
+X-Gm-Message-State: AOJu0YyTj3yxG57skXbQBAmfPMAl0elJ+5AXbvvdSVs7fDjDMb8kCi/U
+	jlEPient8Uyj8rp1355/tQJny5/FVXB2liaR/WgKijNELjG7+f5VGMRUrbcBcKzulgdcfvpz69O
+	8VTwCR62Vo3kmF5sw
+X-Received: by 2002:a17:902:e88a:b0:1cf:cf34:d504 with SMTP id w10-20020a170902e88a00b001cfcf34d504mr10647257plg.36.1701222670719;
+        Tue, 28 Nov 2023 17:51:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFjcyx3N+DNToUL9Hv4An0WzWRGQGeKo8qG1Mreu4smi9ox2DwD/fiqiB1BZRc1igeaFX+hpA==
+X-Received: by 2002:a17:902:e88a:b0:1cf:cf34:d504 with SMTP id w10-20020a170902e88a00b001cfcf34d504mr10647240plg.36.1701222670394;
+        Tue, 28 Nov 2023 17:51:10 -0800 (PST)
+Received: from localhost ([240d:1a:c0d:9f00:3342:3fe3:7275:954])
+        by smtp.gmail.com with ESMTPSA id d10-20020a170903230a00b001cfc44aac0fsm5613445plh.111.2023.11.28.17.51.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 17:46:38 -0800 (PST)
-Message-ID: <656697fe.050a0220.18692.0d42@mx.google.com>
-X-Google-Original-Message-ID: <ZWaX_B-rzInbrhDU@Ansuel-xps.>
-Date: Wed, 29 Nov 2023 02:46:36 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH RFC net-next 4/8] dsa: Create port LEDs based on DT
- binding
-References: <20231128232135.358638-1-andrew@lunn.ch>
- <20231128232135.358638-5-andrew@lunn.ch>
+        Tue, 28 Nov 2023 17:51:09 -0800 (PST)
+Date: Wed, 29 Nov 2023 10:50:46 +0900 (JST)
+Message-Id: <20231129.105046.2126277148145584341.syoshida@redhat.com>
+To: willemdebruijn.kernel@gmail.com, edumazet@google.com, pabeni@redhat.com
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in
+ ipgre_xmit()
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <6564bbd5580de_8a1ac29481@willemb.c.googlers.com.notmuch>
+References: <20231126151652.372783-1-syoshida@redhat.com>
+	<6564bbd5580de_8a1ac29481@willemb.c.googlers.com.notmuch>
+X-Mailer: Mew version 6.9 on Emacs 29.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231128232135.358638-5-andrew@lunn.ch>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 29, 2023 at 12:21:31AM +0100, Andrew Lunn wrote:
-> Allow LEDs to be described in each ports DT subnode. Parse these when
-> setting up the ports, currently supporting brightness and link.
+On Mon, 27 Nov 2023 10:55:01 -0500, Willem de Bruijn wrote:
+> Shigeru Yoshida wrote:
+>> In ipgre_xmit(), skb_pull() may fail even if pskb_inet_may_pull() returns
+>> true. For example, applications can create a malformed packet that causes
+>> this problem with PF_PACKET.
 > 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  include/net/dsa.h |   3 +
->  net/dsa/dsa.c     | 138 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 141 insertions(+)
+> It may fail because because pskb_inet_may_pull does not account for
+> tunnel->hlen.
 > 
-> diff --git a/include/net/dsa.h b/include/net/dsa.h
-> index ae73765cd71c..2e05e4fd0b76 100644
-> --- a/include/net/dsa.h
-> +++ b/include/net/dsa.h
-> @@ -325,6 +325,9 @@ struct dsa_port {
->  		 */
->  		struct list_head	user_vlans;
->  	};
-> +
-> +	/* List of LEDs associated to this port */
-> +	struct list_head leds;
->  };
->  
->  /* TODO: ideally DSA ports would have a single dp->link_dp member,
-> diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-> index ac7be864e80d..b13748f9b519 100644
-> --- a/net/dsa/dsa.c
-> +++ b/net/dsa/dsa.c
-> @@ -34,6 +34,15 @@
->  static DEFINE_MUTEX(dsa2_mutex);
->  LIST_HEAD(dsa_tree_list);
->  
-> +struct dsa_led {
-> +	struct list_head led_list;
-> +	struct dsa_port *dp;
-> +	struct led_classdev led_cdev;
-> +	u8 index;
-> +};
-> +
-> +#define to_dsa_led(d) container_of(d, struct dsa_led, led_cdev)
-> +
->  static struct workqueue_struct *dsa_owq;
->  
->  /* Track the bridges with forwarding offload enabled */
-> @@ -461,6 +470,116 @@ static void dsa_tree_teardown_cpu_ports(struct dsa_switch_tree *dst)
->  			dp->cpu_dp = NULL;
->  }
->  
-> +static int dsa_led_brightness_set(struct led_classdev *led_cdev,
-> +				  enum led_brightness value)
-> +{
-> +	struct dsa_led *dsa_led = to_dsa_led(led_cdev);
-> +	struct dsa_port *dp = dsa_led->dp;
-> +	struct dsa_switch *ds = dp->ds;
-> +
-> +	return ds->ops->led_brightness_set(ds, dp->index, dsa_led->index,
-> +					   value);
-> +}
-> +
-> +static int dsa_led_blink_set(struct led_classdev *led_cdev,
-> +			     unsigned long *delay_on, unsigned long *delay_off)
-> +{
-> +	struct dsa_led *dsa_led = to_dsa_led(led_cdev);
-> +	struct dsa_port *dp = dsa_led->dp;
-> +	struct dsa_switch *ds = dp->ds;
-> +
-> +	return ds->ops->led_blink_set(ds, dp->index, dsa_led->index,
-> +				      delay_on, delay_off);
-> +}
-> +
-> +static int dsa_port_led_setup(struct dsa_port *dp,
-> +			      struct device_node *led)
-> +{
-> +	struct led_init_data init_data = {};
-> +	struct dsa_switch *ds = dp->ds;
-> +	struct led_classdev *cdev;
-> +	struct dsa_led *dsa_led;
-> +	u32 index;
-> +	int err;
-> +
-> +	dsa_led = devm_kzalloc(ds->dev, sizeof(*dsa_led), GFP_KERNEL);
-> +	if (!dsa_led)
-> +		return -ENOMEM;
-> +
-> +	dsa_led->dp = dp;
-> +	cdev = &dsa_led->led_cdev;
-> +
-> +	err = of_property_read_u32(led, "reg", &index);
-> +	if (err)
-> +		return err;
-> +	if (index > 255)
-> +		return -EINVAL;
-> +
-> +	dsa_led->index = index;
-> +
-> +	if (ds->ops->led_brightness_set)
-> +		cdev->brightness_set_blocking = dsa_led_brightness_set;
-> +	if (ds->ops->led_blink_set)
-> +		cdev->blink_set = dsa_led_blink_set;
-> +
-> +	cdev->max_brightness = 1;
-> +
-> +	init_data.fwnode = of_fwnode_handle(led);
+> Is that what you are referring to with malformed packet? Can you
+> eloborate a bit on in which way the packet has to be malformed to
+> reach this?
 
-Please add
+Thank you very much for your prompt feedback.
 
-init_data.devname_mandatory = true;
+Actually, I found this problem by running syzkaller. Syzkaller
+reported the following uninit-value issue (I think the root cause of
+this issue is the same as the one Eric mentioned):
 
-cled will derive the name based on color action and won't include the
-devname resulting in LEDs having the same name.
+=====================================================
+BUG: KMSAN: uninit-value in __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+BUG: KMSAN: uninit-value in ipgre_xmit+0xdf4/0xe70 net/ipv4/ip_gre.c:662
+ __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+ ipgre_xmit+0xdf4/0xe70 net/ipv4/ip_gre.c:662
+ __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+ xmit_one net/core/dev.c:3543 [inline]
+ dev_hard_start_xmit+0x24a/0xa10 net/core/dev.c:3559
+ __dev_queue_xmit+0x32f6/0x50e0 net/core/dev.c:4344
+ dev_queue_xmit include/linux/netdevice.h:3112 [inline]
+ packet_xmit+0x8f/0x6b0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3087 [inline]
+ packet_sendmsg+0x8c24/0x9aa0 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ __sys_sendto+0x717/0xa00 net/socket.c:2194
+ __do_sys_sendto net/socket.c:2206 [inline]
+ __se_sys_sendto net/socket.c:2202 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2202
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-> +	if (dp->user) {
-> +		init_data.devicename = dev_name(&dp->user->dev);
-> +		err = devm_led_classdev_register_ext(&dp->user->dev, cdev,
-> +						     &init_data);
-> +	} else {
-> +		init_data.devicename = kasprintf(GFP_KERNEL, "%s:%d",
-> +						 dev_name(ds->dev), dp->index);
-> +		err = devm_led_classdev_register_ext(ds->dev, cdev, &init_data);
-> +	}
-> +	if (err)
-> +		return err;
-> +
-> +	INIT_LIST_HEAD(&dsa_led->led_list);
-> +	list_add(&dsa_led->led_list, &dp->leds);
-> +
-> +	if (!dp->user)
-> +		kfree(init_data.devicename);
-> +
-> +	return 0;
-> +}
-> +
-> +static int dsa_port_leds_setup(struct dsa_port *dp)
-> +{
-> +	struct device_node *leds, *led;
-> +	int err;
-> +
-> +	if (!dp->dn)
-> +		return 0;
-> +
-> +	leds = of_get_child_by_name(dp->dn, "leds");
-> +	if (!leds)
-> +		return 0;
-> +
-> +	for_each_available_child_of_node(leds, led) {
-> +		err = dsa_port_led_setup(dp, led);
-> +		if (err)
-> +			return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void dsa_port_leds_teardown(struct dsa_port *dp)
-> +{
-> +	struct dsa_switch *ds = dp->ds;
-> +	struct device *dev = ds->dev;
-> +	struct led_classdev *cdev;
-> +	struct dsa_led *dsa_led;
-> +
-> +	list_for_each_entry(dsa_led, &dp->leds, led_list) {
-> +		cdev = &dsa_led->led_cdev;
-> +		devm_led_classdev_unregister(dev, cdev);
-> +	}
-> +}
-> +
->  static int dsa_port_setup(struct dsa_port *dp)
->  {
->  	bool dsa_port_link_registered = false;
-> @@ -494,6 +613,11 @@ static int dsa_port_setup(struct dsa_port *dp)
->  		err = dsa_port_enable(dp, NULL);
->  		if (err)
->  			break;
-> +
-> +		err = dsa_port_leds_setup(dp);
-> +		if (err)
-> +			break;
-> +
->  		dsa_port_enabled = true;
->  
->  		break;
-> @@ -512,12 +636,22 @@ static int dsa_port_setup(struct dsa_port *dp)
->  		err = dsa_port_enable(dp, NULL);
->  		if (err)
->  			break;
-> +
-> +		err = dsa_port_leds_setup(dp);
-> +		if (err)
-> +			break;
-> +
->  		dsa_port_enabled = true;
->  
->  		break;
->  	case DSA_PORT_TYPE_USER:
->  		of_get_mac_address(dp->dn, dp->mac);
->  		err = dsa_user_create(dp);
-> +		if (err)
-> +			break;
-> +
-> +		err = dsa_port_leds_setup(dp);
-> +
->  		break;
->  	}
->  
-> @@ -544,11 +678,13 @@ static void dsa_port_teardown(struct dsa_port *dp)
->  	case DSA_PORT_TYPE_UNUSED:
->  		break;
->  	case DSA_PORT_TYPE_CPU:
-> +		dsa_port_leds_teardown(dp);
->  		dsa_port_disable(dp);
->  		if (dp->dn)
->  			dsa_shared_port_link_unregister_of(dp);
->  		break;
->  	case DSA_PORT_TYPE_DSA:
-> +		dsa_port_leds_teardown(dp);
->  		dsa_port_disable(dp);
->  		if (dp->dn)
->  			dsa_shared_port_link_unregister_of(dp);
-> @@ -556,6 +692,7 @@ static void dsa_port_teardown(struct dsa_port *dp)
->  	case DSA_PORT_TYPE_USER:
->  		if (dp->user) {
->  			dsa_user_destroy(dp->user);
-> +			dsa_port_leds_teardown(dp);
->  			dp->user = NULL;
->  		}
->  		break;
-> @@ -1108,6 +1245,7 @@ static struct dsa_port *dsa_port_touch(struct dsa_switch *ds, int index)
->  	INIT_LIST_HEAD(&dp->mdbs);
->  	INIT_LIST_HEAD(&dp->vlans); /* also initializes &dp->user_vlans */
->  	INIT_LIST_HEAD(&dp->list);
-> +	INIT_LIST_HEAD(&dp->leds);
->  	list_add_tail(&dp->list, &dst->ports);
->  
->  	return dp;
-> -- 
-> 2.42.0
+Uninit was stored to memory at:
+ __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+ ipgre_xmit+0xded/0xe70 net/ipv4/ip_gre.c:662
+ __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+ xmit_one net/core/dev.c:3543 [inline]
+ dev_hard_start_xmit+0x24a/0xa10 net/core/dev.c:3559
+ __dev_queue_xmit+0x32f6/0x50e0 net/core/dev.c:4344
+ dev_queue_xmit include/linux/netdevice.h:3112 [inline]
+ packet_xmit+0x8f/0x6b0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3087 [inline]
+ packet_sendmsg+0x8c24/0x9aa0 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ __sys_sendto+0x717/0xa00 net/socket.c:2194
+ __do_sys_sendto net/socket.c:2206 [inline]
+ __se_sys_sendto net/socket.c:2202 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2202
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was created at:
+ slab_post_alloc_hook+0x103/0x9e0 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5f7/0xb50 mm/slub.c:3523
+ kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:560
+ pskb_expand_head+0x20b/0x19a0 net/core/skbuff.c:2098
+ __skb_cow include/linux/skbuff.h:3586 [inline]
+ skb_cow_head include/linux/skbuff.h:3620 [inline]
+ ipgre_xmit+0x73c/0xe70 net/ipv4/ip_gre.c:638
+ __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+ xmit_one net/core/dev.c:3543 [inline]
+ dev_hard_start_xmit+0x24a/0xa10 net/core/dev.c:3559
+ __dev_queue_xmit+0x32f6/0x50e0 net/core/dev.c:4344
+ dev_queue_xmit include/linux/netdevice.h:3112 [inline]
+ packet_xmit+0x8f/0x6b0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3087 [inline]
+ packet_sendmsg+0x8c24/0x9aa0 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ __sys_sendto+0x717/0xa00 net/socket.c:2194
+ __do_sys_sendto net/socket.c:2206 [inline]
+ __se_sys_sendto net/socket.c:2202 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2202
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 1 PID: 11318 Comm: syz-executor.7 Not tainted 6.6.0-14500-g1c41041124bd #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+=====================================================
+
+The simplified version of the repro is shown below:
+
+#include <linux/if_ether.h>
+#include <sys/ioctl.h>
+#include <netinet/ether.h>
+#include <net/if.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <linux/if_packet.h>
+
+int main(void)
+{
+	int s, s1, s2, data = 0;
+	struct ifreq ifr;
+	struct sockaddr_ll addr = { 0 };
+	unsigned char mac_addr[] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6};
+
+	s = socket(AF_PACKET, SOCK_DGRAM, 0x300);
+	s1 = socket(AF_PACKET, SOCK_RAW, 0x300);
+	s2 = socket(AF_NETLINK, SOCK_RAW, 0);
+
+	strcpy(ifr.ifr_name, "gre0");
+	ioctl(s2, SIOCGIFINDEX, &ifr);
+
+	addr.sll_family = AF_PACKET;
+	addr.sll_ifindex = ifr.ifr_ifindex;
+	addr.sll_protocol = htons(0);
+	addr.sll_hatype = ARPHRD_ETHER;
+	addr.sll_pkttype = PACKET_HOST;
+	addr.sll_halen = ETH_ALEN;
+	memcpy(addr.sll_addr, mac_addr, ETH_ALEN);
+
+	sendto(s1, &data, 1, 0, (struct sockaddr *)&addr, sizeof(addr));
+
+	return 0;
+}
+
+The repro sends a 1-byte packet that doesn't have the correct IP
+header. I meant this as "malformed pachet", but that might be a bit
+confusing, sorry.
+
+I think the cause of the uninit-value access is that ipgre_xmit()
+reallocates the skb with skb_cow_head() and copies only the 1-byte
+data, so any IP header access through `tnl_params` can cause the
+problem.
+
+At first I tried to modify pskb_inet_may_pull() to detect this type of
+packet, but I ended up doing this patch.
+
+Any advice is welcome!
+
+Thanks,
+Shigeru
+
+> 
+> FYI: I had a quick look at the IPv6 equivalent code.
+> ip6gre_tunnel_xmit is sufficiently different. It makes sense that this
+> is an IPv4 only patch.
+> 
+>> This patch fixes the problem by dropping skb and returning from the
+>> function if skb_pull() fails.
+>> 
+>> Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
+>> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+>> ---
+>>  net/ipv4/ip_gre.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+>> index 22a26d1d29a0..95efa97cb84b 100644
+>> --- a/net/ipv4/ip_gre.c
+>> +++ b/net/ipv4/ip_gre.c
+>> @@ -643,7 +643,8 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+>>  		/* Pull skb since ip_tunnel_xmit() needs skb->data pointing
+>>  		 * to gre header.
+>>  		 */
+>> -		skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
+>> +		if (!skb_pull(skb, tunnel->hlen + sizeof(struct iphdr)))
+>> +			goto free_skb;
+>>  		skb_reset_mac_header(skb);
+>>  
+>>  		if (skb->ip_summed == CHECKSUM_PARTIAL &&
+>> -- 
+>> 2.41.0
+>> 
+> 
 > 
 
--- 
-	Ansuel
 
