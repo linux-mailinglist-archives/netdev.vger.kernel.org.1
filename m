@@ -1,113 +1,75 @@
-Return-Path: <netdev+bounces-52121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F8A7FD5D4
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:35:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E397FD5F2
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EDEE2821C3
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:35:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE2BC282F6B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 11:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA1D1CAB2;
-	Wed, 29 Nov 2023 11:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vuzdJXag"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF91E1CFB6;
+	Wed, 29 Nov 2023 11:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4715DA;
-	Wed, 29 Nov 2023 03:35:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rqS+h/QhB+l3YOA1zOKZSiEXB38gEHQM7lW0MLULbqg=; b=vuzdJXagBK8d7m5cAmLL0Boojc
-	QyyhacdZgGAZS2j6Hit5ht9BRy5aUqNw+7TaK/yQcKNNG4Gm5VsmU2C6r5zrPk/c/RODcxSIfcXY9
-	t2CNXc8fL009N6jI30245Z1FtuxIezXE7Y6p60LWcBLeq4wP+NwYmJ7Hshxq4tJkyfufrqe0mCr5D
-	3v1TfYbAfnmkZ8Q413fHNagFsWg0usjA/RDbJ23DsP0gt9j6dwHVt5sdiS/xpwfY+e+pSi48774LV
-	HmanbcFoR+0rnLz7cQaWEEbQDX7fTJYYbgwCY+ru11YjTTU9idzi1TTVscPzF8L3jBz5lFphvE34g
-	Gy9+ohPw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48210)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r8IqR-0000Iz-2l;
-	Wed, 29 Nov 2023 11:35:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r8IqS-0003xO-Ap; Wed, 29 Nov 2023 11:35:08 +0000
-Date: Wed, 29 Nov 2023 11:35:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
-Subject: Re: [PATCH net] net: stmmac: update Rx clk divider for 10M SGMII
-Message-ID: <ZWch7LIqbMEaLRLW@shell.armlinux.org.uk>
-References: <20231124050818.1221-1-quic_snehshah@quicinc.com>
- <ZWBo5EKjkffNOqkQ@shell.armlinux.org.uk>
- <47c9eb95-ff6a-4432-a7ef-1f3ebf6f593f@quicinc.com>
- <ZWRVz05Gb4oALDnf@shell.armlinux.org.uk>
- <3bf6f666-b58a-460f-88f5-ad8ec08bfbbc@quicinc.com>
- <ZWRp3pVv0DNsPMT7@shell.armlinux.org.uk>
- <474a8942-e22f-4899-acb9-f794d01fdfe9@quicinc.com>
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5C78B5
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:42:07 -0800 (PST)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2858cb6b1a8so7073044a91.2
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 03:42:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701258127; x=1701862927;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjPA4/c9WZ5F20R0UIB2Kd3JkPUDLADtTQZRXgPbEls=;
+        b=Ajk1CtOZVqn4at5jLExqADS4TFVUa9z1yXgoVPz88icedMqz+N2bqL24BX5OgCws4j
+         UVnQRCVijkCbEl1q2V7D636FJsxjpPyvxviCj6G5th8AQUlm/vKm3+lyrRBIuhmwdOKX
+         m+CvGRzJJb04d+l5On4KtbaUWMVrYAy6rheno58W6b5gmJsw78X3uqqxpez10yzu2sod
+         k3OXtlmXxeSGvkmk1Dr4U2GyhE3NmnZMofP7wlNZgB9GGRgSCHYpovSS3FtIqMjGH0v8
+         Ug9n+88CAXFK1JmZytABIBXw4G4gnTEJpTyCrkb0KnBBNb5jGMkHKe4w7eXqRGaZp/U4
+         LxOA==
+X-Gm-Message-State: AOJu0Yw/dPORJtB5yrvUFdYxF2bRJnTkkiUF/vc9IZbSBRN6h5gZUwJw
+	bR0Ymj6AnaFEZuxJSMwQirseW46sPKJ/JkFR2XtFG8DG4yoB
+X-Google-Smtp-Source: AGHT+IGbTN6xrle3YcbjSc2dUkUNdkT+KI44D8h/5Q5ENIpOrNqCRlZlOPhp74t7acqNCThMkM2zuB6AQt0YMxOb0C3zZQRUpPR1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <474a8942-e22f-4899-acb9-f794d01fdfe9@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a17:90a:4614:b0:285:71b3:7b41 with SMTP id
+ w20-20020a17090a461400b0028571b37b41mr3815999pjg.4.1701258127230; Wed, 29 Nov
+ 2023 03:42:07 -0800 (PST)
+Date: Wed, 29 Nov 2023 03:42:07 -0800
+In-Reply-To: <CANn89i+6BuZA6AjocG_0zTkD1u=pNgZc_DpZMO=yUN=S1cHS3w@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000584f41060b490648@google.com>
+Subject: Re: [syzbot] [net?] general protection fault in page_pool_unlist
+From: syzbot <syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com>
+To: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 29, 2023 at 04:56:53PM +0530, Sneh Shah wrote:
-> 
-> 
-> On 11/27/2023 3:35 PM, Russell King (Oracle) wrote:
-> > On Mon, Nov 27, 2023 at 03:17:20PM +0530, Sneh Shah wrote:
-> >> On 11/27/2023 2:09 PM, Russell King (Oracle) wrote:
-> >>> On Mon, Nov 27, 2023 at 11:25:34AM +0530, Sneh Shah wrote:
-> >>>> On 11/24/2023 2:42 PM, Russell King (Oracle) wrote:
-> >>>>> The next concern I have is that you're only doing this for SPEED_10.
-> >>>>> If it needs to be programmed for SPEED_10 to work, and not any of the
-> >>>>> other speeds, isn't this something that can be done at initialisation
-> >>>>> time? If it has to be done depending on the speed, then don't you need
-> >>>>> to do this for each speed with an appropriate value?
-> >>>>
-> >>>> This field programming is required only for 10M speed in for SGMII mode. other speeds are agnostic to this field. Hence we are programming it always when SGMII link comes up in 10M mode. init driver data for ethqos is common for sgmii and rgmii. As this fix is specific to SGMII we can't add this to init driver data.
-> >>>
-> >>> I wasn't referring to adding it to driver data. I was asking whether it
-> >>> could be done in the initialisation path.
-> >>>
-> >> No, IOMACRO block is configured post phylink up regardless of RGMII or SGMII mode. We are not updating them at driver initialization time itself.
-> > 
-> > What reason (in terms of the hardware) requires you to do this every
-> > time you select 10M speed? Does the hardware change the value in the
-> > register?
-> > 
-> Yes, the hardware changes the value in register every time the interface is toggled. That is the reason we have ethqos_configure_sgmii function to configure registers whenever there is link activity.
+Hello,
 
-That is sufficient reason to write it each time - and it would be good
-to mention this in a comment above the write in
-ethqos_configure_sgmii().
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Thanks.
+Reported-and-tested-by: syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Tested on:
+
+commit:         f1be1e04 Merge branch '40GbE' of git://git.kernel.org/..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=1333cb78e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=abf6d5a82dab01fe
+dashboard link: https://syzkaller.appspot.com/bug?extid=f9f8efb58a4db2ca98d0
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=174c37a4e80000
+
+Note: testing is done by a robot and is best-effort only.
 
