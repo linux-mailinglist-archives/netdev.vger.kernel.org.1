@@ -1,59 +1,48 @@
-Return-Path: <netdev+bounces-52246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1848F7FDF74
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:42:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401757FDE03
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:11:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BB011C20AA0
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:42:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C44DAB20E65
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA493529C;
-	Wed, 29 Nov 2023 18:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E163D0A0;
+	Wed, 29 Nov 2023 17:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k3teRwIz"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Q8lz/dRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1712E12C
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:41:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701283316; x=1732819316;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=FuM6+pB8IDds+B7QD+pku6Po3IZK41UrFEWqjt8/w94=;
-  b=k3teRwIztb0kLdbb7o+0JYhvgL331OZEUtVHvI9xF4ZXdBPL3fLkEEWi
-   PQMU6Lopq2imDCrPJcpMG/90RiINQeIkvS7GWMvpywKsESfiqWF+3Vgxr
-   XK7yi0h/qpjOavA40M5Om2W/OKRXFeE2uoEe0PLvwVNyHBT5nXaC7WxaW
-   nH0PwOQrQ/jRHlW5zGGwu0uGbtSNE1kS8osMyPpy7jq/L/5++tFhRoaZl
-   DIiucrPsKzy3BbPUq7LMT5yVXFQVO/R9QxegGH54HhabHJXFSCumo1gnd
-   Y6kQR3Rhf//RTuWgKgkoVT1CluE0s4wauNH35K+AUHQb6RbJC0/xdQuAV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="193022"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="193022"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 10:41:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="772776470"
-X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="772776470"
-Received: from fedora-sys-rao.jf.intel.com (HELO f37-upstream-rao..) ([10.166.5.220])
-  by fmsmga007.fm.intel.com with ESMTP; 29 Nov 2023 10:41:54 -0800
-From: Ranganatha Rao <ranganatha.rao@intel.com>
-To: intel-wired-lan@lists.osuosl.org
+X-Greylist: delayed 429 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Nov 2023 09:11:34 PST
+Received: from forward206a.mail.yandex.net (forward206a.mail.yandex.net [178.154.239.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F91D1
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 09:11:34 -0800 (PST)
+Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
+	by forward206a.mail.yandex.net (Yandex) with ESMTP id 5603268FD8
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 20:04:25 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-54.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-54.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:7d84:0:640:6613:0])
+	by forward100a.mail.yandex.net (Yandex) with ESMTP id 774D946CB8;
+	Wed, 29 Nov 2023 20:04:19 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-54.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id I4Z91X4Oc8c0-vXHyeDrt;
+	Wed, 29 Nov 2023 20:04:19 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1701277459; bh=A8rwaLBdmdoH3ljvyJC9Zh3/wiZgmRUvbRMlhaG57TI=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=Q8lz/dRxV2CXR0pdkg95Q/bg4bUhH578RmHB7LRFiCqIsMVjTtVfkgSIGm0XX20eL
+	 ZpQr5/weL3VDarMQS4kExSwxmeTMwjhuBVniBhAA9wgmybeZERKxAbZoF0yZG5egPg
+	 PCljVElbLg709uUk5wk9AAPkBgickVXMbD5d5O2A=
+Authentication-Results: mail-nwsmtp-smtp-production-main-54.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Cc: netdev@vger.kernel.org,
-	Slawomir Laba <slawomirx.laba@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Ranganatha Rao <ranganatha.rao@intel.com>
-Subject: [PATCH iwl-net, v2] iavf: Fix iavf_shutdown to call iavf_remove instead iavf_close
-Date: Wed, 29 Nov 2023 10:35:26 -0500
-Message-ID: <20231129153526.57912-1-ranganatha.rao@intel.com>
-X-Mailer: git-send-email 2.41.0
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] nfc: pn533: fix fortify warning
+Date: Wed, 29 Nov 2023 20:03:46 +0300
+Message-ID: <20231129170352.6050-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,190 +51,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Slawomir Laba <slawomirx.laba@intel.com>
+When compiling with gcc version 14.0.0 20231129 (experimental) and
+CONFIG_FORTIFY_SOURCE=y, I've noticed the following:
 
-Make the flow for pci shutdown be the same to the pci remove.
+In file included from ./include/linux/string.h:295,
+                 from ./include/linux/bitmap.h:12,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/paravirt.h:17,
+                 from ./arch/x86/include/asm/irqflags.h:60,
+                 from ./include/linux/irqflags.h:17,
+                 from ./include/linux/rcupdate.h:26,
+                 from ./include/linux/rculist.h:11,
+                 from ./include/linux/pid.h:5,
+                 from ./include/linux/sched.h:14,
+                 from ./include/linux/ratelimit.h:6,
+                 from ./include/linux/dev_printk.h:16,
+                 from ./include/linux/device.h:15,
+                 from drivers/nfc/pn533/pn533.c:9:
+In function 'fortify_memcpy_chk',
+    inlined from 'pn533_target_found_felica' at drivers/nfc/pn533/pn533.c:781:2:
+./include/linux/fortify-string.h:588:25: warning: call to '__read_overflow2_field'
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Wattribute-warning]
+  588 |                         __read_overflow2_field(q_size_field, size);
 
-iavf_shutdown was implementing an incomplete version
-of iavf_remove. It misses several calls to the kernel like
-iavf_free_misc_irq, iavf_reset_interrupt_capability, iounmap
-that might break the system on reboot or hibernation.
+Here the fortification logic interprets call to 'memcpy()' as an attempt
+to copy an amount of data which exceeds the size of the specified field
+(9 bytes from 1-byte 'opcode') and thus issues an overread warning -
+which is silenced by using the convenient 'struct_group()' quirk.
 
-Implement the call of iavf_remove directly in iavf_shutdown to
-close this gap.
-
-Fixes below error messages (dmesg) during shutdown stress tests -
-[685814.900917] ice 0000:88:00.0: MAC 02:d0:5f:82:43:5d does not exist for
- VF 0
-[685814.900928] ice 0000:88:00.0: MAC 33:33:00:00:00:01 does not exist for
-VF 0
-
-Reproduction:
-
-1. Create one VF interface:
-echo 1 > /sys/class/net/<interface_name>/device/sriov_numvfs
-
-2. Run live dmesg on the host:
-dmesg -wH
-
-3. On SUT, script below steps into vf_namespace_assignment.sh
-
-<#!/bin/sh> // Remove <>. Git removes # line
-if=<VF name> (edit this per VF name)
-loop=0
-
-while true; do
-
-echo test round $loop
-let loop++
-
-ip netns add ns$loop
-ip link set dev $if up
-ip link set dev $if netns ns$loop
-ip netns exec ns$loop ip link set dev $if up
-ip netns exec ns$loop ip link set dev $if netns 1
-ip netns delete ns$loop
-
-done
-
-4. Run the script for at least 1000 iterations on SUT:
-./vf_namespace_assignment.sh
-
-Expected result:
-No errors in dmesg.
-
-Fixes: 129cf89e5856 ("iavf: rename functions and structs to new name")
-Signed-off-by: Slawomir Laba <slawomirx.laba@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Co-authored-by: Ranganatha Rao <ranganatha.rao@intel.com>
-Signed-off-by: Ranganatha Rao <ranganatha.rao@intel.com>
-
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-v2: Add reproduction steps in commit log
----
- drivers/net/ethernet/intel/iavf/iavf_main.c | 72 ++++++---------------
- 1 file changed, 21 insertions(+), 51 deletions(-)
+ drivers/nfc/pn533/pn533.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index c862ebcd2e39..3c177dcd3b38 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -276,27 +276,6 @@ void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
- 	kfree(mem->va);
- }
+diff --git a/drivers/nfc/pn533/pn533.c b/drivers/nfc/pn533/pn533.c
+index b19c39dcfbd9..7fb0f6c004f7 100644
+--- a/drivers/nfc/pn533/pn533.c
++++ b/drivers/nfc/pn533/pn533.c
+@@ -740,8 +740,10 @@ static int pn533_target_found_type_a(struct nfc_target *nfc_tgt, u8 *tgt_data,
  
--/**
-- * iavf_lock_timeout - try to lock mutex but give up after timeout
-- * @lock: mutex that should be locked
-- * @msecs: timeout in msecs
-- *
-- * Returns 0 on success, negative on failure
-- **/
--static int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
--{
--	unsigned int wait, delay = 10;
--
--	for (wait = 0; wait < msecs; wait += delay) {
--		if (mutex_trylock(lock))
--			return 0;
--
--		msleep(delay);
--	}
--
--	return -1;
--}
--
- /**
-  * iavf_schedule_reset - Set the flags and schedule a reset event
-  * @adapter: board private structure
-@@ -4825,34 +4804,6 @@ int iavf_process_config(struct iavf_adapter *adapter)
- 	return 0;
- }
+ struct pn533_target_felica {
+ 	u8 pol_res;
+-	u8 opcode;
+-	u8 nfcid2[NFC_NFCID2_MAXSIZE];
++	struct_group(sensf,
++		u8 opcode;
++		u8 nfcid2[NFC_NFCID2_MAXSIZE];
++	);
+ 	u8 pad[8];
+ 	/* optional */
+ 	u8 syst_code[];
+@@ -778,8 +780,9 @@ static int pn533_target_found_felica(struct nfc_target *nfc_tgt, u8 *tgt_data,
+ 	else
+ 		nfc_tgt->supported_protocols = NFC_PROTO_FELICA_MASK;
  
--/**
-- * iavf_shutdown - Shutdown the device in preparation for a reboot
-- * @pdev: pci device structure
-- **/
--static void iavf_shutdown(struct pci_dev *pdev)
--{
--	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
--	struct net_device *netdev = adapter->netdev;
--
--	netif_device_detach(netdev);
--
--	if (netif_running(netdev))
--		iavf_close(netdev);
--
--	if (iavf_lock_timeout(&adapter->crit_lock, 5000))
--		dev_warn(&adapter->pdev->dev, "%s: failed to acquire crit_lock\n", __func__);
--	/* Prevent the watchdog from running. */
--	iavf_change_state(adapter, __IAVF_REMOVE);
--	adapter->aq_required = 0;
--	mutex_unlock(&adapter->crit_lock);
--
--#ifdef CONFIG_PM
--	pci_save_state(pdev);
--
--#endif
--	pci_disable_device(pdev);
--}
--
- /**
-  * iavf_probe - Device Initialization Routine
-  * @pdev: PCI device information struct
-@@ -5063,16 +5014,21 @@ static int __maybe_unused iavf_resume(struct device *dev_d)
-  **/
- static void iavf_remove(struct pci_dev *pdev)
- {
--	struct iavf_adapter *adapter = iavf_pdev_to_adapter(pdev);
- 	struct iavf_fdir_fltr *fdir, *fdirtmp;
- 	struct iavf_vlan_filter *vlf, *vlftmp;
- 	struct iavf_cloud_filter *cf, *cftmp;
- 	struct iavf_adv_rss *rss, *rsstmp;
- 	struct iavf_mac_filter *f, *ftmp;
-+	struct iavf_adapter *adapter;
- 	struct net_device *netdev;
- 	struct iavf_hw *hw;
+-	memcpy(nfc_tgt->sensf_res, &tgt_felica->opcode, 9);
+-	nfc_tgt->sensf_res_len = 9;
++	memcpy(nfc_tgt->sensf_res, &tgt_felica->sensf,
++	       sizeof(tgt_felica->sensf));
++	nfc_tgt->sensf_res_len = sizeof(tgt_felica->sensf);
  
--	netdev = adapter->netdev;
-+	/* Don't proceed with remove if netdev is already freed */
-+	netdev = pci_get_drvdata(pdev);
-+	if (!netdev)
-+		return;
-+
-+	adapter = iavf_pdev_to_adapter(pdev);
- 	hw = &adapter->hw;
- 
- 	if (test_and_set_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section))
-@@ -5184,11 +5140,25 @@ static void iavf_remove(struct pci_dev *pdev)
- 
- 	destroy_workqueue(adapter->wq);
- 
-+	pci_set_drvdata(pdev, NULL);
-+
- 	free_netdev(netdev);
- 
- 	pci_disable_device(pdev);
- }
- 
-+/**
-+ * iavf_shutdown - Shutdown the device in preparation for a reboot
-+ * @pdev: pci device structure
-+ **/
-+static void iavf_shutdown(struct pci_dev *pdev)
-+{
-+	iavf_remove(pdev);
-+
-+	if (system_state == SYSTEM_POWER_OFF)
-+		pci_set_power_state(pdev, PCI_D3hot);
-+}
-+
- static SIMPLE_DEV_PM_OPS(iavf_pm_ops, iavf_suspend, iavf_resume);
- 
- static struct pci_driver iavf_driver = {
+ 	memcpy(nfc_tgt->nfcid2, tgt_felica->nfcid2, NFC_NFCID2_MAXSIZE);
+ 	nfc_tgt->nfcid2_len = NFC_NFCID2_MAXSIZE;
 -- 
-2.41.0
+2.43.0
 
 
