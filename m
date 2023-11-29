@@ -1,119 +1,159 @@
-Return-Path: <netdev+bounces-52236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267E87FDF28
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:14:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B170B7FDF33
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:18:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F432B20DEB
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:14:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BDD8B2100F
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C144F5F2;
-	Wed, 29 Nov 2023 18:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65E55C3F4;
+	Wed, 29 Nov 2023 18:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="eNe2jYbi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCngQQxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1D89A
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:14:19 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32fdc5be26dso67179f8f.2
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:14:19 -0800 (PST)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E87A3;
+	Wed, 29 Nov 2023 10:18:48 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9fffa4c4f43so7474466b.3;
+        Wed, 29 Nov 2023 10:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1701281658; x=1701886458; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wY9WeKtXlEdT6ZB9TX0PBdHOlwsuJkt60GHvQlNmDZk=;
-        b=eNe2jYbiHpkwa/ZNkwOKT14qO98/sNJ5OK0f5gcf2tcDDzf6G05TeflGiDnlPn0b/F
-         0jxSCryWYJh/61ZODteUoF8r6sudle8sNM1yGrTdsJjOjjXDkql/4VHQIXo3boRe6szq
-         LSMOp+vWjXRrseRTWyFWY8Jaes+wBc2bm/EJc4fK10Kb1VYQQe8Y2yP6BLIcvkouJfcj
-         VC+dT8srvnfX+I6dAg3oLRuvC2vjnEOBnCt5OTGXG74Qy2aj93cKs31RpOYW0ap1OlHL
-         KN7Pmo9ak++sDXbQQwhOI13g+tXtu6+FZZMky8pD3e6W1rJGuI1c6bap6T2v5ce6L/M/
-         vS1A==
+        d=gmail.com; s=20230601; t=1701281927; x=1701886727; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+oxFI2xDlsJXdq2twNcWIhhbiyZKz5nGCnvY004qL9Y=;
+        b=jCngQQxbrJ/tnNdZNeiFS6J3A8ITLbAbQ4eAg9O6doogvNeTjSZaTJ7BJytEZGKYkW
+         apFyuxWA3uynA0fjVHhVz+jDxLguRoAzsGIaA01QCEkjeXUZtmxmrJhhmWOcC3bJAZzq
+         YjyorhBr5Pl5aITlL3N6MW42oGvOi8Y4rBH+eILYT6Lu2wH35G4fWkQZlIYJLTzMdtnI
+         C9PEbcqS2UnsuopE35AjXh8LZHDLW5TtCSNldXI4ChQgIaUhteOzTY9/VkSAMatSg/Z0
+         vCkfAbk/u8LoRB+m6sJ1XhXMqXTaDo7rZ+9EV2kVHjbjbg+E4u1Lmyv0aVb3lC/G5zZw
+         1HPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701281658; x=1701886458;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wY9WeKtXlEdT6ZB9TX0PBdHOlwsuJkt60GHvQlNmDZk=;
-        b=YraTnTDgEMAeP8X6Cl0wg0h5wImU49fNVQTnpp5O9+XCW6y05r3dNYtixH5eU452nY
-         JFzm9hAWVaZIAX+YDAdZ+FZnyf9eRX4E6ow66RYzVyczxis7rSMnDnGDQYbCYMWgC82h
-         SFTzWLG6gYJEhbgXoXOvoEm216i6mPsVdLIS+4fQ1Ce39R9rq7a71LOnDKP/JZ4KZtxa
-         jE2x/LMWRWJA5a3oQ9k9rpg2ZZL6kODKv+NfKFiqBzNyYLzQJX7WFSP3DoUsX0IdD8TC
-         UyMGmo081Yo7CWiWCl5Oslbbm2S1/mPl4Usmq8P5lIHLec57Mr9r9TcgR0+AX5Bqij8L
-         aJHw==
-X-Gm-Message-State: AOJu0Yz5XO5HbF6VS+Glxrp9WFSqiw2mBOZhUMMt5/2m996KmLER2nIe
-	JiDtV5LISyrNoUSJrEAxXL/g0Q==
-X-Google-Smtp-Source: AGHT+IHofg/hK+69psa2zHUNArxjJYgRtbYj/y3G4jlgWw7XUJhrw71mnLqzsxXOXWGxw3ObhmdCgQ==
-X-Received: by 2002:a05:6000:88:b0:331:6b82:a3ad with SMTP id m8-20020a056000008800b003316b82a3admr13548656wrx.60.1701281658390;
-        Wed, 29 Nov 2023 10:14:18 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id t2-20020a5d4602000000b0032da4c98ab2sm18812649wrq.35.2023.11.29.10.14.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 10:14:17 -0800 (PST)
-Message-ID: <df55eb1d-b63a-4652-8103-d2bd7b5d7eda@arista.com>
-Date: Wed, 29 Nov 2023 18:14:16 +0000
+        d=1e100.net; s=20230601; t=1701281927; x=1701886727;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+oxFI2xDlsJXdq2twNcWIhhbiyZKz5nGCnvY004qL9Y=;
+        b=N1k849lZyuqYZxrHb3NcqJmS0F77G8mvcw0vt+vMnsOpO1/wQ8e9UUjk0+DKNeVWnS
+         CWhL6akRbWwS3DkoKqM+H3xiHfW95tt3Tf7C/pQHPKXxVCRefBYb5maIAHKYlIUuMxMr
+         BCxhrCRuNya1sZ/EBaln5mQPUQUG/4T/3Hl25u+jNSrZEJZ5PxdHehyUW5NysOuqRYmR
+         6SAtYW+zBsJaJbOLoK198eU+HunBdLAMJeRw7XGMJtjQ9tAgrGQ73K/6jiFIEC7WrrRE
+         oeij9OYqm/WZWtPT7c3oURwOL67eSUFBTgktTHYu2Hc3DlunajooscgU018eRNOIQ4f5
+         3Kcw==
+X-Gm-Message-State: AOJu0YzCPpXqIAUFMp3BVpPNM5m1EJFgTI6fuQ5G4XZqRtCvfPr9u1g+
+	XEN0zfIsXCcyFchXCTuEyGY=
+X-Google-Smtp-Source: AGHT+IGiIg549aZpIYoA3pve4OmRttOCyYE1U0jSAOSKby4WAR65DFIaa5YMrWhY6o6QqTauDVhqOw==
+X-Received: by 2002:a17:906:b248:b0:a04:cc0e:ff3b with SMTP id ce8-20020a170906b24800b00a04cc0eff3bmr14594160ejb.27.1701281926915;
+        Wed, 29 Nov 2023 10:18:46 -0800 (PST)
+Received: from skbuf ([188.26.185.12])
+        by smtp.gmail.com with ESMTPSA id u25-20020a17090657d900b0098ec690e6d7sm8119082ejr.73.2023.11.29.10.18.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 10:18:45 -0800 (PST)
+Date: Wed, 29 Nov 2023 20:18:42 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH net-next v8 5/9] ARM64: dts: marvell: Fix some common
+ switch mistakes
+Message-ID: <20231129181842.74zihcd642lx5zgo@skbuf>
+References: <20231114-marvell-88e6152-wan-led-v8-0-50688741691b@linaro.org>
+ <20231114-marvell-88e6152-wan-led-v8-5-50688741691b@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20231129165721.337302-1-dima@arista.com>
- <20231129165721.337302-7-dima@arista.com>
- <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114-marvell-88e6152-wan-led-v8-5-50688741691b@linaro.org>
 
-On 11/29/23 18:09, Eric Dumazet wrote:
-> On Wed, Nov 29, 2023 at 5:57 PM Dmitry Safonov <dima@arista.com> wrote:
->>
->> RFC 5925 (6.2):
->>> TCP-AO emulates a 64-bit sequence number space by inferring when to
->>> increment the high-order 32-bit portion (the SNE) based on
->>> transitions in the low-order portion (the TCP sequence number).
->>
->> snd_sne and rcv_sne are the upper 4 bytes of extended SEQ number.
->> Unfortunately, reading two 4-bytes pointers can't be performed
->> atomically (without synchronization).
->>
->> In order to avoid locks on TCP fastpath, let's just double-account for
->> SEQ changes: snd_una/rcv_nxt will be lower 4 bytes of snd_sne/rcv_sne.
->>
-> 
-> This will not work on 32bit kernels ?
+On Tue, Nov 14, 2023 at 12:36:00AM +0100, Linus Walleij wrote:
+> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> index 9eab2bb22134..66cd98b67744 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> @@ -304,7 +304,13 @@ phy1: ethernet-phy@1 {
+>  		reg = <1>;
+>  	};
+>  
+> -	/* switch nodes are enabled by U-Boot if modules are present */
+> +	/*
+> +	 * NOTE: switch nodes are enabled by U-Boot if modules are present
+> +	 * DO NOT change this node name (switch0@10) even if it is not following
+> +	 * conventions! Deployed U-Boot binaries are explicitly looking for
+> +	 * this node in order to augment the device tree!
+> +	 * Also do not touch the "ports" or "port@n" nodes. These are also ABI.
+> +	 */
+>  	switch0@10 {
+>  		compatible = "marvell,mv88e6190";
+>  		reg = <0x10>;
+> @@ -430,6 +436,7 @@ port-sfp@a {
+>  		};
+>  	};
+>  
+> +	/* NOTE: this node name is ABI, don't change it! */
+>  	switch0@2 {
+>  		compatible = "marvell,mv88e6085";
+>  		reg = <0x2>;
+> @@ -497,6 +504,7 @@ port@5 {
+>  		};
+>  	};
+>  
+> +	/* NOTE: this node name is ABI, don't change it! */
+>  	switch1@11 {
+>  		compatible = "marvell,mv88e6190";
+>  		reg = <0x11>;
+> @@ -622,6 +630,7 @@ port-sfp@a {
+>  		};
+>  	};
+>  
+> +	/* NOTE: this node name is ABI, don't change it! */
+>  	switch1@2 {
+>  		compatible = "marvell,mv88e6085";
+>  		reg = <0x2>;
+> @@ -689,6 +698,7 @@ port@5 {
+>  		};
+>  	};
+>  
+> +	/* NOTE: this node name is ABI, don't change it! */
+>  	switch2@12 {
+>  		compatible = "marvell,mv88e6190";
+>  		reg = <0x12>;
+> @@ -805,6 +815,7 @@ port-sfp@a {
+>  		};
+>  	};
+>  
+> +	/* NOTE: this node name is ABI, don't change it! */
+>  	switch2@2 {
+>  		compatible = "marvell,mv88e6085";
+>  		reg = <0x2>;
 
-Yeah, unsure if there's someone who wants to run BGP on 32bit box, so at
-this moment it's already limited:
+I wouldn't spam the device tree with all these comments; doing so gives
+a false sense of completeness. Code inspection shows that the "port-sfp@a"
+node name is also established ABI, but there isn't any explicit comment
+to point that out. I think a single comment that uses plural to refer to
+all nodes should be enough.
 
-config TCP_AO
-	bool "TCP: Authentication Option (RFC5925)"
-	select CRYPTO
-	select TCP_SIGPOOL
-	depends on 64BIT && IPV6 != m # seq-number extension needs WRITE_ONCE(u64)
-
-Probably, if there will be a person who is interested in this, it can
-get a spinlock for !CONFIG_64BIT.
-
-> Unless ao->snd_sne and ao->rcv_sneare only read/written under the
-> socket lock (and in this case no READ_ONCE()/WRITE_ONCE() should be
-> necessary)
-
-Thanks,
-            Dmitry
-
+Also, doesn't the comment go better along with the patch that changes
+the switch compatible strings, rather than with the patch that actually
+fixes what can be fixed (ethernet-phy node names)?
 
