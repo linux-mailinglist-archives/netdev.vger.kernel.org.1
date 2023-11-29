@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-52013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051DC7FCE34
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 06:24:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4BE7FCE41
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 06:28:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2840B1C20A90
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:24:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBC941C20A59
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EFC6FA6;
-	Wed, 29 Nov 2023 05:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9D16AAC;
+	Wed, 29 Nov 2023 05:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dRoTA+/q"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="inLIu5x8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5881BE;
-	Tue, 28 Nov 2023 21:23:57 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A91B19A;
+	Tue, 28 Nov 2023 21:28:37 -0800 (PST)
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ASIdt2Q021069;
-	Tue, 28 Nov 2023 21:23:51 -0800
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ASIdt6r021079;
+	Tue, 28 Nov 2023 21:28:32 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=RyQNu/4f6bw63umQMN6av9DZSEVhbf5Xz7SFVkrjG6c=;
- b=dRoTA+/qReOFVuar7zJPScRoUn4NKrjiON1fHQR0sZs/yo1wkjJiGlPBgBUyXaYHuavV
- VDjRNhw1cnuMqC+aXzD6LVgmVC/i39LSfvcoSlsFYXgkva+RBc3AWDxHCrF2Vv2ctBNC
- 1Zr+fONsyhUy5eeU36ota54GRz2GcHZQt2Ffxj7hN2ISyhJWfxbe78NQ2MLrfQ/4X830
- hKCLuJJBiCZW7yK+Vtxl67aOBwysT/Y28KlTd9NyVEGaXvlKAaxRMXHSCYoSEg90EA3Y
- PfDNI6ID8F4k4waLxj7YzhPqOXqzv6ttJEm27MCj0dJnq9RjoKKHlDCWNfIAcqYyINPW pg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3unn86a18w-1
+ bh=1ewM6MqFrt1Nn4jz3SiK0ncDnmr3if++qJDwehzsdVs=;
+ b=inLIu5x8poU/JJLW8MF6VMpPAhEVAc1dA1pmaMD4j3wgFnzAheO27nqm+sT8Nt9OYLDW
+ nWnWmu0A96+ebIq9CKQ6dJRcfLQ24oyT8Mfc9IlFxAnpfEOf2KaHNQaRJskEdNOIkJRH
+ UsA2io64e2X/80Oklb/uHHTbp28tGJJ6mvA9oqJuODZIHJaVve0QsRWwmn6S7iZoTRTV
+ C3SPDGfENuJnnVchZ/qpDqb93qfwPHa8/xCfjPt1n2JFDUmamXRJfGpQasPHYY4VsSMH
+ N65MuBjMLlGBbnwhTZjtp6JQ1hjIbvdQVvRQg9CYMPRoT0ujnls1DUynRHUuFDVmGxBi nw== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3unn86a1jc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 28 Nov 2023 21:23:51 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 Nov
- 2023 21:23:49 -0800
+	Tue, 28 Nov 2023 21:28:31 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 Nov
+ 2023 21:28:30 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
  (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 28 Nov 2023 21:23:49 -0800
+ Transport; Tue, 28 Nov 2023 21:28:30 -0800
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id ADB743F7048;
-	Tue, 28 Nov 2023 21:23:45 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id 1BE3D3F7043;
+	Tue, 28 Nov 2023 21:28:25 -0800 (PST)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
         <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
         <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-        "Subbaraya Sundeep" <sbhatta@marvell.com>
-Subject: [PATCH v2 net] octeontx2-pf: Add missing mutex lock in otx2_get_pauseparam
-Date: Wed, 29 Nov 2023 10:53:42 +0530
-Message-ID: <1701235422-22488-1-git-send-email-sbhatta@marvell.com>
+        <naveenm@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [PATCH v2 net] octeontx2-af: Check return value of nix_get_nixlf before using nixlf
+Date: Wed, 29 Nov 2023 10:58:23 +0530
+Message-ID: <1701235703-22690-1-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,51 +59,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: GzgL5lzcAPokTodDWzZsP1yHw-0rQYGU
-X-Proofpoint-GUID: GzgL5lzcAPokTodDWzZsP1yHw-0rQYGU
+X-Proofpoint-ORIG-GUID: pdscyTL9rRvbjJzcLYViIVRJFf9LGElg
+X-Proofpoint-GUID: pdscyTL9rRvbjJzcLYViIVRJFf9LGElg
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-29_02,2023-11-27_01,2023-05-22_02
 
-All the mailbox messages sent to AF needs to be guarded
-by mutex lock. Add the missing lock in otx2_get_pauseparam
-function.
+If a NIXLF is not attached to a PF/VF device then
+nix_get_nixlf function fails and returns proper error
+code. But npc_get_default_entry_action does not check it
+and uses garbage value in subsequent calls. Fix this
+by cheking the return value of nix_get_nixlf.
 
-Fixes: 75f36270990c ("octeontx2-pf: Support to enable/disable pause frames via ethtool")
+Fixes: 967db3529eca ("octeontx2-af: add support for multicast/promisc packet replication feature")
 Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 ---
-v2 changes:
- Added maintainers of AF driver too
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 9efcec5..53f6258 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -334,9 +334,12 @@ static void otx2_get_pauseparam(struct net_device *netdev,
- 	if (is_otx2_lbkvf(pfvf->pdev))
- 		return;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 16cfc80..f658058 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -389,7 +389,13 @@ static u64 npc_get_default_entry_action(struct rvu *rvu, struct npc_mcam *mcam,
+ 	int bank, nixlf, index;
  
-+	mutex_lock(&pfvf->mbox.lock);
- 	req = otx2_mbox_alloc_msg_cgx_cfg_pause_frm(&pfvf->mbox);
--	if (!req)
-+	if (!req) {
-+		mutex_unlock(&pfvf->mbox.lock);
- 		return;
+ 	/* get ucast entry rule entry index */
+-	nix_get_nixlf(rvu, pf_func, &nixlf, NULL);
++	if (nix_get_nixlf(rvu, pf_func, &nixlf, NULL)) {
++		dev_err(rvu->dev, "%s: nixlf not attached to pcifunc:0x%x\n",
++			__func__, pf_func);
++		/* Action 0 is drop */
++		return 0;
 +	}
- 
- 	if (!otx2_sync_mbox_msg(&pfvf->mbox)) {
- 		rsp = (struct cgx_pause_frm_cfg *)
-@@ -344,6 +347,7 @@ static void otx2_get_pauseparam(struct net_device *netdev,
- 		pause->rx_pause = rsp->rx_pause;
- 		pause->tx_pause = rsp->tx_pause;
- 	}
-+	mutex_unlock(&pfvf->mbox.lock);
- }
- 
- static int otx2_set_pauseparam(struct net_device *netdev,
++
+ 	index = npc_get_nixlf_mcam_index(mcam, pf_func, nixlf,
+ 					 NIXLF_UCAST_ENTRY);
+ 	bank = npc_get_bank(mcam, index);
 -- 
 2.7.4
 
