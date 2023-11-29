@@ -1,41 +1,57 @@
-Return-Path: <netdev+bounces-52008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9307F7FCE0E
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68A257FCE16
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 05:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE8E51C21064
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A07D1C210AB
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 04:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6356FA6;
-	Wed, 29 Nov 2023 04:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AEB6FB2;
+	Wed, 29 Nov 2023 04:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/TunPZp"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cf7pphZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF686FA5
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 149B1C433C9;
-	Wed, 29 Nov 2023 04:50:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701233424;
-	bh=zdGX5wEfjDirv8VVCe5Xz/q6fTQSFV2zAnrQNCT5WV4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y/TunPZp13e4ZPRuX0UlALlA70llvMtJV9MOi+jlvu87DUv3NvPesnznP/8v0LoOS
-	 QlH00m2MuVwr8f/6X+XidyWzT7Objjr9pVF/r2+Cq9p8LJov81VuhcGqrDnnZQwnYF
-	 YT2BEqqi4g2Gmew7zNwnU7gD8Vx7YmduukMQNz/r/aMYG7UYRtFe1QVWTkaHayUaxz
-	 x0xaJnGm/bQPQoE8FQwM8nTR4ZAkmR9UCu/jPjNuYm4ZtR2gZpE8aLHA7W+Gzi7MvB
-	 tJgQTAY4xY5yyGdNDSp6Ns+aPbVQCT4R2EcJtJJqKxs1uliNAgOhE7m4Yt5abVYAiP
-	 RPV+zJiReGeIQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EEDECDFAA89;
-	Wed, 29 Nov 2023 04:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF0710E7;
+	Tue, 28 Nov 2023 20:53:58 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AT3jmWc006444;
+	Tue, 28 Nov 2023 20:53:53 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=opgqyZX6LMVrmkQX5DCOWm0LZevDwASGJmt2zGyiYfA=;
+ b=cf7pphZ0DfoQv1234ijBTwjtKhRvMlsQd1cb0+TjAAdIE7re0SBi94+9sh4Glhj1EtwX
+ vDf7mcXm2Yjfe+EWhJr3uiBJoyb4ZVX5Ap/0FZ94o6ERg67Ls19SIgm7jtjVRjjyrsWZ
+ HoE1DJtLkpsjGAiI8w8Yosgo1J+zOe33k2+jDfonjRQoSNnuxnM9Z3rn5Pnzmprb4wek
+ SPqg55Ju8FcmCljqkbwzLZjv9unWkZzNZVnV9eQJNEuhwmAO1rbEXVT71MODUZmg+Ott
+ vvadVSjwvQhe5UqXybNHIH1tWg84okkr9SaSIeu/tKorwfiTKnFUVFObvgCRAsJrQD3S 9w== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3una4dmdra-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 28 Nov 2023 20:53:53 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 Nov
+ 2023 20:53:51 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 28 Nov 2023 20:53:51 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 85EE63F7043;
+	Tue, 28 Nov 2023 20:53:50 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>
+Subject: [PATCH net-next v2 0/2] support OCTEON CN98 devices
+Date: Tue, 28 Nov 2023 20:53:46 -0800
+Message-ID: <20231129045348.2538843-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,38 +59,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] iproute2: prevent memory leak on error return
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170123342397.22449.3200085287282268932.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Nov 2023 04:50:23 +0000
-References: <20231114081307.36926-1-heminhong@kylinos.cn>
-In-Reply-To: <20231114081307.36926-1-heminhong@kylinos.cn>
-To: heminhong <heminhong@kylinos.cn>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
+Content-Type: text/plain
+X-Proofpoint-GUID: X_1OoNhzm7c87nwF5OHdvZsYAuJtKUFG
+X-Proofpoint-ORIG-GUID: X_1OoNhzm7c87nwF5OHdvZsYAuJtKUFG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-29_01,2023-11-27_01,2023-05-22_02
 
-Hello:
+Implement device unload control net API required for CN98
+devices and add support in driver for the same.
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+Changes:
+V2:
+  - Changed dev_info print to dev_dbg in device_remove API
 
-On Tue, 14 Nov 2023 16:13:07 +0800 you wrote:
-> When rtnl_statsdump_req_filter() or rtnl_dump_filter() failed to process,
-> just return will cause memory leak.
-> 
-> Signed-off-by: heminhong <heminhong@kylinos.cn>
-> ---
->  ip/iplink.c | 2 ++
->  1 file changed, 2 insertions(+)
+V1: https://lore.kernel.org/all/20231127162135.2529363-1-srasheed@marvell.com/
 
-Here is the summary with links:
-  - iproute2: prevent memory leak on error return
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=389657c3ec43
+Shinas Rasheed (2):
+  octeon_ep: implement device unload control net API
+  octeon_ep: support OCTEON CN98 devices
 
-You are awesome, thank you!
+ .../ethernet/marvell/octeon_ep.rst            |  1 +
+ .../marvell/octeon_ep/octep_cn9k_pf.c         | 24 +++++++++++++++----
+ .../marvell/octeon_ep/octep_ctrl_net.c        | 16 ++++++++++++-
+ .../marvell/octeon_ep/octep_ctrl_net.h        | 11 +++++++++
+ .../ethernet/marvell/octeon_ep/octep_main.c   |  4 ++++
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  1 +
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  4 ++++
+ 7 files changed, 56 insertions(+), 5 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
