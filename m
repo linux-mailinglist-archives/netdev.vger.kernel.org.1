@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-52222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E0467FDE8C
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:39:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47447FDED6
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06FB9282615
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D881C20986
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8755E4F1F7;
-	Wed, 29 Nov 2023 17:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F2859149;
+	Wed, 29 Nov 2023 17:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAEgde2w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIyfzKp/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6583B34CF7;
-	Wed, 29 Nov 2023 17:39:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43073C433C8;
-	Wed, 29 Nov 2023 17:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F451B296;
+	Wed, 29 Nov 2023 17:49:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15191C433C7;
+	Wed, 29 Nov 2023 17:49:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701279592;
-	bh=3J4iQaKQJl07LgfKQzir6Zof3M/XrEMBbmsjffBPgYY=;
+	s=k20201202; t=1701280184;
+	bh=Vv2kg7tUugR+HRvGHfArl3hiwfBQKgqlPjyZTkGiqMA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WAEgde2wk9nC92RYQyrxsBe6hLqet/k4QjCU4bAKmrJX9KaZI2kLiGd6P+lb9eInl
-	 FOkeyU38MPheNp+l5PDn1w5L84iPSbyXo3rHUZal1levE+PmtFXBH32Xh5KchymOQU
-	 gAnz6PFUgYuHVcUetb7aj56mjnpE0hRAjB4CDroZKnPVTBZ9ji51mNbx+2Y54ZF0j7
-	 +zv51gQOFmteTeahubKKCY3ZVI+pJ7AZvPr3aSXFJsX94tBX0u91/OS1AWFgIgUCRo
-	 AIJwYf7JfR6Q424+3Rm8le5ETf7TF9OyjkeagRnjcgJkTwPT/f+aqv1R3DZ+AUmaxw
-	 fzhC/adMdSt6A==
-Date: Wed, 29 Nov 2023 09:39:51 -0800
+	b=vIyfzKp/JUZx7ipcA63+BeDgfzWutCphqYFFS4V5ds5KbiDdmM6s/LvIAVXc14eIS
+	 5+q/A4IGl8R+xzaEuA3r5I6mzTgAboszbNeACRdFL2F8+OUIF/Ib/yCmxpGZ8PsVTL
+	 hQB0f1HptdILOjdbcEmfrqs61iFCL6QhS5bOlvAdDBOdXDazGUPLIeaz8JkBPP6XNq
+	 8VSSx8GSN4YqyIuhk+OZB170LdlcfvM6Y43NUPD8dM2KaPKTB0iCbGxvnPqgjNKKkf
+	 zBoE7FeM4EeFKkNosnPs+wC7XSOtFZHRpbgpF2fDqKVHeEgs8VPGWRgZemieJupDf1
+	 mCSz1Y6958E3A==
+Date: Wed, 29 Nov 2023 09:49:43 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Michalik <michal.michalik@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
- arkadiusz.kubalewski@intel.com, jonathan.lemon@gmail.com,
- pabeni@redhat.com, poros@redhat.com, milena.olech@intel.com,
- mschmidt@redhat.com, linux-clk@vger.kernel.org, bvanassche@acm.org,
- davem@davemloft.net, edumazet@google.com
-Subject: Re: [PATCH RFC net-next v4 2/2] selftests/dpll: add DPLL system
- integration selftests
-Message-ID: <20231129093951.3be1bd8b@kernel.org>
-In-Reply-To: <20231123105243.7992-3-michal.michalik@intel.com>
-References: <20231123105243.7992-1-michal.michalik@intel.com>
-	<20231123105243.7992-3-michal.michalik@intel.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+ donald.hunter@redhat.com
+Subject: Re: [RFC PATCH net-next v1 0/6] tools/net/ynl: Add dynamic selector
+ for options attrs
+Message-ID: <20231129094943.13f1ae0c@kernel.org>
+In-Reply-To: <m2bkbc8pim.fsf@gmail.com>
+References: <20231129101159.99197-1-donald.hunter@gmail.com>
+	<20231129080943.01d81902@kernel.org>
+	<m2bkbc8pim.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,74 +55,93 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 23 Nov 2023 05:52:43 -0500 Michal Michalik wrote:
-> The tests are written in Python3 (3.7+) and pytest testing framework.
-> Framework is basing on the ynl library available in the kernel tree
-> at: tools/net/ynl
-
-LGTM!
-
-Somewhat tangential question, a nit, and a comment..
- 
-> The DPLL system integration tests are meant to be part of selftests, so
-> they can be build and run using command:
->   make -C tools/testing/selftests
+On Wed, 29 Nov 2023 16:58:57 +0000 Donald Hunter wrote:
+> rt_link shares attribute-sets between different kinds of link so I think
+> that rules out putting the key on the attribute-set. I think we may also
+> see reuse across stats attribute sets in tc.
 > 
-> Alternatively, they can be run using single command [1]:
->   make kselftest
+> FWIW I initially considered avoiding a selector list by using a template
+> to generate the attribute set name, but that broke pretty quickly.
+
+Ah :(
+
+> It seems reasonable to pull the selector list out of line because
+> they do get big, e.g. over 100 lines for tc "options".
 > 
-> If we want to run only DPLL tests, we should set the TARGETS variable:
->   make -C tools/testing/selftests TARGETS=drivers/net/netdevsim/dpll
+> My preference is 1, probably including a fallback to "binary" if there
+> is no selector match.
+
+Are there any "nests" that need a real binary type? An actual byte
+array? Or are these all structs? If the latter then fixed-header
+covers it.
+
+> I think that once you have broken out to a sub-message, they're no
+> longer "nested-attributes" and we should maybe reuse "attribute-set".
+
+Good point.
+
+> I don't think we can reuse "sub-type" because the schema for it is the
+> set of netlink type names, not a free string. Maybe we add "sub-message"
+> instead?
+
+Sounds good.
+
+> So how about this:
 > 
-> They can also be run standalone using starter script:
->   ./run_dpll_tests.sh
+> attribute-sets:
+>   -
+>     name: outside-attrs
+>     attributes:
+>       ...
+>       -
+>          name: kind
+>          type: string
+>       -
+>          name: options
+>          type: sub-message
+>          sub-message: inside-msg
+>          selector: kind
+>     ...
+>   -
+>     name: inside-attrs:
+>     attributes:
+>       ...
 > 
-> There is a possibliy to set optional PYTEST_PARAMS environment variable
-> to set the pytest options, like tests filtering ("-k <filter>") or
-> verbose output ("-v").
+> sub-messages:
+>   -
+>     name: inside-msg
+>     formats:
+>       -
+>         value: some-value
+>         fixed-header: struct-name
+>       -
+>         value: other-value
+>         fixed-header: struct-name-two
+>         attribute-set: inside-attrs
+>       -
+>         value: another-one
+>         attribute-set: inside-attrs
+>   -
+>     name: different-inside-msg
+>     ...
 > 
-> [1] https://www.kernel.org/doc/html/v5.0/dev-tools/kselftest.html
+> operations:
+>   ...
 
-nit: s/v5.0/v6.6/ ? Or /v5.0/latest/
+LG!
 
-Did you try to run it in vmtest or virtme-ng?
-https://www.youtube.com/watch?v=NT-325hgXjY
-https://lpc.events/event/17/contributions/1506/attachments/1143/2441/virtme-ng.pdf
+> I cannot think of a better name than "formats" so happy to go with that.
 
-I'm thinking of using those for continuous testing, curious all 
-the Python setup works okay with them.
+Or maybe "variants" ?
 
-> +@pytest.fixture(scope="class", params=((0,), (1, 0), (0, 1)))
+> Did you want an explicit "list:" in the yaml schema?
 
-We have both uses of pytest and unittest in the kernel:
+You mean instead of the "formats" or in addition somewhere?
+Under sub-messages?
 
-$ git grep --files-with-matches '^import .*unittest'
-scripts/rust_is_available_test.py
-tools/crypto/ccp/test_dbc.py
-tools/perf/pmu-events/metric_test.py
-tools/testing/kunit/kunit_tool_test.py
-tools/testing/selftests/bpf/test_bpftool.py
-tools/testing/selftests/tpm2/tpm2.py
-tools/testing/selftests/tpm2/tpm2_tests.py
+The "formats" is basically a "list", just feels less artificial
+to call it something else than "list". No strong preference, tho.
 
-$ git grep --files-with-matches '^import .*pytest'
-scripts/kconfig/tests/conftest.py
-tools/testing/selftests/drivers/sdsi/sdsi.sh
-tools/testing/selftests/drivers/sdsi/sdsi_test.py
-tools/testing/selftests/hid/tests/base.py
-tools/testing/selftests/hid/tests/conftest.py
-tools/testing/selftests/hid/tests/test_gamepad.py
-tools/testing/selftests/hid/tests/test_mouse.py
-tools/testing/selftests/hid/tests/test_multitouch.py
-tools/testing/selftests/hid/tests/test_sony.py
-tools/testing/selftests/hid/tests/test_tablet.py
-tools/testing/selftests/hid/tests/test_usb_crash.py
-tools/testing/selftests/hid/tests/test_wacom_generic.py
-
-unittest seems a bit more popular but pytest does seem like
-a better fit indeed.
-
-Did you see what the sdsi test does? It seems to assume everything 
-is installed locally, without the venv. I wonder if that may be simpler
-to get going with vmtest?
+If you mean under "sub-messages" - I can't think of any extra property
+we may want to put there. So going directly to entries seems fine.
 
