@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B170B7FDF33
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:18:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 883BE7FDF3E
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BDD8B2100F
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:18:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B0B7B20E2B
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65E55C3F4;
-	Wed, 29 Nov 2023 18:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA58F5C90A;
+	Wed, 29 Nov 2023 18:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCngQQxb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WjvcKD6R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E87A3;
-	Wed, 29 Nov 2023 10:18:48 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9fffa4c4f43so7474466b.3;
-        Wed, 29 Nov 2023 10:18:48 -0800 (PST)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA221111;
+	Wed, 29 Nov 2023 10:22:32 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-54b0c7987easo140334a12.3;
+        Wed, 29 Nov 2023 10:22:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701281927; x=1701886727; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701282151; x=1701886951; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+oxFI2xDlsJXdq2twNcWIhhbiyZKz5nGCnvY004qL9Y=;
-        b=jCngQQxbrJ/tnNdZNeiFS6J3A8ITLbAbQ4eAg9O6doogvNeTjSZaTJ7BJytEZGKYkW
-         apFyuxWA3uynA0fjVHhVz+jDxLguRoAzsGIaA01QCEkjeXUZtmxmrJhhmWOcC3bJAZzq
-         YjyorhBr5Pl5aITlL3N6MW42oGvOi8Y4rBH+eILYT6Lu2wH35G4fWkQZlIYJLTzMdtnI
-         C9PEbcqS2UnsuopE35AjXh8LZHDLW5TtCSNldXI4ChQgIaUhteOzTY9/VkSAMatSg/Z0
-         vCkfAbk/u8LoRB+m6sJ1XhXMqXTaDo7rZ+9EV2kVHjbjbg+E4u1Lmyv0aVb3lC/G5zZw
-         1HPg==
+        bh=kg1pvQxZr0Yp+vscQfTgOv58nNrXqVZgw3mSxR0cbeA=;
+        b=WjvcKD6REJ2sJVMH+ZTqq/472Eds/jXeZP7LZuN7V6gCQBAL04obn8w8wgpiuRWfik
+         L6fLQXdzf2fGXfy8TaoCAv1Wwzw/iC+zui/FqWBkpmACPFdjtWCy1WcSdCpZFQ+Jgrfw
+         Ivl+wZKEVTXsoaig0F4BhqO6GBVwEPYtkOrBD+M40owoCWY7hvaX7rWL6jb5suBTKwGB
+         pL6E26PfHTvssvD0sIaBT+ehjcLKhKGls/5Hhob6a0FCGybNnOHjRpO3mirc++bMheeQ
+         M9zQkVG2Qx+V3np0SKSes2iW44rAHCIieo5eM14jCtUb3OpuJ3yZA9wrgMdzEN/p1JHZ
+         oPyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701281927; x=1701886727;
+        d=1e100.net; s=20230601; t=1701282151; x=1701886951;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+oxFI2xDlsJXdq2twNcWIhhbiyZKz5nGCnvY004qL9Y=;
-        b=N1k849lZyuqYZxrHb3NcqJmS0F77G8mvcw0vt+vMnsOpO1/wQ8e9UUjk0+DKNeVWnS
-         CWhL6akRbWwS3DkoKqM+H3xiHfW95tt3Tf7C/pQHPKXxVCRefBYb5maIAHKYlIUuMxMr
-         BCxhrCRuNya1sZ/EBaln5mQPUQUG/4T/3Hl25u+jNSrZEJZ5PxdHehyUW5NysOuqRYmR
-         6SAtYW+zBsJaJbOLoK198eU+HunBdLAMJeRw7XGMJtjQ9tAgrGQ73K/6jiFIEC7WrrRE
-         oeij9OYqm/WZWtPT7c3oURwOL67eSUFBTgktTHYu2Hc3DlunajooscgU018eRNOIQ4f5
-         3Kcw==
-X-Gm-Message-State: AOJu0YzCPpXqIAUFMp3BVpPNM5m1EJFgTI6fuQ5G4XZqRtCvfPr9u1g+
-	XEN0zfIsXCcyFchXCTuEyGY=
-X-Google-Smtp-Source: AGHT+IGiIg549aZpIYoA3pve4OmRttOCyYE1U0jSAOSKby4WAR65DFIaa5YMrWhY6o6QqTauDVhqOw==
-X-Received: by 2002:a17:906:b248:b0:a04:cc0e:ff3b with SMTP id ce8-20020a170906b24800b00a04cc0eff3bmr14594160ejb.27.1701281926915;
-        Wed, 29 Nov 2023 10:18:46 -0800 (PST)
+        bh=kg1pvQxZr0Yp+vscQfTgOv58nNrXqVZgw3mSxR0cbeA=;
+        b=uVNq3PZiGVauXxHvPRWf/CYXdXKI/mBR5hsp3UslMDDghPBe3WLApLd2rGxb+xT7G+
+         EiKz1eCSPwXBQynTLnHGYKTmNulU8QTazhst0r25s9JCD0G+ZVghSDqfHChcZlqZh64b
+         Z8XqOmy+gXrTC+zliIRSv3ZuhP0EqeQTKXh6ETbWHFYXO6Ejt/1ydieJwBiotGLT05bF
+         FTmAYR7XMosTxADD8F+mt5tZgHpOZ0hlG/9AZIf6+Bo7lEIVmg/sFa+buVN8Xw4Jg9Tu
+         7xH+PdUIHiAMJtdJalYYS0glE+R0X+9KaYHdbHEjoikdxeDnrahUMAZc4mJwBkA3aum/
+         Vezg==
+X-Gm-Message-State: AOJu0YxVUxSgaKnU9YYBpWmDZ8P/l8KoXJFfLAWMQKrBe/MY/FTi2zxB
+	Zh8unm5FH1DwokEyvKT+oVHhpHrOt0jMOA==
+X-Google-Smtp-Source: AGHT+IHMtF40HxlvRo+APB+jPpalwBuJqn3SbBJUjS6GNEA8Z0uVn10sTkcN1aaginhl4c9XoSsv2A==
+X-Received: by 2002:aa7:d30f:0:b0:54b:1530:df8 with SMTP id p15-20020aa7d30f000000b0054b15300df8mr11058630edq.22.1701282151158;
+        Wed, 29 Nov 2023 10:22:31 -0800 (PST)
 Received: from skbuf ([188.26.185.12])
-        by smtp.gmail.com with ESMTPSA id u25-20020a17090657d900b0098ec690e6d7sm8119082ejr.73.2023.11.29.10.18.44
+        by smtp.gmail.com with ESMTPSA id s3-20020a056402014300b00543b2d6f88asm7570447edu.15.2023.11.29.10.22.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 10:18:45 -0800 (PST)
-Date: Wed, 29 Nov 2023 20:18:42 +0200
+        Wed, 29 Nov 2023 10:22:30 -0800 (PST)
+Date: Wed, 29 Nov 2023 20:22:27 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Linus Walleij <linus.walleij@linaro.org>
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -71,11 +71,13 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
 	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH net-next v8 5/9] ARM64: dts: marvell: Fix some common
- switch mistakes
-Message-ID: <20231129181842.74zihcd642lx5zgo@skbuf>
+Subject: Re: [PATCH net-next v8 4/9] ARM: dts: nxp: Fix some common switch
+ mistakes
+Message-ID: <20231129182227.r226qbtqsubgaoy7@skbuf>
 References: <20231114-marvell-88e6152-wan-led-v8-0-50688741691b@linaro.org>
- <20231114-marvell-88e6152-wan-led-v8-5-50688741691b@linaro.org>
+ <20231114-marvell-88e6152-wan-led-v8-0-50688741691b@linaro.org>
+ <20231114-marvell-88e6152-wan-led-v8-4-50688741691b@linaro.org>
+ <20231114-marvell-88e6152-wan-led-v8-4-50688741691b@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,76 +86,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231114-marvell-88e6152-wan-led-v8-5-50688741691b@linaro.org>
+In-Reply-To: <20231114-marvell-88e6152-wan-led-v8-4-50688741691b@linaro.org>
+ <20231114-marvell-88e6152-wan-led-v8-4-50688741691b@linaro.org>
 
-On Tue, Nov 14, 2023 at 12:36:00AM +0100, Linus Walleij wrote:
-> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-> index 9eab2bb22134..66cd98b67744 100644
-> --- a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-> +++ b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-> @@ -304,7 +304,13 @@ phy1: ethernet-phy@1 {
->  		reg = <1>;
->  	};
->  
-> -	/* switch nodes are enabled by U-Boot if modules are present */
-> +	/*
-> +	 * NOTE: switch nodes are enabled by U-Boot if modules are present
-> +	 * DO NOT change this node name (switch0@10) even if it is not following
-> +	 * conventions! Deployed U-Boot binaries are explicitly looking for
-> +	 * this node in order to augment the device tree!
-> +	 * Also do not touch the "ports" or "port@n" nodes. These are also ABI.
-> +	 */
->  	switch0@10 {
->  		compatible = "marvell,mv88e6190";
->  		reg = <0x10>;
-> @@ -430,6 +436,7 @@ port-sfp@a {
->  		};
->  	};
->  
-> +	/* NOTE: this node name is ABI, don't change it! */
->  	switch0@2 {
->  		compatible = "marvell,mv88e6085";
->  		reg = <0x2>;
-> @@ -497,6 +504,7 @@ port@5 {
->  		};
->  	};
->  
-> +	/* NOTE: this node name is ABI, don't change it! */
->  	switch1@11 {
->  		compatible = "marvell,mv88e6190";
->  		reg = <0x11>;
-> @@ -622,6 +630,7 @@ port-sfp@a {
->  		};
->  	};
->  
-> +	/* NOTE: this node name is ABI, don't change it! */
->  	switch1@2 {
->  		compatible = "marvell,mv88e6085";
->  		reg = <0x2>;
-> @@ -689,6 +698,7 @@ port@5 {
->  		};
->  	};
->  
-> +	/* NOTE: this node name is ABI, don't change it! */
->  	switch2@12 {
->  		compatible = "marvell,mv88e6190";
->  		reg = <0x12>;
-> @@ -805,6 +815,7 @@ port-sfp@a {
->  		};
->  	};
->  
-> +	/* NOTE: this node name is ABI, don't change it! */
->  	switch2@2 {
->  		compatible = "marvell,mv88e6085";
->  		reg = <0x2>;
+On Tue, Nov 14, 2023 at 12:35:59AM +0100, Linus Walleij wrote:
+> Fix some errors in the Marvell MV88E6xxx switch descriptions:
+> - switch0@0 is not OK, should be ethernet-switch@0
+> - ports should be ethernet-ports
+> - port should be ethernet-port
+> - phy should be ethernet-phy
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
 
-I wouldn't spam the device tree with all these comments; doing so gives
-a false sense of completeness. Code inspection shows that the "port-sfp@a"
-node name is also established ABI, but there isn't any explicit comment
-to point that out. I think a single comment that uses plural to refer to
-all nodes should be enough.
-
-Also, doesn't the comment go better along with the patch that changes
-the switch compatible strings, rather than with the patch that actually
-fixes what can be fixed (ethernet-phy node names)?
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
