@@ -1,109 +1,94 @@
-Return-Path: <netdev+bounces-52231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF297FDF12
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:07:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 269697FDF16
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 19:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66D08B211B7
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:06:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 586D81C20AA1
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B225C3C0;
-	Wed, 29 Nov 2023 18:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C72E5C3C4;
+	Wed, 29 Nov 2023 18:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Viv2jJJ1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="04b8Q81K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C34AA8;
-	Wed, 29 Nov 2023 10:06:51 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-409299277bbso135015e9.2;
-        Wed, 29 Nov 2023 10:06:51 -0800 (PST)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21228B9
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:09:28 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-54b0c368d98so466a12.1
+        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 10:09:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701281210; x=1701886010; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WP/VskNJd0LA4E1Mk07bsXVasJaRqm4qXuSnlHideFE=;
-        b=Viv2jJJ14cnHsSiQMdm1UCPNoju6w1pIshvNP6BEWSaN3RSOoa9mQyjakwA4bgBSyg
-         6Mg4K1CS6Y/D/g3yaNS4mm+yFkCzz79WdiFAex+Dl8mgLPL5voskWEbOlQTDfkld2+oe
-         0Edxx+M/3b9f1twkAJCtMcNfiavOOI1y+sl0cGTY8hHeoNT405g8Z2xBPGIucs6nPgsK
-         9Y0IRnKlFVatmU3WncOStZK7KonitVI6hdDKL0X+F80yxO1Fv2s77Efk7a95/c1PM5vq
-         uVx7EtYL5QIcx4TkqlZXodnp5DlXsJKSTqKqzVIXDL9vrDzpKfoHYy5HILkF0WDNY4if
-         TybQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701281210; x=1701886010;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1701281366; x=1701886166; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WP/VskNJd0LA4E1Mk07bsXVasJaRqm4qXuSnlHideFE=;
-        b=sA04V7+YxfPptJlgNhhAxtcjMv/7Ylz3v7WfPsUhb4zyfHuLttBfPt5NjkBf+Qkdng
-         UYKmr8LDC1O+Q4MP2RtG2xwHSzo8aJMfbDaFj6oG/JEERK+F/bLMuUoXl0T8RpZJIqZ+
-         6eSEV0KV9Apyrh7kIYdxXMtwfdroJzHrDVMozyaCkkCe08a0PQPnBN+L87DjSuxeWRd9
-         Epa9nd03t5f19RE6vgUIU9sfDnCcl/988fZkVoZMCIiYfr7kVNE7+MWKkn9tnBZjQJm5
-         Co7B0E7erGJ/LnDG0VM1mWiIn3O+bajIPUhtNk6X9Q9GLHxI8KnNBaIWo2sN0IN0KoX/
-         tXcA==
-X-Gm-Message-State: AOJu0YyDfuMMclNTgB1tcUsE6MoPlk1kmEDHEyAEmLPD+buJFEY6w6AY
-	ztj+gh0UYTXm1iggP8JMpLI=
-X-Google-Smtp-Source: AGHT+IGCqKmEQmXCHAhNv3R9Y7f8whXFQ6c5b+m19lU3XNKj7aXxtJJZw2vSzghtWrgTqB2kFIERSg==
-X-Received: by 2002:a05:600c:188a:b0:40b:5021:f057 with SMTP id x10-20020a05600c188a00b0040b5021f057mr3307729wmp.11.1701281209422;
-        Wed, 29 Nov 2023 10:06:49 -0800 (PST)
-Received: from skbuf ([188.26.185.12])
-        by smtp.gmail.com with ESMTPSA id d18-20020a05600c34d200b0040b2b38a1fasm3101035wmq.4.2023.11.29.10.06.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 10:06:45 -0800 (PST)
-Date: Wed, 29 Nov 2023 20:06:42 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH net-next v9 3/5] dt-bindings: net: ethernet-switch:
- Accept special variants
-Message-ID: <20231129180642.q5ybndg5fp5c4udg@skbuf>
-References: <20231127-marvell-88e6152-wan-led-v9-0-272934e04681@linaro.org>
- <20231127-marvell-88e6152-wan-led-v9-0-272934e04681@linaro.org>
- <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
- <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
+        bh=9YPZxso0QzNj3gqcGGnNvHk0pzKPfOYD5SPW1T+A/ws=;
+        b=04b8Q81KSvsKQJIr2Te+mfZoEcAHDHyHsjycrRAolZzPGhXM25XYFF1Uqs9MjADf/t
+         dyZ4Xdv4ryaQE6/ar2C5pnG96McgeQwyODgjbzxOTmpkHf+V4EZNM4OhQL9HBnqVmJ69
+         hGeAjtpmrCHm24SZU1qmm4euTEsMkYN3qEs0rGVJ81wrkS0Nlso5vFmFNa0SBoiUKs8Y
+         IQxib3K+ZZ6e5BSzkL7C3jFOfL57KyB/oODB/pkcGoPXejC1h2mzuwtFGlH5fEKJd7Px
+         0R6xmQcNWqTyIjK8gsbZumazpyZwpG9NV2Yckrq3mHN253isf7XN1yPZpM5xWRb0Vlv2
+         NYbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701281366; x=1701886166;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9YPZxso0QzNj3gqcGGnNvHk0pzKPfOYD5SPW1T+A/ws=;
+        b=SvKi1ibmqOM12o5Ug//iuUt9Q6Mw23LfIgqQeGjouJ5aYNQgd3SpPzjCOTEwixfmEd
+         iD4m4jc6Xy75k4CN22pYr7DNjnpeWh09fP9WsJGBg4bVLWWraQHZpCPkoS49mCpn3NZU
+         6GuzQac3Cf7w4ACqZPaV/AAtuaIW4qKpAo0pDoWwj/+1HZ/ddS/HCeUEgcx7eBusIL9e
+         fHzcqPK6Y3REOi3ByU7wt6+D0VJeBao0eCWZgF6RezqGZx+3xiNclOg4HWofu1mZdYQ0
+         EG1F32MNGR/uzaFXSF0vVwE9uyRgtJGBsLtppTtdEbWe6jJbKIbFn6FfSmmh2TsUwITM
+         ZAeA==
+X-Gm-Message-State: AOJu0Yxaql4L0eTIpGEhdPELLBk2dvcR2/PrS9FLYL7EiaD4ZGLqDKYl
+	cTThcwKdK6Iqz2URQs9toSTPUYXtlrR7WXNHfcvu5Q==
+X-Google-Smtp-Source: AGHT+IGiyVfo0h1STetqMMeNh8jBnd+AcgPt9CyQh2xWsa4CcDK38D7CVSk+TcXDS8kdKV2WvAN1e4fYH4EH4oFMgT4=
+X-Received: by 2002:a05:6402:430e:b0:54b:67da:b2f with SMTP id
+ m14-20020a056402430e00b0054b67da0b2fmr635103edc.7.1701281366310; Wed, 29 Nov
+ 2023 10:09:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
- <20231127-marvell-88e6152-wan-led-v9-3-272934e04681@linaro.org>
+References: <20231129165721.337302-1-dima@arista.com> <20231129165721.337302-7-dima@arista.com>
+In-Reply-To: <20231129165721.337302-7-dima@arista.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Nov 2023 19:09:15 +0100
+Message-ID: <CANn89iJcfn0yEM7Pe4RGY3P0LmOsppXO7c=eVqpwVNdOY2v3zA@mail.gmail.com>
+Subject: Re: [PATCH v4 6/7] net/tcp: Store SNEs + SEQs on ao_info
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
+	Dmitry Safonov <0x7f454c46@gmail.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
+	Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 27, 2023 at 04:43:06PM +0100, Linus Walleij wrote:
-> Accept special node naming variants for Marvell switches with
-> special node names as ABI.
-> 
-> This is maybe not the prettiest but it avoids special-casing
-> the Marvell MV88E6xxx bindings by copying a lot of generic
-> binding code down into that one binding just to special-case
-> these unfixable nodes.
-> 
-> Reviewed-by: Rob Herring <robh@kernel.org>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
+On Wed, Nov 29, 2023 at 5:57=E2=80=AFPM Dmitry Safonov <dima@arista.com> wr=
+ote:
+>
+> RFC 5925 (6.2):
+> > TCP-AO emulates a 64-bit sequence number space by inferring when to
+> > increment the high-order 32-bit portion (the SNE) based on
+> > transitions in the low-order portion (the TCP sequence number).
+>
+> snd_sne and rcv_sne are the upper 4 bytes of extended SEQ number.
+> Unfortunately, reading two 4-bytes pointers can't be performed
+> atomically (without synchronization).
+>
+> In order to avoid locks on TCP fastpath, let's just double-account for
+> SEQ changes: snd_una/rcv_nxt will be lower 4 bytes of snd_sne/rcv_sne.
+>
 
-Not great, not terrible.
+This will not work on 32bit kernels ?
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Unless ao->snd_sne and ao->rcv_sneare only read/written under the
+socket lock (and in this case no READ_ONCE()/WRITE_ONCE() should be
+necessary)
 
