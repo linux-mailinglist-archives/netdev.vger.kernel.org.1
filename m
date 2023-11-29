@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-51933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-51934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F9F7FCC14
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:55:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB0C7FCC50
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 02:26:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07C2F283354
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 00:55:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F37B1C20B2A
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 01:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFC110E7;
-	Wed, 29 Nov 2023 00:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04C2185B;
+	Wed, 29 Nov 2023 01:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NBZBGb/8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZRB8DAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 655DB170B
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6d81fc0ad6eso2084652a34.2
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 16:54:52 -0800 (PST)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB357F5;
+	Tue, 28 Nov 2023 17:26:00 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5c2066accc5so4215763a12.3;
+        Tue, 28 Nov 2023 17:26:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1701219291; x=1701824091; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
-        b=NBZBGb/8+4eEITunAzUMzigxc8uz6j8Dg75wyZQthgQUON4ZqrN+peLBlg8XoqnyxL
-         VzfbbSiO2lV6MNm9UL5EY3n8AZSt0kSidXdfjXdCir/k5UuGgrvCx6BJzGmE0WpMrqAg
-         scj6RRezMFx8SkhZqpj/Zz8ZGtyuCss6g3c/ywM4zwBSg1maf2tINNcQJOgAz7bA2zXp
-         KgKhrCTKmkjAsmCBk96zKknUm3+Q3dRWHkyW9UO5fKyYTAfTmbkzkWCTNEbDyVa8Y2HG
-         451mq05zv3EOdmPVl+h/+cRaKbiHjyXaeZgbzOMoKFUqItjWAfFRqXT0AUSxxcAymGRF
-         7SPw==
+        d=gmail.com; s=20230601; t=1701221160; x=1701825960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SVOFTCg/xZX2VkbDOt6Fpz6uOzcvRQ3a4F6VRrWEkpU=;
+        b=dZRB8DAjPP0rzl+m8tI+W+qfMXGeyI7c6RPwHMw/ahuKDnC29dkegJYZzv2eQeO3Ou
+         cSc4smqg9xxWxWfSlbFitjUYbiFdaNBNxXtspEPODYUD/3vktS4svcaiGistlgdyrYA+
+         laDdp6bYVVn5qHegZjU1q7ktNJzwUgUx0M61gLlH7ce2njZWBZbtSTmqmY3LCGYAYbtG
+         HXEM+Cv6+o+Qi8SPoWrZLkMX8eo7mkkgrLOvpPXpYOBlXy+6/9sd1upRdKoB9MAAJ0BJ
+         6gTZ3yp9f6CEVBkycvE55q87c0IU12slvkxzNvNJZEWOOn+Y+tMbtFb4BRrxFWLYaZmU
+         /3CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701219291; x=1701824091;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KD7A1Mi78WcdpTbacYeqydWRhhJC6MIZ9wADFHK3ceE=;
-        b=uGJ/xz9SoMBESn6vbKokXjlvd7Z+myeiLPSi1Zwe/lYhiMH7xk7eV6TtP9ELMi+Phr
-         JAeZ0xiw1OTEB0TK7IWOkw3ScC9hgiWVWINSTfqyyKr3zh7eJ71J7dgkVGeq9FJ3vfU9
-         X/RBfGTaIyuQ2Pdb4HwkNeqoOXoTZPqIPu4eIXTHQqzM7ZxYe71a/0F2r8PJwm7tDZ+b
-         Z/G2eSifqQpUhcEJ8lc5NRmLzASqofqmFhcQLFmgZP761zN+UEbWl9nWcg5xltp+4ipC
-         3joh1sHNi8QVdRmtFzEaGvvWtz0raAaEtHILHRpRfMr/rTpHtGyX2/YJCim+8Qp+WW5F
-         49sw==
-X-Gm-Message-State: AOJu0YyslHKt4hMquyux2ZJgu5Zqxk0q7fjCJqqPr40rftEND4Z3vfs8
-	qPVg+Vgsz3aQzHrH7zQpiOTcHQ==
-X-Google-Smtp-Source: AGHT+IGKiwEuykqxh29J1y1VqvKSA4pC1uEUHtE7SoQBvdHo0iXpRqPiFg8DX/ZmKtSwphh/2Jx77g==
-X-Received: by 2002:a05:6870:c690:b0:1fa:2f8:c734 with SMTP id cv16-20020a056870c69000b001fa02f8c734mr16951479oab.5.1701219291679;
-        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-134-23-187.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.134.23.187])
-        by smtp.gmail.com with ESMTPSA id b1-20020a056830344100b006d81e704023sm945291otu.2.2023.11.28.16.54.50
+        d=1e100.net; s=20230601; t=1701221160; x=1701825960;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SVOFTCg/xZX2VkbDOt6Fpz6uOzcvRQ3a4F6VRrWEkpU=;
+        b=anSwhm8f1dxEPT90XRH7dIg0sFTSzBTmfULkjDlTrkzZCFxa5m/aR7BrhGJMpZheYA
+         JBzte/NyV0l1FywNfT/vyMRGuJqUcHfG2czeoe7H6KoNHe8W/Vw5FegTsmJvnLJa16dt
+         Wzs4sUsQnfRdAkBkHV7JyYWffc4Qr1vfTv3xhVbqu1L214u/DvcHn9SvFu3SngrF4+/B
+         w0BWQ5Cqd3aWOt715KV255SL9t90pb8tkumRSanCmLhC820oCGmIFRtSKzuHFjI4f6it
+         FfqzLvWUWV5VZ5z7nYasFcmC6LDGTNjvAitoxqNcfsN6d3gDA0hX+qIz9s5cLtykswlG
+         M7og==
+X-Gm-Message-State: AOJu0YwOyp2JphO4niGjQcwylBNQilVmq+txAVLx1rDHA3xYVz96uAd+
+	pdQW0Z10S0g7xC8dNgum0sw=
+X-Google-Smtp-Source: AGHT+IEQhA9RfxAKATEO7MpYaUFnB5Crfa8RCeYldiz63/kgE6FE1YSDWyD9IEqSlqAh0wDdjJ4qAw==
+X-Received: by 2002:a17:90b:3ec3:b0:285:9424:4a4e with SMTP id rm3-20020a17090b3ec300b0028594244a4emr15445544pjb.38.1701221160080;
+        Tue, 28 Nov 2023 17:26:00 -0800 (PST)
+Received: from john.lan ([2605:59c8:148:ba10:9a79:36c7:502e:91e9])
+        by smtp.gmail.com with ESMTPSA id gb23-20020a17090b061700b00285114454b4sm122757pjb.22.2023.11.28.17.25.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Nov 2023 16:54:51 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1r88qo-005kIY-2m;
-	Tue, 28 Nov 2023 20:54:50 -0400
-Date: Tue, 28 Nov 2023 20:54:50 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, akpm@linux-foundation.org,
-	alex.williamson@redhat.com, alim.akhtar@samsung.com,
-	alyssa@rosenzweig.io, asahi@lists.linux.dev,
-	baolu.lu@linux.intel.com, bhelgaas@google.com,
-	cgroups@vger.kernel.org, corbet@lwn.net, david@redhat.com,
-	dwmw2@infradead.org, hannes@cmpxchg.org, heiko@sntech.de,
-	iommu@lists.linux.dev, jasowang@redhat.com,
-	jernej.skrabec@gmail.com, jonathanh@nvidia.com, joro@8bytes.org,
-	kevin.tian@intel.com, krzysztof.kozlowski@linaro.org,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-rockchip@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, lizefan.x@bytedance.com,
-	marcan@marcan.st, mhiramat@kernel.org, mst@redhat.com,
-	m.szyprowski@samsung.com, netdev@vger.kernel.org,
-	paulmck@kernel.org, rdunlap@infradead.org, robin.murphy@arm.com,
-	samuel@sholland.org, suravee.suthikulpanit@amd.com,
-	sven@svenpeter.dev, thierry.reding@gmail.com, tj@kernel.org,
-	tomas.mudrunka@gmail.com, vdumpa@nvidia.com,
-	virtualization@lists.linux.dev, wens@csie.org, will@kernel.org,
-	yu-cheng.yu@intel.com
-Subject: Re: [PATCH 00/16] IOMMU memory observability
-Message-ID: <20231129005450.GH1312390@ziepe.ca>
-References: <20231128204938.1453583-1-pasha.tatashin@soleen.com>
- <CAJD7tkb1FqTqwONrp2nphBDkEamQtPCOFm0208H3tp0Gq2OLMQ@mail.gmail.com>
- <CA+CK2bB3nHfu1Z6_6fqN3YTAzKXMiJ12MOWpbs8JY7rQo4Fq0g@mail.gmail.com>
- <CAJD7tkZZNhf4KGV+7N+z8NFpJrvyeNudXU-WdVeE8Rm9pobfgQ@mail.gmail.com>
- <20231128235214.GD1312390@ziepe.ca>
- <CAJD7tkbbq6bHtPn7yE3wSS693OSthh1eBDvF-_MWZfDMXDYPKw@mail.gmail.com>
- <20231129002826.GG1312390@ziepe.ca>
- <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
+        Tue, 28 Nov 2023 17:25:59 -0800 (PST)
+From: John Fastabend <john.fastabend@gmail.com>
+To: martin.lau@kernel.org,
+	jakub@cloudflare.com
+Cc: john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf v4 0/2] sockmap fix for KASAN_VMALLOC and af_unix
+Date: Tue, 28 Nov 2023 17:25:55 -0800
+Message-Id: <20231129012557.95371-1-john.fastabend@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJD7tkbxhK7XFcf7h+XE2poNuOsFBQFrxZyeFr=9DoEG_acssA@mail.gmail.com>
 
-On Tue, Nov 28, 2023 at 04:30:27PM -0800, Yosry Ahmed wrote:
-> On Tue, Nov 28, 2023 at 4:28 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Nov 28, 2023 at 04:25:03PM -0800, Yosry Ahmed wrote:
-> >
-> > > > > Right, but as I mention above, if userspace starts depending on this
-> > > > > equation, we won't be able to add any more classes of "secondary" page
-> > > > > tables to SecPageTables. I'd like to avoid that if possible. We can do
-> > > > > the subtraction in the kernel.
-> > > >
-> > > > What Sean had suggested was that SecPageTables was always intended to
-> > > > account all the non-primary mmu memory used by page tables. If this is
-> > > > the case we shouldn't be trying to break it apart into finer
-> > > > counters. These are big picture counters, not detailed allocation by
-> > > > owner counters.
-> > >
-> > > Right, I agree with that, but if SecPageTables includes page tables
-> > > from multiple sources, and it is observed to be suspiciously high, the
-> > > logical next step is to try to find the culprit, right?
-> >
-> > You can make that case already, if it is high wouldn't you want to
-> > find the exact VMM process that was making it high?
-> >
-> > It is a sign of fire, not a detailed debug tool.
-> 
-> Fair enough. We can always add separate counters later if needed,
-> potentially under KVM stats to get more fine-grained details as you
-> mentioned.
-> 
-> I am only worried about users subtracting the iommu-only counter to
-> get a KVM counter. We should at least document that  SecPageTables may
-> be expanded to include other sources later to avoid that.
+The af_unix tests in sockmap_listen causes a splat from KASAN_VMALLOC.
+Fix it here and include an extra test to catch case where both pairs
+of the af_unix socket are included in a BPF sockmap.
 
-Well, we just broke it already, anyone thinking it was only kvm
-counters is going to be sad now :) As I understand it was already
-described to be more general that kvm so probably nothing to do really
+Also it seems the test infra is not passing type through correctly when
+testing unix_inet_redir_to_connected. Unfortunately, the simple fix
+also caused some CI tests to fail so investigating that now.
 
-Jason
+v4: forgot to commit typo fix add that now (CI build failed)
+v3: drop unnecessary assignment (Martin) and rebase on latest selftests.
+v2: drop changes to dgram side its fine per Jakub's point it graps a
+    reference on the peer socket from each sendmsg.
+
+John Fastabend (2):
+  bpf: sockmap, af_unix stream sockets need to hold ref for pair sock
+  bpf: sockmap, add af_unix test with both sockets in map
+
+ include/linux/skmsg.h                         |  1 +
+ include/net/af_unix.h                         |  1 +
+ net/core/skmsg.c                              |  2 +
+ net/unix/af_unix.c                            |  2 -
+ net/unix/unix_bpf.c                           |  5 ++
+ .../selftests/bpf/prog_tests/sockmap_listen.c | 51 +++++++++++++++----
+ .../selftests/bpf/progs/test_sockmap_listen.c |  7 +++
+ 7 files changed, 56 insertions(+), 13 deletions(-)
+
+-- 
+2.33.0
+
 
