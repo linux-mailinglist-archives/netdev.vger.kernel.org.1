@@ -1,167 +1,167 @@
-Return-Path: <netdev+bounces-52129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352737FD6E6
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:38:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C072A7FD6E7
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 13:38:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DF66B216A6
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C296283555
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 12:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF510134A4;
-	Wed, 29 Nov 2023 12:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F0F14265;
+	Wed, 29 Nov 2023 12:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="cTa+qq/U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ab1Sqfj2"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2050.outbound.protection.outlook.com [40.107.7.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78081D4A
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 04:38:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NVWxsAPzbiqkbg/FGgM7XhaHUwF3Y11KRZUspBaqNdHC+SH/3GE7LhvAhDvKAIg1ss6gJTwRMG6bBcWObkNYzrQbWSHoBqMeJCHls/reYbX/pLNirzT1I9TNeVsI3+mszOhgvnid/Hq2rKQnSnQydpz2kIL14tYPcnPMJKahiXYrQOv8YJMw+qcFu9uBl8UeCWivwkd9tqGgiuwkC4hOgvdzSjhMVxLl63B/AHbLfxUyZqCe/xHUyjk9jGT9OHAI48mvSxXHstfAOrWxW045K73LpZ07oTlGNiH2RcR++5r7rO9jpQy/6IAag3z+pqa9rYVSx8ml0CRjSJP5MOjJ5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5ol2WTLvjy/VKOicQXryLtMK0iWdj8PwDAKwupG+ZII=;
- b=ef6/GWG3rG1bflpQnwlS0FZQACDS4ckBYeCFdUYI14HmtQ21zh2F4CtOWfAtOyTy4G2MSmzx7PXav8Owojeb+t/72iCFGP3UZZtiKXbcbgat9QaKc0s2qJx+f2mFKTCjJSpSWxZsedsZkaJmMxkvjbHQqred+fqWDL7dRDRbhsmkEM6jXgPj//fA9R9xS+YCaAzEyzW/TZOfzzVlx8WAotnc/pWhIS0153brZ2vLsVp8dQ/uAlyoV0V7Zjed2Oia+6Z3EdtGUTgCxwtCEcNU8aJYSIzPxznRK0UzjHIn+gUcMbwg8yJkjsBsxUl1bQd/N5UAdYKt95aczrDwH6MFGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ol2WTLvjy/VKOicQXryLtMK0iWdj8PwDAKwupG+ZII=;
- b=cTa+qq/UWUCt5Ux0ZrelESinw1zYQQrjb4Z1zeXHG6Men+wXzQevUQCY77+AZEVOw1ixFvfja1Eu5Vfgi1O8JRsJJxTFoq3/16xHQkeuu1iM2tTWiLwitWscPcy/SYxRlDNytcNRzDX+01Ml8znE2p1ePnm9zKh5v86Itb0016o=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS1PR04MB9382.eurprd04.prod.outlook.com (2603:10a6:20b:4da::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.21; Wed, 29 Nov
- 2023 12:38:22 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7046.015; Wed, 29 Nov 2023
- 12:38:22 +0000
-Date: Wed, 29 Nov 2023 14:38:19 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/8] DSA LED infrastructure, mv88e6xxx and
- QCA8K
-Message-ID: <20231129123819.zrm25eieeuxndr2r@skbuf>
-References: <20231128232135.358638-1-andrew@lunn.ch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231128232135.358638-1-andrew@lunn.ch>
-X-ClientProxiedBy: VI1PR06CA0171.eurprd06.prod.outlook.com
- (2603:10a6:803:c8::28) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CF1C1B297
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 12:38:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFD5C433C8;
+	Wed, 29 Nov 2023 12:38:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701261535;
+	bh=YRPmgyXmnqLz1Gklpj9zRIaCJd4+aKMKj1bXHQYDK2M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ab1Sqfj2yUckgCwxxT6h6QHlIZHnJcU3RukIWFlzdGyNJkIPO5tFBKi+g/cyBBHuv
+	 pHEN1otKZ20rY21owZpLSo1Chjo75m0OhzJffIIAPo57PjF6EZULlgnyoZ8jwgowKA
+	 kt/WZ0o/cDDPO8+sydvhB+ZbVY0iHeNcFK0JmMVif6tK96HvYvBz+8EZxL1ZjRDP3F
+	 kefgUk3n+g5Yz1bOOV5/23dEGFBxQMfeYM0dKEvPpOgd9dzrN5W6IeR1RrXy1t9aFe
+	 KdCuI1+4ICPvYC6a2ssJaXtInmFOFC4gD6pRdZW2P3VtZI9oBqj+qNM85/dLhqwKPi
+	 xYn+j9F1aL5dw==
+Message-ID: <e37e8d74-d741-44fb-9e28-2b9203331637@kernel.org>
+Date: Wed, 29 Nov 2023 14:38:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS1PR04MB9382:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7efd723f-c72b-4d7a-64f9-08dbf0d812ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	PJA2v5gq8ayeHpy9buUmN8l0hWO6SogxDNAkujHzxbaNupc9ktzSkd2tldG1IJOhPPrSqQiDlw47nUR4UcFOxZzcKROXlp9eV2w/142iFpapIU+uvjjyyOqmdAvlhuMc+AZdTM0gyhWDLkLhQP4YaZ4sLQJwnC9Q2NMNoASouFzJUchrogSH4tYmWfuVnBE7kSsBEIih0CDkKeBb2pWHOMQR6hUjhT94Hc+jktr/phfOXLZ4pPTyZ0w85ygLzcdNuESB4JWZKKd20mmTCRNLfpBxQ+RNDh0clTCndMnOg3UXQmWYzRKHkMJtS8Wr7cl6TjiZkuGVOCSrkLfja0N7Lr6neYOKWB213Wbpo8gncyepcTmpQUD2+YLCwlv5mITf4QubKR8jWMuv40GZuJwP23NT62UF5BQGWoFb1JVjtMiCMlZMO7wGQxcR3ufFHM/uXoDlSU1uBfyazUT2wJA4o54RnityuI4ouJ8u1dNiptsx/TU2YD+mLmzM4pk3IBz/ipUsTlqx77RyGhtoFBTJAYurYiVQQ+pPmv98HXYwBQ4jekZSxcl4WzleyaAP/0l5x0A9TTLNn9qwbqplS0zoVBq+IkSgzFjlk4Hpyv+lT7o=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(136003)(346002)(366004)(396003)(39860400002)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(26005)(1076003)(6512007)(9686003)(86362001)(38100700002)(6486002)(54906003)(5660300002)(966005)(41300700001)(2906002)(6666004)(6506007)(478600001)(4326008)(66476007)(8676002)(316002)(8936002)(6916009)(33716001)(66946007)(66556008)(44832011)(32563001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?0sCzslOtllvLfye+f2hDMR4XIyqNOLInMP7BeBYK8lDH/Ri3+uAYIFgJElTb?=
- =?us-ascii?Q?FqxzeAMKMmThvgc2OlBVksU/iQN33Q8QEQa5oJzci6F0NFwvAOvXl938oBWh?=
- =?us-ascii?Q?vd106D3WSbZMQvy5Ub5foN3cLkFhGmapX9KV81qKuaYjJOX23QiRkeKRihUr?=
- =?us-ascii?Q?xaNjmlMCQgGpQO5t67z3ENkS355QBP02ItHzFc0/Iyknyk1FnjavRAmFYWeJ?=
- =?us-ascii?Q?WabYG13AfqqxDduXCeuBtsEhcRQ2c9nL8y1LefVwsfwc/AJJMMOSKamz+6xB?=
- =?us-ascii?Q?Z0D58PLDDay89EXrLZF5PiwlmcAdPM4KIoxyeS6qqrNrsvE7g3H0wl1cRlQ0?=
- =?us-ascii?Q?DSEeOlENJGbSmOZyLEK3Blq5tgFGgNf9BiKmwxU/3oPNbaZad/mLjGY2iXEE?=
- =?us-ascii?Q?M+DNJ8LL+zTgQJvobkzEhepYlWt4qu4engBEfpQ9xLp9RrBNm7GbggxH8kh9?=
- =?us-ascii?Q?RsKJ5SaFSg9U8mS99fjnVqU65u4vudA8K3qh0rBT5QsmCluWWoCMFrPk+n74?=
- =?us-ascii?Q?dujFhjAQkMqhnLMWq58EvjNu/y3eCASZ/juxGmFTwJylOzqrnioZJWQSmtNM?=
- =?us-ascii?Q?aeBe3QXkmPK3X8cccB167NK1GMI9M6nINE26tXtVBxd3Bd5OUNVJDIdU0cWC?=
- =?us-ascii?Q?47bu9jJy5wPcGUWfO+2m3x2XghC1/EZPRbu471fZmQIfHxAIgxmVCnZRxPK8?=
- =?us-ascii?Q?yd6vGR6JmEXKz42/NL5Z6m/oYKCXG2hxkR4Hj8FWQAWWGbcMcBqVzz1e+BsE?=
- =?us-ascii?Q?eI+7akBlrqTrMv8mT+iPssoLYiuK3we8JMNz8WnsKPKXdtKXjV1PWocOQCYP?=
- =?us-ascii?Q?bGpJrZC5jujrreQv2BosJcXXtrAKdTDmAKZReAZnOMp4hkJEyNvUFAspl6DA?=
- =?us-ascii?Q?XQxcBNo5/Gb9tFZ4Vj/TzIRY9YXQJH1Z+AVCUKlsqTvBwBKB5ognopw6nogo?=
- =?us-ascii?Q?/47PIN6I9SrjBPpSR/oUn+Tw13H9ql4DMwekR37MjXuJ3Ds+6oKXpB/k7C4/?=
- =?us-ascii?Q?NByNR7FT44pVztpYo0myE5+OUzpZaq8S+BBk95OsXg285HZbWVKeJ/gKPyng?=
- =?us-ascii?Q?/YbQOzSEe1aCGGQfyIgoztn8i5tZRPq01oOi+FNYdVpYbtMMmht7YyaVupjg?=
- =?us-ascii?Q?r5LN2WBH+I6hRr3elT6Om8vFzSGN2/tVdhPyK+hFpgEMYGLHujJKfFFOQ4/n?=
- =?us-ascii?Q?kYgyZb4HKgDzM4/sg9s1er9aXWkjY8X8bUt0oG/7xze8FoXuAVRBlwJrg1dQ?=
- =?us-ascii?Q?bV+2MecYfXv6PgXRKuFg+788hgbFWmL8aVdpjZ6kb//KORtolWlrqXm/u/nE?=
- =?us-ascii?Q?Y6iaVEI2X4w8zjYCt5pznShFfUwXWw6raj3rcRgYhYIyASgKnaZLo6ZLOckz?=
- =?us-ascii?Q?i6sFuoojiD9oak5d6HrZV/LinVLahzEFP/aCQj1xm2juuYezDgiljPHvGygo?=
- =?us-ascii?Q?0PVCH9tq/F4eAlWRrd8K2F/B8aAL69KT94qp8toYuqoquITq+KsbBkmRezTM?=
- =?us-ascii?Q?xkWC5a+Lmggc0U0Dc8xgY8kAOtxTHiQErb6T4EXarXYAFR+fediOd9UPu1bI?=
- =?us-ascii?Q?bGg6FIbzwKpCLXh6S9BdWELwKWkE+6rt6zsKIetoenW+Yqwqkzl+dcLJO+v9?=
- =?us-ascii?Q?ow=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7efd723f-c72b-4d7a-64f9-08dbf0d812ff
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2023 12:38:22.6777
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QjtiPHvVdRACP5N7Ua1vCns+FdOXWeqQ+OSP8aZ7EaByDR8+OQF0bhF6aVh69pAc0mXQeePFY0Zg7PfNN9gy0A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9382
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: ti: am65-cpsw: improve suspend/resume
+ support for J7200
+Content-Language: en-US
+To: Thomas Richard <thomas.richard@bootlin.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, s-vadapalli@ti.com,
+ grygorii.strashko@ti.com, dan.carpenter@linaro.org,
+ thomas.petazzoni@bootlin.com, gregory.clement@bootlin.com, u-kumar1@ti.com
+References: <20231128131936.600233-1-thomas.richard@bootlin.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231128131936.600233-1-thomas.richard@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+Hi,
 
-On Wed, Nov 29, 2023 at 12:21:27AM +0100, Andrew Lunn wrote:
-> This patchset extends the DSA core to add support for port LEDs being
-> controlled via sys/class/leds, and offloading blinking via
-> ledtrig-netdev. The core parses the device tree binding, and registers
-> LEDs. The DSA switch ops structure is extended with the needed
-> functions.
-> 
-> The mv88e6xxx support is partially added. Support for setting the
-> brightness and blinking is provided, but offloading of blinking is not
-> yet available. To demonstrate this, the wrt1900ac device tree is
-> extended with LEDs.
-> 
-> The existing QCA8K code is refactored to make use of this shared code.
-> 
-> RFC:
-> 
-> Linus, can you rework your code into this for offloading blinking ?
-> And test with ports 5 & 6.
-> 
-> Christian: Please test QCA8K. I would not be surprised if there is an
-> off-by-one.
-> 
-> This code can also be found in
-> 
-> https://github.com/lunn/ v6.7-rc2-net-next-mv88e6xxx-leds
+On 28/11/2023 15:19, Thomas Richard wrote:
+> From: Gregory CLEMENT <gregory.clement@bootlin.com>
 
-I am disappointed to see the dsa_switch_ops API polluted with odds and
-ends which have nothing to do with Ethernet-connected Ethernet switches
-(DSA's focus).
+Subject is vague. Please be explicit about you are trying to do.
 
-Looking at the code, I don't see why dsa_port_leds_setup() cannot be
-rebranded as library code usable by any netdev driver and which bypasses DSA.
-Individual DSA switch drivers could call it directly while providing
-their struct device for the port, and a smaller ops structure for the
-cdev. But more importantly, other non-DSA drivers could do the same.
+> 
+> On J7200 the SoC is off during suspend, so the clocks have to be
 
-I think it comes as no surprise that driver authors prefer using the DSA
-API as their first choice even for technically non-DSA switches, seeing
-how we tend to cram all sorts of unrelated stuff into the monolithic
-struct dsa_switch_ops, and how that makes the API attractive. But then
-we push them away from DSA for valid reasons, and they end up copying
-its support code word for word.
+What do you mean by SoC is off? I suppose you are referring to a certain
+low power state of the SoC?
 
-Maybe this sounds a bit harsh, but NACK from me for the approach.
+By "clocks have to be completely powered down" you mean they have to
+be gated in addition to be disabled? What happens if they are left ungated?
+Does it prevent SoC form entering the target low power state?
+
+> completely power down, and phy_set_mode_ext must be called again.
+
+Why must phy_set_mode_ext() be called again?
+
+> 
+
+Not all SoCs behave like J7200 so can we please restrict this change to J7200? Thanks.
+
+> Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
+> Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 25 ++++++++++++++++++++++++
+>  drivers/net/ethernet/ti/am65-cpts.c      | 11 +++++++++--
+>  2 files changed, 34 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index ece9f8df98ae..e95ef30bd67f 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -2115,6 +2115,27 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+>  	return ret;
+>  }
+>  
+> +static int am65_cpsw_nuss_resume_slave_ports(struct am65_cpsw_common *common)
+> +{
+> +	struct device *dev = common->dev;
+> +	int i;
+> +
+> +	for (i = 1; i <= common->port_num; i++) {
+> +		struct am65_cpsw_port *port;
+> +		int ret;
+> +
+> +		port = am65_common_get_port(common, i);
+> +
+> +		ret = phy_set_mode_ext(port->slave.ifphy, PHY_MODE_ETHERNET, port->slave.phy_if);
+> +		if (ret) {
+> +			dev_err(dev, "port %d error setting phy mode %d\n", i, ret);
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static void am65_cpsw_pcpu_stats_free(void *data)
+>  {
+>  	struct am65_cpsw_ndev_stats __percpu *stats = data;
+> @@ -3087,6 +3108,10 @@ static int am65_cpsw_nuss_resume(struct device *dev)
+>  	if (common->rx_irq_disabled)
+>  		disable_irq(common->rx_chns.irq);
+>  
+> +	ret = am65_cpsw_nuss_resume_slave_ports(common);
+> +	if (ret)
+> +		dev_err(dev, "failed to resume slave ports: %d", ret);
+> +
+>  	am65_cpts_resume(common->cpts);
+>  
+>  	for (i = 0; i < common->port_num; i++) {
+> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+> index c66618d91c28..e6db5b61409a 100644
+> --- a/drivers/net/ethernet/ti/am65-cpts.c
+> +++ b/drivers/net/ethernet/ti/am65-cpts.c
+> @@ -1189,7 +1189,11 @@ void am65_cpts_suspend(struct am65_cpts *cpts)
+>  	cpts->sr_cpts_ns = am65_cpts_gettime(cpts, NULL);
+>  	cpts->sr_ktime_ns = ktime_to_ns(ktime_get_real());
+>  	am65_cpts_disable(cpts);
+> -	clk_disable(cpts->refclk);
+> +
+> +	/* During suspend the SoC can be power off, so let's not only
+> +	 * disable but also unprepare the clock
+> +	 */
+> +	clk_disable_unprepare(cpts->refclk);
+>  
+>  	/* Save GENF state */
+>  	memcpy_fromio(&cpts->sr_genf, &cpts->reg->genf, sizeof(cpts->sr_genf));
+> @@ -1204,8 +1208,11 @@ void am65_cpts_resume(struct am65_cpts *cpts)
+>  	int i;
+>  	s64 ktime_ns;
+>  
+> +	/* During suspend the SoC can be power off, so let's not only
+> +	 * enable but also prepare the clock
+> +	 */
+> +	clk_prepare_enable(cpts->refclk);
+>  	/* restore state and enable CPTS */
+> -	clk_enable(cpts->refclk);
+>  	am65_cpts_write32(cpts, cpts->sr_rftclk_sel, rftclk_sel);
+>  	am65_cpts_set_add_val(cpts);
+>  	am65_cpts_write32(cpts, cpts->sr_control, control);
+
+-- 
+cheers,
+-roger
 
