@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-52024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A12B47FCFE1
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:28:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 087327FCFE3
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 08:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B0332828B2
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F7A9282B71
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 07:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB2C10977;
-	Wed, 29 Nov 2023 07:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDB510975;
+	Wed, 29 Nov 2023 07:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MX/XF/u5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vDcrhh2s"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A3E19BA
-	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:28:03 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5cfe0b63eeeso52178757b3.0
-        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:28:03 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEAF41FDC
+	for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:28:05 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5cd1172b815so5207647b3.0
+        for <netdev@vger.kernel.org>; Tue, 28 Nov 2023 23:28:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701242883; x=1701847683; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701242885; x=1701847685; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PWrUAHj+LREfhagj/5p9N1CYzQOlzwvf0m0DD/YzVk4=;
-        b=MX/XF/u5RVZ8QHQ/Rj1xs/ebz6hgdyBN0znJDl3YqDWztmZ8n4chBnZ6HbRqL/xo7a
-         i5vNClgkov+EI/o49bnTGP1PQs8lKyKDrCdu7He/1BzeTA31ASi/QWk1sK4EVAO3l9+Z
-         q2dvp9Kg1c8QF2KE7ZqDF9GMG6/lXWgFwIziuxIHMjqzs+hBw19P09QM4Z/IWna0u3pa
-         /RiSFGnCn1aDliOAXSH2AxmO8S30HCu5Nvd7FB/e705gizJO7HUVV6PAzXMDK2kuW4p9
-         KCNeJDHacDZ7CIOqukafB0+8D8ZqRsc5YZs7p90bs5Y0+yur17qQ0m/XFeEbhJBD25MV
-         t+LA==
+        bh=0duY6HgYZrH0IdtUmiHNtuxP6R6tHSVVPl1w1PahLsw=;
+        b=vDcrhh2s03PChq6ZVx3r+M3Xqwe8+MuyJnM2vXaetg11nAZ55rshScnSyUhNMGNJj8
+         Nzg4/bY+P9F7Qe0VWO4SnKo4qpEIfChvYutCsVX1sSIpoOsPeAmffT2pksL3at0dei1k
+         TQ5AHj8EA/g+yP3rX8sj7r7a+d70zkGKO1NjfbJb8Pgbfe6TCRE/9qJf5nwmCvTbJoGu
+         /zDFdc0iKRJRZSMmtQGnBVsfC2AIehbGpgL1QJo1CLj97+8GaoRkBX2AxHYOU55mnYpF
+         LRKbXxhh/q3L2kHzau14aceICiahmWM5nV1c9QXyWuOIjZLVlxVFqBGw17uy0ZxWshj1
+         vDVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701242883; x=1701847683;
+        d=1e100.net; s=20230601; t=1701242885; x=1701847685;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PWrUAHj+LREfhagj/5p9N1CYzQOlzwvf0m0DD/YzVk4=;
-        b=xVZ7e1qYnY1ztkgybeLFWsjSYfu1CUtpR1eqf1JnQMawREzsAGJVk9Jo+FkPByJ5mQ
-         a+kYqYxrUQ5klwBDlsyMg/cDEdqufoKglcl6IPCVbtfgZSkGUEOdwaVzcECj574G3f8j
-         iZAJDw77Ok4p2Y6CqwDE9+uvwMcfvpPQTtJjxoYaExQVQalHKlTT1eT/mbyrcgCI+uUW
-         miKbW37uZO1Wd+j4p7gaxjOSGjXRdjmlnUygC+vfrlsCU3c7sKQ/01iwECFwODHdrp1D
-         xWhv22pfsdH32mwHdQJvEraAm6MbFOaCfgtGx39lzGeSoWqfCQ3r1oNuUlrWiuyuDo3F
-         pyaA==
-X-Gm-Message-State: AOJu0YwL6JqesVE+C7MJd6TAqdrawJEm3I3pvYLkbECresKE/7oon9Ve
-	qDO2DG04XWXlsckvFAk6TCeL8w3oob3Z+K4=
-X-Google-Smtp-Source: AGHT+IE9ZnYIk2DbdqYd7pRsU0JXQqpvCSAcYhourcDdEMWawiCZqJA5eabGLsZ/IbXAp7b7OoVjU9FSmfJlfh4=
+        bh=0duY6HgYZrH0IdtUmiHNtuxP6R6tHSVVPl1w1PahLsw=;
+        b=Oh7Nrbb5DW+5YdOy9JB9pdDLt8XP3CxlNvYDhM+H56sQHelqF1bfv6D1OozBNZXgYf
+         QWH31/xjzRRdRxyWv6AQOc1GlPIo3zdUzH7qTC4BAd5JUjhGjS1wsC98BdoEy4tV68Dh
+         n6MbUn8NCgikplYoHzTzOYdqhnxLFCxUwiYzqqVKJlBtffbhNMSMKV/LvwFkSZmyEq+p
+         H+BOGtNj1dK+Ai1MgIxzPExaunZlemkK+jnG/MgSfzk/zyIh7Td/pS12a/TUSH2+GcXV
+         GOVW2NE2dnMn5KMt1Hi2zkTHbJZZRLgKrpmjPuiIjNaTLbLeZTfZ/QO/ltbR4juDeH5s
+         UFRg==
+X-Gm-Message-State: AOJu0YwkyKysRONrwjEYOz/qE+N5ZJxOlax9cciUNj0xi5GfL7j7pXJ2
+	64myIpY2Fl2LUimFA5VfI3d1XTmY36wGEmc=
+X-Google-Smtp-Source: AGHT+IFfDSLrHMAzkskRUhweuJ1Ar/CzVWcbACaCdi2IL5KbDa0UbZtDjC/DuUAmeMXkjeycr7FAW0ak58UVRCM=
 X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a05:690c:340b:b0:5cb:73ab:3e4d with SMTP
- id fn11-20020a05690c340b00b005cb73ab3e4dmr489228ywb.6.1701242883083; Tue, 28
- Nov 2023 23:28:03 -0800 (PST)
-Date: Wed, 29 Nov 2023 07:27:53 +0000
+ (user=lixiaoyan job=sendgmr) by 2002:a81:b047:0:b0:5d2:74f1:9c8b with SMTP id
+ x7-20020a81b047000000b005d274f19c8bmr17711ywk.2.1701242884957; Tue, 28 Nov
+ 2023 23:28:04 -0800 (PST)
+Date: Wed, 29 Nov 2023 07:27:54 +0000
 In-Reply-To: <20231129072756.3684495-1-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231129072756.3684495-1-lixiaoyan@google.com>
 X-Mailer: git-send-email 2.43.0.rc1.413.gea7ed67945-goog
-Message-ID: <20231129072756.3684495-3-lixiaoyan@google.com>
-Subject: [PATCH v8 net-next 2/5] cache: enforce cache groups
+Message-ID: <20231129072756.3684495-4-lixiaoyan@google.com>
+Subject: [PATCH v8 net-next 3/5] netns-ipv4: reorganize netns_ipv4 fast path variables
 From: Coco Li <lixiaoyan@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
@@ -70,78 +70,194 @@ Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google
 	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Set up build time warnings to safeguard against future header changes of
-organized structs.
+Reorganize fast path variables on tx-txrx-rx order.
+Fastpath cacheline ends after sysctl_tcp_rmem.
+There are only read-only variables here. (write is on the control path
+and not considered in this case)
 
-Warning includes:
+Below data generated with pahole on x86 architecture.
+Fast path variables span cache lines before change: 4
+Fast path variables span cache lines after change: 2
 
-1) whether all variables are still in the same cache group
-2) whether all the cache groups have the sum of the members size (in the
-   maximum condition, including all members defined in configs)
-
-The __cache_group* variables are ignored in kernel-doc check in the
-various header files they appear in to enforce the cache groups.
-
-Suggested-by: Daniel Borkmann <daniel@iogearbox.net>
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Wei Wang <weiwan@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
 Signed-off-by: Coco Li <lixiaoyan@google.com>
 ---
- include/linux/cache.h | 25 +++++++++++++++++++++++++
- scripts/kernel-doc    |  5 +++++
- 2 files changed, 30 insertions(+)
+ include/net/netns/ipv4.h | 47 +++++++++++++++++++++++++++-------------
+ net/core/net_namespace.c | 45 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 77 insertions(+), 15 deletions(-)
 
-diff --git a/include/linux/cache.h b/include/linux/cache.h
-index 9900d20b76c28..0ecb17bb68837 100644
---- a/include/linux/cache.h
-+++ b/include/linux/cache.h
-@@ -85,6 +85,31 @@
- #define cache_line_size()	L1_CACHE_BYTES
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 73f43f6991999..ea882964c71ee 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -42,6 +42,38 @@ struct inet_timewait_death_row {
+ struct tcp_fastopen_context;
+ 
+ struct netns_ipv4 {
++	/* Cacheline organization can be found documented in
++	 * Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst.
++	 * Please update the document when adding new fields.
++	 */
++
++	/* TX readonly hotpath cache lines */
++	__cacheline_group_begin(netns_ipv4_read_tx);
++	u8 sysctl_tcp_early_retrans;
++	u8 sysctl_tcp_tso_win_divisor;
++	u8 sysctl_tcp_tso_rtt_log;
++	u8 sysctl_tcp_autocorking;
++	int sysctl_tcp_min_snd_mss;
++	unsigned int sysctl_tcp_notsent_lowat;
++	int sysctl_tcp_limit_output_bytes;
++	int sysctl_tcp_min_rtt_wlen;
++	int sysctl_tcp_wmem[3];
++	u8 sysctl_ip_fwd_use_pmtu;
++	__cacheline_group_end(netns_ipv4_read_tx);
++
++	/* TXRX readonly hotpath cache lines */
++	__cacheline_group_begin(netns_ipv4_read_txrx);
++	u8 sysctl_tcp_moderate_rcvbuf;
++	__cacheline_group_end(netns_ipv4_read_txrx);
++
++	/* RX readonly hotpath cache line */
++	__cacheline_group_begin(netns_ipv4_read_rx);
++	u8 sysctl_ip_early_demux;
++	u8 sysctl_tcp_early_demux;
++	int sysctl_tcp_reordering;
++	int sysctl_tcp_rmem[3];
++	__cacheline_group_end(netns_ipv4_read_rx);
++
+ 	struct inet_timewait_death_row tcp_death_row;
+ 	struct udp_table *udp_table;
+ 
+@@ -96,17 +128,14 @@ struct netns_ipv4 {
+ 
+ 	u8 sysctl_ip_default_ttl;
+ 	u8 sysctl_ip_no_pmtu_disc;
+-	u8 sysctl_ip_fwd_use_pmtu;
+ 	u8 sysctl_ip_fwd_update_priority;
+ 	u8 sysctl_ip_nonlocal_bind;
+ 	u8 sysctl_ip_autobind_reuse;
+ 	/* Shall we try to damage output packets if routing dev changes? */
+ 	u8 sysctl_ip_dynaddr;
+-	u8 sysctl_ip_early_demux;
+ #ifdef CONFIG_NET_L3_MASTER_DEV
+ 	u8 sysctl_raw_l3mdev_accept;
  #endif
+-	u8 sysctl_tcp_early_demux;
+ 	u8 sysctl_udp_early_demux;
  
-+#ifndef __cacheline_group_begin
-+#define __cacheline_group_begin(GROUP) \
-+	__u8 __cacheline_group_begin__##GROUP[0]
-+#endif
-+
-+#ifndef __cacheline_group_end
-+#define __cacheline_group_end(GROUP) \
-+	__u8 __cacheline_group_end__##GROUP[0]
-+#endif
-+
-+#ifndef CACHELINE_ASSERT_GROUP_MEMBER
-+#define CACHELINE_ASSERT_GROUP_MEMBER(TYPE, GROUP, MEMBER) \
-+	BUILD_BUG_ON(!(offsetof(TYPE, MEMBER) >= \
-+		       offsetofend(TYPE, __cacheline_group_begin__##GROUP) && \
-+		       offsetofend(TYPE, MEMBER) <= \
-+		       offsetof(TYPE, __cacheline_group_end__##GROUP)))
-+#endif
-+
-+#ifndef CACHELINE_ASSERT_GROUP_SIZE
-+#define CACHELINE_ASSERT_GROUP_SIZE(TYPE, GROUP, SIZE) \
-+	BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP) - \
-+		     offsetofend(TYPE, __cacheline_group_begin__##GROUP) > \
-+		     SIZE)
-+#endif
-+
- /*
-  * Helper to add padding within a struct to ensure data fall into separate
-  * cachelines.
-diff --git a/scripts/kernel-doc b/scripts/kernel-doc
-index 08a3e603db192..0a890fe4d22b1 100755
---- a/scripts/kernel-doc
-+++ b/scripts/kernel-doc
-@@ -1592,6 +1592,11 @@ sub push_parameter($$$$$) {
- 		$parameterdescs{$param} = "anonymous\n";
- 		$anon_struct_union = 1;
- 	}
-+	elsif ($param =~ "__cacheline_group" )
-+	# handle cache group enforcing variables: they do not need be described in header files
-+	{
-+		return; # ignore __cacheline_group_begin and __cacheline_group_end
-+	}
+ 	u8 sysctl_nexthop_compat_mode;
+@@ -119,7 +148,6 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_mtu_probing;
+ 	int sysctl_tcp_mtu_probe_floor;
+ 	int sysctl_tcp_base_mss;
+-	int sysctl_tcp_min_snd_mss;
+ 	int sysctl_tcp_probe_threshold;
+ 	u32 sysctl_tcp_probe_interval;
  
- 	# warn if parameter has no description
- 	# (but ignore ones starting with # as these are not parameters
+@@ -135,17 +163,14 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_backlog_ack_defer;
+ 	u8 sysctl_tcp_pingpong_thresh;
+ 
+-	int sysctl_tcp_reordering;
+ 	u8 sysctl_tcp_retries1;
+ 	u8 sysctl_tcp_retries2;
+ 	u8 sysctl_tcp_orphan_retries;
+ 	u8 sysctl_tcp_tw_reuse;
+ 	int sysctl_tcp_fin_timeout;
+-	unsigned int sysctl_tcp_notsent_lowat;
+ 	u8 sysctl_tcp_sack;
+ 	u8 sysctl_tcp_window_scaling;
+ 	u8 sysctl_tcp_timestamps;
+-	u8 sysctl_tcp_early_retrans;
+ 	u8 sysctl_tcp_recovery;
+ 	u8 sysctl_tcp_thin_linear_timeouts;
+ 	u8 sysctl_tcp_slow_start_after_idle;
+@@ -161,21 +186,13 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_frto;
+ 	u8 sysctl_tcp_nometrics_save;
+ 	u8 sysctl_tcp_no_ssthresh_metrics_save;
+-	u8 sysctl_tcp_moderate_rcvbuf;
+-	u8 sysctl_tcp_tso_win_divisor;
+ 	u8 sysctl_tcp_workaround_signed_windows;
+-	int sysctl_tcp_limit_output_bytes;
+ 	int sysctl_tcp_challenge_ack_limit;
+-	int sysctl_tcp_min_rtt_wlen;
+ 	u8 sysctl_tcp_min_tso_segs;
+-	u8 sysctl_tcp_tso_rtt_log;
+-	u8 sysctl_tcp_autocorking;
+ 	u8 sysctl_tcp_reflect_tos;
+ 	int sysctl_tcp_invalid_ratelimit;
+ 	int sysctl_tcp_pacing_ss_ratio;
+ 	int sysctl_tcp_pacing_ca_ratio;
+-	int sysctl_tcp_wmem[3];
+-	int sysctl_tcp_rmem[3];
+ 	unsigned int sysctl_tcp_child_ehash_entries;
+ 	unsigned long sysctl_tcp_comp_sack_delay_ns;
+ 	unsigned long sysctl_tcp_comp_sack_slack_ns;
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index f4183c4c1ec82..cb8bcbff9e83a 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -1099,11 +1099,56 @@ static void rtnl_net_notifyid(struct net *net, int cmd, int id, u32 portid,
+ 	rtnl_set_sk_err(net, RTNLGRP_NSID, err);
+ }
+ 
++#ifdef CONFIG_NET_NS
++static void __init netns_ipv4_struct_check(void)
++{
++	/* TX readonly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_early_retrans);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_tso_win_divisor);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_tso_rtt_log);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_autocorking);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_min_snd_mss);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_notsent_lowat);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_limit_output_bytes);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_min_rtt_wlen);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_tcp_wmem);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
++				      sysctl_ip_fwd_use_pmtu);
++	CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_tx, 33);
++
++	/* TXRX readonly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_txrx,
++				      sysctl_tcp_moderate_rcvbuf);
++	CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_txrx, 1);
++
++	/* RX readonly hotpath cache line */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
++				      sysctl_ip_early_demux);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
++				      sysctl_tcp_early_demux);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
++				      sysctl_tcp_reordering);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
++				      sysctl_tcp_rmem);
++	CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_rx, 18);
++}
++#endif
++
+ void __init net_ns_init(void)
+ {
+ 	struct net_generic *ng;
+ 
+ #ifdef CONFIG_NET_NS
++	netns_ipv4_struct_check();
+ 	net_cachep = kmem_cache_create("net_namespace", sizeof(struct net),
+ 					SMP_CACHE_BYTES,
+ 					SLAB_PANIC|SLAB_ACCOUNT, NULL);
 -- 
 2.43.0.rc1.413.gea7ed67945-goog
 
