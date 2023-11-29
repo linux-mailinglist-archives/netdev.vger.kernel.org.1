@@ -1,133 +1,110 @@
-Return-Path: <netdev+bounces-52172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78097FDB54
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:25:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD947FDB67
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 16:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22ACB1C2031B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:25:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10EC4B20AC7
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 15:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C6E38DDF;
-	Wed, 29 Nov 2023 15:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBFD38DEC;
+	Wed, 29 Nov 2023 15:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OoJeyAfR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HPus4F3F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5585A1BF3
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:25:29 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-a02d12a2444so986683566b.3
-        for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:25:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701271527; x=1701876327; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EgYWpKLNErfu13BFJAcWaeBfQj9tEc8uJTd7cUhrg6s=;
-        b=OoJeyAfRxv2Ul50XIaUhDF1X4WL4y4gFz7Q+4ucs9Up3w94DZtFEe4r7SfKoRlmMR6
-         7yAV/E9ERGd1I8LqHINw2KbwxJ7PsxgWZgCo6UnEqxOhsCwdzyh0GyUkLgqcsjYUrqzb
-         2v76v7s4c10GUMCrkf90wvd1K1FzINZR66Xk3PGBznfC08AcI2BayUWIK2sNusbT+nj1
-         iYtQ/T6uduNPTUWRs6UJYC9NlVZ8I+TTiSRKj0Of4XEdFcOaAEfEU4oNbq7DWLog6j6Y
-         ileioKb7dhF/YdbRrQ2P4CQ3Vzvvocb9NimXN0c6omvoHp8NlcXj8oDB8UAQnJJfCI13
-         gRJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701271527; x=1701876327;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EgYWpKLNErfu13BFJAcWaeBfQj9tEc8uJTd7cUhrg6s=;
-        b=TLGaDVkeLZDwE7gaqNef2XRZH7CiWP6pM9+fDwZMxUBpWnVtDiBOkfu4ovAyNZLZlw
-         dbWYdaHUh6VyvqoYqx2Cp1eq8NRh9A7fRFuDY7ty+gnhLW5SLSpJFvKMbOcjtqy73quU
-         mXPSMTybsHffrflo5cmYjiQs/nptuQ6svL9QA5CNbs8iuK9RieKq9a05eKSJEjna4WNL
-         z2Vu70pnWRHYGhqSXJuRKJtPrl1T+XaoCQ4O4GRuaLZP5+NhPWjE1WHVRZf9iTlmpWFM
-         aIKCVU/s+PEtK7DwP+dW+LC6O+vSYPWRZ7dxNxhODXcE6xN4yYHvYWCYCIpq+gLTH0Kb
-         iP/g==
-X-Gm-Message-State: AOJu0Yyb37+J0OfRUGJye+VV1QmVV1Mz1Fnac0P5iOWX621dNf1IuvOy
-	BKiP4/URltp6A6PYJG7IJAhN+A==
-X-Google-Smtp-Source: AGHT+IFfl8X0miMz06A4l2QgSCTEvccBqr0xvkZMo+SGGMsx1wSeSkSkU2kmJWD3q7I4TcZARBhsVg==
-X-Received: by 2002:a17:906:2cb:b0:a0f:76dc:febc with SMTP id 11-20020a17090602cb00b00a0f76dcfebcmr7241328ejk.70.1701271527583;
-        Wed, 29 Nov 2023 07:25:27 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id r21-20020a170906351500b00a0bd234566bsm5371392eja.143.2023.11.29.07.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 07:25:27 -0800 (PST)
-Date: Wed, 29 Nov 2023 16:25:25 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
-	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com, sdf@google.com, horms@kernel.org
-Subject: Re: [patch net-next v4 5/9] genetlink: introduce per-sock family
- private pointer storage
-Message-ID: <ZWdX5ccvLxuUh0Eb@nanopsycho>
-References: <20231123181546.521488-1-jiri@resnulli.us>
- <20231123181546.521488-6-jiri@resnulli.us>
- <20231127144626.0abb7260@kernel.org>
- <ZWWj8VZF5Puww2gm@nanopsycho>
- <20231128071116.1b6aed13@kernel.org>
- <ZWYP3H0wtaWxwneR@nanopsycho>
- <20231128083605.0c8868cd@kernel.org>
- <ZWdDw2EJJbv6ecJ5@nanopsycho>
- <20231129070157.41d17b26@kernel.org>
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EB81BF
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 07:29:18 -0800 (PST)
+Message-ID: <0c2efe49-03db-4616-a4e5-26ff0434e323@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701271757;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8oj8NqBU6PvsJkrw0mP5/tdKRY1iPOIpTDWPs7tNcdE=;
+	b=HPus4F3FMmbIqNJQzFTIAo9HB0eWDFdXdKvnw6QL5Rp5aEV8A4LNIKR2WOvqID06ZbwgEv
+	mtwS8FO0s2eJHn/JUmKoqtcZtUM57btzOL1xXjLE0y/Ih8Vjh43dXSx90tMspRNGT/nMhI
+	GzstSrHYhJLRYv47ExNn+CguKXmc+BU=
+Date: Wed, 29 Nov 2023 23:29:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231129070157.41d17b26@kernel.org>
+Subject: Re: [PATCH net-next 2/5] virtio_net: Add page_pool support to improve
+ performance
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Liang Chen <liangchen.linux@gmail.com>, jasowang@redhat.com,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xuanzhuo@linux.alibaba.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, pabeni@redhat.com,
+ alexander.duyck@gmail.com
+References: <20230526054621.18371-1-liangchen.linux@gmail.com>
+ <20230526054621.18371-2-liangchen.linux@gmail.com>
+ <c745f67e-91e6-4a32-93f2-dc715056eb51@linux.dev>
+ <20231129095825-mutt-send-email-mst@kernel.org>
+ <b699fbc8-260a-48e9-b6cc-8bfecd09afed@linux.dev>
+In-Reply-To: <b699fbc8-260a-48e9-b6cc-8bfecd09afed@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Wed, Nov 29, 2023 at 04:01:57PM CET, kuba@kernel.org wrote:
->On Wed, 29 Nov 2023 14:59:31 +0100 Jiri Pirko wrote:
->> Tue, Nov 28, 2023 at 05:36:05PM CET, kuba@kernel.org wrote:
->> >No, you can do exact same thing, just instead of putting the string
->> >directly into the xarray you put a struct which points to the string.  
->> 
->> I'm lost. What "string" are you talking about exactly? I'm not putting
->> any string to xarray.
->> 
->> In the existing implementation, I have following struct:
->> struct devlink_obj_desc {
->>         struct rcu_head rcu;
->>         const char *bus_name;
->>         const char *dev_name;
->>         unsigned int port_index;
->>         bool port_index_valid;
->>         long data[];
->> };
->> 
->> This is the struct put pointer to into the xarray. Pointer to this
->> struct is dereferenced under rcu in notification code and the struct
->> is freed by kfree_rcu().
->
->Sorry I was looking at patch 8 which has only:
->
->+struct devlink_obj_desc {
->+	struct rcu_head rcu;
->+	const char *bus_name;
->+	const char *dev_name;
->+	long data[];
->+};
->
->that's basically a string and an rcu_head, that's what I meant.
->
->> >Core still does the kfree of the container (struct devlink_sk_priv).
->> >But what's inside the container struct (string pointer) has to be
->> >handled by the destructor.
->> >
->> >Feels like you focus on how to prove me wrong more than on
->> >understanding what I'm saying :|  
->> 
->> Not at all, I have no reason for it. I just want to get my job done
->> and I am having very hard time to understand what you want exactly.
->
->Sockets may want to hold state for more than filtering.
->Try to look past your singular use case.
 
-Okay, I'll try to make another V. But please don't be mad I
-misunderstood something if I do :)
+在 2023/11/29 23:22, Zhu Yanjun 写道:
+>
+> 在 2023/11/29 22:59, Michael S. Tsirkin 写道:
+>> On Wed, Nov 29, 2023 at 10:50:57PM +0800, Zhu Yanjun wrote:
+>>> 在 2023/5/26 13:46, Liang Chen 写道:
+>>
+>> what made you respond to a patch from May, now?
+>
+> I want to apply page_pool to our virtio_net. This virtio_net works on 
+> our device.
+>
+> I want to verify whether page_pool on virtio_net with our device can 
+> improve the performance or not.
+>
+> And I found that ethtool is wrong.
+>
+> I use virtio_net on our device. I found that page member variable in 
+> rq is not used in recv path.
+>
+> When virtio_net is modprobe, I checked page member variable in rq with 
+> kprobe or crash tool.  page member variable in rq is always NULL.
+>
+> But sg in recv path is used.
+>
+> So how to use page member variable in rq? If page member variable in 
+> rq is always NULL, can we remove it?
+>
+> BTW, I use ping and iperf tool to make tests with virtio_net. In the 
+> tests, page member variable in rq is always NULL.
+
+
+And I replaced page member variable in rq with page_pool, but the 
+statistics of page_pool are always 0.
+
+It is interesting that page_pool member variable in rq is not used in 
+ping and iperf tests.
+
+I am not sure what tests can make page member variable not NULL. ^_^
+
+Best Regards,
+
+Zhu Yanjun
+
+
+>
+> It is interesting.
+>
+> Zhu Yanjun
+>
+>>
 
