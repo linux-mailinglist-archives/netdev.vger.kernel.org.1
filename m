@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-52223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E47447FDED6
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:49:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDC57FDEE0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 18:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D881C20986
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:49:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF1062826D0
+	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 17:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F2859149;
-	Wed, 29 Nov 2023 17:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECD048CCA;
+	Wed, 29 Nov 2023 17:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIyfzKp/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6KR6NWd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F451B296;
-	Wed, 29 Nov 2023 17:49:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15191C433C7;
-	Wed, 29 Nov 2023 17:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8134D1B296
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 17:52:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45D4C433C7;
+	Wed, 29 Nov 2023 17:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701280184;
-	bh=Vv2kg7tUugR+HRvGHfArl3hiwfBQKgqlPjyZTkGiqMA=;
+	s=k20201202; t=1701280370;
+	bh=TeE0Isi9YwAMtl8bMXbwMjaH/0PAcKg5AcG0AGcQ/Cs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vIyfzKp/JUZx7ipcA63+BeDgfzWutCphqYFFS4V5ds5KbiDdmM6s/LvIAVXc14eIS
-	 5+q/A4IGl8R+xzaEuA3r5I6mzTgAboszbNeACRdFL2F8+OUIF/Ib/yCmxpGZ8PsVTL
-	 hQB0f1HptdILOjdbcEmfrqs61iFCL6QhS5bOlvAdDBOdXDazGUPLIeaz8JkBPP6XNq
-	 8VSSx8GSN4YqyIuhk+OZB170LdlcfvM6Y43NUPD8dM2KaPKTB0iCbGxvnPqgjNKKkf
-	 zBoE7FeM4EeFKkNosnPs+wC7XSOtFZHRpbgpF2fDqKVHeEgs8VPGWRgZemieJupDf1
-	 mCSz1Y6958E3A==
-Date: Wed, 29 Nov 2023 09:49:43 -0800
+	b=N6KR6NWdBUe9tFdkDnztYFJVQdBZoJJa6mOyRiTbpm75dRLI9Uk5z6eNybJC7AbhB
+	 I5Zj+goISMxczvQrXgusYiBAoqocLGMKcrn4iXReG6CD9y46AvCfWdkADF4wV10Yc8
+	 ZulJSUFPkpmXCw2hlEfL+8N4TjPmygDBBvncdyQ4eyrvEMyw0L4Iz6HyO38uQY6OEV
+	 qQ14V87JJrcSD1aOvDlguDGvKq5DuA5SjPS7+Tdqjv9/18T4b1CnpIi51giOcRaboi
+	 VAOWvNGh5Xq8bXDopmM2n1i97ykPx7ll6tAyknluxiKV5dETsCec6j3rRU/XuZiId0
+	 48ie20a2MtSpg==
+Date: Wed, 29 Nov 2023 09:52:48 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
- donald.hunter@redhat.com
-Subject: Re: [RFC PATCH net-next v1 0/6] tools/net/ynl: Add dynamic selector
- for options attrs
-Message-ID: <20231129094943.13f1ae0c@kernel.org>
-In-Reply-To: <m2bkbc8pim.fsf@gmail.com>
-References: <20231129101159.99197-1-donald.hunter@gmail.com>
-	<20231129080943.01d81902@kernel.org>
-	<m2bkbc8pim.fsf@gmail.com>
+To: Min Li <min.li.xe@renesas.com>
+Cc: Min Li <lnimi@hotmail.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "lee@kernel.org" <lee@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] ptp: introduce PTP_CLOCK_EXTOFF event for
+ the measured external offset
+Message-ID: <20231129095248.557d37ca@kernel.org>
+In-Reply-To: <OS3PR01MB65932F46E55E38E3DDB938C9BA83A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
+References: <PH7PR03MB706497752B942B2C33C45E58A0BDA@PH7PR03MB7064.namprd03.prod.outlook.com>
+	<20231128195811.06bd301d@kernel.org>
+	<OS3PR01MB65932F46E55E38E3DDB938C9BA83A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,93 +55,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Nov 2023 16:58:57 +0000 Donald Hunter wrote:
-> rt_link shares attribute-sets between different kinds of link so I think
-> that rules out putting the key on the attribute-set. I think we may also
-> see reuse across stats attribute sets in tc.
-> 
-> FWIW I initially considered avoiding a selector list by using a template
-> to generate the attribute set name, but that broke pretty quickly.
+On Wed, 29 Nov 2023 16:59:38 +0000 Min Li wrote:
+> But the driver that I submitted is a brand new PHC driver. So I don't
+> know if it is appropriate to separate them to net and net-next?
+> Because the driver change depends on the this patch.
 
-Ah :(
+What's in your tree? What I'm saying is that the diff context does not
+match net-next:
 
-> It seems reasonable to pull the selector list out of line because
-> they do get big, e.g. over 100 lines for tc "options".
-> 
-> My preference is 1, probably including a fallback to "binary" if there
-> is no selector match.
+$ git checkout net-next/main
+$ git pw series apply 804642
+Applying: ptp: introduce PTP_CLOCK_EXTOFF event for the measured external offset
+Using index info to reconstruct a base tree...
+M	drivers/ptp/ptp_clock.c
+Falling back to patching base and 3-way merge...
+Auto-merging drivers/ptp/ptp_clock.c
+Applying: ptp: add FemtoClock3 Wireless as ptp hardware clock
 
-Are there any "nests" that need a real binary type? An actual byte
-array? Or are these all structs? If the latter then fixed-header
-covers it.
 
-> I think that once you have broken out to a sub-message, they're no
-> longer "nested-attributes" and we should maybe reuse "attribute-set".
-
-Good point.
-
-> I don't think we can reuse "sub-type" because the schema for it is the
-> set of netlink type names, not a free string. Maybe we add "sub-message"
-> instead?
-
-Sounds good.
-
-> So how about this:
-> 
-> attribute-sets:
->   -
->     name: outside-attrs
->     attributes:
->       ...
->       -
->          name: kind
->          type: string
->       -
->          name: options
->          type: sub-message
->          sub-message: inside-msg
->          selector: kind
->     ...
->   -
->     name: inside-attrs:
->     attributes:
->       ...
-> 
-> sub-messages:
->   -
->     name: inside-msg
->     formats:
->       -
->         value: some-value
->         fixed-header: struct-name
->       -
->         value: other-value
->         fixed-header: struct-name-two
->         attribute-set: inside-attrs
->       -
->         value: another-one
->         attribute-set: inside-attrs
->   -
->     name: different-inside-msg
->     ...
-> 
-> operations:
->   ...
-
-LG!
-
-> I cannot think of a better name than "formats" so happy to go with that.
-
-Or maybe "variants" ?
-
-> Did you want an explicit "list:" in the yaml schema?
-
-You mean instead of the "formats" or in addition somewhere?
-Under sub-messages?
-
-The "formats" is basically a "list", just feels less artificial
-to call it something else than "list". No strong preference, tho.
-
-If you mean under "sub-messages" - I can't think of any extra property
-we may want to put there. So going directly to entries seems fine.
+Do you have any intermediate commits in your local branch? 
+Or perhaps the patches are based on some other tree, not net-next?
 
