@@ -1,130 +1,304 @@
-Return-Path: <netdev+bounces-52510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B3B7FEF52
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:42:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90FC17FEF97
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3B6B1C20C64
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:42:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121991F20B53
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9EED3B1AC;
-	Thu, 30 Nov 2023 12:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFDF3B183;
+	Thu, 30 Nov 2023 12:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/BUMA2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596A71B3
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 04:42:34 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VxRYdGL_1701348150;
-Received: from 30.222.48.140(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VxRYdGL_1701348150)
-          by smtp.aliyun-inc.com;
-          Thu, 30 Nov 2023 20:42:31 +0800
-Message-ID: <dd8d0c1f-f1ef-42e3-b6a9-24fb5c82f881@linux.alibaba.com>
-Date: Thu, 30 Nov 2023 20:42:27 +0800
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DA110C2
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 04:58:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701349080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0ASa9WpbKWW7aZFBB+5VpaDclg9OAib7/Ai6IndLNTE=;
+	b=K/BUMA2UnK37qi4PQqxrS0+oSqS5GPuDm5oKqDNeTUc/YBjtVABemIB7Fnj+urWAJoqlnv
+	S9D4BU0f6D1xhi933yzMWKoh5UH2pbpzHINcwzA/zaxqDdfPfW8lMIgl4Q/kg/Ju+Q7G5n
+	IkpZ5hDz+6OYYlHXVkyK5RDQs1avjgE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-2-kJoUytKpPc6Jkcb_56_PPQ-1; Thu, 30 Nov 2023 07:56:55 -0500
+X-MC-Unique: kJoUytKpPc6Jkcb_56_PPQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB32E866DCA;
+	Thu, 30 Nov 2023 12:56:54 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.163])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9FE8A40C6EB9;
+	Thu, 30 Nov 2023 12:56:53 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.7-rc4
+Date: Thu, 30 Nov 2023 13:56:38 +0100
+Message-ID: <20231130125638.726279-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 4/4] virtio-net: support rx netdim
-To: Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc: jasowang@redhat.com, mst@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, hawk@kernel.org,
- john.fastabend@gmail.com, ast@kernel.org, horms@kernel.org,
- xuanzhuo@linux.alibaba.com, yinjun.zhang@corigine.com
-References: <cover.1701050450.git.hengqi@linux.alibaba.com>
- <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
- <8d2ee27f10a7a6c9414f10e8c0155c090b5f11e3.camel@redhat.com>
- <6f78d5e0-a8a8-463e-938c-9a9b49cf106f@linux.alibaba.com>
- <4608e204307b1fb16e1f98e0a9c52e6ce2d0a3db.camel@redhat.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <4608e204307b1fb16e1f98e0a9c52e6ce2d0a3db.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
+Hi Linus!
 
+We just received a report regarding the WiFi/debugfs fixes below possibly
+causing some dmesg noise - trying to register multiple times the same entry.
+I hope it should not block this.
 
-在 2023/11/30 下午8:23, Paolo Abeni 写道:
-> On Thu, 2023-11-30 at 20:09 +0800, Heng Qi wrote:
->> 在 2023/11/30 下午5:33, Paolo Abeni 写道:
->>> On Mon, 2023-11-27 at 10:55 +0800, Heng Qi wrote:
->>>> @@ -4738,11 +4881,14 @@ static void remove_vq_common(struct virtnet_info *vi)
->>>>    static void virtnet_remove(struct virtio_device *vdev)
->>>>    {
->>>>    	struct virtnet_info *vi = vdev->priv;
->>>> +	int i;
->>>>    
->>>>    	virtnet_cpu_notif_remove(vi);
->>>>    
->>>>    	/* Make sure no work handler is accessing the device. */
->>>>    	flush_work(&vi->config_work);
->>>> +	for (i = 0; i < vi->max_queue_pairs; i++)
->>>> +		cancel_work(&vi->rq[i].dim.work);
->>> If the dim work is still running here, what prevents it from completing
->>> after the following unregister/free netdev?
->> Yes, no one here is trying to stop it,
-> So it will cause UaF, right?
->
->> the situation is like
->> unregister/free netdev
->> when rss are being set, so I think this is ok.
->   
-> Could you please elaborate more the point?
+The following changes since commit d3fa86b1a7b4cdc4367acacea16b72e0a200b3d7:
 
-If I'm not wrong, I think the following 2 scenarios are similar:
+  Merge tag 'net-6.7-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-11-23 10:40:13 -0800)
 
-Scen2 1:
-1. User uses ethtool to configure rss settings
-2. ethtool core holds rtnl_lock
-2. virtnet_remove() is called
-3. virtnet_send_command() is called.
+are available in the Git repository at:
 
-Scene 2:
-1. virtnet_poll() queues a virtnet_rx_dim_work()
-1. virtnet_rx_dim_work() is called and holds rtnl_lock
-2. virtnet_remove() is called
-3. virtnet_send_command() is called.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.7-rc4
 
-So I think it's ok to use cancel_work() here.
-What do you think? :)
+for you to fetch changes up to 777f245eec8152926b411e3d4f4545310f52cbed:
 
->
->>> It looks like you want need to call cancel_work_sync here?
->> In v4, Yinjun Zhang mentioned that _sync() can cause deadlock[1].
->> Therefore, cancel_work() is used here instead of cancel_work_sync() to
->> avoid possible deadlock.
->>
->> [1]
->> https://lore.kernel.org/all/20231122092939.1005591-1-yinjun.zhang@corigine.com/
-> Here the call to cancel_work() happens while the caller does not held
-> the rtnl lock, the deadlock reported above will not be triggered.
+  Merge branch 'net-ravb-fixes-for-the-ravb-driver' (2023-11-30 10:59:11 +0100)
 
-There's cancel_work_sync() in v4 and I did reproduce the deadlock.
+----------------------------------------------------------------
+Including fixes from bpf and wifi.
 
-rtnl_lock held -> .ndo_stop() -> cancel_work_sync() -> 
-virtnet_rx_dim_work(),
-the work acquires the rtnl_lock again, then a deadlock occurs.
+Current release - regressions:
 
-I tested the scenario of ctrl cmd/.remove/.ndo_stop()/dim_work when there is
-a big concurrency, and cancel_work() works well.
+  - neighbour: fix __randomize_layout crash in struct neighbour
 
-Thanks!
+  - r8169: fix deadlock on RTL8125 in jumbo mtu mode
 
->
->>> Additionally the later remove_vq_common() will needless call
->>> cancel_work() again;
->> Yes. remove_vq_common() now does not call cancel_work().
-> I'm sorry, I missread the context in a previous chunk.
->
-> The other point should still apply.
->
-> Cheers,
->
-> Paolo
+Previous releases - regressions:
+
+  - wifi:
+    - mac80211: fix warning at station removal time
+    - cfg80211: fix CQM for non-range use
+
+  - tools: ynl-gen: fix unexpected response handling
+
+  - octeontx2-af: fix possible buffer overflow
+
+  - dpaa2: recycle the RX buffer only after all processing done
+
+  - rswitch: fix missing dev_kfree_skb_any() in error path
+
+Previous releases - always broken:
+
+  - ipv4: fix uaf issue when receiving igmp query packet
+
+  - wifi: mac80211: fix debugfs deadlock at device removal time
+
+  - bpf:
+    - sockmap: af_unix stream sockets need to hold ref for pair sock
+    - netdevsim: don't accept device bound programs
+
+  - selftests: fix a char signedness issue
+
+  - dsa: mv88e6xxx: fix marvell 6350 probe crash
+
+  - octeontx2-pf: restore TC ingress police rules when interface is up
+
+  - wangxun: fix memory leak on msix entry
+
+  - ravb: keep reverse order of operations in ravb_remove()
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Ben Greear (1):
+      wifi: mac80211: handle 320 MHz in ieee80211_ht_cap_ie_to_sta_ht_cap
+
+Claudiu Beznea (6):
+      net: ravb: Check return value of reset_control_deassert()
+      net: ravb: Use pm_runtime_resume_and_get()
+      net: ravb: Make write access to CXR35 first before accessing other EMAC registers
+      net: ravb: Start TX queues after HW initialization succeeded
+      net: ravb: Stop DMA in case of failures on ravb_open()
+      net: ravb: Keep reverse order of operations in ravb_remove()
+
+Dan Carpenter (1):
+      wifi: iwlwifi: mvm: fix an error code in iwl_mvm_mld_add_sta()
+
+Daniel Borkmann (1):
+      netkit: Reject IFLA_NETKIT_PEER_INFO in netkit_change_link
+
+Dave Ertman (1):
+      ice: Fix VF Reset paths when interface in a failed over aggregate
+
+David S. Miller (2):
+      Merge branch 'rswitch-fixes'
+      Merge branch 'dpaa2-eth-fixes'
+
+Edward Adam Davis (1):
+      mptcp: fix uninit-value in mptcp_incoming_options
+
+Elena Salomatkina (1):
+      octeontx2-af: Fix possible buffer overflow
+
+Furong Xu (1):
+      net: stmmac: xgmac: Disable FPE MMC interrupts
+
+Geetha sowjanya (1):
+      octeontx2-pf: Fix adding mbox work queue entry when num_vfs > 64
+
+Greg Ungerer (2):
+      net: dsa: mv88e6xxx: fix marvell 6350 switch probing
+      net: dsa: mv88e6xxx: fix marvell 6350 probe crash
+
+Gustavo A. R. Silva (1):
+      neighbour: Fix __randomize_layout crash in struct neighbour
+
+Heiner Kallweit (2):
+      r8169: fix deadlock on RTL8125 in jumbo mtu mode
+      r8169: prevent potential deadlock in rtl8169_close
+
+Hou Tao (1):
+      bpf: Add missed allocation hint for bpf_mem_cache_alloc_flags()
+
+Ioana Ciornei (2):
+      dpaa2-eth: increase the needed headroom to account for alignment
+      dpaa2-eth: recycle the RX buffer only after all processing done
+
+Jakub Kicinski (5):
+      Merge branch 'selftests-net-fix-a-few-small-compiler-warnings'
+      ethtool: don't propagate EOPNOTSUPP from dumps
+      tools: ynl-gen: always construct struct ynl_req_state
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'wireless-2023-11-29' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+
+Jiawen Wu (1):
+      net: libwx: fix memory leak on msix entry
+
+Johannes Berg (9):
+      wifi: cfg80211: fix CQM for non-range use
+      wifi: cfg80211: lock wiphy mutex for rfkill poll
+      wifi: cfg80211: hold wiphy mutex for send_interface
+      debugfs: fix automount d_fsdata usage
+      debugfs: annotate debugfs handlers vs. removal with lockdep
+      debugfs: add API to allow debugfs operations cancellation
+      wifi: cfg80211: add locked debugfs wrappers
+      wifi: mac80211: use wiphy locked debugfs helpers for agg_status
+      wifi: mac80211: use wiphy locked debugfs for sdata/link
+
+John Fastabend (2):
+      bpf, sockmap: af_unix stream sockets need to hold ref for pair sock
+      bpf, sockmap: Add af_unix test with both sockets in map
+
+Lorenzo Bianconi (1):
+      wifi: mt76: mt7925: fix typo in mt7925_init_he_caps
+
+Michael-CY Lee (1):
+      wifi: avoid offset calculation on NULL pointer
+
+Ming Yen Hsieh (1):
+      wifi: mt76: mt7921: fix 6GHz disabled by the missing default CLC config
+
+Oldřich Jedlička (1):
+      wifi: mac80211: do not pass AP_VLAN vif pointer to drivers during flush
+
+Paolo Abeni (1):
+      Merge branch 'net-ravb-fixes-for-the-ravb-driver'
+
+Stanislav Fomichev (1):
+      netdevsim: Don't accept device bound programs
+
+Subbaraya Sundeep (1):
+      octeontx2-pf: Restore TC ingress police rules when interface is up
+
+Willem de Bruijn (4):
+      selftests/net: ipsec: fix constant out of range
+      selftests/net: fix a char signedness issue
+      selftests/net: unix: fix unused variable compiler warning
+      selftests/net: mptcp: fix uninitialized variable warnings
+
+Yoshihiro Shimoda (4):
+      net: rswitch: Fix type of ret in rswitch_start_xmit()
+      net: rswitch: Fix return value in rswitch_start_xmit()
+      net: rswitch: Fix missing dev_kfree_skb_any() in error path
+      ravb: Fix races between ravb_tx_timeout_work() and net related ops
+
+Zhengchao Shao (1):
+      ipv4: igmp: fix refcnt uaf issue when receiving igmp query packet
+
+ drivers/net/dsa/mv88e6xxx/chip.c                   |  26 +++-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  16 ++-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.h   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c           | 122 +++++++++-------
+ drivers/net/ethernet/intel/ice/ice_lag.h           |   1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c        |  20 +++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c      |  25 ++++
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |   4 +-
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c |   3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h   |   2 +
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |   9 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c   | 120 ++++++++++++----
+ drivers/net/ethernet/realtek/r8169_main.c          |   9 +-
+ drivers/net/ethernet/renesas/ravb_main.c           |  69 +++++----
+ drivers/net/ethernet/renesas/rswitch.c             |  22 +--
+ drivers/net/ethernet/stmicro/stmmac/mmc_core.c     |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c        |   2 +-
+ drivers/net/netdevsim/bpf.c                        |   4 +-
+ drivers/net/netkit.c                               |   6 +
+ drivers/net/wireless/ath/ath9k/Kconfig             |   4 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c   |   4 +-
+ drivers/net/wireless/mediatek/mt76/mt7921/mcu.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/main.c   |   4 +-
+ fs/debugfs/file.c                                  | 100 +++++++++++++
+ fs/debugfs/inode.c                                 |  71 +++++++--
+ fs/debugfs/internal.h                              |  21 ++-
+ include/linux/debugfs.h                            |  19 +++
+ include/linux/ieee80211.h                          |   4 +-
+ include/linux/skmsg.h                              |   1 +
+ include/net/af_unix.h                              |   1 +
+ include/net/cfg80211.h                             |  46 ++++++
+ include/net/neighbour.h                            |   2 +-
+ kernel/bpf/memalloc.c                              |   2 +
+ net/core/skmsg.c                                   |   2 +
+ net/ethtool/netlink.c                              |   1 +
+ net/ipv4/igmp.c                                    |   6 +-
+ net/mac80211/Kconfig                               |   2 +-
+ net/mac80211/debugfs_netdev.c                      | 150 +++++++++++++------
+ net/mac80211/debugfs_sta.c                         |  74 +++++-----
+ net/mac80211/driver-ops.h                          |   9 +-
+ net/mac80211/ht.c                                  |   1 +
+ net/mptcp/options.c                                |   1 +
+ net/unix/af_unix.c                                 |   2 -
+ net/unix/unix_bpf.c                                |   5 +
+ net/wireless/core.c                                |   6 +-
+ net/wireless/core.h                                |   1 +
+ net/wireless/debugfs.c                             | 160 +++++++++++++++++++++
+ net/wireless/nl80211.c                             |  55 ++++---
+ tools/net/ynl/generated/devlink-user.c             |  87 +++++++----
+ tools/net/ynl/generated/ethtool-user.c             |  51 ++++---
+ tools/net/ynl/generated/fou-user.c                 |   6 +-
+ tools/net/ynl/generated/handshake-user.c           |   3 +-
+ tools/net/ynl/ynl-gen-c.py                         |  10 +-
+ .../selftests/bpf/prog_tests/sockmap_listen.c      |  51 +++++--
+ .../selftests/bpf/progs/test_sockmap_listen.c      |   7 +
+ tools/testing/selftests/net/af_unix/diag_uid.c     |   1 -
+ tools/testing/selftests/net/cmsg_sender.c          |   2 +-
+ tools/testing/selftests/net/ipsec.c                |   4 +-
+ tools/testing/selftests/net/mptcp/mptcp_connect.c  |  11 +-
+ tools/testing/selftests/net/mptcp/mptcp_inq.c      |  11 +-
+ 60 files changed, 1128 insertions(+), 337 deletions(-)
 
 
