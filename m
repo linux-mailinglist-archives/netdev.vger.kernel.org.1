@@ -1,49 +1,54 @@
-Return-Path: <netdev+bounces-52603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B7E7FF63D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:37:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703527FF673
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C456B281993
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:37:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0103CB20E79
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB51537ED;
-	Thu, 30 Nov 2023 16:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70255100A;
+	Thu, 30 Nov 2023 16:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+WfRvpH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWcwnlM+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D95482DC;
-	Thu, 30 Nov 2023 16:37:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14325C433C7;
-	Thu, 30 Nov 2023 16:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD1254F82;
+	Thu, 30 Nov 2023 16:43:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2197C433C8;
+	Thu, 30 Nov 2023 16:43:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701362220;
-	bh=SobiidIS+hHcukJvYsXZfDPPGv/R7HPfRW8Q9/zJa4A=;
+	s=k20201202; t=1701362582;
+	bh=8wyputpFdm2cBZ54ZzkL6T98tTMSJWpqPV+JdrSK/7s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l+WfRvpHrwFcH8e0Rc5LeToQAMVsKHg8zRjgK/9FHGqJ4qIff68sKeolM7nxWOnW5
-	 B6Dc8T2yqvV2BJWfLjbP/YxQVgl7PajeyZimbEJvV1Zxc45BRJk87YWhJtvUPNLYGC
-	 FpVKPGPG+eR0Fyd3m81nLS0RonccR2VQJ20OpV96GtE4PZwEHCS8ktccsJftsLX4Pf
-	 JDLMSvBi1BW2sTlwj3tglZFYFfrUVP1tkcNhLdVJjcm8u3LjBsw1GJ0/XqGBg/CnGn
-	 94+dpy6hgWNyMEV0pw2Bi6/A+6Bwd2ql0Bfn4EG7eMm4CdQuDFpiD4Zyd/+2QGLAy5
-	 nWHr2C6yBhFhg==
-Date: Thu, 30 Nov 2023 16:36:55 +0000
+	b=rWcwnlM+w1ltPx8nM+/an5hvPw8v4UIBR91eaUZCa48me5GW+dK0OUU4H6vjMxoY0
+	 dLcpZabGxfPi7yIXpBsxCTkiU3k9yfTuf/zXhnVvbHtcGoyx1N4Yau+sTo/wLEGInY
+	 zzu7XT4Q0QOnMsNCE1G7ll+jex3eXlvBTgSxpLbB/UXsdvujHgiI4KGCH++ggxro5t
+	 XAnNAzLt71G0QVl7cCJoaum3SUMvgI7HGvBOEfYljNP0rXMaP7dL35ZPI0zb1ENe9q
+	 y1vpuO5kAuFomMY2V1vPYm7Aj0TvaSPzhGaAwB9AaZOH7BtrJk5KRzN+Vz/ltIPRs9
+	 Ahhj8BkvDe3AQ==
+Date: Thu, 30 Nov 2023 16:42:57 +0000
 From: Simon Horman <horms@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
-	brauner@kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v11 bpf-next 02/17] bpf: add BPF token delegation mount
- options to BPF FS
-Message-ID: <20231130163655.GC32077@kernel.org>
-References: <20231127190409.2344550-1-andrii@kernel.org>
- <20231127190409.2344550-3-andrii@kernel.org>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>, dmitry.bezrukov@aquantia.com,
+	marcinguy@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCHv2] USB: gl620a: check for rx buffer overflow
+Message-ID: <20231130164257.GD32077@kernel.org>
+References: <20231122095306.15175-1-oneukum@suse.com>
+ <2c1a8d3e-fac1-d728-1c8d-509cd21f7b4d@omp.ru>
+ <367cedf8-881b-4b88-8da0-a46a556effda@suse.com>
+ <5a04ff8e-7044-2d46-ab12-f18f7833b7f5@gmail.com>
+ <2338f70a-1823-47ad-8302-7fb62481f736@suse.com>
+ <20231124115307.GP50352@kernel.org>
+ <794803a2-3084-4591-b91f-6c7cc7a3dbe9@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,35 +57,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231127190409.2344550-3-andrii@kernel.org>
+In-Reply-To: <794803a2-3084-4591-b91f-6c7cc7a3dbe9@suse.com>
 
-On Mon, Nov 27, 2023 at 11:03:54AM -0800, Andrii Nakryiko wrote:
+On Thu, Nov 30, 2023 at 10:38:09AM +0100, Oliver Neukum wrote:
+> On 24.11.23 12:53, Simon Horman wrote:
+> > 
+> > 
+> > I think it would be useful to include information along the lines
+> > of the above in the patch description.
+> 
+> Hi,
+> 
+> I see why you want this information to be available.
+> So I thought about it and I think this should be
+> either in Documentation or in a comment in usbnet,
+> so that new drivers include the necessary checks
+> from the start. What do you think?
 
-...
+Hi Oliver,
 
-> @@ -764,7 +817,10 @@ static int bpf_get_tree(struct fs_context *fc)
->  
->  static void bpf_free_fc(struct fs_context *fc)
->  {
-> -	kfree(fc->fs_private);
-> +	struct bpf_mount_opts *opts = fc->s_fs_info;
-> +
-> +	if (opts)
-> +		kfree(opts);
->  }
+yes, now you mention it that does seem appropriate.
+And I don't think that doing so gates this patch.
 
-Hi Andrii,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-as it looks like there will be a v12, I have a minor nit to report: There
-is no need to check if opts is non-NULL because kfree() is basically a
-no-op if it's argument is NULL.
-
-So perhaps this can become (completely untested!):
-
-static void bpf_free_fc(struct fs_context *fc)
-{
-	kfree(fc->s_fs_info);
-}
-
-...
+-- 
+pw-bot: under-review
 
