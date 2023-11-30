@@ -1,173 +1,141 @@
-Return-Path: <netdev+bounces-52412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 649807FEAA4
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:31:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2FF7FEABD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9672C1C20C2A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:31:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B679B20FB7
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AFA2231C;
-	Thu, 30 Nov 2023 08:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1702D602;
+	Thu, 30 Nov 2023 08:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TcAFb0bd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gIsNX1BV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B39CD5C
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:31:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701333062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uvwklizxttywrNQn/HzGf7D1oVOeCG+xDam5mVjOLQ0=;
-	b=TcAFb0bdbqbkE78I9x2Gi4rdarMA3VvD1GTPt2wadhFGgmICBxdFGxIKBSoTmo2RcyQxjd
-	WEEUcoGFCvv7L7xopwaiytj3jsN3TnR8zKNJJ+GeyPYk5siKAv34GBn7CBZ+sQ1hI+w/lf
-	oA4IM3/TPfaxv1j1FEq78ezOFgbdjz0=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-313-MUgB0fHZPO2V9gD9EDRY_w-1; Thu, 30 Nov 2023 03:31:00 -0500
-X-MC-Unique: MUgB0fHZPO2V9gD9EDRY_w-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2c9b18161b6so7214791fa.3
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:31:00 -0800 (PST)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0DD2B2
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:33:40 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54af1daf6a9so873053a12.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:33:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701333219; x=1701938019; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8PSAY2k2J7SrIdNr0vF4rXf43WhakIolosmZF+sg9ug=;
+        b=gIsNX1BVfD71qSglxZ03JpKyhv5cSzsZ7xLN37LoumT/1Y3S/MgE7G8SSwgASbWeij
+         qwkKugTi3TpqNRTMX3gZf72KozKqQUThtdKXFHNMiBfTxx83wmM5vgpz6O0WOu+0hRM+
+         c63W5Fv7e488xtJDjJDkagxnXnAwyDL2FCx4wakklXmq2StO9wQRnocHur77IvM55tuL
+         SafY9IX6cmwfkRTFqihC8Uqkmhq1nmmhYEPUCokw8WH2XgBESlpFJAEqaurt2xbVjaTp
+         0sTuKpabGMobdTHwhecbV3wxbkDx/dXrf5/kveTkJUro1IWs7KaD9S2zDwqOTxN8zc46
+         QqRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701333059; x=1701937859;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvwklizxttywrNQn/HzGf7D1oVOeCG+xDam5mVjOLQ0=;
-        b=ZHMgPAsvTlFkA1KMbt5vu2LtZRzoBg6HarZaQtuPp9TzfFCBHG5jEmFfaQZcgufdTb
-         UdPSQwQIGIb11SnGjS5k0jX/SAgWhrXDreVKUH1Jviv4TnKIAcVPDed37erclnJ+DqXG
-         TSvUi+n7I1RbghvL1ovp6FN0vASP5GOe2I3BRfbSegvTxSOmKqpF2vfvDUc3OihcwXfJ
-         s+i2qNDjfQbGifd6+iK14kMiJIm5RgkA9zK3NKFBHTf70/lvr/jic8n0o8eo/QXzxcGl
-         qsBk3UQ4bUFayuKa9hs95ZZxFm7L74pVDjdr/qHBCDyXxfmtP59Yi2Z7PcQd3p6l05B4
-         b0zA==
-X-Gm-Message-State: AOJu0YzMrXcr2y1nQiS5F6vhkx9vLTymInt+b6Ww3TTo98zEPMilQE9o
-	dqJqaEfZL13Xu+xicyrGj/hWtVmu9f7/3qqK/f1F+xsQfZx+nNe8x/dBa7FRMnCTziuw29aGysR
-	3+kqXof/btBGHvUaG
-X-Received: by 2002:a05:6512:3b87:b0:50b:c6c7:1e60 with SMTP id g7-20020a0565123b8700b0050bc6c71e60mr3510707lfv.29.1701333059229;
-        Thu, 30 Nov 2023 00:30:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFZPXMRUFPQjq9fdK7LoNwx6iK0sPnSJoC33Kzjoq8NkyT67Yp84Aiz14LjSlhXSudqjwUSpQ==
-X-Received: by 2002:a05:6512:3b87:b0:50b:c6c7:1e60 with SMTP id g7-20020a0565123b8700b0050bc6c71e60mr3510684lfv.29.1701333058851;
-        Thu, 30 Nov 2023 00:30:58 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
-        by smtp.gmail.com with ESMTPSA id r5-20020a05600c35c500b0040b54335d57sm4368784wmq.17.2023.11.30.00.30.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 00:30:58 -0800 (PST)
-Date: Thu, 30 Nov 2023 09:30:54 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 1/3] vsock: update SO_RCVLOWAT setting callback
-Message-ID: <pewqjb3y45q4s5ffqxwavss5hz2ub5eeucms7egopbfpjq4bnr@rnjezpz2xgsu>
-References: <20231129212519.2938875-1-avkrasnov@salutedevices.com>
- <20231129212519.2938875-2-avkrasnov@salutedevices.com>
+        d=1e100.net; s=20230601; t=1701333219; x=1701938019;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8PSAY2k2J7SrIdNr0vF4rXf43WhakIolosmZF+sg9ug=;
+        b=Aba2f8G3O9inVRfaP9CalbBzfypYGd0JqL4BTeOI1hWdAXKv5fYL10MJgBcnYcXlgb
+         8ayv8UrKngZuAS5R8C7JRSIY/cIujRL8mrtmTkjTVS1xwE8xfbcezpOQ4gNvDdmxnPuh
+         GMRqVGPLIGyjjxphPLYgGZJQLkxL/K8gBi8xmo7i5MTIu+CRwoesmZfJoxLWPZ4pM4BZ
+         IDfqkZFfKNAlzxNWAN2SSTx48uYgSrNBaaSyo3c/HssTMC5dETpALIWzMimtKjEqt51x
+         XHfcWHQxbFxZiboedRpv1b6ClF2Uo17cq6xiSakA2Fmdai02kVxlqCDjgqwPW6mCboBT
+         k2rQ==
+X-Gm-Message-State: AOJu0YxVaSP4n/a7HGJFs8n8db1l1adshTf7MGHfyBQjofAXc53nyG/7
+	/fyeBV6Tns77fVbc5V0/owFBuwHUD7+w7KLVUqE=
+X-Google-Smtp-Source: AGHT+IFgzitCvBSeMROIhzbM/XZqqBd9jq7G/YZnGvhD8zhcpiJZSW3EA1UTK2CouOOqV0cSitIjNw==
+X-Received: by 2002:aa7:d848:0:b0:54a:f411:9a2e with SMTP id f8-20020aa7d848000000b0054af4119a2emr17483276eds.0.1701333219485;
+        Thu, 30 Nov 2023 00:33:39 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.109])
+        by smtp.gmail.com with ESMTPSA id c19-20020aa7c993000000b0054bcfd3d671sm323775edt.37.2023.11.30.00.33.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Nov 2023 00:33:39 -0800 (PST)
+Message-ID: <5607b466-3db1-4c18-be16-2731ee55451a@linaro.org>
+Date: Thu, 30 Nov 2023 09:33:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231129212519.2938875-2-avkrasnov@salutedevices.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: qcom,ipa: document SM8650 compatible
+Content-Language: en-US
+To: Neil Armstrong <neil.armstrong@linaro.org>, Andy Gross
+ <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231129-topic-sm8650-upstream-bindings-ipa-v1-1-ca21eb2dfb14@linaro.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231129-topic-sm8650-upstream-bindings-ipa-v1-1-ca21eb2dfb14@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023 at 12:25:17AM +0300, Arseniy Krasnov wrote:
->Do not return if transport callback for SO_RCVLOWAT is set (only in
->error case). In this case we don't need to set 'sk_rcvlowat' field in
->each transport - only in 'vsock_set_rcvlowat()'. Also, if 'sk_rcvlowat'
->is now set only in af_vsock.c, change callback name from 'set_rcvlowat'
->to 'notify_set_rcvlowat'.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> Changelog:
-> v3 -> v4:
->  * Rename 'set_rcvlowat' to 'notify_set_rcvlowat'.
->  * Commit message updated.
+On 29/11/2023 18:22, Neil Armstrong wrote:
+> Document the IPA on the SM8650 Platform which uses version 5.5.1,
+> which is a minor revision of v5.5 found on SM8550, thus we can
+> use the SM8550 bindings as fallback since it shares the same
+> register mappings.
+> 
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
->
-> include/net/af_vsock.h           | 2 +-
-> net/vmw_vsock/af_vsock.c         | 9 +++++++--
-> net/vmw_vsock/hyperv_transport.c | 4 ++--
-> 3 files changed, 10 insertions(+), 5 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index e302c0e804d0..535701efc1e5 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -137,7 +137,6 @@ struct vsock_transport {
-> 	u64 (*stream_rcvhiwat)(struct vsock_sock *);
-> 	bool (*stream_is_active)(struct vsock_sock *);
-> 	bool (*stream_allow)(u32 cid, u32 port);
->-	int (*set_rcvlowat)(struct vsock_sock *vsk, int val);
->
-> 	/* SEQ_PACKET. */
-> 	ssize_t (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
->@@ -168,6 +167,7 @@ struct vsock_transport {
-> 		struct vsock_transport_send_notify_data *);
-> 	/* sk_lock held by the caller */
-> 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
->+	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->
-> 	/* Shutdown. */
-> 	int (*shutdown)(struct vsock_sock *, int);
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 816725af281f..54ba7316f808 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2264,8 +2264,13 @@ static int vsock_set_rcvlowat(struct sock *sk, int val)
->
-> 	transport = vsk->transport;
->
->-	if (transport && transport->set_rcvlowat)
->-		return transport->set_rcvlowat(vsk, val);
->+	if (transport && transport->notify_set_rcvlowat) {
->+		int err;
->+
->+		err = transport->notify_set_rcvlowat(vsk, val);
->+		if (err)
->+			return err;
->+	}
->
-> 	WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
-> 	return 0;
->diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->index 7cb1a9d2cdb4..e2157e387217 100644
->--- a/net/vmw_vsock/hyperv_transport.c
->+++ b/net/vmw_vsock/hyperv_transport.c
->@@ -816,7 +816,7 @@ int hvs_notify_send_post_enqueue(struct vsock_sock *vsk, ssize_t written,
-> }
->
-> static
->-int hvs_set_rcvlowat(struct vsock_sock *vsk, int val)
->+int hvs_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
-> {
-> 	return -EOPNOTSUPP;
-> }
->@@ -856,7 +856,7 @@ static struct vsock_transport hvs_transport = {
-> 	.notify_send_pre_enqueue  = hvs_notify_send_pre_enqueue,
-> 	.notify_send_post_enqueue = hvs_notify_send_post_enqueue,
->
->-	.set_rcvlowat             = hvs_set_rcvlowat
->+	.notify_set_rcvlowat      = hvs_notify_set_rcvlowat
-> };
->
-> static bool hvs_check_transport(struct vsock_sock *vsk)
->-- 
->2.25.1
->
+Best regards,
+Krzysztof
 
 
