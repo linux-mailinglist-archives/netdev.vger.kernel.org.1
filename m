@@ -1,45 +1,49 @@
-Return-Path: <netdev+bounces-52545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE7347FF17A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:17:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D697FF197
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:18:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98EC628249F
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3E0282270
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AA8495E2;
-	Thu, 30 Nov 2023 14:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B265F49F9C;
+	Thu, 30 Nov 2023 14:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="opAj57fh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rKH2GVzt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF5883;
-	Thu, 30 Nov 2023 06:17:08 -0800 (PST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1701353825; bh=yghvjtwfe2VoJIk53aHU8FWUgdXH2HkotJ7JMAjgvv8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=opAj57fhbJfKcAE+hZ9nHFm8WYWDky/N8TsuvNmO4LDnhlqLTO5cjxjfYo6u2ZQwO
-	 PkOyD5UMD0UQISsL5XQl4QfTiIy8RGzOI1pQqbcfCN3wMtEzFTwZdatn+AeKtMG1ZH
-	 aL8KOYAXk426EIKQ/M6grA3PNsf9Nr7Z/ivWZ4eN10uDCpLP89bgrHBqtd5NsjM6F8
-	 3QWycqSQbZrxZzvqkjttTMlE8SLPd6sYIzyB44o73jicXkxtra7C9CrwGY26NOTeK/
-	 4uv9oL4YX4aVBRM9gcRBjsRUfDwYIazz5D9HmAXPlpf1XdWdFCZv+4/w2CWEXXo53W
-	 LroZ6qNQ5LUOg==
-To: Florian Westphal <fw@strlen.de>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
- lorenzo@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH nf-next 7/8] netfilter: nf_tables: add flowtable map for
- xdp offload
-In-Reply-To: <20231130135308.GA5447@breakpoint.cc>
-References: <20231121122800.13521-1-fw@strlen.de>
- <20231121122800.13521-8-fw@strlen.de> <87il5re7su.fsf@toke.dk>
- <20231130135308.GA5447@breakpoint.cc>
-Date: Thu, 30 Nov 2023 15:17:05 +0100
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87ttp31g2m.fsf@toke.dk>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862EF495EA;
+	Thu, 30 Nov 2023 14:18:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5879C433C7;
+	Thu, 30 Nov 2023 14:18:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701353919;
+	bh=KWh6WrvRBA/2y9C3DeEyxrAn6hfNwQA1TgM/LAr/cbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rKH2GVztBJVr9VrPuidBNfh17LuITLFr0quPg6mvsC8ofPB4+mMGM4vHBUJ9ViEjt
+	 lHo9Wqx8mtKuDeoJj6EdWARnmohWzMl+MuP6cyIBqsIvOz+8uA2fra+Ybse0ENEbq4
+	 lL3uRUVXHPM/RsIn5KCMFyRhONgSJ0tmjMX0X8G3qGQmbKW990CnipJrJPatZcoTIP
+	 mme0Ut6q5B0GxCQhT/0jLItZV95iEjo4Bpg0qY9DJXy2yb9deIDk+bijdnrUyzFv93
+	 7mWLPSBe1C82QttfBNTeYVAoQenI1D/4Awu8m0WwGvk4t8F0cCAJUA3qUiRJALm4Yn
+	 loYtiDl6b9QfQ==
+Date: Thu, 30 Nov 2023 15:18:33 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keescook@chromium.org,
+	kernel-team@meta.com, sargun@sargun.me
+Subject: Re: [PATCH v11 bpf-next 02/17] bpf: add BPF token delegation mount
+ options to BPF FS
+Message-ID: <20231130-zivildienst-weckt-4888b2689eea@brauner>
+References: <20231127190409.2344550-1-andrii@kernel.org>
+ <20231127190409.2344550-3-andrii@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,51 +51,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20231127190409.2344550-3-andrii@kernel.org>
 
-Florian Westphal <fw@strlen.de> writes:
+On Mon, Nov 27, 2023 at 11:03:54AM -0800, Andrii Nakryiko wrote:
+> Add few new mount options to BPF FS that allow to specify that a given
+> BPF FS instance allows creation of BPF token (added in the next patch),
+> and what sort of operations are allowed under BPF token. As such, we get
+> 4 new mount options, each is a bit mask
+>   - `delegate_cmds` allow to specify which bpf() syscall commands are
+>     allowed with BPF token derived from this BPF FS instance;
+>   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
+>     a set of allowable BPF map types that could be created with BPF token;
+>   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
+>     a set of allowable BPF program types that could be loaded with BPF token;
+>   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
+>     a set of allowable BPF program attach types that could be loaded with
+>     BPF token; delegate_progs and delegate_attachs are meant to be used
+>     together, as full BPF program type is, in general, determined
+>     through both program type and program attach type.
+> 
+> Currently, these mount options accept the following forms of values:
+>   - a special value "any", that enables all possible values of a given
+>   bit set;
+>   - numeric value (decimal or hexadecimal, determined by kernel
+>   automatically) that specifies a bit mask value directly;
+>   - all the values for a given mount option are combined, if specified
+>   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
+>   delegate_maps=0x1 -o delegate_maps=0x2` will result in a combined 0x3
+>   mask.
+> 
+> Ideally, more convenient (for humans) symbolic form derived from
+> corresponding UAPI enums would be accepted (e.g., `-o
+> delegate_progs=kprobe|tracepoint`) and I intend to implement this, but
+> it requires a bunch of UAPI header churn, so I postponed it until this
+> feature lands upstream or at least there is a definite consensus that
+> this feature is acceptable and is going to make it, just to minimize
+> amount of wasted effort and not increase amount of non-essential code to
+> be reviewed.
+> 
+> Attentive reader will notice that BPF FS is now marked as
+> FS_USERNS_MOUNT, which theoretically makes it mountable inside non-init
+> user namespace as long as the process has sufficient *namespaced*
+> capabilities within that user namespace. But in reality we still
+> restrict BPF FS to be mountable only by processes with CAP_SYS_ADMIN *in
+> init userns* (extra check in bpf_fill_super()). FS_USERNS_MOUNT is added
+> to allow creating BPF FS context object (i.e., fsopen("bpf")) from
+> inside unprivileged process inside non-init userns, to capture that
+> userns as the owning userns. It will still be required to pass this
+> context object back to privileged process to instantiate and mount it.
+> 
+> This manipulation is important, because capturing non-init userns as the
+> owning userns of BPF FS instance (super block) allows to use that userns
+> to constraint BPF token to that userns later on (see next patch). So
+> creating BPF FS with delegation inside unprivileged userns will restrict
+> derived BPF token objects to only "work" inside that intended userns,
+> making it scoped to a intended "container". Also, setting these
+> delegation options requires capable(CAP_SYS_ADMIN), so unprivileged
+> process cannot set this up without involvement of a privileged process.
+> 
+> There is a set of selftests at the end of the patch set that simulates
+> this sequence of steps and validates that everything works as intended.
+> But careful review is requested to make sure there are no missed gaps in
+> the implementation and testing.
+> 
+> This somewhat subtle set of aspects is the result of previous
+> discussions ([0]) about various user namespace implications and
+> interactions with BPF token functionality and is necessary to contain
+> BPF token inside intended user namespace.
+> 
+>   [0] https://lore.kernel.org/bpf/20230704-hochverdient-lehne-eeb9eeef785e@brauner/
+> 
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> ---
 
-> Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk> wrote:
->> I am not a huge fan of this flag, especially not as UAPI. Using the XDP
->> offload functionality is already an explicit opt-in by userspace (you
->> need to load the XDP program). So adding a second UAPI flag that you
->> have to set for the flowtable to be compatible with XDP seems to just
->> constrain things needlessly (and is bound to lead to bugs)?
->
-> I can remove it.  But it leads to issues, for example one flowtable
-> can shadow another one.
->
-> I'd prefer to handle this from control plane and reject such config.
-> Alternative is to ignore this and handle it as "self sabotage, don't
-> care" combined with "do not do that, then".
+I still think this is a little weird because this isn't really
+unprivileged bpf and it isn't really safe bpf as well.
 
-I do see your point about avoiding invalid configurations, but, well XDP
-is already very much a "use it right or it will break on you" kind of
-thing, so I think that bit is kinda unavoidable. As in, upon loading the
-XDP program that does the lookup, you can validate the configuration and
-reject loading if it's setup in a way that your program can support.
-Whereas if you have to set a flag on the flowtable itself, that means
-you have to make changes to the nft ruleset itself to be compatible with
-XDP acceleration (right?), you can't just go "accelerate my existing
-ruleset".
+All this does is allow an administrator to punch a big fat hole into an
+unprivileged container so workloads get to play with their favorite toy.
 
->> If we can't change the behaviour, we could change the lookup mechanism?
->> BPF is pretty flexible, nothing says it has to use an ifindex as the
->> lookup key? The neatest thing would be to have some way for userspace to
->> directly populate a reference to the flowtable struct in a map, but a
->> simpler solution would be to just introduce an opaque ID for each
->> flowtable instance and use that as the lookup key (userspace could
->> trivially put that into a map for the BPF program to find)?
->
-> Won't that complicate things?  Userspace will have to use netlink
-> events to discover when a flowtable is removed, no?
+I think that having a way to have signed bpf programs in addition to
+this would be much more interesting to generic workloads that don't know
+who or what they can trust.
 
-Well, I am kinda assuming that userspace is the entity doing the
-removing, in which case it should already know this, right? I must admit
-to being a little fuzzy on the details of when a flowtable object is
-replaced, though. For instance, does reloading an nft ruleset always
-replace the flowtable with a new one (even if there's no change to the
-flowtable config itself)?
+And there's a few things to remember:
 
--Toke
+* This absolutely isn't a safety mechanism.
+* This absolutely isn't safe to enable generically in containers.
+* This is a workaround and not a solution to unprivileged bpf.
+
+And this is an ACK solely on the code of this patch, not the concept.
+Acked-by: Christian Brauner <brauner@kernel.org> (reluctantly)
 
