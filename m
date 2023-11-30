@@ -1,118 +1,62 @@
-Return-Path: <netdev+bounces-52647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C85A7FF925
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:13:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0B97FF921
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0271C20BA3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:13:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15D69B20E1A
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F8359158;
-	Thu, 30 Nov 2023 18:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739C359148;
+	Thu, 30 Nov 2023 18:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AtBJI9Bu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1u73PJS8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79761B3
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:13:49 -0800 (PST)
-Message-ID: <ab31efa1-d6b9-499d-a735-0852ed036a2f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701368027;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=58Q6JcRzCXrW3RrlsjnmRKm8ghiXbb5Xj7YAxJh8ddA=;
-	b=AtBJI9BuCfKzfI5R9tI+Kwev5Bhl1Io5lMwCd6STjFUeCeZhabgbsxQb75w8hvz9j5cQAY
-	cWDhainP961H9WYDZRAX1flA6b7azEidy2s357rMlEt8nZvCFrJx0AERt+N2peYPSakG0l
-	ll7v67yTCS0osNPGmdspI+FG4s7AgE0=
-Date: Thu, 30 Nov 2023 10:13:07 -0800
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECCD31B3
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:13:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8ckDCFnG5XwkvZJDpsjOjyKrOSn4bB8xpoBOW5kTJ90=; b=1u73PJS8ErIXGW/BgzzndLKFdb
+	tMMz5JZV0BQ7fPqGP4geiwZa3Wt9cZz6bGRAkokp0tmsqu2yDgfWlRre5xwSjTkmXIPSWXsPxLGei
+	qjfP1gWqrJ0gAqiGZ6gXV1vZ16rLnktKhPp8z/da3T0Fngih6NeAhIkylXo1omZwbtF4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r8lXD-001gy5-Qw; Thu, 30 Nov 2023 19:13:11 +0100
+Date: Thu, 30 Nov 2023 19:13:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Bahadur, Sachin" <sachin.bahadur@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH iwl-next v2] ice: Print NIC FW version during init
+Message-ID: <fadae2d9-68ab-4a1a-bfe1-78d0f1c2fb13@lunn.ch>
+References: <20231129175604.1374020-1-sachin.bahadur@intel.com>
+ <6404194f-3193-49e0-8e46-267affb56c24@lunn.ch>
+ <BY5PR11MB4257E2D47667F2108BEDBE0F9682A@BY5PR11MB4257.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] bpf: add sock_ops callbacks for data
- send/recv/acked events
-Content-Language: en-US
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
- hengqi@linux.alibaba.com, edumazet@google.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20231123030732.111576-1-lulie@linux.alibaba.com>
- <438f45f9-4e18-4d7d-bfa5-4a239c4a2304@linux.alibaba.com>
- <3aa60895-c149-4cac-a09a-169abbe4e2f5@linux.dev>
- <1bcd4871-7403-41d9-8ae6-4df4878d9275@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <1bcd4871-7403-41d9-8ae6-4df4878d9275@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY5PR11MB4257E2D47667F2108BEDBE0F9682A@BY5PR11MB4257.namprd11.prod.outlook.com>
 
-On 11/29/23 2:05 AM, Philo Lu wrote:
-> 
-> On 2023/11/29 08:33, Martin KaFai Lau wrote:
->> On 11/23/23 4:37 AM, Philo Lu wrote:
->>> Sorry, I forgot to cc the maintainers.
->>>
->>> On 2023/11/23 11:07, Philo Lu wrote:
->>>> Add 3 sock_ops operators, namely BPF_SOCK_OPS_DATA_SEND_CB,
->>>> BPF_SOCK_OPS_DATA_RECV_CB, and BPF_SOCK_OPS_DATA_ACKED_CB. A flag
->>>> BPF_SOCK_OPS_DATA_EVENT_CB_FLAG is provided to minimize the performance
->>>> impact. The flag must be explicitly set to enable these callbacks.
->>>>
->>>> If the flag is enabled, bpf sock_ops program will be called every time a
->>>> tcp data packet is sent, received, and acked.
->>>> BPF_SOCK_OPS_DATA_SEND_CB: call bpf after a data packet is sent.
->>>> BPF_SOCK_OPS_DATA_RECV_CB: call bpf after a data packet is receviced.
->>>> BPF_SOCK_OPS_DATA_ACKED_CB: call bpf after a valid ack packet is
->>>> processed (some sent data are ackknowledged).
->>>>
->>>> We use these callbacks for fine-grained tcp monitoring, which collects
->>>> and analyses every tcp request/response event information. The whole
->>>> system has been described in SIGMOD'18 (see
->>>> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
->>>> achieve this with bpf, we require hooks for data events that call
->>>> sock_ops bpf (1) when any data packet is sent/received/acked, and (2)
->>>> after critical tcp state variables have been updated (e.g., snd_una,
->>>> snd_nxt, rcv_nxt). However, existing sock_ops operators cannot meet our
->>>> requirements.
->>>>
->>>> Besides, these hooks also help to debug tcp when data send/recv/acked.
->>
->> This all sounds like a tracing use case. Why tracepoint is not used instead?
-> 
-> Yes, our use case is pure tracing. We add hooks to sockops because we also use
-> other ops like BPF_SOCK_OPS_STATE_CB. Thus, sockops seems a natural solution
-> for us.
+> Yes, this info is available via the "devlink dev info" command. 
+> Adding this info in dmesg ensures the version information is
+> available when someone is looking at the dmesg log to debug an issue. 
+ 
+Ideally you would train your users to use devlink info, since you get
+more useful information, and it should work for any vendors NIC, not
+just Intel which is spamming the log with firmware versions.
 
-There is also an existing trace_inet_sock_set_state() tracepoint for tracking 
-the state change. There are other existing tracepoints in 
-include/trace/events/tcp.h for tcp perf monitoring/analysis purpose (e.g. 
-trace_tcp_retransmit_skb). All it needs is read-only access to sk and the 
-purpose is for tcp perf monitoring/analysis. If a hook is needed here 
-(cgroup-bpf or tracepoint), I would think it is better to supplement the 
-existing tcp tracepoints which were also added to do tcp monitoring.
-
-I suspect the fexit bpf prog may also work because the fexit bpf prog is called 
-after the traced kernel function is called. However, the kernel functions may 
-get inlined and the tracepoint will still be needed. May be the netdev 
-maintainer can chime in here regarding the tracepoint additions.
-
-> 
-> We can also use tracepoint (with sockops) instead. So we think which to use
-> depends on your opinions. Many thanks.
-> 
-> 
+  Andrew
 
 
