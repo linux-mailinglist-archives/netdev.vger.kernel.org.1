@@ -1,116 +1,112 @@
-Return-Path: <netdev+bounces-52401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC1C27FEA14
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:00:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94F47FEA15
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A5B528169D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:00:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4B9BB20DBA
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337FB20DD1;
-	Thu, 30 Nov 2023 08:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BE220B1E;
+	Thu, 30 Nov 2023 08:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hJJEJ8Yi"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RO8aveJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A2DD7F
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:00:37 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bca79244fso937500e87.3
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:00:37 -0800 (PST)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0011110D9
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:01:07 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-50bccc2e3efso575785e87.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:01:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701331236; x=1701936036; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701331266; x=1701936066; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=T3xrbxDioJnNBsN6cFVU5iXuYKzJG/S0mkUSUk6WGOA=;
-        b=hJJEJ8YiMxyMX0zZmZeRAXQFog1P4EKVvQPW5JNvOze5yoTg2obnxVKnCzk+VsptrK
-         KR7j/7sairApuZCtDLeD2j79sj5UGE+xk2QaEqfkkfdQoNgX77+O9quhcU4JeKS5u6c7
-         QTUVWHHEybPDvfQP4AHPM2jQkHdAmisCKKUvk=
+        bh=JuRJhWnb42//gMuDGqYnUpW4c8SU2sc7uoLCVnJtTWY=;
+        b=RO8aveJAseCGssZ6n1OHyuTg5xCZvitsg/DLFlTsvu9rFH+J1LfnuwXm4Q9muP4PXq
+         tVcA2lwINFGlTaAU9NRDdGndS+q3VGIGNqG8pUIVEPD/YpyXvHXC90pqJA2nULBNJ7Pk
+         a3RNXMfCXJc6R+Vhikc7zahSxKPbMcaiDfLgo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701331236; x=1701936036;
+        d=1e100.net; s=20230601; t=1701331266; x=1701936066;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=T3xrbxDioJnNBsN6cFVU5iXuYKzJG/S0mkUSUk6WGOA=;
-        b=GCrEubFdQWVFS4ZYPFAdcoZDKmlg1Z7esB3cBxck6LBHOyEAdje2psCWSssxxZmo8m
-         UNNyuMH5sWJ2iMM+8OWIT8R5ny2tOEKRwSZ5xEZFIlpwxcyHqDZ8pupImxl4i+FCybQx
-         ScSq1glR55/T/H2W+Bkqk7t30CZm3NptFBjY53JYsOAJMHOUsxr6E2KWz4wDVJCcxt1f
-         6xSRY4+ViJ2wTI+OEQW30Yy//V93+CaX4PDk90gaQ+KiPmX/nRVsqSddAr2B6/h7vnkd
-         lI96z9q7/hNMd+eJbMqLYQYpTdrl182mCKyhDZHXAJ8ftWqlhxv1MFHpSMzsxh7YrTcp
-         480Q==
-X-Gm-Message-State: AOJu0Yw/blpcIuwOrEYMPPmI6cbyZckKTM0DT7nUsUK9Cj6NhJUy0Rk8
-	x3aZSE483tqC5wiV+YHSiQMTOr/gx2kfeEeje6pnHg==
-X-Google-Smtp-Source: AGHT+IG6AS5JXFfpFfIcmuLkZZzQYpfsVLSQDnRp2ysxtMYzhMbXJ8uNXWoXQ+LhWGSwgb4cMAlL0+++jxCiBs94ipI=
-X-Received: by 2002:a05:6512:b07:b0:4f8:7513:8cac with SMTP id
- w7-20020a0565120b0700b004f875138cacmr14059860lfu.48.1701331236010; Thu, 30
- Nov 2023 00:00:36 -0800 (PST)
+        bh=JuRJhWnb42//gMuDGqYnUpW4c8SU2sc7uoLCVnJtTWY=;
+        b=UrNFWDd5Oj6qs+1K6KjevDubixpsoZ6HS0jr7cZ/qdc9DwnzVHnwy8E1S7t415Pj6X
+         tSs+mbnbYgYVQ9lpEjY1o4KlUulK3SPLJrT+JthoXq0flDClFG7mTkgoqi2Bcdq9MDEr
+         APcyYaj9DL+TQ1i3F8m6zpaV6INRKP7Ce0a78i6gm2ZMxhDzWg/jPu7Wuc//jKxhYwRu
+         OhQjJRwKIBzb8DGAmYaeWPY0NhLzJ3zrJ85hGm/c/CpZBBK3n0uSBHItQdJinoFD4CDE
+         y3PNtD/sT73t1QDj7/Fj1rZyChXr0vLwi69tK6QueZEU7CanwoP09tYurBygqcwisNjw
+         LQUQ==
+X-Gm-Message-State: AOJu0YxTddXX/FDtmsIcBE6fP9Piwj1k5y4zKnjDeXVli/3ak0G1GSL3
+	tgtOIulZEaa2gShA7u3bf3Q7eIjSHMYBBXjF8fSibA==
+X-Google-Smtp-Source: AGHT+IEOWTag4CF/UiMBec6HQpbr7eQ4oihIKvyjNBZcy8E27Q59NfEt/AIqn6xnijRXmNceMqcO6zEMu+wNaFNYbQI=
+X-Received: by 2002:a19:c507:0:b0:50b:cb86:4352 with SMTP id
+ w7-20020a19c507000000b0050bcb864352mr918298lfe.44.1701331266327; Thu, 30 Nov
+ 2023 00:01:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231130075818.18401-1-gakula@marvell.com> <20231130075818.18401-5-gakula@marvell.com>
-In-Reply-To: <20231130075818.18401-5-gakula@marvell.com>
+References: <20231130075818.18401-1-gakula@marvell.com> <20231130075818.18401-3-gakula@marvell.com>
+In-Reply-To: <20231130075818.18401-3-gakula@marvell.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 30 Nov 2023 13:30:23 +0530
-Message-ID: <CAH-L+nNgpZ4MrLcNvsCehe=4rH1Lx0pS_9irGzWGp1Rh8N_Vyg@mail.gmail.com>
-Subject: Re: [net v3 PATCH 4/5] octeontx2-af: Add missing mcs flr handler call
+Date: Thu, 30 Nov 2023 13:30:54 +0530
+Message-ID: <CAH-L+nN96FLT9bR3tXm2qLoC6zjW_tdj2xvVOTK3g0Drp0Kheg@mail.gmail.com>
+Subject: Re: [net v3 PATCH 2/5] octeontx2-af: Fix mcs sa cam entries size
 To: Geetha sowjanya <gakula@marvell.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
 	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
 	sgoutham@marvell.com, lcherian@marvell.com, jerinj@marvell.com, 
 	sbhatta@marvell.com, hkelam@marvell.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000fd98ee060b5a0b5e"
+	boundary="000000000000c9926f060b5a0d2c"
 
---000000000000fd98ee060b5a0b5e
-Content-Type: multipart/alternative; boundary="000000000000f829f6060b5a0b27"
+--000000000000c9926f060b5a0d2c
+Content-Type: multipart/alternative; boundary="000000000000c6c00f060b5a0db8"
 
---000000000000f829f6060b5a0b27
+--000000000000c6c00f060b5a0db8
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 30, 2023 at 1:29=E2=80=AFPM Geetha sowjanya <gakula@marvell.com=
+On Thu, Nov 30, 2023 at 1:28=E2=80=AFPM Geetha sowjanya <gakula@marvell.com=
 > wrote:
 
-> If mcs resources are attached to PF/VF. These resources need
-> to be freed on FLR. This patch add missing mcs flr call on PF FLR.
+> On latest silicon versions SA cam entries increased to 256.
+> This patch fixes the datatype of sa_entries in mcs_hw_info
+> struct to u16 to hold 256 entries.
 >
-> Fixes: bd69476e86fc ("octeontx2-af: cn10k: mcs: Install a default TCAM fo=
-r
-> normal traffic")
+> Fixes: 080bbd19c9dd ("octeontx2-af: cn10k: mcs: Add mailboxes for port
+> related operations")
 > Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 > ---
-> v2-v3:
->  Fixed typo error in commit message.
+>  drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->  drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 3 +++
->  1 file changed, 3 insertions(+)
->
+
 Looks good to me.
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 >
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> index 22c395c7d040..731bb82b577c 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> @@ -2631,6 +2631,9 @@ static void __rvu_flr_handler(struct rvu *rvu, u16
-> pcifunc)
->         rvu_npc_free_mcam_entries(rvu, pcifunc, -1);
->         rvu_mac_reset(rvu, pcifunc);
->
-> +       if (rvu->mcs_blk_cnt)
-> +               rvu_mcs_flr_handler(rvu, pcifunc);
-> +
->         mutex_unlock(&rvu->flr_lock);
->  }
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> index 6845556581c3..5df42634ceb8 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+> @@ -1945,7 +1945,7 @@ struct mcs_hw_info {
+>         u8 tcam_entries;        /* RX/TX Tcam entries per mcs block */
+>         u8 secy_entries;        /* RX/TX SECY entries per mcs block */
+>         u8 sc_entries;          /* RX/TX SC CAM entries per mcs block */
+> -       u8 sa_entries;          /* PN table entries =3D SA entries */
+> +       u16 sa_entries;         /* PN table entries =3D SA entries */
+>         u64 rsvd[16];
+>  };
 >
 > --
 > 2.25.1
@@ -122,52 +118,51 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh A P
 
---000000000000f829f6060b5a0b27
+--000000000000c6c00f060b5a0db8
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Nov 30, 2023 at 1:29=E2=80=AF=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Nov 30, 2023 at 1:28=E2=80=AF=
 PM Geetha sowjanya &lt;<a href=3D"mailto:gakula@marvell.com">gakula@marvell=
 .com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
 gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
-ex">If mcs resources are attached to PF/VF. These resources need<br>
-to be freed on FLR. This patch add missing mcs flr call on PF FLR.<br>
+ex">On latest silicon versions SA cam entries increased to 256.<br>
+This patch fixes the datatype of sa_entries in mcs_hw_info<br>
+struct to u16 to hold 256 entries.<br>
 <br>
-Fixes: bd69476e86fc (&quot;octeontx2-af: cn10k: mcs: Install a default TCAM=
- for normal traffic&quot;)<br>
+Fixes: 080bbd19c9dd (&quot;octeontx2-af: cn10k: mcs: Add mailboxes for port=
+ related operations&quot;)<br>
 Signed-off-by: Geetha sowjanya &lt;<a href=3D"mailto:gakula@marvell.com" ta=
 rget=3D"_blank">gakula@marvell.com</a>&gt;<br>
 Reviewed-by: Wojciech Drewek &lt;<a href=3D"mailto:wojciech.drewek@intel.co=
 m" target=3D"_blank">wojciech.drewek@intel.com</a>&gt;<br>
 ---<br>
-v2-v3:<br>
-=C2=A0Fixed typo error in commit message.<br>
+=C2=A0drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br></blockquote><div><b=
+r></div>Looks good to me.<br><br><div>Reviewed-by: Kalesh AP &lt;<a href=3D=
+"mailto:kalesh-anakkur.purayil@broadcom.com">kalesh-anakkur.purayil@broadco=
+m.com</a>&gt;=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
 <br>
-=C2=A0drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 3 +++<br>
-=C2=A01 file changed, 3 insertions(+)<br></blockquote>Looks good to me.<br>=
-<br><div>Reviewed-by: Kalesh AP &lt;<a href=3D"mailto:kalesh-anakkur.purayi=
-l@broadcom.com">kalesh-anakkur.purayil@broadcom.com</a>&gt;=C2=A0</div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
-:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/=
-ethernet/marvell/octeontx2/af/rvu.c<br>
-index 22c395c7d040..731bb82b577c 100644<br>
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c<br>
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c<br>
-@@ -2631,6 +2631,9 @@ static void __rvu_flr_handler(struct rvu *rvu, u16 pc=
-ifunc)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 rvu_npc_free_mcam_entries(rvu, pcifunc, -1);<br=
->
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 rvu_mac_reset(rvu, pcifunc);<br>
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0if (rvu-&gt;mcs_blk_cnt)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rvu_mcs_flr_handler=
-(rvu, pcifunc);<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 mutex_unlock(&amp;rvu-&gt;flr_lock);<br>
-=C2=A0}<br>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net=
+/ethernet/marvell/octeontx2/af/mbox.h<br>
+index 6845556581c3..5df42634ceb8 100644<br>
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h<br>
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h<br>
+@@ -1945,7 +1945,7 @@ struct mcs_hw_info {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 tcam_entries;=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* =
+RX/TX Tcam entries per mcs block */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 secy_entries;=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* =
+RX/TX SECY entries per mcs block */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u8 sc_entries;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 /* RX/TX SC CAM entries per mcs block */<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0u8 sa_entries;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 /* PN table entries =3D SA entries */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u16 sa_entries;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0/* PN table entries =3D SA entries */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 u64 rsvd[16];<br>
+=C2=A0};<br>
 <br>
 -- <br>
 2.25.1<br>
@@ -177,9 +172,9 @@ ifunc)<br>
 gnature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_signature"><d=
 iv dir=3D"ltr">Regards,<div>Kalesh A P</div></div></div></div>
 
---000000000000f829f6060b5a0b27--
+--000000000000c6c00f060b5a0db8--
 
---000000000000fd98ee060b5a0b5e
+--000000000000c9926f060b5a0d2c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -251,14 +246,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIGCdkTb+QWVlOWEiX7d3BYl1L5Qd2B1yT7M0c2VFaXfqMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEzMDA4MDAzNlowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIKGmaRT9MKfZNSumAdvRPHv30/mKnzuzqIt2GUHJjlnzMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEzMDA4MDEwNlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBICjtmDh7P
-LHUl3Myq+n5g5qqnN1ZwPYZlmLqKvgJ5QxjtY/HvOu31d3E1aiyUKc17yGszkPmrKx/umD0SGvaN
-FFU3Mp/rYNrX8i2aQe51ieIAFun8rhjzu2HGMyUIBRxot62Q/bboNybt1Ir7LRPqnDdWoCo13j8L
-xcCC2sNEc/W6fOtS5XDDXfkskElhY0RSMgk32zJQVSvqIfh7lTEgK8dvz9ANQx6WIPNuiN0xNOrq
-6J2fKNTjyyELS3z26PEfXoM2Q4iWK6nEaFWy7oTYNA73/Ww9AiYyz4k2E2x4kMSVA/BhDCjnXwzl
-2l3wgMMpfHO3SMO3Y5LFx+g8u8c/
---000000000000fd98ee060b5a0b5e--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAWjqXXcbNl
+CTgajLZw0G55c1G+xevUfvTpMWB0nZbosU3dbKncET+Z2GYhKez3tvDA0jJPYbOG7B7X3K0hkFY0
+dSyFTOqQYOcyr9qbg5OdIDMTjwrPfuWF6izquIfNofwjJbBa3bwAp21AXy/6xVEIgkv35nPoeDJ4
+4knYT7psCiuwbQEhu4jF276GOERHbQ/Wplr1mPFS0YAlQ2l1mQTyeHSnpxrc+d2xbVZUoaVZ6BgL
+qBilT9C19P+uEivo46Q2IGgIiwBktvpuX6Atn7oJRZVfIXcWYZMeh2FHI5A+xx8TnmJ5hNwEt9IN
+NNlkYfib9WFVnfkZN5hjkxhvKrfm
+--000000000000c9926f060b5a0d2c--
 
