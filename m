@@ -1,113 +1,290 @@
-Return-Path: <netdev+bounces-52723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2F17FFE37
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 23:01:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8BD7FFE6F
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 23:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 490F9281862
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:01:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9BAF28185E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B426A6168F;
-	Thu, 30 Nov 2023 22:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2832553E10;
+	Thu, 30 Nov 2023 22:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jfZFb4Rg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="al/9HPqq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF4B1710
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 14:00:58 -0800 (PST)
-Message-ID: <e23e6332-7c09-42b8-83a0-1a8029132ccc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701381656;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xjU8Mjr2mhBH7uq+8/pzRg8GPwJ2oaoRJytnOd6B9Co=;
-	b=jfZFb4RgRN0nxVmRsCK+puCzw5xLvUcdP/5YlayMZHTkTixhxt+RmauDjztHOAIEZfDv1q
-	DE6jzWUQv8utoxqyLvoHMziQmcSz9rQvLovziqIEmUXxuNU6grDtgZHXB8qNVcHO9hAWEv
-	PfFzsbu7a4Xi2RyR1+n83JRVA2O71jI=
-Date: Thu, 30 Nov 2023 14:00:48 -0800
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D500710DF;
+	Thu, 30 Nov 2023 14:25:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701383112; x=1732919112;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KHys1lrvLSvVLmfkynxPY7O5+K9sxl8sZ418S7POmC4=;
+  b=al/9HPqqkQDWdPGlsvLw496Z53ljB3neGebMQH/qguJdcJfVhRgV3fET
+   yPCH4p7sACZZlNmzgQoRPpLeyjqPf04IIrM+t94o/Rl44aMxKSDp8M9A+
+   P4BrZwi2DazIT/wxVfwLo8hZcixeDwO9J5R6T1r1yGbW5hqhGUFCYmPgK
+   TIvQ1v/XhTwIJtVo6p8kCNjO/cC8dH35kHTECeClET3hlOUAi3DeTkfME
+   /WnZ+BIS5+mCCYKt3wxSmXRYaUv9VMM/tshiT4mq4W1vNec2apLz73bkl
+   LGy1bL3gfDFSvYDM2Wi/Vn9BWripb7j+d3MWU9KIKY0d0ouo204IM/XW8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="383794531"
+X-IronPort-AV: E=Sophos;i="6.04,240,1695711600"; 
+   d="scan'208";a="383794531"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 14:25:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="887394498"
+X-IronPort-AV: E=Sophos;i="6.04,240,1695711600"; 
+   d="scan'208";a="887394498"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Nov 2023 14:25:12 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 30 Nov 2023 14:25:11 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 30 Nov 2023 14:25:11 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 14:25:11 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 30 Nov 2023 14:25:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XsprzFzIa+W9BqGmU5QMg0NN4rbne1qtKclwZ5w7wQcCcRiNrNKH0CxPZ4X0k3oXlZnn898hjVEwFQt3sA+ZWjylAvrVAL+pRHvfZymbnJ7LkhSxycSHZvhqKANJwfkKE+DE2itJLdiHlu7vsYOLGhiDzFLuFj/yxTbVhjdik1EUJgSABD+7GQ9XlrHrStJc/nkhMKOAsA9VUpMNOwghxR0NgoGVf0Ej71RlViloxneDLSxwRda25ayxaFO+klVFKksV6urSZSI+NFbKVG1ZIoqTpx+tUEgzw2kKVkNo+cfeR87k9RPqvOtbjysikAtnlkfS12Ji+bxJl/wbOUx6wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QRXkzRif21J1ORhx4hua5hMS+qLyM2uQhiD3bAl2M60=;
+ b=nZPyQximPbuxzthctKpkKcqfCBNcVPUlvW3gN+zcKddyM9XXeG3kafPCkpfz0YUE8dvAo/9KCv9sRl+DVRH8YTU0vyjvhGR24wqhTIgtyC4F7mgYgedpjS9VKrPpwGV5dfOGLtCKS/+XQ6J9blLQoFnjOsssN5HsbOhPLhaxEGTu/ULPlc7kRJpuNofQ3bcmBsQLCsTAJopx3ED8v2XztM6JasTxZIjmGuIaad0CNnYnTcu5qg6tjfcoOlzjLbAOtTpAluScwdZd45rRhx+Q972e3XujjKI6MUem5BYcRf7IXmzYTk1LlHWKY9h2e59YxsB4OKFA1XZmjqfOBhWzQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ0PR11MB5103.namprd11.prod.outlook.com (2603:10b6:a03:2d3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
+ 2023 22:25:03 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::dbee:4787:6eeb:57f5]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::dbee:4787:6eeb:57f5%4]) with mapi id 15.20.7046.024; Thu, 30 Nov 2023
+ 22:25:03 +0000
+Message-ID: <f5df96db-ba15-485e-8494-6920b24aa45a@intel.com>
+Date: Thu, 30 Nov 2023 14:25:00 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] r8169: fix rtl8125b PAUSE frames blasting when
+ suspended
+Content-Language: en-US
+To: Grant Grundler <grundler@chromium.org>
+CC: ChunHao Lin <hau@realtek.com>, <hkallweit1@gmail.com>,
+	<nic_swsd@realtek.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20231129155350.5843-1-hau@realtek.com>
+ <4aeebf95-cf12-4462-80c7-dd1dafddb611@intel.com>
+ <CANEJEGs9r0vq9QkGTcLryPnviMPgztJDsFjHqnRH65KbCqeF7g@mail.gmail.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <CANEJEGs9r0vq9QkGTcLryPnviMPgztJDsFjHqnRH65KbCqeF7g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR04CA0194.namprd04.prod.outlook.com
+ (2603:10b6:303:86::19) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
-Content-Language: en-US
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
- Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, kernel-team
- <kernel-team@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Jakub Sitnicki <jakub@cloudflare.com>, Daniel Borkmann
- <daniel@iogearbox.net>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@redhat.com>, Edward Cree <ecree.xilinx@gmail.com>
-References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
- <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
- <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net> <87fs0qj61x.fsf@toke.dk>
- <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com> <87plzsi5wj.fsf@toke.dk>
- <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net> <871qc72vmh.fsf@toke.dk>
- <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net>
- <e3402045-a36f-461f-8eab-bbc51735492d@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <e3402045-a36f-461f-8eab-bbc51735492d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ0PR11MB5103:EE_
+X-MS-Office365-Filtering-Correlation-Id: c733467e-1856-46e2-318e-08dbf1f332e7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GDhRpx/AzXCDvC8kEabDR13pFJopkdWjLQX3PX/xuUvvC5k8GKHKN3DUJqjG/FK3J6SCbvnI3rh8UfdSQExqyDUUCtTHpTP9lI6tLhUNPXUFAHNDElTMd1Su4+RXCNhDjeyo3USta6cpy91Agm91XgoBdQPRCZsdInVX0da8Zd7QNR+oDnbGvfmN7xyI20g8ZJEcPyFUAK6T+URJ512wNGOZa6Nxlosln2Ed70kJZwMI26xghMqaU2Q26H33Tt/WMrW/NHjbKYhwdSbcm8SwixCNh7Ys+qgRXlYvTw5EkzQmHQCPee7zOS6NfjtYFXkYQITZ2nrbOG2jWRCJIPDtax9oVGgNNmidgBn60kuFU64R19Wtq4IIpaXMXSHO/+DhoS4rsU/gsm8x99m+i/Lr33HFuKK+WDvRHCqCwg8Lk+uVQARMrwlB0JwHBcf+u9ryFczcZljWFqfqYTnPUN4YtmgUNv6iAjgRyGzZPm0BKwr60lCGYRQNUMRp7hnf4/LI6L2xWDMc5OkG/twL3n3YFKyLOXx0pjwloIxwr+VTdSfw3RjEDFqFpgRNAeJJqUMEsoVynGe2OcL9ybQT1jQjbug7faNNl2HZQK28pOubyt2T1a+yJEfO2xcXdjvVOgPQf/CCvw0CzyFQdPcIFnGfJA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(39860400002)(396003)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(6916009)(316002)(66556008)(66946007)(66476007)(6486002)(478600001)(7416002)(15650500001)(5660300002)(36756003)(41300700001)(2906002)(31696002)(4326008)(8936002)(8676002)(86362001)(82960400001)(83380400001)(2616005)(66574015)(38100700002)(26005)(31686004)(53546011)(6512007)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YmlhbnZvWmlYbHVmZWZabDhmRlFCRVRLZ2E1MTZKWHJRaUU1WXhoai9CM3Vr?=
+ =?utf-8?B?NUNYR3BNcnNQUEllbk9PNjAzVU1PbFFpRmJ6dWczbHpLWHhPSTRYVk5Eait2?=
+ =?utf-8?B?VlRyL0RhcGZjMXAyWTZCNWQ0V3l3ajNlUU9jZGZtd3E0TTdieFQ5cGtlV3hs?=
+ =?utf-8?B?cUtjVGVtOVR1Y0ZVZlU3NXR5YXBsYkN4Q2pUTmRtM2pEMjhqaVpSQmk4cnBG?=
+ =?utf-8?B?dG1VSFdWN0x2MGZFeW9rY2haekw4STZ3UHF5K0g1eW9jSWlSKzdCOVE3eXc2?=
+ =?utf-8?B?RDFzZjFwK1NmNjlBSUxOb1lzV0M0TE9yOW9Ndy9SYzY1ZEZRbWVTd2RCUitF?=
+ =?utf-8?B?TnRCMlJTaVIvR05EbFdtV01qL01ZZHA0bWVYUFVGcnV2bnA3SmpqemR1YXl2?=
+ =?utf-8?B?SURKb0R3ZUROZ1Zjd2pWM0x6WlhMdXIxc0RuMUdOMUpreG9Ja2pMR2ZzQkdJ?=
+ =?utf-8?B?aVoyckZCMGRGaG9ObE9NbVdDRXdQRFA4c1RHNkMrSnduaGNEMkxSd1o4U09j?=
+ =?utf-8?B?TzFOR2wvUmZMVmllVzdqc29md1NxNDcvU3hIeWRSbmZxVzNBSHRSbWEycUpW?=
+ =?utf-8?B?a1JiMlp0ckFNNStmNTF5aXQ4S213U0JLRU1wSVZnbXdlYVVJMlNWUnpaSHVI?=
+ =?utf-8?B?Q2hmK0ZsVWNSTXg0K2t4NEMzK3R4Q2hHYUJLbHU2QXpGdy9sSE13OWU5a0Zk?=
+ =?utf-8?B?ZDZrbHU3eWlrQUZQVnNVUmtZL3B1bnhKUXc3ZkM2ZDdDSm1PanE0Z3A3QUpK?=
+ =?utf-8?B?S3pDempuVytjTWorUCtUTE5Ecm1sd2hnazFwVTZIaGMwanBQcWVMRndZY21a?=
+ =?utf-8?B?VXp4ckxwSW56aWxTT1VXZ29BSDB4NFk4aVp6ZjBxaS9hV3MzNW9ScWtSOGRG?=
+ =?utf-8?B?WlpiNThiVmpCdjYvZTcvaURUWU1Gc1NIdzE3bU5ZRDRzelc2N3F1SUNMbmpi?=
+ =?utf-8?B?d3dLWVZSdDN1OC9PckllRW9uVTBWNnFscmVBTEtxaCs1bWtRejNvcnZiSWNX?=
+ =?utf-8?B?V3RvRndmbm5KVCsxZEI3NXJZbS96UEFpbnExVXcwa1NuYXdKZzg3Y3c3YVlr?=
+ =?utf-8?B?WncvWERjQlVkVVRRZW16Y2szQmkzaEd1YzBtbWhnNnVYZnBvMzN5ZzJIYzlD?=
+ =?utf-8?B?ckNtdVpDeW9MOUc1ZllGbHMwb0hVMzlGek4yQTJDbzFHOTZVOXhqYmdNVVoy?=
+ =?utf-8?B?TXJCb216SWhFM0JuMUMwOEoyNTZjTTdWcWRYNkRybGh4T3JUeGQ3RGw5Mi9F?=
+ =?utf-8?B?bGUzUWZRY0JIZE5EZ1ZLOUV1VkI1U0R2NUU0U1hoZThnR1AxMXd0bmNvZzV6?=
+ =?utf-8?B?ZCtHaFpwQUw0ZWpZRGgwV1hZY0RZUUZNNEV4VVdDcFdCVzBWTS8zUHBzZjRZ?=
+ =?utf-8?B?WU50eVBGY0ZDUmpXSEhzbUpPREFLcVNKSDhKbWhKUzRXdWhwU3d4aG5YM3FW?=
+ =?utf-8?B?aW9haXdPKzJ4RWJ3L3ZCMUVZaGNpYmlFSjFsMnRXakxVbkQ0aDRxeGdYWVJF?=
+ =?utf-8?B?V3dKY0RXai9ibkQwd2FzcEkrTkFyYmJWSlI0Y1VaS2dUMGVaMVZGbHBEVzBh?=
+ =?utf-8?B?K3pIRFVqZFFaemx3eW9reGUzWEhjWjZJa2NKejdqZCtBUWlseENNeWMyMUti?=
+ =?utf-8?B?eElLMHUxSVA5dDZxd1g3NUY5aSs1WURmcmNIWGY2RDJOWENONFB0M0xNWTh2?=
+ =?utf-8?B?bUhKcFJzKzM3cEttWk5qSTNGNXIwVWo4d3U2bUxsSkRndzBsTURuVWF4alZ6?=
+ =?utf-8?B?M3g2OTRaVE5SemV6QlI4M3RreXU1dFpiZkI1am0wUGpiVDFRdjlpWlFreG9O?=
+ =?utf-8?B?N2NNakxOVTF1YWNlUFp3YytZVnBDa0gwc2Zja2lDenI5Z1UrTnJ2RVJla3RO?=
+ =?utf-8?B?eU1BMHhpMUZRbERlRThhN1gyOTZTNXBZdUlLZnVXQmF2Q1NNcDM3U2Z4U3JQ?=
+ =?utf-8?B?YmpTRE1va2VMQ1lVMG91VUpoOHIvV1FWRVlqTGllZThib1ZJSTllQ00yVFFy?=
+ =?utf-8?B?QnN4akNRcFlsdGZkQitpTmtJbzJWcHdrclg2NHdEaEZUTStuc3lXTklXbjRt?=
+ =?utf-8?B?UDJpTFJnNWlLZVFIMi9vU2lrWThicFZ0ZEZoTXZEblpvc2tCRTZqTGpBcXZL?=
+ =?utf-8?B?S1c5SzZBK3JjZEF2U0ZpTm5PcjE2OE56S2lodnZYQk94STBDU3JqNjVQRXZ1?=
+ =?utf-8?B?M1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c733467e-1856-46e2-318e-08dbf1f332e7
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 22:25:03.7528
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uDIM9kXvJhNtaG9RFrmn2BKnTrnyEH7taVcgJDWgIp+Q9CxR8Uv7zsDIFPixQmvbdXWyg3s1vy0OzUb4B1pTOE/6A8GbHBw2m/uFs1jMcLI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5103
+X-OriginatorOrg: intel.com
 
-On 11/30/23 12:35 PM, Jesper Dangaard Brouer wrote:
-> I should explain our use-case(s) a bit more.
-> We do want the information to survive XDP_PASS into the SKB.
-> Its the hole point, as we want to transfer information from XDP layer to
-> TC-layer and perhaps further all the way to BPF socket filters (I even
-> heard someone asked for).
+
+
+On 11/29/2023 3:40 PM, Grant Grundler wrote:
+> On Wed, Nov 29, 2023 at 3:05 PM Jacob Keller <jacob.e.keller@intel.com> wrote:
+>> On 11/29/2023 7:53 AM, ChunHao Lin wrote:
+>>> When FIFO reaches near full state, device will issue pause frame.
+>>> If pause slot is enabled(set to 1), in this time, device will issue
+>>> pause frame only once. But if pause slot is disabled(set to 0), device
+>>> will keep sending pause frames until FIFO reaches near empty state.
+>>>
+>>> When pause slot is disabled, if there is no one to handle receive
+>>> packets, device FIFO will reach near full state and keep sending
+>>> pause frames. That will impact entire local area network.
+>>>
+>>> This issue can be reproduced in Chromebox (not Chromebook) in
+>>> developer mode running a test image (and v5.10 kernel):
+>>> 1) ping -f $CHROMEBOX (from workstation on same local network)
+>>> 2) run "powerd_dbus_suspend" from command line on the $CHROMEBOX
+>>> 3) ping $ROUTER (wait until ping fails from workstation)
+>>>
+>>> Takes about ~20-30 seconds after step 2 for the local network to
+>>> stop working.
+>>>
+>>> Fix this issue by enabling pause slot to only send pause frame once
+>>> when FIFO reaches near full state.
+>>>
+>>
+>> Makes sense. Avoiding the spam is good.  The naming is a bit confusing
+>> but I guess that comes from realtek datasheet?
 > 
-> I'm trying to get an overview, as I now have multiple product teams that
-> want to store information across/into differ layer, and they have other
-> teams that consume this information.
+> I don't know. It doesn't matter to me what it's called since I don't
+> have access to the data sheet anyway. :/
 > 
-> We are exploring more options than only XDP metadata area to store
-> information.  I have suggested that once an SKB have a socket
-> associated, then we can switch into using BPF local socket storage
-> tricks. (The lifetime of XDP metadata is not 100% clear as e.g.
-> pskb_expand_head clears it via skb_metadata_clear).
-> All ideas are welcome, e.g. I'm also looking at ability to store
-> auxiliary/metadata data associated with a dst_entry. And SKB->mark is
-> already used for other use-cases and isn't big enough. (and then there
-> is fun crossing a netns boundry).
+
+The name is fine, i just found it a bit hard to parse since its
+effectively "PAUSE_SLOT_ON" makes us *not* send pause frames forever.
+
+I think its fine as-is, since this is referring to the use of the pause
+slot in hardware.
+
+>>> Fixes: f1bce4ad2f1c ("r8169: add support for RTL8125")
+>>> Reported-by: Grant Grundler <grundler@chromium.org>
+>>> Tested-by: Grant Grundler <grundler@chromium.org>
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: ChunHao Lin <hau@realtek.com>
+>>> ---
+>>> v2:
+>>> - update comment and title.
+>>> ---
+>>>  drivers/net/ethernet/realtek/r8169_main.c | 7 ++++++-
+>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>>> index 62cabeeb842a..bb787a52bc75 100644
+>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>>> @@ -196,6 +196,7 @@ enum rtl_registers {
+>>>                                       /* No threshold before first PCI xfer */
+>>>  #define      RX_FIFO_THRESH                  (7 << RXCFG_FIFO_SHIFT)
+>>>  #define      RX_EARLY_OFF                    (1 << 11)
+>>> +#define      RX_PAUSE_SLOT_ON                (1 << 11)       /* 8125b and later */
+>>
+>> This confuses me though: RX_EARLY_OFF is (1 << 11) as well.. Is that
+>> from a different set of devices?
 > 
-> Let me explain *one* of the concrete use-cases.  As described in [1],
-> the CF XDP L4 load-balancer Unimog have been extended to a product
-> called Plurimog that does load-balancing across data-centers "colo's".
-> When Plurimog redirects to another colo, the original "landing" colo's
-> ID is carried across (in some encap header) to a Unimog instance.  Thus,
-> the original landing Colo ID is known to Unimog running in another colo,
-> but that header is popped, so this info need to be transferred somehow.
-> I'm told that even the webserver/Nginx need to know the orig/foreign
-> landing colo ID (here there should be socket associated). For TCP SYN
-> packets, the layered DOS protecting also need to know foreign landing
-> colo ID. Other teams/products needs this for accounting, e.g. Traffic
-> Manager[1], Radar[2] and Capacity planning.
+> Yes, for a different HW version of the device.
+> 
 
-We also bumped into a usecase about plumbing the RX timestamp taken at XDP to 
-its final "sk" for analysis purpose. The usecase had not materialized.
+Great.
 
-fwiw, one of my thoughts at that time is similar to your sk local storage 
-thinking, do a bpf_sk_lookup_tcp at xdp and store the stats there. It will waste 
-the lookup effort because there is no skb to do the bpf_sk_assign(). Then follow 
-this direction of thought is to allocate a skb in the xdp prog itself if we know 
-it is a XDP_PASS.
+>> We're writing to the same register
+>> RxConfig here I think in both cases?
+> 
+> Yes. But to different versions of the HW which use this bit
+> differently. Ergo the comment about "8125b and later".
+> 
+>> Can you clarify if these are supposed to be the same bit?
+> 
+> Yes, they are the same bit - but different versions of HW use BIT(11)
+> differently.
 
-That said, the sk storage approach would work fine if whatever it wants to 
-collect from xdp_md(s)/skb(s) can be stacked/aggregated in a sk. It would be 
-nicer if the __sk_buff->data_meta can work more like other bpf local storage 
-(sk, task, cgroup...etc) such that it will be available to other bpf prog type 
-(e.g. a tracing prog).
+Thanks for the clarification!
+
+> 
+>>
+>>>  #define      RXCFG_DMA_SHIFT                 8
+>>>                                       /* Unlimited maximum PCI burst. */
+>>>  #define      RX_DMA_BURST                    (7 << RXCFG_DMA_SHIFT)
+>>> @@ -2306,9 +2307,13 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
+>>>       case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_53:
+>>>               RTL_W32(tp, RxConfig, RX128_INT_EN | RX_MULTI_EN | RX_DMA_BURST | RX_EARLY_OFF);
+>>>               break;
+>>> -     case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
+>>> +     case RTL_GIGA_MAC_VER_61:
+>>>               RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
+>>>               break;
+>>
+>> I assume there isn't a VER_62 between these?
+> 
+> Correct. My clue is this code near the top of this file:
+> 
+>  149         [RTL_GIGA_MAC_VER_61] = {"RTL8125A",            FIRMWARE_8125A_3},
+>  150         /* reserve 62 for CFG_METHOD_4 in the vendor driver */
+>  151         [RTL_GIGA_MAC_VER_63] = {"RTL8125B",            FIRMWARE_8125B_2},
+> 
+>>
+>>> +     case RTL_GIGA_MAC_VER_63:
+>>> +             RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
+>>> +                     RX_PAUSE_SLOT_ON);
+>>
+>> We add RX_PAUSE_SLOT_ON now for RTL_GIGA_MAC_VER_63 in addition. Makes
+>> sense.
+> 
+> Exactly.
+> 
+> thanks for reviewing!
+> 
+
+Great.
+
+For the record:
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
