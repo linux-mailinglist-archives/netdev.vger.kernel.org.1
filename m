@@ -1,69 +1,105 @@
-Return-Path: <netdev+bounces-52557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0067FF32D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:05:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2CA27FF337
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F74AB20DD3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:05:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 122061C20C4E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8615851C42;
-	Thu, 30 Nov 2023 15:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB3051C44;
+	Thu, 30 Nov 2023 15:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIY9u2fc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yn/Jk19t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E61448CF7;
-	Thu, 30 Nov 2023 15:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B61AC433C7;
-	Thu, 30 Nov 2023 15:05:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701356742;
-	bh=E8R3+0hXLh0qc5ZynnQNCLMHS7lZrhkDk9GDBZI56nU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VIY9u2fcuqy0jrFeWhhU8p0XhEkQMIjwTpWZC+7jpQeLBZEDal2SeIYsWPznDgIes
-	 QcaO6cOTqKK2Qoc/JKYF8hMobtCpNhR+2/8iEIGC6tldR55nJK0FuYezPq77+M5gUJ
-	 GelD/c1LEeXrNQXwiLBKn46GW0cd8IdSEZV9/vzqDLsVP6s2IPRW+MSdnVzXFo4jm3
-	 gDq0+o6Qzj2dfZlADSgeXPXMLAiat+AQzKETkS25lomecmFMyhxd0Uk8nOTw4pgE8l
-	 s23l1TdElKfehE2dIqhlxoGpt2reWkbdR8XdWkecZ/8dWj8Z1v/HtbqoCAGsXVaFb2
-	 T4KDiN0HIA2Iw==
-Date: Thu, 30 Nov 2023 07:05:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yujie Liu <yujie.liu@intel.com>
-Cc: kernel test robot <lkp@intel.com>, <davem@davemloft.net>,
- <oe-kbuild-all@lists.linux.dev>, <netdev@vger.kernel.org>,
- <edumazet@google.com>, <pabeni@redhat.com>, <corbet@lwn.net>,
- <leitao@debian.org>, <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH net-next] docs: netlink: link to family documentations
- from spec info
-Message-ID: <20231130070541.105b9e34@kernel.org>
-In-Reply-To: <ZWhNOvnxSMAudjXM@yujie-X299>
-References: <20231127205642.2293153-1-kuba@kernel.org>
-	<202311280834.lYzXIFc4-lkp@intel.com>
-	<20231127190611.37a94d4c@kernel.org>
-	<ZWhNOvnxSMAudjXM@yujie-X299>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AC21B4;
+	Thu, 30 Nov 2023 07:09:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=D+LmC+1/RYTLpkFTwI8yb/n8Ew6AV+Cl7nqaIiFwlPs=; b=Yn/Jk19thhlWMIUF0bplu8nx6s
+	4dc/ABz2PL5pQvTaKMGJP1xvVlD4KvnF7JdUyWac08oNceGczk3W2qFILgO/KM7Nv0cYtdeERRG62
+	Xkd+8k6dlp12GXHbG+EN2bUzGEV3XuaYgkP0bYypD/sc9F7gdvZLyeZJSxTBQnf26qMc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r8iez-001fvP-Fe; Thu, 30 Nov 2023 16:09:01 +0100
+Date: Thu, 30 Nov 2023 16:09:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 04/14] net: phy: at803x: move qca83xx stats out
+ of generic at803x_priv struct
+Message-ID: <987fe800-ea6c-44a0-9895-57feb6731b08@lunn.ch>
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-5-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231129021219.20914-5-ansuelsmth@gmail.com>
 
-On Thu, 30 Nov 2023 16:52:10 +0800 Yujie Liu wrote:
-> > Is it possible that the build bot is missing python-yaml support and
-> > the generation of Documentation/networking/netlink_spec/index.rst
-> > fails?  
+On Wed, Nov 29, 2023 at 03:12:09AM +0100, Christian Marangi wrote:
+> Introduce a specific priv struct for qca83xx PHYs to store hw stats
+> data and a specific probe to allocate this alternative priv struct.
 > 
-> Hi Jakub, this is indeed due to missing pyyaml module in the bot so the
-> doc file is not generated. We've installed it now and the warning is
-> gone. Sorry for the noise and please ignore this report.
+> This also have the benefits of reducing memory allocated for every other
+> at803x PHY since only qca83xx currently supports storing hw stats.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/at803x.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> index 4ff41d70fc47..3b7baa4bb637 100644
+> --- a/drivers/net/phy/at803x.c
+> +++ b/drivers/net/phy/at803x.c
+> @@ -301,6 +301,10 @@ static struct at803x_hw_stat qca83xx_hw_stats[] = {
+>  	{ "eee_wake_errors", 0x16, GENMASK(15, 0), MMD},
+>  };
+>  
+> +struct qca83xx_priv {
+> +	u64 stats[ARRAY_SIZE(qca83xx_hw_stats)];
+> +};
+> +
+>  struct at803x_priv {
+>  	int flags;
+>  	u16 clk_25m_reg;
+> @@ -311,7 +315,6 @@ struct at803x_priv {
+>  	bool is_1000basex;
+>  	struct regulator_dev *vddio_rdev;
+>  	struct regulator_dev *vddh_rdev;
+> -	u64 stats[ARRAY_SIZE(qca83xx_hw_stats)];
+>  };
 
-No worries at all, thanks for confirming!
+I agree with Russell here, this is the wrong way to go.
+
+Maybe keep at803x_priv for all the common private members which are
+shared by all variants. Add a qca83xx_priv which includes this:
+
+struct qca83xx_priv {
+	struct at803x_priv at803_priv;
+	u64 stats[ARRAY_SIZE(qca83xx_hw_stats)];
+};
+
+	Andrew
 
