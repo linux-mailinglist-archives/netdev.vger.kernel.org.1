@@ -1,152 +1,79 @@
-Return-Path: <netdev+bounces-52710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87F37FFDC5
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:45:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C947FFDE2
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 687DDB20F1A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:45:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2218B20F7E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726295A10B;
-	Thu, 30 Nov 2023 21:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5155A11B;
+	Thu, 30 Nov 2023 21:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nczQtCQM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3Udz4MS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E31170D
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 13:45:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701380723; x=1732916723;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=gbJyS1ni1fasYiNfICmx4OXt8W5RATHo/YDRnY0i+1A=;
-  b=nczQtCQMDP2qTISRVw+qY8msNBGY4UBbB0Seu4O0BOYcht1dKqDqEVGs
-   c6UmKVRLty6L+/sJPEQmEz6xcjkxU2w+qY/iWFc1ZRrV/HzK8cuDYqTTQ
-   6Hkrm7zCYvaDUf+qzzhd8q8WS37OhzhHoWxTQ9Ylpe+A9Hy2ypQXhWvQq
-   6aTCGefO4jcz6KfqgecW1V/s5JYVQmlRPEfUHrbc0RcChvTfl+l8iZz9t
-   cwGj+RQjNEnpT8y4Qfq6D215adIFSsYBzlsd0zc6aWKJP4Bw9QOs1aakC
-   rg0VzmL1/WgM1bQ/smVmh1h1c0MWMXf8OTtRH4m83yULgIZutTR9B7bjt
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="373579455"
-X-IronPort-AV: E=Sophos;i="6.04,240,1695711600"; 
-   d="scan'208";a="373579455"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 13:45:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="745774201"
-X-IronPort-AV: E=Sophos;i="6.04,240,1695711600"; 
-   d="scan'208";a="745774201"
-Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 13:45:23 -0800
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com
-Subject: [PATCH iwl-next v1] idpf: refactor some missing field get/prep conversions
-Date: Thu, 30 Nov 2023 13:45:11 -0800
-Message-Id: <20231130214511.647586-1-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.39.3
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B591737;
+	Thu, 30 Nov 2023 13:49:43 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-33330a5617fso54382f8f.2;
+        Thu, 30 Nov 2023 13:49:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701380982; x=1701985782; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2OoZwSJUfIqZQwBptojEqNEhn+UQMwK+7zIqY5foD0=;
+        b=E3Udz4MSE2+e8vaZP+JGP9e5V6ZN70z8UEcXzwbE5WEssLbVFtk++//QTtG088Rdew
+         Llx6wZK2hIx3fX475UbsroVj0pOcomZ9UjbzDa1QFXMqkCT26SqGvWIcD3qb+QgEWa6q
+         DzThPJTb0Ljf1yX73f8lp4P0t9S7xHJ2thuqymufbKbI4jlTMBAtQxmS0eGbuNdEizTT
+         TegiBctwswgayNkMPoFOMchq7+GZpbw9jrilqdHrNnJwwmyleOCAgod7mqVu74j1DvxE
+         3DK0jRgkTzNsCi275XCyazf7GDZo2QiT0t9B6n8FXT5aTnbS7xqU7jRAwz1xcrZrD4qF
+         niPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701380982; x=1701985782;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y2OoZwSJUfIqZQwBptojEqNEhn+UQMwK+7zIqY5foD0=;
+        b=awWEPt3EUSCxTEdo1DZAunltlPGk1Z6EZwlsc/q/JQs3PDOerxXdzG3WTzUtyOd/3x
+         zc/M+0FJTqlORtwhsP1nswHux5IF6I3g9ptHJqbV8MfAWEfCYxRq8ZXzQYAGcAT4bs8P
+         9eZvIfpO6K9dK7CCZxZqGJV+CFVsp5nSWoc5Nxrphjpl76aF8wVS6L1LBdgE3R22c61k
+         CAZnNKZooJf4M/H41V5wIc3DLSvysxRyrG8fZDY2MNdncaJw7lYP6OIaNOiPxOBLbxjZ
+         iNfJn3rueLzg01fL9Bd1dUyAurbD+ejL4xv7qQXvqcESgr0cWFs2oeuSDiwvmZylXut7
+         JxfQ==
+X-Gm-Message-State: AOJu0Yx6Uki8dmNqq2ICOXcbx95A2LBuFzVhIMwHjxSvWnS3tgW/O3R8
+	uXrorUawWBYgQNn4v8bCyq4=
+X-Google-Smtp-Source: AGHT+IHqLsELJY+jB+hoUDBKt4LlwCRnpvu2KKtFI1HLD3ruCqknr6ZKBtJo3PLWbW45Ai1GkLJnjw==
+X-Received: by 2002:a5d:4147:0:b0:31a:ed75:75df with SMTP id c7-20020a5d4147000000b0031aed7575dfmr123721wrq.15.1701380981687;
+        Thu, 30 Nov 2023 13:49:41 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:4842:bce4:1c44:6271])
+        by smtp.gmail.com with ESMTPSA id f14-20020adfe90e000000b00327b5ca093dsm2509906wrm.117.2023.11.30.13.49.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 13:49:41 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
+ <pabeni@redhat.com>,  Jonathan Corbet <corbet@lwn.net>,
+  linux-doc@vger.kernel.org,  Jacob Keller <jacob.e.keller@intel.com>,
+  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 0/6] tools/net/ynl: Add 'sub-message'
+ support to ynl
+In-Reply-To: <20231130171019.12775-1-donald.hunter@gmail.com> (Donald Hunter's
+	message of "Thu, 30 Nov 2023 17:10:13 +0000")
+Date: Thu, 30 Nov 2023 21:49:31 +0000
+Message-ID: <m2ttp27vys.fsf@gmail.com>
+References: <20231130171019.12775-1-donald.hunter@gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Most of idpf correctly uses FIELD_GET and FIELD_PREP, but a couple spots
-were missed so fix those.
-
-This conversion was automated via a coccinelle script as posted with the
-previous series.
-
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
----
-This patch should be applied after the larger FIELD_PREP/FIELD_GET
-conversion series for the Intel drivers.
----
- .../ethernet/intel/idpf/idpf_singleq_txrx.c    |  7 +++----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c    | 18 ++++++++----------
- 2 files changed, 11 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 81288a17da2a..447753495c53 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -328,10 +328,9 @@ static void idpf_tx_singleq_build_ctx_desc(struct idpf_queue *txq,
- 
- 	if (offload->tso_segs) {
- 		qw1 |= IDPF_TX_CTX_DESC_TSO << IDPF_TXD_CTX_QW1_CMD_S;
--		qw1 |= ((u64)offload->tso_len << IDPF_TXD_CTX_QW1_TSO_LEN_S) &
--			IDPF_TXD_CTX_QW1_TSO_LEN_M;
--		qw1 |= ((u64)offload->mss << IDPF_TXD_CTX_QW1_MSS_S) &
--			IDPF_TXD_CTX_QW1_MSS_M;
-+		qw1 |= FIELD_PREP(IDPF_TXD_CTX_QW1_TSO_LEN_M,
-+				  offload->tso_len);
-+		qw1 |= FIELD_PREP(IDPF_TXD_CTX_QW1_MSS_M, offload->mss);
- 
- 		u64_stats_update_begin(&txq->stats_sync);
- 		u64_stats_inc(&txq->q_stats.tx.lso_pkts);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 1f728a9004d9..f3009d2a3c2e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -505,7 +505,7 @@ static void idpf_rx_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
- 
- 	/* store the buffer ID and the SW maintained GEN bit to the refillq */
- 	refillq->ring[nta] =
--		((buf_id << IDPF_RX_BI_BUFID_S) & IDPF_RX_BI_BUFID_M) |
-+		FIELD_PREP(IDPF_RX_BI_BUFID_M, buf_id) |
- 		(!!(test_bit(__IDPF_Q_GEN_CHK, refillq->flags)) <<
- 		 IDPF_RX_BI_GEN_S);
- 
-@@ -1825,14 +1825,14 @@ static bool idpf_tx_clean_complq(struct idpf_queue *complq, int budget,
- 		u16 gen;
- 
- 		/* if the descriptor isn't done, no work yet to do */
--		gen = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--		      IDPF_TXD_COMPLQ_GEN_M) >> IDPF_TXD_COMPLQ_GEN_S;
-+		gen = FIELD_GET(IDPF_TXD_COMPLQ_GEN_M,
-+				le16_to_cpu(tx_desc->qid_comptype_gen));
- 		if (test_bit(__IDPF_Q_GEN_CHK, complq->flags) != gen)
- 			break;
- 
- 		/* Find necessary info of TX queue to clean buffers */
--		rel_tx_qid = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--			 IDPF_TXD_COMPLQ_QID_M) >> IDPF_TXD_COMPLQ_QID_S;
-+		rel_tx_qid = FIELD_GET(IDPF_TXD_COMPLQ_QID_M,
-+				       le16_to_cpu(tx_desc->qid_comptype_gen));
- 		if (rel_tx_qid >= complq->txq_grp->num_txq ||
- 		    !complq->txq_grp->txqs[rel_tx_qid]) {
- 			dev_err(&complq->vport->adapter->pdev->dev,
-@@ -1842,9 +1842,8 @@ static bool idpf_tx_clean_complq(struct idpf_queue *complq, int budget,
- 		tx_q = complq->txq_grp->txqs[rel_tx_qid];
- 
- 		/* Determine completion type */
--		ctype = (le16_to_cpu(tx_desc->qid_comptype_gen) &
--			IDPF_TXD_COMPLQ_COMPL_TYPE_M) >>
--			IDPF_TXD_COMPLQ_COMPL_TYPE_S;
-+		ctype = FIELD_GET(IDPF_TXD_COMPLQ_COMPL_TYPE_M,
-+				  le16_to_cpu(tx_desc->qid_comptype_gen));
- 		switch (ctype) {
- 		case IDPF_TXD_COMPLT_RE:
- 			hw_head = le16_to_cpu(tx_desc->q_head_compl_tag.q_head);
-@@ -1947,8 +1946,7 @@ void idpf_tx_splitq_build_ctb(union idpf_tx_flex_desc *desc,
- 	desc->q.qw1.cmd_dtype =
- 		cpu_to_le16(params->dtype & IDPF_FLEX_TXD_QW1_DTYPE_M);
- 	desc->q.qw1.cmd_dtype |=
--		cpu_to_le16((td_cmd << IDPF_FLEX_TXD_QW1_CMD_S) &
--			    IDPF_FLEX_TXD_QW1_CMD_M);
-+		cpu_to_le16(FIELD_PREP(IDPF_FLEX_TXD_QW1_CMD_M, td_cmd));
- 	desc->q.qw1.buf_size = cpu_to_le16((u16)size);
- 	desc->q.qw1.l2tags.l2tag1 = cpu_to_le16(params->td_tag);
- }
--- 
-2.39.3
-
+Looks like I'll need to resend because I got send failures.
 
