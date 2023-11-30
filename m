@@ -1,335 +1,192 @@
-Return-Path: <netdev+bounces-52663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05757FF9E3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:47:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525657FF9F9
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:49:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36A41C210F2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:47:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 076D5281875
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7705A0F5;
-	Thu, 30 Nov 2023 18:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7CA1DA36;
+	Thu, 30 Nov 2023 18:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="Mc9Sk6Cx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQShjCmk"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04olkn2077.outbound.protection.outlook.com [40.92.47.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1C51712;
-	Thu, 30 Nov 2023 10:47:05 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wb7QG06PlEdMAVBDos4rJ5UXzJ0ctyfJSl2bOxdYANtPv1IOpuoavSJl2XtXYD7m5P8jSl5t0SHNB948QFq5ix5BgLPMdDoui+3wf0OwphTZpsev4VFh81RFTLjYZ1adZCO9VG2bnq557bIIZXVA8OCkYsXvj2c5QXq+2Td3re5vJjaQCBzo8FJ/9hYdmTAx46QRzTUw9DPji3RkUNxu2Vdhbf88r+SqAxpCQrwMyMkFJ33l8H11H/bDO5mG6zNkHCDy97eJ36nXdNZWF9pqGUhKb5Zrsz+k6TOPWew4h8O2QH6+IKl+LjeEZmZb2+XppZ3wTBxS2iTZsUoeA0saUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jg7b6p+xqD2UoF2S3eJvncZGfTYlOgCJeL446xehAFE=;
- b=R6AcLACjem01c8GayrNkA9GV0zxKWXos1kqrjnC7KewaXRLqW+xg+RuzQbt+rmEC8DC63MGp3t5fDmPnehqk4luzwpCv5UD7jVt/Qnc34UNkWMjmjFN8sFmfAVOPpvrHtY2qv1DsKIMX8DL5MuiXu1HoLNOriWKV0H0QZjqhjoXE+UQDGCgACOSHfodwkWe2iobG8J8qzedAa2DrkSYobbBPjYsr5L25E2YuRRQUo1npRzbQMaoidhg8Q/MbPNKoO5S/xziLxU3hQmb5CxnyMeQ9DSRrsUFzuJevZ3kG5jBjWTZL+C5JVkVqFudjNtk3rYKU4X2FkdDvjjc40bdfPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jg7b6p+xqD2UoF2S3eJvncZGfTYlOgCJeL446xehAFE=;
- b=Mc9Sk6CxooYjJTBA6EkFX0IY5v6HBtAoGyMpMZrn8fb1nHFcxHkwRRq1rEFWIiIe1qXjvGDo3hmRKKSqEVJo0FPgvRltgNkzObL1iSqkQFYaKur8GJYRiTmiEqKDq5JgZ3o7b51S8xbnrN3cdazQGWw9eV9zGcr+Gf9vadTZ5Gf81mzQNbOAmaNF4fuLnmPGoq1Hyh3Tj2Ibng+aLlrneQPGtSuC/f/GLufw9y7yEpi7VXDpGhza0wbboDd66xxVgLMw2HbihSDMQi2ZtU5lgKeJHX8WG/rV5/Lr0ECjeuUeiO+0w0uu9HnPYHrt1h/0c/T6QOy+scBgzrZw8DUt5g==
-Received: from PH7PR03MB7064.namprd03.prod.outlook.com (2603:10b6:510:2a5::8)
- by CO1PR03MB5905.namprd03.prod.outlook.com (2603:10b6:303:9b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.8; Thu, 30 Nov
- 2023 18:47:03 +0000
-Received: from PH7PR03MB7064.namprd03.prod.outlook.com
- ([fe80::9ca4:4c22:a89:9a8]) by PH7PR03MB7064.namprd03.prod.outlook.com
- ([fe80::9ca4:4c22:a89:9a8%7]) with mapi id 15.20.7068.012; Thu, 30 Nov 2023
- 18:47:03 +0000
-From: Min Li <lnimi@hotmail.com>
-To: richardcochran@gmail.com,
-	lee@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
-Subject: [PATCH net-next v6 6/6] ptp: clockmatrix: move register and firmware related definition to idt8a340_reg.h
-Date: Thu, 30 Nov 2023 13:46:34 -0500
-Message-ID:
- <PH7PR03MB70645A63EA0D578001954977A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231130184634.22577-1-lnimi@hotmail.com>
-References: <20231130184634.22577-1-lnimi@hotmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [/xfBx6/lF9F5BG0uspKjusiwXRPJbJVs]
-X-ClientProxiedBy: YQBPR0101CA0262.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:68::24) To PH7PR03MB7064.namprd03.prod.outlook.com
- (2603:10b6:510:2a5::8)
-X-Microsoft-Original-Message-ID: <20231130184634.22577-6-lnimi@hotmail.com>
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFDB710DE
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:49:14 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-285bb0575d5so1690652a91.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:49:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701370154; x=1701974954; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJL3/xZlETlaSZxAbteHfIDjLP0TbdjMEyzT5VAw/Aw=;
+        b=SQShjCmkpS3myXcupF1sSNyN4lVv7f8sQbr4z47TNjayUfDnD6UAEU2jFxrQGvf/Zp
+         7r1c89jOvf+1Dws2ZI87DOvgNVaIeVcnOn0jvbIpM9GlOZX3DTV6jsgHOgGBM8flnqy5
+         wgd6Pin9H+Zzv4Kpw/IltQ3I7n4IY44IkGeGbCZCYwRzZLlDY9UiuJ/HRx8e7phyk8cV
+         xcgs9UQaxts6DdFF9aBxfgTgCXS2ImFD/pRnm2EsGhyUHtBD7t2fdDAprhulEvfnyHHr
+         sFOuHDEaZ6Ku6g0agsGQeC6v8zwoajfA3e1ltnZb5DKLJ3Fj0+Xfy63tcm1hNykNfyCM
+         xs0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701370154; x=1701974954;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJL3/xZlETlaSZxAbteHfIDjLP0TbdjMEyzT5VAw/Aw=;
+        b=Vlvt+B8aeLQScLAld/ZlxkSrtOAk2Tl5mLHNtpflE/T/dIdExUq/gZXT46wV5N03xx
+         8Y0w4okaRpxnH9J1JAVJofBLNHfYQMHsBUzTr3wN+hUgo1FHutkH1KKIcoilUwaiesCT
+         LMMd4bkIXvEeiUW7HxqeVkn2lrvxG+nWXDAmuX/5JMEuPovqLdPQ3QeDVfZWEp3NeZo/
+         gaSeV7J82y2G4LPJ8HfgmMBH5upXp9ysrtuSaiegBtVU7JI8dPcvzls79gZZQXVyD+sB
+         zUs0x8JVk7PSeqGFYXp0XoZ6hWwFSRRGNeN+NMpQ+c8jWKoMFudo56UjEK6Fx+mUcB5D
+         9myQ==
+X-Gm-Message-State: AOJu0YxRLQv9bNOSagDvWJB79FE1WKFlTIur/T6Kqr7Jcqk7ClqUoHaH
+	7kAt+4btrC6Pe6W6hh4aqS5p7cc=
+X-Google-Smtp-Source: AGHT+IGyDyxAMwcoJS6sciBw/5vkzmmMOCxH2ARe2G7kvbgl3cR0YNiiHR7qICXmLsKg3A/6Wj9bU1U=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:90a:e011:b0:286:5274:8cab with SMTP id
+ u17-20020a17090ae01100b0028652748cabmr78809pjy.1.1701370154197; Thu, 30 Nov
+ 2023 10:49:14 -0800 (PST)
+Date: Thu, 30 Nov 2023 10:49:12 -0800
+In-Reply-To: <ZWhpGWDP6mrM-Y35@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR03MB7064:EE_|CO1PR03MB5905:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94a40415-6742-4d4b-5756-08dbf1d4be08
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Ertx5e2YY3IeAl7ZVpkaxXlkO+TCn9L0YMVhRSQFOuZ04A5bf/0hWdS9zuiFxZ7r5OdMQofBYX6Zy/+1ylJKAlXaaYzYGGvB5Y7A+zqwHpXRNwcIXfBRnKTN3jFeeBmzax0Jj8zPDauHxVSjlTl9Cs0BwDCGK58J+cjt+lXQz3reiaKyv2X7HxYLjR0nQAH0AathgHD68jnTeH44ocQnEkNzDE8b9NHjJMoKvFIz8vgs/CQ1ehet3MFVO94SjLphL5oUXPiRD+Pk/wHLK6SgUp3iI++8ZVzaU2G5nbVxSsBZHrFs/xciP7sw33QXXyyhQJKt2x1EwZA4jYyX5vGgMHsQwibViITle4Cb3GTCC9OrxSA17yGjIuWgqpn1o6l7bCv0cHxvJeWkGT+AviFyUeLU4WATV7PVlnn+qqDcIxbU4y8FEy78WOGeA9qLCWqn8cLaAW6MK1Ik5tiDHhbSx/YuqbvXZibFha/dqUPBXDp0J/BskM3KBTS7Sz4gcktP5weNS3BxcF6rGRZtB2OqFx55K616VHDd5fCayaTwokl7XvSL+9y38eXqUVtzc10Z
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?yAjErtFPdV9uDRqLayzsRn7A7aC/1CFTRmMpZat5m8QBsHMVrZBteZa5VC/G?=
- =?us-ascii?Q?dwRDrf+1ZiH/3Ru3fLWiGGaTpkCRU7a9dgt+J4nDpngTB1Zc6unJi0wdIgSK?=
- =?us-ascii?Q?MYvOJG3lOOxTF0etRKFRw71LoJRj5+5coUV/eZV4NUJBqlyaAfh9IfBQww0N?=
- =?us-ascii?Q?u0MHuYa3wOZLTzhwCWM/oOkDqok6vRBWHcwahpfOPXEmKCDaRVI0YYv8rz/J?=
- =?us-ascii?Q?c4dsk0jMP8BJ8dA9931SNE6ZPMF/697iUro+CJ2Hcepq7EqdgU1m7gOziRI/?=
- =?us-ascii?Q?+d7julXHjb1NpBm9AqHJhbl4YmH/ynZ3X1iomb3LXKUQDl/OLPWC7MOZWIfB?=
- =?us-ascii?Q?3rjCyuUh1epnvOYcn6LEv0ra5UwtWcOgpyLOm8Y5J2Rp5bIfovQDJzf8pTbD?=
- =?us-ascii?Q?y7v2WLVeeLB5CVXdfN8BTaoSphVpebU3IGbyycIZPGv/mY0+eUsnndNhckXQ?=
- =?us-ascii?Q?IkWdJ90ila2oWcgp8x8B7WgBwWnqijmBatwYvW92G2JTlyi5kRq2rXjqakTz?=
- =?us-ascii?Q?1HIdMEf4QPVJYESOLFq95h+guaLHsCiSDei4Kgvn+zH48u5s7vPgLJjbYOxD?=
- =?us-ascii?Q?muEm9ANjQrKF2WXleHPnx0BOA8cJB2e7+p4xIll237JQMNvjDSluIQclnZZ8?=
- =?us-ascii?Q?e5ayhaPgOIFsYi6dqomyG3qvf7FhYEZnF/oTtWkJ+97YXnFAxfVVrm5nj1mS?=
- =?us-ascii?Q?QgFWxz5bYIvy9Lsndj9fBaxVZ8OJttmnt/ZVsJyRv0k3+G7hgo6RirY6dqYs?=
- =?us-ascii?Q?LnK86h9WWRkZT9mHc+kRdm4vP1sejTFJRl+7oLO7qgcPk5U5PDN6UpcuLlc3?=
- =?us-ascii?Q?HtM8sa5ouu3Y1SWxprWNrce1y0UcWsFaRGKmZ/dBXIYHgcCbUuvy4VRbr9dX?=
- =?us-ascii?Q?E0450ODLcYKanWoOLXoGyCgDDTvTjHABHMdC9pAAniWZ7Ob0cENrPuUDCmiU?=
- =?us-ascii?Q?Lvm4pILp804cmkhD2Gf2nEz75tWoHL89db1jcaG6N4I9wInh4dtnuzSmB9pq?=
- =?us-ascii?Q?wgDM+nu+P5nAoKMKMhu0l3N6zNTm/ely3EqNbIeyhdJvZCQCjZuibL9scblI?=
- =?us-ascii?Q?gpgYzOmTXBAS0ZJx2ixsWbrb1w71abcgzBnDUXaLxceEVIRNZbCux/qNDKmE?=
- =?us-ascii?Q?ItZm6KP4TWvwwue+rUosZpY8GWta88k4WPbh77h45ATBHVCwij8y7LSqofXJ?=
- =?us-ascii?Q?wvkCkhKtvYKbIWJ0PrRhj6tc+37PNeSiTTpJEQ=3D=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-685f7.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94a40415-6742-4d4b-5756-08dbf1d4be08
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR03MB7064.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 18:47:03.2474
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR03MB5905
+Mime-Version: 1.0
+References: <cover.1701334869.git.lorenzo@kernel.org> <ce8cc5ce6e25d5e455704aa42fbf633be206ce85.1701334869.git.lorenzo@kernel.org>
+ <f41935a3-790b-4d23-870c-a37b757aea99@kernel.org> <ZWhpGWDP6mrM-Y35@lore-desk>
+Message-ID: <ZWjZKPYCglmjFJUH@google.com>
+Subject: Re: [PATCH v2 net-next 2/2] xdp: add multi-buff support for xdp
+ running in generic mode
+From: Stanislav Fomichev <sdf@google.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	lorenzo.bianconi@redhat.com, bpf@vger.kernel.org, toke@redhat.com, 
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com, 
+	kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+Content-Type: text/plain; charset="utf-8"
 
-From: Min Li <min.li.xe@renesas.com>
+On 11/30, Lorenzo Bianconi wrote:
+> > 
+> > 
+> > On 11/30/23 10:11, Lorenzo Bianconi wrote:
+> > > Similar to native xdp, do not always linearize the skb in
+> > > netif_receive_generic_xdp routine but create a non-linear xdp_buff to be
+> > > processed by the eBPF program. This allow to add  multi-buffer support
+> > > for xdp running in generic mode.
+> > > 
+> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > ---
+> > >   net/core/dev.c | 144 ++++++++++++++++++++++++++++++++++++++++---------
+> > >   1 file changed, 119 insertions(+), 25 deletions(-)
+> > > 
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index 4df68d7f04a2..0d08e755bb7f 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -4853,6 +4853,12 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+> > >   	xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
+> > >   	xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
+> > >   			 skb_headlen(skb) + mac_len, true);
+> > > +	if (skb_is_nonlinear(skb)) {
+> > > +		skb_shinfo(skb)->xdp_frags_size = skb->data_len;
+> > > +		xdp_buff_set_frags_flag(xdp);
+> > > +	} else {
+> > > +		xdp_buff_clear_frags_flag(xdp);
+> > > +	}
+> > >   	orig_data_end = xdp->data_end;
+> > >   	orig_data = xdp->data;
+> > > @@ -4882,6 +4888,14 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+> > >   		skb->len += off; /* positive on grow, negative on shrink */
+> > >   	}
+> > > +	/* XDP frag metadata (e.g. nr_frags) are updated in eBPF helpers
+> > > +	 * (e.g. bpf_xdp_adjust_tail), we need to update data_len here.
+> > > +	 */
+> > > +	if (xdp_buff_has_frags(xdp))
+> > > +		skb->data_len = skb_shinfo(skb)->xdp_frags_size;
+> > > +	else
+> > > +		skb->data_len = 0;
+> > > +
+> > >   	/* check if XDP changed eth hdr such SKB needs update */
+> > >   	eth = (struct ethhdr *)xdp->data;
+> > >   	if ((orig_eth_type != eth->h_proto) ||
+> > > @@ -4915,54 +4929,134 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+> > >   	return act;
+> > >   }
+> > > -static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
+> > > -				     struct xdp_buff *xdp,
+> > > -				     struct bpf_prog *xdp_prog)
+> > > +static int netif_skb_check_for_generic_xdp(struct sk_buff **pskb,
+> > > +					   struct bpf_prog *prog)
+> > 
+> > I like this is split out into a check function.
+> > 
+> > >   {
+> > >   	struct sk_buff *skb = *pskb;
+> > > -	u32 act = XDP_DROP;
+> > > -
+> > > -	/* Reinjected packets coming from act_mirred or similar should
+> > > -	 * not get XDP generic processing.
+> > > -	 */
+> > > -	if (skb_is_redirected(skb))
+> > > -		return XDP_PASS;
+> > 
+> > (For other reviewers)
+> > This reinjected check is moved further down.
+> > 
+> > > +	int err;
+> > > -	/* XDP packets must be linear and must have sufficient headroom
+> > > -	 * of XDP_PACKET_HEADROOM bytes. This is the guarantee that also
+> > > -	 * native XDP provides, thus we need to do it here as well.
+> > > +	/* XDP does not support fraglist so we need to linearize
+> > > +	 * the skb.
+> > >   	 */
+> > > -	if (skb_cloned(skb) || skb_is_nonlinear(skb) ||
+> > > -	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
+> > > +	if (skb_has_frag_list(skb) || !prog->aux->xdp_has_frags) {
+> > >   		int hroom = XDP_PACKET_HEADROOM - skb_headroom(skb);
+> > >   		int troom = skb->tail + skb->data_len - skb->end;
+> > >   		/* In case we have to go down the path and also linearize,
+> > >   		 * then lets do the pskb_expand_head() work just once here.
+> > >   		 */
+> > > -		if (pskb_expand_head(skb,
+> > > -				     hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
+> > > -				     troom > 0 ? troom + 128 : 0, GFP_ATOMIC))
+> > > -			goto do_drop;
+> > > -		if (skb_linearize(skb))
+> > > -			goto do_drop;
+> > > +		err = pskb_expand_head(skb,
+> > > +				       hroom > 0 ? ALIGN(hroom, NET_SKB_PAD) : 0,
+> > > +				       troom > 0 ? troom + 128 : 0, GFP_ATOMIC);
+> > > +		if (err)
+> > > +			return err;
+> > > +
+> > > +		err = skb_linearize(skb);
+> > > +		if (err)
+> > > +			return err;
+> > > +
+> > > +		return 0;
+> > > +	}
+> > > +
+> > > +	/* XDP packets must have sufficient headroom of XDP_PACKET_HEADROOM
+> > > +	 * bytes. This is the guarantee that also native XDP provides,
+> > > +	 * thus we need to do it here as well.
+> > > +	 */
+> > > +	if (skb_cloned(skb) || skb_shinfo(skb)->nr_frags ||
+> > 
+> > I though we could allow a SKB with skb_shinfo(skb)->nr_frags (that isn't
+> > cloned or shared) to be processed by generic XDP without any reallocation?
+> 
+> I do not think so, we discussed about it with Jakub here [0]
+> 
+> [0] https://lore.kernel.org/netdev/20231128105145.7b39db7d@kernel.org/
 
-This change is needed by rsmu driver, which will be submitted separately
-from mfd tree.
-
-Signed-off-by: Min Li <min.li.xe@renesas.com>
----
- drivers/ptp/ptp_clockmatrix.h    |  33 ---------
- include/linux/mfd/idt8a340_reg.h | 121 +++++++++++++++++++++++++++++--
- 2 files changed, 113 insertions(+), 41 deletions(-)
-
-diff --git a/drivers/ptp/ptp_clockmatrix.h b/drivers/ptp/ptp_clockmatrix.h
-index 31d90b1bf025..f041c7999ddc 100644
---- a/drivers/ptp/ptp_clockmatrix.h
-+++ b/drivers/ptp/ptp_clockmatrix.h
-@@ -21,32 +21,6 @@
- #define MAX_ABS_WRITE_PHASE_NANOSECONDS (107374182L)
- #define MAX_FFO_PPB (244000)
- 
--#define TOD_MASK_ADDR		(0xFFA5)
--#define DEFAULT_TOD_MASK	(0x04)
--
--#define SET_U16_LSB(orig, val8) (orig = (0xff00 & (orig)) | (val8))
--#define SET_U16_MSB(orig, val8) (orig = (0x00ff & (orig)) | (val8 << 8))
--
--#define TOD0_PTP_PLL_ADDR		(0xFFA8)
--#define TOD1_PTP_PLL_ADDR		(0xFFA9)
--#define TOD2_PTP_PLL_ADDR		(0xFFAA)
--#define TOD3_PTP_PLL_ADDR		(0xFFAB)
--
--#define TOD0_OUT_ALIGN_MASK_ADDR	(0xFFB0)
--#define TOD1_OUT_ALIGN_MASK_ADDR	(0xFFB2)
--#define TOD2_OUT_ALIGN_MASK_ADDR	(0xFFB4)
--#define TOD3_OUT_ALIGN_MASK_ADDR	(0xFFB6)
--
--#define DEFAULT_OUTPUT_MASK_PLL0	(0x003)
--#define DEFAULT_OUTPUT_MASK_PLL1	(0x00c)
--#define DEFAULT_OUTPUT_MASK_PLL2	(0x030)
--#define DEFAULT_OUTPUT_MASK_PLL3	(0x0c0)
--
--#define DEFAULT_TOD0_PTP_PLL		(0)
--#define DEFAULT_TOD1_PTP_PLL		(1)
--#define DEFAULT_TOD2_PTP_PLL		(2)
--#define DEFAULT_TOD3_PTP_PLL		(3)
--
- #define PHASE_PULL_IN_THRESHOLD_NS_DEPRECATED	(150000)
- #define PHASE_PULL_IN_THRESHOLD_NS		(15000)
- #define TOD_WRITE_OVERHEAD_COUNT_MAX		(2)
-@@ -121,11 +95,4 @@ struct idtcm {
- 	ktime_t			start_time;
- };
- 
--struct idtcm_fwrc {
--	u8 hiaddr;
--	u8 loaddr;
--	u8 value;
--	u8 reserved;
--} __packed;
--
- #endif /* PTP_IDTCLOCKMATRIX_H */
-diff --git a/include/linux/mfd/idt8a340_reg.h b/include/linux/mfd/idt8a340_reg.h
-index 13b36f4858b3..5aeb0820f876 100644
---- a/include/linux/mfd/idt8a340_reg.h
-+++ b/include/linux/mfd/idt8a340_reg.h
-@@ -116,16 +116,41 @@
- #define OTP_SCSR_CONFIG_SELECT            0x0022
- 
- #define STATUS                            0x2010c03c
--#define DPLL0_STATUS			  0x0018
--#define DPLL1_STATUS			  0x0019
--#define DPLL2_STATUS			  0x001a
--#define DPLL3_STATUS			  0x001b
--#define DPLL4_STATUS			  0x001c
--#define DPLL5_STATUS			  0x001d
--#define DPLL6_STATUS			  0x001e
--#define DPLL7_STATUS			  0x001f
-+#define IN0_MON_STATUS                    0x0008
-+#define IN1_MON_STATUS                    0x0009
-+#define IN2_MON_STATUS                    0x000a
-+#define IN3_MON_STATUS                    0x000b
-+#define IN4_MON_STATUS                    0x000c
-+#define IN5_MON_STATUS                    0x000d
-+#define IN6_MON_STATUS                    0x000e
-+#define IN7_MON_STATUS                    0x000f
-+#define IN8_MON_STATUS                    0x0010
-+#define IN9_MON_STATUS                    0x0011
-+#define IN10_MON_STATUS                   0x0012
-+#define IN11_MON_STATUS                   0x0013
-+#define IN12_MON_STATUS                   0x0014
-+#define IN13_MON_STATUS                   0x0015
-+#define IN14_MON_STATUS                   0x0016
-+#define IN15_MON_STATUS                   0x0017
-+#define DPLL0_STATUS                      0x0018
-+#define DPLL1_STATUS                      0x0019
-+#define DPLL2_STATUS                      0x001a
-+#define DPLL3_STATUS                      0x001b
-+#define DPLL4_STATUS                      0x001c
-+#define DPLL5_STATUS                      0x001d
-+#define DPLL6_STATUS                      0x001e
-+#define DPLL7_STATUS                      0x001f
- #define DPLL_SYS_STATUS                   0x0020
- #define DPLL_SYS_APLL_STATUS              0x0021
-+#define DPLL0_REF_STATUS                  0x0022
-+#define DPLL1_REF_STATUS                  0x0023
-+#define DPLL2_REF_STATUS                  0x0024
-+#define DPLL3_REF_STATUS                  0x0025
-+#define DPLL4_REF_STATUS                  0x0026
-+#define DPLL5_REF_STATUS                  0x0027
-+#define DPLL6_REF_STATUS                  0x0028
-+#define DPLL7_REF_STATUS                  0x0029
-+#define DPLL_SYS_REF_STATUS               0x002a
- #define DPLL0_FILTER_STATUS               0x0044
- #define DPLL1_FILTER_STATUS               0x004c
- #define DPLL2_FILTER_STATUS               0x0054
-@@ -192,6 +217,25 @@
- #define DPLL_CTRL_REG_0                   0x0002
- #define DPLL_CTRL_REG_1                   0x0003
- #define DPLL_CTRL_REG_2                   0x0004
-+#define DPLL_REF_PRIORITY_0               0x000f
-+#define DPLL_REF_PRIORITY_1               0x0010
-+#define DPLL_REF_PRIORITY_2               0x0011
-+#define DPLL_REF_PRIORITY_3               0x0012
-+#define DPLL_REF_PRIORITY_4               0x0013
-+#define DPLL_REF_PRIORITY_5               0x0014
-+#define DPLL_REF_PRIORITY_6               0x0015
-+#define DPLL_REF_PRIORITY_7               0x0016
-+#define DPLL_REF_PRIORITY_8               0x0017
-+#define DPLL_REF_PRIORITY_9               0x0018
-+#define DPLL_REF_PRIORITY_10              0x0019
-+#define DPLL_REF_PRIORITY_11              0x001a
-+#define DPLL_REF_PRIORITY_12              0x001b
-+#define DPLL_REF_PRIORITY_13              0x001c
-+#define DPLL_REF_PRIORITY_14              0x001d
-+#define DPLL_REF_PRIORITY_15              0x001e
-+#define DPLL_REF_PRIORITY_16              0x001f
-+#define DPLL_REF_PRIORITY_17              0x0020
-+#define DPLL_REF_PRIORITY_18              0x0021
- #define DPLL_MAX_FREQ_OFFSET              0x0025
- #define DPLL_WF_TIMER                     0x002c
- #define DPLL_WP_TIMER                     0x002e
-@@ -450,6 +494,10 @@
- #define OUTPUT_TDC_1                      0x2010cd08
- #define OUTPUT_TDC_2                      0x2010cd10
- #define OUTPUT_TDC_3                      0x2010cd18
-+
-+#define OUTPUT_TDC_CTRL_4                 0x0006
-+#define OUTPUT_TDC_CTRL_4_V520            0x0007
-+
- #define INPUT_TDC                         0x2010cd20
- 
- #define SCRATCH                           0x2010cf50
-@@ -668,6 +716,28 @@
- #define DPLL_STATE_MASK                   (0xf)
- #define DPLL_STATE_SHIFT                  (0x0)
- 
-+/* Bit definitions for the DPLL0_REF_STAT register */
-+#define DPLL_REF_STATUS_MASK              (0x1f)
-+
-+/* Bit definitions for the DPLL register */
-+#define DPLL_REF_PRIORITY_ENABLE_SHIFT       (0)
-+#define DPLL_REF_PRIORITY_REF_SHIFT          (1)
-+#define DPLL_REF_PRIORITY_GROUP_NUMBER_SHIFT (6)
-+
-+/* Bit definitions for the IN0_MON_STATUS register */
-+#define IN_MON_STATUS_LOS_SHIFT       (0)
-+#define IN_MON_STATUS_NO_ACT_SHIFT    (1)
-+#define IN_MON_STATUS_FFO_LIMIT_SHIFT (2)
-+
-+#define DEFAULT_PRIORITY_GROUP (0)
-+#define MAX_PRIORITY_GROUP     (3)
-+
-+#define MAX_REF_PRIORITIES (19)
-+
-+#define MAX_ELECTRICAL_REFERENCES (16)
-+
-+#define NO_REFERENCE (0x1f)
-+
- /*
-  * Return register address based on passed in firmware version
-  */
-@@ -778,4 +848,39 @@ enum scsr_tod_write_type_sel {
- 	SCSR_TOD_WR_TYPE_SEL_DELTA_MINUS = 2,
- 	SCSR_TOD_WR_TYPE_SEL_MAX = SCSR_TOD_WR_TYPE_SEL_DELTA_MINUS,
- };
-+
-+/* firmware interface */
-+struct idtcm_fwrc {
-+	u8 hiaddr;
-+	u8 loaddr;
-+	u8 value;
-+	u8 reserved;
-+} __packed;
-+
-+#define SET_U16_LSB(orig, val8) (orig = (0xff00 & (orig)) | (val8))
-+#define SET_U16_MSB(orig, val8) (orig = (0x00ff & (orig)) | (val8 << 8))
-+
-+#define TOD_MASK_ADDR		(0xFFA5)
-+#define DEFAULT_TOD_MASK	(0x04)
-+
-+#define TOD0_PTP_PLL_ADDR		(0xFFA8)
-+#define TOD1_PTP_PLL_ADDR		(0xFFA9)
-+#define TOD2_PTP_PLL_ADDR		(0xFFAA)
-+#define TOD3_PTP_PLL_ADDR		(0xFFAB)
-+
-+#define TOD0_OUT_ALIGN_MASK_ADDR	(0xFFB0)
-+#define TOD1_OUT_ALIGN_MASK_ADDR	(0xFFB2)
-+#define TOD2_OUT_ALIGN_MASK_ADDR	(0xFFB4)
-+#define TOD3_OUT_ALIGN_MASK_ADDR	(0xFFB6)
-+
-+#define DEFAULT_OUTPUT_MASK_PLL0	(0x003)
-+#define DEFAULT_OUTPUT_MASK_PLL1	(0x00c)
-+#define DEFAULT_OUTPUT_MASK_PLL2	(0x030)
-+#define DEFAULT_OUTPUT_MASK_PLL3	(0x0c0)
-+
-+#define DEFAULT_TOD0_PTP_PLL		(0)
-+#define DEFAULT_TOD1_PTP_PLL		(1)
-+#define DEFAULT_TOD2_PTP_PLL		(2)
-+#define DEFAULT_TOD3_PTP_PLL		(3)
-+
- #endif
--- 
-2.39.2
-
+Can this be done as an optimization later on? If, from the bpf side,
+the verifier can attest that the program is not calling
+bpf_xdp_{load,store}_bytes on the frags for example.
 
