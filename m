@@ -1,146 +1,236 @@
-Return-Path: <netdev+bounces-52392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68817FE9D2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:38:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C237FE9EE
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:53:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DA1EB20DCB
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 07:38:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48FC5B20DA4
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 07:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30E68495;
-	Thu, 30 Nov 2023 07:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4030A20DC3;
+	Thu, 30 Nov 2023 07:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="UEE3ixx1"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="GAoFdcgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDD3B9;
-	Wed, 29 Nov 2023 23:38:12 -0800 (PST)
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 3AU7Qk4t003588;
-	Wed, 29 Nov 2023 23:37:53 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=xNOmDHuoSUU7Aid89oI4ZzLqX4AFkBasjG/xx78Lk30=; b=
-	UEE3ixx1nKaO4Mgr7bJfdO4IS437C9hie3Evf9Hjxti2xZ3On+8DWOtJ+GZBhQ5d
-	u0868wX6GAkl+01NYO4cOVA2cRWhrgtOwvNEIvJl3nV5BKmoR5vA+NWy9DecIrzq
-	Omph0njhuAWZmE8q42uPvCgXq86tjK2NXdzhocr5F3B3SipcCCjhhi8tYlP3Uhgt
-	iUeo68DMf4uXmLoA+MzxxjIQEHwj3krpDgBM8hmqxjfqZRedKQ2ItvTyJZRCXEie
-	euE9+9SXrnZMknsEeSn4ir7fAnuFLVhgys0yk/WeBScpF+JjFWdv8bdEzWK5Uv05
-	tR6Otf5O5Z/HIJqL8BdeIQ==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3upgxtg8d2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 29 Nov 2023 23:37:53 -0800 (PST)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 29 Nov 2023 23:38:00 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.34 via Frontend Transport; Wed, 29 Nov 2023 23:37:57 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com>
-CC: <almasrymina@google.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <hawk@kernel.org>, <ilias.apalodimas@linaro.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH net-next] net: page_pool: fix null-ptr-deref in page_pool_unlist
-Date: Thu, 30 Nov 2023 15:37:49 +0800
-Message-ID: <20231130073749.1329999-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000f2b6b0060b488674@google.com>
-References: <000000000000f2b6b0060b488674@google.com>
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2096.outbound.protection.outlook.com [40.107.93.96])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66195A3;
+	Wed, 29 Nov 2023 23:53:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h+WbDS611KgkvhVYyrViY76mtvhZrZonQlW/ch3Zuo4mXN6bRmVLaimul1pNWY8naP+lX3MXpQA+xtq6WKGZZr72uoWCIFRdv0JvgatewRv/JB6pAxTJYLSfoHW6V4mukiBKC3iHeCt6GZ35kEtVvfRbuuTg9BTZE1h4QusEkRmkMJr+zltkJ2moadtrnqbQdL0OGwVY3PZvTGJlegdEnpD+glQaA50IfLHHLP8GBvCpzjSsAPTRIq4nkE3TN4LSzmu4F9sf4oSIIZarXo/Y2Y4NWbrtnfdhCAC1gEI0tSpih6X7sWgpebMpTeWwsRb7uCXb2jg73u4fzor+ehJU2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=asqmTou09C/3k66FLy5kyxq5QD0gk2YCPZVq0DeXgMI=;
+ b=P4BgUFGtHTLh0Lk7Rx6WUO9BckKfSSYCFoNFTM5bRRm+kELxR4D3JrSjYpwYyRMICPmE17g1dupXxRZ1z/G7ShFeXl2806uwCz/JUIMjRIOWoFVXkQOCRoOHb4hViluyfXXIJQbNKwT1TcWnWKHUEXH/RiDc4fDVHHRPdJyE/+/Ijq9Op8EGcD1q1kDeUbjksWX9aLqJ/DId1Q1ugph6ckqRQoP7sF5M6dIhELG7c+zYmCF/DDkthHLimjES3JY6SUeKOU+Bx2KtAnmEhlAZWS+v24ATvPghv/YAMI0lsddOtq08xsI69G7JM46nGoz7FTx0AS18XZL3co40fycTnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=asqmTou09C/3k66FLy5kyxq5QD0gk2YCPZVq0DeXgMI=;
+ b=GAoFdcgZE+1LSIQzgSyGScnyp3V3qOjGkDFTlMc/D5wi50/gj0thBe9ZV/0vVjO41WbkVKB+zOSHMMjE+tDPJRjGW7W1I8eACZEZn7yod/KsvuMH0b/2kM5wN7rfOgn04BtgkdbNL2+3DJAT9JcO41C9jd2G3QoKwl3Q/yrVPeU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SN4PR01MB7455.prod.exchangelabs.com (2603:10b6:806:202::11) by
+ BN0PR01MB7037.prod.exchangelabs.com (2603:10b6:408:149::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.23; Thu, 30 Nov 2023 07:53:10 +0000
+Received: from SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68]) by SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68%3]) with mapi id 15.20.7025.022; Thu, 30 Nov 2023
+ 07:53:10 +0000
+From: Quan Nguyen <quan@os.amperecomputing.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	openbmc@lists.ozlabs.org,
+	Open Source Submission <patches@amperecomputing.com>
+Cc: Phong Vo <phong@os.amperecomputing.com>,
+	Thang Nguyen <thang@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Dung Cao <dung@os.amperecomputing.com>
+Subject: [PATCH] mctp i2c: Requeue the packet when arbitration is lost
+Date: Thu, 30 Nov 2023 14:52:47 +0700
+Message-Id: <20231130075247.3078931-1-quan@os.amperecomputing.com>
+X-Mailer: git-send-email 2.35.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR04CA0017.apcprd04.prod.outlook.com
+ (2603:1096:4:197::15) To SN4PR01MB7455.prod.exchangelabs.com
+ (2603:10b6:806:202::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: RYNMjJmSHk4VKJqogjDBGZ2nbWPmJG76
-X-Proofpoint-ORIG-GUID: RYNMjJmSHk4VKJqogjDBGZ2nbWPmJG76
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_25,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 clxscore=1011 spamscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=792 mlxscore=0 impostorscore=0 adultscore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311060001 definitions=main-2311300056
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN4PR01MB7455:EE_|BN0PR01MB7037:EE_
+X-MS-Office365-Filtering-Correlation-Id: dec803bb-62be-4d3a-a3db-08dbf1796524
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0RSgACKP6REJcVpP7GabG/UmPv5uEeQjfoWUZvQ2CA0cKzY7SalkzxtCbYgm1qxGmkGpDVtFPUgQLP+eC/oq8CYCKY//e4XQO0r+WtdDpTapzekIe6Ir2CLp+v/Z+eAH4Ts7m9ZhTa4jHTGo6UrW8ADi6pO7Y2VJCbaVN1k+0OHZaBvTBDtywGpeYrh8vgszHVKLD1gDT19jyGU+d+3V25mhZBHhqG1rHMVi4P4csbcYhuui58o/vNv0Kmw6IpSzaNoEuPWSSI0kr0zzAjAp1jK2E1CPskIpXvBFtSE+WRHDIFDDwZO2Er82zNjYLOqHp91uOuZ2awIsIMdYPVo8Fr3bBrjQrFllPoaCWWx6vGvG3LnH9oNBOz+ZD2UcPwHUa1uz9CJxrXulkHmAjruIGFvqem04fDHI30gb8ULQaW0Ihw3ykWtssabLnLJiB7MEszZZrxupPRcVSLYrHA5pJzYxAAOOQ06ahqMDQD6+HTMNCZMh72oyREdyzOZz6BQh6zHra/UxoMSaH347RG7NqDaeg1jQYaLfqyahj0DT3ADrY9/t/wkvYo43+WbeSs/PWWKfjPMq9Indz7lqfK+bH7xLgHaKIxUGOQz76P2tcOFE9IYknamuRHl92m9lqfmXS4E1JIG6kZBjoQ/jkWT26GqHg+C69yCfaWA/ARYH6zolN7z0dSfEZdbwRc48VeRrtJThbvcx8GHIpluJGdYbFcbitjpJQU3w34bU8DORxNA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR01MB7455.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(396003)(39850400004)(366004)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(6506007)(6666004)(52116002)(38100700002)(8676002)(8936002)(4326008)(41300700001)(6512007)(478600001)(6486002)(110136005)(2906002)(921008)(107886003)(38350700005)(2616005)(1076003)(66946007)(316002)(5660300002)(26005)(54906003)(66476007)(66556008)(86362001)(202311291699003)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?BTOFA95GMgy6W6Dkz70L9sah9uCiL5iyYcdU2M0IMTJ+EHkTexy3vpnqep63?=
+ =?us-ascii?Q?mo/M45TY7G0qbKrPfmy4rC/jsH53hv9MZgE3Ldz5+1C41Oj2SsOwn0o17qxJ?=
+ =?us-ascii?Q?EwyyDw9NcVhvh8LbnIYlXNIhLNDNAj9ey20YmI1ttBNBjl20NahSXfwwro4r?=
+ =?us-ascii?Q?fSGP0yZ66GFbFEpc+3dPtRwX8sUiE4NMtA0bAEqRcbuZwxYedswhKc9K88DP?=
+ =?us-ascii?Q?S7AEKr5HgRYBsdKoP8xAnffpw/3EJf9DWUHa4i4qPqvk35ns/BjfU4CAOo7y?=
+ =?us-ascii?Q?DhDyahPsLqL6rMorV4u8Qu3C4ozA0uHh6N9ANEaQORNDgGrEe0yxXxY7Vvuf?=
+ =?us-ascii?Q?CnRmcbIOOOFDwapOj+KNEqJeU4II7Uvu56Es+zkwERxcmHrwNmROP76dIZdA?=
+ =?us-ascii?Q?BXDAAdpGivu6OHMg+ozb3hhZne4QpsQROtI6hn6AC4KNkNqdgJyyW1ztvDGn?=
+ =?us-ascii?Q?XZbgnFYs+WK5ZMDItoPkUPXzc6GRUF2EpQUlwyjD5W1+JdN2E8wpbsxMLsho?=
+ =?us-ascii?Q?lpuidcfUsaoXgKK3kL4egwyN2vn30F3/DbzZ4hUPx/Pq6POzbLz30AXk5agu?=
+ =?us-ascii?Q?PnxvDJQsLsdbmldGZupQf0RKbruU4C195a7rP3m3iNUDDWsXk8oPfQqB6q0Y?=
+ =?us-ascii?Q?nRYRFmt9cmRaX0YByAViO1jpW5dOYpe40Z4eoEh9HuN+NoX5eQUyVrO0QSS0?=
+ =?us-ascii?Q?/CHjmXhNndgcyBrrkQ6KGCCOX+hxsbtN2m0iQDAtILqfhKhLtmQwEIHaD+dE?=
+ =?us-ascii?Q?/WPET/XJ73ZdrA/sWQ3hTfL+WxBsXiGigMmlr6tpyXci2vb+6tJwLl5tddgo?=
+ =?us-ascii?Q?zXGooHeSqh6AakyT++dlKkrYo1Jdqh2kQUCeG17nf7FObjx98uyzVZ8dbfxH?=
+ =?us-ascii?Q?D84OUYuD+ucR49kLJ+uBUAvjxLvH0yc0d8adxwnS3UVilFHsKv1moyvdnORJ?=
+ =?us-ascii?Q?UFcyvytdfVvUEiFue2Cft75g/lBSH68C+b5Pm0ExUlJesNeG/O/gcpA+2YqH?=
+ =?us-ascii?Q?GHHRVjhcv9NE90ITS82T81uYZHvXDYwQl7tBHefuf3fJX+LT5SMSp3Zc/PLk?=
+ =?us-ascii?Q?jyOR4soh2Juvd4dc3sUuFQk2k/XwsMKXaF7qt7Q39rAFz174f/7WmsiI5qC6?=
+ =?us-ascii?Q?Kcl7YcbhJyjmgW7GK7cHBVjyxIyRoJ2gvEZGPDjiPMpgTiU9DXCGgO1ETAEx?=
+ =?us-ascii?Q?KXhN58va9osFy31q1cDGi8/40f3DIMvcao+FJ6jVF71mv6r2bxwJrUqKq43o?=
+ =?us-ascii?Q?lKyL9+CyQ2Q2AqMm2SsD5mu3NtjbzlIsV2qOm2eq0mDEZDrCI32+BbBNagtn?=
+ =?us-ascii?Q?cYCDJtYOXnU/V4B/cLpGMxkUBAuGhzrMeBCEgFmT0C1AX0ZDr43Ntj4h/lYk?=
+ =?us-ascii?Q?Q9umXeqC+02JbSIM4nybo22DXYMQOvODBoFFsDRsbzaehCyiSlyk3aQjn9Ka?=
+ =?us-ascii?Q?0+Hzv/Q4pTCUWj0oJGRgkNFKhngbNPTxuDPjxSFkL8YqgifOJBW9HWIuTiVh?=
+ =?us-ascii?Q?/fqYB3OyKuVb/pD254lYlgYEKh1gFvkzsUZxht9SduojfkJU98OYXI38OMO1?=
+ =?us-ascii?Q?wiqvvo7Uq4b7jakW+Spd9Pek94/YFqA+qc/4/QEzQ3Wuc36AcSN5LmvgjcOY?=
+ =?us-ascii?Q?46pGEmCRJnU5mTsM/ywJQvE=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dec803bb-62be-4d3a-a3db-08dbf1796524
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR01MB7455.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 07:53:09.9429
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: elJv3Q8NAPvHz53o4EtvuDVriztZEY/i3Ri+y+RlnLWfz9Cy3fz6sGXIx8EiU3IY6d8ebTzpSeVNS0SXzLK3iywdgVZaHIPTcr3Vy1ucP4g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB7037
 
-[Syz report]
-Illegal XDP return value 4294946546 on prog  (id 2) dev N/A, expect packet loss!
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 PID: 5064 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkaller-00533-ga379972973a8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
-RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
-RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
-Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 f0 06 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
-RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
-RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
-R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
-R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
-FS:  000055555717a380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000002555398 CR3: 0000000025044000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __page_pool_destroy net/core/page_pool.c:851 [inline]
- page_pool_release+0x507/0x6b0 net/core/page_pool.c:891
- page_pool_destroy+0x1ac/0x4c0 net/core/page_pool.c:956
- xdp_test_run_teardown net/bpf/test_run.c:216 [inline]
- bpf_test_run_xdp_live+0x1578/0x1af0 net/bpf/test_run.c:388
- bpf_prog_test_run_xdp+0x827/0x1530 net/bpf/test_run.c:1254
- bpf_prog_test_run kernel/bpf/syscall.c:4041 [inline]
- __sys_bpf+0x11bf/0x4920 kernel/bpf/syscall.c:5402
- __do_sys_bpf kernel/bpf/syscall.c:5488 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5486 [inline]
- __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5486
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+If arbitration is lost, __i2c_transfer() returns -EAGAIN and the
+packet should be resent.
 
-[Analysis]
-If "user.list" is initialized, the corresponding slow.netdev device must exist, 
-so before recycling "user.list", it is necessary to confirm that the "slow.netdev"
-device is valid.
+Requeue the packet and increase collisions count on this case.
 
-[Fix]
-Add slow.netdev != NULL check before delete "user.list".
-
-Fixes: 083772c9f972 ("net: page_pool: record pools per netdev")
-Reported-by: syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+Co-developed-by: Dung Cao <dung@os.amperecomputing.com>
+Signed-off-by: Dung Cao <dung@os.amperecomputing.com>
+Signed-off-by: Quan Nguyen <quan@os.amperecomputing.com>
 ---
- net/core/page_pool_user.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/mctp/mctp-i2c.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 1426434a7e15..ca71f4103b3a 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -339,7 +339,8 @@ void page_pool_unlist(struct page_pool *pool)
- 	mutex_lock(&page_pools_lock);
- 	netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_DEL_NTF);
- 	xa_erase(&page_pools, pool->user.id);
--	hlist_del(&pool->user.list);
-+	if (pool->slow.netdev)
-+		hlist_del(&pool->user.list);
- 	mutex_unlock(&page_pools_lock);
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index b37a9e4bade4..132023306052 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -442,14 +442,14 @@ static void mctp_i2c_unlock_reset(struct mctp_i2c_dev *midev)
+ 		i2c_unlock_bus(midev->adapter, I2C_LOCK_SEGMENT);
  }
  
+-static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
++static int mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ {
+ 	struct net_device_stats *stats = &midev->ndev->stats;
+ 	enum mctp_i2c_flow_state fs;
+ 	struct mctp_i2c_hdr *hdr;
+ 	struct i2c_msg msg = {0};
+ 	u8 *pecp;
+-	int rc;
++	int rc = 0;
+ 
+ 	fs = mctp_i2c_get_tx_flow_state(midev, skb);
+ 
+@@ -461,17 +461,11 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ 		dev_warn_ratelimited(&midev->adapter->dev,
+ 				     "Bad tx length %d vs skb %u\n",
+ 				     hdr->byte_count + 3, skb->len);
+-		return;
++		return -EINVAL;
+ 	}
+ 
+-	if (skb_tailroom(skb) >= 1) {
+-		/* Linear case with space, we can just append the PEC */
+-		skb_put(skb, 1);
+-	} else {
+-		/* Otherwise need to copy the buffer */
+-		skb_copy_bits(skb, 0, midev->tx_scratch, skb->len);
+-		hdr = (void *)midev->tx_scratch;
+-	}
++	skb_copy_bits(skb, 0, midev->tx_scratch, skb->len);
++	hdr = (void *)midev->tx_scratch;
+ 
+ 	pecp = (void *)&hdr->source_slave + hdr->byte_count;
+ 	*pecp = i2c_smbus_pec(0, (u8 *)hdr, hdr->byte_count + 3);
+@@ -503,17 +497,20 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ 		break;
+ 
+ 	case MCTP_I2C_TX_FLOW_INVALID:
+-		return;
++		return rc;
+ 	}
+ 
+ 	if (rc < 0) {
+ 		dev_warn_ratelimited(&midev->adapter->dev,
+ 				     "__i2c_transfer failed %d\n", rc);
+ 		stats->tx_errors++;
++		if (rc == -EAGAIN)
++			stats->collisions++;
+ 	} else {
+ 		stats->tx_bytes += skb->len;
+ 		stats->tx_packets++;
+ 	}
++	return rc;
+ }
+ 
+ static void mctp_i2c_flow_release(struct mctp_i2c_dev *midev)
+@@ -568,6 +565,7 @@ static int mctp_i2c_tx_thread(void *data)
+ 	struct mctp_i2c_dev *midev = data;
+ 	struct sk_buff *skb;
+ 	unsigned long flags;
++	int rc;
+ 
+ 	for (;;) {
+ 		if (kthread_should_stop())
+@@ -583,8 +581,17 @@ static int mctp_i2c_tx_thread(void *data)
+ 			mctp_i2c_flow_release(midev);
+ 
+ 		} else if (skb) {
+-			mctp_i2c_xmit(midev, skb);
+-			kfree_skb(skb);
++			rc = mctp_i2c_xmit(midev, skb);
++			if (rc == -EAGAIN) {
++				spin_lock_irqsave(&midev->tx_queue.lock, flags);
++				if (skb_queue_len(&midev->tx_queue) >= MCTP_I2C_TX_WORK_LEN)
++					kfree_skb(skb);
++				else
++					__skb_queue_head(&midev->tx_queue, skb);
++				spin_unlock_irqrestore(&midev->tx_queue.lock, flags);
++			} else {
++				kfree_skb(skb);
++			}
+ 
+ 		} else {
+ 			wait_event_idle(midev->tx_wq,
 -- 
-2.26.1
+2.35.1
 
 
