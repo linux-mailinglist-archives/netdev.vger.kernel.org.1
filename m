@@ -1,122 +1,80 @@
-Return-Path: <netdev+bounces-52470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5717FED68
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:57:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F37117FED77
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67121C20DB1
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:57:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9644BB20A07
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9403B78C;
-	Thu, 30 Nov 2023 10:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="SpNsCB7z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2123C079;
+	Thu, 30 Nov 2023 11:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EDA510D1;
-	Thu, 30 Nov 2023 02:57:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=mc1OLpee3TWcqUe5AdRmVwPMQcYF7vxiCpediutrrUY=; b=SpNsCB7z0+7EO8aKboPMHjpTQU
-	PXgj3eo95QbN0OLDseUhZdxx44PVLDrlobFy++Achn9m5E24RjwE56fgKA1OhAvJuXGEvCKKe49PI
-	b6WLX6TNfayJAK54fhQEJ08Bjkkmal/R0wJ3cobHS5Yowxf079VoQMeg8e1028vWOYmLaVuo9JpuN
-	mjN48PUjDcmJDK9UWJ3B7o7bNl+u3SccMd3MWzQNoS9i5IH0eOqdPcUMmGyLoKujnbc3fQGTQQ8LA
-	RT8QgmUahb91whlkHdQNTHXc8UFEl6yqxH9bvk/jAoC4LF98X0mUw4TP5qG9wG4929MeUMh9yw7+9
-	1KxJzXwQ==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r8ej4-000JxI-LG; Thu, 30 Nov 2023 11:56:58 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r8ej4-0005mZ-1V; Thu, 30 Nov 2023 11:56:58 +0100
-Subject: Re: [External] Re: [PATCH bpf-next] netkit: Add some ethtool ops to
- provide information to user
-To: Feng Zhou <zhoufeng.zf@bytedance.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com, tangchen.1@bytedance.com
-References: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
- <51dd35c9-ff5b-5b11-04d1-9a5ae9466780@blackwall.org>
- <16b4d42d-2d62-460e-912f-6e3b86f3004d@bytedance.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
-Date: Thu, 30 Nov 2023 11:56:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A053FD50;
+	Thu, 30 Nov 2023 03:02:10 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0VxRQVSY_1701342127;
+Received: from 30.221.130.31(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VxRQVSY_1701342127)
+          by smtp.aliyun-inc.com;
+          Thu, 30 Nov 2023 19:02:08 +0800
+Message-ID: <319ca57a-c89b-ba37-c5ca-e1eafc73392f@linux.alibaba.com>
+Date: Thu, 30 Nov 2023 19:02:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <16b4d42d-2d62-460e-912f-6e3b86f3004d@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v2 1/7] net/smc: Rename some variable 'fce' to
+ 'fce_v2x' for clarity
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
+ schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1700836935-23819-1-git-send-email-guwen@linux.alibaba.com>
+ <1700836935-23819-2-git-send-email-guwen@linux.alibaba.com>
+ <298442c7-40f0-42ab-b5cb-07603d8689f5@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <298442c7-40f0-42ab-b5cb-07603d8689f5@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27109/Thu Nov 30 09:44:04 2023)
 
-On 11/30/23 10:24 AM, Feng Zhou wrote:
-> 在 2023/11/30 17:06, Nikolay Aleksandrov 写道:
->> On 11/30/23 09:58, Feng zhou wrote:
->>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>
->>> Add get_strings, get_sset_count, get_ethtool_stats to get peer
->>> ifindex.
->>> ethtool -S nk1
->>> NIC statistics:
->>>       peer_ifindex: 36
->>>
->>> Add get_link, get_link_ksettings to get link stat.
->>> ethtool nk1
->>> Settings for nk1:
->>>     ...
->>>     Link detected: yes
->>>
->>> Add get_ts_info.
->>> ethtool -T nk1
->>> Time stamping parameters for nk1:
->>> ...
->>>
->>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->>> ---
->>>   drivers/net/netkit.c | 53 ++++++++++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 53 insertions(+)
->>>
->>
->> Hi,
->> I don't see any point in sending peer_ifindex through ethtool, even
->> worse through ethtool stats. That is definitely the wrong place for it.
->> You can already retrieve that through netlink. About the speed/duplex
->> this one makes more sense, but this is the wrong way to do it.
->> See how we did it for virtio_net (you are free to set speed/duplex
->> to anything to please bonding for example). Although I doubt anyone will use netkit with bonding, so even that is questionable. :)
->>
->> Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
+
+On 2023/11/29 20:50, Wenjia Zhang wrote:
 > 
-> We use netkit to replace veth to improve performance, veth can be used ethtool -S veth to get peer_ifindex, so this part is added, as long as it is to keep the netkit part and veth unified, to ensure the same usage habits, and to replace it without perception.
+> 
+> On 24.11.23 15:42, Wen Gu wrote:
+>> Rename some smc_clc_first_contact_ext_v2x type variables to 'fce_v2x'
+>> to distinguish them from smc_clc_first_contact_ext type variables.
+>>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_clc.c | 26 +++++++++++++-------------
+>>   1 file changed, 13 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+>> index 0fda515..c41a249 100644
+>> --- a/net/smc/smc_clc.c
+>> +++ b/net/smc/smc_clc.c
+>> @@ -418,15 +418,15 @@ static bool smc_clc_msg_prop_valid(struct smc_clc_msg_proposal *pclc)
+>>       return true;
+>>   }
+>> -static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce,
+>> +static int smc_clc_fill_fce(struct smc_clc_first_contact_ext_v2x *fce_v2x,
+>>                   struct smc_init_info *ini)
+> 
+> Since this function is only used by v2.x, IMO, this function name could also be changed to e.g. smc_clc_fill_fce_v2x.
 
-Could you elaborate some more on the use case why you need to retrieve it
-via ethtool, what alternatives were tried and don't work?
-
-Please also elaborate on the case for netkit_get_link_ksettings() and which
-concrete problem you are trying to address with this extension?
-
-The commit message only explains what is done but does not go into the detail
-of _why_ you need it.
-
-Thanks,
-Daniel
+Thank you, Wenjia. The function name will also be changed.
 
