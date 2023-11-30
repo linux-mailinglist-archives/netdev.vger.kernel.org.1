@@ -1,267 +1,89 @@
-Return-Path: <netdev+bounces-52685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EE147FFAAE
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:01:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A517FFACD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1D22818BA
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:01:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3EFA2818A4
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DD15FEF6;
-	Thu, 30 Nov 2023 19:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409E15FF01;
+	Thu, 30 Nov 2023 19:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AJ+zRkhN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpuaA+LH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F73110F4
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 11:01:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701370894; x=1732906894;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=C2ugeQLjge/FQ7dwSBK5X4WXnbqHpMnmigIEZXslnBY=;
-  b=AJ+zRkhNQPwHem5ds07vcR4h9QzH4ms/QbImPwAui03YJfXJYjrwyYjN
-   dNccyVb16/gCfilOeP3YP5/WNt6+b2js44LDbMWuj2uAH8EBgwQJn+3oE
-   KaLr6IjLONiACwCG2ECT+UvG/TsC835COx5LA+YbSay2bFQ5A+A624/XG
-   0udVg7lzqRnQeT+YLC+vWJeYH4PlZrpbP4FfAEbIuyYd2HDcikieMngIw
-   fp8z/RAUdXjrIDwlle14LdsiDjd8WGdBSp41mFm8tYXApJbvDhHsTGaO4
-   zbPMiOcc5CKckCaFutl72qakwFxFojFANerOqwSV6tHn1KwDXqFGpbqzW
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="261559"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="261559"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 11:01:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="745736689"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="745736689"
-Received: from ktahomi-mobl2.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.67.109])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 11:01:32 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski
- <kuba@kernel.org>, Linux Kernel Network Developers
- <netdev@vger.kernel.org>
-Subject: Re: Fwd: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
-In-Reply-To: <CAM0EoMkAxx+JwLxc_T0jJd3+jZmoSTndLKC6Ap7qYwd58A5Zmg@mail.gmail.com>
-References: <00000000000077c77f060b603f2d@google.com>
- <CAM0EoMkAxx+JwLxc_T0jJd3+jZmoSTndLKC6Ap7qYwd58A5Zmg@mail.gmail.com>
-Date: Thu, 30 Nov 2023 11:01:32 -0800
-Message-ID: <87msuvvzeb.fsf@intel.com>
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894D0D48
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 11:09:49 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54b8a4d64b5so1378382a12.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 11:09:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701371388; x=1701976188; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M18k0Gk1/fj/6yEF63zM2Yr67RGDEcrjdLvSk4xIBW0=;
+        b=LpuaA+LHWpmDCxzjlh498Lgpm0jzpheXEexO3T7YTqxmNpBd3553njU6naDWh19w2c
+         tfhE6P+GieQs1OnG9w7G+PxamCa7DcXfOdsbEloGOH33lW2UNW5iLJORLuQwIG5sZqrV
+         h9tz3SZ88BfMIB69tp7rSZ9U4x+BHi8tAl8zARoIwill8dfe0+R2ioFwNNVW/6IFwXpY
+         88+X6AUeCUs9jwYlFUKp4/DHwPROUK+ldMiuZDV9OGgC1czm3jPtJRuuN4wnm99ItEUb
+         9mxBtrH8+mhmeg/b6hAAJCls1n3ivkZN76Cb2w46mkKdS0UAIkOrVs64a7YBnDHVUu5m
+         nVLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701371388; x=1701976188;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M18k0Gk1/fj/6yEF63zM2Yr67RGDEcrjdLvSk4xIBW0=;
+        b=ZtXk/CprU+fN5Gtq77O1hq45mACvMBEXyuZd72E6xGlB6L1Xn3skfEx1RDiMUkxPvQ
+         MSTsS2weaBX18Xy9whj+VV19rgqycDaw3XkPCayVacKVMVK7LKPll906/HOJ+mLwb3r3
+         vqD7prWViAnVdqwtlf/Q092doJz/J3WjhfMmxGj9THQkaaigTCrniGyLA0790XgcP6r4
+         Z2l7G96PTpGu4IcAA8Bl/VvBD7JAjng7BY16sJ2XHklEztF2pU8zLwbLofZgSgbl6U5s
+         P/pPQMSIaYDrRsbk7C7JSIwCUZwnyV3qs6hmiIqvCjDy0pCjjzqrD7G8J5LeYjIPfyvY
+         DP2w==
+X-Gm-Message-State: AOJu0YxcPWJqqakTfeAkVoECm7+vr4z5aVtCnrjhyYLCKrFwWHxC84ZX
+	ZWX5CLr3kAlbE0MYuNBayX+3U8HcdOs=
+X-Google-Smtp-Source: AGHT+IFpQE7bevW5fLpISeqeXU55Wtc+X12qFdY8w0CiN2HWygSGtw/2EuUIADJ4fiX/VhIp5KMVgg==
+X-Received: by 2002:a50:c349:0:b0:54a:f3df:5814 with SMTP id q9-20020a50c349000000b0054af3df5814mr11872edb.25.1701371086501;
+        Thu, 30 Nov 2023 11:04:46 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id s15-20020a05600c384f00b0040b35195e54sm2899860wmr.5.2023.11.30.11.04.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Nov 2023 11:04:45 -0800 (PST)
+Subject: Re: [PATCH net-next 1/2] sfc: Implement ndo_hwtstamp_(get|set)
+To: Alex Austin <alex.austin@amd.com>, netdev@vger.kernel.org,
+ linux-net-drivers@amd.com
+Cc: habetsm.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ lorenzo@kernel.org, memxor@gmail.com, alardam@gmail.com, bhelgaas@google.com
+References: <20231130135826.19018-1-alex.austin@amd.com>
+ <20231130135826.19018-2-alex.austin@amd.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6bc0037b-c3c2-5282-730e-2b5a40122a29@gmail.com>
+Date: Thu, 30 Nov 2023 19:04:45 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20231130135826.19018-2-alex.austin@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Jamal Hadi Salim <jhs@mojatatu.com> writes:
+On 30/11/2023 13:58, Alex Austin wrote:
+> Update efx->ptp_data to use kernel_hwtstamp_config and implement
+> ndo_hwtstamp_(get|set). Remove SIOCGHWTSTAMP and SIOCSHWTSTAMP from
+> efx_ioctl.
+> 
+> Signed-off-by: Alex Austin <alex.austin@amd.com>
+> Acked-by: Martin Habets <habetsm.xilinx@gmail.com>
 
-> Vinicius/Vladmir,
-> I pinged you on this already. Can you take a look please? There is a
-> reproducer..
->
-
-Sure. Will take a look.
-
-> cheers,
-> jamal
->
-> ---------- Forwarded message ---------
-> From: syzbot <syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com>
-> Date: Thu, Nov 30, 2023 at 10:24=E2=80=AFAM
-> Subject: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
-> To: <bp@alien8.de>, <davem@davemloft.net>, <edumazet@google.com>,
-> <hpa@zytor.com>, <jhs@mojatatu.com>, <jiri@resnulli.us>,
-> <kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <mingo@redhat.com>,
-> <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-> <syzkaller-bugs@googlegroups.com>, <tglx@linutronix.de>,
-> <vinicius.gomes@intel.com>, <willemdebruijn.kernel@gmail.com>,
-> <x86@kernel.org>, <xiyou.wangcong@gmail.com>
->
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    18d46e76d7c2 Merge tag 'for-6.7-rc3-tag' of git://git.ker=
-n..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D16bcc8b4e80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb39fe85d254f=
-638
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dde8e83db70e8bee=
-dd556
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils
-> for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12172952e80=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1086b58ae80000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/0ce5608c89e8/dis=
-k-18d46e76.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/eef847faba9c/vmlinu=
-x-18d46e76.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/6a3df3288860/b=
-zImage-18d46e76.xz
->
-> The issue was bisected to:
->
-> commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-> Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Date:   Sat Sep 29 00:59:43 2018 +0000
->
->     tc: Add support for configuring the taprio scheduler
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D16a29b52e8=
-0000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D15a29b52e8=
-0000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11a29b52e80000
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com
-> Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio schedule=
-r")
->
-> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> rcu:    0-...!: (1 GPs behind) idle=3D79f4/1/0x4000000000000000
-> softirq=3D5546/5548 fqs=3D1
-> rcu:    (detected by 1, t=3D10503 jiffies, g=3D5017, q=3D384 ncpus=3D2)
-> Sending NMI from CPU 1 to CPUs 0:
-> NMI backtrace for cpu 0
-> CPU: 0 PID: 5106 Comm: syz-executor201 Not tainted
-> 6.7.0-rc3-syzkaller-00024-g18d46e76d7c2 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine,
-> BIOS Google 11/10/2023
-> RIP: 0010:__run_hrtimer kernel/time/hrtimer.c:1686 [inline]
-> RIP: 0010:__hrtimer_run_queues+0x62e/0xc20 kernel/time/hrtimer.c:1752
-> Code: fc ff df 48 89 fa 48 c1 ea 03 0f b6 04 02 48 89 fa 83 e2 07 38
-> d0 7f 08 84 c0 0f 85 fb 04 00 00 45 0f b6 6e 3b 31 ff 44 89 ee <e8> 2d
-> 46 11 00 45 84 ed 0f 84 8e fb ff ff e8 ef 4a 11 00 4c 89 f7
-> RSP: 0018:ffffc90000007e40 EFLAGS: 00000046
-> RAX: 0000000000000000 RBX: ffff8880b982ba40 RCX: ffffffff817642f9
-> RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000002 R12: ffff8880b982b940
-> R13: 0000000000000000 R14: ffff88801c43a340 R15: ffffffff88a2daf0
-> FS:  00005555566fe380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fe9404c73b0 CR3: 0000000076e2d000 CR4: 0000000000350ef0
-> Call Trace:
->  <NMI>
->  </NMI>
->  <IRQ>
->  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
->  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
->  __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:10=
-82
->  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
->  </IRQ>
->  <TASK>
->  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.=
-h:645
-> RIP: 0010:lock_acquire+0x1ef/0x520 kernel/locking/lockdep.c:5722
-> Code: c1 05 bd 6c 9a 7e 83 f8 01 0f 85 b4 02 00 00 9c 58 f6 c4 02 0f
-> 85 9f 02 00 00 48 85 ed 74 01 fb 48 b8 00 00 00 00 00 fc ff df <48> 01
-> c3 48 c7 03 00 00 00 00 48 c7 43 08 00 00 00 00 48 8b 84 24
-> RSP: 0018:ffffc9000432fb00 EFLAGS: 00000206
-> RAX: dffffc0000000000 RBX: 1ffff92000865f62 RCX: ffffffff81672c0e
-> RDX: 0000000000000001 RSI: ffffffff8accbae0 RDI: ffffffff8b2f0dc0
-> RBP: 0000000000000200 R08: 0000000000000000 R09: fffffbfff23e33d0
-> R10: ffffffff91f19e87 R11: 0000000000000000 R12: 0000000000000001
-> R13: 0000000000000000 R14: ffffffff8d0f0b48 R15: 0000000000000000
->  __mutex_lock_common kernel/locking/mutex.c:603 [inline]
->  __mutex_lock+0x175/0x9d0 kernel/locking/mutex.c:747
->  pcpu_alloc+0xbb8/0x1420 mm/percpu.c:1769
->  packet_alloc_pending net/packet/af_packet.c:1232 [inline]
->  packet_create+0x2b7/0x8e0 net/packet/af_packet.c:3373
->  __sock_create+0x328/0x800 net/socket.c:1569
->  sock_create net/socket.c:1620 [inline]
->  __sys_socket_create net/socket.c:1657 [inline]
->  __sys_socket+0x14c/0x260 net/socket.c:1704
->  __do_sys_socket net/socket.c:1718 [inline]
->  __se_sys_socket net/socket.c:1716 [inline]
->  __x64_sys_socket+0x72/0xb0 net/socket.c:1716
->  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> RIP: 0033:0x7fe940479de9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48
-> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-> 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffe1bf080b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fe940479de9
-> RDX: 0000000000000000 RSI: 0000000800000003 RDI: 0000000000000011
-> RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000100000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe1bf08110
-> R13: 0000000000030c67 R14: 00007ffe1bf080dc R15: 0000000000000003
->  </TASK>
-> INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.067=
- msecs
-> rcu: rcu_preempt kthread timer wakeup didn't happen for 10497 jiffies!
-> g5017 f0x0 RCU_GP_WAIT_FQS(5) ->state=3D0x402
-> rcu:    Possible timer handling issue on cpu=3D0 timer-softirq=3D2416
-> rcu: rcu_preempt kthread starved for 10498 jiffies! g5017 f0x0
-> RCU_GP_WAIT_FQS(5) ->state=3D0x402 ->cpu=3D0
-> rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is
-> now expected behavior.
-> rcu: RCU grace-period kthread stack dump:
-> task:rcu_preempt     state:I stack:27904 pid:17    tgid:17    ppid:2
->    flags:0x00004000
-> Call Trace:
->  <TASK>
->  context_switch kernel/sched/core.c:5376 [inline]
->  __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
->  __schedule_loop kernel/sched/core.c:6763 [inline]
->  schedule+0xe9/0x270 kernel/sched/core.c:6778
->  schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
->  rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
->  rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
->  kthread+0x2c6/0x3a0 kernel/kthread.c:388
->  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
->  </TASK>
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
-
---=20
-Vinicius
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
