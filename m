@@ -1,196 +1,145 @@
-Return-Path: <netdev+bounces-52581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D0647FF450
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:02:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D737FF457
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A3CFB20BC2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BE63B20D10
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCA154661;
-	Thu, 30 Nov 2023 16:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC8B54669;
+	Thu, 30 Nov 2023 16:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uh2LJM9E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mDIdWTHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA230170C;
-	Thu, 30 Nov 2023 08:02:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701360147; x=1732896147;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=6frXSfxU8ie8NVKoTJ92q0K2tw5cTUPiwkn8q2XaPXw=;
-  b=Uh2LJM9ER5ULbkEZ8Tno1cFqkbxdg2sJHAOq5fg8W+nxgLA1gZNAQfCh
-   d329mJGB2z//iII/Bj18xjl1VfYMIdeaVhUDczgsB55tEuIpVfCfPXhyF
-   9XvSXnKJKyrLxbszXXP6ZHmfpfqXZFrT6rFvXRvGKxUOjNENdRkIi2UiE
-   FvPYd1yYJIVWYV4jBOCjugmXe7awYyFXguoND7DsbW3GquH7MmDrb00fV
-   4RzTKGmCPCWsEX7/+SF+dAh0kYwVprDgiHwWjhdZMSAoXrsyK36ysYeSm
-   NCM4LwhHHTp62CG9w0V8fAXyejzOvgBvlekxS9oMS//ESCuiLNvb1jPQm
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="459836284"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="459836284"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 08:02:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="887280665"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="887280665"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Nov 2023 08:02:21 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 08:02:18 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 08:02:18 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 30 Nov 2023 08:02:18 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YxsYMCdTBUTCBq8K/qhYKUhRYO879Mi4KL2DLiKwCfgU73vYRm7ZTLBlfH0yoeD/iLPpmhiHdeGHyLWkRAju8iZXyaGAOEnFFU6zn+ieyz8uoW3GQQN+csg9VZRJczBzYxS+po5iGyBl+xB1T3AxIv5lB7aRbhLmnHwO3vNrOLi4qADzeFmz0Jt/SFzT1C8x2SojsLD85gdT2jMkhzx2lvlWkHdjZtsQN7irAYDklpY3PDttaAnHpHK4uKqQgTehVCh0Gp96JU+m5joivMBkhHC+0Guc7yxUR/XMCEy13hG4TcPtMmTDt6L1VyLzM3UJXbEFYzTGHMAd+v1JKG5AdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pZ8x7w7kVAcusRPwvFmZueg8rP1lRiWA1tJMiWFGmPE=;
- b=DLpmngnVPOcY1k9JUM9vnXC1C292D4VL0UDJZlTSl+E68srg1rwX4ksWYMaC8+egwsf7lkUCUDu/r7DbwJr8J/RDWTmHgqYexOyq2RLhcAjpA2Qf5wYm5AuGXU2X91EbvmkxXA0NkXDs/i8dQPl4oR3GkB7XupAa2cR0E1zlj7lMGORfW2FliOQK2s6uPYH39CutjtwGBA6hKqdgiPmN88Hk6UfpSuKOV788vfYEYfdM5BQXUvdqeQnmSvhhK9eKm3vHqTZlwHHYFtaEUizxTBRJF4fJoC84I0Hb+9+YShjpN1H+SalE4jlk/chTtPeN2bG7cI87BjzO8HrTms2Eiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by CH3PR11MB8363.namprd11.prod.outlook.com (2603:10b6:610:177::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
- 2023 16:02:17 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7046.024; Thu, 30 Nov 2023
- 16:02:17 +0000
-Message-ID: <f01e7e91-08f1-4548-8e73-aa931d5b4834@intel.com>
-Date: Thu, 30 Nov 2023 17:01:23 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 13/14] libie: add per-queue Page Pool stats
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>, Alexander Duyck
-	<alexanderduyck@fb.com>, Yunsheng Lin <linyunsheng@huawei.com>, "David
- Christensen" <drc@linux.vnet.ibm.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "Paul
- Menzel" <pmenzel@molgen.mpg.de>, <netdev@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
-References: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
- <20231124154732.1623518-14-aleksander.lobakin@intel.com>
- <e43fc483-3d9c-4ca0-a976-f89226266112@intel.com>
- <20231129062914.0f895d1c@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20231129062914.0f895d1c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0247.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b5::17) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5A1E10E4
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 08:05:05 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54bfa9b4142so13610a12.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 08:05:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701360304; x=1701965104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=py/UYRyeys28a8i4kga7u2wKQX1+4E1lmesjjnOgCD8=;
+        b=mDIdWTHrw9DVk7xHxd9mDRRWvuD7LLCYUjrdGPT38BJpuiNmarg0NRRigpmgK4wz6W
+         qgHv3RSgWdKIqrPxY0InFmI4Y/4E2xprCySyJgywcQgyj3avSVyvJoUeBB4e6kpwLjcV
+         +hCgaVz9n1rSoGkkDYXalCtK+vClpZBbV7vQQ8flIdCxrf/0OrnF9WNOrS5ct8Jn/obf
+         Fh5fMMA1KHTKkasOkEbiek5Vx4oJ7AxciMxjqxluRFy0/6HxcG+M1615a8gKpNMrNcCi
+         nnEoPArJYg7sMHiAzRp8DJOTL/P5XDYZrEu/etqU1nBWsSWz7HvQja/90R42zpdRGPWo
+         kfRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701360304; x=1701965104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=py/UYRyeys28a8i4kga7u2wKQX1+4E1lmesjjnOgCD8=;
+        b=PHV+HInmvRWVqPhKgpiETPJyqUwnihVywwpvkICh/axPgm24YsNDhLtm2ppcV7iYhU
+         rqShVENtxUQ/ZDWKN/M2P+xWM5mXnXtfmhhzDNNR5xv8UjUn8hcHE3H6MOTkHlMyAEEb
+         lHkf1O5Qr8LTEwnaIxEvnnN2uAC6oL2qBK1VMLKMwb59Hd3IBzaXh64Ax6Nm/yyJhHZK
+         OacoFdGtFD/qpeUcSBtxUthWenHpNHpZPpAta9Rbe9otI2prKS9ZYoqiDvoq8DnbAEOm
+         64ixoMD+v+SSy9IApHLC54gZibRMK8kCUduIHFPZxekMvaSEwDArpP8Xjg3rtApmMJyw
+         Hd6A==
+X-Gm-Message-State: AOJu0YxQJKeyEPWUCAgYpJiDiZ+fZZAOrZhz2eQWSiHeXReN8u0Oy3M/
+	EgGoh0ggQkWQl27zXJYosIiKwPFO3CRz1V9c4o+QRQ==
+X-Google-Smtp-Source: AGHT+IHiX/yaU3mC6vkAZLouB0rZDjFCvjF0MByDKZWp9pOIJXPlUJogCYBhUQSR8ZGDMh5Fzb3+d+gtEkO0LjexB+A=
+X-Received: by 2002:a05:6402:1cae:b0:54b:81ba:93b2 with SMTP id
+ cz14-20020a0564021cae00b0054b81ba93b2mr190505edb.2.1701360304140; Thu, 30 Nov
+ 2023 08:05:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|CH3PR11MB8363:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9402e759-85c6-49d6-3e4c-08dbf1bdb951
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 43+tiC/mabBYboMyl5ZijmAwG90AZSv+wJ1dQXsZFSO7/m3Kmk/mdvD3FvV6V0tgJc1ZMLgUkReY8bnut4VOOKE3lhDO9+MysZBwp+xwRfIR9qDUsvlFGnd4J8RhgQPJIQ5ymkAwfJ9E7y+TdmRrXwlWzy0a0IeNQ6f8zc7txVyKqNgZnf4/g4L68VcKBkm2xgyjQk8EC0M24bYJZ7M27xcgnGITOwcN3x6O4TlinJO6+gE/TgVWP7er+mw+uIK7WbrfPuy/jVu0B9K1zFi8vgA5xRIUv2WCp2k1dCVHzLLeoqEcRktkQZ455FIbPn+raJ0MkkywONw5w+js28Tc1dvWirsn9egMgchSxf/ew6dFtjXEg5x1kx0LAhDTcZ7FHwRdefP1vyr8Ohs/9WMwFXy+U/dxqrMbR1rf/TXy/6A2TGuVukGFEsVqjPjj9/rnU2UkFv69g1W1UvGzjsaxjLODr+dTeoteCEMjRXq4htCOtsuYgKtT0Yh1JAmkGcMZioY64w17HKw7vPpd2NS5EIMd1ogX99MnRU+nCycJuYap8ny4mh7nPJpknCFN32y9yOcpaJMG4ZUshTP39diR1jHJFU2GH+natLmuaWzlr15gK8VXFALDQPLOGma3Kq0Q1HGUMh20avptair55iF/Dw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(136003)(346002)(366004)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(26005)(31686004)(82960400001)(38100700002)(7416002)(2906002)(5660300002)(6666004)(6506007)(83380400001)(2616005)(6512007)(478600001)(36756003)(6486002)(41300700001)(66946007)(6916009)(54906003)(4326008)(8676002)(66556008)(86362001)(66476007)(31696002)(8936002)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WEdYN0dYRGtYN3owTm9aYUZpYmlsYXhZYStWL2Ixenh0S0RFZ1JJblJ0bm9M?=
- =?utf-8?B?M3k4bU1Qc3pRdm1EakYzWnk1Wk5CVnpxSGE2YmFwb3JKbUhCcS9LU3kvZURa?=
- =?utf-8?B?VW5QbUptMjFDQUJjU09JOFBYNS9qcU9sWWVVcjRUOENuZ1lFZVA3Q1J6M2Na?=
- =?utf-8?B?RlZxTTRRbzFQSng2VG0rdG9JcUM4TWhkR0xBcWhSbmpzeHlXc01ZVWRJeTlU?=
- =?utf-8?B?K3NYVDRFdmZkSjhkQXkvS2ZMMU9MY2dJcUh0aTFOZ25ZT01nWlU2NlJMRnVu?=
- =?utf-8?B?cTUwZFZoSTRJZ2VHL2xsMWIvczlmL29iL1E2NTM3Yk1jMGE0TVdYci9KaTVX?=
- =?utf-8?B?TUFqVTlHTXN3VnBHc3VCdzBzWEY0Z3BqREJKTTYyWEhJY2JJQmtLb01DcWNq?=
- =?utf-8?B?ZW1SMjFyTDJuenJtdzhCeHJWbFprY1VqWm1pSS9BRXg1TzVtbUNGMkZPNEs2?=
- =?utf-8?B?dHlseHFWakh1L2lhNkYxdUhzazZZQ1g2Q2U4T2RNNlhVbDI2dnJYSTd3VlFE?=
- =?utf-8?B?SlZnK3hJM2YwVldjTFVCdmkrYUtJTGZZTzd0cHJQblA4NlRBQTVEWXN5SUU2?=
- =?utf-8?B?Ny8zZVFwOERMMVpwRnVpbVV4V0NOTG9Ta2xEaVo2N0RGUWdDMjVLcU9NaGJR?=
- =?utf-8?B?N0JtNEREelNPY3hZN2ZpR2Y3bitNYnpnb0xYcUEwVERkc3NzN28rb0lRdGlY?=
- =?utf-8?B?SENsM2NZN0xuZVhyRWx6ZHZEUTR2djZwVzRsVTNQTnVQUlg0bnMyNGs1SDFJ?=
- =?utf-8?B?d2dmbmNVYWZNYTc2UFB0UjdJUWVVVTlITnJuM0ZCYjJnaWg0OW96QTl0cmtX?=
- =?utf-8?B?UXFvTEFkMFdnaHFUY1hxUHFkVFFvcjU4OG50ZXJtREVMSWd6NDhTeUxFWVpY?=
- =?utf-8?B?Y3ZzTFVaQ2FxelJwaWlHbjdteTlBdHdpUFc0WGphUmtrdUVjTktWMlVoZTZ2?=
- =?utf-8?B?QnZDY3JMVnBJMDR4aEdTcVZqaG41OFF1cHd5Z1dpWDdqclduRzV6d0luY0xz?=
- =?utf-8?B?bWU1K20zUU00aDJmMnFEQisxeDNxZy9teFhHY3NvK1JRbjBlWnFzdGN2MnZy?=
- =?utf-8?B?cW8wM3oyRDYwclk0ZmdBdnlLNytXM3lKclFXVjlpZmdnZFFqL2lCeksvR3J2?=
- =?utf-8?B?OFFQSjZ2UUZvVnFITUxjSnZFQ21CZm1aWStvZ2xiQlJTUitlWnlqZU9EN0hx?=
- =?utf-8?B?VTJkTldHZ0VzS0Nna0xNcWtEM0w0MWhWVnF0Z2NpQ09kVUtDNFZiRlg3YWtF?=
- =?utf-8?B?cDFHdzk5M09aOWNsOEp0ZlZTM1FxUnlOT1ZDVDB0dGlFMWd4R3pDYnpodHZo?=
- =?utf-8?B?Wmx2NHB5MDBuVkc4VndqdVhraXBvU2FtNW1CcE5lNnhKREkvbVg1RGxhei9M?=
- =?utf-8?B?OHhRc0N6YXMyUFJGMzdHcjlmbWczNjBScjdCbVUrWVY5b2tkbGdOM1N6Vm5o?=
- =?utf-8?B?MXN6YitlbUdHOGVuMXk5bEZvUmxoajEwQjNuaWV6Um43RW05K2hlL1NnYTdq?=
- =?utf-8?B?SjBOU3AzdFlXdGdza3Z5K0ZSVVB2TEE0VnFId2Mwc3A2dTN4QVpYcDl6dWVW?=
- =?utf-8?B?dXpOaUlMY3dZdnJBemQ5TWlFcHVWTFVHRmtrU3B5c2IxN3NqUlpBYjZvTlA2?=
- =?utf-8?B?S3M0RlIyY2FlM0Q3bXVhb2daM09peG9CMkw1S3NlckxQRjNaM3JNN3ZpeVc4?=
- =?utf-8?B?K0VuLzRTbm5CaTlhNzY1OXRBaUhBT05yTTdseUJZell0N2luZU41SHN3OU9M?=
- =?utf-8?B?TGQyaHlOLzhBTEx6cm5sUmlvTU50SDljcnpGclVxV21pQ0NNWmhTL2tINGcx?=
- =?utf-8?B?aHU1VjRPaER6VjVMZVo4QXBTZ1RjYkR6Y0RMWEFwVFowTXVSMVhWNCtXWEdT?=
- =?utf-8?B?N3ZsNUZiaTZEZEFiVTJNZEozOFFxNWhYdnJsTnZTa3dYMHkzeWxqY1lkSEMz?=
- =?utf-8?B?K2g4eHpyMUI1YXNuWDhUcElsa1dFdkM0ZW83SHFQVldaM0hmNEpjNjV0djBq?=
- =?utf-8?B?MUplRCtWOC9YSmFjRCtxSzROaUVYUzhBQWhWczNGVytoRUtRa0tjV3d2Qm83?=
- =?utf-8?B?bWtsQjBoS2RaVFplNXUzSG1seEtVck16cnRibHFuMnFuWHRuSVlydTVzVkdk?=
- =?utf-8?B?d0I2a0NJZERRZlJ2UTNjWHN5OWdrNFR6WnVLM3djWWw3WFFKcHhGR2xPNjBt?=
- =?utf-8?B?WkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9402e759-85c6-49d6-3e4c-08dbf1bdb951
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 16:02:16.6160
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: egH4tE00az/IF+dz4iACkrsQiwyEfMtyIa7OvbIsv2GCps5xO5wNJMD2lzMjD9DaYHpHrbEMZk88Pm4oRdAOehCRIvb+mFT+4zJ+Jh7AEdA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8363
-X-OriginatorOrg: intel.com
+References: <20231129234916.16128-1-daniel@iogearbox.net> <CANn89i+0UuXTYzBD1=zaWmvBKNtyriWQifOhQKF3Y7z4BWZhig@mail.gmail.com>
+ <edef4d8b-8682-c23f-31c4-57546be97299@iogearbox.net> <6568b03cbceb7_1b8920827@john.notmuch>
+In-Reply-To: <6568b03cbceb7_1b8920827@john.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 30 Nov 2023 17:04:50 +0100
+Message-ID: <CANn89iK9VrbRJsF2KoLfArv5Eu5d7Hyq-pSO4hmWuS_PNsM8dQ@mail.gmail.com>
+Subject: Re: pull-request: bpf 2023-11-30
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Wed, 29 Nov 2023 06:29:14 -0800
+On Thu, Nov 30, 2023 at 4:54=E2=80=AFPM John Fastabend <john.fastabend@gmai=
+l.com> wrote:
+>
+> Daniel Borkmann wrote:
+> > On 11/30/23 3:53 PM, Eric Dumazet wrote:
+> > > On Thu, Nov 30, 2023 at 12:49=E2=80=AFAM Daniel Borkmann <daniel@ioge=
+arbox.net> wrote:
+> > >>
+> > >> Hi David, hi Jakub, hi Paolo, hi Eric,
+> > >>
+> > >> The following pull-request contains BPF updates for your *net* tree.
+> > >>
+> > >> We've added 5 non-merge commits during the last 7 day(s) which conta=
+in
+> > >> a total of 10 files changed, 66 insertions(+), 15 deletions(-).
+> > >>
+> > >> The main changes are:
+> > >>
+> > >> 1) Fix AF_UNIX splat from use after free in BPF sockmap, from John F=
+astabend.
+> > >
+> > > syzbot is not happy with this patch.
+> > >
+> > > Would the following fix make sense?
+> > >
+> > > diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> > > index 7ea7c3a0d0d06224f49ad5f073bf772b9528a30a..58e89361059fbf9d5942c=
+6dd268dd80ac4b57098
+> > > 100644
+> > > --- a/net/unix/unix_bpf.c
+> > > +++ b/net/unix/unix_bpf.c
+> > > @@ -168,7 +168,8 @@ int unix_stream_bpf_update_proto(struct sock *sk,
+> > > struct sk_psock *psock, bool r
+> > >          }
+> > >
+> > >          sk_pair =3D unix_peer(sk);
+> > > -       sock_hold(sk_pair);
+> > > +       if (sk_pair)
+> > > +               sock_hold(sk_pair);
+> > >          psock->sk_pair =3D sk_pair;
+> > >          unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
+> > >          sock_replace_proto(sk, &unix_stream_bpf_prot);
+> > >
+> >
+> > Oh well :/ Above looks reasonable to me, thanks, but I'll defer to John=
+ & Jakub (both Cc'ed)
+> > for a final look.
+> >
+> > Thanks,
+> > Daniel
+>
+> Is that sk in LISTEN state by any chance? I can't think why we even allow=
+ such a
+> thing for af_unix sockets.  Another possible fix would be to block adding=
+ these
+> to sockmap at all.
+>
+> But, above should be fine as well so I would just go with that. Eric or D=
+aniel
+> would you like to submit a patch or I can if needed.
 
-> On Wed, 29 Nov 2023 14:40:33 +0100 Alexander Lobakin wrote:
->>> Expand the libie generic per-queue stats with the generic Page Pool
->>> stats provided by the API itself, when CONFIG_PAGE_POOL_STATS is
->>> enabled. When it's not, there'll be no such fields in the stats
->>> structure, so no space wasted.  
->>
->> Do I get it correctly that after Page Pool Netlink introspection was
->> merged, this commit makes no sense and we shouln't add PP stats to the
->> drivers private ones?
-> 
-> Yes, 100%.
+Here is the repro:
 
-Meh, this way the stats won't survive ifdown/ifup cycles as usually
-page_pools get destroyed on ifdown :z
-In that patch, I backup the PP stats to a device-lifetime container when
-the pool gets destroyed, maybe we could do something similar?
+# See https://goo.gl/kgGztJ for information about syzkaller reproducers.
+#{"procs":1,"slowdown":1,"sandbox":"","sandbox_arg":0,"close_fds":false}
+r0 =3D socket(0x1, 0x1, 0x0)
+r1 =3D bpf$MAP_CREATE(0x0, &(0x7f0000000200)=3D@base=3D{0xf, 0x4, 0x4, 0x12=
+}, 0x48)
+bpf$MAP_UPDATE_ELEM(0x2, &(0x7f0000000140)=3D{r1, &(0x7f0000000000),
+&(0x7f0000000100)=3D@tcp6=3Dr0}, 0x20)
 
-> 
-> FWIW I am aware that better tooling would be good so non-developers
-> could access to the PP Netlink :(  I'm thinking we should clean up 
-> YNL lib packaging a little and try to convince iproute2 maintainers 
-> to accept simple CLI built on top of it.
-
-Thanks,
-Olek
+I will release the syzbot report, and send the patch, thanks.
 
