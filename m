@@ -1,108 +1,69 @@
-Return-Path: <netdev+bounces-52556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108367FF327
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:04:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0067FF32D
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:05:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DEC1B20DEF
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:04:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F74AB20DD3
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A019E51032;
-	Thu, 30 Nov 2023 15:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8615851C42;
+	Thu, 30 Nov 2023 15:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Vq6gKddC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIY9u2fc"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0A310D5;
-	Thu, 30 Nov 2023 07:04:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=DOYtruExIOZ/Nqp4nuzJftAqHrayrWEPpJP1gdM610U=; b=Vq6gKddCOYJxUGbWwZ73S6TXqI
-	9uaWnHIp0Tsib321eUDu6sAaSFkA4BN0Bk/gVByOga9jNsUG+raBnCKoArDe/fMbmAdUJgvtXxHBj
-	pp14v0p5JA9mXgcuRU/Nzi7gfdmkVKK1wJzReWRsD/lFI35QaJN5LOOszfcb5yUGFH1zDjaRufzgG
-	hgUQoTLvRrv4BWYDqNWnXMtd0LPiq2vIvk3SRJdfTGVbHaUAGnD+Zxgcm2hIcXgDqSm8fHFl3/2Xs
-	NzF8ch12UE7f0a++U96C0VotE11Z7IH2h6AY0lyCqR6v2G335DU1/5xoUr0a0lO7PJLyiw9zoNyw9
-	R2/3hfLg==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r8iaV-0000gY-JY; Thu, 30 Nov 2023 16:04:23 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r8iaU-000HcA-Vl; Thu, 30 Nov 2023 16:04:23 +0100
-Subject: Re: pull-request: bpf 2023-11-30
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- andrii@kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- bpf@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com
-References: <20231129234916.16128-1-daniel@iogearbox.net>
- <CANn89i+0UuXTYzBD1=zaWmvBKNtyriWQifOhQKF3Y7z4BWZhig@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <edef4d8b-8682-c23f-31c4-57546be97299@iogearbox.net>
-Date: Thu, 30 Nov 2023 16:04:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E61448CF7;
+	Thu, 30 Nov 2023 15:05:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B61AC433C7;
+	Thu, 30 Nov 2023 15:05:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701356742;
+	bh=E8R3+0hXLh0qc5ZynnQNCLMHS7lZrhkDk9GDBZI56nU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VIY9u2fcuqy0jrFeWhhU8p0XhEkQMIjwTpWZC+7jpQeLBZEDal2SeIYsWPznDgIes
+	 QcaO6cOTqKK2Qoc/JKYF8hMobtCpNhR+2/8iEIGC6tldR55nJK0FuYezPq77+M5gUJ
+	 GelD/c1LEeXrNQXwiLBKn46GW0cd8IdSEZV9/vzqDLsVP6s2IPRW+MSdnVzXFo4jm3
+	 gDq0+o6Qzj2dfZlADSgeXPXMLAiat+AQzKETkS25lomecmFMyhxd0Uk8nOTw4pgE8l
+	 s23l1TdElKfehE2dIqhlxoGpt2reWkbdR8XdWkecZ/8dWj8Z1v/HtbqoCAGsXVaFb2
+	 T4KDiN0HIA2Iw==
+Date: Thu, 30 Nov 2023 07:05:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yujie Liu <yujie.liu@intel.com>
+Cc: kernel test robot <lkp@intel.com>, <davem@davemloft.net>,
+ <oe-kbuild-all@lists.linux.dev>, <netdev@vger.kernel.org>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <corbet@lwn.net>,
+ <leitao@debian.org>, <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH net-next] docs: netlink: link to family documentations
+ from spec info
+Message-ID: <20231130070541.105b9e34@kernel.org>
+In-Reply-To: <ZWhNOvnxSMAudjXM@yujie-X299>
+References: <20231127205642.2293153-1-kuba@kernel.org>
+	<202311280834.lYzXIFc4-lkp@intel.com>
+	<20231127190611.37a94d4c@kernel.org>
+	<ZWhNOvnxSMAudjXM@yujie-X299>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CANn89i+0UuXTYzBD1=zaWmvBKNtyriWQifOhQKF3Y7z4BWZhig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27109/Thu Nov 30 09:44:04 2023)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 11/30/23 3:53 PM, Eric Dumazet wrote:
-> On Thu, Nov 30, 2023 at 12:49 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>
->> Hi David, hi Jakub, hi Paolo, hi Eric,
->>
->> The following pull-request contains BPF updates for your *net* tree.
->>
->> We've added 5 non-merge commits during the last 7 day(s) which contain
->> a total of 10 files changed, 66 insertions(+), 15 deletions(-).
->>
->> The main changes are:
->>
->> 1) Fix AF_UNIX splat from use after free in BPF sockmap, from John Fastabend.
+On Thu, 30 Nov 2023 16:52:10 +0800 Yujie Liu wrote:
+> > Is it possible that the build bot is missing python-yaml support and
+> > the generation of Documentation/networking/netlink_spec/index.rst
+> > fails?  
 > 
-> syzbot is not happy with this patch.
-> 
-> Would the following fix make sense?
-> 
-> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
-> index 7ea7c3a0d0d06224f49ad5f073bf772b9528a30a..58e89361059fbf9d5942c6dd268dd80ac4b57098
-> 100644
-> --- a/net/unix/unix_bpf.c
-> +++ b/net/unix/unix_bpf.c
-> @@ -168,7 +168,8 @@ int unix_stream_bpf_update_proto(struct sock *sk,
-> struct sk_psock *psock, bool r
->          }
-> 
->          sk_pair = unix_peer(sk);
-> -       sock_hold(sk_pair);
-> +       if (sk_pair)
-> +               sock_hold(sk_pair);
->          psock->sk_pair = sk_pair;
->          unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
->          sock_replace_proto(sk, &unix_stream_bpf_prot);
-> 
+> Hi Jakub, this is indeed due to missing pyyaml module in the bot so the
+> doc file is not generated. We've installed it now and the warning is
+> gone. Sorry for the noise and please ignore this report.
 
-Oh well :/ Above looks reasonable to me, thanks, but I'll defer to John & Jakub (both Cc'ed)
-for a final look.
-
-Thanks,
-Daniel
+No worries at all, thanks for confirming!
 
