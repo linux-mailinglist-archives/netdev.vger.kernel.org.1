@@ -1,181 +1,89 @@
-Return-Path: <netdev+bounces-52549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7957FF1C1
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:27:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 875CF7FF231
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF9F6282568
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:27:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7AD21C20DDD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A3C51007;
-	Thu, 30 Nov 2023 14:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3253C6B6;
+	Thu, 30 Nov 2023 14:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvnHHPzJ"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Mjyr2vwr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A36638DE3;
-	Thu, 30 Nov 2023 14:27:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD7CC433C8;
-	Thu, 30 Nov 2023 14:27:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701354453;
-	bh=yqEXIpQy4FBfhgWNcAYCelks8EMoeqgn8N2Sbjp7GAU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uvnHHPzJl8qbOltPoozNXg6U/WHs3ngyXnvj3BLgTnZtV5Vs36ToUF1csQM4PMR8y
-	 kyX/XZdpGo1+40yZSaTJAwkMS2kXwWzOZXZNm6N/J/t7nfWsM7vRhNaPPctBeneVT+
-	 X0pTcRZd6dtj8nmqwwpZpmmyGLTxV7gHl0SMxCw077O7miwFmyTBI/J5Y/7o7Kn4Aw
-	 eFdQ0y1el2rOHOcg/qpJlSRndKlVCefg5Z/pWcbuG3uz0PjbPAAur+CYnF+i9swHli
-	 6WsndrZZZOTQF+2M5c+lELoUtAE8FWMHW+uStOEDNYB8L5LDaR0x43w2nZ4Q6kAjZD
-	 1FANr8iMFO/oQ==
-Date: Thu, 30 Nov 2023 15:27:28 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, paul@paul-moore.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v11 bpf-next 03/17] bpf: introduce BPF token object
-Message-ID: <20231130-katzen-anhand-7ad530f187da@brauner>
-References: <20231127190409.2344550-1-andrii@kernel.org>
- <20231127190409.2344550-4-andrii@kernel.org>
- <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C515E85
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 06:37:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=5NgPc7GHzRKED0Ib5dQL25cqaCEVJt7eXcZUzWsfGqI=; b=Mjyr2vwr2awI1ode/GlMtMj8gW
+	6U+RnnREylQQShJzym2RzOmbZCxADl8E60bPtpuhjSwWLA7qfURuJTJk5b6sK7NaIl/F/8WpBKG+p
+	f8yZek59D8jqgjjfkGbhvn1PF4ffaQCAxviMY2/2LNF2VNSGN3M4ekhlmdv2b3rIxwIhOkCXnDps/
+	0CbWVKCQgqKrzi/44sf0STiVGYJXrq1wieZLSELHh3WZxM+DBTR4aGfevZxzamL2B2gD5MAJhp+jZ
+	LckT5s0tU3JatZrK/KyQktn9Jhf/FqU6SGFwo+ieEgHxDxK3AJCikQWXU+NctunWw4UN6nvhm4g/j
+	fU+kJoyQ==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r8i9z-000Nyp-T0; Thu, 30 Nov 2023 15:36:59 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r8i9z-0007Jv-ID; Thu, 30 Nov 2023 15:36:59 +0100
+Subject: Re: [PATCH net] net/packet: move reference count in packet_sock to 64
+ bits
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org
+Cc: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>,
+ stable <stable@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <2023113042-unfazed-dioxide-f854@gregkh>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <37d84da7-12d2-7646-d4fb-240d1023fe7a@iogearbox.net>
+Date: Thu, 30 Nov 2023 15:36:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
+In-Reply-To: <2023113042-unfazed-dioxide-f854@gregkh>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27109/Thu Nov 30 09:44:04 2023)
 
-On Tue, Nov 28, 2023 at 04:05:36PM -0800, Andrii Nakryiko wrote:
-> On Mon, Nov 27, 2023 at 11:06 AM Andrii Nakryiko <andrii@kernel.org> wrote:
-> >
-> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
-> > allow delegating privileged BPF functionality, like loading a BPF
-> > program or creating a BPF map, from privileged process to a *trusted*
-> > unprivileged process, all while having a good amount of control over which
-> > privileged operations could be performed using provided BPF token.
-> >
-> > This is achieved through mounting BPF FS instance with extra delegation
-> > mount options, which determine what operations are delegatable, and also
-> > constraining it to the owning user namespace (as mentioned in the
-> > previous patch).
-> >
-> > BPF token itself is just a derivative from BPF FS and can be created
-> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BPF
-> > FS FD, which can be attained through open() API by opening BPF FS mount
-> > point. Currently, BPF token "inherits" delegated command, map types,
-> > prog type, and attach type bit sets from BPF FS as is. In the future,
-> > having an BPF token as a separate object with its own FD, we can allow
-> > to further restrict BPF token's allowable set of things either at the
-> > creation time or after the fact, allowing the process to guard itself
-> > further from unintentionally trying to load undesired kind of BPF
-> > programs. But for now we keep things simple and just copy bit sets as is.
-> >
-> > When BPF token is created from BPF FS mount, we take reference to the
-> > BPF super block's owning user namespace, and then use that namespace for
-> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
-> > capabilities that are normally only checked against init userns (using
-> > capable()), but now we check them using ns_capable() instead (if BPF
-> > token is provided). See bpf_token_capable() for details.
-> >
-> > Such setup means that BPF token in itself is not sufficient to grant BPF
-> > functionality. User namespaced process has to *also* have necessary
-> > combination of capabilities inside that user namespace. So while
-> > previously CAP_BPF was useless when granted within user namespace, now
-> > it gains a meaning and allows container managers and sys admins to have
-> > a flexible control over which processes can and need to use BPF
-> > functionality within the user namespace (i.e., container in practice).
-> > And BPF FS delegation mount options and derived BPF tokens serve as
-> > a per-container "flag" to grant overall ability to use bpf() (plus further
-> > restrict on which parts of bpf() syscalls are treated as namespaced).
-> >
-> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
-> > within the BPF FS owning user namespace, rounding up the ns_capable()
-> > story of BPF token.
-> >
-> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > ---
-> >  include/linux/bpf.h            |  41 +++++++
-> >  include/uapi/linux/bpf.h       |  37 ++++++
-> >  kernel/bpf/Makefile            |   2 +-
-> >  kernel/bpf/inode.c             |  17 ++-
-> >  kernel/bpf/syscall.c           |  17 +++
-> >  kernel/bpf/token.c             | 209 +++++++++++++++++++++++++++++++++
-> >  tools/include/uapi/linux/bpf.h |  37 ++++++
-> >  7 files changed, 350 insertions(+), 10 deletions(-)
-> >  create mode 100644 kernel/bpf/token.c
-> >
+On 11/30/23 3:20 PM, Greg Kroah-Hartman wrote:
+> In some potential instances the reference count on struct packet_sock
+> could be saturated and cause overflows which gets the kernel a bit
+> confused.  To prevent this, move to a 64bit atomic reference count to
+> prevent the possibility of this type of overflow.
 > 
-> [...]
+> Because we can not handle saturation, using refcount_t is not possible
+> in this place.  Maybe someday in the future if it changes could it be
+> used.
 > 
-> > +int bpf_token_create(union bpf_attr *attr)
-> > +{
-> > +       struct bpf_mount_opts *mnt_opts;
-> > +       struct bpf_token *token = NULL;
-> > +       struct user_namespace *userns;
-> > +       struct inode *inode;
-> > +       struct file *file;
-> > +       struct path path;
-> > +       struct fd f;
-> > +       umode_t mode;
-> > +       int err, fd;
-> > +
-> > +       f = fdget(attr->token_create.bpffs_fd);
-> > +       if (!f.file)
-> > +               return -EBADF;
-> > +
-> > +       path = f.file->f_path;
-> > +       path_get(&path);
-> > +       fdput(f);
-> > +
-> > +       if (path.dentry != path.mnt->mnt_sb->s_root) {
-> > +               err = -EINVAL;
-> > +               goto out_path;
-> > +       }
-> > +       if (path.mnt->mnt_sb->s_op != &bpf_super_ops) {
-> > +               err = -EINVAL;
-> > +               goto out_path;
-> > +       }
-> > +       err = path_permission(&path, MAY_ACCESS);
-> > +       if (err)
-> > +               goto out_path;
-> > +
-> > +       userns = path.dentry->d_sb->s_user_ns;
-> > +       /*
-> > +        * Enforce that creators of BPF tokens are in the same user
-> > +        * namespace as the BPF FS instance. This makes reasoning about
-> > +        * permissions a lot easier and we can always relax this later.
-> > +        */
-> > +       if (current_user_ns() != userns) {
-> > +               err = -EPERM;
-> > +               goto out_path;
-> > +       }
+> Original version from Daniel after I did it wrong, I've provided a
+> changelog.
 > 
-> Hey Christian,
-> 
-> I've added stricter userns check as discussed on previous revision,
-> and a few lines above fixed BPF FS root check (path.dentry !=
-> path.mnt->mnt_sb->s_root). Hopefully that addresses the remaining
-> concerns you've had.
-> 
-> I'd appreciate it if you could take another look to double check if
-> I'm not messing anything up, and if it all looks good, can I please
-> get an ack from you? Thank you!
+> Reported-by: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>
+> Cc: stable <stable@kernel.org>
+> Cc: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Please enforce that in order to use a token the caller must be in the
-same user namespace as the token as well. IOW, we don't want to yet make
-it possible to use a token created in an ancestor user namespace to load
-or attach bpf programs in a descendant user namespace. Let's be as
-restrictive as we can: tokens are only valid within the user namespace
-they were created in.
+Thanks!
+
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
