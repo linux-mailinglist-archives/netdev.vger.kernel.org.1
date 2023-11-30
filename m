@@ -1,90 +1,189 @@
-Return-Path: <netdev+bounces-52416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083477FEAFB
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:39:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4F27FEAFD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:40:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CA0DB211CA
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:39:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 881BC2820A1
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB832D606;
-	Thu, 30 Nov 2023 08:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C7220DD7;
+	Thu, 30 Nov 2023 08:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gpvqXzIy"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="LSsjtRFi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DCCE10E2
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:39:26 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54b0c368d98so6881a12.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:39:26 -0800 (PST)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2100.outbound.protection.outlook.com [40.107.94.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD779A;
+	Thu, 30 Nov 2023 00:39:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mkouRmxDG7nDv6VJZM5IP3OhX9EgBSHEnjxIjH15ng6JxRsdsiLxgX5qVvhSiX7nGQchd9i7bB4qyzsXoc5RmtAccT0O/O1ArCgFlb+88pa4bk5dMuDylVfg/9xLy07xQE+7iVwp1k36IHbO3HV454bYmNt61C9ufSXtggWTDhkfl/mvSM/Mwe4Xkrpf/Lk4/NjiJWPU9M42dNRkA4rMKCx8tcvwaHPBOdDFOj10tN9eYxBlT8ZSCyCsAwoebXjTAktmdgq0ivsK2sGJwX/7e+Q1JHsOdxiDCYK03Ok7UXIOuLVU/Crc93K1C/Ht4x+vLg8R0RX2ZIRu5BT5kyIHow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yV/F29IfBt/gtR2BrPHsqcXTL1lajfnG9dJh+c70JEY=;
+ b=BmbmFvA4WUAleonWLrv9ZDM0mhvx3texp3AgvyjYdaIqbEkffnRMDSizlryB6uxft+Gzgs3NjPlwN3l1ud7AtCCBaXznOB/14OL5k0v4dwJL3R3F7jX+sY+5SPWlivRTl2aY7uiAdXQHK1//jRoLsl8ZNKaoXAvXUfmKFdzg60bpN5uep9H4Is1MWm+gpoV067txItxq1W66uGyAD5tL+BwbHn3ZnbX620DjD1D3KAzPoZ+skR9yepCVLxZUN5hP8SfpoU1gt/Ex2RQkpQwBZikMsbFmuu1JqaX4bqmiaUcWaPZoImBSiSP8s1ThOaIshU5wXpsm27Ies3hALzR6Zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701333565; x=1701938365; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qNav2MEUYxomWdlekB/cfRgdHTUz7LNcPyW/u3GPNtg=;
-        b=gpvqXzIyB1//t+XmrMDXcpsyn60kbfisGn+XbPN6CogTzpkZzN637dBwHbV670ea5z
-         fKTIhhfluMtU65igkxDGCz75oROPD2vDNlBFBpg0zhGTm478kegDf2ST5I8WJGP3d1E1
-         l4oBUJsEPYxHw/Ea4hXV6ujVfARd6+M9WXsVKLMP6AX73YVs8SAjvgFdY34ZR+0qPC68
-         SAAlGt66ZU0uU+WfvzJ8GujvYx+uA5OWCo/U6euxthg3ouLYUTZnfynlDXBrQfCDYExM
-         bLjPMjGZCdZSJKIsgrOFJmNsMa+fY10rOnBbUZofacSQY6VOICTHd2AO7o84WoXmzNvG
-         IdiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701333565; x=1701938365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qNav2MEUYxomWdlekB/cfRgdHTUz7LNcPyW/u3GPNtg=;
-        b=DXVEN3LqBo2PWvEOVntoKUyzySkH9psUF9Vmd6W61fLIaZOd4p53/cxLpErJKWdBqy
-         rNB7cehzQ2E8ttmO9VLLkb8I6S+Ul8+3V1eN+b0IxDhBlv/3Lcl/Lz/zNPX7G+XlGnKO
-         9H2BEY5a43j3KEqC8gSLIl52Yr2+oEvlpRZBWEXcJ9Uaj/AIGc8u/ZIFkiVBjccc1Hq5
-         6h3ON4WQTJe5Y1/G/dRiSACIard5eES1x/NgosqA65UJWdxE0FeggCyB8lAp+quC+0Wn
-         inrS+2vDnZTz7SAZ5ypJBoba/69q4d0Xnd3dCq6AvcOs+Ugda/tthIjUyfxRecMHZW11
-         yw/A==
-X-Gm-Message-State: AOJu0Yx8JE9JNI1EOkrwlbJzEe1PGvUhhXvl/mhINmryF7iiKxGBhy7s
-	cI2VAS/MD5tVk7yz+w7KPBw4TtssS6MR9XyzdC86Ow==
-X-Google-Smtp-Source: AGHT+IHEVYYBrVItFxZDzJOCGTJxPEFfT5vPA2+6IQgNSKQGV+De4+z0ginIjihoHCxMdzYrw4mpMpmrfvPjyUzv2b8=
-X-Received: by 2002:a05:6402:1cae:b0:54b:81ba:93b2 with SMTP id
- cz14-20020a0564021cae00b0054b81ba93b2mr114502edb.2.1701333564532; Thu, 30 Nov
- 2023 00:39:24 -0800 (PST)
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yV/F29IfBt/gtR2BrPHsqcXTL1lajfnG9dJh+c70JEY=;
+ b=LSsjtRFin/HjufzxrKUA4bOEhzQ8qa5r89fiIHUkb82DiozA6kTPej+0gatnr7zI0ZPfMG49cVascfp4GHHshegEvBO/9cbBFRHStx5DlOqNABSNAaqZcnD8yZ7IWQMns2LRrX5iG1ESrUFgAn8nxXQD0bSqdfxc29ZHVm0Qrho=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SN4PR01MB7455.prod.exchangelabs.com (2603:10b6:806:202::11) by
+ SA1PR01MB6560.prod.exchangelabs.com (2603:10b6:806:1aa::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.24; Thu, 30 Nov 2023 08:39:56 +0000
+Received: from SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68]) by SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68%3]) with mapi id 15.20.7025.022; Thu, 30 Nov 2023
+ 08:39:56 +0000
+Message-ID: <706506b7-a89c-4dfc-b233-be7822eb056e@os.amperecomputing.com>
+Date: Thu, 30 Nov 2023 15:39:45 +0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mctp i2c: Requeue the packet when arbitration is lost
+Content-Language: en-CA
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
+ Open Source Submission <patches@amperecomputing.com>
+Cc: Phong Vo <phong@os.amperecomputing.com>,
+ Thang Nguyen <thang@os.amperecomputing.com>,
+ Dung Cao <dung@os.amperecomputing.com>
+References: <20231130075247.3078931-1-quan@os.amperecomputing.com>
+ <473048522551f1cae5273eb4cd31b732d6e33e53.camel@codeconstruct.com.au>
+From: Quan Nguyen <quan@os.amperecomputing.com>
+In-Reply-To: <473048522551f1cae5273eb4cd31b732d6e33e53.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2P153CA0018.APCP153.PROD.OUTLOOK.COM (2603:1096::28) To
+ SN4PR01MB7455.prod.exchangelabs.com (2603:10b6:806:202::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129022924.96156-1-kuniyu@amazon.com> <20231130003349.60533-1-kuniyu@amazon.com>
- <20231129201905.1959478b@kernel.org>
-In-Reply-To: <20231129201905.1959478b@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Nov 2023 09:39:13 +0100
-Message-ID: <CANn89iJU=dm0hHqd6iSYXCMapcnCEUC=sKiTDdX1DvAkY+rHsQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 0/8] tcp: Clean up and refactor cookie_v[46]_check().
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, horms@kernel.org, 
-	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN4PR01MB7455:EE_|SA1PR01MB6560:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ba9933a-9f55-4a36-d22b-08dbf17fee39
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YZF71IwKkXVJfZW1t3qAnEyI0rYCVaCICKrjyfCYfpyAMo1Q7UCjOvQjwl7yYH7FXN+KZg7umrrf28sRkW2Om4cs81Jo6+dw8dabBVaVs3pkSlyAggoe2GZZqHgY2bSdwUJNOI3Cs/WPYtPEwBsNEBYPBeGS9gpSzjweh+p4+VxocTTd3xU8rHwTPzV+JLq+AQb4fXUY0FjVezRT9RV+L5c2emkY8uyzwmsK4E5I++T6DenslMtli3Psvc+FSdFPoKpCp51x3imZZnr7A3ppVLmfDvnjUziOSNhupaUwnYIDANogNm8hnnJpCdHyDlGM4b7971Aabn3oW9Q9W+LmafI1CLoTaGHu8UxiaGDG4JyTS1r/eoYa0v4bvFw504kJ5QJJ1Jl1RMX3++UWcPh0m7rDY01tFXHG9VVlCzuzUdbDpqzLuPxmwipelsb773v6xiSNmvNEXsHqRccWxbiKrX/KdncH2o1g/3XvWSiJMFeckgNuvL4SlJ0zgypcHzQq8WeWK5MP/9IQMQgi9yJdiIVTtdHN/04j9Re9hoGFbeOOpNj4S+/LFao/UdhPylqnLnwogRopbzLj0Km++hVEEMlhvTVoMrQoDg+VRBe50qOGIEG5pNVdHJxmiH8mCGyWnC+NyeqrN2MNn3ygxeO2Gmg/vf8mPtdMBQjK/LRP/V8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR01MB7455.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(396003)(39850400004)(346002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(5660300002)(2906002)(6506007)(6666004)(966005)(6486002)(478600001)(4326008)(8676002)(8936002)(86362001)(31696002)(316002)(54906003)(110136005)(66476007)(66556008)(66946007)(26005)(107886003)(921008)(31686004)(83380400001)(2616005)(6512007)(202311291699003)(53546011)(38100700002)(41300700001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?clArZ2hvOUlmNXl4bEhVYkk3RjhweDVYWHZzMnNzYi92UGROb2c3R2hTNFlN?=
+ =?utf-8?B?L1VieWtFMDNtWk9WZm1sT3M3OGo5U1BNK2hoOUhueUNUSE8za1hZWXhVZ08z?=
+ =?utf-8?B?S1ZSUDdpV1hyc0w1ZFUwNDhoamhhTkZweDJWcjIyemJ1NE9hZ0ZJVnFUOThv?=
+ =?utf-8?B?Zk9LY2NMS1d6ZnVMaEtFU0x3WW9TRUIrMDRrVWFxOXR4U3AxeXpNUWRPY2NW?=
+ =?utf-8?B?RTVsdGNmMHllbVYyVWFUWFRQSWhtRXpWNkErYzJrQ0FnZVBBSXV0Q1ZZTXRK?=
+ =?utf-8?B?M1hCMnBQcythS0ZpN2hMU0VtRDJoN2dRcmJzT3lNZ1J0VDM4NjBjTWowUEtY?=
+ =?utf-8?B?Mkh4MC9WdlIxMnN4YlVUUW41YmY5bkxQekdpbExEbGdhMFJkUFA3cFVSMjAx?=
+ =?utf-8?B?OFZTS2dtRm5LWThQeUFtNWRGaTdoZGpDaExZQmczS2M1YXE0R3lXTlFPcWZN?=
+ =?utf-8?B?VGFkN0puMlVOQlZ5T1RqaDNmTzR6OGh3WVFjMTRSQnBvZ2dtNFRkRXRDMDlG?=
+ =?utf-8?B?QVR1dEZSc0dtYktMSThBYnFxeGRRQXFCTnRVT0U0V2JqMjlLcmNGb1pCTGJs?=
+ =?utf-8?B?Tlc3ZFpHUGFpWmhlSTJDdXhHeHdNZ2w4SGp6S0hMTE1zYUs1TWlZeGVxcDA0?=
+ =?utf-8?B?Yk9Jb2lORTBLME81dDl4MmFLcnYxVXRSbGFPSkxEQ2U2OGpKZTkvSVJKQ1I5?=
+ =?utf-8?B?eVBWdmNvaGRic1B6alF3NFV4bmR6QXNJVklROGZZc0J1RS9JcXVadjFicUlp?=
+ =?utf-8?B?WXBOUm5NbEhraHNRUmFiNVJENVF6NjFyY2YvMFUzcnJIaWduWDdqTkpsbDZa?=
+ =?utf-8?B?WWEvd1VNaytPL3VSU3ZCN2N2UnpqNnNQWDNKVlNYak5hc25TeGJhTnViZEhG?=
+ =?utf-8?B?dVZya0tDSVhwcFFDTDJmN2RrQ056dm1vY3F5cUx2c0dHQ201d3Y5Q092YUUx?=
+ =?utf-8?B?NjFobDFwWCsxa0lOVWtSem5Eekt0Qk1GdXJxMTNDSzhkekJZZk94dE1GNlVR?=
+ =?utf-8?B?ZVJld1dTYWJMN0trNnd0bGJZOXFOSnZrOE1OSnNiZUlkdjlrNGJocUhkdXBt?=
+ =?utf-8?B?VFdOdDhJSVpMeG43clVyRFc2Qi9zMmJCcWRhUE4wRHJ3c1ppYktCblpna2dz?=
+ =?utf-8?B?L0M5OE5BbWtXbmhmbHlpT3VHbFF4cThpdzU2MWVidVl3NE9CRU1RNWRtM0lp?=
+ =?utf-8?B?NnN5M3BTcU5kb3U2aTRKa0drdjdERW9xTVFTdE1valordUZvaU1JKzA5aFpt?=
+ =?utf-8?B?aGdWZFo5UXJMTlk3Tkp5LzdMY1RuVFgwbEhVOGpTMTYyM0NwRW1xRG5jeDdp?=
+ =?utf-8?B?Y2VVeXdsR0pQdkg4UkI0MjNVSFZnNGtueC9DMUNLZFZNT1dycXdDZlNOenZT?=
+ =?utf-8?B?dlVjMVE3SUw1REI0UXVCMVAyTHRIaERTOW9aVC94SUhyMVk1b1MrazNSRUlV?=
+ =?utf-8?B?bTFHbE5ibCtqd3QrenIrUytBQ243dE9MWGhpZjNlY2tOT0JmS1hXdWVDTEFq?=
+ =?utf-8?B?dFNxRGxsU2hmbE1BTko2Qzl5S2tPSjZtMkZzbFVkem5EM1Fhd3BoTUVzV1Nq?=
+ =?utf-8?B?UU93TlgzSW1YSmhpVURyWHJHcTdmbXhEWW84eFdyWnVsc2g2dERhUGhXVWs2?=
+ =?utf-8?B?SHZzS2N3c0hhdHord3h0Q1dsbnhPT3JMNEZmb2xyTEt3MFNFYlVWNEcyY0hp?=
+ =?utf-8?B?dGJ1RjVEVlFZNG9ybnJUVHpUaTFLRldkWE1TTjdSeDVOa3ZhdXg1NHpTNnFW?=
+ =?utf-8?B?Q1YyUGVzTTBNMkhyTkNEZVlBZEJJNStFcUI2YzhQVlBndDlmcEVPZzNZTDJx?=
+ =?utf-8?B?WWtlRnRBNHhxMkYvaVdKMUJXcDBIR29aY3E1ekFIZ3RtUWpSMzVGTFlNcHR3?=
+ =?utf-8?B?ZU1DZWxjQjFxNENJeWNPMThVRWVWQ3o4dFE0WDc2UytJdm9xejhIUWVpMEtG?=
+ =?utf-8?B?UzhOMGFVKzJWc29PU09qQXBwV3dUNldsZUFBU2pQUHFVblRiM1hUU090NU1G?=
+ =?utf-8?B?b1hJVVUrQVpaUElmMmlvK0lEdE93bFpNRmtYNkxGWCsvTm9sdDkrODZjTDZU?=
+ =?utf-8?B?L3Y4ZW1UdnBGWWVlSmU0Ry9OeXFvY0J4bHJuOVBoaEp0YkhRTkJxTmVrWnV1?=
+ =?utf-8?B?V3lZS2RMVkY2NUVVQXd5MjUvU3Qyci84Vm4rUXpQMTFmYUM3eGR0SUxBWGtH?=
+ =?utf-8?Q?7/2spUU9rCg9a4vnEONCFJs=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ba9933a-9f55-4a36-d22b-08dbf17fee39
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR01MB7455.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 08:39:56.8262
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yS0FznNfA++d7BvfiXnhfp0xhbnZx4MwDb2837VqOiM+LdJXu1pphfZ4o/hr92kzBwK64huNxtqNvx4JZyvUcDNdhJ3/pwCQ91xppJ6/rt8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR01MB6560
 
-On Thu, Nov 30, 2023 at 5:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 29 Nov 2023 16:33:49 -0800 Kuniyuki Iwashima wrote:
-> > I just realised that Reviewed-by tag for patch 2 of v2 series contained
-> > a wrong email address, and I happend to copy-and-paste it for patch 1-7=
-...
-> >
-> > > Reviewed-by: Eric Dumazet <edumazert@google.com>
-> > https://lore.kernel.org/netdev/CANn89iLy5cuVU6Pbb4hU7otefEn1ufRswJUo5JZ=
--LC8aGVUCSg@mail.gmail.com/
-> >
-> > Sorry for bothering, but it would be appreciated if it's fixed while
-> > merging.
->
-> Fixed, thanks for catching!
 
-Indeed, thanks Jakub and Kuniyuki :)
+
+On 30/11/2023 15:03, Jeremy Kerr wrote:
+> Hi Quan,
+> 
+>> If arbitration is lost, __i2c_transfer() returns -EAGAIN and the
+>> packet should be resent.
+>>
+>> Requeue the packet and increase collisions count on this case.
+> 
+> Are you sure you want to re-queue the packet here? The i2c core would
+> have already retried on arbitration loss:
+> 
+>    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/i2c-core-base.c#n2223
+> 
+> With this change, we would be disregarding the limits in adap->retries
+> and/or adap->timeout.
+> 
+
+Yes, the __i2c_transfer() does try its best to send the packet but if it 
+still fail with -EAGAIN, that means it still unable to win the arbitration.
+
+Without this patch we usually see the error below. The consequence is it 
+stop and need the PLDM layer to retry when timed out, which takes time.
+
+"[   61.616210] i2c i2c-3: __i2c_transfer failed -11"
+
+With this commit, we all see the packets go through peacefully just by 
+requeueing the packets at MCTP layer and eliminated the need to retry in 
+PLDM layer which would need more time.
+
+The result in our test is as below (Note: would needs some addition 
+debug print code). I also think it is worth noting that in our setup 
+there are multiple Masters.
+
+[73183.511487] i2c i2c-3: Arbitration loss, re-queue the packet
+[73192.550519] i2c i2c-3: __i2c_transfer failed -11
+[73192.555734] i2c i2c-3: Arbitration loss, re-queue the packet
+[73207.250036] i2c i2c-3: __i2c_transfer failed -11
+[73207.255247] i2c i2c-3: Arbitration loss, re-queue the packet
+[73429.499875] i2c i2c-3: __i2c_transfer failed -11
+[73429.505116] i2c i2c-3: Arbitration loss, re-queue the packet
+[73504.672065] i2c i2c-3: __i2c_transfer failed -11
+[73504.677317] i2c i2c-3: Arbitration loss, re-queue the packet
+[73540.762984] i2c i2c-3: __i2c_transfer failed -11
+[73540.768242] i2c i2c-3: Arbitration loss, re-queue the packet
+[73631.040049] i2c i2c-3: __i2c_transfer failed -11
+[73631.045333] i2c i2c-3: Arbitration loss, re-queue the packet
+[73648.538967] i2c i2c-3: __i2c_transfer failed -11
+
+Thanks,
+- Quan
 
