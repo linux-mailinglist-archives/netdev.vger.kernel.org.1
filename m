@@ -1,103 +1,87 @@
-Return-Path: <netdev+bounces-52335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 886677FE4DA
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:34:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67477FE67D
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 03:09:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA7591C20B4B
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:34:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E035B20DF7
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 02:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B4D187D;
-	Thu, 30 Nov 2023 00:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xl7G6ik/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A43882B;
+	Thu, 30 Nov 2023 02:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6A41A6
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:34:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701304450; x=1732840450;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tiQZM9uFEdCXMdQgrqXY4j3bJSSutSlyPA8qHzUJPvY=;
-  b=Xl7G6ik/uGLcxrSYo6ixKNBCMIidhlOjBfDkDfYPDdl8eXYZgA8G1A4l
-   rlKXfzbLvNS6ETH6FrLvR6IUr/bBNmccIJUcwpmxrX6IE+51eUd5Lf9ND
-   DePHEJ9nM3nlYAUoMTbQwmAR5NHnJmmyDo/OZFWLDRKtk2VpgZvo+dHcH
-   M=;
-X-IronPort-AV: E=Sophos;i="6.04,237,1695686400"; 
-   d="scan'208";a="687336494"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 00:34:04 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id 4A8A8C064D;
-	Thu, 30 Nov 2023 00:34:03 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:64576]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.167:2525] with esmtp (Farcaster)
- id b52301aa-46d6-4621-baad-753f28ca6e22; Thu, 30 Nov 2023 00:34:02 +0000 (UTC)
-X-Farcaster-Flow-ID: b52301aa-46d6-4621-baad-753f28ca6e22
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 30 Nov 2023 00:34:02 +0000
-Received: from 88665a182662.ant.amazon.com (10.118.240.181) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 30 Nov 2023 00:33:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v3 net-next 0/8] tcp: Clean up and refactor cookie_v[46]_check().
-Date: Wed, 29 Nov 2023 16:33:49 -0800
-Message-ID: <20231130003349.60533-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231129022924.96156-1-kuniyu@amazon.com>
-References: <20231129022924.96156-1-kuniyu@amazon.com>
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16619BD
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 18:09:33 -0800 (PST)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1r8WUR-0002Ut-1F;
+	Thu, 30 Nov 2023 02:09:20 +0000
+Date: Thu, 30 Nov 2023 02:09:13 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
+	hawk@kernel.org, ilias.apalodimas@linaro.org, dsahern@gmail.com,
+	dtatulea@nvidia.com, willemb@google.com, almasrymina@google.com,
+	shakeelb@google.com, john@phrozen.org
+Subject: Re: [PATCH net-next v4 00/13] net: page_pool: add netlink-based
+ introspection
+Message-ID: <ZWfuyc13oEkp583C@makrotopia.org>
+References: <20231126230740.2148636-1-kuba@kernel.org>
+ <170118422773.21698.10391322196700008288.git-patchwork-notify@kernel.org>
+ <ZWeamcTq9kv0oGd4@makrotopia.org>
+ <CANn89i+srqtEAqaKv=b9xrevL7xPk8MwoMwmudzOshjf0nDxfw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA004.ant.amazon.com (10.13.139.16) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+In-Reply-To: <CANn89i+srqtEAqaKv=b9xrevL7xPk8MwoMwmudzOshjf0nDxfw@mail.gmail.com>
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 28 Nov 2023 18:29:16 -0800
-> This is a preparation series for upcoming arbitrary SYN Cookie
-> support with BPF. [0]
-> 
-> There are slight differences between cookie_v[46]_check().  Such a
-> discrepancy caused an issue in the past, and BPF SYN Cookie support
-> will add more churn.
-> 
-> The primary purpose of this series is to clean up and refactor
-> cookie_v[46]_check() to minimise such discrepancies and make the
-> BPF series easier to review.
-> 
-> [0]: https://lore.kernel.org/netdev/20231121184245.69569-1-kuniyu@amazon.com/
-> 
-> 
-> Changes:
->   v3:
->     Patch 8: Fix ecn_ok init (Eric Dumazet)
+Hi Eric,
 
-I just realised that Reviewed-by tag for patch 2 of v2 series contained
-a wrong email address, and I happend to copy-and-paste it for patch 1-7...
+On Wed, Nov 29, 2023 at 10:12:49PM +0100, Eric Dumazet wrote:
+> On Wed, Nov 29, 2023 at 9:10 PM Daniel Golle <daniel@makrotopia.org> wrote:
+> > Hi Paolo,
+> >
+> > after the merge of this series to linux-next I'm seeing a new crash
+> > during boot.
+> > It can absolutely be that this is a bug in the Ethernet driver I'm
+> > working on though which only got exposed now. While I'm figuring it
+> > out I thought it'd still be good to let you know.
+> > [...]
+> Please look at the syzbot report
+> 
+> Proposed patch was :
+> 
+> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+> index 1426434a7e1587797da92f3199c0012559b51271..07becd4eceddcd4be9e5bea6479f8ffd16dac851
+> 100644
+> --- a/net/core/page_pool_user.c
+> +++ b/net/core/page_pool_user.c
+> @@ -339,7 +339,8 @@ void page_pool_unlist(struct page_pool *pool)
+>         mutex_lock(&page_pools_lock);
+>         netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_DEL_NTF);
+>         xa_erase(&page_pools, pool->user.id);
+> -       hlist_del(&pool->user.list);
+> +       if (!hlist_unhashed(&pool->user.list))
+> +               hlist_del(&pool->user.list);
+>         mutex_unlock(&page_pools_lock);
+>  }
+> 
 
-> Reviewed-by: Eric Dumazet <edumazert@google.com>
-https://lore.kernel.org/netdev/CANn89iLy5cuVU6Pbb4hU7otefEn1ufRswJUo5JZ-LC8aGVUCSg@mail.gmail.com/
+Confirming that the above patch fixes the issue.
 
-Sorry for bothering, but it would be appreciated if it's fixed while
-merging.
-
-Thanks!
+Tested-by: Daniel Golle <daniel@makrotopia.org>
 
