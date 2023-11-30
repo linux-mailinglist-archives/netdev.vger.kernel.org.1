@@ -1,140 +1,113 @@
-Return-Path: <netdev+bounces-52439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6427B7FEBE1
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:32:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8083E7FEBE3
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:33:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20812281C3D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:32:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F634281C19
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7529638F8E;
-	Thu, 30 Nov 2023 09:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9FA38F89;
+	Thu, 30 Nov 2023 09:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FfUvEDc8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mq3GgL22"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056CE8F
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:32:08 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a049d19b63bso94391666b.2
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:32:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1701336726; x=1701941526; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=P/v+E0O4KgB3PzqewrGMsWduXZyX66RbKGdE2wkw244=;
-        b=FfUvEDc8NR0BjvjpVmqhxF2bcMWWClLVD5pj6ZjwEbrVuo6rFhvqjDq5ZwQZMf6vP3
-         u0C3DfGKRoFy0WRXRb4P33mX1IB+mxTWmuVMR7AQV2WZiVRoGjUmcaw77szT7z97HwEh
-         r0NrDG9J2tXe0kCwhDgNpqZJ0qyzdxE+jIlqhCQPnmFjJUFuQVkrw6vGswrzPAT89/Jf
-         gYNq3oMJIq5f+ALc8gQvamOa2CFFZVTMbrVOeILjcEAwhrMuLtKum2WXOl9a8wkExcId
-         VvlKUpy+nFScHSlpsLMLqx3LSw0TftJnLDYPaegzm/5N5AomH++fSFqwyHIkyEipM7fE
-         94FQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1FCD48
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:33:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701336816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aCExvHYEswKuEfeCmLnGAnokX5PwVgkIGHZN/pMhG/0=;
+	b=Mq3GgL22Q6FV6vqhPcwn9miNG+2XCCwA8LyIvRHLVh3eqe6FIUkPUPJoni5yfia7D5pu7G
+	iBb0iaqTHlPUQ+WXbKp7L0MLtJtzD/GNwRMdHOa4MAf5/kvFZgQLNqxkwfLnqbapjv+kBE
+	elbqlOMZGmpKNzl8VBlBTLaEnEzfiUQ=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-ZFecgY3MOuyBw9OlKPjUpg-1; Thu, 30 Nov 2023 04:33:34 -0500
+X-MC-Unique: ZFecgY3MOuyBw9OlKPjUpg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a18a4b745b2so4360566b.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:33:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701336726; x=1701941526;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P/v+E0O4KgB3PzqewrGMsWduXZyX66RbKGdE2wkw244=;
-        b=HSSEhuOtyBpnGv6nhhZaO9TRv7GVRIOTDgDV9SeIH238ly5CEMqKFvdD1BhHwEHMc+
-         7+acNeSdKtz9vrQqPR0GxeM9qsts82/+wqf6yJ34EzKIuqUIjZdMUNyzlVqxVZDCjFHY
-         M5ZPTz/z+RHaJu0uBLd1H5J2SkhneJFak2zTDu2bz8YwgyTXE3WFaXXubBtkW46q/2oy
-         uZoagJdhKs8MDPiN2v37PMZiUMl96ZSV3vwaSzZcFgSAAa5g1b19vNt+ZPKLP8SvkRV3
-         PlWWbCgA6nXgfj3w7ptlOHOYDRBuM0thEM8JZVZBcER2CLLIHfiW8V0kHWAOnW37oDRG
-         ceAA==
-X-Gm-Message-State: AOJu0Yykn84Gqht1e3P/Hx/OOd8+YRAVJcsOzg4jNYFVr9JYgE3OVlIr
-	7TWSqoudVAe4A38f1gzNFpPNt735AmSTyOPj2OwXNQ==
-X-Google-Smtp-Source: AGHT+IGXjWVuBYY5l5aHrCHU2RKffK8zb0E2vHCoOtW2t/1OT/SnCOt9wG+d9OOCYiT2ZpuE2FHs5Q==
-X-Received: by 2002:a17:906:f80c:b0:a0d:e65a:277d with SMTP id kh12-20020a170906f80c00b00a0de65a277dmr7340847ejb.12.1701336726466;
-        Thu, 30 Nov 2023 01:32:06 -0800 (PST)
-Received: from cloudflare.com (79.184.129.107.ipv4.supernova.orange.pl. [79.184.129.107])
-        by smtp.gmail.com with ESMTPSA id k11-20020a170906128b00b009ff8f199f21sm483466ejb.19.2023.11.30.01.32.04
+        d=1e100.net; s=20230601; t=1701336813; x=1701941613;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aCExvHYEswKuEfeCmLnGAnokX5PwVgkIGHZN/pMhG/0=;
+        b=T83z8Ol2F71gVmKfjI8X3nzlZA1Y1YLFdYB6Wm/tIJSfOKWu29jZENFF97u/y8zQnN
+         H3OHtkDMUq3j006zStFrFtVK2pmbEKGa70qweENFci8z6z2rh7Msm02fyKtwqLoGQDTb
+         uEWAvFpmLfwsOghzi88cN3k1inbXkkf9OYUcuTGJSrmLPtgM7tRsWSmSLKwl87TlYzwb
+         jljeZNAiN29n7sQ3S46LzAMqRWKi5COYsz/xNuapD6uVrzs+cWV+fCJStMdVXXO2hfCL
+         J+voFqs2wa/DOqtJEhig5NjMjcDVeLAlSEqowDk1ngmbirRDp8jHxZ2LSen3y8wpDNr/
+         oNkw==
+X-Gm-Message-State: AOJu0YyxtotsniKMbiQK9myl75ojrwf824hy3ckxoduWIpo9wImdFCII
+	0+UG91cawL64JWhDrm3UDY7K6uxWj7paZjEL2hW3LUJpf0QhJnRTAClP1qXSxHXsIcuweti5eqG
+	i4ayFA1upZoe9rSXD
+X-Received: by 2002:a17:907:390:b0:a01:b9bd:87a with SMTP id ss16-20020a170907039000b00a01b9bd087amr820675ejb.7.1701336813536;
+        Thu, 30 Nov 2023 01:33:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEP5pbMR674ut0hyknc6qi/7vtoWZqWf64ILFllSlxQGa/5LjZX7aHjzFBJZ0hRNM8lzBLUKg==
+X-Received: by 2002:a17:907:390:b0:a01:b9bd:87a with SMTP id ss16-20020a170907039000b00a01b9bd087amr820654ejb.7.1701336813204;
+        Thu, 30 Nov 2023 01:33:33 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-254-39.dyn.eolo.it. [146.241.254.39])
+        by smtp.gmail.com with ESMTPSA id ay22-20020a170906d29600b009efe6fdf615sm463853ejb.150.2023.11.30.01.33.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 01:32:05 -0800 (PST)
-References: <a4f5b61c9cd44eada41d8f09d3848806@AcuMS.aculab.com>
- <87r0k82tbi.fsf@cloudflare.com>
- <a00cb120e5224a20931dcba10987cc80@AcuMS.aculab.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 'Jakub Kicinski'
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Stephen
- Hemminger <stephen@networkplumber.org>, Eric Dumazet
- <edumazet@google.com>, 'David Ahern' <dsahern@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] ipv4: Use READ/WRITE_ONCE() for IP
- local_port_range
-Date: Thu, 30 Nov 2023 10:29:33 +0100
-In-reply-to: <a00cb120e5224a20931dcba10987cc80@AcuMS.aculab.com>
-Message-ID: <87msuv37u4.fsf@cloudflare.com>
+        Thu, 30 Nov 2023 01:33:32 -0800 (PST)
+Message-ID: <8d2ee27f10a7a6c9414f10e8c0155c090b5f11e3.camel@redhat.com>
+Subject: Re: [PATCH net-next v5 4/4] virtio-net: support rx netdim
+From: Paolo Abeni <pabeni@redhat.com>
+To: Heng Qi <hengqi@linux.alibaba.com>, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc: jasowang@redhat.com, mst@redhat.com, kuba@kernel.org,
+ edumazet@google.com,  davem@davemloft.net, hawk@kernel.org,
+ john.fastabend@gmail.com, ast@kernel.org,  horms@kernel.org,
+ xuanzhuo@linux.alibaba.com, yinjun.zhang@corigine.com
+Date: Thu, 30 Nov 2023 10:33:31 +0100
+In-Reply-To: <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
+References: <cover.1701050450.git.hengqi@linux.alibaba.com>
+	 <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 
-On Thu, Nov 30, 2023 at 09:04 AM GMT, David Laight wrote:
-> From: Jakub Sitnicki
->> Sent: 29 November 2023 20:17
->> 
->> Hey David,
->> 
->> On Wed, Nov 29, 2023 at 07:26 PM GMT, David Laight wrote:
->> > Commit 227b60f5102cd added a seqlock to ensure that the low and high
->> > port numbers were always updated together.
->> > This is overkill because the two 16bit port numbers can be held in
->> > a u32 and read/written in a single instruction.
->> >
->> > More recently 91d0b78c5177f added support for finer per-socket limits.
->> > The user-supplied value is 'high << 16 | low' but they are held
->> > separately and the socket options protected by the socket lock.
->> >
->> > Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
->> > fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
->> > always updated together.
->> >
->> > Change (the now trival) inet_get_local_port_range() to a static inline
->> > to optimise the calling code.
->> > (In particular avoiding returning integers by reference.)
->> >
->> > Signed-off-by: David Laight <david.laight@aculab.com>
->> > ---
->> 
->> Regarding the per-socket changes - we don't expect contention on sock
->> lock between inet_stream_connect / __inet_bind, where we grab it and
->> eventually call inet_sk_get_local_port_range, and sockopt handlers, do
->> we?
->> 
->> The motivation is not super clear for me for that of the changes.
->
-> The locking in the getsockopt() code is actually quite horrid.
-> Look at the conditionals for the rntl lock.
-> It is conditionally acquired based on a function that sets a flag,
-> but released based on the exit path from the switch statement.
->
-> But there are only two options that need the rtnl lock and the socket
-> lock, and two trivial ones (including this one) that need the socket
-> lock.
-> So the code can be simplified by moving the locking into the case branches.
-> With only 2 such cases the overhead will be minimal (compared the to
-> setsockopt() case where a lot of options need locking.
->
-> This is all part of a big patchset I'm trying to write that converts
-> all the setsockopt code to take an 'unsigned int optlen' parameter
-> and return the length to pass back to the caller.
-> So the copy_to_user() of the updated length is done by the syscall
-> stub rather than inside every separate function (and sometimes in
-> multiple places in a function).
->
-> After all, if the copy fails EFAULT the application is broken.
-> It really doesn't matter if any side effects have happened.
-> If you get a fault reading from a pipe the data is lost.
+On Mon, 2023-11-27 at 10:55 +0800, Heng Qi wrote:
+> @@ -4738,11 +4881,14 @@ static void remove_vq_common(struct virtnet_info =
+*vi)
+>  static void virtnet_remove(struct virtio_device *vdev)
+>  {
+>  	struct virtnet_info *vi =3D vdev->priv;
+> +	int i;
+> =20
+>  	virtnet_cpu_notif_remove(vi);
+> =20
+>  	/* Make sure no work handler is accessing the device. */
+>  	flush_work(&vi->config_work);
+> +	for (i =3D 0; i < vi->max_queue_pairs; i++)
+> +		cancel_work(&vi->rq[i].dim.work);
 
-OK, so you're trying to refactor the setsockopt handler. Now it makes
-more sense what is driving this work. Thanks for the context.
+If the dim work is still running here, what prevents it from completing
+after the following unregister/free netdev?
 
-[...]
+It looks like you want need to call cancel_work_sync here?
+
+Additionally the later remove_vq_common() will needless call
+cancel_work() again; possibly is better to consolidate a single (sync)
+call there.
+
+Cheers,
+
+Paolo
+
 
