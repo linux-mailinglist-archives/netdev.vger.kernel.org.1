@@ -1,297 +1,275 @@
-Return-Path: <netdev+bounces-52479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428E17FEDD4
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:29:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C297FEE37
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:46:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 655D11C20F37
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:29:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDE48B20B74
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15753C68C;
-	Thu, 30 Nov 2023 11:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177DA3C6BC;
+	Thu, 30 Nov 2023 11:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6029198C;
-	Thu, 30 Nov 2023 03:28:42 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VxRPuBr_1701343717;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VxRPuBr_1701343717)
-          by smtp.aliyun-inc.com;
-          Thu, 30 Nov 2023 19:28:39 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kgraul@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	raspl@linux.ibm.com,
-	schnelle@linux.ibm.com,
-	linux-s390@vger.kernel.org,
+X-Greylist: delayed 563 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Nov 2023 03:45:07 PST
+Received: from shmail0.sohard.de (shmail0.sohard.de [87.140.57.250])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D7B1989;
+	Thu, 30 Nov 2023 03:45:07 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+	by shmail0.sohard.de (Postfix) with ESMTP id A9425BE08E3;
+	Thu, 30 Nov 2023 11:35:41 +0000 (UTC)
+Received: from shmail0.sohard.de ([127.0.0.1])
+ by localhost (shmail0.sohard.de [127.0.0.1]) (amavis, port 10032) with ESMTP
+ id RrOfBY0s_N0T; Thu, 30 Nov 2023 11:35:41 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by shmail0.sohard.de (Postfix) with ESMTP id 4435EBE08E4;
+	Thu, 30 Nov 2023 11:35:41 +0000 (UTC)
+X-Virus-Scanned: amavis at shmail0.sohard.de
+Received: from shmail0.sohard.de ([127.0.0.1])
+ by localhost (shmail0.sohard.de [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id lIGlhNebZmyJ; Thu, 30 Nov 2023 11:35:41 +0000 (UTC)
+Received: from protest9.fue.sohard.de (protest9.fue.sohard.de [192.168.144.82])
+	by shmail0.sohard.de (Postfix) with ESMTPSA id 1F967BE08E3;
+	Thu, 30 Nov 2023 11:35:41 +0000 (UTC)
+From: Thomas Reichinger <thomas.reichinger@sohard.de>
+To: 
+Cc: Thomas Reichinger <thomas.reichinger@sohard.de>,
+	Michael Grzeschik <m.grzeschik@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 7/7] net/smc: manage system EID in SMC stack instead of ISM driver
-Date: Thu, 30 Nov 2023 19:28:15 +0800
-Message-Id: <1701343695-122657-8-git-send-email-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
-References: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
+Subject: [PATCH] arcnet: restoring support for multiple Sohard Arcnet cards
+Date: Thu, 30 Nov 2023 12:35:03 +0100
+Message-Id: <20231130113503.6812-1-thomas.reichinger@sohard.de>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-The System EID (SEID) is an internal EID that is used by the SMCv2
-software stack that has a predefined and constant value representing
-the s390 physical machine that the OS is executing on. So it should
-be managed by SMC stack instead of ISM driver and be consistent for
-all ISMv2 device (including virtual ISM devices) on s390 architecture.
+Probe of Sohard Arcnet cards fails,
+if 2 or more cards are installed in a system.
+See kernel log:
+[    2.759203] arcnet: arcnet loaded
+[    2.763648] arcnet:com20020: COM20020 chipset support (by David Woodho=
+use et al.)
+[    2.770585] arcnet:com20020_pci: COM20020 PCI support
+[    2.772295] com20020 0000:02:00.0: enabling device (0000 -> 0003)
+[    2.772354] (unnamed net_device) (uninitialized): PLX-PCI Controls
+...
+[    3.071301] com20020 0000:02:00.0 arc0-0 (uninitialized): PCI COM20020=
+: station FFh found at F080h, IRQ 101.
+[    3.071305] com20020 0000:02:00.0 arc0-0 (uninitialized): Using CKP 64=
+ - data rate 2.5 Mb/s
+[    3.071534] com20020 0000:07:00.0: enabling device (0000 -> 0003)
+[    3.071581] (unnamed net_device) (uninitialized): PLX-PCI Controls
+...
+[    3.369501] com20020 0000:07:00.0: Led pci:green:tx:0-0 renamed to pci=
+:green:tx:0-0_1 due to name collision
+[    3.369535] com20020 0000:07:00.0: Led pci:red:recon:0-0 renamed to pc=
+i:red:recon:0-0_1 due to name collision
+[    3.370586] com20020 0000:07:00.0 arc0-0 (uninitialized): PCI COM20020=
+: station E1h found at C000h, IRQ 35.
+[    3.370589] com20020 0000:07:00.0 arc0-0 (uninitialized): Using CKP 64=
+ - data rate 2.5 Mb/s
+[    3.370608] com20020: probe of 0000:07:00.0 failed with error -5
 
-Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+commit 5ef216c1f848 ("arcnet: com20020-pci: add rotary index support")
+changes the device name of all COM20020 based PCI cards,
+even if only some cards support this:
+	snprintf(dev->name, sizeof(dev->name), "arc%d-%d", dev->dev_id, i);
+
+The error happens because all Sohard Arcnet cards would be called arc0-0,
+since the Sohard Arcnet cards don't have a PLX rotary coder.
+I.e. EAE Arcnet cards have a PLX rotary coder,
+which sets the first decimal, ensuring unique devices names.
+
+This patch adds two new card feature flags to indicate
+which cards support LEDs and the PLX rotary coder.
+For EAE based cards the names still depend on the PLX rotary coder
+(untested, since missing EAE hardware).
+For Sohard based cards, this patch will result in devices
+being called arc0, arc1, ... (tested).
+
+Signed-off-by: Thomas Reichinger <thomas.reichinger@sohard.de>
 ---
- drivers/s390/net/ism.h     |  7 -------
- drivers/s390/net/ism_drv.c | 38 ++++++--------------------------------
- include/linux/ism.h        |  1 -
- include/net/smc.h          |  1 -
- net/smc/smc_ism.c          | 33 ++++++++++++++++++++++++---------
- net/smc/smc_ism.h          |  7 +++++++
- 6 files changed, 37 insertions(+), 50 deletions(-)
+ drivers/net/arcnet/arcdevice.h    |  2 +
+ drivers/net/arcnet/com20020-pci.c | 89 ++++++++++++++++---------------
+ 2 files changed, 48 insertions(+), 43 deletions(-)
 
-diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
-index 70c5bbd..047fa610 100644
---- a/drivers/s390/net/ism.h
-+++ b/drivers/s390/net/ism.h
-@@ -16,7 +16,6 @@
-  */
- #define ISM_DMB_WORD_OFFSET	1
- #define ISM_DMB_BIT_OFFSET	(ISM_DMB_WORD_OFFSET * 32)
--#define ISM_IDENT_MASK		0x00FFFF
- 
- #define ISM_REG_SBA	0x1
- #define ISM_REG_IEQ	0x2
-@@ -192,12 +191,6 @@ struct ism_sba {
- #define ISM_CREATE_REQ(dmb, idx, sf, offset)		\
- 	((dmb) | (idx) << 24 | (sf) << 23 | (offset))
- 
--struct ism_systemeid {
--	u8	seid_string[24];
--	u8	serial_number[4];
--	u8	type[4];
--};
+diff --git a/drivers/net/arcnet/arcdevice.h b/drivers/net/arcnet/arcdevic=
+e.h
+index 19e996a829c9..b54275389f8a 100644
+--- a/drivers/net/arcnet/arcdevice.h
++++ b/drivers/net/arcnet/arcdevice.h
+@@ -186,6 +186,8 @@ do {									\
+ #define ARC_IS_5MBIT    1   /* card default speed is 5MBit */
+ #define ARC_CAN_10MBIT  2   /* card uses COM20022, supporting 10MBit,
+ 				 but default is 2.5MBit. */
++#define ARC_HAS_LED     4   /* card has software controlled LEDs */
++#define ARC_HAS_ROTARY  8   /* card has rotary encoder */
+=20
+ /* information needed to define an encapsulation driver */
+ struct ArcProto {
+diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20=
+020-pci.c
+index c580acb8b1d3..7b5c8bb02f11 100644
+--- a/drivers/net/arcnet/com20020-pci.c
++++ b/drivers/net/arcnet/com20020-pci.c
+@@ -213,12 +213,13 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 		if (!strncmp(ci->name, "EAE PLX-PCI FB2", 15))
+ 			lp->backplane =3D 1;
+=20
+-		/* Get the dev_id from the PLX rotary coder */
+-		if (!strncmp(ci->name, "EAE PLX-PCI MA1", 15))
+-			dev_id_mask =3D 0x3;
+-		dev->dev_id =3D (inb(priv->misc + ci->rotary) >> 4) & dev_id_mask;
 -
- static inline void __ism_read_cmd(struct ism_dev *ism, void *data,
- 				  unsigned long offset, unsigned long len)
- {
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 250248b..0590027 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -36,6 +36,7 @@
- 						/* a list for fast mapping  */
- static u8 max_client;
- static DEFINE_MUTEX(clients_lock);
-+static bool ism_v2_capable;
- struct ism_dev_list {
- 	struct list_head list;
- 	struct mutex mutex; /* protects ism device list */
-@@ -443,32 +444,6 @@ int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
- }
- EXPORT_SYMBOL_GPL(ism_move);
- 
--static struct ism_systemeid SYSTEM_EID = {
--	.seid_string = "IBM-SYSZ-ISMSEID00000000",
--	.serial_number = "0000",
--	.type = "0000",
--};
+-		snprintf(dev->name, sizeof(dev->name), "arc%d-%d", dev->dev_id, i);
++		if (ci->flags & ARC_HAS_ROTARY) {
++			/* Get the dev_id from the PLX rotary coder */
++			if (!strncmp(ci->name, "EAE PLX-PCI MA1", 15))
++				dev_id_mask =3D 0x3;
++			dev->dev_id =3D (inb(priv->misc + ci->rotary) >> 4) & dev_id_mask;
++			snprintf(dev->name, sizeof(dev->name), "arc%d-%d", dev->dev_id, i);
++		}
+=20
+ 		if (arcnet_inb(ioaddr, COM20020_REG_R_STATUS) =3D=3D 0xFF) {
+ 			pr_err("IO address %Xh is empty!\n", ioaddr);
+@@ -230,6 +231,10 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 			goto err_free_arcdev;
+ 		}
+=20
++		ret =3D com20020_found(dev, IRQF_SHARED);
++		if (ret)
++			goto err_free_arcdev;
++
+ 		card =3D devm_kzalloc(&pdev->dev, sizeof(struct com20020_dev),
+ 				    GFP_KERNEL);
+ 		if (!card) {
+@@ -239,41 +244,39 @@ static int com20020pci_probe(struct pci_dev *pdev,
+=20
+ 		card->index =3D i;
+ 		card->pci_priv =3D priv;
+-		card->tx_led.brightness_set =3D led_tx_set;
+-		card->tx_led.default_trigger =3D devm_kasprintf(&pdev->dev,
+-						GFP_KERNEL, "arc%d-%d-tx",
+-						dev->dev_id, i);
+-		card->tx_led.name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL,
+-						"pci:green:tx:%d-%d",
+-						dev->dev_id, i);
 -
--static void ism_create_system_eid(void)
--{
--	struct cpuid id;
--	u16 ident_tail;
--	char tmp[5];
+-		card->tx_led.dev =3D &dev->dev;
+-		card->recon_led.brightness_set =3D led_recon_set;
+-		card->recon_led.default_trigger =3D devm_kasprintf(&pdev->dev,
+-						GFP_KERNEL, "arc%d-%d-recon",
+-						dev->dev_id, i);
+-		card->recon_led.name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL,
+-						"pci:red:recon:%d-%d",
+-						dev->dev_id, i);
+-		card->recon_led.dev =3D &dev->dev;
+-		card->dev =3D dev;
 -
--	get_cpu_id(&id);
--	ident_tail = (u16)(id.ident & ISM_IDENT_MASK);
--	snprintf(tmp, 5, "%04X", ident_tail);
--	memcpy(&SYSTEM_EID.serial_number, tmp, 4);
--	snprintf(tmp, 5, "%04X", id.machine);
--	memcpy(&SYSTEM_EID.type, tmp, 4);
--}
+-		ret =3D devm_led_classdev_register(&pdev->dev, &card->tx_led);
+-		if (ret)
+-			goto err_free_arcdev;
+=20
+-		ret =3D devm_led_classdev_register(&pdev->dev, &card->recon_led);
+-		if (ret)
+-			goto err_free_arcdev;
 -
--u8 *ism_get_seid(void)
--{
--	return SYSTEM_EID.seid_string;
--}
--EXPORT_SYMBOL_GPL(ism_get_seid);
+-		dev_set_drvdata(&dev->dev, card);
 -
- static void ism_handle_event(struct ism_dev *ism)
- {
- 	struct ism_event *entry;
-@@ -560,7 +535,9 @@ static int ism_dev_init(struct ism_dev *ism)
- 
- 	if (!ism_add_vlan_id(ism, ISM_RESERVED_VLANID))
- 		/* hardware is V2 capable */
--		ism_create_system_eid();
-+		ism_v2_capable = true;
-+	else
-+		ism_v2_capable = false;
- 
- 	mutex_lock(&ism_dev_list.mutex);
- 	mutex_lock(&clients_lock);
-@@ -665,8 +642,7 @@ static void ism_dev_exit(struct ism_dev *ism)
- 	}
- 	mutex_unlock(&clients_lock);
- 
--	if (SYSTEM_EID.serial_number[0] != '0' ||
--	    SYSTEM_EID.type[0] != '0')
-+	if (ism_v2_capable)
- 		ism_del_vlan_id(ism, ISM_RESERVED_VLANID);
- 	unregister_ieq(ism);
- 	unregister_sba(ism);
-@@ -812,8 +788,7 @@ static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
- 
- static int smcd_supports_v2(void)
- {
--	return SYSTEM_EID.serial_number[0] != '0' ||
--		SYSTEM_EID.type[0] != '0';
-+	return ism_v2_capable;
- }
- 
- static u64 ism_get_local_gid(struct ism_dev *ism)
-@@ -859,7 +834,6 @@ static inline struct device *smcd_get_dev(struct smcd_dev *dev)
- 	.signal_event = smcd_signal_ieq,
- 	.move_data = smcd_move,
- 	.supports_v2 = smcd_supports_v2,
--	.get_system_eid = ism_get_seid,
- 	.get_local_gid = smcd_get_local_gid,
- 	.get_chid = smcd_get_chid,
- 	.get_dev = smcd_get_dev,
-diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 9a4c204..5428edd 100644
---- a/include/linux/ism.h
-+++ b/include/linux/ism.h
-@@ -86,7 +86,6 @@ int  ism_register_dmb(struct ism_dev *dev, struct ism_dmb *dmb,
- int  ism_unregister_dmb(struct ism_dev *dev, struct ism_dmb *dmb);
- int  ism_move(struct ism_dev *dev, u64 dmb_tok, unsigned int idx, bool sf,
- 	      unsigned int offset, void *data, unsigned int size);
--u8  *ism_get_seid(void);
- 
- const struct smcd_ops *ism_get_smcd_ops(void);
- 
-diff --git a/include/net/smc.h b/include/net/smc.h
-index a0dc1187e..c9dcb30 100644
---- a/include/net/smc.h
-+++ b/include/net/smc.h
-@@ -73,7 +73,6 @@ struct smcd_ops {
- 			 bool sf, unsigned int offset, void *data,
- 			 unsigned int size);
- 	int (*supports_v2)(void);
--	u8* (*get_system_eid)(void);
- 	void (*get_local_gid)(struct smcd_dev *dev, struct smcd_gid *gid);
- 	u16 (*get_chid)(struct smcd_dev *dev);
- 	struct device* (*get_dev)(struct smcd_dev *dev);
-diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index a33f861..ac88de2 100644
---- a/net/smc/smc_ism.c
-+++ b/net/smc/smc_ism.c
-@@ -43,6 +43,27 @@ static void smcd_handle_irq(struct ism_dev *ism, unsigned int dmbno,
+-		ret =3D com20020_found(dev, IRQF_SHARED);
+-		if (ret)
+-			goto err_free_arcdev;
+-
+-		devm_arcnet_led_init(dev, dev->dev_id, i);
++		if (ci->flags & ARC_HAS_LED) {
++			card->tx_led.brightness_set =3D led_tx_set;
++			card->tx_led.default_trigger =3D devm_kasprintf(&pdev->dev,
++							GFP_KERNEL, "arc%d-%d-tx",
++							dev->dev_id, i);
++			card->tx_led.name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL,
++							"pci:green:tx:%d-%d",
++							dev->dev_id, i);
++
++			card->tx_led.dev =3D &dev->dev;
++			card->recon_led.brightness_set =3D led_recon_set;
++			card->recon_led.default_trigger =3D devm_kasprintf(&pdev->dev,
++							GFP_KERNEL, "arc%d-%d-recon",
++							dev->dev_id, i);
++			card->recon_led.name =3D devm_kasprintf(&pdev->dev, GFP_KERNEL,
++							"pci:red:recon:%d-%d",
++							dev->dev_id, i);
++			card->recon_led.dev =3D &dev->dev;
++
++			ret =3D devm_led_classdev_register(&pdev->dev, &card->tx_led);
++			if (ret)
++				goto err_free_arcdev;
++
++			ret =3D devm_led_classdev_register(&pdev->dev, &card->recon_led);
++			if (ret)
++				goto err_free_arcdev;
++
++			dev_set_drvdata(&dev->dev, card);
++			devm_arcnet_led_init(dev, dev->dev_id, i);
++		}
+=20
++		card->dev =3D dev;
+ 		list_add(&card->list, &priv->list_dev);
+ 		continue;
+=20
+@@ -329,7 +332,7 @@ static struct com20020_pci_card_info card_info_5mbit =
+=3D {
  };
- #endif
- 
-+static void smc_ism_create_system_eid(void)
-+{
-+	struct smc_ism_seid *seid =
-+		(struct smc_ism_seid *)smc_ism_v2_system_eid;
-+#if IS_ENABLED(CONFIG_S390)
-+	struct cpuid id;
-+	u16 ident_tail;
-+	char tmp[5];
-+
-+	memcpy(seid->seid_string, "IBM-SYSZ-ISMSEID00000000", 24);
-+	get_cpu_id(&id);
-+	ident_tail = (u16)(id.ident & SMC_ISM_IDENT_MASK);
-+	snprintf(tmp, 5, "%04X", ident_tail);
-+	memcpy(seid->serial_number, tmp, 4);
-+	snprintf(tmp, 5, "%04X", id.machine);
-+	memcpy(seid->type, tmp, 4);
-+#else
-+	memset(seid, 0, SMC_MAX_EID_LEN);
-+#endif
-+}
-+
- /* Test if an ISM communication is possible - same CPC */
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
- 		    struct smcd_dev *smcd)
-@@ -431,14 +452,8 @@ static void smcd_register_dev(struct ism_dev *ism)
- 
- 	mutex_lock(&smcd_dev_list.mutex);
- 	if (list_empty(&smcd_dev_list.list)) {
--		u8 *system_eid = NULL;
--
--		system_eid = smcd->ops->get_system_eid();
--		if (smcd->ops->supports_v2()) {
-+		if (smcd->ops->supports_v2())
- 			smc_ism_v2_capable = true;
--			memcpy(smc_ism_v2_system_eid, system_eid,
--			       SMC_MAX_EID_LEN);
--		}
- 	}
- 	/* sort list: devices without pnetid before devices with pnetid */
- 	if (smcd->pnetid[0])
-@@ -542,10 +557,10 @@ int smc_ism_init(void)
- {
- 	int rc = 0;
- 
--#if IS_ENABLED(CONFIG_ISM)
- 	smc_ism_v2_capable = false;
--	memset(smc_ism_v2_system_eid, 0, SMC_MAX_EID_LEN);
-+	smc_ism_create_system_eid();
- 
-+#if IS_ENABLED(CONFIG_ISM)
- 	rc = ism_register_client(&smc_ism_client);
- #endif
- 	return rc;
-diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-index 0e5e563..ffff40c 100644
---- a/net/smc/smc_ism.h
-+++ b/net/smc/smc_ism.h
-@@ -16,6 +16,7 @@
- #include "smc.h"
- 
- #define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
-+#define SMC_ISM_IDENT_MASK		0x00FFFF
- 
- struct smcd_dev_list {	/* List of SMCD devices */
- 	struct list_head list;
-@@ -30,6 +31,12 @@ struct smc_ism_vlanid {			/* VLAN id set on ISM device */
- 	refcount_t refcnt;		/* Reference count */
+=20
+ static struct com20020_pci_card_info card_info_sohard =3D {
+-	.name =3D "PLX-PCI",
++	.name =3D "SOHARD SH ARC-PCI",
+ 	.devcount =3D 1,
+ 	/* SOHARD needs PCI base addr 4 */
+ 	.chan_map_tbl =3D {
+@@ -364,7 +367,7 @@ static struct com20020_pci_card_info card_info_eae_ar=
+c1 =3D {
+ 		},
+ 	},
+ 	.rotary =3D 0x0,
+-	.flags =3D ARC_CAN_10MBIT,
++	.flags =3D ARC_HAS_ROTARY | ARC_HAS_LED | ARC_CAN_10MBIT,
  };
- 
-+struct smc_ism_seid {
-+	u8 seid_string[24];
-+	u8 serial_number[4];
-+	u8 type[4];
-+};
-+
- struct smcd_dev;
- 
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
--- 
-1.8.3.1
+=20
+ static struct com20020_pci_card_info card_info_eae_ma1 =3D {
+@@ -396,7 +399,7 @@ static struct com20020_pci_card_info card_info_eae_ma=
+1 =3D {
+ 		},
+ 	},
+ 	.rotary =3D 0x0,
+-	.flags =3D ARC_CAN_10MBIT,
++	.flags =3D ARC_HAS_ROTARY | ARC_HAS_LED | ARC_CAN_10MBIT,
+ };
+=20
+ static struct com20020_pci_card_info card_info_eae_fb2 =3D {
+@@ -421,7 +424,7 @@ static struct com20020_pci_card_info card_info_eae_fb=
+2 =3D {
+ 		},
+ 	},
+ 	.rotary =3D 0x0,
+-	.flags =3D ARC_CAN_10MBIT,
++	.flags =3D ARC_HAS_ROTARY | ARC_HAS_LED | ARC_CAN_10MBIT,
+ };
+=20
+ static const struct pci_device_id com20020pci_id_table[] =3D {
+--=20
+2.34.1
 
 
