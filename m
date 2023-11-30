@@ -1,105 +1,93 @@
-Return-Path: <netdev+bounces-52560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45FDE7FF348
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:16:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 729A77FF36B
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 749941C20D35
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:16:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3A881C20DF8
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AEAB51C3B;
-	Thu, 30 Nov 2023 15:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D15D524A9;
+	Thu, 30 Nov 2023 15:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIt114rq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwGBUgOE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D62B1B3
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:16:00 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3b3f55e1bbbso588500b6e.2
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:16:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701357359; x=1701962159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mfI8FXRvZEdls/OEw4QY+jI4dB3/RzHHv1MmQpiqi+8=;
-        b=LIt114rqpIFDGmB+kEEqlyoJ+J/y4ngCSR5N/BI17ctW0e4H6la8MTwSKnW/JEC8f7
-         hLfzu0TcHaPkppsfT9YmpSFawx9eLtoXFazK4DGl4dtop2/2ZAK5oj64SENvd3p0wCC2
-         n3pDjRd0TWJjeaEf5vYKpMM7xjCeh5R7FsscrwUzen64da/mXN7qXQwcExtOtuEyiyqX
-         61PNoaDFNAQxBtwI0ghIAjDhsgopNFjQsmuhuJ1dlgCIcfw/Myshvrh10nfu9RbqK+I6
-         nNfqHMBNIyl7PfrJUYEzbnnzW0NQ+/xX/3gljzxDo4xNlSVLPSyfVYf+xnwJfDv1fvqt
-         f68w==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0B310EA
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:20:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701357638;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dEqkJxwjlfqEUZLoeifhFNRmLYsQ9sgPgHYM3n7xUho=;
+	b=dwGBUgOEXqOlx8mjo/1zY3i73YlKDELtQEAvZ+eAv8aqAqAcz1k+YsYRbM7aB6IBVrtxtP
+	OAz44eD/vQn0BYpKngVndkvzVpWjKqBqrKD3tVI0ByTF9uwUJH95U/akl+kKlPywP++j2A
+	S6UK5JnU6lUfMYMU6NM3PT7coDFmYRY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-9hjVX9dXMGy6-2KbG-d8lQ-1; Thu, 30 Nov 2023 10:20:37 -0500
+X-MC-Unique: 9hjVX9dXMGy6-2KbG-d8lQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40b371a69f9so1499285e9.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:20:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701357359; x=1701962159;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mfI8FXRvZEdls/OEw4QY+jI4dB3/RzHHv1MmQpiqi+8=;
-        b=evQmEwzNeIl3hF4HCcJo7ESeIkqFBn39KgVhguScuwp04y9m3lLU5qefEncIZXKYAr
-         6bcnj44JBU+iA8XHc6nFh4eNugAznX78rBwluQpijloYXeLSnY5iVBNSviJnSS9VcX6i
-         EQTAdUs4skPz/jw9Vglf04aOkGmIeEnKBtG65MbH7b50wKfFrd15IYuq8lhvpqwZJLPB
-         Lki0t3pX0D/6vopeEnUqI+BDpTsas5lev2yb6eG+uT+zfjwQryhVLzorj7lHb5XzfPl8
-         T0ppw1Jjkq+78ubdclg76uzdM5KxFKGdA+z7K4mX3NJneTsv6NzAp4wXNcXIyKwYQio0
-         hU8w==
-X-Gm-Message-State: AOJu0Yxui/lKNwImWHVz7GKoX3kCjce2UNQMLGYqQOGSUZ5cPyUGkfm1
-	Nv/DZZfTooP6XpPicg/jZcE=
-X-Google-Smtp-Source: AGHT+IG7S6zwmgwehDyYaO3Ejt0g/UUqerZxOJOnw3YWeNnWFzix86hSCYWENS81B3OaWga7HQwIlA==
-X-Received: by 2002:a05:6808:bcc:b0:3b6:d617:a719 with SMTP id o12-20020a0568080bcc00b003b6d617a719mr29859230oik.41.1701357359451;
-        Thu, 30 Nov 2023 07:15:59 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id n18-20020a0ce492000000b0067a35c1d10csm571455qvl.114.2023.11.30.07.15.58
+        d=1e100.net; s=20230601; t=1701357636; x=1701962436;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dEqkJxwjlfqEUZLoeifhFNRmLYsQ9sgPgHYM3n7xUho=;
+        b=jGurex/5T8WN2nJGamZQQk+Deuq9Q+x/fx/+uMBoxuqYwFr9KLhz+5lntNiSZqS2uR
+         6CWv5ihpANbAGnw7pMYKSqXeHzBWByEGgsv6NJrzq3BERmDkJp3LG2MkVgYh+UQBVn6D
+         eYiaQhch6R2C3z3uRKr7SysMGOtyKyqQIuUunijyyFDEWGxOfB5LLSpeZUPV/LaLBzHS
+         RbhDhcuflJ4W63BujhTqF25ILCXCLRVf2npuYXRGKXOUAIrMKXzkv8Qz04vLZnYOqpf7
+         leclF66uA4rwvcTE6visz4bhri16n1Ii09E/FB6laeRx+GBO3wLIWYy+zY6TzWGu1T+m
+         35Sw==
+X-Gm-Message-State: AOJu0YzTpBuB/fYB/4t9G9mzjCHbpzSrBM3eq8SZtV1bhuGVtong9Dd6
+	h0OoL0vCWsiD6O03PsmSd9/xkfrUYmnX/yFsS33ksQNSa5wcnnE85mNGSoO0G7VZAIuIjXzdbux
+	xMBginBTI4W0wHFT/
+X-Received: by 2002:a05:600c:8512:b0:405:358c:ba75 with SMTP id gw18-20020a05600c851200b00405358cba75mr15223897wmb.0.1701357636290;
+        Thu, 30 Nov 2023 07:20:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGmWmZDOiZtkqddOsdMjnFnx0anMvXkNnD8AcLel/BSwwmSEX8SLaio0xywMh1dMKaV6S35xQ==
+X-Received: by 2002:a05:600c:8512:b0:405:358c:ba75 with SMTP id gw18-20020a05600c851200b00405358cba75mr15223881wmb.0.1701357635879;
+        Thu, 30 Nov 2023 07:20:35 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-118-234.dyn.eolo.it. [146.241.118.234])
+        by smtp.gmail.com with ESMTPSA id u2-20020a05600c138200b00405d9a950a2sm6036725wmf.28.2023.11.30.07.20.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 07:15:59 -0800 (PST)
-Date: Thu, 30 Nov 2023 10:15:58 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- netdev@vger.kernel.org
-Cc: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>, 
- stable <stable@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Message-ID: <6568a72eab745_f2ed0294ad@willemb.c.googlers.com.notmuch>
-In-Reply-To: <37d84da7-12d2-7646-d4fb-240d1023fe7a@iogearbox.net>
-References: <2023113042-unfazed-dioxide-f854@gregkh>
- <37d84da7-12d2-7646-d4fb-240d1023fe7a@iogearbox.net>
-Subject: Re: [PATCH net] net/packet: move reference count in packet_sock to 64
- bits
+        Thu, 30 Nov 2023 07:20:35 -0800 (PST)
+Message-ID: <182382de40ab8f129829ceb3fa3f71608bfa65fb.camel@redhat.com>
+Subject: Re: [GIT PULL] Networking for v6.7-rc4
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 30 Nov 2023 16:20:34 +0100
+In-Reply-To: <20231130125638.726279-1-pabeni@redhat.com>
+References: <20231130125638.726279-1-pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
 
-Daniel Borkmann wrote:
-> On 11/30/23 3:20 PM, Greg Kroah-Hartman wrote:
-> > In some potential instances the reference count on struct packet_sock
-> > could be saturated and cause overflows which gets the kernel a bit
-> > confused.  To prevent this, move to a 64bit atomic reference count to
-> > prevent the possibility of this type of overflow.
-> > 
-> > Because we can not handle saturation, using refcount_t is not possible
-> > in this place.  Maybe someday in the future if it changes could it be
-> > used.
-> > 
-> > Original version from Daniel after I did it wrong, I've provided a
-> > changelog.
-> > 
-> > Reported-by: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>
-> > Cc: stable <stable@kernel.org>
-> > Cc: Daniel Borkmann <daniel@iogearbox.net>
-> > Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
-> Thanks!
-> 
-> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+On Thu, 2023-11-30 at 13:56 +0100, Paolo Abeni wrote:
+> We just received a report regarding the WiFi/debugfs fixes below possibly
+> causing some dmesg noise - trying to register multiple times the same ent=
+ry.
 
-Acked-by: Willem de Bruijn <willemb@google.com>
+Jakub noted that such report is on a kernel that predates the changes
+in this PR, so you can ignore the above.
+
+Sorry for the noise,
+
+Paolo
+
 
