@@ -1,91 +1,87 @@
-Return-Path: <netdev+bounces-52422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691B77FEB16
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:46:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51927FEB1A
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:46:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EE728204E
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:46:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84F86B20DD9
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903E72C84A;
-	Thu, 30 Nov 2023 08:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4725E2D609;
+	Thu, 30 Nov 2023 08:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tXqL4m8T"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E63A2;
-	Thu, 30 Nov 2023 00:46:15 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SgqRN3BjGzMnZ8;
-	Thu, 30 Nov 2023 16:41:20 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 Nov
- 2023 16:46:12 +0800
-Subject: Re: [Intel-wired-lan] [PATCH net-next v5 03/14] page_pool: avoid
- calling no-op externals when possible
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Christoph Hellwig
-	<hch@lst.de>
-CC: Paul Menzel <pmenzel@molgen.mpg.de>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Larysa Zaremba <larysa.zaremba@intel.com>, <netdev@vger.kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, <linux-kernel@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Michal Kubiak <michal.kubiak@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, David Christensen
-	<drc@linux.vnet.ibm.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20231124154732.1623518-1-aleksander.lobakin@intel.com>
- <20231124154732.1623518-4-aleksander.lobakin@intel.com>
- <6bd14aa9-fa65-e4f6-579c-3a1064b2a382@huawei.com>
- <a1a0c27f-f367-40e7-9dc2-9421b4b6379a@intel.com>
- <534e7752-38a9-3e7e-cb04-65789712fb66@huawei.com>
- <8c6d09be-78d0-436e-a5a6-b94fb094b0b3@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <4814a337-454b-d476-dabe-5035dd6dc51f@huawei.com>
-Date: Thu, 30 Nov 2023 16:46:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D1510E3
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:46:27 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40b35199f94so51455e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:46:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701333985; x=1701938785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wC3vGfw8buwXx/+n8qL73juvjuvtnig2ryfrV/uy7ZQ=;
+        b=tXqL4m8TG+Kly8PJVjMO3y7O8GzDkyUrZQPcn7n/ylfmo6y3AG+XPg+yWmeFbIVyez
+         yKrTNMaDPOP1ubolcm6Hfb5xqFtEzdEpTEfPutco13iLtHU1Jr9tclwtMo2i5FF/6Y7o
+         xEs7w9Qkgk3QHVmwj33gbf/T0LWSwUDmO8U8MdeDvvMPPRkdy86Qv7L3nVO0yMU4nugB
+         0udkVQEwE5c/ZbMev2Udh2L33+fNLVeXyMXo4r4bMgmev803n6IiAVF373lvESSpx4Tn
+         MevpVPTrjWhtx7pzGybMQo2pkMcIyY3CckEa8iDH3hW/rrVOlb5lZ/S9mYp77sB9nDLt
+         s3Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701333985; x=1701938785;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wC3vGfw8buwXx/+n8qL73juvjuvtnig2ryfrV/uy7ZQ=;
+        b=owhLKNp3TwhAi4QcLucIA3xoM9B/mXE9x25dlZ1bmFo3YhaBeqUeMVXoBdVUTYPdxl
+         aEdwn/QGZn81lLHnYabMhoeBpYtTlUIesenITbAAvmHmdaGqaUlLpUExxagPBGBn/60R
+         N0Ju26UMUaPM50f7iGwDyE/x36V+N/Mxzjmde0DUQ/s6Hp2R14iwn6URiXyuPygcNqOc
+         Q8WilJ2LprO+Gue0uKyXk6freoGAvk1n3L3+bkiRXsaA8JbeMj3jNmVU0qtc/qFybYtv
+         UstERwCA9Nr9ORXhkdSP2vPOdR3zlYnZJHKEWfALxCodRFjmHfZuKxURbQnnFgTvO2nl
+         R0yA==
+X-Gm-Message-State: AOJu0Yz9ryQal1hznb92sNsw0IqPMzyyRgBNlJi2xutbOgh4m99I84/X
+	3JzHbnuIuxJJWwwUOhrR2I8qVU8gLpilBiekj7BWJw==
+X-Google-Smtp-Source: AGHT+IFCUSEg8dN6oCdqKrhoebdwpoM1SqTlSMDHfQfBP47TnasviGUbaB/JoKO5XvBtjrGpyWvK43c278oK7R6mLnw=
+X-Received: by 2002:a05:600c:6006:b0:40b:443d:9b78 with SMTP id
+ az6-20020a05600c600600b0040b443d9b78mr119836wmb.0.1701333985108; Thu, 30 Nov
+ 2023 00:46:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <8c6d09be-78d0-436e-a5a6-b94fb094b0b3@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+References: <CABOYnLy_ufLD=BWDJct2chXMDYdZK=dNb4cnPYD5xo3WW1YCrw@mail.gmail.com>
+In-Reply-To: <CABOYnLy_ufLD=BWDJct2chXMDYdZK=dNb4cnPYD5xo3WW1YCrw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 30 Nov 2023 09:46:14 +0100
+Message-ID: <CANn89iKpO35x-mFNgGA1axhn1hrq2HZBOFXo+wkTRPKxCQyQKA@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
+To: xingwei lee <xrivendell7@gmail.com>
+Cc: syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com, davem@davemloft.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023/11/29 21:17, Alexander Lobakin wrote:
-> From: Yunsheng Lin <linyunsheng@huawei.com>
-> Date: Wed, 29 Nov 2023 11:17:50 +0800
-> 
->> On 2023/11/27 22:32, Alexander Lobakin wrote:
->>>
->>> Chris, any thoughts on a global flag for skipping DMA syncs ladder?
->>
->> It seems there was one already in the past:
->>
->> https://lore.kernel.org/netdev/7c55a4d7-b4aa-25d4-1917-f6f355bd722e@arm.com/T/
-> 
-> It addresses a different problem, meaningless indirect calls, while this
-> one addresses meaningless direct calls :>
-> When the above gets merged, we could combine these two into one global,
-> but Eric wasn't active with his patch and I remember there were some
-> problems, so I wouldn't count on that it will arrive soon.
+On Thu, Nov 30, 2023 at 9:42=E2=80=AFAM xingwei lee <xrivendell7@gmail.com>=
+ wrote:
+>
+> Hello
+> I reproduced this bug with repro.txt and repro.c
+>
+>
 
-I went through the above patch, It seems to me that there was no
-fundamental problem that stopping us from implementing it in the dma
-layer basing on Eric' patch if Eric is no longer interested in working
-on a newer version?
 
-It is just that if we allow every subsystem and driver using dma API
-doing their own trick of skipping dma sync, then there is less willing
-to implement it in the dma layer.
+Is your syzbot instance ready to accept patches for testing ?
+
+Otherwise, a repro which happens to  work 'by luck' might not work for me.
+
+The bug here is a race condition with rds subsystem being dismantled
+at netns dismantle, the 'repro' could be anything really.
 
