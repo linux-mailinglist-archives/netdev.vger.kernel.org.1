@@ -1,96 +1,153 @@
-Return-Path: <netdev+bounces-52314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F1E7FE45C
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:56:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFB27FE46B
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A58DC1C20A6B
-	for <lists+netdev@lfdr.de>; Wed, 29 Nov 2023 23:56:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A1192822F6
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F179747A67;
-	Wed, 29 Nov 2023 23:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FD1369;
+	Thu, 30 Nov 2023 00:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AFXAyTX8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ktl/m0o3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA504CB5D;
-	Wed, 29 Nov 2023 23:56:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14715C433C7;
-	Wed, 29 Nov 2023 23:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB49F7FB;
+	Thu, 30 Nov 2023 00:02:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FA3CC433C8;
+	Thu, 30 Nov 2023 00:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701302175;
-	bh=FK/XJ8k7CN61Y+SQ5dJKbLrahAUivCDGaeaXNYqZt2o=;
+	s=k20201202; t=1701302524;
+	bh=JUfy9PkTGB3gNUUcDpux3gYV9KYIjfLf4mmkshe8UG0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AFXAyTX8Shnb4CIfE2Q9iYTgz1rK2nby7PMOiNBV/45sKOjLIx5NneSuAvTv6EkaL
-	 JOh/PJ8LwvfYrUf5Mj8Ec9+YNi9MK95wCaAGSuqurmuQGxxlRnuAInXET197tMJ0uk
-	 ZqrHS/KYCVXvBPx+czULvcNeJCQ97V3TmZq6Bc3OJLbGR0deix0gKlCXmkzYdrjZM+
-	 se383zhQwlecOmBxmULwQIUtVYRjWnmyRWhnEZ52T1ISWl9D1bjIE/aPHM5pI+yDdp
-	 McUSwJa6s1GuMB/px6+xtgoGV/NkZ97VpOsClujI26bdxBH0AvZCBibYeNYy1Vp3fm
-	 vF4+wHzwG3PTw==
-Date: Wed, 29 Nov 2023 15:56:13 -0800
+	b=Ktl/m0o3zGXWl4dRs8Uljd2uSDXRAKuRKGS5gjDqHVy63kq81zh+MAE7mcVDqDvyN
+	 ql5WfEsMjGTodqmelTMlwpRovOMGK4HL4xNysCvPXN3Rto8Rmjm4zV30i2I0FMm//A
+	 JVfo6LrJKKsNId8yEJvvp1Vndr6C6HkyN6k+ZcnuRL/7AjZ4hH4JwV3ZtlL/FP0jLt
+	 rY3PxRlSvGCxPsAW1/xLoXZpjSpT/gaUslTRpMajetq+sXz4btfjc8zDjf0t+C3yNC
+	 QFgnNanyBxeOyxjviG6bXU9pokZVgnQiewuRe9g/H0BAQIPtcTMqaL/gB/niItqVYh
+	 f+AJW9ODCZgxA==
+Date: Wed, 29 Nov 2023 16:02:02 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel
- review list <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
- Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, rrameshbabu@nvidia.com
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231129155613.58c4b93b@kernel.org>
-In-Reply-To: <20231129230034.7301d8b2@kmaincent-XPS-13-7390>
-References: <20231120121440.3274d44c@kmaincent-XPS-13-7390>
-	<20231120120601.ondrhbkqpnaozl2q@skbuf>
-	<20231120144929.3375317e@kmaincent-XPS-13-7390>
-	<20231120142316.d2emoaqeej2pg4s3@skbuf>
-	<20231120093723.4d88fb2a@kernel.org>
-	<157c68b0-687e-4333-9d59-fad3f5032345@lunn.ch>
-	<20231120105148.064dc4bd@kernel.org>
-	<20231120195858.wpaymolv6ws4hntp@skbuf>
-	<20231120134551.30d0306c@kernel.org>
-	<20231129210959.19e1e2b7@kmaincent-XPS-13-7390>
-	<20231129203700.ckpkc4r5bwwudwpf@skbuf>
-	<20231129230034.7301d8b2@kmaincent-XPS-13-7390>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>, KY Srinivasan
+ <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
+ "sharmaajay@microsoft.com" <sharmaajay@microsoft.com>, "leon@kernel.org"
+ <leon@kernel.org>, "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+ "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
+ <tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, Yury Norov <yury.norov@gmail.com>
+Subject: Re: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ
+ affinity on HT cores
+Message-ID: <20231129160202.6d66459f@kernel.org>
+In-Reply-To: <20231129221739.GA20858@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+	<20231121154841.7fc019c8@kernel.org>
+	<PUZP153MB0788476CD22D5AA2ECDC11ABCCBDA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+	<20231127100639.5f2f3d3e@kernel.org>
+	<20231129221739.GA20858@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Nov 2023 23:00:34 +0100 K=C3=B6ry Maincent wrote:
-> > Not sure why you say "not used", though. Are you not planning to expose
-> > the qualifier as an attribute to the listing of hwtstamp providers
-> > offered to user space by ETHTOOL_MSG_TSINFO_GET? =20
->=20
-> Yes I will, I was just saying that all the PHC would be set as precise fo=
-r now.
-> Approximate timestamp quality won't be used because IIUC there are no NIC=
- driver
-> supporting it yet.
+On Wed, 29 Nov 2023 14:17:39 -0800 Souradeep Chakrabarti wrote:
+> On Mon, Nov 27, 2023 at 10:06:39AM -0800, Jakub Kicinski wrote:
+> > On Mon, 27 Nov 2023 09:36:38 +0000 Souradeep Chakrabarti wrote:  
+> > > easier to keep things inside the mana driver code here  
+> > 
+> > Easier for who? Upstream we care about consistency and maintainability
+> > across all drivers.  
+> I am refactoring the code and putting some of the changes in topology.h
+> and in nodemask.h. I am sharing the proposed change here for those two
+> files. Please let me know if they are acceptable.
 
-Agreed that we should add the attr from the start.
+Thanks, adding Yury <yury.norov@gmail.com> who's the best person 
+to comment on the details...
 
-Maybe we can ask/work with Rahul <rrameshbabu@nvidia.com>
-to implement the right thing in mlx5?
+> Added a new helper to iterate on numa nodes with cpu and start from a 
+> particular node, instead of first node. This helps when we want to
+> iterate from the local numa node.
+> 
+> diff --git a/include/linux/nodemask.h b/include/linux/nodemask.h
+> index 8d07116caaf1..6e4528376164 100644
+> --- a/include/linux/nodemask.h
+> +++ b/include/linux/nodemask.h
+> @@ -392,6 +392,15 @@ static inline void __nodes_fold(nodemask_t *dstp, const nodemask_t *origp,
+>         for ((node) = 0; (node) < 1 && !nodes_empty(mask); (node)++)
+>  #endif /* MAX_NUMNODES */
+> 
+> +#if MAX_NUMNODES > 1
+> +#define for_each_node_next_mask(node_start, node_next, mask)           \
+> +       for ((node_next) = (node_start);                                \
+> +            (node_next) < MAX_NUMNODES;                                \
+> +            (node_next) = next_node((node_next), (mask)))
+> +#else
+> +#define for_each_node_next_mask(node_start, node_next, mask)   \
+> +       for_each_node_mask(node_next, mask)
+> +#endif
+>  /*
+>   * Bitmasks that are kept for all the nodes.
+>   */
+> @@ -440,6 +449,8 @@ static inline int num_node_state(enum node_states state)
+> 
+>  #define for_each_node_state(__node, __state) \
+>         for_each_node_mask((__node), node_states[__state])
+> +#define for_each_node_next_state(__node_start, __node_next, __state) \
+> +       for_each_node_next_mask((__node_start), (__node_next), node_states[__state])
+> 
+>  #define first_online_node      first_node(node_states[N_ONLINE])
+>  #define first_memory_node      first_node(node_states[N_MEMORY])
+> @@ -489,7 +500,8 @@ static inline int num_node_state(enum node_states state)
+> 
+>  #define for_each_node_state(node, __state) \
+>         for ( (node) = 0; (node) == 0; (node) = 1)
+> -
+> +#define for_each_node_next_state(node, next_node, _state) \
+> +       for_each_node_state(node, __state)
+>  #define first_online_node      0
+>  #define first_memory_node      0
+>  #define next_online_node(nid)  (MAX_NUMNODES)
+> @@ -535,6 +547,8 @@ static inline int node_random(const nodemask_t *maskp)
+> 
+>  #define for_each_node(node)       for_each_node_state(node, N_POSSIBLE)
+>  #define for_each_online_node(node) for_each_node_state(node, N_ONLINE)
+> +#define for_each_online_node_next(node, next_node)  \
+> +                                 for_each_node_next_state(node, next_node, N_ONLINE)
+> 
+>  /*
+>   * For nodemask scratch area.
+> diff --git a/include/linux/topology.h b/include/linux/topology.h
+> index 52f5850730b3..a06b16e5a955 100644
+> --- a/include/linux/topology.h
+> +++ b/include/linux/topology.h
+> @@ -43,6 +43,9 @@
+>         for_each_online_node(node)                      \
+>                 if (nr_cpus_node(node))
+> 
+> +#define for_each_next_node_with_cpus(node, next_node)  \
+> +               for_each_online_node_next(node, next_node)      \
+> +               if (nr_cpus_node(next_node))
+>  int arch_update_cpu_topology(void);
+> 
+>  /* Conform to ACPI 2.0 SLIT distance definitions */
+> 
 
-Failing that we can mark mlx5 as imprecise, until its sorted out.
-So that we have both types in the tree.
 
