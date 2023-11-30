@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75897FFDEF
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:50:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718F97FFDF1
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 22:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D801281708
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:50:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 202DC2818CC
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8C55B217;
-	Thu, 30 Nov 2023 21:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC845DF15;
+	Thu, 30 Nov 2023 21:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2bMpSdV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdWg00dH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8478110F9;
-	Thu, 30 Nov 2023 13:50:16 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3333074512bso49226f8f.1;
-        Thu, 30 Nov 2023 13:50:16 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0153B10FA;
+	Thu, 30 Nov 2023 13:50:18 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40b2ddab817so13741005e9.3;
+        Thu, 30 Nov 2023 13:50:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701381014; x=1701985814; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701381016; x=1701985816; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9AK8QepPskxCil5g9Uq2zBTi0Gm4T10NxAWhodYVXSQ=;
-        b=T2bMpSdVP/z0dedvvFUpcNNaf365s/C3OWlEZso81766L1Z2/L7ulYgPkguvb8eT2q
-         DlhfSpzmxyc6BJZKK0+cJwFtNwFbs/AxDZ77VM4WG5Sra7UC+wo6+lbIfCn8KiR2SHxz
-         jENcjj6wi9x6NG7lF7oyqcMTinGplgsfQCSVETAK49Cqst6884yah2fq+sIAj59Jyeaf
-         IGC637WLsIwyg6szVumVNJd51kbXYHv5ilptflQHxHD2VZVEyWWvo7ovMVLDypwHlxrJ
-         j1XurjQg9MuNnI1DRE3Kn5VjyqNXPN5rkUQMkIDOa2piOJ9F+dXBn7oWzicX2iVbci2l
-         SI2Q==
+        bh=vgCtaPEKyLMLb6wb3kRhYFjLJzCQNIVjBWkIQrXykKU=;
+        b=gdWg00dH0IAVHKmYoJ0/gWQ7KTCo/sYeTiAGFq03IIDZrYEyq+nDPHzDMTdluQVE+B
+         wWqH10vGyzhCb4F5/xJ6JzrQC4fsg9zA6L8XXyjVsKdmUVwmMwuyeeBqCM28WFrfBjkr
+         zZelOaGeQgmDyRE84cvtwbvhcMszLnUuLsSzd36HGgy3ggGazqhmfdII96vNGRSTnXIP
+         IekrxG3lBdsC55oHz/aUzYPYOXAtrFqtCbj6LjPTo2zA5ViZoLNtKFSYRGTSwGWmyB+g
+         E6UnhqA7uK7zxUbYTkHZx6x9v0ZAob+qo6GXqTysNeT3qP86JxTIBxjtxc/FdE5lax+R
+         NW/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701381014; x=1701985814;
+        d=1e100.net; s=20230601; t=1701381016; x=1701985816;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9AK8QepPskxCil5g9Uq2zBTi0Gm4T10NxAWhodYVXSQ=;
-        b=NtvvvH1UvGd07CWvgEKx0pjs6M0UDSXL3c4PIw0SawOY9GYQixJg9kUZ+itt4gmbBJ
-         2qWMThojElMlbV+pF/skc9Z6d2BzN2k53zMHqVlz+UvtxtGu6M8vjjMGPIvZetMKZLJ5
-         hwVaCSZalcxWN6ajarFmb7gmRzuXPN86Q9YO6AozMrNAAUD7OhuguSN2RuFh6CIS59MD
-         rJfXrZAn2fsOhbzB1Zmfc6jTZEDnkYmnditZST+ZGFxlTWdZySi8NSmxTZU77OBAKmq9
-         Cop4tAgP7GXlMP4dPpuiFE0M9yJkFeqdtEMEtjsmxMcsOB3IUD22XYAQnqNn033Oa8ue
-         OCrg==
-X-Gm-Message-State: AOJu0YwCd5ZmRHlK5PPcocpliZHrBEwam0e5HSDCJFcTmrh0VpTIamlf
-	llcK6jUv7bCeRb8lBtCgS40UKRLBMzSodQ==
-X-Google-Smtp-Source: AGHT+IGygukuT4amMYOHFuo5nl5Ufe7EodDMml936EklseFJyM0Mc9VSPgC/AN4vtZ46s4PpwC1xiQ==
-X-Received: by 2002:a05:6000:1004:b0:333:2d31:50e6 with SMTP id a4-20020a056000100400b003332d3150e6mr113624wrx.14.1701381014485;
-        Thu, 30 Nov 2023 13:50:14 -0800 (PST)
+        bh=vgCtaPEKyLMLb6wb3kRhYFjLJzCQNIVjBWkIQrXykKU=;
+        b=tdyVuew1qc5uU3Gw/Tu0zYWjJswSs4gXSzpEFE/HJdS1KhOJMuFEPZWx/2+2GAXGQs
+         lAUucThjIkErBecw3ITE+o8Ao/04umDwkiHijW4VKFDDmvZKz6xYCfDKF0+z2mCGBMWE
+         WwkltQrYdcjKaUJbE5L9Kz97A1HDKOkhYJBCYzyyXPVKS74RAp9tQh0OIMJqRm4o7vk3
+         Z49Ju+DdSU1VHrjm8+hKJonc1q3XZvcia9MqEI1CPJ9Jr5lZy5dCcVkzszVss6s1WZUN
+         2SvC+R/6Xo/MOXpceGwIsZK8GPpLpEqukLhcO3UNVeMEbnMzjre+7CKUf7wH7ZsQV2Lo
+         8aGA==
+X-Gm-Message-State: AOJu0YxYNDmhn3sBcmgskFmMYO0lfIoXjmmrqqZCz7gZmlDLe/HnA8f7
+	DgxIEXHDKK1OqJ3Wlf6f65aJAfeGnr3mmA==
+X-Google-Smtp-Source: AGHT+IFrsdx3iF8rhb0X4ERtMWWbydkceTvxbw22KZQEV0PJtj07wdzB8s0CyqqHaiyc5YARPnFHLw==
+X-Received: by 2002:a05:600c:206:b0:40b:5e21:e28d with SMTP id 6-20020a05600c020600b0040b5e21e28dmr76982wmi.122.1701381015845;
+        Thu, 30 Nov 2023 13:50:15 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:4842:bce4:1c44:6271])
-        by smtp.gmail.com with ESMTPSA id dd10-20020a0560001e8a00b0032fbe5b1e45sm2519237wrb.61.2023.11.30.13.50.13
+        by smtp.gmail.com with ESMTPSA id dd10-20020a0560001e8a00b0032fbe5b1e45sm2519237wrb.61.2023.11.30.13.50.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 13:50:13 -0800 (PST)
+        Thu, 30 Nov 2023 13:50:15 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -64,9 +64,9 @@ To: netdev@vger.kernel.org,
 	Jacob Keller <jacob.e.keller@intel.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 5/6] doc/netlink/specs: add sub-message type to rt_link family
-Date: Thu, 30 Nov 2023 21:49:57 +0000
-Message-ID: <20231130214959.27377-6-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 6/6] doc/netlink/specs: Add a spec for tc
+Date: Thu, 30 Nov 2023 21:49:58 +0000
+Message-ID: <20231130214959.27377-7-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231130214959.27377-1-donald.hunter@gmail.com>
 References: <20231130214959.27377-1-donald.hunter@gmail.com>
@@ -78,321 +78,2035 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Switch to using a sub-message selector in the rt_link spec for the
-link-specific 'data' attribute.
+This is a work-in-progress spec for tc that covers:
+ - most of the qdiscs
+ - the flower classifier
+ - new, del, get for qdisc, chain, class and filter
+
+Notable omissions:
+ - most of the stats attrs are left as binary blobs
+ - notifications are not yet implemented
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/specs/rt_link.yaml | 273 ++++++++++++++++++++++-
- 1 file changed, 269 insertions(+), 4 deletions(-)
+ Documentation/netlink/specs/tc.yaml | 2008 +++++++++++++++++++++++++++
+ 1 file changed, 2008 insertions(+)
+ create mode 100644 Documentation/netlink/specs/tc.yaml
 
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index d86a68f8475c..3a6a97b5f50a 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -966,8 +966,9 @@ attribute-sets:
-         type: string
-       -
-         name: data
--        type: binary
--        # kind specific nest, e.g. linkinfo-bridge-attrs
+diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
+new file mode 100644
+index 000000000000..20743ebbf049
+--- /dev/null
++++ b/Documentation/netlink/specs/tc.yaml
+@@ -0,0 +1,2008 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++
++name: tc
++protocol: netlink-raw
++protonum: 0
++
++doc:
++  Netlink raw family for tc qdisc, chain, class and filter configuration
++  over rtnetlink.
++
++definitions:
++  -
++    name: tcmsg
++    type: struct
++    members:
++      -
++        name: family
++        type: u8
++      -
++        name: pad
++        type: pad
++        len: 3
++      -
++        name: ifindex
++        type: s32
++      -
++        name: handle
++        type: u32
++      -
++        name: parent
++        type: u32
++      -
++        name: info
++        type: u32
++  -
++    name: tc-cls-flags
++    type: flags
++    entries:
++      - skip-hw
++      - skip-sw
++      - in-hw
++      - not-in-nw
++      - verbose
++  -
++    name: tc-stats
++    type: struct
++    members:
++      -
++        name: bytes
++        type: u64
++      -
++        name: packets
++        type: u32
++      -
++        name: drops
++        type: u32
++      -
++        name: overlimits
++        type: u32
++      -
++        name: bps
++        type: u32
++      -
++        name: pps
++        type: u32
++      -
++        name: qlen
++        type: u32
++      -
++        name: backlog
++        type: u32
++  -
++    name: tc-cbs-qopt
++    type: struct
++    members:
++      -
++        name: offload
++        type: u8
++      -
++        name: pad
++        type: pad
++        len: 3
++      -
++        name: hicredit
++        type: s32
++      -
++        name: locredit
++        type: s32
++      -
++        name: idleslope
++        type: s32
++      -
++        name: sendslope
++        type: s32
++  -
++    name: tc-etf-qopt
++    type: struct
++    members:
++      -
++        name: delta
++        type: s32
++      -
++        name: clockid
++        type: s32
++      -
++        name: flags
++        type: s32
++  -
++    name: tc-fifo-qopt
++    type: struct
++    members:
++      -
++        name: limit
++        type: u32
++  -
++    name: tc-htb-opt
++    type: struct
++    members:
++      -
++        name: rate
++        type: binary
++        len: 12
++      -
++        name: ceil
++        type: binary
++        len: 12
++      -
++        name: buffer
++        type: u32
++      -
++        name: cbuffer
++        type: u32
++      -
++        name: quantum
++        type: u32
++      -
++        name: level
++        type: u32
++      -
++        name: prio
++        type: u32
++  -
++    name: tc-htb-glob
++    type: struct
++    members:
++      -
++        name: version
++        type: u32
++      -
++        name: rate2quantum
++        type: u32
++      -
++        name: defcls
++        type: u32
++      -
++        name: debug
++        type: u32
++      -
++        name: direct-pkts
++        type: u32
++  -
++    name: tc-gred-qopt
++    type: struct
++    members:
++      -
++        name: limit
++        type: u32
++      -
++        name: qth-min
++        type: u32
++      -
++        name: qth-max
++        type: u32
++      -
++        name: DP
++        type: u32
++      -
++        name: backlog
++        type: u32
++      -
++        name: qave
++        type: u32
++      -
++        name: forced
++        type: u32
++      -
++        name: early
++        type: u32
++      -
++        name: other
++        type: u32
++      -
++        name: pdrop
++        type: u32
++      -
++        name: Wlog
++        type: u8
++      -
++        name: Plog
++        type: u8
++      -
++        name: Scell_log
++        type: u8
++      -
++        name: prio
++        type: u8
++      -
++        name: packets
++        type: u32
++      -
++        name: bytesin
++        type: u32
++  -
++    name: tc-gred-sopt
++    type: struct
++    members:
++      -
++        name: DPs
++        type: u32
++      -
++        name: def_DP
++        type: u32
++      -
++        name: grio
++        type: u8
++      -
++        name: flags
++        type: u8
++      -
++        name: pad1
++        type: u16
++  -
++    name: tc-hfsc-qopt
++    type: struct
++    members:
++      -
++        name: defcls
++        type: u16
++  -
++    name: tc-mqprio-qopt
++    type: struct
++    members:
++      -
++        name: num-tc
++        type: u8
++      -
++        name: prio-tc-map
++        type: binary
++        len: 16
++      -
++        name: hw
++        type: u8
++      -
++        name: count
++        type: binary
++        len: 32
++      -
++        name: offset
++        type: binary
++        len: 32
++  -
++    name: tc-multiq-qopt
++    type: struct
++    members:
++      -
++        name: bands
++        type: u16
++      -
++        name: max-bands
++        type: u16
++  -
++    name: tc-netem-qopt
++    type: struct
++    members:
++      -
++        name: latency
++        type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: loss
++        type: u32
++      -
++        name: gap
++        type: u32
++      -
++        name: duplicate
++        type: u32
++      -
++        name: jitter
++        type: u32
++  -
++    name: tc-prio-qopt
++    type: struct
++    members:
++      -
++        name: bands
++        type: u16
++      -
++        name: priomap
++        type: binary
++        len: 16
++  -
++    name: tc-red-qopt
++    type: struct
++    members:
++      -
++        name: limit
++        type: u32
++      -
++        name: qth-min
++        type: u32
++      -
++        name: qth-max
++        type: u32
++      -
++        name: Wlog
++        type: u8
++      -
++        name: Plog
++        type: u8
++      -
++        name: Scell-log
++        type: u8
++      -
++        name: flags
++        type: u8
++  -
++    name: tc-sfb-qopt
++    type: struct
++    members:
++      -
++        name: rehash-interval
++        type: u32
++      -
++        name: warmup-time
++        type: u32
++      -
++        name: max
++        type: u32
++      -
++        name: bin-size
++        type: u32
++      -
++        name: increment
++        type: u32
++      -
++        name: decrement
++        type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: penalty-rate
++        type: u32
++      -
++        name: penalty-burst
++        type: u32
++  -
++    name: tc-sfq-qopt-v1 # TODO nested structs
++    type: struct
++    members:
++      -
++        name: quantum
++        type: u32
++      -
++        name: perturb-period
++        type: s32
++      -
++        name: limit
++        type: u32
++      -
++        name: divisor
++        type: u32
++      -
++        name: flows
++        type: u32
++      -
++        name: depth
++        type: u32
++      -
++        name: headdrop
++        type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: qth-min
++        type: u32
++      -
++        name: qth-mac
++        type: u32
++      -
++        name: Wlog
++        type: u8
++      -
++        name: Plog
++        type: u8
++      -
++        name: Scell-log
++        type: u8
++      -
++        name: flags
++        type: u8
++      -
++        name: max-P
++        type: u32
++      -
++        name: prob-drop
++        type: u32
++      -
++        name: forced-drop
++        type: u32
++      -
++        name: prob-mark
++        type: u32
++      -
++        name: forced-mark
++        type: u32
++      -
++        name: prob-mark-head
++        type: u32
++      -
++        name: forced-mark-head
++        type: u32
++  -
++    name: tc-tbf-qopt
++    type: struct
++    members:
++      -
++        name: rate
++        type: binary # TODO nested struct tc_ratespec
++        len: 12
++      -
++        name: peakrate
++        type: binary # TODO nested struct tc_ratespec
++        len: 12
++      -
++        name: limit
++        type: u32
++      -
++        name: buffer
++        type: u32
++      -
++        name: mtu
++        type: u32
++  -
++    name: tc-sizespec
++    type: struct
++    members:
++      -
++        name: cell-log
++        type: u8
++      -
++        name: size-log
++        type: u8
++      -
++        name: cell-align
++        type: s16
++      -
++        name: overhead
++        type: s32
++      -
++        name: linklayer
++        type: u32
++      -
++        name: mpu
++        type: u32
++      -
++        name: mtu
++        type: u32
++      -
++        name: tsize
++        type: u32
++  -
++    name: gnet-estimator
++    type: struct
++    members:
++      -
++        name: interval
++        type: s8
++      -
++        name: ewma-log
++        type: u8
++attribute-sets:
++  -
++    name: tc-attrs
++    attributes:
++      -
++        name: kind
++        type: string
++      -
++        name: options
 +        type: sub-message
-+        sub-message: linkinfo-data-msg
++        sub-message: tc-options-msg
 +        selector: kind
-       -
-         name: xstats
-         type: binary
-@@ -976,10 +977,10 @@ attribute-sets:
-         type: string
-       -
-         name: slave-data
--        type: binary
--        # kind specific nest
-+        type: binary # kind specific nest
-   -
-     name: linkinfo-bridge-attrs
-+    name-prefix: ifla-br-
-     attributes:
-       -
-         name: forward-delay
-@@ -1123,6 +1124,238 @@ attribute-sets:
-       -
-         name: mcast-querier-state
-         type: binary
++      -
++        name: stats
++        type: binary
++        struct: tc-stats
++      -
++        name: xstats
++        type: binary
++      -
++        name: rate
++        type: binary
++        struct: gnet-estimator
++      -
++        name: fcnt
++        type: u32
++      -
++        name: stats2
++        type: nest
++        nested-attributes: tca-stats-attrs
++      -
++        name: stab
++        type: nest
++        nested-attributes: tca-stab-attrs
++      -
++        name: pad
++        type: pad
++      -
++        name: dump-invisible
++        type: flag
++      -
++        name: chain
++        type: u32
++      -
++        name: hw-offload
++        type: u8
++      -
++        name: ingress-block
++        type: u32
++      -
++        name: egress-block
++        type: u32
++      -
++        name: dump-flags
++        type: bitfield32
++      -
++        name: ext-warn-msg
++        type: string
 +  -
-+    name: linkinfo-gre-attrs
-+    name-prefix: ifla-gre-
++    name: tc-cake-attrs
 +    attributes:
 +      -
-+        name: link
++        name: pad
++        type: pad
++      -
++        name: base-rate64
++        type: u64
++      -
++        name: diffserv-mode
 +        type: u32
 +      -
-+        name: iflags
-+        type: u16
-+      -
-+        name: oflags
-+        type: u16
-+      -
-+        name: ikey
++        name: atm
 +        type: u32
 +      -
-+        name: okey
++        name: flow-mode
 +        type: u32
 +      -
-+        name: local
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: remote
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ttl
-+        type: u8
-+      -
-+        name: tos
-+        type: u8
-+      -
-+        name: pmtudisc
-+        type: u8
-+      -
-+        name: encap-limit
++        name: overhead
 +        type: u32
 +      -
-+        name: flowinfo
++        name: rtt
 +        type: u32
 +      -
-+        name: flags
++        name: target
 +        type: u32
 +      -
-+        name: encap-type
-+        type: u16
-+      -
-+        name: encap-flags
-+        type: u16
-+      -
-+        name: encap-sport
-+        type: u16
-+      -
-+        name: encap-dport
-+        type: u16
-+      -
-+        name: collect-metadata
-+        type: flag
-+      -
-+        name: ignore-df
-+        type: u8
-+      -
-+        name: fwmark
++        name: autorate
 +        type: u32
 +      -
-+        name: erspan-index
++        name: memory
 +        type: u32
 +      -
-+        name: erspan-ver
-+        type: u8
-+      -
-+        name: erspan-dir
-+        type: u8
-+      -
-+        name: erspan-hwid
-+        type: u16
-+  -
-+    name: linkinfo-geneve-attrs
-+    name-prefix: ifla-geneve-
-+    attributes:
-+      -
-+        name: id
++        name: nat
 +        type: u32
 +      -
-+        name: remote
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ttl
-+        type: u8
-+      -
-+        name: tos
-+        type: u8
-+      -
-+        name: port
-+        type: u16
-+      -
-+        name: collect-metadata
-+        type: flag
-+      -
-+        name: remote6
-+        type: binary
-+        display-hint: ipv6
-+      -
-+        name: udp-csum
-+        type: u8
-+      -
-+        name: udp-zero-csum6-tx
-+        type: u8
-+      -
-+        name: udp-zero-csum6-rx
-+        type: u8
-+      -
-+        name: label
++        name: raw
 +        type: u32
 +      -
-+        name: ttl-inherit
-+        type: u8
-+      -
-+        name: df
-+        type: u8
-+      -
-+        name: inner-proto-inherit
-+        type: flag
-+  -
-+    name: linkinfo-iptun-attrs
-+    name-prefix: ifla-iptun-
-+    attributes:
-+      -
-+        name: link
++        name: wash
 +        type: u32
 +      -
-+        name: local
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: remote
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: ttl
-+        type: u8
-+      -
-+        name: tos
-+        type: u8
-+      -
-+        name: encap-limit
-+        type: u8
-+      -
-+        name: flowinfo
++        name: mpu
 +        type: u32
 +      -
-+        name: flags
-+        type: u16
++        name: ingress
++        type: u32
 +      -
-+        name: proto
-+        type: u8
++        name: ack-filter
++        type: u32
 +      -
-+        name: pmtudisc
-+        type: u8
-+      -
-+        name: 6rd-prefix
-+        type: binary
-+        display-hint: ipv6
-+      -
-+        name: 6rd-relay-prefix
-+        type: binary
-+        display-hint: ipv4
-+      -
-+        name: 6rd-prefixlen
-+        type: u16
-+      -
-+        name: 6rd-relay-prefixlen
-+        type: u16
-+      -
-+        name: encap-type
-+        type: u16
-+      -
-+        name: encap-flags
-+        type: u16
-+      -
-+        name: encap-sport
-+        type: u16
-+      -
-+        name: encap-dport
-+        type: u16
-+      -
-+        name: collect-metadata
-+        type: flag
++        name: split-gso
++        type: u32
 +      -
 +        name: fwmark
 +        type: u32
 +  -
-+    name: linkinfo-tun-attrs
-+    name-prefix: ifla-tun-
++    name: tc-cake-stats-attrs
 +    attributes:
 +      -
-+        name: owner
++        name: pad
++        type: pad
++      -
++        name: capacity-estimate64
++        type: u64
++      -
++        name: memory-limit
 +        type: u32
 +      -
-+        name: group
++        name: memory-used
 +        type: u32
 +      -
-+        name: type
-+        type: u8
-+      -
-+        name: pi
-+        type: u8
-+      -
-+        name: vnet-hdr
-+        type: u8
-+      -
-+        name: persist
-+        type: u8
-+      -
-+        name: multi-queue
-+        type: u8
-+      -
-+        name: num-queues
++        name: avg-netoff
 +        type: u32
 +      -
-+        name: num-disabled-queues
++        name: min-netlen
++        type: u32
++      -
++        name: max-netlen
++        type: u32
++      -
++        name: min-adjlen
++        type: u32
++      -
++        name: max-adjlen
++        type: u32
++      -
++        name: tin-stats
++        type: binary
++      -
++        name: deficit
++        type: s32
++      -
++        name: cobalt-count
++        type: u32
++      -
++        name: dropping
++        type: u32
++      -
++        name: drop-next-us
++        type: s32
++      -
++        name: p-drop
++        type: u32
++      -
++        name: blue-timer-us
++        type: s32
++  -
++    name: tc-cbs-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-cbs-qopt
++  -
++    name: tc-choke-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-red-qopt
++      -
++        name: stab
++        type: binary
++      -
++        name: max-p
 +        type: u32
 +  -
-+    name: linkinfo-vrf-attrs
-+    name-prefix: ifla-vrf-
++    name: tc-codel-attrs
 +    attributes:
 +      -
-+        name: table
++        name: target
 +        type: u32
-   -
-     name: xdp-attrs
-     attributes:
-@@ -1241,6 +1474,38 @@ attribute-sets:
-         name: used
-         type: u8
- 
++      -
++        name: limit
++        type: u32
++      -
++        name: interval
++        type: u32
++      -
++        name: ecn
++        type: u32
++      -
++        name: ce-threshold
++        type: u32
++  -
++    name: tc-flower-attrs
++    attributes:
++      -
++        name: classid
++        type: u32
++      -
++        name: indev
++        type: string
++      -
++        name: act
++        type: array-nest
++        nested-attributes: tc-act-attrs
++      -
++        name: key-eth-dst
++        type: binary
++        display-hint: mac
++      -
++        name: key-eth-dst-mask
++        type: binary
++        display-hint: mac
++      -
++        name: key-eth-src
++        type: binary
++        display-hint: mac
++      -
++        name: key-eth-src-mask
++        type: binary
++        display-hint: mac
++      -
++        name: key-eth-type
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-ip-proto
++        type: u8
++      -
++        name: key-ipv4-src
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-ipv4-src-mask
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-ipv4-dst
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-ipv4-dst-mask
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-ipv6-src
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-ipv6-src-mask
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-ipv6-dst
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-ipv6-dst-mask
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-tcp-src
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-tcp-dst
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-udp-src
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-udp-dst
++        type: u16
++        byte-order: big-endian
++      -
++        name: flags
++        type: u32
++        enum: tc-cls-flags
++        enum-as-flags: true
++      -
++        name: key-vlan-id
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-vlan-prio
++        type: u8
++      -
++        name: key-vlan-eth-type
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-key-id
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-enc-ipv4-src
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-enc-ipv4-src-mask
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-enc-ipv4-dst
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-enc-ipv4-dst-mask
++        type: u32
++        byte-order: big-endian
++        display-hint: ipv4
++      -
++        name: key-enc-ipv6-src
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-enc-ipv6-src-mask
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-enc-ipv6-dst
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-enc-ipv6-dst-mask
++        type: binary
++        display-hint: ipv6
++      -
++        name: key-tcp-src-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-tcp-dst-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-udp-src-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-udp-dst-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-sctp-src-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-sctp-dst-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-sctp-src
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-sctp-dst
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-udp-src-port
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-udp-src-port-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-udp-dst-port
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-udp-dst-port-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-flags
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-flags-mask
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-icmpv4-code
++        type: u8
++      -
++        name: key-icmpv4-code-mask
++        type: u8
++      -
++        name: key-icmpv4-type
++        type: u8
++      -
++        name: key-icmpv4-type-mask
++        type: u8
++      -
++        name: key-icmpv6-code
++        type: u8
++      -
++        name: key-icmpv6-code-mask
++        type: u8
++      -
++        name: key-icmpv6-type
++        type: u8
++      -
++        name: key-icmpv6-type-mask
++        type: u8
++      -
++        name: key-arp-sip
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-arp-sip-mask
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-arp-tip
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-arp-tip-mask
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-arp-op
++        type: u8
++      -
++        name: key-arp-op-mask
++        type: u8
++      -
++        name: key-arp-sha
++        type: binary
++      -
++        name: key-arp-sha-mask
++        type: binary
++      -
++        name: key-arp-tha
++        type: binary
++      -
++        name: key-arp-tha-mask
++        type: binary
++      -
++        name: key-mpls-ttl
++        type: u8
++      -
++        name: key-mpls-bos
++        type: u8
++      -
++        name: key-mpls-tc
++        type: u8
++      -
++        name: key-mpls-label
++        type: u32
++        byte-order: big-endian
++      -
++        name: key-tcp-flags
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-tcp-flags-mask
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-ip-tos
++        type: u8
++      -
++        name: key-ip-tos-mask
++        type: u8
++      -
++        name: key-ip-ttl
++        type: u8
++      -
++        name: key-ip-ttl-mask
++        type: u8
++      -
++        name: key-cvlan-id
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-cvlan-prio
++        type: u8
++      -
++        name: key-cvlan-eth-type
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-enc-ip-tos
++        type: u8
++      -
++        name: key-enc-ip-tos-mask
++        type: u8
++      -
++        name: key-enc-ip-ttl
++        type: u8
++      -
++        name: key-enc-ip-ttl-mask
++        type: u8
++      -
++        name: key-enc-opts
++        type: binary
++      -
++        name: key-enc-opts-mask
++        type: binary
++      -
++        name: in-hw-count
++        type: u32
++      -
++        name: key-port-src-min
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-port-src-max
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-port-dst-min
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-port-dst-max
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-ct-state
++        type: u16
++      -
++        name: key-ct-state-mask
++        type: u16
++      -
++        name: key-ct-zone
++        type: u16
++      -
++        name: key-ct-zone-mask
++        type: u16
++      -
++        name: key-ct-mark
++        type: u32
++      -
++        name: key-ct-mark-mask
++        type: u32
++      -
++        name: key-ct-labels
++        type: binary
++      -
++        name: key-ct-labels-mask
++        type: binary
++      -
++        name: key-mpls-opts
++        type: binary
++      -
++        name: key-hash
++        type: u32
++      -
++        name: key-hash-mask
++        type: u32
++      -
++        name: key-num-of-vlans
++        type: u8
++      -
++        name: key-pppoe-sid
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-ppp-proto
++        type: u16
++        byte-order: big-endian
++      -
++        name: key-l2-tpv3-sid
++        type: u32
++        byte-order: big-endian
++  -
++    name: tc-gred-attrs
++    attributes:
++      -
++        name: parms
++        type: binary # array of struct: tc-gred-qopt
++      -
++        name: stab
++        type: binary
++        sub-type: u8
++      -
++        name: dps
++        type: binary
++        struct: tc-gred-sopt
++      -
++        name: max-p
++        type: binary
++        sub-type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: vq-list
++        type: nest
++        nested-attributes: tca-gred-vq-list-attrs
++  -
++    name: tca-gred-vq-list-attrs
++    attributes:
++      -
++        name: entry
++        type: nest
++        nested-attributes: tca-gred-vq-entry-attrs
++        multi-attr: true
++  -
++    name: tca-gred-vq-entry-attrs
++    attributes:
++      -
++        name: pad
++        type: pad
++      -
++        name: dp
++        type: u32
++      -
++        name: stat-bytes
++        type: u32
++      -
++        name: stat-packets
++        type: u32
++      -
++        name: stat-backlog
++        type: u32
++      -
++        name: stat-prob-drop
++        type: u32
++      -
++        name: stat-prob-mark
++        type: u32
++      -
++        name: stat-forced-drop
++        type: u32
++      -
++        name: stat-forced-mark
++        type: u32
++      -
++        name: stat-pdrop
++        type: u32
++      -
++        name: stat-other
++        type: u32
++      -
++        name: flags
++        type: u32
++  -
++    name: tc-hfsc-attrs
++    attributes:
++      -
++        name: rsc
++        type: binary
++      -
++        name: fsc
++        type: binary
++      -
++        name: usc
++        type: binary
++  -
++    name: tc-hhf-attrs
++    attributes:
++      -
++        name: backlog-limit
++        type: u32
++      -
++        name: quantum
++        type: u32
++      -
++        name: hh-flows-limit
++        type: u32
++      -
++        name: reset-timeout
++        type: u32
++      -
++        name: admit-bytes
++        type: u32
++      -
++        name: evict-timeout
++        type: u32
++      -
++        name: non-hh-weight
++        type: u32
++  -
++    name: tc-htb-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-htb-opt
++      -
++        name: init
++        type: binary
++        struct: tc-htb-glob
++      -
++        name: ctab
++        type: binary
++      -
++        name: rtab
++        type: binary
++      -
++        name: direct-qlen
++        type: u32
++      -
++        name: rate64
++        type: u64
++      -
++        name: ceil64
++        type: u64
++      -
++        name: pad
++        type: pad
++      -
++        name: offload
++        type: flag
++  -
++    name: tc-act-attrs
++    attributes:
++      -
++        name: kind
++        type: string
++      -
++        name: options
++        type: sub-message
++        sub-message: tc-act-options-msg
++        selector: kind
++      -
++        name: index
++        type: u32
++      -
++        name: stats
++        type: binary
++      -
++        name: pad
++        type: pad
++      -
++        name: cookie
++        type: binary
++      -
++        name: flags
++        type: bitfield32
++      -
++        name: hw-stats
++        type: bitfield32
++      -
++        name: used-hw-stats
++        type: bitfield32
++      -
++        name: in-hw-count
++        type: u32
++  -
++    name: tc-etf-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-etf-qopt
++  -
++    name: tc-ets-attrs
++    attributes:
++      -
++        name: nbands
++        type: u8
++      -
++        name: nstrict
++        type: u8
++      -
++        name: quanta
++        type: nest
++        nested-attributes: tc-ets-attrs
++      -
++        name: quanta-band
++        type: u32
++        multi-attr: true
++      -
++        name: priomap
++        type: nest
++        nested-attributes: tc-ets-attrs
++      -
++        name: priomap-band
++        type: u8
++        multi-attr: true
++  -
++    name: tc-fq-attrs
++    attributes:
++      -
++        name: plimit
++        type: u32
++      -
++        name: flow-plimit
++        type: u32
++      -
++        name: quantum
++        type: u32
++      -
++        name: initial-quantum
++        type: u32
++      -
++        name: rate-enable
++        type: u32
++      -
++        name: flow-default-rate
++        type: u32
++      -
++        name: flow-max-rate
++        type: u32
++      -
++        name: buckets-log
++        type: u32
++      -
++        name: flow-refill-delay
++        type: u32
++      -
++        name: orphan-mask
++        type: u32
++      -
++        name: low-rate-threshold
++        type: u32
++      -
++        name: ce-threshold
++        type: u32
++      -
++        name: timer-slack
++        type: u32
++      -
++        name: horizon
++        type: u32
++      -
++        name: horizon-drop
++        type: u8
++  -
++    name: tc-fq-codel-attrs
++    attributes:
++      -
++        name: target
++        type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: interval
++        type: u32
++      -
++        name: ecn
++        type: u32
++      -
++        name: flows
++        type: u32
++      -
++        name: quantum
++        type: u32
++      -
++        name: ce-threshold
++        type: u32
++      -
++        name: drop-batch-size
++        type: u32
++      -
++        name: memory-limit
++        type: u32
++      -
++        name: ce-threshold-selector
++        type: u8
++      -
++        name: ce-threshold-mask
++        type: u8
++  -
++    name: tc-fq-pie-attrs
++    attributes:
++      -
++        name: limit
++        type: u32
++      -
++        name: flows
++        type: u32
++      -
++        name: target
++        type: u32
++      -
++        name: tupdate
++        type: u32
++      -
++        name: alpha
++        type: u32
++      -
++        name: beta
++        type: u32
++      -
++        name: quantum
++        type: u32
++      -
++        name: memory-limit
++        type: u32
++      -
++        name: ecn-prob
++        type: u32
++      -
++        name: ecn
++        type: u32
++      -
++        name: bytemode
++        type: u32
++      -
++        name: dq-rate-estimator
++        type: u32
++  -
++    name: tc-netem-attrs
++    attributes:
++      -
++        name: corr
++        type: binary
++      -
++        name: delay-dist
++        type: binary
++        sub-type: s16
++      -
++        name: reorder
++        type: binary
++      -
++        name: corrupt
++        type: binary
++      -
++        name: loss
++        type: binary
++      -
++        name: rate
++        type: binary
++      -
++        name: ecn
++        type: u32
++      -
++        name: rate64
++        type: u64
++      -
++        name: pad
++        type: u32
++      -
++        name: latency64
++        type: s64
++      -
++        name: jitter64
++        type: s64
++      -
++        name: slot
++        type: binary
++      -
++        name: slot-dist
++        type: binary
++        sub-type: s16
++  -
++    name: tc-pie-attrs
++    attributes:
++      -
++        name: target
++        type: u32
++      -
++        name: limit
++        type: u32
++      -
++        name: tupdate
++        type: u32
++      -
++        name: alpha
++        type: u32
++      -
++        name: beta
++        type: u32
++      -
++        name: ecn
++        type: u32
++      -
++        name: bytemode
++        type: u32
++      -
++        name: dq-rate-estimator
++        type: u32
++  -
++    name: tc-red-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-red-qopt
++      -
++        name: stab
++        type: binary
++      -
++        name: max-p
++        type: u32
++      -
++        name: flags
++        type: binary
++      -
++        name: early-drop-block
++        type: u32
++      -
++        name: mark-block
++        type: u32
++  -
++    name: tc-taprio-attrs
++    attributes:
++      -
++        name: priomap
++        type: binary
++        struct: tc-mqprio-qopt
++      -
++        name: sched-entry-list
++        type: nest
++        nested-attributes: tc-taprio-sched-entry-list
++      -
++        name: sched-base-time
++        type: s64
++      -
++        name: sched-single-entry
++        type: nest
++        nested-attributes: tc-taprio-sched-entry
++      -
++        name: sched-clockid
++        type: s32
++      -
++        name: pad
++        type: pad
++      -
++        name: admin-sched
++        type: binary
++      -
++        name: sched-cycle-time
++        type: s64
++      -
++        name: sched-cycle-time-extension
++        type: s64
++      -
++        name: flags
++        type: u32
++      -
++        name: txtime-delay
++        type: u32
++      -
++        name: tc-entry
++        type: nest
++        nested-attributes: tc-taprio-tc-entry-attrs
++  -
++    name: tc-taprio-sched-entry-list
++    attributes:
++      -
++        name: entry
++        type: nest
++        nested-attributes: tc-taprio-sched-entry
++  -
++    name: tc-taprio-sched-entry
++    attributes:
++      -
++        name: index
++        type: u32
++      -
++        name: cmd
++        type: u8
++      -
++        name: gate-mask
++        type: u32
++      -
++        name: interval
++        type: u32
++  -
++    name: tc-taprio-tc-entry-attrs
++    attributes:
++      -
++        name: index
++        type: u32
++      -
++        name: max-sdu
++        type: u32
++      -
++        name: fp
++        type: u32
++  -
++    name: tc-tbf-attrs
++    attributes:
++      -
++        name: parms
++        type: binary
++        struct: tc-tbf-qopt
++      -
++        name: rtab
++        type: binary
++      -
++        name: ptab
++        type: binary
++      -
++        name: rate64
++        type: u64
++      -
++        name: prate4
++        type: u64
++      -
++        name: burst
++        type: u32
++      -
++        name: pburst
++        type: u32
++      -
++        name: pad
++        type: pad
++  -
++    name: tca-gact-attrs
++    attributes:
++      -
++        name: tm
++        type: binary
++      -
++        name: parms
++        type: binary
++      -
++        name: prob
++        type: binary
++      -
++        name: pad
++        type: pad
++  -
++    name: tca-stab-attrs
++    attributes:
++      -
++        name: base
++        type: binary
++        struct: tc-sizespec
++      -
++        name: data
++        type: binary
++  -
++    name: tca-stats-attrs
++    attributes:
++      -
++        name: basic
++        type: binary
++      -
++        name: rate-est
++        type: binary
++      -
++        name: queue
++        type: binary
++      -
++        name: app
++        type: binary # TODO sub-message needs 2+ level deep lookup
++        sub-message: tca-stats-app-msg
++        selector: kind
++      -
++        name: rate-est64
++        type: binary
++      -
++        name: pad
++        type: pad
++      -
++        name: basic-hw
++        type: binary
++      -
++        name: pkt64
++        type: binary
++
 +sub-messages:
 +  -
-+    name: linkinfo-data-msg
++    name: tc-options-msg
 +    formats:
 +      -
-+        value: bridge
-+        attribute-set: linkinfo-bridge-attrs
++        value: bfifo
++        fixed-header: tc-fifo-qopt
 +      -
-+        value: erspan
-+        attribute-set: linkinfo-gre-attrs
++        value: cake
++        attribute-set: tc-cake-attrs
 +      -
-+        value: gre
-+        attribute-set: linkinfo-gre-attrs
++        value: cbs
++        attribute-set: tc-cbs-attrs
 +      -
-+        value: gretap
-+        attribute-set: linkinfo-gre-attrs
++        value: choke
++        attribute-set: tc-choke-attrs
 +      -
-+        value: geneve
-+        attribute-set: linkinfo-geneve-attrs
++        value: clsact # no content
 +      -
-+        value: ipip
-+        attribute-set: linkinfo-iptun-attrs
++        value: codel
++        attribute-set: tc-codel-attrs
 +      -
-+        value: sit
-+        attribute-set: linkinfo-iptun-attrs
++        value: drr # TODO
 +      -
-+        value: tun
-+        attribute-set: linkinfo-tun-attrs
++        value: etf
++        attribute-set: tc-etf-attrs
 +      -
-+        value: vrf
-+        attribute-set: linkinfo-vrf-attrs
++        value: ets
++        attribute-set: tc-ets-attrs
++      -
++        value: fq
++        attribute-set: tc-fq-attrs
++      -
++        value: fq_codel
++        attribute-set: tc-fq-codel-attrs
++      -
++        value: fq_pie
++        attribute-set: tc-fq-pie-attrs
++      -
++        value: flower
++        attribute-set: tc-flower-attrs
++      -
++        value: gred
++        attribute-set: tc-gred-attrs
++      -
++        value: hfsc
++        fixed-header: tc-hfsc-qopt
++      -
++        value: hhf
++        attribute-set: tc-hhf-attrs
++      -
++        value: htb
++        attribute-set: tc-htb-attrs
++      -
++        value: ingress # no content
++      -
++        value: mq # TODO
++      -
++        value: mqprio
++        fixed-header: tc-mqprio-qopt
++      -
++        value: multiq
++        fixed-header: tc-multiq-qopt
++      -
++        value: netem
++        fixed-header: tc-netem-qopt
++        attribute-set: tc-netem-attrs
++      -
++        value: pfifo
++        fixed-header: tc-fifo-qopt
++      -
++        value: pfifo_fast
++        fixed-header: tc-prio-qopt
++      -
++        value: pfifo_head_drop
++        fixed-header: tc-fifo-qopt
++      -
++        value: pie
++        attribute-set: tc-pie-attrs
++      -
++        value: plug # TODO
++      -
++        value: prio
++        fixed-header: tc-prio-qopt
++      -
++        value: qfq # TODO
++      -
++        value: red
++        attribute-set: tc-red-attrs
++      -
++        value: sfb
++        fixed-header: tc-sfb-qopt
++      -
++        value: sfq
++        fixed-header: tc-sfq-qopt-v1
++      -
++        value: taprio
++        attribute-set: tc-taprio-attrs
++      -
++        value: tbf
++        attribute-set: tc-tbf-attrs
++  -
++    name: tc-act-options-msg
++    formats:
++      -
++        value: gact
++        attribute-set: tca-gact-attrs
++  -
++    name: tca-stats-app-msg
++    formats:
++      -
++        value: bfifo
++      -
++        value: blackhole
++      -
++        value: cake
++        attribute-set: tc-cake-stats-attrs
++      -
++        value: cbs
++      -
++        value: choke
++      -
++        value: clsact
++      -
++        value: codel
++      -
++        value: drr
++      -
++        value: etf
++      -
++        value: ets
++      -
++        value: fq
++      -
++        value: fq_codel
++      -
++        value: fq_pie
++      -
++        value: flower
++      -
++        value: gred
++      -
++        value: hfsc
++      -
++        value: hhf
++      -
++        value: htb
++      -
++        value: ingress
++      -
++        value: mq
++      -
++        value: mqprio
++      -
++        value: multiq
++      -
++        value: netem
++      -
++        value: noqueue
++      -
++        value: pfifo
++      -
++        value: pfifo_fast
++      -
++        value: pfifo_head_drop
++      -
++        value: pie
++      -
++        value: plug
++      -
++        value: prio
++      -
++        value: qfq
++      -
++        value: red
++      -
++        value: sfb
++      -
++        value: sfq
++      -
++        value: taprio
++      -
++        value: tbf
 +
- operations:
-   enum-model: directional
-   list:
++operations:
++  enum-model: directional
++  list:
++    -
++      name: newqdisc
++      doc: Create new tc qdisc.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 36
++          attributes: &create-params
++            - tcm-family
++            - tcm-ifindex
++            - tcm-handle
++            - tcm-parent
++            - tca-kind
++            - tca-options
++            - tca-rate
++            - tca-stab
++            - tca-chain
++            - tca-ingress-block
++            - tca-egress-block
++    -
++      name: delqdisc
++      doc: Delete existing tc qdisc.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 37
++          attributes: &lookup-params
++            - tcm-family
++            - tcm-ifindex
++            - tcm-handle
++            - tcm-parent
++    -
++      name: getqdisc
++      doc: Get / dump tc qdisc information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 38
++          attributes:
++            - tcm-family
++            - tcm-ifindex
++            - tcm-handle
++            - tcm-parent
++            - tca-dump-invisible
++            - tca-dump-flags
++        reply:
++          value: 36
++          attributes: &tc-all
++            - tcm-family
++            - tcm-ifindex
++            - tcm-handle
++            - tcm-parent
++            - tca-kind
++            - tca-options
++            - tca-stats
++            - tca-xstats
++            - tca-rate
++            - tca-fcnt
++            - tca-stats2
++            - tca-stab
++            - tca-chain
++            - tca-ingress-block
++            - tca-egress-block
++    -
++      name: newtclass
++      doc: Get / dump tc traffic class information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 40
++          attributes: *create-params
++    -
++      name: deltclass
++      doc: Get / dump tc traffic class information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 41
++          attributes: *lookup-params
++    -
++      name: gettclass
++      doc: Get / dump tc traffic class information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 42
++          attributes: *lookup-params
++        reply:
++          value: 40
++          attributes: *tc-all
++    -
++      name: newtfilter
++      doc: Get / dump tc filter information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 44
++          attributes: *create-params
++    -
++      name: deltfilter
++      doc: Get / dump tc filter information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 45
++          attributes: *lookup-params
++    -
++      name: gettfilter
++      doc: Get / dump tc filter information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 46
++          attributes: *lookup-params
++        reply:
++          value: 44
++          attributes: *tc-all
++    -
++      name: newchain
++      doc: Get / dump tc chain information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 100
++          attributes: *create-params
++    -
++      name: delchain
++      doc: Get / dump tc chain information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 101
++          attributes: *lookup-params
++    -
++      name: getchain
++      doc: Get / dump tc chain information.
++      attribute-set: tc-attrs
++      fixed-header: tcmsg
++      do:
++        request:
++          value: 102
++          attributes: *lookup-params
++        reply:
++          value: 100
++          attributes: *tc-all
++
++mcast-groups:
++  list:
++    -
++      name: rtnlgrp-tc
++      value: 4
 -- 
 2.42.0
 
