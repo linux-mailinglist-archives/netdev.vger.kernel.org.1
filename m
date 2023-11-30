@@ -1,88 +1,209 @@
-Return-Path: <netdev+bounces-52504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DC7D7FEE6D
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:00:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D427FEE8B
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDFD928207B
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7544E1C20BD6
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7517A3E494;
-	Thu, 30 Nov 2023 12:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0D645960;
+	Thu, 30 Nov 2023 12:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNiTmBZn"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Bpt7p/4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577323C682
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 12:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BC217C433B9;
-	Thu, 30 Nov 2023 12:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701345624;
-	bh=CUreQza/C7c64MC/0Qvm+BYMYkuQB3B3gg2esZpOBwI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fNiTmBZn/NdnM0mMK2odLgyucOhDeIX8d9Gm0kMdK8EVeHDuRzELinO9JxPEYxY/d
-	 5P0nNLxGA314A54LgxtDINW8oj55gOogah0Y3slI5+L75jFZnbpXUr6X8PWX2kKz3i
-	 HGt1bI82tBCYcBNlktviugZ7BYH5LwGH6Xa/uhtBFqi72pSoR29yfHaxC/JMrx7LAd
-	 AjIOqVuX0xaiUfq7XFIK+V/fP0m6kLhhbxIGLmQ07y3WX/YToeSfMRPHr4ctDm69yt
-	 d4T/724cZwFonlMljDXhclg2PBWuys9CVN5EbQup9PlEDYdPW6V9sC27AOJBaw4p3M
-	 7JC72ioZXONow==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A013FDFAA82;
-	Thu, 30 Nov 2023 12:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CB16BD46;
+	Thu, 30 Nov 2023 04:05:12 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 1AF5C20B74C0; Thu, 30 Nov 2023 04:05:12 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1AF5C20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701345912;
+	bh=/rVuqlYYpLzwGHq/EK9NytP0xWQESkkc0TlDS3zxqY4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bpt7p/4HhHDo6dYClHRLdHCut/FjhKTk6mGeZB+9C5QBTqhDefLDJZszOOxWnf74K
+	 khFcWy3czqcJIXDdbr6llkD8Ic6HzwBpTBpnCLFwf3UXFQ2bOstrSz+QR8JwTmoGnO
+	 jGgGYdAqsWiKEO2EKytfiLc+FYSb9ihaSt+rwXXc=
+Date: Thu, 30 Nov 2023 04:05:12 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+	Jakub Kicinski <kuba@kernel.org>, KY Srinivasan <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ
+ affinity on HT cores
+Message-ID: <20231130120512.GA15408@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <20231121154841.7fc019c8@kernel.org>
+ <PUZP153MB0788476CD22D5AA2ECDC11ABCCBDA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <ZWfwcYPLVo+4V8Ps@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [patch net-next 0/2] devlink: warn about existing entities during
- reload-reinit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170134562465.19177.6196540342532643128.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Nov 2023 12:00:24 +0000
-References: <20231128115255.773377-1-jiri@resnulli.us>
-In-Reply-To: <20231128115255.773377-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
- corbet@lwn.net, sachin.bahadur@intel.com, przemyslaw.kitszel@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWfwcYPLVo+4V8Ps@yury-ThinkPad>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 28 Nov 2023 12:52:53 +0100 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Wed, Nov 29, 2023 at 06:16:17PM -0800, Yury Norov wrote:
+> On Mon, Nov 27, 2023 at 09:36:38AM +0000, Souradeep Chakrabarti wrote:
+> > 
+> > 
+> > >-----Original Message-----
+> > >From: Jakub Kicinski <kuba@kernel.org>
+> > >Sent: Wednesday, November 22, 2023 5:19 AM
+> > >To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> > >Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> > ><haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> > ><decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
+> > >pabeni@redhat.com; Long Li <longli@microsoft.com>;
+> > >sharmaajay@microsoft.com; leon@kernel.org; cai.huoqing@linux.dev;
+> > >ssengar@linux.microsoft.com; vkuznets@redhat.com; tglx@linutronix.de; linux-
+> > >hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > >linux-rdma@vger.kernel.org; Souradeep Chakrabarti
+> > ><schakrabarti@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>
+> > >Subject: [EXTERNAL] Re: [PATCH V2 net-next] net: mana: Assigning IRQ affinity on
+> > >HT cores
+> > >
+> > >On Tue, 21 Nov 2023 05:54:37 -0800 Souradeep Chakrabarti wrote:
+> > >> Existing MANA design assigns IRQ to every CPUs, including sibling
+> > >> hyper-threads in a core. This causes multiple IRQs to work on same CPU
+> > >> and may reduce the network performance with RSS.
+> > >>
+> > >> Improve the performance by adhering the configuration for RSS, which
+> > >> assigns IRQ on HT cores.
+> > >
+> > >Drivers should not have to carry 120 LoC for something as basic as spreading IRQs.
+> > >Please take a look at include/linux/topology.h and if there's nothing that fits your
+> > >needs there - add it. That way other drivers can reuse it.
+> > Because of the current design idea, it is easier to keep things inside
+> > the mana driver code here. As the idea of IRQ distribution here is :
+> > 1)Loop through interrupts to assign CPU
+> > 2)Find non sibling online CPU from local NUMA and assign the IRQs
+> > on them.
+> > 3)If number of IRQs is more than number of non-sibling CPU in that
+> > NUMA node, then assign on sibling CPU of that node.
+> > 4)Keep doing it till all the online CPUs are used or no more IRQs.
+> > 5)If all CPUs in that node are used, goto next NUMA node with CPU.
+> > Keep doing 2 and 3.
+> > 6) If all CPUs in all NUMA nodes are used, but still there are IRQs
+> > then wrap over from first local NUMA node and continue
+> > doing 2, 3 4 till all IRQs are assigned.
 > 
-> Recently there has been a couple of attempts from drivers to block
-> devlink reload in certain situations. Turned out, the drivers do not
-> properly tear down ports and related netdevs during reload.
+> Hi Souradeep,
 > 
-> To address this, add couple of checks to be done during devlink reload
-> reinit action. Also, extend documentation to be more explicit.
+> (Thanks Jakub for sharing this thread with me)
 > 
-> [...]
+> If I understand your intention right, you can leverage the existing
+> cpumask_local_spread().
+> 
+> But I think I've got something better for you. The below series adds
+> a for_each_numa_cpu() iterator, which may help you doing most of the
+> job without messing with nodes internals.
+> 
+> https://lore.kernel.org/netdev/ZD3l6FBnUh9vTIGc@yury-ThinkPad/T/
+>
+Thanks Yur and Jakub. I was trying to find this patch, but unable to find it on that thread.
+Also in net-next I am unable to find it. Can you please tell, if it has been committed?
+If not can you please point me out the correct patch for this macro. It will be
+really helpful.
+> By using it, the pseudocode implementing your algorithm may look
+> like this:
+> 
+>         unsigned int cpu, hop;
+>         unsigned int irq = 0;
+> 
+> again:
+>         cpu = get_cpu();
+>         node = cpu_to_node(cpu);
+>         cpumask_copy(cpus, cpu_online_mask);
+> 
+>         for_each_numa_cpu(cpu, hop, node, cpus) {
+>                 /* All siblings are the same for IRQ spreading purpose */
+>                 irq_set_affinity_and_hint(irq, topology_sibling_cpumask());
+> 
+>                 /* One IRQ per sibling group */
+>                 cpumask_andnot(cpus, cpus, topology_sibling_cpumask());
+> 
+>                 if (++irq == num_irqs)
+>                         break;
+>         }
+> 
+>         if (irq < num_irqs)
+>                 goto again;
+> 
+> (Completely not tested, just an idea.)
+>
+I have done similar kind of change for our driver, but constraint here is that total number of IRQs
+can be equal to the total number of online CPUs, in some setup. It is either equal
+to the number of online CPUs or maximum 64 IRQs if online CPUs are more than that.
+So my proposed change is following:
 
-Here is the summary with links:
-  - [net-next,1/2] Documentation: devlink: extend reload-reinit description
-    https://git.kernel.org/netdev/net-next/c/15d74e6588a1
-  - [net-next,2/2] devlink: warn about existing entities during reload-reinit
-    https://git.kernel.org/netdev/net-next/c/9b2348e2d6c9
++static int irq_setup(int *irqs, int nvec, int start_numa_node)
++{
++       cpumask_var_t node_cpumask;
++       int i, cpu, err = 0;
++       unsigned int  next_node;
++       cpumask_t visited_cpus;
++       unsigned int start_node = start_numa_node;
++       i = 0;
++       if (!alloc_cpumask_var(&node_cpumask, GFP_KERNEL)) {
++               err = -ENOMEM;
++               goto free_mask;
++       }
++       cpumask_andnot(&visited_cpus, &visited_cpus, &visited_cpus);
++       start_node = 1;
++       for_each_next_node_with_cpus(start_node, next_node) {
++               cpumask_copy(node_cpumask, cpumask_of_node(next_node));
++               for_each_cpu(cpu, node_cpumask) {
++                       cpumask_andnot(node_cpumask, node_cpumask,
++                                      topology_sibling_cpumask(cpu));
++                       irq_set_affinity_and_hint(irqs[i], cpumask_of(cpu));
++                       if(++i == nvec)
++                               goto free_mask;
++                       cpumask_set_cpu(cpu, &visited_cpus);
++                       if (cpumask_empty(node_cpumask) && cpumask_weight(&visited_cpus) <
++                           nr_cpus_node(next_node)) {
++                               cpumask_copy(node_cpumask, cpumask_of_node(next_node));
++                               cpumask_andnot(node_cpumask, node_cpumask, &visited_cpus);
++                               cpu = cpumask_first(node_cpumask);
++                       }
++               }
++               if (next_online_node(next_node) == MAX_NUMNODES)
++                       next_node = first_online_node;
++       }
++free_mask:
++       free_cpumask_var(node_cpumask);
++       return err;
++} 
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I can definitely use the for_each_numa_cpu() instead of my proposed for_each_next_node_with_cpus()
+macro here and that will make it cleaner.
+Thanks for the suggestion.
+> Thanks,
+> Yury
 
