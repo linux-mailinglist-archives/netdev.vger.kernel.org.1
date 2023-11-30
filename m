@@ -1,236 +1,102 @@
-Return-Path: <netdev+bounces-52393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C237FE9EE
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:53:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E7A07FEA04
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48FC5B20DA4
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 07:53:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48BB5281F81
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 07:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4030A20DC3;
-	Thu, 30 Nov 2023 07:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4798220DD0;
+	Thu, 30 Nov 2023 07:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="GAoFdcgZ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="biirskV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2096.outbound.protection.outlook.com [40.107.93.96])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66195A3;
-	Wed, 29 Nov 2023 23:53:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h+WbDS611KgkvhVYyrViY76mtvhZrZonQlW/ch3Zuo4mXN6bRmVLaimul1pNWY8naP+lX3MXpQA+xtq6WKGZZr72uoWCIFRdv0JvgatewRv/JB6pAxTJYLSfoHW6V4mukiBKC3iHeCt6GZ35kEtVvfRbuuTg9BTZE1h4QusEkRmkMJr+zltkJ2moadtrnqbQdL0OGwVY3PZvTGJlegdEnpD+glQaA50IfLHHLP8GBvCpzjSsAPTRIq4nkE3TN4LSzmu4F9sf4oSIIZarXo/Y2Y4NWbrtnfdhCAC1gEI0tSpih6X7sWgpebMpTeWwsRb7uCXb2jg73u4fzor+ehJU2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=asqmTou09C/3k66FLy5kyxq5QD0gk2YCPZVq0DeXgMI=;
- b=P4BgUFGtHTLh0Lk7Rx6WUO9BckKfSSYCFoNFTM5bRRm+kELxR4D3JrSjYpwYyRMICPmE17g1dupXxRZ1z/G7ShFeXl2806uwCz/JUIMjRIOWoFVXkQOCRoOHb4hViluyfXXIJQbNKwT1TcWnWKHUEXH/RiDc4fDVHHRPdJyE/+/Ijq9Op8EGcD1q1kDeUbjksWX9aLqJ/DId1Q1ugph6ckqRQoP7sF5M6dIhELG7c+zYmCF/DDkthHLimjES3JY6SUeKOU+Bx2KtAnmEhlAZWS+v24ATvPghv/YAMI0lsddOtq08xsI69G7JM46nGoz7FTx0AS18XZL3co40fycTnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=asqmTou09C/3k66FLy5kyxq5QD0gk2YCPZVq0DeXgMI=;
- b=GAoFdcgZE+1LSIQzgSyGScnyp3V3qOjGkDFTlMc/D5wi50/gj0thBe9ZV/0vVjO41WbkVKB+zOSHMMjE+tDPJRjGW7W1I8eACZEZn7yod/KsvuMH0b/2kM5wN7rfOgn04BtgkdbNL2+3DJAT9JcO41C9jd2G3QoKwl3Q/yrVPeU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from SN4PR01MB7455.prod.exchangelabs.com (2603:10b6:806:202::11) by
- BN0PR01MB7037.prod.exchangelabs.com (2603:10b6:408:149::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7046.23; Thu, 30 Nov 2023 07:53:10 +0000
-Received: from SN4PR01MB7455.prod.exchangelabs.com
- ([fe80::5682:1d84:171a:1d68]) by SN4PR01MB7455.prod.exchangelabs.com
- ([fe80::5682:1d84:171a:1d68%3]) with mapi id 15.20.7025.022; Thu, 30 Nov 2023
- 07:53:10 +0000
-From: Quan Nguyen <quan@os.amperecomputing.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	openbmc@lists.ozlabs.org,
-	Open Source Submission <patches@amperecomputing.com>
-Cc: Phong Vo <phong@os.amperecomputing.com>,
-	Thang Nguyen <thang@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Dung Cao <dung@os.amperecomputing.com>
-Subject: [PATCH] mctp i2c: Requeue the packet when arbitration is lost
-Date: Thu, 30 Nov 2023 14:52:47 +0700
-Message-Id: <20231130075247.3078931-1-quan@os.amperecomputing.com>
-X-Mailer: git-send-email 2.35.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR04CA0017.apcprd04.prod.outlook.com
- (2603:1096:4:197::15) To SN4PR01MB7455.prod.exchangelabs.com
- (2603:10b6:806:202::11)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B61BC;
+	Wed, 29 Nov 2023 23:58:37 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ATK6TZw027647;
+	Wed, 29 Nov 2023 23:58:25 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=I3IUqkrdzto+f+egA9GuiCblE946vPct0ELxdKJ5JEc=;
+ b=biirskV4vIYUgndWuWHU30s6DVcrp+1BhxK3ziLYt+sLUdXmrd6/9RAgLflQ8j/vLuI3
+ ROk4/CTjckiObktPriPx/3j8V7JnyQjKzvEA+VEdKl0WXA/LXVgeoKK17C60okg2zlXv
+ sKYBZV5OssiQoDyjBMZo5cFFLxsQuLw1zjcmiU6nwaUKHdjtrOTDZoO1fwWlOiG/0UDh
+ Aaz01Da/ah7uKHz2g6lJjstDTWt3NOAEakI/VY5DiDhde49dMJnKlfgtJ0lBNvfvl8ue
+ BCB6y1TVs1/uAtgO9cvIYbc5s4CEYF/0TgCYHtpcesF/OuJcfRdYbiMdu2i9FVehu5GE fg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3upc1v2hyf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 23:58:24 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
+ 2023 23:58:23 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 29 Nov 2023 23:58:23 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id B2B013F7044;
+	Wed, 29 Nov 2023 23:58:19 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>
+Subject: [net v3 PATCH 0/5] octeontx2-af: miscellaneous fixes
+Date: Thu, 30 Nov 2023 13:28:13 +0530
+Message-ID: <20231130075818.18401-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN4PR01MB7455:EE_|BN0PR01MB7037:EE_
-X-MS-Office365-Filtering-Correlation-Id: dec803bb-62be-4d3a-a3db-08dbf1796524
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	0RSgACKP6REJcVpP7GabG/UmPv5uEeQjfoWUZvQ2CA0cKzY7SalkzxtCbYgm1qxGmkGpDVtFPUgQLP+eC/oq8CYCKY//e4XQO0r+WtdDpTapzekIe6Ir2CLp+v/Z+eAH4Ts7m9ZhTa4jHTGo6UrW8ADi6pO7Y2VJCbaVN1k+0OHZaBvTBDtywGpeYrh8vgszHVKLD1gDT19jyGU+d+3V25mhZBHhqG1rHMVi4P4csbcYhuui58o/vNv0Kmw6IpSzaNoEuPWSSI0kr0zzAjAp1jK2E1CPskIpXvBFtSE+WRHDIFDDwZO2Er82zNjYLOqHp91uOuZ2awIsIMdYPVo8Fr3bBrjQrFllPoaCWWx6vGvG3LnH9oNBOz+ZD2UcPwHUa1uz9CJxrXulkHmAjruIGFvqem04fDHI30gb8ULQaW0Ihw3ykWtssabLnLJiB7MEszZZrxupPRcVSLYrHA5pJzYxAAOOQ06ahqMDQD6+HTMNCZMh72oyREdyzOZz6BQh6zHra/UxoMSaH347RG7NqDaeg1jQYaLfqyahj0DT3ADrY9/t/wkvYo43+WbeSs/PWWKfjPMq9Indz7lqfK+bH7xLgHaKIxUGOQz76P2tcOFE9IYknamuRHl92m9lqfmXS4E1JIG6kZBjoQ/jkWT26GqHg+C69yCfaWA/ARYH6zolN7z0dSfEZdbwRc48VeRrtJThbvcx8GHIpluJGdYbFcbitjpJQU3w34bU8DORxNA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR01MB7455.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(396003)(39850400004)(366004)(230922051799003)(186009)(1800799012)(64100799003)(451199024)(6506007)(6666004)(52116002)(38100700002)(8676002)(8936002)(4326008)(41300700001)(6512007)(478600001)(6486002)(110136005)(2906002)(921008)(107886003)(38350700005)(2616005)(1076003)(66946007)(316002)(5660300002)(26005)(54906003)(66476007)(66556008)(86362001)(202311291699003)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BTOFA95GMgy6W6Dkz70L9sah9uCiL5iyYcdU2M0IMTJ+EHkTexy3vpnqep63?=
- =?us-ascii?Q?mo/M45TY7G0qbKrPfmy4rC/jsH53hv9MZgE3Ldz5+1C41Oj2SsOwn0o17qxJ?=
- =?us-ascii?Q?EwyyDw9NcVhvh8LbnIYlXNIhLNDNAj9ey20YmI1ttBNBjl20NahSXfwwro4r?=
- =?us-ascii?Q?fSGP0yZ66GFbFEpc+3dPtRwX8sUiE4NMtA0bAEqRcbuZwxYedswhKc9K88DP?=
- =?us-ascii?Q?S7AEKr5HgRYBsdKoP8xAnffpw/3EJf9DWUHa4i4qPqvk35ns/BjfU4CAOo7y?=
- =?us-ascii?Q?DhDyahPsLqL6rMorV4u8Qu3C4ozA0uHh6N9ANEaQORNDgGrEe0yxXxY7Vvuf?=
- =?us-ascii?Q?CnRmcbIOOOFDwapOj+KNEqJeU4II7Uvu56Es+zkwERxcmHrwNmROP76dIZdA?=
- =?us-ascii?Q?BXDAAdpGivu6OHMg+ozb3hhZne4QpsQROtI6hn6AC4KNkNqdgJyyW1ztvDGn?=
- =?us-ascii?Q?XZbgnFYs+WK5ZMDItoPkUPXzc6GRUF2EpQUlwyjD5W1+JdN2E8wpbsxMLsho?=
- =?us-ascii?Q?lpuidcfUsaoXgKK3kL4egwyN2vn30F3/DbzZ4hUPx/Pq6POzbLz30AXk5agu?=
- =?us-ascii?Q?PnxvDJQsLsdbmldGZupQf0RKbruU4C195a7rP3m3iNUDDWsXk8oPfQqB6q0Y?=
- =?us-ascii?Q?nRYRFmt9cmRaX0YByAViO1jpW5dOYpe40Z4eoEh9HuN+NoX5eQUyVrO0QSS0?=
- =?us-ascii?Q?/CHjmXhNndgcyBrrkQ6KGCCOX+hxsbtN2m0iQDAtILqfhKhLtmQwEIHaD+dE?=
- =?us-ascii?Q?/WPET/XJ73ZdrA/sWQ3hTfL+WxBsXiGigMmlr6tpyXci2vb+6tJwLl5tddgo?=
- =?us-ascii?Q?zXGooHeSqh6AakyT++dlKkrYo1Jdqh2kQUCeG17nf7FObjx98uyzVZ8dbfxH?=
- =?us-ascii?Q?D84OUYuD+ucR49kLJ+uBUAvjxLvH0yc0d8adxwnS3UVilFHsKv1moyvdnORJ?=
- =?us-ascii?Q?UFcyvytdfVvUEiFue2Cft75g/lBSH68C+b5Pm0ExUlJesNeG/O/gcpA+2YqH?=
- =?us-ascii?Q?GHHRVjhcv9NE90ITS82T81uYZHvXDYwQl7tBHefuf3fJX+LT5SMSp3Zc/PLk?=
- =?us-ascii?Q?jyOR4soh2Juvd4dc3sUuFQk2k/XwsMKXaF7qt7Q39rAFz174f/7WmsiI5qC6?=
- =?us-ascii?Q?Kcl7YcbhJyjmgW7GK7cHBVjyxIyRoJ2gvEZGPDjiPMpgTiU9DXCGgO1ETAEx?=
- =?us-ascii?Q?KXhN58va9osFy31q1cDGi8/40f3DIMvcao+FJ6jVF71mv6r2bxwJrUqKq43o?=
- =?us-ascii?Q?lKyL9+CyQ2Q2AqMm2SsD5mu3NtjbzlIsV2qOm2eq0mDEZDrCI32+BbBNagtn?=
- =?us-ascii?Q?cYCDJtYOXnU/V4B/cLpGMxkUBAuGhzrMeBCEgFmT0C1AX0ZDr43Ntj4h/lYk?=
- =?us-ascii?Q?Q9umXeqC+02JbSIM4nybo22DXYMQOvODBoFFsDRsbzaehCyiSlyk3aQjn9Ka?=
- =?us-ascii?Q?0+Hzv/Q4pTCUWj0oJGRgkNFKhngbNPTxuDPjxSFkL8YqgifOJBW9HWIuTiVh?=
- =?us-ascii?Q?/fqYB3OyKuVb/pD254lYlgYEKh1gFvkzsUZxht9SduojfkJU98OYXI38OMO1?=
- =?us-ascii?Q?wiqvvo7Uq4b7jakW+Spd9Pek94/YFqA+qc/4/QEzQ3Wuc36AcSN5LmvgjcOY?=
- =?us-ascii?Q?46pGEmCRJnU5mTsM/ywJQvE=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dec803bb-62be-4d3a-a3db-08dbf1796524
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR01MB7455.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 07:53:09.9429
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: elJv3Q8NAPvHz53o4EtvuDVriztZEY/i3Ri+y+RlnLWfz9Cy3fz6sGXIx8EiU3IY6d8ebTzpSeVNS0SXzLK3iywdgVZaHIPTcr3Vy1ucP4g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB7037
+Content-Type: text/plain
+X-Proofpoint-GUID: ZPxnofCS1QoM-kYtxKhU5yvaQZAEbhA_
+X-Proofpoint-ORIG-GUID: ZPxnofCS1QoM-kYtxKhU5yvaQZAEbhA_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-30_05,2023-11-29_01,2023-05-22_02
 
-If arbitration is lost, __i2c_transfer() returns -EAGAIN and the
-packet should be resent.
+The series of patches fixes various issues related to mcs
+and NIX link registers.
 
-Requeue the packet and increase collisions count on this case.
+v2-v3:
+ Fixed typo error in patch 4 commit message.
 
-Co-developed-by: Dung Cao <dung@os.amperecomputing.com>
-Signed-off-by: Dung Cao <dung@os.amperecomputing.com>
-Signed-off-by: Quan Nguyen <quan@os.amperecomputing.com>
----
- drivers/net/mctp/mctp-i2c.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+v1-v2:
+ Fixed author name for patch 5.
+ Added Reviewed-by.
 
-diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
-index b37a9e4bade4..132023306052 100644
---- a/drivers/net/mctp/mctp-i2c.c
-+++ b/drivers/net/mctp/mctp-i2c.c
-@@ -442,14 +442,14 @@ static void mctp_i2c_unlock_reset(struct mctp_i2c_dev *midev)
- 		i2c_unlock_bus(midev->adapter, I2C_LOCK_SEGMENT);
- }
- 
--static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
-+static int mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
- {
- 	struct net_device_stats *stats = &midev->ndev->stats;
- 	enum mctp_i2c_flow_state fs;
- 	struct mctp_i2c_hdr *hdr;
- 	struct i2c_msg msg = {0};
- 	u8 *pecp;
--	int rc;
-+	int rc = 0;
- 
- 	fs = mctp_i2c_get_tx_flow_state(midev, skb);
- 
-@@ -461,17 +461,11 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
- 		dev_warn_ratelimited(&midev->adapter->dev,
- 				     "Bad tx length %d vs skb %u\n",
- 				     hdr->byte_count + 3, skb->len);
--		return;
-+		return -EINVAL;
- 	}
- 
--	if (skb_tailroom(skb) >= 1) {
--		/* Linear case with space, we can just append the PEC */
--		skb_put(skb, 1);
--	} else {
--		/* Otherwise need to copy the buffer */
--		skb_copy_bits(skb, 0, midev->tx_scratch, skb->len);
--		hdr = (void *)midev->tx_scratch;
--	}
-+	skb_copy_bits(skb, 0, midev->tx_scratch, skb->len);
-+	hdr = (void *)midev->tx_scratch;
- 
- 	pecp = (void *)&hdr->source_slave + hdr->byte_count;
- 	*pecp = i2c_smbus_pec(0, (u8 *)hdr, hdr->byte_count + 3);
-@@ -503,17 +497,20 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
- 		break;
- 
- 	case MCTP_I2C_TX_FLOW_INVALID:
--		return;
-+		return rc;
- 	}
- 
- 	if (rc < 0) {
- 		dev_warn_ratelimited(&midev->adapter->dev,
- 				     "__i2c_transfer failed %d\n", rc);
- 		stats->tx_errors++;
-+		if (rc == -EAGAIN)
-+			stats->collisions++;
- 	} else {
- 		stats->tx_bytes += skb->len;
- 		stats->tx_packets++;
- 	}
-+	return rc;
- }
- 
- static void mctp_i2c_flow_release(struct mctp_i2c_dev *midev)
-@@ -568,6 +565,7 @@ static int mctp_i2c_tx_thread(void *data)
- 	struct mctp_i2c_dev *midev = data;
- 	struct sk_buff *skb;
- 	unsigned long flags;
-+	int rc;
- 
- 	for (;;) {
- 		if (kthread_should_stop())
-@@ -583,8 +581,17 @@ static int mctp_i2c_tx_thread(void *data)
- 			mctp_i2c_flow_release(midev);
- 
- 		} else if (skb) {
--			mctp_i2c_xmit(midev, skb);
--			kfree_skb(skb);
-+			rc = mctp_i2c_xmit(midev, skb);
-+			if (rc == -EAGAIN) {
-+				spin_lock_irqsave(&midev->tx_queue.lock, flags);
-+				if (skb_queue_len(&midev->tx_queue) >= MCTP_I2C_TX_WORK_LEN)
-+					kfree_skb(skb);
-+				else
-+					__skb_queue_head(&midev->tx_queue, skb);
-+				spin_unlock_irqrestore(&midev->tx_queue.lock, flags);
-+			} else {
-+				kfree_skb(skb);
-+			}
- 
- 		} else {
- 			wait_event_idle(midev->tx_wq,
+Geetha sowjanya (3):
+  octeontx2-af: Fix mcs sa cam entries size
+  octeontx2-af: Fix mcs stats register address
+  octeontx2-af: Add missing mcs flr handler call
+
+Nithin Dabilpuram (1):
+  octeontx2-af: Adjust Tx credits when MCS external bypass is disabled
+
+Rahul Bhansali (1):
+  octeontx2-af: Update Tx link register range
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  2 +-
+ .../net/ethernet/marvell/octeontx2/af/mcs.c   | 16 ++++++++--
+ .../net/ethernet/marvell/octeontx2/af/mcs.h   |  2 ++
+ .../ethernet/marvell/octeontx2/af/mcs_reg.h   | 31 ++++++++++++++++---
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |  3 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  1 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  8 +++++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.c   |  4 +--
+ 8 files changed, 58 insertions(+), 9 deletions(-)
+
 -- 
-2.35.1
+2.25.1
 
 
