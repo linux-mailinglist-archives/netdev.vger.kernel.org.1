@@ -1,267 +1,233 @@
-Return-Path: <netdev+bounces-52414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7D37FEAC7
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:34:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B838E7FEB10
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B229B21025
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:34:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA3631C20D59
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 08:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E6222098;
-	Thu, 30 Nov 2023 08:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42A42D601;
+	Thu, 30 Nov 2023 08:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k0biSUnC"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="JD3N97eQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBF610FF
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:34:13 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-54b0c368d98so6849a12.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 00:34:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701333251; x=1701938051; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qXo48++PN4J59kZEwmuXxhgLqro/JnSA9tOip05A0qQ=;
-        b=k0biSUnCR5D85d+2eDg6LAIQrS5drIxEEoIDpFMy6TWS8xEwux6ZImjS0cUb9mZGSc
-         XAora9qRc2XbJxPYFierVjRLmP4yv++XjZU9DiaBepiyelO0M30z67IAEmpJpVNJPmaf
-         P4fHUhBQUTLvhFwv6a38Ds83p7YFwkOzG1d/b4GvNGECywEydNm2yBUdicvpL3LE1aNn
-         u9mUis6L0bRasZH138u7l4OFYAVoLEWDipUloK9whcoK7t98u/weQf1nN88tbJDv6IN8
-         Smk0FbmtA1SYF57Jc198WkabzX5omWAOo25tCZkJTOyYrSfbzyQ4RRop8qUybg1/BJth
-         coGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701333251; x=1701938051;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qXo48++PN4J59kZEwmuXxhgLqro/JnSA9tOip05A0qQ=;
-        b=BL3GkoITxaYLBoZdETlCTkYZ5lsGe+BfdGJShuJcbLP5oAjcf4Zd+K6soKepnz3kQU
-         MvJoPJjTHnLdItAVdqKV8cUmmDMfBWl4hjBuY+gnEcoM+fcwJpzMU5etz+krWJjDZhcm
-         9Aq5z+BExAvk86uEinqUjWHslo1hP0IaKRaevKK/rL9IpI9/XuWCJUmk9LIhhjVyedJ9
-         mlmbey57+ScEyrQ/hZ71cRmZnxyidpcCQ+Kqh2AwBO8Vqnl6mZbKeU4JOHWDfM8vbyWo
-         m8jWem4f+C0BjElnor809APr3pNsTLy++LkIlkcqxIjztX5aofMbvM35eIDyreD0eHvu
-         5MSQ==
-X-Gm-Message-State: AOJu0YxHWtg+YDc9JM5KuVCexmFt+Nkqb0gfpR7/TWXfvJyFz5IDpOTb
-	y+heTUE0g/wbhn7t67tcwPC/i9P7JyfnT3QKGTYiCg==
-X-Google-Smtp-Source: AGHT+IECQzIfXr6OtTMX8MsFCuGNv7SQ2HOnhHMKdAxvpMo5DrLlhbNHWwNXL+iPnSmW+RqEspz3TrOglZ4jk+YeSBc=
-X-Received: by 2002:a05:6402:1cae:b0:54b:81ba:93b2 with SMTP id
- cz14-20020a0564021cae00b0054b81ba93b2mr113958edb.2.1701333251299; Thu, 30 Nov
- 2023 00:34:11 -0800 (PST)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D6412C;
+	Thu, 30 Nov 2023 00:44:14 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 3F9B1120028;
+	Thu, 30 Nov 2023 11:44:11 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 3F9B1120028
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1701333851;
+	bh=OqaK0CN4E7VbyGA0xV65PXd1DINTieOgHEsowFYpIuA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=JD3N97eQPOlymq0NTTuWBF8GWphFd6MS53W31+ZnpbEFHr/jhA6LeENiwx1qBB5+X
+	 FctuJVJegkrGpVWijXAmY+tg5WU+UY0n4dtkcXnZgTLWviOVukat14+IwosnsV/tp/
+	 mhyaN+SqvHjkAh3XDbh2sNzBzSR5U2QO1kHYhzjK/TXtFK05Nc3KtrW9AvvZ5FaM8Q
+	 Am1e/w6qVAhHzhjuSZxT4QpkjI+80b25Dnhj2+2BmxCwXEFYnqCNDkz7ArA47YgOG5
+	 cEOPz+GptyWNH6JSo9NunkOlAgyDWJtKPQUr5Ecp4FDnf6HrCqAtcszJz9EDQZLS8C
+	 dk0DmGXBo3isg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 30 Nov 2023 11:44:11 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 30 Nov 2023 11:44:04 +0300
+Message-ID: <3fa2e016-364c-e4a9-0ee6-a2dc09a9a495@salutedevices.com>
+Date: Thu, 30 Nov 2023 11:36:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABOYnLwSO7zLH+KVwTUJnV2_Hk+u+5+g8DPanTfLeEg05tFEQQ@mail.gmail.com>
- <CANn89iL8wmUf+G5nafMH1aCyeBDkoZ8micsAdECj6ktS-koG5w@mail.gmail.com>
-In-Reply-To: <CANn89iL8wmUf+G5nafMH1aCyeBDkoZ8micsAdECj6ktS-koG5w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Nov 2023 09:34:00 +0100
-Message-ID: <CANn89iLNH3NgZr=5eZ22_wL2xOf179UnHU2YVL91L5QgzRmEeQ@mail.gmail.com>
-Subject: Re: WARNING in cleanup_net
-To: xingwei lee <xrivendell7@gmail.com>
-Cc: linux-kernel@vger.kernel.org, santosh.shilimkar@oracle.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
-	syzkaller@googlegroups.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v4 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231129212519.2938875-1-avkrasnov@salutedevices.com>
+ <20231129212519.2938875-3-avkrasnov@salutedevices.com>
+ <cdgg4rtr6t3ez7l7vbgngmeitsmrplwg7vgpebodrxkpouh4yn@yb4aug7zergh>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <cdgg4rtr6t3ez7l7vbgngmeitsmrplwg7vgpebodrxkpouh4yn@yb4aug7zergh>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181719 [Nov 30 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/30 05:19:00 #22579688
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Thu, Nov 30, 2023 at 9:24=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Nov 30, 2023 at 9:19=E2=80=AFAM xingwei lee <xrivendell7@gmail.co=
-m> wrote:
-> >
-> > Hi
-> > I found a bug with syzkaller titled "WARNING in cleanup_net" in the
-> > last upstream.
-> > =3D* BUG DETAILS =3D*
-> > kernel commit: 3b47bc037bd44f142ac09848e8d3ecccc726be99
-> > kernel config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=
-=3Df2a9d08825f82ef3
-> > repro.c/repro.txt:
-> > https://gist.github.com/xrivendell7/44780af4a9dededc5ff7a7c0583ce3f1
-> > the crash report=EF=BC=9A
-> > [ 8584.181281][T11719] bond0 (unregistering): Released all slaves
-> > [ 8585.839049][T11719] ref_tracker: net notrefcnt@ffff888021ba0220 has
-> > 1/1 users at
-> > [ 8585.839049][T11719]   sk_alloc+0xaf0/0xbf0
-> > [ 8585.839049][T11719]   inet6_create+0x39b/0x1300
-> > [ 8585.839049][T11719]   __sock_create+0x34f/0x850
-> > [ 8585.839049][T11719]   rds_tcp_listen_init+0xda/0x4f0
-> > [ 8585.839049][T11719]   rds_tcp_init_net+0x147/0x400
-> > [ 8585.839049][T11719]   ops_init+0xc4/0x680
-> > [ 8585.839049][T11719]   setup_net+0x431/0xa80
-> > [ 8585.839049][T11719]   copy_net_ns+0x313/0x6b0
-> > [ 8585.839049][T11719]   create_new_namespaces+0x3fb/0xb60
-> > [ 8585.839049][T11719]   unshare_nsproxy_namespaces+0xd0/0x200
-> > [ 8585.839049][T11719]   ksys_unshare+0x47c/0xa30
-> > [ 8585.839049][T11719]   __x64_sys_unshare+0x36/0x50
-> > [ 8585.839049][T11719]   do_syscall_64+0x40/0x110
-> > [ 8585.839049][T11719]   entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> > [ 8585.839049][T11719]
-> > [ 8585.858614][T11719] ------------[ cut here ]------------
-> > [ 8585.860037][T11719] WARNING: CPU: 3 PID: 11719 at
-> > lib/ref_tracker.c:179 ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.862152][T11719] Modules linked in:
-> > [ 8585.863038][T11719] CPU: 3 PID: 11719 Comm: kworker/u8:3 Not
-> > tainted 6.7.0-rc1-g7475e51b8796-dirty #2
-> > [ 8585.865268][T11719] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> > 1996), BIOS 1.16.2-1.fc38 04/01/2014
-> > [ 8585.867345][T11719] Workqueue: netns cleanup_net
-> > [ 8585.868401][T11719] RIP: 0010:ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.869426][T11719] Code: 00 00 4d 39 f5 49 8b 06 4d 89 f7 0f 85 08
-> > ff ff ff 48 8b 2c 24 31 ff e8 c4 09 d6 fc 48 8b 74 24 18 48 89 ef e8
-> > 67 13 32 06 90 <0f> 0b 90 48 8d 5d 44 31 ff e8 a8 09 d6 fc be 04 00 00
-> > 00 48 89 df
-> > [ 8585.872786][T11719] RSP: 0018:ffffc9000386fb78 EFLAGS: 00010286
-> > [ 8585.873790][T11719] RAX: 0000000080000000 RBX: dffffc0000000000
-> > RCX: 0000000000000000
-> > [ 8585.875085][T11719] RDX: 0000000000000001 RSI: ffffffff8b2cb900
-> > RDI: 0000000000000001
-> > [ 8585.876394][T11719] RBP: ffff888021ba0220 R08: 0000000000000001
-> > R09: fffffbfff24a13e9
-> > [ 8585.877808][T11719] R10: ffffffff92509f4f R11: 0000000000000003
-> > R12: ffff888021ba0270
-> > [ 8585.879138][T11719] R13: ffff888021ba0270 R14: ffff888021ba0270
-> > R15: ffff888021ba0270
-> > [ 8585.880481][T11719] FS: 0000000000000000(0000)
-> > GS:ffff88823bd00000(0000) knlGS:0000000000000000
-> > [ 8585.881965][T11719] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [ 8585.882719][T11719] CR2: 00007f00c5cd79f0 CR3: 000000000d377000
-> > CR4: 0000000000750ef0
-> > [ 8585.883536][T11719] PKRU: 55555554
-> > [ 8585.883901][T11719] Call Trace:
-> > [ 8585.884247][T11719] <TASK>
-> > [ 8585.884561][T11719] ? show_regs+0x9a/0xb0
-> > [ 8585.885005][T11719] ? __warn+0xf5/0x3c0
-> > [ 8585.885423][T11719] ? report_bug+0x506/0x5f0
-> > [ 8585.885900][T11719] ? ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.886466][T11719] ? report_bug+0x41c/0x5f0
-> > [ 8585.886939][T11719] ? handle_bug+0x3d/0x70
-> > [ 8585.887609][T11719] ? exc_invalid_op+0x17/0x40
-> > [ 8585.888104][T11719] ? asm_exc_invalid_op+0x1a/0x20
-> > [ 8585.888646][T11719] ? ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.889203][T11719] ? ref_tracker_dir_exit+0x3f9/0x6a0
-> > [ 8585.889900][T11719] ? ref_tracker_dir_snprint+0xe0/0xe0
-> > [ 8585.890465][T11719] ? __kmem_cache_free+0xc0/0x180
-> > [ 8585.890989][T11719] cleanup_net+0x927/0xb70
-> > [ 8585.891462][T11719] ? unregister_pernet_device+0x80/0x80
-> > [ 8585.892038][T11719] process_one_work+0x8ab/0x1730
-> > [ 8585.892564][T11719] ? unregister_pernet_device+0x80/0x80
-> > [ 8585.893137][T11719] ? workqueue_congested+0x320/0x320
-> > [ 8585.893692][T11719] ? assign_work+0x1b7/0x260
-> > [ 8585.894177][T11719] worker_thread+0x931/0x1380
-> > [ 8585.894683][T11719] ? process_one_work+0x1730/0x1730
-> > [ 8585.895224][T11719] kthread+0x2d3/0x3b0
-> > [ 8585.895664][T11719] ? _raw_spin_unlock_irq+0x23/0x50
-> > [ 8585.896191][T11719] ? kthread_complete_and_exit+0x40/0x40
-> > [ 8585.896779][T11719] ret_from_fork+0x4e/0x80
-> > [ 8585.897245][T11719] ? kthread_complete_and_exit+0x40/0x40
-> > [ 8585.897863][T11719] ret_from_fork_asm+0x11/0x20
-> > [ 8585.898371][T11719] </TASK>
-> > [ 8585.898702][T11719] Kernel panic - not syncing: kernel: panic_on_war=
-n set ...
-> > [ 8585.899428][T11719] CPU: 3 PID: 11719 Comm: kworker/u8:3 Not
-> > tainted 6.7.0-rc1-g7475e51b8796-dirty #2
-> > [ 8585.900572][T11719] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> > 1996), BIOS 1.16.2-1.fc38 04/01/2014
-> > [ 8585.901550][T11719] Workqueue: netns cleanup_net
-> > [ 8585.902038][T11719] Call Trace:
-> > [ 8585.902377][T11719] <TASK>
-> > [ 8585.902693][T11719] dump_stack_lvl+0xee/0x1e0
-> > [ 8585.903170][T11719] panic+0x754/0x810
-> > [ 8585.903805][T11719] ? panic_smp_self_stop+0xa0/0xa0
-> > [ 8585.904377][T11719] ? show_trace_log_lvl+0x394/0x540
-> > [ 8585.905159][T11719] ? check_panic_on_warn+0xa4/0xc0
-> > [ 8585.905742][T11719] ? ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.906532][T11719] check_panic_on_warn+0xb8/0xc0
-> > [ 8585.907108][T11719] __warn+0x101/0x3c0
-> > [ 8585.907577][T11719] ? report_bug+0x506/0x5f0
-> > [ 8585.908317][T11719] ? ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.909080][T11719] report_bug+0x41c/0x5f0
-> > [ 8585.909599][T11719] handle_bug+0x3d/0x70
-> > [ 8585.910089][T11719] exc_invalid_op+0x17/0x40
-> > [ 8585.910571][T11719] asm_exc_invalid_op+0x1a/0x20
-> > [ 8585.911115][T11719] RIP: 0010:ref_tracker_dir_exit+0x3fa/0x6a0
-> > [ 8585.911798][T11719] Code: 00 00 4d 39 f5 49 8b 06 4d 89 f7 0f 85 08
-> > ff ff ff 48 8b 2c 24 31 ff e8 c4 09 d6 fc 48 8b 74 24 18 48 89 ef e8
-> > 67 13 32 06 90 <0f> 0b 90 48 8d 5d 44 31 ff e8 a8 09 d6 fc be 04 00 00
-> > 00 48 89 df
-> > [ 8585.914135][T11719] RSP: 0018:ffffc9000386fb78 EFLAGS: 00010286
-> > [ 8585.914813][T11719] RAX: 0000000080000000 RBX: dffffc0000000000
-> > RCX: 0000000000000000
-> > [ 8585.915654][T11719] RDX: 0000000000000001 RSI: ffffffff8b2cb900
-> > RDI: 0000000000000001
-> > [ 8585.916556][T11719] RBP: ffff888021ba0220 R08: 0000000000000001
-> > R09: fffffbfff24a13e9
-> > [ 8585.917647][T11719] R10: ffffffff92509f4f R11: 0000000000000003
-> > R12: ffff888021ba0270
-> > [ 8585.918692][T11719] R13: ffff888021ba0270 R14: ffff888021ba0270
-> > R15: ffff888021ba0270
-> > [ 8585.919598][T11719] ? ref_tracker_dir_exit+0x3f9/0x6a0
-> > [ 8585.920188][T11719] ? ref_tracker_dir_snprint+0xe0/0xe0
-> > [ 8585.920803][T11719] ? __kmem_cache_free+0xc0/0x180
-> > [ 8585.921387][T11719] cleanup_net+0x927/0xb70
-> > [ 8585.921891][T11719] ? unregister_pernet_device+0x80/0x80
-> > [ 8585.922481][T11719] process_one_work+0x8ab/0x1730
-> > [ 8585.923093][T11719] ? unregister_pernet_device+0x80/0x80
-> > [ 8585.923781][T11719] ? workqueue_congested+0x320/0x320
-> > [ 8585.924385][T11719] ? assign_work+0x1b7/0x260
-> > [ 8585.924923][T11719] worker_thread+0x931/0x1380
-> > [ 8585.925467][T11719] ? process_one_work+0x1730/0x1730
-> > [ 8585.926079][T11719] kthread+0x2d3/0x3b0
-> > [ 8585.926538][T11719] ? _raw_spin_unlock_irq+0x23/0x50
-> > [ 8585.927138][T11719] ? kthread_complete_and_exit+0x40/0x40
-> > [ 8585.927763][T11719] ret_from_fork+0x4e/0x80
-> > [ 8585.928256][T11719] ? kthread_complete_and_exit+0x40/0x40
-> > [ 8585.928903][T11719] ret_from_fork_asm+0x11/0x20
-> > [ 8585.929470][T11719] </TASK>
-> > [ 8585.930023][T11719] Kernel Offset: disabled
-> > [ 8585.930517][T11719] Rebooting in 86400 seconds..
-> > =3D* OTHERS =3D*
-> > I noticed syzbot has two similar bugs named WARNING in cleanup_net=EF=
-=BC=9A
-> > https://syzkaller.appspot.com/bug?extid=3D7e1e1bdb852961150198
-> > https://syzkaller.appspot.com/bug?id=3D14c45b4081250ebeb4a9000f3774da82=
-9f7e43b4
-> >
-> > However, these two seem fixed and not related to this.
-> > Without in-depth analysis, I guess it's maybe a race condition bug and
-> > the import part may be the refcnt_tracker in socket$rds not handled
-> > properly but I'm not sure.
-> >
-> > [ 8585.839049][T11719] ref_tracker: net notrefcnt@ffff888021ba0220 has
-> > 1/1 users at
-> > [ 8585.839049][T11719]   sk_alloc+0xaf0/0xbf0
-> > [ 8585.839049][T11719]   inet6_create+0x39b/0x1300
-> > [ 8585.839049][T11719]   __sock_create+0x34f/0x850
-> > [ 8585.839049][T11719]   rds_tcp_listen_init+0xda/0x4f0
-> > [ 8585.839049][T11719]   rds_tcp_init_net+0x147/0x400
-> > [ 8585.839049][T11719]   ops_init+0xc4/0x680
-> > [ 8585.839049][T11719]   setup_net+0x431/0xa80
-> > [ 8585.839049][T11719]   copy_net_ns+0x313/0x6b0
-> > [ 8585.839049][T11719]   create_new_namespaces+0x3fb/0xb60
-> > [ 8585.839049][T11719]   unshare_nsproxy_namespaces+0xd0/0x200
-> > [ 8585.839049][T11719]   ksys_unshare+0x47c/0xa30
-> > [ 8585.839049][T11719]   __x64_sys_unshare+0x36/0x50
-> > [ 8585.839049][T11719]   do_syscall_64+0x40/0x110
-> > [ 8585.839049][T11719]   entry_SYSCALL_64_after_hwframe+0x63/0x6b
->
-> I have a similar syzbot  bug in my triage queue I will release right now.
->
 
-This is the "[syzbot] [net?] WARNING in cleanup_net (3)"  thread.
 
-> I already worked on a solution.
+On 30.11.2023 11:38, Stefano Garzarella wrote:
+> On Thu, Nov 30, 2023 at 12:25:18AM +0300, Arseniy Krasnov wrote:
+>> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>> than number of bytes in rx queue. It is needed, because 'poll()' will
+>> wait until number of bytes in rx queue will be not smaller than
+>> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>> for tx/rx is possible: sender waits for free space and receiver is
+>> waiting data in 'poll()'.
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> ---
+>> Changelog:
+>> v1 -> v2:
+>>  * Update commit message by removing 'This patch adds XXX' manner.
+>>  * Do not initialize 'send_update' variable - set it directly during
+>>    first usage.
+>> v3 -> v4:
+>>  * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>>
+>> drivers/vhost/vsock.c                   |  3 ++-
+>> include/linux/virtio_vsock.h            |  1 +
+>> net/vmw_vsock/virtio_transport.c        |  3 ++-
+>> net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
+>> net/vmw_vsock/vsock_loopback.c          |  3 ++-
+>> 5 files changed, 34 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> index f75731396b7e..c5e58a60a546 100644
+>> --- a/drivers/vhost/vsock.c
+>> +++ b/drivers/vhost/vsock.c
+>> @@ -449,8 +449,9 @@ static struct virtio_transport vhost_transport = {
+>>         .notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>>         .notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>>
+>> -        .read_skb = virtio_transport_read_skb,
+>> +        .read_skb = virtio_transport_read_skb
+> 
+> I think it is better to avoid this change, so when we will need to add
+> new callbacks, we don't need to edit this line again.
+> 
+> Please avoid it also in the other place in this patch.
+> 
+> The rest LGTM.
 
-But was waiting for a repro...
+Yes, I see, I thought about that, but chose beauty instead of pragmatism :)
+Ok, I'll fix it:)
 
->
-> Thanks.
+Thanks, Arseniy
+
+> 
+> Thanks,
+> Stefano
+> 
+>>     },
+>>
+>>     .send_pkt = vhost_transport_send_pkt,
+>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> index ebb3ce63d64d..c82089dee0c8 100644
+>> --- a/include/linux/virtio_vsock.h
+>> +++ b/include/linux/virtio_vsock.h
+>> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>> int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>> #endif /* _LINUX_VIRTIO_VSOCK_H */
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index af5bab1acee1..8b7bb7ca8ea5 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -537,8 +537,9 @@ static struct virtio_transport virtio_transport = {
+>>         .notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>>         .notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>>
+>> -        .read_skb = virtio_transport_read_skb,
+>> +        .read_skb = virtio_transport_read_skb
+>>     },
+>>
+>>     .send_pkt = virtio_transport_send_pkt,
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index f6dc896bf44c..1cb556ad4597 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>> }
+>> EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>>
+>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val)
+>> +{
+>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>> +    bool send_update;
+>> +
+>> +    spin_lock_bh(&vvs->rx_lock);
+>> +
+>> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
+>> +     * kick sender to send more data, because sender may sleep in its
+>> +     * 'send()' syscall waiting for enough space at our side.
+>> +     */
+>> +    send_update = vvs->rx_bytes < val;
+>> +
+>> +    spin_unlock_bh(&vvs->rx_lock);
+>> +
+>> +    if (send_update) {
+>> +        int err;
+>> +
+>> +        err = virtio_transport_send_credit_update(vsk);
+>> +        if (err < 0)
+>> +            return err;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(virtio_transport_notify_set_rcvlowat);
+>> +
+>> MODULE_LICENSE("GPL v2");
+>> MODULE_AUTHOR("Asias He");
+>> MODULE_DESCRIPTION("common code for virtio vsock");
+>> diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>> index 048640167411..454f69838c2a 100644
+>> --- a/net/vmw_vsock/vsock_loopback.c
+>> +++ b/net/vmw_vsock/vsock_loopback.c
+>> @@ -96,8 +96,9 @@ static struct virtio_transport loopback_transport = {
+>>         .notify_send_pre_enqueue  = virtio_transport_notify_send_pre_enqueue,
+>>         .notify_send_post_enqueue = virtio_transport_notify_send_post_enqueue,
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>>
+>> -        .read_skb = virtio_transport_read_skb,
+>> +        .read_skb = virtio_transport_read_skb
+>>     },
+>>
+>>     .send_pkt = vsock_loopback_send_pkt,
+>> -- 
+>> 2.25.1
+>>
+> 
 
