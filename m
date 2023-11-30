@@ -1,187 +1,186 @@
-Return-Path: <netdev+bounces-52537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2297FF12C
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:06:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27C17FF12F
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1499C282501
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:05:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADA1B281A5A
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE160487B3;
-	Thu, 30 Nov 2023 14:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A707487A3;
+	Thu, 30 Nov 2023 14:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJFfWf0V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXFH6GC4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7504196
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 06:05:51 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-54b0c368d98so10579a12.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 06:05:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701353150; x=1701957950; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ImwHFURbq6hKN/keUK8aNThOCC0p1tGX8QSbugfi08c=;
-        b=mJFfWf0VjcjOkdP3NhxYjD/uRd/zmUyGJozyrEMrbG2d7NBGfFq7tyVwIBfTQDWsHM
-         v9sePPmMZfzhgd8K66TL67sEhdMNgn6tWYDY1WrAquPcNFw5lDfWmZUWLRCDPm55ngAj
-         JYCZwl6vWXEu/QiqWWJ1k0mXqPLdHL8FzcFbGKonPY+uJMlUupWznE/g9/1wNd1goA1m
-         lWlO1BYsKdoa5f58+G3gjN1Gou2d5y9d7eaiI9NKqZMHi0vaKo4t0nadfLBf9PjRePF8
-         cNbYBYp7iw5hW4OWH6Smy9Vnk50Wk1iE5VdQfkmS8KFADvenBcheAkH8AzxlSe6tMI/j
-         Hsbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701353150; x=1701957950;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ImwHFURbq6hKN/keUK8aNThOCC0p1tGX8QSbugfi08c=;
-        b=BVYz8C6wkbSlUQNQ2+zdjenuhNmb1BTYhwxVeNhpe/h309+QLJEs4e4JYait/SO4WC
-         RummPctw7YA1fquylj8rkBEZfr1fcbN8aFrhTW7xyMhQLT4e3E+NlrYaH1J1KAKox392
-         vngsM4O1sQtVzMidCu/jOq1xYLDVHRhgHsyG6+cNkV1mzllsDa396oS1EZ+WjyYTuCXM
-         4GRYlWu2HshIwGfJsanQoJ9uq74/lQ+G7X6W4gpkOjCqBTU5yWJmsIqjxsW2tuDkMwL+
-         PMY5C27+ZP8bbmgmYJxn/6O3YSyB3QbM5xGjeppTFz6gS0ff44AfxN96xRxX7St+ew0E
-         cohw==
-X-Gm-Message-State: AOJu0YyHEgvFg3gta6TrTpaFmRBSI39ix/szHgBstoYRKtzokD3Raj7c
-	ydKnVvJctpdq2glkevO4QXuaMphCLIiQ9I7B06q6/A==
-X-Google-Smtp-Source: AGHT+IGB/oNM3pi5zkTnn2b4TwS9JWsLEAZuZZRjBNgCJybg0ElnesfwqQR+J/SYxkhhj1Qw2OUXTWz61L1kgNY09Ss=
-X-Received: by 2002:a05:6402:1cae:b0:54b:81ba:93b2 with SMTP id
- cz14-20020a0564021cae00b0054b81ba93b2mr165225edb.2.1701353150080; Thu, 30 Nov
- 2023 06:05:50 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606593C694;
+	Thu, 30 Nov 2023 14:06:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4BBCC433C8;
+	Thu, 30 Nov 2023 14:05:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701353161;
+	bh=Uxb8lq8gQHpjrno1KoUwg1Mus2BJGIAIKr4LDCZRUNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fXFH6GC4ec+qG45QCOxHIa7R+/kEhagCw+QYo9IaZmHN4naDQl9a+72pdSrS9y61w
+	 dPPw+2YkiAVNC5XfuOtK8joEFE7mCCmo4a3sqfprj6+tjY4Epemz2n6nEeuVJ3HbEB
+	 WY1TzV+YzZUJZzZC/Pl868iTHzZp0F0zWFUFh17nlw8PvAM9vWfHFpCH/RPKo8Mdsu
+	 ND/sMLJXGzwbHwE82YKWjsjkGkWeK2VSnWqvt1RPU50ojF8fof4vZO00nZMxz1JplS
+	 sYHtUB/AAbkfbgrpBldubTOhddobm4aSsjgKGr9eNkIbhFosXiS1mxFxKi9FFx2PM1
+	 R1khGriFf0JRQ==
+Date: Thu, 30 Nov 2023 15:05:56 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, paul@paul-moore.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keescook@chromium.org,
+	kernel-team@meta.com, sargun@sargun.me
+Subject: Re: [PATCH v11 bpf-next 03/17] bpf: introduce BPF token object
+Message-ID: <20231130-schaukeln-knurren-7fddaf4c0494@brauner>
+References: <20231127190409.2344550-1-andrii@kernel.org>
+ <20231127190409.2344550-4-andrii@kernel.org>
+ <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6564bbd5580de_8a1ac29481@willemb.c.googlers.com.notmuch>
- <20231129.105046.2126277148145584341.syoshida@redhat.com> <CANn89iLxEZAjomWEW4GFJds6kyd6Zf+ed9kx6eVsaQ57De6gMw@mail.gmail.com>
- <20231130.230329.2023533070545022513.syoshida@redhat.com>
-In-Reply-To: <20231130.230329.2023533070545022513.syoshida@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 Nov 2023 15:05:38 +0100
-Message-ID: <CANn89i+u6tFJQKESV9DH-HypezVV7Ux+XhnyFGLd833PR9Qpyw@mail.gmail.com>
-Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in ipgre_xmit()
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
 
-On Thu, Nov 30, 2023 at 3:03=E2=80=AFPM Shigeru Yoshida <syoshida@redhat.co=
-m> wrote:
->
-> On Wed, 29 Nov 2023 10:56:47 +0100, Eric Dumazet wrote:
-> > On Wed, Nov 29, 2023 at 2:51=E2=80=AFAM Shigeru Yoshida <syoshida@redha=
-t.com> wrote:
-> >>
-> >> On Mon, 27 Nov 2023 10:55:01 -0500, Willem de Bruijn wrote:
-> >> > Shigeru Yoshida wrote:
-> >> >> In ipgre_xmit(), skb_pull() may fail even if pskb_inet_may_pull() r=
-eturns
-> >> >> true. For example, applications can create a malformed packet that =
-causes
-> >> >> this problem with PF_PACKET.
-> >> >
-> >> > It may fail because because pskb_inet_may_pull does not account for
-> >> > tunnel->hlen.
-> >> >
-> >> > Is that what you are referring to with malformed packet? Can you
-> >> > eloborate a bit on in which way the packet has to be malformed to
-> >> > reach this?
-> >>
-> >> Thank you very much for your prompt feedback.
-> >>
-> >> Actually, I found this problem by running syzkaller. Syzkaller
-> >> reported the following uninit-value issue (I think the root cause of
-> >> this issue is the same as the one Eric mentioned):
+On Tue, Nov 28, 2023 at 04:05:36PM -0800, Andrii Nakryiko wrote:
+> On Mon, Nov 27, 2023 at 11:06 AM Andrii Nakryiko <andrii@kernel.org> wrote:
 > >
-> > Yes, I also have a similar syzbot report (but no repro yet) I am
-> > releasing it right now.
+> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > allow delegating privileged BPF functionality, like loading a BPF
+> > program or creating a BPF map, from privileged process to a *trusted*
+> > unprivileged process, all while having a good amount of control over which
+> > privileged operations could be performed using provided BPF token.
 > >
-> >>
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> >> BUG: KMSAN: uninit-value in __gre_xmit net/ipv4/ip_gre.c:469 [inline]
-> >> BUG: KMSAN: uninit-value in ipgre_xmit+0xdf4/0xe70 net/ipv4/ip_gre.c:6=
-62
-> >>  __gre_xmit net/ipv4/ip_gre.c:469 [inline]
-> >>
+> > This is achieved through mounting BPF FS instance with extra delegation
+> > mount options, which determine what operations are delegatable, and also
+> > constraining it to the owning user namespace (as mentioned in the
+> > previous patch).
 > >
+> > BPF token itself is just a derivative from BPF FS and can be created
+> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BPF
+> > FS FD, which can be attained through open() API by opening BPF FS mount
+> > point. Currently, BPF token "inherits" delegated command, map types,
+> > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > having an BPF token as a separate object with its own FD, we can allow
+> > to further restrict BPF token's allowable set of things either at the
+> > creation time or after the fact, allowing the process to guard itself
+> > further from unintentionally trying to load undesired kind of BPF
+> > programs. But for now we keep things simple and just copy bit sets as is.
 > >
+> > When BPF token is created from BPF FS mount, we take reference to the
+> > BPF super block's owning user namespace, and then use that namespace for
+> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > capabilities that are normally only checked against init userns (using
+> > capable()), but now we check them using ns_capable() instead (if BPF
+> > token is provided). See bpf_token_capable() for details.
 > >
-> >> The simplified version of the repro is shown below:
-> >>
-> >> #include <linux/if_ether.h>
-> >> #include <sys/ioctl.h>
-> >> #include <netinet/ether.h>
-> >> #include <net/if.h>
-> >> #include <sys/socket.h>
-> >> #include <netinet/in.h>
-> >> #include <string.h>
-> >> #include <unistd.h>
-> >> #include <stdio.h>
-> >> #include <stdlib.h>
-> >> #include <linux/if_packet.h>
-> >>
-> >> int main(void)
-> >> {
-> >>         int s, s1, s2, data =3D 0;
-> >>         struct ifreq ifr;
-> >>         struct sockaddr_ll addr =3D { 0 };
-> >>         unsigned char mac_addr[] =3D {0x1, 0x2, 0x3, 0x4, 0x5, 0x6};
-> >>
-> >>         s =3D socket(AF_PACKET, SOCK_DGRAM, 0x300);
-> >>         s1 =3D socket(AF_PACKET, SOCK_RAW, 0x300);
-> >>         s2 =3D socket(AF_NETLINK, SOCK_RAW, 0);
-> >>
-> >>         strcpy(ifr.ifr_name, "gre0");
-> >>         ioctl(s2, SIOCGIFINDEX, &ifr);
-> >>
-> >>         addr.sll_family =3D AF_PACKET;
-> >>         addr.sll_ifindex =3D ifr.ifr_ifindex;
-> >>         addr.sll_protocol =3D htons(0);
-> >>         addr.sll_hatype =3D ARPHRD_ETHER;
-> >>         addr.sll_pkttype =3D PACKET_HOST;
-> >>         addr.sll_halen =3D ETH_ALEN;
-> >>         memcpy(addr.sll_addr, mac_addr, ETH_ALEN);
-> >>
-> >>         sendto(s1, &data, 1, 0, (struct sockaddr *)&addr, sizeof(addr)=
-);
-> >>
-> >>         return 0;
-> >> }
-> >>
-> >> The repro sends a 1-byte packet that doesn't have the correct IP
-> >> header. I meant this as "malformed pachet", but that might be a bit
-> >> confusing, sorry.
-> >>
-> >> I think the cause of the uninit-value access is that ipgre_xmit()
-> >> reallocates the skb with skb_cow_head() and copies only the 1-byte
-> >> data, so any IP header access through `tnl_params` can cause the
-> >> problem.
-> >>
-> >> At first I tried to modify pskb_inet_may_pull() to detect this type of
-> >> packet, but I ended up doing this patch.
+> > Such setup means that BPF token in itself is not sufficient to grant BPF
+> > functionality. User namespaced process has to *also* have necessary
+> > combination of capabilities inside that user namespace. So while
+> > previously CAP_BPF was useless when granted within user namespace, now
+> > it gains a meaning and allows container managers and sys admins to have
+> > a flexible control over which processes can and need to use BPF
+> > functionality within the user namespace (i.e., container in practice).
+> > And BPF FS delegation mount options and derived BPF tokens serve as
+> > a per-container "flag" to grant overall ability to use bpf() (plus further
+> > restrict on which parts of bpf() syscalls are treated as namespaced).
 > >
-> > Even after your patch, __skb_pull() could call BUG() and crash.
+> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
+> > within the BPF FS owning user namespace, rounding up the ns_capable()
+> > story of BPF token.
 > >
-> > I would suggest using this fix instead.
->
-> Thank you for your comment.
->
-> Your patch ensures that skb_pull() can pull the required size, so it
-> looks good to me. Also, I have tested your suggested patch with the
-> repro and confirmed that it fixes the issue.
->
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+> >  include/linux/bpf.h            |  41 +++++++
+> >  include/uapi/linux/bpf.h       |  37 ++++++
+> >  kernel/bpf/Makefile            |   2 +-
+> >  kernel/bpf/inode.c             |  17 ++-
+> >  kernel/bpf/syscall.c           |  17 +++
+> >  kernel/bpf/token.c             | 209 +++++++++++++++++++++++++++++++++
+> >  tools/include/uapi/linux/bpf.h |  37 ++++++
+> >  7 files changed, 350 insertions(+), 10 deletions(-)
+> >  create mode 100644 kernel/bpf/token.c
+> >
+> 
+> [...]
+> 
+> > +int bpf_token_create(union bpf_attr *attr)
+> > +{
+> > +       struct bpf_mount_opts *mnt_opts;
+> > +       struct bpf_token *token = NULL;
+> > +       struct user_namespace *userns;
+> > +       struct inode *inode;
+> > +       struct file *file;
+> > +       struct path path;
+> > +       struct fd f;
+> > +       umode_t mode;
+> > +       int err, fd;
+> > +
+> > +       f = fdget(attr->token_create.bpffs_fd);
+> > +       if (!f.file)
+> > +               return -EBADF;
+> > +
+> > +       path = f.file->f_path;
+> > +       path_get(&path);
+> > +       fdput(f);
+> > +
+> > +       if (path.dentry != path.mnt->mnt_sb->s_root) {
+> > +               err = -EINVAL;
+> > +               goto out_path;
+> > +       }
+> > +       if (path.mnt->mnt_sb->s_op != &bpf_super_ops) {
+> > +               err = -EINVAL;
+> > +               goto out_path;
+> > +       }
+> > +       err = path_permission(&path, MAY_ACCESS);
+> > +       if (err)
+> > +               goto out_path;
+> > +
+> > +       userns = path.dentry->d_sb->s_user_ns;
+> > +       /*
+> > +        * Enforce that creators of BPF tokens are in the same user
+> > +        * namespace as the BPF FS instance. This makes reasoning about
+> > +        * permissions a lot easier and we can always relax this later.
+> > +        */
+> > +       if (current_user_ns() != userns) {
+> > +               err = -EPERM;
+> > +               goto out_path;
+> > +       }
 
-This is great, please cook/send a V2 with this updated patch.
+I should note that the reason I'm saying it makes reasoning about
+permissions easier is that this here guarantees that:
 
-I will add a 'Reviewed-by: Eric Dumazet <edumazet@google.com>' then.
+file->f_cred->user_ns == file->f_path.dentry->d_sb->s_user_ns
 
-Thanks.
+So cases where you would need to check that you have permissions in the
+openers userns are equivalent to checking permissions in the token's and
+therefore bpffs' userns.
+
+> 
+> Hey Christian,
+> 
+> I've added stricter userns check as discussed on previous revision,
+> and a few lines above fixed BPF FS root check (path.dentry !=
+> path.mnt->mnt_sb->s_root). Hopefully that addresses the remaining
+> concerns you've had.
+> 
+> I'd appreciate it if you could take another look to double check if
+> I'm not messing anything up, and if it all looks good, can I please
+> get an ack from you? Thank you!
+
+I'll take a look.
 
