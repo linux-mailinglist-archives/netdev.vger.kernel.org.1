@@ -1,57 +1,56 @@
-Return-Path: <netdev+bounces-52322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFD97FE498
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6566F7FE499
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8FD8B20EBD
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2ED7282410
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E5F180;
-	Thu, 30 Nov 2023 00:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDA9180;
+	Thu, 30 Nov 2023 00:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QcLN8jEe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f0CTuJPA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64055F4
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:11:01 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7861BF4
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:11:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701303062; x=1732839062;
+  t=1701303067; x=1732839067;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ljmRhK43fmZT+sHmqmI/yD215b49akCuYB3340EEqkg=;
-  b=QcLN8jEeLthnT4Dm96hfu+bQ5BIvth/Ga66ot1MnNoljIBV3moCW2J8J
-   5l9Tym+dpWnTe40/rAxLsGCt/2pM/5Oq+XepzZBZJdg2ouegBs44+WgL7
-   g8iYp6tAHMpOoUjgwPkzN8+dwldesDLAi0+u8gWbl7TXMCw/BPzkAqQyc
-   3FJJ65ZcOMK7zPIKsuM1XrQsEmnXxCuOwSfEvcES0LgEMNAYbaLbCLp9G
-   Ajtu8chmGCeUeUHTGnJLUXmP5VkPjN1Q3Xa6e/At9GXgb7shmv4P0T+8y
-   /DA8sJeI+yzeD4AnJ4XfrgU0WUT93pKqpy6jCO/cAdWg4ev0tJDzSA/qi
+  bh=lgxEZ3d+2hbS28CKoWQf+cPvMiDKdJEcNrEnkYKQ0HY=;
+  b=f0CTuJPAA8n3Hrdi17dK5x+sIZEeM65shJBM6pDLgr/QUkGpCvjXE4sN
+   ojzH2E2dLAf61I/psepNe+YKO8BSQEmLS/xujJB/ADOSDV6SmVkZ6dEBQ
+   pSt/DnZKfVNV6wzAGpagglMLBIYbth+4uC6Laa2OQWn//JBkSDRtFoGh9
+   DjYPOdjjSKKIUCM5kqZTdDn9srMayEe9QDq9Ku1nksR51AEPSVy0Zg9yL
+   zjSei06WLG+oHA5Dd5RqCfuyOUzlKJP78xTp+lyr9OwUfLhXLq4WDxBdA
+   /Vc5rIv7usFlS7a/MIywfkoNTnTnWGdhKac4UFoEqIkrHUSZAJ8SRpJ1q
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="6516690"
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="6516711"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="6516690"
+   d="scan'208";a="6516711"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 16:11:01 -0800
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 16:11:07 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="860004458"
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="860004506"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="860004458"
+   d="scan'208";a="860004506"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by FMSMGA003.fm.intel.com with ESMTP; 29 Nov 2023 16:10:59 -0800
-Subject: [net-next PATCH v10 01/11] netdev-genl: spec: Extend netdev netlink
- spec in YAML for queue
+  by FMSMGA003.fm.intel.com with ESMTP; 29 Nov 2023 16:11:05 -0800
+Subject: [net-next PATCH v10 02/11] net: Add queue and napi association
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
 Cc: edumazet@google.com, ast@kernel.org, sdf@google.com, lorenzo@kernel.org,
  tariqt@nvidia.com, daniel@iogearbox.net, anthony.l.nguyen@intel.com,
  lucien.xin@gmail.com, michael.chan@broadcom.com, sridhar.samudrala@intel.com,
  amritha.nambiar@intel.com
-Date: Wed, 29 Nov 2023 16:27:28 -0800
-Message-ID: <170130404828.5198.9881119528634736897.stgit@anambiarhost.jf.intel.com>
+Date: Wed, 29 Nov 2023 16:27:33 -0800
+Message-ID: <170130405381.5198.9101458398130202413.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <170130378595.5198.158092030504280163.stgit@anambiarhost.jf.intel.com>
 References: <170130378595.5198.158092030504280163.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -64,562 +63,105 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-Add support in netlink spec(netdev.yaml) for queue information.
-Add code generated from the spec.
-
-Note: The "queue-type" attribute takes values 0 and 1 for rx
-and tx queue type respectively.
+Add the napi pointer in netdev queue for tracking the napi
+instance for each queue. This achieves the queue<->napi mapping.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
- Documentation/netlink/specs/netdev.yaml |   52 +++++++++++
- include/uapi/linux/netdev.h             |   16 +++
- net/core/netdev-genl-gen.c              |   26 +++++
- net/core/netdev-genl-gen.h              |    3 +
- net/core/netdev-genl.c                  |   10 ++
- tools/include/uapi/linux/netdev.h       |   16 +++
- tools/net/ynl/generated/netdev-user.c   |  153 +++++++++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h   |   99 ++++++++++++++++++++
- 8 files changed, 375 insertions(+)
+ include/linux/netdevice.h     |    8 ++++++++
+ include/net/netdev_rx_queue.h |    4 ++++
+ net/core/dev.c                |   37 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 20f75b7d3240..ec1da5681683 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -55,6 +55,10 @@ definitions:
-         name: hash
-         doc:
-           Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
-+  -
-+    name: queue-type
-+    type: enum
-+    entries: [ rx, tx ]
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 998c7aaa98b8..821b81730c0e 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -665,6 +665,10 @@ struct netdev_queue {
+ #ifdef CONFIG_XDP_SOCKETS
+ 	struct xsk_buff_pool    *pool;
+ #endif
++	/* NAPI instance for the queue
++	 * Readers and writers must hold RTNL
++	 */
++	struct napi_struct      *napi;
+ /*
+  * write-mostly part
+  */
+@@ -2655,6 +2659,10 @@ static inline void *netdev_priv(const struct net_device *dev)
+  */
+ #define SET_NETDEV_DEVTYPE(net, devtype)	((net)->dev.type = (devtype))
  
- attribute-sets:
-   -
-@@ -193,6 +197,31 @@ attribute-sets:
-         name: recycle-released-refcnt
-         type: uint
- 
-+  -
-+    name: queue
-+    attributes:
-+      -
-+        name: id
-+        doc: Queue index; most queue types are indexed like a C array, with
-+             indexes starting at 0 and ending at queue count - 1. Queue indexes
-+             are scoped to an interface and queue type.
-+        type: u32
-+      -
-+        name: ifindex
-+        doc: ifindex of the netdevice to which the queue belongs.
-+        type: u32
-+        checks:
-+          min: 1
-+      -
-+        name: type
-+        doc: Queue type as rx, tx. Each queue type defines a separate ID space.
-+        type: u32
-+        enum: queue-type
-+      -
-+        name: napi-id
-+        doc: ID of the NAPI instance which services this queue.
-+        type: u32
++void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
++			  enum netdev_queue_type type,
++			  struct napi_struct *napi);
 +
- operations:
-   list:
-     -
-@@ -290,6 +319,29 @@ operations:
-       dump:
-         reply: *pp-stats-reply
-       config-cond: page-pool-stats
-+    -
-+      name: queue-get
-+      doc: Get queue information from the kernel.
-+           Only configured queues will be reported (as opposed to all available
-+           hardware queues).
-+      attribute-set: queue
-+      do:
-+        request:
-+          attributes:
-+            - ifindex
-+            - type
-+            - id
-+        reply: &queue-get-op
-+          attributes:
-+            - id
-+            - type
-+            - napi-id
-+            - ifindex
-+      dump:
-+        request:
-+          attributes:
-+            - ifindex
-+        reply: *queue-get-op
+ /* Default NAPI poll() weight
+  * Device drivers are strongly advised to not use bigger value
+  */
+diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+index cdcafb30d437..aa1716fb0e53 100644
+--- a/include/net/netdev_rx_queue.h
++++ b/include/net/netdev_rx_queue.h
+@@ -21,6 +21,10 @@ struct netdev_rx_queue {
+ #ifdef CONFIG_XDP_SOCKETS
+ 	struct xsk_buff_pool            *pool;
+ #endif
++	/* NAPI instance for the queue
++	 * Readers and writers must hold RTNL
++	 */
++	struct napi_struct		*napi;
+ } ____cacheline_aligned_in_smp;
  
- mcast-groups:
-   list:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 2b37233e00c0..126af54005ba 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -53,6 +53,11 @@ enum netdev_xdp_rx_metadata {
- 	NETDEV_XDP_RX_METADATA_MASK = 3,
- };
- 
-+enum netdev_queue_type {
-+	NETDEV_QUEUE_TYPE_RX,
-+	NETDEV_QUEUE_TYPE_TX,
-+};
-+
- enum {
- 	NETDEV_A_DEV_IFINDEX = 1,
- 	NETDEV_A_DEV_PAD,
-@@ -94,6 +99,16 @@ enum {
- 	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
- };
- 
-+enum {
-+	NETDEV_A_QUEUE_ID = 1,
-+	NETDEV_A_QUEUE_IFINDEX,
-+	NETDEV_A_QUEUE_TYPE,
-+	NETDEV_A_QUEUE_NAPI_ID,
-+
-+	__NETDEV_A_QUEUE_MAX,
-+	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-+};
-+
- enum {
- 	NETDEV_CMD_DEV_GET = 1,
- 	NETDEV_CMD_DEV_ADD_NTF,
-@@ -104,6 +119,7 @@ enum {
- 	NETDEV_CMD_PAGE_POOL_DEL_NTF,
- 	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
- 	NETDEV_CMD_PAGE_POOL_STATS_GET,
-+	NETDEV_CMD_QUEUE_GET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index dccd8c3a141e..b1dcf88c82cf 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -46,6 +46,18 @@ static const struct nla_policy netdev_page_pool_stats_get_nl_policy[NETDEV_A_PAG
- };
- #endif /* CONFIG_PAGE_POOL_STATS */
- 
-+/* NETDEV_CMD_QUEUE_GET - do */
-+static const struct nla_policy netdev_queue_get_do_nl_policy[NETDEV_A_QUEUE_TYPE + 1] = {
-+	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-+	[NETDEV_A_QUEUE_TYPE] = NLA_POLICY_MAX(NLA_U32, 1),
-+	[NETDEV_A_QUEUE_ID] = { .type = NLA_U32, },
-+};
-+
-+/* NETDEV_CMD_QUEUE_GET - dump */
-+static const struct nla_policy netdev_queue_get_dump_nl_policy[NETDEV_A_QUEUE_IFINDEX + 1] = {
-+	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-+};
-+
- /* Ops table for netdev */
- static const struct genl_split_ops netdev_nl_ops[] = {
- 	{
-@@ -88,6 +100,20 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.flags	= GENL_CMD_CAP_DUMP,
- 	},
- #endif /* CONFIG_PAGE_POOL_STATS */
-+	{
-+		.cmd		= NETDEV_CMD_QUEUE_GET,
-+		.doit		= netdev_nl_queue_get_doit,
-+		.policy		= netdev_queue_get_do_nl_policy,
-+		.maxattr	= NETDEV_A_QUEUE_TYPE,
-+		.flags		= GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd		= NETDEV_CMD_QUEUE_GET,
-+		.dumpit		= netdev_nl_queue_get_dumpit,
-+		.policy		= netdev_queue_get_dump_nl_policy,
-+		.maxattr	= NETDEV_A_QUEUE_IFINDEX,
-+		.flags		= GENL_CMD_CAP_DUMP,
-+	},
- };
- 
- static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index 649e4b46eccf..086623c1797a 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -23,6 +23,9 @@ int netdev_nl_page_pool_stats_get_doit(struct sk_buff *skb,
- 				       struct genl_info *info);
- int netdev_nl_page_pool_stats_get_dumpit(struct sk_buff *skb,
- 					 struct netlink_callback *cb);
-+int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info);
-+int netdev_nl_queue_get_dumpit(struct sk_buff *skb,
-+			       struct netlink_callback *cb);
- 
- enum {
- 	NETDEV_NLGRP_MGMT,
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index fe61f85bcf33..336c608e6a6b 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -129,6 +129,16 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	return skb->len;
+ /*
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 3950ced396b5..0a2eecbeef38 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6400,6 +6400,43 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
  }
+ EXPORT_SYMBOL(dev_set_threaded);
  
-+int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static int netdev_genl_netdevice_event(struct notifier_block *nb,
- 				       unsigned long event, void *ptr)
- {
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 2b37233e00c0..126af54005ba 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -53,6 +53,11 @@ enum netdev_xdp_rx_metadata {
- 	NETDEV_XDP_RX_METADATA_MASK = 3,
- };
- 
-+enum netdev_queue_type {
-+	NETDEV_QUEUE_TYPE_RX,
-+	NETDEV_QUEUE_TYPE_TX,
-+};
-+
- enum {
- 	NETDEV_A_DEV_IFINDEX = 1,
- 	NETDEV_A_DEV_PAD,
-@@ -94,6 +99,16 @@ enum {
- 	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
- };
- 
-+enum {
-+	NETDEV_A_QUEUE_ID = 1,
-+	NETDEV_A_QUEUE_IFINDEX,
-+	NETDEV_A_QUEUE_TYPE,
-+	NETDEV_A_QUEUE_NAPI_ID,
-+
-+	__NETDEV_A_QUEUE_MAX,
-+	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-+};
-+
- enum {
- 	NETDEV_CMD_DEV_GET = 1,
- 	NETDEV_CMD_DEV_ADD_NTF,
-@@ -104,6 +119,7 @@ enum {
- 	NETDEV_CMD_PAGE_POOL_DEL_NTF,
- 	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
- 	NETDEV_CMD_PAGE_POOL_STATS_GET,
-+	NETDEV_CMD_QUEUE_GET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index a7b7019d00f1..0eb366c3f0c4 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -23,6 +23,7 @@ static const char * const netdev_op_strmap[] = {
- 	[NETDEV_CMD_PAGE_POOL_DEL_NTF] = "page-pool-del-ntf",
- 	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] = "page-pool-change-ntf",
- 	[NETDEV_CMD_PAGE_POOL_STATS_GET] = "page-pool-stats-get",
-+	[NETDEV_CMD_QUEUE_GET] = "queue-get",
- };
- 
- const char *netdev_op_str(int op)
-@@ -63,6 +64,18 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
- 	return netdev_xdp_rx_metadata_strmap[value];
- }
- 
-+static const char * const netdev_queue_type_strmap[] = {
-+	[0] = "rx",
-+	[1] = "tx",
-+};
-+
-+const char *netdev_queue_type_str(enum netdev_queue_type value)
-+{
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(netdev_queue_type_strmap))
-+		return NULL;
-+	return netdev_queue_type_strmap[value];
-+}
-+
- /* Policies */
- struct ynl_policy_attr netdev_page_pool_info_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
- 	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
-@@ -121,6 +134,18 @@ struct ynl_policy_nest netdev_page_pool_stats_nest = {
- 	.table = netdev_page_pool_stats_policy,
- };
- 
-+struct ynl_policy_attr netdev_queue_policy[NETDEV_A_QUEUE_MAX + 1] = {
-+	[NETDEV_A_QUEUE_ID] = { .name = "id", .type = YNL_PT_U32, },
-+	[NETDEV_A_QUEUE_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+	[NETDEV_A_QUEUE_TYPE] = { .name = "type", .type = YNL_PT_U32, },
-+	[NETDEV_A_QUEUE_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest netdev_queue_nest = {
-+	.max_attr = NETDEV_A_QUEUE_MAX,
-+	.table = netdev_queue_policy,
-+};
-+
- /* Common nested types */
- void netdev_page_pool_info_free(struct netdev_page_pool_info *obj)
- {
-@@ -598,6 +623,134 @@ netdev_page_pool_stats_get_dump(struct ynl_sock *ys)
- 	return NULL;
- }
- 
-+/* ============== NETDEV_CMD_QUEUE_GET ============== */
-+/* NETDEV_CMD_QUEUE_GET - do */
-+void netdev_queue_get_req_free(struct netdev_queue_get_req *req)
-+{
-+	free(req);
-+}
-+
-+void netdev_queue_get_rsp_free(struct netdev_queue_get_rsp *rsp)
-+{
-+	free(rsp);
-+}
-+
-+int netdev_queue_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
-+{
-+	struct ynl_parse_arg *yarg = data;
-+	struct netdev_queue_get_rsp *dst;
-+	const struct nlattr *attr;
-+
-+	dst = yarg->data;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_QUEUE_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.id = 1;
-+			dst->id = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_QUEUE_TYPE) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.type = 1;
-+			dst->type = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_QUEUE_NAPI_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.napi_id = 1;
-+			dst->napi_id = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_QUEUE_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+struct netdev_queue_get_rsp *
-+netdev_queue_get(struct ynl_sock *ys, struct netdev_queue_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_queue_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_QUEUE_GET, 1);
-+	ys->req_policy = &netdev_queue_nest;
-+	yrs.yarg.rsp_policy = &netdev_queue_nest;
-+
-+	if (req->_present.ifindex)
-+		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_IFINDEX, req->ifindex);
-+	if (req->_present.type)
-+		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_TYPE, req->type);
-+	if (req->_present.id)
-+		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_ID, req->id);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_queue_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_QUEUE_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_queue_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_QUEUE_GET - dump */
-+void netdev_queue_get_list_free(struct netdev_queue_get_list *rsp)
-+{
-+	struct netdev_queue_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_queue_get_list *
-+netdev_queue_get_dump(struct ynl_sock *ys,
-+		      struct netdev_queue_get_req_dump *req)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_queue_get_list);
-+	yds.cb = netdev_queue_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_QUEUE_GET;
-+	yds.rsp_policy = &netdev_queue_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_QUEUE_GET, 1);
-+	ys->req_policy = &netdev_queue_nest;
-+
-+	if (req->_present.ifindex)
-+		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_IFINDEX, req->ifindex);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_queue_get_list_free(yds.first);
-+	return NULL;
-+}
-+
- static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 	[NETDEV_CMD_DEV_ADD_NTF] =  {
- 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index 4093602c9b6c..345808dd6377 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -19,6 +19,7 @@ extern const struct ynl_family ynl_netdev_family;
- const char *netdev_op_str(int op);
- const char *netdev_xdp_act_str(enum netdev_xdp_act value);
- const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
-+const char *netdev_queue_type_str(enum netdev_queue_type value);
- 
- /* Common nested types */
- struct netdev_page_pool_info {
-@@ -258,4 +259,102 @@ netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp
- struct netdev_page_pool_stats_get_list *
- netdev_page_pool_stats_get_dump(struct ynl_sock *ys);
- 
-+/* ============== NETDEV_CMD_QUEUE_GET ============== */
-+/* NETDEV_CMD_QUEUE_GET - do */
-+struct netdev_queue_get_req {
-+	struct {
-+		__u32 ifindex:1;
-+		__u32 type:1;
-+		__u32 id:1;
-+	} _present;
-+
-+	__u32 ifindex;
-+	enum netdev_queue_type type;
-+	__u32 id;
-+};
-+
-+static inline struct netdev_queue_get_req *netdev_queue_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_queue_get_req));
-+}
-+void netdev_queue_get_req_free(struct netdev_queue_get_req *req);
-+
-+static inline void
-+netdev_queue_get_req_set_ifindex(struct netdev_queue_get_req *req,
-+				 __u32 ifindex)
-+{
-+	req->_present.ifindex = 1;
-+	req->ifindex = ifindex;
-+}
-+static inline void
-+netdev_queue_get_req_set_type(struct netdev_queue_get_req *req,
-+			      enum netdev_queue_type type)
-+{
-+	req->_present.type = 1;
-+	req->type = type;
-+}
-+static inline void
-+netdev_queue_get_req_set_id(struct netdev_queue_get_req *req, __u32 id)
-+{
-+	req->_present.id = 1;
-+	req->id = id;
-+}
-+
-+struct netdev_queue_get_rsp {
-+	struct {
-+		__u32 id:1;
-+		__u32 type:1;
-+		__u32 napi_id:1;
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u32 id;
-+	enum netdev_queue_type type;
-+	__u32 napi_id;
-+	__u32 ifindex;
-+};
-+
-+void netdev_queue_get_rsp_free(struct netdev_queue_get_rsp *rsp);
-+
-+/*
-+ * Get queue information from the kernel. Only configured queues will be reported (as opposed to all available hardware queues).
++/**
++ * netif_queue_set_napi - Associate queue with the napi
++ * @dev: device to which NAPI and queue belong
++ * @queue_index: Index of queue
++ * @type: queue type as RX or TX
++ * @napi: NAPI context, pass NULL to clear previously set NAPI
++ *
++ * Set queue with its corresponding napi context. This should be done after
++ * registering the NAPI handler for the queue-vector and the queues have been
++ * mapped to the corresponding interrupt vector.
 + */
-+struct netdev_queue_get_rsp *
-+netdev_queue_get(struct ynl_sock *ys, struct netdev_queue_get_req *req);
-+
-+/* NETDEV_CMD_QUEUE_GET - dump */
-+struct netdev_queue_get_req_dump {
-+	struct {
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u32 ifindex;
-+};
-+
-+static inline struct netdev_queue_get_req_dump *
-+netdev_queue_get_req_dump_alloc(void)
++void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
++			  enum netdev_queue_type type, struct napi_struct *napi)
 +{
-+	return calloc(1, sizeof(struct netdev_queue_get_req_dump));
++	struct netdev_rx_queue *rxq;
++	struct netdev_queue *txq;
++
++	if (WARN_ON_ONCE(napi && !napi->dev))
++		return;
++	if (dev->reg_state >= NETREG_REGISTERED)
++		ASSERT_RTNL();
++
++	switch (type) {
++	case NETDEV_QUEUE_TYPE_RX:
++		rxq = __netif_get_rx_queue(dev, queue_index);
++		rxq->napi = napi;
++		return;
++	case NETDEV_QUEUE_TYPE_TX:
++		txq = netdev_get_tx_queue(dev, queue_index);
++		txq->napi = napi;
++		return;
++	default:
++		return;
++	}
 +}
-+void netdev_queue_get_req_dump_free(struct netdev_queue_get_req_dump *req);
++EXPORT_SYMBOL(netif_queue_set_napi);
 +
-+static inline void
-+netdev_queue_get_req_dump_set_ifindex(struct netdev_queue_get_req_dump *req,
-+				      __u32 ifindex)
-+{
-+	req->_present.ifindex = 1;
-+	req->ifindex = ifindex;
-+}
-+
-+struct netdev_queue_get_list {
-+	struct netdev_queue_get_list *next;
-+	struct netdev_queue_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void netdev_queue_get_list_free(struct netdev_queue_get_list *rsp);
-+
-+struct netdev_queue_get_list *
-+netdev_queue_get_dump(struct ynl_sock *ys,
-+		      struct netdev_queue_get_req_dump *req);
-+
- #endif /* _LINUX_NETDEV_GEN_H */
+ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+ 			   int (*poll)(struct napi_struct *, int), int weight)
+ {
 
 
