@@ -1,146 +1,154 @@
-Return-Path: <netdev+bounces-52546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D697FF197
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:18:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65DC37FF1A6
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3E0282270
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:18:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF9D8B20F2B
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B265F49F9C;
-	Thu, 30 Nov 2023 14:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C41D4F89E;
+	Thu, 30 Nov 2023 14:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rKH2GVzt"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="vcT1ikKm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862EF495EA;
-	Thu, 30 Nov 2023 14:18:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5879C433C7;
-	Thu, 30 Nov 2023 14:18:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701353919;
-	bh=KWh6WrvRBA/2y9C3DeEyxrAn6hfNwQA1TgM/LAr/cbk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rKH2GVztBJVr9VrPuidBNfh17LuITLFr0quPg6mvsC8ofPB4+mMGM4vHBUJ9ViEjt
-	 lHo9Wqx8mtKuDeoJj6EdWARnmohWzMl+MuP6cyIBqsIvOz+8uA2fra+Ybse0ENEbq4
-	 lL3uRUVXHPM/RsIn5KCMFyRhONgSJ0tmjMX0X8G3qGQmbKW990CnipJrJPatZcoTIP
-	 mme0Ut6q5B0GxCQhT/0jLItZV95iEjo4Bpg0qY9DJXy2yb9deIDk+bijdnrUyzFv93
-	 7mWLPSBe1C82QttfBNTeYVAoQenI1D/4Awu8m0WwGvk4t8F0cCAJUA3qUiRJALm4Yn
-	 loYtiDl6b9QfQ==
-Date: Thu, 30 Nov 2023 15:18:33 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v11 bpf-next 02/17] bpf: add BPF token delegation mount
- options to BPF FS
-Message-ID: <20231130-zivildienst-weckt-4888b2689eea@brauner>
-References: <20231127190409.2344550-1-andrii@kernel.org>
- <20231127190409.2344550-3-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD7838DE3
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 14:20:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 782D1C433C9;
+	Thu, 30 Nov 2023 14:20:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1701354049;
+	bh=JvX9vOIldncs1qZta3Pp662iEvBIIZCayC4dB/Tb45E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=vcT1ikKm9H2BhHQ0kaIk25AQlJGjuw/97fmICMhzZTR0jN3PGLbdMGmsdSGragO9H
+	 mHKDud1VIB7ihBFVG4uFbuYD2WRwtmVal0jdXj/oVdL2PQiWadleV1rK/7jaYWld4d
+	 RhaCDZm9DAYLdgs6F+86DJjzciMFy9Zx/GblynD4=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: netdev@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>,
+	stable <stable@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net] net/packet: move reference count in packet_sock to 64 bits
+Date: Thu, 30 Nov 2023 14:20:43 +0000
+Message-ID: <2023113042-unfazed-dioxide-f854@gregkh>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231127190409.2344550-3-andrii@kernel.org>
+Lines: 99
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3353; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=JvX9vOIldncs1qZta3Pp662iEvBIIZCayC4dB/Tb45E=; b=owGbwMvMwCRo6H6F97bub03G02pJDKkZs6w6gxujn1tIpT2Zf+mfbsvi4uOMpnwvI2okL/Rve l7h/EGkI5aFQZCJQVZMkeXLNp6j+ysOKXoZ2p6GmcPKBDKEgYtTACaSncqwoHl7jO6vL/tY537O zlm/pdPanv2+I8OCpTrHinTjNb4ubsrc9ZDL2YPzz7ubAA==
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 27, 2023 at 11:03:54AM -0800, Andrii Nakryiko wrote:
-> Add few new mount options to BPF FS that allow to specify that a given
-> BPF FS instance allows creation of BPF token (added in the next patch),
-> and what sort of operations are allowed under BPF token. As such, we get
-> 4 new mount options, each is a bit mask
->   - `delegate_cmds` allow to specify which bpf() syscall commands are
->     allowed with BPF token derived from this BPF FS instance;
->   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
->     a set of allowable BPF map types that could be created with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
->     a set of allowable BPF program types that could be loaded with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
->     a set of allowable BPF program attach types that could be loaded with
->     BPF token; delegate_progs and delegate_attachs are meant to be used
->     together, as full BPF program type is, in general, determined
->     through both program type and program attach type.
-> 
-> Currently, these mount options accept the following forms of values:
->   - a special value "any", that enables all possible values of a given
->   bit set;
->   - numeric value (decimal or hexadecimal, determined by kernel
->   automatically) that specifies a bit mask value directly;
->   - all the values for a given mount option are combined, if specified
->   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
->   delegate_maps=0x1 -o delegate_maps=0x2` will result in a combined 0x3
->   mask.
-> 
-> Ideally, more convenient (for humans) symbolic form derived from
-> corresponding UAPI enums would be accepted (e.g., `-o
-> delegate_progs=kprobe|tracepoint`) and I intend to implement this, but
-> it requires a bunch of UAPI header churn, so I postponed it until this
-> feature lands upstream or at least there is a definite consensus that
-> this feature is acceptable and is going to make it, just to minimize
-> amount of wasted effort and not increase amount of non-essential code to
-> be reviewed.
-> 
-> Attentive reader will notice that BPF FS is now marked as
-> FS_USERNS_MOUNT, which theoretically makes it mountable inside non-init
-> user namespace as long as the process has sufficient *namespaced*
-> capabilities within that user namespace. But in reality we still
-> restrict BPF FS to be mountable only by processes with CAP_SYS_ADMIN *in
-> init userns* (extra check in bpf_fill_super()). FS_USERNS_MOUNT is added
-> to allow creating BPF FS context object (i.e., fsopen("bpf")) from
-> inside unprivileged process inside non-init userns, to capture that
-> userns as the owning userns. It will still be required to pass this
-> context object back to privileged process to instantiate and mount it.
-> 
-> This manipulation is important, because capturing non-init userns as the
-> owning userns of BPF FS instance (super block) allows to use that userns
-> to constraint BPF token to that userns later on (see next patch). So
-> creating BPF FS with delegation inside unprivileged userns will restrict
-> derived BPF token objects to only "work" inside that intended userns,
-> making it scoped to a intended "container". Also, setting these
-> delegation options requires capable(CAP_SYS_ADMIN), so unprivileged
-> process cannot set this up without involvement of a privileged process.
-> 
-> There is a set of selftests at the end of the patch set that simulates
-> this sequence of steps and validates that everything works as intended.
-> But careful review is requested to make sure there are no missed gaps in
-> the implementation and testing.
-> 
-> This somewhat subtle set of aspects is the result of previous
-> discussions ([0]) about various user namespace implications and
-> interactions with BPF token functionality and is necessary to contain
-> BPF token inside intended user namespace.
-> 
->   [0] https://lore.kernel.org/bpf/20230704-hochverdient-lehne-eeb9eeef785e@brauner/
-> 
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
+In some potential instances the reference count on struct packet_sock
+could be saturated and cause overflows which gets the kernel a bit
+confused.  To prevent this, move to a 64bit atomic reference count to
+prevent the possibility of this type of overflow.
 
-I still think this is a little weird because this isn't really
-unprivileged bpf and it isn't really safe bpf as well.
+Because we can not handle saturation, using refcount_t is not possible
+in this place.  Maybe someday in the future if it changes could it be
+used.
 
-All this does is allow an administrator to punch a big fat hole into an
-unprivileged container so workloads get to play with their favorite toy.
+Original version from Daniel after I did it wrong, I've provided a
+changelog.
 
-I think that having a way to have signed bpf programs in addition to
-this would be much more interesting to generic workloads that don't know
-who or what they can trust.
+Reported-by: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>
+Cc: stable <stable@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/packet/af_packet.c | 16 ++++++++--------
+ net/packet/internal.h  |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-And there's a few things to remember:
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index a84e00b5904b..9356b661c3d9 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -4300,7 +4300,7 @@ static void packet_mm_open(struct vm_area_struct *vma)
+ 	struct sock *sk = sock->sk;
+ 
+ 	if (sk)
+-		atomic_inc(&pkt_sk(sk)->mapped);
++		atomic64_inc(&pkt_sk(sk)->mapped);
+ }
+ 
+ static void packet_mm_close(struct vm_area_struct *vma)
+@@ -4310,7 +4310,7 @@ static void packet_mm_close(struct vm_area_struct *vma)
+ 	struct sock *sk = sock->sk;
+ 
+ 	if (sk)
+-		atomic_dec(&pkt_sk(sk)->mapped);
++		atomic64_dec(&pkt_sk(sk)->mapped);
+ }
+ 
+ static const struct vm_operations_struct packet_mmap_ops = {
+@@ -4405,7 +4405,7 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 
+ 	err = -EBUSY;
+ 	if (!closing) {
+-		if (atomic_read(&po->mapped))
++		if (atomic64_read(&po->mapped))
+ 			goto out;
+ 		if (packet_read_pending(rb))
+ 			goto out;
+@@ -4508,7 +4508,7 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 
+ 	err = -EBUSY;
+ 	mutex_lock(&po->pg_vec_lock);
+-	if (closing || atomic_read(&po->mapped) == 0) {
++	if (closing || atomic64_read(&po->mapped) == 0) {
+ 		err = 0;
+ 		spin_lock_bh(&rb_queue->lock);
+ 		swap(rb->pg_vec, pg_vec);
+@@ -4526,9 +4526,9 @@ static int packet_set_ring(struct sock *sk, union tpacket_req_u *req_u,
+ 		po->prot_hook.func = (po->rx_ring.pg_vec) ?
+ 						tpacket_rcv : packet_rcv;
+ 		skb_queue_purge(rb_queue);
+-		if (atomic_read(&po->mapped))
+-			pr_err("packet_mmap: vma is busy: %d\n",
+-			       atomic_read(&po->mapped));
++		if (atomic64_read(&po->mapped))
++			pr_err("packet_mmap: vma is busy: %lld\n",
++			       atomic64_read(&po->mapped));
+ 	}
+ 	mutex_unlock(&po->pg_vec_lock);
+ 
+@@ -4606,7 +4606,7 @@ static int packet_mmap(struct file *file, struct socket *sock,
+ 		}
+ 	}
+ 
+-	atomic_inc(&po->mapped);
++	atomic64_inc(&po->mapped);
+ 	vma->vm_ops = &packet_mmap_ops;
+ 	err = 0;
+ 
+diff --git a/net/packet/internal.h b/net/packet/internal.h
+index d29c94c45159..24acd0044a0d 100644
+--- a/net/packet/internal.h
++++ b/net/packet/internal.h
+@@ -122,7 +122,7 @@ struct packet_sock {
+ 	__be16			num;
+ 	struct packet_rollover	*rollover;
+ 	struct packet_mclist	*mclist;
+-	atomic_t		mapped;
++	atomic64_t		mapped;
+ 	enum tpacket_versions	tp_version;
+ 	unsigned int		tp_hdrlen;
+ 	unsigned int		tp_reserve;
+-- 
+2.43.0
 
-* This absolutely isn't a safety mechanism.
-* This absolutely isn't safe to enable generically in containers.
-* This is a workaround and not a solution to unprivileged bpf.
-
-And this is an ACK solely on the code of this patch, not the concept.
-Acked-by: Christian Brauner <brauner@kernel.org> (reluctantly)
 
