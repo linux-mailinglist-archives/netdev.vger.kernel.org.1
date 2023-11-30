@@ -1,111 +1,75 @@
-Return-Path: <netdev+bounces-52626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37F07FF824
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:25:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5DFE7FF829
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4E931C21157
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62955281706
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBE256769;
-	Thu, 30 Nov 2023 17:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850B556751;
+	Thu, 30 Nov 2023 17:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GSi2FBGL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tCGiikmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E884171C
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 09:25:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701365134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z3+asrSFrGo9UuOPMpB+FykgEmlyfPD8k1SOx9pGWoI=;
-	b=GSi2FBGLYZSsX0oCkllK5tz/nlQSr6bo95zN9DZw1mDXJa3Kvm5K7mTbH/IU3cmuLD7MmT
-	UgJrhx67DTwVgDsMfwodvWUEAf9+VaMTISjRfF0GTOWXxp4fcxxilg+BuvMQLFZf/q3u7N
-	+MOj9dg9cC3m85OWY86XqB6n+zIpYm0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-60-hZEARIXePO-JRq5KGeOjXA-1; Thu, 30 Nov 2023 12:25:29 -0500
-X-MC-Unique: hZEARIXePO-JRq5KGeOjXA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 31FE8101A53B;
-	Thu, 30 Nov 2023 17:25:29 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CD270492BFC;
-	Thu, 30 Nov 2023 17:25:26 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: stern@rowland.harvard.edu
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oneukum@suse.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH] net: usb: ax88179_178a: avoid failed operations when device is disconnected
-Date: Thu, 30 Nov 2023 18:25:21 +0100
-Message-ID: <20231130172525.193069-1-jtornosm@redhat.com>
-In-Reply-To: <e2faf901-84de-41ad-804d-6c86bc304ef1@rowland.harvard.edu>
-References: <e2faf901-84de-41ad-804d-6c86bc304ef1@rowland.harvard.edu>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3ECE133;
+	Thu, 30 Nov 2023 09:26:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8uE72B/ZbsCd2fU3mnrHk7yTs0g881UEt43C00CniGU=; b=tCGiikmXA1Toh2xAc4IbKCLf23
+	UU8yrlZ7y2ehr8c63qU+z3aBbCS+vKCCKn5pG23ZCFb6gk/utmM3MD64mtt9c+xZNnuI+jbn0d62g
+	i3cJVrgHAMFwgDhwJf6CGxi1i9/XjHsGsXyjIH50HhMJCNaxn0h4RKPWHaPDMyeVTFEk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r8knl-001giW-Mj; Thu, 30 Nov 2023 18:26:13 +0100
+Date: Thu, 30 Nov 2023 18:26:13 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tomer Maimon <tmaimon77@gmail.com>
+Cc: alexandre.torgue@foss.st.com, tali.perry1@gmail.com,
+	edumazet@google.com, krzysztof.kozlowski+dt@linaro.org,
+	linux-stm32@st-md-mailman.stormreply.com, benjaminfair@google.com,
+	openbmc@lists.ozlabs.org, joabreu@synopsys.com, joel@jms.id.au,
+	devicetree@vger.kernel.org, j.neuschaefer@gmx.net,
+	robh+dt@kernel.org, peppe.cavallaro@st.com,
+	linux-arm-kernel@lists.infradead.org, avifishman70@gmail.com,
+	venture@google.com, linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+	davem@davemloft.net
+Subject: Re: [PATCH v1 2/2] net: stmmac: Add NPCM support
+Message-ID: <25d0c091-3dce-4d62-a112-c82106809c65@lunn.ch>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+ <20231121151733.2015384-3-tmaimon77@gmail.com>
+ <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
+ <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
+ <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
+ <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
+ <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
+ <a551aefa-777d-4fd3-b1a5-086dc3e62646@lunn.ch>
+ <CAP6Zq1jVO5y3ySeGNE5-=XWV6Djay5MhGxXCZb9y91q=EA71Vg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAP6Zq1jVO5y3ySeGNE5-=XWV6Djay5MhGxXCZb9y91q=EA71Vg@mail.gmail.com>
 
-Hi Alan,
+> I will check with the xpcs maintainer how can we add indirect access
+> to the xpcs module.
 
-Thank you again for you comments.
+https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c#L449
 
-> What are these unnecessary operations?
-Sorry if I was not clear, I was referring to the reading and writing 
-operations that are commanded within stop and unbind driver functions.
-This operations are necessary if we unbind to get the device stopped in
-a known state but if the device is detached, they are failing and imho
-they are not necessary. That is the reason why I was trying to detect 
-when the device is really disconnected, to allow sending commands only
-if the device was still connected. 
+It creates a regmap for the memory range. On top of that it creates an
+MDIO bus. You can then access the PCS in the normal way.
 
-> In general, drivers should treat "unbind" the same as "disconnect" (in
-> both cases, the ->disconnect() routine is called).  If a driver tries to
-> send commands to the device while the disconnect routine is running, it
-> should expect that they might fail and not generate an error message if
-> they do.
->
-> (Also, note that the USB core will allow a driver to send commands to
-> the device during unbind only if the .soft_unbind flag is set in the
-> usb_driver structure.)
->
-> And in any case, a driver should _never_ try to communicate with the
-> device after the disconnect routine has returned.
-Ok, understood, very helpful clarification.
-In any case, I was referring to the internal operations during stop and
-unbind. And if any failed operations are commanded before and after
-disconnection (if any), try to detect with the warning to be sure if there
-is any problem.
-
-I have checked that other drivers are using USB_STATE_NOTATTACHED to check
-and confirm the device disconnection. And I am trying to analyze other 
-drivers to check if this can be done in another way. 
-If I use -ENODEV as Oliver suggested, I think I wouldn't know if the device
-is disconnected previous to any operation. But maybe this is the way.
-
-Best regards
-José Ignacio
-
+	Andrew
 
