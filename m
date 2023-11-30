@@ -1,193 +1,130 @@
-Return-Path: <netdev+bounces-52529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A3A7FF0F5
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 789CC7FF0F8
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C06D1C20ACB
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E861C20D37
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0F248780;
-	Thu, 30 Nov 2023 13:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BE548787;
+	Thu, 30 Nov 2023 13:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E4JJ7mmI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6jpkfrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FF11B3;
-	Thu, 30 Nov 2023 05:55:10 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ja51zvteE+gjGgjpYKiO++1sGSwH0UK1OfiEZIbAse4Xx39kdLNdnUcFuMvo0fqhtQgZLw7/lC8Lfnqq+k5a+xUi2X9EOAJ3OPFI32hdR/odAPXeTD4jwjk68f3vMV5tKCd43d3mgGAOyhGCmhdOSyLMe88VWoT9YVaVHqkKC6UI7qJ6oEJVcNX1alZFTGIOY71WODk1DTCiwqLMwmpFQ4IzEoS1yFal8o+T5k91h3FUwCXJwrujFkqDsI9BN9bS5AKXPkBx+pT2g0THq4wRfhRd6lFsode43PnWDiI2+Nsx2zOj+Nl91nSm5TOexrOt3sX689sGAVTjZ6NQojIBeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qtek7g6kM7XsinjCODCas4KVSO4wVTPxu3a7sy+P0c8=;
- b=MfTrUhM4OF7Zn7oFftr6p0hI4ZJ2DJnoDKl3KEvdXiu/bYfivgOKpsAtoEqLyWheppJWX88D/DQnXXeEAiwjoECo3/lvOIZCKJvr3CWeAIShUpn8moYLnunozzXRMt+gZxSB4wI3ztBkhUg6q4aNTD24wDyrGKLGOksR60SCJGPHYz+oZdNoMsivhp8NpxUHveriNKOWxNzdvFRpCVS/QNZ/Sk5/+0MYgCeMo1zCwOsXAHFiKe75ExZ/aGHWUmvVstBofgSbTlRnmEWFqGdKR0yOZNOjKrqWSyBa89C8+v/Qf7tYmdZ0h3ljbG7s1i5Q7WpZ6HLgRxHF79EteOMAIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qtek7g6kM7XsinjCODCas4KVSO4wVTPxu3a7sy+P0c8=;
- b=E4JJ7mmIvTWXTJc9lOI5OvotMNs8KxIlYA4Eq5aVo1kmdyLnj6hH6VNMPUGGuYM+JRwMK1IUa3JxCCOOq/1VcMtAnXBJAeEMLkCULApOhJByZd4rYJmoOglE5KMxniRmUpkI4ftHEbF/qxf6hCvwIUVH7x6qBHE0oMPd1eSN8PRAMDdHT5KRMcQLVvwUSerk7lZcV7XBwqP9dAgGQyGcE7+sNZiZTLb9llgZ+G9gLQp8AjV9XbfDSvEOFVjM59JYw7FHTneOPOj4vYmIy1FBW4E/n52N10CBYoKQemxa4HwZtrKW7IFUkzJ+xWmMd7qqmdhvT+C1R/tR2w3FBwhvfQ==
-Received: from MN2PR12MB4486.namprd12.prod.outlook.com (2603:10b6:208:263::23)
- by DM6PR12MB4483.namprd12.prod.outlook.com (2603:10b6:5:2a2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Thu, 30 Nov
- 2023 13:55:07 +0000
-Received: from MN2PR12MB4486.namprd12.prod.outlook.com
- ([fe80::8e49:a604:559e:6962]) by MN2PR12MB4486.namprd12.prod.outlook.com
- ([fe80::8e49:a604:559e:6962%7]) with mapi id 15.20.7046.024; Thu, 30 Nov 2023
- 13:55:07 +0000
-From: Shachar Kagan <skagan@nvidia.com>
-To: "edumazet@google.com" <edumazet@google.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas
-	<yishaih@nvidia.com>, Ido Kalir <idok@nvidia.com>, Topaz Uliel
-	<topazu@nvidia.com>, Shirly Ohnona <shirlyo@nvidia.com>, Ziyad Atiyyeh
-	<ziyadat@nvidia.com>
-Subject: Bug report connect to VM with Vagrant
-Thread-Topic: Bug report connect to VM with Vagrant
-Thread-Index: AdojlBh7YzKl9vsWRhaqwSQXl5yh5w==
-Date: Thu, 30 Nov 2023 13:55:06 +0000
-Message-ID:
- <MN2PR12MB44863139E562A59329E89DBEB982A@MN2PR12MB4486.namprd12.prod.outlook.com>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR12MB4486:EE_|DM6PR12MB4483:EE_
-x-ms-office365-filtering-correlation-id: c78cad25-3628-4efa-af72-08dbf1abf5e0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- hrk+t/965vzdC1BISPq3Jx8OfmQ4iSHQ6QLXBxmxn02S/VnHEZrdaXyryEWnZTzf7yy3XnUcHHPxuCyLX1+kZ+9+XJfZ5alpPazYTWYsXqZYdh2lMq+Gc8NPLdwl4VqgpxoBRfgaK/t92eTzDHg6aioMiSDgx+WUUjZstTQ2YU6xmJ9Pb+3TNob3+JUjzkM1RiNwHZ9adQsp1ybXOiCTkl04vS+saJaPwshkJewMUeaNna4/2qOaWL5xqsNH+QJqs2SvJN71ziVFHafZ+gCe2bi6gR9KYCJZsTDsVCc4RnKoRPSehmYi1GnsAzJniRMb4VH+upYGiA/6Z+fJt5KkIBR+G51SInxGWi1pQCq0Hjk9tx6d1MfXpjtM/1j+x1p6Z3SfAqOrHUElU5zKBORUQODtAUVW8b+047q1nQIZjHR734h3JRLFYZ76F9BKI7CArh70r8BB8GeD45++JEITbj7ToKuFcH0tx+Xfi6jr2lmgp8nnzC7VSalBgHUNeoMfzUzvWIH46aBQ2LPhjN+LtIGpB+5Lac44JrYwSzFR6Rr24/pTU55QNmP4tINgpauDIgR9/IbeJYBfbWl6uVzMg6b49F66DoujHTvm3pSF1i00U6xf9TSGPxGUrGbd0CWUHs6vxOVT33+9LR9z4+sG7w==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4486.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(38070700009)(55016003)(33656002)(122000001)(2906002)(41300700001)(5660300002)(86362001)(83380400001)(71200400001)(9686003)(38100700002)(6506007)(7696005)(107886003)(26005)(478600001)(76116006)(52536014)(66476007)(66946007)(64756008)(4326008)(8676002)(8936002)(66446008)(66556008)(54906003)(6916009)(316002)(17993001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?ZmJwem8vcEY2MW5CNGVINWRsQSs5eVZwUWdWVWdxdFpIeGZYWnJXVWZHRnVQ?=
- =?utf-8?B?UFZFaUdxTEdBdGpjbGJHMWxQSzB4ekhPK2p0ZXMva1JNSFlST2gyNXdWM0pa?=
- =?utf-8?B?MVBleExCL0c5WlFUNk9zeWFteVMwaXRVMm5YeWtBTFZCQllRc3M2cFJCb0hY?=
- =?utf-8?B?VTJUTU84Q3ltVkljSjBGVnZMbzJSNnRPYVJheEFuYXh6b2tNVnphZG9uRGlV?=
- =?utf-8?B?ZVduK3dHTnp4RWpoWG9BU1NFcmduZG9tdmphd25DSGtUTmhNL2c0TEZLUlFT?=
- =?utf-8?B?dk9IdUpORFh1ZFE0czFQWkJsYjFjNnQ3TWtTbDI0LzRQaFZ5OGZ5UkZRSm1j?=
- =?utf-8?B?SndpbzNKTXkyZ0o3T2FJdnlIUVRHWW5xbjZaZlVxRUQxYldPQ2xrd09wUGNB?=
- =?utf-8?B?TnVmRDJjRmhUM1dOTU51d2xBRHYvR0J3QzNSZFNIQlRZRXMrVnB3MDVXbC8w?=
- =?utf-8?B?SmQwSENJVDYzb3FiNHZIQVR6UkxLQkhZenBiWG9uM1R1L3BhQkZLamYwa1VV?=
- =?utf-8?B?dkhWLzRpQ1lVODZ4Z0Q0QS9HY1VYV3g3TVhGVGFVdEdmQWtNMEtIYVpzNGNE?=
- =?utf-8?B?UjNPY09DMjA5RnplSERQZUtWdG5NVERkRFlEVWhQUjQxVlFGYXVUNm80MDhU?=
- =?utf-8?B?M0ZqWitSVFNsc3lDY2pUeHNkbmtBSlU4QWREU0dhOFovQ0xoUlhBdmp1TlVp?=
- =?utf-8?B?K1pBN3hzVkw2aDBZaDhuZUJXKzlSUnRHZnYxOHJCazcyRGZTOThQRDRLVWxZ?=
- =?utf-8?B?bWxVd2ZTQW9OUmxqaXFEejk0bjdoTElQUUpCNGwrckRiR21qWVV4enZtZnhN?=
- =?utf-8?B?QWJiUS9DVlJTZlpuQ0F5S1dsekg0VFZMaDZURjFNZ05vMklXY0liWE5tbUJB?=
- =?utf-8?B?YWNyOXVwR01rbDJYOVpzaVJTNFBxNERUNGM3NE1DSC80ZFNJRzdWUnNodjV6?=
- =?utf-8?B?TndDeW05Tzg1cExYbEYyMW1kdWVWazZNaXlXQWh4MmIvbkgrU1lxUUdCNHhG?=
- =?utf-8?B?TEdiV0czNHYvKzh4YmZwbml5aVpXMTFXR0plbVIzVmpUYjUyQWRpUUtrRlNa?=
- =?utf-8?B?NXV4UWhOVDZ6T1RWNTRxNnIxbWpyUlBMeS9DZnZqUjkwTnVTbEUxeFczcGN5?=
- =?utf-8?B?NWNUeEZlTTluSkFHNnJBTCtMcmFCVkhPczY2WjlOd3hCU3VOZVF3bGwwZnRH?=
- =?utf-8?B?VkwxNVI2VVh5YzFFTjhmTE5LNDA0K3A2ZXVGZWpXVEtnalU0N0oyK09FZ2ZV?=
- =?utf-8?B?QlBYajhPbDNsRjNLVjQyU3BxeVg4YW5OVS9GMThsclVBV0tmV1Z2TU54bHJy?=
- =?utf-8?B?OGlxUjlSMWpoYjhQdERtaVhnMGlTZDIwdlJGY1B4WjBrVURsWlZKd01jeDhj?=
- =?utf-8?B?RHlqWUE3MlYvNHhweFRyZjErc0oyZGg3KzdRT2tubCt6SEhyamVHdnp0NlZ2?=
- =?utf-8?B?R0MwYit4UEJOUnZJcVVTOTNPYisvNFc1RHFobkttdEJpQjZQckY1WElSRmZk?=
- =?utf-8?B?SExwRjV3MG9kclo0TEhWOGxoa2lhRGd6UnpITHZGWjA2TklsK2t6MFRXbFJW?=
- =?utf-8?B?ZkxuSFhBbmZWMGdZREpmcGprc29FT0F6YzBSN2J6REVORzlDcmUzSTNSS3c5?=
- =?utf-8?B?WmJLVGk0L09tR0VJdGxMQWJjeU9FeWY0Nlp6V0ZObTJ6MUs4TURwNEFScHNT?=
- =?utf-8?B?Z2F3OWZRRVVUUDQ5bitZUlRkaVN6c0xabmNieFF1NklVUlZEM2xSYUgrRGhL?=
- =?utf-8?B?d1dpMElCVmdhTk1WKzF2Ymcvd1c4NmJkaW10VisrdkJuK3kwM0dKQWQrK2c1?=
- =?utf-8?B?Q2tFZE5Qb1JhUU0vZ1F5amxObWlPN0ZEa1MvNjk4eWh1SUQ5L2RDWjlCN1Mz?=
- =?utf-8?B?cXpzYmtmZnNMVU9WYnZ2cU81MlA0cnBVc1l3M09HRUZ1c250K1BSSCs3UjdN?=
- =?utf-8?B?RGlhanFhYzM3KzVvQUZYTXMzZzcyYlBLWVhuUjQ3OUMwWnF1T0txb291Tlgz?=
- =?utf-8?B?NzhLT2U0NFBPc3Y2bmxMYkovY0NkWDlkNmJSUVFtMkNXUkJkRWEzUTVtQXFE?=
- =?utf-8?B?ZGRuTnhXSC8rY0ZIUkdEQmpLc0lOU1Rpd0tHSWYyRkRINmN2Mk9GbkNkeDJD?=
- =?utf-8?Q?XUJ4=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D401B3
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:55:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701352554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DGrL90Etrr9V73ll7rDSIVqdC8n1ownVWJtUzMBU8oo=;
+	b=U6jpkfrpTx5mc0SyezSPvaveGIJ77z7gg43rsNjWXNCrd+tDJ3is12Quy3lT7BBJPNGqC6
+	B2VJNxc0Advn/lxxQ4VzhEvSjJQhZEnxJbV3kaWpGedMZ5s1ERTuUmly9dXXo892kcrBaV
+	RW5pL+7Tz9wmunHkiAxNnGxI7piCmAc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-332-KquQBu2RPJaHRgV7Z_-etg-1; Thu, 30 Nov 2023 08:55:52 -0500
+X-MC-Unique: KquQBu2RPJaHRgV7Z_-etg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a1867751573so137332966b.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:55:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701352551; x=1701957351;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DGrL90Etrr9V73ll7rDSIVqdC8n1ownVWJtUzMBU8oo=;
+        b=FjfAGAij8rgD1C9VUDsHoTOnVrU1mALp58ahUpa6sWapilEL/ZiM8wN8t7Y+s3LdT5
+         AC39XfB2dJfbuHiLhe+ZDA71zLcR8mvNJfmpPjrWg4ONZxxNxh2w/LbdstAjrHJS2gZN
+         0S6AICacawD2jh3vn1PLxl34GmKfI4HxaT+zbeBgBTSdE6A/MsomQqTn7Q5msY+U62EZ
+         X1WQJPHECiWyiMIH2KBYt/hmB7l1258odH9C42WUGlFrCh1wa3QAR3uzqFU8CnO4oCAK
+         rR2GEdahKG+23vwOz161NWvYagBy2CmEGzmtm4Nbw9KOyrAecx3IMwGaQ/+uYixAym8S
+         ywhA==
+X-Gm-Message-State: AOJu0Ywbc7dD/hxS9cYIs8Pl+SNmWIXk/+jVT17MEWKMBgyi+dQZj/Ar
+	wFe9nBflLMwNvXLhFupS3eegNThPpRRDRdd9CcMF8qPM5gGiS2y+BxNgIEOmYr++AszkegaSGMZ
+	AlgfpOjX5PznW10K2
+X-Received: by 2002:a17:906:2096:b0:a18:d028:1cce with SMTP id 22-20020a170906209600b00a18d0281ccemr1182184ejq.35.1701352551492;
+        Thu, 30 Nov 2023 05:55:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHg3ne5YwP5WnJehuvdpfEMr2u2ALVAAGZQb8Dpga9/0bhigqzGIOq/KC7JDEHBRCT8qDexjg==
+X-Received: by 2002:a17:906:2096:b0:a18:d028:1cce with SMTP id 22-20020a170906209600b00a18d0281ccemr1182160ejq.35.1701352551161;
+        Thu, 30 Nov 2023 05:55:51 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 13-20020a170906100d00b009b2ca104988sm698612ejm.98.2023.11.30.05.55.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 05:55:50 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 6FF9BF784AC; Thu, 30 Nov 2023 14:55:50 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, Edward Cree
+ <ecree.xilinx@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
+ Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, kernel-team <kernel-team@cloudflare.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Sitnicki <jakub@cloudflare.com>
+Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
+In-Reply-To: <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
+References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
+ <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
+ <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net>
+ <87fs0qj61x.fsf@toke.dk> <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
+ <87plzsi5wj.fsf@toke.dk>
+ <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 30 Nov 2023 14:55:50 +0100
+Message-ID: <871qc72vmh.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4486.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c78cad25-3628-4efa-af72-08dbf1abf5e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2023 13:55:06.9643
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YxxAGYgYtFhPvtDBFLoQGIGD78KyRgANTBykKJJQCM9mkm8qTibp/dOlQS3naPk1amGgTdr/Y/j1224SFH6oRQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4483
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-SGkgRXJpYywNCg0KSSBoYXZlIGFuIGlzc3VlIHRoYXQgYmlzZWN0aW9uIHBvaW50ZWQgYXQgdGhp
-cyBwYXRjaDoNCmNvbW1pdCAwYThkZTM2NGZmN2ExNDU1OGU5Njc2ZjQyNDI4MzE0ODExMDM4NGQ2
-DQp0Y3A6IG5vIGxvbmdlciBhYm9ydCBTWU5fU0VOVCB3aGVuIHJlY2VpdmluZyBzb21lIElDTVAN
-Cg0KRnVsbCBjb21taXQgbWVzc2FnZSBhdCBbMV0uDQogICAgDQpUaGUgaXNzdWUgYXBwZWFycyB3
-aGlsZSB1c2luZyBWYWdyYW50IHRvIG1hbmFnZSBuZXN0ZWQgVk1zLg0KVGhlIHN0ZXBzIGFyZToN
-CiogY3JlYXRlIHZhZ3JhbnQgZmlsZQ0KKiB2YWdyYW50IHVwDQoqIHZhZ3JhbnQgaGFsdCAoVk0g
-aXMgY3JlYXRlZCBidXQgc2h1dCBkb3duKQ0KKiB2YWdyYW50IHVwIC0gZmFpbA0KDQpUdXJuIG9u
-IGEgVk0gd2l0aCDigJhWYWdyYW50IHVw4oCZIGZhaWxzIHdoZW4gdGhlIFZNIGlzIGluIGhhbHQg
-c3RhdGUuIFdoZW4gdGhlIFZNIGhhc24ndCBiZWVuIGNyZWF0ZWQgeWV0LCAnVmFncmFudCB1cCcg
-cGFzc2VzLg0KVGhlIGZhaWx1cmUgb2NjdXJzIGluIHRoZSBOZXQtU1NIIGNvbm5lY3Rpb24gdG8g
-dGhlIFZNIHN0ZXAuDQpWYWdyYW50IGVycm9yIGlzIOKAmEd1ZXN0IGNvbW11bmljYXRpb24gY291
-bGQgbm90IGJlIGVzdGFibGlzaGVkISBUaGlzIGlzIHVzdWFsbHkgYmVjYXVzZSBTU0ggaXMgbm90
-IHJ1bm5pbmcsIHRoZSBhdXRoZW50aWNhdGlvbiBpbmZvcm1hdGlvbiB3YXMgY2hhbmdlZCwgb3Ig
-c29tZSBvdGhlciBuZXR3b3JraW5nIGlzc3VlLicNCldlIHVzZSBhIG5ldyB2ZXJzaW9uIG9mIHZh
-Z3JhbnQtbGlidmlydC4NClR1cm4gb24gdGhlIFZNIHdpdGggdmlyc2ggaW5zdGVhZCBvZiB2YWdy
-YW50IHdvcmtzLg0KDQpTdGRvdXRbMl0gYmVsbG93Lg0KDQpBbnkgaWRlYSB3aGF0IG1heSBjYXVz
-ZSB0aGUgZXJyb3Igd2l0aCB5b3VyIHBhdGNoPw0KDQpUaGFua3MsDQpTaGFjaGFyIEthZ2FuDQoN
-ClsxXQ0KY29tbWl0IDBhOGRlMzY0ZmY3YTE0NTU4ZTk2NzZmNDI0MjgzMTQ4MTEwMzg0ZDYNCkF1
-dGhvcjogRXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29nbGUuY29tPg0KRGF0ZTogICBUdWUgTm92
-IDE0IDE3OjIzOjQxIDIwMjMgKzAwMDANCg0KICAgIHRjcDogbm8gbG9uZ2VyIGFib3J0IFNZTl9T
-RU5UIHdoZW4gcmVjZWl2aW5nIHNvbWUgSUNNUA0KICAgIA0KICAgIEN1cnJlbnRseSwgbm9uIGZh
-dGFsIElDTVAgbWVzc2FnZXMgcmVjZWl2ZWQgb24gYmVoYWxmDQogICAgb2YgU1lOX1NFTlQgc29j
-a2V0cyBkbyBjYWxsIHRjcF9sZF9SVE9fcmV2ZXJ0KCkNCiAgICB0byBpbXBsZW1lbnQgUkZDIDYw
-NjksIGJ1dCBpbW1lZGlhdGVseSBjYWxsIHRjcF9kb25lKCksDQogICAgdGh1cyBhYm9ydGluZyB0
-aGUgY29ubmVjdCgpIGF0dGVtcHQuDQogICAgDQogICAgVGhpcyB2aW9sYXRlcyBSRkMgMTEyMiBm
-b2xsb3dpbmcgcmVxdWlyZW1lbnQ6DQogICAgDQogICAgNC4yLjMuOSAgSUNNUCBNZXNzYWdlcw0K
-ICAgIC4uLg0KICAgICAgICAgICAgICBvICAgIERlc3RpbmF0aW9uIFVucmVhY2hhYmxlIC0tIGNv
-ZGVzIDAsIDEsIDUNCiAgICANCiAgICAgICAgICAgICAgICAgICAgIFNpbmNlIHRoZXNlIFVucmVh
-Y2hhYmxlIG1lc3NhZ2VzIGluZGljYXRlIHNvZnQgZXJyb3INCiAgICAgICAgICAgICAgICAgICAg
-IGNvbmRpdGlvbnMsIFRDUCBNVVNUIE5PVCBhYm9ydCB0aGUgY29ubmVjdGlvbiwgYW5kIGl0DQog
-ICAgICAgICAgICAgICAgICAgICBTSE9VTEQgbWFrZSB0aGUgaW5mb3JtYXRpb24gYXZhaWxhYmxl
-IHRvIHRoZQ0KICAgICAgICAgICAgICAgICAgICAgYXBwbGljYXRpb24uDQogICAgDQogICAgVGhp
-cyBwYXRjaCBtYWtlcyBzdXJlIG5vbiAnZmF0YWwnIElDTVBbdjZdIG1lc3NhZ2VzIGRvIG5vdA0K
-ICAgIGFib3J0IHRoZSBjb25uZWN0aW9uIGF0dGVtcHQuDQogICAgDQogICAgSXQgZW5hYmxlcyBS
-RkMgNjA2OSBmb3IgU1lOX1NFTlQgc29ja2V0cyBhcyBhIHJlc3VsdC4NCiAgICANCiAgICBTaWdu
-ZWQtb2ZmLWJ5OiBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+DQogICAgQ2M6IERh
-dmlkIE1vcmxleSA8bW9ybGV5ZEBnb29nbGUuY29tPg0KICAgIENjOiBOZWFsIENhcmR3ZWxsIDxu
-Y2FyZHdlbGxAZ29vZ2xlLmNvbT4NCiAgICBDYzogWXVjaHVuZyBDaGVuZyA8eWNoZW5nQGdvb2ds
-ZS5jb20+DQogICAgU2lnbmVkLW9mZi1ieTogRGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxv
-ZnQubmV0Pg0KDQpbMl0NClZhZ3JhbnQgdXAgc3Rkb3V0Og0KQnJpbmdpbmcgbWFjaGluZSAncGxh
-eWVyMScgdXAgd2l0aCAnbGlidmlydCcgcHJvdmlkZXIuLi4NCj09PiBwbGF5ZXIxOiBDcmVhdGlu
-ZyBzaGFyZWQgZm9sZGVycyBtZXRhZGF0YS4uLg0KPT0+IHBsYXllcjE6IFN0YXJ0aW5nIGRvbWFp
-bi4NCj09PiBwbGF5ZXIxOiBEb21haW4gbGF1bmNoaW5nIHdpdGggZ3JhcGhpY3MgY29ubmVjdGlv
-biBzZXR0aW5ncy4uLg0KPT0+IHBsYXllcjE6ICAtLSBHcmFwaGljcyBQb3J0OiAgICAgIDU5MDAN
-Cj09PiBwbGF5ZXIxOiAgLS0gR3JhcGhpY3MgSVA6ICAgICAgICAxMjcuMC4wLjENCj09PiBwbGF5
-ZXIxOiAgLS0gR3JhcGhpY3MgUGFzc3dvcmQ6ICBOb3QgZGVmaW5lZA0KPT0+IHBsYXllcjE6ICAt
-LSBHcmFwaGljcyBXZWJzb2NrZXQ6IDU3MDANCj09PiBwbGF5ZXIxOiBXYWl0aW5nIGZvciBkb21h
-aW4gdG8gZ2V0IGFuIElQIGFkZHJlc3MuLi4NCj09PiBwbGF5ZXIxOiBXYWl0aW5nIGZvciBtYWNo
-aW5lIHRvIGJvb3QuIFRoaXMgbWF5IHRha2UgYSBmZXcgbWludXRlcy4uLg0KICAgIHBsYXllcjE6
-IFNTSCBhZGRyZXNzOiAxOTIuMTY4LjEyMy42MToyMg0KICAgIHBsYXllcjE6IFNTSCB1c2VybmFt
-ZTogdmFncmFudA0KICAgIHBsYXllcjE6IFNTSCBhdXRoIG1ldGhvZDogcHJpdmF0ZSBrZXkNCj09
-PiBwbGF5ZXIxOiBBdHRlbXB0aW5nIGdyYWNlZnVsIHNodXRkb3duIG9mIFZNLi4uDQo9PT4gcGxh
-eWVyMTogQXR0ZW1wdGluZyBncmFjZWZ1bCBzaHV0ZG93biBvZiBWTS4uLg0KPT0+IHBsYXllcjE6
-IEF0dGVtcHRpbmcgZ3JhY2VmdWwgc2h1dGRvd24gb2YgVk0uLi4NCiAgICBwbGF5ZXIxOiBHdWVz
-dCBjb21tdW5pY2F0aW9uIGNvdWxkIG5vdCBiZSBlc3RhYmxpc2hlZCEgVGhpcyBpcyB1c3VhbGx5
-IGJlY2F1c2UNCiAgICBwbGF5ZXIxOiBTU0ggaXMgbm90IHJ1bm5pbmcsIHRoZSBhdXRoZW50aWNh
-dGlvbiBpbmZvcm1hdGlvbiB3YXMgY2hhbmdlZCwNCiAgICBwbGF5ZXIxOiBvciBzb21lIG90aGVy
-IG5ldHdvcmtpbmcgaXNzdWUuIFZhZ3JhbnQgd2lsbCBmb3JjZSBoYWx0LCBpZg0KICAgIHBsYXll
-cjE6IGNhcGFibGUuDQo9PT4gcGxheWVyMTogQXR0ZW1wdGluZyBkaXJlY3Qgc2h1dGRvd24gb2Yg
-ZG9tYWluLi4uDQoNCg0K
+Daniel Borkmann <daniel@iogearbox.net> writes:
+
+> On 11/29/23 10:52 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Edward Cree <ecree.xilinx@gmail.com> writes:
+>>> On 28/11/2023 14:39, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>>> I'm not quite sure what should be the semantics of that, though. I.e.,
+>>>> if you are trying to aggregate two packets that have the flag set, whi=
+ch
+>>>> packet do you take the value from? What if only one packet has the flag
+>
+> It would probably make sense if both packets have it set.
+
+Right, so "aggregate only if both packets have the flag set, keeping the
+metadata area from the first packet", then?
+
+>>>> set? Or should we instead have a "metadata_xdp_only" flag that just
+>>>> prevents the skb metadata field from being set entirely?
+>
+> What would be the use case compared to resetting meta data right before
+> we return with XDP_PASS?
+
+I was thinking it could save a call to xdp_adjust_meta() to reset it
+back to zero before PASSing the packet. But okay, that may be of
+marginal utility.
+
+>>> Sounds like what's actually needed is bpf progs inside the GRO engine
+>>>   to implement the metadata "protocol" prepare and coalesce callbacks?
+>>=20
+>> Hmm, yes, I guess that would be the most general solution :)
+>
+> Feels like a potential good fit, agree, although for just solving the
+> above sth not requiring extra BPF might be nice as well.
+
+Yeah, I agree that just the flag makes sense on its own.
+
+-Toke
+
 
