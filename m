@@ -1,125 +1,128 @@
-Return-Path: <netdev+bounces-52682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8001E7FFA6C
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:55:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F557FFA9E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B152F1C20AF2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:55:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD941F20F04
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01C656764;
-	Thu, 30 Nov 2023 18:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C995A5FEF4;
+	Thu, 30 Nov 2023 19:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="WBOmF01E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79C210E2
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:53:25 -0800 (PST)
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AUIpa2B031257
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:53:25 -0800
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3uphtvwe6y-8
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 10:53:24 -0800
-Received: from twshared15232.14.prn3.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 10:53:20 -0800
-Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
-	id ACFA63C6029B4; Thu, 30 Nov 2023 10:53:08 -0800 (PST)
-From: Andrii Nakryiko <andrii@kernel.org>
-To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
-        <brauner@kernel.org>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-        <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
-Subject: [PATCH v12 bpf-next 17/17] bpf,selinux: allocate bpf_security_struct per BPF token
-Date: Thu, 30 Nov 2023 10:52:29 -0800
-Message-ID: <20231130185229.2688956-18-andrii@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231130185229.2688956-1-andrii@kernel.org>
-References: <20231130185229.2688956-1-andrii@kernel.org>
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3960194;
+	Thu, 30 Nov 2023 11:00:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=vsYR7scdNZIludsndTghewaH2HznFu0Os5QUOPvM1nM=;
+	t=1701370851; x=1702580451; b=WBOmF01E6Upq82AIEmzqAngGCrNPVkhshRmAxIeVvBTF4nx
+	Veh+JmsSERVzV9RvCVUzxiogMcru/K+SLZvZrvR6iLCzIjP/IvBT+pIJhuSV9O0jt7zm6bB49Q4FV
+	AscWjSx1MXLL6PXq7yRehSL2VWcTkdf2GrttAF1AAZ+9PCFHZVOdLaxQL/pH145geHnjAAOVIZQbu
+	wMwfKdg3WnstNcLrMG3HmCjJOhlCfs9DmAB5Azk9qLOWsKzrVQUNuM16DKDF5D/Blsfdt0FPf5IST
+	jK4Mb7GBrsIx/AghSXg5Hh20TTLzfBMz1TnlVGlU1oM+DeYvcRztFqO33UCsVncw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1r8mHF-0000000A9bL-1Kjt;
+	Thu, 30 Nov 2023 20:00:45 +0100
+Message-ID: <bbfd6f959e7ff4b567084ef3d962bf255aa25c85.camel@sipsolutions.net>
+Subject: Re: [RFC PATCH] wifi: cfg80211: fix CQM for non-range use
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kees Cook <keescook@chromium.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, Michael Walle
+ <mwalle@kernel.org>,  lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+ linux-wireless@vger.kernel.org,  Max Schulze <max.schulze@online.de>,
+ netdev@vger.kernel.org
+Date: Thu, 30 Nov 2023 20:00:44 +0100
+In-Reply-To: <202311301054.0049306B7@keescook>
+References: <202311090752.hWcJWAHL-lkp@intel.com>
+	 <202311090752.hWcJWAHL-lkp@intel.com>
+	 <1c37d99f722f891a50c540853e54d4e36bdf0157.camel@sipsolutions.net>
+	 <fc1dbe4a-a810-445c-9398-60a5e55990a2@quicinc.com>
+	 <202311301016.84D0010@keescook>
+	 <01e3663e9e1418a183ee86251e0352256494ee28.camel@sipsolutions.net>
+	 <202311301054.0049306B7@keescook>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Ia61ZAjV__qqqYRGd5VhDPEiMrxuMzHD
-X-Proofpoint-GUID: Ia61ZAjV__qqqYRGd5VhDPEiMrxuMzHD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-30_18,2023-11-30_01,2023-05-22_02
+X-malware-bazaar: not-scanned
 
-Utilize newly added bpf_token_create/bpf_token_free LSM hooks to
-allocate struct bpf_security_struct for each BPF token object in
-SELinux. This just follows similar pattern for BPF prog and map.
+On Thu, 2023-11-30 at 10:55 -0800, Kees Cook wrote:
+> On Thu, Nov 30, 2023 at 07:40:26PM +0100, Johannes Berg wrote:
+> > On Thu, 2023-11-30 at 10:32 -0800, Kees Cook wrote:
+> > > Yeah, I would expect this to mean that there is a code path that
+> > > GCC found where the value could overflow. It does this when a variabl=
+e
+> > > "value range" gets bounded (e.g. an int isn't the full -INT_MAX to IN=
+T_MAX
+> > > range).And flex_array_size() was designed to saturate at SIZE_MIX rat=
+her
+> > > than wrapping around to an unexpected small value, so these are playi=
+ng
+> > > together it seems.
+> > >=20
+> > > However, I would have expected the kzalloc() to blow up _first_.
+> >=20
+> > Hmm.
+> >=20
+> > > Regardless, I suspect the addition of "if (n_thresholds > 1)" is what=
+ is
+> > > tripping GCC.
+> > >=20
+> > >                 int len =3D nla_len(attrs[NL80211_ATTR_CQM_RSSI_THOLD=
+]);
+> > > 		...
+> > >                 return nl80211_set_cqm_rssi(info, thresholds, len / 4=
+,
+> > >                                             hysteresis);
+> > >=20
+> > > Now it "knows" there is a path where n_threasholds could be [2,
+> > > INT_MAX].
+> >=20
+> > Yeah, it's not _really_ bounded, apart from the message length? But the=
+n
+> > struct_size() should saturate and fail? But I guess it cannot know that=
+,
+> > and limits the object size to 1<<63 - 1 whereas the copy is 1<<64 - 1..=
+.
+> >=20
+> > > Does this warning go away if "len" is made unsigned?
+>=20
+> Actually, this alone fixes it too:
+>=20
+> diff --git a/include/net/netlink.h b/include/net/netlink.h
+> index 167b91348e57..c59679524705 100644
+> --- a/include/net/netlink.h
+> +++ b/include/net/netlink.h
+> @@ -1214,9 +1214,9 @@ static inline void *nla_data(const struct nlattr *n=
+la)
+>   * nla_len - length of payload
+>   * @nla: netlink attribute
+>   */
+> -static inline int nla_len(const struct nlattr *nla)
+> +static inline u16 nla_len(const struct nlattr *nla)
+>  {
+> -	return nla->nla_len - NLA_HDRLEN;
+> +	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN : 0;
+>  }
+>=20
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
----
- security/selinux/hooks.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Heh. If you can sell that to Jakub I don't mind, but that might be a
+harder sell than the int/u32 in our code...
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 002351ab67b7..1501e95366a1 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6828,6 +6828,29 @@ static void selinux_bpf_prog_free(struct bpf_prog =
-*prog)
- 	prog->aux->security =3D NULL;
- 	kfree(bpfsec);
- }
-+
-+static int selinux_bpf_token_create(struct bpf_token *token, union bpf_a=
-ttr *attr,
-+				    struct path *path)
-+{
-+	struct bpf_security_struct *bpfsec;
-+
-+	bpfsec =3D kzalloc(sizeof(*bpfsec), GFP_KERNEL);
-+	if (!bpfsec)
-+		return -ENOMEM;
-+
-+	bpfsec->sid =3D current_sid();
-+	token->security =3D bpfsec;
-+
-+	return 0;
-+}
-+
-+static void selinux_bpf_token_free(struct bpf_token *token)
-+{
-+	struct bpf_security_struct *bpfsec =3D token->security;
-+
-+	token->security =3D NULL;
-+	kfree(bpfsec);
-+}
- #endif
-=20
- struct lsm_blob_sizes selinux_blob_sizes __ro_after_init =3D {
-@@ -7183,6 +7206,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- 	LSM_HOOK_INIT(bpf_prog, selinux_bpf_prog),
- 	LSM_HOOK_INIT(bpf_map_free, selinux_bpf_map_free),
- 	LSM_HOOK_INIT(bpf_prog_free, selinux_bpf_prog_free),
-+	LSM_HOOK_INIT(bpf_token_free, selinux_bpf_token_free),
- #endif
-=20
- #ifdef CONFIG_PERF_EVENTS
-@@ -7241,6 +7265,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- #ifdef CONFIG_BPF_SYSCALL
- 	LSM_HOOK_INIT(bpf_map_create, selinux_bpf_map_create),
- 	LSM_HOOK_INIT(bpf_prog_load, selinux_bpf_prog_load),
-+	LSM_HOOK_INIT(bpf_token_create, selinux_bpf_token_create),
- #endif
- #ifdef CONFIG_PERF_EVENTS
- 	LSM_HOOK_INIT(perf_event_alloc, selinux_perf_event_alloc),
---=20
-2.34.1
-
+johannes
 
