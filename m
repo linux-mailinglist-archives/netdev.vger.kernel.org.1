@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C087B7FF375
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:21:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D6F7FF376
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:21:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 796F328188F
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:21:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D81E2819D2
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAF0524A9;
-	Thu, 30 Nov 2023 15:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34AE1524BA;
+	Thu, 30 Nov 2023 15:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zpZfp6h+"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="02TTBh5X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89931BD2
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:21:33 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6cdcd790f42so1060974b3a.3
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:21:33 -0800 (PST)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 571D81BD5
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:21:37 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6cbbfdf72ecso1047837b3a.2
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:21:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701357693; x=1701962493; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701357696; x=1701962496; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5fQ0E21BvJN0Iwjm/femF1Os2TlYZXPFt1b5fVnA6IY=;
-        b=zpZfp6h+kGrYS4ziValmDIFylm3oDrzYcbNwD3yEUBAqxg94sot9DEc/nt46jHkIPt
-         Y/lEyf6da4II2ZmBse5vp4qD9UfDL+omcsqYz719Y0rhjkmORNrBI0haKGNAprfFwJSh
-         2ct/gQbwgAlR1rSMFfErD83aeiCu7ePIIOwbYbvhraH3dpll0pm8uH1SS6LtUqE5wRdI
-         Yv4N4gozgIypK8YlPHeY1Jt63zElZ0ycbFAuDwXPUqqcBFn9lvtJDrhYR5TThxwPthmu
-         eI3AGlLvo5f3SpufGFpidcQGs+K0Y7Xaxl61SwxHudOlEuzHysXp4dnp/LafL2bCiqpZ
-         EJRQ==
+        bh=PV/FnAxElgomcsnpFDOxAMkh9FJZjFm56tGPBQMJCpg=;
+        b=02TTBh5Xvudy3ZooW9MqXRPYIJJCE6IXCYaYPZJqiNiYDt1cU0KWfItqj5G8ohmuW+
+         56xta9fAY993dbgqTDVZubSezlJzzALrZm7imFMHBnmCTaoGY0K6agbBAaQ4DzLpeLuD
+         VwR/ie7wlz8bZG9IwbxUUbXCBFS4uTGmkM5x4Bw6w+jDrETdpMNN+YqjubbEqgdOayCs
+         6vqygy6y981oOhJVURxXWD3VG4rDFM84MHC5jxQ8X9m95t/0YngYZgZqVZXoqPS7p1lE
+         /eDFadkisWIqWBfCjBPQyxIhrxh1GDv6cYMhUG2Vgg2rGHiASQ7FgpqJ5KU9y6NJzFnQ
+         b35A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701357693; x=1701962493;
+        d=1e100.net; s=20230601; t=1701357696; x=1701962496;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5fQ0E21BvJN0Iwjm/femF1Os2TlYZXPFt1b5fVnA6IY=;
-        b=fSN2LryGBuEgu3jEFEbOpOH2e1q/HD8VAIXe95zGU3yuswk9n3t6t7fTIuWG8AbZel
-         LMcmHrpy/ffauyiP3u6RJuXjXwvg+xfyuRR7EmvLOEklWTEeURQqEAr00GZbhQWRrAO3
-         CUT7GWxj0FF3fdza+oOwitCqtgoKTMTon6EHEbm8ep7oiuxis9uoEGTtOgyg2DfACCfO
-         UW3TWf+1zwqcVQAEX59uJ1lHYaDjPqSsAE+i6ra8cuR24jHPCeM7xSKJn5YcVw8txYD3
-         iPHkVcEmRuYnPrp6DuHmNxyxJ0Y3FQZ+oNexsWV5WlW5qTJS6EaA3kQAUjkvk93VJXmI
-         yowg==
-X-Gm-Message-State: AOJu0Yxv8O7RyYxUuRdYC6LR3BhHJWbiK0sSvWVNssDEomkIXkJkSNlY
-	+LjnEHWUKwP2yZAYtnJSyflXFkYijM43/EYg+eM=
-X-Google-Smtp-Source: AGHT+IGzDr40ylhmdKfs1ZggEL5dadBqX+6hB+XTy20vplwdEgsOKGh10Or5UNPFj8EZg/tpKKt+uA==
-X-Received: by 2002:a05:6a00:891:b0:6c4:d5ee:c6 with SMTP id q17-20020a056a00089100b006c4d5ee00c6mr26552902pfj.1.1701357693238;
-        Thu, 30 Nov 2023 07:21:33 -0800 (PST)
+        bh=PV/FnAxElgomcsnpFDOxAMkh9FJZjFm56tGPBQMJCpg=;
+        b=SsXpPanEN1QGtjzMdsDU6oz11UJ2G7jPX1uIVK5hb/s/PG1eo1sGQggiLRfqNtawVT
+         q5BrwHD/iXOHcsSQFmCpcOeA+MDIEIcnhwY5BFjPOmij6EUU/5az407fHZ6I61Cz6TYM
+         wJgQL0XSjBGGxnyeIUR56PqOMm5AXxU/n/mbCEwCcdrQ7HDKMEra8wFcUX5x753Lh0CI
+         OXxDzNNbNt9/VppL5eE9/wq9nRGe4bm4sVSTVeg+l3v2fUJQlH1tXe9siBUCNxVp441z
+         gWwklyT3itjIBB6+8mYLVNkLYcKQ8uzC1TkaR5sPTk7bBZJbkwkpNJP6E7YSLSYeXyb7
+         9jBg==
+X-Gm-Message-State: AOJu0YyoDaYIQbYTozEttRRwtM/qIGAtXwCK9fJlz3Qv3oqGSELgnawR
+	Ll6jnrvtd6fyev86wLoAHjn2K4M1ckU6+Inpi88=
+X-Google-Smtp-Source: AGHT+IG5vth8u1O/rujHGOtQq4NWRbPLGKGkux7W+2h906NnbxeKqMUHKHtGx8SijIeehTx/lsmrHQ==
+X-Received: by 2002:a05:6a20:9382:b0:18b:962c:1ead with SMTP id x2-20020a056a20938200b0018b962c1eadmr26851331pzh.3.1701357696487;
+        Thu, 30 Nov 2023 07:21:36 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id p16-20020aa78610000000b006cc02a6d18asm1342579pfn.61.2023.11.30.07.21.30
+        by smtp.gmail.com with ESMTPSA id p16-20020aa78610000000b006cc02a6d18asm1342579pfn.61.2023.11.30.07.21.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 07:21:32 -0800 (PST)
+        Thu, 30 Nov 2023 07:21:36 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	jiri@resnulli.us,
 	mleitner@redhat.com,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next 3/4] net/sched: act_api: stop loop over ops array on NULL in tcf_action_init
-Date: Thu, 30 Nov 2023 12:20:40 -0300
-Message-Id: <20231130152041.13513-4-pctammela@mojatatu.com>
+Subject: [PATCH net-next 4/4] net/sched: act_api: use tcf_act_for_each_action in tcf_idr_insert_many
+Date: Thu, 30 Nov 2023 12:20:41 -0300
+Message-Id: <20231130152041.13513-5-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231130152041.13513-1-pctammela@mojatatu.com>
 References: <20231130152041.13513-1-pctammela@mojatatu.com>
@@ -78,7 +78,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ops array is contiguous, so stop processing whenever a NULL is found
+The actions array is contiguous, so stop processing whenever a NULL
+is found. This is already the assumption for tcf_action_destroy[1],
+which is called from tcf_actions_init.
+
+[1] https://elixir.bootlin.com/linux/v6.7-rc3/source/net/sched/act_api.c#L1115
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
@@ -86,22 +90,26 @@ Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 2e948e5992b6..d3cb9f5b25da 100644
+index d3cb9f5b25da..abec5c45b5a4 100644
 --- a/net/sched/act_api.c
 +++ b/net/sched/act_api.c
-@@ -1506,10 +1506,8 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
- err:
- 	tcf_action_destroy(actions, flags & TCA_ACT_FLAGS_BIND);
- err_mod:
--	for (i = 0; i < TCA_ACT_MAX_PRIO; i++) {
--		if (ops[i])
--			module_put(ops[i]->owner);
--	}
-+	for (i = 0; i < TCA_ACT_MAX_PRIO && ops[i]; i++)
-+		module_put(ops[i]->owner);
- 	return err;
- }
+@@ -1285,14 +1285,12 @@ static const struct nla_policy tcf_action_policy[TCA_ACT_MAX + 1] = {
  
+ void tcf_idr_insert_many(struct tc_action *actions[])
+ {
++	struct tc_action *a;
+ 	int i;
+ 
+-	for (i = 0; i < TCA_ACT_MAX_PRIO; i++) {
+-		struct tc_action *a = actions[i];
++	tcf_act_for_each_action(i, a, actions) {
+ 		struct tcf_idrinfo *idrinfo;
+ 
+-		if (!a)
+-			continue;
+ 		idrinfo = a->idrinfo;
+ 		mutex_lock(&idrinfo->lock);
+ 		/* Replace ERR_PTR(-EBUSY) allocated by tcf_idr_check_alloc if
 -- 
 2.40.1
 
