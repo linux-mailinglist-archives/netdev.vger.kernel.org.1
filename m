@@ -1,92 +1,56 @@
-Return-Path: <netdev+bounces-52591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC0BF7FF4C2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:22:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB3B7FF4E1
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCEA71C20F82
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:22:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F5211C20EF6
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2D854F8F;
-	Thu, 30 Nov 2023 16:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D57E54F94;
+	Thu, 30 Nov 2023 16:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zq/Y39Jf"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j83gq1zE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD85131;
-	Thu, 30 Nov 2023 08:22:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701361325; x=1732897325;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bXoVezPhVWKfoB3JGdgSXzPzDzpsCHhdUMolTMlscIk=;
-  b=Zq/Y39JfsSeJYxpFxFiHPGtupQT8jPxyiyLRxywhw6TIlwpqMM5KuBXa
-   12Qc95vP2U4dRt4nbzFjkc0cRjb3pQLo448DA1lrQ7Ea3Xe8tKTjWDuPZ
-   coStaEqSu/Q4SQrQP7DP8GVhlwMOuzJ4QmPE//5qcgkgFkfxnd4OGI+W6
-   8AhksZI3RVHkS1IIxOp4RXhUhqNXLrVRhPvVOZeV9y5Dtq6Zgrg6OT8cc
-   9Sty2fCBh9aBhYt/Rr/j6HdnqIGGM9/McXEI4b3oZMu4N3rNSQ5/OPzCE
-   PAyhA7EVmuThhLRpkttwQAuv5CAjReMJOwd+BAcQuviF03xUvE7BQhXhl
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="383744636"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="383744636"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 08:22:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="803758703"
-X-IronPort-AV: E=Sophos;i="6.04,239,1695711600"; 
-   d="scan'208";a="803758703"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
-  by orsmga001.jf.intel.com with ESMTP; 30 Nov 2023 08:21:55 -0800
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B96495C2;
+	Thu, 30 Nov 2023 16:24:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D0EC433C7;
+	Thu, 30 Nov 2023 16:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1701361454;
+	bh=3EF50quMPrPbvg00kmHOgCNwoHXsCNjbnPSGn8JvNu0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=j83gq1zEmv4NLjFgsuZuiQlYRxJw+iGPHfCdj5CABqZVeNJQbrZB+GOYIrhfFVR5H
+	 TauEbpVvrx/EtmD7bdH8fdOlD3tVsrj170HUwm1CgUf86z+N0XIqCDZTA8Od51T7pf
+	 LpS/MC+56RExiW1172eiIGn96Y4pLjnuzTrEyIRM=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Topel <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	bpf@vger.kernel.org,
-	xdp-hints@xdp-project.net,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kselftest@vger.kernel.org,
-	Song Yoong Siang <yoong.siang.song@intel.com>
-Subject: [PATCH bpf-next 3/3] selftests/bpf: Add launch time to xdp_hw_metadata
-Date: Fri,  1 Dec 2023 00:20:28 +0800
-Message-Id: <20231130162028.852006-4-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231130162028.852006-1-yoong.siang.song@intel.com>
-References: <20231130162028.852006-1-yoong.siang.song@intel.com>
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6 009/112] rxrpc: Fix RTT determination to use any ACK as a source
+Date: Thu, 30 Nov 2023 16:20:56 +0000
+Message-ID: <20231130162140.616180723@linuxfoundation.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231130162140.298098091@linuxfoundation.org>
+References: <20231130162140.298098091@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,122 +59,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds launch time support to xdp_hw_metadata. User can configure
-the delta of HW launch time to HW RX-time by using "-l" argument.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
-This patch is tested with stmmac on Intel Tiger Lake platform. Refer to
-result below, the delta between pre-determined launch time and actual
-transmit time is around 24 us.
+------------------
 
-$ sudo ./xdp_hw_metadata enp0s30f4
-...
-xsk_ring_cons__peek: 1
-0x55fcb80ce7a8: rx_desc[0]->addr=80100 addr=80100 comp_addr=80100 EoP
-No rx_hash err=-95
-HW RX-time:   1677764507059055964 (sec:1677764507.0591) delta to User RX-time sec:0.0002 (237.548 usec)
-XDP RX-time:   1677764507059280741 (sec:1677764507.0593) delta to User RX-time sec:0.0000 (12.771 usec)
-0x55fcb80ce7a8: ping-pong with csum=5619 (want 8626) csum_start=34 csum_offset=6
-HW RX-time:   1677764507059055964 (sec:1677764507.0591) delta to HW Launch-time sec:1.0000 (1000000.000 usec)
-0x55fcb80ce7a8: complete tx idx=0 addr=18
-HW Launch-time:   1677764508059055964 (sec:1677764508.0591) delta to HW TX-complete-time sec:0.0000 (24.235 usec)
-HW TX-complete-time:   1677764508059080199 (sec:1677764508.0591) delta to User TX-complete-time sec:0.0054 (5423.263 usec)
-XDP RX-time:   1677764507059280741 (sec:1677764507.0593) delta to User TX-complete-time sec:1.0052 (1005222.721 usec)
-HW RX-time:   1677764507059055964 (sec:1677764507.0591) delta to HW TX-complete-time sec:1.0000 (1000024.235 usec)
-0x55fcb80ce7a8: complete rx idx=128 addr=80100
+From: David Howells <dhowells@redhat.com>
 
-$ sudo ./xdp_hw_metadata enp0s30f4 -l 10000000
-...
-xsk_ring_cons__peek: 1
-0x5626d54de7a8: rx_desc[0]->addr=80100 addr=80100 comp_addr=80100 EoP
-No rx_hash err=-95
-HW RX-time:   1677764655807717783 (sec:1677764655.8077) delta to User RX-time sec:0.0002 (240.571 usec)
-XDP RX-time:   1677764655807942983 (sec:1677764655.8079) delta to User RX-time sec:0.0000 (15.371 usec)
-0x5626d54de7a8: ping-pong with csum=5619 (want 8626) csum_start=34 csum_offset=6
-HW RX-time:   1677764655807717783 (sec:1677764655.8077) delta to HW Launch-time sec:0.0100 (10000.000 usec)
-0x5626d54de7a8: complete tx idx=0 addr=18
-HW Launch-time:   1677764655817717783 (sec:1677764655.8177) delta to HW TX-complete-time sec:0.0000 (23.965 usec)
-HW TX-complete-time:   1677764655817741748 (sec:1677764655.8177) delta to User TX-complete-time sec:0.0003 (291.792 usec)
-XDP RX-time:   1677764655807942983 (sec:1677764655.8079) delta to User TX-complete-time sec:0.0101 (10090.557 usec)
-HW RX-time:   1677764655807717783 (sec:1677764655.8077) delta to HW TX-complete-time sec:0.0100 (10023.965 usec)
-0x5626d54de7a8: complete rx idx=128 addr=80100
+[ Upstream commit 3798680f2fbbe0ca3ab6138b34e0d161c36497ee ]
 
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+Fix RTT determination to be able to use any type of ACK as the response
+from which RTT can be calculated provided its ack.serial is non-zero and
+matches the serial number of an outgoing DATA or ACK packet.  This
+shouldn't be limited to REQUESTED-type ACKs as these can have other types
+substituted for them for things like duplicate or out-of-order packets.
+
+Fixes: 4700c4d80b7b ("rxrpc: Fix loss of RTT samples due to interposed ACK")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ include/trace/events/rxrpc.h |  2 +-
+ net/rxrpc/input.c            | 35 ++++++++++++++++-------------------
+ 2 files changed, 17 insertions(+), 20 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3291625ba4fb..ff1b2e5b0fce 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -13,6 +13,7 @@
-  * - UDP 9091 packets trigger TX reply
-  * - TX HW timestamp is requested and reported back upon completion
-  * - TX checksum is requested
-+ * - HW launch time is set for transmission
-  */
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+index 4c53a5ef6257b..f7e537f64db45 100644
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -328,7 +328,7 @@
+ 	E_(rxrpc_rtt_tx_ping,			"PING")
  
- #include <test_progs.h>
-@@ -61,6 +62,8 @@ int rxq;
- bool skip_tx;
- __u64 last_hw_rx_timestamp;
- __u64 last_xdp_rx_timestamp;
-+__u64 last_launch_time;
-+__u64 launch_time_offset = 1000000000; /* 1 second */
+ #define rxrpc_rtt_rx_traces \
+-	EM(rxrpc_rtt_rx_cancel,			"CNCL") \
++	EM(rxrpc_rtt_rx_other_ack,		"OACK") \
+ 	EM(rxrpc_rtt_rx_obsolete,		"OBSL") \
+ 	EM(rxrpc_rtt_rx_lost,			"LOST") \
+ 	EM(rxrpc_rtt_rx_ping_response,		"PONG") \
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 030d64f282f37..3f9594d125192 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -643,12 +643,8 @@ static void rxrpc_complete_rtt_probe(struct rxrpc_call *call,
+ 			clear_bit(i + RXRPC_CALL_RTT_PEND_SHIFT, &call->rtt_avail);
+ 			smp_mb(); /* Read data before setting avail bit */
+ 			set_bit(i, &call->rtt_avail);
+-			if (type != rxrpc_rtt_rx_cancel)
+-				rxrpc_peer_add_rtt(call, type, i, acked_serial, ack_serial,
+-						   sent_at, resp_time);
+-			else
+-				trace_rxrpc_rtt_rx(call, rxrpc_rtt_rx_cancel, i,
+-						   orig_serial, acked_serial, 0, 0);
++			rxrpc_peer_add_rtt(call, type, i, acked_serial, ack_serial,
++					   sent_at, resp_time);
+ 			matched = true;
+ 		}
  
- void test__fail(void) { /* for network_helpers.c */ }
+@@ -801,20 +797,21 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 			   summary.ack_reason, nr_acks);
+ 	rxrpc_inc_stat(call->rxnet, stat_rx_acks[ack.reason]);
  
-@@ -274,6 +277,8 @@ static bool complete_tx(struct xsk *xsk, clockid_t clock_id)
- 	if (meta->completion.tx_timestamp) {
- 		__u64 ref_tstamp = gettime(clock_id);
- 
-+		print_tstamp_delta("HW Launch-time", "HW TX-complete-time",
-+				   last_launch_time, meta->completion.tx_timestamp);
- 		print_tstamp_delta("HW TX-complete-time", "User TX-complete-time",
- 				   meta->completion.tx_timestamp, ref_tstamp);
- 		print_tstamp_delta("XDP RX-time", "User TX-complete-time",
-@@ -371,6 +376,13 @@ static void ping_pong(struct xsk *xsk, void *rx_packet, clockid_t clock_id)
- 	       xsk, ntohs(udph->check), ntohs(want_csum),
- 	       meta->request.csum_start, meta->request.csum_offset);
- 
-+	/* Set launch time at launch_time_offset ns later than HW Rx-time */
-+	meta->flags |= XDP_TXMD_FLAGS_LAUNCH_TIME;
-+	last_launch_time = last_hw_rx_timestamp + launch_time_offset;
-+	meta->request.launch_time = last_launch_time;
-+	print_tstamp_delta("HW RX-time", "HW Launch-time",
-+			   last_hw_rx_timestamp, meta->request.launch_time);
-+
- 	memcpy(data, rx_packet, len); /* don't share umem chunk for simplicity */
- 	tx_desc->options |= XDP_TX_METADATA;
- 	tx_desc->len = len;
-@@ -595,6 +607,7 @@ static void print_usage(void)
- 		"  -h    Display this help and exit\n\n"
- 		"  -m    Enable multi-buffer XDP for larger MTU\n"
- 		"  -r    Don't generate AF_XDP reply (rx metadata only)\n"
-+		"  -l    Delta of HW launch time to HW RX-time in ns (default: 1s)\n"
- 		"Generate test packets on the other machine with:\n"
- 		"  echo -n xdp | nc -u -q1 <dst_ip> 9091\n";
- 
-@@ -605,7 +618,7 @@ static void read_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "chmr")) != -1) {
-+	while ((opt = getopt(argc, argv, "chmrl:")) != -1) {
- 		switch (opt) {
- 		case 'c':
- 			bind_flags &= ~XDP_USE_NEED_WAKEUP;
-@@ -621,6 +634,9 @@ static void read_args(int argc, char *argv[])
- 		case 'r':
- 			skip_tx = true;
- 			break;
-+		case 'l':
-+			launch_time_offset = atoll(optarg);
+-	switch (ack.reason) {
+-	case RXRPC_ACK_PING_RESPONSE:
+-		rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
+-					 rxrpc_rtt_rx_ping_response);
+-		break;
+-	case RXRPC_ACK_REQUESTED:
+-		rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
+-					 rxrpc_rtt_rx_requested_ack);
+-		break;
+-	default:
+-		if (acked_serial != 0)
++	if (acked_serial != 0) {
++		switch (ack.reason) {
++		case RXRPC_ACK_PING_RESPONSE:
+ 			rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
+-						 rxrpc_rtt_rx_cancel);
+-		break;
++						 rxrpc_rtt_rx_ping_response);
 +			break;
- 		case '?':
- 			if (isprint(optopt))
- 				fprintf(stderr, "Unknown option: -%c\n", optopt);
++		case RXRPC_ACK_REQUESTED:
++			rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
++						 rxrpc_rtt_rx_requested_ack);
++			break;
++		default:
++			rxrpc_complete_rtt_probe(call, skb->tstamp, acked_serial, ack_serial,
++						 rxrpc_rtt_rx_other_ack);
++			break;
++		}
+ 	}
+ 
+ 	if (ack.reason == RXRPC_ACK_PING) {
 -- 
-2.34.1
+2.42.0
+
+
 
 
