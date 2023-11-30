@@ -1,252 +1,222 @@
-Return-Path: <netdev+bounces-52638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A2A7FF8E6
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:57:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F577FF979
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:36:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8EAE1C20F10
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:57:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D280F2817B6
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDD3584ED;
-	Thu, 30 Nov 2023 17:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA5556440;
+	Thu, 30 Nov 2023 18:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="WAT5oDG7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VClaQUPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17284106;
-	Thu, 30 Nov 2023 09:57:10 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 9BE2310000C;
-	Thu, 30 Nov 2023 20:57:08 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 9BE2310000C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701367028;
-	bh=GQ+XJH7YnidtbHQaeaS0PeBL7Kso+nmuqzoHzSKei08=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=WAT5oDG7EWHGRtCF3+fWOeNq4o/9hGg/zbaTEtx+L2DxaeCbRLzTRHJZ0nTTpB3Sc
-	 8TmresZUJHN3C+Ob+rd74J4Gp1ATwwWeCuLmmUEPpODmQ3ldHNGOT3MCNUDhwwdeKi
-	 /olwbmnbVzFSw3cl1ImM2A7eW2TMOKJayaX+auiSSxyjaZ2GJ4g4CrTRhnHsqGcCo4
-	 m2VpRraAmYsj1GBdvk/9B5zOUydd+YQzhPPItlB3BUx9wfIAAnwPe7tSjR0cEeQs3A
-	 aD/+68BIqYvXbvgXdiBaWLV+GMa13Gyzm8hrCWPkJT8PukuavC1+kzjgdD4h2tpyb5
-	 /UFIqgNR8xiMg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 30 Nov 2023 20:57:08 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 30 Nov 2023 20:57:07 +0300
-Message-ID: <71d18598-1793-0c6c-7de6-f546befc47c1@salutedevices.com>
-Date: Thu, 30 Nov 2023 20:49:09 +0300
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A952D10EA;
+	Thu, 30 Nov 2023 10:35:59 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a1882023bbfso140719566b.3;
+        Thu, 30 Nov 2023 10:35:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701369358; x=1701974158; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j0ZuOjmtVHlX0ubp6onvOS4SnKgdwsygvRAPYLPj5Bk=;
+        b=VClaQUPoMm3HrD4O9OjZ+GMdSY65hI0RPDnB5/uv2AJdZ/K6dEpNsbvDkEnJwrdMzx
+         R/ZwthoENl1ma5LsRAxS1WZqN3PO1VsQjMJv6PWlXaln02sFFxSE+TYg12k4vbCW5QfL
+         VVbfwRBaJ6BNkH6rEz52xtxgrFeFQ9JE+CaVBhG8JLJXDGmUL4fASFTh/WzPvnns9SQw
+         dRRlEpGVQYwFawRsaXAlZzkXmkxfUfwzRjwPfp307i/6ucwYwrHFBFt6iFyA+uyA2yTN
+         y6LmeJkY8e/tKMFw9BzC8t9ULdg3/KzmFobXz/IwUqcr3gU65Ad//sSN/dva0awB0b8T
+         wuTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701369358; x=1701974158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j0ZuOjmtVHlX0ubp6onvOS4SnKgdwsygvRAPYLPj5Bk=;
+        b=J8T3Nf9BrFM18dYiBj8jwGnX8Det9o5kFjeF3Qib14gPowNq7lOE5TdjwGVqpalh48
+         Ip1DB0R4ZaIyV3DJeCHQyeBHPuceoHuqwXRnIZszQZaCNQX2tWrOqhqCG8trZs/8M00x
+         gnbKqb2Myj5PfgpMXEb3EPHRRUthtkQRdukB7FtRY2PgMqFoCSJGTq+lNro160cM2Fq9
+         EUYscLLmdT54vDv1kWPY5BpwXoSkTqdjq8p1bcGRDcQAl00b21NManBgVNXXaG8wdnFu
+         GQm4AdDC1mFdJN8qz9cct1ZLRoAXDJrMv5gK11cpYecGpKt/eM4rkIjB5nBlt2LbzSzE
+         q7Mg==
+X-Gm-Message-State: AOJu0Yyn4vnnqDZcny2qgTENq8G9lhqHC8jG0kxX78Lvw4W4+VwMSXoN
+	lLbVO9kk0s3QPGIJQCZnEQZQ07ESZGEGqBUI1kD+xUOy
+X-Google-Smtp-Source: AGHT+IGIBH8l0IRBM5I7fwjL4au6/JL5XgUgQma4YCeHzWocvzxDOGysPlgCPKQFgWRiAKTrYRHY2EhCVQJG+08hf58=
+X-Received: by 2002:a50:aad8:0:b0:54b:10a8:ad6f with SMTP id
+ r24-20020a50aad8000000b0054b10a8ad6fmr1119edc.40.1701367070000; Thu, 30 Nov
+ 2023 09:57:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
- setting SO_RCVLOWAT
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi
-	<stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231130130840.253733-1-avkrasnov@salutedevices.com>
- <20231130130840.253733-3-avkrasnov@salutedevices.com>
- <20231130084044-mutt-send-email-mst@kernel.org>
- <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
- <20231130085445-mutt-send-email-mst@kernel.org>
- <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
- <b3fa2aaa-9fdc-30a2-4c87-53eb106900ee@salutedevices.com>
- <20231130123653-mutt-send-email-mst@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20231130123653-mutt-send-email-mst@kernel.org>
+References: <20231127190409.2344550-1-andrii@kernel.org> <20231127190409.2344550-4-andrii@kernel.org>
+ <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com> <20231130-katzen-anhand-7ad530f187da@brauner>
+In-Reply-To: <20231130-katzen-anhand-7ad530f187da@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 30 Nov 2023 09:57:37 -0800
+Message-ID: <CAEf4BzZA2or352VkAaBsr+fsWAGO1Cs_gonH7Ffm5emXGE+2Ug@mail.gmail.com>
+Subject: Re: [PATCH v11 bpf-next 03/17] bpf: introduce BPF token object
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181746 [Nov 30 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;lore.kernel.org:7.1.1;salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/11/30 16:58:00
-X-KSMG-LinksScanning: Clean, bases: 2023/11/30 17:45:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/30 16:54:00 #22587452
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Nov 30, 2023 at 6:27=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> On Tue, Nov 28, 2023 at 04:05:36PM -0800, Andrii Nakryiko wrote:
+> > On Mon, Nov 27, 2023 at 11:06=E2=80=AFAM Andrii Nakryiko <andrii@kernel=
+.org> wrote:
+> > >
+> > > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > > allow delegating privileged BPF functionality, like loading a BPF
+> > > program or creating a BPF map, from privileged process to a *trusted*
+> > > unprivileged process, all while having a good amount of control over =
+which
+> > > privileged operations could be performed using provided BPF token.
+> > >
+> > > This is achieved through mounting BPF FS instance with extra delegati=
+on
+> > > mount options, which determine what operations are delegatable, and a=
+lso
+> > > constraining it to the owning user namespace (as mentioned in the
+> > > previous patch).
+> > >
+> > > BPF token itself is just a derivative from BPF FS and can be created
+> > > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts =
+BPF
+> > > FS FD, which can be attained through open() API by opening BPF FS mou=
+nt
+> > > point. Currently, BPF token "inherits" delegated command, map types,
+> > > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > > having an BPF token as a separate object with its own FD, we can allo=
+w
+> > > to further restrict BPF token's allowable set of things either at the
+> > > creation time or after the fact, allowing the process to guard itself
+> > > further from unintentionally trying to load undesired kind of BPF
+> > > programs. But for now we keep things simple and just copy bit sets as=
+ is.
+> > >
+> > > When BPF token is created from BPF FS mount, we take reference to the
+> > > BPF super block's owning user namespace, and then use that namespace =
+for
+> > > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > > capabilities that are normally only checked against init userns (usin=
+g
+> > > capable()), but now we check them using ns_capable() instead (if BPF
+> > > token is provided). See bpf_token_capable() for details.
+> > >
+> > > Such setup means that BPF token in itself is not sufficient to grant =
+BPF
+> > > functionality. User namespaced process has to *also* have necessary
+> > > combination of capabilities inside that user namespace. So while
+> > > previously CAP_BPF was useless when granted within user namespace, no=
+w
+> > > it gains a meaning and allows container managers and sys admins to ha=
+ve
+> > > a flexible control over which processes can and need to use BPF
+> > > functionality within the user namespace (i.e., container in practice)=
+.
+> > > And BPF FS delegation mount options and derived BPF tokens serve as
+> > > a per-container "flag" to grant overall ability to use bpf() (plus fu=
+rther
+> > > restrict on which parts of bpf() syscalls are treated as namespaced).
+> > >
+> > > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BP=
+F)
+> > > within the BPF FS owning user namespace, rounding up the ns_capable()
+> > > story of BPF token.
+> > >
+> > > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > ---
+> > >  include/linux/bpf.h            |  41 +++++++
+> > >  include/uapi/linux/bpf.h       |  37 ++++++
+> > >  kernel/bpf/Makefile            |   2 +-
+> > >  kernel/bpf/inode.c             |  17 ++-
+> > >  kernel/bpf/syscall.c           |  17 +++
+> > >  kernel/bpf/token.c             | 209 +++++++++++++++++++++++++++++++=
+++
+> > >  tools/include/uapi/linux/bpf.h |  37 ++++++
+> > >  7 files changed, 350 insertions(+), 10 deletions(-)
+> > >  create mode 100644 kernel/bpf/token.c
+> > >
+> >
+> > [...]
+> >
+> > > +int bpf_token_create(union bpf_attr *attr)
+> > > +{
+> > > +       struct bpf_mount_opts *mnt_opts;
+> > > +       struct bpf_token *token =3D NULL;
+> > > +       struct user_namespace *userns;
+> > > +       struct inode *inode;
+> > > +       struct file *file;
+> > > +       struct path path;
+> > > +       struct fd f;
+> > > +       umode_t mode;
+> > > +       int err, fd;
+> > > +
+> > > +       f =3D fdget(attr->token_create.bpffs_fd);
+> > > +       if (!f.file)
+> > > +               return -EBADF;
+> > > +
+> > > +       path =3D f.file->f_path;
+> > > +       path_get(&path);
+> > > +       fdput(f);
+> > > +
+> > > +       if (path.dentry !=3D path.mnt->mnt_sb->s_root) {
+> > > +               err =3D -EINVAL;
+> > > +               goto out_path;
+> > > +       }
+> > > +       if (path.mnt->mnt_sb->s_op !=3D &bpf_super_ops) {
+> > > +               err =3D -EINVAL;
+> > > +               goto out_path;
+> > > +       }
+> > > +       err =3D path_permission(&path, MAY_ACCESS);
+> > > +       if (err)
+> > > +               goto out_path;
+> > > +
+> > > +       userns =3D path.dentry->d_sb->s_user_ns;
+> > > +       /*
+> > > +        * Enforce that creators of BPF tokens are in the same user
+> > > +        * namespace as the BPF FS instance. This makes reasoning abo=
+ut
+> > > +        * permissions a lot easier and we can always relax this late=
+r.
+> > > +        */
+> > > +       if (current_user_ns() !=3D userns) {
+> > > +               err =3D -EPERM;
+> > > +               goto out_path;
+> > > +       }
+> >
+> > Hey Christian,
+> >
+> > I've added stricter userns check as discussed on previous revision,
+> > and a few lines above fixed BPF FS root check (path.dentry !=3D
+> > path.mnt->mnt_sb->s_root). Hopefully that addresses the remaining
+> > concerns you've had.
+> >
+> > I'd appreciate it if you could take another look to double check if
+> > I'm not messing anything up, and if it all looks good, can I please
+> > get an ack from you? Thank you!
+>
+> Please enforce that in order to use a token the caller must be in the
+> same user namespace as the token as well. IOW, we don't want to yet make
+> it possible to use a token created in an ancestor user namespace to load
+> or attach bpf programs in a descendant user namespace. Let's be as
+> restrictive as we can: tokens are only valid within the user namespace
+> they were created in.
 
+Ok, I will add the check to bpf_token_allow_cmd() and bpf_token_capable().
 
-On 30.11.2023 20:37, Michael S. Tsirkin wrote:
-> On Thu, Nov 30, 2023 at 06:41:56PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 30.11.2023 17:11, Stefano Garzarella wrote:
->>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
->>>> On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
->>>>>
->>>>>
->>>>> On 30.11.2023 16:42, Michael S. Tsirkin wrote:
->>>>>> On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
->>>>>>> Send credit update message when SO_RCVLOWAT is updated and it is bigger
->>>>>>> than number of bytes in rx queue. It is needed, because 'poll()' will
->>>>>>> wait until number of bytes in rx queue will be not smaller than
->>>>>>> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
->>>>>>> for tx/rx is possible: sender waits for free space and receiver is
->>>>>>> waiting data in 'poll()'.
->>>>>>>
->>>>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>>>>>> ---
->>>>>>>   Changelog:
->>>>>>>   v1 -> v2:
->>>>>>>    * Update commit message by removing 'This patch adds XXX' manner.
->>>>>>>    * Do not initialize 'send_update' variable - set it directly during
->>>>>>>      first usage.
->>>>>>>   v3 -> v4:
->>>>>>>    * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
->>>>>>>   v4 -> v5:
->>>>>>>    * Do not change callbacks order in transport structures.
->>>>>>>
->>>>>>>   drivers/vhost/vsock.c                   |  1 +
->>>>>>>   include/linux/virtio_vsock.h            |  1 +
->>>>>>>   net/vmw_vsock/virtio_transport.c        |  1 +
->>>>>>>   net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
->>>>>>>   net/vmw_vsock/vsock_loopback.c          |  1 +
->>>>>>>   5 files changed, 31 insertions(+)
->>>>>>>
->>>>>>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>>>>>> index f75731396b7e..4146f80db8ac 100644
->>>>>>> --- a/drivers/vhost/vsock.c
->>>>>>> +++ b/drivers/vhost/vsock.c
->>>>>>> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
->>>>>>>           .notify_buffer_size       = virtio_transport_notify_buffer_size,
->>>>>>>
->>>>>>>           .read_skb = virtio_transport_read_skb,
->>>>>>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
->>>>>>>       },
->>>>>>>
->>>>>>>       .send_pkt = vhost_transport_send_pkt,
->>>>>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->>>>>>> index ebb3ce63d64d..c82089dee0c8 100644
->>>>>>> --- a/include/linux/virtio_vsock.h
->>>>>>> +++ b/include/linux/virtio_vsock.h
->>>>>>> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
->>>>>>>   void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
->>>>>>>   int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
->>>>>>>   int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
->>>>>>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
->>>>>>>   #endif /* _LINUX_VIRTIO_VSOCK_H */
->>>>>>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->>>>>>> index af5bab1acee1..8007593a3a93 100644
->>>>>>> --- a/net/vmw_vsock/virtio_transport.c
->>>>>>> +++ b/net/vmw_vsock/virtio_transport.c
->>>>>>> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
->>>>>>>           .notify_buffer_size       = virtio_transport_notify_buffer_size,
->>>>>>>
->>>>>>>           .read_skb = virtio_transport_read_skb,
->>>>>>> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
->>>>>>>       },
->>>>>>>
->>>>>>>       .send_pkt = virtio_transport_send_pkt,
->>>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>>>>> index f6dc896bf44c..1cb556ad4597 100644
->>>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>>>>> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
->>>>>>>   }
->>>>>>>   EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
->>>>>>>
->>>>>>> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, >> int val)
->>>>>>> +{
->>>>>>> +    struct virtio_vsock_sock *vvs = vsk->trans;
->>>>>>> +    bool send_update;
->>>>>>> +
->>>>>>> +    spin_lock_bh(&vvs->rx_lock);
->>>>>>> +
->>>>>>> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
->>>>>>> +     * kick sender to send more data, because sender may sleep in >> its
->>>>>>> +     * 'send()' syscall waiting for enough space at our side.
->>>>>>> +     */
->>>>>>> +    send_update = vvs->rx_bytes < val;
->>>>>>> +
->>>>>>> +    spin_unlock_bh(&vvs->rx_lock);
->>>>>>> +
->>>>>>> +    if (send_update) {
->>>>>>> +        int err;
->>>>>>> +
->>>>>>> +        err = virtio_transport_send_credit_update(vsk);
->>>>>>> +        if (err < 0)
->>>>>>> +            return err;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    return 0;
->>>>>>> +}
->>>>>>
->>>>>>
->>>>>> I find it strange that this will send a credit update
->>>>>> even if nothing changed since this was called previously.
->>>>>> I'm not sure whether this is a problem protocol-wise,
->>>>>> but it certainly was not envisioned when the protocol was
->>>>>> built. WDYT?
->>>>>
->>>>> >From virtio spec I found:
->>>>>
->>>>> It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
->>>>> VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
->>>>> in buffer space occurs.
->>>>> So I guess there is no limitations to send such type of packet, e.g. it is not
->>>>> required to be a reply for some another packet. Please, correct me if im wrong.
->>>>>
->>>>> Thanks, Arseniy
->>>>
->>>>
->>>> Absolutely. My point was different - with this patch it is possible
->>>> that you are not adding any credits at all since the previous
->>>> VIRTIO_VSOCK_OP_CREDIT_UPDATE.
->>>
->>> I think the problem we're solving here is that since as an optimization we avoid sending the update for every byte we consume, but we put a threshold, then we make sure we update the peer.
->>>
->>> A credit update contains a snapshot and sending it the same as the previous one should not create any problem.
->>>
->>> My doubt now is that we only do this when we set RCVLOWAT , should we also do something when we consume bytes to avoid the optimization we have?
->>
->> @Michael, Stefano just reproduced problem during bytes reading, but there is already old fix for this, which we forget to merge:)
->> I think it must be included to this patchset.
->>
->> https://lore.kernel.org/netdev/f304eabe-d2ef-11b1-f115-6967632f0339@sberdevices.ru/
->>
->> Thanks, Arseniy
-> 
-> 
-> I generally don't merge patches tagged as RFC.
-> Repost without that tag?
-> Also, it looks like a bugfix we need either way, no?
-
-I'll repost it without RFC as part of this patchset, also i'll add test for it
-
-Thanks, Arseniy
-
-> 
->>>
->>> Stefano
->>>
-> 
+Thanks a lot for the reviews!
 
