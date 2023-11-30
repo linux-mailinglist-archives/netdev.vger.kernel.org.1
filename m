@@ -1,111 +1,169 @@
-Return-Path: <netdev+bounces-52702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8C97FFC9A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:35:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C12A67FFC9C
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEC80B210BF
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:34:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A7AA281A86
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FBD59142;
-	Thu, 30 Nov 2023 20:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF7359151;
+	Thu, 30 Nov 2023 20:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZDiYNDVj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="maO0WLRr"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EB2A1703;
-	Thu, 30 Nov 2023 12:34:50 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4FFB8240006;
-	Thu, 30 Nov 2023 20:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701376488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IzQ3On710hTv4xHUxSRSe52ROEYKFUSjwFd+FRw9ZWo=;
-	b=ZDiYNDVjFXSdd+LTZVKANyqlnEkTWiTR8yc/VLuFsekCuu17tQQuKYpOMDajW5APgyyZgn
-	K/c4zgpvDVG+cc2AUL7Bo/kTCLhhz+QBP1BknOrBANFqUrIU9nnWBdMTcyHg44TN4JAuCU
-	1L+grucTiVpIrmCYvcsvxcBaFj0opmJp6PWECQ0NsgXWyKBlp2eMcWvfnj2uuYgatUS1wI
-	bQIhD6vcX0DlHmnQNKoXgzm4ogPNiRCBhbtPqU5k2scwA3MTTyGvgf8E3jSLWwnf9uqbiM
-	aHV/8bpcShrEg/vqzSLYKYmJ4+jHTjP5zGv3rKUmt7UINkA+DanGsptTm8CfSw==
-Date: Thu, 30 Nov 2023 21:34:41 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tomer Maimon <tmaimon77@gmail.com>,
- davem@davemloft.net, avifishman70@gmail.com, venture@google.com,
- openbmc@lists.ozlabs.org, robh+dt@kernel.org, tali.perry1@gmail.com,
- mcoquelin.stm32@gmail.com, edumazet@google.com, joabreu@synopsys.com,
- joel@jms.id.au, krzysztof.kozlowski+dt@linaro.org, peppe.cavallaro@st.com,
- j.neuschaefer@gmx.net, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, benjaminfair@google.com
-Subject: Re: [Linux-stm32] [PATCH v1 2/2] net: stmmac: Add NPCM support
-Message-ID: <20231130213441.032a661c@device.home>
-In-Reply-To: <xvy2coamb6cl3wcbkl32f6w7kksoxfocyd63t7k7bz4pne2gyx@lktivhqovy7p>
-References: <20231121151733.2015384-1-tmaimon77@gmail.com>
-	<20231121151733.2015384-3-tmaimon77@gmail.com>
-	<6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
-	<CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
-	<9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
-	<CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
-	<CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
-	<a551aefa-777d-4fd3-b1a5-086dc3e62646@lunn.ch>
-	<CAP6Zq1jVO5y3ySeGNE5-=XWV6Djay5MhGxXCZb9y91q=EA71Vg@mail.gmail.com>
-	<25d0c091-3dce-4d62-a112-c82106809c65@lunn.ch>
-	<xvy2coamb6cl3wcbkl32f6w7kksoxfocyd63t7k7bz4pne2gyx@lktivhqovy7p>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4F95674E;
+	Thu, 30 Nov 2023 20:35:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5CA8C433C8;
+	Thu, 30 Nov 2023 20:35:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701376507;
+	bh=TMbxkVXhSMNls7arGzXSGdcXn5cA3ZdLWLsa3WgMvsM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=maO0WLRrf6UG7/RQiYC1WqanCdVjCwlFVybtsufUe13lzOPxLM7bflV0XP65Ryv09
+	 Ox1WXDYJWLLFehrmtADKcpw2/qI1rU00LW6/u00uRCIc4DQPxS+gbBskTqiWMlg79Y
+	 B3fS/o/vKRiUz4TGGjWq2l65adtBOO1cfllh5Myybw4aOlUVBv0wnPDhE9iV0XJ3ev
+	 56rdhlSjXqGORxxswNy7kRz33uDTynVSnNUgL04EEEWMp2ymVCe3VYIkBgWqeJK5E7
+	 DWBNTrbDfIEb6MXFdFxDQwU5EyfL4Bm/UWiOOcCYkY/XQZzcKsrOiz1Ge0Ks5aSmvX
+	 qYHEJvxvNMsGw==
+Message-ID: <e3402045-a36f-461f-8eab-bbc51735492d@kernel.org>
+Date: Thu, 30 Nov 2023 21:35:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Edward Cree <ecree.xilinx@gmail.com>
+Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
+ Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, kernel-team
+ <kernel-team@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Jakub Sitnicki <jakub@cloudflare.com>
+References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
+ <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
+ <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net> <87fs0qj61x.fsf@toke.dk>
+ <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com> <87plzsi5wj.fsf@toke.dk>
+ <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net> <871qc72vmh.fsf@toke.dk>
+ <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
 
-On Thu, 30 Nov 2023 22:59:32 +0300
-Serge Semin <fancer.lancer@gmail.com> wrote:
 
-> On Thu, Nov 30, 2023 at 06:26:13PM +0100, Andrew Lunn wrote:
-> > > I will check with the xpcs maintainer how can we add indirect access
-> > > to the xpcs module.  
-> > 
-> > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c#L449
-> > 
-> > It creates a regmap for the memory range. On top of that it creates an
-> > MDIO bus. You can then access the PCS in the normal way.  
+On 11/30/23 17:32, Daniel Borkmann wrote:
+> On 11/30/23 2:55 PM, Toke Høiland-Jørgensen wrote:
+>> Daniel Borkmann <daniel@iogearbox.net> writes
+>>> On 11/29/23 10:52 PM, Toke Høiland-Jørgensen wrote:
+>>>> Edward Cree <ecree.xilinx@gmail.com> writes:
+>>>>> On 28/11/2023 14:39, Toke Høiland-Jørgensen wrote:
+>>>>>> I'm not quite sure what should be the semantics of that, though. 
+>>>>>> I.e.,
+>>>>>> if you are trying to aggregate two packets that have the flag set, 
+>>>>>> which
+>>>>>> packet do you take the value from? What if only one packet has the 
+>>>>>> flag
+>>>
+>>> It would probably make sense if both packets have it set.
+>>
+>> Right, so "aggregate only if both packets have the flag set, keeping the
+>> metadata area from the first packet", then?
 > 
-> Actually Synopsys DW XPCS can be synthesized with two types of the CSR
-> interfaces:
-> 1. MDIO: device looks as a normal MDIO device. This option is currently
->    supported by the STMMAC MDIO driver.
-> 2. MCI/APB3: device MMD CSRs are directly (all CSRs are visible) or
->    indirectly (paged-base access) accessible over the system memory bus.
+> Yes, sgtm.
 > 
-> In addition to the above XPCS device can be equipped with separate
-> clock sources (at least to feed the MCI or APB3 interface) and may
-> have dedicated IRQ line to signal various events like link
-> establishing, failures, etc. From that perspective XPCS in both cases
-> looks as a normal platform device for which would be better to have a
-> special DT-node defined with all those resources supplied. Then the
-> XPCS DT-node could be passed to the DW MAC DT-node via the already
-> standardized "pcs-handle" DT-property.
 
-To my understanding, this should work, there's another PCS that works
-this way : 
-https://elixir.bootlin.com/linux/v6.7-rc3/source/drivers/net/pcs/pcs-rzn1-miic.c
+Seems like a good default behavior: "keeping the metadata area from the 
+first packet".
+(Please object if someone sees a issue for their use-case with this 
+default.)
 
-Are you still able to use the mdio-regmap glue that Andrew mentioned,
-to avoid the duplication between the mdio and mmio register accesses ?
 
-Maxime
+>>>>>> set? Or should we instead have a "metadata_xdp_only" flag that just
+>>>>>> prevents the skb metadata field from being set entirely?
+>>>
+>>> What would be the use case compared to resetting meta data right before
+>>> we return with XDP_PASS?
+>>
+>> I was thinking it could save a call to xdp_adjust_meta() to reset it
+>> back to zero before PASSing the packet. But okay, that may be of
+>> marginal utility.
+> 
+> Agree, feels too marginal.
+>
+
+I should explain our use-case(s) a bit more.
+We do want the information to survive XDP_PASS into the SKB.
+Its the hole point, as we want to transfer information from XDP layer to
+TC-layer and perhaps further all the way to BPF socket filters (I even
+heard someone asked for).
+
+I'm trying to get an overview, as I now have multiple product teams that
+want to store information across/into differ layer, and they have other
+teams that consume this information.
+
+We are exploring more options than only XDP metadata area to store
+information.  I have suggested that once an SKB have a socket
+associated, then we can switch into using BPF local socket storage
+tricks. (The lifetime of XDP metadata is not 100% clear as e.g.
+pskb_expand_head clears it via skb_metadata_clear).
+All ideas are welcome, e.g. I'm also looking at ability to store
+auxiliary/metadata data associated with a dst_entry. And SKB->mark is
+already used for other use-cases and isn't big enough. (and then there
+is fun crossing a netns boundry).
+
+Let me explain *one* of the concrete use-cases.  As described in [1],
+the CF XDP L4 load-balancer Unimog have been extended to a product
+called Plurimog that does load-balancing across data-centers "colo's".
+When Plurimog redirects to another colo, the original "landing" colo's
+ID is carried across (in some encap header) to a Unimog instance.  Thus,
+the original landing Colo ID is known to Unimog running in another colo,
+but that header is popped, so this info need to be transferred somehow.
+I'm told that even the webserver/Nginx need to know the orig/foreign
+landing colo ID (here there should be socket associated). For TCP SYN
+packets, the layered DOS protecting also need to know foreign landing
+colo ID. Other teams/products needs this for accounting, e.g. Traffic
+Manager[1], Radar[2] and Capacity planning.
+
+
+  [1] https://blog.cloudflare.com/meet-traffic-manager/
+  [2] https://radar.cloudflare.com/
+
+
+
+>>>>> Sounds like what's actually needed is bpf progs inside the GRO engine
+>>>>>    to implement the metadata "protocol" prepare and coalesce 
+>>>>> callbacks?
+>>>>
+>>>> Hmm, yes, I guess that would be the most general solution :)
+>>>
+>>> Feels like a potential good fit, agree, although for just solving the
+>>> above sth not requiring extra BPF might be nice as well.
+>>
+>> Yeah, I agree that just the flag makes sense on its own.
+
+I've mentioned before (e.g. at NetConf) I would really like to see BPF
+progs inside the GRO engine, but that is a larger project on its own.
+I think it is worth doing eventually, but I likely need a solution to
+unblock the "tracing"/debugging use-case, where someone added a
+timestamp to XDP metadata and discovered GRO was not working.
+
+I guess, we can do the Plurimog use-case now, as it should be stable for
+packets belonging to the same (GRO) flow.
+
+--Jesper
 
