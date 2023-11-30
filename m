@@ -1,154 +1,111 @@
-Return-Path: <netdev+bounces-52701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 017217FFC72
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:28:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8C97FFC9A
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:35:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294351C21188
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:28:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEC80B210BF
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0E6584C7;
-	Thu, 30 Nov 2023 20:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FBD59142;
+	Thu, 30 Nov 2023 20:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT+0NxUg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZDiYNDVj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3195106;
-	Thu, 30 Nov 2023 12:28:37 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-db4364ecd6aso1449445276.2;
-        Thu, 30 Nov 2023 12:28:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701376117; x=1701980917; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YYgokxpdXnom83isGSeLIiEWyDvQWuc8uahFIcEFCiU=;
-        b=lT+0NxUgwEKXHXQwHxoAPu8UiUMQRKxIr/R2Wo/G87IfsGfZLZqqMfT/MAgw1agiY5
-         NbYzaAuSQXMqkwA/ZGRj9AAHLyI9HhXDxpk56CUrSFUurGa3Mm5YqPsJhZLW+rKGSEag
-         8d9ooJHB83tjWRd4eV85vB1r1g7G/K8N1aBTbz/TxYAu0aWmcoqUgdK4jN1gsrxcND79
-         CD1x9LP7qJYwP/5VAZMK6zqSClv7W/L78hfQe2yrEXO9XnR2qvL2pUz44VFG5Spb9gmj
-         leELW/F/dPzivqrVV+8ptS2aqMX4G1ccDrVXkzfB/7ixMa2dii/gsUzy237VCuZktGrN
-         o7Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701376117; x=1701980917;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YYgokxpdXnom83isGSeLIiEWyDvQWuc8uahFIcEFCiU=;
-        b=jAriABDXGTvtxfziSgX8WzTBROg+F99vUmLUVwpjs9FDFIVRtlI70okz3Nd6HygIRG
-         gKQa2z0lmNGDaiZhhHum8Os8sln/kXSq8Yxwer5AsNcksrUgEaZ3v8SEpsyOF+jyrYfy
-         xcTFv73bCZQYf7c1wiursiLS0pYgzAC556iRfbdBXft2c0xAqnpmdmZH0Ps8WBhe8AxX
-         2b2h/V+Eyfz1wnXkUfumLaQYVet2lNSC5p4zBLFi5pxfYG6l9Eb5D1VoFj2SRGI23KwA
-         XCl9DjxgjIoocyT90eUvkjewsYA+RvIhg6WVbGSBTfemJje+Rk1P4ZlEXIAn4rwADHXu
-         ZMQw==
-X-Gm-Message-State: AOJu0YzG/k8xhQpOWbgfLgU3ni+kYhrO4IWcrfBER35PPr0b/jgP5bn2
-	RJaNN5C8ZMm3Zy0adOsw9mk=
-X-Google-Smtp-Source: AGHT+IHYZiQbkBLJ008rJXlLXZbrmVVGfJZyhDvQvrE7IAhJuIYy3iC3ruuDLfNDxv8+R4e1qKgz3Q==
-X-Received: by 2002:a25:268f:0:b0:db5:4938:483 with SMTP id m137-20020a25268f000000b00db549380483mr975627ybm.32.1701376116773;
-        Thu, 30 Nov 2023 12:28:36 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id q2-20020a0c9a42000000b00679d7e76b64sm800622qvd.126.2023.11.30.12.28.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 12:28:36 -0800 (PST)
-Date: Thu, 30 Nov 2023 15:28:36 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Bjorn Topel <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@google.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- bpf@vger.kernel.org, 
- xdp-hints@xdp-project.net, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, 
- linux-kselftest@vger.kernel.org, 
- Song Yoong Siang <yoong.siang.song@intel.com>
-Message-ID: <6568f07418508_fbb8229478@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231130162028.852006-2-yoong.siang.song@intel.com>
-References: <20231130162028.852006-1-yoong.siang.song@intel.com>
- <20231130162028.852006-2-yoong.siang.song@intel.com>
-Subject: Re: [PATCH bpf-next 1/3] xsk: add launch time support to XDP Tx
- metadata
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EB2A1703;
+	Thu, 30 Nov 2023 12:34:50 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4FFB8240006;
+	Thu, 30 Nov 2023 20:34:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701376488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IzQ3On710hTv4xHUxSRSe52ROEYKFUSjwFd+FRw9ZWo=;
+	b=ZDiYNDVjFXSdd+LTZVKANyqlnEkTWiTR8yc/VLuFsekCuu17tQQuKYpOMDajW5APgyyZgn
+	K/c4zgpvDVG+cc2AUL7Bo/kTCLhhz+QBP1BknOrBANFqUrIU9nnWBdMTcyHg44TN4JAuCU
+	1L+grucTiVpIrmCYvcsvxcBaFj0opmJp6PWECQ0NsgXWyKBlp2eMcWvfnj2uuYgatUS1wI
+	bQIhD6vcX0DlHmnQNKoXgzm4ogPNiRCBhbtPqU5k2scwA3MTTyGvgf8E3jSLWwnf9uqbiM
+	aHV/8bpcShrEg/vqzSLYKYmJ4+jHTjP5zGv3rKUmt7UINkA+DanGsptTm8CfSw==
+Date: Thu, 30 Nov 2023 21:34:41 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tomer Maimon <tmaimon77@gmail.com>,
+ davem@davemloft.net, avifishman70@gmail.com, venture@google.com,
+ openbmc@lists.ozlabs.org, robh+dt@kernel.org, tali.perry1@gmail.com,
+ mcoquelin.stm32@gmail.com, edumazet@google.com, joabreu@synopsys.com,
+ joel@jms.id.au, krzysztof.kozlowski+dt@linaro.org, peppe.cavallaro@st.com,
+ j.neuschaefer@gmx.net, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, benjaminfair@google.com
+Subject: Re: [Linux-stm32] [PATCH v1 2/2] net: stmmac: Add NPCM support
+Message-ID: <20231130213441.032a661c@device.home>
+In-Reply-To: <xvy2coamb6cl3wcbkl32f6w7kksoxfocyd63t7k7bz4pne2gyx@lktivhqovy7p>
+References: <20231121151733.2015384-1-tmaimon77@gmail.com>
+	<20231121151733.2015384-3-tmaimon77@gmail.com>
+	<6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
+	<CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
+	<9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
+	<CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
+	<CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
+	<a551aefa-777d-4fd3-b1a5-086dc3e62646@lunn.ch>
+	<CAP6Zq1jVO5y3ySeGNE5-=XWV6Djay5MhGxXCZb9y91q=EA71Vg@mail.gmail.com>
+	<25d0c091-3dce-4d62-a112-c82106809c65@lunn.ch>
+	<xvy2coamb6cl3wcbkl32f6w7kksoxfocyd63t7k7bz4pne2gyx@lktivhqovy7p>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Song Yoong Siang wrote:
-> This patch extends the XDP Tx metadata framework to include Time-Based
-> Scheduling (TBS) support where the NIC will schedule a packet for
-> transmission at a pre-determined time called launch time. The value of
-> launch time is communicated from user space to Ethernet driver via
-> launch_time field of struct xsk_tx_metadata.
+Hello,
+
+On Thu, 30 Nov 2023 22:59:32 +0300
+Serge Semin <fancer.lancer@gmail.com> wrote:
+
+> On Thu, Nov 30, 2023 at 06:26:13PM +0100, Andrew Lunn wrote:
+> > > I will check with the xpcs maintainer how can we add indirect access
+> > > to the xpcs module.  
+> > 
+> > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c#L449
+> > 
+> > It creates a regmap for the memory range. On top of that it creates an
+> > MDIO bus. You can then access the PCS in the normal way.  
 > 
-> Suggested-by: Stanislav Fomichev <sdf@google.com>
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> ---
->  Documentation/netlink/specs/netdev.yaml      |  4 ++++
->  Documentation/networking/xsk-tx-metadata.rst |  5 +++++
->  include/net/xdp_sock.h                       | 10 ++++++++++
->  include/net/xdp_sock_drv.h                   |  1 +
->  include/uapi/linux/if_xdp.h                  |  9 +++++++++
->  include/uapi/linux/netdev.h                  |  3 +++
->  net/core/netdev-genl.c                       |  2 ++
->  net/xdp/xsk.c                                |  3 +++
->  tools/include/uapi/linux/if_xdp.h            |  9 +++++++++
->  tools/include/uapi/linux/netdev.h            |  3 +++
->  tools/net/ynl/generated/netdev-user.c        |  1 +
->  11 files changed, 50 insertions(+)
+> Actually Synopsys DW XPCS can be synthesized with two types of the CSR
+> interfaces:
+> 1. MDIO: device looks as a normal MDIO device. This option is currently
+>    supported by the STMMAC MDIO driver.
+> 2. MCI/APB3: device MMD CSRs are directly (all CSRs are visible) or
+>    indirectly (paged-base access) accessible over the system memory bus.
 > 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index 00439bcbd2e3..a602776bbfb4 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -66,6 +66,10 @@ definitions:
->          name: tx-checksum
->          doc:
->            L3 checksum HW offload is supported by the driver.
-> +      -
-> +        name: launch-time
-> +        doc:
-> +          HW Time-Based Scheduling (TBS) is supported by the driver.
+> In addition to the above XPCS device can be equipped with separate
+> clock sources (at least to feed the MCI or APB3 interface) and may
+> have dedicated IRQ line to signal various events like link
+> establishing, failures, etc. From that perspective XPCS in both cases
+> looks as a normal platform device for which would be better to have a
+> special DT-node defined with all those resources supplied. Then the
+> XPCS DT-node could be passed to the DW MAC DT-node via the already
+> standardized "pcs-handle" DT-property.
 
-Can we avoid introducing another term? We already have too many:
-launchtime, earliest delivery time (EDT), SO_TXTIME,
-pacing offload, earliest txtime first (ETF).  
+To my understanding, this should work, there's another PCS that works
+this way : 
+https://elixir.bootlin.com/linux/v6.7-rc3/source/drivers/net/pcs/pcs-rzn1-miic.c
 
+Are you still able to use the mdio-regmap glue that Andrew mentioned,
+to avoid the duplication between the mdio and mmio register accesses ?
 
+Maxime
 
