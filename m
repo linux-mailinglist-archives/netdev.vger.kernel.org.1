@@ -1,98 +1,163 @@
-Return-Path: <netdev+bounces-52388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE0547FE8DF
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 06:59:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90877FE8F8
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 07:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52DBF282272
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 05:59:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60219282179
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 06:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C821BDF3;
-	Thu, 30 Nov 2023 05:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A2C1D534;
+	Thu, 30 Nov 2023 06:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YvcI6g1k"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Dcip5YaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F05F0D7F;
-	Wed, 29 Nov 2023 21:58:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=QJtAxhbCHcDrRV4Aa254WKnp3BN8TL7k7TrxRHdBrhY=; b=YvcI6g1k+1eUV3+0avRYXIbOgG
-	p2SZ0EUdc5F0Y5Dsotfba0WqgvlwAvBrQ4xJuspFrBleoX+qIxjRYMwUVVPVo6Om1xwX8Xy/5b/YZ
-	WcE1eguohju0yxwfYWIoUD970pq9lENDeNg/EJK8H2PLH9zFdf4SbEtBJQBMpKtw3pG8bVBIwXsQd
-	AkX+kHULUcvbO2egt+EZK5K1FriypfzKj94Q888niLbq4vpurdPvuRCa/ejdGdWr9G4SxL4m42NWu
-	Dr7/fKAvGzKpUIXXDixkhDfj87s3zc4QyI4ZmCpIMnvxVw7goGuhHz3zALyr5lFPCDN9ijAdWE40Y
-	Woz4/h/w==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r8a4c-009ziS-1M;
-	Thu, 30 Nov 2023 05:58:54 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K . Y . Srinivasan" <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	linux-hyperv@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Michael Kelley <mikelley@microsoft.com>
-Subject: [PATCH v2] hv_netvsc: rndis_filter needs to select NLS
-Date: Wed, 29 Nov 2023 21:58:53 -0800
-Message-ID: <20231130055853.19069-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.43.0
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC024D66;
+	Wed, 29 Nov 2023 22:07:24 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AU3K0rs024869;
+	Wed, 29 Nov 2023 22:07:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=z4t1WdlmW+hR+yq0a+c9zTIk+DFWEXOFIevPFNpA530=;
+ b=Dcip5YaDInD8BM7JevsxZbmrGY/0s+G0oH5r/e48CY/Yxa2lsAv1l46muQRW4YptzEKU
+ XowbIS/GBLWGhY/z+FLA+YpC0m5njXp3ScrECMaFOTuBIN0qdhAtgcxCE+0qzq/xVpbN
+ 7h0TN+zbCx5SumiiW26I8tTL/3GURVZmKyse5oXKfxZ4LaX1eaCbiVW8DB3wHbQev5mc
+ Ahfs3nn2a7jaA4UBKnsWJKSX+FkwJ/noGP/4z8sZ38xOnLl9ydjclbkUgwQ2s/lnBAtf
+ glQcQ4Jh8va/FC0am0U1VlTJ8gpYiOLJ2Jx5LXXk7c6fUmGS/ccyYrqlbRyMkXB9Aec5 iQ== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3updt69krk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 29 Nov 2023 22:07:10 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 29 Nov
+ 2023 22:07:08 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 29 Nov 2023 22:07:08 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 880E33F7071;
+	Wed, 29 Nov 2023 22:07:04 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <pbhagavatula@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH] octeontx2-af: debugfs: update CQ context fields
+Date: Thu, 30 Nov 2023 11:37:03 +0530
+Message-ID: <20231130060703.16769-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: a3BB-cXgoS9cXrpvAjNKSNaKFO3snIl4
+X-Proofpoint-ORIG-GUID: a3BB-cXgoS9cXrpvAjNKSNaKFO3snIl4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-30_03,2023-11-29_01,2023-05-22_02
 
-rndis_filter uses utf8s_to_utf16s() which is provided by setting
-NLS, so select NLS to fix the build error:
+From: Nithin Dabilpuram <ndabilpuram@marvell.com>
 
-ERROR: modpost: "utf8s_to_utf16s" [drivers/net/hyperv/hv_netvsc.ko] undefined!
+This patch update the CQ structure fields to support the feature
+added in new silicons and also dump these fields in debugfs.
 
-Fixes: 1ce09e899d28 ("hyperv: Add support for setting MAC from within guests")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: K. Y. Srinivasan <kys@microsoft.com>
-Cc: Wei Liu <wei.liu@kernel.org>
-Cc: Dexuan Cui <decui@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 ---
-v2: correct Subject prefix (Michael)
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c | 17 +++++++++++++++++
+ .../ethernet/marvell/octeontx2/af/rvu_struct.h  | 17 +++++++++++------
+ 2 files changed, 28 insertions(+), 6 deletions(-)
 
- drivers/net/hyperv/Kconfig |    1 +
- 1 file changed, 1 insertion(+)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index 468b6561ed3f..e6d7914ce61c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -1825,6 +1825,8 @@ static void print_nix_rq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
+ static void print_nix_cq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
+ {
+ 	struct nix_cq_ctx_s *cq_ctx = &rsp->cq;
++	struct nix_hw *nix_hw = m->private;
++	struct rvu *rvu = nix_hw->rvu;
+ 
+ 	seq_printf(m, "W0: base \t\t\t%llx\n\n", cq_ctx->base);
+ 
+@@ -1836,6 +1838,16 @@ static void print_nix_cq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
+ 	seq_printf(m, "W1: bpid \t\t\t%d\nW1: bp_ena \t\t\t%d\n\n",
+ 		   cq_ctx->bpid, cq_ctx->bp_ena);
+ 
++	if (!is_rvu_otx2(rvu)) {
++		seq_printf(m, "W1: lbpid_high \t\t\t0x%03x\n", cq_ctx->lbpid_high);
++		seq_printf(m, "W1: lbpid_med \t\t\t0x%03x\n", cq_ctx->lbpid_med);
++		seq_printf(m, "W1: lbpid_low \t\t\t0x%03x\n", cq_ctx->lbpid_low);
++		seq_printf(m, "(W1: lbpid) \t\t\t0x%03x\n",
++			   cq_ctx->lbpid_high << 6 | cq_ctx->lbpid_med << 3 |
++			   cq_ctx->lbpid_low);
++		seq_printf(m, "W1: lbp_ena \t\t\t\t%d\n\n", cq_ctx->lbp_ena);
++	}
++
+ 	seq_printf(m, "W2: update_time \t\t%d\nW2:avg_level \t\t\t%d\n",
+ 		   cq_ctx->update_time, cq_ctx->avg_level);
+ 	seq_printf(m, "W2: head \t\t\t%d\nW2:tail \t\t\t%d\n\n",
+@@ -1847,6 +1859,11 @@ static void print_nix_cq_ctx(struct seq_file *m, struct nix_aq_enq_rsp *rsp)
+ 		   cq_ctx->qsize, cq_ctx->caching);
+ 	seq_printf(m, "W3: substream \t\t\t0x%03x\nW3: ena \t\t\t%d\n",
+ 		   cq_ctx->substream, cq_ctx->ena);
++	if (!is_rvu_otx2(rvu)) {
++		seq_printf(m, "W3: lbp_frac \t\t\t%d\n", cq_ctx->lbp_frac);
++		seq_printf(m, "W3: cpt_drop_err_en \t\t\t%d\n",
++			   cq_ctx->cpt_drop_err_en);
++	}
+ 	seq_printf(m, "W3: drop_ena \t\t\t%d\nW3: drop \t\t\t%d\n",
+ 		   cq_ctx->drop_ena, cq_ctx->drop);
+ 	seq_printf(m, "W3: bp \t\t\t\t%d\n\n", cq_ctx->bp);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
+index edc9367b1b95..5ef406c7e8a4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_struct.h
+@@ -340,11 +340,12 @@ struct nix_aq_res_s {
+ /* NIX Completion queue context structure */
+ struct nix_cq_ctx_s {
+ 	u64 base;
+-	u64 rsvd_64_67		: 4;
++	u64 lbp_ena             : 1;
++	u64 lbpid_low           : 3;
+ 	u64 bp_ena		: 1;
+-	u64 rsvd_69_71		: 3;
++	u64 lbpid_med           : 3;
+ 	u64 bpid		: 9;
+-	u64 rsvd_81_83		: 3;
++	u64 lbpid_high          : 3;
+ 	u64 qint_idx		: 7;
+ 	u64 cq_err		: 1;
+ 	u64 cint_idx		: 7;
+@@ -358,10 +359,14 @@ struct nix_cq_ctx_s {
+ 	u64 drop		: 8;
+ 	u64 drop_ena		: 1;
+ 	u64 ena			: 1;
+-	u64 rsvd_210_211	: 2;
+-	u64 substream		: 20;
++	u64 cpt_drop_err_en     : 1;
++	u64 rsvd_211	        : 1;
++	u64 substream           : 12;
++	u64 stash_thresh        : 4;
++	u64 lbp_frac            : 4;
+ 	u64 caching		: 1;
+-	u64 rsvd_233_235	: 3;
++	u64 stashing            : 1;
++	u64 rsvd_234_235	: 2;
+ 	u64 qsize		: 4;
+ 	u64 cq_err_int		: 8;
+ 	u64 cq_err_int_ena	: 8;
+-- 
+2.25.1
 
-diff -- a/drivers/net/hyperv/Kconfig b/drivers/net/hyperv/Kconfig
---- a/drivers/net/hyperv/Kconfig
-+++ b/drivers/net/hyperv/Kconfig
-@@ -3,5 +3,6 @@ config HYPERV_NET
- 	tristate "Microsoft Hyper-V virtual network driver"
- 	depends on HYPERV
- 	select UCS2_STRING
-+	select NLS
- 	help
- 	  Select this option to enable the Hyper-V virtual network driver.
 
