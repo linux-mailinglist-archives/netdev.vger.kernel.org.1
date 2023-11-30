@@ -1,123 +1,181 @@
-Return-Path: <netdev+bounces-52548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 219DB7FF1B3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:24:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E7957FF1C1
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80BDBB21078
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:23:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF9F6282568
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECB051001;
-	Thu, 30 Nov 2023 14:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A3C51007;
+	Thu, 30 Nov 2023 14:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dG68xzPy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvnHHPzJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30502482E6
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 14:23:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE68BC433C9;
-	Thu, 30 Nov 2023 14:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A36638DE3;
+	Thu, 30 Nov 2023 14:27:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD7CC433C8;
+	Thu, 30 Nov 2023 14:27:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701354235;
-	bh=wZi0hGsQ3XSwYWlqArpLeqdlNCo/znhk/QdMHk4tYUk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dG68xzPyU20XZ30fUI7KF112zmAlPo7LLNpOLogfgPUVOG25PZTzaCKISCVXCNQH5
-	 vAmfvzQ5wSTCLD9v/km1KtpC8tGC+PdmSrNUMWkuuNSyENbR/kQxnw/Csu946O2Q7j
-	 PvA96I/ZxY8C1IG5aVog//9/ItsnjXqQITnhoefE7fjIzgocOUKlyCXK6XZQf3hJfG
-	 MeIbwy62yYT0qjuibndhPLU6qiYktfioL6Uk5V3bOui/Yd3M1a1M6CUmTRA51OYHEY
-	 05pvA00Q58cb/ODMJdQhpBnjPTFDABXbwwD05sLHM5CYIop9dlu7lXPgKJYVH8k9D7
-	 TGeqggUxTBODA==
-Message-ID: <030c7d65-bead-46d0-8422-8a9ff0548d72@kernel.org>
-Date: Thu, 30 Nov 2023 16:23:49 +0200
+	s=k20201202; t=1701354453;
+	bh=yqEXIpQy4FBfhgWNcAYCelks8EMoeqgn8N2Sbjp7GAU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uvnHHPzJl8qbOltPoozNXg6U/WHs3ngyXnvj3BLgTnZtV5Vs36ToUF1csQM4PMR8y
+	 kyX/XZdpGo1+40yZSaTJAwkMS2kXwWzOZXZNm6N/J/t7nfWsM7vRhNaPPctBeneVT+
+	 X0pTcRZd6dtj8nmqwwpZpmmyGLTxV7gHl0SMxCw077O7miwFmyTBI/J5Y/7o7Kn4Aw
+	 eFdQ0y1el2rOHOcg/qpJlSRndKlVCefg5Z/pWcbuG3uz0PjbPAAur+CYnF+i9swHli
+	 6WsndrZZZOTQF+2M5c+lELoUtAE8FWMHW+uStOEDNYB8L5LDaR0x43w2nZ4Q6kAjZD
+	 1FANr8iMFO/oQ==
+Date: Thu, 30 Nov 2023 15:27:28 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, paul@paul-moore.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keescook@chromium.org,
+	kernel-team@meta.com, sargun@sargun.me
+Subject: Re: [PATCH v11 bpf-next 03/17] bpf: introduce BPF token object
+Message-ID: <20231130-katzen-anhand-7ad530f187da@brauner>
+References: <20231127190409.2344550-1-andrii@kernel.org>
+ <20231127190409.2344550-4-andrii@kernel.org>
+ <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 6/7] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-7-rogerq@kernel.org>
- <20231120232620.uciap4bazypzlg3g@skbuf>
- <eeea995b-a294-4a46-aa3e-93fc2b274504@kernel.org>
- <20231121115314.deuvdjk64rcwktl4@skbuf>
- <6def78e7-8264-4745-94f3-b32b854af0c2@kernel.org>
- <20231130132222.w2irs5c4lxh5jcv7@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231130132222.w2irs5c4lxh5jcv7@skbuf>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzauJjmqMdgqBrsvmXjATj4s6Om94BV471LwwdmJpx3PjQ@mail.gmail.com>
 
-
-
-On 30/11/2023 15:22, Vladimir Oltean wrote:
-> On Thu, Nov 30, 2023 at 01:49:03PM +0200, Roger Quadros wrote:
->> Thanks for the debug instructions. Indeed lldpad tries to enable MM TX and the
->> network drivers set_mm() hook gets called and returns success but still
->> lldpad sees some error.
->>
->> I've also confirmed that ethnl_set_mm() runs successfully and returns 1.
->> I suppose something is going wrong in user-space with libnl?
->>
->> Nov 21 11:50:02 am62xx lldpad[708]: eth0: Link partner preemption capability supported
->> Nov 21 11:50:02 am62xx lldpad[708]: eth0: Link partner preemption capability not enabled
->> Nov 21 11:50:02 am62xx lldpad[708]: eth0: Link partner preemption capability not active
->> Nov 21 11:50:02 am62xx lldpad[708]: eth0: Link partner minimum fragment size: 124 octets
->> Nov 21 11:50:02 am62xx lldpad[708]: eth0: initiating MM verification with a retry interval of 134 ms...
->> Nov 21 11:50:02 am62xx lldpad[708]: ethtool: kernel reports: integer out of range
->>
->>
->> full debug log is below.
+On Tue, Nov 28, 2023 at 04:05:36PM -0800, Andrii Nakryiko wrote:
+> On Mon, Nov 27, 2023 at 11:06 AM Andrii Nakryiko <andrii@kernel.org> wrote:
+> >
+> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > allow delegating privileged BPF functionality, like loading a BPF
+> > program or creating a BPF map, from privileged process to a *trusted*
+> > unprivileged process, all while having a good amount of control over which
+> > privileged operations could be performed using provided BPF token.
+> >
+> > This is achieved through mounting BPF FS instance with extra delegation
+> > mount options, which determine what operations are delegatable, and also
+> > constraining it to the owning user namespace (as mentioned in the
+> > previous patch).
+> >
+> > BPF token itself is just a derivative from BPF FS and can be created
+> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts BPF
+> > FS FD, which can be attained through open() API by opening BPF FS mount
+> > point. Currently, BPF token "inherits" delegated command, map types,
+> > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > having an BPF token as a separate object with its own FD, we can allow
+> > to further restrict BPF token's allowable set of things either at the
+> > creation time or after the fact, allowing the process to guard itself
+> > further from unintentionally trying to load undesired kind of BPF
+> > programs. But for now we keep things simple and just copy bit sets as is.
+> >
+> > When BPF token is created from BPF FS mount, we take reference to the
+> > BPF super block's owning user namespace, and then use that namespace for
+> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > capabilities that are normally only checked against init userns (using
+> > capable()), but now we check them using ns_capable() instead (if BPF
+> > token is provided). See bpf_token_capable() for details.
+> >
+> > Such setup means that BPF token in itself is not sufficient to grant BPF
+> > functionality. User namespaced process has to *also* have necessary
+> > combination of capabilities inside that user namespace. So while
+> > previously CAP_BPF was useless when granted within user namespace, now
+> > it gains a meaning and allows container managers and sys admins to have
+> > a flexible control over which processes can and need to use BPF
+> > functionality within the user namespace (i.e., container in practice).
+> > And BPF FS delegation mount options and derived BPF tokens serve as
+> > a per-container "flag" to grant overall ability to use bpf() (plus further
+> > restrict on which parts of bpf() syscalls are treated as namespaced).
+> >
+> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
+> > within the BPF FS owning user namespace, rounding up the ns_capable()
+> > story of BPF token.
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+> >  include/linux/bpf.h            |  41 +++++++
+> >  include/uapi/linux/bpf.h       |  37 ++++++
+> >  kernel/bpf/Makefile            |   2 +-
+> >  kernel/bpf/inode.c             |  17 ++-
+> >  kernel/bpf/syscall.c           |  17 +++
+> >  kernel/bpf/token.c             | 209 +++++++++++++++++++++++++++++++++
+> >  tools/include/uapi/linux/bpf.h |  37 ++++++
+> >  7 files changed, 350 insertions(+), 10 deletions(-)
+> >  create mode 100644 kernel/bpf/token.c
+> >
 > 
-> Ah, you got confused. Openlldp issues multiple ETHTOOL_MSG_MM_SET
-> netlink messages. What you observe is that one of them succeeds, and
-> then another one returns -ERANGE before even calling the driver's
-> set_mm() method.
+> [...]
 > 
-> And that comes from here in net/ethtool/mm.c:
+> > +int bpf_token_create(union bpf_attr *attr)
+> > +{
+> > +       struct bpf_mount_opts *mnt_opts;
+> > +       struct bpf_token *token = NULL;
+> > +       struct user_namespace *userns;
+> > +       struct inode *inode;
+> > +       struct file *file;
+> > +       struct path path;
+> > +       struct fd f;
+> > +       umode_t mode;
+> > +       int err, fd;
+> > +
+> > +       f = fdget(attr->token_create.bpffs_fd);
+> > +       if (!f.file)
+> > +               return -EBADF;
+> > +
+> > +       path = f.file->f_path;
+> > +       path_get(&path);
+> > +       fdput(f);
+> > +
+> > +       if (path.dentry != path.mnt->mnt_sb->s_root) {
+> > +               err = -EINVAL;
+> > +               goto out_path;
+> > +       }
+> > +       if (path.mnt->mnt_sb->s_op != &bpf_super_ops) {
+> > +               err = -EINVAL;
+> > +               goto out_path;
+> > +       }
+> > +       err = path_permission(&path, MAY_ACCESS);
+> > +       if (err)
+> > +               goto out_path;
+> > +
+> > +       userns = path.dentry->d_sb->s_user_ns;
+> > +       /*
+> > +        * Enforce that creators of BPF tokens are in the same user
+> > +        * namespace as the BPF FS instance. This makes reasoning about
+> > +        * permissions a lot easier and we can always relax this later.
+> > +        */
+> > +       if (current_user_ns() != userns) {
+> > +               err = -EPERM;
+> > +               goto out_path;
+> > +       }
 > 
-> 149 const struct nla_policy ethnl_mm_set_policy[ETHTOOL_A_MM_MAX + 1] = {
-> 150 »       [ETHTOOL_A_MM_HEADER]»  »       = NLA_POLICY_NESTED(ethnl_header_policy),
-> 151 »       [ETHTOOL_A_MM_VERIFY_ENABLED]»  = NLA_POLICY_MAX(NLA_U8, 1),
-> 152 »       [ETHTOOL_A_MM_VERIFY_TIME]»     = NLA_POLICY_RANGE(NLA_U32, 1, 128), // <---- here
-> 153 »       [ETHTOOL_A_MM_TX_ENABLED]»      = NLA_POLICY_MAX(NLA_U8, 1),
-> 154 »       [ETHTOOL_A_MM_PMAC_ENABLED]»    = NLA_POLICY_MAX(NLA_U8, 1),
-> 155 »       [ETHTOOL_A_MM_TX_MIN_FRAG_SIZE]»= NLA_POLICY_RANGE(NLA_U32, 60, 252),
-> 156 };
+> Hey Christian,
 > 
-> You are reporting in .get_mm() a maximum verify time which is larger
-> than the core ethtool is willing to accept in a further .set_mm() call.
-> And openlldp will try to max out on the verify time. Hence the -ERANGE.
-
-You are spot on on this. Thanks. :)
-
+> I've added stricter userns check as discussed on previous revision,
+> and a few lines above fixed BPF FS root check (path.dentry !=
+> path.mnt->mnt_sb->s_root). Hopefully that addresses the remaining
+> concerns you've had.
 > 
-> The range I chose for the policy comes from 802.3-2018 clause 30.14.1.6,
-> which says that the aMACMergeVerifyTime variable has a range between 1
-> and 128 ms inclusive.
+> I'd appreciate it if you could take another look to double check if
+> I'm not messing anything up, and if it all looks good, can I please
+> get an ack from you? Thank you!
 
-I forced driver state->max_verify_time = 128; and now that -ERANGE
-error is gone and the lldp test case passes.
-
-I also applied your patch to ethtool_mm.sh and don't see the error with 
-'addFragSize 0' anymore
-
-Should I include your patch in the next revision of this series?
-
--- 
-cheers,
--roger
+Please enforce that in order to use a token the caller must be in the
+same user namespace as the token as well. IOW, we don't want to yet make
+it possible to use a token created in an ancestor user namespace to load
+or attach bpf programs in a descendant user namespace. Let's be as
+restrictive as we can: tokens are only valid within the user namespace
+they were created in.
 
