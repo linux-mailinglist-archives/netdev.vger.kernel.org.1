@@ -1,562 +1,219 @@
-Return-Path: <netdev+bounces-52449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DE37FEC17
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:45:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C67F07FEC1E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2599228194B
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:45:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2B128227F
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E1839848;
-	Thu, 30 Nov 2023 09:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5C83A279;
+	Thu, 30 Nov 2023 09:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LktKvD/R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+1FHY37"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719C38495;
-	Thu, 30 Nov 2023 09:45:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F0F9C433C7;
-	Thu, 30 Nov 2023 09:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701337524;
-	bh=BuhlKb7dMZJImNH5WJgeYsMGxzMvlHb+H9Esw+jSppY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LktKvD/RJQiIl/RbFhePcWOPsrFAO2S9K/p3AfgUVqF0On1afq7UVU6e0YHCg2Nmd
-	 V4aUpdLtuWXgGbLfbyCLvSg6qQ+4GnC8DAfR98o0IMHR+ZqwIRKi62fJfroM87li8/
-	 h410EIp99hpCLbY0gBWhh9F6DhC8/294viNOuiVAcDLyaqNu905nqdXqzXfKRIZ+g1
-	 LFTyKvPGyQarXAB4vkVxXAlCiC10K0YkuGU7+IOTw4dK93mGVozPW87DNIH/a8nhRe
-	 jxiTEEGTVm2hdlEodcpda4aLOPb65X0CDeNn8o3zHJ7aXB23wVVf/eKyQTdC0RvOSF
-	 YtDnOhAEWVVlw==
-Date: Thu, 30 Nov 2023 10:45:21 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, neilb@suse.de,
-	netdev@vger.kernel.org, kuba@kernel.org
-Subject: Re: [PATCH v5 2/3] NFSD: convert write_version to netlink command
-Message-ID: <ZWhZsRKzoSya4gTM@lore-desk>
-References: <cover.1701277475.git.lorenzo@kernel.org>
- <8b47d2e3f704066204149653fd1bd86a64188f61.1701277475.git.lorenzo@kernel.org>
- <88d91863e36a1e36f7770aa8a7f42853250e3d55.camel@kernel.org>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1726E10EF
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:46:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701337566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PfGI1qlZAEAF2BhJp3RmJxUya50qDURSNVaHY6y9EXQ=;
+	b=U+1FHY37/Pn3SjfZwwZL8EhYDSM0wvCGofnyA465OdN7FFx5iRcIoaD1pY5JJM3NpwcGVi
+	MzC8tWJ/jQfQB9BtEbaBirpX0ZYKXlDiwBBmKMmCywA1H55DcVxGEEloAcdbOx9w7TRyH+
+	xVDpsFE9IGuwER4tCijK8E0TS58QlBc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-yCboAz6BNDODXCRzP19AgA-1; Thu, 30 Nov 2023 04:46:04 -0500
+X-MC-Unique: yCboAz6BNDODXCRzP19AgA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-332ee20a3f0so815733f8f.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:46:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701337563; x=1701942363;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PfGI1qlZAEAF2BhJp3RmJxUya50qDURSNVaHY6y9EXQ=;
+        b=h0bE05/a9OL17qZbJHMTUN1XVKIP1NRbrokEJkfxdIUTSYdXEX9R1fTq7Bhwj4ibgZ
+         dA9wvknQghRf3hD3Jq9x/C/HRvdH96OT59D53gTgPqXt4AF5Yo9KH0mSyZeeSNKdOtSa
+         6Y60Yf+N1apWA/8jyn3Qwy5W38sijwM9fbXR7Nc+LsQfvVqC9DTKmNx0kGr05aVdIZtc
+         uE1TSduR1E4NRFFFJZa2diZziUK65o5SXPHVxdBxOm2Z2A1sHiOxszkqVVVV2ny4t0WG
+         Vd0rJkb1qOK0CPmoQKF/vCtlOEjYJNLV39ItzdmC8gJD6q6Vybz6E4GS/zQsaYUzybHb
+         H11A==
+X-Gm-Message-State: AOJu0Yz92thoP1Ju6KSTyMdE41t+EfdmIl3HOO92EP7OjzMQw13V1qvJ
+	Txk7B+EmrJMPq6MvYf4eIAsgEKAAQzrU5VeLpuAg3wYbEs5LJRhM3My0jWPt6f+T2ucvI4TdHQ7
+	2EWE5H3U4txqIiiuz
+X-Received: by 2002:adf:f18a:0:b0:333:2003:f8d5 with SMTP id h10-20020adff18a000000b003332003f8d5mr1300594wro.47.1701337563322;
+        Thu, 30 Nov 2023 01:46:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFZ1YqAf91AEdYFb/UmG1d2aec7j4UFFqWCYZRHFF8ZmzzWbiemhO2JFaP7Qe8H76kv8gs1Wg==
+X-Received: by 2002:adf:f18a:0:b0:333:2003:f8d5 with SMTP id h10-20020adff18a000000b003332003f8d5mr1300567wro.47.1701337562911;
+        Thu, 30 Nov 2023 01:46:02 -0800 (PST)
+Received: from redhat.com ([2.55.10.128])
+        by smtp.gmail.com with ESMTPSA id t3-20020adfe443000000b00332fcdafc22sm1036634wrm.70.2023.11.30.01.46.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 01:46:02 -0800 (PST)
+Date: Thu, 30 Nov 2023 04:45:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH vhost v13 11/12] virtio_ring: introduce dma sync api for
+ virtqueue
+Message-ID: <20231130044512-mutt-send-email-mst@kernel.org>
+References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
+ <20230810123057.43407-12-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="e7ViDVOtBnNomE4a"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <88d91863e36a1e36f7770aa8a7f42853250e3d55.camel@kernel.org>
+In-Reply-To: <20230810123057.43407-12-xuanzhuo@linux.alibaba.com>
+
+On Thu, Aug 10, 2023 at 08:30:56PM +0800, Xuan Zhuo wrote:
+> These API has been introduced:
+> 
+> * virtqueue_dma_need_sync
+> * virtqueue_dma_sync_single_range_for_cpu
+> * virtqueue_dma_sync_single_range_for_device
+> 
+> These APIs can be used together with the premapped mechanism to sync the
+> DMA address.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 76 ++++++++++++++++++++++++++++++++++++
+>  include/linux/virtio.h       |  8 ++++
+>  2 files changed, 84 insertions(+)
+> 
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 916479c9c72c..81ecb29c88f1 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -3175,4 +3175,80 @@ int virtqueue_dma_mapping_error(struct virtqueue *_vq, dma_addr_t addr)
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_dma_mapping_error);
+>  
+> +/**
+> + * virtqueue_dma_need_sync - check a dma address needs sync
+> + * @_vq: the struct virtqueue we're talking about.
+> + * @addr: DMA address
+> + *
+> + * Check if the dma address mapped by the virtqueue_dma_map_* APIs needs to be
+> + * synchronized
+> + *
+> + * return bool
+> + */
+> +bool virtqueue_dma_need_sync(struct virtqueue *_vq, dma_addr_t addr)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +
+> +	if (!vq->use_dma_api)
+> +		return false;
+> +
+> +	return dma_need_sync(vring_dma_dev(vq), addr);
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_dma_need_sync);
+> +
+> +/**
+> + * virtqueue_dma_sync_single_range_for_cpu - dma sync for cpu
+> + * @_vq: the struct virtqueue we're talking about.
+> + * @addr: DMA address
+> + * @offset: DMA address offset
+> + * @size: buf size for sync
+> + * @dir: DMA direction
+> + *
+> + * Before calling this function, use virtqueue_dma_need_sync() to confirm that
+> + * the DMA address really needs to be synchronized
+> + *
+> + */
+> +void virtqueue_dma_sync_single_range_for_cpu(struct virtqueue *_vq,
+> +					     dma_addr_t addr,
+> +					     unsigned long offset, size_t size,
+> +					     enum dma_data_direction dir)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	struct device *dev = vring_dma_dev(vq);
+> +
+> +	if (!vq->use_dma_api)
+> +		return;
+> +
+> +	dma_sync_single_range_for_cpu(dev, addr, offset, size,
+> +				      DMA_BIDIRECTIONAL);
+> +}
 
 
---e7ViDVOtBnNomE4a
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Why did you use DMA_BIDIRECTIONAL here?
+Why is "dir" ignored?
 
-> On Wed, 2023-11-29 at 18:12 +0100, Lorenzo Bianconi wrote:
-> > Introduce write_version netlink command similar to the ones available
-> > through the procfs.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  Documentation/netlink/specs/nfsd.yaml |  32 ++++++++
-> >  fs/nfsd/netlink.c                     |  19 +++++
-> >  fs/nfsd/netlink.h                     |   3 +
-> >  fs/nfsd/nfsctl.c                      | 105 ++++++++++++++++++++++++++
-> >  include/uapi/linux/nfsd_netlink.h     |  11 +++
-> >  tools/net/ynl/generated/nfsd-user.c   |  81 ++++++++++++++++++++
-> >  tools/net/ynl/generated/nfsd-user.h   |  55 ++++++++++++++
-> >  7 files changed, 306 insertions(+)
-> >=20
-> > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netl=
-ink/specs/nfsd.yaml
-> > index c92e1425d316..6c5e42bb20f6 100644
-> > --- a/Documentation/netlink/specs/nfsd.yaml
-> > +++ b/Documentation/netlink/specs/nfsd.yaml
-> > @@ -68,6 +68,18 @@ attribute-sets:
-> >        -
-> >          name: threads
-> >          type: u32
-> > +  -
-> > +    name: server-version
-> > +    attributes:
-> > +      -
-> > +        name: major
-> > +        type: u32
-> > +      -
-> > +        name: minor
-> > +        type: u32
-> > +      -
-> > +        name: status
-> > +        type: u8
-> > =20
-> >  operations:
-> >    list:
-> > @@ -110,3 +122,23 @@ operations:
-> >          reply:
-> >            attributes:
-> >              - threads
-> > +    -
-> > +      name: version-set
-> > +      doc: enable/disable server version
-> > +      attribute-set: server-version
-> > +      flags: [ admin-perm ]
-> > +      do:
-> > +        request:
-> > +          attributes:
-> > +            - major
-> > +            - minor
-> > +            - status
-> > +    -
-> > +      name: version-get
-> > +      doc: dump server versions
-> > +      attribute-set: server-version
-> > +      dump:
-> > +        reply:
-> > +          attributes:
-> > +            - major
-> > +            - minor
-> > diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-> > index 1a59a8e6c7e2..0608a7bd193b 100644
-> > --- a/fs/nfsd/netlink.c
-> > +++ b/fs/nfsd/netlink.c
-> > @@ -15,6 +15,13 @@ static const struct nla_policy nfsd_threads_set_nl_p=
-olicy[NFSD_A_SERVER_WORKER_T
-> >  	[NFSD_A_SERVER_WORKER_THREADS] =3D { .type =3D NLA_U32, },
-> >  };
-> > =20
-> > +/* NFSD_CMD_VERSION_SET - do */
-> > +static const struct nla_policy nfsd_version_set_nl_policy[NFSD_A_SERVE=
-R_VERSION_STATUS + 1] =3D {
-> > +	[NFSD_A_SERVER_VERSION_MAJOR] =3D { .type =3D NLA_U32, },
-> > +	[NFSD_A_SERVER_VERSION_MINOR] =3D { .type =3D NLA_U32, },
-> > +	[NFSD_A_SERVER_VERSION_STATUS] =3D { .type =3D NLA_U8, },
-> > +};
-> > +
-> >  /* Ops table for nfsd */
-> >  static const struct genl_split_ops nfsd_nl_ops[] =3D {
-> >  	{
-> > @@ -36,6 +43,18 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D=
- {
-> >  		.doit	=3D nfsd_nl_threads_get_doit,
-> >  		.flags	=3D GENL_CMD_CAP_DO,
-> >  	},
-> > +	{
-> > +		.cmd		=3D NFSD_CMD_VERSION_SET,
-> > +		.doit		=3D nfsd_nl_version_set_doit,
-> > +		.policy		=3D nfsd_version_set_nl_policy,
-> > +		.maxattr	=3D NFSD_A_SERVER_VERSION_STATUS,
-> > +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> > +	},
-> > +	{
-> > +		.cmd	=3D NFSD_CMD_VERSION_GET,
-> > +		.dumpit	=3D nfsd_nl_version_get_dumpit,
-> > +		.flags	=3D GENL_CMD_CAP_DUMP,
-> > +	},
-> >  };
-> > =20
-> >  struct genl_family nfsd_nl_family __ro_after_init =3D {
-> > diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
-> > index 4137fac477e4..7d203cec08e4 100644
-> > --- a/fs/nfsd/netlink.h
-> > +++ b/fs/nfsd/netlink.h
-> > @@ -18,6 +18,9 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
-> >  				  struct netlink_callback *cb);
-> >  int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *in=
-fo);
-> >  int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info *in=
-fo);
-> > +int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info *in=
-fo);
-> > +int nfsd_nl_version_get_dumpit(struct sk_buff *skb,
-> > +			       struct netlink_callback *cb);
-> > =20
-> >  extern struct genl_family nfsd_nl_family;
-> > =20
-> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > index 130b3d937a79..f04430f79687 100644
-> > --- a/fs/nfsd/nfsctl.c
-> > +++ b/fs/nfsd/nfsctl.c
-> > @@ -1757,6 +1757,111 @@ int nfsd_nl_threads_get_doit(struct sk_buff *sk=
-b, struct genl_info *info)
-> >  	return err;
-> >  }
-> > =20
-> > +/**
-> > + * nfsd_nl_version_set_doit - enable/disable the provided nfs server v=
-ersion
-> > + * @skb: reply buffer
-> > + * @info: netlink metadata and command arguments
-> > + *
-> > + * Return 0 on success or a negative errno.
-> > + */
-> > +int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info *in=
-fo)
-> > +{
-> > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_id);
-> > +	enum vers_op cmd;
-> > +	u32 major, minor;
-> > +	u8 status;
-> > +	int ret;
-> > +
-> > +	if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_VERSION_MAJOR) ||
-> > +	    GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_VERSION_MINOR) ||
-> > +	    GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_VERSION_STATUS))
-> > +		return -EINVAL;
-> > +
-> > +	major =3D nla_get_u32(info->attrs[NFSD_A_SERVER_VERSION_MAJOR]);
-> > +	minor =3D nla_get_u32(info->attrs[NFSD_A_SERVER_VERSION_MINOR]);
-> > +
-> > +	status =3D nla_get_u32(info->attrs[NFSD_A_SERVER_VERSION_STATUS]);
-> > +	cmd =3D !!status ? NFSD_SET : NFSD_CLEAR;
-> > +
-> > +	mutex_lock(&nfsd_mutex);
-> > +	switch (major) {
-> > +	case 4:
-> > +		ret =3D nfsd_minorversion(nn, minor, cmd);
-> > +		break;
-> > +	case 2:
-> > +	case 3:
-> > +		if (!minor) {
-> > +			ret =3D nfsd_vers(nn, major, cmd);
-> > +			break;
-> > +		}
-> > +		fallthrough;
-> > +	default:
-> > +		ret =3D -EINVAL;
-> > +		break;
-> > +	}
-> > +	mutex_unlock(&nfsd_mutex);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_version_get_doit - Handle verion_get dumpit
-> > + * @skb: reply buffer
-> > + * @cb: netlink metadata and command arguments
-> > + *
-> > + * Returns the size of the reply or a negative errno.
-> > + */
-> > +int nfsd_nl_version_get_dumpit(struct sk_buff *skb,
-> > +			       struct netlink_callback *cb)
-> > +{
-> > +	struct nfsd_net *nn =3D net_generic(sock_net(skb->sk), nfsd_net_id);
-> > +	int i, ret =3D -ENOMEM;
-> > +
-> > +	mutex_lock(&nfsd_mutex);
-> > +
-> > +	for (i =3D 2; i <=3D 4; i++) {
-> > +		int j;
-> > +
-> > +		if (i < cb->args[0]) /* already consumed */
-> > +			continue;
-> > +
-> > +		if (!nfsd_vers(nn, i, NFSD_AVAIL))
-> > +			continue;
-> > +
-> > +		for (j =3D 0; j <=3D NFSD_SUPPORTED_MINOR_VERSION; j++) {
-> > +			void *hdr;
-> > +
-> > +			if (!nfsd_vers(nn, i, NFSD_TEST))
-> > +				continue;
-> > +
-> > +			/* NFSv{2,3} does not support minor numbers */
-> > +			if (i < 4 && j)
-> > +				continue;
-> > +
-> > +			if (i =3D=3D 4 && !nfsd_minorversion(nn, j, NFSD_TEST))
-> > +				continue;
-> > +
-> > +			hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
-> > +					  cb->nlh->nlmsg_seq, &nfsd_nl_family,
-> > +					  0, NFSD_CMD_VERSION_GET);
-> > +			if (!hdr)
-> > +				goto out;
-> > +
-> > +			if (nla_put_u32(skb, NFSD_A_SERVER_VERSION_MAJOR, i) ||
-> > +			    nla_put_u32(skb, NFSD_A_SERVER_VERSION_MINOR, j))
-> > +				goto out;
-> > +
-> > +			genlmsg_end(skb, hdr);
-> > +		}
-> > +	}
-> > +	cb->args[0] =3D i;
-> > +	ret =3D skb->len;
-> > +out:
-> > +	mutex_unlock(&nfsd_mutex);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  /**
-> >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-> >   * @net: a freshly-created network namespace
-> > diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfs=
-d_netlink.h
-> > index 1b6fe1f9ed0e..1b3340f31baa 100644
-> > --- a/include/uapi/linux/nfsd_netlink.h
-> > +++ b/include/uapi/linux/nfsd_netlink.h
-> > @@ -36,10 +36,21 @@ enum {
-> >  	NFSD_A_SERVER_WORKER_MAX =3D (__NFSD_A_SERVER_WORKER_MAX - 1)
-> >  };
-> > =20
-> > +enum {
-> > +	NFSD_A_SERVER_VERSION_MAJOR =3D 1,
-> > +	NFSD_A_SERVER_VERSION_MINOR,
-> > +	NFSD_A_SERVER_VERSION_STATUS,
-> > +
-> > +	__NFSD_A_SERVER_VERSION_MAX,
-> > +	NFSD_A_SERVER_VERSION_MAX =3D (__NFSD_A_SERVER_VERSION_MAX - 1)
-> > +};
-> > +
-> >  enum {
-> >  	NFSD_CMD_RPC_STATUS_GET =3D 1,
-> >  	NFSD_CMD_THREADS_SET,
-> >  	NFSD_CMD_THREADS_GET,
-> > +	NFSD_CMD_VERSION_SET,
-> > +	NFSD_CMD_VERSION_GET,
-> > =20
-> >  	__NFSD_CMD_MAX,
-> >  	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
-> > diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/genera=
-ted/nfsd-user.c
-> > index 9768328a7751..4cb71c3cd18d 100644
-> > --- a/tools/net/ynl/generated/nfsd-user.c
-> > +++ b/tools/net/ynl/generated/nfsd-user.c
-> > @@ -17,6 +17,8 @@ static const char * const nfsd_op_strmap[] =3D {
-> >  	[NFSD_CMD_RPC_STATUS_GET] =3D "rpc-status-get",
-> >  	[NFSD_CMD_THREADS_SET] =3D "threads-set",
-> >  	[NFSD_CMD_THREADS_GET] =3D "threads-get",
-> > +	[NFSD_CMD_VERSION_SET] =3D "version-set",
-> > +	[NFSD_CMD_VERSION_GET] =3D "version-get",
-> >  };
-> > =20
-> >  const char *nfsd_op_str(int op)
-> > @@ -58,6 +60,17 @@ struct ynl_policy_nest nfsd_server_worker_nest =3D {
-> >  	.table =3D nfsd_server_worker_policy,
-> >  };
-> > =20
-> > +struct ynl_policy_attr nfsd_server_version_policy[NFSD_A_SERVER_VERSIO=
-N_MAX + 1] =3D {
-> > +	[NFSD_A_SERVER_VERSION_MAJOR] =3D { .name =3D "major", .type =3D YNL_=
-PT_U32, },
-> > +	[NFSD_A_SERVER_VERSION_MINOR] =3D { .name =3D "minor", .type =3D YNL_=
-PT_U32, },
-> > +	[NFSD_A_SERVER_VERSION_STATUS] =3D { .name =3D "status", .type =3D YN=
-L_PT_U8, },
-> > +};
-> > +
-> > +struct ynl_policy_nest nfsd_server_version_nest =3D {
-> > +	.max_attr =3D NFSD_A_SERVER_VERSION_MAX,
-> > +	.table =3D nfsd_server_version_policy,
-> > +};
-> > +
-> >  /* Common nested types */
-> >  /* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_RPC_STATUS_GET =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> >  /* NFSD_CMD_RPC_STATUS_GET - dump */
-> > @@ -290,6 +303,74 @@ struct nfsd_threads_get_rsp *nfsd_threads_get(stru=
-ct ynl_sock *ys)
-> >  	return NULL;
-> >  }
-> > =20
-> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_VERSION_SET =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > +/* NFSD_CMD_VERSION_SET - do */
-> > +void nfsd_version_set_req_free(struct nfsd_version_set_req *req)
-> > +{
-> > +	free(req);
-> > +}
-> > +
-> > +int nfsd_version_set(struct ynl_sock *ys, struct nfsd_version_set_req =
-*req)
-> > +{
-> > +	struct nlmsghdr *nlh;
-> > +	int err;
-> > +
-> > +	nlh =3D ynl_gemsg_start_req(ys, ys->family_id, NFSD_CMD_VERSION_SET, =
-1);
-> > +	ys->req_policy =3D &nfsd_server_version_nest;
-> > +
-> > +	if (req->_present.major)
-> > +		mnl_attr_put_u32(nlh, NFSD_A_SERVER_VERSION_MAJOR, req->major);
-> > +	if (req->_present.minor)
-> > +		mnl_attr_put_u32(nlh, NFSD_A_SERVER_VERSION_MINOR, req->minor);
-> > +	if (req->_present.status)
-> > +		mnl_attr_put_u8(nlh, NFSD_A_SERVER_VERSION_STATUS, req->status);
-> > +
-> > +	err =3D ynl_exec(ys, nlh, NULL);
-> > +	if (err < 0)
-> > +		return -1;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_VERSION_GET =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > +/* NFSD_CMD_VERSION_GET - dump */
-> > +void nfsd_version_get_list_free(struct nfsd_version_get_list *rsp)
-> > +{
-> > +	struct nfsd_version_get_list *next =3D rsp;
-> > +
-> > +	while ((void *)next !=3D YNL_LIST_END) {
-> > +		rsp =3D next;
-> > +		next =3D rsp->next;
-> > +
-> > +		free(rsp);
-> > +	}
-> > +}
-> > +
-> > +struct nfsd_version_get_list *nfsd_version_get_dump(struct ynl_sock *y=
-s)
-> > +{
-> > +	struct ynl_dump_state yds =3D {};
-> > +	struct nlmsghdr *nlh;
-> > +	int err;
-> > +
-> > +	yds.ys =3D ys;
-> > +	yds.alloc_sz =3D sizeof(struct nfsd_version_get_list);
-> > +	yds.cb =3D nfsd_version_get_rsp_parse;
-> > +	yds.rsp_cmd =3D NFSD_CMD_VERSION_GET;
-> > +	yds.rsp_policy =3D &nfsd_server_version_nest;
-> > +
-> > +	nlh =3D ynl_gemsg_start_dump(ys, ys->family_id, NFSD_CMD_VERSION_GET,=
- 1);
-> > +
-> > +	err =3D ynl_exec_dump(ys, nlh, &yds);
-> > +	if (err < 0)
-> > +		goto free_list;
-> > +
-> > +	return yds.first;
-> > +
-> > +free_list:
-> > +	nfsd_version_get_list_free(yds.first);
-> > +	return NULL;
-> > +}
-> > +
-> >  const struct ynl_family ynl_nfsd_family =3D  {
-> >  	.name		=3D "nfsd",
-> >  };
-> > diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/genera=
-ted/nfsd-user.h
-> > index e162a4f20d91..e61c5a9e46fb 100644
-> > --- a/tools/net/ynl/generated/nfsd-user.h
-> > +++ b/tools/net/ynl/generated/nfsd-user.h
-> > @@ -111,4 +111,59 @@ void nfsd_threads_get_rsp_free(struct nfsd_threads=
-_get_rsp *rsp);
-> >   */
-> >  struct nfsd_threads_get_rsp *nfsd_threads_get(struct ynl_sock *ys);
-> > =20
-> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_VERSION_SET =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > +/* NFSD_CMD_VERSION_SET - do */
-> > +struct nfsd_version_set_req {
-> > +	struct {
-> > +		__u32 major:1;
-> > +		__u32 minor:1;
-> > +		__u32 status:1;
-> > +	} _present;
-> > +
-> > +	__u32 major;
-> > +	__u32 minor;
-> > +	__u8 status;
-> > +};
-> > +
->=20
-> This more or less mirrors how the "versions" file works today, but that
-> interface is quite klunky.=A0 We don't have a use case that requires that
-> we do this piecemeal like this. I think we'd be better served with a
-> more declarative interface that reconfigures the supported versions in
-> one shot:
->=20
-> Instead of having "major,minor,status" and potentially having to call
-> this command several times from userland, it seems like it would be
-> nicer to just have userland send down a list "major,minor" that should
-> be enabled, and then just let the kernel figure out whether to enable or
-> disable each. An empty list could mean "disable everything".
->=20
-> That's simpler to reason out as an interface from userland too. Trying
-> to keep track of the enabled and disabled versions and twiddle it is
-> really tricky in rpc.nfsd today.
 
-Ack. So far I have just converted the current implementation to netlink
-and I have not changed any logic. Anyway I am fine to change the current
-logic. Should we have 2 rpc.nfsd version in this case?
+> +EXPORT_SYMBOL_GPL(virtqueue_dma_sync_single_range_for_cpu);
+> +
+> +/**
+> + * virtqueue_dma_sync_single_range_for_device - dma sync for device
+> + * @_vq: the struct virtqueue we're talking about.
+> + * @addr: DMA address
+> + * @offset: DMA address offset
+> + * @size: buf size for sync
+> + * @dir: DMA direction
+> + *
+> + * Before calling this function, use virtqueue_dma_need_sync() to confirm that
+> + * the DMA address really needs to be synchronized
+> + */
+> +void virtqueue_dma_sync_single_range_for_device(struct virtqueue *_vq,
+> +						dma_addr_t addr,
+> +						unsigned long offset, size_t size,
+> +						enum dma_data_direction dir)
+> +{
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	struct device *dev = vring_dma_dev(vq);
+> +
+> +	if (!vq->use_dma_api)
+> +		return;
+> +
+> +	dma_sync_single_range_for_device(dev, addr, offset, size,
+> +					 DMA_BIDIRECTIONAL);
+> +}
+> +EXPORT_SYMBOL_GPL(virtqueue_dma_sync_single_range_for_device);
+> +
+>  MODULE_LICENSE("GPL");
 
-Regards,
-Lorenzo
+same question here.
 
-> =20
-> > +static inline struct nfsd_version_set_req *nfsd_version_set_req_alloc(=
-void)
-> > +{
-> > +	return calloc(1, sizeof(struct nfsd_version_set_req));
-> > +}
-> > +void nfsd_version_set_req_free(struct nfsd_version_set_req *req);
-> > +
-> > +static inline void
-> > +nfsd_version_set_req_set_major(struct nfsd_version_set_req *req, __u32=
- major)
-> > +{
-> > +	req->_present.major =3D 1;
-> > +	req->major =3D major;
-> > +}
-> > +static inline void
-> > +nfsd_version_set_req_set_minor(struct nfsd_version_set_req *req, __u32=
- minor)
-> > +{
-> > +	req->_present.minor =3D 1;
-> > +	req->minor =3D minor;
-> > +}
-> > +static inline void
-> > +nfsd_version_set_req_set_status(struct nfsd_version_set_req *req, __u8=
- status)
-> > +{
-> > +	req->_present.status =3D 1;
-> > +	req->status =3D status;
-> > +}
-> > +
-> > +/*
-> > + * enable/disable server version
-> > + */
-> > +int nfsd_version_set(struct ynl_sock *ys, struct nfsd_version_set_req =
-*req);
-> > +
-> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_VERSION_GET =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > +/* NFSD_CMD_VERSION_GET - dump */
-> > +struct nfsd_version_get_list {
-> > +	struct nfsd_version_get_list *next;
-> > +	struct nfsd_version_get_rsp obj __attribute__ ((aligned (8)));
-> > +};
-> > +
-> > +void nfsd_version_get_list_free(struct nfsd_version_get_list *rsp);
-> > +
-> > +struct nfsd_version_get_list *nfsd_version_get_dump(struct ynl_sock *y=
-s);
-> > +
-> >  #endif /* _LINUX_NFSD_GEN_H */
->=20
-> --=20
-> Jeff Layton <jlayton@kernel.org>
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index 79e3c74391e0..1311a7fbe675 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -220,4 +220,12 @@ void virtqueue_dma_unmap_single_attrs(struct virtqueue *_vq, dma_addr_t addr,
+>  				      size_t size, enum dma_data_direction dir,
+>  				      unsigned long attrs);
+>  int virtqueue_dma_mapping_error(struct virtqueue *_vq, dma_addr_t addr);
+> +
+> +bool virtqueue_dma_need_sync(struct virtqueue *_vq, dma_addr_t addr);
+> +void virtqueue_dma_sync_single_range_for_cpu(struct virtqueue *_vq, dma_addr_t addr,
+> +					     unsigned long offset, size_t size,
+> +					     enum dma_data_direction dir);
+> +void virtqueue_dma_sync_single_range_for_device(struct virtqueue *_vq, dma_addr_t addr,
+> +						unsigned long offset, size_t size,
+> +						enum dma_data_direction dir);
+>  #endif /* _LINUX_VIRTIO_H */
+> -- 
+> 2.32.0.3.g01195cf9f
 
---e7ViDVOtBnNomE4a
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZWhZsQAKCRA6cBh0uS2t
-rANDAQDSPZ1e4GIIddvgfLyQJrlOGPq4WNwgoVFlevBI/J04SAEAiRPpFE9sChSa
-wMZDdEwtLI4HRYlb9SYIl06Bj7QEKAI=
-=GxZ8
------END PGP SIGNATURE-----
-
---e7ViDVOtBnNomE4a--
 
