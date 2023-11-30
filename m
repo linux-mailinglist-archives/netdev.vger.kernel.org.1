@@ -1,112 +1,99 @@
-Return-Path: <netdev+bounces-52522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F9217FF050
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:38:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C826F7FF025
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FEE41C20A99
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:38:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 048561C20C49
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC172482C2;
-	Thu, 30 Nov 2023 13:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73E04655C;
+	Thu, 30 Nov 2023 13:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="OWghkhHd"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ns+uyV6h"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 554 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Nov 2023 05:38:10 PST
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0B910D5;
-	Thu, 30 Nov 2023 05:38:10 -0800 (PST)
-Received: from [192.168.1.55] (125.179-65-87.adsl-dyn.isp.belgacom.be [87.65.179.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 04E2E200CCEC;
-	Thu, 30 Nov 2023 14:28:53 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 04E2E200CCEC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1701350933;
-	bh=yEf+RebkcIT37fxi/jtCy8qZ4gAHzzGnKtpP5kElZQ0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OWghkhHdabnD77lXSbGWmfVtjLhHaYJwprfsBZO+XUl8JB9IBSWarPASzpGpACt7a
-	 ynH1eEqfWLOGtCcuH38K7aYxzZfRrRjjszcxMDWocGJ/OJ919dOoOrHU5aMPoLQ0Qu
-	 PZS7q4Ji/5hnBqvykZQ9vd6uuCm9Ethviyajo0oszY/3186ZoDk/cYuuz2doxOzdtw
-	 bRPF5E5ZZ5c23YN8rY7q4kkuthVlxM6Nv/8VucP553bHfNSXNK8ynMRP01aR/Kcva3
-	 ho7KFe0N6ekdDDrnPKVBQ61RWqW39tNfc8OoxLRt3HoNR8qxxTvR0vmngqDmfzYuZK
-	 Dm9U2IvKCofGQ==
-Message-ID: <4ab6e843-fd60-4abf-a23f-c8032e617f5c@uliege.be>
-Date: Thu, 30 Nov 2023 14:28:51 +0100
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4138D6C
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:30:39 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-a187cd4eb91so99605266b.3
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:30:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701351038; x=1701955838; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8qf6bXC8FJ83lNGT9tjL04pdejgvn2dYx2KNvITvFIw=;
+        b=ns+uyV6hSXKZbMv9yTEGc0OK5/k7lxEFUATE9Ur9BxolHGcH0X5HlHBgXUCz94OdC2
+         SNZjKVyCKbS5uGsnrmzAoscdk/wMP1hMEqBAp2lHEm+W33U1Zo3KGn04ltIcYKEayP6D
+         vftiWqGEj70cV+FfC10N3s4+b+nY2b/FZyC41xflX6FLGWvLOXRQwBgG6fW0meRod7hJ
+         JTiYL8aGIxCy49cYd7jPaujbHKLfjzXR20YJA05ShsUwdq7JDHlQjoFEezkHzm6HyHnV
+         X5KJeLDWgWl0PbCRM+XlT25oZlzO9SwzXMLsO4zRdYsyX7TML+7rrXij/8basIM//TIp
+         7sFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701351038; x=1701955838;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8qf6bXC8FJ83lNGT9tjL04pdejgvn2dYx2KNvITvFIw=;
+        b=SgBijvwqw9nXBGKigNBNsRCzJkzjzjHHfISSNw0arppmHznHHbSF5SHw8ISL9zdeQn
+         AYeUqkdYsvsSvlNyPQgb++WIlH8TsviSouRJA+j0nqnYT/A897Sv35FY/eGjUp2bVYpL
+         L66SQGqaG+xqWKFKc0GtvFjcjVUwXg9xiKLOTLFXjCsTVEqaS7gNjgC9LCzvwyVmPIBA
+         vdUzMSMpfKZN3eNd4PXMtMqVYKOCsfLcUdRp/moCbdX+7btE5QrpbYkVVmP+Hb1tKmt5
+         P8JoBY1/oBJQvBowTZKc5o8fFL1WAKRiaUkc05vC17I2aaxay48uvGtxHvZA5KOoxQZE
+         G4yQ==
+X-Gm-Message-State: AOJu0YzhovfooP7UPGOHlhKNkrGAoSF/YNDR3S6ij+LT/uTuxEQqzKZA
+	yTXFtEvsX5oWObY2+kscIyAt1w==
+X-Google-Smtp-Source: AGHT+IGo1DCMih+KavIBjFyiMqs/wxwUBKBsji+igq/OhlNLWdOzu+wtQ4oaIh/fpNgpljqnh2GrpA==
+X-Received: by 2002:a17:907:6b88:b0:a11:adc9:d14e with SMTP id rg8-20020a1709076b8800b00a11adc9d14emr8759007ejc.71.1701351038029;
+        Thu, 30 Nov 2023 05:30:38 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id jg41-20020a170907972900b00a046a773175sm670550ejc.122.2023.11.30.05.30.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 05:30:37 -0800 (PST)
+Date: Thu, 30 Nov 2023 14:30:36 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, corbet@lwn.net
+Subject: Re: [patch net-next] docs: netlink: add NLMSG_DONE message format
+ for doit actions
+Message-ID: <ZWiOfMs1PT14LLau@nanopsycho>
+References: <20231128151916.780588-1-jiri@resnulli.us>
+ <20231128073059.314ed76b@kernel.org>
+ <ZWdOtzoBHiRY53y9@nanopsycho>
+ <20231129071656.6de3f298@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next 10/14] selftests/net: convert ioam6.sh to run
- it in unique namespace
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
- Po-Hsu Lin <po-hsu.lin@canonical.com>, Guillaume Nault <gnault@redhat.com>,
- Petr Machata <petrm@nvidia.com>, James Prestwood <prestwoj@gmail.com>,
- Jaehee Park <jhpark1013@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
- Francesco Ruggeri <fruggeri@arista.com>, Xin Long <lucien.xin@gmail.com>,
- justin.iurman@uliege.be
-References: <20231130040105.1265779-1-liuhangbin@gmail.com>
- <20231130040105.1265779-11-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <20231130040105.1265779-11-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231129071656.6de3f298@kernel.org>
 
-On 11/30/23 05:01, Hangbin Liu wrote:
-> Here is the test result after conversion.
-> 
-> ]# ./ioam6.sh
-> 
-> --------------------------------------------------------------------------
-> OUTPUT tests
-> --------------------------------------------------------------------------
-> TEST: Unknown IOAM namespace (inline mode)                          [ OK ]
-> TEST: Unknown IOAM namespace (encap mode)                           [ OK ]
-> TEST: Missing trace room (inline mode)                              [ OK ]
-> TEST: Missing trace room (encap mode)                               [ OK ]
-> TEST: Trace type with bit 0 only (inline mode)                      [ OK ]
-> ...
-> TEST: Full supported trace (encap mode)                             [ OK ]
-> 
-> --------------------------------------------------------------------------
-> GLOBAL tests
-> --------------------------------------------------------------------------
-> TEST: Forward - Full supported trace (inline mode)                  [ OK ]
-> TEST: Forward - Full supported trace (encap mode)                   [ OK ]
-> 
-> - Tests passed: 88
-> - Tests failed: 0
-> 
-> Acked-by: David Ahern <dsahern@kernel.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Wed, Nov 29, 2023 at 04:16:56PM CET, kuba@kernel.org wrote:
+>On Wed, 29 Nov 2023 15:46:15 +0100 Jiri Pirko wrote:
+>> >> In case NLMSG_DONE message is sent as a reply to doit action, multiple
+>> >> kernel implementation do not send anything else than struct nlmsghdr.
+>> >> Add this note to the Netlink intro documentation.  
+>> >
+>> >You mean when the reply has F_MULTI set, correct?  
+>> 
+>> Well, that would be ideal. However, that flag is parallel to NLMSG_DONE.
+>> I see that at least drivers/connector/connector.c does not set this flag
+>> when sending NLMSG_DONE type.
+>
+>connector is a really bad example, the doc would have to say "some
+>families use NLMSG_DONE as an actual message type which may have pretty
+>much anything attached to it". It's not worth it, sorry.
 
-Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
+The existing documentation confuses uapi users (I have sample).
+They expect error with NLMSG_DONE.
 
-LGTM. Just one question though. Is there any reason not to use 
-cleanup_ns everywhere? There is the following diff (actually, 3 times):
 
-> -    ip netns del ioam-tmp-node || true
-> +    ip netns del $ioam_tmp_node || true
-
-While, at the same time, there is the following diff (as expected):
-
-> -  ip netns del ioam-node-alpha || true
-> -  ip netns del ioam-node-beta || true
-> -  ip netns del ioam-node-gamma || true
-> +  cleanup_ns $ioam_node_alpha $ioam_node_beta $ioam_node_gamma
-
-IMO, it looks like cleanup_ns can safely replace all "ip netns del" 
-instances in ioam6.sh.
+>-- 
+>pw-bot: reject
 
