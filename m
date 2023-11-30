@@ -1,130 +1,130 @@
-Return-Path: <netdev+bounces-52530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789CC7FF0F8
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:56:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDAA7FF102
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 14:58:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E861C20D37
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:56:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F05DB20E33
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BE548787;
-	Thu, 30 Nov 2023 13:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6525482FC;
+	Thu, 30 Nov 2023 13:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6jpkfrp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3tEDy3wf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D401B3
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:55:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701352554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DGrL90Etrr9V73ll7rDSIVqdC8n1ownVWJtUzMBU8oo=;
-	b=U6jpkfrpTx5mc0SyezSPvaveGIJ77z7gg43rsNjWXNCrd+tDJ3is12Quy3lT7BBJPNGqC6
-	B2VJNxc0Advn/lxxQ4VzhEvSjJQhZEnxJbV3kaWpGedMZ5s1ERTuUmly9dXXo892kcrBaV
-	RW5pL+7Tz9wmunHkiAxNnGxI7piCmAc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-332-KquQBu2RPJaHRgV7Z_-etg-1; Thu, 30 Nov 2023 08:55:52 -0500
-X-MC-Unique: KquQBu2RPJaHRgV7Z_-etg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a1867751573so137332966b.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:55:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701352551; x=1701957351;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DGrL90Etrr9V73ll7rDSIVqdC8n1ownVWJtUzMBU8oo=;
-        b=FjfAGAij8rgD1C9VUDsHoTOnVrU1mALp58ahUpa6sWapilEL/ZiM8wN8t7Y+s3LdT5
-         AC39XfB2dJfbuHiLhe+ZDA71zLcR8mvNJfmpPjrWg4ONZxxNxh2w/LbdstAjrHJS2gZN
-         0S6AICacawD2jh3vn1PLxl34GmKfI4HxaT+zbeBgBTSdE6A/MsomQqTn7Q5msY+U62EZ
-         X1WQJPHECiWyiMIH2KBYt/hmB7l1258odH9C42WUGlFrCh1wa3QAR3uzqFU8CnO4oCAK
-         rR2GEdahKG+23vwOz161NWvYagBy2CmEGzmtm4Nbw9KOyrAecx3IMwGaQ/+uYixAym8S
-         ywhA==
-X-Gm-Message-State: AOJu0Ywbc7dD/hxS9cYIs8Pl+SNmWIXk/+jVT17MEWKMBgyi+dQZj/Ar
-	wFe9nBflLMwNvXLhFupS3eegNThPpRRDRdd9CcMF8qPM5gGiS2y+BxNgIEOmYr++AszkegaSGMZ
-	AlgfpOjX5PznW10K2
-X-Received: by 2002:a17:906:2096:b0:a18:d028:1cce with SMTP id 22-20020a170906209600b00a18d0281ccemr1182184ejq.35.1701352551492;
-        Thu, 30 Nov 2023 05:55:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHg3ne5YwP5WnJehuvdpfEMr2u2ALVAAGZQb8Dpga9/0bhigqzGIOq/KC7JDEHBRCT8qDexjg==
-X-Received: by 2002:a17:906:2096:b0:a18:d028:1cce with SMTP id 22-20020a170906209600b00a18d0281ccemr1182160ejq.35.1701352551161;
-        Thu, 30 Nov 2023 05:55:51 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170906100d00b009b2ca104988sm698612ejm.98.2023.11.30.05.55.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 05:55:50 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6FF9BF784AC; Thu, 30 Nov 2023 14:55:50 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, Edward Cree
- <ecree.xilinx@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Yan Zhai <yan@cloudflare.com>, Stanislav Fomichev <sdf@google.com>,
- Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, kernel-team <kernel-team@cloudflare.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric
- Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Sitnicki <jakub@cloudflare.com>
-Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
-In-Reply-To: <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
-References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
- <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org>
- <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net>
- <87fs0qj61x.fsf@toke.dk> <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
- <87plzsi5wj.fsf@toke.dk>
- <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 30 Nov 2023 14:55:50 +0100
-Message-ID: <871qc72vmh.fsf@toke.dk>
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF686B9
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 05:58:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mZM/WMfQoYErSQwph/qVl378YWjb4XSFjdX3CTsil6aUPvgyFbW/9xBNmJpit8O2IcpUY9drpIE1Ruy096OcTzmrFCmYNW/zX3ozD56cFGvYyr3UIWNyGsxPE93kxf7L5EuU2TipsniyLxfKmOPKopaN8RaeM5tQem5lQlRYpqHSRNMOm8h8OF/cstdYjS5J0wkQ6DXu4GQr3A24AnhUQzW0fxEZNsZjOk3ExqHHz8RJeCM84HHTdfdTwUeEGFD/e/YpDbVu1X4jkB74xRp4vlYvnylwS2nnEyfeI8+ws8tEUvlaEnHEft55E0AYbB/L0Eqc5AgbIMPiIJedep4L2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c5ikstlUZ9dFV1rFOmQx92yI9ALyAVvoKoLoLwbFGEo=;
+ b=IbYZlm8l0AEgizt+B3JsTnH1kIC6JJEJG6b/41ony82QiMLTZPgRMzsV4bhVsykV+4HP3nXBP5veE0dvwCEPncWxRuVXpFj6Dn+dM0aQgUtL/xozCqzwqnifKq6yWsC9C1S3uBooQkTwgiqQtQuegbNEGMSv171RP3Mevq55an8wYtuJxFoaiguE0HAerdB6zjfKwsoA0U5JRLlLsSmcpkeNGkwcSEXeLDi7fcfKs2wTFrMBRIbrt38lVvlpukQUhEOHLNPVJF59PRfx1uNWuQKWAmW/5rITyq3rHPqYjrGaKDy71CGlnI83rccqSOq1xSETYpNk0O1MqcDiyo8+QA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c5ikstlUZ9dFV1rFOmQx92yI9ALyAVvoKoLoLwbFGEo=;
+ b=3tEDy3wfPrCOcXVpLFB+GckrQOXTDtpXEuJ1y9+oQNzvTTHfaY9Jke2DhxADnDSFlklMo6C9kmHkIApJjDMIBPtlJo3gwSQC+Fklg3cK9RwBH+Xk2JpHeD6kPlVoZ6mewPIyasoCOZoT8fxhwUJMvR0VqYu/dNGZxzHnJ3lDuQo=
+Received: from BL1PR13CA0361.namprd13.prod.outlook.com (2603:10b6:208:2c0::6)
+ by IA1PR12MB7544.namprd12.prod.outlook.com (2603:10b6:208:42c::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.22; Thu, 30 Nov
+ 2023 13:58:36 +0000
+Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
+ (2603:10b6:208:2c0:cafe::f5) by BL1PR13CA0361.outlook.office365.com
+ (2603:10b6:208:2c0::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.21 via Frontend
+ Transport; Thu, 30 Nov 2023 13:58:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7046.21 via Frontend Transport; Thu, 30 Nov 2023 13:58:36 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Thu, 30 Nov
+ 2023 07:58:35 -0600
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Thu, 30 Nov
+ 2023 07:58:35 -0600
+Received: from xcbalexaust40x.xilinx.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 07:58:33 -0600
+From: Alex Austin <alex.austin@amd.com>
+To: <netdev@vger.kernel.org>, <linux-net-drivers@amd.com>
+CC: <ecree.xilinx@gmail.com>, <habetsm.xilinx@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>, <lorenzo@kernel.org>,
+	<alex.austin@amd.com>, <memxor@gmail.com>, <alardam@gmail.com>,
+	<bhelgaas@google.com>
+Subject: [PATCH net-next 0/2] sfc: Implement ndo_hwtstamp_(get|set)
+Date: Thu, 30 Nov 2023 13:58:24 +0000
+Message-ID: <20231130135826.19018-1-alex.austin@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|IA1PR12MB7544:EE_
+X-MS-Office365-Filtering-Correlation-Id: ed7f0dcc-cebe-45a8-d318-08dbf1ac72a2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/uEBmRao9+P1R/SxJ5EcxvkkzIrWPwcrHlkAqZD3WTlwYPv+eh0/7+VWfsZDJPwGes4rRtPJ68aPWSijTz42YsVlfpWxjwQuCWxuZbxL4ppSXKeCMHCejb5BQoQfr/URTyGGptZrpKfRBYNuxD689JMUIZJ+QBdES5VyV8gP8Liru3aSJaYhRRgg2VbBQ6DEN27j3iCK9rKNs6J4sPwgr1pHgPo2duONCHe3Rb7yx8ZioOKmSEmFnSeeIYa2ym9IIh3FFW1vs9am/dKYoQR10YHZZmbTXq+LsM9YzkfW6gzOO8MnDeRqFOT/8vWKbCM78LT9dz0on4DOPvbaITuDlD1/iFG3Iw6ARUzM4ESiD9P7YJ2skOjFitF9FWQ4BCT+Rv1k5Twy46TSb1I3SpViFQ/AHXYl338CrLAzuC3KvGdAtcFLpjB33g1C7Bq4z/CLJcStX6cjIRvIb6ESlV82iTHNjYU2bdq9umFjJV3VFGLQJCtC+AoT3OIBdoyFBCZ6js+HjcVfNL7qRbRC+Ajg4fmWMZMy1J2rQTJKTu/y6MC1Ucl5FF3tED+HM9s4i86d/C9Xz1uqC6YWLV+F817pSdDjkl5TsAUIVMO7kNb6eu1LR6ZA67FgLbW0Hq8RA6I1i/MzL2XODab60Em/bIYaLyTaWAL+xXUD04H25tkuZZsHj5+eGjqZHnZg7Gwux9u4qT+hp+Up/kOEq1aP3s6RW+XvLU4iDLzrwQf6+rWtb6sX7WCxCEtdNUtie0baRSPL2VOzk3Nvc6Gbkp+8r2eMGg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(396003)(39860400002)(230922051799003)(82310400011)(186009)(64100799003)(1800799012)(451199024)(40470700004)(46966006)(36840700001)(47076005)(356005)(41300700001)(2616005)(44832011)(4326008)(86362001)(8676002)(1076003)(6666004)(8936002)(5660300002)(40480700001)(7416002)(2906002)(4744005)(26005)(110136005)(81166007)(478600001)(316002)(6636002)(70206006)(70586007)(426003)(40460700003)(54906003)(336012)(36860700001)(83380400001)(36756003)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 13:58:36.2530
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed7f0dcc-cebe-45a8-d318-08dbf1ac72a2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7544
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+Implement ndo_hwtstamp_get and ndo_hwtstamp_set for sfc and sfc-siena.
 
-> On 11/29/23 10:52 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Edward Cree <ecree.xilinx@gmail.com> writes:
->>> On 28/11/2023 14:39, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>>> I'm not quite sure what should be the semantics of that, though. I.e.,
->>>> if you are trying to aggregate two packets that have the flag set, whi=
-ch
->>>> packet do you take the value from? What if only one packet has the flag
->
-> It would probably make sense if both packets have it set.
+Alex Austin (2):
+  sfc: Implement ndo_hwtstamp_(get|set)
+  sfc-siena: Implement ndo_hwtstamp_(get|set)
 
-Right, so "aggregate only if both packets have the flag set, keeping the
-metadata area from the first packet", then?
+ drivers/net/ethernet/sfc/ef10.c             |  4 +--
+ drivers/net/ethernet/sfc/efx.c              | 24 +++++++++++++----
+ drivers/net/ethernet/sfc/net_driver.h       |  2 +-
+ drivers/net/ethernet/sfc/ptp.c              | 30 ++++++++-------------
+ drivers/net/ethernet/sfc/ptp.h              |  7 +++--
+ drivers/net/ethernet/sfc/siena/efx.c        | 24 +++++++++++++----
+ drivers/net/ethernet/sfc/siena/net_driver.h |  2 +-
+ drivers/net/ethernet/sfc/siena/ptp.c        | 30 +++++++++------------
+ drivers/net/ethernet/sfc/siena/ptp.h        |  7 +++--
+ drivers/net/ethernet/sfc/siena/siena.c      |  2 +-
+ 10 files changed, 76 insertions(+), 56 deletions(-)
 
->>>> set? Or should we instead have a "metadata_xdp_only" flag that just
->>>> prevents the skb metadata field from being set entirely?
->
-> What would be the use case compared to resetting meta data right before
-> we return with XDP_PASS?
-
-I was thinking it could save a call to xdp_adjust_meta() to reset it
-back to zero before PASSing the packet. But okay, that may be of
-marginal utility.
-
->>> Sounds like what's actually needed is bpf progs inside the GRO engine
->>>   to implement the metadata "protocol" prepare and coalesce callbacks?
->>=20
->> Hmm, yes, I guess that would be the most general solution :)
->
-> Feels like a potential good fit, agree, although for just solving the
-> above sth not requiring extra BPF might be nice as well.
-
-Yeah, I agree that just the flag makes sense on its own.
-
--Toke
+-- 
+2.39.3
 
 
