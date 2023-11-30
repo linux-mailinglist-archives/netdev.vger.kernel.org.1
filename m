@@ -1,104 +1,137 @@
-Return-Path: <netdev+bounces-52691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 087697FFB5F
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:31:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCD77FFB76
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C790B20D0C
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:31:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1850B1F20FC5
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494EC52F66;
-	Thu, 30 Nov 2023 19:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BDC52F7A;
+	Thu, 30 Nov 2023 19:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GikRZv8V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPw778g4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0CCBD54
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 11:31:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701372699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XUKjduYx0sBCtPzyCQgJXjX+AsFij/jhpdfQd/PC2MQ=;
-	b=GikRZv8VuIhIBuJYU1ysB2OdyhHoGEHSGc8OHyRIywo7LvrsOcgMuAuhfM6D+u7A24DmqV
-	aZMWTvkg05fmW6B5r2vg7YR0GPccraxbuUC1+iXSXMByKpKA6MzwYz64zDFkPjY2O9jJB1
-	O9dJlhoUl5CkVVSCdpqcZkYOrfdkxas=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-84-ruzrkH6zNcqvsDcI07CyeA-1; Thu, 30 Nov 2023 14:31:38 -0500
-X-MC-Unique: ruzrkH6zNcqvsDcI07CyeA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ACBB485A58C;
-	Thu, 30 Nov 2023 19:31:37 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 061F31C060AE;
-	Thu, 30 Nov 2023 19:31:35 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B21A593;
+	Thu, 30 Nov 2023 11:38:20 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3331752d2b9so954541f8f.3;
+        Thu, 30 Nov 2023 11:38:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701373099; x=1701977899; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AEfJqIl3X2gXSOJ2gIPsjyHWEUMck6FZOj8vIfnbhnA=;
+        b=iPw778g4WqUj5Li67O8gmG63dCzzpS9KNVYO7T57Wp/fBOnvhko2JE6Ong93QEH58W
+         L6ymF+C4QPqqP3ksYVPbyycng4erR64qVivHj/8QgbV9mU+513mFueSXIdWcSmtzMu3+
+         5+sd1Wh5F+5O5nFuxMpaQcJxbC7enEtWe1VoIISfLkn4N3BX0b2AnWJBYE4tWbkbbzal
+         r/4NW/OwVUH9hxYG+aE+PnxcX8E5xeNFFygHCmf6IPRVMINapsWrAgSVoWAPsI3vsUUP
+         SI/q2OdxNoBs6bkkkl9UMtAYk7vKqECC8O1s69cxLNEALh8vHV1st78VAzeovhgNCHnY
+         2Stw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701373099; x=1701977899;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AEfJqIl3X2gXSOJ2gIPsjyHWEUMck6FZOj8vIfnbhnA=;
+        b=Bhl7U5Gje/DCywiADL0qXVAUH9cIxzZJVOoOxJx9vfMkE5bjg38lsSjrv1LLLsWqPC
+         7A8LX16SxI4tkbWALFk4XHrzDwFrsX4z/ayOU049eTL9nPKRL/xcgEGDOX9t8qxhdwg4
+         5E1jEtZIraXVs+MRlf4XoJM9MTslkJ+TuI9kGuJtujmKfnZuDEeYoorVKJBpXBuclOXi
+         CPjRwdou81iHjwbnN4JfiNJzmdKeL/Ga8tFRA5cHxG0xc3ENBxGdJ9hluA8kkdj7N4zj
+         mgQc8xk3vHV4cPCgBURJf7/V3rMV0pb9OSjB+gWZ4dxfEmyJVjJxeBrhYem2UZZYgxVn
+         fKmg==
+X-Gm-Message-State: AOJu0Yzq9bL4LhV4kMKAqesAQiQqzdD64gi7G3AWiq3ArSQtqJFlfM0U
+	vh54ofaj8ORq4CryMhieRIs=
+X-Google-Smtp-Source: AGHT+IHETBlUH8OmbXwCkdKprfxeaHj4ZH7B3muQxe0+pLAfyy9N7pPT0vBpxpbYA7fBh3pRkTHiew==
+X-Received: by 2002:a5d:6acf:0:b0:333:2fd2:8144 with SMTP id u15-20020a5d6acf000000b003332fd28144mr27399wrw.97.1701373098878;
+        Thu, 30 Nov 2023 11:38:18 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id a12-20020a056000188c00b0032ddf2804ccsm2334838wri.83.2023.11.30.11.38.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 11:38:18 -0800 (PST)
+Message-ID: <6568e4aa.050a0220.120a5.9c83@mx.google.com>
+X-Google-Original-Message-ID: <ZWjkqRDk_g-4SpW_@Ansuel-xps.>
+Date: Thu, 30 Nov 2023 20:38:17 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] i40e: Fix wrong mask used during DCB config
-Date: Thu, 30 Nov 2023 20:31:34 +0100
-Message-ID: <20231130193135.1580284-1-ivecera@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 06/14] net: phy: at803x: move at8031 specific
+ data out of generic at803x_priv
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-7-ansuelsmth@gmail.com>
+ <47df2f0d-3410-43c2-96d3-87af47cfdcce@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <47df2f0d-3410-43c2-96d3-87af47cfdcce@lunn.ch>
 
-Mask used for clearing PRTDCB_RETSTCC register in function
-i40e_dcb_hw_rx_ets_bw_config() is incorrect as there is used
-define I40E_PRTDCB_RETSTCC_ETSTC_SHIFT instead of define
-I40E_PRTDCB_RETSTCC_ETSTC_MASK.
+On Thu, Nov 30, 2023 at 04:21:50PM +0100, Andrew Lunn wrote:
+> > +struct at8031_data {
+> > +	bool is_fiber;
+> > +	bool is_1000basex;
+> > +	struct regulator_dev *vddio_rdev;
+> > +	struct regulator_dev *vddh_rdev;
+> > +};
+> > +
+> >  struct at803x_priv {
+> >  	int flags;
+> >  	u16 clk_25m_reg;
+> >  	u16 clk_25m_mask;
+> >  	u8 smarteee_lpi_tw_1g;
+> >  	u8 smarteee_lpi_tw_100m;
+> > -	bool is_fiber;
+> > -	bool is_1000basex;
+> > -	struct regulator_dev *vddio_rdev;
+> > -	struct regulator_dev *vddh_rdev;
+> > +
+> > +	/* Specific data for at8031 PHYs */
+> > +	void *data;
+> >  };
+> 
+> I don't really like this void *
+> 
+> Go through at803x_priv and find out what is common to them all, and
+> keep that in one structure. Add per family private structures which
+> include the common as a member.
 
-The PRTDCB_RETSTCC register is used to configure whether ETS
-or strict priority is used as TSA in Rx for particular TC.
+As you notice later in the patches, only at803x have stuff in common
+qca803xx and qca808x doesn't use the struct at all (aside from stats)
 
-In practice it means that once the register is set to use ETS
-as TSA then it is not possible to switch back to strict priority
-without CoreR reset.
+And in the at803x PHY family only at8031 have fiber 1000basex and
+regulators.
 
-Fix the value in the clearing mask.
+> 
+> By having real types everywhere you get the compiler doing checks for
+> you.
 
-Fixes: 90bc8e003be2 ("i40e: Add hardware configuration for software based DCB")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_dcb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Main problem is that adding something like
+'struct at8031_data* at8031_data' looks also bad.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb.c b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-index 68602fc375f6..073ffbfcbe8d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-@@ -1576,7 +1576,7 @@ void i40e_dcb_hw_rx_ets_bw_config(struct i40e_hw *hw, u8 *bw_share,
- 		reg = rd32(hw, I40E_PRTDCB_RETSTCC(i));
- 		reg &= ~(I40E_PRTDCB_RETSTCC_BWSHARE_MASK     |
- 			 I40E_PRTDCB_RETSTCC_UPINTC_MODE_MASK |
--			 I40E_PRTDCB_RETSTCC_ETSTC_SHIFT);
-+			 I40E_PRTDCB_RETSTCC_ETSTC_MASK);
- 		reg |= ((u32)bw_share[i] << I40E_PRTDCB_RETSTCC_BWSHARE_SHIFT) &
- 			 I40E_PRTDCB_RETSTCC_BWSHARE_MASK;
- 		reg |= ((u32)mode[i] << I40E_PRTDCB_RETSTCC_UPINTC_MODE_SHIFT) &
+Maybe I can rework the 2 bool to flags (they are used only by at803x)
+and keep the 2 regulator pointer?
+
+> 
+> As Russell pointed out, this patch series is going to be too big. So
+> break it up. We can move fast on patches which are simple and
+> obviously correct.
+> 
 -- 
-2.41.0
-
+	Ansuel
 
