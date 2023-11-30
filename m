@@ -1,136 +1,164 @@
-Return-Path: <netdev+bounces-52618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBC87FF7CA
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:11:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9D67FF7D4
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77E762815FB
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:11:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A753B20D5B
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 17:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FF055C1E;
-	Thu, 30 Nov 2023 17:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C8655C26;
+	Thu, 30 Nov 2023 17:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nRhBO/OA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLqSFtWt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457823C694
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 17:11:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9765BC433C7;
-	Thu, 30 Nov 2023 17:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701364290;
-	bh=z8tPq/OZFdLYzHcBmbFrH1eT9NsxQ9H6d+/+FYkxiZw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nRhBO/OAOyR0zL9RuMc2BZ8dbWhnPyzxFlUAWFe1TAis9hnTHvVV0Zsa1391RCgAF
-	 vSH2hGxvMlNxIURDzEw/9XWsM2kth1WkWMZnqdH95j8H9Bkvj41RKzX/5U8OqRWuH2
-	 D7Cc6KCrAKtjHyVvisPY9DMDKtCCU6k3B7+RqJbKCQ9HNPooA8w+Elasfm4Vim5zE5
-	 BktKtSyphAWZ279FY0LAZJ+sKtwjgyURUX4rtdgYMU0Th8xs6gmHXgXwLldHIVlEHT
-	 4Urs1HOcQUL4aI9+67wuhzg26rzX2py5kqFsLtbW0DU2cwNpWc7KH6BDwb8dJt32bp
-	 nnCwM8Rcj048A==
-Date: Thu, 30 Nov 2023 17:11:26 +0000
-From: Simon Horman <horms@kernel.org>
-To: Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v2 2/2] ptp: add FemtoClock3 Wireless as ptp
- hardware clock
-Message-ID: <20231130171126.GH32077@kernel.org>
-References: <20231129204806.14539-1-lnimi@hotmail.com>
- <PH7PR03MB7064FC8C284D83E9C34B8C08A083A@PH7PR03MB7064.namprd03.prod.outlook.com>
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED5010E2;
+	Thu, 30 Nov 2023 09:14:03 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40b538d5c4eso8209955e9.1;
+        Thu, 30 Nov 2023 09:14:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701364441; x=1701969241; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iWl/4qXizi6Ul7FtDLArDPeN2uRl1gF4/EhF2ynBmFQ=;
+        b=NLqSFtWtnAiDe7tix8o1I/mAJyDqprjn9pZxSzdzC2h/zWpUdTr1Xjyccch+2ZDRzf
+         RS9U10LsYq1/9zHwvjcoMMfVtY5xtR8/isIId9AZLdDAVrJI37xFRS+Q3WGl2cio9dDr
+         S1oGclkMSPqlNfgBrOtsixpCBdrRtf/RKMsUNOlBGVAv4CDeIyjyrF56I4j+gIf5qwXK
+         HSWG6XmqGQra2ieox0hqYXGI1xzm9m7NzZbd4HiMve4lTcdQo0xURNXX9bOledT4iQWj
+         uta1gwLJpS4n5zxlge+2p1LTVzwhME8d0quZ25Q5sxidTCgg9mc8iDS8C6sZtRq8jtks
+         Fwxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701364441; x=1701969241;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iWl/4qXizi6Ul7FtDLArDPeN2uRl1gF4/EhF2ynBmFQ=;
+        b=d2gHHjUfM2iY/lDrptBKnOKIm5I7rDPUASaGp1c36vgXoZqiSSz9glmrhz4fySiw0Q
+         bTaM0bWZ16eZaSC+Mku6GZ8L06778ercsa5DJhg5S3Cp7HsKD5OIZDhFVqvcYWbW90eE
+         LZhSWPnhoonzuzgqTOFdL65TSe9C+131/SIs3JM0DXyrHt04S0JwTjr3p/LxbBICX8Nd
+         OZyRBw73obOCWU93Zh3qIJE/66LOu4htAmTKvHhgOVkUgfGqYbfUaD6DGXZymm7K9tUT
+         wtNLFqdiU2p/vLHlKaDHnW/1+Tm5bvZliEkZSirIXHOhhkblIuSMiRXGzOmivQE9tiVQ
+         SN1w==
+X-Gm-Message-State: AOJu0YxLCA+OxjM3L+9nPx2DfVfS9QJUdmRhujn8z8TaLBhYUiaRceAc
+	EYcPF+lRESLdve7IFiQAmt++oiaww30IVA==
+X-Google-Smtp-Source: AGHT+IFcjULPc6i1EL7NlmgVnLtLDnVD4YxzkCXSb+WBV7McMvSCaxucbUxj/Gr9orpl0B0v10g52w==
+X-Received: by 2002:a5d:5648:0:b0:333:160c:549f with SMTP id j8-20020a5d5648000000b00333160c549fmr16385wrw.60.1701364441137;
+        Thu, 30 Nov 2023 09:14:01 -0800 (PST)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:4842:bce4:1c44:6271])
+        by smtp.gmail.com with ESMTPSA id d10-20020a5d538a000000b003332ef77db4sm260519wrv.44.2023.11.30.09.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 09:13:59 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 4/6] tools/net/ynl: Add binary and pad support to structs for tc
+Date: Thu, 30 Nov 2023 17:13:47 +0000
+Message-ID: <20231130171349.13021-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR03MB7064FC8C284D83E9C34B8C08A083A@PH7PR03MB7064.namprd03.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 29, 2023 at 03:48:06PM -0500, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
-> 
-> The RENESAS FemtoClock3 Wireless is a high-performance jitter attenuator,
-> frequency translator, and clock synthesizer. The device is comprised of 3
-> digital PLLs (DPLL) to track CLKIN inputs and three independent low phase
-> noise fractional output dividers (FOD) that output low phase noise clocks.
-> 
-> FemtoClock3 supports one Time Synchronization (Time Sync) channel to enable
-> an external processor to control the phase and frequency of the Time Sync
-> channel and to take phase measurements using the TDC. Intended applications
-> are synchronization using the precision time protocol (PTP) and
-> synchronization with 0.5 Hz and 1 Hz signals from GNSS.
-> 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
+The tc netlink-raw family needs binary and pad types for several
+qopt C structs. Add support for them to ynl.
 
-Hi Min Li,
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ Documentation/netlink/netlink-raw.yaml |  2 +-
+ tools/net/ynl/lib/ynl.py               | 36 +++++++++++++++++++-------
+ 2 files changed, 27 insertions(+), 11 deletions(-)
 
-some minor feedback from my side.
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index 26203282422f..dc3d4eeb67bb 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -127,7 +127,7 @@ properties:
+                 type: string
+               type:
+                 description: The netlink attribute type
+-                enum: [ u8, u16, u32, u64, s8, s16, s32, s64, string, binary ]
++                enum: [ u8, u16, u32, u64, s8, s16, s32, s64, string, binary, pad ]
+               len:
+                 $ref: '#/$defs/len-or-define'
+               byte-order:
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 886ecef5319e..4f1c1e51845e 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -670,8 +670,11 @@ class YnlFamily(SpecFamily):
+             fixed_header_members = self.consts[name].members
+             size = 0
+             for m in fixed_header_members:
+-                format = NlAttr.get_format(m.type, m.byte_order)
+-                size += format.size
++                if m.type in ['pad', 'binary']:
++                    size += m.len
++                else:
++                    format = NlAttr.get_format(m.type, m.byte_order)
++                    size += format.size
+             return size
+         else:
+             return 0
+@@ -681,12 +684,20 @@ class YnlFamily(SpecFamily):
+         fixed_header_attrs = dict()
+         offset = 0
+         for m in fixed_header_members:
+-            format = NlAttr.get_format(m.type, m.byte_order)
+-            [ value ] = format.unpack_from(msg.raw, offset)
+-            offset += format.size
+-            if m.enum:
+-                value = self._decode_enum(value, m)
+-            fixed_header_attrs[m.name] = value
++            value = None
++            if m.type == 'pad':
++                offset += m.len
++            elif m.type == 'binary':
++                value = msg.raw[offset:offset+m.len]
++                offset += m.len
++            else:
++                format = NlAttr.get_format(m.type, m.byte_order)
++                [ value ] = format.unpack_from(msg.raw, offset)
++                offset += format.size
++            if value is not None:
++                if m.enum:
++                    value = self._decode_enum(value, m)
++                fixed_header_attrs[m.name] = value
+         return fixed_header_attrs
+ 
+     def handle_ntf(self, decoded):
+@@ -753,8 +764,13 @@ class YnlFamily(SpecFamily):
+             fixed_header_members = self.consts[op.fixed_header].members
+             for m in fixed_header_members:
+                 value = vals.pop(m.name) if m.name in vals else 0
+-                format = NlAttr.get_format(m.type, m.byte_order)
+-                msg += format.pack(value)
++                if m.type == 'pad':
++                    msg += bytearray(m.len)
++                elif m.type == 'binary':
++                    msg += bytes.fromhex(value)
++                else:
++                    format = NlAttr.get_format(m.type, m.byte_order)
++                    msg += format.pack(value)
+         for name, value in vals.items():
+             msg += self._add_attr(op.attr_set.name, name, value)
+         msg = _genl_msg_finalize(msg)
+-- 
+2.42.0
 
-...
-
-> diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-
-...
-
-> +static inline s64 ns2counters(struct idtfc3 *idtfc3, s64 nsec, u32 *sub_ns)
-> +{
-> +	s64 sync;
-> +	s32 rem;
-> +
-> +	if (likely(nsec > 0)) {
-> +		sync = div_u64_rem(nsec, idtfc3->ns_per_sync, &rem);
-> +		*sub_ns = rem;
-> +	} else if (nsec < 0) {
-> +		sync = -div_u64_rem(-nsec - 1, idtfc3->ns_per_sync, &rem) - 1;
-> +		*sub_ns = idtfc3->ns_per_sync - rem - 1;
-> +	}
-> +
-> +	return sync * idtfc3->ns_per_sync;
-
-Perhaps it cannot occur, but if nsec is exactly 0, then
-sync is uninitialised here.
-
-Flagged by clang-17 W=1 build, and Smatch.
-
-> +}
-
-...
-
-> +static int _idtfc3_settime(struct idtfc3 *idtfc3, const struct timespec64 *ts)
-> +{
-> +	s64 offset_ns, now_ns, sync_ns;
-> +	u32 counter, sub_ns;
-> +	int now;
-> +
-> +	if (timespec64_valid(ts) == false) {
-> +		dev_err(idtfc3->dev, "%s: invalid timespec", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	now = idtfc3_read_subcounter(idtfc3);
-> +	if (now < 0)
-> +		return now;
-> +
-> +	offset_ns = (idtfc3->sub_sync_count - now) * idtfc3->ns_per_counter;
-> +	now_ns = timespec64_to_ns(ts);
-> +	sync_ns = ns2counters(idtfc3, offset_ns + now_ns, &sub_ns);
-
-sync_ns is set here but otherwise unused.
-Perhaps the assignment can be dropped and sync_ns removed from this
-function?
-
-As flagged by gcc-13 W=1 build and Smatch.
-
-> +
-> +	counter = sub_ns / idtfc3->ns_per_counter;
-> +	return idtfc3_timecounter_update(idtfc3, counter, now_ns);
-> +}
-
-...
 
