@@ -1,70 +1,62 @@
-Return-Path: <netdev+bounces-52344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98FB47FE7AC
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 04:34:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EC9A7FE7AD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 04:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C19721C20A71
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 03:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 802FC1C20A1E
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 03:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5D0125A1;
-	Thu, 30 Nov 2023 03:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355AB125CC;
+	Thu, 30 Nov 2023 03:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCyhMZiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B973D50
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 19:34:25 -0800 (PST)
-X-QQ-mid:Yeas43t1701315143t650t15003
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [183.128.129.197])
-X-QQ-SSF:00400000000000F0FSF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 4404046532227934155
-To: "'Andrew Lunn'" <andrew@lunn.ch>
-Cc: <netdev@vger.kernel.org>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<mengyuanlou@net-swift.com>
-References: <20231122102226.986265-1-jiawenwu@trustnetic.com> <20231122102226.986265-3-jiawenwu@trustnetic.com> <4a36b46d-3f71-430f-8158-da58769ae52a@lunn.ch>
-In-Reply-To: <4a36b46d-3f71-430f-8158-da58769ae52a@lunn.ch>
-Subject: RE: [PATCH net-next 2/5] net: wangxun: add ethtool_ops for ring parameters
-Date: Thu, 30 Nov 2023 11:32:22 +0800
-Message-ID: <029601da233d$d4b8a9a0$7e29fce0$@trustnetic.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194BFF50C
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 03:35:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 199F4C433C8;
+	Thu, 30 Nov 2023 03:35:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701315349;
+	bh=XGqmWD77sXdnGWOA001IM8JkoCwVcsIqbJiBnf0OjS0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hCyhMZiTzDYBthI+byvs2789ZnDTPq0GnqTTPL2rMWSORvLiSJ4EmbdSqHHTnmEo0
+	 NF+m8Op4fqbfP5oJA9Bq91IeuuSyaHtTSjLGMg1xuYXjToltPNpxkj1Nco7M9nOQzf
+	 3TG+5ru79RtfwvaBTbVxXgXSqk3hnaBbhSmaRg7FZaszOzwYoJoKjHo/hQnXDuM3vY
+	 1wJFwgKPN1riIlGlOlCub1+7Y5vI/Zecmq0f5n/7uQHfDNideKOe6M+JPdDwljpRrq
+	 qfcjllUGfLrfFThL+cKUnpQCCwW96n6YAbDi2EC7/dWe5doZ5TPvhNikbTxbYfGNXz
+	 ixPXyT316I/PA==
+Date: Wed, 29 Nov 2023 19:35:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Yinjun Zhang <yinjun.zhang@corigine.com>, netdev@vger.kernel.org,
+ oss-drivers@corigine.com
+Subject: Re: [PATCH net-next] nfp: ethtool: expose transmit SO_TIMESTAMPING
+ capability
+Message-ID: <20231129193548.1e77e7cc@kernel.org>
+In-Reply-To: <20231129080413.83789-1-louis.peens@corigine.com>
+References: <20231129080413.83789-1-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQIZ7m4FfqhO6yXRbjtvxmXj2jKlSQJjneaLAvi6Bwev57q7YA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-> > +int wx_set_ring(struct wx *wx, u32 new_tx_count, u32 new_rx_count)
-> > +{
-> > +	struct wx_ring *temp_ring;
-> > +	int i, err = 0;
-> > +
-> > +	/* allocate temporary buffer to store rings in */
-> > +	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
-> > +	temp_ring = vmalloc(i * sizeof(struct wx_ring));
+On Wed, 29 Nov 2023 10:04:13 +0200 Louis Peens wrote:
+> From: Yinjun Zhang <yinjun.zhang@corigine.com>
 > 
-> So it is O.K. for the pages to be scattered around the physical
-> address space, not contiguous. Does this memory ever get passed to the
-> hardware?
+> NFP always supports software time stamping of tx, now expose
+> the capability through ethtool ops.
 
-No, this memory is only used to temporarily store ring info. It will be freed after
-restoring the ring info.
-
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
