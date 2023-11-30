@@ -1,42 +1,46 @@
-Return-Path: <netdev+bounces-52480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A48C7FEE12
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:40:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1404E7FEE27
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:44:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9834B20DD3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:40:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2C41281C96
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 11:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CA23C6A7;
-	Thu, 30 Nov 2023 11:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MFXTVHYS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBE74502B;
+	Thu, 30 Nov 2023 11:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E4E010DF
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 03:40:12 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701344410;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=NTo/KQQFEKB5cdC4RkdHzgx+ceXO4URIfFSeciyVXgs=;
-	b=MFXTVHYSusV951Pk3RANkK8fDKmFQhh0f2WLnLM2w6iRGcJypKsSJdweM4/q8UmShh6cUe
-	g3qSWgsly4267aI1BBSHideSViWxAPHERuXetOoRr/5HqM73y6Aw3i4WrYjZPYrZYcuAqr
-	Zr7jyp6PJpWMopPWw3+LjnbtqiZo7YA=
-From: Geliang Tang <geliang.tang@linux.dev>
-To: David Ahern <dsahern@kernel.org>
-Cc: Geliang Tang <geliang.tang@linux.dev>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	Matthieu Baerts <matttbe@kernel.org>
-Subject: [PATCH iproute2-next] ss: mptcp: print out subflows_total counter
-Date: Thu, 30 Nov 2023 19:40:36 +0800
-Message-Id: <ecf501dce539b4cc77e450d510c0414eec4bba7f.1701344289.git.geliang.tang@linux.dev>
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A287810E2;
+	Thu, 30 Nov 2023 03:44:04 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AUBhaTnB3495101, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AUBhaTnB3495101
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 Nov 2023 19:43:36 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Thu, 30 Nov 2023 19:43:36 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Thu, 30 Nov
+ 2023 19:43:35 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v13 00/13] Add Realtek automotive PCIe driver
+Date: Thu, 30 Nov 2023 19:43:14 +0800
+Message-ID: <20231130114327.1530225-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,49 +48,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-A new counter mptcpi_subflows_total has been added in mptcpi_flags
-to count the total amount of subflows from mptcp_info including the
-initial one into kernel in this commit:
+This series includes adding realtek automotive ethernet driver 
+and adding rtase ethernet driver entry in MAINTAINERS file.
 
-  6ebf6f90ab4a ("mptcp: add mptcpi_subflows_total counter")
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
 
-This patch prints out this counter into mptcp_stats output.
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
 
-Acked-by: Matthieu Baerts <matttbe@kernel.org>
-Signed-off-by: Geliang Tang <geliang.tang@linux.dev>
----
- include/uapi/linux/mptcp.h | 1 +
- misc/ss.c                  | 2 ++
- 2 files changed, 3 insertions(+)
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
 
-diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
-index 99b55575..c2e6f3be 100644
---- a/include/uapi/linux/mptcp.h
-+++ b/include/uapi/linux/mptcp.h
-@@ -55,6 +55,7 @@ struct mptcp_info {
- 	__u64	mptcpi_bytes_sent;
- 	__u64	mptcpi_bytes_received;
- 	__u64	mptcpi_bytes_acked;
-+	__u8	mptcpi_subflows_total;
- };
- 
- /* MPTCP Reset reason codes, rfc8684 */
-diff --git a/misc/ss.c b/misc/ss.c
-index 7e67dbe4..67363ec0 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -3239,6 +3239,8 @@ static void mptcp_stats_print(struct mptcp_info *s)
- 		out(" bytes_received:%llu", s->mptcpi_bytes_received);
- 	if (s->mptcpi_bytes_acked)
- 		out(" bytes_acked:%llu", s->mptcpi_bytes_acked);
-+	if (s->mptcpi_subflows_total)
-+		out(" subflows_total:%u", s->mptcpi_subflows_total);
- }
- 
- static void mptcp_show_info(const struct nlmsghdr *nlh, struct inet_diag_msg *r,
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+v11 -> v12:
+- Use pm_sleep_ptr and related macros.
+- Remove multicast filter limit.
+- Remove VLAN support and CBS offload functions. 
+- Remove redundent code.
+- Fix compiler warnning.
+
+v12 -> v13:
+- Fixed the compiler warning of unuse rtase_suspend() and rtase_resume()
+when there is no define CONFIG_PM_SLEEP.
+
+Justin Lai (13):
+  rtase: Add pci table supported in this module
+  rtase: Implement the .ndo_open function
+  rtase: Implement the rtase_down function
+  rtase: Implement the interrupt routine and rtase_poll
+  rtase: Implement hardware configuration function
+  rtase: Implement .ndo_start_xmit function
+  rtase: Implement a function to receive packets
+  rtase: Implement net_device_ops
+  rtase: Implement pci_driver suspend and resume function
+  rtase: Implement ethtool function
+  rtase: Add a Makefile in the rtase folder
+  realtek: Update the Makefile and Kconfig in the realtek folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   17 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  335 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2366 +++++++++++++++++
+ 6 files changed, 2736 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
 -- 
-2.35.3
+2.34.1
 
 
