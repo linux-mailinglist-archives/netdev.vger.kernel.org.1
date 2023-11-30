@@ -1,153 +1,154 @@
-Return-Path: <netdev+bounces-52700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DDA67FFC68
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:24:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 017217FFC72
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEBEB1C20C87
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:24:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294351C21188
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAC753E3C;
-	Thu, 30 Nov 2023 20:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0E6584C7;
+	Thu, 30 Nov 2023 20:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dalxBy4d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT+0NxUg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B8810FF;
-	Thu, 30 Nov 2023 12:24:09 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40b40423df8so12114145e9.0;
-        Thu, 30 Nov 2023 12:24:09 -0800 (PST)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3195106;
+	Thu, 30 Nov 2023 12:28:37 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-db4364ecd6aso1449445276.2;
+        Thu, 30 Nov 2023 12:28:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701375848; x=1701980648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=S8gTz2MUVz+WKOP5tFTP9yWnrMxXAQWUx4ViPQ1DOAQ=;
-        b=dalxBy4dgW7r+DlQjAuIyScIlqquspKB768CTPVtAM+Jr84yX0K3eVu4mICdEOIjF6
-         TkoSKxoanrWFm+6EH/jBq9+PQBtzbeujJCrPpc57VtlvsY3rlW06c+TtNE+ott3EgP9/
-         SM4WtWfiqqbzVniEcf0TOqWQfcLyjfgsyskVTBrlJbC5LXmBGefYPkDsuRk66sSWxOhw
-         jirADGdQAoka6097NIkLcBBxFy553JSpV7kf99QYBusuuJUk6r08uvuOfbdrYoiYDjAj
-         lNhPCjQYn7qbnrDqC5e6Jqaus31L+KytqLolRZtcRRR/LHwoo/NsMffflQ6NoVp+RMQj
-         VNIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701375848; x=1701980648;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1701376117; x=1701980917; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S8gTz2MUVz+WKOP5tFTP9yWnrMxXAQWUx4ViPQ1DOAQ=;
-        b=RUqlei/Xa/OHKemvC4qA+cVd0MsRjgxNq85/WIDHkgt/Cj7tfAKs1EXtxuD+o8GLOR
-         u/Vpl467DmADZpo/hP6vZbJR/eWrZEGlPWNIZMB2D0wFA2n9+gwIGUhkac7ZuknWk/gN
-         L1yqKV3lrer7I/nNml+UfgNvjGimS/MNeqq98KcsmKLsNpPRHzpJ1arv/3UCP2gFQ0yu
-         v1hnvuvGUUt+PT8dg7k/eKrJ5hT4cGxa+LK1JbJxcJREG0AfB0Nt2pEp8SbIT1QUKyTm
-         XsmuyGfPG/er4UG+JrhWAV/9EUe9WMaLDHmOl/0TgYy76+mWJhah8IKAD4upvsCzF+xG
-         uk7Q==
-X-Gm-Message-State: AOJu0YyFAwd9ACEGUOXAmaFNJjMULdWjXm2NIPBYYvmMK60oSMybRR0+
-	Ou2do4LNJqQyNjIOM+8yvxk=
-X-Google-Smtp-Source: AGHT+IFpkTGD8DYsKb7c2nqtRg2flhIF0Jm5Y6j0TlCxotdH/o/+OW79eNqE4GdOYLK7VnTMxjRR+g==
-X-Received: by 2002:a05:600c:1c81:b0:40b:5e4a:4063 with SMTP id k1-20020a05600c1c8100b0040b5e4a4063mr26419wms.131.1701375847671;
-        Thu, 30 Nov 2023 12:24:07 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id h19-20020a05600c351300b0040b347d90d0sm6630454wmq.12.2023.11.30.12.24.06
+        bh=YYgokxpdXnom83isGSeLIiEWyDvQWuc8uahFIcEFCiU=;
+        b=lT+0NxUgwEKXHXQwHxoAPu8UiUMQRKxIr/R2Wo/G87IfsGfZLZqqMfT/MAgw1agiY5
+         NbYzaAuSQXMqkwA/ZGRj9AAHLyI9HhXDxpk56CUrSFUurGa3Mm5YqPsJhZLW+rKGSEag
+         8d9ooJHB83tjWRd4eV85vB1r1g7G/K8N1aBTbz/TxYAu0aWmcoqUgdK4jN1gsrxcND79
+         CD1x9LP7qJYwP/5VAZMK6zqSClv7W/L78hfQe2yrEXO9XnR2qvL2pUz44VFG5Spb9gmj
+         leELW/F/dPzivqrVV+8ptS2aqMX4G1ccDrVXkzfB/7ixMa2dii/gsUzy237VCuZktGrN
+         o7Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701376117; x=1701980917;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YYgokxpdXnom83isGSeLIiEWyDvQWuc8uahFIcEFCiU=;
+        b=jAriABDXGTvtxfziSgX8WzTBROg+F99vUmLUVwpjs9FDFIVRtlI70okz3Nd6HygIRG
+         gKQa2z0lmNGDaiZhhHum8Os8sln/kXSq8Yxwer5AsNcksrUgEaZ3v8SEpsyOF+jyrYfy
+         xcTFv73bCZQYf7c1wiursiLS0pYgzAC556iRfbdBXft2c0xAqnpmdmZH0Ps8WBhe8AxX
+         2b2h/V+Eyfz1wnXkUfumLaQYVet2lNSC5p4zBLFi5pxfYG6l9Eb5D1VoFj2SRGI23KwA
+         XCl9DjxgjIoocyT90eUvkjewsYA+RvIhg6WVbGSBTfemJje+Rk1P4ZlEXIAn4rwADHXu
+         ZMQw==
+X-Gm-Message-State: AOJu0YzG/k8xhQpOWbgfLgU3ni+kYhrO4IWcrfBER35PPr0b/jgP5bn2
+	RJaNN5C8ZMm3Zy0adOsw9mk=
+X-Google-Smtp-Source: AGHT+IHYZiQbkBLJ008rJXlLXZbrmVVGfJZyhDvQvrE7IAhJuIYy3iC3ruuDLfNDxv8+R4e1qKgz3Q==
+X-Received: by 2002:a25:268f:0:b0:db5:4938:483 with SMTP id m137-20020a25268f000000b00db549380483mr975627ybm.32.1701376116773;
+        Thu, 30 Nov 2023 12:28:36 -0800 (PST)
+Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
+        by smtp.gmail.com with ESMTPSA id q2-20020a0c9a42000000b00679d7e76b64sm800622qvd.126.2023.11.30.12.28.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 12:24:07 -0800 (PST)
-Message-ID: <6568ef67.050a0220.398ae.be77@mx.google.com>
-X-Google-Original-Message-ID: <ZWjvZW47TYQSmpoP@Ansuel-xps.>
-Date: Thu, 30 Nov 2023 21:24:05 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH 06/14] net: phy: at803x: move at8031 specific
- data out of generic at803x_priv
-References: <20231129021219.20914-1-ansuelsmth@gmail.com>
- <20231129021219.20914-7-ansuelsmth@gmail.com>
- <47df2f0d-3410-43c2-96d3-87af47cfdcce@lunn.ch>
- <6568e4aa.050a0220.120a5.9c83@mx.google.com>
- <568f8b22-a7d2-46c3-a539-30ecf6a85b18@lunn.ch>
+        Thu, 30 Nov 2023 12:28:36 -0800 (PST)
+Date: Thu, 30 Nov 2023 15:28:36 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Song Yoong Siang <yoong.siang.song@intel.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Bjorn Topel <bjorn@kernel.org>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@google.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ xdp-hints@xdp-project.net, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, 
+ linux-kselftest@vger.kernel.org, 
+ Song Yoong Siang <yoong.siang.song@intel.com>
+Message-ID: <6568f07418508_fbb8229478@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231130162028.852006-2-yoong.siang.song@intel.com>
+References: <20231130162028.852006-1-yoong.siang.song@intel.com>
+ <20231130162028.852006-2-yoong.siang.song@intel.com>
+Subject: Re: [PATCH bpf-next 1/3] xsk: add launch time support to XDP Tx
+ metadata
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <568f8b22-a7d2-46c3-a539-30ecf6a85b18@lunn.ch>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023 at 09:14:00PM +0100, Andrew Lunn wrote:
-> On Thu, Nov 30, 2023 at 08:38:17PM +0100, Christian Marangi wrote:
-> > On Thu, Nov 30, 2023 at 04:21:50PM +0100, Andrew Lunn wrote:
-> > > > +struct at8031_data {
-> > > > +	bool is_fiber;
-> > > > +	bool is_1000basex;
-> > > > +	struct regulator_dev *vddio_rdev;
-> > > > +	struct regulator_dev *vddh_rdev;
-> > > > +};
-> > > > +
-> > > >  struct at803x_priv {
-> > > >  	int flags;
-> > > >  	u16 clk_25m_reg;
-> > > >  	u16 clk_25m_mask;
-> > > >  	u8 smarteee_lpi_tw_1g;
-> > > >  	u8 smarteee_lpi_tw_100m;
-> > > > -	bool is_fiber;
-> > > > -	bool is_1000basex;
-> > > > -	struct regulator_dev *vddio_rdev;
-> > > > -	struct regulator_dev *vddh_rdev;
-> > > > +
-> > > > +	/* Specific data for at8031 PHYs */
-> > > > +	void *data;
-> > > >  };
-> > > 
-> > > I don't really like this void *
-> > > 
-> > > Go through at803x_priv and find out what is common to them all, and
-> > > keep that in one structure. Add per family private structures which
-> > > include the common as a member.
-> > 
-> > As you notice later in the patches, only at803x have stuff in common
-> > qca803xx and qca808x doesn't use the struct at all (aside from stats)
+Song Yoong Siang wrote:
+> This patch extends the XDP Tx metadata framework to include Time-Based
+> Scheduling (TBS) support where the NIC will schedule a packet for
+> transmission at a pre-determined time called launch time. The value of
+> launch time is communicated from user space to Ethernet driver via
+> launch_time field of struct xsk_tx_metadata.
 > 
-> The dangers here are taking a phydev->priv and casting it. You think
-> it is X, but is actually Y, and bad things happen.
+> Suggested-by: Stanislav Fomichev <sdf@google.com>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> ---
+>  Documentation/netlink/specs/netdev.yaml      |  4 ++++
+>  Documentation/networking/xsk-tx-metadata.rst |  5 +++++
+>  include/net/xdp_sock.h                       | 10 ++++++++++
+>  include/net/xdp_sock_drv.h                   |  1 +
+>  include/uapi/linux/if_xdp.h                  |  9 +++++++++
+>  include/uapi/linux/netdev.h                  |  3 +++
+>  net/core/netdev-genl.c                       |  2 ++
+>  net/xdp/xsk.c                                |  3 +++
+>  tools/include/uapi/linux/if_xdp.h            |  9 +++++++++
+>  tools/include/uapi/linux/netdev.h            |  3 +++
+>  tools/net/ynl/generated/netdev-user.c        |  1 +
+>  11 files changed, 50 insertions(+)
 > 
-> The helpers you have in your common.c must never do this. You can have
-> a at803x_priv only visible inside the at803x driver, and a
-> qca808x_priv only visible inside the qca808x driver. Define a
-> structure which is needed for the shared code in common.c, and pass it
-> as a parameter to these helpers.
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+> index 00439bcbd2e3..a602776bbfb4 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -66,6 +66,10 @@ definitions:
+>          name: tx-checksum
+>          doc:
+>            L3 checksum HW offload is supported by the driver.
+> +      -
+> +        name: launch-time
+> +        doc:
+> +          HW Time-Based Scheduling (TBS) is supported by the driver.
 
-Tell me if the idea is crazy enough. Ideally common function should do
-simple phy read/write and should not reference stuff using priv (as we
-would have the problem you are pointing out)
+Can we avoid introducing another term? We already have too many:
+launchtime, earliest delivery time (EDT), SO_TXTIME,
+pacing offload, earliest txtime first (ETF).  
 
-But phy_read/write needs phydev...
 
-Would be ok to have something like
-
-struct qca_ethphy_common {
- struct phy_device *phydev;
-}
-
-And pass this struct to the helper? Is it enough to desist devs from
-starting introducing function in common.c, checking the ID there and
-starting doing stuff with funny specific phydev priv?
-
-> 
-> You have a reasonably good idea what your end goal is. The tricky part
-> is getting there, in lots of easy to review, obviously correct steps.
->
-
--- 
-	Ansuel
 
