@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-52651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A1B7FF93B
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:23:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 506E97FF943
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 19:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6E6DB20DBB
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:23:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABD2928158C
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 18:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF72584FF;
-	Thu, 30 Nov 2023 18:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E906B59172;
+	Thu, 30 Nov 2023 18:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzZZ8kZR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJiHRxIN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4BE53806;
-	Thu, 30 Nov 2023 18:23:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E830C433C8;
-	Thu, 30 Nov 2023 18:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA42D54FBD;
+	Thu, 30 Nov 2023 18:24:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DFDEC433C7;
+	Thu, 30 Nov 2023 18:24:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701368622;
-	bh=qQlf1wlM46DStT6SsBHk1Ov4ohMfBkiHcFw/hbSHDzA=;
+	s=k20201202; t=1701368696;
+	bh=wPIgvmYXn8XujCdyRCb4AFBjJLjOcelID6h7SxaT5hY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FzZZ8kZRdJ6pu6uovrGlCvcsYD7x7XChrvYhQtmCH0KuYQqvn11bWG96iotfj+n7p
-	 dXhzk7H2K0gpbPETqyRcS6ISPZgn6eN27zEvbY9g8OqigiikY0TfTmeveUjN7p3AZj
-	 ZTIj+dyREsWw7HRSoo/fVNdWUnKXjScHmJe01yqK7BWZIMbnZbohkkmltCJidBGLIG
-	 kVHBqFoNIAnqmJybMFjnBDFeTWHdLBlspwKVOVZGBsd5gdmGtjCBJBNgEhw1o7PfGG
-	 Tlxlf3Ib/rtxu0Q3rdlAOswSiIGZ/kBdBDHKSkxjCfnfrZZFwmdUYhjBaYbbnweOSv
-	 rdwpPyoHj9o1A==
-Date: Thu, 30 Nov 2023 18:23:38 +0000
+	b=GJiHRxIN8DGcil4FV942uO/5zKPkC8dJKlOvVUQW2NSv+ryDnOIsiT2UCRojDOuuX
+	 un/61uItBt8ImwU3hUOVnYNe3SGnBAQ5uFA3jMxe8uW+NtChemHvJ8bnlLn2KfViUv
+	 yYiUGHcHHbh+5TOoWMWbP0CIZO0N3v2DUTrfHwNBQw34plqsbw8Po0FkEXIrWM79xx
+	 ZehUMbkQzXauNCJOF1GatCrYMv4xBJ5zcFyYjbOwTsWuM+9XVB+U1V0VL4TRS3eloq
+	 qh+dRR9RLZSwlPfpDNSX/TDn6Rjb87c9KXoByXpe5kbSChA5poSbYtXbrtS4e1oFXQ
+	 cLEpD34rBGN3g==
+Date: Thu, 30 Nov 2023 18:24:51 +0000
 From: Simon Horman <horms@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Shinas Rasheed <srasheed@marvell.com>,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] octeon_ep: Fix error code in probe()
-Message-ID: <20231130182338.GM32077@kernel.org>
-References: <cd2c5d69-b515-4933-9443-0a8f1b7fc599@moroto.mountain>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, nogikh@google.com,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	v9fs@lists.linux.dev
+Subject: Re: [PATCH net] MAINTAINERS: exclude 9p from networking
+Message-ID: <20231130182451.GN32077@kernel.org>
+References: <20231128145916.2475659-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,23 +53,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cd2c5d69-b515-4933-9443-0a8f1b7fc599@moroto.mountain>
+In-Reply-To: <20231128145916.2475659-1-kuba@kernel.org>
 
-On Tue, Nov 28, 2023 at 04:13:19PM +0300, Dan Carpenter wrote:
-> Set the error code if octep_ctrl_net_get_mtu() fails.  Currently the code
-> returns success.
+On Tue, Nov 28, 2023 at 06:59:15AM -0800, Jakub Kicinski wrote:
+> We don't have much to say about 9p, even tho it lives under net/.
+> Avoid CCing netdev.
 > 
-> Fixes: 0a5f8534e398 ("octeon_ep: get max rx packet length from firmware")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 1 +
->  1 file changed, 1 insertion(+)
-
-Thanks Dan,
-
-I had noticed this one too.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
 
