@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-52331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D90087FE4A2
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:11:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8D77FE4A4
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 01:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A747B2121A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:11:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250C1B20EB0
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 00:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60662385;
-	Thu, 30 Nov 2023 00:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C34D385;
+	Thu, 30 Nov 2023 00:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aLBSFWPB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Unrr4me6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB0CCA
-	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:11:51 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D779910C8
+	for <netdev@vger.kernel.org>; Wed, 29 Nov 2023 16:11:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701303111; x=1732839111;
+  t=1701303116; x=1732839116;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kBfnDMj0eLuxkcItt0ZPkHag/uxwbD9FO0IpFVBpcBk=;
-  b=aLBSFWPByq6pmsDPkGqhIx0Z6hKCY2MNLcZ35liq/T2dVn5Cpqbr4LH2
-   2kf/1pxTB1dgiotn43x6ddtxtq8T6FDNAFzo9tzd4oH2YYl3QuFbsgup/
-   YYN1ULDJtqZp3K47ExCqntkl3Vf67Sny2ssYoa1zVrHW9dwwESopc9dVB
-   XWL5XVvQ46i1JUPNeJNpzyvCaWL2hMuB2tlQkWmzRfUbiTn3RLrN4CEP0
-   CBG9byfaD+/7YqLRzndJUYQsWVfdBXzHaGFgHS9rE0AdJ5CBTN5ZTzVcR
-   MyG4YLHW6b8OsrBGM9MwqO3kIqPCQ5FLkesoRf5lLIIODaEhXtYiEVrMl
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="112131"
+  bh=Q4eW1WYARWHK8XmjV06jS3nRLlxtSkMZf4EszkUSn48=;
+  b=Unrr4me6jYOp5T18WD3HSMprsF1e26Ov8oxU118r43kp9+/ZdWUbAmGE
+   3q1QQ2NtQUOm4YFANl9Bxn4+ZMxtxsXNiy8pVNnQQCed6p7AT6EA5rfDt
+   d1wIDIas8XKd5IN4RDd0OauXb1hTSYmlhZmLfNYFR26e7OCrukNnnlJO3
+   4m+FRavznPrqa5LwXJXpRQUpXujYIo/NNggwX3ZWquIH1f9uMXTbji8L/
+   eC7gSPiFhIR/VxrGa+IY8baObAvCOreyXxIZ27PbveBW5Infoeq8mrJ0P
+   lXrq1gL20a5FhuFoHA4o5rUZafA+HuBy9RXCvDAsVGOf/63pkcR6MfGM5
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="112148"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="112131"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 16:11:51 -0800
+   d="scan'208";a="112148"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2023 16:11:56 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="772864011"
+X-IronPort-AV: E=McAfee;i="6600,9927,10909"; a="839619979"
 X-IronPort-AV: E=Sophos;i="6.04,237,1695711600"; 
-   d="scan'208";a="772864011"
+   d="scan'208";a="839619979"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by fmsmga007.fm.intel.com with ESMTP; 29 Nov 2023 16:11:50 -0800
-Subject: [net-next PATCH v10 10/11] netdev-genl: Add PID for the NAPI thread
+  by fmsmga004.fm.intel.com with ESMTP; 29 Nov 2023 16:11:56 -0800
+Subject: [net-next PATCH v10 11/11] eth: bnxt: link NAPI instances to queues
+ and IRQs
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
 Cc: edumazet@google.com, ast@kernel.org, sdf@google.com, lorenzo@kernel.org,
  tariqt@nvidia.com, daniel@iogearbox.net, anthony.l.nguyen@intel.com,
  lucien.xin@gmail.com, michael.chan@broadcom.com, sridhar.samudrala@intel.com,
  amritha.nambiar@intel.com
-Date: Wed, 29 Nov 2023 16:28:18 -0800
-Message-ID: <170130409873.5198.6723749951487504481.stgit@anambiarhost.jf.intel.com>
+Date: Wed, 29 Nov 2023 16:28:24 -0800
+Message-ID: <170130410439.5198.5369308046781025813.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <170130378595.5198.158092030504280163.stgit@anambiarhost.jf.intel.com>
 References: <170130378595.5198.158092030504280163.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -63,38 +64,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-In the threaded NAPI mode, expose the PID of the NAPI thread.
+From: Jakub Kicinski <kuba@kernel.org>
 
+Make bnxt compatible with the newly added netlink queue GET APIs.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
- net/core/netdev-genl.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index e87d2f2d7fec..b39e9c8c0dc1 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -152,6 +152,7 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 			const struct genl_info *info)
- {
- 	void *hdr;
-+	pid_t pid;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index e35e7e02538c..08793e24e0ee 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -3845,6 +3845,9 @@ static int bnxt_init_one_rx_ring(struct bnxt *bp, int ring_nr)
+ 	ring = &rxr->rx_ring_struct;
+ 	bnxt_init_rxbd_pages(ring, type);
  
- 	if (WARN_ON_ONCE(!napi->dev))
- 		return -EINVAL;
-@@ -172,6 +173,12 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
- 		goto nla_put_failure;
- 
-+	if (napi->thread) {
-+		pid = task_pid_nr(napi->thread);
-+		if (nla_put_u32(rsp, NETDEV_A_NAPI_PID, pid))
-+			goto nla_put_failure;
-+	}
++	netif_queue_set_napi(bp->dev, ring_nr, NETDEV_QUEUE_TYPE_RX,
++			     &rxr->bnapi->napi);
 +
- 	genlmsg_end(rsp, hdr);
+ 	if (BNXT_RX_PAGE_MODE(bp) && bp->xdp_prog) {
+ 		bpf_prog_add(bp->xdp_prog, 1);
+ 		rxr->xdp_prog = bp->xdp_prog;
+@@ -3921,6 +3924,9 @@ static int bnxt_init_tx_rings(struct bnxt *bp)
+ 		struct bnxt_ring_struct *ring = &txr->tx_ring_struct;
+ 
+ 		ring->fw_ring_id = INVALID_HW_RING_ID;
++
++		netif_queue_set_napi(bp->dev, i, NETDEV_QUEUE_TYPE_TX,
++				     &txr->bnapi->napi);
+ 	}
  
  	return 0;
+@@ -9754,6 +9760,7 @@ static int bnxt_request_irq(struct bnxt *bp)
+ 		if (rc)
+ 			break;
+ 
++		netif_napi_set_irq(&bp->bnapi[i]->napi, irq->vector);
+ 		irq->requested = 1;
+ 
+ 		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+@@ -9781,6 +9788,11 @@ static void bnxt_del_napi(struct bnxt *bp)
+ 	if (!bp->bnapi)
+ 		return;
+ 
++	for (i = 0; i < bp->rx_nr_rings; i++)
++		netif_queue_set_napi(bp->dev, i, NETDEV_QUEUE_TYPE_RX, NULL);
++	for (i = 0; i < bp->tx_nr_rings; i++)
++		netif_queue_set_napi(bp->dev, i, NETDEV_QUEUE_TYPE_TX, NULL);
++
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		struct bnxt_napi *bnapi = bp->bnapi[i];
+ 
 
 
