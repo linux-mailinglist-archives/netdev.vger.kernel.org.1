@@ -1,163 +1,109 @@
-Return-Path: <netdev+bounces-52698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C987FFC04
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:11:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDAA17FFC17
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 21:14:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7054AB20F3A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:11:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A20C1C2105F
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 20:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3755953E17;
-	Thu, 30 Nov 2023 20:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3C653E20;
+	Thu, 30 Nov 2023 20:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="H4iep1VZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M/FFasjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF721D5C
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 12:11:31 -0800 (PST)
-Received: from eig-obgw-6006a.ext.cloudfilter.net ([10.0.30.182])
-	by cmsmtp with ESMTPS
-	id 8lvHrQMLOL9Ag8nNjrCkUq; Thu, 30 Nov 2023 20:11:31 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 8nNirweLMGKIc8nNirHja8; Thu, 30 Nov 2023 20:11:31 +0000
-X-Authority-Analysis: v=2.4 cv=E+beGIRl c=1 sm=1 tr=0 ts=6568ec73
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=8XV0R0IcXUXM6S+KMni/4w==:17
- a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
- a=IkcTkHD0fZMA:10 a=BNY50KLci1gA:10 a=wYkD_t78qR0A:10 a=QyXUC8HyAAAA:8
- a=VwQbUJbxAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8
- a=stkexhm8AAAA:8 a=COk6AnOGAAAA:8 a=cm27Pg_UAAAA:8 a=-k1GZaui-gibiiQ_YVAA:9
- a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22 a=y1Q9-5lHfBjTkpIzbSAN:22
- a=pIW3pCRaVxJDc-hWtpF8:22 a=TjNXssC_j7lpFel5tvFf:22 a=xmb-EsYY8bH0VWELuYED:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0H3D5HS7abL9eprgUTSy9+mJmSpcKG17VCFcw5z1EN8=; b=H4iep1VZzfwjxSuULriOoC4TdJ
-	tFyxfBmO7uU21MhuVwKnwrkpr3prsiBBcLZ25Z/T+c722vSSs7XR/z1e8z6d7yevLAAynW0HiT4i2
-	uJkr0y+QzS+repb9gDxJQ9UPHQs4EsdUewdTlCoceWDPoXK3aSiatfwJj53OAqhFn6W2ew/706KEs
-	zmPAj0Aqvsm5PYqdtmEvdc+GJXdBCxqFx/tPA+kXl4Wl/prngTDTtyhosaX7Rt/TAzxZAbnVloLzy
-	EwJahuRY+SOGGnzFbOc7ErImiKvPQ6egGmh8TxQW8XjIdrHkKQigh3teYMnHro/EQC/+QKox/3s9y
-	OPzGqy0w==;
-Received: from 189.215.208.186.cable.dyn.cableonline.com.mx ([189.215.208.186]:2120 helo=[192.168.0.28])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1r8nNg-0021Hn-1q;
-	Thu, 30 Nov 2023 14:11:28 -0600
-Message-ID: <31934933-24cf-42bf-90d1-c83b44b71d4f@embeddedor.com>
-Date: Thu, 30 Nov 2023 14:11:25 -0600
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EA7D5C;
+	Thu, 30 Nov 2023 12:14:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QiJokDsL8QN5EiH/N+WOWgk31hOcooIUYZ6/kJVxIFs=; b=M/FFasjTuZNrAreY8dUIOLYxRJ
+	mD5Qk6SW2y6l1bzv9Mk+9Lw1xoIdD5PRw1zr829LS4KGK5TWbb8pOeBCBvFUgWivUogjapvqvOhnm
+	AM9NTcanmq+0zhhOv0rCXVwnklVekN/G+EVY4XtvqRFmaFa51LKzVObqzHuf/07xp8j4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r8nQ8-001hSg-8R; Thu, 30 Nov 2023 21:14:00 +0100
+Date: Thu, 30 Nov 2023 21:14:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH 06/14] net: phy: at803x: move at8031 specific
+ data out of generic at803x_priv
+Message-ID: <568f8b22-a7d2-46c3-a539-30ecf6a85b18@lunn.ch>
+References: <20231129021219.20914-1-ansuelsmth@gmail.com>
+ <20231129021219.20914-7-ansuelsmth@gmail.com>
+ <47df2f0d-3410-43c2-96d3-87af47cfdcce@lunn.ch>
+ <6568e4aa.050a0220.120a5.9c83@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] netlink: Return unsigned value for nla_len()
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: kernel test robot <lkp@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>,
- Jeff Johnson <quic_jjohnson@quicinc.com>, Michael Walle <mwalle@kernel.org>,
- Max Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20231130200058.work.520-kees@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20231130200058.work.520-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.215.208.186
-X-Source-L: No
-X-Exim-ID: 1r8nNg-0021Hn-1q
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 189.215.208.186.cable.dyn.cableonline.com.mx ([192.168.0.28]) [189.215.208.186]:2120
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 4
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfAW2y5kt9fx5+DLyfhzBJv7qwSqL5V9w/+9p20VQY6rbIJMlF3yXyzoGfA6u1IfTD2y/Ah5l8C6pRyjE0iwIXUpCn2prrrwWXRwxbun/7bR1pDdXWaj2
- uxJHpL/LMdCx9ZcxQRw/Ur7seKuBKhEglPuGmc8dkgzCx3rpa0N/xksCN3bdF1Us0+PQP/CfjVBSUBRVrsrQJw412DUAcLO3pxM=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6568e4aa.050a0220.120a5.9c83@mx.google.com>
 
-
-
-On 11/30/23 14:01, Kees Cook wrote:
-> The return value from nla_len() is never expected to be negative, and can
-> never be more than struct nlattr::nla_len (a u16). Adjust the prototype
-> on the function, and explicitly bounds check the subtraction. This will
-> let GCC's value range optimization passes know that the return can never
-> be negative, and can never be larger than u16. As recently discussed[1],
-> this silences the following warning in GCC 12+:
+On Thu, Nov 30, 2023 at 08:38:17PM +0100, Christian Marangi wrote:
+> On Thu, Nov 30, 2023 at 04:21:50PM +0100, Andrew Lunn wrote:
+> > > +struct at8031_data {
+> > > +	bool is_fiber;
+> > > +	bool is_1000basex;
+> > > +	struct regulator_dev *vddio_rdev;
+> > > +	struct regulator_dev *vddh_rdev;
+> > > +};
+> > > +
+> > >  struct at803x_priv {
+> > >  	int flags;
+> > >  	u16 clk_25m_reg;
+> > >  	u16 clk_25m_mask;
+> > >  	u8 smarteee_lpi_tw_1g;
+> > >  	u8 smarteee_lpi_tw_100m;
+> > > -	bool is_fiber;
+> > > -	bool is_1000basex;
+> > > -	struct regulator_dev *vddio_rdev;
+> > > -	struct regulator_dev *vddh_rdev;
+> > > +
+> > > +	/* Specific data for at8031 PHYs */
+> > > +	void *data;
+> > >  };
+> > 
+> > I don't really like this void *
+> > 
+> > Go through at803x_priv and find out what is common to them all, and
+> > keep that in one structure. Add per family private structures which
+> > include the common as a member.
 > 
-> net/wireless/nl80211.c: In function 'nl80211_set_cqm_rssi.isra':
-> net/wireless/nl80211.c:12892:17: warning: 'memcpy' specified bound 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
-> 12892 |                 memcpy(cqm_config->rssi_thresholds, thresholds,
->        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 12893 |                        flex_array_size(cqm_config, rssi_thresholds,
->        |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 12894 |                                        n_thresholds));
->        |                                        ~~~~~~~~~~~~~~
-> 
-> This has the additional benefit of being defensive in the face of nlattr
-> corruption or logic errors (i.e. nla_len being set smaller than
-> NLA_HDRLEN).
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202311090752.hWcJWAHL-lkp@intel.com/ [1]
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Johannes Berg <johannes@sipsolutions.net>
-> Cc: Jeff Johnson <quic_jjohnson@quicinc.com>
-> Cc: Michael Walle <mwalle@kernel.org>
-> Cc: Max Schulze <max.schulze@online.de>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-wireless@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> As you notice later in the patches, only at803x have stuff in common
+> qca803xx and qca808x doesn't use the struct at all (aside from stats)
 
-Looks good to me.
+The dangers here are taking a phydev->priv and casting it. You think
+it is X, but is actually Y, and bad things happen.
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+The helpers you have in your common.c must never do this. You can have
+a at803x_priv only visible inside the at803x driver, and a
+qca808x_priv only visible inside the qca808x driver. Define a
+structure which is needed for the shared code in common.c, and pass it
+as a parameter to these helpers.
 
-Thanks
---
-Gustavo
+You have a reasonably good idea what your end goal is. The tricky part
+is getting there, in lots of easy to review, obviously correct steps.
 
-> ---
->   include/net/netlink.h | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/netlink.h b/include/net/netlink.h
-> index 167b91348e57..c59679524705 100644
-> --- a/include/net/netlink.h
-> +++ b/include/net/netlink.h
-> @@ -1214,9 +1214,9 @@ static inline void *nla_data(const struct nlattr *nla)
->    * nla_len - length of payload
->    * @nla: netlink attribute
->    */
-> -static inline int nla_len(const struct nlattr *nla)
-> +static inline u16 nla_len(const struct nlattr *nla)
->   {
-> -	return nla->nla_len - NLA_HDRLEN;
-> +	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN : 0;
->   }
->   
->   /**
+	Andrew
+
 
