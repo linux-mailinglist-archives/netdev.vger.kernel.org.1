@@ -1,101 +1,98 @@
-Return-Path: <netdev+bounces-52506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C7D7FEEA1
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:09:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703BD7FEEAD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 13:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF3B2281F67
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:09:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E81C5B210D5
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 12:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4CF45960;
-	Thu, 30 Nov 2023 12:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096B045C17;
+	Thu, 30 Nov 2023 12:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRc7X2mi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594AAD40
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 04:09:46 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VxRQ4Df_1701346182;
-Received: from 30.222.48.140(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VxRQ4Df_1701346182)
-          by smtp.aliyun-inc.com;
-          Thu, 30 Nov 2023 20:09:43 +0800
-Message-ID: <6f78d5e0-a8a8-463e-938c-9a9b49cf106f@linux.alibaba.com>
-Date: Thu, 30 Nov 2023 20:09:38 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2E84503D;
+	Thu, 30 Nov 2023 12:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B7A9C433CB;
+	Thu, 30 Nov 2023 12:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701346225;
+	bh=1kZu0OaOgqszldbJN4LuIZlOfCuN/8er0T8tdUIft9M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iRc7X2mip91qIPYJpATu+KCLgx2idnGbSeLxs7Q8dfBQk1wv/36ueSem0x7dVos8M
+	 sFEFONBPFIKJw9KTh+4jALCFfPIHK+onui0VxDrdjjyXN2OEXUix2xDIPpgUOA9jhg
+	 LKrNQd5zgmiFiHCrMW2Fg9+ZHcxGjawKAi/tT52rKZ4f/4CVttoKhjWfEtduTSAFU3
+	 jzBcgC5r/XRL1hVxe04BB6OkRy4a5Yv5kdmKS/NgEOe6cuQ6AIUDh++TQXcrxKCyTE
+	 cclNlZxILV7iLbd1mDVlNFbuokdv9N8xvvwRVC9xHra/CxHbbacmo/RlFa9J43BG3Y
+	 U4Y17ty/qheOw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 514A6E00090;
+	Thu, 30 Nov 2023 12:10:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 4/4] virtio-net: support rx netdim
-To: Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc: jasowang@redhat.com, mst@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, hawk@kernel.org,
- john.fastabend@gmail.com, ast@kernel.org, horms@kernel.org,
- xuanzhuo@linux.alibaba.com, yinjun.zhang@corigine.com
-References: <cover.1701050450.git.hengqi@linux.alibaba.com>
- <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
- <8d2ee27f10a7a6c9414f10e8c0155c090b5f11e3.camel@redhat.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <8d2ee27f10a7a6c9414f10e8c0155c090b5f11e3.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/4] net: ethernet: Convert to platform remove
+ callback returning void
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170134622532.26213.12094812518949511980.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Nov 2023 12:10:25 +0000
+References: <20231128173823.867512-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20231128173823.867512-1-u.kleine-koenig@pengutronix.de>
+To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, rogerq@kernel.org, s-vadapalli@ti.com,
+ dan.carpenter@linaro.org, netdev@vger.kernel.org, kernel@pengutronix.de,
+ r-gunasekaran@ti.com, jesse.brandeburg@intel.com, robh@kernel.org,
+ linyunsheng@huawei.com, alardam@gmail.com, linux-omap@vger.kernel.org,
+ memxor@gmail.com, sdf@google.com, horms@kernel.org,
+ quic_jjohnson@quicinc.com, wei.fang@nxp.com, nnac123@linux.ibm.com,
+ ansuelsmth@gmail.com
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-在 2023/11/30 下午5:33, Paolo Abeni 写道:
-> On Mon, 2023-11-27 at 10:55 +0800, Heng Qi wrote:
->> @@ -4738,11 +4881,14 @@ static void remove_vq_common(struct virtnet_info *vi)
->>   static void virtnet_remove(struct virtio_device *vdev)
->>   {
->>   	struct virtnet_info *vi = vdev->priv;
->> +	int i;
->>   
->>   	virtnet_cpu_notif_remove(vi);
->>   
->>   	/* Make sure no work handler is accessing the device. */
->>   	flush_work(&vi->config_work);
->> +	for (i = 0; i < vi->max_queue_pairs; i++)
->> +		cancel_work(&vi->rq[i].dim.work);
-> If the dim work is still running here, what prevents it from completing
-> after the following unregister/free netdev?
+On Tue, 28 Nov 2023 18:38:24 +0100 you wrote:
+> Hello,
+> 
+> in (implicit) v1 of this series
+> (https://lore.kernel.org/netdev/20231117091655.872426-1-u.kleine-koenig@pengutronix.de)
+> I tried to address the resource leaks in the three cpsw drivers. However
+> this is hard to get right without being able to test the changes. So
+> here comes a series that just converts all drivers below
+> drivers/net/ethernet to use .remove_new() and adds a comment about the
+> potential leaks for someone else to fix the problem.
+> 
+> [...]
 
-Yes, no one here is trying to stop it, the situation is like 
-unregister/free netdev
-when rss are being set, so I think this is ok.
+Here is the summary with links:
+  - [net-next,v2,1/4] net: ethernet: ti: am65-cpsw: Convert to platform remove callback returning void
+    https://git.kernel.org/netdev/net-next/c/7234dc5ccba6
+  - [net-next,v2,2/4] net: ethernet: ti: cpsw: Convert to platform remove callback returning void
+    https://git.kernel.org/netdev/net-next/c/7ac3f867a358
+  - [net-next,v2,3/4] net: ethernet: ti: cpsw-new: Convert to platform remove callback returning void
+    https://git.kernel.org/netdev/net-next/c/a76772e2fd83
+  - [net-next,v2,4/4] net: ethernet: ezchip: Convert to platform remove callback returning void
+    https://git.kernel.org/netdev/net-next/c/7ec1bb2ce64b
 
->
-> It looks like you want need to call cancel_work_sync here?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-In v4, Yinjun Zhang mentioned that _sync() can cause deadlock[1].
-Therefore, cancel_work() is used here instead of cancel_work_sync() to 
-avoid possible deadlock.
-
-[1] 
-https://lore.kernel.org/all/20231122092939.1005591-1-yinjun.zhang@corigine.com/
-
->
-> Additionally the later remove_vq_common() will needless call
-> cancel_work() again;
-
-Yes. remove_vq_common() now does not call cancel_work().
-
-> possibly is better to consolidate a single (sync)
-> call there.
-
-Do you mean add it in virtnet_freeze()?
-cancel_work() has existed in the path virtnet_freeze() -> 
-virtnet_freeze_down() -> virtnet_close().
-
-Thanks!
-
->
-> Cheers,
->
-> Paolo
 
 
