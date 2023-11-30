@@ -1,120 +1,79 @@
-Return-Path: <netdev+bounces-52429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5547FEB5E
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:06:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407127FEB8D
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 495FEB20D71
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:06:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2E01C20A72
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C84347A2;
-	Thu, 30 Nov 2023 09:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C6C358A4;
+	Thu, 30 Nov 2023 09:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="K0r+XOF3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WhPLe7+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C63CF
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:06:30 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-3331974c2ceso480138f8f.0
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:06:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1701335189; x=1701939989; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eJ5LmNpN5QcwNvER/5g/ZnTRjIBCAtvU7kmUUks1hNI=;
-        b=K0r+XOF3C1iQrXytK+rIxZgSSQ4W3ZrViMomJ53pkTXvfed3TxRzJnkSfx2jQqDvbf
-         Q/adUp9UM8LyR07bO56ApOj0+oeH0PlHHQd09Pd+a6h+eBhiVO0Gpbfj9g/FQpurGSuK
-         WA6kidV2RCAUeQ/d0NRPf6XbVA5p0bQehtcXy2CYNaJbTlo2DxpfIS4pcc+9/C0iZZWQ
-         4ns/84AB9yOGtlsjkgrEhFFg9kw3DEx6dO9b3IniK3gjeT0TI8V5CRb0H9f1sfzbauh+
-         yep7L5cZ4S+brErHelCDZx/92yTt0OLcm+91FFnCb1b0RnP+xczjF+CnHR6yE6BMBWLv
-         DQfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701335189; x=1701939989;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eJ5LmNpN5QcwNvER/5g/ZnTRjIBCAtvU7kmUUks1hNI=;
-        b=ATC6Yv51upTukSIT10tLjnO0XrW+UF3wrwNobNL8nzFIeG1HOfb0tDX1C4peoEMRBy
-         9pvx09H1MEbX7dQiI3I/3KCjlppuUVCPXFoWqxKOL3m3VBStVhnOMtVJdv4hfjiqM4Zq
-         yKx4mGaH+xosviS5+rmlTATFi0LpvckCWj0nlcL8Nv6aeBTIVAy9n/0YgN9in+Fdj67e
-         O1uMPFW7pLVx/NglRznBrC5v+YgvBdIGKpVzu2ETZh79R7P7oT5wzIwR63ZZS7xm2109
-         T+U0FeBo2kmsF32+uPgAdCWmQfNb7Fp0UGwbO0ENuhyM1DMtd4AhBp0a5TpOj4mxj4L1
-         Ex3w==
-X-Gm-Message-State: AOJu0Yx3RaOVGS1ImzuRoxGfskU0cgKd41qakgmgcguYkaRIJFjhs5y7
-	VWU60t6/EJQXCoIF4FTlyyyliw==
-X-Google-Smtp-Source: AGHT+IG3qiBMyklUjHLUA0JpQRxzV/uVj6ZdX1vKxXoWyydiAQzpr8xbbllWv+CAuQ+aC0bky0EhcA==
-X-Received: by 2002:adf:f1c6:0:b0:333:75c:362f with SMTP id z6-20020adff1c6000000b00333075c362fmr7589388wro.45.1701335189038;
-        Thu, 30 Nov 2023 01:06:29 -0800 (PST)
-Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
-        by smtp.gmail.com with ESMTPSA id e9-20020adffc49000000b00332cfd83b8dsm929523wrs.96.2023.11.30.01.06.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 01:06:28 -0800 (PST)
-Message-ID: <51dd35c9-ff5b-5b11-04d1-9a5ae9466780@blackwall.org>
-Date: Thu, 30 Nov 2023 11:06:27 +0200
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8819E2F86F;
+	Thu, 30 Nov 2023 09:12:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F20BC433C8;
+	Thu, 30 Nov 2023 09:12:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701335524;
+	bh=Qg61lpLbgqDeoofePJmkszRcZdvneo2mvpoD+dzpgAA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WhPLe7+ynS3+Fu8ilfb3vYWnml4KeNblJTGW8uu6XV3dyI81omq2U7ZJc1rcZL9+9
+	 MGF9e2F2XUz8QfdqSd4ZxZWBXhwkIRCra8EKoKP6Kf8sa4idLqYEqD7IJ3xqul2oXo
+	 Efjp/fYZXiFOtm2bXh0YcEEWHPoYnS/kRP4pP7/CctOFerXXew+e/Jb/G7hCzWmEkV
+	 iiXkQRqwHmDYVs1nFjZneulfKxrUDDNE/446Jt/J4JKrkk0teasWsaNZQ9WJM5HpxU
+	 pRzuQsNXUhSnDXuNlQVqH91ZfNBFxqQ5H7r58EKahHGTJlWVQC6jNVfWPTiscyNdeR
+	 /uOUyCrn0kdYQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lorenzo.bianconi@redhat.com,
+	bpf@vger.kernel.org,
+	hawk@kernel.org,
+	toke@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com
+Subject: [PATCH v2 net-next 0/2] add multi-buff support for xdp running in generic mode
+Date: Thu, 30 Nov 2023 10:11:47 +0100
+Message-ID: <cover.1701334869.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH bpf-next] netkit: Add some ethtool ops to provide
- information to user
-Content-Language: en-US
-To: Feng zhou <zhoufeng.zf@bytedance.com>, daniel@iogearbox.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com, tangchen.1@bytedance.com
-References: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/30/23 09:58, Feng zhou wrote:
-> From: Feng Zhou <zhoufeng.zf@bytedance.com>
-> 
-> Add get_strings, get_sset_count, get_ethtool_stats to get peer
-> ifindex.
-> ethtool -S nk1
-> NIC statistics:
->       peer_ifindex: 36
-> 
-> Add get_link, get_link_ksettings to get link stat.
-> ethtool nk1
-> Settings for nk1:
-> 	...
-> 	Link detected: yes
-> 
-> Add get_ts_info.
-> ethtool -T nk1
-> Time stamping parameters for nk1:
-> ...
-> 
-> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
-> ---
->   drivers/net/netkit.c | 53 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 53 insertions(+)
-> 
+Introduce multi-buffer support for xdp running in generic mode not always
+linearizing the skb in netif_receive_generic_xdp routine.
 
-Hi,
-I don't see any point in sending peer_ifindex through ethtool, even
-worse through ethtool stats. That is definitely the wrong place for it.
-You can already retrieve that through netlink. About the speed/duplex
-this one makes more sense, but this is the wrong way to do it.
-See how we did it for virtio_net (you are free to set speed/duplex
-to anything to please bonding for example). Although I doubt anyone will 
-use netkit with bonding, so even that is questionable. :)
+Changes since v1:
+- explictly keep the skb segmented in netif_skb_check_for_generic_xdp() and
+  do not rely on pskb_expand_head()
 
-Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Lorenzo Bianconi (2):
+  xdp: rely on skb pointer reference in do_xdp_generic and
+    netif_receive_generic_xdp
+  xdp: add multi-buff support for xdp running in generic mode
 
-Cheers,
-  Nik
+ drivers/net/tun.c         |   4 +-
+ include/linux/netdevice.h |   2 +-
+ net/core/dev.c            | 158 ++++++++++++++++++++++++++++++--------
+ 3 files changed, 130 insertions(+), 34 deletions(-)
+
+-- 
+2.43.0
 
 
