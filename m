@@ -1,113 +1,117 @@
-Return-Path: <netdev+bounces-52440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8083E7FEBE3
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:33:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0471D7FEC08
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F634281C19
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:33:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87CE5B20DE2
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9FA38F89;
-	Thu, 30 Nov 2023 09:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1372738FB4;
+	Thu, 30 Nov 2023 09:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mq3GgL22"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="Rj6QOEfZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1FCD48
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:33:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701336816;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aCExvHYEswKuEfeCmLnGAnokX5PwVgkIGHZN/pMhG/0=;
-	b=Mq3GgL22Q6FV6vqhPcwn9miNG+2XCCwA8LyIvRHLVh3eqe6FIUkPUPJoni5yfia7D5pu7G
-	iBb0iaqTHlPUQ+WXbKp7L0MLtJtzD/GNwRMdHOa4MAf5/kvFZgQLNqxkwfLnqbapjv+kBE
-	elbqlOMZGmpKNzl8VBlBTLaEnEzfiUQ=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-19-ZFecgY3MOuyBw9OlKPjUpg-1; Thu, 30 Nov 2023 04:33:34 -0500
-X-MC-Unique: ZFecgY3MOuyBw9OlKPjUpg-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a18a4b745b2so4360566b.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:33:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701336813; x=1701941613;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aCExvHYEswKuEfeCmLnGAnokX5PwVgkIGHZN/pMhG/0=;
-        b=T83z8Ol2F71gVmKfjI8X3nzlZA1Y1YLFdYB6Wm/tIJSfOKWu29jZENFF97u/y8zQnN
-         H3OHtkDMUq3j006zStFrFtVK2pmbEKGa70qweENFci8z6z2rh7Msm02fyKtwqLoGQDTb
-         uEWAvFpmLfwsOghzi88cN3k1inbXkkf9OYUcuTGJSrmLPtgM7tRsWSmSLKwl87TlYzwb
-         jljeZNAiN29n7sQ3S46LzAMqRWKi5COYsz/xNuapD6uVrzs+cWV+fCJStMdVXXO2hfCL
-         J+voFqs2wa/DOqtJEhig5NjMjcDVeLAlSEqowDk1ngmbirRDp8jHxZ2LSen3y8wpDNr/
-         oNkw==
-X-Gm-Message-State: AOJu0YyxtotsniKMbiQK9myl75ojrwf824hy3ckxoduWIpo9wImdFCII
-	0+UG91cawL64JWhDrm3UDY7K6uxWj7paZjEL2hW3LUJpf0QhJnRTAClP1qXSxHXsIcuweti5eqG
-	i4ayFA1upZoe9rSXD
-X-Received: by 2002:a17:907:390:b0:a01:b9bd:87a with SMTP id ss16-20020a170907039000b00a01b9bd087amr820675ejb.7.1701336813536;
-        Thu, 30 Nov 2023 01:33:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEP5pbMR674ut0hyknc6qi/7vtoWZqWf64ILFllSlxQGa/5LjZX7aHjzFBJZ0hRNM8lzBLUKg==
-X-Received: by 2002:a17:907:390:b0:a01:b9bd:87a with SMTP id ss16-20020a170907039000b00a01b9bd087amr820654ejb.7.1701336813204;
-        Thu, 30 Nov 2023 01:33:33 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-254-39.dyn.eolo.it. [146.241.254.39])
-        by smtp.gmail.com with ESMTPSA id ay22-20020a170906d29600b009efe6fdf615sm463853ejb.150.2023.11.30.01.33.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 01:33:32 -0800 (PST)
-Message-ID: <8d2ee27f10a7a6c9414f10e8c0155c090b5f11e3.camel@redhat.com>
-Subject: Re: [PATCH net-next v5 4/4] virtio-net: support rx netdim
-From: Paolo Abeni <pabeni@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc: jasowang@redhat.com, mst@redhat.com, kuba@kernel.org,
- edumazet@google.com,  davem@davemloft.net, hawk@kernel.org,
- john.fastabend@gmail.com, ast@kernel.org,  horms@kernel.org,
- xuanzhuo@linux.alibaba.com, yinjun.zhang@corigine.com
-Date: Thu, 30 Nov 2023 10:33:31 +0100
-In-Reply-To: <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
-References: <cover.1701050450.git.hengqi@linux.alibaba.com>
-	 <12c0a070d31f29e394b78a8abb4c009274b8a88c.1701050450.git.hengqi@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+X-Greylist: delayed 311 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Nov 2023 01:40:11 PST
+Received: from mail.katalix.com (mail.katalix.com [IPv6:2a05:d01c:827:b342:16d0:7237:f32a:8096])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0C2CAD40;
+	Thu, 30 Nov 2023 01:40:10 -0800 (PST)
+Received: from [IPV6:2a02:8010:6359:1:4d3:e723:472d:b106] (unknown [IPv6:2a02:8010:6359:1:4d3:e723:472d:b106])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 3B89A7D219;
+	Thu, 30 Nov 2023 09:34:58 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1701336898; bh=ErXmxPvBEc8Any6QeP1YRnOLa/336/55/jQeFDo6YzM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<d8b511d0-b5ec-d0b9-86d0-62b821735a78@katalix.com>|
+	 Date:=20Thu,=2030=20Nov=202023=2009:34:57=20+0000|MIME-Version:=20
+	 1.0|To:=20Hangbin=20Liu=20<liuhangbin@gmail.com>,=20netdev@vger.ke
+	 rnel.org|Cc:=20"David=20S.=20Miller"=20<davem@davemloft.net>,=20Ja
+	 kub=20Kicinski=0D=0A=20<kuba@kernel.org>,=20Eric=20Dumazet=20<edum
+	 azet@google.com>,=0D=0A=20Paolo=20Abeni=20<pabeni@redhat.com>,=20S
+	 huah=20Khan=20<shuah@kernel.org>,=0D=0A=20David=20Ahern=20<dsahern
+	 @kernel.org>,=20linux-kselftest@vger.kernel.org,=0D=0A=20Po-Hsu=20
+	 Lin=20<po-hsu.lin@canonical.com>,=20Guillaume=20Nault=20<gnault@re
+	 dhat.com>,=0D=0A=20Petr=20Machata=20<petrm@nvidia.com>,=20James=20
+	 Prestwood=20<prestwoj@gmail.com>,=0D=0A=20Jaehee=20Park=20<jhpark1
+	 013@gmail.com>,=20Ido=20Schimmel=20<idosch@nvidia.com>,=0D=0A=20Fr
+	 ancesco=20Ruggeri=20<fruggeri@arista.com>,=0D=0A=20Justin=20Iurman
+	 =20<justin.iurman@uliege.be>,=20Xin=20Long=20<lucien.xin@gmail.com
+	 >|References:=20<20231130040105.1265779-1-liuhangbin@gmail.com>=0D
+	 =0A=20<20231130040105.1265779-12-liuhangbin@gmail.com>|From:=20Jam
+	 es=20Chapman=20<jchapman@katalix.com>|Subject:=20Re:=20[PATCHv2=20
+	 net-next=2011/14]=20selftests/net:=20convert=20l2tp.sh=20to=20run=
+	 20it=0D=0A=20in=20unique=20namespace|In-Reply-To:=20<2023113004010
+	 5.1265779-12-liuhangbin@gmail.com>;
+	b=Rj6QOEfZ4awl8QwOIsGr3q3RpCGkvjvOGdkVjag9es8YnHCVFjMM71M+7Zsppd0MS
+	 NHOh7kSnrIupARwOwRF5eu+Cqe2ICTffn/fyh0jSToQCCU43XRWHNaG0WbBnBnheej
+	 jFlJGZpMmvy3bDZFC4F+3yGiPTMZUJqfayqrxNayOVu1Ky0jMsDrOOSbVgNlfKYW3x
+	 SsG4cro+gejTGFsAfcxO9X0+s4F8EwZ6sKBE/oCD9N4px+l4tfdM9q/7dqnZ2zFXbb
+	 CF0lh615Cje/sdJgDaJandtHre3Sf/w84BwAbMzbvtVwrfzLZSk8fDuWjWr10/QvRI
+	 36TrNMUSAoveA==
+Message-ID: <d8b511d0-b5ec-d0b9-86d0-62b821735a78@katalix.com>
+Date: Thu, 30 Nov 2023 09:34:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
+ Po-Hsu Lin <po-hsu.lin@canonical.com>, Guillaume Nault <gnault@redhat.com>,
+ Petr Machata <petrm@nvidia.com>, James Prestwood <prestwoj@gmail.com>,
+ Jaehee Park <jhpark1013@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
+ Francesco Ruggeri <fruggeri@arista.com>,
+ Justin Iurman <justin.iurman@uliege.be>, Xin Long <lucien.xin@gmail.com>
+References: <20231130040105.1265779-1-liuhangbin@gmail.com>
+ <20231130040105.1265779-12-liuhangbin@gmail.com>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: [PATCHv2 net-next 11/14] selftests/net: convert l2tp.sh to run it
+ in unique namespace
+In-Reply-To: <20231130040105.1265779-12-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2023-11-27 at 10:55 +0800, Heng Qi wrote:
-> @@ -4738,11 +4881,14 @@ static void remove_vq_common(struct virtnet_info =
-*vi)
->  static void virtnet_remove(struct virtio_device *vdev)
->  {
->  	struct virtnet_info *vi =3D vdev->priv;
-> +	int i;
-> =20
->  	virtnet_cpu_notif_remove(vi);
-> =20
->  	/* Make sure no work handler is accessing the device. */
->  	flush_work(&vi->config_work);
-> +	for (i =3D 0; i < vi->max_queue_pairs; i++)
-> +		cancel_work(&vi->rq[i].dim.work);
+On 30/11/2023 04:01, Hangbin Liu wrote:
+> Here is the test result after conversion.
+>
+> ]# ./l2tp.sh
+> TEST: IPv4 basic L2TP tunnel                                        [ OK ]
+> TEST: IPv4 route through L2TP tunnel                                [ OK ]
+> TEST: IPv6 basic L2TP tunnel                                        [ OK ]
+> TEST: IPv6 route through L2TP tunnel                                [ OK ]
+> TEST: IPv4 basic L2TP tunnel - with IPsec                           [ OK ]
+> TEST: IPv4 route through L2TP tunnel - with IPsec                   [ OK ]
+> TEST: IPv6 basic L2TP tunnel - with IPsec                           [ OK ]
+> TEST: IPv6 route through L2TP tunnel - with IPsec                   [ OK ]
+> TEST: IPv4 basic L2TP tunnel                                        [ OK ]
+> TEST: IPv4 route through L2TP tunnel                                [ OK ]
+> TEST: IPv6 basic L2TP tunnel - with IPsec                           [ OK ]
+> TEST: IPv6 route through L2TP tunnel - with IPsec                   [ OK ]
+> TEST: IPv4 basic L2TP tunnel - after IPsec teardown                 [ OK ]
+> TEST: IPv4 route through L2TP tunnel - after IPsec teardown         [ OK ]
+> TEST: IPv6 basic L2TP tunnel - after IPsec teardown                 [ OK ]
+> TEST: IPv6 route through L2TP tunnel - after IPsec teardown         [ OK ]
+>
+> Tests passed:  16
+> Tests failed:   0
+>
+> Acked-by: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-If the dim work is still running here, what prevents it from completing
-after the following unregister/free netdev?
+Reviewed-by: James Chapman <jchapman@katalix.com>
 
-It looks like you want need to call cancel_work_sync here?
-
-Additionally the later remove_vq_common() will needless call
-cancel_work() again; possibly is better to consolidate a single (sync)
-call there.
-
-Cheers,
-
-Paolo
 
 
