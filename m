@@ -1,205 +1,155 @@
-Return-Path: <netdev+bounces-52578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E91A7FF3F9
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:52:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334FC7FF405
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 16:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1EC028176A
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:51:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64F5F1C20E25
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 15:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E2D524A9;
-	Thu, 30 Nov 2023 15:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22BA53809;
+	Thu, 30 Nov 2023 15:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQQI74sy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/GBRaRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F7B10C2
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:51:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701359513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R9sH/nsXBm58uJZS6MMM9fWob8FhigNQ0Gt0J9YIG4w=;
-	b=JQQI74syvb/dy6MrKK9YKM0sx7VWlVsN/NIrYuGNEeukcrDtPqSvcHomgJ7t2EeUi2mo8e
-	gLrYCHpEN4wcIzJmY4l3SLsS/bLK5VX7vG5bxS2rLv9K/f7D7saGBvReBpn90XO7oODEE/
-	FO+vFolCVlD3p0MzomnMJXt9prom980=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-A5ff_npWOWuGXLBsxip0LQ-1; Thu, 30 Nov 2023 10:51:52 -0500
-X-MC-Unique: A5ff_npWOWuGXLBsxip0LQ-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50aa9997747so1455226e87.0
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 07:51:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701359510; x=1701964310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC65810D5;
+	Thu, 30 Nov 2023 07:54:39 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-5ab94fc098cso853998a12.1;
+        Thu, 30 Nov 2023 07:54:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701359679; x=1701964479; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R9sH/nsXBm58uJZS6MMM9fWob8FhigNQ0Gt0J9YIG4w=;
-        b=W3lQtbpTBT9718QpW1URU52U4sKlgi2nk/Vaa0KbHdC8zQx2ZxA2op+wo1w5JOA47D
-         booEbL6j62zx3fuD6Ezx4mJy3Odyqg6bbQC6mQQo4LOc4pRrtnz+CgKP/ipMTt5a8dT/
-         zNEVzxAEkgYa0dKGcOrs/MHvn0S8aqq8XqSL9qcPULrUqfm+Ps5uBvV7RcRyhKGLy7bo
-         XQj99fONYomqHyuEOnBo1ASgNYkTQpgt9YPAmLgDJQvmmW8kLPuz2GeCAwpYRMOPitU1
-         /OkxxERixNJbmZfsW7Zhcjk1HhcFTR6riSbQRhxYSmojvd29eNyat0eukbaOy4y4mTbU
-         HATA==
-X-Gm-Message-State: AOJu0Yxe8Zy4UcCgmw+vB+Es6UmpEPVwe4VQTZbhce8MLt+Iwbfi7XU9
-	QyHDk9lrwuRdE4i0DtCs0cDYwZyWcuK5LcYzxMNlLUUHVj0Dsdqa4LfNBWLC8JBpmvFVrXhBShU
-	v2zxdzf5eisz/wz/6
-X-Received: by 2002:a05:6512:3e0a:b0:503:36cb:5436 with SMTP id i10-20020a0565123e0a00b0050336cb5436mr14134486lfv.9.1701359510517;
-        Thu, 30 Nov 2023 07:51:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFxK+o76JjlzjGo4sCr3Sdp4eHXm0tn7JN0/Jt0LixY17vWdyrIK6Iu8rubG0+Tpb3vMIYqkw==
-X-Received: by 2002:a05:6512:3e0a:b0:503:36cb:5436 with SMTP id i10-20020a0565123e0a00b0050336cb5436mr14134472lfv.9.1701359510167;
-        Thu, 30 Nov 2023 07:51:50 -0800 (PST)
-Received: from debian (2a01cb058918ce00f1553101655f9ec6.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:f155:3101:655f:9ec6])
-        by smtp.gmail.com with ESMTPSA id s9-20020a05600c45c900b0040b4fca8620sm6138574wmo.37.2023.11.30.07.51.48
+        bh=7SEGQMTDM9nIwkV/HUIBS14c5J5qAwdGyfYFq/Vjc8o=;
+        b=N/GBRaRvH/ya7kg0T2sHwYMdBqUQ4OyfzaEPkwlFaLKPRRCeLWy9TaTcq/X5zlEt0x
+         0/j4T6t/gCgPbIpY/TNyDHglAvagmBOBNrpaTMfc3DKCi18TOleIRJMZFE7qEIeL8Qu0
+         /8GyWV3ZNHUvo2IZfmuyoih5hGDBnqenHQcyZpZcpxPEl8ULw4dejYp+UgPOjtGZg0fz
+         1Rc5irYs2QDDI4XbU05pWduzUHXZzxuLQN+t9g4SXQBgNg7Ige1Y1viW4rkFdfKYRVFm
+         lvPTcXuXFWNpiX35oEN2yCXJ/sXfOvS+Glm+R4hWBLN1tJQhy0EIknltycNKskvALiiV
+         /6aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701359679; x=1701964479;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7SEGQMTDM9nIwkV/HUIBS14c5J5qAwdGyfYFq/Vjc8o=;
+        b=lxKMRzCnCEJvxtkErx6c/q7W9yDvHItYqgLBs03cYBTDeaj4WjgX7Wi0JRE9R9cnxb
+         1hPUi6uW4s8eVkQNy6Z/S7MT3j/j0yKdsTlxIWJpTbEbvurGFk8twWh5NfNJ5WlTEeRu
+         lFTC3LroJE3ntRri2JjJuhRzalYE7/DUtmv0siuCkqjuyeV3F5KbomdEtX/7LsIpGV+j
+         /Wz/0PcpCn4rrjBJ9mf4S7JiaI0Lpa5x1VSrrn7Wp0WBWGujYDYeKBxW4z1P5hlL2FtJ
+         rp8VVsVC9y3ZNmPJeqHwSOcjR3wq1DSCxlX5cyObwQnqhYGHiK3uOKi6FIKjFO1qK/Ek
+         kVSg==
+X-Gm-Message-State: AOJu0YzA+8AiAyOuY+9xE7FNiNG+FQlEGAjwgolRY1eYYEladX3c/VI3
+	HkEspYpBakxbjdqxRRFlDlQ=
+X-Google-Smtp-Source: AGHT+IEuvjIe4wkG0SuuT+uuCcHxxohkSxvU+YD+z3xS6xwZ9Uh6MTAq9f8PID06mw39uv4zNSsETg==
+X-Received: by 2002:a05:6a21:a591:b0:18c:138e:f268 with SMTP id gd17-20020a056a21a59100b0018c138ef268mr23600964pzc.21.1701359678849;
+        Thu, 30 Nov 2023 07:54:38 -0800 (PST)
+Received: from localhost ([2605:59c8:148:ba10:1053:7b0:e3cc:7b48])
+        by smtp.gmail.com with ESMTPSA id k5-20020aa79d05000000b006cbcd08ed56sm1369884pfp.56.2023.11.30.07.54.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 07:51:49 -0800 (PST)
-Date: Thu, 30 Nov 2023 16:51:47 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Michal Kubecek <mkubecek@suse.cz>
-Subject: Re: [PATCH net-next v3] tcp: Dump bound-only sockets in inet_diag.
-Message-ID: <ZWivkx3frDwoCX0k@debian>
-References: <49a05d612fc8968b17780ed82ecb1b96dcf78e5a.1701358163.git.gnault@redhat.com>
+        Thu, 30 Nov 2023 07:54:37 -0800 (PST)
+Date: Thu, 30 Nov 2023 07:54:36 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, 
+ Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ ast@kernel.org, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com
+Message-ID: <6568b03cbceb7_1b8920827@john.notmuch>
+In-Reply-To: <edef4d8b-8682-c23f-31c4-57546be97299@iogearbox.net>
+References: <20231129234916.16128-1-daniel@iogearbox.net>
+ <CANn89i+0UuXTYzBD1=zaWmvBKNtyriWQifOhQKF3Y7z4BWZhig@mail.gmail.com>
+ <edef4d8b-8682-c23f-31c4-57546be97299@iogearbox.net>
+Subject: Re: pull-request: bpf 2023-11-30
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49a05d612fc8968b17780ed82ecb1b96dcf78e5a.1701358163.git.gnault@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 30, 2023 at 04:40:51PM +0100, Guillaume Nault wrote:
-> Walk the hashinfo->bhash2 table so that inet_diag can dump TCP sockets
-> that are bound but haven't yet called connect() or listen().
-> 
-> The code is inspired by the ->lhash2 loop. However there's no manual
-> test of the source port, since this kind of filtering is already
-> handled by inet_diag_bc_sk(). Also, a maximum of 16 sockets are dumped
-> at a time, to avoid running with bh disabled for too long.
-> 
-> There's no TCP state for bound but otherwise inactive sockets. Such
-> sockets normally map to TCP_CLOSE. However, "ss -l", which is supposed
-> to only dump listening sockets, actually requests the kernel to dump
-> sockets in either the TCP_LISTEN or TCP_CLOSE states. To avoid dumping
-> bound-only sockets with "ss -l", we therefore need to define a new
-> pseudo-state (TCP_BOUND_INACTIVE) that user space will be able to set
-> explicitly.
-> 
-> With an IPv4, an IPv6 and an IPv6-only socket, bound respectively to
-> 40000, 64000, 60000, an updated version of iproute2 could work as
-> follow:
-> 
->   $ ss -t state bound-inactive
->   Recv-Q   Send-Q     Local Address:Port       Peer Address:Port   Process
->   0        0                0.0.0.0:40000           0.0.0.0:*
->   0        0                   [::]:60000              [::]:*
->   0        0                      *:64000                 *:*
+Daniel Borkmann wrote:
+> On 11/30/23 3:53 PM, Eric Dumazet wrote:
+> > On Thu, Nov 30, 2023 at 12:49=E2=80=AFAM Daniel Borkmann <daniel@ioge=
+arbox.net> wrote:
+> >>
+> >> Hi David, hi Jakub, hi Paolo, hi Eric,
+> >>
+> >> The following pull-request contains BPF updates for your *net* tree.=
 
-Here's a patch for iproute2-next for easy testing.
-I'll submit it formally once the kernel side will be in place.
+> >>
+> >> We've added 5 non-merge commits during the last 7 day(s) which conta=
+in
+> >> a total of 10 files changed, 66 insertions(+), 15 deletions(-).
+> >>
+> >> The main changes are:
+> >>
+> >> 1) Fix AF_UNIX splat from use after free in BPF sockmap, from John F=
+astabend.
+> > =
 
--------- >8 --------
+> > syzbot is not happy with this patch.
+> > =
 
-diff --git a/man/man8/ss.8 b/man/man8/ss.8
-index 073e9f03..4ece41fa 100644
---- a/man/man8/ss.8
-+++ b/man/man8/ss.8
-@@ -40,6 +40,10 @@ established connections) sockets.
- .B \-l, \-\-listening
- Display only listening sockets (these are omitted by default).
- .TP
-+.B \-B, \-\-bound-inactive
-+Display only TCP bound but inactive (not listening, connecting, etc.) sockets
-+(these are omitted by default).
-+.TP
- .B \-o, \-\-options
- Show timer information. For TCP protocol, the output format is:
- .RS
-@@ -456,6 +460,9 @@ states except for
- - opposite to
- .B bucket
- 
-+.B bound-inactive
-+- bound but otherwise inactive sockets (not listening, connecting, etc.)
-+
- .SH EXPRESSION
- 
- .B EXPRESSION
-diff --git a/misc/ss.c b/misc/ss.c
-index 9438382b..45f01286 100644
---- a/misc/ss.c
-+++ b/misc/ss.c
-@@ -210,6 +210,8 @@ enum {
- 	SS_LAST_ACK,
- 	SS_LISTEN,
- 	SS_CLOSING,
-+	SS_NEW_SYN_RECV,
-+	SS_BOUND_INACTIVE,
- 	SS_MAX
- };
- 
-@@ -1381,6 +1383,8 @@ static void sock_state_print(struct sockstat *s)
- 		[SS_LAST_ACK] = "LAST-ACK",
- 		[SS_LISTEN] =	"LISTEN",
- 		[SS_CLOSING] = "CLOSING",
-+		[SS_NEW_SYN_RECV] = "NEW-SYN-RECV",
-+		[SS_BOUND_INACTIVE] = "BOUND-INACTIVE",
- 	};
- 
- 	switch (s->local.family) {
-@@ -5333,6 +5337,7 @@ static void _usage(FILE *dest)
- "   -r, --resolve       resolve host names\n"
- "   -a, --all           display all sockets\n"
- "   -l, --listening     display listening sockets\n"
-+"   -B, --bound-inactive display TCP bound but inactive sockets\n"
- "   -o, --options       show timer information\n"
- "   -e, --extended      show detailed socket information\n"
- "   -m, --memory        show socket memory usage\n"
-@@ -5415,6 +5420,8 @@ static int scan_state(const char *state)
- 		[SS_LAST_ACK] = "last-ack",
- 		[SS_LISTEN] =	"listening",
- 		[SS_CLOSING] = "closing",
-+		[SS_NEW_SYN_RECV] = "new-syn-recv",
-+		[SS_BOUND_INACTIVE] = "bound-inactive",
- 	};
- 	int i;
- 
-@@ -5481,6 +5488,7 @@ static const struct option long_opts[] = {
- 	{ "vsock", 0, 0, OPT_VSOCK },
- 	{ "all", 0, 0, 'a' },
- 	{ "listening", 0, 0, 'l' },
-+	{ "bound-inactive", 0, 0, 'B' },
- 	{ "ipv4", 0, 0, '4' },
- 	{ "ipv6", 0, 0, '6' },
- 	{ "packet", 0, 0, '0' },
-@@ -5519,7 +5527,7 @@ int main(int argc, char *argv[])
- 	int state_filter = 0;
- 
- 	while ((ch = getopt_long(argc, argv,
--				 "dhaletuwxnro460spTbEf:mMiA:D:F:vVzZN:KHSO",
-+				 "dhalBetuwxnro460spTbEf:mMiA:D:F:vVzZN:KHSO",
- 				 long_opts, NULL)) != EOF) {
- 		switch (ch) {
- 		case 'n':
-@@ -5584,6 +5592,9 @@ int main(int argc, char *argv[])
- 		case 'l':
- 			state_filter = (1 << SS_LISTEN) | (1 << SS_CLOSE);
- 			break;
-+		case 'B':
-+			state_filter = 1 << SS_BOUND_INACTIVE;
-+			break;
- 		case '4':
- 			filter_af_set(&current_filter, AF_INET);
- 			break;
+> > Would the following fix make sense?
+> > =
 
+> > diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> > index 7ea7c3a0d0d06224f49ad5f073bf772b9528a30a..58e89361059fbf9d5942c=
+6dd268dd80ac4b57098
+> > 100644
+> > --- a/net/unix/unix_bpf.c
+> > +++ b/net/unix/unix_bpf.c
+> > @@ -168,7 +168,8 @@ int unix_stream_bpf_update_proto(struct sock *sk,=
+
+> > struct sk_psock *psock, bool r
+> >          }
+> > =
+
+> >          sk_pair =3D unix_peer(sk);
+> > -       sock_hold(sk_pair);
+> > +       if (sk_pair)
+> > +               sock_hold(sk_pair);
+> >          psock->sk_pair =3D sk_pair;
+> >          unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
+> >          sock_replace_proto(sk, &unix_stream_bpf_prot);
+> > =
+
+> =
+
+> Oh well :/ Above looks reasonable to me, thanks, but I'll defer to John=
+ & Jakub (both Cc'ed)
+> for a final look.
+> =
+
+> Thanks,
+> Daniel
+
+Is that sk in LISTEN state by any chance? I can't think why we even allow=
+ such a
+thing for af_unix sockets.  Another possible fix would be to block adding=
+ these
+to sockmap at all.
+
+But, above should be fine as well so I would just go with that. Eric or D=
+aniel
+would you like to submit a patch or I can if needed.
+
+Thanks,
+John=
 
