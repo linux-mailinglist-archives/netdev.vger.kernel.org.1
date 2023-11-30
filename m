@@ -1,214 +1,166 @@
-Return-Path: <netdev+bounces-52428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7CE17FEB59
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:04:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6137FEB60
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 10:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 809FAB20DC5
-	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:04:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E12281FCD
+	for <lists+netdev@lfdr.de>; Thu, 30 Nov 2023 09:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82BE321A3;
-	Thu, 30 Nov 2023 09:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035A4347B2;
+	Thu, 30 Nov 2023 09:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Q3K7ila"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAA4B9
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:04:41 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-258-7sZ5_6P0N8a6Y_sMVfxPCQ-1; Thu, 30 Nov 2023 09:04:38 +0000
-X-MC-Unique: 7sZ5_6P0N8a6Y_sMVfxPCQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 30 Nov
- 2023 09:04:37 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 30 Nov 2023 09:04:37 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Jakub Sitnicki' <jakub@cloudflare.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 'Jakub Kicinski'
-	<kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Stephen Hemminger
-	<stephen@networkplumber.org>, Eric Dumazet <edumazet@google.com>, "'David
- Ahern'" <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [PATCH net-next] ipv4: Use READ/WRITE_ONCE() for IP
- local_port_range
-Thread-Topic: [PATCH net-next] ipv4: Use READ/WRITE_ONCE() for IP
- local_port_range
-Thread-Index: Adoi+bAva1sBL8lHT0izPKjl5W7JsAAB2DuAABo0W/A=
-Date: Thu, 30 Nov 2023 09:04:36 +0000
-Message-ID: <a00cb120e5224a20931dcba10987cc80@AcuMS.aculab.com>
-References: <a4f5b61c9cd44eada41d8f09d3848806@AcuMS.aculab.com>
- <87r0k82tbi.fsf@cloudflare.com>
-In-Reply-To: <87r0k82tbi.fsf@cloudflare.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B9ACF
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:06:35 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso6743a12.1
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 01:06:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701335194; x=1701939994; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ji0TcYQnbQEbDh01WgrJTk7wL+caCmxVODK2KI2XUTs=;
+        b=1Q3K7ilaKOumFPuY10P1rU/0/sDAXFgmQRNJZTFwCSxx2+jqebsg2rOwMNP6A6GxSh
+         9KFbuMa7ng81l7C9Se9Vprqmg34U6E5OVEjPD9PZLkZooc0kljCZhSdjR6vvrbVMxIeU
+         OmpxacxuBwrCMSV7IlnLsaQjKRfwDZhh5GmmAfSNulZVaUkW41GTpL4wPZchA6+Gj8jy
+         IHu7eXI5oVfo2pzbTmPU7kA9OijE1NNCF6pwOXPWJyScOEYmLusk7ogvhu8CjtzNhzpK
+         dbGB9JLP02JTP0uceycE1E/TXx2oJI0wllmS4GCwEvXdtv5ztPT6YZQIzEgVgWrt50Ou
+         FTzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701335194; x=1701939994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ji0TcYQnbQEbDh01WgrJTk7wL+caCmxVODK2KI2XUTs=;
+        b=Sl2Xf6++akZrOFvpboCiuT11ICfOiW7zh1DMgA7G/KAQ/oHaCuoFGiXPNhdUt/ATAw
+         MRns10yh98dASEDUly9B0cy3cGYwaqDH+jLIaWk+1rj7LsunnCV61MkPZ0yK3JH/Rz22
+         LSs/Cy60yybGe4vD05rrLNXuVTORRNqVi6xO1lbxWDYyqFu2sICjrTnNLkptB9QW4F9p
+         SfPb+2RmM+DeBtGPLfmPIP3ZCPVSqVaudZ43XKdrhPDlzjGFWmT4ypsYKIwvNRZdbdhF
+         4noT38G2urbTL0M5sbOurDJgQWKLvzKaqwQgpltZ0QibVZmtqvTafIVbjzHSUxwZAbOG
+         lmKg==
+X-Gm-Message-State: AOJu0YwxqnJC8FkOhf2+B9lYyfBMN0TI6oz9yhO9RIbT2DEHzr6oY/k/
+	wmEdJiTXFkF8gd1CKo77ZHQz+1Z5jJw6/SAQ2UZLdg==
+X-Google-Smtp-Source: AGHT+IH1Pp3wiHdsDAnteFWdj5kVjIBa/ymgRlPikZYTN1ohVofW7QppOL2mSsJW3mzKg0X8sA586SgCJmVWbQI+TkI=
+X-Received: by 2002:a50:9f82:0:b0:54b:221d:ee1c with SMTP id
+ c2-20020a509f82000000b0054b221dee1cmr80711edf.5.1701335193804; Thu, 30 Nov
+ 2023 01:06:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+References: <CANn89iJxtgkKLQwmi2ZZYQP0VnrWgarJZrSL2KgkSdkO615vcw@mail.gmail.com>
+ <20231130085810.4014847-1-lizhi.xu@windriver.com>
+In-Reply-To: <20231130085810.4014847-1-lizhi.xu@windriver.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 30 Nov 2023 10:06:20 +0100
+Message-ID: <CANn89iJT_dkpK2+9pAE376om6gDem7VKtCuALwPLc3AUWL8M8w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: page_pool: fix null-ptr-deref in page_pool_unlist
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: almasrymina@google.com, davem@davemloft.net, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Sitnicki
-> Sent: 29 November 2023 20:17
->=20
-> Hey David,
->=20
-> On Wed, Nov 29, 2023 at 07:26 PM GMT, David Laight wrote:
-> > Commit 227b60f5102cd added a seqlock to ensure that the low and high
-> > port numbers were always updated together.
-> > This is overkill because the two 16bit port numbers can be held in
-> > a u32 and read/written in a single instruction.
+On Thu, Nov 30, 2023 at 9:58=E2=80=AFAM Lizhi Xu <lizhi.xu@windriver.com> w=
+rote:
+>
+> On Thu, 30 Nov 2023 09:29:04 +0100, Eric Dumazet <edumazet@google.com> wr=
+ote:
+> > > [Syz report]
+> > > Illegal XDP return value 4294946546 on prog  (id 2) dev N/A, expect p=
+acket loss!
+> > > general protection fault, probably for non-canonical address 0xdffffc=
+0000000000: 0000 [#1] PREEMPT SMP KASAN
+> > > KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007=
+]
+> > > CPU: 0 PID: 5064 Comm: syz-executor391 Not tainted 6.7.0-rc2-syzkalle=
+r-00533-ga379972973a8 #0
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BI=
+OS Google 11/10/2023
+> > > RIP: 0010:__hlist_del include/linux/list.h:988 [inline]
+> > > RIP: 0010:hlist_del include/linux/list.h:1002 [inline]
+> > > RIP: 0010:page_pool_unlist+0xd1/0x170 net/core/page_pool_user.c:342
+> > > Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 90 00 00 00 4c 8b a3 =
+f0 06 00 00 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 0=
+0 75 68 48 85 ed 49 89 2c 24 74 24 e8 1b ca 07 f9 48 8d
+> > > RSP: 0018:ffffc900039ff768 EFLAGS: 00010246
+> > > RAX: dffffc0000000000 RBX: ffff88814ae02000 RCX: 0000000000000000
+> > > RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88814ae026f0
+> > > RBP: 0000000000000000 R08: 0000000000000000 R09: fffffbfff1d57fdc
+> > > R10: ffffffff8eabfee3 R11: ffffffff8aa0008b R12: 0000000000000000
+> > > R13: ffff88814ae02000 R14: dffffc0000000000 R15: 0000000000000001
+> > > FS:  000055555717a380(0000) GS:ffff8880b9800000(0000) knlGS:000000000=
+0000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 0000000002555398 CR3: 0000000025044000 CR4: 00000000003506f0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > Call Trace:
+> > >  <TASK>
+> > >  __page_pool_destroy net/core/page_pool.c:851 [inline]
+> > >  page_pool_release+0x507/0x6b0 net/core/page_pool.c:891
+> > >  page_pool_destroy+0x1ac/0x4c0 net/core/page_pool.c:956
+> > >  xdp_test_run_teardown net/bpf/test_run.c:216 [inline]
+> > >  bpf_test_run_xdp_live+0x1578/0x1af0 net/bpf/test_run.c:388
+> > >  bpf_prog_test_run_xdp+0x827/0x1530 net/bpf/test_run.c:1254
+> > >  bpf_prog_test_run kernel/bpf/syscall.c:4041 [inline]
+> > >  __sys_bpf+0x11bf/0x4920 kernel/bpf/syscall.c:5402
+> > >  __do_sys_bpf kernel/bpf/syscall.c:5488 [inline]
+> > >  __se_sys_bpf kernel/bpf/syscall.c:5486 [inline]
+> > >  __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5486
+> > >  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+> > >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+> > >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > >
+> > > [Analysis]
+> > > If "user.list" is initialized, the corresponding slow.netdev device m=
+ust exist,
+> > > so before recycling "user.list", it is necessary to confirm that the =
+"slow.netdev"
+> > > device is valid.
+> > >
+> > > [Fix]
+> > > Add slow.netdev !=3D NULL check before delete "user.list".
+> > >
+> > > Fixes: 083772c9f972 ("net: page_pool: record pools per netdev")
+> > > Reported-by: syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com
+> > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
 > >
-> > More recently 91d0b78c5177f added support for finer per-socket limits.
-> > The user-supplied value is 'high << 16 | low' but they are held
-> > separately and the socket options protected by the socket lock.
 > >
-> > Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
-> > fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
-> > always updated together.
 > >
-> > Change (the now trival) inet_get_local_port_range() to a static inline
-> > to optimise the calling code.
-> > (In particular avoiding returning integers by reference.)
+> > I sent a fix already ?
 > >
-> > Signed-off-by: David Laight <david.laight@aculab.com>
-> > ---
->=20
-> Regarding the per-socket changes - we don't expect contention on sock
-> lock between inet_stream_connect / __inet_bind, where we grab it and
-> eventually call inet_sk_get_local_port_range, and sockopt handlers, do
-> we?
->=20
-> The motivation is not super clear for me for that of the changes.
-
-The locking in the getsockopt() code is actually quite horrid.
-Look at the conditionals for the rntl lock.
-It is conditionally acquired based on a function that sets a flag,
-but released based on the exit path from the switch statement.
-
-But there are only two options that need the rtnl lock and the socket
-lock, and two trivial ones (including this one) that need the socket
-lock.
-So the code can be simplified by moving the locking into the case branches.
-With only 2 such cases the overhead will be minimal (compared the to
-setsockopt() case where a lot of options need locking.
-
-This is all part of a big patchset I'm trying to write that converts
-all the setsockopt code to take an 'unsigned int optlen' parameter
-and return the length to pass back to the caller.
-So the copy_to_user() of the updated length is done by the syscall
-stub rather than inside every separate function (and sometimes in
-multiple places in a function).
-
-After all, if the copy fails EFAULT the application is broken.
-It really doesn't matter if any side effects have happened.
-If you get a fault reading from a pipe the data is lost.
-
->=20
-> >  include/net/inet_sock.h         |  5 +----
-> >  include/net/ip.h                |  7 ++++++-
-> >  include/net/netns/ipv4.h        |  3 +--
-> >  net/ipv4/af_inet.c              |  4 +---
-> >  net/ipv4/inet_connection_sock.c | 29 ++++++++++------------------
-> >  net/ipv4/ip_sockglue.c          | 34 ++++++++++++++++-----------------
-> >  net/ipv4/sysctl_net_ipv4.c      | 12 ++++--------
-> >  7 files changed, 40 insertions(+), 54 deletions(-)
+> > https://lore.kernel.org/netdev/CANn89i+6BuZA6AjocG_0zTkD1u=3DpNgZc_DpZM=
+O=3DyUN=3DS1cHS3w@mail.gmail.com/
 > >
-> > diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-> > index 74db6d97cae1..ebf71410aa2b 100644
-> > --- a/include/net/inet_sock.h
-> > +++ b/include/net/inet_sock.h
-> > @@ -234,10 +234,7 @@ struct inet_sock {
-> >  =09int=09=09=09uc_index;
-> >  =09int=09=09=09mc_index;
-> >  =09__be32=09=09=09mc_addr;
-> > -=09struct {
-> > -=09=09__u16 lo;
-> > -=09=09__u16 hi;
-> > -=09}=09=09=09local_port_range;
-> > +=09u32=09=09=09local_port_range;
->=20
-> Nit: This field would benefit from a similar comment as you have added to
-> local_ports.range ("/* high << 16 | low */"), now that it is no longer
-> obvious how to interpret the contents.
->=20
-> >
-> >  =09struct ip_mc_socklist __rcu=09*mc_list;
-> >  =09struct inet_cork_full=09cork;
->=20
-> [...]
->=20
-> > diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection=
-_sock.c
-> > index 394a498c2823..1a45d41f8b39 100644
-> > --- a/net/ipv4/inet_connection_sock.c
-> > +++ b/net/ipv4/inet_connection_sock.c
-> > @@ -117,34 +117,25 @@ bool inet_rcv_saddr_any(const struct sock *sk)
->=20
-> [...]
->=20
-> >  void inet_sk_get_local_port_range(const struct sock *sk, int *low, int=
- *high)
-> >  {
-> >  =09const struct inet_sock *inet =3D inet_sk(sk);
-> >  =09const struct net *net =3D sock_net(sk);
-> >  =09int lo, hi, sk_lo, sk_hi;
-> > +=09u32 sk_range;
-> >
-> >  =09inet_get_local_port_range(net, &lo, &hi);
-> >
-> > -=09sk_lo =3D inet->local_port_range.lo;
-> > -=09sk_hi =3D inet->local_port_range.hi;
-> > +=09sk_range =3D READ_ONCE(inet->local_port_range);
-> > +=09if (unlikely(sk_range)) {
-> > +=09=09sk_lo =3D sk_range & 0xffff;
-> > +=09=09sk_hi =3D sk_range >> 16;
-> >
-> > -=09if (unlikely(lo <=3D sk_lo && sk_lo <=3D hi))
-> > -=09=09lo =3D sk_lo;
-> > -=09if (unlikely(lo <=3D sk_hi && sk_hi <=3D hi))
-> > -=09=09hi =3D sk_hi;
-> > +=09=09if (unlikely(lo <=3D sk_lo && sk_lo <=3D hi))
-> > +=09=09=09lo =3D sk_lo;
-> > +=09=09if (unlikely(lo <=3D sk_hi && sk_hi <=3D hi))
-> > +=09=09=09hi =3D sk_hi;
-> > +=09}
->=20
-> Actually when we know that sk_range is set, the above two branches
-> become likely. It will be usually so that the set per-socket port range
-> narrows down the per-netns port range.
+> > Please do not attribute to yourself work done by others, let me submit
+> > the fix formally, thanks.
+> What exists may not necessarily be right, and how do you prove that I saw=
+ your
+> fix before fixing it?
+>
+> You have only tested on syzbot, that's all.
+> This does not mean that others should refer to you for repairs, nor does =
+it
+> prove that you have made repairs, and others cannot fix them.
 
-True, I'd left them alone, but would also flip the first conditional.
+I am just saying I sent a fix already, and that it was sent a few
+minutes after the syzbot report was available.
 
-I can edit the patch :-)
+(You included syzbot+f9f8efb58a4db2ca98d0@syzkaller.appspotmail.com in
+your report, meaning that you must have seen my patch)
 
-=09David
-
->=20
-> These checks exist only in case the per-netns port range has been
-> reconfigured after per-socket port range has been set. The per-netns one
-> always takes precedence.
->=20
-> >
-> >  =09*low =3D lo;
-> >  =09*high =3D hi;
->=20
-> [...]
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+It is not because I sleep during night time that you can decide to use
+my work without any credits.
 
