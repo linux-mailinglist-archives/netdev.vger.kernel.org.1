@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-53124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74AF58016A4
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 635BF8016A3
 	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0525B211B4
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ABA81C20B34
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503393F8EA;
-	Fri,  1 Dec 2023 22:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26094619DE;
+	Fri,  1 Dec 2023 22:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gS9016uM"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X3WluVq7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C232CD54
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:58 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-67a51ad638eso32220316d6.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:58 -0800 (PST)
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB752AD
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:59 -0800 (PST)
+Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3b837d974ecso751485b6e.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470398; x=1702075198; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470399; x=1702075199; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=34Sfld6H4RDoMozY8if/8OEhAL+u+aqVOMy47PhNcAE=;
-        b=gS9016uMvqTohIe2lkgG5sxyN4wToqUXaiDX21jhlrUgsUMJV0mqVXYXFI5M48EZf1
-         NaXPVpzsyjzXv0cA8dx4jA/Z9V1j39PnzuLAFnySo1j/lOtrWrVEwrf0wCFA430leQHL
-         YWYUCkJWwa8SgKEx6JUruyZeOb8VEffQfjtGc=
+        bh=4yiwMsA8+UUMeDOCdekRJ3Fxueivu0rDI11CiMc87iw=;
+        b=X3WluVq7LmgsIxxFSwWOdVnUht7UhGS5KjB8Vw0TnUqPf7a2tn2lXnminHFsON9wF8
+         jw+ccz4dLAJaU8EN6yaW6yN14SQjHU4QfbNMQl5GrSP0xSILQZdl6lBVFLwGrVjWiMre
+         4vTR/TrOjZSCrQOzkhTEBq1uiAPEfbv3ccivE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470398; x=1702075198;
+        d=1e100.net; s=20230601; t=1701470399; x=1702075199;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=34Sfld6H4RDoMozY8if/8OEhAL+u+aqVOMy47PhNcAE=;
-        b=GU13Psv+itnbmNPxbMZ7jMyPCz+hvC3TtqzfvdOCOVkU4kpnFjQI8DDr5ak0+YyiXC
-         U78ItPgvohf1aBAa2fvziv9UobfrIEScvS4DCB/TGVnXi8/dp40cdZekD/uUuTNYkg8D
-         aypX6+UY/Q8NZpGSNv6nJPvcpOdVV3GpAlRvtifXT2SNjwyCgdAAzWPHXS/c2mvlbeER
-         AWYjky1fJGry24FoGSN1QXiT8WcjWcJ3dAKRUDt4GbwHEjMIfTyGclNiTaQeyUPl82+/
-         b5Uh6OahY0FbufckohiVRUvCWwEPsG+zoNKt6xFZn9gtJ4x/Jarl46C/Jj/pO/61pt5N
-         Xfqg==
-X-Gm-Message-State: AOJu0YyDZqXV6qf+jJWCK0kYwYMu5UUgfz3VVO2TXOyY77g7xdmA95hU
-	KAuq5usID0p6EXz6kjQYJY78BA==
-X-Google-Smtp-Source: AGHT+IHXyITZdMN4GYKWBNhN7ftPo/sPhgCTvyUnm636az7XyiklMYNa4kJLSS5H0aZagC95aiHKLQ==
-X-Received: by 2002:a05:6214:dce:b0:67a:a72d:fbb8 with SMTP id 14-20020a0562140dce00b0067aa72dfbb8mr314220qvt.54.1701470397691;
-        Fri, 01 Dec 2023 14:39:57 -0800 (PST)
+        bh=4yiwMsA8+UUMeDOCdekRJ3Fxueivu0rDI11CiMc87iw=;
+        b=RJMWhYupP/U+NZkiJ2taZpO1rdlKCiPrnCbRj0xeHTHwz0/DMWss5AVhAglfZvz/5g
+         BbF9gUMK8UlQ3cFLsZRRzJpCg9yeZrJ1WodrGuHkLB35f0cnlS1dHeg1qOFoX6NAPUaY
+         pu3Sf3w+X27HReGUVC8Q/VMql/lOSDF5X20Y31kH3FWC4JZFJhHnaKQ78/qA21HXQ2H3
+         vEkRqsvuDN3g0zZCs/8u92qhopzNxysve4C4NfYYtvYkJ5KU1Ea9BdGf8FT0HhYV/Mzr
+         /enlbdZi4g5VPS19PCnQlqlNwHuvEMprCQR70if0PRAZoKVDdeZs5BKaZNtP3tu7VTPM
+         ImWQ==
+X-Gm-Message-State: AOJu0Yx6qhWOLRvyQyKhQy0ZQ13iuiJ74R1uKO4Bvyc4g+DxSmD1F3Ec
+	8hMc6IDyIJu0l71B1+l+Jj6s/w==
+X-Google-Smtp-Source: AGHT+IHme3sfXC3bk1JsNMYxLxymJ1StnwS0wjw+SrzguU/xV+UZuHlM9gxtPm4fLLUdFrFoukFc3g==
+X-Received: by 2002:a05:6808:14c6:b0:3b8:b063:adf1 with SMTP id f6-20020a05680814c600b003b8b063adf1mr319848oiw.78.1701470399116;
+        Fri, 01 Dec 2023 14:39:59 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.56
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:39:57 -0800 (PST)
+        Fri, 01 Dec 2023 14:39:58 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next 07/15] bnxt_en: Add new P7 hardware interface definitions
-Date: Fri,  1 Dec 2023 14:39:16 -0800
-Message-Id: <20231201223924.26955-8-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net-next 08/15] bnxt_en: Refactor RX VLAN acceleration logic.
+Date: Fri,  1 Dec 2023 14:39:17 -0800
+Message-Id: <20231201223924.26955-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -68,218 +69,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000acda3b060b7a72a7"
+	boundary="000000000000c1edd6060b7a72f7"
 
---000000000000acda3b060b7a72a7
+--000000000000c1edd6060b7a72f7
 Content-Transfer-Encoding: 8bit
 
-Add new RX, TX, and TPA hardware interface structures and macros for the
-P7 chips.
+Refactor the logic in the RX path that checks for the accelerated VLAN
+tag by adding a new function.  This will make it easier to support
+the new receive logic on P7 chips.
 
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h | 85 ++++++++++++++++++++++-
- 1 file changed, 84 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 44 ++++++++++++++++-------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d10811f4073b..ba9caae923f2 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -139,11 +139,15 @@ struct tx_cmp {
- 	__le32 tx_cmp_flags_type;
- 	#define CMP_TYPE					(0x3f << 0)
- 	 #define CMP_TYPE_TX_L2_CMP				 0
-+	 #define CMP_TYPE_TX_L2_COAL_CMP			 2
-+	 #define CMP_TYPE_TX_L2_PKT_TS_CMP			 4
- 	 #define CMP_TYPE_RX_L2_CMP				 17
- 	 #define CMP_TYPE_RX_AGG_CMP				 18
- 	 #define CMP_TYPE_RX_L2_TPA_START_CMP			 19
- 	 #define CMP_TYPE_RX_L2_TPA_END_CMP			 21
- 	 #define CMP_TYPE_RX_TPA_AGG_CMP			 22
-+	 #define CMP_TYPE_RX_L2_V3_CMP				 23
-+	 #define CMP_TYPE_RX_L2_TPA_START_V3_CMP		 25
- 	 #define CMP_TYPE_STATUS_CMP				 32
- 	 #define CMP_TYPE_REMOTE_DRIVER_REQ			 34
- 	 #define CMP_TYPE_REMOTE_DRIVER_RESP			 36
-@@ -170,9 +174,13 @@ struct tx_cmp {
- 	 #define TX_CMP_ERRORS_DMA_ERROR			 (1 << 6)
- 	 #define TX_CMP_ERRORS_HINT_TOO_SHORT			 (1 << 7)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index b38c17a27903..9aca38b6f196 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -1783,6 +1783,34 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 	napi_gro_receive(&bnapi->napi, skb);
+ }
  
--	__le32 tx_cmp_unsed_3;
-+	__le32 sq_cons_idx;
-+	#define TX_CMP_SQ_CONS_IDX_MASK				0x00ffffff
- };
- 
-+#define TX_CMP_SQ_CONS_IDX(txcmp)					\
-+	(le32_to_cpu((txcmp)->sq_cons_idx) & TX_CMP_SQ_CONS_IDX_MASK)
++static struct sk_buff *bnxt_rx_vlan(struct sk_buff *skb, u8 cmp_type,
++				    struct rx_cmp *rxcmp,
++				    struct rx_cmp_ext *rxcmp1)
++{
++	__be16 vlan_proto;
++	u16 vtag;
 +
- struct rx_cmp {
- 	__le32 rx_cmp_len_flags_type;
- 	#define RX_CMP_CMP_TYPE					(0x3f << 0)
-@@ -200,8 +208,20 @@ struct rx_cmp {
- 	 #define RX_CMP_AGG_BUFS_SHIFT				 1
- 	#define RX_CMP_RSS_HASH_TYPE				(0x7f << 9)
- 	 #define RX_CMP_RSS_HASH_TYPE_SHIFT			 9
-+	#define RX_CMP_V3_RSS_EXT_OP_LEGACY			(0xf << 12)
-+	 #define RX_CMP_V3_RSS_EXT_OP_LEGACY_SHIFT		 12
-+	#define RX_CMP_V3_RSS_EXT_OP_NEW			(0xf << 8)
-+	 #define RX_CMP_V3_RSS_EXT_OP_NEW_SHIFT			 8
- 	#define RX_CMP_PAYLOAD_OFFSET				(0xff << 16)
- 	 #define RX_CMP_PAYLOAD_OFFSET_SHIFT			 16
-+	#define RX_CMP_SUB_NS_TS				(0xf << 16)
-+	 #define RX_CMP_SUB_NS_TS_SHIFT				 16
-+	#define RX_CMP_METADATA1				(0xf << 28)
-+	 #define RX_CMP_METADATA1_SHIFT				 28
-+	#define RX_CMP_METADATA1_TPID_SEL			(0x7 << 28)
-+	#define RX_CMP_METADATA1_TPID_8021Q			(0x1 << 28)
-+	#define RX_CMP_METADATA1_TPID_8021AD			(0x0 << 28)
-+	#define RX_CMP_METADATA1_VALID				(0x8 << 28)
- 
- 	__le32 rx_cmp_rss_hash;
- };
-@@ -215,6 +235,30 @@ struct rx_cmp {
- 	(((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_RSS_HASH_TYPE) >>\
- 	  RX_CMP_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
- 
-+#define RX_CMP_V3_HASH_TYPE_LEGACY(rxcmp)				\
-+	((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_V3_RSS_EXT_OP_LEGACY) >>\
-+	 RX_CMP_V3_RSS_EXT_OP_LEGACY_SHIFT)
++	if (cmp_type == CMP_TYPE_RX_L2_CMP) {
++		__le32 flags2 = rxcmp1->rx_cmp_flags2;
++		u32 meta_data;
 +
-+#define RX_CMP_V3_HASH_TYPE_NEW(rxcmp)				\
-+	((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_V3_RSS_EXT_OP_NEW) >>\
-+	 RX_CMP_V3_RSS_EXT_OP_NEW_SHIFT)
++		if (!(flags2 & cpu_to_le32(RX_CMP_FLAGS2_META_FORMAT_VLAN)))
++			return skb;
 +
-+#define RX_CMP_V3_HASH_TYPE(bp, rxcmp)				\
-+	(((bp)->rss_cap & BNXT_RSS_CAP_RSS_TCAM) ?		\
-+	  RX_CMP_V3_HASH_TYPE_NEW(rxcmp) :			\
-+	  RX_CMP_V3_HASH_TYPE_LEGACY(rxcmp))
++		meta_data = le32_to_cpu(rxcmp1->rx_cmp_meta_data);
++		vtag = meta_data & RX_CMP_FLAGS2_METADATA_TCI_MASK;
++		vlan_proto = htons(meta_data >> RX_CMP_FLAGS2_METADATA_TPID_SFT);
++		if (eth_type_vlan(vlan_proto))
++			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
++		else
++			goto vlan_err;
++	}
++	return skb;
++vlan_err:
++	dev_kfree_skb(skb);
++	return NULL;
++}
 +
-+#define EXT_OP_INNER_4		0x0
-+#define EXT_OP_OUTER_4		0x2
-+#define EXT_OP_INNFL_3		0x8
-+#define EXT_OP_OUTFL_3		0xa
-+
-+#define RX_CMP_VLAN_VALID(rxcmp)				\
-+	((rxcmp)->rx_cmp_misc_v1 & cpu_to_le32(RX_CMP_METADATA1_VALID))
-+
-+#define RX_CMP_VLAN_TPID_SEL(rxcmp)				\
-+	(le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_METADATA1_TPID_SEL)
-+
- struct rx_cmp_ext {
- 	__le32 rx_cmp_flags2;
- 	#define RX_CMP_FLAGS2_IP_CS_CALC			0x1
-@@ -262,6 +306,9 @@ struct rx_cmp_ext {
+ /* returns the following:
+  * 1       - 1 packet successfully received
+  * 0       - successful TPA_START, packet not completed yet
+@@ -2001,20 +2029,10 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 	cfa_code = RX_CMP_CFA_CODE(rxcmp1);
+ 	skb->protocol = eth_type_trans(skb, bnxt_get_pkt_dev(bp, cfa_code));
  
- 	#define RX_CMPL_CFA_CODE_MASK				(0xffff << 16)
- 	 #define RX_CMPL_CFA_CODE_SFT				 16
-+	#define RX_CMPL_METADATA0_TCI_MASK			(0xffff << 16)
-+	#define RX_CMPL_METADATA0_VID_MASK			(0x0fff << 16)
-+	 #define RX_CMPL_METADATA0_SFT				 16
+-	if ((rxcmp1->rx_cmp_flags2 &
+-	     cpu_to_le32(RX_CMP_FLAGS2_META_FORMAT_VLAN)) &&
+-	    (skb->dev->features & BNXT_HW_FEATURE_VLAN_ALL_RX)) {
+-		u32 meta_data = le32_to_cpu(rxcmp1->rx_cmp_meta_data);
+-		u16 vtag = meta_data & RX_CMP_FLAGS2_METADATA_TCI_MASK;
+-		__be16 vlan_proto = htons(meta_data >>
+-					  RX_CMP_FLAGS2_METADATA_TPID_SFT);
+-
+-		if (eth_type_vlan(vlan_proto)) {
+-			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+-		} else {
+-			dev_kfree_skb(skb);
++	if (skb->dev->features & BNXT_HW_FEATURE_VLAN_ALL_RX) {
++		skb = bnxt_rx_vlan(skb, cmp_type, rxcmp, rxcmp1);
++		if (!skb)
+ 			goto next_rx;
+-		}
+ 	}
  
- 	__le32 rx_cmp_timestamp;
- };
-@@ -287,6 +334,10 @@ struct rx_cmp_ext {
- 	((le32_to_cpu((rxcmpl1)->rx_cmp_cfa_code_errors_v2) &		\
- 	  RX_CMPL_CFA_CODE_MASK) >> RX_CMPL_CFA_CODE_SFT)
- 
-+#define RX_CMP_METADATA0_TCI(rxcmp1)					\
-+	((le32_to_cpu((rxcmp1)->rx_cmp_cfa_code_errors_v2) &		\
-+	  RX_CMPL_METADATA0_TCI_MASK) >> RX_CMPL_METADATA0_SFT)
-+
- struct rx_agg_cmp {
- 	__le32 rx_agg_cmp_len_flags_type;
- 	#define RX_AGG_CMP_TYPE					(0x3f << 0)
-@@ -329,10 +380,18 @@ struct rx_tpa_start_cmp {
- 	#define RX_TPA_START_CMP_V1				(0x1 << 0)
- 	#define RX_TPA_START_CMP_RSS_HASH_TYPE			(0x7f << 9)
- 	 #define RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT		 9
-+	#define RX_TPA_START_CMP_V3_RSS_HASH_TYPE		(0x1ff << 7)
-+	 #define RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT	 7
- 	#define RX_TPA_START_CMP_AGG_ID				(0x7f << 25)
- 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT			 25
- 	#define RX_TPA_START_CMP_AGG_ID_P5			(0xffff << 16)
- 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT_P5		 16
-+	#define RX_TPA_START_CMP_METADATA1			(0xf << 28)
-+	 #define RX_TPA_START_CMP_METADATA1_SHIFT		 28
-+	#define RX_TPA_START_METADATA1_TPID_SEL			(0x7 << 28)
-+	#define RX_TPA_START_METADATA1_TPID_8021Q		(0x1 << 28)
-+	#define RX_TPA_START_METADATA1_TPID_8021AD		(0x0 << 28)
-+	#define RX_TPA_START_METADATA1_VALID			(0x8 << 28)
- 
- 	__le32 rx_tpa_start_cmp_rss_hash;
- };
-@@ -346,6 +405,11 @@ struct rx_tpa_start_cmp {
- 	   RX_TPA_START_CMP_RSS_HASH_TYPE) >>				\
- 	  RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
- 
-+#define TPA_START_V3_HASH_TYPE(rx_tpa_start)				\
-+	(((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
-+	   RX_TPA_START_CMP_V3_RSS_HASH_TYPE) >>			\
-+	  RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
-+
- #define TPA_START_AGG_ID(rx_tpa_start)					\
- 	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
- 	 RX_TPA_START_CMP_AGG_ID) >> RX_TPA_START_CMP_AGG_ID_SHIFT)
-@@ -358,6 +422,14 @@ struct rx_tpa_start_cmp {
- 	((rx_tpa_start)->rx_tpa_start_cmp_len_flags_type &		\
- 	 cpu_to_le32(RX_TPA_START_CMP_FLAGS_ERROR))
- 
-+#define TPA_START_VLAN_VALID(rx_tpa_start)				\
-+	((rx_tpa_start)->rx_tpa_start_cmp_misc_v1 &			\
-+	 cpu_to_le32(RX_TPA_START_METADATA1_VALID))
-+
-+#define TPA_START_VLAN_TPID_SEL(rx_tpa_start)				\
-+	(le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
-+	 RX_TPA_START_METADATA1_TPID_SEL)
-+
- struct rx_tpa_start_cmp_ext {
- 	__le32 rx_tpa_start_cmp_flags2;
- 	#define RX_TPA_START_CMP_FLAGS2_IP_CS_CALC		(0x1 << 0)
-@@ -368,6 +440,8 @@ struct rx_tpa_start_cmp_ext {
- 	#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_VALID		(0x1 << 9)
- 	#define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT		(0x3 << 10)
- 	 #define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT_SHIFT	 10
-+	#define RX_TPA_START_CMP_V3_FLAGS2_T_IP_TYPE		(0x1 << 10)
-+	#define RX_TPA_START_CMP_V3_FLAGS2_AGG_GRO		(0x1 << 11)
- 	#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL		(0xffff << 16)
- 	 #define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_SHIFT	 16
- 
-@@ -381,6 +455,9 @@ struct rx_tpa_start_cmp_ext {
- 	 #define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_FLUSH	 (0x5 << 1)
- 	#define RX_TPA_START_CMP_CFA_CODE			(0xffff << 16)
- 	 #define RX_TPA_START_CMPL_CFA_CODE_SHIFT		 16
-+	#define RX_TPA_START_CMP_METADATA0_TCI_MASK		(0xffff << 16)
-+	#define RX_TPA_START_CMP_METADATA0_VID_MASK		(0x0fff << 16)
-+	 #define RX_TPA_START_CMP_METADATA0_SFT			 16
- 	__le32 rx_tpa_start_cmp_hdr_info;
- };
- 
-@@ -397,6 +474,11 @@ struct rx_tpa_start_cmp_ext {
- 	  RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_MASK) >>			\
- 	 RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_SHIFT)
- 
-+#define TPA_START_METADATA0_TCI(rx_tpa_start)				\
-+	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_cfa_code_v2) &	\
-+	  RX_TPA_START_CMP_METADATA0_TCI_MASK) >>			\
-+	 RX_TPA_START_CMP_METADATA0_SFT)
-+
- struct rx_tpa_end_cmp {
- 	__le32 rx_tpa_end_cmp_len_flags_type;
- 	#define RX_TPA_END_CMP_TYPE				(0x3f << 0)
-@@ -2023,6 +2105,7 @@ struct bnxt {
- #define BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA	BIT(0)
- #define BNXT_RSS_CAP_UDP_RSS_CAP		BIT(1)
- #define BNXT_RSS_CAP_NEW_RSS_CAP		BIT(2)
-+#define BNXT_RSS_CAP_RSS_TCAM			BIT(3)
- 
- 	u16			max_mtu;
- 	u8			max_tc;
+ 	skb_checksum_none_assert(skb);
 -- 
 2.30.1
 
 
---000000000000acda3b060b7a72a7
+--000000000000c1edd6060b7a72f7
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -350,14 +222,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPw51gTdQIayuAq6WdDATzp0pNA5HNLC
-HzHFb4AqpVALMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyMzk1OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOMrpj2NANfRM578qVJkDV3YLfe2aiud
+EAAPhAX0UiJSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyMzk1OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBRqdNDoOs7RWINnyGejVuOvWErejgfitQfPtMmLHyJiSjD+l5S
-176cbVF0Jjh+b6MzeIIy4s2w6Y+Ou3lo77CIAifPyqt5ZFATs6GXMzjRtwPWKkWrWShCt8OZkDjV
-hqMmEQejQU2jI2zNJ8XM5psARBPfwKijs8lOGdyLRYNqfKACd9k49TmmGX/hEDPKJUTy4jkgg4M6
-OAzv4ACCjogjMkhnEPVmp+xd0TyCWrqTw163ZSW66/GUHA8F/CV2pX7k2aXY8CTYIb5OPMviJOZL
-eK91wIRCYrXYlSMkybK0La07aSMO/T2CxHpph2xb81hH5snLN1dTPfvnYMxn/kLf
---000000000000acda3b060b7a72a7--
+ATANBgkqhkiG9w0BAQEFAASCAQA6tx9/EAFX1jONkXKqdzyFdscaFaqJZeYruX7MNYkrSmiIdy8D
+5af7I54CwM8c7NJQyK7fpKggZvTk6jkdLtSWC/u1YhSdZV+H3vyF/qQb9U7lXIqpgsHVWIkuuoMX
+9qJrURD5unrkxuJP93gP6gpN8ikxrUzDK7xeGFUTBaYaxG0pFUdHhS9h/hNMwahNXuKDd2uV7aT7
+KeTH8EzxafJylnvpIwEvo55BOwy9O7QdZLtKScj/oShx8sKOYUKvwywuZy3Qlk/Nv6pexliDAP//
+wPXgPE1tnZ52SUk5RAe1y+QyZb58wglnXVlkvrxHobh749f81JOQa6ex0b4/k+59
+--000000000000c1edd6060b7a72f7--
 
