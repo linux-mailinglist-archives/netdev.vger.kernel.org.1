@@ -1,128 +1,149 @@
-Return-Path: <netdev+bounces-52847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B478005EB
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:39:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F4B800613
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:42:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCAE31C20EA6
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:39:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5F71F20D38
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE3B15AE6;
-	Fri,  1 Dec 2023 08:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E791A5A1;
+	Fri,  1 Dec 2023 08:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fOftkOdj"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kHYsiKrj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035CD1717
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:39:40 -0800 (PST)
-Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-58d12b53293so1063408eaf.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:39:39 -0800 (PST)
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCE9196
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:42:49 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-28591079eb5so1505583a91.1
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:42:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701419979; x=1702024779; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HAD/BJOp3KfcAEwToEpZAFOpfcfSAx6mao3aBhe0GVs=;
-        b=fOftkOdjSW3o0FXm6twOtVVAn04q2GIaFHpMitI+XsVqySe/WDltjjm4EpHmV6/6Vs
-         MquYTSl8iG2kG5MJx119L/+ri8Lc1IlMUvfj4Aham58cEwbR/fwJREtIcl5GNf4VH+Vy
-         rz1OEz9YYevRQ6pzDkWEi0G7eG/ffF7+SeTz0=
+        d=bytedance.com; s=google; t=1701420169; x=1702024969; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+BektOburQXG+cnVes1gG9CvIvVklrxBOP0251luLyc=;
+        b=kHYsiKrj19n2T9Kt0FmcQ0QcDbtiHorBeZoHw5NhUJoKIz09o3vkNMQ2QNq9U/323u
+         QdyJ8WGL9kY+CTx4572elOksuM/z5ekEeqeAVdRFdmWbxAnlumlBmJXsdmpoPUGOdJhR
+         Yxef/EEZy8gKa1WBikMrAC3cvQbbgOlTjs9M5XkyQr0TflQW0vvoxhEDIsQVvBSIZ94G
+         4gY/T7aW0bM1KnobZeNuckOYqc68QLS84MGmrEgPowJWd2kF3wyLolNyKh0123zp+Ov0
+         IjZfY3jl9oTPTnLVxWHiTupaNUJSq3nYsc4vGfZiFxvGNUSsZPbhLC7rvtE7OdHekS/8
+         4Wmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701419979; x=1702024779;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HAD/BJOp3KfcAEwToEpZAFOpfcfSAx6mao3aBhe0GVs=;
-        b=Q+uIxSri0S1xQWFmcM5XQ3NBayZJNc7pE4Xpj4GLlYSZDMN9e1IvOfYRMyT0QYT3jk
-         M2/KDpaDbA1Ny7P6+00630jgHtV5GvtfR2+a3pOpHYrmtwZfOvn/NL12zGtGTxFbXobJ
-         /9hUAn8TAuhvUa0j0RbXPvmkrrP33lez+Y8GvbDCNMwb6Zi8xGKpJZRpuEeeX2YZHT9B
-         0KspEJ80RPClMQ0WSbmlst32fszKktJ6wme6lQcx4BfXWHHuzZdqNQOjo9HArVZ5AFR3
-         3ynVRiohwlgvjLSOr4D8xgDFRKexNKzPIcZfA45mZmZMzL8R4OuJBQjePy5YwHoOyGHF
-         Xtdg==
-X-Gm-Message-State: AOJu0YxmiM3SZBQ9OqDXQ1eMTBudMuaqp3NRbao2mjqb+9oEUFUn1VWE
-	WAFDmBg3TP0O27iJGmCJel3Skg==
-X-Google-Smtp-Source: AGHT+IFRIZi1t3+6sB5l+ZFlRb5IEgTuJyz64lMyM/xKkArWyB7tZ0RcUsK3ZoDsk1o6uNy6C/voyA==
-X-Received: by 2002:a05:6358:3a0e:b0:16d:d643:4800 with SMTP id g14-20020a0563583a0e00b0016dd6434800mr25665290rwe.21.1701419979280;
-        Fri, 01 Dec 2023 00:39:39 -0800 (PST)
-Received: from judyhsiao0523.c.googlers.com.com (148.175.199.104.bc.googleusercontent.com. [104.199.175.148])
-        by smtp.gmail.com with ESMTPSA id hy7-20020a056a006a0700b0068790c41ca2sm2500089pfb.27.2023.12.01.00.39.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 00:39:38 -0800 (PST)
-From: Judy Hsiao <judyhsiao@chromium.org>
-To: Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>
-Cc: Douglas Anderson <dianders@chromium.org>,
-	Judy Hsiao <judyhsiao@chromium.org>,
-	Brian Haley <haleyb.dev@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Joel Granados <joel.granados@gmail.com>,
-	Julian Anastasov <ja@ssi.bg>,
-	Leon Romanovsky <leon@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable preemption for long
-Date: Fri,  1 Dec 2023 08:39:03 +0000
-Message-ID: <20231201083926.1817394-1-judyhsiao@chromium.org>
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
+        d=1e100.net; s=20230601; t=1701420169; x=1702024969;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+BektOburQXG+cnVes1gG9CvIvVklrxBOP0251luLyc=;
+        b=R//ZliIcm6NZzOlkSPHGoLyVUR1ozzrogLccDlxXoPPg6T+/20bkJvaf8nkDfTb5oJ
+         Q/dmBVP8mfhsgsdbMKAH1phT2iR0L4OTcQcx0lSQVmlURBhhl4xwjFHhTD2qs2rhOg6r
+         Pr8H0M631UFCEfQGdlX2pkNhBH2eHFiqLlQxxzOlF4ExTPz4ei7n6hhuXXWJtUnjGGsL
+         33dJhHkd4azd65XI1AXPerDtI2NtayW7wRMRoF49JYRxxmjkfxpbHTZRQT86ZhTH9tqC
+         xeWoZFQDvuYAZYv3gyizfNOKh8UiXC7nZ4kLjAjshZNUkOKlPf6mKy0Vfb0a5YSmPmCl
+         0nZQ==
+X-Gm-Message-State: AOJu0Yx4oiwW6fXQorsIifoq8MnSSQarfSNKps1pUZdrB8Ume7FYca3V
+	9rcKRAuH9UtekS46XLwnARIiBSBJfjQNP3VazlQ=
+X-Google-Smtp-Source: AGHT+IHQlZQSaiA1mjh+Q6JoSIYJ8AxSKOD+/HgFMegaxFy19UtbZ/j6lBZcz5IClhqCixQds2+CYQ==
+X-Received: by 2002:a17:90b:3a90:b0:285:8cb6:6153 with SMTP id om16-20020a17090b3a9000b002858cb66153mr33062567pjb.17.1701420168679;
+        Fri, 01 Dec 2023 00:42:48 -0800 (PST)
+Received: from [10.84.154.115] ([203.208.167.146])
+        by smtp.gmail.com with ESMTPSA id o10-20020a170902d4ca00b001cfba9dac6esm2770341plg.115.2023.12.01.00.42.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Dec 2023 00:42:48 -0800 (PST)
+Message-ID: <57587b74-f865-4b56-8d65-a5cbc6826079@bytedance.com>
+Date: Fri, 1 Dec 2023 16:42:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: [PATCH bpf-next] netkit: Add some ethtool ops to provide
+ information to user
+To: Daniel Borkmann <daniel@iogearbox.net>,
+ Nikolay Aleksandrov <razor@blackwall.org>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com, tangchen.1@bytedance.com
+References: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
+ <51dd35c9-ff5b-5b11-04d1-9a5ae9466780@blackwall.org>
+ <16b4d42d-2d62-460e-912f-6e3b86f3004d@bytedance.com>
+ <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
+From: Feng Zhou <zhoufeng.zf@bytedance.com>
+In-Reply-To: <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-We are seeing cases where neigh_cleanup_and_release() is called by
-neigh_forced_gc() many times in a row with preemption turned off.
-When running on a low powered CPU at a low CPU frequency, this has
-been measured to keep preemption off for ~10 ms. That's not great on a
-system with HZ=1000 which expects tasks to be able to schedule in
-with ~1ms latency.
+在 2023/11/30 18:56, Daniel Borkmann 写道:
+> On 11/30/23 10:24 AM, Feng Zhou wrote:
+>> 在 2023/11/30 17:06, Nikolay Aleksandrov 写道:
+>>> On 11/30/23 09:58, Feng zhou wrote:
+>>>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
+>>>>
+>>>> Add get_strings, get_sset_count, get_ethtool_stats to get peer
+>>>> ifindex.
+>>>> ethtool -S nk1
+>>>> NIC statistics:
+>>>>       peer_ifindex: 36
+>>>>
+>>>> Add get_link, get_link_ksettings to get link stat.
+>>>> ethtool nk1
+>>>> Settings for nk1:
+>>>>     ...
+>>>>     Link detected: yes
+>>>>
+>>>> Add get_ts_info.
+>>>> ethtool -T nk1
+>>>> Time stamping parameters for nk1:
+>>>> ...
+>>>>
+>>>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+>>>> ---
+>>>>   drivers/net/netkit.c | 53 
+>>>> ++++++++++++++++++++++++++++++++++++++++++++
+>>>>   1 file changed, 53 insertions(+)
+>>>>
+>>>
+>>> Hi,
+>>> I don't see any point in sending peer_ifindex through ethtool, even
+>>> worse through ethtool stats. That is definitely the wrong place for it.
+>>> You can already retrieve that through netlink. About the speed/duplex
+>>> this one makes more sense, but this is the wrong way to do it.
+>>> See how we did it for virtio_net (you are free to set speed/duplex
+>>> to anything to please bonding for example). Although I doubt anyone 
+>>> will use netkit with bonding, so even that is questionable. :)
+>>>
+>>> Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
+>>
+>> We use netkit to replace veth to improve performance, veth can be used 
+>> ethtool -S veth to get peer_ifindex, so this part is added, as long as 
+>> it is to keep the netkit part and veth unified, to ensure the same 
+>> usage habits, and to replace it without perception.
+> 
+> Could you elaborate some more on the use case why you need to retrieve it
+> via ethtool, what alternatives were tried and don't work?
+> 
+> Please also elaborate on the case for netkit_get_link_ksettings() and which
+> concrete problem you are trying to address with this extension?
+> 
+> The commit message only explains what is done but does not go into the 
+> detail
+> of _why_ you need it.
+> 
+> Thanks,
+> Daniel
 
-Suggested-by: Douglas Anderson <dianders@chromium.org>
-Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
+In general, this information can be obtained through ip commands or 
+netlink, and netkit_get_link_ksettings really not necessary. The reason 
+why ethtool supports this is that when we use veth, our business 
+colleagues are used to using ethtool to obtain peer_ifindex, and then 
+replace netkit, found that it could not be used, resulting in their 
+script failure, so they asked us for a request.
 
----
-
- net/core/neighbour.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index df81c1f0a570..f7a89c7a7673 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -256,6 +256,8 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- 	unsigned long tref = jiffies - 5 * HZ;
- 	struct neighbour *n, *tmp;
- 	int shrunk = 0;
-+	bool finish = true;
-+	unsigned long timeout = jiffies + msecs_to_jiffies(1);        /* timeout in 1ms */
- 
- 	NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
- 
-@@ -278,10 +280,14 @@ static int neigh_forced_gc(struct neigh_table *tbl)
- 				shrunk++;
- 			if (shrunk >= max_clean)
- 				break;
-+			if (time_after(jiffies, timeout)) {
-+				finish = false;
-+				break;
-+			}
- 		}
- 	}
--
--	WRITE_ONCE(tbl->last_flush, jiffies);
-+	if (finish)
-+		WRITE_ONCE(tbl->last_flush, jiffies);
- 
- 	write_unlock_bh(&tbl->lock);
- 
--- 
-2.43.0.rc2.451.g8631bc7472-goog
 
 
