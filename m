@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-53123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15A98016A2
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AF58016A4
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C2A1C20C50
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0525B211B4
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AA717D2;
-	Fri,  1 Dec 2023 22:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503393F8EA;
+	Fri,  1 Dec 2023 22:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X56gee0X"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gS9016uM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B46D6C
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:57 -0800 (PST)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-41eb4210383so15719571cf.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:57 -0800 (PST)
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C232CD54
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:58 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-67a51ad638eso32220316d6.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470396; x=1702075196; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470398; x=1702075198; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IHPm9bMQ0UUeVCFUzW1wmDi9EoVh1TqfRiSExNkr10g=;
-        b=X56gee0XNWKQHUQ5TVYP0XK/rpyWEbxcsZjpYcOy+Jaqtbjfot6cztzB0aOwqxOU98
-         43Mup/WWN0/LHOIRyPyDOvyAy+++YQbYBuA+HzowRtY0we029FhIxW1oIEgi+GqJK6wV
-         Wanu6szDyHv08cyND6V3H6mBBm4HfWLY8+Uhc=
+        bh=34Sfld6H4RDoMozY8if/8OEhAL+u+aqVOMy47PhNcAE=;
+        b=gS9016uMvqTohIe2lkgG5sxyN4wToqUXaiDX21jhlrUgsUMJV0mqVXYXFI5M48EZf1
+         NaXPVpzsyjzXv0cA8dx4jA/Z9V1j39PnzuLAFnySo1j/lOtrWrVEwrf0wCFA430leQHL
+         YWYUCkJWwa8SgKEx6JUruyZeOb8VEffQfjtGc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470396; x=1702075196;
+        d=1e100.net; s=20230601; t=1701470398; x=1702075198;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IHPm9bMQ0UUeVCFUzW1wmDi9EoVh1TqfRiSExNkr10g=;
-        b=Z4/BDSwygxP5DCyjXc6LUl045Q9ZxJG6AsE9/6p/a1G7SQxvEhb5CjVaEgO+Z9/MGP
-         cU7gTXB6MieqipdzlndnkNFJASJuFwlzWTexC2LP3dK8nvlgLdKN3L/zZHZ5zSHmav0F
-         St8XFQ4k16dvk2vgODtNP281QhBt/Ccmci8l+ji1ozVYCoUHbyGI7T2w+PTx+ClRRKTr
-         YDEwPKTapnYjkM3KpCzJMiXffBcDQ3GW9lZSrWGkVS4ezpKeoY+/ItZp6wkNFKq+szvQ
-         O54/YO5N4vig36zMvbmd9hgeAyyrR1L+YbYUvZl/Flfv+GFIJjNa0q956224nfM18XkX
-         xYtw==
-X-Gm-Message-State: AOJu0Yy/zDyeSEHoxxoHVp7aiRIarDzgtbGZ3LKjPEQsPXfOL4/GTLZT
-	2C7i7EUz8PGo99AHM2OQFmX4+A==
-X-Google-Smtp-Source: AGHT+IFB3MrZ9dk1CQ2UFSeqy+zFmfP84thpzn1kbU6pH7H0UeK49vSdP9/LfekeW/v+QR3CZym5VA==
-X-Received: by 2002:a05:622a:1113:b0:424:27c:cff1 with SMTP id e19-20020a05622a111300b00424027ccff1mr356488qty.1.1701470396099;
-        Fri, 01 Dec 2023 14:39:56 -0800 (PST)
+        bh=34Sfld6H4RDoMozY8if/8OEhAL+u+aqVOMy47PhNcAE=;
+        b=GU13Psv+itnbmNPxbMZ7jMyPCz+hvC3TtqzfvdOCOVkU4kpnFjQI8DDr5ak0+YyiXC
+         U78ItPgvohf1aBAa2fvziv9UobfrIEScvS4DCB/TGVnXi8/dp40cdZekD/uUuTNYkg8D
+         aypX6+UY/Q8NZpGSNv6nJPvcpOdVV3GpAlRvtifXT2SNjwyCgdAAzWPHXS/c2mvlbeER
+         AWYjky1fJGry24FoGSN1QXiT8WcjWcJ3dAKRUDt4GbwHEjMIfTyGclNiTaQeyUPl82+/
+         b5Uh6OahY0FbufckohiVRUvCWwEPsG+zoNKt6xFZn9gtJ4x/Jarl46C/Jj/pO/61pt5N
+         Xfqg==
+X-Gm-Message-State: AOJu0YyDZqXV6qf+jJWCK0kYwYMu5UUgfz3VVO2TXOyY77g7xdmA95hU
+	KAuq5usID0p6EXz6kjQYJY78BA==
+X-Google-Smtp-Source: AGHT+IHXyITZdMN4GYKWBNhN7ftPo/sPhgCTvyUnm636az7XyiklMYNa4kJLSS5H0aZagC95aiHKLQ==
+X-Received: by 2002:a05:6214:dce:b0:67a:a72d:fbb8 with SMTP id 14-20020a0562140dce00b0067aa72dfbb8mr314220qvt.54.1701470397691;
+        Fri, 01 Dec 2023 14:39:57 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.54
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.56
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:39:55 -0800 (PST)
+        Fri, 01 Dec 2023 14:39:57 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next 06/15] bnxt_en: Refactor RSS capability fields
-Date: Fri,  1 Dec 2023 14:39:15 -0800
-Message-Id: <20231201223924.26955-7-michael.chan@broadcom.com>
+	gospo@broadcom.com
+Subject: [PATCH net-next 07/15] bnxt_en: Add new P7 hardware interface definitions
+Date: Fri,  1 Dec 2023 14:39:16 -0800
+Message-Id: <20231201223924.26955-8-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -69,198 +68,218 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000093f679060b7a72d1"
+	boundary="000000000000acda3b060b7a72a7"
 
---00000000000093f679060b7a72d1
+--000000000000acda3b060b7a72a7
 Content-Transfer-Encoding: 8bit
 
-From: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Add new RX, TX, and TPA hardware interface structures and macros for the
+P7 chips.
 
-Add a new rss_cap field in the per device struct bnxt and move all
-the RSS capability fields there.  It will be easier to add new RSS
-capabilities for the new P7 chips.
-
-Signed-off-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 25 ++++++++++---------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  7 +++---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 ++---
- 3 files changed, 20 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 85 ++++++++++++++++++++++-
+ 1 file changed, 84 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d4da55e01b2c..b38c17a27903 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4268,7 +4268,7 @@ static int bnxt_alloc_vnic_attributes(struct bnxt *bp)
- 			goto out;
- 		}
- vnic_skip_grps:
--		if ((bp->flags & BNXT_FLAG_NEW_RSS_CAP) &&
-+		if ((bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) &&
- 		    !(vnic->flags & BNXT_VNIC_RSS_FLAG))
- 			continue;
- 
-@@ -5765,7 +5765,8 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
- 	int rc;
- 
- 	bp->hw_ring_stats_size = sizeof(struct ctx_hw_stats);
--	bp->flags &= ~(BNXT_FLAG_NEW_RSS_CAP | BNXT_FLAG_ROCE_MIRROR_CAP);
-+	bp->flags &= ~BNXT_FLAG_ROCE_MIRROR_CAP;
-+	bp->rss_cap &= ~BNXT_RSS_CAP_NEW_RSS_CAP;
- 	if (bp->hwrm_spec_code < 0x10600)
- 		return 0;
- 
-@@ -5780,7 +5781,7 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
- 
- 		if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS) &&
- 		    (flags & VNIC_QCAPS_RESP_FLAGS_RSS_DFLT_CR_CAP))
--			bp->flags |= BNXT_FLAG_NEW_RSS_CAP;
-+			bp->rss_cap |= BNXT_RSS_CAP_NEW_RSS_CAP;
- 		if (flags &
- 		    VNIC_QCAPS_RESP_FLAGS_ROCE_MIRRORING_CAPABLE_VNIC_CAP)
- 			bp->flags |= BNXT_FLAG_ROCE_MIRROR_CAP;
-@@ -5793,7 +5794,7 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
- 		     !(bp->fw_cap & BNXT_FW_CAP_EXT_HW_STATS_SUPPORTED)))
- 			bp->fw_cap |= BNXT_FW_CAP_VLAN_RX_STRIP;
- 		if (flags & VNIC_QCAPS_RESP_FLAGS_RSS_HASH_TYPE_DELTA_CAP)
--			bp->fw_cap |= BNXT_FW_CAP_RSS_HASH_TYPE_DELTA;
-+			bp->rss_cap |= BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA;
- 		bp->max_tpa_v2 = le16_to_cpu(resp->max_aggs_supported);
- 		if (bp->max_tpa_v2) {
- 			if (BNXT_CHIP_P5(bp))
-@@ -6456,7 +6457,7 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, int tx_rings, int rx_rings,
- 			req->num_cmpl_rings = cpu_to_le16(cp_rings);
- 			req->num_hw_ring_grps = cpu_to_le16(ring_grps);
- 			req->num_rsscos_ctxs = cpu_to_le16(1);
--			if (!(bp->flags & BNXT_FLAG_NEW_RSS_CAP) &&
-+			if (!(bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) &&
- 			    bnxt_rfs_supported(bp))
- 				req->num_rsscos_ctxs =
- 					cpu_to_le16(ring_grps + 1);
-@@ -9133,7 +9134,7 @@ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
- 
- 		vnic = &bp->vnic_info[vnic_id];
- 		vnic->flags |= BNXT_VNIC_RFS_FLAG;
--		if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
-+		if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
- 			vnic->flags |= BNXT_VNIC_RFS_NEW_RSS_FLAG;
- 		rc = bnxt_hwrm_vnic_alloc(bp, vnic_id, ring_id, 1);
- 		if (rc) {
-@@ -9227,7 +9228,7 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
- 	rc = bnxt_setup_vnic(bp, 0);
- 	if (rc)
- 		goto err_out;
--	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
-+	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
- 		bnxt_hwrm_update_rss_hash_cfg(bp);
- 
- 	if (bp->flags & BNXT_FLAG_RFS) {
-@@ -11555,7 +11556,7 @@ static bool bnxt_rfs_supported(struct bnxt *bp)
- 		return false;
- 	if (BNXT_PF(bp) && !BNXT_CHIP_TYPE_NITRO_A0(bp))
- 		return true;
--	if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
-+	if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
- 		return true;
- 	return false;
- }
-@@ -11576,7 +11577,7 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
- 	max_rss_ctxs = bnxt_get_max_func_rss_ctxs(bp);
- 
- 	/* RSS contexts not a limiting factor */
--	if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
-+	if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
- 		max_rss_ctxs = max_vnics;
- 	if (vnics > max_vnics || vnics > max_rss_ctxs) {
- 		if (bp->rx_nr_rings > 1)
-@@ -12697,15 +12698,15 @@ static int bnxt_fw_init_one_p2(struct bnxt *bp)
- 
- static void bnxt_set_dflt_rss_hash_type(struct bnxt *bp)
- {
--	bp->flags &= ~BNXT_FLAG_UDP_RSS_CAP;
-+	bp->rss_cap &= ~BNXT_RSS_CAP_UDP_RSS_CAP;
- 	bp->rss_hash_cfg = VNIC_RSS_CFG_REQ_HASH_TYPE_IPV4 |
- 			   VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4 |
- 			   VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6 |
- 			   VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV6;
--	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
-+	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
- 		bp->rss_hash_delta = bp->rss_hash_cfg;
- 	if (BNXT_CHIP_P4_PLUS(bp) && bp->hwrm_spec_code >= 0x10501) {
--		bp->flags |= BNXT_FLAG_UDP_RSS_CAP;
-+		bp->rss_cap |= BNXT_RSS_CAP_UDP_RSS_CAP;
- 		bp->rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV4 |
- 				    VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV6;
- 	}
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 79b4deb45cfb..d10811f4073b 100644
+index d10811f4073b..ba9caae923f2 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1900,8 +1900,6 @@ struct bnxt {
- 	#define BNXT_FLAG_RFS		0x100
- 	#define BNXT_FLAG_SHARED_RINGS	0x200
- 	#define BNXT_FLAG_PORT_STATS	0x400
--	#define BNXT_FLAG_UDP_RSS_CAP	0x800
--	#define BNXT_FLAG_NEW_RSS_CAP	0x2000
- 	#define BNXT_FLAG_WOL_CAP	0x4000
- 	#define BNXT_FLAG_ROCEV1_CAP	0x8000
- 	#define BNXT_FLAG_ROCEV2_CAP	0x10000
-@@ -2021,6 +2019,10 @@ struct bnxt {
- 	u16			rss_indir_tbl_entries;
- 	u32			rss_hash_cfg;
- 	u32			rss_hash_delta;
-+	u32			rss_cap;
-+#define BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA	BIT(0)
-+#define BNXT_RSS_CAP_UDP_RSS_CAP		BIT(1)
-+#define BNXT_RSS_CAP_NEW_RSS_CAP		BIT(2)
+@@ -139,11 +139,15 @@ struct tx_cmp {
+ 	__le32 tx_cmp_flags_type;
+ 	#define CMP_TYPE					(0x3f << 0)
+ 	 #define CMP_TYPE_TX_L2_CMP				 0
++	 #define CMP_TYPE_TX_L2_COAL_CMP			 2
++	 #define CMP_TYPE_TX_L2_PKT_TS_CMP			 4
+ 	 #define CMP_TYPE_RX_L2_CMP				 17
+ 	 #define CMP_TYPE_RX_AGG_CMP				 18
+ 	 #define CMP_TYPE_RX_L2_TPA_START_CMP			 19
+ 	 #define CMP_TYPE_RX_L2_TPA_END_CMP			 21
+ 	 #define CMP_TYPE_RX_TPA_AGG_CMP			 22
++	 #define CMP_TYPE_RX_L2_V3_CMP				 23
++	 #define CMP_TYPE_RX_L2_TPA_START_V3_CMP		 25
+ 	 #define CMP_TYPE_STATUS_CMP				 32
+ 	 #define CMP_TYPE_REMOTE_DRIVER_REQ			 34
+ 	 #define CMP_TYPE_REMOTE_DRIVER_RESP			 36
+@@ -170,9 +174,13 @@ struct tx_cmp {
+ 	 #define TX_CMP_ERRORS_DMA_ERROR			 (1 << 6)
+ 	 #define TX_CMP_ERRORS_HINT_TOO_SHORT			 (1 << 7)
+ 
+-	__le32 tx_cmp_unsed_3;
++	__le32 sq_cons_idx;
++	#define TX_CMP_SQ_CONS_IDX_MASK				0x00ffffff
+ };
+ 
++#define TX_CMP_SQ_CONS_IDX(txcmp)					\
++	(le32_to_cpu((txcmp)->sq_cons_idx) & TX_CMP_SQ_CONS_IDX_MASK)
++
+ struct rx_cmp {
+ 	__le32 rx_cmp_len_flags_type;
+ 	#define RX_CMP_CMP_TYPE					(0x3f << 0)
+@@ -200,8 +208,20 @@ struct rx_cmp {
+ 	 #define RX_CMP_AGG_BUFS_SHIFT				 1
+ 	#define RX_CMP_RSS_HASH_TYPE				(0x7f << 9)
+ 	 #define RX_CMP_RSS_HASH_TYPE_SHIFT			 9
++	#define RX_CMP_V3_RSS_EXT_OP_LEGACY			(0xf << 12)
++	 #define RX_CMP_V3_RSS_EXT_OP_LEGACY_SHIFT		 12
++	#define RX_CMP_V3_RSS_EXT_OP_NEW			(0xf << 8)
++	 #define RX_CMP_V3_RSS_EXT_OP_NEW_SHIFT			 8
+ 	#define RX_CMP_PAYLOAD_OFFSET				(0xff << 16)
+ 	 #define RX_CMP_PAYLOAD_OFFSET_SHIFT			 16
++	#define RX_CMP_SUB_NS_TS				(0xf << 16)
++	 #define RX_CMP_SUB_NS_TS_SHIFT				 16
++	#define RX_CMP_METADATA1				(0xf << 28)
++	 #define RX_CMP_METADATA1_SHIFT				 28
++	#define RX_CMP_METADATA1_TPID_SEL			(0x7 << 28)
++	#define RX_CMP_METADATA1_TPID_8021Q			(0x1 << 28)
++	#define RX_CMP_METADATA1_TPID_8021AD			(0x0 << 28)
++	#define RX_CMP_METADATA1_VALID				(0x8 << 28)
+ 
+ 	__le32 rx_cmp_rss_hash;
+ };
+@@ -215,6 +235,30 @@ struct rx_cmp {
+ 	(((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_RSS_HASH_TYPE) >>\
+ 	  RX_CMP_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
+ 
++#define RX_CMP_V3_HASH_TYPE_LEGACY(rxcmp)				\
++	((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_V3_RSS_EXT_OP_LEGACY) >>\
++	 RX_CMP_V3_RSS_EXT_OP_LEGACY_SHIFT)
++
++#define RX_CMP_V3_HASH_TYPE_NEW(rxcmp)				\
++	((le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_V3_RSS_EXT_OP_NEW) >>\
++	 RX_CMP_V3_RSS_EXT_OP_NEW_SHIFT)
++
++#define RX_CMP_V3_HASH_TYPE(bp, rxcmp)				\
++	(((bp)->rss_cap & BNXT_RSS_CAP_RSS_TCAM) ?		\
++	  RX_CMP_V3_HASH_TYPE_NEW(rxcmp) :			\
++	  RX_CMP_V3_HASH_TYPE_LEGACY(rxcmp))
++
++#define EXT_OP_INNER_4		0x0
++#define EXT_OP_OUTER_4		0x2
++#define EXT_OP_INNFL_3		0x8
++#define EXT_OP_OUTFL_3		0xa
++
++#define RX_CMP_VLAN_VALID(rxcmp)				\
++	((rxcmp)->rx_cmp_misc_v1 & cpu_to_le32(RX_CMP_METADATA1_VALID))
++
++#define RX_CMP_VLAN_TPID_SEL(rxcmp)				\
++	(le32_to_cpu((rxcmp)->rx_cmp_misc_v1) & RX_CMP_METADATA1_TPID_SEL)
++
+ struct rx_cmp_ext {
+ 	__le32 rx_cmp_flags2;
+ 	#define RX_CMP_FLAGS2_IP_CS_CALC			0x1
+@@ -262,6 +306,9 @@ struct rx_cmp_ext {
+ 
+ 	#define RX_CMPL_CFA_CODE_MASK				(0xffff << 16)
+ 	 #define RX_CMPL_CFA_CODE_SFT				 16
++	#define RX_CMPL_METADATA0_TCI_MASK			(0xffff << 16)
++	#define RX_CMPL_METADATA0_VID_MASK			(0x0fff << 16)
++	 #define RX_CMPL_METADATA0_SFT				 16
+ 
+ 	__le32 rx_cmp_timestamp;
+ };
+@@ -287,6 +334,10 @@ struct rx_cmp_ext {
+ 	((le32_to_cpu((rxcmpl1)->rx_cmp_cfa_code_errors_v2) &		\
+ 	  RX_CMPL_CFA_CODE_MASK) >> RX_CMPL_CFA_CODE_SFT)
+ 
++#define RX_CMP_METADATA0_TCI(rxcmp1)					\
++	((le32_to_cpu((rxcmp1)->rx_cmp_cfa_code_errors_v2) &		\
++	  RX_CMPL_METADATA0_TCI_MASK) >> RX_CMPL_METADATA0_SFT)
++
+ struct rx_agg_cmp {
+ 	__le32 rx_agg_cmp_len_flags_type;
+ 	#define RX_AGG_CMP_TYPE					(0x3f << 0)
+@@ -329,10 +380,18 @@ struct rx_tpa_start_cmp {
+ 	#define RX_TPA_START_CMP_V1				(0x1 << 0)
+ 	#define RX_TPA_START_CMP_RSS_HASH_TYPE			(0x7f << 9)
+ 	 #define RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT		 9
++	#define RX_TPA_START_CMP_V3_RSS_HASH_TYPE		(0x1ff << 7)
++	 #define RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT	 7
+ 	#define RX_TPA_START_CMP_AGG_ID				(0x7f << 25)
+ 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT			 25
+ 	#define RX_TPA_START_CMP_AGG_ID_P5			(0xffff << 16)
+ 	 #define RX_TPA_START_CMP_AGG_ID_SHIFT_P5		 16
++	#define RX_TPA_START_CMP_METADATA1			(0xf << 28)
++	 #define RX_TPA_START_CMP_METADATA1_SHIFT		 28
++	#define RX_TPA_START_METADATA1_TPID_SEL			(0x7 << 28)
++	#define RX_TPA_START_METADATA1_TPID_8021Q		(0x1 << 28)
++	#define RX_TPA_START_METADATA1_TPID_8021AD		(0x0 << 28)
++	#define RX_TPA_START_METADATA1_VALID			(0x8 << 28)
+ 
+ 	__le32 rx_tpa_start_cmp_rss_hash;
+ };
+@@ -346,6 +405,11 @@ struct rx_tpa_start_cmp {
+ 	   RX_TPA_START_CMP_RSS_HASH_TYPE) >>				\
+ 	  RX_TPA_START_CMP_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
+ 
++#define TPA_START_V3_HASH_TYPE(rx_tpa_start)				\
++	(((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	   RX_TPA_START_CMP_V3_RSS_HASH_TYPE) >>			\
++	  RX_TPA_START_CMP_V3_RSS_HASH_TYPE_SHIFT) & RSS_PROFILE_ID_MASK)
++
+ #define TPA_START_AGG_ID(rx_tpa_start)					\
+ 	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
+ 	 RX_TPA_START_CMP_AGG_ID) >> RX_TPA_START_CMP_AGG_ID_SHIFT)
+@@ -358,6 +422,14 @@ struct rx_tpa_start_cmp {
+ 	((rx_tpa_start)->rx_tpa_start_cmp_len_flags_type &		\
+ 	 cpu_to_le32(RX_TPA_START_CMP_FLAGS_ERROR))
+ 
++#define TPA_START_VLAN_VALID(rx_tpa_start)				\
++	((rx_tpa_start)->rx_tpa_start_cmp_misc_v1 &			\
++	 cpu_to_le32(RX_TPA_START_METADATA1_VALID))
++
++#define TPA_START_VLAN_TPID_SEL(rx_tpa_start)				\
++	(le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_misc_v1) &	\
++	 RX_TPA_START_METADATA1_TPID_SEL)
++
+ struct rx_tpa_start_cmp_ext {
+ 	__le32 rx_tpa_start_cmp_flags2;
+ 	#define RX_TPA_START_CMP_FLAGS2_IP_CS_CALC		(0x1 << 0)
+@@ -368,6 +440,8 @@ struct rx_tpa_start_cmp_ext {
+ 	#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_VALID		(0x1 << 9)
+ 	#define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT		(0x3 << 10)
+ 	 #define RX_TPA_START_CMP_FLAGS2_EXT_META_FORMAT_SHIFT	 10
++	#define RX_TPA_START_CMP_V3_FLAGS2_T_IP_TYPE		(0x1 << 10)
++	#define RX_TPA_START_CMP_V3_FLAGS2_AGG_GRO		(0x1 << 11)
+ 	#define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL		(0xffff << 16)
+ 	 #define RX_TPA_START_CMP_FLAGS2_CSUM_CMPL_SHIFT	 16
+ 
+@@ -381,6 +455,9 @@ struct rx_tpa_start_cmp_ext {
+ 	 #define RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_FLUSH	 (0x5 << 1)
+ 	#define RX_TPA_START_CMP_CFA_CODE			(0xffff << 16)
+ 	 #define RX_TPA_START_CMPL_CFA_CODE_SHIFT		 16
++	#define RX_TPA_START_CMP_METADATA0_TCI_MASK		(0xffff << 16)
++	#define RX_TPA_START_CMP_METADATA0_VID_MASK		(0x0fff << 16)
++	 #define RX_TPA_START_CMP_METADATA0_SFT			 16
+ 	__le32 rx_tpa_start_cmp_hdr_info;
+ };
+ 
+@@ -397,6 +474,11 @@ struct rx_tpa_start_cmp_ext {
+ 	  RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_MASK) >>			\
+ 	 RX_TPA_START_CMP_ERRORS_BUFFER_ERROR_SHIFT)
+ 
++#define TPA_START_METADATA0_TCI(rx_tpa_start)				\
++	((le32_to_cpu((rx_tpa_start)->rx_tpa_start_cmp_cfa_code_v2) &	\
++	  RX_TPA_START_CMP_METADATA0_TCI_MASK) >>			\
++	 RX_TPA_START_CMP_METADATA0_SFT)
++
+ struct rx_tpa_end_cmp {
+ 	__le32 rx_tpa_end_cmp_len_flags_type;
+ 	#define RX_TPA_END_CMP_TYPE				(0x3f << 0)
+@@ -2023,6 +2105,7 @@ struct bnxt {
+ #define BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA	BIT(0)
+ #define BNXT_RSS_CAP_UDP_RSS_CAP		BIT(1)
+ #define BNXT_RSS_CAP_NEW_RSS_CAP		BIT(2)
++#define BNXT_RSS_CAP_RSS_TCAM			BIT(3)
  
  	u16			max_mtu;
  	u8			max_tc;
-@@ -2086,7 +2088,6 @@ struct bnxt {
- 	#define BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V2	BIT_ULL(16)
- 	#define BNXT_FW_CAP_PCIE_STATS_SUPPORTED	BIT_ULL(17)
- 	#define BNXT_FW_CAP_EXT_STATS_SUPPORTED		BIT_ULL(18)
--	#define BNXT_FW_CAP_RSS_HASH_TYPE_DELTA		BIT_ULL(19)
- 	#define BNXT_FW_CAP_ERR_RECOVER_RELOAD		BIT_ULL(20)
- 	#define BNXT_FW_CAP_HOT_RESET			BIT_ULL(21)
- 	#define BNXT_FW_CAP_PTP_RTC			BIT_ULL(22)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 99c8b15bdfbe..14cb0512ee93 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1203,7 +1203,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- 		if (tuple == 4)
- 			rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4;
- 	} else if (cmd->flow_type == UDP_V4_FLOW) {
--		if (tuple == 4 && !(bp->flags & BNXT_FLAG_UDP_RSS_CAP))
-+		if (tuple == 4 && !(bp->rss_cap & BNXT_RSS_CAP_UDP_RSS_CAP))
- 			return -EINVAL;
- 		rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV4;
- 		if (tuple == 4)
-@@ -1213,7 +1213,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- 		if (tuple == 4)
- 			rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV6;
- 	} else if (cmd->flow_type == UDP_V6_FLOW) {
--		if (tuple == 4 && !(bp->flags & BNXT_FLAG_UDP_RSS_CAP))
-+		if (tuple == 4 && !(bp->rss_cap & BNXT_RSS_CAP_UDP_RSS_CAP))
- 			return -EINVAL;
- 		rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV6;
- 		if (tuple == 4)
-@@ -1253,7 +1253,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
- 	if (bp->rss_hash_cfg == rss_hash_cfg)
- 		return 0;
- 
--	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
-+	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
- 		bp->rss_hash_delta = bp->rss_hash_cfg ^ rss_hash_cfg;
- 	bp->rss_hash_cfg = rss_hash_cfg;
- 	if (netif_running(bp->dev)) {
 -- 
 2.30.1
 
 
---00000000000093f679060b7a72d1
+--000000000000acda3b060b7a72a7
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -331,14 +350,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILrJXGyNvPpCM1yrUkLhjK3fe3JhaZG2
-+wTpgl/aeRjkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyMzk1NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPw51gTdQIayuAq6WdDATzp0pNA5HNLC
+HzHFb4AqpVALMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyMzk1OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCHqCFlKERTbrOlFfhr44YxkJU4zEvPxDasilpxzTaEPW8TZ8RW
-7s8Ebog050UQiOo7vvzoN0zE5REJQw4fjdQBpFE3rPWakow6v9uruNaYaxfmvkCBQl59rKgoS0IV
-bmw7yuvsp+yODL06rjUObJ0uu4MfW5dEWaMojfrftHrDj6lBaGJ8XDT0kOlRJF30GeeMya9RnL+8
-nFPeYrfbdWjs4XtRLvjOsjAhDEF6jmTxlN0zGOrlsQdAmqDsPfKGKeiyv8hu0tV20CB3kEYEtvJ0
-Xlo2KDVsQkpBr1hqrhipGZXRMWDjBRsjree6OVz/Udh8Y6EpGloyOn8hzV2BwM/r
---00000000000093f679060b7a72d1--
+ATANBgkqhkiG9w0BAQEFAASCAQBRqdNDoOs7RWINnyGejVuOvWErejgfitQfPtMmLHyJiSjD+l5S
+176cbVF0Jjh+b6MzeIIy4s2w6Y+Ou3lo77CIAifPyqt5ZFATs6GXMzjRtwPWKkWrWShCt8OZkDjV
+hqMmEQejQU2jI2zNJ8XM5psARBPfwKijs8lOGdyLRYNqfKACd9k49TmmGX/hEDPKJUTy4jkgg4M6
+OAzv4ACCjogjMkhnEPVmp+xd0TyCWrqTw163ZSW66/GUHA8F/CV2pX7k2aXY8CTYIb5OPMviJOZL
+eK91wIRCYrXYlSMkybK0La07aSMO/T2CxHpph2xb81hH5snLN1dTPfvnYMxn/kLf
+--000000000000acda3b060b7a72a7--
 
