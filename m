@@ -1,57 +1,43 @@
-Return-Path: <netdev+bounces-52940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F290A800CB8
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 14:58:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D096800D1A
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE424281864
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:58:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4D24B20B64
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 14:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B389D3C687;
-	Fri,  1 Dec 2023 13:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0qATxg0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54363D980;
+	Fri,  1 Dec 2023 14:25:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980DF3C078
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 13:58:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B95EC433CC;
-	Fri,  1 Dec 2023 13:58:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701439117;
-	bh=IgSlcVD1qnZtu5IGR89IkS74E9HA882UMgWuLU9CUAk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y0qATxg01Yj/pDf7lDa9UyOSUCPGESsGwxmbTUV+4B3xeI989uGFcuP37JJT+yuxu
-	 MU5MNmUtgTNAu4MfoGmHpAR83/4zqtNBY08dZJ4gRga8vJERA/eRCmNxXw7OrhNbln
-	 t7zYKxKkGDBqHVyZNEBFvp3iwY5MMprO+ByAN0pyT1dGBVjyCMUsW32klhaMZTHyMF
-	 Qg1HbfsD2YSTvhJwj7ALlkot62wGptAgPDBVmeF/+m2GxQZsmussFoPJ4zF43CqvM0
-	 j1omgNQ/9/b+5Avtd34ycS7eNJl+JyGy8d45VKm5MFrO82be6qhSzSQ9S0BKen88Ox
-	 uCGQ9EqHS53cg==
-From: Roger Quadros <rogerq@kernel.org>
-To: davem@davemloft.net,
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911E610F4;
+	Fri,  1 Dec 2023 06:25:08 -0800 (PST)
+Received: from i53875b61.versanet.de ([83.135.91.97] helo=phil.lan)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1r94Rs-0000PA-CQ; Fri, 01 Dec 2023 15:24:56 +0100
+From: Heiko Stuebner <heiko@sntech.de>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com
+Cc: linux@armlinux.org.uk,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	vladimir.oltean@nxp.com
-Cc: s-vadapalli@ti.com,
-	r-gunasekaran@ti.com,
-	vigneshr@ti.com,
-	srk@ti.com,
-	horms@kernel.org,
-	p-varis@ti.com,
 	netdev@vger.kernel.org,
-	rogerq@kernel.org
-Subject: [PATCH v7 net-next 8/8] selftests: forwarding: ethtool_mm: support devices with higher rx-min-frag-size
-Date: Fri,  1 Dec 2023 15:58:02 +0200
-Message-Id: <20231201135802.28139-9-rogerq@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231201135802.28139-1-rogerq@kernel.org>
-References: <20231201135802.28139-1-rogerq@kernel.org>
+	linux-kernel@vger.kernel.org,
+	quentin.schulz@theobroma-systems.com,
+	heiko@sntech.de,
+	Heiko Stuebner <heiko.stuebner@cherry.de>
+Subject: [PATCH] net: mdio: enable optional clock when registering a phy from devicetree
+Date: Fri,  1 Dec 2023 15:24:53 +0100
+Message-Id: <20231201142453.324697-1-heiko@sntech.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,85 +46,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+From: Heiko Stuebner <heiko.stuebner@cherry.de>
 
-Some devices have errata due to which they cannot report ETH_ZLEN (60)
-in the rx-min-frag-size. This was foreseen of course, and lldpad has
-logic that when we request it to advertise addFragSize 0, it will round
-it up to the lowest value that is _actually_ supported by the hardware.
+The ethernet-phy binding (now) specifys that phys can declare a clock
+supply. Phy driver itself will handle this when probing the phy-driver.
 
-The problem is that the selftest expects lldpad to report back to us the
-same value as we requested.
+But there is a gap when trying to detect phys, because the mdio-bus needs
+to talk to the phy to get its phy-id. Using actual phy-ids in the dt like
+       compatible = "ethernet-phy-id0022.1640",
+                    "ethernet-phy-ieee802.3-c22";
+of course circumvents this, but in turn hard-codes the phy.
 
-Make the selftest smarter by figuring out on its own what is a
-reasonable value to expect.
+With boards often having multiple phy options and the mdio-bus being able
+to actually probe devices, this feels like a step back.
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Tested-by: Roger Quadros <rogerq@kernel.org>
+So check for the existence of a phy-clock per the -dtbinding in the
+of_mdiobus_register_phy() and enable the clock around the
+fwnode_mdiobus_register_phy() call which tries to determine the phy-id.
+
+Signed-off-by: Heiko Stuebner <heiko.stuebner@cherry.de>
 ---
- .../selftests/net/forwarding/ethtool_mm.sh    | 37 ++++++++++++++++++-
- 1 file changed, 35 insertions(+), 2 deletions(-)
+ drivers/net/mdio/of_mdio.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-Changelog:
-
-v7: initial commit
-
-diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-index 39e736f30322..6212913f4ad1 100755
---- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-+++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-@@ -155,15 +155,48 @@ manual_failed_verification_h2_to_h1()
- 	manual_failed_verification $h2 $h1
- }
+diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+index 64ebcb6d235c..895b12849b23 100644
+--- a/drivers/net/mdio/of_mdio.c
++++ b/drivers/net/mdio/of_mdio.c
+@@ -8,6 +8,7 @@
+  * out of the OpenFirmware device tree and using it to populate an mii_bus.
+  */
  
-+smallest_supported_add_frag_size()
-+{
-+	local iface=$1
-+	local rx_min_frag_size=
-+
-+	rx_min_frag_size=$(ethtool --json --show-mm $iface | \
-+		jq '.[]."rx-min-frag-size"')
-+
-+	if [ $rx_min_frag_size -le 60 ]; then
-+		echo 0
-+	elif [ $rx_min_frag_size -le 124 ]; then
-+		echo 1
-+	elif [ $rx_min_frag_size -le 188 ]; then
-+		echo 2
-+	elif [ $rx_min_frag_size -le 252 ]; then
-+		echo 3
-+	else
-+		echo "$iface: RX min frag size $rx_min_frag_size cannot be advertised over LLDP"
-+		exit 1
-+	fi
-+}
-+
-+expected_add_frag_size()
-+{
-+	local iface=$1
-+	local requested=$2
-+	local min=$(smallest_supported_add_frag_size $iface)
-+
-+	[ $requested -le $min ] && echo $min || echo $requested
-+}
-+
- lldp_change_add_frag_size()
++#include <linux/clk.h>
+ #include <linux/device.h>
+ #include <linux/err.h>
+ #include <linux/fwnode_mdio.h>
+@@ -15,6 +16,7 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
++#include <linux/of_clk.h>
+ #include <linux/of_irq.h>
+ #include <linux/of_mdio.h>
+ #include <linux/of_net.h>
+@@ -46,7 +48,37 @@ EXPORT_SYMBOL(of_mdiobus_phy_device_register);
+ static int of_mdiobus_register_phy(struct mii_bus *mdio,
+ 				    struct device_node *child, u32 addr)
  {
- 	local add_frag_size=$1
-+	local pattern=
- 
- 	lldptool -T -i $h1 -V addEthCaps addFragSize=$add_frag_size >/dev/null
- 	# Wait for TLVs to be received
- 	sleep 2
--	lldptool -i $h2 -t -n -V addEthCaps | \
--		grep -q "Additional fragment size: $add_frag_size"
-+	pattern=$(printf "Additional fragment size: %d" \
-+			 $(expected_add_frag_size $h1 $add_frag_size))
-+	lldptool -i $h2 -t -n -V addEthCaps | grep -q "$pattern"
+-	return fwnode_mdiobus_register_phy(mdio, of_fwnode_handle(child), addr);
++	struct clk *clk = NULL;
++	int ret;
++
++	/* ethernet-phy binding specifies a maximum of 1 clock */
++	if (of_clk_get_parent_count(child) == 1) {
++		clk = of_clk_get(child, 0);
++		if (IS_ERR(clk)) {
++			if (PTR_ERR(clk) != -ENOENT)
++				return dev_err_probe(&mdio->dev, PTR_ERR(clk),
++						     "Could not get defined clock for MDIO device at address %u\n",
++						     addr);
++
++			clk = NULL;
++		}
++	}
++
++	ret = clk_prepare_enable(clk);
++	if (ret < 0) {
++		clk_put(clk);
++		dev_err(&mdio->dev,
++			"Could not enable clock for MDIO device at address %u: %d\n",
++			addr, ret);
++		return ret;
++	}
++
++	ret = fwnode_mdiobus_register_phy(mdio, of_fwnode_handle(child), addr);
++
++	clk_disable_unprepare(clk);
++	clk_put(clk);
++
++	return ret;
  }
  
- lldp()
+ static int of_mdiobus_register_device(struct mii_bus *mdio,
 -- 
-2.34.1
+2.39.2
 
 
