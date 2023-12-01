@@ -1,317 +1,200 @@
-Return-Path: <netdev+bounces-53078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A50B7801345
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:02:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1659380136D
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6EBD1C20944
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:02:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F4BFB20E34
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7417D48CF1;
-	Fri,  1 Dec 2023 19:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B02E4EB46;
+	Fri,  1 Dec 2023 19:11:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OMUjqk+D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b51SJEei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF542D63
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 11:02:27 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-db548da6e3bso732958276.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 11:02:27 -0800 (PST)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD572B0;
+	Fri,  1 Dec 2023 11:11:45 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-54b0e553979so3164643a12.2;
+        Fri, 01 Dec 2023 11:11:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701457347; x=1702062147; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701457904; x=1702062704; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dAmgtkbgDqkQCCAzPWHDhZI+//WYau1qYeKz85oRKXU=;
-        b=OMUjqk+DvdRRSOt/+MJhFAmANvF1P8L7O9/G/ycp2yiztzaEnNYS7smayjaJaWslyM
-         XQCVE/c4THgSe4uz0ZQS1IJH3zmxg0ip03/3FetusoWMFipBttLR3MNx6zGM7ftYrwlQ
-         2wIynm/vNQsAjcN51NeajbylLWMgxgBzw0j0Xg7+ztwg0tNByxCfghP1GNUOkw6hvCnh
-         7sMp6yy9/PwfWohTqsgEGI6sP/TQVJvibYzDcpILic8vc6puui/jAcFbz5Ya3+DnbPps
-         j41o1Xptx2TWYhCN16DkYeE95pumairWgDq+/8kCLObqJe0eCVisbYUTu2D4vHYKFhY5
-         pyog==
+        bh=7b2qv0QWPtpd3SOyHqmLbQnb6QDi1Dy0b3kkXbjYsP4=;
+        b=b51SJEeiyQgzOMZsm5+PJonTmWBDCbNPSYxZEsQYowrVYmwZoeySw6Kb9AdQb/N4sV
+         MlaoWKz4bMtZHozsq931bXwFl44MDmzNGskglLB/Uw4yMNS28n9HjAajCE8JEzEeure9
+         Q+8Ql8WX9AT1IGpc5AyuGCNK8ZYE8FlFPdOmAz/Hl63MZo6y2eluuQcpei94T3Z+A7Ir
+         a4VaUVBo7DoiY0si5YwzgsOqPR8ZqpkWM+arwe6nofhjBwOWPsXuqF9+Pz2rJ2tFS13m
+         UYkDCIkzQV4G1aGgPeFpt29DWjqSIt7EEsZWouGnrUF8xWhZMj5XtfoaONE3Iy17N5hp
+         JQ8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701457347; x=1702062147;
+        d=1e100.net; s=20230601; t=1701457904; x=1702062704;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dAmgtkbgDqkQCCAzPWHDhZI+//WYau1qYeKz85oRKXU=;
-        b=XWIs6MxlgDdUi1npyHzx1Dxb258RoZbQwyqHaPKJ1Q7kNEKYhpJfXP8rWnc1JtRMVh
-         IjtDIeqxMMsmDHlIYPSPkSiYSabVt3/2g6RU4DH988+9U9OZQlEFlI4SKYrpDJAczGCD
-         mFgYkul/r7Ot1t0u5qYxf7gRN6gDo+gbJDGVjJSndOab8mhXKl7FjHnW/U6x8wdVYTa6
-         vB14c3m8gMlkPTkFQIxETej3w/sI1R0lXcdzZ4gnyP15e6r8iiVyOf3DUs2F62DxvF6r
-         5RmZfwqTqCQXRihX6KGDyvZ5oJjARqEpY8Hu1exIgPJvEPo/dYxoaOr7uO6Si0gIScEw
-         Yy1w==
-X-Gm-Message-State: AOJu0YyKQLUC7CxaHwR3PNEHwHfFid8/aNq+O16+64KLB6IDA/z3mWIW
-	51WQk8h9NF4CZ7ZnwUTcAQE+Lb6V0biAgnpl+GfRiA==
-X-Google-Smtp-Source: AGHT+IFfLLAk/tooZ541dzpT+owM5kC2z1sspForCzjhabsbV9WwWypG6KOzFOfZItTrgMdIV3wvpS9tVwNa6gcZGXA=
-X-Received: by 2002:a25:738a:0:b0:db7:cfbf:e41e with SMTP id
- o132-20020a25738a000000b00db7cfbfe41emr1863415ybc.26.1701457346161; Fri, 01
- Dec 2023 11:02:26 -0800 (PST)
+        bh=7b2qv0QWPtpd3SOyHqmLbQnb6QDi1Dy0b3kkXbjYsP4=;
+        b=lIrewYxez0NIbc76ZN8meLQFTvrIsyKf7YByaFNhCdMmcDb5WFq4enFSQB/rixOgZa
+         VedjtQPaQp8KyJYNTvQpk599vKCh6p1VO+dWrJD4gVf8RWEVPEbzA0Og8i0R99R57S1h
+         PdQDT+rwaEtiXpyxKktUelpyMkyLurfzKbvNREEGFJYg6pSrry/7yborwbzGIE9wvay/
+         NIaHOdpRZlxH6e77kHFkLSpWpC4FSG+XSw4tgrFUJP1/gXv1xfK2B+k818CbP02yJBz9
+         PMbyaXLWi6ZAFXtlkKVCzgOsIjUjaEpexHDN3gIVVqyaARUHRK0GFArNc6AjCY/ysBF2
+         dkoQ==
+X-Gm-Message-State: AOJu0YxEzhHzY9nDGHWLFhxFGmsXcG5Ijo53K6wRFIJmjl9BvV2PTOtg
+	yXJjT0CiWW6yDY6X6JWrvwgsQLfQumNxLuAK3EbdVOvo
+X-Google-Smtp-Source: AGHT+IGIQpnkASsjxBknJbw9LL3639mMvt4MnBhyj+0QZCNfwUSuXzZCXcCDeoZ3xygNZeUuaF+Z7qJQqLRxhyr3Afc=
+X-Received: by 2002:a17:906:f84a:b0:a19:a19b:55f9 with SMTP id
+ ks10-20020a170906f84a00b00a19a19b55f9mr1129420ejb.137.1701457903624; Fri, 01
+ Dec 2023 11:11:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00000000000077c77f060b603f2d@google.com> <CAM0EoMkAxx+JwLxc_T0jJd3+jZmoSTndLKC6Ap7qYwd58A5Zmg@mail.gmail.com>
- <87il5i7pc2.fsf@intel.com>
-In-Reply-To: <87il5i7pc2.fsf@intel.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 1 Dec 2023 14:02:15 -0500
-Message-ID: <CAM0EoMmZsjJuXUvte7PSWNeMu0TyBYAz=RS+j8AzHV-NrwGe+Q@mail.gmail.com>
-Subject: Re: Fwd: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
+References: <cover.1701193577.git.dxu@dxuuu.xyz> <ed7920365daf5eff1c82892b57e918d3db786ac7.1701193577.git.dxu@dxuuu.xyz>
+ <20c593b6f31720a3d24d75e5e5cc3245b67249d1.camel@gmail.com> <ib27gbqj6c6ilblugm5kalwyfty6h4zujhvykw4a562uorqzjn@6wxeino6q7vk>
+In-Reply-To: <ib27gbqj6c6ilblugm5kalwyfty6h4zujhvykw4a562uorqzjn@6wxeino6q7vk>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 1 Dec 2023 11:11:31 -0800
+Message-ID: <CAEf4BzbO80kFyFBCUixJ_NGqjJv79i+6oQXz+-jzRE+MaoRYZA@mail.gmail.com>
+Subject: Re: [PATCH ipsec-next v2 3/6] libbpf: Add BPF_CORE_WRITE_BITFIELD() macro
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, ndesaulniers@google.com, andrii@kernel.org, 
+	nathan@kernel.org, daniel@iogearbox.net, ast@kernel.org, 
+	steffen.klassert@secunet.com, antony.antony@secunet.com, 
+	alexei.starovoitov@gmail.com, yonghong.song@linux.dev, martin.lau@linux.dev, 
+	song@kernel.org, john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com, 
+	haoluo@google.com, jolsa@kernel.org, trix@redhat.com, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, devel@linux-ipsec.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Vinicius,
-
-On Thu, Nov 30, 2023 at 7:12=E2=80=AFPM Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
+On Thu, Nov 30, 2023 at 5:33=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
 >
-> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+> On Tue, Nov 28, 2023 at 07:59:01PM +0200, Eduard Zingerman wrote:
+> > On Tue, 2023-11-28 at 10:54 -0700, Daniel Xu wrote:
+> > > Similar to reading from CO-RE bitfields, we need a CO-RE aware bitfie=
+ld
+> > > writing wrapper to make the verifier happy.
+> > >
+> > > Two alternatives to this approach are:
+> > >
+> > > 1. Use the upcoming `preserve_static_offset` [0] attribute to disable
+> > >    CO-RE on specific structs.
+> > > 2. Use broader byte-sized writes to write to bitfields.
+> > >
+> > > (1) is a bit a bit hard to use. It requires specific and
+> > > not-very-obvious annotations to bpftool generated vmlinux.h. It's als=
+o
+> > > not generally available in released LLVM versions yet.
+> > >
+> > > (2) makes the code quite hard to read and write. And especially if
+> > > BPF_CORE_READ_BITFIELD() is already being used, it makes more sense t=
+o
+> > > to have an inverse helper for writing.
+> > >
+> > > [0]: https://reviews.llvm.org/D133361
+> > > From: Eduard Zingerman <eddyz87@gmail.com>
+> > >
+> > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> > > ---
+> >
+> > Could you please also add a selftest (or several) using __retval()
+> > annotation for this macro?
 >
-> > Vinicius/Vladmir,
-> > I pinged you on this already. Can you take a look please? There is a
-> > reproducer..
-> >
+> Good call about adding tests -- I found a few bugs with the code from
+> the other thread. But boy did they take a lot of brain cells to figure
+> out.
 >
-> It seems to be another one of those, syzkaller managed to produce a
-> schedule with a small enough interval that it's going to starve some
-> other things. (in this case, the interval is 127 ns)
+> There was some 6th grade algebra involved too -- I'll do my best to
+> explain it in the commit msg for v3.
 >
-> We already reject intervals that won't allow the passage of the smallest
-> ethernet packet. I am running out of ideas that we could do to, at least
-> at configuration time.
 >
-
-I am afraid i dont know enough about taprio to comment on that. If you
-think it is useful for me to look at the code i will.
-
-> But one almost crazy idea turned up: what if we only start the timer
-> when there are actually packets in the qdisc? i.e. if the queue was
-> empty, we would only start the timer during "empty -> non-empty"
-> enqueue(), and stop the timer when the queue goes back to empty.
+> Here are the fixes in case you are curious:
 >
+> diff --git a/tools/lib/bpf/bpf_core_read.h b/tools/lib/bpf/bpf_core_read.=
+h
+> index 7a764f65d299..8f02c558c0ff 100644
+> --- a/tools/lib/bpf/bpf_core_read.h
+> +++ b/tools/lib/bpf/bpf_core_read.h
+> @@ -120,7 +120,9 @@ enum bpf_enum_value_kind {
+>         unsigned int byte_size =3D __CORE_RELO(s, field, BYTE_SIZE);     =
+ \
+>         unsigned int lshift =3D __CORE_RELO(s, field, LSHIFT_U64);       =
+ \
+>         unsigned int rshift =3D __CORE_RELO(s, field, RSHIFT_U64);       =
+ \
+> -       unsigned int bit_size =3D (rshift - lshift);                     =
+ \
+> +       unsigned int bit_size =3D (64 - rshift);                         =
+ \
+> +       unsigned int hi_size =3D lshift;                                 =
+ \
+> +       unsigned int lo_size =3D (rshift - lshift);                      =
+ \
 
-Sounds like a sensible thing to do (regardless of syzkaller issue
-here) as long as you are not counting on absolute time somewhere in
-the taprio algorithm.
+nit: let's drop unnecessary ()
 
-> I think that way, we remove the issue that causes most of the syzkaller
-> reports, and we would reduce the CPU overhead when taprio is idle (on a
-> non-debug system with the problematic schedule I am seeing ~2% overhead
-> in perf top).
+>         unsigned long long nval, val, hi, lo;                           \
+>                                                                         \
+>         asm volatile("" : "+r"(p));                                     \
+> @@ -131,13 +133,13 @@ enum bpf_enum_value_kind {
+>         case 4: val =3D *(unsigned int *)p; break;                       =
+ \
+>         case 8: val =3D *(unsigned long long *)p; break;                 =
+ \
+>         }                                                               \
+> -       hi =3D val >> (bit_size + rshift);                               =
+ \
+> -       hi <<=3D bit_size + rshift;                                      =
+ \
+> -       lo =3D val << (bit_size + lshift);                               =
+ \
+> -       lo >>=3D bit_size + lshift;                                      =
+ \
+> +       hi =3D val >> (64 - hi_size);                                    =
+ \
+> +       hi <<=3D 64 - hi_size;                                           =
+ \
+> +       lo =3D val << (64 - lo_size);                                    =
+ \
+> +       lo >>=3D 64 - lo_size;                                           =
+ \
+>         nval =3D new_val;                                                =
+ \
+> -       nval <<=3D lshift;                                               =
+ \
+> -       nval >>=3D rshift;                                               =
+ \
+> +       nval <<=3D (64 - bit_size);                                      =
+ \
+> +       nval >>=3D (64 - bit_size - lo_size);                            =
+ \
+>         val =3D hi | nval | lo;                                          =
+ \
+
+this looks.. unusual. I'd imagine we calculate a mask, mask out bits
+we are replacing, and then OR with new values, roughly (assuming all
+the right left/right shift values and stuff)
+
+/* clear bits */
+val &=3D ~(bitfield_mask << shift);
+/* set bits */
+val |=3D (nval & bitfield_mask) << shift;
+
+?
+
+>         switch (byte_size) {                                            \
+>         case 1: *(unsigned char *)p      =3D val; break;                 =
+ \
 >
-> Does that sound like it could work?
 >
-
-I believe so with the caveat of the relatedness of time measurement.
-
-cheers,
-jamal
-
-
-> > cheers,
-> > jamal
-> >
-> > ---------- Forwarded message ---------
-> > From: syzbot <syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com>
-> > Date: Thu, Nov 30, 2023 at 10:24=E2=80=AFAM
-> > Subject: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
-> > To: <bp@alien8.de>, <davem@davemloft.net>, <edumazet@google.com>,
-> > <hpa@zytor.com>, <jhs@mojatatu.com>, <jiri@resnulli.us>,
-> > <kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <mingo@redhat.com>,
-> > <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-> > <syzkaller-bugs@googlegroups.com>, <tglx@linutronix.de>,
-> > <vinicius.gomes@intel.com>, <willemdebruijn.kernel@gmail.com>,
-> > <x86@kernel.org>, <xiyou.wangcong@gmail.com>
-> >
-> >
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    18d46e76d7c2 Merge tag 'for-6.7-rc3-tag' of git://git.k=
-ern..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D16bcc8b4e80=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb39fe85d25=
-4f638
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3Dde8e83db70e8b=
-eedd556
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils
-> > for Debian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12172952e=
-80000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1086b58ae80=
-000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/0ce5608c89e8/d=
-isk-18d46e76.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/eef847faba9c/vmli=
-nux-18d46e76.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/6a3df3288860=
-/bzImage-18d46e76.xz
-> >
-> > The issue was bisected to:
-> >
-> > commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-> > Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> > Date:   Sat Sep 29 00:59:43 2018 +0000
-> >
-> >     tc: Add support for configuring the taprio scheduler
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D16a29b52=
-e80000
-> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D15a29b52=
-e80000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D11a29b52e80=
-000
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the co=
-mmit:
-> > Reported-by: syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com
-> > Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio schedu=
-ler")
-> >
-> > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> > rcu:    0-...!: (1 GPs behind) idle=3D79f4/1/0x4000000000000000
-> > softirq=3D5546/5548 fqs=3D1
-> > rcu:    (detected by 1, t=3D10503 jiffies, g=3D5017, q=3D384 ncpus=3D2)
-> > Sending NMI from CPU 1 to CPUs 0:
-> > NMI backtrace for cpu 0
-> > CPU: 0 PID: 5106 Comm: syz-executor201 Not tainted
-> > 6.7.0-rc3-syzkaller-00024-g18d46e76d7c2 #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine,
-> > BIOS Google 11/10/2023
-> > RIP: 0010:__run_hrtimer kernel/time/hrtimer.c:1686 [inline]
-> > RIP: 0010:__hrtimer_run_queues+0x62e/0xc20 kernel/time/hrtimer.c:1752
-> > Code: fc ff df 48 89 fa 48 c1 ea 03 0f b6 04 02 48 89 fa 83 e2 07 38
-> > d0 7f 08 84 c0 0f 85 fb 04 00 00 45 0f b6 6e 3b 31 ff 44 89 ee <e8> 2d
-> > 46 11 00 45 84 ed 0f 84 8e fb ff ff e8 ef 4a 11 00 4c 89 f7
-> > RSP: 0018:ffffc90000007e40 EFLAGS: 00000046
-> > RAX: 0000000000000000 RBX: ffff8880b982ba40 RCX: ffffffff817642f9
-> > RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
-> > RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-> > R10: 0000000000000001 R11: 0000000000000002 R12: ffff8880b982b940
-> > R13: 0000000000000000 R14: ffff88801c43a340 R15: ffffffff88a2daf0
-> > FS:  00005555566fe380(0000) GS:ffff8880b9800000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 00007fe9404c73b0 CR3: 0000000076e2d000 CR4: 0000000000350ef0
-> > Call Trace:
-> >  <NMI>
-> >  </NMI>
-> >  <IRQ>
-> >  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
-> >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
-> >  __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:=
-1082
-> >  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
-> >  </IRQ>
-> >  <TASK>
-> >  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentr=
-y.h:645
-> > RIP: 0010:lock_acquire+0x1ef/0x520 kernel/locking/lockdep.c:5722
-> > Code: c1 05 bd 6c 9a 7e 83 f8 01 0f 85 b4 02 00 00 9c 58 f6 c4 02 0f
-> > 85 9f 02 00 00 48 85 ed 74 01 fb 48 b8 00 00 00 00 00 fc ff df <48> 01
-> > c3 48 c7 03 00 00 00 00 48 c7 43 08 00 00 00 00 48 8b 84 24
-> > RSP: 0018:ffffc9000432fb00 EFLAGS: 00000206
-> > RAX: dffffc0000000000 RBX: 1ffff92000865f62 RCX: ffffffff81672c0e
-> > RDX: 0000000000000001 RSI: ffffffff8accbae0 RDI: ffffffff8b2f0dc0
-> > RBP: 0000000000000200 R08: 0000000000000000 R09: fffffbfff23e33d0
-> > R10: ffffffff91f19e87 R11: 0000000000000000 R12: 0000000000000001
-> > R13: 0000000000000000 R14: ffffffff8d0f0b48 R15: 0000000000000000
-> >  __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-> >  __mutex_lock+0x175/0x9d0 kernel/locking/mutex.c:747
-> >  pcpu_alloc+0xbb8/0x1420 mm/percpu.c:1769
-> >  packet_alloc_pending net/packet/af_packet.c:1232 [inline]
-> >  packet_create+0x2b7/0x8e0 net/packet/af_packet.c:3373
-> >  __sock_create+0x328/0x800 net/socket.c:1569
-> >  sock_create net/socket.c:1620 [inline]
-> >  __sys_socket_create net/socket.c:1657 [inline]
-> >  __sys_socket+0x14c/0x260 net/socket.c:1704
-> >  __do_sys_socket net/socket.c:1718 [inline]
-> >  __se_sys_socket net/socket.c:1716 [inline]
-> >  __x64_sys_socket+0x72/0xb0 net/socket.c:1716
-> >  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-> >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
-> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> > RIP: 0033:0x7fe940479de9
-> > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48
-> > 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-> > 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> > RSP: 002b:00007ffe1bf080b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
-> > RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fe940479de9
-> > RDX: 0000000000000000 RSI: 0000000800000003 RDI: 0000000000000011
-> > RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000100000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe1bf08110
-> > R13: 0000000000030c67 R14: 00007ffe1bf080dc R15: 0000000000000003
-> >  </TASK>
-> > INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.0=
-67 msecs
-> > rcu: rcu_preempt kthread timer wakeup didn't happen for 10497 jiffies!
-> > g5017 f0x0 RCU_GP_WAIT_FQS(5) ->state=3D0x402
-> > rcu:    Possible timer handling issue on cpu=3D0 timer-softirq=3D2416
-> > rcu: rcu_preempt kthread starved for 10498 jiffies! g5017 f0x0
-> > RCU_GP_WAIT_FQS(5) ->state=3D0x402 ->cpu=3D0
-> > rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is
-> > now expected behavior.
-> > rcu: RCU grace-period kthread stack dump:
-> > task:rcu_preempt     state:I stack:27904 pid:17    tgid:17    ppid:2
-> >    flags:0x00004000
-> > Call Trace:
-> >  <TASK>
-> >  context_switch kernel/sched/core.c:5376 [inline]
-> >  __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
-> >  __schedule_loop kernel/sched/core.c:6763 [inline]
-> >  schedule+0xe9/0x270 kernel/sched/core.c:6778
-> >  schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
-> >  rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
-> >  rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
-> >  kthread+0x2c6/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-> >  </TASK>
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bise=
-ction
-> >
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> >
-> > If you want syzbot to run the reproducer, reply with:
-> > #syz test: git://repo/address.git branch-or-commit-hash
-> > If you attach or paste a git patch, syzbot will apply it before testing=
-.
-> >
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> >
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> >
-> > If you want to undo deduplication, reply with:
-> > #syz undup
->
-> --
-> Vinicius
+> Thanks,
+> Daniel
 
