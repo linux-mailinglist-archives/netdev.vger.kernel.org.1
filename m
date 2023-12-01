@@ -1,171 +1,140 @@
-Return-Path: <netdev+bounces-52831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DBDF800533
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:06:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D30A800555
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3FA281721
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:06:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1D4FB20D6E
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216D1171D8;
-	Fri,  1 Dec 2023 08:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8948718625;
+	Fri,  1 Dec 2023 08:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RXWHF2Bg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRLFbIZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B23010F8;
-	Fri,  1 Dec 2023 00:06:28 -0800 (PST)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B17cWdt021468;
-	Fri, 1 Dec 2023 08:06:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=s6xuQM0TQ839OS3q8j/gWK3Yd0MG2d7O9pgSlh4CGGA=;
- b=RXWHF2BgdeNuqkYnuc0IoUjxsYlk40uyJb2IUq3AE8UitfiqNMXl32S76bHfd+Yaijjj
- GKx63MC0pXhb6UqDmUOdAlYtYDOB6iq3BUyWV8daUJqr7IitwlmlGCh2Ilk6lOlUO+/A
- TyyjK2sD3EfsLuXpIcsLB5Y6XcfvloV3/Gs9N3c3hWhPBGWzAdv+v+3A5ogyD1cFgBhe
- ueE57+i2jnPAFWyYEkov3Rhq9JKokjlZASfRdUZo4O+XsUbL09WZmpZIw30hSl9mlrqJ
- tGjOmvfBbsRkETyA+deDfHiKEhfd+2gnzh1n3+xBsIPgUHesWUovrt19RqKM7z06Jxe2 3w== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uq2kp921e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 08:06:00 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B185xNB027895
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 1 Dec 2023 08:05:59 GMT
-Received: from [10.253.35.195] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 1 Dec
- 2023 00:05:55 -0800
-Message-ID: <27d3ce6f-5bf9-4199-bfac-33223be1d681@quicinc.com>
-Date: Fri, 1 Dec 2023 16:05:50 +0800
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B845170C
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:20:03 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1ce28faa92dso2399565ad.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:20:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701418802; x=1702023602; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4zUlETjBRKMJV2SnKEGh/CF2OTNLFvzk/SPEwsphsMU=;
+        b=fRLFbIZKvaez/J+2k75OeCogo53wF0Fq+yrjt3WxRYZ8o22ho5ALrNHxZn0y5Nu1jb
+         jG/+Pjlo1LhyZ/wsa1+3Te6MVF+gvH2Uv5ogaZrXOWW+u3zQqramktPciLExqCb6gfPC
+         2nwn5BwOMzPPdr4N5f+I+tB+txZjpBhBsOqTuBUBwXVDismh0Qvl8voFOtOCGdDHi979
+         b6cEPTFq6N0nIpoa8uz+mduk57eYVj3poY4ioiCrRHGpCedks3AD8HhmJJC0+3EP3byq
+         iX4TGHPycq7cEEWSYmXoBPq76fWqizJaeer25cI7I3kelAzz65LX6zLc5VioaAzcOiXw
+         fiJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701418802; x=1702023602;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4zUlETjBRKMJV2SnKEGh/CF2OTNLFvzk/SPEwsphsMU=;
+        b=WwZwOjAHn6x3oyujockXBWZ6B50BDFtgVK0Fd0cMzu9Ok0k7o3VShpCf2kT1fPClxh
+         +iIP/UijMWnTSX5CRJQWZ+SzmwdNaB7VIpKWARQltNnHdemhZ18VCD1BL0uOhK/ofvrx
+         R7w3LMpbulNm5aCd3oz9YNrquJNxEJ5Vz2NV6ZKUzUNAkC7n+wlFvOBcPGA20B1RqKVS
+         N/nLo8zhXsocAubN6mLU9IzO80RgBKUDWv1KxABWFa841Looe3o7sPU5dp4Rb0C0tQFk
+         dIWK1FQgbFNq1/txUl5+tx3jCnCkNhWS5ggIrZJO790/rB/n0wx2gQ5OmjthPSMcSSAH
+         WRUw==
+X-Gm-Message-State: AOJu0Yxq3y7Pomzcq6oPdEjUVsOX8vMA9HUBWTyrQ1cV5DP39yEydT/D
+	w7wD5abIok6b3YvKRXnbSSqy1DEVK1znag==
+X-Google-Smtp-Source: AGHT+IE2JPYDSdnC91XB6VS8ALR9CAAId19DXk2wcJ+rrETzGALp9s3m6m1Wb6EndIJy2wpJMovubg==
+X-Received: by 2002:a17:902:7789:b0:1ca:86b:7ed9 with SMTP id o9-20020a170902778900b001ca086b7ed9mr25916453pll.40.1701418801928;
+        Fri, 01 Dec 2023 00:20:01 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id bf3-20020a170902b90300b001cfc68aca48sm2715787plb.135.2023.12.01.00.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 00:20:01 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Florian Westphal <fw@strlen.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Marc Muehlfeld <mmuehlfe@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 00/10] Doc: update bridge doc
+Date: Fri,  1 Dec 2023 16:19:40 +0800
+Message-ID: <20231201081951.1623069-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/6] net: phy: at803x: add QCA8084 ethernet phy support
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        Andrew Lunn
-	<andrew@lunn.ch>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <hkallweit1@gmail.com>, <corbet@lwn.net>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231129120446.dfwei5cd7ulbdj4v@skbuf>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231129120446.dfwei5cd7ulbdj4v@skbuf>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 0x6xkabtDRX8pJ3fhNwWE3SLpZPFJCKB
-X-Proofpoint-GUID: 0x6xkabtDRX8pJ3fhNwWE3SLpZPFJCKB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_06,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
- bulkscore=0 clxscore=1011 spamscore=0 mlxlogscore=999 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2312010051
+Content-Transfer-Encoding: 8bit
 
+The current bridge kernel doc is too old. It only pointed to the
+linuxfoundation wiki page which lacks of the new features.
 
+Here let's start the new bridge document and put all the bridge info
+so new developers and users could catch up the last bridge status soon.
 
-On 11/29/2023 8:04 PM, Vladimir Oltean wrote:
-> On Wed, Nov 29, 2023 at 06:34:16PM +0800, Jie Luo wrote:
->>>> The PCS drivers in drivers/net/pcs/ should be in PHY side, such as
->>>> pcs-lynx.c and pcs-xpcs.c, they are configuring the MDIO device
->>>> registers.
->>>
->>> Wrong. No they are not. Just because they are accessed via MDIO does
->>> not mean they are in the PHY. MDIO can be used for more than just the
->>> PHY, and is on a lot of platforms.
->>>
->>> LX2160A for example has many MDIO buses, and the PCSes (of which there
->>> are multiple inside the chip, and use pcs-lynx) are accessed through
->>> the MDIO bus specific to each port. They are not MMIO mapped.
->>>
->>> The same is true on stmmac platforms, where xpcs is used - xpcs is the
->>> _MAC_ side PCS.
->>>
->>> Sorry but you are wrong.
->>>
->>
->> OK, but it creates the PCS driver based on the MDIO device in pcs-lynx.c
->> looks like this PCS is located in PHY device from hardware perspective.
-> 
-> In some ways, this contradiction has a potato-patato aspect to it.
-> As Russell says, NXP devices do have internal SGMII/USXGMII/10GBASE-R
-> ports which use pcs-lynx.c to access the registers of the PCS layer
-> (which are on MDIO buses internal to the SoC). They could legally be
-> called PHYs, because they have all the layers that 802.3 says a PHY
-> should have: a PCS, a PMA and a PMD.
-> 
-> But what phylib understands a phy_device to be is a more restricted
-> definition than just "a PHY - any PHY". Originally, phylib considered a
-> struct phy_device to be something (a discrete chip) that has pins and a
-> phy_interface_t towards its host side, and pins + an ethtool_link_mode_bit_indices
-> on its media side.
-> 
-> Traditionally, the media side is exclusively copper (BASE-T, BASE-T1) or
-> fiber (BASE-SX/LX).
-> 
-> A struct phy_device was then also used with PHY_INTERFACE_MODE_INTERNAL
-> to represent the built-in BASE-T PHYs that are embedded within certain
-> small/medium business Ethernet switches. And then, more and more other
-> similar embedded copper PHYs.
-> 
-> The idea is that (1) a phy_device connects to a remote system, and
-> (2) the phylib API does not have insight into the components of the
-> PHY it controls: PCS, PMA, PMD. It's all just a monolithic struct phy_device.
-> 
-> Because there are serial phy_interface_t modes where the MAC also need a
-> PHY to even connect to the phylib PHY, a problem presented itself:
-> phylib only has support for a single phy_device. So a new framework
-> appeared: phylink, which uses the unmodified phylib layer for the
-> external PHY, but models the MAC-side PHY using a different API. Later
-> on, that API became the phylink_pcs.
-> 
-> To muddy the waters, a phylink_pcs structure usually connects to another
-> local component as described above, like a phylib PHY (on-board or on an
-> SFP module). But it can also connect directly to a remote system (like a
-> phy_device would). But the phylink_pcs is always integrated in silicon
-> with the MAC, and the "media side" of it is a phy_interface_t type, not
-> an ethtool_link_mode_bit_indices type.
-> 
-> Having a separate phylink_pcs is what allows us to work around phylib's
-> limitation of having a single phy_device. The reverse is also true: you
-> can have a single phylink_pcs, and that belongs to the client MAC driver.
-> 
-> The other layers (PMA/PMD) of the MAC-side PHY are modeled in the kernel
-> as a struct phy (https://docs.kernel.org/driver-api/phy/index.html), and
-> we have the phy_set_mode_ext() API for reconfiguring this layer to a
-> different mode. Again, this is not applicable for phylib PHYs, which are
-> monolithic.
-> 
-> Given the above definitions, what NXP has and drives with pcs-lynx.c is
-> not a struct phy_device, but a MAC-side PCS represented by a phylink_pcs.
-> It absolutely does not matter that the register access method for the
-> PCS is an internal MDIO bus. FWIW, the PMA/PMD layer is at
-> drivers/phy/freescale/phy-fsl-lynx-28g.c.
-> 
-> So, if put into the proper context, what Russell is saying is correct,
-> but I think you need a bit of history to not get even more confused
-> about why it is the way it is.
+v3 -> v4:
+- Patch01: Reference and borrow definitions from the IEEE 802.1Q-2022 standard
+           for bridge (Stephen Hemminger)
+- Patch04: Remind that kAPI is unstable. Add back sysfs part, but only note
+           that sysfs is deprecated. (Stephen Hemminger, Florian Fainelli)
+- Patch05: Mention the RSTP and IEEE 802.1D developing info. (Stephen Hemminger)
+- Some other grammar fixes.
 
-Thanks Vladimir for the detail information, i just get this message, 
-which is helpful to me.
+v2 -> v3:
+- Split the bridge doc update and adding kAPI/uAPI field to 2 part (Nikolay Aleksandrov)
+- Update bridge and bridge enum descriptions (Nikolay Aleksandrov)
+- Add user space stp help for STP doc (Vladimir Oltean)
+
+v1 -> v2:
+- Update bridge and bridge port enum descriptions (Vladimir Oltean)
+
+RFCv3 -> v1:
+- Fix up various typos, grammar and technical issues (Nikolay Aleksandrov)
+
+RFCv2 -> RFCv3:
+- Update netfilter part (Florian Westphal)
+- Break the one large patch in to multiparts for easy reviewing. Please tell
+  me if I break it too much.. (Nikolay Aleksandrov)
+- Update the description of each enum and doc (Nikolay Aleksandrov)
+- Add more descriptions for STP/Multicast/VLAN.
+
+RFCv1 -> RFCv2:
+- Drop the python tool that generate iproute man page from kernel doc
+
+Hangbin Liu (10):
+  docs: bridge: update doc format to rst
+  net: bridge: add document for IFLA_BR enum
+  net: bridge: add document for IFLA_BRPORT enum
+  docs: bridge: Add kAPI/uAPI fields
+  docs: bridge: add STP doc
+  docs: bridge: add VLAN doc
+  docs: bridge: add multicast doc
+  docs: bridge: add switchdev doc
+  docs: bridge: add netfilter doc
+  docs: bridge: add other features
+
+ Documentation/networking/bridge.rst | 334 +++++++++++++++++-
+ include/uapi/linux/if_link.h        | 521 ++++++++++++++++++++++++++++
+ net/bridge/br_private.h             |   2 +
+ 3 files changed, 847 insertions(+), 10 deletions(-)
+
+-- 
+2.41.0
+
 
