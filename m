@@ -1,132 +1,65 @@
-Return-Path: <netdev+bounces-52806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EEA80041D
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:43:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF4580041A
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3383B2115B
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:43:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 284F21C20BE2
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586F1E575;
-	Fri,  1 Dec 2023 06:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56991DDC8;
+	Fri,  1 Dec 2023 06:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmRRsryR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y54S440A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6EE1717;
-	Thu, 30 Nov 2023 22:43:38 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1d011cdf562so1815905ad.2;
-        Thu, 30 Nov 2023 22:43:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701413018; x=1702017818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0yddnFS992tMf8yGV+gCO+8OPk9UQIAfSEyGw6gN3Wg=;
-        b=SmRRsryR6hj0rHJYcAK32p/YFzNMr0mqtojsO6Je8ZsvbygK3i0+JDijI9eQZs/otb
-         1vtYIorx9KEGRasoqmVexN+v5b3kpvPHqIPbpEybzheLzkbaTL5psvwEgYred47FN2bO
-         9I9DSBOqWeCuMDvNMd4H3dtSrBmvs48ZYAkprXH1DE+txJcjjoYoht29nV/4B7ig6Vvv
-         f+MgW3oE/uLfJC+/wxVnfSozgnfZaYbJG3NeB7CAtEqcNqE+6E7i4Ul05UJoUPUvA3xA
-         KBxcEj/XQFhxXmOEM5y6UVJ5OhOYNmrRnSrLNw6AHFekuPD66wrs51WK4pQIi5IjoTzT
-         lq3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701413018; x=1702017818;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0yddnFS992tMf8yGV+gCO+8OPk9UQIAfSEyGw6gN3Wg=;
-        b=PvMb7p1LWtghpLptWwbX9mDpcYJzIiv7eX971EELQKtS9tn5t/Jd/KFxaUe/Pq2WyJ
-         7RxsrgniktdMuMQISps9T0DzB5W4BJ6MbngL/Zg7UBC7bMgcdhCyUmYPnjrqJHQIxj0v
-         A5C3YrlPGjY5J5IkDZgFZZtPA9p400m/Akc7dnTRE4/O4jjEzzon9LD3Kdonk2kFENXa
-         mfaM1jUpxX2eCKNsD+jAn20WpYSrh6Ohu41tXN03bX3vQGOxL4exio0recEbnBBFucan
-         T+bz7obSTFaIgLFMJYHF7DuyrscdEIy31b3lE1DMNquJC1IPFC9L0iYVs2lpSoePmmGR
-         74Ug==
-X-Gm-Message-State: AOJu0YwqxVO2O9fDjGWoofa+/35u3vkXMrD1gGoKJZ2bUVXO1bRC1vP7
-	ZnfyV9a6j+moJbiBUjOXH0g=
-X-Google-Smtp-Source: AGHT+IFboOu7gJP78sklkMvQrBmjjz2znNFgUlTJUZhJQ7qyVuj7ZBA5CsHjP8pxCoVdxTaF2yz7kA==
-X-Received: by 2002:a17:903:2281:b0:1cf:ea64:f508 with SMTP id b1-20020a170903228100b001cfea64f508mr14180802plh.2.1701413017955;
-        Thu, 30 Nov 2023 22:43:37 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c20d00b001c737950e4dsm2526386pll.2.2023.11.30.22.43.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 22:43:37 -0800 (PST)
-Date: Fri, 1 Dec 2023 14:43:31 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Petr Machata <petrm@nvidia.com>,
-	James Prestwood <prestwoj@gmail.com>,
-	Jaehee Park <jhpark1013@gmail.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Francesco Ruggeri <fruggeri@arista.com>,
-	Xin Long <lucien.xin@gmail.com>
-Subject: Re: [PATCHv2 net-next 10/14] selftests/net: convert ioam6.sh to run
- it in unique namespace
-Message-ID: <ZWmAk9637Oo4HYOU@Laptop-X1>
-References: <20231130040105.1265779-1-liuhangbin@gmail.com>
- <20231130040105.1265779-11-liuhangbin@gmail.com>
- <4ab6e843-fd60-4abf-a23f-c8032e617f5c@uliege.be>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B618483;
+	Fri,  1 Dec 2023 06:43:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2828AC433C7;
+	Fri,  1 Dec 2023 06:43:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701413015;
+	bh=Ac2LAr8zXdRG53W9ecY2idG7L9BWseIgaVc9xlc+IgE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Y54S440AsWcq4zKgpUJwb6Eo2jPhoX7OEwix9AjAOplmg8KzsEW4mWPmVLbS/be5P
+	 zg67q/E27Rcg0tCBvZ+v84oAdnRUG6p9jBD7oGTR3YuBkahqq+0Kxteh/bDjpNGiSw
+	 SXsByEmi9u5DSNcdMyAxlUkY1QomkRcc+INawIab8L8ILnzh6ODZe/T09BdZYJ89C/
+	 aEYeUCIeSx5bWkt+MZOkk0i36rjzxGnSyYlT8vey+E5MfWKBR/LoCWpcASpjBUmrBK
+	 ojgOYv3sryOwtdjHI771ExnzToumZEpVsmO5+PQLFNIqni8jAgTdkodgZeM5BdLnZa
+	 bSY0whrHcPqNg==
+Date: Thu, 30 Nov 2023 22:43:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: mdio: replace deprecated strncpy with strscpy
+Message-ID: <20231130224334.1c1f08c9@kernel.org>
+In-Reply-To: <170138163205.3649164.7210516802378847737.b4-ty@chromium.org>
+References: <20231012-strncpy-drivers-net-mdio-mdio-gpio-c-v1-1-ab9b06cfcdab@google.com>
+	<170138163205.3649164.7210516802378847737.b4-ty@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ab6e843-fd60-4abf-a23f-c8032e617f5c@uliege.be>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 30, 2023 at 02:28:51PM +0100, Justin Iurman wrote:
-> On 11/30/23 05:01, Hangbin Liu wrote:
-> > Here is the test result after conversion.
-> > 
-> > ]# ./ioam6.sh
-> > 
-> > --------------------------------------------------------------------------
-> > OUTPUT tests
-> > --------------------------------------------------------------------------
-> > TEST: Unknown IOAM namespace (inline mode)                          [ OK ]
-> > TEST: Unknown IOAM namespace (encap mode)                           [ OK ]
-> > TEST: Missing trace room (inline mode)                              [ OK ]
-> > TEST: Missing trace room (encap mode)                               [ OK ]
-> > TEST: Trace type with bit 0 only (inline mode)                      [ OK ]
-> > ...
-> > TEST: Full supported trace (encap mode)                             [ OK ]
-> > 
-> > --------------------------------------------------------------------------
-> > GLOBAL tests
-> > --------------------------------------------------------------------------
-> > TEST: Forward - Full supported trace (inline mode)                  [ OK ]
-> > TEST: Forward - Full supported trace (encap mode)                   [ OK ]
-> > 
-> > - Tests passed: 88
-> > - Tests failed: 0
-> > 
-> > Acked-by: David Ahern <dsahern@kernel.org>
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+On Thu, 30 Nov 2023 14:00:33 -0800 Kees Cook wrote:
+> Applied to for-next/hardening, thanks!
 > 
-> Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
-> 
-> LGTM. Just one question though. Is there any reason not to use cleanup_ns
-> everywhere? There is the following diff (actually, 3 times):
+> [1/1] net: mdio: replace deprecated strncpy with strscpy
+>       https://git.kernel.org/kees/c/3247bb945786
 
-Hi Justin,
-
-Thanks for your review. There is no much intend. I just use del ns for one
-line change. And use cleanup_ns for multi line changes. I can make all
-ns delete via cleanup_ns in next version.
-
-BTW, I will use `cleanup_ns $ns || true` in next version as cleanup_ns
-could return none 0 in PATCHv2.
-
-Thanks
-Hangbin
+newer version of this was posted...
 
