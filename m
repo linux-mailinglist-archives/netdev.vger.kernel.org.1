@@ -1,92 +1,122 @@
-Return-Path: <netdev+bounces-53041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33EA801254
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:12:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C26A80126A
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5618BB20925
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:12:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B61F281469
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8954EB5B;
-	Fri,  1 Dec 2023 18:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A285E4F204;
+	Fri,  1 Dec 2023 18:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bo8RwCHr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ME+7xuSh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0982AFE
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 10:12:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701454360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eo7xap0NBkXGgcofC7Izp1aCkyA3LViMyhdVJuT5nbs=;
-	b=bo8RwCHrgc+qkIkV86gPA6yk50LPCec/poa2Zu+EsaRNhZxiAuZP2AxerhrZPZLRaozGMI
-	XJzUCHeCTh98Jflb1ZAyy/iY/xIVIeBH6PvZnGgnGKEsTtd7bQfR2ef7J8pM7OiB4fxDl/
-	EbX8bN7Ry0nsHRSwyO/kz4OuAoxN/mI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-rKdpOFvtPHOsG3_qNqahdw-1; Fri, 01 Dec 2023 13:12:37 -0500
-X-MC-Unique: rKdpOFvtPHOsG3_qNqahdw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54b40eba4e0so3421311a12.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 10:12:36 -0800 (PST)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8D1106
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 10:17:04 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d053c45897so7278625ad.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 10:17:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1701454624; x=1702059424; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=80BOfbzU3jRYQRqKUun9qybGXNm0Ak9QPhMAb8Oq5lY=;
+        b=ME+7xuShkkCd0062a9EL0L48UcVgl2XNVW5BRL6HrY/mg3DiShxSdpn7IJmQxj/w1W
+         y6Kih+9DYWaLfoqYp+5pe938En1UXK6dzqyoieMKZZnN5wPV/Uq1I9TVzm7jMnnSzyry
+         5cZjnWvfXpQLdgXob0ttJuENteq2/BltyHmws=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701454356; x=1702059156;
-        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eo7xap0NBkXGgcofC7Izp1aCkyA3LViMyhdVJuT5nbs=;
-        b=SdyjQCA4HF8VDeiZQIZeT1C2NknYF3CA/Oz5dJVeo+1A3AuF6F4gQZzZtZYDFShcE/
-         rKpqLeTP6dRYUauURl3HVTE1VyzdY7GwyFIJEbNoT+k8D2teMXC9JhhPEkGmzcvmL02z
-         nHGctXhwXU4McUK+QzsAumMao57q8qPntlQ6B+nDhAnC8RIH9RV9WQ56XMl9zvYZuBoR
-         FvRWZEHL0W7i/Z/eWC9Cg0InRVwFPwuKKYn+4ERHmRRqyyLr2fI7LuOStrSfMWSLGT/l
-         mOm4KVi/umxoTpx98k8LQsaUJIGK6kKgYYtnoVTnwBYXX5sPB9i8/D1Xes91tDoRMJjc
-         VBKw==
-X-Gm-Message-State: AOJu0Yws6rRqSE6WSp2vDCpLVbgzCG1nlqD+AjGcPsBIDJDxvalMO4S5
-	8VI0UrQMtTbTBmNu32ioj1wixrkay51I2AYC/cjv1cAlg6CQMYs9HCXGgqI9USX4XxUIX/QTw2q
-	82X7VYjD1Ukt81WqIpCsYs0aMS28A10ip
-X-Received: by 2002:aa7:c9d0:0:b0:54b:2760:d99a with SMTP id i16-20020aa7c9d0000000b0054b2760d99amr1985062edt.4.1701454355962;
-        Fri, 01 Dec 2023 10:12:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEIovzMkU9GGxm/lfiO9iFgkmLmHfKoGkE3JT3QTYZ4vsLfuDjE3meivBRZ+27lhp8Z91Wy1CPhL4dBwGQxqNE=
-X-Received: by 2002:aa7:c9d0:0:b0:54b:2760:d99a with SMTP id
- i16-20020aa7c9d0000000b0054b2760d99amr1985049edt.4.1701454355701; Fri, 01 Dec
- 2023 10:12:35 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 1 Dec 2023 10:12:34 -0800
-From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20231201175015.214214-1-pctammela@mojatatu.com> <20231201175015.214214-5-pctammela@mojatatu.com>
+        d=1e100.net; s=20230601; t=1701454624; x=1702059424;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=80BOfbzU3jRYQRqKUun9qybGXNm0Ak9QPhMAb8Oq5lY=;
+        b=RunHTGL8YMHndBQ9wOSpY8LFdybn2ZcUULbYQXE30KAwEqz4VY7JrvH1SAszZSDojF
+         7SfcKAZ8xzAZjSeGQC8XJHSOVu6kWnUpmF0o7GBbIZfZ5PpP0KjKab6Z0iraAaZ2p2Hs
+         TBJ8qsRlJJ4aLwZin06iyVSdBaOe5RDV7dzKWFCn31bG90zjAVfkcv1BWruFlji5k/id
+         /w+97+5fLM1iHE7ZfFRudNMbNHpA9k9jk4Y9ZCXVG+T+aF4G7XQV/nrKkRLV6sTvocYN
+         N4urfGQzQpa3mPLERjmI86Olqldja9EFPMNh6Gwm+jvKZBhNOuvfYVAOa3J0B1mGLJhq
+         mh9w==
+X-Gm-Message-State: AOJu0Yzv45qBKtjdL2Hdp2abCIVxhGibM+Es7wpN63ednkU187IuTsRC
+	DK0xlhVURvCLsebNM0X3/dReGw==
+X-Google-Smtp-Source: AGHT+IHL4QH3wU1zQC3wiy9r3528WOQq1iSHFfDCieTdatztPnIyrMoq50t3CKZORUjazAX/9P8zkg==
+X-Received: by 2002:a17:902:db06:b0:1cf:c376:6d7f with SMTP id m6-20020a170902db0600b001cfc3766d7fmr26246754plx.42.1701454623948;
+        Fri, 01 Dec 2023 10:17:03 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id l6-20020a170902d34600b001cfb99d8b82sm1570921plk.136.2023.12.01.10.17.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 10:17:03 -0800 (PST)
+Date: Fri, 1 Dec 2023 10:17:02 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kernel test robot <lkp@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Michael Walle <mwalle@kernel.org>,
+	Max Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] netlink: Return unsigned value for nla_len()
+Message-ID: <202312010953.BEDC06111@keescook>
+References: <20231130200058.work.520-kees@kernel.org>
+ <20231130172520.5a56ae50@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231201175015.214214-5-pctammela@mojatatu.com>
-Date: Fri, 1 Dec 2023 10:12:34 -0800
-Message-ID: <CALnP8Zaxp1D3gC8tqRwULdJVL1uSnpGUq43fyL-QRkVTjDFb1Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/4] net/sched: act_api: use
- tcf_act_for_each_action in tcf_idr_insert_many
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231130172520.5a56ae50@kernel.org>
 
-On Fri, Dec 01, 2023 at 02:50:15PM -0300, Pedro Tammela wrote:
-> The actions array is contiguous, so stop processing whenever a NULL
-> is found. This is already the assumption for tcf_action_destroy[1],
-> which is called from tcf_actions_init.
->
-> [1] https://elixir.bootlin.com/linux/v6.7-rc3/source/net/sched/act_api.c#L1115
->
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+On Thu, Nov 30, 2023 at 05:25:20PM -0800, Jakub Kicinski wrote:
+> On Thu, 30 Nov 2023 12:01:01 -0800 Kees Cook wrote:
+> > This has the additional benefit of being defensive in the face of nlattr
+> > corruption or logic errors (i.e. nla_len being set smaller than
+> > NLA_HDRLEN).
+> 
+> As Johannes predicted I'd rather not :(
+> 
+> The callers should put the nlattr thru nla_ok() during validation
+> (nla_validate()), or walking (nla_for_each_* call nla_ok()).
+> 
+> > -static inline int nla_len(const struct nlattr *nla)
+> > +static inline u16 nla_len(const struct nlattr *nla)
+> >  {
+> > -	return nla->nla_len - NLA_HDRLEN;
+> > +	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN : 0;
+> >  }
+> 
+> Note the the NLA_HDRLEN is the length of struct nlattr.
+> I mean of the @nla object that gets passed in as argument here.
+> So accepting that nla->nla_len may be < NLA_HDRLEN means
+> that we are okay with dereferencing a truncated object...
+> 
+> We can consider making the return unsinged without the condition maybe?
 
-Patch could have been squashed with patch 1, btw.
+Yes, if we did it without the check, it'd do "less" damage on
+wrap-around. (i.e. off by U16_MAX instead off by INT_MAX).
 
-Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+But I'd like to understand: what's the harm in adding the clamp? The
+changes to the assembly are tiny:
+https://godbolt.org/z/Ecvbzn1a1
 
+i.e. a likely dropped-from-the-pipeline xor and a "free" cmov (checking
+the bit from the subtraction). I don't think it could even get measured
+in real-world cycle counts. This is much like the refcount_t work:
+checking for the overflow condition has almost 0 overhead.
+
+(It looks like I should use __builtin_sub_overflow() to correctly hint
+GCC, but Clang gets it right without such hinting. Also I changed
+NLA_HDRLEN to u16 to get the best result, which suggests there might be
+larger savings throughout the code base just from that change...)
+
+-- 
+Kees Cook
 
