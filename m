@@ -1,88 +1,121 @@
-Return-Path: <netdev+bounces-52887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FFB48008D3
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:46:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF0F28008D7
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66C021C20F70
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:46:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59BA1B215D6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D481D550;
-	Fri,  1 Dec 2023 10:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60FA210F5;
+	Fri,  1 Dec 2023 10:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tmr5tUlC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWPKPFHs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3D510E5
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 02:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701427584;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6NA57GVpcAlUrYRXA0xtGWCe36ignqDZBMAU0zkJLz4=;
-	b=Tmr5tUlC4HfHUjaFNEbVZRRKEHw38i9IChfW/WcvUFSLLjB7JiY6/hPKO/9FbWn/WvXgmR
-	RAmlzHyBxjmQniGa7SpikcGX6uAdZrtLzekNSOH21PMKUPlygWeuYwJA39g3wBau2bXyx1
-	ijUTG4lADMnDTpNZD5hnm0C8nSTQ1Yo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-266-bWjaQz9HPTCrFgStonuXtQ-1; Fri,
- 01 Dec 2023 05:46:20 -0500
-X-MC-Unique: bWjaQz9HPTCrFgStonuXtQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AD7C3C0C127;
-	Fri,  1 Dec 2023 10:46:19 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 12C8E10E46;
-	Fri,  1 Dec 2023 10:46:16 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: stern@rowland.harvard.edu
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oneukum@suse.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH] net: usb: ax88179_178a: avoid failed operations when device is disconnected
-Date: Fri,  1 Dec 2023 11:46:14 +0100
-Message-ID: <20231201104615.173933-1-jtornosm@redhat.com>
-In-Reply-To: <e8e4ac26-9168-452c-80bc-f32904808cc9@rowland.harvard.edu>
-References: <e8e4ac26-9168-452c-80bc-f32904808cc9@rowland.harvard.edu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87491EB5D;
+	Fri,  1 Dec 2023 10:46:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F6A3C433C7;
+	Fri,  1 Dec 2023 10:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701427589;
+	bh=5zjayL88soz+UgJbryPsfFfFuCruLUpe7CIqCl/SLV8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SWPKPFHsSk8v67r+wzTQi1CO6hcbjUUpZE3vnilfgHHfZwu4IJFOQ5+rwbUdgPmLc
+	 yWtMqvr0cxc2sdZrbCSHK568MaEExBRSfpDet74hIw2pKTCMegAO8qkO+wBD57U//9
+	 730HNIMRIxuWCCJFQNjzcbx58JHzDGYi6owXtMvfOhgcSIwgOpoBgzUhFTnyt4XCDN
+	 e7Syzbndkz/v/VLblq4L9o8kSEXECELQ08REb4v+RuY+aRar9yp//iKZVGMv256t73
+	 o71Zp0tFHEerRmrytXpPlbRTZhyt+4VDNMgczQDGar2JHc9H5WbBlArbEMH4DACuda
+	 pFCJdIzQ48ioA==
+Message-ID: <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
+Date: Fri, 1 Dec 2023 11:46:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
+Content-Language: en-US
+To: Song Yoong Siang <yoong.siang.song@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Topel <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, bpf@vger.kernel.org, xdp-hints@xdp-project.net,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20231201062421.1074768-1-yoong.siang.song@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Alan,
 
-Thank you for your help.
-    
-> Another possibility would be to have the unbind routine set a flag in
-> the private data structure, and then make the ax88179_write_cmd() and
-> ax88179_read_cmd() routines avoid printing error messages if the flag is
-> set.  Or don't bother with the flag, and simply make the routines skip
-> printing an error message if a transfer fails with error code -ENODEV.
 
-Yes, I had thought about those possibilities and I think they are the only
-ones from the driver. As you are commenting as well, I will try a second
-version with that.
+On 12/1/23 07:24, Song Yoong Siang wrote:
+> This series expands XDP TX metadata framework to include ETF HW offload.
+> 
+> Changes since v1:
+> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
+> - rename launch-time to txtime
+> 
 
-Best regards
-José Ignacio
+I strongly disagree with this renaming (sorry to disagree with Willem).
 
+The i210 and i225 chips call this LaunchTime in their programmers 
+datasheets, and even in the driver code[1].
+
+Using this "txtime" name in the code is also confusing, because how can 
+people reading the code know the difference between:
+  - tmo_request_timestamp and tmo_request_txtime
+
+
+[1] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/tsn/code01_follow_qdisc_TSN_offload.org
+
+> v1: https://patchwork.kernel.org/project/netdevbpf/cover/20231130162028.852006-1-yoong.siang.song@intel.com/
+> 
+> Song Yoong Siang (3):
+>    xsk: add ETF support to XDP Tx metadata
+>    net: stmmac: Add txtime support to XDP ZC
+>    selftests/bpf: Add txtime to xdp_hw_metadata
+> 
+>   Documentation/netlink/specs/netdev.yaml        |  4 ++++
+>   Documentation/networking/xsk-tx-metadata.rst   |  5 +++++
+>   drivers/net/ethernet/stmicro/stmmac/stmmac.h   |  2 ++
+>   .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 13 +++++++++++++
+>   include/net/xdp_sock.h                         |  9 +++++++++
+>   include/net/xdp_sock_drv.h                     |  1 +
+>   include/uapi/linux/if_xdp.h                    |  9 +++++++++
+>   include/uapi/linux/netdev.h                    |  3 +++
+>   net/core/netdev-genl.c                         |  2 ++
+>   net/xdp/xsk.c                                  |  3 +++
+>   tools/include/uapi/linux/if_xdp.h              |  9 +++++++++
+>   tools/include/uapi/linux/netdev.h              |  3 +++
+>   tools/net/ynl/generated/netdev-user.c          |  1 +
+>   tools/testing/selftests/bpf/xdp_hw_metadata.c  | 18 +++++++++++++++++-
+>   14 files changed, 81 insertions(+), 1 deletion(-)
+> 
 
