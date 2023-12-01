@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-53019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5213280120F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:50:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 717BC801210
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3886B20C1F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF61828148F
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C464E630;
-	Fri,  1 Dec 2023 17:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067074EB32;
+	Fri,  1 Dec 2023 17:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="WD0wS3yU"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dWGL38WU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D15AC
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 09:50:33 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-2839b922c18so2154840a91.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 09:50:33 -0800 (PST)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE68FC
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 09:50:36 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cfbce92362so6031795ad.1
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 09:50:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701453033; x=1702057833; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+dZMHTWKZMoxoQs0cVr6KRd9m5G2En2sdYgF2ar58rg=;
-        b=WD0wS3yUmPWSHbM/2QFAszra6nSDtbkwL5asI3JsK2OHFTUhQkIONi2TGYvX2Yniml
-         Qedfl6sO29wOKfVAL/JwpXDTX6TrGyBoYXfzPi/v5T51ldWzOyFHyXY8O6reAloYdnz9
-         LzVUUH+CT+hJqjdRrLd1d7OaVZQjT7ipXzeMmYhW3BxbWujTO3Z+9iFDRWtEbdDAUd9O
-         M6GMip4jZyNeMdj0C1GCqI+3AfCewq2U/n9zVjNoPKpCDqRkG4g4feajJWuVyOZbA//8
-         EMCYqW+EHamSB8zyVKBDHQjE31YN5ta7hdKWRJ5w1BAoIVmT9gRQKDC4QW8HJzJodf6o
-         091Q==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701453036; x=1702057836; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TPiKsCCgA2C4rEsExgFz/FQnyM6xy20WmctuQWGyukM=;
+        b=dWGL38WUimaB0IKg/4WDwF2XMIte8nnduDltskwQcIMpgu9usljhaDLSmjeumOKuGo
+         Xf8VCMBIHQKWm+4cd77eBnEFdJCdqReuhuKF4UADUR8pg5nCepPoS3LYE4h7rwTXehRF
+         jUlCj5J1reXez9DONKPn/PrMuMJ9LhVtccjG1Ktd3B39Sk2H0tFmcKtq1f5YnYhYvVeF
+         +PK1yjKMcVa0zfg6SnCHMmvySTuhP69q0ICkclQbanhMruf3a2yRGj5ukeGMWYxEH7z7
+         IsABYSzPolqMCUMSYaAZGJkW0lUbr2CwQRkcT1UUaXad6q/u5lYlqH4wvvTg1rF45bgN
+         imyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701453033; x=1702057833;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+dZMHTWKZMoxoQs0cVr6KRd9m5G2En2sdYgF2ar58rg=;
-        b=TNddw+KsDmv3+0Y6BHQsA17W4oaz0NcJ8mijDIWqIRWxPR6kTkkbhX8+eyu3A34Hl9
-         BlCnvZscHpejT1u/jv32LoMP9dHGf4ZyuMEZRXyKqyXQeUKC+HWYC2ETcrVuH98SzoVR
-         JbjBbLggApt23Zm25rFVqvW5DinxmnPCth2UVYJlP7sWL419iZI6DDiLhf7/UJoPzI2x
-         w3vJbwGbO03Stbl7QaE+4piwArBD6/phyzaYgJyhEPKb37nXwTDHLcWUdcCrVBOVzefU
-         61XsqELdrS69HMbj2lrqevjvUg1vlOk+vKAKyvERhqimyh9eJqsmW9Go8vS888u6MHvs
-         Qp4A==
-X-Gm-Message-State: AOJu0YzctQjlrpcAEhkyFNmQnPKLfRC/G0KdkaCKyMZvRwLG5vtHH3iW
-	kOOZFWO1JZSOr2jIa3PyD01tJ6WVXI7YP9rtl24=
-X-Google-Smtp-Source: AGHT+IE7saAIaaBnMeGgCQpjxWYcIDNbnAeO7OGpEV8FbBtmvy5anCzTQZlgftf6eZ5FZphSE5Dalw==
-X-Received: by 2002:a17:90b:1989:b0:27d:1862:a494 with SMTP id mv9-20020a17090b198900b0027d1862a494mr26282680pjb.11.1701453032908;
-        Fri, 01 Dec 2023 09:50:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701453036; x=1702057836;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TPiKsCCgA2C4rEsExgFz/FQnyM6xy20WmctuQWGyukM=;
+        b=PCwh9Gbrw80KCyqKjtyt0w8/TKkZjM3zN0mdIVKJTCPhw+A4zFGRL304d32uFFcnzs
+         IXFeYndy5j++JL+CxG0GK6JRRGVSQJldCqumq1x6ySeKbulZms1udDkiIc8GHX1k5HJ+
+         vcOJSBOMLgla0WTkhJM5yN8+FIUCF2SQmUlmMt7kXBLrOi6CqadSUJYyb87UfXXGcGAZ
+         OyTx0ULtfWoclk7ml60+RshD9SgCed4KvH+KIxdVDPpm5G8SV5VjKbIJ74tM41oknWg0
+         ExLg6MlJUiXrsR2puLQniuN5RtGb6gwqTWpHXRxqLm+8TzCp0a8RH58aA3tF7bpp/Uv7
+         iilA==
+X-Gm-Message-State: AOJu0YwLNPpOodtckWzWeTAz9f/QepDO06TJsrCLABSqgdhqX5zWclh8
+	JsftG48BO5G632f9cMtF9OPjfTEgIaBXjdwewQQ=
+X-Google-Smtp-Source: AGHT+IF+gV41Y1G+V1C0T7kMSJnGIip8P9qm/tIHzKz42jzMWffVWpIePQzMAC5nBRIg4AiLkjlcWQ==
+X-Received: by 2002:a17:903:184:b0:1cf:bd98:633f with SMTP id z4-20020a170903018400b001cfbd98633fmr28782615plg.30.1701453036024;
+        Fri, 01 Dec 2023 09:50:36 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id v11-20020a1709028d8b00b001cca8a01e68sm3619729plo.278.2023.12.01.09.50.30
+        by smtp.gmail.com with ESMTPSA id v11-20020a1709028d8b00b001cca8a01e68sm3619729plo.278.2023.12.01.09.50.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 09:50:32 -0800 (PST)
+        Fri, 01 Dec 2023 09:50:35 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -63,10 +64,12 @@ Cc: davem@davemloft.net,
 	jiri@resnulli.us,
 	mleitner@redhat.com,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v2 0/4] net/sched: act_api: contiguous action arrays
-Date: Fri,  1 Dec 2023 14:50:11 -0300
-Message-Id: <20231201175015.214214-1-pctammela@mojatatu.com>
+Subject: [PATCH net-next v2 1/4] net/sched: act_api: use tcf_act_for_each_action
+Date: Fri,  1 Dec 2023 14:50:12 -0300
+Message-Id: <20231201175015.214214-2-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231201175015.214214-1-pctammela@mojatatu.com>
+References: <20231201175015.214214-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,28 +78,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When dealing with action arrays in act_api it's natural to ask if they
-are always contiguous (no NULL pointers in between). Yes, they are in
-all cases so far, so make use of the already present tcf_act_for_each_action
-macro to explicitly document this assumption.
+Use the auxiliary macro tcf_act_for_each_action in all the
+functions that expect a contiguous action array
 
-There was an instance where it was not, but it was refactorable (patch 2)
-to make the array contiguous.
+Suggested-by: Marcelo Ricardo Leitner <mleitner@redhat.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ net/sched/act_api.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-v1->v2:
-- Respin
-- Added Jamal's acked-by
-
-Pedro Tammela (4):
-  net/sched: act_api: use tcf_act_for_each_action
-  net/sched: act_api: avoid non-contiguous action array
-  net/sched: act_api: stop loop over ops array on NULL in
-    tcf_action_init
-  net/sched: act_api: use tcf_act_for_each_action in tcf_idr_insert_many
-
- net/sched/act_api.c | 57 ++++++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 27 deletions(-)
-
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index c39252d61ebb..05aae374c159 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1118,8 +1118,7 @@ int tcf_action_destroy(struct tc_action *actions[], int bind)
+ 	struct tc_action *a;
+ 	int ret = 0, i;
+ 
+-	for (i = 0; i < TCA_ACT_MAX_PRIO && actions[i]; i++) {
+-		a = actions[i];
++	tcf_act_for_each_action(i, a, actions) {
+ 		actions[i] = NULL;
+ 		ops = a->ops;
+ 		ret = __tcf_idr_release(a, bind, true);
+@@ -1211,8 +1210,7 @@ int tcf_action_dump(struct sk_buff *skb, struct tc_action *actions[],
+ 	int err = -EINVAL, i;
+ 	struct nlattr *nest;
+ 
+-	for (i = 0; i < TCA_ACT_MAX_PRIO && actions[i]; i++) {
+-		a = actions[i];
++	tcf_act_for_each_action(i, a, actions) {
+ 		nest = nla_nest_start_noflag(skb, i + 1);
+ 		if (nest == NULL)
+ 			goto nla_put_failure;
+@@ -1753,10 +1751,10 @@ static int tca_action_flush(struct net *net, struct nlattr *nla,
+ 
+ static int tcf_action_delete(struct net *net, struct tc_action *actions[])
+ {
++	struct tc_action *a;
+ 	int i;
+ 
+-	for (i = 0; i < TCA_ACT_MAX_PRIO && actions[i]; i++) {
+-		struct tc_action *a = actions[i];
++	tcf_act_for_each_action(i, a, actions) {
+ 		const struct tc_action_ops *ops = a->ops;
+ 		/* Actions can be deleted concurrently so we must save their
+ 		 * type and id to search again after reference is released.
+@@ -1768,7 +1766,7 @@ static int tcf_action_delete(struct net *net, struct tc_action *actions[])
+ 		if (tcf_action_put(a)) {
+ 			/* last reference, action was deleted concurrently */
+ 			module_put(ops->owner);
+-		} else  {
++		} else {
+ 			int ret;
+ 
+ 			/* now do the delete */
 -- 
 2.40.1
 
