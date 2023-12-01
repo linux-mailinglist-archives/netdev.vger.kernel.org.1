@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-52997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A068010CB
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:11:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D75198010CD
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA1D4B21364
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:11:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CC70B20EB5
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071DD4E1C4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B1B4E1DA;
 	Fri,  1 Dec 2023 17:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VS+kEXsf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fpvNaS+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 561AC10D;
-	Fri,  1 Dec 2023 09:11:38 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 33608240003;
-	Fri,  1 Dec 2023 17:11:36 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0351AD;
+	Fri,  1 Dec 2023 09:11:39 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2010724000C;
+	Fri,  1 Dec 2023 17:11:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
 	t=1701450697;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/z2GMSwZ2UNGYr5iLjjY4QG91gNCEh1rLR6YA/r15IU=;
-	b=VS+kEXsfEbj8IFlCLn5iQVx4V5vkUNQ3Q6MBf3zIq1X+CvXWW6Wc/HuuqmDvztos2dKMH0
-	QJNi54KAhKmBfZ+zlhbD9BK0iXzhAqVYX1Nr2zT3DB5KtcCuAJ0tYtyEA8zPGNEzvdzgon
-	fkk3OTWe0cQ34Ux7TyC+lwEw+/3/CpOZ6ENnnkCdmHUrxD48wuzrlEEOfVI3q+x4qD12ik
-	PmX5/qOoPoTJw+Mt9P83ZjAFNilbeTUwK7J5hqaUoZakwG8RIrmndtS84GKHcOXri4qVTW
-	DVZdhuEGOJuxBfCTv/bxCwHmUgRf+Ykdq4KCQY/UMtkWtJVJROsn8ej52rzvGw==
+	bh=w9oMddiV8aUR1P9MAu7yoBPmutS8btmPB15oO7Ga9UA=;
+	b=fpvNaS+FPAm5220u5ro+VpiziU9YQlmfoVs8MNNbO0zUE/VFS+ybtfgFRijXIYqZmTlsmL
+	gJ2RgEf04tefj57Tjx4wkZMCErFWn1q13IzIkKQSKb5kzC4N0czg5jL6dUF3jLbRe+BH7A
+	SKptssLtNlC1QuHRK42pR/Bg9I5wHZRSzAt7dwdaqd2TvugM6oHQiwMYGQXEglZUh5PgAI
+	k85UwuO/jDlEMAvGxeLNaEOdzcCzOLwGjQHnHsXIH/cB8m+s4rKGC211DLbUiYLpD8qcni
+	1JYEilko/icTcsyylLnVxbLukElmDQWSR5vhQ9d7AZn0Hag9SlMPa8ed5Ps7MQ==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 01 Dec 2023 18:10:23 +0100
-Subject: [PATCH net-next v2 1/8] net: pse-pd: Rectify and adapt the naming
- of admin_cotrol member of struct pse_control_config
+Date: Fri, 01 Dec 2023 18:10:24 +0100
+Subject: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power Equipment
+ with c33 (PoE) alongside PoDL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,8 +43,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231201-feature_poe-v2-1-56d8cac607fa@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
 References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
 In-Reply-To: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -63,92 +63,219 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
 X-Mailer: b4 0.12.4
 X-GND-Sasl: kory.maincent@bootlin.com
 
-In commit 18ff0bcda6d1 ("ethtool: add interface to interact with Ethernet
-Power Equipment"), the 'pse_control_config' structure was introduced,
-housing a single member labeled 'admin_cotrol' responsible for maintaining
-the operational state of the PoDL PSE functions.
+In the current PSE interface for Ethernet Power Equipment, support is
+limited to PoDL. This patch extends the interface to accommodate the
+objects specified in IEEE 802.3-2022 145.2 for Power sourcing
+Equipment (PSE).
 
-A noticeable typographical error exists in the naming of this field
-('cotrol' should be corrected to 'control'), which this commit aims to
-rectify.
+The following objects are now supported and considered mandatory:
+- IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus
+- IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+- IEEE 802.3-2022 30.9.1.2.1 aPSEAdminControl
 
-Furthermore, with upcoming extensions of this structure to encompass PoE
-functionalities, the field is being renamed to 'podl_admin_state' to
-distinctly indicate that this state is tailored specifically for PoDL."
+To avoid confusion between "PoDL PSE" and "PoE PSE", which have similar
+names but distinct values, we have followed the suggestion of Oleksij
+Rempel and Andrew Lunn to maintain separate naming schemes for each,
+using c33 (clause 33) prefix for "PoE PSE".
+You can find more details in the discussion threads here:
+https://lore.kernel.org/netdev/20230912110637.GI780075@pengutronix.de/
+https://lore.kernel.org/netdev/2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch/
 
 Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/pse_regulator.c | 8 ++++----
- include/linux/pse-pd/pse.h         | 4 ++--
- net/ethtool/pse-pd.c               | 2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/pse-pd/pse_regulator.c b/drivers/net/pse-pd/pse_regulator.c
-index e2bf8306ca90..1dedf4de296e 100644
---- a/drivers/net/pse-pd/pse_regulator.c
-+++ b/drivers/net/pse-pd/pse_regulator.c
-@@ -31,10 +31,10 @@ pse_reg_ethtool_set_config(struct pse_controller_dev *pcdev, unsigned long id,
- 	struct pse_reg_priv *priv = to_pse_reg(pcdev);
- 	int ret;
- 
--	if (priv->admin_state == config->admin_cotrol)
-+	if (priv->admin_state == config->podl_admin_control)
- 		return 0;
- 
--	switch (config->admin_cotrol) {
-+	switch (config->podl_admin_control) {
- 	case ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED:
- 		ret = regulator_enable(priv->ps);
- 		break;
-@@ -43,14 +43,14 @@ pse_reg_ethtool_set_config(struct pse_controller_dev *pcdev, unsigned long id,
- 		break;
- 	default:
- 		dev_err(pcdev->dev, "Unknown admin state %i\n",
--			config->admin_cotrol);
-+			config->podl_admin_control);
- 		ret = -ENOTSUPP;
- 	}
- 
- 	if (ret)
- 		return ret;
- 
--	priv->admin_state = config->admin_cotrol;
-+	priv->admin_state = config->podl_admin_control;
- 
- 	return 0;
- }
+Changes in v2:
+- Rename all the PoE variables and enum with a c33 prefix.
+- Add documentation, thanks to Oleksij for having written one.
+---
+ Documentation/networking/pse-pd/introduction.rst | 73 ++++++++++++++++++++++++
+ include/linux/pse-pd/pse.h                       |  9 +++
+ include/uapi/linux/ethtool.h                     | 43 ++++++++++++++
+ include/uapi/linux/ethtool_netlink.h             |  3 +
+ 4 files changed, 128 insertions(+)
+
+diff --git a/Documentation/networking/pse-pd/introduction.rst b/Documentation/networking/pse-pd/introduction.rst
+new file mode 100644
+index 000000000000..e213083b9aff
+--- /dev/null
++++ b/Documentation/networking/pse-pd/introduction.rst
+@@ -0,0 +1,73 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++Power Sourcing Equipment (PSE) in IEEE 802.3 Standard
++=====================================================
++
++Overview
++--------
++
++Power Sourcing Equipment (PSE) is essential in networks for delivering power
++along with data over Ethernet cables. It usually refers to devices like
++switches and hubs that supply power to Powered Devices (PDs) such as IP
++cameras, VoIP phones, and wireless access points.
++
++PSE vs. PoDL PSE
++----------------
++
++PSE in the IEEE 802.3 standard generally refers to equipment that provides
++power alongside data over Ethernet cables, typically associated with Power over
++Ethernet (PoE).
++
++PoDL PSE, or Power over Data Lines PSE, specifically denotes PSEs operating
++with single balanced twisted-pair PHYs, as per Clause 104 of IEEE 802.3. PoDL
++is significant in contexts like automotive and industrial controls where power
++and data delivery over a single pair is advantageous.
++
++IEEE 802.3-2018 Addendums and Related Clauses
++----------------------------------------------
++
++Key addenda to the IEEE 802.3-2018 standard relevant to power delivery over
++Ethernet are as follows:
++
++- **802.3af (Approved in 2003-06-12)**: Known as PoE in the market, detailed in
++  Clause 33, delivering up to 15.4W of power.
++- **802.3at (Approved in 2009-09-11)**: Marketed as PoE+, enhancing PoE as
++  covered in Clause 33, increasing power delivery to up to 30W.
++- **802.3bt (Approved in 2018-09-27)**: Known as 4PPoE in the market, outlined
++  in Clause 33. Type 3 delivers up to 60W, and Type 4 up to 100W.
++- **802.3bu (Approved in 2016-12-07)**: Formerly referred to as PoDL, detailed
++  in Clause 104. Introduces Classes 0 - 9. Class 9 PoDL PSE delivers up to ~65W
++
++Kernel Naming Convention Recommendations
++----------------------------------------
++
++For clarity and consistency within the Linux kernel's networking subsystem, the
++following naming conventions are recommended:
++
++- For general PSE (PoE) code, use "c33_pse" key words. For example:
++  ``enum ethtool_c33_pse_admin_state c33_admin_control;``.
++  This aligns with Clause 33, encompassing various PoE forms.
++
++- For PoDL PSE - specific code, use "podl_pse". For example:
++  ``enum ethtool_podl_pse_admin_state podl_admin_control;`` to differentiate
++  PoDL PSE settings according to Clause 104.
++
++Summary of Clause 33: Data Terminal Equipment (DTE) Power via Media Dependent Interface (MDI)
++-------------------------------------------------------------------------------------------
++
++Clause 33 of the IEEE 802.3 standard defines the functional and electrical
++characteristics of Powered Device (PD) and Power Sourcing Equipment (PSE).
++These entities enable power delivery using the same generic cabling as for data
++transmission, integrating power with data communication for devices such as
++10BASE-T, 100BASE-TX, or 1000BASE-T.
++
++Summary of Clause 104: Power over Data Lines (PoDL) of Single Balanced Twisted-Pair Ethernet
++-------------------------------------------------------------------------------------------
++
++Clause 104 of the IEEE 802.3 standard delineates the functional and electrical
++characteristics of PoDL Powered Devices (PDs) and PoDL Power Sourcing Equipment
++(PSEs). These are designed for use with single balanced twisted-pair Ethernet
++Physical Layers. In this clause, 'PSE' refers specifically to PoDL PSE, and
++'PD' to PoDL PD. The key intent is to provide devices with a unified interface
++for both data and the power required to process this data over a single
++balanced twisted-pair Ethernet connection.
 diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index fb724c65c77b..199cf4ae3cf2 100644
+index 199cf4ae3cf2..be4e5754eb24 100644
 --- a/include/linux/pse-pd/pse.h
 +++ b/include/linux/pse-pd/pse.h
-@@ -15,11 +15,11 @@ struct pse_controller_dev;
- /**
-  * struct pse_control_config - PSE control/channel configuration.
+@@ -17,9 +17,12 @@ struct pse_controller_dev;
   *
-- * @admin_cotrol: set PoDL PSE admin control as described in
-+ * @podl_admin_control: set PoDL PSE admin control as described in
+  * @podl_admin_control: set PoDL PSE admin control as described in
   *	IEEE 802.3-2018 30.15.1.2.1 acPoDLPSEAdminControl
++ * @c33_admin_control: set PSE admin control as described in
++ *	IEEE 802.3-2022 30.9.1.2.1 acPSEAdminControl
   */
  struct pse_control_config {
--	enum ethtool_podl_pse_admin_state admin_cotrol;
-+	enum ethtool_podl_pse_admin_state podl_admin_control;
+ 	enum ethtool_podl_pse_admin_state podl_admin_control;
++	enum ethtool_c33_pse_admin_state c33_admin_control;
  };
  
  /**
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index cc478af77111..aef57a058f0d 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -130,7 +130,7 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
- 	struct phy_device *phydev;
+@@ -29,10 +32,16 @@ struct pse_control_config {
+  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+  * @podl_pw_status: power detection status of the PoDL PSE.
+  *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
++ * @c33_admin_state: operational state of the PSE
++ *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
++ * @c33_pw_status: power detection status of the PSE.
++ *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
+  */
+ struct pse_control_status {
+ 	enum ethtool_podl_pse_admin_state podl_admin_state;
+ 	enum ethtool_podl_pse_pw_d_status podl_pw_status;
++	enum ethtool_c33_pse_admin_state c33_admin_state;
++	enum ethtool_c33_pse_pw_d_status c33_pw_status;
+ };
  
- 	/* this values are already validated by the ethnl_pse_set_policy */
--	config.admin_cotrol = nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL]);
-+	config.podl_admin_control = nla_get_u32(tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL]);
+ /**
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index f7fba0dc87e5..1d1631f009fa 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -752,6 +752,49 @@ enum ethtool_module_power_mode {
+ 	ETHTOOL_MODULE_POWER_MODE_HIGH,
+ };
  
- 	phydev = dev->phydev;
- 	if (!phydev) {
++/**
++ * enum ethtool_c33_pse_admin_state - operational state of the PoDL PSE
++ *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN: state of PSE functions is unknown
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED: PSE functions are disabled
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED: PSE functions are enabled
++ */
++enum ethtool_c33_pse_admin_state {
++	ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
++	ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED,
++};
++
++/**
++ * enum ethtool_c33_pse_pw_d_status - power detection status of the PSE.
++ *	IEEE 802.3-2022 30.9.1.1.3 aPoDLPSEPowerDetectionStatus:
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN: PSE status is unknown
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: "The enumeration “disabled”
++ *	indicates that the PSE State diagram is in the state DISABLED."
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: "The enumeration “searching”
++ *	indicates the PSE State diagram is in a state other than those
++ *	listed."
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: "The enumeration
++ *	“deliveringPower” indicates that the PSE State diagram is in the
++ *	state POWER_ON."
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: "The enumeration “test” indicates that
++ *	the PSE State diagram is in the state TEST_MODE."
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: "The enumeration “fault” indicates that
++ *	the PSE State diagram is in the state TEST_ERROR."
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: "The enumeration “otherFault”
++ *	indicates that the PSE State diagram is in the state IDLE due to
++ *	the variable error_condition = true."
++ */
++enum ethtool_c33_pse_pw_d_status {
++	ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED,
++	ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_TEST,
++	ETHTOOL_C33_PSE_PW_D_STATUS_FAULT,
++	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
++};
++
+ /**
+  * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
+  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+index 73e2c10dc2cc..ba805285e408 100644
+--- a/include/uapi/linux/ethtool_netlink.h
++++ b/include/uapi/linux/ethtool_netlink.h
+@@ -895,6 +895,9 @@ enum {
+ 	ETHTOOL_A_PODL_PSE_ADMIN_STATE,		/* u32 */
+ 	ETHTOOL_A_PODL_PSE_ADMIN_CONTROL,	/* u32 */
+ 	ETHTOOL_A_PODL_PSE_PW_D_STATUS,		/* u32 */
++	ETHTOOL_A_C33_PSE_ADMIN_STATE,		/* u32 */
++	ETHTOOL_A_C33_PSE_ADMIN_CONTROL,	/* u32 */
++	ETHTOOL_A_C33_PSE_PW_D_STATUS,		/* u32 */
+ 
+ 	/* add new constants above here */
+ 	__ETHTOOL_A_PSE_CNT,
 
 -- 
 2.25.1
