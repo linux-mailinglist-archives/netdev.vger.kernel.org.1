@@ -1,130 +1,101 @@
-Return-Path: <netdev+bounces-52914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFA0E800B49
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:54:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441E0800B53
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 305E4B210A1
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:54:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07474281380
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6942511E;
-	Fri,  1 Dec 2023 12:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58A72554C;
+	Fri,  1 Dec 2023 12:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S455FoSG"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="EB7lMl11"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC796FAE;
-	Fri,  1 Dec 2023 12:54:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F842C433C7;
-	Fri,  1 Dec 2023 12:54:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701435289;
-	bh=P2FL1X4NYqxVthjCO0D7cIJ1azpBuuilQifHoY07bP0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S455FoSG61mKUZ0is+keMFfTLXDjVj5qHdJSdCDuJtnfdhFd59umsj0Qraz5QUSwf
-	 O6xLSMIAtj/keM3GF1GIivC/TU6Dz1lhO8uvti4aWfevRwetDFrKS4L6WfnITjiY9r
-	 5Ywc47VF4aDh6p9t83rUERypvudy9l81ny9AVYEDVdMiFv1TPr83s+a34e2CIVgW/m
-	 bhMDCWTGCjh5W6nJ6d+ldXEhFKWdFXKw71z3QSw2VnU7dkhSm3yuloFGvlgKfJCReq
-	 blm3J23UZ3MDH/elWzVMsT+uEi0kbNHkePaQdeaWVWZyFhXN+IFcUbBzjkRznvbY4y
-	 UTMCDmQhwORMA==
-Date: Fri, 1 Dec 2023 13:54:39 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alexey Tikhonov <atikhono@redhat.com>
-Cc: linux-man@vger.kernel.org, libc-alpha@sourceware.org,
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7997110E2
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 04:58:48 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c9b5b72983so27925401fa.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 04:58:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701435527; x=1702040327; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D6nPMIeiOzXojMtOnec9dlfj2tC6M+GsyaRnfz50osY=;
+        b=EB7lMl11UY1P0KDuFap6sqcY8ZodnRZ/rMZ2JLkkTcJ1v1rnC1LV6Px2k3WkvsYEWQ
+         6huWq1MnfbkMU9xFgXEzQYPr5wSFv6jqQsPqR7jHm8t9Q8wZwLtu+ufyv89daLTho1KC
+         uKeGA98alerPnnHx4FHB2k0L/RV0lm4VG6YAT63tSQhNtzX11OaaTerh1bWtbLFNWszf
+         nbxBn8IbBmO2Ujs8BGd8LUROxudQj9nGdpXBxJIIo6fgkZ27+NjCrK44JxMqk6AbkIw3
+         5ZLX/70jUFR+9T0nY26WVr8FH8jmJxV17t1KaSdBHRBJOA9Efk07PSEWSNJsmjB2Wz/X
+         ZnCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701435527; x=1702040327;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D6nPMIeiOzXojMtOnec9dlfj2tC6M+GsyaRnfz50osY=;
+        b=Mtc+wwTJZIZrvYPhaJ4PasOSJaWe2C88qp+GkX74MTRXxQ0sOvDkcWbh2W6lwVHgx4
+         iE2u3MVLcQAqP4EtVhY2Pq5sCouG7zUw2Ns4PB+zB5OL4ZjteiZSOSlwhN44uysbVhOJ
+         ubzue0ZzIykA+qNllX2Qi2QTE+xHaLPZicRNWta6KrH8DgCopFXLvkkxmqr+/dCQZ/id
+         pet3rXRZZdeznC99cKvEh0oYHRqwwwQi/snCZ8ncjRoYloEsIxHgDpMx39LqJmYuwfbE
+         C42JVYEOfOwo5//rzhDIUoPNjJU3w3RHajB3bsU5KtwCatib3FeOlEwaClebKY92BMWI
+         Ieiw==
+X-Gm-Message-State: AOJu0YzP5ebUViAGh3kGVktynvVSGDamQBlvvs0R+fatzi2va3/YYf0z
+	sw70yMu3vpaQZr+xZQ7AWBVyIA==
+X-Google-Smtp-Source: AGHT+IHONMOZIyUDFFN6eU5oJ0ZXKF+mjcNGH45TJTId6KrCw9eoKyFNHdjMtwI7/P1W8RxBletgIg==
+X-Received: by 2002:a2e:9911:0:b0:2c9:baac:2e8c with SMTP id v17-20020a2e9911000000b002c9baac2e8cmr787430lji.35.1701435526566;
+        Fri, 01 Dec 2023 04:58:46 -0800 (PST)
+Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id z13-20020a05651c11cd00b002c02b36d381sm417036ljo.88.2023.12.01.04.58.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 04:58:46 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
 	netdev@vger.kernel.org
-Subject: Re: UNIX(7)
-Message-ID: <ZWnXlcsVJfPO1Qsb@debian>
-References: <CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8Z+gf2kznWouErA@mail.gmail.com>
+Subject: [PATCH net-next 0/4] net: dsa: mv88e6xxx: Add "eth-mac" and "rmon" counter group support
+Date: Fri,  1 Dec 2023 13:58:08 +0100
+Message-Id: <20231201125812.1052078-1-tobias@waldekranz.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="iLiW9yrc7Uo/hPBs"
-Content-Disposition: inline
-In-Reply-To: <CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8Z+gf2kznWouErA@mail.gmail.com>
+Organization: Addiva Elektronik
+Content-Transfer-Encoding: 8bit
 
+The majority of the changes (1/4) are about refactoring the existing
+ethtool statistics support to make it possible to read individual
+counters, rather than the whole set.
 
---iLiW9yrc7Uo/hPBs
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 1 Dec 2023 13:54:39 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alexey Tikhonov <atikhono@redhat.com>
-Cc: linux-man@vger.kernel.org, libc-alpha@sourceware.org,
-	netdev@vger.kernel.org
-Subject: Re: UNIX(7)
+2/4 tries to collect all information about a stat in a single place
+using a mapper macro, which is then used to generate the original list
+of stats, along with a matching enum. checkpatch is less than amused
+with this construct, but prior art exists (__BPF_FUNC_MAPPER in
+include/uapi/linux/bpf.h, for example). Is there a better way forward?
 
-Hello Alexey,
+With that in place, adding the actual counter groups is pretty
+straight forward (3-4/4).
 
-On Fri, Dec 01, 2023 at 01:16:27PM +0100, Alexey Tikhonov wrote:
-> Hello.
->=20
-> There is a discrepancy between the man page description of
-> 'SO_PEERCRED' and real behavior.
->=20
-> `man 7 unix` states:
-> ```
->        SO_PEERCRED
->               This read-only socket option returns the credentials of
->               the peer process connected to this socket.  The returned
->               credentials are those that were in effect at the time of
->               the call to connect(2) or socketpair(2).
-> ```
->=20
-> This doesn't match real behavior in following situation (just an example):
->  - process starts with uid=3D0, gid=3D0
->  - process creates UNIX socket, binds it, listens on it
->  - process changes to uid=3Duid1, git=3Dgid1 (using `setresuid()`, `setre=
-sgid()`)
->  - another process connects to the listening socket and requests
-> peer's credentials using `getsockopt(... SOL_SOCKET, SO_PEERCRED ...)`
->=20
-> According to the man page: SO_PEERCRED should report (uid1, gid1),
-> because peer process was running under (uid1, gid1) "at the time of
-> the call to connect(2)"
-> In reality SO_PEERCRED reports (0, 0)
-> Reproducing code is available in
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D2247682
->=20
-> I'm not entirely sure if this is a real bug or rather a  poor
-> description in the man page, but I tend to think that it's the latter.
+Tobias Waldekranz (4):
+  net: dsa: mv88e6xxx: Create API to read a single stat counter
+  net: dsa: mv88e6xxx: Give each hw stat an ID
+  net: dsa: mv88e6xxx: Add "eth-mac" counter group support
+  net: dsa: mv88e6xxx: Add "rmon" counter group support
 
-I've CCed netdev@, since they probably know better.
+ drivers/net/dsa/mv88e6xxx/chip.c | 405 +++++++++++++++++++++----------
+ drivers/net/dsa/mv88e6xxx/chip.h |  27 ++-
+ 2 files changed, 288 insertions(+), 144 deletions(-)
 
-Thanks,
-Alex
+-- 
+2.34.1
 
---
-<https://www.alejandro-colomar.es/>
-
---iLiW9yrc7Uo/hPBs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmVp148ACgkQnowa+77/
-2zJQ2RAAqk/Ru/IR6r6G21jdLgAsbPRMR4TDQcFdPq1oci+Hgzzcn+K6QATiPW/W
-D9a7UKSJHaYaZeaxLFZS/QO5Wwp+SeP0PmKFqFcTnJLfKKnRnP8sfwSI1zCp/X8i
-uzzeVbEfZMbED70uKoLioJ/dZQbLyG9M6u8wLRQVWTIJv641wuYWfKJQI74dU4Rv
-6ymu9EB6rrqwcZwctyK5c88Ldu4vYLux2JmNPDSIyi34c5R6a4GWJuVldem7yHDm
-YJ38K1U2YnrThRy9PXsw7CRkgaegwYqYK4838710vleLFcmMC5pIDGlmBfX+PJ0B
-g9F21OICYBFNqMzEXNANEO2vM8wRN+dUagnUCp27S8kmtVeJoO1JCLN3VsS58yWR
-vTUqZuLG9i0mo2gGjaWFdeSF9J7wpvymVfXQJ41ehWi+XnYpqmbyOlzyA5lbX+ej
-hPI0Z7IrClOePKXOPHNFdXI0egkhHDJEtmCDlNQzl/CO52Ef7qm3cbMZ8v+gRRrF
-rPR3v7N4eOfbUvLZIw+6P2W+JAV4tvBXhDWDP1jw4qoVW/Bzmm+gMk2136W2Vq8N
-5WH4u1oPuRH9hNkhtOCWbL6RSgDNvHZBoK1H5PM0tvm+AaD1G+mfg444NcMnSRDY
-YdQNew3UNIuyEa5BnGYu7NmFFPmsivu/koXbHdhppSmHk+igWWM=
-=77os
------END PGP SIGNATURE-----
-
---iLiW9yrc7Uo/hPBs--
 
