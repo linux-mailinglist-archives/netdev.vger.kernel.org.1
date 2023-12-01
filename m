@@ -1,89 +1,105 @@
-Return-Path: <netdev+bounces-52869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C03CB8007F6
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:11:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B97B8007FA
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:12:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C024281B27
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:11:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D5E281EC6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4071DDCC;
-	Fri,  1 Dec 2023 10:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B194A208BB;
+	Fri,  1 Dec 2023 10:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="BQlNUb26"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED0384;
-	Fri,  1 Dec 2023 02:11:28 -0800 (PST)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5d3d5b10197so9943577b3.2;
-        Fri, 01 Dec 2023 02:11:28 -0800 (PST)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8DEA84
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 02:12:29 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40b4734b975so19927905e9.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 02:12:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1701425548; x=1702030348; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L7QCxPC+fYseWuexTotpYyV8w/1vbCfusdIIG1y6MSo=;
+        b=BQlNUb264snWlw0B00LGXp5/042MwtsgtDbH+CeSH3REN7+E74AOMvAfJPoR3n1WDk
+         v3iurBDviPU3WXMLUpQWHopO1kXFG55fWKTwGVFaJvxWBdTiGayaXpeVGXX+Smyq+5Eq
+         mlkBJ9UciAWg2KYOkgSK+PHg5BzySTSzyfmfAhc1kT8H316q8XJxRUkFFZf5MiC0WbAw
+         YFzOndpsKuYk9eToMohENbCoAl1W2s9NHDgMyoD8DT3GGH489My13WvToPVrWPwv/H/o
+         zr4DuZWjvnJh7xW0RL3maiCK+R5wF6vB4wNx6YyTjrM1Getyn8wYUUC1MUcw3eQBAsTN
+         GDSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701425487; x=1702030287;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4C8ps9IR9RDt6FA4GKz0FWqJd8X49zk3Wo87ga7yHog=;
-        b=D3n7WezcvN2fxvjPyFnUm1tYq+Wm/5DeyOfpyfWZFZCIUctqCJJAocq5mfEYCOkckF
-         /UN60uH5y7jPd5aGghjJkGKqdegzKzH4aK5GV8EKqQ8aGi+svMNpKZTaiXj8Q2Byin5A
-         FMg+IFOv0apa9kABsXXixgjzPAB0X++bauaFGAWC7709Mml7Qby/QxTS5CsL3jQ6N0Yi
-         4QOdT39gzXNxC4B+WAfy488/ctKVqIw39JBTJUhCQ7izINldtc92zcupi6DBLSFXys3/
-         /CrYvd9sztpp8kD+XqZEoHa0B0rLDV7QknJRuf3kcboTywL4nfYeDSVY52N7gX26QsZd
-         J5xg==
-X-Gm-Message-State: AOJu0YykoKXwXFoqKM8vjbBoHmyqhl2WXisdfJhommcRrgmJqqU4wyj4
-	IuDPgLC0grMCt4v3dEFTTnTn9LG416cuIw==
-X-Google-Smtp-Source: AGHT+IElXPkFQv2MRqcGz/dqUx//URpIDYETobdWDnEhnx2SYHy3VxLZzE752GvnAyHgPw9wHD5w8g==
-X-Received: by 2002:a81:ac60:0:b0:5d4:3596:5ace with SMTP id z32-20020a81ac60000000b005d435965acemr848286ywj.12.1701425485244;
-        Fri, 01 Dec 2023 02:11:25 -0800 (PST)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
-        by smtp.gmail.com with ESMTPSA id s127-20020a817785000000b005a7c829dda2sm969144ywc.84.2023.12.01.02.11.20
+        d=1e100.net; s=20230601; t=1701425548; x=1702030348;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L7QCxPC+fYseWuexTotpYyV8w/1vbCfusdIIG1y6MSo=;
+        b=cLYZbO/ibFEjOyzVYZp3YGC3TVnoh9KG5zluN+jMK1fIkeULVqprCtXZoJzLHnyvNu
+         EmCrYaAvXK5HUpNEl5o5N9r0O96xyFWNBw6YSvqnLiMwVFr0IpLIFaF0PsI+YkBsB8m/
+         AhjyisAQ410EDzxaa5NsUWHiALnTgk8HG8DB9KhIoQ6ef39Vcz0/HcYywjdGaFLRpJfP
+         ylS+B3AESMFW4Wp4c8ZZXc7kZna8m18X4tkDbNMNTObcMqtGlIcd0NvprKc51+5U09Xp
+         sG+vrxWNRjyPSvnykpzB1lZmvMNZSBxQoHnN4qarjPHi3eWcbdX0wF4dLaeL5R9Ix5NG
+         U1iA==
+X-Gm-Message-State: AOJu0YxvQcYYZ4wfCzjYSEZV4pHl/mPrXgWALRhyYUeqmfd37tcLOSPZ
+	/2AAp4g7lIDMj8y4mne4v73BDw==
+X-Google-Smtp-Source: AGHT+IFlCTKbYaADO7WKCziLqzHiA3ywHgZrnBRkgn1TMHHoy3VUQ4ul50xqVpORNEuysX9wk+QVFA==
+X-Received: by 2002:a5d:4fd0:0:b0:333:2fd2:5d43 with SMTP id h16-20020a5d4fd0000000b003332fd25d43mr539920wrw.117.1701425547781;
+        Fri, 01 Dec 2023 02:12:27 -0800 (PST)
+Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
+        by smtp.gmail.com with ESMTPSA id r13-20020adff70d000000b0033334c3acb6sm27153wrp.98.2023.12.01.02.12.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 02:11:21 -0800 (PST)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5d35a952943so16722067b3.3;
-        Fri, 01 Dec 2023 02:11:20 -0800 (PST)
-X-Received: by 2002:a05:690c:f83:b0:5ce:4bb:832d with SMTP id
- df3-20020a05690c0f8300b005ce04bb832dmr22433792ywb.6.1701425480657; Fri, 01
- Dec 2023 02:11:20 -0800 (PST)
+        Fri, 01 Dec 2023 02:12:27 -0800 (PST)
+Message-ID: <c3f15499-931a-86d0-11aa-4b77f0a86ec6@blackwall.org>
+Date: Fri, 1 Dec 2023 12:12:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com> <20231201054655.3731772-2-yoshihiro.shimoda.uh@renesas.com>
-In-Reply-To: <20231201054655.3731772-2-yoshihiro.shimoda.uh@renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 1 Dec 2023 11:11:09 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVeVjV4kYvxXM+5TkVxGp91gCA_K9RW6+B8ugKbEd9K-g@mail.gmail.com>
-Message-ID: <CAMuHMdVeVjV4kYvxXM+5TkVxGp91gCA_K9RW6+B8ugKbEd9K-g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/9] net: rswitch: Drop unused argument/return value
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCHv4 net-next 01/10] docs: bridge: update doc format to rst
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Marc Muehlfeld <mmuehlfe@redhat.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+References: <20231201081951.1623069-1-liuhangbin@gmail.com>
+ <20231201081951.1623069-2-liuhangbin@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231201081951.1623069-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 1, 2023 at 6:47=E2=80=AFAM Yoshihiro Shimoda
-<yoshihiro.shimoda.uh@renesas.com> wrote:
-> Drop unused argument and return value of rswitch_tx_free() to
-> simplify the code.
->
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+On 12/1/23 10:19, Hangbin Liu wrote:
+> The current bridge kernel doc is too old. It only pointed to the
+> linuxfoundation wiki page which lacks of the new features.
+> 
+> Here let's start the new bridge document and put all the bridge info
+> so new developers and users could catch up the last bridge status soon.
+> 
+> In this patch, Convert the doc to rst format. Add bridge brief introduction,
+> FAQ and contact info.
+> 
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>   Documentation/networking/bridge.rst | 47 +++++++++++++++++++++++------
+>   1 file changed, 37 insertions(+), 10 deletions(-)
+> 
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
