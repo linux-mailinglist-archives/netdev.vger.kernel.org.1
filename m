@@ -1,43 +1,73 @@
-Return-Path: <netdev+bounces-52779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26B43800337
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:47:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCDB980035D
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9B1BB20B11
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 05:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8586C2817B3
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 05:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285F0C2CF;
-	Fri,  1 Dec 2023 05:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC36BE6C;
+	Fri,  1 Dec 2023 05:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MdBv04z6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 190421724;
-	Thu, 30 Nov 2023 21:47:05 -0800 (PST)
-X-IronPort-AV: E=Sophos;i="6.04,240,1695654000"; 
-   d="scan'208";a="188815812"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 01 Dec 2023 14:47:01 +0900
-Received: from localhost.localdomain (unknown [10.166.13.99])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 1A21C403FE26;
-	Fri,  1 Dec 2023 14:47:01 +0900 (JST)
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F193170C;
+	Thu, 30 Nov 2023 21:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701409998; x=1732945998;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rNUFphnEkQB+qWot/63Nna2HVEbtWnhUjyaz1RNUd68=;
+  b=MdBv04z6GYo1k3KcUtbAdJL5Kj9svzrjZkJIjtE5NHWGcAZGQj/uhW0c
+   C0Yl8G9dWzyMvFwNPj6t6ml7eW+Nb0X8s5fZsXZaQclRd/Ha6yBfb1c2F
+   cFxYbti4N93Xjkl/PXJDu+IbFFVFVMM7Sg/Qa1ON7Yg5kzAXnoaKrsVt8
+   KeDjD+gNK1EMRhhgD3lQfoxdVcgC5N/fYj49tPgrbx/OjkKzB07ZsDuhU
+   NJ/nAHbEX6+1FnHyg1VKlMxgg68L7PUyMXuRA/3rJFStihcOFCIy8jK+P
+   dsnyoV795GBAZqofp0uOt26SYrRTo6ST36Kho0ycd6O5retooztXlLEUC
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="373623981"
+X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
+   d="scan'208";a="373623981"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 21:53:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="763004522"
+X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
+   d="scan'208";a="763004522"
+Received: from ppgyli0104.png.intel.com ([10.126.160.64])
+  by orsmga007.jf.intel.com with ESMTP; 30 Nov 2023 21:53:04 -0800
+From: Rohan G Thomas <rohan.g.thomas@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Serge Semin <fancer.lancer@gmail.com>
 Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH net-next v2 9/9] net: rswitch: Allow jumbo frames
-Date: Fri,  1 Dec 2023 14:46:55 +0900
-Message-Id: <20231201054655.3731772-10-yoshihiro.shimoda.uh@renesas.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com>
-References: <20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Rohan G Thomas <rohan.g.thomas@intel.com>
+Subject: [PATCH net-next v2 0/3] net: stmmac: EST implementation
+Date: Fri,  1 Dec 2023 13:52:49 +0800
+Message-Id: <20231201055252.1302-1-rohan.g.thomas@intel.com>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,44 +76,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow jumbo frames by changing maximum MTU size and number of RX queues.
+Hi,
+This patchset extends EST interrupt handling support to DWXGMAC IP
+followed by refactoring of EST implementation. Added a separate
+module for EST and moved all EST related functions to the new module.
 
-Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
----
- drivers/net/ethernet/renesas/rswitch.c | 2 ++
- drivers/net/ethernet/renesas/rswitch.h | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+Also added support for EST cycle-time-extension.
 
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index c5e3ee8f82bc..f55e15987dce 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1882,6 +1882,8 @@ static int rswitch_device_alloc(struct rswitch_private *priv, unsigned int index
- 	snprintf(ndev->name, IFNAMSIZ, "tsn%d", index);
- 	ndev->netdev_ops = &rswitch_netdev_ops;
- 	ndev->ethtool_ops = &rswitch_ethtool_ops;
-+	ndev->max_mtu = RSWITCH_MAX_MTU;
-+	ndev->min_mtu = ETH_MIN_MTU;
- 
- 	netif_napi_add(ndev, &rdev->napi, rswitch_poll);
- 
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index 4252677e2a55..72e3ff596d31 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -26,9 +26,10 @@
- 		else
- 
- #define TX_RING_SIZE		1024
--#define RX_RING_SIZE		1024
-+#define RX_RING_SIZE		4096
- #define TS_RING_SIZE		(TX_RING_SIZE * RSWITCH_NUM_PORTS)
- 
-+#define RSWITCH_MAX_MTU		9600
- #define RSWITCH_HEADROOM	(NET_SKB_PAD + NET_IP_ALIGN)
- #define RSWITCH_DESC_BUF_SIZE	2048
- #define RSWITCH_TAILROOM	SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+changelog v2:
+* Refactor EST implementation as suggested by Serge and Jakub
+* Added support for EST cycle-time-extension
+
+Rohan G Thomas (3):
+  net: stmmac: xgmac: EST interrupts handling
+  net: stmmac: Refactor EST implementation
+  net: stmmac: Add support for EST cycle-time-extension
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |   4 -
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 137 ---------------
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  51 ------
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  16 --
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  53 ------
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  21 +++
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  22 ++-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_est.c  | 165 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_est.h  |  64 +++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  |   4 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   8 +-
+ 15 files changed, 276 insertions(+), 275 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_est.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_est.h
+
 -- 
-2.34.1
+2.26.2
 
 
