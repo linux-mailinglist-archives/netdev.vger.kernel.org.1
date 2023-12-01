@@ -1,75 +1,79 @@
-Return-Path: <netdev+bounces-52753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D5B580001D
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:15:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D11800021
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D399B2123D
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:15:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B32B2815D0
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AB07469;
-	Fri,  1 Dec 2023 00:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2655163;
+	Fri,  1 Dec 2023 00:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jq3pdT26"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hQtreRop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CD8199D;
-	Thu, 30 Nov 2023 16:15:03 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b595bf5d2so11459665e9.2;
-        Thu, 30 Nov 2023 16:15:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701389701; x=1701994501; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o0La5H0sjddNIq/VvoGQu8ZG94GEUi31ycq7n/iZy+E=;
-        b=jq3pdT26z2bx314KexihN4nYi1TPpZWhkt4N2MrvzQsTpb3RHq7zC7YjAdJEyDki4c
-         t3HPOwJ3s/pcyTFykSrq9sKTRzcYIr/IVau4Pg93D8qCZUTm03wh/NO84peUKS66dQ/g
-         ApqoyVPRCPeOc64RPLkrHOE184JQDYTI+2//ztBRw3kEKKlzeupQlEfx6GOq6bqZktOE
-         OwFQ3UDP2VHrf5HW1Lzbp/L6+RBhMcXHHbEMEs1MMnMU70I9YdXMfzpAuRiKCoCywKmf
-         Msl4cDWu6zly+r2tG7w/JMc0K6J8VUYJiXoE9PDkPVOSyTh+rZy9V3vNPGNNXZJAn8CP
-         9Nfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701389701; x=1701994501;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o0La5H0sjddNIq/VvoGQu8ZG94GEUi31ycq7n/iZy+E=;
-        b=RNS65/RNPCYsE/A2Ab5FEJJIcbToxRVX/fN5b5HWi8qzoBUUj+6cCMuxaxfqwjVBkU
-         ShAET4jBSlVrTwKiuV1qFP0pt/4bs9acng2JBarqNbSautnluPOTB0pavaLhph/WpbYQ
-         ZSNz7NAg7vkvPcvqS+TaaeSh137L75+GPb1jbm7mKK8ZeneAYAw4fCevsVFUULC89cAg
-         8A/rVXe7s0IKM39iwqD6Lz2mZ0MjhiP6s29ZFqhDj8GiGE6r0845vTmuMHT86+BI8iFD
-         7wj5bizgVaOLakIAYryc45djUWkUAW9DklPBybHlARvwMUGG0G78NVOI2sPB2DLRQxcU
-         D9yQ==
-X-Gm-Message-State: AOJu0YwfQ09at8pmew4Z+xefIUkZWYdGBLZd2Vlju0EYa/aCq5k+zfeO
-	j83z4RO+RWvXlMql0yzrn6w=
-X-Google-Smtp-Source: AGHT+IFtGye2IP2ziCz7F2vBizhjGkh+8k2WtNNzepSDOg/li/0McSwyDBcgg4DN+2Xelyqu8IJkHw==
-X-Received: by 2002:a05:600c:46c9:b0:40b:3faa:c964 with SMTP id q9-20020a05600c46c900b0040b3faac964mr81262wmo.27.1701389701515;
-        Thu, 30 Nov 2023 16:15:01 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id g16-20020a05600c4ed000b0040b47c53610sm3535457wmq.14.2023.11.30.16.15.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 16:15:01 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v2 12/12] net: phy: at803x: drop specific PHY id check from cable test functions
-Date: Fri,  1 Dec 2023 01:14:23 +0100
-Message-Id: <20231201001423.20989-14-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231201001423.20989-1-ansuelsmth@gmail.com>
-References: <20231201001423.20989-1-ansuelsmth@gmail.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEC3197
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 16:19:39 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B107Nx0027003;
+	Fri, 1 Dec 2023 00:19:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=kGOElApfG0nsY3ihHSfxR9/QkQdYffNiRwrB6Ko+AZU=;
+ b=hQtreRopcI4hlHjuxaqo9Q7lnkqNGGk9acJVt6HIblq2/pOCKjXSIXBMtbyE15rjwA1d
+ tyE7da/L9/fBatXSN8Glp8xxLMwtxtHyorcPOG4VTFp83VWui/cYsZHn8yLB6UxWa15m
+ A4q3W9aPaot7bOPm8cDhJjbc4uNO+OrgDTxMT1ZpHKtvEL9yuglTPPSu8lLSgckvlMHu
+ /5RWgFh8qg3ZyC1qKDejHDZ3CAz32js4ro3JqoS89R2m4chJ9/GWm5nDGLR6KSJHGpn9
+ DAoX44DpNurpb+ZCjCzU3RUg9fGRMLLsw4SHrkcoAeTztSfNNCKWF4NUG3Ukscci4+QO gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uq4nn89q6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 00:19:34 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B108K4P029871;
+	Fri, 1 Dec 2023 00:19:33 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uq4nn89pv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 00:19:33 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AUMaY43029841;
+	Fri, 1 Dec 2023 00:19:32 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ukwy2999t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 00:19:32 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B10JWOe52495076
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 1 Dec 2023 00:19:32 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F298A58056;
+	Fri,  1 Dec 2023 00:19:31 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 976BF58052;
+	Fri,  1 Dec 2023 00:19:31 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  1 Dec 2023 00:19:31 +0000 (GMT)
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+To: michael.chan@broadcom.com
+Cc: davem@davemloft.net, drc@linux.vnet.ibm.com, edumazet@google.com,
+        kuba@kernel.org, mchan@broadcom.com, netdev@vger.kernel.org,
+        pabeni@redhat.com, pavan.chebbi@broadcom.com, prashant@broadcom.com,
+        siva.kallam@broadcom.com, thinhtr@linux.vnet.ibm.com,
+        Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Subject: [PATCH v4] net/tg3: fix race condition in tg3_reset_task()
+Date: Thu, 30 Nov 2023 18:19:11 -0600
+Message-Id: <20231201001911.656-1-thinhtr@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231116151822.281-1-thinhtr@linux.vnet.ibm.com>
+References: <20231116151822.281-1-thinhtr@linux.vnet.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,222 +81,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9oym-qNdrtjLqq_dtnVBFDnsw7X5yIIc
+X-Proofpoint-ORIG-GUID: BeJoVe7s4W3nnHcEu-AQ66mRg5yQC-a5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-30_24,2023-11-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 mlxlogscore=854 phishscore=0 impostorscore=0 suspectscore=0
+ mlxscore=0 adultscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2312010000
 
-Drop specific PHY id check for cable test functions for at803x. This is
-done to make functions more generic. While at it better describe what
-the functions does by using more symbolic function names.
+When an EEH error is encountered by a PCI adapter, the EEH driver
+modifies the PCI channel's state as shown below:
 
-PHYs that requires to set additional reg are moved to specific function
-calling the more generic one.
+   enum {
+      /* I/O channel is in normal state */
+      pci_channel_io_normal = (__force pci_channel_state_t) 1,
 
-cdt_start and cdt_wait_for_completion are changed to take an additional
-arg to pass specific values specific to the PHY.
+      /* I/O to channel is blocked */
+      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+      /* PCI card is dead */
+      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
+   };
+
+If the same EEH error then causes the tg3 driver's transmit timeout
+logic to execute, the tg3_tx_timeout() function schedules a reset
+task via tg3_reset_task_schedule(), which may cause a race condition
+between the tg3 and EEH driver as both attempt to recover the HW via
+a reset action.
+
+EEH driver gets error event
+--> eeh_set_channel_state()
+    and set device to one of
+    error state above           scheduler: tg3_reset_task() get
+                                returned error from tg3_init_hw()
+                             --> dev_close() shuts down the interface
+tg3_io_slot_reset() and
+tg3_io_resume() fail to
+reset/resume the device
+
+To resolve this issue, we avoid the race condition by checking the PCI
+channel state in the tg3_reset_task() function and skip the tg3 driver
+initiated reset when the PCI channel is not in the normal state.  (The
+driver has no access to tg3 device registers at this point and cannot
+even complete the reset task successfully without external assistance.)
+We'll leave the reset procedure to be managed by the EEH driver which
+calls the tg3_io_error_detected(), tg3_io_slot_reset() and
+tg3_io_resume() functions as appropriate.
+
+Adding the same checking in tg3_dump_state() to avoid dumping all
+device registers when the PCI channel is not in the normal state.
+
+
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
+
+  v4: moving the PCI error checking to tg3_reset_task() and
+      tg3_dump_state() 
+  v3: re-post the patch.
+  v2: checking PCI errors in tg3_tx_timeout()
+
 ---
- drivers/net/phy/at803x.c | 95 +++++++++++++++++++++-------------------
- 1 file changed, 50 insertions(+), 45 deletions(-)
+ drivers/net/ethernet/broadcom/tg3.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 27dc0a9ca076..d102f826db73 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -1222,31 +1222,16 @@ static int at803x_cdt_fault_length(u16 status)
- 	return (dt * 824) / 10;
- }
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 48b6191efa56..49f299c868a1 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6474,6 +6474,14 @@ static void tg3_dump_state(struct tg3 *tp)
+ 	int i;
+ 	u32 *regs;
  
--static int at803x_cdt_start(struct phy_device *phydev, int pair)
-+static int at803x_cdt_start(struct phy_device *phydev,
-+			    u32 cdt_start)
- {
--	u16 cdt;
--
--	/* qca8081 takes the different bit 15 to enable CDT test */
--	if (phydev->drv->phy_id == QCA8081_PHY_ID)
--		cdt = QCA808X_CDT_ENABLE_TEST |
--			QCA808X_CDT_LENGTH_UNIT |
--			QCA808X_CDT_INTER_CHECK_DIS;
--	else
--		cdt = FIELD_PREP(AT803X_CDT_MDI_PAIR_MASK, pair) |
--			AT803X_CDT_ENABLE_TEST;
--
--	return phy_write(phydev, AT803X_CDT, cdt);
-+	return phy_write(phydev, AT803X_CDT, cdt_start);
- }
- 
--static int at803x_cdt_wait_for_completion(struct phy_device *phydev)
-+static int at803x_cdt_wait_for_completion(struct phy_device *phydev,
-+					  u32 cdt_en)
- {
- 	int val, ret;
--	u16 cdt_en;
--
--	if (phydev->drv->phy_id == QCA8081_PHY_ID)
--		cdt_en = QCA808X_CDT_ENABLE_TEST;
--	else
--		cdt_en = AT803X_CDT_ENABLE_TEST;
- 
- 	/* One test run takes about 25ms */
- 	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
-@@ -1266,11 +1251,13 @@ static int at803x_cable_test_one_pair(struct phy_device *phydev, int pair)
- 	};
- 	int ret, val;
- 
--	ret = at803x_cdt_start(phydev, pair);
-+	val = FIELD_PREP(AT803X_CDT_MDI_PAIR_MASK, pair) |
-+	      AT803X_CDT_ENABLE_TEST;
-+	ret = at803x_cdt_start(phydev, val);
- 	if (ret)
- 		return ret;
- 
--	ret = at803x_cdt_wait_for_completion(phydev);
-+	ret = at803x_cdt_wait_for_completion(phydev, AT803X_CDT_ENABLE_TEST);
- 	if (ret)
- 		return ret;
- 
-@@ -1292,19 +1279,11 @@ static int at803x_cable_test_one_pair(struct phy_device *phydev, int pair)
- }
- 
- static int at803x_cable_test_get_status(struct phy_device *phydev,
--					bool *finished)
-+					bool *finished, unsigned long pair_mask)
- {
--	unsigned long pair_mask;
- 	int retries = 20;
- 	int pair, ret;
- 
--	if (phydev->phy_id == ATH9331_PHY_ID ||
--	    phydev->phy_id == ATH8032_PHY_ID ||
--	    phydev->phy_id == QCA9561_PHY_ID)
--		pair_mask = 0x3;
--	else
--		pair_mask = 0xf;
--
- 	*finished = false;
- 
- 	/* According to the datasheet the CDT can be performed when
-@@ -1331,7 +1310,7 @@ static int at803x_cable_test_get_status(struct phy_device *phydev,
- 	return 0;
- }
- 
--static int at803x_cable_test_start(struct phy_device *phydev)
-+static void at803x_cable_test_autoneg(struct phy_device *phydev)
- {
- 	/* Enable auto-negotiation, but advertise no capabilities, no link
- 	 * will be established. A restart of the auto-negotiation is not
-@@ -1339,11 +1318,11 @@ static int at803x_cable_test_start(struct phy_device *phydev)
- 	 */
- 	phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
- 	phy_write(phydev, MII_ADVERTISE, ADVERTISE_CSMA);
--	if (phydev->phy_id != ATH9331_PHY_ID &&
--	    phydev->phy_id != ATH8032_PHY_ID &&
--	    phydev->phy_id != QCA9561_PHY_ID)
--		phy_write(phydev, MII_CTRL1000, 0);
-+}
- 
-+static int at803x_cable_test_start(struct phy_device *phydev)
-+{
-+	at803x_cable_test_autoneg(phydev);
- 	/* we do all the (time consuming) work later */
- 	return 0;
- }
-@@ -1620,6 +1599,29 @@ static int at8031_config_intr(struct phy_device *phydev)
- 	return at803x_config_intr(phydev);
- }
- 
-+/* AR8031 and AR8035 share the same cable test get status reg */
-+static int at8031_cable_test_get_status(struct phy_device *phydev,
-+					bool *finished)
-+{
-+	return at803x_cable_test_get_status(phydev, finished, 0xf);
-+}
++	/* If it is a PCI error, all registers will be 0xffff,
++	 * we don't dump them out, just report the error and return
++	 */
++	if (tp->pdev->error_state != pci_channel_io_normal) {
++		netdev_err(tp->dev, "PCI channel ERROR!\n");
++		return;
++	}
 +
-+/* AR8031 and AR8035 share the same cable test start logic */
-+static int at8031_cable_test_start(struct phy_device *phydev)
-+{
-+	at803x_cable_test_autoneg(phydev);
-+	phy_write(phydev, MII_CTRL1000, 0);
-+	/* we do all the (time consuming) work later */
-+	return 0;
-+}
-+
-+/* AR8032, AR9331 and QCA9561 share the same cable test get status reg */
-+static int at8032_cable_test_get_status(struct phy_device *phydev,
-+					bool *finished)
-+{
-+	return at803x_cable_test_get_status(phydev, finished, 0x3);
-+}
-+
- static int at8035_parse_dt(struct phy_device *phydev)
- {
- 	struct at803x_priv *priv = phydev->priv;
-@@ -2043,11 +2045,14 @@ static int qca808x_cable_test_get_status(struct phy_device *phydev, bool *finish
+ 	regs = kzalloc(TG3_REG_BLK_SIZE, GFP_ATOMIC);
+ 	if (!regs)
+ 		return;
+@@ -11259,7 +11267,8 @@ static void tg3_reset_task(struct work_struct *work)
+ 	rtnl_lock();
+ 	tg3_full_lock(tp, 0);
  
- 	*finished = false;
- 
--	ret = at803x_cdt_start(phydev, 0);
-+	val = QCA808X_CDT_ENABLE_TEST |
-+	      QCA808X_CDT_LENGTH_UNIT |
-+	      QCA808X_CDT_INTER_CHECK_DIS;
-+	ret = at803x_cdt_start(phydev, val);
- 	if (ret)
- 		return ret;
- 
--	ret = at803x_cdt_wait_for_completion(phydev);
-+	ret = at803x_cdt_wait_for_completion(phydev, QCA808X_CDT_ENABLE_TEST);
- 	if (ret)
- 		return ret;
- 
-@@ -2145,8 +2150,8 @@ static struct phy_driver at803x_driver[] = {
- 	.handle_interrupt	= at803x_handle_interrupt,
- 	.get_tunable		= at803x_get_tunable,
- 	.set_tunable		= at803x_set_tunable,
--	.cable_test_start	= at803x_cable_test_start,
--	.cable_test_get_status	= at803x_cable_test_get_status,
-+	.cable_test_start	= at8031_cable_test_start,
-+	.cable_test_get_status	= at8031_cable_test_get_status,
- }, {
- 	/* Qualcomm Atheros AR8030 */
- 	.phy_id			= ATH8030_PHY_ID,
-@@ -2183,8 +2188,8 @@ static struct phy_driver at803x_driver[] = {
- 	.handle_interrupt	= at803x_handle_interrupt,
- 	.get_tunable		= at803x_get_tunable,
- 	.set_tunable		= at803x_set_tunable,
--	.cable_test_start	= at803x_cable_test_start,
--	.cable_test_get_status	= at803x_cable_test_get_status,
-+	.cable_test_start	= at8031_cable_test_start,
-+	.cable_test_get_status	= at8031_cable_test_get_status,
- }, {
- 	/* Qualcomm Atheros AR8032 */
- 	PHY_ID_MATCH_EXACT(ATH8032_PHY_ID),
-@@ -2199,7 +2204,7 @@ static struct phy_driver at803x_driver[] = {
- 	.config_intr		= at803x_config_intr,
- 	.handle_interrupt	= at803x_handle_interrupt,
- 	.cable_test_start	= at803x_cable_test_start,
--	.cable_test_get_status	= at803x_cable_test_get_status,
-+	.cable_test_get_status	= at8032_cable_test_get_status,
- }, {
- 	/* ATHEROS AR9331 */
- 	PHY_ID_MATCH_EXACT(ATH9331_PHY_ID),
-@@ -2212,7 +2217,7 @@ static struct phy_driver at803x_driver[] = {
- 	.config_intr		= at803x_config_intr,
- 	.handle_interrupt	= at803x_handle_interrupt,
- 	.cable_test_start	= at803x_cable_test_start,
--	.cable_test_get_status	= at803x_cable_test_get_status,
-+	.cable_test_get_status	= at8032_cable_test_get_status,
- 	.read_status		= at803x_read_status,
- 	.soft_reset		= genphy_soft_reset,
- 	.config_aneg		= at803x_config_aneg,
-@@ -2228,7 +2233,7 @@ static struct phy_driver at803x_driver[] = {
- 	.config_intr		= at803x_config_intr,
- 	.handle_interrupt	= at803x_handle_interrupt,
- 	.cable_test_start	= at803x_cable_test_start,
--	.cable_test_get_status	= at803x_cable_test_get_status,
-+	.cable_test_get_status	= at8032_cable_test_get_status,
- 	.read_status		= at803x_read_status,
- 	.soft_reset		= genphy_soft_reset,
- 	.config_aneg		= at803x_config_aneg,
+-	if (tp->pcierr_recovery || !netif_running(tp->dev)) {
++	if (tp->pcierr_recovery || !netif_running(tp->dev) ||
++	    tp->pdev->error_state != pci_channel_io_normal) {
+ 		tg3_flag_clear(tp, RESET_TASK_PENDING);
+ 		tg3_full_unlock(tp);
+ 		rtnl_unlock();
 -- 
-2.40.1
+2.25.1
 
 
