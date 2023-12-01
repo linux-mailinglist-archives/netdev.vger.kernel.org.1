@@ -1,125 +1,76 @@
-Return-Path: <netdev+bounces-53112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C9B8015D9
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:08:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01BEB801627
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8D71B20F3E
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:08:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B28D0281E0F
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD3A5A11A;
-	Fri,  1 Dec 2023 22:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B693F8C4;
+	Fri,  1 Dec 2023 22:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qq7fYrPZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l6A1jUNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB1FD63;
-	Fri,  1 Dec 2023 14:08:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1701468484; x=1733004484;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8o4/hfCAnfKPX4yUMshaIazjT8z9QiKc4SR1fVJeakk=;
-  b=qq7fYrPZU8oDDBlIoJjwqK74ifhF9xWNg7azQfmMzOnbbEkYjCRMQwnR
-   IUYDMbUnsZjei3V4hUZKgiLCORdckHaD4Cd4lTkah23v6vIZOsYXo2m+L
-   QAyiCmIdX2BYUiNhJUtjTq1wSkIgXvs3J3sGhf6sqhZfLN6PYrittNzvN
-   c=;
-X-IronPort-AV: E=Sophos;i="6.04,242,1695686400"; 
-   d="scan'208";a="366117092"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-0ec33b60.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 22:07:59 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-0ec33b60.us-west-2.amazon.com (Postfix) with ESMTPS id C6E77A097F;
-	Fri,  1 Dec 2023 22:07:57 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:58955]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.242:2525] with esmtp (Farcaster)
- id 7dfbec46-2e69-43cd-bc3e-3317f64baa94; Fri, 1 Dec 2023 22:07:57 +0000 (UTC)
-X-Farcaster-Flow-ID: 7dfbec46-2e69-43cd-bc3e-3317f64baa94
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 1 Dec 2023 22:07:56 +0000
-Received: from 88665a182662.ant.amazon.com (10.118.249.178) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Fri, 1 Dec 2023 22:07:52 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <alx@kernel.org>
-CC: <atikhono@redhat.com>, <libc-alpha@sourceware.org>,
-	<linux-man@vger.kernel.org>, <netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: UNIX(7)
-Date: Fri, 1 Dec 2023 14:07:43 -0800
-Message-ID: <20231201220743.32491-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZWnXlcsVJfPO1Qsb@debian>
-References: <ZWnXlcsVJfPO1Qsb@debian>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C5310D;
+	Fri,  1 Dec 2023 14:15:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=O4CthWDfvVmWbJZJbZ85nPI4SK2uYVkYLn0z69Q22W0=; b=l6A1jUNIVGUmVp+FLKEIqfjkF7
+	kBTtTOAPfafxrKH1goS4Whl4hdAThLfYlfthkBx3fxrqHjWW1pxyZsWcN340S4Fj7VPkpxVoft0Es
+	gJI4mM/aMJfJ0wcSRDvubRqMXa3mi+CQeaRzJhGS5xAJ3aVhQ1OLxVJOKJpmSFx3/fUg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r9BnA-001o0X-GC; Fri, 01 Dec 2023 23:15:24 +0100
+Date: Fri, 1 Dec 2023 23:15:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiko Stuebner <heiko@sntech.de>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quentin.schulz@theobroma-systems.com,
+	Heiko Stuebner <heiko.stuebner@cherry.de>
+Subject: Re: [PATCH] net: mdio: enable optional clock when registering a phy
+ from devicetree
+Message-ID: <84c102fa-e3f4-4454-82c9-95eea7eeb941@lunn.ch>
+References: <20231201142453.324697-1-heiko@sntech.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB004.ant.amazon.com (10.13.138.84) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231201142453.324697-1-heiko@sntech.de>
 
-From: Alejandro Colomar <alx@kernel.org>
-Date: Fri, 1 Dec 2023 13:54:39 +0100
-> Hello Alexey,
+On Fri, Dec 01, 2023 at 03:24:53PM +0100, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@cherry.de>
 > 
-> On Fri, Dec 01, 2023 at 01:16:27PM +0100, Alexey Tikhonov wrote:
-> > Hello.
-> > 
-> > There is a discrepancy between the man page description of
-> > 'SO_PEERCRED' and real behavior.
-> > 
-> > `man 7 unix` states:
-> > ```
-> >        SO_PEERCRED
-> >               This read-only socket option returns the credentials of
-> >               the peer process connected to this socket.  The returned
-> >               credentials are those that were in effect at the time of
-> >               the call to connect(2) or socketpair(2).
-> > ```
-> > 
-> > This doesn't match real behavior in following situation (just an example):
-> >  - process starts with uid=0, gid=0
-> >  - process creates UNIX socket, binds it, listens on it
-> >  - process changes to uid=uid1, git=gid1 (using `setresuid()`, `setresgid()`)
-> >  - another process connects to the listening socket and requests
-> > peer's credentials using `getsockopt(... SOL_SOCKET, SO_PEERCRED ...)`
-> > 
-> > According to the man page: SO_PEERCRED should report (uid1, gid1),
-> > because peer process was running under (uid1, gid1) "at the time of
-> > the call to connect(2)"
-> > In reality SO_PEERCRED reports (0, 0)
-> > Reproducing code is available in
-> > https://bugzilla.redhat.com/show_bug.cgi?id=2247682
-> > 
-> > I'm not entirely sure if this is a real bug or rather a  poor
-> > description in the man page, but I tend to think that it's the latter.
+> The ethernet-phy binding (now) specifys that phys can declare a clock
+> supply. Phy driver itself will handle this when probing the phy-driver.
+> 
+> But there is a gap when trying to detect phys, because the mdio-bus needs
+> to talk to the phy to get its phy-id. Using actual phy-ids in the dt like
+>        compatible = "ethernet-phy-id0022.1640",
+>                     "ethernet-phy-ieee802.3-c22";
+> of course circumvents this, but in turn hard-codes the phy.
+> 
+> With boards often having multiple phy options and the mdio-bus being able
+> to actually probe devices, this feels like a step back.
+> 
+> So check for the existence of a phy-clock per the -dtbinding in the
+> of_mdiobus_register_phy() and enable the clock around the
+> fwnode_mdiobus_register_phy() call which tries to determine the phy-id.
 
-When calling getsockopt(), we cannot know dynamically who the peer's
-owner is.  So, we just initialise the cred when we know the owner,
-and it's the caller of listen(), connect(), and socketpair().
+Why handle this separately to the reset GPIO and the reset controller?
 
-In your case, the listener's cred is initialised with the caller's
-cred during the first liten().
-
-  listener's peer_cred = get_cred(rcu_dereference_protected(current->cred, 1))
-
-And connect() will initialise two creds as follows:
-
-  connect()er's peer_cred = listener's peer_cred
-  new socket's peer_cred = get_cred(rcu_dereference_protected(current->cred, 1))
-
-If you call listen() again after setresuid() and before connect(),
-you can update the listener's cred and get the new IDs at the final
-getsockopt().
+    Andrew
 
