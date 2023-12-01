@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-53128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6367D8016A9
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF52B8016AB
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53A181C20C77
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60007281EF8
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7758E59B6B;
-	Fri,  1 Dec 2023 22:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B165D619DF;
+	Fri,  1 Dec 2023 22:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="B+hUVeaS"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fu7SUfMA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EEC7AD
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:40:04 -0800 (PST)
-Received: by mail-qv1-xf32.google.com with SMTP id 6a1803df08f44-67a44ee7ab3so16461176d6.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:40:04 -0800 (PST)
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC54D67
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:40:06 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-423a9cb7e80so16038601cf.3
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:40:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470403; x=1702075203; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470405; x=1702075205; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mDfI0qETOyOwee4a05idwPbHSr3fDqaCzwRXHLLk0WU=;
-        b=B+hUVeaSMGMF7a2tRN/AMzTb4ZcqeEcjgQYf8wVtuB8U7E1h3+u3/nhkeN7AzTELXK
-         rEwFhg6IELZ7Rb6BTRz6Yk19s/HNV0NXNaO4CUawHJVrMV+7Y746bnSDnL8rMoflKan9
-         TiwWq6kNcHXeE3yG9PPqbgqaWfwCygveJlQ0I=
+        bh=Aaj1qrJH1AVlUTm3Egq0FBDvBiQ6ruZezO+w9jFo4/Y=;
+        b=fu7SUfMAiu6sA6LAwniU3C/b4NvR4WYLtg/vkBZskwdE2PDROlhlTygIHX7jtUvZWv
+         5oyJIAdTaNSCfzjakXTML7RFLy5Co8IwRddGrjAnznCSIPmJgMn1f+HHgPt3nMW4XB86
+         NZ8X/19gWGUaUbzWAcOjpksetk593YzctM21I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470403; x=1702075203;
+        d=1e100.net; s=20230601; t=1701470405; x=1702075205;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mDfI0qETOyOwee4a05idwPbHSr3fDqaCzwRXHLLk0WU=;
-        b=Z98JSXNfz6YhBYjtpiuRhV+GCCMiCXpsEhS8iRKzFTLNlr04XktWVkad5F+WpcHqmn
-         LDI/ZwwkLsEQNg3JCEfYIdvk/iKh8Yoh6DxYzrVqHE9ZWAa/VFnDrttoGf/dVqr1QjYm
-         na/D9ZE34TNTks7BT4oVL7szKoLq4PFjdZ2PICbNfLJ2vR7Q1yfK8gIDIAYvNV/j8DIl
-         Ty/mT5O10VNva1Hce5+Y1g2+WoOt26MhiMbYYMKMAdhm34J/KfaLofH2uj8RW4+3xmpM
-         Mk4Cd1JiH84eWHDDo10U/0JRIqYAByrBjcaJaZLEjDchX7ED/LHTT4lRk4tn7WHbc7JO
-         WgEQ==
-X-Gm-Message-State: AOJu0YzF8iylz2lD6SV7X/nGro+wUI+fizg5AM3hQ25eqmbXRTaBkfV4
-	SkStKUMs0ik+3tXDFpPqab07cg==
-X-Google-Smtp-Source: AGHT+IErXjB2JXLKtyeDv/0mDdZdk1rjLTVDrl5RjbVjVdlSazHwcHO6mbGhH5DnYgcXPYkbjxemCA==
-X-Received: by 2002:a05:6214:564d:b0:67a:a721:f304 with SMTP id mh13-20020a056214564d00b0067aa721f304mr295479qvb.68.1701470403120;
-        Fri, 01 Dec 2023 14:40:03 -0800 (PST)
+        bh=Aaj1qrJH1AVlUTm3Egq0FBDvBiQ6ruZezO+w9jFo4/Y=;
+        b=AvWq34aaNo0I/JCM181VKWLxrJPpMFvuAzpycijnOsql953hx/6Norpb4j2ZrKNgLU
+         Fv8re3fD2owQJCdQizk/KE/gVNnIczp/VZAQemKmIXP5jVZEMbDUhChj4TmMq811GvdN
+         y8r9iBRP2VytiwYR9s8Elu3ChjECTflYynHxzR4pDVpRPZ6pzYyINJ2l88/LE4chKR0B
+         MMzIQ5gvpGDt1lCAUlWtP/qGog3M0KbKSl42CC73R55KCXgJ8ZpVn/SNOwbJhHbjh4OF
+         A6qdgKzEWUbwhKN/2Q/qbKkpq1RRJGL0zoS2Z54CBwz1NsDlNIjbUSs8Zk3LGaDMHQNw
+         LmZw==
+X-Gm-Message-State: AOJu0YxDH5L3RQKKb362JNr5wBtgR/inqJzWrUvLdD1Q1cqYIKIMOftK
+	OE9XydXYFXnkyKBBioCoT+yjKU+4bU3ZqKBw8xY=
+X-Google-Smtp-Source: AGHT+IFOFWyfHP5O41xAJUjRIfKr2mu++ujd4+5PPut19Y3eeIrdprUEmlqmsu4b0EwVhAl8sWHMvA==
+X-Received: by 2002:a05:622a:86:b0:423:8e8c:4d70 with SMTP id o6-20020a05622a008600b004238e8c4d70mr29330628qtw.67.1701470405079;
+        Fri, 01 Dec 2023 14:40:05 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.40.01
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.40.03
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:40:02 -0800 (PST)
+        Fri, 01 Dec 2023 14:40:04 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,12 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
+	Hongguang Gao <hongguang.gao@broadcom.com>,
+	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
 	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next 11/15] bnxt_en: Refactor ethtool speeds logic
-Date: Fri,  1 Dec 2023 14:39:20 -0800
-Message-Id: <20231201223924.26955-12-michael.chan@broadcom.com>
+Subject: [PATCH net-next 12/15] bnxt_en: Support new firmware link parameters
+Date: Fri,  1 Dec 2023 14:39:21 -0800
+Message-Id: <20231201223924.26955-13-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -69,167 +71,356 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000000e0d8060b7a7390"
+	boundary="0000000000002034e6060b7a73b9"
 
---00000000000000e0d8060b7a7390
+--0000000000002034e6060b7a73b9
 Content-Transfer-Encoding: 8bit
 
-Add helper functions to refactor the logic that converts firmware
-speed masks to ethtool speeds.  Pass the phy_flags to
-bnxt_get_ethtool_speeds() and the call chain.  The refactoring and the
-phy_flags will be needed when adding support for the new speeds in the
-next patches.
+Newer firmware supporting PAM4 112Gbps speeds use new parameters in
+firmware message structures.  Detect the new firmware capability and
+add basic logic to report and store these new fields.
 
+Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
+Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
 Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 87 +++++++++++++------
- 1 file changed, 61 insertions(+), 26 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 93 +++++++++++++++++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 46 +++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 10 ++
+ 3 files changed, 143 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index ad0b93682771..a9b6141337d4 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1801,7 +1801,7 @@ static const u16 bnxt_pam4_speed_masks[] = {
- };
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 3b0ced2a5f32..5f6c4644271c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -2250,6 +2250,10 @@ static u16 bnxt_agg_ring_id_to_grp_idx(struct bnxt *bp, u16 ring_id)
  
- static enum bnxt_link_speed_indices
--bnxt_encoding_speed_idx(u8 sig_mode, u16 speed_msk)
-+bnxt_encoding_speed_idx(u8 sig_mode, u16 phy_flags, u16 speed_msk)
+ static u16 bnxt_get_force_speed(struct bnxt_link_info *link_info)
  {
- 	const u16 *speeds;
- 	int idx, len;
-@@ -1831,14 +1831,14 @@ bnxt_encoding_speed_idx(u8 sig_mode, u16 speed_msk)
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2)
++		return link_info->force_link_speed2;
+ 	if (link_info->req_signal_mode == BNXT_SIG_MODE_PAM4)
+ 		return link_info->force_pam4_link_speed;
+ 	return link_info->force_link_speed;
+@@ -2257,6 +2261,28 @@ static u16 bnxt_get_force_speed(struct bnxt_link_info *link_info)
  
- static void
- __bnxt_get_ethtool_speeds(unsigned long fw_mask, enum bnxt_media_type media,
--			  u8 sig_mode, unsigned long *et_mask)
-+			  u8 sig_mode, u16 phy_flags, unsigned long *et_mask)
+ static void bnxt_set_force_speed(struct bnxt_link_info *link_info)
  {
- 	enum ethtool_link_mode_bit_indices link_mode;
- 	enum bnxt_link_speed_indices speed;
- 	u8 bit;
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++		link_info->req_link_speed = link_info->force_link_speed2;
++		link_info->req_signal_mode = BNXT_SIG_MODE_NRZ;
++		switch (link_info->req_link_speed) {
++		case BNXT_LINK_SPEED_50GB_PAM4:
++		case BNXT_LINK_SPEED_100GB_PAM4:
++		case BNXT_LINK_SPEED_200GB_PAM4:
++		case BNXT_LINK_SPEED_400GB_PAM4:
++			link_info->req_signal_mode = BNXT_SIG_MODE_PAM4;
++			break;
++		case BNXT_LINK_SPEED_100GB_PAM4_112:
++		case BNXT_LINK_SPEED_200GB_PAM4_112:
++		case BNXT_LINK_SPEED_400GB_PAM4_112:
++			link_info->req_signal_mode = BNXT_SIG_MODE_PAM4_112;
++			break;
++		default:
++			link_info->req_signal_mode = BNXT_SIG_MODE_NRZ;
++		}
++		return;
++	}
+ 	link_info->req_link_speed = link_info->force_link_speed;
+ 	link_info->req_signal_mode = BNXT_SIG_MODE_NRZ;
+ 	if (link_info->force_pam4_link_speed) {
+@@ -2267,12 +2293,25 @@ static void bnxt_set_force_speed(struct bnxt_link_info *link_info)
  
- 	for_each_set_bit(bit, &fw_mask, BNXT_FW_SPEED_MSK_BITS) {
--		speed = bnxt_encoding_speed_idx(sig_mode, 1 << bit);
-+		speed = bnxt_encoding_speed_idx(sig_mode, phy_flags, 1 << bit);
- 		if (!speed)
- 			continue;
- 
-@@ -1852,16 +1852,66 @@ __bnxt_get_ethtool_speeds(unsigned long fw_mask, enum bnxt_media_type media,
- 
- static void
- bnxt_get_ethtool_speeds(unsigned long fw_mask, enum bnxt_media_type media,
--			u8 sig_mode, unsigned long *et_mask)
-+			u8 sig_mode, u16 phy_flags, unsigned long *et_mask)
+ static void bnxt_set_auto_speed(struct bnxt_link_info *link_info)
  {
- 	if (media) {
--		__bnxt_get_ethtool_speeds(fw_mask, media, sig_mode, et_mask);
-+		__bnxt_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
- 		return;
- 	}
- 
- 	/* list speeds for all media if unknown */
- 	for (media = 1; media < __BNXT_MEDIA_END; media++)
--		__bnxt_get_ethtool_speeds(fw_mask, media, sig_mode, et_mask);
-+		__bnxt_get_ethtool_speeds(fw_mask, media, sig_mode, phy_flags,
-+					  et_mask);
-+}
-+
-+static void
-+bnxt_get_all_ethtool_support_speeds(struct bnxt_link_info *link_info,
-+				    enum bnxt_media_type media,
-+				    struct ethtool_link_ksettings *lk_ksettings)
-+{
 +	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 phy_flags = bp->phy_flags;
 +
-+	bnxt_get_ethtool_speeds(link_info->support_speeds, media,
-+				BNXT_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+	bnxt_get_ethtool_speeds(link_info->support_pam4_speeds, media,
-+				BNXT_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.supported);
-+}
-+
-+static void
-+bnxt_get_all_ethtool_adv_speeds(struct bnxt_link_info *link_info,
-+				enum bnxt_media_type media,
-+				struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 phy_flags = bp->phy_flags;
-+
-+	bnxt_get_ethtool_speeds(link_info->advertising, media,
-+				BNXT_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+	bnxt_get_ethtool_speeds(link_info->advertising_pam4, media,
-+				BNXT_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.advertising);
-+}
-+
-+static void
-+bnxt_get_all_ethtool_lp_speeds(struct bnxt_link_info *link_info,
-+			       enum bnxt_media_type media,
-+			       struct ethtool_link_ksettings *lk_ksettings)
-+{
-+	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 phy_flags = bp->phy_flags;
-+
-+	bnxt_get_ethtool_speeds(link_info->lp_auto_link_speeds, media,
-+				BNXT_SIG_MODE_NRZ, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
-+	bnxt_get_ethtool_speeds(link_info->lp_auto_pam4_link_speeds, media,
-+				BNXT_SIG_MODE_PAM4, phy_flags,
-+				lk_ksettings->link_modes.lp_advertising);
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++		link_info->advertising = link_info->auto_link_speeds2;
++		return;
++	}
+ 	link_info->advertising = link_info->auto_link_speeds;
+ 	link_info->advertising_pam4 = link_info->auto_pam4_link_speeds;
  }
  
- static void bnxt_update_speed(u32 *delta, bool installed_media, u16 *speeds,
-@@ -2017,12 +2067,7 @@ static int bnxt_get_link_ksettings(struct net_device *dev,
- 	mutex_lock(&bp->link_lock);
- 	bnxt_get_ethtool_modes(link_info, lk_ksettings);
- 	media = bnxt_get_media(link_info);
--	bnxt_get_ethtool_speeds(link_info->support_speeds,
--				media, BNXT_SIG_MODE_NRZ,
--				lk_ksettings->link_modes.supported);
--	bnxt_get_ethtool_speeds(link_info->support_pam4_speeds,
--				media, BNXT_SIG_MODE_PAM4,
--				lk_ksettings->link_modes.supported);
-+	bnxt_get_all_ethtool_support_speeds(link_info, media, lk_ksettings);
- 	bnxt_fw_to_ethtool_support_fec(link_info, lk_ksettings);
- 	link_mode = bnxt_get_link_mode(link_info);
- 	if (link_mode != BNXT_LINK_MODE_UNKNOWN)
-@@ -2035,20 +2080,10 @@ static int bnxt_get_link_ksettings(struct net_device *dev,
- 		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
- 				 lk_ksettings->link_modes.advertising);
- 		base->autoneg = AUTONEG_ENABLE;
--		bnxt_get_ethtool_speeds(link_info->advertising,
--					media, BNXT_SIG_MODE_NRZ,
--					lk_ksettings->link_modes.advertising);
--		bnxt_get_ethtool_speeds(link_info->advertising_pam4,
--					media, BNXT_SIG_MODE_PAM4,
--					lk_ksettings->link_modes.advertising);
--		if (link_info->phy_link_status == BNXT_LINK_LINK) {
--			bnxt_get_ethtool_speeds(link_info->lp_auto_link_speeds,
--						media, BNXT_SIG_MODE_NRZ,
--						lk_ksettings->link_modes.lp_advertising);
--			bnxt_get_ethtool_speeds(link_info->lp_auto_pam4_link_speeds,
--						media, BNXT_SIG_MODE_PAM4,
--						lk_ksettings->link_modes.lp_advertising);
--		}
-+		bnxt_get_all_ethtool_adv_speeds(link_info, media, lk_ksettings);
-+		if (link_info->phy_link_status == BNXT_LINK_LINK)
-+			bnxt_get_all_ethtool_lp_speeds(link_info, media,
-+						       lk_ksettings);
- 	} else {
- 		base->autoneg = AUTONEG_DISABLE;
+ static bool bnxt_force_speed_updated(struct bnxt_link_info *link_info)
+ {
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++		if (link_info->req_link_speed != link_info->force_link_speed2)
++			return true;
++		return false;
++	}
+ 	if (link_info->req_signal_mode == BNXT_SIG_MODE_NRZ &&
+ 	    link_info->req_link_speed != link_info->force_link_speed)
+ 		return true;
+@@ -2284,6 +2323,13 @@ static bool bnxt_force_speed_updated(struct bnxt_link_info *link_info)
+ 
+ static bool bnxt_auto_speed_updated(struct bnxt_link_info *link_info)
+ {
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++		if (link_info->advertising != link_info->auto_link_speeds2)
++			return true;
++		return false;
++	}
+ 	if (link_info->advertising != link_info->auto_link_speeds ||
+ 	    link_info->advertising_pam4 != link_info->auto_pam4_link_speeds)
+ 		return true;
+@@ -10082,7 +10128,10 @@ void bnxt_report_link(struct bnxt *bp)
+ 				signal = "(NRZ) ";
+ 				break;
+ 			case PORT_PHY_QCFG_RESP_SIGNAL_MODE_PAM4:
+-				signal = "(PAM4) ";
++				signal = "(PAM4 56Gbps) ";
++				break;
++			case PORT_PHY_QCFG_RESP_SIGNAL_MODE_PAM4_112:
++				signal = "(PAM4 112Gbps) ";
+ 				break;
+ 			default:
+ 				break;
+@@ -10110,7 +10159,9 @@ static bool bnxt_phy_qcaps_no_speed(struct hwrm_port_phy_qcaps_output *resp)
+ 	if (!resp->supported_speeds_auto_mode &&
+ 	    !resp->supported_speeds_force_mode &&
+ 	    !resp->supported_pam4_speeds_auto_mode &&
+-	    !resp->supported_pam4_speeds_force_mode)
++	    !resp->supported_pam4_speeds_force_mode &&
++	    !resp->supported_speeds2_auto_mode &&
++	    !resp->supported_speeds2_force_mode)
+ 		return true;
+ 	return false;
+ }
+@@ -10156,6 +10207,7 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
+ 			/* Phy re-enabled, reprobe the speeds */
+ 			link_info->support_auto_speeds = 0;
+ 			link_info->support_pam4_auto_speeds = 0;
++			link_info->support_auto_speeds2 = 0;
+ 		}
  	}
+ 	if (resp->supported_speeds_auto_mode)
+@@ -10164,6 +10216,9 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
+ 	if (resp->supported_pam4_speeds_auto_mode)
+ 		link_info->support_pam4_auto_speeds =
+ 			le16_to_cpu(resp->supported_pam4_speeds_auto_mode);
++	if (resp->supported_speeds2_auto_mode)
++		link_info->support_auto_speeds2 =
++			le16_to_cpu(resp->supported_speeds2_auto_mode);
+ 
+ 	bp->port_count = resp->port_cnt;
+ 
+@@ -10181,9 +10236,19 @@ static bool bnxt_support_dropped(u16 advertising, u16 supported)
+ 
+ static bool bnxt_support_speed_dropped(struct bnxt_link_info *link_info)
+ {
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
+ 	/* Check if any advertised speeds are no longer supported. The caller
+ 	 * holds the link_lock mutex, so we can modify link_info settings.
+ 	 */
++	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++		if (bnxt_support_dropped(link_info->advertising,
++					 link_info->support_auto_speeds2)) {
++			link_info->advertising = link_info->support_auto_speeds2;
++			return true;
++		}
++		return false;
++	}
+ 	if (bnxt_support_dropped(link_info->advertising,
+ 				 link_info->support_auto_speeds)) {
+ 		link_info->advertising = link_info->support_auto_speeds;
+@@ -10232,18 +10297,25 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
+ 	link_info->lp_pause = resp->link_partner_adv_pause;
+ 	link_info->force_pause_setting = resp->force_pause;
+ 	link_info->duplex_setting = resp->duplex_cfg;
+-	if (link_info->phy_link_status == BNXT_LINK_LINK)
++	if (link_info->phy_link_status == BNXT_LINK_LINK) {
+ 		link_info->link_speed = le16_to_cpu(resp->link_speed);
+-	else
++		if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2)
++			link_info->active_lanes = resp->active_lanes;
++	} else {
+ 		link_info->link_speed = 0;
++		link_info->active_lanes = 0;
++	}
+ 	link_info->force_link_speed = le16_to_cpu(resp->force_link_speed);
+ 	link_info->force_pam4_link_speed =
+ 		le16_to_cpu(resp->force_pam4_link_speed);
++	link_info->force_link_speed2 = le16_to_cpu(resp->force_link_speeds2);
+ 	link_info->support_speeds = le16_to_cpu(resp->support_speeds);
+ 	link_info->support_pam4_speeds = le16_to_cpu(resp->support_pam4_speeds);
++	link_info->support_speeds2 = le16_to_cpu(resp->support_speeds2);
+ 	link_info->auto_link_speeds = le16_to_cpu(resp->auto_link_speed_mask);
+ 	link_info->auto_pam4_link_speeds =
+ 		le16_to_cpu(resp->auto_pam4_link_speed_mask);
++	link_info->auto_link_speeds2 = le16_to_cpu(resp->auto_link_speeds2);
+ 	link_info->lp_auto_link_speeds =
+ 		le16_to_cpu(resp->link_partner_adv_speeds);
+ 	link_info->lp_auto_pam4_link_speeds =
+@@ -10382,7 +10454,11 @@ static void bnxt_hwrm_set_link_common(struct bnxt *bp, struct hwrm_port_phy_cfg_
+ {
+ 	if (bp->link_info.autoneg & BNXT_AUTONEG_SPEED) {
+ 		req->auto_mode |= PORT_PHY_CFG_REQ_AUTO_MODE_SPEED_MASK;
+-		if (bp->link_info.advertising) {
++		if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++			req->enables |=
++				cpu_to_le32(PORT_PHY_CFG_REQ_ENABLES_AUTO_LINK_SPEEDS2_MASK);
++			req->auto_link_speeds2_mask = cpu_to_le16(bp->link_info.advertising);
++		} else if (bp->link_info.advertising) {
+ 			req->enables |= cpu_to_le32(PORT_PHY_CFG_REQ_ENABLES_AUTO_LINK_SPEED_MASK);
+ 			req->auto_link_speed_mask = cpu_to_le16(bp->link_info.advertising);
+ 		}
+@@ -10396,7 +10472,12 @@ static void bnxt_hwrm_set_link_common(struct bnxt *bp, struct hwrm_port_phy_cfg_
+ 		req->flags |= cpu_to_le32(PORT_PHY_CFG_REQ_FLAGS_RESTART_AUTONEG);
+ 	} else {
+ 		req->flags |= cpu_to_le32(PORT_PHY_CFG_REQ_FLAGS_FORCE);
+-		if (bp->link_info.req_signal_mode == BNXT_SIG_MODE_PAM4) {
++		if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
++			req->force_link_speeds2 = cpu_to_le16(bp->link_info.req_link_speed);
++			req->enables |= cpu_to_le32(PORT_PHY_CFG_REQ_ENABLES_FORCE_LINK_SPEEDS2);
++			netif_info(bp, link, bp->dev, "Forcing FW speed2: %d\n",
++				   (u32)bp->link_info.req_link_speed);
++		} else if (bp->link_info.req_signal_mode == BNXT_SIG_MODE_PAM4) {
+ 			req->force_pam4_link_speed = cpu_to_le16(bp->link_info.req_link_speed);
+ 			req->enables |= cpu_to_le32(PORT_PHY_CFG_REQ_ENABLES_FORCE_PAM4_LINK_SPEED);
+ 		} else {
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 57694eb7feeb..d8c2b0790117 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1360,6 +1360,7 @@ struct bnxt_link_info {
+ #define BNXT_LINK_STATE_DOWN	1
+ #define BNXT_LINK_STATE_UP	2
+ #define BNXT_LINK_IS_UP(bp)	((bp)->link_info.link_state == BNXT_LINK_STATE_UP)
++	u8			active_lanes;
+ 	u8			duplex;
+ #define BNXT_LINK_DUPLEX_HALF	PORT_PHY_QCFG_RESP_DUPLEX_STATE_HALF
+ #define BNXT_LINK_DUPLEX_FULL	PORT_PHY_QCFG_RESP_DUPLEX_STATE_FULL
+@@ -1394,8 +1395,11 @@ struct bnxt_link_info {
+ #define BNXT_LINK_SPEED_50GB	PORT_PHY_QCFG_RESP_LINK_SPEED_50GB
+ #define BNXT_LINK_SPEED_100GB	PORT_PHY_QCFG_RESP_LINK_SPEED_100GB
+ #define BNXT_LINK_SPEED_200GB	PORT_PHY_QCFG_RESP_LINK_SPEED_200GB
++#define BNXT_LINK_SPEED_400GB	PORT_PHY_QCFG_RESP_LINK_SPEED_400GB
+ 	u16			support_speeds;
+ 	u16			support_pam4_speeds;
++	u16			support_speeds2;
++
+ 	u16			auto_link_speeds;	/* fw adv setting */
+ #define BNXT_LINK_SPEED_MSK_100MB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS_100MB
+ #define BNXT_LINK_SPEED_MSK_1GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS_1GB
+@@ -1411,12 +1415,52 @@ struct bnxt_link_info {
+ #define BNXT_LINK_PAM4_SPEED_MSK_50GB PORT_PHY_QCFG_RESP_SUPPORT_PAM4_SPEEDS_50G
+ #define BNXT_LINK_PAM4_SPEED_MSK_100GB PORT_PHY_QCFG_RESP_SUPPORT_PAM4_SPEEDS_100G
+ #define BNXT_LINK_PAM4_SPEED_MSK_200GB PORT_PHY_QCFG_RESP_SUPPORT_PAM4_SPEEDS_200G
++	u16			auto_link_speeds2;
++#define BNXT_LINK_SPEEDS2_MSK_1GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_1GB
++#define BNXT_LINK_SPEEDS2_MSK_10GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_10GB
++#define BNXT_LINK_SPEEDS2_MSK_25GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_25GB
++#define BNXT_LINK_SPEEDS2_MSK_40GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_40GB
++#define BNXT_LINK_SPEEDS2_MSK_50GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_50GB
++#define BNXT_LINK_SPEEDS2_MSK_100GB PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_100GB
++#define BNXT_LINK_SPEEDS2_MSK_50GB_PAM4	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_50GB_PAM4_56
++#define BNXT_LINK_SPEEDS2_MSK_100GB_PAM4	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_100GB_PAM4_56
++#define BNXT_LINK_SPEEDS2_MSK_200GB_PAM4	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_200GB_PAM4_56
++#define BNXT_LINK_SPEEDS2_MSK_400GB_PAM4	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_400GB_PAM4_56
++#define BNXT_LINK_SPEEDS2_MSK_100GB_PAM4_112	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_100GB_PAM4_112
++#define BNXT_LINK_SPEEDS2_MSK_200GB_PAM4_112	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_200GB_PAM4_112
++#define BNXT_LINK_SPEEDS2_MSK_400GB_PAM4_112	\
++	PORT_PHY_QCFG_RESP_SUPPORT_SPEEDS2_400GB_PAM4_112
++
+ 	u16			support_auto_speeds;
+ 	u16			support_pam4_auto_speeds;
++	u16			support_auto_speeds2;
++
+ 	u16			lp_auto_link_speeds;
+ 	u16			lp_auto_pam4_link_speeds;
+ 	u16			force_link_speed;
+ 	u16			force_pam4_link_speed;
++	u16			force_link_speed2;
++#define BNXT_LINK_SPEED_50GB_PAM4	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_50GB_PAM4_56
++#define BNXT_LINK_SPEED_100GB_PAM4	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_100GB_PAM4_56
++#define BNXT_LINK_SPEED_200GB_PAM4	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_200GB_PAM4_56
++#define BNXT_LINK_SPEED_400GB_PAM4	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_400GB_PAM4_56
++#define BNXT_LINK_SPEED_100GB_PAM4_112	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_100GB_PAM4_112
++#define BNXT_LINK_SPEED_200GB_PAM4_112	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_200GB_PAM4_112
++#define BNXT_LINK_SPEED_400GB_PAM4_112	\
++	PORT_PHY_CFG_REQ_FORCE_LINK_SPEEDS2_400GB_PAM4_112
++
+ 	u32			preemphasis;
+ 	u8			module_status;
+ 	u8			active_fec_sig_mode;
+@@ -1447,6 +1491,7 @@ struct bnxt_link_info {
+ 	u8			req_signal_mode;
+ #define BNXT_SIG_MODE_NRZ	PORT_PHY_QCFG_RESP_SIGNAL_MODE_NRZ
+ #define BNXT_SIG_MODE_PAM4	PORT_PHY_QCFG_RESP_SIGNAL_MODE_PAM4
++#define BNXT_SIG_MODE_PAM4_112	PORT_PHY_QCFG_RESP_SIGNAL_MODE_PAM4_112
+ #define BNXT_SIG_MODE_MAX	(PORT_PHY_QCFG_RESP_SIGNAL_MODE_LAST + 1)
+ 	u8			req_duplex;
+ 	u8			req_flow_ctrl;
+@@ -2337,6 +2382,7 @@ struct bnxt {
+ #define BNXT_PHY_FL_NO_PAUSE		(PORT_PHY_QCAPS_RESP_FLAGS2_PAUSE_UNSUPPORTED << 8)
+ #define BNXT_PHY_FL_NO_PFC		(PORT_PHY_QCAPS_RESP_FLAGS2_PFC_UNSUPPORTED << 8)
+ #define BNXT_PHY_FL_BANK_SEL		(PORT_PHY_QCAPS_RESP_FLAGS2_BANK_ADDR_SUPPORTED << 8)
++#define BNXT_PHY_FL_SPEEDS2		(PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED << 8)
+ 
+ 	u8			num_tests;
+ 	struct bnxt_test_info	*test_info;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index a9b6141337d4..7bc0bddbb126 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -2020,11 +2020,20 @@ u32 bnxt_fw_to_ethtool_speed(u16 fw_link_speed)
+ 	case BNXT_LINK_SPEED_40GB:
+ 		return SPEED_40000;
+ 	case BNXT_LINK_SPEED_50GB:
++	case BNXT_LINK_SPEED_50GB_PAM4:
+ 		return SPEED_50000;
+ 	case BNXT_LINK_SPEED_100GB:
++	case BNXT_LINK_SPEED_100GB_PAM4:
++	case BNXT_LINK_SPEED_100GB_PAM4_112:
+ 		return SPEED_100000;
+ 	case BNXT_LINK_SPEED_200GB:
++	case BNXT_LINK_SPEED_200GB_PAM4:
++	case BNXT_LINK_SPEED_200GB_PAM4_112:
+ 		return SPEED_200000;
++	case BNXT_LINK_SPEED_400GB:
++	case BNXT_LINK_SPEED_400GB_PAM4:
++	case BNXT_LINK_SPEED_400GB_PAM4_112:
++		return SPEED_400000;
+ 	default:
+ 		return SPEED_UNKNOWN;
+ 	}
+@@ -2040,6 +2049,7 @@ static void bnxt_get_default_speeds(struct ethtool_link_ksettings *lk_ksettings,
+ 		base->duplex = DUPLEX_HALF;
+ 		if (link_info->duplex & BNXT_LINK_DUPLEX_FULL)
+ 			base->duplex = DUPLEX_FULL;
++		lk_ksettings->lanes = link_info->active_lanes;
+ 	} else if (!link_info->autoneg) {
+ 		base->speed = bnxt_fw_to_ethtool_speed(link_info->req_link_speed);
+ 		base->duplex = DUPLEX_HALF;
 -- 
 2.30.1
 
 
---00000000000000e0d8060b7a7390
+--0000000000002034e6060b7a73b9
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -300,14 +491,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINHq9V7ZPSffpW3o+JJ2+eNMYVYWTXRz
-1zMCq4/vePukMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyNDAwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAhgtzbcMhsgct0FRWvzg4lUgxTymWBo
+Pvp7ZatrStpzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyNDAwNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCx8Pi8EWmR3FrEIWw+xTJwBEUrP+fsQruLQd/h9BWqAdNfiwA8
-+mQHNemKCVclGKqUqxutenutpzqS/lUukyL5b4QpZ5GKOKV2+G4I+fDuh3yvm9c65OV20Z5HZ2lD
-0Hs9Wy63YWY3R0Bxmgk24xVfMbXpLXwOvvddn78u1LUu7dtFX30gU8R+TdYooKD8hBdz6Q+3s8I0
-z5lHqKQu/ePVwojKhhIQAsiZUrA5L9Hauq+3WduBwdG8DyQr0DzDefj4N1eRGJnX76xX07D75Npx
-VbrSP4pVlRWHA6S5n6leUr+mKOZSOfWfL+r8IwTmB+sWotBwikqRoSfcQB6BxeVm
---00000000000000e0d8060b7a7390--
+ATANBgkqhkiG9w0BAQEFAASCAQBbRqLUcFPLS+NDU7gEhszQ8JH45kHXxThwvNF8nVqt+TIuVebR
+bBxXROhwJKBWYHMATUdyHcE3Kds+PBJkfe3bq424ZFQ3v47tS7D5e2vd/e+KzVV6WZsOO5zopW42
+gYgw5hGmODJtZfrmoqJeMAW4hJztdpCDdU2vuqcnuYe2lGsYprJvpvdopDUwFpshQ5ixYCmFKn4f
+SvXKmVoAY+Rvzp/bHSaXUk+NQ1vOztCm/46+c3NiNNQg3x345omooJqqVFTufXMb+G5EhrJ+BEkV
+/vEFFDTouPj1L9ZfJjjyFs9k3Da+TsFKMEkRKR9nZGhGMeiU+AeNUOmsmT73vGvR
+--0000000000002034e6060b7a73b9--
 
