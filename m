@@ -1,90 +1,127 @@
-Return-Path: <netdev+bounces-53030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4E2801233
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:05:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7B5801238
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F24A21F20C73
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:05:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1FC2813D6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724394EB2D;
-	Fri,  1 Dec 2023 18:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D7E4EB47;
+	Fri,  1 Dec 2023 18:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yeru570v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XzieZNU9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 110AA12A
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 10:05:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701453917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QnLRP+rHS2RqlJuua+HIfj0D3jwT5nHmopztNQ4aPBA=;
-	b=Yeru570velAEUDxTTM4J6I3VAG7vZ7fVLLBdMOD9nKNj2P9lzh4iFFaoIXx3PqAEK0DA94
-	BVIM9p8+zlK8AuSfEULIfjigUrHlJOlLDVJks7jtCQlN4vKJWvRxoxGnuYrIFVZuY7OVdQ
-	1HL+42T49AcsO9/hc451oN4sGWEmB5w=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-164-TZT9iVFgMWKbHszeMSM1oA-1; Fri, 01 Dec 2023 13:05:15 -0500
-X-MC-Unique: TZT9iVFgMWKbHszeMSM1oA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54b7e11013bso1714835a12.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 10:05:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701453914; x=1702058714;
-        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QnLRP+rHS2RqlJuua+HIfj0D3jwT5nHmopztNQ4aPBA=;
-        b=iiYPvQZnA/NuIF9MloH7VLdIK9FhETZupJj3ZUvmKKtrsOUwdUOThwRXzJXXkgYDgg
-         n5+mtSdZWCp00xXWfSK8dwzm4RMXE6vCNtqFhHBcG/Bi3Yk+2FmNt4UQAwNFJp+V2LZy
-         zKUTeOPgyclZnEncztEKym25uCaTpPHNnqIMqzF1so7U0QE3FQWl8WbjJc5pBxL1UsOL
-         /S2ywTBgWMOpTkwZb/XXEJxZnilStbugTTnWiHaPU4KeiNaI2J1K3ZRJmLuTUaK63+8h
-         6pbTfzRv671aSVd/tIT6Chd8dCsNzjcQuwrFZkqx85BOvGjeaW7qDZmN3Pb6oXayUjFP
-         rHJA==
-X-Gm-Message-State: AOJu0YwncYL1+KXZFYPANccqJX3D1dYEpQfhFV/BkUC15Im9ut1Um2TR
-	yzamGl/oy2crjznxQS4TIZc7irtNo3kPOyVoqRf0E8vP5wzAmfDhVW7oVcESBS485/vhmNdkSCP
-	ddUkoIzWAynwEMl7P8GlX1EYgrDY52duYjePUWnm/
-X-Received: by 2002:a50:bb44:0:b0:54c:4837:7d39 with SMTP id y62-20020a50bb44000000b0054c48377d39mr688740ede.120.1701453914234;
-        Fri, 01 Dec 2023 10:05:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE79EM7om4xFKyq7DC6WnXnNnI005l+IA57J2EJWmk87WU2wZbb8Er4SbwI9QoZdTuH4IG5PG+mK9cwAS8TV30=
-X-Received: by 2002:a50:bb44:0:b0:54c:4837:7d39 with SMTP id
- y62-20020a50bb44000000b0054c48377d39mr688723ede.120.1701453913589; Fri, 01
- Dec 2023 10:05:13 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 1 Dec 2023 10:05:12 -0800
-From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20231201175015.214214-1-pctammela@mojatatu.com> <20231201175015.214214-4-pctammela@mojatatu.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0429BFF
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 10:08:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701454135; x=1732990135;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=nbmzyceupvAW2bI3bEIn7PA3l4Ti1U1NC3FRbvG0xqI=;
+  b=XzieZNU9lX0pEWPMWRQNd4byNyR75t0JR1jJYeV7/uZNk1Z9JtrUbPo7
+   pClTHIbOaYOge+Dox+8GcyGN1RsQlpDip8b3JyZkTxhh20bsi1pStg8GA
+   5cvP5DU/fq0+n4hVjRrVvsEO/pN7eblnJsrG1khP5Q2FE+u3v0uOxoUW/
+   zHrEG9dbJVRTDqPlV9+FTGbeNCXQ91n42DraXb5PtpKjs2cxGAp48xv+c
+   qPoiwy11KlZ3h6d+KS2mXKTwLwXEjlEyonZ5AYoxGd3bLdxYgNhNkb4Dw
+   XTbncxxry9XeLIpTiJPc1bG9U/qJO3goZk62aUFycDu8NrVJQfM0DWUnl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="12244379"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="12244379"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 10:08:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="893272435"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="893272435"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga004.jf.intel.com with ESMTP; 01 Dec 2023 10:08:54 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/6][pull request] Intel Wired LAN Driver Updates 2023-12-01 (ice)
+Date: Fri,  1 Dec 2023 10:08:38 -0800
+Message-ID: <20231201180845.219494-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231201175015.214214-4-pctammela@mojatatu.com>
-Date: Fri, 1 Dec 2023 10:05:12 -0800
-Message-ID: <CALnP8ZaVt6swzFY_aa_FTigA=SHKQDMERDS4398yDcUjYBTYKA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/4] net/sched: act_api: stop loop over ops
- array on NULL in tcf_action_init
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 01, 2023 at 02:50:14PM -0300, Pedro Tammela wrote:
-> -	for (i = 0; i < TCA_ACT_MAX_PRIO; i++) {
-> -		if (ops[i])
-> -			module_put(ops[i]->owner);
-> -	}
-> +	for (i = 0; i < TCA_ACT_MAX_PRIO && ops[i]; i++)
-> +		module_put(ops[i]->owner);
->  	return err;
+This series contains updates to ice driver only.
 
-Seems you thought it would have been an abuse to use
-tcf_act_for_each_action() here as well, which I can understand.
+Konrad provides temperature reporting via hwmon.
+
+Arkadiusz adds reporting of Clock Generation Unit (CGU) information via
+devlink info.
+
+Pawel adjusts error messaging for ntuple filters to account for additional
+possibility for encountering an error.
+
+Karol ensures that all timestamps occurring around reset are processed and
+renames some E822 functions to convey additional usage for E823 devices.
+
+Jake provides mechanism to ensure that all timestamps on E822 devices
+are processed.
+
+The following are changes since commit 15bc81212f593fbd7bda787598418b931842dc14:
+  octeon_ep: set backpressure watermark for RX queues
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Arkadiusz Kubalewski (1):
+  ice: add CGU info to devlink info callback
+
+Jacob Keller (1):
+  ice: periodically kick Tx timestamp interrupt
+
+Karol Kolacinski (2):
+  ice: Re-enable timestamping correctly after reset
+  ice: Rename E822 to E82X
+
+Konrad Knitter (1):
+  ice: read internal temperature sensor
+
+Pawel Kaminski (1):
+  ice: Improve logs for max ntuple errors
+
+ Documentation/networking/devlink/ice.rst      |   9 +
+ drivers/net/ethernet/intel/Kconfig            |  11 +
+ drivers/net/ethernet/intel/ice/Makefile       |   1 +
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  28 ++
+ drivers/net/ethernet/intel/ice/ice_common.c   |  54 ++-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  |  20 +
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c |  13 +-
+ drivers/net/ethernet/intel/ice/ice_hwmon.c    | 126 +++++
+ drivers/net/ethernet/intel/ice/ice_hwmon.h    |  15 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   7 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 117 +++--
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   2 +-
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   |  12 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 444 +++++++++---------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  48 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |  14 +-
+ 18 files changed, 627 insertions(+), 297 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.h
+
+-- 
+2.41.0
 
 
