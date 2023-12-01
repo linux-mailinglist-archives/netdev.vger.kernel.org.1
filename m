@@ -1,41 +1,46 @@
-Return-Path: <netdev+bounces-52895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB44280096A
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:10:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5D88009C5
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F6D92813FC
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:10:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28931F20ED2
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD79210FD;
-	Fri,  1 Dec 2023 11:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHpuoNkx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1D221345;
+	Fri,  1 Dec 2023 11:18:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51669210F5
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 11:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D1172C433C7;
-	Fri,  1 Dec 2023 11:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701429023;
-	bh=a16OAQT2aoHFf/rpgoy1OBrQ1J6SxYIu1qUavost96Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WHpuoNkxOfpQjiIjE+8wgR5se8dvPnG7Z00xbSGSsj1DWaPITMGjvO5PSuMDgKeQh
-	 SPRRAe3AipZB7o5wbDV2aY94TQcYXWMFr23+3fP0S1+m+VEZczakNmpaX5HXqQGZGb
-	 araWvemnbh4eJURNEs11Ks1K7+hK0pfFOyaO4KVVQ8CNUuVjFvSHMtP3cmzQG0f6hk
-	 /leN4ZnmHAf/b/vacNWzS/DUPw1V1eSfk36BqqMmKxOSW8OBi1pvWxFblSsJVWn3Nw
-	 zs4h+Yv7judjY/sBbjx0O9oB7iue9o8bsSK05g0sHg8wv6RKue3yMVzxiu0Bt9qLT5
-	 7dSYxBrz4umHQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B58EAC59A4C;
-	Fri,  1 Dec 2023 11:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+X-Greylist: delayed 181 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Dec 2023 03:18:33 PST
+Received: from mail78-59.sinamail.sina.com.cn (mail78-59.sinamail.sina.com.cn [219.142.78.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570DA2695
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 03:18:32 -0800 (PST)
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.69.95])
+	by sina.com (172.16.235.25) with ESMTP
+	id 6569BFBF0000234E; Fri, 1 Dec 2023 19:13:06 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 17365334210190
+X-SMAIL-UIID: 1EBE428C27F64FC68BE7DFEF2B933622-20231201-191306-1
+From: Hillf Danton <hdanton@sina.com>
+To: xingwei lee <xrivendell7@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
+Date: Fri,  1 Dec 2023 19:12:53 +0800
+Message-Id: <20231201111253.1029-1-hdanton@sina.com>
+In-Reply-To: <CABOYnLzq7XwbFncos1p8FOnDyVes4VDkjWE277TngdJqSie14A@mail.gmail.com>
+References: <CANn89iJ7h_LFSV6n_9WmbTMwTMsZ0UgdBj_oGrnzcrZu7oCxFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,43 +48,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] octeontx2-pf: Add missing mutex lock in
- otx2_get_pauseparam
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170142902373.13641.10956556267132946776.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Dec 2023 11:10:23 +0000
-References: <1701235422-22488-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1701235422-22488-1-git-send-email-sbhatta@marvell.com>
-To: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- sgoutham@marvell.com, gakula@marvell.com, hkelam@marvell.com,
- lcherian@marvell.com, jerinj@marvell.com
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 29 Nov 2023 10:53:42 +0530 you wrote:
-> All the mailbox messages sent to AF needs to be guarded
-> by mutex lock. Add the missing lock in otx2_get_pauseparam
-> function.
+On Fri, 1 Dec 2023 08:39:32 +0800 xingwei lee <xrivendell7@gmail.com>
+> I forgot to CC others, repeat mail.
+> Sorry, Dumazet. I found this bug with my modified syzkaller in my
+> local environment.
+> You are right, I crashed this bug about 10 times and used some
+> heuristic solutions to increase the chances of luck with modifying
+> syz-repro during this process.
+> I can confirm the reproduction can trigger the bug soon and I hope it helps you.
+> I'll test your patch and give your feedback ASAP.
 > 
-> Fixes: 75f36270990c ("octeontx2-pf: Support to enable/disable pause frames via ethtool")
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> I apply your patch at
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3b47bc037bd44f142ac09848e8d3ecccc726be99
+> with a little fix:
 > 
-> [...]
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index fef349dd72fa..36d2871ac24f 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2197,8 +2197,6 @@ static void __sk_destruct(struct rcu_head *head)
+> 
+>         if (likely(sk->sk_net_refcnt))
+>                 put_net_track(sock_net(sk), &sk->ns_tracker);
+> -       else
+> -               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, false);
+> 
+>         sk_prot_free(sk->sk_prot_creator, sk);
+>  }
+> @@ -2212,6 +2210,9 @@ void sk_destruct(struct sock *sk)
+>                 use_call_rcu = true;
+>         }
+> 
+> +       if (unlikely(!sk->sk_net_refcnt))
+> +               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, false);
+> +
+>         if (use_call_rcu)
+>                 call_rcu(&sk->sk_rcu, __sk_destruct);
+>         else
+> 
+> and It's also trigger the crash like below:
 
-Here is the summary with links:
-  - [v2,net] octeontx2-pf: Add missing mutex lock in otx2_get_pauseparam
-    https://git.kernel.org/netdev/net/c/9572c949385a
+Looks like a refcount leak that could be cured with the diff below.
+Only for thoughts.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--- x/include/net/net_namespace.h
++++ y/include/net/net_namespace.h
+@@ -320,7 +320,7 @@ static inline int check_net(const struct
+ 	return 1;
+ }
+ 
+-#define net_drop_ns NULL
++static void net_drop_ns(void *w) { }
+ #endif
+ 
+ 
+@@ -355,7 +355,7 @@ static inline void __netns_tracker_free(
+ static inline struct net *get_net_track(struct net *net,
+ 					netns_tracker *tracker, gfp_t gfp)
+ {
+-	get_net(net);
++	refcount_inc(&net->passive);
+ 	netns_tracker_alloc(net, tracker, gfp);
+ 	return net;
+ }
+@@ -363,7 +363,7 @@ static inline struct net *get_net_track(
+ static inline void put_net_track(struct net *net, netns_tracker *tracker)
+ {
+ 	__netns_tracker_free(net, tracker, true);
+-	put_net(net);
++	net_drop_ns(net);
+ }
+ 
+ typedef struct {
+--
 
