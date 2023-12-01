@@ -1,147 +1,505 @@
-Return-Path: <netdev+bounces-52970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F47801010
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:25:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75B55801021
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A39A280C3C
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:25:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8DA41F20F9F
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088984CDED;
-	Fri,  1 Dec 2023 16:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A3F3B29C;
+	Fri,  1 Dec 2023 16:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kO8eVe2O"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PBAiFj3A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF852A6;
-	Fri,  1 Dec 2023 08:25:24 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-50bdebb1786so496299e87.1;
-        Fri, 01 Dec 2023 08:25:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701447923; x=1702052723; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Fe9LinVeEIS31sVu9a8Ip9icgC4gCnScZC9xWW4pX4=;
-        b=kO8eVe2Om6W7oe8P2GtUiPRM6d//ZVGK8ZKlWqc3qpCabfCj5QhOliNY8AzBWpVh9S
-         6erIbTR60xmsZvMEcGYDLxCZy3HBz8eCcApG5tt90EOvgFrfQ34n5Tdk7YD+vOKydo0s
-         eBbQTDjJtORLSaz/5hwVjATqT8Oygfb6kOQkIPxmib/hGNc8Fg1zKT4iv3imRJj6ZXD1
-         p10v262tO1cRmhiMjxhqOrLUq6qs0C8bxpR8Z6JXeLWh2X1LgK50BKVH2w0m8hiL7bbm
-         Y3GJ1yDE5T4WGA0tQ82og9/B7oS3pZ8PYogts2+MNO2SkVw8ssnOuxIxptPGoivQr/Bo
-         IAZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701447923; x=1702052723;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Fe9LinVeEIS31sVu9a8Ip9icgC4gCnScZC9xWW4pX4=;
-        b=pQayqNNZBc0Kdmf1KPXI+JyWVQrEyX4e2OBlH1EHIY/Q0GmZHbmE7pbcng0KYdaY9U
-         z0o4iXBIm60nuntTa/5NXFeU5ZEbU/w/ddZVJJU9yAhzTlyiBNlK/TIbwGNh3Ob1cDia
-         2Qp5ZWnDxUNkkBD6k9sKZe1yX6t5grnhyKYmJHO9OA/pbUkA2/+XNf6OYFgBr6RSSaY0
-         wr+slLbf0XzNIwDDR2cMX80iiwTvCVCDtgrS7ZrD7Y4ewSeYtcaLPgx4OI9JKJLJaaxG
-         S98tQsWdm0Z56SKBeUFWuXz+01gnj7cSaFYJukm0k+mznwiP957NK9iJugoGlk3N0eKD
-         kXGA==
-X-Gm-Message-State: AOJu0Yzp1WuUQUsQyZcGufMCHbEWalnuT20eX1MReqjREGdpK5xKsagN
-	FoX4I6Dj3666PTGhJh8ggSE=
-X-Google-Smtp-Source: AGHT+IED2w+hujxue7bm9bOGpjjCdvrKzr90/3i7E5Xd7uj7qqmqvOaSeS01ayw0GAygOWScKCMiaA==
-X-Received: by 2002:a05:6512:280b:b0:50b:d764:64c0 with SMTP id cf11-20020a056512280b00b0050bd76464c0mr1188134lfb.117.1701447922712;
-        Fri, 01 Dec 2023 08:25:22 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id i15-20020a056512340f00b0050bc303f3cbsm232121lfr.173.2023.12.01.08.25.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 08:25:22 -0800 (PST)
-Date: Fri, 1 Dec 2023 19:25:19 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Tomer Maimon <tmaimon77@gmail.com>, davem@davemloft.net, 
-	avifishman70@gmail.com, venture@google.com, openbmc@lists.ozlabs.org, robh+dt@kernel.org, 
-	tali.perry1@gmail.com, mcoquelin.stm32@gmail.com, edumazet@google.com, 
-	joabreu@synopsys.com, joel@jms.id.au, krzysztof.kozlowski+dt@linaro.org, 
-	peppe.cavallaro@st.com, j.neuschaefer@gmx.net, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, benjaminfair@google.com
-Subject: Re: [Linux-stm32] [PATCH v1 2/2] net: stmmac: Add NPCM support
-Message-ID: <dfbwvsvefbkj6lodj5nmj2up32vnai32u3qk667mpfjytvmp4z@uvny7nhaykzi>
-References: <6aeb28f5-04c2-4723-9da2-d168025c307c@lunn.ch>
- <CAP6Zq1j0kyrg+uxkXH-HYqHz0Z4NwWRUGzprius=BPC9+WfKFQ@mail.gmail.com>
- <9ad42fef-b210-496a-aafc-eb2a7416c4df@lunn.ch>
- <CAP6Zq1jw9uLP_FQGR8=p3Y2NTP6XcNtzkJQ0dm3+xVNE1SpsVg@mail.gmail.com>
- <CAP6Zq1ijfMSPjk1vPwDM2B+r_vAH3DShhSu_jr8xJyUkTQY89w@mail.gmail.com>
- <a551aefa-777d-4fd3-b1a5-086dc3e62646@lunn.ch>
- <CAP6Zq1jVO5y3ySeGNE5-=XWV6Djay5MhGxXCZb9y91q=EA71Vg@mail.gmail.com>
- <25d0c091-3dce-4d62-a112-c82106809c65@lunn.ch>
- <xvy2coamb6cl3wcbkl32f6w7kksoxfocyd63t7k7bz4pne2gyx@lktivhqovy7p>
- <20231130213441.032a661c@device.home>
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603A083;
+	Fri,  1 Dec 2023 08:31:08 -0800 (PST)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1GUIPF002470;
+	Fri, 1 Dec 2023 16:31:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=wIr0pVsfWvGANkOc79yLdF5wut93kx7dMxtsOXN+uIM=;
+ b=PBAiFj3AbnqLXfcM+338Fq8tg/e5CgOFSD7CgcyyBcmNm6cxPsG5rY2XYUD9+++sQ3MK
+ ZQJ7Tfl/ufnVx1e8kuQhWP5DYTiDQo/RGFe+04q5zQwYyJ9UCCiBj6LqL50MEFRcU7vc
+ cAulEEijM/AfeZpQEGa87N3t2OQCfDOWGSDaGSHEg0gVqHSnlEcKlq0UCTY9oOEBmxoX
+ 4V9yI3jjmtYLoMUbzPQTMTS2ji4fCSHzNWM1ezooOdf6ScjZkM1izv1CR1ySvzykDnjw
+ oBBdVOlm4bOkdAa8HXT1Rtjzi/V0TAthXpBl4xD0yuZ5kHHNNutXvv4dLT6W5rNVk99p Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqk2k822r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 16:31:01 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1GUOXQ002818;
+	Fri, 1 Dec 2023 16:31:00 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqk2k821v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 16:31:00 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1DoNlE031663;
+	Fri, 1 Dec 2023 16:30:59 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukun06cwh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 16:30:59 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B1GUumi22872826
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 1 Dec 2023 16:30:56 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 40FF12004B;
+	Fri,  1 Dec 2023 16:30:56 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 10B8A20040;
+	Fri,  1 Dec 2023 16:30:55 +0000 (GMT)
+Received: from [9.179.28.5] (unknown [9.179.28.5])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  1 Dec 2023 16:30:54 +0000 (GMT)
+Message-ID: <19b288d3-5434-40b1-93fa-7db47e417f60@linux.ibm.com>
+Date: Fri, 1 Dec 2023 17:30:54 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 5/7] net/smc: compatible with 128-bits extend
+ GID of virtual ISM device
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
+ <1701343695-122657-6-git-send-email-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1701343695-122657-6-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: J3ErTrvEnCj9xbn8jvO_FnmGVAPd24SY
+X-Proofpoint-GUID: 9gnKUn2vcGwTXfSkZZM2aoUcRnPA4FpH
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231130213441.032a661c@device.home>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-01_15,2023-11-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 phishscore=0 suspectscore=0 lowpriorityscore=0
+ spamscore=0 mlxscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2312010112
 
-Hi Maxime
 
-On Thu, Nov 30, 2023 at 09:34:41PM +0100, Maxime Chevallier wrote:
-> Hello,
-> 
-> On Thu, 30 Nov 2023 22:59:32 +0300
-> Serge Semin <fancer.lancer@gmail.com> wrote:
-> 
-> > On Thu, Nov 30, 2023 at 06:26:13PM +0100, Andrew Lunn wrote:
-> > > > I will check with the xpcs maintainer how can we add indirect access
-> > > > to the xpcs module.  
-> > > 
-> > > https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c#L449
-> > > 
-> > > It creates a regmap for the memory range. On top of that it creates an
-> > > MDIO bus. You can then access the PCS in the normal way.  
-> > 
-> > Actually Synopsys DW XPCS can be synthesized with two types of the CSR
-> > interfaces:
-> > 1. MDIO: device looks as a normal MDIO device. This option is currently
-> >    supported by the STMMAC MDIO driver.
-> > 2. MCI/APB3: device MMD CSRs are directly (all CSRs are visible) or
-> >    indirectly (paged-base access) accessible over the system memory bus.
-> > 
-> > In addition to the above XPCS device can be equipped with separate
-> > clock sources (at least to feed the MCI or APB3 interface) and may
-> > have dedicated IRQ line to signal various events like link
-> > establishing, failures, etc. From that perspective XPCS in both cases
-> > looks as a normal platform device for which would be better to have a
-> > special DT-node defined with all those resources supplied. Then the
-> > XPCS DT-node could be passed to the DW MAC DT-node via the already
-> > standardized "pcs-handle" DT-property.
-> 
 
-> To my understanding, this should work, there's another PCS that works
-> this way : 
-> https://elixir.bootlin.com/linux/v6.7-rc3/source/drivers/net/pcs/pcs-rzn1-miic.c
+On 30.11.23 12:28, Wen Gu wrote:
+[...]
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 766a1f1..d1e18bf 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+[...]
+> @@ -1048,7 +1048,8 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
+>  {
+>  	int rc = SMC_CLC_DECL_NOSMCDDEV;
+>  	struct smcd_dev *smcd;
+> -	int i = 1;
+> +	int i = 1, entry = 1;
+> +	bool is_virtual;
+>  	u16 chid;
+>  
+>  	if (smcd_indicated(ini->smc_type_v1))
+> @@ -1060,14 +1061,23 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
+>  		chid = smc_ism_get_chid(smcd);
+>  		if (!smc_find_ism_v2_is_unique_chid(chid, ini, i))
+>  			continue;
+> +		is_virtual = __smc_ism_is_virtual(chid);
+>  		if (!smc_pnet_is_pnetid_set(smcd->pnetid) ||
+>  		    smc_pnet_is_ndev_pnetid(sock_net(&smc->sk), smcd->pnetid)) {
+> +			if (is_virtual && entry == SMC_MAX_ISM_DEVS)
+> +				/* only one GID-CHID entry left in CLC Proposal SMC-Dv2
+> +				 * extension. but a virtual ISM device's GID takes two
+> +				 * entries. So give up it and try the next potential ISM
+> +				 * device.
+> +				 */
 
-It is similar to that, but since DW XPCS can reside on the normal MDIO
-bus and in the system memory I took a liberty to implement the DW XPCS
-MCI/APB3 interface support in the framework of the MDIO subsystem,
-especially seeing Synopsys call them just "Management Interfaces", the
-MMD CSRs can be indirectly accessible and since potentially there can
-be more than one XPCS device on the same MCI/APB3 bus.
+It is really importatnt to note that virtual ISMs take 2 entries.
+But it is still hard to understand this piece of code. e.g. I was wondering for a while,
+why you mention CLC here...
+Maybe it would be easier to understand this, if you rename SMC_MAX_ISM_DEVS to something else?
+Something like SMCD_MAX_V2_GID_ENTRIES?
 
-> 
-> Are you still able to use the mdio-regmap glue that Andrew mentioned,
-> to avoid the duplication between the mdio and mmio register accesses ?
+> +				continue;
+>  			ini->ism_dev[i] = smcd;
+>  			ini->ism_chid[i] = chid;
+>  			ini->is_smcd = true;
+>  			rc = 0;
+>  			i++;
+> -			if (i > SMC_MAX_ISM_DEVS)
+> +			entry = is_virtual ? entry + 2 : entry + 1;
+> +			if (entry > SMC_MAX_ISM_DEVS)
+>  				break;
+>  		}
+>  	}
+[...]
 
-Andrew cited the glue code using the Lynx PCS driver. In my case it's
-DW XPCS driver. In anycase my patchset is designed in a way so not to
-break (hopefully) the current DW XPCS driver users (STMMAC Eth for
-sure, WangSun XGBE, SJA1105 DSA). So it will be still possible to create a
-dedicated MDIO bus (using mdio-regmap API too) with the XPCS device
-being detectable on it.
 
--Serge(y)
 
-> 
-> Maxime
+> @@ -2154,18 +2176,35 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
+>  	smcd_v2_ext = smc_get_clc_smcd_v2_ext(smc_v2_ext);
+>  
+>  	mutex_lock(&smcd_dev_list.mutex);
+> -	if (pclc_smcd->ism.chid)
+> +	if (pclc_smcd->ism.chid) {
+>  		/* check for ISM device matching proposed native ISM device */
+> +		smcd_gid.gid = ntohll(pclc_smcd->ism.gid);
+> +		smcd_gid.gid_ext = 0;
+>  		smc_check_ism_v2_match(ini, ntohs(pclc_smcd->ism.chid),
+> -				       ntohll(pclc_smcd->ism.gid), &matches);
+> +				       &smcd_gid, &matches);
+> +	}
+>  	for (i = 1; i <= smc_v2_ext->hdr.ism_gid_cnt; i++) {
+
+IMO the following code would be easier to read, if you change the above to count 
+from i = 0; i < smc_v2_ext->hdr.ism_gid_cnt;
+and then use i and i+1 as indexes below.
+
+>  		/* check for ISM devices matching proposed non-native ISM
+>  		 * devices
+>  		 */
+> -		smc_check_ism_v2_match(ini,
+> -				       ntohs(smcd_v2_ext->gidchid[i - 1].chid),
+> -				       ntohll(smcd_v2_ext->gidchid[i - 1].gid),
+> -				       &matches);
+> +		smcd_gid.gid = ntohll(smcd_v2_ext->gidchid[i - 1].gid);
+> +		smcd_gid.gid_ext = 0;
+> +		chid = ntohs(smcd_v2_ext->gidchid[i - 1].chid);
+> +		if (__smc_ism_is_virtual(chid)) {
+> +			if (i == smc_v2_ext->hdr.ism_gid_cnt ||
+> +			    chid != ntohs(smcd_v2_ext->gidchid[i].chid))
+> +				/* a virtual ISM device takes two GID-CHID entries
+> +				 * and CHID of the second entry repeats that of the
+> +				 * first entry.
+> +				 *
+> +				 * So check if the second GID-CHID entry exists and
+> +				 * the CHIDs of these two entries are the same.
+> +				 */
+> +				continue;
+> +
+> +			smcd_gid.gid_ext = ntohll(smcd_v2_ext->gidchid[i++].gid);
+> +		}
+> +		smc_check_ism_v2_match(ini, chid, &smcd_gid, &matches);
+>  	}
+>  	mutex_unlock(&smcd_dev_list.mutex);
+>  
+[...]
+
+
+
+> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+> index e2e437b..2d8bc0b 100644
+> --- a/net/smc/smc_clc.c
+> +++ b/net/smc/smc_clc.c
+[...]
+> @@ -1020,23 +1033,28 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
+>  	if (first_contact)
+>  		clc->hdr.typev2 |= SMC_FIRST_CONTACT_MASK;
+>  	if (conn->lgr->is_smcd) {
+
+It would be nice to have 2 subfunctions for ism and rdma instead of this large if/else block.
+
+> +		struct smcd_gid smcd_gid;
+> +		u16 chid;
+> +
+>  		/* SMC-D specific settings */
+>  		memcpy(clc->hdr.eyecatcher, SMCD_EYECATCHER,
+>  		       sizeof(SMCD_EYECATCHER));
+> +		conn->lgr->smcd->ops->get_local_gid(conn->lgr->smcd, &smcd_gid);
+>  		clc->hdr.typev1 = SMC_TYPE_D;
+> -		clc->d0.gid =
+> -			conn->lgr->smcd->ops->get_local_gid(conn->lgr->smcd);
+> -		clc->d0.token = conn->rmb_desc->token;
+> +		clc->d0.gid = htonll(smcd_gid.gid);
+> +		clc->d0.token = htonll(conn->rmb_desc->token);
+>  		clc->d0.dmbe_size = conn->rmbe_size_comp;
+>  		clc->d0.dmbe_idx = 0;
+>  		memcpy(&clc->d0.linkid, conn->lgr->id, SMC_LGR_ID_SIZE);
+>  		if (version == SMC_V1) {
+>  			clc->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
+>  		} else {
+> -			clc_v2->d1.chid =
+> -				htons(smc_ism_get_chid(conn->lgr->smcd));
+> +			chid = smc_ism_get_chid(conn->lgr->smcd);
+> +			clc_v2->d1.chid = htons(chid);
+>  			if (eid && eid[0])
+>  				memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
+> +			if (__smc_ism_is_virtual(chid))
+> +				clc_v2->d1.gid_ext = htonll(smcd_gid.gid_ext);
+>  			len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
+>  			if (first_contact) {
+>  				fce_len = smc_clc_fill_fce_v2x(&fce_v2x, ini);
+> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+> index e64c235..dcc63f4 100644
+> --- a/net/smc/smc_clc.h
+> +++ b/net/smc/smc_clc.h
+> @@ -205,8 +205,8 @@ struct smcr_clc_msg_accept_confirm {	/* SMCR accept/confirm */
+>  } __packed;
+>  
+>  struct smcd_clc_msg_accept_confirm_common {	/* SMCD accept/confirm */
+> -	u64 gid;		/* Sender GID */
+> -	u64 token;		/* DMB token */
+> +	__be64 gid;		/* Sender GID */
+> +	__be64 token;		/* DMB token */
+
+Good catch, that this needs to be __be. (including the host to net conversions you did above)
+This is not related to the subject of this patch though. So either this should be in a separate patch
+or at least mentioned in the commit message.
+
+>  	u8 dmbe_idx;		/* DMBE index */
+>  #if defined(__BIG_ENDIAN_BITFIELD)
+>  	u8 dmbe_size : 4,	/* buf size (compressed) */
+> @@ -285,8 +285,8 @@ struct smc_clc_msg_accept_confirm_v2 {	/* clc accept / confirm message */
+>  			struct smcd_clc_msg_accept_confirm_common d0;
+>  			__be16 chid;
+>  			u8 eid[SMC_MAX_EID_LEN];
+> -			u8 reserved5[8];
+> -		} d1;
+> +			__be64 gid_ext;
+> +		} __packed d1;
+>  	};
+>  };
+>  
+> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> index d520ee6..32eece5 100644
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.> @@ -506,6 +506,7 @@ static int smc_nl_fill_smcd_lgr(struct smc_link_group *lgr,
+>  {
+>  	char smc_pnet[SMC_MAX_PNETID_LEN + 1];
+>  	struct smcd_dev *smcd = lgr->smcd;
+> +	struct smcd_gid smcd_gid;
+>  	struct nlattr *attrs;
+>  	void *nlh;
+>  
+> @@ -521,11 +522,11 @@ static int smc_nl_fill_smcd_lgr(struct smc_link_group *lgr,
+>  
+>  	if (nla_put_u32(skb, SMC_NLA_LGR_D_ID, *((u32 *)&lgr->id)))
+>  		goto errattr;
+> +	smcd->ops->get_local_gid(smcd, &smcd_gid);
+>  	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_GID,
+> -			      smcd->ops->get_local_gid(smcd),
+> -				  SMC_NLA_LGR_D_PAD))
+> +			      smcd_gid.gid, SMC_NLA_LGR_D_PAD))
+>  		goto errattr;
+> -	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_PEER_GID, lgr->peer_gid,
+> +	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_PEER_GID, lgr->peer_gid.gid,
+>  			      SMC_NLA_LGR_D_PAD))
+>  		goto errattr;
+
+For virtual ism, you will only see the first half of the GID.
+Is that acceptable? Today we use netlink only for display purposes. 
+What if somebody uses the netlink content as functional input to a user space program?
+
+
+>  	if (nla_put_u8(skb, SMC_NLA_LGR_D_VLAN_ID, lgr->vlan_id))
+> @@ -876,7 +877,10 @@ static int smc_lgr_create(struct smc_sock *smc, struct smc_init_info *ini)
+>  		/* SMC-D specific settings */
+
+
+I guess I never really understood, why we define a single linkgroup for SMC-D.
+Probably because SMC-R linkgroups were implemented before SMC-D support was added.
+To all: Do we want to keep that concept?
+
+
+>  		smcd = ini->ism_dev[ini->ism_selected];
+>  		get_device(smcd->ops->get_dev(smcd));
+> -		lgr->peer_gid = ini->ism_peer_gid[ini->ism_selected];
+> +		lgr->peer_gid.gid =
+> +			ini->ism_peer_gid[ini->ism_selected].gid;
+> +		lgr->peer_gid.gid_ext =
+> +			ini->ism_peer_gid[ini->ism_selected].gid_ext;
+>  		lgr->smcd = ini->ism_dev[ini->ism_selected];
+>  		lgr_list = &ini->ism_dev[ini->ism_selected]->lgr_list;
+>  		lgr_lock = &lgr->smcd->lgr_lock;
+> @@ -1514,7 +1518,8 @@ void smc_lgr_terminate_sched(struct smc_link_group *lgr)
+>  }
+>  
+>  /* Called when peer lgr shutdown (regularly or abnormally) is received */
+> -void smc_smcd_terminate(struct smcd_dev *dev, u64 peer_gid, unsigned short vlan)
+> +void smc_smcd_terminate(struct smcd_dev *dev, struct smcd_gid *peer_gid,
+> +			unsigned short vlan)
+>  {
+>  	struct smc_link_group *lgr, *l;
+>  	LIST_HEAD(lgr_free_list);
+> @@ -1522,9 +1527,12 @@ void smc_smcd_terminate(struct smcd_dev *dev, u64 peer_gid, unsigned short vlan)
+>  	/* run common cleanup function and build free list */
+>  	spin_lock_bh(&dev->lgr_lock);
+>  	list_for_each_entry_safe(lgr, l, &dev->lgr_list, list) {
+> -		if ((!peer_gid || lgr->peer_gid == peer_gid) &&
+> +		if ((!peer_gid->gid ||
+> +		     (lgr->peer_gid.gid == peer_gid->gid &&
+> +		      !smc_ism_is_virtual(dev) ? 1 :
+> +		      lgr->peer_gid.gid_ext == peer_gid->gid_ext)) &&
+>  		    (vlan == VLAN_VID_MASK || lgr->vlan_id == vlan)) {
+> -			if (peer_gid) /* peer triggered termination */
+> +			if (peer_gid->gid) /* peer triggered termination */
+>  				lgr->peer_shutdown = 1;
+>  			list_move(&lgr->list, &lgr_free_list);
+>  			lgr->freeing = 1;
+> @@ -1859,10 +1867,12 @@ static bool smcr_lgr_match(struct smc_link_group *lgr, u8 smcr_version,
+>  	return false;
+>  }
+>  
+> -static bool smcd_lgr_match(struct smc_link_group *lgr,
+> -			   struct smcd_dev *smcismdev, u64 peer_gid)
+> +static bool smcd_lgr_match(struct smc_link_group *lgr, struct smcd_dev *smcismdev,
+> +			   struct smcd_gid *peer_gid)
+>  {
+> -	return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
+> +	return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+> +		smc_ism_is_virtual(smcismdev) ?
+> +		(lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
+>  }
+>  
+>  /* create a new SMC connection (and a new link group if necessary) */
+> @@ -1892,7 +1902,7 @@ int smc_conn_create(struct smc_sock *smc, struct smc_init_info *ini)
+>  		write_lock_bh(&lgr->conns_lock);
+>  		if ((ini->is_smcd ?
+>  		     smcd_lgr_match(lgr, ini->ism_dev[ini->ism_selected],
+> -				    ini->ism_peer_gid[ini->ism_selected]) :
+> +				    &ini->ism_peer_gid[ini->ism_selected]) :
+>  		     smcr_lgr_match(lgr, ini->smcr_version,
+>  				    ini->peer_systemid,
+>  				    ini->peer_gid, ini->peer_mac, role,
+[...]
+> diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
+> index a584613..c180c18 100644
+> --- a/net/smc/smc_diag.c
+> +++ b/net/smc/smc_diag.c
+> @@ -21,6 +21,7 @@
+>  
+>  #include "smc.h"
+>  #include "smc_core.h"
+> +#include "smc_ism.h"
+>  
+>  struct smc_diag_dump_ctx {
+>  	int pos[2];
+> @@ -168,12 +169,14 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
+>  		struct smc_connection *conn = &smc->conn;
+>  		struct smcd_diag_dmbinfo dinfo;
+>  		struct smcd_dev *smcd = conn->lgr->smcd;
+> +		struct smcd_gid smcd_gid;
+>  
+>  		memset(&dinfo, 0, sizeof(dinfo));
+>  
+>  		dinfo.linkid = *((u32 *)conn->lgr->id);
+> -		dinfo.peer_gid = conn->lgr->peer_gid;
+> -		dinfo.my_gid = smcd->ops->get_local_gid(smcd);
+> +		dinfo.peer_gid = conn->lgr->peer_gid.gid;
+> +		smcd->ops->get_local_gid(smcd, &smcd_gid);
+> +		dinfo.my_gid = smcd_gid.gid;
+
+For virtual ism, you will only see the first half of the GID.
+Is that acceptable? 
+
+>  		dinfo.token = conn->rmb_desc->token;
+>  		dinfo.peer_token = conn->peer_token;
+>  
+> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+> index fbee249..a33f861 100644
+> --- a/net/smc/smc_ism.c
+> +++ b/net/smc/smc_ism.c
+
+Some of the content of this file is specific to s390 firmware ISMs and some is
+relevant to all future ism devices.
+IMO there is some more work to do to create a clean "smcd-protocol to scmd-device" interface.
+Maybe also some moving between this file and drivers/s390/net/ism_drv.c
+
+Maybe this would be a good next patchset?
+
+Whoever takes this work, remember:
+https://lore.kernel.org/netdev/1c6bdfbf-54c1-4251-916e-9a703a9f644c@infradead.org/T/
+We want to be able to combine SMC, ISM and future kernel modules in any combination.
+Gerd's patch above was meant to solve the current problem. For additional ism devices,
+we need some more improvements, I think.
+
+
+
+
+
+> @@ -44,7 +44,8 @@ static void smcd_handle_irq(struct ism_dev *ism, unsigned int dmbno,
+>  #endif
+>  
+>  /* Test if an ISM communication is possible - same CPC */
+> -int smc_ism_cantalk(u64 peer_gid, unsigned short vlan_id, struct smcd_dev *smcd)
+> +int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
+> +		    struct smcd_dev *smcd)
+>  {
+>  	return smcd->ops->query_remote_gid(smcd, peer_gid, vlan_id ? 1 : 0,
+>  					   vlan_id);
+> @@ -208,7 +209,7 @@ int smc_ism_register_dmb(struct smc_link_group *lgr, int dmb_len,
+>  	dmb.dmb_len = dmb_len;
+>  	dmb.sba_idx = dmb_desc->sba_idx;
+>  	dmb.vlan_id = lgr->vlan_id;
+> -	dmb.rgid = lgr->peer_gid;
+> +	dmb.rgid = lgr->peer_gid.gid;
+>  	rc = lgr->smcd->ops->register_dmb(lgr->smcd, &dmb, &smc_ism_client);
+>  	if (!rc) {
+>  		dmb_desc->sba_idx = dmb.sba_idx;
+> @@ -340,18 +341,20 @@ struct smc_ism_event_work {
+>  
+>  static void smcd_handle_sw_event(struct smc_ism_event_work *wrk)
+>  {
+> +	struct smcd_gid peer_gid = { .gid = wrk->event.tok,
+> +				     .gid_ext = 0 };
+>  	union smcd_sw_event_info ev_info;
+>  
+>  	ev_info.info = wrk->event.info;
+>  	switch (wrk->event.code) {
+>  	case ISM_EVENT_CODE_SHUTDOWN:	/* Peer shut down DMBs */
+> -		smc_smcd_terminate(wrk->smcd, wrk->event.tok, ev_info.vlan_id);
+> +		smc_smcd_terminate(wrk->smcd, &peer_gid, ev_info.vlan_id);
+>  		break;
+>  	case ISM_EVENT_CODE_TESTLINK:	/* Activity timer */
+>  		if (ev_info.code == ISM_EVENT_REQUEST) {
+>  			ev_info.code = ISM_EVENT_RESPONSE;
+>  			wrk->smcd->ops->signal_event(wrk->smcd,
+> -						     wrk->event.tok,
+> +						     &peer_gid,
+>  						     ISM_EVENT_REQUEST_IR,
+>  						     ISM_EVENT_CODE_TESTLINK,
+>  						     ev_info.info);
+> @@ -365,10 +368,12 @@ static void smc_ism_event_work(struct work_struct *work)
+>  {
+>  	struct smc_ism_event_work *wrk =
+>  		container_of(work, struct smc_ism_event_work, work);
+> +	struct smcd_gid smcd_gid = { .gid = wrk->event.tok,
+> +				     .gid_ext = 0 };
+>  
+>  	switch (wrk->event.type) {
+>  	case ISM_EVENT_GID:	/* GID event, token is peer GID */
+> -		smc_smcd_terminate(wrk->smcd, wrk->event.tok, VLAN_VID_MASK);
+> +		smc_smcd_terminate(wrk->smcd, &smcd_gid, VLAN_VID_MASK);
+>  		break;
+>  	case ISM_EVENT_DMB:
+>  		break;
+> @@ -525,7 +530,7 @@ int smc_ism_signal_shutdown(struct smc_link_group *lgr)
+>  	memcpy(ev_info.uid, lgr->id, SMC_LGR_ID_SIZE);
+>  	ev_info.vlan_id = lgr->vlan_id;
+>  	ev_info.code = ISM_EVENT_REQUEST;
+> -	rc = lgr->smcd->ops->signal_event(lgr->smcd, lgr->peer_gid,
+> +	rc = lgr->smcd->ops->signal_event(lgr->smcd, &lgr->peer_gid,
+>  					  ISM_EVENT_REQUEST_IR,
+>  					  ISM_EVENT_CODE_SHUTDOWN,
+>  					  ev_info.info);
+[...]
 
