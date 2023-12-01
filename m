@@ -1,290 +1,158 @@
-Return-Path: <netdev+bounces-52789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC81C800375
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:57:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A571D800379
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B4BB20EB8
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 05:57:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C98DE1C20A5C
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302BFBE5A;
-	Fri,  1 Dec 2023 05:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331B5BE5C;
+	Fri,  1 Dec 2023 06:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="hub64wgi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L20XJVL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C271703
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 21:57:06 -0800 (PST)
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 884214444C
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 05:57:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1701410224;
-	bh=4C3Q+HYtKfZyxDgeOKsRqwmlAqpmpjj4o0+uQrRnSeg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=hub64wgiE/b7E2AE585ZbC9ukm3cuQL5xj3POaFpP27FysMtDf3kUj67O0KrA32vK
-	 j6LGbNRRomJFEE/pdSK00YJUm4VF06tGgbVsYrJ1UyK4ju6xapdIfe7pBi9hdu+vJ4
-	 mGwnLiIDQIFHd3u21Ho1kmLaU3Y5hH5iTseJh544JVK7lutQiIXBSbONQGX6meppDG
-	 3yFAppSea4+ed1Qs5xsftx4I1JbL1GMn57gdlbdeNk41/IoAR3V7cvJd3a0PHFesUL
-	 hVLOEI2HDPbRlZGbXmCaHTAdbB65YSYM/0Vr1J5oWL3ILhSVq5NiMjpoRPeqaCBtLV
-	 X+gZdAY7nAiHw==
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-58d336d8f91so1711327eaf.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 21:57:04 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3559A1720
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 22:00:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701410412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c5UCSvcRKtd6d2j+BMVs/9VlfhZGRPUwVUQBSZyn2JA=;
+	b=L20XJVL6UNkRsVyDRTnclrL2yL3url6qNgKOiaJEAaa9Nw4hwMeZEqoUGZNzItgedagA2m
+	CMHUQH5rC0Dl4Bs7TqSK5OJVWNj67T+YLqdml1fW4XA8XPlNZG18pyf+fFT7lluu8I2iDh
+	RWyjXTfDYWuLf96RCB24/NMd3GEsq0M=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-487-2c3leWtAMAqgqhgMfqWv9w-1; Fri, 01 Dec 2023 01:00:08 -0500
+X-MC-Unique: 2c3leWtAMAqgqhgMfqWv9w-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-285b77f7e1fso1663159a91.0
+        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 22:00:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701410223; x=1702015023;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4C3Q+HYtKfZyxDgeOKsRqwmlAqpmpjj4o0+uQrRnSeg=;
-        b=Co+Hts7Gl+Hzb42sDbuRLYWgIW2QGVuo61/N5KqIz2C62xDhW++B5anqFvgu6rmW3z
-         V3R/qlnItQjqN61iDVIlsF8CaZbsKBbIwL+OfsNaZoxNEVEmit8YsYEEvILFmHHatlwG
-         GXQOmOeVbEylKdKG9o+cVfczUFea2AFeGKnB/g4CQSQ3y9D/FI70F8aLZaPHJmv8cINW
-         6XIjB5oRCQfvqpErs/OmmhP/FKAcQJsSoCjDsXpUF3DdA7IJuK/7VDP9nTf18gHmXPcN
-         e2MoATiDVTJgmiG0DOmmabVTuWeUeC/pAezg/thGRz8W8+ctaQUEuqo7/+fE7xfG/NX6
-         nYpQ==
-X-Gm-Message-State: AOJu0YwcYFKdlRfWdSQJKhFWuV51f7sTX6hHf/c+1h0SL8LGvGV0tlsm
-	aCs7q/Ti7IzF+tLwyNmn+1+bkrUJIVRif+M7RTtEKdy/TJliYtiBeayYi47Tm7OVW+yDMd668Ql
-	gQ7q2x2yMQWahLuXS5FiETznX1z+GC4qplcJ7uloiVh++9JXT
-X-Received: by 2002:a05:6871:580e:b0:1fa:f5c8:ae26 with SMTP id oj14-20020a056871580e00b001faf5c8ae26mr3724oac.21.1701410223025;
-        Thu, 30 Nov 2023 21:57:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF6Sv7F4YQ6l5th4NeOqoH+2HbufHCZ5sMoYMT8kmkwzAXGA7RHOxgGCCpwa8Zo2RVV8e4FXnLJOe95eFvtZ38=
-X-Received: by 2002:a05:6871:580e:b0:1fa:f5c8:ae26 with SMTP id
- oj14-20020a056871580e00b001faf5c8ae26mr3712oac.21.1701410222758; Thu, 30 Nov
- 2023 21:57:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701410407; x=1702015207;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=c5UCSvcRKtd6d2j+BMVs/9VlfhZGRPUwVUQBSZyn2JA=;
+        b=kVXsH4WGa6loBjYYZxdm0qh8IwpxC/3tBjzgMBItVE8t04hxx5HykmsWmAb8hALTTu
+         0gNXnqOXnSUTXLwkVuPWndOYGYNvg1+NPcoVtfbEb3PDanbv4htG1tXdGgNiCwinYQ6J
+         HrQV9mj5uNq+abTKRlRLhcSxe+sU07LiSYc3t27OuRAaBCdc5SzwoPZHAv3FAVi/YYcc
+         AZPKhsJdbYMZ3GkkZsJvoPVZ8QysI1F19EleyuO+WHLJCPMYxjKb1BQkHlVPXUVx9DyL
+         BwI2wPNpnOXg+R+0xgZi5Ga5Du0520mHzOjCWOB36Nbd0wVWD/AQgTLAuFB7TUA8MDxd
+         zfMQ==
+X-Gm-Message-State: AOJu0YyqAhKuVFQ3H/YPzQvbiFIYT6LExMjrwebQynIYoMG6qlanrgPG
+	rLxoRsDAF+m6tDbW/2h/pUYCg9uzr87Lr+4UZEmAM7sTehswxDLGBhVXFXxP8V3nddSu9pkVfCA
+	zUgkrfOIB096wgEq0
+X-Received: by 2002:a17:90a:1656:b0:286:49cb:ef22 with SMTP id x22-20020a17090a165600b0028649cbef22mr3583848pje.24.1701410407252;
+        Thu, 30 Nov 2023 22:00:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHFL0i6C+nvuHJfXZFwprm/4fHEbJS8k0eoF9pHdZq0wQukG9xOm1Bqg4VmjooU3zZwm9Y4lw==
+X-Received: by 2002:a17:90a:1656:b0:286:49cb:ef22 with SMTP id x22-20020a17090a165600b0028649cbef22mr3583751pje.24.1701410405567;
+        Thu, 30 Nov 2023 22:00:05 -0800 (PST)
+Received: from localhost ([240d:1a:c0d:9f00:3342:3fe3:7275:954])
+        by smtp.gmail.com with ESMTPSA id z8-20020a17090ab10800b002865028e17csm1039533pjq.9.2023.11.30.22.00.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 22:00:05 -0800 (PST)
+Date: Fri, 01 Dec 2023 15:00:01 +0900 (JST)
+Message-Id: <20231201.150001.994919262711540315.syoshida@redhat.com>
+To: edumazet@google.com
+Cc: willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
+ davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ipv4: ip_gre: Handle skb_pull() failure in
+ ipgre_xmit()
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <CANn89i+u6tFJQKESV9DH-HypezVV7Ux+XhnyFGLd833PR9Qpyw@mail.gmail.com>
+References: <CANn89iLxEZAjomWEW4GFJds6kyd6Zf+ed9kx6eVsaQ57De6gMw@mail.gmail.com>
+	<20231130.230329.2023533070545022513.syoshida@redhat.com>
+	<CANn89i+u6tFJQKESV9DH-HypezVV7Ux+XhnyFGLd833PR9Qpyw@mail.gmail.com>
+X-Mailer: Mew version 6.9 on Emacs 29.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231130040105.1265779-1-liuhangbin@gmail.com> <20231130040105.1265779-2-liuhangbin@gmail.com>
-In-Reply-To: <20231130040105.1265779-2-liuhangbin@gmail.com>
-From: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Date: Fri, 1 Dec 2023 13:56:51 +0800
-Message-ID: <CAMy_GT_YawM_6Xw9Qtt8rNLraAnfh_UkYjrb6j_1sWCSjfPN0w@mail.gmail.com>
-Subject: Re: [PATCHv2 net-next 01/14] selftests/net: add lib.sh
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org, 
-	Guillaume Nault <gnault@redhat.com>, Petr Machata <petrm@nvidia.com>, 
-	James Prestwood <prestwoj@gmail.com>, Jaehee Park <jhpark1013@gmail.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Francesco Ruggeri <fruggeri@arista.com>, 
-	Justin Iurman <justin.iurman@uliege.be>, Xin Long <lucien.xin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-On Thu, Nov 30, 2023 at 12:01=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com>=
- wrote:
->
-> Add a lib.sh for net selftests. This file can be used to define commonly
-> used variables and functions. Some commonly used functions can be moved
-> from forwarding/lib.sh to this lib file. e.g. busywait().
->
-> Add function setup_ns() for user to create unique namespaces with given
-> prefix name.
->
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/net/Makefile          |  2 +-
->  tools/testing/selftests/net/forwarding/lib.sh | 27 +-----
->  tools/testing/selftests/net/lib.sh            | 85 +++++++++++++++++++
->  3 files changed, 87 insertions(+), 27 deletions(-)
->  create mode 100644 tools/testing/selftests/net/lib.sh
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index 9274edfb76ff..14bd68da7466 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -54,7 +54,7 @@ TEST_PROGS +=3D ip_local_port_range.sh
->  TEST_PROGS +=3D rps_default_mask.sh
->  TEST_PROGS +=3D big_tcp.sh
->  TEST_PROGS_EXTENDED :=3D in_netns.sh setup_loopback.sh setup_veth.sh
-> -TEST_PROGS_EXTENDED +=3D toeplitz_client.sh toeplitz.sh
-> +TEST_PROGS_EXTENDED +=3D toeplitz_client.sh toeplitz.sh lib.sh
->  TEST_GEN_FILES =3D  socket nettest
->  TEST_GEN_FILES +=3D psock_fanout psock_tpacket msg_zerocopy reuseport_ad=
-dr_any
->  TEST_GEN_FILES +=3D tcp_mmap tcp_inq psock_snd txring_overwrite
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testin=
-g/selftests/net/forwarding/lib.sh
-> index e37a15eda6c2..8f6ca458af9a 100755
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -4,9 +4,6 @@
->  ########################################################################=
-######
->  # Defines
->
-> -# Kselftest framework requirement - SKIP code is 4.
-> -ksft_skip=3D4
-> -
->  # Can be overridden by the configuration file.
->  PING=3D${PING:=3Dping}
->  PING6=3D${PING6:=3Dping6}
-> @@ -41,6 +38,7 @@ if [[ -f $relative_path/forwarding.config ]]; then
->         source "$relative_path/forwarding.config"
->  fi
->
-> +source ../lib.sh
->  ########################################################################=
-######
->  # Sanity checks
->
-> @@ -395,29 +393,6 @@ log_info()
->         echo "INFO: $msg"
->  }
->
-> -busywait()
-> -{
-> -       local timeout=3D$1; shift
-> -
-> -       local start_time=3D"$(date -u +%s%3N)"
-> -       while true
-> -       do
-> -               local out
-> -               out=3D$("$@")
-> -               local ret=3D$?
-> -               if ((!ret)); then
-> -                       echo -n "$out"
-> -                       return 0
-> -               fi
-> -
-> -               local current_time=3D"$(date -u +%s%3N)"
-> -               if ((current_time - start_time > timeout)); then
-> -                       echo -n "$out"
-> -                       return 1
-> -               fi
-> -       done
-> -}
-> -
->  not()
->  {
->         "$@"
-> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests=
-/net/lib.sh
-> new file mode 100644
-> index 000000000000..518eca57b815
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/lib.sh
-> @@ -0,0 +1,85 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +########################################################################=
-######
-> +# Defines
-> +
-> +# Kselftest framework requirement - SKIP code is 4.
-> +ksft_skip=3D4
-> +
-> +########################################################################=
-######
-> +# Helpers
-> +busywait()
-> +{
-> +       local timeout=3D$1; shift
-> +
-> +       local start_time=3D"$(date -u +%s%3N)"
-> +       while true
-> +       do
-> +               local out
-> +               out=3D$("$@")
-> +               local ret=3D$?
-> +               if ((!ret)); then
-> +                       echo -n "$out"
-> +                       return 0
-> +               fi
-> +
-> +               local current_time=3D"$(date -u +%s%3N)"
-> +               if ((current_time - start_time > timeout)); then
-> +                       echo -n "$out"
-> +                       return 1
-> +               fi
-> +       done
-> +}
-> +
-> +cleanup_ns()
-> +{
-> +       local ns=3D""
-> +       local errexit=3D0
-> +       local ret=3D0
-> +
-> +       # disable errexit temporary
-> +       if [[ $- =3D~ "e" ]]; then
-> +               errexit=3D1
-> +               set +e
-> +       fi
-> +
-> +       for ns in "$@"; do
-> +               ip netns delete "${ns}" &> /dev/null
-> +               if ! busywait 2 ip netns list \| grep -vq "^$ns$" &> /dev=
-/null; then
-> +                       echo "Warn: Failed to remove namespace $ns"
-> +                       ret=3D1
-> +               fi
-> +       done
-> +
-> +       [ $errexit -eq 1 ] && set -e
-> +       return $ret
-> +}
-> +
-> +# setup netns with given names as prefix. e.g
-> +# setup_ns local remote
-> +setup_ns()
-> +{
-> +       local ns=3D""
-> +       local ns_name=3D""
-> +       local ns_list=3D""
-> +       for ns_name in "$@"; do
-> +               # Some test may setup/remove same netns multi times
-> +               if unset ${ns_name} 2> /dev/null; then
-> +                       ns=3D"${ns_name,,}-$(mktemp -u XXXXXX)"
-> +                       eval readonly ${ns_name}=3D"$ns"
-> +               else
-> +                       eval ns=3D'$'${ns_name}
-> +                       cleanup_ns "$ns"
-> +
-> +               fi
-> +
-> +               if ! ip netns add "$ns"; then
-> +                       echo "Failed to create namespace $ns_name"
-> +                       cleanup_ns "$ns_list"
-> +                       return $ksft_skip
-> +               fi
-> +               ip -n "$ns" link set lo up
-I got this patchset tested the result is looking good. However it
-seems that not all of the tests require this loopback bring up, e.g.
-* arp_ndisc_untracked_subnets.sh
-* cmsg_ipv6.sh
-* cmsg_so_mark.sh
-* cmsg_time.sh
-* drop_monitor_tests.sh
-* icmp.sh
-* ndisc_unsolicited_na_test.sh
-* sctp_vrf.sh
-* unicast_extensions.sh
+DQpPbiBUaHUsIDMwIE5vdiAyMDIzIDE1OjA1OjM4ICswMTAwLCBFcmljIER1bWF6ZXQgd3JvdGU6
+DQo+IE9uIFRodSwgTm92IDMwLCAyMDIzIGF0IDM6MDPigK9QTSBTaGlnZXJ1IFlvc2hpZGEgPHN5
+b3NoaWRhQHJlZGhhdC5jb20+IHdyb3RlOg0KPj4NCj4+IE9uIFdlZCwgMjkgTm92IDIwMjMgMTA6
+NTY6NDcgKzAxMDAsIEVyaWMgRHVtYXpldCB3cm90ZToNCj4+ID4gT24gV2VkLCBOb3YgMjksIDIw
+MjMgYXQgMjo1MeKAr0FNIFNoaWdlcnUgWW9zaGlkYSA8c3lvc2hpZGFAcmVkaGF0LmNvbT4gd3Jv
+dGU6DQo+PiA+Pg0KPj4gPj4gT24gTW9uLCAyNyBOb3YgMjAyMyAxMDo1NTowMSAtMDUwMCwgV2ls
+bGVtIGRlIEJydWlqbiB3cm90ZToNCj4+ID4+ID4gU2hpZ2VydSBZb3NoaWRhIHdyb3RlOg0KPj4g
+Pj4gPj4gSW4gaXBncmVfeG1pdCgpLCBza2JfcHVsbCgpIG1heSBmYWlsIGV2ZW4gaWYgcHNrYl9p
+bmV0X21heV9wdWxsKCkgcmV0dXJucw0KPj4gPj4gPj4gdHJ1ZS4gRm9yIGV4YW1wbGUsIGFwcGxp
+Y2F0aW9ucyBjYW4gY3JlYXRlIGEgbWFsZm9ybWVkIHBhY2tldCB0aGF0IGNhdXNlcw0KPj4gPj4g
+Pj4gdGhpcyBwcm9ibGVtIHdpdGggUEZfUEFDS0VULg0KPj4gPj4gPg0KPj4gPj4gPiBJdCBtYXkg
+ZmFpbCBiZWNhdXNlIGJlY2F1c2UgcHNrYl9pbmV0X21heV9wdWxsIGRvZXMgbm90IGFjY291bnQg
+Zm9yDQo+PiA+PiA+IHR1bm5lbC0+aGxlbi4NCj4+ID4+ID4NCj4+ID4+ID4gSXMgdGhhdCB3aGF0
+IHlvdSBhcmUgcmVmZXJyaW5nIHRvIHdpdGggbWFsZm9ybWVkIHBhY2tldD8gQ2FuIHlvdQ0KPj4g
+Pj4gPiBlbG9ib3JhdGUgYSBiaXQgb24gaW4gd2hpY2ggd2F5IHRoZSBwYWNrZXQgaGFzIHRvIGJl
+IG1hbGZvcm1lZCB0bw0KPj4gPj4gPiByZWFjaCB0aGlzPw0KPj4gPj4NCj4+ID4+IFRoYW5rIHlv
+dSB2ZXJ5IG11Y2ggZm9yIHlvdXIgcHJvbXB0IGZlZWRiYWNrLg0KPj4gPj4NCj4+ID4+IEFjdHVh
+bGx5LCBJIGZvdW5kIHRoaXMgcHJvYmxlbSBieSBydW5uaW5nIHN5emthbGxlci4gU3l6a2FsbGVy
+DQo+PiA+PiByZXBvcnRlZCB0aGUgZm9sbG93aW5nIHVuaW5pdC12YWx1ZSBpc3N1ZSAoSSB0aGlu
+ayB0aGUgcm9vdCBjYXVzZSBvZg0KPj4gPj4gdGhpcyBpc3N1ZSBpcyB0aGUgc2FtZSBhcyB0aGUg
+b25lIEVyaWMgbWVudGlvbmVkKToNCj4+ID4NCj4+ID4gWWVzLCBJIGFsc28gaGF2ZSBhIHNpbWls
+YXIgc3l6Ym90IHJlcG9ydCAoYnV0IG5vIHJlcHJvIHlldCkgSSBhbQ0KPj4gPiByZWxlYXNpbmcg
+aXQgcmlnaHQgbm93Lg0KPj4gPg0KPj4gPj4NCj4+ID4+ID09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+PiA+PiBCVUc6IEtNU0FOOiB1bmluaXQt
+dmFsdWUgaW4gX19ncmVfeG1pdCBuZXQvaXB2NC9pcF9ncmUuYzo0NjkgW2lubGluZV0NCj4+ID4+
+IEJVRzogS01TQU46IHVuaW5pdC12YWx1ZSBpbiBpcGdyZV94bWl0KzB4ZGY0LzB4ZTcwIG5ldC9p
+cHY0L2lwX2dyZS5jOjY2Mg0KPj4gPj4gIF9fZ3JlX3htaXQgbmV0L2lwdjQvaXBfZ3JlLmM6NDY5
+IFtpbmxpbmVdDQo+PiA+Pg0KPj4gPg0KPj4gPg0KPj4gPg0KPj4gPj4gVGhlIHNpbXBsaWZpZWQg
+dmVyc2lvbiBvZiB0aGUgcmVwcm8gaXMgc2hvd24gYmVsb3c6DQo+PiA+Pg0KPj4gPj4gI2luY2x1
+ZGUgPGxpbnV4L2lmX2V0aGVyLmg+DQo+PiA+PiAjaW5jbHVkZSA8c3lzL2lvY3RsLmg+DQo+PiA+
+PiAjaW5jbHVkZSA8bmV0aW5ldC9ldGhlci5oPg0KPj4gPj4gI2luY2x1ZGUgPG5ldC9pZi5oPg0K
+Pj4gPj4gI2luY2x1ZGUgPHN5cy9zb2NrZXQuaD4NCj4+ID4+ICNpbmNsdWRlIDxuZXRpbmV0L2lu
+Lmg+DQo+PiA+PiAjaW5jbHVkZSA8c3RyaW5nLmg+DQo+PiA+PiAjaW5jbHVkZSA8dW5pc3RkLmg+
+DQo+PiA+PiAjaW5jbHVkZSA8c3RkaW8uaD4NCj4+ID4+ICNpbmNsdWRlIDxzdGRsaWIuaD4NCj4+
+ID4+ICNpbmNsdWRlIDxsaW51eC9pZl9wYWNrZXQuaD4NCj4+ID4+DQo+PiA+PiBpbnQgbWFpbih2
+b2lkKQ0KPj4gPj4gew0KPj4gPj4gICAgICAgICBpbnQgcywgczEsIHMyLCBkYXRhID0gMDsNCj4+
+ID4+ICAgICAgICAgc3RydWN0IGlmcmVxIGlmcjsNCj4+ID4+ICAgICAgICAgc3RydWN0IHNvY2th
+ZGRyX2xsIGFkZHIgPSB7IDAgfTsNCj4+ID4+ICAgICAgICAgdW5zaWduZWQgY2hhciBtYWNfYWRk
+cltdID0gezB4MSwgMHgyLCAweDMsIDB4NCwgMHg1LCAweDZ9Ow0KPj4gPj4NCj4+ID4+ICAgICAg
+ICAgcyA9IHNvY2tldChBRl9QQUNLRVQsIFNPQ0tfREdSQU0sIDB4MzAwKTsNCj4+ID4+ICAgICAg
+ICAgczEgPSBzb2NrZXQoQUZfUEFDS0VULCBTT0NLX1JBVywgMHgzMDApOw0KPj4gPj4gICAgICAg
+ICBzMiA9IHNvY2tldChBRl9ORVRMSU5LLCBTT0NLX1JBVywgMCk7DQo+PiA+Pg0KPj4gPj4gICAg
+ICAgICBzdHJjcHkoaWZyLmlmcl9uYW1lLCAiZ3JlMCIpOw0KPj4gPj4gICAgICAgICBpb2N0bChz
+MiwgU0lPQ0dJRklOREVYLCAmaWZyKTsNCj4+ID4+DQo+PiA+PiAgICAgICAgIGFkZHIuc2xsX2Zh
+bWlseSA9IEFGX1BBQ0tFVDsNCj4+ID4+ICAgICAgICAgYWRkci5zbGxfaWZpbmRleCA9IGlmci5p
+ZnJfaWZpbmRleDsNCj4+ID4+ICAgICAgICAgYWRkci5zbGxfcHJvdG9jb2wgPSBodG9ucygwKTsN
+Cj4+ID4+ICAgICAgICAgYWRkci5zbGxfaGF0eXBlID0gQVJQSFJEX0VUSEVSOw0KPj4gPj4gICAg
+ICAgICBhZGRyLnNsbF9wa3R0eXBlID0gUEFDS0VUX0hPU1Q7DQo+PiA+PiAgICAgICAgIGFkZHIu
+c2xsX2hhbGVuID0gRVRIX0FMRU47DQo+PiA+PiAgICAgICAgIG1lbWNweShhZGRyLnNsbF9hZGRy
+LCBtYWNfYWRkciwgRVRIX0FMRU4pOw0KPj4gPj4NCj4+ID4+ICAgICAgICAgc2VuZHRvKHMxLCAm
+ZGF0YSwgMSwgMCwgKHN0cnVjdCBzb2NrYWRkciAqKSZhZGRyLCBzaXplb2YoYWRkcikpOw0KPj4g
+Pj4NCj4+ID4+ICAgICAgICAgcmV0dXJuIDA7DQo+PiA+PiB9DQo+PiA+Pg0KPj4gPj4gVGhlIHJl
+cHJvIHNlbmRzIGEgMS1ieXRlIHBhY2tldCB0aGF0IGRvZXNuJ3QgaGF2ZSB0aGUgY29ycmVjdCBJ
+UA0KPj4gPj4gaGVhZGVyLiBJIG1lYW50IHRoaXMgYXMgIm1hbGZvcm1lZCBwYWNoZXQiLCBidXQg
+dGhhdCBtaWdodCBiZSBhIGJpdA0KPj4gPj4gY29uZnVzaW5nLCBzb3JyeS4NCj4+ID4+DQo+PiA+
+PiBJIHRoaW5rIHRoZSBjYXVzZSBvZiB0aGUgdW5pbml0LXZhbHVlIGFjY2VzcyBpcyB0aGF0IGlw
+Z3JlX3htaXQoKQ0KPj4gPj4gcmVhbGxvY2F0ZXMgdGhlIHNrYiB3aXRoIHNrYl9jb3dfaGVhZCgp
+IGFuZCBjb3BpZXMgb25seSB0aGUgMS1ieXRlDQo+PiA+PiBkYXRhLCBzbyBhbnkgSVAgaGVhZGVy
+IGFjY2VzcyB0aHJvdWdoIGB0bmxfcGFyYW1zYCBjYW4gY2F1c2UgdGhlDQo+PiA+PiBwcm9ibGVt
+Lg0KPj4gPj4NCj4+ID4+IEF0IGZpcnN0IEkgdHJpZWQgdG8gbW9kaWZ5IHBza2JfaW5ldF9tYXlf
+cHVsbCgpIHRvIGRldGVjdCB0aGlzIHR5cGUgb2YNCj4+ID4+IHBhY2tldCwgYnV0IEkgZW5kZWQg
+dXAgZG9pbmcgdGhpcyBwYXRjaC4NCj4+ID4NCj4+ID4gRXZlbiBhZnRlciB5b3VyIHBhdGNoLCBf
+X3NrYl9wdWxsKCkgY291bGQgY2FsbCBCVUcoKSBhbmQgY3Jhc2guDQo+PiA+DQo+PiA+IEkgd291
+bGQgc3VnZ2VzdCB1c2luZyB0aGlzIGZpeCBpbnN0ZWFkLg0KPj4NCj4+IFRoYW5rIHlvdSBmb3Ig
+eW91ciBjb21tZW50Lg0KPj4NCj4+IFlvdXIgcGF0Y2ggZW5zdXJlcyB0aGF0IHNrYl9wdWxsKCkg
+Y2FuIHB1bGwgdGhlIHJlcXVpcmVkIHNpemUsIHNvIGl0DQo+PiBsb29rcyBnb29kIHRvIG1lLiBB
+bHNvLCBJIGhhdmUgdGVzdGVkIHlvdXIgc3VnZ2VzdGVkIHBhdGNoIHdpdGggdGhlDQo+PiByZXBy
+byBhbmQgY29uZmlybWVkIHRoYXQgaXQgZml4ZXMgdGhlIGlzc3VlLg0KPj4NCj4gDQo+IFRoaXMg
+aXMgZ3JlYXQsIHBsZWFzZSBjb29rL3NlbmQgYSBWMiB3aXRoIHRoaXMgdXBkYXRlZCBwYXRjaC4N
+Cj4gDQo+IEkgd2lsbCBhZGQgYSAnUmV2aWV3ZWQtYnk6IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRA
+Z29vZ2xlLmNvbT4nIHRoZW4uDQoNClRoYW5rcywgRXJpYyEgSSdsbCBzZW5kIGEgdjIgcGF0Y2gg
+c29vbi4NCg0KU2hpZ2VydQ0KDQo+IA0KPiBUaGFua3MuDQo+IA0K
 
-A possible solution could be adding an extra flag to setup_ns(), bring
-lo up on demand.
-
-Not sure if this is needed, as I can't think of possible impacts of
-this for the moment.
-(Maybe a test does not require loopback device in such state?)
-Other might be able to provide some feedback about this.
-
-> +               ns_list=3D"$ns_list $ns"
-> +       done
-> +}
-> --
-> 2.41.0
->
 
