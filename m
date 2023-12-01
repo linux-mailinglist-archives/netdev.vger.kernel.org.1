@@ -1,142 +1,96 @@
-Return-Path: <netdev+bounces-52991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD121801095
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:51:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53FA68010B1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60854B2116C
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:51:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E673281A60
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDC04D105;
-	Fri,  1 Dec 2023 16:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA704D12E;
+	Fri,  1 Dec 2023 17:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyF4sQnf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69FCF84;
-	Fri,  1 Dec 2023 08:51:39 -0800 (PST)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5d3ffa1ea24so11198677b3.3;
-        Fri, 01 Dec 2023 08:51:39 -0800 (PST)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F69F3;
+	Fri,  1 Dec 2023 09:03:21 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6cdcef787ffso2353840b3a.0;
+        Fri, 01 Dec 2023 09:03:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701450201; x=1702055001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qNWn1kdO8blUyQYsaUuU441May+eNH4MGJiwzkp6ycg=;
+        b=XyF4sQnf27IlxfPHxB7EfEGGAhlGQBachWONmEClvqy2PRde1vZrM07J5OmNXVNpcx
+         8aDXs5l6+iwNm3cmGAumNrKPCCUR5MMlpxj9mfpvzgZn0AuBW+Qn+i0KB8iLHg4ppOup
+         +4xgsRQPYLYt8zdErxY6iDGdAPkZhev7Sts3dcRKhDaCgTeToVIOlZ9/Z3JFNZj04FFi
+         tNtO3frJh0z054nc1LpLoZjn+UeNtN1tL7VfRiYMO3QzwK8XYQV4SuyHbp5Fy8let2lU
+         eWCDjMTSfttEVW8uJZw8ZCjIAgGPQUO6DHlMWeK5W+J2jHp/dZnzs9yc6Ri4S1L0uDCW
+         hf+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701449498; x=1702054298;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yDzeyfGvLGKAd0t6wo+v/fNB/1C7/68ct1cBPBE+Rpo=;
-        b=SwTWdakvf7d5dgzXAfGXKETbfe8hdwBPyE8oUFrI4Sb6buwiU3CGJA9vaVqd12YQ5j
-         573GXzyI8v0CpdB28hXjSOtuFymn+VyITjkZlnRYwUmK9/OVXFBCTLrmIE7crmb67CId
-         HBgGYvpsnRQ+6xKaPEmj5zz0JM15abloxhmkJPHxG28L5U3u3A0FfQYNDmYjtfkTihrI
-         l6s7o5oNGokA6GC+uQ9SnGff48T1O4O7vfgrfZ9x9ako9FvdQi2JoDm8HY/MuNXf/CJ0
-         7J+K5f5s3svgXdkRR+bfUqwoCKIgIyjkt4trlYIuJvduz4kmZB1muMVHCbUxucz1kbdX
-         bXcg==
-X-Gm-Message-State: AOJu0YzxGbeHARavKFfII5H4TKDdpBC/DjXzpN7JDxq4WZTuatAdfkLa
-	4a78/D1O/q7H5FG+k6NJzaLzORmWv2QMmw==
-X-Google-Smtp-Source: AGHT+IH43T68ldw1tPhF5dB+8ElOyMxhmXs8LU1in/Neu6f21ET2d4Jav1dwhHJbLL7BzpcV5JKI5g==
-X-Received: by 2002:a81:ac56:0:b0:5d3:464d:18d9 with SMTP id z22-20020a81ac56000000b005d3464d18d9mr6201581ywj.21.1701449498364;
-        Fri, 01 Dec 2023 08:51:38 -0800 (PST)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
-        by smtp.gmail.com with ESMTPSA id u204-20020a8160d5000000b005d29344e625sm1193845ywb.114.2023.12.01.08.51.35
+        d=1e100.net; s=20230601; t=1701450201; x=1702055001;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qNWn1kdO8blUyQYsaUuU441May+eNH4MGJiwzkp6ycg=;
+        b=RCJgaNIhNYx/I13ksGwwW8xHbSNx7NfaAyDCLgVPxLuXEvf0CsvH3wZulKR0RYPN5f
+         PHHJoIovZ7hoJm7YF3ah6YC6hnTBkQchJM+DS2Tws2ghkCViWC+WTCrufeJu3KXjP9/Y
+         QYMf7LpTbWliG3nBmdLfHRYP2Vk+IYI/Nkp8wYtTfF7mlYu1A/rI4VSI0ZQ8Y7KQdHtE
+         qns6nLDkMPBXnXYiaMliMi5+v00pIF2he7+JFbYNtB3s5iUH7MnP4cBX0BWck6HN4q+G
+         7mB8u4HKwo73Kw/WbnLL5cdMgogZ+vHpXRmOcyalPyNcPeXrnnkOGy7y3yqnboIk9LXI
+         XG0A==
+X-Gm-Message-State: AOJu0YyKGhiUGbZsFJrtUHpysFwzgbYdZ69xUIAQyIOIeq3ivo8Y3Ay0
+	puc/1ewrhtK3IFLO7hrODLw=
+X-Google-Smtp-Source: AGHT+IGOFtaHoKo25pNZCUcukn0B+nCZPW8yNEXEsoJiDnOrjXmO7oZXnTTp8W69Zu32Vsx754Q6aQ==
+X-Received: by 2002:a05:6a00:2e1c:b0:6c6:b5ae:15a4 with SMTP id fc28-20020a056a002e1c00b006c6b5ae15a4mr34841765pfb.20.1701450200769;
+        Fri, 01 Dec 2023 09:03:20 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id r14-20020aa79ece000000b006c9c0705b5csm3232908pfq.48.2023.12.01.09.03.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 08:51:36 -0800 (PST)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5c08c47c055so25662177b3.1;
-        Fri, 01 Dec 2023 08:51:35 -0800 (PST)
-X-Received: by 2002:a81:9b4b:0:b0:5d3:a789:4e0d with SMTP id
- s72-20020a819b4b000000b005d3a7894e0dmr4657972ywg.17.1701449495359; Fri, 01
- Dec 2023 08:51:35 -0800 (PST)
+        Fri, 01 Dec 2023 09:03:20 -0800 (PST)
+Message-ID: <36c32191-8cde-4a95-baf4-311b663fe275@gmail.com>
+Date: Fri, 1 Dec 2023 09:03:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com> <20231120070024.4079344-7-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231120070024.4079344-7-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 1 Dec 2023 17:51:23 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdU6-jHrT6DjFkwHoBytOzT=E9=dujWBq0v++ow4CJW==g@mail.gmail.com>
-Message-ID: <CAMuHMdU6-jHrT6DjFkwHoBytOzT=E9=dujWBq0v++ow4CJW==g@mail.gmail.com>
-Subject: Re: [PATCH 06/14] pinctrl: renesas: rzg2l: Add pin configuration
- support for pinmux groups
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
-	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] net: phy: micrel: use devm_clk_get_optional_enabled
+ for the rmii-ref clock
+Content-Language: en-US
+To: Heiko Stuebner <heiko@sntech.de>, andrew@lunn.ch, hkallweit1@gmail.com
+Cc: linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, quentin.schulz@theobroma-systems.com,
+ Heiko Stuebner <heiko.stuebner@cherry.de>
+References: <20231201150131.326766-1-heiko@sntech.de>
+ <20231201150131.326766-2-heiko@sntech.de>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231201150131.326766-2-heiko@sntech.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Claudiu,
+On 12/1/23 07:01, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@cherry.de>
+> 
+> While the external clock input will most likely be enabled, it's not
+> guaranteed and clk_get_rate in some suppliers will even just return
+> valid results when the clock is running.
+> 
+> So use devm_clk_get_optional_enabled to retrieve and enable the clock
+> in one go.
+> 
+> Signed-off-by: Heiko Stuebner <heiko.stuebner@cherry.de>
 
-On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
-wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->
-> On RZ/G3S different Ethernet pins needs to be configured with different
-> settings (e.g. power-source need to be set, RGMII TXC, TX_CTL pins need
-> output-enable). Commit adjust driver to allow specifying pin configuratio=
-n
-> for pinmux groups. With this DT settings like the following are taken
-> into account by driver:
->
-> eth0_pins: eth0 {
->         tx_ctl {
->                 pinmux =3D <RZG2L_PORT_PINMUX(1, 1, 1)>;  /* ET0_TX_CTL *=
-/
->                 power-source =3D <1800>;
->                 output-enable;
->                 drive-strength-microamp =3D <5200>;
->         };
-> };
->
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-Thanks for your patch!
-
-> --- a/drivers/pinctrl/renesas/pinctrl-rzg2l.c
-> +++ b/drivers/pinctrl/renesas/pinctrl-rzg2l.c
-> @@ -376,8 +376,11 @@ static int rzg2l_dt_subnode_to_map(struct pinctrl_de=
-v *pctldev,
->                 goto done;
->         }
->
-> -       if (num_pinmux)
-> +       if (num_pinmux) {
->                 nmaps +=3D 1;
-> +               if (num_configs)
-> +                       nmaps +=3D 1;
-
-I think this would be more readable, and better follow the style of
-the surrounding statements, if this new check would not be nested
-under the num_pinmux check.
-
-> +       }
->
->         if (num_pins)
->                 nmaps +=3D num_pins;
-
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
