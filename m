@@ -1,169 +1,310 @@
-Return-Path: <netdev+bounces-53165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0635C80183A
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:57:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A52801851
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 01:00:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28341F20FE6
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:57:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02EBA281380
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415D856B83;
-	Fri,  1 Dec 2023 23:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECC759B52;
+	Fri,  1 Dec 2023 23:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JWYvBz95"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mEM88SmB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9187F9A
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 15:57:06 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54c74b3cd4cso852171a12.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 15:57:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701475025; x=1702079825; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2nYz8nkKnI/7gBd0YXSd8EINQA+Rcj/aeIwLgHoBcYg=;
-        b=JWYvBz95ikM3/hD9sj+hwHQjUWpOJjUj6n+aGwDcVUoOQGocB5Q1Iy9WrWU5RNrS+u
-         hd2BPZbqgKmXcHs6PiIqWOJMCeI38CXdVtzbeL9pp8wfjNJ6n+okPLwxTNxmUYy6dK6A
-         aCtgvv3WbqwgW7GB5eaQfRODPZk/Sk1JhL7mQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701475025; x=1702079825;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2nYz8nkKnI/7gBd0YXSd8EINQA+Rcj/aeIwLgHoBcYg=;
-        b=caOzRZR3zKUQzEHz1Qz7GJ3JrkITn1+IghVDAecmF3AUNAQBKDZWjvMylBGkGsuScH
-         vm/zj0/PW0MuccrMLYQoe3nDnelEJNQtvFsRRgmgZiE/bLTOnHFfWGJ6cfcy3mn379Ce
-         eAT4Fzz66TrYsVU8fau65W4h4NmkK4r3UyL56CJzYDLOO7mipuB7nlRA04qgj12cMPgl
-         DOgrhUjX1RTnt2JG4Wtwk3HNO/5ytRTVyaQKobIUduCIlmPfft5GFpT5LaclnOVbVNBE
-         spzDLrfXjysIMzGV8GokozuVXH8AW+Uj6qWhQ1/pxZELWtSMaHj4UYQ0xp2+BbIzGQJa
-         GUtQ==
-X-Gm-Message-State: AOJu0YwcAQxQbOfIQrq+fVT7S/1ixE4RAWTH9dWZgelYT2XCoCo0+TqF
-	WwkHxUb+O/Iar0y24R8CfoK7YULeuV1ylamo73h7gw==
-X-Google-Smtp-Source: AGHT+IFkEhgitouvfy7/TeBpc37ucbmiP7trDYkOiUwqGwD5CJwaeDMmRkqHI8n9gUgsVQ86iVMebPkVTuhzAzXHSEM=
-X-Received: by 2002:a50:9e24:0:b0:54c:6453:1d71 with SMTP id
- z33-20020a509e24000000b0054c64531d71mr1747850ede.3.1701475024866; Fri, 01 Dec
- 2023 15:57:04 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F559A
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 15:59:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701475194; x=1733011194;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2+0ReYztB9A7pnrrDNvw8uGroW6pthTc2yO5Cqask84=;
+  b=mEM88SmBSMXO4/FrvIea+Vw5fFzber2IcH2tvKZ4Kogwk7HzXUrENTWU
+   /NdW7rSTRKFgc4XTphIb7KhI7z6+6NsSrmzXPcQeoQzYC+aqxgtYWTUJn
+   U6yVwqQAYFwFApFsHWmEm0yaZ2tZXmZ4wM9e1H2A8S1yYLwyORi5o5zJZ
+   Sm84RKRhmXMVseTpa06D7EGTbBuExfL37XDIDmZKdko0cSgHRAZejaPYE
+   J66YeqFDJXqphLd5GPjOobp368AH4ksLe/w3/AP+DFqiXtDMxxOgfEj1V
+   wWUS+yId6N+gQMngG8x1cWl4lg8tEmfDSJEk4pUDMIaiEHHC+i798G/83
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="392429556"
+X-IronPort-AV: E=Sophos;i="6.04,243,1695711600"; 
+   d="scan'208";a="392429556"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 15:59:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="719682202"
+X-IronPort-AV: E=Sophos;i="6.04,243,1695711600"; 
+   d="scan'208";a="719682202"
+Received: from c3-1-server.sj.intel.com ([10.232.18.246])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 15:59:53 -0800
+From: Pawel Kaminski <pawel.kaminski@intel.com>
+To: intel-wired-lan@osuosl.org
+Cc: netdev@vger.kernel.org,
+	Pawel Kaminski <pawel.kaminski@intel.com>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v1] ice: Add support for devlink loopback param.
+Date: Fri,  1 Dec 2023 15:59:49 -0800
+Message-ID: <20231201235949.62728-1-pawel.kaminski@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <170147307026.5260.9300080745237900261.stgit@anambiarhost.jf.intel.com>
- <170147336340.5260.6773000274196548907.stgit@anambiarhost.jf.intel.com>
-In-Reply-To: <170147336340.5260.6773000274196548907.stgit@anambiarhost.jf.intel.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 1 Dec 2023 15:56:52 -0800
-Message-ID: <CACKFLi=W73+-rjNwyD+yU+WTcqjkDm28NShTdpLMwfgdivhGLQ@mail.gmail.com>
-Subject: Re: [net-next PATCH v11 11/11] eth: bnxt: link NAPI instances to
- queues and IRQs
-To: Amritha Nambiar <amritha.nambiar@intel.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, ast@kernel.org, sdf@google.com, lorenzo@kernel.org, 
-	tariqt@nvidia.com, daniel@iogearbox.net, anthony.l.nguyen@intel.com, 
-	lucien.xin@gmail.com, hawk@kernel.org, sridhar.samudrala@intel.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007abbd1060b7b8636"
+Content-Transfer-Encoding: 8bit
 
---0000000000007abbd1060b7b8636
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Add support for devlink loopback param. Supported values are "enabled",
+"disabled" and "prioritized". Default configuration is set to "enabled.
 
-On Fri, Dec 1, 2023 at 3:12=E2=80=AFPM Amritha Nambiar
-<amritha.nambiar@intel.com> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> Make bnxt compatible with the newly added netlink queue GET APIs.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
+By default loopback traffic BW is locked to PF configured BW. HW is
+capable of higher speeds on loopback traffic. Loopback param set to
+"prioritized" enables HW BW prioritization for VF to VF traffic,
+effectively increasing BW between VFs. Applicable to 8x10G and 4x25G
+cards.
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+To achieve max loopback BW one could:
+ - Make, as much as possible, fair distribution of loopback usages
+   between groups to gain maximal loopback BW.
+ - Try to dedicate ports for loopback only traffic, with minimal network
+   traffic.
 
---0000000000007abbd1060b7b8636
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Changing loopback configuration will trigger CORER reset in order to take
+effect.
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIN/EUWTjo72aJpZwa4ar7Q+rk+pO6eOH
-ZIkL1wjcIxCoMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIzNTcwNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQClXBrwiXppGc24lrkne/KmWxTHT7Ttadj+hFWU131sslTNfkWG
-o6be2eOXTrYcdKsk85PE85UGaBXD2Wy+5/1aWX9mOZup+0Z69rSsK0jaCnYYowqEclmcKoISHE8q
-jt8R1zxd/kgufJzXEH8n4gqbYkD3nOO8z0rbBt+7sCUa1oib2khKiptIZNFchF7Xx+oyGwrLthWF
-r6UIzhfRtzSsUbxnYT/RslFgY0uyVjlpBn1kVqmV6+R0/7TN3V+5X2ABgDWUsEEPoQgwbE5AZnx3
-J3OVF7xqXlaMfTSeg9/kSbQC9cBT478/ojNBPaUtYDPYt2Cdt+arEGp6vDDEAl73
---0000000000007abbd1060b7b8636--
+Example command to change current value:
+devlink dev param set pci/0000:b2:00.3 name loopback value prioritized \
+        cmode permanent
+
+Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
+---
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 128 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 4 files changed, 143 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 6a5e974a1776..13d0e3cbc24c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -230,6 +230,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
+ #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
+ };
+ 
++/* Loopback port parameter mode values. */
++enum ice_loopback_mode {
++	ICE_LOOPBACK_MODE_ENABLED = 0,
++	ICE_LOOPBACK_MODE_DISABLED = 1,
++	ICE_LOOPBACK_MODE_PRIORITIZED = 2,
++};
++
+ /* Set Port parameters, (direct, 0x0203) */
+ struct ice_aqc_set_port_params {
+ 	__le16 cmd_flags;
+@@ -238,7 +245,9 @@ struct ice_aqc_set_port_params {
+ 	__le16 swid;
+ #define ICE_AQC_PORT_SWID_VALID			BIT(15)
+ #define ICE_AQC_PORT_SWID_M			0xFF
+-	u8 reserved[10];
++	u8 loopback_mode;
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID BIT(2)
++	u8 reserved[9];
+ };
+ 
+ /* These resource type defines are used for all switch resource
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 2f67ea1feb60..2efa781efcdb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1019,7 +1019,7 @@ int ice_init_hw(struct ice_hw *hw)
+ 		status = -ENOMEM;
+ 		goto err_unroll_cqinit;
+ 	}
+-
++	hw->port_info->loopback_mode = ICE_LOOPBACK_MODE_ENABLED;
+ 	/* set the back pointer to HW */
+ 	hw->port_info->hw = hw;
+ 
+@@ -2962,6 +2962,10 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
+ 	cmd = &desc.params.set_port_params;
+ 
+ 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
++
++	cmd->loopback_mode = pi->loopback_mode |
++				ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID;
++
+ 	if (double_vlan)
+ 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
+ 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index 65be56f2af9e..8fe5bda5d5fe 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -1429,6 +1429,127 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
+ 	return 0;
+ }
+ 
++#define DEVLINK_LPBK_DISABLED_STR "disabled"
++#define DEVLINK_LPBK_ENABLED_STR "enabled"
++#define DEVLINK_LPBK_PRIORITIZED_STR "prioritized"
++
++/**
++ * ice_devlink_loopback_mode_to_str - Get string for lpbk mode.
++ * @mode: Loopback_mode used in port_info struct.
++ *
++ * Return: Mode respective string or "Invalid".
++ */
++static const char *ice_devlink_loopback_mode_to_str(enum ice_loopback_mode mode)
++{
++	switch (mode) {
++	case ICE_LOOPBACK_MODE_ENABLED:
++		return DEVLINK_LPBK_ENABLED_STR;
++	case ICE_LOOPBACK_MODE_PRIORITIZED:
++		return DEVLINK_LPBK_PRIORITIZED_STR;
++	case ICE_LOOPBACK_MODE_DISABLED:
++		return DEVLINK_LPBK_DISABLED_STR;
++	}
++
++	return "Invalid";
++}
++
++/**
++ * ice_devlink_loopback_str_to_mode - Get lpbk mode from string name.
++ * @mode_str: Loopback mode string.
++ *
++ * Return: Mode value or negative number if invalid.
++ */
++static int ice_devlink_loopback_str_to_mode(const char *mode_str)
++{
++	if (!strcmp(mode_str, DEVLINK_LPBK_ENABLED_STR))
++		return ICE_LOOPBACK_MODE_ENABLED;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_PRIORITIZED_STR))
++		return ICE_LOOPBACK_MODE_PRIORITIZED;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_DISABLED_STR))
++		return ICE_LOOPBACK_MODE_DISABLED;
++
++	return -EINVAL;
++}
++
++/**
++ * ice_devlink_loopback_get - Get loopback parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: the Parameter ID to set.
++ * @ctx: Context to store the parameter value.
++ *
++ * Return: Zero on success.
++ */
++static int ice_devlink_loopback_get(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_port_info *pi;
++	const char *mode_str;
++
++	pi = pf->hw.port_info;
++	mode_str = ice_devlink_loopback_mode_to_str(pi->loopback_mode);
++	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_set - Set loopback parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: the Parameter ID to set.
++ * @ctx: Context to get the parameter value.
++ *
++ * Return: Zero on success.
++ */
++static int ice_devlink_loopback_set(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx)
++{
++	int new_loopback_mode = ice_devlink_loopback_str_to_mode(ctx->val.vstr);
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct device *dev = ice_pf_to_dev(pf);
++	struct ice_port_info *pi;
++
++	pi = pf->hw.port_info;
++	if (pi->loopback_mode != new_loopback_mode) {
++		pi->loopback_mode = new_loopback_mode;
++		dev_info(dev, "Setting loopback to %s\n", ctx->val.vstr);
++		ice_schedule_reset(pf, ICE_RESET_CORER);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_validate - Validate passed loopback parameter value.
++ * @devlink: Unused pointer to devlink instance.
++ * @id: The parameter ID to validate.
++ * @val: Value to validate.
++ * @extack: Netlink extended ACK structure.
++ *
++ * Supported values are:
++ * "enabled" - loopback is enabled, "disabled" - loopback is disabled
++ * "prioritized" - loopback traffic is prioritized in scheduling.
++ *
++ * Return: Zero when passed parameter value is supported. Negative value on
++ * error.
++ */
++static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
++					 union devlink_param_value val,
++					 struct netlink_ext_ack *extack)
++{
++	if (ice_devlink_loopback_str_to_mode(val.vstr) < 0) {
++		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is not supported.");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++enum ice_param_id {
++	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
++	ICE_DEVLINK_PARAM_ID_LOOPBACK,
++};
++
+ static const struct devlink_param ice_devlink_params[] = {
+ 	DEVLINK_PARAM_GENERIC(ENABLE_ROCE, BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+ 			      ice_devlink_enable_roce_get,
+@@ -1438,7 +1559,12 @@ static const struct devlink_param ice_devlink_params[] = {
+ 			      ice_devlink_enable_iw_get,
+ 			      ice_devlink_enable_iw_set,
+ 			      ice_devlink_enable_iw_validate),
+-
++	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOOPBACK,
++			     "loopback", DEVLINK_PARAM_TYPE_STRING,
++			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			     ice_devlink_loopback_get,
++			     ice_devlink_loopback_set,
++			     ice_devlink_loopback_validate),
+ };
+ 
+ static void ice_devlink_free(void *devlink_ptr)
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 1fff865d0661..c8d75a1820a1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -713,6 +713,7 @@ struct ice_port_info {
+ 	u16 sw_id;			/* Initial switch ID belongs to port */
+ 	u16 pf_vf_num;
+ 	u8 port_state;
++	u8 loopback_mode;
+ #define ICE_SCHED_PORT_STATE_INIT	0x0
+ #define ICE_SCHED_PORT_STATE_READY	0x1
+ 	u8 lport;
+-- 
+2.41.0
+
 
