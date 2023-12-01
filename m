@@ -1,99 +1,317 @@
-Return-Path: <netdev+bounces-53077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD93A801318
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:49:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A50B7801345
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:02:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AA8E1C20EAD
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:49:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6EBD1C20944
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 19:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7239E2554E;
-	Fri,  1 Dec 2023 18:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7417D48CF1;
+	Fri,  1 Dec 2023 19:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OMUjqk+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8817110DB
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 10:49:22 -0800 (PST)
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6cde5cf72a0so2959050b3a.3
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 10:49:22 -0800 (PST)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF542D63
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 11:02:27 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-db548da6e3bso732958276.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 11:02:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701457347; x=1702062147; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dAmgtkbgDqkQCCAzPWHDhZI+//WYau1qYeKz85oRKXU=;
+        b=OMUjqk+DvdRRSOt/+MJhFAmANvF1P8L7O9/G/ycp2yiztzaEnNYS7smayjaJaWslyM
+         XQCVE/c4THgSe4uz0ZQS1IJH3zmxg0ip03/3FetusoWMFipBttLR3MNx6zGM7ftYrwlQ
+         2wIynm/vNQsAjcN51NeajbylLWMgxgBzw0j0Xg7+ztwg0tNByxCfghP1GNUOkw6hvCnh
+         7sMp6yy9/PwfWohTqsgEGI6sP/TQVJvibYzDcpILic8vc6puui/jAcFbz5Ya3+DnbPps
+         j41o1Xptx2TWYhCN16DkYeE95pumairWgDq+/8kCLObqJe0eCVisbYUTu2D4vHYKFhY5
+         pyog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701456562; x=1702061362;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V7uf/nKmgeB4s8AOYp5odSuJMyINXnSr8QWYtuxIBzY=;
-        b=gUbYR2fpZAafdv8eh5HR4X0ZPm3ThU/r6TdFJ9d7r/ODEBHWaf2IRkhkCuBXCtE54F
-         U/UCR0/RP54V/PAs893cz6oy65fa3lrrPrqI6rQZs0B7yWuPB8aiZaQO8AZNsZ/9EjjC
-         1vZnetUS9QKYwooroulkdL1tDNbovv1fKkUz+Z3ab8jBKaYxL7xUtXVwh18T1mHHE/vJ
-         xRXOzTgQ0blp9uNxWn/Ov02MDHU5rF1KDDPZA48X3+Sa/H2ZV18DOWMFfsrwhplsgkm+
-         7smsMz+Vb5b+9p/mEQHiyUewE8V7NZXWERpgrN0OSFQoXb6SzmTDCYCREDgbIXRXDBHH
-         PxoA==
-X-Gm-Message-State: AOJu0YzCYb8V7Xxjk0Id5Mp/TAyLebvzIJaXgMcw38IVpWhQCKdPNgbf
-	n2SxunomZzancuM6P8ujOrKs1VABLRxfnbQsKN74HbdJ6ZXv
-X-Google-Smtp-Source: AGHT+IGUlw4/hagoD6X3KinajDD/07g+mo7vw/4QKPKJaydC8FYQx5YjjtYPkMk1e4oyqU+KF7hBYuo2j8nElT2I5fPFt+RJv8tj
+        d=1e100.net; s=20230601; t=1701457347; x=1702062147;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dAmgtkbgDqkQCCAzPWHDhZI+//WYau1qYeKz85oRKXU=;
+        b=XWIs6MxlgDdUi1npyHzx1Dxb258RoZbQwyqHaPKJ1Q7kNEKYhpJfXP8rWnc1JtRMVh
+         IjtDIeqxMMsmDHlIYPSPkSiYSabVt3/2g6RU4DH988+9U9OZQlEFlI4SKYrpDJAczGCD
+         mFgYkul/r7Ot1t0u5qYxf7gRN6gDo+gbJDGVjJSndOab8mhXKl7FjHnW/U6x8wdVYTa6
+         vB14c3m8gMlkPTkFQIxETej3w/sI1R0lXcdzZ4gnyP15e6r8iiVyOf3DUs2F62DxvF6r
+         5RmZfwqTqCQXRihX6KGDyvZ5oJjARqEpY8Hu1exIgPJvEPo/dYxoaOr7uO6Si0gIScEw
+         Yy1w==
+X-Gm-Message-State: AOJu0YyKQLUC7CxaHwR3PNEHwHfFid8/aNq+O16+64KLB6IDA/z3mWIW
+	51WQk8h9NF4CZ7ZnwUTcAQE+Lb6V0biAgnpl+GfRiA==
+X-Google-Smtp-Source: AGHT+IFfLLAk/tooZ541dzpT+owM5kC2z1sspForCzjhabsbV9WwWypG6KOzFOfZItTrgMdIV3wvpS9tVwNa6gcZGXA=
+X-Received: by 2002:a25:738a:0:b0:db7:cfbf:e41e with SMTP id
+ o132-20020a25738a000000b00db7cfbfe41emr1863415ybc.26.1701457346161; Fri, 01
+ Dec 2023 11:02:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:b4c:b0:6ce:d0:118c with SMTP id
- p12-20020a056a000b4c00b006ce00d0118cmr381472pfo.6.1701456561791; Fri, 01 Dec
- 2023 10:49:21 -0800 (PST)
-Date: Fri, 01 Dec 2023 10:49:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f76a65060b7739da@google.com>
-Subject: [syzbot] Monthly wireless report (Nov 2023)
-From: syzbot <syzbot+listd3e5fd84a00bcad8b79e@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <00000000000077c77f060b603f2d@google.com> <CAM0EoMkAxx+JwLxc_T0jJd3+jZmoSTndLKC6Ap7qYwd58A5Zmg@mail.gmail.com>
+ <87il5i7pc2.fsf@intel.com>
+In-Reply-To: <87il5i7pc2.fsf@intel.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 1 Dec 2023 14:02:15 -0500
+Message-ID: <CAM0EoMmZsjJuXUvte7PSWNeMu0TyBYAz=RS+j8AzHV-NrwGe+Q@mail.gmail.com>
+Subject: Re: Fwd: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello wireless maintainers/developers,
+Hi Vinicius,
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+On Thu, Nov 30, 2023 at 7:12=E2=80=AFPM Vinicius Costa Gomes
+<vinicius.gomes@intel.com> wrote:
+>
+> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+>
+> > Vinicius/Vladmir,
+> > I pinged you on this already. Can you take a look please? There is a
+> > reproducer..
+> >
+>
+> It seems to be another one of those, syzkaller managed to produce a
+> schedule with a small enough interval that it's going to starve some
+> other things. (in this case, the interval is 127 ns)
+>
+> We already reject intervals that won't allow the passage of the smallest
+> ethernet packet. I am running out of ideas that we could do to, at least
+> at configuration time.
+>
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 32 issues are still open and 117 have been fixed so far.
+I am afraid i dont know enough about taprio to comment on that. If you
+think it is useful for me to look at the code i will.
 
-Some of the still happening issues:
+> But one almost crazy idea turned up: what if we only start the timer
+> when there are actually packets in the qdisc? i.e. if the queue was
+> empty, we would only start the timer during "empty -> non-empty"
+> enqueue(), and stop the timer when the queue goes back to empty.
+>
 
-Ref  Crashes Repro Title
-<1>  5951    Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<2>  4366    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<3>  3474    Yes   WARNING in ieee80211_rx_list
-                   https://syzkaller.appspot.com/bug?extid=8830db5d3593b5546d2e
-<4>  3175    Yes   WARNING in ieee80211_link_info_change_notify (2)
-                   https://syzkaller.appspot.com/bug?extid=de87c09cc7b964ea2e23
-<5>  2663    No    WARNING in ieee80211_ibss_csa_beacon (2)
-                   https://syzkaller.appspot.com/bug?extid=b10a54cb0355d83fd75c
-<6>  984     Yes   WARNING in __rate_control_send_low
-                   https://syzkaller.appspot.com/bug?extid=fdc5123366fb9c3fdc6d
-<7>  829     Yes   WARNING in ar5523_submit_rx_cmd/usb_submit_urb
-                   https://syzkaller.appspot.com/bug?extid=6101b0c732dea13ea55b
-<8>  734     Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<9>  357     Yes   WARNING in ieee80211_bss_info_change_notify (2)
-                   https://syzkaller.appspot.com/bug?extid=dd4779978217b1973180
-<10> 61      Yes   WARNING in ieee80211_free_ack_frame (2)
-                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
+Sounds like a sensible thing to do (regardless of syzkaller issue
+here) as long as you are not counting on absolute time somewhere in
+the taprio algorithm.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> I think that way, we remove the issue that causes most of the syzkaller
+> reports, and we would reduce the CPU overhead when taprio is idle (on a
+> non-debug system with the problematic schedule I am seeing ~2% overhead
+> in perf top).
+>
+> Does that sound like it could work?
+>
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+I believe so with the caveat of the relatedness of time measurement.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+cheers,
+jamal
 
-You may send multiple commands in a single email message.
+
+> > cheers,
+> > jamal
+> >
+> > ---------- Forwarded message ---------
+> > From: syzbot <syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com>
+> > Date: Thu, Nov 30, 2023 at 10:24=E2=80=AFAM
+> > Subject: [syzbot] [net?] INFO: rcu detected stall in sys_socket (10)
+> > To: <bp@alien8.de>, <davem@davemloft.net>, <edumazet@google.com>,
+> > <hpa@zytor.com>, <jhs@mojatatu.com>, <jiri@resnulli.us>,
+> > <kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <mingo@redhat.com>,
+> > <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+> > <syzkaller-bugs@googlegroups.com>, <tglx@linutronix.de>,
+> > <vinicius.gomes@intel.com>, <willemdebruijn.kernel@gmail.com>,
+> > <x86@kernel.org>, <xiyou.wangcong@gmail.com>
+> >
+> >
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    18d46e76d7c2 Merge tag 'for-6.7-rc3-tag' of git://git.k=
+ern..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D16bcc8b4e80=
+000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb39fe85d25=
+4f638
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=3Dde8e83db70e8b=
+eedd556
+> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils
+> > for Debian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12172952e=
+80000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1086b58ae80=
+000
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/0ce5608c89e8/d=
+isk-18d46e76.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/eef847faba9c/vmli=
+nux-18d46e76.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/6a3df3288860=
+/bzImage-18d46e76.xz
+> >
+> > The issue was bisected to:
+> >
+> > commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
+> > Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> > Date:   Sat Sep 29 00:59:43 2018 +0000
+> >
+> >     tc: Add support for configuring the taprio scheduler
+> >
+> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D16a29b52=
+e80000
+> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D15a29b52=
+e80000
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D11a29b52e80=
+000
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the co=
+mmit:
+> > Reported-by: syzbot+de8e83db70e8beedd556@syzkaller.appspotmail.com
+> > Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio schedu=
+ler")
+> >
+> > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > rcu:    0-...!: (1 GPs behind) idle=3D79f4/1/0x4000000000000000
+> > softirq=3D5546/5548 fqs=3D1
+> > rcu:    (detected by 1, t=3D10503 jiffies, g=3D5017, q=3D384 ncpus=3D2)
+> > Sending NMI from CPU 1 to CPUs 0:
+> > NMI backtrace for cpu 0
+> > CPU: 0 PID: 5106 Comm: syz-executor201 Not tainted
+> > 6.7.0-rc3-syzkaller-00024-g18d46e76d7c2 #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine,
+> > BIOS Google 11/10/2023
+> > RIP: 0010:__run_hrtimer kernel/time/hrtimer.c:1686 [inline]
+> > RIP: 0010:__hrtimer_run_queues+0x62e/0xc20 kernel/time/hrtimer.c:1752
+> > Code: fc ff df 48 89 fa 48 c1 ea 03 0f b6 04 02 48 89 fa 83 e2 07 38
+> > d0 7f 08 84 c0 0f 85 fb 04 00 00 45 0f b6 6e 3b 31 ff 44 89 ee <e8> 2d
+> > 46 11 00 45 84 ed 0f 84 8e fb ff ff e8 ef 4a 11 00 4c 89 f7
+> > RSP: 0018:ffffc90000007e40 EFLAGS: 00000046
+> > RAX: 0000000000000000 RBX: ffff8880b982ba40 RCX: ffffffff817642f9
+> > RDX: 0000000000000003 RSI: 0000000000000000 RDI: 0000000000000000
+> > RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+> > R10: 0000000000000001 R11: 0000000000000002 R12: ffff8880b982b940
+> > R13: 0000000000000000 R14: ffff88801c43a340 R15: ffffffff88a2daf0
+> > FS:  00005555566fe380(0000) GS:ffff8880b9800000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007fe9404c73b0 CR3: 0000000076e2d000 CR4: 0000000000350ef0
+> > Call Trace:
+> >  <NMI>
+> >  </NMI>
+> >  <IRQ>
+> >  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1814
+> >  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1065 [inline]
+> >  __sysvec_apic_timer_interrupt+0x105/0x400 arch/x86/kernel/apic/apic.c:=
+1082
+> >  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1076
+> >  </IRQ>
+> >  <TASK>
+> >  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentr=
+y.h:645
+> > RIP: 0010:lock_acquire+0x1ef/0x520 kernel/locking/lockdep.c:5722
+> > Code: c1 05 bd 6c 9a 7e 83 f8 01 0f 85 b4 02 00 00 9c 58 f6 c4 02 0f
+> > 85 9f 02 00 00 48 85 ed 74 01 fb 48 b8 00 00 00 00 00 fc ff df <48> 01
+> > c3 48 c7 03 00 00 00 00 48 c7 43 08 00 00 00 00 48 8b 84 24
+> > RSP: 0018:ffffc9000432fb00 EFLAGS: 00000206
+> > RAX: dffffc0000000000 RBX: 1ffff92000865f62 RCX: ffffffff81672c0e
+> > RDX: 0000000000000001 RSI: ffffffff8accbae0 RDI: ffffffff8b2f0dc0
+> > RBP: 0000000000000200 R08: 0000000000000000 R09: fffffbfff23e33d0
+> > R10: ffffffff91f19e87 R11: 0000000000000000 R12: 0000000000000001
+> > R13: 0000000000000000 R14: ffffffff8d0f0b48 R15: 0000000000000000
+> >  __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+> >  __mutex_lock+0x175/0x9d0 kernel/locking/mutex.c:747
+> >  pcpu_alloc+0xbb8/0x1420 mm/percpu.c:1769
+> >  packet_alloc_pending net/packet/af_packet.c:1232 [inline]
+> >  packet_create+0x2b7/0x8e0 net/packet/af_packet.c:3373
+> >  __sock_create+0x328/0x800 net/socket.c:1569
+> >  sock_create net/socket.c:1620 [inline]
+> >  __sys_socket_create net/socket.c:1657 [inline]
+> >  __sys_socket+0x14c/0x260 net/socket.c:1704
+> >  __do_sys_socket net/socket.c:1718 [inline]
+> >  __se_sys_socket net/socket.c:1716 [inline]
+> >  __x64_sys_socket+0x72/0xb0 net/socket.c:1716
+> >  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+> >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > RIP: 0033:0x7fe940479de9
+> > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48
+> > 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+> > 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> > RSP: 002b:00007ffe1bf080b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+> > RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fe940479de9
+> > RDX: 0000000000000000 RSI: 0000000800000003 RDI: 0000000000000011
+> > RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000100000000
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe1bf08110
+> > R13: 0000000000030c67 R14: 00007ffe1bf080dc R15: 0000000000000003
+> >  </TASK>
+> > INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.0=
+67 msecs
+> > rcu: rcu_preempt kthread timer wakeup didn't happen for 10497 jiffies!
+> > g5017 f0x0 RCU_GP_WAIT_FQS(5) ->state=3D0x402
+> > rcu:    Possible timer handling issue on cpu=3D0 timer-softirq=3D2416
+> > rcu: rcu_preempt kthread starved for 10498 jiffies! g5017 f0x0
+> > RCU_GP_WAIT_FQS(5) ->state=3D0x402 ->cpu=3D0
+> > rcu:    Unless rcu_preempt kthread gets sufficient CPU time, OOM is
+> > now expected behavior.
+> > rcu: RCU grace-period kthread stack dump:
+> > task:rcu_preempt     state:I stack:27904 pid:17    tgid:17    ppid:2
+> >    flags:0x00004000
+> > Call Trace:
+> >  <TASK>
+> >  context_switch kernel/sched/core.c:5376 [inline]
+> >  __schedule+0xedb/0x5af0 kernel/sched/core.c:6688
+> >  __schedule_loop kernel/sched/core.c:6763 [inline]
+> >  schedule+0xe9/0x270 kernel/sched/core.c:6778
+> >  schedule_timeout+0x137/0x290 kernel/time/timer.c:2167
+> >  rcu_gp_fqs_loop+0x1ec/0xb10 kernel/rcu/tree.c:1631
+> >  rcu_gp_kthread+0x24b/0x380 kernel/rcu/tree.c:1830
+> >  kthread+0x2c6/0x3a0 kernel/kthread.c:388
+> >  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+> >  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+> >  </TASK>
+> >
+> >
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> > For information about bisection process see: https://goo.gl/tpsmEJ#bise=
+ction
+> >
+> > If the report is already addressed, let syzbot know by replying with:
+> > #syz fix: exact-commit-title
+> >
+> > If you want syzbot to run the reproducer, reply with:
+> > #syz test: git://repo/address.git branch-or-commit-hash
+> > If you attach or paste a git patch, syzbot will apply it before testing=
+.
+> >
+> > If you want to overwrite report's subsystems, reply with:
+> > #syz set subsystems: new-subsystem
+> > (See the list of subsystem names on the web dashboard)
+> >
+> > If the report is a duplicate of another one, reply with:
+> > #syz dup: exact-subject-of-another-report
+> >
+> > If you want to undo deduplication, reply with:
+> > #syz undup
+>
+> --
+> Vinicius
 
