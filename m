@@ -1,222 +1,213 @@
-Return-Path: <netdev+bounces-52926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE74800C6B
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 14:43:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394BE800C77
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 14:46:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11DA281B50
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:43:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E19522813CF
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3180F3AC27;
-	Fri,  1 Dec 2023 13:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DF33A295;
+	Fri,  1 Dec 2023 13:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hUIWb+vp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sa3WRT3J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C8C3A6;
-	Fri,  1 Dec 2023 05:43:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701438194; x=1732974194;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XBlab6cUP0UzblnQ1S/5MOz/UggsWJmt5+Nkuwg6rog=;
-  b=hUIWb+vpz8cwZiCRc6dZqmCi8iDUWjGE/VAratQ98F0hJUhQdHQTCN12
-   Da6Yd/bj9T+QOfZbWYn7qN7ENzNYp9wuxa1fL/4OjgidpDvJsFnJe73SQ
-   Ndt3nLM7rF8FOXsZQlzDYKXFgZcHf2o7SpPs+jR4rFYnHIsb8W7NVhP68
-   oq3mcHGIv+dGMB8EtgI4qtbfFUVIkxd4fvCz9OvZOMSt+/sHST64BESRF
-   U848ev/UtEtEsa4LAOD5cRswrvlqNebibpYrdhW6LNw4qWistkn5s9kaS
-   kIBcZKB6jfmXk2B21KArnQtrgU5rNNx3A21nC+jNZ1M9Kq1uJE/rMPAbb
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="396302287"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="396302287"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 05:43:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="798731580"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="798731580"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Dec 2023 05:43:09 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 1 Dec 2023 05:43:09 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Fri, 1 Dec 2023 05:43:09 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Fri, 1 Dec 2023 05:43:09 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TjyhLFvAwEZHltes+HyTxqivPCckLhnD7/yfX9Ob0YBoKsYk7ZfKrK9rnhY9gYkwJ+NPeu8S7Bxonbbd9Wd6NJSmmswraNmG4brN5annfqgblyykwNpp9fpFt/dR30THZqtBqQnFUP9WV3kkrtMDEkXzu5NdD90BVEsfCqH8/HCCCl58Jp59vTQtHfL2GTxZ49rXYu3KOstih2bvmYhTsudn/MWsLjmOstcIcyl95QQsF2M/oxjoRrQHe4yKjYJ/q1G+FlygpWxCWYxCBA5fi7z559PlI1i7NjcHZvpP2DzeshH+hUbYErFLr3xNzMVF+hGujvrDqv6MpO+/TBzjAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XBlab6cUP0UzblnQ1S/5MOz/UggsWJmt5+Nkuwg6rog=;
- b=lo455dBYxBHsXGsxzFV6T4kbGpPGA1FINzT2I+QZMN/AZeWqlo7cyGZw2jhhLRlIzvpPA33RkQTy2HADwtZqFFNziEZ2UF9SffbY8y+cqMvlFNMK2qGRSiuXPG9oY/BuFPJe4gEqNf4RG2QiMNNDWqr86yo11jgSYFlnGNCofy5P6xieYPyge70idJMQlQMH7PHwfVABh3w/lMohrq125kDzT6WMSdK0qpPdd/xcmcm0qxZpKkJGGvokLUQShHUyyrujWyLAk2EvO2RYkp74sLP7XlCRMfkC72vNlOC1mwjOgv5pqpAUVP9XaZCcBUJAznArm5ZDgLsm8d+6oMhhTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20)
- by CH0PR11MB5379.namprd11.prod.outlook.com (2603:10b6:610:ba::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.27; Fri, 1 Dec
- 2023 13:43:07 +0000
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::6ffc:93a3:6d7f:383c]) by PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::6ffc:93a3:6d7f:383c%6]) with mapi id 15.20.7046.024; Fri, 1 Dec 2023
- 13:43:07 +0000
-From: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
-	<corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>, "Karlsson, Magnus"
-	<magnus.karlsson@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
-	<sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, "Mykola
- Lysenko" <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
-	<kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
-	<jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "xdp-hints@xdp-project.net"
-	<xdp-hints@xdp-project.net>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>
-Subject: RE: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
-Thread-Topic: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
-Thread-Index: AQHaJB8W7iUch8mtVUCDEJ1OnRle9bCUPv4AgAAvtGA=
-Date: Fri, 1 Dec 2023 13:43:07 +0000
-Message-ID: <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
-References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
- <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
-In-Reply-To: <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5830:EE_|CH0PR11MB5379:EE_
-x-ms-office365-filtering-correlation-id: 835c06d4-d99d-4f1d-49f6-08dbf273736e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: bnZS0az6aI0NVCStd90yEaDKJvqG8afoY2V8p4JNGimXpyRktmumw0OuJj21J/tNRKhqSRNDlg3IO6iTx86XMZoOlhPTuj6NTpIqTfNlZoXNw5moAeu0KPM6bPxZQbUpunlAZ8SY1+eCRLO6gJXg81tI2gOLpE6CqdQ/VFhWqpC3YpPWhFGDs8KhKtRinZDw/0LhX9PFQ9MDf24izKv8Sgf0Wf4BLnk+cUKr9oaD0qKkTk79zY0khfl4huuZ5T2EeHwKwsUz+Zsf9FNBnj7JDnxqHol1EApEhozv4igcTf2stDyXIJ1vwwg93q9eyRCjoxLtebP7A4RvjPe7qpE3Ko0pVERxxE1qxPkSzPPMUljsMUNGdX/EO2aIDbYgagG45w88RTnpFxbwBmvLFzWHZMJI0TkfK9ibCKcbsTfY1FIT60Pru5/UNlQTlLT5lpHSihJVzNmZqDm3cPCIfzXcdb4QkiEXOQyjBW1cYOj7eRtbJmZc3BQ6refXVcSVCdE2ysDbZspPj2KKUoGLTeMiw2TlMWFL78VPf/3iG4RUb3W6d7qigDQoM64S1C9xK+bD/4Krfd58ocaAihzaoxPvdmQWKMTyMrOMpDIJAajxBea1bArcBNUrqpMOsegU4sXRxu9NkivHkGPVGPcSDkMfFg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5830.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(136003)(39860400002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2906002)(4326008)(52536014)(8676002)(8936002)(55016003)(26005)(110136005)(316002)(41300700001)(54906003)(76116006)(66476007)(64756008)(66556008)(66446008)(66946007)(5660300002)(7416002)(7406005)(9686003)(53546011)(6506007)(7696005)(83380400001)(38100700002)(82960400001)(122000001)(86362001)(921008)(33656002)(71200400001)(478600001)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TC9zZkJIMVIrYlMrSlJZTUJsVU1vRUxrV0JWeW9qNmNWekxmQk4vemNHZUw1?=
- =?utf-8?B?Ym9kQlY4LzZTQ2Q5NWhLdnBKM0YyRzh3aVZwT0EyV24yeGZKOGVRV2REV2k5?=
- =?utf-8?B?UmlTN3NZYk1pRTkwSkV5QUxFcVlORDF4VVZKZ094Z21oT0Z2c1psNXR4UzVu?=
- =?utf-8?B?cnF0RDZDWVkxQlNYVkJHTGVUMmpWaGQ2YTB0Yi8wcElDVVBOYXYvWlJYTVlD?=
- =?utf-8?B?T1JoYklkNlBxSStnN3krZ0FOczlqdkNYRFNyc2pTaElidCt6YS95cC8zeEQ4?=
- =?utf-8?B?VWtITGxkZDdxQkdUdGtjZGhBV2pCRzBkajY3b1Bqc2p4RnRMWWtqWlBXdFhn?=
- =?utf-8?B?QXd1eDlFbTBDNzJELzdyYmovM3N6V1BaelF5VFhzNWRLTUkyNW5jRXRTcmhT?=
- =?utf-8?B?YUFXT0JVUlhlQUVFb0kvM3hqRmpOMFRxeE4xUENUK0huUUhIVU10VU9YZ2t0?=
- =?utf-8?B?ME40UnNKMTBDbzl5eXd5b0YyOFdoM1R2NllSQ0dIdW90TzR4cGZwcTk2V0hp?=
- =?utf-8?B?Ui9Vd0lvbXdJdExENDcrS3VwTmIwRmtnNklNSWJJNHhNaVlXZmFBNHpySHE3?=
- =?utf-8?B?OXZUZ2FSa0dWZjNoVHhmV0Q4MUtnSHdzK3NFVlJzSmVwaFRueGt0QUFMZnJ4?=
- =?utf-8?B?V01GbHFLeGNiRUJSVTlYanB0Y1ExSHlHd3VoV0ZBK3FNNzhpUnlDTTBJSXlN?=
- =?utf-8?B?TVYyTmNGWXNJdkpvdDJ4K1hNL3cycGF4a3J1ZmsxZTBXQlVzY0dhR0xwRjdX?=
- =?utf-8?B?QVFLZjBPQmRNdXkyY1JTR1RuWjgyTXVxTml1MU4vc0YyL3Erb050ZDIyempC?=
- =?utf-8?B?Tm4zd2V3SmIrbEE3MGp5NXNLQ1lWVEtSa0xoRjJzV1ZGcXhYSWZ6YmFYSDhV?=
- =?utf-8?B?LzM5cnk2T2ZEQ2grSkllNGFPZmlrYzcyNTY2YnJBQWlkbGpMckx3VFcrYXlr?=
- =?utf-8?B?Mm1FazlNZURBcjM2MzJTdTExdjd0T0M4clVLZ2NYRDJrYSt2ZXU1WUNBTFZv?=
- =?utf-8?B?SDQ0UXphNEJtSHkrcGVXc1k5SkppeEprcjBBQ3YrTjdRbTBFaFFYVWoyYzZk?=
- =?utf-8?B?cE5tUGZQUERheFNLWHRDVEh0NGsxdm93dXJRS2ZxSEV0dXgrTjVEaFM1VzVC?=
- =?utf-8?B?dU1sL21YOUJ2dC8vMkVOVWJOVy9sTE0wY1lHWDBZd01USUljR0VneGlPd1kv?=
- =?utf-8?B?b2R0ZEU5S1FISWROdE9WbUN3TEpabW12aFpBSzdneTV3OWw1clBvNkNkZkhC?=
- =?utf-8?B?Q0tDN2VXVC9qZXpJcHJJZHl5ejFBcm1WQjBtc2JCTFJpamFqNmxRNDhGQlRi?=
- =?utf-8?B?dzdRV1dDWjE3Mm5oeXMwcEtTd0NubDFOYnY3dnByckNyc3FYK3NjQnFGVDNZ?=
- =?utf-8?B?VHZJZUFHMndzQUh5c3M5d0VLSWNFMkcreTdhZ0dCank3UDF1dzQ1Ti9IZGI2?=
- =?utf-8?B?YWlPNHdrQWM2WUdMRk01NWVhMkEwZFF3Uko0c1dGZnluWkVtU3pvMTBTRmlS?=
- =?utf-8?B?QlJpdlYvai92Mjk5azNYRGtLdC9MOGs0RXU0bnQ1V0FZeDU4RitDUWhDOG1H?=
- =?utf-8?B?MVl0dWxUYkdnQzJQNHI3SXFqTHZlM0ZjU3d5dUhIeTIyUCtpd1B2OEZ3RndY?=
- =?utf-8?B?TlE2cWJqaDd1dEw2OFM1Z0FBQkNXdTFIUUhJZnlIZitPS2pXczE3MGxHT005?=
- =?utf-8?B?Z1dEaFQ0TGdsaGV1S25paFRoTW91K01VV2x2NDF6NCsvSHF2aUhpNDFHMSt2?=
- =?utf-8?B?bGQ3SzZXTUVVS2F4S2V2RTlLWGhpNENkVDJuaWN3ZVRMWEZXQVorQ2pzUUtx?=
- =?utf-8?B?YkZZZVk4Tk5ZTXNrYkgzVzFEVi8rOUZxbU5oVTRQRlJYZVJ3M0J6RHd3dUR2?=
- =?utf-8?B?ekNPd2JsTmhyeUZFZjBhQU91d3NabHZUQUdiSXdVRUl6SlhxVnprcEVLVGZP?=
- =?utf-8?B?MnJSMHIvMlU3dHpBRVJxcU1ZbUFZVlBSRVZZbGR6dzRZMERmTk1kbnp5TWF1?=
- =?utf-8?B?MXd4U0U4UWw2YVlQSFdWY1lxZS9SbEs4VmdjRzhCMlFvTjlTcVF6bWtpVm9R?=
- =?utf-8?B?ajZVanJwaXBtMFdNRGZWd1Y0bDZsbFMzTGFsbUVoblNGT3NPS0RXVXhEY2xn?=
- =?utf-8?B?VUJMbWlwclFMOXNKYVFLd0hPMHI5aWFUd0F2T1BxUXdUQmJOQng0UEpwUWQv?=
- =?utf-8?B?VVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7C75D48
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 05:46:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701438404;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CZOsoVNTrlsyDIj04ZnPkYY4FYY9jzgQ1kRjegPcrJ4=;
+	b=Sa3WRT3JBZLz14Sbr05jHknYxInAhAc4ooc2hlXeXXFfIxFCJOlolyYy8/h4YAthBSjrKt
+	xU8LBmapDFApZ4jjJxatNOHE7yHeKelSIAMXh+vU9mlU8OXJdLj2nCEbWx5T8nZwI+5nei
+	rDXDHgBzRCXk2m6PuHlFC9ZVxotkzfk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-295-JxDopkrqPtS-12mHFloEHw-1; Fri, 01 Dec 2023 08:46:40 -0500
+X-MC-Unique: JxDopkrqPtS-12mHFloEHw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B8D7C811E7B;
+	Fri,  1 Dec 2023 13:46:39 +0000 (UTC)
+Received: from [10.45.225.216] (unknown [10.45.225.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id AA6F12166B26;
+	Fri,  1 Dec 2023 13:46:37 +0000 (UTC)
+Message-ID: <27946430-66d0-4a09-b275-ead122a082ce@redhat.com>
+Date: Fri, 1 Dec 2023 14:46:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5830.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 835c06d4-d99d-4f1d-49f6-08dbf273736e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Dec 2023 13:43:07.4313
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LTHtJtvo9PzdK2KByLb8dnkXya/VJPsyHIF0l5CDB71kcRg9dkJdqpCKsfxNd5OMRXenX7I80eLdNWSVbEZwf2wqVChM2c7bHfpXvnhCdRs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5379
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] i40e: Fix kernel crash during
+ macvlan offloading setup
+Content-Language: en-US
+To: "Brelinski, Tony" <tony.brelinski@intel.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Harshitha Ramamurthy <harshitha.ramamurthy@intel.com>,
+ "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+ open list <linux-kernel@vger.kernel.org>, Eric Dumazet
+ <edumazet@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+ "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20231124164233.86691-1-ivecera@redhat.com>
+ <20231129163618.GD43811@kernel.org>
+ <DM6PR11MB4218C83B7A07BB833D298D388282A@DM6PR11MB4218.namprd11.prod.outlook.com>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <DM6PR11MB4218C83B7A07BB833D298D388282A@DM6PR11MB4218.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-T24gRnJpZGF5LCBEZWNlbWJlciAxLCAyMDIzIDY6NDYgUE0sIEplc3BlciBEYW5nYWFyZCBCcm91
-ZXIgPGhhd2tAa2VybmVsLm9yZz4gd3JvdGU6DQo+T24gMTIvMS8yMyAwNzoyNCwgU29uZyBZb29u
-ZyBTaWFuZyB3cm90ZToNCj4+IFRoaXMgc2VyaWVzIGV4cGFuZHMgWERQIFRYIG1ldGFkYXRhIGZy
-YW1ld29yayB0byBpbmNsdWRlIEVURiBIVyBvZmZsb2FkLg0KPj4NCj4+IENoYW5nZXMgc2luY2Ug
-djE6DQo+PiAtIHJlbmFtZSBUaW1lLUJhc2VkIFNjaGVkdWxpbmcgKFRCUykgdG8gRWFybGllc3Qg
-VHhUaW1lIEZpcnN0IChFVEYpDQo+PiAtIHJlbmFtZSBsYXVuY2gtdGltZSB0byB0eHRpbWUNCj4+
-DQo+DQo+SSBzdHJvbmdseSBkaXNhZ3JlZSB3aXRoIHRoaXMgcmVuYW1pbmcgKHNvcnJ5IHRvIGRp
-c2FncmVlIHdpdGggV2lsbGVtKS4NCj4NCj5UaGUgaTIxMCBhbmQgaTIyNSBjaGlwcyBjYWxsIHRo
-aXMgTGF1bmNoVGltZSBpbiB0aGVpciBwcm9ncmFtbWVycw0KPmRhdGFzaGVldHMsIGFuZCBldmVu
-IGluIHRoZSBkcml2ZXIgY29kZVsxXS4NCj4NCj5Vc2luZyB0aGlzICJ0eHRpbWUiIG5hbWUgaW4g
-dGhlIGNvZGUgaXMgYWxzbyBjb25mdXNpbmcsIGJlY2F1c2UgaG93IGNhbg0KPnBlb3BsZSByZWFk
-aW5nIHRoZSBjb2RlIGtub3cgdGhlIGRpZmZlcmVuY2UgYmV0d2VlbjoNCj4gIC0gdG1vX3JlcXVl
-c3RfdGltZXN0YW1wIGFuZCB0bW9fcmVxdWVzdF90eHRpbWUNCj4NCg0KSGkgSmVzcGVyIGFuZCBX
-aWxsZW0sDQoNCkhvdyBhYm91dCB1c2luZyAibGF1bmNoX3RpbWUiIGZvciB0aGUgZmxhZy92YXJp
-YWJsZSBhbmQNCiJFYXJsaWVzdCBUeFRpbWUgRmlyc3QiIGZvciB0aGUgZGVzY3JpcHRpb24vY29t
-bWVudHM/ICANCg0KVGhhbmtzICYgUmVnYXJkcw0KU2lhbmcNCg0KPg0KPlsxXQ0KPmh0dHBzOi8v
-Z2l0aHViLmNvbS94ZHAtcHJvamVjdC94ZHAtDQo+cHJvamVjdC9ibG9iL21hc3Rlci9hcmVhcy90
-c24vY29kZTAxX2ZvbGxvd19xZGlzY19UU05fb2ZmbG9hZC5vcmcNCj4NCj4+IHYxOg0KPmh0dHBz
-Oi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9uZXRkZXZicGYvY292ZXIvMjAyMzExMzAx
-NjIwMjguODUyMDA2LTEtDQo+eW9vbmcuc2lhbmcuc29uZ0BpbnRlbC5jb20vDQo+Pg0KPj4gU29u
-ZyBZb29uZyBTaWFuZyAoMyk6DQo+PiAgICB4c2s6IGFkZCBFVEYgc3VwcG9ydCB0byBYRFAgVHgg
-bWV0YWRhdGENCj4+ICAgIG5ldDogc3RtbWFjOiBBZGQgdHh0aW1lIHN1cHBvcnQgdG8gWERQIFpD
-DQo+PiAgICBzZWxmdGVzdHMvYnBmOiBBZGQgdHh0aW1lIHRvIHhkcF9od19tZXRhZGF0YQ0KPj4N
-Cj4+ICAgRG9jdW1lbnRhdGlvbi9uZXRsaW5rL3NwZWNzL25ldGRldi55YW1sICAgICAgICB8ICA0
-ICsrKysNCj4+ICAgRG9jdW1lbnRhdGlvbi9uZXR3b3JraW5nL3hzay10eC1tZXRhZGF0YS5yc3Qg
-ICB8ICA1ICsrKysrDQo+PiAgIGRyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0
-bW1hYy5oICAgfCAgMiArKw0KPj4gICAuLi4vbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0
-bW1hY19tYWluLmMgIHwgMTMgKysrKysrKysrKysrKw0KPj4gICBpbmNsdWRlL25ldC94ZHBfc29j
-ay5oICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDkgKysrKysrKysrDQo+PiAgIGluY2x1ZGUv
-bmV0L3hkcF9zb2NrX2Rydi5oICAgICAgICAgICAgICAgICAgICAgfCAgMSArDQo+PiAgIGluY2x1
-ZGUvdWFwaS9saW51eC9pZl94ZHAuaCAgICAgICAgICAgICAgICAgICAgfCAgOSArKysrKysrKysN
-Cj4+ICAgaW5jbHVkZS91YXBpL2xpbnV4L25ldGRldi5oICAgICAgICAgICAgICAgICAgICB8ICAz
-ICsrKw0KPj4gICBuZXQvY29yZS9uZXRkZXYtZ2VubC5jICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgIDIgKysNCj4+ICAgbmV0L3hkcC94c2suYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB8ICAzICsrKw0KPj4gICB0b29scy9pbmNsdWRlL3VhcGkvbGludXgvaWZfeGRwLmggICAg
-ICAgICAgICAgIHwgIDkgKysrKysrKysrDQo+PiAgIHRvb2xzL2luY2x1ZGUvdWFwaS9saW51eC9u
-ZXRkZXYuaCAgICAgICAgICAgICAgfCAgMyArKysNCj4+ICAgdG9vbHMvbmV0L3lubC9nZW5lcmF0
-ZWQvbmV0ZGV2LXVzZXIuYyAgICAgICAgICB8ICAxICsNCj4+ICAgdG9vbHMvdGVzdGluZy9zZWxm
-dGVzdHMvYnBmL3hkcF9od19tZXRhZGF0YS5jICB8IDE4ICsrKysrKysrKysrKysrKysrLQ0KPj4g
-ICAxNCBmaWxlcyBjaGFuZ2VkLCA4MSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0K
+
+
+On 30. 11. 23 20:24, Brelinski, Tony wrote:
+>> -----Original Message-----
+>> From: Intel-wired-lan<intel-wired-lan-bounces@osuosl.org>  On Behalf Of
+>> Simon Horman
+>> Sent: Wednesday, November 29, 2023 8:36 AM
+>> To: ivecera<ivecera@redhat.com>
+>> Cc: Harshitha Ramamurthy<harshitha.ramamurthy@intel.com>; Drewek,
+>> Wojciech<wojciech.drewek@intel.com>;netdev@vger.kernel.org;
+>> Brandeburg, Jesse<jesse.brandeburg@intel.com>; open list <linux-
+>> kernel@vger.kernel.org>; Eric Dumazet <edumazet@google.com>; Nguyen,
+>> Anthony L<anthony.l.nguyen@intel.com>; Jeff Kirsher
+>> <jeffrey.t.kirsher@intel.com>; moderated list:INTEL ETHERNET DRIVERS <intel-
+>> wired-lan@lists.osuosl.org>; Keller, Jacob E <jacob.e.keller@intel.com>; Jakub
+>> Kicinski<kuba@kernel.org>; Paolo Abeni<pabeni@redhat.com>; David S.
+>> Miller<davem@davemloft.net>
+>> Subject: Re: [Intel-wired-lan] [PATCH iwl-net] i40e: Fix kernel crash during
+>> macvlan offloading setup
+>>
+>> On Fri, Nov 24, 2023 at 05:42:33PM +0100, Ivan Vecera wrote:
+>>> Function i40e_fwd_add() computes num of created channels and num of
+>>> queues per channel according value of pf->num_lan_msix.
+>>>
+>>> This is wrong because the channels are used for subordinated net
+>>> devices that reuse existing queues from parent net device and number
+>>> of existing queue pairs (pf->num_queue_pairs) should be used instead.
+>>>
+>>> E.g.:
+>>> Let's have (pf->num_lan_msix == 32)... Then we reduce number of
+>>> combined queues by ethtool to 8 (so pf->num_queue_pairs == 8).
+>>> i40e_fwd_add() called by macvlan then computes number of macvlans
+>>> channels to be 16 and queues per channel 1 and calls
+>>> i40e_setup_macvlans(). This computes new number of queue pairs for PF
+>>> as:
+>>>
+>>> num_qps = vsi->num_queue_pairs - (macvlan_cnt * qcnt);
+>>>
+>>> This is evaluated in this case as:
+>>> num_qps = (8 - 16 * 1) = (u16)-8 = 0xFFF8
+>>>
+>>> ...and this number is stored vsi->next_base_queue that is used during
+>>> channel creation. This leads to kernel crash.
+>>>
+>>> Fix this bug by computing the number of offloaded macvlan devices and
+>>> no. their queues according the current number of queues instead of
+>>> maximal one.
+>>>
+>>> Reproducer:
+>>> 1) Enable l2-fwd-offload
+>>> 2) Reduce number of queues
+>>> 3) Create macvlan device
+>>> 4) Make it up
+>>>
+>>> Result:
+>>> [root@cnb-03 ~]# ethtool -K enp2s0f0np0 l2-fwd-offload on
+>>> [root@cnb-03 ~]# ethtool -l enp2s0f0np0 | grep Combined
+>>> Combined:       32
+>>> Combined:       32
+>>> [root@cnb-03 ~]# ethtool -L enp2s0f0np0 combined 8
+>>> [root@cnb-03 ~]# ip link add link enp2s0f0np0 mac0 type macvlan mode
+>>> bridge
+>>> [root@cnb-03 ~]# ip link set mac0 up
+>>> ...
+>>> [ 1225.686698] i40e 0000:02:00.0: User requested queue count/HW max
+>>> RSS count:  8/32 [ 1242.399103] BUG: kernel NULL pointer dereference,
+>>> address: 0000000000000118 [ 1242.406064] #PF: supervisor write access
+>>> in kernel mode [ 1242.411288] #PF: error_code(0x0002) - not-present
+>>> page [ 1242.416417] PGD 0 P4D 0 [ 1242.418950] Oops: 0002 [#1]
+>> PREEMPT
+>>> SMP NOPTI [ 1242.423308] CPU: 26 PID: 2253 Comm: ip Kdump: loaded
+>> Not
+>>> tainted 6.7.0-rc1+ #20 [ 1242.430607] Hardware name: Abacus electric,
+>>> s.r.o. -servis@abacus.cz  Super Server/H12SSW-iN, BIOS 2.4 04/13/2022
+>>> [ 1242.440850] RIP:
+>>> 0010:i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e] [
+>>> 1242.448165] Code: 48 89 b3 80 00 00 00 48 89 bb 88 00 00 00 74 3c 31
+>>> c9 0f b7 53 16 49 8b b4 24 f0 0c 00 00 01 ca 83 c1 01 0f b7 d2 48 8b
+>>> 34 d6 <48> 89 9e 18 01 00 00 49 8b b4 24 e8 0c 00 00 48 8b 14 d6 48 89
+>>> 9a [ 1242.466902] RSP: 0018:ffffa4d52cd2f610 EFLAGS: 00010202 [
+>>> 1242.472121] RAX: 0000000000000000 RBX: ffff9390a4ba2e40 RCX:
+>>> 0000000000000001 [ 1242.479244] RDX: 000000000000fff8 RSI:
+>>> 0000000000000000 RDI: ffffffffffffffff [ 1242.486370] RBP:
+>>> ffffa4d52cd2f650 R08: 0000000000000020 R09: 0000000000000000 [
+>>> 1242.493494] R10: 0000000000000000 R11: 0000000100000001 R12:
+>>> ffff9390b861a000 [ 1242.500626] R13: 00000000000000a0 R14:
+>>> 0000000000000010 R15: ffff9390b861a000 [ 1242.507751] FS:
+>> 00007efda536b740(0000) GS:ffff939f4ec80000(0000)
+>> knlGS:0000000000000000 [ 1242.515826] CS:  0010 DS: 0000 ES: 0000
+>> CR0: 0000000080050033 [ 1242.521564] CR2: 0000000000000118 CR3:
+>> 000000010bd48002 CR4: 0000000000770ef0 [ 1242.528699] PKRU:
+>> 55555554 [ 1242.531400] Call Trace:
+>>> [ 1242.533846]  <TASK>
+>>> [ 1242.535943]  ? __die+0x20/0x70
+>>> [ 1242.539004]  ? page_fault_oops+0x76/0x170 [ 1242.543018]  ?
+>>> exc_page_fault+0x65/0x150 [ 1242.546942]  ?
+>>> asm_exc_page_fault+0x22/0x30 [ 1242.551131]  ?
+>>> i40e_channel_config_tx_ring.constprop.0+0xd9/0x180 [i40e] [
+>>> 1242.557847]  i40e_setup_channel.part.0+0x5f/0x130 [i40e] [
+>>> 1242.563167]  i40e_setup_macvlans.constprop.0+0x256/0x420 [i40e] [
+>>> 1242.569099]  i40e_fwd_add+0xbf/0x270 [i40e] [ 1242.573300]
+>>> macvlan_open+0x16f/0x200 [macvlan] [ 1242.577831]
+>>> __dev_open+0xe7/0x1b0 [ 1242.581236]
+>> __dev_change_flags+0x1db/0x250
+>>> ...
+>>>
+>>> Fixes: 1d8d80b4e4ff ("i40e: Add macvlan support on i40e")
+>>> Signed-off-by: Ivan Vecera<ivecera@redhat.com>
+>> Thanks Ivan,
+>>
+>> I agree with the analysis and that the problem was introduced by the cited
+>> patch.
+>>
+>> Reviewed-by: Simon Horman<horms@kernel.org>
+>>
+>> _______________________________________________
+>> Intel-wired-lan mailing list
+>> Intel-wired-lan@osuosl.org
+>> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+> The issue this patch is supposed to fix is resolved by this patch, but now there is a new crash seen with this patch.  Crash output below:
+> 
+> Crash logs:
+> 
+> [  315.844666] i40e 0000:86:00.0: Query for DCB configuration failed, err -EIO aq_err I40E_AQ_RC_EINVAL
+> [  315.844678] i40e 0000:86:00.0: DCB init failed -5, disabled
+> [  315.873394] i40e 0000:86:00.0: User requested queue count/HW max RSS count:  1/64
+> [  315.900682] i40e 0000:86:00.0 eth4: Not enough queues to support macvlans
+
+I'm able to reproduce now... I have found that the macvlan offloading is 
+broken in several ways. I'm working to address theses issues.
+
+Thanks,
+Ivan
+
 
