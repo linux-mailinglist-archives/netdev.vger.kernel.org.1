@@ -1,149 +1,130 @@
-Return-Path: <netdev+bounces-52848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F4B800613
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:42:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9D8800655
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5F71F20D38
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:42:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88039281858
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E791A5A1;
-	Fri,  1 Dec 2023 08:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kHYsiKrj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFBE1C690;
+	Fri,  1 Dec 2023 08:55:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCE9196
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:42:49 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-28591079eb5so1505583a91.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:42:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1701420169; x=1702024969; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+BektOburQXG+cnVes1gG9CvIvVklrxBOP0251luLyc=;
-        b=kHYsiKrj19n2T9Kt0FmcQ0QcDbtiHorBeZoHw5NhUJoKIz09o3vkNMQ2QNq9U/323u
-         QdyJ8WGL9kY+CTx4572elOksuM/z5ekEeqeAVdRFdmWbxAnlumlBmJXsdmpoPUGOdJhR
-         Yxef/EEZy8gKa1WBikMrAC3cvQbbgOlTjs9M5XkyQr0TflQW0vvoxhEDIsQVvBSIZ94G
-         4gY/T7aW0bM1KnobZeNuckOYqc68QLS84MGmrEgPowJWd2kF3wyLolNyKh0123zp+Ov0
-         IjZfY3jl9oTPTnLVxWHiTupaNUJSq3nYsc4vGfZiFxvGNUSsZPbhLC7rvtE7OdHekS/8
-         4Wmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701420169; x=1702024969;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+BektOburQXG+cnVes1gG9CvIvVklrxBOP0251luLyc=;
-        b=R//ZliIcm6NZzOlkSPHGoLyVUR1ozzrogLccDlxXoPPg6T+/20bkJvaf8nkDfTb5oJ
-         Q/dmBVP8mfhsgsdbMKAH1phT2iR0L4OTcQcx0lSQVmlURBhhl4xwjFHhTD2qs2rhOg6r
-         Pr8H0M631UFCEfQGdlX2pkNhBH2eHFiqLlQxxzOlF4ExTPz4ei7n6hhuXXWJtUnjGGsL
-         33dJhHkd4azd65XI1AXPerDtI2NtayW7wRMRoF49JYRxxmjkfxpbHTZRQT86ZhTH9tqC
-         xeWoZFQDvuYAZYv3gyizfNOKh8UiXC7nZ4kLjAjshZNUkOKlPf6mKy0Vfb0a5YSmPmCl
-         0nZQ==
-X-Gm-Message-State: AOJu0Yx4oiwW6fXQorsIifoq8MnSSQarfSNKps1pUZdrB8Ume7FYca3V
-	9rcKRAuH9UtekS46XLwnARIiBSBJfjQNP3VazlQ=
-X-Google-Smtp-Source: AGHT+IHQlZQSaiA1mjh+Q6JoSIYJ8AxSKOD+/HgFMegaxFy19UtbZ/j6lBZcz5IClhqCixQds2+CYQ==
-X-Received: by 2002:a17:90b:3a90:b0:285:8cb6:6153 with SMTP id om16-20020a17090b3a9000b002858cb66153mr33062567pjb.17.1701420168679;
-        Fri, 01 Dec 2023 00:42:48 -0800 (PST)
-Received: from [10.84.154.115] ([203.208.167.146])
-        by smtp.gmail.com with ESMTPSA id o10-20020a170902d4ca00b001cfba9dac6esm2770341plg.115.2023.12.01.00.42.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 00:42:48 -0800 (PST)
-Message-ID: <57587b74-f865-4b56-8d65-a5cbc6826079@bytedance.com>
-Date: Fri, 1 Dec 2023 16:42:42 +0800
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDADC12A;
+	Fri,  1 Dec 2023 00:55:08 -0800 (PST)
+Received: from [192.168.1.103] (178.176.73.221) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 1 Dec
+ 2023 11:54:59 +0300
+Subject: Re: [PATCH net-next v2 8/9] net: rswitch: Add jumbo frames handling
+ for TX
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
+References: <20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com>
+ <20231201054655.3731772-9-yoshihiro.shimoda.uh@renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <3d3d27f6-a0ee-993e-f5b8-cd940a5e042f@omp.ru>
+Date: Fri, 1 Dec 2023 11:54:47 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH bpf-next] netkit: Add some ethtool ops to provide
- information to user
-To: Daniel Borkmann <daniel@iogearbox.net>,
- Nikolay Aleksandrov <razor@blackwall.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com, tangchen.1@bytedance.com
-References: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
- <51dd35c9-ff5b-5b11-04d1-9a5ae9466780@blackwall.org>
- <16b4d42d-2d62-460e-912f-6e3b86f3004d@bytedance.com>
- <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231201054655.3731772-9-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 12/01/2023 08:39:42
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181754 [Dec 01 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.221
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 12/01/2023 08:45:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 12/1/2023 5:09:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-在 2023/11/30 18:56, Daniel Borkmann 写道:
-> On 11/30/23 10:24 AM, Feng Zhou wrote:
->> 在 2023/11/30 17:06, Nikolay Aleksandrov 写道:
->>> On 11/30/23 09:58, Feng zhou wrote:
->>>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>>
->>>> Add get_strings, get_sset_count, get_ethtool_stats to get peer
->>>> ifindex.
->>>> ethtool -S nk1
->>>> NIC statistics:
->>>>       peer_ifindex: 36
->>>>
->>>> Add get_link, get_link_ksettings to get link stat.
->>>> ethtool nk1
->>>> Settings for nk1:
->>>>     ...
->>>>     Link detected: yes
->>>>
->>>> Add get_ts_info.
->>>> ethtool -T nk1
->>>> Time stamping parameters for nk1:
->>>> ...
->>>>
->>>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>> ---
->>>>   drivers/net/netkit.c | 53 
->>>> ++++++++++++++++++++++++++++++++++++++++++++
->>>>   1 file changed, 53 insertions(+)
->>>>
->>>
->>> Hi,
->>> I don't see any point in sending peer_ifindex through ethtool, even
->>> worse through ethtool stats. That is definitely the wrong place for it.
->>> You can already retrieve that through netlink. About the speed/duplex
->>> this one makes more sense, but this is the wrong way to do it.
->>> See how we did it for virtio_net (you are free to set speed/duplex
->>> to anything to please bonding for example). Although I doubt anyone 
->>> will use netkit with bonding, so even that is questionable. :)
->>>
->>> Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
->>
->> We use netkit to replace veth to improve performance, veth can be used 
->> ethtool -S veth to get peer_ifindex, so this part is added, as long as 
->> it is to keep the netkit part and veth unified, to ensure the same 
->> usage habits, and to replace it without perception.
-> 
-> Could you elaborate some more on the use case why you need to retrieve it
-> via ethtool, what alternatives were tried and don't work?
-> 
-> Please also elaborate on the case for netkit_get_link_ksettings() and which
-> concrete problem you are trying to address with this extension?
-> 
-> The commit message only explains what is done but does not go into the 
-> detail
-> of _why_ you need it.
-> 
-> Thanks,
-> Daniel
+On 12/1/23 8:46 AM, Yoshihiro Shimoda wrote:
 
-In general, this information can be obtained through ip commands or 
-netlink, and netkit_get_link_ksettings really not necessary. The reason 
-why ethtool supports this is that when we use veth, our business 
-colleagues are used to using ethtool to obtain peer_ifindex, and then 
-replace netkit, found that it could not be used, resulting in their 
-script failure, so they asked us for a request.
+> If the driver would like to transmit a jumbo frame like 2KiB or more,
+> it should be split into multiple queues. In the near future, to support
+> this, add handling specific descriptor types F{START,MID,END}. However,
+> such jumbo frames will not happen yet because the maximum MTU size is
+> still default for now.
+> 
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+[...]
 
+> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+> index 009e6bfdad27..c5e3ee8f82bc 100644
+> --- a/drivers/net/ethernet/renesas/rswitch.c
+> +++ b/drivers/net/ethernet/renesas/rswitch.c
+> @@ -1631,15 +1631,44 @@ static bool rswitch_ext_desc_set(struct rswitch_device *rdev,
+[...]
+>  static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  {
+>  	struct rswitch_device *rdev = netdev_priv(ndev);
+>  	struct rswitch_gwca_queue *gq = rdev->tx_queue;
+> +	dma_addr_t dma_addr, dma_addr_orig;
+>  	netdev_tx_t ret = NETDEV_TX_OK;
+>  	struct rswitch_ext_desc *desc;
+> -	dma_addr_t dma_addr;
+> +	unsigned int i, nr_desc;
+> +	u8 die_dt;
+> +	u16 len;
+>  
+> -	if (rswitch_get_num_cur_queues(gq) >= gq->ring_size - 1) {
+> +	nr_desc = (skb->len - 1) / RSWITCH_DESC_BUF_SIZE + 1;
+> +	if (rswitch_get_num_cur_queues(gq) >= gq->ring_size - nr_desc) {
+>  		netif_stop_subqueue(ndev, 0);
+>  		return NETDEV_TX_BUSY;
+>  	}
+> @@ -1647,19 +1676,26 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
+>  	if (skb_put_padto(skb, ETH_ZLEN))
+>  		return ret;
+>  
+> -	dma_addr = dma_map_single(ndev->dev.parent, skb->data, skb->len, DMA_TO_DEVICE);
+> +	dma_addr_orig = dma_map_single(ndev->dev.parent, skb->data, skb->len, DMA_TO_DEVICE);
+>  	if (dma_mapping_error(ndev->dev.parent, dma_addr))
 
+   Not dma_addr_orig? dma_addr isn't even set at this point, no?
+
+[...]
+
+MBR, Sergey
 
