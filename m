@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-52756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59FF8000E5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 02:20:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAE78000F0
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 02:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D45701C20979
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0051D1C20E96
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE36410E6;
-	Fri,  1 Dec 2023 01:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9CF17E1;
+	Fri,  1 Dec 2023 01:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ryFmnlIn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXgn6AmB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E6363A;
-	Fri,  1 Dec 2023 01:20:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17986C433C9;
-	Fri,  1 Dec 2023 01:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A627117D9;
+	Fri,  1 Dec 2023 01:25:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C4FC433C8;
+	Fri,  1 Dec 2023 01:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701393652;
-	bh=nFKftdJBJkkXnWh6TstAte2xl9IU8vEIseHhMgB1U74=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ryFmnlIn6mVhS3zoUaGbq7BXFuuYfznL96QsyMgFE+ETrgIx9IcD1UU6v3dzGL+EL
-	 5YU49yn8UXW84brJs3psNRB7E0PcMVr3KWi3rYLuZq0nkKaU2FbMd5I2MDQYHsYB2c
-	 55Or5KyMIeey5SCxSgcVmG0Rhjhe85QqdRsnh8te0B9+RPioAum2vjWB1+IqVrFiwu
-	 bw/+7PkfIhoGSFTaBV8vP3Joo+D8ajE4ZStcFUDSgDw6qlQD/NVuFgkD7ZiXzMee0n
-	 jbz2YDWJ9gMRGPcqkrwTv2fZ9OjB6nOFtSwBANXmLulyW/JM/BSoXHt0oNFgloM9OD
-	 aKlozyMbzp+IA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0D37DFAA86;
-	Fri,  1 Dec 2023 01:20:51 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1701393922;
+	bh=pA9obsUKkI3gLtmE5e/MIgsUKhFNUSwkoGABXxOXVu4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qXgn6AmBfQ/Zd6RVRJTPsZAbwENL/P5ChNB5zVXW0us7mhGHTnTM9sNNTsCC9XQxN
+	 L1uGh4x2n2RNCNp1RMfq9bjsLjHILqLsFEDBfDoRuu5RbUweF3Qn4DCOZPuUtfOC/W
+	 cgLl/hy6IQQTBfTywH4xH6a7Ijlk+gb4RALHriraRg/4+zauwSA3WB9jIBHc6UvEMK
+	 pve1ll983tzlpGE+05zeqz0RtkS54rsaP4JSXJoyKf4BX+eaGsmizKzq1dj0/9ks0B
+	 AJIe6Qexsgf9KACjBa6OjE70PNGpb1hiWU6Y0mWHs9fPVNfTs8PGu3yaeu8pMQBDFs
+	 wTU9Lq7vBbWSw==
+Date: Thu, 30 Nov 2023 17:25:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: kernel test robot <lkp@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>, Jeff
+ Johnson <quic_jjohnson@quicinc.com>, Michael Walle <mwalle@kernel.org>, Max
+ Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] netlink: Return unsigned value for nla_len()
+Message-ID: <20231130172520.5a56ae50@kernel.org>
+In-Reply-To: <20231130200058.work.520-kees@kernel.org>
+References: <20231130200058.work.520-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2023-11-30
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170139365198.11061.17706181086269150529.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Dec 2023 01:20:51 +0000
-References: <20231130145708.32573-1-daniel@iogearbox.net>
-In-Reply-To: <20231130145708.32573-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 30 Nov 2023 12:01:01 -0800 Kees Cook wrote:
+> This has the additional benefit of being defensive in the face of nlattr
+> corruption or logic errors (i.e. nla_len being set smaller than
+> NLA_HDRLEN).
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+As Johannes predicted I'd rather not :(
 
-On Thu, 30 Nov 2023 15:57:08 +0100 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 30 non-merge commits during the last 7 day(s) which contain
-> a total of 58 files changed, 1598 insertions(+), 154 deletions(-).
-> 
-> [...]
+The callers should put the nlattr thru nla_ok() during validation
+(nla_validate()), or walking (nla_for_each_* call nla_ok()).
 
-Here is the summary with links:
-  - pull-request: bpf-next 2023-11-30
-    https://git.kernel.org/netdev/net-next/c/0d47fa5cc91b
+> -static inline int nla_len(const struct nlattr *nla)
+> +static inline u16 nla_len(const struct nlattr *nla)
+>  {
+> -	return nla->nla_len - NLA_HDRLEN;
+> +	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN : 0;
+>  }
 
-You are awesome, thank you!
+Note the the NLA_HDRLEN is the length of struct nlattr.
+I mean of the @nla object that gets passed in as argument here.
+So accepting that nla->nla_len may be < NLA_HDRLEN means
+that we are okay with dereferencing a truncated object...
+
+We can consider making the return unsinged without the condition maybe?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
