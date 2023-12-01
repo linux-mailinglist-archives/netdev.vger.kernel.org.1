@@ -1,104 +1,136 @@
-Return-Path: <netdev+bounces-52792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B28F8003A5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:20:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85E08003A8
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D62051F20F51
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:20:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A456A2815B3
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C31C15F;
-	Fri,  1 Dec 2023 06:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EFEC13F;
+	Fri,  1 Dec 2023 06:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Bu0gX/kZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqxx95AJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BEE171A
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 22:20:42 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bbc36f767so2489442e87.1
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 22:20:42 -0800 (PST)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5345171A;
+	Thu, 30 Nov 2023 22:20:57 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-5c19a328797so130529a12.3;
+        Thu, 30 Nov 2023 22:20:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1701411641; x=1702016441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lr1SxrxtjnBwIXeraWPTW6/ftY9gYyhFBASILs735gM=;
-        b=Bu0gX/kZUotT/KrYDuNZ3NzsN37pF0BHAOzjoWpopSbRfvPDIcRFVgyOdm/otM4Wei
-         iG55L/Na5euAxJ7oyL9iqcmiHveSU0mYkIQYUhT8I2J9D+tltAAlVfiqmvGd4n/OVejm
-         UntIlFRJXEaLjOldaO8ULaPUwvvr4ojFsevHQFZa8ZiLSejp2DfhPrRMoFXqM/YeG0mz
-         zwke6JmK8chAY0e7i9dMNe2Nm9+iIcsyQHf7SqEk5lAB2wcUslqvztOLiMXbzHCl5DQp
-         YoRZbvShS431w+olIGoZEEHpUI2cgQB6NgIU4nGrNOX/622OmsuF0pY4Cn9fg3itUtyV
-         YJew==
+        d=gmail.com; s=20230601; t=1701411657; x=1702016457; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YK7DAK/HYP5JoaioB+ozsCCJdE2mJr0IL2oKiStr1mo=;
+        b=mqxx95AJDxQc4Pe6Mbs1bEgPe3FWWGlwebTTMMxKqcEEMtRpvpQWULgABZbP6R4KZU
+         dKtcN0q/Y5LaSMYzlqmddCtOoOURutB69biw36e+88fgc9SO4oOl14yv9M2O78TCe3dq
+         tyqf5p4HuspBOjcEGAQvQWpw1pxi2MREo2sBPhtknWCC0Ty8Ty1hceiOipA84EUwS3S6
+         rWnn2893raZMFfC5B8qEWL2PNu52p1lOKCl5BiBJYvgXgNUoB42frvlcjpphzdwl3oAt
+         i5zl55L0IhUT31GUUMvvgNX6mAATxv4sFjkNlZBelV0C9CO/yWvNTuGQzTFsKyIrRAp1
+         AYfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701411641; x=1702016441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lr1SxrxtjnBwIXeraWPTW6/ftY9gYyhFBASILs735gM=;
-        b=VAStwev2yxC70UONbgJXFzku5wv8XUHVoDT3Lp7XOSyD1U/+JKz0DIaYRcz5m5WiZ6
-         5Al7F9GbZRldiAyi2+8t9ZuqesXYE5bKtcmePp59vyF6VBmo0MwndUZBlgwJ5qIy7INV
-         LC7a50Ceu14e+Jll2PG7A6g1m78HcPenbrY7xzR6WD+p1udvQS+iwHkDIjHhM0qYpITx
-         VgL22isC+QpQNAGHEhj4vaiuA38vCnoxzJpCftmyaC1d7xzxusxtMqbNvu2hDpT+E8Ud
-         jsgEf4LK7lKFXmknEgyRqgOvDPIOAAwIDU5NZa8Vbk7QvzdsmI3PvatZYJszGTulNjEg
-         O9zA==
-X-Gm-Message-State: AOJu0Yxa7iJw9C2BMXLc7xWEEe5mmeRjVQW1qwSyVZO3LW7h6DR9ZtKY
-	681dHxN8uCJidxyI6iEuCQHhQr40dM+LA+ZdlCl5uA==
-X-Google-Smtp-Source: AGHT+IEuumCPkABaLV/MxgbmMcrswJVGbF+ByC+rsYSy+g2bl3UvowPLpycWs4tprIt/k5f+BCcYB+9a8tnOQdzATiY=
-X-Received: by 2002:a05:6512:2205:b0:50b:d764:76e7 with SMTP id
- h5-20020a056512220500b0050bd76476e7mr503276lfu.118.1701411641008; Thu, 30 Nov
- 2023 22:20:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701411657; x=1702016457;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YK7DAK/HYP5JoaioB+ozsCCJdE2mJr0IL2oKiStr1mo=;
+        b=MVuyhNdzr/mOvZ3z5tWgBU3BMVXARpcl+QDkVKgoQ2lxIwKr+ZcPhbU/93vpeqpp4T
+         P4A00Z+a5o548FmJ3kGWRhtr4VCcyU6m9X0AhJ9S3U1lNKYYMdtKw187V4pkdyFX/iZv
+         Qe/5VLdBenddff2Y78hdbLtARqYSgqj0KIAg/gQMOS2pRZTdOBUlT9VuImJzYG7FbV/V
+         W2IEBaXlVMuzYtURORWpI04TxfXfXXzz7yVUucGIe14wGz+Z8eqrh82duGT6A3YpYgmn
+         Tbh8gC9Wz0Xa0eVVcefHEWIld5LdFUldnyyXYg9j4/5sw+sCyk9ahDMtwg5XYuF0w3cN
+         UlqA==
+X-Gm-Message-State: AOJu0Yy1AnyU0/DAx1vVl2FFeYkIsTXFNxtwwodnlZglMR3wqnsLKeTS
+	Ll6vSP7o1TqfmBf38ghnL98=
+X-Google-Smtp-Source: AGHT+IFg344i9i44nWIlUV5nGDm3itL0uS1LAjuTEZ0pXCNIudCdwvHhrYNJRYVSw9tIQ3panVXfrw==
+X-Received: by 2002:a05:6a21:33a4:b0:18c:18d3:c8fd with SMTP id yy36-20020a056a2133a400b0018c18d3c8fdmr19354698pzb.14.1701411656907;
+        Thu, 30 Nov 2023 22:20:56 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id t189-20020a6281c6000000b00690c0cf97c9sm2313172pfd.73.2023.11.30.22.20.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Nov 2023 22:20:55 -0800 (PST)
+Date: Fri, 1 Dec 2023 14:20:49 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Po-Hsu Lin <po-hsu.lin@canonical.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Guillaume Nault <gnault@redhat.com>,
+	Petr Machata <petrm@nvidia.com>,
+	James Prestwood <prestwoj@gmail.com>,
+	Jaehee Park <jhpark1013@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Francesco Ruggeri <fruggeri@arista.com>,
+	Justin Iurman <justin.iurman@uliege.be>,
+	Xin Long <lucien.xin@gmail.com>
+Subject: Re: [PATCHv2 net-next 01/14] selftests/net: add lib.sh
+Message-ID: <ZWl7QaMAWj+RP21T@Laptop-X1>
+References: <20231130040105.1265779-1-liuhangbin@gmail.com>
+ <20231130040105.1265779-2-liuhangbin@gmail.com>
+ <CAMy_GT_YawM_6Xw9Qtt8rNLraAnfh_UkYjrb6j_1sWCSjfPN0w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
- <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org> <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net>
- <87fs0qj61x.fsf@toke.dk> <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
- <87plzsi5wj.fsf@toke.dk> <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
- <871qc72vmh.fsf@toke.dk> <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net> <e3402045-a36f-461f-8eab-bbc51735492d@kernel.org>
-In-Reply-To: <e3402045-a36f-461f-8eab-bbc51735492d@kernel.org>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 1 Dec 2023 00:20:30 -0600
-Message-ID: <CAO3-PbrQ+LoPYZUN2kpvMHmwW-Opa3pX=g11gdNy1oaXPG6GAg@mail.gmail.com>
-Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Stanislav Fomichev <sdf@google.com>, Netdev <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	kernel-team <kernel-team@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Sitnicki <jakub@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMy_GT_YawM_6Xw9Qtt8rNLraAnfh_UkYjrb6j_1sWCSjfPN0w@mail.gmail.com>
 
-On Thu, Nov 30, 2023 at 2:35=E2=80=AFPM Jesper Dangaard Brouer <hawk@kernel=
-.org> wrote:
->
-> We are exploring more options than only XDP metadata area to store
-> information.  I have suggested that once an SKB have a socket
-> associated, then we can switch into using BPF local socket storage
-> tricks. (The lifetime of XDP metadata is not 100% clear as e.g.
-> pskb_expand_head clears it via skb_metadata_clear).
-> All ideas are welcome, e.g. I'm also looking at ability to store
-> auxiliary/metadata data associated with a dst_entry. And SKB->mark is
-> already used for other use-cases and isn't big enough. (and then there
-> is fun crossing a netns boundry).
->
-sk local storage might not work for the cases if packets are purely
-forwarded or end up with a tun/tap device. Can we make XDP metadata
-life time clear then? It would also be really interesting if we can
-sendmsg with metadata, too. We often have a hard time distinguishing
-if a kernel event like packet drop/retransmission correlates to a
-reported customer problem. It's hard because when the event happens,
-there isn't customer specific information in the context to correlate,
-usually only multiplexed sockets and the packet triggering such an
-event. Allowing carrying some extra information on the packet would
-definitely improve this a lot with BPF tracing.
+On Fri, Dec 01, 2023 at 01:56:51PM +0800, Po-Hsu Lin wrote:
+> > +# setup netns with given names as prefix. e.g
+> > +# setup_ns local remote
+> > +setup_ns()
+> > +{
+> > +       local ns=""
+> > +       local ns_name=""
+> > +       local ns_list=""
+> > +       for ns_name in "$@"; do
+> > +               # Some test may setup/remove same netns multi times
+> > +               if unset ${ns_name} 2> /dev/null; then
+> > +                       ns="${ns_name,,}-$(mktemp -u XXXXXX)"
+> > +                       eval readonly ${ns_name}="$ns"
+> > +               else
+> > +                       eval ns='$'${ns_name}
+> > +                       cleanup_ns "$ns"
+> > +
+> > +               fi
+> > +
+> > +               if ! ip netns add "$ns"; then
+> > +                       echo "Failed to create namespace $ns_name"
+> > +                       cleanup_ns "$ns_list"
+> > +                       return $ksft_skip
+> > +               fi
+> > +               ip -n "$ns" link set lo up
+> I got this patchset tested the result is looking good. However it
+> seems that not all of the tests require this loopback bring up, e.g.
+> * arp_ndisc_untracked_subnets.sh
+> * cmsg_ipv6.sh
+> * cmsg_so_mark.sh
+> * cmsg_time.sh
+> * drop_monitor_tests.sh
+> * icmp.sh
+> * ndisc_unsolicited_na_test.sh
+> * sctp_vrf.sh
+> * unicast_extensions.sh
+> 
+> A possible solution could be adding an extra flag to setup_ns(), bring
+> lo up on demand.
+> 
+> Not sure if this is needed, as I can't think of possible impacts of
+> this for the moment.
+> (Maybe a test does not require loopback device in such state?)
+> Other might be able to provide some feedback about this.
 
-Yan
+Yes, I also can't think of impact of set lo up. So I just do it explicit.
+If someone could help find out the impact, I can add a flag for this function.
+
+Thanks
+Hangbin
 
