@@ -1,73 +1,104 @@
-Return-Path: <netdev+bounces-52950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67922800DE2
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:03:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05FA0800E18
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:09:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02039B20CDA
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:03:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70BF6B21468
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB883FE20;
-	Fri,  1 Dec 2023 15:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF135495EE;
+	Fri,  1 Dec 2023 15:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fblCLBpf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZW2H/utz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC68171B
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:03:08 -0800 (PST)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-77bcbc14899so115042285a.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 07:03:08 -0800 (PST)
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748C010F9;
+	Fri,  1 Dec 2023 07:09:17 -0800 (PST)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-77d645c0e06so112311585a.3;
+        Fri, 01 Dec 2023 07:09:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701442987; x=1702047787; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701443356; x=1702048156; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0mDrILsdJdFn3RK4jint0RO5y2314rw2m+gKdkZIZY4=;
-        b=fblCLBpfz0TCXUl78I11bnOB/g+JJ2bdXG8E1NYJK45IPBuAuPJbiZTCkQJ6bRW3cf
-         35K9cu4uSO0fqT9wnG/ZD2BZVDdoVpnphXtS53Vwg5aiEZkou4O57hDAHP2FV6SQ70+W
-         WtgiNar9RJ8FYz4Xjrie0fazelgdeqGVSktFoxKRFRoP2pee+GR2zOKUt05t86IgqAut
-         SEbdGO5p1sIFnjML2MvKakp9Q1Ohfy7kLA4jkyCtnANGZdvcHzE4mJRbv9YnXpUjWhUY
-         hDc+cU15LGkLmzPfO7fMgC2wVx1vH9WSYplMZfA4vR4JS7OkAsUtUoak66dY8xaFdeML
-         X2rw==
+        bh=zLso2pmbW+pqec/n5hTLrdVINDT0pM+C03w8nh7HKns=;
+        b=ZW2H/utzzf1N7CiaySlvo1Rf/2AEihSxENWVUquX4J/l39PzuK8dND9WNcVXu1taoX
+         Rj7+SHZGsei6QlOGW9p8OZyqJXLHCh2i4c8hybn6eqz9mw30mwtTXz81AEMAE2jtfFhJ
+         UgYS/PUTL/mjlV8uEoiyH4vyKHSIfDaGCB+RrUvSRorMWS7H2kcJV25cIOfjFGlU7Dvw
+         u9RbeF1A90lzZJzDh189xT8bkgXIrd417KCDKsKVnVZ+BwSakSccGybZE2aB9ouJiQ8Z
+         UOiRmPKUhUQQYtARmx4fNnb6LRFGEKroQOFtv1QlNoPhv62L+jjc0GLrT7120XYRMs15
+         NsZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701442987; x=1702047787;
+        d=1e100.net; s=20230601; t=1701443356; x=1702048156;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=0mDrILsdJdFn3RK4jint0RO5y2314rw2m+gKdkZIZY4=;
-        b=cwU1nqS1Slh68gnGkAlO0MVH5UQ2/yNlaJTDCnKZZ35TtnNVAel9v7WAHYWlxkpLKy
-         uoc7ZPzQ0m1cxiss+oRWo7PsSTUtuGEwhSjH74iBH9yrpU63yRxRG7hnPi/Qpo5Hm1rV
-         LXWiRiqCKQF2KxyLYirzl/o4yA0cP4byxpUl/A1wNH8orzuQf4dJ/aa459grRJzA32Hn
-         cTRWvjPZOKkZIeXx4EkOs6DfYfRrxeNL0vtu5el9w9HGfnZgZWALl3Yw52LF0k58tYK9
-         fdSjs7l0smEKqIcx30jPF3XdgV2uCiD8WT+/Gu1vku0nKwAPvg9owvgGRl3G2x3snQM7
-         PnCQ==
-X-Gm-Message-State: AOJu0YxtWR9RcfhoiRKzCpPYSpIvK/4yTKQCUwrc0mOiwIPdAq9m6JIE
-	wh8X5fQ+YS8iuMsUHygHo8q3fQrgAts=
-X-Google-Smtp-Source: AGHT+IHEQb2BtsAD29iVjRmDcX5XKawJEs5JgqeE6zV6AEF4jLtDR8Gxyg9VOCobe8z1StICZT3uFA==
-X-Received: by 2002:a05:620a:839a:b0:77b:e2ae:934c with SMTP id pb26-20020a05620a839a00b0077be2ae934cmr32438028qkn.12.1701442987123;
-        Fri, 01 Dec 2023 07:03:07 -0800 (PST)
+        bh=zLso2pmbW+pqec/n5hTLrdVINDT0pM+C03w8nh7HKns=;
+        b=eFFRYwiS/0K9fqnRZIK4nTKrZI+AHpzU9i0L2JMXRFwUyBxhPPb9NLRn9JjPoQCtFU
+         flSBTRW9Z6/5JuDkTQ9kGQohIMtwiFb1RA2gr9tDZE2L/0R7VMraOpZn7C1IGacXiTaq
+         GdiC67/XivIrehsMTEyS8qWsM+uKQd+V9capxdJZMFD8wzDGlowRRRanSiSnf7TAc3y0
+         WElU4YuiIfcrPIHCeZQkV+LIFwHNZrPDiksCnxwNJygmCfyidZHAdYOdicqTHOs8jrhi
+         f3uXZ3NJsxUx/5brQHV1ehe9jTTtW88sCaUe/mIcxxbFQeqDj6l/+MSzf8NpQmPmGmY4
+         M8Gw==
+X-Gm-Message-State: AOJu0YyjQydEDG3m72cwB5wEfj+HUAm1KPUvfU6lJ5bwfs71NQqKXDo9
+	xPSMiezz/FnMYilqTw6dRI0iVMZ5PtHgdA==
+X-Google-Smtp-Source: AGHT+IH54DZX3epKyg6LRt2pdYZkL/+XeUYhSrEyKX4h3aISopJX9pTR0/tZhUxii4HdMqDmoQRtqg==
+X-Received: by 2002:ad4:4511:0:b0:67a:8ed9:c9f with SMTP id k17-20020ad44511000000b0067a8ed90c9fmr3811562qvu.48.1701443356450;
+        Fri, 01 Dec 2023 07:09:16 -0800 (PST)
 Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id z27-20020a05620a101b00b0077d8fdc7e84sm1561460qkj.5.2023.12.01.07.03.06
+        by smtp.gmail.com with ESMTPSA id g12-20020a0caacc000000b0067a39a44ca5sm1106qvb.77.2023.12.01.07.09.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 07:03:06 -0800 (PST)
-Date: Fri, 01 Dec 2023 10:03:06 -0500
+        Fri, 01 Dec 2023 07:09:15 -0800 (PST)
+Date: Fri, 01 Dec 2023 10:09:15 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, 
- netdev@vger.kernel.org
-Cc: Daniel Borkmann <daniel@iogearbox.net>, 
- "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Linus Torvalds <torvalds@linux-foundation.org>, 
- stable@kernel.org
-Message-ID: <6569f5aa70747_138af529417@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20231201131021.19999-1-daniel@iogearbox.net>
-References: <20231201131021.19999-1-daniel@iogearbox.net>
-Subject: Re: [PATCH net v2] packet: Move reference count in packet_sock to
- atomic_long_t
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Bjorn Topel <bjorn@kernel.org>, 
+ "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
+ "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@google.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
+ "linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Message-ID: <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
+References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
+ <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
+ <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
+Subject: RE: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,33 +109,41 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Daniel Borkmann wrote:
-> In some potential instances the reference count on struct packet_sock
-> could be saturated and cause overflows which gets the kernel a bit
-> confused. To prevent this, move to a 64-bit atomic reference count on
-> 64-bit architectures to prevent the possibility of this type to overflow.
+Song, Yoong Siang wrote:
+> On Friday, December 1, 2023 6:46 PM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+> >On 12/1/23 07:24, Song Yoong Siang wrote:
+> >> This series expands XDP TX metadata framework to include ETF HW offload.
+> >>
+> >> Changes since v1:
+> >> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
+> >> - rename launch-time to txtime
+> >>
+> >
+> >I strongly disagree with this renaming (sorry to disagree with Willem).
+> >
+> >The i210 and i225 chips call this LaunchTime in their programmers
+> >datasheets, and even in the driver code[1].
+> >
+> >Using this "txtime" name in the code is also confusing, because how can
+> >people reading the code know the difference between:
+> >  - tmo_request_timestamp and tmo_request_txtime
+> >
 > 
-> Because we can not handle saturation, using refcount_t is not possible
-> in this place. Maybe someday in the future if it changes it could be
-> used. Also, instead of using plain atomic64_t, use atomic_long_t instead.
-> 32-bit machines tend to be memory-limited (i.e. anything that increases
-> a reference uses so much memory that you can't actually get to 2**32
-> references). 32-bit architectures also tend to have serious problems
-> with 64-bit atomics. Hence, atomic_long_t is the more natural solution.
+> Hi Jesper and Willem,
 > 
-> Reported-by: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>
-> Co-developed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: stable@kernel.org
-> ---
->  [ No Fixes tag, needed for all currently maintained stable kernels. ]
-> 
->  v1 -> v2:
->    - Switch from atomic64_t to atomic_long_t (Linus)
+> How about using "launch_time" for the flag/variable and
+> "Earliest TxTime First" for the description/comments?  
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I don't particularly care which term we use, as long as we're
+consistent. Especially, don't keep introducing new synonyms.
 
+The fact that one happens to be one vendor's marketing term does not
+make it preferable, IMHO. On the contrary.
+
+SO_TXTIME is in the ABI, and EDT has been used publicly in kernel
+patches and conference talks, e.g., Van Jacobson's Netdev 0x12
+keynote. Those are vendor agnostic commonly used terms.
+
+But as long as Launch Time is not an Intel only trademark, fine to
+select that.
 
