@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-52740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36700800002
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:14:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E70800007
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67BE91C20A2E
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:14:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A052E281B7B
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D58620;
-	Fri,  1 Dec 2023 00:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9B7138D;
+	Fri,  1 Dec 2023 00:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8Lu5ZJ5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FL+dykhW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6337D196;
-	Thu, 30 Nov 2023 16:14:50 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-333308c3683so131140f8f.3;
-        Thu, 30 Nov 2023 16:14:50 -0800 (PST)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F6C133;
+	Thu, 30 Nov 2023 16:14:51 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-332d5c852a0so962672f8f.3;
+        Thu, 30 Nov 2023 16:14:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701389689; x=1701994489; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rbMRUAfFn47SD4U+uFEOnC9vSvmwUi2NELQbNX2DDtA=;
-        b=Y8Lu5ZJ5uUoM3fQHPT234pGNqTsADTnSPR37N6u4gZOYOSb4MJmZe5+xvbUWLs32rM
-         YxdyeCznqi2NTRu6SgL78J7kL5NhzPT4XbTNWWeajdJyqpx+aSG08gvtgI30jiA5/Yqj
-         XpyjA548HcT2rn15QOyTENdLZUVyJGIWGKPldTX47/OlDBHWpwQRVYuGx1a/rPAKupH2
-         sn7nZ/XAk2H51KWL3Vm6OyB5+1aHZtDqS2H1OTrPbyjhzNj6dGkEyugLe5d/T+Ujdp1B
-         AO5KnvHlpkHAiMSpok6ymlI4DXsqoYoiVb5jFn/vGCgMHnnOmdSe7JhMI/xWzlO53pD4
-         ZsfQ==
+        d=gmail.com; s=20230601; t=1701389690; x=1701994490; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MfZOawQYQNHqU9ZIBqp6/PMD5jOFrh8dAxaGlSct1Og=;
+        b=FL+dykhWQ4ZSqV5/x7Wn7K8cFzAEKi9QQLwXYscHPGGqGqlYGR154qzpNrHORKGYF0
+         Noz6LchtQdQ0ADDS8VJW/N2JnCHhXGDX+DU83YmrmF9kTCT7DV2y8X2RVD5c+Hts64N1
+         etdnBG/Ro56KOfOhj/PngNIvdNLQisZuxS2VFoT0Bt9MCnJrHWqw4TIgRLKKwuOJ9SIr
+         LcVCnExUzBbXavwLvOFOLDTXetLjvPfaUDCSsYGy6DxZrh3QcOmV+tTzKYJo6m1zgltI
+         armakfJUWte+3Ibrxxp0Sf30ihO509RX0HvTd/IBC31A4U/cWVdqoArG5G17EkS9xBrI
+         GaLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701389689; x=1701994489;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rbMRUAfFn47SD4U+uFEOnC9vSvmwUi2NELQbNX2DDtA=;
-        b=O/J6TrKVNM44MpwZsAVwFObL9oLeRJ8Rrj3EpN/IK3RjzE8V8ifVpO55LhMM2cOrDT
-         nh/wrB0mN+mQEgNyBobjiMSGVPoCviLLuNjDw+cbKA82mb4TJwvop21TutarouQVUwEY
-         7MKFkGc3yldz+fMjihZZKnZa5F7U0DvAPXl/k/qvpbKuEX3OcUELcY8hCZvixkqZC3GM
-         yOmcGJ5tU9g91cfx6xVy/HVm0XRbFZNxhfKVpAZd2xFkPDQDv0DpfLx6WAgp6KOvuL+p
-         hFtfnUNlGx5SIcto4iJTJqpH6fRuxnznJZ1VVc+KypMlwrrK6dyHUR7XQHkOcCe1GJmV
-         M3og==
-X-Gm-Message-State: AOJu0YwUASC09yZ+OtED7hcCuG5jNKSrKyeZGM+4Rx0hvgdFiHDMlxbF
-	6V5fgaT+wAVNKVVtakuJFdg=
-X-Google-Smtp-Source: AGHT+IFwRGHS2tPjFk1hrnhXtuCfo2T+vO+mPvAHX1fulP9kHjEvYxhfoQuWC4gItjSIhrawmk0dmw==
-X-Received: by 2002:adf:e983:0:b0:333:2fc4:464 with SMTP id h3-20020adfe983000000b003332fc40464mr147908wrm.93.1701389688625;
-        Thu, 30 Nov 2023 16:14:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701389690; x=1701994490;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MfZOawQYQNHqU9ZIBqp6/PMD5jOFrh8dAxaGlSct1Og=;
+        b=Fhdw4R4Qo24XS8XPZfGoVWw5WPu/rn8evDPp4IkuqG9jd46nenEHIv2Lm4HMhJ9rAN
+         wvHQ/IzTUi6UxhA7vUrHnnpLi1NXPA1fa1R57yk4f2lBARlWplZJnOvsd+bytPnECG8k
+         o6VbdeOkX0P/BOfw6qRVSbaZERFDmU/ocNxNZRkqop7fupng4/sI4cdh4eXQLurK5Zti
+         +26tw3NCUtoSp80AenYLWM7T0vM7MJuDs05wyMQIyl5MbP7M8xHaxqOc4wtqmTG0VRmQ
+         Juz9vDQRv90hnff8AzmELOgKXFJ7dh2zCtHsAEfAYlmrELOs94maoNa5idYh6XWPbsBz
+         pOcw==
+X-Gm-Message-State: AOJu0YxJvTAymQbMQX2oL2p94tDbihW78N3RqQLWLIYn7wXOeu1f3EaW
+	ZHqOOL9d0gBqmFK5+++/vt0=
+X-Google-Smtp-Source: AGHT+IG/twidJaUWlUWAiSD8uGlObqLx0Ig1UdraooC+IUrT3e/SH0UT8hm/oEW5ge+/bwhAFqjinQ==
+X-Received: by 2002:a05:6000:1372:b0:333:2fd2:5d42 with SMTP id q18-20020a056000137200b003332fd25d42mr203533wrz.116.1701389689788;
+        Thu, 30 Nov 2023 16:14:49 -0800 (PST)
 Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id g16-20020a05600c4ed000b0040b47c53610sm3535457wmq.14.2023.11.30.16.14.47
+        by smtp.googlemail.com with ESMTPSA id g16-20020a05600c4ed000b0040b47c53610sm3535457wmq.14.2023.11.30.16.14.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 16:14:48 -0800 (PST)
+        Thu, 30 Nov 2023 16:14:49 -0800 (PST)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
@@ -63,10 +64,12 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v2 00/12] net: phy: at803x: cleanup
-Date: Fri,  1 Dec 2023 01:14:10 +0100
-Message-Id: <20231201001423.20989-1-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 01/12] net: phy: at803x: fix passing the wrong reference for config_intr
+Date: Fri,  1 Dec 2023 01:14:11 +0100
+Message-Id: <20231201001423.20989-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231201001423.20989-1-ansuelsmth@gmail.com>
+References: <20231201001423.20989-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,56 +78,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The intention of this big series is to try to cleanup the big
-at803x PHY driver.
+Fix passing the wrong reference for config_initr on passing the function
+pointer, drop the wrong & from at803x_config_intr in the PHY struct.
 
-It currently have 3 different family of PHY in it. at803x, qca83xx
-and qca808x.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+ drivers/net/phy/at803x.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-The current codebase required lots of cleanup and reworking to
-make the split possible as currently there is a greater use of
-adding special function matching the phy_id.
-
-This has been reworked to make the function actually generic
-and make the change only in more specific one. The result
-is the addition of micro additional function but that is for good
-as it massively simplify splitting the driver later.
-
-Consider that this is all in preparation for the addition of
-qca807x PHY driver that will also uso some of the functions of
-at803x.
-
-Subsequent series will come with the actual PHY split and other
-required cleanup. This is only to start the process with minor
-changes.
-
-Changes v2:
-- Drop split part due to series too big
-- Split changes even more
-- Fix problem pointed out by Russell (flawed reworked function logic)
-- Add Reviewed-by tag from Andrew
-- Minor rework to prevent further code duplication for cdt
-
-Christian Marangi (12):
-  net: phy: at803x: fix passing the wrong reference for config_intr
-  net: phy: at803x: move disable WOL to specific at8031 probe
-  net: phy: at803x: raname hw_stats functions to qca83xx specific name
-  net: phy: at803x: move qca83xx specific check in dedicated functions
-  net: phy: at803x: move specific DT option for at8031 to specific probe
-  net: phy: at803x: move specific at8031 probe mode check to dedicated
-    probe
-  net: phy: at803x: move specific at8031 config_init to dedicated
-    function
-  net: phy: at803x: move specific at8031 WOL bits to dedicated function
-  net: phy: at803x: move specific at8031 config_intr to dedicated
-    function
-  net: phy: at803x: make at8031 related DT functions name more specific
-  net: phy: at803x: move at8035 specific DT parse to dedicated probe
-  net: phy: at803x: drop specific PHY ID check from cable test functions
-
- drivers/net/phy/at803x.c | 777 +++++++++++++++++++++------------------
- 1 file changed, 428 insertions(+), 349 deletions(-)
-
+diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+index 37fb033e1c29..ef203b0807e5 100644
+--- a/drivers/net/phy/at803x.c
++++ b/drivers/net/phy/at803x.c
+@@ -2104,7 +2104,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.write_page		= at803x_write_page,
+ 	.get_features		= at803x_get_features,
+ 	.read_status		= at803x_read_status,
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.get_tunable		= at803x_get_tunable,
+ 	.set_tunable		= at803x_set_tunable,
+@@ -2134,7 +2134,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.resume			= at803x_resume,
+ 	.flags			= PHY_POLL_CABLE_TEST,
+ 	/* PHY_BASIC_FEATURES */
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.cable_test_start	= at803x_cable_test_start,
+ 	.cable_test_get_status	= at803x_cable_test_get_status,
+@@ -2150,7 +2150,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.resume			= at803x_resume,
+ 	.flags			= PHY_POLL_CABLE_TEST,
+ 	/* PHY_BASIC_FEATURES */
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.cable_test_start	= at803x_cable_test_start,
+ 	.cable_test_get_status	= at803x_cable_test_get_status,
 -- 
 2.40.1
 
