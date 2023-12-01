@@ -1,118 +1,84 @@
-Return-Path: <netdev+bounces-52890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 123D18008F1
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:49:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29012800937
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440291C20FBC
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57D7F1C20757
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA41220B3D;
-	Fri,  1 Dec 2023 10:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0070120B3E;
+	Fri,  1 Dec 2023 11:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="mcWH1h3t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFIl4xpG"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD83310D7;
-	Fri,  1 Dec 2023 02:49:44 -0800 (PST)
-Received: from [10.28.30.211] (ubuntu.user.uliege.priv [10.28.30.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 31AD0200CCF5;
-	Fri,  1 Dec 2023 11:49:42 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 31AD0200CCF5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1701427782;
-	bh=yqTmpjxC+vmCiRMzZ6JjEUlZ7fEf3rMCw5yimOIcRAk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mcWH1h3tptTWBjigd9kGih1J5RsKH/tfPJFzy4ad2ULxaNrvkFCCSZ0rw4RRKobJv
-	 Aibh1OpWzT7s4ocFMTF9q4QD1zgkqEBuGHklelIm0fWrsH6sAe0zQMMLzSiK2RQjb8
-	 qmG1U6d2eL/NEqWTKDmjMevD5Cjo79QM3jEw8lc12U0pBm6S9jRQTj0/19723e6p9d
-	 IUxCfjmhx1w+caXR92fIAUyAxdUMaMDsBNRlwajCa5cDJ2Z8HaiFohjblN9aIobkIx
-	 pyePFpoTApHCMCbUSbk5onJ1flTksOljZ7rEtKs8Y7SRe4NzEwifhyThXrZToQQi17
-	 C6QcNFQmIkIUw==
-Message-ID: <699fb67c-efb4-4fc9-bf18-a2ddeffbcdb7@uliege.be>
-Date: Fri, 1 Dec 2023 11:49:42 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5144208A8;
+	Fri,  1 Dec 2023 11:00:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A2BE5C433CA;
+	Fri,  1 Dec 2023 11:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701428425;
+	bh=lDz8O3kEJRuixW9zKX5JW7qIlAHXaOgJ6uYeYOFOs58=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jFIl4xpGaY0jY17aAExWUdyHLl1BkrPFLilm8AFqAAJSmgoFqM9dYGWkHmx+IKkVg
+	 xeNZKHTZIZiH9XiRWAPJ2rDr27WtjMF49+iRdhhJh7cRQe1hgMRw2DHrtuqfLV2wxD
+	 5WUCZXHVDAEQNvPaMUVQicMOIVemeXFRPm3dRpwSZYPU0tLE0xG8S+d16Cc5G+V7R9
+	 I4RMtOs2NSQxNJ+nUYJk6EjR2OShXspACMq4PxOLGZQsOP/S2jww91SSghLfV6d07g
+	 H3yEQ6SSod/J7+R/1JfOV+PVfv6pgTmlBlJpzYTMl6D0WBCQwfGBP+bOXXha5ruEfH
+	 Y+ksQl2GLWR6w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83F03C59A4C;
+	Fri,  1 Dec 2023 11:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next 10/14] selftests/net: convert ioam6.sh to run
- it in unique namespace
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
- Po-Hsu Lin <po-hsu.lin@canonical.com>, Guillaume Nault <gnault@redhat.com>,
- Petr Machata <petrm@nvidia.com>, James Prestwood <prestwoj@gmail.com>,
- Jaehee Park <jhpark1013@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
- Francesco Ruggeri <fruggeri@arista.com>, Xin Long <lucien.xin@gmail.com>,
- justin.iurman@uliege.be
-References: <20231130040105.1265779-1-liuhangbin@gmail.com>
- <20231130040105.1265779-11-liuhangbin@gmail.com>
- <4ab6e843-fd60-4abf-a23f-c8032e617f5c@uliege.be> <ZWmAk9637Oo4HYOU@Laptop-X1>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <ZWmAk9637Oo4HYOU@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] octeon_ep: Fix error code in probe()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170142842553.7076.7768114131648140649.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Dec 2023 11:00:25 +0000
+References: <cd2c5d69-b515-4933-9443-0a8f1b7fc599@moroto.mountain>
+In-Reply-To: <cd2c5d69-b515-4933-9443-0a8f1b7fc599@moroto.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: srasheed@marvell.com, vburru@marvell.com, sedara@marvell.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
-On 12/1/23 07:43, Hangbin Liu wrote:
-> On Thu, Nov 30, 2023 at 02:28:51PM +0100, Justin Iurman wrote:
->> On 11/30/23 05:01, Hangbin Liu wrote:
->>> Here is the test result after conversion.
->>>
->>> ]# ./ioam6.sh
->>>
->>> --------------------------------------------------------------------------
->>> OUTPUT tests
->>> --------------------------------------------------------------------------
->>> TEST: Unknown IOAM namespace (inline mode)                          [ OK ]
->>> TEST: Unknown IOAM namespace (encap mode)                           [ OK ]
->>> TEST: Missing trace room (inline mode)                              [ OK ]
->>> TEST: Missing trace room (encap mode)                               [ OK ]
->>> TEST: Trace type with bit 0 only (inline mode)                      [ OK ]
->>> ...
->>> TEST: Full supported trace (encap mode)                             [ OK ]
->>>
->>> --------------------------------------------------------------------------
->>> GLOBAL tests
->>> --------------------------------------------------------------------------
->>> TEST: Forward - Full supported trace (inline mode)                  [ OK ]
->>> TEST: Forward - Full supported trace (encap mode)                   [ OK ]
->>>
->>> - Tests passed: 88
->>> - Tests failed: 0
->>>
->>> Acked-by: David Ahern <dsahern@kernel.org>
->>> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->>
->> Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
->>
->> LGTM. Just one question though. Is there any reason not to use cleanup_ns
->> everywhere? There is the following diff (actually, 3 times):
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 28 Nov 2023 16:13:19 +0300 you wrote:
+> Set the error code if octep_ctrl_net_get_mtu() fails.  Currently the code
+> returns success.
 > 
-> Hi Justin,
-> 
-> Thanks for your review. There is no much intend. I just use del ns for one
-> line change. And use cleanup_ns for multi line changes. I can make all
-> ns delete via cleanup_ns in next version.
+> Fixes: 0a5f8534e398 ("octeon_ep: get max rx packet length from firmware")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-+1, I think it would make sense to use the new API everywhere for 
-consistency.
+Here is the summary with links:
+  - [net-next] octeon_ep: Fix error code in probe()
+    https://git.kernel.org/netdev/net-next/c/0cd523ee8642
 
-> BTW, I will use `cleanup_ns $ns || true` in next version as cleanup_ns
-> could return none 0 in PATCHv2.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Sounds good, thanks!
 
-> Thanks
-> Hangbin
 
