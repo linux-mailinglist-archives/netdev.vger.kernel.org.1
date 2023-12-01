@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-52733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D945C7FFFDB
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:06:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BB67FFFD9
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 01:05:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4DA1C20FE4
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA6B3281619
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 00:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9980B163;
-	Fri,  1 Dec 2023 00:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B4763A;
+	Fri,  1 Dec 2023 00:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Aywsc5gn"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TWpWCpKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2054.outbound.protection.outlook.com [40.107.223.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B2B10F3
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 16:05:43 -0800 (PST)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2071.outbound.protection.outlook.com [40.107.220.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D30139
+	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 16:05:44 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TvxFg99ZGYvF/WM58t7u+j0PfZRu+g90DEPkdm2idy8BnPgGvQJn30levWMuNaq0w/jp2qwAqOtQdT6kzeFAQwp9asXcJ0C3neFClGZcru+FM6UHJCdhFtuUJWymlQUZk6kGU90G9vYSaxPpjycUdXUOIQEQIIi/zEa8L9YtA86WzrERUeq6ZTZU9Ibs/pJHPFXz3Z9ktttOARi6RupZKSIoyJTukMiFyrbRuLESdrPsXSxvWFHqZOPoLNRvTWp/432vPJfPuF9yHcBshx1Nadx2BfEbyx07GdWLu0ihOqfzQEmJwk0an/Z2CB3/NtD9O0heCM/6ZA6PKSq4QzEWtA==
+ b=IRd1Ztozjfl/XGDjEAYla8No8cXLgY2HKnPHbmiyqZ7NffBj8UstVvG+9Q9XEAC2JfDXAlpooPYDN6sGgkhomU9IenjerPRTf/0N/Pu1q4vvE+eN2pYTbT6worSYU2zplRqk63d4ZkF6ltc3m9sKFhKamOK9/hiMUHqQA5vO9WEY1X29L2NczEdjTzA3s9K9kanUwosVMWPTyAI8+YYMCau39Pw0cx8LenH9jAe19S1oYQM77wWL3aJEUu/PcTejBDqsHlKe9yqalhKYBzSDGn8oAlsohzCr2V4+vPBPtERKat/rjCasxzm6cnhIclXpvWEKBEBKD1LCMDxJnyziUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GbMYeAo1/R+rqEvx/QWVhubdE0Qp5Z30vspGWRI9FQQ=;
- b=BHK8Ebjyxf6Lnjc1UQXwMdxP8paV7RN8GvMpMRxlzOolteY+lLUmFrCOt9PUAHZZL96ng1bQzklFQYq4PHjuw4Hdyn0IkZY4J0G1vSyR/XWdKeY12UEiyKsXDm1jQPklcuN9w4FJZv3dKidBq1X58VE7IVRq7f9W2l04OsJDJwLyPTzr22Gq9DJjHt9V80lrWat+tgyrVC+HOdhQ5hxFeCkPaSTtVVUwHD9f3qlTXU9biglp2unLgjndAPbC56Wz/T9y4BUTQzMiUQC6xonACRc3btxxCUbQ/V3EowucCswWlNNd6Pc/CUZiKRU0d7KcccVjwW4iXA+dUll+8Fx8BQ==
+ bh=lMzruAiRrDPpybeoTmb9CKTfXeMZ5d5ZGX9yrstYDVM=;
+ b=kZZ4yhqn77Xr+fdU11VPnWBO8hzRdjFVKChDHTPRefEeDovKkm+PGHUmPhXp49EN2d8WRmyv0NLB2PTi9IyAuhZUoCERimOyAkjE33dNVctRUi2yfA6qRVBPsm9g5vFuWj5t58vFbOBKRKHz8zoOJGSYB29BPGO/fKPsuiG0nLAIptBZGx84NCPE+N+Fx/JAc7ernVFwnMEFSuCMDXAqUXoEn2enGR34IzExfEgNnahtXq9e3cf1aH+/iAF5XNaXqbNC8nIp0BuHYT7TjSllK/CKzmTiCNLNv3Qij56z7Bpc7QTqa1FWCxYfWh0ol8NERiiy0T1d6EOYAlfziE1vfw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GbMYeAo1/R+rqEvx/QWVhubdE0Qp5Z30vspGWRI9FQQ=;
- b=Aywsc5gnTfZZoCRlXoOsElTOaDgaUxUA7TPNHL1TsbG1ktqMEf8Sus+wvRvTyWU6XJ1AY8fmPiJQu6hCz3y5zynYIeBtrBXn7XR06yKER6LK8gFPJrZ6bPNjcNTHuoCN/mf7qN2PELTAdVs5n20fN/Y43g+kJNa9h0zYoMzb3nw=
-Received: from CY5PR18CA0037.namprd18.prod.outlook.com (2603:10b6:930:13::20)
- by LV8PR12MB9406.namprd12.prod.outlook.com (2603:10b6:408:20b::20) with
+ bh=lMzruAiRrDPpybeoTmb9CKTfXeMZ5d5ZGX9yrstYDVM=;
+ b=TWpWCpKsyTiUCs6+o3k3G10WubeC9mXoniKmuaCLxptQ09JiqbYDIR7i2FxZP4b7URpBsFjiL0vda/mcuWg49ioSLT5AHMEt1weszFQLKbaqPq2aurERXVUvIoXiPiggNH4L+h2KO1bFkAva/hlZqB0GtK4fJZpjgwHScmzeC1o=
+Received: from CY5PR18CA0045.namprd18.prod.outlook.com (2603:10b6:930:13::26)
+ by CH2PR12MB5002.namprd12.prod.outlook.com (2603:10b6:610:6d::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23; Fri, 1 Dec
- 2023 00:05:41 +0000
+ 2023 00:05:42 +0000
 Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
- (2603:10b6:930:13:cafe::7f) by CY5PR18CA0037.outlook.office365.com
- (2603:10b6:930:13::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24 via Frontend
+ (2603:10b6:930:13:cafe::b7) by CY5PR18CA0045.outlook.office365.com
+ (2603:10b6:930:13::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.23 via Frontend
  Transport; Fri, 1 Dec 2023 00:05:41 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
@@ -56,15 +56,15 @@ Received: from SATLEXMB04.amd.com (165.204.84.17) by
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Thu, 30 Nov
- 2023 18:05:39 -0600
+ 2023 18:05:40 -0600
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net 2/7] ionic: Use cached VF attributes
-Date: Thu, 30 Nov 2023 16:05:14 -0800
-Message-ID: <20231201000519.13363-3-shannon.nelson@amd.com>
+Subject: [PATCH net 3/7] ionic: set ionic ptr before setting up ethtool ops
+Date: Thu, 30 Nov 2023 16:05:15 -0800
+Message-ID: <20231201000519.13363-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20231201000519.13363-1-shannon.nelson@amd.com>
 References: <20231201000519.13363-1-shannon.nelson@amd.com>
@@ -79,275 +79,58 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|LV8PR12MB9406:EE_
-X-MS-Office365-Filtering-Correlation-Id: d75636a1-e4e6-44e0-ec16-08dbf201419a
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|CH2PR12MB5002:EE_
+X-MS-Office365-Filtering-Correlation-Id: e54e7671-b12a-4560-d3a0-08dbf2014203
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	IUe2xUBzi4w6m3CPk/yVGDe5IDMx4Zw/p+/V5Rwpp6wXfTxoXfitHRBRdWKpmPtFcfGNsk+PsyJ3/NhoY3cOjnAY+J6YOiKHfxFuKzQEovIxnIoKeHFQGVQfuuQp29z3r4+nLNAf3PxjYWJ7/X+qngAceRV/ELZBMnNBmwTRlZlgy3L1QbZNhEhvUkAIccem+WeQBoXgDAkJbGl21dTjVnNtNt0g+w5Ll/k8M9PEzA6sL46gBEo0Wt7bLYJBXeBMrCbqiux8kR5GIF+o5c2kiMcA8EcLBtyfcagsSYMX/ktf/Rl9ejIrzqm75q4QP5dlznXOfmHo/VgDmOC1ISqnELjgR+6l57Sz8cbm/tggc8uZhwuh+EUdBoWn3NkvtWx7vEilq1mijz//EsvzVlRyi4vqzSttNtJCQX3USchTAf5NLND/8AMKNv4tFdhsczAvgO2MqDkNEkSXhWIT2MAL9emzCW9gleao1FmtCbehODhvOxg5SCHGjJPpsjuXjYYsLSTmBsKai8ZnVhEQLAWZT/5UQllshsbvKyN+LKTl5mwwv9zai2tAp1+wRdboQge5seh1hBICw22NzMpxGPBjIqihYL2rC/c4QgruqiTeFzXKnsdD1arjgiI4J0kn7ufj4+aJ6RDbe98QFBhfF8Q/8dxi7MB2W0v14smDjCyy7nZTTaesLOGooKfnctH8Prwtji4xlzHpeYuwrg537BwJntM4JXfZZju0A1NcypIosngbea+YeG0oOL3PfBnQIk0J5ZlAC7F/EpN+13a/EDU0Mg==
+	Z6230Hy7jgxNlq7Wo52h27BXGdxoqBP2QVYST/WcCnoN+zlSf7jJBlcA0IRDJR20CBrxt5UM/dYCJVI7wtDWfGu6peGFEHeuz5fxCSRzuRku0+4p92nogRCmA7/axayXArhwZvto6uI1nnYmIcwCUGfpV4MxE/hhQ+aNXLjEYf9ngKvJ5n4VdL0RKiY2DyCpTKo/r6c9a4dcJH67VLpmD7KXM1vEmCd1Kc/90H6NkkmYHf0x0zHtStN4FmkKM6nsuUZloELXyOO7mcKSGTYnZHI1zrg4kHohQpnETckiKEge4sVHrvWz6x0R7W5ktDxJZdwARX72Tj6jnxPf/P4M7u6Gu/W5y/H4EtwHEeTWKDKfw3OjaBnFAOL+UyQdI1NOogx6y10DH1PvrjG7B8q/28+qGv1iui+KcpvWI+IWJyT3T1GyuGOlXl1eEMzI9LLJfShZDn8ZJ1nCI7PFQ1roWOVVqkamicVApF+PPQCSlS2/NoIswQzm5tBjaQyWzg7ohA4CKrqR3ZxX/58TXj7q93MLtOilakub4TMmf7T2MhDgWhbci6MEX4Qz0G4vRT4uX4VxeHnQsMYrBCOTXhFH4laJ/UL4IDR+YEWGi9H2AhwBf4wRVqLoATGKQgOADwwt4hm+ys+iOrKAibvBoAI3ksvDqoAomFNAn/8I36GsyBRPHBaNqJhiaiAD6vqO1k4Zy8xM7Toig3xccUF1tKdh3sEsnZsNMkAy1WealEe7xGPC0Z5AEzUeppbpxAOuEloGG30DHOliDLz/tletGECChQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(136003)(346002)(396003)(230922051799003)(451199024)(1800799012)(186009)(82310400011)(64100799003)(36840700001)(40470700004)(46966006)(5660300002)(40460700003)(478600001)(26005)(36756003)(1076003)(426003)(16526019)(36860700001)(81166007)(41300700001)(356005)(336012)(2616005)(83380400001)(86362001)(47076005)(82740400003)(2906002)(6666004)(40480700001)(44832011)(110136005)(70586007)(70206006)(316002)(54906003)(4326008)(8936002)(8676002)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(376002)(396003)(346002)(230922051799003)(186009)(64100799003)(451199024)(82310400011)(1800799012)(46966006)(36840700001)(40470700004)(86362001)(316002)(26005)(16526019)(54906003)(1076003)(110136005)(70206006)(2616005)(70586007)(40460700003)(426003)(336012)(2906002)(83380400001)(44832011)(40480700001)(36860700001)(6666004)(8936002)(41300700001)(82740400003)(8676002)(47076005)(356005)(478600001)(36756003)(4326008)(5660300002)(81166007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 00:05:41.1680
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 00:05:41.8399
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d75636a1-e4e6-44e0-ec16-08dbf201419a
+X-MS-Exchange-CrossTenant-Network-Message-Id: e54e7671-b12a-4560-d3a0-08dbf2014203
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CY4PEPF0000EE34.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9406
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5002
 
-From: Brett Creeley <brett.creeley@amd.com>
+To be sure there are no race conditions in startup, make sure
+that the lif->ionic value used in some ethtool callbacks is
+defined before setting ethtool ops.
 
-Each time a VF attribute is set via iproute a call to get the VF
-configuration is also made. This is currently problematic because for
-each VF configuration call there are multiple commands sent to the
-device. Unfortunately, this doesn't scale well. Fix this by reporting
-the cached VF attributes.
-
-The original change to query the device for getting the VF attributes
-was made to remain consistent with device set VF attributes. However,
-after further investigation there is no need to query the device.
-
-Fixes: f16f5be31009 ("ionic: Query FW when getting VF info via ndo_get_vf_config")
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Fixes: 1a58e196467f ("ionic: Add basic lif support")
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic.h   |  2 -
- .../net/ethernet/pensando/ionic/ionic_dev.c   | 40 --------
- .../net/ethernet/pensando/ionic/ionic_dev.h   |  3 +-
- .../net/ethernet/pensando/ionic/ionic_lif.c   | 93 ++-----------------
- .../net/ethernet/pensando/ionic/ionic_main.c  | 22 -----
- 5 files changed, 11 insertions(+), 149 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic.h b/drivers/net/ethernet/pensando/ionic/ionic.h
-index 2453a40f6ee8..9ffef2e06885 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic.h
-@@ -91,6 +91,4 @@ int ionic_port_identify(struct ionic *ionic);
- int ionic_port_init(struct ionic *ionic);
- int ionic_port_reset(struct ionic *ionic);
- 
--const char *ionic_vf_attr_to_str(enum ionic_vf_attr attr);
--
- #endif /* _IONIC_H_ */
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-index c06576f43916..bb9245d933e4 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-@@ -469,46 +469,6 @@ int ionic_set_vf_config(struct ionic *ionic, int vf,
- 	return err;
- }
- 
--int ionic_dev_cmd_vf_getattr(struct ionic *ionic, int vf, u8 attr,
--			     struct ionic_vf_getattr_comp *comp)
--{
--	union ionic_dev_cmd cmd = {
--		.vf_getattr.opcode = IONIC_CMD_VF_GETATTR,
--		.vf_getattr.attr = attr,
--		.vf_getattr.vf_index = cpu_to_le16(vf),
--	};
--	int err;
--
--	if (vf >= ionic->num_vfs)
--		return -EINVAL;
--
--	switch (attr) {
--	case IONIC_VF_ATTR_SPOOFCHK:
--	case IONIC_VF_ATTR_TRUST:
--	case IONIC_VF_ATTR_LINKSTATE:
--	case IONIC_VF_ATTR_MAC:
--	case IONIC_VF_ATTR_VLAN:
--	case IONIC_VF_ATTR_RATE:
--		break;
--	case IONIC_VF_ATTR_STATSADDR:
--	default:
--		return -EINVAL;
--	}
--
--	mutex_lock(&ionic->dev_cmd_lock);
--	ionic_dev_cmd_go(&ionic->idev, &cmd);
--	err = ionic_dev_cmd_wait_nomsg(ionic, DEVCMD_TIMEOUT);
--	memcpy_fromio(comp, &ionic->idev.dev_cmd_regs->comp.vf_getattr,
--		      sizeof(*comp));
--	mutex_unlock(&ionic->dev_cmd_lock);
--
--	if (err && comp->status != IONIC_RC_ENOSUPP)
--		ionic_dev_cmd_dev_err_print(ionic, cmd.vf_getattr.opcode,
--					    comp->status, err);
--
--	return err;
--}
--
- void ionic_vf_start(struct ionic *ionic)
- {
- 	union ionic_dev_cmd cmd = {
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 9b5463040075..745a3292be92 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -341,8 +341,7 @@ void ionic_dev_cmd_port_pause(struct ionic_dev *idev, u8 pause_type);
- 
- int ionic_set_vf_config(struct ionic *ionic, int vf,
- 			struct ionic_vf_setattr_cmd *vfc);
--int ionic_dev_cmd_vf_getattr(struct ionic *ionic, int vf, u8 attr,
--			     struct ionic_vf_getattr_comp *comp);
-+
- void ionic_dev_cmd_queue_identify(struct ionic_dev *idev,
- 				  u16 lif_type, u8 qtype, u8 qver);
- void ionic_vf_start(struct ionic *ionic);
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index edc14730ce88..afb77e2d04c5 100644
+index afb77e2d04c5..a5e6b1e2f5ee 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -2332,82 +2332,11 @@ static int ionic_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd
- 	}
- }
+@@ -3054,6 +3054,7 @@ int ionic_lif_alloc(struct ionic *ionic)
+ 	lif = netdev_priv(netdev);
+ 	lif->netdev = netdev;
+ 	ionic->lif = lif;
++	lif->ionic = ionic;
+ 	netdev->netdev_ops = &ionic_netdev_ops;
+ 	ionic_ethtool_set_ops(netdev);
  
--static int ionic_get_fw_vf_config(struct ionic *ionic, int vf, struct ionic_vf *vfdata)
--{
--	struct ionic_vf_getattr_comp comp = { 0 };
--	int err;
--	u8 attr;
--
--	attr = IONIC_VF_ATTR_VLAN;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err)
--		vfdata->vlanid = comp.vlanid;
--
--	attr = IONIC_VF_ATTR_SPOOFCHK;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err)
--		vfdata->spoofchk = comp.spoofchk;
--
--	attr = IONIC_VF_ATTR_LINKSTATE;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err) {
--		switch (comp.linkstate) {
--		case IONIC_VF_LINK_STATUS_UP:
--			vfdata->linkstate = IFLA_VF_LINK_STATE_ENABLE;
--			break;
--		case IONIC_VF_LINK_STATUS_DOWN:
--			vfdata->linkstate = IFLA_VF_LINK_STATE_DISABLE;
--			break;
--		case IONIC_VF_LINK_STATUS_AUTO:
--			vfdata->linkstate = IFLA_VF_LINK_STATE_AUTO;
--			break;
--		default:
--			dev_warn(ionic->dev, "Unexpected link state %u\n", comp.linkstate);
--			break;
--		}
--	}
--
--	attr = IONIC_VF_ATTR_RATE;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err)
--		vfdata->maxrate = comp.maxrate;
--
--	attr = IONIC_VF_ATTR_TRUST;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err)
--		vfdata->trusted = comp.trust;
--
--	attr = IONIC_VF_ATTR_MAC;
--	err = ionic_dev_cmd_vf_getattr(ionic, vf, attr, &comp);
--	if (err && comp.status != IONIC_RC_ENOSUPP)
--		goto err_out;
--	if (!err)
--		ether_addr_copy(vfdata->macaddr, comp.macaddr);
--
--err_out:
--	if (err)
--		dev_err(ionic->dev, "Failed to get %s for VF %d\n",
--			ionic_vf_attr_to_str(attr), vf);
--
--	return err;
--}
--
- static int ionic_get_vf_config(struct net_device *netdev,
- 			       int vf, struct ifla_vf_info *ivf)
- {
- 	struct ionic_lif *lif = netdev_priv(netdev);
- 	struct ionic *ionic = lif->ionic;
--	struct ionic_vf vfdata = { 0 };
- 	int ret = 0;
+@@ -3076,7 +3077,6 @@ int ionic_lif_alloc(struct ionic *ionic)
+ 	lif->neqs = ionic->neqs_per_lif;
+ 	lif->nxqs = ionic->ntxqs_per_lif;
  
- 	if (!netif_device_present(netdev))
-@@ -2418,18 +2347,16 @@ static int ionic_get_vf_config(struct net_device *netdev,
- 	if (vf >= pci_num_vf(ionic->pdev) || !ionic->vfs) {
- 		ret = -EINVAL;
- 	} else {
--		ivf->vf = vf;
--		ivf->qos = 0;
--
--		ret = ionic_get_fw_vf_config(ionic, vf, &vfdata);
--		if (!ret) {
--			ivf->vlan         = le16_to_cpu(vfdata.vlanid);
--			ivf->spoofchk     = vfdata.spoofchk;
--			ivf->linkstate    = vfdata.linkstate;
--			ivf->max_tx_rate  = le32_to_cpu(vfdata.maxrate);
--			ivf->trusted      = vfdata.trusted;
--			ether_addr_copy(ivf->mac, vfdata.macaddr);
--		}
-+		struct ionic_vf *vfdata = &ionic->vfs[vf];
-+
-+		ivf->vf		  = vf;
-+		ivf->qos	  = 0;
-+		ivf->vlan         = le16_to_cpu(vfdata->vlanid);
-+		ivf->spoofchk     = vfdata->spoofchk;
-+		ivf->linkstate    = vfdata->linkstate;
-+		ivf->max_tx_rate  = le32_to_cpu(vfdata->maxrate);
-+		ivf->trusted      = vfdata->trusted;
-+		ether_addr_copy(ivf->mac, vfdata->macaddr);
- 	}
+-	lif->ionic = ionic;
+ 	lif->index = 0;
  
- 	up_read(&ionic->vf_op_lock);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-index 835577392178..8d15f9203bd5 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-@@ -188,28 +188,6 @@ static const char *ionic_opcode_to_str(enum ionic_cmd_opcode opcode)
- 	}
- }
- 
--const char *ionic_vf_attr_to_str(enum ionic_vf_attr attr)
--{
--	switch (attr) {
--	case IONIC_VF_ATTR_SPOOFCHK:
--		return "IONIC_VF_ATTR_SPOOFCHK";
--	case IONIC_VF_ATTR_TRUST:
--		return "IONIC_VF_ATTR_TRUST";
--	case IONIC_VF_ATTR_LINKSTATE:
--		return "IONIC_VF_ATTR_LINKSTATE";
--	case IONIC_VF_ATTR_MAC:
--		return "IONIC_VF_ATTR_MAC";
--	case IONIC_VF_ATTR_VLAN:
--		return "IONIC_VF_ATTR_VLAN";
--	case IONIC_VF_ATTR_RATE:
--		return "IONIC_VF_ATTR_RATE";
--	case IONIC_VF_ATTR_STATSADDR:
--		return "IONIC_VF_ATTR_STATSADDR";
--	default:
--		return "IONIC_VF_ATTR_UNKNOWN";
--	}
--}
--
- static void ionic_adminq_flush(struct ionic_lif *lif)
- {
- 	struct ionic_desc_info *desc_info;
+ 	if (is_kdump_kernel()) {
 -- 
 2.17.1
 
