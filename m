@@ -1,231 +1,191 @@
-Return-Path: <netdev+bounces-52884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE808008AE
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:44:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 397C78008BF
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A38281574
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:43:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 666BF1C209E6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD7D20B31;
-	Fri,  1 Dec 2023 10:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4EA1CAB9;
+	Fri,  1 Dec 2023 10:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ohTJK1dp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WRo3SQWP"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EDB4D40;
-	Fri,  1 Dec 2023 02:43:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=nLp68dePSfpizVBKx02HJlI+GJJe6c/8548Gc3WLetc=;
-	t=1701427419; x=1702637019; b=ohTJK1dpBauqNZg9cqfX2JmHRIuDzwzTLU8xZhcyBnbrbS2
-	rbfFDxAFRPv5/i6gFqMirTfnxxEe1exQ1ND0SROLSLbQviSx74tXaANhbu7R6Ljh9WjZTITwNwp37
-	XIC8YO7HIJkTxXUAUGQN7EGudz/evPh8Y7+M0HJCNuvu5BvmLtHQynNRJIMNv13phyKkBg6tDHygE
-	BRfnjJi0y/kuVc1o8XskU3Oetyn5zFHFP6bN7MBGVX6aDbr4l2k9GXONwoABeYNUZshuPRRgn96Q3
-	MuEETOqeKiMtsOmvBLnlDVcMGw/XTvmmgM0OK5bCBNoYDh6+LM85h1YdjIKpbAFA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r90zh-0000000BBV7-0Oz0;
-	Fri, 01 Dec 2023 11:43:37 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH wireless-next 3/3] wifi: nl80211: report carrier up count to userspace
-Date: Fri,  1 Dec 2023 11:41:17 +0100
-Message-ID: <20231201114329.c43ed5db7146.Idd29862133993877b9fdff962dca3649e842249a@changeid>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231201104329.25898-5-johannes@sipsolutions.net>
-References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
- <20231201104329.25898-5-johannes@sipsolutions.net>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDC510FD;
+	Fri,  1 Dec 2023 02:44:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701427496; x=1732963496;
+  h=message-id:date:subject:to:references:from:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=Eoq0sCYkxxqFk7nbAkJWqFfGfsyAXmAvR4aHIdZ3nuI=;
+  b=WRo3SQWPO6+Tn8UuXEEgjGUpqJViGDYBzn46R8crPWSzSgtoIN7gdWm9
+   9CDiAhKtv1VFp0yMwJq+6M/yp7M/ULOmsiJFD2LdsgXCz4DMUz4PMe9nM
+   HEUeRBxAsaPeNOAEikE1vtaJe2LVDZeAqmN14NJetR0lwsMfRAozO7zgI
+   r7v/ufgwHSIA0d1nPCjbQjVRKjPQNXuZDYZ8Lf6edQLrg4PJjXJqggky+
+   3xN8Dt7BupnLWsZSsc8RxnnCu+d2BoWvTmhpTpXhwgWpQqOgnvve5evwg
+   IHRhqFg0Q7pYTtlA1jQq8g87/XypxrwZfd909RT3ji2NdmeodupWgBC4v
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="15023264"
+X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
+   d="scan'208";a="15023264"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 02:44:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="913542357"
+X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
+   d="scan'208";a="913542357"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Dec 2023 02:44:55 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 1 Dec 2023 02:44:55 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 1 Dec 2023 02:44:55 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 1 Dec 2023 02:44:55 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GdcMHvnz1obSAccrb8sP3mLvX/2neFJi5CDouxpu1eum/N4/5OQtEBRrl9HhXC7Nlgs6T9/ukUM3W8K2I/6MRCGC+sJH3mGx3DLQT3zjasp0Yam52HLKXhNM2wJExANV3JJoLscnM4Fgd7/8oo/qdMioZ7YR5yHMifleg/y+YlBkDFZbE/2P6rIyIvpwVZCGfPHoX5WuZAlVpQBEtVDORh6itFmrCbpQ/QBlT+2FvuZS3uLdR4Qteg+uKUUd0rHnXHXXijNebpGgxwe5ZV9JaS0dL/XON/ZAla+5YNyZ4rbOtdY1eyI0X0K1KyBzupsjafD2CIccIJ70AFQXokXVwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1vFfI2yaGAXaH9cvgZo1sR6vcezYaMaZQ3Dvsf2cRVo=;
+ b=joNnN0xSe+GpKe4sA1KuybFHWlTL4FoK/Oru3u9mcHgix5ZrtdcvZB2YiPrHFMPNQSWaT2V+u/iZPptDrJLqB92jO0eY8+81d4+un+ycjuFiAEz1jWt8nhepK/7jjyTIwD7DQLWxsGGcFNYY6xtX+57PUfK229dQNzyyAxwxKCUlZVnrK5TEmHVF/tuMHXtrClG2qHWMRpo9IpSz7a8DOas1TJVyqD7yzgB4MBQ0ci4uz4G++yyGOIZbnJZJgYAa8KeIQH0Y63EFUyWEigjFfMq5UmPZZPem4ApaMTwCwNs0mdsfrSFG8x2PwDsHxKyCEp6wHqfByk4vW33kuSLM3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DS0PR11MB8739.namprd11.prod.outlook.com (2603:10b6:8:1bb::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Fri, 1 Dec
+ 2023 10:44:52 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.7046.027; Fri, 1 Dec 2023
+ 10:44:52 +0000
+Message-ID: <bb7d635a-8cea-4fcd-9d27-fb9e3d82cab9@intel.com>
+Date: Fri, 1 Dec 2023 11:44:45 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH v3] octeontx2-pf: consider both Rx and Tx packet stats
+ for adaptive interrupt coalescing
+Content-Language: en-US
+To: Suman Ghosh <sumang@marvell.com>, <sgoutham@marvell.com>,
+	<gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+	<lcherian@marvell.com>, <jerinj@marvell.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <horms@kernel.org>,
+	<naveenm@marvell.com>
+References: <20231201053330.3903694-1-sumang@marvell.com>
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20231201053330.3903694-1-sumang@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0160.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a2::15) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DS0PR11MB8739:EE_
+X-MS-Office365-Filtering-Correlation-Id: 420cbb20-e3ce-4f5c-0c82-08dbf25a8cb8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9YHxf2qNBQAug3szDu49UGNuFER+rT0924GPE26OeFQT0Ts8cWF75h1fXvUSwTeL3jylXbobiP42TizFgpS2+JkagdTXfZ9ltlXTUGJO1xjbyb5+XxPDVR5bWe2JEQsbnF55qfA2xt1vTAX3+JKWAURofS0ejXJrJghxipd5AIDAJQBZuPcoDiCqlplGxo4nVf+tliooTZnOPhDCwHyT0R5AuOKmrfDEn+HqrZ7amGAy8jlvlWCjluHHARS8hImJn6njkRHOC99nN4aupZwseMjmajerK04CvJk3eqhaYdwShdl/nRpQzx+B8/uXkKQKhd/iMXepdwBnI8jQ8tUNrl515QWqbLwzwkeSZZFFvJ7QrydvXNY0onI2/AH2J22sGkyaH/Hvkmp8f3N2JDJ6f/+RoMOYS97sXNB6qt2dqryOws7M2+mSY8zZ6FkazL0362FFixHLLOggV8eoGhHQ4SSOVbZ338Ifk7wkoJFL5FjsxAumlcxwcv8L/ceSy85W1es+JRAQtjiwtTz+jdSIwvmdI1Y9Vih+cv/k2z6+FJwRejQ/W1JDz7Zn/w6EiNMD6b9wYwjh6XK0dj9WBHRIjG6XbbqGaot6sB9qgYx/JDVfWt8iyMkXiRih4mLi7bpY6ZXENgIiGuXEc2bhrLGQaU1d40oS7V8hRMdD5q97IqY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39860400002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(31686004)(921008)(86362001)(66476007)(66946007)(82960400001)(38100700002)(36756003)(31696002)(83380400001)(26005)(6506007)(2616005)(6512007)(6666004)(53546011)(2906002)(316002)(66556008)(8676002)(5660300002)(8936002)(7416002)(478600001)(44832011)(6486002)(41300700001)(4744005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b1kzYmFVbENvUHh6UE55UzR5SThPeHZ3OFowamF5QTZBMitMRUdMaCthZmFB?=
+ =?utf-8?B?MzNrUHMvNEVBbE5HWkg4d3dybnpvZ2dlc0R1TTBJV2V4bFVQV09Oc2JPTUZQ?=
+ =?utf-8?B?N1VGeHk4MEZ5SThCbkErS2VpKzYrV0V4akREamMxQ3NucFBHR0VRbnpkNVJo?=
+ =?utf-8?B?bWx0NFRFa1NRMHhyVE5sVHB3QTFTTWdGTmM0eFF6VDZHOVhhMUg1M0Z1SDhM?=
+ =?utf-8?B?akU5N1RyaklSdnI3dnJlMzN0VVpRZjRKTjRqdjd4WGNaL05yUE1Ed3Nkb3Ba?=
+ =?utf-8?B?ZnpwenRUaFFET3VPcklnM3VwMHo0cWJlNUlzWmdTYmpkVVBhOStWTE14NVAx?=
+ =?utf-8?B?VExxNHQ3NCtidGt4TlduVFBqek1PZUJteHpiNGtmdzZ6THlFV3ZXUW5GZ2Fo?=
+ =?utf-8?B?Y2FHNnZHcGN0dGNlL3V4S3hxMlJjdVQ3MXJhQnJ5QnU1OENYdnJmZndVS2Rz?=
+ =?utf-8?B?cm14ckd4cmNzd0RVOWJaUFM2ZVBXS24zVXptYlU4OFZ3UlZUd3VZUEpWTnhv?=
+ =?utf-8?B?MW5NWDV5K1RBNFBERWxSdEh6MUx3NnhVeUViUFBXaTdnT1IzM3p5cmZhc0Q2?=
+ =?utf-8?B?b1ZVZVpsOUxmODFqK1Y4dEpEbHhZNENQSnVnWmxrMzRRWFp6ejl2WWUxV21o?=
+ =?utf-8?B?S0RNWERGS0JjcEhzdEEybHFNbW03TXI2a2dkWDJLbEdoZ25Ja2t0a2JScGoz?=
+ =?utf-8?B?Vncwa3JwZHdkVFVLci8vNXJoSFBERVBiZERUb0xkNGpXcDEvVm9tbVA3ZHpa?=
+ =?utf-8?B?aVdBR0dnc2cxcnQ1YUNJUXBVckN6UFV5VTRzV3RjTXpTcXhQMS84bEVKbWdN?=
+ =?utf-8?B?Y2lsZ0dlUzd0MzFTdUhjd3RjNGVkTzRmanBFUVFZU080TkhaWXJTYnlCeVRp?=
+ =?utf-8?B?YzZPazBtc1BHT1RuL09mbmZEeW1FbWxpcUdNUEtxNlZaODFIQ0RPamUxdEdV?=
+ =?utf-8?B?TDVZeVZiMWt4WExaNnR2MlhZY2NncVNIZ0JkUDlKNnJKMFZHV2pWbFBjRVBh?=
+ =?utf-8?B?cjlqRUdTL0RXS0JqUVhyeTkvVTdkUWFYUnVGdnI3MFZmcEpLZnpndXMxVEdk?=
+ =?utf-8?B?clU4ckRCU3dwa1QwTW15TG5YbjgrVXJiZ3ZEQ3V0THMzWmtiSVRiSzdLNkNG?=
+ =?utf-8?B?SC9YQ2twcG1PclZYb2UvZVpGRUJaN0Yra3I4a3FsOUgzQ2tVcUNwTTJJaXJk?=
+ =?utf-8?B?YkFhR0ZRMmlqYzd2ZFphbm9oQ3huTkhjQ1Y2anFZMUM1cC92UEdWdDVmbzd3?=
+ =?utf-8?B?dmxLVDdDNUZsU2VnN0kvek9vdmcxZXRrdEZqaVpENE5UN2UvY0xmL0haNzhB?=
+ =?utf-8?B?TDJFWlEvZDlXOFhrcEduaEdCZmNlVVd2SjlMNXlDakszMzVBbnRqZk1hNFhi?=
+ =?utf-8?B?RytZWGF5dkRPVjNKaHA3Y0piMUNPMkhZVUhUdXpMc3hmSU5BMVpUai9NRzBk?=
+ =?utf-8?B?QjczaXFod1lYMmtuZzk5R29UZXN2WVZkSWpOcU5pTWVsbTJGSHRYZ1FBdmwx?=
+ =?utf-8?B?Rk9qeUlsVVFUVHdEY3AwN0t2RWNvV1BlQ2toR1RCOWwvaFBXb0lqMVhIc0Va?=
+ =?utf-8?B?dDJLZCtmbmdOcXFHUEs3MTlFdTdscEN4U1Qzd29Kb0t3RGhtNHBUWTFOSjE4?=
+ =?utf-8?B?MXhpV1U3Q3pZS0Y2TmhrWnB4RDJXNGRZT0w2UDBlN0twako3dVVmV3k2UE0z?=
+ =?utf-8?B?Wk5lZjkzeXFXd2t4V2w0SGEwcVBqZmVBQmFoZk5IcmwxT0tHdC9BY3EzTDRS?=
+ =?utf-8?B?Wkt4Sk91K1Y3UUNaajhNUDg3SU1seXYzWW9RQWtrZms2dVNVSnJRSEZxZU1U?=
+ =?utf-8?B?K1RSUkd3WlZ4dkhxWThJamhrU3p1aEwvNXdON3hsTzJQOGd0VUJ4dmkwa3FY?=
+ =?utf-8?B?ZlZyenpBb2F2QklBbzdHanZOU0JibVNJOWtKN0Z0TitTVjMvUWlUdlVqZmNZ?=
+ =?utf-8?B?ZlkvL1BLSlpBVGFMdzVGYVJPb1d4eUFNMXNnRU5HYmZUeVZpVnFPWDFsb0Iy?=
+ =?utf-8?B?N0NFVGZmTnlFdmhRMERseUJEYmlMM2NxeGRIcTV3NnJXakRZOWUyQmlYT1NM?=
+ =?utf-8?B?NU5od0s5REJRYVlBcHZPRC9xVi9jTFliUENpWDV4TTRqc240NVFxVUhPNktq?=
+ =?utf-8?B?QzlMMWt4bmh6cWFqOTBicTVjQllyamJLUmYwck92ZGpIQXJweUF0NFNTRE5R?=
+ =?utf-8?B?UFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 420cbb20-e3ce-4f5c-0c82-08dbf25a8cb8
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 10:44:52.7214
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MYSc/oQfEeyuGdLKOUc4FvLA/Y1p5AGWxk6CDwkX7wOJIhz431HA4ueMDFjznmircHXjON0i8W89ockECVnHWYyT+oRGctQ0eEUylY6ieVM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8739
+X-OriginatorOrg: intel.com
 
-From: Johannes Berg <johannes.berg@intel.com>
 
-There's a race in the carrier change that happens if userspace
-sees the RX association event via nl80211, but the driver (or
-mac80211) just prior to that set the carrier on. The carrier
-on event is actually only processed by the link watch work, so
-userspace can (and we've seen this at least in simulation with
-ARCH=um and time-travel) attempt to send a frame before that
-has run, if it was just waiting for the association to finish
-(only on open connections, of course, for encryption it has to
-go through the 4-way-handshake first before sending data frames.)
 
-There's really no completely good way to address this, I've
-previously analyzed this here:
-https://lore.kernel.org/netdev/346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net/
+On 01.12.2023 06:33, Suman Ghosh wrote:
+> From: Naveen Mamindlapalli <naveenm@marvell.com>
+> 
+> The current adaptive interrupt coalescing code updates only rx
+> packet stats for dim algorithm. This patch also updates tx packet
+> stats which will be useful when there is only tx traffic.
+> Also moved configuring hardware adaptive interrupt setting to
+> driver dim callback.
+> 
+> Fixes: 6e144b47f560 ("octeontx2-pf: Add support for adaptive interrupt coalescing")
+> Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> ---
 
-This new solution requires both kernel and userspace work, it
-basically builds on #3 outlined in the email linked above, but
-with the addition of letting userspace _know_ that it may need
-to wait for the rtnetlink event.
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-So to solve it, with this change userspace can see the value of
-the carrier_up_count at the association event, and if it hasn't
-yet seen the same value via an rtnetlink event (it is imperative
-that it doesn't query, it must wait for events) then it can wait
-for that event before trying to send data frames.
-
-For now, implement this for association and IBSS joined events.
-
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- include/uapi/linux/nl80211.h | 16 ++++++++++++
- net/wireless/nl80211.c       | 47 ++++++++++++++++--------------------
- 2 files changed, 37 insertions(+), 26 deletions(-)
-
-diff --git a/include/uapi/linux/nl80211.h b/include/uapi/linux/nl80211.h
-index 0cd1da2c2902..120936f81a28 100644
---- a/include/uapi/linux/nl80211.h
-+++ b/include/uapi/linux/nl80211.h
-@@ -2830,6 +2830,20 @@ enum nl80211_commands {
-  * @NL80211_ATTR_MLO_LINK_DISABLED: Flag attribute indicating that the link is
-  *	disabled.
-  *
-+ * @NL80211_ATTR_CARRIER_UP_COUNT: This u32 attribute is included in some
-+ *	events that indicate a successful connection (notably association),
-+ *	indicating the value of the netdev's carrier_up_count at the time
-+ *	of sending this event. Userspace can use this to fix a race: when
-+ *	the carrier is turned on, the actual handling thereof is done in
-+ *	an asynchronous manner in the kernel. Thus, if userspace attempts
-+ *	to send a frame immediately after receiving the event indicating
-+ *	successful connection over nl80211, that may not go through if the
-+ *	asynchronous processing in the kernel hasn't yet happened. To fix
-+ *	it then userspace should be listening to rtnetlink events, and if
-+ *	it didn't see the value of the carrier_up_count yet, it can wait
-+ *	for a further rtnetlink event with a value equal to or bigger than
-+ *	the value reported here, and only then transmit data.
-+ *
-  * @NUM_NL80211_ATTR: total number of nl80211_attrs available
-  * @NL80211_ATTR_MAX: highest attribute number currently defined
-  * @__NL80211_ATTR_AFTER_LAST: internal use
-@@ -3368,6 +3382,8 @@ enum nl80211_attrs {
- 
- 	NL80211_ATTR_MLO_LINK_DISABLED,
- 
-+	NL80211_ATTR_CARRIER_UP_COUNT,
-+
- 	/* add attributes here, update the policy in nl80211.c */
- 
- 	__NL80211_ATTR_AFTER_LAST,
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 403a4a38966a..d91a99f90aaa 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -818,6 +818,7 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
- 	[NL80211_ATTR_HW_TIMESTAMP_ENABLED] = { .type = NLA_FLAG },
- 	[NL80211_ATTR_EMA_RNR_ELEMS] = { .type = NLA_NESTED },
- 	[NL80211_ATTR_MLO_LINK_DISABLED] = { .type = NLA_FLAG },
-+	[NL80211_ATTR_CARRIER_UP_COUNT] = { .type = NLA_REJECT },
- };
- 
- /* policy for the key attributes */
-@@ -17738,11 +17739,13 @@ void nl80211_common_reg_change_event(enum nl80211_commands cmd_id,
- 
- struct nl80211_mlme_event {
- 	enum nl80211_commands cmd;
-+	const u8 *mac_addr;
- 	const u8 *buf;
- 	size_t buf_len;
- 	int uapsd_queues;
- 	const u8 *req_ies;
- 	size_t req_ies_len;
-+	u32 carrier_up_count;
- 	bool reconnect;
- };
- 
-@@ -17766,12 +17769,17 @@ static void nl80211_send_mlme_event(struct cfg80211_registered_device *rdev,
- 
- 	if (nla_put_u32(msg, NL80211_ATTR_WIPHY, rdev->wiphy_idx) ||
- 	    nla_put_u32(msg, NL80211_ATTR_IFINDEX, netdev->ifindex) ||
--	    nla_put(msg, NL80211_ATTR_FRAME, event->buf_len, event->buf) ||
-+	    (event->buf &&
-+	     nla_put(msg, NL80211_ATTR_FRAME, event->buf_len, event->buf)) ||
- 	    (event->req_ies &&
- 	     nla_put(msg, NL80211_ATTR_REQ_IE, event->req_ies_len,
- 		     event->req_ies)))
- 		goto nla_put_failure;
- 
-+	if (event->mac_addr &&
-+	    nla_put(msg, NL80211_ATTR_MAC, ETH_ALEN, event->mac_addr))
-+		goto nla_put_failure;
-+
- 	if (event->reconnect &&
- 	    nla_put_flag(msg, NL80211_ATTR_RECONNECT_REQUESTED))
- 		goto nla_put_failure;
-@@ -17789,6 +17797,11 @@ static void nl80211_send_mlme_event(struct cfg80211_registered_device *rdev,
- 		nla_nest_end(msg, nla_wmm);
- 	}
- 
-+	if (event->carrier_up_count &&
-+	    nla_put_u32(msg, NL80211_ATTR_CARRIER_UP_COUNT,
-+			event->carrier_up_count))
-+		goto nla_put_failure;
-+
- 	genlmsg_end(msg, hdr);
- 
- 	genlmsg_multicast_netns(&nl80211_fam, wiphy_net(&rdev->wiphy), msg, 0,
-@@ -17824,6 +17837,7 @@ void nl80211_send_rx_assoc(struct cfg80211_registered_device *rdev,
- 		.uapsd_queues = data->uapsd_queues,
- 		.req_ies = data->req_ies,
- 		.req_ies_len = data->req_ies_len,
-+		.carrier_up_count = atomic_read(&netdev->carrier_up_count),
- 	};
- 
- 	nl80211_send_mlme_event(rdev, netdev, &event, GFP_KERNEL);
-@@ -18307,32 +18321,13 @@ void nl80211_send_ibss_bssid(struct cfg80211_registered_device *rdev,
- 			     struct net_device *netdev, const u8 *bssid,
- 			     gfp_t gfp)
- {
--	struct sk_buff *msg;
--	void *hdr;
-+	struct nl80211_mlme_event event = {
-+		.cmd = NL80211_CMD_JOIN_IBSS,
-+		.mac_addr = bssid,
-+		.carrier_up_count = atomic_read(&netdev->carrier_up_count),
-+	};
- 
--	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, gfp);
--	if (!msg)
--		return;
--
--	hdr = nl80211hdr_put(msg, 0, 0, 0, NL80211_CMD_JOIN_IBSS);
--	if (!hdr) {
--		nlmsg_free(msg);
--		return;
--	}
--
--	if (nla_put_u32(msg, NL80211_ATTR_WIPHY, rdev->wiphy_idx) ||
--	    nla_put_u32(msg, NL80211_ATTR_IFINDEX, netdev->ifindex) ||
--	    nla_put(msg, NL80211_ATTR_MAC, ETH_ALEN, bssid))
--		goto nla_put_failure;
--
--	genlmsg_end(msg, hdr);
--
--	genlmsg_multicast_netns(&nl80211_fam, wiphy_net(&rdev->wiphy), msg, 0,
--				NL80211_MCGRP_MLME, gfp);
--	return;
--
-- nla_put_failure:
--	nlmsg_free(msg);
-+	nl80211_send_mlme_event(rdev, netdev, &event, gfp);
- }
- 
- void cfg80211_notify_new_peer_candidate(struct net_device *dev, const u8 *addr,
--- 
-2.43.0
+> v3 changes:
+> - Updated signed-off-by signature.
+> 
+> v2 changes:
+> - Missed adding the fixes tag in v1. Added the same in v2.
+> 
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  9 +++++++++
+>  .../marvell/octeontx2/nic/otx2_txrx.c         | 20 +++++++++----------
+>  2 files changed, 19 insertions(+), 10 deletions(-)
+> 
 
 
