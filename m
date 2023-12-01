@@ -1,199 +1,292 @@
-Return-Path: <netdev+bounces-53086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4D88013E6
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 21:06:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF68380141D
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 21:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038AC1C20AD4
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:06:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BDDA1F20F02
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757FD56468;
-	Fri,  1 Dec 2023 20:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AD356B74;
+	Fri,  1 Dec 2023 20:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="qGpYgkjN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Z3I5vxLf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hKN/f405"
 X-Original-To: netdev@vger.kernel.org
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F3EB2;
-	Fri,  1 Dec 2023 12:05:54 -0800 (PST)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailnew.nyi.internal (Postfix) with ESMTP id A7F0C580773;
-	Fri,  1 Dec 2023 15:05:51 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Fri, 01 Dec 2023 15:05:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-	1701461151; x=1701468351; bh=/u3yLH29k8T5r7NJxXWGv9BlZGGVl+1F2ls
-	zusvsbJ0=; b=qGpYgkjNlqWggIHiSu4D3RZgSJ3nBcLv5OqMeVZguaCQyi5QNEp
-	9cgeMwa9X8sJ3Ttg4uh0ZXAOpEuILMhkgqCRSofFtZAsT3NguXWGTJJPxiwHmjw4
-	UwnZ24pzEHzKJ24Rz869muRs25eB97k+q9lK8l7LOEHAs1VyQBu920DxKPzLnGiG
-	ofq/PLmKQo4Q58loWslypGUJksj1Vyz3z3/Z4B1FyQgzeTftTkjLasamFTBTGxLP
-	XOt+dMB6O6UEO7QYzAsRYmAepXsFt+GDBbaY+O8HrVB0KH+CFaewQqaJ8HbxJi5L
-	yzjtAWAABEJoqsVOEX7rmVwt0FhFDTFoqsQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1701461151; x=1701468351; bh=/u3yLH29k8T5r7NJxXWGv9BlZGGVl+1F2ls
-	zusvsbJ0=; b=Z3I5vxLf2sF9upN8LhfnCJPBDEtQYg/Tr9l3XRyFdiPuxKxN2Y7
-	ghg4kqphZf5+YkfnbNHwLbsWZL8Iubi4WPmld0ucsGXWWCYpFkt8xgismuAf0RSc
-	tC1WUGs0ffZe73UUQDj2n+keugJizzrBPpA3a21fpnZhpfJ9/+qwJs0UmRGIl9zh
-	KZCvKN3rbIGzjq03qzMvNwiO8IB9huNIlVXD7qawLbEkj4tH+Pd/nC83sAphOwZs
-	z1O6dtu5eG4fPByRtKeBt96owIMuIJnkRltvgjnYopqanbEjbohRcTt5ONjWzoRJ
-	qEEkifcAU4d6brV1I7HkPdMv2Oznd5MWlAg==
-X-ME-Sender: <xms:nzxqZWUjC9lp9p6jh7fwpomS4my8s8UrkjxESTFi5KjtlmOIbhyCYQ>
-    <xme:nzxqZSnsnOqBeegXNad2P5ufA9lN21YsbSAn0yvH7xNWzB0HUvaiFx5_hVy2fZl6h
-    IzloH8fI_EjpF8W7A>
-X-ME-Received: <xmr:nzxqZaa7KRzdSDXvNQjUhOSjmZkjSzAiqm0sxiJ_nWsG3-NAOIKgsr48CtlDTlgwCFHDv1owU6feqTMxwAV_DSMu2aKbjkbOHNTe8ig>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeiledgudeffecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enfghrlhcuvffnffculddvfedmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
-    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
-    eqnecuggftrfgrthhtvghrnhephfduffelfedvfedvveduheefveejgeekffdtteeuteet
-    udeihfekvdfgtdfghfevnecuffhomhgrihhnpehllhhvmhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdig
-    hiii
-X-ME-Proxy: <xmx:nzxqZdV1R7IHQVG1uD13WEcP23w4KVAxdyWo7iH3H_UPuPYB96S_Lw>
-    <xmx:nzxqZQlO6q7EWBmx-R03AXcYRmis09HJ83070hOriaz7Vqznz8TCJg>
-    <xmx:nzxqZSfsETtnVxUqj8VpSjnEOwPoRbchBot0QB__Cux1aSdUq4zOSg>
-    <xmx:nzxqZSXU1j-qVCk7LL3oxDwiL4B6NCT3bAv3EFbLN_MSLITWcuso1g>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 1 Dec 2023 15:05:49 -0500 (EST)
-Date: Fri, 1 Dec 2023 13:05:47 -0700
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, ndesaulniers@google.com, 
-	andrii@kernel.org, nathan@kernel.org, daniel@iogearbox.net, ast@kernel.org, 
-	steffen.klassert@secunet.com, antony.antony@secunet.com, alexei.starovoitov@gmail.com, 
-	yonghong.song@linux.dev, martin.lau@linux.dev, song@kernel.org, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	trix@redhat.com, bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, devel@linux-ipsec.org, netdev@vger.kernel.org
-Subject: Re: [PATCH ipsec-next v2 3/6] libbpf: Add BPF_CORE_WRITE_BITFIELD()
- macro
-Message-ID: <hoqjfeuhcb36whzorttcpepvsnysmkcxmfteqo34tdhz5r5oqx@vcqcoc2iyoub>
-References: <cover.1701193577.git.dxu@dxuuu.xyz>
- <ed7920365daf5eff1c82892b57e918d3db786ac7.1701193577.git.dxu@dxuuu.xyz>
- <20c593b6f31720a3d24d75e5e5cc3245b67249d1.camel@gmail.com>
- <ib27gbqj6c6ilblugm5kalwyfty6h4zujhvykw4a562uorqzjn@6wxeino6q7vk>
- <CAEf4BzbO80kFyFBCUixJ_NGqjJv79i+6oQXz+-jzRE+MaoRYZA@mail.gmail.com>
- <CAEf4BzYGLVXVUptLym8p4dw4X=XxRErPLuPi=msHrwvXgDbCbQ@mail.gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D5B1704
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 12:12:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701461534; x=1732997534;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LNn4yLVDh8MX84UNx7rQKwDx3VyWazyvdfWsg7vBXAk=;
+  b=hKN/f405FImswfTYEf1NAqpCwA657LXqt4viwj+43KURdUGjD9Yemieb
+   5AgLqEluAhgcc0QRT8sY97EpwJmFpOAIMXHQSc1/a82Mj03z8JsEB92z0
+   q6T7db6AVH+Oj/Maogl266QtiXfERoVsL/GXKEKZ3W2uNG0q2MQrvPyvQ
+   s8DH5g+VWQpKfkaSR8BDfrwrfLJ1QqL4/aHFpfgCC1+SeaVjdFh+3apjM
+   /OefJzp+BHPOTWwqT0fmARS8vb1+x6Me6mmhDqD3KbsxLM+V/+4K5Pkbt
+   ghRbmfhwY0nuL0EFGcrPD11nPZ+sleY7bNCbjQEDNBVPxNiwiyvm+xnes
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="557702"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="557702"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 12:12:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="769799379"
+X-IronPort-AV: E=Sophos;i="6.04,242,1695711600"; 
+   d="scan'208";a="769799379"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Dec 2023 12:12:12 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 1 Dec 2023 12:12:12 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 1 Dec 2023 12:12:11 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 1 Dec 2023 12:12:11 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 1 Dec 2023 12:12:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iuV8IKk5+73eQLoGhJzLtbkYNSPEbTm34BmH+HKDAuHDrMgdC5S1W5aDG5XeTkGTUHcpa1tFjcWJaZN54RcIw/NNJegBjceboLJ6bLJ6cOHPirVerOrOP9z5MX0t4isVOUjnxRmNVR3QBwFgSeAPvr07BRJ0LSQWHt1T76IKZ+0juDoTshlQmketxevs3jyzQrQ8tF2PyusNtMg20MAoGQyyptlwKfGmdEzJRsYY4YGWyRo4rWsB3iuC78T0/sCAXXSt69MxxrjyXUg3L2j3E0TjrwcIpofPvaIp7RKCUYFN7CRrmpTWXWbyruD2BFnij+cy4d1BjDzVmBuzARyKeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A8qh0PaKugsRRiqYeESZ/GOComgy5GQfm/sNGbvgxp8=;
+ b=gDyTBJNVuOr/MQwcdh3FSAW/jHbMYdteIFNu2Bmro9020IzjAeoqHr+/xSp+pq7f4ueaeroUNMKovv3bbdFwzc7iZ13BsCME/2fYWlSosUaxM8mPwaJgvDh7RVcGpcoRq6uFTJ8jHQdk/MyK64ftAFFUlm8F/9R4/yyC/phMoFYkvMvi3ZPN0SEZEiEpWUXqzn9FpmDYKDeTYpYXgQpO8WIjwAkfXWKyl6eBZC6jKE6HcSCVmKNJV1cyW2T0tF7QVz26g4q0o26C7iBz4OTbNmnBgKmROXV9ss1ecsVtiNdxhuIXuXCOF+7qD494+VV1RmRNI5dp3JFduvy0YjnB+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by IA1PR11MB7176.namprd11.prod.outlook.com (2603:10b6:208:418::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Fri, 1 Dec
+ 2023 20:12:06 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::7706:285b:27d0:2c5d]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::7706:285b:27d0:2c5d%6]) with mapi id 15.20.7046.028; Fri, 1 Dec 2023
+ 20:12:06 +0000
+Message-ID: <97ed09be-cb2b-48c3-846d-7a0e453ef816@intel.com>
+Date: Fri, 1 Dec 2023 12:12:05 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] idpf: refactor some missing
+ field get/prep conversions
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, Julia Lawall <julia.lawall@inria.fr>
+References: <20231130214511.647586-1-jesse.brandeburg@intel.com>
+ <212e5518-0f72-4bf5-bc5f-49d184be1931@intel.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Autocrypt: addr=jesse.brandeburg@intel.com; keydata=
+ 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
+ /fnLfll98Nhx
+In-Reply-To: <212e5518-0f72-4bf5-bc5f-49d184be1931@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0224.namprd04.prod.outlook.com
+ (2603:10b6:303:87::19) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzYGLVXVUptLym8p4dw4X=XxRErPLuPi=msHrwvXgDbCbQ@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|IA1PR11MB7176:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17aaf117-fac4-4dd0-8a98-08dbf2a9caa5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iCI8Z9JAhQP/o3NGbAN1kqom9iUowG7M841Bif8rM1QeE49dJTljg4H75SPHsHZAO2YALtKR+6yex4bKbx7jmUbrymAFvY9ZG+kDILwQ0l96QRLMymloSyMvF/QVzFnjQIvyE6Q7bzG/XIFvd0d3evMV1hOSv3Zq4PvRc7V7rd20fIpX2DhfegKRPEj7c6kkB4dswZjJNz3XmcuJ/uj4X3V4t5fyMYnh6lx+4kESOka9FiYXr5JBwxXKf7PcVp4JwwA9DnF8YEjs5PvP5d1PAd+meJzXuVw1zrExQ2b8eZrglKme/+RjAAXJYsjDi/pfPVrLCRgYSElbEiJuAfMV26HMR5ghVN02BLx5nhc0jTq1jp4poKB57BmzclX1I+fnBusMCc7yaSJKS9qoxrL7zXMRMzeVnRtAb61YiSOAPU0vcqsk/VWE2YF3J1ot0JWU3HKjdUMZ/no+qckV244QbLP01U9l+XIhkouY3U70LWJVqqIMObMhqnn5z69XQX44QxVo0UgvHBS4ne9NUlY2sFmxNl9kmfzRzcFx3PMSrmQucAzGn28Lo+fq4jg234Rqkx5FkEusgi7DsgjOwyTodJs4nvAaaOJY678XCGE5EE/m9Ns7uF83C1Mo1MJgD1D90icl5kJ0ur7Hj0pgZqYwfA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(376002)(136003)(39860400002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(53546011)(26005)(2616005)(66556008)(6512007)(82960400001)(6862004)(6506007)(4326008)(5660300002)(31696002)(6486002)(8676002)(37006003)(44832011)(6636002)(66476007)(478600001)(316002)(66946007)(38100700002)(83380400001)(31686004)(86362001)(8936002)(36756003)(41300700001)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SjhsaTkvMjcyM05qMTNCUW0vOFg2Q2JQUTVIL2IyU2ZMbDRVRVcvdmh0Qmt6?=
+ =?utf-8?B?UUYvZkZpTmJpM2pEUFNMZTBnNmEzb0RFc09LTjlzb05TclhPNlpNU0xkWnNp?=
+ =?utf-8?B?eGhqZ1lGNXVhejhLOGZFSmNqeEtpRUl1NEJkdlhGYUVWQUxjKzlWTWprelBL?=
+ =?utf-8?B?WW9ZWDY1N0xsTUcwVTY3c0dneVJDV3dEb2lvMHpTQzMySmY4RDk4emJNMDB3?=
+ =?utf-8?B?SGdQQXVJTVhteG1ieStscGhLRnAwZzRXRHdJOTZaYVErVjROS1ZyUDhNRWN0?=
+ =?utf-8?B?VkNWYVJSa2F6T1o1NkRPTDNrSlFCdjI1RGlQSjF4d2hRV1VkVkRJbWh5b3Bz?=
+ =?utf-8?B?Zi9OREhCZ0VSRHBpK2JIZjg1YUErUFlVZmQ0cTk2M3dZNitSQ2RwR1VIYTFa?=
+ =?utf-8?B?ajR2YlNMdzJ1U0t0ZithUE83N3FmcmQwVFpkMHdUeENXUjhTU0RFaFQvd2lO?=
+ =?utf-8?B?d2Yza1dhU21NTXBXMmhhNW5hR1JoQTJRM2hwSytiVzdXVVpaN1lmRHpROGpv?=
+ =?utf-8?B?eDUzYnp6d21TbU5vbFQwc1oxSEdEWkNzeVg5YmtwZDdEWGg4ZmhzQTVlL1Jj?=
+ =?utf-8?B?UzAvQ2Y5cnpDd1h2ZWpUMG0zcVdCd0hNYlF2SG9mZVcvVTlZQUVZVVZyN2Y2?=
+ =?utf-8?B?a2JEaUJiM2Y3eHZJbFpBRzBhRW9tWTNjU0JaQjZKU0VNdHVjZXpCTnVsVXY0?=
+ =?utf-8?B?YnQ1Wmp6NHE5dGE0ZEJXeTJra3dxc1RkSk5NZDNKamVvWkZwaFhOWkoyVURJ?=
+ =?utf-8?B?Njl6Q21GNkxuYk45S1poVVc2eGliYXZPSmYyZkNrKzk3eFRqSUowY1lrUmpE?=
+ =?utf-8?B?MnkrQWxlWXQzbnlQbjcwY1RhSVV6MjR1TUpHWkRGMUtFS1NzelhKVkJ2SjEx?=
+ =?utf-8?B?enVjREZEcWo4eDFROTU4TTlKT1drcnhBeHYyVGpadEhUM3VMVFdHRlpMYWpu?=
+ =?utf-8?B?MGh0cHdrK3BidkdCcDZIczZqVXBDelBvamt6d2NFYkFNUjZjc21MaWVxeWdD?=
+ =?utf-8?B?U0Y4U1FraVFlZjVUTDZHU2V4dmNUOG9uUDZZRUFDR3VheVNwdlpDUWtsSGtF?=
+ =?utf-8?B?bkp0b0tjVFlFeEJXdnRYL2pZcDhRVDM4S3NaRFpOc0MwMktLMUwzcTJVcDdZ?=
+ =?utf-8?B?czVtNlU0cXQyUzd1bzZ6Nm5pb3NzRkRKanUwWlV0VFY2SjlCV25mSUsvUTZK?=
+ =?utf-8?B?aVUvYnZES012S1hqZWJJUEZzOUphNTVYTW4vSGRpZ1RVd09HVGFCQ0xpVkIw?=
+ =?utf-8?B?Z1lSc0syWnlZNklXd1dVSXVidnNVOVRQdW5xMFNzMmlUbC9QZ0liaXU1Y0lR?=
+ =?utf-8?B?MlZPUkNBTW0wbXhsRWc2aGRoUXRjcEpVYkpXV1BkeHRtN0huTXFOSk9SUXlX?=
+ =?utf-8?B?M1BsNUxXK2c2SWY4RHRMRDZ5WldYN1NjdXZ3SUVjYmM5YVV4SVkrZEViN3Fs?=
+ =?utf-8?B?SEg3RDE0cS9sZndMdUg2eDJIa29EUm9FalpmYW92RkVqZU9MdnhvRTI5R21a?=
+ =?utf-8?B?UDNjeHRiamhVTEJTSFRkTUNFMzBSUmI1Z21jTGZxR3Z3bFlBN0xEVXJQWmtX?=
+ =?utf-8?B?RERyNEUyYm5Idlp4WmdhQit1RXk4bnMvbm96RXFQOGZVcThERHQ4UzhtTjJ1?=
+ =?utf-8?B?bjl4Tk5YSVNYSENoWVpQNVMvVkw5dEFscm9oSytSZ0d5YzlMcURtd2NrM2JB?=
+ =?utf-8?B?MVMwaUIraWd2OUYvdTY3L1Zob3MzV2M2L0JSL05oVTNCcitSem9MaDBHVTh6?=
+ =?utf-8?B?N0hqUlluMWVwSUdvSmRYZnFZbjNSVlMvbitwS0RueHVXL25mejJOMm83SmZU?=
+ =?utf-8?B?WVpqZ25xYlU1NHhReTFnbFcwSTRwQ3NhZWVueSt4YXdRZmtIU1hvdXZZbHBQ?=
+ =?utf-8?B?RFFCTlZGWjFwKzFMY2MxclNqRDM5c0lNQlpUbmZpcVJWNEloMzB1dit4Slh4?=
+ =?utf-8?B?eUVKekpKR1VMNTlrSFl6ak1Ock14ZzN2SXNtVU45aFdJOC9UUFYrbEJGSUU5?=
+ =?utf-8?B?Z2F3UnEwS0pCaXdwakVhWGM5Q2pWWXVYRlRiVFVyajZrd3l4N1F3UGNkWlBF?=
+ =?utf-8?B?UGNyMW5yMFNXbW05NHRDNFRmamtxcmp4S1JTWHVFRXNBZmJmNHAyR3MySzg2?=
+ =?utf-8?B?dUVkL25zay9wa2FkQVBybGErazd3dTdPS3NhU1o2OUhwa3ZvZTBKZUx6b3JJ?=
+ =?utf-8?B?VXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17aaf117-fac4-4dd0-8a98-08dbf2a9caa5
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 20:12:06.7359
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1trPrPTVSoAo2n09zLV7to3iughfZiCfs42LG0XGh3CkqJ9RiTnFwyekFB/S0eBCZ3QZG+rzBRiUS/LbNlJ3TM4xTSYzEbaEMpMgo9SYYZY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7176
+X-OriginatorOrg: intel.com
 
-On Fri, Dec 01, 2023 at 11:13:13AM -0800, Andrii Nakryiko wrote:
-> On Fri, Dec 1, 2023 at 11:11 AM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Thu, Nov 30, 2023 at 5:33 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> > >
-> > > On Tue, Nov 28, 2023 at 07:59:01PM +0200, Eduard Zingerman wrote:
-> > > > On Tue, 2023-11-28 at 10:54 -0700, Daniel Xu wrote:
-> > > > > Similar to reading from CO-RE bitfields, we need a CO-RE aware bitfield
-> > > > > writing wrapper to make the verifier happy.
-> > > > >
-> > > > > Two alternatives to this approach are:
-> > > > >
-> > > > > 1. Use the upcoming `preserve_static_offset` [0] attribute to disable
-> > > > >    CO-RE on specific structs.
-> > > > > 2. Use broader byte-sized writes to write to bitfields.
-> > > > >
-> > > > > (1) is a bit a bit hard to use. It requires specific and
-> > > > > not-very-obvious annotations to bpftool generated vmlinux.h. It's also
-> > > > > not generally available in released LLVM versions yet.
-> > > > >
-> > > > > (2) makes the code quite hard to read and write. And especially if
-> > > > > BPF_CORE_READ_BITFIELD() is already being used, it makes more sense to
-> > > > > to have an inverse helper for writing.
-> > > > >
-> > > > > [0]: https://reviews.llvm.org/D133361
-> > > > > From: Eduard Zingerman <eddyz87@gmail.com>
-> > > > >
-> > > > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > > > > ---
-> > > >
-> > > > Could you please also add a selftest (or several) using __retval()
-> > > > annotation for this macro?
-> > >
-> > > Good call about adding tests -- I found a few bugs with the code from
-> > > the other thread. But boy did they take a lot of brain cells to figure
-> > > out.
-> > >
-> > > There was some 6th grade algebra involved too -- I'll do my best to
-> > > explain it in the commit msg for v3.
-> > >
-> > >
-> > > Here are the fixes in case you are curious:
-> > >
-> > > diff --git a/tools/lib/bpf/bpf_core_read.h b/tools/lib/bpf/bpf_core_read.h
-> > > index 7a764f65d299..8f02c558c0ff 100644
-> > > --- a/tools/lib/bpf/bpf_core_read.h
-> > > +++ b/tools/lib/bpf/bpf_core_read.h
-> > > @@ -120,7 +120,9 @@ enum bpf_enum_value_kind {
-> > >         unsigned int byte_size = __CORE_RELO(s, field, BYTE_SIZE);      \
-> > >         unsigned int lshift = __CORE_RELO(s, field, LSHIFT_U64);        \
-> > >         unsigned int rshift = __CORE_RELO(s, field, RSHIFT_U64);        \
-> > > -       unsigned int bit_size = (rshift - lshift);                      \
-> > > +       unsigned int bit_size = (64 - rshift);                          \
-> > > +       unsigned int hi_size = lshift;                                  \
-> > > +       unsigned int lo_size = (rshift - lshift);                       \
-> >
-> > nit: let's drop unnecessary ()
-> >
-> > >         unsigned long long nval, val, hi, lo;                           \
-> > >                                                                         \
-> > >         asm volatile("" : "+r"(p));                                     \
-> > > @@ -131,13 +133,13 @@ enum bpf_enum_value_kind {
-> > >         case 4: val = *(unsigned int *)p; break;                        \
-> > >         case 8: val = *(unsigned long long *)p; break;                  \
-> > >         }                                                               \
-> > > -       hi = val >> (bit_size + rshift);                                \
-> > > -       hi <<= bit_size + rshift;                                       \
-> > > -       lo = val << (bit_size + lshift);                                \
-> > > -       lo >>= bit_size + lshift;                                       \
-> > > +       hi = val >> (64 - hi_size);                                     \
-> > > +       hi <<= 64 - hi_size;                                            \
-> > > +       lo = val << (64 - lo_size);                                     \
-> > > +       lo >>= 64 - lo_size;                                            \
-> > >         nval = new_val;                                                 \
-> > > -       nval <<= lshift;                                                \
-> > > -       nval >>= rshift;                                                \
-> > > +       nval <<= (64 - bit_size);                                       \
-> > > +       nval >>= (64 - bit_size - lo_size);                             \
-> > >         val = hi | nval | lo;                                           \
-> >
-> > this looks.. unusual. I'd imagine we calculate a mask, mask out bits
-> > we are replacing, and then OR with new values, roughly (assuming all
-> > the right left/right shift values and stuff)
-> >
-> > /* clear bits */
-> > val &= ~(bitfield_mask << shift);
-> 
-> we can also calculate shifted mask with just
-> 
-> bitfield_mask = (-1ULL) << some_left_shift >> some_right_shift;
-> val &= ~bitfield_mask;
+On 12/1/2023 6:32 AM, Alexander Lobakin wrote:
+> From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Yeah I was chatting w/ JonathanL about this and I've got basically that
-code ready to send for v3.
+>> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+>> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+>> @@ -505,7 +505,7 @@ static void idpf_rx_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
+>>  
+>>  	/* store the buffer ID and the SW maintained GEN bit to the refillq */
+>>  	refillq->ring[nta] =
+>> -		((buf_id << IDPF_RX_BI_BUFID_S) & IDPF_RX_BI_BUFID_M) |
+>> +		FIELD_PREP(IDPF_RX_BI_BUFID_M, buf_id) |
+>>  		(!!(test_bit(__IDPF_Q_GEN_CHK, refillq->flags)) <<
+>>  		 IDPF_RX_BI_GEN_S);
+> 
+> Why isn't that one converted as well?
+
+Because it's not a constant, and it's not checking a mask with "&", so
+the automation ignored it. I *did* a test, and we could convert the
+return value from test_bit (a bool) into the IDPF_RX_BI_GEN_M mask with
+FIELD_PREP, since C-code allows the luxury of converting a bool to a
+"1", even though it's a bit type ugly in this age of strict typing.
+
+> 
+>>  
+>> @@ -1825,14 +1825,14 @@ static bool idpf_tx_clean_complq(struct idpf_queue *complq, int budget,
+>>  		u16 gen;
+>>  
+>>  		/* if the descriptor isn't done, no work yet to do */
+>> -		gen = (le16_to_cpu(tx_desc->qid_comptype_gen) &
+>> -		      IDPF_TXD_COMPLQ_GEN_M) >> IDPF_TXD_COMPLQ_GEN_S;
+>> +		gen = FIELD_GET(IDPF_TXD_COMPLQ_GEN_M,
+>> +				le16_to_cpu(tx_desc->qid_comptype_gen));
+> 
+> The definition:
+> 
+> #define IDPF_TXD_COMPLQ_GEN_M		BIT_ULL(IDPF_TXD_COMPLQ_GEN_S)
+> 
+> Please don't use FIELD_*() API for 1 bit.
+
+Did you mean that gen is effectively used as a bool? I think that has
+nothing to do with my change over to FIELD_GET, but I could see how
+redesigning this code would be useful, but not as part of this
+conversion series.
+
+> 
+> 		gen = !!(le16_to_cpu(tx_desc->qid_comptype_gen) &
+> 			 IDPF_TXD_COMPLQ_GEN_M);
+> 
+> is enough.
+
+Generally I'd prefer that the kind of check above returned a bool with a
+constant conversion of the mask (compile time) to an LE16 mask, and then
+use that, which is why all of our other drivers do that instead.
+
+> 
+> Moreover, you could use le*_{get,encode,replace}_bits() to get/set LE
+> values right away without 2-step operation (from/to CPU + masks), but
+> you didn't do that here (see below for an example).
+
+Those aren't widely used yet in our drivers so I wasn't picking them up
+yet. But thank you for pointing that out.
+
+<snip>
+
+
+> In general, I would say those two issues are very common in IDPF and
+> also the whole your series converting the Intel drivers. The scripts
+> won't check whether the mask has only 1 bit or whether the value gets
+> converted from/to LE, so they won't help here.
+
+I had been hoping to do some more followup work. it's possible that with
+some tweaking the coccinelle script could learn how to detect non-pow2
+constants, and therefore possibly one bit constants as well. Maybe
+@Julia can help us refine the script and possibly get it into the
+scripts/coccinelle directory to help other drivers as well.
+
+> Could you maybe manually recheck all the places where bitfield masks are
+> used at least in IDPF (better in ice, iavf, i40e, ..., as well) and
+> posted a series that would address them? At the end, manual work is more
+> valuable than automated conversions :p
+
+I think a followup series would work better for this, do you agree?
 
 Thanks,
-Daniel
+Jesse
 
