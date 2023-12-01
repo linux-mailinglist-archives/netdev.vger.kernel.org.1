@@ -1,276 +1,155 @@
-Return-Path: <netdev+bounces-52849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9C780061B
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:44:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D718005E1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:38:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656A4281591
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:44:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5883828184F
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B8F1BDF6;
-	Fri,  1 Dec 2023 08:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC5C1170D;
+	Fri,  1 Dec 2023 08:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="lbYwH1S7"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="V2jdfQrP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085BD10D8;
-	Fri,  1 Dec 2023 00:43:58 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 367E410000E;
-	Fri,  1 Dec 2023 11:43:56 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 367E410000E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1701420236;
-	bh=cNydxF+MjkzDLe6n/KMmuFObemSpIhIQZZBD3g5JP1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=lbYwH1S7hO5OdxqLxtf1BxQ6rlWQsJ6RlsL/TBiZSWqaR+Ru03FF0qu+DGwlX0CIU
-	 FZlT8d+TqCb6MYa/NoUSlsK29vTAm/iN6lnLbSXHeKOYX3rC0JWKl2bFY2RWyZymLh
-	 q1qRPYkVqfRZZSrjNX9ROBu/riP9Y8mOJ0/IswxXJe9pZGl2oNeH1QmPi2ZKR3gkK1
-	 qxMeSFTKYnFr7YZUpxEwrDNoA1xGkFOzRK6Fr8PzHyIzQmkxbb5+aWZvMDHLRQ2qgL
-	 Fj45wA5eALMqz3mrJXKPQokZpL1xutmWQLQ7fnzqy+TCN974QNyvEV7oXv9g6hAhl3
-	 9iJRWwLuHjNPA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri,  1 Dec 2023 11:43:55 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 1 Dec 2023 11:43:55 +0300
-Message-ID: <e58cf080-3611-0a19-c6e5-544d7101e975@salutedevices.com>
-Date: Fri, 1 Dec 2023 11:35:56 +0300
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 265B51713;
+	Fri,  1 Dec 2023 00:38:36 -0800 (PST)
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id E4D562014F;
+	Fri,  1 Dec 2023 16:38:29 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1701419911;
+	bh=+KSs+S6XcLMSAulP0SuGmY2oifnKHSYDKmvztsfn43M=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=V2jdfQrP6FJNnJhX557yHgaxcphbnWagtP61AzZRcHnwAuHr0u8+WR6znCpndlsdN
+	 p34DBEct2U1bFfiubxx5AzSQnwCNIPKqbBCP1VdA/DJnSvEYxKjTgZO6ITNqaWeMKW
+	 eqMlYPOGoVviI/IK4C66EdgPVBkqX3r1BAJb5fdlAXHpFtpbS3K6wDw2+vmztRJ/aH
+	 5MRTheUJIY8AuIUMMRGqrFhp5KBaVC9ZgoYo55nGImbRj4o4e+OaTZoWIiLJ9yVK5d
+	 kBl+3TYVHcOlt/n3P0J+QGkkWa2A7DLonMy7l34r53azZ5pvtCkGsuhDcBqo4yB35m
+	 U9gj+4RF0Eing==
+Message-ID: <10491ca5819563f98e2f4414836fd4da0c84c753.camel@codeconstruct.com.au>
+Subject: Re: [PATCH] mctp i2c: Requeue the packet when arbitration is lost
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Quan Nguyen <quan@os.amperecomputing.com>, Matt Johnston
+ <matt@codeconstruct.com.au>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,  Open Source
+ Submission <patches@amperecomputing.com>
+Cc: Phong Vo <phong@os.amperecomputing.com>, Thang Nguyen
+	 <thang@os.amperecomputing.com>, Dung Cao <dung@os.amperecomputing.com>
+Date: Fri, 01 Dec 2023 16:38:29 +0800
+In-Reply-To: <3e8b18e6-673c-4ee6-a56b-08641c605efc@os.amperecomputing.com>
+References: <20231130075247.3078931-1-quan@os.amperecomputing.com>
+	 <473048522551f1cae5273eb4cd31b732d6e33e53.camel@codeconstruct.com.au>
+	 <706506b7-a89c-4dfc-b233-be7822eb056e@os.amperecomputing.com>
+	 <852eaa7b5040124049e51ceba2d13a5799cb6748.camel@codeconstruct.com.au>
+	 <3e8b18e6-673c-4ee6-a56b-08641c605efc@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
- setting SO_RCVLOWAT
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231130130840.253733-1-avkrasnov@salutedevices.com>
- <20231130130840.253733-3-avkrasnov@salutedevices.com>
- <20231130084044-mutt-send-email-mst@kernel.org>
- <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
- <20231130085445-mutt-send-email-mst@kernel.org>
- <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
- <20231130123815-mutt-send-email-mst@kernel.org>
- <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181753 [Dec 01 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/01 06:07:00 #22595704
-X-KSMG-AntiVirus-Status: Clean, skipped
+
+Hi Quan,
+
+> As per [1], __i2c_transfer() will retry for adap->retries times=20
+> consecutively (without any wait) within the amount of time specified
+> by adap->timeout.
+>=20
+> So as per my observation, once it loses the arbitration, the next
+> retry is most likely still lost as another controller who win the
+> arbitration may still be using the bus.
+
+In general (and specifically with your hardware setup), the controller
+should be waiting for a bus-idle state before attempting the
+retransmission. You may well hit another arbitration loss after that,
+but it won't be from the same bus activity.
+
+> Especially for upper layer protocol message like PLDM or SPDM, which
+> size is far bigger than SMBus, usually ends up to queue several MCTP
+> packets at a time. But if to requeue the packet, it must wait to
+> acquire the lock
+
+... you're relying on the delay of acquiring a spinlock? The only
+contention on that lock is from local packets being sent to the device
+(and, in heavy TX backlogs, the netif queue will be stopped, so that
+lock will be uncontended).
+
+That sounds fairly fragile, and somewhat disconnected from the goal of
+waiting for a bus idle state.
+
+> before actually queueing that packet, and that is
+> more likely to increase the chance to win the arbitration than to
+> retry it right away as on the i2c core.
+>=20
+> Another reason is that, as i2c is widely used for many other=20
+> applications, fixing the retry algorithm within the i2c core seems=20
+> impossible.
+
+What needs fixing there? You haven't identified any issue with it.
+
+> The other fact is that the initial default value of these two
+> parameters=20
+> depends on each type of controller; I'm not sure why yet.
+>=20
+> + i2c-aspeed: =C2=A0 =C2=A0 retries=3D0 timeout=3D1 sec [2]
+> + i2c-cadence: =C2=A0 =C2=A0retries=3D3 timeout=3D1 sec [3]
+> + i2c-designware: retries=3D3 timeout=3D1 sec [4], [5]
+> + i2c-emev2: =C2=A0 =C2=A0 =C2=A0retries=3D5 timeout=3D1 sec [6]
+> + ...
+>=20
+> Unfortunately, in our case, we use i2c-aspeed, and there is only one
+> try (see [2]), and that means we have only one single shot. I'm not
+> sure why i2c-aspeed chose to set retries=3D0 by default, but I guess
+> there must be a reason behind it.
+
+I would suggest that the actual fix you want here is to increase that
+retry count, rather than working-around your "not sure" points above
+with a duplication of the common retry mechanism.
+
+> And yes, I agree, as per [7], these two parameters could be adjusted
+> via ioctl() from userspace if the user wishes to change them. But,
+> honestly, forcing users to change these parameters is not a good way,
+> as I might have to say.
+
+But now you're forcing users to use your infinite-retry mechanism
+instead.
+
+We already have a retry mechanism, which is user-configurable, and we
+can set per-controller defaults. If you believe the defaults (present in
+the aspeed driver) are not suitable, and it's too onerous for users to
+adjust, then I would suggest proposing a change to the default.
+
+Your requeue approach has a problem, in that there is no mechanism for
+recovery on repeated packet contention. In a scenario where a specific
+packet always causes contention (say, a faulty device on the bus
+attempts to respond to that packet too early), then the packet is never
+dequeued; other packets already queued will be blocked behind this one
+packet. The only way to make forward progress from there is to fill the
+TX queue completely.
+
+You could address that by limiting the retries and/or having a timeout,
+but then you may as well just use the existing retry mechanism that we
+already have, which already does that.
+
+> To avoid that, requeueing the packet in the MCTP layer was kind of
+> way better choice, and it was confirmed via our case.
+
+Your earlier examples showed a max of one retry was needed for recovery.
+I would suggest bumping the i2c-aspeed driver default to suit the other
+in-tree controllers would be a much more appropriate fix.
+
+Cheers,
 
 
-
-On 01.12.2023 11:27, Stefano Garzarella wrote:
-> On Thu, Nov 30, 2023 at 12:40:43PM -0500, Michael S. Tsirkin wrote:
->> On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
->>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
->>> > On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
->>> > >
->>> > >
->>> > > On 30.11.2023 16:42, Michael S. Tsirkin wrote:
->>> > > > On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
->>> > > >> Send credit update message when SO_RCVLOWAT is updated and it is bigger
->>> > > >> than number of bytes in rx queue. It is needed, because 'poll()' will
->>> > > >> wait until number of bytes in rx queue will be not smaller than
->>> > > >> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
->>> > > >> for tx/rx is possible: sender waits for free space and receiver is
->>> > > >> waiting data in 'poll()'.
->>> > > >>
->>> > > >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>> > > >> ---
->>> > > >>  Changelog:
->>> > > >>  v1 -> v2:
->>> > > >>   * Update commit message by removing 'This patch adds XXX' manner.
->>> > > >>   * Do not initialize 'send_update' variable - set it directly during
->>> > > >>     first usage.
->>> > > >>  v3 -> v4:
->>> > > >>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
->>> > > >>  v4 -> v5:
->>> > > >>   * Do not change callbacks order in transport structures.
->>> > > >>
->>> > > >>  drivers/vhost/vsock.c                   |  1 +
->>> > > >>  include/linux/virtio_vsock.h            |  1 +
->>> > > >>  net/vmw_vsock/virtio_transport.c        |  1 +
->>> > > >>  net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
->>> > > >>  net/vmw_vsock/vsock_loopback.c          |  1 +
->>> > > >>  5 files changed, 31 insertions(+)
->>> > > >>
->>> > > >> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>> > > >> index f75731396b7e..4146f80db8ac 100644
->>> > > >> --- a/drivers/vhost/vsock.c
->>> > > >> +++ b/drivers/vhost/vsock.c
->>> > > >> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
->>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
->>> > > >>
->>> > > >>          .read_skb = virtio_transport_read_skb,
->>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
->>> > > >>      },
->>> > > >>
->>> > > >>      .send_pkt = vhost_transport_send_pkt,
->>> > > >> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->>> > > >> index ebb3ce63d64d..c82089dee0c8 100644
->>> > > >> --- a/include/linux/virtio_vsock.h
->>> > > >> +++ b/include/linux/virtio_vsock.h
->>> > > >> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
->>> > > >>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
->>> > > >>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
->>> > > >>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
->>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
->>> > > >>  #endif /* _LINUX_VIRTIO_VSOCK_H */
->>> > > >> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->>> > > >> index af5bab1acee1..8007593a3a93 100644
->>> > > >> --- a/net/vmw_vsock/virtio_transport.c
->>> > > >> +++ b/net/vmw_vsock/virtio_transport.c
->>> > > >> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
->>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
->>> > > >>
->>> > > >>          .read_skb = virtio_transport_read_skb,
->>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
->>> > > >>      },
->>> > > >>
->>> > > >>      .send_pkt = virtio_transport_send_pkt,
->>> > > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>> > > >> index f6dc896bf44c..1cb556ad4597 100644
->>> > > >> --- a/net/vmw_vsock/virtio_transport_common.c
->>> > > >> +++ b/net/vmw_vsock/virtio_transport_common.c
->>> > > >> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
->>> > > >>  }
->>> > > >>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
->>> > > >>
->>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
->>> > > >> int val)
->>> > > >> +{
->>> > > >> +    struct virtio_vsock_sock *vvs = vsk->trans;
->>> > > >> +    bool send_update;
->>> > > >> +
->>> > > >> +    spin_lock_bh(&vvs->rx_lock);
->>> > > >> +
->>> > > >> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
->>> > > >> +     * kick sender to send more data, because sender may sleep in
->>> > > >> its
->>> > > >> +     * 'send()' syscall waiting for enough space at our side.
->>> > > >> +     */
->>> > > >> +    send_update = vvs->rx_bytes < val;
->>> > > >> +
->>> > > >> +    spin_unlock_bh(&vvs->rx_lock);
->>> > > >> +
->>> > > >> +    if (send_update) {
->>> > > >> +        int err;
->>> > > >> +
->>> > > >> +        err = virtio_transport_send_credit_update(vsk);
->>> > > >> +        if (err < 0)
->>> > > >> +            return err;
->>> > > >> +    }
->>> > > >> +
->>> > > >> +    return 0;
->>> > > >> +}
->>> > > >
->>> > > >
->>> > > > I find it strange that this will send a credit update
->>> > > > even if nothing changed since this was called previously.
->>> > > > I'm not sure whether this is a problem protocol-wise,
->>> > > > but it certainly was not envisioned when the protocol was
->>> > > > built. WDYT?
->>> > >
->>> > > >From virtio spec I found:
->>> > >
->>> > > It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
->>> > > VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
->>> > > in buffer space occurs.
->>> > > So I guess there is no limitations to send such type of packet, e.g. it is not
->>> > > required to be a reply for some another packet. Please, correct me if im wrong.
->>> > >
->>> > > Thanks, Arseniy
->>> >
->>> >
->>> > Absolutely. My point was different - with this patch it is possible
->>> > that you are not adding any credits at all since the previous
->>> > VIRTIO_VSOCK_OP_CREDIT_UPDATE.
->>>
->>> I think the problem we're solving here is that since as an optimization we
->>> avoid sending the update for every byte we consume, but we put a threshold,
->>> then we make sure we update the peer.
->>>
->>> A credit update contains a snapshot and sending it the same as the previous
->>> one should not create any problem.
->>
->> Well it consumes a buffer on the other side.
-> 
-> Sure, but we are already speculating by not updating the other side when
-> we consume bytes before a certain threshold. This already avoids to
-> consume many buffers.
-> 
-> Here we're only sending it once, when the user sets RCVLOWAT, so
-> basically I expect it won't affect performance.
-
-Moreover I think in practice setting RCVLOWAT is rare case, while this patch
-fixes real problem I guess
-
-
-> 
->>
->>> My doubt now is that we only do this when we set RCVLOWAT , should we also
->>> do something when we consume bytes to avoid the optimization we have?
->>>
->>> Stefano
->>
->> Isn't this why we have credit request?
-> 
-> Yep, but in practice we never use it. It would also consume 2 buffers,
-> one at the transmitter and one at the receiver.
-> 
-> However I agree that maybe we should start using it before we decide not
-> to send any more data.
-> 
-> To be compatible with older devices, though, I think for now we also
-> need to send a credit update when the bytes in the receive queue are
-> less than RCVLOWAT, as Arseniy proposed in the other series.
-
-Looks like (in theory of course), that credit request is considered to be
-paired with credit update. While current usage of credit update is something
-like ACK packet in TCP, e.g. telling peer that we are ready to receive more
-data.
-
-Thanks, Arseniy
-
-> 
-> Thanks,
-> Stefano
-> 
+Jeremy
 
