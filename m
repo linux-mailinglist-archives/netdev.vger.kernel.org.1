@@ -1,150 +1,142 @@
-Return-Path: <netdev+bounces-52955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09945800E8E
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:27:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3632800E9C
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:31:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3771C209F0
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:26:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486B81C20927
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7C64AF6B;
-	Fri,  1 Dec 2023 15:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LlkAVm0E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E524AF64;
+	Fri,  1 Dec 2023 15:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F76F103;
-	Fri,  1 Dec 2023 07:26:53 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-423f2d0c8baso13722541cf.2;
-        Fri, 01 Dec 2023 07:26:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701444412; x=1702049212; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Y5uUpKThH5AlPxwZK/+8ce/JS/o6enGufFaGhxrFrA=;
-        b=LlkAVm0E4GDkDf9KHlwLtfA44S2vZn7n7tu7k0Syq3g8Vy7TobnUZOEMLm+C4RRy5w
-         mFd5f2BdgT3QF0mYiEuaOH/AbRTq2kRppiB6v6aPkzRYSYjMlz3c2fKVjbhLtLcawuDG
-         qCafr0+1phPmkEYQt17zrgradddvlb5Zrg2LKgCmihhXFXJ3L2rtbtlRBjFEgpDFzINg
-         iRvfhULsQ4GW4+2ptSo2Jt3k1yuo2X6PFUin3PfbQZ4rQHAxT7AD8Y7eLAfGApwuoSl+
-         RMc+0TboXHMBzA9O2MmKiAXm0IBO3vRqUccFrZyekvQaZG1RIpGXmvcUWKAUHDVtYb61
-         qI8w==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C45194
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:31:24 -0800 (PST)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1d05f027846so5770795ad.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 07:31:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701444412; x=1702049212;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+Y5uUpKThH5AlPxwZK/+8ce/JS/o6enGufFaGhxrFrA=;
-        b=HcPi8dnQXOmRsVhxlXHKJHskiCTfmvgJV22pBv4v2n5Bt/mbJuzaJes8/chvDpypVG
-         KeqVR1gVjmUZuEDuo237m9s0sQ9HujJlzSH3dVYdg/ZfwHPLp09J7X2HT7Q/O64Em4by
-         H6JQUAkFoSRWDeC4zQnaxGxM0NTGZFo1XVl3bHXbOH8I9xkQ4hOL/u17V4eV/NQuTQqn
-         2l9F1m8BnphgYaSme3ZSV4wkav/Ib5dMfiiQHdL0EXGu5PM3/zi+R9HUdIQl1lWxMpGU
-         mXGR3Yu8Lb2YqdqPnfJiEtTSnGmFkaRO4mT6/3F7HWkxHFs6ftkbKrlIO7d7U0TNoQTh
-         vVyg==
-X-Gm-Message-State: AOJu0YwcAhuwBdJQHhh0nab/5S9BUd54E+dNPmXYVWHpesvCj5uX2p27
-	PoPpKwBkEGx4gSdgafvMD6s=
-X-Google-Smtp-Source: AGHT+IE7pPHWo5O6L0cGSE4Vt8ZBvbgF4ZpSTi5qSKV/OfAW0SLGDPjTMnoWDJPMCufOEPTxcgQJbA==
-X-Received: by 2002:a05:622a:1a89:b0:423:6e29:c149 with SMTP id s9-20020a05622a1a8900b004236e29c149mr30091182qtc.1.1701444412484;
-        Fri, 01 Dec 2023 07:26:52 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id w2-20020ac87182000000b00423de58d3d8sm1567519qto.40.2023.12.01.07.26.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 07:26:51 -0800 (PST)
-Date: Fri, 01 Dec 2023 10:26:51 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, 
- Song Yoong Siang <yoong.siang.song@intel.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Bjorn Topel <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@google.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- bpf@vger.kernel.org, 
- xdp-hints@xdp-project.net, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <6569fb3b31fb6_1396ec2948@willemb.c.googlers.com.notmuch>
-In-Reply-To: <5a660c0f-d3ed-47a2-b9be-098a224b8a12@kernel.org>
-References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
- <20231201062421.1074768-3-yoong.siang.song@intel.com>
- <5a660c0f-d3ed-47a2-b9be-098a224b8a12@kernel.org>
-Subject: Re: [PATCH bpf-next v2 2/3] net: stmmac: Add txtime support to XDP ZC
+        d=1e100.net; s=20230601; t=1701444684; x=1702049484;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0oJz4ABqI6dQYHTyvK+VaenbIcleK/g5CtSQLh80SqY=;
+        b=JiEUfmIQlR1qsgV9/uyjYFa89bqw/d0XSFQBTsslrfJyRRWwROBo/BQzOvXH1oZuJA
+         GFvyC206uYDrb+77P+/iX8cIf0N59sU9ldg4jJz6ffppdpRNzvq/m0iGMraNVmtf5Iwe
+         ell43wKm2YVWfBXmAHAtL+ijd/aDM8A4e4XVcZo6Huwwv6F3HhIL3chS4d6K3xQi9v9U
+         Qq1mY/gxV/8IRsqMqIKOkj1Yt1XQZQKgdV6yBWpGK438xCd9ywdYfC/HJPY0moIiaLVW
+         +ZhkIfTkXBAXXNfc/MNXTk9axZyCQCaMxSSRxhagLpTd2W4S15Lsy6P4S+MzfJ0dOJnf
+         jfkg==
+X-Gm-Message-State: AOJu0Yz4+dkp6BFlPn9OCsx/XjlN3K3Z2lfxmPMMuZWpIuVPvIlM40hV
+	1AEOxzACkQgGJV2lV2QwkgzLnJL0WOAoHqxHxUAGxJEpXbiz
+X-Google-Smtp-Source: AGHT+IEpfkl2TVrJUq3upLcd96cDovCb5c1uhiWIvTt2OW0A5SrXccNr+K53jgdEjnBTjCOmmHJuSjF/KEqeMS5ZdULuHsQxD8zE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a17:903:2308:b0:1cc:274d:ba5a with SMTP id
+ d8-20020a170903230800b001cc274dba5amr5686495plh.0.1701444684119; Fri, 01 Dec
+ 2023 07:31:24 -0800 (PST)
+Date: Fri, 01 Dec 2023 07:31:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000000843f060b747650@google.com>
+Subject: [syzbot] [wireguard?] KCSAN: data-race in wg_packet_handshake_receive_worker
+ / wg_packet_rx_poll (6)
+From: syzbot <syzbot+57cb9d16a1b17521eb76@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 12/1/23 07:24, Song Yoong Siang wrote:
-> > This patch enables txtime support to XDP zero copy via XDP Tx
-> > metadata framework.
-> > 
-> > Signed-off-by: Song Yoong Siang<yoong.siang.song@intel.com>
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
-> >   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
-> >   2 files changed, 15 insertions(+)
-> 
-> I think we need to see other drivers using this new feature to evaluate
-> if API is sane.
-> 
-> I suggest implementing this for igc driver (chip i225) and also for igb
-> (i210 chip) that both support this kind of LaunchTime feature in HW.
-> 
-> The API and stmmac driver takes a u64 as time.
-> I'm wondering how this applies to i210 that[1] have 25-bit for
-> LaunchTime (with 32 nanosec granularity) limiting LaunchTime max 0.5
-> second into the future.
-> And i225 that [1] have 30-bit max 1 second into the future.
-> 
-> 
-> [1] 
-> https://github.com/xdp-project/xdp-project/blob/master/areas/tsn/code01_follow_qdisc_TSN_offload.org
+Hello,
 
-Good point Jesper.
+syzbot found the following issue on:
 
-Can we also explicitly document what the type of the field is?
-Nanoseconds against the NIC hardware clock, it sounds like.
+HEAD commit:    d2da77f431ac Merge tag 'parisc-for-6.7-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11294880e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8c1151391aefc0c3
+dashboard link: https://syzkaller.appspot.com/bug?extid=57cb9d16a1b17521eb76
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-We have some experience with this, too. Something needs to do the
-conversion from host clock to NIC clock. It is not sufficent to just
-assume that the host clock is synced against the NIC clock by PTP.
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0ebc29947781/disk-d2da77f4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a82ec858fbee/vmlinux-d2da77f4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d45f2fa85085/bzImage-d2da77f4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+57cb9d16a1b17521eb76@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in wg_packet_handshake_receive_worker / wg_packet_rx_poll
+
+read-write to 0xffff8881392abfa0 of 8 bytes by interrupt on cpu 1:
+ update_rx_stats drivers/net/wireguard/receive.c:23 [inline]
+ wg_packet_consume_data_done drivers/net/wireguard/receive.c:358 [inline]
+ wg_packet_rx_poll+0xd35/0xf00 drivers/net/wireguard/receive.c:474
+ __napi_poll+0x60/0x3b0 net/core/dev.c:6533
+ napi_poll net/core/dev.c:6602 [inline]
+ net_rx_action+0x32b/0x750 net/core/dev.c:6735
+ __do_softirq+0xc4/0x279 kernel/softirq.c:553
+ do_softirq+0x5e/0x90 kernel/softirq.c:454
+ __local_bh_enable_ip+0x64/0x70 kernel/softirq.c:381
+ __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+ _raw_spin_unlock_bh+0x36/0x40 kernel/locking/spinlock.c:210
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ ptr_ring_consume_bh include/linux/ptr_ring.h:367 [inline]
+ wg_packet_handshake_receive_worker+0x184/0x5e0 drivers/net/wireguard/receive.c:212
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
+ worker_thread+0x525/0x730 kernel/workqueue.c:2784
+ kthread+0x1d7/0x210 kernel/kthread.c:388
+ ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+read-write to 0xffff8881392abfa0 of 8 bytes by task 22808 on cpu 0:
+ update_rx_stats drivers/net/wireguard/receive.c:23 [inline]
+ wg_receive_handshake_packet drivers/net/wireguard/receive.c:198 [inline]
+ wg_packet_handshake_receive_worker+0x4b9/0x5e0 drivers/net/wireguard/receive.c:213
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
+ worker_thread+0x525/0x730 kernel/workqueue.c:2784
+ kthread+0x1d7/0x210 kernel/kthread.c:388
+ ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+value changed: 0x00000000000070b0 -> 0x00000000000070d0
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 22808 Comm: kworker/0:4 Not tainted 6.7.0-rc2-syzkaller-00265-gd2da77f431ac #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+Workqueue: wg-kex-wg2 wg_packet_handshake_receive_worker
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
