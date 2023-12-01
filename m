@@ -1,125 +1,93 @@
-Return-Path: <netdev+bounces-52866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2088007E2
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:06:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E826F8007F3
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:11:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDDDF1C20BBB
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3E4E2809D6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B716C200BD;
-	Fri,  1 Dec 2023 10:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82451C6A9;
+	Fri,  1 Dec 2023 10:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EolkPQDc"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MyxwMCa+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442FBB2;
-	Fri,  1 Dec 2023 02:06:18 -0800 (PST)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B14mDrR030535;
-	Fri, 1 Dec 2023 10:06:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id; s=qcppdkim1;
- bh=A1EGrq2r/Zjw8fa3aqVFo2FlroFAid1G/BIBvjuO6XE=;
- b=EolkPQDcG1j3zhat+vvfRdu5KMutWS9ebFOytYPeKH34926T1Fy4QjTwnIXJyUeoKiGG
- QKzL8mon3wb6igqPzbAHzbVFP9S+YnNyh59iUmBq3xgHziu3s1IArhuzVvEsOZuQk8RO
- U62qDOJfQ/IMLGqTWHLzlKdDdhWf7/CpdS0vyvWP/OG1y9sQUICF1imGBh/kqcppNnus
- Uvlh3tpXKg/88lgNWoIl0iI1AUZL2HyEh/1Osm9uyKl9IZGaFLlL+rmz4TszjTz47tiS
- a5TjpqmBhnyvlh4HdxJ+WuFML4t7Vu09xZasH3yRalVzmIlvTnh9dWt0kRm8wXnT3zGC zQ== 
-Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uprhdu3v8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 10:06:02 +0000
-Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3B1A5urY026649;
-	Fri, 1 Dec 2023 10:05:56 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3unmf087ye-1;
-	Fri, 01 Dec 2023 10:05:56 +0000
-Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1A5uQd026644;
-	Fri, 1 Dec 2023 10:05:56 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3B1A5ulh026640;
-	Fri, 01 Dec 2023 10:05:56 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id 6DC595001C3; Fri,  1 Dec 2023 15:35:55 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-        Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH v2] net: stmmac: update Rx clk divider for 10M SGMII
-Date: Fri,  1 Dec 2023 15:35:48 +0530
-Message-Id: <20231201100548.12994-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: H7GjdgLppbe_t5WTRxU9l3iP1t53Znd7
-X-Proofpoint-GUID: H7GjdgLppbe_t5WTRxU9l3iP1t53Znd7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_07,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 spamscore=0 suspectscore=0 impostorscore=0 mlxlogscore=763
- clxscore=1015 mlxscore=0 priorityscore=1501 adultscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312010067
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE75170F
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 02:10:48 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2c9b5c12898so23975901fa.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 02:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701425446; x=1702030246; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=n8E0QyaHO2zChIxVOU0YYWJPMrzFVG6nS9T0+zfhmyg=;
+        b=MyxwMCa+LQg+Chnv+l/sUiHgtt0sArwJ1k5N2HZQNt8TTzlV5FC8y7szKbkstOBRzw
+         j2DNAqo8dj6j2Xbs22sZdoebIC0hZci3kTpCi3VzcApzb12x/J7YVXjYeKPHlGn6hfsk
+         Vq05MfyAu/f+Cx56+SU7n2QPy7BneaqxvnDC4seLD+isN6bR2aqcIpnPROBOmOQgHxXN
+         RJhMhNb4VsXDIdvYP80CLxeDQYeYxrWx5MWSKLm35ZjMTxRocEKvPyOFnhh1lo0DWY4R
+         RsEj4PZFMOYKLiRwpN49GzjhmSjG9pjCc8auyb6McZygbzfUcjEwmtwfkPEEVCO8xc8D
+         SbRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701425446; x=1702030246;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n8E0QyaHO2zChIxVOU0YYWJPMrzFVG6nS9T0+zfhmyg=;
+        b=C/E9ezQCohjAylMAlbhCo/lWqehqvybjABQlgQ+K6WrxowVO/XPm3supcMvNmPmgZH
+         oZ47aUzmduVyirImfTk7FU9VxU6juMLpZoCIS2eTO1x3VSOx00iF6zy7JIcZMpwjdZSm
+         lClqe9uVqpAYOMAPB3E3m2jlDgGHULx1QixjSc26VWBXhLaTMdnRr/UW+kkFg04TJwjO
+         su0eG3fNtLPoSDR5b/cZ0vNCAtzCI7/6klEXNZcbaQJ6NuTLJzU8UZ0mDtXr7naLl4Q3
+         7lehHWJNfjW/IJydDAtX5oNY3VY4qbWzyLbuTIWiXb7+mDmSgJYRs5vwHkdvzB/gVM6m
+         PRKA==
+X-Gm-Message-State: AOJu0YziCVPz/qj+jd8IUlEUssfxwGi3h5RrODrPbVsQmgJleYRCelGE
+	v5kJEAs8Ssm0p68zGPdFXbbs6Pu7bof7kBDeYYuWXA==
+X-Google-Smtp-Source: AGHT+IEjiIKL1J883D5OEhe5x4clQxaJAlHkMh9GOJjhv1wGD6i0tPElWfosSDTJz8xNMDxIfxZ61sqNJrax1MKZWwQ=
+X-Received: by 2002:a2e:8803:0:b0:2c9:d874:6edc with SMTP id
+ x3-20020a2e8803000000b002c9d8746edcmr745747ljh.57.1701425446677; Fri, 01 Dec
+ 2023 02:10:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20231130115611.6632-1-liangchen.linux@gmail.com>
+ <20231130115611.6632-2-liangchen.linux@gmail.com> <CAC_iWjL68n-GRN7vs_jwvzbnVy8sPh4_SP=wVDq0HkFOmSU-nQ@mail.gmail.com>
+In-Reply-To: <CAC_iWjL68n-GRN7vs_jwvzbnVy8sPh4_SP=wVDq0HkFOmSU-nQ@mail.gmail.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Fri, 1 Dec 2023 12:10:10 +0200
+Message-ID: <CAC_iWjKBE5s9iiTPKgsoDx5LSWjsSXE-7SSPSk+EVJXLC10-GQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/4] page_pool: Rename pp_frag_count to pp_ref_count
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hawk@kernel.org, linyunsheng@huawei.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, jasowang@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-SGMII 10MBPS mode needs RX clock divider to avoid drops in Rx.
-Update configure SGMII function with rx clk divider programming.
+re-sending as plain-text, apologize for the noise...
 
-Fixes: 463120c31c58 ("net: stmmac: dwmac-qcom-ethqos: add support for SGMII")
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
----
-v2 changelog:
-- Use FIELD_PREP to prepare bifield values in place of GENMASK
-- Add fixes tag
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On Fri, 1 Dec 2023 at 11:59, Ilias Apalodimas
+<ilias.apalodimas@linaro.org> wrote:
+>
+> Hi Liang,
+>
+> On Thu, 30 Nov 2023 at 13:59, Liang Chen <liangchen.linux@gmail.com> wrote:
+>>
+>> To support multiple users referencing the same fragment, pp_frag_count is
+>> renamed to pp_ref_count to better reflect its actual meaning based on the
+>> suggestion from [1].
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d3bf42d0fceb..df6ff8bcdb5c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -34,6 +34,7 @@
- #define RGMII_CONFIG_LOOPBACK_EN		BIT(2)
- #define RGMII_CONFIG_PROG_SWAP			BIT(1)
- #define RGMII_CONFIG_DDR_MODE			BIT(0)
-+#define RGMII_CONFIG_SGMII_CLK_DVDR		GENMASK(18, 10)
- 
- /* SDCC_HC_REG_DLL_CONFIG fields */
- #define SDCC_DLL_CONFIG_DLL_RST			BIT(30)
-@@ -617,6 +618,9 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- 	case SPEED_10:
- 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
- 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
-+		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
-+			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR, 0x31),
-+			      RGMII_IO_MACRO_CONFIG);
- 		break;
- 	}
- 
--- 
-2.17.1
+The patch does more than what the description says and those should be
+in 2 different patches.
+I am ok with pp_frag_count -> pp_ref_count, for the functions I am not
+sure the rename makes anything better.
 
+Jakub, are you ok with the name changes or is it going to make bisecting a pain?
+
+Thanks
+/Ilias
 
