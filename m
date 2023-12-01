@@ -1,137 +1,276 @@
-Return-Path: <netdev+bounces-52845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4125B8005A3
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:34:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9C780061B
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71F0B1C20EC9
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:34:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656A4281591
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84C61170D;
-	Fri,  1 Dec 2023 08:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B8F1BDF6;
+	Fri,  1 Dec 2023 08:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="T41uadYX"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="lbYwH1S7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C771711;
-	Fri,  1 Dec 2023 00:33:55 -0800 (PST)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B18X2ON032381;
-	Fri, 1 Dec 2023 08:33:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=xbEY5pbdgrGRStC1B+zZTqRATZzBHAwFSvid2XQ9imc=;
- b=T41uadYXrRzikO+r4lFQPN1A8GUAmkP67Z8GtKz7oArGPKClf0kwxXQO+3DyIu+WomNl
- 4QllESAITN2ECOqaTbRqdFRG2ko8PCkWH1pvj1il+7vt5IrFjao5SR9rGICq8Gbq6MbV
- VkPAUvaDpKQSxnS6GHac7/t6nD+mG1C88h8m3pzc0acknsTT0k4uThBEEngdokbRPENz
- rgaVxdiB0NO9jBTZIdAP9lYe4tX7JnwRwyKk0LhGIyYJG3DaSBHXvU6p7LSoLyB8vgRB
- nzpgg0BUP44Tj6dKVoaKx7zOcWEnUqE/ctUFBXl5z/SVsEtrlkHz3sudVmv48wTyeyzC Rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqc2q80w4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 08:33:50 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B18XEOn000649;
-	Fri, 1 Dec 2023 08:33:49 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqc2q80vj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 08:33:49 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B16YVMN015317;
-	Fri, 1 Dec 2023 08:33:49 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukvrm3rcc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Dec 2023 08:33:48 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B18XmE750135454
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 1 Dec 2023 08:33:48 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA50B58056;
-	Fri,  1 Dec 2023 08:33:47 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9E0EC58052;
-	Fri,  1 Dec 2023 08:33:44 +0000 (GMT)
-Received: from [9.171.36.63] (unknown [9.171.36.63])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  1 Dec 2023 08:33:44 +0000 (GMT)
-Message-ID: <b50c8e41-9787-4281-81fa-e2cfe8fe3146@linux.ibm.com>
-Date: Fri, 1 Dec 2023 09:33:43 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/7] net/smc: implement SMCv2.1 virtual ISM
- device support
-Content-Language: en-GB
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nIx74hUPJEgNw7KqTmMHnG8qTVAak0aU
-X-Proofpoint-GUID: FB8tw4bcZt64nqadfbFNZoW0C6Z2OWBN
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085BD10D8;
+	Fri,  1 Dec 2023 00:43:58 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 367E410000E;
+	Fri,  1 Dec 2023 11:43:56 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 367E410000E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1701420236;
+	bh=cNydxF+MjkzDLe6n/KMmuFObemSpIhIQZZBD3g5JP1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=lbYwH1S7hO5OdxqLxtf1BxQ6rlWQsJ6RlsL/TBiZSWqaR+Ru03FF0qu+DGwlX0CIU
+	 FZlT8d+TqCb6MYa/NoUSlsK29vTAm/iN6lnLbSXHeKOYX3rC0JWKl2bFY2RWyZymLh
+	 q1qRPYkVqfRZZSrjNX9ROBu/riP9Y8mOJ0/IswxXJe9pZGl2oNeH1QmPi2ZKR3gkK1
+	 qxMeSFTKYnFr7YZUpxEwrDNoA1xGkFOzRK6Fr8PzHyIzQmkxbb5+aWZvMDHLRQ2qgL
+	 Fj45wA5eALMqz3mrJXKPQokZpL1xutmWQLQ7fnzqy+TCN974QNyvEV7oXv9g6hAhl3
+	 9iJRWwLuHjNPA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri,  1 Dec 2023 11:43:55 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 1 Dec 2023 11:43:55 +0300
+Message-ID: <e58cf080-3611-0a19-c6e5-544d7101e975@salutedevices.com>
+Date: Fri, 1 Dec 2023 11:35:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-01_06,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- mlxlogscore=999 clxscore=1015 spamscore=0 suspectscore=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312010055
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231130130840.253733-1-avkrasnov@salutedevices.com>
+ <20231130130840.253733-3-avkrasnov@salutedevices.com>
+ <20231130084044-mutt-send-email-mst@kernel.org>
+ <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
+ <20231130085445-mutt-send-email-mst@kernel.org>
+ <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+ <20231130123815-mutt-send-email-mst@kernel.org>
+ <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181753 [Dec 01 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 5 0.3.5 98d108ddd984cca1d7e65e595eac546a62b0144b, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/12/01 06:07:00 #22595704
+X-KSMG-AntiVirus-Status: Clean, skipped
 
 
 
-On 30.11.23 12:28, Wen Gu wrote:
-> The fourth edition of SMCv2 adds the SMC version 2.1 feature updates for
-> SMC-Dv2 with virtual ISM. Virtual ISM are created and supported mainly by
-> OS or hypervisor software, comparable to IBM ISM which is based on platform
-> firmware or hardware.
+On 01.12.2023 11:27, Stefano Garzarella wrote:
+> On Thu, Nov 30, 2023 at 12:40:43PM -0500, Michael S. Tsirkin wrote:
+>> On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
+>>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
+>>> > On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
+>>> > >
+>>> > >
+>>> > > On 30.11.2023 16:42, Michael S. Tsirkin wrote:
+>>> > > > On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
+>>> > > >> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>>> > > >> than number of bytes in rx queue. It is needed, because 'poll()' will
+>>> > > >> wait until number of bytes in rx queue will be not smaller than
+>>> > > >> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>>> > > >> for tx/rx is possible: sender waits for free space and receiver is
+>>> > > >> waiting data in 'poll()'.
+>>> > > >>
+>>> > > >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>>> > > >> ---
+>>> > > >>  Changelog:
+>>> > > >>  v1 -> v2:
+>>> > > >>   * Update commit message by removing 'This patch adds XXX' manner.
+>>> > > >>   * Do not initialize 'send_update' variable - set it directly during
+>>> > > >>     first usage.
+>>> > > >>  v3 -> v4:
+>>> > > >>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>>> > > >>  v4 -> v5:
+>>> > > >>   * Do not change callbacks order in transport structures.
+>>> > > >>
+>>> > > >>  drivers/vhost/vsock.c                   |  1 +
+>>> > > >>  include/linux/virtio_vsock.h            |  1 +
+>>> > > >>  net/vmw_vsock/virtio_transport.c        |  1 +
+>>> > > >>  net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
+>>> > > >>  net/vmw_vsock/vsock_loopback.c          |  1 +
+>>> > > >>  5 files changed, 31 insertions(+)
+>>> > > >>
+>>> > > >> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>> > > >> index f75731396b7e..4146f80db8ac 100644
+>>> > > >> --- a/drivers/vhost/vsock.c
+>>> > > >> +++ b/drivers/vhost/vsock.c
+>>> > > >> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
+>>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>> > > >>
+>>> > > >>          .read_skb = virtio_transport_read_skb,
+>>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>>> > > >>      },
+>>> > > >>
+>>> > > >>      .send_pkt = vhost_transport_send_pkt,
+>>> > > >> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>>> > > >> index ebb3ce63d64d..c82089dee0c8 100644
+>>> > > >> --- a/include/linux/virtio_vsock.h
+>>> > > >> +++ b/include/linux/virtio_vsock.h
+>>> > > >> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>>> > > >>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>>> > > >>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>>> > > >>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>>> > > >>  #endif /* _LINUX_VIRTIO_VSOCK_H */
+>>> > > >> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>> > > >> index af5bab1acee1..8007593a3a93 100644
+>>> > > >> --- a/net/vmw_vsock/virtio_transport.c
+>>> > > >> +++ b/net/vmw_vsock/virtio_transport.c
+>>> > > >> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
+>>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>> > > >>
+>>> > > >>          .read_skb = virtio_transport_read_skb,
+>>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>>> > > >>      },
+>>> > > >>
+>>> > > >>      .send_pkt = virtio_transport_send_pkt,
+>>> > > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> > > >> index f6dc896bf44c..1cb556ad4597 100644
+>>> > > >> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> > > >> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> > > >> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>>> > > >>  }
+>>> > > >>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>>> > > >>
+>>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
+>>> > > >> int val)
+>>> > > >> +{
+>>> > > >> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>>> > > >> +    bool send_update;
+>>> > > >> +
+>>> > > >> +    spin_lock_bh(&vvs->rx_lock);
+>>> > > >> +
+>>> > > >> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
+>>> > > >> +     * kick sender to send more data, because sender may sleep in
+>>> > > >> its
+>>> > > >> +     * 'send()' syscall waiting for enough space at our side.
+>>> > > >> +     */
+>>> > > >> +    send_update = vvs->rx_bytes < val;
+>>> > > >> +
+>>> > > >> +    spin_unlock_bh(&vvs->rx_lock);
+>>> > > >> +
+>>> > > >> +    if (send_update) {
+>>> > > >> +        int err;
+>>> > > >> +
+>>> > > >> +        err = virtio_transport_send_credit_update(vsk);
+>>> > > >> +        if (err < 0)
+>>> > > >> +            return err;
+>>> > > >> +    }
+>>> > > >> +
+>>> > > >> +    return 0;
+>>> > > >> +}
+>>> > > >
+>>> > > >
+>>> > > > I find it strange that this will send a credit update
+>>> > > > even if nothing changed since this was called previously.
+>>> > > > I'm not sure whether this is a problem protocol-wise,
+>>> > > > but it certainly was not envisioned when the protocol was
+>>> > > > built. WDYT?
+>>> > >
+>>> > > >From virtio spec I found:
+>>> > >
+>>> > > It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
+>>> > > VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
+>>> > > in buffer space occurs.
+>>> > > So I guess there is no limitations to send such type of packet, e.g. it is not
+>>> > > required to be a reply for some another packet. Please, correct me if im wrong.
+>>> > >
+>>> > > Thanks, Arseniy
+>>> >
+>>> >
+>>> > Absolutely. My point was different - with this patch it is possible
+>>> > that you are not adding any credits at all since the previous
+>>> > VIRTIO_VSOCK_OP_CREDIT_UPDATE.
+>>>
+>>> I think the problem we're solving here is that since as an optimization we
+>>> avoid sending the update for every byte we consume, but we put a threshold,
+>>> then we make sure we update the peer.
+>>>
+>>> A credit update contains a snapshot and sending it the same as the previous
+>>> one should not create any problem.
+>>
+>> Well it consumes a buffer on the other side.
 > 
-> With the introduction of virtual ISM, SMCv2.1 makes some updates:
+> Sure, but we are already speculating by not updating the other side when
+> we consume bytes before a certain threshold. This already avoids to
+> consume many buffers.
 > 
-> - Introduce feature bitmask to indicate supplemental features.
-> - Reserve a range of CHIDs for virtual ISM.
-> - Support extended GIDs (128 bits) in CLC handshake.
-> 
-> So this patch set aims to implement these updates in Linux kernel. And it
-> acts as the first part of SMC-D virtual ISM extension & loopback-ism [1].
-> 
-> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
-> 
-> v3->v2:
-> - Rename smc_clc_fill_fce as smc_clc_fill_fce_v2x;
-> - Remove ISM_IDENT_MASK from drivers/s390/net/ism.h;
-> - Add explicitly assigning 'false' to ism_v2_capable in ism_dev_init();
-> - Remove smc_ism_set_v2_capable() helper for now, and introduce it in
->    later loopback-ism implementation;
-> 
-> v2->v1:
-> - Fix sparse complaint;
-> - Rebase to the latest net-next;
-> 
-Hi Wen Gu,
+> Here we're only sending it once, when the user sets RCVLOWAT, so
+> basically I expect it won't affect performance.
 
-LGTM, Thank you!
+Moreover I think in practice setting RCVLOWAT is rare case, while this patch
+fixes real problem I guess
 
-Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+
+> 
+>>
+>>> My doubt now is that we only do this when we set RCVLOWAT , should we also
+>>> do something when we consume bytes to avoid the optimization we have?
+>>>
+>>> Stefano
+>>
+>> Isn't this why we have credit request?
+> 
+> Yep, but in practice we never use it. It would also consume 2 buffers,
+> one at the transmitter and one at the receiver.
+> 
+> However I agree that maybe we should start using it before we decide not
+> to send any more data.
+> 
+> To be compatible with older devices, though, I think for now we also
+> need to send a credit update when the bytes in the receive queue are
+> less than RCVLOWAT, as Arseniy proposed in the other series.
+
+Looks like (in theory of course), that credit request is considered to be
+paired with credit update. While current usage of credit update is something
+like ACK packet in TCP, e.g. telling peer that we are ready to receive more
+data.
+
+Thanks, Arseniy
+
+> 
+> Thanks,
+> Stefano
+> 
 
