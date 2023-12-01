@@ -1,125 +1,153 @@
-Return-Path: <netdev+bounces-52897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5D88009C5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:18:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121CC8009C6
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28931F20ED2
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C016F2817F1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1D221345;
-	Fri,  1 Dec 2023 11:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA17208A8;
+	Fri,  1 Dec 2023 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kAQsN+K3"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 181 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Dec 2023 03:18:33 PST
-Received: from mail78-59.sinamail.sina.com.cn (mail78-59.sinamail.sina.com.cn [219.142.78.59])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570DA2695
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 03:18:32 -0800 (PST)
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.69.95])
-	by sina.com (172.16.235.25) with ESMTP
-	id 6569BFBF0000234E; Fri, 1 Dec 2023 19:13:06 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 17365334210190
-X-SMAIL-UIID: 1EBE428C27F64FC68BE7DFEF2B933622-20231201-191306-1
-From: Hillf Danton <hdanton@sina.com>
-To: xingwei lee <xrivendell7@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
-Date: Fri,  1 Dec 2023 19:12:53 +0800
-Message-Id: <20231201111253.1029-1-hdanton@sina.com>
-In-Reply-To: <CABOYnLzq7XwbFncos1p8FOnDyVes4VDkjWE277TngdJqSie14A@mail.gmail.com>
-References: <CANn89iJ7h_LFSV6n_9WmbTMwTMsZ0UgdBj_oGrnzcrZu7oCxFw@mail.gmail.com>
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C73910DF;
+	Fri,  1 Dec 2023 03:18:56 -0800 (PST)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1B8FZv018133;
+	Fri, 1 Dec 2023 11:18:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SQeMsnkSmvQHWc9TP1DATsAWIlnBwjDXrz6OTIEeqsQ=;
+ b=kAQsN+K3EGsgSamBNfuGLzBbEgW0jSGh5sp+407hkH+878d1dKL/Z2jB3xqC4Q0XLr9i
+ sLYq1+Glf+acycicHlvSzXz4XV9GLCL78miJUaycDbi7bMp1+ACUnvlxlTI9bdK9Uw7P
+ JIOVsG6AVJn4SS8o3FZrUIRTCH5Vf29PqBNFiqukw91BRkn2bX/va62bGnTnvcEvZued
+ uSJ+9euorxY57lTe0x8mHxTsygEvPCFVGuENo+om+BoTw+3XBK2b/32Lq/fI9gADlUXB
+ TigdGzpRXl02uypV1pK6jyCaUUHjzIYknEXWpJ8wcSDMpraGjJ3TiNs7bkTVbgt8BEXL kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqebmrab6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 11:18:49 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B1B8vZ4021075;
+	Fri, 1 Dec 2023 11:18:48 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uqebmraas-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 11:18:48 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B1AY0SY020438;
+	Fri, 1 Dec 2023 11:18:47 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ukvrm4gy0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 11:18:47 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B1BIiUu20906498
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 1 Dec 2023 11:18:44 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88C4420043;
+	Fri,  1 Dec 2023 11:18:44 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4FFC420040;
+	Fri,  1 Dec 2023 11:18:43 +0000 (GMT)
+Received: from [9.179.28.5] (unknown [9.179.28.5])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  1 Dec 2023 11:18:43 +0000 (GMT)
+Message-ID: <aab0905a-b77f-4504-a510-83c98f79b2b7@linux.ibm.com>
+Date: Fri, 1 Dec 2023 12:18:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 7/7] net/smc: manage system EID in SMC stack
+ instead of ISM driver
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
+ <1701343695-122657-8-git-send-email-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1701343695-122657-8-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FhuwSygUbyqQmJDW3VqesCgWrJ_W82Es
+X-Proofpoint-GUID: J4vhBy5WdwyS8I8f6ghFE4d9QqdS_khM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-01_09,2023-11-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 mlxscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2312010074
 
-On Fri, 1 Dec 2023 08:39:32 +0800 xingwei lee <xrivendell7@gmail.com>
-> I forgot to CC others, repeat mail.
-> Sorry, Dumazet. I found this bug with my modified syzkaller in my
-> local environment.
-> You are right, I crashed this bug about 10 times and used some
-> heuristic solutions to increase the chances of luck with modifying
-> syz-repro during this process.
-> I can confirm the reproduction can trigger the bug soon and I hope it helps you.
-> I'll test your patch and give your feedback ASAP.
-> 
-> I apply your patch at
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3b47bc037bd44f142ac09848e8d3ecccc726be99
-> with a little fix:
-> 
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index fef349dd72fa..36d2871ac24f 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2197,8 +2197,6 @@ static void __sk_destruct(struct rcu_head *head)
-> 
->         if (likely(sk->sk_net_refcnt))
->                 put_net_track(sock_net(sk), &sk->ns_tracker);
-> -       else
-> -               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, false);
-> 
->         sk_prot_free(sk->sk_prot_creator, sk);
->  }
-> @@ -2212,6 +2210,9 @@ void sk_destruct(struct sock *sk)
->                 use_call_rcu = true;
->         }
-> 
-> +       if (unlikely(!sk->sk_net_refcnt))
-> +               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, false);
-> +
->         if (use_call_rcu)
->                 call_rcu(&sk->sk_rcu, __sk_destruct);
->         else
-> 
-> and It's also trigger the crash like below:
 
-Looks like a refcount leak that could be cured with the diff below.
-Only for thoughts.
 
---- x/include/net/net_namespace.h
-+++ y/include/net/net_namespace.h
-@@ -320,7 +320,7 @@ static inline int check_net(const struct
- 	return 1;
- }
- 
--#define net_drop_ns NULL
-+static void net_drop_ns(void *w) { }
- #endif
- 
- 
-@@ -355,7 +355,7 @@ static inline void __netns_tracker_free(
- static inline struct net *get_net_track(struct net *net,
- 					netns_tracker *tracker, gfp_t gfp)
- {
--	get_net(net);
-+	refcount_inc(&net->passive);
- 	netns_tracker_alloc(net, tracker, gfp);
- 	return net;
- }
-@@ -363,7 +363,7 @@ static inline struct net *get_net_track(
- static inline void put_net_track(struct net *net, netns_tracker *tracker)
- {
- 	__netns_tracker_free(net, tracker, true);
--	put_net(net);
-+	net_drop_ns(net);
- }
- 
- typedef struct {
---
+On 30.11.23 12:28, Wen Gu wrote:
+> The System EID (SEID) is an internal EID that is used by the SMCv2
+> software stack that has a predefined and constant value representing
+> the s390 physical machine that the OS is executing on. So it should
+> be managed by SMC stack instead of ISM driver and be consistent for
+> all ISMv2 device (including virtual ISM devices) on s390 architecture.
+> 
+> Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+
+
+[...]
+> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+> index a33f861..ac88de2 100644
+> --- a/net/smc/smc_ism.c
+> +++ b/net/smc/smc_ism.c
+[...]
+> @@ -431,14 +452,8 @@ static void smcd_register_dev(struct ism_dev *ism)
+>  
+>  	mutex_lock(&smcd_dev_list.mutex);
+>  	if (list_empty(&smcd_dev_list.list)) {
+> -		u8 *system_eid = NULL;
+> -
+> -		system_eid = smcd->ops->get_system_eid();
+> -		if (smcd->ops->supports_v2()) {
+> +		if (smcd->ops->supports_v2())
+>  			smc_ism_v2_capable = true;
+> -			memcpy(smc_ism_v2_system_eid, system_eid,
+> -			       SMC_MAX_EID_LEN);
+> -		}
+>  	}
+
+Just a comment:
+Here we only check the first smcd device to determine whether we support v2.
+Which is ok, for today's platform firmware ISM devices, as they are always the same version.
+
+When you add virtual ISM devices (loopback-ism, virtio-ism) then this needs to be changed.
+IMO the logic then needs to be "if all smcd devices support v2,
+then smc_ism_v2_capable = true;
+else smc_ism_v2_capable = false;"
+
+I don't know if you would like to change that now in this patch, or later when
+you add when you add the support for loopback.
+
+
+
 
