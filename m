@@ -1,201 +1,163 @@
-Return-Path: <netdev+bounces-52959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843CF800EAC
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:37:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28020800EB5
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 053391F20F91
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:37:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AB70B21044
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7AF4AF84;
-	Fri,  1 Dec 2023 15:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF1C4AF9C;
+	Fri,  1 Dec 2023 15:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRASJF6O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBE51B2;
-	Fri,  1 Dec 2023 07:36:52 -0800 (PST)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5d3d5b10197so13329497b3.2;
-        Fri, 01 Dec 2023 07:36:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701445012; x=1702049812;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9UV5Mpe2cpSWdbqOG1++lkTk70fwQykmNN2hXvOVom0=;
-        b=YpNsaaEkTKiJqnC0KmEd8Jo2mC+Bu2i0qEQzNkvoXNWBQKWowhKE6gaeb991D0OtqV
-         SVlD7uMqw+So2IFAeStxmvO+24H4r1lNf0xB3nlsDKUIISky5JgEIeBvIkrbrXZYXgeL
-         ZfKc3U4+Lk8/NOzlIPtkXrFg0xc6wkXSfXtlB0qXjKZromJK1b0GFLUmIbks3XbzuCMG
-         d/+KquNI/LGfjOKgCDQENhxTkIaFwSSXZudNer2WNv69fOaNT5xwMXxs7jpOGxoIRS+L
-         E5iO6tlly9c1OMfmPhzocP3yUz9NCTfaz0XWwhrqU2hEJWyrdRGqp9TXyy907pX/A+Ty
-         pzoA==
-X-Gm-Message-State: AOJu0YzOBtlP+Yn4MysuDStUQ8KWqtU6Bj1qX1fqpoPZmziQ0fxxMNqu
-	v7MvT/vYBaRt0A0phu372Cb9IeMnQsh51A==
-X-Google-Smtp-Source: AGHT+IH90ZSpjcBFpWK8As4egkUF0GGiv6hK3MC47qVKASewNIIfK1QDpleOKB/Q85Az0GxxKXNpJw==
-X-Received: by 2002:a0d:ccc4:0:b0:5d4:244b:9e9a with SMTP id o187-20020a0dccc4000000b005d4244b9e9amr2259159ywd.17.1701445011611;
-        Fri, 01 Dec 2023 07:36:51 -0800 (PST)
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
-        by smtp.gmail.com with ESMTPSA id i71-20020a0ddf4a000000b005d3758fda7dsm1022205ywe.31.2023.12.01.07.36.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 07:36:50 -0800 (PST)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5d2c6c1ab66so24433777b3.1;
-        Fri, 01 Dec 2023 07:36:50 -0800 (PST)
-X-Received: by 2002:a0d:fc05:0:b0:5cb:332e:ab68 with SMTP id
- m5-20020a0dfc05000000b005cb332eab68mr26596241ywf.5.1701445010237; Fri, 01 Dec
- 2023 07:36:50 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E441B4A9AA;
+	Fri,  1 Dec 2023 15:39:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EBDDC433C7;
+	Fri,  1 Dec 2023 15:39:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701445181;
+	bh=V7WtW43roNI+kWQ1jgxoaFh9ZbnjwKeONNImrea0QOQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TRASJF6OIlc3u7XXuhbDaK4viFQJH7E7P4b0J4LqnZBm3T4XlnR3wBJcRPM9GJJO4
+	 4Y3WNVYM4egNGn7EKS+XOf7HsyIWWI1Ehnm+UycZlQSrC7GkVbPj/7oh4rYBe9Ht/3
+	 Q8rfJDaPym3mbS1oRuUcd7Vy4vu8MUT7Jlq0QsMl1UPCi5URZ2uu+0dCnh7/NJHdvr
+	 AOgvp6+9g5MBccZC9x5e2TXU8Eg2bC9bCY7IiiWlMjj1jU3MkU2p5RjuMLWiXpjfxN
+	 KoK0WQEMGg98VWuozPV8zRgNgzyxLI3luIXEVYj89SJnBDR6Vm0nnbrxcaIOf+rl7s
+	 FVxTlyu/GUKTA==
+Message-ID: <179a4581-f7df-4eb1-ab67-8d65f856a2fe@kernel.org>
+Date: Fri, 1 Dec 2023 16:39:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-4-claudiu.beznea.uj@bp.renesas.com>
- <CAMuHMdVMpKVY8WX7dbtHfgnwgePH+i9+2BAumb37sFmqccb44g@mail.gmail.com>
- <CAMuHMdVWvVtFMUe+J9R2ZU8Hi5CGs0NQfwUxitganM85183KkA@mail.gmail.com> <55a0048a-7fa1-49cd-a70f-8f7d948adf27@tuxon.dev>
-In-Reply-To: <55a0048a-7fa1-49cd-a70f-8f7d948adf27@tuxon.dev>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 1 Dec 2023 16:36:38 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUb79rt2YVQO66_+8YcmAyS-PwFVcx0XfZVN-to3EB2SQ@mail.gmail.com>
-Message-ID: <CAMuHMdUb79rt2YVQO66_+8YcmAyS-PwFVcx0XfZVN-to3EB2SQ@mail.gmail.com>
-Subject: Re: [PATCH 03/14] clk: renesas: rzg2l-cpg: Add support for MSTOP
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
-	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "Song, Yoong Siang" <yoong.siang.song@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Topel <bjorn@kernel.org>, "Karlsson, Magnus"
+ <magnus.karlsson@intel.com>,
+ "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andre Fredette <afredette@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
+ <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
+ <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
+ <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Claudiu,
 
-On Mon, Nov 27, 2023 at 8:37=E2=80=AFAM claudiu beznea <claudiu.beznea@tuxo=
-n.dev> wrote:
-> On 24.11.2023 11:08, Geert Uytterhoeven wrote:
-> > On Thu, Nov 23, 2023 at 5:35=E2=80=AFPM Geert Uytterhoeven <geert@linux=
--m68k.org> wrote:
-> >> On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.=
-dev> wrote:
-> >>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >>>
-> >>> RZ/{G2L, V2L, G3S} based CPG versions have support for saving extra
-> >>> power when clocks are disabled by activating module standby. This is =
-done
-> >>> though MSTOP specific registers that are part of CPG. Each individual
-> >>> module have one or more bits associated in one MSTOP register (see ta=
-ble
-> >>> "Registers for Module Standby Mode" from HW manuals). Hardware manual
-> >>> associates modules' clocks to one or more MSTOP bits. There are 3 map=
-pings
-> >>> available (identified by researching RZ/G2L, RZ/G3S, RZ/V2L HW manual=
-s):
-> >>>
-> >>> case 1: N clocks mapped to N MSTOP bits (with N=3D{0, ..., X})
-> >>> case 2: N clocks mapped to 1 MSTOP bit  (with N=3D{0, ..., X})
-> >>> case 3: N clocks mapped to M MSTOP bits (with N=3D{0, ..., X}, M=3D{0=
-, ..., Y})
-> >>>
-> >>> Case 3 has been currently identified on RZ/V2L for VCPL4 module.
-> >>>
-> >>> To cover all 3 cases the individual platform drivers will provide to
-> >>> clock driver MSTOP register offset and associated bits in this regist=
-er
-> >>> as a bitmask and the clock driver will apply this bitmask to proper
-> >>> MSTOP register.
-> >>>
-> >>> As most of the modules have more than one clock and these clocks are
-> >>> mapped to 1 MSTOP bitmap that need to be applied to MSTOP registers,
-> >>> to avoid switching the module to/out of standby when the module has
-> >>> enabled/disabled clocks a counter has been associated to each module
-> >>> (though struct mstop::count) which is incremented/decremented every
-> >>> time a module's clock is enabled/disabled and the settings to MSTOP
-> >>> register are applied only when the counter reaches zero (counter zero
-> >>> means either 1st clock of the module is going to be enabled or all cl=
-ocks
-> >>> of the module are going to be disabled).
 
-> > After giving this some more thought, it feels odd to derive the standby
-> > state of a module from the state of its module clocks, while the latter
-> > are already controlled through Runtime PM and a Clock Domain.
-> >
-> > A first alternative solution could be to drop the GENPD_FLAG_PM_CLK
-> > flag from the RZ/G2L CPG clock domain, and provide your own
-> > gpd_dev_ops.start() and .stop() callbacks that take care of both
-> > module standby and clocks (through pm_clk_{resume,suspend}().
-> > (See https://elixir.bootlin.com/linux/v6.7-rc2/source/drivers/base/powe=
-r/domain.c#L2093
-> > for the GENPD_FLAG_PM_CLK case).
-> > That still leaves you with a need to associate an MSTOP register and
-> > bitmask with a device through its module clocks.
-> >
-> > A second alternative solution could be to increase #power-domain-cells
-> > from zero to one, and register individual PM Domains for each module,
-> > and control module standby from the generic_pm_domain.power_{on,off}()
-> > callbacks.  Devices would specify the module using the power-domains =
-=3D
-> > <&cpg <id> > property in DT, with <id> one of the to-be-added list of
-> > modules in include/dt-bindings/clock/r9a08g045-cpg.h.  The RZ/G2L CPG
-> > driver can handle the mapping from <id> to MSTOP register and bitmask.
-> > This solution requires updates to DT, but you can keep compatibility
-> > with old DTBs by only registering the new PM Domains when
-> > #power-domain-cells is one.
-> > The extra power saving would only be applicable with new DTBs, though.
+On 12/1/23 16:09, Willem de Bruijn wrote:
+> Song, Yoong Siang wrote:
+>> On Friday, December 1, 2023 6:46 PM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>>> On 12/1/23 07:24, Song Yoong Siang wrote:
+>>>> This series expands XDP TX metadata framework to include ETF HW offload.
+>>>>
+>>>> Changes since v1:
+>>>> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
+>>>> - rename launch-time to txtime
+>>>>
+>>>
+>>> I strongly disagree with this renaming (sorry to disagree with Willem).
+>>>
+>>> The i210 and i225 chips call this LaunchTime in their programmers
+>>> datasheets, and even in the driver code[1].
+>>>
+>>> Using this "txtime" name in the code is also confusing, because how can
+>>> people reading the code know the difference between:
+>>>   - tmo_request_timestamp and tmo_request_txtime
+>>>
+>>
+>> Hi Jesper and Willem,
+>>
+>> How about using "launch_time" for the flag/variable and
+>> "Earliest TxTime First" for the description/comments?
+> 
+
+I don't follow why you are calling the feature:
+  - "Earliest TxTime First" (ETF).
+  - AFAIK this just reference an qdisc name (that most don't know exists)
+
+
+> I don't particularly care which term we use, as long as we're
+> consistent. Especially, don't keep introducing new synonyms.
+> 
+> The fact that one happens to be one vendor's marketing term does not
+> make it preferable, IMHO. On the contrary.
 >
-> I prefer this alternative even though it cannot be applied for old DTBs, =
-it
-> looks to me that is more modular. What do you think?
 
-I prefer the second alternative, too.
+These kind of hardware features are defined as part of Time Sensitive
+Networking (TSN).
+I believe these TSN features are defined as part of IEEE 802.1Qbv (2015)
+and according to Wikipedia[2] incorporated into IEEE 802.1Q.
 
-> The only thing is that MSTOP is not really a power off/on switch (if it
-> would be implemented with generic_pm_domain.power_{on, off}) but is more
+[2] https://en.wikipedia.org/wiki/Time-Sensitive_Networking
 
-That's fine: Linux' PM Domains are fairly generic and abstract, and
-not limited to pure power domains/areas.
 
-> like a clock disable/enable functionality (it should not be an issue
-> though, just saying)... According to manual (I'm referring to Figure 41.4
-> Block Connection Overview for Module Standby Mode of HW manula of RZ/G3S)=
-,
-> it disables/enables the module's bus clock.
+> SO_TXTIME is in the ABI, and EDT has been used publicly in kernel
+> patches and conference talks, e.g., Van Jacobson's Netdev 0x12
+> keynote. Those are vendor agnostic commonly used terms.
+> 
 
-Thanks for the pointer! That picture nicely shows the internal behavior.
-For comparison, on SH/R-Mobile and R-Car SoCs there is a similar
-internal structure, but it is less visible to the programmer:
-there are no individual controls for each clock or reset that is
-fed into a module.  These are all hidden behind a single Module
-Stop resp. Reset control bit.  In Linux, we modeled the module stop
-bit as a gate clock, controlled by Runtime PM through the Clock Domain's
-.start()/.stop() callbacks.
+I agree that EDT (Earliest Departure Time) have become a thing and term
+in our community.
+We could associate this feature with this.
+I do fear what hardware behavior will be it if I e.g. ask it to send a
+packet 2 sec in the future on i225 which max support 1 sec.
+Will hardware send it at 1 sec?
+Because then I'm violating the *Earliest* Departure Time.
 
-Note that you also have to take into account Figure 41.2 ("Modules in
-Power Domain").  When adding support for power transitions later, you
-can register a PM Domain representing PD_ISOVCC, and use that as the
-parent PM Domain for the individual PM Domains for modules belonging
-to PD_ISOVCC.  All of that can be handled in the driver, and would
-not need any changes to DT.
 
-Gr{oetje,eeting}s,
+> But as long as Launch Time is not an Intel only trademark, fine to
+> select that.
 
-                        Geert
+The IEEE 802.1Qbv is sometimes called Time-Aware Shaper (TAS), but I
+don't like to for us to name this after this.  This features is simply
+taking advantage of exposing one of the hardware building blocks
+(controlling/setting packet "launch time") that can be used for
+implementing a TAS.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+I like the name "launch time" because it doesn't get easily confused
+with other timestamps, and intuitively describes packet will be send at
+a specific time (likely in future).
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+--Jesper
 
