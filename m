@@ -1,88 +1,104 @@
-Return-Path: <netdev+bounces-52947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89935800DD5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:02:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF53D800DDC
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B00281C20C12
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A7271C20E19
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AC23E49C;
-	Fri,  1 Dec 2023 15:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0B23FE29;
+	Fri,  1 Dec 2023 15:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnzIEJkg"
 X-Original-To: netdev@vger.kernel.org
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04ED9193;
-	Fri,  1 Dec 2023 07:01:51 -0800 (PST)
-Received: from i53875b61.versanet.de ([83.135.91.97] helo=phil.lan)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1r951T-0000eX-PW; Fri, 01 Dec 2023 16:01:43 +0100
-From: Heiko Stuebner <heiko@sntech.de>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	quentin.schulz@theobroma-systems.com,
-	heiko@sntech.de,
-	Heiko Stuebner <heiko.stuebner@cherry.de>
-Subject: [PATCH 2/2] net: phy: micrel: allow usage of generic ethernet-phy clock
-Date: Fri,  1 Dec 2023 16:01:31 +0100
-Message-Id: <20231201150131.326766-3-heiko@sntech.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231201150131.326766-1-heiko@sntech.de>
-References: <20231201150131.326766-1-heiko@sntech.de>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A906125D7;
+	Fri,  1 Dec 2023 15:02:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40DD3C433C9;
+	Fri,  1 Dec 2023 15:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701442950;
+	bh=HCKgkvZM3p9a1PhMU+0ZdI63NNj7rU/pKhx/Px4fVKY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZnzIEJkgcQPJ9EhwbA+QMxmLvo7Vb5mFoKAoNXH6yHgW+nms/wyXGXewhlB2+aaMv
+	 ggRc0WCfAnmF4J1gGXJNsVm00we+Ush4nAHaDY6/aboqP1YpJAeXkD97yaQm8LF8DA
+	 kcLJiTetD9+tqyUXfvHMuhZjY2ZJFxqDcxvpvNstZflcgXy8ZgkfwU667pQAlZks+n
+	 JLx/dRpoe81S7cz16xFnm3ay1eGU674lCQdb1zXCGrUTHqAKRJwjbY6ZS9z8d7fK1o
+	 4iwBWtKKzMnCl2rC99z3RVqUB/XbA4ZBM/7CWSyEJ5gV7SbzjnjMTZ4SljJxZUkoLX
+	 rN/ROb0OGkmhg==
+Message-ID: <5a660c0f-d3ed-47a2-b9be-098a224b8a12@kernel.org>
+Date: Fri, 1 Dec 2023 16:02:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 2/3] net: stmmac: Add txtime support to XDP ZC
+Content-Language: en-US
+To: Song Yoong Siang <yoong.siang.song@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Topel <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, bpf@vger.kernel.org, xdp-hints@xdp-project.net,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
+ <20231201062421.1074768-3-yoong.siang.song@intel.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20231201062421.1074768-3-yoong.siang.song@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Heiko Stuebner <heiko.stuebner@cherry.de>
 
-The generic ethernet-phy binding allows describing an external clock since
-commit 350b7a258f20 ("dt-bindings: net: phy: Document support for external PHY clk")
-for cases where the phy is not supplied by an oscillator but instead
-by a clock from the host system.
 
-And the old named "rmii-ref" clock from 2014 is only specified for phys
-of the KSZ8021, KSZ8031, KSZ8081, KSZ8091 types.
+On 12/1/23 07:24, Song Yoong Siang wrote:
+> This patch enables txtime support to XDP zero copy via XDP Tx
+> metadata framework.
+> 
+> Signed-off-by: Song Yoong Siang<yoong.siang.song@intel.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
+>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
+>   2 files changed, 15 insertions(+)
 
-So allow retrieving and enabling the optional generic clock on phys that
-do not provide a rmii-ref clock.
+I think we need to see other drivers using this new feature to evaluate
+if API is sane.
 
-Signed-off-by: Heiko Stuebner <heiko.stuebner@cherry.de>
----
- drivers/net/phy/micrel.c | 5 +++++
- 1 file changed, 5 insertions(+)
+I suggest implementing this for igc driver (chip i225) and also for igb
+(i210 chip) that both support this kind of LaunchTime feature in HW.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index ec6a39dc9053..9490849437c0 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -2021,6 +2021,11 @@ static int kszphy_probe(struct phy_device *phydev)
- 				   rate);
- 			return -EINVAL;
- 		}
-+	} else if (!clk) {
-+		/* unnamed clock from the generic ethernet-phy binding */
-+		clk = devm_clk_get_optional_enabled(&phydev->mdio.dev, NULL);
-+		if (IS_ERR(clk))
-+			return PTR_ERR(clk);
- 	}
- 
- 	if (ksz8041_fiber_mode(phydev))
--- 
-2.39.2
+The API and stmmac driver takes a u64 as time.
+I'm wondering how this applies to i210 that[1] have 25-bit for
+LaunchTime (with 32 nanosec granularity) limiting LaunchTime max 0.5
+second into the future.
+And i225 that [1] have 30-bit max 1 second into the future.
+
+
+[1] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/tsn/code01_follow_qdisc_TSN_offload.org
 
 
