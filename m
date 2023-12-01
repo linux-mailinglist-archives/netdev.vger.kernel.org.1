@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-53131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010318016AE
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:41:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B6728016AF
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9551F210A3
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2A83281FB4
 	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150434EB3B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AAF59E39;
 	Fri,  1 Dec 2023 22:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NwE6Y0Ft"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fhFA2RQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D952D54
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:40:09 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-423dccefb68so31494201cf.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:40:09 -0800 (PST)
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA8ED6C
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:40:11 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3b898c9b4cbso661733b6e.2
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:40:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470408; x=1702075208; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470410; x=1702075210; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pOYk4fkGrDBENn1GOG5KQeQwyEmzzvV5BVXavJ5SDWo=;
-        b=NwE6Y0FtnLV+HuXq25dltjQCsOydnBlTKSUQOolmVvhd8zcSABVl3qNTJD1GS7i+GD
-         Po8OgRo+7WuXxVXSh9gXLZ2zj0DEATNGeLDaWRL4To2YYvWtdYE6MgbUOWaKq2yYgviF
-         c1/rzWdMDkP1y9HxvO5bYW3rE8515C4qxTOs4=
+        bh=M/ylkDUKYu37ksKA8wjvf2p0y9xAMd+N7Kg6P8PKXQU=;
+        b=fhFA2RQkwcrBqUQfeG1kM7nsxaJWOjAmk9OrSjwjl9QmuGAq88cBwDyinWu0IbJrF5
+         iVOOIr0Oi7M/FHM/swkH6esXXhOrOyZmBAgH4Dd/HkbWt+hlPk4YwAdZwNKLR172ry6T
+         LTF1WXbisgomtnEOU+q23MmCLwm0THr1YQs1g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470408; x=1702075208;
+        d=1e100.net; s=20230601; t=1701470410; x=1702075210;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pOYk4fkGrDBENn1GOG5KQeQwyEmzzvV5BVXavJ5SDWo=;
-        b=vtYKeii8tcFFPR5WpIojGbeBwC3xZK3cr7t7ORiHD0WfWFCz9D2/EfdbmFIZqNYloT
-         aBpsCEaN9W8LP1lXx2AiO2ogkEIq8PDgjc3Myu03v3ecO/6Rq0xjX0vZ7p3u2MqAw5JZ
-         3VXcUvRA6PrCJOdzOsNcpQUjfjGtdSAynU4Ttt0qTYYhZSq/OJkeDWr2F2c4gboW8smM
-         8VfXAMZNA6qdgSWAECuYklLE8EXIwGwwXTgIrK8sUXbV5xCFcdExrzWVF2yKi8U49yqT
-         F9E3fkovjX5VB5j+36VtR5pj4EuuM2cm8ffaB8bjH/+4LsZ9Dg4gEqDOvwxt6K4Zk3lM
-         Z5Sg==
-X-Gm-Message-State: AOJu0YwqEi3YM5f4XkoRczAoDDDJnqKT/W5p6XGbRIKLfw+Nt5g8F6rs
-	0YidKS1gqbNAXyxtUwn7fHCaBQ==
-X-Google-Smtp-Source: AGHT+IEgCSRd8qHWmsm1IeVqYug1BjcmikN3Ym6z3BHDf+lgiaRWxCo/iPdMbcUpNOtnZH15rKFcew==
-X-Received: by 2002:a05:622a:514:b0:423:7255:3c7e with SMTP id l20-20020a05622a051400b0042372553c7emr416887qtx.17.1701470408446;
-        Fri, 01 Dec 2023 14:40:08 -0800 (PST)
+        bh=M/ylkDUKYu37ksKA8wjvf2p0y9xAMd+N7Kg6P8PKXQU=;
+        b=T+rKN8/qCnlNzH5pPnfR2bDaUJEFab+YlGO2m9iHvBh+fHOGx8WTqIj1MP5O3/aph1
+         YK07RE1oUloNJdhjTkq66Z9dd4yQ5kdFO0rBO1VSwYrFl/KveSqKhzvoqHSMWzhz881u
+         uoI+OaNbIZwWghuEONPo9DFcltFz/MpSEqKQcrQHxWy/MEsDAwu3v+OFrxExto/dLNYq
+         LbY4gwuOyn9+HvNBMp+GnIYa142QdGFmHze2kh/5FM24JG/KUgXFOWDTAuxdTjlrU+0l
+         6VEBKyyx2zPMCiIrr+IISc7vQ4E2gkt9FABELxkJm+CACWC1OYCW4YpRHwFgFb0NWavg
+         tGTg==
+X-Gm-Message-State: AOJu0YwPsno44QB6TOwb9KU4jdQilFy2OLWJdoYjywsFElN2K4PBnT5+
+	8m+VugODG6OOMBrATvuKelZGLg==
+X-Google-Smtp-Source: AGHT+IHCu/F1xmiuFVmOyvczy//1hgux2iQ7CdA3Gz9ljiEvMAanC4vf4Mttalyvz8mYUjeOMAKuTg==
+X-Received: by 2002:a05:6808:487:b0:3b8:97fe:7cfe with SMTP id z7-20020a056808048700b003b897fe7cfemr281388oid.9.1701470410155;
+        Fri, 01 Dec 2023 14:40:10 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.40.06
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.40.08
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:40:07 -0800 (PST)
+        Fri, 01 Dec 2023 14:40:09 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com,
-	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-Subject: [PATCH net-next 14/15] bnxt_en: Report the new ethtool link modes in the new firmware interface
-Date: Fri,  1 Dec 2023 14:39:23 -0800
-Message-Id: <20231201223924.26955-15-michael.chan@broadcom.com>
+	gospo@broadcom.com
+Subject: [PATCH net-next 15/15] bnxt_en: Add 5760X (P7) PCI IDs
+Date: Fri,  1 Dec 2023 14:39:24 -0800
+Message-Id: <20231201223924.26955-16-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -69,299 +68,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000050c11a060b7a7321"
+	boundary="00000000000070ccff060b7a7346"
 
---00000000000050c11a060b7a7321
+--00000000000070ccff060b7a7346
 Content-Transfer-Encoding: 8bit
 
-Add new look up entries to convert the new supported speeds, advertised
-speeds, etc to ethtool link modes.
+Now with basic support for the new chip family, add the PCI IDs of the
+new devices.
 
-Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 171 ++++++++++++++++--
- 1 file changed, 151 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h | 4 ++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 0a7dd48f1da8..bb9cab821587 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1577,6 +1577,22 @@ static const enum bnxt_media_type bnxt_phy_types[] = {
- 	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR2] = BNXT_MEDIA_SR,
- 	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR2] = BNXT_MEDIA_LR_ER_FR,
- 	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER2] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASECR] = BNXT_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASESR] = BNXT_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASELR] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_100G_BASEER] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASECR2] = BNXT_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASESR2] = BNXT_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASELR2] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_200G_BASEER2] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR8] = BNXT_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR8] = BNXT_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR8] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER8] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASECR4] = BNXT_MEDIA_CR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASESR4] = BNXT_MEDIA_SR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASELR4] = BNXT_MEDIA_LR_ER_FR,
-+	[PORT_PHY_QCFG_RESP_PHY_TYPE_400G_BASEER4] = BNXT_MEDIA_LR_ER_FR,
- };
- 
- static enum bnxt_media_type
-@@ -1604,6 +1620,7 @@ enum bnxt_link_speed_indices {
- 	BNXT_LINK_SPEED_50GB_IDX,
- 	BNXT_LINK_SPEED_100GB_IDX,
- 	BNXT_LINK_SPEED_200GB_IDX,
-+	BNXT_LINK_SPEED_400GB_IDX,
- 	__BNXT_LINK_SPEED_END
- };
- 
-@@ -1615,9 +1632,21 @@ static enum bnxt_link_speed_indices bnxt_fw_speed_idx(u16 speed)
- 	case BNXT_LINK_SPEED_10GB: return BNXT_LINK_SPEED_10GB_IDX;
- 	case BNXT_LINK_SPEED_25GB: return BNXT_LINK_SPEED_25GB_IDX;
- 	case BNXT_LINK_SPEED_40GB: return BNXT_LINK_SPEED_40GB_IDX;
--	case BNXT_LINK_SPEED_50GB: return BNXT_LINK_SPEED_50GB_IDX;
--	case BNXT_LINK_SPEED_100GB: return BNXT_LINK_SPEED_100GB_IDX;
--	case BNXT_LINK_SPEED_200GB: return BNXT_LINK_SPEED_200GB_IDX;
-+	case BNXT_LINK_SPEED_50GB:
-+	case BNXT_LINK_SPEED_50GB_PAM4:
-+		return BNXT_LINK_SPEED_50GB_IDX;
-+	case BNXT_LINK_SPEED_100GB:
-+	case BNXT_LINK_SPEED_100GB_PAM4:
-+	case BNXT_LINK_SPEED_100GB_PAM4_112:
-+		return BNXT_LINK_SPEED_100GB_IDX;
-+	case BNXT_LINK_SPEED_200GB:
-+	case BNXT_LINK_SPEED_200GB_PAM4:
-+	case BNXT_LINK_SPEED_200GB_PAM4_112:
-+		return BNXT_LINK_SPEED_200GB_IDX;
-+	case BNXT_LINK_SPEED_400GB:
-+	case BNXT_LINK_SPEED_400GB_PAM4:
-+	case BNXT_LINK_SPEED_400GB_PAM4_112:
-+		return BNXT_LINK_SPEED_400GB_IDX;
- 	default: return BNXT_LINK_SPEED_UNKNOWN;
- 	}
- }
-@@ -1690,6 +1719,12 @@ bnxt_link_modes[__BNXT_LINK_SPEED_END][BNXT_SIG_MODE_MAX][__BNXT_MEDIA_END] = {
- 			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT,
- 			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
- 		},
-+		[BNXT_SIG_MODE_PAM4_112] = {
-+			[BNXT_MEDIA_CR] = ETHTOOL_LINK_MODE_100000baseCR_Full_BIT,
-+			[BNXT_MEDIA_SR] = ETHTOOL_LINK_MODE_100000baseSR_Full_BIT,
-+			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_100000baseKR_Full_BIT,
-+			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT,
-+		},
- 	},
- 	[BNXT_LINK_SPEED_200GB_IDX] = {
- 		[BNXT_SIG_MODE_PAM4] = {
-@@ -1698,6 +1733,26 @@ bnxt_link_modes[__BNXT_LINK_SPEED_END][BNXT_SIG_MODE_MAX][__BNXT_MEDIA_END] = {
- 			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
- 			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT,
- 		},
-+		[BNXT_SIG_MODE_PAM4_112] = {
-+			[BNXT_MEDIA_CR] = ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT,
-+			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT,
-+			[BNXT_MEDIA_SR] = ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT,
-+			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT,
-+		},
-+	},
-+	[BNXT_LINK_SPEED_400GB_IDX] = {
-+		[BNXT_SIG_MODE_PAM4] = {
-+			[BNXT_MEDIA_CR] = ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT,
-+			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_400000baseKR8_Full_BIT,
-+			[BNXT_MEDIA_SR] = ETHTOOL_LINK_MODE_400000baseSR8_Full_BIT,
-+			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_400000baseLR8_ER8_FR8_Full_BIT,
-+		},
-+		[BNXT_SIG_MODE_PAM4_112] = {
-+			[BNXT_MEDIA_CR] = ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT,
-+			[BNXT_MEDIA_KR] = ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT,
-+			[BNXT_MEDIA_SR] = ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT,
-+			[BNXT_MEDIA_LR_ER_FR] = ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT,
-+		},
- 	},
- };
- 
-@@ -1762,7 +1817,8 @@ static void bnxt_get_ethtool_modes(struct bnxt_link_info *link_info,
- 				 lk_ksettings->link_modes.supported);
- 	}
- 
--	if (link_info->support_auto_speeds || link_info->support_pam4_auto_speeds)
-+	if (link_info->support_auto_speeds || link_info->support_auto_speeds2 ||
-+	    link_info->support_pam4_auto_speeds)
- 		linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
- 				 lk_ksettings->link_modes.supported);
- 
-@@ -1798,6 +1854,30 @@ static const u16 bnxt_pam4_speed_masks[] = {
- 	[BNXT_LINK_SPEED_50GB_IDX] = BNXT_LINK_PAM4_SPEED_MSK_50GB,
- 	[BNXT_LINK_SPEED_100GB_IDX] = BNXT_LINK_PAM4_SPEED_MSK_100GB,
- 	[BNXT_LINK_SPEED_200GB_IDX] = BNXT_LINK_PAM4_SPEED_MSK_200GB,
-+	[__BNXT_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-+};
-+
-+static const u16 bnxt_nrz_speeds2_masks[] = {
-+	[BNXT_LINK_SPEED_1GB_IDX] = BNXT_LINK_SPEEDS2_MSK_1GB,
-+	[BNXT_LINK_SPEED_10GB_IDX] = BNXT_LINK_SPEEDS2_MSK_10GB,
-+	[BNXT_LINK_SPEED_25GB_IDX] = BNXT_LINK_SPEEDS2_MSK_25GB,
-+	[BNXT_LINK_SPEED_40GB_IDX] = BNXT_LINK_SPEEDS2_MSK_40GB,
-+	[BNXT_LINK_SPEED_50GB_IDX] = BNXT_LINK_SPEEDS2_MSK_50GB,
-+	[BNXT_LINK_SPEED_100GB_IDX] = BNXT_LINK_SPEEDS2_MSK_100GB,
-+	[__BNXT_LINK_SPEED_END - 1] = 0 /* make any legal speed a valid index */
-+};
-+
-+static const u16 bnxt_pam4_speeds2_masks[] = {
-+	[BNXT_LINK_SPEED_50GB_IDX] = BNXT_LINK_SPEEDS2_MSK_50GB_PAM4,
-+	[BNXT_LINK_SPEED_100GB_IDX] = BNXT_LINK_SPEEDS2_MSK_100GB_PAM4,
-+	[BNXT_LINK_SPEED_200GB_IDX] = BNXT_LINK_SPEEDS2_MSK_200GB_PAM4,
-+	[BNXT_LINK_SPEED_400GB_IDX] = BNXT_LINK_SPEEDS2_MSK_400GB_PAM4,
-+};
-+
-+static const u16 bnxt_pam4_112_speeds2_masks[] = {
-+	[BNXT_LINK_SPEED_100GB_IDX] = BNXT_LINK_SPEEDS2_MSK_100GB_PAM4_112,
-+	[BNXT_LINK_SPEED_200GB_IDX] = BNXT_LINK_SPEEDS2_MSK_200GB_PAM4_112,
-+	[BNXT_LINK_SPEED_400GB_IDX] = BNXT_LINK_SPEEDS2_MSK_400GB_PAM4_112,
- };
- 
- static enum bnxt_link_speed_indices
-@@ -1808,12 +1888,26 @@ bnxt_encoding_speed_idx(u8 sig_mode, u16 phy_flags, u16 speed_msk)
- 
- 	switch (sig_mode) {
- 	case BNXT_SIG_MODE_NRZ:
--		speeds = bnxt_nrz_speed_masks;
--		len = ARRAY_SIZE(bnxt_nrz_speed_masks);
-+		if (phy_flags & BNXT_PHY_FL_SPEEDS2) {
-+			speeds = bnxt_nrz_speeds2_masks;
-+			len = ARRAY_SIZE(bnxt_nrz_speeds2_masks);
-+		} else {
-+			speeds = bnxt_nrz_speed_masks;
-+			len = ARRAY_SIZE(bnxt_nrz_speed_masks);
-+		}
- 		break;
- 	case BNXT_SIG_MODE_PAM4:
--		speeds = bnxt_pam4_speed_masks;
--		len = ARRAY_SIZE(bnxt_pam4_speed_masks);
-+		if (phy_flags & BNXT_PHY_FL_SPEEDS2) {
-+			speeds = bnxt_pam4_speeds2_masks;
-+			len = ARRAY_SIZE(bnxt_pam4_speeds2_masks);
-+		} else {
-+			speeds = bnxt_pam4_speed_masks;
-+			len = ARRAY_SIZE(bnxt_pam4_speed_masks);
-+		}
-+		break;
-+	case BNXT_SIG_MODE_PAM4_112:
-+		speeds = bnxt_pam4_112_speeds2_masks;
-+		len = ARRAY_SIZE(bnxt_pam4_112_speeds2_masks);
- 		break;
- 	default:
- 		return BNXT_LINK_SPEED_UNKNOWN;
-@@ -1872,14 +1966,23 @@ bnxt_get_all_ethtool_support_speeds(struct bnxt_link_info *link_info,
- 				    struct ethtool_link_ksettings *lk_ksettings)
- {
- 	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
- 	u16 phy_flags = bp->phy_flags;
- 
--	bnxt_get_ethtool_speeds(link_info->support_speeds, media,
--				BNXT_SIG_MODE_NRZ, phy_flags,
-+	if (phy_flags & BNXT_PHY_FL_SPEEDS2) {
-+		sp_nrz = link_info->support_speeds2;
-+		sp_pam4 = link_info->support_speeds2;
-+		sp_pam4_112 = link_info->support_speeds2;
-+	} else {
-+		sp_nrz = link_info->support_speeds;
-+		sp_pam4 = link_info->support_pam4_speeds;
-+	}
-+	bnxt_get_ethtool_speeds(sp_nrz, media, BNXT_SIG_MODE_NRZ, phy_flags,
- 				lk_ksettings->link_modes.supported);
--	bnxt_get_ethtool_speeds(link_info->support_pam4_speeds, media,
--				BNXT_SIG_MODE_PAM4, phy_flags,
-+	bnxt_get_ethtool_speeds(sp_pam4, media, BNXT_SIG_MODE_PAM4, phy_flags,
- 				lk_ksettings->link_modes.supported);
-+	bnxt_get_ethtool_speeds(sp_pam4_112, media, BNXT_SIG_MODE_PAM4_112,
-+				phy_flags, lk_ksettings->link_modes.supported);
- }
- 
- static void
-@@ -1888,14 +1991,22 @@ bnxt_get_all_ethtool_adv_speeds(struct bnxt_link_info *link_info,
- 				struct ethtool_link_ksettings *lk_ksettings)
- {
- 	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 sp_nrz, sp_pam4, sp_pam4_112 = 0;
- 	u16 phy_flags = bp->phy_flags;
- 
--	bnxt_get_ethtool_speeds(link_info->advertising, media,
--				BNXT_SIG_MODE_NRZ, phy_flags,
-+	sp_nrz = link_info->advertising;
-+	if (phy_flags & BNXT_PHY_FL_SPEEDS2) {
-+		sp_pam4 = link_info->advertising;
-+		sp_pam4_112 = link_info->advertising;
-+	} else {
-+		sp_pam4 = link_info->advertising_pam4;
-+	}
-+	bnxt_get_ethtool_speeds(sp_nrz, media, BNXT_SIG_MODE_NRZ, phy_flags,
- 				lk_ksettings->link_modes.advertising);
--	bnxt_get_ethtool_speeds(link_info->advertising_pam4, media,
--				BNXT_SIG_MODE_PAM4, phy_flags,
-+	bnxt_get_ethtool_speeds(sp_pam4, media, BNXT_SIG_MODE_PAM4, phy_flags,
- 				lk_ksettings->link_modes.advertising);
-+	bnxt_get_ethtool_speeds(sp_pam4_112, media, BNXT_SIG_MODE_PAM4_112,
-+				phy_flags, lk_ksettings->link_modes.advertising);
- }
- 
- static void
-@@ -1940,22 +2051,42 @@ static void bnxt_update_speed(u32 *delta, bool installed_media, u16 *speeds,
- static void bnxt_set_ethtool_speeds(struct bnxt_link_info *link_info,
- 				    const unsigned long *et_mask)
- {
-+	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
-+	u16 const *sp_msks, *sp_pam4_msks, *sp_pam4_112_msks;
- 	enum bnxt_media_type media = bnxt_get_media(link_info);
-+	u16 *adv, *adv_pam4, *adv_pam4_112 = NULL;
-+	u32 delta_pam4_112 = 0;
- 	u32 delta_pam4 = 0;
- 	u32 delta_nrz = 0;
- 	int i, m;
- 
-+	adv = &link_info->advertising;
-+	if (bp->phy_flags & BNXT_PHY_FL_SPEEDS2) {
-+		adv_pam4 = &link_info->advertising;
-+		adv_pam4_112 = &link_info->advertising;
-+		sp_msks = bnxt_nrz_speeds2_masks;
-+		sp_pam4_msks = bnxt_pam4_speeds2_masks;
-+		sp_pam4_112_msks = bnxt_pam4_112_speeds2_masks;
-+	} else {
-+		adv_pam4 = &link_info->advertising_pam4;
-+		sp_msks = bnxt_nrz_speed_masks;
-+		sp_pam4_msks = bnxt_pam4_speed_masks;
-+	}
- 	for (i = 1; i < __BNXT_LINK_SPEED_END; i++) {
- 		/* accept any legal media from user */
- 		for (m = 1; m < __BNXT_MEDIA_END; m++) {
- 			bnxt_update_speed(&delta_nrz, m == media,
--					  &link_info->advertising,
--					  bnxt_nrz_speed_masks[i], et_mask,
-+					  adv, sp_msks[i], et_mask,
- 					  bnxt_link_modes[i][BNXT_SIG_MODE_NRZ][m]);
- 			bnxt_update_speed(&delta_pam4, m == media,
--					  &link_info->advertising_pam4,
--					  bnxt_pam4_speed_masks[i], et_mask,
-+					  adv_pam4, sp_pam4_msks[i], et_mask,
- 					  bnxt_link_modes[i][BNXT_SIG_MODE_PAM4][m]);
-+			if (!adv_pam4_112)
-+				continue;
-+
-+			bnxt_update_speed(&delta_pam4_112, m == media,
-+					  adv_pam4_112, sp_pam4_112_msks[i], et_mask,
-+					  bnxt_link_modes[i][BNXT_SIG_MODE_PAM4_112][m]);
- 		}
- 	}
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 5f6c4644271c..a405c89b00d3 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -120,6 +120,10 @@ static const struct {
+ 	[BCM57508] = { "Broadcom BCM57508 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
+ 	[BCM57504] = { "Broadcom BCM57504 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
+ 	[BCM57502] = { "Broadcom BCM57502 NetXtreme-E 10Gb/25Gb/50Gb Ethernet" },
++	[BCM57608] = { "Broadcom BCM57608 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb/400Gb Ethernet" },
++	[BCM57604] = { "Broadcom BCM57604 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
++	[BCM57602] = { "Broadcom BCM57602 NetXtreme-E 10Gb/25Gb/50Gb/100Gb Ethernet" },
++	[BCM57601] = { "Broadcom BCM57601 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb/400Gb Ethernet" },
+ 	[BCM57508_NPAR] = { "Broadcom BCM57508 NetXtreme-E Ethernet Partition" },
+ 	[BCM57504_NPAR] = { "Broadcom BCM57504 NetXtreme-E Ethernet Partition" },
+ 	[BCM57502_NPAR] = { "Broadcom BCM57502 NetXtreme-E Ethernet Partition" },
+@@ -174,6 +178,10 @@ static const struct pci_device_id bnxt_pci_tbl[] = {
+ 	{ PCI_VDEVICE(BROADCOM, 0x1750), .driver_data = BCM57508 },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1751), .driver_data = BCM57504 },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1752), .driver_data = BCM57502 },
++	{ PCI_VDEVICE(BROADCOM, 0x1760), .driver_data = BCM57608 },
++	{ PCI_VDEVICE(BROADCOM, 0x1761), .driver_data = BCM57604 },
++	{ PCI_VDEVICE(BROADCOM, 0x1762), .driver_data = BCM57602 },
++	{ PCI_VDEVICE(BROADCOM, 0x1763), .driver_data = BCM57601 },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1800), .driver_data = BCM57502_NPAR },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1801), .driver_data = BCM57504_NPAR },
+ 	{ PCI_VDEVICE(BROADCOM, 0x1802), .driver_data = BCM57508_NPAR },
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index d8c2b0790117..afa784305fea 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1906,6 +1906,10 @@ enum board_idx {
+ 	BCM57508_NPAR,
+ 	BCM57504_NPAR,
+ 	BCM57502_NPAR,
++	BCM57608,
++	BCM57604,
++	BCM57602,
++	BCM57601,
+ 	BCM58802,
+ 	BCM58804,
+ 	BCM58808,
 -- 
 2.30.1
 
 
---00000000000050c11a060b7a7321
+--00000000000070ccff060b7a7346
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -432,14 +199,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE34NhlP3VvNSOaxfMzcX1KCzel83eJl
-EpQFWWTqqLWWMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyNDAwOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEzGXHhmPiyQRwB8SNBQ7+/DG1/vEM23
+U1QmUxBaJSzbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyNDAxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAnQlo6VKMMX7ekuKcDwJK/R3+UXM15dmAaBPtQhR1ngxPFHJHC
-wwbumC80G0JbXhZaDcCxGI9XbT99Ampjtgv2d7p8FIlRhT7Bxmcytiqt1FAlRe1/I2W4Hs0TSMpG
-KbhGfg3f7m208PdfspNzzZF3TDl3C5DSLO4jhlZJ2Uerk4sVzFJICw2ojeESxpizFhbrXi4qyVG6
-eVaDDrzPiFZUh029m8qq3Wa/4foJAjanO4JzJBIUkQbvBjzNMN3+y1ATFmg2uFZ4zJ7KDopYD95c
-GgDA3Fxv5Jbt5B2vwwYVSs7yjaIa6/D7RIx3HvJdkMMRT4mgKxWYbtpMRY5+MWA0
---00000000000050c11a060b7a7321--
+ATANBgkqhkiG9w0BAQEFAASCAQAtCcy1HuRD9pjlu9/DGKnLsrnUkooBtZtPxgGSpN8PseeBgGQa
+Lc94Rm56VM4jQlYxGdGx1OxJMRt6PNVh3bSZYpjNUXy8WcSZv/iy98/pmWAemYjHjXPcuyPM2IPX
+VRjNZtGgDGlbmqcyi7G5MpjWMOR56VG5X/3VxwMzDvBVeTw+GYDajpTxKg5BRf9L731BVkC1cHpP
+3pDcQ13bl8ttjJdB3MoB98pl0bg3Sbm7EEpphMyH4V7MZUwE316R80bOfYSTkQpIHW3UHkXGiGHZ
+krynT17EtrqjEkuT0jP+4S0P170f2i675FuLltQpTCWGP6n7vx/Wk/Mqi3zYMJha
+--00000000000070ccff060b7a7346--
 
