@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-53133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439058016C3
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:41:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358E6801737
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 731CE1C20EBC
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:41:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB26F1F20FDA
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6998D3F8DC;
-	Fri,  1 Dec 2023 22:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C773F8C9;
+	Fri,  1 Dec 2023 23:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpzgGHqB"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jinn21TH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8170AD;
-	Fri,  1 Dec 2023 14:41:12 -0800 (PST)
-Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3b8929269a0so785402b6e.1;
-        Fri, 01 Dec 2023 14:41:12 -0800 (PST)
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0063490
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 15:00:19 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3b844e3e817so750344b6e.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 15:00:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701470472; x=1702075272; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HppQFlrOhl3DpBuO1vH2x7JNHeOPGUaD7VcYDrznbHA=;
-        b=NpzgGHqBLa4rhwf3pIJlYKpT/UzcFSF4zjZNTAySmMD8jHy83hw4NXcTcXfD2nRcbC
-         Cl4XSG5nilG538gqgQJkiBQd9t7q7teyZrtBPGL88Llt0AGI+00hW+WZnjDIL2TeqwER
-         o1RpCObGgcNAbbS0i7HMg+WFREEe1AU+uUh57mVVbMWPzMGsBFwfCSJWC4t4c31gO9gK
-         PQdNtP7Y+2v0xv+L+LOu6u55OegMHN7Tlctb5pwRaCeFaotFY63HDxLqupJUxbuwk+VQ
-         lIZ1I7krCL/kDRaBK5UXv1ldbIO+iArjNfGZaU67ncy2peahrK0eXKRdMD4dVZuAC/dV
-         cf5w==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701471619; x=1702076419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZdCEdkIzxRkw9uVoHT4u6L8OnkYy+pL1LkGUviftO20=;
+        b=jinn21THagA2jM1x4iOjkAcl2bqiqKMktxWHv0SryX8xMq0N0kV/sNRJPRkHOSSsG8
+         LuGVWXFFlaSHP0pI2Wy6LMEY1Ux6nNUl51oxFwLqmg0JNhNj0OvAa+QS4pmwJaCxDBct
+         Z5pDiH/sqoinpvy6ahDAjW+VZyaUvBhAv5heWZtCKCTN1H37MLJkafDH5cWu1rXQ+hIl
+         /Mlguuh0YZSc4TIwO2E4U6Ek++w1k9v7jZ6Ijzq6BUbXrtWvY7m/Y6pSV7LIZGw+pGwU
+         ElioiSsnr8qpFPgDZlSuA8dLmfO/DRULgq8CWJTKLmHwMGSCLL7oe3aP5sSh94BHd+Bn
+         RGMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470472; x=1702075272;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HppQFlrOhl3DpBuO1vH2x7JNHeOPGUaD7VcYDrznbHA=;
-        b=YP/Qg9AAkj6i2+p4Ddu7AEbplTx04aN64GnWBOyJcLw+WlupUQKCsSU8W2gtzx8Vv7
-         3NrERNQIyzlLytPT1vM0ONiVAFSx1NOujwAU6V/jBgHPRdVIj41hh2VvfjRH0tup2yjF
-         qoKjiRQtAJzitKysqLZ0HjqPvpU2m690K+94FZXmBZ5n2v6r8lmqWg5cjRlZty0U1J+m
-         wH4+9JurLq23wrFtiNnplBQiyOsWbMlrjrP7CFwgWGwcS6MW0PzfOeAMzbnZesw2oBSQ
-         QhuiEZbAoHWI0rWWwlK4x1UlaZI53A6WnyZE3IZZgLfB5/JHnfBp9dvt2vSvrNN1aIbm
-         z+/g==
-X-Gm-Message-State: AOJu0Yw4yA7br1nXz9jbkf2Eb/bmbHBAa0B3Z3QQYq6n1msEloKTuXBc
-	WD4Ooi989K7G6Wz/X5bR8OU=
-X-Google-Smtp-Source: AGHT+IHUOL8efQZ4MRUvrrftFGV9/JlRPQPOPPiIMIUEfpYOV6SvhxXGWaxD6FdpVtbfxmrjKFPZww==
-X-Received: by 2002:a05:6358:2606:b0:16b:c43f:3da4 with SMTP id l6-20020a056358260600b0016bc43f3da4mr279561rwc.3.1701470471955;
-        Fri, 01 Dec 2023 14:41:11 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id js3-20020a17090b148300b002809822545dsm3626410pjb.32.2023.12.01.14.41.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:41:11 -0800 (PST)
-Message-ID: <ecbdcfb7-32ab-45cc-991a-982c52bf4b14@gmail.com>
-Date: Fri, 1 Dec 2023 14:41:09 -0800
+        d=1e100.net; s=20230601; t=1701471619; x=1702076419;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZdCEdkIzxRkw9uVoHT4u6L8OnkYy+pL1LkGUviftO20=;
+        b=ZB8/2wa7SbNRlzptZ2eK0hcDEWn/SmKhTWMy/CavAhCKnZrDd+wrpAyRnbcxy1lnT1
+         gKL3vbGTLtF+P1U2Pe7mesdi4RrOpDKokaVXVRw1aDzjwNYaUq36tgiuYGQSy2hmulbI
+         2gGjsaaaRc+DC9z+tbhsWXaof0ihqvQ+H1mcy2DumvaMIlUidtZN/AP/Vf4SpS+xv4cp
+         okAieutSZtDID6Jf/3bsTDRWdUGZtTN3OhQ9lt/KY2opq01hB8ADsV1CVdKZy5spsDFA
+         0KiwzCFYQpqDKMfn0x/v6pQL7EOrKGA0VJEtjT3ECUVl8/G+9vXzAn7zQElJrucFCm9T
+         PWUQ==
+X-Gm-Message-State: AOJu0Yz3VS0t2jnbCqgnT0a9cUnz6djMFZwv40b/Ci/LY9ORepjE+sTA
+	uSR2zqng02XLp/u0kyeDuN7jMJwzgyYQywI81VI=
+X-Google-Smtp-Source: AGHT+IG1lS0lLtwxPZbyG4JUmhu4IideDFKndRQ0/dylXEGGAtJi91NdjLHiOrARU9PeOl2ptHK56Q==
+X-Received: by 2002:a05:6808:1241:b0:3b8:4d7b:9259 with SMTP id o1-20020a056808124100b003b84d7b9259mr379135oiv.35.1701471619301;
+        Fri, 01 Dec 2023 15:00:19 -0800 (PST)
+Received: from localhost.localdomain ([2804:7f1:e2c0:638:b3b3:3480:1b98:451d])
+        by smtp.gmail.com with ESMTPSA id y62-20020a62ce41000000b006be0fb89ac3sm3632124pfg.30.2023.12.01.15.00.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 15:00:18 -0800 (PST)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@iogearbox.net
+Cc: dcaratti@redhat.com,
+	netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: [PATCH net-next v2 0/3] net: sched: Make tc-related drop reason more flexible for remaining qdiscs
+Date: Fri,  1 Dec 2023 20:00:08 -0300
+Message-ID: <20231201230011.2925305-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: mdio: enable optional clock when registering a phy
- from devicetree
-Content-Language: en-US
-To: Heiko Stuebner <heiko@sntech.de>, andrew@lunn.ch, hkallweit1@gmail.com
-Cc: linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, quentin.schulz@theobroma-systems.com,
- Heiko Stuebner <heiko.stuebner@cherry.de>
-References: <20231201142453.324697-1-heiko@sntech.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231201142453.324697-1-heiko@sntech.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/1/23 06:24, Heiko Stuebner wrote:
-> From: Heiko Stuebner <heiko.stuebner@cherry.de>
-> 
-> The ethernet-phy binding (now) specifys that phys can declare a clock
-> supply. Phy driver itself will handle this when probing the phy-driver.
-> 
-> But there is a gap when trying to detect phys, because the mdio-bus needs
-> to talk to the phy to get its phy-id. Using actual phy-ids in the dt like
->         compatible = "ethernet-phy-id0022.1640",
->                      "ethernet-phy-ieee802.3-c22";
-> of course circumvents this, but in turn hard-codes the phy.
+This patch builds on Daniel's patch[1] to add initial support of tc drop
+reason. The main goal is to distinguish between policy and error drops for
+the remainder of the egress qdiscs (other than clsact).
+The drop reason is set by cls_api and act_api in the tc skb cb in case
+any error occurred in the data path.
 
-But it is the established practice for situations like those where you 
-need specific resources to be available in order to identify the device 
-you are trying to probe/register.
+Also add new skb drop reasons that are idiosyncratic to TC.
 
-You can get away here with the clock API because it can operate on 
-device_node, and you might be able with a bunch of other "resources" 
-subsystems, but for instance with regulators, that won't work, we need a 
-"struct device" which won't be created because that is exactly what we 
-are trying to do.
+[1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
 
-Also this only works for OF, not for ACPI or other yet to come firmware 
-interface.
+Changes in V2:
+- Dropped RFC tag
+- Removed check for drop reason being overwritten by filter in cls_api.c
+- Simplified logic and removed function tcf_init_drop_reason
 
-Sorry but NACK.
+Victor Nogueira (3):
+  net: sched: Move drop_reason to struct tc_skb_cb
+  net: sched: Make tc-related drop reason more flexible for remaining
+    qdiscs
+  net: sched: Add initial TC error skb drop reasons
 
-I am sympathetic to the idea that if you have multiple boards and you 
-may have multiple PHY vendors this may not really scale, but in 2023 you 
-have boot loaders aware of the Device Tree which can do all sorts of 
-live DTB patching to provide the kernel with a "perfect" view of the world.
+ include/net/dropreason-core.h | 30 +++++++++++++++++++++++++++---
+ include/net/pkt_cls.h         |  6 ------
+ include/net/pkt_sched.h       | 18 ------------------
+ include/net/sch_generic.h     | 32 +++++++++++++++++++++++++++++++-
+ net/core/dev.c                | 12 ++++++++----
+ net/sched/act_api.c           |  3 ++-
+ net/sched/cls_api.c           | 31 +++++++++++++++----------------
+ 7 files changed, 83 insertions(+), 49 deletions(-)
+
 -- 
-Florian
+2.25.1
 
 
