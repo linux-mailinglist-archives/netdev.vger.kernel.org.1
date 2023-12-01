@@ -1,234 +1,166 @@
-Return-Path: <netdev+bounces-52772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECB08002EC
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:15:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29997800308
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:33:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29531B20C4F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 05:15:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7834281407
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 05:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77730441B;
-	Fri,  1 Dec 2023 05:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F94279CD;
+	Fri,  1 Dec 2023 05:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLQ+3Rd5"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TfiQN/AN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0F210C2
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 21:15:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701407748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SHwmJNsb+e2xdb/Uv7JTIMOAPZD+rYanzUJIDl9T/t0=;
-	b=SLQ+3Rd53exPO8DOEp2WBokH6koGekZ/a/JBNaOz5XYwHFI+7gyQ8FHm6ZiOI/9HZUHYtC
-	an1HMgSoXV3u5SJ0UAlOvpBd0ES4VLZ1YoDElTuMLWhh+CPBEBnEH+eElsQKmDTxrTBtUJ
-	nhTDWXoChpAVpC6vrOpbC05qCPJ1MBU=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-551-DgYDYoFdNN-gbXs-Dj3HfA-1; Fri, 01 Dec 2023 00:15:46 -0500
-X-MC-Unique: DgYDYoFdNN-gbXs-Dj3HfA-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-50bc7296f75so1971972e87.2
-        for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 21:15:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701407745; x=1702012545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SHwmJNsb+e2xdb/Uv7JTIMOAPZD+rYanzUJIDl9T/t0=;
-        b=bb+/zovRieHC/ro8Vk7ozS2gmd3/iK6B09v9/4QF2iK5q6D7EogobW609jHj2gcVRM
-         Iseyb4P8K6AU1hMqsiZoslrRR3MVzY22+qreVTiUOZEz0F/P4oQe5o49IhBfODXOUPHX
-         lxrF4r9SrUVTv35gQ28el/9lR7w8km3ck0TJfiybldNwzTTRCkG/GlSlk/OKNr902cWl
-         +htxyKbwGv3R3mjKnxupaBO6GBrEDCmu9GeFK58UKMWU3N+bpvZ7a2XiSzEESle48uG6
-         wJoKX+lqbOZaXgwV15FyMUrVqAVeQZ2ePi43pFaQ4wkciMLxn9YdWv4Parq2ABuWHp1t
-         koYQ==
-X-Gm-Message-State: AOJu0Yybp2HMHW15/5l0fd0g9BdwVAh34KLwcctV5ZV/ahx27ja3TP1R
-	wpomvDHuwq8wgrfpVakkUfx2Cb78XNuC0zwYXVXxu7tpKdZ2z0l/DvIGENlnVaIPkngjtnc9vrS
-	2zrh0TsDqfV2Df5hV5/Wd0gdVluaEDeDi
-X-Received: by 2002:a19:5507:0:b0:50b:d944:c01c with SMTP id n7-20020a195507000000b0050bd944c01cmr120817lfe.222.1701407745187;
-        Thu, 30 Nov 2023 21:15:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHDBmetXyWF5RpBUSGtpgeHdSYlEbcjte2vsAB88zgUOH9Pe6a2lbEGXksrcRpWFGOS8rAg498bSWjWs3JsMxo=
-X-Received: by 2002:a19:5507:0:b0:50b:d944:c01c with SMTP id
- n7-20020a195507000000b0050bd944c01cmr120809lfe.222.1701407744848; Thu, 30 Nov
- 2023 21:15:44 -0800 (PST)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A661703;
+	Thu, 30 Nov 2023 21:33:48 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B12Fd3n032634;
+	Thu, 30 Nov 2023 21:33:41 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=rP3Ji68hr4FNmt1jJp4/fePLt1PrNYK2+C381Tz68Ig=;
+ b=TfiQN/AN5Bh6H+7zvuJ0pwy1UPrI7fYEcwuhFCGQsHFd48yWxzhqlNA6xGRUQ/yBXSdr
+ TnU9bFiSy3GUONflrx16B/3S6A6qN7BJ0DuUTK7rUsYAtPQZy9fzicWvXokurphRxwKu
+ yQ+H0V8rSwbZgrFWVns0yFJLSDvw7+URUevGczG+183CPaHqubpXyxCYx8NFed0wfBQo
+ KC7FmwoEFFTD2JY6v9hgwE3h7YYKogQCaAkvJeAVoA+H3xMdNhVmJzKEEK5cOm/ARgAJ
+ YBkyJhjXhulQpu596pSZ3QmzK/FgT/v95rrZtpG6xOgiV+oaECDxPgImUMtjd3qj3IXl NA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3updt6ed9d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 30 Nov 2023 21:33:40 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 30 Nov
+ 2023 21:33:38 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 30 Nov 2023 21:33:38 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id EC9133F706B;
+	Thu, 30 Nov 2023 21:33:32 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>,
+        <naveenm@marvell.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH v3] octeontx2-pf: consider both Rx and Tx packet stats for adaptive interrupt coalescing
+Date: Fri, 1 Dec 2023 11:03:30 +0530
+Message-ID: <20231201053330.3903694-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <647701d8-c99b-4ca8-9817-137eaefda237@linux.intel.com> <CACGkMEvoGOO0jtq5T7arAjRoB_0_fHB2+hPJe1JsPqcAuvr98w@mail.gmail.com>
- <6f84bbad-62f9-43df-8134-a6836cc3b66c@linux.intel.com> <CACGkMEvtus2BseZec8at6YORO=As1v9r9p=xtZjE1e2i=uhwhA@mail.gmail.com>
- <20231130044045-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231130044045-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 1 Dec 2023 13:15:32 +0800
-Message-ID: <CACGkMEuvnmif_pBJRqAER3wuYmF_ebzgRnKwwUnHMH4kv2XrFQ@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: features
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Ning, Hongyu" <hongyu.ning@linux.intel.com>, xuanzhuo@linux.alibaba.com, 
-	Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, eperezma@redhat.com, shannon.nelson@amd.com, 
-	yuanyaogoog@chromium.org, yuehaibing@huawei.com, 
-	kirill.shutemov@linux.intel.com, sathyanarayanan.kuppuswamy@linux.intel.com, 
-	alexander.shishkin@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Y_XrMjM9bgam5AieALxwAoa4r4282kvX
+X-Proofpoint-ORIG-GUID: Y_XrMjM9bgam5AieALxwAoa4r4282kvX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-01_03,2023-11-30_01,2023-05-22_02
 
-On Thu, Nov 30, 2023 at 5:44=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Wed, Nov 29, 2023 at 06:20:31PM +0800, Jason Wang wrote:
-> > On Wed, Nov 29, 2023 at 6:12=E2=80=AFPM Ning, Hongyu
-> > <hongyu.ning@linux.intel.com> wrote:
-> > >
-> > >
-> > > On 2023/11/29 17:16, Jason Wang wrote:
-> > > > On Wed, Nov 29, 2023 at 5:05=E2=80=AFPM Ning, Hongyu
-> > > > <hongyu.ning@linux.intel.com> wrote:
-> > > >>
-> > > >>
-> > > >>
-> > > >> On 2023/9/4 6:13, Michael S. Tsirkin wrote:
-> > > >>> The following changes since commit 2dde18cd1d8fac735875f2e4987f11=
-817cc0bc2c:
-> > > >>>
-> > > >>>     Linux 6.5 (2023-08-27 14:49:51 -0700)
-> > > >>>
-> > > >>> are available in the Git repository at:
-> > > >>>
-> > > >>>     https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git=
- tags/for_linus
-> > > >>>
-> > > >>> for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb28=
-81b9ab:
-> > > >>>
-> > > >>>     virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (=
-2023-09-03 18:10:24 -0400)
-> > > >>>
-> > > >>> ----------------------------------------------------------------
-> > > >>> virtio: features
-> > > >>>
-> > > >>> a small pull request this time around, mostly because the
-> > > >>> vduse network got postponed to next relase so we can be sure
-> > > >>> we got the security store right.
-> > > >>>
-> > > >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > >>>
-> > > >>> ----------------------------------------------------------------
-> > > >>> Eugenio P=C3=A9rez (4):
-> > > >>>         vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
-> > > >>>         vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backe=
-nd feature
-> > > >>>         vdpa: add get_backend_features vdpa operation
-> > > >>>         vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-> > > >>>
-> > > >>> Jason Wang (1):
-> > > >>>         virtio_vdpa: build affinity masks conditionally
-> > > >>>
-> > > >>> Xuan Zhuo (12):
-> > > >>>         virtio_ring: check use_dma_api before unmap desc for indi=
-rect
-> > > >>>         virtio_ring: put mapping error check in vring_map_one_sg
-> > > >>>         virtio_ring: introduce virtqueue_set_dma_premapped()
-> > > >>>         virtio_ring: support add premapped buf
-> > > >>>         virtio_ring: introduce virtqueue_dma_dev()
-> > > >>>         virtio_ring: skip unmap for premapped
-> > > >>>         virtio_ring: correct the expression of the description of=
- virtqueue_resize()
-> > > >>>         virtio_ring: separate the logic of reset/enable from virt=
-queue_resize
-> > > >>>         virtio_ring: introduce virtqueue_reset()
-> > > >>>         virtio_ring: introduce dma map api for virtqueue
-> > > >>>         virtio_ring: introduce dma sync api for virtqueue
-> > > >>>         virtio_net: merge dma operations when filling mergeable b=
-uffers
-> > > >>
-> > > >> Hi,
-> > > >> above patch (upstream commit 295525e29a5b) seems causing a virtnet
-> > > >> related Call Trace after WARNING from kernel/dma/debug.c.
-> > > >>
-> > > >> details (log and test setup) tracked in
-> > > >> https://bugzilla.kernel.org/show_bug.cgi?id=3D218204
-> > > >>
-> > > >> it's recently noticed in a TDX guest testing since v6.6.0 release =
-cycle
-> > > >> and can still be reproduced in latest v6.7.0-rc3.
-> > > >>
-> > > >> as local bisects results show, above WARNING and Call Trace is lin=
-ked
-> > > >> with this patch, do you mind to take a look?
-> > > >
-> > > > Looks like virtqueue_dma_sync_single_range_for_cpu() use
-> > > > DMA_BIDIRECTIONAL unconditionally.
-> > > >
-> > > > We should use dir here.
-> > > >
-> > > > Mind to try?
-> > > >
-> > > > Thanks
-> > > >
-> > >
-> > > sure, but what I see in the code
-> > > virtqueue_dma_sync_single_range_for_cpu() is using DMA_FROM_DEVICE,
-> > > probably I misunderstood your point?
-> > >
-> > > Please let me know any patch/setting to try here.
-> >
-> > Something like attached.  (Not even compiling test).
-> >
-> > Thanks
->
-> Forwarding it inline for the record - I am not sure all the
-> 0 day machinery handles attachments. Jason given it's reported to work
-> can you please repost properly with a full commit log etc?
-> I think we also need to fix virtqueue_dma_sync_single_range_for_device -
-> please include that too.
+From: Naveen Mamindlapalli <naveenm@marvell.com>
 
-Yes, want to sent something like this yesterday but it was interrupted
-by other tasks.
+The current adaptive interrupt coalescing code updates only rx
+packet stats for dim algorithm. This patch also updates tx packet
+stats which will be useful when there is only tx traffic.
+Also moved configuring hardware adaptive interrupt setting to
+driver dim callback.
 
-I see Xuan has posted a patch, I will ack on that.
+Fixes: 6e144b47f560 ("octeontx2-pf: Add support for adaptive interrupt coalescing")
+Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+v3 changes:
+- Updated signed-off-by signature.
 
-Thanks
+v2 changes:
+- Missed adding the fixes tag in v1. Added the same in v2.
 
->
->
-> From: Jason Wang <jasowang@redhat.com>
-> Date: Wed, 29 Nov 2023 17:14:15 +0800
-> Subject: [PATCH] virtio_ring: fix DMA dir during sync
-> Content-type: text/plain
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ---
->  drivers/virtio/virtio_ring.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 81ecb29c88f1..91d869814373 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -3220,7 +3220,7 @@ void virtqueue_dma_sync_single_range_for_cpu(struct=
- virtqueue *_vq,
->                 return;
->
->         dma_sync_single_range_for_cpu(dev, addr, offset, size,
-> -                                     DMA_BIDIRECTIONAL);
-> +                                     dir);
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_dma_sync_single_range_for_cpu);
->
-> --
-> 2.42.0
->
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  9 +++++++++
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 20 +++++++++----------
+ 2 files changed, 19 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index ba95ac913274..6c0e0e2c235b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1685,6 +1685,14 @@ static void otx2_do_set_rx_mode(struct otx2_nic *pf)
+ 	mutex_unlock(&pf->mbox.lock);
+ }
+ 
++static void otx2_set_irq_coalesce(struct otx2_nic *pfvf)
++{
++	int cint;
++
++	for (cint = 0; cint < pfvf->hw.cint_cnt; cint++)
++		otx2_config_irq_coalescing(pfvf, cint);
++}
++
+ static void otx2_dim_work(struct work_struct *w)
+ {
+ 	struct dim_cq_moder cur_moder;
+@@ -1700,6 +1708,7 @@ static void otx2_dim_work(struct work_struct *w)
+ 		CQ_TIMER_THRESH_MAX : cur_moder.usec;
+ 	pfvf->hw.cq_ecount_wait = (cur_moder.pkts > NAPI_POLL_WEIGHT) ?
+ 		NAPI_POLL_WEIGHT : cur_moder.pkts;
++	otx2_set_irq_coalesce(pfvf);
+ 	dim->state = DIM_START_MEASURE;
+ }
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 6ee15f3c25ed..4d519ea833b2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -512,11 +512,18 @@ static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_p
+ {
+ 	struct dim_sample dim_sample;
+ 	u64 rx_frames, rx_bytes;
++	u64 tx_frames, tx_bytes;
+ 
+ 	rx_frames = OTX2_GET_RX_STATS(RX_BCAST) + OTX2_GET_RX_STATS(RX_MCAST) +
+ 		OTX2_GET_RX_STATS(RX_UCAST);
+ 	rx_bytes = OTX2_GET_RX_STATS(RX_OCTS);
+-	dim_update_sample(pfvf->napi_events, rx_frames, rx_bytes, &dim_sample);
++	tx_bytes = OTX2_GET_TX_STATS(TX_OCTS);
++	tx_frames = OTX2_GET_TX_STATS(TX_UCAST);
++
++	dim_update_sample(pfvf->napi_events,
++			  rx_frames + tx_frames,
++			  rx_bytes + tx_bytes,
++			  &dim_sample);
+ 	net_dim(&cq_poll->dim, dim_sample);
+ }
+ 
+@@ -558,16 +565,9 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
+ 		if (pfvf->flags & OTX2_FLAG_INTF_DOWN)
+ 			return workdone;
+ 
+-		/* Check for adaptive interrupt coalesce */
+-		if (workdone != 0 &&
+-		    ((pfvf->flags & OTX2_FLAG_ADPTV_INT_COAL_ENABLED) ==
+-		     OTX2_FLAG_ADPTV_INT_COAL_ENABLED)) {
+-			/* Adjust irq coalese using net_dim */
++		/* Adjust irq coalese using net_dim */
++		if (pfvf->flags & OTX2_FLAG_ADPTV_INT_COAL_ENABLED)
+ 			otx2_adjust_adaptive_coalese(pfvf, cq_poll);
+-			/* Update irq coalescing */
+-			for (i = 0; i < pfvf->hw.cint_cnt; i++)
+-				otx2_config_irq_coalescing(pfvf, i);
+-		}
+ 
+ 		if (unlikely(!filled_cnt)) {
+ 			struct refill_work *work;
+-- 
+2.25.1
 
 
