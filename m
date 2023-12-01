@@ -1,200 +1,118 @@
-Return-Path: <netdev+bounces-52893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E42800905
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:50:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 123D18008F1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 11:49:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 677C3281AD5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:50:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440291C20FBC
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 10:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0444F219E4;
-	Fri,  1 Dec 2023 10:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA41220B3D;
+	Fri,  1 Dec 2023 10:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="sx7I83Mw"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="mcWH1h3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC80C1726;
-	Fri,  1 Dec 2023 02:49:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=rDc7S3TGwDRkuN19FCwRpWlUg/012zfS/c7UoSCfhOg=;
-	t=1701427798; x=1702637398; b=sx7I83MwXTI5q1y3hsEdV1kcfKxOdHCD1XKDrnSv3DIMDNU
-	8COzLqD8xB+QrS+dvmNK6rDwPexvgf/y74xWxx0IvW6y5yD9AUm7rmYc8ygxGiq7BqyQ1dUTUzila
-	drXGLx3zmqD4vTq7FlhkdsZbC3tdxFi5f3ldoWBUW5mbT7pWXMwpDRbDeG7ykl1ieqR8C08Y7D4dZ
-	nP4zx6iHfAFlz3mdxufCo0oEAu54QzMmrYSJdjc6XNeuhdcewG8RGecH+pImX/aaIv8v499cjiv4C
-	UgcqX5iEj38X/M9R3plurEx1II/VAbk1/GYCdXqZ3aKDdYNnuKFdZnJD/MdNJJ5Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r915n-0000000BBjV-3rZk;
-	Fri, 01 Dec 2023 11:49:56 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: linux-wireless@vger.kernel.org
-Cc: hostap@lists.infradead.org,
-	netdev@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH wpa_suppplicant 2/2] driver_nl82011: wait for rtnetlink event with carrier_up_count
-Date: Fri,  1 Dec 2023 11:49:09 +0100
-Message-ID: <20231201114952.420b40a5f188.I75677b755f36ca63f8289d84de29b212f4c37ec0@changeid>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231201104952.26254-4-johannes@sipsolutions.net>
-References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
- <20231201104952.26254-4-johannes@sipsolutions.net>
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD83310D7;
+	Fri,  1 Dec 2023 02:49:44 -0800 (PST)
+Received: from [10.28.30.211] (ubuntu.user.uliege.priv [10.28.30.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 31AD0200CCF5;
+	Fri,  1 Dec 2023 11:49:42 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 31AD0200CCF5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1701427782;
+	bh=yqTmpjxC+vmCiRMzZ6JjEUlZ7fEf3rMCw5yimOIcRAk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mcWH1h3tptTWBjigd9kGih1J5RsKH/tfPJFzy4ad2ULxaNrvkFCCSZ0rw4RRKobJv
+	 Aibh1OpWzT7s4ocFMTF9q4QD1zgkqEBuGHklelIm0fWrsH6sAe0zQMMLzSiK2RQjb8
+	 qmG1U6d2eL/NEqWTKDmjMevD5Cjo79QM3jEw8lc12U0pBm6S9jRQTj0/19723e6p9d
+	 IUxCfjmhx1w+caXR92fIAUyAxdUMaMDsBNRlwajCa5cDJ2Z8HaiFohjblN9aIobkIx
+	 pyePFpoTApHCMCbUSbk5onJ1flTksOljZ7rEtKs8Y7SRe4NzEwifhyThXrZToQQi17
+	 C6QcNFQmIkIUw==
+Message-ID: <699fb67c-efb4-4fc9-bf18-a2ddeffbcdb7@uliege.be>
+Date: Fri, 1 Dec 2023 11:49:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net-next 10/14] selftests/net: convert ioam6.sh to run
+ it in unique namespace
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
+ Po-Hsu Lin <po-hsu.lin@canonical.com>, Guillaume Nault <gnault@redhat.com>,
+ Petr Machata <petrm@nvidia.com>, James Prestwood <prestwoj@gmail.com>,
+ Jaehee Park <jhpark1013@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
+ Francesco Ruggeri <fruggeri@arista.com>, Xin Long <lucien.xin@gmail.com>,
+ justin.iurman@uliege.be
+References: <20231130040105.1265779-1-liuhangbin@gmail.com>
+ <20231130040105.1265779-11-liuhangbin@gmail.com>
+ <4ab6e843-fd60-4abf-a23f-c8032e617f5c@uliege.be> <ZWmAk9637Oo4HYOU@Laptop-X1>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <ZWmAk9637Oo4HYOU@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+On 12/1/23 07:43, Hangbin Liu wrote:
+> On Thu, Nov 30, 2023 at 02:28:51PM +0100, Justin Iurman wrote:
+>> On 11/30/23 05:01, Hangbin Liu wrote:
+>>> Here is the test result after conversion.
+>>>
+>>> ]# ./ioam6.sh
+>>>
+>>> --------------------------------------------------------------------------
+>>> OUTPUT tests
+>>> --------------------------------------------------------------------------
+>>> TEST: Unknown IOAM namespace (inline mode)                          [ OK ]
+>>> TEST: Unknown IOAM namespace (encap mode)                           [ OK ]
+>>> TEST: Missing trace room (inline mode)                              [ OK ]
+>>> TEST: Missing trace room (encap mode)                               [ OK ]
+>>> TEST: Trace type with bit 0 only (inline mode)                      [ OK ]
+>>> ...
+>>> TEST: Full supported trace (encap mode)                             [ OK ]
+>>>
+>>> --------------------------------------------------------------------------
+>>> GLOBAL tests
+>>> --------------------------------------------------------------------------
+>>> TEST: Forward - Full supported trace (inline mode)                  [ OK ]
+>>> TEST: Forward - Full supported trace (encap mode)                   [ OK ]
+>>>
+>>> - Tests passed: 88
+>>> - Tests failed: 0
+>>>
+>>> Acked-by: David Ahern <dsahern@kernel.org>
+>>> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+>>
+>> Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
+>>
+>> LGTM. Just one question though. Is there any reason not to use cleanup_ns
+>> everywhere? There is the following diff (actually, 3 times):
+> 
+> Hi Justin,
+> 
+> Thanks for your review. There is no much intend. I just use del ns for one
+> line change. And use cleanup_ns for multi line changes. I can make all
+> ns delete via cleanup_ns in next version.
 
-There's a race (see the comment in the code) between the
-kernel and userspace that can lead to dropping TX packets
-after the associated event was already received.
++1, I think it would make sense to use the new API everywhere for 
+consistency.
 
-If the kernel indicates the carrier_up_count, wait for
-the corresponding rtnetlink event to reach that count.
-This fixes the race since the rtnetlink event is sent
-after the async processing that's needed in the kernel
-before a frame can be transmitted.
+> BTW, I will use `cleanup_ns $ns || true` in next version as cleanup_ns
+> could return none 0 in PATCHv2.
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- src/drivers/driver_nl80211.c       |  7 ++++
- src/drivers/driver_nl80211.h       |  2 ++
- src/drivers/driver_nl80211_event.c | 52 ++++++++++++++++++++++++++++++
- 3 files changed, 61 insertions(+)
+Sounds good, thanks!
 
-diff --git a/src/drivers/driver_nl80211.c b/src/drivers/driver_nl80211.c
-index 03d54222bb52..b442dee1e710 100644
---- a/src/drivers/driver_nl80211.c
-+++ b/src/drivers/driver_nl80211.c
-@@ -1365,6 +1365,7 @@ static void wpa_driver_nl80211_event_rtm_newlink(void *ctx,
- 	char ifname[IFNAMSIZ + 1];
- 	char extra[100], *pos, *end;
- 	int init_failed;
-+	u32 carrier_up_count = 0;
- 
- 	extra[0] = '\0';
- 	pos = extra;
-@@ -1396,6 +1397,9 @@ static void wpa_driver_nl80211_event_rtm_newlink(void *ctx,
- 			pos += os_snprintf(pos, end - pos, " linkmode=%u",
- 					   nla_get_u32((struct nlattr *) attr));
- 			break;
-+		case IFLA_CARRIER_UP_COUNT:
-+			carrier_up_count = nla_get_u32((struct nlattr *) attr);
-+			break;
- 		}
- 		attr = RTA_NEXT(attr, attrlen);
- 	}
-@@ -1415,6 +1419,9 @@ static void wpa_driver_nl80211_event_rtm_newlink(void *ctx,
- 	if (init_failed)
- 		return; /* do not update interface state */
- 
-+	if (carrier_up_count)
-+		drv->carrier_up_count = carrier_up_count;
-+
- 	if (!drv->if_disabled && !(ifi->ifi_flags & IFF_UP)) {
- 		namebuf[0] = '\0';
- 		if (if_indextoname(ifi->ifi_index, namebuf) &&
-diff --git a/src/drivers/driver_nl80211.h b/src/drivers/driver_nl80211.h
-index f82f604e9017..874988715b21 100644
---- a/src/drivers/driver_nl80211.h
-+++ b/src/drivers/driver_nl80211.h
-@@ -201,6 +201,8 @@ struct wpa_driver_nl80211_data {
- 	unsigned int puncturing:1;
- 	unsigned int qca_ap_allowed_freqs:1;
- 
-+	u32 carrier_up_count;
-+
- 	u32 ignore_next_local_disconnect;
- 	u32 ignore_next_local_deauth;
- 
-diff --git a/src/drivers/driver_nl80211_event.c b/src/drivers/driver_nl80211_event.c
-index 60b4fb51fcd8..4ff25b57ceeb 100644
---- a/src/drivers/driver_nl80211_event.c
-+++ b/src/drivers/driver_nl80211_event.c
-@@ -19,6 +19,7 @@
- #include "common/ieee802_11_defs.h"
- #include "common/ieee802_11_common.h"
- #include "driver_nl80211.h"
-+#include "netlink.h"
- 
- 
- static void
-@@ -256,6 +257,49 @@ static void nl80211_parse_wmm_params(struct nlattr *wmm_attr,
- }
- 
- 
-+/*
-+ * Wait for an RTM newlink event with corresponding carrier up count
-+ *
-+ * There's a race condition with mac80211 and the network stack, which
-+ * mostly hits depending on scheduling in time-simulation (tests),
-+ * which is that mac80211 will both indicate carrier on to the network
-+ * stack and send the associated/... event to userspace. Now, the
-+ * internal kernel function netif_carrier_ok() immediately returns
-+ * true after this, however, the linkwatch work still needs to run
-+ * and change the TX queue qdisc away from noop (which drops all TX
-+ * packets).
-+ *
-+ * When the race happens, userspace (and in particular tests) can see
-+ * the associated/... event and immediately try to send a frame, at a
-+ * time that the linkwatch work hasn't run yet, causing the frame to
-+ * be dropped.
-+ *
-+ * Thus, if the kernel indicated the current carrier_up_count in an
-+ * event, wait here for an RTM newlink event for our interface, so in
-+ * in addition to seeing the associated/... event, we also know the
-+ * carrier state has actually changed sufficiently to send packets,
-+ * if it was meant to change.
-+ *
-+ * This works because the event to userspace is also sent from the
-+ * asynchronous linkwatch work.
-+ */
-+static void
-+nl80211_wait_for_carrier_up_count(struct wpa_driver_nl80211_data *drv,
-+				  u32 carrier_up_count)
-+{
-+#define WRAPPED_U32_LESS(x, y)	((s32)(y) - (s32)(x) < 0)
-+
-+	if (WRAPPED_U32_LESS(drv->carrier_up_count, carrier_up_count))
-+		netlink_process_one_event(drv->global->netlink, 100);
-+
-+	if (WRAPPED_U32_LESS(drv->carrier_up_count, carrier_up_count))
-+		wpa_printf(MSG_ERROR,
-+			   "nl80211: %s: carrier up count %u not seen (got %u)\n",
-+			   drv->first_bss->ifname, carrier_up_count,
-+			   drv->carrier_up_count);
-+}
-+
-+
- static void mlme_event_assoc(struct wpa_driver_nl80211_data *drv,
- 			     const u8 *frame, size_t len, struct nlattr *wmm,
- 			     struct nlattr *req_ie)
-@@ -3845,6 +3889,14 @@ static void do_process_drv_event(struct i802_bss *bss, int cmd,
- 	     cmd == NL80211_CMD_SCAN_ABORTED))
- 		nl80211_restore_ap_mode(bss);
- 
-+	/* see comment above wpa_driver_nl80211_own_ifname() */
-+	if (tb[NL80211_ATTR_CARRIER_UP_COUNT]) {
-+		u32 carrier_up_count =
-+			nla_get_u32(tb[NL80211_ATTR_CARRIER_UP_COUNT]);
-+
-+		nl80211_wait_for_carrier_up_count(drv, carrier_up_count);
-+	}
-+
- 	switch (cmd) {
- 	case NL80211_CMD_TRIGGER_SCAN:
- 		wpa_dbg(drv->ctx, MSG_DEBUG, "nl80211: Scan trigger");
--- 
-2.43.0
-
+> Thanks
+> Hangbin
 
