@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-53008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C158011A7
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:26:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D56F8011AB
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:27:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AC40B2115F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:26:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EAA0B21347
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A194E1CF;
-	Fri,  1 Dec 2023 17:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA664E602;
+	Fri,  1 Dec 2023 17:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QeacZHjc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 297ED211E;
-	Fri,  1 Dec 2023 09:25:48 -0800 (PST)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5d3ffa1ea24so11588397b3.3;
-        Fri, 01 Dec 2023 09:25:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701451546; x=1702056346;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ifFZ+tz2XMUa8Xxg+1KF6w2Puzkq4cfz8G0iZBhXb/w=;
-        b=sJGaUQh29M1IK0xOTKs/9sflb5J4Qwn3woY5wD/BVE3T6Y2VpO9JO82kQei+96cNqa
-         vGY0lVdg78NYRaZ3yPoW1aCRbWje19V9OxWPQcmbErsoC7Qlyx6lGRyM1X6K/9YwBL7P
-         wl0zKpAuW0DOxDcnzl0YPpA0iwyPk+tKnlcQUuclP041plepgWVwQ7s4lF86DBUUFxCx
-         Aj74OzPnYgU6UUkJl2wdVhGSrYlyoOginj+0O+BoHzuQUolgaO7kmwrQ3oe5J4fVdrG0
-         H/K1BoONG2g/u4ZtVfWCNIHggSUHQQ+wTqeXRyATbFCHqWubazdOUTfu0oeg00TS/BYU
-         L+YQ==
-X-Gm-Message-State: AOJu0Yy5H4nqI3MnSjbXjLIyd17yyK2SetJs6Wiul9OVnZP7C6YxrwOV
-	eyBrTan2wp6gJzTnCmiYJSaP+YXPydC5SA==
-X-Google-Smtp-Source: AGHT+IFKOnio0tcA3llLP+Sxov/BN6tmtwDgAcgcgSaqZvFNSxNyKSkYrV2nAuq7+wExpBMZjDlr0g==
-X-Received: by 2002:a81:ac1d:0:b0:5d4:36:c32c with SMTP id k29-20020a81ac1d000000b005d40036c32cmr2900511ywh.18.1701451546445;
-        Fri, 01 Dec 2023 09:25:46 -0800 (PST)
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
-        by smtp.gmail.com with ESMTPSA id u189-20020a8179c6000000b005d34a381f59sm1190705ywc.102.2023.12.01.09.25.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 09:25:44 -0800 (PST)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5d34f8f211fso22410827b3.0;
-        Fri, 01 Dec 2023 09:25:44 -0800 (PST)
-X-Received: by 2002:a81:ac1d:0:b0:5d4:36:c32c with SMTP id k29-20020a81ac1d000000b005d40036c32cmr2900397ywh.18.1701451543993;
- Fri, 01 Dec 2023 09:25:43 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882E6270B
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 09:27:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701451649;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mIN6tLPw09H9zOs4zuK0VfA5bwhOPcu5mP00NJGpiN4=;
+	b=QeacZHjcDQD6cZ7n0/2X+YvR3e+Bk+fJc8Koz+jmVAcN7qaJi36KY82kDumYbpKPzUMFxU
+	du1OtQ6sgika7rv2JKfIjp8aySw4mIF3/pyNdA4SlFpe830ZhrhzakJVB6CjNWVsdef3V2
+	OMgFK81/vM589YIYODto6vl2JGWcNjM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-568-eD3LDQIjMwmrsUndj-JnrQ-1; Fri,
+ 01 Dec 2023 12:27:19 -0500
+X-MC-Unique: eD3LDQIjMwmrsUndj-JnrQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4735B3804528;
+	Fri,  1 Dec 2023 17:27:19 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 362E22026D4C;
+	Fri,  1 Dec 2023 17:27:17 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: stern@rowland.harvard.edu
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	greg@kroah.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	oneukum@suse.com,
+	pabeni@redhat.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] net: usb: ax88179_178a: avoid failed operations when device is disconnected
+Date: Fri,  1 Dec 2023 18:27:14 +0100
+Message-ID: <20231201172716.182693-1-jtornosm@redhat.com>
+In-Reply-To: <140e912f-8702-4e85-8d6c-ef0255e718f8@rowland.harvard.edu>
+References: <140e912f-8702-4e85-8d6c-ef0255e718f8@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com> <20231120070024.4079344-9-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20231120070024.4079344-9-claudiu.beznea.uj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 1 Dec 2023 18:25:32 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXygjeHvrSB=KpVB4n1BTAinvNLL+AmjRhERy+2QbJMiA@mail.gmail.com>
-Message-ID: <CAMuHMdXygjeHvrSB=KpVB4n1BTAinvNLL+AmjRhERy+2QbJMiA@mail.gmail.com>
-Subject: Re: [PATCH 08/14] pinctrl: renesas: rzg2l: Add output enable support
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
-	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Hi Claudiu,
+Hi Alan,
 
-Thanks for your patch!
+> Would it be good enough just to check for ret != -ENODEV and not do the 
+> stopping_unbinding check at all?
+I thought about that but if possible, I would like to ignore the failed
+operation messages only under a controlled and expected situation. 
+I think that if there is a problem with the device it will be easier to
+analyze it later with all the possible information.
+But this is my opinion ...
 
-On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.dev> =
-wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->
-> Some of the Ethernet pins on RZ/G3S (but also valid for RZ/G2L) need to
-> have direction of the IO buffer set as output for Ethernet to work
-> properly. On RZ/G3S these pins are P1_0/P7_0, P1_1/P7_1 with could have
-> the following Ethernet functions: TXC/TX_CLK or TX_CTL/TX_EN. To be able
-> to configure this the output enable has been implemented. This is
-> implemented with 2 per-platform read/write functions to be able to simply
-> validate the pins supporting this on a platform basis. Moreover, on RZ/G2=
-L
-> the register though which these settings could be done is 8 bits long
-> whereas on RZ/G3S this is a 32 bit register. The Ethernet pins supporting
-> OEN are different. These differences could be handled in platform specifi=
-c
-> OEN read/write functions.
+Thank you
 
-These registers are documented to support access sizes of 8/16/32 bits
-on RZ/G3S.  Hence you don't need to differentiate, but can just use
-8-bit accesses on all platforms.
+Best regards
+José Ignacio
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
