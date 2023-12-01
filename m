@@ -1,103 +1,211 @@
-Return-Path: <netdev+bounces-52966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C07800F8E
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:13:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36E0800FD3
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:14:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98FB5B21036
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:13:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34989281AFA
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4454C3C6;
-	Fri,  1 Dec 2023 16:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZ6Fg5nw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7D64C3D2;
+	Fri,  1 Dec 2023 16:14:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ADFB2;
-	Fri,  1 Dec 2023 08:13:26 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54c11430624so3354083a12.1;
-        Fri, 01 Dec 2023 08:13:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701447205; x=1702052005; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wIiVfGjOqLbqrFMUXwsWqhKvCLy0+YRMCVG4285ndOk=;
-        b=eZ6Fg5nwC6wL1t03K/dv5dwlbMG2M+u55VESUlN37M5FGY/rpGPSS+bwYyi6qkdNt3
-         fAykxQjHxnTcn2vDP9JPuq5Cx/jyx3HAZE12LC2vSe43JkAiGlEmQ2tcLgeM4jQmgh6x
-         pMnWiHa174x1onP3leoFrIbWpyxHL0D+AbQkuVuyY+5tL2RW2LKV8VRNHydTqdWqTbNY
-         XeX2NFsAh2cnZmE8Lhnjqj7m6oMaWJlboDl6KPR1SP9XBHoyX42/bYyMS4TmNQLTqeEp
-         n0jq5ohEPLaGtMbgmCFL2gWeF78EOcxlQlgTADu6tYTSMzOurI7j8fMxaj9aiHuu64Ug
-         GUOg==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F210910F4
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 08:14:21 -0800 (PST)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5c5c8ece6c4so713691a12.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 08:14:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701447205; x=1702052005;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wIiVfGjOqLbqrFMUXwsWqhKvCLy0+YRMCVG4285ndOk=;
-        b=RCVDKmHz/PKUVGp9puXdQ0Id6TWvE0Y7ZuoBPi7S27pnE0NL7/dE5oNlAgp0QQX+Ft
-         NHo3dt4dA+VWwwwlpSMBr8nqDNp+CeHl6wvt0VeysFYMrz2rpM23+kpmj2iLOMuucGld
-         p9yfNKHbIOFmo8C4V/EJm0QHjSSeiif8LjONTkJbmlL67B8XkmHT+GM4bYTqW1ILydIk
-         sc/MpTrFsRXnbshniWr5tU6mojJ7XJIERMbYa1ORpQndIsN7AXMARK9UaGLX+smdLhTh
-         oHE3Stb67iPSls8Fr7WoNAsmKIwewupiFfQ9RqDiCHiIKbbmBLl0PWGluPZR+LSkV3UF
-         nNSg==
-X-Gm-Message-State: AOJu0YxrGqvjcrr4nZbQIiK45J/4+e9NrxF0iXzmDEfK7ccVxgg4hgUn
-	ImLFw6IJnhbpADGsXtD//BY=
-X-Google-Smtp-Source: AGHT+IGk3WBJ86FEE6LGFsbCpoX1T7woOAbx/+XZ2RJZcdaqx4RDMLAiNXn0qRfATUxZ9Ok2nqr6OA==
-X-Received: by 2002:a17:906:9b44:b0:a19:a409:37de with SMTP id ep4-20020a1709069b4400b00a19a40937demr1403155ejc.55.1701447205044;
-        Fri, 01 Dec 2023 08:13:25 -0800 (PST)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id c6-20020a170906694600b00a0aca4d2b25sm2043603ejs.180.2023.12.01.08.13.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 08:13:24 -0800 (PST)
-Message-ID: <18808a1815e76a3c3fb661ff6a588a50389b1475.camel@gmail.com>
-Subject: Re: [PATCH ipsec-next v2 3/6] libbpf: Add BPF_CORE_WRITE_BITFIELD()
- macro
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: ndesaulniers@google.com, andrii@kernel.org, nathan@kernel.org, 
- daniel@iogearbox.net, ast@kernel.org, steffen.klassert@secunet.com, 
- antony.antony@secunet.com, alexei.starovoitov@gmail.com,
- yonghong.song@linux.dev,  martin.lau@linux.dev, song@kernel.org,
- john.fastabend@gmail.com,  kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org,  trix@redhat.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org,  llvm@lists.linux.dev, devel@linux-ipsec.org,
- netdev@vger.kernel.org
-Date: Fri, 01 Dec 2023 18:13:22 +0200
-In-Reply-To: <ib27gbqj6c6ilblugm5kalwyfty6h4zujhvykw4a562uorqzjn@6wxeino6q7vk>
-References: <cover.1701193577.git.dxu@dxuuu.xyz>
-	 <ed7920365daf5eff1c82892b57e918d3db786ac7.1701193577.git.dxu@dxuuu.xyz>
-	 <20c593b6f31720a3d24d75e5e5cc3245b67249d1.camel@gmail.com>
-	 <ib27gbqj6c6ilblugm5kalwyfty6h4zujhvykw4a562uorqzjn@6wxeino6q7vk>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+        d=1e100.net; s=20230601; t=1701447261; x=1702052061;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vEtDZIP82VxMlYg7UA5Ytfxnjx2Cbb370QUc13RWESs=;
+        b=SBWcFmP+F33mfMq4veK2yGxYqWtgHHOrQO2OF+Wse9ZVpzUqU1eIScW/s2HeQ/HV4I
+         jVI6CNNRNLHHZBO8JThSvCYFNo+BNzczlRmP2fMoqYG3aGU04uVZ8dY7zgQP8LwCLrhg
+         xvq/2u7RvJp+J2Ltb/hBhrDK24zyP78TJDh6wlI0rQ12lnZb0FRZFgpLbbfOzEa/oahf
+         xHEyDfcaFf3aMAuJgiiScjBz3Kuz1tfjlZNjMORxMTUyDfZp0XM4/x2/lAKM3C/kKjmE
+         4zzyg1Hq5tYtSOX5McG1ra5l0nn6x7bosoN5w5du9cpC2XBxO9k7hSFpVVUc+Dm3n/Pa
+         TbwA==
+X-Gm-Message-State: AOJu0YxYKaY5z3W0fm1Sv27hrFCJ0KfqUti3OVjRXH4oF/5wf0sGxkc1
+	bLrgZqDFjKashgVJl9PFJ9okd1xE8F8NY5fxQD3h69duzdpd
+X-Google-Smtp-Source: AGHT+IFpvK2Dsg3/9Rax/6rp/kkDoRmJD4LLMonQLWCZ50TS8hMN4ulTZ2efRBBfRFQyVJ3QXOwORNgfkrOmEvRkuni6rYoxOscB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a63:4c:0:b0:5bd:d756:86d2 with SMTP id 73-20020a63004c000000b005bdd75686d2mr3700859pga.10.1701447261485;
+ Fri, 01 Dec 2023 08:14:21 -0800 (PST)
+Date: Fri, 01 Dec 2023 08:14:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009fffb7060b750f4f@google.com>
+Subject: [syzbot] [net?] memory leak in copy_net_ns (2)
+From: syzbot <syzbot+989b6c53cd6d6ec47ab2@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2023-11-30 at 18:33 -0700, Daniel Xu wrote:
-[...]
-> Good call about adding tests -- I found a few bugs with the code from
-> the other thread. But boy did they take a lot of brain cells to figure
-> out.
->=20
-> There was some 6th grade algebra involved too -- I'll do my best to
-> explain it in the commit msg for v3.
->=20
-> Here are the fixes in case you are curious:
+Hello,
 
-Ouch, I knew my code from 3am can't be trusted, sorry for that.
-Your math seem to make sense, thank you.
+syzbot found the following issue on:
 
-[...]
+HEAD commit:    e017769f4ce2 Merge tag 'for-6.6-rc7-tag' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10277593680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8c4e4700f1727d30
+dashboard link: https://syzkaller.appspot.com/bug?extid=989b6c53cd6d6ec47ab2
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174e61ed680000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/52a9cd027b72/disk-e017769f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/646078695995/vmlinux-e017769f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a78855f93880/bzImage-e017769f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+989b6c53cd6d6ec47ab2@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff88810e8d3660 (size 32):
+  comm "syz-executor.3", pid 5088, jiffies 4294979538 (age 423.340s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574aa5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1117
+    [<ffffffff83eb94f0>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff83eb94f0>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83eb94f0>] net_alloc net/core/net_namespace.c:422 [inline]
+    [<ffffffff83eb94f0>] copy_net_ns+0xc0/0x3d0 net/core/net_namespace.c:476
+    [<ffffffff812db5d7>] create_new_namespaces+0x197/0x500 kernel/nsproxy.c:110
+    [<ffffffff812dc012>] unshare_nsproxy_namespaces+0xa2/0x120 kernel/nsproxy.c:228
+    [<ffffffff81293f84>] ksys_unshare+0x314/0x610 kernel/fork.c:3435
+    [<ffffffff81294296>] __do_sys_unshare kernel/fork.c:3506 [inline]
+    [<ffffffff81294296>] __se_sys_unshare kernel/fork.c:3504 [inline]
+    [<ffffffff81294296>] __x64_sys_unshare+0x16/0x20 kernel/fork.c:3504
+    [<ffffffff84b2b548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b2b548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff88810e8d3fa0 (size 32):
+  comm "syz-executor.4", pid 5078, jiffies 4294979546 (age 423.260s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574aa5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1117
+    [<ffffffff83eb94f0>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff83eb94f0>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83eb94f0>] net_alloc net/core/net_namespace.c:422 [inline]
+    [<ffffffff83eb94f0>] copy_net_ns+0xc0/0x3d0 net/core/net_namespace.c:476
+    [<ffffffff812db5d7>] create_new_namespaces+0x197/0x500 kernel/nsproxy.c:110
+    [<ffffffff812dc012>] unshare_nsproxy_namespaces+0xa2/0x120 kernel/nsproxy.c:228
+    [<ffffffff81293f84>] ksys_unshare+0x314/0x610 kernel/fork.c:3435
+    [<ffffffff81294296>] __do_sys_unshare kernel/fork.c:3506 [inline]
+    [<ffffffff81294296>] __se_sys_unshare kernel/fork.c:3504 [inline]
+    [<ffffffff81294296>] __x64_sys_unshare+0x16/0x20 kernel/fork.c:3504
+    [<ffffffff84b2b548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b2b548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff888111239400 (size 32):
+  comm "syz-executor.1", pid 5075, jiffies 4294979553 (age 423.190s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574aa5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1117
+    [<ffffffff83eb94f0>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff83eb94f0>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83eb94f0>] net_alloc net/core/net_namespace.c:422 [inline]
+    [<ffffffff83eb94f0>] copy_net_ns+0xc0/0x3d0 net/core/net_namespace.c:476
+    [<ffffffff812db5d7>] create_new_namespaces+0x197/0x500 kernel/nsproxy.c:110
+    [<ffffffff812dc012>] unshare_nsproxy_namespaces+0xa2/0x120 kernel/nsproxy.c:228
+    [<ffffffff81293f84>] ksys_unshare+0x314/0x610 kernel/fork.c:3435
+    [<ffffffff81294296>] __do_sys_unshare kernel/fork.c:3506 [inline]
+    [<ffffffff81294296>] __se_sys_unshare kernel/fork.c:3504 [inline]
+    [<ffffffff81294296>] __x64_sys_unshare+0x16/0x20 kernel/fork.c:3504
+    [<ffffffff84b2b548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b2b548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff888111239840 (size 32):
+  comm "syz-executor.7", pid 5076, jiffies 4294979555 (age 423.170s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574aa5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1117
+    [<ffffffff83eb94f0>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff83eb94f0>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83eb94f0>] net_alloc net/core/net_namespace.c:422 [inline]
+    [<ffffffff83eb94f0>] copy_net_ns+0xc0/0x3d0 net/core/net_namespace.c:476
+    [<ffffffff812db5d7>] create_new_namespaces+0x197/0x500 kernel/nsproxy.c:110
+    [<ffffffff812dc012>] unshare_nsproxy_namespaces+0xa2/0x120 kernel/nsproxy.c:228
+    [<ffffffff81293f84>] ksys_unshare+0x314/0x610 kernel/fork.c:3435
+    [<ffffffff81294296>] __do_sys_unshare kernel/fork.c:3506 [inline]
+    [<ffffffff81294296>] __se_sys_unshare kernel/fork.c:3504 [inline]
+    [<ffffffff81294296>] __x64_sys_unshare+0x16/0x20 kernel/fork.c:3504
+    [<ffffffff84b2b548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b2b548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff888143eae6c0 (size 32):
+  comm "syz-executor.6", pid 5077, jiffies 4294979559 (age 423.180s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574aa5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1117
+    [<ffffffff83eb94f0>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff83eb94f0>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff83eb94f0>] net_alloc net/core/net_namespace.c:422 [inline]
+    [<ffffffff83eb94f0>] copy_net_ns+0xc0/0x3d0 net/core/net_namespace.c:476
+    [<ffffffff812db5d7>] create_new_namespaces+0x197/0x500 kernel/nsproxy.c:110
+    [<ffffffff812dc012>] unshare_nsproxy_namespaces+0xa2/0x120 kernel/nsproxy.c:228
+    [<ffffffff81293f84>] ksys_unshare+0x314/0x610 kernel/fork.c:3435
+    [<ffffffff81294296>] __do_sys_unshare kernel/fork.c:3506 [inline]
+    [<ffffffff81294296>] __se_sys_unshare kernel/fork.c:3504 [inline]
+    [<ffffffff81294296>] __x64_sys_unshare+0x16/0x20 kernel/fork.c:3504
+    [<ffffffff84b2b548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b2b548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+[  846.
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
