@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-53122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CD580169F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B15A98016A2
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C664AB20FB8
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C2A1C20C50
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3F03F8DB;
-	Fri,  1 Dec 2023 22:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AA717D2;
+	Fri,  1 Dec 2023 22:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZWEDuooO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X56gee0X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB27D67
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:55 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-423c28db22eso31312141cf.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:55 -0800 (PST)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B46D6C
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:57 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-41eb4210383so15719571cf.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470395; x=1702075195; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470396; x=1702075196; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBK43eNMRoJ0VYm+mq0tfngczeToPBDiWPoCLfYrtL0=;
-        b=ZWEDuooO8x5CS/vhnUkJeA7HyEYFc7oUYd81c6hbzJCMDkW91LsqifkHiY0N84MAzL
-         BMomIJ3X1bP0d9S2Wfw7KmL4LK3auCwxJJAxc8qHNfvBETcohcRR3YXxo9jU676Bxxa5
-         RIf2rDKNYl2KTjEUswhUNWgnnKyCC4APiuqas=
+        bh=IHPm9bMQ0UUeVCFUzW1wmDi9EoVh1TqfRiSExNkr10g=;
+        b=X56gee0XNWKQHUQ5TVYP0XK/rpyWEbxcsZjpYcOy+Jaqtbjfot6cztzB0aOwqxOU98
+         43Mup/WWN0/LHOIRyPyDOvyAy+++YQbYBuA+HzowRtY0we029FhIxW1oIEgi+GqJK6wV
+         Wanu6szDyHv08cyND6V3H6mBBm4HfWLY8+Uhc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470395; x=1702075195;
+        d=1e100.net; s=20230601; t=1701470396; x=1702075196;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBK43eNMRoJ0VYm+mq0tfngczeToPBDiWPoCLfYrtL0=;
-        b=ERb9FjgwDSkl78IzShkvN3tZQvP5QHVwsyHBR+XEsI/behu351FgxA8swTY5fpdl/i
-         X9WsuKMMEOmRC/2zgxROrX4vQy8rA3wQAzZThBFRnt6nGKTh/8DA7AhJdKyzn7du8X6J
-         ycyJZUrM5haIsP0Erc3q//Cn2Fd/byaefTDfA20atIvyYvnfzDiFNare/C+3WCCUJwBJ
-         Ueu7rze7iNwhICiDSflRo+sXGRPN3yXvimo27UGIfrl0DUE8PYQ5Jmlf2h1DCwoSKa/b
-         ANZtGB74itWgk3iG6KoDFt6CbL0nXjg3GWH93KfB8Tt7jp8VYHDSrelri/9lpIKf6E3N
-         q5Mg==
-X-Gm-Message-State: AOJu0Yxkqgr7gjZIjw+3C5SO36lSKTR+cQi7PnhfLf1xUvzeh1CvNYyl
-	GN/IkawaMlA891PozIp6JY2v0ia5VK5YF3qE5M0=
-X-Google-Smtp-Source: AGHT+IGVYp9CWfAzaWvk/LobAQYXV0x9H9glxDH9+I+xshtoHaJbogrHRQ/VQOICMhbie5siLlrMVA==
-X-Received: by 2002:a05:622a:451:b0:425:4042:f45f with SMTP id o17-20020a05622a045100b004254042f45fmr306525qtx.67.1701470394673;
-        Fri, 01 Dec 2023 14:39:54 -0800 (PST)
+        bh=IHPm9bMQ0UUeVCFUzW1wmDi9EoVh1TqfRiSExNkr10g=;
+        b=Z4/BDSwygxP5DCyjXc6LUl045Q9ZxJG6AsE9/6p/a1G7SQxvEhb5CjVaEgO+Z9/MGP
+         cU7gTXB6MieqipdzlndnkNFJASJuFwlzWTexC2LP3dK8nvlgLdKN3L/zZHZ5zSHmav0F
+         St8XFQ4k16dvk2vgODtNP281QhBt/Ccmci8l+ji1ozVYCoUHbyGI7T2w+PTx+ClRRKTr
+         YDEwPKTapnYjkM3KpCzJMiXffBcDQ3GW9lZSrWGkVS4ezpKeoY+/ItZp6wkNFKq+szvQ
+         O54/YO5N4vig36zMvbmd9hgeAyyrR1L+YbYUvZl/Flfv+GFIJjNa0q956224nfM18XkX
+         xYtw==
+X-Gm-Message-State: AOJu0Yy/zDyeSEHoxxoHVp7aiRIarDzgtbGZ3LKjPEQsPXfOL4/GTLZT
+	2C7i7EUz8PGo99AHM2OQFmX4+A==
+X-Google-Smtp-Source: AGHT+IFB3MrZ9dk1CQ2UFSeqy+zFmfP84thpzn1kbU6pH7H0UeK49vSdP9/LfekeW/v+QR3CZym5VA==
+X-Received: by 2002:a05:622a:1113:b0:424:27c:cff1 with SMTP id e19-20020a05622a111300b00424027ccff1mr356488qty.1.1701470396099;
+        Fri, 01 Dec 2023 14:39:56 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.53
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.54
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:39:54 -0800 (PST)
+        Fri, 01 Dec 2023 14:39:55 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next 05/15] bnxt_en: Implement the new toggle bit doorbell mechanism on P7 chips
-Date: Fri,  1 Dec 2023 14:39:14 -0800
-Message-Id: <20231201223924.26955-6-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: [PATCH net-next 06/15] bnxt_en: Refactor RSS capability fields
+Date: Fri,  1 Dec 2023 14:39:15 -0800
+Message-Id: <20231201223924.26955-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -68,94 +69,198 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007eb72d060b7a72b6"
+	boundary="00000000000093f679060b7a72d1"
 
---0000000000007eb72d060b7a72b6
+--00000000000093f679060b7a72d1
 Content-Transfer-Encoding: 8bit
 
-The new chip family passes the Toggle bits to the driver in the NQE
-notification.  The driver now stores this value and sends it back to
-hardware when it re-arms the RX and TX CQs.  Together with the earlier
-patch that guarantees the driver will only re-arm the CQ at the end of
-NAPI polling if it has seen a new NQE, this method allows the hardware
-to detect any dropped doorbells.
+From: Ajit Khaparde <ajit.khaparde@broadcom.com>
 
+Add a new rss_cap field in the per device struct bnxt and move all
+the RSS capability fields there.  It will be easier to add new RSS
+capabilities for the new P7 chips.
+
+Signed-off-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 +++++++++++++----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 +
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 25 ++++++++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  7 +++---
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 ++---
+ 3 files changed, 20 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index a17de1aceff4..d4da55e01b2c 100644
+index d4da55e01b2c..b38c17a27903 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2880,13 +2880,18 @@ static void __bnxt_poll_cqs_done(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		struct bnxt_db_info *db;
- 
- 		if (cpr2->had_work_done) {
-+			u32 tgl = 0;
-+
-+			if (dbr_type == DBR_TYPE_CQ_ARMALL) {
-+				cpr2->had_nqe_notify = 0;
-+				tgl = cpr2->toggle;
-+			}
- 			db = &cpr2->cp_db;
--			bnxt_writeq(bp, db->db_key64 | dbr_type |
-+			bnxt_writeq(bp,
-+				    db->db_key64 | dbr_type | DB_TOGGLE(tgl) |
- 				    DB_RING_IDX(db, cpr2->cp_raw_cons),
- 				    db->doorbell);
- 			cpr2->had_work_done = 0;
--			if (dbr_type == DBR_TYPE_CQ_ARMALL)
--				cpr2->had_nqe_notify = 0;
+@@ -4268,7 +4268,7 @@ static int bnxt_alloc_vnic_attributes(struct bnxt *bp)
+ 			goto out;
  		}
- 	}
- 	__bnxt_poll_work_done(bp, bnapi, budget);
-@@ -2912,6 +2917,8 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
- 		work_done = __bnxt_poll_cqs(bp, bnapi, budget);
- 	}
- 	while (1) {
-+		u16 type;
-+
- 		cons = RING_CMP(raw_cons);
- 		nqcmp = &cpr->nq_desc_ring[CP_RING(cons)][CP_IDX(cons)];
+ vnic_skip_grps:
+-		if ((bp->flags & BNXT_FLAG_NEW_RSS_CAP) &&
++		if ((bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) &&
+ 		    !(vnic->flags & BNXT_VNIC_RSS_FLAG))
+ 			continue;
  
-@@ -2933,7 +2940,8 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
- 		 */
- 		dma_rmb();
+@@ -5765,7 +5765,8 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
+ 	int rc;
  
--		if (nqcmp->type == cpu_to_le16(NQ_CN_TYPE_CQ_NOTIFICATION)) {
-+		type = le16_to_cpu(nqcmp->type);
-+		if (NQE_CN_TYPE(type) == NQ_CN_TYPE_CQ_NOTIFICATION) {
- 			u32 idx = le32_to_cpu(nqcmp->cq_handle_low);
- 			u32 cq_type = BNXT_NQ_HDL_TYPE(idx);
- 			struct bnxt_cp_ring_info *cpr2;
-@@ -2946,6 +2954,7 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
- 			idx = BNXT_NQ_HDL_IDX(idx);
- 			cpr2 = &cpr->cp_ring_arr[idx];
- 			cpr2->had_nqe_notify = 1;
-+			cpr2->toggle = NQE_CN_TOGGLE(type);
- 			work_done += __bnxt_poll_work(bp, cpr2,
- 						      budget - work_done);
- 			cpr->has_more_work |= cpr2->has_more_work;
+ 	bp->hw_ring_stats_size = sizeof(struct ctx_hw_stats);
+-	bp->flags &= ~(BNXT_FLAG_NEW_RSS_CAP | BNXT_FLAG_ROCE_MIRROR_CAP);
++	bp->flags &= ~BNXT_FLAG_ROCE_MIRROR_CAP;
++	bp->rss_cap &= ~BNXT_RSS_CAP_NEW_RSS_CAP;
+ 	if (bp->hwrm_spec_code < 0x10600)
+ 		return 0;
+ 
+@@ -5780,7 +5781,7 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
+ 
+ 		if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS) &&
+ 		    (flags & VNIC_QCAPS_RESP_FLAGS_RSS_DFLT_CR_CAP))
+-			bp->flags |= BNXT_FLAG_NEW_RSS_CAP;
++			bp->rss_cap |= BNXT_RSS_CAP_NEW_RSS_CAP;
+ 		if (flags &
+ 		    VNIC_QCAPS_RESP_FLAGS_ROCE_MIRRORING_CAPABLE_VNIC_CAP)
+ 			bp->flags |= BNXT_FLAG_ROCE_MIRROR_CAP;
+@@ -5793,7 +5794,7 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
+ 		     !(bp->fw_cap & BNXT_FW_CAP_EXT_HW_STATS_SUPPORTED)))
+ 			bp->fw_cap |= BNXT_FW_CAP_VLAN_RX_STRIP;
+ 		if (flags & VNIC_QCAPS_RESP_FLAGS_RSS_HASH_TYPE_DELTA_CAP)
+-			bp->fw_cap |= BNXT_FW_CAP_RSS_HASH_TYPE_DELTA;
++			bp->rss_cap |= BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA;
+ 		bp->max_tpa_v2 = le16_to_cpu(resp->max_aggs_supported);
+ 		if (bp->max_tpa_v2) {
+ 			if (BNXT_CHIP_P5(bp))
+@@ -6456,7 +6457,7 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, int tx_rings, int rx_rings,
+ 			req->num_cmpl_rings = cpu_to_le16(cp_rings);
+ 			req->num_hw_ring_grps = cpu_to_le16(ring_grps);
+ 			req->num_rsscos_ctxs = cpu_to_le16(1);
+-			if (!(bp->flags & BNXT_FLAG_NEW_RSS_CAP) &&
++			if (!(bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) &&
+ 			    bnxt_rfs_supported(bp))
+ 				req->num_rsscos_ctxs =
+ 					cpu_to_le16(ring_grps + 1);
+@@ -9133,7 +9134,7 @@ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
+ 
+ 		vnic = &bp->vnic_info[vnic_id];
+ 		vnic->flags |= BNXT_VNIC_RFS_FLAG;
+-		if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
++		if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
+ 			vnic->flags |= BNXT_VNIC_RFS_NEW_RSS_FLAG;
+ 		rc = bnxt_hwrm_vnic_alloc(bp, vnic_id, ring_id, 1);
+ 		if (rc) {
+@@ -9227,7 +9228,7 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
+ 	rc = bnxt_setup_vnic(bp, 0);
+ 	if (rc)
+ 		goto err_out;
+-	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
++	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
+ 		bnxt_hwrm_update_rss_hash_cfg(bp);
+ 
+ 	if (bp->flags & BNXT_FLAG_RFS) {
+@@ -11555,7 +11556,7 @@ static bool bnxt_rfs_supported(struct bnxt *bp)
+ 		return false;
+ 	if (BNXT_PF(bp) && !BNXT_CHIP_TYPE_NITRO_A0(bp))
+ 		return true;
+-	if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
++	if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
+ 		return true;
+ 	return false;
+ }
+@@ -11576,7 +11577,7 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
+ 	max_rss_ctxs = bnxt_get_max_func_rss_ctxs(bp);
+ 
+ 	/* RSS contexts not a limiting factor */
+-	if (bp->flags & BNXT_FLAG_NEW_RSS_CAP)
++	if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
+ 		max_rss_ctxs = max_vnics;
+ 	if (vnics > max_vnics || vnics > max_rss_ctxs) {
+ 		if (bp->rx_nr_rings > 1)
+@@ -12697,15 +12698,15 @@ static int bnxt_fw_init_one_p2(struct bnxt *bp)
+ 
+ static void bnxt_set_dflt_rss_hash_type(struct bnxt *bp)
+ {
+-	bp->flags &= ~BNXT_FLAG_UDP_RSS_CAP;
++	bp->rss_cap &= ~BNXT_RSS_CAP_UDP_RSS_CAP;
+ 	bp->rss_hash_cfg = VNIC_RSS_CFG_REQ_HASH_TYPE_IPV4 |
+ 			   VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4 |
+ 			   VNIC_RSS_CFG_REQ_HASH_TYPE_IPV6 |
+ 			   VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV6;
+-	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
++	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
+ 		bp->rss_hash_delta = bp->rss_hash_cfg;
+ 	if (BNXT_CHIP_P4_PLUS(bp) && bp->hwrm_spec_code >= 0x10501) {
+-		bp->flags |= BNXT_FLAG_UDP_RSS_CAP;
++		bp->rss_cap |= BNXT_RSS_CAP_UDP_RSS_CAP;
+ 		bp->rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV4 |
+ 				    VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV6;
+ 	}
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 6d96f66dc8c0..79b4deb45cfb 100644
+index 79b4deb45cfb..d10811f4073b 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1038,6 +1038,7 @@ struct bnxt_cp_ring_info {
- 	u8			had_work_done:1;
- 	u8			has_more_work:1;
- 	u8			had_nqe_notify:1;
-+	u8			toggle;
+@@ -1900,8 +1900,6 @@ struct bnxt {
+ 	#define BNXT_FLAG_RFS		0x100
+ 	#define BNXT_FLAG_SHARED_RINGS	0x200
+ 	#define BNXT_FLAG_PORT_STATS	0x400
+-	#define BNXT_FLAG_UDP_RSS_CAP	0x800
+-	#define BNXT_FLAG_NEW_RSS_CAP	0x2000
+ 	#define BNXT_FLAG_WOL_CAP	0x4000
+ 	#define BNXT_FLAG_ROCEV1_CAP	0x8000
+ 	#define BNXT_FLAG_ROCEV2_CAP	0x10000
+@@ -2021,6 +2019,10 @@ struct bnxt {
+ 	u16			rss_indir_tbl_entries;
+ 	u32			rss_hash_cfg;
+ 	u32			rss_hash_delta;
++	u32			rss_cap;
++#define BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA	BIT(0)
++#define BNXT_RSS_CAP_UDP_RSS_CAP		BIT(1)
++#define BNXT_RSS_CAP_NEW_RSS_CAP		BIT(2)
  
- 	u8			cp_ring_type;
- 	u8			cp_idx;
+ 	u16			max_mtu;
+ 	u8			max_tc;
+@@ -2086,7 +2088,6 @@ struct bnxt {
+ 	#define BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V2	BIT_ULL(16)
+ 	#define BNXT_FW_CAP_PCIE_STATS_SUPPORTED	BIT_ULL(17)
+ 	#define BNXT_FW_CAP_EXT_STATS_SUPPORTED		BIT_ULL(18)
+-	#define BNXT_FW_CAP_RSS_HASH_TYPE_DELTA		BIT_ULL(19)
+ 	#define BNXT_FW_CAP_ERR_RECOVER_RELOAD		BIT_ULL(20)
+ 	#define BNXT_FW_CAP_HOT_RESET			BIT_ULL(21)
+ 	#define BNXT_FW_CAP_PTP_RTC			BIT_ULL(22)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 99c8b15bdfbe..14cb0512ee93 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1203,7 +1203,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+ 		if (tuple == 4)
+ 			rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV4;
+ 	} else if (cmd->flow_type == UDP_V4_FLOW) {
+-		if (tuple == 4 && !(bp->flags & BNXT_FLAG_UDP_RSS_CAP))
++		if (tuple == 4 && !(bp->rss_cap & BNXT_RSS_CAP_UDP_RSS_CAP))
+ 			return -EINVAL;
+ 		rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV4;
+ 		if (tuple == 4)
+@@ -1213,7 +1213,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+ 		if (tuple == 4)
+ 			rss_hash_cfg |= VNIC_RSS_CFG_REQ_HASH_TYPE_TCP_IPV6;
+ 	} else if (cmd->flow_type == UDP_V6_FLOW) {
+-		if (tuple == 4 && !(bp->flags & BNXT_FLAG_UDP_RSS_CAP))
++		if (tuple == 4 && !(bp->rss_cap & BNXT_RSS_CAP_UDP_RSS_CAP))
+ 			return -EINVAL;
+ 		rss_hash_cfg &= ~VNIC_RSS_CFG_REQ_HASH_TYPE_UDP_IPV6;
+ 		if (tuple == 4)
+@@ -1253,7 +1253,7 @@ static int bnxt_srxfh(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+ 	if (bp->rss_hash_cfg == rss_hash_cfg)
+ 		return 0;
+ 
+-	if (bp->fw_cap & BNXT_FW_CAP_RSS_HASH_TYPE_DELTA)
++	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
+ 		bp->rss_hash_delta = bp->rss_hash_cfg ^ rss_hash_cfg;
+ 	bp->rss_hash_cfg = rss_hash_cfg;
+ 	if (netif_running(bp->dev)) {
 -- 
 2.30.1
 
 
---0000000000007eb72d060b7a72b6
+--00000000000093f679060b7a72d1
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -226,14 +331,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIA20dT2dtz51ETBczoAIIQX9T3T1hBmw
-8FvBWelGiqWpMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyMzk1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILrJXGyNvPpCM1yrUkLhjK3fe3JhaZG2
++wTpgl/aeRjkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyMzk1NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBGKB4kenTTR6jaARrOVC3lkLII9kEcF8rvRt7PnZ++1lUYvJXY
-gzm/DOLdjFIZplk3jfZ5tCX8+sZrTpolWt79uOzUpzrYwFj3YIdw6agchKGT6X1dgHh1LH4kkMuX
-ubGTXVf2VOs36xc1pjdidTw3/aHdh4xaN9V8k8oOh40WNKTdI6SF0qLKHOif5zSCLFdBbFXUftYZ
-5CPZmwjOEXtHft7NaSF/VXbUo1woEjZpg4sTfCcSPpSYTdM+DMcQdCQb33stpSjVAVrpoFxOVs+S
-kPm1nlyhBbDVP/03MNoqHKebgMH4SCx7xoxqaKYjrL71tkbdR1aJVsx+sWobmHVz
---0000000000007eb72d060b7a72b6--
+ATANBgkqhkiG9w0BAQEFAASCAQCHqCFlKERTbrOlFfhr44YxkJU4zEvPxDasilpxzTaEPW8TZ8RW
+7s8Ebog050UQiOo7vvzoN0zE5REJQw4fjdQBpFE3rPWakow6v9uruNaYaxfmvkCBQl59rKgoS0IV
+bmw7yuvsp+yODL06rjUObJ0uu4MfW5dEWaMojfrftHrDj6lBaGJ8XDT0kOlRJF30GeeMya9RnL+8
+nFPeYrfbdWjs4XtRLvjOsjAhDEF6jmTxlN0zGOrlsQdAmqDsPfKGKeiyv8hu0tV20CB3kEYEtvJ0
+Xlo2KDVsQkpBr1hqrhipGZXRMWDjBRsjree6OVz/Udh8Y6EpGloyOn8hzV2BwM/r
+--00000000000093f679060b7a72d1--
 
