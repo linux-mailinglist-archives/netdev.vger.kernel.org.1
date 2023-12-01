@@ -1,163 +1,140 @@
-Return-Path: <netdev+bounces-52960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28020800EB5
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:39:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3F5800EE1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AB70B21044
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:39:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E85ED1F20F91
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF1C4AF9C;
-	Fri,  1 Dec 2023 15:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9387F4B5D8;
+	Fri,  1 Dec 2023 15:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRASJF6O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EutDptHi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E441B4A9AA;
-	Fri,  1 Dec 2023 15:39:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EBDDC433C7;
-	Fri,  1 Dec 2023 15:39:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701445181;
-	bh=V7WtW43roNI+kWQ1jgxoaFh9ZbnjwKeONNImrea0QOQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TRASJF6OIlc3u7XXuhbDaK4viFQJH7E7P4b0J4LqnZBm3T4XlnR3wBJcRPM9GJJO4
-	 4Y3WNVYM4egNGn7EKS+XOf7HsyIWWI1Ehnm+UycZlQSrC7GkVbPj/7oh4rYBe9Ht/3
-	 Q8rfJDaPym3mbS1oRuUcd7Vy4vu8MUT7Jlq0QsMl1UPCi5URZ2uu+0dCnh7/NJHdvr
-	 AOgvp6+9g5MBccZC9x5e2TXU8Eg2bC9bCY7IiiWlMjj1jU3MkU2p5RjuMLWiXpjfxN
-	 KoK0WQEMGg98VWuozPV8zRgNgzyxLI3luIXEVYj89SJnBDR6Vm0nnbrxcaIOf+rl7s
-	 FVxTlyu/GUKTA==
-Message-ID: <179a4581-f7df-4eb1-ab67-8d65f856a2fe@kernel.org>
-Date: Fri, 1 Dec 2023 16:39:32 +0100
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D86110DE
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:58:37 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54c69c61b58so4237a12.1
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 07:58:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701446315; x=1702051115; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s4XTRLCjQNY4AaZPgLHYq/6hjlTc5C/AJGeUvs9n7yQ=;
+        b=EutDptHiUw9rM5JuCY25WabPBKiHNyPj2O8tbnWZTfTULbh5vz19L9UJegjVgsyfFk
+         cnKJvb6nZkgmUV/rwAMaUGJpGZd5hX+RNq71upD92ZX8d39R15O/ERxAo+csVA1cHGWe
+         h0OnMhCRHTvVMVwlq58HGZcvhgh8dXO/L845Y5SGYxAnrGLYg1wa32vEFvVYHLTDwi74
+         DcqSouehddDVIVFPWQvFQpRD9HoV23wB/cSE+MA+OPlrc3s+nkEMeoP6qN9tABLvpLY8
+         q+dQtyl+0cpur+BJ78wT1WjMlm2YoK1B1qdFMTR9sk7jDFwd7ZhDtm4Ji3Pgeq2EcIM+
+         c4xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701446315; x=1702051115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s4XTRLCjQNY4AaZPgLHYq/6hjlTc5C/AJGeUvs9n7yQ=;
+        b=HPkeOcJ4mAhqazOE5A8rGsbAAmM6R6kYuoMN7E43r7+QDGoXlHCXFXoxwjoQkJUPoA
+         XkcRFr0M5dmHiRVS7QQ7c9i9rrZveLPSamX2+1OR7s0vR1PtYtkqEHh7kTWocG938muN
+         uTS+sviF7lL03Sx63COqOGdKxAVVlRVucH0gJIgWjPHuSEDxyUXz/peQA9vo1z47aHA9
+         61PeUdT0npfgXYomhhpDRp02LRZ/K4YX9u74ZrRqGMvJCekrHe8TKvlp9rE+3D8uLIC9
+         SsZb1ioZqtYruT+7Tu0HAWuNWDuBAX6N3wp0midl4fNS71AljaYr9LT4wS2uuxLL1io6
+         Oj4A==
+X-Gm-Message-State: AOJu0YwP2KuRPwh1rRFpew60R0bwtaaDiMgtmFVBMrZgV14CwrPwSaWS
+	mO4R574pNeTs0wKVk9hpuTQfUON+hiwzY0e0ksJ+fA==
+X-Google-Smtp-Source: AGHT+IETZC5B9Y3xnn8xU2T+GKS4UY7ZOf1kGKXZS07ClteBVWmFc9YIExz8FHVfWlSRa04bkafc9UBaoXCV5Z1s4T0=
+X-Received: by 2002:a50:d49c:0:b0:543:fb17:1a8 with SMTP id
+ s28-20020a50d49c000000b00543fb1701a8mr83421edi.3.1701446315174; Fri, 01 Dec
+ 2023 07:58:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "Song, Yoong Siang" <yoong.siang.song@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Bjorn Topel <bjorn@kernel.org>, "Karlsson, Magnus"
- <magnus.karlsson@intel.com>,
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andre Fredette <afredette@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
- <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
- <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
- <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231201083926.1817394-1-judyhsiao@chromium.org>
+ <CANn89iJMbMZdnJRP0CUVfEi20whhShBfO+DAmdaerhiXfiTx5A@mail.gmail.com> <CAD=FV=Vf18TxUWpGTN9b=iECq=5BmEoopQjsMH2U6bDX2=T3cQ@mail.gmail.com>
+In-Reply-To: <CAD=FV=Vf18TxUWpGTN9b=iECq=5BmEoopQjsMH2U6bDX2=T3cQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 1 Dec 2023 16:58:21 +0100
+Message-ID: <CANn89iLzmKOGhMeUUxeM=1b2PP3kieTeYsmpfA0GvJdcQMkgtQ@mail.gmail.com>
+Subject: Re: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable
+ preemption for long
+To: Doug Anderson <dianders@chromium.org>
+Cc: Judy Hsiao <judyhsiao@chromium.org>, David Ahern <dsahern@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 12/1/23 16:09, Willem de Bruijn wrote:
-> Song, Yoong Siang wrote:
->> On Friday, December 1, 2023 6:46 PM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>> On 12/1/23 07:24, Song Yoong Siang wrote:
->>>> This series expands XDP TX metadata framework to include ETF HW offload.
->>>>
->>>> Changes since v1:
->>>> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
->>>> - rename launch-time to txtime
->>>>
->>>
->>> I strongly disagree with this renaming (sorry to disagree with Willem).
->>>
->>> The i210 and i225 chips call this LaunchTime in their programmers
->>> datasheets, and even in the driver code[1].
->>>
->>> Using this "txtime" name in the code is also confusing, because how can
->>> people reading the code know the difference between:
->>>   - tmo_request_timestamp and tmo_request_txtime
->>>
->>
->> Hi Jesper and Willem,
->>
->> How about using "launch_time" for the flag/variable and
->> "Earliest TxTime First" for the description/comments?
-> 
-
-I don't follow why you are calling the feature:
-  - "Earliest TxTime First" (ETF).
-  - AFAIK this just reference an qdisc name (that most don't know exists)
-
-
-> I don't particularly care which term we use, as long as we're
-> consistent. Especially, don't keep introducing new synonyms.
-> 
-> The fact that one happens to be one vendor's marketing term does not
-> make it preferable, IMHO. On the contrary.
+On Fri, Dec 1, 2023 at 4:16=E2=80=AFPM Doug Anderson <dianders@chromium.org=
+> wrote:
 >
+> Hi,
+>
+> On Fri, Dec 1, 2023 at 1:10=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Fri, Dec 1, 2023 at 9:39=E2=80=AFAM Judy Hsiao <judyhsiao@chromium.o=
+rg> wrote:
+> > >
+> > > We are seeing cases where neigh_cleanup_and_release() is called by
+> > > neigh_forced_gc() many times in a row with preemption turned off.
+> > > When running on a low powered CPU at a low CPU frequency, this has
+> > > been measured to keep preemption off for ~10 ms. That's not great on =
+a
+> > > system with HZ=3D1000 which expects tasks to be able to schedule in
+> > > with ~1ms latency.
+> >
+> > This will not work in general, because this code runs with BH blocked.
+> >
+> > jiffies will stay untouched for many more ms on systems with only one C=
+PU.
+> >
+> > I would rather not rely on jiffies here but ktime_get_ns() [1]
+> >
+> > Also if we break the loop based on time, we might be unable to purge
+> > the last elements in gc_list.
+> > We might need to use a second list to make sure to cycle over all
+> > elements eventually.
+> >
+> >
+> > [1]
+> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> > index df81c1f0a57047e176b7c7e4809d2dae59ba6be5..e2340e6b07735db8cf6e75d=
+23ef09bb4b0db53b4
+> > 100644
+> > --- a/net/core/neighbour.c
+> > +++ b/net/core/neighbour.c
+> > @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl=
+)
+> >  {
+> >         int max_clean =3D atomic_read(&tbl->gc_entries) -
+> >                         READ_ONCE(tbl->gc_thresh2);
+> > +       u64 tmax =3D ktime_get_ns() + NSEC_PER_MSEC;
+>
+> It might be nice to make the above timeout based on jiffies. On a
+> HZ=3D100 system it's probably OK to keep preemption disabled for 10 ms
+> but on a HZ=3D1000 system you'd want 1 ms. ...so maybe you'd want to use
+> jiffies_to_nsecs(1)?
 
-These kind of hardware features are defined as part of Time Sensitive
-Networking (TSN).
-I believe these TSN features are defined as part of IEEE 802.1Qbv (2015)
-and according to Wikipedia[2] incorporated into IEEE 802.1Q.
+I do not think so. 10ms would be awfully long.
 
-[2] https://en.wikipedia.org/wiki/Time-Sensitive_Networking
+We have nsec based time service, why downgrading to jiffies resolution ???
 
+>
+> One worry might be that we disabled preemption _right before_ we were
+> supposed to be scheduled out. In that case we'll end up blocking some
+> other task for another full timeslice, but maybe there's not a lot we
+> can do there?
 
-> SO_TXTIME is in the ABI, and EDT has been used publicly in kernel
-> patches and conference talks, e.g., Van Jacobson's Netdev 0x12
-> keynote. Those are vendor agnostic commonly used terms.
-> 
-
-I agree that EDT (Earliest Departure Time) have become a thing and term
-in our community.
-We could associate this feature with this.
-I do fear what hardware behavior will be it if I e.g. ask it to send a
-packet 2 sec in the future on i225 which max support 1 sec.
-Will hardware send it at 1 sec?
-Because then I'm violating the *Earliest* Departure Time.
-
-
-> But as long as Launch Time is not an Intel only trademark, fine to
-> select that.
-
-The IEEE 802.1Qbv is sometimes called Time-Aware Shaper (TAS), but I
-don't like to for us to name this after this.  This features is simply
-taking advantage of exposing one of the hardware building blocks
-(controlling/setting packet "launch time") that can be used for
-implementing a TAS.
-
-I like the name "launch time" because it doesn't get easily confused
-with other timestamps, and intuitively describes packet will be send at
-a specific time (likely in future).
-
---Jesper
+Can you tell us in which scenario this gc_list can be so big, other
+than fuzzers ?
 
