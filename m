@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-53119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A043C80169B
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF7580169D
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 23:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2277C1F21082
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C7B91F2109F
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 22:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7FC619CB;
-	Fri,  1 Dec 2023 22:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD17619D2;
+	Fri,  1 Dec 2023 22:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RwiGke7k"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LdC3nIs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1EF8AD
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:52 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-42542163a1fso93571cf.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:52 -0800 (PST)
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5422FD54
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 14:39:54 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3b5714439b3so662310b6e.3
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 14:39:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701470392; x=1702075192; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701470393; x=1702075193; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8q90gn4bNPRL1M4sFYZ3SudsPk9XpXBothX4HDEsfZs=;
-        b=RwiGke7kPNOxgKYV/scDoK+AEktFGijTy3kC6MxIR5LQ+m0w3M9LW/tXhINBPrrTGK
-         gWPFST1MzF7QJxBAt1LqVp9BvEyXC/zWwpfqj9TTIPLOPEHWTXUcQrZQfTMEEpTFkQ3s
-         qs9uIWNxRCBlDikLCSfgMqmgidV9yHenYCWFM=
+        bh=dlN4F1+odCy5PCjDvuF2a1q4z1fAhAL3aqBytEBXCU8=;
+        b=LdC3nIs6Jb+MsUxPn+OWAUJbSqEuJ+EPzUTj3VWRbiGf/+TrTCgOh8ykcAKauL8sUP
+         eMod9aGxK6IGaahWWtqymM2Qh++lGmXbsthQVQzJfqQL1BfHrQTOpnAkavipDYiGW5wr
+         8VeT8wfyp2R8Rk4bY81etaDW5m7SQI3/rDOWY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701470392; x=1702075192;
+        d=1e100.net; s=20230601; t=1701470393; x=1702075193;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8q90gn4bNPRL1M4sFYZ3SudsPk9XpXBothX4HDEsfZs=;
-        b=dDL0sZrcLUQi17a8mMbs3Cnzt/j4dy58q13u8yOPKaSD9PowxLC+6dJ3PaFCido07b
-         D1jERrVoLg20gKC1NqT+Si9Jq4oGuI8RBdfeWC0Be2kA0mYJ966ciIN44Erax/2Tcwby
-         qBS3bQ80elbmkjpA0VRooYTPdYMP70ZjlNFAeg92LZkasSKp2b83TgnBVv3iGpY3E0Tw
-         hvXdSlAduUUBferd+RprBImuqYHW76418bc8cy2wPDvJUU4TgaR60fULX7m9qml+QSwR
-         hDrC9CxEqtIWNoyN8UjhBFfwrfS2x+Asc612hT7SRXYxb29YzDNegYMzc2XI4p+Vnf8h
-         RyRg==
-X-Gm-Message-State: AOJu0YwiwfhUOvV2VrXRNsiTKz99z1yqVueBH06E6A0/xTeTpw+kGRmD
-	d9Ts2DKsBY74qFQkL7F7TQJd7Q==
-X-Google-Smtp-Source: AGHT+IFy63Jz3UQp+xGfN3m1aIvRc6GDlTr1MtYaDgRym4hqvYKqg9gjPmA7MeavathKbq2YhIlX+A==
-X-Received: by 2002:a05:622a:40b:b0:41e:2314:8dde with SMTP id n11-20020a05622a040b00b0041e23148ddemr273460qtx.38.1701470391638;
-        Fri, 01 Dec 2023 14:39:51 -0800 (PST)
+        bh=dlN4F1+odCy5PCjDvuF2a1q4z1fAhAL3aqBytEBXCU8=;
+        b=mXA0mRwUOIFEa+gNiB26Nu3mRdaPLhvCDKJEAycMVdiz0MqU2dAzg2W/5QMrtXCXRB
+         Os7ibdV/PEPVoyVtccDhjDbBv5PtYOQ6XN+lgITSUhMzuCI+/Lpfj+ha8KR2ssrkYCAC
+         iw8vEcUVPn1YZ2JXlNAn5aRmSjFlUM2CGy0GG1M8EDWiGIhrjcGZWg5UNAs7vmOOYzet
+         lqaxarvjUmtoYCaiUILaBQNLdDcYgI9TUhpCGX2t0fgAb/nzsJJV/yUnT+cfsvraOz11
+         92iEIzdeT3ywBJjxpzZdGyMn7/tc28ok4sXBVk1TyZ1u2yybLrnVOA606ji+nDAxn6Ci
+         hzDQ==
+X-Gm-Message-State: AOJu0Ywn9YWrTH0rSWg5c4z8EJCIVhSwHMINr7W3sWShEFu+SL5bn6Wd
+	QpR5Hg+dsgw64u4O4NoEXozKQg==
+X-Google-Smtp-Source: AGHT+IGqgA+i3LFD9RoU92PIz0ExaAN8CL9+uLwQwwnyT8KU/RRZ7XutBT0PUBgbs2W5WMQ0V4fiQQ==
+X-Received: by 2002:aca:280e:0:b0:3b8:b063:8965 with SMTP id 14-20020aca280e000000b003b8b0638965mr207705oix.115.1701470393421;
+        Fri, 01 Dec 2023 14:39:53 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.50
+        by smtp.gmail.com with ESMTPSA id i14-20020ac8488e000000b004199c98f87dsm1878715qtq.74.2023.12.01.14.39.51
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Dec 2023 14:39:51 -0800 (PST)
+        Fri, 01 Dec 2023 14:39:52 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net-next 03/15] bnxt_en: Define basic P7 macros
-Date: Fri,  1 Dec 2023 14:39:12 -0800
-Message-Id: <20231201223924.26955-4-michael.chan@broadcom.com>
+	gospo@broadcom.com,
+	Hongguang Gao <hongguang.gao@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next 04/15] bnxt_en: Consolidate DB offset calculation
+Date: Fri,  1 Dec 2023 14:39:13 -0800
+Message-Id: <20231201223924.26955-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231201223924.26955-1-michael.chan@broadcom.com>
 References: <20231201223924.26955-1-michael.chan@broadcom.com>
@@ -68,245 +70,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000050aa88060b7a7221"
+	boundary="0000000000006c9743060b7a7283"
 
---00000000000050aa88060b7a7221
+--0000000000006c9743060b7a7283
 Content-Transfer-Encoding: 8bit
 
-Repurpose the BNXT_FLAG_CHIP_SR2 flag by renaming it to
-BNXT_FLAG_CHIP_P7 since the SR2 chip never went to production.  The SR2
-statictics structure is also renamed for the P7 chip.  Define the basic
-P7 doorbell bits (Epoch. Toggle, etc) and implement the Epoch bit
-logic.  The next higher bit beyond the legal doorbell mask is the
-Epoch bit used for doorbells on P7 chips.  This bit is used by the
-chip to detect dropped doorbells.
+From: Hongguang Gao <hongguang.gao@broadcom.com>
 
-The 57608 chip ID belonging to the P7 family is also defined.  Note
-that the PCI ID is not added until the last patch in the series.
+The doorbell offset on P5 chips is hard coded.  On the new P7 chips,
+it is returned by the firmware.  Simplify the logic that determines
+this offset and store it in a new db_offset field in struct bnxt.
+Also, provide this offset to the RoCE driver in struct bnxt_en_dev.
 
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Signed-off-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 21 ++++++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 40 ++++++++++++++-----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  2 +-
- 3 files changed, 48 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 16 +++++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 10 ++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |  4 ++++
+ 4 files changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6f37b6ac8996..829b2a6a05a0 100644
+index 829b2a6a05a0..a17de1aceff4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -260,6 +260,10 @@ static bool bnxt_vf_pciid(enum board_idx idx)
- 	bnxt_writeq(bp, (db)->db_key64 | DBR_TYPE_NQ | DB_RING_IDX(db, idx),\
- 		    (db)->doorbell)
- 
-+#define BNXT_DB_NQ_P7(db, idx)						\
-+	bnxt_writeq(bp, (db)->db_key64 | DBR_TYPE_NQ_MASK |		\
-+		    DB_RING_IDX(db, idx), (db)->doorbell)
-+
- #define BNXT_DB_CQ_ARM(db, idx)						\
- 	writel(DB_CP_REARM_FLAGS | DB_RING_IDX(db, idx), (db)->doorbell)
- 
-@@ -269,7 +273,9 @@ static bool bnxt_vf_pciid(enum board_idx idx)
- 
- static void bnxt_db_nq(struct bnxt *bp, struct bnxt_db_info *db, u32 idx)
+@@ -6031,10 +6031,6 @@ static void bnxt_set_db(struct bnxt *bp, struct bnxt_db_info *db, u32 ring_type,
+ 			u32 map_idx, u32 xid)
  {
--	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
-+	if (bp->flags & BNXT_FLAG_CHIP_P7)
-+		BNXT_DB_NQ_P7(db, idx);
-+	else if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
- 		BNXT_DB_NQ_P5(db, idx);
- 	else
- 		BNXT_DB_CQ(db, idx);
-@@ -5784,7 +5790,7 @@ static int bnxt_hwrm_vnic_qcaps(struct bnxt *bp)
- 			if (BNXT_CHIP_P5(bp))
- 				bp->hw_ring_stats_size = BNXT_RING_STATS_SIZE_P5;
- 			else
--				bp->hw_ring_stats_size = BNXT_RING_STATS_SIZE_P5_SR2;
-+				bp->hw_ring_stats_size = BNXT_RING_STATS_SIZE_P7;
- 		}
- 	}
- 	hwrm_req_drop(bp, req);
-@@ -6015,6 +6021,10 @@ static void bnxt_set_db_mask(struct bnxt *bp, struct bnxt_db_info *db,
- 		db->db_ring_mask = bp->cp_ring_mask;
- 		break;
- 	}
-+	if (bp->flags & BNXT_FLAG_CHIP_P7) {
-+		db->db_epoch_mask = db->db_ring_mask + 1;
-+		db->db_epoch_shift = DBR_EPOCH_SFT - ilog2(db->db_epoch_mask);
-+	}
- }
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+-		if (BNXT_PF(bp))
+-			db->doorbell = bp->bar1 + DB_PF_OFFSET_P5;
+-		else
+-			db->doorbell = bp->bar1 + DB_VF_OFFSET_P5;
+ 		switch (ring_type) {
+ 		case HWRM_RING_ALLOC_TX:
+ 			db->db_key64 = DBR_PATH_L2 | DBR_TYPE_SQ;
+@@ -6054,6 +6050,8 @@ static void bnxt_set_db(struct bnxt *bp, struct bnxt_db_info *db, u32 ring_type,
  
- static void bnxt_set_db(struct bnxt *bp, struct bnxt_db_info *db, u32 ring_type,
-@@ -6041,6 +6051,9 @@ static void bnxt_set_db(struct bnxt *bp, struct bnxt_db_info *db, u32 ring_type,
- 			break;
- 		}
- 		db->db_key64 |= (u64)xid << DBR_XID_SFT;
+ 		if (bp->flags & BNXT_FLAG_CHIP_P7)
+ 			db->db_key64 |= DBR_VALID;
 +
-+		if (bp->flags & BNXT_FLAG_CHIP_P7)
-+			db->db_key64 |= DBR_VALID;
++		db->doorbell = bp->bar1 + bp->db_offset;
  	} else {
  		db->doorbell = bp->bar1 + map_idx * 0x80;
  		switch (ring_type) {
-@@ -14014,8 +14027,8 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+@@ -7146,7 +7144,6 @@ static int bnxt_hwrm_func_qcfg(struct bnxt *bp)
+ {
+ 	struct hwrm_func_qcfg_output *resp;
+ 	struct hwrm_func_qcfg_input *req;
+-	u32 min_db_offset = 0;
+ 	u16 flags;
+ 	int rc;
  
- 	if (BNXT_CHIP_P5_PLUS(bp)) {
- 		bp->flags |= BNXT_FLAG_CHIP_P5_PLUS;
--		if (BNXT_CHIP_SR2(bp))
--			bp->flags |= BNXT_FLAG_CHIP_SR2;
-+		if (BNXT_CHIP_P7(bp))
-+			bp->flags |= BNXT_FLAG_CHIP_P7;
+@@ -7204,16 +7201,17 @@ static int bnxt_hwrm_func_qcfg(struct bnxt *bp)
+ 	if (bp->db_size)
+ 		goto func_qcfg_exit;
+ 
+-	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
++	bp->db_offset = le16_to_cpu(resp->legacy_l2_db_size_kb) * 1024;
++	if (BNXT_CHIP_P5(bp)) {
+ 		if (BNXT_PF(bp))
+-			min_db_offset = DB_PF_OFFSET_P5;
++			bp->db_offset = DB_PF_OFFSET_P5;
+ 		else
+-			min_db_offset = DB_VF_OFFSET_P5;
++			bp->db_offset = DB_VF_OFFSET_P5;
  	}
+ 	bp->db_size = PAGE_ALIGN(le16_to_cpu(resp->l2_doorbell_bar_size_kb) *
+ 				 1024);
+ 	if (!bp->db_size || bp->db_size > pci_resource_len(bp->pdev, 2) ||
+-	    bp->db_size <= min_db_offset)
++	    bp->db_size <= bp->db_offset)
+ 		bp->db_size = pci_resource_len(bp->pdev, 2);
  
- 	rc = bnxt_alloc_rss_indir_tbl(bp);
+ func_qcfg_exit:
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 8a22b2d7ea94..40b26f7a0f5e 100644
+index 40b26f7a0f5e..6d96f66dc8c0 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -541,6 +541,8 @@ struct nqe_cn {
- 	#define NQ_CN_TYPE_SFT            0
- 	#define NQ_CN_TYPE_CQ_NOTIFICATION  0x30UL
- 	#define NQ_CN_TYPE_LAST            NQ_CN_TYPE_CQ_NOTIFICATION
-+	#define NQ_CN_TOGGLE_MASK         0xc0UL
-+	#define NQ_CN_TOGGLE_SFT          6
- 	__le16	reserved16;
- 	__le32	cq_handle_low;
- 	__le32	v;
-@@ -561,6 +563,10 @@ struct nqe_cn {
- #define BNXT_SET_NQ_HDL(cpr)						\
- 	(((cpr)->cp_ring_type << BNXT_NQ_HDL_TYPE_SHIFT) | (cpr)->cp_idx)
+@@ -2216,6 +2216,7 @@ struct bnxt {
+ 	/* ensure atomic 64-bit doorbell writes on 32-bit systems. */
+ 	spinlock_t		db_lock;
+ #endif
++	int			db_offset;	/* db_offset within db_size */
+ 	int			db_size;
  
-+#define NQE_CN_TYPE(type)	((type) & NQ_CN_TYPE_MASK)
-+#define NQE_CN_TOGGLE(type)	(((type) & NQ_CN_TOGGLE_MASK) >>	\
-+				 NQ_CN_TOGGLE_SFT)
-+
- #define DB_IDX_MASK						0xffffff
- #define DB_IDX_VALID						(0x1 << 26)
- #define DB_IRQ_DIS						(0x1 << 27)
-@@ -576,9 +582,14 @@ struct nqe_cn {
- 
- /* 64-bit doorbell */
- #define DBR_INDEX_MASK					0x0000000000ffffffULL
-+#define DBR_EPOCH_MASK					0x01000000UL
-+#define DBR_EPOCH_SFT					24
-+#define DBR_TOGGLE_MASK					0x06000000UL
-+#define DBR_TOGGLE_SFT					25
- #define DBR_XID_MASK					0x000fffff00000000ULL
- #define DBR_XID_SFT					32
- #define DBR_PATH_L2					(0x1ULL << 56)
-+#define DBR_VALID					(0x1ULL << 58)
- #define DBR_TYPE_SQ					(0x0ULL << 60)
- #define DBR_TYPE_RQ					(0x1ULL << 60)
- #define DBR_TYPE_SRQ					(0x2ULL << 60)
-@@ -591,6 +602,7 @@ struct nqe_cn {
- #define DBR_TYPE_CQ_CUTOFF_ACK				(0x9ULL << 60)
- #define DBR_TYPE_NQ					(0xaULL << 60)
- #define DBR_TYPE_NQ_ARM					(0xbULL << 60)
-+#define DBR_TYPE_NQ_MASK				(0xeULL << 60)
- #define DBR_TYPE_NULL					(0xfULL << 60)
- 
- #define DB_PF_OFFSET_P5					0x10000
-@@ -819,9 +831,17 @@ struct bnxt_db_info {
- 		u32		db_key32;
- 	};
- 	u32			db_ring_mask;
-+	u32			db_epoch_mask;
-+	u8			db_epoch_shift;
- };
- 
--#define DB_RING_IDX(db, idx)	((idx) & (db)->db_ring_mask)
-+#define DB_EPOCH(db, idx)	(((idx) & (db)->db_epoch_mask) <<	\
-+				 ((db)->db_epoch_shift))
-+
-+#define DB_TOGGLE(tgl)		((tgl) << DBR_TOGGLE_SFT)
-+
-+#define DB_RING_IDX(db, idx)	(((idx) & (db)->db_ring_mask) |		\
-+				 DB_EPOCH(db, idx))
- 
- struct bnxt_tx_ring_info {
- 	struct bnxt_napi	*bnapi;
-@@ -1803,14 +1823,14 @@ struct bnxt {
- #define CHIP_NUM_57504		0x1751
- #define CHIP_NUM_57502		0x1752
- 
-+#define CHIP_NUM_57608		0x1760
-+
- #define CHIP_NUM_58802		0xd802
- #define CHIP_NUM_58804		0xd804
- #define CHIP_NUM_58808		0xd808
- 
- 	u8			chip_rev;
- 
--#define CHIP_NUM_58818		0xd818
--
- #define BNXT_CHIP_NUM_5730X(chip_num)		\
- 	((chip_num) >= CHIP_NUM_57301 &&	\
- 	 (chip_num) <= CHIP_NUM_57304)
-@@ -1888,7 +1908,7 @@ struct bnxt {
- 					 BNXT_FLAG_ROCEV2_CAP)
- 	#define BNXT_FLAG_NO_AGG_RINGS	0x20000
- 	#define BNXT_FLAG_RX_PAGE_MODE	0x40000
--	#define BNXT_FLAG_CHIP_SR2	0x80000
-+	#define BNXT_FLAG_CHIP_P7	0x80000
- 	#define BNXT_FLAG_MULTI_HOST	0x100000
- 	#define BNXT_FLAG_DSN_VALID	0x200000
- 	#define BNXT_FLAG_DOUBLE_DB	0x400000
-@@ -1918,8 +1938,8 @@ struct bnxt {
- 				  (bp)->max_tpa_v2) && !is_kdump_kernel())
- #define BNXT_RX_JUMBO_MODE(bp)	((bp)->flags & BNXT_FLAG_JUMBO)
- 
--#define BNXT_CHIP_SR2(bp)			\
--	((bp)->chip_num == CHIP_NUM_58818)
-+#define BNXT_CHIP_P7(bp)			\
-+	((bp)->chip_num == CHIP_NUM_57608)
- 
- #define BNXT_CHIP_P5(bp)			\
- 	((bp)->chip_num == CHIP_NUM_57508 ||	\
-@@ -1928,7 +1948,7 @@ struct bnxt {
- 
- /* Chip class phase 5 */
- #define BNXT_CHIP_P5_PLUS(bp)			\
--	(BNXT_CHIP_P5(bp) || BNXT_CHIP_SR2(bp))
-+	(BNXT_CHIP_P5(bp) || BNXT_CHIP_P7(bp))
- 
- /* Chip class phase 4.x */
- #define BNXT_CHIP_P4(bp)			\
-@@ -2272,15 +2292,15 @@ struct bnxt {
- #define BNXT_NUM_TX_RING_STATS			8
- #define BNXT_NUM_TPA_RING_STATS			4
- #define BNXT_NUM_TPA_RING_STATS_P5		5
--#define BNXT_NUM_TPA_RING_STATS_P5_SR2		6
-+#define BNXT_NUM_TPA_RING_STATS_P7		6
- 
- #define BNXT_RING_STATS_SIZE_P5					\
- 	((BNXT_NUM_RX_RING_STATS + BNXT_NUM_TX_RING_STATS +	\
- 	  BNXT_NUM_TPA_RING_STATS_P5) * 8)
- 
--#define BNXT_RING_STATS_SIZE_P5_SR2				\
-+#define BNXT_RING_STATS_SIZE_P7					\
- 	((BNXT_NUM_RX_RING_STATS + BNXT_NUM_TX_RING_STATS +	\
--	  BNXT_NUM_TPA_RING_STATS_P5_SR2) * 8)
-+	  BNXT_NUM_TPA_RING_STATS_P7) * 8)
- 
- #define BNXT_GET_RING_STATS64(sw, counter)		\
- 	(*((sw) + offsetof(struct ctx_hw_stats, counter) / 8))
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index b0cea5b600cc..99c8b15bdfbe 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -513,7 +513,7 @@ static int bnxt_get_num_tpa_ring_stats(struct bnxt *bp)
- 		if (bp->max_tpa_v2) {
- 			if (BNXT_CHIP_P5(bp))
- 				return BNXT_NUM_TPA_RING_STATS_P5;
--			return BNXT_NUM_TPA_RING_STATS_P5_SR2;
-+			return BNXT_NUM_TPA_RING_STATS_P7;
- 		}
- 		return BNXT_NUM_TPA_RING_STATS;
+ #define BNXT_NTP_FLTR_MAX_FLTR	4096
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+index e89731492f5e..93f9bd55020f 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+@@ -42,13 +42,10 @@ static void bnxt_fill_msix_vecs(struct bnxt *bp, struct bnxt_msix_entry *ent)
+ 	for (i = 0; i < num_msix; i++) {
+ 		ent[i].vector = bp->irq_tbl[idx + i].vector;
+ 		ent[i].ring_idx = idx + i;
+-		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+-			ent[i].db_offset = DB_PF_OFFSET_P5;
+-			if (BNXT_VF(bp))
+-				ent[i].db_offset = DB_VF_OFFSET_P5;
+-		} else {
++		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
++			ent[i].db_offset = bp->db_offset;
++		else
+ 			ent[i].db_offset = (idx + i) * 0x80;
+-		}
  	}
+ }
+ 
+@@ -333,6 +330,7 @@ static void bnxt_set_edev_info(struct bnxt_en_dev *edev, struct bnxt *bp)
+ 	edev->pdev = bp->pdev;
+ 	edev->l2_db_size = bp->db_size;
+ 	edev->l2_db_size_nc = bp->db_size;
++	edev->l2_db_offset = bp->db_offset;
+ 
+ 	if (bp->flags & BNXT_FLAG_ROCEV1_CAP)
+ 		edev->flags |= BNXT_EN_FLAG_ROCEV1_CAP;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
+index 6ff77f082e6c..b9e73de14b57 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
+@@ -73,6 +73,10 @@ struct bnxt_en_dev {
+ 							 * bytes mapped as non-
+ 							 * cacheable.
+ 							 */
++	int				l2_db_offset;	/* Doorbell offset in
++							 * bytes within
++							 * l2_db_size_nc.
++							 */
+ 	u16				chip_num;
+ 	u16				hw_ring_stats_size;
+ 	u16				pf_port_id;
 -- 
 2.30.1
 
 
---00000000000050aa88060b7a7221
+--0000000000006c9743060b7a7283
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -377,14 +277,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDRRLZajow33D7hB7acw61BwmQ0ahAOa
-zhdvBUY5KanJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-MTIyMzk1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAN0TnWRzXse7XH8TaDjvZP5FbKwOYX+
+iGbU3ZzQCR+dMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+MTIyMzk1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBQNxgwlnprVWJxaCWhL44sU0Ch6kwEjgwXZkIAiZqD5T7czBwF
-VbKiyvXzTrzsFvPE9zabScK59zZqSv3NHGuIOQ3V35W8/g7Xi4GyC2R0E20wmjrjTXsux6oY7F3X
-1hjtc6DifuFfW+anjLw2XyKJh/GtWj2gNuMm8a+VPsGlb3QMxZBjJ5gpD3R5cjFUSXFFHnPfXV9o
-a7wIDx57hlRYn2SihnqFHpNqI8TY588Wjsa2mRsK177lyQsJX3/nHYLUMaQD4OoWvHUaynwuuWFA
-v/SFGM0P/+xDpvwxyNEdgWM9bMgbZEdMaXLZ+Sp6OXhsU8Nar4QmbQLaTBeEOkPx
---00000000000050aa88060b7a7221--
+ATANBgkqhkiG9w0BAQEFAASCAQALJb88L7UBb1ArZkN+ZlY0TSRb5U78aWSvgT6YViCmQEzX8ZNl
+4/Jpe9uV+agH5z+FPjaIvo4vZsRoDg1EB/st9SsCYucKx8y5WIXZV31GFP8lLnyWqw2ySwKQHXSy
+d6E+QXczCLICTE3ytTg3OtYdrX3cW7niwigRTyta4/TcM1TtcgfgRExuCvbVNXyzMeKcyQSair7E
+KBvBUMy/trxRQU+MaC2g+1PqgBlQNoGX0RlxI8mRgekFJajkH/3FzEocpR3eztVLnK62vtPisFAw
+rv9P/f2bGfH4DFGUJLOiw6vWkZw5touhPXa9YyQDg5J5BOxBliCq9snYob6IeV+Q
+--0000000000006c9743060b7a7283--
 
