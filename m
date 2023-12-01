@@ -1,489 +1,221 @@
-Return-Path: <netdev+bounces-52801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E876800404
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:36:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 185408003E1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 315241C20C29
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:36:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23DCA1C20C86
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 06:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9CB523F;
-	Fri,  1 Dec 2023 06:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5508CBE73;
+	Fri,  1 Dec 2023 06:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WoKXrBS2"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="h8hcUshI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279F7DE
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 22:35:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701412558; x=1732948558;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=G6FhNL3Zyd9RYDuAiO01gEtgzIVhQV5V/TmXV/utbLg=;
-  b=WoKXrBS2G64Boy+yweb5Y83FSguoexzJFhh1je7HEzRh3hGKk8oAcYTs
-   D0elADFNpThVju7h3W39Up3qkCVHRB/w6D38p/kEXlnygEU9j1koUt5my
-   u+yjdLmrDnadkT4bF0wrcHnjptdyn4kMUR23af1/QcoqjcStyvIft0oRI
-   X9XdFRqBRL/SYjBb4wp2lP9cAGWRmYuC/HwPcZXwvShmVg4fO6cJvpuEI
-   h2AYRtBODhOMD2XOSwcBjhUVPKAqHMD8G/c1nhQkC7fJYJ5AlsGEGkKct
-   Xlkm1s3mpo2h7bLxh/WEFPMnmqxD5PKy5TAZhoz2a3Y/413NSSlbo94tC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="424597682"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="424597682"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 22:35:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="860457991"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="860457991"
-Received: from wp3.sh.intel.com ([10.240.108.102])
-  by FMSMGA003.fm.intel.com with ESMTP; 30 Nov 2023 22:35:55 -0800
-From: Steven Zou <steven.zou@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	andriy.shevchenko@linux.intel.com,
-	aleksander.lobakin@intel.com,
-	andrii.staikov@intel.com,
-	jan.sokolowski@intel.com,
-	steven.zou@intel.com
-Subject: [PATCH iwl-next 2/2] ice: Add switch recipe reusing feature
-Date: Fri,  1 Dec 2023 14:25:02 +0800
-Message-Id: <20231201062502.10099-3-steven.zou@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20231201062502.10099-1-steven.zou@intel.com>
-References: <20231201062502.10099-1-steven.zou@intel.com>
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2105.outbound.protection.outlook.com [40.107.92.105])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B0B172B;
+	Thu, 30 Nov 2023 22:31:37 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jUIyWkpYNUlRiobWvKfBKrW+Mt3G4wOXJTIoKLJWryTZY0SS54+b15pr7styc7a7oDDjO1Kb/pSPBSMxEX75+cdc6BW1QxpWbRulNh2zo4EjKXJLfVCS3C+aombkryuQR5c29ntRVeb8bm/fQKmCWuescNonUpHb3u8/8nhBMbMwo1UdbTtTuLkoPUtE/aj1szgcfoujzT+KYUYwbYR9QDe7FItWdxUpZwJm/jfYFigBGP3vJayfrRANkV5igX2mabUp9v6jfuUhQWCgnIkF3QdCZiC8B0mxA4uVBSVfoXjy50WbohJDcHXCnHLsvemZUSgWR980Sfr/mtforhIICQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qVSn6+mEouHdoIlcKyZKXR30CEfKA/WIL9COV5b69E8=;
+ b=Kze9UdpELBPcFK5TOSV6Xjkg+Z0ZwnSSvFbV4/yr7EjJwq+hrPDEh4zuSjRfc4AhgQvVpdvzJmD3+RpCI0/Oagy6SBz9OVYXm9pQtys+ZXx5XriEF6lvgezeUuSiiNWi4HqiHLLHiX6lULJ0WzYwSqVN6ZG6zHrjPWfi53u/eVP+x+vBxoLB80GeTLb92uRtLhXhu+jjLkMwbS+tuow6OfwkKIgQV9t3vzY0bstcxDPKu0CIp3hZBKVoakK/UmcqXmX2JNQzpYbsCAeGn1flFpsB4f5oGDCwhl+9CUbit93LINP9q0Ho9M26dtmNxPTLZMhw4w92l7LufWyU23//Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qVSn6+mEouHdoIlcKyZKXR30CEfKA/WIL9COV5b69E8=;
+ b=h8hcUshIuZ0VLtVf8ZTfQ4qjL8VFaLqBtlGSHKrJ73+e+qeYhx7FvzOCrau+agmN1iRwgq13H6ZclV3dPp/z/3qPIBXOQsjFTcv4AulDSD4QPvvjL4c1r5PXwwnssCI+8aH52JdPCMs8sh6etij/k23DkFLSmUb0ZCV43uYpayo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SN4PR01MB7455.prod.exchangelabs.com (2603:10b6:806:202::11) by
+ SA1PR01MB8159.prod.exchangelabs.com (2603:10b6:806:333::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.24; Fri, 1 Dec 2023 06:31:33 +0000
+Received: from SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68]) by SN4PR01MB7455.prod.exchangelabs.com
+ ([fe80::5682:1d84:171a:1d68%3]) with mapi id 15.20.7025.022; Fri, 1 Dec 2023
+ 06:31:33 +0000
+Message-ID: <3e8b18e6-673c-4ee6-a56b-08641c605efc@os.amperecomputing.com>
+Date: Fri, 1 Dec 2023 13:31:22 +0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mctp i2c: Requeue the packet when arbitration is lost
+Content-Language: en-CA
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
+ Open Source Submission <patches@amperecomputing.com>
+Cc: Phong Vo <phong@os.amperecomputing.com>,
+ Thang Nguyen <thang@os.amperecomputing.com>,
+ Dung Cao <dung@os.amperecomputing.com>
+References: <20231130075247.3078931-1-quan@os.amperecomputing.com>
+ <473048522551f1cae5273eb4cd31b732d6e33e53.camel@codeconstruct.com.au>
+ <706506b7-a89c-4dfc-b233-be7822eb056e@os.amperecomputing.com>
+ <852eaa7b5040124049e51ceba2d13a5799cb6748.camel@codeconstruct.com.au>
+From: Quan Nguyen <quan@os.amperecomputing.com>
+In-Reply-To: <852eaa7b5040124049e51ceba2d13a5799cb6748.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI1PR02CA0032.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::12) To SN4PR01MB7455.prod.exchangelabs.com
+ (2603:10b6:806:202::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN4PR01MB7455:EE_|SA1PR01MB8159:EE_
+X-MS-Office365-Filtering-Correlation-Id: fb98e83b-e607-45ff-a5b8-08dbf2372936
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1AvpgAbzSoxeuGHotuGzot1duUfKD4B2xYAcg3i486vbFsdenQW3Xcb9+R6WzZrQ8X07ntcNy5OGd7d6n3stcgwZEZFcTvOpEbnwNPtIPs8rJDo5K0eF8qr2C7vknmyzDEfkDkJKmsNBSZPEmZ8j3fo2LF5bCzWbD18yl7UJsuWqquOgYXA+l5+/F6VQ7QaGGd/d8sv0t04VoJ6ZjYRAkCnzlWf1J+N+spYTfBZpHlaMVnCgrS8tjE6NMFL+BYQfEKvmzvy972DepY2CtdcXB5aXj7Pv0i+HRT94t83EWepE0gIdf8AK2p7GOFlLeNa3d3eSeACoOvK3CdSC4zHueK4EaSlxIdsS4UrG0zGejyqZGcRzUpmW1lX7r26Q9GsHhOWv4B051IKzDALR07Uk0Xnnt6VrRytYz7vW8Ij0KerwLUzO8s3+MBD/sD5GxRfijYpQZ+OBDsccVTzX1jPgXnE3zkrARRix9pJPo+QGM2eUV1e5UvVrmwszgXGFTzIbbowN+WDAENpIQfJYzARulQPhIoatkgIA5UVIWKpwtXjtDGO9CWCyFYIVzGJmdh3WHh4W175Al6U+sRCXM1GLL4p1GqtDGp0ZbrztrjgjuLiy7xzt7WdUdQViUvM7AN93
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR01MB7455.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(39850400004)(346002)(366004)(376002)(396003)(136003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(6506007)(66556008)(31696002)(66946007)(54906003)(66476007)(316002)(8936002)(8676002)(4326008)(966005)(478600001)(6486002)(110136005)(86362001)(2906002)(41300700001)(921008)(5660300002)(38100700002)(107886003)(2616005)(26005)(6666004)(83380400001)(6512007)(53546011)(31686004)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?enNZcmVTeEZQYklzUzRFNHJLT2hGWTBHVlBVSE5iNGZVbWh2aUpaS1ZOTDRi?=
+ =?utf-8?B?OC9Cd29lbFQ3dVdoU0VhY2lIRXFtQUU0VlhVSUdYZXNtWDcrRXlLeWVPTmYx?=
+ =?utf-8?B?M2lic09maExhWVB5b3FPc1k5QVZOalVHV2xMVkRid0RTRDdQQ0dickdwNmFL?=
+ =?utf-8?B?K2R2YlgrOTQzR2hPbGtPb0tEUTJtWkxLU2E2cW1rNkRhbDRxOTdSN0tBdDRo?=
+ =?utf-8?B?cndxVSs4VzhYRFVwVktmcVlXV2NvcVMrbU1VNm9ETGVRelFqZ04yVjk3NGR2?=
+ =?utf-8?B?Wk91NDZmQXdiaVBTRVl1VmlKSXNBN3hYVUprSmQ2SmVXSmRwN0lCNnJxTVdN?=
+ =?utf-8?B?QWs5UWxkZ0F5Z3lVY2s0ZUZ6MW9OZVprYnBCeVMvc0ZEUGdoZXl4MHNTNTgr?=
+ =?utf-8?B?c04rNHFBMXlvdjBqYTBJY01ER3hGTVNBWURSWEg5SThFQ1pIZ01BZTMrMDRZ?=
+ =?utf-8?B?NHBZU1cvMDRCYU5PVjUvaHhUV2RBQStHS2pUVmJMeVlvS2lLUTVUK0JERWcy?=
+ =?utf-8?B?Y2JGTlg1eWJlc0wvV0R6RXdiZlBCU0tPRllhajBtOGQwZ3NIS1JsUlVBOHRT?=
+ =?utf-8?B?eHZQKzdCVlZ4SmRGWkxhOU1sSDVjbjBXeCtlQVhaeFRGRTdpMCtmd1pGZFVo?=
+ =?utf-8?B?bnBTQ0MxM0xnTjgyR0ZvbklwMmFxWG1nYVZCbnIwSWV2R0orMUw5OWVXM2xN?=
+ =?utf-8?B?dlMyQjdJbkYvd0hxMzZwcUJ0SkxPTmJwcmVOTkk0R0hYbEJ4NU00NFBoRkNW?=
+ =?utf-8?B?OXpYdjRuRTNPd2QyMFJZQ1VhbEpFNkNBR0cxT25rb0ZvR0Q0MGR2ODdUem95?=
+ =?utf-8?B?Mi9FS09OZ242bXNRRTNhaTRuem13ZmZkcUpMZ0ZlSzJ3dlBWa2huSmw1V0p5?=
+ =?utf-8?B?YkRZK1RuQXJ1QWtYbHZabWNaVUlDeFpuWUFScU4rMFRPWDZjcWtRR3N5MEkw?=
+ =?utf-8?B?UzNIMTU2NS9hNDRqRy9mWGpDUW1Hajdla3ZFOWJCZjM5dk9BcENodmh3VVVt?=
+ =?utf-8?B?WUI1TWd4TitFblBORmJOTTNkWUlpN0QwNExwSmI0VmdWeE9zSW91WFhNUDBE?=
+ =?utf-8?B?WGlVZk41K29hMVpVb3lMNGU1a0NJMEZaUXlONk0rZngxWHZJZ3QzZGZPUGRn?=
+ =?utf-8?B?OTh0NSsxRmxFWTBEcWFneGhXNmlLY1l6dTNDRkp3VnZJMnd3L29JTVFsNnhM?=
+ =?utf-8?B?Rzh0alNnaU5GUFBhVzJMbDFWclVveXpCTFlTWld4a2MzM2R0UHN6Tm9IQ2lO?=
+ =?utf-8?B?YW9tR0FPYlhPVmRlNW5VSllmcjY0dWpETEZ5c1ViWGJ4OUhqRnBzRDI1dEhq?=
+ =?utf-8?B?YWVIaW1EYU9EaVZZVDlzVVhVdGhEZXZrVkRjQXV6cm1jN2RPQnhZTnBoc094?=
+ =?utf-8?B?blN2TG5mNWEycVNjdUN1WDVIbjdrUW5XREE2dUNTTlErY3pUSldZU2U1ZGUy?=
+ =?utf-8?B?OGR1eDB0KzNCb0pHMlRYeWNJMzNhOFhJbm9Fd2RhakhteHZsUnlLbVB0VTdV?=
+ =?utf-8?B?K1VUSmVmd2lYdFlTNkNaV3dNZEJWWVo4U1RaVWkrL3pKeE02akNwd1BsRXE3?=
+ =?utf-8?B?ZW5wRktRb3hBNFRURUlrZlBGRXFuZS9uWTlzd21FakZYaVU3dTlPTmlBaG9X?=
+ =?utf-8?B?aEFPUUxGellhNW0vVExpUXYzVlVTTzFaODZCa3kwYStSUTllb3ZLL2JLVmpy?=
+ =?utf-8?B?YkwxSi9jaWhKYTdpT3hKUTM3ZjJ1MDVCdzlBZVRPWTBxaEVQSTQwZ0YxR2pZ?=
+ =?utf-8?B?Z0ZNSVpkZG4xVHNla2lwNmwzZ1RCTUdscncvaTdDRTRYblQyRkpRenRqd1A1?=
+ =?utf-8?B?RERrYTV3YldsV3JmVUdzdWNYenBuT2hLeEozaUQ0VjhZZmlCakZGMXIwMzRL?=
+ =?utf-8?B?elllSnZmd0diQ0V4QjVwZTJRV0ZyUlg1a3RSa0YycjBSQno2MVhKbHdBYW1i?=
+ =?utf-8?B?a2IzdTY2V0FWYjVFa3lKUWc5MVJHb2tsellrbXVMRHNYVzVDNmVGcVJIdlg0?=
+ =?utf-8?B?ekM0QWZxQjdpaEZVbG9DYXRBOE9aQU5LRlRPMnp5emJxQk42RHdheHRqa3R4?=
+ =?utf-8?B?MTJjQkVKTFAxUWlTQ0pRSmJXYm13VDFmSDdvdGdDaXNQdFRBV0J4d29MWU0z?=
+ =?utf-8?B?cGYxdE9ucDUva3ZOd09tMThSNnZZOEt5QTVKckI0ek5GcnNZYVBtNG15TnBp?=
+ =?utf-8?Q?wBeOAunzNf/K9jmVV59oTkI=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb98e83b-e607-45ff-a5b8-08dbf2372936
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR01MB7455.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 06:31:33.7817
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3MnezFXXpLPMo5Crl1BvnTS21AxJS8yaqKBY8MGbBI83DDZRiOc7sxn93RRoPKKvsqsq0OP/FX6fgbZaXHhTpYFJBdDe9P+6X/BxQkTF+TA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR01MB8159
 
-New E810 firmware supports the corresponding functionality, so the driver
-allows PFs to subscribe the same switch recipes. Then when the PF is done
-with a switch recipes, the PF can ask firmware to free that switch recipe.
 
-When users configure a rule to PFn into E810 switch component, if there is
-no existing recipe matching this rule's pattern, the driver will request
-firmware to allocate and return a new recipe resource for the rule by
-calling ice_add_sw_recipe() and ice_alloc_recipe(). If there is an existing
-recipe matching this rule's pattern with different key value, or this is a
-same second rule to PFm into switch component, the driver checks out this
-recipe by calling ice_find_recp(), the driver will tell firmware to share
-using this same recipe resource by calling ice_subscribable_recp_shared()
-and ice_subscribe_recipe().
 
-When firmware detects that all subscribing PFs have freed the switch
-recipe, firmware will free the switch recipe so that it can be reused.
+On 30/11/2023 16:40, Jeremy Kerr wrote:
+> Hi Quan,
+> 
+>> With this commit, we all see the packets go through peacefully just
+>> by requeueing the packets at MCTP layer and eliminated the need to
+>> retry in PLDM layer which would need more time.
+> 
+> It's certainly possible that this tries harder to send MCTP packets,
+> but it's just duplicating the retry mechanism already present in the
+> i2c core.
+> 
+> Why do we need another retry mechanism here? How is the i2c core retry
+> mechanism not sufficient?
+> 
+> It would seem that you can get the same behaviour by adjusting the
+> retries/timeout limits in the core code, which has the advantage of
+> applying to all arbitration loss events on the i2c bus, not just for
+> MCTP tx.
+> 
 
-This feature also fixes a problem where all switch recipes would eventually
-be exhausted because switch recipes could not be freed, as freeing a shared
-recipe could potentially break other PFs that were using it.
+Hi Jeremy,
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
-Signed-off-by: Steven Zou <steven.zou@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
- drivers/net/ethernet/intel/ice/ice_switch.c   | 187 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
- 5 files changed, 177 insertions(+), 17 deletions(-)
+As per [1], __i2c_transfer() will retry for adap->retries times 
+consecutively (without any wait) within the amount of time specified by 
+adap->timeout.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index c2b3ccce3124..2654aaad9a51 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -264,6 +264,8 @@ struct ice_aqc_set_port_params {
- #define ICE_AQC_RES_TYPE_FLAG_SHARED			BIT(7)
- #define ICE_AQC_RES_TYPE_FLAG_SCAN_BOTTOM		BIT(12)
- #define ICE_AQC_RES_TYPE_FLAG_IGNORE_INDEX		BIT(13)
-+#define ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED		BIT(14)
-+#define ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_CTL		BIT(15)
- 
- #define ICE_AQC_RES_TYPE_FLAG_DEDICATED			0x00
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 8df151dd0c90..5bfec6bb759b 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1321,6 +1321,8 @@ int ice_init_hw(struct ice_hw *hw)
- 	if (status)
- 		goto err_unroll_fltr_mgmt_struct;
- 	mutex_init(&hw->tnl_lock);
-+	ice_init_chk_recipe_reuse_support(hw);
-+
- 	return 0;
- 
- err_unroll_fltr_mgmt_struct:
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 3cee603b187f..b926c045ebec 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -2074,6 +2074,18 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
- 	return status;
- }
- 
-+/**
-+ * ice_init_chk_recipe_reuse_support - check if recipe reuse is supported
-+ * @hw: pointer to the hardware structure
-+ */
-+void ice_init_chk_recipe_reuse_support(struct ice_hw *hw)
-+{
-+	struct ice_nvm_info *nvm = &hw->flash.nvm;
-+
-+	hw->recp_reuse = (nvm->major == 0x4 && nvm->minor >= 0x30) ||
-+			 nvm->major > 0x4;
-+}
-+
- /**
-  * ice_alloc_recipe - add recipe resource
-  * @hw: pointer to the hardware structure
-@@ -2083,12 +2095,16 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
- {
- 	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
- 	u16 buf_len = __struct_size(sw_buf);
-+	u16 res_type;
- 	int status;
- 
- 	sw_buf->num_elems = cpu_to_le16(1);
--	sw_buf->res_type = cpu_to_le16((ICE_AQC_RES_TYPE_RECIPE <<
--					ICE_AQC_RES_TYPE_S) |
--					ICE_AQC_RES_TYPE_FLAG_SHARED);
-+	res_type = FIELD_PREP(ICE_AQC_RES_TYPE_M, ICE_AQC_RES_TYPE_RECIPE);
-+	if (hw->recp_reuse)
-+		res_type |= ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED;
-+	else
-+		res_type |= ICE_AQC_RES_TYPE_FLAG_SHARED;
-+	sw_buf->res_type = cpu_to_le16(res_type);
- 	status = ice_aq_alloc_free_res(hw, sw_buf, buf_len,
- 				       ice_aqc_opc_alloc_res);
- 	if (!status)
-@@ -2097,6 +2113,70 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
- 	return status;
- }
- 
-+/**
-+ * ice_free_recipe_res - free recipe resource
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to free
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_free_recipe_res(struct ice_hw *hw, u16 rid)
-+{
-+	return ice_free_hw_res(hw, ICE_AQC_RES_TYPE_RECIPE, 1, &rid);
-+}
-+
-+/**
-+ * ice_release_recipe_res - disassociate and free recipe resource
-+ * @hw: pointer to the hardware structure
-+ * @recp: the recipe struct resource to unassociate and free
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_release_recipe_res(struct ice_hw *hw,
-+				  struct ice_sw_recipe *recp)
-+{
-+	DECLARE_BITMAP(r_bitmap, ICE_MAX_NUM_RECIPES);
-+	struct ice_switch_info *sw = hw->switch_info;
-+	u64 recp_assoc;
-+	u32 rid, prof;
-+	int status;
-+
-+	for_each_set_bit(rid, recp->r_bitmap, ICE_MAX_NUM_RECIPES) {
-+		for_each_set_bit(prof, recipe_to_profile[rid],
-+				 ICE_MAX_NUM_PROFILES) {
-+			status = ice_aq_get_recipe_to_profile(hw, prof,
-+							      &recp_assoc,
-+							      NULL);
-+			if (status)
-+				return status;
-+
-+			bitmap_from_arr64(r_bitmap, &recp_assoc,
-+					  ICE_MAX_NUM_RECIPES);
-+			bitmap_andnot(r_bitmap, r_bitmap, recp->r_bitmap,
-+				      ICE_MAX_NUM_RECIPES);
-+			bitmap_to_arr64(&recp_assoc, r_bitmap,
-+					ICE_MAX_NUM_RECIPES);
-+			ice_aq_map_recipe_to_profile(hw, prof,
-+						     recp_assoc, NULL);
-+
-+			clear_bit(rid, profile_to_recipe[prof]);
-+			clear_bit(prof, recipe_to_profile[rid]);
-+		}
-+
-+		status = ice_free_recipe_res(hw, rid);
-+		if (status)
-+			return status;
-+
-+		sw->recp_list[rid].recp_created = false;
-+		sw->recp_list[rid].adv_rule = false;
-+		memset(&sw->recp_list[rid].lkup_exts, 0,
-+		       sizeof(sw->recp_list[rid].lkup_exts));
-+		clear_bit(rid, recp->r_bitmap);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_get_recp_to_prof_map - updates recipe to profile mapping
-  * @hw: pointer to hardware structure
-@@ -2146,6 +2226,7 @@ ice_collect_result_idx(struct ice_aqc_recipe_data_elem *buf,
-  * @recps: struct that we need to populate
-  * @rid: recipe ID that we are populating
-  * @refresh_required: true if we should get recipe to profile mapping from FW
-+ * @is_add: flag of adding recipe
-  *
-  * This function is used to populate all the necessary entries into our
-  * bookkeeping so that we have a current list of all the recipes that are
-@@ -2153,7 +2234,7 @@ ice_collect_result_idx(struct ice_aqc_recipe_data_elem *buf,
-  */
- static int
- ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
--		    bool *refresh_required)
-+		    bool *refresh_required, bool is_add)
- {
- 	DECLARE_BITMAP(result_bm, ICE_MAX_FV_WORDS);
- 	struct ice_aqc_recipe_data_elem *tmp;
-@@ -2270,8 +2351,12 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
- 			recps[idx].chain_idx = ICE_INVAL_CHAIN_IND;
- 		}
- 
--		if (!is_root)
-+		if (!is_root) {
-+			if (hw->recp_reuse && is_add)
-+				recps[idx].recp_created = true;
-+
- 			continue;
-+		}
- 
- 		/* Only do the following for root recipes entries */
- 		memcpy(recps[idx].r_bitmap, root_bufs.recipe_bitmap,
-@@ -2295,7 +2380,8 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
- 
- 	/* Copy result indexes */
- 	bitmap_copy(recps[rid].res_idxs, result_bm, ICE_MAX_FV_WORDS);
--	recps[rid].recp_created = true;
-+	if (is_add)
-+		recps[rid].recp_created = true;
- 
- err_unroll:
- 	kfree(tmp);
-@@ -4575,12 +4661,13 @@ static struct ice_protocol_entry ice_prot_id_tbl[ICE_PROTOCOL_LAST] = {
-  * @hw: pointer to the hardware structure
-  * @lkup_exts: extension sequence to match
-  * @rinfo: information regarding the rule e.g. priority and action info
-+ * @is_add: flag of adding recipe
-  *
-  * Returns index of matching recipe, or ICE_MAX_NUM_RECIPES if not found.
-  */
- static u16
- ice_find_recp(struct ice_hw *hw, struct ice_prot_lkup_ext *lkup_exts,
--	      const struct ice_adv_rule_info *rinfo)
-+	      const struct ice_adv_rule_info *rinfo, bool is_add)
- {
- 	bool refresh_required = true;
- 	struct ice_sw_recipe *recp;
-@@ -4594,11 +4681,12 @@ ice_find_recp(struct ice_hw *hw, struct ice_prot_lkup_ext *lkup_exts,
- 		 * entry update it in our SW bookkeeping and continue with the
- 		 * matching.
- 		 */
--		if (!recp[i].recp_created)
-+		if (hw->recp_reuse) {
- 			if (ice_get_recp_frm_fw(hw,
- 						hw->switch_info->recp_list, i,
--						&refresh_required))
-+						&refresh_required, is_add))
- 				continue;
-+		}
- 
- 		/* Skip inverse action recipes */
- 		if (recp[i].root_buf && recp[i].root_buf->content.act_ctrl &
-@@ -5279,6 +5367,49 @@ ice_get_compat_fv_bitmap(struct ice_hw *hw, struct ice_adv_rule_info *rinfo,
- 	ice_get_sw_fv_bitmap(hw, prof_type, bm);
- }
- 
-+/**
-+ * ice_subscribe_recipe - subscribe to an existing recipe
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to subscribe to
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_subscribe_recipe(struct ice_hw *hw, u16 rid)
-+{
-+	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
-+	u16 buf_len = __struct_size(sw_buf);
-+	u16 res_type;
-+	int status;
-+
-+	/* Prepare buffer to allocate resource */
-+	sw_buf->num_elems = cpu_to_le16(1);
-+	res_type = FIELD_PREP(ICE_AQC_RES_TYPE_M, ICE_AQC_RES_TYPE_RECIPE) |
-+		   ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED |
-+		   ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_CTL;
-+	sw_buf->res_type = cpu_to_le16(res_type);
-+
-+	sw_buf->elem[0].e.sw_resp = cpu_to_le16(rid);
-+
-+	status = ice_aq_alloc_free_res(hw, sw_buf, buf_len,
-+				       ice_aqc_opc_alloc_res);
-+
-+	return status;
-+}
-+
-+/**
-+ * ice_subscribable_recp_shared - share an existing subscribable recipe
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to subscribe to
-+ */
-+static void ice_subscribable_recp_shared(struct ice_hw *hw, u16 rid)
-+{
-+	struct ice_sw_recipe *recps = hw->switch_info->recp_list;
-+	u16 sub_rid;
-+
-+	for_each_set_bit(sub_rid, recps[rid].r_bitmap, ICE_MAX_NUM_RECIPES)
-+		ice_subscribe_recipe(hw, sub_rid);
-+}
-+
- /**
-  * ice_add_adv_recipe - Add an advanced recipe that is not part of the default
-  * @hw: pointer to hardware structure
-@@ -5301,6 +5432,7 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	struct ice_sw_fv_list_entry *tmp;
- 	struct ice_sw_recipe *rm;
- 	int status = 0;
-+	u16 rid_tmp;
- 	u8 i;
- 
- 	if (!lkups_cnt)
-@@ -5378,10 +5510,14 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	}
- 
- 	/* Look for a recipe which matches our requested fv / mask list */
--	*rid = ice_find_recp(hw, lkup_exts, rinfo);
--	if (*rid < ICE_MAX_NUM_RECIPES)
-+	*rid = ice_find_recp(hw, lkup_exts, rinfo, true);
-+	if (*rid < ICE_MAX_NUM_RECIPES) {
- 		/* Success if found a recipe that match the existing criteria */
-+		if (hw->recp_reuse)
-+			ice_subscribable_recp_shared(hw, *rid);
-+
- 		goto err_unroll;
-+	}
- 
- 	rm->tun_type = rinfo->tun_type;
- 	/* Recipe we need does not exist, add a recipe */
-@@ -5400,14 +5536,14 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		status = ice_aq_get_recipe_to_profile(hw, fvit->profile_id,
- 						      &recp_assoc, NULL);
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		bitmap_from_arr64(r_bitmap, &recp_assoc, ICE_MAX_NUM_RECIPES);
- 		bitmap_or(r_bitmap, r_bitmap, rm->r_bitmap,
- 			  ICE_MAX_NUM_RECIPES);
- 		status = ice_acquire_change_lock(hw, ICE_RES_WRITE);
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		bitmap_to_arr64(&recp_assoc, r_bitmap, ICE_MAX_NUM_RECIPES);
- 		status = ice_aq_map_recipe_to_profile(hw, fvit->profile_id,
-@@ -5415,7 +5551,7 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		ice_release_change_lock(hw);
- 
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		/* Update profile to recipe bitmap array */
- 		bitmap_copy(profile_to_recipe[fvit->profile_id], r_bitmap,
-@@ -5429,6 +5565,16 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	*rid = rm->root_rid;
- 	memcpy(&hw->switch_info->recp_list[*rid].lkup_exts, lkup_exts,
- 	       sizeof(*lkup_exts));
-+	goto err_unroll;
-+
-+err_free_recipe:
-+	if (hw->recp_reuse) {
-+		for_each_set_bit(rid_tmp, rm->r_bitmap, ICE_MAX_NUM_RECIPES) {
-+			if (!ice_free_recipe_res(hw, rid_tmp))
-+				clear_bit(rid_tmp, rm->r_bitmap);
-+		}
-+	}
-+
- err_unroll:
- 	list_for_each_entry_safe(r_entry, r_tmp, &rm->rg_list, l_entry) {
- 		list_del(&r_entry->l_entry);
-@@ -6431,7 +6577,7 @@ ice_rem_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 			return -EIO;
- 	}
- 
--	rid = ice_find_recp(hw, &lkup_exts, rinfo);
-+	rid = ice_find_recp(hw, &lkup_exts, rinfo, false);
- 	/* If did not find a recipe that match the existing criteria */
- 	if (rid == ICE_MAX_NUM_RECIPES)
- 		return -EINVAL;
-@@ -6475,14 +6621,21 @@ ice_rem_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 					 ice_aqc_opc_remove_sw_rules, NULL);
- 		if (!status || status == -ENOENT) {
- 			struct ice_switch_info *sw = hw->switch_info;
-+			struct ice_sw_recipe *r_list = sw->recp_list;
- 
- 			mutex_lock(rule_lock);
- 			list_del(&list_elem->list_entry);
- 			devm_kfree(ice_hw_to_dev(hw), list_elem->lkups);
- 			devm_kfree(ice_hw_to_dev(hw), list_elem);
- 			mutex_unlock(rule_lock);
--			if (list_empty(&sw->recp_list[rid].filt_rules))
--				sw->recp_list[rid].adv_rule = false;
-+			if (list_empty(&r_list[rid].filt_rules)) {
-+				r_list[rid].adv_rule = false;
-+
-+				/* All rules for this recipe are now removed */
-+				if (hw->recp_reuse)
-+					ice_release_recipe_res(hw,
-+							       &r_list[rid]);
-+			}
- 		}
- 		kfree(s_rule);
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
-index 89ffa1b51b5a..9cf819b20d9c 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-@@ -429,5 +429,6 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
- int
- ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 r_assoc,
- 			     struct ice_sq_cd *cd);
-+void ice_init_chk_recipe_reuse_support(struct ice_hw *hw);
- 
- #endif /* _ICE_SWITCH_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 2be3955e249e..4c756c2b6157 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -862,6 +862,8 @@ struct ice_hw {
- 
- 	u16 max_burst_size;	/* driver sets this value */
- 
-+	u8 recp_reuse:1;	/* indicates whether FW supports recipe reuse */
-+
- 	/* Tx Scheduler values */
- 	u8 num_tx_sched_layers;
- 	u8 num_tx_sched_phys_layers;
--- 
-2.31.1
+So as per my observation, once it loses the arbitration, the next retry 
+is most likely still lost as another controller who win the arbitration 
+may still be using the bus. Especially for upper layer protocol message 
+like PLDM or SPDM, which size is far bigger than SMBus, usually ends up 
+to queue several MCTP packets at a time. But if to requeue the packet, 
+it must wait to acquire the lock before actually queueing that packet, 
+and that is more likely to increase the chance to win the arbitration 
+than to retry it right away as on the i2c core.
 
+Another reason is that, as i2c is widely used for many other 
+applications, fixing the retry algorithm within the i2c core seems 
+impossible.
+
+The other fact is that the initial default value of these two parameters 
+depends on each type of controller; I'm not sure why yet.
+
++ i2c-aspeed:     retries=0 timeout=1 sec [2]
++ i2c-cadence:    retries=3 timeout=1 sec [3]
++ i2c-designware: retries=3 timeout=1 sec [4], [5]
++ i2c-emev2:      retries=5 timeout=1 sec [6]
++ ...
+
+Unfortunately, in our case, we use i2c-aspeed, and there is only one try 
+(see [2]), and that means we have only one single shot. I'm not sure why 
+i2c-aspeed chose to set retries=0 by default, but I guess there must be 
+a reason behind it.
+
+And yes, I agree, as per [7], these two parameters could be adjusted via 
+ioctl() from userspace if the user wishes to change them. But, honestly, 
+forcing users to change these parameters is not a good way, as I might 
+have to say.
+
+To avoid that, requeueing the packet in the MCTP layer was kind of way 
+better choice, and it was confirmed via our case.
+
+Thanks,
+- Quan
+
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/i2c-core-base.c#n2223
+[2] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/busses/i2c-aspeed.c#n1030
+[3] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/busses/i2c-cadence.c#n1322
+[4] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/busses/i2c-designware-master.c#n1030
+[5] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/busses/i2c-designware-slave.c#n258
+[6] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/busses/i2c-emev2.c#n385
+[7] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/i2c/i2c-dev.c#n478
 
