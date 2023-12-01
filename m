@@ -1,103 +1,63 @@
-Return-Path: <netdev+bounces-53098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6C7801467
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 21:25:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA8A801483
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 21:35:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1D561C20E63
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:25:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78A95B20E06
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 20:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558765A106;
-	Fri,  1 Dec 2023 20:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2779D4D137;
+	Fri,  1 Dec 2023 20:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="kPnplShX";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Gmf0ih1R"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qvC8YCxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F1B010FE;
-	Fri,  1 Dec 2023 12:24:09 -0800 (PST)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailnew.nyi.internal (Postfix) with ESMTP id B685158098F;
-	Fri,  1 Dec 2023 15:24:08 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Fri, 01 Dec 2023 15:24:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1701462248; x=
-	1701469448; bh=Xy5DWhMcuaQWz9hFzj8IU9Hd0UISUG5+/EyW9nquCao=; b=k
-	PnplShXeoT/pLs3XBMWJwo4uneVlKesk6vw4jj8pei7V3UtxTbHmyS1f8zTH0qJ3
-	sxtxRwHn6SXidwOX2VyjuJ91Pqf1oFSLC9eYuMSni1iVlQV6L5Kt52kVmF9yEh0A
-	2p49AyghvFmF7Lo1aBmr8CCkzfkmmG0kj7vOwqRGA/5qUq4o+PtL5g5FB5PqtCxw
-	200Ig0vKOOWd4jHEozsqfKUbdfeZlESZTVMiNQLKGxKKNlgTNJZueDHP4HcszN/b
-	XcMv3JLc0/QpOEoA/A8iMlor9ed286mzXeCByhkA79B72bIE2D/tqOl/DB73Dbnl
-	A251/+kKFZCBk6srZSLUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1701462248; x=
-	1701469448; bh=Xy5DWhMcuaQWz9hFzj8IU9Hd0UISUG5+/EyW9nquCao=; b=G
-	mf0ih1R80LIGpElB8YeIy29SrRg551bE3NZHwJpg08xOHhwjY0hRmPmuc7Ewk8yv
-	TirWmxJc3MfwIgLVKWlKSbpJevk98lwBNEa3C6rFMbdrqT0KlSbh3Z4y3ImmHEbp
-	Dr4jlH1MiptBIJBWdjetpzvvRm0YPIoHCIdlFr3H31ffYsUB4Pqp5iQfqVuAh3RC
-	zSh8AWSK/uSjp8xlvuTM1Uu7sPT5ELhQVBQphytYPJzNswaVZSHQEhiTbNh1yiG7
-	JXSo3ms7jGplM4P/7edBuKnS6+fgxmMyq1SIl13jVTtS94HkA1iWVI1LHJ85XnAg
-	frysoQcuCkFyWT0kdFICg==
-X-ME-Sender: <xms:6EBqZX9XHirbtF9BLWkBBsGihcY8bp0-mueWOaGgjbYDQZx183B72A>
-    <xme:6EBqZTt3kURm3k9TnHWl55uIT9WQUNFK25eWajxZ1oDzUUe5B_2FOBoBHcFCiStQt
-    D4MdQ7_-tIoYQL16w>
-X-ME-Received: <xmr:6EBqZVAe0-52IwK1P_moZi2LB2HSwO3QcZLJ3BY_7BxrAC4zu8sWj1_rTEkJvGaxf6Rh2m1db1eBQ78arpV6rL2T9LHc7-9pKw9iT0wpmzloew>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudeiledgudefjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdefhedmnecujfgurhephf
-    fvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcu
-    oegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduie
-    ekvdeuteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhi
-    iigvpedunecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:6EBqZTc0w_MsVG5ivQ7AK92ii9QMpCpXvU23R3XYtrug0Wk87YjYjg>
-    <xmx:6EBqZcNp_jvjdp1vzhsMQDQtXLcH9KJszrqnk6vmK5nZNdM-D_RV8g>
-    <xmx:6EBqZVnWAjm8FFlGr67OvKvhRqtmGA8agybITikuXqFbEapnkGJf-Q>
-    <xmx:6EBqZbOgAd_EPsf5HBEbSI6Y_4-yhGaEj2w9ZThNCf_swbMgHO_Arg>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 1 Dec 2023 15:24:06 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: davem@davemloft.net,
-	daniel@iogearbox.net,
-	shuah@kernel.org,
-	kuba@kernel.org,
-	ast@kernel.org,
-	john.fastabend@gmail.com,
-	hawk@kernel.org,
-	andrii@kernel.org,
-	steffen.klassert@secunet.com,
-	antony.antony@secunet.com,
-	alexei.starovoitov@gmail.com,
-	yonghong.song@linux.dev,
-	eddyz87@gmail.com
-Cc: martin.lau@linux.dev,
-	song@kernel.org,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devel@linux-ipsec.org
-Subject: [PATCH ipsec-next v3 9/9] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
-Date: Fri,  1 Dec 2023 13:23:20 -0700
-Message-ID: <b315b0ffa7cc8f96e30b0c2b0b1feae99e2fbc4a.1701462010.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <cover.1701462010.git.dxu@dxuuu.xyz>
-References: <cover.1701462010.git.dxu@dxuuu.xyz>
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACACFC
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 12:34:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1701462899; x=1732998899;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KmM7vO5nqtyyZAxKDKTsPPzEzMdKvgdFyGIhEnoFQzQ=;
+  b=qvC8YCxQRpvTELQwrtXBjtVJvoqdorsl0LXKtqVlnGEXYDap84MZfA2H
+   kHxN7lin1d6I9MhZOmXE43QK2Whnsgs4+y+z0r1Rw0l4FDpAzQa7JN/M6
+   T/8M+NTpSUYOVP+HTyaHaJQnJ18nEDyQsLeahgObvRL8zhGim3IbSTga5
+   4=;
+X-IronPort-AV: E=Sophos;i="6.04,242,1695686400"; 
+   d="scan'208";a="622835391"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1box-1dm6-7f722725.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 20:34:56 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1box-1dm6-7f722725.us-east-1.amazon.com (Postfix) with ESMTPS id D1FB486241;
+	Fri,  1 Dec 2023 20:34:54 +0000 (UTC)
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:29670]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.242:2525] with esmtp (Farcaster)
+ id 10db0d8b-acd1-4468-b52a-c23e97bcc7b1; Fri, 1 Dec 2023 20:34:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 10db0d8b-acd1-4468-b52a-c23e97bcc7b1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Fri, 1 Dec 2023 20:34:53 +0000
+Received: from 88665a182662.ant.amazon.com (10.118.249.178) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Fri, 1 Dec 2023 20:34:49 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnault@redhat.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <mkubecek@suse.cz>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v4] tcp: Dump bound-only sockets in inet_diag.
+Date: Fri, 1 Dec 2023 12:34:34 -0800
+Message-ID: <20231201203434.22931-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <b3a84ae61e19c06806eea9c602b3b66e8f0cfc81.1701362867.git.gnault@redhat.com>
+References: <b3a84ae61e19c06806eea9c602b3b66e8f0cfc81.1701362867.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,161 +65,216 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-This commit extends test_tunnel selftest to test the new XDP xfrm state
-lookup kfunc.
+From: Guillaume Nault <gnault@redhat.com>
+Date: Fri, 1 Dec 2023 15:49:52 +0100
+> Walk the hashinfo->bhash2 table so that inet_diag can dump TCP sockets
+> that are bound but haven't yet called connect() or listen().
+> 
+> The code is inspired by the ->lhash2 loop. However there's no manual
+> test of the source port, since this kind of filtering is already
+> handled by inet_diag_bc_sk(). Also, a maximum of 16 sockets are dumped
+> at a time, to avoid running with bh disabled for too long.
+> 
+> There's no TCP state for bound but otherwise inactive sockets. Such
+> sockets normally map to TCP_CLOSE. However, "ss -l", which is supposed
+> to only dump listening sockets, actually requests the kernel to dump
+> sockets in either the TCP_LISTEN or TCP_CLOSE states. To avoid dumping
+> bound-only sockets with "ss -l", we therefore need to define a new
+> pseudo-state (TCP_BOUND_INACTIVE) that user space will be able to set
+> explicitly.
+> 
+> With an IPv4, an IPv6 and an IPv6-only socket, bound respectively to
+> 40000, 64000, 60000, an updated version of iproute2 could work as
+> follow:
+> 
+>   $ ss -t state bound-inactive
+>   Recv-Q   Send-Q     Local Address:Port       Peer Address:Port   Process
+>   0        0                0.0.0.0:40000           0.0.0.0:*
+>   0        0                   [::]:60000              [::]:*
+>   0        0                      *:64000                 *:*
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+> 
+> v4:
+>   * Use plain sock_put() instead of sock_gen_put() (Eric Dumazet).
+> 
+> v3:
+>   * Grab sockets with sock_hold(), instead of refcount_inc_not_zero()
+>     (Kuniyuki Iwashima).
+>   * Use a new TCP pseudo-state (TCP_BOUND_INACTIVE), to dump bound-only
+>     sockets, so that "ss -l" won't print them (Eric Dumazet).
+> 
+> v2:
+>   * Use ->bhash2 instead of ->bhash (Kuniyuki Iwashima).
+>   * Process no more than 16 sockets at a time (Kuniyuki Iwashima).
+> 
+>  include/net/tcp_states.h |  2 +
+>  include/uapi/linux/bpf.h |  1 +
+>  net/ipv4/inet_diag.c     | 86 +++++++++++++++++++++++++++++++++++++++-
+>  net/ipv4/tcp.c           |  1 +
+>  4 files changed, 89 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/tcp_states.h b/include/net/tcp_states.h
+> index cc00118acca1..d60e8148ff4c 100644
+> --- a/include/net/tcp_states.h
+> +++ b/include/net/tcp_states.h
+> @@ -22,6 +22,7 @@ enum {
+>  	TCP_LISTEN,
+>  	TCP_CLOSING,	/* Now a valid state */
+>  	TCP_NEW_SYN_RECV,
+> +	TCP_BOUND_INACTIVE, /* Pseudo-state for inet_diag */
+>  
+>  	TCP_MAX_STATES	/* Leave at the end! */
+>  };
+> @@ -43,6 +44,7 @@ enum {
+>  	TCPF_LISTEN	 = (1 << TCP_LISTEN),
+>  	TCPF_CLOSING	 = (1 << TCP_CLOSING),
+>  	TCPF_NEW_SYN_RECV = (1 << TCP_NEW_SYN_RECV),
+> +	TCPF_BOUND_INACTIVE = (1 << TCP_BOUND_INACTIVE),
+>  };
+>  
+>  #endif	/* _LINUX_TCP_STATES_H */
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 7a5498242eaa..8ee2404d077c 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6892,6 +6892,7 @@ enum {
+>  	BPF_TCP_LISTEN,
+>  	BPF_TCP_CLOSING,	/* Now a valid state */
+>  	BPF_TCP_NEW_SYN_RECV,
+> +	BPF_TCP_BOUND_INACTIVE,
+>  
+>  	BPF_TCP_MAX_STATES	/* Leave at the end! */
+>  };
+> diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+> index 7d0e7aaa71e0..46b13962ad02 100644
+> --- a/net/ipv4/inet_diag.c
+> +++ b/net/ipv4/inet_diag.c
+> @@ -1077,10 +1077,94 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
+>  		s_i = num = s_num = 0;
+>  	}
+>  
+> +/* Process a maximum of SKARR_SZ sockets at a time when walking hash buckets
+> + * with bh disabled.
+> + */
+> +#define SKARR_SZ 16
+> +
+> +	/* Dump bound but inactive (not listening, connecting, etc.) sockets */
+> +	if (cb->args[0] == 1) {
+> +		if (!(idiag_states & TCPF_BOUND_INACTIVE))
+> +			goto skip_bind_ht;
+> +
+> +		for (i = s_i; i < hashinfo->bhash_size; i++) {
+> +			struct inet_bind_hashbucket *ibb;
+> +			struct inet_bind2_bucket *tb2;
+> +			struct sock *sk_arr[SKARR_SZ];
+> +			int num_arr[SKARR_SZ];
+> +			int idx, accum, res;
+> +
+> +resume_bind_walk:
+> +			num = 0;
+> +			accum = 0;
+> +			ibb = &hashinfo->bhash2[i];
+> +
+> +			spin_lock_bh(&ibb->lock);
+> +			inet_bind_bucket_for_each(tb2, &ibb->chain) {
+> +				if (!net_eq(ib2_net(tb2), net))
+> +					continue;
+> +
+> +				sk_for_each_bound_bhash2(sk, &tb2->owners) {
+> +					struct inet_sock *inet = inet_sk(sk);
+> +
+> +					if (num < s_num)
+> +						goto next_bind;
+> +
+> +					if (sk->sk_state != TCP_CLOSE ||
+> +					    !inet->inet_num)
 
-Co-developed-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- .../selftests/bpf/prog_tests/test_tunnel.c    | 20 ++++++--
- .../selftests/bpf/progs/test_tunnel_kern.c    | 51 +++++++++++++++++++
- 2 files changed, 67 insertions(+), 4 deletions(-)
+Sorry for missing this in the previous version, but I think
+inet_num is always non-zero because 0 selects a port automatically
+and the min of ipv4_local_port_range is 1.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-index 2d7f8fa82ebd..fc804095d578 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_tunnel.c
-@@ -278,7 +278,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 1 mode tunnel "
-+			"spi %d reqid 1 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -292,7 +292,7 @@ static int add_xfrm_tunnel(void)
- 	SYS(fail,
- 	    "ip netns exec at_ns0 "
- 		"ip xfrm state add src %s dst %s proto esp "
--			"spi %d reqid 2 mode tunnel "
-+			"spi %d reqid 2 mode tunnel replay-window 42 "
- 			"auth-trunc 'hmac(sha1)' %s 96 enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -313,7 +313,7 @@ static int add_xfrm_tunnel(void)
- 	 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 1 mode tunnel "
-+		    "spi %d reqid 1 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR_VETH0, IP4_ADDR1_VETH1, XFRM_SPI_IN_TO_OUT, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -325,7 +325,7 @@ static int add_xfrm_tunnel(void)
- 	/* root -> at_ns0 */
- 	SYS(fail,
- 	    "ip xfrm state add src %s dst %s proto esp "
--		    "spi %d reqid 2 mode tunnel "
-+		    "spi %d reqid 2 mode tunnel replay-window 42 "
- 		    "auth-trunc 'hmac(sha1)' %s 96  enc 'cbc(aes)' %s",
- 	    IP4_ADDR1_VETH1, IP4_ADDR_VETH0, XFRM_SPI_OUT_TO_IN, XFRM_AUTH, XFRM_ENC);
- 	SYS(fail,
-@@ -628,8 +628,10 @@ static void test_xfrm_tunnel(void)
- {
- 	DECLARE_LIBBPF_OPTS(bpf_tc_hook, tc_hook,
- 			    .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_xdp_attach_opts, opts);
- 	struct test_tunnel_kern *skel = NULL;
- 	struct nstoken *nstoken;
-+	int xdp_prog_fd;
- 	int tc_prog_fd;
- 	int ifindex;
- 	int err;
-@@ -654,6 +656,14 @@ static void test_xfrm_tunnel(void)
- 	if (attach_tc_prog(&tc_hook, tc_prog_fd, -1))
- 		goto done;
- 
-+	/* attach xdp prog to tunnel dev */
-+	xdp_prog_fd = bpf_program__fd(skel->progs.xfrm_get_state_xdp);
-+	if (!ASSERT_GE(xdp_prog_fd, 0, "bpf_program__fd"))
-+		goto done;
-+	err = bpf_xdp_attach(ifindex, xdp_prog_fd, XDP_FLAGS_REPLACE, &opts);
-+	if (!ASSERT_OK(err, "bpf_xdp_attach"))
-+		goto done;
-+
- 	/* ping from at_ns0 namespace test */
- 	nstoken = open_netns("at_ns0");
- 	err = test_ping(AF_INET, IP4_ADDR_TUNL_DEV1);
-@@ -667,6 +677,8 @@ static void test_xfrm_tunnel(void)
- 		goto done;
- 	if (!ASSERT_EQ(skel->bss->xfrm_remote_ip, 0xac100164, "remote_ip"))
- 		goto done;
-+	if (!ASSERT_EQ(skel->bss->xfrm_replay_window, 42, "replay_window"))
-+		goto done;
- 
- done:
- 	delete_xfrm_tunnel();
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3a59eb9c34de..c0dd38616562 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -30,6 +30,10 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap) __ksym;
-+struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
-+		       u32 opts__sz) __ksym;
-+void bpf_xdp_xfrm_state_release(struct xfrm_state *x) __ksym;
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_ARRAY);
-@@ -950,4 +954,51 @@ int xfrm_get_state(struct __sk_buff *skb)
- 	return TC_ACT_OK;
- }
- 
-+volatile int xfrm_replay_window = 0;
-+
-+SEC("xdp")
-+int xfrm_get_state_xdp(struct xdp_md *xdp)
-+{
-+	struct bpf_xfrm_state_opts opts = {};
-+	struct xfrm_state *x = NULL;
-+	struct ip_esp_hdr *esph;
-+	struct bpf_dynptr ptr;
-+	u8 esph_buf[8] = {};
-+	u8 iph_buf[20] = {};
-+	struct iphdr *iph;
-+	u32 off;
-+
-+	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
-+		goto out;
-+
-+	off = sizeof(struct ethhdr);
-+	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
-+	if (!iph || iph->protocol != IPPROTO_ESP)
-+		goto out;
-+
-+	off += sizeof(struct iphdr);
-+	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
-+	if (!esph)
-+		goto out;
-+
-+	opts.netns_id = BPF_F_CURRENT_NETNS;
-+	opts.daddr.a4 = iph->daddr;
-+	opts.spi = esph->spi;
-+	opts.proto = IPPROTO_ESP;
-+	opts.family = AF_INET;
-+
-+	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
-+	if (!x || opts.error)
-+		goto out;
-+
-+	if (!x->replay_esn)
-+		goto out;
-+
-+	xfrm_replay_window = x->replay_esn->replay_window;
-+out:
-+	if (x)
-+		bpf_xdp_xfrm_state_release(x);
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.42.1
+Otherwise, looks good to me.
 
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+> +						goto next_bind;
+> +
+> +					if (r->sdiag_family != AF_UNSPEC &&
+> +					    r->sdiag_family != sk->sk_family)
+> +						goto next_bind;
+> +
+> +					if (!inet_diag_bc_sk(bc, sk))
+> +						goto next_bind;
+> +
+> +					sock_hold(sk);
+> +					num_arr[accum] = num;
+> +					sk_arr[accum] = sk;
+> +					if (++accum == SKARR_SZ)
+> +						goto pause_bind_walk;
+> +next_bind:
+> +					num++;
+> +				}
+> +			}
+> +pause_bind_walk:
+> +			spin_unlock_bh(&ibb->lock);
+> +
+> +			res = 0;
+> +			for (idx = 0; idx < accum; idx++) {
+> +				if (res >= 0) {
+> +					res = inet_sk_diag_fill(sk_arr[idx],
+> +								NULL, skb, cb,
+> +								r, NLM_F_MULTI,
+> +								net_admin);
+> +					if (res < 0)
+> +						num = num_arr[idx];
+> +				}
+> +				sock_put(sk_arr[idx]);
+> +			}
+> +			if (res < 0)
+> +				goto done;
+> +
+> +			cond_resched();
+> +
+> +			if (accum == SKARR_SZ) {
+> +				s_num = num + 1;
+> +				goto resume_bind_walk;
+> +			}
+> +
+> +			s_num = 0;
+> +		}
+> +skip_bind_ht:
+> +		cb->args[0] = 2;
+> +		s_i = num = s_num = 0;
+> +	}
+> +
+>  	if (!(idiag_states & ~TCPF_LISTEN))
+>  		goto out;
+>  
+> -#define SKARR_SZ 16
+>  	for (i = s_i; i <= hashinfo->ehash_mask; i++) {
+>  		struct inet_ehash_bucket *head = &hashinfo->ehash[i];
+>  		spinlock_t *lock = inet_ehash_lockp(hashinfo, i);
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 53bcc17c91e4..a100df07d34a 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -2605,6 +2605,7 @@ void tcp_set_state(struct sock *sk, int state)
+>  	BUILD_BUG_ON((int)BPF_TCP_LISTEN != (int)TCP_LISTEN);
+>  	BUILD_BUG_ON((int)BPF_TCP_CLOSING != (int)TCP_CLOSING);
+>  	BUILD_BUG_ON((int)BPF_TCP_NEW_SYN_RECV != (int)TCP_NEW_SYN_RECV);
+> +	BUILD_BUG_ON((int)BPF_TCP_BOUND_INACTIVE != (int)TCP_BOUND_INACTIVE);
+>  	BUILD_BUG_ON((int)BPF_TCP_MAX_STATES != (int)TCP_MAX_STATES);
+>  
+>  	/* bpf uapi header bpf.h defines an anonymous enum with values
+> -- 
+> 2.39.2
 
