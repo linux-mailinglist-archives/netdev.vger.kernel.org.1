@@ -1,100 +1,116 @@
-Return-Path: <netdev+bounces-52993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805F38010B2
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:03:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638A98010BD
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 18:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23245B20D41
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:03:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C9FE281B5E
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D07A4D130;
-	Fri,  1 Dec 2023 17:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127E14D5B4;
+	Fri,  1 Dec 2023 17:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4e2r0HG"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="azipypqH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B804198;
-	Fri,  1 Dec 2023 09:03:48 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6cdfcef5f8aso920763b3a.3;
-        Fri, 01 Dec 2023 09:03:48 -0800 (PST)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF96A103
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 09:10:02 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-a0029289b1bso319907266b.1
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 09:10:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701450228; x=1702055028; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9cjuIkJ9H8CNcUcuncysFw/32ztJiuwvLYvu+mgg+Nc=;
-        b=J4e2r0HGMDerR9RB5msukkC04Hrm2L7aU9oaBrRGMKzip4ExZ7fnwO+FsG9HTxUo3B
-         KXcvs102CfmAXmtoJMw8Hs3OMejXPfyaWW/5V+U8oSvrzm8YX/Eyq7sIuI9NJp5z5qkC
-         NhubYlONoRSKQZyMWcuBsG29SQIulo5YbMGN9BZNCiX3peg+qeoOX9fD4adWZh0p15B8
-         pCPyJyuNTocEUgLEwOrC+PGdndGBZ5Zn9cYjq5uVWb44TqZwV2wNRIRpRxzxaoGpC6Ye
-         1m348qfp+8zX/2m1ejdrcTPLPX3lsR/vY7AZPzIXYl8jkhu9NR2oThI633zfE+l8x7Pr
-         vQgA==
+        d=cloudflare.com; s=google09082023; t=1701450601; x=1702055401; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X3zW7mG2APHlMn0V6o6nSB6zPP6gthz2hZJEIkh2JQ8=;
+        b=azipypqHJwP9+l/NGQNNE7ZatJ5nFj/fVvQ/qWZLdy9MGUbQSMsQNca1T7/OngU48X
+         VUgwUvESxcM18afEapKC/WKFV+c/AvO9U9oJDrP3wmOdk8zzDRedDUwJ8QZgfQX2h6Zj
+         JTYastoeQlNtzOLBp39dBcRMTn/JocNAtC0OfcUimm635afDfpNQ96yXfNHZhSwXGcpH
+         W6PosswVLcbfroHE4DGNTYWUKG10r1NfafpgTsLn8C1K2YyQrEiuWsDpUcuVjKcl33BJ
+         tviuBUbQ0ETmu8D0KqVm8Zk2r2W1VXgYvuAxRlhogstF35GM+wiUyHjQ5WmWp0AKswTE
+         rlEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701450228; x=1702055028;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9cjuIkJ9H8CNcUcuncysFw/32ztJiuwvLYvu+mgg+Nc=;
-        b=nEIYG4IZaBkRV5MnWZn8zasNSKESdfRFihQp4qIYqez4S4BvmBY92l34CdY6/skrWM
-         MKVUb7Biw7o2aWyjjxvLM35sCCUREwuLf9Bgw09tc7T9TJaworQaas985w8Ki9IE/7x2
-         FkHdSeRGQFjZIoBysGI7psZMUS5BeoVQ3zoET1xyz4Qk2ovKoAq5XUAKp5qzR8/DHC/z
-         L6vTD8tfKoEoroF1x7W4q51BnDdKWEOudO7HaY/qQjC1y3gBnLZapukdvmczhxqyMPBs
-         v+Bp/eml8QXk2pAJIMFkGEXj2B5YgDUmPwTkBjUKP+vFqdEPWpcE/LF0cd6hsr114RcM
-         j+bA==
-X-Gm-Message-State: AOJu0Yy//nrwko4J5+S8vOU/FczS2sa88i3NWcH7/szEO/5i98Gjd+dk
-	+todmykWBYJ4t6Cdl6Q2toU=
-X-Google-Smtp-Source: AGHT+IGKXSF0uigJqiWQrI0nCGJEGnuOt717Ok9SMu83MM6+qCac2B0oi6+1kI/lPE2SuaLOXZ90rQ==
-X-Received: by 2002:a05:6a20:9c93:b0:18b:281e:51ba with SMTP id mj19-20020a056a209c9300b0018b281e51bamr29188274pzb.11.1701450227742;
-        Fri, 01 Dec 2023 09:03:47 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id r14-20020aa79ece000000b006c9c0705b5csm3232908pfq.48.2023.12.01.09.03.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Dec 2023 09:03:45 -0800 (PST)
-Message-ID: <b6ba48dd-e470-4592-979b-23afc475ec03@gmail.com>
-Date: Fri, 1 Dec 2023 09:03:44 -0800
+        d=1e100.net; s=20230601; t=1701450601; x=1702055401;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X3zW7mG2APHlMn0V6o6nSB6zPP6gthz2hZJEIkh2JQ8=;
+        b=Z69fsadjU4B5gMRU47NBlHHngjJ6dmVd2rTOE+70Vt+2e9D5OYat7iwhcKUkxQi9Gm
+         bBbGM2NpMLFq5+Iv0O+Au1YvIIQCqR8Mh8F+FeFYvM9jK3r/LCNeWCajUeYVZx6kO3L9
+         zey5ZkgcKyLlrCzdsDkE2e1jnWuqnc/euanckoK0TYxoG3es4cMSaumous48fLgiWeZn
+         KZvioWryDmq/T86fq9XtCRVrQE4qcWQ+uveoZyH3NhDwOsrhee/12b4mWEzTNEf9Ciwe
+         SB1LWdD5OijSnmzve75Kc9aBWpupEfnSDs8LLvuyPVvjykkOneXG5+dcTyVBn3OJTS5d
+         ezyw==
+X-Gm-Message-State: AOJu0YwNZUnoPETD23m7vK6QYUhMDuxIX/TgFEr3zTD3dcO6mrKA6xL2
+	5W5fUFLCkyb+9ttkBWpQGfAltxWzn0USIhV9JDEQDA==
+X-Google-Smtp-Source: AGHT+IH4ncADHFyIn/OqBzHVQ/DOI9V6HAKg1NgLlTJq0oNS8mR9wtqEIUQxSmogb93qB7eVnNTo5G+gMKvTILVe9PI=
+X-Received: by 2002:a17:906:3b17:b0:9e0:dcf:17d8 with SMTP id
+ g23-20020a1709063b1700b009e00dcf17d8mr917922ejf.71.1701450601142; Fri, 01 Dec
+ 2023 09:10:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: phy: micrel: allow usage of generic ethernet-phy
- clock
-Content-Language: en-US
-To: Heiko Stuebner <heiko@sntech.de>, andrew@lunn.ch, hkallweit1@gmail.com
-Cc: linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, quentin.schulz@theobroma-systems.com,
- Heiko Stuebner <heiko.stuebner@cherry.de>
-References: <20231201150131.326766-1-heiko@sntech.de>
- <20231201150131.326766-3-heiko@sntech.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231201150131.326766-3-heiko@sntech.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <92a355bd-7105-4a17-9543-ba2d8ae36a37@kernel.org>
+ <21d05784-3cd7-4050-b66f-bad3eab73f4e@kernel.org> <7f48dc04-080d-f7e1-5e01-598a1ace2d37@iogearbox.net>
+ <87fs0qj61x.fsf@toke.dk> <0b0c6538-92a5-3041-bc48-d7286f1b873b@gmail.com>
+ <87plzsi5wj.fsf@toke.dk> <1ff5c528-79a8-fbb7-8083-668ca5086ecf@iogearbox.net>
+ <871qc72vmh.fsf@toke.dk> <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net>
+In-Reply-To: <8677db3e-5662-7ebe-5af0-e5a3ca60587f@iogearbox.net>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 1 Dec 2023 11:09:50 -0600
+Message-ID: <CAO3-PbptY8PvyVnAfM=n=T8ihivso-jD1iwyWO=8WVWyLFe81A@mail.gmail.com>
+Subject: Re: Does skb_metadata_differs really need to stop GRO aggregation?
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Edward Cree <ecree.xilinx@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, kernel-team <kernel-team@cloudflare.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Sitnicki <jakub@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/1/23 07:01, Heiko Stuebner wrote:
-> From: Heiko Stuebner <heiko.stuebner@cherry.de>
-> 
-> The generic ethernet-phy binding allows describing an external clock since
-> commit 350b7a258f20 ("dt-bindings: net: phy: Document support for external PHY clk")
-> for cases where the phy is not supplied by an oscillator but instead
-> by a clock from the host system.
-> 
-> And the old named "rmii-ref" clock from 2014 is only specified for phys
-> of the KSZ8021, KSZ8031, KSZ8081, KSZ8091 types.
-> 
-> So allow retrieving and enabling the optional generic clock on phys that
-> do not provide a rmii-ref clock.
-> 
-> Signed-off-by: Heiko Stuebner <heiko.stuebner@cherry.de>
+On Thu, Nov 30, 2023 at 10:32=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.=
+net> wrote:
+>
+> On 11/30/23 2:55 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> > Daniel Borkmann <daniel@iogearbox.net> writes
+> >> On 11/29/23 10:52 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> >>> Edward Cree <ecree.xilinx@gmail.com> writes:
+> >>>> On 28/11/2023 14:39, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> >>>>> I'm not quite sure what should be the semantics of that, though. I.=
+e.,
+> >>>>> if you are trying to aggregate two packets that have the flag set, =
+which
+> >>>>> packet do you take the value from? What if only one packet has the =
+flag
+> >>
+> >> It would probably make sense if both packets have it set.
+> >
+> > Right, so "aggregate only if both packets have the flag set, keeping th=
+e
+> > metadata area from the first packet", then?
+>
+> Yes, sgtm.
+>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+There is one flaw for TCP in current implementation (before adding the
+flag), which we experienced earlier in production: when metadata
+differs on TCP packets, it not only disables GRO, but also reorder all
+PSH packets. This happens because when metadata differs, the new
+packet will be linked as a different node on the GRO merge list, since
+NAPI_GRO_CB->same_flow is set to 0 for all previous packets. However,
+packets with flags like PSH will be immediately flushed to the upper
+stack, while its predecessor packets might still be waiting on the
+merge list. I think it might make sense to first delay metadata
+comparison before skb_gro_receive, then add the flag to determine if
+the difference really matters.
 
+Yan
 
