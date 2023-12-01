@@ -1,178 +1,130 @@
-Return-Path: <netdev+bounces-52913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B38800B48
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:53:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA0E800B49
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 13:54:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF0351C2095F
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:53:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 305E4B210A1
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 12:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7151EB4E;
-	Fri,  1 Dec 2023 12:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6942511E;
+	Fri,  1 Dec 2023 12:54:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4ra3o/ND"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S455FoSG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65EC010F3
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 04:53:04 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40b51e26a7aso58425e9.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 04:53:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701435183; x=1702039983; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aqpq7qHLQzhXGOS0FtYsA/dDj6qZVEXGLfJk8ruj1VQ=;
-        b=4ra3o/NDQzR9A3vZt74XxM3ks2mIrEDBQ7bjf/Z7rBzcbZCEncgUF6GwDHiPRfkdAz
-         Zr/s9lS7qZXMyd6a1lz3AmVZcYRtnM/6UWuqiwyQ952hcYskhFXeNGZy2AmRhlN8tR6D
-         D3UaCd+U/sxqZ8GUnCHpfNZ0JD9jCX31Tw4IBNRSE/PkE9kH8UdF6dejJdpYCRnlCX3u
-         wHne0CK2KVQpjv5Dmcenqlf7w5Ztica3+hJJpirIQIvLvcvR+7fojmNxAW+bPZQDZCnt
-         G63twRcrJt0KXLprEU+kYX3V9jRIPcmveC5Vhze3pffSyGExrW5tuhxrbJOlW6MCB2fh
-         wm3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701435183; x=1702039983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aqpq7qHLQzhXGOS0FtYsA/dDj6qZVEXGLfJk8ruj1VQ=;
-        b=PK7Q8TEGc9Q1z175o4F2Sz3WRaH6LXJq/2JKUVnUDTevX6vQ0Uz5+2GeG6SBxMAlm2
-         I98KK3pgJieQnEG0v0YOjtZy8026o+lmIMXPdKWVqgnhmAdkOT79ZyvacCsdwU03P0qn
-         e0HwUjd3OByqJaqQ1CM4w4xgybVm8GBcQSNt3Wd7yuBVCz45Ggk/IwYmZoN5w608NW3L
-         iLwpD5rsZ4wUmGdKsX7JSFidq73ZxH/9XLk6XE102qHf4nuvF1VhiHBOR8hx0oHPexqn
-         2Du95VoTJLArAGhQymTdGD2POWFWy2V4/AiDs+f9G0VYJuXOSgc/R95fyCJA1MgZ24Rw
-         wPcA==
-X-Gm-Message-State: AOJu0YyR+N8KhmFcodfTrA0XFf9RfYKuGAgexpk4OkH4shB8fRD7X6vp
-	UrJrfBv76nuVrND6iX+5QG5GpDkhIPqegHBN7Nb7XQ==
-X-Google-Smtp-Source: AGHT+IE4wQYaBnqmb47NhHuxGm5Cq/SfIkFeH2fOHieO0RJR2XpHK11M+z2ntPhQMxoAK/PFzCgg9YNcyYpsCzdZM6U=
-X-Received: by 2002:a05:600c:6014:b0:40b:33aa:a2b9 with SMTP id
- az20-20020a05600c601400b0040b33aaa2b9mr155629wmb.4.1701435182521; Fri, 01 Dec
- 2023 04:53:02 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC796FAE;
+	Fri,  1 Dec 2023 12:54:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F842C433C7;
+	Fri,  1 Dec 2023 12:54:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701435289;
+	bh=P2FL1X4NYqxVthjCO0D7cIJ1azpBuuilQifHoY07bP0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S455FoSG61mKUZ0is+keMFfTLXDjVj5qHdJSdCDuJtnfdhFd59umsj0Qraz5QUSwf
+	 O6xLSMIAtj/keM3GF1GIivC/TU6Dz1lhO8uvti4aWfevRwetDFrKS4L6WfnITjiY9r
+	 5Ywc47VF4aDh6p9t83rUERypvudy9l81ny9AVYEDVdMiFv1TPr83s+a34e2CIVgW/m
+	 bhMDCWTGCjh5W6nJ6d+ldXEhFKWdFXKw71z3QSw2VnU7dkhSm3yuloFGvlgKfJCReq
+	 blm3J23UZ3MDH/elWzVMsT+uEi0kbNHkePaQdeaWVWZyFhXN+IFcUbBzjkRznvbY4y
+	 UTMCDmQhwORMA==
+Date: Fri, 1 Dec 2023 13:54:39 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Alexey Tikhonov <atikhono@redhat.com>
+Cc: linux-man@vger.kernel.org, libc-alpha@sourceware.org,
+	netdev@vger.kernel.org
+Subject: Re: UNIX(7)
+Message-ID: <ZWnXlcsVJfPO1Qsb@debian>
+References: <CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8Z+gf2kznWouErA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJ7h_LFSV6n_9WmbTMwTMsZ0UgdBj_oGrnzcrZu7oCxFw@mail.gmail.com>
- <CABOYnLzq7XwbFncos1p8FOnDyVes4VDkjWE277TngdJqSie14A@mail.gmail.com> <20231201111253.1029-1-hdanton@sina.com>
-In-Reply-To: <20231201111253.1029-1-hdanton@sina.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Dec 2023 13:52:49 +0100
-Message-ID: <CANn89iJsY8-_wBwpQt4oV7uF5hP73rFY-GX_GHLVaTUiys6Yig@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING in cleanup_net (3)
-To: Hillf Danton <hdanton@sina.com>
-Cc: xingwei lee <xrivendell7@gmail.com>, 
-	syzbot+9ada62e1dc03fdc41982@syzkaller.appspotmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="iLiW9yrc7Uo/hPBs"
+Content-Disposition: inline
+In-Reply-To: <CABPeg3a9L0142gmdZZ+0hoD+Q3Vgv0BQ21g8Z+gf2kznWouErA@mail.gmail.com>
+
+
+--iLiW9yrc7Uo/hPBs
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 1 Dec 2023 13:54:39 +0100
+From: Alejandro Colomar <alx@kernel.org>
+To: Alexey Tikhonov <atikhono@redhat.com>
+Cc: linux-man@vger.kernel.org, libc-alpha@sourceware.org,
+	netdev@vger.kernel.org
+Subject: Re: UNIX(7)
 
-On Fri, Dec 1, 2023 at 12:13=E2=80=AFPM Hillf Danton <hdanton@sina.com> wro=
-te:
->
-> On Fri, 1 Dec 2023 08:39:32 +0800 xingwei lee <xrivendell7@gmail.com>
-> > I forgot to CC others, repeat mail.
-> > Sorry, Dumazet. I found this bug with my modified syzkaller in my
-> > local environment.
-> > You are right, I crashed this bug about 10 times and used some
-> > heuristic solutions to increase the chances of luck with modifying
-> > syz-repro during this process.
-> > I can confirm the reproduction can trigger the bug soon and I hope it h=
-elps you.
-> > I'll test your patch and give your feedback ASAP.
-> >
-> > I apply your patch at
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D3b47bc037bd44f142ac09848e8d3ecccc726be99
-> > with a little fix:
-> >
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index fef349dd72fa..36d2871ac24f 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -2197,8 +2197,6 @@ static void __sk_destruct(struct rcu_head *head)
-> >
-> >         if (likely(sk->sk_net_refcnt))
-> >                 put_net_track(sock_net(sk), &sk->ns_tracker);
-> > -       else
-> > -               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, fal=
-se);
-> >
-> >         sk_prot_free(sk->sk_prot_creator, sk);
-> >  }
-> > @@ -2212,6 +2210,9 @@ void sk_destruct(struct sock *sk)
-> >                 use_call_rcu =3D true;
-> >         }
-> >
-> > +       if (unlikely(!sk->sk_net_refcnt))
-> > +               __netns_tracker_free(sock_net(sk), &sk->ns_tracker, fal=
-se);
-> > +
-> >         if (use_call_rcu)
-> >                 call_rcu(&sk->sk_rcu, __sk_destruct);
-> >         else
-> >
-> > and It's also trigger the crash like below:
->
-> Looks like a refcount leak that could be cured with the diff below.
-> Only for thoughts.
->
-> --- x/include/net/net_namespace.h
-> +++ y/include/net/net_namespace.h
-> @@ -320,7 +320,7 @@ static inline int check_net(const struct
->         return 1;
->  }
->
-> -#define net_drop_ns NULL
-> +static void net_drop_ns(void *w) { }
->  #endif
->
->
-> @@ -355,7 +355,7 @@ static inline void __netns_tracker_free(
->  static inline struct net *get_net_track(struct net *net,
->                                         netns_tracker *tracker, gfp_t gfp=
-)
->  {
-> -       get_net(net);
-> +       refcount_inc(&net->passive);
->         netns_tracker_alloc(net, tracker, gfp);
->         return net;
->  }
-> @@ -363,7 +363,7 @@ static inline struct net *get_net_track(
->  static inline void put_net_track(struct net *net, netns_tracker *tracker=
-)
->  {
->         __netns_tracker_free(net, tracker, true);
-> -       put_net(net);
-> +       net_drop_ns(net);
->  }
->
->  typedef struct {
-> --
+Hello Alexey,
 
-I do not think so.If you saw my prior patch, my thinking was :
+On Fri, Dec 01, 2023 at 01:16:27PM +0100, Alexey Tikhonov wrote:
+> Hello.
+>=20
+> There is a discrepancy between the man page description of
+> 'SO_PEERCRED' and real behavior.
+>=20
+> `man 7 unix` states:
+> ```
+>        SO_PEERCRED
+>               This read-only socket option returns the credentials of
+>               the peer process connected to this socket.  The returned
+>               credentials are those that were in effect at the time of
+>               the call to connect(2) or socketpair(2).
+> ```
+>=20
+> This doesn't match real behavior in following situation (just an example):
+>  - process starts with uid=3D0, gid=3D0
+>  - process creates UNIX socket, binds it, listens on it
+>  - process changes to uid=3Duid1, git=3Dgid1 (using `setresuid()`, `setre=
+sgid()`)
+>  - another process connects to the listening socket and requests
+> peer's credentials using `getsockopt(... SOL_SOCKET, SO_PEERCRED ...)`
+>=20
+> According to the man page: SO_PEERCRED should report (uid1, gid1),
+> because peer process was running under (uid1, gid1) "at the time of
+> the call to connect(2)"
+> In reality SO_PEERCRED reports (0, 0)
+> Reproducing code is available in
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D2247682
+>=20
+> I'm not entirely sure if this is a real bug or rather a  poor
+> description in the man page, but I tend to think that it's the latter.
 
-At netns dismantle, RDS is supposed to close all kernel sockets it created.
+I've CCed netdev@, since they probably know better.
 
-Because of RCU grace period imposed on TCP listeners, my concern was
-that we might have to release the sk->ns_tracker before
-the RCU grace period ended. (I think my patch makes sense anyway, I
-mentioned this race possibility in the past)
+Thanks,
+Alex
 
-If the splat still occurs, this means that at the end of
-rds_tcp_listen_stop(), rds_tcp_listen_sock->sk refcount had not
-reached yet 0.
+--
+<https://www.alejandro-colomar.es/>
 
-Therefore I think the bug is in RDS.
+--iLiW9yrc7Uo/hPBs
+Content-Type: application/pgp-signature; name="signature.asc"
 
-We could add a debug point in rds_tcp_listen_sock(), I suspect
-something in RDS got a sock_hold(sk)
-and did not release the refcount before we exit from rds_tcp_listen_stop()
+-----BEGIN PGP SIGNATURE-----
 
-Another way would be to add a tracker on sockets, but this seems a lot of w=
-ork.
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmVp148ACgkQnowa+77/
+2zJQ2RAAqk/Ru/IR6r6G21jdLgAsbPRMR4TDQcFdPq1oci+Hgzzcn+K6QATiPW/W
+D9a7UKSJHaYaZeaxLFZS/QO5Wwp+SeP0PmKFqFcTnJLfKKnRnP8sfwSI1zCp/X8i
+uzzeVbEfZMbED70uKoLioJ/dZQbLyG9M6u8wLRQVWTIJv641wuYWfKJQI74dU4Rv
+6ymu9EB6rrqwcZwctyK5c88Ldu4vYLux2JmNPDSIyi34c5R6a4GWJuVldem7yHDm
+YJ38K1U2YnrThRy9PXsw7CRkgaegwYqYK4838710vleLFcmMC5pIDGlmBfX+PJ0B
+g9F21OICYBFNqMzEXNANEO2vM8wRN+dUagnUCp27S8kmtVeJoO1JCLN3VsS58yWR
+vTUqZuLG9i0mo2gGjaWFdeSF9J7wpvymVfXQJ41ehWi+XnYpqmbyOlzyA5lbX+ej
+hPI0Z7IrClOePKXOPHNFdXI0egkhHDJEtmCDlNQzl/CO52Ef7qm3cbMZ8v+gRRrF
+rPR3v7N4eOfbUvLZIw+6P2W+JAV4tvBXhDWDP1jw4qoVW/Bzmm+gMk2136W2Vq8N
+5WH4u1oPuRH9hNkhtOCWbL6RSgDNvHZBoK1H5PM0tvm+AaD1G+mfg444NcMnSRDY
+YdQNew3UNIuyEa5BnGYu7NmFFPmsivu/koXbHdhppSmHk+igWWM=
+=77os
+-----END PGP SIGNATURE-----
+
+--iLiW9yrc7Uo/hPBs--
 
