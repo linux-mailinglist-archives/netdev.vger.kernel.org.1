@@ -1,140 +1,89 @@
-Return-Path: <netdev+bounces-52961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3F5800EE1
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:58:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A695800EE5
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 17:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E85ED1F20F91
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3D011C2097C
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9387F4B5D8;
-	Fri,  1 Dec 2023 15:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EutDptHi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF014BA84;
+	Fri,  1 Dec 2023 15:59:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D86110DE
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:58:37 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54c69c61b58so4237a12.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 07:58:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701446315; x=1702051115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s4XTRLCjQNY4AaZPgLHYq/6hjlTc5C/AJGeUvs9n7yQ=;
-        b=EutDptHiUw9rM5JuCY25WabPBKiHNyPj2O8tbnWZTfTULbh5vz19L9UJegjVgsyfFk
-         cnKJvb6nZkgmUV/rwAMaUGJpGZd5hX+RNq71upD92ZX8d39R15O/ERxAo+csVA1cHGWe
-         h0OnMhCRHTvVMVwlq58HGZcvhgh8dXO/L845Y5SGYxAnrGLYg1wa32vEFvVYHLTDwi74
-         DcqSouehddDVIVFPWQvFQpRD9HoV23wB/cSE+MA+OPlrc3s+nkEMeoP6qN9tABLvpLY8
-         q+dQtyl+0cpur+BJ78wT1WjMlm2YoK1B1qdFMTR9sk7jDFwd7ZhDtm4Ji3Pgeq2EcIM+
-         c4xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701446315; x=1702051115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s4XTRLCjQNY4AaZPgLHYq/6hjlTc5C/AJGeUvs9n7yQ=;
-        b=HPkeOcJ4mAhqazOE5A8rGsbAAmM6R6kYuoMN7E43r7+QDGoXlHCXFXoxwjoQkJUPoA
-         XkcRFr0M5dmHiRVS7QQ7c9i9rrZveLPSamX2+1OR7s0vR1PtYtkqEHh7kTWocG938muN
-         uTS+sviF7lL03Sx63COqOGdKxAVVlRVucH0gJIgWjPHuSEDxyUXz/peQA9vo1z47aHA9
-         61PeUdT0npfgXYomhhpDRp02LRZ/K4YX9u74ZrRqGMvJCekrHe8TKvlp9rE+3D8uLIC9
-         SsZb1ioZqtYruT+7Tu0HAWuNWDuBAX6N3wp0midl4fNS71AljaYr9LT4wS2uuxLL1io6
-         Oj4A==
-X-Gm-Message-State: AOJu0YwP2KuRPwh1rRFpew60R0bwtaaDiMgtmFVBMrZgV14CwrPwSaWS
-	mO4R574pNeTs0wKVk9hpuTQfUON+hiwzY0e0ksJ+fA==
-X-Google-Smtp-Source: AGHT+IETZC5B9Y3xnn8xU2T+GKS4UY7ZOf1kGKXZS07ClteBVWmFc9YIExz8FHVfWlSRa04bkafc9UBaoXCV5Z1s4T0=
-X-Received: by 2002:a50:d49c:0:b0:543:fb17:1a8 with SMTP id
- s28-20020a50d49c000000b00543fb1701a8mr83421edi.3.1701446315174; Fri, 01 Dec
- 2023 07:58:35 -0800 (PST)
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id A59741B2
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:59:54 -0800 (PST)
+Received: (qmail 290509 invoked by uid 1000); 1 Dec 2023 10:59:53 -0500
+Date: Fri, 1 Dec 2023 10:59:53 -0500
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Douglas Anderson <dianders@chromium.org>
+Cc: linux-usb@vger.kernel.org,
+  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+  Simon Horman <horms@kernel.org>, Grant Grundler <grundler@chromium.org>,
+  Hayes Wang <hayeswang@realtek.com>,
+  =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+  Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+  "David S . Miller" <davem@davemloft.net>, Brian Geffon <bgeffon@google.com>,
+  Bastien Nocera <hadess@hadess.net>,
+  Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+  Flavio Suligoi <f.suligoi@asem.it>,
+  Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+  Ricardo =?iso-8859-1?Q?Ca=F1uelo?= <ricardo.canuelo@collabora.com>,
+  Rob Herring <robh@kernel.org>, Roy Luo <royluo@google.com>,
+  Stanley Chang <stanley_chang@realtek.com>,
+  Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] usb: core: Save the config when a device is
+ deauthorized+authorized
+Message-ID: <62b7467f-f142-459d-aa23-8bfd70bbe733@rowland.harvard.edu>
+References: <20231130154337.1.Ie00e07f07f87149c9ce0b27ae4e26991d307e14b@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201083926.1817394-1-judyhsiao@chromium.org>
- <CANn89iJMbMZdnJRP0CUVfEi20whhShBfO+DAmdaerhiXfiTx5A@mail.gmail.com> <CAD=FV=Vf18TxUWpGTN9b=iECq=5BmEoopQjsMH2U6bDX2=T3cQ@mail.gmail.com>
-In-Reply-To: <CAD=FV=Vf18TxUWpGTN9b=iECq=5BmEoopQjsMH2U6bDX2=T3cQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 1 Dec 2023 16:58:21 +0100
-Message-ID: <CANn89iLzmKOGhMeUUxeM=1b2PP3kieTeYsmpfA0GvJdcQMkgtQ@mail.gmail.com>
-Subject: Re: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-To: Doug Anderson <dianders@chromium.org>
-Cc: Judy Hsiao <judyhsiao@chromium.org>, David Ahern <dsahern@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231130154337.1.Ie00e07f07f87149c9ce0b27ae4e26991d307e14b@changeid>
 
-On Fri, Dec 1, 2023 at 4:16=E2=80=AFPM Doug Anderson <dianders@chromium.org=
-> wrote:
->
-> Hi,
->
-> On Fri, Dec 1, 2023 at 1:10=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Fri, Dec 1, 2023 at 9:39=E2=80=AFAM Judy Hsiao <judyhsiao@chromium.o=
-rg> wrote:
-> > >
-> > > We are seeing cases where neigh_cleanup_and_release() is called by
-> > > neigh_forced_gc() many times in a row with preemption turned off.
-> > > When running on a low powered CPU at a low CPU frequency, this has
-> > > been measured to keep preemption off for ~10 ms. That's not great on =
-a
-> > > system with HZ=3D1000 which expects tasks to be able to schedule in
-> > > with ~1ms latency.
-> >
-> > This will not work in general, because this code runs with BH blocked.
-> >
-> > jiffies will stay untouched for many more ms on systems with only one C=
-PU.
-> >
-> > I would rather not rely on jiffies here but ktime_get_ns() [1]
-> >
-> > Also if we break the loop based on time, we might be unable to purge
-> > the last elements in gc_list.
-> > We might need to use a second list to make sure to cycle over all
-> > elements eventually.
-> >
-> >
-> > [1]
-> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> > index df81c1f0a57047e176b7c7e4809d2dae59ba6be5..e2340e6b07735db8cf6e75d=
-23ef09bb4b0db53b4
-> > 100644
-> > --- a/net/core/neighbour.c
-> > +++ b/net/core/neighbour.c
-> > @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl=
-)
-> >  {
-> >         int max_clean =3D atomic_read(&tbl->gc_entries) -
-> >                         READ_ONCE(tbl->gc_thresh2);
-> > +       u64 tmax =3D ktime_get_ns() + NSEC_PER_MSEC;
->
-> It might be nice to make the above timeout based on jiffies. On a
-> HZ=3D100 system it's probably OK to keep preemption disabled for 10 ms
-> but on a HZ=3D1000 system you'd want 1 ms. ...so maybe you'd want to use
-> jiffies_to_nsecs(1)?
+On Thu, Nov 30, 2023 at 03:43:47PM -0800, Douglas Anderson wrote:
+> Right now, when a USB device is deauthorized (by writing 0 to the
+> "authorized" field in sysfs) and then reauthorized (by writing a 1) it
+> loses any configuration it might have had. This is because
+> usb_deauthorize_device() calls:
+>   usb_set_configuration(usb_dev, -1);
+> ...and then usb_authorize_device() calls:
+>   usb_choose_configuration(udev);
+> ...to choose the "best" configuration.
+> 
+> This generally works OK and it looks like the above design was chosen
+> on purpose. In commit 93993a0a3e52 ("usb: introduce
+> usb_authorize/deauthorize()") we can see some discussion about keeping
+> the old config but it was decided not to bother since we can't save it
+> for wireless USB anyway. It can be noted that as of commit
+> 1e4c574225cc ("USB: Remove remnants of Wireless USB and UWB") wireless
+> USB is removed anyway, so there's really not a good reason not to keep
+> the old config.
+> 
+> Unfortunately, throwing away the old config breaks when something has
+> decided to choose a config other than the normal "best" config.
+> Specifically, it can be noted that as of commit ec51fbd1b8a2 ("r8152:
+> add USB device driver for config selection") that the r8152 driver
+> subclasses the generic USB driver and selects a config other than the
+> one that would have been selected by usb_choose_configuration(). This
+> logic isn't re-run after a deauthorize + authorize and results in the
+> r8152 driver not being re-bound.
+> 
+> Let's change things to save the old config when we deauthorize and
+> then restore it when we re-authorize. We'll disable this logic for
+> wireless USB where we re-fetch the descriptor after authorization.
 
-I do not think so. 10ms would be awfully long.
+Would it be better to make the r8152 driver override 
+usb_choose_configuration()?  This is the sort of thing that subclassing 
+is intended for.
 
-We have nsec based time service, why downgrading to jiffies resolution ???
-
->
-> One worry might be that we disabled preemption _right before_ we were
-> supposed to be scheduled out. In that case we'll end up blocking some
-> other task for another full timeslice, but maybe there's not a lot we
-> can do there?
-
-Can you tell us in which scenario this gc_list can be so big, other
-than fuzzers ?
+Alan Stern
 
