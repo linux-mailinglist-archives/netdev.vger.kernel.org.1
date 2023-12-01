@@ -1,192 +1,171 @@
-Return-Path: <netdev+bounces-52830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E74800511
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:53:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBDF800533
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 084381C20A67
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 07:53:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3FA281721
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E77715ACF;
-	Fri,  1 Dec 2023 07:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216D1171D8;
+	Fri,  1 Dec 2023 08:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Csfao/ry"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RXWHF2Bg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072CF10F8
-	for <netdev@vger.kernel.org>; Thu, 30 Nov 2023 23:53:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701417208; x=1732953208;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CGJu70902JcGJGLjnKMKELdudgqAa2OWtOSoLw7fSlg=;
-  b=Csfao/ryYyciAeC3terdN2Ymb9cRKMNzZ795z/WYGb8M1c2IRY00vzfR
-   Su4bJCQX6qjcFJBYWq+3565CYls4DVIb+Ie950SnnaXLCeuSrrm80AAhB
-   V811yPycPvY7GUfqSP5G27E01JSJ1oShVXMpTqhLbrdNmv2THlaMRpZNh
-   qbjmP+xGTPFaO3FijgGDbexVlt81/8Nio414Rt+4WlFbYVppjZQDhk+K3
-   +CJm1xV86ganvR1LjiRcAYZs8DXW3886Jf1kz884Hu6s7SHiesf3GJ1+p
-   DFBnY+dJiQrVLdJFJ24QcCqeGoQbzCUFPOUfeuQQGjWcsE/H2FVSXwy94
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="15002797"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="15002797"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2023 23:52:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10910"; a="773343576"
-X-IronPort-AV: E=Sophos;i="6.04,241,1695711600"; 
-   d="scan'208";a="773343576"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Nov 2023 23:52:39 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 23:52:39 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 30 Nov 2023 23:52:38 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 30 Nov 2023 23:52:38 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 30 Nov 2023 23:52:37 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T/o4FJjeKwYG4F/Iv9SRjfiQFZLBtTw8Rn5Nr6KO19kwvOcerv+GqDTvIlSIZammfypYlEUB5qoL9QpUou6LkT2YbHa88nIImYUL6dESCQXihEhIfgSSBRLdSZWABWnAozenmgBIosRA36TVj5hcYFL9Ksh0+l//e8YRmYDo2Qr/SZkmCMv/ZRH7suBa9DHw+MGDK2v5z2k4l+Di7Uhf7xcXTao6/Jqgxur2TsiV42CRzPLgzi9H24VpegLZafb+xnuZBXBVDRjXgfcC1Hs3sRYbSVKvFEf7X+4gmST8IIJlnxdt580/h8s1F+KCAG29yK9QlheR2xvl947EiG54lw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XPFt8t9/JF60hgIuqFtZMDweWRQfINabgYK+47JjDJs=;
- b=m8FIDv7TO/bfxdC0qgJoxlozM2GLNu6dkKL0Xa3K7I8XLzs61Fng/K1+FcxYyj28fzkBHq3QpE/T9Hq9/+RtjvR1nz95kdxr5PwVkHFf6cK3k308SBPrmXjcYXahPXcBgO1VqbDlQtHshrRj7A/LkcDwDAtxVxY6dCoGc80d6F4jcQcOpkzdzp/Lve6Fp2KDkfJONG0mSBO22GM3aivrD9oqnTGv9wrxwR/HlYgGmafSytQ74G9KhKBkJ77+9zR1M2nqEreBHd3xAUHW7oeyy3U5f33QV6U+3KQLks+CtZABh7Hm1BofD8RT1dCQSvkqetgFbflh9tKDuBvfgTP4rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by SJ2PR11MB8402.namprd11.prod.outlook.com (2603:10b6:a03:545::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.24; Fri, 1 Dec
- 2023 07:52:30 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::5112:5e76:3f72:38f7]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::5112:5e76:3f72:38f7%5]) with mapi id 15.20.7046.024; Fri, 1 Dec 2023
- 07:52:30 +0000
-Message-ID: <266d7d7a-06a2-6d76-e17a-70d37abb04c9@intel.com>
-Date: Fri, 1 Dec 2023 08:52:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] idpf: refactor some missing
- field get/prep conversions
-Content-Language: en-US
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>
-References: <20231130214511.647586-1-jesse.brandeburg@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20231130214511.647586-1-jesse.brandeburg@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0106.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9c::18) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B23010F8;
+	Fri,  1 Dec 2023 00:06:28 -0800 (PST)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B17cWdt021468;
+	Fri, 1 Dec 2023 08:06:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=s6xuQM0TQ839OS3q8j/gWK3Yd0MG2d7O9pgSlh4CGGA=;
+ b=RXWHF2BgdeNuqkYnuc0IoUjxsYlk40uyJb2IUq3AE8UitfiqNMXl32S76bHfd+Yaijjj
+ GKx63MC0pXhb6UqDmUOdAlYtYDOB6iq3BUyWV8daUJqr7IitwlmlGCh2Ilk6lOlUO+/A
+ TyyjK2sD3EfsLuXpIcsLB5Y6XcfvloV3/Gs9N3c3hWhPBGWzAdv+v+3A5ogyD1cFgBhe
+ ueE57+i2jnPAFWyYEkov3Rhq9JKokjlZASfRdUZo4O+XsUbL09WZmpZIw30hSl9mlrqJ
+ tGjOmvfBbsRkETyA+deDfHiKEhfd+2gnzh1n3+xBsIPgUHesWUovrt19RqKM7z06Jxe2 3w== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uq2kp921e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Dec 2023 08:06:00 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B185xNB027895
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 1 Dec 2023 08:05:59 GMT
+Received: from [10.253.35.195] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 1 Dec
+ 2023 00:05:55 -0800
+Message-ID: <27d3ce6f-5bf9-4199-bfac-33223be1d681@quicinc.com>
+Date: Fri, 1 Dec 2023 16:05:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SJ2PR11MB8402:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3298bf01-6cc1-4f61-ac74-08dbf2427851
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wnZRRcm3vJrpbRD0gc06iLU9yq9kdK80RW+WYPv84G4ATyNDr91B4MhALDUYNxeM5VIDf0XjyGzY4WByoriBEUFgGfZipml+6RwYne/++4+LYEIgE9UqiN6oeB8QYRu1CI3jnaeibqys77aqW84IKrnazn5tY67ae/TCJoBMVwjXJViV0hP8/KFDePsomvbomXGIsKY7Eip0b6Je63Ey2IoUZlU57LrD3eUbdGLMgpKB0GQTA07q2LSeSJcguX1X9QFzXh13qMO/EtfsbZlObLDyy8TuGRo/9ADXZNM2XnTwj350Mta/0dDRK10kGvObX8GWpHspV5yFRO7Q4OUTVEwRQuOi7GnQqyE4Xnoxg5gkpFAcAT9G7IinxQBevNW/Rb5rGdzmcnpxCRQ8NcT1yEzoJV3HNzMKB9f4Kz/+i/9j49QnMJPf7GsiZmzJvgd1kZI4NvRnXZa85kQmNWXXwn1sya7uQC/eRKbuVATiWQr+wMca3kejrKksm+Xn+LDSy93aFVyg68VGORKdatXRfGTmXtgWcUgc3Q1sJXwqdFpIqOyD6/b3Q4kO9AUPe13vcBnEo6OTUeIcX8HEgbbdDohVUXUsi7i5J25nnLz1MZOPmK3xTMOaxxEr4PtF4wvxry7GioPe15BTqzCfXdNSjw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(346002)(366004)(396003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(26005)(31686004)(38100700002)(82960400001)(4744005)(5660300002)(2906002)(6666004)(6506007)(53546011)(83380400001)(2616005)(107886003)(6512007)(36756003)(41300700001)(478600001)(86362001)(4326008)(6486002)(66946007)(8676002)(66556008)(316002)(66476007)(8936002)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QWduSjFsSkRCK2xoUk8ycWYrNU1nUE81Z0dRZDJ2a2dqNXZ4TllmdVVrWWtQ?=
- =?utf-8?B?cW03MjhJR2ZlcDB5T01KSTV0SjZ0YVAzdlo2NGd5WTBDZDJqQWdyS05LQ1pk?=
- =?utf-8?B?Ni9RNUxOWFlZZGhyeUxKRXlRa082U0V1QWpPVWg3dnZtVkpTc2I5QUJJOFQ1?=
- =?utf-8?B?MGs5Z2VPMUhKNXZnRmF4NFNva2ZDQUtSSVd3L2JrSW5nRnppeDVYZGVrRWRF?=
- =?utf-8?B?Ti80TGNweGxJWk1kSG1HWElVWE5pL0pQOEZWSlBsVVZHNysxbThJVXI0Z21X?=
- =?utf-8?B?bnV4dXNFTWg0MEJFQXMzMWY5NEJNWXRNWXYweXhuQlRXRmdWSE0wNCtIa3BO?=
- =?utf-8?B?eFcrT1QyRTdEOVoxNzA4RzR0dUQydkc1aGROdnJxZm5HbFJ2ckNLS1FMeitZ?=
- =?utf-8?B?QU1NaWdvWXQ5UFl1ZWkxWXpNdXZHT2hTbUgwaXRXS3Uxc2tFSlFsdEpZajE4?=
- =?utf-8?B?aXV1UkhRRHFGUXdudjQ0WE5sZTdEbllYUjZaWXpZN3ZQTHdqYlRraWMrdWpl?=
- =?utf-8?B?T2cycXc0dG9hcG9oakFUcWgzSjBMZ0o2dU9NeEl4bXFRL2ZzYjVHTmNWS29M?=
- =?utf-8?B?MU5CcHRQQit4MDQ0bk1zUUpuN29iaWJtOWdnK0F2OHIrYk5VOHBtSDl0L0pL?=
- =?utf-8?B?NUJ4WTdtYWNhRkpMa0J6WWlZbkV4TEliRDJvR2E4WlkvNTVRR25ud1ZyOHVR?=
- =?utf-8?B?V29INGtoTHdKNlg0RkZ1UnRCRU9pdnNrSUtNb21DQjdrdFFHdzRGaWxWSkdJ?=
- =?utf-8?B?cXJISFZzZGNxNGpVSXBvVjMwK2hhTjhmeno3SlBGNnExOE84WDJXeHljOTd3?=
- =?utf-8?B?N2xYRjRUWmxUOG1BUG5kSkw1UnQyUWtvRk93YzY0QXhqYXZ6RUZ6dHplak5R?=
- =?utf-8?B?MWVyTVlLNnZNQzFvVG5VKzVtQUVnZEFCUU1tT1pWRWR6dTQzbDUxZGxsd3BN?=
- =?utf-8?B?c1J6aTZGR21aTlVWQVpCQTZIeHdaNVpxbythd3JBUjYzNkVaT1l1dzNEb1pR?=
- =?utf-8?B?d24zK3BQV2RhMnN2bFZzNHpVbUFmM0lON09yU01KeWc0VWZHOGxaSUYzOXdv?=
- =?utf-8?B?dVFKOEg5TUVwa1BleXkyb3k2cFlFQStRbDV3eUF0eDlVYTIzMG03NU4wOEpr?=
- =?utf-8?B?ejBXTzNMdW00RW5xMDFDSEJmd2FaS29FTVpVL0l6U2d5OGYzcDBrRjFKTWxa?=
- =?utf-8?B?Z2pVbmVjdjAwQ1hQOG9KakhvYnpTeXl5VWdwdXdwVWNKTEdkaldnVkdoaklG?=
- =?utf-8?B?T29WTjZrUkF3UmVQeVFVTGZBRS85dklyVjVOVTlDRkNlYmtxazkwejd3VDFw?=
- =?utf-8?B?WFFhUFN3Wmp6djY4TFZQeHVjZFZZYUp3TTlzb2dwS295NFRqUk80MVNYekw0?=
- =?utf-8?B?ZkplWS84Q3FvRExoTzFWZVROSkF3K24rdml5OUxaWW4wYWtISXhyb0pxNFBa?=
- =?utf-8?B?d25MZ0JTcDdPVFEyVlA3T0JkeXRUQjZqd0p1ekNMaTdGMjhVN3JwVXNpOVdB?=
- =?utf-8?B?Ky9uOGZWSW95cmhSblZ4NHRJT2lNMUtldlFNV3BrdHo5cW92YUxjSFkwQnNx?=
- =?utf-8?B?ZjZZUjJoODk4cFAzTjVZUVYvU3ZRK1FueXdINFZudHdKMGp1QkV0Q3IwMGNr?=
- =?utf-8?B?cjlhUWdVWElzbkQ4K0xMSDRLR3JMOFkzOVNxSGVKWWpQU1l2NDlzbERBc0pm?=
- =?utf-8?B?YnB0bXh4M0NoN0tXTTgrUVkrM0plTDcvbGdYRFYwMTFyTTYyc1dSSllQYXRj?=
- =?utf-8?B?cnBwcXlhMzJWK2ZjbEg3VmxMeWkyRFg2TEwybi9WYndHSEpSZ253amZ2M2g4?=
- =?utf-8?B?VFdIM2NEYWlDakgyYmp6TU9EMElsOEVVcy9Xd1BkQnZUbkxhZDExQVBMbDdE?=
- =?utf-8?B?cmpKRUJ2ZUptMkQvekZ5Sm5mMG5hQVZLV3hWRHRNTU5aZ2F5VE9hZmwxaWtx?=
- =?utf-8?B?VFJDcDJxWlRWV0krWitYdmxDSlNUdjhHWTNTTW45SEFpQkRMUGl5aVRKbTJi?=
- =?utf-8?B?ZWtGVnZBU3orZ1YrUU5TYk9KeXNaMTZjazdoTW4zSmcvWUhHZ1FOaVl5dlkz?=
- =?utf-8?B?WTRBU0EyNmRqUmlUd2hyVE04ZG4xVGdudzMyVmpWQVZMWHdTa3AyYmtkUDBs?=
- =?utf-8?B?NzFGRzJuSS9wY1YwY294cm5ONEplNzNibXRJSTdscmd5dXRVOTVva29VSlZ4?=
- =?utf-8?B?ZlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3298bf01-6cc1-4f61-ac74-08dbf2427851
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2023 07:52:30.5818
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p01GpMv+a19s15NKmmaEC3Zxm8hR4ajAZkafqfSiSFGp1LbWUladW0uEP4ZtKA4eHxQXjXs5LXUbpO7zWqXU0LqpHwe+szBkXNXAMav0nE0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8402
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 3/6] net: phy: at803x: add QCA8084 ethernet phy support
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <hkallweit1@gmail.com>, <corbet@lwn.net>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231129120446.dfwei5cd7ulbdj4v@skbuf>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <20231129120446.dfwei5cd7ulbdj4v@skbuf>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 0x6xkabtDRX8pJ3fhNwWE3SLpZPFJCKB
+X-Proofpoint-GUID: 0x6xkabtDRX8pJ3fhNwWE3SLpZPFJCKB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-01_06,2023-11-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
+ bulkscore=0 clxscore=1011 spamscore=0 mlxlogscore=999 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2312010051
 
-On 11/30/23 22:45, Jesse Brandeburg wrote:
-> Most of idpf correctly uses FIELD_GET and FIELD_PREP, but a couple spots
-> were missed so fix those.
+
+
+On 11/29/2023 8:04 PM, Vladimir Oltean wrote:
+> On Wed, Nov 29, 2023 at 06:34:16PM +0800, Jie Luo wrote:
+>>>> The PCS drivers in drivers/net/pcs/ should be in PHY side, such as
+>>>> pcs-lynx.c and pcs-xpcs.c, they are configuring the MDIO device
+>>>> registers.
+>>>
+>>> Wrong. No they are not. Just because they are accessed via MDIO does
+>>> not mean they are in the PHY. MDIO can be used for more than just the
+>>> PHY, and is on a lot of platforms.
+>>>
+>>> LX2160A for example has many MDIO buses, and the PCSes (of which there
+>>> are multiple inside the chip, and use pcs-lynx) are accessed through
+>>> the MDIO bus specific to each port. They are not MMIO mapped.
+>>>
+>>> The same is true on stmmac platforms, where xpcs is used - xpcs is the
+>>> _MAC_ side PCS.
+>>>
+>>> Sorry but you are wrong.
+>>>
+>>
+>> OK, but it creates the PCS driver based on the MDIO device in pcs-lynx.c
+>> looks like this PCS is located in PHY device from hardware perspective.
 > 
-> This conversion was automated via a coccinelle script as posted with the
-> previous series.
-
-[1]
-
+> In some ways, this contradiction has a potato-patato aspect to it.
+> As Russell says, NXP devices do have internal SGMII/USXGMII/10GBASE-R
+> ports which use pcs-lynx.c to access the registers of the PCS layer
+> (which are on MDIO buses internal to the SoC). They could legally be
+> called PHYs, because they have all the layers that 802.3 says a PHY
+> should have: a PCS, a PMA and a PMD.
 > 
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> ---
-> This patch should be applied after the larger FIELD_PREP/FIELD_GET
-> conversion series for the Intel drivers.
-
-or at the end of,
-so [1] would be self-explanatory
-
-> ---
->   .../ethernet/intel/idpf/idpf_singleq_txrx.c    |  7 +++----
->   drivers/net/ethernet/intel/idpf/idpf_txrx.c    | 18 ++++++++----------
->   2 files changed, 11 insertions(+), 14 deletions(-)
+> But what phylib understands a phy_device to be is a more restricted
+> definition than just "a PHY - any PHY". Originally, phylib considered a
+> struct phy_device to be something (a discrete chip) that has pins and a
+> phy_interface_t towards its host side, and pins + an ethtool_link_mode_bit_indices
+> on its media side.
 > 
+> Traditionally, the media side is exclusively copper (BASE-T, BASE-T1) or
+> fiber (BASE-SX/LX).
+> 
+> A struct phy_device was then also used with PHY_INTERFACE_MODE_INTERNAL
+> to represent the built-in BASE-T PHYs that are embedded within certain
+> small/medium business Ethernet switches. And then, more and more other
+> similar embedded copper PHYs.
+> 
+> The idea is that (1) a phy_device connects to a remote system, and
+> (2) the phylib API does not have insight into the components of the
+> PHY it controls: PCS, PMA, PMD. It's all just a monolithic struct phy_device.
+> 
+> Because there are serial phy_interface_t modes where the MAC also need a
+> PHY to even connect to the phylib PHY, a problem presented itself:
+> phylib only has support for a single phy_device. So a new framework
+> appeared: phylink, which uses the unmodified phylib layer for the
+> external PHY, but models the MAC-side PHY using a different API. Later
+> on, that API became the phylink_pcs.
+> 
+> To muddy the waters, a phylink_pcs structure usually connects to another
+> local component as described above, like a phylib PHY (on-board or on an
+> SFP module). But it can also connect directly to a remote system (like a
+> phy_device would). But the phylink_pcs is always integrated in silicon
+> with the MAC, and the "media side" of it is a phy_interface_t type, not
+> an ethtool_link_mode_bit_indices type.
+> 
+> Having a separate phylink_pcs is what allows us to work around phylib's
+> limitation of having a single phy_device. The reverse is also true: you
+> can have a single phylink_pcs, and that belongs to the client MAC driver.
+> 
+> The other layers (PMA/PMD) of the MAC-side PHY are modeled in the kernel
+> as a struct phy (https://docs.kernel.org/driver-api/phy/index.html), and
+> we have the phy_set_mode_ext() API for reconfiguring this layer to a
+> different mode. Again, this is not applicable for phylib PHYs, which are
+> monolithic.
+> 
+> Given the above definitions, what NXP has and drives with pcs-lynx.c is
+> not a struct phy_device, but a MAC-side PCS represented by a phylink_pcs.
+> It absolutely does not matter that the register access method for the
+> PCS is an internal MDIO bus. FWIW, the PMA/PMD layer is at
+> drivers/phy/freescale/phy-fsl-lynx-28g.c.
+> 
+> So, if put into the proper context, what Russell is saying is correct,
+> but I think you need a bit of history to not get even more confused
+> about why it is the way it is.
 
-Anyway,
-it is better code so,
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-
+Thanks Vladimir for the detail information, i just get this message, 
+which is helpful to me.
 
