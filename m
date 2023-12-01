@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-52833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB20800556
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:20:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB5D1800557
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 09:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A2B21C20953
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C2012817E5
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 08:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811AA18625;
-	Fri,  1 Dec 2023 08:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24E418629;
+	Fri,  1 Dec 2023 08:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L3h6VB3K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYGXpL2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C60B170C
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:20:08 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1cfbce92362so2098285ad.1
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:20:08 -0800 (PST)
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30301717
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 00:20:13 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5bd5809f63aso207178a12.3
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 00:20:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701418807; x=1702023607; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701418813; x=1702023613; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2ZBDkpNPcullmg2ZrjoSc/KjdpI4wddQiZVrmKtbFFs=;
-        b=L3h6VB3KyLPN/qMHWWqveF2UyYHw5HiFPzu6SDVOq76rP+UuD++k/f1QsN+gkqlmmK
-         AKMYvVzcBv5fY60Jf742QbWmmXdmKhyzTZt+AWtS/gAcrMbs3pbMwwrE9/UOgLJUgoPX
-         amGngvxangBqE+FgJdTR9ISUXGD9s/OimsNLNduD2BYRPUd66fouKssQVs5eNwzaqbYM
-         CO4r2ZlMXxom96lRbI4wzInrGVCStp5v0Vmrhvq87R1Vlz5E9XhzheFexuZK5XMgfkJY
-         AHCyIaVIWIcKjMN8n9FZs8IqIB1F3icz2hR2LiDEKc0WBsPlDuF1EfB8mJ91A3q6qRSK
-         H+xw==
+        bh=c6HIzwqr4/G6CFZsZZgL29k9Nley8qoBr++UrQLwdHI=;
+        b=MYGXpL2C+zCJ+qwm36F9/6Kx7RjTFWqbRwXhHmyfNAlhdrf0zJH/V8cSz+gRHHA152
+         RliaTehqZY7ragbkoJ9fTNviE1DLJCpY6tXRkZ1+W5mowfQY9CeHZXfaUzVH8sODndbt
+         UuzFgtQ5G4485LfP5meH4U4QEIujHzWbqdyhCZcK//NTdPDP2aiOLwiCvBHw0rsjLoOK
+         2L0Mc3UcaTlD1sbKnh35kEXKNpA0JKktSOeZ713YpWlj+ReaYEPG71kgzvjvjwc/BI/8
+         c+Dz/d7XcG7FGNOEC7Az1XQ0ANd8/+QsK/H2vicpQn88BC9e4Gu452lpQT1rKIjLrQ/Q
+         BfKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701418807; x=1702023607;
+        d=1e100.net; s=20230601; t=1701418813; x=1702023613;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2ZBDkpNPcullmg2ZrjoSc/KjdpI4wddQiZVrmKtbFFs=;
-        b=NTlZzjn2zRwbhOxXP7BqogThs3TXgkir79K/A81mUTawoapTcazo0JKV+Cz0QoiOhb
-         MH2OuPoH0sCl2vH8TT3I/uvwAHhtT69ZsrODm1w9vcGS0pyK7EcYMNAl0YKms2M4VbSd
-         oZ88FyxqBxZlE0LhhnVKY6MxI+LT/JchFfwvaXklKOncM8uevALwQje/XImXstO3OqLp
-         DRJrC5Lq6S/KzDi+1+goRBEoDy7gcjJ+6jCxIAsucuQMlkFGqosOGvw7vZHkvnfbBkHl
-         Em7jLNMBTWuZoJcGq4YQ1We/mojVgpUu0fo+FIz6NWKWN4btbmK2krAkOnJgkusGqWdq
-         vN5Q==
-X-Gm-Message-State: AOJu0YzLwvIqCBAO+xsdHd5ass3AMKrsbbpAv/3RxzazRLlP88GdXnuO
-	6OAhSVpduLk3Sn5RECCSP2ZqnVIcN4CqFg==
-X-Google-Smtp-Source: AGHT+IHkTVnlzX74dBfR8nL0TdvzkBLcwRvTetc2a6DZFYUpkdS69AYmkPAtuHuZvmGgaZjZBUrRIw==
-X-Received: by 2002:a17:902:e5cc:b0:1d0:4759:bb60 with SMTP id u12-20020a170902e5cc00b001d04759bb60mr4225902plf.26.1701418807260;
-        Fri, 01 Dec 2023 00:20:07 -0800 (PST)
+        bh=c6HIzwqr4/G6CFZsZZgL29k9Nley8qoBr++UrQLwdHI=;
+        b=OaoX4OhQsP9cJ5Ubm5buaTejfvyRkAUoErEwB3pW4M2NtWFYYfTVo4pfs2dH6YJy2d
+         KIAkAYn8BhZ+qtUk2VyW5BPxg2HkIz/FtuwnCyNeh5g2KJO+8yletCc5Wuyzfxcfz0bI
+         ieDE0ksZRRBpKooWenp0wrVmC2ewlpilv6BATwZwefXQfKWjxnJgbzId5+p6tCyki/1H
+         EMwlsexMJcrpqnG0UZQDE6iOkng4v17kmkUC/7GaJ9L+cWshA2sAf4UKNRzQGCzOS3On
+         aFXIzPvex8H8Luny2N4Eg1XrdJnz6nqUYQnWDgta8AZ4GjQ1QFSGFgar0LLdc0o5mepO
+         JKWA==
+X-Gm-Message-State: AOJu0Yx2wC4ro1JvoJUkh+SFlT6jw/rC35Kzva2f/wlJPBg5cGDAOO52
+	YP8l6oHnelT08qczdfx3hiDDr5AgbZLREQ==
+X-Google-Smtp-Source: AGHT+IGwnVv5FxIIwmhPNwFh9aJjI6jxfdwPy911L/rNZXfrAnCKaq/dGjHmc8PbiWQDDlrOfxzSSA==
+X-Received: by 2002:a17:903:1c3:b0:1d0:45b2:d8b1 with SMTP id e3-20020a17090301c300b001d045b2d8b1mr3204541plh.33.1701418812581;
+        Fri, 01 Dec 2023 00:20:12 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id bf3-20020a170902b90300b001cfc68aca48sm2715787plb.135.2023.12.01.00.20.02
+        by smtp.gmail.com with ESMTPSA id bf3-20020a170902b90300b001cfc68aca48sm2715787plb.135.2023.12.01.00.20.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 00:20:06 -0800 (PST)
+        Fri, 01 Dec 2023 00:20:12 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -70,11 +70,10 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Marc Muehlfeld <mmuehlfe@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: [PATCHv4 net-next 01/10] docs: bridge: update doc format to rst
-Date: Fri,  1 Dec 2023 16:19:41 +0800
-Message-ID: <20231201081951.1623069-2-liuhangbin@gmail.com>
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 02/10] net: bridge: add document for IFLA_BR enum
+Date: Fri,  1 Dec 2023 16:19:42 +0800
+Message-ID: <20231201081951.1623069-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231201081951.1623069-1-liuhangbin@gmail.com>
 References: <20231201081951.1623069-1-liuhangbin@gmail.com>
@@ -86,81 +85,305 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The current bridge kernel doc is too old. It only pointed to the
-linuxfoundation wiki page which lacks of the new features.
+Add document for IFLA_BR enum so we can use it in
+Documentation/networking/bridge.rst.
 
-Here let's start the new bridge document and put all the bridge info
-so new developers and users could catch up the last bridge status soon.
-
-In this patch, Convert the doc to rst format. Add bridge brief introduction,
-FAQ and contact info.
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/networking/bridge.rst | 47 +++++++++++++++++++++++------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+ include/uapi/linux/if_link.h | 280 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 280 insertions(+)
 
-diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-index c859f3c1636e..6ad8b42b2c50 100644
---- a/Documentation/networking/bridge.rst
-+++ b/Documentation/networking/bridge.rst
-@@ -4,18 +4,45 @@
- Ethernet Bridging
- =================
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 8181ef23a7a2..a5f873c85a72 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -461,6 +461,286 @@ enum in6_addr_gen_mode {
  
--In order to use the Ethernet bridging functionality, you'll need the
--userspace tools.
-+Introduction
-+============
+ /* Bridge section */
  
--Documentation for Linux bridging is on:
--   https://wiki.linuxfoundation.org/networking/bridge
-+The IEEE 802.1Q-2022 (Bridges and Bridged Networks) standard defines the
-+operation of bridges in computer networks. A bridge, in the context of this
-+standard, is a device that connects two or more network segments and operates
-+at the data link layer (Layer 2) of the OSI (Open Systems Interconnection)
-+model. The purpose of a bridge is to filter and forward frames between
-+different segments based on the destination MAC (Media Access Control) address.
- 
--The bridge-utilities are maintained at:
--   git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bridge-utils.git
-+FAQ
-+===
- 
--Additionally, the iproute2 utilities can be used to configure
--bridge devices.
-+What does a bridge do?
-+----------------------
- 
--If you still have questions, don't hesitate to post to the mailing list 
--(more info https://lists.linux-foundation.org/mailman/listinfo/bridge).
-+A bridge transparently forwards traffic between multiple network interfaces.
-+In plain English this means that a bridge connects two or more physical
-+Ethernet networks, to form one larger (logical) Ethernet network.
- 
-+Is it L3 protocol independent?
-+------------------------------
-+
-+Yes. The bridge sees all frames, but it *uses* only L2 headers/information.
-+As such, the bridging functionality is protocol independent, and there should
-+be no trouble forwarding IPX, NetBEUI, IP, IPv6, etc.
-+
-+Contact Info
-+============
-+
-+The code is currently maintained by Roopa Prabhu <roopa@nvidia.com> and
-+Nikolay Aleksandrov <razor@blackwall.org>. Bridge bugs and enhancements
-+are discussed on the linux-netdev mailing list netdev@vger.kernel.org and
-+bridge@lists.linux-foundation.org.
-+
-+The list is open to anyone interested: http://vger.kernel.org/vger-lists.html#netdev
-+
-+External Links
-+==============
-+
-+The old Documentation for Linux bridging is on:
-+https://wiki.linuxfoundation.org/networking/bridge
++/**
++ * DOC: Bridge enum definition
++ *
++ * Please *note* that the timer values in the following section are expected
++ * in clock_t format, which is seconds multiplied by USER_HZ (generally
++ * defined as 100).
++ *
++ * @IFLA_BR_FORWARD_DELAY
++ *   The bridge forwarding delay is the time spent in LISTENING state
++ *   (before moving to LEARNING) and in LEARNING state (before moving
++ *   to FORWARDING). Only relevant if STP is enabled.
++ *
++ *   The valid values are between (2 * USER_HZ) and (30 * USER_HZ).
++ *   The default value is (15 * USER_HZ).
++ *
++ * @IFLA_BR_HELLO_TIME
++ *   The time between hello packets sent by the bridge, when it is a root
++ *   bridge or a designated bridge. Only relevant if STP is enabled.
++ *
++ *   The valid values are between (1 * USER_HZ) and (10 * USER_HZ).
++ *   The default value is (2 * USER_HZ).
++ *
++ * @IFLA_BR_MAX_AGE
++ *   The hello packet timeout is the time until another bridge in the
++ *   spanning tree is assumed to be dead, after reception of its last hello
++ *   message. Only relevant if STP is enabled.
++ *
++ *   The valid values are between (6 * USER_HZ) and (40 * USER_HZ).
++ *   The default value is (20 * USER_HZ).
++ *
++ * @IFLA_BR_AGEING_TIME
++ *   Configure the bridge's FDB entries aging time. It is the time a MAC
++ *   address will be kept in the FDB after a packet has been received from
++ *   that address. After this time has passed, entries are cleaned up.
++ *   Allow values outside the 802.1 standard specification for special cases:
++ *
++ *     * 0 - entry never ages (all permanent)
++ *     * 1 - entry disappears (no persistence)
++ *
++ *   The default value is (300 * USER_HZ).
++ *
++ * @IFLA_BR_STP_STATE
++ *   Turn spanning tree protocol on (*IFLA_BR_STP_STATE* > 0) or off
++ *   (*IFLA_BR_STP_STATE* == 0) for this bridge.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_PRIORITY
++ *   Set this bridge's spanning tree priority, used during STP root bridge
++ *   election.
++ *
++ *   The valid values are between 0 and 65535.
++ *
++ * @IFLA_BR_VLAN_FILTERING
++ *   Turn VLAN filtering on (*IFLA_BR_VLAN_FILTERING* > 0) or off
++ *   (*IFLA_BR_VLAN_FILTERING* == 0). When disabled, the bridge will not
++ *   consider the VLAN tag when handling packets.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_VLAN_PROTOCOL
++ *   Set the protocol used for VLAN filtering.
++ *
++ *   The valid values are 0x8100(802.1Q) or 0x88A8(802.1AD). The default value
++ *   is 0x8100(802.1Q).
++ *
++ * @IFLA_BR_GROUP_FWD_MASK
++ *   The group forwarding mask. This is the bitmask that is applied to
++ *   decide whether to forward incoming frames destined to link-local
++ *   addresses (of the form 01:80:C2:00:00:0X).
++ *
++ *   The default value is 0, which means the bridge does not forward any
++ *   link-local frames coming on this port.
++ *
++ * @IFLA_BR_ROOT_ID
++ *   The bridge root id, read only.
++ *
++ * @IFLA_BR_BRIDGE_ID
++ *   The bridge id, read only.
++ *
++ * @IFLA_BR_ROOT_PORT
++ *   The bridge root port, read only.
++ *
++ * @IFLA_BR_ROOT_PATH_COST
++ *   The bridge root path cost, read only.
++ *
++ * @IFLA_BR_TOPOLOGY_CHANGE
++ *   The bridge topology change, read only.
++ *
++ * @IFLA_BR_TOPOLOGY_CHANGE_DETECTED
++ *   The bridge topology change detected, read only.
++ *
++ * @IFLA_BR_HELLO_TIMER
++ *   The bridge hello timer, read only.
++ *
++ * @IFLA_BR_TCN_TIMER
++ *   The bridge tcn timer, read only.
++ *
++ * @IFLA_BR_TOPOLOGY_CHANGE_TIMER
++ *   The bridge topology change timer, read only.
++ *
++ * @IFLA_BR_GC_TIMER
++ *   The bridge gc timer, read only.
++ *
++ * @IFLA_BR_GROUP_ADDR
++ *   Set the MAC address of the multicast group this bridge uses for STP.
++ *   The address must be a link-local address in standard Ethernet MAC address
++ *   format. It is an address of the form 01:80:C2:00:00:0X, with X in [0, 4..f].
++ *
++ *   The default value is 0.
++ *
++ * @IFLA_BR_FDB_FLUSH
++ *   Flush bridge's fdb dynamic entries.
++ *
++ * @IFLA_BR_MCAST_ROUTER
++ *   Set bridge's multicast router if IGMP snooping is enabled.
++ *   The valid values are:
++ *
++ *     * 0 - disabled.
++ *     * 1 - automatic (queried).
++ *     * 2 - permanently enabled.
++ *
++ *   The default value is 1.
++ *
++ * @IFLA_BR_MCAST_SNOOPING
++ *   Turn multicast snooping on (*IFLA_BR_MCAST_SNOOPING* > 0) or off
++ *   (*IFLA_BR_MCAST_SNOOPING* == 0).
++ *
++ *   The default value is 1.
++ *
++ * @IFLA_BR_MCAST_QUERY_USE_IFADDR
++ *   If enabled use the bridge's own IP address as source address for IGMP
++ *   queries (*IFLA_BR_MCAST_QUERY_USE_IFADDR* > 0) or the default of 0.0.0.0
++ *   (*IFLA_BR_MCAST_QUERY_USE_IFADDR* == 0).
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_MCAST_QUERIER
++ *   Enable (*IFLA_BR_MULTICAST_QUERIER* > 0) or disable
++ *   (*IFLA_BR_MULTICAST_QUERIER* == 0) IGMP querier, ie sending of multicast
++ *   queries by the bridge.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_MCAST_HASH_ELASTICITY
++ *   Set multicast database hash elasticity, It is the maximum chain length in
++ *   the multicast hash table. This attribute is *deprecated* and the value
++ *   is always 16.
++ *
++ * @IFLA_BR_MCAST_HASH_MAX
++ *   Set maximum size of the multicast hash table
++ *
++ *   The default value is 4096, the value must be a power of 2.
++ *
++ * @IFLA_BR_MCAST_LAST_MEMBER_CNT
++ *   The Last Member Query Count is the number of Group-Specific Queries
++ *   sent before the router assumes there are no local members. The Last
++ *   Member Query Count is also the number of Group-and-Source-Specific
++ *   Queries sent before the router assumes there are no listeners for a
++ *   particular source.
++ *
++ *   The default value is 2.
++ *
++ * @IFLA_BR_MCAST_STARTUP_QUERY_CNT
++ *   The Startup Query Count is the number of Queries sent out on startup,
++ *   separated by the Startup Query Interval.
++ *
++ *   The default value is 2.
++ *
++ * @IFLA_BR_MCAST_LAST_MEMBER_INTVL
++ *   The Last Member Query Interval is the Max Response Time inserted into
++ *   Group-Specific Queries sent in response to Leave Group messages, and
++ *   is also the amount of time between Group-Specific Query messages.
++ *
++ *   The default value is (1 * USER_HZ).
++ *
++ * @IFLA_BR_MCAST_MEMBERSHIP_INTVL
++ *   The interval after which the bridge will leave a group, if no membership
++ *   reports for this group are received.
++ *
++ *   The default value is (260 * USER_HZ).
++ *
++ * @IFLA_BR_MCAST_QUERIER_INTVL
++ *   The interval between queries sent by other routers. if no queries are
++ *   seen after this delay has passed, the bridge will start to send its own
++ *   queries (as if *IFLA_BR_MCAST_QUERIER_INTVL* was enabled).
++ *
++ *   The default value is (255 * USER_HZ).
++ *
++ * @IFLA_BR_MCAST_QUERY_INTVL
++ *   The Query Interval is the interval between General Queries sent by
++ *   the Querier.
++ *
++ *   The default value is (125 * USER_HZ). The minimum value is (1 * USER_HZ).
++ *
++ * @IFLA_BR_MCAST_QUERY_RESPONSE_INTVL
++ *   The Max Response Time used to calculate the Max Resp Code inserted
++ *   into the periodic General Queries.
++ *
++ *   The default value is (10 * USER_HZ).
++ *
++ * @IFLA_BR_MCAST_STARTUP_QUERY_INTVL
++ *   The interval between queries in the startup phase.
++ *
++ *   The default value is (125 * USER_HZ) / 4. The minimum value is (1 * USER_HZ).
++ *
++ * @IFLA_BR_NF_CALL_IPTABLES
++ *   Enable (*NF_CALL_IPTABLES* > 0) or disable (*NF_CALL_IPTABLES* == 0)
++ *   iptables hooks on the bridge.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_NF_CALL_IP6TABLES
++ *   Enable (*NF_CALL_IP6TABLES* > 0) or disable (*NF_CALL_IP6TABLES* == 0)
++ *   ip6tables hooks on the bridge.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_NF_CALL_ARPTABLES
++ *   Enable (*NF_CALL_ARPTABLES* > 0) or disable (*NF_CALL_ARPTABLES* == 0)
++ *   arptables hooks on the bridge.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_VLAN_DEFAULT_PVID
++ *   VLAN ID applied to untagged and priority-tagged incoming packets.
++ *
++ *   The default value is 1. Setting to the special value 0 makes all ports of
++ *   this bridge not have a PVID by default, which means that they will
++ *   not accept VLAN-untagged traffic.
++ *
++ * @IFLA_BR_PAD
++ *   Bridge attribute padding type for netlink message.
++ *
++ * @IFLA_BR_VLAN_STATS_ENABLED
++ *   Enable (*IFLA_BR_VLAN_STATS_ENABLED* == 1) or disable
++ *   (*IFLA_BR_VLAN_STATS_ENABLED* == 0) per-VLAN stats accounting.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_MCAST_STATS_ENABLED
++ *   Enable (*IFLA_BR_MCAST_STATS_ENABLED* > 0) or disable
++ *   (*IFLA_BR_MCAST_STATS_ENABLED* == 0) multicast (IGMP/MLD) stats
++ *   accounting.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_MCAST_IGMP_VERSION
++ *   Set the IGMP version.
++ *
++ *   The valid values are 2 and 3. The default value is 2.
++ *
++ * @IFLA_BR_MCAST_MLD_VERSION
++ *   Set the MLD version.
++ *
++ *   The valid values are 1 and 2. The default value is 1.
++ *
++ * @IFLA_BR_VLAN_STATS_PER_PORT
++ *   Enable (*IFLA_BR_VLAN_STATS_PER_PORT* == 1) or disable
++ *   (*IFLA_BR_VLAN_STATS_PER_PORT* == 0) per-VLAN per-port stats accounting.
++ *   Can be changed only when there are no port VLANs configured.
++ *
++ *   The default value is 0 (disabled).
++ *
++ * @IFLA_BR_MULTI_BOOLOPT
++ *   The multi_boolopt is used to control new boolean options to avoid adding
++ *   new netlink attributes. You can look at ``enum br_boolopt_id`` for those
++ *   options.
++ *
++ * @IFLA_BR_MCAST_QUERIER_STATE
++ *   Bridge mcast querier states, read only.
++ *
++ * @IFLA_BR_FDB_N_LEARNED
++ *   The number of dynamically learned FDB entries for the current bridge,
++ *   read only.
++ *
++ * @IFLA_BR_FDB_MAX_LEARNED
++ *   Set the number of max dynamically learned FDB entries for the current
++ *   bridge.
++ */
+ enum {
+ 	IFLA_BR_UNSPEC,
+ 	IFLA_BR_FORWARD_DELAY,
 -- 
 2.41.0
 
