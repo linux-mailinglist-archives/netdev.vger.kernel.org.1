@@ -1,149 +1,107 @@
-Return-Path: <netdev+bounces-52951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-52952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05FA0800E18
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:09:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A03800E2B
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 16:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70BF6B21468
-	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 847A51C208BC
+	for <lists+netdev@lfdr.de>; Fri,  1 Dec 2023 15:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF135495EE;
-	Fri,  1 Dec 2023 15:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8A73E497;
+	Fri,  1 Dec 2023 15:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZW2H/utz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HCsckeLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748C010F9;
-	Fri,  1 Dec 2023 07:09:17 -0800 (PST)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-77d645c0e06so112311585a.3;
-        Fri, 01 Dec 2023 07:09:17 -0800 (PST)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E86EAD
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 07:12:14 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3333487fefbso61721f8f.1
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 07:12:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701443356; x=1702048156; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zLso2pmbW+pqec/n5hTLrdVINDT0pM+C03w8nh7HKns=;
-        b=ZW2H/utzzf1N7CiaySlvo1Rf/2AEihSxENWVUquX4J/l39PzuK8dND9WNcVXu1taoX
-         Rj7+SHZGsei6QlOGW9p8OZyqJXLHCh2i4c8hybn6eqz9mw30mwtTXz81AEMAE2jtfFhJ
-         UgYS/PUTL/mjlV8uEoiyH4vyKHSIfDaGCB+RrUvSRorMWS7H2kcJV25cIOfjFGlU7Dvw
-         u9RbeF1A90lzZJzDh189xT8bkgXIrd417KCDKsKVnVZ+BwSakSccGybZE2aB9ouJiQ8Z
-         UOiRmPKUhUQQYtARmx4fNnb6LRFGEKroQOFtv1QlNoPhv62L+jjc0GLrT7120XYRMs15
-         NsZg==
+        d=gmail.com; s=20230601; t=1701443533; x=1702048333; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7ogPN0fsaHMjSk4bQ/WcT76AeUw55Y7gBlP7VeeJR3c=;
+        b=HCsckeLhNUAY9tYuIDeE7/13zzWd+i2aeiKpFHs8QtD5a/56RBaHItVqOy5V+OwJpW
+         ku8/pggtszUMNe1kzuNIuBMO4Z2dB85P/zDz1zcsT5UnCkhUoAEpUfUJe+QNH5vYafxs
+         +vHw9ORoKnGnOP2gAMHKMb7HyOZBn0Xx3fxBQ90soGBmLoBkD+3RnhR/ICjCUDeqKuwY
+         YFo8/aqrMCdXZMG5emHwxadawEuUIT+NIfPbzYEqgNrxTCawcBz7WUmJh0LH3vk0Y0hP
+         H7gH8gR80cHUV9/JoEOIFAqAs0oBsqljBZHM3uMY9ZvjvxbGHkHEfz1kh/5Rp7NyeSFY
+         qDOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701443356; x=1702048156;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zLso2pmbW+pqec/n5hTLrdVINDT0pM+C03w8nh7HKns=;
-        b=eFFRYwiS/0K9fqnRZIK4nTKrZI+AHpzU9i0L2JMXRFwUyBxhPPb9NLRn9JjPoQCtFU
-         flSBTRW9Z6/5JuDkTQ9kGQohIMtwiFb1RA2gr9tDZE2L/0R7VMraOpZn7C1IGacXiTaq
-         GdiC67/XivIrehsMTEyS8qWsM+uKQd+V9capxdJZMFD8wzDGlowRRRanSiSnf7TAc3y0
-         WElU4YuiIfcrPIHCeZQkV+LIFwHNZrPDiksCnxwNJygmCfyidZHAdYOdicqTHOs8jrhi
-         f3uXZ3NJsxUx/5brQHV1ehe9jTTtW88sCaUe/mIcxxbFQeqDj6l/+MSzf8NpQmPmGmY4
-         M8Gw==
-X-Gm-Message-State: AOJu0YyjQydEDG3m72cwB5wEfj+HUAm1KPUvfU6lJ5bwfs71NQqKXDo9
-	xPSMiezz/FnMYilqTw6dRI0iVMZ5PtHgdA==
-X-Google-Smtp-Source: AGHT+IH54DZX3epKyg6LRt2pdYZkL/+XeUYhSrEyKX4h3aISopJX9pTR0/tZhUxii4HdMqDmoQRtqg==
-X-Received: by 2002:ad4:4511:0:b0:67a:8ed9:c9f with SMTP id k17-20020ad44511000000b0067a8ed90c9fmr3811562qvu.48.1701443356450;
-        Fri, 01 Dec 2023 07:09:16 -0800 (PST)
-Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id g12-20020a0caacc000000b0067a39a44ca5sm1106qvb.77.2023.12.01.07.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 07:09:15 -0800 (PST)
-Date: Fri, 01 Dec 2023 10:09:15 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Bjorn Topel <bjorn@kernel.org>, 
- "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@google.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
- "xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
- "linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Message-ID: <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
-References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
- <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
- <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
-Subject: RE: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
+        d=1e100.net; s=20230601; t=1701443533; x=1702048333;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7ogPN0fsaHMjSk4bQ/WcT76AeUw55Y7gBlP7VeeJR3c=;
+        b=gsZjzNENxWeQXS6fD7K0tdJsUs/0bvqIPLmj8t15LYi8hkVV/1KCLmpeYyAMYJsBCC
+         gpvSz1bNFZgHMSkwrN+js6Uv1k3PB7Qp9hpJUIjq/GvMYEAbh6QzfYmEw+GvYdogkQd8
+         H1ULojACzJVuP1LrsbEkjM9c+zIqXAZwX+6ueJA/vcLs7pvNNtdRrOjKXsJJGagv+h1s
+         KuzZu3JWc3wYIZRvKeJzvpJ+0Bjap3wAzYgy4Y1fel1s40CoAW/4B9lTA5UwoyYJWb56
+         gR9gG8ppRF1LGWb1EZc3t7wM0ud0HgXbZeHtdXpenCvmYqEcPZwv3l4Ybr/3b0IQsbzZ
+         ytbQ==
+X-Gm-Message-State: AOJu0Ywsny5ej1toik3aXuBCagLbMd5asUm3+njA73AZJI7Y167f8qLO
+	oX2VzX5NI38jUka/NorjO6dMz+B2BoU=
+X-Google-Smtp-Source: AGHT+IHqsCg2F0MmmEsbIsa8JRPAL95wGvZvFTVp8bKMP/FjwdhDNsbfJX3sH/N8bt6OqV+hCHn9Xg==
+X-Received: by 2002:a5d:64a6:0:b0:333:3383:fbc with SMTP id m6-20020a5d64a6000000b0033333830fbcmr1459050wrp.7.1701443532617;
+        Fri, 01 Dec 2023 07:12:12 -0800 (PST)
+Received: from [10.0.0.4] ([37.170.89.160])
+        by smtp.gmail.com with ESMTPSA id i15-20020a5d584f000000b003331c7b409asm4481933wrf.78.2023.12.01.07.12.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Dec 2023 07:12:12 -0800 (PST)
+Message-ID: <93e09c53-0621-4cdf-9e5f-84e8d20585a3@gmail.com>
+Date: Fri, 1 Dec 2023 16:12:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] packet: Move reference count in packet_sock to
+ atomic_long_t
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
+Cc: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>, stable@kernel.org
+References: <20231201131021.19999-1-daniel@iogearbox.net>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+In-Reply-To: <20231201131021.19999-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Song, Yoong Siang wrote:
-> On Friday, December 1, 2023 6:46 PM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
-> >On 12/1/23 07:24, Song Yoong Siang wrote:
-> >> This series expands XDP TX metadata framework to include ETF HW offload.
-> >>
-> >> Changes since v1:
-> >> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
-> >> - rename launch-time to txtime
-> >>
-> >
-> >I strongly disagree with this renaming (sorry to disagree with Willem).
-> >
-> >The i210 and i225 chips call this LaunchTime in their programmers
-> >datasheets, and even in the driver code[1].
-> >
-> >Using this "txtime" name in the code is also confusing, because how can
-> >people reading the code know the difference between:
-> >  - tmo_request_timestamp and tmo_request_txtime
-> >
-> 
-> Hi Jesper and Willem,
-> 
-> How about using "launch_time" for the flag/variable and
-> "Earliest TxTime First" for the description/comments?  
 
-I don't particularly care which term we use, as long as we're
-consistent. Especially, don't keep introducing new synonyms.
+On 12/1/23 14:10, Daniel Borkmann wrote:
+> In some potential instances the reference count on struct packet_sock
+> could be saturated and cause overflows which gets the kernel a bit
+> confused. To prevent this, move to a 64-bit atomic reference count on
+> 64-bit architectures to prevent the possibility of this type to overflow.
+>
+> Because we can not handle saturation, using refcount_t is not possible
+> in this place. Maybe someday in the future if it changes it could be
+> used. Also, instead of using plain atomic64_t, use atomic_long_t instead.
+> 32-bit machines tend to be memory-limited (i.e. anything that increases
+> a reference uses so much memory that you can't actually get to 2**32
+> references). 32-bit architectures also tend to have serious problems
+> with 64-bit atomics. Hence, atomic_long_t is the more natural solution.
+>
+> Reported-by: "The UK's National Cyber Security Centre (NCSC)" <security@ncsc.gov.uk>
+> Co-developed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: stable@kernel.org
+> ---
+>   
 
-The fact that one happens to be one vendor's marketing term does not
-make it preferable, IMHO. On the contrary.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-SO_TXTIME is in the ABI, and EDT has been used publicly in kernel
-patches and conference talks, e.g., Van Jacobson's Netdev 0x12
-keynote. Those are vendor agnostic commonly used terms.
 
-But as long as Launch Time is not an Intel only trademark, fine to
-select that.
 
