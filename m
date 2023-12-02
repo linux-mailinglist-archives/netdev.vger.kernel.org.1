@@ -1,114 +1,82 @@
-Return-Path: <netdev+bounces-53244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D265801C08
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 11:01:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BAE7801C22
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 11:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1151C20B3D
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A1728135D
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0D915491;
-	Sat,  2 Dec 2023 10:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE574156E0;
+	Sat,  2 Dec 2023 10:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="wSmehsPW"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D349CC;
-	Sat,  2 Dec 2023 02:01:36 -0800 (PST)
-Received: from luzhipeng.223.5.5.5 (unknown [60.177.97.75])
-	by mail-app2 (Coremail) with SMTP id by_KCgCnrEz3_2plN6c7AA--.29237S2;
-	Sat, 02 Dec 2023 17:59:19 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	George Cherian <george.cherian@marvell.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] octeontx2-af: fix a use-after-free in rvu_npa_register_reporters
-Date: Sat,  2 Dec 2023 17:59:02 +0800
-Message-Id: <20231202095902.3264863-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0C4D67;
+	Sat,  2 Dec 2023 02:06:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=o45hdsTEGxCn0t+rxCqz3d1GuoH4T/qGAEWkFyx+Odg=;
+	t=1701511600; x=1702721200; b=wSmehsPWm3+GGZlale9ITHw5TzablTSPziSGSvbGAUlynhY
+	TA1dRhGa013lnCDdpgnaZblCX6N9s4VAle8vEjvM257LAf+KVlnVMJCJtcXKHXcYVGaEbI8zgoU+n
+	GIGLqaVbKAL9/d68XRdv/Hls70O46k4/vw1IQlrJ2l23TlcdpZptv9YjQW4LieXF7sc1R+m3VCHA6
+	BPL4Hx6AczsBbjPAk8SodMpk/Q8ogc2vOmQI/zBH0i5xD3It/RzcPj9IBXYnfnAnlbnRt/+2GqDjp
+	RK7ddV+qL/cKOfw/kNz+vUnjrqMzWGk7AjaeMeZvWhEhPqUguXo6jnogRCvMpkPg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1r9MtR-0000000CPtN-3yIk;
+	Sat, 02 Dec 2023 11:06:38 +0100
+Message-ID: <339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
+Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Sat, 02 Dec 2023 11:06:36 +0100
+In-Reply-To: <20231201162844.14d1bbb0@kernel.org>
+References: 
+	<346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+	 <20231201104329.25898-5-johannes@sipsolutions.net>
+	 <20231201162844.14d1bbb0@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:by_KCgCnrEz3_2plN6c7AA--.29237S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFyxWFyftFy3Cr1xXFW7twb_yoW8tr18pF
-	WrAry5Gr97t34jqF9rXa1Utay2k3Wktr4UWr1xKwnIg3WrJrsayrsaqF9YgFsxArWkGFWj
-	qr4Yq3yUZrZrJr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r4fMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUjMmh5UUUUU==
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+X-malware-bazaar: not-scanned
 
-The rvu_dl will be freed in rvu_npa_health_reporters_destroy(rvu_dl)
-after the create_workqueue fails, and after that free, the rvu_dl will
-be translate back through rvu_npa_health_reporters_create,
-rvu_health_reporters_create, and rvu_register_dl. Finally it goes to the
-err_dl_health label, being freed again in
-rvu_health_reporters_destroy(rvu) by rvu_npa_health_reporters_destroy.
-In the second calls of rvu_npa_health_reporters_destroy, however,
-it uses rvu_dl->rvu_npa_health_reporter, which is already freed at
-the end of rvu_npa_health_reporters_destroy in the first call.
+On Fri, 2023-12-01 at 16:28 -0800, Jakub Kicinski wrote:
+> On Fri,  1 Dec 2023 11:41:14 +0100 Johannes Berg wrote:
+> > So I had put this aside for a while, but really got annoyed by all
+> > the test failures now ... thinking about this again I basically now
+> > arrived at a variant of solution #3 previously outlined, and I've
+> > kind of convinced myself that userspace should always get an event
+> > with a new carrier_up_count as it does today.
+>=20
+> Would it work if we exposed "linkwatch is pending" / "link is
+> transitioning" bit to user space?
 
-So this patch prevents the first destroy by instantly returning -ENONMEN
-when create_workqueue fails. In addition, since the failure of
-create_workqueue is the only entrence of label err, it has been
-integrated into the error-handling path of create_workqueue.
+Not sure, not by much or more than what this did? It's basically the
+same, I think: I exposed the carrier_up_count at the kernel time, so if
+userspace hasn't seen an event with a value >=3D that it knows the link is
+transitioning.
 
-Fixes: f1168d1e207c ("octeontx2-af: Add devlink health reporters for NPA")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+> Even crazier, would it help if we had rtnl_getlink() run
+> linkwatch for the target link if linkwatch is pending?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-index 41df5ac23f92..058f75dc4c8a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_devlink.c
-@@ -1285,7 +1285,7 @@ static int rvu_npa_register_reporters(struct rvu_devlink *rvu_dl)
- 
- 	rvu_dl->devlink_wq = create_workqueue("rvu_devlink_wq");
- 	if (!rvu_dl->devlink_wq)
--		goto err;
-+		return -ENOMEM;
- 
- 	INIT_WORK(&rvu_reporters->intr_work, rvu_npa_intr_work);
- 	INIT_WORK(&rvu_reporters->err_work, rvu_npa_err_work);
-@@ -1293,9 +1293,6 @@ static int rvu_npa_register_reporters(struct rvu_devlink *rvu_dl)
- 	INIT_WORK(&rvu_reporters->ras_work, rvu_npa_ras_work);
- 
- 	return 0;
--err:
--	rvu_npa_health_reporters_destroy(rvu_dl);
--	return -ENOMEM;
- }
- 
- static int rvu_npa_health_reporters_create(struct rvu_devlink *rvu_dl)
--- 
-2.34.1
+Sure, if we were to just synchronize that at the right time (doesn't
+even need to be rtnl_getlink, could be a new operation) that'd solve the
+issue too, perhaps more easily.
 
+johannes
 
