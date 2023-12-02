@@ -1,79 +1,84 @@
-Return-Path: <netdev+bounces-53212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EBAB801A3B
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:28:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1919C801A42
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48711C20B9C
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 03:28:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C066A1F210F5
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 03:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B478579CC;
-	Sat,  2 Dec 2023 03:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35EA79D8;
+	Sat,  2 Dec 2023 03:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyOxrWYM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iz/Dx5Dz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E2B613E;
-	Sat,  2 Dec 2023 03:28:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30426C433C8;
-	Sat,  2 Dec 2023 03:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C1B23AF
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 03:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13132C433C9;
+	Sat,  2 Dec 2023 03:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701487728;
-	bh=5Iznkl7Y/UaOI16u1p9z9TNAVqCqy4L/LgDnEnmoT0c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IyOxrWYMs6Tj+TmW+3JjcrBCpnsAtOryyhNLFggtzwjzTTFSihe51dj8JMLpA0CEs
-	 vNbukE02lwU+Ozm3SWICClspjaDDjvSFN/AN1z2sPL6CZ3L0UI8EBf8EbHewUl718f
-	 8+3F63d8ipmvFP8hnwnv+f2T3VGHF1Bk0FKzm0YWnNx0uTyJ5k4GxWtXg42a0JPoYo
-	 M9J1J803EXwuwH8LBrpmYO9gXvyQCA9DEl+lA+8u9dquFdXWh9c18EXDlMlgm2ynfX
-	 3LPjdLfYgaQqvobwJ+Qsa+q3Vl3fGmx1gNtzF8r035Wjd1vTDwfE2YMir+p8t1fFvE
-	 yOQpikEFSl2NA==
-Date: Fri, 1 Dec 2023 19:28:46 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Mykola
- Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh
- <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, bpf@vger.kernel.org, xdp-hints@xdp-project.net,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next 1/3] xsk: add launch time support to XDP Tx
- metadata
-Message-ID: <20231201192846.15c9e64e@kernel.org>
-In-Reply-To: <20231130162028.852006-2-yoong.siang.song@intel.com>
-References: <20231130162028.852006-1-yoong.siang.song@intel.com>
-	<20231130162028.852006-2-yoong.siang.song@intel.com>
+	s=k20201202; t=1701488424;
+	bh=vZxBipH19Gjg17dKBRsDB0Gs4uZStmVNI9tMPhOax6c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iz/Dx5Dz5yenPKzCsoA2E57wyO65qy2AiXsib/YpqZYoUPCTkxtZcZz+QzpNWmj+C
+	 3H0Jpt9XhjzLJ6kaDo1OW+QSQ8n10MJxZqWY2tPHliQI963W5qsOKALmB1OrPnO81A
+	 7fAMNaaa1/aDwHf8cLtGCAjkaV9D+oT1kQZgtxpPypi+7BLeEqeNj8Ha2FaaBXRWky
+	 +z/N/RXX1esKPx4Co6PA7H5EKwhxqhdoUJsNrEP9ph+kNP4+LFV7a52RksytfJ5NKh
+	 qyeNSgumpXzzUChGx0Ay/PfGemnSrG8VZwlfuKg1YNwebgZwA0SlsKF1z2kpgbSaJR
+	 7tW/KiOwzaCfQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ECE81C64459;
+	Sat,  2 Dec 2023 03:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tcp: tcp_gro_dev_warn() cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170148842396.13520.2541912983542148159.git-patchwork-notify@kernel.org>
+Date: Sat, 02 Dec 2023 03:40:23 +0000
+References: <20231130184135.4130860-1-edumazet@google.com>
+In-Reply-To: <20231130184135.4130860-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-On Fri,  1 Dec 2023 00:20:26 +0800 Song Yoong Siang wrote:
-> +        name: launch-time
-> +        doc:
-> +          HW Time-Based Scheduling (TBS) is supported by the driver.
+Hello:
 
-Does this mean fifo "gating" or HW can do reordering?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 30 Nov 2023 18:41:35 +0000 you wrote:
+> Use DO_ONCE_LITE_IF() and __cold attribute to put tcp_gro_dev_warn()
+> out of line.
+> 
+> This also allows the message to be printed again after a
+> "echo 1 > /sys/kernel/debug/clear_warn_once"
+> 
+> Also add a READ_ONCE() when reading device mtu, as it could
+> be changed concurrently.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] tcp: tcp_gro_dev_warn() cleanup
+    https://git.kernel.org/netdev/net-next/c/b32e8fbeace6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
