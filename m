@@ -1,48 +1,51 @@
-Return-Path: <netdev+bounces-53274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBC6801E1D
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 19:47:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0CC801E21
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 19:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 056A3281102
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 18:47:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68632B20B85
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 18:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6474B9474;
-	Sat,  2 Dec 2023 18:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0537DF9D5;
+	Sat,  2 Dec 2023 18:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDRYe9Ec"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5yZi5op"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408322F3E;
-	Sat,  2 Dec 2023 18:46:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BD5EC433C7;
-	Sat,  2 Dec 2023 18:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E428828
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 18:58:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFE6EC433C7;
+	Sat,  2 Dec 2023 18:58:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701542816;
-	bh=Rgi3ddaSq/HnZV4GLA+Aa7G8rUV64eKojW6PMPBNtlE=;
+	s=k20201202; t=1701543527;
+	bh=pGZmxg4gMuH9Y/xp6YNdSj3V/YUamxIEYzNm/xMRWhc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NDRYe9EcyY7hvm5QXWy+l2EWvYbBCj/Tqx08098S/0f8IFTnSYllNmnPhOI1twK8i
-	 roGybv/M+fJk5vg0Nvr8vx5t6eCFNqeVb8jRtvAYXBtxligNPo5pk9jcyDHkSzRMG0
-	 dJb1t51kj3qsBQc1NtEpeAWzv5pf1ZZtuRROopMUBvFiwyWYJLhHEmr7c8a+N6Ecot
-	 neh8uVaH4V4z/ul/8nNp1PTkRSfeqnC68KB3l7am/fwIDmxHooSnh6jZlUHQdno8e+
-	 T1FtyAU4V/4O+4do9ly+ppNIVniyDdED1Pzu7GinmiLaIlda8LKeKRfhvW4JCMp35v
-	 Qw8C9pVLoviEQ==
-Date: Sat, 2 Dec 2023 10:46:55 -0800
+	b=r5yZi5optou1fyuiBv5bgcirRha8rYqhwkAX11o+bLsdJBri1Fmv7k+S5o9F9lJfA
+	 isTpc5oXp+nyuu7xLVXXETZby8sI2NMCWrokZ0+gnZbq30UjgodzuG6bCvrrIZftM6
+	 4lGBJ7iHwt94DT1YeWwhZ9hQ8pYaabSpMxuRHsX6s2PVwRI37XHV4fyYjBSUvYdLP2
+	 tI6GWln+sXwdCT+o4lvbpWZVshBW1fXT2ncZFBFXq969gGcxDO3xerB/Xrwty+dTam
+	 9abRCz+Rxabl05bmByuODvkNSB3GAUNWTxdMvrWn9DGk+xLapAQelv8vlNKtlyvwfU
+	 dDSaOLegQx/3A==
+Date: Sat, 2 Dec 2023 10:58:45 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
-Message-ID: <20231202104655.68138ab4@kernel.org>
-In-Reply-To: <339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
-References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
-	<20231201104329.25898-5-johannes@sipsolutions.net>
-	<20231201162844.14d1bbb0@kernel.org>
-	<339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Justin Lai <justinlai0215@realtek.com>, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v13 01/13] rtase: Add pci table supported in
+ this module
+Message-ID: <20231202105845.12e27e31@kernel.org>
+In-Reply-To: <27b2b87a-929d-4b97-9265-303391982d27@lunn.ch>
+References: <20231130114327.1530225-1-justinlai0215@realtek.com>
+	<20231130114327.1530225-2-justinlai0215@realtek.com>
+	<20231201203602.7e380716@kernel.org>
+	<27b2b87a-929d-4b97-9265-303391982d27@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,29 +55,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 02 Dec 2023 11:06:36 +0100 Johannes Berg wrote:
-> > Would it work if we exposed "linkwatch is pending" / "link is
-> > transitioning" bit to user space?  
+On Sat, 2 Dec 2023 17:27:57 +0100 Andrew Lunn wrote:
+> > > + *  The block of the Realtek RTL90xx series is our entire chip architecture,
+> > > + *  the GMAC is connected to the switch core, and there is no PHY in between.
+> > > + *  In addition, this driver is mainly used to control GMAC, but does not
+> > > + *  control the switch core, so it is not the same as DSA.  
+> > 
+> > Okay, but you seem to only register one netdev.
+> > 
+> > Which MAC is it for?  
 > 
-> Not sure, not by much or more than what this did? It's basically the
-> same, I think: I exposed the carrier_up_count at the kernel time, so if
-> userspace hasn't seen an event with a value >= that it knows the link is
-> transitioning.
+> The GMAC one. This is going to be a DSA system, and this driver is for
+> the conduit MAC the CPU uses. At some point, i hope there is a DSA
+> driver added, or the existing realtek driver is extended to support
+> this switch.
 
-The benefit being that it'd work for everyone, without having to add
-the carrier count in random events?
+Oh, thanks, it even says so in the comment. I blame it on late night
+reviewing. I was confused by the "driver [...] does not control the
+switch core, so it is not the same as DSA." Looking at the discussion
+in v3 it sounds like the switch is controlled by a different PCI
+function? In which case it very much sounds like DSA. Or maybe there
+was a minor misunderstanding there, and the driver will need MFD /
+auxbus, which is still close to DSA.
 
-> > Even crazier, would it help if we had rtnl_getlink() run
-> > linkwatch for the target link if linkwatch is pending?  
-> 
-> Sure, if we were to just synchronize that at the right time (doesn't
-> even need to be rtnl_getlink, could be a new operation) that'd solve the
-> issue too, perhaps more easily.
-
-I was wondering about the new op, too, but "synchronize things please"
-op feels a little hacky. rtnl_getlink returns link state, so it feels
-somewhat natural for it to do the sync, to make sure that what it
-returns is in fact correct information. No strong feelings, tho.
-rtnl_getlink does return a lot, so maybe a new rtnl_getcarrier op?
-Or we can make reading sysfs "carrier" do the sync?
+I'm mainly asking to make sure we avoid "implicitly programming" the
+switch, like, IIUC, one of the TI drivers did. And we ended up with
+multiple versions / modes of operation :( Sounds like this driver
+doesn't touch switch registers yet, tho, so all good.
 
