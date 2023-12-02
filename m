@@ -1,65 +1,85 @@
-Return-Path: <netdev+bounces-53220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6D8801A89
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:14:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC63C801A9B
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0461F210E4
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:14:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDF501C20B7A
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116D98F44;
-	Sat,  2 Dec 2023 04:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA6BBA34;
+	Sat,  2 Dec 2023 04:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E0Tmj6hr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNlM0e1C"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37928C0B;
-	Sat,  2 Dec 2023 04:14:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A11C433C7;
-	Sat,  2 Dec 2023 04:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC25BA22
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE448C43391;
+	Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701490474;
-	bh=fPGmDPaKjV8LMrfSaKKD2/2w8V2jbH3SmiSiLi26M04=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E0Tmj6hrHp7t06Sqv+Y/4N2r4YHquEOmxHUYx+fUaHchKjih0iSlHONwecakzJUl2
-	 IO66H2+Aji9o3rfqvoZhV3kElMddcjImiNFoYvuY9cfkLktIKP0DUepvGZm6f9Thkk
-	 IGsCK+uOOAAg+EThqHv9tbE6RsHzlxh1cAnhVE9ZWIQ8d5FTrDblVpHZ1DrgPrRQxj
-	 /Y7L+j61ZSeeVyHwWRf905+uqnagePbcRjjEFIg8UrIKc2CnU8Y7jbbBqZmY9ACZx9
-	 BYoO65fc7x0qpPxttpF02xq24cZNlwRH5rTD+LTpN1tL8MvidzlrAWKgARgi1XfR8L
-	 g7YsDM7q2yd2Q==
-Date: Fri, 1 Dec 2023 20:14:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: <hkallweit1@gmail.com>
-Cc: ChunHao Lin <hau@realtek.com>, <nic_swsd@realtek.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <grundler@chromium.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net v2] r8169: fix rtl8125b PAUSE frames blasting when
- suspended
-Message-ID: <20231201201432.20d40150@kernel.org>
-In-Reply-To: <20231129155350.5843-1-hau@realtek.com>
-References: <20231129155350.5843-1-hau@realtek.com>
+	s=k20201202; t=1701490824;
+	bh=PEMYclhCkQOsQjmYM/8h/waI+etEhpl8PV98QdlSbok=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CNlM0e1CY9ZJ4dpvZfaaE8w6Wk6ii1Pir0PMn4+B0mZRF34dT0ORMOsP5PzvG1C2H
+	 +0v1oKaPsv1IFnhcpLZCeu91xOdkksWSm5tg4n9jTO5e23NdiOmJ8sdWsNRSif8/vG
+	 OzgfnczCNtqxJDZGQGSFGUq/vzEbgvAlcXx1nmaQJZt3pCWFfsbTZ2xz8D7XNBDKE8
+	 GEMohJuxgmadFoTVJ1Z9uYidM1dAO1Bg/ll5yUMefohjNQlLQTJ5qAzY+yYObvDgr7
+	 zEQ4IcS1pwXL8hC7J1SOZAl8zZsBTY+mN9xnRlR4jgwG1B/0AK0unSIzHsj2Itykj+
+	 pqh3vD8PZXAuw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A91B6C59A4C;
+	Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH] octeontx2-af: debugfs: update CQ context fields
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170149082468.6898.10971138559604830624.git-patchwork-notify@kernel.org>
+Date: Sat, 02 Dec 2023 04:20:24 +0000
+References: <20231130060703.16769-1-gakula@marvell.com>
+In-Reply-To: <20231130060703.16769-1-gakula@marvell.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ sgoutham@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+ pbhagavatula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
 
-On Wed, 29 Nov 2023 23:53:50 +0800 ChunHao Lin wrote:
-> When FIFO reaches near full state, device will issue pause frame.
-> If pause slot is enabled(set to 1), in this time, device will issue
-> pause frame only once. But if pause slot is disabled(set to 0), device
-> will keep sending pause frames until FIFO reaches near empty state.
+Hello:
 
-Heiner, looks good?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 30 Nov 2023 11:37:03 +0530 you wrote:
+> From: Nithin Dabilpuram <ndabilpuram@marvell.com>
+> 
+> This patch update the CQ structure fields to support the feature
+> added in new silicons and also dump these fields in debugfs.
+> 
+> Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] octeontx2-af: debugfs: update CQ context fields
+    https://git.kernel.org/netdev/net-next/c/4f09947abf24
+
+You are awesome, thank you!
 -- 
-pw-bot: needs-ack
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
