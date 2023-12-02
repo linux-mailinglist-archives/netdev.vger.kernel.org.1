@@ -1,108 +1,74 @@
-Return-Path: <netdev+bounces-53257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F45801D33
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:15:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2959D801D41
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 526CF1C20982
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 14:15:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ED982819E0
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 14:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6543518C04;
-	Sat,  2 Dec 2023 14:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F6618B1F;
+	Sat,  2 Dec 2023 14:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XixYoi6g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZDMpiuF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD8711C;
-	Sat,  2 Dec 2023 06:15:44 -0800 (PST)
-Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-77dc733b25cso181011485a.1;
-        Sat, 02 Dec 2023 06:15:44 -0800 (PST)
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E7011C
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 06:18:51 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-77dc404d926so180233185a.2
+        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 06:18:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701526543; x=1702131343; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701526731; x=1702131531; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cHjT/29o2cHv+uPSUDloG/9K5z+4mwtqcKQnCHqcHPk=;
-        b=XixYoi6gWsVTI/OvkDXmzWnmpY0gqzoB5KNuJV9kiDvtTEuJHgp/FRlGCAuR/aj0h2
-         AL5pIF4AFVP3A58/hheKs0LCmimp6wUV6Hu1hMpFcpzq47k6SQGZrow6ZTNv3HlEsW+6
-         TtZIE/qt13UbV0X6BIhD9zQ+r4BFvUHWj7sNCVKyJIljmYyXmaMA4zGiXFU7sB395jUa
-         cTUvMSa4Gjgw4nc75EwNsJaWKOG4Das3FHdE8R4h0R/d/4NmBd9oHIscM4zCcMDE/sL2
-         bT06kZvqNtRMmOC02oXQvXfgUC+Kxt0u8a2fwwh1idNUUlc6bkgY5p5iBYBmGnsEy8M5
-         kvIw==
+        bh=/vd3M27iMTv991NoLV/BszcRpbpnWZ/qNg4aOGoZi74=;
+        b=eZDMpiuFyNolCsOqstIsC7v622zVDCqUdl8pOB7IKjk15FE/luuphv3vC9GVOFfoft
+         NQEtree1E2DYNuAwyozc0zLQxAX7uwviWGTNEzQGr+0kroziQAuahccxK0bAYxhXxB6r
+         dw09v85wvf7Zk301Lj2IU1T+IYRqJuZM7LNa9nefiR3lYdue+QOu9iHItZKQaOngCFfG
+         anvNPcce8SIW16h2N2ISvL9oPlmOSl68H9g6YoHifbbNxF/xHzTg3hbzrMwXnhq9AaZz
+         fZTr4rfqkQGnZtSGfibkx6RS6/3uusBSDUbrLh2NAR1fen6gmIElfiw9Ea/aRsQxNked
+         YKHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701526543; x=1702131343;
+        d=1e100.net; s=20230601; t=1701526731; x=1702131531;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=cHjT/29o2cHv+uPSUDloG/9K5z+4mwtqcKQnCHqcHPk=;
-        b=cBvm2KIqrTFjx0Pq3m7EBk98PEmOp+ByOr1sJbLbzZbkpaHvnSGAaaexJEaiwxhZvr
-         GgDcRCgU8MucLctsRXo2jk6PjpQ1UPPgvZqulm2uXKJn5ifsrLjzB+wavmCG91K+QUF4
-         ldrDttvfUAfLi++7hsZWcoYeYYTWV3cL6Z98K9EwCVNH+nlv4eP2RRjtIUuGj1Rm1865
-         6Hu1X6UKYbNPMWTJPqjEqmOiXyHhVC5hXyLGgK/N7DLHi+F1JRZBqlhgBZ0H57h3kKly
-         oBs81mp7maycHvvOyjOEHpPsKQbQqtMdmGoFTxoafidjX299oMZDLDinsCUWDhR8a/Es
-         QE+w==
-X-Gm-Message-State: AOJu0YxbJADUsIyeYh3IlK5D8kytigttcfLylkSj3RMzcg6w+bEhNDDI
-	ycvklnBfuMMT2m/6pgEAn6s=
-X-Google-Smtp-Source: AGHT+IFMroJHDqq6Ir9gZVJ3R728hRmkVYJHVfNaHzVnIzw/nmWz3p78L6RXN42OK1k/cU3B+r7M9w==
-X-Received: by 2002:ae9:f812:0:b0:77e:fba3:4f32 with SMTP id x18-20020ae9f812000000b0077efba34f32mr1152322qkh.136.1701526543353;
-        Sat, 02 Dec 2023 06:15:43 -0800 (PST)
+        bh=/vd3M27iMTv991NoLV/BszcRpbpnWZ/qNg4aOGoZi74=;
+        b=tEYONnfuJSwDwvmgRgYY4wpVRRPuxr3wD4u5E5fO75rnC8Vl7ft6a/ZrESPukWY2RF
+         QTp+mmhoSxU33GYkAfu2f0DqmLhGRYvq4tpB5UPNwhXM8wtvdYF3D8CjejAPWWoo1GS/
+         /kG4rBBtLVgCFvKymK1JtYR0h5Zhv1F5ditJav8c7QoAfDvKH3FEH42b6WgLtrlYT+yi
+         yCbue9yI71j8WQBAgmUCW5mX+GjBMvVd5SXzPeOO5PNLwI8BaTA/gO0v70//EHPxz11S
+         Zan0OpgN+LzK0YOpxMqUCh0A6CEyCURd/yTP+gTiSrOrpGGBS1gRN8Dj+wzGGFJpjo1O
+         oJzw==
+X-Gm-Message-State: AOJu0YyT3FdLNtdb38i65bdjtqxq/GGKt9w2gDnXpZK914u1MSHLtf5d
+	UXZFZkXqYA5UOj4KuXkzdaA=
+X-Google-Smtp-Source: AGHT+IH02f7XiHlNreb0NePwaUMuCWJadadYwzpju2pkrleHETbzTJT+5NlyWapJ1J2Di6HBCLDzAA==
+X-Received: by 2002:a05:620a:438b:b0:77d:bdc2:1dc2 with SMTP id a11-20020a05620a438b00b0077dbdc21dc2mr1728309qkp.33.1701526730797;
+        Sat, 02 Dec 2023 06:18:50 -0800 (PST)
 Received: from localhost (114.66.194.35.bc.googleusercontent.com. [35.194.66.114])
-        by smtp.gmail.com with ESMTPSA id br30-20020a05620a461e00b0077d742fb27esm2452534qkb.49.2023.12.02.06.15.42
+        by smtp.gmail.com with ESMTPSA id ez16-20020ad45910000000b0067aa25438fdsm1084922qvb.40.2023.12.02.06.18.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Dec 2023 06:15:42 -0800 (PST)
-Date: Sat, 02 Dec 2023 09:15:42 -0500
+        Sat, 02 Dec 2023 06:18:50 -0800 (PST)
+Date: Sat, 02 Dec 2023 09:18:50 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "Song, Yoong Siang" <yoong.siang.song@intel.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Bjorn Topel <bjorn@kernel.org>, 
- "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@google.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, 
- Andre Fredette <afredette@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
- "xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
- "linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Message-ID: <656b3c0ebb103_1a6a2c2947d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <179a4581-f7df-4eb1-ab67-8d65f856a2fe@kernel.org>
-References: <20231201062421.1074768-1-yoong.siang.song@intel.com>
- <d4f99931-442c-4cd7-b3cf-80d8681a2986@kernel.org>
- <PH0PR11MB58306C2E50009A6E22F9DAD3D881A@PH0PR11MB5830.namprd11.prod.outlook.com>
- <6569f71bad00d_138af5294d@willemb.c.googlers.com.notmuch>
- <179a4581-f7df-4eb1-ab67-8d65f856a2fe@kernel.org>
-Subject: Re: [PATCH bpf-next v2 0/3] xsk: TX metadata txtime support
+To: Zhengchao Shao <shaozhengchao@huawei.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: weiyongjun1@huawei.com, 
+ yuehaibing@huawei.com, 
+ shaozhengchao@huawei.com
+Message-ID: <656b3cca535fd_1a6a2c29494@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231202130658.2266526-1-shaozhengchao@huawei.com>
+References: <20231202130658.2266526-1-shaozhengchao@huawei.com>
+Subject: Re: [PATCH net-next,v2] macvlan: implement .parse_protocol hook
+ function in macvlan_hard_header_ops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,111 +79,19 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Jesper Dangaard Brouer wrote:
+Zhengchao Shao wrote:
+> The .parse_protocol hook function in the macvlan_header_ops structure is
+> not implemented. As a result, when the AF_PACKET family is used to send
+> packets, skb->protocol will be set to 0.
+> Macvlan is a device of type ARPHRD_ETHER (ether_setup). Therefore, use
+> eth_header_parse_protocol function to obtain the protocol.
 > 
-> 
-> On 12/1/23 16:09, Willem de Bruijn wrote:
-> > Song, Yoong Siang wrote:
-> >> On Friday, December 1, 2023 6:46 PM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
-> >>> On 12/1/23 07:24, Song Yoong Siang wrote:
-> >>>> This series expands XDP TX metadata framework to include ETF HW offload.
-> >>>>
-> >>>> Changes since v1:
-> >>>> - rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
-> >>>> - rename launch-time to txtime
-> >>>>
-> >>>
-> >>> I strongly disagree with this renaming (sorry to disagree with Willem).
-> >>>
-> >>> The i210 and i225 chips call this LaunchTime in their programmers
-> >>> datasheets, and even in the driver code[1].
-> >>>
-> >>> Using this "txtime" name in the code is also confusing, because how can
-> >>> people reading the code know the difference between:
-> >>>   - tmo_request_timestamp and tmo_request_txtime
-> >>>
-> >>
-> >> Hi Jesper and Willem,
-> >>
-> >> How about using "launch_time" for the flag/variable and
-> >> "Earliest TxTime First" for the description/comments?
-> > 
-> 
-> I don't follow why you are calling the feature:
->   - "Earliest TxTime First" (ETF).
->   - AFAIK this just reference an qdisc name (that most don't know exists)
-> 
-> 
-> > I don't particularly care which term we use, as long as we're
-> > consistent. Especially, don't keep introducing new synonyms.
-> > 
-> > The fact that one happens to be one vendor's marketing term does not
-> > make it preferable, IMHO. On the contrary.
-> >
-> 
-> These kind of hardware features are defined as part of Time Sensitive
-> Networking (TSN).
-> I believe these TSN features are defined as part of IEEE 802.1Qbv (2015)
-> and according to Wikipedia[2] incorporated into IEEE 802.1Q.
-> 
-> [2] https://en.wikipedia.org/wiki/Time-Sensitive_Networking
-> 
-> 
-> > SO_TXTIME is in the ABI, and EDT has been used publicly in kernel
-> > patches and conference talks, e.g., Van Jacobson's Netdev 0x12
-> > keynote. Those are vendor agnostic commonly used terms.
-> > 
-> 
-> I agree that EDT (Earliest Departure Time) have become a thing and term
-> in our community.
-> We could associate this feature with this.
-> I do fear what hardware behavior will be it if I e.g. ask it to send a
-> packet 2 sec in the future on i225 which max support 1 sec.
-> Will hardware send it at 1 sec?
-> Because then I'm violating the *Earliest* Departure Time.
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 
-That should definitely not happen. At least not on a device that
-implements EDT semantics.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-This relates to Jakub's question in the previous thread on whether
-this mechanism allows out-of-order transmission or maintains FIFO
-behavior. That really is device specific.
-
-Older devices only support this for low rate (PTP) and with a small
-fixed number of outstanding requests. For pacing offload, devices need
-to support up to linerate and out-of-order.
-
-I don't think we want to enforce either in software, as the hardware
-is already out there. But it would be good if drivers can somehow
-label these capabilities. Including programmable horizon.
-
-It is up to the qdisc to ensure that it does not pass packets to the
-device beyond its horizon.
-
-ETF and FQ already have a concept of horizon. And a way to queue
-errors for packets out of bound (SO_EE_CODE_TXTIME_..).
-
-> 
-> > But as long as Launch Time is not an Intel only trademark, fine to
-> > select that.
-> 
-> The IEEE 802.1Qbv is sometimes called Time-Aware Shaper (TAS), but I
-> don't like to for us to name this after this.  This features is simply
-> taking advantage of exposing one of the hardware building blocks
-> (controlling/setting packet "launch time") that can be used for
-> implementing a TAS.
-> 
-> I like the name "launch time" because it doesn't get easily confused
-> with other timestamps, and intuitively describes packet will be send at
-> a specific time (likely in future).
-> 
-> --Jesper
-
-Understood on your point that txtime and tx_timestamp are too similar.
-As said, I don't care strongly. Launch time sounds fine to me. Others
-can speak up if they disagree.
-
-I take launch time as a less strict than EDT: it is a request to send
-at a certain time, with no strict definition on uncertainty. While EDT
-more strictly ensures that a packet is not sent before the timestamp.
+Macvlan does not use skb->protocol in its ndo_start_xmit often. But
+does use it once, in macvlan_broadcast, to not broadcast ETH_P_PAUSE
+frames.
 
