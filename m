@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-53264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB1E801D77
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:08:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6D48801D83
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33321C20873
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:08:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4541CB20C94
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2D118E1F;
-	Sat,  2 Dec 2023 15:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3156199D1;
+	Sat,  2 Dec 2023 15:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JvEza2vj"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="pc9d1gBB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6864DCD;
-	Sat,  2 Dec 2023 07:08:25 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B2Ecusj013427;
-	Sat, 2 Dec 2023 07:08:12 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=ebvhMGYZfFXqPW9szGU1GX5lx6iPZW3kOny7Mv67BhY=;
- b=JvEza2vjrexsNm7zSqt14VAx7WsFFnkzVBKqulOTYCaRJK2Yj7IkaqPM79PVG46U7xUF
- R1HefUasLr68mjBq1cZ9AyIAEvFePGAIl1gb9EUw3AYp5hxav1KhmcNATYDFsrujpKpm
- lA76iPzrwm8Lh53NeJ7+Wz7Cwt0gc4EB83r1bU/758J/dR08Y3s9d1iBkm2eymg179QO
- B+kXRYa2wfnsfBNtZIlrpGlAyB1b9jYbGRDxvRS7WKVsHM1NSNH54PqMFZrmT5szN9I4
- U/zAuis9l0eCXpkLthk8OX9Y0d7qImQtReLbgnihGqgyxfd4HiwD//BZ5pz8DpJGyxyZ jw== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ur4yrg5v1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sat, 02 Dec 2023 07:08:12 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 2 Dec
- 2023 07:08:10 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sat, 2 Dec 2023 07:08:10 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 13CF83F707A;
-	Sat,  2 Dec 2023 07:08:10 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net v1] octeon_ep: initialise control mbox tasks before using APIs
-Date: Sat, 2 Dec 2023 07:08:07 -0800
-Message-ID: <20231202150807.2571103-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B80BB;
+	Sat,  2 Dec 2023 07:41:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1701531672; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=b07VKVp3Y6KFSvXCq5WtA/wgwkIQOH2fLg1vVgZoMkH3HaksMyW+xK7FyB7G7iVqTfeXjkXSeRqiz3seB36GTmulhDVkWA2JvV+b1BoCIaxe/myU36N/WxQQkcFP7oO+NaC2+xBu1n0o3qIfZUSd5gf6b11N2xMU7+1sFH/I1WI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1701531672; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=8NY9bd//Bp+IVrU4lm9lUah8k6STVPOlOeGkQeycAEQ=; 
+	b=NKsepZb6PWTkl3BMgX9JB7p3BDFRx6JmmMCJ3+57Zmn9vXAeIK/SC2qPbPW19UkIvwvD+6hsfMzApzELzOURnAdwE5cuKk7c7M9n+pM89TKcyBwMj0kTXDeXc0dMipx4AOwc86q7w8GarsP82H8jI56nGk7e5nq6CIoCZZS2zWs=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701531672;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=8NY9bd//Bp+IVrU4lm9lUah8k6STVPOlOeGkQeycAEQ=;
+	b=pc9d1gBBtKz3gEWE+aU6f8Cne2i7KvNB7gJFhomdsLE5nIeQXQz2j/KsNIBv9uVa
+	pNCs/xQPAYwzTvEkIvShBN8VCHNdRfqM1wK1iwERTmHuFxUFjh0v6oecJLT9qdIDgNj
+	QmCqlu5FRabYEpIik7tu4O6UeJg/JE/jjUfJaBWw=
+Received: from kampyooter.. (122.170.35.155 [122.170.35.155]) by mx.zoho.in
+	with SMTPS id 1701531670973749.3078715470447; Sat, 2 Dec 2023 21:11:10 +0530 (IST)
+From: Siddh Raman Pant <code@siddh.me>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Samuel Ortiz <sameo@linux.intel.com>
+Subject: [PATCH net-next v2 0/2] nfc: Fix UAF during datagram sending caused by missing refcounting
+Date: Sat,  2 Dec 2023 21:10:57 +0530
+Message-ID: <cover.1701530776.git.code@siddh.me>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,58 +58,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: H-y_2-0nBCf_wb2zWehq-JUKi3w-SKED
-X-Proofpoint-ORIG-GUID: H-y_2-0nBCf_wb2zWehq-JUKi3w-SKED
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-02_13,2023-11-30_01,2023-05-22_02
+X-ZohoMailClient: External
 
-Do INIT_WORK for the various workqueue tasks before the first
-invocation of any control net APIs. Since octep_ctrl_net_get_info
-was called before the control net receive work task was even
-initialised, the function call wasn't returning actual firmware
-info queried from Octeon.
+For connectionless transmission, llcp_sock_sendmsg() codepath will
+eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
+an argument for calculating the total size for skb allocation.
 
-Fixes: 8d6198a14e2b ("octeon_ep: support to fetch firmware info")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
- .../net/ethernet/marvell/octeon_ep/octep_main.c    | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+virtual_ncidev_close() codepath eventually releases socket by calling
+nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
+and afterwards the nfc_dev will be eventually freed.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 552970c7dec0..3e7bfd3e0f56 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -1193,6 +1193,13 @@ int octep_device_setup(struct octep_device *oct)
- 	if (ret)
- 		return ret;
- 
-+	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
-+	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
-+	INIT_DELAYED_WORK(&oct->intr_poll_task, octep_intr_poll_task);
-+	oct->poll_non_ioq_intr = true;
-+	queue_delayed_work(octep_wq, &oct->intr_poll_task,
-+			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
-+
- 	atomic_set(&oct->hb_miss_cnt, 0);
- 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
- 
-@@ -1333,13 +1340,6 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	queue_delayed_work(octep_wq, &octep_dev->hb_task,
- 			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
- 
--	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
--	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
--	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
--	octep_dev->poll_non_ioq_intr = true;
--	queue_delayed_work(octep_wq, &octep_dev->intr_poll_task,
--			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
--
- 	netdev->netdev_ops = &octep_netdev_ops;
- 	octep_set_ethtool_ops(netdev);
- 	netif_carrier_off(netdev);
+When an ndev gets freed, llcp_sock_sendmsg() will result in an
+use-after-free as it
+
+(1) doesn't have any checks in place for avoiding the datagram sending.
+
+(2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop
+    which can race with freeing. This loop contains the call to
+    nfc_alloc_send_skb() where we dereference the nfc_dev pointer.
+
+nfc_dev is being freed because we do not hold a reference to it when
+we hold a reference to llcp_local. Thus, virtual_ncidev_close()
+eventually calls nfc_release() due to refcount going to 0.
+
+Since state has to be LLCP_BOUND for datagram sending, we can bail out
+early in llcp_sock_sendmsg().
+
+Please review and let me know if any errors are there, and hopefully
+this gets accepted.
+
+Thanks,
+Siddh
+
+Changes in v2:
+- Add net-next in patch subject.
+- Removed unnecessary extra lock and hold nfc_dev ref when holding llcp_sock.
+- Remove last formatting patch.
+- Picked up r-b from Krzysztof for LLCP_BOUND patch.
+
+Siddh Raman Pant (2):
+  nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to
+    llcp_local
+  nfc: Do not send datagram if socket state isn't LLCP_BOUND
+
+ net/nfc/llcp_core.c | 21 +++++++++++++++++++--
+ net/nfc/llcp_sock.c |  5 +++++
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
 -- 
-2.25.1
-
+2.42.0
 
