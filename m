@@ -1,82 +1,118 @@
-Return-Path: <netdev+bounces-53245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BAE7801C22
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 11:06:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB712801C3D
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 11:35:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A1728135D
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69268281550
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE574156E0;
-	Sat,  2 Dec 2023 10:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3142CBE64;
+	Sat,  2 Dec 2023 10:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="wSmehsPW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sfgp9dqk"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0C4D67;
-	Sat,  2 Dec 2023 02:06:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=o45hdsTEGxCn0t+rxCqz3d1GuoH4T/qGAEWkFyx+Odg=;
-	t=1701511600; x=1702721200; b=wSmehsPWm3+GGZlale9ITHw5TzablTSPziSGSvbGAUlynhY
-	TA1dRhGa013lnCDdpgnaZblCX6N9s4VAle8vEjvM257LAf+KVlnVMJCJtcXKHXcYVGaEbI8zgoU+n
-	GIGLqaVbKAL9/d68XRdv/Hls70O46k4/vw1IQlrJ2l23TlcdpZptv9YjQW4LieXF7sc1R+m3VCHA6
-	BPL4Hx6AczsBbjPAk8SodMpk/Q8ogc2vOmQI/zBH0i5xD3It/RzcPj9IBXYnfnAnlbnRt/+2GqDjp
-	RK7ddV+qL/cKOfw/kNz+vUnjrqMzWGk7AjaeMeZvWhEhPqUguXo6jnogRCvMpkPg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r9MtR-0000000CPtN-3yIk;
-	Sat, 02 Dec 2023 11:06:38 +0100
-Message-ID: <339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
-Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Sat, 02 Dec 2023 11:06:36 +0100
-In-Reply-To: <20231201162844.14d1bbb0@kernel.org>
-References: 
-	<346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
-	 <20231201104329.25898-5-johannes@sipsolutions.net>
-	 <20231201162844.14d1bbb0@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF3D123
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 02:35:02 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso3141a12.1
+        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 02:35:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701513300; x=1702118100; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A7KLR1V49A85aDqj3DT7Qp07q2fPdNDOn1B86Di+C7g=;
+        b=Sfgp9dqkHoGHTj07tOsTyG+y3GawVn/Cq62ywh00q+1ixz21bYWFEcTQDdl84Ei50E
+         hRNzK2O6z/JserAzvZUDCYUhlQlLYsaW+aCVrNActBbvjf2bu0MMQ1qS6bD6s6AvRzUl
+         WuxPEzKz+anfzhSdKXH8xEcXyCYZNrf+vJ+R/XfefhnxzuLuBNq3HXQPMp1kQ27xEzj+
+         L6k9z14f0jkfWnnyK2Dq2b7qvGxgH9xpEfNnVBtjlHjWxgCbd/Jb1FlmkCgW1n0aROFu
+         s5n2Ge3yI5XpfDwRFF8A6G047tvG+vrVon31mzf8F63QZNaYeBAercHEVEXQIwJpm88I
+         q6Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701513300; x=1702118100;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A7KLR1V49A85aDqj3DT7Qp07q2fPdNDOn1B86Di+C7g=;
+        b=S6MGYVK2txV2WbWXKIgO6/OTisXIIeQKZzeL7N04KO3O+ryIW91tlHzonS06yi/nbx
+         6mN395ha31Uo8vuNFU4PujAw7y3Y/56Y3As8iNIDA18XnxREX7FHaofDdoNFLJwGA2dL
+         vrMyB0sQjP38Ie0Z/5mPoes5dgvygbfaFyo6e3NYeNPnhKt6HUSvH+6bYJuyQykl8X+2
+         9EbIbREH/d73/mREOHQKHB6nkIPkqkdo8qV1gm20RKu9nqfRjh4kHYqCZfrWnMIL+Pl5
+         BYXFwCKNS8kmLR9yUQBwawgR1RHdx5kZcRjafnolZV0AiWjnBBbmR++rz91E1mPbxey0
+         vp+g==
+X-Gm-Message-State: AOJu0YzvbToXpcFgnVOD8Fy4Ye+r9C2CUP0VnEkdwFS9IEs2YHLyOc9v
+	4Byxkpo8jpn2Hf9bCiFs2IitD2EsrFwPuPL0zUajBg==
+X-Google-Smtp-Source: AGHT+IHUq8X4h15xM52/LypICK/y4gsVcQNhc1jtFO/Hy1h7vmTZe+8RM5wyX8Cft2+EviJMvXlVooAfRQNXHt91Ifw=
+X-Received: by 2002:a50:bb48:0:b0:54b:bf08:a95f with SMTP id
+ y66-20020a50bb48000000b0054bbf08a95fmr278726ede.6.1701513300138; Sat, 02 Dec
+ 2023 02:35:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+References: <20231201025528.2216489-1-shaozhengchao@huawei.com>
+ <81b8bca0-6c61-966a-bac8-fecb0ad60f57@huawei.com> <6569fa1a427c0_1396ec2945e@willemb.c.googlers.com.notmuch>
+ <61c80195-db33-fa38-6b1f-007f651eebe2@huawei.com>
+In-Reply-To: <61c80195-db33-fa38-6b1f-007f651eebe2@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 2 Dec 2023 11:34:46 +0100
+Message-ID: <CANn89iKXDvO8MHFn4fbuYdCjqzsYDNR0QkRpXNqj+1GDD9Jkww@mail.gmail.com>
+Subject: Re: [PATCH net,v2] ipvlan: implement .parse_protocol hook function in ipvlan_header_ops
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, luwei32@huawei.com, 
+	fw@strlen.de, maheshb@google.com, weiyongjun1@huawei.com, 
+	yuehaibing@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-12-01 at 16:28 -0800, Jakub Kicinski wrote:
-> On Fri,  1 Dec 2023 11:41:14 +0100 Johannes Berg wrote:
-> > So I had put this aside for a while, but really got annoyed by all
-> > the test failures now ... thinking about this again I basically now
-> > arrived at a variant of solution #3 previously outlined, and I've
-> > kind of convinced myself that userspace should always get an event
-> > with a new carrier_up_count as it does today.
->=20
-> Would it work if we exposed "linkwatch is pending" / "link is
-> transitioning" bit to user space?
+On Sat, Dec 2, 2023 at 3:14=E2=80=AFAM shaozhengchao <shaozhengchao@huawei.=
+com> wrote:
+>
+>
+>
+> On 2023/12/1 23:22, Willem de Bruijn wrote:
+> > shaozhengchao wrote:
+> >>
+> >>
+> >> On 2023/12/1 10:55, Zhengchao Shao wrote:
+> >>> The .parse_protocol hook function in the ipvlan_header_ops structure =
+is
+> >>> not implemented. As a result, when the AF_PACKET family is used to se=
+nd
+> >>> packets, skb->protocol will be set to 0.
+> >>> Ipvlan is a device of type ARPHRD_ETHER (ether_setup). Therefore, use
+> >>> eth_header_parse_protocol function to obtain the protocol.
+> >>>
+> >>> Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver."=
+)
+> >>
+> >> Maybe Fixes should be: 75c65772c3d1 ("net/packet: Ask driver for
+> >> protocol if not provided by user")
+> >
+> Hi Willem:
+> > Definitely not anything older than the introduction of
+> > header_ops.parse_protocol.
+> >
+>     Yes, I think so.
+> > I gave my +1 when it targeted net-next, so imho this is not really
+> > stable material anyhow.
+>    But, if skb->protocol =3D 0, no matter what type of packet it is, it
+> will be discarded directly in ipvlan_process_outbound().
+> So net branch will be OK? What I missed?
+> Thanks.
 
-Not sure, not by much or more than what this did? It's basically the
-same, I think: I exposed the carrier_up_count at the kernel time, so if
-userspace hasn't seen an event with a value >=3D that it knows the link is
-transitioning.
+This never worked, and nobody ever claimed it has ever worked: this is
+a new functionality.
 
-> Even crazier, would it help if we had rtnl_getlink() run
-> linkwatch for the target link if linkwatch is pending?
+net-next seems appropriate to me.
 
-Sure, if we were to just synchronize that at the right time (doesn't
-even need to be rtnl_getlink, could be a new operation) that'd solve the
-issue too, perhaps more easily.
-
-johannes
+It seems that skb->protocol =3D=3D 0 is only used by fuzzers, or careless
+applications ?
 
