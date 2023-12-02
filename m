@@ -1,74 +1,129 @@
-Return-Path: <netdev+bounces-53262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1238D801D6B
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:56:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B25E5801D73
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43E1F1C208BC
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 14:56:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31B01C208D1
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4D118C0F;
-	Sat,  2 Dec 2023 14:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C710118C35;
+	Sat,  2 Dec 2023 15:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="GUBi5Fha"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B2B5106
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 06:56:05 -0800 (PST)
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b6d023424bso2173559b6e.3
-        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 06:56:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701528964; x=1702133764;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nu5xLdLOLeUMpry7HT1oxjIq+0DkqL24uDVpCnJXOHU=;
-        b=k5NOfTqyNxFqdpF2apZxM8WW94P46xTYtbvmf8t3hW1f/L7mIq/gJBdkXrIWZrgv/l
-         on30gZt6BnvfS4ulf8r6o2Fs00DYekW4efPgOpMGev4dN0dn5H2wupaw1daBjqCv1+/F
-         gEaoODG5ljmjV2QWcPAIMcLtSejMVftThuGk2P0oj+wWBKkqaKjricim9O5IdDXGw/T8
-         ZzH34WEmhjx/ZbVvXBxsEyqrQ9Pri01FaHABmjgZzdlLsov0S+NY8xoxMi+K6Ji4Ow5u
-         EhfuCAb6Wrd4eaNN1nXUvOr9dhcOc7HUiXZII277fD6mM9nKTE+P29QFEa9NNeISncHn
-         uPYg==
-X-Gm-Message-State: AOJu0Yy++cgIdNaUNJEXY//tY1sziD5rVn5YoxqwNgbFUmdFbhdq8xhf
-	50gzfjj6BMdDXrqw628ZFE/oqXwhabZKn6s7EzUFgE3i5n98
-X-Google-Smtp-Source: AGHT+IHCaaicQHGkcJ9gewQxrg9Zx+K/8/06nvLqQ1tRUvyVjVoCAee8lRno5uUJ9zOPWaIEeG0tubhqY/SSq9LRkA2GZEvuUaK9
+X-Greylist: delayed 370 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 07:05:09 PST
+Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB8B102;
+	Sat,  2 Dec 2023 07:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1701529506;
+	bh=+4tkXT2Y0ZJNldwcYbIGmHyE8OJNqApK4fyYv38niwQ=;
+	h=From:To:Cc:Subject:Date;
+	b=GUBi5Fha+OHP29KFzB+au403WHJ9kax2BT4WP5zoXnLxcl2y5HtsinAz7zmO3Mlpl
+	 2N9FKfFLzOoRrOqLYBM7dJuu3JRMQ0dUHnw5ZAT8PwLuyzVYq+/fmVOOrjdIk6dS16
+	 CEw0lqdTvyj4ZdxIdkqKHDkInu7QlJwdve63Dl7A=
+Received: from KernelDevBox.byted.org ([180.184.49.4])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id EB51FC1C; Sat, 02 Dec 2023 22:58:53 +0800
+X-QQ-mid: xmsmtpt1701529133tmz3ieq44
+Message-ID: <tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com>
+X-QQ-XMAILINFO: MIHMmFPOQW9Xwuxg219KDH2tOJ9xY5IPqVV5LYIize3GgkHCsQ7U0mx5nSYkzi
+	 yIo8eJVrtOHShJqG4/qHU1EVMvth1+D7N/gaQqZGlmOVGcrm65ydZ0TZ5CEOqsMZNl4b0wE31gpd
+	 T/YHSGDqME7yHtIGbpOYCP7mrr1X+Pc/FIv+BfMGGVb/5oxtpO25xQpcDEg6nodoibM1cIAxQjqE
+	 9kHxBDNIKtD0uXzv1vSdK67VEcf2xKYeW/uoeixXBMhm9cIhKEfAzp7jUUjZOcjw2KUTljWlC+yO
+	 n1HliH+0SUx1RupK8T2duLqSZyC8rpnjT1SPb6NQ7MsSERjoALEdZM6bQOUIVBfuiQyo7gKEZ9b3
+	 ZqCcdlEjfMTo/6DKMPtBdo8fZX4Q20XvC6zCBDfsOk1rNiMhGNKoUvICFqOF9AXvoJ/SgZ8yxg+B
+	 V3kUK2NEkf4TCGo1XjidMDuNDJt6fYQwaHgJIEKAna6Ulu9LFGeksKIovGsjm/ET3zMOZHjZuYuX
+	 HtPJhapVtj4iDe898/wGNEDRTmE21fL28xUamfGY8ZsCy2/7IzwaJ349haBZbh68Jt0ZVjjA+ZaD
+	 OVYipUnHFHNvLVJU96SFnbRwikfUk6avPWCWcXtS67DkgeNmkEyFHt7C1S+qRuHHTIA4fn+MFv4F
+	 AQjij1XUOgCT6XolUo8Stnin1tQV9WTb5WGtC+HKAjYU+OUPSNn/M6cD4TO4yur3XUBWD1HkKqBm
+	 jZSZDxhpUTjbh2FEJjxG9lAlrKUhhuZeYK6VstgIkpAosSyNlm4eAXIlxdzWqfMFPtjy5IzfO8q7
+	 8kLvmB2QwEJMQmlNtaNHFiUlV2uqAXknI03ZhSbS/EuLuYsPmiK9H8ExMNwjC3yWcSNFp+nO+Fm8
+	 lhlxgf6d0nP3+W9tSfQB5YejFyxZGhOzISSk2O7rkuNX/IST8Kw6VBbLHmJ4XIGYaDBElC+Gjrgf
+	 nJUC9nxrxBMORxrZ6axc/5EjFLTDsUBKBRKceBKvfOIUX3Cp+jCOq+KrA7r80a
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Zhang Shurong <zhang_shurong@foxmail.com>
+To: alex.aring@gmail.com
+Cc: stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	harperchen1110@gmail.com,
+	Zhang Shurong <zhang_shurong@foxmail.com>
+Subject: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date: Sat,  2 Dec 2023 22:58:52 +0800
+X-OQ-MSGID: <20231202145852.505410-1-zhang_shurong@foxmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:189f:b0:3b8:9b14:756c with SMTP id
- bi31-20020a056808189f00b003b89b14756cmr699004oib.9.1701528964701; Sat, 02 Dec
- 2023 06:56:04 -0800 (PST)
-Date: Sat, 02 Dec 2023 06:56:04 -0800
-In-Reply-To: <0642446f-ebd9-429a-a293-94840c765038@siddh.me>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008424e2060b881511@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in nfc_alloc_send_skb
-From: syzbot <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-To: code@siddh.me, davem@davemloft.net, edumazet@google.com, 
-	krzysztof.kozlowski@linaro.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Level: **
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The syzkaller reported an issue:
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+ __compat_sys_sendmsg net/compat.c:346 [inline]
+ __do_compat_sys_sendmsg net/compat.c:353 [inline]
+ __se_compat_sys_sendmsg net/compat.c:350 [inline]
 
-Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+We found hdr->key_id_mode is uninitialized in mac802154_set_header_security()
+which indicates hdr.fc.security_enabled should be 0. However, it is set to be cb->secen before.
+Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains uninit-value issue.
+Since mac802154_set_header_security() sets hdr.fc.security_enabled based on the variables
+ieee802154_sub_if_data *sdata and ieee802154_mac_cb *cb in a collaborative manner.
+Therefore, we should not set security_enabled prior to mac802154_set_header_security().
 
-Tested on:
+Fixed it by removing the line that sets the hdr.fc.security_enabled.
 
-commit:         7453d7a6 nfp: ethtool: expose transmit SO_TIMESTAMPING..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=1632f254e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=94286555cac4ea49
-dashboard link: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=11d5552ce80000
+Syzkaller don't provide repro, and I provide a syz repro like:
+r0 = syz_init_net_socket$802154_dgram(0x24, 0x2, 0x0)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000000)=0x2, 0x4)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000080), 0x4)
+sendmsg$802154_dgram(r0, &(0x7f0000000100)={&(0x7f0000000040)={0x24, @short}, 0x14, &(0x7f00000000c0)={0x0}}, 0x0)
 
-Note: testing is done by a robot and is best-effort only.
+Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
+Signed-off-by: Zhang Shurong <zhang_shurong@foxmail.com>
+---
+ net/mac802154/iface.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..c99b6e40a5db 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
+ 
+ 	memset(&hdr.fc, 0, sizeof(hdr.fc));
+ 	hdr.fc.type = cb->type;
+-	hdr.fc.security_enabled = cb->secen;
+ 	hdr.fc.ack_request = cb->ackreq;
+ 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+ 
+-- 
+2.30.2
+
 
