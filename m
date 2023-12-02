@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-53270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A615801DD9
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 17:48:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B69D801DE9
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 18:10:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B9511C208DF
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:48:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEC611F21186
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 17:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F99168BF;
-	Sat,  2 Dec 2023 16:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7591C2AF;
+	Sat,  2 Dec 2023 17:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZoOTDXN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSaF0O2v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D8C3D82
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 16:48:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD44C433C9;
-	Sat,  2 Dec 2023 16:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95E218B11;
+	Sat,  2 Dec 2023 17:09:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 060B0C433C7;
+	Sat,  2 Dec 2023 17:09:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701535709;
-	bh=DnZEzNXP9hV68Bv4xg8L4T2Cgy7MhrlHkGJzKWd0Rog=;
+	s=k20201202; t=1701536999;
+	bh=tUTQ+O04DUoL60hnD6X577YIlDHEoUJR6qm+9eDRlNU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SZoOTDXNOwfGy+XbS4lGBQnlNtfStPpSe6XOuqQbxnbXDAUBoZaxsBOXb2D0e9dmu
-	 C7p8JBEBYJRi0f0bK+IiWqwRZivi4i7Yep2WYel8lRjn8pg/WNx16abD/9vaSwAyAR
-	 k4GatGF7Xw7DiyvOAZMGPkwt6A+K+y//RaCLR9ncjQMGdaNL+aqaolGYgZJKoIem/6
-	 fMHcyTIbpba7xUZLqzio6tpm7HN3f4iXQsM8BLAQs6HGWp7wxz0PXN6ghbQEEtNMDe
-	 NZa3CQKerGMXmPiMF4YfSgJAGp7mYigBA8NEINbq3X72XTGMZRY5/a/Q6TV9VTNUxc
-	 NDJVm2GW1LVYQ==
-Date: Sat, 2 Dec 2023 16:48:24 +0000
+	b=SSaF0O2vdB8RDPafXTH0UiEjGZWYE6T3cGHid+UF5LSaw17x/xQG5nviHGv8GOzqA
+	 E86Eu9+yC4yi7xb6T2Shhw/q6zw6NqGJe9HqOmtZOeN8aZAagGzw2+aQXGzM5I73d/
+	 z3h20ixfQuUKTfCCWRJkXtSbdMtbBCQ02g8h2hDiAP1J1IAztUsFK52QVA5A90JR9Q
+	 Zdxi7hcCTK4gvDN44ymXjVO8RpY8Ef7mqXc6pKVqy3uWL3zMX/SbCO4mBPB9atnSZn
+	 4feZxZ7VPs///RjGwhbUp0xk4uQTje8Zm7Qt6/WxULKUz4PqT7vxBKWmH0Anj4Fl8s
+	 g4CcgNcgE+RZA==
+Date: Sat, 2 Dec 2023 17:09:52 +0000
 From: Simon Horman <horms@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH iwl-net] i40e: Fix ST code value for Clause 45
-Message-ID: <20231202164824.GA50400@kernel.org>
-References: <20231129161711.771729-1-ivecera@redhat.com>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org,
+	toke@kernel.org, willemb@google.com, dsahern@kernel.org,
+	magnus.karlsson@intel.com, bjorn@kernel.org,
+	maciej.fijalkowski@intel.com, hawk@kernel.org,
+	yoong.siang.song@intel.com, netdev@vger.kernel.org,
+	xdp-hints@xdp-project.net
+Subject: Re: [PATCH bpf-next v6 06/13] xsk: Document tx_metadata_len layout
+Message-ID: <20231202170952.GB50400@kernel.org>
+References: <20231127190319.1190813-1-sdf@google.com>
+ <20231127190319.1190813-7-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,27 +56,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231129161711.771729-1-ivecera@redhat.com>
+In-Reply-To: <20231127190319.1190813-7-sdf@google.com>
 
-On Wed, Nov 29, 2023 at 05:17:10PM +0100, Ivan Vecera wrote:
-> ST code value for clause 45 that has been changed by
-> commit 8196b5fd6c73 ("i40e: Refactor I40E_MDIO_CLAUSE* macros")
-> is currently wrong.
+On Mon, Nov 27, 2023 at 11:03:12AM -0800, Stanislav Fomichev wrote:
+> - how to use
+> - how to query features
+> - pointers to the examples
 > 
-> The mentioned commit refactored ..MDIO_CLAUSE??_STCODE_MASK so
-> their value is the same for both clauses. The value is correct
-> for clause 22 but not for clause 45.
-> 
-> Fix the issue by adding a parameter to I40E_GLGEN_MSCA_STCODE_MASK
-> macro that specifies required value.
-> 
-> Fixes: 8196b5fd6c73 ("i40e: Refactor I40E_MDIO_CLAUSE* macros")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Signed-off-by: Stanislav Fomichev <sdf@google.com>
 
-Thanks Ivan,
+...
 
-I agree with your analysis and this fix looks good to me.
+> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+> index 205696780b78..e3e9420fd817 100644
+> --- a/Documentation/networking/xdp-rx-metadata.rst
+> +++ b/Documentation/networking/xdp-rx-metadata.rst
+> @@ -1,3 +1,5 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+>  ===============
+>  XDP RX Metadata
+>  ===============
+> diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
+> new file mode 100644
+> index 000000000000..4f376560b23f
+> --- /dev/null
+> +++ b/Documentation/networking/xsk-tx-metadata.rst
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Stan,
 
+could you send a follow-up patch to add an SPDX identifier here?
+
+> @@ -0,0 +1,70 @@
+> +==================
+> +AF_XDP TX Metadata
+> +==================
+
+...
 
