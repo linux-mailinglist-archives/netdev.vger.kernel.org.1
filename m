@@ -1,154 +1,180 @@
-Return-Path: <netdev+bounces-53233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8238801B01
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 07:28:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0C3801B6A
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:12:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8D91C20AC1
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 06:28:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256251C2083C
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 08:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD8BBE5B;
-	Sat,  2 Dec 2023 06:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YglY1EA2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785EFC8CE;
+	Sat,  2 Dec 2023 08:12:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 959B51A6
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 22:28:23 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1d0477a0062so84805ad.0
-        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 22:28:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1701498503; x=1702103303; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tbZ3baswrVIXCpv17EXNLNQ6fCKKgX8I1X1ug4sHQRo=;
-        b=YglY1EA2yEd6/FYjxTbHAGTkC+hloqwMvNU+aEl1QJDbjtmggqyyOocdeuetVZMn3K
-         zZLhB7p6QPVWXs0YLKpFo/ckvmV9FMJM0hSfC1yX7DFKtCWDcf6SDDaCeivY2FbPvo63
-         YJWqdfh6l3bWs0kAV3IJ9pgm1qPCBIwHkkiz0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701498503; x=1702103303;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tbZ3baswrVIXCpv17EXNLNQ6fCKKgX8I1X1ug4sHQRo=;
-        b=nAwAjQOgGsCFf/6/6AaQygeLneytbxSipI543Uni6xJAh1TBdqApZ0I1G3bqCSFYS4
-         TEeFI4fMJQfBZT4NKdJhROe6ZSS1sNtoXXm/+Rq8Pt+GFOcE/K8o98ZwvZNWGAP/n3aU
-         IVSibX4QrqQqtYJVFmRftHw8bTHSXp0qFpxOj7jgOouZs1N9V4/LMMcn8o6liTACKqFo
-         pRHpUTHqjLgeFde95/Z0KgyXLdqkXtZtXjKFLCHHP9AvATCsFK87UWaoR2yTVTOP5+bS
-         K6Q8IF62IA6jFqzdhs8ltToutnycvSTqp9F+SejjNdP0dnOW4dXn45X0UylddyWHfcQF
-         NqMQ==
-X-Gm-Message-State: AOJu0Ywr8D7rPGn8xKOAJH/qwLo5IGlas7JVWDtpwvsGLLfe25Z7JMO2
-	A5Oi1Oz3yHXxapIBJ6WlgDIO8kx89kr2pOyLoSfG9w==
-X-Google-Smtp-Source: AGHT+IHHapKzN4HswkxJ9mFZ0Q1mejXuz2mhlzv5W1guU8/mRZQUxRLkyyjIUWIFM++nAIZTEtK2Lat2HMN5Lss2eXw=
-X-Received: by 2002:a17:903:428a:b0:1cf:acbf:d0b5 with SMTP id
- ju10-20020a170903428a00b001cfacbfd0b5mr333159plb.1.1701498502612; Fri, 01 Dec
- 2023 22:28:22 -0800 (PST)
+X-Greylist: delayed 542 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 00:12:05 PST
+Received: from mail-m12821.netease.com (mail-m12821.netease.com [103.209.128.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA2B3134;
+	Sat,  2 Dec 2023 00:12:05 -0800 (PST)
+Received: from ubuntu.localdomain (unknown [111.222.250.119])
+	by mail-m12750.qiye.163.com (Hmail) with ESMTPA id D46C3F20445;
+	Sat,  2 Dec 2023 16:02:31 +0800 (CST)
+From: Shifeng Li <lishifeng@sangfor.com.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	eranbe@mellanox.com,
+	moshe@mellanox.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dinghui@sangfor.com.cn,
+	lishifeng1992@126.com,
+	Shifeng Li <lishifeng@sangfor.com.cn>,
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: [PATCH net v4] net/mlx5e: Fix a race in command alloc flow
+Date: Sat,  2 Dec 2023 00:01:26 -0800
+Message-Id: <20231202080126.1167237-1-lishifeng@sangfor.com.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201183113.343256-1-dianders@chromium.org> <20231201102946.v2.3.Ie00e07f07f87149c9ce0b27ae4e26991d307e14b@changeid>
-In-Reply-To: <20231201102946.v2.3.Ie00e07f07f87149c9ce0b27ae4e26991d307e14b@changeid>
-From: Grant Grundler <grundler@chromium.org>
-Date: Fri, 1 Dec 2023 22:28:11 -0800
-Message-ID: <CANEJEGvVSrRnZNt_i637CW6ajY_AY+1YDRabhBpb62S9UK1xdA@mail.gmail.com>
-Subject: Re: [PATCH net v2 3/3] r8152: Choose our USB config with
- choose_configuration() rather than probe()
-To: Douglas Anderson <dianders@chromium.org>
-Cc: linux-usb@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Grant Grundler <grundler@chromium.org>, Hayes Wang <hayeswang@realtek.com>, 
-	Simon Horman <horms@kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
-	netdev@vger.kernel.org, Brian Geffon <bgeffon@google.com>, 
-	Alan Stern <stern@rowland.harvard.edu>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCH0oYVkoZHkpMTB0fGh4eHlUTARMWGhIXJBQOD1
+	lXWRgSC1lBWUpKSlVJSUlVSU5LVUpKQllXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQktLWQ
+	Y+
+X-HM-Tid: 0a8c298cf3a7b21dkuuud46c3f20445
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6OAw6Dxw*KTw8KAsCGCEZKgE3
+	URMaCzhVSlVKTEtKTktPSk5IS01DVTMWGhIXVRcSCBMSHR4VHDsIGhUcHRQJVRgUFlUYFUVZV1kS
+	C1lBWUpKSlVJSUlVSU5LVUpKQllXWQgBWUFNSEpCNwY+
 
-On Fri, Dec 1, 2023 at 10:31=E2=80=AFAM Douglas Anderson <dianders@chromium=
-.org> wrote:
->
-> If you deauthorize the r8152 device (by writing 0 to the "authorized"
-> field in sysfs) and then reauthorize it (by writing a 1) then it no
-> longer works. This is because when you do the above we lose the
-> special configuration that we set in rtl8152_cfgselector_probe().
-> Deauthorizing causes the config to be set to -1 and then reauthorizing
-> runs the default logic for choosing the best config.
->
-> I made an attempt to fix it so that the config is kept across
-> deauthorizing / reauthorizing [1] but it was a bit ugly.
->
-> Let's instead use the new USB core feature to override
-> choose_configuration().
->
-> This patch relies upon the patches ("usb: core: Don't force USB
-> generic_subclass drivers to define probe()") and ("usb: core: Allow
-> subclassed USB drivers to override usb_choose_configuration()")
->
-> [1] https://lore.kernel.org/r/20231130154337.1.Ie00e07f07f87149c9ce0b27ae=
-4e26991d307e14b@changeid
->
-> Fixes: ec51fbd1b8a2 ("r8152: add USB device driver for config selection")
-> Suggested-by: Alan Stern <stern@rowland.harvard.edu>
-> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Fix a cmd->ent use after free due to a race on command entry.
+Such race occurs when one of the commands releases its last refcount and
+frees its index and entry while another process running command flush
+flow takes refcount to this command entry. The process which handles
+commands flush may see this command as needed to be flushed if the other
+process allocated a ent->idx but didn't set ent to cmd->ent_arr in
+cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
+the spin lock.
 
-Reviewed-by: Grant Grundler <grundler@chromium.org>
+[70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+[70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
+[70013.081968]
+[70013.082028] Workqueue: events aer_isr
+[70013.082053] Call Trace:
+[70013.082067]  dump_stack+0x8b/0xbb
+[70013.082086]  print_address_description+0x6a/0x270
+[70013.082102]  kasan_report+0x179/0x2c0
+[70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+[70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
+[70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
+[70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
+[70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
+[70013.082409]  pci_device_remove+0xf3/0x280
+[70013.082439]  device_release_driver_internal+0x1c3/0x470
+[70013.082453]  pci_stop_bus_device+0x109/0x160
+[70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
+[70013.082485]  pcie_do_fatal_recovery+0x167/0x550
+[70013.082493]  aer_isr+0x7d2/0x960
+[70013.082543]  process_one_work+0x65f/0x12d0
+[70013.082556]  worker_thread+0x87/0xb50
+[70013.082571]  kthread+0x2e9/0x3a0
+[70013.082592]  ret_from_fork+0x1f/0x40
 
-> ---
->
-> Changes in v2:
-> - ("Choose our USB config with choose_configuration()...) new for v2.
->
->  drivers/net/usb/r8152.c | 16 +++++-----------
->  1 file changed, 5 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 2c5c1e91ded6..0da723d11326 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -10053,7 +10053,7 @@ static struct usb_driver rtl8152_driver =3D {
->         .disable_hub_initiated_lpm =3D 1,
->  };
->
-> -static int rtl8152_cfgselector_probe(struct usb_device *udev)
-> +static int rtl8152_cfgselector_choose_configuration(struct usb_device *u=
-dev)
->  {
->         struct usb_host_config *c;
->         int i, num_configs;
-> @@ -10080,19 +10080,13 @@ static int rtl8152_cfgselector_probe(struct usb=
-_device *udev)
->         if (i =3D=3D num_configs)
->                 return -ENODEV;
->
-> -       if (usb_set_configuration(udev, c->desc.bConfigurationValue)) {
-> -               dev_err(&udev->dev, "Failed to set configuration %d\n",
-> -                       c->desc.bConfigurationValue);
-> -               return -ENODEV;
-> -       }
-> -
-> -       return 0;
-> +       return c->desc.bConfigurationValue;
->  }
->
->  static struct usb_device_driver rtl8152_cfgselector_driver =3D {
-> -       .name =3D         MODULENAME "-cfgselector",
-> -       .probe =3D        rtl8152_cfgselector_probe,
-> -       .id_table =3D     rtl8152_table,
-> +       .name =3D MODULENAME "-cfgselector",
-> +       .choose_configuration =3D rtl8152_cfgselector_choose_configuratio=
-n,
-> +       .id_table =3D rtl8152_table,
->         .generic_subclass =3D 1,
->         .supports_autosuspend =3D 1,
->  };
-> --
-> 2.43.0.rc2.451.g8631bc7472-goog
->
+The logical relationship of this error is as follows:
+
+             aer_recover_work              |          ent->work
+-------------------------------------------+------------------------------
+aer_recover_work_func                      |
+|- pcie_do_recovery                        |
+  |- report_error_detected                 |
+    |- mlx5_pci_err_detected               |cmd_work_handler
+      |- mlx5_enter_error_state            |  |- cmd_alloc_index
+        |- enter_error_state               |    |- lock cmd->alloc_lock
+          |- mlx5_cmd_flush                |    |- clear_bit
+            |- mlx5_cmd_trigger_completions|    |- unlock cmd->alloc_lock
+              |- lock cmd->alloc_lock      |
+              |- vector = ~dev->cmd.vars.bitmask
+              |- for_each_set_bit          |
+                |- cmd_ent_get(cmd->ent_arr[i]) (UAF) 
+              |- unlock cmd->alloc_lock    |  |- cmd->ent_arr[ent->idx]=ent
+
+The cmd->ent_arr[ent->idx] assignment and the bit clearing are not 
+protected by the cmd->alloc_lock in cmd_work_handler().
+
+Fixes: 50b2412b7e78 ("net/mlx5: Avoid possible free of command entry while timeout comp handler")
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+---
+v1->v2: fix code conflicts.
+v2->v3: modify Fixes line and massage git log.
+v3->v4: add target tree name in the subject and add the logical diagram.
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
+index f8f0a712c943..a7b1f9686c09 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
+@@ -156,15 +156,18 @@ static u8 alloc_token(struct mlx5_cmd *cmd)
+ 	return token;
+ }
+ 
+-static int cmd_alloc_index(struct mlx5_cmd *cmd)
++static int cmd_alloc_index(struct mlx5_cmd *cmd, struct mlx5_cmd_work_ent *ent)
+ {
+ 	unsigned long flags;
+ 	int ret;
+ 
+ 	spin_lock_irqsave(&cmd->alloc_lock, flags);
+ 	ret = find_first_bit(&cmd->vars.bitmask, cmd->vars.max_reg_cmds);
+-	if (ret < cmd->vars.max_reg_cmds)
++	if (ret < cmd->vars.max_reg_cmds) {
+ 		clear_bit(ret, &cmd->vars.bitmask);
++		ent->idx = ret;
++		cmd->ent_arr[ent->idx] = ent;
++	}
+ 	spin_unlock_irqrestore(&cmd->alloc_lock, flags);
+ 
+ 	return ret < cmd->vars.max_reg_cmds ? ret : -ENOMEM;
+@@ -979,7 +982,7 @@ static void cmd_work_handler(struct work_struct *work)
+ 	sem = ent->page_queue ? &cmd->vars.pages_sem : &cmd->vars.sem;
+ 	down(sem);
+ 	if (!ent->page_queue) {
+-		alloc_ret = cmd_alloc_index(cmd);
++		alloc_ret = cmd_alloc_index(cmd, ent);
+ 		if (alloc_ret < 0) {
+ 			mlx5_core_err_rl(dev, "failed to allocate command entry\n");
+ 			if (ent->callback) {
+@@ -994,15 +997,14 @@ static void cmd_work_handler(struct work_struct *work)
+ 			up(sem);
+ 			return;
+ 		}
+-		ent->idx = alloc_ret;
+ 	} else {
+ 		ent->idx = cmd->vars.max_reg_cmds;
+ 		spin_lock_irqsave(&cmd->alloc_lock, flags);
+ 		clear_bit(ent->idx, &cmd->vars.bitmask);
++		cmd->ent_arr[ent->idx] = ent;
+ 		spin_unlock_irqrestore(&cmd->alloc_lock, flags);
+ 	}
+ 
+-	cmd->ent_arr[ent->idx] = ent;
+ 	lay = get_inst(cmd, ent->idx);
+ 	ent->lay = lay;
+ 	memset(lay, 0, sizeof(*lay));
+-- 
+2.25.1
+
 
