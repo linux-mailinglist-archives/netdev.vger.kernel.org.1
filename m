@@ -1,153 +1,131 @@
-Return-Path: <netdev+bounces-53242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923F6801BA5
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:30:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF26801BE9
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3092F1F21153
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:30:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDA9F1C208D8
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6686211732;
-	Sat,  2 Dec 2023 09:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PV3qkCYH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116DE14013;
+	Sat,  2 Dec 2023 09:55:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434ED129;
-	Sat,  2 Dec 2023 01:30:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cJLjF77y4SxHEjhOXmOD85mb2tXiT1lNxpnlYkZDglQ=; b=PV3qkCYHbGLiIITrG9RmdVBpGt
-	dZM+/IuzIBJsIhispOgoPrWvFxw0DTPbZGEm5CtaF0Qs2Ep3N+gsw0lOiKrWZH0CC6cHPENHUcycP
-	LYjXjV8dJHRM6XIxLqVrf0aunHcAC/o4Lz7CGJrMtTTRABiQwnN35QNhl6dWTt2nl5OwohIh+/GB7
-	5MotVL2W4IVGe+suBjtekgHICGTClzxiF2pQJeLSVBybGgTLt/2enbborcxowEaaKq1NYVLomTMeX
-	ftnt37kMGJlxW5Zmn7K7bnzLPdvcZc6QTEbYMoWyKUuts2+L8sNMF0fjJzvi07+2tQ0+ta/EhMcnc
-	W5a8JLhQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53892)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r9MKT-0003yv-03;
-	Sat, 02 Dec 2023 09:30:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r9MKQ-0006xW-U6; Sat, 02 Dec 2023 09:30:26 +0000
-Date: Sat, 2 Dec 2023 09:30:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Simon Horman <horms@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Message-ID: <ZWr5MiiR1OQujoGG@shell.armlinux.org.uk>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-8-arinc.unal@arinc9.com>
- <20231121185358.GA16629@kernel.org>
- <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B19D134
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 01:55:22 -0800 (PST)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33331e98711so1165780f8f.1
+        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 01:55:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701510921; x=1702115721;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P250h/bKlvXlZjOSynNCwWP3G767EkohggePlElSbr0=;
+        b=ESkYd4KgZWAlb74GflhubUevBlJGZUMGUJ6XtHNriBlcl22oLu2ynvbVEHirHpBEey
+         DcUa+ns7seuz/+hBkcP1/nfI2YXOqB8588di9EAjYAFwv4g9jHvKw5yRmVjgWtVUCxyE
+         sr4TdEhdMhjNIobS6e3y3fh0lw/FmX7WYy4Z5Caye5nK9MNOIBcpmc9QPkOFmFTez/s7
+         8dUno0STyy62epTz2hjIrNjsZNFY8W81EAomR8SfXCHjyVfY0zxBx3Jlmw9GksjMdqtC
+         ujBQEieVr4E6oPBpyLN2kDZQ9OsEupLEjbbKu1Y0SjX2eq3DoO/8rhYYxuLVTg4VJfTl
+         x2+g==
+X-Gm-Message-State: AOJu0Yz6JUgucheerqpoOuH6ZOPsx36B8V9S4skjBxZjbMO6aBU6ar9g
+	4iB9buvG/Ig/Yog5JFc19E1g/yukebYuQg==
+X-Google-Smtp-Source: AGHT+IHlJpX7lHPqAJWc/CgtHYsO1kAjJpvE5xGLnFXABj0yvlBjUdMUVlEmpp+BlT0AnrrxtN33tw==
+X-Received: by 2002:a5d:658c:0:b0:333:3cf1:baa3 with SMTP id q12-20020a5d658c000000b003333cf1baa3mr191313wru.39.1701510920479;
+        Sat, 02 Dec 2023 01:55:20 -0800 (PST)
+Received: from [10.148.82.213] ([195.228.69.10])
+        by smtp.gmail.com with ESMTPSA id e5-20020a5d4e85000000b0033333bee379sm3048875wru.107.2023.12.02.01.55.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Dec 2023 01:55:20 -0800 (PST)
+Message-ID: <71fd7ea47ca01f85c995c481a19aba15142e1341.camel@inf.elte.hu>
+Subject: Re: BUG: igc: Unable to select 100 Mbps speed mode
+From: Ferenc Fejes <fejes@inf.elte.hu>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, netdev
+	 <netdev@vger.kernel.org>
+Cc: "anthony.l.nguyen" <anthony.l.nguyen@intel.com>, Jesse Brandeburg
+	 <jesse.brandeburg@intel.com>, "Neftin, Sasha" <sasha.neftin@intel.com>
+Date: Sat, 02 Dec 2023 10:55:19 +0100
+In-Reply-To: <87zfytv6e2.fsf@intel.com>
+References: <c40ebbf9c285b87fc64d6f10d2cdc8e07d29b8c6.camel@inf.elte.hu>
+	 <87zfytv6e2.fsf@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Dec 02, 2023 at 11:45:42AM +0300, Arınç ÜNAL wrote:
-> Hi Simon.
-> 
-> On 21.11.2023 21:53, Simon Horman wrote:
-> > On Sat, Nov 18, 2023 at 03:31:57PM +0300, Arınç ÜNAL wrote:
-> > > There's no need to run all the code on mt7530_setup_port5() if port 5 is
-> > > disabled. The only case for calling mt7530_setup_port5() from
-> > > mt7530_setup() is when PHY muxing is enabled. That is because port 5 is not
-> > > defined as a port on the devicetree, therefore, it cannot be controlled by
-> > > phylink.
-> > > 
-> > > Because of this, run mt7530_setup_port5() if priv->p5_intf_sel is
-> > > P5_INTF_SEL_PHY_P0 or P5_INTF_SEL_PHY_P4. Remove the P5_DISABLED case from
-> > > mt7530_setup_port5().
-> > > 
-> > > Stop initialising the interface variable as the remaining cases will always
-> > > call mt7530_setup_port5() with it initialised.
-> > > 
-> > > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> > > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> > > ---
-> > >   drivers/net/dsa/mt7530.c | 9 +++------
-> > >   1 file changed, 3 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> > > index fc87ec817672..1aab4c3f28b0 100644
-> > > --- a/drivers/net/dsa/mt7530.c
-> > > +++ b/drivers/net/dsa/mt7530.c
-> > > @@ -942,9 +942,6 @@ static void mt7530_setup_port5(struct dsa_switch *ds, phy_interface_t interface)
-> > >   		/* MT7530_P5_MODE_GMAC: P5 -> External phy or 2nd GMAC */
-> > >   		val &= ~MHWTRAP_P5_DIS;
-> > >   		break;
-> > > -	case P5_DISABLED:
-> > > -		interface = PHY_INTERFACE_MODE_NA;
-> > > -		break;
-> > >   	default:
-> > >   		dev_err(ds->dev, "Unsupported p5_intf_sel %d\n",
-> > >   			priv->p5_intf_sel);
-> > > @@ -2313,8 +2310,6 @@ mt7530_setup(struct dsa_switch *ds)
-> > >   		 * Set priv->p5_intf_sel to the appropriate value if PHY muxing
-> > >   		 * is detected.
-> > >   		 */
-> > > -		interface = PHY_INTERFACE_MODE_NA;
-> > > -
-> > >   		for_each_child_of_node(dn, mac_np) {
-> > >   			if (!of_device_is_compatible(mac_np,
-> > >   						     "mediatek,eth-mac"))
-> > > @@ -2346,7 +2341,9 @@ mt7530_setup(struct dsa_switch *ds)
-> > >   			break;
-> > >   		}
-> > > -		mt7530_setup_port5(ds, interface);
-> > > +		if (priv->p5_intf_sel == P5_INTF_SEL_PHY_P0 ||
-> > > +		    priv->p5_intf_sel == P5_INTF_SEL_PHY_P4)
-> > > +			mt7530_setup_port5(ds, interface);
-> > 
-> > Hi Arınç,
-> > 
-> > It appears that interface is now uninitialised here.
-> > 
-> > Flagged by Smatch.
-> 
-> I'm not sure why it doesn't catch that for mt7530_setup_port5() to run
-> here, priv->p5_intf_sel must be either P5_INTF_SEL_PHY_P0 or
-> P5_INTF_SEL_PHY_P4. And for that to happen, the interface variable will be
-> initialised.
+Hi Vinicius,
 
-It's probably due to the complexities involved in analysing the values
-of variables, especially when they're in structures that are passed in.
+On Fri, 2023-12-01 at 15:40 -0800, Vinicius Costa Gomes wrote:
+> Hi,
+>=20
+> Ferenc Fejes <fejes@inf.elte.hu> writes:
+>=20
+> > Hi!
+> >=20
+> > I upgraded from Ubuntu 23.04 to 23.10, the default Linux version
+> > changed from 6.2 to 6.5.
+> >=20
+> > We immediately noticed that we cannot set 100 Mbps mode on i225
+> > with
+> > the new kernel.
+> >=20
+> > E.g.:
+> > sudo ethtool -s enp4s0 speed 100 duplex full
+> > dmesg:
+> > [=C2=A0=C2=A0 60.304330] igc 0000:03:00.0 enp3s0: NIC Link is Down
+> > [=C2=A0=C2=A0 62.582764] igc 0000:03:00.0 enp3s0: NIC Link is Up 2500 M=
+bps
+> > Full
+> > Duplex, Flow Control: RX/TX
+> >=20
+>=20
+> I wonder if this patch fixes it, and it is still not available in
+> your
+> distro:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3De7684d29efdf37304c62bb337ea55b3428ca118e
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Will take a look, thanks. I'm not familiar Ubuntu's versioning and
+custom patches, nor their backport policy.
+
+However their "mantic" tree (6.5) looks like this:
+https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/mantic/t=
+ree/drivers/net/ethernet/intel/igc/igc_ethtool.c#n1804
+
+So the patch above not applied there.
+
+>=20
+> > I just switched back to 6.2 and with that it works correctly.
+> >=20
+> > Sorry if this has already been addressed, after a quick search in
+> > the
+> > lore I cannot find anything related.
+> >=20
+>=20
+> I think it was discussed here:
+>=20
+> https://lore.kernel.org/all/20230922163804.7DDBA2440449@us122.sjc.aristan=
+etworks.com/
+
+Thank you, look like I missed it. Sorry for the noise!
+
+>=20
+> > Best,
+> > Ferenc
+> >=20
+>=20
+>=20
+> Cheers,
+
+Best,
+Ferenc
+
 
