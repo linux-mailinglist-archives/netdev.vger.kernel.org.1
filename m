@@ -1,310 +1,142 @@
-Return-Path: <netdev+bounces-53166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A52801851
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 01:00:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A0E8018BD
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 01:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02EBA281380
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5C91F2110B
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECC759B52;
-	Fri,  1 Dec 2023 23:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD6B64A;
+	Sat,  2 Dec 2023 00:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mEM88SmB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WP7q2qW1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F559A
-	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 15:59:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701475194; x=1733011194;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2+0ReYztB9A7pnrrDNvw8uGroW6pthTc2yO5Cqask84=;
-  b=mEM88SmBSMXO4/FrvIea+Vw5fFzber2IcH2tvKZ4Kogwk7HzXUrENTWU
-   /NdW7rSTRKFgc4XTphIb7KhI7z6+6NsSrmzXPcQeoQzYC+aqxgtYWTUJn
-   U6yVwqQAYFwFApFsHWmEm0yaZ2tZXmZ4wM9e1H2A8S1yYLwyORi5o5zJZ
-   Sm84RKRhmXMVseTpa06D7EGTbBuExfL37XDIDmZKdko0cSgHRAZejaPYE
-   J66YeqFDJXqphLd5GPjOobp368AH4ksLe/w3/AP+DFqiXtDMxxOgfEj1V
-   wWUS+yId6N+gQMngG8x1cWl4lg8tEmfDSJEk4pUDMIaiEHHC+i798G/83
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="392429556"
-X-IronPort-AV: E=Sophos;i="6.04,243,1695711600"; 
-   d="scan'208";a="392429556"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 15:59:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10911"; a="719682202"
-X-IronPort-AV: E=Sophos;i="6.04,243,1695711600"; 
-   d="scan'208";a="719682202"
-Received: from c3-1-server.sj.intel.com ([10.232.18.246])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2023 15:59:53 -0800
-From: Pawel Kaminski <pawel.kaminski@intel.com>
-To: intel-wired-lan@osuosl.org
-Cc: netdev@vger.kernel.org,
-	Pawel Kaminski <pawel.kaminski@intel.com>,
-	Michal Wilczynski <michal.wilczynski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v1] ice: Add support for devlink loopback param.
-Date: Fri,  1 Dec 2023 15:59:49 -0800
-Message-ID: <20231201235949.62728-1-pawel.kaminski@intel.com>
-X-Mailer: git-send-email 2.41.0
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED03830F9;
+	Fri,  1 Dec 2023 16:10:31 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3331752d2b9so1900687f8f.3;
+        Fri, 01 Dec 2023 16:10:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701475830; x=1702080630; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qy+N5d1sKzj7I4P1vs4/0wYYWCdSwATy3bQ5v3nl6OA=;
+        b=WP7q2qW1NmijZu9TDdUHVQ2+PXdrdGIva85EC8TskC+4NQ+etjhNXPahFELL5p+qhE
+         1NpQvMUq+RB/KodXFgNHCmyT8NWicHl/u1OQl5RSS6KMdR75nwBFBy9AQnk5NcuWsE0p
+         +snmnhlYM7Ch7AO8fMT9irlBtUpbTfP5ps0ohaNh2p15yPP8qXOhlk3hVL8pWvos/5NW
+         waDl92cLCNwuao9rgxloma4ipPaBwe3ZDs+UZYu4x88mfg8NIDTDuHMfinTkMRXCBnER
+         ipy5wzx8cB3kJ14ex4sDOgQ7cPw4ef3mgJ3buk35zGpyMRyGDUI2MQkYIbORj0ptz8st
+         /YPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701475830; x=1702080630;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qy+N5d1sKzj7I4P1vs4/0wYYWCdSwATy3bQ5v3nl6OA=;
+        b=m2NjHrgUwMEUJ7FuIPaSrhMgGOsbgA4/YUdN7AKfeKjqhG4j5n8M5JR6lvWBUP2MJi
+         s772JGThVllQLXVIrpo7vK6kEBopB9zStiCi2rC73CMtJABVzPuAxzSJwk+vccAgtOTO
+         bHldPhafYAn5W2VwxWTEVxibudC1jbGLMOsjHJNPopNCZSnXmqrAfnKU0VtrGstYCgcW
+         YTI8nWW2EwXC/Vcv67DerhDt5rCBv37z+iN+0KndzE9GT3YiDRzsAZQCom9cIdmdpUZP
+         W1g+uE30bEIn0cSawcMbiHa6GA+Wx2OAy3+BoGxpeZANPG0NOs5V7yYi2fbZGoX4M54Y
+         zIWQ==
+X-Gm-Message-State: AOJu0YxbNY9P9CGaIEdKMbZfXyeGe4cxtkGSLt/BIOrCpbIvnmwzTtbU
+	qnnsxiCDg7Uf0pmTUKNhGLR2BVC2XLZgN8D7dK0McZhh
+X-Google-Smtp-Source: AGHT+IFAOMmgvWu3DQQ28rpPVUzjYgXwP1BC01OgX29gy1bHVz0AvsDA74t0tlgKWpBBV01cV96gd+OIS9DHf6mJv8E=
+X-Received: by 2002:a05:6000:bc2:b0:32d:9df1:6f68 with SMTP id
+ dm2-20020a0560000bc200b0032d9df16f68mr1430697wrb.22.1701475830145; Fri, 01
+ Dec 2023 16:10:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1701462010.git.dxu@dxuuu.xyz>
+In-Reply-To: <cover.1701462010.git.dxu@dxuuu.xyz>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 1 Dec 2023 16:10:18 -0800
+Message-ID: <CAADnVQKWrvec6ap_7O0Z5uAJe-pdrhuJk8LRkmWvGMM4iF9Frg@mail.gmail.com>
+Subject: Re: [PATCH ipsec-next v3 0/9] Add bpf_xdp_get_xfrm_state() kfunc
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, antony.antony@secunet.com, 
+	Yonghong Song <yonghong.song@linux.dev>, Eddy Z <eddyz87@gmail.com>, devel@linux-ipsec.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for devlink loopback param. Supported values are "enabled",
-"disabled" and "prioritized". Default configuration is set to "enabled.
+On Fri, Dec 1, 2023 at 12:23=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+> This patchset adds two kfunc helpers, bpf_xdp_get_xfrm_state() and
+> bpf_xdp_xfrm_state_release() that wrap xfrm_state_lookup() and
+> xfrm_state_put(). The intent is to support software RSS (via XDP) for
+> the ongoing/upcoming ipsec pcpu work [0]. Recent experiments performed
+> on (hopefully) reproducible AWS testbeds indicate that single tunnel
+> pcpu ipsec can reach line rate on 100G ENA nics.
+>
+> Note this patchset only tests/shows generic xfrm_state access. The
+> "secret sauce" (if you can really even call it that) involves accessing
+> a soon-to-be-upstreamed pcpu_num field in xfrm_state. Early example is
+> available here [1].
+>
+> [0]: https://datatracker.ietf.org/doc/draft-ietf-ipsecme-multi-sa-perform=
+ance/03/
+> [1]: https://github.com/danobi/xdp-tools/blob/e89a1c617aba3b50d990f779357=
+d6ce2863ecb27/xdp-bench/xdp_redirect_cpumap.bpf.c#L385-L406
+>
+> Changes from v2:
+> * Fix/simplify BPF_CORE_WRITE_BITFIELD() algorithm
+> * Added verifier tests for bitfield writes
+> * Fix state leakage across test_tunnel subtests
+>
+> Changes from v1:
+> * Move xfrm tunnel tests to test_progs
+> * Fix writing to opts->error when opts is invalid
+> * Use __bpf_kfunc_start_defs()
+> * Remove unused vxlanhdr definition
+> * Add and use BPF_CORE_WRITE_BITFIELD() macro
+> * Make series bisect clean
+>
+> Changes from RFCv2:
+> * Rebased to ipsec-next
+> * Fix netns leak
+>
+> Changes from RFCv1:
+> * Add Antony's commit tags
+> * Add KF_ACQUIRE and KF_RELEASE semantics
+>
+> Daniel Xu (9):
+>   bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
+>   bpf: xfrm: Add bpf_xdp_xfrm_state_release() kfunc
+>   libbpf: Add BPF_CORE_WRITE_BITFIELD() macro
+>   bpf: selftests: test_loader: Support __btf_path() annotation
+>   libbpf: selftests: Add verifier tests for CO-RE bitfield writes
+>   bpf: selftests: test_tunnel: Setup fresh topology for each subtest
+>   bpf: selftests: test_tunnel: Use vmlinux.h declarations
+>   bpf: selftests: Move xfrm tunnel test to test_progs
+>   bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
+>
+>  include/net/xfrm.h                            |   9 +
+>  net/xfrm/Makefile                             |   1 +
+>  net/xfrm/xfrm_policy.c                        |   2 +
+>  net/xfrm/xfrm_state_bpf.c                     | 128 ++++++++++++++
+>  tools/lib/bpf/bpf_core_read.h                 |  34 ++++
+>  .../selftests/bpf/prog_tests/test_tunnel.c    | 162 +++++++++++++++++-
+>  .../selftests/bpf/prog_tests/verifier.c       |   2 +
+>  tools/testing/selftests/bpf/progs/bpf_misc.h  |   1 +
+>  .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+>  .../selftests/bpf/progs/test_tunnel_kern.c    | 138 ++++++++-------
+>  .../bpf/progs/verifier_bitfield_write.c       | 100 +++++++++++
+>  tools/testing/selftests/bpf/test_loader.c     |   7 +
+>  tools/testing/selftests/bpf/test_tunnel.sh    |  92 ----------
+>  13 files changed, 522 insertions(+), 155 deletions(-)
 
-By default loopback traffic BW is locked to PF configured BW. HW is
-capable of higher speeds on loopback traffic. Loopback param set to
-"prioritized" enables HW BW prioritization for VF to VF traffic,
-effectively increasing BW between VFs. Applicable to 8x10G and 4x25G
-cards.
-
-To achieve max loopback BW one could:
- - Make, as much as possible, fair distribution of loopback usages
-   between groups to gain maximal loopback BW.
- - Try to dedicate ports for loopback only traffic, with minimal network
-   traffic.
-
-Changing loopback configuration will trigger CORER reset in order to take
-effect.
-
-Example command to change current value:
-devlink dev param set pci/0000:b2:00.3 name loopback value prioritized \
-        cmode permanent
-
-Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
-Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
- drivers/net/ethernet/intel/ice/ice_common.c   |   6 +-
- drivers/net/ethernet/intel/ice/ice_devlink.c  | 128 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
- 4 files changed, 143 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 6a5e974a1776..13d0e3cbc24c 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -230,6 +230,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
- #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
- };
- 
-+/* Loopback port parameter mode values. */
-+enum ice_loopback_mode {
-+	ICE_LOOPBACK_MODE_ENABLED = 0,
-+	ICE_LOOPBACK_MODE_DISABLED = 1,
-+	ICE_LOOPBACK_MODE_PRIORITIZED = 2,
-+};
-+
- /* Set Port parameters, (direct, 0x0203) */
- struct ice_aqc_set_port_params {
- 	__le16 cmd_flags;
-@@ -238,7 +245,9 @@ struct ice_aqc_set_port_params {
- 	__le16 swid;
- #define ICE_AQC_PORT_SWID_VALID			BIT(15)
- #define ICE_AQC_PORT_SWID_M			0xFF
--	u8 reserved[10];
-+	u8 loopback_mode;
-+#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID BIT(2)
-+	u8 reserved[9];
- };
- 
- /* These resource type defines are used for all switch resource
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 2f67ea1feb60..2efa781efcdb 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1019,7 +1019,7 @@ int ice_init_hw(struct ice_hw *hw)
- 		status = -ENOMEM;
- 		goto err_unroll_cqinit;
- 	}
--
-+	hw->port_info->loopback_mode = ICE_LOOPBACK_MODE_ENABLED;
- 	/* set the back pointer to HW */
- 	hw->port_info->hw = hw;
- 
-@@ -2962,6 +2962,10 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
- 	cmd = &desc.params.set_port_params;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
-+
-+	cmd->loopback_mode = pi->loopback_mode |
-+				ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID;
-+
- 	if (double_vlan)
- 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
- 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index 65be56f2af9e..8fe5bda5d5fe 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -1429,6 +1429,127 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
- 	return 0;
- }
- 
-+#define DEVLINK_LPBK_DISABLED_STR "disabled"
-+#define DEVLINK_LPBK_ENABLED_STR "enabled"
-+#define DEVLINK_LPBK_PRIORITIZED_STR "prioritized"
-+
-+/**
-+ * ice_devlink_loopback_mode_to_str - Get string for lpbk mode.
-+ * @mode: Loopback_mode used in port_info struct.
-+ *
-+ * Return: Mode respective string or "Invalid".
-+ */
-+static const char *ice_devlink_loopback_mode_to_str(enum ice_loopback_mode mode)
-+{
-+	switch (mode) {
-+	case ICE_LOOPBACK_MODE_ENABLED:
-+		return DEVLINK_LPBK_ENABLED_STR;
-+	case ICE_LOOPBACK_MODE_PRIORITIZED:
-+		return DEVLINK_LPBK_PRIORITIZED_STR;
-+	case ICE_LOOPBACK_MODE_DISABLED:
-+		return DEVLINK_LPBK_DISABLED_STR;
-+	}
-+
-+	return "Invalid";
-+}
-+
-+/**
-+ * ice_devlink_loopback_str_to_mode - Get lpbk mode from string name.
-+ * @mode_str: Loopback mode string.
-+ *
-+ * Return: Mode value or negative number if invalid.
-+ */
-+static int ice_devlink_loopback_str_to_mode(const char *mode_str)
-+{
-+	if (!strcmp(mode_str, DEVLINK_LPBK_ENABLED_STR))
-+		return ICE_LOOPBACK_MODE_ENABLED;
-+	else if (!strcmp(mode_str, DEVLINK_LPBK_PRIORITIZED_STR))
-+		return ICE_LOOPBACK_MODE_PRIORITIZED;
-+	else if (!strcmp(mode_str, DEVLINK_LPBK_DISABLED_STR))
-+		return ICE_LOOPBACK_MODE_DISABLED;
-+
-+	return -EINVAL;
-+}
-+
-+/**
-+ * ice_devlink_loopback_get - Get loopback parameter.
-+ * @devlink: Pointer to the devlink instance.
-+ * @id: the Parameter ID to set.
-+ * @ctx: Context to store the parameter value.
-+ *
-+ * Return: Zero on success.
-+ */
-+static int ice_devlink_loopback_get(struct devlink *devlink, u32 id,
-+				    struct devlink_param_gset_ctx *ctx)
-+{
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	struct ice_port_info *pi;
-+	const char *mode_str;
-+
-+	pi = pf->hw.port_info;
-+	mode_str = ice_devlink_loopback_mode_to_str(pi->loopback_mode);
-+	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_loopback_set - Set loopback parameter.
-+ * @devlink: Pointer to the devlink instance.
-+ * @id: the Parameter ID to set.
-+ * @ctx: Context to get the parameter value.
-+ *
-+ * Return: Zero on success.
-+ */
-+static int ice_devlink_loopback_set(struct devlink *devlink, u32 id,
-+				    struct devlink_param_gset_ctx *ctx)
-+{
-+	int new_loopback_mode = ice_devlink_loopback_str_to_mode(ctx->val.vstr);
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	struct device *dev = ice_pf_to_dev(pf);
-+	struct ice_port_info *pi;
-+
-+	pi = pf->hw.port_info;
-+	if (pi->loopback_mode != new_loopback_mode) {
-+		pi->loopback_mode = new_loopback_mode;
-+		dev_info(dev, "Setting loopback to %s\n", ctx->val.vstr);
-+		ice_schedule_reset(pf, ICE_RESET_CORER);
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_loopback_validate - Validate passed loopback parameter value.
-+ * @devlink: Unused pointer to devlink instance.
-+ * @id: The parameter ID to validate.
-+ * @val: Value to validate.
-+ * @extack: Netlink extended ACK structure.
-+ *
-+ * Supported values are:
-+ * "enabled" - loopback is enabled, "disabled" - loopback is disabled
-+ * "prioritized" - loopback traffic is prioritized in scheduling.
-+ *
-+ * Return: Zero when passed parameter value is supported. Negative value on
-+ * error.
-+ */
-+static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
-+					 union devlink_param_value val,
-+					 struct netlink_ext_ack *extack)
-+{
-+	if (ice_devlink_loopback_str_to_mode(val.vstr) < 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is not supported.");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+enum ice_param_id {
-+	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
-+	ICE_DEVLINK_PARAM_ID_LOOPBACK,
-+};
-+
- static const struct devlink_param ice_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_ROCE, BIT(DEVLINK_PARAM_CMODE_RUNTIME),
- 			      ice_devlink_enable_roce_get,
-@@ -1438,7 +1559,12 @@ static const struct devlink_param ice_devlink_params[] = {
- 			      ice_devlink_enable_iw_get,
- 			      ice_devlink_enable_iw_set,
- 			      ice_devlink_enable_iw_validate),
--
-+	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOOPBACK,
-+			     "loopback", DEVLINK_PARAM_TYPE_STRING,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     ice_devlink_loopback_get,
-+			     ice_devlink_loopback_set,
-+			     ice_devlink_loopback_validate),
- };
- 
- static void ice_devlink_free(void *devlink_ptr)
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 1fff865d0661..c8d75a1820a1 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -713,6 +713,7 @@ struct ice_port_info {
- 	u16 sw_id;			/* Initial switch ID belongs to port */
- 	u16 pf_vf_num;
- 	u8 port_state;
-+	u8 loopback_mode;
- #define ICE_SCHED_PORT_STATE_INIT	0x0
- #define ICE_SCHED_PORT_STATE_READY	0x1
- 	u8 lport;
--- 
-2.41.0
-
+I really think this should go via bpf-next tree.
+The bpf changes are much bigger than ipsec.
 
