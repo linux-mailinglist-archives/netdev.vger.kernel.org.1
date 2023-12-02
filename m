@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-53225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4DBB801AA5
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:30:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3147801AA6
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 663C81F2112C
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D17D21C20B3D
 	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18343D70;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA0B947E;
 	Sat,  2 Dec 2023 04:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iFmyKaT3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvNYn0gi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5321BE6F
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 04:30:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 37D8EC433CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52F1BE67;
+	Sat,  2 Dec 2023 04:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 40B38C433CB;
 	Sat,  2 Dec 2023 04:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701491425;
-	bh=uYh0hAOiVfqI1yraa83qaecD3Lom4RWZbQ4IgR1ECHI=;
+	bh=PoWIqTH0mN0BrOjN4NLWRNHF3E0J9dWWpted9GPFRUA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iFmyKaT3ipMSiZai/820Ocv8gBge6eS+OGjYI4aC4Uib7ITroyhEfTDho5W6epbP/
-	 KwtdAvBW9Ea9zz35HfGnT2ucThRdq9bEO22hr4JTtJmy/W3IFNicrkLaubWz78em30
-	 s2A1bDrC2ykmHvQ/FmsFPI1aAXdjw7P4DfiBjVvgqaAYiCL+9GUef0fFSPDeuIi3EA
-	 y4JMsl+Le1BhLVvHsYCx/eFZnDqx3Jy2g7iXkwOj4e8lVkqWTsGrnN1WqPr5rpPkxU
-	 +QhM2fjk3d6k5BvevQw6YoIgdeEtlLkLs7IM2QzqpyY/l6iN0mCHsTMQWibVMpa9Vq
-	 iAFexZgHEYoWw==
+	b=ZvNYn0giq7DMnwjgNSKhirQCJUmEzOe9bhVkB1dyQiyBi+fH/a938arbitJtLpLt/
+	 au/6g0KM74GNWdo5LISxwz4wNbTDJ72Dbae4jKH2HkZaK1sMYNiMpZl/6jSQDD7e5o
+	 V+85zQCUqUEkL/22yohcavSeWf12pfQJqsbh4u6JAdaYA0hSJlgGL7Lu3ld/RQTymA
+	 u5Xd49XPhsDlmpj10QXqij3I1duC7m+QzqWkpYPc9T9qDJfXll+jtKCMGmXgo8MV/t
+	 /Zg6tiPFGuesqk5Fb4yd/3sD3UlNpwVrdiaRDwd7HDbbsHU/ktNUEOlbsoV+/pnjDg
+	 sdTFu+9Wn67UQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21EF4DFAA84;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29448C73FEA;
 	Sat,  2 Dec 2023 04:30:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,37 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] nfp: ethtool: expose transmit SO_TIMESTAMPING
- capability
+Subject: Re: [net-next] net: ethernet: renesas: rcar_gen4_ptp: Depend on
+ PTP_1588_CLOCK
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170149142513.10970.6458960041889194841.git-patchwork-notify@kernel.org>
+ <170149142516.10970.16359351222269905219.git-patchwork-notify@kernel.org>
 Date: Sat, 02 Dec 2023 04:30:25 +0000
-References: <20231129080413.83789-1-louis.peens@corigine.com>
-In-Reply-To: <20231129080413.83789-1-louis.peens@corigine.com>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- yinjun.zhang@corigine.com, netdev@vger.kernel.org, oss-drivers@corigine.com
+References: <20231129111142.3322667-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20231129111142.3322667-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, arnd@arndb.de
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 29 Nov 2023 10:04:13 +0200 you wrote:
-> From: Yinjun Zhang <yinjun.zhang@corigine.com>
-> 
-> NFP always supports software time stamping of tx, now expose
-> the capability through ethtool ops.
-> 
-> Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
-> Signed-off-by: Louis Peens <louis.peens@corigine.com>
+On Wed, 29 Nov 2023 12:11:42 +0100 you wrote:
+> When breaking out the Gen4 gPTP support to its own module the dependency
+> on the PTP_1588_CLOCK framework was left as optional and only stated for
+> the driver using the module. This leads to issues when doing
+> COMPILE_TEST of RENESAS_GEN4_PTP separately and PTP_1588_CLOCK is built
+> as a module and the other as a built-in. Add an explicit depend on
+> PTP_1588_CLOCK.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] nfp: ethtool: expose transmit SO_TIMESTAMPING capability
-    https://git.kernel.org/netdev/net-next/c/7453d7a633d0
+  - [net-next] net: ethernet: renesas: rcar_gen4_ptp: Depend on PTP_1588_CLOCK
+    https://git.kernel.org/netdev/net-next/c/078e07570359
 
 You are awesome, thank you!
 -- 
