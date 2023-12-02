@@ -1,68 +1,62 @@
-Return-Path: <netdev+bounces-53263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B25E5801D73
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:05:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB1E801D77
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:08:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31B01C208D1
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:05:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33321C20873
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C710118C35;
-	Sat,  2 Dec 2023 15:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2D118E1F;
+	Sat,  2 Dec 2023 15:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="GUBi5Fha"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JvEza2vj"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 370 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 07:05:09 PST
-Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB8B102;
-	Sat,  2 Dec 2023 07:05:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1701529506;
-	bh=+4tkXT2Y0ZJNldwcYbIGmHyE8OJNqApK4fyYv38niwQ=;
-	h=From:To:Cc:Subject:Date;
-	b=GUBi5Fha+OHP29KFzB+au403WHJ9kax2BT4WP5zoXnLxcl2y5HtsinAz7zmO3Mlpl
-	 2N9FKfFLzOoRrOqLYBM7dJuu3JRMQ0dUHnw5ZAT8PwLuyzVYq+/fmVOOrjdIk6dS16
-	 CEw0lqdTvyj4ZdxIdkqKHDkInu7QlJwdve63Dl7A=
-Received: from KernelDevBox.byted.org ([180.184.49.4])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id EB51FC1C; Sat, 02 Dec 2023 22:58:53 +0800
-X-QQ-mid: xmsmtpt1701529133tmz3ieq44
-Message-ID: <tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com>
-X-QQ-XMAILINFO: MIHMmFPOQW9Xwuxg219KDH2tOJ9xY5IPqVV5LYIize3GgkHCsQ7U0mx5nSYkzi
-	 yIo8eJVrtOHShJqG4/qHU1EVMvth1+D7N/gaQqZGlmOVGcrm65ydZ0TZ5CEOqsMZNl4b0wE31gpd
-	 T/YHSGDqME7yHtIGbpOYCP7mrr1X+Pc/FIv+BfMGGVb/5oxtpO25xQpcDEg6nodoibM1cIAxQjqE
-	 9kHxBDNIKtD0uXzv1vSdK67VEcf2xKYeW/uoeixXBMhm9cIhKEfAzp7jUUjZOcjw2KUTljWlC+yO
-	 n1HliH+0SUx1RupK8T2duLqSZyC8rpnjT1SPb6NQ7MsSERjoALEdZM6bQOUIVBfuiQyo7gKEZ9b3
-	 ZqCcdlEjfMTo/6DKMPtBdo8fZX4Q20XvC6zCBDfsOk1rNiMhGNKoUvICFqOF9AXvoJ/SgZ8yxg+B
-	 V3kUK2NEkf4TCGo1XjidMDuNDJt6fYQwaHgJIEKAna6Ulu9LFGeksKIovGsjm/ET3zMOZHjZuYuX
-	 HtPJhapVtj4iDe898/wGNEDRTmE21fL28xUamfGY8ZsCy2/7IzwaJ349haBZbh68Jt0ZVjjA+ZaD
-	 OVYipUnHFHNvLVJU96SFnbRwikfUk6avPWCWcXtS67DkgeNmkEyFHt7C1S+qRuHHTIA4fn+MFv4F
-	 AQjij1XUOgCT6XolUo8Stnin1tQV9WTb5WGtC+HKAjYU+OUPSNn/M6cD4TO4yur3XUBWD1HkKqBm
-	 jZSZDxhpUTjbh2FEJjxG9lAlrKUhhuZeYK6VstgIkpAosSyNlm4eAXIlxdzWqfMFPtjy5IzfO8q7
-	 8kLvmB2QwEJMQmlNtaNHFiUlV2uqAXknI03ZhSbS/EuLuYsPmiK9H8ExMNwjC3yWcSNFp+nO+Fm8
-	 lhlxgf6d0nP3+W9tSfQB5YejFyxZGhOzISSk2O7rkuNX/IST8Kw6VBbLHmJ4XIGYaDBElC+Gjrgf
-	 nJUC9nxrxBMORxrZ6axc/5EjFLTDsUBKBRKceBKvfOIUX3Cp+jCOq+KrA7r80a
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Zhang Shurong <zhang_shurong@foxmail.com>
-To: alex.aring@gmail.com
-Cc: stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	harperchen1110@gmail.com,
-	Zhang Shurong <zhang_shurong@foxmail.com>
-Subject: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
-Date: Sat,  2 Dec 2023 22:58:52 +0800
-X-OQ-MSGID: <20231202145852.505410-1-zhang_shurong@foxmail.com>
-X-Mailer: git-send-email 2.30.2
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6864DCD;
+	Sat,  2 Dec 2023 07:08:25 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B2Ecusj013427;
+	Sat, 2 Dec 2023 07:08:12 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=ebvhMGYZfFXqPW9szGU1GX5lx6iPZW3kOny7Mv67BhY=;
+ b=JvEza2vjrexsNm7zSqt14VAx7WsFFnkzVBKqulOTYCaRJK2Yj7IkaqPM79PVG46U7xUF
+ R1HefUasLr68mjBq1cZ9AyIAEvFePGAIl1gb9EUw3AYp5hxav1KhmcNATYDFsrujpKpm
+ lA76iPzrwm8Lh53NeJ7+Wz7Cwt0gc4EB83r1bU/758J/dR08Y3s9d1iBkm2eymg179QO
+ B+kXRYa2wfnsfBNtZIlrpGlAyB1b9jYbGRDxvRS7WKVsHM1NSNH54PqMFZrmT5szN9I4
+ U/zAuis9l0eCXpkLthk8OX9Y0d7qImQtReLbgnihGqgyxfd4HiwD//BZ5pz8DpJGyxyZ jw== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ur4yrg5v1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sat, 02 Dec 2023 07:08:12 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 2 Dec
+ 2023 07:08:10 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sat, 2 Dec 2023 07:08:10 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 13CF83F707A;
+	Sat,  2 Dec 2023 07:08:10 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
+        "Veerasenareddy
+ Burru" <vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: [PATCH net v1] octeon_ep: initialise control mbox tasks before using APIs
+Date: Sat, 2 Dec 2023 07:08:07 -0800
+Message-ID: <20231202150807.2571103-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,60 +64,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: H-y_2-0nBCf_wb2zWehq-JUKi3w-SKED
+X-Proofpoint-ORIG-GUID: H-y_2-0nBCf_wb2zWehq-JUKi3w-SKED
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-02_13,2023-11-30_01,2023-05-22_02
 
-The syzkaller reported an issue:
+Do INIT_WORK for the various workqueue tasks before the first
+invocation of any control net APIs. Since octep_ctrl_net_get_info
+was called before the control net receive work task was even
+initialised, the function call wasn't returning actual firmware
+info queried from Octeon.
 
-BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
-BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
- ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
- ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
- ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
- wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
- dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
- ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:725 [inline]
- sock_sendmsg net/socket.c:748 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
- __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
- __compat_sys_sendmsg net/compat.c:346 [inline]
- __do_compat_sys_sendmsg net/compat.c:353 [inline]
- __se_compat_sys_sendmsg net/compat.c:350 [inline]
-
-We found hdr->key_id_mode is uninitialized in mac802154_set_header_security()
-which indicates hdr.fc.security_enabled should be 0. However, it is set to be cb->secen before.
-Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains uninit-value issue.
-Since mac802154_set_header_security() sets hdr.fc.security_enabled based on the variables
-ieee802154_sub_if_data *sdata and ieee802154_mac_cb *cb in a collaborative manner.
-Therefore, we should not set security_enabled prior to mac802154_set_header_security().
-
-Fixed it by removing the line that sets the hdr.fc.security_enabled.
-
-Syzkaller don't provide repro, and I provide a syz repro like:
-r0 = syz_init_net_socket$802154_dgram(0x24, 0x2, 0x0)
-setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000000)=0x2, 0x4)
-setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000080), 0x4)
-sendmsg$802154_dgram(r0, &(0x7f0000000100)={&(0x7f0000000040)={0x24, @short}, 0x14, &(0x7f00000000c0)={0x0}}, 0x0)
-
-Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
-Signed-off-by: Zhang Shurong <zhang_shurong@foxmail.com>
+Fixes: 8d6198a14e2b ("octeon_ep: support to fetch firmware info")
+Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 ---
- net/mac802154/iface.c | 1 -
- 1 file changed, 1 deletion(-)
+ .../net/ethernet/marvell/octeon_ep/octep_main.c    | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index c0e2da5072be..c99b6e40a5db 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index 552970c7dec0..3e7bfd3e0f56 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -1193,6 +1193,13 @@ int octep_device_setup(struct octep_device *oct)
+ 	if (ret)
+ 		return ret;
  
- 	memset(&hdr.fc, 0, sizeof(hdr.fc));
- 	hdr.fc.type = cb->type;
--	hdr.fc.security_enabled = cb->secen;
- 	hdr.fc.ack_request = cb->ackreq;
- 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
++	INIT_WORK(&oct->tx_timeout_task, octep_tx_timeout_task);
++	INIT_WORK(&oct->ctrl_mbox_task, octep_ctrl_mbox_task);
++	INIT_DELAYED_WORK(&oct->intr_poll_task, octep_intr_poll_task);
++	oct->poll_non_ioq_intr = true;
++	queue_delayed_work(octep_wq, &oct->intr_poll_task,
++			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
++
+ 	atomic_set(&oct->hb_miss_cnt, 0);
+ 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
  
+@@ -1333,13 +1340,6 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	queue_delayed_work(octep_wq, &octep_dev->hb_task,
+ 			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
+ 
+-	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
+-	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
+-	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
+-	octep_dev->poll_non_ioq_intr = true;
+-	queue_delayed_work(octep_wq, &octep_dev->intr_poll_task,
+-			   msecs_to_jiffies(OCTEP_INTR_POLL_TIME_MSECS));
+-
+ 	netdev->netdev_ops = &octep_netdev_ops;
+ 	octep_set_ethtool_ops(netdev);
+ 	netif_carrier_off(netdev);
 -- 
-2.30.2
+2.25.1
 
 
