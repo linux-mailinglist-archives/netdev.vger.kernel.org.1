@@ -1,66 +1,103 @@
-Return-Path: <netdev+bounces-53206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8888019FD
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 03:20:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461E6801A03
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 03:28:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F4551C20ACF
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 02:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 755FA1C20BAF
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 02:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B71567C;
-	Sat,  2 Dec 2023 02:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVofHzzs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111C06135;
+	Sat,  2 Dec 2023 02:28:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7322C9C
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 02:20:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3689EC433C9;
-	Sat,  2 Dec 2023 02:19:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701483599;
-	bh=jv+tdtTf6KOSM4NMkkH6kJ/ll3oQ44CqAOvTnC9Q+y4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cVofHzzsiVx3/gqRJ83x7+hO/RjUlLHNWJhDChEXamTwmQBWAznIwwl/8gzvp1QOK
-	 b2LiyJMWvFmC9lwQ7HFpe+kuoMI7pHV4DRBLPe1FcGRXDEBSKKDuMh1iVs9yZzIlvM
-	 OvUHcYT8h2LQ8Jvn/m2URQN8/sjN8CwJdk9wKSSYSVFewFv6XJYh1DFzvY4hiFjWab
-	 BxfZNOVHLqlwqzB3Pq8lOgw87ADY97oM2py7Nt/sc64XVPRl4WHa6uOBHwMJHJgQ3M
-	 YyGyC+Pvx/WY/6AomRLjCBT/1yAn7B6XMy9ZsksDWo2LwFz6JZPgKWQix/hrmljFab
-	 XvaSAElvd7mcg==
-Date: Fri, 1 Dec 2023 18:19:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Liang Chen <liangchen.linux@gmail.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, hawk@kernel.org,
- linyunsheng@huawei.com, netdev@vger.kernel.org, linux-mm@kvack.org,
- jasowang@redhat.com
-Subject: Re: [PATCH net-next v6 1/4] page_pool: Rename pp_frag_count to
- pp_ref_count
-Message-ID: <20231201181958.31f72a43@kernel.org>
-In-Reply-To: <CAC_iWjKBE5s9iiTPKgsoDx5LSWjsSXE-7SSPSk+EVJXLC10-GQ@mail.gmail.com>
-References: <20231130115611.6632-1-liangchen.linux@gmail.com>
-	<20231130115611.6632-2-liangchen.linux@gmail.com>
-	<CAC_iWjL68n-GRN7vs_jwvzbnVy8sPh4_SP=wVDq0HkFOmSU-nQ@mail.gmail.com>
-	<CAC_iWjKBE5s9iiTPKgsoDx5LSWjsSXE-7SSPSk+EVJXLC10-GQ@mail.gmail.com>
+X-Greylist: delayed 346 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Dec 2023 18:27:56 PST
+Received: from mail-m12810.netease.com (mail-m12810.netease.com [103.209.128.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA638132;
+	Fri,  1 Dec 2023 18:27:56 -0800 (PST)
+Received: from [0.0.0.0] (unknown [IPV6:240e:3b7:3271:7f20:4433:b746:c1de:367])
+	by mail-m12773.qiye.163.com (Hmail) with ESMTPA id ABC322C027E;
+	Sat,  2 Dec 2023 10:21:37 +0800 (CST)
+Message-ID: <db0f5324-a4a8-3ae7-58f5-e82dd24643a9@sangfor.com.cn>
+Date: Sat, 2 Dec 2023 10:21:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v3] net/mlx5e: Fix a race in command alloc flow
+Content-Language: en-US
+To: Shifeng Li <lishifeng@sangfor.com.cn>, saeedm@nvidia.com,
+ leon@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, eranbe@mellanox.com, moshe@mellanox.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lishifeng1992@126.com,
+ Moshe Shemesh <moshe@nvidia.com>
+References: <20231130030559.622165-1-lishifeng@sangfor.com.cn>
+From: Ding Hui <dinghui@sangfor.com.cn>
+In-Reply-To: <20231130030559.622165-1-lishifeng@sangfor.com.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCS05LVh9DHU9DTk0fSUsaT1UTARMWGhIXJBQOD1
+	lXWRgSC1lBWUlPSx5BSBlMQUhJTEpBTB1JS0FPT0hIQRlMT01BGEofHkFITUxZV1kWGg8SFR0UWU
+	FZT0tIVUpNT0lOSVVKS0tVSkJZBg++
+X-HM-Tid: 0a8c2854d8aeb249kuuuabc322c027e
+X-HM-MType: 1
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6M1E6CCo*DDw4CgstLSwyMkNM
+	SDIaFE1VSlVKTEtKT0NITUJDQk9KVTMWGhIXVR8SFRwTDhI7CBoVHB0UCVUYFBZVGBVFWVdZEgtZ
+	QVlJT0seQUgZTEFISUxKQUwdSUtBT09ISEEZTE9NQRhKHx5BSE1MWVdZCAFZQUhDTkI3Bg++
 
-On Fri, 1 Dec 2023 12:10:10 +0200 Ilias Apalodimas wrote:
-> Jakub, are you ok with the name changes or is it going to make
-> bisecting a pain?
+On 2023/11/30 11:05, Shifeng Li wrote:
+> Fix a cmd->ent use after free due to a race on command entry.
+> Such race occurs when one of the commands releases its last refcount and
+> frees its index and entry while another process running command flush
+> flow takes refcount to this command entry. The process which handles
+> commands flush may see this command as needed to be flushed if the other
+> process allocated a ent->idx but didn't set ent to cmd->ent_arr in
+> cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
+> the spin lock.
+> 
+> [70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+> [70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
+> [70013.081968]
+> [70013.082028] Workqueue: events aer_isr
+> [70013.082053] Call Trace:
+> [70013.082067]  dump_stack+0x8b/0xbb
+> [70013.082086]  print_address_description+0x6a/0x270
+> [70013.082102]  kasan_report+0x179/0x2c0
+> [70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
+> [70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
+> [70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
+> [70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
+> [70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
+> [70013.082409]  pci_device_remove+0xf3/0x280
+> [70013.082439]  device_release_driver_internal+0x1c3/0x470
+> [70013.082453]  pci_stop_bus_device+0x109/0x160
+> [70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
+> [70013.082485]  pcie_do_fatal_recovery+0x167/0x550
+> [70013.082493]  aer_isr+0x7d2/0x960
+> [70013.082543]  process_one_work+0x65f/0x12d0
+> [70013.082556]  worker_thread+0x87/0xb50
+> [70013.082571]  kthread+0x2e9/0x3a0
+> [70013.082592]  ret_from_fork+0x1f/0x40
+> 
 
-It's perfectly fine.
-I should probably mention that I asked for this rename,
-so I'm not impartial :)
+It is better if you also put the diagram [1] in the commit log, that is easy to understand.
+
+[1] https://www.spinics.net/lists/netdev/msg951955.html
+
+> Fixes: 50b2412b7e78 ("net/mlx5: Avoid possible free of command entry while timeout comp handler")
+> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+> Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
+
+-- 
+Thanks,
+- Ding Hui
+
 
