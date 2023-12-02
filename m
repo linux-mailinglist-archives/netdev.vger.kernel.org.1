@@ -1,229 +1,169 @@
-Return-Path: <netdev+bounces-53227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34221801AB4
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:36:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC540801ABA
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:40:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDDC21F21130
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:36:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B34FE1C20AE6
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7191C05;
-	Sat,  2 Dec 2023 04:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6188C17;
+	Sat,  2 Dec 2023 04:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BnslKoHv"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iSCU+o24"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ABF619AD
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 04:36:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA2DCC433C7;
-	Sat,  2 Dec 2023 04:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701491764;
-	bh=6NhfdgwZTUrPIrSDJEJSv0GOyYpRQevIVy8JgFUc018=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BnslKoHvup4M6k2YoOB/yqcuqoXgwWX+E2Wp5w+qGLoD2/fcElkyRsJuQJgT29DMt
-	 34qAoeosfnr/LxwD0M/y7SSxFEePpb26IIkcEbJOoAIleR3lqeMCJwWvhkyVCafhsH
-	 C84VcOEA76m7iNFa2mRnY6OUPr+nFNhfxYYYDSqQy0p+3aeYeAXbMTrJTu72VwlnDc
-	 xL+edw5j+W1P2pUjMGdtiq4/QixJSReVzor2ygSPjGaxNs08e5vTvf2GMDmicpN19x
-	 wrJ5JNniIXKR1eqkXSZjCxGcmysnjDbMkHKRN+0wtEKIK4MBzJwL7/JicLc2D1vxDN
-	 SAtiRU/y8lLRQ==
-Date: Fri, 1 Dec 2023 20:36:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
- <pkshih@realtek.com>, <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v13 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <20231201203602.7e380716@kernel.org>
-In-Reply-To: <20231130114327.1530225-2-justinlai0215@realtek.com>
-References: <20231130114327.1530225-1-justinlai0215@realtek.com>
-	<20231130114327.1530225-2-justinlai0215@realtek.com>
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4B9D48
+	for <netdev@vger.kernel.org>; Fri,  1 Dec 2023 20:39:47 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6cde14ff73bso2288594b3a.0
+        for <netdev@vger.kernel.org>; Fri, 01 Dec 2023 20:39:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1701491986; x=1702096786; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8Y6F/avy73hBdHBfGZhJm2X6H2KWeohwE7b2q/RCBhw=;
+        b=iSCU+o241H1kCkeCYWpFLy2r2uzCWe49UkV+VaLP90OcfaAj1vTJ4d3EbfmX622+7M
+         dDpB+xco/Hg3NwLEZYw0/JFjQYbLhyQtA5Y9nHXzzPuOiVCWPp/uGpmB3rzL17ere0Pw
+         XO+DaAYeyVMS6brG2XVU+u+wzpJV2LyTvZXw4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701491986; x=1702096786;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Y6F/avy73hBdHBfGZhJm2X6H2KWeohwE7b2q/RCBhw=;
+        b=MDdk3F6waX78U0qYPVQbK19Rjljyx3TdsL/4by2elvR5+PliThc3R21eDgzAVsHG0e
+         TOmOXjI53mFSOxh8bz42HVW5KYyGQxu8oEnr09e7RtCuTgHE1/BVkNqJKQ0FDiR9KBYF
+         9wwht+kqRlVHLAMfRc8lmqFZnZuvnU1RcrGU78/IJVl6lA2t7kZbAc+Ljmr/h2WSZYvR
+         PRD51q4b6EI2zBLuQBGPF/fQecfXi9CR3lo2MM1igM8DfNHbAdgZzxHzTHyXIKEampxp
+         u23WR7Rk9EilMAb6AOF2n/vTxJH9yuvmR5DjFcRK11vfRS6ucDIbJf9Kmqih4DGgAf2K
+         o3bg==
+X-Gm-Message-State: AOJu0YxmDE5glIvh2rNz+1ZiL+KrRga91wdA1H1nfprmZoltFg2G4d0x
+	n5Q2cMN8JxN5vKJT9nDXs4dapQ==
+X-Google-Smtp-Source: AGHT+IH/BdewRMQ/fzaT4gRUZfAvLUViODtXGwcWXeQUBcu4ap+HfQc5J3caVqaEYx2QUqjXLsHQUg==
+X-Received: by 2002:a05:6a00:180f:b0:6ce:2757:7858 with SMTP id y15-20020a056a00180f00b006ce27577858mr746645pfa.19.1701491986409;
+        Fri, 01 Dec 2023 20:39:46 -0800 (PST)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x13-20020aa784cd000000b006cde2889213sm3848668pfn.14.2023.12.01.20.39.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Dec 2023 20:39:45 -0800 (PST)
+Date: Fri, 1 Dec 2023 20:39:44 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kernel test robot <lkp@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Michael Walle <mwalle@kernel.org>,
+	Max Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] netlink: Return unsigned value for nla_len()
+Message-ID: <202312012026.A0178237@keescook>
+References: <20231130200058.work.520-kees@kernel.org>
+ <20231130172520.5a56ae50@kernel.org>
+ <202312010953.BEDC06111@keescook>
+ <20231201104505.44ec5c89@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231201104505.44ec5c89@kernel.org>
 
-On Thu, 30 Nov 2023 19:43:15 +0800 Justin Lai wrote:
-> + *  Below is a simplified block diagram of the chip and its relevant interfaces.
-> + *
-> + *               *************************
-> + *               *                       *
-> + *               *  CPU network device   *
-> + *               *                       *
-> + *               *   +-------------+     *
-> + *               *   |  PCIE Host  |     *
-> + *               ***********++************
-> + *                          ||
-> + *                         PCIE
-> + *                          ||
-> + *      ********************++**********************
-> + *      *            | PCIE Endpoint |             *
-> + *      *            +---------------+             *
-> + *      *                | GMAC |                  *
-> + *      *                +--++--+  Realtek         *
-> + *      *                   ||     RTL90xx Series  *
-> + *      *                   ||                     *
-> + *      *     +-------------++----------------+    *
-> + *      *     |           | MAC |             |    *
-> + *      *     |           +-----+             |    *
-> + *      *     |                               |    *
-> + *      *     |     Ethernet Switch Core      |    *
-> + *      *     |                               |    *
-> + *      *     |   +-----+           +-----+   |    *
-> + *      *     |   | MAC |...........| MAC |   |    *
-> + *      *     +---+-----+-----------+-----+---+    *
-> + *      *         | PHY |...........| PHY |        *
-> + *      *         +--++-+           +--++-+        *
-> + *      *************||****************||***********
-> + *
-> + *  The block of the Realtek RTL90xx series is our entire chip architecture,
-> + *  the GMAC is connected to the switch core, and there is no PHY in between.
-> + *  In addition, this driver is mainly used to control GMAC, but does not
-> + *  control the switch core, so it is not the same as DSA.
+On Fri, Dec 01, 2023 at 10:45:05AM -0800, Jakub Kicinski wrote:
+> On Fri, 1 Dec 2023 10:17:02 -0800 Kees Cook wrote:
+> > > > -static inline int nla_len(const struct nlattr *nla)
+> > > > +static inline u16 nla_len(const struct nlattr *nla)
+> > > >  {
+> > > > -	return nla->nla_len - NLA_HDRLEN;
+> > > > +	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN : 0;
+> > > >  }  
+> > > 
+> > > Note the the NLA_HDRLEN is the length of struct nlattr.
+> > > I mean of the @nla object that gets passed in as argument here.
+> > > So accepting that nla->nla_len may be < NLA_HDRLEN means
+> > > that we are okay with dereferencing a truncated object...
+> > > 
+> > > We can consider making the return unsinged without the condition maybe?  
+> > 
+> > Yes, if we did it without the check, it'd do "less" damage on
+> > wrap-around. (i.e. off by U16_MAX instead off by INT_MAX).
+> > 
+> > But I'd like to understand: what's the harm in adding the clamp? The
+> > changes to the assembly are tiny:
+> > https://godbolt.org/z/Ecvbzn1a1
+> 
+> Hm, I wonder if my explanation was unclear or you disagree..
+> 
+> This is the structure:
+> 
+> struct nlattr {
+> 	__u16           nla_len; // attr len, incl. this header
+> 	__u16           nla_type;
+> };
+> 
+> and (removing no-op wrappers):
+> 
+> #define NLA_HDRLEN	sizeof(struct nlattr)
+> 
+> So going back to the code:
+> 
+> 	return nla->nla_len > NLA_HDRLEN ? nla->nla_len - NLA_HDRLEN...
+> 
+> We are reading nla->nla_len, which is the first 2 bytes of the structure.
+> And then we check if the structure is... there?
 
-Okay, but you seem to only register one netdev.
+I'm not debating whether it's there or not -- I'm saying the _contents_ of
+"nlattr::nla_len", in the face of corruption or lack of initialization,
+may be less than NLA_HDRLEN. (There's a lot of "but that's can't happen"
+that _does_ happen in the kernel, so I'm extra paranoid.)
 
-Which MAC is it for?
+> If we don't trust that struct nlattr which gets passed here is at least
+> NLA_HDRLEN (4B) then why do we think it's safe to read nla_len (the
+> first 2B of it)?
 
-> +#include <linux/crc32.h>
-> +#include <linux/dma-mapping.h>
-> +#include <linux/etherdevice.h>
-> +#include <linux/if_vlan.h>
-> +#include <linux/in.h>
-> +#include <linux/init.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/io.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/ip.h>
-> +#include <linux/ipv6.h>
-> +#include <linux/mdio.h>
-> +#include <linux/module.h>
-> +#include <linux/moduleparam.h>
+Type confusion (usually due to Use-after-Free flaws) means that a memory
+region is valid (i.e. good pointer), but that the contents might have
+gotten changed through other means. (To see examples of this with
+struct msg_msg, see: https://syst3mfailure.io/wall-of-perdition/)
 
-I don't see module params, please trim the includes.
+(On a related note, why does nla_len start at 4 instead of 0? i.e. why
+does it include the size of nlattr? That seems redundant based on the
+same logic you're using here.)
 
-> +#include <linux/netdevice.h>
-> +#include <linux/pci.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/prefetch.h>
-> +#include <linux/rtnetlink.h>
-> +#include <linux/tcp.h>
-> +#include <asm/irq.h>
-> +#include <net/ip6_checksum.h>
-> +#include <net/page_pool/helpers.h>
-> +#include <net/pkt_cls.h>
+> That's why I was pointing at nla_ok(). nla_ok() takes the size of the
+> buffer / message as an arg, so that it can also check if looking at
+> nla_len itself is not going to be an OOB access. 99% of netlink buffers
+> we parse come from user space. So it's not like someone could have
+> mis-initialized the nla_len in the kernel and being graceful is helpful.
+> 
+> The extra conditional is just a minor thing. The major thing is that
+> unless I'm missing something the check makes me go 🤨️
 
-> +static void rtase_get_mac_address(struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	u8 mac_addr[ETH_ALEN] __aligned(2) = {};
-> +	u32 i;
-> +
-> +	for (i = 0; i < ETH_ALEN; i++)
-> +		mac_addr[i] = rtase_r8(tp, RTASE_MAC0 + i);
-> +
-> +	if (!is_valid_ether_addr(mac_addr)) {
-> +		eth_random_addr(mac_addr);
-> +		dev->addr_assign_type = NET_ADDR_RANDOM;
+My concern is that there are 562 callers of nla_len():
 
-eth_hw_addr_random()
+$ git grep '\bnla_len(\b' | wc -l
+562
 
-> +		netdev_warn(dev, "Random ether addr %pM\n", mac_addr);
-> +	}
-> +
-> +	eth_hw_addr_set(dev, mac_addr);
-> +	rtase_rar_set(tp, mac_addr);
-> +
-> +	ether_addr_copy(dev->perm_addr, dev->dev_addr);
+We have no way to be certain that all callers follow a successful
+nla_ok() call.
 
-Should it be perm if it's random?
+Regardless, just moving from "int" to "u16" solves a bunch of value
+range tracking pain that GCC appears to get upset about, so if you
+really don't want the (tiny) sanity check, I can just send the u16
+change.
 
-> +}
-> +
-> +static void rtase_reset_interrupt(struct pci_dev *pdev,
-> +				  const struct rtase_private *tp)
-> +{
-> +	if (tp->sw_flag & SWF_MSIX_ENABLED)
-> +		pci_disable_msix(pdev);
-> +	else
-> +		pci_disable_msi(pdev);
-> +}
-> +
-> +static int rtase_alloc_msix(struct pci_dev *pdev, struct rtase_private *tp)
-> +{
-> +	int ret;
-> +	u16 i;
-> +
-> +	memset(tp->msix_entry, 0x0, RTASE_NUM_MSIX * sizeof(struct msix_entry));
-> +
-> +	for (i = 0; i < RTASE_NUM_MSIX; i++)
-> +		tp->msix_entry[i].entry = i;
-> +
-> +	ret = pci_enable_msix_range(pdev, tp->msix_entry, tp->int_nums,
-> +				    tp->int_nums);
+-Kees
 
-pci_enable_msix_exact()
-
-> +	if (ret == tp->int_nums) {
-> +		for (i = 0; i < tp->int_nums; i++) {
-> +			tp->int_vector[i].irq = pci_irq_vector(pdev, i);
-> +			tp->int_vector[i].status = 1;
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-
-> +	if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)))
-> +		dev->features |= NETIF_F_HIGHDMA;
-> +	else if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32)))
-> +		goto err_out_free_res;
-> +	else
-> +		dev_info(&pdev->dev, "DMA_BIT_MASK: 32\n");
-
-This dance is unnecessary, see https://lkml.org/lkml/2021/6/7/398
-
-> +	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
-> +	if (!dev->tstats)
-> +		goto err_out_1;
-
-Please use dev->pcpu_stat_type
-Set it before register and core will allocate stats for you.
-
-> +	ret = register_netdev(dev);
-> +	if (ret != 0)
-> +		goto err_out;
-> +
-> +	netdev_dbg(dev, "%pM, IRQ %d\n", dev->dev_addr, dev->irq);
-> +
-> +	netif_carrier_off(dev);
-
-Should be before register_netdev().
-
-> +	goto out;
-
-Just return 0...
-
-> +static void rtase_remove_one(struct pci_dev *pdev)
-> +{
-> +	struct net_device *dev = pci_get_drvdata(pdev);
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	struct rtase_int_vector *ivec;
-> +	u32 i;
-> +
-> +	for (i = 0; i < tp->int_nums; i++) {
-> +		ivec = &tp->int_vector[i];
-> +		netif_napi_del(&ivec->napi);
-
-NAPI instances should be added on ndo_open()
+-- 
+Kees Cook
 
