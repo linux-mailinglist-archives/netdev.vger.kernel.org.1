@@ -1,180 +1,156 @@
-Return-Path: <netdev+bounces-53234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0C3801B6A
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:12:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACB2801B78
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:20:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256251C2083C
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 08:12:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CE9D1C209EC
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 08:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785EFC8CE;
-	Sat,  2 Dec 2023 08:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240F1D29F;
+	Sat,  2 Dec 2023 08:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFhgzukW"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 542 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 00:12:05 PST
-Received: from mail-m12821.netease.com (mail-m12821.netease.com [103.209.128.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA2B3134;
-	Sat,  2 Dec 2023 00:12:05 -0800 (PST)
-Received: from ubuntu.localdomain (unknown [111.222.250.119])
-	by mail-m12750.qiye.163.com (Hmail) with ESMTPA id D46C3F20445;
-	Sat,  2 Dec 2023 16:02:31 +0800 (CST)
-From: Shifeng Li <lishifeng@sangfor.com.cn>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	eranbe@mellanox.com,
-	moshe@mellanox.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dinghui@sangfor.com.cn,
-	lishifeng1992@126.com,
-	Shifeng Li <lishifeng@sangfor.com.cn>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [PATCH net v4] net/mlx5e: Fix a race in command alloc flow
-Date: Sat,  2 Dec 2023 00:01:26 -0800
-Message-Id: <20231202080126.1167237-1-lishifeng@sangfor.com.cn>
-X-Mailer: git-send-email 2.25.1
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8F1198;
+	Sat,  2 Dec 2023 00:19:50 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a00ac0101d9so419348466b.0;
+        Sat, 02 Dec 2023 00:19:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701505188; x=1702109988; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ngS2ris1InPJCJ/71s9B7T9BRtWlJbWZ8eermDVsAPc=;
+        b=GFhgzukWyDXg7MgnY46Fk/3BnJ5WW7jIrguE3BWfbAs5NSPlxS04R6SzdtvZVx3o4I
+         QLEhUdc805I1Trt3h+GOp5mJWjl/7GI6oJscoHzMqbh7Xty6KdwQK5QDlfCOCBb7t6bJ
+         umMnf3ka3H8D8lilraegnFFK7xJX4SOliNj4Fofyc/SuDu+DWnmzNxWUKzBeP45FYZqr
+         Nb9fmqa/IdmQCrJQnOgeAkQVFz5LZ3Me9EYdqkgFLovZa5HnARtp5m1ZfncT+BFPvGFA
+         EfwzdSHOhhaLY0nlTbX7AgzWGmAATo7Y/EqhhiGjuU2oE5PzzOlaowahxWMTiP27jA6u
+         f7yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701505188; x=1702109988;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ngS2ris1InPJCJ/71s9B7T9BRtWlJbWZ8eermDVsAPc=;
+        b=Ze30m9oI8c1boZ6E5rFrURt2w1jkmUqB3xeQEEJsMSmGkBw/w1DFaX6qItlOWP5Mk4
+         5fchMO5v/rwyuw2EIJd7uIkA15Q4WJiw0giSbIdBLfaYa6ubW7X3WNtN/NdZSprakUWP
+         zIDf+AAwvmvKrOexWQ8F70TJhVxbwOnJot6yBfW2PobQzLdgYodAj7aVkhU1JXCTSz4q
+         lUOsQH2LcqUkWTtiFbOnHPENRi4isr1/Goy9NFl5pnJ7tp/82xR54EDvbJr/D4NKRUm4
+         KNcFXpuX9vphwTYzeIOjA6af9h7CFS1BKAEk4Ftbv4hPa2pVM9E4jMmhVIY8GxOsZeAh
+         ExKQ==
+X-Gm-Message-State: AOJu0Yw5lb+gQ8Xp2/82oYpaEzqBPmtYVbXbztBI9PdxBGO0oLts8TdU
+	xq39g4INBqFFfVg07T+3rk8=
+X-Google-Smtp-Source: AGHT+IHWXh9VTXKmwGrvfSO853aykEmjVyN78J/yeawbEJQEovLJurQPBXSZ6B3//ZNgrNwLMNLFBA==
+X-Received: by 2002:a17:906:10c8:b0:a19:a1ba:da52 with SMTP id v8-20020a17090610c800b00a19a1bada52mr1277430ejv.121.1701505187903;
+        Sat, 02 Dec 2023 00:19:47 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c5f2:af00:b411:4430:8d9f:2d09? (dynamic-2a01-0c23-c5f2-af00-b411-4430-8d9f-2d09.c23.pool.telefonica.de. [2a01:c23:c5f2:af00:b411:4430:8d9f:2d09])
+        by smtp.googlemail.com with ESMTPSA id re17-20020a170906d8d100b009fc0c42098csm2835546ejb.173.2023.12.02.00.19.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Dec 2023 00:19:47 -0800 (PST)
+Message-ID: <5576d307-36f7-4cb5-80e7-290b659ba573@gmail.com>
+Date: Sat, 2 Dec 2023 09:19:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCH0oYVkoZHkpMTB0fGh4eHlUTARMWGhIXJBQOD1
-	lXWRgSC1lBWUpKSlVJSUlVSU5LVUpKQllXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQktLWQ
-	Y+
-X-HM-Tid: 0a8c298cf3a7b21dkuuud46c3f20445
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6OAw6Dxw*KTw8KAsCGCEZKgE3
-	URMaCzhVSlVKTEtKTktPSk5IS01DVTMWGhIXVRcSCBMSHR4VHDsIGhUcHRQJVRgUFlUYFUVZV1kS
-	C1lBWUpKSlVJSUlVSU5LVUpKQllXWQgBWUFNSEpCNwY+
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] r8169: fix rtl8125b PAUSE frames blasting when
+ suspended
+Content-Language: en-US
+To: ChunHao Lin <hau@realtek.com>
+Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, grundler@chromium.org, stable@vger.kernel.org
+References: <20231129155350.5843-1-hau@realtek.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231129155350.5843-1-hau@realtek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix a cmd->ent use after free due to a race on command entry.
-Such race occurs when one of the commands releases its last refcount and
-frees its index and entry while another process running command flush
-flow takes refcount to this command entry. The process which handles
-commands flush may see this command as needed to be flushed if the other
-process allocated a ent->idx but didn't set ent to cmd->ent_arr in
-cmd_work_handler(). Fix it by moving the assignment of cmd->ent_arr into
-the spin lock.
+On 29.11.2023 16:53, ChunHao Lin wrote:
+> When FIFO reaches near full state, device will issue pause frame.
+> If pause slot is enabled(set to 1), in this time, device will issue
+> pause frame only once. But if pause slot is disabled(set to 0), device
+> will keep sending pause frames until FIFO reaches near empty state.
+> 
+> When pause slot is disabled, if there is no one to handle receive
+> packets, device FIFO will reach near full state and keep sending
+> pause frames. That will impact entire local area network.
+> 
+> This issue can be reproduced in Chromebox (not Chromebook) in
+> developer mode running a test image (and v5.10 kernel):
+> 1) ping -f $CHROMEBOX (from workstation on same local network)
+> 2) run "powerd_dbus_suspend" from command line on the $CHROMEBOX
+> 3) ping $ROUTER (wait until ping fails from workstation)
+> 
+> Takes about ~20-30 seconds after step 2 for the local network to
+> stop working.
+> 
+> Fix this issue by enabling pause slot to only send pause frame once
+> when FIFO reaches near full state.
+> 
+> Fixes: f1bce4ad2f1c ("r8169: add support for RTL8125")
+> Reported-by: Grant Grundler <grundler@chromium.org>
+> Tested-by: Grant Grundler <grundler@chromium.org>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> ---
+> v2:
+> - update comment and title.
+> ---
 
-[70013.081955] BUG: KASAN: use-after-free in mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.081967] Write of size 4 at addr ffff88880b1510b4 by task kworker/26:1/1433361
-[70013.081968]
-[70013.082028] Workqueue: events aer_isr
-[70013.082053] Call Trace:
-[70013.082067]  dump_stack+0x8b/0xbb
-[70013.082086]  print_address_description+0x6a/0x270
-[70013.082102]  kasan_report+0x179/0x2c0
-[70013.082173]  mlx5_cmd_trigger_completions+0x1e2/0x4c0 [mlx5_core]
-[70013.082267]  mlx5_cmd_flush+0x80/0x180 [mlx5_core]
-[70013.082304]  mlx5_enter_error_state+0x106/0x1d0 [mlx5_core]
-[70013.082338]  mlx5_try_fast_unload+0x2ea/0x4d0 [mlx5_core]
-[70013.082377]  remove_one+0x200/0x2b0 [mlx5_core]
-[70013.082409]  pci_device_remove+0xf3/0x280
-[70013.082439]  device_release_driver_internal+0x1c3/0x470
-[70013.082453]  pci_stop_bus_device+0x109/0x160
-[70013.082468]  pci_stop_and_remove_bus_device+0xe/0x20
-[70013.082485]  pcie_do_fatal_recovery+0x167/0x550
-[70013.082493]  aer_isr+0x7d2/0x960
-[70013.082543]  process_one_work+0x65f/0x12d0
-[70013.082556]  worker_thread+0x87/0xb50
-[70013.082571]  kthread+0x2e9/0x3a0
-[70013.082592]  ret_from_fork+0x1f/0x40
+Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-The logical relationship of this error is as follows:
-
-             aer_recover_work              |          ent->work
--------------------------------------------+------------------------------
-aer_recover_work_func                      |
-|- pcie_do_recovery                        |
-  |- report_error_detected                 |
-    |- mlx5_pci_err_detected               |cmd_work_handler
-      |- mlx5_enter_error_state            |  |- cmd_alloc_index
-        |- enter_error_state               |    |- lock cmd->alloc_lock
-          |- mlx5_cmd_flush                |    |- clear_bit
-            |- mlx5_cmd_trigger_completions|    |- unlock cmd->alloc_lock
-              |- lock cmd->alloc_lock      |
-              |- vector = ~dev->cmd.vars.bitmask
-              |- for_each_set_bit          |
-                |- cmd_ent_get(cmd->ent_arr[i]) (UAF) 
-              |- unlock cmd->alloc_lock    |  |- cmd->ent_arr[ent->idx]=ent
-
-The cmd->ent_arr[ent->idx] assignment and the bit clearing are not 
-protected by the cmd->alloc_lock in cmd_work_handler().
-
-Fixes: 50b2412b7e78 ("net/mlx5: Avoid possible free of command entry while timeout comp handler")
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
----
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
----
-v1->v2: fix code conflicts.
-v2->v3: modify Fixes line and massage git log.
-v3->v4: add target tree name in the subject and add the logical diagram.
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index f8f0a712c943..a7b1f9686c09 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -156,15 +156,18 @@ static u8 alloc_token(struct mlx5_cmd *cmd)
- 	return token;
- }
- 
--static int cmd_alloc_index(struct mlx5_cmd *cmd)
-+static int cmd_alloc_index(struct mlx5_cmd *cmd, struct mlx5_cmd_work_ent *ent)
- {
- 	unsigned long flags;
- 	int ret;
- 
- 	spin_lock_irqsave(&cmd->alloc_lock, flags);
- 	ret = find_first_bit(&cmd->vars.bitmask, cmd->vars.max_reg_cmds);
--	if (ret < cmd->vars.max_reg_cmds)
-+	if (ret < cmd->vars.max_reg_cmds) {
- 		clear_bit(ret, &cmd->vars.bitmask);
-+		ent->idx = ret;
-+		cmd->ent_arr[ent->idx] = ent;
-+	}
- 	spin_unlock_irqrestore(&cmd->alloc_lock, flags);
- 
- 	return ret < cmd->vars.max_reg_cmds ? ret : -ENOMEM;
-@@ -979,7 +982,7 @@ static void cmd_work_handler(struct work_struct *work)
- 	sem = ent->page_queue ? &cmd->vars.pages_sem : &cmd->vars.sem;
- 	down(sem);
- 	if (!ent->page_queue) {
--		alloc_ret = cmd_alloc_index(cmd);
-+		alloc_ret = cmd_alloc_index(cmd, ent);
- 		if (alloc_ret < 0) {
- 			mlx5_core_err_rl(dev, "failed to allocate command entry\n");
- 			if (ent->callback) {
-@@ -994,15 +997,14 @@ static void cmd_work_handler(struct work_struct *work)
- 			up(sem);
- 			return;
- 		}
--		ent->idx = alloc_ret;
- 	} else {
- 		ent->idx = cmd->vars.max_reg_cmds;
- 		spin_lock_irqsave(&cmd->alloc_lock, flags);
- 		clear_bit(ent->idx, &cmd->vars.bitmask);
-+		cmd->ent_arr[ent->idx] = ent;
- 		spin_unlock_irqrestore(&cmd->alloc_lock, flags);
- 	}
- 
--	cmd->ent_arr[ent->idx] = ent;
- 	lay = get_inst(cmd, ent->idx);
- 	ent->lay = lay;
- 	memset(lay, 0, sizeof(*lay));
--- 
-2.25.1
 
 
