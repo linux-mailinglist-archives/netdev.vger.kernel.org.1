@@ -1,118 +1,64 @@
-Return-Path: <netdev+bounces-53171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569868018DB
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 01:20:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0D18018EA
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 01:28:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8820B20CE9
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B36AE281BFD
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 00:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAC97E2;
-	Sat,  2 Dec 2023 00:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA8D193;
+	Sat,  2 Dec 2023 00:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jn43UGKF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCO6gc5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B6CCF;
-	Fri,  1 Dec 2023 16:20:19 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c9b5c12898so34226401fa.2;
-        Fri, 01 Dec 2023 16:20:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701476417; x=1702081217; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=V7H5mtM4rdlF96TurskSVKsv77wngFKN9XzMokfXX3o=;
-        b=Jn43UGKFRFJ0+BEoGYvujtwfUqqKtIr6LDAE+RABaR+aVGqcnIx9X9jdWX7QQ8vIhF
-         E+loP/zR25iuxh77C4btFqjufM4WD3BO2iyr9QdKMy3yGDdswhGhTm5BhnKpzH++fMND
-         zGK4JuVbf316yQGLyUbTcV9WKT/UktTEHsfqJbJUTSbSRn9q/6/p8gjzreGNi/SmfCr3
-         pnE4OHHQKOcPdAIY3UXT0u+zXq3fVybVi4WWzvlKWrVN1lRZ1poPiJ5Lc1qAlyBMy1hf
-         19xNACl2sU2y+boBKntWDxToJ9O9xgm4rJmEJRv0/UPG0I5o8AHMU2uoTIaX3dJFq48F
-         +qdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701476417; x=1702081217;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V7H5mtM4rdlF96TurskSVKsv77wngFKN9XzMokfXX3o=;
-        b=gIOVEQWQwbhgyaaxtu5zJHX9YrxLDozKa65p7yZFZ3XnQDZ+2UTERbXnoS+q31ndcw
-         P22HAiS1z0JdsQ8D4grM9jZizJEaNRxooKqL7IgBXFMx1sr0dA4/6Q2Tozfhq+lwyvuM
-         MCeABfqJiw3+o83O8Bpd4c3bEV8ToxHoq/Qd1S5qVgdIo1GTzO/4GvOzSPLB/58WkiYr
-         7IvClF9NCAwyr1DyBAOuVG2RtOsb1Tc827OScTX5uFC8519CddvS0SUz0lUrUfD2hbLD
-         ldOnyohNNbT9K72H0U+K+MuHZDRY/8+PpJTjPzGRnHyFT/1ApaN1CsY0akVNxbeWYX/U
-         TUcQ==
-X-Gm-Message-State: AOJu0YyIQYXyB5sJRa0qtUuuTaLChD+qCrslkclMvnKDilrM+kMxyquo
-	4lJR/sdi+eq0zwrodjLs/sM=
-X-Google-Smtp-Source: AGHT+IHIx/W2tOPuzPFRMcUv6dY0UL4yjmePC/SUMhNp+oiMbw0mgLKn5Mr6poXdbiv24WSxMFodQA==
-X-Received: by 2002:a2e:8895:0:b0:2c9:d874:6efc with SMTP id k21-20020a2e8895000000b002c9d8746efcmr1441290lji.89.1701476417363;
-        Fri, 01 Dec 2023 16:20:17 -0800 (PST)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170906a40d00b00a18a9931dc1sm2365617ejz.105.2023.12.01.16.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Dec 2023 16:20:16 -0800 (PST)
-Message-ID: <d2fe8b0593a1009305e90d98a8bff984c1314748.camel@gmail.com>
-Subject: Re: [PATCH ipsec-next v3 5/9] libbpf: selftests: Add verifier tests
- for CO-RE bitfield writes
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>, Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, shuah@kernel.org,
- andrii@kernel.org,  steffen.klassert@secunet.com,
- antony.antony@secunet.com,  alexei.starovoitov@gmail.com,
- yonghong.song@linux.dev, mykolal@fb.com,  martin.lau@linux.dev,
- song@kernel.org, john.fastabend@gmail.com,  kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, devel@linux-ipsec.org,
- netdev@vger.kernel.org
-Date: Sat, 02 Dec 2023 02:20:15 +0200
-In-Reply-To: <ka2irjz53qjkax545o67mvouyytzqw3dvorqixe2q72crgzjpi@he2uiobuelvd>
-References: <cover.1701462010.git.dxu@dxuuu.xyz>
-	 <e4d14fb5f07145ff4a367cc01d8dcf6c82581c88.1701462010.git.dxu@dxuuu.xyz>
-	 <CAEf4Bzaz+_y=kxBpPmwYsvzaHypmL=ZBfOK12vLom04DRDWyPg@mail.gmail.com>
-	 <ka2irjz53qjkax545o67mvouyytzqw3dvorqixe2q72crgzjpi@he2uiobuelvd>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADB4180;
+	Sat,  2 Dec 2023 00:28:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C8B4C433C7;
+	Sat,  2 Dec 2023 00:28:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701476925;
+	bh=R0k0tXYJ+7iYYb4PuYlDXmyrZ419znNCZk78MJognfE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XCO6gc5YMrsqvtUec95lwReeHXO5R8bI0Ex9DtHRiUJXNZ63Teeyhqo7Om3Sxt4WS
+	 gc1qn1MvOYLzYbNKc4+psBCm5dnBIV/8qFazpLjIiTIGosJ1N5P0/bX+qilx2kZjUU
+	 Ol1tD8AIHrhn/Y+0Xt6LELQSaw72nd/q8cmsudFfaCRtjV5cSpGBusIqYWYpIm5wmo
+	 kW+Z2+jhOkmht4aR2adt32/IbIZO4gfx+YJP5oH/tE/gK7Cw3aVQwKmW6uGT9u9rOJ
+	 jImLtnsURwka7Sdd2Tc1DybR0fHRb2WuZXRE6cQv7rZXaukjHzdsKls5tWADvHCTj5
+	 VrGNFHVBRoRqw==
+Date: Fri, 1 Dec 2023 16:28:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
+Message-ID: <20231201162844.14d1bbb0@kernel.org>
+In-Reply-To: <20231201104329.25898-5-johannes@sipsolutions.net>
+References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+	<20231201104329.25898-5-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2023-12-01 at 17:10 -0700, Daniel Xu wrote:
-[...]
-> > > +SEC("tc")
-> > > +__description("single CO-RE bitfield roundtrip")
-> > > +__btf_path("btf__core_reloc_bitfields.bpf.o")
-> > > +__success __failure_unpriv
-> >=20
-> > do we want __failure_unpriv at all? Is this failure related to
-> > *bitfield* logic at all?
->=20
-> Oh, I pre-emptively added it. From the docs, I thought __failure_unpriv
-> meant "don't try to load this as an unprivileged used cuz it'll fail".
-> And since I used the tc hook, I figured it'd fail.
+On Fri,  1 Dec 2023 11:41:14 +0100 Johannes Berg wrote:
+> So I had put this aside for a while, but really got annoyed by all
+> the test failures now ... thinking about this again I basically now
+> arrived at a variant of solution #3 previously outlined, and I've
+> kind of convinced myself that userspace should always get an event
+> with a new carrier_up_count as it does today.
 
-Actually it means:
-"try to load as unprivileged user and expect failure,
- report error on successful load".
-
-In general, the meaning of "___xxx" and "___xxx_unpriv" annotations
-is identical, except first instructs to run the test in privileged mode,
-while second instructs to run test in unprivileged mode:
-- if only annotations w/o "*_unpriv" suffix are present the test would
-  be executed as privileged;
-- if only annotations with "*_unpriv" suffix are present the test would
-  be executed as unprivileged;
-- if both kinds of annotations are present the test would be executed
-  in both modes.
-
-[...]
+Would it work if we exposed "linkwatch is pending" / "link is
+transitioning" bit to user space?
+Even crazier, would it help if we had rtnl_getlink() run
+linkwatch for the target link if linkwatch is pending?
 
