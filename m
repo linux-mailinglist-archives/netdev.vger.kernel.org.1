@@ -1,85 +1,74 @@
-Return-Path: <netdev+bounces-53261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E819801D5C
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:45:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1238D801D6B
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 15:56:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5D92281B7B
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 14:45:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43E1F1C208BC
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 14:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A4A1946D;
-	Sat,  2 Dec 2023 14:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4D118C0F;
+	Sat,  2 Dec 2023 14:56:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E717134
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 06:45:23 -0800 (PST)
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1fafbf42404so2281572fac.1
-        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 06:45:23 -0800 (PST)
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B2B5106
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 06:56:05 -0800 (PST)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b6d023424bso2173559b6e.3
+        for <netdev@vger.kernel.org>; Sat, 02 Dec 2023 06:56:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701528322; x=1702133122;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uXji0FayEZ6ZtxjggJXewCoQp56yCFYLUG6+WjvjOH0=;
-        b=nPdfU7ojuYxxl1sBSsiCqNO4AV5ICpEPT8Kn+gckmQF4/jxCM9tOzY2jahnLPQOLO6
-         a5LFp5OaXGAqhjnepjpI18KNkyqaTuVmNm0Dre4TUgpraz2gUst/fN2C1bHchP+khjBp
-         fxPA2jHtoyU9OumqxRsbfUvHL8RPIOMT6zklnmFu1qn8uo8IBc0resEE9+u+q1+hijjh
-         R523cWYvpDADw5zogKGik2Ak3JYYZg5Nc6IVENXIRfy3cjySmrJuZLmcNYxY8TwcGb2S
-         I4xWYu7s5pl2A3jYqpmzfk1rGj01Xzd8MCM5nQqTOPdfExGG9bnddKpIScGD853dLT+S
-         EqYA==
-X-Gm-Message-State: AOJu0YyKZKR/RJHocMBpCjsAM9Yne7q/XqWfhGJZskqqMfARRmWI3ER+
-	n9nppORWvu/2muOkBZy7qLiq4r8WhcK83Cx1ryVc+i1PcSPx
-X-Google-Smtp-Source: AGHT+IG9uEwV+geit3YX8pywaHxADr5o9qfC/4ittVHFsfKR4mufuPIca7zzAfGnfqGuSmhQx2FkG6zobjB/PRwPmOOEE29VI//U
+        d=1e100.net; s=20230601; t=1701528964; x=1702133764;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nu5xLdLOLeUMpry7HT1oxjIq+0DkqL24uDVpCnJXOHU=;
+        b=k5NOfTqyNxFqdpF2apZxM8WW94P46xTYtbvmf8t3hW1f/L7mIq/gJBdkXrIWZrgv/l
+         on30gZt6BnvfS4ulf8r6o2Fs00DYekW4efPgOpMGev4dN0dn5H2wupaw1daBjqCv1+/F
+         gEaoODG5ljmjV2QWcPAIMcLtSejMVftThuGk2P0oj+wWBKkqaKjricim9O5IdDXGw/T8
+         ZzH34WEmhjx/ZbVvXBxsEyqrQ9Pri01FaHABmjgZzdlLsov0S+NY8xoxMi+K6Ji4Ow5u
+         EhfuCAb6Wrd4eaNN1nXUvOr9dhcOc7HUiXZII277fD6mM9nKTE+P29QFEa9NNeISncHn
+         uPYg==
+X-Gm-Message-State: AOJu0Yy++cgIdNaUNJEXY//tY1sziD5rVn5YoxqwNgbFUmdFbhdq8xhf
+	50gzfjj6BMdDXrqw628ZFE/oqXwhabZKn6s7EzUFgE3i5n98
+X-Google-Smtp-Source: AGHT+IHCaaicQHGkcJ9gewQxrg9Zx+K/8/06nvLqQ1tRUvyVjVoCAee8lRno5uUJ9zOPWaIEeG0tubhqY/SSq9LRkA2GZEvuUaK9
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:3312:b0:1fa:de51:f90b with SMTP id
- x18-20020a056870331200b001fade51f90bmr789107oae.11.1701528322667; Sat, 02 Dec
- 2023 06:45:22 -0800 (PST)
-Date: Sat, 02 Dec 2023 06:45:22 -0800
+X-Received: by 2002:a05:6808:189f:b0:3b8:9b14:756c with SMTP id
+ bi31-20020a056808189f00b003b89b14756cmr699004oib.9.1701528964701; Sat, 02 Dec
+ 2023 06:56:04 -0800 (PST)
+Date: Sat, 02 Dec 2023 06:56:04 -0800
+In-Reply-To: <0642446f-ebd9-429a-a293-94840c765038@siddh.me>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003f7eb8060b87efb6@google.com>
-Subject: [syzbot] Monthly wireguard report (Dec 2023)
-From: syzbot <syzbot+liste63a02b3d759fb087a11@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Message-ID: <0000000000008424e2060b881511@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in nfc_alloc_send_skb
+From: syzbot <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+To: code@siddh.me, davem@davemloft.net, edumazet@google.com, 
+	krzysztof.kozlowski@linaro.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+X-Spam-Level: **
 
-Hello wireguard maintainers/developers,
+Hello,
 
-This is a 31-day syzbot report for the wireguard subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireguard
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 4 issues are still open and 15 have been fixed so far.
+Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
 
-Some of the still happening issues:
+Tested on:
 
-Ref Crashes Repro Title
-<1> 818     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
-                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
-<2> 594     No    KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll (2)
-                  https://syzkaller.appspot.com/bug?extid=d1de830e4ecdaac83d89
-<3> 3       No    KCSAN: data-race in wg_packet_handshake_receive_worker / wg_packet_rx_poll (6)
-                  https://syzkaller.appspot.com/bug?extid=57cb9d16a1b17521eb76
+commit:         7453d7a6 nfp: ethtool: expose transmit SO_TIMESTAMPING..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=1632f254e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=94286555cac4ea49
+dashboard link: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=11d5552ce80000
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Note: testing is done by a robot and is best-effort only.
 
