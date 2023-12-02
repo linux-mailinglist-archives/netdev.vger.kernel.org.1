@@ -1,98 +1,78 @@
-Return-Path: <netdev+bounces-53221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C526801A95
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:20:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F44801A9D
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 05:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C932728140D
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:20:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E10E1F2110C
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 04:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147308F6D;
-	Sat,  2 Dec 2023 04:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F478F6D;
+	Sat,  2 Dec 2023 04:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OE9/YrLf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKN5sxY/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF688BFB;
-	Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55B81C433C9;
-	Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172FD8F55
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 04:20:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEA5EC433C8;
+	Sat,  2 Dec 2023 04:20:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701490824;
-	bh=wY26yQIEBbe4Nr9NvsYTLwnEbE6uZhSZJ1xkeUJI2dM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OE9/YrLfJEZhgX63nlNw2azgOcPe/dNf2/yBrovdJdVvFBKdkXS2qTw9Nja5kK/wz
-	 LxzeLR02oAuI1PDjhz3qEVYpVTKPvtVySOKGvU1viYdrxmWzR3dCNr4sGJ8Jbz0KgN
-	 Ch7FFM6mC5OnqaAXxAWsr+FS4ylJXKBczJYE3I9XN5JvSAeglmV64A6IGn0aySxwQ9
-	 bMqQuutpptLKgbKSquJbeahve7MAE+krVxlXfR4jkurvBsqpKodTRDYHUQPcgUACKI
-	 vJbbHj8+K8BNgtcX84iv/mtR5L41IIbn12rLINgLI5CdznK+xSeEBxA7+A3ircVWUR
-	 IHraTD/zgEKEg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3F68AC64459;
-	Sat,  2 Dec 2023 04:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1701490844;
+	bh=Q5sTfh6XDzNIXrht9g0ro8YBIqK0zlToGlBkJL7c0vI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SKN5sxY/XlhNrm9/y15bJS0Uf+LOxBEAjxjTx3q3svyEUakk7EE2prdGNL4oxigrx
+	 J2iZt7feAfJvb3NEmkDC6ELKrWeQI7WW+tCAxeCJNoWw/XzSAoqg2D74KPsF3AMIQc
+	 nsMZvMmbRN3eJP4NAEJnAvNPsUTX6+CpS2wC/L7Bxefw4Y1OZs8G1Mcyf7vxPKw/qM
+	 YU7RC7keRAPpr6e/GDZhj/abpw0WDTuU8T+Zn2Ga4spBr5/ULZHgqhkIRs8bi2iv9E
+	 IWZAdEV3yFEd6bpfVvHm6RBZCIbBgjVSfRV/aRwgajOhl9ayMbeTSrD3St9ZeWZCAW
+	 ORiQ5sODQy2PQ==
+Date: Fri, 1 Dec 2023 20:20:42 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Coco Li <lixiaoyan@google.com>, Eric Dumazet <edumazet@google.com>, Neal
+ Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi
+ <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, David Ahern <dsahern@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu
+ <wwchao@google.com>, Wei Wang <weiwan@google.com>, Pradeep Nemavat
+ <pnemavat@google.com>
+Subject: Re: [PATCH v8 net-next 2/5] cache: enforce cache groups
+Message-ID: <20231201202042.1d352825@kernel.org>
+In-Reply-To: <20231129072756.3684495-3-lixiaoyan@google.com>
+References: <20231129072756.3684495-1-lixiaoyan@google.com>
+	<20231129072756.3684495-3-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] hv_netvsc: rndis_filter needs to select NLS
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170149082425.6898.11188583894805240877.git-patchwork-notify@kernel.org>
-Date: Sat, 02 Dec 2023 04:20:24 +0000
-References: <20231130055853.19069-1-rdunlap@infradead.org>
-In-Reply-To: <20231130055853.19069-1-rdunlap@infradead.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, haiyangz@microsoft.com, kys@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, linux-hyperv@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, horms@kernel.org, mikelley@microsoft.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 29 Nov 2023 07:27:53 +0000 Coco Li wrote:
+> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+> index 08a3e603db192..0a890fe4d22b1 100755
+> --- a/scripts/kernel-doc
+> +++ b/scripts/kernel-doc
+> @@ -1592,6 +1592,11 @@ sub push_parameter($$$$$) {
+>  		$parameterdescs{$param} = "anonymous\n";
+>  		$anon_struct_union = 1;
+>  	}
+> +	elsif ($param =~ "__cacheline_group" )
+> +	# handle cache group enforcing variables: they do not need be described in header files
+> +	{
+> +		return; # ignore __cacheline_group_begin and __cacheline_group_end
+> +	}
+>  
+>  	# warn if parameter has no description
+>  	# (but ignore ones starting with # as these are not parameters
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 29 Nov 2023 21:58:53 -0800 you wrote:
-> rndis_filter uses utf8s_to_utf16s() which is provided by setting
-> NLS, so select NLS to fix the build error:
-> 
-> ERROR: modpost: "utf8s_to_utf16s" [drivers/net/hyperv/hv_netvsc.ko] undefined!
-> 
-> Fixes: 1ce09e899d28 ("hyperv: Add support for setting MAC from within guests")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: K. Y. Srinivasan <kys@microsoft.com>
-> Cc: Wei Liu <wei.liu@kernel.org>
-> Cc: Dexuan Cui <decui@microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Tested-by: Simon Horman <horms@kernel.org> # build-tested
-> Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] hv_netvsc: rndis_filter needs to select NLS
-    https://git.kernel.org/netdev/net/c/6c89f4996437
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hi Jon, would you be okay with this chunk going into net-next?
 
