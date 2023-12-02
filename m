@@ -1,268 +1,134 @@
-Return-Path: <netdev+bounces-53241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11810801BA3
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:23:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01861801BA1
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 10:19:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B33B82818A4
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:23:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DFCB1F210D5
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 09:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81B51118C;
-	Sat,  2 Dec 2023 09:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C46101CB;
+	Sat,  2 Dec 2023 09:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rock-chips.com header.i=@rock-chips.com header.b="Th2v5iV/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XTTKhK1Y"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 314 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 01:23:31 PST
-Received: from mail-m92244.xmail.ntesmail.com (mail-m92244.xmail.ntesmail.com [103.126.92.244])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D689E;
-	Sat,  2 Dec 2023 01:23:31 -0800 (PST)
-DKIM-Signature: a=rsa-sha256;
-	b=Th2v5iV/l2L1wbN87SyMQIQyavtk6yH9CCgzrnj4JP6zyjT9Cr47YT2H0osyJzpzE+e2EQcy66wJfupbGmX62VqJxLyQscUwiG9SfnU9mp9YYYoZXw3NHuTTuJxsm/C6V5OQutvvdavOljHCIh0q2UowQNyqNd20SkvEugytRB8=;
-	s=default; c=relaxed/relaxed; d=rock-chips.com; v=1;
-	bh=vyX/lxSXq2Q5RNwAmsKFUuXJAonqdZmX1UmuleUYFkE=;
-	h=date:mime-version:subject:message-id:from;
-Received: from localhost.localdomain (unknown [58.22.7.114])
-	by mail-m11876.qiye.163.com (Hmail) with ESMTPA id EE86B3C030D;
-	Sat,  2 Dec 2023 17:18:07 +0800 (CST)
-From: David Wu <david.wu@rock-chips.com>
-To: netdev@vger.kernel.org,
-	sebastian.reichel@collabora.com
-Cc: davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	David Wu <david.wu@rock-chips.com>
-Subject: [PATCH] net: ethernet: stmmac: dwmac-rk: Repair the clock handling
-Date: Sat,  2 Dec 2023 17:18:06 +0800
-Message-Id: <20231202091806.179512-1-david.wu@rock-chips.com>
-X-Mailer: git-send-email 2.25.1
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A757D129;
+	Sat,  2 Dec 2023 01:18:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ljdt96q37XyVBUeAeout9zjcuiFhMzg+dq/n/3z9e7Y=; b=XTTKhK1YAoO7AlNGjg5fgWTvo0
+	zMJxAcHQ2r4rsk13rXeKMGQxO7EWXFGh4eSt88bgBNTzrhfCO0A0hWMG2rlalewo3a8WQ4ZXvIhd7
+	lSNaWFOSEOT31hNRg9vZ1N4Ap+WOfkmlAObR2+Qcz8RyNtNohxpBYomByfs0J4TtrfenRinuhvzRT
+	TlbDrFhebOynKq3mQnV4m8GFwJrU6kJ7IoA/KfkklQpTLfM9ANK7TnkTiLGhP67uXgG35Y2nKuXfP
+	hMOs6EnGoNY2ZF/diOqnIYz/yjxrC/zPcjP5QitBv9FkabwllV5WjgGtxip8KaFe/HCnVfXTB1rIh
+	BMM0JE7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33552)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r9M95-0003yM-0T;
+	Sat, 02 Dec 2023 09:18:43 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r9M94-0006xE-Nf; Sat, 02 Dec 2023 09:18:42 +0000
+Date: Sat, 2 Dec 2023 09:18:42 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Eric Woudstra <ericwouds@gmail.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net] net: phylink: set phy_state interface when attaching
+ SFP
+Message-ID: <ZWr2ctwiBak7r263@shell.armlinux.org.uk>
+References: <8abed37d01d427bf9d27a157860c54375c994ea1.1700887953.git.daniel@makrotopia.org>
+ <ZWGwJE0aCC/H3O2A@shell.armlinux.org.uk>
+ <ZWojqBKfZvShtjel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFDSUNOT01LS0k3V1ktWUFJV1kPCRoVCBIfWUFZQ00aHlZMTkJDT09IHh4YShpVEwETFh
-	oSFyQUDg9ZV1kYEgtZQVlOQ1VJSVVMVUpKT1lXWRYaDxIVHRRZQVlPS0hVSk1PSUxOVUpLS1VKQk
-	tLWQY+
-X-HM-Tid: 0a8c29d228ce2eb2kusnee86b3c030d
-X-HM-MType: 1
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6PjY6FRw6Ojw4NAsdQxpPMhIZ
-	N0MKCjJVSlVKTEtKTktDTUNDQ09IVTMWGhIXVR8aDRIfVQwOOwkUGBBWGBMSCwhVGBQWRVlXWRIL
-	WUFZTkNVSUlVTFVKSk9ZV1kIAVlBTE5CSTcG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWojqBKfZvShtjel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-It's clarier and simpler to replace devm_clk_bulk_get_optional
-via devm_clk_bulk_get_all. And it may be a different clocks
-combination for different Socs, so for the clk_mac_speed, it is
-more correct to obtain the clock directly by its name.
+On Fri, Dec 01, 2023 at 06:19:20PM +0000, Daniel Golle wrote:
+> On Sat, Nov 25, 2023 at 08:28:20AM +0000, Russell King (Oracle) wrote:
+> > On Sat, Nov 25, 2023 at 04:56:20AM +0000, Daniel Golle wrote:
+> > > Assume 'usxgmii' being set as initial interface mode in DTS. Now plug
+> > > a 2.5GBase-T SFP module with exposed PHY. Currently this results in
+> > > a rather bizare situation:
+> > > 
+> > > RTL8221B-VB-CG 2.5Gbps PHY (C45) i2c:sfp1-wan:11: rtl822x_c45_get_features: supported=00,00000000,00008000,000080ef
+> > > mtk_soc_eth 15100000.ethernet eth2: requesting link mode phy/2500base-x with support 00,00000000,00008000,0000e0ef
+> > > mtk_soc_eth 15100000.ethernet eth2: switched to phy/2500base-x link mode   <<< !!!!!!
+> > > mtk_soc_eth 15100000.ethernet eth2: major config usxgmii    <<< !!!!!!
+> > > mtk_soc_eth 15100000.ethernet eth2: phylink_mac_config: mode=phy/usxgmii/none adv=00,00000000,00000000,00000000 pause=00
+> > > mtk_soc_eth 15100000.ethernet eth2: PHY [i2c:sfp1-wan:11] driver [RTL8221B-VB-CG 2.5Gbps PHY (C45)] (irq=POLL)
+> > > mtk_soc_eth 15100000.ethernet eth2: phy: 2500base-x setting supported 00,00000000,00008000,0000e0ef advertising 00,00000000,00008000,0000e0ef
+> > > 
+> > > Then the link seemingly comes up (but is dead) because no subsequent
+> > > call to phylink_major_config actually configured MAC and PCS for
+> > > 2500base-x mode.
+> > > 
+> > > This is because phylink_mac_initial_config() considers
+> > > pl->phy_state.interface if in MLO_AN_PHY mode while
+> > > phylink_sfp_set_config() only sets pl->link_config.interface.
+> > > 
+> > > Also set pl->phy_state.interface in phylink_sfp_set_config().
+> > 
+> > Does it _actually_ matter?
+> 
+> It does matter, I'm suggesting this change because the SFP module
+> won't work without it.
+> 
+> > When the PHY's link comes up, doesn't it get sorted out for the real
+> > mode that will be used?
+> 
+> That does happen once the interface mode *changes* to anything else,
+> than 2500M/Full and the PHY driver sets state->interface to SGMII.
+> However, initially it does *not* happen, probably because phylink
+> ends up believing MAC and PCS are already operating in 2500base-x
+> mode (but that's not the case).
+> 
+> Previously (eg. with the BananaPi R3) this has not been a problem
+> because the default interface mode defined in device tree anyway has
+> also been 2500base-x. Now that I'm testing the same module with the
+> R4 which uses usxgmii by default the problem surfaced.
 
-Fixes: ea449f7fa0bf ("net: ethernet: stmmac: dwmac-rk: rework optional clock handling")
-Signed-off-by: David Wu <david.wu@rock-chips.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 83 ++++++++-----------
- 1 file changed, 33 insertions(+), 50 deletions(-)
+Okay, I think what we have here is an ordering issue in
+phylink_sfp_connect_phy(). phylink_bringup_phy() will set
+phy_state.interface, but that happens after the major config has
+happened.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 382e8de1255d..fff18037e68c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -39,24 +39,6 @@ struct rk_gmac_ops {
- 	u32 regs[];
- };
- 
--static const char * const rk_clocks[] = {
--	"aclk_mac", "pclk_mac", "mac_clk_tx", "clk_mac_speed",
--};
--
--static const char * const rk_rmii_clocks[] = {
--	"mac_clk_rx", "clk_mac_ref", "clk_mac_refout",
--};
--
--enum rk_clocks_index {
--	RK_ACLK_MAC = 0,
--	RK_PCLK_MAC,
--	RK_MAC_CLK_TX,
--	RK_CLK_MAC_SPEED,
--	RK_MAC_CLK_RX,
--	RK_CLK_MAC_REF,
--	RK_CLK_MAC_REFOUT,
--};
--
- struct rk_priv_data {
- 	struct platform_device *pdev;
- 	phy_interface_t phy_iface;
-@@ -73,6 +55,7 @@ struct rk_priv_data {
- 	int num_clks;
- 	struct clk *clk_mac;
- 	struct clk *clk_phy;
-+	struct clk *clk_mac_speed;
- 
- 	struct reset_control *phy_reset;
- 
-@@ -116,12 +99,11 @@ static void px30_set_to_rmii(struct rk_priv_data *bsp_priv)
- 
- static void px30_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
--	struct clk *clk_mac_speed = bsp_priv->clks[RK_CLK_MAC_SPEED].clk;
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	int ret;
- 
--	if (!clk_mac_speed) {
--		dev_err(dev, "%s: Missing clk_mac_speed clock\n", __func__);
-+	if (!bsp_priv->clk_mac_speed) {
-+		dev_err(dev, "Missing clk_mac_speed clock\n");
- 		return;
- 	}
- 
-@@ -129,7 +111,7 @@ static void px30_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 		regmap_write(bsp_priv->grf, PX30_GRF_GMAC_CON1,
- 			     PX30_GMAC_SPEED_10M);
- 
--		ret = clk_set_rate(clk_mac_speed, 2500000);
-+		ret = clk_set_rate(bsp_priv->clk_mac_speed, 2500000);
- 		if (ret)
- 			dev_err(dev, "%s: set clk_mac_speed rate 2500000 failed: %d\n",
- 				__func__, ret);
-@@ -137,7 +119,7 @@ static void px30_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 		regmap_write(bsp_priv->grf, PX30_GRF_GMAC_CON1,
- 			     PX30_GMAC_SPEED_100M);
- 
--		ret = clk_set_rate(clk_mac_speed, 25000000);
-+		ret = clk_set_rate(bsp_priv->clk_mac_speed, 25000000);
- 		if (ret)
- 			dev_err(dev, "%s: set clk_mac_speed rate 25000000 failed: %d\n",
- 				__func__, ret);
-@@ -1079,11 +1061,15 @@ static void rk3568_set_to_rmii(struct rk_priv_data *bsp_priv)
- 
- static void rk3568_set_gmac_speed(struct rk_priv_data *bsp_priv, int speed)
- {
--	struct clk *clk_mac_speed = bsp_priv->clks[RK_CLK_MAC_SPEED].clk;
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned long rate;
- 	int ret;
- 
-+	if (!bsp_priv->clk_mac_speed) {
-+		dev_err(dev, "Missing clk_mac_speed clock\n");
-+		return;
-+	}
-+
- 	switch (speed) {
- 	case 10:
- 		rate = 2500000;
-@@ -1099,7 +1085,7 @@ static void rk3568_set_gmac_speed(struct rk_priv_data *bsp_priv, int speed)
- 		return;
- 	}
- 
--	ret = clk_set_rate(clk_mac_speed, rate);
-+	ret = clk_set_rate(bsp_priv->clk_mac_speed, rate);
- 	if (ret)
- 		dev_err(dev, "%s: set clk_mac_speed rate %ld failed %d\n",
- 			__func__, rate, ret);
-@@ -1385,11 +1371,15 @@ static void rv1126_set_to_rmii(struct rk_priv_data *bsp_priv)
- 
- static void rv1126_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
--	struct clk *clk_mac_speed = bsp_priv->clks[RK_CLK_MAC_SPEED].clk;
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned long rate;
- 	int ret;
- 
-+	if (!bsp_priv->clk_mac_speed) {
-+		dev_err(dev, "Missing clk_mac_speed clock\n");
-+		return;
-+	}
-+
- 	switch (speed) {
- 	case 10:
- 		rate = 2500000;
-@@ -1405,7 +1395,7 @@ static void rv1126_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 		return;
- 	}
- 
--	ret = clk_set_rate(clk_mac_speed, rate);
-+	ret = clk_set_rate(bsp_priv->clk_mac_speed, rate);
- 	if (ret)
- 		dev_err(dev, "%s: set clk_mac_speed rate %ld failed %d\n",
- 			__func__, rate, ret);
-@@ -1413,11 +1403,15 @@ static void rv1126_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 
- static void rv1126_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
--	struct clk *clk_mac_speed = bsp_priv->clks[RK_CLK_MAC_SPEED].clk;
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned long rate;
- 	int ret;
- 
-+	if (!bsp_priv->clk_mac_speed) {
-+		dev_err(dev, "Missing clk_mac_speed clock\n");
-+		return;
-+	}
-+
- 	switch (speed) {
- 	case 10:
- 		rate = 2500000;
-@@ -1430,7 +1424,7 @@ static void rv1126_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 		return;
- 	}
- 
--	ret = clk_set_rate(clk_mac_speed, rate);
-+	ret = clk_set_rate(bsp_priv->clk_mac_speed, rate);
- 	if (ret)
- 		dev_err(dev, "%s: set clk_mac_speed rate %ld failed %d\n",
- 			__func__, rate, ret);
-@@ -1492,31 +1486,14 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
- 	struct rk_priv_data *bsp_priv = plat->bsp_priv;
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	int phy_iface = bsp_priv->phy_iface;
--	int i, j, ret;
-+	int ret;
- 
- 	bsp_priv->clk_enabled = false;
- 
--	bsp_priv->num_clks = ARRAY_SIZE(rk_clocks);
--	if (phy_iface == PHY_INTERFACE_MODE_RMII)
--		bsp_priv->num_clks += ARRAY_SIZE(rk_rmii_clocks);
--
--	bsp_priv->clks = devm_kcalloc(dev, bsp_priv->num_clks,
--				      sizeof(*bsp_priv->clks), GFP_KERNEL);
--	if (!bsp_priv->clks)
--		return -ENOMEM;
--
--	for (i = 0; i < ARRAY_SIZE(rk_clocks); i++)
--		bsp_priv->clks[i].id = rk_clocks[i];
--
--	if (phy_iface == PHY_INTERFACE_MODE_RMII) {
--		for (j = 0; j < ARRAY_SIZE(rk_rmii_clocks); j++)
--			bsp_priv->clks[i++].id = rk_rmii_clocks[j];
--	}
--
--	ret = devm_clk_bulk_get_optional(dev, bsp_priv->num_clks,
--					 bsp_priv->clks);
--	if (ret)
-+	ret = devm_clk_bulk_get_all(dev, &bsp_priv->clks);
-+	if (ret <= 0)
- 		return dev_err_probe(dev, ret, "Failed to get clocks\n");
-+	bsp_priv->num_clks = ret;
- 
- 	/* "stmmaceth" will be enabled by the core */
- 	bsp_priv->clk_mac = devm_clk_get(dev, "stmmaceth");
-@@ -1538,6 +1515,12 @@ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
- 		clk_set_rate(bsp_priv->clk_phy, 50000000);
- 	}
- 
-+	/* get option clock */
-+	bsp_priv->clk_mac_speed = devm_clk_get(dev, "clk_mac_speed");
-+	ret = PTR_ERR_OR_ZERO(bsp_priv->clk_mac_speed);
-+	if (ret)
-+		bsp_priv->clk_mac_speed = NULL;
-+
- 	return 0;
- }
- 
+With a built-in PHY, the sequence would be:
+
+ - connect to PHY (which calls phylink_bringup_phy())
+ - phylink_start() (which calls phylink_major_config())
+
+whereas in this case we have the reverse. That needs to be sorted.
+I can't do that over this weekend, but if you remind me I'll look
+at it next week.
+
+Thanks.
+
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
