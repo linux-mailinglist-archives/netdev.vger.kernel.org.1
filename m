@@ -1,77 +1,87 @@
-Return-Path: <netdev+bounces-53279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75990801E37
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 20:21:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4971801E57
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 20:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D421C2084B
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 19:21:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BEC2280EEF
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 19:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646031C69C;
-	Sat,  2 Dec 2023 19:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AC320DD9;
+	Sat,  2 Dec 2023 19:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjNT42ok"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OByKiWl8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488E619448
-	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 19:21:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7A8C433C9;
-	Sat,  2 Dec 2023 19:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC821F608;
+	Sat,  2 Dec 2023 19:30:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0B97C433C9;
+	Sat,  2 Dec 2023 19:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701544865;
-	bh=7bnMIPdcyyE3JV3poJ2NEga2ixCjC16/Hl+yEa/j6iE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tjNT42oke+8SlfgZfFzf/WOefE2+ArDC5E+gHOUeIhai5JkrIFt0l5hvpAg7F3aUt
-	 zC/qv3XHaTOGPNtd7SpazsnAaDEB1alkdPWPTpcLFJoMkCc76gvMgUc1DFjtdf81up
-	 nEmi1RZJY9DG6pwoGQiSt+jKFoafogfK1gMx3gElOdm+y4tS4oOXi+HUVhDzIrGEil
-	 vGyKSvlinNDz3eynXYAMT3WCxQ51SpuLLWNEi+Sh3pMl6ZNnxs7f05MAEf++4pgl8U
-	 74LSFh9o8NClrFNndjo7U/vdbGPvWgtO4XCFeISaPrm775YYFag0qOjWb9kFyk4rOZ
-	 7rWEPiQtLdNaA==
-Date: Sat, 2 Dec 2023 11:21:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, marcelo.leitner@gmail.com, vladbu@nvidia.com
-Subject: Re: [PATCH net-next 3/4] net/sched: act_api: conditional
- notification of events
-Message-ID: <20231202112104.0ca43022@kernel.org>
-In-Reply-To: <20231201204314.220543-4-pctammela@mojatatu.com>
-References: <20231201204314.220543-1-pctammela@mojatatu.com>
-	<20231201204314.220543-4-pctammela@mojatatu.com>
+	s=k20201202; t=1701545423;
+	bh=7oFK4ed8T89dSsjywyHK5bLa86wuR3jqGdVIRyazGRM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OByKiWl8mrA9qDMq2PnkK3QXm7Zf0APYeujzi39JI+0XvTsnJUMUdZV05U3GHlpfM
+	 8OLPuk0nNkacJ/0eeL9vJIwugxN5Fc0Y4e6Dn6peCyAsQMWtD2uy/9haQWTzUvFep5
+	 6z21zwbdifl11u4Uf81TC6iQP9NpJyKjwv2mZTeMRRoh1JVtKZsc8Uk62T6KgzNPdX
+	 xSFRgJLKbwBQkHFujUTi0jaVnyBsGYxTHpEzJjAoq96Ya7VA15L0qXSaqHfM+wRSWk
+	 Pg6F8qPG/DLJaL64DXarnqxoDdYx2/NkDeqFfC/MAdgnopznJGjLC4vBviWdn73B4U
+	 iiGA4fR1EJsuA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7FD73C59A4C;
+	Sat,  2 Dec 2023 19:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] r8169: fix rtl8125b PAUSE frames blasting when
+ suspended
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170154542352.15478.16376698686118479482.git-patchwork-notify@kernel.org>
+Date: Sat, 02 Dec 2023 19:30:23 +0000
+References: <20231129155350.5843-1-hau@realtek.com>
+In-Reply-To: <20231129155350.5843-1-hau@realtek.com>
+To: ChunHao Lin <hau@realtek.com>
+Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, grundler@chromium.org,
+ stable@vger.kernel.org
 
-On Fri,  1 Dec 2023 17:43:13 -0300 Pedro Tammela wrote:
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -1791,6 +1791,13 @@ tcf_reoffload_del_notify(struct net *net, struct tc_action *action)
->  	struct sk_buff *skb;
->  	int ret;
->  
-> +	if (!tc_should_notify(net, 0)) {
-> +		ret = tcf_idr_release_unsafe(action);
-> +		if (ret == ACT_P_DELETED)
-> +			module_put(ops->owner);
-> +		return ret;
-> +	}
+Hello:
 
-I fell like we can do better than this.. let's refactor this code a bit
-harder. Maybe factor out the alloc_skb() and fill()? Then add a wrapper
-around rtnetlink_send() which does nothing if skb is NULL?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  	skb = alloc_skb(attr_size <= NLMSG_GOODSIZE ? NLMSG_GOODSIZE : attr_size,
->  			GFP_KERNEL);
->  	if (!skb)
+On Wed, 29 Nov 2023 23:53:50 +0800 you wrote:
+> When FIFO reaches near full state, device will issue pause frame.
+> If pause slot is enabled(set to 1), in this time, device will issue
+> pause frame only once. But if pause slot is disabled(set to 0), device
+> will keep sending pause frames until FIFO reaches near empty state.
+> 
+> When pause slot is disabled, if there is no one to handle receive
+> packets, device FIFO will reach near full state and keep sending
+> pause frames. That will impact entire local area network.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] r8169: fix rtl8125b PAUSE frames blasting when suspended
+    https://git.kernel.org/netdev/net/c/4b0768b6556a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
