@@ -1,47 +1,52 @@
-Return-Path: <netdev+bounces-53269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924E0801DB7
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 17:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A615801DD9
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 17:48:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B80BD1C20915
-	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:28:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B9511C208DF
+	for <lists+netdev@lfdr.de>; Sat,  2 Dec 2023 16:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1221C6A8;
-	Sat,  2 Dec 2023 16:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F99168BF;
+	Sat,  2 Dec 2023 16:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2thgjsDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZoOTDXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB046102;
-	Sat,  2 Dec 2023 08:28:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8ciHNODe1XPDwRK+aaMl61d1zRycOP5g608zUMVfPxw=; b=2thgjsDDHgmxMZfWqUFviHaPEK
-	n+R1DfQa8qc2fTb2/P/ct6SRk4m0gUInbJ4AyF/msduCPmpGvMSLhmGfUU3VlU8oHZtfLeqQqaYNB
-	AecDJKiEpOv84dLDKIKHkv9DawjHv9H8rLIn2t0UfrdL5WY0guaQm91jw67cXr7xbxX4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r9SqT-001rE6-RY; Sat, 02 Dec 2023 17:27:57 +0100
-Date: Sat, 2 Dec 2023 17:27:57 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Justin Lai <justinlai0215@realtek.com>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pkshih@realtek.com, larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v13 01/13] rtase: Add pci table supported in
- this module
-Message-ID: <27b2b87a-929d-4b97-9265-303391982d27@lunn.ch>
-References: <20231130114327.1530225-1-justinlai0215@realtek.com>
- <20231130114327.1530225-2-justinlai0215@realtek.com>
- <20231201203602.7e380716@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D8C3D82
+	for <netdev@vger.kernel.org>; Sat,  2 Dec 2023 16:48:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD44C433C9;
+	Sat,  2 Dec 2023 16:48:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701535709;
+	bh=DnZEzNXP9hV68Bv4xg8L4T2Cgy7MhrlHkGJzKWd0Rog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SZoOTDXNOwfGy+XbS4lGBQnlNtfStPpSe6XOuqQbxnbXDAUBoZaxsBOXb2D0e9dmu
+	 C7p8JBEBYJRi0f0bK+IiWqwRZivi4i7Yep2WYel8lRjn8pg/WNx16abD/9vaSwAyAR
+	 k4GatGF7Xw7DiyvOAZMGPkwt6A+K+y//RaCLR9ncjQMGdaNL+aqaolGYgZJKoIem/6
+	 fMHcyTIbpba7xUZLqzio6tpm7HN3f4iXQsM8BLAQs6HGWp7wxz0PXN6ghbQEEtNMDe
+	 NZa3CQKerGMXmPiMF4YfSgJAGp7mYigBA8NEINbq3X72XTGMZRY5/a/Q6TV9VTNUxc
+	 NDJVm2GW1LVYQ==
+Date: Sat, 2 Dec 2023 16:48:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH iwl-net] i40e: Fix ST code value for Clause 45
+Message-ID: <20231202164824.GA50400@kernel.org>
+References: <20231129161711.771729-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,56 +55,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231201203602.7e380716@kernel.org>
+In-Reply-To: <20231129161711.771729-1-ivecera@redhat.com>
 
-On Fri, Dec 01, 2023 at 08:36:02PM -0800, Jakub Kicinski wrote:
-> On Thu, 30 Nov 2023 19:43:15 +0800 Justin Lai wrote:
-> > + *  Below is a simplified block diagram of the chip and its relevant interfaces.
-> > + *
-> > + *               *************************
-> > + *               *                       *
-> > + *               *  CPU network device   *
-> > + *               *                       *
-> > + *               *   +-------------+     *
-> > + *               *   |  PCIE Host  |     *
-> > + *               ***********++************
-> > + *                          ||
-> > + *                         PCIE
-> > + *                          ||
-> > + *      ********************++**********************
-> > + *      *            | PCIE Endpoint |             *
-> > + *      *            +---------------+             *
-> > + *      *                | GMAC |                  *
-> > + *      *                +--++--+  Realtek         *
-> > + *      *                   ||     RTL90xx Series  *
-> > + *      *                   ||                     *
-> > + *      *     +-------------++----------------+    *
-> > + *      *     |           | MAC |             |    *
-> > + *      *     |           +-----+             |    *
-> > + *      *     |                               |    *
-> > + *      *     |     Ethernet Switch Core      |    *
-> > + *      *     |                               |    *
-> > + *      *     |   +-----+           +-----+   |    *
-> > + *      *     |   | MAC |...........| MAC |   |    *
-> > + *      *     +---+-----+-----------+-----+---+    *
-> > + *      *         | PHY |...........| PHY |        *
-> > + *      *         +--++-+           +--++-+        *
-> > + *      *************||****************||***********
-> > + *
-> > + *  The block of the Realtek RTL90xx series is our entire chip architecture,
-> > + *  the GMAC is connected to the switch core, and there is no PHY in between.
-> > + *  In addition, this driver is mainly used to control GMAC, but does not
-> > + *  control the switch core, so it is not the same as DSA.
+On Wed, Nov 29, 2023 at 05:17:10PM +0100, Ivan Vecera wrote:
+> ST code value for clause 45 that has been changed by
+> commit 8196b5fd6c73 ("i40e: Refactor I40E_MDIO_CLAUSE* macros")
+> is currently wrong.
 > 
-> Okay, but you seem to only register one netdev.
+> The mentioned commit refactored ..MDIO_CLAUSE??_STCODE_MASK so
+> their value is the same for both clauses. The value is correct
+> for clause 22 but not for clause 45.
 > 
-> Which MAC is it for?
+> Fix the issue by adding a parameter to I40E_GLGEN_MSCA_STCODE_MASK
+> macro that specifies required value.
+> 
+> Fixes: 8196b5fd6c73 ("i40e: Refactor I40E_MDIO_CLAUSE* macros")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-The GMAC one. This is going to be a DSA system, and this driver is for
-the conduit MAC the CPU uses. At some point, i hope there is a DSA
-driver added, or the existing realtek driver is extended to support
-this switch.
+Thanks Ivan,
 
-       Andrew
- 
+I agree with your analysis and this fix looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
