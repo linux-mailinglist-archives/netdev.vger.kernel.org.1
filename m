@@ -1,136 +1,439 @@
-Return-Path: <netdev+bounces-53346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 741E98026F0
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:34:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D4B88026FD
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4C991C209CB
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:34:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F27C91F211B5
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE9B18AE5;
-	Sun,  3 Dec 2023 19:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4121805A;
+	Sun,  3 Dec 2023 19:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8FjXbL+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sTN0L4FR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5552116;
-	Sun,  3 Dec 2023 11:34:05 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-db8892a5f96so778827276.2;
-        Sun, 03 Dec 2023 11:34:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701632044; x=1702236844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tow+85T+lc+N5QthCRRY7+xksWqAIO8q8vX1kWlFmwA=;
-        b=S8FjXbL+Om07tTWypyRabwgvKQMEr/uxqw3jaqPqfXxvRJasTDSmpGGHFPSbFMiH7V
-         fQBZphDsUWDU+5IQ+a3DtQZcV/UoXX3rXrwSX8HK7A9Dw3nI3VSzBFWivQnH+IzJ3bCn
-         G1CNIAO5gsQ18SvVo34/e1L8lumlzYAS9IlobGLPi2LyRKl21lGv/GrpxiOxNSyNfZVA
-         uJ/7ec2UYYzfA63vLqDjcmqw2+j7Rj2ZKH/JiwCjExh+QYnEZTV6Wx6//6qA6tmjxS5K
-         A8y10wN1cHbYX4fH+IUMPMylobCEZN9swQ6tnKTf70i0d6tNaIS3y1mAJPFv/X5z5euj
-         W25w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701632044; x=1702236844;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tow+85T+lc+N5QthCRRY7+xksWqAIO8q8vX1kWlFmwA=;
-        b=lpyO5K6jHutrCWknsNUU2o3mO1Qh5WInAUtBlxFo+BQPcPJVKRqGgA6FYvBnaaOcaK
-         FJN2FDUzN/TgcUr6U4864xmSV7b+ablM2J1XqNeaRWgpp2HCkkNHxeN7dZPZdqMWUzSz
-         MtkTMKdMKRZfvwkt7ESQJj3op7Fw+aRkh62lF1nlvoZyngMfy+GlBni2IYfY3iQJpXzy
-         4IYXHM3VWmF6N7a6f81o9UmKPLhLPJPbteswMtsdi5xiqsLelTsXYv569gOe5hlh7DC7
-         C22vDXomC9ZwdudOtUkI53Ubw0MbqfL2UDDdhHkM9noo5xdi5WFGFtn3VS0+VuJ33x6W
-         B2zQ==
-X-Gm-Message-State: AOJu0Yy1Y/q/wyLQb+Mte8EoOI8GQlh9194IAqoww4XDtOYiZioNuayx
-	/fzQAr15VTjx50Nr77cDLOrlKBnchBt+9A==
-X-Google-Smtp-Source: AGHT+IFdVY+nDvHApuybbKRgPwqo30yRyljr/trWB68rXRo3Ez+hOUZ7Bb+kBQ88sAzhLkZwEbNRpQ==
-X-Received: by 2002:a25:457:0:b0:db7:dacf:6205 with SMTP id 84-20020a250457000000b00db7dacf6205mr1739115ybe.87.1701632044112;
-        Sun, 03 Dec 2023 11:34:04 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:cb98:c3e:57c:8191])
-        by smtp.gmail.com with ESMTPSA id bt13-20020a056902136d00b00d72176bdc5csm1759016ybb.40.2023.12.03.11.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 11:34:03 -0800 (PST)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEA1C30C3;
+	Sun,  3 Dec 2023 11:35:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5kdk7NFvHqeMqSQj/vvyZS672r6fTVBe/SPbye4Cvow=; b=sTN0L4FRNGtyAzojEV8PIpHtNL
+	62/xauG7IQTV4lDACxkdzTLk2UZTVoVpiX6+IPcGRH/AdKwLfHs7k5l+KA/E9WJD+7mJQcRLhzcJ8
+	Zvk2VdzBSRxUXyEGgjGPBmke7yLJXLVlVSpuyB8U+fezvXwfgZUa7ZjSmcUjPEd4rCNc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r9sEw-001uaj-5h; Sun, 03 Dec 2023 20:34:54 +0100
+Date: Sun, 3 Dec 2023 20:34:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Alexandra Winter <wintera@linux.ibm.com>
-Subject: [PATCH v2 31/35] net: smc: use find_and_set_bit() in smc_wr_tx_get_free_slot_index()
-Date: Sun,  3 Dec 2023 11:33:03 -0800
-Message-Id: <20231203193307.542794-30-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231203193307.542794-1-yury.norov@gmail.com>
-References: <20231203192422.539300-1-yury.norov@gmail.com>
- <20231203193307.542794-1-yury.norov@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <639c5222-043f-4e27-9efa-ce2a1d73eaba@lunn.ch>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
 
-The function opencodes find_and_set_bit() with a for_each() loop. Use
-it, and make the whole function a simple almost one-liner.
+> +static int pd692x0_try_recv_msg(const struct i2c_client *client,
+> +				struct pd692x0_msg *msg,
+> +				struct pd692x0_msg *buf)
+> +{
+> +	msleep(30);
+> +
+> +	memset(buf, 0, sizeof(*buf));
+> +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> +	if (buf->key)
+> +		return 1;
+> +
+> +	msleep(100);
+> +
+> +	memset(buf, 0, sizeof(*buf));
+> +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> +	if (buf->key)
+> +		return 1;
+> +
+> +	return 0;
 
-While here, drop explicit initialization of *idx, because it's already
-initialized by the caller in case of ENOLINK, or set properly with
-->wr_tx_mask, if nothing is found, in case of EBUSY.
+Maybe make this function return a bool? Or 0 on success, -EIO on
+error?
 
-CC: Tony Lu <tonylu@linux.alibaba.com>
-CC: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- net/smc/smc_wr.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+> +}
+> +
+> +/* Implementation of I2C communication, specifically addressing scenarios
+> + * involving communication loss. Refer to the "Synchronization During
+> + * Communication Loss" section in the Communication Protocol document for
+> + * further details.
+> + */
+> +static int pd692x0_recv_msg(struct pd692x0_priv *priv,
+> +			    struct pd692x0_msg *msg,
+> +			    struct pd692x0_msg *buf)
+> +{
+> +	const struct i2c_client *client = priv->client;
+> +	int ret;
+> +
+> +	ret = pd692x0_try_recv_msg(client, msg, buf);
+> +	if (ret)
+> +		goto out_success;
 
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index 0021065a600a..b6f0cfc52788 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -170,15 +170,11 @@ void smc_wr_tx_cq_handler(struct ib_cq *ib_cq, void *cq_context)
- 
- static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
- {
--	*idx = link->wr_tx_cnt;
- 	if (!smc_link_sendable(link))
- 		return -ENOLINK;
--	for_each_clear_bit(*idx, link->wr_tx_mask, link->wr_tx_cnt) {
--		if (!test_and_set_bit(*idx, link->wr_tx_mask))
--			return 0;
--	}
--	*idx = link->wr_tx_cnt;
--	return -EBUSY;
-+
-+	*idx = find_and_set_bit(link->wr_tx_mask, link->wr_tx_cnt);
-+	return *idx < link->wr_tx_cnt ? 0 : -EBUSY;
- }
- 
- /**
--- 
-2.40.1
+The danger with this returning an int, is this fragment of code is the
+exact opposite to normal. Developers are used to ret being an error
+code, and this goto would then be going to error handling. Without the
+_success it would be easy to understand this wrongly.
 
+> +
+> +	dev_warn(&client->dev,
+> +		 "Communication lost, rtnl is locked until communication is back!");
+
+Maybe add another dev_warn() if/when communication is re-established?
+
+> +static int pd692x0_sendrecv_msg(struct pd692x0_priv *priv,
+> +				struct pd692x0_msg *msg,
+> +				struct pd692x0_msg *buf)
+> +{
+> +	struct device *dev = &priv->client->dev;
+> +	int ret;
+> +
+> +	ret = pd692x0_send_msg(priv, msg);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = pd692x0_recv_msg(priv, msg, buf);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (msg->echo != buf->echo) {
+> +		dev_err(dev, "Wrong match in message ID\n");
+
+Maybe print the two values? This is not something you expect to
+happen, so if it does, its probably hard to reproduce? Having the two
+values probably helps you debug it, without being able to reproduce
+it? Are they different by one, does it happen on wrap-around, have one
+gone back to 0, etc.
+
+> +		return -EIO;
+> +	}
+> +
+> +	/* If the reply is a report message is it successful */
+> +	if (buf->key == PD692X0_KEY_REPORT &&
+> +	    (buf->sub[0] || buf->sub[1])) {
+> +		return -EIO;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static struct pd692x0_priv *to_pd692x0_priv(struct pse_controller_dev *pcdev)
+> +{
+> +	return container_of(pcdev, struct pd692x0_priv, pcdev);
+> +}
+> +
+> +static int pd692x0_fw_unavailable(struct pd692x0_priv *priv)
+> +{
+> +	switch (priv->fw_state) {
+> +	case PD692X0_FW_OK:
+> +		return 0;
+> +	case PD692X0_FW_PREPARE:
+> +	case PD692X0_FW_WRITE:
+> +	case PD692X0_FW_COMPLETE:
+> +		dev_err(&priv->client->dev, "Firmware update in progress!\n");
+> +		return -EBUSY;
+> +	case PD692X0_FW_BROKEN:
+> +	case PD692X0_FW_NEED_UPDATE:
+> +	default:
+> +		dev_err(&priv->client->dev,
+> +			"Firmware issue. Please update it!\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +
+> +static int pd692x0_ethtool_set_config(struct pse_controller_dev *pcdev,
+> +				      unsigned long id,
+> +				      struct netlink_ext_ack *extack,
+> +				      const struct pse_control_config *config)
+> +{
+> +	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
+> +	struct pd692x0_msg msg, buf = {0};
+> +	int ret;
+> +
+> +	ret = pd692x0_fw_unavailable(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (priv->admin_state[id] == config->c33_admin_control)
+> +		return 0;
+> +
+> +	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
+> +	switch (config->c33_admin_control) {
+> +	case ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED:
+> +		msg.data[0] = 0x1;
+> +		break;
+> +	case ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED:
+> +		msg.data[0] = 0x0;
+> +		break;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	msg.sub[2] = id;
+> +	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	priv->admin_state[id] = config->c33_admin_control;
+> +
+> +	return 0;
+> +}
+> +
+> +static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
+> +				      unsigned long id,
+> +				      struct netlink_ext_ack *extack,
+> +				      struct pse_control_status *status)
+> +{
+> +	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
+> +	struct pd692x0_msg msg, buf = {0};
+> +	int ret;
+> +
+> +	ret = pd692x0_fw_unavailable(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_STATUS];
+> +	msg.sub[2] = id;
+> +	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Compare Port Status (Communication Protocol Document par. 7.1) */
+> +	if ((buf.sub[0] & 0xf0) == 0x80 || (buf.sub[0] & 0xf0) == 0x90)
+> +		status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING;
+> +	else if (buf.sub[0] == 0x1b || buf.sub[0] == 0x22)
+> +		status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING;
+> +	else if (buf.sub[0] == 0x12)
+> +		status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_FAULT;
+> +	else
+> +		status->c33_pw_status = ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED;
+> +
+> +	if (buf.sub[1])
+> +		status->c33_admin_state = ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED;
+> +	else
+> +		status->c33_admin_state = ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED;
+> +
+> +	priv->admin_state[id] = status->c33_admin_state;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct pd692x0_msg_ver pd692x0_get_sw_version(struct pd692x0_priv *priv)
+> +{
+> +	struct device *dev = &priv->client->dev;
+> +	struct pd692x0_msg msg, buf = {0};
+> +	struct pd692x0_msg_ver ver = {0};
+> +	int ret;
+> +
+> +	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_SW_VER];
+> +	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+> +	if (ret < 0) {
+> +		dev_err(dev, "Failed to get PSE version (%pe)\n", ERR_PTR(ret));
+> +		return ver;
+> +	}
+> +
+> +	/* Extract version from the message */
+> +	ver.prod = buf.sub[2];
+> +	ver.maj_sw_ver = (buf.data[0] << 8 | buf.data[1]) / 100;
+> +	ver.min_sw_ver = ((buf.data[0] << 8 | buf.data[1]) / 10) % 10;
+> +	ver.pa_sw_ver = (buf.data[0] << 8 | buf.data[1]) % 10;
+> +	ver.param = buf.data[2];
+> +	ver.build = buf.data[3];
+> +
+> +	return ver;
+> +}
+> +
+> +static const struct pse_controller_ops pd692x0_ops = {
+> +	.ethtool_get_status = pd692x0_ethtool_get_status,
+> +	.ethtool_set_config = pd692x0_ethtool_set_config,
+> +};
+> +
+> +struct matrix {
+> +	u8 hw_port_a;
+> +	u8 hw_port_b;
+> +};
+> +
+> +static int
+> +pd692x0_set_ports_matrix(struct pd692x0_priv *priv,
+> +			 const struct matrix port_matrix[PD692X0_MAX_LOGICAL_PORTS])
+> +{
+> +	struct pd692x0_msg msg, buf;
+> +	int ret, i;
+> +
+> +	/* Write temporary Matrix */
+> +	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_TMP_PORT_MATRIX];
+> +	for (i = 0; i < PD692X0_MAX_LOGICAL_PORTS; i++) {
+> +		msg.sub[2] = i;
+> +		msg.data[0] = port_matrix[i].hw_port_a;
+> +		msg.data[1] = port_matrix[i].hw_port_b;
+> +
+> +		ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+> +	/* Program Matrix */
+> +	msg = pd692x0_msg_template_list[PD692X0_MSG_PRG_PORT_MATRIX];
+> +	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int
+> +pd692x0_get_of_matrix(struct device *dev,
+> +		      struct matrix port_matrix[PD692X0_MAX_LOGICAL_PORTS])
+> +{
+> +	u32 val[PD692X0_MAX_LOGICAL_PORTS * 3];
+> +	int ret, i, ports_matrix_size;
+> +
+> +	ports_matrix_size = device_property_count_u32(dev, "ports-matrix");
+> +	if (ports_matrix_size <= 0)
+> +		return -EINVAL;
+> +	if (ports_matrix_size % 3 ||
+> +	    ports_matrix_size > PD692X0_MAX_LOGICAL_PORTS * 3) {
+> +		dev_err(dev, "Not valid ports-matrix property size: %d\n",
+> +			ports_matrix_size);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ret = device_property_read_u32_array(dev, "ports-matrix", val,
+> +					     ports_matrix_size);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Init Matrix */
+> +	for (i = 0; i < PD692X0_MAX_LOGICAL_PORTS; i++) {
+> +		port_matrix[i].hw_port_a = 0xff;
+> +		port_matrix[i].hw_port_b = 0xff;
+> +	}
+> +
+> +	/* Update with values from DT */
+> +	for (i = 0; i < ports_matrix_size; i += 3) {
+> +		unsigned int logical_port;
+> +
+> +		if (val[i] >= PD692X0_MAX_LOGICAL_PORTS) {
+> +			dev_err(dev, "Not valid ports-matrix property\n");
+> +			return -EINVAL;
+> +		}
+> +		logical_port = val[i];
+> +
+> +		if (val[i + 1] < PD692X0_MAX_HW_PORTS)
+> +			port_matrix[logical_port].hw_port_a = val[i + 1];
+> +
+> +		if (val[i + 2] < PD692X0_MAX_HW_PORTS)
+> +			port_matrix[logical_port].hw_port_b = val[i + 2];
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int pd692x0_update_matrix(struct pd692x0_priv *priv)
+> +{
+> +	struct matrix port_matrix[PD692X0_MAX_LOGICAL_PORTS];
+> +	struct device *dev = &priv->client->dev;
+> +	int ret;
+> +
+> +	ret = pd692x0_get_of_matrix(dev, port_matrix);
+> +	if (ret < 0) {
+> +		dev_warn(dev,
+> +			 "Unable to parse port-matrix, saved matrix will be used\n");
+> +		return 0;
+> +	}
+> +
+> +	ret = pd692x0_set_ports_matrix(priv, port_matrix);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +#define PD692X0_FW_LINE_MAX_SZ 0xff
+
+That probably works. Most linkers producing SREC output do limit
+themselves to lines of 80 charactors max. But the SREC format actually
+allows longer lines.
+
+> +static int pd692x0_fw_get_next_line(const u8 *data,
+> +				    char *line, size_t size)
+> +{
+> +	size_t line_size;
+> +	int i;
+> +
+> +	line_size = min_t(size_t, size, (size_t)PD692X0_FW_LINE_MAX_SZ);
+> +
+> +	memset(line, 0, PD692X0_FW_LINE_MAX_SZ);
+> +	for (i = 0; i < line_size - 1; i++) {
+> +		if (*data == '\r' && *(data + 1) == '\n') {
+> +			line[i] = '\r';
+> +			line[i + 1] = '\n';
+> +			return i + 2;
+> +		}
+
+Does the Vendor Documentation indicate Windoze line endings will
+always be used? Motorola SREC allow both Windows or rest of the world
+line endings to be used. 
+
+> +static enum fw_upload_err pd692x0_fw_poll_complete(struct fw_upload *fwl)
+> +{
+> +	struct pd692x0_priv *priv = fwl->dd_handle;
+> +	const struct i2c_client *client = priv->client;
+> +	struct pd692x0_msg_ver ver;
+> +	int ret;
+> +
+> +	priv->fw_state = PD692X0_FW_COMPLETE;
+> +
+> +	ret = pd692x0_fw_reset(client);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ver = pd692x0_get_sw_version(priv);
+> +	if (ver.maj_sw_ver != PD692X0_FW_MAJ_VER) {
+
+That is probably too strong a condition. You need to allow firmware
+upgrades, etc. Does it need to be an exact match, or would < be
+enough?
+
+w> +	if (ver.maj_sw_ver != PD692X0_FW_MAJ_VER) {
+> +		dev_err(dev, "Too old firmware version. Please update it\n");
+> +		priv->fw_state = PD692X0_FW_NEED_UPDATE;
+
+Same here.
+
+     Andrew
 
