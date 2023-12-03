@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-53345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE108026ED
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:34:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBE88026EB
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B72F280E91
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:34:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8B50280E46
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A23182A1;
-	Sun,  3 Dec 2023 19:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9014F18049;
+	Sun,  3 Dec 2023 19:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INmutiGk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JgytcY7N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5884919F;
-	Sun,  3 Dec 2023 11:33:56 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-daf4f0e3a0fso1923328276.1;
-        Sun, 03 Dec 2023 11:33:56 -0800 (PST)
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A556113;
+	Sun,  3 Dec 2023 11:34:00 -0800 (PST)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-5cece20f006so44070457b3.3;
+        Sun, 03 Dec 2023 11:34:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701632034; x=1702236834; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701632039; x=1702236839; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=umylsjeSPs0cDBz7+FTUGH2Vn0LO0b26GddccWPu0Jc=;
-        b=INmutiGknFZp4otivmEjEN6U5i9K+DYuNAAwT4RR6E6MHxetNGsWEjpz4PFZZ3NewE
-         XoKmhzornVPQikoYdYEKbY0/ENZMcQNcbTSwLpRGFI+8ruV0Xm9BKJ64Jqxn27jK5u4v
-         F4MphdmtdPwA6l/hAJcLIgbq15egqT9GYh6fAJ9uteezJ3DFwfqJ2TKc3d0XCR5IFTQH
-         eSp8g1BkM4R+thZ3DYoDIsO+5JEY8faCXPyWKqK+yjzdenQdE5P+JPtH/bJAcOib480v
-         1CKY9k6RMfd/HfancmSlu0slSrXlX7zyKSu+vuigYABNaVGhOPLTw21ZcPCy0tiBj7WD
-         LUzA==
+        bh=oOA21j87mR+yiywFqhw/n2ogDgEt85D4G/d7gO/inIA=;
+        b=JgytcY7N94v8jdinYmONzMtSa4aq07zgEq2N2MywhkQAtb67A7JzB67D86goKcEWMW
+         9epDoR4YQTtvbPmTodJynrjJts199/nCIhuOQk0ip8ZJGejsCnj23v2+GPrNoyFNeQLO
+         RmQHuRTF5E0xugwA8Cty2QcvznEqIxqNArMweIaTCirV+w0m/H0NNsHItRDrPTnVuEvE
+         k/mIe8bk69cxOz5qEggKAo7ryY38Ivb1ShUkHw9jxfnEEBb5jNuVY0VapMhmGMEJsKbp
+         BrpNOpJFHV545SR9rTvV1Md/vSDziEXDLO1eKoWQkpCwD4MDA5uOJBDJcRGyw675YnWb
+         xGSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701632034; x=1702236834;
+        d=1e100.net; s=20230601; t=1701632039; x=1702236839;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=umylsjeSPs0cDBz7+FTUGH2Vn0LO0b26GddccWPu0Jc=;
-        b=UTFgThxl5cLW5H480WHyvTltiuI1rEDZJj+XSsd5lmaSlVM/5wwZ6iFOuH5SYqVzp0
-         SH43b3k9NVnziXWgEuWqh/QzAsklti0sV+HUFxOjE4Z5pi2jzTyafEfxyjQejwOUvSe7
-         iPjBJICEq+W+nduJmCV2wIPMaunAr0QFEOkpwLjbOa66eWJOq1o51+43Bsh65vYnMjqb
-         l6Ap2nZuWxvh8QlzMwj0WXrFuzTYdcPsRYPcnUQvNjJ591NJ27CnILxpCE7hqV/J4g4A
-         i7148fVLvS8fij6tm/Cj9JxvruXv56FnOsJOIFT6SO3JWbTOLBCngqQ2tcX170rVmJ7z
-         pIdA==
-X-Gm-Message-State: AOJu0YzgsN/84LRH1P435owWM29qOW8iSSsXH4+rY11skcq8wOtoerdg
-	lykASl1wZX1Sqs0mTG5NB/p1Z6qbL9OCkA==
-X-Google-Smtp-Source: AGHT+IEMrAskXkIWksgXiWbXkBl3jPfPd1x1T+uOqGjr26YyA+tnyIwo24cYyzJVLZxKOZWy5dfEjA==
-X-Received: by 2002:a5b:28c:0:b0:d9b:87f3:54f9 with SMTP id x12-20020a5b028c000000b00d9b87f354f9mr2129725ybl.28.1701632034561;
-        Sun, 03 Dec 2023 11:33:54 -0800 (PST)
+        bh=oOA21j87mR+yiywFqhw/n2ogDgEt85D4G/d7gO/inIA=;
+        b=WO8Vu98n1OGwzgAimE/o0QuC9FmRN/9z53Cx5Fy24wetDMMGpoOeQZSNAB4ytrMLJm
+         txHJ6fDhPB36Yw/ItZCvnD8/4iZ9ApoqQXAiwvqmv7v7OXcc0jPmPBq3Ag04njmvfqpJ
+         UJGy61wGUJ+V5E4r/vCEye0u5PkyNADhjRsN/a9UIh/RBLc/W1EiHW18i72Gi1gi94HU
+         P7gq/FRz8kVuomtpniQpbDrWOIl9SEc0+AcHlIc4CjzM7yW9PlwT8noPnic29omxLi8i
+         0dOYQX3ARF0+3ikXOSEO4YAVf/6mrGxenSAz7QmuJpla6iW1jcZDTQk3GQbboYuhOLCb
+         OvCA==
+X-Gm-Message-State: AOJu0Yxxlv/KsbJOStqB0Io9YY/EMlJ/m6UMU2anXU/N2gZhn+ZdAE3b
+	AcVhMWC8u5SW1tCsYvZaY9mSEW8husdDJA==
+X-Google-Smtp-Source: AGHT+IHXy1WAEEEpXL8d3Qiwz0WaUvvRd1DJhAPAt9NZCAbQTeYlZnMbDBTKqf04Wx3t8kWOvaFN/w==
+X-Received: by 2002:a0d:ebd4:0:b0:5d7:1940:f3ef with SMTP id u203-20020a0debd4000000b005d71940f3efmr2486245ywe.87.1701632038986;
+        Sun, 03 Dec 2023 11:33:58 -0800 (PST)
 Received: from localhost ([2601:344:8301:57f0:cb98:c3e:57c:8191])
-        by smtp.gmail.com with ESMTPSA id o145-20020a257397000000b00d9caecd5c86sm1810336ybc.62.2023.12.03.11.33.53
+        by smtp.gmail.com with ESMTPSA id w20-20020a81a214000000b005d40a826831sm2113106ywg.115.2023.12.03.11.33.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 11:33:53 -0800 (PST)
+        Sun, 03 Dec 2023 11:33:57 -0800 (PST)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
-	Karsten Keil <isdn@linux-pingi.de>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
 Cc: Yury Norov <yury.norov@gmail.com>,
 	Jan Kara <jack@suse.cz>,
@@ -67,9 +71,9 @@ Cc: Yury Norov <yury.norov@gmail.com>,
 	Alexey Klimov <klimov.linux@gmail.com>,
 	Bart Van Assche <bvanassche@acm.org>,
 	Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH v2 26/35] mISDN: optimize get_free_devid()
-Date: Sun,  3 Dec 2023 11:32:58 -0800
-Message-Id: <20231203193307.542794-25-yury.norov@gmail.com>
+Subject: [PATCH v2 28/35] ethernet: rocker: optimize ofdpa_port_internal_vlan_id_get()
+Date: Sun,  3 Dec 2023 11:33:00 -0800
+Message-Id: <20231203193307.542794-27-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231203193307.542794-1-yury.norov@gmail.com>
 References: <20231203192422.539300-1-yury.norov@gmail.com>
@@ -82,42 +86,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-get_free_devid() traverses each bit in device_ids in an open-coded loop.
-We can do it faster by using dedicated find_and_set_bit().
-
-It makes the whole function a nice one-liner, and because MAX_DEVICE_ID
-is a small constant-time value (63), on 64-bit platforms find_and_set_bit()
-call will be optimized to:
-
-	ffs();
-	test_and_set_bit().
+Optimize ofdpa_port_internal_vlan_id_get() by using find_and_set_bit(),
+instead of polling every bit from bitmap in a for-loop.
 
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
- drivers/isdn/mISDN/core.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/rocker/rocker_ofdpa.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/isdn/mISDN/core.c b/drivers/isdn/mISDN/core.c
-index ab8513a7acd5..3f97db006cf3 100644
---- a/drivers/isdn/mISDN/core.c
-+++ b/drivers/isdn/mISDN/core.c
-@@ -197,14 +197,9 @@ get_mdevice_count(void)
- static int
- get_free_devid(void)
- {
--	u_int	i;
-+	u_int i = find_and_set_bit((u_long *)&device_ids, MAX_DEVICE_ID + 1);
+diff --git a/drivers/net/ethernet/rocker/rocker_ofdpa.c b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+index 826990459fa4..449be8af7ffc 100644
+--- a/drivers/net/ethernet/rocker/rocker_ofdpa.c
++++ b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+@@ -2249,14 +2249,11 @@ static __be16 ofdpa_port_internal_vlan_id_get(struct ofdpa_port *ofdpa_port,
+ 	found = entry;
+ 	hash_add(ofdpa->internal_vlan_tbl, &found->entry, found->ifindex);
  
--	for (i = 0; i <= MAX_DEVICE_ID; i++)
--		if (!test_and_set_bit(i, (u_long *)&device_ids))
--			break;
--	if (i > MAX_DEVICE_ID)
--		return -EBUSY;
--	return i;
-+	return i <= MAX_DEVICE_ID ? i : -EBUSY;
- }
+-	for (i = 0; i < OFDPA_N_INTERNAL_VLANS; i++) {
+-		if (test_and_set_bit(i, ofdpa->internal_vlan_bitmap))
+-			continue;
++	i = find_and_set_bit(ofdpa->internal_vlan_bitmap, OFDPA_N_INTERNAL_VLANS);
++	if (i < OFDPA_N_INTERNAL_VLANS)
+ 		found->vlan_id = htons(OFDPA_INTERNAL_VLAN_ID_BASE + i);
+-		goto found;
+-	}
+-
+-	netdev_err(ofdpa_port->dev, "Out of internal VLAN IDs\n");
++	else
++		netdev_err(ofdpa_port->dev, "Out of internal VLAN IDs\n");
  
- int
+ found:
+ 	found->ref_count++;
 -- 
 2.40.1
 
