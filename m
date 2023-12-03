@@ -1,133 +1,482 @@
-Return-Path: <netdev+bounces-53338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B509802662
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:51:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1001802677
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:03:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3343280D63
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF0961C2082A
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A23F1775B;
-	Sun,  3 Dec 2023 18:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BA3179A5;
+	Sun,  3 Dec 2023 19:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="qW2pjun2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oiCifH/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC8CDA;
-	Sun,  3 Dec 2023 10:51:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=QtIyW3E7F8b3M4DB9PWxzuQJmSmGS9EQPoqv9FPpM1U=;
-	t=1701629492; x=1702839092; b=qW2pjun2tRXyr19yfLBkGwYew6Y3r9bPL8/A1+kUKplDeZ/
-	ldV0TjT8AuTI6EQf5FdMCs8UydjJ7/wcK16uVGcGEQaPH1/V+ePaTPiXhGh0yDmlt8HXGCY+oypML
-	GxAjWy9sUmxhqQab/5yTX0UilJ8KYQqjIyFrb/DMwTW9xcwNZFJrtGDUIrTXfKsW42OkHEwSrRCIK
-	96vhJpnlc0s5UUVRTjglvwx0ZmbUJJFOZonjgZHDOKXCuX+j0vB1T+/lXgTwoSD5pDFekeeCb7NZ1
-	v0W8K6zNHREu+E2lHN39L0kh8ZCp659iMY24kQWvWRrbu1MIDSCjBSR+vqTt0YuA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1r9rYv-0000000DmPt-3GxJ;
-	Sun, 03 Dec 2023 19:51:30 +0100
-Message-ID: <efd89dee78a4c42b7825fa55bbceafad9bb9df36.camel@sipsolutions.net>
-Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Sun, 03 Dec 2023 19:51:28 +0100
-In-Reply-To: <20231202104655.68138ab4@kernel.org>
-References: 
-	<346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
-	 <20231201104329.25898-5-johannes@sipsolutions.net>
-	 <20231201162844.14d1bbb0@kernel.org>
-	 <339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
-	 <20231202104655.68138ab4@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [IPv6:2001:41d0:203:375::bb])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 238FBE8;
+	Sun,  3 Dec 2023 11:02:58 -0800 (PST)
+Message-ID: <b5547960-c4ef-2b90-0186-a859d18849fc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701630176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nxq7aIbrJ6AwmWr1/OebIisO2F9yp31b2RngOBMBOEg=;
+	b=oiCifH/n2sWY6Hpd+2O+bQvik1y5jeLRfh5DVfSuj4bGr9s6kubIRLUxvZAf0CPzaMj3vb
+	8Gsp6rMvtkyhWZRNLu50vCrCR8oDxtykvqEXrykYJjaruXs2uDX+o2JEwKZXe8QWIfcBiE
+	tnq2ZhM7soM6Gzot+GWwB6uD+cagc0g=
+Date: Sun, 3 Dec 2023 19:02:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Vadim Fedorenko <vadfed@meta.com>
+References: <20231202010604.1877561-1-vadfed@meta.com>
+ <3bea70d0-94a5-4d41-be15-2e8b5932a3b0@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <3bea70d0-94a5-4d41-be15-2e8b5932a3b0@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 2023-12-02 at 10:46 -0800, Jakub Kicinski wrote:
-> On Sat, 02 Dec 2023 11:06:36 +0100 Johannes Berg wrote:
-> > > Would it work if we exposed "linkwatch is pending" / "link is
-> > > transitioning" bit to user space? =20
-> >=20
-> > Not sure, not by much or more than what this did? It's basically the
-> > same, I think: I exposed the carrier_up_count at the kernel time, so if
-> > userspace hasn't seen an event with a value >=3D that it knows the link=
- is
-> > transitioning.
->=20
-> The benefit being that it'd work for everyone, without having to add
-> the carrier count in random events?
+On 02.12.2023 01:48, Martin KaFai Lau wrote:
+> On 12/1/23 5:06 PM, Vadim Fedorenko wrote:
+>> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+>> index eb447b0a9423..0143ff6c93a1 100644
+>> --- a/include/linux/bpf.h
+>> +++ b/include/linux/bpf.h
+>> @@ -1228,6 +1228,7 @@ int bpf_dynptr_check_size(u32 size);
+>>   u32 __bpf_dynptr_size(const struct bpf_dynptr_kern *ptr);
+>>   const void *__bpf_dynptr_data(const struct bpf_dynptr_kern *ptr, u32 len);
+>>   void *__bpf_dynptr_data_rw(const struct bpf_dynptr_kern *ptr, u32 len);
+>> +bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr);
+>>   #ifdef CONFIG_BPF_JIT
+>>   int bpf_trampoline_link_prog(struct bpf_tramp_link *link, struct 
+>> bpf_trampoline *tr);
+>> diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
+>> new file mode 100644
+>> index 000000000000..e81bd8ab979c
+>> --- /dev/null
+>> +++ b/include/linux/bpf_crypto.h
+>> @@ -0,0 +1,23 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
+>> +#ifndef _BPF_CRYPTO_H
+>> +#define _BPF_CRYPTO_H
+>> +
+>> +struct bpf_crypto_type {
+>> +    void *(*alloc_tfm)(const char *algo);
+>> +    void (*free_tfm)(void *tfm);
+>> +    int (*has_algo)(const char *algo);
+>> +    int (*setkey)(void *tfm, const u8 *key, unsigned int keylen);
+>> +    int (*setauthsize)(void *tfm, unsigned int authsize);
+>> +    int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+>> +    int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+>> +    unsigned int (*ivsize)(void *tfm);
+>> +    u32 (*get_flags)(void *tfm);
+>> +    struct module *owner;
+>> +    char name[14];
+> 
+> Does it have a macro (from crypto ?) that can be reused here instead of a 
+> numeric constant?
+> 
+I have checked AF_ALG which uses the same way and there is no constant
+unfortunately:
+https://elixir.bootlin.com/linux/v6.7-rc3/source/include/crypto/if_alg.h#L55
 
-Well, true. You'd still have to add random rtnl_getlink() calls to your
-userspace, and then wait for an event if it's transitioning? Actually a
-bit _more_ complicated since then we'd have to do rtnl_getlink() after
-receiving the assoc event, and then wait if still transitioning. Or I
-guess we could do it when sending a frame there in the tests, but it's
-another call into the kernel vs. getting the information we need in the
-event.
+Maybe Herbert will suggest some constant instead?
 
-But yeah honestly I don't mind that either, and maybe it helps address
-some other use cases like what Andrew had in mind in his reply to my
-original thread.
+>> +};
+>> +
+>> +int bpf_crypto_register_type(const struct bpf_crypto_type *type);
+>> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type);
+>> +
+>> +#endif /* _BPF_CRYPTO_H */
+>> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+>> index f526b7573e97..bcde762bb2c2 100644
+>> --- a/kernel/bpf/Makefile
+>> +++ b/kernel/bpf/Makefile
+>> @@ -41,6 +41,9 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+>>   obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+>>   obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+>>   endif
+>> +ifeq ($(CONFIG_CRYPTO),y)
+>> +obj-$(CONFIG_BPF_SYSCALL) += crypto.o
+>> +endif
+>>   obj-$(CONFIG_BPF_PRELOAD) += preload/
+>>   obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
+>> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+>> new file mode 100644
+>> index 000000000000..a1e543d1d7fe
+>> --- /dev/null
+>> +++ b/kernel/bpf/crypto.c
+>> @@ -0,0 +1,364 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/* Copyright (c) 2023 Meta, Inc */
+>> +#include <linux/bpf.h>
+>> +#include <linux/bpf_crypto.h>
+>> +#include <linux/bpf_mem_alloc.h>
+>> +#include <linux/btf.h>
+>> +#include <linux/btf_ids.h>
+>> +#include <linux/filter.h>
+>> +#include <linux/scatterlist.h>
+>> +#include <linux/skbuff.h>
+>> +#include <crypto/skcipher.h>
+>> +
+>> +struct bpf_crypto_type_list {
+>> +    const struct bpf_crypto_type *type;
+>> +    struct list_head list;
+>> +};
+>> +
+>> +static LIST_HEAD(bpf_crypto_types);
+>> +static DECLARE_RWSEM(bpf_crypto_types_sem);
+>> +
+>> +/**
+>> + * struct bpf_crypto_ctx - refcounted BPF crypto context structure
+>> + * @type:    The pointer to bpf crypto type
+>> + * @tfm:    The pointer to instance of crypto API struct.
+>> + * @rcu:    The RCU head used to free the crypto context with RCU safety.
+>> + * @usage:    Object reference counter. When the refcount goes to 0, the
+>> + *        memory is released back to the BPF allocator, which provides
+>> + *        RCU safety.
+>> + */
+>> +struct bpf_crypto_ctx {
+>> +    const struct bpf_crypto_type *type;
+>> +    void *tfm;
+>> +    struct rcu_head rcu;
+>> +    refcount_t usage;
+>> +};
+>> +
+>> +int bpf_crypto_register_type(const struct bpf_crypto_type *type)
+>> +{
+>> +    struct bpf_crypto_type_list *node;
+>> +    int err = -EEXIST;
+>> +
+>> +    down_write(&bpf_crypto_types_sem);
+>> +    list_for_each_entry(node, &bpf_crypto_types, list) {
+>> +        if (!strcmp(node->type->name, type->name))
+>> +            goto unlock;
+>> +    }
+>> +
+>> +    node = kmalloc(sizeof(*node), GFP_KERNEL);
+>> +    err = -ENOMEM;
+>> +    if (!node)
+>> +        goto unlock;
+>> +
+>> +    node->type = type;
+>> +    list_add(&node->list, &bpf_crypto_types);
+>> +    err = 0;
+>> +
+>> +unlock:
+>> +    up_write(&bpf_crypto_types_sem);
+>> +
+>> +    return err;
+>> +}
+>> +EXPORT_SYMBOL_GPL(bpf_crypto_register_type);
+>> +
+>> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type)
+>> +{
+>> +    struct bpf_crypto_type_list *node;
+>> +    int err = -ENOENT;
+>> +
+>> +    down_write(&bpf_crypto_types_sem);
+>> +    list_for_each_entry(node, &bpf_crypto_types, list) {
+>> +        if (strcmp(node->type->name, type->name))
+>> +            continue;
+>> +
+>> +        list_del(&node->list);
+>> +        kfree(node);
+>> +        err = 0;
+>> +        break;
+>> +    }
+>> +    up_write(&bpf_crypto_types_sem);
+>> +
+>> +    return err;
+>> +}
+>> +EXPORT_SYMBOL_GPL(bpf_crypto_unregister_type);
+>> +
+>> +static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
+>> +{
+>> +    const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
+>> +    struct bpf_crypto_type_list *node;
+>> +
+>> +    down_read(&bpf_crypto_types_sem);
+>> +    list_for_each_entry(node, &bpf_crypto_types, list) {
+>> +        if (strcmp(node->type->name, name))
+>> +            continue;
+>> +
+>> +        if (try_module_get(node->type->owner))
+> 
+> If I read patch 2 correctly, it is always built-in. I am not sure I understand 
+> the module_put/get in this patch.
 
-> > > Even crazier, would it help if we had rtnl_getlink() run
-> > > linkwatch for the target link if linkwatch is pending? =20
-> >=20
-> > Sure, if we were to just synchronize that at the right time (doesn't
-> > even need to be rtnl_getlink, could be a new operation) that'd solve th=
-e
-> > issue too, perhaps more easily.
->=20
-> I was wondering about the new op, too, but "synchronize things please"
-> op feels a little hacky.
+Well, yeah, right now it's built-in, but it can be easily converted to module
+with it's own Kconfig option. Especially if we think about adding aead crypto
+and using bpf in embedded setups with less amount of resources.
 
-Agree ... but then again it's all a bit hacky. You can even read
-"carrier is on" when it's really not yet ready...
+>> +            type = node->type;
+>> +        break;
+>> +    }
+>> +    up_read(&bpf_crypto_types_sem);
+>> +
+>> +    return type;
+>> +}
+>> +
+>> +__bpf_kfunc_start_defs();
+>> +
+>> +/**
+>> + * bpf_crypto_ctx_create() - Create a mutable BPF crypto context.
+>> + *
+>> + * Allocates a crypto context that can be used, acquired, and released by
+>> + * a BPF program. The crypto context returned by this function must either
+>> + * be embedded in a map as a kptr, or freed with bpf_crypto_ctx_release().
+>> + * As crypto API functions use GFP_KERNEL allocations, this function can
+>> + * only be used in sleepable BPF programs.
+>> + *
+>> + * bpf_crypto_ctx_create() allocates memory for crypto context.
+>> + * It may return NULL if no memory is available.
+>> + * @type__str: pointer to string representation of crypto type.
+>> + * @algo__str: pointer to string representation of algorithm.
+>> + * @pkey:      bpf_dynptr which holds cipher key to do crypto.
+>> + * @err:       integer to store error code when NULL is returned
+>> + */
+>> +__bpf_kfunc struct bpf_crypto_ctx *
+>> +bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
+>> +              const struct bpf_dynptr_kern *pkey,
+>> +              unsigned int authsize, int *err)
+>> +{
+>> +    const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
+>> +    struct bpf_crypto_ctx *ctx;
+>> +    const u8 *key;
+>> +    u32 key_len;
+>> +
+>> +    type = bpf_crypto_get_type(type__str);
+>> +    if (IS_ERR(type)) {
+>> +        *err = PTR_ERR(type);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    if (!type->has_algo(algo__str)) {
+>> +        *err = -EOPNOTSUPP;
+>> +        goto err;
+> 
+> ctx is still not initialized. The error path will crash.
 
-> rtnl_getlink returns link state, so it feels
-> somewhat natural for it to do the sync, to make sure that what it
-> returns is in fact correct information.
+good catch, thanks!
 
-Yeah that's a good point that I just mentioned above though - today the
-kernel will happily return a state that it's not actually willing to
-honour yet, i.e. if you actively read the state, you'll see carrier on
-before the kernel is actually willing to transmit packets on the link.
+>> +    }
+>> +
+>> +    if (!authsize && type->setauthsize) {
+>> +        *err = -EOPNOTSUPP;
+>> +        goto err;
+>> +    }
+>> +
+>> +    if (authsize && !type->setauthsize) {
+>> +        *err = -EOPNOTSUPP;
+>> +        goto err;
+>> +    }
+>> +
+>> +    key_len = __bpf_dynptr_size(pkey);
+>> +    if (!key_len) {
+>> +        *err = -EINVAL;
+>> +        goto err;
+>> +    }
+>> +    key = __bpf_dynptr_data(pkey, key_len);
+>> +    if (!key) {
+>> +        *err = -EINVAL;
+>> +        goto err;
+>> +    }
+>> +
+>> +    ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+>> +    if (!ctx) {
+>> +        *err = -ENOMEM;
+>> +        goto err;
+>> +    }
+>> +
+>> +    ctx->type = type;
+>> +    ctx->tfm = type->alloc_tfm(algo__str);
+>> +    if (IS_ERR(ctx->tfm)) {
+>> +        *err = PTR_ERR(ctx->tfm);
+>> +        ctx->tfm = NULL;
+>> +        goto err;
+>> +    }
+>> +
+>> +    if (authsize) {
+>> +        *err = type->setauthsize(ctx->tfm, authsize);
+>> +        if (*err)
+>> +            goto err;
+>> +    }
+>> +
+>> +    *err = type->setkey(ctx->tfm, key, key_len);
+>> +    if (*err)
+>> +        goto err;
+>> +
+>> +    refcount_set(&ctx->usage, 1);
+>> +
+>> +    return ctx;
+>> +err:
+>> +    if (ctx->tfm)
+>> +        type->free_tfm(ctx->tfm);
+>> +    kfree(ctx);
+>> +    module_put(type->owner);
+>> +
+>> +    return NULL;
+>> +}
+>> +
+>> +static void crypto_free_cb(struct rcu_head *head)
+>> +{
+>> +    struct bpf_crypto_ctx *ctx;
+>> +
+>> +    ctx = container_of(head, struct bpf_crypto_ctx, rcu);
+>> +    ctx->type->free_tfm(ctx->tfm);
+>> +    module_put(ctx->type->owner);
+>> +    kfree(ctx);
+>> +}
+>> +
+>> +/**
+>> + * bpf_crypto_ctx_acquire() - Acquire a reference to a BPF crypto context.
+>> + * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
+>> + *         pointer.
+>> + *
+>> + * Acquires a reference to a BPF crypto context. The context returned by this 
+>> function
+>> + * must either be embedded in a map as a kptr, or freed with
+>> + * bpf_crypto_skcipher_ctx_release().
+>> + */
+>> +__bpf_kfunc struct bpf_crypto_ctx *
+>> +bpf_crypto_ctx_acquire(struct bpf_crypto_ctx *ctx)
+>> +{
+>> +    refcount_inc(&ctx->usage);
+>> +    return ctx;
+>> +}
+>> +
+>> +/**
+>> + * bpf_crypto_ctx_release() - Release a previously acquired BPF crypto context.
+>> + * @ctx: The crypto context being released.
+>> + *
+>> + * Releases a previously acquired reference to a BPF crypto context. When the 
+>> final
+>> + * reference of the BPF crypto context has been released, it is subsequently 
+>> freed in
+>> + * an RCU callback in the BPF memory allocator.
+>> + */
+>> +__bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
+>> +{
+>> +    if (refcount_dec_and_test(&ctx->usage))
+>> +        call_rcu(&ctx->rcu, crypto_free_cb);
+>> +}
+>> +
+>> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+>> +                const struct bpf_dynptr_kern *src,
+>> +                struct bpf_dynptr_kern *dst,
+>> +                const struct bpf_dynptr_kern *iv,
+>> +                bool decrypt)
+>> +{
+>> +    u32 src_len, dst_len, iv_len;
+>> +    const u8 *psrc;
+>> +    u8 *pdst, *piv;
+>> +    int err;
+>> +
+>> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
+>> +        return -EINVAL;
+>> +
+>> +    if (__bpf_dynptr_is_rdonly(dst))
+>> +        return -EINVAL;
+>> +
+>> +    iv_len = __bpf_dynptr_size(iv);
+>> +    src_len = __bpf_dynptr_size(src);
+>> +    dst_len = __bpf_dynptr_size(dst);
+>> +    if (!src_len || !dst_len)
+>> +        return -EINVAL;
+>> +
+>> +    if (iv_len != ctx->type->ivsize(ctx->tfm))
+>> +        return -EINVAL;
+>> +
+>> +    psrc = __bpf_dynptr_data(src, src_len);
+>> +    if (!psrc)
+>> +        return -EINVAL;
+>> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
+>> +    if (!pdst)
+>> +        return -EINVAL;
+>> +
+>> +    piv = iv_len ? __bpf_dynptr_data_rw(iv, iv_len) : NULL;
+>> +    if (iv_len && !piv)
+>> +        return -EINVAL;
+>> +
+>> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
+>> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
+>> +
+>> +    return err;
+>> +}
+>> +
+>> +/**
+>> + * bpf_crypto_decrypt() - Decrypt buffer using configured context and IV 
+>> provided.
+>> + * @ctx:    The crypto context being used. The ctx must be a trusted pointer.
+>> + * @src:    bpf_dynptr to the encrypted data. Must be a trusted pointer.
+>> + * @dst:    bpf_dynptr to the buffer where to store the result. Must be a 
+>> trusted pointer.
+>> + * @iv:        bpf_dynptr to IV data to be used by decryptor.
+>> + *
+>> + * Decrypts provided buffer using IV data and the crypto context. Crypto 
+>> context must be configured.
+>> + */
+>> +__bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
+>> +                   const struct bpf_dynptr_kern *src,
+>> +                   struct bpf_dynptr_kern *dst,
+>> +                   struct bpf_dynptr_kern *iv)
+>> +{
+>> +    return bpf_crypto_crypt(ctx, src, dst, iv, true);
+>> +}
+>> +
+>> +/**
+>> + * bpf_crypto_encrypt() - Encrypt buffer using configured context and IV 
+>> provided.
+>> + * @ctx:    The crypto context being used. The ctx must be a trusted pointer.
+>> + * @src:    bpf_dynptr to the plain data. Must be a trusted pointer.
+>> + * @dst:    bpf_dynptr to buffer where to store the result. Must be a trusted 
+>> pointer.
+>> + * @iv:        bpf_dynptr to IV data to be used by decryptor.
+>> + *
+>> + * Encrypts provided buffer using IV data and the crypto context. Crypto 
+>> context must be configured.
+>> + */
+>> +__bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
+>> +                   const struct bpf_dynptr_kern *src,
+>> +                   struct bpf_dynptr_kern *dst,
+>> +                   struct bpf_dynptr_kern *iv)
+>> +{
+>> +    return bpf_crypto_crypt(ctx, src, dst, iv, false);
+>> +}
+>> +
+>> +__bpf_kfunc_end_defs();
+>> +
+>> +BTF_SET8_START(crypt_init_kfunc_btf_ids)
+>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_create, KF_ACQUIRE | KF_RET_NULL | 
+>> KF_SLEEPABLE)
+>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_release, KF_RELEASE)
+>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_acquire, KF_ACQUIRE | KF_TRUSTED_ARGS)
+> 
+> Considering bpf_crypto_ctx is rcu protected, the acquire may use "KF_ACQUIRE | 
+> KF_RCU | KF_RET_NULL" such that the bpf_crypto_ctx_acquire(ctx_from_map_value) 
+> will work and the user will prepare checking NULL from day one.
+>
 
-Fixing that _would_ be nice, but I'm somewhat worried that it will cause
-performance regressions to always sync there? OTOH, it would hopefully
-not actually have to wait most of the time since link_watch isn't always
-pending...
+Got it. What about create? Should it also include KF_RCU?
 
-> rtnl_getlink does return a lot, so maybe a new rtnl_getcarrier op?
-
-Does it matter? Just another attribute ...
-
-> Or we can make reading sysfs "carrier" do the sync?
-
-I think I wouldn't mind now, and perhaps if we want to sync in netlink
-we should also do this here so that it's consistent, but I'm not sure
-I'd want this to be the only way to do it, I might imagine that someone
-might want this in some kind of container that doesn't necessarily have
-(full) access there? Dunno.
-
-
-We _could_ also use an input attribute on the rtnl_getlink() call to
-have userspace explicitly opt in to doing the sync before returning
-information?
-
-
-johannes
 
