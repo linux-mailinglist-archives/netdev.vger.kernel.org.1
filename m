@@ -1,219 +1,386 @@
-Return-Path: <netdev+bounces-53321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468B88025C3
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 17:52:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B768025D0
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 660951C20966
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 16:52:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FAE3280D4F
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 17:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCD81642E;
-	Sun,  3 Dec 2023 16:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C41A16438;
+	Sun,  3 Dec 2023 17:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KbX2ippj"
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="Y33UkWii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D510A106;
-	Sun,  3 Dec 2023 08:52:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701622354; x=1733158354;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EA2ji1tKwR3xZ86ktJFvtkVW0seRxPfhzpnrXQXAqB4=;
-  b=KbX2ippj1PaACm0L/STZvJXEIuCSVeRW3+51NiiqUGhFG3aU8WmuMnng
-   n6pBUbdggDWh9pGZsZsWHpeaGXq9jyehvVv7c7L41zSxqW1HHbzVQQoow
-   3KuRXjeRpzQXXAPdSOicV0AgAW0EDQi5drmGC4t+X+07cOFHL76UhBtS4
-   M+mdWwooQ1FxhppcWaCQqS5IhCZQO1dOo6UsEtjgIueOXHdeFxowwVglS
-   LPP6MD4Ua8h9ghHiVIuyPeAysmW/99Jz9wQmJwX1lQtgvxavqc0ERmdqX
-   ScWPmZP1CIbl7Gfj+jrjQWLlgJf3c/gv2bBNmqYK/hAkB30y2MKQWZHgM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="706864"
-X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
-   d="scan'208";a="706864"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 08:52:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="799345527"
-X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
-   d="scan'208";a="799345527"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
-  by orsmga008.jf.intel.com with ESMTP; 03 Dec 2023 08:52:24 -0800
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Topel <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	bpf@vger.kernel.org,
-	xdp-hints@xdp-project.net,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kselftest@vger.kernel.org,
-	Song Yoong Siang <yoong.siang.song@intel.com>
-Subject: [PATCH bpf-next v3 3/3] selftests/bpf: add Launch Time request to xdp_hw_metadata
-Date: Mon,  4 Dec 2023 00:51:29 +0800
-Message-Id: <20231203165129.1740512-4-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231203165129.1740512-1-yoong.siang.song@intel.com>
-References: <20231203165129.1740512-1-yoong.siang.song@intel.com>
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5632F0;
+	Sun,  3 Dec 2023 09:00:04 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B3FwhbZ012364;
+	Sun, 3 Dec 2023 08:59:51 -0800
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ur2tvad70-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 Dec 2023 08:59:51 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lBWw5/+x9gr1MmCzjjVBU//KUIJJ6VgEgfH8R74vW5YqQ5AescCekkdikPwkknaqhupdAsV9tARSXZ6WTnDPkihRjAFxrq72PjBGRdShUXAyeWIIZ4IIvFwo9FYm6mVxAdh7HCMdNWtgTMAfM6lkyppArbMQia4g+wb/R6QX4WQMEOqEgtMllxcKVqMpz5Hd64ivrpwGKjnLoKF68EJq6hOj3q8ySiLW3oiyAG0QPRzYjpwMcJJXTs121ei9fsw+NDjY00eybB8M702bwrcJC2wwf6fsZW330Z393tAOgz0t1kq+7H3XJjdHtQeQvHpENKqg+RL/Jh8OhD6YPWVo7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=syN4lesymle8luQlcDxtUMF8++/uC23xknN1nBA0RwM=;
+ b=Mik6/YhkpbCKIfjqEcMYTgrNgfTY0xXa1OmzgT9wSIv5vEpZfZrraIu9QjQERusE/tEqw+69xrL5cLq7HCHFMz9bdutV9UPIv25Y2SdYquDLKGqgaoIS07b3fXB+M7/O8PKYoNliteNn39MUdGRmjF1qdaDYjn2MPVVtzLkyB70opzbMfZP55WKnLqQwTmD7TfmsOOXam7Qp4jRo19Z0PMnuO93ZCMa6egT+0t+ImtwuVWILoO8svdv05qXDn8m4UscW0HcrzG+2D66UrLJfaxiUDOi+TgiX6ff/LdO/k0qY+6RkGlFaTqYYO+ZQrvqDw9JKvILZgDhSJOcr6PIJfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=syN4lesymle8luQlcDxtUMF8++/uC23xknN1nBA0RwM=;
+ b=Y33UkWiiLtq4CStlkeDECTPZyC5Zb/IUJEKtnzcN7t5ErOzNObaVv4IaW9KtnfZCdcY0Si9W1tcvI5thPcILTkIbc9hB/oH8yoY+pC06F62GNs6VMXQPrWBGFKM2h+sY/Wq+o1Aap11HIIWkycykY6vLjhtzq8CYe87siAwu1/M=
+Received: from SJ0PR18MB5216.namprd18.prod.outlook.com (2603:10b6:a03:430::6)
+ by DM4PR18MB4317.namprd18.prod.outlook.com (2603:10b6:5:398::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.32; Sun, 3 Dec
+ 2023 16:59:39 +0000
+Received: from SJ0PR18MB5216.namprd18.prod.outlook.com
+ ([fe80::6a4f:cb8d:70fd:ef2]) by SJ0PR18MB5216.namprd18.prod.outlook.com
+ ([fe80::6a4f:cb8d:70fd:ef2%4]) with mapi id 15.20.7046.032; Sun, 3 Dec 2023
+ 16:59:39 +0000
+From: Suman Ghosh <sumang@marvell.com>
+To: Siddh Raman Pant <code@siddh.me>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Samuel Ortiz
+	<sameo@linux.intel.com>,
+        "syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com"
+	<syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+Subject: RE: [EXT] [PATCH net-next v2 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
+Thread-Topic: [EXT] [PATCH net-next v2 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
+Thread-Index: AQHaJTYgngNuT7kSE0OBtZPJVIp8E7CXuLWQ
+Date: Sun, 3 Dec 2023 16:59:39 +0000
+Message-ID: 
+ <SJ0PR18MB5216AB7B26C1F34A8748F2DADB87A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+References: <cover.1701530776.git.code@siddh.me>
+ <476cccdcb57645784889fc82f0c7c10ff4c8b8c0.1701530776.git.code@siddh.me>
+In-Reply-To: 
+ <476cccdcb57645784889fc82f0c7c10ff4c8b8c0.1701530776.git.code@siddh.me>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-dg-ref: 
+ =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcc3VtYW5nXGFw?=
+ =?us-ascii?Q?cGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0YmEy?=
+ =?us-ascii?Q?OWUzNWJcbXNnc1xtc2ctNTY1NDQxNzAtOTFmZC0xMWVlLWI2ZmUtODQxNDRk?=
+ =?us-ascii?Q?ZWVhNTRjXGFtZS10ZXN0XDU2NTQ0MTcxLTkxZmQtMTFlZS1iNmZlLTg0MTQ0?=
+ =?us-ascii?Q?ZGVlYTU0Y2JvZHkudHh0IiBzej0iMzU1NCIgdD0iMTMzNDYwOTYzNzY3NTA2?=
+ =?us-ascii?Q?MjI1IiBoPSJId01PTW1NRlhGWHJBcWw1ekF6RkxEbVVOOUU9IiBpZD0iIiBi?=
+ =?us-ascii?Q?bD0iMCIgYm89IjEiIGNpPSJjQUFBQUVSSFUxUlNSVUZOQ2dVQUFCZ1dBQUF4?=
+ =?us-ascii?Q?VmI0WUNpYmFBYmFZMzlUZHY0bnF0cGpmMU4yL2llb1pBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBSEFBQUFCdUR3QUEzZzhBQURvR0FBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?RUFBUUVCQUFBQTlSZW5Md0NBQVFBQUFBQUFBQUFBQUo0QUFBQmhBR1FBWkFC?=
+ =?us-ascii?Q?eUFHVUFjd0J6QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFF?=
+ =?us-ascii?Q?QUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdNQWRRQnpBSFFBYndCdEFGOEFjQUJs?=
+ =?us-ascii?Q?QUhJQWN3QnZBRzRBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFB?=
+ =?us-ascii?Q?QUFDZUFBQUFZd0IxQUhNQWRBQnZBRzBBWHdCd0FHZ0Fid0J1QUdVQWJnQjFB?=
+ =?us-ascii?Q?RzBBWWdCbEFISUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCakFIVUFj?=
+ =?us-ascii?Q?d0IwQUc4QWJRQmZBSE1BY3dCdUFGOEFaQUJoQUhNQWFBQmZBSFlBTUFBeUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+x-dg-refone: 
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQUFBQUFBZ0FBQUFBQW5nQUFBR01B?=
+ =?us-ascii?Q?ZFFCekFIUUFid0J0QUY4QWN3QnpBRzRBWHdCckFHVUFlUUIzQUc4QWNnQmtB?=
+ =?us-ascii?Q?SE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNlQUFBQVl3QjFBSE1BZEFCdkFHMEFY?=
+ =?us-ascii?Q?d0J6QUhNQWJnQmZBRzRBYndCa0FHVUFiQUJwQUcwQWFRQjBBR1VBY2dCZkFI?=
+ =?us-ascii?Q?WUFNQUF5QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUlBQUFBQUFKNEFBQUJqQUhVQWN3QjBBRzhBYlFCZkFITUFjd0J1QUY4QWN3?=
+ =?us-ascii?Q?QndBR0VBWXdCbEFGOEFkZ0F3QURJQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFH?=
+ =?us-ascii?Q?UUFiQUJ3QUY4QWN3QnJBSGtBY0FCbEFGOEFZd0JvQUdFQWRBQmZBRzBBWlFC?=
+ =?us-ascii?Q?ekFITUFZUUJuQUdVQVh3QjJBREFBTWdBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBWkFCc0FIQUFYd0J6QUd3?=
+ =?us-ascii?Q?QVlRQmpBR3NBWHdCakFHZ0FZUUIwQUY4QWJRQmxBSE1BY3dCaEFHY0FaUUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+x-dg-reftwo: 
+ =?us-ascii?Q?QUFBQUFBQUFBQUJBQUFBQUFBQUFBSUFBQUFBQUo0QUFBQmtBR3dBY0FCZkFI?=
+ =?us-ascii?Q?UUFaUUJoQUcwQWN3QmZBRzhBYmdCbEFHUUFjZ0JwQUhZQVpRQmZBR1lBYVFC?=
+ =?us-ascii?Q?c0FHVUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFB?=
+ =?us-ascii?Q?QUFBQUFBQWdBQUFBQUFuZ0FBQUdVQWJRQmhBR2tBYkFCZkFHRUFaQUJrQUhJ?=
+ =?us-ascii?Q?QVpRQnpBSE1BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFD?=
+ =?us-ascii?Q?ZUFBQUFiUUJoQUhJQWRnQmxBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhB?=
+ =?us-ascii?Q?YmdCaEFHMEFaUUJ6QUY4QVl3QnZBRzRBWmdCcEFHUUFaUUJ1QUhRQWFRQmhB?=
+ =?us-ascii?Q?R3dBWHdCaEFHd0Fid0J1QUdVQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFjZ0Iy?=
+ =?us-ascii?Q?QUdVQWJBQmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFITUFY?=
+ =?us-ascii?Q?d0J5QUdVQWN3QjBBSElBYVFCakFIUUFaUUJrQUY4QVlRQnNBRzhBYmdCbEFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVB?=
+ =?us-ascii?Q?QUFBQUFBQUFBZ0FBQUFBQW5nQUFBRzBBWVFCeUFIWUFaUUJzQUY4QWNBQnlB?=
+ =?us-ascii?Q?RzhBYWdCbEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFISUFaUUJ6QUhRQWNn?=
+ =?us-ascii?Q?QnBBR01BZEFCbEFHUUFYd0JvQUdVQWVBQmpBRzhBWkFCbEFITUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFB?=
+ =?us-ascii?Q?QUNlQUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUdFQWNnQnRBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+x-dg-rorf: true
+x-dg-refthree: 
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlB?=
+ =?us-ascii?Q?QUFBQUFKNEFBQUJ0QUdFQWNnQjJBR1VBYkFCc0FGOEFad0J2QUc4QVp3QnNB?=
+ =?us-ascii?Q?R1VBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBRUFBQUFBQUFBQUFnQUFBQUFBbmdBQUFHMEFZ?=
+ =?us-ascii?Q?UUJ5QUhZQVpRQnNBR3dBWHdCd0FISUFid0JxQUdVQVl3QjBBRjhBWXdCdkFH?=
+ =?us-ascii?Q?UUFaUUJ6QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQVFBQUFBQUFBQUFDQUFBQUFBQ2VBQUFBYlFCaEFISUFkZ0JsQUd3QWJB?=
+ =?us-ascii?Q?QmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QmpBRzhBWkFCbEFITUFYd0JrQUdr?=
+ =?us-ascii?Q?QVl3QjBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJBQUFBQUFBQUFB?=
+ =?us-ascii?Q?SUFBQUFBQUo0QUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWNBQnlBRzhBYWdC?=
+ =?us-ascii?Q?bEFHTUFkQUJmQUc0QVlRQnRBR1VBY3dCZkFHTUFid0J1QUdZQWFRQmtBR1VB?=
+ =?us-ascii?Q?YmdCMEFHa0FZUUJzQUY4QWJRQmhBSElBZGdCbEFHd0FiQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUcw?=
+ =?us-ascii?Q?QVlRQnlBSFlBWlFCc0FHd0FYd0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFiZ0Jo?=
+ =?us-ascii?Q?QUcwQVpRQnpBRjhBWXdCdkFHNEFaZ0JwQUdRQVpRQnVBSFFBYVFCaEFHd0FY?=
+ =?us-ascii?Q?d0J0QUdFQWNnQjJBR1VBYkFCc0FGOEFid0J5QUY4QVlRQnlBRzBBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+x-dg-reffour: 
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNBQUFBQUFDZUFB?=
+ =?us-ascii?Q?QUFiUUJoQUhJQWRnQmxBR3dBYkFCZkFIQUFjZ0J2QUdvQVpRQmpBSFFBWHdC?=
+ =?us-ascii?Q?dUFHRUFiUUJsQUhNQVh3QmpBRzhBYmdCbUFHa0FaQUJsQUc0QWRBQnBBR0VB?=
+ =?us-ascii?Q?YkFCZkFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCdkFISUFYd0JuQUc4QWJ3Qm5B?=
+ =?us-ascii?Q?R3dBWlFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBSjRBQUFCdEFHRUFjZ0IyQUdV?=
+ =?us-ascii?Q?QWJBQnNBRjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0Jm?=
+ =?us-ascii?Q?QUhJQVpRQnpBSFFBY2dCcEFHTUFkQUJsQUdRQVh3QnRBR0VBY2dCMkFHVUFi?=
+ =?us-ascii?Q?QUJzQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFB?=
+ =?us-ascii?Q?QUFBQUFBZ0FBQUFBQW5nQUFBRzBBWVFCeUFIWUFaUUJzQUd3QVh3QndBSElB?=
+ =?us-ascii?Q?YndCcUFHVUFZd0IwQUY4QWJnQmhBRzBBWlFCekFGOEFjZ0JsQUhNQWRBQnlB?=
+ =?us-ascii?Q?R2tBWXdCMEFHVUFaQUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3?=
+ =?us-ascii?Q?QmhBSElBYlFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFRQUFBQUFBQUFBQ0FBQUFBQUNl?=
+ =?us-ascii?Q?QUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUhRQVpRQnlBRzBBYVFCdUFIVUFj?=
+ =?us-ascii?Q?d0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFCQUFBQUFBQUFBQUlBQUFBQUFKNEFBQUJ0QUdFQWNnQjJB?=
+ =?us-ascii?Q?R1VBYkFCc0FGOEFkd0J2QUhJQVpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBRUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFnQUFBQUFBT2dZQUFBQUFBQUFJQUFBQUFBQUFBQWdBQUFBQUFB?=
+ =?us-ascii?Q?QUFDQUFBQUFBQUFBQWFCZ0FBR1FBQUFCZ0FB?=
+x-dg-reffive: 
+ =?us-ascii?Q?QUFBQUFBQVlRQmtBR1FBY2dCbEFITUFjd0FBQUNRQUFBQUFBQUFBWXdCMUFI?=
+ =?us-ascii?Q?TUFkQUJ2QUcwQVh3QndBR1VBY2dCekFHOEFiZ0FBQUM0QUFBQUFBQUFBWXdC?=
+ =?us-ascii?Q?MUFITUFkQUJ2QUcwQVh3QndBR2dBYndCdUFHVUFiZ0IxQUcwQVlnQmxBSElB?=
+ =?us-ascii?Q?QUFBd0FBQUFBQUFBQUdNQWRRQnpBSFFBYndCdEFGOEFjd0J6QUc0QVh3QmtB?=
+ =?us-ascii?Q?R0VBY3dCb0FGOEFkZ0F3QURJQUFBQXdBQUFBQUFBQUFHTUFkUUJ6QUhRQWJ3?=
+ =?us-ascii?Q?QnRBRjhBY3dCekFHNEFYd0JyQUdVQWVRQjNBRzhBY2dCa0FITUFBQUErQUFB?=
+ =?us-ascii?Q?QUFBQUFBR01BZFFCekFIUUFid0J0QUY4QWN3QnpBRzRBWHdCdUFHOEFaQUJs?=
+ =?us-ascii?Q?QUd3QWFRQnRBR2tBZEFCbEFISUFYd0IyQURBQU1nQUFBRElBQUFBQUFBQUFZ?=
+ =?us-ascii?Q?d0IxQUhNQWRBQnZBRzBBWHdCekFITUFiZ0JmQUhNQWNBQmhBR01BWlFCZkFI?=
+ =?us-ascii?Q?WUFNQUF5QUFBQVBnQUFBQUFBQUFCa0FHd0FjQUJmQUhNQWF3QjVBSEFBWlFC?=
+ =?us-ascii?Q?ZkFHTUFhQUJoQUhRQVh3QnRBR1VBY3dCekFHRUFad0JsQUY4QWRnQXdBRElB?=
+ =?us-ascii?Q?QUFBMkFBQUFBQUFBQUdRQWJBQndBRjhBY3dCc0FHRUFZd0JyQUY4QVl3Qm9B?=
+ =?us-ascii?Q?R0VBZEFCZkFHMEFaUUJ6QUhNQVlRQm5BR1VBQUFBNEFBQUFBQUFBQUdRQWJB?=
+ =?us-ascii?Q?QndBRjhBZEFCbEFHRUFiUUJ6QUY4QWJ3QnVBR1VBWkFCeUFHa0FkZ0JsQUY4?=
+ =?us-ascii?Q?QVpnQnBBR3dBWlFBQUFDUUFBQUFBQUFBQVpRQnRBR0VBYVFCc0FGOEFZUUJr?=
+ =?us-ascii?Q?QUdRQWNnQmxBSE1BY3dBQUFGZ0FBQUFBQUFBQWJRQmhBSElBZGdCbEFHd0FY?=
+ =?us-ascii?Q?d0J3QUhJQWJ3QnFBR1VBWXdCMEFGOEFiZ0JoQUcwQVpRQnpBRjhBWXdCdkFH?=
+ =?us-ascii?Q?NEFaZ0JwQUdRQVpRQnVBSFFBYVFCaEFHd0FYd0JoQUd3QWJ3QnVBR1VBQUFC?=
+ =?us-ascii?Q?VUFBQUFBQUFBQUcwQVlRQnlBSFlBWlFCc0FGOEFjQUJ5QUc4QWFnQmxBR01B?=
+ =?us-ascii?Q?ZEFCZkFHNEFZUUJ0QUdVQWN3QmZBSElBWlFCekFIUUFjZ0JwQUdNQWRBQmxB?=
+ =?us-ascii?Q?R1FBWHdCaEFHd0Fid0J1QUdVQUFBQmFBQUFBQUFBQUFHMEFZUUJ5QUhZQVpR?=
+ =?us-ascii?Q?QnNBRjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBRzRBWVFCdEFHVUFjd0JmQUhJ?=
+ =?us-ascii?Q?QVpRQnpBSFFBY2dCcEFHTUFkQUJsQUdRQVh3Qm9BR1VBZUFCakFHOEFaQUJs?=
+ =?us-ascii?Q?QUhNQUFBQWdBQUFBQUFBQUFHMEFZUUJ5QUhZQVpRQnNBR3dBWHdCaEFISUFi?=
+ =?us-ascii?Q?UUFBQUNZQUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBR2NBYndCdkFH?=
+ =?us-ascii?Q?Y0FiQUJsQUFBQU5BQUFBQUFBQUFCdEFHRUFj?=
+x-dg-refsix: 
+ =?us-ascii?Q?Z0IyQUdVQWJBQnNBRjhBY0FCeUFHOEFhZ0JsQUdNQWRBQmZBR01BYndCa0FH?=
+ =?us-ascii?Q?VUFjd0FBQUQ0QUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSEFBY2dC?=
+ =?us-ascii?Q?dkFHb0FaUUJqQUhRQVh3QmpBRzhBWkFCbEFITUFYd0JrQUdrQVl3QjBBQUFB?=
+ =?us-ascii?Q?WGdBQUFBQUFBQUJ0QUdFQWNnQjJBR1VBYkFCc0FGOEFjQUJ5QUc4QWFnQmxB?=
+ =?us-ascii?Q?R01BZEFCZkFHNEFZUUJ0QUdVQWN3QmZBR01BYndCdUFHWUFhUUJrQUdVQWJn?=
+ =?us-ascii?Q?QjBBR2tBWVFCc0FGOEFiUUJoQUhJQWRnQmxBR3dBYkFBQUFHd0FBQUFBQUFB?=
+ =?us-ascii?Q?QWJRQmhBSElBZGdCbEFHd0FiQUJmQUhBQWNnQnZBR29BWlFCakFIUUFYd0J1?=
+ =?us-ascii?Q?QUdFQWJRQmxBSE1BWHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFi?=
+ =?us-ascii?Q?QUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3QmhBSElBYlFBQUFI?=
+ =?us-ascii?Q?SUFBQUFBQUFBQWJRQmhBSElBZGdCbEFHd0FiQUJmQUhBQWNnQnZBR29BWlFC?=
+ =?us-ascii?Q?akFIUUFYd0J1QUdFQWJRQmxBSE1BWHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRB?=
+ =?us-ascii?Q?ZEFCcEFHRUFiQUJmQUcwQVlRQnlBSFlBWlFCc0FHd0FYd0J2QUhJQVh3Qm5B?=
+ =?us-ascii?Q?RzhBYndCbkFHd0FaUUFBQUZvQUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJB?=
+ =?us-ascii?Q?QmZBSEFBY2dCdkFHb0FaUUJqQUhRQVh3QnVBR0VBYlFCbEFITUFYd0J5QUdV?=
+ =?us-ascii?Q?QWN3QjBBSElBYVFCakFIUUFaUUJrQUY4QWJRQmhBSElBZGdCbEFHd0FiQUFB?=
+ =?us-ascii?Q?QUdnQUFBQUFBQUFBYlFCaEFISUFkZ0JsQUd3QWJBQmZBSEFBY2dCdkFHb0Fa?=
+ =?us-ascii?Q?UUJqQUhRQVh3QnVBR0VBYlFCbEFITUFYd0J5QUdVQWN3QjBBSElBYVFCakFI?=
+ =?us-ascii?Q?UUFaUUJrQUY4QWJRQmhBSElBZGdCbEFHd0FiQUJmQUc4QWNnQmZBR0VBY2dC?=
+ =?us-ascii?Q?dEFBQUFLZ0FBQUFBQUFBQnRBR0VBY2dCMkFHVUFiQUJzQUY4QWRBQmxBSElB?=
+ =?us-ascii?Q?YlFCcEFHNEFkUUJ6QUFBQUlnQUFBQUFBQUFCdEFHRUFjZ0IyQUdVQWJBQnNB?=
+ =?us-ascii?Q?RjhBZHdCdkFISUFaQUFBQUE9PSIvPjwvbWV0YT4=3D?=
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR18MB5216:EE_|DM4PR18MB4317:EE_
+x-ms-office365-filtering-correlation-id: fb4bcf09-9688-458d-d89c-08dbf4213ccd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ SqVWFBURWoXcgeK10/qV0WWVt52BIBqMzIcsKB4djmf3gpfQot3fu9yS8HRGdGaVDa6OcPvP/oIdA9lgGx6YngYqtJyYw6/4xK0hIqPNv1dfwnwZD3oW2WzW/dMKadNNgYAswWKIb2c39xdaw2f0/N6ATTFpReEAQ2y7wGZPl+/N8XQTgN8mWEI3HtNep+syiUed84AlKheXdBtKrajaU5smEtUsqqtbnRdGIdqmJMW77Zb7Y27gytAjENjgXs+F9hH6osqWpnVR2aQN/pwlSX8IXp89gYpzzLGi/r49LquXisaA5L7Ik452YbkZ9lWe57TceF0pU4ExnP25VyK/psaAcc+LCKJ0tEXJMsluZgkj+JkURPVisRF4kQMbi1EIRohM2SfBY93NF/yoBL3yS0W+P65u+NqQszknRJHInXWCMZjKIRhJneOmSyWpeUv4Cfg+Qc5GN4szT/HTbBSGF65FmgaYgARhzSVV21BMjmMNH7R0xqUXIoj0AmXgsUzGPX22eVm5+c58HzbQNS8dyNqpL1LA2VZjY0GlqB/KszOXYvD+ef0mbycIw3anRUl8jlufaOhIPkDiKCxg71OPaj9sBOSdayBbn2n7EdxqozqtbfbZ/Ua8vYRep12+BFQP
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR18MB5216.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39850400004)(346002)(376002)(366004)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(86362001)(52536014)(7416002)(2906002)(5660300002)(41300700001)(33656002)(38070700009)(6506007)(9686003)(7696005)(83380400001)(55016003)(26005)(478600001)(71200400001)(38100700002)(122000001)(110136005)(8936002)(66476007)(66556008)(66946007)(66446008)(76116006)(54906003)(64756008)(316002)(8676002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?nRL0pOs7EKDnUlTu1L3yc8vCyCP+WbNTgITMG/LOHwotNfs5veI0rQV7bUpk?=
+ =?us-ascii?Q?AX6gmWftqZbmmgNaTtMbH22e6RGYJ4mZ1vzu2QTTAgV44WfGLtdA6zOjoEeD?=
+ =?us-ascii?Q?/+fNmATeeUumn/bygNy/LOZ8U12LPWz3/clt+uTt7aQ/uwLVqP6zUo7QR0PK?=
+ =?us-ascii?Q?ef9iVV53/QcdjaROnQ3n2jTaqzCF1Is1Y4jTN2osILSvA+WcM8lb93TxCezN?=
+ =?us-ascii?Q?/FxYY6A/IUfiJy/eu2xB3dMuWQJca3xSJSWiudXYyOFdd8PGkurblgOrQcXA?=
+ =?us-ascii?Q?mcwo0V3mO03sdNaK7ZhzGDB1+PCsmi3yJP1KVLUNhylY40lAH1nwUTn1Fv6R?=
+ =?us-ascii?Q?8zf6qIubbTkKn8rQ8EbL6Vbv4MFqZhHuAl6sBNbDi1XhmZPDbmYMc7xWw6YG?=
+ =?us-ascii?Q?8sopltOecTHEiJpocsDBDEKILpSscy7w/vd0x9r/rqxgiPkAbezJ9IM6h2zK?=
+ =?us-ascii?Q?Dtr5drarSQdTI/UMBqG44CEqinLUhuIJxI3gpgw8Wj2SvZfrL+BOimrj0a1K?=
+ =?us-ascii?Q?bUr3NFsIvJ9w3JcKFQPLujdfNtgFx5ZdrMit2nOoB+kANfFJYgDL3OnZq7m2?=
+ =?us-ascii?Q?9ucar7D0ICGJZp2jESkP1+F/QmsL2Td7e+ApzkWyXPaRLcBt2iEtn7FKPJz3?=
+ =?us-ascii?Q?417QiQaZOPEfYju2spg4WHX+USjPa7L/w7uSPrICIOuqe+evfvaOwFKQ5nAM?=
+ =?us-ascii?Q?KhcenPK1/vPM4FwnS+zhax/6X8nMB0eCaFevYnZlKtko5tXiWSQZKvc3aPQh?=
+ =?us-ascii?Q?X/oIfrBAuWCZLBIPypbLJsPYuC1BdCD2MmRav1rhGgyEdSQ4izXZNw3+JYrp?=
+ =?us-ascii?Q?xU1CVwZfs2/ITYUmPn01UARjtE5bZIwHD+iiW1ydejPKsk0HojyAYWZvsrHf?=
+ =?us-ascii?Q?9vVYNI4ijA88/cLBxtcHEicJDzDmZ2LFTXggpox67aPjcFAoKQS52XO2XicU?=
+ =?us-ascii?Q?M0xnv7ETVmYcepN3O/VlUIKADoOvJkax+DLKSOu4wY1uSOlvKHw/9GnMjkut?=
+ =?us-ascii?Q?7uNe9dZS3IxWmkYmDTnL/feq/EsD4V2NSDn90pkRRZwXY8EPOz4GQaJi/Yxx?=
+ =?us-ascii?Q?/Xl2Kxlf4QH+sfJpzhSLReqvwg95F1a4ZmNHnWMI8dTTzlneEbQ6XWFNutvE?=
+ =?us-ascii?Q?0SPhJ652uhIjlIzer1xWeT11pit8Jd/p9euxn1/9dlOJvNsDuParbNZb/9el?=
+ =?us-ascii?Q?c2VwSjmEIrGm9OhP/jDNoDEhe8jC7iWcO4B3jMdB8QBRS1yODQYcqXaUPJvy?=
+ =?us-ascii?Q?VG8/jdvr2rd89KFDz8Su4N7jm0FEGuek7yUJZcAwlyPtrir5rkEfoPCj/WLJ?=
+ =?us-ascii?Q?OkPKT8aNB9HdIcJS33U9oDxfFHFj7Bbz9mi/kIzwCLe+D15nriQF3QDN+NxJ?=
+ =?us-ascii?Q?0KzTjvdwXARdA1S1QnUYyHiDEToONY+WPdoPhV4Jlg8RWFKslAAjPCGi/Itl?=
+ =?us-ascii?Q?F5gdGVRJPj/a7GiTe/4iB324a3uRvY6V7sfPVpzEtqskcAtU1I/s/C+9ObZ7?=
+ =?us-ascii?Q?7MBcwvW8H48N+spLaYPooP2Cs5+mw4qnocvUSEnv5XmWsN+S3Oao9LXpWMj9?=
+ =?us-ascii?Q?fACbhgIV+HpoDUJMkvLGSU0mrWgZZt3kRRcNzqYP?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR18MB5216.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb4bcf09-9688-458d-d89c-08dbf4213ccd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Dec 2023 16:59:39.3976
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X9rVFW06ulbwJrfNQbsogcO8vwlVLT8G+gS1DmXA1n1d/jll5Qbafcc1PI1qGkUtVGBgOpVx/QRg05rAgJYUQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR18MB4317
+X-Proofpoint-ORIG-GUID: z0adMqWCmVpJisU2v82Rn-Y9eOn42VJu
+X-Proofpoint-GUID: z0adMqWCmVpJisU2v82Rn-Y9eOn42VJu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-03_15,2023-11-30_01,2023-05-22_02
 
-This patch adds Launch Time hw offload request to xdp_hw_metadata. User can
-configure the delta of HW launch time to HW RX-time by using "-l" argument.
-The default delta is set to 0.1 second.
+Hi Siddh,
 
-This patch is tested with stmmac on Intel Tiger Lake platform. Refer to
-result below, the delta between pre-determined launch time and actual HW
-transmit complete time is around 24 us.
+>@@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+> 	if (local =3D=3D NULL)
+> 		return 0;
+>
+>+	nfc_put_device(local->dev);
+[Suman] One question here, if we consider the path, nfc_llcp_mac_is_down() =
+-> nfc_llcp_socket_release() -> nfc_llcp_local_put(), then inside nfc_llcp_=
+socket_release()
+we are already doing nfc_put_device() if "sk->sk_state =3D=3D LLCP_CONNECTE=
+D", with this change we are doing it again. I guess you need to add some ch=
+eck to avoid that. Let me know if I am missing something.
 
-$ sudo ./xdp_hw_metadata eth0
-...
-xsk_ring_cons__peek: 1
-0x55e577c3a7a8: rx_desc[0]->addr=80100 addr=80100 comp_addr=80100 EoP
-No rx_hash err=-95
-HW RX-time:   1677762523393813392 (sec:1677762523.3938) delta to User RX-time sec:0.0003 (259.290 usec)
-XDP RX-time:   1677762523394050576 (sec:1677762523.3941) delta to User RX-time sec:0.0000 (22.106 usec)
-0x55e577c3a7a8: ping-pong with csum=5619 (want 8626) csum_start=34 csum_offset=6
-HW RX-time:   1677762523393813392 (sec:1677762523.3938) delta to HW Launch-time sec:0.1000 (100000.000 usec)
-0x55e577c3a7a8: complete tx idx=0 addr=18
-HW Launch-time:   1677762523493813392 (sec:1677762523.4938) delta to HW TX-complete-time sec:0.0000 (24.181 usec)
-HW TX-complete-time:   1677762523493837573 (sec:1677762523.4938) delta to User TX-complete-time sec:0.0007 (737.636 usec)
-XDP RX-time:   1677762523394050576 (sec:1677762523.3941) delta to User TX-complete-time sec:0.1005 (100524.633 usec)
-HW RX-time:   1677762523393813392 (sec:1677762523.3938) delta to HW TX-complete-time sec:0.1000 (100024.181 usec)
-0x55e577c3a7a8: complete rx idx=128 addr=80100
-
-$ sudo ./xdp_hw_metadata eth0 -l 10000000
-...
-poll: 1 (0) skip=17 fail=0 redir=17
-xsk_ring_cons__peek: 1
-0x558336d397a8: rx_desc[15]->addr=9e100 addr=9e100 comp_addr=9e100 EoP
-No rx_hash err=-95
-HW RX-time:   1677762699254666655 (sec:1677762699.2547) delta to User RX-time sec:0.0003 (256.928 usec)
-XDP RX-time:   1677762699254901232 (sec:1677762699.2549) delta to User RX-time sec:0.0000 (22.351 usec)
-0x558336d397a8: ping-pong with csum=5619 (want 8626) csum_start=34 csum_offset=6
-HW RX-time:   1677762699254666655 (sec:1677762699.2547) delta to HW Launch-time sec:0.0100 (10000.000 usec)
-0x558336d397a8: complete tx idx=15 addr=f018
-HW Launch-time:   1677762699264666655 (sec:1677762699.2647) delta to HW TX-complete-time sec:0.0000 (24.307 usec)
-HW TX-complete-time:   1677762699264690962 (sec:1677762699.2647) delta to User TX-complete-time sec:0.0003 (309.901 usec)
-XDP RX-time:   1677762699254901232 (sec:1677762699.2549) delta to User TX-complete-time sec:0.0101 (10099.631 usec)
-HW RX-time:   1677762699254666655 (sec:1677762699.2547) delta to HW TX-complete-time sec:0.0100 (10024.307 usec)
-0x558336d397a8: complete rx idx=143 addr=9e100
-
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
----
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3291625ba4fb..3e238bb310b7 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -13,6 +13,7 @@
-  * - UDP 9091 packets trigger TX reply
-  * - TX HW timestamp is requested and reported back upon completion
-  * - TX checksum is requested
-+ * - HW launch time is set for transmission
-  */
- 
- #include <test_progs.h>
-@@ -61,6 +62,8 @@ int rxq;
- bool skip_tx;
- __u64 last_hw_rx_timestamp;
- __u64 last_xdp_rx_timestamp;
-+__u64 last_launch_time;
-+__u64 launch_time_delta_to_hw_rx_timestamp = 100000000; /* 0.1 second */
- 
- void test__fail(void) { /* for network_helpers.c */ }
- 
-@@ -274,6 +277,8 @@ static bool complete_tx(struct xsk *xsk, clockid_t clock_id)
- 	if (meta->completion.tx_timestamp) {
- 		__u64 ref_tstamp = gettime(clock_id);
- 
-+		print_tstamp_delta("HW Launch-time", "HW TX-complete-time",
-+				   last_launch_time, meta->completion.tx_timestamp);
- 		print_tstamp_delta("HW TX-complete-time", "User TX-complete-time",
- 				   meta->completion.tx_timestamp, ref_tstamp);
- 		print_tstamp_delta("XDP RX-time", "User TX-complete-time",
-@@ -371,6 +376,14 @@ static void ping_pong(struct xsk *xsk, void *rx_packet, clockid_t clock_id)
- 	       xsk, ntohs(udph->check), ntohs(want_csum),
- 	       meta->request.csum_start, meta->request.csum_offset);
- 
-+	/* Set the value of launch time */
-+	meta->flags |= XDP_TXMD_FLAGS_LAUNCH_TIME;
-+	meta->request.launch_time = last_hw_rx_timestamp +
-+				    launch_time_delta_to_hw_rx_timestamp;
-+	last_launch_time = meta->request.launch_time;
-+	print_tstamp_delta("HW RX-time", "HW Launch-time", last_hw_rx_timestamp,
-+			   meta->request.launch_time);
-+
- 	memcpy(data, rx_packet, len); /* don't share umem chunk for simplicity */
- 	tx_desc->options |= XDP_TX_METADATA;
- 	tx_desc->len = len;
-@@ -595,6 +608,7 @@ static void print_usage(void)
- 		"  -h    Display this help and exit\n\n"
- 		"  -m    Enable multi-buffer XDP for larger MTU\n"
- 		"  -r    Don't generate AF_XDP reply (rx metadata only)\n"
-+		"  -l    Delta of HW Launch-time to HW RX-time in ns (default: 0.1s)\n"
- 		"Generate test packets on the other machine with:\n"
- 		"  echo -n xdp | nc -u -q1 <dst_ip> 9091\n";
- 
-@@ -605,7 +619,7 @@ static void read_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "chmr")) != -1) {
-+	while ((opt = getopt(argc, argv, "chmrl:")) != -1) {
- 		switch (opt) {
- 		case 'c':
- 			bind_flags &= ~XDP_USE_NEED_WAKEUP;
-@@ -621,6 +635,9 @@ static void read_args(int argc, char *argv[])
- 		case 'r':
- 			skip_tx = true;
- 			break;
-+		case 'l':
-+			launch_time_delta_to_hw_rx_timestamp = atoll(optarg);
-+			break;
- 		case '?':
- 			if (isprint(optopt))
- 				fprintf(stderr, "Unknown option: -%c\n", optopt);
--- 
-2.34.1
+> 	return kref_put(&local->ref, local_release);  }
+>
+>@@ -959,8 +963,17 @@ static void nfc_llcp_recv_connect(struct
+>nfc_llcp_local *local,
+> 	}
+>
+> 	new_sock =3D nfc_llcp_sock(new_sk);
+>-	new_sock->dev =3D local->dev;
+>+
+> 	new_sock->local =3D nfc_llcp_local_get(local);
+>+	if (!new_sock->local) {
+>+		reason =3D LLCP_DM_REJ;
+>+		release_sock(&sock->sk);
+>+		sock_put(&sock->sk);
+>+		sock_put(&new_sock->sk);
+[Suman] don't we need to free new_sock? nfc_llcp_sock_free()?
+>+		goto fail;
+>+	}
+>+
+>+	new_sock->dev =3D local->dev;
+> 	new_sock->rw =3D sock->rw;
+> 	new_sock->miux =3D sock->miux;
+> 	new_sock->nfc_protocol =3D sock->nfc_protocol; @@ -1597,7 +1610,11 @@
+>int nfc_llcp_register_device(struct nfc_dev *ndev)
+> 	if (local =3D=3D NULL)
+> 		return -ENOMEM;
+>
+>-	local->dev =3D ndev;
+>+	/* Hold a reference to the device. */
+>+	local->dev =3D nfc_get_device(ndev->idx);
+>+	if (!local->dev)
+>+		return -ENODEV;
+[Suman] Memory leak here. Need to call kfree(local).
+>+
+> 	INIT_LIST_HEAD(&local->list);
+> 	kref_init(&local->ref);
+> 	mutex_init(&local->sdp_lock);
+>--
+>2.42.0
+>
 
 
