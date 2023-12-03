@@ -1,200 +1,134 @@
-Return-Path: <netdev+bounces-53317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDCC1802592
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 17:41:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2091E8025AE
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 17:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 807CEB2092B
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 16:41:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D05C5280D6A
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 16:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE823156C9;
-	Sun,  3 Dec 2023 16:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DBB15AFB;
+	Sun,  3 Dec 2023 16:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="juUirD9s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kUG7p1KE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F352F47
-	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 16:41:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4D5C433C8;
-	Sun,  3 Dec 2023 16:41:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701621687;
-	bh=26wMpKPKrZag2Orm0i9X0BOac/BjRVT4g0G/xCMIVbA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=juUirD9srFrqrXnYOjDnYd+GqPB4NlmOjL8mdit7pIcQv5v4zPCbZwOAuj/URla8T
-	 LF2I2KGM3/3C8DG3KmQMIYBAEJyV7esvk+KfO6rEoNzEsP9OgkKEM8Has0b0XY1fw+
-	 f6rjAhOkVcskFLMxQwmCsGh05Vo7Tx04fZrfoR6mJ9NrDrXT2sRKBhHes3gGhzcyxm
-	 ZKgkuh5mNHiM/JnNp3wAb3WVAZMXbmln0OngrDtYv4svXtrH7STz+xI0IiYIZapTj2
-	 dNHZCjNWY3fOI4+O9cXxnT/fGUeN2C7xBH/rrb4ru/QzSzGclP5KSSRIM8ir5PUpUv
-	 OzchAtbJXHGnQ==
-Date: Sun, 3 Dec 2023 16:41:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
-	sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net v3 PATCH 1/5] octeontx2-af: Adjust Tx credits when MCS
- external bypass is disabled
-Message-ID: <20231203164121.GK50400@kernel.org>
-References: <20231130075818.18401-1-gakula@marvell.com>
- <20231130075818.18401-2-gakula@marvell.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA96E5;
+	Sun,  3 Dec 2023 08:51:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701622315; x=1733158315;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lTyXJMsSPVluiy97P4qSM7nDpEehwOMAB+SjdzyXSkI=;
+  b=kUG7p1KEz2nSZlXDuzwckmoVWIuFxDYmMgWSjtrK9xM7332MBNrXE8p8
+   nX0Jr3ciCKIkBqyaBkt5Ts3YKvTN4AdtTdV1MjYfgKRjlbOnFP8liyqCE
+   sP7f5Hb01KgNbit1DhW5ENJO8eGRvHGj6Y8kBGDBlPtijfvx7HDAlkDz9
+   8Z7NJANubRWyOoZqN2G3lfOyh3Cq6mr5bBECIHTHV0/XotOFdJgWxDbWN
+   s3ciFVOdq+/rqeGRUYmb9azqiobDiGScik8fXkdJT4TfsmXiQWVPKDK+p
+   bD0X3MyxXck9XXgnPyorqfA5ATjC+ztn5TipZel/LjTNb6/OR/tMOaHJ5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="706802"
+X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
+   d="scan'208";a="706802"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2023 08:51:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="799345384"
+X-IronPort-AV: E=Sophos;i="6.04,247,1695711600"; 
+   d="scan'208";a="799345384"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
+  by orsmga008.jf.intel.com with ESMTP; 03 Dec 2023 08:51:44 -0800
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bjorn Topel <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	bpf@vger.kernel.org,
+	xdp-hints@xdp-project.net,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	Song Yoong Siang <yoong.siang.song@intel.com>
+Subject: [PATCH bpf-next v3 0/3] xsk: TX metadata Launch Time support
+Date: Mon,  4 Dec 2023 00:51:26 +0800
+Message-Id: <20231203165129.1740512-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231130075818.18401-2-gakula@marvell.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 30, 2023 at 01:28:14PM +0530, Geetha sowjanya wrote:
-> From: Nithin Dabilpuram <ndabilpuram@marvell.com>
-> 
-> When MCS external bypass is disabled, MCS returns additional
-> 2 credits(32B) for every packet Tx'ed on LMAC. To account for
-> these extra credits, NIX_AF_TX_LINKX_NORM_CREDIT.CC_MCS_CNT
-> needs to be configured as otherwise NIX Tx credits would overflow
-> and will never be returned to idle state credit count
-> causing issues with credit control and MTU change.
-> 
-> This patch fixes the same by configuring CC_MCS_CNT at probe
-> time for MCS enabled SoC's
-> 
-> Fixes: bd69476e86fc ("octeontx2-af: cn10k: mcs: Install a default TCAM for normal traffic")
-> Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-> Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+This series expands XDP TX metadata framework to include ETF HW offload.
 
-Hi Geetha and Nithin,
+Changes since v1: (Willem)
+- rename Time-Based Scheduling (TBS) to Earliest TxTime First (ETF)
+- rename launch-time to txtime
 
-some minor feedback from my side.
+Changes since v2: (Jesper & Willem)
+- rename to use launch time
+- change the default launch time in xdp_hw_metadata apps from 1s to 0.1s
+  because some NICs do not support such a large future time.
 
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/mcs.c     | 12 ++++++++++++
->  drivers/net/ethernet/marvell/octeontx2/af/mcs.h     |  2 ++
->  drivers/net/ethernet/marvell/octeontx2/af/rvu.h     |  1 +
->  drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c |  8 ++++++++
->  4 files changed, 23 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-> index c43f19dfbd74..d6effbe46208 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.c
-> @@ -1219,6 +1219,17 @@ struct mcs *mcs_get_pdata(int mcs_id)
->  	return NULL;
->  }
->  
-> +bool is_mcs_bypass(int mcs_id)
-> +{
-> +	struct mcs *mcs_dev;
-> +
-> +	list_for_each_entry(mcs_dev, &mcs_list, mcs_list) {
-> +		if (mcs_dev->mcs_id == mcs_id)
-> +			return mcs_dev->bypass;
-> +	}
-> +	return true;
-> +}
-> +
->  void mcs_set_port_cfg(struct mcs *mcs, struct mcs_port_cfg_set_req *req)
->  {
->  	u64 val = 0;
-> @@ -1447,6 +1458,7 @@ static void mcs_set_external_bypass(struct mcs *mcs, u8 bypass)
->  	else
->  		val &= ~BIT_ULL(6);
->  	mcs_reg_write(mcs, MCSX_MIL_GLOBAL, val);
-> +	mcs->bypass = bypass;
+v1: https://patchwork.kernel.org/project/netdevbpf/cover/20231130162028.852006-1-yoong.siang.song@intel.com/
+v2: https://patchwork.kernel.org/project/netdevbpf/cover/20231201062421.1074768-1-yoong.siang.song@intel.com/
 
-I think that bool would be a more appropriate type than u8 for:
+Song Yoong Siang (3):
+  xsk: add Launch Time HW offload to XDP Tx metadata
+  net: stmmac: add Launch Time support to XDP ZC
+  selftests/bpf: add Launch Time request to xdp_hw_metadata
 
-* The bypass parameter of mcs_set_external_bypass()
-* The bypass field of struct mcs
+ Documentation/netlink/specs/netdev.yaml       |  4 ++++
+ Documentation/networking/xsk-tx-metadata.rst  |  4 ++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
+ include/net/xdp_sock.h                        | 10 ++++++++++
+ include/net/xdp_sock_drv.h                    |  1 +
+ include/uapi/linux/if_xdp.h                   |  9 +++++++++
+ include/uapi/linux/netdev.h                   |  3 +++
+ net/core/netdev-genl.c                        |  2 ++
+ net/xdp/xsk.c                                 |  3 +++
+ tools/include/uapi/linux/if_xdp.h             |  9 +++++++++
+ tools/include/uapi/linux/netdev.h             |  3 +++
+ tools/net/ynl/generated/netdev-user.c         |  1 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 19 ++++++++++++++++++-
+ 14 files changed, 82 insertions(+), 1 deletion(-)
 
->  }
->  
->  static void mcs_global_cfg(struct mcs *mcs)
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs.h b/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
-> index 0f89dcb76465..ccd43c3f3460 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs.h
-> @@ -149,6 +149,7 @@ struct mcs {
->  	u16			num_vec;
->  	void			*rvu;
->  	u16			*tx_sa_active;
-> +	u8                      bypass;
->  };
->  
->  struct mcs_ops {
-> @@ -206,6 +207,7 @@ void mcs_get_custom_tag_cfg(struct mcs *mcs, struct mcs_custom_tag_cfg_get_req *
->  int mcs_alloc_ctrlpktrule(struct rsrc_bmap *rsrc, u16 *pf_map, u16 offset, u16 pcifunc);
->  int mcs_free_ctrlpktrule(struct mcs *mcs, struct mcs_free_ctrl_pkt_rule_req *req);
->  int mcs_ctrlpktrule_write(struct mcs *mcs, struct mcs_ctrl_pkt_rule_write_req *req);
-> +bool is_mcs_bypass(int mcs_id);
->  
->  /* CN10K-B APIs */
->  void cn10kb_mcs_set_hw_capabilities(struct mcs *mcs);
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> index c4d999ef5ab4..9887edccadf7 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> @@ -345,6 +345,7 @@ struct nix_hw {
->  	struct nix_txvlan txvlan;
->  	struct nix_ipolicer *ipolicer;
->  	u64    *tx_credits;
-> +	u64 cc_mcs_cnt;
->  };
->  
->  /* RVU block's capabilities or functionality,
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index c112c71ff576..daafce5fef46 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> @@ -12,6 +12,7 @@
->  #include "rvu_reg.h"
->  #include "rvu.h"
->  #include "npc.h"
-> +#include "mcs.h"
->  #include "cgx.h"
->  #include "lmac_common.h"
->  #include "rvu_npc_hash.h"
-> @@ -4389,6 +4390,12 @@ static void nix_link_config(struct rvu *rvu, int blkaddr,
->  			    SDP_HW_MAX_FRS << 16 | NIC_HW_MIN_FRS);
->  	}
->  
-> +	/* Get MCS external bypass status for CN10K-B */
-> +	if (mcs_get_blkcnt() == 1) {
-> +		/* Adjust for 2 credits when external bypass is disabled */
-> +		nix_hw->cc_mcs_cnt = is_mcs_bypass(0) ? 0 : 2;
+-- 
+2.34.1
 
-Perhaps it doesn't matter, but to me it seems a bit excessive to use a
-64-bit field to store such small values.
-
-> +	}
-> +
->  	/* Set credits for Tx links assuming max packet length allowed.
->  	 * This will be reconfigured based on MTU set for PF/VF.
->  	 */
-> @@ -4412,6 +4419,7 @@ static void nix_link_config(struct rvu *rvu, int blkaddr,
->  			tx_credits = (lmac_fifo_len - lmac_max_frs) / 16;
->  			/* Enable credits and set credit pkt count to max allowed */
->  			cfg =  (tx_credits << 12) | (0x1FF << 2) | BIT_ULL(1);
-> +			cfg |= (nix_hw->cc_mcs_cnt << 32);
-
-I do see that cc_mcs_cnt needs to be 64-bit here to avoid truncation.
-But overall I think this function could benefit from the use
-of FIELD_PREP(), which I think would side-step that problem.
-
->  
->  			link = iter + slink;
->  			nix_hw->tx_credits[link] = tx_credits;
-> -- 
-> 2.25.1
-> 
 
