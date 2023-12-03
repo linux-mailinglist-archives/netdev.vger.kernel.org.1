@@ -1,92 +1,133 @@
-Return-Path: <netdev+bounces-53329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E401802610
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:50:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB66B80261F
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2138E1C208FC
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 17:50:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CBD41F20F88
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA9A1772B;
-	Sun,  3 Dec 2023 17:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19DE17735;
+	Sun,  3 Dec 2023 18:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7Y/TuEp"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="ISmc0HM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590BE156EB;
-	Sun,  3 Dec 2023 17:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A9D5C433C8;
-	Sun,  3 Dec 2023 17:50:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701625821;
-	bh=KaCBA7aWetgNynrDp9I/L5TG0YXmHua23gxLEqwslEw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A7Y/TuEpYv7g7QuAjMRI8Pgilq10cC6gmaahN0JJV8K4PcZgm5SOqgVtdyu3VEXqp
-	 6iM8eukVtdjbPI+a2jeunwaut2pyMLHEaS3ryk43p74agXW/oFyY8J3IuUg0fN46Ms
-	 LS4DikhG8FmNVdryCKzC6wY1FXXavqZzCWoHRAJn1sQTFh+VKK6VW2kyE4uJWIoP2E
-	 7FWJs0s0aqlCyZUt7qeRhPAbuwqIbZE0UwchkYuO9iUmB0P1t26l91qfSae2rn/pBe
-	 vAdoca4MJ0wd9M4Se4RRPH8HHJlWFUlBulORCqW/YJhYfh3X0/tycYDEJDV1XpSz2e
-	 2PFfZ/EDXmL7g==
-Date: Sun, 3 Dec 2023 17:50:15 +0000
-From: Simon Horman <horms@kernel.org>
-To: Shifeng Li <lishifeng@sangfor.com.cn>
-Cc: saeedm@nvidia.com, leon@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ogerlitz@mellanox.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dinghui@sangfor.com.cn, lishifeng1992@126.com
-Subject: Re: [PATCH] net/mlx5e: Fix slab-out-of-bounds in
- mlx5_query_nic_vport_mac_list()
-Message-ID: <20231203175015.GP50400@kernel.org>
-References: <20231130094656.894412-1-lishifeng@sangfor.com.cn>
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024F1D6;
+	Sun,  3 Dec 2023 10:09:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1701626931; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=HD013oKEY/KfaGYVjdW0BKpb8BZryAHUC477hAmAi2Lngfq1KZjZNa+kXnRaSJesAEjtilcX2HzPFQ+SIN7T5MrugYui3pUrOn8HiQQFXLo4mtOX5JyOCM0bKOCB2z75hPyAD/3iNA8n5IChsjEBJX380gBBTVvEucKMJn+Tuxs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1701626931; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=jig7nqOtSLq3le2nJnQ+h5DRxXbpyeM6+FUUU6eub08=; 
+	b=I/jEA/xvVZl5u/aVb2qGfb0njKhX+yqejs6qBiX+agCmPoQt//qusk+exmqKaVLZzcowDbPmurbfXPnkjalzhxIdw0Vhiat8qjKsQB/0kgj3yxLcDBYN/Us2toQtAhYescc4Zsk/4x0vvU8YfZekPyPFf1yuNsbauVhZNJA4tqY=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701626931;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=jig7nqOtSLq3le2nJnQ+h5DRxXbpyeM6+FUUU6eub08=;
+	b=ISmc0HM7xP436viT81IWbs+UyQ6qOS8WGreQyEiChIdL45uKHjio113JYcwwsjQg
+	aXs62Nm26/R+RpYbMbpXVs1XMsr0cAw1IhmbHQ8zESEDK9RdIWV6A7aQJ3N7/Ouv1zo
+	X6Y0PbMOo+RhCdMAHY9wkN8gebwkpFycOVBBuEgA=
+Received: from mail.zoho.in by mx.zoho.in
+	with SMTP id 1701626900046660.6408974070963; Sun, 3 Dec 2023 23:38:20 +0530 (IST)
+Date: Sun, 03 Dec 2023 23:38:20 +0530
+From: Siddh Raman Pant <code@siddh.me>
+To: "Suman Ghosh" <sumang@marvell.com>
+Cc: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Samuel Ortiz" <sameo@linux.intel.com>,
+	"syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com"
+ <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+Message-ID: <18c30ddee40.70f9a1a945075.1438711881490299499@siddh.me>
+In-Reply-To: <SJ0PR18MB5216AB7B26C1F34A8748F2DADB87A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+References: <cover.1701530776.git.code@siddh.me>
+ <476cccdcb57645784889fc82f0c7c10ff4c8b8c0.1701530776.git.code@siddh.me> <SJ0PR18MB5216AB7B26C1F34A8748F2DADB87A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+Subject: RE: [EXT] [PATCH net-next v2 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231130094656.894412-1-lishifeng@sangfor.com.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-On Thu, Nov 30, 2023 at 01:46:56AM -0800, Shifeng Li wrote:
-> Out_sz that the size of out buffer is calculated using query_nic_vport
-> _context_in structure when driver query the MAC list. However query_nic
-> _vport_context_in structure is smaller than query_nic_vport_context_out.
-> When allowed_list_size is greater than 96, calling ether_addr_copy() will
-> trigger an slab-out-of-bounds.
-> 
-> [ 1170.055866] BUG: KASAN: slab-out-of-bounds in mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
-> [ 1170.055869] Read of size 4 at addr ffff88bdbc57d912 by task kworker/u128:1/461
-> [ 1170.055870]
-> [ 1170.055932] Workqueue: mlx5_esw_wq esw_vport_change_handler [mlx5_core]
-> [ 1170.055936] Call Trace:
-> [ 1170.055949]  dump_stack+0x8b/0xbb
-> [ 1170.055958]  print_address_description+0x6a/0x270
-> [ 1170.055961]  kasan_report+0x179/0x2c0
-> [ 1170.056061]  mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
-> [ 1170.056162]  esw_update_vport_addr_list+0x2c5/0xcd0 [mlx5_core]
-> [ 1170.056257]  esw_vport_change_handle_locked+0xd08/0x1a20 [mlx5_core]
-> [ 1170.056377]  esw_vport_change_handler+0x6b/0x90 [mlx5_core]
-> [ 1170.056381]  process_one_work+0x65f/0x12d0
-> [ 1170.056383]  worker_thread+0x87/0xb50
-> [ 1170.056390]  kthread+0x2e9/0x3a0
-> [ 1170.056394]  ret_from_fork+0x1f/0x40
-> 
-> Fixes: e16aea2744ab ("net/mlx5: Introduce access functions to modify/query vport mac lists")
-> Cc: Ding Hui <dinghui@sangfor.com.cn>
-> Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
+On Sun, 03 Dec 2023 22:29:39 +0530, Suman Ghosh wrote:
+> Hi Siddh,
+>=20
+> >@@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+> > =C2=A0=C2=A0=C2=A0=C2=A0if (local =3D=3D NULL)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> >
+> >+=C2=A0=C2=A0=C2=A0=C2=A0nfc_put_device(local->dev);
+> [Suman] One question here, if we consider the path, nfc_llcp_mac_is_down(=
+) ->
+> nfc_llcp_socket_release() -> nfc_llcp_local_put(), then inside
+> nfc_llcp_socket_release() we are already doing nfc_put_device() if=20
+> "sk->sk_state =3D=3D LLCP_CONNECTED", with this change we are doing it ag=
+ain.
+> I guess you need to add some check to avoid that. Let me know if I am
+> missing something.
 
-Hi,
+The socket state is set to LLCP_CONNECTED in just two places:
+nfc_llcp_recv_connect() and nfc_llcp_recv_cc().
 
-I am unsure how you calculated the 96 figure above.
-But in any case I agree that the cited patch introduced
-the mismatch that you describe.
+nfc_get_device() is used prior to setting the socket state to
+LLCP_CONNECTED in nfc_llcp_recv_connect(). After that, it calls
+nfc_llcp_send_cc(), which I suppose is a connection PDU by some
+Google-fu (NFC specs is paywalled).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+In nfc_llcp_recv_cc(), we do not use nfc_get_device(), but since
+one must send cc (which is done in nfc_llcp_recv_connect()), I
+think we are good here.
+
+This patch change doesn't touch any other refcounting. We increment
+the refcount whenever we get the local, and decrement when we put it.
+nfc_llcp_find_local() involves getting it, so all users of that
+function increment the refcount, which is also the case with
+nfc_llcp_mac_is_down(). The last nfc_llcp_local_put() then correctly
+decrements the refcount.
+
+If there is indeed a refcount error due to LLCP_CONNECTED, it probably
+exists without this patch too.
+
+> > =C2=A0=C2=A0=C2=A0=C2=A0new_sock->local =3D nfc_llcp_local_get(local);
+> >+=C2=A0=C2=A0=C2=A0=C2=A0if (!new_sock->local) {
+> >+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0reason =3D LLCP_DM_REJ;
+> >+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0release_sock(&sock->sk)=
+;
+> >+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sock_put(&sock->sk);
+> >+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sock_put(&new_sock->sk)=
+;
+> [Suman] don't we need to free new_sock? nfc_llcp_sock_free()?
+>
+> [...]
+>
+> >+=C2=A0=C2=A0=C2=A0=C2=A0local->dev =3D nfc_get_device(ndev->idx);
+> >+=C2=A0=C2=A0=C2=A0=C2=A0if (!local->dev)
+> >+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENODEV;
+> [Suman] Memory leak here. Need to call kfree(local).
+
+Yes, you are correct. Very stupid of me. Will send a v3.
+
+Thanks,
+Siddh
+
 
