@@ -1,87 +1,83 @@
-Return-Path: <netdev+bounces-53335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D814A80264E
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:38:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A142802658
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 19:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 737DC1F20FF0
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:38:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C91CC280D65
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 18:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354A9171D9;
-	Sun,  3 Dec 2023 18:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898BB17748;
+	Sun,  3 Dec 2023 18:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="maVOiZen"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TSQ7UUC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D029ADA;
-	Sun,  3 Dec 2023 10:38:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HLV8YOVDigNgWOz0plPakVj5s9mqkHpb2at7e7OE9i8=; b=maVOiZenfrED7JgoNTkfQoYl6E
-	xnjzKhI7F2GN6XDMO1Dy2rjMf3sVIlFb1qsKR6FYxdxRR46ZRliG+7ekpTyC40QnvmRBMUT7Ze6Md
-	aFoKgrKfZGMWlHEHSndFe/iVqCgjt1O4OpTznUqPS0iA7cYAt0plIPyUSxW1MEjsAtb0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r9rLw-001uPa-IS; Sun, 03 Dec 2023 19:38:04 +0100
-Date: Sun, 3 Dec 2023 19:38:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v2 3/8] net: pse-pd: Introduce PSE types
- enumeration
-Message-ID: <69292ed5-63d3-4316-9bab-630bd00ce807@lunn.ch>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
- <20231201-feature_poe-v2-3-56d8cac607fa@bootlin.com>
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [IPv6:2001:41d0:203:375::ad])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A97E8
+	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 10:43:45 -0800 (PST)
+Message-ID: <676411df-cd7a-a1d5-4226-f67d0b50ea80@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701629023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BBz9LymNCxeqZZMoXDw/zmthZk9wncxavL+5neEQduU=;
+	b=TSQ7UUC/Hqi6LOte+31Y8ksb/IJpFzKPqfEQ8gz5XOfbEL1kViaZ+l2+ndj//e0trk16Qo
+	zz6Kez4w0qC4fZUxwxzugJMWfKp6K3N+dVlkX3QYFckM0bGYWbbIEUmMIlkqb2TFkdMPYw
+	pm6qWA49laKSHkWa2JjVadADD+WoCxs=
+Date: Sun, 3 Dec 2023 18:43:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201-feature_poe-v2-3-56d8cac607fa@bootlin.com>
+Subject: Re: [PATCH bpf-next v7 3/3] selftests: bpf: crypto skcipher algo
+ selftests
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, Vadim Fedorenko <vadfed@meta.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+References: <20231202010604.1877561-1-vadfed@meta.com>
+ <20231202010604.1877561-3-vadfed@meta.com>
+ <20231203105912.GE50400@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20231203105912.GE50400@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> +/**
-> + * enum - Types of PSE controller.
-> + *
-> + * @PSE_UNKNOWN: Type of PSE controller is unknown
-> + * @PSE_PODL: PSE controller which support PoDL
-> + * @PSE_C33: PSE controller which support Clause 33 (PoE)
-> + */
-> +enum {
-> +	PSE_UNKNOWN = BIT(0),
-> +	PSE_PODL = BIT(1),
-> +	PSE_C33 = BIT(2),
-> +};
+On 03.12.2023 10:59, Simon Horman wrote:
+> On Fri, Dec 01, 2023 at 05:06:04PM -0800, Vadim Fedorenko wrote:
+>> Add simple tc hook selftests to show the way to work with new crypto
+>> BPF API. Some weird structre and map are added to setup program to make
+> 
+> Hi Vadim,
+> 
+> as it looks like there will be a new revision of this series,
+> please consider updating the spelling of structure.
+>
 
-Maybe this should be in the netlink API?
+Hi Simon!
 
-I think you can imply it by looking at what properties are in the
-netlink reply, but having it explicitly is probably better.
-ethtool(1) can default to PSE_PODL if the property is missing for an
-older kernel.
+Thanks for pointing it out. Actually with alignment fixes in BPF UAPI this
+sentence is no longer actual and the test program is rewritten without
+hacks. I'll remove this from commit message in new revision.
 
-      Andrew
+>> verifier happy about dynptr initialization from memory. Simple AES-ECB
+>> algo is used to demonstrate encryption and decryption of fixed size
+>> buffers.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> 
+> ...
+
 
