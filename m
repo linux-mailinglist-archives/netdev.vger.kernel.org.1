@@ -1,107 +1,213 @@
-Return-Path: <netdev+bounces-53351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21CA802735
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 21:13:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8ED8027AF
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 22:12:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB0EF1C20843
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 20:12:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99D321F211E9
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 21:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F1818B15;
-	Sun,  3 Dec 2023 20:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CFC18C3F;
+	Sun,  3 Dec 2023 21:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ZanCAnPZ"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lNeuh7iw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF47CC8
-	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 12:12:53 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1d098b87eeeso3341645ad.0
-        for <netdev@vger.kernel.org>; Sun, 03 Dec 2023 12:12:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1701634373; x=1702239173; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xO24qM7L3FZejklSl13rahZfpSL5EcfZ0L0IpjvAw9U=;
-        b=ZanCAnPZTcj6PPlhfcjDgtVJQT8S54GD/6WnuArbbQDGZKn+ua3jlw/cwMoZ8k3Rwd
-         FfS1PY9o4+qFiqdsmC1EHke9beKEet3TqqFbGSh87R77ziFwVefyaW6DSGj4PD28Vd+G
-         6hjwxP7AlFcBFUctQjlB0CzMrFTJH/VHVZWwz+WbV8RGlNZ9ONSVXsnZVw9bk/pEXYOd
-         wtVuBCMfIlT9v0GnUS4nxkkK+MH3n+zYcJH6XfiP3ZEEbBJbZIqovRYSwmYkVh7A17ru
-         WQmEPv7+t0gFtOPd+jMXP6AOvStBs+OWyv+08G6IZOHpg4K4Fy8k2zKlLlttYqXiF0hB
-         BV0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701634373; x=1702239173;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xO24qM7L3FZejklSl13rahZfpSL5EcfZ0L0IpjvAw9U=;
-        b=IgaJ3uH8oy2GilRYcM+oAW9Km0BGzfEi0GCcgPxWzAIMbIp22tvK+8EphzepWso8uQ
-         cQF8hs4IubK7X9jGMQPy1dGMS6yvVof2H1lgulifglX4KmOoO1rHWBUQzju/beA7Zyd2
-         Q7xos9MxHiVSzAnDGvWTHKh2+s5XnKPfS48W7Mn+sTWvqZxxUH15lDylTwG6Ogl3rCcO
-         HNSycQW9luEwIpDEqe3j4XGs6hGPnhIP4r4CAswrqfLNVwuYULDpAZkiiE2VKRQI6B0s
-         MCdBNEx/HhHANfLaMo4UZXBWnM9Egw5QR9uT5kHp7oZ8v40nBE72xDpmUWMOi6xpMp/l
-         TYfA==
-X-Gm-Message-State: AOJu0YzhclpzK+P/9BRW99Ty4zRXHAmPuaJbJymZKYIV0MpkW1eCj9Gd
-	SIlQcls24OYu/ylogQsu2wPQ7A==
-X-Google-Smtp-Source: AGHT+IGh/FAI2fFdl6MYPlAGAZ9FtArqBwRE1Q77Q+97ClLSZriCaOW/xw/yAzC14dXwefDRx3AX4g==
-X-Received: by 2002:a17:903:11cc:b0:1d0:6ffd:9e1c with SMTP id q12-20020a17090311cc00b001d06ffd9e1cmr3869207plh.110.1701634373407;
-        Sun, 03 Dec 2023 12:12:53 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id f13-20020a170902ab8d00b001cc20dd8825sm3453399plr.213.2023.12.03.12.12.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 12:12:53 -0800 (PST)
-Date: Sun, 3 Dec 2023 12:12:50 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>, Vladimir
- Oltean <olteanv@gmail.com>, Roopa Prabhu <roopa@nvidia.com>, Florian
- Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Marc Muehlfeld
- <mmuehlfe@redhat.com>
-Subject: Re: [PATCH net-next 05/10] docs: bridge: add STP doc
-Message-ID: <20231203121250.35110a99@hermes.local>
-In-Reply-To: <ZVwd31WaAsy6Cmwy@Laptop-X1>
-References: <20231117093145.1563511-1-liuhangbin@gmail.com>
-	<20231117093145.1563511-6-liuhangbin@gmail.com>
-	<20231120113947.ljveakvl6fgrshly@skbuf>
-	<ZVwd31WaAsy6Cmwy@Laptop-X1>
+Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B59B7CF
+	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 13:11:55 -0800 (PST)
+Received: from [192.168.1.18] ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id 9tkhrjQzbnYhw9tkhrWksH; Sun, 03 Dec 2023 22:11:53 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1701637913;
+	bh=/iWSzUSCtFxSRa7nJPgd9T8NZlrqaIvJ6JJK7oUVfkU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=lNeuh7iw0dmLd7K5RcK/cw56GO34h3LHTskBM0f9tZZQQAx7Av1Z3uQFkqwpmbHsv
+	 ypXPbhrtsL5+vQMNPwbP+ckmaGZioLgfr9l2wIpMw6S+JRyytKA5+/YpijhJHnxHxf
+	 08GD5f04SFs2kw12PjEc1BiU4IGkB9x+RVYu6X5hF3UyzNoZPX03B01rtFy6G3LA0l
+	 Gv1ytpLjnipBqwaO4IEl0/6VlQ6TRtDFAfsMlkGgcvZpXtIxG3E5mtzr+PipsrEPBV
+	 IgDH0dws3sqVBqjsRQM9aTxwb5bDhtzEthUKjTJ3sJq6Ywq4ROKvs4dDC/ep7/QTHg
+	 IXhysDhb5Q1hQ==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 03 Dec 2023 22:11:53 +0100
+X-ME-IP: 92.140.202.140
+Message-ID: <6eeead27-e1b1-48e4-8a3b-857e1c33496b@wanadoo.fr>
+Date: Sun, 3 Dec 2023 22:11:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Content-Language: fr
+To: Kory Maincent <kory.maincent@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>,
+ Russ Weight <russ.weight@linux.dev>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 21 Nov 2023 11:02:55 +0800
-Hangbin Liu <liuhangbin@gmail.com> wrote:
-
-> On Mon, Nov 20, 2023 at 01:39:47PM +0200, Vladimir Oltean wrote:
-> > On Fri, Nov 17, 2023 at 05:31:40PM +0800, Hangbin Liu wrote:  
-> > > +STP
-> > > +===  
-> > 
-> > I think it would be very good to say a few words about the user space
-> > STP helper at /sbin/bridge-stp, and that the kernel only has full support
-> > for the legacy STP, whereas newer protocols are all handled in user
-> > space. But I don't know a lot of technical details about it, so I would
-> > hope somebody else chimes in with a paragraph inserted here somewhere :)  
+Le 01/12/2023 à 18:10, Kory Maincent a écrit :
+> Add a new driver for the PD692x0 I2C Power Sourcing Equipment controller.
+> This driver only support i2c communication for now.
 > 
-> Hmm, I google searched but can't find this tool. Nikolay, is this tool still
-> widely used? Do you know where I can find the source code/doc of it?
+> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 > 
-> Thanks
-> Hangbin
+> This driver is based on the patch merged in an immutable branch from Jakub
+> repo. It is Tagged at:
+> git://git.kernel.org/pub/scm/linux/kernel/git/kuba/linux.git firmware_loader-add-upload-error
+> 
+> Change in v2:
+> - Drop of_match_ptr
+> - Follow the "c33" PoE prefix naming change.
+> - Remove unused delay_recv variable. Then, remove struct pd692x0_msg_content
+>    which is similar to struct pd692x0_msg.
+> - Fix a weird sleep loop.
+> - Improve pd692x0_recv_msg for better readability.
+> - Fix a warning reported by Simon on a pd692x0_fw_write_line call.
+> ---
 
-Older one is here (no longer maintained):
-  https://github.com/shemminger/RSTP
-Other version is here:
-  https://github.com/mstpd/mstpd
+...
+
+> +static int pd692x0_fw_get_next_line(const u8 *data,
+> +				    char *line, size_t size)
+> +{
+> +	size_t line_size;
+> +	int i;
+> +
+> +	line_size = min_t(size_t, size, (size_t)PD692X0_FW_LINE_MAX_SZ);
+
+Nit: useless size_t cast
+> +
+> +	memset(line, 0, PD692X0_FW_LINE_MAX_SZ);
+> +	for (i = 0; i < line_size - 1; i++) {
+> +		if (*data == '\r' && *(data + 1) == '\n') {
+> +			line[i] = '\r';
+> +			line[i + 1] = '\n';
+> +			return i + 2;
+> +		}
+> +		line[i] = *data;
+> +		data++;
+> +	}
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int pd692x0_i2c_probe(struct i2c_client *client)
+> +{
+> +	struct device *dev = &client->dev;
+> +	struct pd692x0_msg buf = {0};
+> +	struct pd692x0_msg_ver ver;
+> +	struct pd692x0_priv *priv;
+> +	struct fw_upload *fwl;
+> +	int ret;
+> +
+> +	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+> +		dev_err(dev, "i2c check functionality failed\n");
+> +		return -ENXIO;
+> +	}
+> +
+> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return -ENOMEM;
+> +
+> +	priv->client = client;
+> +	i2c_set_clientdata(client, priv);
+> +
+> +	priv->pcdev.owner = THIS_MODULE;
+> +	priv->pcdev.ops = &pd692x0_ops;
+> +	priv->pcdev.dev = dev;
+> +	priv->pcdev.types = PSE_C33;
+> +	priv->pcdev.of_pse_n_cells = 1;
+> +	priv->pcdev.nr_lines = PD692X0_MAX_LOGICAL_PORTS;
+> +	ret = devm_pse_controller_register(dev, &priv->pcdev);
+> +	if (ret) {
+> +		return dev_err_probe(dev, ret,
+> +				     "failed to register PSE controller\n");
+> +	}
+
+Nit: un-needed {}
+
+> +
+> +	fwl = firmware_upload_register(THIS_MODULE, dev, dev_name(dev),
+> +				       &pd692x0_fw_ops, priv);
+> +	if (IS_ERR(fwl)) {
+> +		dev_err(dev, "Failed to register to the Firmware Upload API\n");
+> +		ret = PTR_ERR(fwl);
+> +		return ret;
+
+Nit: return dev_err_probe()?
+
+> +	}
+> +	priv->fwl = fwl;
+> +
+> +	ret = i2c_master_recv(client, (u8 *)&buf, sizeof(buf));
+> +	if (ret != sizeof(buf)) {
+> +		dev_err(dev, "Failed to get device status\n");
+> +		ret = -EIO;
+> +		goto err_fw_unregister;
+> +	}
+> +
+> +	if (buf.key != 0x03 || buf.echo != 0xff || buf.sub[0] & 0x01) {
+> +		dev_err(dev, "PSE controller error\n");
+> +		ret = -EIO;
+> +		goto err_fw_unregister;
+> +	}
+> +
+> +	if (buf.sub[0] & 0x02) {
+> +		dev_err(dev, "PSE firmware error. Please update it.\n");
+> +		priv->fw_state = PD692X0_FW_BROKEN;
+> +		return 0;
+> +	}
+> +
+> +	ver = pd692x0_get_sw_version(priv);
+> +	dev_info(&client->dev, "Software version %d.%02d.%d.%d\n", ver.prod,
+> +		 ver.maj_sw_ver, ver.min_sw_ver, ver.pa_sw_ver);
+> +
+> +	if (ver.maj_sw_ver != PD692X0_FW_MAJ_VER) {
+> +		dev_err(dev, "Too old firmware version. Please update it\n");
+> +		priv->fw_state = PD692X0_FW_NEED_UPDATE;
+> +		return 0;
+> +	}
+> +
+> +	ret = pd692x0_update_matrix(priv);
+> +	if (ret < 0) {
+> +		dev_err(dev, "Error configuring ports matrix (%pe)\n",
+> +			ERR_PTR(ret));
+> +		goto err_fw_unregister;
+> +	}
+> +
+> +	priv->fw_state = PD692X0_FW_OK;
+> +	return 0;
+> +
+> +err_fw_unregister:
+> +	firmware_upload_unregister(priv->fwl);
+> +	return ret;
+> +}
+
+...
+
 
