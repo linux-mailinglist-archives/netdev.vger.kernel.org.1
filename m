@@ -1,138 +1,138 @@
-Return-Path: <netdev+bounces-53310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1875680238D
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 12:54:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A43E5802457
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 14:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96B2EB2097E
-	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 11:54:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 592F61F20FB1
+	for <lists+netdev@lfdr.de>; Sun,  3 Dec 2023 13:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACF6D29B;
-	Sun,  3 Dec 2023 11:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1701172C;
+	Sun,  3 Dec 2023 13:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iMIZzSnp"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="YpSHBzLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D386D0
-	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 03:54:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701604477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NsMMCvKq0Ewiy320Ly77st5H5qzHH4bDYVOsTjx5q7g=;
-	b=iMIZzSnpWDjmrB1ZYgrjowyrb8jtStYoU144SlKeZ0/HkKD32anqVzJ+VOdEHupMmozEKi
-	GXSnc8Tv2FaWnmEpDFYRgCxRk4FXFUDBsTyzdg8JngW/GV4LzwH2PwNCqTVUhRJYhYPntT
-	2U7vIjldKSiEhoSFRxdV5kManaHU0no=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-IrGc1WVsOrGnTJmtjYyOJQ-1; Sun, 03 Dec 2023 06:54:35 -0500
-X-MC-Unique: IrGc1WVsOrGnTJmtjYyOJQ-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5c668dc7f7bso939721a12.3
-        for <netdev@vger.kernel.org>; Sun, 03 Dec 2023 03:54:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701604474; x=1702209274;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NsMMCvKq0Ewiy320Ly77st5H5qzHH4bDYVOsTjx5q7g=;
-        b=NQLQBdt9gfdw/31vdI1nYjUvD3pheIp8tx3k/HhfMzd9rzNeLvApA/HWGHjqZR3lMP
-         KiwfS3Pf+U1ScwpwZtGsm4GkW8llXVP6WwqZ8quxJJARvAt2Y6jnvPwv9AOY6QUY0yeb
-         DlKveeY8urbxuQaizWw5hKVJ9st5h80TxpauGCjNkM8meftApoKQ26eVLFCzTwR39jcu
-         gVHKuxRsOBHe5fNi7y0PM39NCGofE6JS7ruMNQj15lnEVEGEtCsfmOf9OwJbi6R/PIgt
-         DwycEk/ITYjpn6iYT5f4xn4esK16+HtpheMAqo7yCNn9ioxQPNxuhK7EOkgV4fdZNmH+
-         uOrQ==
-X-Gm-Message-State: AOJu0YxfyWnXCb33X8q3ou56UnwOZeJjQTS5haVaMHT9y03RuB7hfJg8
-	gV3Dd+N3/rxrNdqQSvBodaqEK5xvbelhMwtgOEIHF8A2tfHmtbXI8AUZGeysvOJ3jrXEZ4oGtdz
-	n+yoAPpWOyRnOtSwM
-X-Received: by 2002:a05:6a20:7f8f:b0:18b:5b7e:6b9 with SMTP id d15-20020a056a207f8f00b0018b5b7e06b9mr3587804pzj.2.1701604474372;
-        Sun, 03 Dec 2023 03:54:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNQD4hRia5373/pCV7PCil0Ivh433RqIJioYM+uHGkbMjdSNcnMOvby2PUm57PEGvQqDzUXg==
-X-Received: by 2002:a05:6a20:7f8f:b0:18b:5b7e:6b9 with SMTP id d15-20020a056a207f8f00b0018b5b7e06b9mr3587789pzj.2.1701604474077;
-        Sun, 03 Dec 2023 03:54:34 -0800 (PST)
-Received: from localhost ([240d:1a:c0d:9f00:7d6c:1284:4ab0:52ee])
-        by smtp.gmail.com with ESMTPSA id x188-20020a6263c5000000b006c31c0dfb69sm6132152pfb.188.2023.12.03.03.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 03:54:33 -0800 (PST)
-Date: Sun, 03 Dec 2023 20:54:09 +0900 (JST)
-Message-Id: <20231203.205409.646024453190363727.syoshida@redhat.com>
-To: sumang@marvell.com
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [EXT] [PATCH net v2] ipv4: ip_gre: Avoid skb_pull() failure in
- ipgre_xmit()
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <SJ0PR18MB5216A25BD74AE376FB1E536BDB87A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20231202161441.221135-1-syoshida@redhat.com>
-	<SJ0PR18MB5216A25BD74AE376FB1E536BDB87A@SJ0PR18MB5216.namprd18.prod.outlook.com>
-X-Mailer: Mew version 6.9 on Emacs 29.1
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E35AF3;
+	Sun,  3 Dec 2023 05:47:51 -0800 (PST)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3B3DlXpk071454;
+	Sun, 3 Dec 2023 07:47:33 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1701611253;
+	bh=xsg/cZcC0C4RBj5/hP3Rl+RIv4uXX6jNJCBDcI6sbsM=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=YpSHBzLFqZlDmVXKm0BcTSuNFrjn4JFnzHvew5OdFiIruybcgRW34OstTfqliCG31
+	 vwAGtBkToresUbhr2WnLYcbFWo80D+hIMRmF3YNkvEA8RY++HuPsI/r72uEx2FKy9r
+	 whyPqiXowhlzMRuRefK2ZjY1LKxsYUDecJkq7Qfg=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3B3DlXL5052513
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Sun, 3 Dec 2023 07:47:33 -0600
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 3
+ Dec 2023 07:47:32 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Sun, 3 Dec 2023 07:47:32 -0600
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3B3DlWD1048955;
+	Sun, 3 Dec 2023 07:47:32 -0600
+Date: Sun, 3 Dec 2023 07:47:32 -0600
+From: Nishanth Menon <nm@ti.com>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+CC: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <andrew@lunn.ch>, <f.fainelli@gmail.com>, <horms@kernel.org>,
+        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>
+Subject: Re: [PATCH net-next v3] net: ethernet: ti: davinci_mdio: Update K3
+ SoCs list for errata i2329
+Message-ID: <20231203134732.qkvq7t4w7nthfxpx@kobold>
+References: <20231201132033.29576-1-r-gunasekaran@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231201132033.29576-1-r-gunasekaran@ti.com>
+User-Agent: NeoMutt/20171215
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi Suman,
-
-On Sun, 3 Dec 2023 06:58:19 +0000, Suman Ghosh wrote:
-> Hi Shigeru,
+On 18:50-20231201, Ravi Gunasekaran wrote:
+> The errata i2329 affects all the currently available silicon revisions of
+> AM62x, AM64x, AM65x, J7200, J721E and J721S2. So remove the revision
+> string from the SoC list.
 > 
->>diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c index
->>22a26d1d29a0..5169c3c72cff 100644
->>--- a/net/ipv4/ip_gre.c
->>+++ b/net/ipv4/ip_gre.c
->>@@ -635,15 +635,18 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
->> 	}
->>
->> 	if (dev->header_ops) {
->>+		int pull_len = tunnel->hlen + sizeof(struct iphdr);
->>+
->> 		if (skb_cow_head(skb, 0))
->> 			goto free_skb;
->>
->> 		tnl_params = (const struct iphdr *)skb->data;
->>
->>-		/* Pull skb since ip_tunnel_xmit() needs skb->data pointing
->>-		 * to gre header.
->>-		 */
->>-		skb_pull(skb, tunnel->hlen + sizeof(struct iphdr));
->>+		if (!pskb_network_may_pull(skb, pull_len))
-> [Suman] Since this is transmit path, should we add unlikely() here?
-
-Thanks for your comment.
-
-I traced this function and found that pskb_may_pull_reason() seems to
-have appropriate likely() and unlikely() as Eric says.
-
-I'm new to Linux networking. Could you kindly explain the background
-of your suggestion?
-
-I understand that a transmit path must be as fast as possible, so we
-should use unlikely() for rare cases such like this error path. Am I
-correct?
-
-Thanks,
-Shigeru
-
->>+			goto free_skb;
->>+
->>+		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
->>+		skb_pull(skb, pull_len);
->> 		skb_reset_mac_header(skb);
->>
->> 		if (skb->ip_summed == CHECKSUM_PARTIAL &&
->>--
->>2.41.0
->>
+> The silicon revisions affected by the errata i2329 can be found under
+> the MDIO module in the "Advisories by Modules" section of each
+> SoC errata document listed below
 > 
+> AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
+> AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
+> AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
+> J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
+> J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
+> J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
+> 
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> ---
+> Changes since v2:
+> * Removed revision string for all the affected SoCs
+> 
+> Changes since v1:
+> * For J721E, retained the incorrect SR ID and added the correct one
+> * Add AM65x SR2.1 to the workaround list
+> 
+> v2: https://lore.kernel.org/all/20231020111738.14671-1-r-gunasekaran@ti.com/
+> v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
+> 
+>  drivers/net/ethernet/ti/davinci_mdio.c | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
+> index 628c87dc1d28..8e07d4a1b6ba 100644
+> --- a/drivers/net/ethernet/ti/davinci_mdio.c
+> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
+> @@ -511,16 +511,12 @@ static const struct k3_mdio_soc_data am65_mdio_soc_data = {
+>  };
+>  
+>  static const struct soc_device_attribute k3_mdio_socinfo[] = {
+> -	{ .family = "AM62X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "AM64X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
+> +	{ .family = "AM62X", .data = &am65_mdio_soc_data },
+> +	{ .family = "AM64X", .data = &am65_mdio_soc_data },
+> +	{ .family = "AM65X", .data = &am65_mdio_soc_data },
+> +	{ .family = "J7200", .data = &am65_mdio_soc_data },
+> +	{ .family = "J721E", .data = &am65_mdio_soc_data },
+> +	{ .family = "J721S2", .data = &am65_mdio_soc_data },
+>  	{ /* sentinel */ },
 
+
+Much better. Thank you. and will avoid the conflicts we have with fixups
+pending..
+
+Reviewed-by: Nishanth Menon <nm@ti.com>
+
+-- 
+
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
