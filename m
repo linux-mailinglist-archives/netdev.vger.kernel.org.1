@@ -1,122 +1,95 @@
-Return-Path: <netdev+bounces-53474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B317580329A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:28:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A9948032AC
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:30:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D698C1C209AE
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:28:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B00F1C20A3F
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579D3241E3;
-	Mon,  4 Dec 2023 12:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D7D200BF;
+	Mon,  4 Dec 2023 12:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fy1vCCwv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwNBAhM3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73650D2
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:28:36 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so13563a12.0
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 04:28:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701692915; x=1702297715; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c7C/S8lLR0a29fUZmsld88FJ/WJYuF5hr49VjGtEE4Y=;
-        b=Fy1vCCwvHRZTbOajNt7Ns8PVjPTU5zhEdS3moWWgdfWw8OUy2RkPmrleh4nkZuPg5p
-         KkC/pxqhLGLQIvqamQHhbUceRuaLLuYIRfGh6mpH+GnC5JmZfVi0tJaTbZt0OFbIevyu
-         kNHHSablozevS84nHHHh+U+ZSk4FzdmaHWT6QTwoJ9JklUulvgYs+Si7Qx/daeZfHa/K
-         5nQTL07K+++1NnTgVv6R6W/gRSBBb32sIi0jdfDT0v0joIae6/aRXCn/spGVA8+Kp0O7
-         bkRi6lWvN9nWHXXUnWr5C/zn3jv6BlWLxAhHILXK2cLZfRk8d9lrvVCKWr4knxbEvCpb
-         LH5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701692915; x=1702297715;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c7C/S8lLR0a29fUZmsld88FJ/WJYuF5hr49VjGtEE4Y=;
-        b=fcqfMVhIpTZxaiIKy6JOdt66YJ3egiYL2LCoRxT734OkgH/ybuvXlE2UWWJVjbjN4R
-         QccvNimiRABcC2koA2WXLdlV1oZe8vSy/Um9puVHtxEYgXsF6KGBxxgdJNmxNmkTjU9O
-         GKVEhTkxsnC6FSnPwyurYwOKDAkV52WsJwQqJ6oi6Xk++bqKO6hkd6Vcq71LWXjWJ3YJ
-         VrTWdx/vzweKZ7zA98f6eq9TtnAtbtFvrZ8jY36N27nLYWIJd1IgTKTHPDeJdddgZU7V
-         HhjGyyQvFohzin75bpD1rAjjCZZrUv8jjdKBwCyT5poYoVsE2hr63AvT05y6dcdwmr8J
-         OHQw==
-X-Gm-Message-State: AOJu0YxbLUQf+rYVv7CQu75vW34LjvES8V2uvRA+fN5wyYoNUGRJwvac
-	pkQrt9migwQ85/p7FkPpgc0so0zupHPC0LGi1Y2j5g==
-X-Google-Smtp-Source: AGHT+IFISfJCPS1icgBXHHbLxd2ru8u88z5BIQahLRVRRq/0+B35P94aGebYvx3Y5PjogX8GYj138Ozk8TfjEa7KVRo=
-X-Received: by 2002:a05:6402:35d3:b0:54c:9996:7833 with SMTP id
- z19-20020a05640235d300b0054c99967833mr81479edc.7.1701692914618; Mon, 04 Dec
- 2023 04:28:34 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751B219BAB;
+	Mon,  4 Dec 2023 12:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CF709C433C8;
+	Mon,  4 Dec 2023 12:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701693024;
+	bh=Scnnbxct6A0XPzh5s73Wc9TuJRZ1k4HhysjpASGiM/M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VwNBAhM3Q1gjAVS8rMJVe7C3EGqC71Xb41c+pR4K4W2naiCy4nJh46gxiocwEGbKB
+	 OuscaGrW9kFb0SgGYGGcERJV3JbEqfNQVxgUYC5ZH/0EgMbdBmyxA8snNBagLAfRcT
+	 F8UxarbIUQ/YUctZZq+hwmpZK37/xXqKqOvCcxy1AQKppTcn10wDB0CUqrFpysLVGt
+	 v9zKu8p8SKS4MuskqiZjHjL2v1x8z1FLHho1DmfpAQ5m+CbrYqWCCC8hKnQGj8FhSZ
+	 +adRCFwQVUfAgS2gfGVEAm3RwON6SObRutdLZrRBVrgYz+QjCzmxktZw7+njTU6rgB
+	 UzCDo1VWusPMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B154CDD4EEF;
+	Mon,  4 Dec 2023 12:30:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231204114322.9218-1-lulie@linux.alibaba.com>
-In-Reply-To: <20231204114322.9218-1-lulie@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Dec 2023 13:28:21 +0100
-Message-ID: <CANn89iKUHQHA2wHw9k1SiazJf7ag7i4Tz+FPutgu870teVw_Bg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: add tracepoints for data send/recv/acked
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, martin.lau@linux.dev, 
-	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com, 
-	alibuda@linux.alibaba.com, guwen@linux.alibaba.com, hengqi@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 1/5] r8152: Hold the rtnl_lock for all of reset
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170169302472.7913.15839516677330615990.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Dec 2023 12:30:24 +0000
+References: <20231129132521.net.v3.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
+In-Reply-To: <20231129132521.net.v3.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
+To: Doug Anderson <dianders@chromium.org>
+Cc: kuba@kernel.org, hayeswang@realtek.com, davem@davemloft.net,
+ linux-usb@vger.kernel.org, grundler@chromium.org, laura.nao@collabora.com,
+ ecgh@chromium.org, stern@rowland.harvard.edu, horms@kernel.org,
+ bjorn@mork.no, edumazet@google.com, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-On Mon, Dec 4, 2023 at 12:43=E2=80=AFPM Philo Lu <lulie@linux.alibaba.com> =
-wrote:
->
-> Add 3 tracepoints, namely tcp_data_send/tcp_data_recv/tcp_data_acked,
-> which will be called every time a tcp data packet is sent, received, and
-> acked.
-> tcp_data_send: called after a data packet is sent.
-> tcp_data_recv: called after a data packet is receviced.
-> tcp_data_acked: called after a valid ack packet is processed (some sent
-> data are ackknowledged).
->
-> We use these callbacks for fine-grained tcp monitoring, which collects
-> and analyses every tcp request/response event information. The whole
-> system has been described in SIGMOD'18 (see
-> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
-> achieve this with bpf, we require hooks for data events that call bpf
-> prog (1) when any data packet is sent/received/acked, and (2) after
-> critical tcp state variables have been updated (e.g., snd_una, snd_nxt,
-> rcv_nxt). However, existing bpf hooks cannot meet our requirements.
-> Besides, these tracepoints help to debug tcp when data send/recv/acked.
+Hello:
 
-This I do not understand.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
->
-> Though kretprobe/fexit can also be used to collect these information,
-> they will not work if the kernel functions get inlined. Considering the
-> stability, we prefer tracepoint as the solution.
+On Wed, 29 Nov 2023 13:25:20 -0800 you wrote:
+> As of commit d9962b0d4202 ("r8152: Block future register access if
+> register access fails") there is a race condition that can happen
+> between the USB device reset thread and napi_enable() (not) getting
+> called during rtl8152_open(). Specifically:
+> * While rtl8152_open() is running we get a register access error
+>   that's _not_ -ENODEV and queue up a USB reset.
+> * rtl8152_open() exits before calling napi_enable() due to any reason
+>   (including usb_submit_urb() returning an error).
+> 
+> [...]
 
-I dunno, this seems quite weak to me. I see many patches coming to add
-tracing in the stack, but no patches fixing any issues.
+Here is the summary with links:
+  - [net,v3,1/5] r8152: Hold the rtnl_lock for all of reset
+    https://git.kernel.org/netdev/net/c/e62adaeecdc6
+  - [net,v3,2/5] r8152: Add RTL8152_INACCESSIBLE checks to more loops
+    https://git.kernel.org/netdev/net/c/32a574c7e268
+  - [net,v3,3/5] r8152: Add RTL8152_INACCESSIBLE to r8156b_wait_loading_flash()
+    https://git.kernel.org/netdev/net/c/8a67b47fced9
+  - [net,v3,4/5] r8152: Add RTL8152_INACCESSIBLE to r8153_pre_firmware_1()
+    https://git.kernel.org/netdev/net/c/8c53a7bd7065
+  - [net,v3,5/5] r8152: Add RTL8152_INACCESSIBLE to r8153_aldps_en()
+    https://git.kernel.org/netdev/net/c/79321a793945
 
-It really looks like : We do not know how TCP stack works, we do not
-know if there is any issue,
-let us add trace points to help us to make forward progress in our analysis=
-.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-These tracepoints will not tell how many segments/bytes were
-sent/acked/received, I really do not see
-how we will avoid adding in the future more stuff, forcing the
-compiler to save more state
-just in case the tracepoint needs the info.
 
-The argument of "add minimal info", so that we can silently add more
-stuff in the future "for free" is not something I buy.
-
-I very much prefer that you make sure the stuff you need is not
-inlined, so that standard kprobe/kretprobe facility can be used.
 
