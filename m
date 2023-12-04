@@ -1,43 +1,62 @@
-Return-Path: <netdev+bounces-53369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043EB8029DD
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:21:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086778029F8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:45:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A5361C20975
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 01:21:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302E41C20850
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 01:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F31A523C;
-	Mon,  4 Dec 2023 01:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABAEECA;
+	Mon,  4 Dec 2023 01:45:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED088F0;
-	Sun,  3 Dec 2023 17:21:06 -0800 (PST)
-X-IronPort-AV: E=Sophos;i="6.04,248,1695654000"; 
-   d="scan'208";a="189033700"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 04 Dec 2023 10:21:02 +0900
-Received: from localhost.localdomain (unknown [10.166.13.99])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 329A0411E23B;
-	Mon,  4 Dec 2023 10:21:02 +0900 (JST)
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: s.shtylyov@omp.ru,
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B659DF;
+	Sun,  3 Dec 2023 17:45:12 -0800 (PST)
+X-UUID: ee64416ed39e48bc895f2e239b83a94d-20231204
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:da4c46b1-07fa-4654-b582-41546c64ad46,IP:15,
+	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:-25
+X-CID-INFO: VERSION:1.1.33,REQID:da4c46b1-07fa-4654-b582-41546c64ad46,IP:15,UR
+	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-25
+X-CID-META: VersionHash:364b77b,CLOUDID:b2281a96-10ce-4e4b-85c2-c9b5229ff92b,B
+	ulkID:231204094504NWR6GREY,BulkQuantity:0,Recheck:0,SF:44|66|38|24|17|19|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-UUID: ee64416ed39e48bc895f2e239b83a94d-20231204
+X-User: chentao@kylinos.cn
+Received: from vt.. [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1135152479; Mon, 04 Dec 2023 09:45:01 +0800
+From: Kunwu Chan <chentao@kylinos.cn>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH net-next v3 9/9] net: rswitch: Allow jumbo frames
-Date: Mon,  4 Dec 2023 10:20:58 +0900
-Message-Id: <20231204012058.3876078-10-yoshihiro.shimoda.uh@renesas.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231204012058.3876078-1-yoshihiro.shimoda.uh@renesas.com>
-References: <20231204012058.3876078-1-yoshihiro.shimoda.uh@renesas.com>
+	pabeni@redhat.com,
+	jeffrey.t.kirsher@intel.com,
+	shannon.nelson@amd.com
+Cc: kunwu.chan@hotmail.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kunwu Chan <chentao@kylinos.cn>,
+	Simon Horman <horms@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH v3 iwl-next] i40e: Use correct buffer size in i40e_dbg_command_read
+Date: Mon,  4 Dec 2023 09:44:55 +0800
+Message-Id: <20231204014455.2444734-1-chentao@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,43 +65,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow jumbo frames by changing maximum MTU size and number of RX queues.
+The size of "i40e_dbg_command_buf" is 256, the size of "name"
+depends on "IFNAMSIZ", plus a null character and format size,
+the total size is more than 256.
 
-Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Improve readability and maintainability by replacing a hardcoded string
+allocation and formatting by the use of the kasprintf() helper.
+
+Fixes: 02e9c290814c ("i40e: debugfs interface")
+Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+Suggested-by: Simon Horman <horms@kernel.org>
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- drivers/net/ethernet/renesas/rswitch.c | 2 ++
- drivers/net/ethernet/renesas/rswitch.h | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+v2
+   - Update the size calculation with IFNAMSIZ and sizeof(i40e_dbg_command_buf)
+v3
+   - Use kasprintf to improve readability and maintainability
+---
+ drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index df419112b67a..9cdcac9c56b9 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1882,6 +1882,8 @@ static int rswitch_device_alloc(struct rswitch_private *priv, unsigned int index
- 	snprintf(ndev->name, IFNAMSIZ, "tsn%d", index);
- 	ndev->netdev_ops = &rswitch_netdev_ops;
- 	ndev->ethtool_ops = &rswitch_ethtool_ops;
-+	ndev->max_mtu = RSWITCH_MAX_MTU;
-+	ndev->min_mtu = ETH_MIN_MTU;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+index 88240571721a..a176de89de9c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+@@ -72,23 +72,22 @@ static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
+ {
+ 	struct i40e_pf *pf = filp->private_data;
+ 	int bytes_not_copied;
+-	int buf_size = 256;
+-	char *buf;
++	char *buf = NULL;
+ 	int len;
  
- 	netif_napi_add(ndev, &rdev->napi, rswitch_poll);
+ 	/* don't allow partial reads */
+ 	if (*ppos != 0)
+ 		return 0;
+-	if (count < buf_size)
+-		return -ENOSPC;
  
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index 4252677e2a55..72e3ff596d31 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -26,9 +26,10 @@
- 		else
+-	buf = kzalloc(buf_size, GFP_KERNEL);
++	buf = kasprintf(GFP_KERNEL, "%s: %s\n",
++			pf->vsi[pf->lan_vsi]->netdev->name,
++			i40e_dbg_command_buf);
+ 	if (!buf)
+ 		return -ENOSPC;
  
- #define TX_RING_SIZE		1024
--#define RX_RING_SIZE		1024
-+#define RX_RING_SIZE		4096
- #define TS_RING_SIZE		(TX_RING_SIZE * RSWITCH_NUM_PORTS)
+-	len = snprintf(buf, buf_size, "%s: %s\n",
+-		       pf->vsi[pf->lan_vsi]->netdev->name,
+-		       i40e_dbg_command_buf);
++	len = strlen(buf);
++	if (count < len)
++		return -ENOSPC;
  
-+#define RSWITCH_MAX_MTU		9600
- #define RSWITCH_HEADROOM	(NET_SKB_PAD + NET_IP_ALIGN)
- #define RSWITCH_DESC_BUF_SIZE	2048
- #define RSWITCH_TAILROOM	SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+ 	bytes_not_copied = copy_to_user(buffer, buf, len);
+ 	kfree(buf);
 -- 
 2.34.1
 
