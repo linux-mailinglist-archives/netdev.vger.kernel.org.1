@@ -1,334 +1,97 @@
-Return-Path: <netdev+bounces-53694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5A0804247
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 00:03:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F5F804260
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 00:08:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB5B2813D3
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 23:03:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 186A11F21360
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 23:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6A623756;
-	Mon,  4 Dec 2023 23:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF862377C;
+	Mon,  4 Dec 2023 23:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="PqJ89naW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vvA+FTKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB136113;
-	Mon,  4 Dec 2023 15:03:29 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-	id 1120220B74C0; Mon,  4 Dec 2023 15:03:29 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1120220B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1701731009;
-	bh=ngAycXySFu4N9asp5N94AoSgcu94Gkaier8id6EuzFc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PqJ89naWt4ooIpRRBteYXPk5M/MbYTzuuzIKOe1A2rjqqj/Csgx3Fxue4SSTHEkvK
-	 GmSvzzv0cSYENKJ1NE1Q4PSgr21CmF/hCMcGkfAnXHRpwRXnX1ujC1lXRKU+DcgqEs
-	 iUY6ofrrXerwP+1gZ/c0wyQhQZoWjhnYEcsnWc7s=
-From: longli@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: [Patch v2 3/3] RDMA/mana_ib: Add CQ interrupt support for RAW QP
-Date: Mon,  4 Dec 2023 15:02:59 -0800
-Message-Id: <1701730979-1148-4-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1701730979-1148-1-git-send-email-longli@linuxonhyperv.com>
-References: <1701730979-1148-1-git-send-email-longli@linuxonhyperv.com>
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1DBAC
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 15:08:34 -0800 (PST)
+Message-ID: <7e93cc7b-0bc0-41d7-af36-d21f919d5755@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701731312;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OMTDuBvfrBcTj07LSr3P2m6REF9k0/Ryy4y4Trr/lFg=;
+	b=vvA+FTKZPChnV3ecNA06X9JnFKhJYMavhM7/yPr+2hBLNJhNmR8omGqAChlikGU1gys05A
+	KZs1A6yX12c4IVzkdX8PKMP1yhIy5D1LJeQnfGppovnMsCbqx4IhXSDswi/LpW9CKB0jmy
+	YneU4DfBp+Ie5xHz0EyuBt5fh/Kzf+E=
+Date: Mon, 4 Dec 2023 15:08:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Content-Language: en-US
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Vadim Fedorenko <vadfed@meta.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20231202010604.1877561-1-vadfed@meta.com>
+ <3bea70d0-94a5-4d41-be15-2e8b5932a3b0@linux.dev>
+ <b5547960-c4ef-2b90-0186-a859d18849fc@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <b5547960-c4ef-2b90-0186-a859d18849fc@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Long Li <longli@microsoft.com>
+On 12/3/23 11:02 AM, Vadim Fedorenko wrote:
+>>> +static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
+>>> +{
+>>> +    const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
+>>> +    struct bpf_crypto_type_list *node;
+>>> +
+>>> +    down_read(&bpf_crypto_types_sem);
+>>> +    list_for_each_entry(node, &bpf_crypto_types, list) {
+>>> +        if (strcmp(node->type->name, name))
+>>> +            continue;
+>>> +
+>>> +        if (try_module_get(node->type->owner))
+>>
+>> If I read patch 2 correctly, it is always built-in. I am not sure I understand 
+>> the module_put/get in this patch.
+> 
+> Well, yeah, right now it's built-in, but it can be easily converted to module
+> with it's own Kconfig option. Especially if we think about adding aead crypto
+> and using bpf in embedded setups with less amount of resources.
 
-At probing time, the MANA core code allocates EQs for supporting interrupts
-on Ethernet queues. The same interrupt mechanisum is used by RAW QP.
+What code is missing to support module? It sounds like all codes are ready.
+and does it really need a separate kconfig option? Can it depend on 
+CONFIG_BPF_SYSCALL and CONFIG_CRYPTO_SKCIPHER?
 
-Use the same EQs for delivering interrupts on the CQ for the RAW QP.
+>>> +BTF_SET8_START(crypt_init_kfunc_btf_ids)
+>>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_create, KF_ACQUIRE | KF_RET_NULL | 
+>>> KF_SLEEPABLE)
+>>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_release, KF_RELEASE)
+>>> +BTF_ID_FLAGS(func, bpf_crypto_ctx_acquire, KF_ACQUIRE | KF_TRUSTED_ARGS)
+>>
+>> Considering bpf_crypto_ctx is rcu protected, the acquire may use "KF_ACQUIRE | 
+>> KF_RCU | KF_RET_NULL" such that the bpf_crypto_ctx_acquire(ctx_from_map_value) 
+>> will work and the user will prepare checking NULL from day one.
+>>
+> 
+> Got it. What about create? Should it also include KF_RCU?
 
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/infiniband/hw/mana/cq.c      | 32 ++++++++++++-
- drivers/infiniband/hw/mana/mana_ib.h |  3 ++
- drivers/infiniband/hw/mana/qp.c      | 72 ++++++++++++++++++++++++++--
- 3 files changed, 102 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mana/cq.c b/drivers/infiniband/hw/mana/cq.c
-index 09a2c263e39b..83ebd070535a 100644
---- a/drivers/infiniband/hw/mana/cq.c
-+++ b/drivers/infiniband/hw/mana/cq.c
-@@ -12,13 +12,20 @@ int mana_ib_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
- 	struct ib_device *ibdev = ibcq->device;
- 	struct mana_ib_create_cq ucmd = {};
- 	struct mana_ib_dev *mdev;
-+	struct gdma_context *gc;
- 	int err;
- 
- 	mdev = container_of(ibdev, struct mana_ib_dev, ib_dev);
-+	gc = mdev->gdma_dev->gdma_context;
- 
- 	if (udata->inlen < sizeof(ucmd))
- 		return -EINVAL;
- 
-+	if (attr->comp_vector > gc->max_num_queues)
-+		return -EINVAL;
-+
-+	cq->comp_vector = attr->comp_vector;
-+
- 	err = ib_copy_from_udata(&ucmd, udata, min(sizeof(ucmd), udata->inlen));
- 	if (err) {
- 		ibdev_dbg(ibdev,
-@@ -56,6 +63,7 @@ int mana_ib_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
- 	/*
- 	 * The CQ ID is not known at this time. The ID is generated at create_qp
- 	 */
-+	cq->id = INVALID_QUEUE_ID;
- 
- 	return 0;
- 
-@@ -69,11 +77,33 @@ int mana_ib_destroy_cq(struct ib_cq *ibcq, struct ib_udata *udata)
- 	struct mana_ib_cq *cq = container_of(ibcq, struct mana_ib_cq, ibcq);
- 	struct ib_device *ibdev = ibcq->device;
- 	struct mana_ib_dev *mdev;
-+	struct gdma_context *gc;
-+	int err;
- 
- 	mdev = container_of(ibdev, struct mana_ib_dev, ib_dev);
-+	gc = mdev->gdma_dev->gdma_context;
-+
-+	err = mana_ib_gd_destroy_dma_region(mdev, cq->gdma_region);
-+	if (err) {
-+		ibdev_dbg(ibdev,
-+			  "Failed to destroy dma region, %d\n", err);
-+		return err;
-+	}
-+
-+	if (cq->id != INVALID_QUEUE_ID) {
-+		kfree(gc->cq_table[cq->id]);
-+		gc->cq_table[cq->id] = NULL;
-+	}
- 
--	mana_ib_gd_destroy_dma_region(mdev, cq->gdma_region);
- 	ib_umem_release(cq->umem);
- 
- 	return 0;
- }
-+
-+void mana_ib_cq_handler(void *ctx, struct gdma_queue *gdma_cq)
-+{
-+	struct mana_ib_cq *cq = ctx;
-+
-+	if (cq->ibcq.comp_handler)
-+		cq->ibcq.comp_handler(&cq->ibcq, cq->ibcq.cq_context);
-+}
-diff --git a/drivers/infiniband/hw/mana/mana_ib.h b/drivers/infiniband/hw/mana/mana_ib.h
-index 7cb3d8ee4292..53bb4905afd5 100644
---- a/drivers/infiniband/hw/mana/mana_ib.h
-+++ b/drivers/infiniband/hw/mana/mana_ib.h
-@@ -86,6 +86,7 @@ struct mana_ib_cq {
- 	int cqe;
- 	u64 gdma_region;
- 	u64 id;
-+	u32 comp_vector;
- };
- 
- struct mana_ib_qp {
-@@ -209,4 +210,6 @@ int mana_ib_query_gid(struct ib_device *ibdev, u32 port, int index,
- void mana_ib_disassociate_ucontext(struct ib_ucontext *ibcontext);
- 
- int mana_ib_query_adapter_caps(struct mana_ib_dev *mdev);
-+
-+void mana_ib_cq_handler(void *ctx, struct gdma_queue *gdma_cq);
- #endif
-diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-index 4667b18ec1dd..186d9829bb93 100644
---- a/drivers/infiniband/hw/mana/qp.c
-+++ b/drivers/infiniband/hw/mana/qp.c
-@@ -99,25 +99,34 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 	struct mana_ib_qp *qp = container_of(ibqp, struct mana_ib_qp, ibqp);
- 	struct mana_ib_dev *mdev =
- 		container_of(pd->device, struct mana_ib_dev, ib_dev);
-+	struct ib_ucontext *ib_ucontext = pd->uobject->context;
- 	struct ib_rwq_ind_table *ind_tbl = attr->rwq_ind_tbl;
- 	struct mana_ib_create_qp_rss_resp resp = {};
- 	struct mana_ib_create_qp_rss ucmd = {};
-+	struct mana_ib_ucontext *mana_ucontext;
-+	struct gdma_queue **gdma_cq_allocated;
- 	mana_handle_t *mana_ind_table;
- 	struct mana_port_context *mpc;
-+	struct gdma_queue *gdma_cq;
- 	unsigned int ind_tbl_size;
- 	struct mana_context *mc;
- 	struct net_device *ndev;
-+	struct gdma_context *gc;
- 	struct mana_ib_cq *cq;
- 	struct mana_ib_wq *wq;
- 	struct gdma_dev *gd;
-+	struct mana_eq *eq;
- 	struct ib_cq *ibcq;
- 	struct ib_wq *ibwq;
- 	int i = 0;
- 	u32 port;
- 	int ret;
- 
--	gd = &mdev->gdma_dev->gdma_context->mana;
-+	gc = mdev->gdma_dev->gdma_context;
-+	gd = &gc->mana;
- 	mc = gd->driver_data;
-+	mana_ucontext =
-+		container_of(ib_ucontext, struct mana_ib_ucontext, ibucontext);
- 
- 	if (!udata || udata->inlen < sizeof(ucmd))
- 		return -EINVAL;
-@@ -179,6 +188,13 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 		goto fail;
- 	}
- 
-+	gdma_cq_allocated = kcalloc(ind_tbl_size, sizeof(*gdma_cq_allocated),
-+				    GFP_KERNEL);
-+	if (!gdma_cq_allocated) {
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+
- 	qp->port = port;
- 
- 	for (i = 0; i < ind_tbl_size; i++) {
-@@ -197,7 +213,8 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 		cq_spec.gdma_region = cq->gdma_region;
- 		cq_spec.queue_size = cq->cqe * COMP_ENTRY_SIZE;
- 		cq_spec.modr_ctx_id = 0;
--		cq_spec.attached_eq = GDMA_CQ_NO_EQ;
-+		eq = &mc->eqs[cq->comp_vector % gc->max_num_queues];
-+		cq_spec.attached_eq = eq->eq->id;
- 
- 		ret = mana_create_wq_obj(mpc, mpc->port_handle, GDMA_RQ,
- 					 &wq_spec, &cq_spec, &wq->rx_object);
-@@ -219,6 +236,21 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 		resp.entries[i].wqid = wq->id;
- 
- 		mana_ind_table[i] = wq->rx_object;
-+
-+		/* Create CQ table entry */
-+		WARN_ON(gc->cq_table[cq->id]);
-+		gdma_cq = kzalloc(sizeof(*gdma_cq), GFP_KERNEL);
-+		if (!gdma_cq) {
-+			ret = -ENOMEM;
-+			goto fail;
-+		}
-+		gdma_cq_allocated[i] = gdma_cq;
-+
-+		gdma_cq->cq.context = cq;
-+		gdma_cq->type = GDMA_CQ;
-+		gdma_cq->cq.callback = mana_ib_cq_handler;
-+		gdma_cq->id = cq->id;
-+		gc->cq_table[cq->id] = gdma_cq;
- 	}
- 	resp.num_entries = i;
- 
-@@ -238,6 +270,7 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 		goto fail;
- 	}
- 
-+	kfree(gdma_cq_allocated);
- 	kfree(mana_ind_table);
- 
- 	return 0;
-@@ -247,8 +280,15 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 		ibwq = ind_tbl->ind_tbl[i];
- 		wq = container_of(ibwq, struct mana_ib_wq, ibwq);
- 		mana_destroy_wq_obj(mpc, GDMA_RQ, wq->rx_object);
-+
-+		if (gdma_cq_allocated[i]) {
-+			gc->cq_table[gdma_cq_allocated[i]->id] =
-+				NULL;
-+			kfree(gdma_cq_allocated[i]);
-+		}
- 	}
- 
-+	kfree(gdma_cq_allocated);
- 	kfree(mana_ind_table);
- 
- 	return ret;
-@@ -273,11 +313,14 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
- 	struct mana_obj_spec wq_spec = {};
- 	struct mana_obj_spec cq_spec = {};
- 	struct mana_port_context *mpc;
-+	struct gdma_queue *gdma_cq;
- 	struct mana_context *mc;
- 	struct net_device *ndev;
- 	struct ib_umem *umem;
--	int err;
-+	struct mana_eq *eq;
-+	int eq_vec;
- 	u32 port;
-+	int err;
- 
- 	mc = gd->driver_data;
- 
-@@ -354,7 +397,9 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
- 	cq_spec.gdma_region = send_cq->gdma_region;
- 	cq_spec.queue_size = send_cq->cqe * COMP_ENTRY_SIZE;
- 	cq_spec.modr_ctx_id = 0;
--	cq_spec.attached_eq = GDMA_CQ_NO_EQ;
-+	eq_vec = send_cq->comp_vector % gd->gdma_context->max_num_queues;
-+	eq = &mc->eqs[eq_vec];
-+	cq_spec.attached_eq = eq->eq->id;
- 
- 	err = mana_create_wq_obj(mpc, mpc->port_handle, GDMA_SQ, &wq_spec,
- 				 &cq_spec, &qp->tx_object);
-@@ -372,6 +417,20 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
- 	qp->sq_id = wq_spec.queue_index;
- 	send_cq->id = cq_spec.queue_index;
- 
-+	/* Create CQ table entry */
-+	WARN_ON(gd->gdma_context->cq_table[send_cq->id]);
-+	gdma_cq = kzalloc(sizeof(*gdma_cq), GFP_KERNEL);
-+	if (!gdma_cq) {
-+		err = -ENOMEM;
-+		goto err_destroy_wq_obj;
-+	}
-+
-+	gdma_cq->cq.context = send_cq;
-+	gdma_cq->type = GDMA_CQ;
-+	gdma_cq->cq.callback = mana_ib_cq_handler;
-+	gdma_cq->id = send_cq->id;
-+	gd->gdma_context->cq_table[send_cq->id] = gdma_cq;
-+
- 	ibdev_dbg(&mdev->ib_dev,
- 		  "ret %d qp->tx_object 0x%llx sq id %llu cq id %llu\n", err,
- 		  qp->tx_object, qp->sq_id, send_cq->id);
-@@ -391,6 +450,11 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
- 	return 0;
- 
- err_destroy_wq_obj:
-+	if (gdma_cq) {
-+		kfree(gdma_cq);
-+		gd->gdma_context->cq_table[send_cq->id] = NULL;
-+	}
-+
- 	mana_destroy_wq_obj(mpc, GDMA_SQ, qp->tx_object);
- 
- err_destroy_dma_region:
--- 
-2.25.1
-
+create should not need KF_RCU. The return value is a trusted/refcounted pointer. 
+It has a reg->ref_obj_id => is_trusted_reg().
 
