@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-53491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1849E8033FC
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:09:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA5A08033F8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEB00B20A94
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:09:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92026281066
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5929224B44;
-	Mon,  4 Dec 2023 13:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447C524B2E;
+	Mon,  4 Dec 2023 13:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="BydMZj2V"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="CXRmlxmN"
 X-Original-To: netdev@vger.kernel.org
 Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 177A81711;
-	Mon,  4 Dec 2023 05:09:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1701695308; cv=none; 
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5739ED5B;
+	Mon,  4 Dec 2023 05:09:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1701695309; cv=none; 
 	d=zohomail.in; s=zohoarc; 
-	b=FSBx9ZYdz/FSXyB5R9mOzJ0xhfKm5uNSPHs16w/XfiqI93dpI0riPT9AjKgmUDQSWr488zH1mhgIs3sxkN8x4yKgfI3LdxFj7wY+QFNOPrChFdERmkopNEjvgFT4gKsNUS3djdxn011pKYKrfBUuQXOMeLlB6FlNo3Yj5VZEVcY=
+	b=FuJc7I9gI1RkTq8sK+QC5tIAlRPr+gnyONRuBkcwoeFW0R7cEa877xmmErxmSNNcnlm9KZv6ZK/jgdWNvh9HWlLkZAhxlsg8uQ61KhzgH6cwiEQ/vortwlpHmCNwDzaaTUy7IVXqY2lUBjILkUW+JHJz38leeK83bl7zcW41mrU=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1701695308; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=NwIRmvVweG55F3TAq45fqxkXdlq0OKsbYfn7kvjhPcw=; 
-	b=RczRxEkbe8xzKyrj/Wz74NZ2ZeVfUIycrq94d2cVLbIydYrNkNtJjUW9PNpV5tcUmq+AGCeZ1e3rE86vW2ErVqi6r8ByioIxkAqnckt3coYc6XOxNgIZ54lIy3Gghto5ExMKzGS7VZUlCHD/kenY0HATVMx0MNB4SyNdVLdUqL4=
+	t=1701695309; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=R3iDLTqqyWsCW/yZ9x9fWDYA3oYZ6WCh4COkmNHdQK4=; 
+	b=a48H7NBxEMBntfGwtB5CvG3I8k9j5o6RLZ2GJ63nHW0Sl5zTHsWluBLBvNFvai5zsq4ch3DyBgjmlI96msXUujX731N7Eq+M7vKXFPDd4P4YwQnN5D14Cnj+WHDVc8VQRSxDgdD1aw4gx9qjsLs8ugNPQn4mDYscrdlfuPpYmls=
 ARC-Authentication-Results: i=1; mx.zohomail.in;
 	dkim=pass  header.i=siddh.me;
 	spf=pass  smtp.mailfrom=code@siddh.me;
 	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701695308;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701695309;
 	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=NwIRmvVweG55F3TAq45fqxkXdlq0OKsbYfn7kvjhPcw=;
-	b=BydMZj2VQ764EI+0mHerVuydsJ3IR7oEbvXbWY59lr0OV4XmTjD8WKmVfGySBNCW
-	l03HgYV2Z1plfV+3tAPMwjdx3eW6zgATk0Qm+pQbT2vT0Sm3I8XOkm23KobV2VvbcE3
-	gseVKRdpWhWmkqfCdrLfAl3BInKTDQE+CDK1YTv0=
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=R3iDLTqqyWsCW/yZ9x9fWDYA3oYZ6WCh4COkmNHdQK4=;
+	b=CXRmlxmNsWzehyzUEEgqV5rDvEO2SimcT6ofZlkfeHZ4ohHwYY30iC7Z4x0Ggor3
+	biFmmQqk04h7kN+fDNs+8x6U3xt2q7E9hx1xQflOmRFsi3BbGpPztZoAPhUx2zzPwEQ
+	RFWLQUnYWBp2vWRYwo8gIBieetIzZ8aEwJ1XMlNw=
 Received: from kampyooter.. (223.229.148.242 [223.229.148.242]) by mx.zoho.in
-	with SMTPS id 1701695307995789.3905037392129; Mon, 4 Dec 2023 18:38:27 +0530 (IST)
+	with SMTPS id 1701695308534654.1773373137597; Mon, 4 Dec 2023 18:38:28 +0530 (IST)
 From: Siddh Raman Pant <code@siddh.me>
 To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -46,11 +46,14 @@ To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Suman Ghosh <sumang@marvell.com>
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 0/2] nfc: Fix UAF during datagram sending caused by missing refcounting
-Date: Mon,  4 Dec 2023 18:38:20 +0530
-Message-ID: <cover.1701627492.git.code@siddh.me>
+	linux-kernel@vger.kernel.org,
+	syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Subject: [PATCH net-next v3 1/2] nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to llcp_local
+Date: Mon,  4 Dec 2023 18:38:21 +0530
+Message-ID: <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <cover.1701627492.git.code@siddh.me>
+References: <cover.1701627492.git.code@siddh.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,54 +63,99 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-ZohoMailClient: External
 
-For connectionless transmission, llcp_sock_sendmsg() codepath will
-eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
-an argument for calculating the total size for skb allocation.
+llcp_sock_sendmsg() calls nfc_llcp_send_ui_frame() which in turn calls
+nfc_alloc_send_skb(), which accesses the nfc_dev from the llcp_sock for
+getting the headroom and tailroom needed for skb allocation.
 
-virtual_ncidev_close() codepath eventually releases socket by calling
-nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
-and afterwards the nfc_dev will be eventually freed.
+Parallelly the nfc_dev can be freed, as the refcount is decreased via
+nfc_free_device(), leading to a UAF reported by Syzkaller, which can
+be summarized as follows:
 
-When an ndev gets freed, llcp_sock_sendmsg() will result in an
-use-after-free as it
+(1) llcp_sock_sendmsg() -> nfc_llcp_send_ui_frame()
+	-> nfc_alloc_send_skb() -> Dereference *nfc_dev
+(2) virtual_ncidev_close() -> nci_free_device() -> nfc_free_device()
+	-> put_device() -> nfc_release() -> Free *nfc_dev
 
-(1) doesn't have any checks in place for avoiding the datagram sending.
+When a reference to llcp_local is acquired, we do not acquire the same
+for the nfc_dev. This leads to freeing even when the llcp_local is in
+use, and this is the case with the UAF described above too.
 
-(2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop
-    which can race with freeing. This loop contains the call to
-    nfc_alloc_send_skb() where we dereference the nfc_dev pointer.
+Thus, when we acquire a reference to llcp_local, we should acquire a
+reference to nfc_dev, and release the references appropriately later.
 
-nfc_dev is being freed because we do not hold a reference to it when
-we hold a reference to llcp_local. Thus, virtual_ncidev_close()
-eventually calls nfc_release() due to refcount going to 0.
+References for llcp_local is initialized in nfc_llcp_register_device()
+(which is called by nfc_register_device()). Thus, we should acquire a
+reference to nfc_dev there.
 
-Since state has to be LLCP_BOUND for datagram sending, we can bail out
-early in llcp_sock_sendmsg().
+nfc_unregister_device() calls nfc_llcp_unregister_device() which in
+turn calls nfc_llcp_local_put(). Thus, the reference to nfc_dev is
+appropriately released later.
 
-Please review and let me know if any errors are there, and hopefully
-this gets accepted.
-
-Thanks,
-Siddh
-
-Changes in v3:
-- Fix missing freeing statements.
-
-Changes in v2:
-- Add net-next in patch subject.
-- Removed unnecessary extra lock and hold nfc_dev ref when holding llcp_sock.
-- Remove last formatting patch.
-- Picked up r-b from Krzysztof for LLCP_BOUND patch.
-
-Siddh Raman Pant (2):
-  nfc: llcp_core: Hold a ref to llcp_local->dev when holding a ref to
-    llcp_local
-  nfc: Do not send datagram if socket state isn't LLCP_BOUND
-
+Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
+Fixes: c7aa12252f51 ("NFC: Take a reference on the LLCP local pointer when creating a socket")
+Signed-off-by: Siddh Raman Pant <code@siddh.me>
+---
  net/nfc/llcp_core.c | 24 ++++++++++++++++++++++--
- net/nfc/llcp_sock.c |  5 +++++
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index 1dac28136e6a..9d45ce6dcdca 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -145,6 +145,9 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
+ 
+ static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
+ {
++	if (!nfc_get_device(local->dev->idx))
++		return NULL;
++
+ 	kref_get(&local->ref);
+ 
+ 	return local;
+@@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+ 	if (local == NULL)
+ 		return 0;
+ 
++	nfc_put_device(local->dev);
+ 	return kref_put(&local->ref, local_release);
+ }
+ 
+@@ -959,8 +963,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+ 	}
+ 
+ 	new_sock = nfc_llcp_sock(new_sk);
+-	new_sock->dev = local->dev;
++
+ 	new_sock->local = nfc_llcp_local_get(local);
++	if (!new_sock->local) {
++		reason = LLCP_DM_REJ;
++		release_sock(&sock->sk);
++		sock_put(&sock->sk);
++		sock_put(&new_sock->sk);
++		nfc_llcp_sock_free(new_sock);
++		goto fail;
++	}
++
++	new_sock->dev = local->dev;
+ 	new_sock->rw = sock->rw;
+ 	new_sock->miux = sock->miux;
+ 	new_sock->nfc_protocol = sock->nfc_protocol;
+@@ -1597,7 +1611,13 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+ 	if (local == NULL)
+ 		return -ENOMEM;
+ 
+-	local->dev = ndev;
++	/* Hold a reference to the device. */
++	local->dev = nfc_get_device(ndev->idx);
++	if (!local->dev) {
++		kfree(local);
++		return -ENODEV;
++	}
++
+ 	INIT_LIST_HEAD(&local->list);
+ 	kref_init(&local->ref);
+ 	mutex_init(&local->sdp_lock);
 -- 
 2.42.0
 
