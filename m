@@ -1,130 +1,71 @@
-Return-Path: <netdev+bounces-53675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5189F804108
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:40:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1455804137
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C175F1F212CE
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:40:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08D4D1C20A60
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A728381D9;
-	Mon,  4 Dec 2023 21:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F41C39FF7;
+	Mon,  4 Dec 2023 21:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXA3q2Vl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeqkDXwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E463BB;
-	Mon,  4 Dec 2023 13:40:43 -0800 (PST)
-Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-58d3c9badf5so3395016eaf.1;
-        Mon, 04 Dec 2023 13:40:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701726042; x=1702330842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bgnlssux72HxJisuzCNboaalKapVb8OejwykiJLLAM4=;
-        b=AXA3q2VlrSsIfu+q/lb/XXHSnuPsdX9T3EAHtjllCIfeSE96MSF2y27M8mhhI3uP0n
-         eDu2qR9td5UEV4GmboLtBAlRQZBkA3qE5PiVCgXiCXNg93BiXgVlyCee7tFDtENQnr8n
-         uxVmnOuYZyLll2g+GzXpuLsrqQQTxAUOBgy65FAKt/0c7H2uFOsguEeZqguP2g84vewf
-         t3rfhmdEmDvKG4f2NkkOpDyjW+PEsMPpPd2jXR9EmVSAuUjQ2MXiDvahI8J8I/+CMWot
-         KoJ0XAGdsr/Xn6Yhj/LfElAWhqXdE3K6lBUdDSu7sFFgCZihpGSgQUyR0pIpPu4LHraG
-         DfSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701726042; x=1702330842;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Bgnlssux72HxJisuzCNboaalKapVb8OejwykiJLLAM4=;
-        b=YXEwJNLJjep1HRdLLK3rmuQuav9IhkTXL1KJqsi8B9V85DrS1LRk8mnqzJ/ZVaaUE2
-         3SCMv+nPKjLsmT0v90uheM38r7Bz3GLhxwwe0ZBCYKB5T9VIYXoT6vTuCjLCk7T/rwlq
-         KsiNBrcPWeBMavDOsMYyg8WOf53LeXBMyAOD9+npDeY3CCpnScALT6E6Y+DUUTYfuFkX
-         xDbuGFy0L0D/f/1bFR9Swnn1sAGFdz9zAUdxisRw+FIbDTL3+V21OoeVFhbXTX/n2USw
-         7/6VLNdlNnB5Summb85LdIWch4YmUTrI2+YxNjQt7Phuf/X8XQjEK8I+qaVTKbSQMUaN
-         bXyA==
-X-Gm-Message-State: AOJu0YwS8rsbSrPARpj4KAsX9cDGduooXdyzM1uJfINgtjv5gm981JXr
-	oWnRNQxLR5t3Rivjp9bGoYI=
-X-Google-Smtp-Source: AGHT+IHptWCzknBSLqGfI4G/TxI2ne8LjlSHh4VPMjX/ZtAmCqymN++mJkaw1rpY8ECHo+Kw65e5PA==
-X-Received: by 2002:a05:6358:7e12:b0:170:17eb:204b with SMTP id o18-20020a0563587e1200b0017017eb204bmr5104566rwm.52.1701726042279;
-        Mon, 04 Dec 2023 13:40:42 -0800 (PST)
-Received: from localhost ([98.97.36.54])
-        by smtp.gmail.com with ESMTPSA id a12-20020a63e40c000000b0059cc2f1b7basm7997694pgi.11.2023.12.04.13.40.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 13:40:41 -0800 (PST)
-Date: Mon, 04 Dec 2023 13:40:40 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org, 
- edumazet@google.com, 
- jakub@cloudflare.com, 
- martin.lau@kernel.org, 
- netdev@vger.kernel.org, 
- kuniyu@amazon.com
-Message-ID: <656e4758675b9_1bd6e2086f@john.notmuch>
-In-Reply-To: <20231201211453.27432-1-kuniyu@amazon.com>
-References: <20231201180139.328529-2-john.fastabend@gmail.com>
- <20231201211453.27432-1-kuniyu@amazon.com>
-Subject: RE: [PATCH bpf v2 1/2] bpf: syzkaller found null ptr deref in
- unix_bpf proto add
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25BD2377C;
+	Mon,  4 Dec 2023 21:59:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6BBC2C433C8;
+	Mon,  4 Dec 2023 21:59:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701727142;
+	bh=4akh1rC0M9jmWAqlssoPVtfX3XuQwBwyV+kVe6CKKoM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=MeqkDXwP2g+C3IlQVxb2MPczoqWb43F58+S64DwRa0C96/RgSFeonT54QEStxdh5T
+	 efgHyoYJwuk3j5QMp4YQ/6O6aZvtxLW0eFwAXV7caOtrs/mNuiACv0oTvfjl96Ul3/
+	 dSkdHKQpdv4lM4wADMSUyb7ocOweooA8hzFzCPQc8cutUPdwIY5yeMqbgyY2/YH3VT
+	 A4/J+XtkyIV3Xff7a/PRt4KuNJhtiRfHhUuuIQ8Bycq4fHYgR1UdvRAVDsha+u0+Ti
+	 8fTzMY/VKrH7uhfCubpcbnX7Ja0nmJeW+rsjLy8Ryu+RIFnFpFadwCtA6+aLLMvGrN
+	 wnGrnF89E0KgQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58A6AC41677;
+	Mon,  4 Dec 2023 21:59:02 +0000 (UTC)
+Subject: Re: [GIT PULL] vdpa: bugfixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20231204083808-mutt-send-email-mst@kernel.org>
+References: <20231204083808-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20231204083808-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: cefc9ba6aed48a3aa085888e3262ac2aa975714b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1e535748449a51842872c46db61525f7524fc63a
+Message-Id: <170172714235.21763.13703793577004715330.pr-tracker-bot@kernel.org>
+Date: Mon, 04 Dec 2023 21:59:02 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, eperezma@redhat.com, jasowang@redhat.com, lkp@intel.com, mst@redhat.com, shannon.nelson@amd.com, steven.sistare@oracle.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
 
-Kuniyuki Iwashima wrote:
-> From: John Fastabend <john.fastabend@gmail.com>
-> Date: Fri,  1 Dec 2023 10:01:38 -0800
-> > I added logic to track the sock pair for stream_unix sockets so that we
-> > ensure lifetime of the sock matches the time a sockmap could reference
-> > the sock (see fixes tag). I forgot though that we allow af_unix unconnected
-> > sockets into a sock{map|hash} map.
-> > 
-> > This is problematic because previous fixed expected sk_pair() to exist
-> > and did not NULL check it. Because unconnected sockets have a NULL
-> > sk_pair this resulted in the NULL ptr dereference found by syzkaller.
-> > 
-> > BUG: KASAN: null-ptr-deref in unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
-> > Write of size 4 at addr 0000000000000080 by task syz-executor360/5073
-> > Call Trace:
-> >  <TASK>
-> >  ...
-> >  sock_hold include/net/sock.h:777 [inline]
-> >  unix_stream_bpf_update_proto+0x72/0x430 net/unix/unix_bpf.c:171
-> >  sock_map_init_proto net/core/sock_map.c:190 [inline]
-> >  sock_map_link+0xb87/0x1100 net/core/sock_map.c:294
-> >  sock_map_update_common+0xf6/0x870 net/core/sock_map.c:483
-> >  sock_map_update_elem_sys+0x5b6/0x640 net/core/sock_map.c:577
-> >  bpf_map_update_value+0x3af/0x820 kernel/bpf/syscall.c:167
-> > 
-> > We considered just checking for the null ptr and skipping taking a ref
-> > on the NULL peer sock. But, if the socket is then connected() after
-> > being added to the sockmap we can cause the original issue again. So
-> > instead this patch blocks adding af_unix sockets that are not in the
-> > ESTABLISHED state.
-> 
-> I'm not sure if someone has the unconnected stream socket use case
-> though, can't we call additional sock_hold() in connect() by checking
-> sk_prot under sk_callback_lock ?
+The pull request you sent on Mon, 4 Dec 2023 08:38:08 -0500:
 
-Could be done I guess yes. I'm not sure the utility of it though. I
-thought above patch was the simplest solution and didn't require touching
-main af_unix code. I don't actually use the sockmap with af_unix
-sockets anywhere so maybe someone who is using this can comment if
-unconnected is needed?
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-From rcu and locking side looks like holding sk_callback_lock would
-be sufficient. I was thinking it would require a rcu grace period
-or something but seems not.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1e535748449a51842872c46db61525f7524fc63a
 
-I guess I could improve original patch if folks want.
+Thank you!
 
-.John
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
