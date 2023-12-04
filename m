@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-53385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935EE802BC5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 07:57:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1AE5802BD0
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:00:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A87EB208D6
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 06:57:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D5F1C2095F
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 07:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98AF186C;
-	Mon,  4 Dec 2023 06:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E64186C;
+	Mon,  4 Dec 2023 07:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="N/THPLzd"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="ckElfA2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2DC8D5
-	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 22:57:06 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1d06fffdb65so6005235ad.2
-        for <netdev@vger.kernel.org>; Sun, 03 Dec 2023 22:57:06 -0800 (PST)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E213101
+	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 22:59:58 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1d0a5422c80so5018105ad.3
+        for <netdev@vger.kernel.org>; Sun, 03 Dec 2023 22:59:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1701673026; x=1702277826; darn=vger.kernel.org;
+        d=theori.io; s=google; t=1701673198; x=1702277998; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BQerDqLT/YuVKy8PnJF+K7oN0s4BlSSuzOpk3jy8sxI=;
-        b=N/THPLzddHjFTXscP7K0dZrgxzepvVC8wnhnHn0UUG0ltE6Pxu7XxNcXrpocyVMuEU
-         s9i8VPkO7iFQDdbuXQ7itX3QzqjW0KWZjG3uTvuiTASHjMS9OyV/BuTilsVsxrK9Ngyo
-         3y3CwHeeZPsUnaINeX4PnabSyC28Blol/jhTo=
+        bh=MX9PCE/s+L2Z904MfQ2/oVmj1XblZE1t5moWkOvo/oA=;
+        b=ckElfA2n1hbSBgJ8YZm/sQPKGFWNjMehrCLfYrwI8F0/jLOy5wGAx2UAPX0UpNJzGI
+         ZnhPCrMI811MDjsY3EcnnZp+t2MtrNu4GJPJ1QnyIpGTzKOmZq719Jc9jkiMdj7tbnY1
+         EO7SwlF/KQyM9kByMHWFiNjOHzFjleKQmAhuc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701673026; x=1702277826;
+        d=1e100.net; s=20230601; t=1701673198; x=1702277998;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BQerDqLT/YuVKy8PnJF+K7oN0s4BlSSuzOpk3jy8sxI=;
-        b=gXKWuQmapinaT6Hf8DXHRryN2OrNHoATd8UaCZkpsfKvkMPIBOoFmlAd+PavPpokGY
-         qF1GvsZr07wPIXdFI9zK2aMpO1ygbBcj95+V1r3xYa1scvTPaMPgJTmfMZrNQvuS6AXU
-         ga47E3CA/QSgKfeF6UX13SRK5h/OB9ie4vcaEfoWlH2DI5LjRzxYVxfPSw4mPv4qH2Fn
-         6QorYfai4hm9DAWbtZ7rCqaDxx/6a26hRNY0aJ6+vppKJC07woUlR3jItUPJWx6qD0hQ
-         fFNj/z+8DOSEpQ7LQF9UiB9eUsUoC680bMbl8jdXnQmKV1ILHmIrKku1ZqqIp3XnZl0n
-         lLXg==
-X-Gm-Message-State: AOJu0YyxOhkh/1M5mtifz2/x0NMGFxug1QPj0w4A1a95G6K2IFTZ+b37
-	qatuPYyIA4nx+K2sMuFXdGLJXg==
-X-Google-Smtp-Source: AGHT+IFNNVKaL+XBoun/3jgvrDxt2YOZK0MpsdVAjuRuoVTESBuUf6Y2VzcR5p72aXnQye4i+YOtrQ==
-X-Received: by 2002:a17:902:d48a:b0:1d0:9c9d:dcde with SMTP id c10-20020a170902d48a00b001d09c9ddcdemr574828plg.122.1701673026294;
-        Sun, 03 Dec 2023 22:57:06 -0800 (PST)
+        bh=MX9PCE/s+L2Z904MfQ2/oVmj1XblZE1t5moWkOvo/oA=;
+        b=Wnr7rcPSQmqN5PZA03Vy+EM8Fm00YFa6GPU/XdGX3xdONo3BahmdTTFcIZbcXvk5u4
+         kOjpa0szNQXsva9Jak2YgsKArAoDJ9C7k5aENe318v3fstFyLgJdWA8OyZs2Q9rUuKTz
+         7mSusWCQoaA5aD7T9ooG5S2q3nNhzNxVSPonMzGS8dgmuoPfFKi6Y8CnIcDy96TEDhjh
+         n679bHxv1ic15ny2Q/VPL9mYy8acMrwSyQl+v7HL1cXKYT0e7v9VuMXxJmHzvYAfjexH
+         MQO7ZloViiSiaxFsprRuBujgUKgowlW/ElEAc02yLOq+JP7W91I1leLcwhnIuF7jDpdO
+         gjlw==
+X-Gm-Message-State: AOJu0Yy558srVX0/RL0hHy4RLOA+Jigxhipj51ihRw+1tQxa4kWMuQ1z
+	/5AwHQ/+xnGwM+6gfrTasIpnqw==
+X-Google-Smtp-Source: AGHT+IHKvFRck+LSlanaWM0Rs2iIfxcXM0ZbK33202PTVxb3GVaY7xLY5+LMcO5xlYOkeuzuPey5xQ==
+X-Received: by 2002:a17:902:6b02:b0:1d0:7181:a90e with SMTP id o2-20020a1709026b0200b001d07181a90emr2798490plk.61.1701673197912;
+        Sun, 03 Dec 2023 22:59:57 -0800 (PST)
 Received: from ubuntu ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id ja5-20020a170902efc500b001d0b080c7e6sm655829plb.208.2023.12.03.22.57.03
+        by smtp.gmail.com with ESMTPSA id c1-20020a170902d48100b001d057080022sm5579701plg.20.2023.12.03.22.59.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 22:57:05 -0800 (PST)
-Date: Sun, 3 Dec 2023 22:56:57 -0800
+        Sun, 03 Dec 2023 22:59:57 -0800 (PST)
+Date: Sun, 3 Dec 2023 22:59:52 -0800
 From: Hyunwoo Kim <v4bel@theori.io>
-To: ralf@linux-mips.org
+To: courmisch@gmail.com
 Cc: v4bel@theori.io, imv4bel@gmail.com, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH] net/rose: Fix Use-After-Free in rose_ioctl
-Message-ID: <20231204065657.GA16054@ubuntu>
+	netdev@vger.kernel.org
+Subject: [PATCH] net: phonet: Fix Use-After-Free in pep_recvmsg
+Message-ID: <20231204065952.GA16224@ubuntu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,35 +65,78 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Because rose_ioctl() accesses sk->sk_receive_queue
-without holding a lock_sock, it can cause a race with
-rose_accept().
-A use-after-free for skb occurs with the following flow.
+Because pep_recvmsg() fetches the skb from pn->ctrlreq_queue
+without holding the lock_sock and then frees it,
+a race can occur with pep_ioctl().
+A use-after-free for a skb occurs with the following flow.
 ```
-rose_ioctl() -> skb_peek()
-rose_accept() -> skb_dequeue() -> kfree_skb()
+pep_recvmsg() -> skb_dequeue() -> skb_free_datagram()
+pep_ioctl() -> skb_peek()
 ```
-Add lock_sock to rose_ioctl() to fix this issue.
+Fix this by adjusting the scope of lock_sock in pep_recvmsg().
 
 Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
 ---
- net/rose/af_rose.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/phonet/pep.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index 0cc5a4e19900..5fe9db64b6df 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -1316,8 +1316,10 @@ static int rose_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 		struct sk_buff *skb;
- 		long amount = 0L;
- 		/* These two are safe on a single CPU system as only user tasks fiddle here */
-+		lock_sock(sk);
- 		if ((skb = skb_peek(&sk->sk_receive_queue)) != NULL)
- 			amount = skb->len;
-+		release_sock(sk);
- 		return put_user(amount, (unsigned int __user *) argp);
+diff --git a/net/phonet/pep.c b/net/phonet/pep.c
+index faba31f2eff2..212d8a9ddaee 100644
+--- a/net/phonet/pep.c
++++ b/net/phonet/pep.c
+@@ -1250,12 +1250,17 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	if (unlikely(1 << sk->sk_state & (TCPF_LISTEN | TCPF_CLOSE)))
+ 		return -ENOTCONN;
+ 
++	lock_sock(sk);
++
+ 	if ((flags & MSG_OOB) || sock_flag(sk, SOCK_URGINLINE)) {
+ 		/* Dequeue and acknowledge control request */
+ 		struct pep_sock *pn = pep_sk(sk);
+ 
+-		if (flags & MSG_PEEK)
++		if (flags & MSG_PEEK) {
++			release_sock(sk);
+ 			return -EOPNOTSUPP;
++		}
++
+ 		skb = skb_dequeue(&pn->ctrlreq_queue);
+ 		if (skb) {
+ 			pep_ctrlreq_error(sk, skb, PN_PIPE_NO_ERROR,
+@@ -1263,12 +1268,14 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 			msg->msg_flags |= MSG_OOB;
+ 			goto copy;
+ 		}
+-		if (flags & MSG_OOB)
++
++		if (flags & MSG_OOB) {
++			release_sock(sk);
+ 			return -EINVAL;
++		}
  	}
+ 
+ 	skb = skb_recv_datagram(sk, flags, &err);
+-	lock_sock(sk);
+ 	if (skb == NULL) {
+ 		if (err == -ENOTCONN && sk->sk_state == TCP_CLOSE_WAIT)
+ 			err = -ECONNRESET;
+@@ -1278,7 +1285,7 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 	if (sk->sk_state == TCP_ESTABLISHED)
+ 		pipe_grant_credits(sk, GFP_KERNEL);
+-	release_sock(sk);
++
+ copy:
+ 	msg->msg_flags |= MSG_EOR;
+ 	if (skb->len > len)
+@@ -1291,6 +1298,8 @@ static int pep_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		err = (flags & MSG_TRUNC) ? skb->len : len;
+ 
+ 	skb_free_datagram(sk, skb);
++
++	release_sock(sk);
+ 	return err;
+ }
  
 -- 
 2.25.1
