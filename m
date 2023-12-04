@@ -1,339 +1,218 @@
-Return-Path: <netdev+bounces-53397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70239802D8A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:49:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D134802D90
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940B91C20A03
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:49:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BE651C20A0A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65131FBE2;
-	Mon,  4 Dec 2023 08:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C791EFBE4;
+	Mon,  4 Dec 2023 08:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="U+bCRgnt"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FG72TTRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF859B;
-	Mon,  4 Dec 2023 00:49:24 -0800 (PST)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4669JV007345;
-	Mon, 4 Dec 2023 08:49:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id; s=qcppdkim1;
- bh=CDImjb7xNhS+hFEs/G+MjK3uesJb5R58jLvNa7bSTkQ=;
- b=U+bCRgntYG6lWWqHu0G24OEAwGRnzT2DvjlKoUeZbX+NSHbR/qekM9/F7vfz7AbfVDRY
- 2rScwxS2vZgbVGax9Rr/UxvletHgygwfDqRUsc5wmdBihYvpAUePsw2qyeRld2tzdx+i
- ulgGH9T9dorOxHvxxLNCxEqVqkQdJ883QOZy+q5EhbxheDGx2B4fH4zesD0Sas5UfuGB
- EW5Gy4qhGdzo8BR1keCLa9Dg3jZdVlCBjuzyKsj3y5AQeOqq/iMtJsxbLguSJnUVxxFL
- NZkgloATzfDBXDY1llKMw8e3e/bKkRHStyLmKIYr6yFxdgthgFkDoMHuUs/Go/80oH1O OQ== 
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uqvp13ex3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 08:49:01 +0000
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3B48mvZE015621;
-	Mon, 4 Dec 2023 08:48:57 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3uqwnkghc2-1;
-	Mon, 04 Dec 2023 08:48:57 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B48mvij015616;
-	Mon, 4 Dec 2023 08:48:57 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3B48muuD015615;
-	Mon, 04 Dec 2023 08:48:57 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id 31B68602FA0; Mon,  4 Dec 2023 14:18:56 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-        Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for qcom ethqos
-Date: Mon,  4 Dec 2023 14:18:54 +0530
-Message-Id: <20231204084854.31543-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 4IRSw3F21LUYQeQxmbPsUmBIoZ8NIWJ3
-X-Proofpoint-ORIG-GUID: 4IRSw3F21LUYQeQxmbPsUmBIoZ8NIWJ3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-04_06,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- suspectscore=0 malwarescore=0 phishscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 adultscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312040066
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2981911F;
+	Mon,  4 Dec 2023 00:50:53 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 5F36D20B74C0; Mon,  4 Dec 2023 00:50:52 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5F36D20B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1701679852;
+	bh=+82ZmFRWEGviEskvJhBjDw/CYlrBPi2B0lQ9asHWocA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FG72TTRUO8BK7F1aqqE2fnikQCMuZI4qTS0WgkBu4sSkEAW7yIXTzXy58+I+LBTMg
+	 kkJKNVQUYwaUGWbUXEG3eVxLzPlSl5g2cR6R7R/aUrH39vl87fQSIIf0fb9NBflrZC
+	 mzKhFP068KZ3yBveHtZl2aXbvLv1fLkEtkkui8kg=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	yury.norov@gmail.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: sch^Crabarti@microsoft.com,
+	paulros@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH V4 net-next] net: mana: Assigning IRQ affinity on HT cores
+Date: Mon,  4 Dec 2023 00:50:41 -0800
+Message-Id: <1701679841-9359-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-Add sysfs nodes to conifigure routing of specific vlan id to GVM queue.
-GVM queue is not exposed to PVM stmmac, so TC ops can't configure routing.
+Existing MANA design assigns IRQ to every CPU, including sibling
+hyper-threads. This may cause multiple IRQs to be active simultaneously
+in the same core and may reduce the network performance with RSS.
 
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+Improve the performance by assigning IRQ to non sibling CPUs in local
+NUMA node.
+
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 216 +++++++++++++++++-
- 1 file changed, 215 insertions(+), 1 deletion(-)
+V3 -> V4:
+* Used for_each_numa_hop_mask() macro and simplified the code.
+Thanks to Yury Norov for the suggestion.
+* Added code to assign hwc irq separately in mana_gd_setup_irqs.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d3bf42d0fceb..ea89045a90a1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -109,6 +109,8 @@ struct qcom_ethqos {
- 	unsigned int num_por;
- 	bool rgmii_config_loopback_en;
- 	bool has_emac_ge_3;
-+	int gvm_vlan_prio;
-+	int gvm_queue;
- };
- 
- static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
-@@ -710,6 +712,214 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
- 	netdev_dbg(priv->dev, "PTP rate %d\n", plat_dat->clk_ptp_rate);
+V2 -> V3:
+* Created a helper function to get the next NUMA with CPU.
+* Added some error checks for unsuccessful memory allocation.
+* Fixed some comments on the code.
+
+V1 -> V2:
+* Simplified the code by removing filter_mask_list and using avail_cpus.
+* Addressed infinite loop issue when there are numa nodes with no CPUs.
+* Addressed uses of local numa node instead of 0 to start.
+* Removed uses of BUG_ON.
+* Placed cpus_read_lock in parent function to avoid num_online_cpus
+  to get changed before function finishes the affinity assignment.
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 70 +++++++++++++++++--
+ 1 file changed, 63 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 6367de0c2c2e..2194a53cce10 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1243,15 +1243,57 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+ 	r->size = 0;
  }
  
-+static ssize_t gvm_vlan_routing_store(struct device *dev,
-+				      struct device_attribute *attr,
-+				      const char *user_buf, size_t size)
++static int irq_setup(int *irqs, int nvec, int start_numa_node)
 +{
-+	struct net_device *netdev = to_net_dev(dev);
-+	struct stmmac_priv *priv;
-+	struct qcom_ethqos *ethqos;
-+	u32 prio;
-+	s8 input = 0;
++	int i = 0, cpu, err = 0;
++	const struct cpumask *node_cpumask;
++	unsigned int  next_node = start_numa_node;
++	cpumask_var_t visited_cpus, node_cpumask_temp;
 +
-+	if (!netdev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
++	if (!zalloc_cpumask_var(&visited_cpus, GFP_KERNEL)) {
++		err = ENOMEM;
++		return err;
 +	}
-+
-+	priv = netdev_priv(netdev);
-+	if (!priv) {
-+		pr_err("priv is NULL\n");
-+		return -EINVAL;
++	if (!zalloc_cpumask_var(&node_cpumask_temp, GFP_KERNEL)) {
++		err = -ENOMEM;
++		return err;
 +	}
-+
-+	ethqos = priv->plat->bsp_priv;
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
++	rcu_read_lock();
++	for_each_numa_hop_mask(node_cpumask, next_node) {
++		cpumask_copy(node_cpumask_temp, node_cpumask);
++		for_each_cpu(cpu, node_cpumask_temp) {
++			cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
++				       topology_sibling_cpumask(cpu));
++			irq_set_affinity_and_hint(irqs[i], cpumask_of(cpu));
++			if (++i == nvec)
++				goto free_mask;
++			cpumask_set_cpu(cpu, visited_cpus);
++			if (cpumask_empty(node_cpumask_temp)) {
++				cpumask_copy(node_cpumask_temp, node_cpumask);
++				cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
++					       visited_cpus);
++				cpu = 0;
++			}
++		}
 +	}
-+
-+	if (kstrtos8(user_buf, 0, &input)) {
-+		pr_err("Error in reading option from user\n");
-+		return -EINVAL;
-+	}
-+
-+	if (input < 1 || input > 7) {
-+		pr_err("Invalid option set by user\n");
-+		return -EINVAL;
-+	}
-+
-+	if (input == ethqos->gvm_vlan_prio)
-+		pr_err("No effect as duplicate input\n");
-+
-+	ethqos->gvm_vlan_prio = input;
-+	prio  = 1 << input;
-+
-+	stmmac_rx_queue_prio(priv, priv->hw, prio, ethqos->gvm_queue);
-+
-+	return size;
++free_mask:
++	rcu_read_unlock();
++	free_cpumask_var(visited_cpus);
++	free_cpumask_var(node_cpumask_temp);
++	return err;
 +}
 +
-+static ssize_t gvm_queue_mapping_store(struct device *dev,
-+				       struct device_attribute *attr,
-+				       const char *user_buf, size_t size)
-+{
-+	struct net_device *netdev = to_net_dev(dev);
-+	struct stmmac_priv *priv;
-+	struct qcom_ethqos *ethqos;
-+	u32 prio;
-+	s8 input = 0;
-+
-+	if (!netdev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	priv = netdev_priv(netdev);
-+	if (!priv) {
-+		pr_err("priv is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	ethqos = priv->plat->bsp_priv;
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	if (kstrtos8(user_buf, 0, &input)) {
-+		pr_err("Error in reading option from user\n");
-+		return -EINVAL;
-+	}
-+
-+	if (input == ethqos->gvm_queue)
-+		pr_err("No effect as duplicate input\n");
-+
-+	ethqos->gvm_queue = input;
-+	prio  = 1 << input;
-+
-+	return size;
-+}
-+
-+static ssize_t gvm_queue_mapping_show(struct device *dev,
-+				      struct device_attribute *attr, char *user_buf)
-+{
-+	struct net_device *netdev = to_net_dev(dev);
-+	struct stmmac_priv *priv;
-+	struct qcom_ethqos *ethqos;
-+
-+	if (!netdev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	priv = netdev_priv(netdev);
-+	if (!priv) {
-+		pr_err("priv is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	ethqos = priv->plat->bsp_priv;
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	return scnprintf(user_buf, 256, "%d\n", ethqos->gvm_queue);
-+}
-+
-+static ssize_t gvm_vlan_routing_show(struct device *dev,
-+				     struct device_attribute *attr, char *user_buf)
-+{
-+	struct net_device *netdev = to_net_dev(dev);
-+	struct stmmac_priv *priv;
-+	struct qcom_ethqos *ethqos;
-+
-+	if (!netdev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	priv = netdev_priv(netdev);
-+	if (!priv) {
-+		pr_err("priv is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	ethqos = priv->plat->bsp_priv;
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	return scnprintf(user_buf, 256, "%d\n", ethqos->gvm_vlan_prio);
-+}
-+
-+static DEVICE_ATTR_RW(gvm_queue_mapping);
-+
-+static DEVICE_ATTR_RW(gvm_vlan_routing);
-+
-+static int ethqos_remove_sysfs(struct qcom_ethqos *ethqos)
-+{
-+	struct net_device *net_dev;
-+
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	net_dev = platform_get_drvdata(ethqos->pdev);
-+	if (!net_dev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	sysfs_remove_file(&net_dev->dev.kobj,
-+			  &dev_attr_gvm_queue_mapping.attr);
-+	sysfs_remove_file(&net_dev->dev.kobj,
-+			  &dev_attr_gvm_vlan_routing.attr);
-+
-+	return 0;
-+}
-+
-+static int ethqos_create_sysfs(struct qcom_ethqos *ethqos)
-+{
-+	int ret;
-+	struct net_device *net_dev;
-+
-+	if (!ethqos) {
-+		pr_err("ethqos is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	net_dev = platform_get_drvdata(ethqos->pdev);
-+	if (!net_dev) {
-+		pr_err("netdev is NULL\n");
-+		return -EINVAL;
-+	}
-+
-+	ret = sysfs_create_file(&net_dev->dev.kobj,
-+				&dev_attr_gvm_queue_mapping.attr);
-+	if (ret) {
-+		pr_err("unable to create passthrough_en sysfs node\n");
-+		goto fail;
-+	}
-+
-+	ret = sysfs_create_file(&net_dev->dev.kobj,
-+				&dev_attr_gvm_vlan_routing.attr);
-+	if (ret) {
-+		pr_err("unable to create cv2x_priority sysfs node\n");
-+		goto fail;
-+	}
-+
-+	return ret;
-+
-+fail:
-+	ethqos_remove_sysfs(ethqos);
-+
-+	return ret;
-+}
-+
- static int qcom_ethqos_probe(struct platform_device *pdev)
+ static int mana_gd_setup_irqs(struct pci_dev *pdev)
  {
- 	struct device_node *np = pdev->dev.of_node;
-@@ -812,7 +1022,11 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
+-	unsigned int max_queues_per_port = num_online_cpus();
+ 	struct gdma_context *gc = pci_get_drvdata(pdev);
++	unsigned int max_queues_per_port;
+ 	struct gdma_irq_context *gic;
+ 	unsigned int max_irqs, cpu;
+-	int nvec, irq;
++	int nvec, *irqs, irq;
+ 	int err, i = 0, j;
+ 
++	cpus_read_lock();
++	max_queues_per_port = num_online_cpus();
+ 	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
+ 		max_queues_per_port = MANA_MAX_NUM_QUEUES;
+ 
+@@ -1261,6 +1303,11 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
+ 	if (nvec < 0)
+ 		return nvec;
++	irqs = kmalloc_array(max_queues_per_port, sizeof(int), GFP_KERNEL);
++	if (!irqs) {
++		err = -ENOMEM;
++		goto free_irq_vector;
++	}
+ 
+ 	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
+ 				   GFP_KERNEL);
+@@ -1287,21 +1334,28 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 			goto free_irq;
+ 		}
+ 
+-		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
++		if (!i) {
++			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
++			cpu = cpumask_local_spread(i, gc->numa_node);
++			irq_set_affinity_and_hint(irq, cpumask_of(cpu));
++		} else {
++			irqs[i - 1] = irq;
++			err = request_irq(irqs[i - 1], mana_gd_intr, 0, gic->name, gic);
++		}
+ 		if (err)
+ 			goto free_irq;
+-
+-		cpu = cpumask_local_spread(i, gc->numa_node);
+-		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
  	}
  
--	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+	ret = devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
-+	if (ret)
-+		return ret;
-+
-+	return ethqos_create_sysfs(ethqos);
- }
++	err = irq_setup(irqs, max_queues_per_port, gc->numa_node);
++	if (err)
++		goto free_irq;
+ 	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
+ 	if (err)
+ 		goto free_irq;
  
- static const struct of_device_id qcom_ethqos_match[] = {
+ 	gc->max_num_msix = nvec;
+ 	gc->num_msix_usable = nvec;
+-
++	cpus_read_unlock();
+ 	return 0;
+ 
+ free_irq:
+@@ -1314,8 +1368,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+ 	}
+ 
+ 	kfree(gc->irq_contexts);
++	kfree(irqs);
+ 	gc->irq_contexts = NULL;
+ free_irq_vector:
++	cpus_read_unlock();
+ 	pci_free_irq_vectors(pdev);
+ 	return err;
+ }
 -- 
-2.17.1
+2.34.1
 
 
