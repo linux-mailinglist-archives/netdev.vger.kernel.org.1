@@ -1,90 +1,114 @@
-Return-Path: <netdev+bounces-53672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27FAE8040EA
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F808040FD
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 596091C20B05
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:18:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32EF71C20A5A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA98364AA;
-	Mon,  4 Dec 2023 21:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="FuzYr1L8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B47381BE;
+	Mon,  4 Dec 2023 21:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AE990;
-	Mon,  4 Dec 2023 13:17:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=QT7k7kPIr5wnFnF5J7GwSeJplbrxHWX0xcDBoBtByho=;
-	t=1701724676; x=1702934276; b=FuzYr1L8FSX4+4trriOxugbZ+34dVOrmBOI/C08hx0KDy9b
-	/AHSRBy2/kqlYubEFefRYpq/5l5wZw9rrDKe9AIdTcX/C98R5t1UGcPmSYdzlcPmbwkIeOHmoSPJS
-	lOfLWSOH27p5BpDw4QhOdLhGC7NEiThC34LvidKWpSaJeCumPtuJKOdwtLsuo9GtZ6sgyNi5ZSPy2
-	dVgVgXAPrM9W+fjqtJkp7+90OKmdvA5wF9FmJSnLj/uDPk/VHO4DyugUDiKLqstQzRir9CvrljvK+
-	EwDHC+mJR2HIm/dlnyHcTK3op+rKTqx8pbg8HX6WdDhO7yqnmsdrh04eJTZAon+g==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAGK7-0000000FGSR-0u4f;
-	Mon, 04 Dec 2023 22:17:51 +0100
-Message-ID: <95265243715c2f7cbb5ef94083d64e1a17d8ee04.camel@sipsolutions.net>
-Subject: Re: Thinkpad P17 keep hanging in ipv6_addrconf addrconf_verify_work
- / netlink in 6.4 and 6.6
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Marc MERLIN <marc@merlins.org>, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ilw@linux.intel.com, 
-	intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>
-Date: Mon, 04 Dec 2023 22:17:50 +0100
-In-Reply-To: <20231204131615.26b57722@kernel.org>
-References: <20231202171326.GB24486@merlins.org>
-	 <20231204004003.GB29484@merlins.org> <20231204073515.GA9208@merlins.org>
-	 <69717129398d05b18df1c1300bfb41da268c52a0.camel@sipsolutions.net>
-	 <20231204131615.26b57722@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+Received: from mail1.merlins.org (magic.merlins.org [209.81.13.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD1CBB6
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 13:28:50 -0800 (PST)
+Received: from merlin by mail1.merlins.org with local (Exim 4.94.2 #2)
+	id 1rAGUj-0001wP-VU by authid <merlin>; Mon, 04 Dec 2023 13:28:49 -0800
+Date: Mon, 4 Dec 2023 13:28:49 -0800
+From: Marc MERLIN <marc@merlins.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
+Message-ID: <20231204212849.GA25864@merlins.org>
+References: <20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231204200038.GA9330@merlins.org>
+ <a6ac887f7ce8af0235558752d0c781b817f1795a.camel@sipsolutions.net>
+ <20231204203622.GB9330@merlins.org>
+ <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
+ <20231204205439.GA32680@merlins.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204205439.GA32680@merlins.org>
+X-Sysadmin: BOFH
+X-URL: http://marc.merlins.org/
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Mail-From: marc@merlins.org
 
-On Mon, 2023-12-04 at 13:16 -0800, Jakub Kicinski wrote:
-> > > > [  363.945511]  __mutex_lock.constprop.0+0x18b/0x291
-> > > >=20
-> > > > [  363.945531]  igc_resume+0x18b/0x1ca [igc 1a96e277f8878a2a3c95992=
-26acd0eeb7de577b7] =20
-> >=20
-> > this is trying to acquire the RTNL, by looking at the code
-> >=20
-> > > > [  363.945566]  __rpm_callback+0x7a/0xe7
-> > > > [  363.945578]  rpm_callback+0x35/0x64
-> > > > [  363.945587]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
-> > > > [  363.945592]  rpm_resume+0x342/0x44a
-> > > > [  363.945600]  ? __kmem_cache_alloc_node+0x123/0x154
-> > > > [  363.945614]  __pm_runtime_resume+0x5a/0x7a
-> > > > [  363.945624]  dev_ethtool+0x15a/0x24e7 =20
-> >=20
-> > but this already holds it
-> >=20
-> > So looks like bug in the 'igc' driver wrt. runtime PM locking.
-> >=20
+On Mon, Dec 04, 2023 at 12:54:39PM -0800, Marc MERLIN wrote:
+> On Mon, Dec 04, 2023 at 09:40:08PM +0100, Johannes Berg wrote:
+> > This one's still the problem, so I guess my 2-line hack didn't do
+> > anything.
+> 
+> sorry, I wasn't clear, this was the last hang before your patch. I
+> wanted to make sure it matched your analysis, which it seems to, so
+> that's good.  I now understand that the order in printk is not actually
+> the order of who is at fault.
+> I'm testing your patch now, will let you know ASAP
 
-So actually maybe it shouldn't be a bug there, I posted this:
+Well. Good news. So far so good.
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20231204200710.40c291e=
-60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid/
+sauron:~# ethtool -i enp11s0
+driver: igc
+version: 6.6.4-amd64-volpre-sysrq-202312
+firmware-version: 1073:8754
+expansion-rom-version: 
+bus-info: 0000:0b:00.0
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
 
-but I don't know this driver at all, and ethtool not that well ...
+sauron:~# iwconfig wlp9s0
+wlp9s0    IEEE 802.11  ESSID:"magicnet"  
+          Mode:Managed  Frequency:5.2 GHz  Access Point: E0:63:DA:28:03:67   
+          Bit Rate=866.7 Mb/s   Tx-Power=22 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+          Link Quality=70/70  Signal level=-40 dBm  
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:992   Missed beacon:0
 
-johannes
+sauron:~# lspci | grep -i net
+09:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411 160MHz (rev 1a)
+0b:00.0 Ethernet controller: Intel Corporation Ethernet Controller I225-LM (rev 03)
+
+It's unfortunate that nouveau doesn't seem to support the nvidia chip at all, not even
+well enough to turn it off, but thankfully I can do this via
+  echo 'auto' > '/sys/bus/pci/devices/0000:01:00.0/power/control'
+
+For power, I was able to get it to idle at 13W with tlp powering down chips to slow
+speeds, and the screen fairly dim. It's not great but it's cmoparable to the P73, so
+close enough.
+
+The weird PME loops I attached in the last Email would also butn batteries on my P73
+without hanging it. Your patch may have fixed that too. If so, thank you
+(will report if I see the PME stuff again).
+
+Either way, I'm in much better shape right now on a laptop I was about
+to return after having spent 3 days of effort on it, so a heartfelt thank you!
+
+Where do you we go from here? Is the patch obviously good/safe, or do we
+need to narrow things down/test some more?
+
+Marc
+-- 
+"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
+ 
+Home page: http://marc.merlins.org/  
 
