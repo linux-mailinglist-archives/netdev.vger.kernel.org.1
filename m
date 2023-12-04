@@ -1,146 +1,190 @@
-Return-Path: <netdev+bounces-53439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50149802FC7
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:12:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6257E802FE5
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:14:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDB93B20A0E
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:12:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936151C20318
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E25C1EB5E;
-	Mon,  4 Dec 2023 10:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A321F5FD;
+	Mon,  4 Dec 2023 10:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/NhjtgV"
+	dkim=pass (2048-bit key) header.d=theobroma-systems.com header.i=@theobroma-systems.com header.b="WmhXOIGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113B5DF
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:12:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701684729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cdTeCVbBKNIz3exfVUizApI93s0ffcM8icuOOUOmJ3U=;
-	b=D/NhjtgVEDMBli+bT3IoWR21gJwq2xTEyutyvICLyI/6RPPH3XQvhZdGxcwjXhanWrFFNY
-	ta1vqJqZhlkRW4hQMeoVu6xml57NdjnVUD5YkGl9kBx9Ay+FlxKW/fbwOxzs0FBsnww/+A
-	XHtL6LzDLOBEk8qxX4oUns4rlj5nqGs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-154-rTjYXkOpOLGth2MosXyJcw-1; Mon, 04 Dec 2023 05:12:08 -0500
-X-MC-Unique: rTjYXkOpOLGth2MosXyJcw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-54c77e011baso1245098a12.2
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 02:12:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701684726; x=1702289526;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cdTeCVbBKNIz3exfVUizApI93s0ffcM8icuOOUOmJ3U=;
-        b=H5X9ukSm6WaQ9OR8s16ijtZx4hl7ZLk2K8r/ez3NgcvdoO92p4hoPP7Z/vwJ/gMEQ2
-         OW56axSceyrqnTd7xg7wRmKm07XfzX87s5J1c0RM81HzFbz4LeryjQe/sSt1sG/x/BDX
-         ZwmF0dDjUia32LEmXSxjWRg/lWNwsCo8Wf3Zb0CO2nUG1pUp2AvTObCqu+I9Pf5wVYj0
-         dZAZTE8KqbhmY2qGBAcvrDmakGqtJ3ex4PKltStTwE7MFOj4f1+mR6U/kxQ8IMVnHyUa
-         L8P+XkD3YEWbWO+aYrde9F27GZOfhQU31JCZxMr/LvMmEiCvcNTi7rNzx3oShpWjJ6TY
-         /q1Q==
-X-Gm-Message-State: AOJu0Yy5lzZbPXSwnyIWVBhJz0NV6cA+kYpoZqgiOUVayEyKxIoOxHBQ
-	s6FEkddehkaHK0R3x88+MgpnR3ujTVEpr7RvU1FA9N9ySLJ3X3jhqdBaEStOwUMGPnTU73NK4V8
-	MiTi51ykBNL4YntfkVVC2aQIbseE/O1pgj615TO26SiE=
-X-Received: by 2002:aa7:d952:0:b0:54c:7833:c111 with SMTP id l18-20020aa7d952000000b0054c7833c111mr1771259eds.36.1701684726558;
-        Mon, 04 Dec 2023 02:12:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE6KO+0DEtzpvHP7tJMyeJVf99YpOjaGGQXV6bz2Km4+w5+B60WueRbh3qCS4/3XJ2MkbutBg9ybAgTn+GT5kw=
-X-Received: by 2002:aa7:d952:0:b0:54c:7833:c111 with SMTP id
- l18-20020aa7d952000000b0054c7833c111mr1771251eds.36.1701684726322; Mon, 04
- Dec 2023 02:12:06 -0800 (PST)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2062.outbound.protection.outlook.com [40.107.21.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 385A785;
+	Mon,  4 Dec 2023 02:14:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NVcnuzwkyBVwXK08dM+B7Ck79PqalFcsb4NjfNRoBj0kNg/A8OeIGSRvMuN+ABmc4FrRR/D/CJRiWoEbvHmLTTBaUQP54x0Z1y5/uaEfARdc/9JLuLdjFcp7Dx5LD6WvtG0hw8lM1PGh7NeVsPYTXlDQ1/JW03FheqUFQ3YFgzGtvg0qy+wM+CjERZiaisYijk++AR0vE6oWKkBIYevvKiAIUNntKHC8oK4XdKLO95l4hJaIOCvM03qTtCnTJnb8prMOqzoGEHxobHOk7c292rZBAVkPA4xXzoPZei9uARHRlDwvZ0iveois2SJgPeO+/RS4wwKTEe2hBw8XPhr8bQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0NK36nIN8ePHeR4VI6DqoQNuwIVti5qjmSBMZeiAKF0=;
+ b=ez+pzkQ6OyHYtHvWKZaZKNxEWTq7iWwT8kxN3J3RWqFM7aBzzIifzrTLutWfCaKxYHOdSz6boDAG2J8+cwrvSXmBWLwhl35KfsXnKWfYixZzQe9KbA/0KDqATZDqcXNtcy7hbY8s0r+WCWkhuPySCXfnFbX7dKdXs/K1HnkAXJmPK66ni5ZSkSU0T9KWkCtPfFRcZ4BHJVKg64XLUdVCOBEw4Dg0MVhIYoi5IpvyXMJZRIP7/1rlcb92Otg7b2QTgnvHGw6mnrNM4XpfPJ8rXPhfMLhShLU/f5vfvMCdTHPH8WiYiqk75TVryrQUIPFNWojAH9xQeUE3MaE0uIB27g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=theobroma-systems.com; dmarc=pass action=none
+ header.from=theobroma-systems.com; dkim=pass header.d=theobroma-systems.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theobroma-systems.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0NK36nIN8ePHeR4VI6DqoQNuwIVti5qjmSBMZeiAKF0=;
+ b=WmhXOIGbIX5XLftQN+1/5ocem8MEPPl6jPhAl09xFLoLXdfQ2mfIMRdeKEVES/I7dWk5+jDl9+wHc3eHDJxR4s90lcusKKmGrADFr0KGnLhCrI7cXlqfnJHHEgSfAh7Kw76bR0e8oSRRmbyvAk44Z9DGtBLcHtFjw2mDVwjP0V8cZMRpA7/q6/ku4oB3m6OLHKt6kaZsw+rqR+uOvZ9dBdawq19TFBlizQ/Z1ktjlISNEpf+1kEBMqNQo9jUxYkEV0NjGnmxMZ3X6WeUDvw3vrc2a4xMv9vFBZhb22VOBOXnQy5gScYZxTrlX6JdNGrdRRBcPl8/XwI3WI2yzvMT3A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=theobroma-systems.com;
+Received: from DU2PR04MB8536.eurprd04.prod.outlook.com (2603:10a6:10:2d7::10)
+ by DUZPR04MB9781.eurprd04.prod.outlook.com (2603:10a6:10:4e1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.22; Mon, 4 Dec
+ 2023 10:14:15 +0000
+Received: from DU2PR04MB8536.eurprd04.prod.outlook.com
+ ([fe80::9ee0:71d6:cd29:289a]) by DU2PR04MB8536.eurprd04.prod.outlook.com
+ ([fe80::9ee0:71d6:cd29:289a%7]) with mapi id 15.20.7068.022; Mon, 4 Dec 2023
+ 10:14:15 +0000
+Message-ID: <10f8e599-940b-4b7c-8c82-8d505007f19b@theobroma-systems.com>
+Date: Mon, 4 Dec 2023 11:14:12 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: mdio: enable optional clock when registering a phy
+ from devicetree
+Content-Language: en-US
+To: Florian Fainelli <f.fainelli@gmail.com>, Heiko Stuebner
+ <heiko@sntech.de>, andrew@lunn.ch, hkallweit1@gmail.com
+Cc: linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Heiko Stuebner <heiko.stuebner@cherry.de>
+References: <20231201142453.324697-1-heiko@sntech.de>
+ <ecbdcfb7-32ab-45cc-991a-982c52bf4b14@gmail.com>
+From: Quentin Schulz <quentin.schulz@theobroma-systems.com>
+In-Reply-To: <ecbdcfb7-32ab-45cc-991a-982c52bf4b14@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FRYP281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::20)
+ To DU2PR04MB8536.eurprd04.prod.outlook.com (2603:10a6:10:2d7::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZWnXlcsVJfPO1Qsb@debian> <20231201220743.32491-1-kuniyu@amazon.com>
-In-Reply-To: <20231201220743.32491-1-kuniyu@amazon.com>
-From: Alexey Tikhonov <atikhono@redhat.com>
-Date: Mon, 4 Dec 2023 11:11:55 +0100
-Message-ID: <CABPeg3ZZCDkRaVy2towZ-amU9v-rQSXZ_M_KnfY1SfWhhT-AZw@mail.gmail.com>
-Subject: Re: UNIX(7)
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, alx@kernel.org, linux-man@vger.kernel.org
-Cc: libc-alpha@sourceware.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PR04MB8536:EE_|DUZPR04MB9781:EE_
+X-MS-Office365-Filtering-Correlation-Id: 583cfd83-2c37-413c-f752-08dbf4b1c4c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	9qm7BAHk4FywL9O1+hONP5BmXNL8fwHXaOMWurMyB8CLlV2uEcwGGzHwshCXpyNA84X5zhyvAYg63swTxBSx+Q7licEeVODu28ArIuTyL25s86Y/9CspHEQotO/0WSTkB0m6piOTFKv+Lwf6RUVJAkmz6SeG31XJSWjFI3BukbKnBbJFJxuUvJ47a99I2z0Uwg560erUFcDU1f5r2cMx75RRlvzU7hFc0WM0bx1Hc+lhkw1Z3bFvd7Fb86ycwoO38uz+M6kJO42vJZrrXBO+PcIHsR5Ur/fzimc3XbQNRjyQsnMynDmZ40ecfbVWb9Wmr01nZy8221ycl7+esiK0qH/JxwIAOM8OpdPgLaMjcHmN3aTRHvGaCmq1CleaxfGGMI38eW0ZgNlHAuG1tqx7l8IJ11Hl2d8NXucN8jc4FCl9Saz4K2TxlA8TxD5imBz1D5qapSfOGPPbaJvUS690y5xMFtlr8/UjG3lPjDRNJthU9chMEJSkXo9p9p8XbccXdgjv9gVjxmrHz7lp+Q23Aij60wGTooe+QspE1aFN2VSIDK1VAbJutRjdf5/60JWHCX7+0uq1cpnK0BTkEXk7TsZhLcfIx90AhDldDZW5aF9uAw8l57SBFld5HJhXP+Makhu88YuqDw120YCRvdTGWg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8536.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(39850400004)(376002)(366004)(396003)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(66476007)(66556008)(44832011)(66946007)(316002)(110136005)(4326008)(8936002)(8676002)(31696002)(86362001)(36756003)(53546011)(6512007)(6506007)(478600001)(6486002)(6666004)(2906002)(107886003)(2616005)(26005)(83380400001)(38100700002)(41300700001)(7416002)(5660300002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?N3RuSFE0YVlRQVErWEtjMmlGbVc5aldmQ08yNFdLNUJrWVA3NTFOcVR5RDNz?=
+ =?utf-8?B?UlJPQWxJeUpEdVg1Slo0QlNNSEpOKysrWUJmSGNxVnRlbnV5TU9WTDM2T29J?=
+ =?utf-8?B?VzlVL2pKQnMvczZiS3dlUzFGRDJuU3kwTXg4TlZmWHBxNDJxN1NKdXF6T2Nq?=
+ =?utf-8?B?WSsyaXBDMm5ZQ1krM0FReGlTeWtTVFFpNVMrNzBvdmdOdUlVNitQSUs2Y0VV?=
+ =?utf-8?B?L2ZIdS9hOUJzSnNuK2hoNEtSUjFrNzJFaE1IVGRvMXFnK2EvSURSUFhKQzRs?=
+ =?utf-8?B?QWRWTk91VFRYTmk2WWVLTVI3bTloNW5CWm5WSmMyYml0cndjTHkrcjY1U3px?=
+ =?utf-8?B?RGZGVWsxUG9SV25sYy94amV5YUZwSFMxc1lpYjVpcCtCYkpsNFpCUFFBdU5y?=
+ =?utf-8?B?aktjV0V2SnErbkxrVVZZNHllZ3FMMzd0dWNUK2dRaFVOVlVYSVpqMHhDSE85?=
+ =?utf-8?B?akMrS042MUdzU29yK2Y4ZHhYSVZsMzdkYWFydnhWT1QzTW9rUTVxblEzdzY5?=
+ =?utf-8?B?UG1zN01iK0FhSEl5c29Mb28zajk5U1pQUHdXdFEvdGRMeStaQ0pVNFJiR0t5?=
+ =?utf-8?B?MkRYZ1l0S1YxSDVJdWk0UnNsbThaT2o4MDJhYjZrbk12QTk3d2Fhdng1UUky?=
+ =?utf-8?B?emJOK1FqOCtLOXF4Y093bUhvdUZtbGdoSnlvUmNQTDZRTkZuZEp6aElRelA4?=
+ =?utf-8?B?dCtDb2k3cUZDd3lJNnV3MGRvbzZOS2hXSHpIK3UxYlIzbEd5Zk84MVZpZFll?=
+ =?utf-8?B?THdra2xkOGIrdVIyMmRub0JzdnNPSlFlNGdUNllIMGZqbjZFS05QNUFQQXZq?=
+ =?utf-8?B?cEFkSy9lQnQ1OCs2OE5BYzlBM3Yvc1NJRk5LUGFkUmRTc3NiTXBySVBHRmx5?=
+ =?utf-8?B?SGM1Ly9LZytiYitrWW95K3F4d25wNGpISnp3a1Vqb0FOUWlzMGF0NU05aStX?=
+ =?utf-8?B?RVZHZm5KQUpqQU5ScHdHVjNxYS9sU1owK3NOWlg3bTBXZGk0WUFaeml3a0tV?=
+ =?utf-8?B?TldFRlNKVFJFRGE5cW8vT2Y4T3ZLWGcrNFdwNW16MERidWVodmoydnZmdkw2?=
+ =?utf-8?B?N1p5aWJKNkpvcTJDUGZ4Wi91Mm5ia2NQZ3RIRnBCbDlsRTVBQjFtU3hMZitQ?=
+ =?utf-8?B?N1IrSDd4c1dNZ2VyV2hGRjFLdWdxQTVBcXNpQ2pzVVpRWVEzNFZkVlRQejJZ?=
+ =?utf-8?B?d1RJOWdvTFJjRzBnSkJYUmxiT3lKVlZtTWo2dytiOWtJbExIa3hkRDYwaXky?=
+ =?utf-8?B?ZDAvekcwN1oyU3ozN1JjQUo3NDl0R29qd3FrdnUweHh1UHZHOFJPRGtXc0xH?=
+ =?utf-8?B?TmUyaUpqNTJqQS84RmZtdVBKWW5xdk9GeHByaVR5RTgrSnpxNkhPS2FLZitO?=
+ =?utf-8?B?b3FkQUNnSTFOZCtCSWt5L0JyV3RlMEFZdVJMdzVEMkpsZFUvS053Q0x4cWN2?=
+ =?utf-8?B?cUdwUHFtUDVXaVJVN2kraU5QUFl6ZzZJa2ovUzRFbkhodFdreU1MbmhTQTFR?=
+ =?utf-8?B?b3RMdGcrNC9qQzUvZFRpOUtMb1p4cVlCTnFtOXgybUNJNmE3QUFCYWNzbnNL?=
+ =?utf-8?B?cDhKa0hLalh3UHVZZVAwaTQ0UFkybkdxTVRQZm0wbi84TEgyd3BBaG45ZFZo?=
+ =?utf-8?B?NldnZFhYeGZMb3R1UjRDa21Td0d3R2xaS2xUYjNtWVVQRmJpSHEwR0VsQUMx?=
+ =?utf-8?B?bjgyb2l5L3pIMGRDYUtHUktDaW10LzlUamo2UmxPWWJKUkdWckF4RGtBamk0?=
+ =?utf-8?B?Um9pY2dLTG5Jc043QWtsVjUxTzd0SWE3MGsxWkhWaytBVWZvUzBJY2JpN3BM?=
+ =?utf-8?B?aUxYMXFwKzM3ZGY5a0lPMUhzSlZkSzNpMVRQaTJSMk9kaXc4Qy91WTVwRWV4?=
+ =?utf-8?B?Wjg2ejJOSnFLQVI2ZHFobUw4bVc5cVpSNnFEVG1PVGN0N2ZxUUg2UjdnVUw3?=
+ =?utf-8?B?TGhmYW1jcVhHZ1lCMHlnWUVjaER0VWljTWlMUUV6ZXIzWndlOHBKRGdxSXNj?=
+ =?utf-8?B?eTlMV1hBbURBMjRkRFpKejBtWWNOd2YrR1lDVHB2TnQrdWdRcll2dDhMK1pQ?=
+ =?utf-8?B?NTZPTFFSeEsrTEs3QjdtUVJjZ3pzZlFCdUx4TkFsNzJLUFFWT2VyczhOS1Yv?=
+ =?utf-8?B?OUVwUmNWQ1JNZ3YwSzlucjRNWk5mRlprTGZCazlwWFhaMWhvNVpHWllnU2s0?=
+ =?utf-8?Q?/ledJB8EMF87ihbRRgv5rAs=3D?=
+X-OriginatorOrg: theobroma-systems.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 583cfd83-2c37-413c-f752-08dbf4b1c4c3
+X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8536.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 10:14:15.1956
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 5e0e1b52-21b5-4e7b-83bb-514ec460677e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IoQ/uNof/tSYM4dw8zrkZMEeGZwZigVpoyc7fY9JQni7vj0lBwvM6oM3y1rZqzVcm8RtDd4wsc4EGxgu2G3dC5i8jVrAEyGe/2wuelrZri6yiTFVHKBTnFERhMvLJWAe
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9781
 
-On Fri, Dec 1, 2023 at 11:08=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> From: Alejandro Colomar <alx@kernel.org>
-> Date: Fri, 1 Dec 2023 13:54:39 +0100
-> > Hello Alexey,
-> >
-> > On Fri, Dec 01, 2023 at 01:16:27PM +0100, Alexey Tikhonov wrote:
-> > > Hello.
-> > >
-> > > There is a discrepancy between the man page description of
-> > > 'SO_PEERCRED' and real behavior.
-> > >
-> > > `man 7 unix` states:
-> > > ```
-> > >        SO_PEERCRED
-> > >               This read-only socket option returns the credentials of
-> > >               the peer process connected to this socket.  The returne=
-d
-> > >               credentials are those that were in effect at the time o=
-f
-> > >               the call to connect(2) or socketpair(2).
-> > > ```
-> > >
-> > > This doesn't match real behavior in following situation (just an exam=
-ple):
-> > >  - process starts with uid=3D0, gid=3D0
-> > >  - process creates UNIX socket, binds it, listens on it
-> > >  - process changes to uid=3Duid1, git=3Dgid1 (using `setresuid()`, `s=
-etresgid()`)
-> > >  - another process connects to the listening socket and requests
-> > > peer's credentials using `getsockopt(... SOL_SOCKET, SO_PEERCRED ...)=
-`
-> > >
-> > > According to the man page: SO_PEERCRED should report (uid1, gid1),
-> > > because peer process was running under (uid1, gid1) "at the time of
-> > > the call to connect(2)"
-> > > In reality SO_PEERCRED reports (0, 0)
-> > > Reproducing code is available in
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=3D2247682
-> > >
-> > > I'm not entirely sure if this is a real bug or rather a  poor
-> > > description in the man page, but I tend to think that it's the latter=
-.
->
-> When calling getsockopt(), we cannot know dynamically who the peer's
-> owner is.  So, we just initialise the cred when we know the owner,
-> and it's the caller of listen(), connect(), and socketpair().
->
-> In your case, the listener's cred is initialised with the caller's
-> cred during the first liten().
->
->   listener's peer_cred =3D get_cred(rcu_dereference_protected(current->cr=
-ed, 1))
+Hi Florian, Heiko,
 
-Thank you for the explanation.
-So this is an omission in the man page.
+On 12/1/23 23:41, Florian Fainelli wrote:
+> On 12/1/23 06:24, Heiko Stuebner wrote:
+>> From: Heiko Stuebner <heiko.stuebner@cherry.de>
+>>
+>> The ethernet-phy binding (now) specifys that phys can declare a clock
+>> supply. Phy driver itself will handle this when probing the phy-driver.
+>>
+>> But there is a gap when trying to detect phys, because the mdio-bus needs
+>> to talk to the phy to get its phy-id. Using actual phy-ids in the dt like
+>>         compatible = "ethernet-phy-id0022.1640",
+>>                      "ethernet-phy-ieee802.3-c22";
+>> of course circumvents this, but in turn hard-codes the phy.
+> 
+> But it is the established practice for situations like those where you 
+> need specific resources to be available in order to identify the device 
+> you are trying to probe/register.
+> 
+> You can get away here with the clock API because it can operate on 
+> device_node, and you might be able with a bunch of other "resources" 
+> subsystems, but for instance with regulators, that won't work, we need a 
+> "struct device" which won't be created because that is exactly what we 
+> are trying to do.
+> 
+> Also this only works for OF, not for ACPI or other yet to come firmware 
+> interface.
+> 
+> Sorry but NACK.
+> 
+> I am sympathetic to the idea that if you have multiple boards and you 
+> may have multiple PHY vendors this may not really scale, but in 2023 you 
+> have boot loaders aware of the Device Tree which can do all sorts of 
+> live DTB patching to provide the kernel with a "perfect" view of the world.
 
->
-> And connect() will initialise two creds as follows:
->
->   connect()er's peer_cred =3D listener's peer_cred
->   new socket's peer_cred =3D get_cred(rcu_dereference_protected(current->=
-cred, 1))
->
-> If you call listen() again after setresuid() and before connect(),
-> you can update the listener's cred and get the new IDs at the final
-> getsockopt().
->
+There's a strong push towards unifying the device tree across all pieces 
+of SW involved, sometimes going as far as only having one binary passed 
+between SW stages (e.g. U-Boot passes its own DT to TF-A, and then to 
+the Linux kernel without actually loading anything aside from the Linux 
+kernel Image binary) if I remember correctly (haven't really followed 
+tbh). So, this is kinda a step backward for this effort. I don't like 
+relying on bootloader to make the kernel work, this is usually not a 
+great thing. I understand the reasons but am still a bit sad to not see 
+this done in the kernel.
 
+Heiko, I would personally put the ID of the PHY to be the most likely 
+encountered in the Linux kernel Device Tree so that if we somehow have a 
+broken bootloader, there's a chance some devices still work properly. HW 
+department said ksz9131 so we can go forward with this. In U-Boot DT, we 
+would need a -u-boot.dtsi we change to the auto-detection compatible and 
+we do the magic the Linux kernel doesn't want to do and hope it's fine 
+for U-Boot maintainers. Once properly detected, we fixup the DT before 
+booting the kernel.
+
+Cheers,
+Quentin
 
