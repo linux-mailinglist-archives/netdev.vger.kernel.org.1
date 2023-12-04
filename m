@@ -1,95 +1,78 @@
-Return-Path: <netdev+bounces-53556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA69803ABA
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:47:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5DC803A19
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7475B20BCE
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21871C20AB8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A634D2E620;
-	Mon,  4 Dec 2023 16:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBA22DF7D;
+	Mon,  4 Dec 2023 16:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eq1+hsaZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDRxVbwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3DBD11A;
-	Mon,  4 Dec 2023 08:47:22 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40c0a03eb87so15155325e9.3;
-        Mon, 04 Dec 2023 08:47:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701708441; x=1702313241; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y8w8/NZodyasp/IFI+hRUIAjihChoTfPl5Cg9hVHbRM=;
-        b=Eq1+hsaZr1I4IJrbzydbldqd5941FGCyABsntflEO44GuaQfCBm/I9/uIcSq5FTQh8
-         wHcRMWzi6dtb4AAAuEQq/obJSiSzmFifgt8arUb7rWFvR/Nzn0FJwV9j+SHdbB8YNifX
-         xKmQeR4CW7xDJSxIs0NZVoC8GLQFhRqjXMy29QIz4gCnL1VwbwMVga/sEqHEDuKzaESr
-         khq3tbOrpfoP8bDzb4FJzKq37/ENRJWLHgp4cemms0zPmTFg+jyupwKTCAnNFTs7IKyj
-         r4vDuCiX68JyxEMH4mxYNDqKbWpwKPUeX/QCu30J7Bw4TWyIFj4WnVckNQL47GfFKrYw
-         hk6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701708441; x=1702313241;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y8w8/NZodyasp/IFI+hRUIAjihChoTfPl5Cg9hVHbRM=;
-        b=IcXHd74IVm/RZEsUxOaI+GSwBS45tqVDDUqF/LmkgOv9UVPHyHG3QsnDfk+XrwW8Qx
-         DcAsk14FcbD8Gld3Emo3sWynbNJ0pxZpZF+BWQO2BbzbpKO7al+OpwCiL+bKnxON3/2M
-         lfjcAEK66kJtvuJqcTS8VV7h7KFldhVg8IJgA2WizqTexcSx6LXNfjHFSPSWaF+zUsos
-         PzNN9FMwP4b9JvqR2UDKrZDQEENPytAlB5R1Sxg9BVKH7atuhtVUA0kjh6/48BwaY7J1
-         881/ycgTDLGTfVdQXkv/hDI6YeSWY60zKTjMqnBUCQ/3QY+5ArSBDrk9R607Sjc/5LnI
-         S8xw==
-X-Gm-Message-State: AOJu0YynuCqM+awSDPDBcUm62qteDKTy81lrJoASE+PeYxzvQz4A6W3i
-	yJByCioztCQi0uw+MR/Qd1M=
-X-Google-Smtp-Source: AGHT+IHEmPcutxPPq5uSAfpi3ImyIAf1IA38LMe3dS4WVOcI/n4t1xYdGJ29dqBM2ZRAxS880RaiAA==
-X-Received: by 2002:a05:600c:348d:b0:40b:5f03:b3ea with SMTP id a13-20020a05600c348d00b0040b5f03b3eamr1142847wmq.268.1701708440984;
-        Mon, 04 Dec 2023 08:47:20 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:d9c9:f651:32f4:3bc])
-        by smtp.gmail.com with ESMTPSA id b19-20020a05600c4e1300b0040648217f4fsm19297397wmq.39.2023.12.04.08.47.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 08:47:20 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
- <jacob.e.keller@intel.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 5/6] doc/netlink/specs: add sub-message type
- to rt_link family
-In-Reply-To: <20231201181014.0955104a@kernel.org> (Jakub Kicinski's message of
-	"Fri, 1 Dec 2023 18:10:14 -0800")
-Date: Mon, 04 Dec 2023 16:22:03 +0000
-Message-ID: <m24jgy6iqc.fsf@gmail.com>
-References: <20231130214959.27377-1-donald.hunter@gmail.com>
-	<20231130214959.27377-6-donald.hunter@gmail.com>
-	<20231201181014.0955104a@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C532D796;
+	Mon,  4 Dec 2023 16:23:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FE7CC433C7;
+	Mon,  4 Dec 2023 16:23:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701707035;
+	bh=ZbKR/GiibxinMTwe3e1OL0Fk+/8nfwiJudNZL/nfcCA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZDRxVbwm2GN/xBSUZOmrGkqtv7Xp4TMPCwMyiF8S+KkDBJdk/IpcWQEcnhiefUhsd
+	 vXiT1+vs/5+5wUEvZF06zYVGojR9mtQyIY3YEzIFl+geUIUFptBqvGLglTr4E6IYd1
+	 dYuJX7RZ57RMJ44NyozolZIJ96w81GC2xyi987CgMlRLSVPml+YiaIJDcbR8KURw0m
+	 idCPWULoSF0cYuB0IRdMpIteazE7pd+yK3FdqTbkCyf93rgLT/IqQoCfxz9/5yjECJ
+	 pDBgdQJ3YKuS4kzSeJjIzdIgiJFMnjmFN+FxmyDL6mmnxFgrJxg8D7Lox4LFq3jRqq
+	 RuKWcGYgFZ3wA==
+Date: Mon, 4 Dec 2023 08:23:54 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH wireless-next 0/3] netlink carrier race workaround
+Message-ID: <20231204082354.78122161@kernel.org>
+In-Reply-To: <efd89dee78a4c42b7825fa55bbceafad9bb9df36.camel@sipsolutions.net>
+References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+	<20231201104329.25898-5-johannes@sipsolutions.net>
+	<20231201162844.14d1bbb0@kernel.org>
+	<339c73a6318bf94803a821d5e8ea7d4c736dc78e.camel@sipsolutions.net>
+	<20231202104655.68138ab4@kernel.org>
+	<efd89dee78a4c42b7825fa55bbceafad9bb9df36.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Sun, 03 Dec 2023 19:51:28 +0100 Johannes Berg wrote:
+> I think I wouldn't mind now, and perhaps if we want to sync in netlink
+> we should also do this here so that it's consistent, but I'm not sure
+> I'd want this to be the only way to do it, I might imagine that someone
+> might want this in some kind of container that doesn't necessarily have
+> (full) access there? Dunno.
 
-> On Thu, 30 Nov 2023 21:49:57 +0000 Donald Hunter wrote:
->>        -
->>          name: slave-data
->> -        type: binary
->> -        # kind specific nest
->> +        type: binary # kind specific nest
->
-> Just to be clear - we can define sub-message for this nest, too, right?
->
-> Not sure if it's worth moving the comment in the commit, it's just
-> noise..
+Also dunno :) We can add a "sync" version of netif_carrier_ok()
+and then call if from whatever places we need.
 
-Ah, good catch. I can at least put in a sub-message placeholder for
-slave-data.
+> We _could_ also use an input attribute on the rtnl_getlink() call to
+> have userspace explicitly opt in to doing the sync before returning
+> information?
+
+Yeah, maybe.. IMHO a more "Rusty Russell API levels" thing to do would
+be to allow opting out, as those who set the magic flag "know what they
+are doing" and returning unsync'ed carrier may be surprising.
+Also a "don't sync flag" we can add later, once someone who actually
+cares appears, avoiding uAPI growth =F0=9F=98=81=EF=B8=8F
+
+Anyway, up to you :)
 
