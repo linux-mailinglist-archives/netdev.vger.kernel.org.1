@@ -1,61 +1,39 @@
-Return-Path: <netdev+bounces-53417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A3F802E72
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:22:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60027802E9A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38F441C2098A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:22:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC552280A87
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91571171B6;
-	Mon,  4 Dec 2023 09:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4921618E27;
+	Mon,  4 Dec 2023 09:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="YFAyG4e+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2QviLJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58983D2
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 01:22:28 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40bd5eaa66cso25425415e9.2
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 01:22:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1701681747; x=1702286547; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nr4Vt64RYXhRYcPjjM40iMIdhnoStkhytq2aXTjQ4Bk=;
-        b=YFAyG4e+JoYvfq87anD5wXI7MDNUP1o5iCo8B9zjwfyqYxyRbtAxsOoeOYNmdBCR47
-         luQyyn9OQjL4Y/C/RdMNlqx8X+ZWEZQDcZzJmZ5NkFu8PgzA1YeVGM2jRD1ETBuijqcU
-         lVsvRatKBYPL+uak+1G1CmIIwtZjLzurLUtP/2DJnp3u3m1zm9O2taYEjER3CWfLc4WF
-         +g0F9rhgdC6RpvodY2gmW9yb9Jg7+vVd52fmtt+KCx9A4LT7sDtE3twba8g/VB7ifK1U
-         vNcBebaHZhrMDidK4xkymw5tUkCu0GLRMS2WkHsf0McrxfE8N/AYsvXMMxS7kkKccIja
-         CbBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701681747; x=1702286547;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nr4Vt64RYXhRYcPjjM40iMIdhnoStkhytq2aXTjQ4Bk=;
-        b=pVhsLMVYjrTlo/eBSLVqZRsJmfdin3DLTtJ1xg8Yd541Hst9/w/GDorkdmwDZZESgH
-         nXJbgIXyYzROCljkF1XJ9BegMntogamDg36uL8SNONGuS7RJFcRunk6Ua/kbJfHekmCC
-         8PgBaPkfYBUSIoCHCFEdA6JJtxlCjTwK5bgLMPLs/issPsSzIPsuh3G0FVs6nHImk99r
-         X51j3A/k6r5t3GVsXoeES0yhyS4Lyo7SZlkY0rvjF7dEj78xj6UcGJ96aomSqk5oNFlg
-         YKQOV9qnt6AwG0cLXBLFcgU+8elK0DvconR+O+1IZAdseFyCJVQvIeLtGzX+TLayboHU
-         k53g==
-X-Gm-Message-State: AOJu0Yw4+mnMlHP6PVibBBOCG90TRMWjX3dV9olzJEFWxxpDmY6f0WGU
-	abPOb73mRsdakF0HfFEkpuZHSA==
-X-Google-Smtp-Source: AGHT+IHc8ghBLDwEQZ9LHRTaRvJqKyyww6iDAhCA/KMKVHZLs237HfM1H6xRzFz1GtBS6dSD0eG9aw==
-X-Received: by 2002:a05:600c:acd:b0:40b:38a8:6c65 with SMTP id c13-20020a05600c0acd00b0040b38a86c65mr1664855wmr.26.1701681746784;
-        Mon, 04 Dec 2023 01:22:26 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:6cba:8826:daed:6772? ([2a01:e0a:b41:c160:6cba:8826:daed:6772])
-        by smtp.gmail.com with ESMTPSA id bg24-20020a05600c3c9800b0040b3d33ab55sm18093140wmb.47.2023.12.04.01.22.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 01:22:26 -0800 (PST)
-Message-ID: <95924d9e-b373-40fd-993c-25b0bae55e61@6wind.com>
-Date: Mon, 4 Dec 2023 10:22:25 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BE814F73
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 09:30:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF40C433C8;
+	Mon,  4 Dec 2023 09:30:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701682259;
+	bh=WLGwhwAcCCBIJIOMjah0fWzcGI0FcfR3oru0iYFcjLU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J2QviLJcwtcg3ovSPHhFw/MTNgYS5Irv15+2Y3qMFhcNNAUGTyPXTxgrISLGYbx+B
+	 FYU2wM/ymmVnmhzVLhdISlUPdI4yD32wAlTuFsDb1EPZ+uQzFXBimDeS8nIlDh3lvD
+	 tcC3s7fAL0siBYkXvByA4oIWCW06Kn5n/h65KlWX/nQklZp6YsRuMon7024v+7C9ce
+	 Tsa8Y3scyNO7s5i/Vynzcf00DdVzPvh4Z97NTV+Q5wJIyRNLA8D68SafoMPSugFAOM
+	 GFo2d950VElHAM8zwPCkIRU1imB9H+GbYaE7sQNhOqw/QKuStsFHC+Z6IzMo/iIjoC
+	 nRGxu08CR9IFQ==
+Message-ID: <96c4f619-857c-4a28-ac86-5a07214842a8@kernel.org>
+Date: Mon, 4 Dec 2023 11:30:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,96 +41,217 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v2] netlink: Return unsigned value for nla_len()
+Subject: Re: [EXTERNAL] [PATCH v7 net-next 6/8] net: ethernet: ti:
+ am65-cpsw-qos: Add Frame Preemption MAC Merge support
 Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: kernel test robot <lkp@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>,
- Jeff Johnson <quic_jjohnson@quicinc.com>, Michael Walle <mwalle@kernel.org>,
- Max Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20231202202539.it.704-kees@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20231202202539.it.704-kees@kernel.org>
+To: "Varis, Pekka" <p-varis@ti.com>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>
+Cc: "Vadapalli, Siddharth" <s-vadapalli@ti.com>,
+ "Gunasekaran, Ravi" <r-gunasekaran@ti.com>,
+ "Raghavendra, Vignesh" <vigneshr@ti.com>,
+ "Govindarajan, Sriramakrishnan" <srk@ti.com>,
+ "horms@kernel.org" <horms@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20231201135802.28139-1-rogerq@kernel.org>
+ <20231201135802.28139-7-rogerq@kernel.org>
+ <c773050ad0534fb3a5a9edcf5302d297@ti.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <c773050ad0534fb3a5a9edcf5302d297@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 02/12/2023 à 21:25, Kees Cook a écrit :
-> The return value from nla_len() is never expected to be negative, and can
-> never be more than struct nlattr::nla_len (a u16). Adjust the prototype
-> on the function. This will let GCC's value range optimization passes
-> know that the return can never be negative, and can never be larger than
-> u16. As recently discussed[1], this silences the following warning in
-> GCC 12+:
-> 
-> net/wireless/nl80211.c: In function 'nl80211_set_cqm_rssi.isra':
-> net/wireless/nl80211.c:12892:17: warning: 'memcpy' specified bound 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
-> 12892 |                 memcpy(cqm_config->rssi_thresholds, thresholds,
->       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 12893 |                        flex_array_size(cqm_config, rssi_thresholds,
->       |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 12894 |                                        n_thresholds));
->       |                                        ~~~~~~~~~~~~~~
-> 
-> A future change would be to clamp the subtraction to make sure it never
-> wraps around if nla_len is somehow less than NLA_HDRLEN, which would
-> have the additional benefit of being defensive in the face of nlattr
-> corruption or logic errors.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202311090752.hWcJWAHL-lkp@intel.com/ [1]
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Johannes Berg <johannes@sipsolutions.net>
-> Cc: Jeff Johnson <quic_jjohnson@quicinc.com>
-> Cc: Michael Walle <mwalle@kernel.org>
-> Cc: Max Schulze <max.schulze@online.de>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-wireless@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  v2:
->  - do not clamp return value (kuba)
->  - adjust NLA_HDRLEN to be u16 also
->  v1: https://lore.kernel.org/all/20231130200058.work.520-kees@kernel.org/
-> ---
->  include/net/netlink.h        | 2 +-
->  include/uapi/linux/netlink.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/netlink.h b/include/net/netlink.h
-> index 83bdf787aeee..7678a596a86b 100644
-> --- a/include/net/netlink.h
-> +++ b/include/net/netlink.h
-> @@ -1200,7 +1200,7 @@ static inline void *nla_data(const struct nlattr *nla)
->   * nla_len - length of payload
->   * @nla: netlink attribute
->   */
-> -static inline int nla_len(const struct nlattr *nla)
-> +static inline u16 nla_len(const struct nlattr *nla)
->  {
->  	return nla->nla_len - NLA_HDRLEN;
->  }
-> diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
-> index f87aaf28a649..270feed9fd63 100644
-> --- a/include/uapi/linux/netlink.h
-> +++ b/include/uapi/linux/netlink.h
-> @@ -247,7 +247,7 @@ struct nlattr {
->  
->  #define NLA_ALIGNTO		4
->  #define NLA_ALIGN(len)		(((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
-> -#define NLA_HDRLEN		((int) NLA_ALIGN(sizeof(struct nlattr)))
-> +#define NLA_HDRLEN		((__u16) NLA_ALIGN(sizeof(struct nlattr)))
-I wonder if this may break the compilation of some userspace tools with errors
-like comparing signed and unsigned values.
+Hi Pekka,
 
+On 01/12/2023 18:01, Varis, Pekka wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Roger Quadros <rogerq@kernel.org>
+>>
+>> Add driver support for viewing / changing the MAC Merge sublayer
+>> parameters and seeing the verification state machine's current state via
+>> ethtool.
+>>
+>> As hardware does not support interrupt notification for verification events
+>> we resort to polling on link up. On link up we try a couple of times for
+>> verification success and if unsuccessful then give up.
+>>
+>> The Frame Preemption feature is described in the Technical Reference
+>> Manual [1] in section:
+>> 	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
+>>
+>> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
+> 
+> Should be 128 not 124
 
-Regards,
-Nicolas
+User space setting is without FCS.
+
+> 
+>>
+>> [1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
+>> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 157 ++++++++++++++++++
+>>  drivers/net/ethernet/ti/am65-cpsw-nuss.c    |   2 +
+>>  drivers/net/ethernet/ti/am65-cpsw-nuss.h    |   5 +
+>>  drivers/net/ethernet/ti/am65-cpsw-qos.c     | 175 ++++++++++++++++++++
+>>  drivers/net/ethernet/ti/am65-cpsw-qos.h     | 102 ++++++++++++
+>>  5 files changed, 441 insertions(+)
+>>
+>> Changelog:
+>>
+>> v7:
+>> - use else if
+>> - drop FIXME comment
+>> - fix lldp kselftest failure by limiting max_verify_time to spec limit of 128ms.
+>> - now passes all ethtool_mm.sh kselftests (patch 8 required)
+>>
+>> v6:
+>> - get mutex around am65_cpsw_iet_commit_preemptible_tcs() in
+>>   am65_cpsw_iet_change_preemptible_tcs()
+>> - use "preemption" instead of "pre-emption"
+>> - call am65_cpsw_setup_mqprio() from within am65_cpsw_setup_taprio()
+>> - Now works with kselftest except the last test which fails
+>>
+>> v5:
+>> - No change
+>>
+>> v4:
+>> - Rebase and include in the same series as mqprio support.
+>>
+>> v3:
+>> - Rebase on top of v6.6-rc1 and mqprio support [1]
+>> - Support ethtool_ops :: get_mm_stats()
+>> - drop unused variables cmn_ctrl and verify_cnt
+>> - make am65_cpsw_iet_link_state_update() and
+>>   am65_cpsw_iet_change_preemptible_tcs() static
+>>
+>> [1] https://lore.kernel.org/all/20230918075358.5878-1-rogerq@kernel.org/
+>>
+>> v2:
+>> - Use proper control bits for PMAC enable
+>> (AM65_CPSW_PN_CTL_IET_PORT_EN)
+>>   and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
+>> - Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
+>>   AM65_CPSW_PN_CTL_IET_PORT_EN set.
+>> - Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
+> 
+> Should be 128 not 124
+> 
+>> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
+>>   1G link if link is inactive.
+>> - resize the RX FIFO based on pmac_enabled, not tx_enabled.
+>>
+>>
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> index b9e1d568604b..5571385b4baf 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> @@ -11,6 +11,7 @@
+>>  #include <linux/pm_runtime.h>
+>>
+>>  #include "am65-cpsw-nuss.h"
+>> +#include "am65-cpsw-qos.h"
+>>  #include "cpsw_ale.h"
+>>  #include "am65-cpts.h"
+>>
+>> @@ -740,6 +741,159 @@ static int am65_cpsw_set_ethtool_priv_flags(struct
+>> net_device *ndev, u32 flags)
+>>  	return 0;
+>>  }
+>>
+>> +static void am65_cpsw_port_iet_rx_enable(struct am65_cpsw_port *port,
+>> +bool enable) {
+>> +	u32 val;
+>> +
+>> +	val = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
+>> +	if (enable)
+>> +		val |= AM65_CPSW_PN_CTL_IET_PORT_EN;
+>> +	else
+>> +		val &= ~AM65_CPSW_PN_CTL_IET_PORT_EN;
+>> +
+>> +	writel(val, port->port_base + AM65_CPSW_PN_REG_CTL);
+>> +	am65_cpsw_iet_common_enable(port->common);
+>> +}
+>> +
+>> +static void am65_cpsw_port_iet_tx_enable(struct am65_cpsw_port *port,
+>> +bool enable) {
+>> +	u32 val;
+>> +
+>> +	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+>> +	if (enable)
+>> +		val |= AM65_CPSW_PN_IET_MAC_PENABLE;
+>> +	else
+>> +		val &= ~AM65_CPSW_PN_IET_MAC_PENABLE;
+>> +
+>> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL); }
+>> +
+>> +static int am65_cpsw_get_mm(struct net_device *ndev, struct
+>> +ethtool_mm_state *state) {
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_ndev_priv *priv = netdev_priv(ndev);
+>> +	u32 port_ctrl, iet_ctrl, iet_status;
+>> +	u32 add_frag_size;
+>> +
+>> +	mutex_lock(&priv->mm_lock);
+>> +
+>> +	iet_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+>> +	port_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
+>> +
+>> +	state->tx_enabled = !!(iet_ctrl &
+>> AM65_CPSW_PN_IET_MAC_PENABLE);
+>> +	state->pmac_enabled = !!(port_ctrl &
+>> AM65_CPSW_PN_CTL_IET_PORT_EN);
+>> +
+>> +	iet_status = readl(port->port_base +
+>> AM65_CPSW_PN_REG_IET_STATUS);
+>> +
+>> +	if (iet_ctrl & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY)
+>> +		state->verify_status =
+>> ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+>> +	else if (iet_status & AM65_CPSW_PN_MAC_VERIFIED)
+>> +		state->verify_status =
+>> ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
+>> +	else if (iet_status & AM65_CPSW_PN_MAC_VERIFY_FAIL)
+>> +		state->verify_status =
+>> ETHTOOL_MM_VERIFY_STATUS_FAILED;
+>> +	else
+>> +		state->verify_status =
+>> ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
+>> +
+>> +	add_frag_size =
+>> AM65_CPSW_PN_IET_MAC_GET_ADDFRAGSIZE(iet_ctrl);
+>> +	state->tx_min_frag_size =
+>> +ethtool_mm_frag_size_add_to_min(add_frag_size);
+>> +
+>> +	/* Errata i2208: RX min fragment size cannot be less than 124 */
+>> +	state->rx_min_frag_size = 124;
+> 
+> /* Errata i2208: RX min fragment size cannot be less than 128 */
+> state->rx_min_frag_size = 128;
+
+ethtool man page says
+"           tx-min-frag-size
+                  Shows the minimum size (in octets) of transmitted non-
+                  final fragments which can be received by the link
+                  partner. Corresponds to the standard addFragSize
+                  variable using the formula:
+
+                  tx-min-frag-size = 64 * (1 + addFragSize) - 4"
+
+Which means user needs to put a -4 offset i.e. drop FCS size.
+
+Drivers show rx-min-frag-size also without the FCS.
+
+e.g.
+https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/mscc/ocelot_mm.c#L260
+
+-- 
+cheers,
+-roger
 
