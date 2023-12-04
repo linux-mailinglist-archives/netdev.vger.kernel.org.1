@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-53620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06160803F0E
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:12:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31C3803F0F
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84DFBB20A3E
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:12:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A5831F212A3
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2F533CCA;
-	Mon,  4 Dec 2023 20:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139A933CEF;
+	Mon,  4 Dec 2023 20:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WBnbKwgt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YV+3zR5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD85C4
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:12:40 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5c5daf2baccso71000487b3.3
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:12:40 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6173DCD
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:12:42 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cf4696e202so71166297b3.2
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701720760; x=1702325560; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Y63sRH03VakaPo/Lt9g0fnAD/Gnn8ok7qeDnLJyPB0M=;
-        b=WBnbKwgtG+yjUxwmkBh3OWo1AqpYcIhh+AZrDoxyoSdoJZJAz8XIQzsk1lYOIHpv5U
-         CV1iYjDpJuDLjrV5OdHxCQy0wCENi2M3BkcVbmkq8vYP4MEOZhILS+ED7KkgyBm8tHjR
-         iOO/3EPeguIN/b+3nwNnLb9v5X8kX0pbIcgoDgKlE2rbGM0NFzaKMTpQAA2O/5HfvIgB
-         +sqlzAgTDJYuGecetoig5Xh2pP+JGXBiqTrJHnB3Nzs8TacG5woyCDY0+BsAapl6hVXU
-         OswtAyLy1RZcmTs7dp6ldXNd4jyRxXLTFemb0I+XBruzOjCwXYd0aNA3FXa79DoV1oxM
-         KGrA==
+        d=google.com; s=20230601; t=1701720761; x=1702325561; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJvo7egwM48POQd/alhJofBGnM9IB/gyLCi/FcD6HtI=;
+        b=YV+3zR5GOF8YzCkior5BBkYUi7l8xOTe5BEabGDS7s7gVo1H2JcIyFFvUVnGeEqQM3
+         nvSypyHCZz20W8Xu6Ia6MeMnJ5eIUYKZ6rmNeW6TRMzS6/Hw5bB8TmSHFufyusOthYsl
+         cej1/B71tUujLZe76sPjMz9csNlEyL5BrMTZd+8lnOLQvcGojlxFcpcpblajuwyGE6H1
+         Tzk4X7OvqImg/u6zF9O9LRdwvbqiFlBfN9BpUNI62nl8ly9EtACl8x6JsoV+cV0tXWt4
+         mxDPTQEzuPkUuV1LBBNxye+bZ5dIYLU1hc21uTXiI2pOneaIwhb8Jjwoy5I/R6aQ3sfx
+         Ga5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701720760; x=1702325560;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y63sRH03VakaPo/Lt9g0fnAD/Gnn8ok7qeDnLJyPB0M=;
-        b=OcrXpB9ntwEz4GwT1DzJJ/kWgbvkdXWw2cY0ISL21bKD3P8kh31rpxpfQQXYE45eob
-         fg3InrOBq5nCEpi7ZTyso3wkjHleNCWlXkPdQ2LdoCpEHWivEVTM+sbuAi+6hmDZjUYF
-         AgX1uLJf2+jBPHPqMivtYpe4WQM85Kj+5Mo82yz3gUXWtII3h+nycJy/SWVXtg86bdnk
-         epa9KV5+QM+x75zS//EFwXKaNkwkO36/DP5/L0n8Y7sF6CtOGJRtRRkO7vyO3f8yv+Pt
-         0K+NpV1vNTgBb+unpMWnm5bviDag2LxD+cVf0SWVwgFKEf3xf+nV3sGedxxwEhuOVe0y
-         braA==
-X-Gm-Message-State: AOJu0YxUekltkS5bwfil31M7l0aabc1uiUaHAftm+i+cJRnuwWJ3uhUr
-	WijA2WhNnrMrpMKrYk4jX9yTWVZEJshctNE=
-X-Google-Smtp-Source: AGHT+IEYQxx0fIfDy4Z03PSLWOCtxUZCPzJ1n3BdKORMTEWLbjmVrdmaDTfkh7rkpTbyotcSP+yFz4ZtrikZoXc=
+        d=1e100.net; s=20230601; t=1701720761; x=1702325561;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJvo7egwM48POQd/alhJofBGnM9IB/gyLCi/FcD6HtI=;
+        b=sUDMqFWOl0ootT99z3t9rxODTCviSxF+2bVFCigEht5CMa+VB4mbOtH2DR4z4YNwRi
+         wix2kdmhcKM8hBw3lrbnbsHxVbGxk0JpDWx/s4uLpyJs4/UVsfm1nq7KMw7nP2AuJkqR
+         BG39wn6d2YPnhcC9gv5xt14Pn6gab6crckTnTkwbZr5XJwS/zDRjBhxGMw40VemT3Gdd
+         3E+D6hDLLFEGut6VjiwG4OlgaU0yeAMz/ZOFuYfQKkHOx5z2ls7mAyRbf94Gums9M68p
+         2kvB/5+iOaz4ogffuQVlGMi9IRoxYLkqY4IwJ21qz2vwV8XabwibTvWI5ode7j+klt4I
+         UYiA==
+X-Gm-Message-State: AOJu0Yw/IuMttZy6IbycFcAtY3w6vS7NIS94unQl3x+hSJoxBF810IT5
+	SYOv0hpaViO+khZG+EACWaJwGaNm0PJBQCw=
+X-Google-Smtp-Source: AGHT+IG4xAdugvSVkKUEphNst75QAlCCOBm6GTuaaxHbqxE6SR9UuUJtcqmuXcaa7pWMXIxlCJ2eKExn0QktvOI=
 X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a05:690c:10:b0:5d7:efdf:7712 with SMTP
- id bc16-20020a05690c001000b005d7efdf7712mr155448ywb.9.1701720759861; Mon, 04
- Dec 2023 12:12:39 -0800 (PST)
-Date: Mon,  4 Dec 2023 20:12:29 +0000
+ (user=lixiaoyan job=sendgmr) by 2002:a81:ac17:0:b0:5d3:edb7:8470 with SMTP id
+ k23-20020a81ac17000000b005d3edb78470mr290388ywh.7.1701720761681; Mon, 04 Dec
+ 2023 12:12:41 -0800 (PST)
+Date: Mon,  4 Dec 2023 20:12:30 +0000
+In-Reply-To: <20231204201232.520025-1-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20231204201232.520025-1-lixiaoyan@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231204201232.520025-1-lixiaoyan@google.com>
-Subject: [PATCH v1 net-next 0/2] Reorganize remaining patch of networking
- struct cachelines
+Message-ID: <20231204201232.520025-2-lixiaoyan@google.com>
+Subject: [PATCH v1 net-next 1/2] net-device: reorganize net_device fast path variables
 From: Coco Li <lixiaoyan@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
@@ -69,19 +70,311 @@ Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google
 	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rebase patches to top-of-head in https://lwn.net/Articles/951321/ to
-ensure the results of the cacheline savings are still accurate.
+Reorganize fast path variables on tx-txrx-rx order
+Fastpath variables end after npinfo.
 
-Coco Li (2):
-  net-device: reorganize net_device fast path variables
-  tcp: reorganize tcp_sock fast path variables
+Below data generated with pahole on x86 architecture.
 
- include/linux/netdevice.h | 117 ++++++++++--------
- include/linux/tcp.h       | 248 ++++++++++++++++++++------------------
- net/core/dev.c            |  56 +++++++++
- net/ipv4/tcp.c            |  93 ++++++++++++++
- 4 files changed, 347 insertions(+), 167 deletions(-)
+Fast path variables span cache lines before change: 12
+Fast path variables span cache lines after change: 4
 
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Coco Li <lixiaoyan@google.com>
+---
+ include/linux/netdevice.h | 117 +++++++++++++++++++++-----------------
+ net/core/dev.c            |  56 ++++++++++++++++++
+ 2 files changed, 120 insertions(+), 53 deletions(-)
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index c2d74bc112ddc..b7bb725e53939 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2092,6 +2092,70 @@ enum netdev_stat_type {
+  */
+ 
+ struct net_device {
++	/* Cacheline organization can be found documented in
++	 * Documentation/networking/net_cachelines/net_device.rst.
++	 * Please update the document when adding new fields.
++	 */
++
++	/* TX read-mostly hotpath */
++	__cacheline_group_begin(net_device_read_tx);
++	unsigned long long	priv_flags;
++	const struct net_device_ops *netdev_ops;
++	const struct header_ops *header_ops;
++	struct netdev_queue	*_tx;
++	unsigned int		real_num_tx_queues;
++	unsigned int		gso_max_size;
++	unsigned int		gso_ipv4_max_size;
++	u16			gso_max_segs;
++	s16			num_tc;
++	/* Note : dev->mtu is often read without holding a lock.
++	 * Writers usually hold RTNL.
++	 * It is recommended to use READ_ONCE() to annotate the reads,
++	 * and to use WRITE_ONCE() to annotate the writes.
++	 */
++	unsigned int		mtu;
++	unsigned short		needed_headroom;
++	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
++#ifdef CONFIG_XPS
++	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
++#endif
++#ifdef CONFIG_NETFILTER_EGRESS
++	struct nf_hook_entries __rcu *nf_hooks_egress;
++#endif
++#ifdef CONFIG_NET_XGRESS
++	struct bpf_mprog_entry __rcu *tcx_egress;
++#endif
++	__cacheline_group_end(net_device_read_tx);
++
++	/* TXRX read-mostly hotpath */
++	__cacheline_group_begin(net_device_read_txrx);
++	unsigned int		flags;
++	unsigned short		hard_header_len;
++	netdev_features_t	features;
++	struct inet6_dev __rcu	*ip6_ptr;
++	__cacheline_group_end(net_device_read_txrx);
++
++	/* RX read-mostly hotpath */
++	__cacheline_group_begin(net_device_read_rx);
++	struct list_head	ptype_specific;
++	int			ifindex;
++	unsigned int		real_num_rx_queues;
++	struct netdev_rx_queue	*_rx;
++	unsigned long		gro_flush_timeout;
++	int			napi_defer_hard_irqs;
++	unsigned int		gro_max_size;
++	unsigned int		gro_ipv4_max_size;
++	rx_handler_func_t __rcu	*rx_handler;
++	void __rcu		*rx_handler_data;
++	possible_net_t			nd_net;
++#ifdef CONFIG_NETPOLL
++	struct netpoll_info __rcu	*npinfo;
++#endif
++#ifdef CONFIG_NET_XGRESS
++	struct bpf_mprog_entry __rcu *tcx_ingress;
++#endif
++	__cacheline_group_end(net_device_read_rx);
++
+ 	char			name[IFNAMSIZ];
+ 	struct netdev_name_node	*name_node;
+ 	struct dev_ifalias	__rcu *ifalias;
+@@ -2116,7 +2180,6 @@ struct net_device {
+ 	struct list_head	unreg_list;
+ 	struct list_head	close_list;
+ 	struct list_head	ptype_all;
+-	struct list_head	ptype_specific;
+ 
+ 	struct {
+ 		struct list_head upper;
+@@ -2124,26 +2187,13 @@ struct net_device {
+ 	} adj_list;
+ 
+ 	/* Read-mostly cache-line for fast-path access */
+-	unsigned int		flags;
+ 	xdp_features_t		xdp_features;
+-	unsigned long long	priv_flags;
+-	const struct net_device_ops *netdev_ops;
+ 	const struct xdp_metadata_ops *xdp_metadata_ops;
+ 	const struct xsk_tx_metadata_ops *xsk_tx_metadata_ops;
+-	int			ifindex;
+ 	unsigned short		gflags;
+-	unsigned short		hard_header_len;
+ 
+-	/* Note : dev->mtu is often read without holding a lock.
+-	 * Writers usually hold RTNL.
+-	 * It is recommended to use READ_ONCE() to annotate the reads,
+-	 * and to use WRITE_ONCE() to annotate the writes.
+-	 */
+-	unsigned int		mtu;
+-	unsigned short		needed_headroom;
+ 	unsigned short		needed_tailroom;
+ 
+-	netdev_features_t	features;
+ 	netdev_features_t	hw_features;
+ 	netdev_features_t	wanted_features;
+ 	netdev_features_t	vlan_features;
+@@ -2187,8 +2237,6 @@ struct net_device {
+ 	const struct tlsdev_ops *tlsdev_ops;
+ #endif
+ 
+-	const struct header_ops *header_ops;
+-
+ 	unsigned char		operstate;
+ 	unsigned char		link_mode;
+ 
+@@ -2229,9 +2277,7 @@ struct net_device {
+ 
+ 
+ 	/* Protocol-specific pointers */
+-
+ 	struct in_device __rcu	*ip_ptr;
+-	struct inet6_dev __rcu	*ip6_ptr;
+ #if IS_ENABLED(CONFIG_VLAN_8021Q)
+ 	struct vlan_info __rcu	*vlan_info;
+ #endif
+@@ -2266,26 +2312,14 @@ struct net_device {
+ 	/* Interface address info used in eth_type_trans() */
+ 	const unsigned char	*dev_addr;
+ 
+-	struct netdev_rx_queue	*_rx;
+ 	unsigned int		num_rx_queues;
+-	unsigned int		real_num_rx_queues;
+-
+ 	struct bpf_prog __rcu	*xdp_prog;
+-	unsigned long		gro_flush_timeout;
+-	int			napi_defer_hard_irqs;
+ #define GRO_LEGACY_MAX_SIZE	65536u
+ /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
+  * and shinfo->gso_segs is a 16bit field.
+  */
+ #define GRO_MAX_SIZE		(8 * 65535u)
+-	unsigned int		gro_max_size;
+-	unsigned int		gro_ipv4_max_size;
+ 	unsigned int		xdp_zc_max_segs;
+-	rx_handler_func_t __rcu	*rx_handler;
+-	void __rcu		*rx_handler_data;
+-#ifdef CONFIG_NET_XGRESS
+-	struct bpf_mprog_entry __rcu *tcx_ingress;
+-#endif
+ 	struct netdev_queue __rcu *ingress_queue;
+ #ifdef CONFIG_NETFILTER_INGRESS
+ 	struct nf_hook_entries __rcu *nf_hooks_ingress;
+@@ -2300,25 +2334,13 @@ struct net_device {
+ /*
+  * Cache lines mostly used on transmit path
+  */
+-	struct netdev_queue	*_tx ____cacheline_aligned_in_smp;
+ 	unsigned int		num_tx_queues;
+-	unsigned int		real_num_tx_queues;
+ 	struct Qdisc __rcu	*qdisc;
+ 	unsigned int		tx_queue_len;
+ 	spinlock_t		tx_global_lock;
+ 
+ 	struct xdp_dev_bulk_queue __percpu *xdp_bulkq;
+ 
+-#ifdef CONFIG_XPS
+-	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
+-#endif
+-#ifdef CONFIG_NET_XGRESS
+-	struct bpf_mprog_entry __rcu *tcx_egress;
+-#endif
+-#ifdef CONFIG_NETFILTER_EGRESS
+-	struct nf_hook_entries __rcu *nf_hooks_egress;
+-#endif
+-
+ #ifdef CONFIG_NET_SCHED
+ 	DECLARE_HASHTABLE	(qdisc_hash, 4);
+ #endif
+@@ -2357,12 +2379,6 @@ struct net_device {
+ 	bool needs_free_netdev;
+ 	void (*priv_destructor)(struct net_device *dev);
+ 
+-#ifdef CONFIG_NETPOLL
+-	struct netpoll_info __rcu	*npinfo;
+-#endif
+-
+-	possible_net_t			nd_net;
+-
+ 	/* mid-layer private */
+ 	void				*ml_priv;
+ 	enum netdev_ml_priv_type	ml_priv_type;
+@@ -2397,20 +2413,15 @@ struct net_device {
+  */
+ #define GSO_MAX_SIZE		(8 * GSO_MAX_SEGS)
+ 
+-	unsigned int		gso_max_size;
+ #define TSO_LEGACY_MAX_SIZE	65536
+ #define TSO_MAX_SIZE		UINT_MAX
+ 	unsigned int		tso_max_size;
+-	u16			gso_max_segs;
+ #define TSO_MAX_SEGS		U16_MAX
+ 	u16			tso_max_segs;
+-	unsigned int		gso_ipv4_max_size;
+ 
+ #ifdef CONFIG_DCB
+ 	const struct dcbnl_rtnl_ops *dcbnl_ops;
+ #endif
+-	s16			num_tc;
+-	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
+ 	u8			prio_tc_map[TC_BITMASK + 1];
+ 
+ #if IS_ENABLED(CONFIG_FCOE)
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 3950ced396b50..4779689f7c437 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11572,6 +11572,60 @@ static struct pernet_operations __net_initdata default_device_ops = {
+ 	.exit_batch = default_device_exit_batch,
+ };
+ 
++static void __init net_dev_struct_check(void)
++{
++	/* TX read-mostly hotpath */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, priv_flags);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, netdev_ops);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, header_ops);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, _tx);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, real_num_tx_queues);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_size);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_ipv4_max_size);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_segs);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, num_tc);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, mtu);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, needed_headroom);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tc_to_txq);
++#ifdef CONFIG_XPS
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, xps_maps);
++#endif
++#ifdef CONFIG_NETFILTER_EGRESS
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, nf_hooks_egress);
++#endif
++#ifdef CONFIG_NET_XGRESS
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tcx_egress);
++#endif
++	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_tx, 152);
++
++	/* TXRX read-mostly hotpath */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, flags);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, hard_header_len);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, features);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, ip6_ptr);
++	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 30);
++
++	/* RX read-mostly hotpath */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ptype_specific);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ifindex);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, real_num_rx_queues);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, _rx);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_flush_timeout);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, napi_defer_hard_irqs);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_max_size);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_ipv4_max_size);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler_data);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, nd_net);
++#ifdef CONFIG_NETPOLL
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, npinfo);
++#endif
++#ifdef CONFIG_NET_XGRESS
++	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
++#endif
++	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 96);
++}
++
+ /*
+  *	Initialize the DEV module. At boot time this walks the device list and
+  *	unhooks any devices that fail to initialise (normally hardware not
+@@ -11589,6 +11643,8 @@ static int __init net_dev_init(void)
+ 
+ 	BUG_ON(!dev_boot_phase);
+ 
++	net_dev_struct_check();
++
+ 	if (dev_proc_init())
+ 		goto out;
+ 
 -- 
 2.43.0.rc2.451.g8631bc7472-goog
 
