@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-53586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0BB803D17
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:32:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E549C803D08
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE37B280EB5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:32:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2166B20B73
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4871328DC0;
-	Mon,  4 Dec 2023 18:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3D22FC32;
+	Mon,  4 Dec 2023 18:31:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F825AF
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:32:17 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF04CD5
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:31:33 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj4-00038w-0z; Mon, 04 Dec 2023 19:31:26 +0100
+	id 1rADj2-00038x-Fx; Mon, 04 Dec 2023 19:31:24 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj1-00DZmP-KD; Mon, 04 Dec 2023 19:31:23 +0100
+	id 1rADj1-00DZmS-Oh; Mon, 04 Dec 2023 19:31:23 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj1-00EE78-9y; Mon, 04 Dec 2023 19:31:23 +0100
+	id 1rADj1-00EE7B-FP; Mon, 04 Dec 2023 19:31:23 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -36,36 +36,13 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Alex Elder <elder@kernel.org>,
 	netdev@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	=?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-renesas-soc@vger.kernel.org,
-	Zhao Qiang <qiang.zhao@nxp.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	Linus Walleij <linusw@kernel.org>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Stephan Gerhold <stephan@gerhold.net>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-arm-msm@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-wpan@vger.kernel.org
-Subject: [PATCH net-next v2 0/9] net*: Convert to platform remove callback returning void
-Date: Mon,  4 Dec 2023 19:30:40 +0100
-Message-ID: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
+	kernel@pengutronix.de
+Subject: [PATCH net-next v2 1/9] net: ipa: Convert to platform remove callback returning void
+Date: Mon,  4 Dec 2023 19:30:41 +0100
+Message-ID:  <c43193b9a002e88da36b111bb44ce2973ecde722.1701713943.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
+References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1746; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=OVvQ8uYjxLMYTaZSJq1OCfRdtPS4cvgLm8vM3BejMRM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlbhrRA9QNL9A6/+EC/b+KUL8ByuRJhbrVgnSOG 4TWQn68YNaJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZW4a0QAKCRCPgPtYfRL+ TjVDB/0eG4VYbw9drfz2A1JiSQIiH+SED39TRg3MQbSa1i7JvhthEdJz3RsgmHJGxuIbvTEaf+G pE3/IiK/WYsAVNlWURx8F58h1MaKSgcCxB6UkK3F13nFcsSdkYViabIu/cyHooy2wVyyCDL31/D kmn9dtqyNwosyXWaN7VXQpLtM+q3Smw5Tl9HVpWdfAenzfShrzn6h5h1vT6pkXsWjucByaEjmjO Ep/nxUhk6mkRawEkvZ2rMZ7/IgkiQ/KfWaIVwkGYHngmAUDeMcuHd3+70YIw50qlOokbuV/k5yW CVge3kM7/CpnqYDmiBU/n7A3crLTVVTN0roUGmeLUQIG0uxJ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2742; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=i2wI1xIadZHZVxHz3LgCDMBnM/dtNyelG/0iXlEJ5xs=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlbhrUi54GzU/9XeBAfnus3jPPmJ0bFkjuTXU3d KWtuR03VuqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZW4a1AAKCRCPgPtYfRL+ Tp2pCACi0vKu/eT7/h53Cl+j/r6WbEgs3d22Q3tTXgOKVdTkS5mIZmn9xUPBUgIsEhw11FCq27q pFK6DNJ2IPBomhVQXwdbzwya2VoVgC6Tk88eg1skJlH1U3fT0i62lknGM4BeKF4OpGWQ8/qwK3R sJtihjGrPOJQbFG4VcJJyuTDfRn+ZpblJ9axJ58vH7Q11HBSGrmTNKSEDCViF1PM9umpj47KKRI bEdP0J0Er7sD5CeVGSLA9Ci8jKGZfB103ptTM/1NDFkZ8xMmnwk+aKipT8RG3qPUkKOPgXhWf/c iR6hctbdKURZQJ/0YizP5+NJ/kfGhRVV94Dn0BgYKV8ZFRr/
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -81,48 +58,86 @@ X-SA-Exim-Mail-From: ukl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello,
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
 
-(implicit) v1 of this series can be found at
-https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@pengutronix.de.
-Changes since then:
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new(), which already returns void. Eventually after all drivers
+are converted, .remove_new() will be renamed to .remove().
 
- - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
-   converts ipa to remove_new() and introduces an error message in the
-   error path that failed before.
+Trivially convert this driver from always returning zero in the remove
+callback to the void returning variant.
 
- - Rebased to today's next
+Link: https://lore.kernel.org/r/20231117095922.876489-3-u.kleine-koenig@pengutronix.de
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/net/ipa/ipa_main.c | 29 +++++++++++++----------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
 
- - Add the tags received in the previous round.
-
-Uwe Kleine-König (9):
-  net: ipa: Convert to platform remove callback returning void
-  net: fjes: Convert to platform remove callback returning void
-  net: pcs: rzn1-miic: Convert to platform remove callback returning
-    void
-  net: sfp: Convert to platform remove callback returning void
-  net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
-    void
-  net: wan/ixp4xx_hss: Convert to platform remove callback returning
-    void
-  net: wwan: qcom_bam_dmux: Convert to platform remove callback
-    returning void
-  ieee802154: fakelb: Convert to platform remove callback returning void
-  ieee802154: hwsim: Convert to platform remove callback returning void
-
- drivers/net/fjes/fjes_main.c             |  6 ++---
- drivers/net/ieee802154/fakelb.c          |  5 ++--
- drivers/net/ieee802154/mac802154_hwsim.c |  6 ++---
- drivers/net/ipa/ipa_main.c               | 29 +++++++++++-------------
- drivers/net/pcs/pcs-rzn1-miic.c          |  6 ++---
- drivers/net/phy/sfp.c                    |  6 ++---
- drivers/net/wan/fsl_ucc_hdlc.c           |  6 ++---
- drivers/net/wan/ixp4xx_hss.c             |  5 ++--
- drivers/net/wwan/qcom_bam_dmux.c         |  6 ++---
- 9 files changed, 29 insertions(+), 46 deletions(-)
-
-
-base-commit: 629a3b49f3f957e975253c54846090b8d5ed2e9b
+diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+index 86884c21e792..00475fd7a205 100644
+--- a/drivers/net/ipa/ipa_main.c
++++ b/drivers/net/ipa/ipa_main.c
+@@ -943,7 +943,7 @@ static int ipa_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
+-static int ipa_remove(struct platform_device *pdev)
++static void ipa_remove(struct platform_device *pdev)
+ {
+ 	struct ipa *ipa = dev_get_drvdata(&pdev->dev);
+ 	struct ipa_power *power = ipa->power;
+@@ -966,8 +966,16 @@ static int ipa_remove(struct platform_device *pdev)
+ 			usleep_range(USEC_PER_MSEC, 2 * USEC_PER_MSEC);
+ 			ret = ipa_modem_stop(ipa);
+ 		}
+-		if (ret)
+-			return ret;
++		if (ret) {
++			/*
++			 * Not cleaning up here properly might also yield a
++			 * crash later on. As the device is still unregistered
++			 * in this case, this might even yield a crash later on.
++			 */
++			dev_err(dev, "Failed to stop modem (%pe), leaking resources\n",
++				ERR_PTR(ret));
++			return;
++		}
+ 
+ 		ipa_teardown(ipa);
+ 	}
+@@ -985,17 +993,6 @@ static int ipa_remove(struct platform_device *pdev)
+ 	ipa_power_exit(power);
+ 
+ 	dev_info(dev, "IPA driver removed");
+-
+-	return 0;
+-}
+-
+-static void ipa_shutdown(struct platform_device *pdev)
+-{
+-	int ret;
+-
+-	ret = ipa_remove(pdev);
+-	if (ret)
+-		dev_err(&pdev->dev, "shutdown: remove returned %d\n", ret);
+ }
+ 
+ static const struct attribute_group *ipa_attribute_groups[] = {
+@@ -1008,8 +1005,8 @@ static const struct attribute_group *ipa_attribute_groups[] = {
+ 
+ static struct platform_driver ipa_driver = {
+ 	.probe		= ipa_probe,
+-	.remove		= ipa_remove,
+-	.shutdown	= ipa_shutdown,
++	.remove_new	= ipa_remove,
++	.shutdown	= ipa_remove,
+ 	.driver	= {
+ 		.name		= "ipa",
+ 		.pm		= &ipa_pm_ops,
 -- 
 2.42.0
 
