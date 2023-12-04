@@ -1,130 +1,118 @@
-Return-Path: <netdev+bounces-53469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E1918031C5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:55:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A344080323A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BD4C1C2086F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:55:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5EE1C209AB
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AA523746;
-	Mon,  4 Dec 2023 11:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB9323762;
+	Mon,  4 Dec 2023 12:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="ph2h0h5j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dmE4a9yF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-228.siemens.flowmailer.net (mta-64-228.siemens.flowmailer.net [185.136.64.228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31DEE6
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 03:55:02 -0800 (PST)
-Received: by mta-64-228.siemens.flowmailer.net with ESMTPSA id 2023120411545925d067d20fde17f0a5
-        for <netdev@vger.kernel.org>;
-        Mon, 04 Dec 2023 12:55:00 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=DeAVJVh1/dmfA7n8KCr9e65gohS5SL4YYZz1yRamMmo=;
- b=ph2h0h5jvGxuWKVsNS0TMd+fNjmiTxwfMkny+Ro6YD2+HKnOLi/CClvCRs5tLNpmSk0jh2
- b2Xas1pUz9iB6dBJVNhJnkJ3JLnWbdX0OqFTVBA38AMksw93F1/n2DVd92g1cldYwMwE1iYt
- KYrV+sFm2RBFyevOjoDdSCwH2EABY=;
-Message-ID: <8602c88c98fd722db8e164a1520c56aebfa64db7.camel@siemens.com>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v3 2/3] net: stmmac: add Launch
- Time support to XDP ZC
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Song Yoong Siang
- <yoong.siang.song@intel.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Bjorn Topel
- <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrii Nakryiko
- <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose
- Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, bpf@vger.kernel.org, xdp-hints@xdp-project.net, 
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  linux-kselftest@vger.kernel.org
-Date: Mon, 04 Dec 2023 12:54:56 +0100
-In-Reply-To: <43b01013-e78b-417e-b169-91909c7309b1@kernel.org>
-References: <20231203165129.1740512-1-yoong.siang.song@intel.com>
-	 <20231203165129.1740512-3-yoong.siang.song@intel.com>
-	 <43b01013-e78b-417e-b169-91909c7309b1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED7CE5
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:12:23 -0800 (PST)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5d8d2b5d1b5so4512837b3.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 04:12:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701691943; x=1702296743; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YCGwGXRc8AWPbM6p5oU9fh3ewd5Eki7b3LIN2iWwphM=;
+        b=dmE4a9yFjGI8pQ2+nlgpQFHPrYAnUi74fqeW7poNAqSSwRlAGTx71LdmEAk1GOmZdC
+         9ERD6+esNKsBDcgajnHfmU2tg90Db0bbn2KZVvh78e3IlE+OtBYmB7PMATAdArLBmIIm
+         MGb69z5C7iwFqlBS/pbAe5xfS9dcZM0bqfCaX8nprGiwQbZkSMyWaQ9mbj7JqOKctvHw
+         81QMVsglNjFjMcZ0OSgWO2hPo6my73pgavav6NiXoM8gS+G9PfOkJYrpb+VuXRnD39d+
+         iao9G2YJ4fhWhtR+TyBUhoNDCYNpT2owu1Wb96X6GJ/WlhhnZr0HN6kw23EjyPRDfsdR
+         vymQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701691943; x=1702296743;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YCGwGXRc8AWPbM6p5oU9fh3ewd5Eki7b3LIN2iWwphM=;
+        b=VO24AGP+JxGwyhrk5qztfO27vJn8XOfNfWQcq5eD2/xn3wu8aiW7aT1PNBNSgPgMhj
+         bcenrIkDNro7gRcVYpHFKgzmKaNL9UJlXRhThsB7BAxtSm6OFWxN8YnxOEyGsgdLejGF
+         fvUtDWBO1HHCGtoTlnKUnTsA/zC6educSghDdLaJ3UUbH5uWTgmGEFrk4hzxm55cnnYO
+         1yQJqOnBfH3pk2BPmYhhi9sJmh3CND+a0UwIDdIHSbGnT5W8vDSNOhmcXLBrCM6R6AuW
+         03UaBgPtYkapbjWs1alWgUd6Qkh1TRXScfMCcqE25QFoyflQuDfP2xHfQIAYekY08vWv
+         71Ag==
+X-Gm-Message-State: AOJu0Yzd9oGfaUXyvpBHM2D3Y3OoPtjjmBGdj1S1kUdJL9rq85SJWpND
+	Rr70rDFpsmySicVgnuL3FGFeqe0DcYZ//3I4rRM1/g==
+X-Google-Smtp-Source: AGHT+IEw0iO9X3qjmZ7kps5wExLi/tS9iX/64k7HmK4DPPUnZWl2yEZ04CtiVtXmEBn8yIjNBUovtUz3Q9RNKgEifaA=
+X-Received: by 2002:a81:c84c:0:b0:5ca:61c7:4ac4 with SMTP id
+ k12-20020a81c84c000000b005ca61c74ac4mr1278078ywl.51.1701691942997; Mon, 04
+ Dec 2023 04:12:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
+ <20230607094922.43106896@kernel.org> <20230607171153.GA109456@thinkpad>
+ <20230607104350.03a51711@kernel.org> <20230608123720.GC5672@thinkpad>
+ <20231117070602.GA10361@thinkpad> <20231117162638.7cdb3e7d@kernel.org>
+ <20231127060439.GA2505@thinkpad> <20231127084639.6be47207@kernel.org>
+ <CAA8EJppL0YHHjHj=teCnAwPDkNhwR1EWYuLPnDue1QdfZ3RS_w@mail.gmail.com> <20231128125808.7a5f0028@kernel.org>
+In-Reply-To: <20231128125808.7a5f0028@kernel.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Mon, 4 Dec 2023 14:12:12 +0200
+Message-ID: <CAA8EJpqGAK-7be1v8VktFRPpBHhUTwKJ=6JTTrFaWh341JAQEQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, mhi@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, loic.poulain@linaro.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2023-12-04 at 11:36 +0100, Jesper Dangaard Brouer wrote:
-> On 12/3/23 17:51, Song Yoong Siang wrote:
-> > This patch enables Launch Time (Time-Based Scheduling) support to XDP z=
-ero
-> > copy via XDP Tx metadata framework.
-> >=20
-> > Signed-off-by: Song Yoong Siang<yoong.siang.song@intel.com>
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
->=20
-> As requested before, I think we need to see another driver implementing=
-=20
-> this.
->=20
-> I propose driver igc and chip i225.
+On Tue, 28 Nov 2023 at 22:58, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 28 Nov 2023 22:35:50 +0200 Dmitry Baryshkov wrote:
+> > Also, please excuse me if this was already answered, just for my understanding:
+> > - If we limit functionality to just networking channels which are used
+> > to pass IP data between host and EP, will that be accepted?
+>
+> That's too hard to enforce. We have 200+ drivers, we can't carefully
+> review every single line of code to make sure you stick to the "just
+> networking" promise you make us. Plus the next guy will come and tell
+> us "but you let the company X do it".
+>
+> > - If we were to implement the PCIe networking card running Linux (e.g.
+> > using Freescale PowerQUICC or Cavium Octeon chips), would you also be
+> > opposed to implementing the EP side of the link as the netdev?
+>
+> Yes.
+>
+> It's very tempting to reuse existing code, written for traffic to build
+> a control channel. This becomes painful because:
+>  - the lifetime rules for interfaces to configure vs to pass traffic
+>    are different, which inevitably leads to bugs in common code,
+>  - the use cases are different, which leads to hacks / abuse,
+>    and then it's a lot harder for us to refactor and optimize core
+>    code / data structures,
+>  - IDK how "channel to talk to FW" fits with the normal IP stack...
 
-igc support would be really nice and highly appreciated. There are a
-lot of tests running here with that chip (i225/i226) / driver (igc)
-combination. Let me know if we can support somehow, testing included.
+Ok, here you are talking about the control path. I can then assume
+that you consider it to be fine to use netdev for the EP data path, if
+the control path is kept separate and those two can not be mixed. Does
+that sound correct?
 
->=20
-> The interesting thing for me is to see how the LaunchTime max 1 second
-> into the future[1] is handled code wise. One suggestion is to add a=20
-> section to Documentation/networking/xsk-tx-metadata.rst per driver that=
-=20
-> mentions/documents these different hardware limitations.  It is natural=
-=20
-> that different types of hardware have limitations.  This is a close-to=
-=20
-> hardware-level abstraction/API, and IMHO as long as we document the=20
-> limitations we can expose this API without too many limitations for more=
-=20
-> capable hardware.
->=20
->   [1]=20
-> https://github.com/xdp-project/xdp-project/blob/master/areas/tsn/code01_f=
-ollow_qdisc_TSN_offload.org#setup-code-driver-igb
->=20
-> This stmmac driver and Intel Tiger Lake CPU must also have some limit on=
-=20
-> how long into the future it will/can schedule packets?
->=20
->=20
-> People from xdp-hints list must make their voice hear if they want i210=
-=20
-> and igb driver support, because it have even-more hardware limitations,=
-=20
-> see [1] (E.g. only TX queue 0 and 1 supports LaunchTime). BUT I know=20
-> some have this hardware in production and might be motivated to get a=20
-> functioning driver with this feature?
+>
+> The "FW channel netdevs" exist for decades now, and are very popular
+> with middle box SDKs, I know. Your choices are:
+>  - keep the code out of tree,
+>  - use a generic interface with a strong standard definition, like
+>    virtio, and expect that no customizations will be allowed.
 
-i210 support would be nice, that would allow us to compare some test
-setups with different NICs. In addition it would simplify some test
-setups. For now, IMHO igc is more important.
-
->=20
-> --Jesper
-
+-- 
+With best wishes
+Dmitry
 
