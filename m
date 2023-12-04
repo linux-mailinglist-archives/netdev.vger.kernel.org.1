@@ -1,218 +1,132 @@
-Return-Path: <netdev+bounces-53398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D134802D90
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:51:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5C7802D96
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BE651C20A0A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:51:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5115B20943
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C791EFBE4;
-	Mon,  4 Dec 2023 08:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B597FBE4;
+	Mon,  4 Dec 2023 08:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="FG72TTRU"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="0IDV24f2"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2981911F;
-	Mon,  4 Dec 2023 00:50:53 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 5F36D20B74C0; Mon,  4 Dec 2023 00:50:52 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5F36D20B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1701679852;
-	bh=+82ZmFRWEGviEskvJhBjDw/CYlrBPi2B0lQ9asHWocA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FG72TTRUO8BK7F1aqqE2fnikQCMuZI4qTS0WgkBu4sSkEAW7yIXTzXy58+I+LBTMg
-	 kkJKNVQUYwaUGWbUXEG3eVxLzPlSl5g2cR6R7R/aUrH39vl87fQSIIf0fb9NBflrZC
-	 mzKhFP068KZ3yBveHtZl2aXbvLv1fLkEtkkui8kg=
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	yury.norov@gmail.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: sch^Crabarti@microsoft.com,
-	paulros@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH V4 net-next] net: mana: Assigning IRQ affinity on HT cores
-Date: Mon,  4 Dec 2023 00:50:41 -0800
-Message-Id: <1701679841-9359-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AAF185
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 00:52:20 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50bf26b677dso874438e87.2
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 00:52:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701679938; x=1702284738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q0hnHEeYG3nS6v6F/DxWFEbRM3Z+Kp9WnIOWyribGJY=;
+        b=0IDV24f2s3qu8XUmctBo6XkWLd5Eloi9YBP029su2E2ouVqD4FFI2CNmsIR1K25UZX
+         4C9P3K0HiIk+YKb/tNRn6UjNHzFDCf3Hgx17tsHHNyHZLzYXoxAvWbXAmDYvyn6cnxjE
+         oav/5wzB7kqHqKGTIseeVy5mVBGayWJ5O2+qwxr+UENbcsLdoyHbric3lG5d0jzAZOVZ
+         Uq3lhqEzNaWwDellMPvXSEFByofgBTkdWTg/kiaRiGaGVQbjqKrw4rV+4qamdRtxZ8gn
+         YUZRanyUuJ2bMg/y4R9Wr21jV9LecFHOdm1frUqEtTBdqaHXxbBFtzFkRX//cRnW4DbO
+         3A3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701679938; x=1702284738;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q0hnHEeYG3nS6v6F/DxWFEbRM3Z+Kp9WnIOWyribGJY=;
+        b=HAjQy4CPe/VwZtyUNvbCTvk3ySwnINt3lDei+/DdLy7TXJxLp1h5865hc9puIVDMXV
+         oDVZ6k7NLbS7dfocrUMlXKwDFPHi6VVEg+ShrkswKz3ONIOvSU3nE7VZ90bQSU5uijxN
+         RKa2yWD1gH4YUhTYPbigC/LNIi6s9RJdWNhsrr3iNG0Nr1G3/U16exBRAJNZNIO88+6U
+         N/Jb3Tsc9FGhci5GB3dMNCGqSRx3L/BC2k1sQ+U5Pj3z7LK4s7PiqiLQjTf8hRM3yY3N
+         cq8EPBmgCDfqE3OPkbdvkydAeL/PiUM6Izp9TxYGUVXWwK9OxfRo7VK6spBn+TF0eOab
+         vegg==
+X-Gm-Message-State: AOJu0YxHxpFN4PpAmYxpZF31xQ6An6QZoV9/VXZTs/DOaTptN6iDxUHg
+	NjIpE8cvRT4EY5IxYl+5Gxtw95WfuJN9hE8MJwM=
+X-Google-Smtp-Source: AGHT+IH/90r4DEeXfOfhkrLdxjnzsegXFAOyQZ0LYKpQwEXbQzNRcXkHmKZq1hFf7gIesXJx6xz5aA==
+X-Received: by 2002:ac2:5a4d:0:b0:50b:f69f:b428 with SMTP id r13-20020ac25a4d000000b0050bf69fb428mr325410lfn.27.1701679937505;
+        Mon, 04 Dec 2023 00:52:17 -0800 (PST)
+Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id m16-20020a056512015000b0050bfe37d28asm22833lfo.34.2023.12.04.00.52.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 00:52:16 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, andrew@lunn.ch, gregory.clement@bootlin.com,
+ sebastian.hesselbarth@gmail.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: mvmdio: Avoid excessive sleeps in
+ polled mode
+In-Reply-To: <20231202124508.3ac34fcf@kernel.org>
+References: <20231201173545.1215940-1-tobias@waldekranz.com>
+ <20231201173545.1215940-3-tobias@waldekranz.com>
+ <20231202124508.3ac34fcf@kernel.org>
+Date: Mon, 04 Dec 2023 09:52:15 +0100
+Message-ID: <87a5qq9wow.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Existing MANA design assigns IRQ to every CPU, including sibling
-hyper-threads. This may cause multiple IRQs to be active simultaneously
-in the same core and may reduce the network performance with RSS.
+On l=C3=B6r, dec 02, 2023 at 12:45, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Fri,  1 Dec 2023 18:35:44 +0100 Tobias Waldekranz wrote:
+>> @@ -94,23 +88,24 @@ static int orion_mdio_wait_ready(const struct orion_=
+mdio_ops *ops,
+>>  				 struct mii_bus *bus)
+>>  {
+>>  	struct orion_mdio_dev *dev =3D bus->priv;
+>> -	unsigned long timeout =3D usecs_to_jiffies(MVMDIO_SMI_TIMEOUT);
+>> -	unsigned long end =3D jiffies + timeout;
+>> -	int timedout =3D 0;
+>> +	unsigned long end, timeout;
+>> +	int done, timedout;
+>>=20=20
+>> -	while (1) {
+>> -	        if (ops->is_done(dev))
+>> +	if (dev->err_interrupt <=3D 0) {
+>> +		if (!read_poll_timeout_atomic(ops->is_done, done, done, 2,
+>> +					      MVMDIO_SMI_TIMEOUT, false, dev))
+>>  			return 0;
+>> -	        else if (timedout)
+>> -			break;
+>> -
+>> -	        if (dev->err_interrupt <=3D 0) {
+>> -			usleep_range(ops->poll_interval_min,
+>> -				     ops->poll_interval_max);
+>> +	} else {
+>> +		timeout =3D usecs_to_jiffies(MVMDIO_SMI_TIMEOUT);
+>> +		end =3D jiffies + timeout;
+>> +		timedout =3D 0;
+>> +
+>> +		while (1) {
+>> +			if (ops->is_done(dev))
+>> +				return 0;
+>> +			else if (timedout)
+>> +				break;
+>>=20=20
+>> -			if (time_is_before_jiffies(end))
+>> -				++timedout;
+>> -	        } else {
+>>  			/* wait_event_timeout does not guarantee a delay of at
+>>  			 * least one whole jiffie, so timeout must be no less
+>>  			 * than two.
+>
+> drivers/net/ethernet/marvell/mvmdio.c:91:16: warning: variable 'end' set =
+but not used [-Wunused-but-set-variable]
+>    91 |         unsigned long end, timeout;
+>       |                       ^
 
-Improve the performance by assigning IRQ to non sibling CPUs in local
-NUMA node.
+Rookie mistake, sorry about that.
 
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
-V3 -> V4:
-* Used for_each_numa_hop_mask() macro and simplified the code.
-Thanks to Yury Norov for the suggestion.
-* Added code to assign hwc irq separately in mana_gd_setup_irqs.
-
-V2 -> V3:
-* Created a helper function to get the next NUMA with CPU.
-* Added some error checks for unsuccessful memory allocation.
-* Fixed some comments on the code.
-
-V1 -> V2:
-* Simplified the code by removing filter_mask_list and using avail_cpus.
-* Addressed infinite loop issue when there are numa nodes with no CPUs.
-* Addressed uses of local numa node instead of 0 to start.
-* Removed uses of BUG_ON.
-* Placed cpus_read_lock in parent function to avoid num_online_cpus
-  to get changed before function finishes the affinity assignment.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 70 +++++++++++++++++--
- 1 file changed, 63 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 6367de0c2c2e..2194a53cce10 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1243,15 +1243,57 @@ void mana_gd_free_res_map(struct gdma_resource *r)
- 	r->size = 0;
- }
- 
-+static int irq_setup(int *irqs, int nvec, int start_numa_node)
-+{
-+	int i = 0, cpu, err = 0;
-+	const struct cpumask *node_cpumask;
-+	unsigned int  next_node = start_numa_node;
-+	cpumask_var_t visited_cpus, node_cpumask_temp;
-+
-+	if (!zalloc_cpumask_var(&visited_cpus, GFP_KERNEL)) {
-+		err = ENOMEM;
-+		return err;
-+	}
-+	if (!zalloc_cpumask_var(&node_cpumask_temp, GFP_KERNEL)) {
-+		err = -ENOMEM;
-+		return err;
-+	}
-+	rcu_read_lock();
-+	for_each_numa_hop_mask(node_cpumask, next_node) {
-+		cpumask_copy(node_cpumask_temp, node_cpumask);
-+		for_each_cpu(cpu, node_cpumask_temp) {
-+			cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
-+				       topology_sibling_cpumask(cpu));
-+			irq_set_affinity_and_hint(irqs[i], cpumask_of(cpu));
-+			if (++i == nvec)
-+				goto free_mask;
-+			cpumask_set_cpu(cpu, visited_cpus);
-+			if (cpumask_empty(node_cpumask_temp)) {
-+				cpumask_copy(node_cpumask_temp, node_cpumask);
-+				cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
-+					       visited_cpus);
-+				cpu = 0;
-+			}
-+		}
-+	}
-+free_mask:
-+	rcu_read_unlock();
-+	free_cpumask_var(visited_cpus);
-+	free_cpumask_var(node_cpumask_temp);
-+	return err;
-+}
-+
- static int mana_gd_setup_irqs(struct pci_dev *pdev)
- {
--	unsigned int max_queues_per_port = num_online_cpus();
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
-+	unsigned int max_queues_per_port;
- 	struct gdma_irq_context *gic;
- 	unsigned int max_irqs, cpu;
--	int nvec, irq;
-+	int nvec, *irqs, irq;
- 	int err, i = 0, j;
- 
-+	cpus_read_lock();
-+	max_queues_per_port = num_online_cpus();
- 	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
- 		max_queues_per_port = MANA_MAX_NUM_QUEUES;
- 
-@@ -1261,6 +1303,11 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
- 	if (nvec < 0)
- 		return nvec;
-+	irqs = kmalloc_array(max_queues_per_port, sizeof(int), GFP_KERNEL);
-+	if (!irqs) {
-+		err = -ENOMEM;
-+		goto free_irq_vector;
-+	}
- 
- 	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
- 				   GFP_KERNEL);
-@@ -1287,21 +1334,28 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 			goto free_irq;
- 		}
- 
--		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-+		if (!i) {
-+			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-+			cpu = cpumask_local_spread(i, gc->numa_node);
-+			irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-+		} else {
-+			irqs[i - 1] = irq;
-+			err = request_irq(irqs[i - 1], mana_gd_intr, 0, gic->name, gic);
-+		}
- 		if (err)
- 			goto free_irq;
--
--		cpu = cpumask_local_spread(i, gc->numa_node);
--		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
- 	}
- 
-+	err = irq_setup(irqs, max_queues_per_port, gc->numa_node);
-+	if (err)
-+		goto free_irq;
- 	err = mana_gd_alloc_res_map(nvec, &gc->msix_resource);
- 	if (err)
- 		goto free_irq;
- 
- 	gc->max_num_msix = nvec;
- 	gc->num_msix_usable = nvec;
--
-+	cpus_read_unlock();
- 	return 0;
- 
- free_irq:
-@@ -1314,8 +1368,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 	}
- 
- 	kfree(gc->irq_contexts);
-+	kfree(irqs);
- 	gc->irq_contexts = NULL;
- free_irq_vector:
-+	cpus_read_unlock();
- 	pci_free_irq_vectors(pdev);
- 	return err;
- }
--- 
-2.34.1
-
+Looking at it again, I think I was too scared of touching the original
+interrupt path, as I have no means of testing it (no hardware). I will
+try to simplify this in v2, and hope that someone else can test it.
 
