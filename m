@@ -1,132 +1,140 @@
-Return-Path: <netdev+bounces-53558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98CE803ABC
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:47:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F2D38039F5
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EE2F1F2125C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:47:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D3BC1F2117B
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8918E2E65A;
-	Mon,  4 Dec 2023 16:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0BA2D784;
+	Mon,  4 Dec 2023 16:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3LAZf6h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYfhrR1+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0A9B0;
-	Mon,  4 Dec 2023 08:47:20 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-40c09f4814eso18431955e9.1;
-        Mon, 04 Dec 2023 08:47:20 -0800 (PST)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20645C6
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 08:18:28 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-40c09ba723eso16159845e9.2
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 08:18:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701708439; x=1702313239; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=olO3IQ86VFY9/5sfsHJJjYomYTJFvoq2c3DIt7TVmCY=;
-        b=h3LAZf6ha6yS1qtbRHFvz0MpWHvC99QYqsgkscbaE5hlIQW65iIrB4903S7ZeX8WVS
-         Pia+keFACdlFDESKDhc1z4RhLUULkerQ6RXspKm1mcs9JJ0wOF3Z8iZ6d4NWjw4aJh3a
-         tn6LLWsY8PKKxOc1Za/2o2r606GizsPhUWP1pNHrlSaUTfgyOKrmj4ff829S71gVfdvs
-         yw613Fh77YRSm+POamUkyE0FaqmChKyHEm3WNYArj5T+VDpD8LlAkgNCA2Qm1qG64k9S
-         n/o2BBnR6HfDa8YHW/LOBVJhlU2C1LFmRaBUM5mFvL4fsv4xOFjSIbGTcqcHQ/T3RAkB
-         tehw==
+        d=gmail.com; s=20230601; t=1701706706; x=1702311506; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V6gTDKa8XeLwDn2k99kZp/LlfNJLkZGNrQil7SG5bEc=;
+        b=WYfhrR1+OPfmqGw/t6HMJfonCTGUyIXG9ucruWmMZz4MQ+R3PPT9xH9cj4OThx8HBO
+         DiwcabmyKZTqao4uEjFcK65Ec1rMtu9cgb0lsECJJode7yhZC+7ynugnBtmSmNxdVIHa
+         JCwpFBeY0tE1hHn4SP6iXr+445OETsIIWhNK9Mnr+t7qKv3f9w4u0eJkRsgfuLNYyTL+
+         ytbF1DL7wbRvAznzDavqmZmohB2XRXbaPv7LVy+nr1GkYW3FujXCfxflm3a/3AqVcm6s
+         daTevcYslWkYsQRExmWsVmv80DwyKKX5Rtj0SbBdnIodkr2/LWTtZ0FSfU6c2RLewBu+
+         PtJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701708439; x=1702313239;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1701706706; x=1702311506;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=olO3IQ86VFY9/5sfsHJJjYomYTJFvoq2c3DIt7TVmCY=;
-        b=BrLTuNEE4U0i7toGwwwSZmTKp2eooPLvLP8UFjtU1uYwXlcRUrDpohxLhsOH+vpYLW
-         rF7xj3cVAYX7IJXNoKAXxZ7cyRE7f1aABcFF3C0BEA8zLU4GANJhn9JZSMS9bRt8svr6
-         9z2rlMaqxOU6C5sIj6eNc1oBTiEWKqJ4+NFqH5Hqel2Q3Ijw8MKPM2hEwQUi4dkPudyX
-         G5+LvG7NO7B0y+zyTaW1Wqm6xoqwallHf0nF7gzkYRopXbdCAiGrrlFGnb4v6bWSUfNk
-         VWA9ToIIFqKdAwUwFWVduN4eL3yZfqv1BaOADjNUUcSXC8qIbNSPZuYv+N8S55fzC8ca
-         Fwvw==
-X-Gm-Message-State: AOJu0YydYl2vd+kix/4oXr2b2jEk8wzcLpAfy9/eHOLZkOTnc8sXafxC
-	PunAdcnFYgZIDZvaqwBVd3o=
-X-Google-Smtp-Source: AGHT+IHY4++uBeyARvWwSTPeRaPMjjmyG45iKkunlVEDItMH7lpKdpvgJM6w9z9kK2qZgcFF3t1MYg==
-X-Received: by 2002:a05:600c:3109:b0:40b:5e1d:839b with SMTP id g9-20020a05600c310900b0040b5e1d839bmr2703575wmo.47.1701708439332;
-        Mon, 04 Dec 2023 08:47:19 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:d9c9:f651:32f4:3bc])
-        by smtp.gmail.com with ESMTPSA id bg36-20020a05600c3ca400b003fe1fe56202sm15881936wmb.33.2023.12.04.08.47.17
+        bh=V6gTDKa8XeLwDn2k99kZp/LlfNJLkZGNrQil7SG5bEc=;
+        b=nRt8nTCnMPuZBVPIGPxpLxeFAy7VC884yrB6/9oAY5g1ZiqcGJcCbtWjvAPnYB2TWA
+         TOJnxyihwvo6kx9Yvh+NiAAKTT/MeXZVt8yTE7vOGNYPtu5l+SqOcbPEfJ2qFeeqVaFO
+         xIHN77QyL9SeQOXtiIYrlOMCMXZ81kdPEkNnztHZ5QqLeuPoLaxN8JpScd9Edq7BA/B2
+         kWyW+K3+e7MXTPiPb7QOr2/vdtkBKjbTUDdiITGPQxuUmZsJopsa94irFyuByZSGQS/Q
+         5kNGmWTKXUM9LHEYl500bvK9l9iMom/jpen0rk4YcGSkDxASO0CeRoUR9XTjuR7XzdpU
+         339w==
+X-Gm-Message-State: AOJu0Yx7pSJbiBnryfkNOxFj6NbI8O7Z/YHmSSyj0TXhiNv3nGaI+yA8
+	N0elu4P42qvvvfnX5ZbM+Pc=
+X-Google-Smtp-Source: AGHT+IFmwFW4URqc/Gws4o01/W3ngf0MrIP5qqBSTWyX28iDlFN0lkOgCgxM2c0Nz8LNo4ZNUjHkQA==
+X-Received: by 2002:a05:600c:450f:b0:40a:5c71:2c3e with SMTP id t15-20020a05600c450f00b0040a5c712c3emr2348687wmo.19.1701706706235;
+        Mon, 04 Dec 2023 08:18:26 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id fa10-20020a05600c518a00b00405442edc69sm19161745wmb.14.2023.12.04.08.18.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 08:47:18 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
- <jacob.e.keller@intel.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 4/6] tools/net/ynl: Add binary and pad
- support to structs for tc
-In-Reply-To: <20231201180646.7d3c851f@kernel.org> (Jakub Kicinski's message of
-	"Fri, 1 Dec 2023 18:06:46 -0800")
-Date: Mon, 04 Dec 2023 16:18:14 +0000
-Message-ID: <m28r6a6iwp.fsf@gmail.com>
-References: <20231130214959.27377-1-donald.hunter@gmail.com>
-	<20231130214959.27377-5-donald.hunter@gmail.com>
-	<20231201180646.7d3c851f@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Mon, 04 Dec 2023 08:18:25 -0800 (PST)
+Date: Mon, 4 Dec 2023 18:18:23 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
+	f.fainelli@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: dsa: mv88e6xxx: Create API to read a
+ single stat counter
+Message-ID: <20231204161823.eyac4mwjakizygmz@skbuf>
+References: <20231201125812.1052078-1-tobias@waldekranz.com>
+ <20231201125812.1052078-1-tobias@waldekranz.com>
+ <20231201125812.1052078-2-tobias@waldekranz.com>
+ <20231201125812.1052078-2-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231201125812.1052078-2-tobias@waldekranz.com>
+ <20231201125812.1052078-2-tobias@waldekranz.com>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Fri, Dec 01, 2023 at 01:58:09PM +0100, Tobias Waldekranz wrote:
+> This change contains no functional change. We simply push the hardware
+> specific stats logic to a function reading a single counter, rather
+> than the whole set.
+> 
+> This is a preparatory change for the upcoming standard ethtool
+> statistics support (i.e. "eth-mac", "eth-ctrl" etc.).
+> 
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> ---
 
-> On Thu, 30 Nov 2023 21:49:56 +0000 Donald Hunter wrote:
->> The tc netlink-raw family needs binary and pad types for several
->> qopt C structs. Add support for them to ynl.
->
-> Nice reuse of the concept of "pad", I don't see why not:
->
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
->
->> +                value = msg.raw[offset:offset+m.len]
->
-> What does Python style guide say about spaces around '+' here?
-> I tend to use C style, no idea if it's right.
+I think I like this patch set. Some nitpicks below.
 
-The relevant section seems to be this:
+> -static int mv88e6320_stats_get_stats(struct mv88e6xxx_chip *chip, int port,
+> -				     uint64_t *data)
+> +static int mv88e6xxx_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
+> +				    const struct mv88e6xxx_hw_stat *stat,
+> +				    uint64_t *data)
+>  {
+> -	return mv88e6xxx_stats_get_stats(chip, port, data,
+> -					 STATS_TYPE_BANK0 | STATS_TYPE_BANK1,
+> -					 MV88E6XXX_G1_STATS_OP_BANK_1_BIT_9,
+> -					 MV88E6XXX_G1_STATS_OP_HIST_RX_TX);
+> +	int ret = 0;
+> +
+> +	if (chip->info->ops->stats_get_stat) {
+> +		mv88e6xxx_reg_lock(chip);
+> +		ret = chip->info->ops->stats_get_stat(chip, port, stat, data);
+> +		mv88e6xxx_reg_unlock(chip);
+> +	}
 
-  However, in a slice the colon acts like a binary operator, and should
-  have equal amounts on either side (treating it as the operator with
-  the lowest priority). In an extended slice, both colons must have the
-  same amount of spacing applied. Exception: when a slice parameter is
-  omitted, the space is omitted:
+There is no chip->info->ops which does not provide stats_get_stat().
+As a separate change, I suppose you could drop the "if".
 
-  # Correct:
-  ham[1:9], ham[1:9:3], ham[:9:3], ham[1::3], ham[1:9:]
-  ham[lower:upper], ham[lower:upper:], ham[lower::step]
-  ham[lower+offset : upper+offset]
-  ham[: upper_fn(x) : step_fn(x)], ham[:: step_fn(x)]
-  ham[lower + offset : upper + offset]
+> +
+> +	return ret;
+>  }
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+> index 44383a03ef2f..b0dfbcae0be9 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.h
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.h
+> @@ -574,8 +585,9 @@ struct mv88e6xxx_ops {
+>  	/* Return the number of strings describing statistics */
+>  	int (*stats_get_sset_count)(struct mv88e6xxx_chip *chip);
+>  	int (*stats_get_strings)(struct mv88e6xxx_chip *chip,  uint8_t *data);
+> -	int (*stats_get_stats)(struct mv88e6xxx_chip *chip,  int port,
+> -			       uint64_t *data);
+> +	int (*stats_get_stat)(struct mv88e6xxx_chip *chip,  int port,
+> +			      const struct mv88e6xxx_hw_stat *stat,
+> +			      uint64_t *data);
 
-  # Wrong:
-  ham[lower + offset:upper + offset]
-  ham[1: 9], ham[1 :9], ham[1:9 :3]
-  ham[lower : : step]
-  ham[ : upper]
+Since you are touching this function prototype anyway, I guess you could
+change its return type. Int assumes it can also return a negative error
+code, which it doesn't. Maybe size_t to denote that it returns an unsigned
+count of statistics?
 
-On that basis I could change it to:
+Also, there is an extraneous space before the "int port" argument which
+you could fix up now.
 
-  (a) value = msg.raw[offset : offset+m.len]
-
-or:
-
-  (b) value = msg.raw[offset : offset + m.len]
-
-But the existing convention in the code is a mix of these styles:
-
-  raw[offset:offset + 4]
-  raw[offset:offset+m['len']]
-
-Happy to go with whatever preference, though maximising whitespace per
-(b) follows python style _and_ C style?
-
-Also happy to make it consistent across the file (in a separate patch)?
+>  	int (*set_cpu_port)(struct mv88e6xxx_chip *chip, int port);
+>  	int (*set_egress_port)(struct mv88e6xxx_chip *chip,
+>  			       enum mv88e6xxx_egress_direction direction,
 
