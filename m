@@ -1,158 +1,120 @@
-Return-Path: <netdev+bounces-53594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 492CF803D95
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:54:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CFF803DE3
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7CFD1F2108C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:54:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0528B1F212BD
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1803F2F85F;
-	Mon,  4 Dec 2023 18:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BB930F90;
+	Mon,  4 Dec 2023 18:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="B5selm5V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gVppsoUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-71.smtpout.orange.fr [80.12.242.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A3E6192
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:54:28 -0800 (PST)
-Received: from [192.168.1.18] ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id AE5FrwDQ5Moj4AE5Frxl1d; Mon, 04 Dec 2023 19:54:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1701716065;
-	bh=bA4kX9rxibdxURNPiiRaVXTSF7jjxSA+0KGcHMkxAZI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=B5selm5VlHoKf3GqZnp0ROHcZkYFo/nfYqc6FE3VSbB8dLja2HdePtpnSyUawFxEq
-	 N8RlfWQj4TNrL1ob16+vh9b2jFuqOM90ro9Mce7Q5gzzgWZ31T68bzHmZ2iBsHLAFc
-	 b5e66ZS5QQML+aMN+ZuHfLd7zdkvYJzeivETaGHhpEe5JANuiqJYM1VmGdL8Aw7DOY
-	 qEJGfeeuQQwL6kfhnfwyqdwFTKCT28r0tH9vA7jTbkaw0Rq9su4lg35c3DyLLYnGe6
-	 GBOyrCRHfZIbZEHje5zQ7/YbOx/BIvNd/juKvGJhIZgrCf3DSzYYvnkF/ZMOvHXkjH
-	 Uk9rae5k0Wmiw==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 04 Dec 2023 19:54:25 +0100
-X-ME-IP: 92.140.202.140
-Message-ID: <8f5f9a4b-f809-44cb-8f26-05e39b29dfb6@wanadoo.fr>
-Date: Mon, 4 Dec 2023 19:54:20 +0100
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA48D7
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:59:28 -0800 (PST)
+Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-464a3b84ef7so63562137.1
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 10:59:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701716367; x=1702321167; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OhTNasiWgh+dkfX0Dm+ISFeJznRbPndi9WOsk0B0xUY=;
+        b=gVppsoUuN4dqz8Syy1kQUrjoI9C/nqzgvQfx9nxccS1+RNS89BFXrTngJIOrk1P6If
+         VplsZJ65o6IHbLWieGBql0IaVkQDWogVu+eI8is0EtgTP0CONumAwdj4iJfQys0/4eMk
+         Iryix0SeSnwxRXh2vSivhXqpgzPjawruaCoQ5ylbQvbXZ9QuXZa0BfcgdycQDQSAHn61
+         a4nSahHkBplyN0wqnAtQotFnTvEPpC6jXp5q+DbUtCi9EowADUZmq8jeuIr89+F+UB6n
+         xbQCIRISWxN9a3sFhAUCq3AEFFWk6PnBYeV0Hv2gnLd7K9HhxKM6WjOEUdOz9tG8WSi5
+         LU/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701716367; x=1702321167;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OhTNasiWgh+dkfX0Dm+ISFeJznRbPndi9WOsk0B0xUY=;
+        b=HOwTGUSohm5v3Ei/lpZBz+afhjYigzMy86X3iExJBD3H9phKGy0TUge+xuMuEznNWZ
+         UVcn/kTJZQ4yXWBFpqDS1ySiyjHGc3EqvTxW9naiuCSwiMqqMmKPPCxix/DydIVzVbJi
+         aydreYlcHCSXjBzeY8iOteqBDprXbuLTL6DqwWKoD181fKXSIGpr52NMevl640OYil7C
+         YUXUyPHSCh8BD+JKLeXorA3JY7ku3ZLhCQLH9CEjXE9k3NDvS2mwu1HrHiVKn+xcrFTT
+         ic/WH1az/Pu2WTTaCu0Jk+UPH4waru5nnMAwQ/uhkDNP3XZkVYjx/1cjIT6aO1U9vcTJ
+         v7ZQ==
+X-Gm-Message-State: AOJu0YwAhQRfilgS1lnKhzBplrL1W1M9oEhOnmVUvXA/Hjtn+P1j2wAY
+	kMdUbA1cq9f6oQAcaf0gGIro1Ub4IAvZgUFmgV8iuw==
+X-Google-Smtp-Source: AGHT+IEfIkpQz/M9GZdrLZVheDNrcWpdTi70JO843+0WuxJNqy5io3mjCriO6X0r0jWpNfjDIVrEn82cF2d3kchgVn8=
+X-Received: by 2002:a05:6102:a53:b0:452:6d82:56e3 with SMTP id
+ i19-20020a0561020a5300b004526d8256e3mr383189vss.6.1701716367163; Mon, 04 Dec
+ 2023 10:59:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [v2] net: hns3: reduce stack usage in
- hclge_dbg_dump_tm_pri()
-To: Arnd Bergmann <arnd@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Jijie Shao <shaojijie@huawei.com>,
- Hao Chen <chenhao418@huawei.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231204085735.4112882-1-arnd@kernel.org>
-Content-Language: fr
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20231204085735.4112882-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231130133630.192490507@infradead.org> <20231130134204.136058029@infradead.org>
+ <CAADnVQJqE=aE7mHVS54pnwwnDS0b67iJbr+t4j5F4HRyJSTOHw@mail.gmail.com>
+ <20231204091334.GM3818@noisy.programming.kicks-ass.net> <20231204111128.GV8262@noisy.programming.kicks-ass.net>
+ <20231204125239.GA1319@noisy.programming.kicks-ass.net> <ZW4LjmUKj1q6RWdL@krava>
+ <20231204181614.GA7299@noisy.programming.kicks-ass.net> <20231204183354.GC7299@noisy.programming.kicks-ass.net>
+In-Reply-To: <20231204183354.GC7299@noisy.programming.kicks-ass.net>
+From: Sami Tolvanen <samitolvanen@google.com>
+Date: Mon, 4 Dec 2023 10:58:48 -0800
+Message-ID: <CABCJKudYc5GtO7TLV=d0-ZYFfBxofrV3-q1vpsaT3MD7oTKpnA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] x86/cfi,bpf: Fix BPF JIT call
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Song Liu <song@kernel.org>, Song Liu <songliubraving@meta.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	linux-arch <linux-arch@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Joao Moreira <joao@overdrivepizza.com>, 
+	Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 04/12/2023 à 09:57, Arnd Bergmann a écrit :
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> This function exceeds the stack frame warning limit:
-> 
-> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c: In function 'hclge_dbg_dump_tm_pri':
-> drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c:1039:1: error: the frame size of 1408 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> 
-> Use dynamic allocation for the largest stack object instead. It
-> would be nice to rewrite this file to completely avoid the extra
-> buffer and just use the one that was already allocated by debugfs,
-> but that is a much larger change.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: fix error handling leak
-> ---
->   .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 21 ++++++++++++-------
->   1 file changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> index ff3f8f424ad9..8f94e13c1edf 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> @@ -981,7 +981,7 @@ static const struct hclge_dbg_item tm_pri_items[] = {
->   
->   static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   {
-> -	char data_str[ARRAY_SIZE(tm_pri_items)][HCLGE_DBG_DATA_STR_LEN];
-> +	char *data_str;
->   	struct hclge_tm_shaper_para c_shaper_para, p_shaper_para;
->   	char *result[ARRAY_SIZE(tm_pri_items)], *sch_mode_str;
->   	char content[HCLGE_DBG_TM_INFO_LEN];
-> @@ -992,8 +992,13 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   	if (ret)
->   		return ret;
->   
-> +	data_str = kcalloc(ARRAY_SIZE(tm_pri_items), HCLGE_DBG_DATA_STR_LEN,
-> +			   GFP_KERNEL);
-> +	if (!data_str)
-> +		return -ENOMEM;
-> +
->   	for (i = 0; i < ARRAY_SIZE(tm_pri_items); i++)
-> -		result[i] = &data_str[i][0];
-> +		result[i] = &data_str[i * HCLGE_DBG_DATA_STR_LEN];
->   
->   	hclge_dbg_fill_content(content, sizeof(content), tm_pri_items,
->   			       NULL, ARRAY_SIZE(tm_pri_items));
-> @@ -1002,23 +1007,23 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   	for (i = 0; i < pri_num; i++) {
->   		ret = hclge_tm_get_pri_sch_mode(hdev, i, &sch_mode);
->   		if (ret)
-> -			return ret;
-> +			goto out;
->   
->   		ret = hclge_tm_get_pri_weight(hdev, i, &weight);
->   		if (ret)
-> -			return ret;
-> +			goto out;
->   
->   		ret = hclge_tm_get_pri_shaper(hdev, i,
->   					      HCLGE_OPC_TM_PRI_C_SHAPPING,
->   					      &c_shaper_para);
->   		if (ret)
-> -			return ret;
-> +			goto out;
->   
->   		ret = hclge_tm_get_pri_shaper(hdev, i,
->   					      HCLGE_OPC_TM_PRI_P_SHAPPING,
->   					      &p_shaper_para);
->   		if (ret)
-> -			return ret;
-> +			goto out;
->   
->   		sch_mode_str = sch_mode & HCLGE_TM_TX_SCHD_DWRR_MSK ? "dwrr" :
->   			       "sp";
-> @@ -1035,7 +1040,9 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   		pos += scnprintf(buf + pos, len - pos, "%s", content);
->   	}
->   
-> -	return 0;
-> +out:
-> +	kfree(data_str);
-> +	return ret;
->   }
->   
->   static const struct hclge_dbg_item tm_qset_items[] = {
+On Mon, Dec 4, 2023 at 10:34=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
+g> wrote:
+>
+> So afaict this is used through bpf_for_each_map_elem(), where the
+> argument still is properly callback_fn. However, in the desriptor
+> bpf_for_each_map_elem_proto the argument gets described as:
+> ARG_PTR_TO_FUNC, which in turn has a comment like:
+>
+>   ARG_PTR_TO_FUNC,        /* pointer to a bpf program function */
+>
+> Which to me sounds like there is definite type punning involved. The
+> call in bpf_for_each_array_elem() is a regular C indirect call, which
+> gets adorned with the kCFI magic.
+>
+> But I doubt the BPF function that gets used gets the correct matching
+> bits on.
+>
+> TL;DR, I think this is a pre-existing problem with kCFI + eBPF and not
+> caused by my patches.
 
-Hi,
-could :
-    pos += scnprintf(buf + pos, len - pos, "%s", <something>);
-be more widely used to avoid the alloc()/free() + copy of strings?
+It is a pre-existing problem, I ran into the same failures when I
+looked into this briefly last year:
 
-CJ
+https://github.com/ClangBuiltLinux/linux/issues/1727
 
+In addition to bpf_for_each_array_elem, a few other callers also use
+the same function pointer type that doesn't match cfi_bpf_hash.
+
+Sami
 
