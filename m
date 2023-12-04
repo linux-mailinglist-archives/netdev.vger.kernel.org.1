@@ -1,30 +1,60 @@
-Return-Path: <netdev+bounces-53515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE266803783
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:51:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8743D803798
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:53:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFE41C2093E
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:51:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 113D5B20837
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA6928364;
-	Mon,  4 Dec 2023 14:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C7428DDC;
+	Mon,  4 Dec 2023 14:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ov+fBVkk"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EAC5D3;
-	Mon,  4 Dec 2023 06:50:58 -0800 (PST)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SkRLz181JzShMs;
-	Mon,  4 Dec 2023 22:46:35 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 22:50:55 +0800
-Message-ID: <7df7cfcb-d39b-4643-a378-a18b8d2b5b35@huawei.com>
-Date: Mon, 4 Dec 2023 22:50:55 +0800
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29215B9
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 06:52:57 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ce4d4c5ea2so689119b3a.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 06:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701701576; x=1702306376; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0Inyjuwt7vULPfDbeZtTpCSklV9diwHLHBhuIy0ynU=;
+        b=ov+fBVkkzFkqQvhgOI/ESaplE85UN9g7FxgueC+EX3gFq8XWMy0cWKDCcVbz0CWTLY
+         e47ArnfQyuUXK30TybawYcXMLJ6PBxMv5pyfo3ENEk/W2xB12rixNZA9CEA9RYac2DPl
+         6L8qhPM2VaEZOje6RxncVyMyjUPZr8YJ4SihISe1m40z8rGeUUWEq3AuwefDJBOmvM9h
+         X4Ogdw5v/PmBz+qItE+NBVEMMxgptva5tUGx232XcR0cAHX75KGNb/vUjX8v/WgdYx/C
+         6gdeZVcNoxVuKWyK1wMVoni1eWuGrVIbg1XJhCIoXjhKpRavMcHfSkOWC/8JTa47e6Ak
+         0bNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701701576; x=1702306376;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0Inyjuwt7vULPfDbeZtTpCSklV9diwHLHBhuIy0ynU=;
+        b=numB2O1gGw5IGBeC6z8ggBV3VJ3YyR4kxI8bl7N/qpG1YZeXGD9lHcCtYX1MWb23Ow
+         MmtceyXNIDKjhfzy8TYZvQebALrzRWeBvP7QhmspAIzS/ZJcHcivxMOmx0vtnKbwsxVB
+         RFrDHPjx8u46kZBIu/GwELHWIWZY0hm3tpdFC5gkD+XCYjs2TzNV51/4QY1vQTSPk81d
+         kX2RfE+TIEesoHSqcB4hELtrXLgupKM7S/ZVkLaOmjC1Xmu3STp6kj4kSD2MYoXjebG2
+         As5VQ/Awpp6VBkFRUU3lfakAztNFHDnDaOz3ud+vPtBjkHzL0P47tOHpoefsqMJ+tNjP
+         lrkA==
+X-Gm-Message-State: AOJu0YzDnmEKfvSWZC2wgRt7GepQ3P2+FfvIAW85NbgiyVbar2ziK6L/
+	Q7HAnCN/1yfCJpdqsw37NIP6Lg==
+X-Google-Smtp-Source: AGHT+IETSM2tJ+CeQCMmRN0X7CAh6aRAzMZaxuB0JzqR7V+X9hilsZP3QdvrBBoWdcbN8fo2YD25eQ==
+X-Received: by 2002:a05:6a21:33a2:b0:18b:9031:822a with SMTP id yy34-20020a056a2133a200b0018b9031822amr34255656pzb.46.1701701576571;
+        Mon, 04 Dec 2023 06:52:56 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id j4-20020a056a00234400b006cdd406e784sm988049pfj.136.2023.12.04.06.52.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Dec 2023 06:52:56 -0800 (PST)
+Message-ID: <a8aebcd8-4d71-49c9-853d-d17647e69308@mojatatu.com>
+Date: Mon, 4 Dec 2023 11:52:52 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -32,62 +62,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Arnd Bergmann <arnd@arndb.de>, Hao Chen
-	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] [v2] net: hns3: reduce stack usage in
- hclge_dbg_dump_tm_pri()
-To: Arnd Bergmann <arnd@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20231204085735.4112882-1-arnd@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20231204085735.4112882-1-arnd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net-next 3/4] net/sched: act_api: conditional notification
+ of events
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, marcelo.leitner@gmail.com, vladbu@nvidia.com
+References: <20231201204314.220543-1-pctammela@mojatatu.com>
+ <20231201204314.220543-4-pctammela@mojatatu.com>
+ <20231202112104.0ca43022@kernel.org>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20231202112104.0ca43022@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
 
+On 02/12/2023 16:21, Jakub Kicinski wrote:
+> On Fri,  1 Dec 2023 17:43:13 -0300 Pedro Tammela wrote:
+>> --- a/net/sched/act_api.c
+>> +++ b/net/sched/act_api.c
+>> @@ -1791,6 +1791,13 @@ tcf_reoffload_del_notify(struct net *net, struct tc_action *action)
+>>   	struct sk_buff *skb;
+>>   	int ret;
+>>   
+>> +	if (!tc_should_notify(net, 0)) {
+>> +		ret = tcf_idr_release_unsafe(action);
+>> +		if (ret == ACT_P_DELETED)
+>> +			module_put(ops->owner);
+>> +		return ret;
+>> +	}
+> 
+> I fell like we can do better than this.. let's refactor this code a bit
+> harder. Maybe factor out the alloc_skb() and fill()? Then add a wrapper
+> around rtnetlink_send() which does nothing if skb is NULL?
 
-on 2023/12/4 16:57, Arnd Bergmann wrote:
-> s already allocated by debugfs,
-> but that is a much larger change.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: fix error handling leak
-> ---
->   .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 21 ++++++++++++-------
->   1 file changed, 14 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> index ff3f8f424ad9..8f94e13c1edf 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-> @@ -981,7 +981,7 @@ static const struct hclge_dbg_item tm_pri_items[] = {
->   
->   static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   {
-> -	char data_str[ARRAY_SIZE(tm_pri_items)][HCLGE_DBG_DATA_STR_LEN];
-> +	char *data_str;
+Ack
 
-We want to define variables in an inverted triangle based on the code length.
-so, "char *data_str" should move four lines down.
-
-   	struct hclge_tm_shaper_para c_shaper_para, p_shaper_para;
-	char *result[ARRAY_SIZE(tm_pri_items)], *sch_mode_str;
-	char content[HCLGE_DBG_TM_INFO_LEN];
-	u8 pri_num, sch_mode, weight, i, j;
-	char *data_str;
-	int pos, ret;
-
->   	struct hclge_tm_shaper_para c_shaper_para, p_shaper_para;
->   	char *result[ARRAY_SIZE(tm_pri_items)], *sch_mode_str;
->   	char content[HCLGE_DBG_TM_INFO_LEN];
-> @@ -992,8 +992,13 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   	if (ret)
->   		return ret;
->
 
