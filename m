@@ -1,151 +1,117 @@
-Return-Path: <netdev+bounces-53393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E32802CC7
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:10:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41E9802D1D
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA15B1F210CC
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:10:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38E1DB208C6
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53C8D314;
-	Mon,  4 Dec 2023 08:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0E8DF72;
+	Mon,  4 Dec 2023 08:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="KwWu3Bpt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C2CD3;
-	Mon,  4 Dec 2023 00:10:17 -0800 (PST)
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-77ecedad216so167078985a.3;
-        Mon, 04 Dec 2023 00:10:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701677416; x=1702282216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nS1L7NOGg06KDGUFGFQufZ/HHPyLo1FuHzjQoQBHem0=;
-        b=AJDhA2a12rQ4GM5Ze2j/Tg6roXa8OWdP5wSSt0DwFyHzHryz2sfNgmt4kb1zefq4tq
-         vGBRe/AP+ZvEB+xFbp9Lefx68ubxbdJOk4XwFHswhLY5Wl7tBzrIPLc88bgz0s3XwlTk
-         ZemqAAcKr3CEzwrjPlMTVboH0HlVw8rC+3+Dxji1++Gp6nMhBpEUDBqI43cb9/+AqvUe
-         /ORKEV4jgxScpFNbkAd3IHr5FBU48x4X5aKsMvIsYOwpH1MCkvMc7C5RRUjhSl09Pl2O
-         9/VAH6uKp+32FYXZwkeOneZ1weMPOwRqBAc2BJw/pl2XBu/oDuuE5dIeFDqbL/4oGRGL
-         QYLQ==
-X-Gm-Message-State: AOJu0YzJyQKdbQrui8yThNu2O+3r4RYNrFieOUWUQZ/E2xgFZf2VTbVD
-	Q0lP2ujoDZWIjD2vcwCE0nTOSFWC5NxGSQ==
-X-Google-Smtp-Source: AGHT+IH+88HvOfduf9w2+EiioRSXS0hHuKcr9eAKG4NAcvE5FKea0kdXX4iOqq4chMrYwfMNzMSrwQ==
-X-Received: by 2002:a05:6214:964:b0:67a:a721:d782 with SMTP id do4-20020a056214096400b0067aa721d782mr4233333qvb.104.1701677416575;
-        Mon, 04 Dec 2023 00:10:16 -0800 (PST)
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com. [209.85.222.181])
-        by smtp.gmail.com with ESMTPSA id rg3-20020a05620a8ec300b0077703f31496sm4042370qkn.92.2023.12.04.00.10.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 00:10:16 -0800 (PST)
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-77dd07e7d39so308509385a.0;
-        Mon, 04 Dec 2023 00:10:16 -0800 (PST)
-X-Received: by 2002:a0d:ebd4:0:b0:5d7:1940:f3ef with SMTP id
- u203-20020a0debd4000000b005d71940f3efmr3110087ywe.87.1701676944345; Mon, 04
- Dec 2023 00:02:24 -0800 (PST)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 320DFFE;
+	Mon,  4 Dec 2023 00:25:50 -0800 (PST)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id E4AA3204D9;
+	Mon,  4 Dec 2023 09:25:47 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hvPwaSxxYUiK; Mon,  4 Dec 2023 09:25:47 +0100 (CET)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 4C40920078;
+	Mon,  4 Dec 2023 09:25:47 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 4C40920078
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1701678347;
+	bh=6LGB45I5byCoMEvvTmFWKfhjgGrm1+u7IAc5pF3fXcc=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=KwWu3BptcKE5mMLWl8mHeIi9qJxIyxohZ3pyPiU8GufgBcZRy11AsRCirUPTY3RQ5
+	 VCuwAOdD4D+GLjwzzqx1CbPm/IV7UUyKjO5zDaHy7JJ76KnHdWhkYiJBa1+jQVCd8/
+	 WhCMr8qRJOI7Oe6Z6dM/unK4csL4qMFT2PaB9f4kbIaooD4Ks7XPzx6bo99hCXx/Pv
+	 B9U4v3BDF/XeDlHwKkMgRtWDKt0SX0DWReAbIC1e+0lAfqcmxD1TmpeUi6WkrEFUHl
+	 D0oGMrMRGiFTY9e/9xvWryQ0LkLVPlrF2/+GQIVr9TUbardkk3RRGkhURoBQiqNKzU
+	 5owz2QNMth0Qg==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 164F580004A;
+	Mon,  4 Dec 2023 09:25:47 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 4 Dec 2023 09:25:46 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 4 Dec
+ 2023 09:25:46 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 49F6131811E6; Mon,  4 Dec 2023 09:25:46 +0100 (CET)
+Date: Mon, 4 Dec 2023 09:25:46 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Daniel Xu <dxu@dxuuu.xyz>
+CC: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Network Development
+	<netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, bpf
+	<bpf@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, "open
+ list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	<antony.antony@secunet.com>, Yonghong Song <yonghong.song@linux.dev>, Eddy Z
+	<eddyz87@gmail.com>, <devel@linux-ipsec.org>, Eyal Birger
+	<eyal.birger@gmail.com>
+Subject: Re: [PATCH ipsec-next v3 0/9] Add bpf_xdp_get_xfrm_state() kfunc
+Message-ID: <ZW2NCm/pIthdpNgF@gauss3.secunet.de>
+References: <cover.1701462010.git.dxu@dxuuu.xyz>
+ <CAADnVQKWrvec6ap_7O0Z5uAJe-pdrhuJk8LRkmWvGMM4iF9Frg@mail.gmail.com>
+ <dkzlpw6sj7we5xteyvbwxufqzg6axwlrvb4arq23ecaiy5ayok@jg52fqjr4ftf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-11-claudiu.beznea.uj@bp.renesas.com>
- <CAMuHMdW9Unpw7NQOGWd4SeFV8XgvRYTKTXnt9Tsagb3Q3U9tNA@mail.gmail.com> <96dd3f54-9560-4587-b4e8-bf75422ff5ef@tuxon.dev>
-In-Reply-To: <96dd3f54-9560-4587-b4e8-bf75422ff5ef@tuxon.dev>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 4 Dec 2023 09:02:12 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWGbEhBdzK4Swu4uX05vX7H2Ow4uE1C=JVNOrdcbZYL=A@mail.gmail.com>
-Message-ID: <CAMuHMdWGbEhBdzK4Swu4uX05vX7H2Ow4uE1C=JVNOrdcbZYL=A@mail.gmail.com>
-Subject: Re: [PATCH 10/14] arm64: renesas: r9a08g045: Add Ethernet nodes
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
-	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dkzlpw6sj7we5xteyvbwxufqzg6axwlrvb4arq23ecaiy5ayok@jg52fqjr4ftf>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hi Claudiu,
+On Fri, Dec 01, 2023 at 05:16:04PM -0700, Daniel Xu wrote:
+> On Fri, Dec 01, 2023 at 04:10:18PM -0800, Alexei Starovoitov wrote:
+> > On Fri, Dec 1, 2023 at 12:23 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
+> > >
+> > >  include/net/xfrm.h                            |   9 +
+> > >  net/xfrm/Makefile                             |   1 +
+> > >  net/xfrm/xfrm_policy.c                        |   2 +
+> > >  net/xfrm/xfrm_state_bpf.c                     | 128 ++++++++++++++
+> > >  tools/lib/bpf/bpf_core_read.h                 |  34 ++++
+> > >  .../selftests/bpf/prog_tests/test_tunnel.c    | 162 +++++++++++++++++-
+> > >  .../selftests/bpf/prog_tests/verifier.c       |   2 +
+> > >  tools/testing/selftests/bpf/progs/bpf_misc.h  |   1 +
+> > >  .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+> > >  .../selftests/bpf/progs/test_tunnel_kern.c    | 138 ++++++++-------
+> > >  .../bpf/progs/verifier_bitfield_write.c       | 100 +++++++++++
+> > >  tools/testing/selftests/bpf/test_loader.c     |   7 +
+> > >  tools/testing/selftests/bpf/test_tunnel.sh    |  92 ----------
+> > >  13 files changed, 522 insertions(+), 155 deletions(-)
+> > 
+> > I really think this should go via bpf-next tree.
+> > The bpf changes are much bigger than ipsec.
+> 
+> Ack. Ended up picking up a lot of stuff along the way.
 
-On Mon, Dec 4, 2023 at 8:41=E2=80=AFAM claudiu beznea <claudiu.beznea@tuxon=
-.dev> wrote:
-> On 01.12.2023 19:35, Geert Uytterhoeven wrote:
-> > On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon.d=
-ev> wrote:
-> >> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >>
-> >> Add Ethernet nodes available on RZ/G3S (R9A08G045).
-> >>
-> >> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >
-> > Thanks for your patch!
-> >
-> >> --- a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-> >> +++ b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-> >> @@ -149,6 +149,38 @@ sdhi2: mmc@11c20000 {
-> >>                         status =3D "disabled";
-> >>                 };
-> >>
-> >> +               eth0: ethernet@11c30000 {
-> >> +                       compatible =3D "renesas,r9a08g045-gbeth", "ren=
-esas,rzg2l-gbeth";
-> >> +                       reg =3D <0 0x11c30000 0 0x10000>;
-> >> +                       interrupts =3D <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH=
->,
-> >> +                                    <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
-> >> +                                    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
-> >> +                       interrupt-names =3D "mux", "fil", "arp_ns";
-> >> +                       clocks =3D <&cpg CPG_MOD R9A08G045_ETH0_CLK_AX=
-I>,
-> >> +                                <&cpg CPG_MOD R9A08G045_ETH0_CLK_CHI>=
-,
-> >> +                                <&cpg CPG_MOD R9A08G045_ETH0_REFCLK>;
-> >> +                       clock-names =3D "axi", "chi", "refclk";
-> >> +                       resets =3D <&cpg R9A08G045_ETH0_RST_HW_N>;
-> >> +                       power-domains =3D <&cpg>;
-> >
-> > Perhaps add a default phy mode, like on other SoCs?
-> >
-> >     phy-mode =3D "rgmii"';
->
-> I skipped this (even it was available on the other SoCs) as I consider th=
-e
-> phy-mode is board specific.
+I'm fine with merging this via the bpf-next tree.
 
-IC.  Still, it's good to have some consistency across boards.
+Please consider to merge the bpf hepler functions
+to one file. We have already xfrm_interface_bpf.c
+and now you introduce xfrm_state_bpf.c.
 
-> > Also missing:
-> >
-> >     #address-cells =3D <1>;
-> >     #size-cells =3D <0>;
->
-> Same for these.
-
-These are required, and always have the same values, so it makes more
-sense to have them in the SoC .dtsi file, once.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Try to merge this into a single xfrm_bpf.c file.
 
