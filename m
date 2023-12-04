@@ -1,132 +1,112 @@
-Return-Path: <netdev+bounces-53522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B6D80389F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:22:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 951978038C8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1030281213
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:22:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5F7C1C20A6B
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566BD2C1AA;
-	Mon,  4 Dec 2023 15:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD962C849;
+	Mon,  4 Dec 2023 15:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="h1tbJjRb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WIp3PXXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C238A5;
-	Mon,  4 Dec 2023 07:22:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=13w0UX6/ajtrdaqmEFNIabzFsVbBD6wanM5B8RKR1F0=; b=h1tbJjRb4K4gChXaRyFghuzqJb
-	Du/pN7Oea7Gs8TteTsFgO69cDI8aYxt1f3zHcINP0HpGUPToGNseGl/zTVJWhBue0QLpIj2UQRxkq
-	pYSIWUc8rdQiFIc9EEYxywmsaQdg4Y1SEpgFb6y0w/nMcJ8RA5JguD0Q5tdkYwdMmRYWc0ziUfxFq
-	LKZzNewfGjMg/14JmTCm8AkNtJV5CLMHfWTr5TlkOBYMp4ZyRFTPRECwhtvf3ZdH4CL1kMnBVEW7z
-	aMxNJjtkx5B8Xt8/1cfy7KG/sDBYtQxipsBOf+UDWz+ZpXgl64+QXXSnTHTKY5BxRrCWtQeItRf7L
-	lt5nZFDg==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rAAmE-00019H-P7; Mon, 04 Dec 2023 16:22:30 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rAAmE-000WgM-1S; Mon, 04 Dec 2023 16:22:30 +0100
-Subject: Re: [PATCH bpf-next] netkit: Add some ethtool ops to provide
- information to user
-To: Feng Zhou <zhoufeng.zf@bytedance.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com, tangchen.1@bytedance.com
-References: <20231130075844.52932-1-zhoufeng.zf@bytedance.com>
- <51dd35c9-ff5b-5b11-04d1-9a5ae9466780@blackwall.org>
- <16b4d42d-2d62-460e-912f-6e3b86f3004d@bytedance.com>
- <94e335d4-ec90-ba78-b2b4-8419b25bfa88@iogearbox.net>
- <57587b74-f865-4b56-8d65-a5cbc6826079@bytedance.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <2a829a9c-69a6-695d-d3df-59190b161787@iogearbox.net>
-Date: Mon, 4 Dec 2023 16:22:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8F2B0;
+	Mon,  4 Dec 2023 07:28:32 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9D4EE240009;
+	Mon,  4 Dec 2023 15:28:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701703708;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I0JOcf6jkxhgsas+jU7HoD00NuB8enDjPLTaHOqduD0=;
+	b=WIp3PXXigOKUmqQlWs81eU0ETi9SOluh1iT/y7P8wqndtOZRUNjGwUuN5PUIFmqWUasfE0
+	wDXOHIiQ8oms3C9dcNLzivgpnhKlkUkYsYks/IvHI5/ozbvzV39ncvpIDP1pNrBlSjGkto
+	vRzqRUZmXUuQOqx/01B3/fMqOUnPv6gmYdFhQsRm9YxBITcnFc5De9BYSoGxBIrqy5mump
+	YPa+/IF0L7aagdbcXfmCpk9EnY3qdlfgC3nhU6uXt2VOiYKk4nMJz9Mo8MLClM9TcXuMRS
+	1fDoLiCxEB5vNg21VJFNY1oSDaDpgPDHVguVyrfNDBHIXvtt3RzDh2Qahl0pbQ==
+Date: Mon, 4 Dec 2023 16:28:25 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 4/8] net: ethtool: pse-pd: Expand pse
+ commands with the PSE PoE interface
+Message-ID: <20231204162825.40e566fe@kmaincent-XPS-13-7390>
+In-Reply-To: <e0b143dc-ca7e-4762-bd0b-3acffad0932b@lunn.ch>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+	<20231201-feature_poe-v2-4-56d8cac607fa@bootlin.com>
+	<e0b143dc-ca7e-4762-bd0b-3acffad0932b@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <57587b74-f865-4b56-8d65-a5cbc6826079@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27113/Mon Dec  4 09:40:35 2023)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 12/1/23 9:42 AM, Feng Zhou wrote:
-> 在 2023/11/30 18:56, Daniel Borkmann 写道:
->> On 11/30/23 10:24 AM, Feng Zhou wrote:
->>> 在 2023/11/30 17:06, Nikolay Aleksandrov 写道:
->>>> On 11/30/23 09:58, Feng zhou wrote:
->>>>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>>>
->>>>> Add get_strings, get_sset_count, get_ethtool_stats to get peer
->>>>> ifindex.
->>>>> ethtool -S nk1
->>>>> NIC statistics:
->>>>>       peer_ifindex: 36
->>>>>
->>>>> Add get_link, get_link_ksettings to get link stat.
->>>>> ethtool nk1
->>>>> Settings for nk1:
->>>>>     ...
->>>>>     Link detected: yes
->>>>>
->>>>> Add get_ts_info.
->>>>> ethtool -T nk1
->>>>> Time stamping parameters for nk1:
->>>>> ...
->>>>>
->>>>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>>> ---
->>>>>   drivers/net/netkit.c | 53 ++++++++++++++++++++++++++++++++++++++++++++
->>>>>   1 file changed, 53 insertions(+)
->>>>
->>>> I don't see any point in sending peer_ifindex through ethtool, even
->>>> worse through ethtool stats. That is definitely the wrong place for it.
->>>> You can already retrieve that through netlink. About the speed/duplex
->>>> this one makes more sense, but this is the wrong way to do it.
->>>> See how we did it for virtio_net (you are free to set speed/duplex
->>>> to anything to please bonding for example). Although I doubt anyone will use netkit with bonding, so even that is questionable. :)
->>>>
->>>> Nacked-by: Nikolay Aleksandrov <razor@blackwall.org>
->>>
->>> We use netkit to replace veth to improve performance, veth can be used ethtool -S veth to get peer_ifindex, so this part is added, as long as it is to keep the netkit part and veth unified, to ensure the same usage habits, and to replace it without perception.
->>
->> Could you elaborate some more on the use case why you need to retrieve it
->> via ethtool, what alternatives were tried and don't work?
->>
->> Please also elaborate on the case for netkit_get_link_ksettings() and which
->> concrete problem you are trying to address with this extension?
->>
->> The commit message only explains what is done but does not go into the detail
->> of _why_ you need it.
-> 
-> In general, this information can be obtained through ip commands or netlink, and netkit_get_link_ksettings really not necessary. The reason why ethtool supports this is that when we use veth, our business colleagues are used to using ethtool to obtain peer_ifindex, and then replace netkit, found that it could not be used, resulting in their script failure, so they asked us for a request.
+On Sun, 3 Dec 2023 19:45:18 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Thanks, so the netkit_get_link_ksettings is optional. I don't quite follow what you
-mean with regards to your business logic in veth to obtain peer ifindex. What does
-the script do exactly with the peer ifindex (aka /why/ is it needed), could you
-elaborate some more - it's still somewhat too vague? :) E.g. why it does not suffice
-to look at the device type or other kind of attributes?
+> > @@ -143,6 +150,43 @@ ethnl_set_pse(struct ethnl_req_info *req_info, str=
+uct
+> > genl_info *info) return -EOPNOTSUPP;
+> >  	}
+> > =20
+> > +	if (!tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] &&
+> > +	    !tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
+> > +		return 0; =20
+>=20
+> -EINVAL? Is there a real use case for not passing either of them?
 
-Thanks,
-Daniel
+No indeed.
+
+> > +
+> > +	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] &&
+> > +	    !(pse_get_types(phydev->psec) & PSE_PODL)) {
+> > +		NL_SET_ERR_MSG_ATTR(info->extack,
+> > +				    tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL],
+> > +				    "setting PSE PoDL admin control not
+> > supported");
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL] &&
+> > +	    !(pse_get_types(phydev->psec) & PSE_C33)) {
+> > +		NL_SET_ERR_MSG_ATTR(info->extack,
+> > +				    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL],
+> > +				    "setting PSE PoE admin control not
+> > supported"); =20
+>=20
+> This probably should be C33, not PoE?
+>=20
+> I guess it depends on what the user space tools are using.=20
+
+Yes, I have hesitated on replacing that one.
+If you prefer c33 in the log, I will change it in next version
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
