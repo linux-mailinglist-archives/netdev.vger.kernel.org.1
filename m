@@ -1,170 +1,151 @@
-Return-Path: <netdev+bounces-53406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4463A802DB7
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:00:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB919802ED0
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:39:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D91B20955
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:00:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38037280F66
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206AC11727;
-	Mon,  4 Dec 2023 09:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEFF1A733;
+	Mon,  4 Dec 2023 09:39:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7E685;
-	Mon,  4 Dec 2023 01:00:16 -0800 (PST)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5cd81e76164so46172117b3.1;
-        Mon, 04 Dec 2023 01:00:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701680415; x=1702285215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zv4xm2Lr7Wl/3u3PM4BZ5e6ASOFA8kBT22UWNSzI29A=;
-        b=W4IcEPU/06rXnT8zKoV97sb61dfK4jvSzjiUKRd2h1ZIyGrOSEWewb93tkXsKxgV0A
-         fyS58euO9pu8E/Prk+l6TktdqcACF3vGncdOCtMy+fDvDZoWUOpNizD1SapCF0RWwX6O
-         YsuR8gHtx8OnYuPVHwooZhdRrP1knUbl8uAuUskgOPKHy+oYiguzK/1Ipb8zhRusOrIC
-         8kXq5aHCzc9YPk8ByTt7hGCsXbZUgql4kjw0i8VXu9DUdkYRUM/+v4we+hnqt/wVybT4
-         +KObvOxtQ5ZoAx6J+fPx7AYaFDBBQbUHT6RjAu8f48MK51cg5Usm8EFMslZZ5F9Ycp6b
-         /ozQ==
-X-Gm-Message-State: AOJu0YxZ2wOAHYwftq2KHj7FQYSatZvhZXiVTiKlxHcT9T8CnFhyDdZl
-	iwaID55UoVvq3WjwHFYsTJLOj0auQvS88A==
-X-Google-Smtp-Source: AGHT+IFLHN5lVcrEbK+UZgMtBA8xq+NoiT1Pt2RM2CuumlHSXQwJJCsSPcRznYrTmXwNk4ReaxfVGQ==
-X-Received: by 2002:a81:7847:0:b0:5d7:1940:dd77 with SMTP id t68-20020a817847000000b005d71940dd77mr2172352ywc.77.1701680415246;
-        Mon, 04 Dec 2023 01:00:15 -0800 (PST)
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
-        by smtp.gmail.com with ESMTPSA id v136-20020a81488e000000b005d8bb479c51sm458655ywa.11.2023.12.04.01.00.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Dec 2023 01:00:15 -0800 (PST)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5d4f71f7e9fso27337927b3.0;
-        Mon, 04 Dec 2023 01:00:15 -0800 (PST)
-X-Received: by 2002:a81:d206:0:b0:5d7:6089:9617 with SMTP id
- x6-20020a81d206000000b005d760899617mr2012816ywi.24.1701680414955; Mon, 04 Dec
- 2023 01:00:14 -0800 (PST)
+X-Greylist: delayed 7800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Dec 2023 01:39:48 PST
+Received: from 10.mo581.mail-out.ovh.net (10.mo581.mail-out.ovh.net [178.33.250.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC829B3
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 01:39:48 -0800 (PST)
+Received: from director4.ghost.mail-out.ovh.net (unknown [10.108.1.121])
+	by mo581.mail-out.ovh.net (Postfix) with ESMTP id 033F627573
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 07:12:13 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-4ws44 (unknown [10.108.16.92])
+	by director4.ghost.mail-out.ovh.net (Postfix) with ESMTPS id AB4201FEA5;
+	Mon,  4 Dec 2023 07:12:12 +0000 (UTC)
+Received: from courmont.net ([37.59.142.110])
+	by ghost-submission-6684bf9d7b-4ws44 with ESMTPSA
+	id hoq/I8x7bWW4dSUATzIUhw
+	(envelope-from <remi@remlab.net>); Mon, 04 Dec 2023 07:12:12 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-110S0042a2dd185-a2d9-4096-8b32-76f2378c721f,
+                    30E1F9A4461AC3388A1ED448D051F90A1CF7BE56) smtp.auth=postmaster@courmont.net
+X-OVh-ClientIp:84.253.200.238
+Date: Mon, 04 Dec 2023 09:12:11 +0200
+From: =?ISO-8859-1?Q?R=E9mi_Denis-Courmont?= <remi@remlab.net>
+To: Hyunwoo Kim <v4bel@theori.io>, courmisch@gmail.com
+CC: v4bel@theori.io, imv4bel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: phonet: Fix Use-After-Free in pep_recvmsg
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20231204065952.GA16224@ubuntu>
+References: <20231204065952.GA16224@ubuntu>
+Message-ID: <A2443BF8-D693-4182-9E07-3FFA33D97217@remlab.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-11-claudiu.beznea.uj@bp.renesas.com>
- <CAMuHMdW9Unpw7NQOGWd4SeFV8XgvRYTKTXnt9Tsagb3Q3U9tNA@mail.gmail.com>
- <96dd3f54-9560-4587-b4e8-bf75422ff5ef@tuxon.dev> <CAMuHMdWGbEhBdzK4Swu4uX05vX7H2Ow4uE1C=JVNOrdcbZYL=A@mail.gmail.com>
- <b3701927-e41a-44d8-8f91-da245b76f532@tuxon.dev>
-In-Reply-To: <b3701927-e41a-44d8-8f91-da245b76f532@tuxon.dev>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 4 Dec 2023 10:00:03 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVmD7-AUn91SaOq1iOMkcGhi0WNvx8bCX3oD+xa-Bt98g@mail.gmail.com>
-Message-ID: <CAMuHMdVmD7-AUn91SaOq1iOMkcGhi0WNvx8bCX3oD+xa-Bt98g@mail.gmail.com>
-Subject: Re: [PATCH 10/14] arm64: renesas: r9a08g045: Add Ethernet nodes
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, linux@armlinux.org.uk, 
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org, 
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de, 
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com, 
-	broonie@kernel.org, alexander.stein@ew.tq-group.com, 
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com, 
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 8920786440130599287
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrudejhedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvfevufgfjghfkfggtgfgsehtqhhmtddtreejnecuhfhrohhmpeftrohmihcuffgvnhhishdqvehouhhrmhhonhhtuceorhgvmhhisehrvghmlhgrsgdrnhgvtheqnecuggftrfgrthhtvghrnheptdehtedtheegfeejfeetheetgedvveekkeejhffggefgieevveffffelgfehueejnecukfhppeduvdejrddtrddtrddupdekgedrvdehfedrvddttddrvdefkedpfeejrdehledrudegvddruddutdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehrvghmihesrhgvmhhlrggsrdhnvghtqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpoffvtefjohhsthepmhhoheekuddpmhhouggvpehsmhhtphhouhht
 
-Hi Claudiu,
+Hi,
 
-On Mon, Dec 4, 2023 at 9:38=E2=80=AFAM claudiu beznea <claudiu.beznea@tuxon=
-.dev> wrote:
-> On 04.12.2023 10:02, Geert Uytterhoeven wrote:
-> > On Mon, Dec 4, 2023 at 8:41=E2=80=AFAM claudiu beznea <claudiu.beznea@t=
-uxon.dev> wrote:
-> >> On 01.12.2023 19:35, Geert Uytterhoeven wrote:
-> >>> On Mon, Nov 20, 2023 at 8:01=E2=80=AFAM Claudiu <claudiu.beznea@tuxon=
-.dev> wrote:
-> >>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >>>>
-> >>>> Add Ethernet nodes available on RZ/G3S (R9A08G045).
-> >>>>
-> >>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> >>>
-> >>> Thanks for your patch!
-> >>>
-> >>>> --- a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-> >>>> +++ b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-> >>>> @@ -149,6 +149,38 @@ sdhi2: mmc@11c20000 {
-> >>>>                         status =3D "disabled";
-> >>>>                 };
-> >>>>
-> >>>> +               eth0: ethernet@11c30000 {
-> >>>> +                       compatible =3D "renesas,r9a08g045-gbeth", "r=
-enesas,rzg2l-gbeth";
-> >>>> +                       reg =3D <0 0x11c30000 0 0x10000>;
-> >>>> +                       interrupts =3D <GIC_SPI 68 IRQ_TYPE_LEVEL_HI=
-GH>,
-> >>>> +                                    <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH=
->,
-> >>>> +                                    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH=
->;
-> >>>> +                       interrupt-names =3D "mux", "fil", "arp_ns";
-> >>>> +                       clocks =3D <&cpg CPG_MOD R9A08G045_ETH0_CLK_=
-AXI>,
-> >>>> +                                <&cpg CPG_MOD R9A08G045_ETH0_CLK_CH=
-I>,
-> >>>> +                                <&cpg CPG_MOD R9A08G045_ETH0_REFCLK=
->;
-> >>>> +                       clock-names =3D "axi", "chi", "refclk";
-> >>>> +                       resets =3D <&cpg R9A08G045_ETH0_RST_HW_N>;
-> >>>> +                       power-domains =3D <&cpg>;
-> >>>
-> >>> Perhaps add a default phy mode, like on other SoCs?
-> >>>
-> >>>     phy-mode =3D "rgmii"';
-> >>
-> >> I skipped this (even it was available on the other SoCs) as I consider=
- the
-> >> phy-mode is board specific.
-> >
-> > IC.  Still, it's good to have some consistency across boards.
-> >
-> >>> Also missing:
-> >>>
-> >>>     #address-cells =3D <1>;
-> >>>     #size-cells =3D <0>;
-> >>
-> >> Same for these.
-> >
-> > These are required, and always have the same values, so it makes more
-> > sense to have them in the SoC .dtsi file, once.
+Le 4 d=C3=A9cembre 2023 08:59:52 GMT+02:00, Hyunwoo Kim <v4bel@theori=2Eio=
+> a =C3=A9crit=C2=A0:
+>Because pep_recvmsg() fetches the skb from pn->ctrlreq_queue
+>without holding the lock_sock and then frees it,
+>a race can occur with pep_ioctl()=2E
+>A use-after-free for a skb occurs with the following flow=2E
+
+Isn't this the same issue that was reported by Huawei rootlab and for whic=
+h I already provided a pair of patches to the security list two months ago?
+
+TBH, I much prefer the approach in the other patch set, which takes the hi=
+t on the ioctl() side rather than the recvmsg()'s=2E
+
+Unfortunately, I have no visibility on what happened or didn't happen afte=
+r that, since the security list is private=2E
+
+>```
+>pep_recvmsg() -> skb_dequeue() -> skb_free_datagram()
+>pep_ioctl() -> skb_peek()
+>```
+>Fix this by adjusting the scope of lock_sock in pep_recvmsg()=2E
 >
-> I remember I had a compilation warning with an Ethernet controller
-> configured with fixed-link having #address-cells, #size-cells. With
-> fixed-link these were not needed.
+>Signed-off-by: Hyunwoo Kim <v4bel@theori=2Eio>
+>---
+> net/phonet/pep=2Ec | 17 +++++++++++++----
+> 1 file changed, 13 insertions(+), 4 deletions(-)
+>
+>diff --git a/net/phonet/pep=2Ec b/net/phonet/pep=2Ec
+>index faba31f2eff2=2E=2E212d8a9ddaee 100644
+>--- a/net/phonet/pep=2Ec
+>+++ b/net/phonet/pep=2Ec
+>@@ -1250,12 +1250,17 @@ static int pep_recvmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len,
+> 	if (unlikely(1 << sk->sk_state & (TCPF_LISTEN | TCPF_CLOSE)))
+> 		return -ENOTCONN;
+>=20
+>+	lock_sock(sk);
+>+
+> 	if ((flags & MSG_OOB) || sock_flag(sk, SOCK_URGINLINE)) {
+> 		/* Dequeue and acknowledge control request */
+> 		struct pep_sock *pn =3D pep_sk(sk);
+>=20
+>-		if (flags & MSG_PEEK)
+>+		if (flags & MSG_PEEK) {
+>+			release_sock(sk);
+> 			return -EOPNOTSUPP;
+>+		}
+>+
 
-I think EtherAVB always use MDIO for management, so fixed-link is
-not applicable.
+Also this change is not really accounted for=2E
 
-> Anyway... I'll keep all in dtsi if you prefer it this way.
-
-Yes please, thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+> 		skb =3D skb_dequeue(&pn->ctrlreq_queue);
+> 		if (skb) {
+> 			pep_ctrlreq_error(sk, skb, PN_PIPE_NO_ERROR,
+>@@ -1263,12 +1268,14 @@ static int pep_recvmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len,
+> 			msg->msg_flags |=3D MSG_OOB;
+> 			goto copy;
+> 		}
+>-		if (flags & MSG_OOB)
+>+
+>+		if (flags & MSG_OOB) {
+>+			release_sock(sk);
+> 			return -EINVAL;
+>+		}
+> 	}
+>=20
+> 	skb =3D skb_recv_datagram(sk, flags, &err);
+>-	lock_sock(sk);
+> 	if (skb =3D=3D NULL) {
+> 		if (err =3D=3D -ENOTCONN && sk->sk_state =3D=3D TCP_CLOSE_WAIT)
+> 			err =3D -ECONNRESET;
+>@@ -1278,7 +1285,7 @@ static int pep_recvmsg(struct sock *sk, struct msgh=
+dr *msg, size_t len,
+>=20
+> 	if (sk->sk_state =3D=3D TCP_ESTABLISHED)
+> 		pipe_grant_credits(sk, GFP_KERNEL);
+>-	release_sock(sk);
+>+
+> copy:
+> 	msg->msg_flags |=3D MSG_EOR;
+> 	if (skb->len > len)
+>@@ -1291,6 +1298,8 @@ static int pep_recvmsg(struct sock *sk, struct msgh=
+dr *msg, size_t len,
+> 		err =3D (flags & MSG_TRUNC) ? skb->len : len;
+>=20
+> 	skb_free_datagram(sk, skb);
+>+
+>+	release_sock(sk);
+> 	return err;
+> }
+>=20
 
