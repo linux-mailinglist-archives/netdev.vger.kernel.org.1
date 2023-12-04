@@ -1,146 +1,303 @@
-Return-Path: <netdev+bounces-53505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75ABC803657
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:22:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524D88036B8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B095AB209B9
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:22:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDA04B209FD
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BC0249ED;
-	Mon,  4 Dec 2023 14:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189FE28DD8;
+	Mon,  4 Dec 2023 14:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="m0+WDqAN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoS1Dts6"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2078.outbound.protection.outlook.com [40.107.14.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1AA2188
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 06:22:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IPswtSWDybsrorTdsMVT3Nge9rUSqrPpDald8CpOkPwJtAnjdULNtQNrPIp96tQfQz8TZw836ObPTUxr5qybH853thL7OTM16uHHIBjZQCN9BWLuu2p/jTptCWGETsiIUYf/EG2MqGdgEZXEmWh3+FNImY+G1atD7jqZ9U5lkbxcMQQx1B81kWe97/kV9Xvu3acXMUPKV0OWfpWCMGFneFs6L1WzYNJKfC+6g0VrJSqllApCXd3kN33YsZFffRwi4ZwL6aA4ezrMdeyfSvC172nOlPb9o6cOo6E/SbN352DSMErvA5NPoEqyg9tbwZj7wvIZYt+6CGPcj1vOVqAyCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E9+8Fyar/vbX5JEYOtVvoVUiqhYo2ZcphWK4FpNCBsg=;
- b=lyWRGLZzE7HR+ltNm4j9ECrHC3xfcAYF1LtU7VLUcf8UiAcnbRTRHtWkip43mWkJRsR9U9LNB1RzDCBkq7sP1zLKv2EDKiUit1v4uosV/2qIpAn8pLNfsdJIy7Mm/J2IZcixAgrwHYR3NntKSCYE52SlebRCuk1rUfy/tLXWAVSBt36Zl8PIA5eJwdql/8JYCIbXLqqBA/I5kXlGS0Q1mTV53UQtNyJc0A8FCXGdRckOniACPHMqr0s27XTzrdf5aT0lsHsfwtNHte4dj35w2ucD31uJUA+VJZZsqVSRQxSnILBTZhjwbeJntjPk9TNHmHx2Yu67t9WuPLxK97/KoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E9+8Fyar/vbX5JEYOtVvoVUiqhYo2ZcphWK4FpNCBsg=;
- b=m0+WDqANOJXfJzZ4QJB0c0CsyjyOJkXQ1Kd+tCImpH9oHICWw72rUyyhE0PW3L2Kg5g+W4TrJmFF+KtlWFfQAnpvEb21xOPj9Hhbk7OvzH/0/8c3laHnvgjayRqyfVPd62ViIM9jHNQQHC6Hq4NfsfgPIK+uT1tQuF5+93ypNLY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by AS5PR04MB10044.eurprd04.prod.outlook.com (2603:10a6:20b:682::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.22; Mon, 4 Dec
- 2023 14:22:05 +0000
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7068.022; Mon, 4 Dec 2023
- 14:22:05 +0000
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: Ioana Ciornei <ioana.ciornei@nxp.com>
-Subject: [PATCH net] dpaa2-switch: fix size of the dma_unmap
-Date: Mon,  4 Dec 2023 16:21:56 +0200
-Message-Id: <20231204142156.1631060-1-ioana.ciornei@nxp.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR10CA0113.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:803:28::42) To GV1PR04MB9070.eurprd04.prod.outlook.com
- (2603:10a6:150:21::14)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58C372D49
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 06:30:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701700227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RSBmlOR1UqkHD0oYidhVbBfvIzTzf5U/uh3kWBx8ItM=;
+	b=eoS1Dts6Aiu0GIvI9t0zuN7QJctxbvebd2gqcW9siqfd6ulu1GMqWOtXGJ+cd+oNi76EWs
+	r6lBl1bH2X3B8jFQyTZL8NIYoFzSg2kpPyrONTCJ+tIo9BbUscFgRDboXD1pyH0gjb3l8R
+	BZUNFQ6lMKclC1RanAkhivDbObEFaDg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-383-6qUjTe60OKm7_k0nelw0oQ-1; Mon, 04 Dec 2023 09:30:24 -0500
+X-MC-Unique: 6qUjTe60OKm7_k0nelw0oQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40b5482879cso29383575e9.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 06:30:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701700222; x=1702305022;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RSBmlOR1UqkHD0oYidhVbBfvIzTzf5U/uh3kWBx8ItM=;
+        b=lfpycq8Xk5+GJkGbLm7lpdXhsfaJHkP1R+OU8g6blaO1y2gQnma3iM59J78hiQnbyB
+         /tqa9oPlLvV++p7r1MH8won2g45DBP//VbUBeQ3MlgHqGnnnrFOvRLgxFKzxBZWwSjIN
+         IlTs8i1rM8YImVymWrjzgmtpSwkKKShy2CSFk1skEn+5uUzW6o+4cIHXkeVQB8XTDyiS
+         dJ1G5d7GSPzZaRIIZUn/WPre+AEiXF7f08J0k76MlvuQrIYNvbZaO6xh6F2kb+Mgf0qN
+         B5782ndrKmGfoDo3o1dlyedUFDO1g3n9gcw3a7tLDz+4j/kQeagVoZ4I7kkOByT1EJlo
+         EV4g==
+X-Gm-Message-State: AOJu0YzCJD9jgZdvlgdCQIqBWvugY0j3BqzxDTCL8xtAG6Ba7dhqWi9K
+	Ju6DsoTBTQOAkiaaMo7FPy0QgTQy16XtMaLTmwEj5uLXRvZIjtw7zFz/Qfe4TzmgRWuFHwXxOWM
+	yhiBO3IwdQV0LQSlb7uM31VTm
+X-Received: by 2002:a05:600c:4711:b0:40b:5e26:237a with SMTP id v17-20020a05600c471100b0040b5e26237amr3023489wmo.43.1701700222509;
+        Mon, 04 Dec 2023 06:30:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGsObmpgovFZtPLsGHM5UifZVuJ4qnoaZ7VOE5NY2SN7kfGCeEjXNr5c5SpPhNfltQzb52PdA==
+X-Received: by 2002:a05:600c:4711:b0:40b:5e26:237a with SMTP id v17-20020a05600c471100b0040b5e26237amr3023478wmo.43.1701700222099;
+        Mon, 04 Dec 2023 06:30:22 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-125.retail.telecomitalia.it. [79.46.200.125])
+        by smtp.gmail.com with ESMTPSA id x18-20020adff0d2000000b003333b67f58csm6444882wro.48.2023.12.04.06.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 06:30:21 -0800 (PST)
+Date: Mon, 4 Dec 2023 15:30:16 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v5 2/3] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+Message-ID: <g7fcjjohedsc4dldrzzlmvegakim3rwarlkh3hgqqvm4qwyld3@h7cqwi7jqq6o>
+References: <20231130084044-mutt-send-email-mst@kernel.org>
+ <02de8982-ec4a-b3b2-e8e5-1bca28cfc01b@salutedevices.com>
+ <20231130085445-mutt-send-email-mst@kernel.org>
+ <pbkiwezwlf6dmogx7exur6tjrtcfzxyn7eqlehqxivqifbkojv@xlziiuzekon4>
+ <20231130123815-mutt-send-email-mst@kernel.org>
+ <smu77vmxw3ki36xhqnhtvujwswvkg5gkfwnt4vr5bnwljclseh@inbewbwkcqxs>
+ <e58cf080-3611-0a19-c6e5-544d7101e975@salutedevices.com>
+ <vqlspza4hzs6i5eajidxgeqd7wesv43ajpo42mljm4leuxfym4@j3h6ux2xlxbi>
+ <214df55d-89e3-2c1d-250a-7428360b6b1b@salutedevices.com>
+ <20231202152108-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AS5PR04MB10044:EE_
-X-MS-Office365-Filtering-Correlation-Id: 018cc788-e446-4a07-7c14-08dbf4d46414
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Y+6QCWuKfpIqyaocDag98HYKRghdnZP+SqOtQG+a1UHb5PWZP4ruzB4t6+a30nYz2erm4zU2xCcZ50T79glmi/sWyBuVhOhRLwAW8kFsImYCC7PSPsJZ1zG43/No5IVbVmrqy9d85zYpn0ZLLQ3qgIj7KOy9AMrulZgPTHbhh2ZGclzn9sGeY2H14cV2GSX7l37OD+veElrCmZrQCuiTiCZ5TiirEWvUjPSwLGWzC8/e35NLneAS2nNAK9vKyj5EhKflSkAYWOxHPVcnfc3++IBhNhXPMQtU6h1kbCIVp4x7+rZVYv+ENg12ZTNf34stf2YEVzpDnIAzIfz++wB/MC/NyBzlJYdtdwB5275+wSmi0YJw8vCvyCQ6XYZRcD+CIGtrtASUtdRfQRS2GGKAbD1NPRlanqbqzs42F5JU2EVithsFqZUtx1h0TWxivLWY9oilD7LN+KRICjlV7fPTJKy6Opx7THVeeZrof9aKVRDnTHPBdD9b0z/FtPTcCq6pRpTnFTpK6fUSrjoLGTQ4d11jYwlFYDfaZ6WYcEucHS7icWkCoyGYy9PeWThGj4DV
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(376002)(346002)(396003)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66556008)(66946007)(66476007)(316002)(478600001)(6486002)(41300700001)(6666004)(36756003)(5660300002)(2906002)(8936002)(4326008)(8676002)(86362001)(44832011)(2616005)(83380400001)(38100700002)(26005)(1076003)(6506007)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?90AlpJj1vMkOtt4roSpYsOtH+8q28yvOHEBiOgmYl8zXTp0NvsZMmMseVLvK?=
- =?us-ascii?Q?hzxmxffc3iPMlwivDN7iFKnWJKf7sONhLScV6NldiNbv1AdoVtscQ/h/4qYY?=
- =?us-ascii?Q?wya2vnK4Z3aIm3dMRQQAnTDZsiFN+heyVHcqa6K76uARI7omvYSUQv/EnCyL?=
- =?us-ascii?Q?/rqtN7zTz61WTUakKkMfJuKVC4sct5VwJjDNB5oABQxaEBVCoLhtL0YuOd/2?=
- =?us-ascii?Q?OdYhyKkAvtv8rL0ik9JZPFx4rC48BSXNr6lpV0sWmVn2VNBfxdFd6qloynNS?=
- =?us-ascii?Q?EmTigUQ4zexCeTL8AZWbYadm9WdRQeLB5j2GN1lGFpPjg63mW26+m4KbL7bd?=
- =?us-ascii?Q?aSKwa7Q40gvvrHnzYWYUKuk3rIzHi2Zy3yDvOUa080mNKNpMAevEMKeT5esj?=
- =?us-ascii?Q?2VxdphMkdc+yA4glDn1v4Zm3PAbvH9RVgs42Osq61VFLLW533JxCP7sqsqBR?=
- =?us-ascii?Q?+Z1BvrNg47DGMMjL2SV7u659fCiN5NXy/wPEnI/6eUdMlZS1ACgiVATTcin1?=
- =?us-ascii?Q?+tvzGCTf6b1Co11YlYsrm4LYIp8H65cD05MWDq6jIPEAxXXNyOowb//Nq7Ph?=
- =?us-ascii?Q?K3VpYckvC9cxCWkMKyWLOR95NAFa07r5xjf6KXwuHsZaftFfxrpP7IjhG5cI?=
- =?us-ascii?Q?kZBzB5L9hhg/na9FisnaXqSl1j9OMaxWbv6XeDEnVl2huvt/HxT0VZ5lySQu?=
- =?us-ascii?Q?HWcZBEAt6FqoLL6v4T3LtcjHn0XocAqjHFiS4w4jRNWQlL4O588D4Zt5LUVi?=
- =?us-ascii?Q?7y68g5Mq3FtbDGZH/ApeakAPJMC7OA5ArwEG9YqYqpHdyFPTQDTQXbYV6cle?=
- =?us-ascii?Q?M4wZmjl7uFGvhvz2d9ts4ws1mSmMKX9hcQra+8petLiUjBavU4ibwx35HI5Y?=
- =?us-ascii?Q?xkHuUOfUdqmUQCmq4OCGkflt6DQodzVM1JE6uU8wcqBOMdL1Y0a7hJvUUSve?=
- =?us-ascii?Q?DW5jtpQZ7bpnJvb7A0fHa+bkIuAJhtrsH4JlisCsjzE445uSIXYqXBpsfSYF?=
- =?us-ascii?Q?zx/dn5RHQ8xgyfD2qnIqDS64DL6og9unLry3UR0wEl/rR460R7+gZoIH3INI?=
- =?us-ascii?Q?K2DFpJCIP17Bob3C2T0bnSgxfUjJzUiR2ddc88RPdM09/CJLBhaJEtn4L7D9?=
- =?us-ascii?Q?lttS3fuxTwcszdq+U5sYpt7F6tWa6qrzRZsKPQi34OQWq4xk90U4S8gr6Ekf?=
- =?us-ascii?Q?IKt1NnssWpLBOToIWy1lJ1OBOZma+vOxplAPfNhuF5d0VhrfXMlXhClnJuac?=
- =?us-ascii?Q?Egedua35+6O500SyJ3VWGPMk9zgOWYqMmU1VxC7ML8WDVn61IJTZ+UMq1X3O?=
- =?us-ascii?Q?CyMRVRsYwRhqXuQyZrsWFbwD98wihqlo2ovpWNWt69mmy4kxWWngn2yyijya?=
- =?us-ascii?Q?7pbsCsYReGcZrjk1nOUPz0WIK7k9lgpX29rHH3DZf2h/vgFYMeEXlRoC7yKt?=
- =?us-ascii?Q?UXBDlXPKLtI8SLNMuQVxCl7QpQrYGwj+8PRz8xE0LchQT3b8OOwa1D0eDgKV?=
- =?us-ascii?Q?iwOwWa3NERTWXec8Icpgy7F3ncvcgWptIoehx3kAU0JVcM60/FHDC5QJuF3d?=
- =?us-ascii?Q?pNGs8HgSIlssJ/nwsfb4aZ1E8q4w+PCbggJidI3w?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 018cc788-e446-4a07-7c14-08dbf4d46414
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 14:22:05.3944
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: s1OCrRtbqLog7NsZvFMQ9UwiGRlR9fGbpWX7et2alYUPMNY8YV9Ap9sUFz/ZUuIlJVvE/QIRoVci77O4X0L0Qg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB10044
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231202152108-mutt-send-email-mst@kernel.org>
 
-The size of the DMA unmap was wrongly put as a sizeof of a pointer.
-Change the value of the DMA unmap to be the actual macro used for the
-allocation and the DMA map.
+On Sat, Dec 02, 2023 at 03:22:39PM -0500, Michael S. Tsirkin wrote:
+>On Fri, Dec 01, 2023 at 01:40:41PM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 01.12.2023 12:48, Stefano Garzarella wrote:
+>> > On Fri, Dec 01, 2023 at 11:35:56AM +0300, Arseniy Krasnov wrote:
+>> >>
+>> >>
+>> >> On 01.12.2023 11:27, Stefano Garzarella wrote:
+>> >>> On Thu, Nov 30, 2023 at 12:40:43PM -0500, Michael S. Tsirkin wrote:
+>> >>>> On Thu, Nov 30, 2023 at 03:11:19PM +0100, Stefano Garzarella wrote:
+>> >>>>> On Thu, Nov 30, 2023 at 08:58:58AM -0500, Michael S. Tsirkin wrote:
+>> >>>>> > On Thu, Nov 30, 2023 at 04:43:34PM +0300, Arseniy Krasnov wrote:
+>> >>>>> > >
+>> >>>>> > >
+>> >>>>> > > On 30.11.2023 16:42, Michael S. Tsirkin wrote:
+>> >>>>> > > > On Thu, Nov 30, 2023 at 04:08:39PM +0300, Arseniy Krasnov wrote:
+>> >>>>> > > >> Send credit update message when SO_RCVLOWAT is updated and it is bigger
+>> >>>>> > > >> than number of bytes in rx queue. It is needed, because 'poll()' will
+>> >>>>> > > >> wait until number of bytes in rx queue will be not smaller than
+>> >>>>> > > >> SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual hungup
+>> >>>>> > > >> for tx/rx is possible: sender waits for free space and receiver is
+>> >>>>> > > >> waiting data in 'poll()'.
+>> >>>>> > > >>
+>> >>>>> > > >> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> >>>>> > > >> ---
+>> >>>>> > > >>  Changelog:
+>> >>>>> > > >>  v1 -> v2:
+>> >>>>> > > >>   * Update commit message by removing 'This patch adds XXX' manner.
+>> >>>>> > > >>   * Do not initialize 'send_update' variable - set it directly during
+>> >>>>> > > >>     first usage.
+>> >>>>> > > >>  v3 -> v4:
+>> >>>>> > > >>   * Fit comment in 'virtio_transport_notify_set_rcvlowat()' to 80 chars.
+>> >>>>> > > >>  v4 -> v5:
+>> >>>>> > > >>   * Do not change callbacks order in transport structures.
+>> >>>>> > > >>
+>> >>>>> > > >>  drivers/vhost/vsock.c                   |  1 +
+>> >>>>> > > >>  include/linux/virtio_vsock.h            |  1 +
+>> >>>>> > > >>  net/vmw_vsock/virtio_transport.c        |  1 +
+>> >>>>> > > >>  net/vmw_vsock/virtio_transport_common.c | 27 +++++++++++++++++++++++++
+>> >>>>> > > >>  net/vmw_vsock/vsock_loopback.c          |  1 +
+>> >>>>> > > >>  5 files changed, 31 insertions(+)
+>> >>>>> > > >>
+>> >>>>> > > >> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> >>>>> > > >> index f75731396b7e..4146f80db8ac 100644
+>> >>>>> > > >> --- a/drivers/vhost/vsock.c
+>> >>>>> > > >> +++ b/drivers/vhost/vsock.c
+>> >>>>> > > >> @@ -451,6 +451,7 @@ static struct virtio_transport vhost_transport = {
+>> >>>>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> >>>>> > > >>
+>> >>>>> > > >>          .read_skb = virtio_transport_read_skb,
+>> >>>>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>> >>>>> > > >>      },
+>> >>>>> > > >>
+>> >>>>> > > >>      .send_pkt = vhost_transport_send_pkt,
+>> >>>>> > > >> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> >>>>> > > >> index ebb3ce63d64d..c82089dee0c8 100644
+>> >>>>> > > >> --- a/include/linux/virtio_vsock.h
+>> >>>>> > > >> +++ b/include/linux/virtio_vsock.h
+>> >>>>> > > >> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>> >>>>> > > >>  void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>> >>>>> > > >>  int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>> >>>>> > > >>  int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>> >>>>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk, int val);
+>> >>>>> > > >>  #endif /* _LINUX_VIRTIO_VSOCK_H */
+>> >>>>> > > >> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> >>>>> > > >> index af5bab1acee1..8007593a3a93 100644
+>> >>>>> > > >> --- a/net/vmw_vsock/virtio_transport.c
+>> >>>>> > > >> +++ b/net/vmw_vsock/virtio_transport.c
+>> >>>>> > > >> @@ -539,6 +539,7 @@ static struct virtio_transport virtio_transport = {
+>> >>>>> > > >>          .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>> >>>>> > > >>
+>> >>>>> > > >>          .read_skb = virtio_transport_read_skb,
+>> >>>>> > > >> +        .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat
+>> >>>>> > > >>      },
+>> >>>>> > > >>
+>> >>>>> > > >>      .send_pkt = virtio_transport_send_pkt,
+>> >>>>> > > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> >>>>> > > >> index f6dc896bf44c..1cb556ad4597 100644
+>> >>>>> > > >> --- a/net/vmw_vsock/virtio_transport_common.c
+>> >>>>> > > >> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> >>>>> > > >> @@ -1684,6 +1684,33 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>> >>>>> > > >>  }
+>> >>>>> > > >>  EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>> >>>>> > > >>
+>> >>>>> > > >> +int virtio_transport_notify_set_rcvlowat(struct vsock_sock *vsk,
+>> >>>>> > > >> int val)
+>> >>>>> > > >> +{
+>> >>>>> > > >> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>> >>>>> > > >> +    bool send_update;
+>> >>>>> > > >> +
+>> >>>>> > > >> +    spin_lock_bh(&vvs->rx_lock);
+>> >>>>> > > >> +
+>> >>>>> > > >> +    /* If number of available bytes is less than new SO_RCVLOWAT value,
+>> >>>>> > > >> +     * kick sender to send more data, because sender may sleep in
+>> >>>>> > > >> its
+>> >>>>> > > >> +     * 'send()' syscall waiting for enough space at our side.
+>> >>>>> > > >> +     */
+>> >>>>> > > >> +    send_update = vvs->rx_bytes < val;
+>> >>>>> > > >> +
+>> >>>>> > > >> +    spin_unlock_bh(&vvs->rx_lock);
+>> >>>>> > > >> +
+>> >>>>> > > >> +    if (send_update) {
+>> >>>>> > > >> +        int err;
+>> >>>>> > > >> +
+>> >>>>> > > >> +        err = virtio_transport_send_credit_update(vsk);
+>> >>>>> > > >> +        if (err < 0)
+>> >>>>> > > >> +            return err;
+>> >>>>> > > >> +    }
+>> >>>>> > > >> +
+>> >>>>> > > >> +    return 0;
+>> >>>>> > > >> +}
+>> >>>>> > > >
+>> >>>>> > > >
+>> >>>>> > > > I find it strange that this will send a credit update
+>> >>>>> > > > even if nothing changed since this was called previously.
+>> >>>>> > > > I'm not sure whether this is a problem protocol-wise,
+>> >>>>> > > > but it certainly was not envisioned when the protocol was
+>> >>>>> > > > built. WDYT?
+>> >>>>> > >
+>> >>>>> > > >From virtio spec I found:
+>> >>>>> > >
+>> >>>>> > > It is also valid to send a VIRTIO_VSOCK_OP_CREDIT_UPDATE packet without previously receiving a
+>> >>>>> > > VIRTIO_VSOCK_OP_CREDIT_REQUEST packet. This allows communicating updates any time a change
+>> >>>>> > > in buffer space occurs.
+>> >>>>> > > So I guess there is no limitations to send such type of packet, e.g. it is not
+>> >>>>> > > required to be a reply for some another packet. Please, correct me if im wrong.
+>> >>>>> > >
+>> >>>>> > > Thanks, Arseniy
+>> >>>>> >
+>> >>>>> >
+>> >>>>> > Absolutely. My point was different - with this patch it is possible
+>> >>>>> > that you are not adding any credits at all since the previous
+>> >>>>> > VIRTIO_VSOCK_OP_CREDIT_UPDATE.
+>> >>>>>
+>> >>>>> I think the problem we're solving here is that since as an optimization we
+>> >>>>> avoid sending the update for every byte we consume, but we put a threshold,
+>> >>>>> then we make sure we update the peer.
+>> >>>>>
+>> >>>>> A credit update contains a snapshot and sending it the same as the previous
+>> >>>>> one should not create any problem.
+>> >>>>
+>> >>>> Well it consumes a buffer on the other side.
+>> >>>
+>> >>> Sure, but we are already speculating by not updating the other side when
+>> >>> we consume bytes before a certain threshold. This already avoids to
+>> >>> consume many buffers.
+>> >>>
+>> >>> Here we're only sending it once, when the user sets RCVLOWAT, so
+>> >>> basically I expect it won't affect performance.
+>> >>
+>> >> Moreover I think in practice setting RCVLOWAT is rare case, while this patch
+>> >> fixes real problem I guess
+>> >>
+>> >>
+>> >>>
+>> >>>>
+>> >>>>> My doubt now is that we only do this when we set RCVLOWAT , should we also
+>> >>>>> do something when we consume bytes to avoid the optimization we have?
+>> >>>>>
+>> >>>>> Stefano
+>> >>>>
+>> >>>> Isn't this why we have credit request?
+>> >>>
+>> >>> Yep, but in practice we never use it. It would also consume 2 buffers,
+>> >>> one at the transmitter and one at the receiver.
+>> >>>
+>> >>> However I agree that maybe we should start using it before we decide not
+>> >>> to send any more data.
+>> >>>
+>> >>> To be compatible with older devices, though, I think for now we also
+>> >>> need to send a credit update when the bytes in the receive queue are
+>> >>> less than RCVLOWAT, as Arseniy proposed in the other series.
+>> >>
+>> >> Looks like (in theory of course), that credit request is considered to be
+>> >> paired with credit update. While current usage of credit update is something
+>> >> like ACK packet in TCP, e.g. telling peer that we are ready to receive more
+>> >> data.
+>> >
+>> > I don't honestly know what the original author's choice was, but I think we reduce latency this way.
+>>
+>> Ah I see,ok
+>>
+>> >
+>> > Effectively though, if we never send any credit update when we consume bytes and always leave it up to the transmitter to ask for an update before transmission, we save even more buffer than the optimization we have, but maybe the latency would grow a lot.
+>>
+>> I think:
+>> 1) Way where sender must request current credit status before sending packet requires rework of kernel part, and for me this approach is not
+>>    so clear than current simple implementation (send RW, reply with CREDIT_UPDATE if needed).
+>> 2) In theory yes, we need one more buffer for such CREDIT_UPDATE, but in practice I don't know how big is this trouble.
+>>
+>> Thanks, Arseniy
+>
+>I just worry that yes, normal users will only call RCVLOWAT once,
+>but a bad user might call it many times causing a ton of
+>credit updates. This is why I feel it's prudent to at least
+>keep track of last credit update and if nothing changed
+>do not resend it on a repeated RCVLOWAT.
 
-Fixes: 1110318d83e8 ("dpaa2-switch: add tc flower hardware offload on ingress traffic")
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Okay, now I get you!
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-index 4798fb7fe35d..609dfde0a64a 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch-flower.c
-@@ -139,7 +139,8 @@ int dpaa2_switch_acl_entry_add(struct dpaa2_switch_filter_block *filter_block,
- 	err = dpsw_acl_add_entry(ethsw->mc_io, 0, ethsw->dpsw_handle,
- 				 filter_block->acl_id, acl_entry_cfg);
- 
--	dma_unmap_single(dev, acl_entry_cfg->key_iova, sizeof(cmd_buff),
-+	dma_unmap_single(dev, acl_entry_cfg->key_iova,
-+			 DPAA2_ETHSW_PORT_ACL_CMD_BUF_SIZE,
- 			 DMA_TO_DEVICE);
- 	if (err) {
- 		dev_err(dev, "dpsw_acl_add_entry() failed %d\n", err);
--- 
-2.25.1
+Yeah, absolutely, we already have `last_fwd_cnt` in `struct 
+virtio_vsock_sock` to do that check.
+
+Thanks,
+Stefano
 
 
