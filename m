@@ -1,66 +1,100 @@
-Return-Path: <netdev+bounces-53464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC2B803154
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:14:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1FC803160
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:19:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8074280E2C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:14:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73133B20A26
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EB722EE5;
-	Mon,  4 Dec 2023 11:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9D922EED;
+	Mon,  4 Dec 2023 11:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="TKzxgZqZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hwnbsSjJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2073.outbound.protection.outlook.com [40.107.20.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903D5D5
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 03:14:03 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEBDA7;
+	Mon,  4 Dec 2023 03:19:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701688745; x=1733224745;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wxePmJy3xQyu05+EaqEBkgpIxb7htKRRL9dvCNNUHm0=;
+  b=hwnbsSjJz8P54JOqcPqc6PqCwO1+AySSI1/SEq9w4lrWUcEc0CyYolIJ
+   jicGQyo5ryyfqKKbGPzIsWvoMfUGrVEcKhnzSD7gXgfCpxb8aRmzqDKfp
+   IDN1HjopiIF4kCYlRUcQ4UafFz6VA/o/czHvEE6Zu/t4hWlSHFUuPN3fJ
+   0w7WolXBv15u7v5qWnACXjXX/L9hSGQypMRQaadt1NUGjp74pUF/d7cMu
+   qQpU2vzSl5ZBodk7ljFbd794c2gBl5PVZpuYA4dsTcx79oT8Y79ckCAp+
+   YOfFttsjM7lwM3jsw+vWxdrlrOjQP4wXNFlfmEouOPVsJrK070SFMJoUM
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="373905389"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="373905389"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 03:19:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="861346605"
+X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
+   d="scan'208";a="861346605"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 03:19:05 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Dec 2023 03:19:04 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 4 Dec 2023 03:19:04 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 4 Dec 2023 03:19:04 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Acdilke53NTFq27UOme3yq8kHagLSfgy0zIDkqS9bGriJ5eAyAw0wY1HoGc62uYaaRCQ7+098jLKC3peu2RP4gVrCpbqAO2UizrVufSN+NeE+rgX0X3J0Nv6VWfy92YoOgH/ipeYknP2hm3Kva6EyOMGwR89asKgCmyHG5YtjoQkQDlUnO23S8LEE5xQGC7bdydN+jQHd764pDe+6fj+48cDzaGpzVZ8ICjc6SgeKS7vUr09GfiZv+YWTHBeKop9TRgTQ5sf6T3SL84bmnG85laYFXWLaDdTNKtF0Wi3QIUGNaxP8dEmBAd0FCZ9LQicmRInE+2wJ0j7+gGWVb6t0A==
+ b=NZLHbg5C2sFa87qPNSH1jduPsuWpdDIdYZOrJS+//Kf261dXeNaCxZgXH8WKkkYQ6y2XIMW50613LBRLnlVeWz2BA2S97/y+n5FFJwAfkpeZ376Ya99n3Sk+/HLMO59dz9enNmyjuetpNKZrErCfZfObGr8Bc6oU/xhpeCw2w2KjsWdtTJhiHROtLIxpwWKJ8FHJFM7L1CUVTbTZuJLwaHQczyDdlCDHVP0jVg79yS1/67R8PLYWeIxT/5DIudObA53Mj6O27PKoy6Lc1Q8PWnQ2MUpgleOEPA4Xt7YncwAwho7a4Dcgzq29u1z3qX37WBczM+6fVNjiEKdfaX2s5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mFk2Ebx+H5q4Wp/urupPueeF48s63z2pnUW4PQEc/SQ=;
- b=IM9fyvP1T9/073CYGlyXgoFN4DSYLhsIh/1DLiYC+qx5Z5urSpB6DjjhM7qLHz/KL0A1Aglv5t5B2WtmGvdlnv0dcyfcvG8Kzmd3NO3KRcz/Jp9zyne2NDCZDmsbaHFC6cNzUtHHCnSYRkppi62GuQv4QsuS1nW2F3l4UdYGPX1Tad+hP6DAu8OJ4NCvA/JE5j4cEOVO4vBKOuiD2z+wNqyh4WmxM7y7Ui5TiYMU2hbzzcHSiu4tu3DxLjQnQuiuNL6XwdMwh+/f1jnURz4wjHNTWvHORiRSQ67yeJrcCyLIc2ljMOCSBQ5fff5EsiGxBNS03QAHjp/r1VGx0mVmGQ==
+ bh=qRwYBxBYMO6DHq/+SOCmdFUF9UCjv3NCYmmzRNnHdOQ=;
+ b=QQAqc3bLJbiWLgZFUcAQd4W+TPBheDKOxdNTJsaC9S5DGR36QKl4gmkDdD1soeZ8cU7V5xhGqBXgOuquL+jle1JP7w2/o5ODg6tQCekPbbKu/NTObkA3KLBmZr/mGG8Ya+w3FEFzeXT9iPldTWgsIpL1LtTa/f3kOv/vx0+lJbqliTfFNN4GOeWyGIhsbF3Wj0WkHhfawoIrI/hWsCDgW4pEypcDwLrrU5SzzBdShMd/EY0MaeEntt5PSm3NTEJ2J7P/bVruD1++pKzXCSGsciqaPm78qoi8HQ+AlvFp5v5EZQ2C98nR38P6oiGtPemNDTGsOZx9rUHDUp5f8T1cJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mFk2Ebx+H5q4Wp/urupPueeF48s63z2pnUW4PQEc/SQ=;
- b=TKzxgZqZNdH3MMzcnE5PsDkHF1BXoAT3Ru80q3TchpcW2SBip2Z3L/10HW0T3Y0RQk2GpUGP0IFDgJs2JhvaAp4YEd0ufDv+cbjzIKnZD9ukqru+IojhP0B09+w0cQmSHv2+lbXgOnH6L7gXkgWnU+1h27VSjlO9aJBwprzYy6M=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by VE1PR04MB7470.eurprd04.prod.outlook.com (2603:10a6:800:1a3::15) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA0PR11MB7838.namprd11.prod.outlook.com (2603:10b6:208:402::12)
+ by DS0PR11MB7410.namprd11.prod.outlook.com (2603:10b6:8:151::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.22; Mon, 4 Dec
- 2023 11:14:00 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.012; Mon, 4 Dec 2023
- 11:14:00 +0000
-Date: Mon, 4 Dec 2023 13:13:57 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
-	vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v7 net-next 8/8] selftests: forwarding: ethtool_mm:
- support devices with higher rx-min-frag-size
-Message-ID: <20231204111357.kg4z3tud6nvwn2ly@skbuf>
-References: <20231201135802.28139-1-rogerq@kernel.org>
- <20231201135802.28139-9-rogerq@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201135802.28139-9-rogerq@kernel.org>
-X-ClientProxiedBy: BE1P281CA0170.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:66::9) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33; Mon, 4 Dec
+ 2023 11:19:02 +0000
+Received: from IA0PR11MB7838.namprd11.prod.outlook.com
+ ([fe80::cbb6:48f6:d69d:f657]) by IA0PR11MB7838.namprd11.prod.outlook.com
+ ([fe80::cbb6:48f6:d69d:f657%5]) with mapi id 15.20.7046.033; Mon, 4 Dec 2023
+ 11:19:02 +0000
+Message-ID: <3b2a26f8-fced-49e3-b129-d742ee49874b@intel.com>
+Date: Mon, 4 Dec 2023 19:18:50 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4 00/12] Add E800 live migration driver
+From: "Cao, Yahui" <yahui.cao@intel.com>
+To: <jgg@nvidia.com>, <alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <lingyu.liu@intel.com>,
+	<kevin.tian@intel.com>, <madhu.chittim@intel.com>,
+	<sridhar.samudrala@intel.com>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <brett.creeley@amd.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>
+References: <20231121025111.257597-1-yahui.cao@intel.com>
+Content-Language: en-US
+In-Reply-To: <20231121025111.257597-1-yahui.cao@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR02CA0010.apcprd02.prod.outlook.com
+ (2603:1096:4:194::15) To IA0PR11MB7838.namprd11.prod.outlook.com
+ (2603:10b6:208:402::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,77 +102,196 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VE1PR04MB7470:EE_
-X-MS-Office365-Filtering-Correlation-Id: f2bbbc66-f940-4d2b-d6f2-08dbf4ba1da5
+X-MS-TrafficTypeDiagnostic: IA0PR11MB7838:EE_|DS0PR11MB7410:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35b4803f-738b-4b69-17d5-08dbf4bad179
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	kfhEYBkjGcP7wtYi7DI/hELDJ4gfft8h6aomQkM2DwR5Gwd3PCvsW88iSKMzxUWiDrKUaqTmvetxagD1rTL2mp29sjes7o3hn5thvqLxpUfSrb1RgdpPThYQ8D8VQKjrYohcYIwGKpr5JR4CZeQ9WA8zlERCWTpdMrFYFpXD7yeGHOF0KjmyDejAWJizQOuyv07MYkNCkUvqcdgwSnC3mRciNc1ptjvFjF8jXz0oCjI+gO4PCAscVf0RZw13McpzkNTsgqK0b5ezueaqEdMsawLw61E/Bh5ADOocQdRC1OjKuMxXy1NzXhL8YjeEA/l2/yoREDQc57mr5HsgzKm2IeYvcXoIo+eEd7+M0Dp7X/iial3wm7dmB1TR66PyaRJ1F77ipJE1A0PlQAb+0cgEHlh+qRXn2TizlctTt2dkEGqU0fGVNFVb6GClKncCQUmd/mIRxWebqLcNtja3ancb7qwXo/MXflUvnV5fPOErawJyA7ESIMq5+f9hV9aXrzFelR2wiYfEhzgoSy3vg4DdlRfk++r/Xqq/gAHQDvXTmWnFud1WV0TbbX7rVcTPMJoX
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(346002)(376002)(366004)(396003)(136003)(230922051799003)(451199024)(186009)(1800799012)(64100799003)(6916009)(66476007)(66556008)(44832011)(66946007)(316002)(4326008)(8936002)(8676002)(86362001)(33716001)(9686003)(6512007)(6506007)(478600001)(6486002)(6666004)(2906002)(1076003)(26005)(83380400001)(38100700002)(41300700001)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: RsEm9VW1wFwWXHZGhfvu6QyZDWH2y10qbWqPsrixPItlHkOtFprQYaxm3ub+/SVqv37iTMz66TcYKhyyEQQlnQU+cTNr0EpiAEIgzY7zwhZbvqZ/U4DBuqHruR/7qorja8hq6ZWbVVIqll0JJjGr/Gyt1gmi5WtfCQDvBYStWmSYZ/pa3DeeSZTg3dMsZD+6pPD2LT1BOtMQeplYYF5zuhzxCqhEXKopFdCzrFR3LIveTEJaQhfherq0+N/Fz06JTXcTqsjq8678HXl6r9I6feFDeaEPpfU0J4g0Xo96T+/9qfObfRLtPTxSdNX+Pcwt21m+O598fcLv10ZfJlQZgoE3HsrZiackNBNRCALN0JqNwR8K+p3Pg+kFwvfibroGxM65vCZU0ylBjmiMsynrCZ+a4ZAB+u1zr70V+w7oi4BaDRkyRFQ/cJ1yZU4p5YMErQunamgusjzq5O8Ujx2iY8tBlzZ1m3/zucJP1GP9EzS11hzFZbMid/tq83fQRCKab71ZTmzty0v3Zz7xyeU6Vab/H3lup1DbTNYszGhGZ5F1Ws2qDirthYfEJF0UKJ0LM+FosqWOgGJBOYS2M7DL40Mu3O58iUg/Zhgh5jiFABnfg/Px28Wh5E1mCCKk/FYKdTivegQ2Z8NXN+/AmiQgX6QJ0gaYXljkQxJ1ApAoBaKJ8AheBGXk0bELohHBCF48YzhVybycrMgzhZ7k61sAYDG0gBleeKkED/uyc9+oMU0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR11MB7838.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(136003)(346002)(396003)(230173577357003)(230273577357003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66946007)(66556008)(66476007)(316002)(478600001)(966005)(6486002)(41300700001)(6666004)(36756003)(5660300002)(2906002)(7416002)(8936002)(4326008)(8676002)(86362001)(2616005)(83380400001)(82960400001)(38100700002)(26005)(31696002)(6506007)(31686004)(53546011)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Am1OpORmkuFRw5bUbXkEhAv3vU/ZDouCI6B9xmmXtpN84GCmJmg4EJ2Tpunp?=
- =?us-ascii?Q?UQ1/BRD0Jrpx4K8F5VNNqgV8NV+ObmS2iF/9Cs3iNLuTsxZ+IJEmViugtwMJ?=
- =?us-ascii?Q?rY03E81XZLwqru2JWUByoGCax97I4nw+REcKS4CAMnZQO6kSP+8FSuSNfIWT?=
- =?us-ascii?Q?U+uumLlPzrXbZLWQIUhfQqil4xSfTTWsoQVxaiWCWNMojvShT9lKb5RPPqkx?=
- =?us-ascii?Q?Kh9cDAsCRzPuCeFU5RSghF3s9bjrAQk1Eh3/Tjp/mLcIjZAt7m/H+gxnzzc6?=
- =?us-ascii?Q?oDuPKuPa/rQ5S5ClA4uFUNA5peRsvmY3WN5Lw9YvyuaERmhDyrw6KqPzYmDT?=
- =?us-ascii?Q?2/yA1z4rSYjiNsYy3r6mf8WcyZqPYSoSIYyuQTy+3fYkPh++VnfrRt9/qat2?=
- =?us-ascii?Q?teBDguaPBZUslIMCJ4r/uGD+iqXSpZuxCGmzStzGZJ8WB1xr8Irxm+kg0+lE?=
- =?us-ascii?Q?8FAj11La/H+Xz3LDbslc7Cr1zx+h3qhpI0ohaGCjicKCq7ANDjn3efmP8yR9?=
- =?us-ascii?Q?tyTat1pBJFuOsnVRba//jomvVpgRL/5v87LM2nmh0f71QsOlugwZbTgNaq5X?=
- =?us-ascii?Q?kLC3G44x3adSHjhsvsBKiKtR+joxS0bavtN0NeSu9MPtrTtGTNoD4P/P1iEH?=
- =?us-ascii?Q?5cug9can5K7XcUMn3SLGYOIwscLFaAgiQ9zV8svjiGH+8HAHg5alwZ3L+eCT?=
- =?us-ascii?Q?Bj6o+KfjEH8a1F5fFXxVcLsnA/jBv6TFuSfloActZzR/wGLFZeROtE3i8v8t?=
- =?us-ascii?Q?dNQr07IkIm/BM+bJDCCSZPekTdaUpLTP2mX2H0ZjYCcNrCzCMXhYNUJKq6A7?=
- =?us-ascii?Q?az1gHZsWlK1a2EuFcHy+krrcVCe2mGHhwnmBOPr5e8XQS+5+5xHr7Nm2DpYU?=
- =?us-ascii?Q?yQnW/TyPhAFOMtYohp4fi1OAi8ERw3u4f76zIncEQsug3gzIj3KLQwrfL7iY?=
- =?us-ascii?Q?LSwxjdlxG1Ow83TzY3ILy+iG5bvllKLfT656S6UmIQ4fZFPIxlfg/D6pgunf?=
- =?us-ascii?Q?4n+X0gzMGFAKXOWRR8rhDX+gpipanFVBxctLfYq6PAsu/YRjPkL6e/puVpuA?=
- =?us-ascii?Q?H2OEQwH8BqVFmv/v7gjYsOEmFI7zTYsGjiwPowDWSIjXzEjWAZnpo3ZHM/Cd?=
- =?us-ascii?Q?KCZaYrdrcgrJanU4Eq4G93EMVrUMeRs1bV1nP6Cx0TCZ9/Cj4aUZPFJ+RSZt?=
- =?us-ascii?Q?0OsmSc6C92tQGzvc2rCLvrg7cd+KZRZi2hEy+57XqeOfF9yhDipJDOUD8LfK?=
- =?us-ascii?Q?kFu6ybfsv13j+PC3tpODfzibox+ns2WmzSDeUAqUUzYMgRWDSKxWiNHUhpuk?=
- =?us-ascii?Q?wAWiG5S92H7wNNUQLQTfLEXJpriL9RDsVVUfi2uKc53TmqGxoevFqYm9c4ww?=
- =?us-ascii?Q?enbkh1B6zeYtcT7U3/S89bEN0/jn/SOUVzGVjpjGCsStGrfPXHSL1Js2Lzo5?=
- =?us-ascii?Q?AqQEeKKVNgD2r+ZnTbJL+DC52Xlt5g0EPcYLFgfyMnYlwA624iFmahu4ZWdu?=
- =?us-ascii?Q?JXKtX1S4ui2PuQCBaQ0HkKb37QV/dDXFufeNHMcIrK+w1zpQG07B6jukA4LE?=
- =?us-ascii?Q?LuD2NKj6FLrCDDvP9V6//T6e+irxQEqHrmcPjVxFl2tnTFPT3MtS6eEVtq0l?=
- =?us-ascii?Q?mg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2bbbc66-f940-4d2b-d6f2-08dbf4ba1da5
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WWRoeEttc1ZmSE9TbjlpQ3hxSGQ4bmg5d1ZFdWx3SnFtbmp4c2JtRGZLencv?=
+ =?utf-8?B?dXRKS3FUV0RrM0F0NGliQjBYNmNneFI2MktQQ3FHa1Ntd3lWTTJIUktJNURI?=
+ =?utf-8?B?L2ZYcUZUWkpTUHZhZnlIcytiKzFDU0tBMUlNZTRidjBpYTZqQXFPY3VqVzRh?=
+ =?utf-8?B?c0prR0p0RFp2ejY1VHBYZG1xeno0MVhsZGhJeWRGbWpWblJZSkRqKzBWWkRY?=
+ =?utf-8?B?aDVlYjNCSldJeWxVbFNDUnQ5ZXA1ekN3MTA1WmtxNjBiRjhXMDcwVWVFbHRa?=
+ =?utf-8?B?VWhDRzFBRE5kN2pLT3dsTU52TjZDc3JZSFE3bEppUFhzSkFScUhBNzNCRngr?=
+ =?utf-8?B?YisySFF0aTlXNis2bTdRTlZXN2xEZU82ZXVrZ09Yc0NVQzk3MzRVdTFRZXRt?=
+ =?utf-8?B?eksvNU4vUlFCc1JObmtxT2FOQm14cjZhelVzL205a0RsSkNtV2hjcG5sS2Jq?=
+ =?utf-8?B?NXMyOUJRVzhvcjBqVk1JekU3aGxBOFFiNGFaV0NzUWNBYmQ3d1BYTytEdWdS?=
+ =?utf-8?B?MWhRMVZTZE1CSXczOVU3UENFRG5zZTM4cW0xVzZmNkRjWldJRTZmMUtKTjFq?=
+ =?utf-8?B?ckVYd1JQL09QOFpkUVM1dk5OSjB5NkJPd05TRmd3WVV1ZGs3bTVndm9Vd0NP?=
+ =?utf-8?B?N09BMHNzazdadTQ1U3hkQ0t2Sm5tMjBJQXovZzhXWVI0WmIvMWE5cWhFSWRB?=
+ =?utf-8?B?RDkreDVLSDNjZFBRaGwzdmFFSmx1V0JyZDBnQnpnTmFEdnFwbVRoRjJLeU1V?=
+ =?utf-8?B?T0x3cUpTUlp0TEZGb0NNdXhva2N3MGk3bnN5dXJ4UFo0cGpKby81cnd0cHFN?=
+ =?utf-8?B?YzBqQkh6OHZNS0Nqd0pHTXlNVXhZdTRuVXRSWGtyZ1FESlh1UjZKOXJMU3gx?=
+ =?utf-8?B?a0tMQmZnbTVEdCtaWTEwTGM2K28ydzhDdlVzb0UyY1piVDdpbkxQeTlvc2Rq?=
+ =?utf-8?B?TEptWVVXb0dXMDhadlBUbzVPM0ZDaVFLNVdSbzduSkVSSWpSMHFnZFdzb3Bl?=
+ =?utf-8?B?RVFaNDFJUmpUOFBrYithb1E5aFFwRlJjM2VQdU9NRkxHVmJ1dDFCVEYxdjZz?=
+ =?utf-8?B?cThZZWZuR0dHdkp2WVRqN1JvYlRrakI5V3pqWXI4dlZxSnU2OGM0dDRGemlF?=
+ =?utf-8?B?b2l6bkJWYjM1cU9PK2xBNnY5azQ3TVlWT1lvUk9lNnpNZTFncnBVSmFzUnpM?=
+ =?utf-8?B?SUJTT1pYMS9SY3ZuYWZ3YUhDQzdsS1R1SWtLT0FnWGI2Tm5sVGJoMGFkWDlj?=
+ =?utf-8?B?SWhCWWVBYXltc282WW5hOUFIZDhSZ3ZocVlkZzhYNUZraTVoS2drcDZiOU5K?=
+ =?utf-8?B?YnNXOGNyV2RTazhOY1pGZy95VURZYWE0dytYeVkveVZDakVMZWJuQkZUR1BE?=
+ =?utf-8?B?bSt3SVllcGtPcDBlVXVWd29qU21rK2FJWFFzOHQzVkZZVWg1Z1JidS96ZFNk?=
+ =?utf-8?B?YkVGbkdxZkFSSlpWVDVDUVJLbDFUWmhnUDlhc0lBbnVJZm8xcGorNFpxTVJJ?=
+ =?utf-8?B?QWJ2TXkyTEUvbmdwdHJFQ0xzZk5aWFpoZkZYcjRyU25EQ25vSFQwdytHcHJw?=
+ =?utf-8?B?WFUwNFM0SHpXcEtsOThhaVhVLzlGQ3l2RGd6NHRrRUlQZXlOOXdmU2M1Yk05?=
+ =?utf-8?B?dEpGZjg1VVZmVVUvSnUvbnZTY2ZtQ0JMa3BOeE9Sa1h3TjRIUjljRlNqTDdC?=
+ =?utf-8?B?di8ya2Z0ellXdHl3eEpHcE5OM3BzbTNPZUFlelNEK29ZYkVlZVpPckE3dkJn?=
+ =?utf-8?B?d1dXVktiN2c5OFFyQnc5QllabEFiUWcwVnAzcGhsK2drY0UwNmNqZ2VWazdJ?=
+ =?utf-8?B?OVFmU3BGNjNLTWNGUWNPRHdwVjhLL0JoVDIzdmFRc3hBajBaWVFGOUZtTldB?=
+ =?utf-8?B?QXVkVTUvbWpiUUVVQ2s1MG5IOUl0NGJjZHVESnlURjZuRFdEbm10ZWVzZmZE?=
+ =?utf-8?B?SlFUNjdhclIyRGxLTlBrUjc3MVBjcnpQU092MHkxdWJ5K2gxcGVEb1VFQm13?=
+ =?utf-8?B?MDBJTDdkdzZJYUpmM3ZuUDNnclJHekVwbmVFQU1ZM2VoZkVmTWJaVGRPUDM1?=
+ =?utf-8?B?V2grVklVeVYzRlZJVDBqaUJIOFJGU05IdDlHWHVVT3JMMjBUMmJoZGYrTHd4?=
+ =?utf-8?Q?bDdRmI7mw+uorWwa4BaTHe3Ml?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35b4803f-738b-4b69-17d5-08dbf4bad179
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR11MB7838.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 11:14:00.2928
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 11:19:02.2084
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wEDNABpwGDcVioAMq2oo4yVYw45L4a+jXWnPUSut6wCBiYQwiV9bujgVwoju50Upze5Bvo5WjD2fSj4pDtyEpA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7470
+X-MS-Exchange-CrossTenant-UserPrincipalName: g9Ca+rekURGDc7ALehkcL3Vc4tGn4MrcJLbUTTNS3gMlK2ksVj3t9TDNtwQage32VFOB3h3dHMg2ujYl8X1a1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7410
+X-OriginatorOrg: intel.com
 
-On Fri, Dec 01, 2023 at 03:58:02PM +0200, Roger Quadros wrote:
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+
+On 11/21/2023 10:50 AM, Yahui Cao wrote:
+> This series adds vfio live migration support for Intel E810 VF devices
+> based on the v2 migration protocol definition series discussed here[0].
 > 
-> Some devices have errata due to which they cannot report ETH_ZLEN (60)
-> in the rx-min-frag-size. This was foreseen of course, and lldpad has
-> logic that when we request it to advertise addFragSize 0, it will round
-> it up to the lowest value that is _actually_ supported by the hardware.
+> Steps to test:
+> 1. Bind one or more E810 VF devices to the module ice-vfio-pci.ko
+> 2. Assign the VFs to the virtual machine and enable device live migration
+> 3. Run a workload using IAVF inside the VM, for example, iperf.
+> 4. Migrate the VM from the source node to a destination node.
 > 
-> The problem is that the selftest expects lldpad to report back to us the
-> same value as we requested.
+> The series is also available for review here[1].
 > 
-> Make the selftest smarter by figuring out on its own what is a
-> reasonable value to expect.
+> Thanks,
+> Yahui
+> [0] https://lore.kernel.org/kvm/20220224142024.147653-1-yishaih@nvidia.com/
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git/log/?h=ice_live_migration
 > 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Tested-by: Roger Quadros <rogerq@kernel.org>
+> Change log:
+> 
+> v4:
+>   - Remove unnecessary iomap from vfio variant driver
+>   - Change Kconfig to select VFIO_PCI_CORE for ICE_VFIO_PCI module (Alex)
+>   - Replace restore state with load state for naming convention
+>   - Remove RXDID Patch
+>   - Fix missed comments in Patch03
+>   - Remove "so" at the beginning of the sentence and fix other grammar issue.
+>   - Remove double init and change return logic for Patch 10
+>   - Change ice_migration_unlog_vf_msg comments for Patch04
+>   - Add r-b from Michal to Patch04 of v4
+>   - Change ice_migration_is_loggable_msg return value type into bool type for Patch05
+>   - Change naming from dirtied to dirty for Patch11
+>   - Use total_length to pass parameter to save/load function instead of macro for Patch12
+>   - Refactor timeout logic for Patch09
+>   - Change migration_enabled from bool into u8:1 type for Patch04
+>   - Fix 80 max line length limit issue and compilation warning
+>   - Add r-b from Igor to all the patches of v4
+>   - Fix incorrect type in assignment of __le16/32 for Patch06
+>   - Change product name to from E800 to E810
+> 
+> v3: https://lore.kernel.org/intel-wired-lan/20230918062546.40419-1-yahui.cao@intel.com/
+>   - Add P2P support in vfio driver (Jason)
+>   - Remove source/destination check in vfio driver (Jason)
+>   - Restructure PF exported API with proper types and layering (Jason)
+>   - Change patchset email sender.
+>   - Reword commit message and comments to be more reviewer-friendly (Kevin)
+>   - Add s-o-b for Patch01 (Kevin)
+>   - Merge Patch08 into Patch04 and merge Patch13 into Patch06 (Kevin)
+>   - Remove uninit() in VF destroy stage for Patch 05 (Kevin)
+>   - change migration_active to migration_enabled (Kevin)
+>   - Add total_size in devstate to greatly simplify the various checks for
+>     Patch07 (Kevin)
+>   - Add magic and version in device state for Patch07 (Kevin)
+>   - Fix rx head init issue in Patch10 (Kevin)
+>   - Remove DMA access for Guest Memory at device resume stage and deprecate
+>     the approach to restore TX head in VF space, instead restore TX head in
+>     PF space and then switch context back to VF space which is transparent
+>     to Guest for Patch11 (Jason, Kevin)
+>   - Use non-interrupt mode instead of VF MSIX vector to restore TX head for
+>     Patch11 (Kevin)
+>   - Move VF pci mmio save/restore from vfio driver into PF driver
+>   - Add configuration match check at device resume stage (Kevin)
+>   - Remove sleep before stopping queue at device suspend stage (Kevin)
+>   - Let PF respond failure to VF if virtual channel messages logging failed (Kevin)
+>   - Add migration setup and description in cover letter
+> 
+> v2: https://lore.kernel.org/intel-wired-lan/20230621091112.44945-1-lingyu.liu@intel.com/
+>   - clarified comments and commit message
+> 
+> v1: https://lore.kernel.org/intel-wired-lan/20230620100001.5331-1-lingyu.liu@intel.com/
+> 
 > ---
+> 
+> 
+> Lingyu Liu (9):
+>    ice: Introduce VF state ICE_VF_STATE_REPLAYING_VC for migration
+>    ice: Add fundamental migration init and exit function
+>    ice: Log virtual channel messages in PF
+>    ice: Add device state save/load function for migration
+>    ice: Fix VSI id in virtual channel message for migration
+>    ice: Save and load RX Queue head
+>    ice: Save and load TX Queue head
+>    ice: Add device suspend function for migration
+>    vfio/ice: Implement vfio_pci driver for E800 devices
+> 
+> Yahui Cao (3):
+>    ice: Add function to get RX queue context
+>    ice: Add function to get and set TX queue context
+>    ice: Save and load mmio registers
+> 
+>   MAINTAINERS                                   |    7 +
+>   drivers/net/ethernet/intel/ice/Makefile       |    1 +
+>   drivers/net/ethernet/intel/ice/ice.h          |    3 +
+>   drivers/net/ethernet/intel/ice/ice_common.c   |  484 +++++-
+>   drivers/net/ethernet/intel/ice/ice_common.h   |   11 +
+>   .../net/ethernet/intel/ice/ice_hw_autogen.h   |   23 +
+>   .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |    3 +
+>   drivers/net/ethernet/intel/ice/ice_main.c     |   15 +
+>   .../net/ethernet/intel/ice/ice_migration.c    | 1378 +++++++++++++++++
+>   .../intel/ice/ice_migration_private.h         |   49 +
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.c   |    4 +
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   11 +
+>   drivers/net/ethernet/intel/ice/ice_virtchnl.c |  256 ++-
+>   drivers/net/ethernet/intel/ice/ice_virtchnl.h |   15 +-
+>   .../ethernet/intel/ice/ice_virtchnl_fdir.c    |   28 +-
+>   drivers/vfio/pci/Kconfig                      |    2 +
+>   drivers/vfio/pci/Makefile                     |    2 +
+>   drivers/vfio/pci/ice/Kconfig                  |   10 +
+>   drivers/vfio/pci/ice/Makefile                 |    4 +
+>   drivers/vfio/pci/ice/ice_vfio_pci.c           |  707 +++++++++
+>   include/linux/net/intel/ice_migration.h       |   48 +
+>   21 files changed, 2962 insertions(+), 99 deletions(-)
+>   create mode 100644 drivers/net/ethernet/intel/ice/ice_migration.c
+>   create mode 100644 drivers/net/ethernet/intel/ice/ice_migration_private.h
+>   create mode 100644 drivers/vfio/pci/ice/Kconfig
+>   create mode 100644 drivers/vfio/pci/ice/Makefile
+>   create mode 100644 drivers/vfio/pci/ice/ice_vfio_pci.c
+>   create mode 100644 include/linux/net/intel/ice_migration.h
+> 
 
-This needs your sign off as well after mine, otherwise in the git log it
-will imply that I sent the patch myself. I think you can reply with the
-tag to this email and either the patchwork bot or one of the maintainers
-will pick it up automatically, it's not a reason in itself to resend.
+Hey Jason & Alex,
+
+     Did you have any chance to review this v4 patchset ?
+
+     The branch is published as 
+https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git/log/?h=ice_live_migration 
+as requested.
+
+     These patches are based on top of commit b85ea95d0864 ("Linux 
+6.7-rc1") and being sent as a whole for ease of review. A branch/shared 
+pull request for the networking portion of these patches (1-11) will be 
+sent when review is complete.
+
+Thanks.
+Yahui.
 
