@@ -1,47 +1,50 @@
-Return-Path: <netdev+bounces-53580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 003EC803D0C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:31:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2975803D0D
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3069E1C20B47
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84676B20B1D
 	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D800D2FC35;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD9D2E3EB;
 	Mon,  4 Dec 2023 18:31:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA1CFA
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:31:34 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 002FDFF
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 10:31:35 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj2-00038y-IA; Mon, 04 Dec 2023 19:31:24 +0100
+	id 1rADj3-00039G-3o; Mon, 04 Dec 2023 19:31:25 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj2-00DZmV-49; Mon, 04 Dec 2023 19:31:24 +0100
+	id 1rADj2-00DZmY-Ea; Mon, 04 Dec 2023 19:31:24 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj1-00EE7F-Qu; Mon, 04 Dec 2023 19:31:23 +0100
+	id 1rADj2-00EE7J-5P; Mon, 04 Dec 2023 19:31:24 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
+Cc: =?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-renesas-soc@vger.kernel.org,
 	netdev@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net-next v2 2/9] net: fjes: Convert to platform remove callback returning void
-Date: Mon,  4 Dec 2023 19:30:42 +0100
-Message-ID:  <4889ac6a7ffa9b02fa5cdd2d3212e739741f80b8.1701713943.git.u.kleine-koenig@pengutronix.de>
+	kernel@pengutronix.de,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH net-next v2 3/9] net: pcs: rzn1-miic: Convert to platform remove callback returning void
+Date: Mon,  4 Dec 2023 19:30:43 +0100
+Message-ID:  <82b728e14a68c421e269eff3b8083d9d6e62d956.1701713943.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
 References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
@@ -52,7 +55,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1925; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=V5CcWa1dpN00caSyAaQLtByRj9WVXqyg1ynTnYkiNHE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlbhrWgJ/2GgCDVC3ayzVgVSekWhGlhbtXdFc2i OyYKo+GjBmJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZW4a1gAKCRCPgPtYfRL+ TnVUB/4v0QFWsoGdGSEtGIFWiUfRO5gol6wb6oaKUOL+ozVu2k5Oeu3cNHqh+rLSYBkCxfmMDoB rmtliesTqf5xppGXjrfVJCm7lNbqX7NSrd/8lY9uRcYC84JHkjAv5gnyNT5ybMm6oMMIExg1JPz swQ5mglXIQ9p3KMjCUHou3+YkvJavcc5B98KzNY2SfE+6yn5DRFg8T4wmFB6oQkryjubdQtEwVy NFPH0XLZbQ4PGuvbLYkHayGDdfq39xwZPSln/dyizU6yZfWVxc29BRVsxrqSQmO1K1IcfxhoVQJ f1U5n3WwO+fDusqKgbZp0RxdVoy8oLAK8CnMqqy5GZjanPj/
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1766; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=i2Z/P9sGagmWu34TWxQ4CGYIrQslMBYPtFr1evQ8ocA=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlbhrZZQzhaE2Njvl74xVu88W/97/IYyx7lh2fL 9ZgukGWjZiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZW4a2QAKCRCPgPtYfRL+ TmZKB/4y1UoT4nRM6Irp0y1hLaDsiyo8WbvOCoLMAlDkrCyJphl6+TjtElz3Wd2MsDLEXmeeUQ+ eb8Yqx8kjUo0G0l9jEyIIkLvuXHhW112S6g80zqRO2zuAB+76fyqWJv/e66b/0J3CyqwFbUrDvi 3v76RpJpZzOQjaqrR7E0f2lvJsuj9OukWIkULqIGcsendvpFKHpCoP+uYZ3Cld7Yd9HJLThzSHt DL80L9TqR6HX+nJXWlblCrXFJaAc3gXxmbeFxz7iWK8D/YMYV/9awQXSq+FOUl+sXUYP3dPgRIN hfyeELifJVhkQEh73cvSIh0bHLtaemfM00B3je0y1lrg6KwI
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -73,43 +76,39 @@ are converted, .remove_new() will be renamed to .remove().
 Trivially convert this driver from always returning zero in the remove
 callback to the void returning variant.
 
-Link: https://lore.kernel.org/r/20231117095922.876489-4-u.kleine-koenig@pengutronix.de
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Link: https://lore.kernel.org/r/20231117095922.876489-5-u.kleine-koenig@pengutronix.de
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/fjes/fjes_main.c | 6 ++----
+ drivers/net/pcs/pcs-rzn1-miic.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/fjes/fjes_main.c b/drivers/net/fjes/fjes_main.c
-index cd8cf08477ec..5fbe33a09bb0 100644
---- a/drivers/net/fjes/fjes_main.c
-+++ b/drivers/net/fjes/fjes_main.c
-@@ -1438,7 +1438,7 @@ static int fjes_probe(struct platform_device *plat_dev)
+diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
+index 97139c07130f..d93f84fbb1fd 100644
+--- a/drivers/net/pcs/pcs-rzn1-miic.c
++++ b/drivers/net/pcs/pcs-rzn1-miic.c
+@@ -505,11 +505,9 @@ static int miic_probe(struct platform_device *pdev)
+ 	return ret;
  }
  
- /* fjes_remove - Device Removal Routine */
--static int fjes_remove(struct platform_device *plat_dev)
-+static void fjes_remove(struct platform_device *plat_dev)
+-static int miic_remove(struct platform_device *pdev)
++static void miic_remove(struct platform_device *pdev)
  {
- 	struct net_device *netdev = dev_get_drvdata(&plat_dev->dev);
- 	struct fjes_adapter *adapter = netdev_priv(netdev);
-@@ -1462,8 +1462,6 @@ static int fjes_remove(struct platform_device *plat_dev)
- 	netif_napi_del(&adapter->napi);
- 
- 	free_netdev(netdev);
+ 	pm_runtime_put(&pdev->dev);
 -
 -	return 0;
  }
  
- static struct platform_driver fjes_driver = {
-@@ -1471,7 +1469,7 @@ static struct platform_driver fjes_driver = {
- 		.name = DRV_NAME,
+ static const struct of_device_id miic_of_mtable[] = {
+@@ -525,7 +523,7 @@ static struct platform_driver miic_driver = {
+ 		.of_match_table = miic_of_mtable,
  	},
- 	.probe = fjes_probe,
--	.remove = fjes_remove,
-+	.remove_new = fjes_remove,
+ 	.probe = miic_probe,
+-	.remove = miic_remove,
++	.remove_new = miic_remove,
  };
+ module_platform_driver(miic_driver);
  
- static acpi_status
 -- 
 2.42.0
 
