@@ -1,30 +1,60 @@
-Return-Path: <netdev+bounces-53395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9DA802D28
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:32:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F33802D59
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECDAA1C209C6
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:32:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA2D1C20A45
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43748947B;
-	Mon,  4 Dec 2023 08:32:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EF0DDAB;
+	Mon,  4 Dec 2023 08:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="D1qGeoCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE7BD5;
-	Mon,  4 Dec 2023 00:32:03 -0800 (PST)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SkGxl6yRdzShgS;
-	Mon,  4 Dec 2023 16:27:39 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 16:32:00 +0800
-Message-ID: <5402aa8a-a20f-4d28-bd36-3b88702ea6ae@huawei.com>
-Date: Mon, 4 Dec 2023 16:31:59 +0800
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A89D8
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 00:38:25 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-33334480eb4so2400958f8f.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 00:38:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1701679104; x=1702283904; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mXHGFzYh/eKEpUPYl1Ap5PY48QYUpYTuUF24q1tFUVc=;
+        b=D1qGeoCDq5zYB+NJH9GWk24cNo7z/weNso2JJzXgjZWQLOXJMWGEdg46MxBBGcPDo6
+         eeSj1vDRp4vpyFgUYIijQsEoHHelAGomZRwh3P8iFzXaH10W/ZFSfqq/d6z+B1EWwHR9
+         YWzaTR1UsOUffe85mzS3+jpqXKNQW+SGEVDGCDzSG3X4EAg6uzCjkYxICFNmLLPP2QQA
+         uOL59qNrt3839+SCDExgg+FYdNMw1afpGBGHIdgMWRXj/a2o6O7J5Oohi/UluREbNpxP
+         sc8V1jioME0GXjXg7N/tyYrIVSlRWzamGT9ydTpIdt/Qt03D+RZIj7cu/DCyv7V5h7iI
+         FIrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701679104; x=1702283904;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mXHGFzYh/eKEpUPYl1Ap5PY48QYUpYTuUF24q1tFUVc=;
+        b=XFNoAgxYVQGBbHRBBUvZhtJHLp/mXgOyeO9iXGpdrbifk6FLzLpBVkzZ1tA/m6r6JX
+         sxWB4nkIlAs+APweb2YAqiyn3XCpZKFpqEbmUMKYqZBxk0VXj1i9wD6x+eOLOUGToZnz
+         VM0oHN1f3mG3uYdcZIxYqVKmvg09ArTGvf0YKkJkigswJJapL2mubCZ6z1fWG3Oeu+X7
+         HvUYwzNzj8QgfQ3WC6z9bHRwr7AdGRyHzkNueafHx1qClkF6OzSUApJynWmKMMifL1vp
+         Cci3LUk/oa74nFQFX+I7bdwO/Ao7ASN2w/6DCQa0U9FLrQBo+Y5U8KZ9KaQ8pfS3Lrrb
+         txeA==
+X-Gm-Message-State: AOJu0YygDfFKgCnwyEuioM9XCvVLGQMAigmxbQ9BMKiDD8/2S+vppwm3
+	4nI9cm2RP8/9/nVqNYTFnLtr8A==
+X-Google-Smtp-Source: AGHT+IELNYw3RkOXAmb8vkG3gRt9A+IRTNasMaoq3lVyPbRRKkTGTZN2fAw1PANrCWuSZFt9WzbeTQ==
+X-Received: by 2002:a05:600c:164a:b0:40c:5c9:287 with SMTP id o10-20020a05600c164a00b0040c05c90287mr1354668wmn.195.1701679103805;
+        Mon, 04 Dec 2023 00:38:23 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.22])
+        by smtp.gmail.com with ESMTPSA id bd22-20020a05600c1f1600b004090798d29csm14232581wmb.15.2023.12.04.00.38.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Dec 2023 00:38:23 -0800 (PST)
+Message-ID: <b3701927-e41a-44d8-8f91-da245b76f532@tuxon.dev>
+Date: Mon, 4 Dec 2023 10:38:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -32,73 +62,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Arnd Bergmann <arnd@arndb.de>, Hao Chen
-	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: hns3: reduce stack usage in hclge_dbg_dump_tm_pri()
-To: Arnd Bergmann <arnd@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20231204072932.1077878-1-arnd@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20231204072932.1077878-1-arnd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+Subject: Re: [PATCH 10/14] arm64: renesas: r9a08g045: Add Ethernet nodes
+Content-Language: en-US
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ linux@armlinux.org.uk, magnus.damm@gmail.com, mturquette@baylibre.com,
+ sboyd@kernel.org, linus.walleij@linaro.org, p.zabel@pengutronix.de,
+ arnd@arndb.de, m.szyprowski@samsung.com, alexandre.torgue@foss.st.com,
+ afd@ti.com, broonie@kernel.org, alexander.stein@ew.tq-group.com,
+ eugen.hristev@collabora.com, sergei.shtylyov@gmail.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+ linux-gpio@vger.kernel.org, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120070024.4079344-11-claudiu.beznea.uj@bp.renesas.com>
+ <CAMuHMdW9Unpw7NQOGWd4SeFV8XgvRYTKTXnt9Tsagb3Q3U9tNA@mail.gmail.com>
+ <96dd3f54-9560-4587-b4e8-bf75422ff5ef@tuxon.dev>
+ <CAMuHMdWGbEhBdzK4Swu4uX05vX7H2Ow4uE1C=JVNOrdcbZYL=A@mail.gmail.com>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <CAMuHMdWGbEhBdzK4Swu4uX05vX7H2Ow4uE1C=JVNOrdcbZYL=A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
-on 2023/12/4 15:29, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
->
->
-> @@ -981,7 +981,7 @@ static const struct hclge_dbg_item tm_pri_items[] = {
->   
->   static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   {
-> -	char data_str[ARRAY_SIZE(tm_pri_items)][HCLGE_DBG_DATA_STR_LEN];
-> +	char *data_str;
->   	struct hclge_tm_shaper_para c_shaper_para, p_shaper_para;
->   	char *result[ARRAY_SIZE(tm_pri_items)], *sch_mode_str;
->   	char content[HCLGE_DBG_TM_INFO_LEN];
-> @@ -991,9 +991,13 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   	ret = hclge_tm_get_pri_num(hdev, &pri_num);
->   	if (ret)
->   		return ret;
 
-Thanks,
-  But it would be better if there is an empty line here.
+On 04.12.2023 10:02, Geert Uytterhoeven wrote:
+> Hi Claudiu,
+> 
+> On Mon, Dec 4, 2023 at 8:41 AM claudiu beznea <claudiu.beznea@tuxon.dev> wrote:
+>> On 01.12.2023 19:35, Geert Uytterhoeven wrote:
+>>> On Mon, Nov 20, 2023 at 8:01 AM Claudiu <claudiu.beznea@tuxon.dev> wrote:
+>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>
+>>>> Add Ethernet nodes available on RZ/G3S (R9A08G045).
+>>>>
+>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> Thanks for your patch!
+>>>
+>>>> --- a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
+>>>> +++ b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
+>>>> @@ -149,6 +149,38 @@ sdhi2: mmc@11c20000 {
+>>>>                         status = "disabled";
+>>>>                 };
+>>>>
+>>>> +               eth0: ethernet@11c30000 {
+>>>> +                       compatible = "renesas,r9a08g045-gbeth", "renesas,rzg2l-gbeth";
+>>>> +                       reg = <0 0x11c30000 0 0x10000>;
+>>>> +                       interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
+>>>> +                                    <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
+>>>> +                                    <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
+>>>> +                       interrupt-names = "mux", "fil", "arp_ns";
+>>>> +                       clocks = <&cpg CPG_MOD R9A08G045_ETH0_CLK_AXI>,
+>>>> +                                <&cpg CPG_MOD R9A08G045_ETH0_CLK_CHI>,
+>>>> +                                <&cpg CPG_MOD R9A08G045_ETH0_REFCLK>;
+>>>> +                       clock-names = "axi", "chi", "refclk";
+>>>> +                       resets = <&cpg R9A08G045_ETH0_RST_HW_N>;
+>>>> +                       power-domains = <&cpg>;
+>>>
+>>> Perhaps add a default phy mode, like on other SoCs?
+>>>
+>>>     phy-mode = "rgmii"';
+>>
+>> I skipped this (even it was available on the other SoCs) as I consider the
+>> phy-mode is board specific.
+> 
+> IC.  Still, it's good to have some consistency across boards.
+> 
+>>> Also missing:
+>>>
+>>>     #address-cells = <1>;
+>>>     #size-cells = <0>;
+>>
+>> Same for these.
+> 
+> These are required, and always have the same values, so it makes more
+> sense to have them in the SoC .dtsi file, once.
 
-> +	data_str = kcalloc(ARRAY_SIZE(tm_pri_items), HCLGE_DBG_DATA_STR_LEN,
-> +			   GFP_KERNEL);
-> +	if (!data_str)
-> +		return -ENOMEM;
->   
->   	for (i = 0; i < ARRAY_SIZE(tm_pri_items); i++)
-> -		result[i] = &data_str[i][0];
-> +		result[i] = &data_str[i * HCLGE_DBG_DATA_STR_LEN];
->   
->   	hclge_dbg_fill_content(content, sizeof(content), tm_pri_items,
->   			       NULL, ARRAY_SIZE(tm_pri_items));
-> @@ -1035,6 +1039,7 @@ static int hclge_dbg_dump_tm_pri(struct hclge_dev *hdev, char *buf, int len)
->   		pos += scnprintf(buf + pos, len - pos, "%s", content);
->   	}
->   
+I remember I had a compilation warning with an Ethernet controller
+configured with fixed-link having #address-cells, #size-cells. With
+fixed-link these were not needed.
 
-all exception condition also need to free memory before return. eg:
-	for (i = 0; i < pri_num; i++) {
-		ret = hclge_tm_get_pri_sch_mode(hdev, i, &sch_mode);
-		if (ret)
-			return ret;
+Anyway... I'll keep all in dtsi if you prefer it this way.
 
-		ret = hclge_tm_get_pri_weight(hdev, i, &weight);
-		if (ret)
-			return ret;
+Thank you,
+Claudiu Beznea
 
-> +	kfree(data_str);
->   	return 0;
->   }
->   
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
 
