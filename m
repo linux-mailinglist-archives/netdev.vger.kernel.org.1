@@ -1,65 +1,79 @@
-Return-Path: <netdev+bounces-53359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E91248029C8
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:20:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC21C8029D1
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:21:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 883E0280BDF
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 01:20:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EB81C2092A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 01:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E8C818;
-	Mon,  4 Dec 2023 01:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927E7EDF;
+	Mon,  4 Dec 2023 01:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544D8E7;
-	Sun,  3 Dec 2023 17:20:04 -0800 (PST)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Sk5N14z2dz1P93b;
-	Mon,  4 Dec 2023 09:16:17 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 09:20:01 +0800
-Message-ID: <c10de383-829e-4c24-bf21-0a2cfd0e4cec@huawei.com>
-Date: Mon, 4 Dec 2023 09:20:00 +0800
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9051FED;
+	Sun,  3 Dec 2023 17:21:02 -0800 (PST)
+X-IronPort-AV: E=Sophos;i="6.04,248,1695654000"; 
+   d="scan'208";a="189033685"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 04 Dec 2023 10:21:01 +0900
+Received: from localhost.localdomain (unknown [10.166.13.99])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 4EF2E411DD38;
+	Mon,  4 Dec 2023 10:21:01 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net-next v3 0/9] net: rswitch: Add jumbo frames support
+Date: Mon,  4 Dec 2023 10:20:49 +0900
+Message-Id: <20231204012058.3876078-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 2/2] net: hns: fix fake link up on xge port
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20231201102703.4134592-1-shaojijie@huawei.com>
- <20231201102703.4134592-3-shaojijie@huawei.com>
- <20231201211926.3807dd7f@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20231201211926.3807dd7f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
+This patch series is based on the latest net-next.git / main branch.
 
-on 2023/12/2 13:19, Jakub Kicinski wrote:
-> On Fri, 1 Dec 2023 18:27:03 +0800 Jijie Shao wrote:
->> +void hns_mac_link_anti_shake(struct mac_driver *mac_ctrl_drv, u32 *link_status)
-> drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c:69:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
->     69 | void hns_mac_link_anti_shake(struct mac_driver *mac_ctrl_drv, u32 *link_status)
->        | ^
->        | static
+Changes from v2:
+https://lore.kernel.org/all/20231201054655.3731772-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch.
+ - Fix using a variable in the patch 8/9.
+ - Add Reviewed-by tag in the patch 1/9.
 
-Thanks,
-   v2 patch is sent to fix it.
+Changes from v1:
+https://lore.kernel.org/all/20231127115334.3670790-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch.
+ - Fix commit descriptions (s/near the future/the near future/).
+
+Yoshihiro Shimoda (9):
+  net: rswitch: Drop unused argument/return value
+  net: rswitch: Use unsigned int for desc related array index
+  net: rswitch: Use build_skb() for RX
+  net: rswitch: Add unmap_addrs instead of dma address in each desc
+  net: rswitch: Add a setting ext descriptor function
+  net: rswitch: Set GWMDNC register
+  net: rswitch: Add jumbo frames handling for RX
+  net: rswitch: Add jumbo frames handling for TX
+  net: rswitch: Allow jumbo frames
+
+ drivers/net/ethernet/renesas/Makefile  |   1 -
+ drivers/net/ethernet/renesas/rswitch.c | 376 +++++++++++++++++--------
+ drivers/net/ethernet/renesas/rswitch.h |  43 ++-
+ 3 files changed, 294 insertions(+), 126 deletions(-)
+
+-- 
+2.34.1
 
 
