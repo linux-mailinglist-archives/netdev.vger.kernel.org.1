@@ -1,175 +1,112 @@
-Return-Path: <netdev+bounces-53669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EBC38040C8
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:10:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D168040E6
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 22:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B2CE2812EC
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:10:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 984761C20AF6
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48CC381C9;
-	Mon,  4 Dec 2023 21:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6D9364C4;
+	Mon,  4 Dec 2023 21:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ueppCu+k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQCt6M60"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB40B9
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 13:10:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QFKX2Z9KJGFgHSGub7DoUVvajPyhmbs8uqbu4S6TH1gqw3fo8TUqnqayO8T5byKEV1RZy7V5gKWUOPN3pX8E1U1J+pg/d7KpQ17zKKV4pdB1XVhdpQD5sHXEjbFwRua5JU/RF84sx2b9XmeXT5tYYO5UheLD2emRloSoG/qifq5ddI3I6fm5sPktjuPrbqIpWXnE3WTRwpMGaio5fe/V0tJ4hdQEaTlw6J6aZ6Qe4wU1nSWREtLtpCf8FfJqhwb042xooUqfjgjfPRQ131IYP6LGwCRIa8UAWx8XfYQYfPVajhglk2EF6CBWfX38AZOEK4sJLUbf4OlSRlvUxyPrZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9u8m/0BB0jCYzPpFvhhJsS0D3vXyQvcwpz+q8fPzR4Y=;
- b=HkUFuX1utn+5EjGzODhGjlcHSCHcp+X5cS+bflL4UKt+3vLB9cQJGdVKgQvPNfJUTEzOtIj7to0jwk22yCOcfUOqY9/saCZ1GgpuPpErFO/nN7hHvleI9pNdlW3kCsWHVuzbzWyi/vTmq7xSxXP1QIIg7pGgir1+gzOrxiG4095st/KT6TZCT28B2msbaLVvKk51CpnWYoK9tgc+3TxAi4yCcRDqFWMVp93oZbwWqEmdYYuTOb28k2+mFWLhBrNthKoVPMks850OHkSAZy7d+B7Z9t5G85ikgL5gsqEMd4dFkSOj1BRRajHGnS0aw3kHPRAMObGu8IwvLMD1mmMiFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9u8m/0BB0jCYzPpFvhhJsS0D3vXyQvcwpz+q8fPzR4Y=;
- b=ueppCu+k7fEDFf4QLCas86y8vJqRDJGHLCcibqX7Jkb6tpOLPY2u7qkGMz743T8IFmcL1hWyX0RNu4dum1Wb3Lmg5K6ZKnlTWg5p7C/jMgd6GrJrOr/9tuR978vgqcVih9KOMbPXnfAaU/D/oW50zmMAfLPZp7FXjWDEMHUEKJ8=
-Received: from SJ0PR03CA0383.namprd03.prod.outlook.com (2603:10b6:a03:3a1::28)
- by MW3PR12MB4441.namprd12.prod.outlook.com (2603:10b6:303:59::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33; Mon, 4 Dec
- 2023 21:10:06 +0000
-Received: from CO1PEPF000044F2.namprd05.prod.outlook.com
- (2603:10b6:a03:3a1:cafe::bd) by SJ0PR03CA0383.outlook.office365.com
- (2603:10b6:a03:3a1::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33 via Frontend
- Transport; Mon, 4 Dec 2023 21:10:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F2.mail.protection.outlook.com (10.167.241.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7068.20 via Frontend Transport; Mon, 4 Dec 2023 21:10:06 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 4 Dec
- 2023 15:10:03 -0600
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: <f.fainelli@gmail.com>, <brett.creeley@amd.com>, <drivers@pensando.io>,
-	Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net-next 5/5] ionic: Re-arrange ionic_intr_info struct for cache perf
-Date: Mon, 4 Dec 2023 13:09:36 -0800
-Message-ID: <20231204210936.16587-6-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20231204210936.16587-1-shannon.nelson@amd.com>
-References: <20231204210936.16587-1-shannon.nelson@amd.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F083F33CE6;
+	Mon,  4 Dec 2023 21:16:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38B67C433C8;
+	Mon,  4 Dec 2023 21:16:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701724576;
+	bh=2iD8vt6eNm0XmwO6zdz79g9BRAd6Cvlx6ThzdonFSAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GQCt6M601eJY4Nnaz4H8Um9YD8LcC+BhL95rxh+WB9jRneB4AiVcAxsuG29q+65Jg
+	 G49tfFPUGRjA47FN2yJYhoX5aCQS90IeMlWvYwgs6QgGUERMYYrZdVIQAOKO5UKL25
+	 Vm57s5/IRbWOUQwueBvoLJYZ5S88aomGHu8R9HJbhrnuRCP6SDP9HF/NREBzkjTJR7
+	 aoz4nb2Z80HkvfMPTh8f//kqLKxZaq7acIsnMh28BxU6ebPzhZUmoMsVqDrs1EDRbz
+	 v8kuHxmibuoWpusFUiv0PInA3IPlunxIneyFCNjmqThjhEUsVccdrWH6m7qAgGZ8YY
+	 Nsl+00Zc4s8uA==
+Date: Mon, 4 Dec 2023 13:16:15 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marc MERLIN <marc@merlins.org>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ilw@linux.intel.com,
+ intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: Thinkpad P17 keep hanging in ipv6_addrconf addrconf_verify_work
+ / netlink in 6.4 and 6.6
+Message-ID: <20231204131615.26b57722@kernel.org>
+In-Reply-To: <69717129398d05b18df1c1300bfb41da268c52a0.camel@sipsolutions.net>
+References: <20231202171326.GB24486@merlins.org>
+	<20231204004003.GB29484@merlins.org>
+	<20231204073515.GA9208@merlins.org>
+	<69717129398d05b18df1c1300bfb41da268c52a0.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F2:EE_|MW3PR12MB4441:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54b7ae6a-a1ba-46f1-ddc5-08dbf50d63fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	JJHFlc3nYH1uxPC7oU4qo1ISjmWERXUmxhrZNRDAvsIh2mFZy6mrq6UMmpwDhq1sBVg29fBCkemdk4jdrTdHLy4JGgwYJb7A2XilhrgYP/E9UyBfcbnUWIy1nGX9PxnMfHWHsCwC98Dj68oMkVdXopGdFDrjspFwuHvp2OMI57y8yspw151FSNnkN0ITJ+pX4apb2GNSE2W/+d/ZMQ24iYojyHwJTCpUX0Qt+s7CxhYXL5JzLuxliLBIkH/JgxmJKxVlEh64f3HlXOzX1dehAUKZRucXlbnhqAsvrhM8JyP2tPGjIiZPadDmQ6L0yn0DnnuIDUkFo0PyVn9atJWpB77nfJfnXXyILHOEs/jtyEb3J5PvLN0pVs93uVHJJdAvgQve4li76Q+bDzFnhzzXur4HgyvwDUYVTsyCm7c6N4FbLI5tOZVrMpvBlGAPRvrbIuKGHnkqm/OclY6ZJaOK5zjXGn8if2lNBXXZc1rDwbzs3tOWBKlSUlDSxWlKQcTDWpc9a/dk3stuS/BTuNA+WcDLtlZSeBrnhKY1XjiVTnzVmijiwqQwkygziVHrOqK1FIRkWoGXadiYCP3P+9BLB0nBZZ+0vyta2wOvo7rmsu4zwpFjtbaxxfkj4qvx4Igj3WXkqOMCakNVVgOFoNars6A7FSaQiHgmSsJ3zfmoFBAUhthNk7ysDPCZEC9gQhqsYlmZWJLAQ7+J4d0wD+VsKiaKxbD0rLAShFjdbks51+/rcte2uVG4LJ5ZgGW0tinhI6FmNMp8FS9CkJGPifxQGAzqFPtdu+B8a4VZx4X5xMs=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(136003)(376002)(346002)(230922051799003)(186009)(82310400011)(451199024)(64100799003)(1800799012)(46966006)(36840700001)(40470700004)(40460700003)(54906003)(316002)(4326008)(86362001)(8936002)(8676002)(44832011)(70586007)(478600001)(110136005)(70206006)(41300700001)(36756003)(2906002)(5660300002)(36860700001)(81166007)(47076005)(356005)(1076003)(16526019)(2616005)(26005)(6666004)(83380400001)(82740400003)(426003)(336012)(40480700001)(21314003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 21:10:06.1922
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54b7ae6a-a1ba-46f1-ddc5-08dbf50d63fc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4441
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Brett Creeley <brett.creeley@amd.com>
+CC: Intel Wired
 
-dim_coal_hw is accessed in the hotpath along with other values
-from the first cacheline of ionic_intr_info. So, re-arrange
-the structure so the hot path variables are on the first
-cacheline.
+https://lore.kernel.org/all/20231204004003.GB29484@merlins.org/
 
-Before:
-
-struct ionic_intr_info {
-	char                       name[32];             /*     0    32 */
-	unsigned int               index;                /*    32     4 */
-	unsigned int               vector;               /*    36     4 */
-	u64                        rearm_count;          /*    40     8 */
-	unsigned int               cpu;                  /*    48     4 */
-
-	/* XXX 4 bytes hole, try to pack */
-
-	cpumask_t                  affinity_mask;        /*    56  1024 */
-	/* --- cacheline 16 boundary (1024 bytes) was 56 bytes ago --- */
-	u32                        dim_coal_hw;          /*  1080     4 */
-
-	/* size: 1088, cachelines: 17, members: 7 */
-	/* sum members: 1080, holes: 1, sum holes: 4 */
-	/* padding: 4 */
-};
-
-After:
-
-struct ionic_intr_info {
-	char                       name[32];             /*     0    32 */
-	u64                        rearm_count;          /*    32     8 */
-	unsigned int               index;                /*    40     4 */
-	unsigned int               vector;               /*    44     4 */
-	unsigned int               cpu;                  /*    48     4 */
-	u32                        dim_coal_hw;          /*    52     4 */
-	cpumask_t                  affinity_mask;        /*    56  1024 */
-
-	/* size: 1080, cachelines: 17, members: 7 */
-	/* last cacheline: 56 bytes */
-};
-
-
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_dev.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 19edcb42d9fd..cee4e5c3d09a 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -269,12 +269,12 @@ struct ionic_queue {
- 
- struct ionic_intr_info {
- 	char name[IONIC_INTR_NAME_MAX_SZ];
-+	u64 rearm_count;
- 	unsigned int index;
- 	unsigned int vector;
--	u64 rearm_count;
- 	unsigned int cpu;
--	cpumask_t affinity_mask;
- 	u32 dim_coal_hw;
-+	cpumask_t affinity_mask;
- };
- 
- struct ionic_cq {
--- 
-2.17.1
+On Mon, 04 Dec 2023 11:57:44 +0100 Johannes Berg wrote:
+> On Sun, 2023-12-03 at 23:35 -0800, Marc MERLIN wrote:
+> > So, I thought that maybe my custom built kernel had options that somehow
+> > made P17 unhappy, and went to a stock debian kernel.
+> > It's not really looking better with that kernel unfortunately :-/
+> > 
+> > Still seems unhappy with networking, first wireless and then ethtool.
+> > Adding wireless lists to Cc just in case  
+> 
+> Well clearly something is not unlocking the RTNL, but digging through
+> the below I only found places that want to acquire the RTNL and wait
+> forever on it (including wireless), but none that actually got stuck
+> while having it acquired already.
+> 
+> 
+> Actually ... no that's wrong.
+> 
+> I can:
+> 
+> > > [  363.945427] INFO: task powertop:6279 blocked for more than 120 seconds.
+> > > [  363.945446]       Tainted: G     U             6.6.3-amd64-preempt-sysrq-20220227 #4
+> > > [  363.945452] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> > > [  363.945456] task:powertop        state:D stack:0     pid:6279  ppid:6267   flags:0x00004002
+> > > [  363.945468] Call Trace:
+> > > [  363.945473]  <TASK>
+> > > [  363.945481]  __schedule+0xba0/0xc05
+> > > [  363.945497]  schedule+0x95/0xce
+> > > [  363.945504]  schedule_preempt_disabled+0x15/0x22
+> > > [  363.945511]  __mutex_lock.constprop.0+0x18b/0x291
+> > > [  363.945520]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
+> > > [  363.945531]  igc_resume+0x18b/0x1ca [igc 1a96e277f8878a2a3c9599226acd0eeb7de577b7]  
+> 
+> this is trying to acquire the RTNL, by looking at the code
+> 
+> > > [  363.945566]  __rpm_callback+0x7a/0xe7
+> > > [  363.945578]  rpm_callback+0x35/0x64
+> > > [  363.945587]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
+> > > [  363.945592]  rpm_resume+0x342/0x44a
+> > > [  363.945600]  ? __kmem_cache_alloc_node+0x123/0x154
+> > > [  363.945614]  __pm_runtime_resume+0x5a/0x7a
+> > > [  363.945624]  dev_ethtool+0x15a/0x24e7  
+> 
+> but this already holds it
+> 
+> So looks like bug in the 'igc' driver wrt. runtime PM locking.
+> 
+> johannes
+> 
+> 
 
 
