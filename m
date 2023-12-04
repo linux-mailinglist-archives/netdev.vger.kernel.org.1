@@ -1,118 +1,100 @@
-Return-Path: <netdev+bounces-53470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A344080323A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:12:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 021B3803263
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5EE1C209AB
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:12:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACCDF280F3A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB9323762;
-	Mon,  4 Dec 2023 12:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dmE4a9yF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223652376D;
+	Mon,  4 Dec 2023 12:20:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED7CE5
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:12:23 -0800 (PST)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5d8d2b5d1b5so4512837b3.0
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 04:12:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701691943; x=1702296743; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCGwGXRc8AWPbM6p5oU9fh3ewd5Eki7b3LIN2iWwphM=;
-        b=dmE4a9yFjGI8pQ2+nlgpQFHPrYAnUi74fqeW7poNAqSSwRlAGTx71LdmEAk1GOmZdC
-         9ERD6+esNKsBDcgajnHfmU2tg90Db0bbn2KZVvh78e3IlE+OtBYmB7PMATAdArLBmIIm
-         MGb69z5C7iwFqlBS/pbAe5xfS9dcZM0bqfCaX8nprGiwQbZkSMyWaQ9mbj7JqOKctvHw
-         81QMVsglNjFjMcZ0OSgWO2hPo6my73pgavav6NiXoM8gS+G9PfOkJYrpb+VuXRnD39d+
-         iao9G2YJ4fhWhtR+TyBUhoNDCYNpT2owu1Wb96X6GJ/WlhhnZr0HN6kw23EjyPRDfsdR
-         vymQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701691943; x=1702296743;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YCGwGXRc8AWPbM6p5oU9fh3ewd5Eki7b3LIN2iWwphM=;
-        b=VO24AGP+JxGwyhrk5qztfO27vJn8XOfNfWQcq5eD2/xn3wu8aiW7aT1PNBNSgPgMhj
-         bcenrIkDNro7gRcVYpHFKgzmKaNL9UJlXRhThsB7BAxtSm6OFWxN8YnxOEyGsgdLejGF
-         fvUtDWBO1HHCGtoTlnKUnTsA/zC6educSghDdLaJ3UUbH5uWTgmGEFrk4hzxm55cnnYO
-         1yQJqOnBfH3pk2BPmYhhi9sJmh3CND+a0UwIDdIHSbGnT5W8vDSNOhmcXLBrCM6R6AuW
-         03UaBgPtYkapbjWs1alWgUd6Qkh1TRXScfMCcqE25QFoyflQuDfP2xHfQIAYekY08vWv
-         71Ag==
-X-Gm-Message-State: AOJu0Yzd9oGfaUXyvpBHM2D3Y3OoPtjjmBGdj1S1kUdJL9rq85SJWpND
-	Rr70rDFpsmySicVgnuL3FGFeqe0DcYZ//3I4rRM1/g==
-X-Google-Smtp-Source: AGHT+IEw0iO9X3qjmZ7kps5wExLi/tS9iX/64k7HmK4DPPUnZWl2yEZ04CtiVtXmEBn8yIjNBUovtUz3Q9RNKgEifaA=
-X-Received: by 2002:a81:c84c:0:b0:5ca:61c7:4ac4 with SMTP id
- k12-20020a81c84c000000b005ca61c74ac4mr1278078ywl.51.1701691942997; Mon, 04
- Dec 2023 04:12:22 -0800 (PST)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F84F3
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:20:12 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA7vP-00057k-Th; Mon, 04 Dec 2023 13:19:47 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA7vO-00DVyJ-Ms; Mon, 04 Dec 2023 13:19:46 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA7vO-005Dow-Ju; Mon, 04 Dec 2023 13:19:46 +0100
+Date: Mon, 4 Dec 2023 13:19:46 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 1/8] net: pse-pd: Rectify and adapt the
+ naming of admin_cotrol member of struct pse_control_config
+Message-ID: <20231204121946.GB981228@pengutronix.de>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-1-56d8cac607fa@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
- <20230607094922.43106896@kernel.org> <20230607171153.GA109456@thinkpad>
- <20230607104350.03a51711@kernel.org> <20230608123720.GC5672@thinkpad>
- <20231117070602.GA10361@thinkpad> <20231117162638.7cdb3e7d@kernel.org>
- <20231127060439.GA2505@thinkpad> <20231127084639.6be47207@kernel.org>
- <CAA8EJppL0YHHjHj=teCnAwPDkNhwR1EWYuLPnDue1QdfZ3RS_w@mail.gmail.com> <20231128125808.7a5f0028@kernel.org>
-In-Reply-To: <20231128125808.7a5f0028@kernel.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Mon, 4 Dec 2023 14:12:12 +0200
-Message-ID: <CAA8EJpqGAK-7be1v8VktFRPpBHhUTwKJ=6JTTrFaWh341JAQEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, mhi@lists.linux.dev, 
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, loic.poulain@linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231201-feature_poe-v2-1-56d8cac607fa@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, 28 Nov 2023 at 22:58, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Tue, 28 Nov 2023 22:35:50 +0200 Dmitry Baryshkov wrote:
-> > Also, please excuse me if this was already answered, just for my understanding:
-> > - If we limit functionality to just networking channels which are used
-> > to pass IP data between host and EP, will that be accepted?
->
-> That's too hard to enforce. We have 200+ drivers, we can't carefully
-> review every single line of code to make sure you stick to the "just
-> networking" promise you make us. Plus the next guy will come and tell
-> us "but you let the company X do it".
->
-> > - If we were to implement the PCIe networking card running Linux (e.g.
-> > using Freescale PowerQUICC or Cavium Octeon chips), would you also be
-> > opposed to implementing the EP side of the link as the netdev?
->
-> Yes.
->
-> It's very tempting to reuse existing code, written for traffic to build
-> a control channel. This becomes painful because:
->  - the lifetime rules for interfaces to configure vs to pass traffic
->    are different, which inevitably leads to bugs in common code,
->  - the use cases are different, which leads to hacks / abuse,
->    and then it's a lot harder for us to refactor and optimize core
->    code / data structures,
->  - IDK how "channel to talk to FW" fits with the normal IP stack...
+On Fri, Dec 01, 2023 at 06:10:23PM +0100, Kory Maincent wrote:
+> In commit 18ff0bcda6d1 ("ethtool: add interface to interact with Ethernet
+> Power Equipment"), the 'pse_control_config' structure was introduced,
+> housing a single member labeled 'admin_cotrol' responsible for maintaining
+> the operational state of the PoDL PSE functions.
+> 
+> A noticeable typographical error exists in the naming of this field
+> ('cotrol' should be corrected to 'control'), which this commit aims to
+> rectify.
+> 
+> Furthermore, with upcoming extensions of this structure to encompass PoE
+> functionalities, the field is being renamed to 'podl_admin_state' to
+> distinctly indicate that this state is tailored specifically for PoDL."
+> 
+> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Ok, here you are talking about the control path. I can then assume
-that you consider it to be fine to use netdev for the EP data path, if
-the control path is kept separate and those two can not be mixed. Does
-that sound correct?
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de> 
 
->
-> The "FW channel netdevs" exist for decades now, and are very popular
-> with middle box SDKs, I know. Your choices are:
->  - keep the code out of tree,
->  - use a generic interface with a strong standard definition, like
->    virtio, and expect that no customizations will be allowed.
+Thx!
 
 -- 
-With best wishes
-Dmitry
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
