@@ -1,163 +1,128 @@
-Return-Path: <netdev+bounces-53438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A2E802FBD
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8003B802FD9
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:12:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F4951F211A5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:11:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BDD0281A4D
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447EF1EB4D;
-	Mon,  4 Dec 2023 10:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340FD20324;
+	Mon,  4 Dec 2023 10:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VBigK6DX"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="f0QirGig"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0D8FD
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:10:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yd14O6+i6BzJWosvpAqQhFNP5pgHdikJuIrKAQzKS2Y=; b=VBigK6DXN/MAHDa3xLfu93jcTo
-	GH6UqsZ2/JYqUOOpvltCHSZasbtmGEIH+XmkOrFiSpIHZmGnWhnyu+g7ucG/phIOIlMYHFQCuAziP
-	qMnbPeASx1EKuEs2jn0Xr4LcP9VZWSqj9kuCXsn4NE/bquxgtAkf0Q1xAVYecNFVtUgh9Z6otC1GL
-	c/SLB++n5ueI6tnZ/uuIx00zNnOUuTsSzsudHDdolhRO9D05HEtjf/2Cf3MuEFvm1G+XRz/5HqQkL
-	yQrdD0z/28o7mhmrb6B94clqtjPjlUyO51vsa7ZvbgdgNGQrqqZCfdmi0aLlqPdUTzL8P+5FS4X5T
-	5zb/zOZw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54472)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rA5uW-0005OT-14;
-	Mon, 04 Dec 2023 10:10:44 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rA5uV-0000bn-Md; Mon, 04 Dec 2023 10:10:43 +0000
-Date: Mon, 4 Dec 2023 10:10:43 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v2 1/7] net: ngbe: implement phylink to handle
- PHY device
-Message-ID: <ZW2loxTO6oKNYLew@shell.armlinux.org.uk>
-References: <20231204091905.1186255-1-jiawenwu@trustnetic.com>
- <20231204091905.1186255-2-jiawenwu@trustnetic.com>
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE80CC;
+	Mon,  4 Dec 2023 02:12:37 -0800 (PST)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3B4815Qm008037;
+	Mon, 4 Dec 2023 11:11:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=selector1; bh=nQnyC3l
+	sx0aVrbg7MvvuUyjEbRMAbRgqkdEPvR+/ZvI=; b=f0QirGigY05O6nytCchuzif
+	gv9t66Hmttc9XqtGRwziHBpd9qf2yGK0Q3YzfNVCv15FSue1Sg9GNS0JhhhLucHj
+	OXugUCQfATGuDG0qj9UdpJBZ3bkMeZ/TdytGxb8eFgUl/bdSv1fOgcJiB5ldbUZq
+	V1U/VcsCX4zFucniCqgpRZKfv57IXBKb8hXctAIbW7ec1dRLm/MoFy72F7PZh/b4
+	R0i2gNERrzYu5F64IF/KRuGFRwV94RHNh1OVr8slDQ9xckwNlhSYTkZl74IVRo25
+	LWFwLBmpUd/i2NwfBnUN2BGKy2PSz/digzsRfSTYvD16b88MJ8OBlx8Vxqx7Ocw=
+	=
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3urf14vm5u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 11:11:49 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7FB95100089;
+	Mon,  4 Dec 2023 11:11:46 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6FFFA21ADAD;
+	Mon,  4 Dec 2023 11:11:46 +0100 (CET)
+Received: from localhost (10.252.13.105) by SHFDAG1NODE2.st.com (10.75.129.70)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 4 Dec
+ 2023 11:11:45 +0100
+From: Raphael Gallais-Pou <raphael.gallais-pou@foss.st.com>
+To: Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Yannick Fertre <yannick.fertre@foss.st.com>,
+        Philippe Cornu <philippe.cornu@foss.st.com>,
+        Maarten Lankhorst
+	<maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+        Richard Cochran <richardcochran@gmail.com>
+CC: <devicetree@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 0/4] Update STM DSI PHY driver
+Date: Mon, 4 Dec 2023 11:11:09 +0100
+Message-ID: <20231204101113.276368-1-raphael.gallais-pou@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204091905.1186255-2-jiawenwu@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-04_06,2023-11-30_01,2023-05-22_02
 
-On Mon, Dec 04, 2023 at 05:18:59PM +0800, Jiawen Wu wrote:
-> Add phylink support for Wangxun 1Gb Ethernet controller.
-> 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
->  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  21 ++-
->  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 127 +++++++++++-------
->  3 files changed, 88 insertions(+), 61 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> index 165e82de772e..4088637440c6 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> @@ -940,6 +940,7 @@ struct wx {
->  	int speed;
->  	int duplex;
->  	struct phy_device *phydev;
+This patch series aims to add several features of the dw-mipi-dsi phy
+driver that are missing or need to be updated.
 
-If you also embed struct phylink_config() in struct wx, then you can get
-to it in the MAC operations using an inline function in wx_type.h:
+First patch update a PM macro.
 
-static inline struct wx *phylink_to_wx(struct phylink_config *config)
-{
-	return container_of(config, struct wx, phylink_config);
-}
+Second patch adds runtime PM functionality to the driver.
 
-which will be more efficient than doing the
-netdev_priv(to_net_dev(config->dev)) dance. It's also what other network
-drivers that use phylink do, so it brings consistency of implementation.
+Third patch adds a clock provider generated by the PHY itself.  As
+explained in the commit log of the second patch, a clock declaration is
+missing.  Since this clock is parent of 'dsi_k', it leads to an orphan
+clock.  Most importantly this patch is an anticipation for future
+versions of the DSI PHY, and its inclusion within the display subsystem
+and the DRM framework.
 
-...
-> -static void ngbe_handle_link_change(struct net_device *dev)
-> +static void ngbe_phy_fixup(struct wx *wx)
->  {
-> -	struct wx *wx = netdev_priv(dev);
-> -	struct phy_device *phydev;
-> -	u32 lan_speed, reg;
-> +	struct phy_device *phydev = wx->phydev;
-> +	struct ethtool_eee eee;
->  
-> -	phydev = wx->phydev;
-> -	if (!(wx->link != phydev->link ||
-> -	      wx->speed != phydev->speed ||
-> -	      wx->duplex != phydev->duplex))
-> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+Last patch fixes a corner effect introduced previously.  Since 'dsi' and
+'dsi_k' are gated by the same bit on the same register, both reference
+work as peripheral clock in the device-tree.
 
-Phylink restricts the advertisement according to the capabilities
-provided, do you should not need to do this. Please remove.
+---
+Changes in v2:
+	- Added patch 1/4 to use SYSTEM_SLEEP_PM_OPS instead of old macro
+	  and removed __maybe_used for accordingly
+	- Changed SET_RUNTIME_PM_OPS to RUNTIME_PM_OPS
 
-> +
-> +	phydev->mac_managed_pm = true;
+Raphael Gallais-Pou (3):
+  drm/stm: dsi: use new SYSTEM_SLEEP_PM_OPS() macro
+  drm/stm: dsi: expose DSI PHY internal clock
+  arm: dts: st: fix DSI peripheral clock on stm32mp15 boards
 
-Please don't bypass phylink's management of this, instead set the
-"mac_managed_pm" boolean in struct phylink_config.
+Yannick Fertre (1):
+  drm/stm: dsi: add pm runtime ops
 
-...
-> +static int ngbe_phylink_init(struct wx *wx)
->  {
-> -	int ret;
-> +	struct phylink_config *config;
-> +	phy_interface_t phy_mode;
-> +	struct phylink *phylink;
->  
-> -	ret = phy_connect_direct(wx->netdev,
-> -				 wx->phydev,
-> -				 ngbe_handle_link_change,
-> -				 PHY_INTERFACE_MODE_RGMII_ID);
-> -	if (ret) {
-> -		wx_err(wx, "PHY connect failed.\n");
-> -		return ret;
-> -	}
-> +	config = devm_kzalloc(&wx->pdev->dev, sizeof(*config), GFP_KERNEL);
-> +	if (!config)
-> +		return -ENOMEM;
->  
-> -	return 0;
-> -}
-> +	config->dev = &wx->netdev->dev;
-> +	config->type = PHYLINK_NETDEV;
-> +	config->mac_capabilities = MAC_1000FD | MAC_100FD |
-> +				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
->  
-> -static void ngbe_phy_fixup(struct wx *wx)
-> -{
-> -	struct phy_device *phydev = wx->phydev;
-> -	struct ethtool_eee eee;
-> +	phy_mode = PHY_INTERFACE_MODE_RGMII_ID;
-> +	__set_bit(PHY_INTERFACE_MODE_RGMII_ID, config->supported_interfaces);
-
-As mentioned above, also set config->mac_managed_pm.
-
-Thanks.
+ arch/arm/boot/dts/st/stm32mp157.dtsi          |   2 +-
+ arch/arm/boot/dts/st/stm32mp157a-dk1-scmi.dts |   2 +-
+ arch/arm/boot/dts/st/stm32mp157c-dk2-scmi.dts |   2 +-
+ arch/arm/boot/dts/st/stm32mp157c-ed1-scmi.dts |   2 +-
+ arch/arm/boot/dts/st/stm32mp157c-ev1-scmi.dts |   2 +-
+ drivers/gpu/drm/stm/dw_mipi_dsi-stm.c         | 278 +++++++++++++++---
+ 6 files changed, 242 insertions(+), 46 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
