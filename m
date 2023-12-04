@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-53458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F31E803109
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:57:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 173F7803112
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03CE31F20F4B
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:57:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73B13280E55
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29000224D4;
-	Mon,  4 Dec 2023 10:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908F1224DB;
+	Mon,  4 Dec 2023 10:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="VTaVjTkA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IoBtcek/"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D1AC0;
-	Mon,  4 Dec 2023 02:57:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=Rgr+/K/w178VZ6/C4ZZl3geFP4puFUQtC1oJjlaIDGs=;
-	t=1701687469; x=1702897069; b=VTaVjTkAksCfU224mQZzERayeFXqC+IE+t1SAuhzW4p9k1o
-	MsIqTvPBYtdfqShFRE9w4KX7q9K1QZpvLgAaXeMw3Qn/fEVMgbjpBrnTe2svKjy27R8/zqvU6qUrG
-	eSXXvVaKwCetuoMmjx3xVzFLZatUeCgi2uEly4EbIrlL2TzKHpf1EWAxV5+QdDr6LnFQFJFzrNYjy
-	G1woqh2IKmjg86QbHyP6bzf5Je9nGgfJDKRNLZIGUAW5Bxq9DEjaIPIHfOwzwXVPxsPox8HgqOSyC
-	FA6ufEMqLDxb9i+2tbjbMA9VlkVIlWRfGwHqzSjEs/8q7XZ6FUqb3AEgrbGvaZkQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rA6e1-0000000Exe4-30ad;
-	Mon, 04 Dec 2023 11:57:46 +0100
-Message-ID: <69717129398d05b18df1c1300bfb41da268c52a0.camel@sipsolutions.net>
-Subject: Re: Thinkpad P17 keep hanging in ipv6_addrconf addrconf_verify_work
- / netlink in 6.4 and 6.6
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Marc MERLIN <marc@merlins.org>, Linux Kernel Mailing List
-	 <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ilw@linux.intel.com
-Cc: "Paul E. McKenney" <paulmck@kernel.org>
-Date: Mon, 04 Dec 2023 11:57:44 +0100
-In-Reply-To: <20231204073515.GA9208@merlins.org>
-References: <20231202171326.GB24486@merlins.org>
-	 <20231204004003.GB29484@merlins.org> <20231204073515.GA9208@merlins.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E0DC3
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:58:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701687523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YdQEhkWXsOUh8naWGtaApXU9iCOOldy3rlTH+Sgrjxk=;
+	b=IoBtcek/SI0DSfh7AXCK3vs50eQM0V5W1D4RLyb5GxooG+prnAbvQNqpCZQWiIeAAHJvze
+	iAfcFqB7+wMw7+6cfBs861CIMr16dkNykwC9o9/qB7vY8Qc+mKOlmwLJIvzFHoDav5MmQ1
+	vZGEC+zRmZRMNJccSBGx+Or8SvGva+o=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-UHLvSpz7NGWFl8VR5Yp0Hw-1; Mon, 04 Dec 2023 05:58:41 -0500
+X-MC-Unique: UHLvSpz7NGWFl8VR5Yp0Hw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40b3712ef28so31785935e9.2
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 02:58:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701687520; x=1702292320;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdQEhkWXsOUh8naWGtaApXU9iCOOldy3rlTH+Sgrjxk=;
+        b=MZnHWiF0uBRaFJ04nHSWL8ZUxOm/mOcZcoNMYXucy5wyzJCbpGZt05bwfRKmR7Aeke
+         l6w2gVEdenA4WHRsQ3cjK58e3k1FqXbBMBfjM9TJT4EHYNipXFmzmX5QAx9aBR7UcJ3O
+         14s/Ct/gDde/ZtYRg71Am5+80LA8bO3a7hoIKDzObiNHr7+bHQZwimL+iWvhKmtXp3pp
+         /bzvy3jr4681HDPaTpeiDQEsa/jPqJVexLEuOYeqRQ6vQbiC9Et994o/Gzvx6hV5kIuy
+         rS0JUEPh4lBlH4U+doeUhYU6RgAZNKViIL39HpgWWwZpz4hjb8QMw2ryJQcfMkml4FJf
+         LzEQ==
+X-Gm-Message-State: AOJu0YyYSVXpzVXEECzSBT2TDM2nvY1jWaJiQe66j7DVVf6Z0uIEQTKJ
+	l1vRtmkW1+ZBD3O2vuphC9lDxMVVce7nR1Kk4+Exo35pMNhJzPcHmI7OInqyXsNBG/rhOFGp1ET
+	Yb2Fe965e7I/BCjh2
+X-Received: by 2002:a05:600c:2488:b0:40b:5e4a:40b7 with SMTP id 8-20020a05600c248800b0040b5e4a40b7mr2163654wms.215.1701687520500;
+        Mon, 04 Dec 2023 02:58:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG3MNKd3KWO/xE6m6VPWr4O9uB3PiuwKe+BA25AzAHZUPbp0bKxiK7odyosZU80JwTx7TtrMw==
+X-Received: by 2002:a05:600c:2488:b0:40b:5e4a:40b7 with SMTP id 8-20020a05600c248800b0040b5e4a40b7mr2163644wms.215.1701687520195;
+        Mon, 04 Dec 2023 02:58:40 -0800 (PST)
+Received: from debian (2a01cb058918ce000a3085b410ac38ee.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:a30:85b4:10ac:38ee])
+        by smtp.gmail.com with ESMTPSA id fm19-20020a05600c0c1300b004060f0a0fd5sm14651373wmb.13.2023.12.04.02.58.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 02:58:39 -0800 (PST)
+Date: Mon, 4 Dec 2023 11:58:37 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
+	dsahern@kernel.org, kuba@kernel.org, mkubecek@suse.cz,
+	netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next v4] tcp: Dump bound-only sockets in inet_diag.
+Message-ID: <ZW2w3YyNMoyN1t97@debian>
+References: <b3a84ae61e19c06806eea9c602b3b66e8f0cfc81.1701362867.git.gnault@redhat.com>
+ <20231201203434.22931-1-kuniyu@amazon.com>
+ <CANn89i+QvbYLFoMkr6NTj2+7eHsZ=s9wo3gpdF1BpH3ejXFEgw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+QvbYLFoMkr6NTj2+7eHsZ=s9wo3gpdF1BpH3ejXFEgw@mail.gmail.com>
 
-On Sun, 2023-12-03 at 23:35 -0800, Marc MERLIN wrote:
-> So, I thought that maybe my custom built kernel had options that somehow
-> made P17 unhappy, and went to a stock debian kernel.
-> It's not really looking better with that kernel unfortunately :-/
->=20
-> Still seems unhappy with networking, first wireless and then ethtool.
-> Adding wireless lists to Cc just in case
+On Fri, Dec 01, 2023 at 09:41:16PM +0100, Eric Dumazet wrote:
+> On Fri, Dec 1, 2023 at 9:34 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > From: Guillaume Nault <gnault@redhat.com>
+> 
+> > > +                                             goto next_bind;
+> > > +
+> > > +                                     if (sk->sk_state != TCP_CLOSE ||
+> > > +                                         !inet->inet_num)
+> >
+> > Sorry for missing this in the previous version, but I think
+> > inet_num is always non-zero because 0 selects a port automatically
+> > and the min of ipv4_local_port_range is 1.
+> >
+> 
+> This is not true, because it can be cleared by another thread, before
+> unhashing happens in __inet_put_port()
+> 
+> Note the test should use READ_ONCE(inet->inet_num), but I did not
+> mention this, as many reads of inet_num are racy.
 
-Well clearly something is not unlocking the RTNL, but digging through
-the below I only found places that want to acquire the RTNL and wait
-forever on it (including wireless), but none that actually got stuck
-while having it acquired already.
+Would you like me to send a v5, or do you prefer to let a future series
+fix all the racy reads and writes at once?
 
-
-Actually ... no that's wrong.
-
-I can:
-
-> > [  363.945427] INFO: task powertop:6279 blocked for more than 120 secon=
-ds.
-> > [  363.945446]       Tainted: G     U             6.6.3-amd64-preempt-s=
-ysrq-20220227 #4
-> > [  363.945452] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
-les this message.
-> > [  363.945456] task:powertop        state:D stack:0     pid:6279  ppid:=
-6267   flags:0x00004002
-> > [  363.945468] Call Trace:
-> > [  363.945473]  <TASK>
-> > [  363.945481]  __schedule+0xba0/0xc05
-> > [  363.945497]  schedule+0x95/0xce
-> > [  363.945504]  schedule_preempt_disabled+0x15/0x22
-> > [  363.945511]  __mutex_lock.constprop.0+0x18b/0x291
-> > [  363.945520]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
-> > [  363.945531]  igc_resume+0x18b/0x1ca [igc 1a96e277f8878a2a3c9599226ac=
-d0eeb7de577b7]
-
-this is trying to acquire the RTNL, by looking at the code
-
-> > [  363.945566]  __rpm_callback+0x7a/0xe7
-> > [  363.945578]  rpm_callback+0x35/0x64
-> > [  363.945587]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
-> > [  363.945592]  rpm_resume+0x342/0x44a
-> > [  363.945600]  ? __kmem_cache_alloc_node+0x123/0x154
-> > [  363.945614]  __pm_runtime_resume+0x5a/0x7a
-> > [  363.945624]  dev_ethtool+0x15a/0x24e7
-
-but this already holds it
-
-So looks like bug in the 'igc' driver wrt. runtime PM locking.
-
-johannes
+Personally, I feel it'd look strange to have a READ_ONCE() only in
+inet_diag_dump_icsk(), while the rest of the stack accesses it
+directly. But just let me know if you feel otherwise and I'll post a
+v5.
 
 
