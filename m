@@ -1,113 +1,131 @@
-Return-Path: <netdev+bounces-53624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECEBA803F28
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:20:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B4B803F35
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:24:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B064B20AC7
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B6AD1F211B0
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F325733CF5;
-	Mon,  4 Dec 2023 20:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA35533CFD;
+	Mon,  4 Dec 2023 20:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="gF52IK8S"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qMSElPWM"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F39AF
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:19:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=nLRIsKHfPCSSM+B0sVxe89ivb9vOKkaNXVkyFCnEc4M=; t=1701721198; x=1702930798; 
-	b=gF52IK8SSfaTUNvdPAO1u2H+L7VknMPsaj1I0wu5eAraaUpQQ4d4IJ8eiTl1txrEsAotGucSU9o
-	TyF6yrvBrTbp0K5cgj3opRU31q9qyLA4bFzYmB5kGTn2Lg1Tmqp82fk5VbMgaBcUT/giXyWhvn8rO
-	uUAPQlj5NhL+I9eRtUC9FSNfYwd/6nLIfNsM+wBnADrqVCryv4jZtI1LnjdAkgcg69AjkXMXugDx1
-	88XFb6o9VsluiUBhh+oDKU4bqsm8T5rWXrs1Wv67HsugqIyow04ZzjPsh99uQ3OVnf0ZtVOJuDki9
-	6Fx1Hf9ySqbpNpss6I1yH0QF4sBVRiSSShcQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAFQ3-0000000FElb-1cYe;
-	Mon, 04 Dec 2023 21:19:55 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>
-Subject: [RFC PATCH] net: rtnetlink: remove local list in __linkwatch_run_queue()
-Date: Mon,  4 Dec 2023 21:19:53 +0100
-Message-ID: <20231204211952.01b2d4ff587d.I698b72219d9f6ce789bd209b8f6dffd0ca32a8f2@changeid>
-X-Mailer: git-send-email 2.43.0
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78937CB
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:24:22 -0800 (PST)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5d8e816f77eso11801947b3.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:24:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701721461; x=1702326261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OfoiTr5fTxRdu5IYw5VlaXEaqDHOxpGp2Ev7i/8Ze5M=;
+        b=qMSElPWM37Imgvf9/weoZs+C81AtjaSmK12dFFdMwH4qv51sXjxjj9v5yCQsCQ8llx
+         DXfnRxJ+sUvrrR0RnFfMdOtUxCwK0bYfCM2FWR2WUM44TRjPwXpkSI+gSNmDKVpJEbWX
+         QhFo/MvhENJrhQ/e56cMjAeP7nojbBbmWo2u4eetBd0szuTQxWnwMNYIftcntoOmdsw4
+         1k/ALziaLM/P3OeySWYeurW2nqvoAgNtG10g01TyWhQ5bNVDPKfp6ZehmQO0QGhliD7c
+         HnL0R0PKWv02/rBKYUjhMwa2TKpe/3NZ91DC3dtPcaafS33v2orANxqMWH5bPIbuHFqf
+         MZJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701721461; x=1702326261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OfoiTr5fTxRdu5IYw5VlaXEaqDHOxpGp2Ev7i/8Ze5M=;
+        b=S1EGquFlq3V4oOIpI5qMsRwkM1LrpihVcSoo76tW8UAQr2Pdb25ASRcuQgRgsUwVyt
+         Ql08QXP7oEwvYGGw0ILkGkRHkyUnT8KILumQVCJcBu2Wa3GMvOIHvzvgut0MSVrfG0S4
+         FpkFp4P9bO7JLiviKXGIConSyd6s6EwInf09oi1+Ruik5riTASwfTYqi1Pw/Sd2e4/QI
+         xqP2w5NpFoX4LC9RE73sHPqaQSZC5c1g5LwHSrLU9xiWzEsPCBDbkpq5fmztGgQnEO1S
+         NCaqZEy139E5V87LjoVivra099ehNDJ6eqs0a6n3lUKHRaOWo3FQ5KMvaZgS0Qc2+rKA
+         UfrA==
+X-Gm-Message-State: AOJu0Ywk1JggYC/z4NHPvz3oS02UU5fVixOlulmoLnLWrFdWKA/RA6CM
+	q8zy2v23H65thC9QGWJXlphvWo2s9ku8GZzzOx/T4ipCf9WNjxZgIAg=
+X-Google-Smtp-Source: AGHT+IENsUBG7Zzu92WUhHi/Q4Lp7l4su/3JlXtlqRPmhddJ0Ov6ZZ1U9oI4mX0+cMwkOiTC7OzV1XaCvBDQ/ntTuAw=
+X-Received: by 2002:a05:690c:3581:b0:5d8:a45e:3755 with SMTP id
+ fr1-20020a05690c358100b005d8a45e3755mr1880057ywb.11.1701721460784; Mon, 04
+ Dec 2023 12:24:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1674233458.git.dcaratti@redhat.com> <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
+In-Reply-To: <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 4 Dec 2023 15:24:09 -0500
+Message-ID: <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
+Subject: Mirred broken WAS(Re: [PATCH net-next 2/2] act_mirred: use the
+ backlog for nested calls to mirred ingress
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, wizhao@redhat.com, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Fri, Jan 20, 2023 at 12:02=E2=80=AFPM Davide Caratti <dcaratti@redhat.co=
+m> wrote:
+>
+> William reports kernel soft-lockups on some OVS topologies when TC mirred
+> egress->ingress action is hit by local TCP traffic [1].
+> The same can also be reproduced with SCTP (thanks Xin for verifying), whe=
+n
+> client and server reach themselves through mirred egress to ingress, and
+> one of the two peers sends a "heartbeat" packet (from within a timer).
+>
+> Enqueueing to backlog proved to fix this soft lockup; however, as Cong
+> noticed [2], we should preserve - when possible - the current mirred
+> behavior that counts as "overlimits" any eventual packet drop subsequent =
+to
+> the mirred forwarding action [3]. A compromise solution might use the
+> backlog only when tcf_mirred_act() has a nest level greater than one:
+> change tcf_mirred_forward() accordingly.
+>
+> Also, add a kselftest that can reproduce the lockup and verifies TC mirre=
+d
+> ability to account for further packet drops after TC mirred egress->ingre=
+ss
+> (when the nest level is 1).
+>
 
-Due to linkwatch_forget_dev() (and perhaps others?) checking for
-list_empty(&dev->link_watch_list), we must have all manipulations
-of even the local on-stack list 'wrk' here under spinlock, since
-even that list can be reached otherwise via dev->link_watch_list.
+I am afraid this broke things. Here's a simple use case which causes
+an infinite loop (that we found while testing blockcasting but
+simplified to demonstrate the issue):
 
-This is already the case, but makes this a bit counter-intuitive,
-often local lists are used to _not_ have to use locking for their
-local use.
+----
+sudo ip netns add p4node
+sudo ip link add p4port0 address 10:00:00:01:AA:BB type veth peer
+port0 address 10:00:00:02:AA:BB
+sudo ip link set dev port0 netns p4node
+sudo ip a add 10.0.0.1/24 dev p4port0
+sudo ip neigh add 10.0.0.2 dev p4port0 lladdr 10:00:00:02:aa:bb
+sudo ip netns exec p4node ip a add 10.0.0.2/24 dev port0
+sudo ip netns exec p4node ip l set dev port0 up
+sudo ip l set dev p4port0 up
+sudo ip netns exec p4node tc qdisc add dev port0 clsact
+sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip
+prio 10 matchall action mirred ingress redirect dev port0
 
-Remove the local list as it doesn't seem to serve any purpose.
-While at it, move a variable declaration into the loop using it.
+ping -I p4port0 10.0.0.2 -c 1
+-----
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- net/core/link_watch.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+reverting the patch fixes things and it gets caught by the nested
+recursion check.
 
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index c469d1c4db5d..ed3e5391fa79 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -192,8 +192,6 @@ static void __linkwatch_run_queue(int urgent_only)
- #define MAX_DO_DEV_PER_LOOP	100
- 
- 	int do_dev = MAX_DO_DEV_PER_LOOP;
--	struct net_device *dev;
--	LIST_HEAD(wrk);
- 
- 	/* Give urgent case more budget */
- 	if (urgent_only)
-@@ -215,11 +213,11 @@ static void __linkwatch_run_queue(int urgent_only)
- 	clear_bit(LW_URGENT, &linkwatch_flags);
- 
- 	spin_lock_irq(&lweventlist_lock);
--	list_splice_init(&lweventlist, &wrk);
-+	while (!list_empty(&lweventlist) && do_dev > 0) {
-+		struct net_device *dev;
- 
--	while (!list_empty(&wrk) && do_dev > 0) {
--
--		dev = list_first_entry(&wrk, struct net_device, link_watch_list);
-+		dev = list_first_entry(&lweventlist, struct net_device,
-+				       link_watch_list);
- 		list_del_init(&dev->link_watch_list);
- 
- 		if (!netif_device_present(dev) ||
-@@ -237,9 +235,6 @@ static void __linkwatch_run_queue(int urgent_only)
- 		spin_lock_irq(&lweventlist_lock);
- 	}
- 
--	/* Add the remaining work back to lweventlist */
--	list_splice_init(&wrk, &lweventlist);
--
- 	if (!list_empty(&lweventlist))
- 		linkwatch_schedule_work(0);
- 	spin_unlock_irq(&lweventlist_lock);
--- 
-2.43.0
+Frankly, I believe we should restore a proper ttl from what was removed her=
+e:
+https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strlen.de/
+The headaches(and time consumed) trying to save the 3-4 bits removing
+the ttl field is not worth it imo.
 
+cheers,
+jamal
 
