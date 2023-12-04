@@ -1,88 +1,107 @@
-Return-Path: <netdev+bounces-53553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8805803AB2
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:47:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 857B3803945
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:55:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C7428147B
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40ABA280DFE
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FAD2557A;
-	Mon,  4 Dec 2023 16:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FF02D03C;
+	Mon,  4 Dec 2023 15:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwXp4hEg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w6Z+vEtt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B781CD;
-	Mon,  4 Dec 2023 08:47:15 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40c09d0b045so16738215e9.0;
-        Mon, 04 Dec 2023 08:47:15 -0800 (PST)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604A0E6
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 07:55:38 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50bf09be81bso3826e87.1
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 07:55:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701708434; x=1702313234; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWOXd0c0JR/1qx0WwIuHDwJru90/T3xdDRdBKcpoorQ=;
-        b=UwXp4hEgyPofr6oQOLmIg6FUkTfaozDMRo40YwF+siEhRL+9yTSYJIeNdgI6DxryIK
-         UvY2k6Ylh9+t1oFoxv8LREBKVf8bcpZaZQ9jHVNmLFKYN5AbtQTDjjgLbD+jNqcEGqwD
-         aII+8spRnlc1y+O8v7Xn+P/oUYVZTHZTxBAhjfBaA6PPPL8p23WfG5k/7DMh/SZTKQwc
-         nHXY2Qf0tsTSEaaqTZqeXwGovxyUKbYke5QxBp8hfTI9SKFg+KmnvQoY0WgFABo8WmZU
-         GikFyoM69wl9uvDDmRgebcXxUMoVB1msPfdrTMH9xIDO3RDQWArkeqe4ih+XpilgkpVK
-         IIMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701708434; x=1702313234;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1701705336; x=1702310136; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UWOXd0c0JR/1qx0WwIuHDwJru90/T3xdDRdBKcpoorQ=;
-        b=D05oy3wBJBksjvwVNXZrHwKblws6eITkzY78X1S90boJesHOJaLl0TdszovMmqLkff
-         NHyEPGWljuej+yU1Saim5P+5vV6wEFjkPAhAaf/EPvDnhXYHApNSOM0RwAV4H3tnwwmK
-         xXfLf7l50waeV0uYUmIHKPz6I3rOqTFv25du7zkEj7Aa6l7krhqrfYItJOG3iHLriihS
-         iw98Zhd/14Bbb1TqWGlTd/qM4BccMFx5mXn4UxLBnnkOejpNrTNoVhAXjVltgUDkjTbQ
-         kH9qlpbaEwnYma7rjT/Vzp2lkkPcd1RwYiD9PxX5MpXU63RKXpAh2NcMfZT/F3LOZao1
-         F1/Q==
-X-Gm-Message-State: AOJu0YweN1KIlnR7o95G5mGMTHOFWhRJ1OadmYwiyvtKqNe/xQkKVwyx
-	dNSuPsSsTR1O2nYlFo/mvpI=
-X-Google-Smtp-Source: AGHT+IEpHyMQPBhE+mKRc+nSSN2OTrbaim+fbgwW/eS8SzPKILZKx0sKKOIcA+vbzPeipjEAhzLLgQ==
-X-Received: by 2002:a05:600c:4f4b:b0:40c:f66:2613 with SMTP id m11-20020a05600c4f4b00b0040c0f662613mr195477wmq.107.1701708433996;
-        Mon, 04 Dec 2023 08:47:13 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:d9c9:f651:32f4:3bc])
-        by smtp.gmail.com with ESMTPSA id p7-20020a05600c358700b0040849ce7116sm19370513wmq.43.2023.12.04.08.47.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 08:47:13 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
- <jacob.e.keller@intel.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 0/6] tools/net/ynl: Add 'sub-message'
- support to ynl
-In-Reply-To: <20231201181505.002edc7f@kernel.org> (Jakub Kicinski's message of
-	"Fri, 1 Dec 2023 18:15:05 -0800")
-Date: Mon, 04 Dec 2023 15:54:13 +0000
-Message-ID: <m2leaa6k0q.fsf@gmail.com>
-References: <20231130214959.27377-1-donald.hunter@gmail.com>
-	<20231201181505.002edc7f@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=uBnceUeXqoc4KAsYh0oGp5cKpBSchhPkcUak6VayEv8=;
+        b=w6Z+vEtt+bpjlg5+4oRkv936gKZzdDucZtq8IRHYvYi2RihpT6Fq5rZM+ixbUjI9r8
+         5vBBQujVG3hZSgz2waH/UgzLmSqQKwIDxDBcdVbEuUGVY4B/LrQAACh7YxRZ3BnAPW+P
+         BH9TPsuV1BALkk4lORFSf0G9p9W4D3BEF8UIGz/6NUjSwvJd7CwGNjiCzZhLsUab6qs0
+         yWwpjslsA4+ITYYSM7YRuchL7r6DypO2YYTjkEt3uyUDwcVWF73Pm+WXL76aoe6Jbb4O
+         SydlpwEL4hfsqhAcqV2tCogFextMtjn4qmbbp3aOmYCFIlnT39vNQQeo+XfXJSJrZHwH
+         8CXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701705336; x=1702310136;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uBnceUeXqoc4KAsYh0oGp5cKpBSchhPkcUak6VayEv8=;
+        b=DOqTBLhxv1Jqqi0VyyZL15qCrlUFPIoAzwyjQ9vbzCzc2eO6dYbsKysdqYiGHUfoW3
+         32jQRLntgX7n8lj4SeVDz0tSDlebRh7Yfvf1CzHyj2VruZgugHd1yHWPCtTaPriWdJqh
+         3C1uQAxDgJxwYyrW43WkMUjPdFpJTNjJw+MiJmArRz/PXwPGqQrq4TfaNy1Od78lmG0Y
+         9RYfYWJldY0S5j9pa6La9yNoPAylMjyjSTwrQTgdFfG7N9kVNSWPRaRNvCYbB9oc5SPY
+         7x0pwDDp3+K71jbzHpC4MKfA2dCW92+PGA+YZVHJpqWsZ2Gzq2ujNweCqXbPMmRZkREk
+         J0JA==
+X-Gm-Message-State: AOJu0YwdX7nWPvfU1Jpd3QKsNhal1qKfTFpLd6TuWwJ65ohANgfWG6YJ
+	PFos36NfPnzsJLX8pBtyLoNamWBM5AtZLQD7HhHKCg==
+X-Google-Smtp-Source: AGHT+IFuKjlGfvmJyy7+xVwL/kDRF40qFgOI72X8CBriksgTyN3qZV5QZt4X+6SaDAxvWQonu5iiV47ARw0geRpl1ok=
+X-Received: by 2002:a05:6512:214f:b0:50b:c5b3:6452 with SMTP id
+ s15-20020a056512214f00b0050bc5b36452mr198415lfr.6.1701705336239; Mon, 04 Dec
+ 2023 07:55:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231204091911.1326130-1-edumazet@google.com> <20231204091911.1326130-4-edumazet@google.com>
+ <695c2152-f7d0-43f0-919b-4df23840907d@kernel.org>
+In-Reply-To: <695c2152-f7d0-43f0-919b-4df23840907d@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Dec 2023 16:55:22 +0100
+Message-ID: <CANn89iJBZkH9CZ=+aRadPw_2TkUrp-HdiD9aEtoRyoNCjNpJVw@mail.gmail.com>
+Subject: Re: [PATCH iproute2 3/5] tc: fq: add TCA_FQ_PRIOMAP handling
+To: David Ahern <dsahern@kernel.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> On Thu, 30 Nov 2023 21:49:52 +0000 Donald Hunter wrote:
->>  Documentation/netlink/specs/rt_link.yaml |  273 ++-
->>  Documentation/netlink/specs/tc.yaml      | 2008 ++++++++++++++++++++++
+On Mon, Dec 4, 2023 at 4:51=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
 >
-> Should we add sub-messages to tools/net/ynl/ynl-gen-rst.py ?
-> Does the output look sane with the new attributes?
+> On 12/4/23 2:19 AM, Eric Dumazet wrote:
+> > @@ -193,6 +196,48 @@ static int fq_parse_opt(struct qdisc_util *qu, int=
+ argc, char **argv,
+> >                       pacing =3D 1;
+> >               } else if (strcmp(*argv, "nopacing") =3D=3D 0) {
+> >                       pacing =3D 0;
+> > +             } else if (strcmp(*argv, "bands") =3D=3D 0) {
+> > +                     int idx;
+> > +
+> > +                     if (set_priomap) {
+> > +                             fprintf(stderr, "Duplicate \"bands\"\n");
+> > +                             return -1;
+> > +                     }
+> > +                     memset(&prio2band, 0, sizeof(prio2band));
+> > +                     NEXT_ARG();
+> > +                     if (get_integer(&prio2band.bands, *argv, 10)) {
+> > +                             fprintf(stderr, "Illegal \"bands\"\n");
+> > +                             return -1;
+> > +                     }
+> > +                     if (prio2band.bands !=3D 3) {
+> > +                             fprintf(stderr, "\"bands\" must be 3\n");
+> > +                             return -1;
+> > +                     }
+>
+> do you expect number of bands to change in the future? If not, why make
+> it an option or just a flag?
 
-Ah, yes we should. Okay if I look at this as a followup patch?
+We do not know yet if this would in the future (we have not changed it
+in the last ~9 years)
+
+I used the same syntax as prio which would allow a future change if needed.
 
