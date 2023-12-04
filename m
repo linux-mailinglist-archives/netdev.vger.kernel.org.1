@@ -1,75 +1,65 @@
-Return-Path: <netdev+bounces-53651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86F2804066
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:50:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E624D804073
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26AAAB20B83
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:50:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B3B91F21071
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD3835EE3;
-	Mon,  4 Dec 2023 20:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="CT36PECD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C6635EE3;
+	Mon,  4 Dec 2023 20:55:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1216C6;
-	Mon,  4 Dec 2023 12:50:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=IvcuO1hSSnoLO74Nmy5OlV/+o+qw+L0ddRc9j5Pdrsw=;
-	t=1701723034; x=1702932634; b=CT36PECD5yMVg7dW6ttKWy5WxO34gZuf8tZ8YZLpO9v7gqV
-	dGXGRrVlLKshihCIfetnS2kv+oH5D8nNFUgJ2zBhpktqrRVeVkZz8rvf7xCHlBIftcigZh9HlPj7e
-	p6kfoY5uJk9SFdxxNUXqjBRPjZvLnldBUcFbvjBbOEE5lTiYgz/OxOyZqtDawQoiOU4l0abwyg7Rl
-	JvPTmdE4TUnwYFe4m48cBpXZ2DcDVgMRQ/aBGm6faGYoAN52Fg5qvQUArrecEpcpXMCiU6gBcdeKD
-	nvvnAe/pWWoiOzEJgsRPtfTYsd2Iw7FCBoVBVhCPrvJb08bNcdw5TSGud4Fr7W6w==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAFte-0000000FFlL-3cj6;
-	Mon, 04 Dec 2023 21:50:31 +0100
-Message-ID: <71d0f8424661b0d7b2c371e422416854790e477a.camel@sipsolutions.net>
-Subject: Re: [PATCH AUTOSEL 4.14] wifi: cfg80211: lock wiphy mutex for
- rfkill poll
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Cc: syzbot+7e59a5bfc7a897247e18@syzkaller.appspotmail.com, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Mon, 04 Dec 2023 21:50:29 +0100
-In-Reply-To: <20231204203735.2095033-1-sashal@kernel.org>
-References: <20231204203735.2095033-1-sashal@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+Received: from mail1.merlins.org (magic.merlins.org [209.81.13.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F775CA
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:55:04 -0800 (PST)
+Received: from merlin by mail1.merlins.org with local (Exim 4.94.2 #2)
+	id 1rAFxf-0003gi-1l by authid <merlin>; Mon, 04 Dec 2023 12:54:39 -0800
+Date: Mon, 4 Dec 2023 12:54:39 -0800
+From: Marc MERLIN <marc@merlins.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
+Message-ID: <20231204205439.GA32680@merlins.org>
+References: <20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+ <20231204200038.GA9330@merlins.org>
+ <a6ac887f7ce8af0235558752d0c781b817f1795a.camel@sipsolutions.net>
+ <20231204203622.GB9330@merlins.org>
+ <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
+X-Sysadmin: BOFH
+X-URL: http://marc.merlins.org/
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Mail-From: marc@merlins.org
 
-On Mon, 2023-12-04 at 15:37 -0500, Sasha Levin wrote:
->=20
-> +++ b/net/wireless/core.c
-> @@ -202,7 +202,9 @@ static void cfg80211_rfkill_poll(struct rfkill *rfkil=
-l, void *data)
->  {
->  	struct cfg80211_registered_device *rdev =3D data;
-> =20
-> +	wiphy_lock(&rdev->wiphy);
+On Mon, Dec 04, 2023 at 09:40:08PM +0100, Johannes Berg wrote:
+> This one's still the problem, so I guess my 2-line hack didn't do
+> anything.
 
-This can't even _build_ on this old kernel?!
+sorry, I wasn't clear, this was the last hang before your patch. I
+wanted to make sure it matched your analysis, which it seems to, so
+that's good.  I now understand that the order in printk is not actually
+the order of who is at fault.
+I'm testing your patch now, will let you know ASAP
 
-Anyway, my locking rework only went into 6.7, so this doesn't make sense
-in any stable kernel, it's just not required.
-
-johannes
+Marc
+-- 
+"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
+ 
+Home page: http://marc.merlins.org/  
 
