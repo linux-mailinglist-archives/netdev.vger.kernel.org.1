@@ -1,331 +1,262 @@
-Return-Path: <netdev+bounces-53482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3590E80334D
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:44:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A56F803365
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF0C0280FAC
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:44:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DB6F1C209EA
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5998B2377D;
-	Mon,  4 Dec 2023 12:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15EF24203;
+	Mon,  4 Dec 2023 12:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NfOZNCit"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lSFvwsYH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4064AA;
-	Mon,  4 Dec 2023 04:44:48 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796009C;
+	Mon,  4 Dec 2023 04:52:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701693888; x=1733229888;
-  h=from:to:cc:subject:date:message-id:references:
+  t=1701694360; x=1733230360;
+  h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=MetmIFiAVHiKZbtEDCY58YSH+1Sz/uhPYJxgTTY98fs=;
-  b=NfOZNCitJpAMAYc9LT1yyY8hotlnupbZozd9LkFlZMs6M/qbVR0fv0Uc
-   0zmYwmhpH7+uC5Xao3iy1/fS1FwgmTvyXUR97x4Z4othQff2mObuRsKdy
-   7ZFpGJcefMHk8Gdn5Ara2GtcKCpGpJlEfbtLcfIHlI6W+R6hRsq36QH+n
-   t2u2rcPGdFoaepX6ycmlf0ScC+PgEH58EPGgDBQBJqbMR3yzBif4nyVnl
-   rztFoxkJ3+2tpyaMgMLDhkl2KbXFCOOjaQgP3EZvnaN2+9QsYTDzlLny2
-   oB1zg75+YaKbo1U6yuKeRCK63LqcCeZZ0Qv/wP7xx4Ki+Yjnda+Vou0lD
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="392601088"
+  bh=F9XsEyt3USxNwphpSAzEaeWM0LyluWMIscPHOaMZMgY=;
+  b=lSFvwsYHz9Wmm4qaQaEjfIg3uT8SWFZKLgOQtZx5lURLQN7cIzlhBX0b
+   GMnm2w+0lCdZMv6oLL+mZ3N7lk8gdmVo7vPEl/jaUD9h1EdUnrlTCbI9U
+   wB2IfVJTlmj3T4tDEVeiq/8R5YAqQ8KK+gSVsC/ZncQRDdDH2jzTgHHuG
+   fsoWi1eqr4UWBnPJJEfEIz0R7JX0iOEvv0VEibSmDtuV1OL+R2mFjodvW
+   ifk87KQ/S1zFHT7hwdM8Za8WoBQBzb3MNPnA5ZuOz9flVvqo9icItvHyr
+   Clpe7vIP4puYj9O90N8dPIPDraidNfPgcsRdqKfjjBB5thb9pVrXPe9l8
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="625865"
 X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="392601088"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 04:44:48 -0800
+   d="scan'208";a="625865"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 04:52:40 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10913"; a="943870475"
 X-IronPort-AV: E=Sophos;i="6.04,249,1695711600"; 
-   d="scan'208";a="18565130"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 04:44:48 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+   d="scan'208";a="943870475"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 04:52:39 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 4 Dec 2023 04:44:47 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.35; Mon, 4 Dec 2023 04:52:38 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 4 Dec 2023 04:44:47 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.34; Mon, 4 Dec 2023 04:52:36 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 4 Dec 2023 04:52:36 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 4 Dec 2023 04:44:47 -0800
+ 15.1.2507.34; Mon, 4 Dec 2023 04:52:36 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e7XLZ1rL9CUwIUGglJMltXMi9VsuveJi+eMLWdnAs7Q/6cbQnIkZJB81ZK5Wu1JOaaHsJeDkRgHvUNgqsQTIsq/zMMG+v2hAPxD4gae23ll9ghz+bh669N/YpGHbtxLp+QVYDKD4+toyO1nEzMMppK4a2pLyODdrY/ImqSzF7JWA74kAF4uS5qMzcPdO9vFiRd7wjeYuRdeNZTAZk6VlMAH4InQZWjgJdOeWesECH+scSQJMfFgXdA7yibfXeuh3p0dHF6iwOzSV7bQiS70Lag3v1w8HRSRfGXxTHMh550LpEasZhkocukndGeLPNLlX/vpknZIYIvS+WIo7tpo6jA==
+ b=U0YOzXFLcccYW82e7sqrUbLOWsXJYg5GtUkJzmNGgBzpz7G1494IxChUv2q7ulG6lHNzob9wexbUd5jjZ5DVBMJ+AMBzaLG0JtH9PlDHKuoKBAnYEhn832na358u3Chqy6R/f77BhnltP/9vkpeOL1nW6M1hHkIxYGWsiQy586wos/fo24H8yDzf/5QOgJ25FYnaIXk5HZytRPY15G/6pcApviqeovYeRTrDuBxQH91mIA4dCzt8jwJd8Bv5cmd7P/CxEI9UkGM+AUYyx39GTUZdPKvVdrZBOcF6+EXsPwuuH6zlt0maC6n6LvM+/qk9hgmj6fnbjwo98U1xUBvGCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pL2phyJOIvkLnJ4ivTdq4dpSskqmx09QHAWXcgShNCc=;
- b=ZEoJ5tNv6v3SY7P+K/TekAXWZtEMCTkUi0xtqL5472yFMLyvMylO0mcdGJnL+7GJcQsczHozkPpCVFxrV7jhZ/EoKYL6VfeaHkDsLqwwHJHFKaumDabTN1Ywdu+/X/scehUxYf0vsA8WRXoHX4NqiQQLCs7cy26kilf1QZNnQt5L7MFXy7PGii60mh+b66jp4hzMhERoFHe69N8Anqh5D0WMa8F2OFjptDsxDCCaFvAA1LXmf/3UcjTEg0QrhR5ZjVCT41hDOnYS/RzHn+wK6c9T0+HSUykaSxSu24G6E56Kq+qplaRZNadTVgjGW463csZlccD/FN0d18Kb2HMBKA==
+ bh=DS5R1P4/Vr026XbYa6wJWHNs0WjEo9AVXZZiXCtEsjk=;
+ b=GUOPcUGG1/vKZf1sN+cF+H7z8f/DJhJB293qKdBFZEegtm/r5F0KClzR7zolXIhnps7e8FEQG6X0/kKuNQAwjK8ASyva6RcnFJRvDfyoSO2u5hYXh9jp+5p4PTcKibGwRt35no5tVF9FpNPXyKTz0Sw+pYWMYkizPd3ON/+zALBpckr7PWGgV9hnzbToQ5Q46TbZp4nH7ZebDmhGEuVnR2/RvQZ1ZsdFS3yvtexOErCAG0JffQ40ww7seRHBFyyrflhTagTgbQyKmGKhQCx2e2K8mtM9cMMO6//KK/2jkstWGDzLSrpFZpXYSJaakk67nH2PA3fJ5s6jmwPcK9qblQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com (2603:10b6:610:17e::19)
- by CH3PR11MB8520.namprd11.prod.outlook.com (2603:10b6:610:1af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Mon, 4 Dec
- 2023 12:44:44 +0000
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::a0ff:c576:dd44:3f12]) by CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::a0ff:c576:dd44:3f12%5]) with mapi id 15.20.7046.034; Mon, 4 Dec 2023
- 12:44:44 +0000
-From: "Michalik, Michal" <michal.michalik@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Kubalewski,
- Arkadiusz" <arkadiusz.kubalewski@intel.com>, "jonathan.lemon@gmail.com"
-	<jonathan.lemon@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>, poros
-	<poros@redhat.com>, "Olech, Milena" <milena.olech@intel.com>, mschmidt
-	<mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
-	<linux-clk@vger.kernel.org>, "bvanassche@acm.org" <bvanassche@acm.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>
-Subject: RE: [PATCH RFC net-next v4 2/2] selftests/dpll: add DPLL system
- integration selftests
-Thread-Topic: [PATCH RFC net-next v4 2/2] selftests/dpll: add DPLL system
- integration selftests
-Thread-Index: AQHaHftDqogcp+ihbE618Bc81MIRXbCRmiWAgAGOCXCAAOF4gIAAvlGQgAAcCoCABBceYA==
-Date: Mon, 4 Dec 2023 12:44:44 +0000
-Message-ID: <CH3PR11MB841424C185225EC7EB9DBE4DE386A@CH3PR11MB8414.namprd11.prod.outlook.com>
-References: <20231123105243.7992-1-michal.michalik@intel.com>
-	<20231123105243.7992-3-michal.michalik@intel.com>
-	<20231129093951.3be1bd8b@kernel.org>
-	<CH3PR11MB84143BBDDE886E6479146365E382A@CH3PR11MB8414.namprd11.prod.outlook.com>
-	<20231130225127.1b56ffca@kernel.org>
-	<CH3PR11MB84146024E32844E0931039ACE381A@CH3PR11MB8414.namprd11.prod.outlook.com>
- <20231201115259.37821ed5@kernel.org>
-In-Reply-To: <20231201115259.37821ed5@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
+Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR11MB8414:EE_|CH3PR11MB8520:EE_
-x-ms-office365-filtering-correlation-id: 003cd46d-d023-4353-70f8-08dbf4c6cae0
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ql9vRaZVVGpSSmGd/M9gzy0J51UNT6bNVd0/zbnfm7QekGnaYAw8Iy8NmjHjykKkYwih15FyCJMvtbUZzSvHN6w6YljPJH6+UXCkCwzW3JdOF1zXOgO9h25ce6Je1wXDOCkO4WN9wtPqahmqiq6j3ICDXCMKAgYNu+97FXdMG7gu2rQwPXnl9IZWSbET+Zb49fexL9M/QaM8pPkhQUPGLNc8qgeIanvZNkD3PCx08EuUI9569Fo6h8Y6PmXc2JRDl2CVA5/AvWFAanh3oN1KhQYFgABmJMBtGS+DBwm3FXnUncRdPwwVgyK1r44X/YYcu7PzR0rdIwAdBhL76cc6V3F63zey0DkW0D0Ji6KuMF2qiXwCtUOfWu5XYJieqUHPrriIA91q1t86x2g7gX5mzJCS58AbQyx/FcVV9wFERUFvHW6fVMdw8dZaBRqg583kdckojFPpdCJyMv4oY+r7vHBrlghHu8+fNp5wH535hLU53YqqiwwFOhEkMG+5mFDLTBdgD7I4Rqf+5lN9SJlrEtgOAO7cbhFWfUb9cjFSf+7utE0YPFrEiW6/HgcrksLxoZr+J9Zthv+8ODnCl9MBpTRHAq3LPQdzbEDVYrf/LDs=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8414.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(39860400002)(396003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(66556008)(76116006)(66476007)(64756008)(54906003)(66446008)(66946007)(316002)(6916009)(478600001)(71200400001)(966005)(38100700002)(7416002)(5660300002)(38070700009)(41300700001)(2906002)(33656002)(52536014)(86362001)(4326008)(8676002)(8936002)(122000001)(83380400001)(55016003)(26005)(82960400001)(9686003)(53546011)(7696005)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IXrDdL6ZbLpW1ciHosfwIuQ4b8pmu6abv99jG9r9r7i/ybeFl1WQKhs+Epur?=
- =?us-ascii?Q?KT/T7wSZTDCXBEQLtuCQsCXkrPE4DTvbL/ZZI0FrkL1RtKtEaTnK4qgNWE2z?=
- =?us-ascii?Q?uQ37rU7wr4Kq1TsQVC6TJUFI9Sm6ZcKM/Xku8t6uV1yAtZq8DRbOMj2pXDl9?=
- =?us-ascii?Q?kGvCiAgRf5F5zvWYoZRHzVxZNOTJ1o+LdnpGYXG9FShOtQENemTUxbcmErPQ?=
- =?us-ascii?Q?mpiO7vKG0iWhuvujwhbkw2fajcukKMXIJ12qOW10op6EaZlJBR/aAbZ6njBr?=
- =?us-ascii?Q?jZh7qpjupBMya27X/4Ik3fQz8ow8SdB2ahqnbO0Xon+frEsSQWpu8CgiI0LB?=
- =?us-ascii?Q?guGjGa2I9jokYp61CsSElLSm4Xof/S+y/N3A9ZSfUEIe1kSDFqLIlv+GzH7a?=
- =?us-ascii?Q?0SNwKupTP7a97SJnftjhSqqJZPNOVSJGAWgbVMBgpPYqTp4CHVSmWCtDO4/d?=
- =?us-ascii?Q?dhTDnY11qSvyF0qLnCxKi9q0gtgTOFGgoh68i50qnmW3S+qrrEHXO7GwzmuY?=
- =?us-ascii?Q?hDEbEf4z4mQyKmFOgQRuUJFYDWqU6mPoJ16bU6fkeqbOvEz4N7TPiP+A0UbK?=
- =?us-ascii?Q?zzcJUewjNyWjTQdwBAjynPBNias0a/YlTuaUtgRV4vb4Lfn+FYkWZ2aaJhzw?=
- =?us-ascii?Q?At8R7+5gvJ6OqDVCZlMMTfBBmjcGb/nYDYaXDNn56sj72QDmaOtM0kBJv8HP?=
- =?us-ascii?Q?U+IjfB6e28pjmCTTpDlgWs1nYK7bkXENBOWG92JiUWGROlJNqwRgaUoWP3Ws?=
- =?us-ascii?Q?aEuM5hfWd9NM4QtH/mGJyt8Cv0i1MLr2Y912Rd0WPr2LOD56//98rX+YHzRj?=
- =?us-ascii?Q?0XnXX22azHIz2kNIaxgpSA/Uwkn5/IJuc7Mit0JzxUSygfguI09QeZm5NR3+?=
- =?us-ascii?Q?21SVuMJplZ2gjYYAVlaa3Hx/HGBZQtBPE3J152RfZcx9JJoNAkzHUAdKqzGg?=
- =?us-ascii?Q?sUc5C1jUWssoNU66Mv5oss5yajp8JEUL5LrFcugoPJ9zVCR2gNS/JiMy0awt?=
- =?us-ascii?Q?1fUsYWXeK4tEhCH12/e3TlQNomhS2gBihipW4n/0vxcW7Cjbmkvb3OAjWWIw?=
- =?us-ascii?Q?brgUDLGUboha2ySo2OqA7EUKNrJ49P7RXV+dP8nIUbTw249QL482eau1ZTS0?=
- =?us-ascii?Q?oInrsrKIJekLfd+Z1/mhObMlrvAJ/w4IFecPnVvVFRiycYjN6h+AexgJNa70?=
- =?us-ascii?Q?qkFfI8WQZBg3EPwk927yh+VKBNnKpYTcA4WHHQRSgPZBol02sfJtkjAyUU9J?=
- =?us-ascii?Q?zIfE4no9hEJNH9BsXJeFImBdZgGAoTXV38Y+Ulz9k1xxMgilQL3SwZs7KN8n?=
- =?us-ascii?Q?7VXAI+0E4eN+YMpcWleJpl7rVHCawUEPpkpCOfyn+hpMPnH/qMP7Bjit2bWC?=
- =?us-ascii?Q?wvVVwBFqq+KaNfs9R8BGoZqVahfHSWTzMUrRDDTsOqbYGQBUbLzddICDbTp2?=
- =?us-ascii?Q?9sR2y9ej68zHsWaJWKS6MOlPz7tY09viYnb1KtfYtPbMrwOsNgq/Q3cUMcyI?=
- =?us-ascii?Q?/qGe+KxLXGPlli+SHQZeLmpUes+MkqaIytIg9jDSjYtuv+diIIV3WuK5zUpU?=
- =?us-ascii?Q?rj/AeB2kX+4K9t4pUVpD4nJkCrKQ2jrQRVFiTmih?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SJ0PR11MB4975.namprd11.prod.outlook.com (2603:10b6:a03:2d0::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.32; Mon, 4 Dec
+ 2023 12:52:34 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7046.033; Mon, 4 Dec 2023
+ 12:52:34 +0000
+Message-ID: <81dbf657-6513-4a8c-a0a9-5a98951c8356@intel.com>
+Date: Mon, 4 Dec 2023 13:51:11 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 iwl-next] i40e: Use correct buffer size in
+ i40e_dbg_command_read
+To: Kunwu Chan <chentao@kylinos.cn>
+CC: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jeffrey.t.kirsher@intel.com>, <shannon.nelson@amd.com>,
+	<kunwu.chan@hotmail.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Simon Horman
+	<horms@kernel.org>
+References: <20231204014455.2444734-1-chentao@kylinos.cn>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231204014455.2444734-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0086.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cd::13) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SJ0PR11MB4975:EE_
+X-MS-Office365-Filtering-Correlation-Id: 928c74f2-8758-4b08-62a3-08dbf4c7e2cc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b/Hkhig3j3kBRVkW9DQtY4ly5Z/HY2lzu9eRznfVCT3d+YdzGkL7RGNRY7LmCKwADY/C0Rs7lTfUkIieXRWeeMVo+fEd0OMHJPEsy0nLsSBnoxFsmfjUl/HmBmflWcJdVMoCCms7d1nKFfjoBmtOEofiOCg+WRQN0joiSFBa5qbhAwlKseHhDUK3wk0xpBlVgbl/2d/yvw6uf74hwOol6x3JbZS3kxBnLvO/4qR4jRSderorhEvBuJX9KtbmpIu+YgjxB8buzm0S9CltzuqS8dB4TxUbi5gxwY1C6F6kY5kZN6EpcpfKQ1gf2G0lZSFiSHr9EQg2os87urhDlKVmIkZ7+ahL69NlUixmvBhsSI1xo9Bj9uO4bH0xzfGT1apfjriLTH5Ft689bwjMQB0YkMBXTfeBe+05GtyjpTDg1rEQiYQLWE9+WZT2KfFZ+wnQsICkFvI/G6S4B4L2SvzdxGnoN29i+FS24SWSfwzU9S8r13D7sFvP6UTyDMD42XlB0UGKZ7yvVk4NrjF1vqfcOgnj2xPfKui+LKvXVf/9fDiXwkYj+0jajfrfnhs/GsKzhxRM23K1IvmB7veWh7AO8XLNfU8S81VRs/q3SLbPdwKTZ0tvHIdoeUL7OpLcZ84GtUnJ9qtie26oQ1PUyGqzsg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(366004)(346002)(136003)(376002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(31686004)(41300700001)(2906002)(7416002)(5660300002)(8676002)(8936002)(6486002)(83380400001)(478600001)(6916009)(316002)(36756003)(38100700002)(66556008)(66946007)(66476007)(6512007)(2616005)(6666004)(6506007)(4326008)(86362001)(26005)(31696002)(82960400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0w5ZnViNjQ1Wm5BcU1ZamdOU1JJWnZSczdTYzhodmFtdnlLbFhqalZaQnRQ?=
+ =?utf-8?B?M2dtSExKU3F3dy92bUw4Zld4UkhQRDE3OWtqRXNESXpNdVMxMS9naXl2NVU5?=
+ =?utf-8?B?c0pBcndXRVJzTEQwalI4K0d4UDlPem1NMHVKMjVIQVJaWDJvbnlJYXRidGdX?=
+ =?utf-8?B?SGpzeEx4Zm9zMWcvZkFQRGJqRTd5ZmJ6RmpZd3JIdXQvTTR5UnpONEhGK3V3?=
+ =?utf-8?B?eVJ1VWVIZDlaVVdJNEt2bFMzVVhOdlRSK2RzM2VybVc5SXBQd0l3TDhxUnFJ?=
+ =?utf-8?B?ZUhVZVVYNHRTVFNuczdyY1VaL2d3cENnRWlCL1lIcWxtN25VQjJQWWZ1SHNz?=
+ =?utf-8?B?TG5ra01wNUNNNU5HaWZ6c1dCZGt2WXVFZjBnNGJQQnhQS0hKclVSaEdQek1y?=
+ =?utf-8?B?USszM2EwTTlEeXowU3FNZmVocHdCRTNzc0NxUWFma1JFem05NUNlU3Y4aFRK?=
+ =?utf-8?B?TkQreUwvMzlwRHZzRm5Wdm5wTHlOTG9uek1rQlVubUxhampscjlhQytNQU5F?=
+ =?utf-8?B?N1VEbXU1SlZZNTl3eVIxMmJEb0NsSFNORGF5Zjl5VGN2NHNSUW1DbGNzLzl2?=
+ =?utf-8?B?cmFHZUxSTmM1U1ZaYkU1eDJvelpneTd6WE40bVg1NklBaGhyQllINXBEZWVG?=
+ =?utf-8?B?TG1ZMHpVL0ZZajlON2k1UjJ4b2lEL3dyNG1Pd2huc3dYb3k2UUFnWS9CSUtM?=
+ =?utf-8?B?T2VFVTFBSnJjc3dRVDNONUlFSWZLUzVQWHd3ODJGMzlJK2hkWDZmQm83aEpV?=
+ =?utf-8?B?b3pPdWU3dmhTL1N5SDhJQlZzTWc3d0F3Rm9JV1JaREU5S244cUtMWllpbVhG?=
+ =?utf-8?B?b1BEODNTZ3FnNmsrY3hiY2liWW1mZTVDZWNBTWlIck50TVI5Q2NkalhnMWw2?=
+ =?utf-8?B?a09hWGN2NGhVVEdSQXZFdXVwMzNnempDdXJ4Z2FSMXNEcFVwRys3eWpLUFZw?=
+ =?utf-8?B?RTJIcUNseHFmOStpRnRHWHJWTVhNRUZhdFdiZkYzWWVyTEk2TFM4Zi9yS05H?=
+ =?utf-8?B?L0tQMnhxWDBJSjI5bGdmMTRCdkt1OXBhVWJKRUgwc2s5N2VmTVRpcXhZb05q?=
+ =?utf-8?B?byt2M2tOcUN3UU9NRWdiQmhhSTBoTERYSEJncXJYUmFpY3loVU1MKzdLMnZ6?=
+ =?utf-8?B?QTBVL3ByYjBua2p6S1RPRVN0dE1SVUprYzlSYXczM3QzR3ZyamdyNUJZbTBz?=
+ =?utf-8?B?WTNSK2QyY0VJVXNKcW1MWUVuaURrUFNoNnp1RXFBRE9HNjg2NGVnNzRkQ3dQ?=
+ =?utf-8?B?enRtRURHeitZU0N6VEV5eW8wOS9xaUlyOTIvVFllNStNd2ZJUkNrdThpQVZ2?=
+ =?utf-8?B?YWlrZ2k4bTkyazdWSnNUV01TbEFEV2lpZGFpVEJDNmN3Z1YxSldBb1Z0VmhO?=
+ =?utf-8?B?VVRZSjBxbDk4L3kwSU1JU1BxVWVCVnY3TGZRVnJxZHprNkFHdUwyaU8wbktB?=
+ =?utf-8?B?akNRR3VleVhBM3BnaEdGSWxrZE50bytrRVYxWjRPUTVuS3BERUY1RXp6RS9t?=
+ =?utf-8?B?Y2FZekgyQzU1d0YreUdhWDBZM0hWTkpHUDBKNWIvUGhnRXNXRW1nVmR2SUVu?=
+ =?utf-8?B?eXI4Z3ZRNFRqUDFxMVFhMHZXeFAxZktGOHVxTWVzT0w3R3QzTWZnRE0zQXBI?=
+ =?utf-8?B?ZVZVZEFkcDV0ditGYVNLdEpJcVN5QVJxMlJ3SWZWcERWNG5sWVRLY0xJUjJS?=
+ =?utf-8?B?d29KZTl2dnhpbnhXZWtsUWdwSk5ONERPaTVHZHlON0ZPdnpweExPeGhFR1VN?=
+ =?utf-8?B?MS9uaGh1VVE1b2d0OXVNQVY4czUrS0VYcUxJY2E2MXgyNkRRS2xra3pEemQv?=
+ =?utf-8?B?cHFNUGMvN3V2UWl5S2VCNTIyWU9ZQXV3YkNJM2lVWk1pRWQ5aTdiNGM0MjMr?=
+ =?utf-8?B?emVTMEV5YjJNQWNxbFVsKzlJQnBYSFVZVlJWTUtYVWVON2pUa3ppVERManJu?=
+ =?utf-8?B?anpJT3Y2Q09CUDNSQUJ2N0xQK0xMc1lHMjkwMzZtVmpacG1YSy9XRmJoUEdv?=
+ =?utf-8?B?UVNHNklvNGpiZFhBK1A5Z01kcmpnL1pvRkxuSUR5NGpBbGpIaFFEOFg1di9W?=
+ =?utf-8?B?aTU3d0ZJOHRTMHAzaWRXU3dUUldlcE9FL1k4UFlOeXZBbTdFQnh0T3Frdkdm?=
+ =?utf-8?B?R1hWUG5MZHFrZkVxemhVVm1ON0xjZHJyYVduMThMTHRxRnc2Y1JydGkrRHl3?=
+ =?utf-8?B?d2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 928c74f2-8758-4b08-62a3-08dbf4c7e2cc
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8414.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 003cd46d-d023-4353-70f8-08dbf4c6cae0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2023 12:44:44.7110
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 12:52:34.5968
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bojGBEpW8qoW7aJcDQr0IY4BLYGqzhOS8ErFZO17o1fhHwQU59eq+yaesLgjGvPHRS00XFONcZFblaxmGH/5fUP2ZLmVNxHkcMKdl2CVn8U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8520
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: McrZvvtAPQDoG4w2Qsllhu/Owg2Yaz4/Irkw7kFvQgrgWr4p+laJ6zLx2cl2s+xq8kWAIu5VinmLANlkDhMD01X8ae5IQkooN15l/9OFwrE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4975
 X-OriginatorOrg: intel.com
 
-Merging two threads.
+From: Kunwu Chan <chentao@kylinos.cn>
+Date: Mon, 4 Dec 2023 09:44:55 +0800
 
-On 1 December 2023 8:53 PM CET, Jakub Kicinski wrote:
->=20
-> On Fri, 1 Dec 2023 18:33:11 +0000 Michalik, Michal wrote:
->> That looks really promising - great idea. I tried only vmtest today, and=
- my tests
->> work kind of flawless with my own built kernel (nested VMs):
->>   $ vmtest -k /home/net-next/vmlinux "modprobe netdevsim && KSRC=3D/home=
-/net-next/ pytest"
->>   =3D> vmlinux
->>   =3D=3D=3D> Booting
->>   =3D=3D=3D> Setting up VM
->>   =3D=3D=3D> Running command =20
->>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D test session starts =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>   platform linux -- Python 3.9.16, pytest-7.4.3, pluggy-1.3.0
->>   rootdir: /home/net-next/tools/testing/selftests/drivers/net/netdevsim/=
-dpll
->>   collected 91 items =20
->>=20
->>   test_dpll.py .........................................................=
-.. [ 64%]
->>   ................................                                      =
-   [100%]
->>=20
->>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D 91 passed in 10.54s =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20
->> I will try to take a look at virtme-ng next week, but to be frank I alre=
-ady like
->> the vmtest.
->=20
-> Hm, FWIW I manged to get virtme-ng to work (I was pointing it at a
-> vmlinux not bzImage which it expects). But vmtest is still unhappy.
->=20
-> $ vmtest -k build/vmlinux "echo Running!"
-> =3D> vmlinux
-> =3D=3D=3D> Booting
-> Failed to connect QGA
->=20
-> Caused by:
->     Timed out waiting for QGA connection
->=20
+> The size of "i40e_dbg_command_buf" is 256, the size of "name"
+> depends on "IFNAMSIZ", plus a null character and format size,
+> the total size is more than 256.
+> 
+> Improve readability and maintainability by replacing a hardcoded string
+> allocation and formatting by the use of the kasprintf() helper.
+> 
+> Fixes: 02e9c290814c ("i40e: debugfs interface")
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+> v2
+>    - Update the size calculation with IFNAMSIZ and sizeof(i40e_dbg_command_buf)
+> v3
+>    - Use kasprintf to improve readability and maintainability
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> index 88240571721a..a176de89de9c 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> @@ -72,23 +72,22 @@ static ssize_t i40e_dbg_command_read(struct file *filp, char __user *buffer,
+>  {
+>  	struct i40e_pf *pf = filp->private_data;
+>  	int bytes_not_copied;
+> -	int buf_size = 256;
+> -	char *buf;
+> +	char *buf = NULL;
 
-I have seen this before I got the proper qemu version, actually I compiled =
-it from scratch:
-  $ qemu-system-x86_64 --version
-  QEMU emulator version 8.1.3
+This is unneeded.
 
-Which version of qemu are you using?
+>  	int len;
+>  
+>  	/* don't allow partial reads */
+>  	if (*ppos != 0)
+>  		return 0;
+> -	if (count < buf_size)
+> -		return -ENOSPC;
+>  
+> -	buf = kzalloc(buf_size, GFP_KERNEL);
+> +	buf = kasprintf(GFP_KERNEL, "%s: %s\n",
+> +			pf->vsi[pf->lan_vsi]->netdev->name,
+> +			i40e_dbg_command_buf);
+>  	if (!buf)
+>  		return -ENOSPC;
+>  
+> -	len = snprintf(buf, buf_size, "%s: %s\n",
+> -		       pf->vsi[pf->lan_vsi]->netdev->name,
+> -		       i40e_dbg_command_buf);
+> +	len = strlen(buf);
 
-Btw. I agree that logs for vmtest are not very helpful, the .vmtest.log fil=
-e is basically empty
-for me every time.
+strlen() doesn't include the terminating '\0', but you need to copy it
+as well. Hence `strlen(buf) + 1`.
 
->=20
-> Are you on Ubuntu? I'm on Fedora. Maybe it has some distro deps :(
->=20
+> +	if (count < len)
+> +		return -ENOSPC;
 
-I'm using Rocky, so kind of similar to Fedora.
-  $ cat /etc/rocky-release
-  Rocky Linux release 9.2 (Blue Onyx)
+Here you have memory leak in case the condition is true.
 
-Also, installed qemu-guest-agent and edk2-ovmf packages according to vmtest=
- instructions.
-Have you installed those?
+>  
+>  	bytes_not_copied = copy_to_user(buffer, buf, len);
+>  	kfree(buf);
 
->> >> To be honest I did not see that. I agree that this is a simpler solut=
-ion, but I am
->> >> not sure if that is not "too simple". What I mean, I'm not sure who w=
-rote the sdsi
->> >> tests, but maybe they were not aware about the Python best practices?=
- Python used
->> >> to be my first language, and I would vote for using the venvs if you =
-asked me.
->> >> I understand that it haven't been done before, but we are here to try=
- to improve
->> >> the things, yes?  =20
->> >=20
->> > I think I already asked how long the setup takes but my only concern=20
->> > is that the setup will be slower, and less useful during development.
->>=20
->> I wanted for "run_dpll_test.sh" to be userfriendly even for people who d=
-oes not
->> have a clue how python/pytest works. If somebody is developing tests, I =
-assume
->> he/she knows what she is doing and is using own environment either way, =
-like
->> venvs with additional Python debug tools and direct pytest in tests dire=
-ctory:
->>   KSRC=3D<KERNEL SRC> pytest
->=20
-> Fair point.
->=20
->> I don't feel like it is slowing anybody down. But since vmtest looks pro=
-mising,
->> maybe I can prepare a reverse logic. What I mean is I will prepare scrip=
-t which
->> helps prepare the environment, but the default will be to use "locally i=
-nstalled
->> stuff" when people just run "make -C tools/testing/selftests".
->=20
-> Let's keep it as is. 10sec for automated run is fine.
+Taking the above two into account, I'd suggest doing something like:
 
-OK
+	if (!buf)
+		return -ENOSPC;
 
-On 1 December 2023 9:03 PM CET, Jakub Kicinski wrote:
->=20
-> On Thu, 23 Nov 2023 05:52:43 -0500 Michal Michalik wrote:
->> +++ b/tools/testing/selftests/drivers/net/netdevsim/dpll/ynlfamilyhandle=
-r.py
->> @@ -0,0 +1,49 @@
->> +# SPDX-License-Identifier: GPL-2.0
->> +#
->> +# Wrapper for the YNL library used to interact with the netlink interfa=
-ce.
->> +#
->> +# Copyright (c) 2023, Intel Corporation.
->> +# Author: Michal Michalik <michal.michalik@intel.com>
->> +
->> +import sys
->> +from pathlib import Path
->> +from dataclasses import dataclass
->> +
->> +from .consts import KSRC, YNLSPEC, YNLPATH
->> +
->> +
->> +try:
->> +    ynl_full_path =3D Path(KSRC) / YNLPATH
->> +    sys.path.append(ynl_full_path.as_posix())
->> +    from lib import YnlFamily
->> +except ModuleNotFoundError:
->> +    print("Failed importing `ynl` library from kernel sources, please s=
-et KSRC")
->> +    sys.exit(1)
->=20
-> Do you have any suggestions on how we could build up a common Python
-> library for selftests? Can we create a directory for "library" code
-> somewhere under tools/testing/ ? Adding a wrapper like this for every
-> test is going to hurt.
->=20
+	len = strlen(buf) + 1;
 
-Agree, my approach is not very elegant but I could not figure out anything =
-more
-useful at that time. Having a common Python libraries might be a good idea =
-- let
-me think a bit how to handle it.=20
+	if (count < len)
+		bytes_not_copied = -ENOSPC;
+	elseif (copy_to_user(buffer, buf, len))
+		bytes_not_copied = -EFAULT;
+	else
+		bytes_not_copied = 0;
 
-> Calling out to YNL, manipulating network namespaces, manipulating
-> netdevsim instances, etc - will be fairly common for a lot of networking
-> tests.
->=20
-> There's already some code in tools/testing/selftests/bpf/test_offload.py
-> which is likely Python-incompetent cause I wrote it. But much like YNL
-> it'd be nice if it was available for new tests for reuse.
->=20
+	kfree(buf);
 
-I will familiarize myself with that - thanks for pointing that out.
+	if (bytes_not_copied)
+		return bytes_not_copied;
 
-> Can we somehow "add to python's library search path" or some such?
+	*ppos = len;
 
-Yeah, we might consider using PYTHONPATH in this "new common lib place":
-https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
+	return len;
+}
 
+Thanks,
+Olek
 
