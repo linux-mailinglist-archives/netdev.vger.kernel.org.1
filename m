@@ -1,136 +1,244 @@
-Return-Path: <netdev+bounces-53569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23D57803BE5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:44:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE563803C5A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 19:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2D25281049
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:44:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A97001C20B2E
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB36F2E854;
-	Mon,  4 Dec 2023 17:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3342F849;
+	Mon,  4 Dec 2023 18:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WsTkbKqn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sbzk/cJa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526D2D3
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 09:44:26 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5caf86963ecso66081357b3.3
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 09:44:26 -0800 (PST)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816DD129;
+	Mon,  4 Dec 2023 10:07:10 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6ce46470647so821732b3a.1;
+        Mon, 04 Dec 2023 10:07:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701711865; x=1702316665; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AHKIIXtuEH10uYVlAQhsfpVcXlWfnFhDRDhpZgy/nhY=;
-        b=WsTkbKqnnm18VmwZL4SMUF9bQWt8oVCkOY+PTLX8EEdNYG6R1w8WO7LZ3/JOlAHjH7
-         F9SGJk8UImRnePddi2WXv+Ch8feCIkoNh0pHt2euu7HK4/tDmd5bLIfHL9gedqPez5ku
-         OfGJuiaT+aP8Q8vmO1GX3oHiR465A9TPJfR9k1zzHhk1j96bjBYowklfSOWYPlLjth/s
-         uAUZ6a805MEysyMhQGx5+J8muqRfD4kNc5mLibSScolW5mbTz71W3Rjp5WMbiBTkljC8
-         Idi3UrUMpIfaP0eOvWQTIIFqYWuWp0EGLduKHBsk8FPKO6rasKwBxTNGGq80lBSDEntq
-         RKmw==
+        d=gmail.com; s=20230601; t=1701713230; x=1702318030; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vnKGL9rVmaXJ0k7UQTGGb8qgGBw3yaFYXulmlj0ClVk=;
+        b=Sbzk/cJarJS+HKABhyq9ZXjIKHReZXRZD2BmG6K1tjWjkQP6qWn2M1Hej+A0irmaku
+         MiQQibihKqnyE5TVi9uvaP+TQXi4717965Cj5SWoxsFXT08rL/dq7gcQha9HMJ+iJ6E4
+         BVSsykoGX1GtN128YVvHFOLoVXyY9pSvbwxF1qFD/Yff8eCGgX7GFA1jKFa07niVVpY4
+         d9OCXuF3WhLpOcz+yEjCxARi6Zebpvmf8U8x8xjf+1Jj/H4bG5JnvtbOkN1l+9J9gmEl
+         oiEG7ELXzD08vZaeO7QyUcVFM2Rqj1v3KKn+P22m3559f6bBVfzqLvxbIyP1mZuhfgJK
+         shBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701711865; x=1702316665;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AHKIIXtuEH10uYVlAQhsfpVcXlWfnFhDRDhpZgy/nhY=;
-        b=LKgSDWMth55KzacrUJlkZP4sb1X7QLc1jRgg5kDEPFkeGNKuOmnvmSP3TgQ4vhskTR
-         np+AYsVv8nv6vZewhJq9XsQpfHGZQZR5SzRq8AqWLBenr4z3E5SkddkZQwIpqL5jfYL9
-         jPXQ1ElAWVJY0usoLh1vfNQX71KOIjdrp7oQptMWPO2bfHSbRqgEDMamcf/vJlpv/Ra0
-         +pjWJp3nCc0n/E6RmmVoXTekvRFPtbis+byf7zHLilQAGyS4EVIhT3Og8KVNiMtdAWCg
-         FaM4sOf3CJLsEl0jPg/uTrWX5EoeX7tV9JrdwYioH+WQXkG9GjfhEWoOQRf8cHD2qGes
-         hPJQ==
-X-Gm-Message-State: AOJu0YzNOmw0YglvGdm/UVvX4A93fgOYBYK8f6dVhiNzUaGAzUilSK/O
-	WJxRNh8d0R9c1oYx58exCWOwfK4=
-X-Google-Smtp-Source: AGHT+IGzHvPVqHSiNAIV4uXK+MSBLIQuOoXZ8GITN+xD5sYKyENVupK9kJa9MZt7FjzHxcKweOhsMbI=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:c044:0:b0:db5:1f69:56d4 with SMTP id
- c65-20020a25c044000000b00db51f6956d4mr491393ybf.3.1701711865548; Mon, 04 Dec
- 2023 09:44:25 -0800 (PST)
-Date: Mon,  4 Dec 2023 09:44:23 -0800
+        d=1e100.net; s=20230601; t=1701713230; x=1702318030;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vnKGL9rVmaXJ0k7UQTGGb8qgGBw3yaFYXulmlj0ClVk=;
+        b=AYyMCAiofwW1w8/LKfRAUteUMOKs3IGWzjKZ81HOLm4Qog7YCel+I5tMBELYkYd3Ic
+         C4T4qpkFlGZeeXP+bncCihQfhjeGD3TsJFVqGBXi/XIjoPO4B2kA2Qlk2CwoPwhDujan
+         +NNUBj2hdZwzJF+J3y4w2hEVmDWduaQnATolFiBBR9nrKzAorPwLhVN5eBryUxtqzHrX
+         V+Fk7vGMXsTDRx7WiPSB9OD38PTNnbefsY008s69lgAXGCZSuKzQm1is49s8RxAW7uOj
+         fmc91cbZIRseHKFcBH1ZvFv+pbAs/b98BwWxq9xVaO3s3RAhfCBsGBSyGFZhNwjbcZOo
+         v/lw==
+X-Gm-Message-State: AOJu0YygE6uwIjeYYcpP+0PeLWzLwNjgGit6simtM/p2Q2tE1GHwtNrK
+	68fyZnN9/CqU4w30ZC6sDjE=
+X-Google-Smtp-Source: AGHT+IGDIGeeBa7UWPj4E4w2SIGHBjZgGz8oxGqwAWzNb+KD7mpnEvIno4bt3NIHORxil3wMtNwC4w==
+X-Received: by 2002:a05:6a20:1448:b0:18c:374c:6e64 with SMTP id a8-20020a056a20144800b0018c374c6e64mr27716780pzi.36.1701713229690;
+        Mon, 04 Dec 2023 10:07:09 -0800 (PST)
+Received: from localhost ([2620:10d:c090:400::4:27ef])
+        by smtp.gmail.com with ESMTPSA id u2-20020a056a00158200b006cdd507ca2esm7943470pfk.167.2023.12.04.10.07.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 10:07:09 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 4 Dec 2023 08:07:07 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Naohiro Aota <Naohiro.Aota@wdc.com>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+	"ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+	"cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+	"coreteam@netfilter.org" <coreteam@netfilter.org>,
+	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"gfs2@lists.linux.dev" <gfs2@lists.linux.dev>,
+	"intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-cachefs@redhat.com" <linux-cachefs@redhat.com>,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-erofs@lists.ozlabs.org" <linux-erofs@lists.ozlabs.org>,
+	"linux-f2fs-devel@lists.sourceforge.net" <linux-f2fs-devel@lists.sourceforge.net>,
+	"linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"nbd@other.debian.org" <nbd@other.debian.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"ntb@lists.linux.dev" <ntb@lists.linux.dev>,
+	"open-iscsi@googlegroups.com" <open-iscsi@googlegroups.com>,
+	"oss-drivers@corigine.com" <oss-drivers@corigine.com>,
+	"platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>,
+	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+	"target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"wireguard@lists.zx2c4.com" <wireguard@lists.zx2c4.com>
+Subject: Re: Performance drop due to alloc_workqueue() misuse and recent
+ change
+Message-ID: <ZW4VS3Z0auYCjg-W@slm.duckdns.org>
+References: <dbu6wiwu3sdhmhikb2w6lns7b27gbobfavhjj57kwi2quafgwl@htjcc5oikcr3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231204174423.3460052-1-sdf@google.com>
-Subject: [PATCH bpf-next] selftests/bpf: Make sure we trigger metadata kfuncs
- for dst 8080
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbu6wiwu3sdhmhikb2w6lns7b27gbobfavhjj57kwi2quafgwl@htjcc5oikcr3>
 
-xdp_metadata test if flaky sometimes:
-verify_xsk_metadata:FAIL:rx_hash_type unexpected rx_hash_type: actual 8 != expected 0
+Hello,
 
-Where 8 means XDP_RSS_TYPE_L4_ANY and is exported from veth driver
-only when 'skb->l4_hash' condition is met. This makes me think
-that the program is triggering again for some other packet.
+On Mon, Dec 04, 2023 at 04:03:47PM +0000, Naohiro Aota wrote:
+> Recently, commit 636b927eba5b ("workqueue: Make unbound workqueues to use
+> per-cpu pool_workqueues") changed WQ_UNBOUND workqueue's behavior. It
+> changed the meaning of alloc_workqueue()'s max_active from an upper limit
+> imposed per NUMA node to a limit per CPU. As a result, massive number of
+> workers can be running at the same time, especially if the workqueue user
+> thinks the max_active is a global limit.
+> 
+> Actually, it is already written it is per-CPU limit in the documentation
+> before the commit. However, several callers seem to misuse max_active,
+> maybe thinking it is a global limit. It is an unexpected behavior change
+> for them.
 
-Let's have a filter, similar to xdp_hw_metadata, where we trigger
-xdp kfuncs only for UDP packets destined to port 8080.
+Right, and the behavior has been like that for a very long time and there
+was no other way to achieve reasonable level of concurrency, so the current
+situation is expected.
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- .../selftests/bpf/progs/xdp_metadata.c        | 31 ++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+> For example, these callers set max_active = num_online_cpus(), which is a
+> suspicious limit applying to per-CPU. This config means we can have nr_cpu
+> * nr_cpu active tasks working at the same time.
 
-diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-index d151d406a123..5d6c1245c310 100644
---- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-@@ -27,11 +27,40 @@ extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
- SEC("xdp")
- int rx(struct xdp_md *ctx)
- {
--	void *data, *data_meta;
-+	void *data, *data_meta, *data_end;
-+	struct ipv6hdr *ip6h = NULL;
-+	struct ethhdr *eth = NULL;
-+	struct udphdr *udp = NULL;
-+	struct iphdr *iph = NULL;
- 	struct xdp_meta *meta;
- 	u64 timestamp = -1;
- 	int ret;
- 
-+	data = (void *)(long)ctx->data;
-+	data_end = (void *)(long)ctx->data_end;
-+	eth = data;
-+	if (eth + 1 < data_end) {
-+		if (eth->h_proto == bpf_htons(ETH_P_IP)) {
-+			iph = (void *)(eth + 1);
-+			if (iph + 1 < data_end && iph->protocol == IPPROTO_UDP)
-+				udp = (void *)(iph + 1);
-+		}
-+		if (eth->h_proto == bpf_htons(ETH_P_IPV6)) {
-+			ip6h = (void *)(eth + 1);
-+			if (ip6h + 1 < data_end && ip6h->nexthdr == IPPROTO_UDP)
-+				udp = (void *)(ip6h + 1);
-+		}
-+		if (udp && udp + 1 > data_end)
-+			udp = NULL;
-+	}
-+
-+	if (!udp)
-+		return XDP_PASS;
-+
-+	/* Forwarding UDP:8080 to AF_XDP */
-+	if (udp->dest != bpf_htons(8080))
-+		return XDP_PASS;
-+
- 	/* Reserve enough for all custom metadata. */
- 
- 	ret = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
+Yeah, that sounds like a good indicator.
+
+> fs/f2fs/data.c: sbi->post_read_wq = alloc_workqueue("f2fs_post_read_wq",
+> fs/f2fs/data.c-                                          WQ_UNBOUND | WQ_HIGHPRI,
+> fs/f2fs/data.c-                                          num_online_cpus());
+> 
+> fs/crypto/crypto.c:     fscrypt_read_workqueue = alloc_workqueue("fscrypt_read_queue",
+> fs/crypto/crypto.c-                                              WQ_UNBOUND | WQ_HIGHPRI,
+> fs/crypto/crypto.c-                                              num_online_cpus());
+> 
+> fs/verity/verify.c:     fsverity_read_workqueue = alloc_workqueue("fsverity_read_queue",
+> fs/verity/verify.c-                                               WQ_HIGHPRI,
+> fs/verity/verify.c-                                               num_online_cpus());
+> 
+> drivers/crypto/hisilicon/qm.c:  qm->wq = alloc_workqueue("%s", WQ_HIGHPRI | WQ_MEM_RECLAIM |
+> drivers/crypto/hisilicon/qm.c-                           WQ_UNBOUND, num_online_cpus(),
+> drivers/crypto/hisilicon/qm.c-                           pci_name(qm->pdev));
+> 
+> block/blk-crypto-fallback.c:    blk_crypto_wq = alloc_workqueue("blk_crypto_wq",
+> block/blk-crypto-fallback.c-                                    WQ_UNBOUND | WQ_HIGHPRI |
+> block/blk-crypto-fallback.c-                                    WQ_MEM_RECLAIM, num_online_cpus());
+> 
+> drivers/md/dm-crypt.c:          cc->crypt_queue = alloc_workqueue("kcryptd/%s",
+> drivers/md/dm-crypt.c-                                            WQ_CPU_INTENSIVE | WQ_MEM_RECLAIM | WQ_UNBOUND,
+> drivers/md/dm-crypt.c-                                            num_online_cpus(), devname);
+
+Most of these work items are CPU bound but not completley so. e.g.
+kcrypt_crypt_write_continue() does wait_for_completion(), so setting
+max_active to 1 likely isn't what they want either. They mostly want some
+reasonable system-wide concurrency limit w.r.t. the CPU count while keeping
+some level of flexibility in terms of task placement.
+
+The previous max_active wasn't great for this because its meaning changed
+depending on the number of nodes. Now, the meaning doesn't change but it's
+not really useful for the above purpose. It's only useful for avoiding
+melting the system completely.
+
+One way to go about it is to declare that concurrency level management for
+unbound workqueue is on users but that seems not ideal given many use cases
+would want it anyway.
+
+Let me think it over but I think the right way to go about it is going the
+other direction - ie. making max_active apply to the whole system regardless
+of the number of nodes / ccx's / whatever.
+
+> Furthermore, the change affects performance in a certain case.
+> 
+> Btrfs creates several WQ_UNBOUND workqueues with a default max_active =
+> min(NRCPUS + 2, 8). As my machine has 96 CPUs with NUMA disabled, this
+> max_active config allows running over 700 active works. Before the commit,
+> it is limited to 8 if NUMA is disabled or limited to 16 if NUMA nodes is 2.
+> 
+> I reverted the workqueue code back to before the commit, and I ran the
+> following fio command on RAID0 btrfs on 6 SSDs.
+> 
+> fio --group_reporting --eta=always --eta-interval=30s --eta-newline=30s \
+>     --rw=write --fallocate=none \
+>     --direct=1 --ioengine=libaio --iodepth=32 \
+>     --filesize=100G \
+>     --blocksize=64k \
+>     --time_based --runtime=300s \
+>     --end_fsync=1 \
+>     --directory=${MNT} \
+>     --name=writer --numjobs=32
+> 
+> By changing workqueue's max_active, the result varies.
+> 
+> - wq max_active=8   (intended limit by btrfs?)
+>   WRITE: bw=2495MiB/s (2616MB/s), 2495MiB/s-2495MiB/s (2616MB/s-2616MB/s), io=753GiB (808GB), run=308953-308953msec
+> - wq max_active=16  (actual limit on 2 NUMA nodes setup)
+>   WRITE: bw=1736MiB/s (1820MB/s), 1736MiB/s-1736MiB/s (1820MB/s-1820MB/s), io=670GiB (720GB), run=395532-395532msec
+> - wq max_active=768 (simulating current limit)
+>   WRITE: bw=1276MiB/s (1338MB/s), 1276MiB/s-1276MiB/s (1338MB/s-1338MB/s), io=375GiB (403GB), run=300984-300984msec
+> 
+> The current performance is slower than the previous limit (max_active=16)
+> by 27%, or it is 50% slower than the intended limit.  The performance drop
+> might be due to contention of the btrfs-endio-write works. There are over
+> 700 kworker instances were created and 100 works are on the 'D' state
+> competing for a lock.
+> 
+> More specifically, I tested the same workload on the commit.
+> 
+> - At commit 636b927eba5b ("workqueue: Make unbound workqueues to use per-cpu pool_workqueues")
+>   WRITE: bw=1191MiB/s (1249MB/s), 1191MiB/s-1191MiB/s (1249MB/s-1249MB/s), io=350GiB (376GB), run=300714-300714msec
+> - At the previous commit = 4cbfd3de73 ("workqueue: Call wq_update_unbound_numa() on all CPUs in NUMA node on CPU hotplug")
+>   WRITE: bw=1747MiB/s (1832MB/s), 1747MiB/s-1747MiB/s (1832MB/s-1832MB/s), io=748GiB (803GB), run=438134-438134msec
+> 
+> So, it is -31.8% performance down with the commit.
+> 
+> In summary, we misuse max_active, considering it is a global limit. And,
+> the recent commit introduced a huge performance drop in some cases.  We
+> need to review alloc_workqueue() usage to check if its max_active setting
+> is proper or not.
+
+Thanks a lot for the report. I think it's a lot more reasonable to assume
+that max_active is global for unbound workqueues. The current workqueue
+behavior is not very intuitive or useful. I'll try to find something more
+reasonable. Thanks for the report and analysis. Much appreciated.
+
+Thanks.
+
 -- 
-2.43.0.rc2.451.g8631bc7472-goog
-
+tejun
 
