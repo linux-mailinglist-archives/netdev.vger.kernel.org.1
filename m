@@ -1,306 +1,122 @@
-Return-Path: <netdev+bounces-53473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0197803297
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:28:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B317580329A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A938B20529
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D698C1C209AE
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8648C2377A;
-	Mon,  4 Dec 2023 12:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579D3241E3;
+	Mon,  4 Dec 2023 12:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fy1vCCwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98599C3
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:28:04 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rA837-0006eT-9Q; Mon, 04 Dec 2023 13:27:45 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rA836-00DVyo-Lo; Mon, 04 Dec 2023 13:27:44 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rA836-005Du1-Ih; Mon, 04 Dec 2023 13:27:44 +0100
-Date: Mon, 4 Dec 2023 13:27:44 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power Equipment
- with c33 (PoE) alongside PoDL
-Message-ID: <20231204122744.GC981228@pengutronix.de>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
- <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73650D2
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:28:36 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so13563a12.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 04:28:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701692915; x=1702297715; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c7C/S8lLR0a29fUZmsld88FJ/WJYuF5hr49VjGtEE4Y=;
+        b=Fy1vCCwvHRZTbOajNt7Ns8PVjPTU5zhEdS3moWWgdfWw8OUy2RkPmrleh4nkZuPg5p
+         KkC/pxqhLGLQIvqamQHhbUceRuaLLuYIRfGh6mpH+GnC5JmZfVi0tJaTbZt0OFbIevyu
+         kNHHSablozevS84nHHHh+U+ZSk4FzdmaHWT6QTwoJ9JklUulvgYs+Si7Qx/daeZfHa/K
+         5nQTL07K+++1NnTgVv6R6W/gRSBBb32sIi0jdfDT0v0joIae6/aRXCn/spGVA8+Kp0O7
+         bkRi6lWvN9nWHXXUnWr5C/zn3jv6BlWLxAhHILXK2cLZfRk8d9lrvVCKWr4knxbEvCpb
+         LH5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701692915; x=1702297715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c7C/S8lLR0a29fUZmsld88FJ/WJYuF5hr49VjGtEE4Y=;
+        b=fcqfMVhIpTZxaiIKy6JOdt66YJ3egiYL2LCoRxT734OkgH/ybuvXlE2UWWJVjbjN4R
+         QccvNimiRABcC2koA2WXLdlV1oZe8vSy/Um9puVHtxEYgXsF6KGBxxgdJNmxNmkTjU9O
+         GKVEhTkxsnC6FSnPwyurYwOKDAkV52WsJwQqJ6oi6Xk++bqKO6hkd6Vcq71LWXjWJ3YJ
+         VrTWdx/vzweKZ7zA98f6eq9TtnAtbtFvrZ8jY36N27nLYWIJd1IgTKTHPDeJdddgZU7V
+         HhjGyyQvFohzin75bpD1rAjjCZZrUv8jjdKBwCyT5poYoVsE2hr63AvT05y6dcdwmr8J
+         OHQw==
+X-Gm-Message-State: AOJu0YxbLUQf+rYVv7CQu75vW34LjvES8V2uvRA+fN5wyYoNUGRJwvac
+	pkQrt9migwQ85/p7FkPpgc0so0zupHPC0LGi1Y2j5g==
+X-Google-Smtp-Source: AGHT+IFISfJCPS1icgBXHHbLxd2ru8u88z5BIQahLRVRRq/0+B35P94aGebYvx3Y5PjogX8GYj138Ozk8TfjEa7KVRo=
+X-Received: by 2002:a05:6402:35d3:b0:54c:9996:7833 with SMTP id
+ z19-20020a05640235d300b0054c99967833mr81479edc.7.1701692914618; Mon, 04 Dec
+ 2023 04:28:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20231204114322.9218-1-lulie@linux.alibaba.com>
+In-Reply-To: <20231204114322.9218-1-lulie@linux.alibaba.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Dec 2023 13:28:21 +0100
+Message-ID: <CANn89iKUHQHA2wHw9k1SiazJf7ag7i4Tz+FPutgu870teVw_Bg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: add tracepoints for data send/recv/acked
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, martin.lau@linux.dev, 
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com, 
+	alibuda@linux.alibaba.com, guwen@linux.alibaba.com, hengqi@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 01, 2023 at 06:10:24PM +0100, Kory Maincent wrote:
-> In the current PSE interface for Ethernet Power Equipment, support is
-> limited to PoDL. This patch extends the interface to accommodate the
-> objects specified in IEEE 802.3-2022 145.2 for Power sourcing
-> Equipment (PSE).
-> 
-> The following objects are now supported and considered mandatory:
-> - IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus
-> - IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
-> - IEEE 802.3-2022 30.9.1.2.1 aPSEAdminControl
-> 
-> To avoid confusion between "PoDL PSE" and "PoE PSE", which have similar
-> names but distinct values, we have followed the suggestion of Oleksij
-> Rempel and Andrew Lunn to maintain separate naming schemes for each,
-> using c33 (clause 33) prefix for "PoE PSE".
-> You can find more details in the discussion threads here:
-> https://lore.kernel.org/netdev/20230912110637.GI780075@pengutronix.de/
-> https://lore.kernel.org/netdev/2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch/
-> 
-> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+On Mon, Dec 4, 2023 at 12:43=E2=80=AFPM Philo Lu <lulie@linux.alibaba.com> =
+wrote:
+>
+> Add 3 tracepoints, namely tcp_data_send/tcp_data_recv/tcp_data_acked,
+> which will be called every time a tcp data packet is sent, received, and
+> acked.
+> tcp_data_send: called after a data packet is sent.
+> tcp_data_recv: called after a data packet is receviced.
+> tcp_data_acked: called after a valid ack packet is processed (some sent
+> data are ackknowledged).
+>
+> We use these callbacks for fine-grained tcp monitoring, which collects
+> and analyses every tcp request/response event information. The whole
+> system has been described in SIGMOD'18 (see
+> https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
+> achieve this with bpf, we require hooks for data events that call bpf
+> prog (1) when any data packet is sent/received/acked, and (2) after
+> critical tcp state variables have been updated (e.g., snd_una, snd_nxt,
+> rcv_nxt). However, existing bpf hooks cannot meet our requirements.
+> Besides, these tracepoints help to debug tcp when data send/recv/acked.
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+This I do not understand.
 
-Thx!
+>
+> Though kretprobe/fexit can also be used to collect these information,
+> they will not work if the kernel functions get inlined. Considering the
+> stability, we prefer tracepoint as the solution.
 
-> ---
-> 
-> Changes in v2:
-> - Rename all the PoE variables and enum with a c33 prefix.
-> - Add documentation, thanks to Oleksij for having written one.
-> ---
->  Documentation/networking/pse-pd/introduction.rst | 73 ++++++++++++++++++++++++
->  include/linux/pse-pd/pse.h                       |  9 +++
->  include/uapi/linux/ethtool.h                     | 43 ++++++++++++++
->  include/uapi/linux/ethtool_netlink.h             |  3 +
->  4 files changed, 128 insertions(+)
-> 
-> diff --git a/Documentation/networking/pse-pd/introduction.rst b/Documentation/networking/pse-pd/introduction.rst
-> new file mode 100644
-> index 000000000000..e213083b9aff
-> --- /dev/null
-> +++ b/Documentation/networking/pse-pd/introduction.rst
-> @@ -0,0 +1,73 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +Power Sourcing Equipment (PSE) in IEEE 802.3 Standard
-> +=====================================================
-> +
-> +Overview
-> +--------
-> +
-> +Power Sourcing Equipment (PSE) is essential in networks for delivering power
-> +along with data over Ethernet cables. It usually refers to devices like
-> +switches and hubs that supply power to Powered Devices (PDs) such as IP
-> +cameras, VoIP phones, and wireless access points.
-> +
-> +PSE vs. PoDL PSE
-> +----------------
-> +
-> +PSE in the IEEE 802.3 standard generally refers to equipment that provides
-> +power alongside data over Ethernet cables, typically associated with Power over
-> +Ethernet (PoE).
-> +
-> +PoDL PSE, or Power over Data Lines PSE, specifically denotes PSEs operating
-> +with single balanced twisted-pair PHYs, as per Clause 104 of IEEE 802.3. PoDL
-> +is significant in contexts like automotive and industrial controls where power
-> +and data delivery over a single pair is advantageous.
-> +
-> +IEEE 802.3-2018 Addendums and Related Clauses
-> +----------------------------------------------
-> +
-> +Key addenda to the IEEE 802.3-2018 standard relevant to power delivery over
-> +Ethernet are as follows:
-> +
-> +- **802.3af (Approved in 2003-06-12)**: Known as PoE in the market, detailed in
-> +  Clause 33, delivering up to 15.4W of power.
-> +- **802.3at (Approved in 2009-09-11)**: Marketed as PoE+, enhancing PoE as
-> +  covered in Clause 33, increasing power delivery to up to 30W.
-> +- **802.3bt (Approved in 2018-09-27)**: Known as 4PPoE in the market, outlined
-> +  in Clause 33. Type 3 delivers up to 60W, and Type 4 up to 100W.
-> +- **802.3bu (Approved in 2016-12-07)**: Formerly referred to as PoDL, detailed
-> +  in Clause 104. Introduces Classes 0 - 9. Class 9 PoDL PSE delivers up to ~65W
-> +
-> +Kernel Naming Convention Recommendations
-> +----------------------------------------
-> +
-> +For clarity and consistency within the Linux kernel's networking subsystem, the
-> +following naming conventions are recommended:
-> +
-> +- For general PSE (PoE) code, use "c33_pse" key words. For example:
-> +  ``enum ethtool_c33_pse_admin_state c33_admin_control;``.
-> +  This aligns with Clause 33, encompassing various PoE forms.
-> +
-> +- For PoDL PSE - specific code, use "podl_pse". For example:
-> +  ``enum ethtool_podl_pse_admin_state podl_admin_control;`` to differentiate
-> +  PoDL PSE settings according to Clause 104.
-> +
-> +Summary of Clause 33: Data Terminal Equipment (DTE) Power via Media Dependent Interface (MDI)
-> +-------------------------------------------------------------------------------------------
-> +
-> +Clause 33 of the IEEE 802.3 standard defines the functional and electrical
-> +characteristics of Powered Device (PD) and Power Sourcing Equipment (PSE).
-> +These entities enable power delivery using the same generic cabling as for data
-> +transmission, integrating power with data communication for devices such as
-> +10BASE-T, 100BASE-TX, or 1000BASE-T.
-> +
-> +Summary of Clause 104: Power over Data Lines (PoDL) of Single Balanced Twisted-Pair Ethernet
-> +-------------------------------------------------------------------------------------------
-> +
-> +Clause 104 of the IEEE 802.3 standard delineates the functional and electrical
-> +characteristics of PoDL Powered Devices (PDs) and PoDL Power Sourcing Equipment
-> +(PSEs). These are designed for use with single balanced twisted-pair Ethernet
-> +Physical Layers. In this clause, 'PSE' refers specifically to PoDL PSE, and
-> +'PD' to PoDL PD. The key intent is to provide devices with a unified interface
-> +for both data and the power required to process this data over a single
-> +balanced twisted-pair Ethernet connection.
-> diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-> index 199cf4ae3cf2..be4e5754eb24 100644
-> --- a/include/linux/pse-pd/pse.h
-> +++ b/include/linux/pse-pd/pse.h
-> @@ -17,9 +17,12 @@ struct pse_controller_dev;
->   *
->   * @podl_admin_control: set PoDL PSE admin control as described in
->   *	IEEE 802.3-2018 30.15.1.2.1 acPoDLPSEAdminControl
-> + * @c33_admin_control: set PSE admin control as described in
-> + *	IEEE 802.3-2022 30.9.1.2.1 acPSEAdminControl
->   */
->  struct pse_control_config {
->  	enum ethtool_podl_pse_admin_state podl_admin_control;
-> +	enum ethtool_c33_pse_admin_state c33_admin_control;
->  };
->  
->  /**
-> @@ -29,10 +32,16 @@ struct pse_control_config {
->   *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
->   * @podl_pw_status: power detection status of the PoDL PSE.
->   *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
-> + * @c33_admin_state: operational state of the PSE
-> + *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
-> + * @c33_pw_status: power detection status of the PSE.
-> + *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
->   */
->  struct pse_control_status {
->  	enum ethtool_podl_pse_admin_state podl_admin_state;
->  	enum ethtool_podl_pse_pw_d_status podl_pw_status;
-> +	enum ethtool_c33_pse_admin_state c33_admin_state;
-> +	enum ethtool_c33_pse_pw_d_status c33_pw_status;
->  };
->  
->  /**
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index f7fba0dc87e5..1d1631f009fa 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -752,6 +752,49 @@ enum ethtool_module_power_mode {
->  	ETHTOOL_MODULE_POWER_MODE_HIGH,
->  };
->  
-> +/**
-> + * enum ethtool_c33_pse_admin_state - operational state of the PoDL PSE
-> + *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
-> + * @ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN: state of PSE functions is unknown
-> + * @ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED: PSE functions are disabled
-> + * @ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED: PSE functions are enabled
-> + */
-> +enum ethtool_c33_pse_admin_state {
-> +	ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN = 1,
-> +	ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
-> +	ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED,
-> +};
-> +
-> +/**
-> + * enum ethtool_c33_pse_pw_d_status - power detection status of the PSE.
-> + *	IEEE 802.3-2022 30.9.1.1.3 aPoDLPSEPowerDetectionStatus:
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN: PSE status is unknown
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: "The enumeration “disabled”
-> + *	indicates that the PSE State diagram is in the state DISABLED."
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: "The enumeration “searching”
-> + *	indicates the PSE State diagram is in a state other than those
-> + *	listed."
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: "The enumeration
-> + *	“deliveringPower” indicates that the PSE State diagram is in the
-> + *	state POWER_ON."
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: "The enumeration “test” indicates that
-> + *	the PSE State diagram is in the state TEST_MODE."
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: "The enumeration “fault” indicates that
-> + *	the PSE State diagram is in the state TEST_ERROR."
-> + * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: "The enumeration “otherFault”
-> + *	indicates that the PSE State diagram is in the state IDLE due to
-> + *	the variable error_condition = true."
-> + */
-> +enum ethtool_c33_pse_pw_d_status {
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN = 1,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_TEST,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_FAULT,
-> +	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
-> +};
-> +
->  /**
->   * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
->   *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
-> diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-> index 73e2c10dc2cc..ba805285e408 100644
-> --- a/include/uapi/linux/ethtool_netlink.h
-> +++ b/include/uapi/linux/ethtool_netlink.h
-> @@ -895,6 +895,9 @@ enum {
->  	ETHTOOL_A_PODL_PSE_ADMIN_STATE,		/* u32 */
->  	ETHTOOL_A_PODL_PSE_ADMIN_CONTROL,	/* u32 */
->  	ETHTOOL_A_PODL_PSE_PW_D_STATUS,		/* u32 */
-> +	ETHTOOL_A_C33_PSE_ADMIN_STATE,		/* u32 */
-> +	ETHTOOL_A_C33_PSE_ADMIN_CONTROL,	/* u32 */
-> +	ETHTOOL_A_C33_PSE_PW_D_STATUS,		/* u32 */
->  
->  	/* add new constants above here */
->  	__ETHTOOL_A_PSE_CNT,
-> 
-> -- 
-> 2.25.1
-> 
-> 
-> 
+I dunno, this seems quite weak to me. I see many patches coming to add
+tracing in the stack, but no patches fixing any issues.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+It really looks like : We do not know how TCP stack works, we do not
+know if there is any issue,
+let us add trace points to help us to make forward progress in our analysis=
+.
+
+These tracepoints will not tell how many segments/bytes were
+sent/acked/received, I really do not see
+how we will avoid adding in the future more stuff, forcing the
+compiler to save more state
+just in case the tracepoint needs the info.
+
+The argument of "add minimal info", so that we can silently add more
+stuff in the future "for free" is not something I buy.
+
+I very much prefer that you make sure the stuff you need is not
+inlined, so that standard kprobe/kretprobe facility can be used.
 
