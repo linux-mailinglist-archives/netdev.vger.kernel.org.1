@@ -1,110 +1,125 @@
-Return-Path: <netdev+bounces-53372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83B9E802A5B
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 03:36:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA4C4802A5D
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 03:40:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABDDD280C88
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:36:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2538FB207E3
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 02:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA030814;
-	Mon,  4 Dec 2023 02:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A56814;
+	Mon,  4 Dec 2023 02:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="cGCIPOh9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+a06eaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98558C3;
-	Sun,  3 Dec 2023 18:36:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
-	Content-Type; bh=5vUcNk5ue3sk+3mKADerTcmAghwekiSZ+hMj+HfWZ60=;
-	b=cGCIPOh9pBxoLykXW8kAFjTzsHMa9ftAQR3EaaIIHu0mT3dfOclIhiHElqgPnA
-	lalPzq5bYLXKYyq7tRZOx1QpKfjSg1+W8H1setooKv95j7Bnu5zwgMJ23Kd/MrMD
-	5+9N1n4M/KjqEOmY7NJB/gmKxC5nbsDrxRpQP6i0D4Dns=
-Received: from [172.23.69.7] (unknown [121.32.254.149])
-	by zwqz-smtp-mta-g5-1 (Coremail) with SMTP id _____wCXq9a2OW1lFtWmDQ--.17161S2;
-	Mon, 04 Dec 2023 10:30:15 +0800 (CST)
-Message-ID: <35e833bf-8aa6-48bd-999c-6b4c9a4fe7f0@126.com>
-Date: Mon, 4 Dec 2023 10:30:14 +0800
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86FFDC5
+	for <netdev@vger.kernel.org>; Sun,  3 Dec 2023 18:39:51 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c09f4bea8so6565315e9.1
+        for <netdev@vger.kernel.org>; Sun, 03 Dec 2023 18:39:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701657590; x=1702262390; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dfz0Ks2PRw0kDFC2Xm3+U40UH9uP9UDmB61v+FGJdTc=;
+        b=a+a06eaWWWfjXlNdIAplZKNA4KhS4VtmECm2eIu7py0wNoP+1GiE9JrnS2KjtGBes8
+         VFul+HZrOxk0yz/8qkjYzwhMmcMAWYMnwy4+YWM3kifN9pjN/9OO66OMWQKQWrtjS2bR
+         LYo68QtAZAE7EjrTS+XqXB+6gVnxBd/BPugLjPpyeTYKHunfDMNtMjCuj8o4hM1MLvIX
+         UeNzPwf1J7WVICsVfHJy5bT9f2sS6IsxwRDuA9+90YPhWx7FsLl0GFyEFWjdRYOb0gfW
+         35170K05C2wMOyhXQU1fMj4ovgsVL8lLM9eryXktdy3403stvAl50+a0xTHW5P6dztY0
+         fPxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701657590; x=1702262390;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dfz0Ks2PRw0kDFC2Xm3+U40UH9uP9UDmB61v+FGJdTc=;
+        b=bmGflP0TW5Qc9B9tVc6i/RoLm8Bwg4ZHhkMv65YLPAFFELNwcSAuQQ88YeKbVHgynb
+         MbyNnRynLfaiPqaTr+oFeV2uGefHSN9kGosdKH0xA8VDhAq9Wzt7JyAx9puTjPvVk09a
+         aGfpNQU/IR6QLbG6O4CHPiqq3UxvhXbUP5m4ob6dNC0GBhOWkjFFV4WoZMhyf/KCX9tK
+         8Zi81v3js25OI1CtQH+HylJsTkkCBXfIWqRznCrbQb3ZRTL970REfMtxsOaE/Pxh5dtt
+         Z8pSMXp5Chf1VpGIY5rj+FUt9vm43fFljg4slsMdF2TU0OPs7OKHf8dx049LjSd4obg/
+         skkw==
+X-Gm-Message-State: AOJu0YxdqaO3cILHea0wfWNaGhRUUOJDlQUj2jFNwLdaMJ3Q5wqsWVWV
+	0B22FG8aoqE7UQrxrPyl8IMKtCHg8VoqPn/k+pZ5u2Rjd9k=
+X-Google-Smtp-Source: AGHT+IHEdjUs9NMZMqDR/WRU71LvtdSqf4Q9Mf1YHsziCYTtEORAeCqrXOcnLKk7qL8OoYrQMRBOAOKCO8G9+GgfUMs=
+X-Received: by 2002:a05:600c:5488:b0:40b:5e1c:af27 with SMTP id
+ iv8-20020a05600c548800b0040b5e1caf27mr2062873wmb.45.1701657589842; Sun, 03
+ Dec 2023 18:39:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5e: Fix slab-out-of-bounds in
- mlx5_query_nic_vport_mac_list()
-To: Simon Horman <horms@kernel.org>, Shifeng Li <lishifeng@sangfor.com.cn>
-Cc: saeedm@nvidia.com, leon@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ogerlitz@mellanox.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, dinghui@sangfor.com.cn
-References: <20231130094656.894412-1-lishifeng@sangfor.com.cn>
- <20231203175015.GP50400@kernel.org>
-From: Shifeng Li <lishifeng1992@126.com>
-In-Reply-To: <20231203175015.GP50400@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_____wCXq9a2OW1lFtWmDQ--.17161S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Ar4ftw4rWw4UXr1UXFW8WFg_yoW8KFW3pF
-	WaywnrZrykJFZ8ZFWUZ3Z5uF10kr4Uu3W7ua90qw13Aayvgrnrta4UAF1jka9rZFWUKrWv
-	ya42vFnIvws8Aa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UWMKtUUUUU=
-X-CM-SenderInfo: xolvxx5ihqwiqzzsqiyswou0bp/1tbiFx08r1pEIGvk+AAAsQ
+References: <20231130115611.6632-1-liangchen.linux@gmail.com>
+ <20231130115611.6632-2-liangchen.linux@gmail.com> <CAC_iWjL68n-GRN7vs_jwvzbnVy8sPh4_SP=wVDq0HkFOmSU-nQ@mail.gmail.com>
+ <CAC_iWjKBE5s9iiTPKgsoDx5LSWjsSXE-7SSPSk+EVJXLC10-GQ@mail.gmail.com>
+In-Reply-To: <CAC_iWjKBE5s9iiTPKgsoDx5LSWjsSXE-7SSPSk+EVJXLC10-GQ@mail.gmail.com>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Mon, 4 Dec 2023 10:39:37 +0800
+Message-ID: <CAKhg4t+6wFv-sAu5jT2rTVjZt76uV3JS7rQ27qNvi+k_rxAVRQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/4] page_pool: Rename pp_frag_count to pp_ref_count
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hawk@kernel.org, linyunsheng@huawei.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, jasowang@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023/12/4 1:50, Simon Horman wrote:
-> On Thu, Nov 30, 2023 at 01:46:56AM -0800, Shifeng Li wrote:
->> Out_sz that the size of out buffer is calculated using query_nic_vport
->> _context_in structure when driver query the MAC list. However query_nic
->> _vport_context_in structure is smaller than query_nic_vport_context_out.
->> When allowed_list_size is greater than 96, calling ether_addr_copy() will
->> trigger an slab-out-of-bounds.
->>
->> [ 1170.055866] BUG: KASAN: slab-out-of-bounds in mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
->> [ 1170.055869] Read of size 4 at addr ffff88bdbc57d912 by task kworker/u128:1/461
->> [ 1170.055870]
->> [ 1170.055932] Workqueue: mlx5_esw_wq esw_vport_change_handler [mlx5_core]
->> [ 1170.055936] Call Trace:
->> [ 1170.055949]  dump_stack+0x8b/0xbb
->> [ 1170.055958]  print_address_description+0x6a/0x270
->> [ 1170.055961]  kasan_report+0x179/0x2c0
->> [ 1170.056061]  mlx5_query_nic_vport_mac_list+0x481/0x4d0 [mlx5_core]
->> [ 1170.056162]  esw_update_vport_addr_list+0x2c5/0xcd0 [mlx5_core]
->> [ 1170.056257]  esw_vport_change_handle_locked+0xd08/0x1a20 [mlx5_core]
->> [ 1170.056377]  esw_vport_change_handler+0x6b/0x90 [mlx5_core]
->> [ 1170.056381]  process_one_work+0x65f/0x12d0
->> [ 1170.056383]  worker_thread+0x87/0xb50
->> [ 1170.056390]  kthread+0x2e9/0x3a0
->> [ 1170.056394]  ret_from_fork+0x1f/0x40
->>
->> Fixes: e16aea2744ab ("net/mlx5: Introduce access functions to modify/query vport mac lists")
->> Cc: Ding Hui <dinghui@sangfor.com.cn>
->> Signed-off-by: Shifeng Li <lishifeng@sangfor.com.cn>
-> 
-> Hi,
-> 
-> I am unsure how you calculated the 96 figure above.
-> But in any case I agree that the cited patch introduced
-> the mismatch that you describe.
-> 
-out_sz = MLX5_ST_SZ_BYTES(query_nic_vport_context_in) + req_list_size * MLX5_ST_SZ_BYTES(mac_address_layout)
-        = 0x80/8 + 128 * 0x40/8 = 0x410 (bytes)
+On Fri, Dec 1, 2023 at 6:10=E2=80=AFPM Ilias Apalodimas
+<ilias.apalodimas@linaro.org> wrote:
+>
+> re-sending as plain-text, apologize for the noise...
+>
+> On Fri, 1 Dec 2023 at 11:59, Ilias Apalodimas
+> <ilias.apalodimas@linaro.org> wrote:
+> >
+> > Hi Liang,
+> >
+> > On Thu, 30 Nov 2023 at 13:59, Liang Chen <liangchen.linux@gmail.com> wr=
+ote:
+> >>
+> >> To support multiple users referencing the same fragment, pp_frag_count=
+ is
+> >> renamed to pp_ref_count to better reflect its actual meaning based on =
+the
+> >> suggestion from [1].
+>
+> The patch does more than what the description says and those should be
+> in 2 different patches.
+> I am ok with pp_frag_count -> pp_ref_count, for the functions I am not
+> sure the rename makes anything better.
 
-nic_vport_ctx = MLX5_ADDR_OF(query_nic_vport_context_out, out, nic_vport_context)
-               = 0x880/8 = 0x110 (bytes)
-mac_addr = MLX5_ADDR_OF(nic_vport_context, nic_vport_ctx, current_uc_mac_address[96]) + 2
-          = 0x110 + 96 * 8 + 2
-          = 0x412 (bytes)
+Yeah, the description doesn't adequately convey what the patch does.
+Before proceeding with splitting the patch, how about changing the
+description to the following?
 
-When i is 96,  the mac_addr offset is 0x412 but the out_sz is 0x410.
-And that will trigger an slab-out-of-bounds.
+page_pool: transition to reference count management after page draining
 
-Thanks.
+To support multiple users referencing the same fragment,
+'pp_frag_count' is renamed to 'pp_ref_count', transitioning pp pages
+from fragment management to reference count management after draining
+based on the suggestion from [1].
 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+The idea is that the concept of fragmenting exists before the page is
+drained, and all related functions retain their current names.
+However, once the page is drained, its management shifts to being
+governed by 'pp_ref_count'. Therefore, all functions associated with
+that lifecycle stage of a pp page are renamed.
 
+
+
+
+
+>
+> Jakub, are you ok with the name changes or is it going to make bisecting =
+a pain?
+>
+> Thanks
+> /Ilias
 
