@@ -1,117 +1,107 @@
-Return-Path: <netdev+bounces-53433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6E6802F49
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:51:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337C5802F9A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:08:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E963A2809A8
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64F941C209AD
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3230B1DDD6;
-	Mon,  4 Dec 2023 09:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6A01EB3D;
+	Mon,  4 Dec 2023 10:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HOLpu4YH"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="YqG31Ari"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9ACF10E
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 01:51:43 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso9020a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 01:51:43 -0800 (PST)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5277D99
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:08:24 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50bf82f4409so643537e87.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 02:08:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701683502; x=1702288302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GGP0Q7p9LapeH2bDY5jkZ9LFInWVGjDrdW3D7GpYi7o=;
-        b=HOLpu4YH+/+nCM2ZXEUS425+6bW2+Q3sJNs1eL3SmcIfnkc/WrM9txv3494Dla6MOE
-         98uZJAxUusZQl2BgFw6F9L6fm/RFgHmrq4E/kyTI3zL7FSl3SQ8zujpeH4w/qfs/HxS5
-         8ApAheGyyy/xb+6P4ogRprxYelwrCHCnqy01QZBwvcysTHiNEV5erJ4UHy06OzVblgbP
-         jBRi9QGIRixfpzmf6jjMjH9XkF+v7LfKYu9jDrhsY0hGZxzEsE0dUR4G4NyAZgGCjUa4
-         HwO6IS8tO4csMaG3DVduDMV1xb+2WojyGO2pZ89gUQ20ALPQs/eThg4ay/tR3/tdPQW6
-         pB7A==
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701684502; x=1702289302; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lhb1kv6CX2Hv4FAK27GwxUBwb+ZZtbDT1S19zCxY+MQ=;
+        b=YqG31ArihteFkmxYiWWSAKE2h+EAjiIpIbxGCpzjwONhHVPDQaeYS+xX67l9s90M0/
+         fBRnUu6r7cJe3oULQvXRMz9Sh9AkxZBc2gNKiIgb5+/C9q3nVUPkOWfoX5ddvVISUJQO
+         xOuEjWvtq3jKewkuZMiG/kGe9qLYFOauC6AGJWQPcKWxJ0Eg/2eYuhawFYaf2IAKY+Bl
+         QnzxyuNgqaIn+HA5hrAiAPnbvTp4ibKGZzJJLZzuIASJFFBvb0EO/Uji4OtA917LlhR+
+         O0TA5OFDnltBapfFzPlCHzMPAnjezmxC/n/tXPkx/SJO0Dtma2fBsuNe+37NR1jEVCa7
+         kQOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701683502; x=1702288302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GGP0Q7p9LapeH2bDY5jkZ9LFInWVGjDrdW3D7GpYi7o=;
-        b=Gks4zKHOIlv26lidIT+gL4t1axtEIF1D1yma6HcyNyEyQI89mM1VS0mFEVDYKr9kUl
-         BVJSs0J4UaUouYQqC4ikkbbbWqjdCKshou7SJlpEU0roLT+wuLG4cX3U+Jyw70+ytYXk
-         WEPuxVvx43EMGkOpoj8K3KglemVc+0Z4kB8ZTsmH+5N03Ybh0g+8fBDxBo+hLDI8MSBD
-         91vgevidqEoeSM+1AS+n5uoYqElXUKzZZoW+9zNUOtfGhPje2gAu+HRdhMKa/wXOucwU
-         laza++Wy3gKTG7xJtzGX7wsoPU+iM1x72sICgBnXDa5YoCu0phfZnbGiadqsHGJgJ0H2
-         BGjw==
-X-Gm-Message-State: AOJu0YypTF+m8poCOg82ma7P/xLbvpuphHNMfJ9uShT7PEvtlWgG4RF1
-	r+5zxs7uXtjNahGgUNoIp7uMxXvVP/G8CgwKc0zHHGdnYVbDzoz7dCtr6Q==
-X-Google-Smtp-Source: AGHT+IFhcFjFwz6EvC7a6jh/cbd+7D0xHbAGrJHpa2ed6aPy0WQWBuuN4mBfV+R5674iaG0dox3TOuj1zREsDWYX3Zg=
-X-Received: by 2002:a50:d797:0:b0:54b:6b3f:4aa8 with SMTP id
- w23-20020a50d797000000b0054b6b3f4aa8mr359821edi.4.1701683501906; Mon, 04 Dec
- 2023 01:51:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701684502; x=1702289302;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lhb1kv6CX2Hv4FAK27GwxUBwb+ZZtbDT1S19zCxY+MQ=;
+        b=miuYtky50CiSdjtLnpoOtZzx1+IXV0RGbl+oRVN3k/Vl7O1OhQmZs0uzzONEVQjBSq
+         O+cFpGzIBMg6zNizZdJxhbZeTYFTZCQYAlQJQh48UMgr7z6jFpTOQ5Ltp0/OZyR89B/B
+         5l7QCnrH0FWtKLR5lql+DB45InlhSnSWZitUe+96yKuuvAu+DDRYaclDW+vmSL/C3xhQ
+         HnDZd9FuSuyY4eWi3oqIP1fIt3PXr3f6dzHnqnNME336abd9BP74OdNZtHjReICTQRGt
+         PQ48d/otWdJ5fQ+PLIDCxAvMCF3OuK+PEuZNLiiWEfWWEHNXjxqNZ7Sg8NPJ1SRlsNPM
+         4BSQ==
+X-Gm-Message-State: AOJu0Yxx0Su21vuPaCaSkzvtH/aAJD2LnPdcMQbYgAbJrmxjHS1tu0Q1
+	NinmoVH1MKj6n/yTQPEPnrxDGQ==
+X-Google-Smtp-Source: AGHT+IHiVbex9/XIpROH3udXrRuVr8QHTU0KN+t5yVEX18e4tAosEdpZpUBPEesl5OaLdm7/CnPTCw==
+X-Received: by 2002:a19:c203:0:b0:50b:f776:1d72 with SMTP id l3-20020a19c203000000b0050bf7761d72mr602703lfc.24.1701684502510;
+        Mon, 04 Dec 2023 02:08:22 -0800 (PST)
+Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id u29-20020a19791d000000b0050beead375bsm553643lfc.57.2023.12.04.02.08.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 02:08:21 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: andrew@lunn.ch,
+	gregory.clement@bootlin.com,
+	sebastian.hesselbarth@gmail.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 net-next 0/3] net: mvmdio: Performance related improvements
+Date: Mon,  4 Dec 2023 11:08:08 +0100
+Message-Id: <20231204100811.2708884-1-tobias@waldekranz.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231204065657.GA16054@ubuntu>
-In-Reply-To: <20231204065657.GA16054@ubuntu>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Dec 2023 10:51:30 +0100
-Message-ID: <CANn89iLFdhshzJKfw8d2ZdDCu__GsoT_4md8ZWPABBAdykADEg@mail.gmail.com>
-Subject: Re: [PATCH] net/rose: Fix Use-After-Free in rose_ioctl
-To: Hyunwoo Kim <v4bel@theori.io>
-Cc: ralf@linux-mips.org, imv4bel@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, linux-hams@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Organization: Addiva Elektronik
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 4, 2023 at 7:57=E2=80=AFAM Hyunwoo Kim <v4bel@theori.io> wrote:
->
-> Because rose_ioctl() accesses sk->sk_receive_queue
-> without holding a lock_sock, it can cause a race with
-> rose_accept().
-> A use-after-free for skb occurs with the following flow.
-> ```
-> rose_ioctl() -> skb_peek()
-> rose_accept() -> skb_dequeue() -> kfree_skb()
-> ```
-> Add lock_sock to rose_ioctl() to fix this issue.
->
-> Signed-off-by: Hyunwoo Kim <v4bel@theori.io>
-> ---
->  net/rose/af_rose.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-> index 0cc5a4e19900..5fe9db64b6df 100644
-> --- a/net/rose/af_rose.c
-> +++ b/net/rose/af_rose.c
-> @@ -1316,8 +1316,10 @@ static int rose_ioctl(struct socket *sock, unsigne=
-d int cmd, unsigned long arg)
->                 struct sk_buff *skb;
->                 long amount =3D 0L;
->                 /* These two are safe on a single CPU system as only user=
- tasks fiddle here */
-> +               lock_sock(sk);
+Observations of the XMDIO bus on a CN9130-based system during a
+firmware download showed a very low bus utilization, which stemmed
+from the 150us (10x the average access time) sleep which would take
+place when the first poll did not succeed.
 
-This is not correct.
+With this series in place, bus throughput increases by about 10x,
+multiplied by whatever gain you are able to extract from running the
+MDC at a higher frequency (hardware dependent).
 
-You will have to lock sk->sk_receive_queue.lock instead.
+I would really appreciate it if someone with access to hardware using
+the IRQ driven path could test that out, since I have not been able to
+figure out how to set this up on CN9130.
 
-Look at rose_recvmsg() for the reason why locking the socket itself is
-not helping.
+v1 -> v2:
+- Remove dead code
+- Simplify IRQ path, now that the polled path is separate.
 
->                 if ((skb =3D skb_peek(&sk->sk_receive_queue)) !=3D NULL)
->                         amount =3D skb->len;
-> +               release_sock(sk);
->                 return put_user(amount, (unsigned int __user *) argp);
->         }
->
-> --
-> 2.25.1
->
+Tobias Waldekranz (3):
+  arm64: dts: marvell: cp11x: Provide clock names for MDIO controllers
+  net: mvmdio: Avoid excessive sleeps in polled mode
+  net: mvmdio: Support setting the MDC frequency on XSMI controllers
+
+ arch/arm64/boot/dts/marvell/armada-cp11x.dtsi |  4 +
+ drivers/net/ethernet/marvell/mvmdio.c         | 97 ++++++++++++-------
+ 2 files changed, 64 insertions(+), 37 deletions(-)
+
+-- 
+2.34.1
+
 
