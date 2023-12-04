@@ -1,562 +1,122 @@
-Return-Path: <netdev+bounces-53622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B46A803F10
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:12:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78364803F20
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD7128126D
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:12:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1279B20ABF
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A6B33CDB;
-	Mon,  4 Dec 2023 20:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943D733CF3;
+	Mon,  4 Dec 2023 20:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e9W2VRdm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQds8Gu9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1A4D2
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:12:44 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5caf86963ecso68259427b3.3
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:12:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701720763; x=1702325563; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O74HspCK8yxVzWj05oejleOkpLo0Jxaq9ulFg5iq8L8=;
-        b=e9W2VRdmXtOAIioL3hyI/E/vkXD6iXTyjTKL/v6kuy9xy4LXTski9WBO3z0EsNcBrS
-         o9xQCXVHwfWACUBkggdomwSXcLhV9yXa4X36UE4bU0xuxgbGQ826VyGnQbUeEU+GvzIs
-         HDF0ETPtbvTIlJkMsMiUJDWOS7V2b3BFyPEoELK7910IM2YuhQLmQCXhwI5uZpuCNkgp
-         VSxlSKf4mOtjSRnChJX6as70dSH1uwQ40R//gs4D6NKQDEzZ3E6ZLFXwUflJwDFky633
-         antKLqWuETCv6Ufnr5Cb3/0/+kTMiHzulWDZSXzQNUc+xuWBZbTgKGru1PoP6OoY8P6D
-         3kTQ==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F56D2
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:16:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701720977;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=scE6uJE/gsl0ExlvPlw1tvZXL0nwbCHoC6Ch9ngDrG8=;
+	b=KQds8Gu9MN9fs665098G4bgXmbejxlRdEzdisgH4g/5hRlycImVcD7QdJRe6HH9qFxKPQh
+	tT+WMUy6oLyLhdwSqMOsiZPd8pTjTgrd/cxUoVuI1qAvhYh+CuC5pnOpKHEpuC+X7YTUwJ
+	+5+VB8QOJl9jI33hcWDrbOqyp+No5zs=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-r-lXMjtxMQaIISc5z7pW4w-1; Mon, 04 Dec 2023 15:16:15 -0500
+X-MC-Unique: r-lXMjtxMQaIISc5z7pW4w-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67aa5d15846so19510766d6.1
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:16:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701720763; x=1702325563;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O74HspCK8yxVzWj05oejleOkpLo0Jxaq9ulFg5iq8L8=;
-        b=t/lp1yMJRd3lFemobYTxrOtuh0giQNI63m+VSy3dDs4oNTqi3vY/qHjDssd29iS0WG
-         PIOsOKGMPkrSXHOOgnE7dBUhWbgauX2s5T/jbkgUbiPdVKAuTvbDvxMm/2OWde1igofQ
-         9dNggKSQ5xVxY17Msdx69tj2+hqeSJQk7lqZjIo/315vLMI4m8VxJ9QP5u2zkOycl+5u
-         HuRz0geMtsdQRLRgQePzPQyAEabdTPp1OprYVYU8WjJBaxM5upqmsKVwnvyDBWwpjYvO
-         1ZNCB9VX1tSY5ut1Q18CSIyURsMj3nTRJfFm2PGjdDEF5zxIwUrepkFREsDib/kP81O1
-         /z1g==
-X-Gm-Message-State: AOJu0YzAr86dFZ7QjsSlTEQ244QrHsb8yjEwkPO/Whhamr54havexpma
-	qZ2grhZV14lpxkvMTK9A3jk9vf/7u7WHbZ0=
-X-Google-Smtp-Source: AGHT+IEboEtT9yw4dL/AVGVuj4b5CZkxHy2w47GCdQJSM6wfP0/y5D5dWW51enNZANU5KJ+/AOcclajdLZm7JsI=
-X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a81:af28:0:b0:5d3:70a6:dd3 with SMTP id
- n40-20020a81af28000000b005d370a60dd3mr393162ywh.3.1701720763562; Mon, 04 Dec
- 2023 12:12:43 -0800 (PST)
-Date: Mon,  4 Dec 2023 20:12:31 +0000
-In-Reply-To: <20231204201232.520025-1-lixiaoyan@google.com>
+        d=1e100.net; s=20230601; t=1701720975; x=1702325775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=scE6uJE/gsl0ExlvPlw1tvZXL0nwbCHoC6Ch9ngDrG8=;
+        b=fU/mxacbxDIu7uG6akVlZds1JAHE4lWPsyThygu3Hc1F2gZhK77hH7kDJuAO+ejhUa
+         VWvYJEpm4AD/I24zR04sNIS2at3pXld8O6MNcBENdhniSeKNuXMYPQz/t1ikCnESHVzI
+         FB9s2Q1ZVQ6TbUtvU6+dm0u0VqDwIUoOUaCOOUno4sWv38tKUnqyf86lZVBI0cYMDL/3
+         nbWxV9lQYex/lgYYFEqdXAW6xFpJTuIhRYEJOIEcWv0mfwIft6Z5p+oLLA3VKeCcKuO+
+         7m0Axdof23JfIiQ76NUs+JGezdFzBkal0zzgX41ZChHBA+Jox+F87Rmd+IV++JZRjuse
+         AvyQ==
+X-Gm-Message-State: AOJu0Yyqh0rRpebc62hQLITI8YY8wMmsS7Fwek97Ad2Aju7Ia/5hmItT
+	GJfol5bNvO/Z685EYqSW3KPUVlryzfFp2NKEptMullt+BdWALAqUpOrzYSiGNYP5gQGXT6xvYoN
+	a8mxfKkxOx1W2+bRA
+X-Received: by 2002:ad4:4481:0:b0:67a:a721:ec1a with SMTP id m1-20020ad44481000000b0067aa721ec1amr127132qvt.94.1701720975324;
+        Mon, 04 Dec 2023 12:16:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGgoVrFG6EC//oL2uzFysj4twtnTf+9h/+HjOZVaxTJrf07QpXYwOj+ja1iSEQZGrynxBr/Ig==
+X-Received: by 2002:ad4:4481:0:b0:67a:a721:ec1a with SMTP id m1-20020ad44481000000b0067aa721ec1amr127121qvt.94.1701720975037;
+        Mon, 04 Dec 2023 12:16:15 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::47])
+        by smtp.gmail.com with ESMTPSA id r3-20020a0cb283000000b00677fb735738sm4618230qve.34.2023.12.04.12.16.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 12:16:14 -0800 (PST)
+Date: Mon, 4 Dec 2023 14:16:12 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Cc: Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, kernel@quicinc.com
+Subject: Re: [PATCH net-next v3 0/3] Ethernet DWMAC5 fault IRQ support
+Message-ID: <rw5vfdvre5rt4rwytfsp3qy6sgsdr3dm6oefr4sap2aqbvpw42@c2dxz42tucby>
+References: <cover.1701695218.git.quic_jsuraj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231204201232.520025-1-lixiaoyan@google.com>
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231204201232.520025-3-lixiaoyan@google.com>
-Subject: [PATCH v1 net-next 2/2] tcp: reorganize tcp_sock fast path variables
-From: Coco Li <lixiaoyan@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Jonathan Corbet <corbet@lwn.net>, 
-	David Ahern <dsahern@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>, 
-	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1701695218.git.quic_jsuraj@quicinc.com>
 
-The variables are organized according in the following way:
+On Mon, Dec 04, 2023 at 06:56:14PM +0530, Suraj Jaiswal wrote:
+> Add support to listen Ethernet HW safery IRQ. The safety IRQ will be
 
-- TX read-mostly hotpath cache lines
-- TXRX read-mostly hotpath cache lines
-- RX read-mostly hotpath cache lines
-- TX read-write hotpath cache line
-- TXRX read-write hotpath cache line
-- RX read-write hotpath cache line
+s/safery/safety/
 
-Fastpath cachelines end after rcvq_space.
+> triggered for ECC, DPP, FSM error.
+> 
+> Changes since v3:
 
-Cache line boundaries are enforced only between read-mostly and
-read-write. That is, if read-mostly tx cachelines bleed into
-read-mostly txrx cachelines, we do not care. We care about the
-boundaries between read and write cachelines because we want
-to prevent false sharing.
+This is listed as v3 in the subject, but it should now be v4 since the
+last version was v3.
 
-Fast path variables span cache lines before change: 12
-Fast path variables span cache lines after change: 8
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Wei Wang <weiwan@google.com>
-Signed-off-by: Coco Li <lixiaoyan@google.com>
----
- include/linux/tcp.h | 248 ++++++++++++++++++++++++--------------------
- net/ipv4/tcp.c      |  93 +++++++++++++++++
- 2 files changed, 227 insertions(+), 114 deletions(-)
-
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 68f3d315d2e18..f55ec155f5b71 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -194,23 +194,121 @@ static inline bool tcp_rsk_used_ao(const struct request_sock *req)
- #define TCP_RMEM_TO_WIN_SCALE 8
- 
- struct tcp_sock {
-+	/* Cacheline organization can be found documented in
-+	 * Documentation/networking/net_cachelines/tcp_sock.rst.
-+	 * Please update the document when adding new fields.
-+	 */
-+
- 	/* inet_connection_sock has to be the first member of tcp_sock */
- 	struct inet_connection_sock	inet_conn;
--	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
-+
-+	/* TX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_tx);
-+	/* timestamp of last sent data packet (for restart window) */
-+	u32	max_window;	/* Maximal window ever seen from peer	*/
-+	u32	rcv_ssthresh;	/* Current window clamp			*/
-+	u32	reordering;	/* Packet reordering metric.		*/
-+	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
- 	u16	gso_segs;	/* Max number of segs per GSO packet	*/
-+	/* from STCP, retrans queue hinting */
-+	struct sk_buff *lost_skb_hint;
-+	struct sk_buff *retransmit_skb_hint;
-+	__cacheline_group_end(tcp_sock_read_tx);
-+
-+	/* TXRX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_txrx);
-+	u32	tsoffset;	/* timestamp offset */
-+	u32	snd_wnd;	/* The window we expect to receive	*/
-+	u32	mss_cache;	/* Cached effective mss, not including SACKS */
-+	u32	snd_cwnd;	/* Sending congestion window		*/
-+	u32	prr_out;	/* Total number of pkts sent during Recovery. */
-+	u32	lost_out;	/* Lost packets			*/
-+	u32	sacked_out;	/* SACK'd packets			*/
-+	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
-+	u8	chrono_type : 2,	/* current chronograph type */
-+		repair      : 1,
-+		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
-+		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
-+	__cacheline_group_end(tcp_sock_read_txrx);
-+
-+	/* RX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_rx);
-+	u32	copied_seq;	/* Head of yet unread data */
-+	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
-+	u32	snd_wl1;	/* Sequence for window update		*/
-+	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
-+	u32	rttvar_us;	/* smoothed mdev_max			*/
-+	u32	retrans_out;	/* Retransmitted packets out		*/
-+	u16	advmss;		/* Advertised MSS			*/
-+	u16	urg_data;	/* Saved octet of OOB data and control flags */
-+	u32	lost;		/* Total data packets lost incl. rexmits */
-+	struct  minmax rtt_min;
-+	/* OOO segments go in this rbtree. Socket lock must be held. */
-+	struct rb_root	out_of_order_queue;
-+	u32	snd_ssthresh;	/* Slow start size threshold		*/
-+	__cacheline_group_end(tcp_sock_read_rx);
- 
-+	/* TX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_tx) ____cacheline_aligned;
-+	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
-+				 * The total number of segments sent.
-+				 */
-+	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
-+				 * total number of data segments sent.
-+				 */
-+	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
-+				 * total number of data bytes sent.
-+				 */
-+	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
-+	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
-+	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
-+	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
-+	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
-+	u32	lsndtime;
-+	u32	mdev_us;	/* medium deviation			*/
-+	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
-+	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
-+	u64	tcp_mstamp;	/* most recent packet received/sent */
-+	u32	rtt_seq;	/* sequence number to update rttvar	*/
-+	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
-+	struct sk_buff *highest_sack;   /* skb just after the highest
-+					 * skb with SACKed bit set
-+					 * (validity guaranteed only if
-+					 * sacked_out > 0)
-+					 */
-+	u8	ecn_flags;	/* ECN status bits.			*/
-+	__cacheline_group_end(tcp_sock_write_tx);
-+
-+	/* TXRX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_txrx);
- /*
-  *	Header prediction flags
-  *	0x5?10 << 16 + snd_wnd in net byte order
-  */
- 	__be32	pred_flags;
--
-+	u32	rcv_nxt;	/* What we want to receive next		*/
-+	u32	snd_nxt;	/* Next sequence we send		*/
-+	u32	snd_una;	/* First byte we want an ack for	*/
-+	u32	window_clamp;	/* Maximal window to advertise		*/
-+	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
-+	u32	packets_out;	/* Packets which are "in flight"	*/
-+	u32	snd_up;		/* Urgent pointer		*/
-+	u32	delivered;	/* Total data packets delivered incl. rexmits */
-+	u32	delivered_ce;	/* Like the above but only ECE marked packets */
-+	u32	app_limited;	/* limited until "delivered" reaches this val */
-+	u32	rcv_wnd;	/* Current receiver window		*/
- /*
-- *	RFC793 variables by their proper names. This means you can
-- *	read the code and the spec side by side (and laugh ...)
-- *	See RFC793 and RFC1122. The RFC writes these in capitals.
-+ *      Options received (usually on last packet, some only on SYN packets).
-  */
--	u64	bytes_received;	/* RFC4898 tcpEStatsAppHCThruOctetsReceived
-+	struct tcp_options_received rx_opt;
-+	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
-+		rate_app_limited:1;  /* rate_{delivered,interval_us} limited? */
-+	__cacheline_group_end(tcp_sock_write_txrx);
-+
-+	/* RX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_rx);
-+	u64	bytes_received;
-+				/* RFC4898 tcpEStatsAppHCThruOctetsReceived
- 				 * sum(delta(rcv_nxt)), or how many bytes
- 				 * were acked.
- 				 */
-@@ -220,45 +318,44 @@ struct tcp_sock {
- 	u32	data_segs_in;	/* RFC4898 tcpEStatsPerfDataSegsIn
- 				 * total number of data segments in.
- 				 */
-- 	u32	rcv_nxt;	/* What we want to receive next 	*/
--	u32	copied_seq;	/* Head of yet unread data		*/
- 	u32	rcv_wup;	/* rcv_nxt on last window update sent	*/
-- 	u32	snd_nxt;	/* Next sequence we send		*/
--	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
--				 * The total number of segments sent.
--				 */
--	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
--				 * total number of data segments sent.
--				 */
--	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
--				 * total number of data bytes sent.
--				 */
-+	u32	max_packets_out;  /* max packets_out in last window */
-+	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
-+	u32	rate_delivered;    /* saved rate sample: packets delivered */
-+	u32	rate_interval_us;  /* saved rate sample: time elapsed */
-+	u32	rcv_rtt_last_tsecr;
-+	u64	first_tx_mstamp;  /* start of window send phase */
-+	u64	delivered_mstamp; /* time we reached "delivered" */
- 	u64	bytes_acked;	/* RFC4898 tcpEStatsAppHCThruOctetsAcked
- 				 * sum(delta(snd_una)), or how many bytes
- 				 * were acked.
- 				 */
-+	struct {
-+		u32	rtt_us;
-+		u32	seq;
-+		u64	time;
-+	} rcv_rtt_est;
-+/* Receiver queue space */
-+	struct {
-+		u32	space;
-+		u32	seq;
-+		u64	time;
-+	} rcvq_space;
-+	__cacheline_group_end(tcp_sock_write_rx);
-+	/* End of Hot Path */
-+
-+/*
-+ *	RFC793 variables by their proper names. This means you can
-+ *	read the code and the spec side by side (and laugh ...)
-+ *	See RFC793 and RFC1122. The RFC writes these in capitals.
-+ */
- 	u32	dsack_dups;	/* RFC4898 tcpEStatsStackDSACKDups
- 				 * total number of DSACK blocks received
- 				 */
-- 	u32	snd_una;	/* First byte we want an ack for	*/
-- 	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
--	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
--	u32	lsndtime;	/* timestamp of last sent data packet (for restart window) */
- 	u32	last_oow_ack_time;  /* timestamp of last out-of-window ACK */
- 	u32	compressed_ack_rcv_nxt;
--
--	u32	tsoffset;	/* timestamp offset */
--
- 	struct list_head tsq_node; /* anchor in tsq_tasklet.head list */
--	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
--
--	u32	snd_wl1;	/* Sequence for window update		*/
--	u32	snd_wnd;	/* The window we expect to receive	*/
--	u32	max_window;	/* Maximal window ever seen from peer	*/
--	u32	mss_cache;	/* Cached effective mss, not including SACKS */
- 
--	u32	window_clamp;	/* Maximal window to advertise		*/
--	u32	rcv_ssthresh;	/* Current window clamp			*/
- 	u8	scaling_ratio;	/* see tcp_win_from_space() */
- 	/* Information of the most recently (s)acked skb */
- 	struct tcp_rack {
-@@ -272,24 +369,16 @@ struct tcp_sock {
- 		   dsack_seen:1, /* Whether DSACK seen after last adj */
- 		   advanced:1;	 /* mstamp advanced since last lost marking */
- 	} rack;
--	u16	advmss;		/* Advertised MSS			*/
- 	u8	compressed_ack;
- 	u8	dup_ack_counter:2,
- 		tlp_retrans:1,	/* TLP is a retransmission */
- 		tcp_usec_ts:1, /* TSval values in usec */
- 		unused:4;
--	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
--	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
--	u8	chrono_type:2,	/* current chronograph type */
--		rate_app_limited:1,  /* rate_{delivered,interval_us} limited? */
-+	u8	thin_lto    : 1,/* Use linear timeouts for thin streams */
-+		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
- 		fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
- 		fastopen_no_cookie:1, /* Allow send/recv SYN+data without a cookie */
--		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
--		fastopen_client_fail:2; /* reason why fastopen failed */
--	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
--		thin_lto    : 1,/* Use linear timeouts for thin streams */
--		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
--		repair      : 1,
-+		fastopen_client_fail:2, /* reason why fastopen failed */
- 		frto        : 1;/* F-RTO (RFC5682) activated in CA_Loss */
- 	u8	repair_queue;
- 	u8	save_syn:2,	/* Save headers of SYN packet */
-@@ -297,45 +386,19 @@ struct tcp_sock {
- 		syn_fastopen:1,	/* SYN includes Fast Open option */
- 		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
- 		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
--		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
--		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
--	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
-+		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
- 
- 	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
--	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
--	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
- 
- /* RTT measurement */
--	u64	tcp_mstamp;	/* most recent packet received/sent */
--	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
--	u32	mdev_us;	/* medium deviation			*/
- 	u32	mdev_max_us;	/* maximal mdev for the last rtt period	*/
--	u32	rttvar_us;	/* smoothed mdev_max			*/
--	u32	rtt_seq;	/* sequence number to update rttvar	*/
--	struct  minmax rtt_min;
- 
--	u32	packets_out;	/* Packets which are "in flight"	*/
--	u32	retrans_out;	/* Retransmitted packets out		*/
--	u32	max_packets_out;  /* max packets_out in last window */
--	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
--
--	u16	urg_data;	/* Saved octet of OOB data and control flags */
--	u8	ecn_flags;	/* ECN status bits.			*/
- 	u8	keepalive_probes; /* num of allowed keep alive probes	*/
--	u32	reordering;	/* Packet reordering metric.		*/
- 	u32	reord_seen;	/* number of data packet reordering events */
--	u32	snd_up;		/* Urgent pointer		*/
--
--/*
-- *      Options received (usually on last packet, some only on SYN packets).
-- */
--	struct tcp_options_received rx_opt;
- 
- /*
-  *	Slow start and congestion control (see also Nagle, and Karn & Partridge)
-  */
-- 	u32	snd_ssthresh;	/* Slow start size threshold		*/
-- 	u32	snd_cwnd;	/* Sending congestion window		*/
- 	u32	snd_cwnd_cnt;	/* Linear increase counter		*/
- 	u32	snd_cwnd_clamp; /* Do not allow snd_cwnd to grow above this */
- 	u32	snd_cwnd_used;
-@@ -343,32 +406,10 @@ struct tcp_sock {
- 	u32	prior_cwnd;	/* cwnd right before starting loss recovery */
- 	u32	prr_delivered;	/* Number of newly delivered packets to
- 				 * receiver in Recovery. */
--	u32	prr_out;	/* Total number of pkts sent during Recovery. */
--	u32	delivered;	/* Total data packets delivered incl. rexmits */
--	u32	delivered_ce;	/* Like the above but only ECE marked packets */
--	u32	lost;		/* Total data packets lost incl. rexmits */
--	u32	app_limited;	/* limited until "delivered" reaches this val */
--	u64	first_tx_mstamp;  /* start of window send phase */
--	u64	delivered_mstamp; /* time we reached "delivered" */
--	u32	rate_delivered;    /* saved rate sample: packets delivered */
--	u32	rate_interval_us;  /* saved rate sample: time elapsed */
--
-- 	u32	rcv_wnd;	/* Current receiver window		*/
--	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
--	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
--	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
--	u32	lost_out;	/* Lost packets			*/
--	u32	sacked_out;	/* SACK'd packets			*/
- 
- 	struct hrtimer	pacing_timer;
- 	struct hrtimer	compressed_ack_timer;
- 
--	/* from STCP, retrans queue hinting */
--	struct sk_buff* lost_skb_hint;
--	struct sk_buff *retransmit_skb_hint;
--
--	/* OOO segments go in this rbtree. Socket lock must be held. */
--	struct rb_root	out_of_order_queue;
- 	struct sk_buff	*ooo_last_skb; /* cache rb_last(out_of_order_queue) */
- 
- 	/* SACKs data, these 2 need to be together (see tcp_options_write) */
-@@ -377,12 +418,6 @@ struct tcp_sock {
- 
- 	struct tcp_sack_block recv_sack_cache[4];
- 
--	struct sk_buff *highest_sack;   /* skb just after the highest
--					 * skb with SACKed bit set
--					 * (validity guaranteed only if
--					 * sacked_out > 0)
--					 */
--
- 	int     lost_cnt_hint;
- 
- 	u32	prior_ssthresh; /* ssthresh saved at recovery start	*/
-@@ -433,21 +468,6 @@ struct tcp_sock {
- 
- 	u32 rcv_ooopack; /* Received out-of-order packets, for tcpinfo */
- 
--/* Receiver side RTT estimation */
--	u32 rcv_rtt_last_tsecr;
--	struct {
--		u32	rtt_us;
--		u32	seq;
--		u64	time;
--	} rcv_rtt_est;
--
--/* Receiver queue space */
--	struct {
--		u32	space;
--		u32	seq;
--		u64	time;
--	} rcvq_space;
--
- /* TCP-specific MTU probe information. */
- 	struct {
- 		u32		  probe_seq_start;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 53bcc17c91e4c..44c745307bc21 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4563,6 +4563,97 @@ static void __init tcp_init_mem(void)
- 	sysctl_tcp_mem[2] = sysctl_tcp_mem[0] * 2;	/* 9.37 % */
- }
- 
-+static void __init tcp_struct_check(void)
-+{
-+	/* TX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, max_window);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, rcv_ssthresh);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, reordering);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, notsent_lowat);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, gso_segs);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, lost_skb_hint);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, retransmit_skb_hint);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 40);
-+
-+	/* TXRX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, tsoffset);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_wnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, mss_cache);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_cwnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, prr_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, lost_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, sacked_out);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_txrx, 31);
-+
-+	/* RX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, copied_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rcv_tstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_wl1);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, tlp_high_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rttvar_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, retrans_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, advmss);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, urg_data);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, lost);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rtt_min);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, out_of_order_queue);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
-+
-+	/* TX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, segs_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, data_segs_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, bytes_sent);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, snd_sml);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_start);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_stat);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, write_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, pushed_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, lsndtime);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, mdev_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_wstamp_ns);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_clock_cache);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, rtt_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tsorted_sent_queue);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, highest_sack);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, ecn_flags);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 113);
-+
-+	/* TXRX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pred_flags);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_nxt);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_nxt);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_una);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, window_clamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, srtt_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, packets_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_up);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered_ce);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 76);
-+
-+	/* RX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, segs_in);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, data_segs_in);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_wup);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, max_packets_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, cwnd_usage_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_delivered);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_interval_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_last_tsecr);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, first_tx_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, delivered_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_acked);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_est);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcvq_space);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_rx, 99);
-+}
-+
- void __init tcp_init(void)
- {
- 	int max_rshare, max_wshare, cnt;
-@@ -4573,6 +4664,8 @@ void __init tcp_init(void)
- 	BUILD_BUG_ON(sizeof(struct tcp_skb_cb) >
- 		     sizeof_field(struct sk_buff, cb));
- 
-+	tcp_struct_check();
-+
- 	percpu_counter_init(&tcp_sockets_allocated, 0, GFP_KERNEL);
- 
- 	timer_setup(&tcp_orphan_timer, tcp_orphan_update, TIMER_DEFERRABLE);
--- 
-2.43.0.rc2.451.g8631bc7472-goog
+> - Fix DT_CHECKER warning
+> - use name safety for the IRQ.
+>  
+> 
+> Suraj Jaiswal (3):
+>   dt-bindings: net: qcom,ethqos: add binding doc for safety IRQ for
+>     sa8775p
+>   arm64: dts: qcom: sa8775p: enable safety IRQ
+>   net: stmmac: Add driver support for DWMAC5 safety IRQ Support
+> 
+>  .../devicetree/bindings/net/qcom,ethqos.yaml   |  9 ++++++---
+>  .../devicetree/bindings/net/snps,dwmac.yaml    |  5 +++--
+>  arch/arm64/boot/dts/qcom/sa8775p.dtsi          | 10 ++++++----
+>  drivers/net/ethernet/stmicro/stmmac/common.h   |  1 +
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h   |  2 ++
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++++++
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c  |  9 +++++++++
+>  7 files changed, 45 insertions(+), 9 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
 
 
