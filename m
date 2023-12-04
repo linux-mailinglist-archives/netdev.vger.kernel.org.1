@@ -1,145 +1,195 @@
-Return-Path: <netdev+bounces-53401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDC3802D9D
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:53:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21F86802DA6
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 09:56:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A83731C2092A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:53:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A60EB2097F
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 08:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAAFCFBED;
-	Mon,  4 Dec 2023 08:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12984FBF0;
+	Mon,  4 Dec 2023 08:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lK8uDfOn"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ETfmKPzE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB6FA5;
-	Mon,  4 Dec 2023 00:53:34 -0800 (PST)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B46sMRR027299;
-	Mon, 4 Dec 2023 08:53:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=DNPW1/ETFxKq/RnXD14axskSrLhfYGFY6SaSrdF8b0A=;
- b=lK8uDfOn8N0dBdSaCmHVYByTU9F/KjqRMJKTmeBf7lX4SWs78+vliwV6l6yLOR6VwjkD
- SHDvTDxlZ5naPzvbRJAcLz0EdFsucBwOIhEYG0pBYE+KqjSw0skSzN9489J+VDdAibwH
- C+EaxQT5CTsdtjmFY2DLvgNwq1YbDh71XYDGQq1908RpYFF7s3Ljx4mSzeNhL5Iw8ChK
- s5qpJe3gslZfsC+mSUgnphsoxoZ4PZqO3tQ3W3BEr6ZQ2jntNgNxk08YGbne1LVafjLM
- iB//ASKZmSD7q6oHM0i8VzuSqq7vJiuxTxi6M7fe2wpHBX5LeNKxzYS66A2LeQZZz84d 0w== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uqwrvuahm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Dec 2023 08:53:17 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B48rGCN029415
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 4 Dec 2023 08:53:16 GMT
-Received: from [10.253.9.254] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 4 Dec
- 2023 00:53:12 -0800
-Message-ID: <312f2ea7-e0a5-4f0e-884d-85c3450e1ce3@quicinc.com>
-Date: Mon, 4 Dec 2023 16:53:10 +0800
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7DB085
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 00:56:18 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6ce387bcb06so447568b3a.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 00:56:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1701680178; x=1702284978; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IAQJCYQQBPLnKuduZOyeVOMsHpT5dV4GjXcKyZdq/Gs=;
+        b=ETfmKPzEAORZ1CE5rPxCA0Je2Gmyd9jVfSlmNHX6iVswwMbEEVSgnn/NcKCL4NONF7
+         NxdbxOPy2HEcDLvkd7+Gy5lo+hZCKyZ7ssMLLFxqRfk4KDxFAXFnNi/IiHTyG83Mdwun
+         Okk8Lfz6UAngAuRf5xgw2QkbYD05ahe3+pIO8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701680178; x=1702284978;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IAQJCYQQBPLnKuduZOyeVOMsHpT5dV4GjXcKyZdq/Gs=;
+        b=MrzzEAVqC43w/EXtUEHYmrVD0t631CjNtLTzM/BjDT5Xi3FmPbWpIW07Iegb+Bx11g
+         auEgGQcZXILzxr3NAsGuRb7QMkbTVXs/7Kkmrf01tU6Vc+zl9oGoh61nPv7RRFlcgFsc
+         D12MxWRyhXAlP5SK8NiI7uWfTV6kHkFAKeTCPdkPV7UMurPCAvbDJo0o+VfsmC2res8t
+         9dDGmM3kNNtxxe9uJA1cBXjKJbUSvg43R6SI7+QoiLJ1TuoiEQEyGUBOSG9YEG+ugMwX
+         iTuxanYdUjNUsoUnJ8h+ZYJ/H1Qa8SgP8aRmLyY+aoaHT848hl8asYvrbIdnZ05x76tP
+         OfKQ==
+X-Gm-Message-State: AOJu0YwLHrhY0JYvCnNwh8BeqtdNzwdQJoYEUz2ZCF24IVNovtIedkQs
+	MWriKtFHTLAEMFyFNEJaycSjbOYiYhoA1DWn8vssfA==
+X-Google-Smtp-Source: AGHT+IGK/KE44x/mW2tjAMBXEjya9vpVO44VlCp4SpQ2ZyAlHQQg0ycvCoM2Ztdtl2ugnYnpTbGnQ1qKhudhkh9e00Y=
+X-Received: by 2002:aa7:9ec8:0:b0:6ce:3260:c469 with SMTP id
+ r8-20020aa79ec8000000b006ce3260c469mr1184297pfq.35.1701680178098; Mon, 04 Dec
+ 2023 00:56:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/9] net: mdio: ipq4019: Enable GPIO reset for ipq5332
- platform
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-4-quic_luoj@quicinc.com>
- <e740a206-37af-49b1-a6b6-baa3c99165c0@lunn.ch>
- <33246b49-2579-4889-9fcb-babec5003a88@quicinc.com>
- <dd2c3cfa-f7ee-4abb-9eff-2aac04fa914f@lunn.ch>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <dd2c3cfa-f7ee-4abb-9eff-2aac04fa914f@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: uil2KWJSHYT_R_mIUcPECDgqjouLWb4y
-X-Proofpoint-GUID: uil2KWJSHYT_R_mIUcPECDgqjouLWb4y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-04_06,2023-11-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=812
- suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312040066
+References: <20231204024004.8245-1-dinghao.liu@zju.edu.cn>
+In-Reply-To: <20231204024004.8245-1-dinghao.liu@zju.edu.cn>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 4 Dec 2023 14:26:05 +0530
+Message-ID: <CALs4sv1cB6a5jKOgh7JWFLYz8pxfxOuszk3MAYc5xWY9HqYX0g@mail.gmail.com>
+Subject: Re: [PATCH] net: bnxt: fix a potential use-after-free in bnxt_init_tc
+To: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc: Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000008f7266060bab4a64"
 
+--0000000000008f7266060bab4a64
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Dec 4, 2023 at 8:11=E2=80=AFAM Dinghao Liu <dinghao.liu@zju.edu.cn>=
+ wrote:
+>
+> When flow_indr_dev_register() fails, bnxt_init_tc will free
+> bp->tc_info through kfree(). However, the caller function
+> bnxt_init_one() will ignore this failure and call
+> bnxt_shutdown_tc() on failure of bnxt_dl_register(), where
+> a use-after-free happens. Fix this issue by setting
+> bp->tc_info to NULL after kfree().
+>
+> Fixes: 627c89d00fb9 ("bnxt_en: flow_offload: offload tunnel decap rules v=
+ia indirect callbacks")
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c b/drivers/net/e=
+thernet/broadcom/bnxt/bnxt_tc.c
+> index 38d89d80b4a9..273c9ba48f09 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_tc.c
+> @@ -2075,6 +2075,7 @@ int bnxt_init_tc(struct bnxt *bp)
+>         rhashtable_destroy(&tc_info->flow_table);
+>  free_tc_info:
+>         kfree(tc_info);
+> +       bp->tc_info =3D NULL;
+>         return rc;
+>  }
 
-On 11/17/2023 1:20 AM, Andrew Lunn wrote:
->> FYI, here is the sequence to bring up qca8084.
->> a. enable clock output to qca8084.
->> b. do gpio reset of qca8084.
->> c. customize MDIO address and initialization configurations.
->> d. the PHY ID can be acquired.
-> 
-> This all sounds like it is specific to the qca8084, so it should be in
-> the driver for the qca8084.
-> 
-> Its been pointed out you can get the driver to load by using the PHY
-> ID in the compatible. You want the SoC clock driver to export a CCF
-> clock, which the PHY driver can use. The PHY driver should also be
-> able to get the GPIO. So i think the PHY driver can do all this.
-> 
->       Andrew
+The other way could have been to assign bp->tc_info only after
+flow_indr_dev_register succeeds.
+But this one works too. Thanks.
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Hi Andrew,
-If i put the GPIO reset in the PHY device tree node, the PHY probe
-function will be postponed to be called instead of being called
-during the MDIO bus register, which leads to the PCS can't be
-created correctly because of reading PHY capability failed before
-the PHY probe function called.
+>
+> --
+> 2.17.1
+>
+>
 
-my device tree nodes are as below.
+--0000000000008f7266060bab4a64
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-ethernet_device {
-	phy-handle = <&phy3>;
-	phy-mode = "2500base-x";
-	...
-};
-
-mdio@90000 {
-	phy3: ethernet-phy@3 {
-		compatible = "ethernet-phy-id004d.d180";
-		reg = <4>;
-		reset-gpios = <&tlmm 51 GPIO_ACTIVE_LOW>;
-		reset-assert-us = <100000>;
-		reset-deassert-us = <100000>;
-		clocks = <...>;
-		clock-names = "...";
-	};
-};
-
-Since the PHY probe function of phy3 is postponed instead of
-called during the MDIO bus driver register, and the initialization
-of qca8084 is not called when the ethernet_device driver is called
-to create PCS, where the phy3 capability is checked, which is failed
-since the qca8084 PHY probe is not called.
-
-Any idea to resolve this call sequence issue?
-Thanks.
-
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINhuN+/ew84XL6SLtyCnJYugYb+Agqsm
+A5Cm5Vn8vzt3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NDA4NTYxOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQApLOAnQtsJfocW2LZ7s7iA+LlY3RpFCytLklogUsN/g/BrVEmF
+IO2R66H8Mw7NIDCn6hIJ2Lt1x0Pv8m6Lh37CpXn47t+Tdq/71VSfRes+NeuzUaB8czc9TNw/Y6by
+quiuQaf8Toet74tQfm6k2+WO28kERV+eZGY0I/WcLxSR1VGhdvNgiSWCIV8xmiu6QsOKjRpmVrrD
+k2jtQg6TluHsKwHTM2RVnkuddv/XmFlaSZV7w6Uxh3vekFgY7v2BdvKLUYgqDl/W/kUEd6At6nIo
+Y4Au7o2Hc/e1IKdE09Eew6uYpV9BAwgO1JOkFdOzaRPhPNxnvrGcHWQoD05edymJ
+--0000000000008f7266060bab4a64--
 
