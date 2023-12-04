@@ -1,97 +1,116 @@
-Return-Path: <netdev+bounces-53567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 648CD803BE0
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:42:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9AD803BE4
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 18:43:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 950021C20A21
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:42:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A30D2B20A01
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49022E84F;
-	Mon,  4 Dec 2023 17:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781152E847;
+	Mon,  4 Dec 2023 17:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jikU+oxI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RH3ZyZpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41228E5
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 09:42:34 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5c627dd2accso1696773a12.0
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 09:42:34 -0800 (PST)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E48AB
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 09:43:34 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-54ca339ae7aso2247085a12.3
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 09:43:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701711754; x=1702316554; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oclHkiXhP9AH9qxtZO4NZEqr37yXlDxNsnoG2f4TTTw=;
-        b=jikU+oxIbJepbha1OTkJKnCyMd1mFh8aehjCIRYg/nEiwL8Tel5S7AB5TKgxHo26fo
-         scxY/I2ZLLtLe3ppJGJFa7F+jJCB3pU6BeW1WVtqViWrV6YZdhdmL0XYnBoO4fXe61yJ
-         LRZRh4YyaYAo5nSMIYolLAqdlbr0RcfDhz/Xs91RXbWoJ9tq4djH6+BmAuqbg4TUrTwo
-         4cwHfvSHxDcFpFuTSwrwtti0EbTavOv37PpRDpOMjMkpYyiSw28CIUlc11qlnRyJxPep
-         kgClByXAKUInPVWW3Lw6O0Q0INPpEikIX2JnaibW3rJi7JpgftSfFl9zWiS0iFDsD1y6
-         yoNg==
+        d=gmail.com; s=20230601; t=1701711813; x=1702316613; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bbcwha69FKdiDtAIT067gyDkFiTddeoh7lwsU4NEZVY=;
+        b=RH3ZyZpoAVFHhVc1o1WFof7VVYXHhH11qJLjs8R3mAQF7OL2Ka77Uc1ocdvV+m9J77
+         6A0HKub6fh6uNVUl6+WrHty9on7vOGkAu9VKnJNnkxu4cz8ANTBXVKIfT/YlLY2Z5S3P
+         kwLS00ruDBdlvdTIHdAc9T+ArK/8FoyrMkFZSH+WJFea93gfQIlEYqE/EfcGC70E/QLN
+         12bENqiz1xULLhcxYeC0W86QsE6D3CbUn/v/Rug96JCCTwxm8EA68p5CjEKpZO5v9+9D
+         N4O+tzG16RSqAuPtkiJqDve4zJPg5mvCFpUnzmJv05ont+AHhX+RJoKdLjrX1Dpd3Ka/
+         Rp7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701711754; x=1702316554;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oclHkiXhP9AH9qxtZO4NZEqr37yXlDxNsnoG2f4TTTw=;
-        b=WVkpsIegvZ+vshp5xy/R0KxyRTojgKaYomLBvPSC9usZHgZ16wBmtziHzvJvv67StX
-         aQWTeU4EcD+3dSezjGAFRY68NBId6Km1OtNubX7JJeMVDt/anpaTrB3DeeSiL1jz6eWY
-         N9wt002ixGevd35EsARbhYnRS9YCoxOAOCQR8TM2j4mdFLBLgd2PuArVUo05voAaSBgG
-         NUIGmSWLiuRmj3QmFF7tCNatdzX1aLLrtPLcSbBsooTdMr1szHEw0Bv4yf5m9QBjwJ8q
-         Oy9HTXCxqTZw2A+dME25Fzo9/rhIuIG0chZ8XQB3KKHoYJatHPUwof627KdZ1I8LICjJ
-         I+yQ==
-X-Gm-Message-State: AOJu0Yz9YiW92Z8KvcKnMsrwJLC+9LIaopf4goYh2m27JjVHKxRONf8L
-	Q2mv2NWEzxtX5wpPqKPJy92UYSY=
-X-Google-Smtp-Source: AGHT+IH5yAVIO/3R6uSF4o3BGdNrm5HO1yH9t7OQQdICWvUaAadHfp4HSnYzoDjRqB9kdScv2F3ApU0=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:2218:0:b0:5be:123c:5fc with SMTP id
- i24-20020a632218000000b005be123c05fcmr4147138pgi.10.1701711753640; Mon, 04
- Dec 2023 09:42:33 -0800 (PST)
-Date: Mon,  4 Dec 2023 09:42:31 -0800
+        d=1e100.net; s=20230601; t=1701711813; x=1702316613;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bbcwha69FKdiDtAIT067gyDkFiTddeoh7lwsU4NEZVY=;
+        b=tu4RGGsuPw/sB3OnXCNeHUW2gAJ/+CG2DYvpdg3fyXeXyWmFeJyCzHlQuBD15Tohlf
+         nD3NcUoTlyBIJtZhjbfpVbo1t8duX41nMnDl1nxCb+HjaJuzJd5529kg4dsmPGPL9Yrh
+         Bx4qajAC9ITy+GmnUFk6I0nYRUPPqFZZom6D+Ii0wO+T2pNZ7oENbgyQsyTAMlVQQaxa
+         q2pZSnikojo5f11QIVwXOsAAIvYXRolfNhQUqfAJv/D2FX6A/sYAcbTDwUwLpG4MEE5u
+         WKuzktwk5wOCdFsmf4jq3LKLeH1xmc6ybySl8tWJsYp2Ag+9i4821HPPfcb28Ao40pUq
+         0JsA==
+X-Gm-Message-State: AOJu0YyzepgWvzNp7hJ6hLsqbS6IqpYiD0xXcfJQN2edt1o0RwugPq0f
+	EKqX6xIkAoC7XpykftzXNCg=
+X-Google-Smtp-Source: AGHT+IHQbHLAXxhPpH5IJoltHnxUfwhWn+1X0Rr1OMArx1no3zFFkChDSqMg9fnc3ZzW4xxe8RRHIA==
+X-Received: by 2002:a17:906:890e:b0:a17:29b0:573e with SMTP id fr14-20020a170906890e00b00a1729b0573emr2590432ejc.37.1701711812801;
+        Mon, 04 Dec 2023 09:43:32 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id jt14-20020a170906ca0e00b00a13f7286209sm5533007ejb.8.2023.12.04.09.43.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 09:43:32 -0800 (PST)
+Date: Mon, 4 Dec 2023 19:43:30 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Danzberger <dd@embedd.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+Message-ID: <20231204174330.rjwxenuuxcimbzce@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231204174231.3457705-1-sdf@google.com>
-Subject: [PATCH bpf-next] xsk: Add missing SPDX to AF_XDP TX metadata documentation
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204154315.3906267-1-dd@embedd.com>
 
-Not sure how I missed that. I even acknowledged it explicitly
-in the changelog [0]. Add the tag for real now.
+Hello Daniel,
 
-[0]: https://lore.kernel.org/bpf/20231127190319.1190813-1-sdf@google.com/
+On Mon, Dec 04, 2023 at 04:43:15PM +0100, Daniel Danzberger wrote:
+> Fixes a NULL pointer access when registering a switch device that has
+> not been defined via DTS.
+> 
+> This might happen when the switch is used on a platform like x86 that
+> doesn't use DTS and instantiates devices in platform specific init code.
+> 
+> Signed-off-by: Daniel Danzberger <dd@embedd.com>
+> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 9545aed905f5..525e13d9e39c 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -1678,7 +1678,7 @@ static int ksz_check_device_id(struct ksz_device *dev)
+>  	dt_chip_data = of_device_get_match_data(dev->dev);
+>  
+>  	/* Check for Device Tree and Chip ID */
+> -	if (dt_chip_data->chip_id != dev->chip_id) {
+> +	if (dt_chip_data && dt_chip_data->chip_id != dev->chip_id) {
+>  		dev_err(dev->dev,
+>  			"Device tree specifies chip %s but found %s, please fix it!\n",
+>  			dt_chip_data->dev_name, dev->info->dev_name);
+> -- 
+> 2.39.2
+> 
+> 
 
-Cc: netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>
-Fixes: 11614723af26 ("xsk: Add option to calculate TX checksum in SW")
-Suggested-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- Documentation/networking/xsk-tx-metadata.rst | 2 ++
- 1 file changed, 2 insertions(+)
+Is this all that's necessary for instantiating the ksz driver through
+ds->dev->platform_data? I suppose not, so can you post it all, please?
 
-diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-index 97ecfa480d00..bd033fe95cca 100644
---- a/Documentation/networking/xsk-tx-metadata.rst
-+++ b/Documentation/networking/xsk-tx-metadata.rst
-@@ -1,3 +1,5 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
- ==================
- AF_XDP TX Metadata
- ==================
--- 
-2.43.0.rc2.451.g8631bc7472-goog
-
+Looking at dsa_switch_probe() -> dsa_switch_parse(), it expects
+ds->dev->platform_data to contain a struct dsa_chip_data. This is in
+contrast with ksz_spi.c, ksz9477_i2c.c and ksz8863_smi.c, which expect
+the dev->platform_data to have the struct ksz_platform_data type.
+But struct ksz_platform_data does not contain struct dsa_chip_data as
+first element.
 
