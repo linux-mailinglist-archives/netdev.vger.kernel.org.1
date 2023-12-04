@@ -1,64 +1,121 @@
-Return-Path: <netdev+bounces-53501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5CAD803625
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:13:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08018803642
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 15:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9032F28103D
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:13:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6A9D280FB8
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 14:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B0E286B3;
-	Mon,  4 Dec 2023 14:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FDB286B7;
+	Mon,  4 Dec 2023 14:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e+X/EkRx"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JjOmfs1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD135FE
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 06:13:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+wJpETgGcKbutG1ffO0VnoD+7J7Fap7n0Qtx/h2mSI4=; b=e+X/EkRxXr0esqk8qg6j2iTY1g
-	LqTu+YSlnHJCudoObiSbdevQAvAtMAYaSVXsHdo3wedkDaSvoHL/FKBBtxvCnUZzZjTbFDTlyoLcL
-	T2Hsm6yPZyzg+Eqe23rwLSS2WmzfZwsCAmSGqmnoDRtC+nqrcd5tn21GEvQHY3QUUt7s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rA9hS-001yqO-7n; Mon, 04 Dec 2023 15:13:30 +0100
-Date: Mon, 4 Dec 2023 15:13:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	gregory.clement@bootlin.com, sebastian.hesselbarth@gmail.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] net: mvmdio: Avoid excessive sleeps in
- polled mode
-Message-ID: <1105b591-567f-4fcc-8cf0-5e83f11d89ae@lunn.ch>
-References: <20231201173545.1215940-1-tobias@waldekranz.com>
- <20231201173545.1215940-3-tobias@waldekranz.com>
- <20231202124508.3ac34fcf@kernel.org>
- <87a5qq9wow.fsf@waldekranz.com>
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98D7083;
+	Mon,  4 Dec 2023 06:20:13 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4CxqrN022063;
+	Mon, 4 Dec 2023 06:20:06 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=5gwLQo8YB8K198lIdN110Kpr4qLxBNopymD5p73eots=;
+ b=JjOmfs1JCf82Gxedjqx7OSjVZmpD5NOJXX624N4pJ+qHEXYTJ5k7nmru6KDsTH16Jl2P
+ JrYDZxhql93F+NI49HrMvVaE3g75uxuGRLdgdKz0rEMGxKQaJ/2LHMf8nlxSfn36aMWP
+ u0m00l8lHUxn4EpXGrgIzVTZ5ecGnL7Na33+Wx+gTh49uMZSeCdAtJsP53NBNxh9UMaQ
+ P85XoxK4a42v6CqhOvUAYeoc6RrsXNZ9WY5tGGY8lw4OhRsI6bnjDC9r1sevcdmyjGFo
+ cM+Y28w1D4r4Fl+hUEUumcOwMmrLbnkn2L1h1lKSAKXVCu9K7WkYW5DMKJaM798VY/5/ Dw== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ur2tvde98-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 06:20:05 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 4 Dec
+ 2023 06:20:04 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 4 Dec 2023 06:20:04 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 9F5353F7099;
+	Mon,  4 Dec 2023 06:19:59 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <horms@kernel.org>, <wojciech.drewek@intel.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH v6 0/2] octeontx2: Multicast/mirror offload changes
+Date: Mon, 4 Dec 2023 19:49:54 +0530
+Message-ID: <20231204141956.3956942-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a5qq9wow.fsf@waldekranz.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: aY_OdZD_WKs-U2tf7-v6kjnSCdzcQhFE
+X-Proofpoint-GUID: aY_OdZD_WKs-U2tf7-v6kjnSCdzcQhFE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-04_12,2023-12-04_01,2023-05-22_02
 
-> Looking at it again, I think I was too scared of touching the original
-> interrupt path, as I have no means of testing it (no hardware). I will
-> try to simplify this in v2, and hope that someone else can test it.
+This patchset includes changes to support TC multicast/mirror offload.
 
-I have a couple of kirkwood machines which have the interrupt. So i
-can test this.
+Patch #1: Adds changes to support new mailbox to offload multicast/mirror
+offload.
 
-    Andrew
+Patch #2: Adds TC related changes which uses the newly added mailboxes to
+offload multicast/mirror rules.
+
+Suman Ghosh (2):
+  octeontx2-af: Add new mbox to support multicast/mirror offload
+  octeontx2-pf: TC flower offload support for mirror
+
+v6 changes:
+- Rebased on TOT.
+
+v5 changes:
+- Updated patch#1.
+  Using hlist_for_each_entry_safe() in function nix_add_mce_list_entry()
+  for node deletion.
+ 
+v4 changes:
+- Updated pacth#1 based on comments from Paolo. The major change is to
+  simplify mutex_lock/unlock logic in function
+  rvu_mbox_handler_nix_mcast_grp_update(),
+  rvu_mbox_handler_nix_mcast_grp_destroy() and
+  rvu_nix_mcast_flr_free_entries().
+  Added one extra variable in the mailbox to indicate if the
+  update/delete request is from AF or not. If AF is requesting for
+  update/delete then the caller is taking the lock.
+
+v3 changes:
+- Updated patch#1 based on comments from Wojciech and Simon.
+  The comments were mostly based on some missed mutex_unlock and
+  code reorganization.
+
+v2 changes:
+- Updated small nits based on review comments from Wojciech Drewek
+  in file drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  72 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |   6 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  39 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 702 +++++++++++++++++-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  14 +-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  73 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 113 ++-
+ 7 files changed, 978 insertions(+), 41 deletions(-)
+
+-- 
+2.25.1
+
 
