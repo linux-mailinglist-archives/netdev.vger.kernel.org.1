@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-53635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B137C803FC2
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:35:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DAF0803FE4
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E18D31C20B4C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:35:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E139FB20B9A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994B035EE8;
-	Mon,  4 Dec 2023 20:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FD635EF8;
+	Mon,  4 Dec 2023 20:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UT9UkkpK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGFqefgP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FFD364C2;
-	Mon,  4 Dec 2023 20:35:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85967C433CC;
-	Mon,  4 Dec 2023 20:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B7935EF6;
+	Mon,  4 Dec 2023 20:36:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B74FC433CB;
+	Mon,  4 Dec 2023 20:36:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701722136;
-	bh=sb94vGji52NuT8tbvozdWSvvBLunX3rybx4F6h+mUsY=;
+	s=k20201202; t=1701722193;
+	bh=5aaVddaxnZ8/nE7jtW/8lqmeta3wu189jxHfWgQbNzs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UT9UkkpKj0cpY+MrFKdb3D717ZyfB20OfK365o0u4J2mfBh2HRE3Jk4NdRaHD6zZE
-	 gV1fuC+wCyYmhnWoAA7bxvN/j0L6x3Kiv1cSpli+qTYjkXfVlPTnbTGR9p3JXNeax0
-	 NKAXGFqVE2nEltXPloKvNgAHusvMKpcE4rDx70Svmq8N+JtsabdXDYHR0xZEFqD4Yv
-	 hiJ1wWL478IEt0s7j9ewW6GuN1MOZge/GC/0qH7+9kWrkgRon/gfoYaOJxMBMB1IPk
-	 CA7O+4dUuVp5KFvHLSJPK7RyqxdY1dz7Zr9Lv6tOUrpStF5EDPyLBYj82dK2sXqztL
-	 RwoY8/QSmQ5Kg==
+	b=tGFqefgP9MKZ83rtRL0dtF64fgNPtHm1OGFbVwUkkNbUFRN46SBMYbov1210SZOuQ
+	 1X5s1sOLq3ZWa708xJjlSEGBs/jGasijqdIBRvX7RPVKZJMnANND8zzUxLOkrVuOhE
+	 he9aFlKBa/gRfjus0Iks048ex3V9+XejS+rAjIDYVMzGQBu3NmLZrpKPbYvhMjcq6/
+	 2NFs1zbJiS/l6dJwRtN7RhR7V/CatSqG9CTwihSHEfP8w9Tz6bZkZkzUeRi0q+r9yO
+	 ohigYDBABLy1R6Z+AKBec5UkFYm3qG2SceduVH6oM2OxF+DTc2Y88ffzJtaxWVjTcc
+	 /Q6kB4tGCSbhQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ben Greear <greearb@candelatech.com>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Edward Adam Davis <eadavis@qq.com>,
+	syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
+	matttbe@kernel.org,
+	martineau@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 07/17] wifi: mac80211: handle 320 MHz in ieee80211_ht_cap_ie_to_sta_ht_cap
-Date: Mon,  4 Dec 2023 15:34:52 -0500
-Message-ID: <20231204203514.2093855-7-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 5.15 04/10] mptcp: fix uninit-value in mptcp_incoming_options
+Date: Mon,  4 Dec 2023 15:36:01 -0500
+Message-ID: <20231204203616.2094529-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231204203514.2093855-1-sashal@kernel.org>
-References: <20231204203514.2093855-1-sashal@kernel.org>
+In-Reply-To: <20231204203616.2094529-1-sashal@kernel.org>
+References: <20231204203616.2094529-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,38 +60,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.65
+X-stable-base: Linux 5.15.141
 Content-Transfer-Encoding: 8bit
 
-From: Ben Greear <greearb@candelatech.com>
+From: Edward Adam Davis <eadavis@qq.com>
 
-[ Upstream commit 00f7d153f3358a7c7e35aef66fcd9ceb95d90430 ]
+[ Upstream commit 237ff253f2d4f6307b7b20434d7cbcc67693298b ]
 
-The new 320 MHz channel width wasn't handled, so connecting
-a station to a 320 MHz AP would limit the station to 20 MHz
-(on HT) after a warning, handle 320 MHz to fix that.
+Added initialization use_ack to mptcp_parse_option().
 
-Signed-off-by: Ben Greear <greearb@candelatech.com>
-Link: https://lore.kernel.org/r/20231109182201.495381-1-greearb@candelatech.com
-[write a proper commit message]
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Reported-by: syzbot+b834a6b2decad004cfa1@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/ht.c | 1 +
+ net/mptcp/options.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/net/mac80211/ht.c b/net/mac80211/ht.c
-index ae42e956eff5a..9bfe128ada47d 100644
---- a/net/mac80211/ht.c
-+++ b/net/mac80211/ht.c
-@@ -271,6 +271,7 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
- 	case NL80211_CHAN_WIDTH_80:
- 	case NL80211_CHAN_WIDTH_80P80:
- 	case NL80211_CHAN_WIDTH_160:
-+	case NL80211_CHAN_WIDTH_320:
- 		bw = ht_cap.cap & IEEE80211_HT_CAP_SUP_WIDTH_20_40 ?
- 				IEEE80211_STA_RX_BW_40 : IEEE80211_STA_RX_BW_20;
- 		break;
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index aa4b0cf7c6380..012e0e352276f 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -103,6 +103,7 @@ static void mptcp_parse_option(const struct sk_buff *skb,
+ 			mp_opt->suboptions |= OPTION_MPTCP_DSS;
+ 			mp_opt->use_map = 1;
+ 			mp_opt->mpc_map = 1;
++			mp_opt->use_ack = 0;
+ 			mp_opt->data_len = get_unaligned_be16(ptr);
+ 			ptr += 2;
+ 		}
 -- 
 2.42.0
 
