@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-53621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31C3803F0F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:12:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B46A803F10
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A5831F212A3
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:12:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD7128126D
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139A933CEF;
-	Mon,  4 Dec 2023 20:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A6B33CDB;
+	Mon,  4 Dec 2023 20:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YV+3zR5G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e9W2VRdm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6173DCD
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:12:42 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5cf4696e202so71166297b3.2
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:12:42 -0800 (PST)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1A4D2
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:12:44 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5caf86963ecso68259427b3.3
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:12:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701720761; x=1702325561; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1701720763; x=1702325563; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJvo7egwM48POQd/alhJofBGnM9IB/gyLCi/FcD6HtI=;
-        b=YV+3zR5GOF8YzCkior5BBkYUi7l8xOTe5BEabGDS7s7gVo1H2JcIyFFvUVnGeEqQM3
-         nvSypyHCZz20W8Xu6Ia6MeMnJ5eIUYKZ6rmNeW6TRMzS6/Hw5bB8TmSHFufyusOthYsl
-         cej1/B71tUujLZe76sPjMz9csNlEyL5BrMTZd+8lnOLQvcGojlxFcpcpblajuwyGE6H1
-         Tzk4X7OvqImg/u6zF9O9LRdwvbqiFlBfN9BpUNI62nl8ly9EtACl8x6JsoV+cV0tXWt4
-         mxDPTQEzuPkUuV1LBBNxye+bZ5dIYLU1hc21uTXiI2pOneaIwhb8Jjwoy5I/R6aQ3sfx
-         Ga5g==
+        bh=O74HspCK8yxVzWj05oejleOkpLo0Jxaq9ulFg5iq8L8=;
+        b=e9W2VRdmXtOAIioL3hyI/E/vkXD6iXTyjTKL/v6kuy9xy4LXTski9WBO3z0EsNcBrS
+         o9xQCXVHwfWACUBkggdomwSXcLhV9yXa4X36UE4bU0xuxgbGQ826VyGnQbUeEU+GvzIs
+         HDF0ETPtbvTIlJkMsMiUJDWOS7V2b3BFyPEoELK7910IM2YuhQLmQCXhwI5uZpuCNkgp
+         VSxlSKf4mOtjSRnChJX6as70dSH1uwQ40R//gs4D6NKQDEzZ3E6ZLFXwUflJwDFky633
+         antKLqWuETCv6Ufnr5Cb3/0/+kTMiHzulWDZSXzQNUc+xuWBZbTgKGru1PoP6OoY8P6D
+         3kTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701720761; x=1702325561;
+        d=1e100.net; s=20230601; t=1701720763; x=1702325563;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJvo7egwM48POQd/alhJofBGnM9IB/gyLCi/FcD6HtI=;
-        b=sUDMqFWOl0ootT99z3t9rxODTCviSxF+2bVFCigEht5CMa+VB4mbOtH2DR4z4YNwRi
-         wix2kdmhcKM8hBw3lrbnbsHxVbGxk0JpDWx/s4uLpyJs4/UVsfm1nq7KMw7nP2AuJkqR
-         BG39wn6d2YPnhcC9gv5xt14Pn6gab6crckTnTkwbZr5XJwS/zDRjBhxGMw40VemT3Gdd
-         3E+D6hDLLFEGut6VjiwG4OlgaU0yeAMz/ZOFuYfQKkHOx5z2ls7mAyRbf94Gums9M68p
-         2kvB/5+iOaz4ogffuQVlGMi9IRoxYLkqY4IwJ21qz2vwV8XabwibTvWI5ode7j+klt4I
-         UYiA==
-X-Gm-Message-State: AOJu0Yw/IuMttZy6IbycFcAtY3w6vS7NIS94unQl3x+hSJoxBF810IT5
-	SYOv0hpaViO+khZG+EACWaJwGaNm0PJBQCw=
-X-Google-Smtp-Source: AGHT+IG4xAdugvSVkKUEphNst75QAlCCOBm6GTuaaxHbqxE6SR9UuUJtcqmuXcaa7pWMXIxlCJ2eKExn0QktvOI=
+        bh=O74HspCK8yxVzWj05oejleOkpLo0Jxaq9ulFg5iq8L8=;
+        b=t/lp1yMJRd3lFemobYTxrOtuh0giQNI63m+VSy3dDs4oNTqi3vY/qHjDssd29iS0WG
+         PIOsOKGMPkrSXHOOgnE7dBUhWbgauX2s5T/jbkgUbiPdVKAuTvbDvxMm/2OWde1igofQ
+         9dNggKSQ5xVxY17Msdx69tj2+hqeSJQk7lqZjIo/315vLMI4m8VxJ9QP5u2zkOycl+5u
+         HuRz0geMtsdQRLRgQePzPQyAEabdTPp1OprYVYU8WjJBaxM5upqmsKVwnvyDBWwpjYvO
+         1ZNCB9VX1tSY5ut1Q18CSIyURsMj3nTRJfFm2PGjdDEF5zxIwUrepkFREsDib/kP81O1
+         /z1g==
+X-Gm-Message-State: AOJu0YzAr86dFZ7QjsSlTEQ244QrHsb8yjEwkPO/Whhamr54havexpma
+	qZ2grhZV14lpxkvMTK9A3jk9vf/7u7WHbZ0=
+X-Google-Smtp-Source: AGHT+IEboEtT9yw4dL/AVGVuj4b5CZkxHy2w47GCdQJSM6wfP0/y5D5dWW51enNZANU5KJ+/AOcclajdLZm7JsI=
 X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a81:ac17:0:b0:5d3:edb7:8470 with SMTP id
- k23-20020a81ac17000000b005d3edb78470mr290388ywh.7.1701720761681; Mon, 04 Dec
- 2023 12:12:41 -0800 (PST)
-Date: Mon,  4 Dec 2023 20:12:30 +0000
+ (user=lixiaoyan job=sendgmr) by 2002:a81:af28:0:b0:5d3:70a6:dd3 with SMTP id
+ n40-20020a81af28000000b005d370a60dd3mr393162ywh.3.1701720763562; Mon, 04 Dec
+ 2023 12:12:43 -0800 (PST)
+Date: Mon,  4 Dec 2023 20:12:31 +0000
 In-Reply-To: <20231204201232.520025-1-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231204201232.520025-1-lixiaoyan@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231204201232.520025-2-lixiaoyan@google.com>
-Subject: [PATCH v1 net-next 1/2] net-device: reorganize net_device fast path variables
+Message-ID: <20231204201232.520025-3-lixiaoyan@google.com>
+Subject: [PATCH v1 net-next 2/2] tcp: reorganize tcp_sock fast path variables
 From: Coco Li <lixiaoyan@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
@@ -70,311 +70,492 @@ Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google
 	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Reorganize fast path variables on tx-txrx-rx order
-Fastpath variables end after npinfo.
+The variables are organized according in the following way:
 
-Below data generated with pahole on x86 architecture.
+- TX read-mostly hotpath cache lines
+- TXRX read-mostly hotpath cache lines
+- RX read-mostly hotpath cache lines
+- TX read-write hotpath cache line
+- TXRX read-write hotpath cache line
+- RX read-write hotpath cache line
+
+Fastpath cachelines end after rcvq_space.
+
+Cache line boundaries are enforced only between read-mostly and
+read-write. That is, if read-mostly tx cachelines bleed into
+read-mostly txrx cachelines, we do not care. We care about the
+boundaries between read and write cachelines because we want
+to prevent false sharing.
 
 Fast path variables span cache lines before change: 12
-Fast path variables span cache lines after change: 4
+Fast path variables span cache lines after change: 8
 
 Suggested-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Wei Wang <weiwan@google.com>
 Signed-off-by: Coco Li <lixiaoyan@google.com>
 ---
- include/linux/netdevice.h | 117 +++++++++++++++++++++-----------------
- net/core/dev.c            |  56 ++++++++++++++++++
- 2 files changed, 120 insertions(+), 53 deletions(-)
+ include/linux/tcp.h | 248 ++++++++++++++++++++++++--------------------
+ net/ipv4/tcp.c      |  93 +++++++++++++++++
+ 2 files changed, 227 insertions(+), 114 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index c2d74bc112ddc..b7bb725e53939 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2092,6 +2092,70 @@ enum netdev_stat_type {
-  */
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 68f3d315d2e18..f55ec155f5b71 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -194,23 +194,121 @@ static inline bool tcp_rsk_used_ao(const struct request_sock *req)
+ #define TCP_RMEM_TO_WIN_SCALE 8
  
- struct net_device {
+ struct tcp_sock {
 +	/* Cacheline organization can be found documented in
-+	 * Documentation/networking/net_cachelines/net_device.rst.
++	 * Documentation/networking/net_cachelines/tcp_sock.rst.
 +	 * Please update the document when adding new fields.
 +	 */
 +
-+	/* TX read-mostly hotpath */
-+	__cacheline_group_begin(net_device_read_tx);
-+	unsigned long long	priv_flags;
-+	const struct net_device_ops *netdev_ops;
-+	const struct header_ops *header_ops;
-+	struct netdev_queue	*_tx;
-+	unsigned int		real_num_tx_queues;
-+	unsigned int		gso_max_size;
-+	unsigned int		gso_ipv4_max_size;
-+	u16			gso_max_segs;
-+	s16			num_tc;
-+	/* Note : dev->mtu is often read without holding a lock.
-+	 * Writers usually hold RTNL.
-+	 * It is recommended to use READ_ONCE() to annotate the reads,
-+	 * and to use WRITE_ONCE() to annotate the writes.
-+	 */
-+	unsigned int		mtu;
-+	unsigned short		needed_headroom;
-+	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
-+#ifdef CONFIG_XPS
-+	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
-+#endif
-+#ifdef CONFIG_NETFILTER_EGRESS
-+	struct nf_hook_entries __rcu *nf_hooks_egress;
-+#endif
-+#ifdef CONFIG_NET_XGRESS
-+	struct bpf_mprog_entry __rcu *tcx_egress;
-+#endif
-+	__cacheline_group_end(net_device_read_tx);
+ 	/* inet_connection_sock has to be the first member of tcp_sock */
+ 	struct inet_connection_sock	inet_conn;
+-	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
 +
-+	/* TXRX read-mostly hotpath */
-+	__cacheline_group_begin(net_device_read_txrx);
-+	unsigned int		flags;
-+	unsigned short		hard_header_len;
-+	netdev_features_t	features;
-+	struct inet6_dev __rcu	*ip6_ptr;
-+	__cacheline_group_end(net_device_read_txrx);
++	/* TX read-mostly hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_read_tx);
++	/* timestamp of last sent data packet (for restart window) */
++	u32	max_window;	/* Maximal window ever seen from peer	*/
++	u32	rcv_ssthresh;	/* Current window clamp			*/
++	u32	reordering;	/* Packet reordering metric.		*/
++	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
+ 	u16	gso_segs;	/* Max number of segs per GSO packet	*/
++	/* from STCP, retrans queue hinting */
++	struct sk_buff *lost_skb_hint;
++	struct sk_buff *retransmit_skb_hint;
++	__cacheline_group_end(tcp_sock_read_tx);
 +
-+	/* RX read-mostly hotpath */
-+	__cacheline_group_begin(net_device_read_rx);
-+	struct list_head	ptype_specific;
-+	int			ifindex;
-+	unsigned int		real_num_rx_queues;
-+	struct netdev_rx_queue	*_rx;
-+	unsigned long		gro_flush_timeout;
-+	int			napi_defer_hard_irqs;
-+	unsigned int		gro_max_size;
-+	unsigned int		gro_ipv4_max_size;
-+	rx_handler_func_t __rcu	*rx_handler;
-+	void __rcu		*rx_handler_data;
-+	possible_net_t			nd_net;
-+#ifdef CONFIG_NETPOLL
-+	struct netpoll_info __rcu	*npinfo;
-+#endif
-+#ifdef CONFIG_NET_XGRESS
-+	struct bpf_mprog_entry __rcu *tcx_ingress;
-+#endif
-+	__cacheline_group_end(net_device_read_rx);
++	/* TXRX read-mostly hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_read_txrx);
++	u32	tsoffset;	/* timestamp offset */
++	u32	snd_wnd;	/* The window we expect to receive	*/
++	u32	mss_cache;	/* Cached effective mss, not including SACKS */
++	u32	snd_cwnd;	/* Sending congestion window		*/
++	u32	prr_out;	/* Total number of pkts sent during Recovery. */
++	u32	lost_out;	/* Lost packets			*/
++	u32	sacked_out;	/* SACK'd packets			*/
++	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
++	u8	chrono_type : 2,	/* current chronograph type */
++		repair      : 1,
++		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
++		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
++	__cacheline_group_end(tcp_sock_read_txrx);
 +
- 	char			name[IFNAMSIZ];
- 	struct netdev_name_node	*name_node;
- 	struct dev_ifalias	__rcu *ifalias;
-@@ -2116,7 +2180,6 @@ struct net_device {
- 	struct list_head	unreg_list;
- 	struct list_head	close_list;
- 	struct list_head	ptype_all;
--	struct list_head	ptype_specific;
++	/* RX read-mostly hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_read_rx);
++	u32	copied_seq;	/* Head of yet unread data */
++	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
++	u32	snd_wl1;	/* Sequence for window update		*/
++	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
++	u32	rttvar_us;	/* smoothed mdev_max			*/
++	u32	retrans_out;	/* Retransmitted packets out		*/
++	u16	advmss;		/* Advertised MSS			*/
++	u16	urg_data;	/* Saved octet of OOB data and control flags */
++	u32	lost;		/* Total data packets lost incl. rexmits */
++	struct  minmax rtt_min;
++	/* OOO segments go in this rbtree. Socket lock must be held. */
++	struct rb_root	out_of_order_queue;
++	u32	snd_ssthresh;	/* Slow start size threshold		*/
++	__cacheline_group_end(tcp_sock_read_rx);
  
- 	struct {
- 		struct list_head upper;
-@@ -2124,26 +2187,13 @@ struct net_device {
- 	} adj_list;
- 
- 	/* Read-mostly cache-line for fast-path access */
--	unsigned int		flags;
- 	xdp_features_t		xdp_features;
--	unsigned long long	priv_flags;
--	const struct net_device_ops *netdev_ops;
- 	const struct xdp_metadata_ops *xdp_metadata_ops;
- 	const struct xsk_tx_metadata_ops *xsk_tx_metadata_ops;
--	int			ifindex;
- 	unsigned short		gflags;
--	unsigned short		hard_header_len;
- 
--	/* Note : dev->mtu is often read without holding a lock.
--	 * Writers usually hold RTNL.
--	 * It is recommended to use READ_ONCE() to annotate the reads,
--	 * and to use WRITE_ONCE() to annotate the writes.
--	 */
--	unsigned int		mtu;
--	unsigned short		needed_headroom;
- 	unsigned short		needed_tailroom;
- 
--	netdev_features_t	features;
- 	netdev_features_t	hw_features;
- 	netdev_features_t	wanted_features;
- 	netdev_features_t	vlan_features;
-@@ -2187,8 +2237,6 @@ struct net_device {
- 	const struct tlsdev_ops *tlsdev_ops;
- #endif
- 
--	const struct header_ops *header_ops;
--
- 	unsigned char		operstate;
- 	unsigned char		link_mode;
- 
-@@ -2229,9 +2277,7 @@ struct net_device {
- 
- 
- 	/* Protocol-specific pointers */
--
- 	struct in_device __rcu	*ip_ptr;
--	struct inet6_dev __rcu	*ip6_ptr;
- #if IS_ENABLED(CONFIG_VLAN_8021Q)
- 	struct vlan_info __rcu	*vlan_info;
- #endif
-@@ -2266,26 +2312,14 @@ struct net_device {
- 	/* Interface address info used in eth_type_trans() */
- 	const unsigned char	*dev_addr;
- 
--	struct netdev_rx_queue	*_rx;
- 	unsigned int		num_rx_queues;
--	unsigned int		real_num_rx_queues;
--
- 	struct bpf_prog __rcu	*xdp_prog;
--	unsigned long		gro_flush_timeout;
--	int			napi_defer_hard_irqs;
- #define GRO_LEGACY_MAX_SIZE	65536u
- /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
-  * and shinfo->gso_segs is a 16bit field.
-  */
- #define GRO_MAX_SIZE		(8 * 65535u)
--	unsigned int		gro_max_size;
--	unsigned int		gro_ipv4_max_size;
- 	unsigned int		xdp_zc_max_segs;
--	rx_handler_func_t __rcu	*rx_handler;
--	void __rcu		*rx_handler_data;
--#ifdef CONFIG_NET_XGRESS
--	struct bpf_mprog_entry __rcu *tcx_ingress;
--#endif
- 	struct netdev_queue __rcu *ingress_queue;
- #ifdef CONFIG_NETFILTER_INGRESS
- 	struct nf_hook_entries __rcu *nf_hooks_ingress;
-@@ -2300,25 +2334,13 @@ struct net_device {
++	/* TX read-write hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_write_tx) ____cacheline_aligned;
++	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
++				 * The total number of segments sent.
++				 */
++	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
++				 * total number of data segments sent.
++				 */
++	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
++				 * total number of data bytes sent.
++				 */
++	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
++	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
++	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
++	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
++	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
++	u32	lsndtime;
++	u32	mdev_us;	/* medium deviation			*/
++	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
++	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
++	u64	tcp_mstamp;	/* most recent packet received/sent */
++	u32	rtt_seq;	/* sequence number to update rttvar	*/
++	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
++	struct sk_buff *highest_sack;   /* skb just after the highest
++					 * skb with SACKed bit set
++					 * (validity guaranteed only if
++					 * sacked_out > 0)
++					 */
++	u8	ecn_flags;	/* ECN status bits.			*/
++	__cacheline_group_end(tcp_sock_write_tx);
++
++	/* TXRX read-write hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_write_txrx);
  /*
-  * Cache lines mostly used on transmit path
+  *	Header prediction flags
+  *	0x5?10 << 16 + snd_wnd in net byte order
   */
--	struct netdev_queue	*_tx ____cacheline_aligned_in_smp;
- 	unsigned int		num_tx_queues;
--	unsigned int		real_num_tx_queues;
- 	struct Qdisc __rcu	*qdisc;
- 	unsigned int		tx_queue_len;
- 	spinlock_t		tx_global_lock;
- 
- 	struct xdp_dev_bulk_queue __percpu *xdp_bulkq;
- 
--#ifdef CONFIG_XPS
--	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
--#endif
--#ifdef CONFIG_NET_XGRESS
--	struct bpf_mprog_entry __rcu *tcx_egress;
--#endif
--#ifdef CONFIG_NETFILTER_EGRESS
--	struct nf_hook_entries __rcu *nf_hooks_egress;
--#endif
+ 	__be32	pred_flags;
 -
- #ifdef CONFIG_NET_SCHED
- 	DECLARE_HASHTABLE	(qdisc_hash, 4);
- #endif
-@@ -2357,12 +2379,6 @@ struct net_device {
- 	bool needs_free_netdev;
- 	void (*priv_destructor)(struct net_device *dev);
- 
--#ifdef CONFIG_NETPOLL
--	struct netpoll_info __rcu	*npinfo;
--#endif
--
--	possible_net_t			nd_net;
--
- 	/* mid-layer private */
- 	void				*ml_priv;
- 	enum netdev_ml_priv_type	ml_priv_type;
-@@ -2397,20 +2413,15 @@ struct net_device {
++	u32	rcv_nxt;	/* What we want to receive next		*/
++	u32	snd_nxt;	/* Next sequence we send		*/
++	u32	snd_una;	/* First byte we want an ack for	*/
++	u32	window_clamp;	/* Maximal window to advertise		*/
++	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
++	u32	packets_out;	/* Packets which are "in flight"	*/
++	u32	snd_up;		/* Urgent pointer		*/
++	u32	delivered;	/* Total data packets delivered incl. rexmits */
++	u32	delivered_ce;	/* Like the above but only ECE marked packets */
++	u32	app_limited;	/* limited until "delivered" reaches this val */
++	u32	rcv_wnd;	/* Current receiver window		*/
+ /*
+- *	RFC793 variables by their proper names. This means you can
+- *	read the code and the spec side by side (and laugh ...)
+- *	See RFC793 and RFC1122. The RFC writes these in capitals.
++ *      Options received (usually on last packet, some only on SYN packets).
   */
- #define GSO_MAX_SIZE		(8 * GSO_MAX_SEGS)
+-	u64	bytes_received;	/* RFC4898 tcpEStatsAppHCThruOctetsReceived
++	struct tcp_options_received rx_opt;
++	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
++		rate_app_limited:1;  /* rate_{delivered,interval_us} limited? */
++	__cacheline_group_end(tcp_sock_write_txrx);
++
++	/* RX read-write hotpath cache lines */
++	__cacheline_group_begin(tcp_sock_write_rx);
++	u64	bytes_received;
++				/* RFC4898 tcpEStatsAppHCThruOctetsReceived
+ 				 * sum(delta(rcv_nxt)), or how many bytes
+ 				 * were acked.
+ 				 */
+@@ -220,45 +318,44 @@ struct tcp_sock {
+ 	u32	data_segs_in;	/* RFC4898 tcpEStatsPerfDataSegsIn
+ 				 * total number of data segments in.
+ 				 */
+- 	u32	rcv_nxt;	/* What we want to receive next 	*/
+-	u32	copied_seq;	/* Head of yet unread data		*/
+ 	u32	rcv_wup;	/* rcv_nxt on last window update sent	*/
+- 	u32	snd_nxt;	/* Next sequence we send		*/
+-	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
+-				 * The total number of segments sent.
+-				 */
+-	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
+-				 * total number of data segments sent.
+-				 */
+-	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
+-				 * total number of data bytes sent.
+-				 */
++	u32	max_packets_out;  /* max packets_out in last window */
++	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
++	u32	rate_delivered;    /* saved rate sample: packets delivered */
++	u32	rate_interval_us;  /* saved rate sample: time elapsed */
++	u32	rcv_rtt_last_tsecr;
++	u64	first_tx_mstamp;  /* start of window send phase */
++	u64	delivered_mstamp; /* time we reached "delivered" */
+ 	u64	bytes_acked;	/* RFC4898 tcpEStatsAppHCThruOctetsAcked
+ 				 * sum(delta(snd_una)), or how many bytes
+ 				 * were acked.
+ 				 */
++	struct {
++		u32	rtt_us;
++		u32	seq;
++		u64	time;
++	} rcv_rtt_est;
++/* Receiver queue space */
++	struct {
++		u32	space;
++		u32	seq;
++		u64	time;
++	} rcvq_space;
++	__cacheline_group_end(tcp_sock_write_rx);
++	/* End of Hot Path */
++
++/*
++ *	RFC793 variables by their proper names. This means you can
++ *	read the code and the spec side by side (and laugh ...)
++ *	See RFC793 and RFC1122. The RFC writes these in capitals.
++ */
+ 	u32	dsack_dups;	/* RFC4898 tcpEStatsStackDSACKDups
+ 				 * total number of DSACK blocks received
+ 				 */
+- 	u32	snd_una;	/* First byte we want an ack for	*/
+- 	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
+-	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
+-	u32	lsndtime;	/* timestamp of last sent data packet (for restart window) */
+ 	u32	last_oow_ack_time;  /* timestamp of last out-of-window ACK */
+ 	u32	compressed_ack_rcv_nxt;
+-
+-	u32	tsoffset;	/* timestamp offset */
+-
+ 	struct list_head tsq_node; /* anchor in tsq_tasklet.head list */
+-	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
+-
+-	u32	snd_wl1;	/* Sequence for window update		*/
+-	u32	snd_wnd;	/* The window we expect to receive	*/
+-	u32	max_window;	/* Maximal window ever seen from peer	*/
+-	u32	mss_cache;	/* Cached effective mss, not including SACKS */
  
--	unsigned int		gso_max_size;
- #define TSO_LEGACY_MAX_SIZE	65536
- #define TSO_MAX_SIZE		UINT_MAX
- 	unsigned int		tso_max_size;
--	u16			gso_max_segs;
- #define TSO_MAX_SEGS		U16_MAX
- 	u16			tso_max_segs;
--	unsigned int		gso_ipv4_max_size;
+-	u32	window_clamp;	/* Maximal window to advertise		*/
+-	u32	rcv_ssthresh;	/* Current window clamp			*/
+ 	u8	scaling_ratio;	/* see tcp_win_from_space() */
+ 	/* Information of the most recently (s)acked skb */
+ 	struct tcp_rack {
+@@ -272,24 +369,16 @@ struct tcp_sock {
+ 		   dsack_seen:1, /* Whether DSACK seen after last adj */
+ 		   advanced:1;	 /* mstamp advanced since last lost marking */
+ 	} rack;
+-	u16	advmss;		/* Advertised MSS			*/
+ 	u8	compressed_ack;
+ 	u8	dup_ack_counter:2,
+ 		tlp_retrans:1,	/* TLP is a retransmission */
+ 		tcp_usec_ts:1, /* TSval values in usec */
+ 		unused:4;
+-	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
+-	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
+-	u8	chrono_type:2,	/* current chronograph type */
+-		rate_app_limited:1,  /* rate_{delivered,interval_us} limited? */
++	u8	thin_lto    : 1,/* Use linear timeouts for thin streams */
++		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
+ 		fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
+ 		fastopen_no_cookie:1, /* Allow send/recv SYN+data without a cookie */
+-		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
+-		fastopen_client_fail:2; /* reason why fastopen failed */
+-	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
+-		thin_lto    : 1,/* Use linear timeouts for thin streams */
+-		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
+-		repair      : 1,
++		fastopen_client_fail:2, /* reason why fastopen failed */
+ 		frto        : 1;/* F-RTO (RFC5682) activated in CA_Loss */
+ 	u8	repair_queue;
+ 	u8	save_syn:2,	/* Save headers of SYN packet */
+@@ -297,45 +386,19 @@ struct tcp_sock {
+ 		syn_fastopen:1,	/* SYN includes Fast Open option */
+ 		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
+ 		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
+-		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
+-		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
+-	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
++		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
  
- #ifdef CONFIG_DCB
- 	const struct dcbnl_rtnl_ops *dcbnl_ops;
- #endif
--	s16			num_tc;
--	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
- 	u8			prio_tc_map[TC_BITMASK + 1];
+ 	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
+-	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
+-	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
  
- #if IS_ENABLED(CONFIG_FCOE)
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 3950ced396b50..4779689f7c437 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11572,6 +11572,60 @@ static struct pernet_operations __net_initdata default_device_ops = {
- 	.exit_batch = default_device_exit_batch,
- };
+ /* RTT measurement */
+-	u64	tcp_mstamp;	/* most recent packet received/sent */
+-	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
+-	u32	mdev_us;	/* medium deviation			*/
+ 	u32	mdev_max_us;	/* maximal mdev for the last rtt period	*/
+-	u32	rttvar_us;	/* smoothed mdev_max			*/
+-	u32	rtt_seq;	/* sequence number to update rttvar	*/
+-	struct  minmax rtt_min;
  
-+static void __init net_dev_struct_check(void)
+-	u32	packets_out;	/* Packets which are "in flight"	*/
+-	u32	retrans_out;	/* Retransmitted packets out		*/
+-	u32	max_packets_out;  /* max packets_out in last window */
+-	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
+-
+-	u16	urg_data;	/* Saved octet of OOB data and control flags */
+-	u8	ecn_flags;	/* ECN status bits.			*/
+ 	u8	keepalive_probes; /* num of allowed keep alive probes	*/
+-	u32	reordering;	/* Packet reordering metric.		*/
+ 	u32	reord_seen;	/* number of data packet reordering events */
+-	u32	snd_up;		/* Urgent pointer		*/
+-
+-/*
+- *      Options received (usually on last packet, some only on SYN packets).
+- */
+-	struct tcp_options_received rx_opt;
+ 
+ /*
+  *	Slow start and congestion control (see also Nagle, and Karn & Partridge)
+  */
+- 	u32	snd_ssthresh;	/* Slow start size threshold		*/
+- 	u32	snd_cwnd;	/* Sending congestion window		*/
+ 	u32	snd_cwnd_cnt;	/* Linear increase counter		*/
+ 	u32	snd_cwnd_clamp; /* Do not allow snd_cwnd to grow above this */
+ 	u32	snd_cwnd_used;
+@@ -343,32 +406,10 @@ struct tcp_sock {
+ 	u32	prior_cwnd;	/* cwnd right before starting loss recovery */
+ 	u32	prr_delivered;	/* Number of newly delivered packets to
+ 				 * receiver in Recovery. */
+-	u32	prr_out;	/* Total number of pkts sent during Recovery. */
+-	u32	delivered;	/* Total data packets delivered incl. rexmits */
+-	u32	delivered_ce;	/* Like the above but only ECE marked packets */
+-	u32	lost;		/* Total data packets lost incl. rexmits */
+-	u32	app_limited;	/* limited until "delivered" reaches this val */
+-	u64	first_tx_mstamp;  /* start of window send phase */
+-	u64	delivered_mstamp; /* time we reached "delivered" */
+-	u32	rate_delivered;    /* saved rate sample: packets delivered */
+-	u32	rate_interval_us;  /* saved rate sample: time elapsed */
+-
+- 	u32	rcv_wnd;	/* Current receiver window		*/
+-	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
+-	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
+-	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
+-	u32	lost_out;	/* Lost packets			*/
+-	u32	sacked_out;	/* SACK'd packets			*/
+ 
+ 	struct hrtimer	pacing_timer;
+ 	struct hrtimer	compressed_ack_timer;
+ 
+-	/* from STCP, retrans queue hinting */
+-	struct sk_buff* lost_skb_hint;
+-	struct sk_buff *retransmit_skb_hint;
+-
+-	/* OOO segments go in this rbtree. Socket lock must be held. */
+-	struct rb_root	out_of_order_queue;
+ 	struct sk_buff	*ooo_last_skb; /* cache rb_last(out_of_order_queue) */
+ 
+ 	/* SACKs data, these 2 need to be together (see tcp_options_write) */
+@@ -377,12 +418,6 @@ struct tcp_sock {
+ 
+ 	struct tcp_sack_block recv_sack_cache[4];
+ 
+-	struct sk_buff *highest_sack;   /* skb just after the highest
+-					 * skb with SACKed bit set
+-					 * (validity guaranteed only if
+-					 * sacked_out > 0)
+-					 */
+-
+ 	int     lost_cnt_hint;
+ 
+ 	u32	prior_ssthresh; /* ssthresh saved at recovery start	*/
+@@ -433,21 +468,6 @@ struct tcp_sock {
+ 
+ 	u32 rcv_ooopack; /* Received out-of-order packets, for tcpinfo */
+ 
+-/* Receiver side RTT estimation */
+-	u32 rcv_rtt_last_tsecr;
+-	struct {
+-		u32	rtt_us;
+-		u32	seq;
+-		u64	time;
+-	} rcv_rtt_est;
+-
+-/* Receiver queue space */
+-	struct {
+-		u32	space;
+-		u32	seq;
+-		u64	time;
+-	} rcvq_space;
+-
+ /* TCP-specific MTU probe information. */
+ 	struct {
+ 		u32		  probe_seq_start;
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 53bcc17c91e4c..44c745307bc21 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4563,6 +4563,97 @@ static void __init tcp_init_mem(void)
+ 	sysctl_tcp_mem[2] = sysctl_tcp_mem[0] * 2;	/* 9.37 % */
+ }
+ 
++static void __init tcp_struct_check(void)
 +{
-+	/* TX read-mostly hotpath */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, priv_flags);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, netdev_ops);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, header_ops);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, _tx);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, real_num_tx_queues);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_size);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_ipv4_max_size);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_segs);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, num_tc);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, mtu);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, needed_headroom);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tc_to_txq);
-+#ifdef CONFIG_XPS
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, xps_maps);
-+#endif
-+#ifdef CONFIG_NETFILTER_EGRESS
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, nf_hooks_egress);
-+#endif
-+#ifdef CONFIG_NET_XGRESS
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tcx_egress);
-+#endif
-+	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_tx, 152);
++	/* TX read-mostly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, max_window);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, rcv_ssthresh);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, reordering);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, notsent_lowat);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, gso_segs);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, lost_skb_hint);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, retransmit_skb_hint);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 40);
 +
-+	/* TXRX read-mostly hotpath */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, flags);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, hard_header_len);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, features);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, ip6_ptr);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 30);
++	/* TXRX read-mostly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, tsoffset);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_wnd);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, mss_cache);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_cwnd);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, prr_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, lost_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, sacked_out);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_txrx, 31);
 +
-+	/* RX read-mostly hotpath */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ptype_specific);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ifindex);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, real_num_rx_queues);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, _rx);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_flush_timeout);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, napi_defer_hard_irqs);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_max_size);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_ipv4_max_size);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler_data);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, nd_net);
-+#ifdef CONFIG_NETPOLL
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, npinfo);
-+#endif
-+#ifdef CONFIG_NET_XGRESS
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
-+#endif
-+	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 96);
++	/* RX read-mostly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, copied_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rcv_tstamp);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_wl1);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, tlp_high_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rttvar_us);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, retrans_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, advmss);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, urg_data);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, lost);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rtt_min);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, out_of_order_queue);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
++
++	/* TX read-write hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, segs_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, data_segs_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, bytes_sent);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, snd_sml);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_start);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_stat);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, write_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, pushed_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, lsndtime);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, mdev_us);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_wstamp_ns);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_clock_cache);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_mstamp);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, rtt_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tsorted_sent_queue);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, highest_sack);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, ecn_flags);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 113);
++
++	/* TXRX read-write hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pred_flags);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_nxt);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_nxt);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_una);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, window_clamp);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, srtt_us);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, packets_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_up);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered_ce);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 76);
++
++	/* RX read-write hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, segs_in);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, data_segs_in);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_wup);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, max_packets_out);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, cwnd_usage_seq);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_delivered);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_interval_us);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_last_tsecr);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, first_tx_mstamp);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, delivered_mstamp);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_acked);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_est);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcvq_space);
++	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_rx, 99);
 +}
 +
- /*
-  *	Initialize the DEV module. At boot time this walks the device list and
-  *	unhooks any devices that fail to initialise (normally hardware not
-@@ -11589,6 +11643,8 @@ static int __init net_dev_init(void)
+ void __init tcp_init(void)
+ {
+ 	int max_rshare, max_wshare, cnt;
+@@ -4573,6 +4664,8 @@ void __init tcp_init(void)
+ 	BUILD_BUG_ON(sizeof(struct tcp_skb_cb) >
+ 		     sizeof_field(struct sk_buff, cb));
  
- 	BUG_ON(!dev_boot_phase);
- 
-+	net_dev_struct_check();
++	tcp_struct_check();
 +
- 	if (dev_proc_init())
- 		goto out;
+ 	percpu_counter_init(&tcp_sockets_allocated, 0, GFP_KERNEL);
  
+ 	timer_setup(&tcp_orphan_timer, tcp_orphan_update, TIMER_DEFERRABLE);
 -- 
 2.43.0.rc2.451.g8631bc7472-goog
 
