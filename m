@@ -1,205 +1,193 @@
-Return-Path: <netdev+bounces-53649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763A680404F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:43:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FECB80405A
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:47:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D9EA2812A8
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:43:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3CB28124F
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91E02EB05;
-	Mon,  4 Dec 2023 20:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDD82FC25;
+	Mon,  4 Dec 2023 20:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnbU+T9z"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="kTVp5hcP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860221BCC
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701722590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CcxV6xsv8L+uEPwt5UPfpW3moxDE6BTcpdqQtS3FRXw=;
-	b=ZnbU+T9zom5AwwUMkbVKw/El09aBgYNj5n/PHBEkzVXNzPQXkRJMc7IixYNMK2heSuOtc6
-	+68IzjyqLY4jw/dl4srMKtN877h2iexLZMJZPAdczme9pXD/Jf+dQTPAii8C7xjFd9iPCx
-	/LuJwa/gFMWo+BuRbUzf0So1ADwc/A8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685-OmNIgizLMVyn6hWo429Q_w-1; Mon, 04 Dec 2023 15:43:06 -0500
-X-MC-Unique: OmNIgizLMVyn6hWo429Q_w-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-67abf4618a2so28651026d6.0
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:43:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701722586; x=1702327386;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CcxV6xsv8L+uEPwt5UPfpW3moxDE6BTcpdqQtS3FRXw=;
-        b=SjB3UFbTR4Hx911Q8/LhrHwqFyF80GloLA5FRlTTN7M9F1eNoNZ8DS9i7kNp4rT1FF
-         M5NySS8KwATnpLTMyT3QqYRzEDFwrPVBdlHH+PjKfZNuTTIn2oLDNV/vgbbChAe4741+
-         HJt+WvnUHw8gkUh+yr/n7QDAtSqOxHGgeQxqNDHyaRpCwaLAfUE/VqJk8W+p3J51TXwk
-         j0E5V8ztcJK219dEmLwU34XAgc4a10bIrfnOFFE9BDBu9ZZSXMsHaTvFrcg7ynTAafI3
-         nsL6rEG+YE113qbwtEF2LIBYLnqSe02VnbMRiG6rxXYAIRHvdu2m68BtoATLu648sg2M
-         yjXw==
-X-Gm-Message-State: AOJu0Yyjb80DFVAzu3JHLryALuJusOvwL8k98Qhsk8cerpFywVs6HZjq
-	AgXtgqDLt7UCcpI3NHfSkdNDNEM3hVRCE3YOWiS4IELuO6YIw4DDPSxsP+Hn2IQNSn0Vugchm9r
-	EOtz5mfqKT+EBJil3
-X-Received: by 2002:a05:6214:2b48:b0:67a:a721:720c with SMTP id jy8-20020a0562142b4800b0067aa721720cmr135464qvb.41.1701722585900;
-        Mon, 04 Dec 2023 12:43:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH27xWS3K2jcZSn77U+0BZD1FMi3abTl2HyZC4yJvCVWmqKhlNAvT/9jKiUYfBDcwREA09qjg==
-X-Received: by 2002:a05:6214:2b48:b0:67a:a721:720c with SMTP id jy8-20020a0562142b4800b0067aa721720cmr135442qvb.41.1701722585632;
-        Mon, 04 Dec 2023 12:43:05 -0800 (PST)
-Received: from fedora ([2600:1700:1ff0:d0e0::47])
-        by smtp.gmail.com with ESMTPSA id qd23-20020ad44817000000b0067a8cd6f034sm4247472qvb.138.2023.12.04.12.43.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 12:43:05 -0800 (PST)
-Date: Mon, 4 Dec 2023 14:43:02 -0600
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add driver support for
- DWMAC5 safety IRQ Support
-Message-ID: <b7uaftelklsquxv5apq5cpkegxfsdsefx3vjdh2kuqdlrq5oia@r4ahkp4dxs6z>
-References: <cover.1701695218.git.quic_jsuraj@quicinc.com>
- <d915004a7c45dc96fa326924c467e1f59af9ccbd.1701695218.git.quic_jsuraj@quicinc.com>
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D218AAA
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:47:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=HPeLbO6YanfaBqml2qtht/At26Dk9UVoLR7RL810Quo=; t=1701722831; x=1702932431; 
+	b=kTVp5hcPBPdMgKM45+8AbQTPYdujd0FRO67RPBPAyMYOMNymXthp7Dhw9xZSW0EVddYxYiYz94J
+	oG/FUKaiGmUChSPZCnMf3eGjL5Qr+cXh97QUrR/IIswcmZUoTtbSesWyjL5dS4kR6lJQTcL1Hjj2r
+	xjtOji1Dttte73CZqWwMCiFJHuo1idw3eihKo1unOxYK8fSRTr6q9P8OdFgLiCfM2gGnejynSJAw8
+	x29iFt8O7gBzXQm5EBhvdbhSm5Pu7+jkHUSsOai4Hb5Kze8n+kVy5f00bUivLxXs0/H152DTNIc0z
+	iVZz8n/57rkQiidE5AW07A/XmH84+K2Cek1Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAFqP-0000000FFhB-1b3R;
+	Mon, 04 Dec 2023 21:47:09 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH net] net: core: synchronize link-watch when carrier is queried
+Date: Mon,  4 Dec 2023 21:47:07 +0100
+Message-ID: <20231204214706.303c62768415.I1caedccae72ee5a45c9085c5eb49c145ce1c0dd5@changeid>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d915004a7c45dc96fa326924c467e1f59af9ccbd.1701695218.git.quic_jsuraj@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 04, 2023 at 06:56:17PM +0530, Suraj Jaiswal wrote:
-> Add IRQ support to listen HW safety IRQ like ECC,DPP,FSM
-> fault and print the fault information in the kernel
-> log.
-> 
-> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/common.h   |  1 +
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h   |  2 ++
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++++++
->  .../ethernet/stmicro/stmmac/stmmac_platform.c  |  9 +++++++++
->  4 files changed, 30 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> index 6b935922054d..c4821c7ab674 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> @@ -347,6 +347,7 @@ enum request_irq_err {
->  	REQ_IRQ_ERR_SFTY_UE,
->  	REQ_IRQ_ERR_SFTY_CE,
->  	REQ_IRQ_ERR_LPI,
-> +	REQ_IRQ_ERR_SAFETY,
->  	REQ_IRQ_ERR_WOL,
->  	REQ_IRQ_ERR_MAC,
->  	REQ_IRQ_ERR_NO,
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 686c94c2e8a7..8eac37ff002d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -33,6 +33,7 @@ struct stmmac_resources {
->  	int irq;
->  	int sfty_ce_irq;
->  	int sfty_ue_irq;
-> +	int safety_common_irq;
->  	int rx_irq[MTL_MAX_RX_QUEUES];
->  	int tx_irq[MTL_MAX_TX_QUEUES];
->  };
-> @@ -343,6 +344,7 @@ struct stmmac_priv {
->  	/* XDP BPF Program */
->  	unsigned long *af_xdp_zc_qps;
->  	struct bpf_prog *xdp_prog;
-> +	int safety_common_irq;
+From: Johannes Berg <johannes.berg@intel.com>
 
-This probably belongs with the other IRQs instead of the "XDP BPF Program"
-section for readability.
+There are multiple ways to query for the carrier state: through
+rtnetlink, sysfs, and (possibly) ethtool. Synchronize linkwatch
+work before these operations so that we don't have a situation
+where userspace queries the carrier state between the driver's
+carrier off->on transition and linkwatch running and expects it
+to work, when really (at least) TX cannot work until linkwatch
+has run.
 
->  };
->  
->  enum stmmac_state {
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index c2ac88aaffed..46a5cb20e4b4 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -3591,6 +3591,10 @@ static void stmmac_free_irq(struct net_device *dev,
->  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
->  			free_irq(priv->wol_irq, dev);
->  		fallthrough;
-> +	case REQ_IRQ_ERR_SAFETY:
-> +		if (priv->safety_common_irq > 0 && priv->safety_common_irq != dev->irq)
-> +			free_irq(priv->safety_common_irq, dev);
-> +		fallthrough;
->  	case REQ_IRQ_ERR_WOL:
->  		free_irq(dev->irq, dev);
->  		fallthrough;
-> @@ -3797,6 +3801,18 @@ static int stmmac_request_irq_single(struct net_device *dev)
->  		}
->  	}
->  
-> +	if (priv->safety_common_irq > 0 && priv->safety_common_irq != dev->irq) {
-> +		ret = request_irq(priv->safety_common_irq, stmmac_safety_interrupt,
-> +				  0, "safety", dev);
-> +		if (unlikely(ret < 0)) {
-> +			netdev_err(priv->dev,
-> +				   "%s: alloc safety failed %d (error: %d)\n",
-> +				   __func__, priv->safety_common_irq, ret);
-> +			irq_err = REQ_IRQ_ERR_SAFETY;
-> +			goto irq_error;
-> +		}
-> +	}
-> +
->  	return 0;
->  
->  irq_error:
-> @@ -7459,6 +7475,8 @@ int stmmac_dvr_probe(struct device *device,
->  	priv->lpi_irq = res->lpi_irq;
->  	priv->sfty_ce_irq = res->sfty_ce_irq;
->  	priv->sfty_ue_irq = res->sfty_ue_irq;
-> +	priv->safety_common_irq = res->safety_common_irq;
-> +
->  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
->  		priv->rx_irq[i] = res->rx_irq[i];
->  	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index 1ffde555da47..41a4a253d75b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -726,6 +726,15 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
->  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
->  	}
->  
-> +	stmmac_res->safety_common_irq =
-> +		platform_get_irq_byname_optional(pdev, "safety");
-> +
-> +	if (stmmac_res->safety_common_irq < 0) {
-> +		if (stmmac_res->safety_common_irq == -EPROBE_DEFER)
-> +			return -EPROBE_DEFER;
-> +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
-> +	}
-> +
->  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
->  
->  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
-> -- 
-> 2.25.1
-> 
+I previously posted a longer explanation of how this applies to
+wireless [1] but with this wireless can simply query the state
+before sending data, to ensure the kernel is ready for it.
+
+[1] https://lore.kernel.org/all/346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net/
+
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ include/linux/netdevice.h | 9 +++++++++
+ net/core/dev.c            | 2 +-
+ net/core/dev.h            | 1 -
+ net/core/link_watch.c     | 2 +-
+ net/core/net-sysfs.c      | 8 +++++++-
+ net/core/rtnetlink.c      | 8 ++++++++
+ net/ethtool/ioctl.c       | 3 +++
+ 7 files changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 2564e209465e..17dbaf379c69 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4195,6 +4195,15 @@ static inline void netdev_ref_replace(struct net_device *odev,
+  */
+ void linkwatch_fire_event(struct net_device *dev);
+ 
++/**
++ * linkwatch_sync_dev - sync linkwatch for the given device
++ * @dev: network device to sync linkwatch for
++ *
++ * Sync linkwatch for the given device, removing it from the
++ * pending work list (if queued).
++ */
++void linkwatch_sync_dev(struct net_device *dev);
++
+ /**
+  *	netif_carrier_ok - test if carrier present
+  *	@dev: network device
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c879246be48d..188799b2c6a5 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10511,7 +10511,7 @@ void netdev_run_todo(void)
+ 		write_lock(&dev_base_lock);
+ 		dev->reg_state = NETREG_UNREGISTERED;
+ 		write_unlock(&dev_base_lock);
+-		linkwatch_forget_dev(dev);
++		linkwatch_sync_dev(dev);
+ 	}
+ 
+ 	while (!list_empty(&list)) {
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 5aa45f0fd4ae..cb06fe5e38ea 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -30,7 +30,6 @@ int __init dev_proc_init(void);
+ #endif
+ 
+ void linkwatch_init_dev(struct net_device *dev);
+-void linkwatch_forget_dev(struct net_device *dev);
+ void linkwatch_run_queue(void);
+ 
+ void dev_addr_flush(struct net_device *dev);
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index ed3e5391fa79..7be5b3ab32bd 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -240,7 +240,7 @@ static void __linkwatch_run_queue(int urgent_only)
+ 	spin_unlock_irq(&lweventlist_lock);
+ }
+ 
+-void linkwatch_forget_dev(struct net_device *dev)
++void linkwatch_sync_dev(struct net_device *dev)
+ {
+ 	unsigned long flags;
+ 	int clean = 0;
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index fccaa5bac0ed..d9b33e923b18 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -194,8 +194,14 @@ static ssize_t carrier_show(struct device *dev,
+ {
+ 	struct net_device *netdev = to_net_dev(dev);
+ 
+-	if (netif_running(netdev))
++	if (netif_running(netdev)) {
++		/* Synchronize carrier state with link watch,
++		 * see also rtnl_getlink().
++		 */
++		linkwatch_sync_dev(netdev);
++
+ 		return sysfs_emit(buf, fmt_dec, !!netif_carrier_ok(netdev));
++	}
+ 
+ 	return -EINVAL;
+ }
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index e8431c6c8490..613268d7c491 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3853,6 +3853,14 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (nskb == NULL)
+ 		goto out;
+ 
++	/* Synchronize the carrier state so we don't report a state
++	 * that we're not actually going to honour immediately; if
++	 * the driver just did a carrier off->on transition, we can
++	 * only TX if link watch work has run, but without this we'd
++	 * already report carrier on, even if it doesn't work yet.
++	 */
++	linkwatch_sync_dev(dev);
++
+ 	err = rtnl_fill_ifinfo(nskb, dev, net,
+ 			       RTM_NEWLINK, NETLINK_CB(skb).portid,
+ 			       nlh->nlmsg_seq, 0, 0, ext_filter_mask,
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 0b0ce4f81c01..a977f8903467 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -58,6 +58,9 @@ static struct devlink *netdev_to_devlink_get(struct net_device *dev)
+ 
+ u32 ethtool_op_get_link(struct net_device *dev)
+ {
++	/* Synchronize carrier state with link watch, see also rtnl_getlink() */
++	linkwatch_sync_dev(dev);
++
+ 	return netif_carrier_ok(dev) ? 1 : 0;
+ }
+ EXPORT_SYMBOL(ethtool_op_get_link);
+-- 
+2.43.0
 
 
