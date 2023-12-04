@@ -1,117 +1,163 @@
-Return-Path: <netdev+bounces-53460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC297803127
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:00:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344BB803130
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D78CB2098F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF2041F20DD9
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9306B224EF;
-	Mon,  4 Dec 2023 11:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93624224FB;
+	Mon,  4 Dec 2023 11:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kaYdwlTf"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qjOtgT2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78FC7F5
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 03:00:40 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c08af319cso14192585e9.2
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 03:00:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701687639; x=1702292439; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N0GjZblnHyXKxMnT2vNIaeSasod01cHebJrAhLXFYYg=;
-        b=kaYdwlTfLbNQj3VPCly6ww6r6XC0EF64ztZhRSk+OKweRF25X90R0RhVcgsBMHS9St
-         XtlCq6GiYzZeNKB/pxWUolv2mp0hV+H8Il2j9jkTi00bNU0unoeUiSmNcexNyY8g9cYS
-         baZ0yDr97k3Vfsz+ksab9G1o+3wPMqmDURDA8FEJZbAX/IbYYPU5zJA81UT4DtZCIQxc
-         B0dny4fIKaFB0no8l4TTfr8kreQmQlOcwyYWykBPLHrDBOhbIiiY0dHTGT0cA3fGmiiq
-         sAx3Zl3NuxooDWgzr7BwNpKpOPfczXB/WZ2TWs8yFINtUdgqW1xpyd0sa835gGh1FCd0
-         AOsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701687639; x=1702292439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N0GjZblnHyXKxMnT2vNIaeSasod01cHebJrAhLXFYYg=;
-        b=m+lykMDI7kgQ5AV7Jo/DUsQMPXWQoKAox8VvuncGnEnWNACBXs2jU3uDgAsZWu2efn
-         g7ko4UNN4qSU96FBzlLm1nxN8tld53Qk2yOvzCqQyRUkC+7VVrtZ8dM5bXFpn3x17D7r
-         wfD4qbfu/iVtbnw4Ax7j73+2PlIMvb9U6Ga03FdpTU4/Ti0vZGvJ/YaqZTssm85xF2iE
-         vYydPH431UgiTZmvN2DGo729U3J7YiOK3wsYkAqSZ7pCUjADdzlG1NseZ+CGjGT6FfIM
-         /ljpa0dBpiIVUyGt80ZRjgKGLqSd9Aiy3N3dAKB798CweNGsVt1/mqDpGwXOyVG6MHAo
-         mQNQ==
-X-Gm-Message-State: AOJu0YynjbGQENqrq3wXyTHqoQnrkMceGw7oflXLyz9Nqfr/QOxSLTMx
-	IMj96R29B4Ta4fWlIilw6Ic=
-X-Google-Smtp-Source: AGHT+IErcHBUcOtPBXx5F6yulL/4xr089hG/NL+qIfLXIWSkRzsFjAJwgKrCyhNoNda/DOTIm1MAnA==
-X-Received: by 2002:a05:600c:4ecb:b0:40b:5e21:ec21 with SMTP id g11-20020a05600c4ecb00b0040b5e21ec21mr2281196wmq.83.1701687638724;
-        Mon, 04 Dec 2023 03:00:38 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id fc9-20020a05600c524900b0040b34720206sm14581504wmb.12.2023.12.04.03.00.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 03:00:38 -0800 (PST)
-Date: Mon, 4 Dec 2023 13:00:35 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Austin, Alex (DCCG)" <alexaust@amd.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Alex Austin <alex.austin@amd.com>,
-	netdev@vger.kernel.org, linux-net-drivers@amd.com,
-	ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	richardcochran@gmail.com, lorenzo@kernel.org, memxor@gmail.com,
-	alardam@gmail.com, bhelgaas@google.com
-Subject: Re: [PATCH net-next 1/2] sfc: Implement ndo_hwtstamp_(get|set)
-Message-ID: <20231204110035.js5zq4z6h4yfhgz5@skbuf>
-References: <20231130135826.19018-1-alex.austin@amd.com>
- <20231130135826.19018-2-alex.austin@amd.com>
- <20231201192531.2d35fb39@kernel.org>
- <ca89ea1b-eaa5-4429-b99c-cf0e40c248db@amd.com>
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2089.outbound.protection.outlook.com [40.107.20.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040C2127
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 03:02:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nt6NEqb21k0ns/iLvwn57kxXM2JPqBPMMzFZGM7cS2dx12zxxjPMscgRu1WJSW462PuMP1FcgpzLLKggH5xEi8jqoxU3mBlYbY6quKjudaI3wq/srMGawe+iA3wnYWtQWiZbDO3e0bPwtAxcqai3omrIvcL5frpstuR3YuKtVf7y2t04KUcw20JxfFI65NV8sx1q29PKqztn1Ng+gM8nREB5wFgWeDeVcf12G23zA87FxqnfZPy4Fv5Tu7n5rh5uSZb4GYbITYSR6NhccMt/Gmh0r0fvGs/Cr2tBVd5pia23K8sO5X2khCtS1mcWThJiNH7UT7e/5X9iLxE6a19ceQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K2cztyqmRfMz9NRk/MnJGed+E78AstEp+Vn1KgsdmDc=;
+ b=XlonCVzit4+Y8b9jxTfE/UtJNk3PiAXW2Nw9buTGl1mQOio665IrgbW+e8L1kiBIEBsZiBWU9b+Sfpfdp1IjWROCKZ8XHBQNN5QE4CP4qt6+sZA2JfYa4d1r+kLuAqnSGwf8Bh7RyGtvPb/nVvnjZl5CFMJkFNAnpiQtnx4OvQaugPfYJ2vF+rO5/3e25gxFquvSL8K2q+P5W1ahjf6pUDjIVH20+yX1Z/JD3fWr0egtdzGZAiYVk1/G/j2ir9HBzXWVo4ht4prnlUQpuKFsCeqcH/fyTjMjgREyFBmxD2w0oI+Zirgzkyp6itypD4UaU/VyqsViuPrw4lHVhUgITA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K2cztyqmRfMz9NRk/MnJGed+E78AstEp+Vn1KgsdmDc=;
+ b=qjOtgT2Mwxo9vyoGS+P4DO0z8OTCvaBEvO+pzhEEy66NzU63m9h+2lm37KijUZOwguXkY8GpfGx+hjGBl8l1H62hO+i0k96o5oIVhU2h8oTMW5tAioakae66N+26HEn6ANvYIOEXdSLpOsoJIQeUufbNgo0Kcpi4nSrITPYRbOc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS1PR04MB9310.eurprd04.prod.outlook.com (2603:10a6:20b:4de::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.22; Mon, 4 Dec
+ 2023 11:02:53 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.012; Mon, 4 Dec 2023
+ 11:02:53 +0000
+Date: Mon, 4 Dec 2023 13:02:49 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "Varis, Pekka" <p-varis@ti.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Vadapalli, Siddharth" <s-vadapalli@ti.com>,
+	"Gunasekaran, Ravi" <r-gunasekaran@ti.com>,
+	"Raghavendra, Vignesh" <vigneshr@ti.com>,
+	"Govindarajan, Sriramakrishnan" <srk@ti.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [EXTERNAL] [PATCH v7 net-next 6/8] net: ethernet: ti:
+ am65-cpsw-qos: Add Frame Preemption MAC Merge support
+Message-ID: <20231204110249.nwayybk5q4uhsgsa@skbuf>
+References: <20231201135802.28139-1-rogerq@kernel.org>
+ <20231201135802.28139-7-rogerq@kernel.org>
+ <c773050ad0534fb3a5a9edcf5302d297@ti.com>
+ <96c4f619-857c-4a28-ac86-5a07214842a8@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96c4f619-857c-4a28-ac86-5a07214842a8@kernel.org>
+X-ClientProxiedBy: BE1P281CA0063.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:26::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca89ea1b-eaa5-4429-b99c-cf0e40c248db@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS1PR04MB9310:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e08f5dc-8a07-4382-702a-08dbf4b88fe6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	91hE0XcIJBnWEevS7jR0nJZg0KvULMAAXwwOdhV75umQs+sa0MzaB5VjeA3bkk8ah7pjwU6N6RrPX+jO92Y9xxLmFpsvzJxiPAOGFQt/0bR/o3w6F2uCIWC7EGenTw92Rz/c/6sknWjYuW427kacxnQv1HsiKxTxzAckbq/IVTnL5Rcz412nC+d6a0NlpwNCJjImrBzB+cGZgsC+F4cFD1SX1sSGhiAGoITF99n9j0HRvsM/upu1eibORf85zOlKUn/aDCpUAyiETx84uD4QUgL0URCQp9AIDWdFW/mWkfGNRmakOzhFhwJpdMGrSnl7i0Ndb9/Vh8wP/8Z8gdvEb8t+ymTd8VR3aZg4oUqNRRsmvDiYwtnFEvqEg/KVjibuUkMiT7JJBayLqHx0ChGp6AlPqWp5KLm5C7kejBKSB8Pz/neYpIcdHnUjfCNeCJWgz3PTm4JNmb+qTXk0L1+AyeFgtTFEmQRuKqonhJxxbvHwct6D1yjexXmtf4BaQtDgdq/kgwb2JegSVncE9ggQW1W9knisw+HiWVUNxS1eTtg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(376002)(346002)(396003)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66556008)(66476007)(6916009)(44832011)(54906003)(316002)(66946007)(5660300002)(4326008)(8936002)(8676002)(7416002)(6486002)(33716001)(38100700002)(83380400001)(86362001)(966005)(478600001)(2906002)(6666004)(1076003)(26005)(6506007)(6512007)(9686003)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?2K0QTT98ysvast1ZEJ8/76tyhUoBac55vmojDYXrSvo9QALq/4zybDtsK4kp?=
+ =?us-ascii?Q?fjbDCMJNeovaIQ4p5ofprGxyduSUDByWqGymCT9Clo9t2KHUrInmXlk0/Y39?=
+ =?us-ascii?Q?xJykMdJQC8eGP9xE5HC1KFcvEG8cEs6t9mt+NlaiL5F70A6T5gXokOvZx9qV?=
+ =?us-ascii?Q?YTwvKTT8S7RjqXb0ESStv3dMVJSVyYS5Dpkjqn1aR7XlVRB3MQQ1OiSBcBcg?=
+ =?us-ascii?Q?YnF6pP1Sf73FyVqLyzE7Jx39vj6XnLkOmLSqD/70M4ILSTGiIPMEjFnNXiMm?=
+ =?us-ascii?Q?YhAse9HElxCHAYiUzg9XR7ins1Mw6vXlWL8AEoFyf7EiiSg4AToFD7DbnENN?=
+ =?us-ascii?Q?zMkOScO8VzN06vnH0Yg7c652CRT6I4YgZVA066Jh5eyU4MPYA/bBjW3VV4qw?=
+ =?us-ascii?Q?mS/ULSXOAIYSYUiFbFNqZ3/P8A4RYmb0Dfzge+Xk81mlReuKj8P7Ku6UrwSR?=
+ =?us-ascii?Q?cLtBtKZvrEZ8GlcPUOK/jSCC7pR5U17rMX71DAQD0Jutp7QJGtAzbbDcFN5S?=
+ =?us-ascii?Q?9ooWqbnDmTsVLLnBvKmoRFXSYHQcq23hXXWAekSaRyEMvwVjvO90P+SeTsrN?=
+ =?us-ascii?Q?MA13lIVcZigBEvkO7a+cuWv9kmdTe4+OpZlrnfWB4aWPtiWYAljh3Y5M3ER3?=
+ =?us-ascii?Q?VoGF2U1kVAzZo5P5ifgybRKLa/XJm/SjuS8HzMx3WQ4RBKAsk2FEHY1Q7SDM?=
+ =?us-ascii?Q?ywD5pODpi1aJA5plcwlRGHgyTuYu2tmjk6Pm0TEgfGP/xFRWviN4HHOFXExu?=
+ =?us-ascii?Q?wGc5XF80Lia/mejtrtShu2Th1R8yhdJlKKG8IBBxwfIHI0AFuwAyzsEAdoJi?=
+ =?us-ascii?Q?f5Rd6vlRN3nAQhOAEGDgV8h2NMibYPkURGrkiY3eIEKBMb7aGWJe6tDe2HIg?=
+ =?us-ascii?Q?Tue80ObJMH5lzNNe2JA99u18ByZjZ8c/dKLgtuM6aazFGxhyLdB01VQwuE+4?=
+ =?us-ascii?Q?vmKAu1U4++UqkVZW+LEYVMK6sxFkemrkl3E4373MWO8eunIswPjW63FurXbE?=
+ =?us-ascii?Q?YE1hoNn6/c5oo3N7VWImSDQvu3cux173QAQpjeQFa4Km09CEsQSSBAS2sPlC?=
+ =?us-ascii?Q?g2jLqFzkXOVzWqSylm+4bRvs0i6BdDuYAPUkJ+2A3bd3mHXJM6TD/NT+0mIr?=
+ =?us-ascii?Q?9jLEL2JGoid6nt/WepjXXHNb66mF6UCbMQmsMkHr6p+YTpr+xPqHDFBxYWP0?=
+ =?us-ascii?Q?8Gia7W9QH9iRMDgVjQpEZOfWoqWyZKHiVwc/QIpsKO97MkMPoRCQgJFxCwD0?=
+ =?us-ascii?Q?sPLZmswh8Nk77pBs/EH2tOlPv5lLIqiULYfPNS3U9mCeXbxgC0cKJKCaBkv/?=
+ =?us-ascii?Q?ALyGEp5mVOr4lvf6fx5THhcdY742pm7SWcMJUaBfGx5FTgWEnjgOW7vshNZa?=
+ =?us-ascii?Q?dk9bWXIT9ExFqLaJXfHOJ1wOdLdC5xDYXXYYI7MqxNlj1+OOF0PZexvQ3oAp?=
+ =?us-ascii?Q?r4jDVb8yBLxxChtZ3XgIpfTVuAQFv38wLiV+DKyuWTuGmM6v5IhBh7KMm8Jc?=
+ =?us-ascii?Q?qWjh2bJcEwS4aI+CrSx3miOUjqigCJBuI16XyIaNf/GAP9grFCbUvLq7cgBs?=
+ =?us-ascii?Q?3B8TLrilimfT2wquuCu6kV9pFfGNRd/IkPVZPl+AbqcPxSeNyr2FRGKtjVcL?=
+ =?us-ascii?Q?Ww=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e08f5dc-8a07-4382-702a-08dbf4b88fe6
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 11:02:52.9912
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EOg7ce0IoIHIWZgzn2KMFq7B/K8HtBZLzzRYiG1hK0H0kT8YWE3LQbRdO3wuEtSAKNusrIWUtQAkvXNu4LSYGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9310
 
-On Mon, Dec 04, 2023 at 10:26:30AM +0000, Austin, Alex (DCCG) wrote:
-> This seems like a good approach. I'll re-work into a v2.
+On Mon, Dec 04, 2023 at 11:30:53AM +0200, Roger Quadros wrote:
+> >> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
+> > 
+> > Should be 128 not 124
 > 
-> Alex
-> 
-> On 02/12/2023 03:25, Jakub Kicinski wrote:
-> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> > 
-> > 
-> > On Thu, 30 Nov 2023 13:58:25 +0000 Alex Austin wrote:
-> > > -     struct hwtstamp_config config;
-> > > +     struct kernel_hwtstamp_config config;
-> > > +     *config = efx->ptp_data->config;
-> > Do we have a lot of places which assign the new structure directly
-> > like this?
-> > 
-> > There's a bit of "request state" in it:
-> > 
-> > struct kernel_hwtstamp_config {
-> >          int flags;
-> >          int tx_type;
-> >          int rx_filter;
-> >          struct ifreq *ifr;             <<<
-> >          bool copied_to_user;           <<<
-> >          enum hwtstamp_source source;
-> > };
-> > 
-> > Maybe keep the type of config as was, and use
-> > hwtstamp_config_to_kernel() to set the right fields?
-> 
+> User space setting is without FCS.
 
-If I may intervene. The "request state" will ultimately go away once all
-drivers are converted. I know it's more fragile and not all fields are
-valid, but I think I would like drivers to store the kernel_ variant of
-the structure, because more stuff will be added to the kernel_ variant
-in the future (the hwtstamp provider + qualifier), and doing this from
-the beginning will avoid reworking them again.
+Technically it's called mCRC for preemptible frames, but yes.
+
+> >> +	/* Errata i2208: RX min fragment size cannot be less than 124 */
+> >> +	state->rx_min_frag_size = 124;
+> > 
+> > /* Errata i2208: RX min fragment size cannot be less than 128 */
+> > state->rx_min_frag_size = 128;
+> 
+> ethtool man page says
+> "           tx-min-frag-size
+>                   Shows the minimum size (in octets) of transmitted non-
+>                   final fragments which can be received by the link
+>                   partner. Corresponds to the standard addFragSize
+>                   variable using the formula:
+> 
+>                   tx-min-frag-size = 64 * (1 + addFragSize) - 4"
+> 
+> Which means user needs to put a -4 offset i.e. drop FCS size.
+> 
+> Drivers show rx-min-frag-size also without the FCS.
+> 
+> e.g.
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/mscc/ocelot_mm.c#L260
+
+Ack.
 
