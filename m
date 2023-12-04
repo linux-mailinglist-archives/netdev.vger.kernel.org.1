@@ -1,92 +1,93 @@
-Return-Path: <netdev+bounces-53616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57733803EE5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:01:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0CD803EE7
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 21:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195492810F5
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA018B20A68
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 20:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0F633096;
-	Mon,  4 Dec 2023 20:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E8333098;
+	Mon,  4 Dec 2023 20:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Th5CH+bl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxagOF64"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B41CCE
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 12:01:13 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-54c77d011acso2377a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 12:01:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701720071; x=1702324871; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z4qUKdBMoTlxHYFiskzAv8nyrsjpTSREfKpRVBZmhZs=;
-        b=Th5CH+blKchcjlPg5H0iQyaw1E0Dc6XFMO2YZGfDy/gegzdrJV9MY8HsyBFSbVjkWz
-         xIvwuBOxwzs4NCh1XZsISIxN6XSp/hwQ/yNkKH5ZzIa3P6OqFmKeR0AXsH81/VticX6q
-         ebKskBIOZYmDj2stBTe5yvR/Df2u2U2Y+5fZJ7ekCrll2c7pFe1xnMSB7NeEfFBC9a+i
-         CxcNx2DzT5xhZ/0dpNcALRJUAspvjlEto6HOiYiVy3NZtfIz9vVRo5Qn8rDv2Qjc6uzG
-         51g4/5VW6vzAeY0+VWfJD+bJe6RMgYiZB2YcDn+IGedSlNmdGSHpBdlJAJY1fWjaSJAk
-         9Aiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701720071; x=1702324871;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z4qUKdBMoTlxHYFiskzAv8nyrsjpTSREfKpRVBZmhZs=;
-        b=i8p7zqM25yZInShLgqUsQszG7Jprw8hAoG+9M9w5Hs9hqdT915iIPqjUNOtQP6gVsr
-         hFzxL0fp8UnsMjPkclCp8E74H6Ibkec4ra83oUsjqQ5YLCATeYNuttr1Ugv0r+w47LkS
-         cIVTpLuSNz4sbq9wU8j48x9k0LObUAcM6tLkunh34trbe9lMLlMzWla9G2XGTMnZW0re
-         i1UpYcfxdOFU9hnMu9B4R+0DsBFH/v63EVbRA7mRniTMPm4e+wR56yESn4ft+rWXUWwb
-         WDwQCz6JqUzt2tk2lPZCI+X0T7qFbc2fSJCGHCxInUtG4AYpWI4jCsFK52hTsvtLB6nc
-         DgGQ==
-X-Gm-Message-State: AOJu0Yxm0e0sWbKy6hS1nSm7WO+r8cXPzx1qsEzekrC6Yyp0F2IALNnp
-	wlIHPm5n7lLMNn+t2JFIGPauD2B63+GtA3oaBvKTgg==
-X-Google-Smtp-Source: AGHT+IGCev6DWYvqpogCA90ucI81NLgaEa0nJpCTgU96onBY6t9QMetZ9gl1hjVPETCRlrC77Ev8Q3QIKkavLVKHwOQ=
-X-Received: by 2002:a50:99de:0:b0:54a:ee8b:7a99 with SMTP id
- n30-20020a5099de000000b0054aee8b7a99mr332954edb.0.1701720071324; Mon, 04 Dec
- 2023 12:01:11 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948292C1AB;
+	Mon,  4 Dec 2023 20:01:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01131C433C7;
+	Mon,  4 Dec 2023 20:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701720114;
+	bh=clwbxwV51CebNhYrMt84h1J/9nrIOCdwldOTtND9l08=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PxagOF64Z+9GOiYFCybYSw+vcButysFRncix2xmJL0r9EXuO+FJrrIgVvrQDgcH/C
+	 6/+s2avRoRlzoP/k6Wj+qURTWxxTxARXDU799oJwsHf7ujOPZofZ76Vljpo5AUqKoF
+	 iS9FNMbZpASgFNNUhnr3PIho1Rr6Nt8xzcUGgIyJsr6qVBNxT1i2HLWGktPXHTbk3Q
+	 zsLmlPHAffD8zI0FW8S4P2zzsZFf4hM/v+UaBxCi7az8yUGov474x6bPynY4l4QK24
+	 WFW0r93jwiXcxvNiONz33ETDuAjCbDi7lpw9wqzeeNEYZ36KTNCHFsuE/yPyv4Wp4z
+	 YyJoWwudksLyA==
+Date: Mon, 4 Dec 2023 12:01:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: aleksander.lobakin@intel.com, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ lorenzo.bianconi@redhat.com, bpf@vger.kernel.org, hawk@kernel.org,
+ toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ sdf@google.com
+Subject: Re: [PATCH v3 net-next 2/2] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <20231204120153.0d51729a@kernel.org>
+In-Reply-To: <ZW3zvEbI6o4ydM_N@lore-desk>
+References: <cover.1701437961.git.lorenzo@kernel.org>
+	<c9ee1db92c8baa7806f8949186b43ffc13fa01ca.1701437962.git.lorenzo@kernel.org>
+	<20231201194829.428a96da@kernel.org>
+	<ZW3zvEbI6o4ydM_N@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZW4piNbx3IenYnuw@debian.debian>
-In-Reply-To: <ZW4piNbx3IenYnuw@debian.debian>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Dec 2023 21:01:00 +0100
-Message-ID: <CANn89iLww-JGAuyD4XFvpn1gy52hgHQwHE1o-UvHu6sU3-6ygw@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next] packet: add a generic drop reason for receive
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Jesper Brouer <jesper@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 4, 2023 at 8:33=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote:
->
-> Commit da37845fdce2 ("packet: uses kfree_skb() for errors.") switches
-> from consume_skb to kfree_skb to improve error handling. However, this
-> could bring a lot of noises when we monitor real packet drops in
-> kfree_skb[1], because in tpacket_rcv or packet_rcv only packet clones
-> can be freed, not actual packets.
->
-> Adding a generic drop reason to allow distinguish these "clone drops".
->
-> [1]: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=3DZah28QwZ_5RU-xcxLFU=
-K2Zj08A8MrLk9jzg@mail.gmail.com/
-> Fixes: da37845fdce2 ("packet: uses kfree_skb() for errors.")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
+On Mon, 4 Dec 2023 16:43:56 +0100 Lorenzo Bianconi wrote:
+> yes, I was thinking about it actually.
+> I run some preliminary tests to check if we are introducing any performance
+> penalties or so.
+> My setup relies on a couple of veth pairs and an eBPF program to perform
+> XDP_REDIRECT from one pair to another one. I am running the program in xdp
+> driver mode (not generic one).
+> 
+> v00 (NS:ns0 - 192.168.0.1/24) <---> (NS:ns1 - 192.168.0.2/24) v01    v10 (NS:ns1 - 192.168.1.1/24) <---> (NS:ns2 - 192.168.1.2/24) v11
+> 
+> v00: iperf3 client
+> v11: iperf3 server
+> 
+> I am run the test with different MTU valeus (1500B, 8KB, 64KB)
+> 
+> net-next veth codebase:
+> =======================
+> - MTU  1500: iperf3 ~  4.37Gbps
+> - MTU  8000: iperf3 ~  9.75Gbps
+> - MTU 64000: iperf3 ~ 11.24Gbps
+> 
+> net-next veth codebase + page_frag_cache instead of page_pool:
+> ==============================================================
+> - MTU  1500: iperf3 ~  4.99Gbps (+14%)
+> - MTU  8000: iperf3 ~  8.5Gbps  (-12%)
+> - MTU 64000: iperf3 ~ 11.9Gbps  ( +6%)
+> 
+> It seems there is no a clear win situation of using page_pool or
+> page_frag_cache. What do you think?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Hm, interesting. Are the iperf processes running on different cores?
+May be worth pinning (both same and different) to make sure the cache
+effects are isolated.
 
