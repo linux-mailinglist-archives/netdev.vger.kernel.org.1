@@ -1,505 +1,306 @@
-Return-Path: <netdev+bounces-53472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE0180328A
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:25:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0197803297
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 13:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D5B81C20A3F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:25:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A938B20529
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A8323777;
-	Mon,  4 Dec 2023 12:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8648C2377A;
+	Mon,  4 Dec 2023 12:28:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DC1C3;
-	Mon,  4 Dec 2023 04:25:03 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0VxpGiOb_1701692699;
-Received: from 30.221.130.147(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VxpGiOb_1701692699)
-          by smtp.aliyun-inc.com;
-          Mon, 04 Dec 2023 20:25:01 +0800
-Message-ID: <3f8dfc86-c27a-f1df-0a58-35fb4948e526@linux.alibaba.com>
-Date: Mon, 4 Dec 2023 20:24:59 +0800
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98599C3
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 04:28:04 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA837-0006eT-9Q; Mon, 04 Dec 2023 13:27:45 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA836-00DVyo-Lo; Mon, 04 Dec 2023 13:27:44 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rA836-005Du1-Ih; Mon, 04 Dec 2023 13:27:44 +0100
+Date: Mon, 4 Dec 2023 13:27:44 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 2/8] ethtool: Expand Ethernet Power Equipment
+ with c33 (PoE) alongside PoDL
+Message-ID: <20231204122744.GC981228@pengutronix.de>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v3 5/7] net/smc: compatible with 128-bits extend
- GID of virtual ISM device
-To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1701343695-122657-1-git-send-email-guwen@linux.alibaba.com>
- <1701343695-122657-6-git-send-email-guwen@linux.alibaba.com>
- <19b288d3-5434-40b1-93fa-7db47e417f60@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <19b288d3-5434-40b1-93fa-7db47e417f60@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231201-feature_poe-v2-2-56d8cac607fa@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+On Fri, Dec 01, 2023 at 06:10:24PM +0100, Kory Maincent wrote:
+> In the current PSE interface for Ethernet Power Equipment, support is
+> limited to PoDL. This patch extends the interface to accommodate the
+> objects specified in IEEE 802.3-2022 145.2 for Power sourcing
+> Equipment (PSE).
+> 
+> The following objects are now supported and considered mandatory:
+> - IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus
+> - IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+> - IEEE 802.3-2022 30.9.1.2.1 aPSEAdminControl
+> 
+> To avoid confusion between "PoDL PSE" and "PoE PSE", which have similar
+> names but distinct values, we have followed the suggestion of Oleksij
+> Rempel and Andrew Lunn to maintain separate naming schemes for each,
+> using c33 (clause 33) prefix for "PoE PSE".
+> You can find more details in the discussion threads here:
+> https://lore.kernel.org/netdev/20230912110637.GI780075@pengutronix.de/
+> https://lore.kernel.org/netdev/2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch/
+> 
+> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Thank you very much for review. See below.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-On 2023/12/2 00:30, Alexandra Winter wrote:
-> 
-> 
-> On 30.11.23 12:28, Wen Gu wrote:
-> [...]
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 766a1f1..d1e18bf 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
-> [...]
->> @@ -1048,7 +1048,8 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
->>   {
->>   	int rc = SMC_CLC_DECL_NOSMCDDEV;
->>   	struct smcd_dev *smcd;
->> -	int i = 1;
->> +	int i = 1, entry = 1;
->> +	bool is_virtual;
->>   	u16 chid;
->>   
->>   	if (smcd_indicated(ini->smc_type_v1))
->> @@ -1060,14 +1061,23 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
->>   		chid = smc_ism_get_chid(smcd);
->>   		if (!smc_find_ism_v2_is_unique_chid(chid, ini, i))
->>   			continue;
->> +		is_virtual = __smc_ism_is_virtual(chid);
->>   		if (!smc_pnet_is_pnetid_set(smcd->pnetid) ||
->>   		    smc_pnet_is_ndev_pnetid(sock_net(&smc->sk), smcd->pnetid)) {
->> +			if (is_virtual && entry == SMC_MAX_ISM_DEVS)
->> +				/* only one GID-CHID entry left in CLC Proposal SMC-Dv2
->> +				 * extension. but a virtual ISM device's GID takes two
->> +				 * entries. So give up it and try the next potential ISM
->> +				 * device.
->> +				 */
-> 
-> It is really importatnt to note that virtual ISMs take 2 entries.
-> But it is still hard to understand this piece of code. e.g. I was wondering for a while,
-> why you mention CLC here...
-> Maybe it would be easier to understand this, if you rename SMC_MAX_ISM_DEVS to something else?
-> Something like SMCD_MAX_V2_GID_ENTRIES?
-> 
+Thx!
 
-I agree.
-
-But I perfer to define a new macro to represent the max ISMv2 entries in CLC proposal message,
-e.g. SMCD_CLC_MAX_V2_GID_ENTRIES, and keep using SMC_MAX_ISM_DEVS to represent the max devices
-that can be proposed. Both semantics are required in the code, such as:
-
-ini->ism_dev[SMC_MAX_ISM_DEVS]        | smcd_v2_ext->gidchid[SMCD_CLC_MAX_V2_GID_ENTRIES]
--------------------------------------------------------------------------------------------
-[1:virtual_ISM_1]                     | [1:virtual_ISM_1 GID]
-                                       | [2:virtual_ISM_1 extension GID]
-[2:ISM_2]                             | [3:ISM_2 GID/CHID]
-[3:ISM_3]                             | [4:ISM_3 GID/CHID]
-
-And SMC_MAX_ISM_DEVS is required no more than SMCD_CLC_MAX_V2_GID_ENTRIES.
-
->> +				continue;
->>   			ini->ism_dev[i] = smcd;
->>   			ini->ism_chid[i] = chid;
->>   			ini->is_smcd = true;
->>   			rc = 0;
->>   			i++;
->> -			if (i > SMC_MAX_ISM_DEVS)
->> +			entry = is_virtual ? entry + 2 : entry + 1;
->> +			if (entry > SMC_MAX_ISM_DEVS)
->>   				break;
->>   		}
->>   	}
-> [...]
+> ---
+> 
+> Changes in v2:
+> - Rename all the PoE variables and enum with a c33 prefix.
+> - Add documentation, thanks to Oleksij for having written one.
+> ---
+>  Documentation/networking/pse-pd/introduction.rst | 73 ++++++++++++++++++++++++
+>  include/linux/pse-pd/pse.h                       |  9 +++
+>  include/uapi/linux/ethtool.h                     | 43 ++++++++++++++
+>  include/uapi/linux/ethtool_netlink.h             |  3 +
+>  4 files changed, 128 insertions(+)
+> 
+> diff --git a/Documentation/networking/pse-pd/introduction.rst b/Documentation/networking/pse-pd/introduction.rst
+> new file mode 100644
+> index 000000000000..e213083b9aff
+> --- /dev/null
+> +++ b/Documentation/networking/pse-pd/introduction.rst
+> @@ -0,0 +1,73 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Power Sourcing Equipment (PSE) in IEEE 802.3 Standard
+> +=====================================================
+> +
+> +Overview
+> +--------
+> +
+> +Power Sourcing Equipment (PSE) is essential in networks for delivering power
+> +along with data over Ethernet cables. It usually refers to devices like
+> +switches and hubs that supply power to Powered Devices (PDs) such as IP
+> +cameras, VoIP phones, and wireless access points.
+> +
+> +PSE vs. PoDL PSE
+> +----------------
+> +
+> +PSE in the IEEE 802.3 standard generally refers to equipment that provides
+> +power alongside data over Ethernet cables, typically associated with Power over
+> +Ethernet (PoE).
+> +
+> +PoDL PSE, or Power over Data Lines PSE, specifically denotes PSEs operating
+> +with single balanced twisted-pair PHYs, as per Clause 104 of IEEE 802.3. PoDL
+> +is significant in contexts like automotive and industrial controls where power
+> +and data delivery over a single pair is advantageous.
+> +
+> +IEEE 802.3-2018 Addendums and Related Clauses
+> +----------------------------------------------
+> +
+> +Key addenda to the IEEE 802.3-2018 standard relevant to power delivery over
+> +Ethernet are as follows:
+> +
+> +- **802.3af (Approved in 2003-06-12)**: Known as PoE in the market, detailed in
+> +  Clause 33, delivering up to 15.4W of power.
+> +- **802.3at (Approved in 2009-09-11)**: Marketed as PoE+, enhancing PoE as
+> +  covered in Clause 33, increasing power delivery to up to 30W.
+> +- **802.3bt (Approved in 2018-09-27)**: Known as 4PPoE in the market, outlined
+> +  in Clause 33. Type 3 delivers up to 60W, and Type 4 up to 100W.
+> +- **802.3bu (Approved in 2016-12-07)**: Formerly referred to as PoDL, detailed
+> +  in Clause 104. Introduces Classes 0 - 9. Class 9 PoDL PSE delivers up to ~65W
+> +
+> +Kernel Naming Convention Recommendations
+> +----------------------------------------
+> +
+> +For clarity and consistency within the Linux kernel's networking subsystem, the
+> +following naming conventions are recommended:
+> +
+> +- For general PSE (PoE) code, use "c33_pse" key words. For example:
+> +  ``enum ethtool_c33_pse_admin_state c33_admin_control;``.
+> +  This aligns with Clause 33, encompassing various PoE forms.
+> +
+> +- For PoDL PSE - specific code, use "podl_pse". For example:
+> +  ``enum ethtool_podl_pse_admin_state podl_admin_control;`` to differentiate
+> +  PoDL PSE settings according to Clause 104.
+> +
+> +Summary of Clause 33: Data Terminal Equipment (DTE) Power via Media Dependent Interface (MDI)
+> +-------------------------------------------------------------------------------------------
+> +
+> +Clause 33 of the IEEE 802.3 standard defines the functional and electrical
+> +characteristics of Powered Device (PD) and Power Sourcing Equipment (PSE).
+> +These entities enable power delivery using the same generic cabling as for data
+> +transmission, integrating power with data communication for devices such as
+> +10BASE-T, 100BASE-TX, or 1000BASE-T.
+> +
+> +Summary of Clause 104: Power over Data Lines (PoDL) of Single Balanced Twisted-Pair Ethernet
+> +-------------------------------------------------------------------------------------------
+> +
+> +Clause 104 of the IEEE 802.3 standard delineates the functional and electrical
+> +characteristics of PoDL Powered Devices (PDs) and PoDL Power Sourcing Equipment
+> +(PSEs). These are designed for use with single balanced twisted-pair Ethernet
+> +Physical Layers. In this clause, 'PSE' refers specifically to PoDL PSE, and
+> +'PD' to PoDL PD. The key intent is to provide devices with a unified interface
+> +for both data and the power required to process this data over a single
+> +balanced twisted-pair Ethernet connection.
+> diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+> index 199cf4ae3cf2..be4e5754eb24 100644
+> --- a/include/linux/pse-pd/pse.h
+> +++ b/include/linux/pse-pd/pse.h
+> @@ -17,9 +17,12 @@ struct pse_controller_dev;
+>   *
+>   * @podl_admin_control: set PoDL PSE admin control as described in
+>   *	IEEE 802.3-2018 30.15.1.2.1 acPoDLPSEAdminControl
+> + * @c33_admin_control: set PSE admin control as described in
+> + *	IEEE 802.3-2022 30.9.1.2.1 acPSEAdminControl
+>   */
+>  struct pse_control_config {
+>  	enum ethtool_podl_pse_admin_state podl_admin_control;
+> +	enum ethtool_c33_pse_admin_state c33_admin_control;
+>  };
+>  
+>  /**
+> @@ -29,10 +32,16 @@ struct pse_control_config {
+>   *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+>   * @podl_pw_status: power detection status of the PoDL PSE.
+>   *	IEEE 802.3-2018 30.15.1.1.3 aPoDLPSEPowerDetectionStatus:
+> + * @c33_admin_state: operational state of the PSE
+> + *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+> + * @c33_pw_status: power detection status of the PSE.
+> + *	IEEE 802.3-2022 30.9.1.1.5 aPSEPowerDetectionStatus:
+>   */
+>  struct pse_control_status {
+>  	enum ethtool_podl_pse_admin_state podl_admin_state;
+>  	enum ethtool_podl_pse_pw_d_status podl_pw_status;
+> +	enum ethtool_c33_pse_admin_state c33_admin_state;
+> +	enum ethtool_c33_pse_pw_d_status c33_pw_status;
+>  };
+>  
+>  /**
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index f7fba0dc87e5..1d1631f009fa 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -752,6 +752,49 @@ enum ethtool_module_power_mode {
+>  	ETHTOOL_MODULE_POWER_MODE_HIGH,
+>  };
+>  
+> +/**
+> + * enum ethtool_c33_pse_admin_state - operational state of the PoDL PSE
+> + *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
+> + * @ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN: state of PSE functions is unknown
+> + * @ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED: PSE functions are disabled
+> + * @ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED: PSE functions are enabled
+> + */
+> +enum ethtool_c33_pse_admin_state {
+> +	ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN = 1,
+> +	ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
+> +	ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED,
+> +};
+> +
+> +/**
+> + * enum ethtool_c33_pse_pw_d_status - power detection status of the PSE.
+> + *	IEEE 802.3-2022 30.9.1.1.3 aPoDLPSEPowerDetectionStatus:
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN: PSE status is unknown
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: "The enumeration “disabled”
+> + *	indicates that the PSE State diagram is in the state DISABLED."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: "The enumeration “searching”
+> + *	indicates the PSE State diagram is in a state other than those
+> + *	listed."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: "The enumeration
+> + *	“deliveringPower” indicates that the PSE State diagram is in the
+> + *	state POWER_ON."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: "The enumeration “test” indicates that
+> + *	the PSE State diagram is in the state TEST_MODE."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: "The enumeration “fault” indicates that
+> + *	the PSE State diagram is in the state TEST_ERROR."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: "The enumeration “otherFault”
+> + *	indicates that the PSE State diagram is in the state IDLE due to
+> + *	the variable error_condition = true."
+> + */
+> +enum ethtool_c33_pse_pw_d_status {
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN = 1,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_TEST,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_FAULT,
+> +	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
+> +};
+> +
+>  /**
+>   * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
+>   *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+> diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+> index 73e2c10dc2cc..ba805285e408 100644
+> --- a/include/uapi/linux/ethtool_netlink.h
+> +++ b/include/uapi/linux/ethtool_netlink.h
+> @@ -895,6 +895,9 @@ enum {
+>  	ETHTOOL_A_PODL_PSE_ADMIN_STATE,		/* u32 */
+>  	ETHTOOL_A_PODL_PSE_ADMIN_CONTROL,	/* u32 */
+>  	ETHTOOL_A_PODL_PSE_PW_D_STATUS,		/* u32 */
+> +	ETHTOOL_A_C33_PSE_ADMIN_STATE,		/* u32 */
+> +	ETHTOOL_A_C33_PSE_ADMIN_CONTROL,	/* u32 */
+> +	ETHTOOL_A_C33_PSE_PW_D_STATUS,		/* u32 */
+>  
+>  	/* add new constants above here */
+>  	__ETHTOOL_A_PSE_CNT,
+> 
+> -- 
+> 2.25.1
 > 
 > 
-> 
->> @@ -2154,18 +2176,35 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
->>   	smcd_v2_ext = smc_get_clc_smcd_v2_ext(smc_v2_ext);
->>   
->>   	mutex_lock(&smcd_dev_list.mutex);
->> -	if (pclc_smcd->ism.chid)
->> +	if (pclc_smcd->ism.chid) {
->>   		/* check for ISM device matching proposed native ISM device */
->> +		smcd_gid.gid = ntohll(pclc_smcd->ism.gid);
->> +		smcd_gid.gid_ext = 0;
->>   		smc_check_ism_v2_match(ini, ntohs(pclc_smcd->ism.chid),
->> -				       ntohll(pclc_smcd->ism.gid), &matches);
->> +				       &smcd_gid, &matches);
->> +	}
->>   	for (i = 1; i <= smc_v2_ext->hdr.ism_gid_cnt; i++) {
-> 
-> IMO the following code would be easier to read, if you change the above to count
-> from i = 0; i < smc_v2_ext->hdr.ism_gid_cnt;
-> and then use i and i+1 as indexes below.
-> 
-
-Thank you. I will change this.
-
->>   		/* check for ISM devices matching proposed non-native ISM
->>   		 * devices
->>   		 */
->> -		smc_check_ism_v2_match(ini,
->> -				       ntohs(smcd_v2_ext->gidchid[i - 1].chid),
->> -				       ntohll(smcd_v2_ext->gidchid[i - 1].gid),
->> -				       &matches);
->> +		smcd_gid.gid = ntohll(smcd_v2_ext->gidchid[i - 1].gid);
->> +		smcd_gid.gid_ext = 0;
->> +		chid = ntohs(smcd_v2_ext->gidchid[i - 1].chid);
->> +		if (__smc_ism_is_virtual(chid)) {
->> +			if (i == smc_v2_ext->hdr.ism_gid_cnt ||
->> +			    chid != ntohs(smcd_v2_ext->gidchid[i].chid))
->> +				/* a virtual ISM device takes two GID-CHID entries
->> +				 * and CHID of the second entry repeats that of the
->> +				 * first entry.
->> +				 *
->> +				 * So check if the second GID-CHID entry exists and
->> +				 * the CHIDs of these two entries are the same.
->> +				 */
->> +				continue;
->> +
->> +			smcd_gid.gid_ext = ntohll(smcd_v2_ext->gidchid[i++].gid);
->> +		}
->> +		smc_check_ism_v2_match(ini, chid, &smcd_gid, &matches);
->>   	}
->>   	mutex_unlock(&smcd_dev_list.mutex);
->>   
-> [...]
-> 
-> 
-> 
->> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
->> index e2e437b..2d8bc0b 100644
->> --- a/net/smc/smc_clc.c
->> +++ b/net/smc/smc_clc.c
-> [...]
->> @@ -1020,23 +1033,28 @@ static int smc_clc_send_confirm_accept(struct smc_sock *smc,
->>   	if (first_contact)
->>   		clc->hdr.typev2 |= SMC_FIRST_CONTACT_MASK;
->>   	if (conn->lgr->is_smcd) {
-> 
-> It would be nice to have 2 subfunctions for ism and rdma instead of this large if/else block.
-> 
-
-OK. I will introduce two subfunctions in a separate patch.
-
->> +		struct smcd_gid smcd_gid;
->> +		u16 chid;
->> +
->>   		/* SMC-D specific settings */
->>   		memcpy(clc->hdr.eyecatcher, SMCD_EYECATCHER,
->>   		       sizeof(SMCD_EYECATCHER));
->> +		conn->lgr->smcd->ops->get_local_gid(conn->lgr->smcd, &smcd_gid);
->>   		clc->hdr.typev1 = SMC_TYPE_D;
->> -		clc->d0.gid =
->> -			conn->lgr->smcd->ops->get_local_gid(conn->lgr->smcd);
->> -		clc->d0.token = conn->rmb_desc->token;
->> +		clc->d0.gid = htonll(smcd_gid.gid);
->> +		clc->d0.token = htonll(conn->rmb_desc->token);
->>   		clc->d0.dmbe_size = conn->rmbe_size_comp;
->>   		clc->d0.dmbe_idx = 0;
->>   		memcpy(&clc->d0.linkid, conn->lgr->id, SMC_LGR_ID_SIZE);
->>   		if (version == SMC_V1) {
->>   			clc->hdr.length = htons(SMCD_CLC_ACCEPT_CONFIRM_LEN);
->>   		} else {
->> -			clc_v2->d1.chid =
->> -				htons(smc_ism_get_chid(conn->lgr->smcd));
->> +			chid = smc_ism_get_chid(conn->lgr->smcd);
->> +			clc_v2->d1.chid = htons(chid);
->>   			if (eid && eid[0])
->>   				memcpy(clc_v2->d1.eid, eid, SMC_MAX_EID_LEN);
->> +			if (__smc_ism_is_virtual(chid))
->> +				clc_v2->d1.gid_ext = htonll(smcd_gid.gid_ext);
->>   			len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
->>   			if (first_contact) {
->>   				fce_len = smc_clc_fill_fce_v2x(&fce_v2x, ini);
->> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
->> index e64c235..dcc63f4 100644
->> --- a/net/smc/smc_clc.h
->> +++ b/net/smc/smc_clc.h
->> @@ -205,8 +205,8 @@ struct smcr_clc_msg_accept_confirm {	/* SMCR accept/confirm */
->>   } __packed;
->>   
->>   struct smcd_clc_msg_accept_confirm_common {	/* SMCD accept/confirm */
->> -	u64 gid;		/* Sender GID */
->> -	u64 token;		/* DMB token */
->> +	__be64 gid;		/* Sender GID */
->> +	__be64 token;		/* DMB token */
-> 
-> Good catch, that this needs to be __be. (including the host to net conversions you did above)
-> This is not related to the subject of this patch though. So either this should be in a separate patch
-> or at least mentioned in the commit message.
-> 
-
-Thank you. I will doing this in a separate patch.
-
->>   	u8 dmbe_idx;		/* DMBE index */
->>   #if defined(__BIG_ENDIAN_BITFIELD)
->>   	u8 dmbe_size : 4,	/* buf size (compressed) */
->> @@ -285,8 +285,8 @@ struct smc_clc_msg_accept_confirm_v2 {	/* clc accept / confirm message */
->>   			struct smcd_clc_msg_accept_confirm_common d0;
->>   			__be16 chid;
->>   			u8 eid[SMC_MAX_EID_LEN];
->> -			u8 reserved5[8];
->> -		} d1;
->> +			__be64 gid_ext;
->> +		} __packed d1;
->>   	};
->>   };
->>   
->> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
->> index d520ee6..32eece5 100644
->> --- a/net/smc/smc_core.c
->> +++ b/net/smc/smc_core.> @@ -506,6 +506,7 @@ static int smc_nl_fill_smcd_lgr(struct smc_link_group *lgr,
->>   {
->>   	char smc_pnet[SMC_MAX_PNETID_LEN + 1];
->>   	struct smcd_dev *smcd = lgr->smcd;
->> +	struct smcd_gid smcd_gid;
->>   	struct nlattr *attrs;
->>   	void *nlh;
->>   
->> @@ -521,11 +522,11 @@ static int smc_nl_fill_smcd_lgr(struct smc_link_group *lgr,
->>   
->>   	if (nla_put_u32(skb, SMC_NLA_LGR_D_ID, *((u32 *)&lgr->id)))
->>   		goto errattr;
->> +	smcd->ops->get_local_gid(smcd, &smcd_gid);
->>   	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_GID,
->> -			      smcd->ops->get_local_gid(smcd),
->> -				  SMC_NLA_LGR_D_PAD))
->> +			      smcd_gid.gid, SMC_NLA_LGR_D_PAD))
->>   		goto errattr;
->> -	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_PEER_GID, lgr->peer_gid,
->> +	if (nla_put_u64_64bit(skb, SMC_NLA_LGR_D_PEER_GID, lgr->peer_gid.gid,
->>   			      SMC_NLA_LGR_D_PAD))
->>   		goto errattr;
-> 
-> For virtual ism, you will only see the first half of the GID.
-> Is that acceptable? Today we use netlink only for display purposes.
-> What if somebody uses the netlink content as functional input to a user space program?
 > 
 
-Thank you for the consideration. I will improve the netlink code about GID.
-
-> 
->>   	if (nla_put_u8(skb, SMC_NLA_LGR_D_VLAN_ID, lgr->vlan_id))
->> @@ -876,7 +877,10 @@ static int smc_lgr_create(struct smc_sock *smc, struct smc_init_info *ini)
->>   		/* SMC-D specific settings */
-> 
-> 
-> I guess I never really understood, why we define a single linkgroup for SMC-D.
-> Probably because SMC-R linkgroups were implemented before SMC-D support was added.
-My understand is similar to yours, that SMC-D reuses LGR concept to anchor all
-connections with a specific peer.
-
-> To all: Do we want to keep that concept?
-> 
-> 
-I guess the concern is that the 'group' semantic is not clear in SMC-D?
-IMHO it is acceptable and SMC-R also supports single link now. So I tend to keep
-the concept in both SMC-R and SMC-D. Let's hear some other opinions as well.
-
->>   		smcd = ini->ism_dev[ini->ism_selected];
->>   		get_device(smcd->ops->get_dev(smcd));
->> -		lgr->peer_gid = ini->ism_peer_gid[ini->ism_selected];
->> +		lgr->peer_gid.gid =
->> +			ini->ism_peer_gid[ini->ism_selected].gid;
->> +		lgr->peer_gid.gid_ext =
->> +			ini->ism_peer_gid[ini->ism_selected].gid_ext;
->>   		lgr->smcd = ini->ism_dev[ini->ism_selected];
->>   		lgr_list = &ini->ism_dev[ini->ism_selected]->lgr_list;
->>   		lgr_lock = &lgr->smcd->lgr_lock;
->> @@ -1514,7 +1518,8 @@ void smc_lgr_terminate_sched(struct smc_link_group *lgr)
->>   }
->>   
->>   /* Called when peer lgr shutdown (regularly or abnormally) is received */
->> -void smc_smcd_terminate(struct smcd_dev *dev, u64 peer_gid, unsigned short vlan)
->> +void smc_smcd_terminate(struct smcd_dev *dev, struct smcd_gid *peer_gid,
->> +			unsigned short vlan)
->>   {
->>   	struct smc_link_group *lgr, *l;
->>   	LIST_HEAD(lgr_free_list);
->> @@ -1522,9 +1527,12 @@ void smc_smcd_terminate(struct smcd_dev *dev, u64 peer_gid, unsigned short vlan)
->>   	/* run common cleanup function and build free list */
->>   	spin_lock_bh(&dev->lgr_lock);
->>   	list_for_each_entry_safe(lgr, l, &dev->lgr_list, list) {
->> -		if ((!peer_gid || lgr->peer_gid == peer_gid) &&
->> +		if ((!peer_gid->gid ||
->> +		     (lgr->peer_gid.gid == peer_gid->gid &&
->> +		      !smc_ism_is_virtual(dev) ? 1 :
->> +		      lgr->peer_gid.gid_ext == peer_gid->gid_ext)) &&
->>   		    (vlan == VLAN_VID_MASK || lgr->vlan_id == vlan)) {
->> -			if (peer_gid) /* peer triggered termination */
->> +			if (peer_gid->gid) /* peer triggered termination */
->>   				lgr->peer_shutdown = 1;
->>   			list_move(&lgr->list, &lgr_free_list);
->>   			lgr->freeing = 1;
->> @@ -1859,10 +1867,12 @@ static bool smcr_lgr_match(struct smc_link_group *lgr, u8 smcr_version,
->>   	return false;
->>   }
->>   
->> -static bool smcd_lgr_match(struct smc_link_group *lgr,
->> -			   struct smcd_dev *smcismdev, u64 peer_gid)
->> +static bool smcd_lgr_match(struct smc_link_group *lgr, struct smcd_dev *smcismdev,
->> +			   struct smcd_gid *peer_gid)
->>   {
->> -	return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
->> +	return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
->> +		smc_ism_is_virtual(smcismdev) ?
->> +		(lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
->>   }
->>   
->>   /* create a new SMC connection (and a new link group if necessary) */
->> @@ -1892,7 +1902,7 @@ int smc_conn_create(struct smc_sock *smc, struct smc_init_info *ini)
->>   		write_lock_bh(&lgr->conns_lock);
->>   		if ((ini->is_smcd ?
->>   		     smcd_lgr_match(lgr, ini->ism_dev[ini->ism_selected],
->> -				    ini->ism_peer_gid[ini->ism_selected]) :
->> +				    &ini->ism_peer_gid[ini->ism_selected]) :
->>   		     smcr_lgr_match(lgr, ini->smcr_version,
->>   				    ini->peer_systemid,
->>   				    ini->peer_gid, ini->peer_mac, role,
-> [...]
->> diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
->> index a584613..c180c18 100644
->> --- a/net/smc/smc_diag.c
->> +++ b/net/smc/smc_diag.c
->> @@ -21,6 +21,7 @@
->>   
->>   #include "smc.h"
->>   #include "smc_core.h"
->> +#include "smc_ism.h"
->>   
->>   struct smc_diag_dump_ctx {
->>   	int pos[2];
->> @@ -168,12 +169,14 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
->>   		struct smc_connection *conn = &smc->conn;
->>   		struct smcd_diag_dmbinfo dinfo;
->>   		struct smcd_dev *smcd = conn->lgr->smcd;
->> +		struct smcd_gid smcd_gid;
->>   
->>   		memset(&dinfo, 0, sizeof(dinfo));
->>   
->>   		dinfo.linkid = *((u32 *)conn->lgr->id);
->> -		dinfo.peer_gid = conn->lgr->peer_gid;
->> -		dinfo.my_gid = smcd->ops->get_local_gid(smcd);
->> +		dinfo.peer_gid = conn->lgr->peer_gid.gid;
->> +		smcd->ops->get_local_gid(smcd, &smcd_gid);
->> +		dinfo.my_gid = smcd_gid.gid;
-> 
-> For virtual ism, you will only see the first half of the GID.
-> Is that acceptable?
-
-Thanks. I will improve the netlink code about extended GID.
-> 
->>   		dinfo.token = conn->rmb_desc->token;
->>   		dinfo.peer_token = conn->peer_token;
->>   
->> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
->> index fbee249..a33f861 100644
->> --- a/net/smc/smc_ism.c
->> +++ b/net/smc/smc_ism.c
-> 
-> Some of the content of this file is specific to s390 firmware ISMs and some is
-> relevant to all future ism devices.
-> IMO there is some more work to do to create a clean "smcd-protocol to scmd-device" interface.
-> Maybe also some moving between this file and drivers/s390/net/ism_drv.c
-> 
-> Maybe this would be a good next patchset?
-> 
-> Whoever takes this work, remember:
-> https://lore.kernel.org/netdev/1c6bdfbf-54c1-4251-916e-9a703a9f644c@infradead.org/T/
-> We want to be able to combine SMC, ISM and future kernel modules in any combination.
-> Gerd's patch above was meant to solve the current problem. For additional ism devices,
-> we need some more improvements, I think.
-> 
->
-That's a good suggestion.
-
-The clean interface requires general consideration. I think it's better to design it
-after loopback-ism is introduced since loopback-ism can be an appropriate example to
-see what should be remained in smc_ism.{c|h} for all kinds of ISMs and what should be
-moved to specific drivers.
-
-I will record it to my list, but I am not sure if I can find an s390 environment to
-develop and test. And anyone else who has interests in this, feel free to take, just
-remember to let others know.
-
-> 
-> 
-> 
->> @@ -44,7 +44,8 @@ static void smcd_handle_irq(struct ism_dev *ism, unsigned int dmbno,
->>   #endif
->>   
->>   /* Test if an ISM communication is possible - same CPC */
->> -int smc_ism_cantalk(u64 peer_gid, unsigned short vlan_id, struct smcd_dev *smcd)
->> +int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
->> +		    struct smcd_dev *smcd)
->>   {
->>   	return smcd->ops->query_remote_gid(smcd, peer_gid, vlan_id ? 1 : 0,
->>   					   vlan_id);
->> @@ -208,7 +209,7 @@ int smc_ism_register_dmb(struct smc_link_group *lgr, int dmb_len,
->>   	dmb.dmb_len = dmb_len;
->>   	dmb.sba_idx = dmb_desc->sba_idx;
->>   	dmb.vlan_id = lgr->vlan_id;
->> -	dmb.rgid = lgr->peer_gid;
->> +	dmb.rgid = lgr->peer_gid.gid;
->>   	rc = lgr->smcd->ops->register_dmb(lgr->smcd, &dmb, &smc_ism_client);
->>   	if (!rc) {
->>   		dmb_desc->sba_idx = dmb.sba_idx;
->> @@ -340,18 +341,20 @@ struct smc_ism_event_work {
->>   
->>   static void smcd_handle_sw_event(struct smc_ism_event_work *wrk)
->>   {
->> +	struct smcd_gid peer_gid = { .gid = wrk->event.tok,
->> +				     .gid_ext = 0 };
->>   	union smcd_sw_event_info ev_info;
->>   
->>   	ev_info.info = wrk->event.info;
->>   	switch (wrk->event.code) {
->>   	case ISM_EVENT_CODE_SHUTDOWN:	/* Peer shut down DMBs */
->> -		smc_smcd_terminate(wrk->smcd, wrk->event.tok, ev_info.vlan_id);
->> +		smc_smcd_terminate(wrk->smcd, &peer_gid, ev_info.vlan_id);
->>   		break;
->>   	case ISM_EVENT_CODE_TESTLINK:	/* Activity timer */
->>   		if (ev_info.code == ISM_EVENT_REQUEST) {
->>   			ev_info.code = ISM_EVENT_RESPONSE;
->>   			wrk->smcd->ops->signal_event(wrk->smcd,
->> -						     wrk->event.tok,
->> +						     &peer_gid,
->>   						     ISM_EVENT_REQUEST_IR,
->>   						     ISM_EVENT_CODE_TESTLINK,
->>   						     ev_info.info);
->> @@ -365,10 +368,12 @@ static void smc_ism_event_work(struct work_struct *work)
->>   {
->>   	struct smc_ism_event_work *wrk =
->>   		container_of(work, struct smc_ism_event_work, work);
->> +	struct smcd_gid smcd_gid = { .gid = wrk->event.tok,
->> +				     .gid_ext = 0 };
->>   
->>   	switch (wrk->event.type) {
->>   	case ISM_EVENT_GID:	/* GID event, token is peer GID */
->> -		smc_smcd_terminate(wrk->smcd, wrk->event.tok, VLAN_VID_MASK);
->> +		smc_smcd_terminate(wrk->smcd, &smcd_gid, VLAN_VID_MASK);
->>   		break;
->>   	case ISM_EVENT_DMB:
->>   		break;
->> @@ -525,7 +530,7 @@ int smc_ism_signal_shutdown(struct smc_link_group *lgr)
->>   	memcpy(ev_info.uid, lgr->id, SMC_LGR_ID_SIZE);
->>   	ev_info.vlan_id = lgr->vlan_id;
->>   	ev_info.code = ISM_EVENT_REQUEST;
->> -	rc = lgr->smcd->ops->signal_event(lgr->smcd, lgr->peer_gid,
->> +	rc = lgr->smcd->ops->signal_event(lgr->smcd, &lgr->peer_gid,
->>   					  ISM_EVENT_REQUEST_IR,
->>   					  ISM_EVENT_CODE_SHUTDOWN,
->>   					  ev_info.info);
-> [...]
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
