@@ -1,84 +1,111 @@
-Return-Path: <netdev+bounces-53457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4B3803082
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:37:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F31E803109
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13A5B20A60
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:37:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03CE31F20F4B
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18732209F;
-	Mon,  4 Dec 2023 10:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29000224D4;
+	Mon,  4 Dec 2023 10:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jGrqD6aq"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="VTaVjTkA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9C7B6;
-	Mon,  4 Dec 2023 02:37:39 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9748F60010;
-	Mon,  4 Dec 2023 10:37:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701686257;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RnURjJz1zj2iI+Yo08gh8Y5xpFjyOss3hVk+wsOXKm8=;
-	b=jGrqD6aq+br++ssVKJLITkxZqRn5OtU0PmFkMwy1JHMs4Yr27JJXvdDuLlmazSBSV9wkTh
-	pjzadBBumg1jw3zflVi2UqDfTCrgectVRDLD/LE0P5p4BJyZQbMAI8v4L4A0i0HH82jXQL
-	4yFGII6gzx1nICwaGEqmzG/qZDu/iT36Cao6K3OvmUdjw7SnzYZ9YwXLWqQBDGW10I4gIN
-	R7Rxj2QBu3tSsw4ZaSwxRXV6JojayJf+3Dlz3bGIeCm2hJL7RcvLq7PGUb5JnK5AZ1+TTM
-	sge2LNL3bnJpC0L9asM90j7KIgmhGS4869MVOOq1CpLHvjSpmerdqI/KlRMEtg==
-Date: Mon, 4 Dec 2023 11:37:32 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>
-Subject: Re: [RFC PATCH net-next v3 08/13] netlink: specs: add ethnl PHY_GET
- command set
-Message-ID: <20231204113732.052e1b78@device.home>
-In-Reply-To: <20231201163704.1306431-9-maxime.chevallier@bootlin.com>
-References: <20231201163704.1306431-1-maxime.chevallier@bootlin.com>
-	<20231201163704.1306431-9-maxime.chevallier@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D1AC0;
+	Mon,  4 Dec 2023 02:57:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=Rgr+/K/w178VZ6/C4ZZl3geFP4puFUQtC1oJjlaIDGs=;
+	t=1701687469; x=1702897069; b=VTaVjTkAksCfU224mQZzERayeFXqC+IE+t1SAuhzW4p9k1o
+	MsIqTvPBYtdfqShFRE9w4KX7q9K1QZpvLgAaXeMw3Qn/fEVMgbjpBrnTe2svKjy27R8/zqvU6qUrG
+	eSXXvVaKwCetuoMmjx3xVzFLZatUeCgi2uEly4EbIrlL2TzKHpf1EWAxV5+QdDr6LnFQFJFzrNYjy
+	G1woqh2IKmjg86QbHyP6bzf5Je9nGgfJDKRNLZIGUAW5Bxq9DEjaIPIHfOwzwXVPxsPox8HgqOSyC
+	FA6ufEMqLDxb9i+2tbjbMA9VlkVIlWRfGwHqzSjEs/8q7XZ6FUqb3AEgrbGvaZkQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rA6e1-0000000Exe4-30ad;
+	Mon, 04 Dec 2023 11:57:46 +0100
+Message-ID: <69717129398d05b18df1c1300bfb41da268c52a0.camel@sipsolutions.net>
+Subject: Re: Thinkpad P17 keep hanging in ipv6_addrconf addrconf_verify_work
+ / netlink in 6.4 and 6.6
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Marc MERLIN <marc@merlins.org>, Linux Kernel Mailing List
+	 <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ilw@linux.intel.com
+Cc: "Paul E. McKenney" <paulmck@kernel.org>
+Date: Mon, 04 Dec 2023 11:57:44 +0100
+In-Reply-To: <20231204073515.GA9208@merlins.org>
+References: <20231202171326.GB24486@merlins.org>
+	 <20231204004003.GB29484@merlins.org> <20231204073515.GA9208@merlins.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-malware-bazaar: not-scanned
 
-Hi all,
+On Sun, 2023-12-03 at 23:35 -0800, Marc MERLIN wrote:
+> So, I thought that maybe my custom built kernel had options that somehow
+> made P17 unhappy, and went to a stock debian kernel.
+> It's not really looking better with that kernel unfortunately :-/
+>=20
+> Still seems unhappy with networking, first wireless and then ethtool.
+> Adding wireless lists to Cc just in case
 
-On Fri,  1 Dec 2023 17:36:58 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+Well clearly something is not unlocking the RTNL, but digging through
+the below I only found places that want to acquire the RTNL and wait
+forever on it (including wireless), but none that actually got stuck
+while having it acquired already.
 
-> The PHY_GET command, supporting both DUMP and GET operations, is used to
-> retrieve the list of PHYs connected to a netdevice, and get topology
-> information to know where exactly it sits on the physical link.
-> 
-> Add the netlink specs corresponding to that command, and bump the
-> ethtool-user.c|h autogenerated files.
 
-Same as for patch 06, I'll drop the ethtool-user stuff for next version.
+Actually ... no that's wrong.
 
-Maxime
+I can:
+
+> > [  363.945427] INFO: task powertop:6279 blocked for more than 120 secon=
+ds.
+> > [  363.945446]       Tainted: G     U             6.6.3-amd64-preempt-s=
+ysrq-20220227 #4
+> > [  363.945452] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disab=
+les this message.
+> > [  363.945456] task:powertop        state:D stack:0     pid:6279  ppid:=
+6267   flags:0x00004002
+> > [  363.945468] Call Trace:
+> > [  363.945473]  <TASK>
+> > [  363.945481]  __schedule+0xba0/0xc05
+> > [  363.945497]  schedule+0x95/0xce
+> > [  363.945504]  schedule_preempt_disabled+0x15/0x22
+> > [  363.945511]  __mutex_lock.constprop.0+0x18b/0x291
+> > [  363.945520]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
+> > [  363.945531]  igc_resume+0x18b/0x1ca [igc 1a96e277f8878a2a3c9599226ac=
+d0eeb7de577b7]
+
+this is trying to acquire the RTNL, by looking at the code
+
+> > [  363.945566]  __rpm_callback+0x7a/0xe7
+> > [  363.945578]  rpm_callback+0x35/0x64
+> > [  363.945587]  ? __pfx_pci_pm_runtime_resume+0x40/0x40
+> > [  363.945592]  rpm_resume+0x342/0x44a
+> > [  363.945600]  ? __kmem_cache_alloc_node+0x123/0x154
+> > [  363.945614]  __pm_runtime_resume+0x5a/0x7a
+> > [  363.945624]  dev_ethtool+0x15a/0x24e7
+
+but this already holds it
+
+So looks like bug in the 'igc' driver wrt. runtime PM locking.
+
+johannes
+
 
