@@ -1,99 +1,160 @@
-Return-Path: <netdev+bounces-53467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896A880318B
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:31:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CBA98031B0
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 12:43:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2CC81C203A3
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:31:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0968280F44
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC53122EFC;
-	Mon,  4 Dec 2023 11:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JdveWYbj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7041A22F10;
+	Mon,  4 Dec 2023 11:43:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E4EA8
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 03:31:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701689487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jJEZOaCc2w94rl3BlMnubip+8eCagEswLw1gSwc8CGo=;
-	b=JdveWYbjufrUhuG8BUzvnBXbyVNIiDZ/QUGjtVIwMI2spJCazNNfVRvgrppe7mc+C9BYHc
-	R/rMSQUSRVAlzUdJq18T9VYWQ5foJF8Ovf0+nXZE6xJ270sbuwLnsdW4ZyAfDKkKjJtX1r
-	N+He/Ao83KqWlrmisnxr16rxvxKa8Ww=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-486-iQPyttfTPUGA5LOLaM8WOg-1; Mon, 04 Dec 2023 06:31:24 -0500
-X-MC-Unique: iQPyttfTPUGA5LOLaM8WOg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C6147811E7B;
-	Mon,  4 Dec 2023 11:31:23 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.90])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E76391C060AE;
-	Mon,  4 Dec 2023 11:31:20 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: oneukum@suse.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	greg@kroah.com,
-	jtornosm@redhat.com,
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEE3107;
+	Mon,  4 Dec 2023 03:43:26 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0Vxp1Hac_1701690202;
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0Vxp1Hac_1701690202)
+          by smtp.aliyun-inc.com;
+          Mon, 04 Dec 2023 19:43:24 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
 	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	stern@rowland.harvard.edu
-Subject: Re: [PATCH v3] net: usb: ax88179_178a: avoid failed operations when device is disconnected
-Date: Mon,  4 Dec 2023 12:31:18 +0100
-Message-ID: <20231204113119.11247-1-jtornosm@redhat.com>
-In-Reply-To: <4ce32363-378c-4ea3-9a4e-d7274d4f7787@suse.com>
-References: <4ce32363-378c-4ea3-9a4e-d7274d4f7787@suse.com>
+	martin.lau@linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	xuanzhuo@linux.alibaba.com,
+	dust.li@linux.alibaba.com,
+	alibuda@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	hengqi@linux.alibaba.com
+Subject: [PATCH net-next] tcp: add tracepoints for data send/recv/acked
+Date: Mon,  4 Dec 2023 19:43:22 +0800
+Message-Id: <20231204114322.9218-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Hi Oliver,
+Add 3 tracepoints, namely tcp_data_send/tcp_data_recv/tcp_data_acked,
+which will be called every time a tcp data packet is sent, received, and
+acked.
+tcp_data_send: called after a data packet is sent.
+tcp_data_recv: called after a data packet is receviced.
+tcp_data_acked: called after a valid ack packet is processed (some sent
+data are ackknowledged).
 
-> this is much better.
->> ...
-> This is problematic. ndo_stop() is not limited to disconnection.
-> It is also used whenever an interface transitions from up to down.
->> ...
->
-> On a general note, you are going for a belt and suspenders approach.
-> It seems to me that you have two options.
-> 1. Do as Alan suggested and ignore ENODEV. You'd be acknowledging that
-> these devices are hotpluggable and therefore -ENODEV is not an error
-> 2. Use only a flag. But if you do that, you are setting it in the wrong
-> place. It should be set in usbnet_disconnect()
-Thank you for you help, I will do what you say.
-I would like to try 2 first so that it only affects the unbind operation.
-If I find any problem, I will try 1.
+We use these callbacks for fine-grained tcp monitoring, which collects
+and analyses every tcp request/response event information. The whole
+system has been described in SIGMOD'18 (see
+https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
+achieve this with bpf, we require hooks for data events that call bpf
+prog (1) when any data packet is sent/received/acked, and (2) after
+critical tcp state variables have been updated (e.g., snd_una, snd_nxt,
+rcv_nxt). However, existing bpf hooks cannot meet our requirements.
+Besides, these tracepoints help to debug tcp when data send/recv/acked.
 
-> O and, well, this is a very mior issue, but you've introduced a memory
-> ordering issue. You ought to use smp_wmb() after setting the flag and
-> smp_rmb() before reading it.
-Thank you again, I'll keep that in mind
+Though kretprobe/fexit can also be used to collect these information,
+they will not work if the kernel functions get inlined. Considering the
+stability, we prefer tracepoint as the solution.
 
-Best regards
-José Ignacio
+Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
+ include/trace/events/tcp.h | 21 +++++++++++++++++++++
+ net/ipv4/tcp_input.c       |  4 ++++
+ net/ipv4/tcp_output.c      |  2 ++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 7b1ddffa3dfc..1423f7cb73f9 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -113,6 +113,13 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_send_reset,
+ 	TP_ARGS(sk, skb)
+ );
+ 
++DEFINE_EVENT(tcp_event_sk_skb, tcp_data_recv,
++
++	TP_PROTO(const struct sock *sk, const struct sk_buff *skb),
++
++	TP_ARGS(sk, skb)
++);
++
+ /*
+  * tcp event with arguments sk
+  *
+@@ -187,6 +194,20 @@ DEFINE_EVENT(tcp_event_sk, tcp_rcv_space_adjust,
+ 	TP_ARGS(sk)
+ );
+ 
++DEFINE_EVENT(tcp_event_sk, tcp_data_send,
++
++	TP_PROTO(struct sock *sk),
++
++	TP_ARGS(sk)
++);
++
++DEFINE_EVENT(tcp_event_sk, tcp_data_acked,
++
++	TP_PROTO(struct sock *sk),
++
++	TP_ARGS(sk)
++);
++
+ TRACE_EVENT(tcp_retransmit_synack,
+ 
+ 	TP_PROTO(const struct sock *sk, const struct request_sock *req),
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index bcb55d98004c..edb1e24a3423 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -824,6 +824,8 @@ static void tcp_event_data_recv(struct sock *sk, struct sk_buff *skb)
+ 
+ 	now = tcp_jiffies32;
+ 
++	trace_tcp_data_recv(sk, skb);
++
+ 	if (!icsk->icsk_ack.ato) {
+ 		/* The _first_ data packet received, initialize
+ 		 * delayed ACK engine.
+@@ -3486,6 +3488,8 @@ static int tcp_clean_rtx_queue(struct sock *sk, const struct sk_buff *ack_skb,
+ 		}
+ 	}
+ #endif
++
++	trace_tcp_data_acked(sk);
+ 	return flag;
+ }
+ 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index eb13a55d660c..cb6f2af55ce2 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2821,6 +2821,8 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
+ 		/* Send one loss probe per tail loss episode. */
+ 		if (push_one != 2)
+ 			tcp_schedule_loss_probe(sk, false);
++
++		trace_tcp_data_send(sk);
+ 		return false;
+ 	}
+ 	return !tp->packets_out && !tcp_write_queue_empty(sk);
+-- 
+2.32.0.3.g01195cf9f
 
 
