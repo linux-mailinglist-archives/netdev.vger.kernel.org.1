@@ -1,173 +1,139 @@
-Return-Path: <netdev+bounces-53543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDED9803A5C
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:35:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CEA8803A67
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 17:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 912311F21226
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6D84280CFC
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 16:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE28A250F3;
-	Mon,  4 Dec 2023 16:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494542E624;
+	Mon,  4 Dec 2023 16:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qo2wA3Tk"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SAolGSb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7190D9B
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 08:34:55 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54ba86ae133so4982130a12.2
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 08:34:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701707694; x=1702312494; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=edBqw88YXJb27IR4+ojupd1HYcnJYWpxxPM3n6v+U4g=;
-        b=Qo2wA3TkxLM5km3vxNFyh6O958rbGWHKh1OWbMuQgc7RFvH5I7w0RRRJnhmP7XEUv+
-         2M5mK5NvAzFRVVX4swnyUzEUSUAfJElpYYHPKVX1PdxZBcwCanieXFOKLwBVvNozw/Od
-         +VMFr8/1XYdN6Q0Fh/hiYRbR+4hdhXnY0Hk6JmkxZqX1xARal8mcp9Oils/o6A8/rZqb
-         K+1f6K8NtD1IS4MZlqXBo4TUMZp+Fb6H1Iss1Gh6nVKijc+y/AP8nJPlDbxJc4+CU0Hj
-         u86zgURF3KLNEbmMdCv8LDSSJaeR1sQ9IcoLnI2f/fxNF1/6R+8fN50Eri/d4d6Z9/Vc
-         CkYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701707694; x=1702312494;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=edBqw88YXJb27IR4+ojupd1HYcnJYWpxxPM3n6v+U4g=;
-        b=qob49Ugl8KYpr6AYa1pDUWWJI1e3DZOXqNtQdGao2GUjJzh5745gezqgVZ0Bmmn8QL
-         qF9XmEIYViiBi7Td/mV9YtL0DjGcfQF9zGbfT4g3Ahxr2wbXbFllge+Sj6NXmjEkvgsH
-         h1ECKMQz8Emr1226z+aQfzyhfxu9QN9Hq0y/CSPC12ERQ5jgkXPcmScTC0uyoYWf2RtS
-         XdWzVcJaGpjwmaFC8DvPnhS+WAYDibWkAn6hhTue91oMyAVfI/S7wsEABdiaTnuvrZAB
-         5Q/L98uVsNyDRQdalUlQe0w0Gwzb7ZbtiOvG/aNqEtaoHcEDPriYMKimUW8Dv3avlj2b
-         /4jA==
-X-Gm-Message-State: AOJu0Yz96IGyPPcP0b7kZOc61cfHkS/1PGOq47ZMDAW/cbfD/yH2GJYy
-	IcmYoYm/RcTuTMhtWvCqR5inf3Qtc0wZXg==
-X-Google-Smtp-Source: AGHT+IFWcbchsupA7NCxjSTVN6Hkd+hXEYI8UIft/OoPttoR96lFfz1BwalEGTZGB/C+LfrejROcWQ==
-X-Received: by 2002:a50:a699:0:b0:54c:84e7:936b with SMTP id e25-20020a50a699000000b0054c84e7936bmr2166665edc.7.1701707693710;
-        Mon, 04 Dec 2023 08:34:53 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id u4-20020aa7d544000000b0054b53aacd86sm4901977edr.65.2023.12.04.08.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 08:34:53 -0800 (PST)
-Date: Mon, 4 Dec 2023 18:34:51 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net: dsa: mv88e6xxx: Add "eth-mac" counter
- group support
-Message-ID: <20231204163451.whx3llb7zvnne433@skbuf>
-References: <20231201125812.1052078-1-tobias@waldekranz.com>
- <20231201125812.1052078-1-tobias@waldekranz.com>
- <20231201125812.1052078-4-tobias@waldekranz.com>
- <20231201125812.1052078-4-tobias@waldekranz.com>
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2089.outbound.protection.outlook.com [40.107.8.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB0E116
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 08:35:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RiGV1PdwDxIKQpZn8WZyxswzgCca5D/86fKuVoykWpVewbhLgAhDcNfipDtZf+w/pHWoBdxtYnx6asQD4dZdBrNxASwAR8FdaZMN/cx6hAHvL/EVgbcPplzM2sAzubN6zBmh+8klaMdOrnPM6HUOaDEeaUtXs78kyZlpACmLaBwbqFYCpYMSWvoobG3BFlWEPZ7jAP0+T8sx6RTLANv4Dc62ozLq/Bav1CXrj+kAnXRJGTKM6dce2okFULfPtI783DXp4pwbusX6EWUma83a6DzbAn08pvR15hDUd06RIhvoILJYP2gv1ecTGpS9um5Gp40f6L7pUnlDclVOfI1CSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZqsCAGZLlBi2zZytwNAZrCFJ8Xtc2Q36K3aHPHwTobY=;
+ b=JBt0GaC+MgI5Rjzp7wDvZNagvDTHEB9lftw4dEQ+uh72dVkgkfSXXOMNxfSmgZjJoIeix6gyEiLJoXKrNjD+0hHTt4/R2HjV/eFqgTGD3KzCsLl92ET4FEibMuJ6l10H1zrF5wtItyr7IjX8VAAVuzOMaOkiRI5WPqaowuvCcvPD93HTvV7OjmF+9RmFqRPjd3CA1C9Ik3Ktnugt4uqB5R27NvuG+zVKrvaw+e1QcXnHtVR8tsE/xZ4mraxO9yPcUyFHZ+AaP3q5YZqOi07ngJwy5XvQTaIbBoSmM9BTmlszJYzNrGAQ5iQliicKeBmnjfP11CnnpuZtH2fEX1yPfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZqsCAGZLlBi2zZytwNAZrCFJ8Xtc2Q36K3aHPHwTobY=;
+ b=SAolGSb0rOSEiKJDYzsKOTxFZrh2nzKzeYc5FBZbAEqrG8IbLA6HswloIm2veklJ1AgaJ3Lt1Qjvb3QgRtpyVCx4ZH+LKKh/asjj8rAzbW/T1LxoEJppkmB7TW75FIQ0IcEZX0nBY+kFsITSpO0ML+1mrKL0glufCfBhkeBJu8E=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
+ by AM9PR04MB8356.eurprd04.prod.outlook.com (2603:10a6:20b:3b4::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.22; Mon, 4 Dec
+ 2023 16:35:54 +0000
+Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::1290:90d4:98c1:3d35]) by GV1PR04MB9070.eurprd04.prod.outlook.com
+ ([fe80::1290:90d4:98c1:3d35%7]) with mapi id 15.20.7068.022; Mon, 4 Dec 2023
+ 16:35:54 +0000
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: Ioana Ciornei <ioana.ciornei@nxp.com>
+Subject: [PATCH 0/8] dpaa2-switch: small improvements
+Date: Mon,  4 Dec 2023 18:35:20 +0200
+Message-Id: <20231204163528.1797565-1-ioana.ciornei@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0441.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c6::10) To GV1PR04MB9070.eurprd04.prod.outlook.com
+ (2603:10a6:150:21::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201125812.1052078-4-tobias@waldekranz.com>
- <20231201125812.1052078-4-tobias@waldekranz.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|AM9PR04MB8356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0200093a-df0f-4264-4ea1-08dbf4e715b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	e7/7ogejGZ/opBrxK5BK2WCA5vsYXtMWm/9qhwcD0dRRPOqj4ck5aOyB1FzC1TcMC3obDefJTphzZrgghTFaLRbu14l0Vd1EDQ9EQXWtCQzsjgpNoIqeADx39GCX7ONyWpmFKedXJdCcgEJYURX2oonkaPMAKTQcic7cQKjm2kHmvgd6uCAR/7hX+urDTnpRAT/TlpkHkflrjvEIjPOl/pvi+FsDgVGIiKpoRpDMpcmyHRhvgiNg8hnQYfItxvi6Yo/9tkv/9VHNfaG0wqXSVvNhiPLnMPNMs36Ai03ueieM9Gh2T5Qu5ZiMv8b+G38lgRNM6mMUBQ/2CmU+VeaIl3kCmS9C30DprXo8B7ospOBWUiHMroiYEmW5XOeB+0b6ZjLWapKdM08g3Bhlojn6kURDMNZYVWrcU2xavTiwvIe0RSgLGGrX9dSCQI6LiuNrp17WAIzsnAr1F4jZIaeSjjxQHKWhCdS0o/Uk3BjupGj72liZUWE3li8W34Z1FPVkH1k3AizyQHbSVcF2qbWsEem5zSSMIanF6sAl9+eHoF80o4L/tqnOM0UCTO63IgnI
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39860400002)(136003)(366004)(396003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(66556008)(66476007)(44832011)(316002)(66946007)(5660300002)(4326008)(8936002)(8676002)(6486002)(38100700002)(83380400001)(86362001)(478600001)(2906002)(6666004)(26005)(2616005)(4744005)(6506007)(6512007)(36756003)(1076003)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5TfHyVjACdvle48nwtAmTZ2TSUHQjjqGNdovjJzgxgBEQzTRx9MLmvgFvKm6?=
+ =?us-ascii?Q?AmePB97XTp+MYPEcJJfKTXMiDxuSLuZF26YxQ9HO3OYm4+t3oOwqyVZVj0g4?=
+ =?us-ascii?Q?qjwpFtKaXT/th17X2ZimCVLytzutE2Wfcg/xVykiuSgvQDlLzW2rxnhxWdG2?=
+ =?us-ascii?Q?JCyUEeC3NaUjovgpRbgRz1mz95eTshk2T1SjO1x4JnjkZnbleKZ62HFBcI1g?=
+ =?us-ascii?Q?mci6/8JxE2OGWWShi7ixz7YiLKrAsAYKd0Qu1OmoroMStJUZ55hyFYyll8Dn?=
+ =?us-ascii?Q?QTNy52zMlo7i4V0p7qpTN5d0EEWu5z87IR591PJFmFf9YPfSKDYoB+23Ta6k?=
+ =?us-ascii?Q?RPvov0rRQCdKG7IQYSn5k2lGDviehlvxAgKPKYywwcQP3k6LG2Zn+zdto0+K?=
+ =?us-ascii?Q?HSC8+3b4QI6Lzvfq5Y5Aj8AUaVIics8VF0BgE2rYrtGmNvxJDT4BagapaEm6?=
+ =?us-ascii?Q?JMQPzQyXvyleZD8+29SM5DLc4WfFMtkn5sFz2V3I/RRvrwW9lV4220i4Zgfv?=
+ =?us-ascii?Q?zicALVrreJo8go0azsfd+JW1H/v6lx8tFPMcjF3adCJteVGVPzj0ZMzggbvA?=
+ =?us-ascii?Q?bZk8CogGwT0oNGTR5ZLRPNjVs5F7xCORKc6tY6UmtzL5o6GKpoPjeInpeO/J?=
+ =?us-ascii?Q?OB+Q5ASoaUjWfWz2xNEEoXvhFuS16c9xadhwe0/nBlx6ngDJsn0VT8fyvMrk?=
+ =?us-ascii?Q?ElllGbOlDxpBGKptt2T6jbJ+bCykrxgH3NhsKKiZ16hUyZOn1mp91AKi1auP?=
+ =?us-ascii?Q?vHn04sZ7ynz8V5Hupu317EH3UtFiYLyALJQBvlV71ub14qUFmS+bISMHDtha?=
+ =?us-ascii?Q?CqQkgSKURMB8Wn2a4Qd4iBsQ7lTUOTgTl5JUf4R2aN3E7xdJ1xmgrgQMZ538?=
+ =?us-ascii?Q?tEwnM5xvb2sbFabjz/5BcXnSqht63NRVbUDIy3AfS7fKRxHFokFF+K+cRSC2?=
+ =?us-ascii?Q?Lglv9vMRm9dOYImuxddDpdJLW9LjcUY6iti5L3d6k5LcC6yeAPd/Jl5DAsy9?=
+ =?us-ascii?Q?dNcxTnW44+QAJoqA7BXKszaPsbGDNcf3VOxDswIdvA3UjEMYVytw4e+r3YE1?=
+ =?us-ascii?Q?Bg+Da47eSfrnA1SW4pz4Mug9HJ4NSCgrmHs8VgbH0rlf0gOod4W/pgL3Lckz?=
+ =?us-ascii?Q?t78CxWV6Rm2n6pyFOJeioiD9u4kO7kiA7ZzrRLX40Oe2e7V+Ear4iRxHM2JA?=
+ =?us-ascii?Q?kQXKrN0iIHBakvOo49/EIU5tlLBpNnqNAn8fniBRCj7esvvse6mQPo1nX54U?=
+ =?us-ascii?Q?PFx2PvPOeK1xorOFPYF/Ywv1mLovSCVCdmzGu4jmeeKPm1LcUiF0p/fSJPeI?=
+ =?us-ascii?Q?kMYcui/hwxKvnH/1FAhViOMg1xc3EXqKTySLc70/WiSwgIXVK59sKrgSU/ws?=
+ =?us-ascii?Q?ioZ7PCERzwUSDwssMJ/i7falNjJ+9LUgFBf4m2xN0gHXTgQ/5TtQV+cNOoe/?=
+ =?us-ascii?Q?gKS/kD5EVeOtpcM7kaIh7QO9/gS62D1kObXKyukRe/n9Z+BvBniQldje0Ah1?=
+ =?us-ascii?Q?YIs0SOH+S5ejYpf/H82ML7P2gE4dKp1TpAm3Zo5DXVYZwfdpF5AwxVHJHync?=
+ =?us-ascii?Q?vni5y3TxMj0i4e/5YkpSv7/WhyWIoE/oGgDz3xrQ?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0200093a-df0f-4264-4ea1-08dbf4e715b6
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2023 16:35:54.3820
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yFi0ImYpJLUCl8hSHhe5Fa7NU6kVgJdS7mCQGRHGjp9TM6Wj2gLP6E7R/x9wFWvhhpkev9VKI+uydGbWnBAAog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8356
 
-On Fri, Dec 01, 2023 at 01:58:11PM +0100, Tobias Waldekranz wrote:
-> Report the applicable subset of an mv88e6xxx port's counters using
-> ethtool's standardized "eth-mac" counter group.
-> 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
->  drivers/net/dsa/mv88e6xxx/chip.c | 52 ++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 71c60f229a2f..51e3744cb89b 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -1320,6 +1320,57 @@ static void mv88e6xxx_get_ethtool_stats(struct dsa_switch *ds, int port,
->  
->  }
->  
-> +static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
-> +					struct ethtool_eth_mac_stats *mac_stats)
-> +{
-> +#define MV88E6XXX_ETH_MAC_STAT_MAPPING(_id, _member)			\
-> +	[MV88E6XXX_HW_STAT_ID_ ## _id] =				\
-> +		offsetof(struct ethtool_eth_mac_stats, stats._member)	\
-> +
-> +	static const size_t stat_map[MV88E6XXX_HW_STAT_ID_MAX] = {
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(out_unicast, FramesTransmittedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(single, SingleCollisionFrames),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(multiple, MultipleCollisionFrames),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(in_unicast, FramesReceivedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(in_fcs_error, FrameCheckSequenceErrors),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(out_octets, OctetsTransmittedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(deferred, FramesWithDeferredXmissions),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(late, LateCollisions),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(in_good_octets, OctetsReceivedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(out_multicasts, MulticastFramesXmittedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(out_broadcasts, BroadcastFramesXmittedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(excessive, FramesWithExcessiveDeferral),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(in_multicasts, MulticastFramesReceivedOK),
-> +		MV88E6XXX_ETH_MAC_STAT_MAPPING(in_broadcasts, BroadcastFramesReceivedOK),
-> +	};
-> +	struct mv88e6xxx_chip *chip = ds->priv;
-> +	const struct mv88e6xxx_hw_stat *stat;
-> +	enum mv88e6xxx_hw_stat_id id;
-> +	u64 *member;
-> +	int ret;
-> +
-> +	mv88e6xxx_reg_lock(chip);
-> +	ret = mv88e6xxx_stats_snapshot(chip, port);
-> +	mv88e6xxx_reg_unlock(chip);
+This patch set consists of a series of small improvements on the
+dpaa2-switch driver ranging from adding some more verbosity when
+encountering errors to reorganizing code to be easily extensible.
 
-Wouldn't it be more consistent with this driver's own convention if the
-mv88e6xxx_reg_lock() was absorbed by mv88e6xxx_stats_snapshot()?
+Ioana Ciornei (8):
+  dpaa2-switch: set interface MAC address only on endpoint change
+  dpaa2-switch: declare the netdev as IFF_LIVE_ADDR_CHANGE capable
+  dpaa2-switch: print an error when the vlan is already configured
+  dpaa2-switch: add ENDPOINT_CHANGED to the irq_mask
+  dpaa2-switch: do not clear any interrupts automatically
+  dpaa2-switch: reorganize the [pre]changeupper events
+  dpaa2-switch: move a check to the prechangeupper stage
+  dpaa2-switch: cleanup the egress flood of an unused FDB
 
-> +
-> +	if (ret < 0)
-> +		return;
-> +
-> +	stat = mv88e6xxx_hw_stats;
-> +	for (id = 0; id < MV88E6XXX_HW_STAT_ID_MAX; id++, stat++) {
-> +		if (!stat_map[id])
-> +			continue;
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 131 +++++++++++-------
+ 1 file changed, 84 insertions(+), 47 deletions(-)
 
-Hmm, a bit fragile, this relies on offsetof(struct ethtool_eth_mac_stats, stats)
-never being 0, which is not a documented requirement.
-
-Would it be hard to make the stat_map[] array compressed rather than
-sparse, and push the stat id inside the struct mv88e6xxx_hw_stat, and
-only operate on ARRAY_SIZE() elements?
-
-> +
-> +		member = (u64 *)(((char *)mac_stats) + stat_map[id]);
-> +		mv88e6xxx_stats_get_stat(chip, port, stat, member);
-> +	}
-> +
-> +	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.MulticastFramesXmittedOK;
-> +	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.BroadcastFramesXmittedOK;
-> +	mac_stats->stats.FramesReceivedOK += mac_stats->stats.MulticastFramesReceivedOK;
-> +	mac_stats->stats.FramesReceivedOK += mac_stats->stats.BroadcastFramesReceivedOK;
-> +}
-> +
->  static int mv88e6xxx_get_regs_len(struct dsa_switch *ds, int port)
->  {
->  	struct mv88e6xxx_chip *chip = ds->priv;
-> @@ -6839,6 +6890,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
->  	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
->  	.get_strings		= mv88e6xxx_get_strings,
->  	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
-> +	.get_eth_mac_stats	= mv88e6xxx_get_eth_mac_stats,
->  	.get_sset_count		= mv88e6xxx_get_sset_count,
->  	.port_max_mtu		= mv88e6xxx_get_max_mtu,
->  	.port_change_mtu	= mv88e6xxx_change_mtu,
-> -- 
-> 2.34.1
-> 
+-- 
+2.25.1
 
 
