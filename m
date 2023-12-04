@@ -1,162 +1,163 @@
-Return-Path: <netdev+bounces-53437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D732802F9D
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:08:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A2E802FBD
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 11:11:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DB7DB20A9F
-	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:08:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F4951F211A5
+	for <lists+netdev@lfdr.de>; Mon,  4 Dec 2023 10:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B60200B2;
-	Mon,  4 Dec 2023 10:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447EF1EB4D;
+	Mon,  4 Dec 2023 10:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="L6fId/4L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VBigK6DX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FFD099
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:08:28 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50bce78f145so5000332e87.0
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 02:08:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701684506; x=1702289306; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NupAADUjLojjcNqZenMNhCx0/lE8c7FM0G/tbESSkUc=;
-        b=L6fId/4LDvqXBNRgzxvCxkLWTn/CFLZb3XHEio+K6iTmuDK3RiYjH6J9G8dKy7Zdl2
-         rRv8hn3X2KggHWVV3V9TczqvYi3BzGg9qxGsLtm5WSlwl2gH52xFkuab8be6TkUJru48
-         vDrQVxOSVoaAQ2SAlF2t0C+qfVkxn9/lYC7c06rXA0ND9i8j1NeumsvFSaw5VFnXcb+j
-         9SiVYJXkL4Pnh1t/4qQkId4DHYCeZU2v+5C/cr1orEulJ7EDBt4RiVnHMhuebOtI1dNk
-         23KoQ0ICMK0lsPHa1W4C0OO0T7XFGJhA24SIflhhQ7VeHiQdO4Q2BjAqg9MlPLqGReA+
-         g/0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701684506; x=1702289306;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NupAADUjLojjcNqZenMNhCx0/lE8c7FM0G/tbESSkUc=;
-        b=rkwEoYF7b6l9j0Tf4BS88aWhYK+7WWHvwQUsosbEwJtQllVqIjKzNneINJZ705h3qy
-         WunGWsamS1Jx6vkikMbHSVM/bbOOjnn8PXYsPUsTJprSS97CYwa8B3/z+thfX5ITrZzV
-         jRfTLBnaWPt4Zf1qekWqGVdIxBK2g7MN9aAaYb5+ZbXZuhEqgWX9aF7qryqE+ZrEuu46
-         V0g50YXVjm0HSrx89mBqZcy86/w/g/6gJRe1rYX1sAWRbtU+oMD+SU+7ZxnSIcNA+4rx
-         H20lcDz/jbC7uhzLRGMH8Ne89xT/ph184x0NrAb7nCSZuUoB8ueEY3cwYwdZCn4IP4E2
-         rruw==
-X-Gm-Message-State: AOJu0YwC9GVc1OrCqKtE5FV82fh+PGGMyGrJY0sKZZqr/YUS5UucuVDV
-	rHmsTP8VHK/TI8pK2N5nZMWrBw==
-X-Google-Smtp-Source: AGHT+IFnKHddgyeXxCxSsPyAvJkBdc+uBF4j3NvlvRO9tK7ilBqh7o/xm9UEOxQdtfjYVRvqCCdX2A==
-X-Received: by 2002:ac2:4d07:0:b0:50b:f822:eac7 with SMTP id r7-20020ac24d07000000b0050bf822eac7mr262516lfi.171.1701684506188;
-        Mon, 04 Dec 2023 02:08:26 -0800 (PST)
-Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id u29-20020a19791d000000b0050beead375bsm553643lfc.57.2023.12.04.02.08.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 02:08:25 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: andrew@lunn.ch,
-	gregory.clement@bootlin.com,
-	sebastian.hesselbarth@gmail.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 net-next 3/3] net: mvmdio: Support setting the MDC frequency on XSMI controllers
-Date: Mon,  4 Dec 2023 11:08:11 +0100
-Message-Id: <20231204100811.2708884-4-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231204100811.2708884-1-tobias@waldekranz.com>
-References: <20231204100811.2708884-1-tobias@waldekranz.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0D8FD
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 02:10:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yd14O6+i6BzJWosvpAqQhFNP5pgHdikJuIrKAQzKS2Y=; b=VBigK6DXN/MAHDa3xLfu93jcTo
+	GH6UqsZ2/JYqUOOpvltCHSZasbtmGEIH+XmkOrFiSpIHZmGnWhnyu+g7ucG/phIOIlMYHFQCuAziP
+	qMnbPeASx1EKuEs2jn0Xr4LcP9VZWSqj9kuCXsn4NE/bquxgtAkf0Q1xAVYecNFVtUgh9Z6otC1GL
+	c/SLB++n5ueI6tnZ/uuIx00zNnOUuTsSzsudHDdolhRO9D05HEtjf/2Cf3MuEFvm1G+XRz/5HqQkL
+	yQrdD0z/28o7mhmrb6B94clqtjPjlUyO51vsa7ZvbgdgNGQrqqZCfdmi0aLlqPdUTzL8P+5FS4X5T
+	5zb/zOZw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54472)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rA5uW-0005OT-14;
+	Mon, 04 Dec 2023 10:10:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rA5uV-0000bn-Md; Mon, 04 Dec 2023 10:10:43 +0000
+Date: Mon, 4 Dec 2023 10:10:43 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew@lunn.ch, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v2 1/7] net: ngbe: implement phylink to handle
+ PHY device
+Message-ID: <ZW2loxTO6oKNYLew@shell.armlinux.org.uk>
+References: <20231204091905.1186255-1-jiawenwu@trustnetic.com>
+ <20231204091905.1186255-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204091905.1186255-2-jiawenwu@trustnetic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Support the standard "clock-frequency" attribute to set the generated
-MDC frequency. If not specified, the driver will leave the divisor
-untouched.
+On Mon, Dec 04, 2023 at 05:18:59PM +0800, Jiawen Wu wrote:
+> Add phylink support for Wangxun 1Gb Ethernet controller.
+> 
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+>  drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  21 ++-
+>  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 127 +++++++++++-------
+>  3 files changed, 88 insertions(+), 61 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> index 165e82de772e..4088637440c6 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> @@ -940,6 +940,7 @@ struct wx {
+>  	int speed;
+>  	int duplex;
+>  	struct phy_device *phydev;
 
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- drivers/net/ethernet/marvell/mvmdio.c | 44 +++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+If you also embed struct phylink_config() in struct wx, then you can get
+to it in the MAC operations using an inline function in wx_type.h:
 
-diff --git a/drivers/net/ethernet/marvell/mvmdio.c b/drivers/net/ethernet/marvell/mvmdio.c
-index 5f66f779e56f..9190eff6c0bb 100644
---- a/drivers/net/ethernet/marvell/mvmdio.c
-+++ b/drivers/net/ethernet/marvell/mvmdio.c
-@@ -53,6 +53,13 @@
- #define  MVMDIO_XSMI_BUSY		BIT(30)
- #define MVMDIO_XSMI_ADDR_REG		0x8
- 
-+#define MVMDIO_XSMI_CFG_REG		0xc
-+#define  MVMDIO_XSMI_CLKDIV_MASK	0x3
-+#define  MVMDIO_XSMI_CLKDIV_256		0x0
-+#define  MVMDIO_XSMI_CLKDIV_64		0x1
-+#define  MVMDIO_XSMI_CLKDIV_32		0x2
-+#define  MVMDIO_XSMI_CLKDIV_8		0x3
-+
- /*
-  * SMI Timeout measurements:
-  * - Kirkwood 88F6281 (Globalscale Dreamplug): 45us to 95us (Interrupt)
-@@ -225,6 +232,40 @@ static int orion_mdio_xsmi_write_c45(struct mii_bus *bus, int mii_id,
- 	return 0;
- }
- 
-+static void orion_mdio_xsmi_set_mdc_freq(struct mii_bus *bus)
-+{
-+	struct orion_mdio_dev *dev = bus->priv;
-+	struct clk *mg_core;
-+	u32 div, freq, cfg;
-+
-+	if (device_property_read_u32(bus->parent, "clock-frequency", &freq))
-+		return;
-+
-+	mg_core = of_clk_get_by_name(bus->parent->of_node, "mg_core_clk");
-+	if (IS_ERR(mg_core)) {
-+		dev_err(bus->parent,
-+			"MG core clock unknown, not changing MDC frequency");
-+		return;
-+	}
-+
-+	div = clk_get_rate(mg_core) / (freq + 1) + 1;
-+	clk_put(mg_core);
-+
-+	if (div <= 8)
-+		div = MVMDIO_XSMI_CLKDIV_8;
-+	else if (div <= 32)
-+		div = MVMDIO_XSMI_CLKDIV_32;
-+	else if (div <= 64)
-+		div = MVMDIO_XSMI_CLKDIV_64;
-+	else
-+		div = MVMDIO_XSMI_CLKDIV_256;
-+
-+	cfg = readl(dev->regs + MVMDIO_XSMI_CFG_REG);
-+	cfg &= ~MVMDIO_XSMI_CLKDIV_MASK;
-+	cfg |= div;
-+	writel(cfg, dev->regs + MVMDIO_XSMI_CFG_REG);
-+}
-+
- static irqreturn_t orion_mdio_err_irq(int irq, void *dev_id)
- {
- 	struct orion_mdio_dev *dev = dev_id;
-@@ -303,6 +344,9 @@ static int orion_mdio_probe(struct platform_device *pdev)
- 			dev_warn(&pdev->dev,
- 				 "unsupported number of clocks, limiting to the first "
- 				 __stringify(ARRAY_SIZE(dev->clk)) "\n");
-+
-+		if (type == BUS_TYPE_XSMI)
-+			orion_mdio_xsmi_set_mdc_freq(bus);
- 	} else {
- 		dev->clk[0] = clk_get(&pdev->dev, NULL);
- 		if (PTR_ERR(dev->clk[0]) == -EPROBE_DEFER) {
+static inline struct wx *phylink_to_wx(struct phylink_config *config)
+{
+	return container_of(config, struct wx, phylink_config);
+}
+
+which will be more efficient than doing the
+netdev_priv(to_net_dev(config->dev)) dance. It's also what other network
+drivers that use phylink do, so it brings consistency of implementation.
+
+...
+> -static void ngbe_handle_link_change(struct net_device *dev)
+> +static void ngbe_phy_fixup(struct wx *wx)
+>  {
+> -	struct wx *wx = netdev_priv(dev);
+> -	struct phy_device *phydev;
+> -	u32 lan_speed, reg;
+> +	struct phy_device *phydev = wx->phydev;
+> +	struct ethtool_eee eee;
+>  
+> -	phydev = wx->phydev;
+> -	if (!(wx->link != phydev->link ||
+> -	      wx->speed != phydev->speed ||
+> -	      wx->duplex != phydev->duplex))
+> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+> +	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+
+Phylink restricts the advertisement according to the capabilities
+provided, do you should not need to do this. Please remove.
+
+> +
+> +	phydev->mac_managed_pm = true;
+
+Please don't bypass phylink's management of this, instead set the
+"mac_managed_pm" boolean in struct phylink_config.
+
+...
+> +static int ngbe_phylink_init(struct wx *wx)
+>  {
+> -	int ret;
+> +	struct phylink_config *config;
+> +	phy_interface_t phy_mode;
+> +	struct phylink *phylink;
+>  
+> -	ret = phy_connect_direct(wx->netdev,
+> -				 wx->phydev,
+> -				 ngbe_handle_link_change,
+> -				 PHY_INTERFACE_MODE_RGMII_ID);
+> -	if (ret) {
+> -		wx_err(wx, "PHY connect failed.\n");
+> -		return ret;
+> -	}
+> +	config = devm_kzalloc(&wx->pdev->dev, sizeof(*config), GFP_KERNEL);
+> +	if (!config)
+> +		return -ENOMEM;
+>  
+> -	return 0;
+> -}
+> +	config->dev = &wx->netdev->dev;
+> +	config->type = PHYLINK_NETDEV;
+> +	config->mac_capabilities = MAC_1000FD | MAC_100FD |
+> +				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+>  
+> -static void ngbe_phy_fixup(struct wx *wx)
+> -{
+> -	struct phy_device *phydev = wx->phydev;
+> -	struct ethtool_eee eee;
+> +	phy_mode = PHY_INTERFACE_MODE_RGMII_ID;
+> +	__set_bit(PHY_INTERFACE_MODE_RGMII_ID, config->supported_interfaces);
+
+As mentioned above, also set config->mac_managed_pm.
+
+Thanks.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
