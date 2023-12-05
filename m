@@ -1,216 +1,136 @@
-Return-Path: <netdev+bounces-53943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAAD3805549
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:57:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0FCE80565E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80B0A2813D8
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:57:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 667A0B20F23
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E1955784;
-	Tue,  5 Dec 2023 12:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A13F65E0A0;
+	Tue,  5 Dec 2023 13:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jme37nru"
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="piEwCZuX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF4CA0;
-	Tue,  5 Dec 2023 04:57:04 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-a1a5772b8a5so447150466b.1;
-        Tue, 05 Dec 2023 04:57:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701781023; x=1702385823; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NaeA7VGskKYNAqgx+Ra1ez8twayn4+H5WNQTw6wh1Eo=;
-        b=jme37nrunDraO3yEwIBtO8m/+eA+FTQRUWpwaEpe6jwfEfFi68YezDEAvPVVDuLT44
-         2K+MNh5ibDF5I6V0lnujmFJ0x+v2RgAkQrsTzo6pynKLXKqDQbv/kwkF6RnxQEs6kZVl
-         TVwkadzl8I3mfOQf8cKFi6JwUvS6Bc4rVNk/xbkVaS451wVXPmGfaZwP1jUZYwHV4pIn
-         acEdlh7AFxV7kJZAKuExm8Ainw6AyZLIgTi4PoQm4DEZPUpT2A/51sYHvX/6jliYsI4c
-         f3GWnr4QgWVx04qJKTwAkfUzNChK+FbbvR6q7Uk4ObLYeWC9GTs6zhBVZPQ4fcBz1V+P
-         Vyog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701781023; x=1702385823;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NaeA7VGskKYNAqgx+Ra1ez8twayn4+H5WNQTw6wh1Eo=;
-        b=oReQd8mgxE5v0E1Or31Mfe+BPrJtgEXlG2JN8pJnpnM3mzO0yMsIDx2hCqQKtcxCAI
-         w3YaaLHZ9dU7rmj3+mpsd3Eghq4tc/QClo2BI7nfEXK/cLETK+RAgzO1cu2bTMRqdwdB
-         RSp7rzjtj7Naz7M6q6rdYa9RtZQ72g+VhZk0ZgcK2dgR9hlXYB26obLYAM2ytIoHUi26
-         1TREQB7auO16E90d5Zy31joK6R7I1QMT/RVVCGuUDQWrB4mkyJS7aASzlKAx2Dbfludk
-         S00tBstlkLLwNzhsevzTuaeeDz+DOb3fACm5NA1ESmk12ZT7B4h8GtmzJvPb4SHZoKQ6
-         ijGA==
-X-Gm-Message-State: AOJu0YxeMnsDH84euAaAET0EceGB/B0+hmEA1LgNZAjUNtYmlKGTyqSc
-	X6E06mcKQsjM5E41iEHzJYk=
-X-Google-Smtp-Source: AGHT+IFzVFbtAQ7Nd/yS4iQtdd1OFimHypCRQHnKyqtQ7zX7f4adAeu1FTOs2INWNSBkBCOSto0Xow==
-X-Received: by 2002:a17:906:4c50:b0:a04:5464:f0bf with SMTP id d16-20020a1709064c5000b00a045464f0bfmr407252ejw.63.1701781022655;
-        Tue, 05 Dec 2023 04:57:02 -0800 (PST)
-Received: from ?IPV6:2a01:c22:72b7:c900:542f:a611:a8f5:339c? (dynamic-2a01-0c22-72b7-c900-542f-a611-a8f5-339c.c22.pool.telefonica.de. [2a01:c22:72b7:c900:542f:a611:a8f5:339c])
-        by smtp.googlemail.com with ESMTPSA id a24-20020a1709064a5800b00a1ce98016besm298080ejv.224.2023.12.05.04.57.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Dec 2023 04:57:02 -0800 (PST)
-Message-ID: <d42dd05d-fc76-4040-aa15-8bbc4aa535f3@gmail.com>
-Date: Tue, 5 Dec 2023 13:57:01 +0100
+X-Greylist: delayed 1792 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Dec 2023 05:48:06 PST
+Received: from kylie.crudebyte.com (kylie.crudebyte.com [5.189.157.229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05412A8;
+	Tue,  5 Dec 2023 05:48:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Content-ID:Content-Description;
+	bh=MlRWkhJV0qSH5U01QGui4oeTrYqJubGpGLDBsWklraw=; b=piEwCZuXLbbZffbD9RGKdATv2V
+	lX7W3X2jTvFhBOMIx1Lzdjkem4jhtNxBBF9vhEi0jsinJi/xaTTSiiWZxCNl4SN99ZNY2E/Vd/dv2
+	XmMq34fW6blMK64yeTu1vzV5NqxUI5phRButXMNKebRmcLjeLjgC1edbxzdSxuvBI3BuLdXuTK6PZ
+	q7BLzVO7nKzn9aTw8RHoxw3mbFUGJ3i61lZUKK+4rkr+23lQV4J9bc9vG8dtYHAt76BDcCrZ+5Gep
+	v6KXGWhHrb/LP2M9VThSPFYFvXNHy1zzihNVOwIybbi9HBZKbFXFFciiQQm3U+Z2gigQHgSJaqU9O
+	Q4KZioqrhI9Lukv9a4nxCHZtrXqXhaJGL+atif60c0igPeAAErevIzaa8e29K1iVljWAMh+sb+gYq
+	LtsCDw8b9YFyldvL0yW8mGTSY3lbXlVIXP85jzXZlN2dOguEjnknzBm908I6tNIQ0GayTn5PCKYVg
+	E8giISdkklKHaU/xPpeb4tdzBND1+O11KoO9oxUfFhjNGxEAxIeBQmcz73LPgAV7QUSBI1DAVOe5L
+	uE+k6iLYnGqHAKeM/MaPVvk+dVIv3m9CHIhYOCZEWHCalsxDB6hkRZ1DIgK3HJK3WIwZcVXJ60bPh
+	2Zv/K88X8HOgsRQNivAvtkcv2Ru+Bez6Oq1t1WNDc=;
+From: Christian Schoenebeck <linux_oss@crudebyte.com>
+To: Dominique Martinet <asmadeus@codewreck.org>,
+ Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>, Latchesar Ionkov <lucho@ionkov.net>,
+ Eric Van Hensbergen <ericvh@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ v9fs@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org
+Subject: Re: [PATCH v2] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
+Date: Tue, 05 Dec 2023 13:29:49 +0100
+Message-ID: <1741521.OAD31uVnNo@silver>
+In-Reply-To: <20231205091952.24754-1-pchelkin@ispras.ru>
+References: <20231205091952.24754-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
- activate if hw-controlled
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- Christian Marangi <ansuelsmth@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
- <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
- <CAFSsGVvBfvkotAd+p++bzca4Km8pHVzNJEGV6CAjYULVOWuD2Q@mail.gmail.com>
- <7535cb07-31ab-407d-9226-7b3f65050a65@lunn.ch>
- <c57558a4-9f3a-48fa-acb7-e3eb2349c666@gmail.com>
- <4c9396eb-f255-4277-8151-caa28c8ea0d3@lunn.ch>
- <9a8373c6-e916-4a98-858a-294e7bed9f24@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <9a8373c6-e916-4a98-858a-294e7bed9f24@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-On 05.12.2023 13:40, Heiner Kallweit wrote:
-> On 05.12.2023 04:00, Andrew Lunn wrote:
->>> Let's take a very simple use case: We have a one bit configuration to
->>> switch a LED between link_100 and link_1000 hw trigger mode.
->>>
->>> Then we have the atomicity issue you described: We can't go directly
->>> from one hw-controlled mode to the other, we have to go via both
->>> modes active or no mode active.
->>>
->>> And unfortunately we don't have the option to indicate this by some
->>> optical LED activity like blinking, especially if the link is down
->>> at the moment.
->>>
->>> Would be a pity if our nice framework can't support such a simple
->>> use case. So, what I could imagine, we react based on the return code
->>> from hw_control_is_supported():
->>>
->>> - 0: use hw control
->>> - -EOPNOTSUPP: fall back to LED software control, no error returned to use
->>> - -ENOTSUPP (another idea: ENOEXEC): store new mode in trigger_data->mode and return error to the user
->>> - other errors: don't store new mode and return error to user
->>>
->>> Not fully intuitive and the subtle difference between EOPNOTSUPP and
->>> ENOTSUPP may confuse driver authors adding device LED support.
->>
->> Using an NFS error code for LEDs will definitely confuse
->> developers. This is not a network file system, where it is valid to
->> use ENOTSUPP.
->>
->> I actually think we need to define some best practices, ordered on
->> what the hardware can do.
->>
->> 1) With software control, set_brightness should do what you expect,
->> not return an error.
->>
->> 2) Without full software control, but there is a mechanism to report a
->> problem, like constant blinking, or off, do that, and return
->> -EOPNOTSUPP.
->>
->> 3) Really dumb hardware like this, set_brightness should be a NULL
->> pointer. The core returns -EOPNOTSUPP.
->>
->> The core should return this -EOPNOTSUPP to user space, but it should
->> accept the configuration change. So the user can put it into an
->> invalid state, in order to get to a valid state with further
->> configuration.
->>
-> Sounds good to me. Let me come up with a RFC patch.
+On Tuesday, December 5, 2023 10:19:50 AM CET Fedor Pchelkin wrote:
+> If an error occurs while processing an array of strings in p9pdu_vreadf
+> then uninitialized members of *wnames array are freed.
 > 
->> I don't see an easy way to let the user know what the valid states
->> are. We currently have a 10bit state. I don't think we can put all the
->> valid ones in a /sysfs file, especially when QCA8K pretty much
->> supports everything.
->>
->> 	 Andrew
+> Fix this by iterating over only lower indices of the array. Also handle
+> possible uninit *wnames usage if first p9pdu_readf() call inside 'T' case
+> fails.
 > 
-> Heiner
+> Found by Linux Verification Center (linuxtesting.org).
+> 
+> Fixes: ace51c4dd2f9 ("9p: add new protocol support code")
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
+> v2: I've missed that *wnames can also be left uninitialized. Please
+> ignore the patch v1. As an answer to Dominique's comment: my
+> organization marks this statement in all commits.
+> 
+>  net/9p/protocol.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/9p/protocol.c b/net/9p/protocol.c
+> index 4e3a2a1ffcb3..043b621f8b84 100644
+> --- a/net/9p/protocol.c
+> +++ b/net/9p/protocol.c
+> @@ -393,6 +393,8 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+>  		case 'T':{
+>  				uint16_t *nwname = va_arg(ap, uint16_t *);
+>  				char ***wnames = va_arg(ap, char ***);
+> +				int i;
+> +				*wnames = NULL;
 
-Patch is so simple that I send it this way. What do you think?
+Consider also initializing `int i = 0;` here. Because ...
 
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index ec0395a6b..a24f3aade 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -310,6 +310,7 @@ static ssize_t netdev_led_attr_store(struct device *dev, const char *buf,
- 				     size_t size, enum led_trigger_netdev_modes attr)
- {
- 	struct led_netdev_data *trigger_data = led_trigger_get_drvdata(dev);
-+	struct led_classdev *led_cdev = trigger_data->led_cdev;
- 	unsigned long state, mode = trigger_data->mode;
- 	int ret;
- 	int bit;
-@@ -349,6 +350,10 @@ static ssize_t netdev_led_attr_store(struct device *dev, const char *buf,
- 	trigger_data->mode = mode;
- 	trigger_data->hw_control = can_hw_control(trigger_data);
- 
-+	if (!led_cdev->brightness_set && !led_cdev->brightness_set_blocking &&
-+	    !trigger_data->hw_control)
-+		return -EOPNOTSUPP;
-+
- 	set_baseline_state(trigger_data);
- 
- 	return size;
--- 
-2.43.0
+>  
+>  				errcode = p9pdu_readf(pdu, proto_version,
+>  								"w", nwname);
+> @@ -406,8 +408,6 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+>  				}
+>  
+>  				if (!errcode) {
+> -					int i;
+> -
+>  					for (i = 0; i < *nwname; i++) {
+
+... this block that initializes `i` is conditional. I mean it does work right
+now as-is, because ...
+
+>  						errcode =
+>  						    p9pdu_readf(pdu,
+> @@ -421,13 +421,11 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+>  
+>  				if (errcode) {
+>  					if (*wnames) {
+> -						int i;
+> -
+> -						for (i = 0; i < *nwname; i++)
+> +						while (--i >= 0)
+>  							kfree((*wnames)[i]);
+> +						kfree(*wnames);
+> +						*wnames = NULL;
+>  					}
+
+... this is wrapped into `if (*wnames) {` and you initialized *wnames with
+NULL, but it just feels like a potential future trap somehow.
+
+Anyway, at least it looks like correct behaviour (ATM), so:
+
+Reviewed-by: Christian Schoenebeck <linux_oss@crudebyte.com>
+
+> -					kfree(*wnames);
+> -					*wnames = NULL;
+>  				}
+>  			}
+>  			break;
+> 
 
 
 
