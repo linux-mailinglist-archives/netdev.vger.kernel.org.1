@@ -1,122 +1,108 @@
-Return-Path: <netdev+bounces-53809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D260E804B70
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:51:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C653804B9A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:58:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 837CA1F2141F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:51:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3ED01F21475
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FF72D63A;
-	Tue,  5 Dec 2023 07:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0D63399A;
+	Tue,  5 Dec 2023 07:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="b4vhiER6"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="hLPLGfwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6D4CA;
-	Mon,  4 Dec 2023 23:50:55 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 15DFEFF80A;
-	Tue,  5 Dec 2023 07:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701762654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=33Cr2ldAlMbcSRdOfjbnL3I/Zg4ZMoiw1vVYuAFexRo=;
-	b=b4vhiER6a0L6V8r2zxzPP/QzfzSTlhkeU1AriyKxFIiplNb1XZ+XCg2+EjeucXV/uV/YO1
-	A6h6P+g9lkmW+V/niTIfxHvrUoEZvRPzOqCAIDa3DT3VFQTc+CsmYxgkF04Y5f60h3AyTB
-	LGT8ZexvnP/khyItrTvFEaSAjyBJLtzeazAio64kaoWBvk9/Cf5MbKMwt/WGwhkx/tsdFN
-	mh73fi+AM6pxPwChmWZxPfMalh+OE/yLyktflvwxRIlg6Tb8lQh+mjSaNsubYNsZFYEufg
-	rM38OiIl0V2/qYiI4jNoAbSvYw49xiCSmt3syB9uLbezVsY4n/msm/yXn2SWag==
-Date: Tue, 5 Dec 2023 08:50:46 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Alexander Aring <alex.aring@gmail.com>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Zhao
- Qiang <qiang.zhao@nxp.com>, Bjorn Andersson <andersson@kernel.org>, Konrad
- Dybcio <konrad.dybcio@linaro.org>, Russell King <linux@armlinux.org.uk>,
- linux-wpan@vger.kernel.org, Andy Gross <agross@kernel.org>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, =?UTF-8?B?Q2zDqW1l?=
- =?UTF-8?B?bnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Christian Marangi
- <ansuelsmth@gmail.com>, Nick Child <nnac123@linux.ibm.com>, Stephan Gerhold
- <stephan@gerhold.net>, linux-arm-msm@vger.kernel.org, Loic Poulain
- <loic.poulain@linaro.org>, Marc Kleine-Budde <mkl@pengutronix.de>,
- linux-arm-kernel@lists.infradead.org, Alex Elder <elder@kernel.org>,
- netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>,
- linux-renesas-soc@vger.kernel.org, kernel@pengutronix.de, Johannes Berg
- <johannes@sipsolutions.net>, Imre Kaloz <kaloz@openwrt.org>,
- linuxppc-dev@lists.ozlabs.org, "David S. Miller" <davem@davemloft.net>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove
- callback returning void
-Message-ID: <20231205085046.7307ca9b@xps-13>
-In-Reply-To: <20231205073911.e6nphzhc6yjan5vu@pengutronix.de>
-References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-	<20231205075110.795b88d2@xps-13>
-	<20231205073911.e6nphzhc6yjan5vu@pengutronix.de>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FC8011F
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 23:58:48 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-332f90a375eso4262958f8f.3
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 23:58:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1701763126; x=1702367926; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g7FpkghBvKrwkpwGugGld407jjY5p4c/xbnuRbVmo3M=;
+        b=hLPLGfwW6c2v6Kho23LseK8L2lF+eua2pXpLm83bwYrKsK4RVhFP/Va2QnHmsV4jde
+         +FpbfflTFjlH3Ws5eGxdNYrM4rGM2HfeI9xcwgS+3qLb4ZrA+CLsnOMgRB1/GBCEzdrO
+         nQcwF7qe6HElv0wyVChb7/lKqEMy7xbGEYrwvlRxoeKA1N5mPC+JuoZZaXyEsm6qo78v
+         0QGRpbCukyQYkZvb9GCT+zb8Y45Sqx1kQ6Pxck42kptVX+2Nm1HCBaSFOGylD+5L7CC1
+         HX8Dgwhtn6uR1SjI8nYU3kYLkIgj0/duZ1ymtFCrWs2EjwQH5LPpA2fWiYCfXMCe/RBL
+         cakw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701763126; x=1702367926;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g7FpkghBvKrwkpwGugGld407jjY5p4c/xbnuRbVmo3M=;
+        b=j01BDWTdFYz2S6RSfTQN/LZOuUlcE2zvsqemIWZHMZwoEAe3nWGwWMEbSHNyKFVNIN
+         rXvI5L1HAAG4YMRqBqbRtMVmHTVG2/Fbb1/BhwHTisovf4XgM98J8Y9QiiGj6cGe6Tlr
+         S/Xoowtj2DTi5Uxhfx83FNdyu/eY5dXjZyz+jj6Y0wKUP6k6o5PDK5VXwEe2VxyfKkKl
+         Hdbln8vsSeL+xPr3CTXhRh1kRbl5pSRX1fd5iwTAKlZljUzW1cFAutYRscLnV8st0Pa7
+         P4KQxm556l5kznEw7M2mlizMGkEi242KJpIH7lMZa60cmjWfep+QL7LYRq0N2AmR/39m
+         cubQ==
+X-Gm-Message-State: AOJu0YySgvIpMT6Utb1aExRgETeEVWKkTZjkIcTNlUcIrML6a7ggzPH7
+	KY07iHjbLa7fP8mrImSFjmBSJA==
+X-Google-Smtp-Source: AGHT+IF0WcZBXfMmBhWKPfp1EXfUTOotIxbbEXjRjIn3xrmPFKEbABwnOm4z9SZDfBvjEsjFHau4YA==
+X-Received: by 2002:a05:600c:1907:b0:40b:4c39:b4e with SMTP id j7-20020a05600c190700b0040b4c390b4emr204745wmq.1.1701763126671;
+        Mon, 04 Dec 2023 23:58:46 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:3e2e:5141:80dd:488f? ([2a01:e0a:b41:c160:3e2e:5141:80dd:488f])
+        by smtp.gmail.com with ESMTPSA id h9-20020a05600c314900b0040b3d8907fesm17817224wmo.29.2023.12.04.23.58.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Dec 2023 23:58:46 -0800 (PST)
+Message-ID: <10737d34-0070-41f5-8903-dcae30ee7ba5@6wind.com>
+Date: Tue, 5 Dec 2023 08:58:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v2] netlink: Return unsigned value for nla_len()
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, kernel test robot <lkp@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes@sipsolutions.net>,
+ Jeff Johnson <quic_jjohnson@quicinc.com>, Michael Walle <mwalle@kernel.org>,
+ Max Schulze <max.schulze@online.de>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20231202202539.it.704-kees@kernel.org>
+ <95924d9e-b373-40fd-993c-25b0bae55e61@6wind.com>
+ <202312041420.886C9F3@keescook>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <202312041420.886C9F3@keescook>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Uwe,
+Le 04/12/2023 à 23:21, Kees Cook a écrit :
+[snip]
+>>> diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
+>>> index f87aaf28a649..270feed9fd63 100644
+>>> --- a/include/uapi/linux/netlink.h
+>>> +++ b/include/uapi/linux/netlink.h
+>>> @@ -247,7 +247,7 @@ struct nlattr {
+>>>  
+>>>  #define NLA_ALIGNTO		4
+>>>  #define NLA_ALIGN(len)		(((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
+>>> -#define NLA_HDRLEN		((int) NLA_ALIGN(sizeof(struct nlattr)))
+>>> +#define NLA_HDRLEN		((__u16) NLA_ALIGN(sizeof(struct nlattr)))
+>> I wonder if this may break the compilation of some userspace tools with errors
+>> like comparing signed and unsigned values.
+> 
+> Should I drop this part, then?
+> 
+Yes please.
 
-u.kleine-koenig@pengutronix.de wrote on Tue, 5 Dec 2023 08:39:11 +0100:
 
-> Hello Miquel,
->=20
-> On Tue, Dec 05, 2023 at 07:51:10AM +0100, Miquel Raynal wrote:
-> > u.kleine-koenig@pengutronix.de wrote on Mon,  4 Dec 2023 19:30:40 +0100=
-: =20
-> > > (implicit) v1 of this series can be found at
-> > > https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koeni=
-g@pengutronix.de.
-> > > Changes since then:
-> > >=20
-> > >  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
-> > >    converts ipa to remove_new() and introduces an error message in the
-> > >    error path that failed before.
-> > >=20
-> > >  - Rebased to today's next
-> > >=20
-> > >  - Add the tags received in the previous round.
-> > >=20
-> > > Uwe Kleine-K=C3=B6nig (9):
-> > >   net: ipa: Convert to platform remove callback returning void
-> > >   net: fjes: Convert to platform remove callback returning void
-> > >   net: pcs: rzn1-miic: Convert to platform remove callback returning
-> > >     void
-> > >   net: sfp: Convert to platform remove callback returning void
-> > >   net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
-> > >     void
-> > >   net: wan/ixp4xx_hss: Convert to platform remove callback returning
-> > >     void
-> > >   net: wwan: qcom_bam_dmux: Convert to platform remove callback
-> > >     returning void
-> > >   ieee802154: fakelb: Convert to platform remove callback returning v=
-oid
-> > >   ieee802154: hwsim: Convert to platform remove callback returning vo=
-id =20
-> >=20
-> > FYI, I plan on taking patches 8 and 9 through wpan-next. =20
->=20
-> I forgot to mention explicitly that there are no interdependencies in
-> this series. So each maintainer picking up up their patches is fine.
-
-Yes, no problem, it was quick to figure out.
-
-Thanks,
-Miqu=C3=A8l
+Thank you,
+Nicolas
 
