@@ -1,67 +1,46 @@
-Return-Path: <netdev+bounces-53985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF28805848
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3921680584E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47D46281D43
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F19281D43
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4E567E91;
-	Tue,  5 Dec 2023 15:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B8067E99;
+	Tue,  5 Dec 2023 15:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wVvwgpQN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="S+f1b+wg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34123A9;
-	Tue,  5 Dec 2023 07:11:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=89zzbnaOwaOpQxmSuOvvT11yQtN9xAnRA3rWd/5dlu8=; b=wVvwgpQN02wca8hJr2kI3Em7Bm
-	K8wqoygQD5JYOZXduOH3K6S2yC3BQr+9X8FZnweMrsEHA4PeOIhDOEPpbyn+rtNF7kDhkKrkzvdDn
-	6kjWDFjtwu63xDQ7YXEdjsUPvgKvOtTcO5/OteLOalMxzqlzXQ9TAimqbkPA5zu9cooTLVOwSjplK
-	ep0Tuh7jDwvsZRUymBHTmdmths2O+28xLdgmwJ1shKBwCV1aBZxu/SFb3F0gc4MrOmwcSol+cWvvO
-	iyNbddRIWD7IVyxxc2XSW/+3K+U1sn58sRSLlZQtWDLp3rGgWWwQ1xa80ZmJJcaZkBZ3NIhoAYszo
-	qupb4Duw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43342)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rAX4U-0006wq-1c;
-	Tue, 05 Dec 2023 15:10:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rAX4U-0001ox-P6; Tue, 05 Dec 2023 15:10:50 +0000
-Date: Tue, 5 Dec 2023 15:10:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <ZW89errbJWUt33vz@shell.armlinux.org.uk>
-References: <20231128133630.7829-1-ansuelsmth@gmail.com>
- <20231128133630.7829-3-ansuelsmth@gmail.com>
- <20231204181752.2be3fd68@kernel.org>
- <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
- <656f37a6.5d0a0220.96144.356f@mx.google.com>
- <adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CD1183
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:12:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ST7xwQ06frK1zNZ8hAvcBA13z9LtRNf0hBcM9I3b+VU=; b=S+f1b+wgIzKS0p3b0J8+dD2yHC
+	4mt+dlSAi5IqHrBNa/XmZ3X8zCaAfVJivIJTKwGg50ynqgr69z/p9kik3uqb71vCP7VbhxFob4KXY
+	NTmq/Zu6DFKKycmhUKDUqIrvEeHzotc64uxV5pwjsQIRnX1VYRcfxBo8MkSw15M7tdWk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rAX5b-0026ik-RJ; Tue, 05 Dec 2023 16:11:59 +0100
+Date: Tue, 5 Dec 2023 16:11:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, gregory.clement@bootlin.com,
+	sebastian.hesselbarth@gmail.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 2/3] net: mvmdio: Avoid excessive sleeps in
+ polled mode
+Message-ID: <2c385c4b-def5-4f43-a35c-68152107f19c@lunn.ch>
+References: <20231204100811.2708884-1-tobias@waldekranz.com>
+ <20231204100811.2708884-3-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,34 +49,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20231204100811.2708884-3-tobias@waldekranz.com>
 
-On Tue, Dec 05, 2023 at 03:54:04PM +0100, Andrew Lunn wrote:
-> > > I tend to agree. These functions should be documented once in kdoc,
-> > > and only once. I don't really care if its in the header, or the C
-> > > code, but not both.
-> > >
-> > 
-> > Ok just to make sure, I should keep the kdoc in the .c and drop them in
-> > .h ? (or should I move the more complete kdoc in .c to .h and remove
-> > kdoc in .c?)
+On Mon, Dec 04, 2023 at 11:08:10AM +0100, Tobias Waldekranz wrote:
+> Before this change, when operating in polled mode, i.e. no IRQ is
+> available, every individual C45 access would be hit with a 150us sleep
+> after the bus access.
 > 
-> Please put the kdoc in the header file and remove if from the .c file.
+> For example, on a board with a CN9130 SoC connected to an MV88X3310
+> PHY, a single C45 read would take around 165us:
+> 
+>     root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
+>     Performed 1000 reads in 165ms
+> 
+> By replacing the long sleep with a tighter poll loop, we observe a 10x
+> increase in bus throughput:
+> 
+>     root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
+>     Performed 1000 reads in 15ms
+> 
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 
-phy-core.c follows the style that the kdoc is in the .c file rather
-than the header file.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-I've raised this before in other subsystems, and it's suggested that
-it's better to have it in the .c file. I guess the reason is that it's
-more obvious that the function is documented when modifying it, so
-there's a higher probability that the kdoc will get updated when the
-function is altered.
-
-I guess a question to ask is how often do people modify a function and
-then check the header for any documentation?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
