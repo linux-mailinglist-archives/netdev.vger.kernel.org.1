@@ -1,169 +1,246 @@
-Return-Path: <netdev+bounces-54090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A176806019
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:05:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1FD806037
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE231F2173E
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:05:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BC151C20E2A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BFB6D1C0;
-	Tue,  5 Dec 2023 21:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07806E2A9;
+	Tue,  5 Dec 2023 21:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LcdgIhPC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NliZEoxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BE91BD;
-	Tue,  5 Dec 2023 13:05:01 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A68B18F;
+	Tue,  5 Dec 2023 13:10:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701810301; x=1733346301;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QoRB+kUlNzcFbM1jcDY4W8+DKPtN7knm2yCQx9BeXHw=;
-  b=LcdgIhPCvGw7/HfGxdIo47Sh5jlPpB6c7qwxdNU3k0KMXqJpBcG2SzVV
-   kgj6Hv0KfXC3FtfP6BlxnP2ufODoePbVt9CZYjU4MBYMBOvIYWYNabwyx
-   pCWmXdqT8M/iqgttbuDkwrr5tMwbcDdWxt+0tP43Wv7SOE7KGOHSie4F6
-   khtq+/MlVxjqGktZJMdySlGunxZHtNC/DXRP5+YQGtrkJ+STrg2MiOQxF
-   TMLUp79h7P9P9Xr5yoM5E0FHLNVa4WI95avJebS33lADZzONEa1AyiNil
-   aY9P8HthgFv2U7rINIM76EqfY3KNRHMa4FsiU/R6T4/dcH04D9yJi9Ws/
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="458275354"
+  t=1701810647; x=1733346647;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Kj6pEmB338Ic4Gh12ntrKi0G9SJXjBINIhr4CPVXh0Y=;
+  b=NliZEoxbubrQbkHFffJaJJQWQ8dJnC4YiOSq70bZpNzYBKpz42xbeZZn
+   uBFkm/WipUVwBtcipxvQjoSzSBW/ZoMPf5sRakLwebZhXwuk1QGoiKXFC
+   XJityl4GB4nBESi8U/s8UcfNxxGoPkfpIt+n/w/A9Uo/lE9dJaBzAQy1s
+   WIiAcbUUbLRumYsfkut0dLCNJ5hkUB4ruaeeasvvnm6RNJozw6JrFvzqK
+   QXixzNX1BBw6TMB7A9zm4ylcBTvewheOwc4jltpivno32fihP4vBQNQdF
+   zP6rQ0QB0okUrwXP4BtSBpDD0xleEymthV/nh4hIrI2CzyT0yygl9ClXA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="373421783"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="458275354"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:05:00 -0800
+   d="scan'208";a="373421783"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:10:46 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="800104497"
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="774757572"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="800104497"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2023 13:04:52 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rAcb3-0009jG-2T;
-	Tue, 05 Dec 2023 21:04:49 +0000
-Date: Wed, 6 Dec 2023 05:04:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alexey Makhalov <amakhalov@vmware.com>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, hpa@zytor.com,
-	dave.hansen@linux.intel.co, bp@alien8.d, mingo@redhat.com,
-	tglx@linutronix.de
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, x86@kernel.org,
-	netdev@vger.kernel.org, richardcochran@gmail.com,
-	linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
-	zackr@vmware.com, linux-graphics-maintainer@vmware.com,
-	pv-drivers@vmware.com, namit@vmware.com, timothym@vmware.com,
-	akaher@vmware.com, jsipek@vmware.com,
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
-	tzimmermann@suse.de, mripard@kernel.org,
-	maarten.lankhorst@linux.intel.com, horms@kernel.org
-Subject: Re: [PATCH v2 6/6] x86/vmware: Add TDX hypercall support
-Message-ID: <202312060432.8e2xdh6F-lkp@intel.com>
-References: <20231201232452.220355-7-amakhalov@vmware.com>
+   d="scan'208";a="774757572"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga007.fm.intel.com with ESMTP; 05 Dec 2023 13:10:41 -0800
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8981834328;
+	Tue,  5 Dec 2023 21:10:38 +0000 (GMT)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>,
+	xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Tariq Toukan <tariqt@mellanox.com>,
+	Saeed Mahameed <saeedm@mellanox.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH bpf-next v8 00/18] XDP metadata via kfuncs for ice + VLAN hint
+Date: Tue,  5 Dec 2023 22:08:29 +0100
+Message-ID: <20231205210847.28460-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201232452.220355-7-amakhalov@vmware.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Alexey,
+This series introduces XDP hints via kfuncs [0] to the ice driver.
 
-kernel test robot noticed the following build errors:
+Series brings the following existing hints to the ice driver:
+ - HW timestamp
+ - RX hash with type
 
-[auto build test ERROR on drm-misc/drm-misc-next]
-[also build test ERROR on dtor-input/next dtor-input/for-linus linus/master v6.7-rc4 next-20231205]
-[cannot apply to tip/x86/vmware]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Series also introduces VLAN tag with protocol XDP hint, it now be accessed by
+XDP and userspace (AF_XDP) programs. They can also be checked with xdp_metadata
+test and xdp_hw_metadata program.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Alexey-Makhalov/x86-vmware-Move-common-macros-to-vmware-h/20231202-072821
-base:   git://anongit.freedesktop.org/drm/drm-misc drm-misc-next
-patch link:    https://lore.kernel.org/r/20231201232452.220355-7-amakhalov%40vmware.com
-patch subject: [PATCH v2 6/6] x86/vmware: Add TDX hypercall support
-config: i386-buildonly-randconfig-005-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060432.8e2xdh6F-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060432.8e2xdh6F-lkp@intel.com/reproduce)
+Impact of these patches on ice performance:
+ZC:
+* Full hints implementation decreases pps in ZC mode by less than 3%
+  (64B, rxdrop)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312060432.8e2xdh6F-lkp@intel.com/
+skb (packets with invalid IP, dropped by stack):
+* Overall, patchset improves peak performance in skb mode by about 0.5%
 
-All error/warnings (new ones prefixed by >>):
+[0] https://patchwork.kernel.org/project/netdevbpf/cover/20230119221536.3349901-1-sdf@google.com/
 
-   In file included from drivers/gpu/drm/vmwgfx/vmwgfx_msg.c:37:
-   In file included from drivers/gpu/drm/vmwgfx/vmwgfx_msg_x86.h:38:
->> arch/x86/include/asm/vmware.h:46:46: warning: declaration of 'struct tdx_module_args' will not be visible outside of this function [-Wvisibility]
-   extern void vmware_tdx_hypercall_args(struct tdx_module_args *args);
-                                                ^
->> arch/x86/include/asm/vmware.h:61:25: error: variable has incomplete type 'struct tdx_module_args'
-           struct tdx_module_args args = {
-                                  ^
-   arch/x86/include/asm/vmware.h:61:9: note: forward declaration of 'struct tdx_module_args'
-           struct tdx_module_args args = {
-                  ^
-   1 warning and 1 error generated.
+v7:
+https://lore.kernel.org/bpf/20231115175301.534113-1-larysa.zaremba@intel.com/
+v6:
+https://lore.kernel.org/bpf/20231012170524.21085-1-larysa.zaremba@intel.com/
+Intermediate RFC v2:
+https://lore.kernel.org/bpf/20230927075124.23941-1-larysa.zaremba@intel.com/
+Intermediate RFC v1:
+https://lore.kernel.org/bpf/20230824192703.712881-1-larysa.zaremba@intel.com/
+v5:
+https://lore.kernel.org/bpf/20230811161509.19722-1-larysa.zaremba@intel.com/
+v4:
+https://lore.kernel.org/bpf/20230728173923.1318596-1-larysa.zaremba@intel.com/
+v3:
+https://lore.kernel.org/bpf/20230719183734.21681-1-larysa.zaremba@intel.com/
+v2:
+https://lore.kernel.org/bpf/20230703181226.19380-1-larysa.zaremba@intel.com/
+v1:
+https://lore.kernel.org/all/20230512152607.992209-1-larysa.zaremba@intel.com/
 
+Changes since v7:
+* shorten timestamp assignment in ice
+* change first argument of ice_fill_rx_descs back to xsk_buff_pool
+* fix kernel-doc for ice_run_xdp_zc
+* add missing XSK_CHECK_PRIV_TYPE() in ice
+* resolved selftests merge conflicts with TX hints
+* AF_INET patch adds new packet generation, not replaces AF_XDP one
+* fix destination port in xdp_metadata
 
-vim +61 arch/x86/include/asm/vmware.h
+Changes since v6:
+* add ability to fill cb of all xdp_buffs in xsk_buff_pool
+* place just pointer to packet context in ice_xdp_buff
+* add const qualifiers in veth implementation
+* generate uapi for VLAN hint
 
-    45	
-  > 46	extern void vmware_tdx_hypercall_args(struct tdx_module_args *args);
-    47	
-    48	/*
-    49	 * TDCALL[TDG.VP.VMCALL] uses rax (arg0) and rcx (arg2), while the use of
-    50	 * rbp (arg6) is discouraged by the TDX specification. Therefore, we
-    51	 * remap those registers to r12, r13 and r14, respectively.
-    52	 */
-    53	static inline
-    54	unsigned long vmware_tdx_hypercall(unsigned long cmd, unsigned long in1,
-    55					   unsigned long in3, unsigned long in4,
-    56					   unsigned long in5, unsigned long in6,
-    57					   uint32_t *out1, uint32_t *out2,
-    58					   uint32_t *out3, uint32_t *out4,
-    59					   uint32_t *out5, uint32_t *out6)
-    60	{
-  > 61		struct tdx_module_args args = {
-    62			.r10 = VMWARE_TDX_VENDOR_LEAF,
-    63			.r11 = VMWARE_TDX_HCALL_FUNC,
-    64			.r12 = VMWARE_HYPERVISOR_MAGIC,
-    65			.r13 = cmd,
-    66			.rbx = in1,
-    67			.rdx = in3,
-    68			.rsi = in4,
-    69			.rdi = in5,
-    70			.r14 = in6,
-    71		};
-    72	
-    73		vmware_tdx_hypercall_args(&args);
-    74	
-    75		if (out1)
-    76			*out1 = args.rbx;
-    77		if (out2)
-    78			*out2 = args.r13;
-    79		if (out3)
-    80			*out3 = args.rdx;
-    81		if (out4)
-    82			*out4 = args.rsi;
-    83		if (out5)
-    84			*out5 = args.rdi;
-    85		if (out6)
-    86			*out6 = args.r14;
-    87	
-    88		return args.r12;
-    89	}
-    90	
+Changes since v5:
+* drop checksum hint from the patchset entirely
+* Alex's patch that lifts the data_meta size limitation is no longer
+  required in this patchset, so will be sent separately
+* new patch: hide some ice hints code behind a static key
+* fix several bugs in ZC mode (ice)
+* change argument order in VLAN hint kfunc (tci, proto -> proto, tci)
+* cosmetic changes
+* analyze performance impact
+
+Changes since v4:
+* Drop the concept of partial checksum from the hint design
+* Drop the concept of checksum level from the hint design
+
+Changes since v3:
+* use XDP_CHECKSUM_VALID_LVL0 + csum_level instead of csum_level + 1
+* fix spelling mistakes
+* read XDP timestamp unconditionally
+* add TO_STR() macro
+
+Changes since v2:
+* redesign checksum hint, so now it gives full status
+* rename vlan_tag -> vlan_tci, where applicable
+* use open_netns() and close_netns() in xdp_metadata
+* improve VLAN hint documentation
+* replace CFI with DEI
+* use VLAN_VID_MASK in xdp_metadata
+* make vlan_get_tag() return -ENODATA
+* remove unused rx_ptype in ice_xsk.c
+* fix ice timestamp code division between patches
+
+Changes since v1:
+* directly return RX hash, RX timestamp and RX checksum status
+  in skb-common functions
+* use intermediate enum value for checksum status in ice
+* get rid of ring structure dependency in ice kfunc implementation
+* make variables const, when possible, in ice implementation
+* use -ENODATA instead of -EOPNOTSUPP for driver implementation
+* instead of having 2 separate functions for c-tag and s-tag,
+  use 1 function that outputs both VLAN tag and protocol ID
+* improve documentation for introduced hints
+* update xdp_metadata selftest to test new hints
+* implement new hints in veth, so they can be tested in xdp_metadata
+* parse VLAN tag in xdp_hw_metadata
+
+Larysa Zaremba (17):
+  ice: make RX hash reading code more reusable
+  ice: make RX HW timestamp reading code more reusable
+  ice: Make ptype internal to descriptor info processing
+  ice: Introduce ice_xdp_buff
+  ice: Support HW timestamp hint
+  ice: Support RX hash XDP hint
+  ice: Support XDP hints in AF_XDP ZC mode
+  xdp: Add VLAN tag hint
+  ice: Implement VLAN tag hint
+  ice: use VLAN proto from ring packet context in skb path
+  veth: Implement VLAN tag XDP hint
+  net: make vlan_get_tag() return -ENODATA instead of -EINVAL
+  mlx5: implement VLAN tag XDP hint
+  selftests/bpf: Allow VLAN packets in xdp_hw_metadata
+  selftests/bpf: Add flags and VLAN hint to xdp_hw_metadata
+  selftests/bpf: Add AF_INET packet generation to xdp_metadata
+  selftests/bpf: Check VLAN tag and proto in xdp_metadata
+
+Maciej Fijalkowski (1):
+  xsk: add functions to fill control buffer
+
+ Documentation/netlink/specs/netdev.yaml       |   4 +
+ Documentation/networking/xdp-rx-metadata.rst  |   8 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |  15 +
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 412 +++++++++---------
+ drivers/net/ethernet/intel/ice/ice_main.c     |  21 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  16 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |  19 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  32 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 207 ++++++++-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  18 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  17 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  15 +
+ drivers/net/veth.c                            |  19 +
+ include/linux/if_vlan.h                       |   4 +-
+ include/linux/mlx5/device.h                   |   2 +-
+ include/net/xdp.h                             |   9 +
+ include/net/xdp_sock_drv.h                    |  17 +
+ include/net/xsk_buff_pool.h                   |   2 +
+ include/uapi/linux/netdev.h                   |   3 +
+ net/core/xdp.c                                |  33 ++
+ net/xdp/xsk_buff_pool.c                       |  12 +
+ tools/include/uapi/linux/netdev.h             |   3 +
+ tools/net/ynl/generated/netdev-user.c         |   1 +
+ .../selftests/bpf/prog_tests/xdp_metadata.c   | 134 +++++-
+ .../selftests/bpf/progs/xdp_hw_metadata.c     |  38 +-
+ .../selftests/bpf/progs/xdp_metadata.c        |   5 +
+ tools/testing/selftests/bpf/testing_helpers.h |   3 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  34 +-
+ tools/testing/selftests/bpf/xdp_metadata.h    |  34 +-
+ 31 files changed, 851 insertions(+), 310 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
 
