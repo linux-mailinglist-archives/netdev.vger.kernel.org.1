@@ -1,174 +1,256 @@
-Return-Path: <netdev+bounces-54017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ABAE8059E3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:21:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 938348059E7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1095B211C4
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:21:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF28B2120A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4170E60BB9;
-	Tue,  5 Dec 2023 16:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAE1675A9;
+	Tue,  5 Dec 2023 16:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="v16FblpM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33F91A2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:21:31 -0800 (PST)
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1fb1c742f0bso3929385fac.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:21:31 -0800 (PST)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A727122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:23:48 -0800 (PST)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5d3644ca426so57626957b3.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:23:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701793428; x=1702398228; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YAbXwpRgDFgfs4oKyWehmC86yPoHD7aoYIYc9vhsGuc=;
+        b=v16FblpMlnghhmAoFp37wip+fj4EJXSPnuopCx9DjCarAAIbRvFCtBlMRvlNqAYlWO
+         1L6jTFYsVz7xHmSm5Ws+OvaK4hlcD5L38UG+qIA1NNkd1u6pl9fMH2lKn/pGwmwuJ3d/
+         rqEv0SVZiWr0XAecp8RJ2depfk4PZyTEAb169UgqNhnAyIf7fxTDBFxCPvvTj6KbgAGC
+         aRI996Eaf6QYnS0LxUJSqDmJzxKllKSJ4RJAQv517QEtko2F9hVOhMtPlB/Enu9IR8QD
+         ZxWa8ldj0/vn2Roe6M4bM9r9y3Ix8eLEsTt7hH7TOkb4zV26WZrC5A1MEokwOX3Xxo6Z
+         R25A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701793291; x=1702398091;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vzfIo4UwHjmv9AcSp0c+7fZqXTBTtszlVZK70ogcugI=;
-        b=i3Dl6pDr37MAsETQuXQVAnAc64U6J4ZZUJwXqkMXWDCRUd0Na7CgNC6fRsoJsm9mfd
-         JEj8xuJD/reqqAxtS8hpZVHaNLLa3FSC/EvvpelHxGgATktmXdyEkGs9TDiRGC+HR5q0
-         49etEwjVHUmuQAkCL6fHWfEeuEwKy2kq/zBNCS1jy1sjn+ccQkEgqEkNakMmuKa/u80Q
-         ry0E37D/+xzZ4pKb66heA9DPsdFmlzOroQeBK2J5ULZltEvVHtofzSC2JirOtdL1ZHd3
-         G1zKZY2+jwmjAZHB2uYXdA+l1mIXJlUE2HLkRfFIJJWOtseSpN6ZAW4BYzWNe/W9F/P4
-         imgA==
-X-Gm-Message-State: AOJu0YxpRBIi11flWWSelS9kKzpElCyNROIsXcy6S0v/uWxB9iOGn/5H
-	o1LC95rtAqBdhCBNeTpf0Y5tDm/RepiLCMmK8pMQEmnboqMn
-X-Google-Smtp-Source: AGHT+IEBnIl+nc2iDQoJp4qY0EVILgvqwTyNqqBJgobjS6yKzxo52U8yGabACkG0EjlHFhjUVC3gEAIaZNq4IzJFPflAJRGJ5hrd
+        d=1e100.net; s=20230601; t=1701793428; x=1702398228;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YAbXwpRgDFgfs4oKyWehmC86yPoHD7aoYIYc9vhsGuc=;
+        b=QO7xIczK8/QE5R5P6RunSeWtinXVUUwg6fzQtwwE6FA8dot99AtpIAkX1/Cls3OEtn
+         ukZBACLl9GFT0plIi1PsmKk/ZSaSbwZPiVFc5n+XhZ4vyCIok06mLR0UShWiqqDrCaJ0
+         +pR/BfFL52c7OvUICJzbO7itamygNoroYGIB9RFg+FPctbswLXVPxxb/xeyaxBlEJmzr
+         BY/0yazH2P0lWI6o5nTMb9pJjllLtZmU+2Wt/V5xSmhyognSXs/5yvw8KyM7pJEpzp2s
+         HcVz0Woqh1HEZSvyd9vPWg/ucwB5Ky5xO5iASjtI8jOo4HX3MYMM9uSh8n6ToI6oYHsz
+         mj4g==
+X-Gm-Message-State: AOJu0Yx76j8p2P8Otc2SWPDVibSpafcMkYO8U2SQXXoe4w9TEQgvpCib
+	C4u/ToAFLhQqCVMhYWt6+Isa4QCHs0EEaUHXhnekpA==
+X-Google-Smtp-Source: AGHT+IG2RqlRgezYi6QCtZRukN9VkP1Ymuig7H0dBKCFX+KQG4RnHn8xpB0giKFOz6sYzbMcRSiF11JZMTLUsqpAvm8=
+X-Received: by 2002:a0d:e881:0:b0:5d9:1524:e315 with SMTP id
+ r123-20020a0de881000000b005d91524e315mr2642283ywe.17.1701793427715; Tue, 05
+ Dec 2023 08:23:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6871:283:b0:1fa:e182:4123 with SMTP id
- i3-20020a056871028300b001fae1824123mr4990580oae.7.1701793291286; Tue, 05 Dec
- 2023 08:21:31 -0800 (PST)
-Date: Tue, 05 Dec 2023 08:21:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009bbd76060bc5a03c@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in data_push_tail / ip6_addr_string
-From: syzbot <syzbot+28e00a6bab865c9c7d46@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20231201182904.532825-1-jhs@mojatatu.com> <20231201182904.532825-16-jhs@mojatatu.com>
+ <656e6f8d7c99f_207cb2087c@john.notmuch> <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
+In-Reply-To: <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 5 Dec 2023 11:23:36 -0500
+Message-ID: <CAM0EoM=MJJH9zNdiEHYpkYYQ_7WqobGv_v8wp04R7HhdPW8TxA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 15/15] p4tc: add P4 classifier
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
+	deb.chatterjee@intel.com, anjali.singhai@intel.com, namrata.limaye@intel.com, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
+	horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Level: **
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Dec 5, 2023 at 8:43=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
+t> wrote:
+>
+> On 12/5/23 1:32 AM, John Fastabend wrote:
+> > Jamal Hadi Salim wrote:
+> >> Introduce P4 tc classifier. A tc filter instantiated on this classifie=
+r
+> >> is used to bind a P4 pipeline to one or more netdev ports. To use P4
+> >> classifier you must specify a pipeline name that will be associated to
+> >> this filter, a s/w parser and datapath ebpf program. The pipeline must=
+ have
+> >> already been created via a template.
+> >> For example, if we were to add a filter to ingress of network interfac=
+e
+> >> device $P0 and associate it to P4 pipeline simple_l3 we'd issue the
+> >> following command:
+> >
+> > In addition to my comments from last iteration.
+> >
+> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
+_l3 \
+> >>      action bpf obj $PARSER.o section prog/tc-parser \
+> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > Having multiple object files is a mistake IMO and will cost
+> > performance. Have a single object file avoid stitching together
+> > metadata and run to completion. And then run entirely from XDP
+> > this is how we have been getting good performance numbers.
+>
+> +1, fully agree.
 
-syzbot found the following issue on:
+As I stated earlier: while performance is important it is not the
+highest priority for what we are doing, rather correctness is. We dont
+want to be wrestling with the verifier or some other limitation like
+tail call limits to gain some increase in a few kkps. We are taking a
+gamble with the parser which is not using any kfuncs at the moment.
+Putting them all in one program will increase the risk.
 
-HEAD commit:    d3fa86b1a7b4 Merge tag 'net-6.7-rc3' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11ee5ad0e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8c1151391aefc0c3
-dashboard link: https://syzkaller.appspot.com/bug?extid=28e00a6bab865c9c7d46
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+As i responded to you earlier,  we just dont want to lose
+functionality, some sample space:
+- we could have multiple pipelines with different priorities - and
+each pipeline may have its own logic with many tables etc (and the
+choice to iterate the next one is essentially encoded in the tc action
+codes)
+- we want to be able to split the pipeline into parts that can run _in
+unison_ in h/w, xdp, and tc
+- we use tc block to map groups of ports heavily
+- we use netlink as our control API
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> >> $PROGNAME.o and $PARSER.o is a compilation of the eBPF programs genera=
+ted
+> >> by the P4 compiler and will be the representation of the P4 program.
+> >> Note that filter understands that $PARSER.o is a parser to be loaded
+> >> at the tc level. The datapath program is merely an eBPF action.
+> >>
+> >> Note we do support a distinct way of loading the parser as opposed to
+> >> making it be an action, the above example would be:
+> >>
+> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
+_l3 \
+> >>      prog type tc obj $PARSER.o ... \
+> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >>
+> >> We support two types of loadings of these initial programs in the pipe=
+line
+> >> and differentiate between what gets loaded at tc vs xdp by using synta=
+x of
+> >>
+> >> either "prog type tc obj" or "prog type xdp obj"
+> >>
+> >> For XDP:
+> >>
+> >> tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
+> >>      prog type xdp obj $PARSER.o section parser/xdp \
+> >>      pinned_link /sys/fs/bpf/mylink \
+> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > I don't think tc should be loading xdp programs. XDP is not 'tc'.
+>
+> For XDP, we do have a separate attach API, for BPF links we have bpf_xdp_=
+link_attach()
+> via bpf(2) and regular progs we have the classic way via dev_change_xdp_f=
+d() with
+> IFLA_XDP_* attributes. Mid-term we'll also add bpf_mprog support for XDP =
+to allow
+> multi-user attachment. tc kernel code should not add yet another way of a=
+ttaching XDP,
+> this should just reuse existing uapi infra instead from userspace control=
+ plane side.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/54d04c4835b4/disk-d3fa86b1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b978f8963a3b/vmlinux-d3fa86b1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f8c85c8cd6ce/bzImage-d3fa86b1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+28e00a6bab865c9c7d46@syzkaller.appspotmail.com
-
-ext4 filesystem being mounted at /root/syzkaller-testdir4291713644/syzkaller.zakLwE/4472/file1 supports timestamps until 2038-01-19 (0x7fffffff)
-==================================================================
-BUG: KCSAN: data-race in data_push_tail / ip6_addr_string
-
-write to 0xffffffff86eb5840 of 1 bytes by task 5346 on cpu 0:
- string_nocheck lib/vsprintf.c:650 [inline]
- ip6_addr_string+0x119/0x1a0 lib/vsprintf.c:1469
- ip_addr_string+0x15f/0x5d0 lib/vsprintf.c:1591
- pointer+0x647/0xd10 lib/vsprintf.c:2444
- vsnprintf+0x861/0xe20 lib/vsprintf.c:2823
- vscnprintf+0x42/0x80 lib/vsprintf.c:2925
- printk_sprint+0x30/0x2d0 kernel/printk/printk.c:2124
- vprintk_store+0x56f/0x800 kernel/printk/printk.c:2238
- vprintk_emit+0xd0/0x5d0 kernel/printk/printk.c:2284
- vprintk_default+0x26/0x30 kernel/printk/printk.c:2318
- vprintk+0x71/0x80 kernel/printk/printk_safe.c:45
- _printk+0x7a/0xa0 kernel/printk/printk.c:2328
- __ip6_tnl_rcv+0x7ee/0x800 net/ipv6/ip6_tunnel.c:848
- ip6_tnl_rcv+0x64/0x80 net/ipv6/ip6_tunnel.c:888
- gre_rcv+0x7b5/0x850
- ip6_protocol_deliver_rcu+0x92f/0xf30 net/ipv6/ip6_input.c:438
- ip6_input_finish net/ipv6/ip6_input.c:483 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip6_input+0xbd/0x1b0 net/ipv6/ip6_input.c:492
- ip6_mc_input+0x34a/0x480 net/ipv6/ip6_input.c:586
- dst_input include/net/dst.h:461 [inline]
- ip6_rcv_finish+0x1e2/0x2e0 net/ipv6/ip6_input.c:79
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ipv6_rcv+0x74/0x150 net/ipv6/ip6_input.c:310
- __netif_receive_skb_one_core net/core/dev.c:5529 [inline]
- __netif_receive_skb+0x90/0x1b0 net/core/dev.c:5643
- netif_receive_skb_internal net/core/dev.c:5729 [inline]
- netif_receive_skb+0x4a/0x310 net/core/dev.c:5788
- tun_rx_batched+0xf0/0x410 drivers/net/tun.c:1555
- tun_get_user+0x1d3f/0x2340 drivers/net/tun.c:2002
- tun_chr_write_iter+0x18e/0x240 drivers/net/tun.c:2048
- call_write_iter include/linux/fs.h:2020 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x48a/0x790 fs/read_write.c:584
- ksys_write+0xeb/0x1a0 fs/read_write.c:637
- __do_sys_write fs/read_write.c:649 [inline]
- __se_sys_write fs/read_write.c:646 [inline]
- __x64_sys_write+0x42/0x50 fs/read_write.c:646
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-read to 0xffffffff86eb5840 of 8 bytes by task 5334 on cpu 1:
- data_make_reusable kernel/printk/printk_ringbuffer.c:590 [inline]
- data_push_tail+0x102/0x430 kernel/printk/printk_ringbuffer.c:675
- data_alloc+0xbe/0x2c0 kernel/printk/printk_ringbuffer.c:1046
- prb_reserve+0x893/0xbc0 kernel/printk/printk_ringbuffer.c:1555
- vprintk_store+0x53e/0x800 kernel/printk/printk.c:2228
- vprintk_emit+0xd0/0x5d0 kernel/printk/printk.c:2284
- vprintk_default+0x26/0x30 kernel/printk/printk.c:2318
- vprintk+0x71/0x80 kernel/printk/printk_safe.c:45
- _printk+0x7a/0xa0 kernel/printk/printk.c:2328
- mnt_warn_timestamp_expiry+0x1bb/0x1f0 fs/namespace.c:2804
- do_new_mount_fc fs/namespace.c:3278 [inline]
- do_new_mount+0x2ee/0x660 fs/namespace.c:3339
- path_mount+0x496/0xb30 fs/namespace.c:3664
- do_mount fs/namespace.c:3677 [inline]
- __do_sys_mount fs/namespace.c:3886 [inline]
- __se_sys_mount+0x27f/0x2d0 fs/namespace.c:3863
- __x64_sys_mount+0x67/0x80 fs/namespace.c:3863
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-value changed: 0x000000010000bfe1 -> 0x303a303030303a30
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 5334 Comm: syz-executor.1 Tainted: G        W          6.7.0-rc2-syzkaller-00095-gd3fa86b1a7b4 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
-==================================================================
+I am probably missing something. We are not loading the XDP program -
+it is preloaded, the only thing the filter does above is grabbing a
+reference to it. The P4 pipeline in this case is split into a piece
+(the parser) that runs on XDP and some that runs on tc. And as i
+mentioned earlier we could go further another piece which is part of
+the pipeline may run in hw. And infact in the future a compiler will
+be able to generate code that is split across machines. For our s/w
+datapath on the same node the only split is between tc and XDP.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >> The theory of operations is as follows:
+> >>
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D1. PARSING=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> The packet first encounters the parser.
+> >> The parser is implemented in ebpf residing either at the TC or XDP
+> >> level. The parsed header values are stored in a shared eBPF map.
+> >> When the parser runs at XDP level, we load it into XDP using tc filter
+> >> command and pin it to a file.
+> >>
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D2. ACTIONS=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> In the above example, the P4 program (minus the parser) is encoded in =
+an
+> >> action($PROGNAME.o). It should be noted that classical tc actions
+> >> continue to work:
+> >> IOW, someone could decide to add a mirred action to mirror all packets
+> >> after or before the ebpf action.
+> >>
+> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
+_l3 \
+> >>      prog type tc obj $PARSER.o section parser/tc-ingress \
+> >>      action bpf obj $PROGNAME.o section prog/tc-ingress \
+> >>      action mirred egress mirror index 1 dev $P1 \
+> >>      action bpf obj $ANOTHERPROG.o section mysect/section-1
+> >>
+> >> It should also be noted that it is feasible to split some of the ingre=
+ss
+> >> datapath into XDP first and more into TC later (as was shown above for
+> >> example where the parser runs at XDP level). YMMV.
+> >
+> > Is there any performance value in partial XDP and partial TC? The main
+> > wins we see in XDP are when we can drop, redirect, etc the packet
+> > entirely in XDP and avoid skb altogether.
+> >
+> >>
+> >> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> >> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> >> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>
+> The cls_p4 is roughly a copy of {cls,act}_bpf, and from a BPF community s=
+ide
+> we moved away from this some time ago for the benefit of a better managem=
+ent
+> API for tc BPF programs via bpf(2) through bpf_mprog (see libbpf and BPF =
+selftests
+> around this), as mentioned earlier. Please use this instead for your user=
+space
+> control plane, otherwise we are repeating the same mistakes from the past=
+ again
+> that were already fixed.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Sorry, that is your use case for kubernetes and not ours. We want to
+use the tc infra. We want to use netlink. I could be misreading what
+you are saying but it seems that you are suggesting that tc infra is
+now obsolete as far as ebpf is concerned? Overall: It is a bit selfish
+to say your use case dictates how other people use ebpf. ebpf is just
+a means to an end for us and _is not the end goal_ - just an infra
+toolset. We spent a long time compromising to meet you somewhere when
+you asked us to use ebpf but you are pushing it now .
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+If you feel we should unify the P4 classifier with the tc ebpf
+classifier etc then we are going to need some changes that are not
+going to be useful for other people. And i dont see the point in that.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+cheers,
+jamal
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> Therefore, from BPF side:
+>
+> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+>
+> Cheers,
+> Daniel
 
