@@ -1,92 +1,76 @@
-Return-Path: <netdev+bounces-53733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D5380448D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:17:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E337B80449D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 976B52813C4
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:17:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F6371C209C5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC23E46AD;
-	Tue,  5 Dec 2023 02:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCDC46AF;
+	Tue,  5 Dec 2023 02:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPhJIaUR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lCYmsG+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFD04689
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 02:17:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BAF2C433C8;
-	Tue,  5 Dec 2023 02:17:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701742674;
-	bh=CFuIQBFb4jQLP5hJXSZ1DamnTQmlulyUK6o3iWa+amA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QPhJIaURVkaehK07DiA9eU7x4cF/P10zqZmv6Gx6GiTtbUDmQj0fxdb3uMce1NdRd
-	 Owsw6ukeGy96FxYtXL22lMsoYsmwV/mAD+NnJJAVP8VdZ8jPdk4EzbSrFQXjT8FJSe
-	 lhRshCmKH/h7Sl5BVk3rEILYGeDJ7sYgmaTdwDai9aoSfefuSLBrDlZLZQJmqVuAsV
-	 xYQsCXgbVQEm908rvw/PNhrpFfPiMv3vClnnexPXg6hG1UdLiKdEsS+PFesBI+hIcH
-	 7j0YdVgbRmhefip2PIRQ2fIZTkS2brQi+sl6Ly+WF6TjpJBvwHh5DSPTpDS9C9yQp9
-	 f1GbEGR3xDw4A==
-Date: Mon, 4 Dec 2023 18:17:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, David Epping
- <david.epping@missinglinkelectronics.com>, Vladimir Oltean
- <olteanv@gmail.com>, Harini Katakam <harini.katakam@amd.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <20231204181752.2be3fd68@kernel.org>
-In-Reply-To: <20231128133630.7829-3-ansuelsmth@gmail.com>
-References: <20231128133630.7829-1-ansuelsmth@gmail.com>
-	<20231128133630.7829-3-ansuelsmth@gmail.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F5CCE;
+	Mon,  4 Dec 2023 18:24:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=avQIdgb7Wcdafp4yfZ6kuA2OSaG3FJ0wg50oUbHTKe8=; b=lCYmsG+5kyPZQGs6XIazPXY+yC
+	YE+ZIWrqzxR+QGyw+VdJanshYmU70Qi6itf6Gq8ON9pFJjYVeTFynPvbRK4MXYlNecFHLxh4xISE7
+	ruZohY/uZIDCpMe3l25WZyp2v47EFPlryLR7Sap/QC6QPOyHVfrAawp5hlApLeArcRHI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rAL6Z-0022aP-Bu; Tue, 05 Dec 2023 03:24:11 +0100
+Date: Tue, 5 Dec 2023 03:24:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+	wedsonaf@gmail.com, aliceryhl@google.com, boqun.feng@gmail.com
+Subject: Re: [PATCH net-next v9 4/4] net: phy: add Rust Asix PHY driver
+Message-ID: <7968e369-0769-428b-8fc9-dcb2af1f08b6@lunn.ch>
+References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+ <20231205011420.1246000-5-fujita.tomonori@gmail.com>
+ <CXG0XVG6V0TS.1MXLVYIPU58QC@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CXG0XVG6V0TS.1MXLVYIPU58QC@kernel.org>
 
-On Tue, 28 Nov 2023 14:36:30 +0100 Christian Marangi wrote:
-> +/**
-> + * phy_package_write_mmd - Convenience function for writing a register
-> + * on an MMD on a given PHY using the PHY package base addr, added of
-> + * the addr_offset value.
-> + * @phydev: The phy_device struct
-> + * @addr_offset: The offset to be added to PHY package base_addr
-> + * @devad: The MMD to read from
-> + * @regnum: The register on the MMD to read
-> + * @val: value to write to @regnum
-> + *
-> + * Same rules as for phy_write();
-> + *
-> + * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-> + */
+On Tue, Dec 05, 2023 at 03:54:48AM +0200, Jarkko Sakkinen wrote:
+> On Tue Dec 5, 2023 at 3:14 AM EET, FUJITA Tomonori wrote:
+> > This is the Rust implementation of drivers/net/phy/ax88796b.c. The
+> > features are equivalent. You can choose C or Rust version kernel
+> > configuration.
+> >
+> > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> > Reviewed-by: Trevor Gross <tmgross@umich.edu>
+> > Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+> 
+> Hardware-agnostic feature must have something that spins in qemu, at least
+> for a wide-coverage feature like phy it would be imho grazy to merge these
+> without a phy driver that anyone can test out.
 
-> +/*
-> + * phy_package_write_mmd - Convenience function for writing a register
-> + * on an MMD on a given PHY using the PHY package base addr, added of
-> + * the addr_offset value.
-> + */
-> +int phy_package_write_mmd(struct phy_device *phydev,
-> +			  unsigned int addr_offset, int devad,
-> +			  u32 regnum, u16 val);
+There are no hardware agnostic features here. PHY drivers are pretty
+much thin layers which talk to the hardware. Take a look at the C
+drivers, what hardware agnostic features do you see in them?
 
-Hm, I see there's some precedent here already for this duplicated
-semi-kdoc. It seems a bit unusual. If I was looking for kdoc and 
-found the header one I'd probably not look at the source file at all.
+People can easily test this driver, its an easily available USB
+dongle, which will work on any USB port, with any SoC architectures.
 
-Andrew, WDYT?
+    Andrew
 
