@@ -1,93 +1,160 @@
-Return-Path: <netdev+bounces-53827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED96804C0B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:15:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5467804C31
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED107280E25
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:15:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0841AB20A83
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3803BB41;
-	Tue,  5 Dec 2023 08:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89FA3C08D;
+	Tue,  5 Dec 2023 08:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dLO1H5KC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gtiujLQ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4FF4FA
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:15:29 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54c79cca895so9640a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 00:15:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701764128; x=1702368928; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ynnvl8LsLrxfDj7bKNLo1dnw8JKtWg9wpT6p42z0kYs=;
-        b=dLO1H5KCFsRnyqmUf1j2z+VNey1dplSwjNtwgWDjk/B2iUBcZkSPtYky3hWQqtuPQh
-         kArrEMxy2Pk2H9ND0JKwJ96+m9fXdzR+56MRtE9VYYoQ9/3ynztv6hgBmYhocYUNST/0
-         b/lQH5EH7ShCW6npWrwq6phq3kKEd8KWx9/fWWU9TUgbn86jbK+62ssxU1znsheSs8+C
-         fs3pD8Jh5M3Zs7tXugb35luASIsaECvbOEQZinnXc45aSfSe+E7nV38MGMZADN5kHLSJ
-         pfJ50XVbIakR1elddXxfas2FlEUhamBZVVhiFSIUos8vgY/RGJgW8YDs0/fd4BE5c+I2
-         2PkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701764128; x=1702368928;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ynnvl8LsLrxfDj7bKNLo1dnw8JKtWg9wpT6p42z0kYs=;
-        b=SAizD7ZzuekX2IqoDryhOytzoKZzuEcgEbT+ZuJuRJVkSyx/X8KZ5r2bk8qGUz9yew
-         q+GUBTY4RlNkdxSOUc1Qv7+f2nLeuRH+fNTKaSLv7CFtHB3V3OXCgO2u1ZQoE3t3KhVC
-         nudefmzRgaDk7BTmlJ3o2y+kybcX5fvI4B8yzDigUdbr36Ptkdv0BZCGDFwonxPO3in1
-         zdwgE2WRsxCz0G/s9/oCT2OHg2byk14kvRTTS3MRjJ62QcCM2U0JnW3g/n0fIv+FyV31
-         dkOSJnOEnrQWFhntxe0nOMd5nih2jUie1RmodYvNqYIuKrjZTepq4ijkRNSuCdUMJRT+
-         4a3w==
-X-Gm-Message-State: AOJu0Yx/KzMrgii4MaUS3U6sLSzQo5j/TEtND2egudCVoHkEoROuSvDg
-	5GXKQRqJNLyn9LxTUOAbaEbPIRvjzsQACVrwORpKXQ==
-X-Google-Smtp-Source: AGHT+IFNWdVhhSQl5FTZcEdFUQFcb28k663ttPMC6jRcM8Ukfae+es4lkf8WRyKmWGpUYViAefmyfT2whU+s1YSg3k8=
-X-Received: by 2002:a50:aacf:0:b0:54b:321:ef1a with SMTP id
- r15-20020a50aacf000000b0054b0321ef1amr419141edc.6.1701764127887; Tue, 05 Dec
- 2023 00:15:27 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634C2138;
+	Tue,  5 Dec 2023 00:23:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701764597; x=1733300597;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gcfTZdhA5gWjXKrvaXBrEm3hhlOaQHfXwYwZPdM9PEM=;
+  b=gtiujLQ88TUa2gLcB7zFDT4/vJTF8IXajM02kDKEXqH8oLG/me8CfC3M
+   zsUpi9qKSBBn9V6dhQ2p9KsGov+Yw4+0cVGhcDmsBeJ9PAE6hEfGLNLa2
+   5Qjjpjt/hrNrGJkFM8bGySzpvBLPd+//XmIKpTNy17+HbzB5iISS2fYW8
+   68meM16kqc7biPywvIY7s8yPRxhINqpQU26yHSaPMosA72EdmNLMT367j
+   H8CnfMgVWV9nccnptF3QAncdbUxhxu7xXugHKEL8o0FmVIhz3kzgbH1AZ
+   y2aALm8bGTDSoMWfyLVdjxdg5g2AvjVZ5FfND5+Ll0GnCgukYj6qR3EBm
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="384259759"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="384259759"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 00:23:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="764248993"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="764248993"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 05 Dec 2023 00:23:16 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAQi2-0008Zp-06;
+	Tue, 05 Dec 2023 08:23:14 +0000
+Date: Tue, 5 Dec 2023 16:23:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: YangXin <yx.0xffff@gmail.com>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ___neigh_lookup_noref(): remove redundant parameters
+Message-ID: <202312051637.EOZ86jSh-lkp@intel.com>
+References: <20231204185943.68-1-yx.0xffff@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201083926.1817394-1-judyhsiao@chromium.org>
- <CANn89iJMbMZdnJRP0CUVfEi20whhShBfO+DAmdaerhiXfiTx5A@mail.gmail.com>
- <CAD=FV=VqmkydL2XXMWNZ7+89F_6nzGZiGfkknaBgf4Zncng1SQ@mail.gmail.com> <CANn89iLuxfSZs+HV6-3=2FJL_KHg3=7WLZ109VXqsXO2-k+KvQ@mail.gmail.com>
-In-Reply-To: <CANn89iLuxfSZs+HV6-3=2FJL_KHg3=7WLZ109VXqsXO2-k+KvQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Dec 2023 09:15:16 +0100
-Message-ID: <CANn89iLugAraF-n-PE72k2g+OUo9T0RcdC+HbKAKRZW-cTbHsg@mail.gmail.com>
-Subject: Re: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-To: Doug Anderson <dianders@chromium.org>
-Cc: Judy Hsiao <judyhsiao@chromium.org>, David Ahern <dsahern@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204185943.68-1-yx.0xffff@gmail.com>
 
-On Tue, Dec 5, 2023 at 9:00=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
->
+Hi YangXin,
 
-> Please Judy send a V2 of the patch.
->
-> I gave feedback, my intention was not to author the patch.
->
-> This is standard procedure, I now realize this was Judy first
-> contribution, sorry for not making this clear.
+kernel test robot noticed the following build warnings:
 
-I meant : "first contribution" in a networking tree, let me clarify that.
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v6.7-rc4 next-20231205]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
->
-> I will simply add a "Reviewed-by: ..." tag when I agree with the result.
+url:    https://github.com/intel-lab-lkp/linux/commits/YangXin/net-___neigh_lookup_noref-remove-redundant-parameters/20231205-030205
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231204185943.68-1-yx.0xffff%40gmail.com
+patch subject: [PATCH] net: ___neigh_lookup_noref(): remove redundant parameters
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231205/202312051637.EOZ86jSh-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231205/202312051637.EOZ86jSh-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312051637.EOZ86jSh-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/net/route.h:28,
+                    from include/net/ip.h:30,
+                    from include/net/busy_poll.h:18,
+                    from drivers/net/ethernet/sfc/falcon/net_driver.h:29,
+                    from drivers/net/ethernet/sfc/falcon/efx.c:21:
+   include/net/arp.h: In function '__ipv4_neigh_lookup_noref':
+   include/net/arp.h:27:64: error: passing argument 3 of '___neigh_lookup_noref' from incompatible pointer type [-Werror=incompatible-pointer-types]
+      27 |         return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
+         |                                                                ^~~~
+         |                                                                |
+         |                                                                u32 * {aka unsigned int *}
+   In file included from include/net/dst.h:20,
+                    from include/net/sock.h:66,
+                    from include/linux/tcp.h:19,
+                    from drivers/net/ethernet/sfc/falcon/efx.c:15:
+   include/net/neighbour.h:296:28: note: expected 'struct net_device *' but argument is of type 'u32 *' {aka 'unsigned int *'}
+     296 |         struct net_device *dev)
+         |         ~~~~~~~~~~~~~~~~~~~^~~
+   include/net/arp.h:27:16: error: too many arguments to function '___neigh_lookup_noref'
+      27 |         return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
+         |                ^~~~~~~~~~~~~~~~~~~~~
+   include/net/neighbour.h:293:33: note: declared here
+     293 | static inline struct neighbour *___neigh_lookup_noref(
+         |                                 ^~~~~~~~~~~~~~~~~~~~~
+   In file included from include/net/route.h:29:
+   include/net/ndisc.h: In function '__ipv6_neigh_lookup_noref':
+>> include/net/ndisc.h:383:64: warning: passing argument 3 of '___neigh_lookup_noref' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     383 |         return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
+         |                                                                ^~~~
+   include/net/neighbour.h:296:28: note: expected 'struct net_device *' but argument is of type 'const void *'
+     296 |         struct net_device *dev)
+         |         ~~~~~~~~~~~~~~~~~~~^~~
+   include/net/ndisc.h:383:16: error: too many arguments to function '___neigh_lookup_noref'
+     383 |         return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
+         |                ^~~~~~~~~~~~~~~~~~~~~
+   include/net/neighbour.h:293:33: note: declared here
+     293 | static inline struct neighbour *___neigh_lookup_noref(
+         |                                 ^~~~~~~~~~~~~~~~~~~~~
+   include/net/ndisc.h: In function '__ipv6_neigh_lookup_noref_stub':
+   include/net/ndisc.h:390:74: warning: passing argument 3 of '___neigh_lookup_noref' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     390 |         return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
+         |                                                                          ^~~~
+   include/net/neighbour.h:296:28: note: expected 'struct net_device *' but argument is of type 'const void *'
+     296 |         struct net_device *dev)
+         |         ~~~~~~~~~~~~~~~~~~~^~~
+   include/net/ndisc.h:390:16: error: too many arguments to function '___neigh_lookup_noref'
+     390 |         return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
+         |                ^~~~~~~~~~~~~~~~~~~~~
+   include/net/neighbour.h:293:33: note: declared here
+     293 | static inline struct neighbour *___neigh_lookup_noref(
+         |                                 ^~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +383 include/net/ndisc.h
+
+   380	
+   381	static inline struct neighbour *__ipv6_neigh_lookup_noref(struct net_device *dev, const void *pkey)
+   382	{
+ > 383		return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
+   384	}
+   385	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
