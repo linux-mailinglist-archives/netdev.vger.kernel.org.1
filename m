@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-54176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8524380630F
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B478806310
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A724C1C20B01
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC2CA1C210FE
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE3A41763;
-	Tue,  5 Dec 2023 23:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9099351C36;
+	Tue,  5 Dec 2023 23:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HLZE+tSw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GhkdEygR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816ED18B
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:29 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77d6b28aa9aso417415485a.3
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:29 -0800 (PST)
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F4015122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:30 -0800 (PST)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-77dc38b4e8dso389575085a.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701819868; x=1702424668; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701819870; x=1702424670; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3v7nQAZ/o1oMxvh2SOa6aPUCXJcA8Pml3tMPIXUrIlk=;
-        b=HLZE+tSw3z4jol7w9CWO6cJYFn1m2NF6adOGY2R2mdhlvixcVNMCYZczaL4lnilC2F
-         VIxYBbUWEmRinumw/ZN2RMH18GNrtFllSWmxCGM1Gnb4DWBUnFBw3mdCaZi3fTIetzvI
-         BjUdg03X2flIfJQ6nxV3eAxfj3nXKwMWSxTxU=
+        bh=BVUP3329gDTZt2+fwubl676AsKn766XC9PIt3X96WHY=;
+        b=GhkdEygRp9IbaXE/qK1lOrsJM9VHFYILWYnnB5lSLjwbn5y/IFH5bDy5GfTcsGJjgf
+         qTLWnUOBDi4aWlRNIWr00U0UJd5fGA+kSguiAD6QvPH9ID0PjUAW7Bld5nnu1XTCVimb
+         tLo6EsNdDA2tVPs0XYnVrk6PF5+YFUdaDlnV8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701819868; x=1702424668;
+        d=1e100.net; s=20230601; t=1701819870; x=1702424670;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3v7nQAZ/o1oMxvh2SOa6aPUCXJcA8Pml3tMPIXUrIlk=;
-        b=Vm0/3e2o0jZbazm7VxCqmxN2YrFumhXsQpIY6QuzUblwkGBihCybl6ic9YmZAwj0zw
-         RfiQFy0jgxzbeU6BqoiKUmSwhrnWMuOg4HOBUrNsKo6iPHRv2NqXt9u+51QpBg493C/6
-         wccLhsObvuw1vquYtLbbx2eIreo+urFUhtlrn0OJv/GLdLQv7KiWxgy4/3LG9XDpAzlL
-         ddW9JttjwD4+WPj4JnyZQFeImcQub4mOA6LKE9dOOl0ExP5pNpbbDzEHqPw+yefgZ3zh
-         MX9I0qXM2iMfeeZ9m13qh8sxK2a6HcNJLkPhiKfU76jMQYEzEBZgzku4faNveYaqxw/q
-         llxQ==
-X-Gm-Message-State: AOJu0Yx/l87E95J3uXau7R88AbnazZYjjhpLXY1BZvPsJnqCLSJP4BRM
-	oKdZgD/8hg2zIWYnmy5bbR+Pqg==
-X-Google-Smtp-Source: AGHT+IE3AEZa0WV3P/5uVm+s0T9ygp/kY5lhS4rgqO8AzMR9AjgZSn+lMZ5ZWjX5firQAqBFzKZIRQ==
-X-Received: by 2002:a05:620a:3951:b0:76d:2725:f36f with SMTP id qs17-20020a05620a395100b0076d2725f36fmr61966qkn.71.1701819868156;
-        Tue, 05 Dec 2023 15:44:28 -0800 (PST)
+        bh=BVUP3329gDTZt2+fwubl676AsKn766XC9PIt3X96WHY=;
+        b=VIRZicypSHfg504Oe5R4spwKvfS9iWAg34Pcj1z3S7Ct3ICHKl0DBPpBWJqcwN8Sce
+         k4mUArfl4uMBAqxnqvvZ+cI9/ZhYJt96ZpACyDtIgNzPs58Dq7KP7suABz/GT/a7+v6H
+         gJgiaKskt73vzs0eeGlL2LPgPJ2+MGzGrm1TA/51N6BlsQsh8NtWslNlejTT8x0jbziZ
+         VGJ0Qtrfac8769eMqPW0QsB3CKgo0hXYsplEiGld97ypFl13DB6tS3SHul9sR+OfgflG
+         vfAVaqe+LdBbOcglyc0BAKS8ykdaycvgquqosJLM0+ZfHUWdmljXP7U83++V3A5C0pAo
+         JEJg==
+X-Gm-Message-State: AOJu0Yy2Hn95NbRbtYRg8NI4MM+xOGSNqMv4IO9WpYwQjSrvHQ/7vNam
+	9MBr0kWuRth+XQKEfhrjjzsQmdLcQA3L8mxeR8U=
+X-Google-Smtp-Source: AGHT+IHTC42IcgQQZgQbi0I0XjsvZ+aeGjtc6bj5lgymEF9L8LuyguDT2uZeVAdIDoQbtQy4kCXNOA==
+X-Received: by 2002:a05:620a:120a:b0:77d:99a2:7450 with SMTP id u10-20020a05620a120a00b0077d99a27450mr65578qkj.28.1701819869848;
+        Tue, 05 Dec 2023 15:44:29 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.26
+        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.28
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Dec 2023 15:44:27 -0800 (PST)
+        Tue, 05 Dec 2023 15:44:29 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,13 +55,12 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net 2/4] bnxt_en: Fix skb recycling logic in bnxt_deliver_skb()
-Date: Tue,  5 Dec 2023 15:44:02 -0800
-Message-Id: <20231205234404.17501-3-michael.chan@broadcom.com>
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net 3/4] bnxt_en: Fix wrong return value check in bnxt_close_nic()
+Date: Tue,  5 Dec 2023 15:44:03 -0800
+Message-Id: <20231205234404.17501-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231205234404.17501-1-michael.chan@broadcom.com>
 References: <20231205234404.17501-1-michael.chan@broadcom.com>
@@ -72,53 +71,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c1f7bb060bcbd09d"
+	boundary="000000000000d876e1060bcbd000"
 
---000000000000c1f7bb060bcbd09d
+--000000000000d876e1060bcbd000
 Content-Transfer-Encoding: 8bit
 
-From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-Receive SKBs can go through the VF-rep path or the normal path.
-skb_mark_for_recycle() is only called for the normal path.  Fix it
-to do it for both paths to fix possible stalled page pool shutdown
-errors.
+The wait_event_interruptible_timeout() function returns 0
+if the timeout elapsed, -ERESTARTSYS if it was interrupted
+by a signal, and the remaining jiffies otherwise if the
+condition evaluated to true before the timeout elapsed.
 
-Fixes: 86b05508f775 ("bnxt_en: Use the unified RX page pool buffers for XDP and non-XDP")
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Driver should have checked for zero return value instead of
+a positive value.
+
+Fixes: c0c050c58d84 ("bnxt_en: New Broadcom ethernet driver.")
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 72f2fc983940..b4a5311bdeb5 100644
+index b4a5311bdeb5..16b7cf6b01a4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1748,13 +1748,14 @@ static void bnxt_tpa_agg(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
- static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
- 			     struct sk_buff *skb)
- {
-+	skb_mark_for_recycle(skb);
-+
- 	if (skb->dev != bp->dev) {
- 		/* this packet belongs to a vf-rep */
- 		bnxt_vf_rep_rx(bp, skb);
- 		return;
+@@ -10753,7 +10753,7 @@ int bnxt_close_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 		rc = wait_event_interruptible_timeout(bp->sriov_cfg_wait,
+ 						      !bp->sriov_cfg,
+ 						      BNXT_SRIOV_CFG_WAIT_TMO);
+-		if (rc)
++		if (!rc)
+ 			netdev_warn(bp->dev, "timeout waiting for SRIOV config operation to complete!\n");
  	}
- 	skb_record_rx_queue(skb, bnapi->index);
--	skb_mark_for_recycle(skb);
- 	napi_gro_receive(&bnapi->napi, skb);
- }
- 
+ #endif
 -- 
 2.30.1
 
 
---000000000000c1f7bb060bcbd09d
+--000000000000d876e1060bcbd000
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -189,14 +182,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPxDFc0UyEeHWCJcckGqM3QioRKIXI0l
-vKrDneOs+dQjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-NTIzNDQyOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDfkLOq62sslnyF0z20eG9TisSFze5lz
+oI/0xSxh4ainMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NTIzNDQzMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCXwLoY60n8mP7PfDSkfehV0IpV1+tF+G7YRZK7CDNNi3+ekc9F
-oCFwC/L1U1KsvkmscT7AClGnX1YnD7wCvwUAJEEL/qQfePO4IBVMyyvUMbnNu5eyfZfMTYrGsLwl
-exIArTm6WRigiRKYb1zqGBw4z07sLuney+H/cUArB9Ra0RlU5YhnVo6Zs8G77CjhEXGLomXwRPB5
-oKhcHlXsAnC/M4luIObI7WO6gELRGsnkqnOfp/Qt9G/zxOaaVGmp42wIapSoI0yH3ERkPLNz8Wrv
-s8RDNwJSk/rXQkPCbNXKHsFkDPhDfG9PskrFyb7Qi9w9wPj+3MtfTRqY6c1+hJKH
---000000000000c1f7bb060bcbd09d--
+ATANBgkqhkiG9w0BAQEFAASCAQADw2F07NL5qR4mMEy8lb9bTEk4gS+agpr211LZib7NAQdBWW+c
+V2Nqsu55yznuLZWzHcsupptp8PjYooPSrHTYmKTgjruaGKZLWSjRHZgrPIcTQYWn+dwcb7VXOIXM
+iB3i9xzYnhm/Ks1fV0OSwVW4/+ffecU196ZDUw5vn+pCZJyD5K5BaZwFtlS1e+XU5eKJuPiK6XvI
+uHk1N5pOr4oMnJFir8DEVqGFYHmeMjQA5aVRMzwqfT9jknb7foYAZ7O04ireahHhPCyiXq8FuoGb
+++8tzL5aHGA4Z9oKlySW7WJWes6B3t3inu1D6sVutq1e0lh2ySgQpZ3OrcDQcjuC
+--000000000000d876e1060bcbd000--
 
