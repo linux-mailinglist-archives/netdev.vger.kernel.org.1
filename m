@@ -1,96 +1,89 @@
-Return-Path: <netdev+bounces-53961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BFF08056B3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:02:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E572A8056DB
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7D821F213F6
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:02:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99D80281CB6
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324D25FF19;
-	Tue,  5 Dec 2023 14:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E4B61FCD;
+	Tue,  5 Dec 2023 14:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNEYduDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5E5B2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:02:33 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rAVzw-0005NI-Rb; Tue, 05 Dec 2023 15:02:04 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rAVzv-00Dkwo-Q9; Tue, 05 Dec 2023 15:02:03 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rAVzv-005PIO-Mv; Tue, 05 Dec 2023 15:02:03 +0100
-Date: Tue, 5 Dec 2023 15:02:03 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Mark Brown <broonie@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Liam Girdwood <lgirdwood@gmail.com>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <20231205140203.GK981228@pengutronix.de>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
- <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
- <20231204225956.GG981228@pengutronix.de>
- <20231205064527.GJ981228@pengutronix.de>
- <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1064059E34;
+	Tue,  5 Dec 2023 14:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CD1FBC433CA;
+	Tue,  5 Dec 2023 14:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701785423;
+	bh=7NxOE4XOSsJwsLX360QCyIS9FPk81p4w1w2koa9zPqY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uNEYduDCMaoUKBjaM/MIDaTSph8F06NofWOwrvWsc88c1q/LDQWOdB0ZaY4x8ffCX
+	 Lkhps45ys1DG3G4/p+nW6CiAKruSK0Apl4ga9yFaMkGmBsvVtcx50EEYNmi1J5XFQQ
+	 EPe61eJzz8QyJ9ctCHYWu+0o3QDenRQNXWgzoTbQZHl3Q8Mm4EzoRMd2uirfzxdP19
+	 Bi28PzwkUVS4kEiqVaG8jlpIaJyq+xTVuYO5gga3OiJmvFAWnZUcb53tzP7LluTOHl
+	 DOVBuG0JUz/CYatkosM9Pojsd5mK4g6uqzYS5Lzolnil/1IVCk8jzDL7ly6gdO3kj3
+	 KrsuTHFumLssA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B488AC43170;
+	Tue,  5 Dec 2023 14:10:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] xsk: Add missing SPDX to AF_XDP TX metadata
+ documentation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170178542373.14907.18386599751711362084.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Dec 2023 14:10:23 +0000
+References: <20231204174231.3457705-1-sdf@google.com>
+In-Reply-To: <20231204174231.3457705-1-sdf@google.com>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, netdev@vger.kernel.org, horms@kernel.org
 
-On Tue, Dec 05, 2023 at 12:55:18PM +0000, Mark Brown wrote:
-> On Tue, Dec 05, 2023 at 07:45:27AM +0100, Oleksij Rempel wrote:
+Hello:
+
+This patch was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Mon,  4 Dec 2023 09:42:31 -0800 you wrote:
+> Not sure how I missed that. I even acknowledged it explicitly
+> in the changelog [0]. Add the tag for real now.
 > 
-> > CC regulator devs here too.
+> [0]: https://lore.kernel.org/bpf/20231127190319.1190813-1-sdf@google.com/
 > 
-> Again, I'm not sure what if any question there is?
+> Cc: netdev@vger.kernel.org
+> Cc: Simon Horman <horms@kernel.org>
+> Fixes: 11614723af26 ("xsk: Add option to calculate TX checksum in SW")
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> 
+> [...]
 
-PSE is kind of PMIC for Ethernet ports. I assume, it is good to let you
-know at least about existence drivers.
+Here is the summary with links:
+  - [bpf-next] xsk: Add missing SPDX to AF_XDP TX metadata documentation
+    https://git.kernel.org/bpf/bpf-next/c/5c399ae080ae
 
-Regards,
-Oleksij
+You are awesome, thank you!
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
