@@ -1,99 +1,87 @@
-Return-Path: <netdev+bounces-53740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC779804510
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:38:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0342F80451B
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E22B28145D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:38:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A2DFB20326
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342841FB0;
-	Tue,  5 Dec 2023 02:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED66F20F8;
+	Tue,  5 Dec 2023 02:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1dolqDJM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H57n9yXc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F8C119;
-	Mon,  4 Dec 2023 18:38:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sPB/9nJhzupGe0X/gusduBPW1Y18K5OKiwVmvCOQ20k=; b=1dolqDJMGC30Q+yJXEdqjCZsGT
-	FC9Owmi66X277vtITRpMoiPso9WDx7YZk8iC6uT4AtKUEA6vksjXWyTYf4SPZnfPXbxCNMhlT5bIN
-	WSfIem3wT98SZk4j7a0osv51fh75BvyTr8SwCk8iHsn5GFW+3gdSLT3FmCq9lKN1anHU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rALJr-0022eR-9b; Tue, 05 Dec 2023 03:37:55 +0100
-Date: Tue, 5 Dec 2023 03:37:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
-References: <20231128133630.7829-1-ansuelsmth@gmail.com>
- <20231128133630.7829-3-ansuelsmth@gmail.com>
- <20231204181752.2be3fd68@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2B4CA58
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 02:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5CB3FC433C8;
+	Tue,  5 Dec 2023 02:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701744025;
+	bh=Eq4A/LWka7uXN0IlYb+DI3bGBTJZiMJO4BXJOr8/xsk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=H57n9yXcXz8gpZ1odXXFD56+T/z4NJwU4FdN961xWaAh83rJkobUXvE3bplJQUlNq
+	 xKsCWjvsYXjRbmL4FetF6R9mMk+jElZAO4aMC+Kx4ZolmJ5wD7FyLKBtZl61mYhesU
+	 OABZrrDQ3Wzi56xGxivlzsaRYq6xzJ+Sud6cox5QqX1g+5NkLm4jrchfXkCeZ4acKM
+	 yCu337UhKokUxi9pYHXlQBonbvcR2HTkgqkk+SEqerhVddc0gn0jLyTIG0LkHuGz6n
+	 mY0ODrgAY/oUvzORFQHovav1urRvX9PvEAruOD5SP0HXtyIb8oHwekbCYh0rkFDo4s
+	 jG4oaqkMYaJ0g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3AD28DD4EEF;
+	Tue,  5 Dec 2023 02:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204181752.2be3fd68@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH v3] octeontx2-pf: consider both Rx and Tx packet stats for
+ adaptive interrupt coalescing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170174402523.31470.12401024322897178687.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Dec 2023 02:40:25 +0000
+References: <20231201053330.3903694-1-sumang@marvell.com>
+In-Reply-To: <20231201053330.3903694-1-sumang@marvell.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
+ naveenm@marvell.com
 
-On Mon, Dec 04, 2023 at 06:17:52PM -0800, Jakub Kicinski wrote:
-> On Tue, 28 Nov 2023 14:36:30 +0100 Christian Marangi wrote:
-> > +/**
-> > + * phy_package_write_mmd - Convenience function for writing a register
-> > + * on an MMD on a given PHY using the PHY package base addr, added of
-> > + * the addr_offset value.
-> > + * @phydev: The phy_device struct
-> > + * @addr_offset: The offset to be added to PHY package base_addr
-> > + * @devad: The MMD to read from
-> > + * @regnum: The register on the MMD to read
-> > + * @val: value to write to @regnum
-> > + *
-> > + * Same rules as for phy_write();
-> > + *
-> > + * NOTE: It's assumed that the entire PHY package is either C22 or C45.
-> > + */
-> 
-> > +/*
-> > + * phy_package_write_mmd - Convenience function for writing a register
-> > + * on an MMD on a given PHY using the PHY package base addr, added of
-> > + * the addr_offset value.
-> > + */
-> > +int phy_package_write_mmd(struct phy_device *phydev,
-> > +			  unsigned int addr_offset, int devad,
-> > +			  u32 regnum, u16 val);
-> 
-> Hm, I see there's some precedent here already for this duplicated
-> semi-kdoc. It seems a bit unusual. If I was looking for kdoc and 
-> found the header one I'd probably not look at the source file at all.
-> 
-> Andrew, WDYT?
+Hello:
 
-I tend to agree. These functions should be documented once in kdoc,
-and only once. I don't really care if its in the header, or the C
-code, but not both.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-      Andrew
+On Fri, 1 Dec 2023 11:03:30 +0530 you wrote:
+> From: Naveen Mamindlapalli <naveenm@marvell.com>
+> 
+> The current adaptive interrupt coalescing code updates only rx
+> packet stats for dim algorithm. This patch also updates tx packet
+> stats which will be useful when there is only tx traffic.
+> Also moved configuring hardware adaptive interrupt setting to
+> driver dim callback.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] octeontx2-pf: consider both Rx and Tx packet stats for adaptive interrupt coalescing
+    https://git.kernel.org/netdev/net/c/adbf100fc470
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
