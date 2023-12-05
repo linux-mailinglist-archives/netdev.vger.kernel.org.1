@@ -1,202 +1,145 @@
-Return-Path: <netdev+bounces-53763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBADE80497A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:52:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF35480497C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59348281556
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 05:52:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 721B81F2143A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 05:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B37D2E4;
-	Tue,  5 Dec 2023 05:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF52D28B;
+	Tue,  5 Dec 2023 05:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wKOKX7k6"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JncF3LfU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3624F9C
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 21:52:17 -0800 (PST)
-Message-ID: <c0365975-4ad2-4c51-968c-f303cdb5273f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701755535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9IfMPAVzr6ZYa90Amtba9aOfo0GDdgvs6qJomVW7M64=;
-	b=wKOKX7k6IqVrcHxZ9YV5xFUhOfeqCDmNoh6l6lTX2P4O62fJGQfMUzyn945ZSh4LkPVgep
-	Wv6573KBfxc0sRxGUU8UuMBrNoREDOYNWAp63Jxwee/y0/CfKQT3THeKgxNuZubx2Jvju9
-	TZ3H/+h2kMv1G6j2RcO1Y6E5p8teBwg=
-Date: Tue, 5 Dec 2023 13:52:08 +0800
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B45111;
+	Mon,  4 Dec 2023 21:52:53 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B4NxDbq021864;
+	Mon, 4 Dec 2023 21:52:47 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=gz+tVJfqr9b4cJ1PIAhfd0qQhpx4IETkTf+nnLO9rVE=;
+ b=JncF3LfUPAOwZii74e1W4YDfiNEWzsbYXxqOHKPBKIcNKgSnSMLCQM5PlJ6NBNpT+odW
+ oHNIac6mQ3O+pe1oOJt+LoXMNq4qdcsB/nwb8VA6Y4FZ6/HgtAYDa+Ew7fqIOl2BG3Io
+ efJmA6I/2EbGmpXf4J0ayNke+tq/R4SCb3B/M4wLTN37saf3luJCNSE8MZ/DZbev8stm
+ l8u633EmUWSIiJ6TFLWFdM01mjTIxTOr+6fMJpGx2ixH2kIpsbXgmdw+2X7WckFJnXlk
+ yaKujh9ms2oj2RojPz2fofLkOJV8+G4hdaUyyxJ8yd/iAKrdZHf1tsho/+OPMQvombI/ Rg== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3usrx3gv2b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 04 Dec 2023 21:52:47 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 4 Dec
+ 2023 21:52:45 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 4 Dec 2023 21:52:46 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 5338C3F708E;
+	Mon,  4 Dec 2023 21:52:42 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>
+Subject: [net-next v2 PATCH] octeontx2-af: cn10k: Increase outstanding LMTST transactions
+Date: Tue, 5 Dec 2023 11:22:41 +0530
+Message-ID: <20231205055241.26355-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH for-next v5 1/7] RDMA/rxe: Cleanup rxe_ah/av_chk_attr
-To: Bob Pearson <rpearsonhpe@gmail.com>, jgg@nvidia.com,
- linux-rdma@vger.kernel.org, dsahern@kernel.org,
- "davem@davemloft.net" <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20231205002322.10143-1-rpearsonhpe@gmail.com>
- <20231205002322.10143-2-rpearsonhpe@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20231205002322.10143-2-rpearsonhpe@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Proofpoint-GUID: hhgGwmqkIge8U7rlBUQwGEd6qemZecI8
+X-Proofpoint-ORIG-GUID: hhgGwmqkIge8U7rlBUQwGEd6qemZecI8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-05_03,2023-12-04_01,2023-05-22_02
 
-Add  David S. Miller and  David Ahern.
+From: Pavan Nikhilesh <pbhagavatula@marvell.com>
 
-They are the maintainers in netdev and very familiar with mcast.
+Currently the number of outstanding store transactions issued by AP as
+a part of LMTST operation is set to 1 i.e default value.
+This patch set to max supported value to increase the performance.
 
-Zhu Yanjun
+Signed-off-by: Pavan Nikhilesh <pbhagavatula@marvell.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+v1-v2:
+ used FIELD_PREP marco.
 
-在 2023/12/5 8:23, Bob Pearson 写道:
-> Replace rxe_ah_chk_attr() and rxe_av_chk_attr() by a single
-> routine rxe_chk_ah_attr().
->
-> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
-> ---
->   drivers/infiniband/sw/rxe/rxe_av.c    | 43 ++++-----------------------
->   drivers/infiniband/sw/rxe/rxe_loc.h   |  3 +-
->   drivers/infiniband/sw/rxe/rxe_qp.c    |  4 +--
->   drivers/infiniband/sw/rxe/rxe_verbs.c |  5 ++--
->   4 files changed, 12 insertions(+), 43 deletions(-)
->
-> diff --git a/drivers/infiniband/sw/rxe/rxe_av.c b/drivers/infiniband/sw/rxe/rxe_av.c
-> index 889d7adbd455..4ac17b8def28 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_av.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_av.c
-> @@ -14,45 +14,24 @@ void rxe_init_av(struct rdma_ah_attr *attr, struct rxe_av *av)
->   	memcpy(av->dmac, attr->roce.dmac, ETH_ALEN);
->   }
->   
-> -static int chk_attr(void *obj, struct rdma_ah_attr *attr, bool obj_is_ah)
-> +int rxe_chk_ah_attr(struct rxe_dev *rxe, struct rdma_ah_attr *attr)
->   {
->   	const struct ib_global_route *grh = rdma_ah_read_grh(attr);
-> -	struct rxe_port *port;
-> -	struct rxe_dev *rxe;
-> -	struct rxe_qp *qp;
-> -	struct rxe_ah *ah;
-> +	struct rxe_port *port = &rxe->port;
->   	int type;
->   
-> -	if (obj_is_ah) {
-> -		ah = obj;
-> -		rxe = to_rdev(ah->ibah.device);
-> -	} else {
-> -		qp = obj;
-> -		rxe = to_rdev(qp->ibqp.device);
-> -	}
-> -
-> -	port = &rxe->port;
-> -
->   	if (rdma_ah_get_ah_flags(attr) & IB_AH_GRH) {
->   		if (grh->sgid_index > port->attr.gid_tbl_len) {
-> -			if (obj_is_ah)
-> -				rxe_dbg_ah(ah, "invalid sgid index = %d\n",
-> -						grh->sgid_index);
-> -			else
-> -				rxe_dbg_qp(qp, "invalid sgid index = %d\n",
-> -						grh->sgid_index);
-> +			rxe_dbg_dev(rxe, "invalid sgid index = %d\n",
-> +					grh->sgid_index);
->   			return -EINVAL;
->   		}
->   
->   		type = rdma_gid_attr_network_type(grh->sgid_attr);
->   		if (type < RDMA_NETWORK_IPV4 ||
->   		    type > RDMA_NETWORK_IPV6) {
-> -			if (obj_is_ah)
-> -				rxe_dbg_ah(ah, "invalid network type for rdma_rxe = %d\n",
-> -						type);
-> -			else
-> -				rxe_dbg_qp(qp, "invalid network type for rdma_rxe = %d\n",
-> -						type);
-> +			rxe_dbg_dev(rxe, "invalid network type for rdma_rxe = %d\n",
-> +					type);
->   			return -EINVAL;
->   		}
->   	}
-> @@ -60,16 +39,6 @@ static int chk_attr(void *obj, struct rdma_ah_attr *attr, bool obj_is_ah)
->   	return 0;
->   }
->   
-> -int rxe_av_chk_attr(struct rxe_qp *qp, struct rdma_ah_attr *attr)
-> -{
-> -	return chk_attr(qp, attr, false);
-> -}
-> -
-> -int rxe_ah_chk_attr(struct rxe_ah *ah, struct rdma_ah_attr *attr)
-> -{
-> -	return chk_attr(ah, attr, true);
-> -}
-> -
->   void rxe_av_from_attr(u8 port_num, struct rxe_av *av,
->   		     struct rdma_ah_attr *attr)
->   {
-> diff --git a/drivers/infiniband/sw/rxe/rxe_loc.h b/drivers/infiniband/sw/rxe/rxe_loc.h
-> index 4d2a8ef52c85..3d2504a0ae56 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_loc.h
-> +++ b/drivers/infiniband/sw/rxe/rxe_loc.h
-> @@ -9,8 +9,7 @@
->   
->   /* rxe_av.c */
->   void rxe_init_av(struct rdma_ah_attr *attr, struct rxe_av *av);
-> -int rxe_av_chk_attr(struct rxe_qp *qp, struct rdma_ah_attr *attr);
-> -int rxe_ah_chk_attr(struct rxe_ah *ah, struct rdma_ah_attr *attr);
-> +int rxe_chk_ah_attr(struct rxe_dev *rxe, struct rdma_ah_attr *attr);
->   void rxe_av_from_attr(u8 port_num, struct rxe_av *av,
->   		     struct rdma_ah_attr *attr);
->   void rxe_av_to_attr(struct rxe_av *av, struct rdma_ah_attr *attr);
-> diff --git a/drivers/infiniband/sw/rxe/rxe_qp.c b/drivers/infiniband/sw/rxe/rxe_qp.c
-> index 28e379c108bc..c28005db032d 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_qp.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_qp.c
-> @@ -456,11 +456,11 @@ int rxe_qp_chk_attr(struct rxe_dev *rxe, struct rxe_qp *qp,
->   			goto err1;
->   	}
->   
-> -	if (mask & IB_QP_AV && rxe_av_chk_attr(qp, &attr->ah_attr))
-> +	if (mask & IB_QP_AV && rxe_chk_ah_attr(rxe, &attr->ah_attr))
->   		goto err1;
->   
->   	if (mask & IB_QP_ALT_PATH) {
-> -		if (rxe_av_chk_attr(qp, &attr->alt_ah_attr))
-> +		if (rxe_chk_ah_attr(rxe, &attr->alt_ah_attr))
->   			goto err1;
->   		if (!rdma_is_port_valid(&rxe->ib_dev, attr->alt_port_num))  {
->   			rxe_dbg_qp(qp, "invalid alt port %d\n", attr->alt_port_num);
-> diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.c b/drivers/infiniband/sw/rxe/rxe_verbs.c
-> index 48f86839d36a..6706d540f1f6 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_verbs.c
-> +++ b/drivers/infiniband/sw/rxe/rxe_verbs.c
-> @@ -286,7 +286,7 @@ static int rxe_create_ah(struct ib_ah *ibah,
->   	/* create index > 0 */
->   	ah->ah_num = ah->elem.index;
->   
-> -	err = rxe_ah_chk_attr(ah, init_attr->ah_attr);
-> +	err = rxe_chk_ah_attr(rxe, init_attr->ah_attr);
->   	if (err) {
->   		rxe_dbg_ah(ah, "bad attr");
->   		goto err_cleanup;
-> @@ -322,10 +322,11 @@ static int rxe_create_ah(struct ib_ah *ibah,
->   
->   static int rxe_modify_ah(struct ib_ah *ibah, struct rdma_ah_attr *attr)
->   {
-> +	struct rxe_dev *rxe = to_rdev(ibah->device);
->   	struct rxe_ah *ah = to_rah(ibah);
->   	int err;
->   
-> -	err = rxe_ah_chk_attr(ah, attr);
-> +	err = rxe_chk_ah_attr(rxe, attr);
->   	if (err) {
->   		rxe_dbg_ah(ah, "bad attr");
->   		goto err_out;
+
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c       | 3 +++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h       | 1 +
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c | 9 +++++++++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h   | 2 ++
+ 4 files changed, 15 insertions(+)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 22c395c7d040..14bb91b98f97 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -935,6 +935,9 @@ static int rvu_setup_hw_resources(struct rvu *rvu)
+ 	hw->total_vfs = (cfg >> 20) & 0xFFF;
+ 	hw->max_vfs_per_pf = (cfg >> 40) & 0xFF;
+ 
++	if (!is_rvu_otx2(rvu))
++		rvu_apr_block_cn10k_init(rvu);
++
+ 	/* Init NPA LF's bitmap */
+ 	block = &hw->block[BLKADDR_NPA];
+ 	if (!block->implemented)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index c4d999ef5ab4..6546cc489d7e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -940,6 +940,7 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw);
+ 
+ /* CN10K RVU - LMT*/
+ void rvu_reset_lmt_map_tbl(struct rvu *rvu, u16 pcifunc);
++void rvu_apr_block_cn10k_init(struct rvu *rvu);
+ 
+ #ifdef CONFIG_DEBUG_FS
+ void rvu_dbg_init(struct rvu *rvu);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+index 0e74c5a2231e..7fa98aeb3663 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
+@@ -559,3 +559,12 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
+ 	cfg |= BIT_ULL(1) | BIT_ULL(2);
+ 	rvu_write64(rvu, blkaddr, NIX_AF_CFG, cfg);
+ }
++
++void rvu_apr_block_cn10k_init(struct rvu *rvu)
++{
++	u64 reg;
++
++	reg = rvu_read64(rvu, BLKADDR_APR, APR_AF_LMT_CFG);
++	reg |=	FIELD_PREP(LMTST_THROTTLE_MASK, LMTST_WR_PEND_MAX);
++	rvu_write64(rvu, BLKADDR_APR, APR_AF_LMT_CFG, reg);
++}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+index b42e631e52d0..189f0eafd5ff 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
+@@ -733,5 +733,7 @@
+ #define APR_LMT_MAP_ENT_DIS_SCH_CMP_SHIFT	23
+ #define APR_LMT_MAP_ENT_SCH_ENA_SHIFT		22
+ #define APR_LMT_MAP_ENT_DIS_LINE_PREF_SHIFT	21
++#define LMTST_THROTTLE_MASK		GENMASK_ULL(38, 35)
++#define LMTST_WR_PEND_MAX		15
+ 
+ #endif /* RVU_REG_H */
+-- 
+2.25.1
+
 
