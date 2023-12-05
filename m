@@ -1,109 +1,96 @@
-Return-Path: <netdev+bounces-53729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B7F804472
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:06:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89639804478
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5BB6B20AFA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:06:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B8B0B20C34
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5F72116;
-	Tue,  5 Dec 2023 02:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8114433;
+	Tue,  5 Dec 2023 02:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="biVQbuux"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="INdjCd2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF521113;
-	Mon,  4 Dec 2023 18:06:19 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5c67fdbe7d4so160360a12.0;
-        Mon, 04 Dec 2023 18:06:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701741979; x=1702346779; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ChmfbSugFn889RdRrkH1XSmiWQdKTGW4FRyLW5Kecos=;
-        b=biVQbuuxSdqZBVykvPoYNSbEfqu95JAIYzoJMBppJzSnY8A3cn4GlMz2Ayc4LuBA7H
-         GoN0vUplSS5TJ4RmkOV0qj4hgCkLz5iK7g43inR+gJ1biRtu/VsbS6o6MHPA9y5r7ys8
-         QXRdCyF6NjOAgKG4eObB+4QSa55hMQmkmePWyTExMXMGNyqwFKmGHW8u6Do/XeBKfEaj
-         Q7dA7TCsLKYyd1SvgVOUKawuBAypW32rPJl23srsE+uzCEFT7mDJKkaDE2RAwB/0oCHm
-         5c5KzhoozyebymMC2pX3HN5whAycLgebgsB9QYLN60/lggTBwHglaZaeDAU6fYOORCXV
-         sRoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701741979; x=1702346779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ChmfbSugFn889RdRrkH1XSmiWQdKTGW4FRyLW5Kecos=;
-        b=blvhhhE8GWgLWi7yCv0fXbJG8LTpGYDcK29MyMaxT6PiMpCQ6v4Fj4+B/pyBJqpEua
-         P2YXm5XaSyMyhuQtp2/OIh7YT89MQHLybASMceao2fNCgx2yQao8uBwFC750YwtUPx+M
-         IzlS9ngG3dETk8/78VimsBzJQbdAKJBFF4xntgUmM5kkOEC7ikGCakk0MyFk368G3eOR
-         /6bgegnRIISWFL9uS40mg+pb/9u1501KQJpr7eObIW8QBUoGbkxXRgwYKgwGoWVS1U/c
-         n3jyLyU4rYA/gnp1P4OvAV/t3lefMCjISH8plkUpdpI4RdpivoBqelIQlO1JvT8KxHXk
-         hppQ==
-X-Gm-Message-State: AOJu0YxQV2htfDdkWKuWlGEhY9Fen9qvOoDkKM4SAjMdJSY9a3SatuTE
-	OgeWtxURdcb181hRgg+NHIg=
-X-Google-Smtp-Source: AGHT+IEY/P1zptoBX7n6TwT4m9BLTAHgNOJGimX7i9JUw27uhzsk1BetNrfcFlbuUM3L8Z+5fEVbhA==
-X-Received: by 2002:a05:6a20:da89:b0:18c:18d4:d932 with SMTP id iy9-20020a056a20da8900b0018c18d4d932mr42136881pzb.6.1701741979298;
-        Mon, 04 Dec 2023 18:06:19 -0800 (PST)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id it4-20020a056a00458400b006cbb58301basm8574150pfb.19.2023.12.04.18.06.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 18:06:18 -0800 (PST)
-Date: Tue, 05 Dec 2023 11:06:18 +0900 (JST)
-Message-Id: <20231205.110618.1499275558053658998.fujita.tomonori@gmail.com>
-To: jarkko@kernel.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
- wedsonaf@gmail.com, aliceryhl@google.com, boqun.feng@gmail.com
-Subject: Re: [PATCH net-next v9 1/4] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CXG0PHF8SB5K.1LNX7D7LCN0W0@kernel.org>
-References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
-	<20231205011420.1246000-2-fujita.tomonori@gmail.com>
-	<CXG0PHF8SB5K.1LNX7D7LCN0W0@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3B63FE4
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 02:08:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7BAFFC433CD;
+	Tue,  5 Dec 2023 02:08:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701742099;
+	bh=HMwG43d889XcMV+jjmbOif7Ze0ji3fZ14zwvIe/4VZw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=INdjCd2uqwoBJoP57dg01wXamoAswVMWdjch7XahOTlF2Ng616xMqthVCUwUEmfgn
+	 8NxE1OUTFzmjfhq6PNPX3SU05AsIOyrn2I9JSljbPWZxXLd6D+CxkjuzN6T7BX7oP+
+	 DCGA5af9Xjm2SCdmGU6ZVU1E3cktU2c5CKA6LUf3QgixV80vz4UUAp7nftNXsaWqK4
+	 /5+BHkPsJmYo/YJbGHY+CKkJEZQ0iogoK62j+eC1TXq7XGHJ2cVhXW3NAZj7QVGygz
+	 +qn/4ekBM65mrDvqfwbj3vQi9T8RQrl0+DGQdNFr//hc5xjoGgnOgmE6JpxaqaH1l0
+	 FSzegPvHSaQng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6657DDD4EEF;
+	Tue,  5 Dec 2023 02:08:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] arcnet: restoring support for multiple Sohard Arcnet cards
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170174209941.18867.5676326878830949662.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Dec 2023 02:08:19 +0000
+References: <20231130113503.6812-1-thomas.reichinger@sohard.de>
+In-Reply-To: <20231130113503.6812-1-thomas.reichinger@sohard.de>
+To: Thomas Reichinger <thomas.reichinger@sohard.de>
+Cc: m.grzeschik@pengutronix.de, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 05 Dec 2023 03:43:50 +0200
-"Jarkko Sakkinen" <jarkko@kernel.org> wrote:
+Hello:
 
-> On Tue Dec 5, 2023 at 3:14 AM EET, FUJITA Tomonori wrote:
->> This patch adds abstractions to implement network PHY drivers; the
->> driver registration and bindings for some of callback functions in
->> struct phy_driver and many genphy_ functions.
->>
->> This feature is enabled with CONFIG_RUST_PHYLIB_ABSTRACTIONS=y.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 30 Nov 2023 12:35:03 +0100 you wrote:
+> Probe of Sohard Arcnet cards fails,
+> if 2 or more cards are installed in a system.
+> See kernel log:
+> [    2.759203] arcnet: arcnet loaded
+> [    2.763648] arcnet:com20020: COM20020 chipset support (by David Woodhouse et al.)
+> [    2.770585] arcnet:com20020_pci: COM20020 PCI support
+> [    2.772295] com20020 0000:02:00.0: enabling device (0000 -> 0003)
+> [    2.772354] (unnamed net_device) (uninitialized): PLX-PCI Controls
+> ...
+> [    3.071301] com20020 0000:02:00.0 arc0-0 (uninitialized): PCI COM20020: station FFh found at F080h, IRQ 101.
+> [    3.071305] com20020 0000:02:00.0 arc0-0 (uninitialized): Using CKP 64 - data rate 2.5 Mb/s
+> [    3.071534] com20020 0000:07:00.0: enabling device (0000 -> 0003)
+> [    3.071581] (unnamed net_device) (uninitialized): PLX-PCI Controls
+> ...
+> [    3.369501] com20020 0000:07:00.0: Led pci:green:tx:0-0 renamed to pci:green:tx:0-0_1 due to name collision
+> [    3.369535] com20020 0000:07:00.0: Led pci:red:recon:0-0 renamed to pci:red:recon:0-0_1 due to name collision
+> [    3.370586] com20020 0000:07:00.0 arc0-0 (uninitialized): PCI COM20020: station E1h found at C000h, IRQ 35.
+> [    3.370589] com20020 0000:07:00.0 arc0-0 (uninitialized): Using CKP 64 - data rate 2.5 Mb/s
+> [    3.370608] com20020: probe of 0000:07:00.0 failed with error -5
 > 
-> Just a question: is `_ABSTRACTIONS` a convention or just for this
-> config flag?
+> [...]
 
-It's a convention.
+Here is the summary with links:
+  - arcnet: restoring support for multiple Sohard Arcnet cards
+    https://git.kernel.org/netdev/net/c/6b17a597fc2f
 
-https://docs.kernel.org/rust/general-information.html#abstractions-vs-bindings
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> That would read anyway that this rust absraction of phy absraction
-> layer or similar.
-> 
-> Why not e.g.
-> 
-> - `CONFIG_RUST_PHYLIB_BINDINGS`
-> - `CONFIG_RUST_PHYLIB_API`
-> - Or even just `CONFIG_RUST_PHYLIB`?
-
-I guess that CONFIG_RUST_PHYLIB_API or CONFIG_RUST_PHYLIB could be
-used. CONFIG_RUST_PHYLIB_ABSTRACTIONS was preferred during the past
-reviewing.
 
