@@ -1,172 +1,145 @@
-Return-Path: <netdev+bounces-53849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29ABA804DF0
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:33:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DB8A804E10
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE981F2133C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:33:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0F521F20FC0
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C2A3FB01;
-	Tue,  5 Dec 2023 09:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA2B3FB01;
+	Tue,  5 Dec 2023 09:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0Aa4r5a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PN82ohLR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E0C9A
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701768780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KmV5PIM8N+YASBRCp2k/i8/vJmd/O3Z/jDrIpMhsQ7o=;
-	b=L0Aa4r5adRyLgL0crAikRJiUBccJAHkaKqCqdb2RZUUqPQlWxwA2qDWMwgOlbdtZVok3Lf
-	vUE/W7iLCJTDsSudXbzn0XjpO48wevoJVjeJZLVAvs1Q+nYpEadazQ0+69eTueVqZOuh56
-	3v3RC3ixYa0xUbLe4SnIUL8x59VgjEo=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-484-XZNGdDv8PmyLVcmkoCQNJw-1; Tue, 05 Dec 2023 04:32:58 -0500
-X-MC-Unique: XZNGdDv8PmyLVcmkoCQNJw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-54c8febd0b0so234976a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 01:32:57 -0800 (PST)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAAEA9
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:39:14 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c9f751663bso31588171fa.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 01:39:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701769152; x=1702373952; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NtzpyzcVkuO9LwWE+PjYEaSMhazCYTfG2gax3rOjNdQ=;
+        b=PN82ohLRjCfeh9wIzKkqrYx8morBBVuBq4E8/MkmC1M9vu7MR5UsepnWMEshR1Kz64
+         aXNvJVbqJ+38Sd8lGjlpx+UIyuYqxImOFsxpUCP2RPnziigHn2Rx0+biYCRrBjS8IDck
+         pbdEBKlT4dH/8cjltT3nfvrnd1Lvx3dhrP82IPr+CjsUR1sLzac89/8dHs1urJ1PADo3
+         hCx4Lg72lF/ZkGbuZlT/ZRAZWndbpv3/eFiQMtuZX69b23PZxkcQy59OElrAK3GOSu1T
+         h8GrjLdyUlFlugN9bhl5Wf5YTmUTE9d4gJJENYtd4YRD7AU+N8ZYXFoM/tPIzvMLLoob
+         Z/fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701768777; x=1702373577;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KmV5PIM8N+YASBRCp2k/i8/vJmd/O3Z/jDrIpMhsQ7o=;
-        b=DpkU+U0/E0CyMDtvvUl8p/pr5GL8L3M81KTvD30cfZoWdflW9KVxER6GAJtTiO381e
-         7VXZPMohnZBG9e9Kb00Nzb8+08NoBoUcoQHe5tCtROT9qA8m1JmucPmDCQHo8u3h7B3J
-         UWJoNHggC9DFE5+d0bCfHMhBH7BcdLq7tVpWd+i14OXcD11vQ6hShGaXv3FwnXZCI8cL
-         cOr5MPZtnVPffnFTGG6egloEhUnn4NftSOVDgqDSO3Kwv86rrRervnISzUjhdGRKOwiG
-         ZdounWNSP6lsBpq5jxeMgERhK14RVmj3vKEqm7bofBpe4iCf3kV2wIvfoHrdoAeAH+1t
-         4Kzg==
-X-Gm-Message-State: AOJu0YzfmU1bbeKUMVlnj5cG37s8YPHQPpwbfrOe1+ELSLHUyBv39LLP
-	HDW57itSVA8DgMD1qF+m/D6Ai5tnLJf1c24xO6NzhGIbytMtk7wWdBCZZUKdLmhjO+LdMkIYkB7
-	wNmVF6sIXcFYrVRnb
-X-Received: by 2002:a05:6402:11cd:b0:54c:6fc0:483a with SMTP id j13-20020a05640211cd00b0054c6fc0483amr7715361edw.2.1701768777010;
-        Tue, 05 Dec 2023 01:32:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHrOiNCUmKVi/iGgzgG60YpzCBmx46bRetO9rs0qZVvKYqL4pzT2RAwtddwNEmm+Bl9ygdisQ==
-X-Received: by 2002:a05:6402:11cd:b0:54c:6fc0:483a with SMTP id j13-20020a05640211cd00b0054c6fc0483amr7715346edw.2.1701768776687;
-        Tue, 05 Dec 2023 01:32:56 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-54.dyn.eolo.it. [146.241.241.54])
-        by smtp.gmail.com with ESMTPSA id z20-20020aa7d414000000b0054c49f1f207sm822636edq.39.2023.12.05.01.32.55
+        d=1e100.net; s=20230601; t=1701769152; x=1702373952;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NtzpyzcVkuO9LwWE+PjYEaSMhazCYTfG2gax3rOjNdQ=;
+        b=do7Ucc9rGeY5rKWcRvvapBXXfOdsynaYF9CJopC11PSbCj2Gt3MZiClN4Fp+xqOWY0
+         U43FeeRrlHhDOHbVTDqEx0+oHJoGV0NWKAShVp2sermXg0bJvDwhfzWWJODrducPH4PC
+         fevwmlEfvxyWjydn/Y/Eupm9cL/mmAnOlgBnO2dt9p607CceoWGcYdRK1+fL0meMoCnJ
+         6DKshV/BSIhnKRH81Uefaz4Naq7WrhOgynKZkDTwjA6fIxGjcwU643xaHEq3VcQqwHbG
+         oKU3qinh3A2a0wnPa1oMEm0vb9B11THzLNFKbL7diKr8DbDwy34eSyWT5PqIhUOaMkO5
+         5YsA==
+X-Gm-Message-State: AOJu0YzbO7XtY+TK7lakC3Bg6GLqJD+puqhZB79OsydA9dvoWxbRL38D
+	UO2deYdrvMhXT0N+gMVgdh4=
+X-Google-Smtp-Source: AGHT+IFJPg0sKIxF4bz9jeMEPTkTFrKHzfUXMG4lAod6JT33aUGWQjBapx0E6AZ35Zjw1RrN7ebKfQ==
+X-Received: by 2002:a2e:a311:0:b0:2c9:e7d5:b39a with SMTP id l17-20020a2ea311000000b002c9e7d5b39amr1191626lje.109.1701769152183;
+        Tue, 05 Dec 2023 01:39:12 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id u19-20020a170906409300b00a19b7362dcfsm5346949ejj.139.2023.12.05.01.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 01:32:56 -0800 (PST)
-Message-ID: <bdbe618d4fd38469e4e139ce4ebd161766f2e4d5.camel@redhat.com>
-Subject: Re: [net-next PATCH v2 08/12] net: phy: at803x: move specific
- at8031 WOL bits to dedicated function
-From: Paolo Abeni <pabeni@redhat.com>
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 05 Dec 2023 10:32:55 +0100
-In-Reply-To: <20231201001423.20989-9-ansuelsmth@gmail.com>
-References: <20231201001423.20989-1-ansuelsmth@gmail.com>
-	 <20231201001423.20989-9-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 05 Dec 2023 01:39:11 -0800 (PST)
+Date: Tue, 5 Dec 2023 11:39:10 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Danzberger <dd@embedd.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+Message-ID: <20231205093910.avpu5udgsahsahoi@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
+ <20231204174330.rjwxenuuxcimbzce@skbuf>
+ <20231204154315.3906267-1-dd@embedd.com>
+ <20231204174330.rjwxenuuxcimbzce@skbuf>
+ <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+ <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+ <20231205083646.h2tqkwourtdyzdee@skbuf>
+ <b309ba69b9e97f8e681f814fda1bb069e11e367d.camel@embedd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b309ba69b9e97f8e681f814fda1bb069e11e367d.camel@embedd.com>
 
-On Fri, 2023-12-01 at 01:14 +0100, Christian Marangi wrote:
-> Move specific at8031 WOL enable/disable to dedicated function to make
-> at803x_set_wol more generic.
->=20
-> This is needed in preparation for PHY driver split as qca8081 share the
-> same function to toggle WOL settings.
->=20
-> In this new implementation WOL module in at8031 is enabled after the
-> generic interrupt is setup. This should not cause any problem as the
-> WOL_INT has a separate implementation and only relay on MAC bits.
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/at803x.c | 42 ++++++++++++++++++++++++----------------
->  1 file changed, 25 insertions(+), 17 deletions(-)
->=20
-> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-> index 02ac71f98466..2de7a59c0faa 100644
-> --- a/drivers/net/phy/at803x.c
-> +++ b/drivers/net/phy/at803x.c
-> @@ -466,27 +466,11 @@ static int at803x_set_wol(struct phy_device *phydev=
-,
->  			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
->  				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
-> =20
-> -		/* Enable WOL function for 1588 */
-> -		if (phydev->drv->phy_id =3D=3D ATH8031_PHY_ID) {
-> -			ret =3D phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> -					     AT803X_PHY_MMD3_WOL_CTRL,
-> -					     0, AT803X_WOL_EN);
-> -			if (ret)
-> -				return ret;
-> -		}
->  		/* Enable WOL interrupt */
->  		ret =3D phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_W=
-OL);
->  		if (ret)
->  			return ret;
->  	} else {
-> -		/* Disable WoL function for 1588 */
-> -		if (phydev->drv->phy_id =3D=3D ATH8031_PHY_ID) {
-> -			ret =3D phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> -					     AT803X_PHY_MMD3_WOL_CTRL,
-> -					     AT803X_WOL_EN, 0);
-> -			if (ret)
-> -				return ret;
-> -		}
->  		/* Disable WOL interrupt */
->  		ret =3D phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL,=
- 0);
->  		if (ret)
-> @@ -1611,6 +1595,30 @@ static int at8031_config_init(struct phy_device *p=
-hydev)
->  	return at803x_config_init(phydev);
->  }
-> =20
-> +static int at8031_set_wol(struct phy_device *phydev,
-> +			  struct ethtool_wolinfo *wol)
-> +{
-> +	int ret;
-> +
-> +	/* First setup MAC address and enable WOL interrupt */
-> +	ret =3D at803x_set_wol(phydev, wol);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (wol->wolopts & WAKE_MAGIC)
-> +		/* Enable WOL function for 1588 */
-> +		ret =3D phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> +				     AT803X_PHY_MMD3_WOL_CTRL,
-> +				     0, AT803X_WOL_EN);
-> +	else
-> +		/* Disable WoL function for 1588 */
-> +		ret =3D phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> +				     AT803X_PHY_MMD3_WOL_CTRL,
-> +				     AT803X_WOL_EN, 0);
-> +
-> +	return ret;
+On Tue, Dec 05, 2023 at 10:08:39AM +0100, Daniel Danzberger wrote:
+> That module is just a way to instantiate the switch on a piece of fixed custom hardware glued
+> together on my desk. It's never meant to be upstream. I just posted it as an example on how the
+> switch can be instantiated via 'i2c_new_client_device' instead of DTS.
 
-If I read correctly, the above changes the order of some WoL
-initialization steps: now WOL_CTRL is touched after
-AT803X_INTR_ENABLE_WOL. Is that correct?
+You're free to use the code in whichever way you want. I was just pointing
+out that non-mainline code gets no attention in terms of converting after
+breaking changes in the API.
 
-Thanks,
+For the networking subsystem there are 2 git trees: net-next for new
+features and net for bug fixes which get backported to stable kernels.
+In Documentation/process/stable-kernel-rules.rst there are some guidelines
+about what constitutes a bug, but my understanding of it is that if we
+can't point to some mainline code that is broken, then it's not a bug
+and the change goes to net-next (aka work pending for v6.8).
 
-Paolo
+So ok, it's not mainline, perfectly fair, but I want to be clear about
+the implication in terms of reduced level of effort in helping to
+maintain such support.
 
+Usually, patches are designated by the author in the email title as
+"[PATCH net-next]" or "[PATCH net]", and to help the backport, one
+should also add a Fixes: tag in case of a bug (search the git log for
+examples). You didn't make your intent clear, so I suppose you don't
+have a clear expectation of how the patch should be handled. The default
+in this case is "net-next".
+
+> The pointer is only copied around, but ksz_platform_data is never actually accessed in any
+> meaningful way. The chip_id assigned from DTS or platform_data doesn't even seem to be respected
+> anywhere in the decision making.
+
+The one assigned from DTS gets respected in ksz_check_device_id(). If
+different from the detected one, the driver fails to probe. Incidentally,
+that's also the snag that you hit in your platform_data case.
+of_device_get_match_data() doesn't work, so the driver isn't able to
+compare the detected switch ID with a pre-established switch ID that it
+expects.
+
+Your patch implies it's ok to go along with whatever is detected, which
+makes the code paths slightly different. If there is an early error in
+the SPI/I2C bus communication, it will be detected for sure in the OF
+case, but it might or might not get detected in the platform_data case.
+It all depends on what we read and the branches that ksz_switch_detect()
+takes.
+
+> Right at 'ksz_switch_register', 'ksz_switch_detect' is called and overwrites 'dev->chip_id' with the
+> id read from the hardware:
+> 
+> static int ksz_switch_detect(struct ksz_device *dev)
+> {
+> 	u8 id1, id2, id4;
+> 	u16 id16;
+> 	u32 id32;
+> 	int ret;
+> 
+> 	/* read chip id */
+> 	ret = ksz_read16(dev, REG_CHIP_ID0, &id16);
+> 	if (ret)
+> 		return ret;
+
+Ok. It would be nice to remove the bogus and confusing handling of
+struct ksz_platform_data. If someone who has the hardware to test and
+make sure nothing breaks (aka you) could do it, it would be even better.
 
