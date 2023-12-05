@@ -1,141 +1,121 @@
-Return-Path: <netdev+bounces-54171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CACAC8062C7
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:15:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA70C8062D8
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71D572820E9
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:15:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65676282133
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF69405FB;
-	Tue,  5 Dec 2023 23:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF055405FF;
+	Tue,  5 Dec 2023 23:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DU7BD5ua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.merlins.org (magic.merlins.org [209.81.13.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69244AC;
-	Tue,  5 Dec 2023 15:15:13 -0800 (PST)
-Received: from c-76-132-34-178.hsd1.ca.comcast.net ([76.132.34.178]:39188 helo=sauron.svh.merlins.org)
-	by mail1.merlins.org with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim 4.94.2 #2)
-	id 1rAedB-0004yz-W0 by authid <merlins.org> with srv_auth_plain; Tue, 05 Dec 2023 15:15:09 -0800
-Received: from merlin by sauron.svh.merlins.org with local (Exim 4.92)
-	(envelope-from <marc@merlins.org>)
-	id 1rAedB-000naT-BZ; Tue, 05 Dec 2023 15:15:09 -0800
-Date: Tue, 5 Dec 2023 15:15:09 -0800
-From: Marc MERLIN <marc@merlins.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	linux-wireless@vger.kernel.org, ilw@linux.intel.com,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
-Message-ID: <20231205231509.GA181276@merlins.org>
-References: <20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
- <20231204200038.GA9330@merlins.org>
- <a6ac887f7ce8af0235558752d0c781b817f1795a.camel@sipsolutions.net>
- <20231204203622.GB9330@merlins.org>
- <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
- <20231204205439.GA32680@merlins.org>
- <20231204212849.GA25864@merlins.org>
- <20231205024652.GA12805@merlins.org>
- <1d986c73c1d39b0cced7d8d2119fba4b2a02418b.camel@sipsolutions.net>
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A7B122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:19:17 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6cb749044a2so6584013b3a.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:19:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701818357; x=1702423157; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5PiiCZDL3T3NJUQFGM2BFRFn7osZL9WwIGkFqGwYXOY=;
+        b=DU7BD5ua4pCnKBc7AAfh0i6QtZok1Wk6MotacKmYFdbJ/XHo4bM26tfEZdOjb8NZH6
+         znySvXUAdZpy8DLQ9Ea7+TClVAhTVWvnfg776SdBiMNSZ0i8sQbiHjJNkHcGbsA1NqWv
+         TGV2kR6R8nGF1mggSELYyIT+mcYv2P15vozkrYkwBBpAY1+24/tUKUoyC+afcGAzBd3z
+         PFYn/8vUTdHTAgT4kxQP+5ToNzSTXKOdA5qDIImqVTEb7E9TWt+RGZkoiezAJvoilAQ6
+         c2Cmih2GvcUxpGaH5j8umTV+NGF0ZsDdDi/KAmBUh5SHU0747Fkf4+7KvOofxxHl9gEV
+         tmPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701818357; x=1702423157;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5PiiCZDL3T3NJUQFGM2BFRFn7osZL9WwIGkFqGwYXOY=;
+        b=YsIZHXDDwHISwZBeEDnql6BbE0SnYZ17M8GaplM7fWnj843FA/ikjHI0BOYTsPj11V
+         3fRot3GbAskLRz4aDF+A44qkP7pnsNNmQ28I9CX8oHamNq8cNbHjuO9ztA1NrRl56dqM
+         hWqd+iX4kzpwO1iyRs0DD4EtHz3iRcRAOloEzTXf3IyPafaWwehIkxwN2EIaPS3PAdVs
+         WVu6tH+bnljcJXibGGls9yvuxy8l4Ed44eMoGF7pjpT0VulMkG0vr1dWlaeiqVu06bHf
+         KetZMZplcQd6ThzyLoxtfsWDTpXbCLxWoSq0fcZTxKouyr9bzVQesi6EwEq78DxLYD/a
+         lEHA==
+X-Gm-Message-State: AOJu0YzHiniDngFWtDguJL9PVUWovRyyD+bdKdBDdeJFF5gj5yVlDShF
+	OrEmoHPb2PLFK56zQKsLCqKQpw==
+X-Google-Smtp-Source: AGHT+IEo8/BvNNq/jTPN2E3w98m5NEfIdtK2I1CwU4UYFZ49lPcvwGHCYPkb39u85f1xlHKJvU3qVA==
+X-Received: by 2002:a05:6a20:4407:b0:18f:97c:8a33 with SMTP id ce7-20020a056a20440700b0018f097c8a33mr10161402pzb.94.1701818356952;
+        Tue, 05 Dec 2023 15:19:16 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c0:638:b3b3:3480:1b98:451d? ([2804:7f1:e2c0:638:b3b3:3480:1b98:451d])
+        by smtp.gmail.com with ESMTPSA id y31-20020a056a00181f00b0068ff267f094sm9812258pfa.158.2023.12.05.15.19.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Dec 2023 15:19:15 -0800 (PST)
+Message-ID: <69d540ad-c855-49bc-a904-824e57e33adc@mojatatu.com>
+Date: Tue, 5 Dec 2023 20:19:11 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/3] net: sched: Add initial TC error skb drop
+ reasons
+Content-Language: en-US
+To: Dave Taht <dave.taht@gmail.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, daniel@iogearbox.net, dcaratti@redhat.com,
+ netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20231201230011.2925305-1-victor@mojatatu.com>
+ <20231201230011.2925305-4-victor@mojatatu.com>
+ <CAA93jw520FBOfmhpOBNyfFPy1UKbjOdc52=0L8uzADUKQyeLHQ@mail.gmail.com>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <CAA93jw520FBOfmhpOBNyfFPy1UKbjOdc52=0L8uzADUKQyeLHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1d986c73c1d39b0cced7d8d2119fba4b2a02418b.camel@sipsolutions.net>
-X-Sysadmin: BOFH
-X-URL: http://marc.merlins.org/
-X-SA-Exim-Connect-IP: 76.132.34.178
-X-SA-Exim-Mail-From: marc@merlins.org
 
-On Tue, Dec 05, 2023 at 08:33:02PM +0100, Johannes Berg wrote:
-> On Mon, 2023-12-04 at 18:46 -0800, Marc MERLIN wrote:
-> > 
-> > [13323.572484] iwlwifi 0000:09:00.0: TB bug workaround: copied 152 bytes from 0xffffff68 to 0xfd080000
-> > [13328.000825] iwlwifi 0000:09:00.0: TB bug workaround: copied 1272 bytes from 0xfffffb08 to 0xff42c000
-> > [13367.278564] iwlwifi 0000:09:00.0: TB bug workaround: copied 1328 bytes from 0xfffffad0 to 0xfec41000
-> > [13389.737971] iwlwifi 0000:09:00.0: TB bug workaround: copied 572 bytes from 0xfffffdc4 to 0xff091000
-> > [13389.860480] iwlwifi 0000:09:00.0: TB bug workaround: copied 148 bytes from 0xffffff6c to 0xfe412000
-> > [13393.435354] iwlwifi 0000:09:00.0: TB bug workaround: copied 360 bytes from 0xfffffe98 to 0xfedcd000
-> > [13409.827199] iwlwifi 0000:09:00.0: TB bug workaround: copied 1348 bytes from 0xfffffabc to 0xfd057000
+On 05/12/2023 19:28, Dave Taht wrote:
+> On Fri, Dec 1, 2023 at 6:00â€¯PM Victor Nogueira <victor@mojatatu.com> wrote:
+>>
+>> Continue expanding Daniel's patch by adding new skb drop reasons that
+>> are idiosyncratic to TC.
+>>
+>> More specifically:
+>>
+>> - SKB_DROP_REASON_TC_EXT_COOKIE_NOTFOUND: tc cookie was looked up using
+>>    ext, but was not found.
+>>
+>> - SKB_DROP_REASON_TC_COOKIE_EXT_MISMATCH: tc ext was looked up using cookie
+>>    and either was not found or different from expected.
+>>
+>> - SKB_DROP_REASON_TC_CHAIN_NOTFOUND: tc chain lookup failed.
+>>
+>> - SKB_DROP_REASON_TC_RECLASSIFY_LOOP: tc exceeded max reclassify loop
+>>    iterations
+>>
+>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+>> ---
+>>
+>> [...]
 > 
-> That's fine, just working around a HW bug on 2^32 address boundaries.
-> 
-> I had a patch a long time ago to make those messages not appear ... not
-> sure where it ended up.
+> I have been meaning to get around to adding
+> QDISC_DROP_REASON_{CONGEST,OVERFLOW,FLOOD,SPIKE} to
+> cake/fq_codel/red/etc for some time now. Would this be the right
+> facility to leverage (or something more direct?) I discussed the why
+> at netdevconf:
 
-About this wifi chip (AX210/AX211/AX411), one last issue I have with it is when I go to
-batteries, it burns a lot of power:
-> The battery reports a discharge rate of 36.8 W
-> The power consumed was 772 J
-> The estimated remaining time is 1 hours, 56 minutes
 > 
-> Summary: 1657.3 wakeups/second,  0.0 GPU ops/seconds, 0.0 VFS ops/sec and 121.5% CPU use
-> 
-> Power est.              Usage       Events/s    Category       Description
->   24.1 W     59.6 pkts/s                Device         Network interface: wlp9s0 (iwlwifi)
->   200 mW     80.6%                      Device         Display backlight
->   139 mW      0.0 µs/s      0.00        Process        [PID 8005] /usr/bin/pipewire
->  5.37 mW     18.0 ms/s     537.1        Timer          tick_sched_timer
-> 
-> 
-> The battery reports a discharge rate of 36.1 W
-> The power consumed was 744 J
-> System baseline power is estimated at 28.9 W
-> 
-> Power est.    Usage     Device name
->   24.0 W    100.0%        Radio device: iwlwifi
->   4.43 W    205.2%        CPU core
->   230 mW    100.0%        Audio codec alsa:hwC0D0: thinkpad (Realtek) (pipewire )
-> 
-> autosuspend is on:
->    Good          Runtime PM for PCI Device Intel Corporation Wi-Fi 6 AX210/AX211/AX411 160MHz
+> https://docs.google.com/document/d/1tTYBPeaRdCO9AGTGQCpoiuLORQzN_bG3TAkEolJPh28/edit
 
+Yes, I think here will be the place to add these new drop reasons.
+After this patch lands, we will add more, but feel free to also
+propose others.
 
-Obviously unloading iwlwifi fixes it:
-> The battery reports a discharge rate of 26.0 W
-> The power consumed was 534 J
-> The estimated remaining time is 2 hours, 40 minutes
-> 
-> Summary: 927.2 wakeups/second,  0.0 GPU ops/seconds, 0.0 VFS ops/sec and 85.5% CPU use
-> 
-> Power est.              Usage       Events/s    Category       Description
->   6.95 W    100.0%                      Device         USB device: Yubico Gnubby (gnubby1) (Yubico)
->   2.09 W      0.0 µs/s      0.00        Process        [PID 8005] /usr/bin/pipewire
->   185 mW     80.6%                      Device         Display backlight
-> 
-> The battery reports a discharge rate of 26.0 W
-> The power consumed was 534 J
-> System baseline power is estimated at 11.5 W
-> 
-> Power est.    Usage     Device name
->   6.95 W    100.0%        USB device: Yubico Gnubby (gnubby1) (Yubico)
->   2.09 W    100.0%        Audio codec alsa:hwC0D0: thinkpad (Realtek) (pipewire )
->   2.02 W     85.5%        CPU core
+cheers,
+Victor
 
-What's very interesting is if I re-insert the iwlwifi module after that, 
-it works and used a lot less power last time I tried, but this time around
-it's still shown as high although probably with a wrong Watt value because powertop
-is confused somehow:
-  28.8 W    470.9 pkts/s                Device         Network interface: wlp9s0 (iwlwifi)
-
-  24.4 W    100.0%        Radio device: iwlwifi
-
-Is this something I should persue separately on
-linux-wireless@vger.kernel.org or ilw@linux.intel.com or elsewhere?
-
-Thanks,
-Marc
--- 
-"A mouse is a device used to point at the xterm you want to type in" - A.S.R.
- 
-Home page: http://marc.merlins.org/                       | PGP 7F55D5F27AAF9D08
 
