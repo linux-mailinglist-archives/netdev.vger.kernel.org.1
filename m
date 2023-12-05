@@ -1,78 +1,111 @@
-Return-Path: <netdev+bounces-53751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D006180457A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:06:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCBD8045FB
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:23:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71661F21203
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:06:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E67C1C20BFF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF276110;
-	Tue,  5 Dec 2023 03:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932DB611E;
+	Tue,  5 Dec 2023 03:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSRmv69M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD3EBF;
-	Mon,  4 Dec 2023 19:05:50 -0800 (PST)
-X-UUID: b1ae75138d6e4ab4b5b51354363fe8e4-20231205
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.33,REQID:8ce5544b-bf9c-4849-94e4-0899eb8f545b,IP:5,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-15
-X-CID-INFO: VERSION:1.1.33,REQID:8ce5544b-bf9c-4849-94e4-0899eb8f545b,IP:5,URL
-	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-15
-X-CID-META: VersionHash:364b77b,CLOUDID:805d4afd-4a48-46e2-b946-12f04f20af8c,B
-	ulkID:231204205248UVJ6B54Y,BulkQuantity:4,Recheck:0,SF:24|17|19|44|66|102,
-	TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,COL:0,
-	OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
-X-UUID: b1ae75138d6e4ab4b5b51354363fe8e4-20231205
-X-User: chentao@kylinos.cn
-Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1111733163; Tue, 05 Dec 2023 11:05:43 +0800
-Message-ID: <d8b80a17-df0b-459c-ae0a-397693f6a443@kylinos.cn>
-Date: Tue, 5 Dec 2023 11:05:41 +0800
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC4ECE;
+	Mon,  4 Dec 2023 19:23:21 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d0c7330ad9so140195ad.1;
+        Mon, 04 Dec 2023 19:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701746601; x=1702351401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JvxaZrlN6riBflsS5wOrGFq6Ymsdyl6Sjh9pe9Rny5o=;
+        b=DSRmv69MmqtLKL/Xz89HgP8ykjHx13h5fyDl+QH2dPi2uE+sPZUbg4EniI+EZiuat5
+         xkzrbvKjTmdFpenVzjuVv50a9zWlXRvxOt7CnZj+qtsYHkaRrwo9YsQLm4NG7GxL18QC
+         rYDlPV2h3vInunMHLarstdVPmJXsrXa73gkJbNOG9DtDsEI2nNE3oDu29xX5iSOPeNo3
+         tbeoOZRjCZhQf1NnfFkywaLAA+pGymklNaqHr0sxOFxcsbyLUbg4HdEqVwyAaatrY+p9
+         Ede1zkMzXmCc7B2ujnOM8v/ObAwCIQgtC+ACy2uMSJ8nUd4fx4fL6qW/P6F0J5oq92+Z
+         Fe8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701746601; x=1702351401;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JvxaZrlN6riBflsS5wOrGFq6Ymsdyl6Sjh9pe9Rny5o=;
+        b=aMxqYTV/Sz1R5zED0aQE9DdMWpJeZrsIubHa0hzDQAoOPr3OOVOwlP/x6gC6CoGogM
+         A3+Mf50571P6Q8PtUPzh9D9B3Vf+hs1QTXwZwx8z8CTdBtaWlWoSwiz17Al63PHeVvHD
+         sysUSj6v4K+uFKV8wC/woKFjLhBXgrWQ5BLScr0biF/sq+k93MQrEbmRnpxBkaWsoMWf
+         4WpX/6xIAPtHP9Z14YbBDxnMiLL1YrYBl6l/OEzHA6Z1bmX5ZvHiMDuJPIEDGzpE3qnN
+         Np7DvuxdfqOFKrEDUE1ktIgYOlk4AP3prr7pbgEVtbgAiKadwPt94EXgIR1ZYVMxQ5GD
+         eWsQ==
+X-Gm-Message-State: AOJu0YzfZcNd9L/yIAxG3oZHJc7Pi8N3DA9UffkcNV6hMDavG3/tnMON
+	7z1vmmd+SuBmiPgSAZXdAhc=
+X-Google-Smtp-Source: AGHT+IGHJZ9DnXPGHbM3qszHQ8KKpstIZgpKnqcJoNdvH/c9q4IhbG2ciaK0nohhU77BVNw4Yv0Xbw==
+X-Received: by 2002:a17:903:1cf:b0:1d0:83bc:5648 with SMTP id e15-20020a17090301cf00b001d083bc5648mr7720344plh.2.1701746601019;
+        Mon, 04 Dec 2023 19:23:21 -0800 (PST)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id t3-20020a170902e84300b001cf838dadbesm9120695plg.56.2023.12.04.19.23.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 19:23:20 -0800 (PST)
+Date: Tue, 05 Dec 2023 12:23:20 +0900 (JST)
+Message-Id: <20231205.122320.1887043941025150953.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+ wedsonaf@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v9 1/4] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <ZW6EL-4XaoY3n4J9@Boquns-Mac-mini.home>
+References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+	<20231205011420.1246000-2-fujita.tomonori@gmail.com>
+	<ZW6EL-4XaoY3n4J9@Boquns-Mac-mini.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 iwl-next] i40e: Use correct buffer size in
- i40e_dbg_command_read
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jeffrey.t.kirsher@intel.com, shannon.nelson@amd.com,
- kunwu.chan@hotmail.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>
-References: <20231204014455.2444734-1-chentao@kylinos.cn>
- <81dbf657-6513-4a8c-a0a9-5a98951c8356@intel.com>
-Content-Language: en-US
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <81dbf657-6513-4a8c-a0a9-5a98951c8356@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-Hi Alexander,
-Thanks for your reply.
+On Mon, 4 Dec 2023 18:00:15 -0800
+Boqun Feng <boqun.feng@gmail.com> wrote:
 
-It's my bad, I'll follow your suggestion in v4 patch:
-1. keep 'buf' as it defined before.
-2. resolve memory leak as your suggestion.
-3. make 'bytes_not_copied' as a return value for error path.
+> On Tue, Dec 05, 2023 at 10:14:17AM +0900, FUJITA Tomonori wrote:
+> [...]
+>> +    /// Gets the current link state.
+>> +    ///
+>> +    /// It returns true if the link is up.
+>> +    pub fn is_link_up(&self) -> bool {
+>> +        const LINK_IS_UP: u64 = 1;
+>> +        // TODO: the code to access to the bit field will be replaced with automatically
+>> +        // generated code by bindgen when it becomes possible.
+>> +        // SAFETY: The struct invariant ensures that we may access
+>> +        // this field without additional synchronization.
+>> +        let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
+>> +        bit_field.get(14, 1) == LINK_IS_UP
+> 
+> I made a mistake here [1], this should be:
+> 
+>     let bit_field = unsafe { &*(core::ptr::addr_of!((*self.0.get())._bitfield_1)) };
+>     bit_field.get(14, 1) == LINK_IS_UP
+> 
+> without `core::ptr::add_of!`, `*(self.0.get())` would still create a
+> temporary `&` to the underlying object I believe. `addr_of!` is the way
+> to avoid create the temporary reference. Same for the other functions.
 
-Thanks again,
-Kunwu
-On 2023/12/4 20:51, Alexander Lobakin wrote:
-> This is unneeded.
+If so, how about functions to access to non bit field like phy_id()?
+
+pub fn phy_id(&self) -> u32 {
+    let phydev = self.0.get();
+    unsafe { (*phydev).phy_id }
+}
 
