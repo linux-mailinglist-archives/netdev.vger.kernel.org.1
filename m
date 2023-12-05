@@ -1,271 +1,263 @@
-Return-Path: <netdev+bounces-54157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 347B1806221
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:52:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16B9806232
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 576401C20FDA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:52:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D79C1F216D2
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D803FE56;
-	Tue,  5 Dec 2023 22:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B2B3FE5C;
+	Tue,  5 Dec 2023 22:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XmAOzcEd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U6r5dOUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D5EA5;
-	Tue,  5 Dec 2023 14:52:09 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-db8892a5f96so3384750276.2;
-        Tue, 05 Dec 2023 14:52:09 -0800 (PST)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50051B2
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:59:10 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d0b9274121so1664415ad.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 14:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701816729; x=1702421529; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vcNn42U4c+vJgC2cbv3DXpQ3FnywuQCxcKqtmybhfIA=;
-        b=XmAOzcEdJn3ApDtLYzKNGBxrNdI0o4qqhvkOjNTB+XFVaYhxY7ePQs817G5pqgA+TC
-         lkimuK4P98hhhpADg77OmhCcvwDixAuHrfa3eKoFAhRoog3hrHKCDUzvwUMsOJVEyWFK
-         6n36HdUbZfe6H+HXuRJpt45oPeRnd8eFzGNc9vxPPsXdJSWqy6+Pe+qvwaDC0BCkn9WE
-         btaUDR0eY9COltPQfd7uswmJF/Ii9z/VISdR4qSpbdFh7+d0EymobCavBacUEKc8AntL
-         UEQijOw0tQkwi8jlLp+hRwMpU3JEFXPBseIG4yNKFnTDvrebTnN+tVQPO4NU4x/1v43N
-         CCpw==
+        d=google.com; s=20230601; t=1701817150; x=1702421950; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DiDmnpUUNncrnI6aYqSgsfPSW6+CjhtdUetE6abrmhM=;
+        b=U6r5dOUShRcNlBrdMrLBOCW1Sm1s3DdWvtf4XJw5th74qMItEO/fZD5SPlthiQZelW
+         xXTZ5i86Y1CP/e+uMivUOmdwKQKxH8Tg9WYFlk9z59fmhzNAnEisg9rYE06C5HbO2zda
+         Bu7N8gRLzWt3QRKA5ZVU3BQiH+egL6o7ATH8Iwq+8gcEuJSlPJYPN0u+KgTt6Feon7Kb
+         Bgy0O+sFeDNJz4kqNpdL1hITjuxzYXd+d/vDd0zzRBWl433sTs0BqpNlZzhO1QxKMziN
+         yB6sHVrWM5LynjnCmNoJJluVIlqs/82CzBtcEpUmVXoJVGab9fEC3Q1TOnECBpQmTiXr
+         mIlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701816729; x=1702421529;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vcNn42U4c+vJgC2cbv3DXpQ3FnywuQCxcKqtmybhfIA=;
-        b=KSAlc0knte1YOfJCPW9ZB9n7hGRg7e2sPMg3CKpY0cCn5Fa4OWNP61LA2JLf5TdX9U
-         S9QBsHR6gZHnAnRMjSRNH9N6dHv5p7fHynjNH0taGPC80NFEApEeKXHHYyhtCi8HeGwr
-         RutPYNREZJHFuYm2BLj+WTVvyQsgDTySpfaEEcaws02sHJZx91RxQhefi74GxdKJQyo0
-         VHtCi/ngprIRHQxHHqQSDTs1VDIghGMeMup0epeQMPOMP4Ixwxvu14h5JZT21bBkImF7
-         OmO+MXnBCT96eUeDVvm6tE5+LJOzwDGZSTkhOy9Ghv3Un8g9kqHg+pMuIuvFo9EdxIBV
-         ibvg==
-X-Gm-Message-State: AOJu0YyasbrkANq2GHyCRs8q/+rzwaFsO9i93sujwxIUwpxpMKkJpXZu
-	5jZO12c3LaT70A3mx4s4z00=
-X-Google-Smtp-Source: AGHT+IHaW8qTDikFMkii/fJOLeKRbKogygQnmaBfNRKT/1Eyhn+SprmKZI/XCNw9CGfSf6a0Azx7dg==
-X-Received: by 2002:a25:26ce:0:b0:db7:dacf:61f5 with SMTP id m197-20020a2526ce000000b00db7dacf61f5mr5016860ybm.71.1701816728667;
-        Tue, 05 Dec 2023 14:52:08 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:f586:28cf:78eb:e395])
-        by smtp.gmail.com with ESMTPSA id g80-20020a25db53000000b00d9c7bf8f32fsm3456417ybf.42.2023.12.05.14.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 14:52:07 -0800 (PST)
-Date: Tue, 5 Dec 2023 14:52:06 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	sch^Crabarti@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH V4 net-next] net: mana: Assigning IRQ affinity on HT cores
-Message-ID: <ZW+plvYrNvdcSFCB@yury-ThinkPad>
-References: <1701679841-9359-1-git-send-email-schakrabarti@linux.microsoft.com>
- <ZW3om2dfA4U0lhVY@yury-ThinkPad>
- <20231205110138.GA31232@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+        d=1e100.net; s=20230601; t=1701817150; x=1702421950;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DiDmnpUUNncrnI6aYqSgsfPSW6+CjhtdUetE6abrmhM=;
+        b=r5agL9HjUYQ3uxmutijmOGhbBxrUcsNOogicNEQtckM5I2d7zf9hxkrc4/w00qcgtG
+         nxi1r8KUbEewjCizycyoxa7xb1YcbqTI6/5Z75K7yfIjaeklQxnU3k0sZvcDls6qm/iR
+         Iv+aPa3nRtlyZw/hbNU05SA0jqTwTC+3H8PA5A421tok9Yr78gD3/I78kmtIEotn0sk2
+         7DoSBRbo2VKZhWZkrxp8yQzGAW7u1ljvYu+7sBjs9KISeru20Sp1DFVYmRrF3jksYbrI
+         cJepzomkkqI1A+bhSGbYWTiXG1il4eVTiLqnXqEWj0nhJfClCJkoIwqVEAk6GuSmR6bq
+         wncw==
+X-Gm-Message-State: AOJu0YxA2xT+w1VXG8sjpLzmTFWTUtXvhr+pG9SPe8iy6FeQOTHWiAuX
+	4QULKRshA6lwms3R6h951ScHoJw=
+X-Google-Smtp-Source: AGHT+IHnWRQw3sBkw9X9W/vevsDl7PUkpFSopPucOm6JGnj51cT1SO2wA03RbmH1O1pGJhycl+koljM=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:902:ce91:b0:1d0:4246:90b1 with SMTP id
+ f17-20020a170902ce9100b001d0424690b1mr50333plg.0.1701817149511; Tue, 05 Dec
+ 2023 14:59:09 -0800 (PST)
+Date: Tue, 5 Dec 2023 14:59:07 -0800
+In-Reply-To: <20231205210847.28460-18-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205110138.GA31232@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Mime-Version: 1.0
+References: <20231205210847.28460-1-larysa.zaremba@intel.com> <20231205210847.28460-18-larysa.zaremba@intel.com>
+Message-ID: <ZW-rO6bzRa47tY-T@google.com>
+Subject: Re: [PATCH bpf-next v8 17/18] selftests/bpf: Add AF_INET packet
+ generation to xdp_metadata
+From: Stanislav Fomichev <sdf@google.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
+	xdp-hints@xdp-project.net, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Tariq Toukan <tariqt@mellanox.com>, 
+	Saeed Mahameed <saeedm@mellanox.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Tue, Dec 05, 2023 at 03:01:38AM -0800, Souradeep Chakrabarti wrote:
-> > > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > index 6367de0c2c2e..2194a53cce10 100644
-> > > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > @@ -1243,15 +1243,57 @@ void mana_gd_free_res_map(struct gdma_resource *r)
-> > >  	r->size = 0;
-> > >  }
-> > >  
-> > > +static int irq_setup(int *irqs, int nvec, int start_numa_node)
-> > > +{
-> > > +	int i = 0, cpu, err = 0;
-> > > +	const struct cpumask *node_cpumask;
-> > > +	unsigned int  next_node = start_numa_node;
-> > > +	cpumask_var_t visited_cpus, node_cpumask_temp;
-> > > +
-> > > +	if (!zalloc_cpumask_var(&visited_cpus, GFP_KERNEL)) {
-> > > +		err = ENOMEM;
-> > > +		return err;
-> > > +	}
-> > > +	if (!zalloc_cpumask_var(&node_cpumask_temp, GFP_KERNEL)) {
-> > > +		err = -ENOMEM;
-> > > +		return err;
-> > > +	}
-> > 
-> > Can you add a bit more of vertical spacing?
-> > 
-> > > +	rcu_read_lock();
-> > > +	for_each_numa_hop_mask(node_cpumask, next_node) {
-> > > +		cpumask_copy(node_cpumask_temp, node_cpumask);
-> > > +		for_each_cpu(cpu, node_cpumask_temp) {
-> > > +			cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
-> > > +				       topology_sibling_cpumask(cpu));
-> > > +			irq_set_affinity_and_hint(irqs[i], cpumask_of(cpu));
-> > > +			if (++i == nvec)
-> > > +				goto free_mask;
-> > > +			cpumask_set_cpu(cpu, visited_cpus);
-> > > +			if (cpumask_empty(node_cpumask_temp)) {
-> > > +				cpumask_copy(node_cpumask_temp, node_cpumask);
-> > > +				cpumask_andnot(node_cpumask_temp, node_cpumask_temp,
-> > > +					       visited_cpus);
-> > > +				cpu = 0;
-> > > +			}
-> > 
-> > It feels like you can calculate number of sibling groups in a hop in
-> > advance, so that you'll know how many IRQs you want to assign per each
-> > hop, and avoid resetting the node_cpumask_temp and spinning in inner
-> > loop for more than once...
-> > 
-> > Can you print your topology, and describe how you want to spread IRQs
-> > on it, and how your existing code does spread them?
-> >
-> The topology of one system is
-> > numactl -H
-> available: 2 nodes (0-1)
-> node 0 cpus: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-> 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
-> 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
-> node 0 size: 459521 MB
-> node 0 free: 456316 MB
-> node 1 cpus: 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118
-> 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143
-> 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168
-> 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191
-> node 1 size: 459617 MB
-> node 1 free: 456864 MB
-> node distances:
-> node   0   1
->   0:  10  21
->   1:  21  10
-> and I want to spread the IRQs in numa0 node first with 
-> CPU0 - IRQ0
-> CPU2 - IRQ1
-> CPU4 - IRQ2
-> CPU6 - IRQ3
-> ---
-> ---
-> ---
-> CPU94 - IRQ47
-> then
-> CPU1 - IRQ48
-> CPU3 - IRQ49
-> CPU32 - IRQ64
+On 12/05, Larysa Zaremba wrote:
+> The easiest way to simulate stripped VLAN tag in veth is to send a packet
+> from VLAN interface, attached to veth. Unfortunately, this approach is
+> incompatible with AF_XDP on TX side, because VLAN interfaces do not have
+> such feature.
 > 
-> In a topology where NUMA0 has 20 cores and NUMA1 has 20 cores, with total 80 CPUS, there I want
-> CPU0 - IRQ0
-> CPU2 - IRQ1
-> CPU4 - IRQ2
+> Check both packets sent via AF_XDP TX and regular socket.
+> 
+> AF_INET packet will also have a filled-in hash type (XDP_RSS_TYPE_L4),
+> unlike AF_XDP packet, so more values can be checked.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 > ---
-> ---
-> ---
-> CPU38 - IRQ19
-> Then
-> CPU1 - IRQ20
-> CPU3 - IRQ21
-> ---
-> ---
-> CPU39 - IRQ39
-> Node1
-> CPU40 - IRQ40
-> CPU42 - IRQ41
-> CPU44 - IRQ42
-> ---
-> CPU78 - IRQ58
-> CPU41 - IRQ59
-> CPU43 - IRQ60
-> ---
-> ---
-> CPU49 - IRQ64
+>  .../selftests/bpf/prog_tests/xdp_metadata.c   | 116 +++++++++++++++---
+>  1 file changed, 97 insertions(+), 19 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> index 33cdf88efa6b..e7f06cbdd845 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> @@ -20,7 +20,7 @@
 >  
-> 
-> Exisitng code : 
-> https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/microsoft/mana/gdma_main.c#L1246
-> 
-> This uses cpumask_local_spread, so in a system where node has 64 cores, it spreads all 64+1 IRQs on
-> 33 cores, rather than spreading it only on HT cores.
+>  #define UDP_PAYLOAD_BYTES 4
+>  
+> -#define AF_XDP_SOURCE_PORT 1234
+> +#define UDP_SOURCE_PORT 1234
+>  #define AF_XDP_CONSUMER_PORT 8080
+>  
+>  #define UMEM_NUM 16
+> @@ -33,6 +33,12 @@
+>  #define RX_ADDR "10.0.0.2"
+>  #define PREFIX_LEN "8"
+>  #define FAMILY AF_INET
+> +#define TX_NETNS_NAME "xdp_metadata_tx"
+> +#define RX_NETNS_NAME "xdp_metadata_rx"
+> +#define TX_MAC "00:00:00:00:00:01"
+> +#define RX_MAC "00:00:00:00:00:02"
+> +
+> +#define XDP_RSS_TYPE_L4 BIT(3)
+>  
+>  struct xsk {
+>  	void *umem_area;
+> @@ -181,7 +187,7 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+>  	ASSERT_EQ(inet_pton(FAMILY, RX_ADDR, &iph->daddr), 1, "inet_pton(RX_ADDR)");
+>  	ip_csum(iph);
+>  
+> -	udph->source = htons(AF_XDP_SOURCE_PORT);
+> +	udph->source = htons(UDP_SOURCE_PORT);
+>  	udph->dest = htons(dst_port);
+>  	udph->len = htons(sizeof(*udph) + UDP_PAYLOAD_BYTES);
+>  	udph->check = ~csum_tcpudp_magic(iph->saddr, iph->daddr,
+> @@ -204,6 +210,30 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+>  	return 0;
+>  }
+>  
+> +static int generate_packet_inet(void)
+> +{
+> +	char udp_payload[UDP_PAYLOAD_BYTES];
+> +	struct sockaddr_in rx_addr;
+> +	int sock_fd, err = 0;
+> +
+> +	/* Build a packet */
+> +	memset(udp_payload, 0xAA, UDP_PAYLOAD_BYTES);
+> +	rx_addr.sin_addr.s_addr = inet_addr(RX_ADDR);
+> +	rx_addr.sin_family = AF_INET;
+> +	rx_addr.sin_port = htons(AF_XDP_CONSUMER_PORT);
+> +
+> +	sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+> +	if (!ASSERT_GE(sock_fd, 0, "socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)"))
+> +		return sock_fd;
+> +
+> +	err = sendto(sock_fd, udp_payload, UDP_PAYLOAD_BYTES, MSG_DONTWAIT,
+> +		     (void *)&rx_addr, sizeof(rx_addr));
+> +	ASSERT_GE(err, 0, "sendto");
+> +
+> +	close(sock_fd);
+> +	return err;
+> +}
+> +
+>  static void complete_tx(struct xsk *xsk)
+>  {
+>  	struct xsk_tx_metadata *meta;
+> @@ -236,7 +266,7 @@ static void refill_rx(struct xsk *xsk, __u64 addr)
+>  	}
+>  }
+>  
+> -static int verify_xsk_metadata(struct xsk *xsk)
+> +static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
+>  {
+>  	const struct xdp_desc *rx_desc;
+>  	struct pollfd fds = {};
+> @@ -290,17 +320,36 @@ static int verify_xsk_metadata(struct xsk *xsk)
+>  	if (!ASSERT_NEQ(meta->rx_hash, 0, "rx_hash"))
+>  		return -1;
+>  
+> +	if (!sent_from_af_xdp) {
+> +		if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash_type"))
+> +			return -1;
+> +		goto done;
+> +	}
+> +
+>  	ASSERT_EQ(meta->rx_hash_type, 0, "rx_hash_type");
+>  
+>  	/* checksum offload */
+>  	ASSERT_EQ(udph->check, htons(0x721c), "csum");
+>  
+> +done:
+>  	xsk_ring_cons__release(&xsk->rx, 1);
+>  	refill_rx(xsk, comp_addr);
+>  
+>  	return 0;
+>  }
+>  
+> +static void switch_ns_to_rx(struct nstoken **tok)
+> +{
+> +	close_netns(*tok);
+> +	*tok = open_netns(RX_NETNS_NAME);
+> +}
+> +
+> +static void switch_ns_to_tx(struct nstoken **tok)
+> +{
+> +	close_netns(*tok);
+> +	*tok = open_netns(TX_NETNS_NAME);
+> +}
+> +
+>  void test_xdp_metadata(void)
+>  {
+>  	struct xdp_metadata2 *bpf_obj2 = NULL;
+> @@ -318,27 +367,31 @@ void test_xdp_metadata(void)
+>  	int sock_fd;
+>  	int ret;
+>  
+> -	/* Setup new networking namespace, with a veth pair. */
+> +	/* Setup new networking namespaces, with a veth pair. */
+> +	SYS(out, "ip netns add " TX_NETNS_NAME);
+> +	SYS(out, "ip netns add " RX_NETNS_NAME);
+>  
+> -	SYS(out, "ip netns add xdp_metadata");
+> -	tok = open_netns("xdp_metadata");
+> +	tok = open_netns(TX_NETNS_NAME);
+>  	SYS(out, "ip link add numtxqueues 1 numrxqueues 1 " TX_NAME
+>  	    " type veth peer " RX_NAME " numtxqueues 1 numrxqueues 1");
+> -	SYS(out, "ip link set dev " TX_NAME " address 00:00:00:00:00:01");
+> -	SYS(out, "ip link set dev " RX_NAME " address 00:00:00:00:00:02");
+> +	SYS(out, "ip link set " RX_NAME " netns " RX_NETNS_NAME);
+> +
+> +	SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
+>  	SYS(out, "ip link set dev " TX_NAME " up");
+> -	SYS(out, "ip link set dev " RX_NAME " up");
+>  	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
+> +
+> +	/* Avoid ARP calls */
+> +	SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_NAME);
+> +
+> +	switch_ns_to_rx(&tok);
+> +
+> +	SYS(out, "ip link set dev " RX_NAME " address " RX_MAC);
+> +	SYS(out, "ip link set dev " RX_NAME " up");
+>  	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
+>  
+>  	rx_ifindex = if_nametoindex(RX_NAME);
+> -	tx_ifindex = if_nametoindex(TX_NAME);
+>  
+> -	/* Setup separate AF_XDP for TX and RX interfaces. */
+> -
+> -	ret = open_xsk(tx_ifindex, &tx_xsk);
+> -	if (!ASSERT_OK(ret, "open_xsk(TX_NAME)"))
+> -		goto out;
+> +	/* Setup separate AF_XDP for RX interface. */
+>  
+>  	ret = open_xsk(rx_ifindex, &rx_xsk);
+>  	if (!ASSERT_OK(ret, "open_xsk(RX_NAME)"))
+> @@ -379,18 +432,38 @@ void test_xdp_metadata(void)
+>  	if (!ASSERT_GE(ret, 0, "bpf_map_update_elem"))
+>  		goto out;
+>  
+> -	/* Send packet destined to RX AF_XDP socket. */
+> +	switch_ns_to_tx(&tok);
+> +
+> +	/* Setup separate AF_XDP for TX interface nad send packet to the RX socket. */
 
-So from what you said, it looks like you're trying to implement the
-following heuristics:
+Not sure we care, but s/nad/and/ if you happen to do another respin..
 
-1. No more than one IRQ per CPU, if possible;
-2. NUMA locality is the second priority;
-3. Sibling dislocality is the last priority;
-
-Can you confirm that?
-
-If the above correct, your code is quite close to what you want except
-that for every new hop (outer loop) you have to clear CPUs belonging to
-previous hop, which is in you case the same as visited_cpus mask.
-
-But I think you can do it even better if just account the number of
-assigned IRQs. That way you can get rid of the most of housekeeping
-code.
-
-const struct cpumask *next, *prev = cpu_none_mask;
-
-for_each_numa_hop_mask(next, node) {
-        cpumask_and_not(curr, next, prev);
-
-        for (w = cpumask_weight(curr), cnt = 0; cnt < w; cnt++)
-                cpumask_copy(cpus, curr);
-                for_each_cpu(cpu, cpus) {
-                        if (i++ == nvec)
-                                goto done;
-
-                        cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
-                        irq_set_affinity_and_hint(irqs[i], topology_sibling_cpumask(cpu)); // [*]
-                }
-        }
-        prev = next;
-}
-
-[*] I already mentioned that in v3, and also asking here: if you're saying
-that wrt IRQs distribution, all CPUs belonging to the same sibling group
-are the same, why don't you assign all the group to the IRQ. It gives the
-system flexibility to balance workload better.
-
-Let's consider this topology:
-
-Node            0               1
-Core        0       1       2       3
-CPU       0   1   2   3   4   5   6   7
-
-The code above should create the following mapping for the IRQs:
-IRQ     Nodes   Cores   CPUs
-0       1       0       0-1
-1       1       1       2-3
-2       1       0       0-1
-3       1       1       2-3
-4       2       2       4-5
-5       2       3       6-7
-6       2       2       4-5
-7       2       3       6-7
-
-This is pretty close to what I proposed in v3, except that it flips
-priorities of NUMA locality vs sibling dislocality. My original
-suggestion is simpler in implementation and aligns with my natural
-feeling of 'fair' IRQ distribution.
-
-Can you make sure that your heuristics are the best wrt performance?
-
-Regarding the rest of the discussion, I think that for_each_numa_hop_mask() 
-together with some basic cpumaks operations results quite a readable
-and maintainable code, and we don't need any more generic API to
-support this type of distribution tasks.
-
-What do you think guys?
-
-Thanks,
-Yury
+Acked-by: Stanislav Fomichev <sdf@google.com>
 
