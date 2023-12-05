@@ -1,194 +1,195 @@
-Return-Path: <netdev+bounces-53953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA07805648
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:45:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8492805657
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7444A1F21549
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:45:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4356F1F2161B
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46BC5D912;
-	Tue,  5 Dec 2023 13:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117BD5E0B8;
+	Tue,  5 Dec 2023 13:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="erBBtOS5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uRp6DB8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2078.outbound.protection.outlook.com [40.107.102.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705F8BA
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 05:45:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KzQVQAjTFjAItseX9qg7js5KM0b6tl57cBrwhtEWlsjhdH4Wxsl10xZOfGgnSjHzpmAMPI/nb8EEQABHQkzVwaflk/yRwu7Twfb3w3mFnziwt8XlgQk2Z+sYUPsJV3YXCCXA4Tffxf7+EVtQMrHlneBy63DRP5k2CpB+ZzvtDhJMDhlVbJTDgCGES7KdvoBClJwAUJBTd/anPhBMhr1YkbkHgYlAKDH8zfQEe5HmhsrrdjJiq+lvfK4uP4Ue6Rk+BhDK5q+3SBu7TwMXn6DKCuDzSXQyY5qUdhY+5/BZC28mOU/Mi0Rz+OO2sHEK0nJlt2HnMmEL/DOpKCeDDBSU+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MkpsLxiI2LU5b0wH7BWBJxmnnlemMKslxXWB9ycI6co=;
- b=kgkpx9BTjr3SF55YEx/Axh9JIVsgAJc3WaWLaM9fp79c9UICD+JJgty96Q+NouEUomNhm//8/j5Ns5pm+dbPvzJnle4AxGD4SGRaHi+KkX53dlfdjJLX9wPBtrxKFmqm+vb9wA/7DVb7lZU+DvicsWO5SLosvEgu1GHer3dqY81+YZkF2fmo7mIlsI7FTyDJbOBwzTiHRJnsqVp8zvd2lfrjut72hNlUbdDouNH3kBscmUZqeJOvqJK5ZhnV/E43IgKzI8anRxjrwrgXw5VMx6CpQ82LLZGAxNkLQaS20ifZ7k2r60nHpYx9zcC2N6ZUUlphXK5UYJnEF4P+7K/csg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MkpsLxiI2LU5b0wH7BWBJxmnnlemMKslxXWB9ycI6co=;
- b=erBBtOS5jdnPdNF6GMDZ81sQucKBX0wqtwrIjM1pVJKyHwHQpjk8rKeFUQSL20k/fMmgP1os6gpUwDUGf6aIeq/7sa5Fq5sHV2+cho7+xhAQY5l/bsyvEj9JqTlvF38axQOMud1n7vlhC51AuASzO73zbAZ585Jl3M839NVZm1E=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4283.namprd12.prod.outlook.com (2603:10b6:5:211::21)
- by DS7PR12MB6093.namprd12.prod.outlook.com (2603:10b6:8:9e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 13:45:38 +0000
-Received: from DM6PR12MB4283.namprd12.prod.outlook.com
- ([fe80::23e8:2f3b:86ac:ba34]) by DM6PR12MB4283.namprd12.prod.outlook.com
- ([fe80::23e8:2f3b:86ac:ba34%3]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 13:45:37 +0000
-Message-ID: <35c146ed-769c-4534-8354-77eb775b0a1a@amd.com>
-Date: Tue, 5 Dec 2023 13:45:32 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] sfc: Implement ndo_hwtstamp_(get|set)
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Alex Austin <alex.austin@amd.com>, netdev@vger.kernel.org,
- linux-net-drivers@amd.com, ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com,
- davem@davemloft.net, edumazet@google.com, richardcochran@gmail.com,
- lorenzo@kernel.org, memxor@gmail.com, alardam@gmail.com, bhelgaas@google.com
-References: <20231130135826.19018-1-alex.austin@amd.com>
- <20231130135826.19018-2-alex.austin@amd.com>
- <20231201192531.2d35fb39@kernel.org>
- <ca89ea1b-eaa5-4429-b99c-cf0e40c248db@amd.com>
- <20231204110035.js5zq4z6h4yfhgz5@skbuf> <20231204101705.1f063d03@kernel.org>
- <20231204184532.jukt3qvk7iqv6y4k@skbuf>
- <1f1c04902562c58736862ce24316f5bc85757bcb.camel@redhat.com>
-From: "Austin, Alex (DCCG)" <alexaust@amd.com>
-In-Reply-To: <1f1c04902562c58736862ce24316f5bc85757bcb.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0053.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:152::22) To DM6PR12MB4283.namprd12.prod.outlook.com
- (2603:10b6:5:211::21)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804C3A8;
+	Tue,  5 Dec 2023 05:47:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sXLv+BQQhFyIj+OepEyZ/ix18aKE+IuVWy2i+TljFxM=; b=uRp6DB8os5K4RsEy/2tUwm8nTZ
+	KpC14YHGa6Zc3D4mUxpfsJ3voOPTih7Wgr854pnrSTaWgxWU6YVi4d5Drw43VHXLu/E6742PCh+Ra
+	FuWh9NO9KUrSK9WHyfAzriA5bQw1gaXSrh7/O7Lj3Q2Vos66sXrbVZCmQ/QssYHxSW01XNWNF3M3Q
+	O9BeC3qGJbLGnu1O7FdgDDpGwWEDYbnc/364SX/dYvg+3XdxymrG0UxnhIUp4fEnG3MzP+StRFNdk
+	89kIl+zuljDMmLDi5bAvd9i891rGvYkWGfPfWeU9TRipURrhKE5Kc4/GjMHGY8d5xkyK4BPcrOE+z
+	x6FdkqZg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36992)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rAVl6-0006qp-0Q;
+	Tue, 05 Dec 2023 13:46:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rAVl6-0001lK-Gv; Tue, 05 Dec 2023 13:46:44 +0000
+Date: Tue, 5 Dec 2023 13:46:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
+ MDIO device
+Message-ID: <ZW8pxM3RvyHJTwqH@shell.armlinux.org.uk>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4283:EE_|DS7PR12MB6093:EE_
-X-MS-Office365-Filtering-Correlation-Id: 122e9803-1767-4462-04f1-08dbf598768c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qQpbT53wwDp0+MaHshHjNytHDqjYg1RtZMEawcj5OzsXTOocPZrV085ozaPLp1dDFY+hwkzS02gQDfUARyGgnzP1HfGw1Csa1xRxL3Idiufe37kkHS21bRQiUiQaikm9vM6v9WySR8sFMEZ86znSJresHaTeABDIegLfwdj6eLkLCEF+r5oYQjX539TPipEgwFx9W8HgnYFg3JYZoCJMOnoKISNNYlSE+/4DmVBqkSJUcUp8dgcTpQziJt2lhX4lar2Zg/kB2Ww5PerJv/uDKeEjPNMXPO7A5akQKR3FhX5l2GIJH6dJ/8FuZ2sLYGiTWoqzcOMr8t9dska/NJVuQi17uwwboavNu0Y/4w7f/0uS3J4vh3+zTTYWUUPMQAVn/7ZVQHzra0CoK6U4DWYYOBVGaVtXf2Yab/XtCV4JyV2LNKh2Ohe+sXh/B5f4zt0aGKmDUS/GZRvUO1sChkO+Q/pUxQ9gFG0kuM/DbOkK/FY+GoU44qYWv+dsTeoLbm8Tf1PMiwgpqeHF8QZAQXfTLgdG5F6cRyRBMPHtZKtmamm/pC4GaKHminDySox0K+PQziVXn+9uyX2t1NIwWF8sGYtbwCo3ac0CzHdT7OJ3/SZuHhAecFG6w1BlmwQzvk8103F8TDIAR1Q3NowTMNNppJAzSorGool1ZGR43f9AiDm7EASb1Ff/jMUzC3TzuZBc
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4283.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(396003)(366004)(346002)(230173577357003)(230273577357003)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(7416002)(31696002)(2906002)(110136005)(316002)(66556008)(66476007)(66946007)(8676002)(41300700001)(36756003)(4326008)(8936002)(31686004)(5660300002)(38100700002)(6486002)(83380400001)(478600001)(26005)(6666004)(2616005)(6512007)(53546011)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OTNXTFkra0NQUE5QVk1pTXZZdkhrcDlVMDQ1SDl0emNlZnQ4a1hrVk9PbUNq?=
- =?utf-8?B?TEdJSHhoNEpPcUd5MlJlVW4zNk5NdytXdDdmdFJvN1ZpSy9oblJlOER2VGxN?=
- =?utf-8?B?bjlmdnljMFVBdWY2OE9mTU4rdHZLdUZ4eTluMEtaZE5lV2Y3N3VoV21aUVVi?=
- =?utf-8?B?STJBa3dtdndaZm1QOWlFOGJhdjFQQTdxVEd0VkxSeGdnMFdiQ3RkQStxQThr?=
- =?utf-8?B?Y2xWMjF3cHlUNzFPN1dwZzdteEZyVXhGYnNNdHZ2SFZYQUxDZy8xQ0RqS1VO?=
- =?utf-8?B?RFkwYjBpWFV5Z2IyVERoUmFINDBtS0tDenlNR3FwNGFqbXUwaGljYjR4aGp4?=
- =?utf-8?B?YUJsTTJVRGIyS1ZRR1BodmFUQmNnVWwxU1dNQU5SeFZyZ3FWSXcyeDJGTWlv?=
- =?utf-8?B?b0tSWmh0YVdXMFJXNmhCdldybjlueWFqTzd4MURwN014elVWMWNvR0c3dUJh?=
- =?utf-8?B?V2xZYnB6RW9zRVdqRWh2dUZyR21MSG9NMStlM0hWQ2hHT25ZazhLbE1PWDl6?=
- =?utf-8?B?aDVnTURDeE03K0Mva1JvSW5EUGI1TWxYVkhrSWNkK0pKaWpYYVhSaDVpQllK?=
- =?utf-8?B?cU1ndk9ybTRHaUc0SVJicTFOcVJlSXhRL3ErUmhhNENFM1FDOWRmNkJEbkd3?=
- =?utf-8?B?KzNtVTl3d3Q3U0FYQVlDbFFuNW5oaVJGR0VDQnBWd3crWVlJKzNrTnp1TUN6?=
- =?utf-8?B?MDcyck5kdTV4alZ6aWJ4VUNZWUZCUnRyMTNVeGlBQTE2ejh1b2lDd0drZEl3?=
- =?utf-8?B?dzhFRUpNVmdka3J5YWFmR1FUOWZhQWVDdzhZOUp0QlRVeENOSGphQlpzbkIv?=
- =?utf-8?B?b2lrbHpqL1pRSHlqY0dDaVg5QmR5TjAzdXR0c0U3NHlaRURrREpFeW9rRTRZ?=
- =?utf-8?B?QlpBMUZMWGRhb1EzaEpOSmdsc2ZsOHFiYkhUT3VJU0FsaDJWQVNGZ0Zka092?=
- =?utf-8?B?RW9lNnlFclNQNmVvOWh4SEFvSEF2cVkvM2xZa1c4WXZ4bG5laW5kT0M1YnVp?=
- =?utf-8?B?bVhhRytFSTlhSm1TOVYyY1Y1U3NaWTVqclkvWFJ1emp5bFYvVjk2UW9Xc281?=
- =?utf-8?B?TnVlTWZzbDdROS9pSnBaVGdneXovOWxRNG9BVnJpTGZ6S3hONG1qUUsxYXZ1?=
- =?utf-8?B?eUlJZmthQUlPNlB5ZFZJaVBMSUFwZElCOGl4V2dJWkxUVkRDOTlSM3NXSzlj?=
- =?utf-8?B?cTZOQlk2c2NqUjlIejdLL3lKSGxvMEYzOWlhUnhrbGpLcFpyV3NaUm9DWmFw?=
- =?utf-8?B?WkJ3YTFIRGhPcmFFTURwdms5dkoycjBwTEdFU2gzRmErQnFYVDVlY1I2SUo5?=
- =?utf-8?B?Q09mNENCVkdiU0MvblA0eVRSSC81UklUdzlkMFdKMmVxVElkNzBMWlJDcy9N?=
- =?utf-8?B?RkpVM3puUVFMb0RxMWhjVjdkRFdIY1huNVhCUktYaHhaT1VMdE9xTzVkbXQv?=
- =?utf-8?B?ckVNRFByckhzTnBRUmdpb1BkZzc2NTkxSldsekQ3ZDZ0enhrQnhJNjJibWEr?=
- =?utf-8?B?SnB0WTNHY2lHY2RwT2NKMkw2MmxXUjJ2ZCtNY2IreGFoRXFjMWt5QlRrZ1RI?=
- =?utf-8?B?QjBQaU9USUhib0Jma01pRkoyWGpLbHhoNzhKRXpXZmU5b0NlYWlJM2ZOR0di?=
- =?utf-8?B?U2lza0pMNE9kaGR4ck9YL1pzTmpHTW8zTld0YjNMZ0s2aTcvYXFiRTR6cVRa?=
- =?utf-8?B?S0JWTE5YUHFBNDJuKy91QW55cW1pakIycXlBTXRyeVJHQWhEdWlwNnFzdDlR?=
- =?utf-8?B?RVdIN2NvKzFDYUMzQmR2aEc0RXhJOEk2aE93R2d4QmFGdjA4ck95NHRkdHYw?=
- =?utf-8?B?VjBOcERnSDlwMkc5R05vOTBuM09YcUZVYktQa2hQMXdoblBtVHJEU0RYSE0x?=
- =?utf-8?B?NjV0b0VoajZiTlN4RVByZHp2QlROOU5hbEVoclRwdlBPK3ZGblRiZ2kyRjJV?=
- =?utf-8?B?djUrZS9mVWh3WkF3cDBiV0ZOTUw4cFp4QlhmdURMSnNzVWlqbE96ZDZ4MVhE?=
- =?utf-8?B?VUVibzRXMGJaQWpXeitCNVdHMWlMeGNrMVpEM1dPdHZPREFsc3RyMDRNYkpM?=
- =?utf-8?B?M0QwWktPbzV4d0s2cUY2eXIwaGloNnlvR3RRNE00bjhGOVIySXFiNXdURVQ4?=
- =?utf-8?Q?R8AU+/STqpi+iKsqz2wq2WH9c?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 122e9803-1767-4462-04f1-08dbf598768c
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4283.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 13:45:37.8599
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vgao6mKDwS/zNh8wuwGGzJXLf5zd3T6n5tBoLqTjeD9q0WTKdFvIx7+1icSD8yuBDNxkU5BSwfuWWnsnByqcFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205103559.9605-7-fancer.lancer@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Based on comments above, my preference is to keep these patches as they are.
+On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
+> If the DW XPCS MDIO devices are either left unmasked for being auto-probed
+> or explicitly registered in the MDIO subsystem by means of the
+> mdiobus_register_board_info() method there is no point in creating the
+> dummy MDIO device instance in order to get the DW XPCS handler since the
+> MDIO core subsystem will create the device during the MDIO bus
+> registration procedure. All what needs to be done is to just reuse the
+> MDIO-device instance available in the mii_bus.mdio_map array (using some
+> getter for it would look better though). It shall prevent the XPCS devices
+> been accessed over several MDIO-device instances.
+> 
+> Note since the MDIO-device instance might be retrieved from the MDIO-bus
+> map array its reference counter shall be increased. If the MDIO-device
+> instance is created in the xpcs_create_mdiodev() method its reference
+> counter will be already increased. So there is no point in toggling the
+> reference counter in the xpcs_create() function. Just drop it from there.
+> 
+> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+> ---
+>  drivers/net/pcs/pcs-xpcs.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 2850122f354a..a53376472394 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -1376,7 +1376,6 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+>  	if (!xpcs)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	mdio_device_get(mdiodev);
+>  	xpcs->mdiodev = mdiodev;
+>  
+>  	xpcs_id = xpcs_get_id(xpcs);
+> @@ -1417,7 +1416,6 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+>  	ret = -ENODEV;
+>  
+>  out:
+> -	mdio_device_put(mdiodev);
+>  	kfree(xpcs);
+>  
+>  	return ERR_PTR(ret);
 
-Thanks,
+The above two hunks are a completely Unnecessary change.
 
-Alex
+> @@ -1437,19 +1435,21 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
+>  	struct mdio_device *mdiodev;
+>  	struct dw_xpcs *xpcs;
+>  
+> -	mdiodev = mdio_device_create(bus, addr);
+> -	if (IS_ERR(mdiodev))
+> -		return ERR_CAST(mdiodev);
+> +	if (addr >= PHY_MAX_ADDR)
+> +		return ERR_PTR(-EINVAL);
+>  
+> -	xpcs = xpcs_create(mdiodev, interface);
+> +	if (mdiobus_is_registered_device(bus, addr)) {
+> +		mdiodev = bus->mdio_map[addr];
+> +		mdio_device_get(mdiodev);
 
-On 05/12/2023 08:52, Paolo Abeni wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->
->
-> On Mon, 2023-12-04 at 20:45 +0200, Vladimir Oltean wrote:
->> On Mon, Dec 04, 2023 at 10:17:05AM -0800, Jakub Kicinski wrote:
->>> On Mon, 4 Dec 2023 13:00:35 +0200 Vladimir Oltean wrote:
->>>> If I may intervene. The "request state" will ultimately go away once all
->>>> drivers are converted. I know it's more fragile and not all fields are
->>>> valid, but I think I would like drivers to store the kernel_ variant of
->>>> the structure, because more stuff will be added to the kernel_ variant
->>>> in the future (the hwtstamp provider + qualifier), and doing this from
->>>> the beginning will avoid reworking them again.
->>> Okay, you know the direction of this work better, so:
->>>
->>> pw-bot: under-review
->> I mean your observation is in principle fair. If drivers save the struct
->> kernel_hwtstamp_config in the set() method and give it back in the get()
->> method (this is very widespread BTW), it's reasonable to question what
->> happens with the temporary fields, ifr and copied_to_user. Won't we
->> corrupt the teporary fields of the kernel_hwtstamp_config structure from
->> the set() with the previous ones from the get()?
->>
->> The answer, I think, is that we do, but in a safe way. Because we implement
->> ndo_hwtstamp_set(), the copied_to_user that we save is false (aka "the
->> driver implementation didn't call copy_to_user()"). And when we give
->> this structure back in ndo_hwtstamp_get(), we overwrite false with false,
->> and a good ifr pointer with a bad one.
->>
->> But the only reason we transport the ifr along with the
->> kernel_hwtstamp_config is for generic_hwtstamp_ioctl_lower() to work,
->> aka a new API upper driver on top of an old API real driver. Which is
->> not the case here, and no one looks at the stale ifr pointer.
->>
->> It's a lot to think about to make sure that something bad won't happen,
->> I agree. I still don't believe it will break in subtle ways, but nonetheless
->> I do recognize the tradeoff. One approach is more straightforward
->> code-wise but more subtle behavior-wise, and the other is the opposite.
-> I tried to dig into the relevant code as far as I can, and I tend to
-> agree with Vladimir: the current approach looks reasonably safe, and
-> forward looking.
->
-> I think any eventual bugs (I could not find any) would be pre-existent
-> to this patch, rooted in dev_ioctl.c and to be addressed there.
->
-> I think this patches should go in the current form.
->
-> Cheers,
->
-> Paolo
->
+This is fine - taking a reference on the mdiodev you've got from
+somewhere else is the right thing to do.
+
+> +	} else {
+> +		mdiodev = mdio_device_create(bus, addr);
+> +		if (IS_ERR(mdiodev))
+> +			return ERR_CAST(mdiodev);
+> +	}
+>  
+> -	/* xpcs_create() has taken a refcount on the mdiodev if it was
+> -	 * successful. If xpcs_create() fails, this will free the mdio
+> -	 * device here. In any case, we don't need to hold our reference
+> -	 * anymore, and putting it here will allow mdio_device_put() in
+> -	 * xpcs_destroy() to automatically free the mdio device.
+> -	 */
+> -	mdio_device_put(mdiodev);
+> +	xpcs = xpcs_create(mdiodev, interface);
+> +	if (IS_ERR(xpcs))
+> +		mdio_device_put(mdiodev);
+
+Without the change to xpcs_create() you don't need this change - and
+this is why I say you don't understand refcounting.
+
+The point here is that the refcounting management is in each function
+where references are gained or lost.
+
+xpcs_create() creates a new reference to the mdiodev by storing it in
+the dw_xpcs structure. Therefore, it takes a reference to the mdiodev.
+If something fails, it drops that reference to restore the refcount
+as it was on function entry.
+
+xpcs_create_mdiodev() as it originally stood creates the mdiodev from
+the bus/address, and then passes that to xpcs_create(). Once
+xpcs_create() has finished its work (irrespective of whether it was
+successful or not) we're done with the mdiodev in this function, so
+the reference is _always_ put.
+
+For your use case, it would be:
+
+	mdiodev = bus->mdio_map[addr];
+	mdio_device_get(mdiodev);
+
+	xpcs = xpcs_create(mdiodev, interface);
+
+	mdio_device_put(mdiodev);
+
+	return xpcs;
+
+which illustrates this point - we get a reference to the mdiodev by
+reading it from the array. We do something (calling xpcs_create)
+with it. If that something was successful, it takes its own refcount
+otherwise leaves it as-is. We're then done with the mdiodev so we
+drop the refcount we took.
+
+There is no need to make the code more complicated by changing this,
+so I regard the refcount changes in this patch to be wrong.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
