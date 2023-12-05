@@ -1,84 +1,105 @@
-Return-Path: <netdev+bounces-53937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498218054FB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:42:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08ABA8054FE
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:44:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016992809CD
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:42:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B72CC281949
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED995C070;
-	Tue,  5 Dec 2023 12:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C0956476;
+	Tue,  5 Dec 2023 12:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XnqPYWWf"
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="RgakGAYx";
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="r5l5QQB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0F510F
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 04:42:46 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1cdeab6b53so51600066b.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 04:42:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701780165; x=1702384965; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qmq4l9ej1A+DpZ4jngQfqL9Oiy2fHxFTbCGet7aE4Nk=;
-        b=XnqPYWWfDmJy4rQN1Bo2AFbtzS2Tc97o35q2D1exJGO91NbeZNDgNQLq9EGbVjDTkC
-         8tf0pAyykThHRuOFkwhzDkbdBoIrRy+/U1/etL0CSZpOgUhX37DO4Ba4L7NbUntIqT1I
-         dvwToMmJsDOwwK9HlQ4HhH5hyIC5omm7Pfvwz+jfnfo1PhhLogXnsHPezHzbOMO/wdSK
-         6n2DBQ/TLW0ezf2IuzPdnwDVrkDTFu6hy3bDvriTb7EerjiyQBON26Qgoxdcxuoc2SX+
-         iGEWx+xdnzl52EolBpOA7eqRckFRt5+lXyswidkUeC7DlvEuKhA/Ga951GcUH9+pHgxm
-         gnig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701780165; x=1702384965;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qmq4l9ej1A+DpZ4jngQfqL9Oiy2fHxFTbCGet7aE4Nk=;
-        b=DnZ4DPfd94T2LLR4IceJbpA0fPf3RPL4mcwNnlZPtME9k3cZ9jE8A8ogO1lToRrx5g
-         CXbi/6Y2qvD4jB9aeHBma4wOCMM5vwpwSU1aYDJf5w27MSKlyP92ry5TQTr0p444mIS1
-         aan4B/gDn2t+s42E3Iy5KwppiAKOAB4azze1PmDhY8ulsxgzjd+fq5XB00AbhbN5+CUc
-         NpxUpa4givyrmmDMHQmjv5fJqEFAqO3eOLwST6qCI8rmFFydLl3JAewrmckJMQYq09wB
-         TVBlXKBU1o2bf3ghsK1GpMx7f5ZTN4ZEcY8g4wwAIfM6T3fwTl/LV+Ag0qcQHmTBB/xV
-         o00Q==
-X-Gm-Message-State: AOJu0YzeOz/PJ5oBzeDstUcpsJVb8yCxS3WwZZ6f8Q6M2yRAfrg7BdZv
-	Yy2vy6gbexDb8FPbJfAMCKY=
-X-Google-Smtp-Source: AGHT+IFYjOCLUwoWmAJKWioPNJPEQtJ5msKJdOqLCGHmz7xmjLzmsqC1abuQdus//5JZ8kictb77Hw==
-X-Received: by 2002:a17:906:2c1:b0:a1c:7671:8806 with SMTP id 1-20020a17090602c100b00a1c76718806mr710090ejk.0.1701780164909;
-        Tue, 05 Dec 2023 04:42:44 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id l14-20020a170906414e00b0099c53c4407dsm6605006ejk.78.2023.12.05.04.42.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 04:42:44 -0800 (PST)
-Date: Tue, 5 Dec 2023 14:42:42 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Danzberger <dd@embedd.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
- platform init
-Message-ID: <20231205124242.tovrlw2s5gfgbceu@skbuf>
-References: <20231204154315.3906267-1-dd@embedd.com>
- <20231205101257.nrlknmlv7sw7smtg@skbuf>
- <db36974a7383bd30037ffda796338c7f4cdfffd7.camel@embedd.com>
- <20231205120421.yfs52kp2ttlqkwlb@skbuf>
+Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D290D7;
+	Tue,  5 Dec 2023 04:43:55 -0800 (PST)
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id 0512EC021; Tue,  5 Dec 2023 13:43:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1701780234; bh=9k2hEUfWqSwjsOCNxJeHa/J+KeqtpWnpfnSOvtCRoqo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RgakGAYxKTHmfDsp3Xz4ToOiFec531bEiG1oi9xpE8L6ixaQmDIE2gEe/81AmGTsx
+	 eRHIgxFTpoptfzdCWKjbWQk2QTwR+BE7qkNahj/nkWO0yDWFek+tn4VLimnd1J70ig
+	 8ANst0jEIPDChSXLz78NnNS2OnIIuCtJG5ozAjrQejv7GqiBlf/ostfQGsn2/4pMIb
+	 uXL10maFRsYdzr/npMZvI5/LT0cFtXCym+TKMh9uHo6w0O8q5QYx8xGm56uo1hiikc
+	 TCfY9o5H4/3geFLUvnLE6+z96SQUa6eaxBbdYt5bwGz+Elje7NcBzuAiwIVVaCCMu+
+	 4JMcN2RW9w02w==
+X-Spam-Level: 
+Received: from gaia (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id 79FDEC009;
+	Tue,  5 Dec 2023 13:43:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1701780233; bh=9k2hEUfWqSwjsOCNxJeHa/J+KeqtpWnpfnSOvtCRoqo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r5l5QQB/eieudp+PT4SYxj+jH20QiV6viRJce+pCsKIvdchAaSSo6NJrm8mbpX077
+	 4FfxkWQ1sekeWcSekEviSIJyQz6pPS3ChXg/kZtOFoWvFUV214ioLcZ3ymvXOOEFLq
+	 TFdGCULG3GMJQkCbiNgoSAqnxxJ3Ula5kL07YimK58QyKTqWpFU8zR+2JHu0jHIKqu
+	 QA7P8uGIOdPCs/vNM+ym0SuZlWDPdbLE5D+Cqwyr+JYnE+ofu4z9wcAaV00YcwQJ1l
+	 R31riyGsVI5wQdTKV90vNKG1rZwuhw8h67zc4qzlX7UPuI5eSg1AF0Nwwfc70vv8Pw
+	 9eWMwT5UxDIsg==
+Received: from localhost (gaia [local])
+	by gaia (OpenSMTPD) with ESMTPA id 98847857;
+	Tue, 5 Dec 2023 12:43:47 +0000 (UTC)
+Date: Tue, 5 Dec 2023 21:43:32 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Latchesar Ionkov <lucho@ionkov.net>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	v9fs@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH v2] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
+Message-ID: <ZW8a9BvNwO4yw_JX@codewreck.org>
+References: <ZW7oQ1KPWTbiGSzL@codewreck.org>
+ <20231205091952.24754-1-pchelkin@ispras.ru>
+ <ZW7t_rq_a2ag5eoU@codewreck.org>
+ <2974507b-57fa-4c9b-a036-055dbf55f6a4-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231205120421.yfs52kp2ttlqkwlb@skbuf>
+In-Reply-To: <2974507b-57fa-4c9b-a036-055dbf55f6a4-pchelkin@ispras.ru>
 
-On Tue, Dec 05, 2023 at 02:04:21PM +0200, Vladimir Oltean wrote:
-> You can post the 2 patches as a v2 of this series (separate thread).
+Fedor Pchelkin wrote on Tue, Dec 05, 2023 at 03:15:43PM +0300:
+> As for the second initialization (the one located after kfree(*wnames) in
+> error handling path - it was there all the time), I think it's better not
+> to touch it. I've just moved kfree and null-assignment under
+> 'if (*wnames)' statement.
 
-Also, for v2 please remember to use scripts/get_maintainer.pl more
-diligently. Would it have been a busier period, I would have probably
-not noticed your patch.
+Ah, I somehow missed this was just moved; that doesn't change anything
+but doesn't hurt either, sure.
+
+> The concern you mentioned is about any user that'd ignore the return code
+> and try to use *wnames (so that the second initialization makes some
+> sense). I can't see if there is any such user but, as said before, it's
+> better not to touch that code.
+
+Yes, it was here before, let's leave it in.
+
+> > I don't mind the change even if there isn't but let's add a word in the
+> > commit message.
+> 
+> OK, will do in v3.
+
+I've queued to -next as is (with the i initialized as Christian pointed
+out), will update if you send a new one later.
+
+Thanks,
+-- 
+Dominique Martinet | Asmadeus
 
