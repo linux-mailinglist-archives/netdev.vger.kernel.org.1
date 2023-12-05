@@ -1,134 +1,170 @@
-Return-Path: <netdev+bounces-53706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42B438043C7
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:08:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6EE8043D4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:16:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A98C2812F5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 01:08:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03F3D1C20A86
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 01:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED09910F4;
-	Tue,  5 Dec 2023 01:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E62ED9;
+	Tue,  5 Dec 2023 01:16:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPgdtvmc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJPpYXFI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE99310E8
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:08:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A21C433C8;
-	Tue,  5 Dec 2023 01:08:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701738520;
-	bh=UgcL2R9C0bhYJdJ2rSepl0vFYdW6GWqKcBPVUBMjf20=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aPgdtvmcipZ5lh98Nr929Of0FRtC+TqZqj5ZKTO9Wrj4sME5iA/e0tWB9+5JqAy+0
-	 rUh1kJiOrQDngq6i0pFM3fMZobyCYxKsTNziDR0tJFlueNKw9cz4xUBSZpvaDsxorF
-	 6xGAamazrJs9Ao5bv/+pF/jTxxXLT4pDiLC8nO8b/5dt/7u4grf41OzhjP4oSKWUsZ
-	 +1ZHh6zriZW+zFLUw921wy1FtdOulgrhfcWFb+LWgzYfIu6zVmxmHlRgsrw8rPspHG
-	 4O0wRM0b/HsV2Y4IJshcHuOAunhv+Gtn6Ld0BrlJp6Ft70AjDmcYr0/SHZrNhu3wIk
-	 G/OQODMgc+A/w==
-Message-ID: <4b095b1c-9fa8-4df9-846b-c33c01e15d97@kernel.org>
-Date: Mon, 4 Dec 2023 18:08:38 -0700
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE76D5;
+	Mon,  4 Dec 2023 17:16:17 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6ce4fe4ed18so306644b3a.1;
+        Mon, 04 Dec 2023 17:16:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701738976; x=1702343776; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bW8p/7StZNBd4w+aXs/KRA66EMDHFIQHYNt6TXm3wDI=;
+        b=YJPpYXFIgtQRoKq6hcT5kG/LVhFe20hSu6FOJyr+iUd5rd57K/rojfnMawyvDSRu/H
+         lF/9hLNQaAj68MD43APA/RzMUrjZQIxs4caS4Yvy8cpCRoK7s13bFoz4Pw94j6oEi1OB
+         oaiUvt14ViKIYI7z7vCgsO6QPVO4l3133YzYYDuu4D96UpZ8zLwF6vaEb1jB/JQ6d1ye
+         9BHoyNzrNkd9osrvJZeVoQ4PX8FEjLkTTXkdfyf4l2zK91/DKbxEUC/tV9frybmJbndM
+         fNlwdtsFu0a2sYpLoEMDikMaFpzx1Qma+tXGnGKp6/+mblVh4J5UbnFvMYEZT36mAXqA
+         OsOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701738976; x=1702343776;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bW8p/7StZNBd4w+aXs/KRA66EMDHFIQHYNt6TXm3wDI=;
+        b=oyScthE+DvwiOHd/y9vbV6OJNeMDp4U6AqiIOsVxoIhB3blK6pepRb38yqwWTXrjno
+         4KgkTz7aaI3i9xnoq3SgZ9Kq9zff3Wq7j/XmL8E4xsDvySnLonoNes/I71qBxBegQsTv
+         hyNNb30MFSH7g7lWkCQ7l2Vk/9AF6OE3FqZ57FqhA/PN2Ds3dwpCQ61urytXAo9cpt3R
+         djBl5XsyCg9PnhXD4uvZjBhI8hizRi1sNSkz7Bc16I8/j1Ns82aHOrtL3RgpkooIJQ9n
+         gVGOqJuIE2lKxlPApZZwlR5INge7sBgdAq4I0M0qswA3LpRwGS994pcxMafbJxIfXVAg
+         ioHQ==
+X-Gm-Message-State: AOJu0YxeObg2uZPV/CNcirjVYk5yykz6R1gf90TYXEV1mfTl491q6tTP
+	TMbiiSUqoGfWUir25UMd4+bTi++Jf+qudQ==
+X-Google-Smtp-Source: AGHT+IGSdPTo3VXtgqI4ABkWxhgD31RlbzxjfDS90P4YmeucppWO6QLt5MsgdcefnXVo4c/9EaiNbA==
+X-Received: by 2002:a05:6a00:1ad1:b0:6cd:e3ef:ce54 with SMTP id f17-20020a056a001ad100b006cde3efce54mr17771746pfv.0.1701738976218;
+        Mon, 04 Dec 2023 17:16:16 -0800 (PST)
+Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id m18-20020a056a00081200b006ce64ebd2a0sm89337pfk.99.2023.12.04.17.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 17:16:15 -0800 (PST)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me,
+	wedsonaf@gmail.com,
+	aliceryhl@google.com,
+	boqun.feng@gmail.com
+Subject: [PATCH net-next v9 0/4] Rust abstractions for network PHY drivers
+Date: Tue,  5 Dec 2023 10:14:16 +0900
+Message-Id: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-Content-Language: en-US
-To: Doug Anderson <dianders@chromium.org>, Eric Dumazet <edumazet@google.com>
-Cc: Judy Hsiao <judyhsiao@chromium.org>, Simon Horman <horms@kernel.org>,
- Brian Haley <haleyb.dev@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Joel Granados <joel.granados@gmail.com>,
- Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>,
- Luis Chamberlain <mcgrof@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20231201083926.1817394-1-judyhsiao@chromium.org>
- <CANn89iJMbMZdnJRP0CUVfEi20whhShBfO+DAmdaerhiXfiTx5A@mail.gmail.com>
- <CAD=FV=VqmkydL2XXMWNZ7+89F_6nzGZiGfkknaBgf4Zncng1SQ@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAD=FV=VqmkydL2XXMWNZ7+89F_6nzGZiGfkknaBgf4Zncng1SQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 12/4/23 4:40 PM, Doug Anderson wrote:
-> Hi,
-> 
-> On Fri, Dec 1, 2023 at 1:10 AM Eric Dumazet <edumazet@google.com> wrote:
->>
->> On Fri, Dec 1, 2023 at 9:39 AM Judy Hsiao <judyhsiao@chromium.org> wrote:
->>>
->>> We are seeing cases where neigh_cleanup_and_release() is called by
->>> neigh_forced_gc() many times in a row with preemption turned off.
->>> When running on a low powered CPU at a low CPU frequency, this has
->>> been measured to keep preemption off for ~10 ms. That's not great on a
->>> system with HZ=1000 which expects tasks to be able to schedule in
->>> with ~1ms latency.
->>
->> This will not work in general, because this code runs with BH blocked.
->>
->> jiffies will stay untouched for many more ms on systems with only one CPU.
->>
->> I would rather not rely on jiffies here but ktime_get_ns() [1]
->>
->> Also if we break the loop based on time, we might be unable to purge
->> the last elements in gc_list.
->> We might need to use a second list to make sure to cycle over all
->> elements eventually.
->>
->>
->> [1]
->> diff --git a/net/core/neighbour.c b/net/core/neighbour.c
->> index df81c1f0a57047e176b7c7e4809d2dae59ba6be5..e2340e6b07735db8cf6e75d23ef09bb4b0db53b4
->> 100644
->> --- a/net/core/neighbour.c
->> +++ b/net/core/neighbour.c
->> @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl)
->>  {
->>         int max_clean = atomic_read(&tbl->gc_entries) -
->>                         READ_ONCE(tbl->gc_thresh2);
->> +       u64 tmax = ktime_get_ns() + NSEC_PER_MSEC;
->>         unsigned long tref = jiffies - 5 * HZ;
->>         struct neighbour *n, *tmp;
->>         int shrunk = 0;
->> +       int loop = 0;
->>
->>         NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
->>
->> @@ -279,10 +281,16 @@ static int neigh_forced_gc(struct neigh_table *tbl)
->>                         if (shrunk >= max_clean)
->>                                 break;
->>                 }
->> +               if (++loop == 16) {
->> +                       if (ktime_get_ns() > tmax)
->> +                               goto unlock;
->> +                       loop = 0;
->> +               }
->>         }
->>
->>         WRITE_ONCE(tbl->last_flush, jiffies);
->>
->> +unlock:
->>         write_unlock_bh(&tbl->lock);
-> 
-> I'm curious what the plan here is. Your patch looks OK to me and I
-> could give it a weak Reviewed-by, but I don't know the code well
-> enough to know if we also need to address your second comment that we
-> need to "use a second list to make sure to cycle over all elements
-> eventually". Is that something you'd expect to get resolved before
-> landing?
-> 
-> Thanks! :-)
+This patchset adds Rust abstractions for phylib. It doesn't fully
+cover the C APIs yet but I think that it's already useful. I implement
+two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
+they work well with real hardware.
 
-entries are added to the gc_list at the tail, so it should be ok to take
-a break. It will pickup at the head on the next trip through.
+The first patch introduces Rust bindings for phylib.
+
+It's unlikely that bindgen will support safe access to a bit field in
+phy_device struct until the next merge window. So this version uses a
+workaround to access to a bit field safely instead of the generated
+code by bindgen.
+
+The second patch adds a macro to declare a kernel module for PHYs
+drivers.
+
+The third adds the Rust ETHERNET PHY LIBRARY entry to MAINTAINERS
+file; adds the binding file and me as a maintainer (as Andrew Lunn
+suggested) with Trevor Gross as a reviewer.
+
+The last patch introduces the Rust version of Asix PHY driver,
+drivers/net/phy/ax88796b.c. The features are equivalent to the C
+version. You can choose C (by default) or Rust version on kernel
+configuration.
+
+v9:
+  - adds a workaround to access to a bit field in phy_device
+  - fixes a comment typo
+v8: https://lore.kernel.org/netdev/20231123050412.1012252-1-fujita.tomonori@gmail.com/
+  - updates the safety comments on Device and its related code
+  - uses _phy_start_aneg instead of phy_start_aneg
+  - drops the patch for enum synchronization
+  - moves Sync From Registration to DriverVTable
+  - fixes doctest errors
+  - minor cleanups
+v7: https://lore.kernel.org/netdev/20231026001050.1720612-1-fujita.tomonori@gmail.com/T/
+  - renames get_link() to is_link_up()
+  - improves the macro format
+  - improves the commit log in the third patch
+  - improves comments
+v6: https://lore.kernel.org/netdev/20231025.090243.1437967503809186729.fujita.tomonori@gmail.com/T/
+  - improves comments
+  - makes the requirement of phy_drivers_register clear
+  - fixes Makefile of the third patch
+v5: https://lore.kernel.org/all/20231019.094147.1808345526469629486.fujita.tomonori@gmail.com/T/
+  - drops the rustified-enum option, writes match by hand; no *risk* of UB
+  - adds Miguel's patch for enum checking
+  - moves CONFIG_RUST_PHYLIB_ABSTRACTIONS to drivers/net/phy/Kconfig
+  - adds a new entry for this abstractions in MAINTAINERS
+  - changes some of Device's methods to take &mut self
+  - comment improvment
+v4: https://lore.kernel.org/netdev/20231012125349.2702474-1-fujita.tomonori@gmail.com/T/
+  - split the core patch
+  - making Device::from_raw() private
+  - comment improvement with code update
+  - commit message improvement
+  - avoiding using bindings::phy_driver in public functions
+  - using an anonymous constant in module_phy_driver macro
+v3: https://lore.kernel.org/netdev/20231011.231607.1747074555988728415.fujita.tomonori@gmail.com/T/
+  - changes the base tree to net-next from rust-next
+  - makes this feature optional; only enabled with CONFIG_RUST_PHYLIB_BINDINGS=y
+  - cosmetic code and comment improvement
+  - adds copyright
+v2: https://lore.kernel.org/netdev/20231006094911.3305152-2-fujita.tomonori@gmail.com/T/
+  - build failure fix
+  - function renaming
+v1: https://lore.kernel.org/netdev/20231002085302.2274260-3-fujita.tomonori@gmail.com/T/
+
+
+FUJITA Tomonori (4):
+  rust: core abstractions for network PHY drivers
+  rust: net::phy add module_phy_driver macro
+  MAINTAINERS: add Rust PHY abstractions for ETHERNET PHY LIBRARY
+  net: phy: add Rust Asix PHY driver
+
+ MAINTAINERS                      |  16 +
+ drivers/net/phy/Kconfig          |  16 +
+ drivers/net/phy/Makefile         |   6 +-
+ drivers/net/phy/ax88796b_rust.rs | 135 +++++
+ rust/bindings/bindings_helper.h  |   3 +
+ rust/kernel/lib.rs               |   3 +
+ rust/kernel/net.rs               |   6 +
+ rust/kernel/net/phy.rs           | 900 +++++++++++++++++++++++++++++++
+ rust/uapi/uapi_helper.h          |   2 +
+ 9 files changed, 1086 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/phy/ax88796b_rust.rs
+ create mode 100644 rust/kernel/net.rs
+ create mode 100644 rust/kernel/net/phy.rs
+
+
+base-commit: 8470e4368b0f3ba788814f3b3c1142ce51d87e21
+-- 
+2.34.1
 
 
