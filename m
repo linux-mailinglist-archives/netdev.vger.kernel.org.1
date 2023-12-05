@@ -1,263 +1,236 @@
-Return-Path: <netdev+bounces-54158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16B9806232
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:59:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E19CE80627F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D79C1F216D2
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:59:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0F21C20F60
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B2B3FE5C;
-	Tue,  5 Dec 2023 22:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D61405C1;
+	Tue,  5 Dec 2023 23:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U6r5dOUS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WADi7HTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50051B2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:59:10 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1d0b9274121so1664415ad.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 14:59:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701817150; x=1702421950; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DiDmnpUUNncrnI6aYqSgsfPSW6+CjhtdUetE6abrmhM=;
-        b=U6r5dOUShRcNlBrdMrLBOCW1Sm1s3DdWvtf4XJw5th74qMItEO/fZD5SPlthiQZelW
-         xXTZ5i86Y1CP/e+uMivUOmdwKQKxH8Tg9WYFlk9z59fmhzNAnEisg9rYE06C5HbO2zda
-         Bu7N8gRLzWt3QRKA5ZVU3BQiH+egL6o7ATH8Iwq+8gcEuJSlPJYPN0u+KgTt6Feon7Kb
-         Bgy0O+sFeDNJz4kqNpdL1hITjuxzYXd+d/vDd0zzRBWl433sTs0BqpNlZzhO1QxKMziN
-         yB6sHVrWM5LynjnCmNoJJluVIlqs/82CzBtcEpUmVXoJVGab9fEC3Q1TOnECBpQmTiXr
-         mIlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701817150; x=1702421950;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DiDmnpUUNncrnI6aYqSgsfPSW6+CjhtdUetE6abrmhM=;
-        b=r5agL9HjUYQ3uxmutijmOGhbBxrUcsNOogicNEQtckM5I2d7zf9hxkrc4/w00qcgtG
-         nxi1r8KUbEewjCizycyoxa7xb1YcbqTI6/5Z75K7yfIjaeklQxnU3k0sZvcDls6qm/iR
-         Iv+aPa3nRtlyZw/hbNU05SA0jqTwTC+3H8PA5A421tok9Yr78gD3/I78kmtIEotn0sk2
-         7DoSBRbo2VKZhWZkrxp8yQzGAW7u1ljvYu+7sBjs9KISeru20Sp1DFVYmRrF3jksYbrI
-         cJepzomkkqI1A+bhSGbYWTiXG1il4eVTiLqnXqEWj0nhJfClCJkoIwqVEAk6GuSmR6bq
-         wncw==
-X-Gm-Message-State: AOJu0YxA2xT+w1VXG8sjpLzmTFWTUtXvhr+pG9SPe8iy6FeQOTHWiAuX
-	4QULKRshA6lwms3R6h951ScHoJw=
-X-Google-Smtp-Source: AGHT+IHnWRQw3sBkw9X9W/vevsDl7PUkpFSopPucOm6JGnj51cT1SO2wA03RbmH1O1pGJhycl+koljM=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:ce91:b0:1d0:4246:90b1 with SMTP id
- f17-20020a170902ce9100b001d0424690b1mr50333plg.0.1701817149511; Tue, 05 Dec
- 2023 14:59:09 -0800 (PST)
-Date: Tue, 5 Dec 2023 14:59:07 -0800
-In-Reply-To: <20231205210847.28460-18-larysa.zaremba@intel.com>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235E6196;
+	Tue,  5 Dec 2023 15:01:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701817267; x=1733353267;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IcnvGakiWRB5wIZ7PIMSEpzTjZxypJ1zC+MUScCOPBQ=;
+  b=WADi7HTj7tCGL2kwTXlQ8nTLxSdBlRRMqlSGFDskXOVt5uqSAOY+eTXv
+   /qbQvLwNh4NzdCsij/umZQ/ziZh9UyGgyeu1KsWJ8l5Jf10PtPFUihh4e
+   MvRwEOke6CtZBSFtUKnz+paO8hPO4HF9nV9GHdgRQtLDCBamLPxD5t6tn
+   0fMb/z8VgOvp+LmlIkHVJjeyUwXWPXiQxnzKSmY1Lpof3PM/H50rp0LU9
+   +3vAm0q/QbWKb+nR/yYZp7HxGU8ZbGZNJLjtp1T+GUeS8oHBh959ftGIn
+   TLAWdddWYYV06DbGW8kMrrmwNyy+5mZBo6/b5Ssu5bpWlJbRK/WxrmI16
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="460462197"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="460462197"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 15:01:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="805434229"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="805434229"
+Received: from blavena-mobl2.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.252.46.234])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 15:01:00 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	corbet@lwn.net,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vladimir.oltean@nxp.com,
+	andrew@lunn.ch,
+	horms@kernel.org,
+	mkubecek@suse.cz,
+	willemdebruijn.kernel@gmail.com,
+	gal@nvidia.com,
+	alexander.duyck@gmail.com,
+	ecree.xilinx@gmail.com,
+	linux-doc@vger.kernel.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next v7 0/8] Support symmetric-xor RSS hash
+Date: Tue,  5 Dec 2023 16:00:41 -0700
+Message-Id: <20231205230049.18872-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231205210847.28460-1-larysa.zaremba@intel.com> <20231205210847.28460-18-larysa.zaremba@intel.com>
-Message-ID: <ZW-rO6bzRa47tY-T@google.com>
-Subject: Re: [PATCH bpf-next v8 17/18] selftests/bpf: Add AF_INET packet
- generation to xdp_metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Tariq Toukan <tariqt@mellanox.com>, 
-	Saeed Mahameed <saeedm@mellanox.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On 12/05, Larysa Zaremba wrote:
-> The easiest way to simulate stripped VLAN tag in veth is to send a packet
-> from VLAN interface, attached to veth. Unfortunately, this approach is
-> incompatible with AF_XDP on TX side, because VLAN interfaces do not have
-> such feature.
-> 
-> Check both packets sent via AF_XDP TX and regular socket.
-> 
-> AF_INET packet will also have a filled-in hash type (XDP_RSS_TYPE_L4),
-> unlike AF_XDP packet, so more values can be checked.
-> 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  .../selftests/bpf/prog_tests/xdp_metadata.c   | 116 +++++++++++++++---
->  1 file changed, 97 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> index 33cdf88efa6b..e7f06cbdd845 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> @@ -20,7 +20,7 @@
->  
->  #define UDP_PAYLOAD_BYTES 4
->  
-> -#define AF_XDP_SOURCE_PORT 1234
-> +#define UDP_SOURCE_PORT 1234
->  #define AF_XDP_CONSUMER_PORT 8080
->  
->  #define UMEM_NUM 16
-> @@ -33,6 +33,12 @@
->  #define RX_ADDR "10.0.0.2"
->  #define PREFIX_LEN "8"
->  #define FAMILY AF_INET
-> +#define TX_NETNS_NAME "xdp_metadata_tx"
-> +#define RX_NETNS_NAME "xdp_metadata_rx"
-> +#define TX_MAC "00:00:00:00:00:01"
-> +#define RX_MAC "00:00:00:00:00:02"
-> +
-> +#define XDP_RSS_TYPE_L4 BIT(3)
->  
->  struct xsk {
->  	void *umem_area;
-> @@ -181,7 +187,7 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
->  	ASSERT_EQ(inet_pton(FAMILY, RX_ADDR, &iph->daddr), 1, "inet_pton(RX_ADDR)");
->  	ip_csum(iph);
->  
-> -	udph->source = htons(AF_XDP_SOURCE_PORT);
-> +	udph->source = htons(UDP_SOURCE_PORT);
->  	udph->dest = htons(dst_port);
->  	udph->len = htons(sizeof(*udph) + UDP_PAYLOAD_BYTES);
->  	udph->check = ~csum_tcpudp_magic(iph->saddr, iph->daddr,
-> @@ -204,6 +210,30 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
->  	return 0;
->  }
->  
-> +static int generate_packet_inet(void)
-> +{
-> +	char udp_payload[UDP_PAYLOAD_BYTES];
-> +	struct sockaddr_in rx_addr;
-> +	int sock_fd, err = 0;
-> +
-> +	/* Build a packet */
-> +	memset(udp_payload, 0xAA, UDP_PAYLOAD_BYTES);
-> +	rx_addr.sin_addr.s_addr = inet_addr(RX_ADDR);
-> +	rx_addr.sin_family = AF_INET;
-> +	rx_addr.sin_port = htons(AF_XDP_CONSUMER_PORT);
-> +
-> +	sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-> +	if (!ASSERT_GE(sock_fd, 0, "socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)"))
-> +		return sock_fd;
-> +
-> +	err = sendto(sock_fd, udp_payload, UDP_PAYLOAD_BYTES, MSG_DONTWAIT,
-> +		     (void *)&rx_addr, sizeof(rx_addr));
-> +	ASSERT_GE(err, 0, "sendto");
-> +
-> +	close(sock_fd);
-> +	return err;
-> +}
-> +
->  static void complete_tx(struct xsk *xsk)
->  {
->  	struct xsk_tx_metadata *meta;
-> @@ -236,7 +266,7 @@ static void refill_rx(struct xsk *xsk, __u64 addr)
->  	}
->  }
->  
-> -static int verify_xsk_metadata(struct xsk *xsk)
-> +static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
->  {
->  	const struct xdp_desc *rx_desc;
->  	struct pollfd fds = {};
-> @@ -290,17 +320,36 @@ static int verify_xsk_metadata(struct xsk *xsk)
->  	if (!ASSERT_NEQ(meta->rx_hash, 0, "rx_hash"))
->  		return -1;
->  
-> +	if (!sent_from_af_xdp) {
-> +		if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash_type"))
-> +			return -1;
-> +		goto done;
-> +	}
-> +
->  	ASSERT_EQ(meta->rx_hash_type, 0, "rx_hash_type");
->  
->  	/* checksum offload */
->  	ASSERT_EQ(udph->check, htons(0x721c), "csum");
->  
-> +done:
->  	xsk_ring_cons__release(&xsk->rx, 1);
->  	refill_rx(xsk, comp_addr);
->  
->  	return 0;
->  }
->  
-> +static void switch_ns_to_rx(struct nstoken **tok)
-> +{
-> +	close_netns(*tok);
-> +	*tok = open_netns(RX_NETNS_NAME);
-> +}
-> +
-> +static void switch_ns_to_tx(struct nstoken **tok)
-> +{
-> +	close_netns(*tok);
-> +	*tok = open_netns(TX_NETNS_NAME);
-> +}
-> +
->  void test_xdp_metadata(void)
->  {
->  	struct xdp_metadata2 *bpf_obj2 = NULL;
-> @@ -318,27 +367,31 @@ void test_xdp_metadata(void)
->  	int sock_fd;
->  	int ret;
->  
-> -	/* Setup new networking namespace, with a veth pair. */
-> +	/* Setup new networking namespaces, with a veth pair. */
-> +	SYS(out, "ip netns add " TX_NETNS_NAME);
-> +	SYS(out, "ip netns add " RX_NETNS_NAME);
->  
-> -	SYS(out, "ip netns add xdp_metadata");
-> -	tok = open_netns("xdp_metadata");
-> +	tok = open_netns(TX_NETNS_NAME);
->  	SYS(out, "ip link add numtxqueues 1 numrxqueues 1 " TX_NAME
->  	    " type veth peer " RX_NAME " numtxqueues 1 numrxqueues 1");
-> -	SYS(out, "ip link set dev " TX_NAME " address 00:00:00:00:00:01");
-> -	SYS(out, "ip link set dev " RX_NAME " address 00:00:00:00:00:02");
-> +	SYS(out, "ip link set " RX_NAME " netns " RX_NETNS_NAME);
-> +
-> +	SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
->  	SYS(out, "ip link set dev " TX_NAME " up");
-> -	SYS(out, "ip link set dev " RX_NAME " up");
->  	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
-> +
-> +	/* Avoid ARP calls */
-> +	SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_NAME);
-> +
-> +	switch_ns_to_rx(&tok);
-> +
-> +	SYS(out, "ip link set dev " RX_NAME " address " RX_MAC);
-> +	SYS(out, "ip link set dev " RX_NAME " up");
->  	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
->  
->  	rx_ifindex = if_nametoindex(RX_NAME);
-> -	tx_ifindex = if_nametoindex(TX_NAME);
->  
-> -	/* Setup separate AF_XDP for TX and RX interfaces. */
-> -
-> -	ret = open_xsk(tx_ifindex, &tx_xsk);
-> -	if (!ASSERT_OK(ret, "open_xsk(TX_NAME)"))
-> -		goto out;
-> +	/* Setup separate AF_XDP for RX interface. */
->  
->  	ret = open_xsk(rx_ifindex, &rx_xsk);
->  	if (!ASSERT_OK(ret, "open_xsk(RX_NAME)"))
-> @@ -379,18 +432,38 @@ void test_xdp_metadata(void)
->  	if (!ASSERT_GE(ret, 0, "bpf_map_update_elem"))
->  		goto out;
->  
-> -	/* Send packet destined to RX AF_XDP socket. */
-> +	switch_ns_to_tx(&tok);
-> +
-> +	/* Setup separate AF_XDP for TX interface nad send packet to the RX socket. */
+Patches 1 and 2 modify the get/set_rxh ethtool API to take a pointer to 
+struct of parameters instead of individual params. This will allow future
+changes to the uAPI-shared struct ethtool_rxfh without changing the
+drivers' API.
 
-Not sure we care, but s/nad/and/ if you happen to do another respin..
+Patch 3 adds the support at the Kernel level, allowing the user to set a
+symmetric-xor RSS hash for a netdevice via:
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+    # ethtool -X eth0 hfunc toeplitz symmetric-xor
+
+and clears the flag via:
+
+    # ethtool -X eth0 hfunc toeplitz
+
+The "symmetric-xor" is set in a new "input_xfrm" field in struct
+ethtool_rxfh. Support for the new "symmetric-xor" flag will be later sent
+to the "ethtool" user-space tool.
+
+Patch 4 fixes a long standing bug with the ice hash function register
+values. The bug has been benign for now since only (asymmetric) Toeplitz
+hash (Zero) has been used.
+
+Patches 5 and 6 lay some groundwork refactoring. While the first is
+mainly cosmetic, the second is needed since there is no more room in the
+previous 64-bit RSS profile ID for the symmetric attribute introduced in 
+the next patch.
+
+Finally, patches 7 and 8 add the symmetric-xor support for the ice 
+(E800 PFs) and the iAVF drivers.
+
+---
+v7: - Use new struct ethtool_rxfh_params to pass arguments to set/get_rxfh
+    - Remove get/set_rxfh_context functions and use a new capability to 
+      indicate RSS context support (cap_rss_ctx_supported).
+    - Move the sanity checks on the rxnfc fields when symmetric-xor is set
+      back to core.
+    - Add a new capability (cap_rss_sym_xor_supported) to indicate
+      symmetric-xor support. Core returns -ENOTSUPP if the driver does not
+      support symmetric-xor.
+    - Rename the new struct ethtool_rxfh field to "input_xfrm" and
+      update "Documentation/networking/ethtool-netlink.rst" and 
+      "Documentation/netlink/specs/ethtool.yaml".
+    - Add a comment on potential vulnerability of symmetric-xor in
+      include/uapi/linux/ethtool.h.
+
+v6: switch user interface to "ethtool -X" (ethtool_rxfh) instead of
+    "ethtool -N". Patch (1) is added to allow new params in the get/set_rxh
+    ethtool API. Doc is updated in "Documentation/networking/scaling.rst"
+    to specify how the "symmetric-xor" manipulates the input fields.
+    https://lore.kernel.org/netdev/20231120205614.46350-2-ahmed.zaki@intel.com/T/
+
+v5: move sanity checks from ethtool/ioctl.c to ice's and iavf's rxfnc
+    drivers entries (patches 5 and 6).
+    https://lore.kernel.org/netdev/20231018170635.65409-2-ahmed.zaki@intel.com/T/
+
+v4: add a comment to "#define RXH_SYMMETRIC_XOR" (in uapi/linux/ethtool.h)
+    https://lore.kernel.org/netdev/20231016154937.41224-1-ahmed.zaki@intel.com/T/
+
+v3: rename "symmetric" to "symmetric-xor" and drop "Fixes" tag in patch 2.
+v2: fixed a "Reviewed by" to "Reviewed-by", also need to cc maintainers.
+
+Ahmed Zaki (6):
+  net: ethtool: pass a pointer to parameters to get/set_rxfh ethtool ops
+  net: ethtool: get rid of get/set_rxfh_context functions
+  net: ethtool: add support for symmetric-xor RSS hash
+  ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+  ice: refactor the FD and RSS flow ID generation
+  iavf: enable symmetric-xor RSS for Toeplitz hash function
+
+Jeff Guo (1):
+  ice: enable symmetric-xor RSS for Toeplitz hash function
+
+Qi Zhang (1):
+  ice: refactor RSS configuration
+
+ Documentation/netlink/specs/ethtool.yaml      |   4 +
+ Documentation/networking/ethtool-netlink.rst  |   6 +-
+ Documentation/networking/scaling.rst          |  15 +
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c |  28 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  |  33 +-
+ .../ethernet/aquantia/atlantic/aq_ethtool.c   |  31 +-
+ .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   |  25 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  28 +-
+ drivers/net/ethernet/broadcom/tg3.c           |  22 +-
+ .../ethernet/cavium/thunder/nicvf_ethtool.c   |  31 +-
+ .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    |  24 +-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |  25 +-
+ .../net/ethernet/emulex/benet/be_ethtool.c    |  28 +-
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |  31 +-
+ .../ethernet/fungible/funeth/funeth_ethtool.c |  40 +-
+ .../net/ethernet/hisilicon/hns/hns_ethtool.c  |  17 +-
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  23 +-
+ .../net/ethernet/huawei/hinic/hinic_ethtool.c |  40 +-
+ .../net/ethernet/intel/fm10k/fm10k_ethtool.c  |  26 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  38 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |   5 +-
+ .../net/ethernet/intel/iavf/iavf_adv_rss.c    |   8 +-
+ .../net/ethernet/intel/iavf/iavf_adv_rss.h    |   3 +-
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |  74 ++-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |   4 +
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  41 ++
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 102 ++--
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c |  35 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |  44 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |   4 +-
+ .../net/ethernet/intel/ice/ice_flex_type.h    |   7 +
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 482 +++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_flow.h     |  60 ++-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   4 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 116 ++---
+ drivers/net/ethernet/intel/ice/ice_main.c     |  58 ++-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 105 +++-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |   1 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |   1 +
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  35 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  40 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c  |  27 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c  |  27 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  35 +-
+ drivers/net/ethernet/intel/ixgbevf/ethtool.c  |  27 +-
+ drivers/net/ethernet/marvell/mvneta.c         |  25 +-
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |  79 +--
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |  80 ++-
+ .../net/ethernet/mellanox/mlx4/en_ethtool.c   |  40 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  |  43 +-
+ .../net/ethernet/microchip/lan743x_ethtool.c  |  34 +-
+ .../ethernet/microsoft/mana/mana_ethtool.c    |  33 +-
+ .../ethernet/netronome/nfp/nfp_net_ethtool.c  |  38 +-
+ .../ethernet/pensando/ionic/ionic_ethtool.c   |  26 +-
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  32 +-
+ drivers/net/ethernet/sfc/ef100_ethtool.c      |   3 +-
+ drivers/net/ethernet/sfc/ethtool.c            |   3 +-
+ drivers/net/ethernet/sfc/ethtool_common.c     | 126 ++---
+ drivers/net/ethernet/sfc/ethtool_common.h     |  13 +-
+ drivers/net/ethernet/sfc/falcon/ethtool.c     |  26 +-
+ drivers/net/ethernet/sfc/siena/ethtool.c      |   3 +-
+ .../net/ethernet/sfc/siena/ethtool_common.c   | 126 ++---
+ .../net/ethernet/sfc/siena/ethtool_common.h   |  13 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  31 +-
+ drivers/net/hyperv/netvsc_drv.c               |  32 +-
+ drivers/net/virtio_net.c                      |  29 +-
+ drivers/net/vmxnet3/vmxnet3_ethtool.c         |  22 +-
+ include/linux/avf/virtchnl.h                  |  35 +-
+ include/linux/ethtool.h                       |  27 +-
+ include/uapi/linux/ethtool.h                  |  45 +-
+ include/uapi/linux/ethtool_netlink.h          |   1 +
+ net/ethtool/common.c                          |  12 +-
+ net/ethtool/ioctl.c                           | 218 ++++----
+ net/ethtool/rss.c                             |  55 +-
+ 79 files changed, 1861 insertions(+), 1267 deletions(-)
+
+-- 
+2.34.1
+
 
