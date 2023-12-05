@@ -1,114 +1,200 @@
-Return-Path: <netdev+bounces-54116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D25C806078
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:13:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5AA806084
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2824228207A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:13:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 040AE281C54
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177386E58D;
-	Tue,  5 Dec 2023 21:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07B96E599;
+	Tue,  5 Dec 2023 21:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="NRV/mgjF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OeGSaUz9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BEC18B
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:13:17 -0800 (PST)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c9f9db9567so37092161fa.3
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 13:13:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701810795; x=1702415595; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=istTDf0KHGtUzZEzp1vwhnOeiv2No26sNUCnsg/mZw0=;
-        b=NRV/mgjFsz/ObKbX26mbnYofTFtfbOCl9CQ3eTpgcGpujWP1TszxwQCb3hEFHVnUYQ
-         XEeJE/xpGZYzx9Wm+QJSXssXsrTs4nGe2GnwUKAV63n6OQ1F6s9HY49yLHF2D0aP/cSJ
-         5VF0Ejr/X69nBA6ZxCZpdLSq40PYRgNE9hgAzx07wvq2ysadAuDWrihYNuYXsJbSgLC5
-         5obmztGGe0WGdV0RUlVYhaTemMSjREgI1MkAMacy/yU5Pk2YJ+HN4GtlyLh0Rdet1LOs
-         vpPw2K0rEaDygoDgqXrlSsJmlXt+fhNBgQzB13BOCYWdHD72Jg7NJeJCALnImuSsK3J3
-         wVeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701810795; x=1702415595;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=istTDf0KHGtUzZEzp1vwhnOeiv2No26sNUCnsg/mZw0=;
-        b=MCHIwgTelSwM7bbZxtdoOPOSzZYGmW8wX+IIv2m89Ia6R0y3pqdjMhd0mGctdKvzoE
-         BtwL/tAUEx0XBCvqqWkMxuGKRSyEjS2KTBnDp2xxxfOkqHqq0G+aBhBhn8PAtJVoJj3w
-         ebvioNkT9qDQ5OrpNyHZTKecjrgTSu0YAobZcWY79cYvIjQxw4764BHpdsLtL8h8a9d4
-         7oDGpKC6lL/HrKeelezCPc5qc2FdBXXrQntuw9N7RpAWQlrAkF38s2rza396pFtSLv0o
-         Mua6rQO7BP0blzCeTlhjt/FCzL3MaxDfMdL3fRyZ9uuQT4Mec84mqzR/7yTfi82xW8L2
-         hYSA==
-X-Gm-Message-State: AOJu0YzjkjAf2lTjnl0j+BUuqHaKHg2DL0Jw2TR9Cys3cqRh5ztxQdle
-	G8W4O7aYAPIrlM6N4yeNIXUoXbuzzn1pdDSMJQo=
-X-Google-Smtp-Source: AGHT+IHL40KrnqTaUn7AGxhIo959OPompFqeurkQKUwy4VoyTf6haN4TwZyiKI5UUqbFYsXWRO66bA==
-X-Received: by 2002:a2e:b166:0:b0:2c9:fab4:65a7 with SMTP id a6-20020a2eb166000000b002c9fab465a7mr2384976ljm.92.1701810794920;
-        Tue, 05 Dec 2023 13:13:14 -0800 (PST)
-Received: from wkz-x13 (h-176-10-137-178.NA.cust.bahnhof.se. [176.10.137.178])
-        by smtp.gmail.com with ESMTPSA id s9-20020a05651c048900b002c9f975619asm1016546ljc.57.2023.12.05.13.13.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 13:13:14 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
- f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 3/6] net: dsa: mv88e6xxx: Fix
- mv88e6352_serdes_get_stats error path
-In-Reply-To: <20231205175040.mbpepmbtxjkrb4dq@skbuf>
-References: <20231205175040.mbpepmbtxjkrb4dq@skbuf>
-Date: Tue, 05 Dec 2023 22:13:12 +0100
-Message-ID: <871qc09wuv.fsf@waldekranz.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7836A5;
+	Tue,  5 Dec 2023 13:15:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701810956; x=1733346956;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ogrbkej1C6j1SgmkqoFwO0g7oaDZworPVFJs/PMsK4g=;
+  b=OeGSaUz9KxnJLQD1yZRC5ArNTsUWe3iISI5TPLMhL3KiHHc8IZj0RvlI
+   nYdEEypZXXlyrGb7YPHI4+Amjs5X33Iv8pnOCExaoCE8s+IARSONWo3xV
+   jSDlld9MkUV4XtjoiMj5shTfcqX/ZFWwK0LcutT0SY8+3F+Utp+nXP+kG
+   +95RtDEDOQ+Jc8RgvXqAJVieS8cUP+VrCLckqer2Pc2gQUwEcvR8DUive
+   XsDgPV5EK3jaNSNgBeMZsP1clAQqiqxeaNGJmcsDZS9YTlRsZ67R20/6j
+   8fECnl6TFV+pLkpgDFcB9AK0Ke9YxsGnxRgREwD6YPvY7t6DhVzlUEUw3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="391127124"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="391127124"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:15:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="944407746"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="944407746"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 05 Dec 2023 13:15:53 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAcli-0009kO-1u;
+	Tue, 05 Dec 2023 21:15:50 +0000
+Date: Wed, 6 Dec 2023 05:15:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadfed@meta.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Message-ID: <202312060500.uMJaMydz-lkp@intel.com>
+References: <20231202010604.1877561-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231202010604.1877561-1-vadfed@meta.com>
 
-On tis, dec 05, 2023 at 19:50, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
-> On Tue, Dec 05, 2023 at 05:04:15PM +0100, Tobias Waldekranz wrote:
->> mv88e6xxx_get_stats, which collects stats from various sources,
->> expects all callees to return the number of stats read. If an error
->> occurs, 0 should be returned.
->> 
->> Prevent future mishaps of this kind by updating the return type to
->> reflect this contract.
->> 
->> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->> ---
->> diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
->> index 3b4b42651fa3..01ea53940786 100644
->> --- a/drivers/net/dsa/mv88e6xxx/serdes.c
->> +++ b/drivers/net/dsa/mv88e6xxx/serdes.c
->> @@ -187,7 +187,7 @@ int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
->>  
->>  	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
->>  	if (err <= 0)
->> -		return err;
->> +		return 0;
->
-> Ok, you're saying we don't care enough about handling the catastrophic
-> event where an MDIO access error takes place in mv88e6xxx_g2_scratch_read()
-> to submit this to "stable".
+Hi Vadim,
 
-It just felt like one of those theoretical bugs that, if you were to hit
-it, you most likely have way bigger issues than not getting at your
-SERDES counters; and since, as you say...
+kernel test robot noticed the following build warnings:
 
-> I guess the impact in such a case is that the error (interpreted as negative
-> count) makes us go back by -EIO (5) entries or whatever into the "data"
-> array provided to user space, overwriting some previous stats and making
-> everything after the failed counter minus the error code be reported in
-> the wrong place relative to its string. I don't think that the error
-> codes are high enough to overcome the ~60 port stats and cause memory
-> accesses behind the "data" array.
+[auto build test WARNING on bpf-next/master]
 
-...the potential for data corruption seems low. But I could send a v3
-and split this into one change that only fixes the return value (which
-could go into -net), and another one that changes the type. Do you think
-it's worth it?
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-crypto-add-skcipher-to-bpf-crypto/20231202-091254
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231202010604.1877561-1-vadfed%40meta.com
+patch subject: [PATCH bpf-next v7 1/3] bpf: make common crypto API for TC/XDP programs
+config: m68k-randconfig-r081-20231202 (https://download.01.org/0day-ci/archive/20231206/202312060500.uMJaMydz-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060500.uMJaMydz-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312060500.uMJaMydz-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> kernel/bpf/crypto.c:126: warning: Function parameter or member 'authsize' not described in 'bpf_crypto_ctx_create'
+
+
+vim +126 kernel/bpf/crypto.c
+
+   105	
+   106	/**
+   107	 * bpf_crypto_ctx_create() - Create a mutable BPF crypto context.
+   108	 *
+   109	 * Allocates a crypto context that can be used, acquired, and released by
+   110	 * a BPF program. The crypto context returned by this function must either
+   111	 * be embedded in a map as a kptr, or freed with bpf_crypto_ctx_release().
+   112	 * As crypto API functions use GFP_KERNEL allocations, this function can
+   113	 * only be used in sleepable BPF programs.
+   114	 *
+   115	 * bpf_crypto_ctx_create() allocates memory for crypto context.
+   116	 * It may return NULL if no memory is available.
+   117	 * @type__str: pointer to string representation of crypto type.
+   118	 * @algo__str: pointer to string representation of algorithm.
+   119	 * @pkey:      bpf_dynptr which holds cipher key to do crypto.
+   120	 * @err:       integer to store error code when NULL is returned
+   121	 */
+   122	__bpf_kfunc struct bpf_crypto_ctx *
+   123	bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
+   124			      const struct bpf_dynptr_kern *pkey,
+   125			      unsigned int authsize, int *err)
+ > 126	{
+   127		const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
+   128		struct bpf_crypto_ctx *ctx;
+   129		const u8 *key;
+   130		u32 key_len;
+   131	
+   132		type = bpf_crypto_get_type(type__str);
+   133		if (IS_ERR(type)) {
+   134			*err = PTR_ERR(type);
+   135			return NULL;
+   136		}
+   137	
+   138		if (!type->has_algo(algo__str)) {
+   139			*err = -EOPNOTSUPP;
+   140			goto err;
+   141		}
+   142	
+   143		if (!authsize && type->setauthsize) {
+   144			*err = -EOPNOTSUPP;
+   145			goto err;
+   146		}
+   147	
+   148		if (authsize && !type->setauthsize) {
+   149			*err = -EOPNOTSUPP;
+   150			goto err;
+   151		}
+   152	
+   153		key_len = __bpf_dynptr_size(pkey);
+   154		if (!key_len) {
+   155			*err = -EINVAL;
+   156			goto err;
+   157		}
+   158		key = __bpf_dynptr_data(pkey, key_len);
+   159		if (!key) {
+   160			*err = -EINVAL;
+   161			goto err;
+   162		}
+   163	
+   164		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+   165		if (!ctx) {
+   166			*err = -ENOMEM;
+   167			goto err;
+   168		}
+   169	
+   170		ctx->type = type;
+   171		ctx->tfm = type->alloc_tfm(algo__str);
+   172		if (IS_ERR(ctx->tfm)) {
+   173			*err = PTR_ERR(ctx->tfm);
+   174			ctx->tfm = NULL;
+   175			goto err;
+   176		}
+   177	
+   178		if (authsize) {
+   179			*err = type->setauthsize(ctx->tfm, authsize);
+   180			if (*err)
+   181				goto err;
+   182		}
+   183	
+   184		*err = type->setkey(ctx->tfm, key, key_len);
+   185		if (*err)
+   186			goto err;
+   187	
+   188		refcount_set(&ctx->usage, 1);
+   189	
+   190		return ctx;
+   191	err:
+   192		if (ctx->tfm)
+   193			type->free_tfm(ctx->tfm);
+   194		kfree(ctx);
+   195		module_put(type->owner);
+   196	
+   197		return NULL;
+   198	}
+   199	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
