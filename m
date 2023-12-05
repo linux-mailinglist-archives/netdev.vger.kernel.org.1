@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-53781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596678049DE
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:14:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518708049DF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56FB91C20E6D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:14:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 000A61C20DB6
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B1C134DD;
-	Tue,  5 Dec 2023 06:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1577DDD5;
+	Tue,  5 Dec 2023 06:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rALA/gWP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RSwYCzQk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35F9134D0
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:13:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 737A7C433C8;
-	Tue,  5 Dec 2023 06:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28D01401B
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:13:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81EDEC433C7;
+	Tue,  5 Dec 2023 06:13:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701756827;
-	bh=Ajb0QBHDOuNSNrtWlp8X9EtiuP+Al4D+gWjN6yBTUvg=;
+	s=k20201202; t=1701756828;
+	bh=DgdpZP7HfWSjHLe0/4veOtRw/mTKBaoDCHkHZgy2K8M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rALA/gWPbawBLdBIcRWycMqo/jjIwH6aR01PNmqj5OrtHmKZza2eZAAnaFOdN6W66
-	 Ywp3LWtKQY+D0igh+AlpwHcFJ41rIquxM251SoBbOoRi/zgrpePuRMEVBHvpAemeSS
-	 0AcM/ub2K31DTffnS9rXcTjlgXa2SS9LUCl4OlNymTyOvqVyRwv4xtTQbme44rsTIO
-	 5unTuqCObFxaf+vEWHhe5xhItoiyNx7Y3kD/nJ5BfPMzvrTIyXIc6TwgyNUL9bvl2s
-	 WlOyEsjC7IanTwbtjclCTjaHomjyf8zi7JOfYUe5rohFIAiddRpZpFXfjBLQJI3XX2
-	 nYvLKsOeqDK+w==
+	b=RSwYCzQkZUg4fEd4SKdQPVEzIaSenk12rJc55EzF4B8me1n24kTTx3bu81jTNIby3
+	 YBYIV1zzQEjf3gF7PdhqYycyZWWH6uIo/dFfiBNpy/IsGv8A3qreJGvgaMlNBQPfr7
+	 eNwObWX7nQ2MpgHO7B5SoSYPYzCo4O8GzM2czUA/hghetGS012VHyVgAqtJjgVcRDh
+	 Z4UlD56V2oVzmo0S5yHsq63J2jnkHDDORhIN9YDZFahqLyMAAcpb10QXrHOmc+rJd2
+	 vm6Z9PEsQrEBmZn1C/H33x0hGElmL02nMEVJVFFpbB5P643ObFHIEncjwDUl8X9MnJ
+	 fSOG3dY6+8cmg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
+	Chris Mi <cmi@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net V2 08/14] net/mlx5e: Check the number of elements before walk TC rhashtable
-Date: Mon,  4 Dec 2023 22:13:21 -0800
-Message-ID: <20231205061327.44638-9-saeed@kernel.org>
+Subject: [net V2 09/14] net/mlx5e: Disable IPsec offload support if not FW steering
+Date: Mon,  4 Dec 2023 22:13:22 -0800
+Message-ID: <20231205061327.44638-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231205061327.44638-1-saeed@kernel.org>
 References: <20231205061327.44638-1-saeed@kernel.org>
@@ -56,39 +56,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Chris Mi <cmi@nvidia.com>
 
-After IPSec TX tables are destroyed, the flow rules in TC rhashtable,
-which have the destination to IPSec, are restored to the original
-one, the uplink.
+IPsec FDB offload can only work with FW steering as of now,
+disable the cap upon non FW steering.
 
-However, when the device is in switchdev mode and unload driver with
-IPSec rules configured, TC rhashtable cleanup is done before IPSec
-cleanup, which means tc_ht->tbl is already freed when walking TC
-rhashtable, in order to restore the destination. So add the checking
-before walking to avoid unexpected behavior.
+And since the IPSec cap is dynamic now based on steering mode.
+Cleanup the resources if they exist instead of checking the
+IPsec cap again.
 
-Fixes: d1569537a837 ("net/mlx5e: Modify and restore TC rules for IPSec TX rules")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Fixes: edd8b295f9e2 ("Merge branch 'mlx5-ipsec-packet-offload-support-in-eswitch-mode'")
+Signed-off-by: Chris Mi <cmi@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 26 ++++++++-----------
+ .../mlx5/core/en_accel/ipsec_offload.c        |  8 +++++-
+ 2 files changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
-index 5a0047bdcb51..190f10aba170 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/ipsec_fs.c
-@@ -152,7 +152,7 @@ void mlx5_esw_ipsec_restore_dest_uplink(struct mlx5_core_dev *mdev)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index 914b9e6eb7db..161c5190c236 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -935,9 +935,11 @@ void mlx5e_ipsec_cleanup(struct mlx5e_priv *priv)
+ 		return;
  
- 	xa_for_each(&esw->offloads.vport_reps, i, rep) {
- 		rpriv = rep->rep_data[REP_ETH].priv;
--		if (!rpriv || !rpriv->netdev)
-+		if (!rpriv || !rpriv->netdev || !atomic_read(&rpriv->tc_ht.nelems))
- 			continue;
+ 	mlx5e_accel_ipsec_fs_cleanup(ipsec);
+-	if (mlx5_ipsec_device_caps(priv->mdev) & MLX5_IPSEC_CAP_TUNNEL)
++	if (ipsec->netevent_nb.notifier_call) {
+ 		unregister_netevent_notifier(&ipsec->netevent_nb);
+-	if (mlx5_ipsec_device_caps(priv->mdev) & MLX5_IPSEC_CAP_PACKET_OFFLOAD)
++		ipsec->netevent_nb.notifier_call = NULL;
++	}
++	if (ipsec->aso)
+ 		mlx5e_ipsec_aso_cleanup(ipsec);
+ 	destroy_workqueue(ipsec->wq);
+ 	kfree(ipsec);
+@@ -1046,6 +1048,12 @@ static int mlx5e_xfrm_validate_policy(struct mlx5_core_dev *mdev,
+ 		}
+ 	}
  
- 		rhashtable_walk_enter(&rpriv->tc_ht, &iter);
++	if (x->xdo.type == XFRM_DEV_OFFLOAD_PACKET &&
++	    !(mlx5_ipsec_device_caps(mdev) & MLX5_IPSEC_CAP_PACKET_OFFLOAD)) {
++		NL_SET_ERR_MSG_MOD(extack, "Packet offload is not supported");
++		return -EINVAL;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -1141,14 +1149,6 @@ static const struct xfrmdev_ops mlx5e_ipsec_xfrmdev_ops = {
+ 	.xdo_dev_state_free	= mlx5e_xfrm_free_state,
+ 	.xdo_dev_offload_ok	= mlx5e_ipsec_offload_ok,
+ 	.xdo_dev_state_advance_esn = mlx5e_xfrm_advance_esn_state,
+-};
+-
+-static const struct xfrmdev_ops mlx5e_ipsec_packet_xfrmdev_ops = {
+-	.xdo_dev_state_add	= mlx5e_xfrm_add_state,
+-	.xdo_dev_state_delete	= mlx5e_xfrm_del_state,
+-	.xdo_dev_state_free	= mlx5e_xfrm_free_state,
+-	.xdo_dev_offload_ok	= mlx5e_ipsec_offload_ok,
+-	.xdo_dev_state_advance_esn = mlx5e_xfrm_advance_esn_state,
+ 
+ 	.xdo_dev_state_update_curlft = mlx5e_xfrm_update_curlft,
+ 	.xdo_dev_policy_add = mlx5e_xfrm_add_policy,
+@@ -1166,11 +1166,7 @@ void mlx5e_ipsec_build_netdev(struct mlx5e_priv *priv)
+ 
+ 	mlx5_core_info(mdev, "mlx5e: IPSec ESP acceleration enabled\n");
+ 
+-	if (mlx5_ipsec_device_caps(mdev) & MLX5_IPSEC_CAP_PACKET_OFFLOAD)
+-		netdev->xfrmdev_ops = &mlx5e_ipsec_packet_xfrmdev_ops;
+-	else
+-		netdev->xfrmdev_ops = &mlx5e_ipsec_xfrmdev_ops;
+-
++	netdev->xfrmdev_ops = &mlx5e_ipsec_xfrmdev_ops;
+ 	netdev->features |= NETIF_F_HW_ESP;
+ 	netdev->hw_enc_features |= NETIF_F_HW_ESP;
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
+index 4e018fba2d5f..6e00afe4671b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
+@@ -6,6 +6,8 @@
+ #include "ipsec.h"
+ #include "lib/crypto.h"
+ #include "lib/ipsec_fs_roce.h"
++#include "fs_core.h"
++#include "eswitch.h"
+ 
+ enum {
+ 	MLX5_IPSEC_ASO_REMOVE_FLOW_PKT_CNT_OFFSET,
+@@ -38,7 +40,10 @@ u32 mlx5_ipsec_device_caps(struct mlx5_core_dev *mdev)
+ 	    MLX5_CAP_ETH(mdev, insert_trailer) && MLX5_CAP_ETH(mdev, swp))
+ 		caps |= MLX5_IPSEC_CAP_CRYPTO;
+ 
+-	if (MLX5_CAP_IPSEC(mdev, ipsec_full_offload)) {
++	if (MLX5_CAP_IPSEC(mdev, ipsec_full_offload) &&
++	    (mdev->priv.steering->mode == MLX5_FLOW_STEERING_MODE_DMFS ||
++	     (mdev->priv.steering->mode == MLX5_FLOW_STEERING_MODE_SMFS &&
++	     is_mdev_legacy_mode(mdev)))) {
+ 		if (MLX5_CAP_FLOWTABLE_NIC_TX(mdev,
+ 					      reformat_add_esp_trasport) &&
+ 		    MLX5_CAP_FLOWTABLE_NIC_RX(mdev,
+@@ -559,6 +564,7 @@ void mlx5e_ipsec_aso_cleanup(struct mlx5e_ipsec *ipsec)
+ 	dma_unmap_single(pdev, aso->dma_addr, sizeof(aso->ctx),
+ 			 DMA_BIDIRECTIONAL);
+ 	kfree(aso);
++	ipsec->aso = NULL;
+ }
+ 
+ static void mlx5e_ipsec_aso_copy(struct mlx5_wqe_aso_ctrl_seg *ctrl,
 -- 
 2.43.0
 
