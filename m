@@ -1,89 +1,134 @@
-Return-Path: <netdev+bounces-53975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46898057DF
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:50:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0348057E3
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:51:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0BA281B3F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC1621C21007
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6844A65ECA;
-	Tue,  5 Dec 2023 14:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5FE565ECE;
+	Tue,  5 Dec 2023 14:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoullTc7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nfvNuo59"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4722A18F
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8307C433C9;
-	Tue,  5 Dec 2023 14:50:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701787824;
-	bh=VVDxm6oONgHLGn7mC1aQKyK5BXNMwRgtPv7JaM0VSz0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AoullTc7wYmOj+z89p8n0TSMtTON/N0kpU2uWqpHCt1yfKp5bmDC2eMfmxm4+6/7s
-	 t2FLdJB8OA0QXpOtDyE8uIZ8W5JCm0lYu5vpV7zEnPU5v+adVpyhiN93HgEfqELZpX
-	 XaXrRv8dTRskCF4fcrF/f5yFIUoB4OCrE6PmZXQb8ZYyYeQnom3/wNP8cOCy/wVRGO
-	 ioiCGdz3PVxp1OIKcddv5bTb6uT794nauXoNnR26ZHKeDKvhKOAdQ1fQX86RaoToMF
-	 fRhz901CRC5ONq0jVvyPyH0lZpRkzm3C6SyPkN0gXE/xanDbHx1OGPNs9G+CgfsMkq
-	 i07Jq/WZyoQoQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9B6B5C43170;
-	Tue,  5 Dec 2023 14:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0AEFCA;
+	Tue,  5 Dec 2023 06:51:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lfxnHu+Bi0iwFhaqZvuue6DCeOGeODkmNEtnuTLsk0c=; b=nfvNuo59MSr8p+SP/ioXzsTPk/
+	Q0EM36l5MU7bhMCatc8Y31D+ViSTMtJss3YHAfecCj32JxgqcwotTO46FMtykJlJCfDqiDOhl8qiM
+	Kf2oFBxe8UQ+I31Y8/+76VpXP6w7JPoY824CfgXd2kY7dDUZwijviiLdwb0h5Yq2MVqMmhNyNpMpN
+	xXJtwwS4HYuyVQ3iEyb8FSH7W5fiHhCfwbuSWrAWc2m1W29ZAERbJvwCJH8ossvCD1040db8rBHpq
+	9sY5gOoFrRZhCS5UMne5a73Kh1KbUNamhDqnaxaDUXe6hfWL/CAvlY6fhZVqN3cmiBE90YjpjmznG
+	+6eJp0Ug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51056)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rAWlI-0006ua-05;
+	Tue, 05 Dec 2023 14:51:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rAWlG-0001nZ-P9; Tue, 05 Dec 2023 14:50:58 +0000
+Date: Tue, 5 Dec 2023 14:50:58 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
+ MDIO device
+Message-ID: <ZW840qQMbVRto442@shell.armlinux.org.uk>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
+ <ZW8ASzkC9IFFlxkV@shell.armlinux.org.uk>
+ <rgp33mm4spbpm5tmgxurkhy4is3lz3z62rz64rni2pygteyrit@zwflw2ejdkn7>
+ <e1806c15-757e-4af0-a8be-075aa77918c2@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] octeontx2-af: fix a use-after-free in
- rvu_npa_register_reporters
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170178782463.5866.15530520826379861519.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Dec 2023 14:50:24 +0000
-References: <20231202095902.3264863-1-alexious@zju.edu.cn>
-In-Reply-To: <20231202095902.3264863-1-alexious@zju.edu.cn>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- george.cherian@marvell.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e1806c15-757e-4af0-a8be-075aa77918c2@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat,  2 Dec 2023 17:59:02 +0800 you wrote:
-> The rvu_dl will be freed in rvu_npa_health_reporters_destroy(rvu_dl)
-> after the create_workqueue fails, and after that free, the rvu_dl will
-> be translate back through rvu_npa_health_reporters_create,
-> rvu_health_reporters_create, and rvu_register_dl. Finally it goes to the
-> err_dl_health label, being freed again in
-> rvu_health_reporters_destroy(rvu) by rvu_npa_health_reporters_destroy.
-> In the second calls of rvu_npa_health_reporters_destroy, however,
-> it uses rvu_dl->rvu_npa_health_reporter, which is already freed at
-> the end of rvu_npa_health_reporters_destroy in the first call.
+On Tue, Dec 05, 2023 at 02:52:24PM +0100, Andrew Lunn wrote:
+> On Tue, Dec 05, 2023 at 02:31:41PM +0300, Serge Semin wrote:
+> > On Tue, Dec 05, 2023 at 10:49:47AM +0000, Russell King (Oracle) wrote:
+> > > On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
+> > > > If the DW XPCS MDIO devices are either left unmasked for being auto-probed
+> > > > or explicitly registered in the MDIO subsystem by means of the
+> > > > mdiobus_register_board_info() method there is no point in creating the
+> > > > dummy MDIO device instance in order to get the DW XPCS handler since the
+> > > > MDIO core subsystem will create the device during the MDIO bus
+> > > > registration procedure.
+> > > 
+> > 
+> > > Please reword this overly long sentence.
+> > 
+> > Ok.
+> > 
+> > > 
+> > > If they're left unmasked, what prevents them being created as PHY
+> > > devices?
+> > 
+> > Not sure I fully get what you meant. If they are left unmasked the
+> > MDIO-device descriptor will be created by the MDIO subsystem anyway.
+> > What the point in creating another one?
 > 
-> [...]
+> Saying what Russell said, in a different way:
+> 
+> /*
+>  * Return true if the child node is for a phy. It must either:
+>  * o Compatible string of "ethernet-phy-idX.X"
+>  * o Compatible string of "ethernet-phy-ieee802.3-c45"
+>  * o Compatible string of "ethernet-phy-ieee802.3-c22"
+>  * o In the white list above (and issue a warning)
+>  * o No compatibility string
+>  *
+>  * A device which is not a phy is expected to have a compatible string
+>  * indicating what sort of device it is.
+>  */
+> bool of_mdiobus_child_is_phy(struct device_node *child)
+> 
+> So when walking the bus, if a node is found which fits these criteria,
+> its assumed to be a PHY. 
+> 
+> Anything on the MDIO bus which is not a PHY needs to use a compatible.
 
-Here is the summary with links:
-  - octeontx2-af: fix a use-after-free in rvu_npa_register_reporters
-    https://git.kernel.org/netdev/net/c/3c91c909f13f
+Right. I'd actually forgotten about the firmware-based walking, and
+was thinking more of the non-firmware bus scanning as the commit
+message was talking about being _unmasked_ and the only mask we have
+is bus->phy_mask.
 
-You are awesome, thank you!
+It seems to me that this is yet another case of a really confusing
+commit message making review harder than it needs to be.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
