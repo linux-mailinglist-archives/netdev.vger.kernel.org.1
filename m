@@ -1,188 +1,112 @@
-Return-Path: <netdev+bounces-54077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3410E805F3A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:15:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 794A8805EC7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FFA1C20F9D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32067281F8C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C986E6DD08;
-	Tue,  5 Dec 2023 20:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF466ABA1;
+	Tue,  5 Dec 2023 19:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KUgpWwdF"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 1834 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Dec 2023 12:15:32 PST
-Received: from mailer.gwdg.de (mailer.gwdg.de [134.76.10.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74699109
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 12:15:32 -0800 (PST)
-Received: from mbx19-fmz-05.um.gwdg.de ([10.108.142.64] helo=email.gwdg.de)
-	by mailer.gwdg.de with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	(GWDG Mailer)
-	(envelope-from <rossow@cispa.de>)
-	id 1rAbLi-00078d-1R;
-	Tue, 05 Dec 2023 20:44:54 +0100
-Received: from [192.168.178.20] (10.250.9.199) by MBX19-FMZ-05.um.gwdg.de
- (10.108.142.64) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.2.1258.28; Tue, 5 Dec
- 2023 11:44:54 -0800
-Message-ID: <901b48cc-a9cc-43a3-bb8d-9ef7f3bd8baa@cispa.de>
-Date: Tue, 5 Dec 2023 20:44:53 +0100
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7063DA5
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:48:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=soPdmCRcIztlx9Qn+p7ZQyp8LgTp6+uQ1GZoBpjgHvA=;
+	t=1701805706; x=1703015306; b=KUgpWwdFUnt6SjEzDa8dyL0WP93N3vLpC94ecb5rnwYAByO
+	lQASwdg9pGF6xxdEpmPlJ9h44YxxPhrKibhfJQvTPkMm1xC4+QTN4n5bLd409bOMrHVz6yn5vwC19
+	cvLuKF3WVVJPcfAmirTBHnvwGbdTHAP6uZzkn8QKy9xtmDuP1ZZUwOL14/nlXZKOJ19OXn1zOUIXy
+	r177kzy0j0MNbq5f9jq5qPiT8F3aY06LS4vytbWF4HrtufwqARw9UX/5QgdIxUmJ1e4zG+RCQOzRs
+	w+Y8uU9cWwJEKmfiuS0hkzLVAo0bmgNTXYKOf1f5o5L4h9elsg3yLLyJxBRX2+zQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAbP2-0000000GWku-2LDb;
+	Tue, 05 Dec 2023 20:48:20 +0100
+Message-ID: <709eff7500f2da223df9905ce49c026a881cb0e0.camel@sipsolutions.net>
+Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
+Cc: Marc MERLIN <marc@merlins.org>, Jesse Brandeburg
+	 <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	intel-wired-lan@lists.osuosl.org, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Date: Tue, 05 Dec 2023 20:48:19 +0100
+In-Reply-To: <d0fc7d04-e3c9-47c0-487e-666cb2a4e3bc@intel.com>
+References: 
+	<20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+	 <d0fc7d04-e3c9-47c0-487e-666cb2a4e3bc@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tcp: do not accept ACK of bytes we never sent
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, Yuchung Cheng <ycheng@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Neal Cardwell
-	<ncardwell@google.com>, Soheil Hassas Yeganeh <soheil@google.com>,
-	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>, Yepeng Pan
-	<yepeng.pan@cispa.de>
-References: <20231205161841.2702925-1-edumazet@google.com>
- <CAK6E8=dCNTuZvyHJYUzv-BmFVkxa=cnDazgLdCtDLvrGmEWT0w@mail.gmail.com>
- <CANn89iK++qfrGEg=2dxfFLXc_SAOUvjwTgtt55L8yRZbVW8a2Q@mail.gmail.com>
-From: Christian Rossow <rossow@cispa.de>
-In-Reply-To: <CANn89iK++qfrGEg=2dxfFLXc_SAOUvjwTgtt55L8yRZbVW8a2Q@mail.gmail.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature";
-	micalg=sha-512; boundary="------------ms050002010204070106000400"
-X-ClientProxiedBy: excmbx-16.um.gwdg.de (134.76.9.227) To
- MBX19-FMZ-05.um.gwdg.de (10.108.142.64)
-X-Virus-Scanned: (clean) by clamav
+X-malware-bazaar: not-scanned
 
---------------ms050002010204070106000400
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, 2023-12-05 at 06:19 +0100, Przemek Kitszel wrote:
+> On 12/4/23 20:07, Johannes Berg wrote:
+> > From: Johannes Berg <johannes.berg@intel.com>
+> >=20
+> > As reported by Marc MERLIN in [1], at least one driver (igc)
+>=20
+> perhaps Reported-by tag? (I know this is RFC as of now)
 
-> Perhaps Yepeng Pan and Christian Rossow have plans to bring this issue to IETF.
-We already brought this up to the IETF TCP WG chairs a few weeks ago. 
-It's still unclear if the TCP WG wants to work on an Internet Draft that 
-mitigates "ghost ACKs". We'll follow up with them.
+I guess.
 
-Cheers,
-Christian
+> > wants/needs to acquire the RTNL inside suspend/resume ops,
+> > which can be called from here in ethtool if runtime PM is
+> > enabled.
+> >=20
+> > [1] https://lore.kernel.org/r/20231202221402.GA11155@merlins.org
+> >=20
+> > Allow this by doing runtime PM transitions without the RTNL
+> > held. For the ioctl to have the same operations order, this
+> > required reworking the code to separately check validity and
+> > do the operation. For the netlink code, this now has to do
+> > the runtime_pm_put a bit later.
+> >=20
+> > Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> > ---
+> >   net/ethtool/ioctl.c   | 71 ++++++++++++++++++++++++++----------------=
+-
+> >   net/ethtool/netlink.c | 32 ++++++++-----------
+> >   2 files changed, 56 insertions(+), 47 deletions(-)
+> >=20
+> Thank you for the patch,
+>=20
+> I like the idea of split into validate + do for dev_ethtool(),
+> what minimizes unneeded PM touching. Moving pm_runtime_get_sync() out of=
+=20
+> RTNL is also a great improvement per se. Also from the pure coding=20
+> perspective I see no obvious flaws in the patch. I think that igc code
+> was just accidental to the issue, in a way that it was not deliberate to
+> hold RTNL for extended periods.
 
---------------ms050002010204070106000400
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: Kryptografische S/MIME-Signatur
+Well Jakub was arguing igc shouldn't be taking rtnl in suspend/resume,
+maybe, but dunno.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgMFADCABgkqhkiG9w0BBwEAAKCC
-EeYwggUSMIID+qADAgECAgkA4wvV+K8l2YEwDQYJKoZIhvcNAQELBQAwgYIxCzAJBgNVBAYT
-AkRFMSswKQYDVQQKDCJULVN5c3RlbXMgRW50ZXJwcmlzZSBTZXJ2aWNlcyBHbWJIMR8wHQYD
-VQQLDBZULVN5c3RlbXMgVHJ1c3QgQ2VudGVyMSUwIwYDVQQDDBxULVRlbGVTZWMgR2xvYmFs
-Um9vdCBDbGFzcyAyMB4XDTE2MDIyMjEzMzgyMloXDTMxMDIyMjIzNTk1OVowgZUxCzAJBgNV
-BAYTAkRFMUUwQwYDVQQKEzxWZXJlaW4genVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVu
-IEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsTB0RGTi1QS0kxLTArBgNVBAMTJERG
-Ti1WZXJlaW4gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkgMjCCASIwDQYJKoZIhvcNAQEBBQAD
-ggEPADCCAQoCggEBAMtg1/9moUHN0vqHl4pzq5lN6mc5WqFggEcVToyVsuXPztNXS43O+FZs
-FVV2B+pG/cgDRWM+cNSrVICxI5y+NyipCf8FXRgPxJiZN7Mg9mZ4F4fCnQ7MSjLnFp2uDo0p
-eQcAIFTcFV9Kltd4tjTTwXS1nem/wHdN6r1ZB+BaL2w8pQDcNb1lDY9/Mm3yWmpLYgHurDg0
-WUU2SQXaeMpqbVvAgWsRzNI8qIv4cRrKO+KA3Ra0Z3qLNupOkSk9s1FcragMvp0049ENF4N1
-xDkesJQLEvHVaY4l9Lg9K7/AjsMeO6W/VRCrKq4Xl14zzsjz9AkH4wKGMUZrAcUQDBHHWekC
-AwEAAaOCAXQwggFwMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUk+PYMiba1fFKpZFK4OpL
-4qIMz+EwHwYDVR0jBBgwFoAUv1kgNgB5oKAia4zV8mHSuCzLgkowEgYDVR0TAQH/BAgwBgEB
-/wIBAjAzBgNVHSAELDAqMA8GDSsGAQQBga0hgiwBAQQwDQYLKwYBBAGBrSGCLB4wCAYGZ4EM
-AQICMEwGA1UdHwRFMEMwQaA/oD2GO2h0dHA6Ly9wa2kwMzM2LnRlbGVzZWMuZGUvcmwvVGVs
-ZVNlY19HbG9iYWxSb290X0NsYXNzXzIuY3JsMIGGBggrBgEFBQcBAQR6MHgwLAYIKwYBBQUH
-MAGGIGh0dHA6Ly9vY3NwMDMzNi50ZWxlc2VjLmRlL29jc3ByMEgGCCsGAQUFBzAChjxodHRw
-Oi8vcGtpMDMzNi50ZWxlc2VjLmRlL2NydC9UZWxlU2VjX0dsb2JhbFJvb3RfQ2xhc3NfMi5j
-ZXIwDQYJKoZIhvcNAQELBQADggEBAIcL/z4Cm2XIVi3WO5qYi3FP2ropqiH5Ri71sqQPrhE4
-eTizDnS6dl2e6BiClmLbTDPo3flq3zK9LExHYFV/53RrtCyD2HlrtrdNUAtmB7Xts5et6u5/
-MOaZ/SLick0+hFvu+c+Z6n/XUjkurJgARH5pO7917tALOxrN5fcPImxHhPalR6D90Bo0fa3S
-PXez7vTXTf/D6OWST1k+kEcQSrCFWMBvf/iu7QhCnh7U3xQuTY+8npTD5+32GPg8SecmqKc2
-2CzeIs2LgtjZeOJVEqM7h0S2EQvVDFKvaYwPBt/QolOLV5h7z/0HJPT8vcP9SpIClxvyt7bP
-ZYoaorVyGTkwggWsMIIElKADAgECAgcbY7rQHiw9MA0GCSqGSIb3DQEBCwUAMIGVMQswCQYD
-VQQGEwJERTFFMEMGA1UEChM8VmVyZWluIHp1ciBGb2VyZGVydW5nIGVpbmVzIERldXRzY2hl
-biBGb3JzY2h1bmdzbmV0emVzIGUuIFYuMRAwDgYDVQQLEwdERk4tUEtJMS0wKwYDVQQDEyRE
-Rk4tVmVyZWluIENlcnRpZmljYXRpb24gQXV0aG9yaXR5IDIwHhcNMTYwNTI0MTEzODQwWhcN
-MzEwMjIyMjM1OTU5WjCBjTELMAkGA1UEBhMCREUxRTBDBgNVBAoMPFZlcmVpbiB6dXIgRm9l
-cmRlcnVuZyBlaW5lcyBEZXV0c2NoZW4gRm9yc2NodW5nc25ldHplcyBlLiBWLjEQMA4GA1UE
-CwwHREZOLVBLSTElMCMGA1UEAwwcREZOLVZlcmVpbiBHbG9iYWwgSXNzdWluZyBDQTCCASIw
-DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ07eRxH3h+Gy8Zp1xCeOdfZojDbchwFfylf
-S2jxrRnWTOFrG7ELf6Gr4HuLi9gtzm6IOhDuV+UefwRRNuu6cG1joL6WLkDh0YNMZj0cZGnl
-m6Stcq5oOVGHecwX064vXWNxSzl660Knl5BpBb+Q/6RAcL0D57+eGIgfn5mITQ5HjUhfZZkQ
-0tkqSe3BuS0dnxLLFdM/fx5ULzquk1enfnjK1UriGuXtQX1TX8izKvWKMKztFwUkP7agCwf9
-TRqaA1KgNpzeJIdl5Of6x5ZzJBTN0OgbaJ4YWa52fvfRCng8h0uwN89Tyjo4EPPLR22MZD08
-WkVKusqAfLjz56dMTM0CAwEAAaOCAgUwggIBMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0P
-AQH/BAQDAgEGMCkGA1UdIAQiMCAwDQYLKwYBBAGBrSGCLB4wDwYNKwYBBAGBrSGCLAEBBDAd
-BgNVHQ4EFgQUazqYi/nyU4na4K2yMh4JH+iqO3QwHwYDVR0jBBgwFoAUk+PYMiba1fFKpZFK
-4OpL4qIMz+EwgY8GA1UdHwSBhzCBhDBAoD6gPIY6aHR0cDovL2NkcDEucGNhLmRmbi5kZS9n
-bG9iYWwtcm9vdC1nMi1jYS9wdWIvY3JsL2NhY3JsLmNybDBAoD6gPIY6aHR0cDovL2NkcDIu
-cGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1nMi1jYS9wdWIvY3JsL2NhY3JsLmNybDCB3QYIKwYB
-BQUHAQEEgdAwgc0wMwYIKwYBBQUHMAGGJ2h0dHA6Ly9vY3NwLnBjYS5kZm4uZGUvT0NTUC1T
-ZXJ2ZXIvT0NTUDBKBggrBgEFBQcwAoY+aHR0cDovL2NkcDEucGNhLmRmbi5kZS9nbG9iYWwt
-cm9vdC1nMi1jYS9wdWIvY2FjZXJ0L2NhY2VydC5jcnQwSgYIKwYBBQUHMAKGPmh0dHA6Ly9j
-ZHAyLnBjYS5kZm4uZGUvZ2xvYmFsLXJvb3QtZzItY2EvcHViL2NhY2VydC9jYWNlcnQuY3J0
-MA0GCSqGSIb3DQEBCwUAA4IBAQCBeEWkTqR/DlXwCbFqPnjMaDWpHPOVnj/z+N9rOHeJLI21
-rT7H8pTNoAauusyosa0zCLYkhmI2THhuUPDVbmCNT1IxQ5dGdfBi5G5mUcFCMWdQ5UnnOR7L
-n8qGSN4IFP8VSytmm6A4nwDO/afr0X9XLchMX9wQEZc+lgQCXISoKTlslPwQkgZ7nu7YRrQb
-tQMMONncsKk/cQYLsgMHM8KNSGMlJTx6e1du94oFOO+4oK4v9NsH1VuEGMGpuEvObJAaguS5
-Pfp38dIfMwK/U+d2+dwmJUFvL6Yb+qQTkPp8ftkLYF3sv8pBoGH7EUkp2KgtdRXYShjqFu9V
-NCIaE40GMIIHHDCCBgSgAwIBAgIMJQzG/6+9NLIdl972MA0GCSqGSIb3DQEBCwUAMIGNMQsw
-CQYDVQQGEwJERTFFMEMGA1UECgw8VmVyZWluIHp1ciBGb2VyZGVydW5nIGVpbmVzIERldXRz
-Y2hlbiBGb3JzY2h1bmdzbmV0emVzIGUuIFYuMRAwDgYDVQQLDAdERk4tUEtJMSUwIwYDVQQD
-DBxERk4tVmVyZWluIEdsb2JhbCBJc3N1aW5nIENBMB4XDTIxMDcxMzA4MDYxMFoXDTI0MDcx
-MjA4MDYxMFowgb0xCzAJBgNVBAYTAkRFMREwDwYDVQQIDAhTYWFybGFuZDEVMBMGA1UEBwwM
-U2FhcmJydWVja2VuMUQwQgYDVQQKDDtDSVNQQSAtIEhlbG1ob2x0ei1aZW50cnVtIGZ1ZXIg
-SW5mb3JtYXRpb25zc2ljaGVyaGVpdCBnR21iSDEPMA0GA1UEBAwGUm9zc293MRIwEAYDVQQq
-DAlDaHJpc3RpYW4xGTAXBgNVBAMMEENocmlzdGlhbiBSb3Nzb3cwggIiMA0GCSqGSIb3DQEB
-AQUAA4ICDwAwggIKAoICAQDJlXUl7oklBIjrfbkAzeNHA+Rd0giiEWq4JJHQBNBc2uenRRMp
-1nFpL7CeaaZWCY3sGhhTguTtPu2/AP1pWxgDfxspPYqGU5zDdSHBLEn0cPbeQWGOuG0+djj9
-yRY5hoGoVTfz7JFYg+61eNJT3naGOs3jvzrxwZaEcC5UiQy5Tk/vi5uSYBwhNDhgmcYQZztN
-q/jUFXoqb1cWjCbKaAfpFvFektlgZe820SO+azJ5ocPnar0M/TV7+sv984WhDzdL/E0CvEoe
-U1Vn9VIoLuxzA4qfPqa9MQXNofr2SZizX008VnBVa4qjQZGgXDJ45BNvdas/g2H2xyDNRdZf
-8BNmL/K+qyLK/Pg2QPzmZ5j+sAcTwqiMoQBGKwn5TZQCxfY3Izwpw31+Aj7jO9Sk7kVvre+S
-zZuGJ5IUrUUAYz3ZPYgLLhwo+GnFNc+mdDgcFNsbmucnkUEKw6rekAmi8ajavDgzdx6FJ4pK
-XaqAJFmdf6r80uCJVOwC3nd8j+u8tAvYhTaQzbeNR3MGuM96mQEzUrWI5EqKZWM7iaEnPJkd
-WSK3V396BS1oUu8mQ9JGjuikT8fx5TmyyznZ8tEJesaxcfmYP/b+Ov5PNnB9GZr99DTvHV8k
-coZsnvlQWkKIfIXjtxZuQJzwIJ0fUJaBvI50tK+85HPEvkzEVEcWOjg50wIDAQABo4ICSDCC
-AkQwPgYDVR0gBDcwNTAPBg0rBgEEAYGtIYIsAQEEMBAGDisGAQQBga0hgiwBAQQJMBAGDisG
-AQQBga0hgiwCAQQJMAkGA1UdEwQCMAAwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsG
-AQUFBwMCBggrBgEFBQcDBDAdBgNVHQ4EFgQUqflVUwHPDIdbJCAC27Abtel9ELwwHwYDVR0j
-BBgwFoAUazqYi/nyU4na4K2yMh4JH+iqO3QwGgYDVR0RBBMwEYEPcm9zc293QGNpc3BhLmRl
-MIGNBgNVHR8EgYUwgYIwP6A9oDuGOWh0dHA6Ly9jZHAxLnBjYS5kZm4uZGUvZGZuLWNhLWds
-b2JhbC1nMi9wdWIvY3JsL2NhY3JsLmNybDA/oD2gO4Y5aHR0cDovL2NkcDIucGNhLmRmbi5k
-ZS9kZm4tY2EtZ2xvYmFsLWcyL3B1Yi9jcmwvY2FjcmwuY3JsMIHbBggrBgEFBQcBAQSBzjCB
-yzAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQ
-MEkGCCsGAQUFBzAChj1odHRwOi8vY2RwMS5wY2EuZGZuLmRlL2Rmbi1jYS1nbG9iYWwtZzIv
-cHViL2NhY2VydC9jYWNlcnQuY3J0MEkGCCsGAQUFBzAChj1odHRwOi8vY2RwMi5wY2EuZGZu
-LmRlL2Rmbi1jYS1nbG9iYWwtZzIvcHViL2NhY2VydC9jYWNlcnQuY3J0MA0GCSqGSIb3DQEB
-CwUAA4IBAQBfaZ1OMq17DivzbyIkp6cYzWeDOOr7Ws+HkGP7Cv0N17mGfoT3GG8kZh3nG7W+
-rywRUpWcSPpMBOVn8e7nBghYYSSzrfRWIwdNwV6NNxXmsqwcP3PbPbK9CZMsmHeOhW4nTbcn
-eS/+HpxXNerjRrSnLzRdQMTU4Zw89Z2IRdAdj7z9v7YiZ1fAAdbpoD+70Yz0kQu1LrW3Rxa2
-0/TIpC17/YNQKIBEas0t+7BtrLZgXe2z+3CiDEr8GreyoydV9v+X68Asz4rRDJT2sJVESdHR
-UVRH9xH+SKSnoZWhi99X9PA6oE7ZFAO5XK0g+AEhCMMNjeWYGLJQyqQKSltJRt0WMYIFKzCC
-BScCAQEwgZ4wgY0xCzAJBgNVBAYTAkRFMUUwQwYDVQQKDDxWZXJlaW4genVyIEZvZXJkZXJ1
-bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsMB0RG
-Ti1QS0kxJTAjBgNVBAMMHERGTi1WZXJlaW4gR2xvYmFsIElzc3VpbmcgQ0ECDCUMxv+vvTSy
-HZfe9jANBglghkgBZQMEAgMFAKCCAl0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjMxMjA1MTk0NDUzWjBPBgkqhkiG9w0BCQQxQgRAGLe3NyBtMTmcRkPa
-/F6eXikWiloNOs3T7Ftq9RAQWmbMIVG3BA5BJShsEUi3Jaj/6BHbZI8C5iJlh9GE0BFexjBs
-BgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcw
-DgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEo
-MIGvBgkrBgEEAYI3EAQxgaEwgZ4wgY0xCzAJBgNVBAYTAkRFMUUwQwYDVQQKDDxWZXJlaW4g
-enVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4x
-EDAOBgNVBAsMB0RGTi1QS0kxJTAjBgNVBAMMHERGTi1WZXJlaW4gR2xvYmFsIElzc3Vpbmcg
-Q0ECDCUMxv+vvTSyHZfe9jCBsQYLKoZIhvcNAQkQAgsxgaGggZ4wgY0xCzAJBgNVBAYTAkRF
-MUUwQwYDVQQKDDxWZXJlaW4genVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNj
-aHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsMB0RGTi1QS0kxJTAjBgNVBAMMHERGTi1WZXJl
-aW4gR2xvYmFsIElzc3VpbmcgQ0ECDCUMxv+vvTSyHZfe9jANBgkqhkiG9w0BAQEFAASCAgBA
-mbrzj2BYeWqZTlRnuplwKVLIESzBfEn47Snd7J3YHuhcWnVafZOGK5PMMjPJN/UE7gcw+1Y9
-7Ja0utylqnmLIapaqrXhKybVWcPyMSgWIaAZcn9hFzUXI36w3D6sCLsLjmXNaiH/LEsF/+RL
-Oe8v1DjiT+bklPrHM9H2bmKKMkskRVx8/uE/XSBJmxJ6rkn5KoVt2Eg90FvR8jtrzIxP0mQA
-tFEgslxyhyj1pxvURlp3yNphgwKG1a5WUywiHk9/F7Hqicw1ZNA8jMbPOUtlB4Qwzc2wfQHW
-7TmBVhRgc+EuQV6SWG+091WC2klqKE6VkupwZ6COy4dgGPxO1lB7bDCxJ889qYQC8om5waYG
-9yJqV8HorYdBy65ZoXvfdT6zEYwrzwdn3BWcBbfqkala+uGz5QFPanluYz8aqE6admBkEIed
-JC0G7DaemVFhR080e6ppSYK/GaefZvPH89vO5H9+YFxpdlf32a/FwbppALNef46GuddJdTRF
-0wDpvep8RSniDHlPEawQ6BdhqFBY6X2MVZ1HVihrV61X/0dG7hU9hQOrHSao7pjw4KvENpli
-GWEzgt8PcAUYzfObY8ETAGgPba88YPqI/V9ZsRN0WcjzsDDIDHZsM4WuvspnTrGxFrfhlATZ
-ag2N3SAGVi5+OT7sXab4vl8cxRMdiqfucAAAAAAAAA==
---------------ms050002010204070106000400--
+> With your patch fixing the bug, there is
+> no point with waiting IMO, so
+>=20
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+
+Well, according to the checks, the patch really should use
+netdev_get_by_name() and netdev_put()? But I don't know how to do that
+on short-term stack thing ... maybe it doesn't have to?
+
+johannes
 
