@@ -1,105 +1,111 @@
-Return-Path: <netdev+bounces-53938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08ABA8054FE
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:44:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780BB80551E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:46:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B72CC281949
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:43:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92681C20BB5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C0956476;
-	Tue,  5 Dec 2023 12:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDE73F8E3;
+	Tue,  5 Dec 2023 12:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="RgakGAYx";
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="r5l5QQB/"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="S1pXFNdO"
 X-Original-To: netdev@vger.kernel.org
-Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D290D7;
-	Tue,  5 Dec 2023 04:43:55 -0800 (PST)
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id 0512EC021; Tue,  5 Dec 2023 13:43:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1701780234; bh=9k2hEUfWqSwjsOCNxJeHa/J+KeqtpWnpfnSOvtCRoqo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RgakGAYxKTHmfDsp3Xz4ToOiFec531bEiG1oi9xpE8L6ixaQmDIE2gEe/81AmGTsx
-	 eRHIgxFTpoptfzdCWKjbWQk2QTwR+BE7qkNahj/nkWO0yDWFek+tn4VLimnd1J70ig
-	 8ANst0jEIPDChSXLz78NnNS2OnIIuCtJG5ozAjrQejv7GqiBlf/ostfQGsn2/4pMIb
-	 uXL10maFRsYdzr/npMZvI5/LT0cFtXCym+TKMh9uHo6w0O8q5QYx8xGm56uo1hiikc
-	 TCfY9o5H4/3geFLUvnLE6+z96SQUa6eaxBbdYt5bwGz+Elje7NcBzuAiwIVVaCCMu+
-	 4JMcN2RW9w02w==
-X-Spam-Level: 
-Received: from gaia (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id 79FDEC009;
-	Tue,  5 Dec 2023 13:43:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1701780233; bh=9k2hEUfWqSwjsOCNxJeHa/J+KeqtpWnpfnSOvtCRoqo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r5l5QQB/eieudp+PT4SYxj+jH20QiV6viRJce+pCsKIvdchAaSSo6NJrm8mbpX077
-	 4FfxkWQ1sekeWcSekEviSIJyQz6pPS3ChXg/kZtOFoWvFUV214ioLcZ3ymvXOOEFLq
-	 TFdGCULG3GMJQkCbiNgoSAqnxxJ3Ula5kL07YimK58QyKTqWpFU8zR+2JHu0jHIKqu
-	 QA7P8uGIOdPCs/vNM+ym0SuZlWDPdbLE5D+Cqwyr+JYnE+ofu4z9wcAaV00YcwQJ1l
-	 R31riyGsVI5wQdTKV90vNKG1rZwuhw8h67zc4qzlX7UPuI5eSg1AF0Nwwfc70vv8Pw
-	 9eWMwT5UxDIsg==
-Received: from localhost (gaia [local])
-	by gaia (OpenSMTPD) with ESMTPA id 98847857;
-	Tue, 5 Dec 2023 12:43:47 +0000 (UTC)
-Date: Tue, 5 Dec 2023 21:43:32 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Latchesar Ionkov <lucho@ionkov.net>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	v9fs@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH v2] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
-Message-ID: <ZW8a9BvNwO4yw_JX@codewreck.org>
-References: <ZW7oQ1KPWTbiGSzL@codewreck.org>
- <20231205091952.24754-1-pchelkin@ispras.ru>
- <ZW7t_rq_a2ag5eoU@codewreck.org>
- <2974507b-57fa-4c9b-a036-055dbf55f6a4-pchelkin@ispras.ru>
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A928C6
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 04:46:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
+	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=xmYX3iHCDz0zWB20iqNWRlfDjouACK8xEIX3J9JrkfI=; b=S1pXFNdOhz7F53Z88x94WjGxtb
+	YfC7ViW1Nzom/On4x7inz+Ws/Gue4pMMSBzc3mgHuELEpVzMY/CMekp0xqTu6+mcO8ni7RohadmS4
+	nN21c2VumULoyvr9ASkR44N+Aefa/HFq0zbja9KuACb6QE6rton9rlAg+P9FuSSxzQ5Q/ApevtUuh
+	FOS56ZWgvws50nxHUnWE/HtrKcOl9/+6emQ6hQkuq/wOPnO33zNnXq8hn+uf6Pcid3fLFL5ZfGXh4
+	0gs5pTlyDZuj9IJRQHlLP7URaL82IgF2sQlufq/Bn9YTUX3zHYp6i1h1n+YY1zaPoU9509cePZVyq
+	yyckwuVg==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sean@geanix.com>)
+	id 1rAUox-000MZs-Ut; Tue, 05 Dec 2023 13:46:39 +0100
+Received: from [185.17.218.86] (helo=zen..)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sean@geanix.com>)
+	id 1rAUox-0001m9-65; Tue, 05 Dec 2023 13:46:39 +0100
+From: Sean Nyekjaer <sean@geanix.com>
+To: woojung.huh@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	ceggers@arri.de,
+	netdev@vger.kernel.org
+Cc: Sean Nyekjaer <sean@geanix.com>
+Subject: [PATCH] net: dsa: microchip: fix NULL pointer dereference in ksz_connect_tag_protocol()
+Date: Tue,  5 Dec 2023 13:46:36 +0100
+Message-ID: <20231205124636.1345761-1-sean@geanix.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2974507b-57fa-4c9b-a036-055dbf55f6a4-pchelkin@ispras.ru>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: sean@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27114/Tue Dec  5 09:39:00 2023)
 
-Fedor Pchelkin wrote on Tue, Dec 05, 2023 at 03:15:43PM +0300:
-> As for the second initialization (the one located after kfree(*wnames) in
-> error handling path - it was there all the time), I think it's better not
-> to touch it. I've just moved kfree and null-assignment under
-> 'if (*wnames)' statement.
+We should check whether the ksz_tagger_data is allocated.
+For example when using DSA_TAG_PROTO_KSZ8795 protocol, ksz_connect() is not
+allocating ksz_tagger_data.
 
-Ah, I somehow missed this was just moved; that doesn't change anything
-but doesn't hurt either, sure.
+This avoids the following null pointer dereference:
+Unable to handle kernel NULL pointer dereference at virtual address 00000000 when write
+[00000000] *pgd=00000000
+Internal error: Oops: 817 [#1] PREEMPT SMP ARM
+Modules linked in:
+CPU: 1 PID: 26 Comm: kworker/u5:1 Not tainted 6.6.0
+Hardware name: STM32 (Device Tree Support)
+Workqueue: events_unbound deferred_probe_work_func
+PC is at ksz_connect_tag_protocol+0x40/0x48
+LR is at ksz_connect_tag_protocol+0x3c/0x48
+[ ... ]
+ ksz_connect_tag_protocol from dsa_register_switch+0x9ac/0xee0
+ dsa_register_switch from ksz_switch_register+0x65c/0x828
+ ksz_switch_register from ksz_spi_probe+0x11c/0x168
+ ksz_spi_probe from spi_probe+0x84/0xa8
+ spi_probe from really_probe+0xc8/0x2d8
 
-> The concern you mentioned is about any user that'd ignore the return code
-> and try to use *wnames (so that the second initialization makes some
-> sense). I can't see if there is any such user but, as said before, it's
-> better not to touch that code.
+Fixes: ab32f56a4100 ("net: dsa: microchip: ptp: add packet transmission timestamping")
+Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Yes, it was here before, let's leave it in.
-
-> > I don't mind the change even if there isn't but let's add a word in the
-> > commit message.
-> 
-> OK, will do in v3.
-
-I've queued to -next as is (with the i initialized as Christian pointed
-out), will update if you send a new one later.
-
-Thanks,
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 42db7679c360..1b9815418294 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2623,9 +2623,10 @@ static int ksz_connect_tag_protocol(struct dsa_switch *ds,
+ 				    enum dsa_tag_protocol proto)
+ {
+ 	struct ksz_tagger_data *tagger_data;
+-
+-	tagger_data = ksz_tagger_data(ds);
+-	tagger_data->xmit_work_fn = ksz_port_deferred_xmit;
++	if (ksz_tagger_data(ds)) {
++		tagger_data = ksz_tagger_data(ds);
++		tagger_data->xmit_work_fn = ksz_port_deferred_xmit;
++	}
+ 
+ 	return 0;
+ }
 -- 
-Dominique Martinet | Asmadeus
+2.42.0
+
 
