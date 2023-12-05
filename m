@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-54020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2EF8059F5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:28:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624A3805A15
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:40:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9347281D6C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:28:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE9E1C211B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F46675B1;
-	Tue,  5 Dec 2023 16:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F617634;
+	Tue,  5 Dec 2023 16:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wkCR9zua"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u2gkL5k/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FD9122
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:28:24 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1d075392ff6so25181055ad.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:28:24 -0800 (PST)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E855E129
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:40:03 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3334d9b57adso1486695f8f.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:40:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701793704; x=1702398504; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1701794402; x=1702399202; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=G4XVJ7C72jHCQjhG0OukDWdFA1Gk9Oaij5y1yi9zKns=;
-        b=wkCR9zuacvO6QQ651kC/hARNFYMfFpw/VwM8bNPaQuKgQQwpR+sDH1BQY4ZZDk1Uc4
-         wUnTR803z+iOIFewU95Or0pywtBZqCktuJN2gdEp6fE16+jxmVyG3GkuyksJR5rvFxki
-         KW/YQI3jWGWVZbzKE0ZQ610PIIoHSY12iG93ali+bv9PienhQKJzUV/A1KYynTMObjLv
-         L0fKUOQEyfpoJI74wXPxPbMi7aoStVDJMnpJx7l02jZOfA6i5EsGIoO8G6ynKWCLI4/G
-         QCt4otiGJVFxnI39w+9RUNwUYtnsnEn74pM+3IPLv9I5vSUfE0Di0iyGlxFTEzvqztlP
-         Ekbw==
+        bh=a8TfjwRcKypybBxsw7XwMuabdDZTIwUX7pnwmTTnOxQ=;
+        b=u2gkL5k/RUlcpJ13U/gn1nFMeY48+7tUcVmkJsqGlZjfYPam4AVlffCvutuG18Tg+y
+         /cpisIwd18d7VCKEcwnM2uJVUvNZ5BhDFQmDEtRFwMEdiLa2QELPt0ih5k663QF6htaP
+         JVIV59l91bIVUesTd0AwScW5AQMYLWV/G7rQclEnVbvj3j8FZ7aHPo+pb4wFqCOrJZLU
+         SCQ2OjeEMNFleiw9wbYfN5Q9CkIZje0XxqmKCEBbpQfMtxgFgN1Y+Vo5samLlaQzg82e
+         JoaNtpDJtbTQ1nHfDi/Dv12eH6rU3VMwk4r13OK0pIdUeU0aINF386/1cI/TQrbrMxhM
+         I0DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701793704; x=1702398504;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1701794402; x=1702399202;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G4XVJ7C72jHCQjhG0OukDWdFA1Gk9Oaij5y1yi9zKns=;
-        b=MNeKN2YRj2qbhgGhDTrIVJMdR4pFlbTw8J+v2mC82pZRU7SFckuByxyKeHjH+MsWMA
-         KEZ0zpvoIVmDlqSE9fUEhjqZUFE2rteb98c5MhTSfA9W5po654jWPshC3jiLqJMWDNiJ
-         f4EijoG87lFiWbfmBjy5ShpoFSQcKNqhuzO5ogJfhzp2ERaPfJDF9VavUAOg35HGuwKU
-         1UGSY2/5/dnWpt2N8zsEsn9GGV7MMjXbl5JDc6y/ESev3r2r6P+zaAR/szyse8CvqsFA
-         0kx0br8Ci/LUobR0GWNZgaYGNQkaljl4HX77QPCz+Ah8g7Ad/XXmP5JMbh5/4qeoG7JW
-         BkXw==
-X-Gm-Message-State: AOJu0YzCK1Ojdvi6Bb0cHSlP7Xcy4dokcR5a+jjGE/sPh1Tqpzsatbl6
-	yEwGQy+1sepu0xiGbTqLgDIbow==
-X-Google-Smtp-Source: AGHT+IGjfDAQa/bvoQsZrLUHMM/vrpPFW4bHqxSDsn8N4P6C5Pxs8KrxSKXyND1fgFFBbRt9oRUYBQ==
-X-Received: by 2002:a17:902:ee44:b0:1d0:700b:3f6a with SMTP id 4-20020a170902ee4400b001d0700b3f6amr1865194plo.36.1701793704021;
-        Tue, 05 Dec 2023 08:28:24 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c0:638:b3b3:3480:1b98:451d? ([2804:7f1:e2c0:638:b3b3:3480:1b98:451d])
-        by smtp.gmail.com with ESMTPSA id jk19-20020a170903331300b001cf570b10dasm8745364plb.65.2023.12.05.08.28.20
+        bh=a8TfjwRcKypybBxsw7XwMuabdDZTIwUX7pnwmTTnOxQ=;
+        b=DkAuhZyO0PYongKjkeRSCG7ITCPgFRhTJQoCO+XkYvpSIB9irBzvzx4zVYDpMMp6T6
+         wLeJz59H8fL/Ofn4gw2vPuh6Gqe4q4HUrm6USfiafV2PiwfcI91JaxPy+h3nGwLvgwxB
+         4u/agncBTY6IILQuDahMvXZTbtWKzxaNpaje4vJxz/igKJYa9VLQX2sIj/5eYPd4wvOp
+         xrg88ObyjM8YFBD+3ZqJGC61TzLKdz5KkFbRBYQ+hw5HiEMn4tXKvtlpWXThv1kvSBEd
+         GUheGefv7l2zvlHQFmLrr22wYzY2UEf6lOjNZ7TkPZ0g6x2tUrx+o+axCJNXMePrtN4K
+         1Oog==
+X-Gm-Message-State: AOJu0YyaQSNo62SRGPPikRT8a+CEwEG7Muu/W1SPrFbjSAS4edxXm8ND
+	VMlNBbUg38X7YIZCme+H8kQQCA==
+X-Google-Smtp-Source: AGHT+IGNjsBTSjVxWibdAehjF0N7/gqUi3qVzIscAnMYFEmJjuzQdEcgTP+uvVFAuVt89eP/wfdOTA==
+X-Received: by 2002:a05:6000:4ef:b0:333:3f7c:b2bd with SMTP id cr15-20020a05600004ef00b003333f7cb2bdmr3281889wrb.108.1701794402365;
+        Tue, 05 Dec 2023 08:40:02 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id dn6-20020a0560000c0600b003333b0d603bsm2306072wrb.42.2023.12.05.08.40.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Dec 2023 08:28:23 -0800 (PST)
-Message-ID: <e72df462-3c21-4b57-b7b0-7b71597b97a7@mojatatu.com>
-Date: Tue, 5 Dec 2023 13:28:19 -0300
+        Tue, 05 Dec 2023 08:40:01 -0800 (PST)
+Message-ID: <fd709885-c489-4f84-83ab-53cfb4920094@linaro.org>
+Date: Tue, 5 Dec 2023 17:40:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,86 +62,172 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] net: sched: Move drop_reason to struct
- tc_skb_cb
+Subject: Re: [PATCH net-next v3 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: dcaratti@redhat.com, netdev@vger.kernel.org, kernel@mojatatu.com
-References: <20231201230011.2925305-1-victor@mojatatu.com>
- <20231201230011.2925305-2-victor@mojatatu.com>
- <7315d962-0911-81b9-7e60-452ab71e3193@iogearbox.net>
- <f0401a8cf451194733457fcedb5c44c9b0c96731.camel@redhat.com>
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <f0401a8cf451194733457fcedb5c44c9b0c96731.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Siddh Raman Pant <code@siddh.me>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Suman Ghosh <sumang@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+References: <cover.1701627492.git.code@siddh.me>
+ <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/12/2023 08:32, Paolo Abeni wrote:
-> On Tue, 2023-12-05 at 12:06 +0100, Daniel Borkmann wrote:
->> On 12/2/23 12:00 AM, Victor Nogueira wrote:
->>> Move drop_reason from struct tcf_result to skb cb - more specifically to
->>> struct tc_skb_cb. With that, we'll be able to also set the drop reason for
->>> the remaining qdiscs (aside from clsact) that do not have access to
->>> tcf_result when time comes to set the skb drop reason.
->>>
->>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->>> ---
->>>    include/net/pkt_cls.h     | 14 ++++++++++++--
->>>    include/net/pkt_sched.h   |  1 +
->>>    include/net/sch_generic.h |  1 -
->>>    net/core/dev.c            |  5 +++--
->>>    net/sched/act_api.c       |  2 +-
->>>    net/sched/cls_api.c       | 23 ++++++++---------------
->>>    6 files changed, 25 insertions(+), 21 deletions(-)
->>>
->>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
->>> index a76c9171db0e..7bd7ea511100 100644
->>> --- a/include/net/pkt_cls.h
->>> +++ b/include/net/pkt_cls.h
->>> @@ -154,10 +154,20 @@ __cls_set_class(unsigned long *clp, unsigned long cl)
->>>    	return xchg(clp, cl);
->>>    }
->>>    
->>> -static inline void tcf_set_drop_reason(struct tcf_result *res,
->>> +struct tc_skb_cb;
->>> +
->>> +static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb);
->>> +
->>> +static inline enum skb_drop_reason
->>> +tc_skb_cb_drop_reason(const struct sk_buff *skb)
->>> +{
->>> +	return tc_skb_cb(skb)->drop_reason;
->>> +}
->>> +
->>> +static inline void tcf_set_drop_reason(const struct sk_buff *skb,
->>>    				       enum skb_drop_reason reason)
->>>    {
->>> -	res->drop_reason = reason;
->>> +	tc_skb_cb(skb)->drop_reason = reason;
->>>    }
->>>    
->>>    static inline void
->>> diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
->>> index 9fa1d0794dfa..f09bfa1efed0 100644
->>> --- a/include/net/pkt_sched.h
->>> +++ b/include/net/pkt_sched.h
->>> @@ -277,6 +277,7 @@ static inline void skb_txtime_consumed(struct sk_buff *skb)
->>>    
->>>    struct tc_skb_cb {
->>>    	struct qdisc_skb_cb qdisc_cb;
->>> +	u32 drop_reason;
->>>    
->>>    	u16 mru;
->>
->> Probably also makes sense to reorder zone below mru.
+On 04/12/2023 14:08, Siddh Raman Pant wrote:
+> llcp_sock_sendmsg() calls nfc_llcp_send_ui_frame() which in turn calls
+> nfc_alloc_send_skb(), which accesses the nfc_dev from the llcp_sock for
+> getting the headroom and tailroom needed for skb allocation.
 > 
-> Or move 'zone' here. It's very minor but I would prefer the latter ;)
-> (and leave the hole at the end of the struct)
+> Parallelly the nfc_dev can be freed, as the refcount is decreased via
+> nfc_free_device(), leading to a UAF reported by Syzkaller, which can
+> be summarized as follows:
+> 
+> (1) llcp_sock_sendmsg() -> nfc_llcp_send_ui_frame()
+> 	-> nfc_alloc_send_skb() -> Dereference *nfc_dev
+> (2) virtual_ncidev_close() -> nci_free_device() -> nfc_free_device()
+> 	-> put_device() -> nfc_release() -> Free *nfc_dev
+> 
+> When a reference to llcp_local is acquired, we do not acquire the same
+> for the nfc_dev. This leads to freeing even when the llcp_local is in
+> use, and this is the case with the UAF described above too.
+> 
+> Thus, when we acquire a reference to llcp_local, we should acquire a
+> reference to nfc_dev, and release the references appropriately later.
+> 
+> References for llcp_local is initialized in nfc_llcp_register_device()
+> (which is called by nfc_register_device()). Thus, we should acquire a
+> reference to nfc_dev there.
+> 
+> nfc_unregister_device() calls nfc_llcp_unregister_device() which in
+> turn calls nfc_llcp_local_put(). Thus, the reference to nfc_dev is
+> appropriately released later.
+> 
+> Reported-and-tested-by: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
+> Fixes: c7aa12252f51 ("NFC: Take a reference on the LLCP local pointer when creating a socket")
+> Signed-off-by: Siddh Raman Pant <code@siddh.me>
+> ---
+>  net/nfc/llcp_core.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index 1dac28136e6a..9d45ce6dcdca 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -145,6 +145,9 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
+>  
+>  static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
+>  {
+> +	if (!nfc_get_device(local->dev->idx))
+> +		return NULL;
+> +
+>  	kref_get(&local->ref);
+>  
+>  	return local;
+> @@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+>  	if (local == NULL)
+>  		return 0;
+>  
+> +	nfc_put_device(local->dev);
 
-Yes, this looks better.
-Thank you, I'll proceed this way.
+Mismatched order with get. Unwinding is always in reversed order. Or
+maybe other order is here on purpose? Then it needs to be explained.
+
+>  	return kref_put(&local->ref, local_release);
+>  }
+>  
+> @@ -959,8 +963,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+>  	}
+>  
+>  	new_sock = nfc_llcp_sock(new_sk);
+> -	new_sock->dev = local->dev;
+> +
+>  	new_sock->local = nfc_llcp_local_get(local);
+> +	if (!new_sock->local) {
+
+There is already an cleanup path/label, so extend it. Existing code
+needs some improvements in that matter as well.
+
+> +		reason = LLCP_DM_REJ;
+> +		release_sock(&sock->sk);
+> +		sock_put(&sock->sk);
+> +		sock_put(&new_sock->sk);
+> +		nfc_llcp_sock_free(new_sock);
+> +		goto fail;
+> +	}
+> +
+> +	new_sock->dev = local->dev;
+>  	new_sock->rw = sock->rw;
+>  	new_sock->miux = sock->miux;
+>  	new_sock->nfc_protocol = sock->nfc_protocol;
+> @@ -1597,7 +1611,13 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+>  	if (local == NULL)
+>  		return -ENOMEM;
+>  
+> -	local->dev = ndev;
+> +	/* Hold a reference to the device. */
+
+That's obvious. Instead write something not obvious - why you call
+nfc_get_device() while not incrementing reference to llcp_local.
+
+> +	local->dev = nfc_get_device(ndev->idx);
+
+This looks confusing. If you can access ndev->idx, then ndev reference
+was already increased. In such case iterating through all devices to
+find it, is unnecessary and confusing.
+
+
+
+Best regards,
+Krzysztof
 
 
