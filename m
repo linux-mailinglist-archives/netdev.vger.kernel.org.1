@@ -1,84 +1,95 @@
-Return-Path: <netdev+bounces-54033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C761805B0A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:19:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F16FC805B0C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38CE5B21038
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC036281345
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E284E692B9;
-	Tue,  5 Dec 2023 17:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE4D692BB;
+	Tue,  5 Dec 2023 17:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkJ6uoCv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWOT32AM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B50BA
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:19:48 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so16317a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 09:19:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701796787; x=1702401587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=umkO62540Aj3zvWzqiFrtAxv4EDQJDPaEch7kzL52w4=;
-        b=AkJ6uoCvQX7DtXIJCQrGnGeKVY9v8RjG18PavVxGcstaWTLPD2Yzpco4t6tdyRGGZH
-         inYGMWp3QKa6vgcGavuermbtFOHhzmZWD0ltwI6qerF8XAwmLSJdWvNvoG3Sf6cx5Qnx
-         IHh/kX/p5Cb7VTNYNBXoCNrnJ6y/jyl4EjjY2uwn5JV5vYseuPqp0gc74INds9fuPKTn
-         9XGddgAWNHzfxf5yiQQvu6mTugh/n9YawP+uOBvYXxiWLmznzW691hLlElhIFLsDgBfa
-         Lw5b4iJZGyFMS4gEjouaU2HIbBvi2ETAci/lTviXRgV2SeX7u3pVjFY2aTrev6dfUY9P
-         yAmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701796787; x=1702401587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=umkO62540Aj3zvWzqiFrtAxv4EDQJDPaEch7kzL52w4=;
-        b=A1+m4NReLeoIHobJUpCJId9YfUlcJQg6EypYrt5nBENjB1DSmU55WqijbkjDIkHdKT
-         YvTtuLi4U9S0A/ZMIUHfEqoLoUDAMjCk76omRa6Fsr0oI1bcPbROSgt5toGzIe8ocSGK
-         I2/0Q9DohH6GNw3iuiwZ2pDp61f+yrwxcpN+ZudN0E1M1L4xMota5Rz25vC6BWJF/mKZ
-         4ct7bncdDmwDYTtm1Vnr+olj60TLQiR3FoRR6iLZN5DYozGZHb4hDJzSKVUUQj45iJqP
-         RgnrYhkKF/ghrace98DRGGd0cdS7G8tOFKQkfZTDjxhg4KiA480TeuvPbmNl5RS3/Jjl
-         kCkA==
-X-Gm-Message-State: AOJu0YxxK5BSm4xTPzwWMBQ9MPPacRYrBTkP3tcCI2stUhdYqWAyK1ke
-	ZOTuPDktsFA8wg5chIeX+/IQXxc1e5zLK9zpWguKCQ==
-X-Google-Smtp-Source: AGHT+IHRRjHLrv/6KKrW2+eJAnGeEoquiwctjD4JS5HmVTRkbeMRPHRJNq/mFyACg001jJP017BhLKURRop1k2Gu7gs=
-X-Received: by 2002:a05:6402:35d3:b0:54c:9996:7833 with SMTP id
- z19-20020a05640235d300b0054c99967833mr313861edc.7.1701796786643; Tue, 05 Dec
- 2023 09:19:46 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F210069280
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C717C433C8;
+	Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701796826;
+	bh=H3KZtBSZ/Y7IZExJ1XMvnf0C8QVYrYDG6bmeA/QsFY4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GWOT32AMpkGzabfcEnFawwGtfWkRrz4gc0Yl859VUGbPcHVVcnI/lZ2xtm/uAOpvi
+	 vPlD/WjjMyJIgQ31gnUBJT0hoacFazL+mOpX/+MH4n+yTP4S6DVVyYYOyMymeKY4Vr
+	 pPychQHoLqnM1k64+dq0OgdLe9lnK4KNI9OteRT3VGPblDV/cA9BAU7wckLQITK5/8
+	 oqBAFC3GuE4CAEKJRupAeWjFO55Bi8kTU0ETwk8lzCOik1M72YqS+KN+WQrZt+YC0O
+	 Ag/KUrtJCc1hzpe5Q4djCbyTEBhLpuh+lCs9bzbViv2z/gH8t56fr0jk46PZD97zGO
+	 ZldQFR+uRNBpQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61B84C43170;
+	Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205161841.2702925-1-edumazet@google.com> <CAK6E8=dCNTuZvyHJYUzv-BmFVkxa=cnDazgLdCtDLvrGmEWT0w@mail.gmail.com>
-In-Reply-To: <CAK6E8=dCNTuZvyHJYUzv-BmFVkxa=cnDazgLdCtDLvrGmEWT0w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Dec 2023 18:19:32 +0100
-Message-ID: <CANn89iK++qfrGEg=2dxfFLXc_SAOUvjwTgtt55L8yRZbVW8a2Q@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: do not accept ACK of bytes we never sent
-To: Yuchung Cheng <ycheng@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Yepeng Pan <yepeng.pan@cispa.de>, Christian Rossow <rossow@cispa.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/2] sfc: Implement ndo_hwtstamp_(get|set)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170179682639.32274.15529514811167186143.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Dec 2023 17:20:26 +0000
+References: <20231130135826.19018-1-alex.austin@amd.com>
+In-Reply-To: <20231130135826.19018-1-alex.austin@amd.com>
+To: Alex Austin <alex.austin@amd.com>
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, ecree.xilinx@gmail.com,
+ habetsm.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ lorenzo@kernel.org, memxor@gmail.com, alardam@gmail.com, bhelgaas@google.com
 
-On Tue, Dec 5, 2023 at 5:47=E2=80=AFPM Yuchung Cheng <ycheng@google.com> wr=
-ote:
+Hello:
 
-> Thank you Eric for the fix. It appears the newer RFC
-> https://www.rfc-editor.org/rfc/rfc9293.html also has this issue that
-> needs a revision?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I do not think RFC 9293 made any refinement about RFC 5961 guidelines.
+On Thu, 30 Nov 2023 13:58:24 +0000 you wrote:
+> Implement ndo_hwtstamp_get and ndo_hwtstamp_set for sfc and sfc-siena.
+> 
+> Alex Austin (2):
+>   sfc: Implement ndo_hwtstamp_(get|set)
+>   sfc-siena: Implement ndo_hwtstamp_(get|set)
+> 
+>  drivers/net/ethernet/sfc/ef10.c             |  4 +--
+>  drivers/net/ethernet/sfc/efx.c              | 24 +++++++++++++----
+>  drivers/net/ethernet/sfc/net_driver.h       |  2 +-
+>  drivers/net/ethernet/sfc/ptp.c              | 30 ++++++++-------------
+>  drivers/net/ethernet/sfc/ptp.h              |  7 +++--
+>  drivers/net/ethernet/sfc/siena/efx.c        | 24 +++++++++++++----
+>  drivers/net/ethernet/sfc/siena/net_driver.h |  2 +-
+>  drivers/net/ethernet/sfc/siena/ptp.c        | 30 +++++++++------------
+>  drivers/net/ethernet/sfc/siena/ptp.h        |  7 +++--
+>  drivers/net/ethernet/sfc/siena/siena.c      |  2 +-
+>  10 files changed, 76 insertions(+), 56 deletions(-)
 
-Perhaps Yepeng Pan and Christian Rossow have plans to bring this issue to I=
-ETF.
+Here is the summary with links:
+  - [net-next,1/2] sfc: Implement ndo_hwtstamp_(get|set)
+    https://git.kernel.org/netdev/net-next/c/1ac23674a971
+  - [net-next,2/2] sfc-siena: Implement ndo_hwtstamp_(get|set)
+    https://git.kernel.org/netdev/net-next/c/d82afc800c1e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
