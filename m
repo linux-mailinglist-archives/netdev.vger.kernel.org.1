@@ -1,361 +1,167 @@
-Return-Path: <netdev+bounces-53845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DAB804DC1
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:26:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF94E804DD9
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724321C20CA3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:26:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655471F212AA
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385933F8CC;
-	Tue,  5 Dec 2023 09:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDB43E48B;
+	Tue,  5 Dec 2023 09:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="W9cEHt8s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPBRrYIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB9929B;
-	Tue,  5 Dec 2023 01:26:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hWZz6YuGiBv64Qi7qj/V04CXbY8nkYfqF3GhjpVK5zVHDlYamKLHHg5b6ALmtNgxTQq+tLPiP/+tkUrjNim1bSS6lAxOYiRg3burSTBPKg6c7s8ukSR3rvBDrsIFJ+sqz7IVz8XDxkR6A7Uq5DuItX8ebAdyGbqpFzyMAIO4DO/xt5SqUNcC8fVp8BFM5/ZxAI7avoRK99+3vATatgk7xkHg5svn1EhOkrtH4c7cuXayj7hNYIWnfjnR50pNVHnqZ/w2d5GlYfwGsz5XQh/5/jBRnQE0qnYC+0wkMXbVwZkAts7S0nvNRXTLsXqecrr7wpOa/0N1t4bWsybC1SbpHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hh/c4zDWCo2LFkRQjLlHRBGyKUIDFJSOkBUwQRI079k=;
- b=h2gRzDjoPdTi7gN7oohtxyRl/6AvUF2S/S17OUaQXId970UGWMPR8rT3VWqS0vpn9+kIJ4fqn2K+nhp55wg4kC0lbzgxSyrw/R01eu6P7qV0P+niIGER+EaoZms8vJfRuxwpTXszTo8onlmZv2NxPIreeUnbWXAWfMMs+zsfuHcRyZUr935WuPqNWtZ9B/dPQHcjstnU7OTDPbX53zpUfaeYbqmKINUMFCBUCkLJJnLFwbJuXS01YJpZjLoWAWLZZcAiyCejXECNx6Rsha9sLTeGxC6LrO9+Lkm8/DtrjfokOh9QJGGwtwyBKC+oU5vdjw/sNYPIZ6wPo/l+rzkF8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hh/c4zDWCo2LFkRQjLlHRBGyKUIDFJSOkBUwQRI079k=;
- b=W9cEHt8s64n4tV0EeI9jutJYn4d5TfKufc7XdGcDoXCbfErER7PSo2HMqBMxde8JT423COjGN5B1tix8sdJ8+pRkws2x8hCFuBVRodOIdC6eeUScCqqhb57NrN/+sV6PDnPorEetpoDIs43wpd+NOVFy+IECVjRMPy4UfpGTsSE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by BY3PR13MB4772.namprd13.prod.outlook.com (2603:10b6:a03:36b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 09:26:47 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::d3c0:fa39:cb9e:a536]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::d3c0:fa39:cb9e:a536%7]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 09:26:47 +0000
-From: Louis Peens <louis.peens@corigine.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Hui Zhou <hui.zhou@corigine.com>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: [PATCH net] nfp: flower: fix for take a mutex lock in soft irq context and rcu lock
-Date: Tue,  5 Dec 2023 11:26:25 +0200
-Message-Id: <20231205092625.18197-1-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: JN2P275CA0048.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::36)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 535E310E9
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:29:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701768542;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HWSbeQkndxR8pOH1jrEtRfCn62USiBxMT3pXbunoD3Q=;
+	b=MPBRrYIf1Z6Z/mqlAt8B8qdqHsQSE7KeFl+ay5kBQ2M3ciR/lnOCX3cdQiMQGFN//ndPMC
+	KBNbMs8dODs2G8bWkO60jSXFFkN9+q5Y4aWYdL9fHzpRAe5BVBxnq2OTBQE0sIIdlCExYG
+	XS5a96GrImyH08j3v/L3vNFOWLmSJoo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-zPiF5HBuMJalD6BkmHpsQg-1; Tue, 05 Dec 2023 04:28:59 -0500
+X-MC-Unique: zPiF5HBuMJalD6BkmHpsQg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1be0f29061so7048266b.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 01:28:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701768538; x=1702373338;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HWSbeQkndxR8pOH1jrEtRfCn62USiBxMT3pXbunoD3Q=;
+        b=rm4P/8ac0Ziy4ZfO3YxbhlQGcbYJZtQgGwhnBWreZ/F5X+TIcNU3FC+JYOJXpe9qHw
+         4Zr9mto4/NUkUeAOKhgCB6tx/nGmzgiTSq7jvA34Am6Jz0I3UE/ZvFwn2titUZlrsQPm
+         IBzZXaCtysQ5Q7tMBCIM92iokGOw1OJTh88NS+YpX8sLbdiN8DjrcGbG/y6QUoLE6xce
+         7OLE1yFf7omDc6RJFY6/9BVaLvChIj03bQYx5WsCS8ooEf89O9MCJ+xhlGO5ArHajuBj
+         YWcVUjQvl/I88Ojc01jjcUEMfp4iHsB/2OLqft3kMUzFTuunvw+fD7ASwsih0AWC/cbe
+         W6uQ==
+X-Gm-Message-State: AOJu0YxfhhsuNr65fH/tklNnedsDO15E6KW0/icZYsGK3GLag+v/LYoc
+	WnWAQZazKk4416mWgWo6oOqF7UIgCMLrrwzvfSXjgRWPk12g1PQomBSg3KwpxE65ygXbXTzsJvt
+	BpNHEupdlN7hHHZpAKrIx0KQ7
+X-Received: by 2002:a17:906:3b96:b0:a1c:87a2:c183 with SMTP id u22-20020a1709063b9600b00a1c87a2c183mr484063ejf.5.1701768538131;
+        Tue, 05 Dec 2023 01:28:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGAbf9T1cl753dwNJrA4r4f5Cd5wzRLvS/Q1MW1BiOQwtPcGxLNeQjBeV3vMyTRD3tSBQzs7w==
+X-Received: by 2002:a17:906:3b96:b0:a1c:87a2:c183 with SMTP id u22-20020a1709063b9600b00a1c87a2c183mr484053ejf.5.1701768537730;
+        Tue, 05 Dec 2023 01:28:57 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-54.dyn.eolo.it. [146.241.241.54])
+        by smtp.gmail.com with ESMTPSA id b20-20020a17090636d400b009dd98089a48sm6382410ejc.43.2023.12.05.01.28.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 01:28:57 -0800 (PST)
+Message-ID: <d657f059d384419fe4df02580a4af9cf69e0e9c2.camel@redhat.com>
+Subject: Re: [PATCH net-next v6 1/6] ptp: clockmatrix: support 32-bit
+ address space
+From: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>, Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
+Date: Tue, 05 Dec 2023 10:28:56 +0100
+In-Reply-To: <20231205092429.GS50400@kernel.org>
+References: 
+	<PH7PR03MB70644CE21E835B48799F3EB3A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
+	 <20231205092429.GS50400@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|BY3PR13MB4772:EE_
-X-MS-Office365-Filtering-Correlation-Id: f457f86a-c0e4-4c40-0d14-08dbf5744dad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eX7HbOmnVsGLl/r3CX8G2xCCzhB1adoAI1955vrbKWje+aWs4GVKEU+FM+xE+E+yjVblDwyQcAP80RagmYPd1N5q7o60Ubm48gMHD0xwkqCF2KOTd0Ncrb1adq6OT9hxb28v1LjC26WX0k8ezGOF/TAemKv9xAbU6kU+CulpnclA2PL9K3+ADx60NwmY7R/ZuDzhNgfJTL48qxGEbcH45WFQgQuEp27M99SvVhR7JBL7IEQbGnnvzfM2h5oXk1nkBArYNpG2vmWCt+odvWLRU5u1B6ruBg9xUQcX81ph9N8C6S/Gf60EmjYo2Ggz49qVLjSzB01kHmi6Xu7UOkGMtzMCB8W6sTjZ3bK/zCDf6NI3JKGgc0VwpPmLS/yuK1I7pLiJKMgupxf1G2Wxa9IpHtSw7IXOObR7kMTWY1jh0vqrpnOkuJplmKXPmxP7RY/weLrKros3iB+bOIPz4Hb2bETYpuCoP15PxGTtAoynsSotE1mDS3roN/QduKY+gLNHeYELR/1x/oRaQvES8g+jjwQInLRxOYaj2cjpemo9/ip/MQpFK3bqoVtpfyMG8Os85PsDage2GgWhvW5l0IFf14JHZyAq+ueuUt+KsfdzPn7QhGaExMct7Y5SP6R9KJtaSCY+arZCzN+C9miBwoXafZbp71E2X1yjtp6Ej4xiytE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(366004)(39840400004)(136003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(107886003)(1076003)(2616005)(4326008)(8936002)(8676002)(6512007)(6506007)(55236004)(52116002)(83380400001)(26005)(6486002)(478600001)(6666004)(66556008)(66946007)(110136005)(66476007)(38100700002)(316002)(2906002)(38350700005)(41300700001)(36756003)(44832011)(86362001)(5660300002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+nsUz3TURydUS1Wzs4LB7h70XTs9GMUDtGKz3JTkT5Qw5pcX4AHZkvYoYuH6?=
- =?us-ascii?Q?eDA5csj7JNPHGN/+i0HljVG663we6yVuvcMyekLXakqGR25KWNWU5AXlt7EM?=
- =?us-ascii?Q?GBV++tgDOygeNY4KPdSiQjRm/00ZI8reM7eM5fqmLIHeouMqe5V3pVZPx6Cw?=
- =?us-ascii?Q?L6EGUi/nfXzmKtzf6vjYoAHXQgd8E/AMHlbek3NBj8J/e5QLB+kX/IluNgup?=
- =?us-ascii?Q?wvzbXthYq0/j50GwNXC9PmsugP60COrTsn0sB7gUvzorcOMdHMR58uUDAqCB?=
- =?us-ascii?Q?v17DUdvfZmjzACM9TmLmqYrC8j7GXWBXXePYzX+32NBb3B8n/NOsK8cdZEmu?=
- =?us-ascii?Q?KbyBPllfEhaDd/SqjvQ0EJSZHGMdm2nJgVXqmJKh8vliYCE4XmXkL/XY4Jtz?=
- =?us-ascii?Q?xd+RtL6uZwaL2aqVcY+AIG9oxxcBK6NUIWNK3PbY2HsCCYx4JxlJ7jDAVmDr?=
- =?us-ascii?Q?Wg6FzfkeK3AuJesuikse+sG2giLrL/En4EVVGCQzyOREHUHcP0wMN0RKOcFa?=
- =?us-ascii?Q?a/G8HtwjILX20T7yRwOGx26orUGifopqJznn3SMg7DH0JN7dNmbij/MhPaCw?=
- =?us-ascii?Q?F1XTaREE0PonlimPcrO0F80/kkwTXEmHwyDlttGR0KfUuMRqMTupzjfXesm5?=
- =?us-ascii?Q?oUsVZmLdLmCCK/uj7UZFwcQp15JHzja6ATpYQHuu8NQG3qhH3W9TFSS6Ysl3?=
- =?us-ascii?Q?D/eCoNapzgtMWH4qRwxi+hVBaAV5jMF4FiyEUAJvVa7Qj6CRpNMLj09nbjOM?=
- =?us-ascii?Q?Kso1Wez+tmq3pheHpfNMF7fg5CtSdh08D9gPqfrWKlsFTQhYMv1VoGCHvfDn?=
- =?us-ascii?Q?Y6cF3OngjGJ+cZ2dFscbg+pqPm1e9deRFEP0Vy06/iJHfOPigbJottYoAOem?=
- =?us-ascii?Q?cIlHFfcGd9ZzQDFFsinYYiJGFcANyQqHonCdqOUmkgRHnQ8RiCycs21TJr8S?=
- =?us-ascii?Q?xH5XbADPEZcGDFcKy7PwU5qF6my1gZzavqQ5MjIjBFvbPO02nWoW1QJsqwiF?=
- =?us-ascii?Q?8LwkfsLAcTw5W7CtkwQuAC1+iUVJbrbv7+U6RY/gVy+dr0JsA3ad2lDkZm0e?=
- =?us-ascii?Q?DC3lvpWDTFYn3JJZBOv1DDtZW2L2TLOadISiNdI7pUs6pxfp0rPdXiFTTF0k?=
- =?us-ascii?Q?NHZrj2q8O2zfJUIRfS6/97wMVHJReJ3L7Lltxdvttpvz3Vq/qwRy9Adti7nc?=
- =?us-ascii?Q?SYxQFoi32A6+6SH39LTdSUFm06+NYJ2maN9aqH2yWfmAGHOXVtQGAteLaUB/?=
- =?us-ascii?Q?+vnwHZ1gpa2hz//Y57Hn86YlxTeHsCHOV1YsscsdUfy8T3QikJz6xPRECDQL?=
- =?us-ascii?Q?gOOD86sIHhZaNkQm235cwa5oAUFbmde8APYEI2I5qsWV31vj+LndHohrPox/?=
- =?us-ascii?Q?R/bbf6uShtKeMid4S1RydfVBAprZEF6KJHcixanVHUCQduvLDsz8L4isXlof?=
- =?us-ascii?Q?HxKm54NtUS27DAbrgln6YzrJJEE7H2nOFE4kUG/Lf2PmdkzbrRlXQWZgrWXq?=
- =?us-ascii?Q?cS2VItWEkKWtVgZCsNl5m6XdktdVOXaW10doq1LVVCUQLi+ubXCdjtTj5s2J?=
- =?us-ascii?Q?sRqhunxcU7prPyWyICvFmpS0uDxurBGGFIYxfZjXkXPg5zvzuGFaw24VIhUO?=
- =?us-ascii?Q?9w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f457f86a-c0e4-4c40-0d14-08dbf5744dad
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 09:26:47.2468
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CS6ZoT69jF4u4GgC+I6BactgzETynjdMCI0olrwWPa4LhUMcDG5yohKmPo8xxeNeJdDVykdv90eb+RrIHagzWgwQJ/btFzfz7kyb2ktfnDM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4772
 
-From: Hui Zhou <hui.zhou@corigine.com>
+On Tue, 2023-12-05 at 09:24 +0000, Simon Horman wrote:
+> On Thu, Nov 30, 2023 at 01:46:29PM -0500, Min Li wrote:
+> > From: Min Li <min.li.xe@renesas.com>
+> >=20
+> > We used to assume 0x2010xxxx address. Now that
+> > we need to access 0x2011xxxx address, we need
+> > to support read/write the whole 32-bit address space.
+> >=20
+> > Signed-off-by: Min Li <min.li.xe@renesas.com>
+>=20
+> ...
+>=20
+> > diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatri=
+x.c
+> > index f6f9d4adce04..f8556627befa 100644
+> > --- a/drivers/ptp/ptp_clockmatrix.c
+> > +++ b/drivers/ptp/ptp_clockmatrix.c
+> > @@ -41,8 +41,8 @@ module_param(firmware, charp, 0);
+> >  static int _idtcm_adjfine(struct idtcm_channel *channel, long scaled_p=
+pm);
+> > =20
+> >  static inline int idtcm_read(struct idtcm *idtcm,
+> > -			     u16 module,
+> > -			     u16 regaddr,
+> > +			     u32 module,
+> > +			     u32 regaddr,
+> >  			     u8 *buf,
+> >  			     u16 count)
+> >  {
+> > @@ -50,8 +50,8 @@ static inline int idtcm_read(struct idtcm *idtcm,
+> >  }
+> > =20
+> >  static inline int idtcm_write(struct idtcm *idtcm,
+> > -			      u16 module,
+> > -			      u16 regaddr,
+> > +			      u32 module,
+> > +			      u32 regaddr,
+> >  			      u8 *buf,
+> >  			      u16 count)
+> >  {
+>=20
+> Hi Min Li,
+>=20
+> My understanding of Paolo's review of v5 was that it would be cleaner to:
+>=20
+> 1. Leave the type of the module parameter as u16
+> 2. Update the type of the regaddr parameter to u32
 
-The neighbour event callback call the function nfp_tun_write_neigh,
-this function will take a mutex lock and it is in soft irq context,
-change the work queue to process the neighbour event.
+[almost over the air conflict here ;) ]
 
-Move the nfp_tun_write_neigh function out of range rcu_read_lock/unlock()
-in function nfp_tunnel_request_route_v4 and nfp_tunnel_request_route_v6.
+I think the module parameter as u32 is needed, as later macro
+definitions will leverage that.
 
-Fixes: abc210952af7 ("nfp: flower: tunnel neigh support bond offload")
-CC: stable@vger.kernel.org # 6.2+
-Signed-off-by: Hui Zhou <hui.zhou@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
----
- .../netronome/nfp/flower/tunnel_conf.c        | 127 +++++++++++++-----
- 1 file changed, 95 insertions(+), 32 deletions(-)
+>=20
+> And...
+>=20
+> ...
+>=20
+> > @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
+> >  	val =3D SYNCTRL1_MASTER_SYNC_RST;
+> > =20
+> >  	/* Place master sync in reset */
+> > -	err =3D idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
+> > +	err =3D idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
+> >  	if (err)
+> >  		return err;
+> > =20
+> > -	err =3D idtcm_write(idtcm, 0, sync_ctrl0, &sync_src, sizeof(sync_src)=
+);
+> > +	err =3D idtcm_write(idtcm, sync_ctrl0, 0, &sync_src, sizeof(sync_src)=
+);
+> >  	if (err)
+> >  		return err;
+> > =20
+>=20
+> ... avoid the need for changes like the two above.
 
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
-index 060a77f2265d..e522845c7c21 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
-@@ -160,6 +160,18 @@ struct nfp_tun_mac_addr_offload {
- 	u8 addr[ETH_ALEN];
- };
- 
-+/**
-+ * struct nfp_neigh_update_work - update neighbour information to nfp
-+ * @work:	Work queue for writing neigh to the nfp
-+ * @n:		neighbour entry
-+ * @app:	Back pointer to app
-+ */
-+struct nfp_neigh_update_work {
-+	struct work_struct work;
-+	struct neighbour *n;
-+	struct nfp_app *app;
-+};
-+
- enum nfp_flower_mac_offload_cmd {
- 	NFP_TUNNEL_MAC_OFFLOAD_ADD =		0,
- 	NFP_TUNNEL_MAC_OFFLOAD_DEL =		1,
-@@ -607,38 +619,30 @@ nfp_tun_write_neigh(struct net_device *netdev, struct nfp_app *app,
- 	nfp_flower_cmsg_warn(app, "Neighbour configuration failed.\n");
- }
- 
--static int
--nfp_tun_neigh_event_handler(struct notifier_block *nb, unsigned long event,
--			    void *ptr)
-+static void
-+nfp_tun_release_neigh_update_work(struct nfp_neigh_update_work *update_work)
- {
--	struct nfp_flower_priv *app_priv;
--	struct netevent_redirect *redir;
--	struct neighbour *n;
-+	neigh_release(update_work->n);
-+	kfree(update_work);
-+}
-+
-+static void nfp_tun_neigh_update(struct work_struct *work)
-+{
-+	struct nfp_neigh_update_work *update_work;
- 	struct nfp_app *app;
-+	struct neighbour *n;
- 	bool neigh_invalid;
- 	int err;
- 
--	switch (event) {
--	case NETEVENT_REDIRECT:
--		redir = (struct netevent_redirect *)ptr;
--		n = redir->neigh;
--		break;
--	case NETEVENT_NEIGH_UPDATE:
--		n = (struct neighbour *)ptr;
--		break;
--	default:
--		return NOTIFY_DONE;
--	}
--
--	neigh_invalid = !(n->nud_state & NUD_VALID) || n->dead;
--
--	app_priv = container_of(nb, struct nfp_flower_priv, tun.neigh_nb);
--	app = app_priv->app;
-+	update_work = container_of(work, struct nfp_neigh_update_work, work);
-+	app = update_work->app;
-+	n = update_work->n;
- 
- 	if (!nfp_flower_get_port_id_from_netdev(app, n->dev))
--		return NOTIFY_DONE;
-+		goto out;
- 
- #if IS_ENABLED(CONFIG_INET)
-+	neigh_invalid = !(n->nud_state & NUD_VALID) || n->dead;
- 	if (n->tbl->family == AF_INET6) {
- #if IS_ENABLED(CONFIG_IPV6)
- 		struct flowi6 flow6 = {};
-@@ -655,13 +659,11 @@ nfp_tun_neigh_event_handler(struct notifier_block *nb, unsigned long event,
- 			dst = ip6_dst_lookup_flow(dev_net(n->dev), NULL,
- 						  &flow6, NULL);
- 			if (IS_ERR(dst))
--				return NOTIFY_DONE;
-+				goto out;
- 
- 			dst_release(dst);
- 		}
- 		nfp_tun_write_neigh(n->dev, app, &flow6, n, true, false);
--#else
--		return NOTIFY_DONE;
- #endif /* CONFIG_IPV6 */
- 	} else {
- 		struct flowi4 flow4 = {};
-@@ -678,17 +680,71 @@ nfp_tun_neigh_event_handler(struct notifier_block *nb, unsigned long event,
- 			rt = ip_route_output_key(dev_net(n->dev), &flow4);
- 			err = PTR_ERR_OR_ZERO(rt);
- 			if (err)
--				return NOTIFY_DONE;
-+				goto out;
- 
- 			ip_rt_put(rt);
- 		}
- 		nfp_tun_write_neigh(n->dev, app, &flow4, n, false, false);
- 	}
--#else
--	return NOTIFY_DONE;
- #endif /* CONFIG_INET */
-+out:
-+	nfp_tun_release_neigh_update_work(update_work);
-+}
- 
--	return NOTIFY_OK;
-+static struct nfp_neigh_update_work *
-+nfp_tun_alloc_neigh_update_work(struct nfp_app *app, struct neighbour *n)
-+{
-+	struct nfp_neigh_update_work *update_work;
-+
-+	update_work = kzalloc(sizeof(*update_work), GFP_ATOMIC);
-+	if (!update_work)
-+		return NULL;
-+
-+	INIT_WORK(&update_work->work, nfp_tun_neigh_update);
-+	neigh_hold(n);
-+	update_work->n = n;
-+	update_work->app = app;
-+
-+	return update_work;
-+}
-+
-+static int
-+nfp_tun_neigh_event_handler(struct notifier_block *nb, unsigned long event,
-+			    void *ptr)
-+{
-+	struct nfp_neigh_update_work *update_work;
-+	struct nfp_flower_priv *app_priv;
-+	struct netevent_redirect *redir;
-+	struct neighbour *n;
-+	struct nfp_app *app;
-+
-+	switch (event) {
-+	case NETEVENT_REDIRECT:
-+		redir = (struct netevent_redirect *)ptr;
-+		n = redir->neigh;
-+		break;
-+	case NETEVENT_NEIGH_UPDATE:
-+		n = (struct neighbour *)ptr;
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (n->tbl != ipv6_stub->nd_tbl && n->tbl != &arp_tbl)
-+#else
-+	if (n->tbl != &arp_tbl)
-+#endif
-+		return NOTIFY_DONE;
-+
-+	app_priv = container_of(nb, struct nfp_flower_priv, tun.neigh_nb);
-+	app = app_priv->app;
-+	update_work = nfp_tun_alloc_neigh_update_work(app, n);
-+	if (!update_work)
-+		return NOTIFY_DONE;
-+
-+	queue_work(system_highpri_wq, &update_work->work);
-+
-+	return NOTIFY_DONE;
- }
- 
- void nfp_tunnel_request_route_v4(struct nfp_app *app, struct sk_buff *skb)
-@@ -706,6 +762,7 @@ void nfp_tunnel_request_route_v4(struct nfp_app *app, struct sk_buff *skb)
- 	netdev = nfp_app_dev_get(app, be32_to_cpu(payload->ingress_port), NULL);
- 	if (!netdev)
- 		goto fail_rcu_unlock;
-+	dev_hold(netdev);
- 
- 	flow.daddr = payload->ipv4_addr;
- 	flow.flowi4_proto = IPPROTO_UDP;
-@@ -725,13 +782,16 @@ void nfp_tunnel_request_route_v4(struct nfp_app *app, struct sk_buff *skb)
- 	ip_rt_put(rt);
- 	if (!n)
- 		goto fail_rcu_unlock;
-+	rcu_read_unlock();
-+
- 	nfp_tun_write_neigh(n->dev, app, &flow, n, false, true);
- 	neigh_release(n);
--	rcu_read_unlock();
-+	dev_put(netdev);
- 	return;
- 
- fail_rcu_unlock:
- 	rcu_read_unlock();
-+	dev_put(netdev);
- 	nfp_flower_cmsg_warn(app, "Requested route not found.\n");
- }
- 
-@@ -749,6 +809,7 @@ void nfp_tunnel_request_route_v6(struct nfp_app *app, struct sk_buff *skb)
- 	netdev = nfp_app_dev_get(app, be32_to_cpu(payload->ingress_port), NULL);
- 	if (!netdev)
- 		goto fail_rcu_unlock;
-+	dev_hold(netdev);
- 
- 	flow.daddr = payload->ipv6_addr;
- 	flow.flowi6_proto = IPPROTO_UDP;
-@@ -766,14 +827,16 @@ void nfp_tunnel_request_route_v6(struct nfp_app *app, struct sk_buff *skb)
- 	dst_release(dst);
- 	if (!n)
- 		goto fail_rcu_unlock;
-+	rcu_read_unlock();
- 
- 	nfp_tun_write_neigh(n->dev, app, &flow, n, true, true);
- 	neigh_release(n);
--	rcu_read_unlock();
-+	dev_put(netdev);
- 	return;
- 
- fail_rcu_unlock:
- 	rcu_read_unlock();
-+	dev_put(netdev);
- 	nfp_flower_cmsg_warn(app, "Requested IPv6 route not found.\n");
- }
- 
--- 
-2.34.1
+This part is correct/what I meant ;)
+
+Cheers,
+
+Paolo
 
 
