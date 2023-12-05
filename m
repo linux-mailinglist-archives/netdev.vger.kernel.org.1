@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-54124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72200806097
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:20:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9761806094
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:19:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FD09282039
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:20:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A7D1F217C2
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E1A6D1C0;
-	Tue,  5 Dec 2023 21:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A036E5AB;
+	Tue,  5 Dec 2023 21:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ngctO9b7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nbIP7610"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127F9A5
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:19:45 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E20818F
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:19:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701811185; x=1733347185;
+  t=1701811183; x=1733347183;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tdHTPl6Xff2eyxWTBObIuAaJFjOonTxjeLKInTiGvfM=;
-  b=ngctO9b7tnikBiNwmIUSorCYdZ9+p+iunGLu/ESg95wJsEuN1QPcDTGC
-   dTYI9zFa8B7ySL8NoDGeBfEawA/n37mTlAYbdauTFzFpe1p5KfALCJQ3w
-   swSRWoZua2mfKO2SMd/wan8Nw2EnJS6yH+PNbDzu8apJbrBB25OpzxYF0
-   /8IDRKbChDPHLiIUM+Jekz/5kDgAk33MyWrO946+xSUXFkpoF/kufLEpP
-   vy8/kbRNhT0WtlcfAmJT5CSSPKqM+UUFmAEVeeHYBgRPsM6W6T1L/Rjue
-   Xaxnj776FptF08B6FJTgutnK1k8HDZiYcSmKxIJoWggDAOo/vzO69Z3yH
+  bh=dS2Z6NAmDO2pR3wC3e2gMXozh2cakb9BTOE8Qro6mOE=;
+  b=nbIP7610HDn8Q59EEJ6VQEOPOqRmAbX9lHYSSAXPjArK2oZIxvxmLbuH
+   GnkHvpQPmbLoBZ0fg9eq0esVTig0MxUIdD2QiKr+6xx5EBrrrxq5JAXOK
+   MT8upxTZhS6Gch3XEjjUOT7pX/z5OA1FwQT+zy2NmFkRbyhSoSEN7hJaI
+   gRJHeKnZ0A/itZPpO/ioZjExG7/JmgJrMNyJmaYhsgBZOjY1i738+Dde9
+   oy/RsDKfov9kV6fkdhxyUWVnZaYySyeg1pCmr6PQVnxm0GAVZ2VUaVka3
+   ZqVDrkRI//VG+ZmvKDvHYjPBY4kQj+eTfd7k9c2mIBlT8YJTaTHlTdeq+
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="393693804"
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="393693810"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="393693804"
+   d="scan'208";a="393693810"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:19:26 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="894510101"
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="894510104"
 X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="894510101"
+   d="scan'208";a="894510104"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga004.jf.intel.com with ESMTP; 05 Dec 2023 13:19:26 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -48,14 +48,14 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+Cc: Marcin Szycik <marcin.szycik@linux.intel.com>,
 	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>,
+	horms@kernel.org,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 1/4] ice: change vfs.num_msix_per to vf->num_msix
-Date: Tue,  5 Dec 2023 13:19:12 -0800
-Message-ID: <20231205211918.2123019-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 2/4] ice: Restore fix disabling RX VLAN filtering
+Date: Tue,  5 Dec 2023 13:19:13 -0800
+Message-ID: <20231205211918.2123019-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231205211918.2123019-1-anthony.l.nguyen@intel.com>
 References: <20231205211918.2123019-1-anthony.l.nguyen@intel.com>
@@ -67,80 +67,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
 
-vfs::num_msix_per should be only used as default value for
-vf->num_msix. For other use cases vf->num_msix should be used, as VF can
-have different MSI-X amount values.
+Fix setting dis_rx_filtering depending on whether port vlan is being
+turned on or off. This was originally fixed in commit c793f8ea15e3 ("ice:
+Fix disabling Rx VLAN filtering with port VLAN enabled"), but while
+refactoring ice_vf_vsi_init_vlan_ops(), the fix has been lost. Restore the
+fix along with the original comment from that change.
 
-Fix incorrect register index calculation. vfs::num_msix_per and
-pf->sriov_base_vector shouldn't be used after implementation of changing
-MSI-X amount on VFs. Instead vf->first_vector_idx should be used, as it
-is storing value for first irq index.
+Also delete duplicate lines in ice_port_vlan_on().
 
-Fixes: fe1c5ca2fe76 ("ice: implement num_msix field per VF")
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Fixes: 2946204b3fa8 ("ice: implement bridge port vlan")
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_sriov.c    | 7 +------
- drivers/net/ethernet/intel/ice/ice_virtchnl.c | 5 ++---
- 2 files changed, 3 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 2a5e6616cc0a..e1494f24f661 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -374,16 +374,11 @@ static void ice_ena_vf_mappings(struct ice_vf *vf)
-  */
- int ice_calc_vf_reg_idx(struct ice_vf *vf, struct ice_q_vector *q_vector)
- {
--	struct ice_pf *pf;
--
- 	if (!vf || !q_vector)
- 		return -EINVAL;
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+index d7b10dc67f03..80dc4bcdd3a4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+@@ -32,7 +32,6 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
+ 		/* setup outer VLAN ops */
+ 		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
+ 		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
+-		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
  
--	pf = vf->pf;
--
- 	/* always add one to account for the OICR being the first MSIX */
--	return pf->sriov_base_vector + pf->vfs.num_msix_per * vf->vf_id +
--		q_vector->v_idx + 1;
-+	return vf->first_vector_idx + q_vector->v_idx + 1;
+ 		/* setup inner VLAN ops */
+ 		vlan_ops = &vsi->inner_vlan_ops;
+@@ -47,8 +46,13 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
+ 
+ 		vlan_ops->set_port_vlan = ice_vsi_set_inner_port_vlan;
+ 		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
+-		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
+ 	}
++
++	/* all Rx traffic should be in the domain of the assigned port VLAN,
++	 * so prevent disabling Rx VLAN filtering
++	 */
++	vlan_ops->dis_rx_filtering = noop_vlan;
++
+ 	vlan_ops->ena_rx_filtering = ice_vsi_ena_rx_vlan_filtering;
  }
  
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index de11b3186bd7..1c7b4ded948b 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -1523,7 +1523,6 @@ static int ice_vc_cfg_irq_map_msg(struct ice_vf *vf, u8 *msg)
- 	u16 num_q_vectors_mapped, vsi_id, vector_id;
- 	struct virtchnl_irq_map_info *irqmap_info;
- 	struct virtchnl_vector_map *map;
--	struct ice_pf *pf = vf->pf;
- 	struct ice_vsi *vsi;
- 	int i;
+@@ -77,6 +81,8 @@ static void ice_port_vlan_off(struct ice_vsi *vsi)
+ 		vlan_ops->del_vlan = ice_vsi_del_vlan;
+ 	}
  
-@@ -1535,7 +1534,7 @@ static int ice_vc_cfg_irq_map_msg(struct ice_vf *vf, u8 *msg)
- 	 * there is actually at least a single VF queue vector mapped
- 	 */
- 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states) ||
--	    pf->vfs.num_msix_per < num_q_vectors_mapped ||
-+	    vf->num_msix < num_q_vectors_mapped ||
- 	    !num_q_vectors_mapped) {
- 		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
- 		goto error_param;
-@@ -1557,7 +1556,7 @@ static int ice_vc_cfg_irq_map_msg(struct ice_vf *vf, u8 *msg)
- 		/* vector_id is always 0-based for each VF, and can never be
- 		 * larger than or equal to the max allowed interrupts per VF
- 		 */
--		if (!(vector_id < pf->vfs.num_msix_per) ||
-+		if (!(vector_id < vf->num_msix) ||
- 		    !ice_vc_isvalid_vsi_id(vf, vsi_id) ||
- 		    (!vector_id && (map->rxq_map || map->txq_map))) {
- 			v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++	vlan_ops->dis_rx_filtering = ice_vsi_dis_rx_vlan_filtering;
++
+ 	if (!test_bit(ICE_FLAG_VF_VLAN_PRUNING, pf->flags))
+ 		vlan_ops->ena_rx_filtering = noop_vlan;
+ 	else
+@@ -141,7 +147,6 @@ void ice_vf_vsi_init_vlan_ops(struct ice_vsi *vsi)
+ 		&vsi->outer_vlan_ops : &vsi->inner_vlan_ops;
+ 
+ 	vlan_ops->add_vlan = ice_vsi_add_vlan;
+-	vlan_ops->dis_rx_filtering = ice_vsi_dis_rx_vlan_filtering;
+ 	vlan_ops->ena_tx_filtering = ice_vsi_ena_tx_vlan_filtering;
+ 	vlan_ops->dis_tx_filtering = ice_vsi_dis_tx_vlan_filtering;
+ }
 -- 
 2.41.0
 
