@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-53899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6AE8051DA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:17:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B964A8051EC
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:21:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 111FE1F21366
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:17:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E527E1C2091F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5947255C1F;
-	Tue,  5 Dec 2023 11:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DED556B62;
+	Tue,  5 Dec 2023 11:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WVU53oZY"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HbYuqE6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F41311F
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 03:17:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701775026; x=1733311026;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=H271sEIBAGP5MA7yccwYLYdOp2ywSPd2T2VYfsYelW8=;
-  b=WVU53oZYk3yfTs4+CJloP+K79XLqnWkr6fmI3rj0PZ0FfV1eBvQvx/uV
-   iB7xW4wPXIvLd1SWIs3C7FekuOUw+r3MfI8UxAfOzjXJ6VHeoDdsrSEwL
-   nqV67mtWGDi1gx1IDrUh/msYh0/ghO5TeHscG0uEAqserEIKIujpfl75r
-   nfx0DdI4wSlkQkELJz1HNtnS6p8dkut9s17+YXevklCViwepfPay0T7Ex
-   U8gsAGyFaB34F4FY8/W3UWFnDDDKl+NFJ/s7ysCUUuoCi1V5Xr5HjL8Jb
-   /TIPpWBhXZUDTnBO/e8afm48G4cFnY7OAHMBXpdzYe0cuIoMbzC3HhOWg
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="397775470"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="397775470"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:17:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="841421178"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="841421178"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.214.215.245]) ([10.214.215.245])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:17:02 -0800
-Message-ID: <c55d299b-ff6b-4da6-bc9f-931d7cd5b2f8@linux.intel.com>
-Date: Tue, 5 Dec 2023 13:16:41 +0200
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E32D39A
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 03:21:15 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2c9eca5bbaeso39623521fa.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 03:21:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701775274; x=1702380074; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WqRNVRWGQ5rja2qPmMz/REMdEBR0XVbaI4jT2CfbfAA=;
+        b=HbYuqE6pX6nXFsTb0wV1EZk2DOVj64/dA7KL30f8Bw3s44T/ONT2THRrXNp9WQ7jtg
+         azS+fHacig9sZVWeyDUYXRcdNwT5NSLG3eAg+kpeKgmAAOmdaco5gvw8bBqzBBqggoBV
+         BdbqKU+CspYreIjtRtQZ+loVqKCQ8zfTo+3tbAFZzezQwfgI3ugwFwoxGJTHQH8XPFQG
+         fzKUSYk/egT/EMDo/sCAUEjthv0pe9GiDU42Yo36GWJrqtVgrhBw82OuOKEWnT+fcf3U
+         9A96t9HLTYDj7+Fp80onBEcyAzyCKM8mfAzLsOB6xwgUGzk4lHqsNdR1tlBYAHsP56Xe
+         G+kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701775274; x=1702380074;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WqRNVRWGQ5rja2qPmMz/REMdEBR0XVbaI4jT2CfbfAA=;
+        b=Q1edQ7n6Ppb/BpK/80Hl4t65Y4XKEE70/eln3afT+VJ4aMcVNrGCGTzMq1nz/7PKsv
+         h3IZw19Vbn1eSBSEfqzqmbD5ANJEgf0D58MqgZRcvVhk7wxPGL/d5/mJLSIElT0gS/wI
+         6GeZtEfT+OZ2f8uF4zlnzTQ8605S1/3aVDJh2ip9e6RIQDKWygG+NsKztkfGN+vszaGC
+         xJ8A+JFpHnWqr89sCrCsmgSJHWFvh2OeW9bREVk5jgdcZD25pf8iryOhoKQULBHfrMFI
+         AKNKhQFXJjf09aGoKvWKt1oNwNXkZ9Z5RhpiA9KRlqcGbEHLedJ/jRzEn/Wi5/vw5/9O
+         k8KA==
+X-Gm-Message-State: AOJu0YzEoCAi4LHZDgOHIAc0U8XyweV23Woxn3xqoPqiZ0+4LY4Sh3jJ
+	i/415OvJkrCCL5orWrNRBewmA/uWPF1EinRgYDs=
+X-Google-Smtp-Source: AGHT+IFYtXDdF/+88+9jIU9GLaXK1TKmpbgAQr4tKxdYeXi0so4i7kp2pDZFtK6Nxua3TYnzqO/nnA==
+X-Received: by 2002:a2e:9906:0:b0:2ca:388:2ae4 with SMTP id v6-20020a2e9906000000b002ca03882ae4mr675008lji.40.1701775273934;
+        Tue, 05 Dec 2023 03:21:13 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id s19-20020a170906355300b00a0949d4f637sm6508449eja.222.2023.12.05.03.21.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 03:21:13 -0800 (PST)
+Date: Tue, 5 Dec 2023 12:21:12 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: core: synchronize link-watch when carrier is
+ queried
+Message-ID: <ZW8HqIgkRwsicjNR@nanopsycho>
+References: <20231204214706.303c62768415.I1caedccae72ee5a45c9085c5eb49c145ce1c0dd5@changeid>
+ <ZW7gMO9YNjP7j4vj@nanopsycho>
+ <48f260af66acc811d97eb64ff1b04ecce5893755.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 08/13] igc: field prep
- conversion
-Content-Language: en-US
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: Julia Lawall <Julia.Lawall@inria.fr>, netdev@vger.kernel.org,
- Sasha Neftin <sasha.neftin@intel.com>,
- Marcin Szycik <marcin.szycik@linux.intel.com>
-References: <20231121211921.19834-1-jesse.brandeburg@intel.com>
- <20231121211921.19834-9-jesse.brandeburg@intel.com>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20231121211921.19834-9-jesse.brandeburg@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <48f260af66acc811d97eb64ff1b04ecce5893755.camel@sipsolutions.net>
 
-On 11/21/2023 23:19, Jesse Brandeburg wrote:
-> Refactor igc driver to use FIELD_PREP(), which reduces lines of code
-> and adds clarity of intent.
-> 
-> This code was generated by the following coccinelle/spatch script and
-> then manually repaired in a later patch.
-> 
-> @prep@
-> constant shift,mask;
-> expression a;
-> @@
-> -((a << shift) & mask)
-> +FIELD_PREP(mask, a)
-> 
-> Cc: Julia Lawall <Julia.Lawall@inria.fr>
-> Cc: Sasha Neftin <sasha.neftin@intel.com>
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+Tue, Dec 05, 2023 at 11:28:32AM CET, johannes@sipsolutions.net wrote:
+>On Tue, 2023-12-05 at 09:32 +0100, Jiri Pirko wrote:
+>> > 
+>> > +	/* Synchronize the carrier state so we don't report a state
+>> > +	 * that we're not actually going to honour immediately; if
+>> > +	 * the driver just did a carrier off->on transition, we can
+>> > +	 * only TX if link watch work has run, but without this we'd
+>> > +	 * already report carrier on, even if it doesn't work yet.
+>> > +	 */
+>> 
+>> This comment is a bit harder to understand for me, but I eventually did
+>> get it :)
+>
+>Do you want to propose different wording with your understanding? :)
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Would not be better I'm afraid :)
+
+>
+>> Patch looks fine to me.
+>
+>Thanks :)
+>
+>johannes
 
