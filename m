@@ -1,69 +1,82 @@
-Return-Path: <netdev+bounces-53925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418C6805382
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:52:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904A2805387
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEFA52813B1
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:52:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B031C20DE8
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A704859E2A;
-	Tue,  5 Dec 2023 11:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13C159E3A;
+	Tue,  5 Dec 2023 11:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="o4IWNUIK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fGyFDt+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391BB135
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 03:51:56 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c9ea37ac87so46395671fa.3
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 03:51:56 -0800 (PST)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB68AC3;
+	Tue,  5 Dec 2023 03:52:38 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1975fe7befso601336066b.2;
+        Tue, 05 Dec 2023 03:52:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701777114; x=1702381914; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701777157; x=1702381957; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=saCupLAeyujtNtMuwV42nMPC/GftoIxNg1bwcti056Y=;
-        b=o4IWNUIKrsB6SF389bBczu6v5bXGLis2JvfShLPXnpu4st4RV0i5as0rAe/8Ad/y1+
-         wk3Yv3dW9ZIfxSZG5Q6JMrxgtgPb0n8QFfYQrVnJeAHyw1vSUWvEwKCA1PRTy43b+4Tr
-         7UdIzVU+iIWjwQGr7r7ALWfFY5UWEMlxYWZjpL4RX03TB1MResJwO18PBDe7RwFztJZW
-         9Nihx7cUXkr6u1GN8KH4959srfcucgGyX3Zf3VE1bVWB9iVz7RG3CceQyOqS5dIPqSu9
-         XIaXavOkvzMalQuRSo/SUXeyqSS7cow6O/81pJ3lCv+2RYspriFc6dyvCDtoe4XPdZWt
-         CYwQ==
+        bh=yQnio+BjHch7uekOs0EbRaR6+xPg48w0mlLLI/zKaaU=;
+        b=fGyFDt+2zfMoMGFkNb+wIqez0LxE+nJA6J0daN/LW4CpjKTBTpG5Gt9AUaEY4VWKFc
+         Y/b4lLuuer2jiUCNf/A+rZ4+Ay+AWp7mxKScBDRdynDcFafxfvQLu0WouwBaD3pxB0+q
+         aawAAXulKODe7QHWNAA/b2QfBM9BeKtbDNqK9fJkvRC//82r8X+0hWlt9OBbo++1dUMB
+         a/d6//g4g2DGrP4PZ68TOhkGBbGkDv2L7mFDK7JcGg7PKggjMf4ZQCJeBhcOdVgSXhL/
+         mSclAgN9uAVIMcf+V6YxYS/j4R9AQFoCyrip7JxinLKBrybeAi+6YcUKWTncNmGpC4Hu
+         6hUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701777114; x=1702381914;
+        d=1e100.net; s=20230601; t=1701777157; x=1702381957;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=saCupLAeyujtNtMuwV42nMPC/GftoIxNg1bwcti056Y=;
-        b=SMAqaje0JC3Z9MKxQmIE+v1hVIuMcNU8fYOgS4o8FHg33OAu8ugieffWL72RxEHLOg
-         3n5ZzimAPnXZX9FF45PcQAHUsvwVL2RIIh5/gmVY4kKXJbV2x3/zq/NAF/edJpyFBzNT
-         GtFr+lwwsn4DqfjAioAkBH7Fgh0uXWlDqb+PpdCKmDFkppnluacGL5vdGI52i2JENKff
-         Qq0rMBcouV04alfP2ERU87crUuZJ8vq+YdmV1Y23EWk51DckYbe1ptDWeNEFsxvix/7I
-         9yqnCF0I700BWzUghCXtTui+N7DN0ES/O/eyPcIBm51C/LLZ8Q6vYOZkTbNhhPn+z28i
-         ldTw==
-X-Gm-Message-State: AOJu0YxAyVU2lPMHD3A9BhqT3eMqLzmcsKoZIxVG/OZHco/ED+8XIpxc
-	FJ/YNmnL5CKIlb0lySTV2UjLcw==
-X-Google-Smtp-Source: AGHT+IFk0VqlKcMR+pWTvLMHa+VkWjOgVcf1cpUfyU+hUxBj2azQElVybyX81VQExlEUsS6PI8t0Ww==
-X-Received: by 2002:a2e:9c0c:0:b0:2ca:69:d65c with SMTP id s12-20020a2e9c0c000000b002ca0069d65cmr1694569lji.91.1701777114501;
-        Tue, 05 Dec 2023 03:51:54 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id uz14-20020a170907118e00b009e5db336137sm6532982ejb.196.2023.12.05.03.51.53
+        bh=yQnio+BjHch7uekOs0EbRaR6+xPg48w0mlLLI/zKaaU=;
+        b=izdRUqlLbiT921wq7u3sJQ35clLmjmc1cRkjllg7ySibdmDDd9hCavXZ2VRIYORofi
+         1aIa1FBMbTEfCtIxhhGb6PZzjHBH8eKBagiCuNp0CuKj1wFaBxm1Q7nNKgnUausGBDf2
+         QMcVpe9EcCRj4VIlYM66EWIZdsd/Z0C1vFH2fU5XWQY13zUEW9GV4W66gVizdl+4Op+0
+         x8uCiZB98bihz/181/UT81WhZZ3H5/cS2RDhsQigJ4BUThNmz227f42/FBSU/SQ+diNf
+         jnEFLxhSbTYEUteEcbmqFOz2SZUCzkHjPQOSNJrfjM1U2bZyauTDj2NMTvS80vzKW5VL
+         Kqgg==
+X-Gm-Message-State: AOJu0YzLp3ohxMJI9ZuniHxCxOiKmVRCLym9g9QLcOEBbnkJAnDeSgTc
+	DNwZC6C0FbUm7hAtXnjt9CA=
+X-Google-Smtp-Source: AGHT+IFbcUHHGMa0y7mPKTyHnJVqbuoOrcBU5Fgp7HSueg3Asjnj4OKHJ4FateR0JcHkUAKp1ewXJQ==
+X-Received: by 2002:a17:907:8c8:b0:a0e:d93a:3202 with SMTP id zu8-20020a17090708c800b00a0ed93a3202mr323045ejb.4.1701777157222;
+        Tue, 05 Dec 2023 03:52:37 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id x12-20020a170906298c00b00a1cbb055575sm451602eje.180.2023.12.05.03.52.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 03:51:54 -0800 (PST)
-Date: Tue, 5 Dec 2023 12:51:52 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, marcelo.leitner@gmail.com,
-	vladbu@nvidia.com
-Subject: Re: [PATCH net-next v2 5/5] net/sched: cls_api: conditional
- notification of events
-Message-ID: <ZW8O2KKxMM7ySr14@nanopsycho>
-References: <20231204203907.413435-1-pctammela@mojatatu.com>
- <20231204203907.413435-6-pctammela@mojatatu.com>
+        Tue, 05 Dec 2023 03:52:37 -0800 (PST)
+Date: Tue, 5 Dec 2023 13:52:34 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
+ MDIO device
+Message-ID: <20231205115234.7ntjvymurot5nnak@skbuf>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,16 +85,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231204203907.413435-6-pctammela@mojatatu.com>
+In-Reply-To: <20231205103559.9605-7-fancer.lancer@gmail.com>
+ <20231205103559.9605-7-fancer.lancer@gmail.com>
 
-Mon, Dec 04, 2023 at 09:39:07PM CET, pctammela@mojatatu.com wrote:
->As of today tc-filter/chain events are unconditionally built and sent to
->RTNLGRP_TC. As with the introduction of tc_should_notify we can check
->before-hand if they are really needed. This will help to alleviate
->system pressure when filters are concurrently added without the rtnl
->lock as in tc-flower.
->
->Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
+> If the DW XPCS MDIO devices are either left unmasked for being auto-probed
+> or explicitly registered in the MDIO subsystem by means of the
+> mdiobus_register_board_info() method
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+mdiobus_register_board_info() has exactly one caller, and that is
+dsa_loop. I don't understand the relevance of it w.r.t. Synopsys XPCS.
+I'm reading the patches in order from the beginning.
+
+> there is no point in creating the dummy MDIO device instance in order
+
+Why dummy? There's nothing dummy about the mdio_device. It's how the PCS
+code accesses the hardware.
+
+> to get the DW XPCS handler since the MDIO core subsystem will create
+> the device during the MDIO bus registration procedure.
+
+It won't, though? Unless someone is using mdiobus_register_board_info()
+possibly, but who does that?
+
+> All what needs to be done is to just reuse the MDIO-device instance
+> available in the mii_bus.mdio_map array (using some getter for it
+> would look better though). It shall prevent the XPCS devices been
+> accessed over several MDIO-device instances.
+> 
+> Note since the MDIO-device instance might be retrieved from the MDIO-bus
+> map array its reference counter shall be increased. If the MDIO-device
+> instance is created in the xpcs_create_mdiodev() method its reference
+> counter will be already increased. So there is no point in toggling the
+> reference counter in the xpcs_create() function. Just drop it from there.
+> 
+> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+> ---
+
+Sorry, because the commit log lost me at the "context presentation" stage,
+I failed to understand the "what"s and the "why"s.
+
+Are you basically trying to add xpcs support on top of an mdio_device
+where the mdio_device_create() call was made externally to the xpcs code,
+through mdiobus_register_board_info() and mdiobus_setup_mdiodev_from_board_info()?
 
