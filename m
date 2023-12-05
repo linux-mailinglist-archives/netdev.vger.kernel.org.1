@@ -1,130 +1,78 @@
-Return-Path: <netdev+bounces-53750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8D9804571
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:02:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D006180457A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:06:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1AD1F2134C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71661F21203
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68206611E;
-	Tue,  5 Dec 2023 03:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fVuqFIzS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF276110;
+	Tue,  5 Dec 2023 03:05:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD5EA59;
-	Tue,  5 Dec 2023 03:02:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF645C433C7;
-	Tue,  5 Dec 2023 03:02:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701745340;
-	bh=rYAvLElhLrYlUkvues4bA4R1RictnO/yOcXpUYdYVks=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fVuqFIzSjLzixcJ12Ryk9hSPWEFcz/y3xG0lSTzuYz7p4FSn8JRPW4YTFGdj8uS/4
-	 BWs191SWvN43pThiFXIRwAGW25Kt7ofO8YwXS2vqX8uKiWws3G9qNQtOyIq76h2PM5
-	 aJ/gvg1pBk6PwO3EN0qRyaTwuvsqXx3OXSUIshJ9sM/bxK7LXNmlgeINka8WQYTiuR
-	 p9WL/1pgzHMcw49Y35C4UkE7+5hbqyH6v9tNIZQrW3GKk1ZDiuiiW0eaHrY02cyei3
-	 /KoqcOSaLQ7bw9M6CmxcsWB5x7VUHlasTUP2AtTU4Vj93E4YUK3lf5u+uLhxQ/I15D
-	 a1BnvFC4c7gxg==
-Date: Mon, 4 Dec 2023 19:02:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Michalik, Michal" <michal.michalik@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Kubalewski,
- Arkadiusz" <arkadiusz.kubalewski@intel.com>, "jonathan.lemon@gmail.com"
- <jonathan.lemon@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>, poros
- <poros@redhat.com>, "Olech, Milena" <milena.olech@intel.com>, mschmidt
- <mschmidt@redhat.com>, "linux-clk@vger.kernel.org"
- <linux-clk@vger.kernel.org>, "bvanassche@acm.org" <bvanassche@acm.org>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>
-Subject: Re: [PATCH RFC net-next v4 2/2] selftests/dpll: add DPLL system
- integration selftests
-Message-ID: <20231204190218.13d4e8cc@kernel.org>
-In-Reply-To: <CH3PR11MB841424C185225EC7EB9DBE4DE386A@CH3PR11MB8414.namprd11.prod.outlook.com>
-References: <20231123105243.7992-1-michal.michalik@intel.com>
-	<20231123105243.7992-3-michal.michalik@intel.com>
-	<20231129093951.3be1bd8b@kernel.org>
-	<CH3PR11MB84143BBDDE886E6479146365E382A@CH3PR11MB8414.namprd11.prod.outlook.com>
-	<20231130225127.1b56ffca@kernel.org>
-	<CH3PR11MB84146024E32844E0931039ACE381A@CH3PR11MB8414.namprd11.prod.outlook.com>
-	<20231201115259.37821ed5@kernel.org>
-	<CH3PR11MB841424C185225EC7EB9DBE4DE386A@CH3PR11MB8414.namprd11.prod.outlook.com>
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD3EBF;
+	Mon,  4 Dec 2023 19:05:50 -0800 (PST)
+X-UUID: b1ae75138d6e4ab4b5b51354363fe8e4-20231205
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:8ce5544b-bf9c-4849-94e4-0899eb8f545b,IP:5,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-15
+X-CID-INFO: VERSION:1.1.33,REQID:8ce5544b-bf9c-4849-94e4-0899eb8f545b,IP:5,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:364b77b,CLOUDID:805d4afd-4a48-46e2-b946-12f04f20af8c,B
+	ulkID:231204205248UVJ6B54Y,BulkQuantity:4,Recheck:0,SF:24|17|19|44|66|102,
+	TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,COL:0,
+	OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-UUID: b1ae75138d6e4ab4b5b51354363fe8e4-20231205
+X-User: chentao@kylinos.cn
+Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1111733163; Tue, 05 Dec 2023 11:05:43 +0800
+Message-ID: <d8b80a17-df0b-459c-ae0a-397693f6a443@kylinos.cn>
+Date: Tue, 5 Dec 2023 11:05:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 iwl-next] i40e: Use correct buffer size in
+ i40e_dbg_command_read
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jeffrey.t.kirsher@intel.com, shannon.nelson@amd.com,
+ kunwu.chan@hotmail.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Simon Horman <horms@kernel.org>
+References: <20231204014455.2444734-1-chentao@kylinos.cn>
+ <81dbf657-6513-4a8c-a0a9-5a98951c8356@intel.com>
+Content-Language: en-US
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <81dbf657-6513-4a8c-a0a9-5a98951c8356@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 4 Dec 2023 12:44:44 +0000 Michalik, Michal wrote:
-> > Hm, FWIW I manged to get virtme-ng to work (I was pointing it at a
-> > vmlinux not bzImage which it expects). But vmtest is still unhappy.
-> >=20
-> > $ vmtest -k build/vmlinux "echo Running!" =20
-> > =3D> vmlinux
-> > =3D=3D=3D> Booting =20
-> > Failed to connect QGA
-> >=20
-> > Caused by:
-> >     Timed out waiting for QGA connection
-> >  =20
->=20
-> I have seen this before I got the proper qemu version, actually I
-> compiled it from scratch:
->  $ qemu-system-x86_64 --version
->   QEMU emulator version 8.1.3
->=20
-> Which version of qemu are you using?
+Hi Alexander,
+Thanks for your reply.
 
-7.2.6
+It's my bad, I'll follow your suggestion in v4 patch:
+1. keep 'buf' as it defined before.
+2. resolve memory leak as your suggestion.
+3. make 'bytes_not_copied' as a return value for error path.
 
-Building Qemu from source won't work for me if the CI is supposed to
-depend on it. I asked Daniel on GH, let's see what he says.
-
-> Btw. I agree that logs for vmtest are not very helpful, the
-> .vmtest.log file is basically empty for me every time.
->=20
-> >=20
-> > Are you on Ubuntu? I'm on Fedora. Maybe it has some distro deps :(
-> >  =20
->=20
-> I'm using Rocky, so kind of similar to Fedora.
->   $ cat /etc/rocky-release
->   Rocky Linux release 9.2 (Blue Onyx)
->=20
-> Also, installed qemu-guest-agent and edk2-ovmf packages according to
-> vmtest instructions. Have you installed those?
-
-Yup, I have those.
-
-> > Calling out to YNL, manipulating network namespaces, manipulating
-> > netdevsim instances, etc - will be fairly common for a lot of networking
-> > tests.
-> >=20
-> > There's already some code in tools/testing/selftests/bpf/test_offload.py
-> > which is likely Python-incompetent cause I wrote it. But much like YNL
-> > it'd be nice if it was available for new tests for reuse.
-> >  =20
->=20
-> I will familiarize myself with that - thanks for pointing that out.
-
-To be clear - I'm not claiming that test_offload.py is beautiful=20
-code :) Just that the problem of accessing shared code exists more
-broadly.
-
-> > Can we somehow "add to python's library search path" or some such? =20
->=20
-> Yeah, we might consider using PYTHONPATH in this "new common lib place":
-> https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
-
-=F0=9F=91=8D=EF=B8=8F
+Thanks again,
+Kunwu
+On 2023/12/4 20:51, Alexander Lobakin wrote:
+> This is unneeded.
 
