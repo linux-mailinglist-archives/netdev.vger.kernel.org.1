@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-54007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4620805972
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:05:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE117805974
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:05:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C0EC281F50
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:05:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5335B21094
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE3063DEA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA86063DF4;
 	Tue,  5 Dec 2023 16:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="y4VDeulw"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="NMX9GK6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947861AB
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:04:34 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bf32c0140so3117121e87.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:04:34 -0800 (PST)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA3F1B6
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:04:36 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bf1e32571so3323316e87.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:04:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701792273; x=1702397073; darn=vger.kernel.org;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701792274; x=1702397074; darn=vger.kernel.org;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=xMdddzjnP7GhllYxAe3T7JpoJBJY99oU2geak9/1xp4=;
-        b=y4VDeulw1++WSnIp47WA/ZTjrSVS/ZvFiJ+tObHo/uWvNBUmiymYL0rsvrC856quBr
-         6zwF5cWwWRywPvs0gbR1qN5M1gWQJ+Cay+n/aEZM9G2G/h2+ePCTsT4Tz7PfXcE+M9wo
-         kk9CnvIhGaD4TXTkNEdYp7PEdiHfyWJAJxsXbtYZTi8Xii5hhawUJLy+Qtl6clvYiUta
-         PcD//qqQmgSVCHjL77UjvMj4ny+ZPt/LN/zMCwCpfztYHxiEGU7pxEXPtNq+5x6hZaHA
-         z1ySC+w9RwsrMP0PcfZ8L1+g6hRJGNMy656ubrUyG2eplfEVMMDAUNxqutDWTCzUE6/c
-         15Ig==
+        bh=tBdLjc3B7qKl4y/0UG50f7tnGZ2PLAtrmTBWMvkt2bs=;
+        b=NMX9GK6+KJkzSA54+1RoUitaXxBvJ2lZ19c7HLRaecUrhvko7SegZqtWhznCcx8Ad4
+         TIQK5G52DeXW27XSvDo1ywmSwt9Mj0nb/S6DdYPNgiyVJYVWf/+H+stTMm9QYhP/8CzZ
+         R5Hn8PSxY4UHXLC3blqhmUE7/do5ooHllioblTcEzWjrc2OZoNZxCjFPXIK4fVDnMuFp
+         qWlWh4DJmB1bipko7/KKF/BhpvL/3DXzOTtd8nyFC8IGSNko0Mzpc9EONs3UvmiDEuEC
+         D91wFGn9owCIMitE0rtm/g6q7Bwu3jhgBy5vucOjfg0YJ9X05kr+bfoueQKr/ZKqbKFs
+         IXvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701792273; x=1702397073;
+        d=1e100.net; s=20230601; t=1701792274; x=1702397074;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xMdddzjnP7GhllYxAe3T7JpoJBJY99oU2geak9/1xp4=;
-        b=ltp2cxhl/uVcdSoaq8Da+mG+sveanxrmucjNC2Jv4Np6P4OxhzpwKeIOR250vdVh/G
-         B7Fj16aMOYqNnz7lMgXLAV7QwtI3pMKFlepojITt5mZkPDD/2AASGVG16EoDu15mN594
-         zrrF6w2jOZdGBO/K2CwMusFIEh/MVLi8le1635Hh7qUm1bKrEVIXCxrYHEnGBz8nNOy6
-         8Jbl3HDQzkf9G9KA9OVBL5PsMHyw4bI28uFkQYzJiD7JwRBZfxWZ90IwNgZb5n03mrhr
-         T2vk15t09dSgW2u2TfF53bIiCL2oOwt+h+1UJZgWblEHEbKQUsuv2zT24Fn6tj97/EtP
-         iF+w==
-X-Gm-Message-State: AOJu0YyNBkUyMeXcdVpom0UQMyC0QFHhp/FgDjHOHQUEF0+IdiBlyERB
-	Af9TZHtgWAKTR2iZhEzpLWgXag==
-X-Google-Smtp-Source: AGHT+IEGTeeaCbHmw9tSFVMcy/QvxMwR4eT5V9k4Hv4/lMnt31/C5T8F3mRURE/XzTdedO3l5Ayxuw==
-X-Received: by 2002:a05:6512:1327:b0:50b:d4c7:193c with SMTP id x39-20020a056512132700b0050bd4c7193cmr4459146lfu.24.1701792272900;
-        Tue, 05 Dec 2023 08:04:32 -0800 (PST)
+        bh=tBdLjc3B7qKl4y/0UG50f7tnGZ2PLAtrmTBWMvkt2bs=;
+        b=rFONx2FXzqa/HheXF9ZNKK7A6qQHFmDhhvDu1iOrdH4xEw5knmdgqnJQyamrebYIqa
+         du3NDVcrhGQPVEr1B1aceCl5k0vebAGjNbMqUr6ChwEy5SffCqNfDreHNBkir+RTzhJm
+         6OMftQGHBb2f9nwsL9L8OQtS54jeWAcyi3CWzfWMtObDugdtGXSLA8zRvNzp1q19lCsO
+         GQr4pLGMkevYjazVUppjxgJW9rkluocBP4TV9lCXMcQrZXp/zWq7Dot7ORThjTIPvNcB
+         pFnNRrfNTFy3cvdBVFNrr4UvrW+PdmHCWBTRSWjWUZuZ3eT4lbq8v7OTjLeUdWAgYANZ
+         clew==
+X-Gm-Message-State: AOJu0YxrUECVQ31T5jjLBRo7ryoQCnPttYQJMsDrJfst9kHj1aMLjTDs
+	QVKNFneiKzVMssKIJHe/rzK53Q==
+X-Google-Smtp-Source: AGHT+IHaEUCXN+o2v9oJcYcBIhbQbGkOVX7Fckw3vDqK7Qv790rJe/x1HArFlTmsTVDL67luGIFaqw==
+X-Received: by 2002:a19:711a:0:b0:50b:f6d2:8569 with SMTP id m26-20020a19711a000000b0050bf6d28569mr1593587lfc.129.1701792274094;
+        Tue, 05 Dec 2023 08:04:34 -0800 (PST)
 Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id h25-20020a056512055900b0050c0bbbe3d2sm171341lfl.256.2023.12.05.08.04.31
+        by smtp.gmail.com with ESMTPSA id h25-20020a056512055900b0050c0bbbe3d2sm171341lfl.256.2023.12.05.08.04.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 08:04:32 -0800 (PST)
+        Tue, 05 Dec 2023 08:04:33 -0800 (PST)
 From: Tobias Waldekranz <tobias@waldekranz.com>
 To: davem@davemloft.net,
 	kuba@kernel.org
@@ -60,9 +60,9 @@ Cc: andrew@lunn.ch,
 	f.fainelli@gmail.com,
 	olteanv@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 net-next 4/6] net: dsa: mv88e6xxx: Give each hw stat an ID
-Date: Tue,  5 Dec 2023 17:04:16 +0100
-Message-Id: <20231205160418.3770042-5-tobias@waldekranz.com>
+Subject: [PATCH v2 net-next 5/6] net: dsa: mv88e6xxx: Add "eth-mac" counter group support
+Date: Tue,  5 Dec 2023 17:04:17 +0100
+Message-Id: <20231205160418.3770042-6-tobias@waldekranz.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231205160418.3770042-1-tobias@waldekranz.com>
 References: <20231205160418.3770042-1-tobias@waldekranz.com>
@@ -75,189 +75,71 @@ MIME-Version: 1.0
 Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
-With the upcoming standard counter group support, we are no longer
-reading out the whole set of counters, but rather mapping a subset to
-the requested group.
-
-Therefore, create an enum with an ID for each stat, such that
-mv88e6xxx_hw_stats[] can be subscripted with a human-readable ID
-corresponding to the counter's name.
+Report the applicable subset of an mv88e6xxx port's counters using
+ethtool's standardized "eth-mac" counter group.
 
 Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 138 +++++++++++++++++--------------
- 1 file changed, 75 insertions(+), 63 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 39 ++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index bb18b47de49c..473f31761b26 100644
+index 473f31761b26..1a16698181fb 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -943,66 +943,78 @@ static int mv88e6xxx_stats_snapshot(struct mv88e6xxx_chip *chip, int port)
- 	return err;
+@@ -1319,6 +1319,44 @@ static void mv88e6xxx_get_ethtool_stats(struct dsa_switch *ds, int port,
+ 	mv88e6xxx_get_stats(chip, port, data);
  }
  
--static struct mv88e6xxx_hw_stat mv88e6xxx_hw_stats[] = {
--	{ "in_good_octets",		8, 0x00, STATS_TYPE_BANK0, },
--	{ "in_bad_octets",		4, 0x02, STATS_TYPE_BANK0, },
--	{ "in_unicast",			4, 0x04, STATS_TYPE_BANK0, },
--	{ "in_broadcasts",		4, 0x06, STATS_TYPE_BANK0, },
--	{ "in_multicasts",		4, 0x07, STATS_TYPE_BANK0, },
--	{ "in_pause",			4, 0x16, STATS_TYPE_BANK0, },
--	{ "in_undersize",		4, 0x18, STATS_TYPE_BANK0, },
--	{ "in_fragments",		4, 0x19, STATS_TYPE_BANK0, },
--	{ "in_oversize",		4, 0x1a, STATS_TYPE_BANK0, },
--	{ "in_jabber",			4, 0x1b, STATS_TYPE_BANK0, },
--	{ "in_rx_error",		4, 0x1c, STATS_TYPE_BANK0, },
--	{ "in_fcs_error",		4, 0x1d, STATS_TYPE_BANK0, },
--	{ "out_octets",			8, 0x0e, STATS_TYPE_BANK0, },
--	{ "out_unicast",		4, 0x10, STATS_TYPE_BANK0, },
--	{ "out_broadcasts",		4, 0x13, STATS_TYPE_BANK0, },
--	{ "out_multicasts",		4, 0x12, STATS_TYPE_BANK0, },
--	{ "out_pause",			4, 0x15, STATS_TYPE_BANK0, },
--	{ "excessive",			4, 0x11, STATS_TYPE_BANK0, },
--	{ "collisions",			4, 0x1e, STATS_TYPE_BANK0, },
--	{ "deferred",			4, 0x05, STATS_TYPE_BANK0, },
--	{ "single",			4, 0x14, STATS_TYPE_BANK0, },
--	{ "multiple",			4, 0x17, STATS_TYPE_BANK0, },
--	{ "out_fcs_error",		4, 0x03, STATS_TYPE_BANK0, },
--	{ "late",			4, 0x1f, STATS_TYPE_BANK0, },
--	{ "hist_64bytes",		4, 0x08, STATS_TYPE_BANK0, },
--	{ "hist_65_127bytes",		4, 0x09, STATS_TYPE_BANK0, },
--	{ "hist_128_255bytes",		4, 0x0a, STATS_TYPE_BANK0, },
--	{ "hist_256_511bytes",		4, 0x0b, STATS_TYPE_BANK0, },
--	{ "hist_512_1023bytes",		4, 0x0c, STATS_TYPE_BANK0, },
--	{ "hist_1024_max_bytes",	4, 0x0d, STATS_TYPE_BANK0, },
--	{ "sw_in_discards",		4, 0x10, STATS_TYPE_PORT, },
--	{ "sw_in_filtered",		2, 0x12, STATS_TYPE_PORT, },
--	{ "sw_out_filtered",		2, 0x13, STATS_TYPE_PORT, },
--	{ "in_discards",		4, 0x00, STATS_TYPE_BANK1, },
--	{ "in_filtered",		4, 0x01, STATS_TYPE_BANK1, },
--	{ "in_accepted",		4, 0x02, STATS_TYPE_BANK1, },
--	{ "in_bad_accepted",		4, 0x03, STATS_TYPE_BANK1, },
--	{ "in_good_avb_class_a",	4, 0x04, STATS_TYPE_BANK1, },
--	{ "in_good_avb_class_b",	4, 0x05, STATS_TYPE_BANK1, },
--	{ "in_bad_avb_class_a",		4, 0x06, STATS_TYPE_BANK1, },
--	{ "in_bad_avb_class_b",		4, 0x07, STATS_TYPE_BANK1, },
--	{ "tcam_counter_0",		4, 0x08, STATS_TYPE_BANK1, },
--	{ "tcam_counter_1",		4, 0x09, STATS_TYPE_BANK1, },
--	{ "tcam_counter_2",		4, 0x0a, STATS_TYPE_BANK1, },
--	{ "tcam_counter_3",		4, 0x0b, STATS_TYPE_BANK1, },
--	{ "in_da_unknown",		4, 0x0e, STATS_TYPE_BANK1, },
--	{ "in_management",		4, 0x0f, STATS_TYPE_BANK1, },
--	{ "out_queue_0",		4, 0x10, STATS_TYPE_BANK1, },
--	{ "out_queue_1",		4, 0x11, STATS_TYPE_BANK1, },
--	{ "out_queue_2",		4, 0x12, STATS_TYPE_BANK1, },
--	{ "out_queue_3",		4, 0x13, STATS_TYPE_BANK1, },
--	{ "out_queue_4",		4, 0x14, STATS_TYPE_BANK1, },
--	{ "out_queue_5",		4, 0x15, STATS_TYPE_BANK1, },
--	{ "out_queue_6",		4, 0x16, STATS_TYPE_BANK1, },
--	{ "out_queue_7",		4, 0x17, STATS_TYPE_BANK1, },
--	{ "out_cut_through",		4, 0x18, STATS_TYPE_BANK1, },
--	{ "out_octets_a",		4, 0x1a, STATS_TYPE_BANK1, },
--	{ "out_octets_b",		4, 0x1b, STATS_TYPE_BANK1, },
--	{ "out_management",		4, 0x1f, STATS_TYPE_BANK1, },
-+#define MV88E6XXX_HW_STAT_MAPPER(_fn)				    \
-+	_fn(in_good_octets,		8, 0x00, STATS_TYPE_BANK0), \
-+	_fn(in_bad_octets,		4, 0x02, STATS_TYPE_BANK0), \
-+	_fn(in_unicast,			4, 0x04, STATS_TYPE_BANK0), \
-+	_fn(in_broadcasts,		4, 0x06, STATS_TYPE_BANK0), \
-+	_fn(in_multicasts,		4, 0x07, STATS_TYPE_BANK0), \
-+	_fn(in_pause,			4, 0x16, STATS_TYPE_BANK0), \
-+	_fn(in_undersize,		4, 0x18, STATS_TYPE_BANK0), \
-+	_fn(in_fragments,		4, 0x19, STATS_TYPE_BANK0), \
-+	_fn(in_oversize,		4, 0x1a, STATS_TYPE_BANK0), \
-+	_fn(in_jabber,			4, 0x1b, STATS_TYPE_BANK0), \
-+	_fn(in_rx_error,		4, 0x1c, STATS_TYPE_BANK0), \
-+	_fn(in_fcs_error,		4, 0x1d, STATS_TYPE_BANK0), \
-+	_fn(out_octets,			8, 0x0e, STATS_TYPE_BANK0), \
-+	_fn(out_unicast,		4, 0x10, STATS_TYPE_BANK0), \
-+	_fn(out_broadcasts,		4, 0x13, STATS_TYPE_BANK0), \
-+	_fn(out_multicasts,		4, 0x12, STATS_TYPE_BANK0), \
-+	_fn(out_pause,			4, 0x15, STATS_TYPE_BANK0), \
-+	_fn(excessive,			4, 0x11, STATS_TYPE_BANK0), \
-+	_fn(collisions,			4, 0x1e, STATS_TYPE_BANK0), \
-+	_fn(deferred,			4, 0x05, STATS_TYPE_BANK0), \
-+	_fn(single,			4, 0x14, STATS_TYPE_BANK0), \
-+	_fn(multiple,			4, 0x17, STATS_TYPE_BANK0), \
-+	_fn(out_fcs_error,		4, 0x03, STATS_TYPE_BANK0), \
-+	_fn(late,			4, 0x1f, STATS_TYPE_BANK0), \
-+	_fn(hist_64bytes,		4, 0x08, STATS_TYPE_BANK0), \
-+	_fn(hist_65_127bytes,		4, 0x09, STATS_TYPE_BANK0), \
-+	_fn(hist_128_255bytes,		4, 0x0a, STATS_TYPE_BANK0), \
-+	_fn(hist_256_511bytes,		4, 0x0b, STATS_TYPE_BANK0), \
-+	_fn(hist_512_1023bytes,		4, 0x0c, STATS_TYPE_BANK0), \
-+	_fn(hist_1024_max_bytes,	4, 0x0d, STATS_TYPE_BANK0), \
-+	_fn(sw_in_discards,		4, 0x10, STATS_TYPE_PORT), \
-+	_fn(sw_in_filtered,		2, 0x12, STATS_TYPE_PORT), \
-+	_fn(sw_out_filtered,		2, 0x13, STATS_TYPE_PORT), \
-+	_fn(in_discards,		4, 0x00, STATS_TYPE_BANK1), \
-+	_fn(in_filtered,		4, 0x01, STATS_TYPE_BANK1), \
-+	_fn(in_accepted,		4, 0x02, STATS_TYPE_BANK1), \
-+	_fn(in_bad_accepted,		4, 0x03, STATS_TYPE_BANK1), \
-+	_fn(in_good_avb_class_a,	4, 0x04, STATS_TYPE_BANK1), \
-+	_fn(in_good_avb_class_b,	4, 0x05, STATS_TYPE_BANK1), \
-+	_fn(in_bad_avb_class_a,		4, 0x06, STATS_TYPE_BANK1), \
-+	_fn(in_bad_avb_class_b,		4, 0x07, STATS_TYPE_BANK1), \
-+	_fn(tcam_counter_0,		4, 0x08, STATS_TYPE_BANK1), \
-+	_fn(tcam_counter_1,		4, 0x09, STATS_TYPE_BANK1), \
-+	_fn(tcam_counter_2,		4, 0x0a, STATS_TYPE_BANK1), \
-+	_fn(tcam_counter_3,		4, 0x0b, STATS_TYPE_BANK1), \
-+	_fn(in_da_unknown,		4, 0x0e, STATS_TYPE_BANK1), \
-+	_fn(in_management,		4, 0x0f, STATS_TYPE_BANK1), \
-+	_fn(out_queue_0,		4, 0x10, STATS_TYPE_BANK1), \
-+	_fn(out_queue_1,		4, 0x11, STATS_TYPE_BANK1), \
-+	_fn(out_queue_2,		4, 0x12, STATS_TYPE_BANK1), \
-+	_fn(out_queue_3,		4, 0x13, STATS_TYPE_BANK1), \
-+	_fn(out_queue_4,		4, 0x14, STATS_TYPE_BANK1), \
-+	_fn(out_queue_5,		4, 0x15, STATS_TYPE_BANK1), \
-+	_fn(out_queue_6,		4, 0x16, STATS_TYPE_BANK1), \
-+	_fn(out_queue_7,		4, 0x17, STATS_TYPE_BANK1), \
-+	_fn(out_cut_through,		4, 0x18, STATS_TYPE_BANK1), \
-+	_fn(out_octets_a,		4, 0x1a, STATS_TYPE_BANK1), \
-+	_fn(out_octets_b,		4, 0x1b, STATS_TYPE_BANK1), \
-+	_fn(out_management,		4, 0x1f, STATS_TYPE_BANK1), \
-+	/*  */
++static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
++					struct ethtool_eth_mac_stats *mac_stats)
++{
++	struct mv88e6xxx_chip *chip = ds->priv;
++	int ret;
 +
-+#define MV88E6XXX_HW_STAT_ENTRY(_string, _size, _reg, _type) \
-+	{ #_string, _size, _reg, _type }
-+static const struct mv88e6xxx_hw_stat mv88e6xxx_hw_stats[] = {
-+	MV88E6XXX_HW_STAT_MAPPER(MV88E6XXX_HW_STAT_ENTRY)
-+};
++	ret = mv88e6xxx_stats_snapshot(chip, port);
++	if (ret < 0)
++		return;
 +
-+#define MV88E6XXX_HW_STAT_ENUM(_string, _size, _reg, _type) \
-+	MV88E6XXX_HW_STAT_ID_ ## _string
-+enum mv88e6xxx_hw_stat_id {
-+	MV88E6XXX_HW_STAT_MAPPER(MV88E6XXX_HW_STAT_ENUM)
- };
- 
- static uint64_t _mv88e6xxx_get_ethtool_stat(struct mv88e6xxx_chip *chip,
-@@ -1049,7 +1061,7 @@ static uint64_t _mv88e6xxx_get_ethtool_stat(struct mv88e6xxx_chip *chip,
- static int mv88e6xxx_stats_get_strings(struct mv88e6xxx_chip *chip,
- 				       uint8_t *data, int types)
++#define MV88E6XXX_ETH_MAC_STAT_MAP(_id, _member)			\
++	mv88e6xxx_stats_get_stat(chip, port,				\
++				 &mv88e6xxx_hw_stats[MV88E6XXX_HW_STAT_ID_ ## _id], \
++				 &mac_stats->stats._member)
++
++	MV88E6XXX_ETH_MAC_STAT_MAP(out_unicast, FramesTransmittedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(single, SingleCollisionFrames);
++	MV88E6XXX_ETH_MAC_STAT_MAP(multiple, MultipleCollisionFrames);
++	MV88E6XXX_ETH_MAC_STAT_MAP(in_unicast, FramesReceivedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(in_fcs_error, FrameCheckSequenceErrors);
++	MV88E6XXX_ETH_MAC_STAT_MAP(out_octets, OctetsTransmittedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(deferred, FramesWithDeferredXmissions);
++	MV88E6XXX_ETH_MAC_STAT_MAP(late, LateCollisions);
++	MV88E6XXX_ETH_MAC_STAT_MAP(in_good_octets, OctetsReceivedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(out_multicasts, MulticastFramesXmittedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(out_broadcasts, BroadcastFramesXmittedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(excessive, FramesWithExcessiveDeferral);
++	MV88E6XXX_ETH_MAC_STAT_MAP(in_multicasts, MulticastFramesReceivedOK);
++	MV88E6XXX_ETH_MAC_STAT_MAP(in_broadcasts, BroadcastFramesReceivedOK);
++
++#undef MV88E6XXX_ETH_MAC_STAT_MAP
++
++	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.MulticastFramesXmittedOK;
++	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.BroadcastFramesXmittedOK;
++	mac_stats->stats.FramesReceivedOK += mac_stats->stats.MulticastFramesReceivedOK;
++	mac_stats->stats.FramesReceivedOK += mac_stats->stats.BroadcastFramesReceivedOK;
++}
++
+ static int mv88e6xxx_get_regs_len(struct dsa_switch *ds, int port)
  {
--	struct mv88e6xxx_hw_stat *stat;
-+	const struct mv88e6xxx_hw_stat *stat;
- 	int i, j;
- 
- 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
-@@ -1130,7 +1142,7 @@ static void mv88e6xxx_get_strings(struct dsa_switch *ds, int port,
- static int mv88e6xxx_stats_get_sset_count(struct mv88e6xxx_chip *chip,
- 					  int types)
- {
--	struct mv88e6xxx_hw_stat *stat;
-+	const struct mv88e6xxx_hw_stat *stat;
- 	int i, j;
- 
- 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
-@@ -1257,7 +1269,7 @@ static size_t mv88e6xxx_stats_get_stat(struct mv88e6xxx_chip *chip, int port,
- static int mv88e6xxx_stats_get_stats(struct mv88e6xxx_chip *chip, int port,
- 				     uint64_t *data)
- {
--	struct mv88e6xxx_hw_stat *stat;
-+	const struct mv88e6xxx_hw_stat *stat;
- 	size_t i, j;
- 
- 	for (i = 0, j = 0; i < ARRAY_SIZE(mv88e6xxx_hw_stats); i++) {
+ 	struct mv88e6xxx_chip *chip = ds->priv;
+@@ -6838,6 +6876,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
+ 	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
+ 	.get_strings		= mv88e6xxx_get_strings,
+ 	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
++	.get_eth_mac_stats	= mv88e6xxx_get_eth_mac_stats,
+ 	.get_sset_count		= mv88e6xxx_get_sset_count,
+ 	.port_max_mtu		= mv88e6xxx_get_max_mtu,
+ 	.port_change_mtu	= mv88e6xxx_change_mtu,
 -- 
 2.34.1
 
