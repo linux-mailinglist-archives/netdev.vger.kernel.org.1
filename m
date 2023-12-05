@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-53739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1401804503
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:34:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC779804510
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B508281493
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:34:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E22B28145D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACB420E8;
-	Tue,  5 Dec 2023 02:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342841FB0;
+	Tue,  5 Dec 2023 02:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="b/w5kHwP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1dolqDJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F618CA48;
-	Tue,  5 Dec 2023 02:34:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F47CC433C8;
-	Tue,  5 Dec 2023 02:34:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1701743679;
-	bh=liax+sIHnmEKfEfVW+s4DmqLUntZruIqSMcTRWSs0Tk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b/w5kHwP00LQYOnC9+5b7PG1sxSHiFKwsRB1yDsd5YpDaHD+tSl0X7jbWde2cdt4L
-	 xyzfu0VP8pQO9lGfB36ETlCv1oD21KUHIKTVAq7ykuYLNXWUVeTt3CjFi3M0dIu3bE
-	 Uv6oZJvVMMkEG9gllT8ApZkUrAyVwSu42Y+khv8Q=
-Date: Tue, 5 Dec 2023 11:34:36 +0900
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F8C119;
+	Mon,  4 Dec 2023 18:38:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sPB/9nJhzupGe0X/gusduBPW1Y18K5OKiwVmvCOQ20k=; b=1dolqDJMGC30Q+yJXEdqjCZsGT
+	FC9Owmi66X277vtITRpMoiPso9WDx7YZk8iC6uT4AtKUEA6vksjXWyTYf4SPZnfPXbxCNMhlT5bIN
+	WSfIem3wT98SZk4j7a0osv51fh75BvyTr8SwCk8iHsn5GFW+3gdSLT3FmCq9lKN1anHU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rALJr-0022eR-9b; Tue, 05 Dec 2023 03:37:55 +0100
+Date: Tue, 5 Dec 2023 03:37:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Douglas Anderson <dianders@chromium.org>, linux-usb@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Grant Grundler <grundler@chromium.org>,
-	Hayes Wang <hayeswang@realtek.com>, Simon Horman <horms@kernel.org>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	netdev@vger.kernel.org, Brian Geffon <bgeffon@google.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] net: usb: r8152: Fix lost config across
- deauthorize+authorize
-Message-ID: <2023120521-fervor-subscript-20b1@gregkh>
-References: <20231201183113.343256-1-dianders@chromium.org>
- <20231204182727.1a52ae59@kernel.org>
+Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
+ MMD read/write
+Message-ID: <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
+References: <20231128133630.7829-1-ansuelsmth@gmail.com>
+ <20231128133630.7829-3-ansuelsmth@gmail.com>
+ <20231204181752.2be3fd68@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,23 +57,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231204182727.1a52ae59@kernel.org>
+In-Reply-To: <20231204181752.2be3fd68@kernel.org>
 
-On Mon, Dec 04, 2023 at 06:27:27PM -0800, Jakub Kicinski wrote:
-> On Fri,  1 Dec 2023 10:29:49 -0800 Douglas Anderson wrote:
-> > Since these three patches straddle the USB subsystem and the
-> > networking subsystem then maintainers will (obviously) need to work
-> > out a way for them to land. I don't have any strong suggestions here
-> > so I'm happy to let the maintainers propose what they think will work
-> > best.
+On Mon, Dec 04, 2023 at 06:17:52PM -0800, Jakub Kicinski wrote:
+> On Tue, 28 Nov 2023 14:36:30 +0100 Christian Marangi wrote:
+> > +/**
+> > + * phy_package_write_mmd - Convenience function for writing a register
+> > + * on an MMD on a given PHY using the PHY package base addr, added of
+> > + * the addr_offset value.
+> > + * @phydev: The phy_device struct
+> > + * @addr_offset: The offset to be added to PHY package base_addr
+> > + * @devad: The MMD to read from
+> > + * @regnum: The register on the MMD to read
+> > + * @val: value to write to @regnum
+> > + *
+> > + * Same rules as for phy_write();
+> > + *
+> > + * NOTE: It's assumed that the entire PHY package is either C22 or C45.
+> > + */
 > 
-> No strong preference here, on a quick read it seems more like a USB
-> change than networking change, tho, so I'll defer to Greg unless told
-> otherwise.
+> > +/*
+> > + * phy_package_write_mmd - Convenience function for writing a register
+> > + * on an MMD on a given PHY using the PHY package base addr, added of
+> > + * the addr_offset value.
+> > + */
+> > +int phy_package_write_mmd(struct phy_device *phydev,
+> > +			  unsigned int addr_offset, int devad,
+> > +			  u32 regnum, u16 val);
+> 
+> Hm, I see there's some precedent here already for this duplicated
+> semi-kdoc. It seems a bit unusual. If I was looking for kdoc and 
+> found the header one I'd probably not look at the source file at all.
+> 
+> Andrew, WDYT?
 
-I took these in my tree already, sorry for not saying anything here.
+I tend to agree. These functions should be documented once in kdoc,
+and only once. I don't really care if its in the header, or the C
+code, but not both.
 
-thanks,
-
-greg k-h
+      Andrew
 
