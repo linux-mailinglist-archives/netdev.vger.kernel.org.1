@@ -1,112 +1,160 @@
-Return-Path: <netdev+bounces-53884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E80B805124
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:50:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A32E4805150
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:54:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29B8E1F2151C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:50:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48C11C20BB0
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70ABA2FC24;
-	Tue,  5 Dec 2023 10:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FBD3E48A;
+	Tue,  5 Dec 2023 10:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="duogcorQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cy6URnmD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDA7116;
-	Tue,  5 Dec 2023 02:49:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Upnjb/CtjXa7Ifq7kmJI62+mAm9o5YlGesjj/UWinbA=; b=duogcorQ4P8zl3J8qpazL8Dgj0
-	gHnjMJldEDLL/hRu89DsHHSe3nLkNLmgqQrqgETe/jTgORfz66dwyn/MNnL9AXKCZiLgwWoUm9bDA
-	e2WdwdhsAXEi+bDtljNF7S+HBTPUb8khY0RpR427YJ3T/hQ/jGBeCl41qzTZcYl/1M96s6k8XVpvq
-	gnmWfAp0NmIzWX5pau2JVLlDP03b/KePZYtrhMeCc8MWjV0kwFS9a7WFL+W1+s7mYPqE+eP83rDXo
-	R4WqtqGhans10+bH8ntaaXL/pWeqN458OXnYwsNGpce4IYqQI1nRXFPflwNsXLyZFy5ETN5ITCgxY
-	CHgwHrXA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60944)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rASzq-0006ds-1N;
-	Tue, 05 Dec 2023 10:49:46 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rASzr-0001e3-Hy; Tue, 05 Dec 2023 10:49:47 +0000
-Date: Tue, 5 Dec 2023 10:49:47 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <ZW8ASzkC9IFFlxkV@shell.armlinux.org.uk>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 633B8199D
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 02:54:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701773673;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IVej9PrmR86I2amOEZJmuPA8qC8UiKK/HyCsbg/KCWM=;
+	b=Cy6URnmDSLkCwKDpOmQLl1ksaiV+ryHtluH50QjonXGlcmR68mW/KOkAElxXrvDRe9eVpR
+	qH/B6qPTcQK+K2ckUWvVIw++GHtVZs61fLdqKKAtxuECxWxkjrjtlymK21KxSjAm+tFtQv
+	ojR3nCm6Z+IEPj7B0gypi20t7wKeBc4=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-gF6kFNllNRmtB0SIIbkgOA-1; Tue, 05 Dec 2023 05:54:32 -0500
+X-MC-Unique: gF6kFNllNRmtB0SIIbkgOA-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c9ec1a2ec1so28044921fa.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 02:54:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701773669; x=1702378469;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IVej9PrmR86I2amOEZJmuPA8qC8UiKK/HyCsbg/KCWM=;
+        b=rz9DJWN2A/Td2znIDoqMS0bXbZnRYPS+ydQycHCByb+2m82y/Fcq1tryZ+s4mObQzW
+         xhMVZFSv2pdTmEcghTA+zM52CsDs21xcyzcNGaAO7J+XNWP+L+BxkpWAsuuuCm9OwVO5
+         yLsh9hV9IIlOHaMowGggFbE+XQt8N2xpMoRTAB3UfHupCgxhR6J3JJKDlqp0LGtUDKdQ
+         +KgjXoWZqgqv0gRAHSi8UY4h20mNDAeEZ1gW+fTCrJnRoE2RjwMnzmYGIYzOrKMidkAL
+         SbNw0Yltur/Je2PtfaGTxvXT9bQs7CTYnwj9kudeGDoOwZorfnKsj8F3IeuyjhaVz4Hu
+         2U5A==
+X-Gm-Message-State: AOJu0Yztx+iYtlLr7KJZEW/vmOF8MQ4vWT33uLu0fy7d7kYh2vKR0Xdw
+	GqdMHEp6a5PeLs0JgNnoOxuvHjgIoxhMbEiJ3icMqqYWnjzFbqyCO3fzkkcFCJt6wv8BHFx4wJ3
+	d38Y0r7nOyFw+bh15UO2AWIee0Aur3jEuSzpYak6w07g=
+X-Received: by 2002:a2e:2404:0:b0:2ca:3b0:c981 with SMTP id k4-20020a2e2404000000b002ca03b0c981mr1288361ljk.60.1701773669513;
+        Tue, 05 Dec 2023 02:54:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE2ssRiYVRsSgeOHK8e4z0hKb3eKncd2x9tZR3khs5rrow+lEW/yyuTe12zSKhzeqVFdesF3BIBVj0FrDDsCCs=
+X-Received: by 2002:a2e:2404:0:b0:2ca:3b0:c981 with SMTP id
+ k4-20020a2e2404000000b002ca03b0c981mr1288359ljk.60.1701773669206; Tue, 05 Dec
+ 2023 02:54:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205103559.9605-7-fancer.lancer@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <cover.1674233458.git.dcaratti@redhat.com> <5fdd584d53f0807f743c07b1c0381cf5649495cd.1674233458.git.dcaratti@redhat.com>
+ <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
+In-Reply-To: <CAM0EoMn4C-zwrTCGzKzuRYukxoqBa8tyHyFDwUSZYwkMOUJ4Lw@mail.gmail.com>
+From: Davide Caratti <dcaratti@redhat.com>
+Date: Tue, 5 Dec 2023 11:54:17 +0100
+Message-ID: <CAKa-r6sNMq5b=PiUhm0U=COV1fE=HL_CjOPxchs1WpWi4-_XNA@mail.gmail.com>
+Subject: Re: Mirred broken WAS(Re: [PATCH net-next 2/2] act_mirred: use the
+ backlog for nested calls to mirred ingress
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, wizhao@redhat.com, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
-> If the DW XPCS MDIO devices are either left unmasked for being auto-probed
-> or explicitly registered in the MDIO subsystem by means of the
-> mdiobus_register_board_info() method there is no point in creating the
-> dummy MDIO device instance in order to get the DW XPCS handler since the
-> MDIO core subsystem will create the device during the MDIO bus
-> registration procedure.
+hello Jamal, thanks for looking at this!
 
-Please reword this overly long sentence.
+On Mon, Dec 4, 2023 at 9:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com> =
+wrote:
+>
+> On Fri, Jan 20, 2023 at 12:02=E2=80=AFPM Davide Caratti <dcaratti@redhat.=
+com> wrote:
+> >
+> > William reports kernel soft-lockups on some OVS topologies when TC mirr=
+ed
+> > egress->ingress action is hit by local TCP traffic [1].
+> > The same can also be reproduced with SCTP (thanks Xin for verifying), w=
+hen
+> > client and server reach themselves through mirred egress to ingress, an=
+d
+> > one of the two peers sends a "heartbeat" packet (from within a timer).
 
-If they're left unmasked, what prevents them being created as PHY
-devices?
+[...]
 
-> @@ -1437,19 +1435,21 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
->  	struct mdio_device *mdiodev;
->  	struct dw_xpcs *xpcs;
->  
-> -	mdiodev = mdio_device_create(bus, addr);
-> -	if (IS_ERR(mdiodev))
-> -		return ERR_CAST(mdiodev);
-> +	if (addr >= PHY_MAX_ADDR)
-> +		return ERR_PTR(-EINVAL);
->  
-> -	xpcs = xpcs_create(mdiodev, interface);
-> +	if (mdiobus_is_registered_device(bus, addr)) {
-> +		mdiodev = bus->mdio_map[addr];
-> +		mdio_device_get(mdiodev);
+> I am afraid this broke things. Here's a simple use case which causes
+> an infinite loop (that we found while testing blockcasting but
+> simplified to demonstrate the issue):
 
-No, this makes no sense now. This function is called
-xpcs_create_mdiodev() - note the "create_mdiodev" part. If it's getting
-the mdiodev from what is already there then it isn't creating it, so
-it's no longer doing what it says in its function name. If you want to
-add this functionality, create a new function to do it.
+[...]
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> sudo ip netns exec p4node tc qdisc add dev port0 clsact
+> sudo ip netns exec p4node tc filter add dev port0 ingress protocol ip
+> prio 10 matchall action mirred ingress redirect dev port0
+
+the above rule is taking packets from port0 ingress and putting it
+again in the mirred ingress of the same device, hence the loop.
+I don't see it much different than what we can obtain with bridges:
+
+# ip link add name one type veth peer name two
+# ip link add name three type veth peer name four
+# for n in even odd; do ip link add name $n type bridge; done
+# for n in one two three four even odd; do ip link set dev $n up; done
+# for n in one three; do ip link set dev $n master odd; done
+# for n in two four; do ip link set dev $n master even; done
+
+there is a practical difference: with bridges we have protocols (like
+STP) that can detect and act-upon loops - while TC mirred needs some
+facility on top (not 100% sure, but the same might also apply to
+similar tools, such as users of bpf_redirect() helper)
+
+> reverting the patch fixes things and it gets caught by the nested
+> recursion check.
+
+the price of that revert is: we'll see those soft-lockups again with
+L4 protocols when peers communicate through mirred egress -> ingress.
+And even if it would fix mirred egress->ingress loops, we would still
+suffer from soft-lockups (on the qdisc root lock) when the same rule
+is done with mirred egress (see an example at
+https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment-178=
+2690200)
+[1]
+
+> Frankly, I believe we should restore a proper ttl from what was removed h=
+ere:
+> https://lore.kernel.org/all/1430765318-13788-1-git-send-email-fw@strlen.d=
+e/
+> The headaches(and time consumed) trying to save the 3-4 bits removing
+> the ttl field is not worth it imo.
+
+TTL would protect us against loops when they are on the same node:
+what do you think about inserting a rule that detects BPDU before the
+mirred ingress rule?
+
+thanks!
+--=20
+davide
+
+[1] by the way: the POC patch at
+https://github.com/multipath-tcp/mptcp_net-next/issues/451#issuecomment-178=
+2654075
+silcences lockdep false warnings, and it preserves the splat when the
+real deadlock happens with TC marred egress. If you agree I will send
+it soon to this ML for review.
+
 
