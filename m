@@ -1,122 +1,70 @@
-Return-Path: <netdev+bounces-53842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56845804D77
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:20:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B48804D7F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:21:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8836B1C20A9E
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:20:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D24DB1C20B2F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDF53E475;
-	Tue,  5 Dec 2023 09:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="OOs6rrNx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABAF3E496;
+	Tue,  5 Dec 2023 09:21:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0875483;
-	Tue,  5 Dec 2023 01:20:09 -0800 (PST)
-Received: from localhost.ispras.ru (unknown [10.10.165.7])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 3F8CD40F1DE9;
-	Tue,  5 Dec 2023 09:20:04 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 3F8CD40F1DE9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1701768007;
-	bh=Xkj0nuUUERVo3DmD0W5CbQml3tG2cDGWBXJRyDsrHq8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OOs6rrNxIXNTpiu+wwKGkoIxiCIgN0JjlOkTYcgNboYScKjXAtJUNbYxCx1uhxUV8
-	 V+dSISTy/vUdFlBok1a3MZBkLoxXytP8ZzQhgiKfvPLttDjHjp4EYZz5IX8s9V5rXa
-	 43jfNC40GiHt+8/BgkeP+wcGGsb2DrgnsNzJMeOs=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	v9fs@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v2] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
-Date: Tue,  5 Dec 2023 12:19:50 +0300
-Message-ID: <20231205091952.24754-1-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <ZW7oQ1KPWTbiGSzL@codewreck.org>
-References: 
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DC583
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:21:31 -0800 (PST)
+X-QQ-mid:Yeas1t1701768050t854t48136
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.204.154.156])
+X-QQ-SSF:00400000000000F0FSF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 13344881203513048041
+To: "'duanqiangwen'" <duanqiangwen@net-swift.com>,
+	<netdev@vger.kernel.org>,
+	<kuba@kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<davem@davemloft.net>,
+	<pabeni@redhat.com>,
+	<yang.lee@linux.alibaba.com>,
+	<error27@gmail.com>,
+	<horms@kernel.org>
+References: <20231205065033.19536-1-duanqiangwen@net-swift.com>
+In-Reply-To: <20231205065033.19536-1-duanqiangwen@net-swift.com>
+Subject: RE: [PATCH net] net: libwx: fix memory leak on free page
+Date: Tue, 5 Dec 2023 17:20:49 +0800
+Message-ID: <04f201da275c$566735d0$0335a170$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJx97aawQypS/CXAFrzFUrGxQZG6q9qx4TA
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-If an error occurs while processing an array of strings in p9pdu_vreadf
-then uninitialized members of *wnames array are freed.
+> @@ -2248,8 +2180,7 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
+> 
+>  		/* free resources associated with mapping */
+>  		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+> -		__page_frag_cache_drain(rx_buffer->page,
+> -					rx_buffer->pagecnt_bias);
+> +
 
-Fix this by iterating over only lower indices of the array. Also handle
-possible uninit *wnames usage if first p9pdu_readf() call inside 'T' case
-fails.
+No need to add this blank line. Other looks good to me, thanks!
 
-Found by Linux Verification Center (linuxtesting.org).
+Reviewed-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-Fixes: ace51c4dd2f9 ("9p: add new protocol support code")
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
----
-v2: I've missed that *wnames can also be left uninitialized. Please
-ignore the patch v1. As an answer to Dominique's comment: my
-organization marks this statement in all commits.
-
- net/9p/protocol.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/net/9p/protocol.c b/net/9p/protocol.c
-index 4e3a2a1ffcb3..043b621f8b84 100644
---- a/net/9p/protocol.c
-+++ b/net/9p/protocol.c
-@@ -393,6 +393,8 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
- 		case 'T':{
- 				uint16_t *nwname = va_arg(ap, uint16_t *);
- 				char ***wnames = va_arg(ap, char ***);
-+				int i;
-+				*wnames = NULL;
+> 
+>  		i++;
+>  		rx_buffer++;
  
- 				errcode = p9pdu_readf(pdu, proto_version,
- 								"w", nwname);
-@@ -406,8 +408,6 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
- 				}
- 
- 				if (!errcode) {
--					int i;
--
- 					for (i = 0; i < *nwname; i++) {
- 						errcode =
- 						    p9pdu_readf(pdu,
-@@ -421,13 +421,11 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
- 
- 				if (errcode) {
- 					if (*wnames) {
--						int i;
--
--						for (i = 0; i < *nwname; i++)
-+						while (--i >= 0)
- 							kfree((*wnames)[i]);
-+						kfree(*wnames);
-+						*wnames = NULL;
- 					}
--					kfree(*wnames);
--					*wnames = NULL;
- 				}
- 			}
- 			break;
--- 
-2.43.0
 
 
