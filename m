@@ -1,64 +1,68 @@
-Return-Path: <netdev+bounces-54174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBFE80630D
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4EF480630E
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1327B21056
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35C8AB211F5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EF14122B;
-	Tue,  5 Dec 2023 23:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73E4123E;
+	Tue,  5 Dec 2023 23:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aqL6xKTK"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="D4i3uEp4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B0518B
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:25 -0800 (PST)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77dd07e7d39so424874985a.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:25 -0800 (PST)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62AD122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:27 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77f0b3f1618so157475085a.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701819865; x=1702424665; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Oaj5ns2xjSwAIRoGhoyALkTLxp3FEkWNq4dK1NxYq2c=;
-        b=aqL6xKTKUnIeluA6TmLsyl9gJ88fM4bHvAM+7Nj8kYDUDEFPAze4Hl3RJUAsTXQ7vq
-         x+LssDk0eqAuGxsNkNFYsI42HeWY1K9XdgMpnZQzYUnSPjFw0fy/5/XJ5cJUhmuAesWO
-         lCHJSMp7TWd3VHwGC2xO0tCBiUGseG3Dz1fxI=
+        d=broadcom.com; s=google; t=1701819867; x=1702424667; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8+UIis1C5FIRofcy9HcTllt1lZGjE1cFQ9qpFZJGBk=;
+        b=D4i3uEp4lwtoReJw9K3fLmzPqNwAGr9tol/mtf2oJkx4wPXVRMlPy7yZrb4Y6aSoAX
+         HpZGnurHFFU3OuKuh7AQKfw7DCWy2fVNoaiEWjks8kVVx0q+s3CZC/7nE4vbams/zt9I
+         AEaNjQObroYNKQWq0FbSFS4vKOwNO+xi5R1DI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701819865; x=1702424665;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Oaj5ns2xjSwAIRoGhoyALkTLxp3FEkWNq4dK1NxYq2c=;
-        b=jtikHYROcS+iEDJc+vpD4VeptNkkOAWEAlvV5xCRaXqv97cJtTCiNMiwjYc33wUTUX
-         l2ViHy2I5/P5QQKA2bWbA/Q2pokclL94UMH+UoV4GHP9v973NRM6pvgd6RFKCVZks75N
-         gh+6YyW/ovUbQRA/QU3ETWKhuXSHx8Ir91iC3UQUdgKh2tUJT71HPzgWffDkW1iHVg9a
-         ep0bgFGHhM2+0/TO8sSExvzMFo0qKW4aHfDBNoRACfWu6Ac7dIXT1w05in/f8HPkxljS
-         avumeuXLL6pS80018sy/AifQLNRTjh5cSF29qpJG7aX9LU9rL16e3u2D6nWMKfITfW3t
-         cGxA==
-X-Gm-Message-State: AOJu0YwIy0zh6y8/UF3PxEpQNCGXEW8dYuO3F1AV7C798QSvFxE1OfUq
-	CbVLHvctRw77+3EyfEHK/EhD+w==
-X-Google-Smtp-Source: AGHT+IGKN833vQ2WkjQFxsVo/iFNh613uqYo0cTqiXRiIvwuE+gSoOazrNX+sI9CPo+UkhT0msz5vQ==
-X-Received: by 2002:a05:620a:3c88:b0:77d:ce07:a6e0 with SMTP id tp8-20020a05620a3c8800b0077dce07a6e0mr43458qkn.3.1701819864389;
-        Tue, 05 Dec 2023 15:44:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701819867; x=1702424667;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8+UIis1C5FIRofcy9HcTllt1lZGjE1cFQ9qpFZJGBk=;
+        b=NB1iBCO2U3I+/DMRRYb/1XsAelbKwF0ytRK3n3eKKQGSnIRJMWUlLhRIRi+00mRklt
+         1QzECIl27P8/Qc8fLlCzQNNkkw0fEhm9HpKCSLJKj87OxagRRihu9dIMRRZOnMhcZOlL
+         MB9kke/srP6zzAKSMqH78FnFvrd3Gpz1ErmhE5bwPQSWtm9U08pEaChxQ1grKGeBT+QD
+         mGWYyfTPFgATaRP0mzMci3YR3/7ffx4+7zMb2hdNWFgiyfHr/13l6MIJInWazvPc+L+H
+         m6Aas+wPgBK4eS1z/lk9kfB8PYAnkA6gK+qI+bDv9yp/d5fVi/DqTbjE76oskeQZh0cp
+         QLYA==
+X-Gm-Message-State: AOJu0YwYvCZU2i/1tVPKdWJcqQA3e7oou/BLtELYNzHNeiOTzTYoPa5p
+	9PVg8Lr9MfqJKw0xouAwgiEtMA==
+X-Google-Smtp-Source: AGHT+IGziAF7ABxS7rE9xBOjsevHQOeFca1H0gE+Kw+AA7qjF0UuA0sRTyjJOpWlynhpodjgKSi8KA==
+X-Received: by 2002:a05:620a:3724:b0:77b:dd1d:2afb with SMTP id de36-20020a05620a372400b0077bdd1d2afbmr37128qkb.65.1701819866357;
+        Tue, 05 Dec 2023 15:44:26 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.23
+        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Dec 2023 15:44:24 -0800 (PST)
+        Tue, 05 Dec 2023 15:44:25 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gospo@broadcom.com
-Subject: [PATCH net 0/4] bnxt_en: Misc. fixes
-Date: Tue,  5 Dec 2023 15:44:00 -0800
-Message-Id: <20231205234404.17501-1-michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, gospo@broadcom.com,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Michael Chan <"michael.chan."@broadcom.com>
+Subject: [PATCH net 1/4] bnxt_en: Clear resource reservation during resume
+Date: Tue,  5 Dec 2023 15:44:01 -0800
+Message-Id: <20231205234404.17501-2-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20231205234404.17501-1-michael.chan@broadcom.com>
+References: <20231205234404.17501-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,35 +70,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008afd1b060bcbd064"
+	boundary="000000000000a656b4060bcbd016"
 
---0000000000008afd1b060bcbd064
+--000000000000a656b4060bcbd016
 Content-Transfer-Encoding: 8bit
 
-4 miscellaneous driver fixes covering PM resume, SKB recycling,
-wrong return value check, and PTP HWTSTAMP_FILTER_ALL.
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Kalesh AP (1):
-  bnxt_en: Fix wrong return value check in bnxt_close_nic()
+We are issuing HWRM_FUNC_RESET cmd to reset the device including
+all reserved resources, but not clearing the reservations
+within the driver struct. As a result, when the driver re-initializes
+as part of resume, it believes that there is no need to do any
+resource reservation and goes ahead and tries to allocate rings
+which will eventually fail beyond a certain number pre-reserved by
+the firmware.
 
-Michael Chan (1):
-  bnxt_en: Fix HWTSTAMP_FILTER_ALL packet timestamp logic
+Fixes: b4c66425771d ("bnxt_en: refactor bnxt_cancel_reservations()")
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan.@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Somnath Kotur (1):
-  bnxt_en: Clear resource reservation during resume
-
-Sreekanth Reddy (1):
-  bnxt_en: Fix skb recycling logic in bnxt_deliver_skb()
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 27 ++++++++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  8 ++++++-
- 2 files changed, 29 insertions(+), 6 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d0359b569afe..72f2fc983940 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -13940,6 +13940,8 @@ static int bnxt_resume(struct device *device)
+ 	if (rc)
+ 		goto resume_exit;
+ 
++	bnxt_clear_reservations(bp, true);
++
+ 	if (bnxt_hwrm_func_drv_rgtr(bp, NULL, 0, false)) {
+ 		rc = -ENODEV;
+ 		goto resume_exit;
 -- 
 2.30.1
 
 
---0000000000008afd1b060bcbd064
+--000000000000a656b4060bcbd016
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -165,14 +183,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKiBCp0ZDISiJiz5d6eAdnFiyeRnAxml
-ncc3z7UWF3FmMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-NTIzNDQyNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGJ2wotyAWfutcU7Q6wWPl8bKSJkJHJK
+xnt3MbAzWWpOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NTIzNDQyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCffqoBkUmg5zXsm2skrdbzpHG4DyjQfk+w059hynDBWF8T8+Ix
-gnz7Pjdgg7BGg4itk6lnj/xOIj6Qb5rV+I0E7EY2UWT5JCQbfjoqH236gLfpwmFJlrjuPcNPeiGb
-sQsUiOc7RzM04CM5fXiccTKfmePWSvImVcXJuBTYSd0cyK8wkizZS6IxJtWyC0zx1Xme6K6t9emD
-Te07Ms14hvleThV1UywzStlAJgqvzStmFOUX/uYv5QNsregffe2JQc2Diyu+lGqQnxlQJXXxnMVh
-DzPc38psmBItF1VLfZg4tBTMh4HMtIrI4kALXqDU+RgBs2A/c4dxyUjnTWqlmLFH
---0000000000008afd1b060bcbd064--
+ATANBgkqhkiG9w0BAQEFAASCAQB+9+KLk43FMHubhykH9iQfZeJKEBdb7dNr/YiZbpX9pIO+qDJb
+GddNr3XW0rmPyGkRmtQnDGL0GgieMYG//ZX2c6I4YcsvW2VvhZY5DjpUYRiLIPOgM/iEH3bNEfiz
+BlSEPcafcCXwgoBkR8o1UfOFd0UW/cHUNZ0UL1VJ/eoGLKi5Mkt1sQ+HERHo7OlX3esNjN+2kfV8
+Syteflnt4FAmiLlZCC5XKN+o/ViVqWzJnY24U+P3Nm5V/kY9WJBKJhzF9VFaMXf7lhZu3NGtuyYA
+JgBB4sNFt3PFIngk3cl2uGttNKt9mvAA8usN8LXWjhrXLixkMGJgQ9wIEZzY3Dj1
+--000000000000a656b4060bcbd016--
 
