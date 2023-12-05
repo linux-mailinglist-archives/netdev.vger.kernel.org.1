@@ -1,173 +1,104 @@
-Return-Path: <netdev+bounces-53965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62CC80572B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:22:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63A6F805732
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 485081F215C7
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:22:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FDCD1F21599
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0C765EB1;
-	Tue,  5 Dec 2023 14:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4265EB6;
+	Tue,  5 Dec 2023 14:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G12L9azg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GgmZ7moS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAA6B9
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:22:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701786137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g9IZpMPIi3jSZTsC7HLeV6BNERkHoH4xs1hFKXipffA=;
-	b=G12L9azg5MaeT/0eLhHxF5hmIuk4sk7MoBR3ReZqoGDPbqmmZo5iliE+YlpkcDKiHvI7dS
-	HFUctw9r3lXuv1icNCxNOGEtgPF65NdGx2mPGuUgsUOTIA4rCbnvXPB6+lYrQzxYevg7yc
-	PJ8Qrn2WWHwdGNW3cjiDdqIkn0BmU50=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-HlPM7iNbN_e3DadELe0CjQ-1; Tue, 05 Dec 2023 09:22:16 -0500
-X-MC-Unique: HlPM7iNbN_e3DadELe0CjQ-1
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6d87f0b71aeso4021192a34.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 06:22:16 -0800 (PST)
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A9119F
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:22:57 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-db4422fff15so3412777276.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 06:22:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701786176; x=1702390976; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=G/Frwe5NoLiVErGGo0J2Fc9HYe79JYyuyxPi79nNvzQ=;
+        b=GgmZ7moSb2Ls8Jzwp9GUedkL79ChZbe5Vn57Lcos0mXNbLufzaVZ/GoPFho+EEK//6
+         r2/nmV9N6nmQH3TXCoCMSbI36hqlB1Z1WjMrcXj09US4WQwitsx6oqyl8KQ4m91RyXKr
+         DistxXkG+oxDmdXjHcaLgY5nGPARlIhChV2ExZyhsvU/SiaWNCsMJB0qPzZjp9slVSmz
+         boRTL/NHScMihGZzq0OU0MnoIll09LmammOAcC9PB2TbahTX3TBoHQuWpsWvH9Z3bkeM
+         JnD2SdmkPIS8M6D3zLa1/tgKj9RQuIjcz7XF4+ieYf7ZijxhaqAb6R6TqfY39RIBAGW2
+         awMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701786135; x=1702390935;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g9IZpMPIi3jSZTsC7HLeV6BNERkHoH4xs1hFKXipffA=;
-        b=iYPY0jzLj0aVTWv/hic0Dyq8w7u9kOqRBLITkiXZ6cT3B8vPhMabJrR6yYH1ncXFiZ
-         VijnVMzUc9NR6VvquMYCIMNVZZfgH4bCQXuPYuP06cvhoIP9sHjkeRE8z3hAmhpwVL9b
-         5kZRGdw+IsjaW5ogA/xLBNunEIE7Vi3Kj2YY1c3txAFok53sGRTaKFKOPdQRstCkqPTH
-         uR00kVKvcSKrmjTcZVCc3LcQNoPCUsCVDARJSu8yg/I8ssO0EXxG7u2e/uFi36ti6OsT
-         m/blf7UJ1fMcxpimdj+QG/UTFC6bPJ+NO4haoh8zGysgT9FXLqwRZcMLjklr+p45GNro
-         Bsuw==
-X-Gm-Message-State: AOJu0Yzt0K3Dru+Eq87umG+u6d5LDLgZRds8mkr39EONQjIGWlpp/3B6
-	7FjvWjotIXZV5wAunHt3+W3i3qNga9Sq1srTQbn2s5LQsj0me20hQtMiUNDb0Dx36pfD+DPHOP6
-	6ahw8jtyGBkKdDxBH
-X-Received: by 2002:a9d:6f82:0:b0:6d8:7afe:7867 with SMTP id h2-20020a9d6f82000000b006d87afe7867mr4894118otq.73.1701786135650;
-        Tue, 05 Dec 2023 06:22:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFQM0DUJ5PkREYuL7J0Iqz04MrH5aEKcLNe4Q826QNJ3Y8wTHvA1ssEqjnGPP+m4NlCYhCYxg==
-X-Received: by 2002:a9d:6f82:0:b0:6d8:7afe:7867 with SMTP id h2-20020a9d6f82000000b006d87afe7867mr4894106otq.73.1701786135338;
-        Tue, 05 Dec 2023 06:22:15 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-125.retail.telecomitalia.it. [79.46.200.125])
-        by smtp.gmail.com with ESMTPSA id f17-20020ac84651000000b00423dbb19262sm5169011qto.78.2023.12.05.06.22.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 06:22:14 -0800 (PST)
-Date: Tue, 5 Dec 2023 15:21:55 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v6 3/4] virtio/vsock: fix logic which reduces
- credit update messages
-Message-ID: <gqrfreguavurkb7betm2utzdfnefrxgxyoilyveowvmspbwpes@45s6jshyelui>
-References: <20231205064806.2851305-1-avkrasnov@salutedevices.com>
- <20231205064806.2851305-4-avkrasnov@salutedevices.com>
- <v335g4fjrn5f6tsw4nysztaklze2obnjwpezps3jgb2xickpge@ea5woxob52nc>
- <809a8962-0082-6443-4e59-549eb28b9a82@salutedevices.com>
+        d=1e100.net; s=20230601; t=1701786176; x=1702390976;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G/Frwe5NoLiVErGGo0J2Fc9HYe79JYyuyxPi79nNvzQ=;
+        b=sQNHNhF0aLUHpOFIqMICKufhvP3I/Up2qOsr+z4I/Q/fe0CgTXJMq1UHrhE4ISkohI
+         C79qYYSW7HX39eJ1FXIUqhYzWJEFqAxCqyMkhsyXYIc1hWcYrQjUfSmVx55vkM6VEFHh
+         P6YssEF+MBLkHfIBT+Z+onJHJhJkjDKXbghhpk5CVAoi+jTT4RjZ8qDnWC6AxpVGHCdz
+         /EP7a7LGOBuuj0geB16TuUXpdj09mqUHKRR4FlJs1+Rg6xG9br81yh2T1ZjeEx/OOVuP
+         j7H6i22RplQb8w8Ou4fqCl2WSKgeNieMh5t5DR2/QZYPjHazkXhuvqrMggPcUlWN7Y5B
+         CPmA==
+X-Gm-Message-State: AOJu0YyCkT5E1l9ulTRt2VlFJk1yyR2N0RzCm59GQ/ZaQBu7GXNy6hMt
+	J50oT15VV6qFTts9/RelcPECCLEfRfjaGKR8JcAA9g==
+X-Google-Smtp-Source: AGHT+IGyrKcpMlCc6HKeOLyBPWiYuASZdAWLwG2aWAnGxzTUHOjqtc2yXhgIigkdzOlV5dwo5Ofz4JjxN6ezYXE4viE=
+X-Received: by 2002:a05:6902:248:b0:db7:dad0:76b5 with SMTP id
+ k8-20020a056902024800b00db7dad076b5mr3673602ybs.81.1701786176179; Tue, 05 Dec
+ 2023 06:22:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <809a8962-0082-6443-4e59-549eb28b9a82@salutedevices.com>
+References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
+ <20230607094922.43106896@kernel.org> <20230607171153.GA109456@thinkpad>
+ <20230607104350.03a51711@kernel.org> <20230608123720.GC5672@thinkpad>
+ <20231117070602.GA10361@thinkpad> <20231117162638.7cdb3e7d@kernel.org>
+ <20231127060439.GA2505@thinkpad> <20231127084639.6be47207@kernel.org>
+ <CAA8EJppL0YHHjHj=teCnAwPDkNhwR1EWYuLPnDue1QdfZ3RS_w@mail.gmail.com>
+ <20231128125808.7a5f0028@kernel.org> <CAA8EJpqGAK-7be1v8VktFRPpBHhUTwKJ=6JTTrFaWh341JAQEQ@mail.gmail.com>
+ <20231204081222.31bb980a@kernel.org>
+In-Reply-To: <20231204081222.31bb980a@kernel.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 5 Dec 2023 16:22:45 +0200
+Message-ID: <CAA8EJprrcH3T8_aA7bZhZXKiWMXjUTZkvLkQzteHUG4_7e4i8w@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, mhi@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, loic.poulain@linaro.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 05, 2023 at 03:07:47PM +0300, Arseniy Krasnov wrote:
+On Mon, 4 Dec 2023 at 18:12, Jakub Kicinski <kuba@kernel.org> wrote:
 >
+> On Mon, 4 Dec 2023 14:12:12 +0200 Dmitry Baryshkov wrote:
+> > Ok, here you are talking about the control path. I can then assume
+> > that you consider it to be fine to use netdev for the EP data path, if
+> > the control path is kept separate and those two can not be mixed. Does
+> > that sound correct?
 >
->On 05.12.2023 13:54, Stefano Garzarella wrote:
->> On Tue, Dec 05, 2023 at 09:48:05AM +0300, Arseniy Krasnov wrote:
->>> Add one more condition for sending credit update during dequeue from
->>> stream socket: when number of bytes in the rx queue is smaller than
->>> SO_RCVLOWAT value of the socket. This is actual for non-default value
->>> of SO_RCVLOWAT (e.g. not 1) - idea is to "kick" peer to continue data
->>> transmission, because we need at least SO_RCVLOWAT bytes in our rx
->>> queue to wake up user for reading data (in corner case it is also
->>> possible to stuck both tx and rx sides, this is why 'Fixes' is used).
->>>
->>> Fixes: b89d882dc9fc ("vsock/virtio: reduce credit update messages")
->>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>> ---
->>> net/vmw_vsock/virtio_transport_common.c | 9 +++++++--
->>> 1 file changed, 7 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>> index e137d740804e..461c89882142 100644
->>> --- a/net/vmw_vsock/virtio_transport_common.c
->>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>> @@ -558,6 +558,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>     struct virtio_vsock_sock *vvs = vsk->trans;
->>>     size_t bytes, total = 0;
->>>     struct sk_buff *skb;
->>> +    bool low_rx_bytes;
->>>     int err = -EFAULT;
->>>     u32 free_space;
->>>
->>> @@ -602,6 +603,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->>>     }
->>>
->>>     free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
->>> +    low_rx_bytes = (vvs->rx_bytes <
->>> +            sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
->>
->> As in the previous patch, should we avoid the update it if `fwd_cnt` and `last_fwd_cnt` are the same?
->>
->> Now I'm thinking if it is better to add that check directly in virtio_transport_send_credit_update().
->
->Good point, but I think, that it is better to keep this check here, because access to 'fwd_cnt' and 'last_fwd_cnt'
->requires taking rx_lock - so I guess it is better to avoid taking this lock every time in 'virtio_transport_send_credit_update()'.
+> If datapath == traffic which is intended to leave the card via
+> the external port, then yes.
 
-Yeah, I agree.
+Then I think I understand what causes the confusion.
 
->So may be we can do something like:
->
->
->fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
->free_space = vvs->buf_alloc - fwd_cnt_delta;
+The MHI netdev is used to deliver network traffic to the modem CPU,
+but it is not the controlpath.
+For the control path we have non-IP MHI channels (QMI, IPCR, etc).
+This can be the traffic targeting e.g. SSH or HTTP server running on
+the EP side of the link.
 
-Pre-existing issue, but should we handle the wrap (e.g. fwd_cnt wrapped, 
-but last_fwd_cnt not yet?). Maybe in that case we can foce the status
-update.
+I probably fail to see the difference between this scenario and the
+proper virtio netdev which also allows us to send the same IPv4/v6
+traffic to the CPU on the EP side.
 
->
->and then, after lock is released:
->
->if (fwd_cnt_delta && (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE ||
->    low_rx_bytes))
->        virtio_transport_send_credit_update(vsk);
->
->WDYT?
-
-Yep, I agree.
-
->
->Also, I guess that next idea to update this optimization(in next patchset), is to make
->threshold depends on vvs->buf_alloc. Because if someone changes minimum buffer size to
->for example 32KB, and then sets buffer size to 32KB, then free_space will be always
->non-zero, thus optimization is off now and credit update is sent on 
->every read.
-
-But does it make sense to allow a buffer smaller than 
-VIRTIO_VSOCK_MAX_PKT_BUF_SIZE?
-
-Maybe we should fail in virtio_transport_notify_buffer_size() or use it 
-as minimum.
-
-Stefano
-
+-- 
+With best wishes
+Dmitry
 
