@@ -1,157 +1,88 @@
-Return-Path: <netdev+bounces-54026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B864B805A45
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:48:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BFD3805A8E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:55:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFFED281480
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:48:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC02A1F216CD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAAC59E37;
-	Tue,  5 Dec 2023 16:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B5F60BBB;
+	Tue,  5 Dec 2023 16:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cSB2ioMh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5VS9852"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F30612C;
-	Tue,  5 Dec 2023 08:48:40 -0800 (PST)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B5Gipsl004962;
-	Tue, 5 Dec 2023 16:48:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=iEELI+drcZPd+0r9PZ1l4RJXQNt1AAeJOMaHk8xqoaQ=;
- b=cSB2ioMhjUkt5CVbO/r5UP6ym6H0xNR5QdF9NtBk4Oj9U1xrDegMDl0DetCW2ezumX91
- ovnlc70/iJNqKzkiyOF1MQ2F6b8Z2+VOrBLJplp00Po5BZQWXGeYTkpCdY952hL2Z8b+
- Za+bowDZEuHLXpnJiFGgZzc9Qa+SBF60mTGKNP8ginz5SST1xatVv+oRy3OQYJ4EO5a1
- DnyT71Ti07fmEKogvb+VB2SVoO9Sg3wNokvXH/BL9WvM2Ug/hARuFTmakHUnlGlfCvfM
- b2/1fK8RofeIort3k/V3oLPDL75Var10/xYoC2GXfKDXm2UT71mXv77wxPdcmV517Pso oA== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3usghcu6s4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 16:48:22 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B5GmLwG011521
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 5 Dec 2023 16:48:21 GMT
-Received: from [10.216.48.31] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 5 Dec
- 2023 08:48:11 -0800
-Message-ID: <0a5f769e-a474-40c6-a886-135716e90dd2@quicinc.com>
-Date: Tue, 5 Dec 2023 22:18:07 +0530
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897F2D41
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:55:45 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50bf37fd2bbso3562386e87.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:55:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701795344; x=1702400144; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikDA3R/+q358DUcNH1/anjWIWcQOxqbfd+f2yKZKvf0=;
+        b=M5VS9852HUZpW35mrTGs6Ox1SifPOInidtYMVq+diYpmkNAqyUj0WBHlNeRBXyzJmA
+         IjHytk890mj2EnNnWiKpZfjAo7kb3HbB5v90fM/kot1VQAa/vf2EqvHkIvJxdUnNFNi8
+         FyCgK1tLhRkOwdBw69Idd4xGt351ddwCY/77TWtPcSU/uSGyBYNSSduRt3677UNvIA0w
+         kqkNogW7Fh+NsP90qGb/z66m518RnAMSce1PPZ9KMK6klzgsmcYV7qN/PtNf6uzP4+VV
+         je0lwcv1dD2hCikF7iyCwy4XtYUTuC7hGUSMbwngxQwRsmaDpZhjObiQmxxrsEEGsbP+
+         DW5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701795344; x=1702400144;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ikDA3R/+q358DUcNH1/anjWIWcQOxqbfd+f2yKZKvf0=;
+        b=WtbIV+wY6xHBFgTEt4EZCT5rMHR7p56TA798ZjO95fab5fzoga4blpTDglRldI2qSJ
+         4cYpviKmnxW672E0CwaNJCz1+6zT+jqTszQznO9JkoCDjJsdef0QizcuLra/H5uot+Zq
+         fk/L5BSN4VeKS9UlMU85AKKztqrXI+X5620VK5Xvg2hGyS7EBSsUBrz9PAdTMgGggMUg
+         oX0AvXdJX38ha+W/s3ApWXckGYnJXPOA4/YLR38FF8dp7CKtZJs9B/ek6MdJt40BDT27
+         6Ar535TfjcsrZHPlrhblKDnkC9dU1VS53GICpxmzcWZrpdVSODRoJi+XEsEzWORLAzCH
+         dPOw==
+X-Gm-Message-State: AOJu0YwcMNQVXn+ovaHDq5Ys+3ybixXnjuaBP6Ber4hpEcLPT9Yjg/n8
+	6/mmR6SX6tWlMzOW057tf7U=
+X-Google-Smtp-Source: AGHT+IHAYR4ULR8frF0+mQ/X1sBmRSM3SJN8dLo2US1KR9hVtk6SYekySlI499NMYqQ0aWJ1LuQvBg==
+X-Received: by 2002:a19:700d:0:b0:50b:f776:1d63 with SMTP id h13-20020a19700d000000b0050bf7761d63mr1855394lfc.44.1701795343500;
+        Tue, 05 Dec 2023 08:55:43 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id b17-20020a05640202d100b0054cb316499dsm1310502edx.10.2023.12.05.08.55.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 08:55:42 -0800 (PST)
+Date: Tue, 5 Dec 2023 18:55:40 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Danzberger <dd@embedd.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+Message-ID: <20231205165540.jnmzuh4pb5xayode@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
+ <20231204174330.rjwxenuuxcimbzce@skbuf>
+ <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/3] Ethernet DWMAC5 fault IRQ support
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>,
-        Andrew Halaney
-	<ahalaney@redhat.com>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        Prasad Sodagudi
-	<psodagud@quicinc.com>, <kernel@quicinc.com>
-References: <cover.1701695218.git.quic_jsuraj@quicinc.com>
- <rw5vfdvre5rt4rwytfsp3qy6sgsdr3dm6oefr4sap2aqbvpw42@c2dxz42tucby>
- <zzkw5obc3z5fndowmrycy77gtjf6wscvkj7klnn34f3ycs3her@hmh5aebpbi3s>
-From: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-In-Reply-To: <zzkw5obc3z5fndowmrycy77gtjf6wscvkj7klnn34f3ycs3her@hmh5aebpbi3s>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: Mc9QZcB1-hKsYyPl6PdhGgV2kxS2dhsL
-X-Proofpoint-GUID: Mc9QZcB1-hKsYyPl6PdhGgV2kxS2dhsL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-05_12,2023-12-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
- adultscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- clxscore=1011 mlxscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2312050132
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
 
-Hi @serge,
-there is some more DT_CHECKER warning & need to fix that before uploading the new patch .
-Will fix the warning & then will update the version ,
+On Tue, Dec 05, 2023 at 09:00:39AM +0100, Daniel Danzberger wrote:
+> > Is this all that's necessary for instantiating the ksz driver through
+> > ds->dev->platform_data? I suppose not, so can you post it all, please?
+> Yes, that NULL pointer was the only issue I encountered.
 
-Thanks
-Suraj
+I was just thinking, the KSZ9477 has internal PHYs on ports 0-4, and an
+internal MDIO bus registered in ksz_mdio_register(). The bus registration
+won't work without OF, since it returns early when not finding
+of_get_child_by_name(dev->dev->of_node, "mdio").
 
-On 12/5/2023 3:35 PM, Serge Semin wrote:
-> Hi Suraj
-> 
-> On Mon, Dec 04, 2023 at 02:16:12PM -0600, Andrew Halaney wrote:
->> On Mon, Dec 04, 2023 at 06:56:14PM +0530, Suraj Jaiswal wrote:
->>> Add support to listen Ethernet HW safery IRQ. The safety IRQ will be
->>
->> s/safery/safety/
->>
->>> triggered for ECC, DPP, FSM error.
->>>
->>> Changes since v3:
->>
->> This is listed as v3 in the subject, but it should now be v4 since the
->> last version was v3.
-> 
-> There are several style-type problems I would like to share. But as
-> Andrew correctly noted the series version was incorrectly left
-> unchanged. Please resubmit the series with the version incremented.
-> I'll send my comments to that new thread so the discussion history and
-> the lore archive would look cleaner. Thanks.
-> 
-> -Serge(y)
-> 
->>
->>> - Fix DT_CHECKER warning
->>> - use name safety for the IRQ.
->>>  
->>>
->>> Suraj Jaiswal (3):
->>>   dt-bindings: net: qcom,ethqos: add binding doc for safety IRQ for
->>>     sa8775p
->>>   arm64: dts: qcom: sa8775p: enable safety IRQ
->>>   net: stmmac: Add driver support for DWMAC5 safety IRQ Support
->>>
->>>  .../devicetree/bindings/net/qcom,ethqos.yaml   |  9 ++++++---
->>>  .../devicetree/bindings/net/snps,dwmac.yaml    |  5 +++--
->>>  arch/arm64/boot/dts/qcom/sa8775p.dtsi          | 10 ++++++----
->>>  drivers/net/ethernet/stmicro/stmmac/common.h   |  1 +
->>>  drivers/net/ethernet/stmicro/stmmac/stmmac.h   |  2 ++
->>>  .../net/ethernet/stmicro/stmmac/stmmac_main.c  | 18 ++++++++++++++++++
->>>  .../ethernet/stmicro/stmmac/stmmac_platform.c  |  9 +++++++++
->>>  7 files changed, 45 insertions(+), 9 deletions(-)
->>>
->>> -- 
->>> 2.25.1
->>>
->>
->>
+Don't you need the internal PHY ports to work?
 
