@@ -1,86 +1,172 @@
-Return-Path: <netdev+bounces-53968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A14805799
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:40:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E900A8057A1
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F018A28228F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:40:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0ADE2825B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677994A987;
-	Tue,  5 Dec 2023 14:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD911524BE;
+	Tue,  5 Dec 2023 14:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ycj0Kwlv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3Tjv78I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB0965ED2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:40:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CB709C433C9;
-	Tue,  5 Dec 2023 14:40:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701787224;
-	bh=Cqjr/l2HE0/9mBSB9DQ/q7hDg0gN44Wa6VbJWXCLi7s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ycj0KwlvU/XrBOh4qMaM1Cc9yWoaiG3a2xkRQsl4vHpQy5hFHoaC4bOhGb6PZm7Jv
-	 WYrR9woUtM4PA2blktSDxLxA5svTYkmD+r903o8iXvI6CilisjQYl38tdblKkfYZkI
-	 tHwuxgpLwK7MhoAk7uhWAjKIoXZtqARJypJG4wGxhDAE2Ri/oeOp5MzjCqSIFFtLpc
-	 X/wLgk048d0Ud3M+VUBlEw7wO+8jSJfU5IHZHANbd/wq7mPaXWA+Iw+HQzOQ2ycRS3
-	 r4VvER6Rq4K1dJ3ziyGoLhU5E2kmqCMep2nSAIVkFc/+sYlZfbSgHRZkVUd3zCTDy0
-	 udfH/RtPH0BLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ACEBFC40C5E;
-	Tue,  5 Dec 2023 14:40:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B3DA129;
+	Tue,  5 Dec 2023 06:43:29 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40c07ed92fdso29342275e9.3;
+        Tue, 05 Dec 2023 06:43:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701787408; x=1702392208; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZGnImGdlNDTwdyaLU8r9UMvVcFSjoGXk6VpSezOFFzM=;
+        b=j3Tjv78IhlfcCX1l+elEUF5WlRR4Nph2hhju40c7BmXyv547NzQwsIRliNefjYxlHQ
+         A9WcYjyxV4rzK+q0mu/n5G0DbkRUe6c7z4/UZyOm03om5MHWAUPMVA/Y3YLqdwlFaBXL
+         NO3yIHKt13ZVyEJ2m/EH+uaKsGgqD8zWmckUZKvQ28M2wWLpd0zz6eYC43tLK2hxzftl
+         p1pHJZLkIvifYee4NEZYPtN8fDrkMlBBoEqRbR8ylTw32P2wP0/JNce+m04rGElczGIk
+         fPe9yX2KeSVb0fchKPiGV2wO0jeE1mSeJcv1DpzPMPkecUElBitSE9JzoERlbBwTtDwk
+         Os3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701787408; x=1702392208;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZGnImGdlNDTwdyaLU8r9UMvVcFSjoGXk6VpSezOFFzM=;
+        b=kzz/mPw/2pZBCor40/fzA++1OGSnzHgGl30b+20MKzqbDrUQuBJhXwBQGc4gzrKVny
+         rzHdr1X49/jCfSUfXHEz1hwIgVZ1vJ0+J2/PsgA1pDdFIC1fki7d5IoqFd4UQ8Eup5Ld
+         RO/gh3qsJkiDn4jcrMsHSXfW4/G0FkJv8Pi3kKtOahNI2+tVj32Nxs2GJVs3bUfFgw5K
+         dkUUdHLnvsicN0wM7nZlwAEBkhahXZsu0CpbsOe7ZRrxWnWjRW6FQEcVPAnz1Jl25oUX
+         DPCvN/Ck7qcmmD9F52ML0aoryQCdTC6U4+XVa6SRvopqOR35bkkakhDZTw9GdooEvJPn
+         c+LA==
+X-Gm-Message-State: AOJu0YyzS8a6Q9N+t90bZoyk+yTfLySa+lhrLy2bL53xMvhCAB9dCCDL
+	BD44lFrDCZ/MOPiZ6JhV4wk=
+X-Google-Smtp-Source: AGHT+IFYpdumJgRJ2s4LxEC0YV9JgVEmFxq0CuMbAQyVRpaTC+PUMGgdvyhwQyU1Xoobg5XhyKXjWg==
+X-Received: by 2002:a05:600c:4ec6:b0:40b:5e1e:b3b0 with SMTP id g6-20020a05600c4ec600b0040b5e1eb3b0mr559765wmq.46.1701787407594;
+        Tue, 05 Dec 2023 06:43:27 -0800 (PST)
+Received: from Ansuel-xps. (host-87-1-181-21.retail.telecomitalia.it. [87.1.181.21])
+        by smtp.gmail.com with ESMTPSA id d13-20020a05600c34cd00b0040b540ff0a5sm19050660wmq.19.2023.12.05.06.43.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 06:43:27 -0800 (PST)
+Message-ID: <656f370f.050a0220.8c4c5.8d3f@mx.google.com>
+X-Google-Original-Message-ID: <ZW83DDRrX-zxf3kw@Ansuel-xps.>
+Date: Tue, 5 Dec 2023 15:43:24 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v2 08/12] net: phy: at803x: move specific at8031
+ WOL bits to dedicated function
+References: <20231201001423.20989-1-ansuelsmth@gmail.com>
+ <20231201001423.20989-9-ansuelsmth@gmail.com>
+ <bdbe618d4fd38469e4e139ce4ebd161766f2e4d5.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,v2] macvlan: implement .parse_protocol hook function
- in macvlan_hard_header_ops
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170178722470.32384.9967935254321756458.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Dec 2023 14:40:24 +0000
-References: <20231202130658.2266526-1-shaozhengchao@huawei.com>
-In-Reply-To: <20231202130658.2266526-1-shaozhengchao@huawei.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, weiyongjun1@huawei.com,
- yuehaibing@huawei.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bdbe618d4fd38469e4e139ce4ebd161766f2e4d5.camel@redhat.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 2 Dec 2023 21:06:58 +0800 you wrote:
-> The .parse_protocol hook function in the macvlan_header_ops structure is
-> not implemented. As a result, when the AF_PACKET family is used to send
-> packets, skb->protocol will be set to 0.
-> Macvlan is a device of type ARPHRD_ETHER (ether_setup). Therefore, use
-> eth_header_parse_protocol function to obtain the protocol.
+On Tue, Dec 05, 2023 at 10:32:55AM +0100, Paolo Abeni wrote:
+> On Fri, 2023-12-01 at 01:14 +0100, Christian Marangi wrote:
+> > Move specific at8031 WOL enable/disable to dedicated function to make
+> > at803x_set_wol more generic.
+> > 
+> > This is needed in preparation for PHY driver split as qca8081 share the
+> > same function to toggle WOL settings.
+> > 
+> > In this new implementation WOL module in at8031 is enabled after the
+> > generic interrupt is setup. This should not cause any problem as the
+> > WOL_INT has a separate implementation and only relay on MAC bits.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> >  drivers/net/phy/at803x.c | 42 ++++++++++++++++++++++++----------------
+> >  1 file changed, 25 insertions(+), 17 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> > index 02ac71f98466..2de7a59c0faa 100644
+> > --- a/drivers/net/phy/at803x.c
+> > +++ b/drivers/net/phy/at803x.c
+> > @@ -466,27 +466,11 @@ static int at803x_set_wol(struct phy_device *phydev,
+> >  			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
+> >  				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
+> >  
+> > -		/* Enable WOL function for 1588 */
+> > -		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
+> > -			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > -					     AT803X_PHY_MMD3_WOL_CTRL,
+> > -					     0, AT803X_WOL_EN);
+> > -			if (ret)
+> > -				return ret;
+> > -		}
+> >  		/* Enable WOL interrupt */
+> >  		ret = phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_WOL);
+> >  		if (ret)
+> >  			return ret;
+> >  	} else {
+> > -		/* Disable WoL function for 1588 */
+> > -		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
+> > -			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > -					     AT803X_PHY_MMD3_WOL_CTRL,
+> > -					     AT803X_WOL_EN, 0);
+> > -			if (ret)
+> > -				return ret;
+> > -		}
+> >  		/* Disable WOL interrupt */
+> >  		ret = phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL, 0);
+> >  		if (ret)
+> > @@ -1611,6 +1595,30 @@ static int at8031_config_init(struct phy_device *phydev)
+> >  	return at803x_config_init(phydev);
+> >  }
+> >  
+> > +static int at8031_set_wol(struct phy_device *phydev,
+> > +			  struct ethtool_wolinfo *wol)
+> > +{
+> > +	int ret;
+> > +
+> > +	/* First setup MAC address and enable WOL interrupt */
+> > +	ret = at803x_set_wol(phydev, wol);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (wol->wolopts & WAKE_MAGIC)
+> > +		/* Enable WOL function for 1588 */
+> > +		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > +				     AT803X_PHY_MMD3_WOL_CTRL,
+> > +				     0, AT803X_WOL_EN);
+> > +	else
+> > +		/* Disable WoL function for 1588 */
+> > +		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > +				     AT803X_PHY_MMD3_WOL_CTRL,
+> > +				     AT803X_WOL_EN, 0);
+> > +
+> > +	return ret;
 > 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> 
-> [...]
+> If I read correctly, the above changes the order of some WoL
+> initialization steps: now WOL_CTRL is touched after
+> AT803X_INTR_ENABLE_WOL. Is that correct?
 
-Here is the summary with links:
-  - [net-next,v2] macvlan: implement .parse_protocol hook function in macvlan_hard_header_ops
-    https://git.kernel.org/netdev/net-next/c/cb297cc5e194
+Correct, as it was pointed out, in the previous revision the WOL was
+enabled before setting the MAC leaving some timeframe where we had
+interrupt that could be triggered by invalind MAC (and also in case MAC
+setup was failing the WOL was laved enabled)
 
-You are awesome, thank you!
+The current change should be safe enough as the WOL module is enabled at
+the end of all the required setup preventing any kind of
+misconfiguration if something fails before.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Ansuel
 
