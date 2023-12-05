@@ -1,77 +1,69 @@
-Return-Path: <netdev+bounces-53921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1114D805372
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:49:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6CE80537A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40BC61C20E75
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:49:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3F831F21514
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C085259E2B;
-	Tue,  5 Dec 2023 11:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED55659B5F;
+	Tue,  5 Dec 2023 11:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEVVCGo/"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Y+YoVLWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660C31AB;
-	Tue,  5 Dec 2023 03:49:46 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50bf898c43cso1994651e87.1;
-        Tue, 05 Dec 2023 03:49:46 -0800 (PST)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668AA181
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 03:50:35 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-a1a496a73ceso539298166b.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 03:50:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701776984; x=1702381784; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701777034; x=1702381834; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AcNcuzGaQBjUBsiLWETqgO5QGNFrGHbqm/wUp0AM8dI=;
-        b=SEVVCGo/NXb7w7bSjOiZx0rYuK6Eyyy6rI6Gyc5cnev3w19Ma7/WpOQ9C9G4onTNPx
-         wKZBDQXA/2MV4lNYaS3zuiFoFg9ZTwn5IU4kIdyvvEoBjcfpp5sgDMTr79/meJ+N6IYv
-         UjIIC4dqE7/9J5S1bgpgL11toczURz8AbNHLOL+ei2tT3BaSjI7HN8xViK7X19GX+WGP
-         C6L0JPvPnsIDkhCPToPi9EcxH625z74X+p5EhPiTk4mzlC7IGRpwkn2Inwfqa5kRtQ65
-         5MIJCcbtwmByC2tc2nQum1LvzDC637VpJwcU3xkyess+cqPgQJmCZeI/f++hWQ3sEQec
-         YJgw==
+        bh=vAldGiFeFbPRKXSlp6m6UonxDt3/eyqKTxSoBbozjFU=;
+        b=Y+YoVLWcB12It/eesAmwBRmpuU4v553U4fgZbnSy5fZ3wHy2tWnn6CBTmufZO25V16
+         gYFcjJ9z0KZg38WyMUS05y1HNfyQRGP2YMJVT/0eGESNNZDZ5BpPoQa1NdLsGZLRhblf
+         euAN+c9vFFgc69Jqr5ZBiG/v8HtU4uGZMoYY+gydr2KW8VDE8MXm2msTO33d1+dnVc9L
+         81CEDW5xhhsRO9NvCy/2vjkQK9ppcxBi9MJqTbLnksnrg6Ix5gRX1zZmRFahGr+Mv0Dt
+         xfMltyY0htpj84+nkAQadJhGTQSYhsciRPEzG1/yWIWh8SYKEL4ATCu20B5DaEsrdxld
+         1bOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701776984; x=1702381784;
+        d=1e100.net; s=20230601; t=1701777034; x=1702381834;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AcNcuzGaQBjUBsiLWETqgO5QGNFrGHbqm/wUp0AM8dI=;
-        b=DcTITSU7NLfBJDMD6ZIFR/m6G2RbEe7GUtYmWk43DpuIleGO0wSv353YaERfYvLVp6
-         jFdpcqdngvznMyM4RnvbGN/X3HmVLiOQ+jENJYXdMQkHp+329JX1ka/NOqnd+fywYTaI
-         19BeZ+xNU+0TwAXGQuZsXzXIAfQmzJzv29r5mfXrF2Z1HUTUvdr1/N0GbN/3geKXTfJt
-         MInDixlGftEpc3duOGktoofP1bTEALPFyZMDegOlxb+YDxQy39qmHg1CzbUzb7TahBt0
-         B1ogjnECDg2ZHeRKMdb60vKwx7EDa4sZ5uWuMBhzxYzsjlr8Vdeo3FkBMmiDvZlDSzOO
-         72IQ==
-X-Gm-Message-State: AOJu0YxBz0CE622HQ+NsnTv/VGV3pILyHe80prybPmtsDtojM77zygTD
-	42aQP0rt+jCnRTYlSQmWW1E=
-X-Google-Smtp-Source: AGHT+IHG01Rbi7bi2+HqRxjF1g6Uid7DKqoIjAsfnJUvTJZdfjRyLs23pzhCbhHBaCrpogRFumVNSg==
-X-Received: by 2002:a05:6512:1394:b0:50c:320:f171 with SMTP id fc20-20020a056512139400b0050c0320f171mr476503lfb.197.1701776983952;
-        Tue, 05 Dec 2023 03:49:43 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id e2-20020a05651236c200b0050bf0921ac1sm792193lfs.206.2023.12.05.03.49.42
+        bh=vAldGiFeFbPRKXSlp6m6UonxDt3/eyqKTxSoBbozjFU=;
+        b=EXshgiiXU2PhxKKKMOP1beJAoDJgqQf3xcxu/XV6/f0p/XU3aOXXDmb8q7V50RHz60
+         Se/E4yzemkJ+O1F4P0RLyz5Hjyx0MIlD3t9pQIfl3xwLop6joHrcsozfbiUxGmGVki0V
+         tldpB3EBnBJCyx6hUdJ4+CTMVHQYsXl/qzmMfFDnsf42Pe/u5U9ryWS2jksWIuf5C8tX
+         xpkkdHdNHhnAmhWZQqNcavDTW+Y8seX0r1Ace/m1SFCWp8Shv6/URT/CLygLoD1s4o95
+         w3hrwKIQwP5zpPkp6QSV5UaueOVBLcMZbQ2VXZ6wHzHth4tHHslXiUiFDAshkhDQ4Kcr
+         sWug==
+X-Gm-Message-State: AOJu0YwfAkzWqZ+TJ3ftzSLJFyKmQQbaPqJfBwFlk2XD1RHx79G0ZozE
+	UeQWxBBQdtqePOEJhQMzpEWjhA==
+X-Google-Smtp-Source: AGHT+IH5+80yQ47HHsYrVMfhNJwQtDhRpw1a3jPCev48ud+9mlzx+KzgOfPFESMozqiO8BJD5FlYeg==
+X-Received: by 2002:a17:906:ac7:b0:9b2:cf77:a105 with SMTP id z7-20020a1709060ac700b009b2cf77a105mr398586ejf.15.1701777033886;
+        Tue, 05 Dec 2023 03:50:33 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id hs22-20020a1709073e9600b00a1a5f7bd1a0sm4274716ejc.30.2023.12.05.03.50.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 03:49:43 -0800 (PST)
-Date: Tue, 5 Dec 2023 14:49:41 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>, Tomer Maimon <tmaimon77@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 05/16] net: pcs: xpcs: Move native device ID
- macro to linux/pcs/pcs-xpcs.h
-Message-ID: <6zejbbv6oriaztbbgyjy6r6hycccq6rvypb5ywxf7nqx3vlq7r@na5eossdsuec>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-6-fancer.lancer@gmail.com>
- <20231205103559.9605-6-fancer.lancer@gmail.com>
- <20231205112755.3am2mazwireflpkq@skbuf>
+        Tue, 05 Dec 2023 03:50:33 -0800 (PST)
+Date: Tue, 5 Dec 2023 12:50:32 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, marcelo.leitner@gmail.com,
+	vladbu@nvidia.com, Victor Nogueira <victor@mojatatu.com>
+Subject: Re: [PATCH net-next v2 1/5] rtnl: add helper to check if rtnl group
+ has listeners
+Message-ID: <ZW8OiMjYQQClP+D1@nanopsycho>
+References: <20231204203907.413435-1-pctammela@mojatatu.com>
+ <20231204203907.413435-2-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,17 +72,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231205112755.3am2mazwireflpkq@skbuf>
+In-Reply-To: <20231204203907.413435-2-pctammela@mojatatu.com>
 
-On Tue, Dec 05, 2023 at 01:27:55PM +0200, Vladimir Oltean wrote:
-> On Tue, Dec 05, 2023 at 01:35:26PM +0300, Serge Semin wrote:
-> > In addition to that having all supported DW XPCS device IDs defined in
-> > a sinle place will improve the code maintainability and readability.
-> 
-> single
+Mon, Dec 04, 2023 at 09:39:03PM CET, pctammela@mojatatu.com wrote:
+>From: Jamal Hadi Salim <jhs@mojatatu.com>
+>
+>As of today, rtnl code creates a new skb and unconditionally fills and
+>broadcasts it to the relevant group. For most operations this is okay
+>and doesn't waste resources in general.
+>
+>When operations are done without the rtnl_lock, as in tc-flower, such
+>skb allocation, message fill and no-op broadcasting can happen in all
+>cores of the system, which contributes to system pressure and wastes
+>precious cpu cycles when no one will receive the built message.
+>
+>Introduce this helper so rtnetlink operations can simply check if someone
+>is listening and then proceed if necessary.
+>
+>Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+>Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 
-Got it. Thanks. Seeing there are so many comments about the log
-messages I'll double check them on v2.
-
--Serge(y)
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
