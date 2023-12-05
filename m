@@ -1,178 +1,190 @@
-Return-Path: <netdev+bounces-54063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A8E805E5F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:10:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E461805E69
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2D581F21423
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:10:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2F27B21031
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD9369286;
-	Tue,  5 Dec 2023 19:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F400F6D1A9;
+	Tue,  5 Dec 2023 19:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hhn7edko"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QcCCdWoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881B3194;
-	Tue,  5 Dec 2023 11:10:01 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6ce4d4c5ea2so2095548b3a.0;
-        Tue, 05 Dec 2023 11:10:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701803401; x=1702408201; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LPvsreD7SHt4olmNelnu/glf+fhgjLiYFThCak4nyVI=;
-        b=Hhn7edkoFmTEiS3+su/j/RRiFeVA9otf8tmzu6jhc75nIjt/f4/yDJtvIr1uDpjQmD
-         QDxDynTskK5OLmTTQqxKSj6HwUlZx8AK8mMvMgPXEBUKpcoGwTXKE9UfZDw7BWlNyR9H
-         qITgRwSJQKZlUpRaP567Wtq7pBrVO2ERNT+Lu3JUQb03+tU8+4qA10d4J6PdMUAEaAGJ
-         E+pRrJNTJKsapNyH+skD5fRK7l0nwdiF+bV9hh/rC6rY82eEWbCZF4I7uqz/HB2kUk9r
-         296unvcjwWGAhvpG5W2JnDWo0U46iPXcxOe8aZ7wB8SG7IulbGNAB49T52CVLnsx/uF6
-         zW9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701803401; x=1702408201;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LPvsreD7SHt4olmNelnu/glf+fhgjLiYFThCak4nyVI=;
-        b=xPA6i2dTsrVGOYPrUqZoin5K26HS2RzzqxgF4zspfzY2+q+sVdjmKP9b7iYbcD7Zsq
-         SNOUlclGkcUXhEJUMgs9zNDRP308euLwDHvSNnbZiwdfO7OpnmkXbSsHGKOWiLoGyJNZ
-         zXpmHOU6Z91bRfUxuIftV4osshC4OvDm2A0SKFsng0RRWqQBrv/BBy5Y21k2CIq3u7y3
-         83oBPYjEF+yHyETgkXgvgGnSu/U+PvBwd/tkHKhdkon4/1r35LvLrgRq6RJ14/IHmJT6
-         I7Hp0UifN6H3f8XRlW9AYQsCSEFdcSFAwqIlA6Y9sI7YpG4JVrQ9I6YzhnWoeqLCi5Rn
-         oRKQ==
-X-Gm-Message-State: AOJu0YzpTwxbqRcdZ5E4Fd8rxpKDTH0NUHwJj1NGMCqUvTDVSVn1p0nT
-	HbfeVL1QNZLwjaHUeM/Ena4=
-X-Google-Smtp-Source: AGHT+IEDq+Ez0h9sWD3yvp/dBLNWpF1VLCTMHXfh4bbVjAmC2l7HwMujCksKsd5K58RuIsXkbKQ4bQ==
-X-Received: by 2002:a05:6a21:19d:b0:18c:570d:c5b4 with SMTP id le29-20020a056a21019d00b0018c570dc5b4mr26991876pzb.35.1701803400827;
-        Tue, 05 Dec 2023 11:10:00 -0800 (PST)
-Received: from localhost.localdomain ([114.249.31.17])
-        by smtp.gmail.com with ESMTPSA id v18-20020a63f212000000b005ab281d0777sm9624568pgh.20.2023.12.05.11.09.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 11:10:00 -0800 (PST)
-From: YangXin <yx.0xffff@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: remove ___neigh_lookup_noref().
-Date: Wed,  6 Dec 2023 03:09:51 +0800
-Message-Id: <20231205190951.67-1-yx.0xffff@gmail.com>
-X-Mailer: git-send-email 2.30.2
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE2FB0
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:12:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701803555; x=1733339555;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zkCkmjo/6gO+psYAjT3o4rmRiAce786m0PTs4ArlFcM=;
+  b=QcCCdWoJ4DoP7eXHqLipNrf4G8bDk0i9r2CbyNp8+Y8L7XXgjX7wJ8H9
+   pW3aPmxWxqjAbUqY86Mwz7tdQS5v3wwAcYAEjWQ2Mw3mjCVgtNzc8HZ23
+   7AG1yoAeTnkl/rDFungj4CkIw9MAtqEwqgpWnaBIlvQHsoUY4ALJGOenm
+   C+uPOH9m4LCJWibXGHXU3gCL0hIq2f9ifo0SHRrsT99lUtrya0Dc230zf
+   T3ftyzQrtKcItxD4PmW2s9dxre/P7dNmCQ4X8ToxgFseOrh+ticQ8nidy
+   3t7b9N1YpYzqk6BlWREDcCfSmS8/32PNBrWthsZNYMD6FPMBpw10bRtKa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="12662571"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="12662571"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 11:12:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="889043566"
+X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
+   d="scan'208";a="889043566"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 05 Dec 2023 11:12:31 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rAaqJ-0009bC-1A;
+	Tue, 05 Dec 2023 19:12:28 +0000
+Date: Wed, 6 Dec 2023 03:12:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shirley Ma <mashirle@us.ibm.com>, David Ahern <dsahern@kernel.org>,
+	Lorenzo Colitti <lorenzo@google.com>
+Subject: Re: [PATCH net] net: ipv6: support reporting otherwise unknown
+ prefix flags in RTM_NEWPREFIX
+Message-ID: <202312060307.EaL1FRwu-lkp@intel.com>
+References: <20231204195252.2004515-1-maze@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204195252.2004515-1-maze@google.com>
 
-key_eq() and hash() are functions of struct neigh_table, so we just need to call tbl->key_eq() and tbl->hash(), instead of passing them in as parameters. 
+Hi Maciej,
 
-And if those two parameters were removed,  ___neigh_lookup_noref() would be pointless, so I replaced ___neigh_lookup_noref() with __neigh_lookup_noref().
+kernel test robot noticed the following build errors:
 
-Signed-off-by: YangXin <yx.0xffff@gmail.com>
----
-Last time I comitted this patch, Mr Dumazet said "this might defeat inlining.".
-So I compiled kernel on my computer with defconfig, made sure that this patch would not lead __neigh_lookup_noref() fail to inline.
+[auto build test ERROR on net/main]
 
-My enviroment:
-Debian12
-gcc version:
-gcc (Debian 12.2.0-14) 12.2.0
+url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-enczykowski/net-ipv6-support-reporting-otherwise-unknown-prefix-flags-in-RTM_NEWPREFIX/20231205-035333
+base:   net/main
+patch link:    https://lore.kernel.org/r/20231204195252.2004515-1-maze%40google.com
+patch subject: [PATCH net] net: ipv6: support reporting otherwise unknown prefix flags in RTM_NEWPREFIX
+config: arm-rpc_defconfig (https://download.01.org/0day-ci/archive/20231206/202312060307.EaL1FRwu-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231206/202312060307.EaL1FRwu-lkp@intel.com/reproduce)
 
- include/net/arp.h       |  2 +-
- include/net/ndisc.h     |  5 ++---
- include/net/neighbour.h | 22 +++++-----------------
- 3 files changed, 8 insertions(+), 21 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202312060307.EaL1FRwu-lkp@intel.com/
 
-diff --git a/include/net/arp.h b/include/net/arp.h
-index e8747e0713c7..e274c7fc5020 100644
---- a/include/net/arp.h
-+++ b/include/net/arp.h
-@@ -24,7 +24,7 @@ static inline struct neighbour *__ipv4_neigh_lookup_noref(struct net_device *dev
- 	if (dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))
- 		key = INADDR_ANY;
- 
--	return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, arp_hashfn, &key, dev);
-+	return __neigh_lookup_noref(&arp_tbl, &key, dev);
- }
- #else
- static inline
-diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-index 9bbdf6eaa942..8e0ba9a87e4d 100644
---- a/include/net/ndisc.h
-+++ b/include/net/ndisc.h
-@@ -380,15 +380,14 @@ static inline u32 ndisc_hashfn(const void *pkey, const struct net_device *dev, _
- 
- static inline struct neighbour *__ipv6_neigh_lookup_noref(struct net_device *dev, const void *pkey)
- {
--	return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, ndisc_hashfn, pkey, dev);
-+	return __neigh_lookup_noref(&nd_tbl, pkey, dev);
- }
- 
- static inline
- struct neighbour *__ipv6_neigh_lookup_noref_stub(struct net_device *dev,
- 						 const void *pkey)
- {
--	return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128,
--				     ndisc_hashfn, pkey, dev);
-+	return __neigh_lookup_noref(ipv6_stub->nd_tbl, pkey, dev);
- }
- 
- static inline struct neighbour *__ipv6_neigh_lookup(struct net_device *dev, const void *pkey)
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 0d28172193fa..434c9e7c7ea7 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -290,37 +290,25 @@ static inline bool neigh_key_eq128(const struct neighbour *n, const void *pkey)
- 		(n32[2] ^ p32[2]) | (n32[3] ^ p32[3])) == 0;
- }
- 
--static inline struct neighbour *___neigh_lookup_noref(
--	struct neigh_table *tbl,
--	bool (*key_eq)(const struct neighbour *n, const void *pkey),
--	__u32 (*hash)(const void *pkey,
--		      const struct net_device *dev,
--		      __u32 *hash_rnd),
--	const void *pkey,
--	struct net_device *dev)
-+static inline struct neighbour *__neigh_lookup_noref(struct neigh_table *tbl,
-+						     const void *pkey,
-+						     struct net_device *dev)
- {
- 	struct neigh_hash_table *nht = rcu_dereference(tbl->nht);
- 	struct neighbour *n;
- 	u32 hash_val;
- 
--	hash_val = hash(pkey, dev, nht->hash_rnd) >> (32 - nht->hash_shift);
-+	hash_val = tbl->hash(pkey, dev, nht->hash_rnd) >> (32 - nht->hash_shift);
- 	for (n = rcu_dereference(nht->hash_buckets[hash_val]);
- 	     n != NULL;
- 	     n = rcu_dereference(n->next)) {
--		if (n->dev == dev && key_eq(n, pkey))
-+		if (n->dev == dev && tbl->key_eq(n, pkey))
- 			return n;
- 	}
- 
- 	return NULL;
- }
- 
--static inline struct neighbour *__neigh_lookup_noref(struct neigh_table *tbl,
--						     const void *pkey,
--						     struct net_device *dev)
--{
--	return ___neigh_lookup_noref(tbl, tbl->key_eq, tbl->hash, pkey, dev);
--}
--
- static inline void neigh_confirm(struct neighbour *n)
- {
- 	if (n) {
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/container_of.h:5,
+                    from include/linux/list.h:5,
+                    from include/linux/module.h:12,
+                    from fs/lockd/svc.c:16:
+>> include/linux/build_bug.h:78:41: error: static assertion failed: "sizeof(struct prefix_info) == 32"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+   include/net/addrconf.h:58:1: note: in expansion of macro 'static_assert'
+      58 | static_assert(sizeof(struct prefix_info) == 32);
+         | ^~~~~~~~~~~~~
+--
+   In file included from lib/vsprintf.c:21:
+>> include/linux/build_bug.h:78:41: error: static assertion failed: "sizeof(struct prefix_info) == 32"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+   include/net/addrconf.h:58:1: note: in expansion of macro 'static_assert'
+      58 | static_assert(sizeof(struct prefix_info) == 32);
+         | ^~~~~~~~~~~~~
+   lib/vsprintf.c: In function 'va_format':
+   lib/vsprintf.c:1683:9: warning: function 'va_format' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+    1683 |         buf += vsnprintf(buf, end > buf ? end - buf : 0, va_fmt->fmt, va);
+         |         ^~~
+--
+   In file included from include/linux/container_of.h:5,
+                    from include/linux/list.h:5,
+                    from include/linux/module.h:12,
+                    from net/ipv4/route.c:63:
+>> include/linux/build_bug.h:78:41: error: static assertion failed: "sizeof(struct prefix_info) == 32"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+   include/net/addrconf.h:58:1: note: in expansion of macro 'static_assert'
+      58 | static_assert(sizeof(struct prefix_info) == 32);
+         | ^~~~~~~~~~~~~
+   net/ipv4/route.c: In function 'ip_rt_send_redirect':
+   net/ipv4/route.c:880:13: warning: variable 'log_martians' set but not used [-Wunused-but-set-variable]
+     880 |         int log_martians;
+         |             ^~~~~~~~~~~~
+--
+   In file included from include/linux/container_of.h:5,
+                    from include/linux/list.h:5,
+                    from include/linux/timer.h:5,
+                    from include/linux/workqueue.h:9,
+                    from include/linux/bpf.h:10,
+                    from net/ipv6/ip6_fib.c:18:
+>> include/linux/build_bug.h:78:41: error: static assertion failed: "sizeof(struct prefix_info) == 32"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+   include/net/addrconf.h:58:1: note: in expansion of macro 'static_assert'
+      58 | static_assert(sizeof(struct prefix_info) == 32);
+         | ^~~~~~~~~~~~~
+   net/ipv6/ip6_fib.c: In function 'fib6_add':
+   net/ipv6/ip6_fib.c:1384:32: warning: variable 'pn' set but not used [-Wunused-but-set-variable]
+    1384 |         struct fib6_node *fn, *pn = NULL;
+         |                                ^~
+
+
+vim +78 include/linux/build_bug.h
+
+bc6245e5efd70c Ian Abbott       2017-07-10  60  
+6bab69c65013be Rasmus Villemoes 2019-03-07  61  /**
+6bab69c65013be Rasmus Villemoes 2019-03-07  62   * static_assert - check integer constant expression at build time
+6bab69c65013be Rasmus Villemoes 2019-03-07  63   *
+6bab69c65013be Rasmus Villemoes 2019-03-07  64   * static_assert() is a wrapper for the C11 _Static_assert, with a
+6bab69c65013be Rasmus Villemoes 2019-03-07  65   * little macro magic to make the message optional (defaulting to the
+6bab69c65013be Rasmus Villemoes 2019-03-07  66   * stringification of the tested expression).
+6bab69c65013be Rasmus Villemoes 2019-03-07  67   *
+6bab69c65013be Rasmus Villemoes 2019-03-07  68   * Contrary to BUILD_BUG_ON(), static_assert() can be used at global
+6bab69c65013be Rasmus Villemoes 2019-03-07  69   * scope, but requires the expression to be an integer constant
+6bab69c65013be Rasmus Villemoes 2019-03-07  70   * expression (i.e., it is not enough that __builtin_constant_p() is
+6bab69c65013be Rasmus Villemoes 2019-03-07  71   * true for expr).
+6bab69c65013be Rasmus Villemoes 2019-03-07  72   *
+6bab69c65013be Rasmus Villemoes 2019-03-07  73   * Also note that BUILD_BUG_ON() fails the build if the condition is
+6bab69c65013be Rasmus Villemoes 2019-03-07  74   * true, while static_assert() fails the build if the expression is
+6bab69c65013be Rasmus Villemoes 2019-03-07  75   * false.
+6bab69c65013be Rasmus Villemoes 2019-03-07  76   */
+6bab69c65013be Rasmus Villemoes 2019-03-07  77  #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+6bab69c65013be Rasmus Villemoes 2019-03-07 @78  #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+6bab69c65013be Rasmus Villemoes 2019-03-07  79  
+07a368b3f55a79 Maxim Levitsky   2022-10-25  80  
+
 -- 
-2.33.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
