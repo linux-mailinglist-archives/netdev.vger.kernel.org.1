@@ -1,115 +1,182 @@
-Return-Path: <netdev+bounces-54129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316D88060E2
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:36:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2D58060E9
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFFB8281D28
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:36:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3ABC281D4D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CD66AB8A;
-	Tue,  5 Dec 2023 21:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B666D1D2;
+	Tue,  5 Dec 2023 21:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B8sZf6ZX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="KsNMkEFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536F2A5;
-	Tue,  5 Dec 2023 13:35:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701812159; x=1733348159;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tHRfx1lLTTEUbpIitHnXG4zSRin4Toua4V/h/F5B9uY=;
-  b=B8sZf6ZXHM/xHLwx8t8niZYuLl/e0LoP8ZhdUHWTDkTKpo2qxzoMOn7s
-   vzH4jK4S3ewblDnXXkaqsIL/+VGCqC4+B4fyct9gICqsiAvo64mT7oagS
-   JdW24ipKwQ0ovgYoKMxeKqpHSVyMUmyJFZ/AalDE5CN3dC2qSPoq3gU1e
-   35GM3Nd9dYgwlH5z9XwLwX+0STEyqY5GNuZA3WM4lPmM7CgLngE4BMX++
-   g548NznFv+QFhNJI7qWRFOPdRIKoxSdWUMRMTlo98WnhcA3hbIsOm7bs1
-   7bMWqLCyo/B5A7q/cdb2w2yqb8rLDiS8es2h7SPEvBsTgEt86Vj7x5K7C
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="391128807"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="391128807"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:35:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="837084266"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="837084266"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga008.fm.intel.com with ESMTP; 05 Dec 2023 13:35:53 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rAd55-0009lI-12;
-	Tue, 05 Dec 2023 21:35:51 +0000
-Date: Wed, 6 Dec 2023 05:35:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kory Maincent <kory.maincent@bootlin.com>,
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F17761A5;
+	Tue,  5 Dec 2023 13:40:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=HwfadbfArAOrbi6WFDIy6INcelr36TFFIrCY2kyM2c4=; b=KsNMkEFoe4cCpPVKu9fmLkWvbx
+	BQu1ttDZYNRVoM+Kt4dTeJ2Q2VOTg/u9VMWS/moeP4V481ksJ4PaN8j7d4DTqPBwoMPqhlcV/V/S5
+	rvxXh03r3El+HsPg2iPM2pMrdSdo86X4XeXH7Zq10ob83U8NF1qiI78+AG312kAr/4+Jw22BzXYBT
+	QdgDfmK3BNQOLMJzSdlleXe1Vrd4JfkLOGurOkjzLKYhniDdC4AD2MPsODbPD2AQXJ191TY9yfhfo
+	0pHZ/bwR70EdGU6kwjOsJSNCOlF2MOZhWqz13R87mDFTMA/9MRPW+dQusySuXzHKIMtP6coOeXTX+
+	AI5lJuwA==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94.2)
+	(envelope-from <phil@nwl.cc>)
+	id 1rAd9L-0006hb-2f; Tue, 05 Dec 2023 22:40:15 +0100
+Date: Tue, 5 Dec 2023 22:40:15 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Jann Horn <jannh@google.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	coreteam@netfilter.org, Christian Brauner <brauner@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <202312060510.XsWjRD4I-lkp@intel.com>
-References: <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+	Network Development <netdev@vger.kernel.org>,
+	kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: Is xt_owner's owner_mt() racy with sock_orphan()? [worse with
+ new TYPESAFE_BY_RCU file lifetime?]
+Message-ID: <ZW+Yv6TR+EMBp03f@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>, Jann Horn <jannh@google.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	coreteam@netfilter.org, Christian Brauner <brauner@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Network Development <netdev@vger.kernel.org>,
+	kernel list <linux-kernel@vger.kernel.org>
+References: <CAG48ez0TfTAkaRWFCTb44x=TWP_sDZVx-5U2hvfQSFOhghNrCA@mail.gmail.com>
+ <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="AjyCI6p3WJlNZLnJ"
 Content-Disposition: inline
-In-Reply-To: <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
 
-Hi Kory,
 
-kernel test robot noticed the following build warnings:
+--AjyCI6p3WJlNZLnJ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-[auto build test WARNING on net-next/main]
+Hi,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kory-Maincent/ethtool-Expand-Ethernet-Power-Equipment-with-c33-PoE-alongside-PoDL/20231202-021033
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231201-feature_poe-v2-8-56d8cac607fa%40bootlin.com
-patch subject: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller driver
-config: alpha-kismet-CONFIG_FW_UPLOAD-CONFIG_PSE_PD692X0-0-0 (https://download.01.org/0day-ci/archive/20231206/202312060510.XsWjRD4I-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20231206/202312060510.XsWjRD4I-lkp@intel.com/reproduce)
+On Tue, Dec 05, 2023 at 06:08:29PM +0100, Jann Horn wrote:
+> On Tue, Dec 5, 2023 at 5:40 PM Jann Horn <jannh@google.com> wrote:
+> >
+> > Hi!
+> >
+> > I think this code is racy, but testing that seems like a pain...
+> >
+> > owner_mt() in xt_owner runs in context of a NF_INET_LOCAL_OUT or
+> > NF_INET_POST_ROUTING hook. It first checks that sk->sk_socket is
+> > non-NULL, then checks that sk->sk_socket->file is non-NULL, then
+> > accesses the ->f_cred of that file.
+> >
+> > I don't see anything that protects this against a concurrent
+> > sock_orphan(), which NULLs out the sk->sk_socket pointer, if we're in
+> 
+> Ah, and all the other users of ->sk_socket in net/netfilter/ do it
+> under the sk_callback_lock... so I guess the fix would be to add the
+> same in owner_mt?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312060510.XsWjRD4I-lkp@intel.com/
+Sounds reasonable, although I wonder how likely a socket is to
+orphan while netfilter is processing a packet it just sent.
 
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for FW_UPLOAD when selected by PSE_PD692X0
-   
-   WARNING: unmet direct dependencies detected for FW_UPLOAD
-     Depends on [n]: FW_LOADER [=n]
-     Selected by [y]:
-     - PSE_PD692X0 [=y] && NETDEVICES [=y] && PSE_CONTROLLER [=y] && I2C [=y]
+How about the attached patch? Not sure what hash to put into a Fixes:
+tag given this is a day 1 bug and ipt_owner/ip6t_owner predate git.
 
+Thanks, Phil
+
+--AjyCI6p3WJlNZLnJ
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-netfilter-xt_owner-Fix-for-unsafe-access-of-sk-sk_so.patch"
+
+From 3e28490e43b04d49e6e7f145a70fff7dd42c8cc5 Mon Sep 17 00:00:00 2001
+From: Phil Sutter <phil@nwl.cc>
+Date: Tue, 5 Dec 2023 21:58:12 +0100
+Subject: [nf PATCH] netfilter: xt_owner: Fix for unsafe access of sk->sk_socket
+
+A concurrently running sock_orphan() may NULL the sk_socket pointer in
+between check and deref. Follow other users (like nft_meta.c for
+instance) and acquire sk_callback_lock before dereferencing sk_socket.
+
+Reported-by: Jann Horn <jannh@google.com>
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+---
+ net/netfilter/xt_owner.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/net/netfilter/xt_owner.c b/net/netfilter/xt_owner.c
+index e85ce69924ae..50332888c8d2 100644
+--- a/net/netfilter/xt_owner.c
++++ b/net/netfilter/xt_owner.c
+@@ -76,18 +76,23 @@ owner_mt(const struct sk_buff *skb, struct xt_action_param *par)
+ 		 */
+ 		return false;
+ 
+-	filp = sk->sk_socket->file;
+-	if (filp == NULL)
++	read_lock_bh(&sk->sk_callback_lock);
++	filp = sk->sk_socket ? sk->sk_socket->file : NULL;
++	if (filp == NULL) {
++		read_unlock_bh(&sk->sk_callback_lock);
+ 		return ((info->match ^ info->invert) &
+ 		       (XT_OWNER_UID | XT_OWNER_GID)) == 0;
++	}
+ 
+ 	if (info->match & XT_OWNER_UID) {
+ 		kuid_t uid_min = make_kuid(net->user_ns, info->uid_min);
+ 		kuid_t uid_max = make_kuid(net->user_ns, info->uid_max);
+ 		if ((uid_gte(filp->f_cred->fsuid, uid_min) &&
+ 		     uid_lte(filp->f_cred->fsuid, uid_max)) ^
+-		    !(info->invert & XT_OWNER_UID))
++		    !(info->invert & XT_OWNER_UID)) {
++			read_unlock_bh(&sk->sk_callback_lock);
+ 			return false;
++		}
+ 	}
+ 
+ 	if (info->match & XT_OWNER_GID) {
+@@ -112,10 +117,13 @@ owner_mt(const struct sk_buff *skb, struct xt_action_param *par)
+ 			}
+ 		}
+ 
+-		if (match ^ !(info->invert & XT_OWNER_GID))
++		if (match ^ !(info->invert & XT_OWNER_GID)) {
++			read_unlock_bh(&sk->sk_callback_lock);
+ 			return false;
++		}
+ 	}
+ 
++	read_unlock_bh(&sk->sk_callback_lock);
+ 	return true;
+ }
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
+
+--AjyCI6p3WJlNZLnJ--
 
