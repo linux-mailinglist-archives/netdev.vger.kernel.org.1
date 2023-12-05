@@ -1,114 +1,120 @@
-Return-Path: <netdev+bounces-54000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6EF805942
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:57:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10645805948
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 647E1B20FAD
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:57:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 886471F2156A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:59:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A7060B8A;
-	Tue,  5 Dec 2023 15:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9226260B91;
+	Tue,  5 Dec 2023 15:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTvBMMg8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKqBKfFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF1660B82;
-	Tue,  5 Dec 2023 15:57:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5137CC433C8;
-	Tue,  5 Dec 2023 15:57:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701791855;
-	bh=WgrVkII6Qt1b4rQxQZ7m71wjsB2HLj5ZsjzJ5yzkPuA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YTvBMMg8ecKR5ZF561HEQW/VK65TRDd+a3xGYtju8FHcPe/8cMjHfKM4OYNqz0D6b
-	 Kc6XI+UgRd7zeyhKPc44yEmAQ7pPxwcrN205q2PRXktR4G1UvJ7oTnMHPl8XGrkvTq
-	 h3LkYTQCyhwvz4Irb5h8AQCASxcBuUMWz6uSTmQaI39tib7uHCjh8t9dBPxoRSPWAD
-	 b0rYqcM7H7Dr/d2HTR/hxHRrIxMW5PVlwb9w1ldpp51LQZ0yCoVSVZAkQWc+ahrXCa
-	 TiXcJWlE/lYDH5/hgVpNZoK68XayvsJfW4zu4BCZse2Laqoep+CofdUzChw4V6CfCr
-	 XiF1idyVJKOFA==
-Date: Tue, 5 Dec 2023 15:57:28 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>,
-	Liam Girdwood <lgirdwood@gmail.com>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
- <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
- <20231204225956.GG981228@pengutronix.de>
- <20231205064527.GJ981228@pengutronix.de>
- <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
- <20231205140203.GK981228@pengutronix.de>
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF04A120
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:58:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701791936; x=1733327936;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UNI2sjfhfAVzVBgHSg5tQ21tJQX6wOTTkGMNm8iRUbg=;
+  b=iKqBKfFS+5hxYWoBwhVu5CLxjRReIo15G4IOHsUGAw7wnAScc5Fod7QN
+   Rqw2/iLdhk0PsuNAzoLsaa9D+qSoYVjthwLwSwJgo7EFMCpOUypbKGCrH
+   wDSCEGfzjv9VcuxaJhQAWDTU+/kYgpDAaEz6cxGNegbzZ4Ez9h20bfYyP
+   GNiMfDkKKFou1xMcx86OlZPTpAK+o4TZ1Kiwq/6W3jfTIPABJez6D4fOx
+   a+TEEFLNJSWkpDQdpDZ+nAVPWN4U+YU6QMI7HqSkZ2CjNpdwoD9IiaY+m
+   C8AVtCrxMjUqvYiABlmYILCCXcTBer31r7gtNtvcWHEh6jBDoeMRFmJBN
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="979025"
+X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
+   d="scan'208";a="979025"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 07:58:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="837010730"
+X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
+   d="scan'208";a="837010730"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 07:58:52 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rAXou-000000024uA-2q04;
+	Tue, 05 Dec 2023 17:58:48 +0200
+Date: Tue, 5 Dec 2023 17:58:48 +0200
+From: "andriy.shevchenko@linux.intel.com" <andriy.shevchenko@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"Hadi Salim, Jamal" <jhs@mojatatu.com>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"Nambiar, Amritha" <amritha.nambiar@intel.com>,
+	"sdf@google.com" <sdf@google.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [patch net-next v4 8/9] devlink: add a command to set
+ notification filter and use it for multicasts
+Message-ID: <ZW9IuN82orhqwjvV@smile.fi.intel.com>
+References: <20231123181546.521488-1-jiri@resnulli.us>
+ <20231123181546.521488-9-jiri@resnulli.us>
+ <6dbb53ac-ec93-31cd-5201-0d49b0fdf0bb@intel.com>
+ <ZW39QoYQUSyIr89P@nanopsycho>
+ <CO1PR11MB5089142F465D060B9AE3FDC0D686A@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <ZW7Vn4F6bm2hYgpi@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1jzDBs4dDTXFfKTt"
-Content-Disposition: inline
-In-Reply-To: <20231205140203.GK981228@pengutronix.de>
-X-Cookie: I've Been Moved!
-
-
---1jzDBs4dDTXFfKTt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <ZW7Vn4F6bm2hYgpi@nanopsycho>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Dec 05, 2023 at 03:02:03PM +0100, Oleksij Rempel wrote:
-> On Tue, Dec 05, 2023 at 12:55:18PM +0000, Mark Brown wrote:
-> > On Tue, Dec 05, 2023 at 07:45:27AM +0100, Oleksij Rempel wrote:
+On Tue, Dec 05, 2023 at 08:47:43AM +0100, Jiri Pirko wrote:
+> Mon, Dec 04, 2023 at 08:17:24PM CET, jacob.e.keller@intel.com wrote:
+> >> -----Original Message-----
+> >> From: Jiri Pirko <jiri@resnulli.us>
+> >> Sent: Monday, December 4, 2023 8:25 AM
+> >> Mon, Nov 27, 2023 at 04:40:22PM CET, przemyslaw.kitszel@intel.com wrote:
+> >> >On 11/23/23 19:15, Jiri Pirko wrote:
 
-> > > CC regulator devs here too.
+...
 
-> > Again, I'm not sure what if any question there is?
+> >> >> +	if (attrs[DEVLINK_ATTR_BUS_NAME])
+> >> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_BUS_NAME]) + 1;
+> >> >> +	if (attrs[DEVLINK_ATTR_DEV_NAME])
+> >> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_DEV_NAME]) + 1;
+> >> >> +
+> >> >> +	flt = kzalloc(sizeof(*flt) + data_size, GFP_KERNEL);
+> >> >
+> >> >instead of arithmetic here, you could use struct_size()
+> >> 
+> >> That is used for flex array, yet I have no flex array here.
+> >
+> >Yea this isn't a flexible array. You could use size_add to ensure that this
+> >can't overflow. I don't know what the bound on the attribute sizes is.
+> 
+> Okay, will do that to be on a safe side.
 
-> PSE is kind of PMIC for Ethernet ports. I assume, it is good to let you
-> know at least about existence drivers.
+If we go this direction it may be makes sense to have done inside nla_len():ish
+type of helper, so it will be once for everyone. But I haven't checked the code
+on how many cases we have when we need to count the size depending on the present
+attributes.
 
-OK...  I mean, if they're not using the regulator framework I'm not sure
-it has much impact - there are plenty of internal regulators in devices
-already so it wouldn't be *too* unusual other than the fact that AFAICT
-this is somewhat split between devices within the subsystem?  Neither of
-the messages was super clear.
+-- 
+With Best Regards,
+Andy Shevchenko
 
---1jzDBs4dDTXFfKTt
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVvSGcACgkQJNaLcl1U
-h9CZ9wf9HEE6iEOCJJpkzG8SBnMctFeBTnq/N662MsvQUGH/qkPPK4oVmr897esm
-HvW9VOSP95JsOrrQrjMEPwm8n4ZDJARuPmCJbh8uHnC3IQAzNYcxKdalN57NAZh+
-1rWfnT6i9rXV68+HB+UQPxhmdYxVAD4u7TfnY9O63FbgZgi8KocKSq61mECuIDf+
-8b51YRkK6SLebysFki+gFZU+e2dCjit9nt1c3o4CBERlAxhghRl2WrJD/HCaUwPC
-TiAsMFSalALFK1mzNjHp/7PW3HGYrhAU1R1EYgjy7FS4+x52of9utSuDoBrNTB60
-YiUS3lNVeG6kJiVJ5Ffw8B9JZOK1HQ==
-=0JPO
------END PGP SIGNATURE-----
-
---1jzDBs4dDTXFfKTt--
 
