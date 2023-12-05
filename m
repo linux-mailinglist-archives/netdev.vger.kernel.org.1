@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-53779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0AF8049DC
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:14:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C1288049DD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A608EB20CDA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:14:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DD6C281674
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EEC12E5A;
-	Tue,  5 Dec 2023 06:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96E412B76;
+	Tue,  5 Dec 2023 06:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RxYNzuwA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWgZW9hK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922A212E55
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:13:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54793C433C9;
-	Tue,  5 Dec 2023 06:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C32812E6D
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:13:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CECAC433C9;
+	Tue,  5 Dec 2023 06:13:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701756825;
-	bh=SO83x7KYil+hnql+kgdtt7Tvp98uebg/TvS3bfGK4hU=;
+	s=k20201202; t=1701756826;
+	bh=hlqgQXTbsYgvXFd/+AfNuyQSlz6EjAMizIF3XdhBb4U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RxYNzuwA5xwbc2tAHfYD5M220drPqXsiB+84eId5VWGvLAyz5vQoFEbscze/BwNoI
-	 XuUtoFEaOaNR3iek089f/+/Tm9o3Rn1znB5XmT4EB0dRhTi7pCKcEIi3RpspnaNppk
-	 gFLoln1dO5yCB1afWb8TjQwlQCbqf5G86PScvwhAIlaqegpJuHm8mlE2etowiuc64b
-	 Yk3AYjHjKyVyxuromaca9vjH+QjSgh7elwsfFlXZga64oBfkZPuw6FLDMso3uP77sG
-	 LIjGV8z5AbyDNaF3nYeTv7Mv/jD1xHpxPPv2afyLolh9/jzXti8frXTvya2tx/TJ7N
-	 oZHEAXLy8Mlng==
+	b=IWgZW9hK8LvLMP+SMT9T/zBHHOupb+hwnu8C3aKT5mqTLxlwoG4HkuXQVkr/NrsSv
+	 zlmAC4VPd12JT3JPaeyMnN6TBMW/aJX9sraZi2Byy7FT2sLKv4rBQYmv1smU0ASOys
+	 8cwnvNDNGYulmSm2bOiNiRzEcirvKmxS5jd3KNKUi98XuxDZFjGxGqAPLABfp+CLUq
+	 glM1aowDWLoNFoSrvmYwiO1YOyqBHV1h/vP+Qa6p3N4M+0oN5uDSLWbALk8ywQfluy
+	 mD1yhTalMU+kIr2/kOzxOHGIKujhQw5cDf2W3j5Vo35rkkHq83bPGZxjSYiSfh3BdB
+	 19Hbch6VDixFQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net V2 06/14] net/mlx5e: Tidy up IPsec NAT-T SA discovery
-Date: Mon,  4 Dec 2023 22:13:19 -0800
-Message-ID: <20231205061327.44638-7-saeed@kernel.org>
+Subject: [net V2 07/14] net/mlx5e: Reduce eswitch mode_lock protection context
+Date: Mon,  4 Dec 2023 22:13:20 -0800
+Message-ID: <20231205061327.44638-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231205061327.44638-1-saeed@kernel.org>
 References: <20231205061327.44638-1-saeed@kernel.org>
@@ -55,88 +56,301 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: Jianbo Liu <jianbol@nvidia.com>
 
-IPsec NAT-T packets are UDP encapsulated packets over ESP normal ones.
-In case they arrive to RX, the SPI and ESP are located in inner header,
-while the check was performed on outer header instead.
+Currently eswitch mode_lock is so heavy, for example, it's locked
+during the whole process of the mode change, which may need to hold
+other locks. As the mode_lock is also used by IPSec to block mode and
+encap change now, it is easy to cause lock dependency.
 
-That wrong check caused to the situation where received rekeying request
-was missed and caused to rekey timeout, which "compensated" this failure
-by completing rekeying.
+Since some of protections are also done by devlink lock, the eswitch
+mode_lock is not needed at those places, and thus the possibility of
+lockdep issue is reduced.
 
-Fixes: d65954934937 ("net/mlx5e: Support IPsec NAT-T functionality")
+Fixes: c8e350e62fc5 ("net/mlx5e: Make TC and IPsec offloads mutually exclusive on a netdev")
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 22 ++++++++++++++-----
- include/linux/mlx5/mlx5_ifc.h                 |  2 +-
- 2 files changed, 17 insertions(+), 7 deletions(-)
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    |  9 +++--
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 35 ++++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  2 +
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 38 +++++++++++--------
+ 4 files changed, 52 insertions(+), 32 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
-index aeb399d8dae5..7a789061c998 100644
+index 7a789061c998..c1e89dc77db9 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
-@@ -1212,13 +1212,22 @@ static void setup_fte_esp(struct mlx5_flow_spec *spec)
- 	MLX5_SET(fte_match_param, spec->match_value, outer_headers.ip_protocol, IPPROTO_ESP);
- }
+@@ -2110,8 +2110,11 @@ static int mlx5e_ipsec_block_tc_offload(struct mlx5_core_dev *mdev)
+ 	struct mlx5_eswitch *esw = mdev->priv.eswitch;
+ 	int err = 0;
  
--static void setup_fte_spi(struct mlx5_flow_spec *spec, u32 spi)
-+static void setup_fte_spi(struct mlx5_flow_spec *spec, u32 spi, bool encap)
- {
- 	/* SPI number */
- 	spec->match_criteria_enable |= MLX5_MATCH_MISC_PARAMETERS;
- 
--	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, misc_parameters.outer_esp_spi);
--	MLX5_SET(fte_match_param, spec->match_value, misc_parameters.outer_esp_spi, spi);
-+	if (encap) {
-+		MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria,
-+				 misc_parameters.inner_esp_spi);
-+		MLX5_SET(fte_match_param, spec->match_value,
-+			 misc_parameters.inner_esp_spi, spi);
-+	} else {
-+		MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria,
-+				 misc_parameters.outer_esp_spi);
-+		MLX5_SET(fte_match_param, spec->match_value,
-+			 misc_parameters.outer_esp_spi, spi);
+-	if (esw)
+-		down_write(&esw->mode_lock);
++	if (esw) {
++		err = mlx5_esw_lock(esw);
++		if (err)
++			return err;
 +	}
+ 
+ 	if (mdev->num_block_ipsec) {
+ 		err = -EBUSY;
+@@ -2122,7 +2125,7 @@ static int mlx5e_ipsec_block_tc_offload(struct mlx5_core_dev *mdev)
+ 
+ unlock:
+ 	if (esw)
+-		up_write(&esw->mode_lock);
++		mlx5_esw_unlock(esw);
+ 
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+index 8d0b915a3121..3047d7015c52 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+@@ -1463,7 +1463,7 @@ int mlx5_eswitch_enable_locked(struct mlx5_eswitch *esw, int num_vfs)
+ {
+ 	int err;
+ 
+-	lockdep_assert_held(&esw->mode_lock);
++	devl_assert_locked(priv_to_devlink(esw->dev));
+ 
+ 	if (!MLX5_CAP_ESW_FLOWTABLE_FDB(esw->dev, ft_support)) {
+ 		esw_warn(esw->dev, "FDB is not supported, aborting ...\n");
+@@ -1531,7 +1531,6 @@ int mlx5_eswitch_enable(struct mlx5_eswitch *esw, int num_vfs)
+ 	if (toggle_lag)
+ 		mlx5_lag_disable_change(esw->dev);
+ 
+-	down_write(&esw->mode_lock);
+ 	if (!mlx5_esw_is_fdb_created(esw)) {
+ 		ret = mlx5_eswitch_enable_locked(esw, num_vfs);
+ 	} else {
+@@ -1554,8 +1553,6 @@ int mlx5_eswitch_enable(struct mlx5_eswitch *esw, int num_vfs)
+ 		}
+ 	}
+ 
+-	up_write(&esw->mode_lock);
+-
+ 	if (toggle_lag)
+ 		mlx5_lag_enable_change(esw->dev);
+ 
+@@ -1569,12 +1566,11 @@ void mlx5_eswitch_disable_sriov(struct mlx5_eswitch *esw, bool clear_vf)
+ 		return;
+ 
+ 	devl_assert_locked(priv_to_devlink(esw->dev));
+-	down_write(&esw->mode_lock);
+ 	/* If driver is unloaded, this function is called twice by remove_one()
+ 	 * and mlx5_unload(). Prevent the second call.
+ 	 */
+ 	if (!esw->esw_funcs.num_vfs && !esw->esw_funcs.num_ec_vfs && !clear_vf)
+-		goto unlock;
++		return;
+ 
+ 	esw_info(esw->dev, "Unload vfs: mode(%s), nvfs(%d), necvfs(%d), active vports(%d)\n",
+ 		 esw->mode == MLX5_ESWITCH_LEGACY ? "LEGACY" : "OFFLOADS",
+@@ -1603,9 +1599,6 @@ void mlx5_eswitch_disable_sriov(struct mlx5_eswitch *esw, bool clear_vf)
+ 		esw->esw_funcs.num_vfs = 0;
+ 	else
+ 		esw->esw_funcs.num_ec_vfs = 0;
+-
+-unlock:
+-	up_write(&esw->mode_lock);
  }
  
- static void setup_fte_no_frags(struct mlx5_flow_spec *spec)
-@@ -1596,8 +1605,9 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
- 	else
- 		setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
+ /* Free resources for corresponding eswitch mode. It is called by devlink
+@@ -1647,10 +1640,8 @@ void mlx5_eswitch_disable(struct mlx5_eswitch *esw)
  
--	setup_fte_spi(spec, attrs->spi);
--	setup_fte_esp(spec);
-+	setup_fte_spi(spec, attrs->spi, attrs->encap);
-+	if (!attrs->encap)
-+		setup_fte_esp(spec);
- 	setup_fte_no_frags(spec);
- 	setup_fte_upper_proto_match(spec, &attrs->upspec);
+ 	devl_assert_locked(priv_to_devlink(esw->dev));
+ 	mlx5_lag_disable_change(esw->dev);
+-	down_write(&esw->mode_lock);
+ 	mlx5_eswitch_disable_locked(esw);
+ 	esw->mode = MLX5_ESWITCH_LEGACY;
+-	up_write(&esw->mode_lock);
+ 	mlx5_lag_enable_change(esw->dev);
+ }
  
-@@ -1719,7 +1729,7 @@ static int tx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+@@ -2254,8 +2245,13 @@ bool mlx5_esw_hold(struct mlx5_core_dev *mdev)
+ 	if (!mlx5_esw_allowed(esw))
+ 		return true;
  
- 	switch (attrs->type) {
- 	case XFRM_DEV_OFFLOAD_CRYPTO:
--		setup_fte_spi(spec, attrs->spi);
-+		setup_fte_spi(spec, attrs->spi, false);
- 		setup_fte_esp(spec);
- 		setup_fte_reg_a(spec);
- 		break;
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 90ca63f4bf63..3f7b664d625b 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -621,7 +621,7 @@ struct mlx5_ifc_fte_match_set_misc_bits {
+-	if (down_read_trylock(&esw->mode_lock) != 0)
++	if (down_read_trylock(&esw->mode_lock) != 0) {
++		if (esw->eswitch_operation_in_progress) {
++			up_read(&esw->mode_lock);
++			return false;
++		}
+ 		return true;
++	}
  
- 	u8         reserved_at_140[0x8];
- 	u8         bth_dst_qp[0x18];
--	u8	   reserved_at_160[0x20];
-+	u8	   inner_esp_spi[0x20];
- 	u8	   outer_esp_spi[0x20];
- 	u8         reserved_at_1a0[0x60];
+ 	return false;
+ }
+@@ -2312,7 +2308,8 @@ int mlx5_esw_try_lock(struct mlx5_eswitch *esw)
+ 	if (down_write_trylock(&esw->mode_lock) == 0)
+ 		return -EINVAL;
+ 
+-	if (atomic64_read(&esw->user_count) > 0) {
++	if (esw->eswitch_operation_in_progress ||
++	    atomic64_read(&esw->user_count) > 0) {
+ 		up_write(&esw->mode_lock);
+ 		return -EBUSY;
+ 	}
+@@ -2320,6 +2317,18 @@ int mlx5_esw_try_lock(struct mlx5_eswitch *esw)
+ 	return esw->mode;
+ }
+ 
++int mlx5_esw_lock(struct mlx5_eswitch *esw)
++{
++	down_write(&esw->mode_lock);
++
++	if (esw->eswitch_operation_in_progress) {
++		up_write(&esw->mode_lock);
++		return -EBUSY;
++	}
++
++	return 0;
++}
++
+ /**
+  * mlx5_esw_unlock() - Release write lock on esw mode lock
+  * @esw: eswitch device.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 37ab66e7b403..b674b57d05aa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -383,6 +383,7 @@ struct mlx5_eswitch {
+ 	struct xarray paired;
+ 	struct mlx5_devcom_comp_dev *devcom;
+ 	u16 enabled_ipsec_vf_count;
++	bool eswitch_operation_in_progress;
  };
+ 
+ void esw_offloads_disable(struct mlx5_eswitch *esw);
+@@ -827,6 +828,7 @@ void mlx5_esw_release(struct mlx5_core_dev *dev);
+ void mlx5_esw_get(struct mlx5_core_dev *dev);
+ void mlx5_esw_put(struct mlx5_core_dev *dev);
+ int mlx5_esw_try_lock(struct mlx5_eswitch *esw);
++int mlx5_esw_lock(struct mlx5_eswitch *esw);
+ void mlx5_esw_unlock(struct mlx5_eswitch *esw);
+ 
+ void esw_vport_change_handle_locked(struct mlx5_vport *vport);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 88236e75fd90..bf78eeca401b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -3733,13 +3733,16 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
+ 		goto unlock;
+ 	}
+ 
++	esw->eswitch_operation_in_progress = true;
++	up_write(&esw->mode_lock);
++
+ 	mlx5_eswitch_disable_locked(esw);
+ 	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV) {
+ 		if (mlx5_devlink_trap_get_num_active(esw->dev)) {
+ 			NL_SET_ERR_MSG_MOD(extack,
+ 					   "Can't change mode while devlink traps are active");
+ 			err = -EOPNOTSUPP;
+-			goto unlock;
++			goto skip;
+ 		}
+ 		err = esw_offloads_start(esw, extack);
+ 	} else if (mode == DEVLINK_ESWITCH_MODE_LEGACY) {
+@@ -3749,6 +3752,9 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
+ 		err = -EINVAL;
+ 	}
+ 
++skip:
++	down_write(&esw->mode_lock);
++	esw->eswitch_operation_in_progress = false;
+ unlock:
+ 	mlx5_esw_unlock(esw);
+ enable_lag:
+@@ -3759,16 +3765,12 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
+ int mlx5_devlink_eswitch_mode_get(struct devlink *devlink, u16 *mode)
+ {
+ 	struct mlx5_eswitch *esw;
+-	int err;
+ 
+ 	esw = mlx5_devlink_eswitch_get(devlink);
+ 	if (IS_ERR(esw))
+ 		return PTR_ERR(esw);
+ 
+-	down_read(&esw->mode_lock);
+-	err = esw_mode_to_devlink(esw->mode, mode);
+-	up_read(&esw->mode_lock);
+-	return err;
++	return esw_mode_to_devlink(esw->mode, mode);
+ }
+ 
+ static int mlx5_esw_vports_inline_set(struct mlx5_eswitch *esw, u8 mlx5_mode,
+@@ -3862,11 +3864,15 @@ int mlx5_devlink_eswitch_inline_mode_set(struct devlink *devlink, u8 mode,
+ 	if (err)
+ 		goto out;
+ 
++	esw->eswitch_operation_in_progress = true;
++	up_write(&esw->mode_lock);
++
+ 	err = mlx5_esw_vports_inline_set(esw, mlx5_mode, extack);
+-	if (err)
+-		goto out;
++	if (!err)
++		esw->offloads.inline_mode = mlx5_mode;
+ 
+-	esw->offloads.inline_mode = mlx5_mode;
++	down_write(&esw->mode_lock);
++	esw->eswitch_operation_in_progress = false;
+ 	up_write(&esw->mode_lock);
+ 	return 0;
+ 
+@@ -3878,16 +3884,12 @@ int mlx5_devlink_eswitch_inline_mode_set(struct devlink *devlink, u8 mode,
+ int mlx5_devlink_eswitch_inline_mode_get(struct devlink *devlink, u8 *mode)
+ {
+ 	struct mlx5_eswitch *esw;
+-	int err;
+ 
+ 	esw = mlx5_devlink_eswitch_get(devlink);
+ 	if (IS_ERR(esw))
+ 		return PTR_ERR(esw);
+ 
+-	down_read(&esw->mode_lock);
+-	err = esw_inline_mode_to_devlink(esw->offloads.inline_mode, mode);
+-	up_read(&esw->mode_lock);
+-	return err;
++	return esw_inline_mode_to_devlink(esw->offloads.inline_mode, mode);
+ }
+ 
+ bool mlx5_eswitch_block_encap(struct mlx5_core_dev *dev)
+@@ -3969,6 +3971,9 @@ int mlx5_devlink_eswitch_encap_mode_set(struct devlink *devlink,
+ 		goto unlock;
+ 	}
+ 
++	esw->eswitch_operation_in_progress = true;
++	up_write(&esw->mode_lock);
++
+ 	esw_destroy_offloads_fdb_tables(esw);
+ 
+ 	esw->offloads.encap = encap;
+@@ -3982,6 +3987,9 @@ int mlx5_devlink_eswitch_encap_mode_set(struct devlink *devlink,
+ 		(void)esw_create_offloads_fdb_tables(esw);
+ 	}
+ 
++	down_write(&esw->mode_lock);
++	esw->eswitch_operation_in_progress = false;
++
+ unlock:
+ 	up_write(&esw->mode_lock);
+ 	return err;
+@@ -3996,9 +4004,7 @@ int mlx5_devlink_eswitch_encap_mode_get(struct devlink *devlink,
+ 	if (IS_ERR(esw))
+ 		return PTR_ERR(esw);
+ 
+-	down_read(&esw->mode_lock);
+ 	*encap = esw->offloads.encap;
+-	up_read(&esw->mode_lock);
+ 	return 0;
+ }
+ 
 -- 
 2.43.0
 
