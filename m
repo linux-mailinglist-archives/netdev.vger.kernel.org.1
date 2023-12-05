@@ -1,131 +1,159 @@
-Return-Path: <netdev+bounces-53727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51850804462
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:59:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A37C804464
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D99DB20AEB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 01:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F8382813CA
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31A420E8;
-	Tue,  5 Dec 2023 01:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F08F20E8;
+	Tue,  5 Dec 2023 02:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L08xTNSk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kuoj8Bfp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B495B4;
-	Mon,  4 Dec 2023 17:59:08 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40c0fc1cf3dso6016395e9.0;
-        Mon, 04 Dec 2023 17:59:08 -0800 (PST)
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6D1B4;
+	Mon,  4 Dec 2023 18:00:19 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5d226f51f71so56926967b3.3;
+        Mon, 04 Dec 2023 18:00:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701741547; x=1702346347; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1701741618; x=1702346418; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fDBKOw3s0R/x34Gl0DdYfEHhp4k1EOz2IyOuhxx/RDw=;
-        b=L08xTNSk5eQU3t+7yuY8dwHJdDqcp5qOVAX9qAPdQOSwnMydAxATTumbVZFOd1LZpk
-         r02QCDg1fTg1Df6oenFxYMTCgt7XJGwkCZPG7FSF/YMHRioeDLY2Ki0N/5Vju9iERrIE
-         xzZq7GI749vs977WligIkSl9yzhFPi7ZFgaJL6WaxGK7al7ZaNEIn5tc11ZLsIgkAQdP
-         YAIRZhwXsfH46ls8en6WagtJChHaClBOO7PQXiqyAWQ5zmof17sXgXqRRRoNi5ZHevqq
-         w/56GAH+2kjIYj1DNYaq8Rl9wnUngWNMdQzTKagxr0a1e00PNOlXGL/Vg6viuwhnvqOv
-         N/vQ==
+        bh=3RARmHBQHLp7Okyt03f3n89xMZ9d0+q/he4xoiCmlIk=;
+        b=kuoj8BfpSYCPJhx2Sh8GdpYD8rdyC80r3w94T30x2Sxt0ADJ119g9KNodZImIpOpNL
+         awWuu6xf40/Km+4LYGKkS/1YthTb/7BHAny1Z0kJ0ykmYP8fHZ/tXpwQBbevh6RpxAex
+         KZhDhF4MLP8F63kiZZccYqb43BTZ0kpyQFKIdOorgfQdBWZr+AV+f/IlzBAnHF8b144M
+         dP6QgcrBR2MSDfNjef/ZZPWabdDEZ6rkEVjuEshpJ6nXrp8PdnNq+k1ADYUHJ2AJnh0K
+         VckNerDU4+TeAPniU2c0m5SrP3yrvp6+4XHCnV4nMDgCLvacMIgMLbe6t1iNf4IKmMuE
+         qRNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701741547; x=1702346347;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1701741618; x=1702346418;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fDBKOw3s0R/x34Gl0DdYfEHhp4k1EOz2IyOuhxx/RDw=;
-        b=HJVpVMBTspDPqLc2iozaFr23k9CsV4CMgIEGZsrNBTq3IroTKnEwCjK0iNl2Gj0Lo8
-         i8/czbeFjtwjo35g+ri/FEAWsThaK/jfXHvws2jeuMUUZCPwnjaMsqETsPkcD7lYUIIq
-         4KePO3CnMMkWkj/OmG7JEOScyLz2f5Q+QdFfNVavhNdXCQ5pxzUXO1mQjdsAzoq/hqNR
-         kh4WKhnMM4hyS6VCbF/a5c72K+C5Pnmx8oSQNxxjd6jHyHYSxhG/CTQHAV8RQfNIDEOW
-         bn5PRegh+ul4SFWIxKg3JV88N9OsX+w+cYsC7+JB/ta9l/1beZji/HTTtO01Ob92Fc5U
-         3b5Q==
-X-Gm-Message-State: AOJu0YyjWSKQgzs+qGx8XSzjGD0ezxrWl7kz0fgNwMf9hUXTAJoyx3Wl
-	MnZwB11yxWjOGEXgio9kRejknr1I79ajWlUg8gI=
-X-Google-Smtp-Source: AGHT+IH3pk98r8xDa4KBJTXsK/VMAwQZ79RDLUR+lRWE7jhLBQZJl49OL7x+1il/lGY6CVzmTDIbZ5teWIODtZG4zyg=
-X-Received: by 2002:a05:600c:444a:b0:40b:5e21:d36f with SMTP id
- v10-20020a05600c444a00b0040b5e21d36fmr31135wmn.120.1701741546663; Mon, 04 Dec
- 2023 17:59:06 -0800 (PST)
+        bh=3RARmHBQHLp7Okyt03f3n89xMZ9d0+q/he4xoiCmlIk=;
+        b=XmIFCdKFQ8ipJtJ8N8E0+tqSSre/dfIPSEBjQ8nHLA/ARBYZiYt0/AavTB0F1lFom9
+         OiSisR0kvfW1BjvKBZNYQR2WDMw/klLHeJ7Wo52nMtYYe5RZbhB/BB4B9Rh6bIPLVwGW
+         M0yXKlv4m4x2Szwx74Ry3hWbGSYzDl3nssgzC1He4bDIC2DGuM1TjbhwMDG6ul/Ft+Wm
+         gAUH0ZyS36fJhxxNHOWWZIIn3OwByyLymTmsv41gbjV6yD+yzKu2eSn/10AEnXOQk2I3
+         JZaWcQCDpEnkxAoRYErgslU/W/aELzcGyOfGSzv4zLtvs47t5pjO+14pLtxvyytg7ndB
+         I0Vw==
+X-Gm-Message-State: AOJu0YxHFQvX4rr64NaSd1kMRuG3YFSvVlg7U0arjO3UGYGu0WSoUbfp
+	uk9PSxeRDmhkJkp0GkMqDwc=
+X-Google-Smtp-Source: AGHT+IHrwAD2wRe915kSxOCIZ3XqjwHqSBhpjHh6VyToYz8tWrKJ69jopjoFovUFlZXqRlcSMuH+JQ==
+X-Received: by 2002:a81:8485:0:b0:5d7:1940:dd7a with SMTP id u127-20020a818485000000b005d71940dd7amr3676043ywf.80.1701741618680;
+        Mon, 04 Dec 2023 18:00:18 -0800 (PST)
+Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
+        by smtp.gmail.com with ESMTPSA id x10-20020a0c8e8a000000b0065b13180892sm1678294qvb.16.2023.12.04.18.00.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 18:00:18 -0800 (PST)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 6EA7327C0054;
+	Mon,  4 Dec 2023 21:00:17 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 04 Dec 2023 21:00:17 -0500
+X-ME-Sender: <xms:MYRuZSlYsrHbszK2KB3DXpG8F40DieaHCF3CA-je6D7H2wtP5dPCsQ>
+    <xme:MYRuZZ175v9530NARl8k5OzgsQtI7wRst5wsd0kiPpyFUOFrEQemiiENAjMzzyqeq
+    VIYr5C50qInlESUMA>
+X-ME-Received: <xmr:MYRuZQoIThrRITRxz53ryq78aDQ_t9lYufO0TjARZT-OXSAtGYtq6UNnEg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudejjedggeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
+    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
+    htthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteehuddujedvkedtkeefgedv
+    vdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhh
+    phgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunh
+    drfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:MYRuZWnUjaiYBE8wG7V5I5zF4Oa6FDQxy4wg6ctj3_s_rJtot5EmJg>
+    <xmx:MYRuZQ2LSUyFRGYSWffPZI-43-Gr9zYYnGsZIjh319Jsc0o9rj-ygw>
+    <xmx:MYRuZdt-IIVKKt2-oZTXAbAQ7WibP0lTxU2bVz3uxQ1UIX533OimtA>
+    <xmx:MYRuZRIHF-aSoTBTLixRWluClgtcURcX1LgQ5_6tuqzQq5cPXv6jJQ>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 Dec 2023 21:00:16 -0500 (EST)
+Date: Mon, 4 Dec 2023 18:00:15 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me, wedsonaf@gmail.com, aliceryhl@google.com
+Subject: Re: [PATCH net-next v9 1/4] rust: core abstractions for network PHY
+ drivers
+Message-ID: <ZW6EL-4XaoY3n4J9@Boquns-Mac-mini.home>
+References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+ <20231205011420.1246000-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1701722991.git.dxu@dxuuu.xyz> <a385991bb4f36133e15d6eacb72ed22a3c02da16.1701722991.git.dxu@dxuuu.xyz>
-In-Reply-To: <a385991bb4f36133e15d6eacb72ed22a3c02da16.1701722991.git.dxu@dxuuu.xyz>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 4 Dec 2023 17:58:55 -0800
-Message-ID: <CAADnVQJXtSNGuZGNfNSD2Or8hfhrxtO_cL1GckHMXc401Rg+kw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 01/10] xfrm: bpf: Move xfrm_interface_bpf.c to xfrm_bpf.c
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, antony.antony@secunet.com, 
-	Yonghong Song <yonghong.song@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, devel@linux-ipsec.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231205011420.1246000-2-fujita.tomonori@gmail.com>
 
-On Mon, Dec 4, 2023 at 12:56=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> This commit moves the contents of xfrm_interface_bpf.c into a new file,
-> xfrm_bpf.c This is in preparation for adding more xfrm kfuncs. We'd like
-> to keep all the bpf integrations in a single file.
->
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> ---
->  net/xfrm/Makefile                             |  7 +------
->  net/xfrm/{xfrm_interface_bpf.c =3D> xfrm_bpf.c} | 12 ++++++++----
->  2 files changed, 9 insertions(+), 10 deletions(-)
->  rename net/xfrm/{xfrm_interface_bpf.c =3D> xfrm_bpf.c} (88%)
->
-> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
-> index cd47f88921f5..29fff452280d 100644
-> --- a/net/xfrm/Makefile
-> +++ b/net/xfrm/Makefile
-> @@ -5,12 +5,6 @@
->
->  xfrm_interface-$(CONFIG_XFRM_INTERFACE) +=3D xfrm_interface_core.o
->
-> -ifeq ($(CONFIG_XFRM_INTERFACE),m)
-> -xfrm_interface-$(CONFIG_DEBUG_INFO_BTF_MODULES) +=3D xfrm_interface_bpf.=
-o
-> -else ifeq ($(CONFIG_XFRM_INTERFACE),y)
-> -xfrm_interface-$(CONFIG_DEBUG_INFO_BTF) +=3D xfrm_interface_bpf.o
-> -endif
-> -
->  obj-$(CONFIG_XFRM) :=3D xfrm_policy.o xfrm_state.o xfrm_hash.o \
->                       xfrm_input.o xfrm_output.o \
->                       xfrm_sysctl.o xfrm_replay.o xfrm_device.o
-> @@ -21,3 +15,4 @@ obj-$(CONFIG_XFRM_USER_COMPAT) +=3D xfrm_compat.o
->  obj-$(CONFIG_XFRM_IPCOMP) +=3D xfrm_ipcomp.o
->  obj-$(CONFIG_XFRM_INTERFACE) +=3D xfrm_interface.o
->  obj-$(CONFIG_XFRM_ESPINTCP) +=3D espintcp.o
-> +obj-$(CONFIG_DEBUG_INFO_BTF) +=3D xfrm_bpf.o
-...
-> +#if IS_BUILTIN(CONFIG_XFRM_INTERFACE) || \
-> +    (IS_MODULE(CONFIG_XFRM_INTERFACE) && IS_ENABLED(CONFIG_DEBUG_INFO_BT=
-F_MODULES))
+On Tue, Dec 05, 2023 at 10:14:17AM +0900, FUJITA Tomonori wrote:
+[...]
+> +    /// Gets the current link state.
+> +    ///
+> +    /// It returns true if the link is up.
+> +    pub fn is_link_up(&self) -> bool {
+> +        const LINK_IS_UP: u64 = 1;
+> +        // TODO: the code to access to the bit field will be replaced with automatically
+> +        // generated code by bindgen when it becomes possible.
+> +        // SAFETY: The struct invariant ensures that we may access
+> +        // this field without additional synchronization.
+> +        let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
+> +        bit_field.get(14, 1) == LINK_IS_UP
+
+I made a mistake here [1], this should be:
+
+    let bit_field = unsafe { &*(core::ptr::addr_of!((*self.0.get())._bitfield_1)) };
+    bit_field.get(14, 1) == LINK_IS_UP
+
+without `core::ptr::add_of!`, `*(self.0.get())` would still create a
+temporary `&` to the underlying object I believe. `addr_of!` is the way
+to avoid create the temporary reference. Same for the other functions.
+
+[1]: https://lore.kernel.org/rust-for-linux/ZT6fzfV9GUQOZnlx@boqun-archlinux/
+
+Regards,
+Boqun
+
+> +    }
 > +
->  /* bpf_xfrm_info - XFRM metadata information
->   *
->   * Members:
-> @@ -108,3 +110,5 @@ int __init register_xfrm_interface_bpf(void)
->         return register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS,
->                                          &xfrm_interface_kfunc_set);
->  }
+> +    /// Gets the current auto-negotiation configuration.
+> +    ///
+> +    /// It returns true if auto-negotiation is enabled.
+> +    pub fn is_autoneg_enabled(&self) -> bool {
+> +        // TODO: the code to access to the bit field will be replaced with automatically
+> +        // generated code by bindgen when it becomes possible.
+> +        // SAFETY: The struct invariant ensures that we may access
+> +        // this field without additional synchronization.
+> +        let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
+> +        bit_field.get(13, 1) == bindings::AUTONEG_ENABLE as u64
+> +    }
 > +
-> +#endif /* xfrm interface */
-
-imo the original approach was cleaner.
-#ifdefs in .c should be avoided when possible.
-But I'm not going to insist.
-
-ipsec folks please ack the first 3 patches.
+> +    /// Gets the current auto-negotiation state.
+> +    ///
+> +    /// It returns true if auto-negotiation is completed.
+> +    pub fn is_autoneg_completed(&self) -> bool {
+> +        const AUTONEG_COMPLETED: u64 = 1;
+> +        // TODO: the code to access to the bit field will be replaced with automatically
+> +        // generated code by bindgen when it becomes possible.
+> +        // SAFETY: The struct invariant ensures that we may access
+> +        // this field without additional synchronization.
+> +        let bit_field = unsafe { &(*self.0.get())._bitfield_1 };
+> +        bit_field.get(15, 1) == AUTONEG_COMPLETED
+> +    }
+> +
+[...]
 
