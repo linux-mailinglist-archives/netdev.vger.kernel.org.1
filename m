@@ -1,131 +1,286 @@
-Return-Path: <netdev+bounces-53926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 904A2805387
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:52:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2078F8053B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B031C20DE8
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:52:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA7F52815B6
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13C159E3A;
-	Tue,  5 Dec 2023 11:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBAC59E55;
+	Tue,  5 Dec 2023 12:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fGyFDt+2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftboGsDP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB68AC3;
-	Tue,  5 Dec 2023 03:52:38 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1975fe7befso601336066b.2;
-        Tue, 05 Dec 2023 03:52:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701777157; x=1702381957; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQnio+BjHch7uekOs0EbRaR6+xPg48w0mlLLI/zKaaU=;
-        b=fGyFDt+2zfMoMGFkNb+wIqez0LxE+nJA6J0daN/LW4CpjKTBTpG5Gt9AUaEY4VWKFc
-         Y/b4lLuuer2jiUCNf/A+rZ4+Ay+AWp7mxKScBDRdynDcFafxfvQLu0WouwBaD3pxB0+q
-         aawAAXulKODe7QHWNAA/b2QfBM9BeKtbDNqK9fJkvRC//82r8X+0hWlt9OBbo++1dUMB
-         a/d6//g4g2DGrP4PZ68TOhkGBbGkDv2L7mFDK7JcGg7PKggjMf4ZQCJeBhcOdVgSXhL/
-         mSclAgN9uAVIMcf+V6YxYS/j4R9AQFoCyrip7JxinLKBrybeAi+6YcUKWTncNmGpC4Hu
-         6hUw==
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A5CC9
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 04:00:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701777635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=20GQcsknLlOrAs8uFrXzeujlWSijSdYal/a04hZduK0=;
+	b=ftboGsDPriEI1WlInqR5jrZfbPBoGJhMSXPP/39zBCCxBSIw5cVFxYypv5aACEpi07pEQG
+	8S+A0scsd3DCcRQpJh2dTNx7aqy1geA3jy8EGKZPqAwp9Dl/23A8x422knqXFrbWHy/RN3
+	OlgESlEVu84bC2guaDJHPeGiRknQLTg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-478-iMDMWNa3PiSUe61VpR9pTg-1; Tue, 05 Dec 2023 07:00:33 -0500
+X-MC-Unique: iMDMWNa3PiSUe61VpR9pTg-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-54cf89b07b1so225485a12.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 04:00:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701777157; x=1702381957;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yQnio+BjHch7uekOs0EbRaR6+xPg48w0mlLLI/zKaaU=;
-        b=izdRUqlLbiT921wq7u3sJQ35clLmjmc1cRkjllg7ySibdmDDd9hCavXZ2VRIYORofi
-         1aIa1FBMbTEfCtIxhhGb6PZzjHBH8eKBagiCuNp0CuKj1wFaBxm1Q7nNKgnUausGBDf2
-         QMcVpe9EcCRj4VIlYM66EWIZdsd/Z0C1vFH2fU5XWQY13zUEW9GV4W66gVizdl+4Op+0
-         x8uCiZB98bihz/181/UT81WhZZ3H5/cS2RDhsQigJ4BUThNmz227f42/FBSU/SQ+diNf
-         jnEFLxhSbTYEUteEcbmqFOz2SZUCzkHjPQOSNJrfjM1U2bZyauTDj2NMTvS80vzKW5VL
-         Kqgg==
-X-Gm-Message-State: AOJu0YzLp3ohxMJI9ZuniHxCxOiKmVRCLym9g9QLcOEBbnkJAnDeSgTc
-	DNwZC6C0FbUm7hAtXnjt9CA=
-X-Google-Smtp-Source: AGHT+IFbcUHHGMa0y7mPKTyHnJVqbuoOrcBU5Fgp7HSueg3Asjnj4OKHJ4FateR0JcHkUAKp1ewXJQ==
-X-Received: by 2002:a17:907:8c8:b0:a0e:d93a:3202 with SMTP id zu8-20020a17090708c800b00a0ed93a3202mr323045ejb.4.1701777157222;
-        Tue, 05 Dec 2023 03:52:37 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id x12-20020a170906298c00b00a1cbb055575sm451602eje.180.2023.12.05.03.52.35
+        d=1e100.net; s=20230601; t=1701777632; x=1702382432;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=20GQcsknLlOrAs8uFrXzeujlWSijSdYal/a04hZduK0=;
+        b=fvx0+Rwf8/1voMZm0ti/duV1JrwAo0lYmjLFONSo3fDEqqJh+3H7y2tnMmFzTsgEUi
+         tpm+CMixHSLn3hnPKHSUaCcBuR2ObUyTyWiChnn+iQPJcrZ3tDiH/yJa+COHelXwpBAz
+         LqiT9BCbRsGz8vhPQ0D/TvvNnF5EXlbtPdjvNk9k+i9fLfSmWFtsK57swUSHrZVC+XxQ
+         e+gOgahsHIeXcdCN26SXihlJqbFaBI5Ckco45Kh8xLFaeX9je6ysIMNb4gylKsIZox/Y
+         NUIK+jbPVrqvpPD8OTLHlVmZgeFFqK6VNEvR2HZIWUuxEvGafvgu/GUcEtTcbZKQGtZl
+         lmrA==
+X-Gm-Message-State: AOJu0YxXtGNRgcPd611mZQlzwBQTIJGGwHnYjX3vULbft1QdZ6vZbgQn
+	9VPAgVle4kYyTMGTVtLQ66Kds2Nnx3DZbQKYeJiiB9TP/XnMXlPADFUrB7bgPhWRdDUzQDhVRrC
+	T/+hq3x80sgbiI/dP
+X-Received: by 2002:a05:6402:430d:b0:54d:3838:490a with SMTP id m13-20020a056402430d00b0054d3838490amr816114edc.3.1701777632063;
+        Tue, 05 Dec 2023 04:00:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF9eONxd7d8LRO22GLsrViNctQNoTDf/CknACqwPnUGu/qVoAXLfeKj9F84EiNm67Wd5ElUDQ==
+X-Received: by 2002:a05:6402:430d:b0:54d:3838:490a with SMTP id m13-20020a056402430d00b0054d3838490amr816096edc.3.1701777631716;
+        Tue, 05 Dec 2023 04:00:31 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-54.dyn.eolo.it. [146.241.241.54])
+        by smtp.gmail.com with ESMTPSA id n10-20020a056402060a00b0054c6a70a435sm986678edv.44.2023.12.05.04.00.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 03:52:37 -0800 (PST)
-Date: Tue, 5 Dec 2023 13:52:34 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <20231205115234.7ntjvymurot5nnak@skbuf>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
+        Tue, 05 Dec 2023 04:00:31 -0800 (PST)
+Message-ID: <7e73dbfe6cad7d551516d02bb02881d885045498.camel@redhat.com>
+Subject: Re: [PATCHv3 net-next 01/14] selftests/net: add lib.sh
+From: Paolo Abeni <pabeni@redhat.com>
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  Eric Dumazet <edumazet@google.com>, Shuah Khan
+ <shuah@kernel.org>, David Ahern <dsahern@kernel.org>, 
+ linux-kselftest@vger.kernel.org, Po-Hsu Lin <po-hsu.lin@canonical.com>, 
+ Guillaume Nault <gnault@redhat.com>, Petr Machata <petrm@nvidia.com>, James
+ Prestwood <prestwoj@gmail.com>,  Jaehee Park <jhpark1013@gmail.com>, Ido
+ Schimmel <idosch@nvidia.com>, Justin Iurman <justin.iurman@uliege.be>, Xin
+ Long <lucien.xin@gmail.com>, James Chapman <jchapman@katalix.com>
+Date: Tue, 05 Dec 2023 13:00:29 +0100
+In-Reply-To: <20231202020110.362433-2-liuhangbin@gmail.com>
+References: <20231202020110.362433-1-liuhangbin@gmail.com>
+	 <20231202020110.362433-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205103559.9605-7-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
 
-On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
-> If the DW XPCS MDIO devices are either left unmasked for being auto-probed
-> or explicitly registered in the MDIO subsystem by means of the
-> mdiobus_register_board_info() method
-
-mdiobus_register_board_info() has exactly one caller, and that is
-dsa_loop. I don't understand the relevance of it w.r.t. Synopsys XPCS.
-I'm reading the patches in order from the beginning.
-
-> there is no point in creating the dummy MDIO device instance in order
-
-Why dummy? There's nothing dummy about the mdio_device. It's how the PCS
-code accesses the hardware.
-
-> to get the DW XPCS handler since the MDIO core subsystem will create
-> the device during the MDIO bus registration procedure.
-
-It won't, though? Unless someone is using mdiobus_register_board_info()
-possibly, but who does that?
-
-> All what needs to be done is to just reuse the MDIO-device instance
-> available in the mii_bus.mdio_map array (using some getter for it
-> would look better though). It shall prevent the XPCS devices been
-> accessed over several MDIO-device instances.
-> 
-> Note since the MDIO-device instance might be retrieved from the MDIO-bus
-> map array its reference counter shall be increased. If the MDIO-device
-> instance is created in the xpcs_create_mdiodev() method its reference
-> counter will be already increased. So there is no point in toggling the
-> reference counter in the xpcs_create() function. Just drop it from there.
-> 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+On Sat, 2023-12-02 at 10:00 +0800, Hangbin Liu wrote:
+> Add a lib.sh for net selftests. This file can be used to define commonly
+> used variables and functions. Some commonly used functions can be moved
+> from forwarding/lib.sh to this lib file. e.g. busywait().
+>=20
+> Add function setup_ns() for user to create unique namespaces with given
+> prefix name.
+>=20
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > ---
+>  tools/testing/selftests/net/Makefile          |  2 +-
+>  tools/testing/selftests/net/forwarding/lib.sh | 27 +-----
+>  tools/testing/selftests/net/lib.sh            | 85 +++++++++++++++++++
+>  3 files changed, 87 insertions(+), 27 deletions(-)
+>  create mode 100644 tools/testing/selftests/net/lib.sh
+>=20
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
+ts/net/Makefile
+> index 9274edfb76ff..14bd68da7466 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -54,7 +54,7 @@ TEST_PROGS +=3D ip_local_port_range.sh
+>  TEST_PROGS +=3D rps_default_mask.sh
+>  TEST_PROGS +=3D big_tcp.sh
+>  TEST_PROGS_EXTENDED :=3D in_netns.sh setup_loopback.sh setup_veth.sh
+> -TEST_PROGS_EXTENDED +=3D toeplitz_client.sh toeplitz.sh
+> +TEST_PROGS_EXTENDED +=3D toeplitz_client.sh toeplitz.sh lib.sh
+>  TEST_GEN_FILES =3D  socket nettest
+>  TEST_GEN_FILES +=3D psock_fanout psock_tpacket msg_zerocopy reuseport_ad=
+dr_any
+>  TEST_GEN_FILES +=3D tcp_mmap tcp_inq psock_snd txring_overwrite
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testin=
+g/selftests/net/forwarding/lib.sh
+> index e37a15eda6c2..8f6ca458af9a 100755
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -4,9 +4,6 @@
+>  ########################################################################=
+######
+>  # Defines
+> =20
+> -# Kselftest framework requirement - SKIP code is 4.
+> -ksft_skip=3D4
+> -
+>  # Can be overridden by the configuration file.
+>  PING=3D${PING:=3Dping}
+>  PING6=3D${PING6:=3Dping6}
+> @@ -41,6 +38,7 @@ if [[ -f $relative_path/forwarding.config ]]; then
+>  	source "$relative_path/forwarding.config"
+>  fi
+> =20
+> +source ../lib.sh
+>  ########################################################################=
+######
+>  # Sanity checks
+> =20
+> @@ -395,29 +393,6 @@ log_info()
+>  	echo "INFO: $msg"
+>  }
+> =20
+> -busywait()
+> -{
+> -	local timeout=3D$1; shift
+> -
+> -	local start_time=3D"$(date -u +%s%3N)"
+> -	while true
+> -	do
+> -		local out
+> -		out=3D$("$@")
+> -		local ret=3D$?
+> -		if ((!ret)); then
+> -			echo -n "$out"
+> -			return 0
+> -		fi
+> -
+> -		local current_time=3D"$(date -u +%s%3N)"
+> -		if ((current_time - start_time > timeout)); then
+> -			echo -n "$out"
+> -			return 1
+> -		fi
+> -	done
+> -}
+> -
+>  not()
+>  {
+>  	"$@"
+> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests=
+/net/lib.sh
+> new file mode 100644
+> index 000000000000..518eca57b815
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/lib.sh
+> @@ -0,0 +1,85 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +########################################################################=
+######
+> +# Defines
+> +
+> +# Kselftest framework requirement - SKIP code is 4.
+> +ksft_skip=3D4
+> +
+> +########################################################################=
+######
+> +# Helpers
+> +busywait()
+> +{
+> +	local timeout=3D$1; shift
+> +
+> +	local start_time=3D"$(date -u +%s%3N)"
+> +	while true
+> +	do
+> +		local out
+> +		out=3D$("$@")
+> +		local ret=3D$?
+> +		if ((!ret)); then
+> +			echo -n "$out"
+> +			return 0
+> +		fi
+> +
+> +		local current_time=3D"$(date -u +%s%3N)"
+> +		if ((current_time - start_time > timeout)); then
+> +			echo -n "$out"
+> +			return 1
+> +		fi
+> +	done
+> +}
+> +
+> +cleanup_ns()
+> +{
+> +	local ns=3D""
+> +	local errexit=3D0
+> +	local ret=3D0
+> +
+> +	# disable errexit temporary
+> +	if [[ $- =3D~ "e" ]]; then
+> +		errexit=3D1
+> +		set +e
+> +	fi
+> +
+> +	for ns in "$@"; do
+> +		ip netns delete "${ns}" &> /dev/null
+> +		if ! busywait 2 ip netns list \| grep -vq "^$ns$" &> /dev/null; then
+> +			echo "Warn: Failed to remove namespace $ns"
+> +			ret=3D1
+> +		fi
+> +	done
+> +
+> +	[ $errexit -eq 1 ] && set -e
+> +	return $ret
+> +}
+> +
+> +# setup netns with given names as prefix. e.g
+> +# setup_ns local remote
+> +setup_ns()
+> +{
+> +	local ns=3D""
+> +	local ns_name=3D""
+> +	local ns_list=3D""
+> +	for ns_name in "$@"; do
+> +		# Some test may setup/remove same netns multi times
+> +		if unset ${ns_name} 2> /dev/null; then
+> +			ns=3D"${ns_name,,}-$(mktemp -u XXXXXX)"
+> +			eval readonly ${ns_name}=3D"$ns"
+> +		else
+> +			eval ns=3D'$'${ns_name}
+> +			cleanup_ns "$ns"
+> +
+> +		fi
+> +
+> +		if ! ip netns add "$ns"; then
+> +			echo "Failed to create namespace $ns_name"
+> +			cleanup_ns "$ns_list"
+> +			return $ksft_skip
+> +		fi
+> +		ip -n "$ns" link set lo up
+> +		ns_list=3D"$ns_list $ns"
 
-Sorry, because the commit log lost me at the "context presentation" stage,
-I failed to understand the "what"s and the "why"s.
+Side note for a possible follow-up: if you maintain $ns_list as global
+variable, and remove from such list the ns deleted by cleanup_ns, you
+could remove the cleanup trap from the individual test with something
+alike:
 
-Are you basically trying to add xpcs support on top of an mdio_device
-where the mdio_device_create() call was made externally to the xpcs code,
-through mdiobus_register_board_info() and mdiobus_setup_mdiodev_from_board_info()?
+final_cleanup_ns()
+{
+	cleanup_ns $ns_list
+}
+
+trap final_cleanup_ns EXIT
+
+No respin needed for the above, could be a follow-up if agreed upon.
+
+Cheers,
+
+Paolo
+
 
