@@ -1,139 +1,81 @@
-Return-Path: <netdev+bounces-54123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6DBB806096
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:20:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B044C806098
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C23E1F217CB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:20:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46A4B280402
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A68692A8;
-	Tue,  5 Dec 2023 21:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EF66E59A;
+	Tue,  5 Dec 2023 21:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VP48O7FG"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JtdAcyaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37CD11A4
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:19:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701811184; x=1733347184;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=M3aNYRUQkpb4vtx8FhPs0rIk8J3vGX+5n01a55rmOhE=;
-  b=VP48O7FGEQmR7HedvBeMLIwrOWLYgJdWxSw+vjSoQ2vlUqMELC5W/4QD
-   HGLG99TypnA8UZNfvSSyisWXBmEtorcZZIn+Ect0bz6/4nzY4+770QVVH
-   tN76t1Fjv2jn2zfS4CrI1FbXwBI8Bjh8hPvP2rddLuhaPm9o5FU+Z8wd+
-   XTq4FBn66fY0EOxJBca21FLWTbU+9T3DVZrqwXcMADPy7XwB88e+J66IU
-   Ah2CbqvaREEL6pRaFWZrKoGOw+kyEVoIjtCUS4f7VxAUFE6XydzsTYLxh
-   Ls5lTxqS8jTMTbCiRpO2P+ZCvbcHCNjbpM1llOhgGgNqXkNY+NhoWnncv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="393693816"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="393693816"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 13:19:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="894510110"
-X-IronPort-AV: E=Sophos;i="6.04,253,1695711600"; 
-   d="scan'208";a="894510110"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga004.jf.intel.com with ESMTP; 05 Dec 2023 13:19:26 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 4/4] iavf: validate tx_coalesce_usecs even if rx_coalesce_usecs is zero
-Date: Tue,  5 Dec 2023 13:19:15 -0800
-Message-ID: <20231205211918.2123019-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231205211918.2123019-1-anthony.l.nguyen@intel.com>
-References: <20231205211918.2123019-1-anthony.l.nguyen@intel.com>
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7044BA5
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:20:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=U0nWIyEl8/21/VA4RkBhcm7lxKI3MarZ6NUK6TymaWE=; b=JtdAcyaZHvHshfv6tdXBP0/Mgx
+	RDAFIC4A4ZCkLm2L+q6zHdEVFlmeA4ojn5GDuTyfSnsedUqY0H6Ao4x+SHU5BTfO6RVS5tW+Vg1ag
+	J4/jHBZVCHzGU79VIE7bjATvGk/uUKqzYuv8IGJV/A71sA+ky/g9Ahr7D6KKr6I57stSdNZuCRdU8
+	v0ukSaq7StTP2bavh3iHoWdCipwd30ykBNRJtSELM0pnu0EKKiS0G1ubAzRsEUQIJ96dhxnKvyPTi
+	qoyQgXVzP1E+jXs1WcsZX9RSyEjI3YW8mmoG26Hvd0PF+FxE2y6l0FKLLEnP5jgy2Auh+hA7qx4u6
+	qR15b2pw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rAcq4-000Hmf-Tz; Tue, 05 Dec 2023 22:20:20 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rAcq4-000WB3-92; Tue, 05 Dec 2023 22:20:20 +0100
+Subject: Re: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason
+ more flexible for remaining qdiscs
+To: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: dcaratti@redhat.com, netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20231205205030.3119672-1-victor@mojatatu.com>
+ <20231205205030.3119672-3-victor@mojatatu.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <fb8e49e5-818c-12b9-c05b-36fc45ad2d63@iogearbox.net>
+Date: Tue, 5 Dec 2023 22:20:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231205205030.3119672-3-victor@mojatatu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27114/Tue Dec  5 09:39:00 2023)
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On 12/5/23 9:50 PM, Victor Nogueira wrote:
+> Incrementing on Daniel's patch[1], make tc-related drop reason more
+> flexible for remaining qdiscs - that is, all qdiscs aside from clsact.
+> In essence, the drop reason will be set by cls_api and act_api in case
+> any error occurred in the data path. With that, we can give the user more
+> detailed information so that they can distinguish between a policy drop
+> or an error drop.
+> 
+> [1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
+> 
+> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 
-In __iavf_set_coalesce, the driver checks both ec->rx_coalesce_usecs and
-ec->tx_coalesce_usecs for validity. It does this via a chain if if/else-if
-blocks. If every single branch of the series of if statements exited, this
-would be fine. However, the rx_coalesce_usecs is checked against zero to
-print an informative message if use_adaptive_rx_coalesce is enabled. If
-this check is true, it short circuits the entire chain of statements,
-preventing validation of the tx_coalesce_usecs field.
-
-Indeed, since commit e792779e6b63 ("iavf: Prevent changing static ITR
-values if adaptive moderation is on") the iavf driver actually rejects any
-change to the tx_coalesce_usecs or rx_coalesce_usecs when
-use_adaptive_tx_coalesce or use_adaptive_rx_coalesce is enabled, making
-this checking a bit redundant.
-
-Fix this error by removing the unnecessary and redundant checks for
-use_adaptive_rx_coalesce and use_adaptive_tx_coalesce. Since zero is a
-valid value, and since the tx_coalesce_usecs and rx_coalesce_usecs fields
-are already unsigned, remove the minimum value check. This allows assigning
-an ITR value ranging from 0-8160 as described by the printed message.
-
-Fixes: 65e87c0398f5 ("i40evf: support queue-specific settings for interrupt moderation")
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf_ethtool.c | 12 ++----------
- drivers/net/ethernet/intel/iavf/iavf_txrx.h    |  1 -
- 2 files changed, 2 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 6f236d1a6444..19cbfe554689 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -827,18 +827,10 @@ static int __iavf_set_coalesce(struct net_device *netdev,
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
- 	int i;
- 
--	if (ec->rx_coalesce_usecs == 0) {
--		if (ec->use_adaptive_rx_coalesce)
--			netif_info(adapter, drv, netdev, "rx-usecs=0, need to disable adaptive-rx for a complete disable\n");
--	} else if ((ec->rx_coalesce_usecs < IAVF_MIN_ITR) ||
--		   (ec->rx_coalesce_usecs > IAVF_MAX_ITR)) {
-+	if (ec->rx_coalesce_usecs > IAVF_MAX_ITR) {
- 		netif_info(adapter, drv, netdev, "Invalid value, rx-usecs range is 0-8160\n");
- 		return -EINVAL;
--	} else if (ec->tx_coalesce_usecs == 0) {
--		if (ec->use_adaptive_tx_coalesce)
--			netif_info(adapter, drv, netdev, "tx-usecs=0, need to disable adaptive-tx for a complete disable\n");
--	} else if ((ec->tx_coalesce_usecs < IAVF_MIN_ITR) ||
--		   (ec->tx_coalesce_usecs > IAVF_MAX_ITR)) {
-+	} else if (ec->tx_coalesce_usecs > IAVF_MAX_ITR) {
- 		netif_info(adapter, drv, netdev, "Invalid value, tx-usecs range is 0-8160\n");
- 		return -EINVAL;
- 	}
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index 7e6ee32d19b6..10ba36602c0c 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -15,7 +15,6 @@
-  */
- #define IAVF_ITR_DYNAMIC	0x8000	/* use top bit as a flag */
- #define IAVF_ITR_MASK		0x1FFE	/* mask for ITR register value */
--#define IAVF_MIN_ITR		     2	/* reg uses 2 usec resolution */
- #define IAVF_ITR_100K		    10	/* all values below must be even */
- #define IAVF_ITR_50K		    20
- #define IAVF_ITR_20K		    50
--- 
-2.41.0
-
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
