@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-53993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AB68058AB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:29:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 753858058BB
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FF6F28219E
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:29:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A835B20D73
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F48768EB4;
-	Tue,  5 Dec 2023 15:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954F55F1CD;
+	Tue,  5 Dec 2023 15:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t+u2FnOS"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SsWGdpSH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70610AD56;
-	Tue,  5 Dec 2023 15:29:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAA2BC433C8;
-	Tue,  5 Dec 2023 15:29:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701790154;
-	bh=SclM1eXnYMdnRBvBsf/lJdJQ0p0yUDsjtvGBYqnKRvM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t+u2FnOSzD0cZ0AXurNhbOSSJJX0fjLrpxVxj6J14W/se6GIxs6iMIOoGYr9cdPKG
-	 z9jBGgLMCmn0X3Q0RQejJxVOJ2S01GZ/pekqoTzjtwYLWVD74qxMlgj6kHFvQ1yBBg
-	 2t9Kz2AmDcSrjafmINUo15LXgEQ8V7Iu8xmJBlyk15/u1RUdwloUJqmM8kFwHcu4GO
-	 tiITk+KpH4rw7pOy0UredN999rtOK2t05dEFp6I9yrbf/Pw7jFMSr00fhE5MTCDghH
-	 ENTAxxXxsIMBrZdJKQaP3+VmpeVsPivJEnxKFLPsee5YTaaKlw8R2lnCJSBEFjK9Fp
-	 7NKl4u74A8FnA==
-Date: Tue, 5 Dec 2023 07:29:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel
- review list <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David
- Epping <david.epping@missinglinkelectronics.com>, Vladimir Oltean
- <olteanv@gmail.com>, Harini Katakam <harini.katakam@amd.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- workflows@vger.kernel.org
-Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
- MMD read/write
-Message-ID: <20231205072912.2d79a1d5@kernel.org>
-In-Reply-To: <ZW89errbJWUt33vz@shell.armlinux.org.uk>
-References: <20231128133630.7829-1-ansuelsmth@gmail.com>
-	<20231128133630.7829-3-ansuelsmth@gmail.com>
-	<20231204181752.2be3fd68@kernel.org>
-	<51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
-	<656f37a6.5d0a0220.96144.356f@mx.google.com>
-	<adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
-	<ZW89errbJWUt33vz@shell.armlinux.org.uk>
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6735BA
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:30:27 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1ce28faa92dso23225265ad.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 07:30:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701790227; x=1702395027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLmURYpAhDgCiKukuJU+wwugu669LleWtssEH22sc1c=;
+        b=SsWGdpSHtoEThRzT1tQQPwrBu9PSWZ1dHkmGvvB4qhsNjHtGmA3hqWJ8Yp+9IvY6GU
+         VF3B3Bm/UMCdFyGgB+tQUuBSaQRuPDWPLtXVhuTvDYKv0fp6NsaRrWdASUDUX1jbODL2
+         ih4Co6ZTpLz4yIYkp9Z4oaF6nZWHVxGKub6Vqx5rVsQwjH5UiDZRPpsnplvl0Y5U10rw
+         kXRREbsZguytppmqrW0xQ5u9JVi6B2hkohQ/jwNGeQEgUW1fbnpuXzzSR3p71SwCpIun
+         ojqkQczSErNOnuvdaUIGdSpqPNDHx2LaBxCHzYx/+/jqNoVj8iSTCNNLQ8QsC4UlGZwB
+         WZKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701790227; x=1702395027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xLmURYpAhDgCiKukuJU+wwugu669LleWtssEH22sc1c=;
+        b=vtD+bZYwZvZj6hIrHrNSiOErCHOmugEpcmp2UR74RSQDQhX2YQWqpd5UFUkDVyb7wJ
+         xLsqjR1ZmSKbc7e07h1dSvNq2QGPAd0Z7xsocpVO6FkX9IOoRmaJxoRTXMXHITBWNmXK
+         Shs81YqrWkHeC5AfJyhoL9jzqvGs/it8fbr8zqp7J/4QajtFZgO7YAa6vN9Eo/1Cexuw
+         RT9Zg5GafdaoP5Tf4T7mCkuZFyFLHu50nX99T+SVtICM2sjNUEypMw7P6chtPESOjG2G
+         Di+R/cW9WMEyufygPudsBu10y0qPlXN30hv249drpqbH5arhiGdK/USuie6BEVBYA0cs
+         wr4A==
+X-Gm-Message-State: AOJu0YxgHJY/j9+8zc6jNiF2tIKWMH9gFkwAxy6mNnq/EmftQ/EOZcSa
+	HeJQQfiiDo6F5GXyhWivVcqySLg9ZGDS8lCyfus=
+X-Google-Smtp-Source: AGHT+IFQKKALvmdSJ+/5AfDuaqrPR7fqlgeoysOYY+9LODIKSdqLyNJ39weF6ACQcYsViW7NbD7CxA==
+X-Received: by 2002:a17:903:41cc:b0:1d0:8383:7433 with SMTP id u12-20020a17090341cc00b001d083837433mr3046638ple.36.1701790227185;
+        Tue, 05 Dec 2023 07:30:27 -0800 (PST)
+Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id w3-20020a170902a70300b001cfc34965aesm10384427plq.50.2023.12.05.07.30.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 07:30:26 -0800 (PST)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	marcelo.leitner@gmail.com,
+	vladbu@nvidia.com,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next 0/2] net/sched: optimizations around action binding and init
+Date: Tue,  5 Dec 2023 12:30:10 -0300
+Message-Id: <20231205153012.484687-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 5 Dec 2023 15:10:50 +0000 Russell King (Oracle) wrote:
-> I've raised this before in other subsystems, and it's suggested that
-> it's better to have it in the .c file. I guess the reason is that it's
-> more obvious that the function is documented when modifying it, so
-> there's a higher probability that the kdoc will get updated when the
-> function is altered.
+Scaling optimizations for action binding in rtnl-less filters.
+We saw a noticeable lock contention around idrinfo->lock when
+testing in a 56 core system, which disappeared after the patches.
 
-Plus I think people using IDEs (i.e. not me) may use the "jump to
-definition" functionality, to find the doc? 
+Pedro Tammela (2):
+  net/sched: act_api: rely on rcu in tcf_idr_check_alloc
+  net/sched: act_api: skip idr replace on bound actions
 
-TBH I thought putting kdoc in the C source was documented in the coding
-style, but I can't find any mention of it now.
+ include/net/act_api.h |  2 +-
+ net/sched/act_api.c   | 67 ++++++++++++++++++++++++++-----------------
+ net/sched/cls_api.c   |  2 +-
+ 3 files changed, 42 insertions(+), 29 deletions(-)
+
+-- 
+2.40.1
+
 
