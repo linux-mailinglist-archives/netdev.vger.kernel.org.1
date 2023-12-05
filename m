@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-53901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA9D8052B6
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:25:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E798052BC
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BC1F1C20BB1
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:25:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34D2428456D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 11:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C40697B8;
-	Tue,  5 Dec 2023 11:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4EE69791;
+	Tue,  5 Dec 2023 11:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JyX8IGgQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VGsUfrlk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F774698
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 03:23:18 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-a1b7b6bf098so342945866b.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 03:23:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701775370; x=1702380170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5yqpkJ+ET/6lBT751aykeaMtjcvTMdn/A7pNY83siyc=;
-        b=JyX8IGgQrzOYRZnsM7jtpEj33UtuZDkftkF5WNbmxDch4FqTL+ghcQrJTmRlJX6QtM
-         8UPvyiVUOzysgBVVGx8MxIpl3Cdc5X35I9jC1EH28mG5yBBbjraPWOa8Pn35/be/vebA
-         IEpZSMvJr+QxTjoYdoQW3NgfyLzbVDQ0ms8Q1a+kdFjx/Hcxgo5a95X32LuInfpMKuyt
-         t9PADL3DE+9FTTaka53stPsXfnvY61y/P4PJET1969fXrUQftDNHJ2z2ByRkSxRHcyFq
-         a1E4Nk7aOfvXvBmEGQYBR+rrmRgrYlVS92MENCA9RkgR+q1A4FUF0J6uLeF4X7IRm4A0
-         s86A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701775370; x=1702380170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5yqpkJ+ET/6lBT751aykeaMtjcvTMdn/A7pNY83siyc=;
-        b=H5ofPD7+FwLMUN1p1tUJlM5L3cEE/6fjV/9AmQp9t/QCvv+hU1Y84TVA1QHXkl6Xyy
-         kGcA9p6uCob5KZAkQAdlzlDK+EVXXSp2vwrNp3fOV1JOaq+1aHspzlUnI3WDCnZL5+Lm
-         8n+h2sd2qGYn9qnfboRBtx+0ftYN06f2AHsC29vMufCbcBeKankE1YypIKnd0bJ9znbK
-         XWPqeXnpiFYF7BPk0H0y9uH5mxs4k2s63AnaGmPDdcxvtYhtXpxrRdu8BxHkHd+A2Nkx
-         5vGVzeO2Z/Sv2Kn+xP4BslLuDBUvBORMmAwWSq2ESiWQTEfwBPWrFog2HQR94KUpJcBh
-         mvRQ==
-X-Gm-Message-State: AOJu0YyNTi6Mnp2yNtqV+/7jJexa75sChTm4TfxLtLmSSZXaTitXj3d+
-	QxaQl6P6DVZInVGYN8hKMSWUWA==
-X-Google-Smtp-Source: AGHT+IHrKClQ7/RhLOCPOXXIuBCSxhhbCc98n00YruPaVJrGWXKgTadBACQeaFW0QTdVYKHrQZFubA==
-X-Received: by 2002:a17:907:1b10:b0:9ee:295:5693 with SMTP id mp16-20020a1709071b1000b009ee02955693mr1196298ejc.7.1701775370568;
-        Tue, 05 Dec 2023 03:22:50 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id m18-20020a17090607d200b00a1ce58e9fc7sm197095ejc.64.2023.12.05.03.22.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 03:22:50 -0800 (PST)
-Date: Tue, 5 Dec 2023 12:22:49 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, Johannes Berg <johannes.berg@intel.com>
-Subject: Re: [RFC PATCH] net: rtnetlink: remove local list in
- __linkwatch_run_queue()
-Message-ID: <ZW8ICbik45ODsRUW@nanopsycho>
-References: <20231204211952.01b2d4ff587d.I698b72219d9f6ce789bd209b8f6dffd0ca32a8f2@changeid>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C92A10CF;
+	Tue,  5 Dec 2023 03:23:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ixJ2HNTOflVEtkIw9lPsvgsuTF/SutHy/lni6jq+Myc=; b=VGsUfrlkXC8ZAyffXZfVwcCK+8
+	DQgoZkbr0CEW7jsTuw1iqVIrncKemqyj6pLzVxB+hTGKPXkYwJZfZc+kN6Bs/NvR7kW+kXH7NLTQr
+	F5dcMBnv3p5gVQONwXCpvP5ihezZNLsrTY183aXqPu5wGuX1BcSDc08SVXf4p4LbFeYmWs6OGiohl
+	gdrHylSYM2T+21z66PWK7vsB/WA3lcEhylu5b5o+gTDOfbT8YnZVRZ/ONo9giZZw/cISb+U7/LHDJ
+	KkYMqAnTvnjMucWpxOOz9vryxqz2wOjG5rVdXYiLQNWgiwSh/4UdKAZx9BMXX2citboGRoHZz8nWA
+	0osNnBWg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55396)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rATVq-0006gB-1w;
+	Tue, 05 Dec 2023 11:22:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rATVq-0001fI-HX; Tue, 05 Dec 2023 11:22:50 +0000
+Date: Tue, 5 Dec 2023 11:22:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 05/16] net: pcs: xpcs: Move native device ID
+ macro to linux/pcs/pcs-xpcs.h
+Message-ID: <ZW8ICvzwIHJhoV9U@shell.armlinux.org.uk>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+ <20231205103559.9605-6-fancer.lancer@gmail.com>
+ <ZW7/TrtSols1igy/@shell.armlinux.org.uk>
+ <bas6l42vk2zzrwo22ss7fuganf4ekvhtvkb32duydjise7ui3o@o4f3rbcpokur>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,28 +71,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231204211952.01b2d4ff587d.I698b72219d9f6ce789bd209b8f6dffd0ca32a8f2@changeid>
+In-Reply-To: <bas6l42vk2zzrwo22ss7fuganf4ekvhtvkb32duydjise7ui3o@o4f3rbcpokur>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Mon, Dec 04, 2023 at 09:19:53PM CET, johannes@sipsolutions.net wrote:
->From: Johannes Berg <johannes.berg@intel.com>
+On Tue, Dec 05, 2023 at 02:14:34PM +0300, Serge Semin wrote:
+> On Tue, Dec 05, 2023 at 10:45:34AM +0000, Russell King (Oracle) wrote:
+> > On Tue, Dec 05, 2023 at 01:35:26PM +0300, Serge Semin wrote:
+> > > Generic MDIO-device driver will support setting a custom device ID for the
+> > > particular MDIO-device.
+> > 
+> > Why future tense? I don't see anything later in this patch set adding
+> > this.
+> 
+> After the next patch is applied
+> [PATCH net-next 10/16] net: pcs: xpcs: Add generic DW XPCS MDIO-device support
+> the DW XPCS driver _will_ support setting custom IDs based on the
+> platform data and the DT compatibles.
 
-Why rfc?
+What is confusing is that the sentence makes it sound like it's some
+generic driver that can be used for any PCS, whereas in reality it is
+_this_ XPCS driver which is not generic.
 
+"This driver will support setting a custom device ID in a future patch."
+or explicitly state the summary line of the patch concerned so one can
+refer to it. Future references are difficult to find whether they're in
+email and especially once they're merged into git.
 
->
->Due to linkwatch_forget_dev() (and perhaps others?) checking for
->list_empty(&dev->link_watch_list), we must have all manipulations
->of even the local on-stack list 'wrk' here under spinlock, since
->even that list can be reached otherwise via dev->link_watch_list.
->
->This is already the case, but makes this a bit counter-intuitive,
->often local lists are used to _not_ have to use locking for their
->local use.
->
->Remove the local list as it doesn't seem to serve any purpose.
->While at it, move a variable declaration into the loop using it.
->
->Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> It can be used for instance to
+> fix the already available SJ1105 and SJ1110 MDIO bus implementations,
+> so instead of substituting the XPCS IDs on the PHYSID CSR reads the
+> driver could just pass the device ID and PMA ID via the device
+> platform data.
+> 
+> If my patch log text looks unclear anyway, just say so. I'll change it
+> accordingly. I guess it would be enough to say that moving is required
+> just to collect all the IDs in a single place.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+You need to adjust your attitude - I did exactly that. There was
+something which I didn't understand, so I raised the issue. Sorry
+for spotting a problem, but do you always get arsey when a reviewer
+picks up on something wrong? If that's your attitude, then for this
+entire series: NAK.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
