@@ -1,145 +1,147 @@
-Return-Path: <netdev+bounces-53807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE4F804B43
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:40:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06FE5804B56
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:47:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58FF528171A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:40:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3814281603
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031F024210;
-	Tue,  5 Dec 2023 07:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEE9286A2;
+	Tue,  5 Dec 2023 07:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="iS/ge1xz"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF3FCB
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 23:40:05 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rAQ1T-0007nO-OE; Tue, 05 Dec 2023 08:39:15 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rAQ1P-00Dh2K-W4; Tue, 05 Dec 2023 08:39:12 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rAQ1P-00EZzR-Lj; Tue, 05 Dec 2023 08:39:11 +0100
-Date: Tue, 5 Dec 2023 08:39:11 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Alexander Aring <alex.aring@gmail.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Zhao Qiang <qiang.zhao@nxp.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Russell King <linux@armlinux.org.uk>, linux-wpan@vger.kernel.org,
-	Andy Gross <agross@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Stephan Gerhold <stephan@gerhold.net>,
-	linux-arm-msm@vger.kernel.org,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org, Alex Elder <elder@kernel.org>,
-	netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>,
-	linux-renesas-soc@vger.kernel.org, kernel@pengutronix.de,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Imre Kaloz <kaloz@openwrt.org>, linuxppc-dev@lists.ozlabs.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove
- callback returning void
-Message-ID: <20231205073911.e6nphzhc6yjan5vu@pengutronix.de>
-References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
- <20231205075110.795b88d2@xps-13>
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6488FCB
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 23:47:47 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-a1b68ae40efso256828766b.0
+        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 23:47:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701762466; x=1702367266; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w+CcGcui1YmWg+yt9qsWBMYdAtBu93YJ8/xh6Ot4PfE=;
+        b=iS/ge1xzxyDshARpdlcb/s1mSTiVKkrBeOYxqAYLVes+nT/PNq2ue+e8jM5LXONYOu
+         uk4UE/NFbNOnW+SFqRPfxuZ+o1rDmb7TVPAs2oNsy690P9OJ4IoNIoCJNigDAwalPpZM
+         WsYS7v5FWFf82YsNrvQqyFNQkewblC3y2O/YIol6i93I3YtckM6oBA1i/Q1XvIfTcCCk
+         3vhcYyt7pa+I6RtrAwaFPp2X7EsD3fGAobSW7LhEma0hXvLur1gcCOzQ3SUEZmol8zAC
+         QZBLx3+Zs5BIT8hZc8Vz6ejwlgsgEGSvqcK3ry/gfLXFQuO5orCyDNrvc/vUoBesjgQ3
+         S5ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701762466; x=1702367266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w+CcGcui1YmWg+yt9qsWBMYdAtBu93YJ8/xh6Ot4PfE=;
+        b=mKaccm10gj9vB0l0wxyyj46LCsmrMGwQwPP5V2eG9jsa6FLA4TYhPK2euFOmaoNxnX
+         pSt5KnZKZYjYVH56JrfwJdy9BJwojvE9EI3LcPxwF+7je3+Vm/aJyku2HqqB0x9Io+Uz
+         yP8EB1Tpe/wQCYiRrB+EqWjquuX7aFc64RBGTCPO8bZ6Q44CQ5NZQvCcTtm1NUD9b5Dh
+         jBlEffdbKh1paweFElEODjBbdpuVQVJnzZkiZdp21/4hWlHTVnhTXUO5DOVog8nU/ePS
+         fPqbGRymIPETczzva6vFUjChDGdvPvL7pW9Gvqs/M1T7UwvaVDYhwzAeOLPSr2mavHyg
+         y5NQ==
+X-Gm-Message-State: AOJu0YzlXmDAzUx3inqHLDNl4RZbEAEDjTQUVeWVJQB3j03quIQIIzyh
+	/qXeJ6lDBW0SkqwVlDWwKy+2og==
+X-Google-Smtp-Source: AGHT+IEX0SSip1LlmZtIdYDvvYVqWhZt1DDKhOqWvJjzS6UghApcKJXUFnj0D1fjvUPQeZdZNMgXrw==
+X-Received: by 2002:a17:906:2244:b0:a19:4f2b:f78a with SMTP id 4-20020a170906224400b00a194f2bf78amr3469088ejr.5.1701762465762;
+        Mon, 04 Dec 2023 23:47:45 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id j21-20020a170906279500b00a0949d4f66fsm6195440ejc.54.2023.12.04.23.47.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Dec 2023 23:47:45 -0800 (PST)
+Date: Tue, 5 Dec 2023 08:47:43 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"Hadi Salim, Jamal" <jhs@mojatatu.com>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"andriy.shevchenko@linux.intel.com" <andriy.shevchenko@linux.intel.com>,
+	"Nambiar, Amritha" <amritha.nambiar@intel.com>,
+	"sdf@google.com" <sdf@google.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [patch net-next v4 8/9] devlink: add a command to set
+ notification filter and use it for multicasts
+Message-ID: <ZW7Vn4F6bm2hYgpi@nanopsycho>
+References: <20231123181546.521488-1-jiri@resnulli.us>
+ <20231123181546.521488-9-jiri@resnulli.us>
+ <6dbb53ac-ec93-31cd-5201-0d49b0fdf0bb@intel.com>
+ <ZW39QoYQUSyIr89P@nanopsycho>
+ <CO1PR11MB5089142F465D060B9AE3FDC0D686A@CO1PR11MB5089.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yvpnmk4qagvgsgfh"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231205075110.795b88d2@xps-13>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <CO1PR11MB5089142F465D060B9AE3FDC0D686A@CO1PR11MB5089.namprd11.prod.outlook.com>
 
+Mon, Dec 04, 2023 at 08:17:24PM CET, jacob.e.keller@intel.com wrote:
+>
+>
+>> -----Original Message-----
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: Monday, December 4, 2023 8:25 AM
+>> To: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+>> Cc: kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net;
+>> edumazet@google.com; Keller, Jacob E <jacob.e.keller@intel.com>; Hadi Salim,
+>> Jamal <jhs@mojatatu.com>; johannes@sipsolutions.net;
+>> andriy.shevchenko@linux.intel.com; Nambiar, Amritha
+>> <amritha.nambiar@intel.com>; sdf@google.com; horms@kernel.org;
+>> netdev@vger.kernel.org
+>> Subject: Re: [patch net-next v4 8/9] devlink: add a command to set notification
+>> filter and use it for multicasts
+>> 
+>> Mon, Nov 27, 2023 at 04:40:22PM CET, przemyslaw.kitszel@intel.com wrote:
+>> >On 11/23/23 19:15, Jiri Pirko wrote:
+>> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >>
+>> 
+>> [...]
+>> 
+>> 
+>> >> diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
+>> >> index fa9afe3e6d9b..33a8e51dea68 100644
+>> >> --- a/net/devlink/netlink.c
+>> >> +++ b/net/devlink/netlink.c
+>> >> @@ -17,6 +17,79 @@ static const struct genl_multicast_group
+>> devlink_nl_mcgrps[] = {
+>> >>   	[DEVLINK_MCGRP_CONFIG] = { .name =
+>> DEVLINK_GENL_MCGRP_CONFIG_NAME },
+>> >>   };
+>> >> +int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
+>> >> +				      struct genl_info *info)
+>> >> +{
+>> >> +	struct nlattr **attrs = info->attrs;
+>> >> +	struct devlink_obj_desc *flt;
+>> >> +	size_t data_offset = 0;
+>> >> +	size_t data_size = 0;
+>> >> +	char *pos;
+>> >> +
+>> >> +	if (attrs[DEVLINK_ATTR_BUS_NAME])
+>> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_BUS_NAME]) + 1;
+>> >> +	if (attrs[DEVLINK_ATTR_DEV_NAME])
+>> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_DEV_NAME]) + 1;
+>> >> +
+>> >> +	flt = kzalloc(sizeof(*flt) + data_size, GFP_KERNEL);
+>> >
+>> >instead of arithmetic here, you could use struct_size()
+>> 
+>> That is used for flex array, yet I have no flex array here.
+>> 
+>
+>Yea this isn't a flexible array. You could use size_add to ensure that this can't overflow. I don't know what the bound on the attribute sizes is.
 
---yvpnmk4qagvgsgfh
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Okay, will do that to be on a safe side.
 
-Hello Miquel,
-
-On Tue, Dec 05, 2023 at 07:51:10AM +0100, Miquel Raynal wrote:
-> u.kleine-koenig@pengutronix.de wrote on Mon,  4 Dec 2023 19:30:40 +0100:
-> > (implicit) v1 of this series can be found at
-> > https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@=
-pengutronix.de.
-> > Changes since then:
-> >=20
-> >  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
-> >    converts ipa to remove_new() and introduces an error message in the
-> >    error path that failed before.
-> >=20
-> >  - Rebased to today's next
-> >=20
-> >  - Add the tags received in the previous round.
-> >=20
-> > Uwe Kleine-K=F6nig (9):
-> >   net: ipa: Convert to platform remove callback returning void
-> >   net: fjes: Convert to platform remove callback returning void
-> >   net: pcs: rzn1-miic: Convert to platform remove callback returning
-> >     void
-> >   net: sfp: Convert to platform remove callback returning void
-> >   net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
-> >     void
-> >   net: wan/ixp4xx_hss: Convert to platform remove callback returning
-> >     void
-> >   net: wwan: qcom_bam_dmux: Convert to platform remove callback
-> >     returning void
-> >   ieee802154: fakelb: Convert to platform remove callback returning void
-> >   ieee802154: hwsim: Convert to platform remove callback returning void
->=20
-> FYI, I plan on taking patches 8 and 9 through wpan-next.
-
-I forgot to mention explicitly that there are no interdependencies in
-this series. So each maintainer picking up up their patches is fine.
-
-Thanks
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---yvpnmk4qagvgsgfh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmVu054ACgkQj4D7WH0S
-/k6iZAgAk0+g8Khu/Ep6tOFWM4mSMy9654kVheNx2FCbbW/bAMDmjjTU+JefFpX+
-7FjzwXTwgg1LgMrgBGElDY2TT6R2655WJe8jWIEOSjXPJLpqH19V1nbyE4D0ESd/
-j3Ng/QZKClTPeg3Qm/6ECF3YR2HDwT1xnUOYPEJinZcpBjJ/oyH16DVG11rvhYxL
-o+1q0NZqQfR+TEwIRj84WFCmk1UCfG7TVGZSJOmby1+bg7W6Heh+yr/vyyQ+vYEL
-4w0ogQenAk2aIlE7RmrsUp9WFA5pTFVYz+xJOA8tJx9p6pzSRpkXWtCN1ZrUTnnY
-vxZ07dy2791XsDRamfgrGOZgzi9RJg==
-=F8+E
------END PGP SIGNATURE-----
-
---yvpnmk4qagvgsgfh--
+>
 
