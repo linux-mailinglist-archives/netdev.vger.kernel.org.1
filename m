@@ -1,111 +1,96 @@
-Return-Path: <netdev+bounces-53960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C20B80568E
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:52:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BFF08056B3
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D8431C20F9F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:52:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7D821F213F6
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8BE5E0CB;
-	Tue,  5 Dec 2023 13:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NktDqN5j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324D25FF19;
+	Tue,  5 Dec 2023 14:02:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DB012C;
-	Tue,  5 Dec 2023 05:52:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fp/k+9cjXPMJD2AI1NBPq4sHcsTLnY0P6a5ilpBrwwI=; b=NktDqN5jNI5Ylg9ZHDCm/VXu55
-	z+DTg9FlA8wsQGtB2rP4e07ENtnZ+R782xG+VNf6Ve91GLktgfzGKWa6epkNfgsfR0hUo+dhFhhS3
-	1CrG3fFgCQUD8ABXHVmW2Siqq94y127Lrsf4p0pvesSlcVu9tV0o9cHVqHfYFhdammPM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rAVqa-0026FF-6u; Tue, 05 Dec 2023 14:52:24 +0100
-Date: Tue, 5 Dec 2023 14:52:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5E5B2
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:02:33 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAVzw-0005NI-Rb; Tue, 05 Dec 2023 15:02:04 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAVzv-00Dkwo-Q9; Tue, 05 Dec 2023 15:02:03 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rAVzv-005PIO-Mv; Tue, 05 Dec 2023 15:02:03 +0100
+Date: Tue, 5 Dec 2023 15:02:03 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mark Brown <broonie@kernel.org>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 06/16] net: pcs: xpcs: Avoid creating dummy XPCS
- MDIO device
-Message-ID: <e1806c15-757e-4af0-a8be-075aa77918c2@lunn.ch>
-References: <20231205103559.9605-1-fancer.lancer@gmail.com>
- <20231205103559.9605-7-fancer.lancer@gmail.com>
- <ZW8ASzkC9IFFlxkV@shell.armlinux.org.uk>
- <rgp33mm4spbpm5tmgxurkhy4is3lz3z62rz64rni2pygteyrit@zwflw2ejdkn7>
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	Liam Girdwood <lgirdwood@gmail.com>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231205140203.GK981228@pengutronix.de>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+ <20231204225956.GG981228@pengutronix.de>
+ <20231205064527.GJ981228@pengutronix.de>
+ <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <rgp33mm4spbpm5tmgxurkhy4is3lz3z62rz64rni2pygteyrit@zwflw2ejdkn7>
+In-Reply-To: <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Dec 05, 2023 at 02:31:41PM +0300, Serge Semin wrote:
-> On Tue, Dec 05, 2023 at 10:49:47AM +0000, Russell King (Oracle) wrote:
-> > On Tue, Dec 05, 2023 at 01:35:27PM +0300, Serge Semin wrote:
-> > > If the DW XPCS MDIO devices are either left unmasked for being auto-probed
-> > > or explicitly registered in the MDIO subsystem by means of the
-> > > mdiobus_register_board_info() method there is no point in creating the
-> > > dummy MDIO device instance in order to get the DW XPCS handler since the
-> > > MDIO core subsystem will create the device during the MDIO bus
-> > > registration procedure.
-> > 
+On Tue, Dec 05, 2023 at 12:55:18PM +0000, Mark Brown wrote:
+> On Tue, Dec 05, 2023 at 07:45:27AM +0100, Oleksij Rempel wrote:
 > 
-> > Please reword this overly long sentence.
+> > CC regulator devs here too.
 > 
-> Ok.
-> 
-> > 
-> > If they're left unmasked, what prevents them being created as PHY
-> > devices?
-> 
-> Not sure I fully get what you meant. If they are left unmasked the
-> MDIO-device descriptor will be created by the MDIO subsystem anyway.
-> What the point in creating another one?
+> Again, I'm not sure what if any question there is?
 
-Saying what Russell said, in a different way:
+PSE is kind of PMIC for Ethernet ports. I assume, it is good to let you
+know at least about existence drivers.
 
-/*
- * Return true if the child node is for a phy. It must either:
- * o Compatible string of "ethernet-phy-idX.X"
- * o Compatible string of "ethernet-phy-ieee802.3-c45"
- * o Compatible string of "ethernet-phy-ieee802.3-c22"
- * o In the white list above (and issue a warning)
- * o No compatibility string
- *
- * A device which is not a phy is expected to have a compatible string
- * indicating what sort of device it is.
- */
-bool of_mdiobus_child_is_phy(struct device_node *child)
-
-So when walking the bus, if a node is found which fits these criteria,
-its assumed to be a PHY. 
-
-Anything on the MDIO bus which is not a PHY needs to use a compatible.
-
-	 Andrew
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
