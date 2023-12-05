@@ -1,71 +1,87 @@
-Return-Path: <netdev+bounces-54066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73F9805E74
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:16:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51FEE805EAA
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:33:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35EAF2818F3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:16:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7DBBB210EF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C763A6D1CB;
-	Tue,  5 Dec 2023 19:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAF06A35D;
+	Tue,  5 Dec 2023 19:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HzHDlKjW"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Q/Eo+FEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5756D1A8
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 19:16:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69924C433C9;
-	Tue,  5 Dec 2023 19:16:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701803767;
-	bh=dFHThxBmnjrmmteNpPiNVEIBTX15vyVkyAINGkaYRe8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HzHDlKjWO3GvAifXp8J72cUctfpy+jZDLA0bBhY2yeXgqOzotz944ixeLAlzh/Nan
-	 jYrRdd8fkHORjFD7cyc5aqjKqy9mzCD94T3vrejrcn+MUevuBLDoHSYNVfl2C+JWA0
-	 9TuRExl15t3bLIpeu5foPvdlPcYTEozi12JwnjWw/ilz8pMjy3xJiHE3qSA3Gdaq1W
-	 JXWpMe5FMQ8oBolm0cUuIb+P22pszymtWg2bL3X38nKKwUA1jht+gsnklq8yCxD1FI
-	 wMHSUV+R+Bpo46VAyuKxtcLUnDjWrH7X5fbakpHv3/DPu2opxovA6IXLvgioNLtM2V
-	 fRSCYUbfz/NZg==
-Date: Tue, 5 Dec 2023 19:16:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: Steven Zou <steven.zou@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com, andriy.shevchenko@linux.intel.com,
-	aleksander.lobakin@intel.com, andrii.staikov@intel.com,
-	jan.sokolowski@intel.com
-Subject: Re: [PATCH iwl-next 1/2] ice: Refactor FW data type and fix bitmap
- casting issue
-Message-ID: <20231205191602.GU50400@kernel.org>
-References: <20231201062502.10099-1-steven.zou@intel.com>
- <20231201062502.10099-2-steven.zou@intel.com>
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE01AB
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:33:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=SkMzdOaiE/tH3KLyUGpebGooZ6m/kC6AAcd35NxWXmA=;
+	t=1701804788; x=1703014388; b=Q/Eo+FEbKPrfOziPHy5XnZPDgWyqEAoY9xNRUGnOrPSvk6R
+	aJoy7+UYUfnwneXoGIt5udVb0G1ZB2MGZbmXZjkUlqbDNoapBOfwj3ZCYPoOrpcUnFAfF0sjKxAT7
+	oMW9yyD6H2hYTpiKy2wgjCTBQmq6YxfVA1W0ODxGnLCF9hmIOQEHBzS1kRaz0w3z2rrFlG07rQvta
+	czoMk/VHCCGHUEHAoz9FaYjmfkIc05xpt6URXvwHvoYaBQtlC7rDkPg+jwl4u/V+h77iOAdXSCNev
+	lAr6/sL30Zwx2SVTyBBV8JgkSkTJH1LLNVZ1brrjRU5IR93TudPfhqp/kv8Zqupg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAbAF-0000000GWCC-2rbp;
+	Tue, 05 Dec 2023 20:33:03 +0100
+Message-ID: <1d986c73c1d39b0cced7d8d2119fba4b2a02418b.camel@sipsolutions.net>
+Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Marc MERLIN <marc@merlins.org>
+Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Date: Tue, 05 Dec 2023 20:33:02 +0100
+In-Reply-To: <20231205024652.GA12805@merlins.org>
+References: 
+	<20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
+	 <20231204200038.GA9330@merlins.org>
+	 <a6ac887f7ce8af0235558752d0c781b817f1795a.camel@sipsolutions.net>
+	 <20231204203622.GB9330@merlins.org>
+	 <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
+	 <20231204205439.GA32680@merlins.org> <20231204212849.GA25864@merlins.org>
+	 <20231205024652.GA12805@merlins.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231201062502.10099-2-steven.zou@intel.com>
+X-malware-bazaar: not-scanned
 
-On Fri, Dec 01, 2023 at 02:25:01PM +0800, Steven Zou wrote:
-> According to the datasheet, the recipe association data is an 8-byte
-> little-endian value. It is described as 'Bitmap of the recipe indexes
-> associated with this profile', it is from 24 to 31 byte area in FW.
-> Therefore, it is defined to '__le64 recipe_assoc' in struct
-> ice_aqc_recipe_to_profile. And then fix the bitmap casting issue, as we
-> must never ever use castings for bitmap type.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
-> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-> Signed-off-by: Steven Zou <steven.zou@intel.com>
+On Mon, 2023-12-04 at 18:46 -0800, Marc MERLIN wrote:
+>=20
+> [13323.572484] iwlwifi 0000:09:00.0: TB bug workaround: copied 152 bytes =
+from 0xffffff68 to 0xfd080000
+> [13328.000825] iwlwifi 0000:09:00.0: TB bug workaround: copied 1272 bytes=
+ from 0xfffffb08 to 0xff42c000
+> [13367.278564] iwlwifi 0000:09:00.0: TB bug workaround: copied 1328 bytes=
+ from 0xfffffad0 to 0xfec41000
+> [13389.737971] iwlwifi 0000:09:00.0: TB bug workaround: copied 572 bytes =
+from 0xfffffdc4 to 0xff091000
+> [13389.860480] iwlwifi 0000:09:00.0: TB bug workaround: copied 148 bytes =
+from 0xffffff6c to 0xfe412000
+> [13393.435354] iwlwifi 0000:09:00.0: TB bug workaround: copied 360 bytes =
+from 0xfffffe98 to 0xfedcd000
+> [13409.827199] iwlwifi 0000:09:00.0: TB bug workaround: copied 1348 bytes=
+ from 0xfffffabc to 0xfd057000
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+That's fine, just working around a HW bug on 2^32 address boundaries.
+
+I had a patch a long time ago to make those messages not appear ... not
+sure where it ended up.
+
+johannes
 
