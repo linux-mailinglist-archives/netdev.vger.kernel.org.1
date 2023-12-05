@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-54175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4EF480630E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8524380630F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 00:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35C8AB211F5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A724C1C20B01
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73E4123E;
-	Tue,  5 Dec 2023 23:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE3A41763;
+	Tue,  5 Dec 2023 23:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="D4i3uEp4"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HLZE+tSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62AD122
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:27 -0800 (PST)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77f0b3f1618so157475085a.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:27 -0800 (PST)
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816ED18B
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 15:44:29 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77d6b28aa9aso417415485a.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 15:44:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701819867; x=1702424667; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1701819868; x=1702424668; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8+UIis1C5FIRofcy9HcTllt1lZGjE1cFQ9qpFZJGBk=;
-        b=D4i3uEp4lwtoReJw9K3fLmzPqNwAGr9tol/mtf2oJkx4wPXVRMlPy7yZrb4Y6aSoAX
-         HpZGnurHFFU3OuKuh7AQKfw7DCWy2fVNoaiEWjks8kVVx0q+s3CZC/7nE4vbams/zt9I
-         AEaNjQObroYNKQWq0FbSFS4vKOwNO+xi5R1DI=
+        bh=3v7nQAZ/o1oMxvh2SOa6aPUCXJcA8Pml3tMPIXUrIlk=;
+        b=HLZE+tSw3z4jol7w9CWO6cJYFn1m2NF6adOGY2R2mdhlvixcVNMCYZczaL4lnilC2F
+         VIxYBbUWEmRinumw/ZN2RMH18GNrtFllSWmxCGM1Gnb4DWBUnFBw3mdCaZi3fTIetzvI
+         BjUdg03X2flIfJQ6nxV3eAxfj3nXKwMWSxTxU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701819867; x=1702424667;
+        d=1e100.net; s=20230601; t=1701819868; x=1702424668;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8+UIis1C5FIRofcy9HcTllt1lZGjE1cFQ9qpFZJGBk=;
-        b=NB1iBCO2U3I+/DMRRYb/1XsAelbKwF0ytRK3n3eKKQGSnIRJMWUlLhRIRi+00mRklt
-         1QzECIl27P8/Qc8fLlCzQNNkkw0fEhm9HpKCSLJKj87OxagRRihu9dIMRRZOnMhcZOlL
-         MB9kke/srP6zzAKSMqH78FnFvrd3Gpz1ErmhE5bwPQSWtm9U08pEaChxQ1grKGeBT+QD
-         mGWYyfTPFgATaRP0mzMci3YR3/7ffx4+7zMb2hdNWFgiyfHr/13l6MIJInWazvPc+L+H
-         m6Aas+wPgBK4eS1z/lk9kfB8PYAnkA6gK+qI+bDv9yp/d5fVi/DqTbjE76oskeQZh0cp
-         QLYA==
-X-Gm-Message-State: AOJu0YwYvCZU2i/1tVPKdWJcqQA3e7oou/BLtELYNzHNeiOTzTYoPa5p
-	9PVg8Lr9MfqJKw0xouAwgiEtMA==
-X-Google-Smtp-Source: AGHT+IGziAF7ABxS7rE9xBOjsevHQOeFca1H0gE+Kw+AA7qjF0UuA0sRTyjJOpWlynhpodjgKSi8KA==
-X-Received: by 2002:a05:620a:3724:b0:77b:dd1d:2afb with SMTP id de36-20020a05620a372400b0077bdd1d2afbmr37128qkb.65.1701819866357;
-        Tue, 05 Dec 2023 15:44:26 -0800 (PST)
+        bh=3v7nQAZ/o1oMxvh2SOa6aPUCXJcA8Pml3tMPIXUrIlk=;
+        b=Vm0/3e2o0jZbazm7VxCqmxN2YrFumhXsQpIY6QuzUblwkGBihCybl6ic9YmZAwj0zw
+         RfiQFy0jgxzbeU6BqoiKUmSwhrnWMuOg4HOBUrNsKo6iPHRv2NqXt9u+51QpBg493C/6
+         wccLhsObvuw1vquYtLbbx2eIreo+urFUhtlrn0OJv/GLdLQv7KiWxgy4/3LG9XDpAzlL
+         ddW9JttjwD4+WPj4JnyZQFeImcQub4mOA6LKE9dOOl0ExP5pNpbbDzEHqPw+yefgZ3zh
+         MX9I0qXM2iMfeeZ9m13qh8sxK2a6HcNJLkPhiKfU76jMQYEzEBZgzku4faNveYaqxw/q
+         llxQ==
+X-Gm-Message-State: AOJu0Yx/l87E95J3uXau7R88AbnazZYjjhpLXY1BZvPsJnqCLSJP4BRM
+	oKdZgD/8hg2zIWYnmy5bbR+Pqg==
+X-Google-Smtp-Source: AGHT+IE3AEZa0WV3P/5uVm+s0T9ygp/kY5lhS4rgqO8AzMR9AjgZSn+lMZ5ZWjX5firQAqBFzKZIRQ==
+X-Received: by 2002:a05:620a:3951:b0:76d:2725:f36f with SMTP id qs17-20020a05620a395100b0076d2725f36fmr61966qkn.71.1701819868156;
+        Tue, 05 Dec 2023 15:44:28 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.24
+        by smtp.gmail.com with ESMTPSA id y15-20020a37e30f000000b007788bb0ab8esm5450429qki.19.2023.12.05.15.44.26
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Dec 2023 15:44:25 -0800 (PST)
+        Tue, 05 Dec 2023 15:44:27 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, gospo@broadcom.com,
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gospo@broadcom.com,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Michael Chan <"michael.chan."@broadcom.com>
-Subject: [PATCH net 1/4] bnxt_en: Clear resource reservation during resume
-Date: Tue,  5 Dec 2023 15:44:01 -0800
-Message-Id: <20231205234404.17501-2-michael.chan@broadcom.com>
+	Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [PATCH net 2/4] bnxt_en: Fix skb recycling logic in bnxt_deliver_skb()
+Date: Tue,  5 Dec 2023 15:44:02 -0800
+Message-Id: <20231205234404.17501-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231205234404.17501-1-michael.chan@broadcom.com>
 References: <20231205234404.17501-1-michael.chan@broadcom.com>
@@ -70,49 +72,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a656b4060bcbd016"
+	boundary="000000000000c1f7bb060bcbd09d"
 
---000000000000a656b4060bcbd016
+--000000000000c1f7bb060bcbd09d
 Content-Transfer-Encoding: 8bit
 
-From: Somnath Kotur <somnath.kotur@broadcom.com>
+From: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
 
-We are issuing HWRM_FUNC_RESET cmd to reset the device including
-all reserved resources, but not clearing the reservations
-within the driver struct. As a result, when the driver re-initializes
-as part of resume, it believes that there is no need to do any
-resource reservation and goes ahead and tries to allocate rings
-which will eventually fail beyond a certain number pre-reserved by
-the firmware.
+Receive SKBs can go through the VF-rep path or the normal path.
+skb_mark_for_recycle() is only called for the normal path.  Fix it
+to do it for both paths to fix possible stalled page pool shutdown
+errors.
 
-Fixes: b4c66425771d ("bnxt_en: refactor bnxt_cancel_reservations()")
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Fixes: 86b05508f775 ("bnxt_en: Use the unified RX page pool buffers for XDP and non-XDP")
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan.@broadcom.com>
+Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
+Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d0359b569afe..72f2fc983940 100644
+index 72f2fc983940..b4a5311bdeb5 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13940,6 +13940,8 @@ static int bnxt_resume(struct device *device)
- 	if (rc)
- 		goto resume_exit;
- 
-+	bnxt_clear_reservations(bp, true);
+@@ -1748,13 +1748,14 @@ static void bnxt_tpa_agg(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
+ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
+ 			     struct sk_buff *skb)
+ {
++	skb_mark_for_recycle(skb);
 +
- 	if (bnxt_hwrm_func_drv_rgtr(bp, NULL, 0, false)) {
- 		rc = -ENODEV;
- 		goto resume_exit;
+ 	if (skb->dev != bp->dev) {
+ 		/* this packet belongs to a vf-rep */
+ 		bnxt_vf_rep_rx(bp, skb);
+ 		return;
+ 	}
+ 	skb_record_rx_queue(skb, bnapi->index);
+-	skb_mark_for_recycle(skb);
+ 	napi_gro_receive(&bnapi->napi, skb);
+ }
+ 
 -- 
 2.30.1
 
 
---000000000000a656b4060bcbd016
+--000000000000c1f7bb060bcbd09d
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -183,14 +189,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGJ2wotyAWfutcU7Q6wWPl8bKSJkJHJK
-xnt3MbAzWWpOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
-NTIzNDQyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPxDFc0UyEeHWCJcckGqM3QioRKIXI0l
+vKrDneOs+dQjMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTIw
+NTIzNDQyOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB+9+KLk43FMHubhykH9iQfZeJKEBdb7dNr/YiZbpX9pIO+qDJb
-GddNr3XW0rmPyGkRmtQnDGL0GgieMYG//ZX2c6I4YcsvW2VvhZY5DjpUYRiLIPOgM/iEH3bNEfiz
-BlSEPcafcCXwgoBkR8o1UfOFd0UW/cHUNZ0UL1VJ/eoGLKi5Mkt1sQ+HERHo7OlX3esNjN+2kfV8
-Syteflnt4FAmiLlZCC5XKN+o/ViVqWzJnY24U+P3Nm5V/kY9WJBKJhzF9VFaMXf7lhZu3NGtuyYA
-JgBB4sNFt3PFIngk3cl2uGttNKt9mvAA8usN8LXWjhrXLixkMGJgQ9wIEZzY3Dj1
---000000000000a656b4060bcbd016--
+ATANBgkqhkiG9w0BAQEFAASCAQCXwLoY60n8mP7PfDSkfehV0IpV1+tF+G7YRZK7CDNNi3+ekc9F
+oCFwC/L1U1KsvkmscT7AClGnX1YnD7wCvwUAJEEL/qQfePO4IBVMyyvUMbnNu5eyfZfMTYrGsLwl
+exIArTm6WRigiRKYb1zqGBw4z07sLuney+H/cUArB9Ra0RlU5YhnVo6Zs8G77CjhEXGLomXwRPB5
+oKhcHlXsAnC/M4luIObI7WO6gELRGsnkqnOfp/Qt9G/zxOaaVGmp42wIapSoI0yH3ERkPLNz8Wrv
+s8RDNwJSk/rXQkPCbNXKHsFkDPhDfG9PskrFyb7Qi9w9wPj+3MtfTRqY6c1+hJKH
+--000000000000c1f7bb060bcbd09d--
 
