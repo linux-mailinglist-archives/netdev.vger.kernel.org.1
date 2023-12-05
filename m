@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-54088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954EB805FC4
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:50:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D4D5805FC5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:50:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AD6E281FA8
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:50:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704011C210AB
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9F86A02B;
-	Tue,  5 Dec 2023 20:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59186A022;
+	Tue,  5 Dec 2023 20:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="w3qIrQFw"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lbSYgCJq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69801188
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 12:50:43 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6ce7632b032so837668b3a.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 12:50:43 -0800 (PST)
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04CB9181
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 12:50:47 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-2886579d59fso69387a91.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 12:50:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701809443; x=1702414243; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701809446; x=1702414246; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=70IKko6nuFG0YgO0yVZiuVVQeJMW/VMd50S6MbDFdyg=;
-        b=w3qIrQFwuFrYD4coUIut6CoYluTiyZP+g3b/VfOw/OdyAJn2g2s4kVEZeo2lZl7S7R
-         0JX2TBs7N0lTD9cytQ9CR43p1U8UZUzqaqCRnA4EtVB6cJcu6jNRHytQDWLIx190eIJ4
-         KL9OuxAYYnZdEdgPTdhSvZxC5GFecib0Gea6nyAHQQFhLXxG8AOkqnLY/7cFkLuxPPnl
-         tW6L0GezyTaquvxQYeS8sx1QQlz0/wz0z2/2P6dzSfnx8QNpcGNtrqFpis7nFke0bUIB
-         pGR/nPZTv2FWKy9aOU7AtFpHHn91Wo0Uimn11+yg1txJM/Xnh5cLN04vLdcz3IK/fGtZ
-         JQKA==
+        bh=BVANgdRDEa+YJZCXYx7mIertr2awDLabYrGi9jshxt8=;
+        b=lbSYgCJqnulzL2dUFGxDsa7X8W927VHfIZmcWoEBQ3tcBLybQ7kdbzu0v6gQUIvj8r
+         37SP2zKLW7KLOKgv5o9ps56NoDbePFcug5Iioqf9SJI+XbUqhbu999bDqhgWCoat8dKa
+         Me1VItXWjS9wxOHQDJcBgaUVeRD+3CcD3t0SSges3WZKf5AbBNMPvC0o0yh1wqHIi8lj
+         eA7w+dkN4pr7fIMxiZkuh9e1RoDvBGgPgsC0AS8NUe+5nqT7T53KhqTMpsRaz98LnFWY
+         8JJ2a0Etj6p4/7K0qP6bIr+E0XFXWC9MaFZn3DsG+gJSD1quoiTTRBzzlqVUEkWufA9t
+         adEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701809443; x=1702414243;
+        d=1e100.net; s=20230601; t=1701809446; x=1702414246;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=70IKko6nuFG0YgO0yVZiuVVQeJMW/VMd50S6MbDFdyg=;
-        b=EfKjBm6vv+cxET3Utt8gr//ZaB589uhf2cmwWgHCNiZlRwLWr2yEcZ4UKUKtvSycRv
-         1HnJ69NNJUNkJ7n8RHTDZzgW9Ufg9jDZof98SeahwznMnqeZTIRDTuP/ypsRhHHl8B9H
-         baeP53rCpFHY7rALg/+OCRviKuMBYe0YSk+W8ARvhX9qebC588YJlr/eLdh0ps7nooKF
-         L9HLM1r9W/oNGSp3wBkhew6WqX159RySCu89Jiu7wxdQ0kDdbzCq9VpW9+WWIHDnW7Jg
-         XSiEqfzSkOKBBc9zIIg6TGxobeCL92xm0Bcg7PdzCFrC5Yl/RW8uZvpVQtWPT1yvxuRI
-         YKGQ==
-X-Gm-Message-State: AOJu0YxZJXahNsSTXfcIVPaL6EkCiZdYIT+H1Np4/JczC+crWtZED07q
-	70DRdepslRJdlW++Pl8FPs5KeQ==
-X-Google-Smtp-Source: AGHT+IHHjtlgBjedyc+QwH8lP9oEOYWKk17ZrffcySxIG5b3rTBYVFnfQQOAk1lW7wjw0Ee77SKCiw==
-X-Received: by 2002:a05:6a20:1444:b0:18f:97c:5b77 with SMTP id a4-20020a056a20144400b0018f097c5b77mr3895540pzi.69.1701809442833;
-        Tue, 05 Dec 2023 12:50:42 -0800 (PST)
+        bh=BVANgdRDEa+YJZCXYx7mIertr2awDLabYrGi9jshxt8=;
+        b=Xppu5mH3NG8DK8o5yM11fdP+wQbP3rGOD4W+wf4+tu7lLKBhtnbJtHmpcSZ/7BlYng
+         ohDDmKT+SFnlDI86vb4ALTFXVqgcnLaiYNYFDSOmc/A4272xtAs7B3fSRQpCQCnGy2Cu
+         VwoXdTG3G5N8ZtDW/1nkSSMFITq5kg+q4gIk10WmVYwF2FRH/2z/7y8jSl7GRHvKDO5J
+         CWarzcNRSYu1C/lkl7L8D8lYIYiAUT3ebma3iLZkPG1580Q6LtjcranIl4jAUtau9+28
+         M0GuFBq/KCV6ZXjowip2C0danxJhCKsr1815peZ5tp401z7XFaIn4KMyDdAgaUKL3JM9
+         zEfQ==
+X-Gm-Message-State: AOJu0YwYLCPgrQ+5CnOxP1hK4xTafj/C1+AsVcaVXlrkKaWJxl+JsGPP
+	NAwKpyoopMfEMRA0tbuV34AFKQ==
+X-Google-Smtp-Source: AGHT+IHLt4SrwwWGW2aZ7I4/HLxgm1mq9RIHmZB5C1UJMMH6/Ga2KPgnmpmbE7FfKSy3mASBbKU+QA==
+X-Received: by 2002:a17:90b:3912:b0:285:fc67:6164 with SMTP id ob18-20020a17090b391200b00285fc676164mr1772672pjb.5.1701809446037;
+        Tue, 05 Dec 2023 12:50:46 -0800 (PST)
 Received: from localhost.localdomain ([2804:7f1:e2c0:638:b3b3:3480:1b98:451d])
-        by smtp.gmail.com with ESMTPSA id iw13-20020a170903044d00b001bf52834696sm8772788plb.207.2023.12.05.12.50.39
+        by smtp.gmail.com with ESMTPSA id iw13-20020a170903044d00b001bf52834696sm8772788plb.207.2023.12.05.12.50.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 12:50:42 -0800 (PST)
+        Tue, 05 Dec 2023 12:50:45 -0800 (PST)
 From: Victor Nogueira <victor@mojatatu.com>
 To: jhs@mojatatu.com,
 	xiyou.wangcong@gmail.com,
@@ -65,9 +65,9 @@ To: jhs@mojatatu.com,
 Cc: dcaratti@redhat.com,
 	netdev@vger.kernel.org,
 	kernel@mojatatu.com
-Subject: [PATCH net-next v3 2/3] net: sched: Make tc-related drop reason more flexible for remaining qdiscs
-Date: Tue,  5 Dec 2023 17:50:29 -0300
-Message-ID: <20231205205030.3119672-3-victor@mojatatu.com>
+Subject: [PATCH net-next v3 3/3] net: sched: Add initial TC error skb drop reasons
+Date: Tue,  5 Dec 2023 17:50:30 -0300
+Message-ID: <20231205205030.3119672-4-victor@mojatatu.com>
 X-Mailer: git-send-email 2.42.1
 In-Reply-To: <20231205205030.3119672-1-victor@mojatatu.com>
 References: <20231205205030.3119672-1-victor@mojatatu.com>
@@ -79,154 +79,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Incrementing on Daniel's patch[1], make tc-related drop reason more
-flexible for remaining qdiscs - that is, all qdiscs aside from clsact.
-In essence, the drop reason will be set by cls_api and act_api in case
-any error occurred in the data path. With that, we can give the user more
-detailed information so that they can distinguish between a policy drop
-or an error drop.
+Continue expanding Daniel's patch by adding new skb drop reasons that
+are idiosyncratic to TC.
 
-[1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
+More specifically:
+
+- SKB_DROP_REASON_TC_EXT_COOKIE_NOTFOUND: tc cookie was looked up using
+  ext, but was not found.
+
+- SKB_DROP_REASON_TC_COOKIE_EXT_MISMATCH: tc ext was looked up using cookie
+  and either was not found or different from expected.
+
+- SKB_DROP_REASON_TC_CHAIN_NOTFOUND: tc chain lookup failed.
+
+- SKB_DROP_REASON_TC_RECLASSIFY_LOOP: tc exceeded max reclassify loop
+  iterations
 
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 ---
- include/net/pkt_cls.h     | 16 ----------------
- include/net/pkt_sched.h   | 19 -------------------
- include/net/sch_generic.h | 31 +++++++++++++++++++++++++++++++
- net/core/dev.c            |  7 +++++--
- 4 files changed, 36 insertions(+), 37 deletions(-)
+ include/net/dropreason-core.h | 30 +++++++++++++++++++++++++++---
+ net/sched/act_api.c           |  3 ++-
+ net/sched/cls_api.c           | 22 ++++++++++++++--------
+ 3 files changed, 43 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index 761e4500cca0..f308e8268651 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -154,22 +154,6 @@ __cls_set_class(unsigned long *clp, unsigned long cl)
- 	return xchg(clp, cl);
- }
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 3c70ad53a49c..fa6ace8f1611 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -85,7 +85,11 @@
+ 	FN(IPV6_NDISC_BAD_OPTIONS)	\
+ 	FN(IPV6_NDISC_NS_OTHERHOST)	\
+ 	FN(QUEUE_PURGE)			\
+-	FN(TC_ERROR)			\
++	FN(TC_EXT_COOKIE_NOTFOUND)	\
++	FN(TC_COOKIE_EXT_MISMATCH)	\
++	FN(TC_COOKIE_MISMATCH)		\
++	FN(TC_CHAIN_NOTFOUND)		\
++	FN(TC_RECLASSIFY_LOOP)		\
+ 	FNe(MAX)
  
--struct tc_skb_cb;
--
--static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb);
--
--static inline enum skb_drop_reason
--tcf_get_drop_reason(const struct sk_buff *skb)
--{
--	return tc_skb_cb(skb)->drop_reason;
--}
--
--static inline void tcf_set_drop_reason(const struct sk_buff *skb,
--				       enum skb_drop_reason reason)
--{
--	tc_skb_cb(skb)->drop_reason = reason;
--}
--
- static inline void
- __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long base)
- {
-diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
-index 9b559aa5c079..1e200d9a066d 100644
---- a/include/net/pkt_sched.h
-+++ b/include/net/pkt_sched.h
-@@ -275,25 +275,6 @@ static inline void skb_txtime_consumed(struct sk_buff *skb)
- 	skb->tstamp = ktime_set(0, 0);
- }
+ /**
+@@ -376,8 +380,28 @@ enum skb_drop_reason {
+ 	SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
+ 	/** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
+ 	SKB_DROP_REASON_QUEUE_PURGE,
+-	/** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
+-	SKB_DROP_REASON_TC_ERROR,
++	/**
++	 * @SKB_DROP_REASON_TC_EXT_COOKIE_NOTFOUND: tc cookie was looked up
++	 * using ext, but was not found.
++	 */
++	SKB_DROP_REASON_TC_EXT_COOKIE_NOTFOUND,
++	/**
++	 * @SKB_DROP_REASON_TC_COOKIE_EXT_MISMATCH: tc ext was lookup using
++	 * cookie and either was not found or different from expected.
++	 */
++	SKB_DROP_REASON_TC_COOKIE_EXT_MISMATCH,
++	/**
++	 * @SKB_DROP_REASON_TC_COOKIE_MISMATCH: tc cookie available but was
++	 * unable to match to filter.
++	 */
++	SKB_DROP_REASON_TC_COOKIE_MISMATCH,
++	/** @SKB_DROP_REASON_TC_CHAIN_NOTFOUND: tc chain lookup failed. */
++	SKB_DROP_REASON_TC_CHAIN_NOTFOUND,
++	/**
++	 * @SKB_DROP_REASON_TC_RECLASSIFY_LOOP: tc exceeded max reclassify loop
++	 * iterations.
++	 */
++	SKB_DROP_REASON_TC_RECLASSIFY_LOOP,
+ 	/**
+ 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+ 	 * shouldn't be used as a real 'reason' - only for tracing code gen
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index f2b136ce9282..ba5aad9be161 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1098,7 +1098,8 @@ int tcf_action_exec(struct sk_buff *skb, struct tc_action **actions,
+ 			}
+ 		} else if (TC_ACT_EXT_CMP(ret, TC_ACT_GOTO_CHAIN)) {
+ 			if (unlikely(!rcu_access_pointer(a->goto_chain))) {
+-				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb,
++						    SKB_DROP_REASON_TC_CHAIN_NOTFOUND);
+ 				return TC_ACT_SHOT;
+ 			}
+ 			tcf_action_goto_chain_exec(a, res);
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 32457a236d77..5012fc0a24a1 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -1682,13 +1682,15 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 			 */
+ 			if (unlikely(n->tp != tp || n->tp->chain != n->chain ||
+ 				     !tp->ops->get_exts)) {
+-				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb,
++						    SKB_DROP_REASON_TC_COOKIE_MISMATCH);
+ 				return TC_ACT_SHOT;
+ 			}
  
--struct tc_skb_cb {
--	struct qdisc_skb_cb qdisc_cb;
--	u32 drop_reason;
--
--	u16 zone; /* Only valid if post_ct = true */
--	u16 mru;
--	u8 post_ct:1;
--	u8 post_ct_snat:1;
--	u8 post_ct_dnat:1;
--};
--
--static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb)
--{
--	struct tc_skb_cb *cb = (struct tc_skb_cb *)skb->cb;
--
--	BUILD_BUG_ON(sizeof(*cb) > sizeof_field(struct sk_buff, cb));
--	return cb;
--}
--
- static inline bool tc_qdisc_stats_dump(struct Qdisc *sch,
- 				       unsigned long cl,
- 				       struct qdisc_walker *arg)
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index c499b56bb215..1d70c2c1572f 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1036,6 +1036,37 @@ static inline struct sk_buff *qdisc_dequeue_head(struct Qdisc *sch)
- 	return skb;
- }
+ 			exts = tp->ops->get_exts(tp, n->handle);
+ 			if (unlikely(!exts || n->exts != exts)) {
+-				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb,
++						    SKB_DROP_REASON_TC_COOKIE_EXT_MISMATCH);
+ 				return TC_ACT_SHOT;
+ 			}
  
-+struct tc_skb_cb {
-+	struct qdisc_skb_cb qdisc_cb;
-+	u32 drop_reason;
-+
-+	u16 zone; /* Only valid if post_ct = true */
-+	u16 mru;
-+	u8 post_ct:1;
-+	u8 post_ct_snat:1;
-+	u8 post_ct_dnat:1;
-+};
-+
-+static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb)
-+{
-+	struct tc_skb_cb *cb = (struct tc_skb_cb *)skb->cb;
-+
-+	BUILD_BUG_ON(sizeof(*cb) > sizeof_field(struct sk_buff, cb));
-+	return cb;
-+}
-+
-+static inline enum skb_drop_reason
-+tcf_get_drop_reason(const struct sk_buff *skb)
-+{
-+	return tc_skb_cb(skb)->drop_reason;
-+}
-+
-+static inline void tcf_set_drop_reason(const struct sk_buff *skb,
-+				       enum skb_drop_reason reason)
-+{
-+	tc_skb_cb(skb)->drop_reason = reason;
-+}
-+
- /* Instead of calling kfree_skb() while root qdisc lock is held,
-  * queue the skb for future freeing at end of __dev_xmit_skb()
-  */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 4b84b72ebae8..f38c928a34aa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3753,6 +3753,8 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
- 
- 	qdisc_calculate_pkt_len(skb, q);
- 
-+	tcf_set_drop_reason(skb, SKB_DROP_REASON_QDISC_DROP);
-+
- 	if (q->flags & TCQ_F_NOLOCK) {
- 		if (q->flags & TCQ_F_CAN_BYPASS && nolock_qdisc_is_empty(q) &&
- 		    qdisc_run_begin(q)) {
-@@ -3782,7 +3784,7 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
- no_lock_out:
- 		if (unlikely(to_free))
- 			kfree_skb_list_reason(to_free,
--					      SKB_DROP_REASON_QDISC_DROP);
-+					      tcf_get_drop_reason(to_free));
- 		return rc;
+@@ -1717,7 +1719,8 @@ static inline int __tcf_classify(struct sk_buff *skb,
  	}
  
-@@ -3837,7 +3839,8 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+ 	if (unlikely(n)) {
+-		tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++		tcf_set_drop_reason(skb,
++				    SKB_DROP_REASON_TC_COOKIE_MISMATCH);
+ 		return TC_ACT_SHOT;
  	}
- 	spin_unlock(root_lock);
- 	if (unlikely(to_free))
--		kfree_skb_list_reason(to_free, SKB_DROP_REASON_QDISC_DROP);
-+		kfree_skb_list_reason(to_free,
-+				      tcf_get_drop_reason(to_free));
- 	if (unlikely(contended))
- 		spin_unlock(&q->busylock);
- 	return rc;
+ 
+@@ -1729,7 +1732,8 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 				       tp->chain->block->index,
+ 				       tp->prio & 0xffff,
+ 				       ntohs(tp->protocol));
+-		tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++		tcf_set_drop_reason(skb,
++				    SKB_DROP_REASON_TC_RECLASSIFY_LOOP);
+ 		return TC_ACT_SHOT;
+ 	}
+ 
+@@ -1767,7 +1771,8 @@ int tcf_classify(struct sk_buff *skb,
+ 				n = tcf_exts_miss_cookie_lookup(ext->act_miss_cookie,
+ 								&act_index);
+ 				if (!n) {
+-					tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++					tcf_set_drop_reason(skb,
++							    SKB_DROP_REASON_TC_EXT_COOKIE_NOTFOUND);
+ 					return TC_ACT_SHOT;
+ 				}
+ 
+@@ -1778,7 +1783,9 @@ int tcf_classify(struct sk_buff *skb,
+ 
+ 			fchain = tcf_chain_lookup_rcu(block, chain);
+ 			if (!fchain) {
+-				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb,
++						    SKB_DROP_REASON_TC_CHAIN_NOTFOUND);
++
+ 				return TC_ACT_SHOT;
+ 			}
+ 
+@@ -1800,10 +1807,9 @@ int tcf_classify(struct sk_buff *skb,
+ 
+ 			ext = tc_skb_ext_alloc(skb);
+ 			if (WARN_ON_ONCE(!ext)) {
+-				tcf_set_drop_reason(skb, SKB_DROP_REASON_TC_ERROR);
++				tcf_set_drop_reason(skb, SKB_DROP_REASON_NOMEM);
+ 				return TC_ACT_SHOT;
+ 			}
+-
+ 			ext->chain = last_executed_chain;
+ 			ext->mru = cb->mru;
+ 			ext->post_ct = cb->post_ct;
 -- 
 2.25.1
 
