@@ -1,123 +1,178 @@
-Return-Path: <netdev+bounces-53958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA4880567C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:50:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65040805643
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:44:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCF8828199A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:50:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC5E01F215E5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60235E0C6;
-	Tue,  5 Dec 2023 13:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BE85D912;
+	Tue,  5 Dec 2023 13:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="kk/c92qZ"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="K3UTLyab"
 X-Original-To: netdev@vger.kernel.org
-X-Greylist: delayed 448 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Dec 2023 05:50:42 PST
-Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d203])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947A41AB
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 05:50:42 -0800 (PST)
-Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d100])
-	by forward203b.mail.yandex.net (Yandex) with ESMTP id 52BF863BA2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 16:43:17 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net [IPv6:2a02:6b8:c14:440b:0:640:fa3a:0])
-	by forward100b.mail.yandex.net (Yandex) with ESMTP id 11DC6608F8
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 16:43:12 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id Bhb61x0oDSw0-Yiua0HLY;
-	Tue, 05 Dec 2023 16:43:11 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1701783791; bh=k8apobDElm3zwlG5gL4Hg2cXeCbkRLw0CegvHiB3F+k=;
-	h=Subject:From:To:Date:Message-ID;
-	b=kk/c92qZUCWY2xlm2m1spPt5SG2lEnJ20OJNH1RI3wJgIGuGdv8EI26TYQ7ej+WBS
-	 k5qQkj1bOuNWI+1baYuf6DT25PCFzWq4UatTHj4Hum6V3T8sdgpQ0ofeTs7acuTQGH
-	 RRRmZx7ENIFbr8SZ75puF3im1DmG9G/GVqFTEb20=
-Authentication-Results: mail-nwsmtp-smtp-production-main-44.sas.yp-c.yandex.net; dkim=pass header.i=@ya.ru
-Message-ID: <fc5a379f-80ad-46d0-b584-0a2e1684978b@ya.ru>
-Date: Tue, 5 Dec 2023 16:43:11 +0300
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4EF3A8;
+	Tue,  5 Dec 2023 05:43:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=CejJeY0vLeqFQt+U97vqcKRuJ19+UmTHuWHOiR2dhE4=; b=K3UTLyabwZk4cmleWcOsKjpKtu
+	5hwIJiFgkj+40JUJdgOOsa1xiIS+uT8z6mKkzy0VAgzXNBPiix4GS8SI83kHKso6M6YMqY5vTg6c2
+	yptESCkQIfW4BVNZAhWkOlFs46bjYLR8jnSE/QzCUwJ45p7F6yD4FW3AMXBTPJWBtbcvwdpE6P97q
+	Zx5b1Cq4GYJ699Bfq9HsIynRSCCt8fy2b7tx/pOUT+twDLEERrOLLKXlbrjyQjtqdJALuniyBnhiR
+	qAiSDTghJt/MlY4JUEbrmaVNs1CL0ygfN9l5CGH2YV0/3Ag5JH/Z2+dHnle/8/fipwzKHUbCtWVGu
+	BLJH6xtg==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rAViA-000I01-B3; Tue, 05 Dec 2023 14:43:42 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rAVi9-000Ey1-7s; Tue, 05 Dec 2023 14:43:41 +0100
+Subject: Re: [PATCH net-next v9 15/15] p4tc: add P4 classifier
+To: John Fastabend <john.fastabend@gmail.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com,
+ namrata.limaye@intel.com, mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+ tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
+ toke@redhat.com, bpf@vger.kernel.org
+References: <20231201182904.532825-1-jhs@mojatatu.com>
+ <20231201182904.532825-16-jhs@mojatatu.com>
+ <656e6f8d7c99f_207cb2087c@john.notmuch>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
+Date: Tue, 5 Dec 2023 14:43:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+In-Reply-To: <656e6f8d7c99f_207cb2087c@john.notmuch>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To: netdev@vger.kernel.org
-From: WGH <da-wgh@ya.ru>
-Subject: IPv6 privacy extensions addresses are re-applied when network cable
- is unplugged
-Autocrypt: addr=wgh@torlan.ru; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27114/Tue Dec  5 09:39:00 2023)
 
-Originally discovered with systemd-networkd, and requested to be reported upstream there: https://github.com/systemd/systemd/issues/29701
+On 12/5/23 1:32 AM, John Fastabend wrote:
+> Jamal Hadi Salim wrote:
+>> Introduce P4 tc classifier. A tc filter instantiated on this classifier
+>> is used to bind a P4 pipeline to one or more netdev ports. To use P4
+>> classifier you must specify a pipeline name that will be associated to
+>> this filter, a s/w parser and datapath ebpf program. The pipeline must have
+>> already been created via a template.
+>> For example, if we were to add a filter to ingress of network interface
+>> device $P0 and associate it to P4 pipeline simple_l3 we'd issue the
+>> following command:
+> 
+> In addition to my comments from last iteration.
+> 
+>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
+>>      action bpf obj $PARSER.o section prog/tc-parser \
+>>      action bpf obj $PROGNAME.o section prog/tc-ingress
+> 
+> Having multiple object files is a mistake IMO and will cost
+> performance. Have a single object file avoid stitching together
+> metadata and run to completion. And then run entirely from XDP
+> this is how we have been getting good performance numbers.
 
-These reproduction steps mention systemd-networkd, but I think it should be possible to reproduce it without it.
++1, fully agree.
 
-1. Have network with IPv6PrivacyExtensions=yes (corresponds to use_tempaddr).
-2. Plug network cable.
-3. Unplug network cable (putting the link down isn't sufficient, only unplugging the cable reproduces the issue)
+>> $PROGNAME.o and $PARSER.o is a compilation of the eBPF programs generated
+>> by the P4 compiler and will be the representation of the P4 program.
+>> Note that filter understands that $PARSER.o is a parser to be loaded
+>> at the tc level. The datapath program is merely an eBPF action.
+>>
+>> Note we do support a distinct way of loading the parser as opposed to
+>> making it be an action, the above example would be:
+>>
+>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
+>>      prog type tc obj $PARSER.o ... \
+>>      action bpf obj $PROGNAME.o section prog/tc-ingress
+>>
+>> We support two types of loadings of these initial programs in the pipeline
+>> and differentiate between what gets loaded at tc vs xdp by using syntax of
+>>
+>> either "prog type tc obj" or "prog type xdp obj"
+>>
+>> For XDP:
+>>
+>> tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
+>>      prog type xdp obj $PARSER.o section parser/xdp \
+>>      pinned_link /sys/fs/bpf/mylink \
+>>      action bpf obj $PROGNAME.o section prog/tc-ingress
+> 
+> I don't think tc should be loading xdp programs. XDP is not 'tc'.
 
-What happens is the temporary address will be removed and immediately re-added, and will linger on the interface even though it has no cable attached.
+For XDP, we do have a separate attach API, for BPF links we have bpf_xdp_link_attach()
+via bpf(2) and regular progs we have the classic way via dev_change_xdp_fd() with
+IFLA_XDP_* attributes. Mid-term we'll also add bpf_mprog support for XDP to allow
+multi-user attachment. tc kernel code should not add yet another way of attaching XDP,
+this should just reuse existing uapi infra instead from userspace control plane side.
 
-I've debugged the issue a bit, I think the problem is as follows:
+>> The theory of operations is as follows:
+>>
+>> ================================1. PARSING================================
+>>
+>> The packet first encounters the parser.
+>> The parser is implemented in ebpf residing either at the TC or XDP
+>> level. The parsed header values are stored in a shared eBPF map.
+>> When the parser runs at XDP level, we load it into XDP using tc filter
+>> command and pin it to a file.
+>>
+>> =============================2. ACTIONS=============================
+>>
+>> In the above example, the P4 program (minus the parser) is encoded in an
+>> action($PROGNAME.o). It should be noted that classical tc actions
+>> continue to work:
+>> IOW, someone could decide to add a mirred action to mirror all packets
+>> after or before the ebpf action.
+>>
+>> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_l3 \
+>>      prog type tc obj $PARSER.o section parser/tc-ingress \
+>>      action bpf obj $PROGNAME.o section prog/tc-ingress \
+>>      action mirred egress mirror index 1 dev $P1 \
+>>      action bpf obj $ANOTHERPROG.o section mysect/section-1
+>>
+>> It should also be noted that it is feasible to split some of the ingress
+>> datapath into XDP first and more into TC later (as was shown above for
+>> example where the parser runs at XDP level). YMMV.
+> 
+> Is there any performance value in partial XDP and partial TC? The main
+> wins we see in XDP are when we can drop, redirect, etc the packet
+> entirely in XDP and avoid skb altogether.
+> 
+>>
+>> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+>> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-* the kernel removes the temporary address
-* systemd-networkd removes the addresses it configured itself (EUI64 stable address)
-* when removing said address, the kernel notices it has no temporary address configured, and re-adds it back, somehow missing the interface has no carrier anymore
+The cls_p4 is roughly a copy of {cls,act}_bpf, and from a BPF community side
+we moved away from this some time ago for the benefit of a better management
+API for tc BPF programs via bpf(2) through bpf_mprog (see libbpf and BPF selftests
+around this), as mentioned earlier. Please use this instead for your userspace
+control plane, otherwise we are repeating the same mistakes from the past again
+that were already fixed. Therefore, from BPF side:
 
-Here's the kernel stack trace when address is re-added (|bpftrace -e 'kprobe:ipv6_add_addr { printf("%s\n%s\n", comm, kstack); }'|):
+Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
 
-  systemd-network
-
-         ipv6_add_addr+1
-         ipv6_create_tempaddr.isra.0+686
-         addrconf_verify_rtnl+1200
-         inet6_addr_del+235
-         inet6_rtm_deladdr+182
-         rtnetlink_rcv_msg+355
-         netlink_rcv_skb+87
-         netlink_unicast+572
-         netlink_sendmsg+585
-         sock_sendmsg+149
-         __sys_sendto+267
-         __x64_sys_sendto+32
-         do_syscall_64+58
-         entry_SYSCALL_64_after_hwframe+9
-
+Cheers,
+Daniel
 
