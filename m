@@ -1,166 +1,179 @@
-Return-Path: <netdev+bounces-54042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920F9805B44
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:44:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6DC805B68
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E191F212E1
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:44:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAEFB1F207C4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B7B68B81;
-	Tue,  5 Dec 2023 17:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE696A323;
+	Tue,  5 Dec 2023 17:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Lh9kok/0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TGDaIUNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6416122;
-	Tue,  5 Dec 2023 09:44:43 -0800 (PST)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B5Gj8Mr010893;
-	Tue, 5 Dec 2023 17:44:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=7Dbf8waRVZWnAgsVdsH/eiTCT+E25OhHyj04Hkrg56o=;
- b=Lh9kok/0AOSA/tfddxmjE5nno6Xt+gIZ8tggXx1BymMcJ69umeN7plU9WlkH5J5wr19H
- 9KX0W00ZIND2N9ELN2DACyNzOzPkJjRNnyc8Rie+x3SbY5lCd2Gma8MibbZ6Jbv2JUkU
- Li9AJCkKKoeF0vOAoaeE9rNglTFmUvDWdNpn0bUYl8Gu2O5kda7oL7rYV24hUfhFcPUj
- O5UP9grpDVwW+/heR/BjduyidqLJ4KhrLP0EjpR5u/QQfzr5RHzJ+0TH+q7QMXTuL/zR
- eKmMK5LgDXlI64yElQTcnJ89/tu8+JTJSzJ81okbHcQ7W1XEPW8Fw25yazxRtS+GOaP/ JA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ut71qr91c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 05 Dec 2023 17:44:08 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B5Hi76q002025
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 5 Dec 2023 17:44:07 GMT
-Received: from [10.110.89.58] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 5 Dec
- 2023 09:44:06 -0800
-Message-ID: <d2762241-f60a-4d61-babe-ce9535d9adde@quicinc.com>
-Date: Tue, 5 Dec 2023 09:44:05 -0800
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E820E122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:48:46 -0800 (PST)
+Received: by mail-vs1-xe31.google.com with SMTP id ada2fe7eead31-4649299d0a0so741350137.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 09:48:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701798526; x=1702403326; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UbMfFmVqoXvr8pImmYuMXZkjwRP+lR7eYnWdpD2Yc6o=;
+        b=TGDaIUNZLb4ATsOGZqUwaZjSMF0rBe0rMDtYurTD/VgstqGSVXFbsFg4o5AoBKmM9I
+         gZLqCasMk7wI39DIsH5BvLGHIBoBX3VhtwKckY+nzqllN9xdmEd0gaI5zLeySRTcx7K7
+         mm1+UbBo3MdjvIuvDytDrmfRCVo0agtKkKUGPmk1h+KJsy9umowSb/Fq2zAcHgqGNWa1
+         3f0l4X5ON04nCrL7tFsSSGAfwGinZKOSzZ+I0i+eZT1RihZkFV+tRaxUhoZJSXnvavvd
+         qUeyqOBzshqyNzh5JR+r0Z9vQ6XNu6z2hnTFRlRXvs/j+QUI3JCx1dJIt3SgWrjxv6lA
+         0ajA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701798526; x=1702403326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UbMfFmVqoXvr8pImmYuMXZkjwRP+lR7eYnWdpD2Yc6o=;
+        b=E3JNi0VQrN418nilGa24HefjbVFEvfJKcV410/7eAe618ygTdmMqlrEtXD6bXbykzg
+         R9NrWxiq7HKOdf7PUmLnLXz3oaaBTPCwmiaH9XWHRZ1mqLyebraeQreZUUG2bL1W9QCn
+         kOZypljh1S6PZk6ZotimecllLSSwzsanv/XqUIBdJRfapMsVLQ7bFSjfD5SUeln+R/eQ
+         ea+foAgkwD6X7ZQtBqq9NFX/I0ZsVtGxt/iUzlsL/f5vZ4NH7Ptm2GLZOXPpVXkw7tR4
+         afGKBZjc5qWxEtSrJ812ITyaSLpRhQV6QN9BGkU3ZfdMZH26SdmTg+brfR4Ry02f0B24
+         vEvA==
+X-Gm-Message-State: AOJu0YzGdVMwFYczcb5lq24yEtgse8Px+Ovi5HDAuTD7cIwjzJ5lW52D
+	OlW8ZcskgIWY2rvL5DqrghiVMfXdap2QTN4WK3nM9GqRz9vUXGYN9PYr6t8q
+X-Google-Smtp-Source: AGHT+IF7v9rDSvMmWXpLCFGt+X7DrIbLGzkBgIn0KRe55tLyKFKETBIY5oudPxpooya4lL4EzdEIE3aLPjRqofsd3mM=
+X-Received: by 2002:a1f:da82:0:b0:4b2:f753:73b7 with SMTP id
+ r124-20020a1fda82000000b004b2f75373b7mr967563vkg.13.1701798525834; Tue, 05
+ Dec 2023 09:48:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package MMD
- read/write
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-        Jakub Kicinski
-	<kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Broadcom internal kernel
- review list <bcm-kernel-feedback-list@broadcom.com>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        David Epping
-	<david.epping@missinglinkelectronics.com>,
-        Vladimir Oltean
-	<olteanv@gmail.com>,
-        Harini Katakam <harini.katakam@amd.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <workflows@vger.kernel.org>
-References: <20231128133630.7829-1-ansuelsmth@gmail.com>
- <20231128133630.7829-3-ansuelsmth@gmail.com>
- <20231204181752.2be3fd68@kernel.org>
- <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
- <656f37a6.5d0a0220.96144.356f@mx.google.com>
- <adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
- <ZW89errbJWUt33vz@shell.armlinux.org.uk> <20231205072912.2d79a1d5@kernel.org>
- <ZW9LroqqugXzqAY9@shell.armlinux.org.uk>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <ZW9LroqqugXzqAY9@shell.armlinux.org.uk>
+References: <20231205161841.2702925-1-edumazet@google.com>
+In-Reply-To: <20231205161841.2702925-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 5 Dec 2023 12:48:24 -0500
+Message-ID: <CADVnQykebdmw8X8rrWH5cw_F7gwJqH2Sza6gzMcBh55WV2k=sA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: do not accept ACK of bytes we never sent
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Yepeng Pan <yepeng.pan@cispa.de>, Christian Rossow <rossow@cispa.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: NKpqRX8BKlW1hDj0TKoHrwWvOGQGJROh
-X-Proofpoint-ORIG-GUID: NKpqRX8BKlW1hDj0TKoHrwWvOGQGJROh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-05_12,2023-12-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 priorityscore=1501
- adultscore=0 bulkscore=0 phishscore=0 suspectscore=0 clxscore=1011
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2312050140
+Content-Transfer-Encoding: quoted-printable
 
-On 12/5/2023 8:11 AM, Russell King (Oracle) wrote:
-> On Tue, Dec 05, 2023 at 07:29:12AM -0800, Jakub Kicinski wrote:
->> On Tue, 5 Dec 2023 15:10:50 +0000 Russell King (Oracle) wrote:
->>> I've raised this before in other subsystems, and it's suggested that
->>> it's better to have it in the .c file. I guess the reason is that it's
->>> more obvious that the function is documented when modifying it, so
->>> there's a higher probability that the kdoc will get updated when the
->>> function is altered.
->>
->> Plus I think people using IDEs (i.e. not me) may use the "jump to
->> definition" functionality, to find the doc? 
->>
->> TBH I thought putting kdoc in the C source was documented in the coding
->> style, but I can't find any mention of it now.
-> 
-> Well, in Documentation/doc-guide/kernel-doc.rst:
-> 
->   The function and type kernel-doc comments should be placed just before
->   the function or type being described in order to maximise the chance
->   that somebody changing the code will also change the documentation.
-> 
-> That implies (but not explicitly) that it should be at the function
-> definition site, since "changing the code" is used as an argument as
-> I did in my previous email.
-> 
-> Secondly, this document goes on to give an example of running
-> scripts/kernel-doc on a .c file.
-> 
-> Thirdly, there are seven references in this document of kernel-doc
-> in .c files, and only one for kernel-doc in a .h file. So this suggests
-> that "it will be in a .c file" isn't a rule (it can't be because of
-> documenting structures!)
-> 
-> So let's not get hung up on whether it should be in .c or .h because I
-> think that isn't relevant. Instead, I think it's about "it should be at
-> the definition site" - that being a structure definition or a function
-> definition, and not at a function prototype.
-> 
-> The only exception I can think of is the style I've used in
-> linux/phylink.h for the _method_ definitions which look like function
-> prototypes - that's just a work-around because one can't kernel-doc
-> the structure-of-function-pointers and document the function parameters
-> without jumping through that hoop, and it would be silly to document
-> the methods in some random driver!
-> 
+On Tue, Dec 5, 2023 at 11:18=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> This patch is based on a detailed report and ideas from Yepeng Pan
+> and Christian Rossow.
+>
+> ACK seq validation is currently following RFC 5961 5.2 guidelines:
+>
+>    The ACK value is considered acceptable only if
+>    it is in the range of ((SND.UNA - MAX.SND.WND) <=3D SEG.ACK <=3D
+>    SND.NXT).  All incoming segments whose ACK value doesn't satisfy the
+>    above condition MUST be discarded and an ACK sent back.  It needs to
+>    be noted that RFC 793 on page 72 (fifth check) says: "If the ACK is a
+>    duplicate (SEG.ACK < SND.UNA), it can be ignored.  If the ACK
+>    acknowledges something not yet sent (SEG.ACK > SND.NXT) then send an
+>    ACK, drop the segment, and return".  The "ignored" above implies that
+>    the processing of the incoming data segment continues, which means
+>    the ACK value is treated as acceptable.  This mitigation makes the
+>    ACK check more stringent since any ACK < SND.UNA wouldn't be
+>    accepted, instead only ACKs that are in the range ((SND.UNA -
+>    MAX.SND.WND) <=3D SEG.ACK <=3D SND.NXT) get through.
+>
+> This can be refined for new (and possibly spoofed) flows,
+> by not accepting ACK for bytes that were never sent.
+>
+> This greatly improves TCP security at a little cost.
+>
+> I added a Fixes: tag to make sure this patch will reach stable trees,
+> even if the 'blamed' patch was adhering to the RFC.
+>
+> tp->bytes_acked was added in linux-4.2
+>
+> Following packetdrill test (courtesy of Yepeng Pan) shows
+> the issue at hand:
+>
+> 0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> +0 bind(3, ..., ...) =3D 0
+> +0 listen(3, 1024) =3D 0
+>
+> // ---------------- Handshake ------------------- //
+>
+> // when window scale is set to 14 the window size can be extended to
+> // 65535 * (2^14) =3D 1073725440. Linux would accept an ACK packet
+> // with ack number in (Server_ISN+1-1073725440. Server_ISN+1)
+> // ,though this ack number acknowledges some data never
+> // sent by the server.
+>
+> +0 < S 0:0(0) win 65535 <mss 1400,nop,wscale 14>
+> +0 > S. 0:0(0) ack 1 <...>
+> +0 < . 1:1(0) ack 1 win 65535
+> +0 accept(3, ..., ...) =3D 4
+>
+> // For the established connection, we send an ACK packet,
+> // the ack packet uses ack number 1 - 1073725300 + 2^32,
+> // where 2^32 is used to wrap around.
+> // Note: we used 1073725300 instead of 1073725440 to avoid possible
+> // edge cases.
+> // 1 - 1073725300 + 2^32 =3D 3221241997
+>
+> // Oops, old kernels happily accept this packet.
+> +0 < . 1:1001(1000) ack 3221241997 win 65535
+>
+> // After the kernel fix the following will be replaced by a challenge ACK=
+,
+> // and prior malicious frame would be dropped.
+> +0 > . 1:1(0) ack 1001
+>
+> Fixes: 354e4aa391ed ("tcp: RFC 5961 5.2 Blind Data Injection Attack Mitig=
+ation")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: Yepeng Pan <yepeng.pan@cispa.de>
+> Reported-by: Christian Rossow <rossow@cispa.de>
+> ---
+>  net/ipv4/tcp_input.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index bcb55d98004c5213f0095613124d5193b15b2793..62cccc2e89ec68b3badae0316=
+8f1bfcd2698e0b7 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -3871,8 +3871,12 @@ static int tcp_ack(struct sock *sk, const struct s=
+k_buff *skb, int flag)
+>          * then we can probably ignore it.
+>          */
+>         if (before(ack, prior_snd_una)) {
+> +               u32 max_window;
+> +
+> +               /* do not accept ACK for bytes we never sent. */
+> +               max_window =3D min_t(u64, tp->max_window, tp->bytes_acked=
+);
+>                 /* RFC 5961 5.2 [Blind Data Injection Attack].[Mitigation=
+] */
+> -               if (before(ack, prior_snd_una - tp->max_window)) {
+> +               if (before(ack, prior_snd_una - max_window)) {
+>                         if (!(flag & FLAG_NO_CHALLENGE_ACK))
+>                                 tcp_send_challenge_ack(sk);
+>                         return -SKB_DROP_REASON_TCP_TOO_OLD_ACK;
+> --
 
-The Linux Kernel philosophy of documenting functions instead of
-prototypes has always bothered me since I'm "old school" and am
-ingrained with the software engineering philosophy that you document
-interfaces, not implementations. This was reinforced early in my career
-by working on multiple projects in different programming languages using
-processes outlined in DOD-STD-2167A, and for some projects, especially
-ones written in Ada, the header files were the design and the documentation.
+Thanks, Eric!
 
-This philosophy was further enforced when working with closed source
-projects (Windows, IOS, VxWorks) where all the documentation was
-contained in shared header files.
+Acked-by: Neal Cardwell <ncardwell@google.com>
 
-So in my experience a function prototype IS the function definition, and
-the actual function is just the implementation of that definition.
-
-But that thinking obviously isn't shared by others.
-
-/jeff
+neal
 
