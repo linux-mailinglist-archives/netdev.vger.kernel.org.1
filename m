@@ -1,149 +1,160 @@
-Return-Path: <netdev+bounces-54153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30BA58061CE
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:39:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555BA8061E0
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:43:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9B7828212B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:39:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA102821FF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586F76D1D1;
-	Tue,  5 Dec 2023 22:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABB63BB28;
+	Tue,  5 Dec 2023 22:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="iQiwOJUt"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QfZxWlKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2082.outbound.protection.outlook.com [40.107.22.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8101A2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:38:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WSJRwAYzgJfJNyhpgHPoa+dANQ7KEznsJSS754aWI+ZP38e39v/a9DC9EoAcUKtyZ/8LfpHB1CZUbJQcPi+J4B1BXa6jERIrCzju+LD+MIRV+lWtQxuBiColkmHOh4sj1qbsZ4BCyiDyn3/VlKWusc2bLa6lwD+ObSFRxFxHADawsD0tQSMQTOrSYWDuOwRGfIXsZlTVonh8U79RRYxX3YOZZ+OotTwa50FkOM579P9q1zJjvgZo2Fz+JJkH/4GzDJWnu7kdhd8M3J0NOQ3affxDcioD9fvqH6C83cNePmM0FiPly3XY0ecBtca/ygrIndNt2u9S4TWioB1duLBSCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fM7AOm/+ye2CHbIoNEeiBtkkfd/azhBFDS9UCbomqnc=;
- b=T1jJjZ/oSe5xjsVwwOVxBAEUdDRQBrr2ZBWHTE21CTAq+DA1HufNYM/aXBYTBBPKs9YhgC3pNr+XlxvtrSoWOFT5NA97sFlYl3qAufWcXO3qcFOhnNSiHjBNQanJYngjC9waJR+paCOCGca7dcc3q2n3wldYM/W52fBlWC4Mc6rYJU/J7tX+AJ4aWLkQZAEX70LtoKgjYWxs0P2qkKhxajZszBLbp0uC2MoJstddupv9mF2ii9W/GlPsda5fVExxQREkW2XjithVXX/Jzr7fiqtbX01WcnHNdXcJd++qTn1fyM1qodhi+0tcPYYz4Lq13VOXv6P0WGx/NmCRQNRi2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fM7AOm/+ye2CHbIoNEeiBtkkfd/azhBFDS9UCbomqnc=;
- b=iQiwOJUtnGrrqIo8FJ1PKkQ+nmuQYLvbx88Xa/OlRbfnsDlJSUzqAkHicoHStrcxjJ4F0wstvc69tS0M2B4wDL5nvVLcbG0dcTuIm6LsDKRUwkOlcagqAjxPpQ0rzNSE+UEh98Bh/b7X40sPgTUwbG/XpJbqHiYWhM3+xY/6BEs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBAPR04MB7416.eurprd04.prod.outlook.com (2603:10a6:10:1b3::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.24; Tue, 5 Dec
- 2023 22:38:55 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.012; Tue, 5 Dec 2023
- 22:38:55 +0000
-Date: Wed, 6 Dec 2023 00:38:49 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 3/6] net: dsa: mv88e6xxx: Fix
- mv88e6352_serdes_get_stats error path
-Message-ID: <20231205223849.wmapl37lerjr7pn3@skbuf>
-References: <20231205175040.mbpepmbtxjkrb4dq@skbuf>
- <871qc09wuv.fsf@waldekranz.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <871qc09wuv.fsf@waldekranz.com>
-X-ClientProxiedBy: AS4P251CA0026.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d3::15) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78862196
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:43:28 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6ce831cbba6so109489b3a.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 14:43:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1701816208; x=1702421008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s5PDjvnXiofAm+LfrZr5GVjzdYbiyiT62E/CMkJfzm4=;
+        b=QfZxWlKsHMlPcqy9Kt+NlA82ZbgqK7VVPUBj50xMjomFqi0DrN66LhIjiZCaiQnCmc
+         wxlKmRlSImP4+A1h+jCW63Baq6M3r5zGaiNsVQaNY2PokzeDJGVImg1pDxQToXNv7O2x
+         FCDL1Hdqs/fxziQB78yMWtxDAKvGOA092rBMM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701816208; x=1702421008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s5PDjvnXiofAm+LfrZr5GVjzdYbiyiT62E/CMkJfzm4=;
+        b=nCl5WypUm4Dyxaylsn4Fy9232wBEWpbbSy7AzamMeo9HwRVwGwCtbBRRaazextsnlV
+         Zkr2l8g4v99iH7BwKXWarV2KAtpQwa4RU0M8IWTOXTxb8shnoN8IyyW+8oOZRxHcRF7T
+         RpDQk+lkojAq7oriuvdvBtiSQ7GLjaBXbT5DqZ4NNJp9SFpnQi/6iBBZNOkxmCxl8zCN
+         DcwF80nQth8lA5hy5iuyZ/oBjvJg+GTgiDuoLO8c4/1/+ng3Pd3pS/DLrzVSzX772U78
+         /4ICFqDXJn3gPA2+EtJ/tU1XQUumqwHhZll1kKFOmSWPE9E4PaFFBi3NywUWeL0fOfLg
+         C7XQ==
+X-Gm-Message-State: AOJu0YxJjAEv3B2UtR4lcAZNyDaPhsNgfXeg898KhQ3Jv+Pi0S+F1eAC
+	IGLoVuOsiQviGKRezEErVBmR4lfqgU6TXVt/KaycstRTZ+GPijcLnI8bYYYE4thni9d8r70jK7c
+	l7Pelbh2XvV/R1tcZVWOsJEI=
+X-Google-Smtp-Source: AGHT+IGLyjhmShxcrztf4iUASVXKLIZrQvbl2nOMjR/Yv9SysVtwrvaOGSlk/eSVNbluuvrw8muVoWkRUp1fFXY/kkM=
+X-Received: by 2002:a05:6a20:1608:b0:18c:b6:ab4f with SMTP id
+ l8-20020a056a20160800b0018c00b6ab4fmr4318468pzj.48.1701816207958; Tue, 05 Dec
+ 2023 14:43:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBAPR04MB7416:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9af01c4-a183-4394-6295-08dbf5e2f589
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yItbdQcfexLricFDLjyBFSPFBiWrdSaNAfZ6qYSdlDd0um3//MVe2WldSKNRyg3bwhvW014Bf8uSn366IsjnnBD1DubXMwq+nDnCAE1bkBRYDGaA9ouYb6zcbpLucR1UnrhztBMwFKi0yluSd229RDCeuPbCkW+fdALoubRPDP0bM28rO0w9AboNhZjN3ZG3FBAxXDfnb4oGQvnCoKjmghnNd1pE1iu7YlzIgErfxjYYbg+SdjLkWJqjVApdG8vtiaLij1fP2SelPqNaDoConS2hjqOl9/wMHDiMld/zTJbMgzHjv/1xpHYny5Ehuhr13+9/rqLc1rqHeid8OYayNj88qcqUIALkXastgeRN4D9SXwdKylGOFvEZS7xuuwJtAjyC9f0I/gqvRsj2PZ9E7EGPy2n2lG1f7f1FKO9vY/CnLBlg+mGqlmmdz49JEUyCitOG7OgBn2slATBp+7Iz7w0zyh84a0CV+09g+2tZd9C8m4YgdpKTHaiflmMS4QQIDHdwm9ivDLL1NdBW7fO5qYlHJMSmnNODAbBqvr7zp/dPQOaRKQgmu4GFTCKY1PHT
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(136003)(366004)(376002)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(44832011)(2906002)(5660300002)(41300700001)(33716001)(86362001)(38100700002)(478600001)(8936002)(1076003)(8676002)(6916009)(66476007)(66556008)(83380400001)(66946007)(6486002)(316002)(6512007)(9686003)(26005)(4326008)(6506007)(6666004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?dsqMacVCyvTgQqTOYFgO4Bo7KrcMlWSKLtdlsnTuvqllD5w118LzAb9Zmhyt?=
- =?us-ascii?Q?xf2FM2zwjU65gU+MXrnPdSJKUlSxW/z07qfmU9ggVHQo4xffHQ5QmwSb9jz9?=
- =?us-ascii?Q?RlziT/dHsByrHBEathtRPLHeVgtIso0gag5qZFqKcdtF54t+n11bWbCSqQnD?=
- =?us-ascii?Q?bsazpSDmPk9DNcg/0K9uMg5V3MVZtVMC1SG3SnG3lNZHOovQYHW3NXDBmiOo?=
- =?us-ascii?Q?+MqbGpnzUF8tvcLHrXAkiyvmIL9LoFMrUEqOVEcutd8h4fCA/qF7zQD+BcOP?=
- =?us-ascii?Q?eRwwOzrdzFpKzLoLFfw+oFI0+8pcG1XkT5WfdjcC36O5p1gdlCiycH1xJNZm?=
- =?us-ascii?Q?lXPJOUc7oSKnImpiE1xrY+xDqCsWsmrOo3yggH3Nhd5KD2KFULZ1Cvz8Zwdh?=
- =?us-ascii?Q?OE2nbeUC0lTYAhQqJpG/1RE5w+5PRtS9BQL2cY7QS/iJd64wo8D9kr83GZsb?=
- =?us-ascii?Q?g27bJ7AI9NGF0gbV4kzcTboN0tE5kFuojr70THX5v4om4GAj8/0Aky2w0rK8?=
- =?us-ascii?Q?ejl3Aqs9k1k3qN/oBiu7DEFWuYzdGyp00JGxCAS7ubJTIO2J8FvEV8+7LoPM?=
- =?us-ascii?Q?Bqx9+IyJHngg1nSDE4QstAlp7FroIwU4KVrI/szSdoRfhLddXzOuWJgmdKuT?=
- =?us-ascii?Q?PL/bBWWKlB679d6T9GkZvHml1TdfRNebWt5eQKjIf0hnFJOpcBhH9ayHLk1e?=
- =?us-ascii?Q?fUCwuc2mN1lOoBN/0Xvt6fPaRXawkc49GjAZ+aqvHaA1/l1TY9b97BJ8xRQg?=
- =?us-ascii?Q?d+zh9Ot5h3wyuuRV/4gc0dgrFImNqBbKvMPdE7m+Mu6etytH0ZxueM4bm6gc?=
- =?us-ascii?Q?Ah/lXh0X6Ru/zIs9T/mlBs3QrJXzGV+3IWv071m93wbFUgrDVHoN2caSHpxy?=
- =?us-ascii?Q?dGrk/1CL/2CoPT7yX2cB7IWlx3j38FzW/M0tAusJiDpr3eV/+jaR9VFRERxF?=
- =?us-ascii?Q?4TA5qsmB6lMb9It7PZpXPhQHsaFyWO00XuYRwBBq4iONULhJCB6RHba8jYHe?=
- =?us-ascii?Q?TGtjd6SJTcNq3mI/P6aBtcwPqJMURApG/mgJoLkwNO7DKbhN3kiUnrZaJsSm?=
- =?us-ascii?Q?EtEZbBUDetwiuEHrw/NHZB3MW707ogsttHbM/R13TJGQZMg3NHY/TJs7G7LF?=
- =?us-ascii?Q?Ie7qPLmYVQap2MFnP3K/YmtWW00ym01oHFoHMdakrAbu4r2BPZ/8lVLf6al9?=
- =?us-ascii?Q?WqytCoNx4WuO80lrTHXQv3vwwf7z4j9qsnzkTOXooEOQ2D7xzk8xkG4Vs3YE?=
- =?us-ascii?Q?KGl1llc9VqiBsEMy/NozHLz5tEa+1Nb4qeFxjI6PkN44dOkxpkvr0neGQXSL?=
- =?us-ascii?Q?Ong3KOvlguSmxjuieWj6aWoTFfXPs0JzPMpuoBXPtgDZDKcRhoA3GwCWjvcI?=
- =?us-ascii?Q?9oKNZ2UQ9R/3PXtj45Uc615X8aP83LY62mtLrdIslZwMRSyccHvdaiKFZ8Ou?=
- =?us-ascii?Q?lHSuq1Nt3vjZU9lfoWjfphRYx493DGN9JvR9mrZjVWa6e+QQxE0+bPUKUbVU?=
- =?us-ascii?Q?BbRmBmY6Hd0x5Tf+Q6J+4YC5WeuhgbHw89tXtWxx8seDwLv8FU+4j6IZbCa2?=
- =?us-ascii?Q?FmgnDfSyuEPgyuVB1q14o14oIs4FEda/QhZd4xrUhX89wByc9LXR5x+d40xN?=
- =?us-ascii?Q?bg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9af01c4-a183-4394-6295-08dbf5e2f589
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 22:38:53.8428
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tla7pNvP1hXQucm7uNT4mMReIvqKjJQKj5xur0f+CMdXfG0I0bnj7uUgcUfMBiHOCpribljWolrOXlEulC69Rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7416
+References: <20231122233058.185601-8-amakhalov@vmware.com> <20231201232452.220355-1-amakhalov@vmware.com>
+ <20231201232452.220355-7-amakhalov@vmware.com> <20231204103100.GYZW2qZE9tbGMtuVgY@fat_crate.local>
+ <c2519c9a-8518-403a-9bca-cb79a5f2a6e9@intel.com> <204f743d-2901-4ad2-bbcc-a7857a8644e7@broadcom.com>
+In-Reply-To: <204f743d-2901-4ad2-bbcc-a7857a8644e7@broadcom.com>
+From: Tim Merrifield <tim.merrifield@broadcom.com>
+Date: Tue, 5 Dec 2023 16:43:16 -0600
+Message-ID: <CAJfbqWyeubVofe4BHQC+a3wacwk0kMPECa8mxZ7gkzhBJ3d5LA@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] x86/vmware: Add TDX hypercall support
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: Dave Hansen <dave.hansen@intel.com>, Borislav Petkov <bp@alien8.de>, 
+	Alexey Makhalov <amakhalov@vmware.com>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, hpa@zytor.com, dave.hansen@linux.intel.co, 
+	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org, 
+	richardcochran@gmail.com, linux-input@vger.kernel.org, 
+	dmitry.torokhov@gmail.com, zackr@vmware.com, 
+	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com, namit@vmware.com, 
+	timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com, 
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com, 
+	tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2023 at 10:13:12PM +0100, Tobias Waldekranz wrote:
-> > Ok, you're saying we don't care enough about handling the catastrophic
-> > event where an MDIO access error takes place in mv88e6xxx_g2_scratch_read()
-> > to submit this to "stable".
-> 
-> It just felt like one of those theoretical bugs that, if you were to hit
-> it, you most likely have way bigger issues than not getting at your
-> SERDES counters; and since, as you say...
-> 
-> > I guess the impact in such a case is that the error (interpreted as negative
-> > count) makes us go back by -EIO (5) entries or whatever into the "data"
-> > array provided to user space, overwriting some previous stats and making
-> > everything after the failed counter minus the error code be reported in
-> > the wrong place relative to its string. I don't think that the error
-> > codes are high enough to overcome the ~60 port stats and cause memory
-> > accesses behind the "data" array.
-> 
-> ...the potential for data corruption seems low. But I could send a v3
-> and split this into one change that only fixes the return value (which
-> could go into -net), and another one that changes the type. Do you think
-> it's worth it?
+Hi Dave and Alexey,
 
-Reading Documentation/process/stable-kernel-rules.rst, I think that
-consistent error checking for register access on a non-hotpluggable bus
-is the type of bug fix that is exceedingly unlikely to have any measurable
-impact on end users, so it might not even qualify for "net".
+Regarding VMware-specific checks, it may be beneficial to add some
+additional checks
+such as ensuring that the hypervisor vendor is VMware,
+r12=3D=3DVMWARE_HYPERVISOR_MAGIC,
+r10=3D=3DVMWARE_TDX_VENDOR_LEAF, r11=3D=3DVMWARE_TDX_HCALL_FUNC and r13 (co=
+mmand) is
+restricted to those few commands we expect to be invoked from the
+kernel or drivers by VMware-specific
+code.
 
-To me, this is good enough. Let's spend our time doing meaningful things,
-while also keeping the material for "net.git" meaningful.
+If we add these checks, would folks be OK with exporting this function?
+
+
+On Tue, Dec 5, 2023 at 3:41=E2=80=AFPM Alexey Makhalov
+<alexey.makhalov@broadcom.com> wrote:
+>
+>
+>
+> On 12/5/23 1:24 PM, Dave Hansen wrote:
+> > On 12/4/23 02:31, Borislav Petkov wrote:
+> >> On Fri, Dec 01, 2023 at 03:24:52PM -0800, Alexey Makhalov wrote:
+> >>> +#ifdef CONFIG_INTEL_TDX_GUEST
+> >>> +/* __tdx_hypercall() is not exported. So, export the wrapper */
+> >>> +void vmware_tdx_hypercall_args(struct tdx_module_args *args)
+> >>> +{
+> >>> +   __tdx_hypercall(args);
+> >>> +}
+> >>> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall_args);
+> >> Uuuh, lovely. I'd like to see what the TDX folks think about this
+> >> export first.
+> >
+> > I don't really like it much.  This does a generic thing (make a TDX
+> > hypercall) with a specific name ("vmware_").  If you want to make an
+> > argument that a certain chunk of the __tdx_hypercall() space is just fo=
+r
+> > VMWare and you also add a VMWare-specific check and then export *that*,
+> > it might be acceptable.
+> >
+> > But I don't want random modules able to make random, unrestricted TDX
+> > hypercalls.  That's asking for trouble.
+>
+> Considering exporting of __tdx_hypercall for random modules is not an
+> option, what VMware specific checks you are suggesting?
+>
+> --
+> This electronic communication and the information and any files transmitt=
+ed
+> with it, or attached to it, are confidential and are intended solely for
+> the use of the individual or entity to whom it is addressed and may conta=
+in
+> information that is confidential, legally privileged, protected by privac=
+y
+> laws, or otherwise restricted from disclosure to anyone else. If you are
+> not the intended recipient or the person responsible for delivering the
+> e-mail to the intended recipient, you are hereby notified that any use,
+> copying, distributing, dissemination, forwarding, printing, or copying of
+> this e-mail is strictly prohibited. If you received this e-mail in error,
+> please return the e-mail to the sender, delete it from your computer, and
+> destroy any printed copy of it.
+
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
