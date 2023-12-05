@@ -1,159 +1,128 @@
-Return-Path: <netdev+bounces-53998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7346E8058D6
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:34:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5C1805928
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71FFD1C21088
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:34:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 325D71C21088
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5429F5F1DD;
-	Tue,  5 Dec 2023 15:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A2668EB9;
+	Tue,  5 Dec 2023 15:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="J+8+bbFX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZjZ2Ra2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-226.siemens.flowmailer.net (mta-65-226.siemens.flowmailer.net [185.136.65.226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E570C196
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:34:35 -0800 (PST)
-Received: by mta-65-226.siemens.flowmailer.net with ESMTPSA id 20231205153432641db64d4a89bfde65
-        for <netdev@vger.kernel.org>;
-        Tue, 05 Dec 2023 16:34:33 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=QLrrt7aQd3uFEGTkO/x97Sh3we90ObbwSexb6iVGv7A=;
- b=J+8+bbFXw8iqevTZ/1LFxb77bPK9BAi2TmeskopxbHBkn5POqgmVNCOYGcqwEep7uOPJpl
- zj+FDvGwqPNeHsljWo0kiWzfDFu9PDhQN6eGhzaJB7XFPDStPDo9SmhEyvxSfz3Nw8ezFswW
- bfVo1XvFDjaGtWxsO3vjq4Ss0mo2w=;
-Message-ID: <5a0faf8cc9ec3ab0d5082c66b909c582c8f1eae6.camel@siemens.com>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v3 2/3] net: stmmac: add Launch
- Time support to XDP ZC
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Bjorn Topel
- <bjorn@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Willem de Bruijn <willemb@google.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Andrii Nakryiko
- <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose
- Abreu <joabreu@synopsys.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	 <linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"xdp-hints@xdp-project.net"
-	 <xdp-hints@xdp-project.net>, "linux-stm32@st-md-mailman.stormreply.com"
-	 <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org"
-	 <linux-arm-kernel@lists.infradead.org>, "linux-kselftest@vger.kernel.org"
-	 <linux-kselftest@vger.kernel.org>
-Date: Tue, 05 Dec 2023 16:34:29 +0100
-In-Reply-To: <PH0PR11MB583000826591093B98BA841DD885A@PH0PR11MB5830.namprd11.prod.outlook.com>
-References: <20231203165129.1740512-1-yoong.siang.song@intel.com>
-	 <20231203165129.1740512-3-yoong.siang.song@intel.com>
-	 <43b01013-e78b-417e-b169-91909c7309b1@kernel.org>
-	 <656de830e8d70_2e983e294ca@willemb.c.googlers.com.notmuch>
-	 <PH0PR11MB583000826591093B98BA841DD885A@PH0PR11MB5830.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E28122
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:54:11 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-db537948ea0so4127793276.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 07:54:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701791651; x=1702396451; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OpCZZN7ifzLhrwAYxkGqYDBB1FuZ2YnYQt+7H4zDU+Q=;
+        b=ZjZ2Ra2m9jCfp3zsDGaiueJ0GfvHiEPOHTWwRqGZ8tpVqnnWAuhjaJ2MxBVazJYwo+
+         AvqN3VKfF/m7dzicuf1H1AYbzhYSWM1LLAr2/AEYMoTlhtrVy0rtsv59pRNu+WirrgfW
+         t5Z6tUNjbsR6HEKGvk50G70sW/U+XJUT8hPTEPmdECqUXHa0F6CLEW0/P36hxi8zyWaI
+         aLVJfaSSm0lGJvzbDnn7ujPsWQQIL6E8N3pmut+fQyuccoJLvyzht/wlD6Di7PvEyBgo
+         qZiJRkgkul5MtSSx4Cdv0OrvQGdUKA89Px7RGKQcmcR7Z/ALRcTd/wnyUNV03y69/tS8
+         4+sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701791651; x=1702396451;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OpCZZN7ifzLhrwAYxkGqYDBB1FuZ2YnYQt+7H4zDU+Q=;
+        b=YZ0eJ40MVxNZMIgrUy773xDnmcG5x/AJFWwpiYJrsggJNdvS8hoAHcQ9xDbMG554mM
+         8b+KxBVEPlxRdMfxTUe99GytQSIlkSBndCjLgn3tuhqOU1xutVIwSnnYA4muua0tnWRL
+         +jVwrchIlKzEeNK07YAkzVnt6fLbMObDOtjPg2cox94MqV62A2ggEvUWs3Y17K4t4bPg
+         25StvqIAAGS7503mXCbkWqFl6gYUPHcPmqJYYfDDGFpxFgJH+W1y+orKXqtBHwfuEMSL
+         9/2rGqm4vwS0YMIuKsqqCq9//N5KCBKiOipSr5ONlqWMYV5ULLaDy6jAygYduNfvExeg
+         vI8A==
+X-Gm-Message-State: AOJu0YwHCl3VcQ2QTSJRQ+Oyopae02iJURdj/0Pi+7Yvp5DkPhlVanwB
+	3ydkFOC2Q2wOltMOL3XM5njM5fGBvs90Oahi+imntQ==
+X-Google-Smtp-Source: AGHT+IGCJb6NJTexBLiNBzgMwl8doc7Qk7WTAXljr3GKe9KFhu9oJQpIiiYrofNfQQq+O9e/tLSF6yqkhku8Pwwo5cc=
+X-Received: by 2002:a25:b293:0:b0:db7:dacf:59fc with SMTP id
+ k19-20020a25b293000000b00db7dacf59fcmr4225994ybj.112.1701791650893; Tue, 05
+ Dec 2023 07:54:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+References: <20231205031535.163661217@linuxfoundation.org>
+In-Reply-To: <20231205031535.163661217@linuxfoundation.org>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 5 Dec 2023 21:23:59 +0530
+Message-ID: <CA+G9fYuL_-Q67t+Y7ST5taYv1XkkoJegH2zBvw_ZUOhF9QRiOg@mail.gmail.com>
+Subject: Re: [PATCH 6.6 000/134] 6.6.5-rc1 review
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Johannes Berg <johannes.berg@intel.com>
+Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
+	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
+	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
+	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
+	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, allen.lkml@gmail.com, 
+	Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2023-12-05 at 15:25 +0000, Song, Yoong Siang wrote:
-> On Monday, December 4, 2023 10:55 PM, Willem de Bruijn wrote:
-> > Jesper Dangaard Brouer wrote:
-> > >=20
-> > >=20
-> > > On 12/3/23 17:51, Song Yoong Siang wrote:
-> > > > This patch enables Launch Time (Time-Based Scheduling) support to X=
-DP zero
-> > > > copy via XDP Tx metadata framework.
-> > > >=20
-> > > > Signed-off-by: Song Yoong Siang<yoong.siang.song@intel.com>
-> > > > ---
-> > > >   drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
-> > >=20
-> > > As requested before, I think we need to see another driver implementi=
-ng
-> > > this.
-> > >=20
-> > > I propose driver igc and chip i225.
->=20
-> Sure. I will include igc patches in next version.
->=20
-> > >=20
-> > > The interesting thing for me is to see how the LaunchTime max 1 secon=
-d
-> > > into the future[1] is handled code wise. One suggestion is to add a
-> > > section to Documentation/networking/xsk-tx-metadata.rst per driver th=
-at
-> > > mentions/documents these different hardware limitations.  It is natur=
-al
-> > > that different types of hardware have limitations.  This is a close-t=
-o
-> > > hardware-level abstraction/API, and IMHO as long as we document the
-> > > limitations we can expose this API without too many limitations for m=
-ore
-> > > capable hardware.
->=20
-> Sure. I will try to add hardware limitations in documentation.=20
->=20
-> >=20
-> > I would assume that the kfunc will fail when a value is passed that
-> > cannot be programmed.
-> >=20
->=20
-> In current design, the xsk_tx_metadata_request() dint got return value.=
-=20
-> So user won't know if their request is fail.=20
-> It is complex to inform user which request is failing.=20
-> Therefore, IMHO, it is good that we let driver handle the error silently.
->=20
+On Tue, 5 Dec 2023 at 08:51, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+>
+> This is the start of the stable review cycle for the 6.6.5 release.
+> There are 134 patches in this series, all will be posted as a response
+> to this one.  If anyone has any issues with these being applied, please
+> let me know.
+>
+> Responses should be made by Thu, 07 Dec 2023 03:14:57 +0000.
+> Anything received after that time might be too late.
+>
+> The whole patch series can be found in one patch at:
+>         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.6.5-rc1.gz
+> or in the git tree and branch at:
+>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.6.y
+> and the diffstat can be found below.
+>
+> thanks,
+>
+> greg k-h
 
-If the programmed value is invalid, the packet will be "dropped" / will
-never make it to the wire, right?
 
-That is clearly a situation that the user should be informed about. For
-RT systems this normally means that something is really wrong regarding
-timing / cycle overflow. Such systems have to react on that situation.
+The x86 allmodconfig with gcc-8 failed but passed with gcc-13.
 
-> =20
->=20
-> > What is being implemented here already exists for qdiscs. The FQ
-> > qdisc takes a horizon attribute and
-> >=20
-> >    "
-> >    when a packet is beyond the horizon
-> >        at enqueue() time:
-> >        - either drop the packet (default policy)
-> >        - or cap its delivery time to the horizon.
-> >    "
-> >    commit 39d010504e6b ("net_sched: sch_fq: add horizon attribute")
-> >=20
-> > Having the admin manually configure this on the qdisc based on
-> > off-line knowledge of the device is more fragile than if the device
-> > would somehow signal its limit to the stack.
-> >=20
-> > But I don't think we should add enforcement of that as a requirement
-> > for this xdp extension of pacing.
+x86_64: gcc-8-allmodconfig: FAILED
+x86_64: gcc-13-allmodconfig: PASS
 
+Build error:
+------------
+In function 'nl80211_set_cqm_rssi.isra.44',
+    inlined from 'nl80211_set_cqm' at net/wireless/nl80211.c:12994:10:
+include/linux/fortify-string.h:57:29: error: '__builtin_memcpy'
+pointer overflow between offset 36 and size [-1, 9223372036854775807]
+[-Werror=array-bounds]
+ #define __underlying_memcpy __builtin_memcpy
+                             ^
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+Suspecting commit:
+-------------
+wifi: cfg80211: fix CQM for non-range use
+commit 7e7efdda6adb385fbdfd6f819d76bc68c923c394 upstream.
+
+
+Links:
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/log
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/history/
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/details/
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
