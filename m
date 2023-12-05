@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-54009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE117805974
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:05:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F48805973
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5335B21094
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:05:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5545C1F21878
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA86063DF4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B88563DEC;
 	Tue,  5 Dec 2023 16:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="NMX9GK6+"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="bGF82Aa1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA3F1B6
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A3019B
 	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:04:36 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bf1e32571so3323316e87.2
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:04:35 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50bffb64178so1915796e87.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:04:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701792274; x=1702397074; darn=vger.kernel.org;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701792275; x=1702397075; darn=vger.kernel.org;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=tBdLjc3B7qKl4y/0UG50f7tnGZ2PLAtrmTBWMvkt2bs=;
-        b=NMX9GK6+KJkzSA54+1RoUitaXxBvJ2lZ19c7HLRaecUrhvko7SegZqtWhznCcx8Ad4
-         TIQK5G52DeXW27XSvDo1ywmSwt9Mj0nb/S6DdYPNgiyVJYVWf/+H+stTMm9QYhP/8CzZ
-         R5Hn8PSxY4UHXLC3blqhmUE7/do5ooHllioblTcEzWjrc2OZoNZxCjFPXIK4fVDnMuFp
-         qWlWh4DJmB1bipko7/KKF/BhpvL/3DXzOTtd8nyFC8IGSNko0Mzpc9EONs3UvmiDEuEC
-         D91wFGn9owCIMitE0rtm/g6q7Bwu3jhgBy5vucOjfg0YJ9X05kr+bfoueQKr/ZKqbKFs
-         IXvg==
+        bh=0vPITSTVxxWi/QeTHEeq7unWtEaVpM/oZPsQybO2yv4=;
+        b=bGF82Aa1BnBnoAQWmc7PcqqceQjI2WR9GMvtvDOSJcx80Ni2jgtD50juR0k6J0e6LY
+         XRu81gHkKBk4PYVCHQof8LYR+ZWhJetwb+V0dnZF7LGTUoALWhQjYQKn/Y0/MBDmYhm5
+         uvAREwRj+orojrh1vQtcWlmPEym2KsTjiUndzNuNTdRRNsGIhaA4Mfmrr8gGFHjlJ1Hp
+         9yHVxEoB4xHxlLttKh3XfTRgG+VTwkjfNJlwvlhCnZZdOQkElm6VGSLt6fTOLoWEWAE+
+         OGMv1fv0AuUa/konbyzjc9IODcQm95f8nI08G25+0t1Px7hkNy9FWFdQABKtk+i9VMz2
+         eo+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701792274; x=1702397074;
+        d=1e100.net; s=20230601; t=1701792275; x=1702397075;
         h=content-transfer-encoding:organization:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=tBdLjc3B7qKl4y/0UG50f7tnGZ2PLAtrmTBWMvkt2bs=;
-        b=rFONx2FXzqa/HheXF9ZNKK7A6qQHFmDhhvDu1iOrdH4xEw5knmdgqnJQyamrebYIqa
-         du3NDVcrhGQPVEr1B1aceCl5k0vebAGjNbMqUr6ChwEy5SffCqNfDreHNBkir+RTzhJm
-         6OMftQGHBb2f9nwsL9L8OQtS54jeWAcyi3CWzfWMtObDugdtGXSLA8zRvNzp1q19lCsO
-         GQr4pLGMkevYjazVUppjxgJW9rkluocBP4TV9lCXMcQrZXp/zWq7Dot7ORThjTIPvNcB
-         pFnNRrfNTFy3cvdBVFNrr4UvrW+PdmHCWBTRSWjWUZuZ3eT4lbq8v7OTjLeUdWAgYANZ
-         clew==
-X-Gm-Message-State: AOJu0YxrUECVQ31T5jjLBRo7ryoQCnPttYQJMsDrJfst9kHj1aMLjTDs
-	QVKNFneiKzVMssKIJHe/rzK53Q==
-X-Google-Smtp-Source: AGHT+IHaEUCXN+o2v9oJcYcBIhbQbGkOVX7Fckw3vDqK7Qv790rJe/x1HArFlTmsTVDL67luGIFaqw==
-X-Received: by 2002:a19:711a:0:b0:50b:f6d2:8569 with SMTP id m26-20020a19711a000000b0050bf6d28569mr1593587lfc.129.1701792274094;
-        Tue, 05 Dec 2023 08:04:34 -0800 (PST)
+        bh=0vPITSTVxxWi/QeTHEeq7unWtEaVpM/oZPsQybO2yv4=;
+        b=wtcQcLWCHfhOWk/MFqxUHjhTvORzMxVhMFvZ3qvhbDrHf0ByKfMZF2olsMYax4yQfN
+         cGHiq3RirfY2DTHBcGKbxL9DMX/I3VgkxxzDInE8QqD3AA18VIqCkL4RMGEgVgomimjs
+         YstCqBUwbyYYlrtkIZKZPAiPvwUWu70bmnExh3ycTDcA0g8fl5jHNGHfWHCi4pca3uRB
+         SCTZhpCF4Pv+eP0eqZxkJ42OoBR6RwyXzPMJ6Nbt3gCjcJFZFHYAgfqkTw2EiEVgb1Kp
+         BwbAvuXlau2pVl/4M7Vse1ocptlxM6ekCzbfl3IaBno6LbvdxEMxj+IJJAc3Pv2iV8nh
+         Txiw==
+X-Gm-Message-State: AOJu0YwTu7an/MI754WWxylZ8iOeUU/DshjkUzVKupSURMg/2uORuNsL
+	EcBZltqq86qxuhjE/HuAzkVn3w==
+X-Google-Smtp-Source: AGHT+IHttDQ/vNNmlIivAzLFIz91u/kcs2nQe0Atn/Z2JbLsZk2egvbXivFRnbtZBlMLV75WRTpJSA==
+X-Received: by 2002:ac2:43a3:0:b0:50b:f547:82ba with SMTP id t3-20020ac243a3000000b0050bf54782bamr1742774lfl.130.1701792275147;
+        Tue, 05 Dec 2023 08:04:35 -0800 (PST)
 Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id h25-20020a056512055900b0050c0bbbe3d2sm171341lfl.256.2023.12.05.08.04.32
+        by smtp.gmail.com with ESMTPSA id h25-20020a056512055900b0050c0bbbe3d2sm171341lfl.256.2023.12.05.08.04.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 08:04:33 -0800 (PST)
+        Tue, 05 Dec 2023 08:04:34 -0800 (PST)
 From: Tobias Waldekranz <tobias@waldekranz.com>
 To: davem@davemloft.net,
 	kuba@kernel.org
@@ -60,9 +60,9 @@ Cc: andrew@lunn.ch,
 	f.fainelli@gmail.com,
 	olteanv@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH v2 net-next 5/6] net: dsa: mv88e6xxx: Add "eth-mac" counter group support
-Date: Tue,  5 Dec 2023 17:04:17 +0100
-Message-Id: <20231205160418.3770042-6-tobias@waldekranz.com>
+Subject: [PATCH v2 net-next 6/6] net: dsa: mv88e6xxx: Add "rmon" counter group support
+Date: Tue,  5 Dec 2023 17:04:18 +0100
+Message-Id: <20231205160418.3770042-7-tobias@waldekranz.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231205160418.3770042-1-tobias@waldekranz.com>
 References: <20231205160418.3770042-1-tobias@waldekranz.com>
@@ -76,24 +76,34 @@ Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
 Report the applicable subset of an mv88e6xxx port's counters using
-ethtool's standardized "eth-mac" counter group.
+ethtool's standardized "rmon" counter group.
 
 Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 39 ++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ drivers/net/dsa/mv88e6xxx/chip.c | 42 ++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 473f31761b26..1a16698181fb 100644
+index 1a16698181fb..2e74109196f4 100644
 --- a/drivers/net/dsa/mv88e6xxx/chip.c
 +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1319,6 +1319,44 @@ static void mv88e6xxx_get_ethtool_stats(struct dsa_switch *ds, int port,
- 	mv88e6xxx_get_stats(chip, port, data);
+@@ -1357,6 +1357,47 @@ static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
+ 	mac_stats->stats.FramesReceivedOK += mac_stats->stats.BroadcastFramesReceivedOK;
  }
  
-+static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
-+					struct ethtool_eth_mac_stats *mac_stats)
++static void mv88e6xxx_get_rmon_stats(struct dsa_switch *ds, int port,
++				     struct ethtool_rmon_stats *rmon_stats,
++				     const struct ethtool_rmon_hist_range **ranges)
 +{
++	static const struct ethtool_rmon_hist_range rmon_ranges[] = {
++		{   64,    64 },
++		{   65,   127 },
++		{  128,   255 },
++		{  256,   511 },
++		{  512,  1023 },
++		{ 1024, 65535 },
++		{}
++	};
 +	struct mv88e6xxx_chip *chip = ds->priv;
 +	int ret;
 +
@@ -101,42 +111,35 @@ index 473f31761b26..1a16698181fb 100644
 +	if (ret < 0)
 +		return;
 +
-+#define MV88E6XXX_ETH_MAC_STAT_MAP(_id, _member)			\
++#define MV88E6XXX_RMON_STAT_MAP(_id, _member)				\
 +	mv88e6xxx_stats_get_stat(chip, port,				\
 +				 &mv88e6xxx_hw_stats[MV88E6XXX_HW_STAT_ID_ ## _id], \
-+				 &mac_stats->stats._member)
++				 &rmon_stats->stats._member)
 +
-+	MV88E6XXX_ETH_MAC_STAT_MAP(out_unicast, FramesTransmittedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(single, SingleCollisionFrames);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(multiple, MultipleCollisionFrames);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(in_unicast, FramesReceivedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(in_fcs_error, FrameCheckSequenceErrors);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(out_octets, OctetsTransmittedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(deferred, FramesWithDeferredXmissions);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(late, LateCollisions);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(in_good_octets, OctetsReceivedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(out_multicasts, MulticastFramesXmittedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(out_broadcasts, BroadcastFramesXmittedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(excessive, FramesWithExcessiveDeferral);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(in_multicasts, MulticastFramesReceivedOK);
-+	MV88E6XXX_ETH_MAC_STAT_MAP(in_broadcasts, BroadcastFramesReceivedOK);
++	MV88E6XXX_RMON_STAT_MAP(in_undersize, undersize_pkts);
++	MV88E6XXX_RMON_STAT_MAP(in_oversize, oversize_pkts);
++	MV88E6XXX_RMON_STAT_MAP(in_fragments, fragments);
++	MV88E6XXX_RMON_STAT_MAP(in_jabber, jabbers);
++	MV88E6XXX_RMON_STAT_MAP(hist_64bytes, hist[0]);
++	MV88E6XXX_RMON_STAT_MAP(hist_65_127bytes, hist[1]);
++	MV88E6XXX_RMON_STAT_MAP(hist_128_255bytes, hist[2]);
++	MV88E6XXX_RMON_STAT_MAP(hist_256_511bytes, hist[3]);
++	MV88E6XXX_RMON_STAT_MAP(hist_512_1023bytes, hist[4]);
++	MV88E6XXX_RMON_STAT_MAP(hist_1024_max_bytes, hist[5]);
 +
-+#undef MV88E6XXX_ETH_MAC_STAT_MAP
++#undef MV88E6XXX_RMON_STAT_MAP
 +
-+	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.MulticastFramesXmittedOK;
-+	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.BroadcastFramesXmittedOK;
-+	mac_stats->stats.FramesReceivedOK += mac_stats->stats.MulticastFramesReceivedOK;
-+	mac_stats->stats.FramesReceivedOK += mac_stats->stats.BroadcastFramesReceivedOK;
++	*ranges = rmon_ranges;
 +}
 +
  static int mv88e6xxx_get_regs_len(struct dsa_switch *ds, int port)
  {
  	struct mv88e6xxx_chip *chip = ds->priv;
-@@ -6838,6 +6876,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
+@@ -6877,6 +6918,7 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
  	.get_strings		= mv88e6xxx_get_strings,
  	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
-+	.get_eth_mac_stats	= mv88e6xxx_get_eth_mac_stats,
+ 	.get_eth_mac_stats	= mv88e6xxx_get_eth_mac_stats,
++	.get_rmon_stats		= mv88e6xxx_get_rmon_stats,
  	.get_sset_count		= mv88e6xxx_get_sset_count,
  	.port_max_mtu		= mv88e6xxx_get_max_mtu,
  	.port_change_mtu	= mv88e6xxx_change_mtu,
