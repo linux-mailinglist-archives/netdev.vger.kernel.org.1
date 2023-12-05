@@ -1,128 +1,114 @@
-Return-Path: <netdev+bounces-53999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5C1805928
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:54:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6EF805942
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 325D71C21088
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:54:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 647E1B20FAD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A2668EB9;
-	Tue,  5 Dec 2023 15:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A7060B8A;
+	Tue,  5 Dec 2023 15:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZjZ2Ra2m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTvBMMg8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E28122
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:54:11 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-db537948ea0so4127793276.2
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 07:54:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701791651; x=1702396451; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OpCZZN7ifzLhrwAYxkGqYDBB1FuZ2YnYQt+7H4zDU+Q=;
-        b=ZjZ2Ra2m9jCfp3zsDGaiueJ0GfvHiEPOHTWwRqGZ8tpVqnnWAuhjaJ2MxBVazJYwo+
-         AvqN3VKfF/m7dzicuf1H1AYbzhYSWM1LLAr2/AEYMoTlhtrVy0rtsv59pRNu+WirrgfW
-         t5Z6tUNjbsR6HEKGvk50G70sW/U+XJUT8hPTEPmdECqUXHa0F6CLEW0/P36hxi8zyWaI
-         aLVJfaSSm0lGJvzbDnn7ujPsWQQIL6E8N3pmut+fQyuccoJLvyzht/wlD6Di7PvEyBgo
-         qZiJRkgkul5MtSSx4Cdv0OrvQGdUKA89Px7RGKQcmcR7Z/ALRcTd/wnyUNV03y69/tS8
-         4+sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701791651; x=1702396451;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OpCZZN7ifzLhrwAYxkGqYDBB1FuZ2YnYQt+7H4zDU+Q=;
-        b=YZ0eJ40MVxNZMIgrUy773xDnmcG5x/AJFWwpiYJrsggJNdvS8hoAHcQ9xDbMG554mM
-         8b+KxBVEPlxRdMfxTUe99GytQSIlkSBndCjLgn3tuhqOU1xutVIwSnnYA4muua0tnWRL
-         +jVwrchIlKzEeNK07YAkzVnt6fLbMObDOtjPg2cox94MqV62A2ggEvUWs3Y17K4t4bPg
-         25StvqIAAGS7503mXCbkWqFl6gYUPHcPmqJYYfDDGFpxFgJH+W1y+orKXqtBHwfuEMSL
-         9/2rGqm4vwS0YMIuKsqqCq9//N5KCBKiOipSr5ONlqWMYV5ULLaDy6jAygYduNfvExeg
-         vI8A==
-X-Gm-Message-State: AOJu0YwHCl3VcQ2QTSJRQ+Oyopae02iJURdj/0Pi+7Yvp5DkPhlVanwB
-	3ydkFOC2Q2wOltMOL3XM5njM5fGBvs90Oahi+imntQ==
-X-Google-Smtp-Source: AGHT+IGCJb6NJTexBLiNBzgMwl8doc7Qk7WTAXljr3GKe9KFhu9oJQpIiiYrofNfQQq+O9e/tLSF6yqkhku8Pwwo5cc=
-X-Received: by 2002:a25:b293:0:b0:db7:dacf:59fc with SMTP id
- k19-20020a25b293000000b00db7dacf59fcmr4225994ybj.112.1701791650893; Tue, 05
- Dec 2023 07:54:10 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF1660B82;
+	Tue,  5 Dec 2023 15:57:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5137CC433C8;
+	Tue,  5 Dec 2023 15:57:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701791855;
+	bh=WgrVkII6Qt1b4rQxQZ7m71wjsB2HLj5ZsjzJ5yzkPuA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YTvBMMg8ecKR5ZF561HEQW/VK65TRDd+a3xGYtju8FHcPe/8cMjHfKM4OYNqz0D6b
+	 Kc6XI+UgRd7zeyhKPc44yEmAQ7pPxwcrN205q2PRXktR4G1UvJ7oTnMHPl8XGrkvTq
+	 h3LkYTQCyhwvz4Irb5h8AQCASxcBuUMWz6uSTmQaI39tib7uHCjh8t9dBPxoRSPWAD
+	 b0rYqcM7H7Dr/d2HTR/hxHRrIxMW5PVlwb9w1ldpp51LQZ0yCoVSVZAkQWc+ahrXCa
+	 TiXcJWlE/lYDH5/hgVpNZoK68XayvsJfW4zu4BCZse2Laqoep+CofdUzChw4V6CfCr
+	 XiF1idyVJKOFA==
+Date: Tue, 5 Dec 2023 15:57:28 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>,
+	Liam Girdwood <lgirdwood@gmail.com>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <88ed0c94-d052-4564-be0c-79a0f502eda8@sirena.org.uk>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+ <20231204225956.GG981228@pengutronix.de>
+ <20231205064527.GJ981228@pengutronix.de>
+ <4b96b8c8-7def-46e5-9c85-d9e925fb9251@sirena.org.uk>
+ <20231205140203.GK981228@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205031535.163661217@linuxfoundation.org>
-In-Reply-To: <20231205031535.163661217@linuxfoundation.org>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 5 Dec 2023 21:23:59 +0530
-Message-ID: <CA+G9fYuL_-Q67t+Y7ST5taYv1XkkoJegH2zBvw_ZUOhF9QRiOg@mail.gmail.com>
-Subject: Re: [PATCH 6.6 000/134] 6.6.5-rc1 review
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Johannes Berg <johannes.berg@intel.com>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, 
-	akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org, 
-	patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de, 
-	jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com, 
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, allen.lkml@gmail.com, 
-	Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-
-On Tue, 5 Dec 2023 at 08:51, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 6.6.5 release.
-> There are 134 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Thu, 07 Dec 2023 03:14:57 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.6.5-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.6.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="1jzDBs4dDTXFfKTt"
+Content-Disposition: inline
+In-Reply-To: <20231205140203.GK981228@pengutronix.de>
+X-Cookie: I've Been Moved!
 
 
-The x86 allmodconfig with gcc-8 failed but passed with gcc-13.
+--1jzDBs4dDTXFfKTt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-x86_64: gcc-8-allmodconfig: FAILED
-x86_64: gcc-13-allmodconfig: PASS
+On Tue, Dec 05, 2023 at 03:02:03PM +0100, Oleksij Rempel wrote:
+> On Tue, Dec 05, 2023 at 12:55:18PM +0000, Mark Brown wrote:
+> > On Tue, Dec 05, 2023 at 07:45:27AM +0100, Oleksij Rempel wrote:
 
-Build error:
-------------
-In function 'nl80211_set_cqm_rssi.isra.44',
-    inlined from 'nl80211_set_cqm' at net/wireless/nl80211.c:12994:10:
-include/linux/fortify-string.h:57:29: error: '__builtin_memcpy'
-pointer overflow between offset 36 and size [-1, 9223372036854775807]
-[-Werror=array-bounds]
- #define __underlying_memcpy __builtin_memcpy
-                             ^
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > CC regulator devs here too.
 
-Suspecting commit:
--------------
-wifi: cfg80211: fix CQM for non-range use
-commit 7e7efdda6adb385fbdfd6f819d76bc68c923c394 upstream.
+> > Again, I'm not sure what if any question there is?
 
+> PSE is kind of PMIC for Ethernet ports. I assume, it is good to let you
+> know at least about existence drivers.
 
-Links:
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/log
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/history/
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.6.y/build/v6.6.4-135-gb0b05ccdd77d/testrun/21509070/suite/build/test/gcc-8-allmodconfig/details/
+OK...  I mean, if they're not using the regulator framework I'm not sure
+it has much impact - there are plenty of internal regulators in devices
+already so it wouldn't be *too* unusual other than the fact that AFAICT
+this is somewhat split between devices within the subsystem?  Neither of
+the messages was super clear.
 
+--1jzDBs4dDTXFfKTt
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Linaro LKFT
-https://lkft.linaro.org
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVvSGcACgkQJNaLcl1U
+h9CZ9wf9HEE6iEOCJJpkzG8SBnMctFeBTnq/N662MsvQUGH/qkPPK4oVmr897esm
+HvW9VOSP95JsOrrQrjMEPwm8n4ZDJARuPmCJbh8uHnC3IQAzNYcxKdalN57NAZh+
+1rWfnT6i9rXV68+HB+UQPxhmdYxVAD4u7TfnY9O63FbgZgi8KocKSq61mECuIDf+
+8b51YRkK6SLebysFki+gFZU+e2dCjit9nt1c3o4CBERlAxhghRl2WrJD/HCaUwPC
+TiAsMFSalALFK1mzNjHp/7PW3HGYrhAU1R1EYgjy7FS4+x52of9utSuDoBrNTB60
+YiUS3lNVeG6kJiVJ5Ffw8B9JZOK1HQ==
+=0JPO
+-----END PGP SIGNATURE-----
+
+--1jzDBs4dDTXFfKTt--
 
