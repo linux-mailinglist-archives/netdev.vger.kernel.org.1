@@ -1,60 +1,70 @@
-Return-Path: <netdev+bounces-53936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4888054F9
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:42:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 498218054FB
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:42:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B453BB20D68
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:42:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016992809CD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93445C8EB;
-	Tue,  5 Dec 2023 12:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED995C070;
+	Tue,  5 Dec 2023 12:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SwvQCpZ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XnqPYWWf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46D7184;
-	Tue,  5 Dec 2023 04:41:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701780081; x=1733316081;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gI7x2ikpkdZ7RpK/7GfN3p+KmRH/Pqha6bn7RpAGAVA=;
-  b=SwvQCpZ9sgx7ryNURrE87vsbeLKiuyX9ZnI/jtAbbrZCkDKwpbYvMBxE
-   JSasRD4ag/6Puq7LyistTy8Bt/G3MsZtFQc9X2z8efZjCZGPAD7XnFMlm
-   PsX/lZ+3BGRkyEqbgU7MeOK/RSY84W+ZXwusAzxD0QAzDNm1Q/ppVTDzU
-   FfAf3SXk3Y3F3UVH6utrwTNNnh/Cq+fLy6mM8m1nlSa2lhBkaajiX3FcV
-   2NUkOtBfmN6wBLS45sRZRDS2RM/xRVjxLDJkLxUFnA5GqAJaN8n3Vp/ou
-   IsdrSc8NOlIcfCXCJajEeKBjiDRKGe7Or5AFk86hVFbNLeO+5e6u7M1VY
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="942067"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="942067"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 04:41:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="1018209996"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="1018209996"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Dec 2023 04:41:17 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rAUjb-0008ya-1o;
-	Tue, 05 Dec 2023 12:41:09 +0000
-Date: Tue, 5 Dec 2023 20:40:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: YangXin <yx.0xffff@gmail.com>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ___neigh_lookup_noref(): remove redundant parameters
-Message-ID: <202312052000.xiZkoBI4-lkp@intel.com>
-References: <20231204185943.68-1-yx.0xffff@gmail.com>
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0F510F
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 04:42:46 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-a1cdeab6b53so51600066b.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 04:42:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701780165; x=1702384965; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qmq4l9ej1A+DpZ4jngQfqL9Oiy2fHxFTbCGet7aE4Nk=;
+        b=XnqPYWWfDmJy4rQN1Bo2AFbtzS2Tc97o35q2D1exJGO91NbeZNDgNQLq9EGbVjDTkC
+         8tf0pAyykThHRuOFkwhzDkbdBoIrRy+/U1/etL0CSZpOgUhX37DO4Ba4L7NbUntIqT1I
+         dvwToMmJsDOwwK9HlQ4HhH5hyIC5omm7Pfvwz+jfnfo1PhhLogXnsHPezHzbOMO/wdSK
+         6n2DBQ/TLW0ezf2IuzPdnwDVrkDTFu6hy3bDvriTb7EerjiyQBON26Qgoxdcxuoc2SX+
+         iGEWx+xdnzl52EolBpOA7eqRckFRt5+lXyswidkUeC7DlvEuKhA/Ga951GcUH9+pHgxm
+         gnig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701780165; x=1702384965;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qmq4l9ej1A+DpZ4jngQfqL9Oiy2fHxFTbCGet7aE4Nk=;
+        b=DnZ4DPfd94T2LLR4IceJbpA0fPf3RPL4mcwNnlZPtME9k3cZ9jE8A8ogO1lToRrx5g
+         CXbi/6Y2qvD4jB9aeHBma4wOCMM5vwpwSU1aYDJf5w27MSKlyP92ry5TQTr0p444mIS1
+         aan4B/gDn2t+s42E3Iy5KwppiAKOAB4azze1PmDhY8ulsxgzjd+fq5XB00AbhbN5+CUc
+         NpxUpa4givyrmmDMHQmjv5fJqEFAqO3eOLwST6qCI8rmFFydLl3JAewrmckJMQYq09wB
+         TVBlXKBU1o2bf3ghsK1GpMx7f5ZTN4ZEcY8g4wwAIfM6T3fwTl/LV+Ag0qcQHmTBB/xV
+         o00Q==
+X-Gm-Message-State: AOJu0YzeOz/PJ5oBzeDstUcpsJVb8yCxS3WwZZ6f8Q6M2yRAfrg7BdZv
+	Yy2vy6gbexDb8FPbJfAMCKY=
+X-Google-Smtp-Source: AGHT+IFYjOCLUwoWmAJKWioPNJPEQtJ5msKJdOqLCGHmz7xmjLzmsqC1abuQdus//5JZ8kictb77Hw==
+X-Received: by 2002:a17:906:2c1:b0:a1c:7671:8806 with SMTP id 1-20020a17090602c100b00a1c76718806mr710090ejk.0.1701780164909;
+        Tue, 05 Dec 2023 04:42:44 -0800 (PST)
+Received: from skbuf ([188.27.185.68])
+        by smtp.gmail.com with ESMTPSA id l14-20020a170906414e00b0099c53c4407dsm6605006ejk.78.2023.12.05.04.42.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 04:42:44 -0800 (PST)
+Date: Tue, 5 Dec 2023 14:42:42 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Danzberger <dd@embedd.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+Message-ID: <20231205124242.tovrlw2s5gfgbceu@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
+ <20231205101257.nrlknmlv7sw7smtg@skbuf>
+ <db36974a7383bd30037ffda796338c7f4cdfffd7.camel@embedd.com>
+ <20231205120421.yfs52kp2ttlqkwlb@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,239 +73,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231204185943.68-1-yx.0xffff@gmail.com>
+In-Reply-To: <20231205120421.yfs52kp2ttlqkwlb@skbuf>
 
-Hi YangXin,
+On Tue, Dec 05, 2023 at 02:04:21PM +0200, Vladimir Oltean wrote:
+> You can post the 2 patches as a v2 of this series (separate thread).
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.7-rc4 next-20231205]
-[cannot apply to horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/YangXin/net-___neigh_lookup_noref-remove-redundant-parameters/20231205-030205
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231204185943.68-1-yx.0xffff%40gmail.com
-patch subject: [PATCH] net: ___neigh_lookup_noref(): remove redundant parameters
-config: arm-defconfig (https://download.01.org/0day-ci/archive/20231205/202312052000.xiZkoBI4-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231205/202312052000.xiZkoBI4-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312052000.xiZkoBI4-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/socket.c:108:
-   In file included from include/net/busy_poll.h:18:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:28:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/socket.c:108:
-   In file included from include/net/busy_poll.h:18:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/socket.c:108:
-   In file included from include/net/busy_poll.h:18:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   3 errors generated.
---
-   In file included from net/core/neighbour.c:30:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   1 error generated.
---
-   In file included from net/ipv4/route.c:86:
-   In file included from include/net/dst_metadata.h:6:
-   In file included from include/net/ip_tunnels.h:18:
-   In file included from include/net/lwtunnel.h:9:
-   In file included from include/net/route.h:28:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv4/route.c:86:
-   In file included from include/net/dst_metadata.h:6:
-   In file included from include/net/ip_tunnels.h:18:
-   In file included from include/net/lwtunnel.h:9:
-   In file included from include/net/route.h:29:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv4/route.c:86:
-   In file included from include/net/dst_metadata.h:6:
-   In file included from include/net/ip_tunnels.h:18:
-   In file included from include/net/lwtunnel.h:9:
-   In file included from include/net/route.h:29:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   net/ipv4/route.c:880:6: warning: variable 'log_martians' set but not used [-Wunused-but-set-variable]
-           int log_martians;
-               ^
-   1 warning and 3 errors generated.
---
-   In file included from net/ipv4/igmp.c:91:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv4/igmp.c:92:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv4/igmp.c:92:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   net/ipv4/igmp.c:1915:6: warning: variable 'changerec' set but not used [-Wunused-but-set-variable]
-           int     changerec = 0;
-                   ^
-   1 warning and 3 errors generated.
---
-   In file included from net/ipv6/anycast.c:37:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv6/anycast.c:37:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv6/anycast.c:39:
-   In file included from include/net/ip6_route.h:9:
-   In file included from include/net/lwtunnel.h:9:
-   In file included from include/net/route.h:28:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   3 errors generated.
---
-   In file included from net/ipv6/ip6_fib.c:29:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:28:
->> include/net/arp.h:27:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv6/ip6_fib.c:29:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv6/ip6_fib.c:29:
-   In file included from include/net/ip.h:30:
-   In file included from include/net/route.h:29:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   net/ipv6/ip6_fib.c:1384:25: warning: variable 'pn' set but not used [-Wunused-but-set-variable]
-           struct fib6_node *fn, *pn = NULL;
-                                  ^
-   1 warning and 3 errors generated.
---
-   In file included from net/ipv6/sysctl_net_ipv6.c:15:
->> include/net/ndisc.h:383:63: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(&nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                 ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   In file included from net/ipv6/sysctl_net_ipv6.c:15:
-   include/net/ndisc.h:390:73: error: too many arguments to function call, expected 3, have 4
-           return ___neigh_lookup_noref(ipv6_stub->nd_tbl, neigh_key_eq128, pkey, dev);
-                  ~~~~~~~~~~~~~~~~~~~~~                                           ^~~
-   include/net/neighbour.h:293:33: note: '___neigh_lookup_noref' declared here
-   static inline struct neighbour *___neigh_lookup_noref(
-                                   ^
-   2 errors generated.
-
-
-vim +27 include/net/arp.h
-
-    20	
-    21	#ifdef CONFIG_INET
-    22	static inline struct neighbour *__ipv4_neigh_lookup_noref(struct net_device *dev, u32 key)
-    23	{
-    24		if (dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))
-    25			key = INADDR_ANY;
-    26	
-  > 27		return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, &key, dev);
-    28	}
-    29	#else
-    30	static inline
-    31	struct neighbour *__ipv4_neigh_lookup_noref(struct net_device *dev, u32 key)
-    32	{
-    33		return NULL;
-    34	}
-    35	#endif
-    36	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Also, for v2 please remember to use scripts/get_maintainer.pl more
+diligently. Would it have been a busier period, I would have probably
+not noticed your patch.
 
