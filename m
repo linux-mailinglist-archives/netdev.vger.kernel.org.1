@@ -1,160 +1,98 @@
-Return-Path: <netdev+bounces-54154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555BA8061E0
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:43:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAFB8061E3
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 23:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EA102821FF
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10A1E2821EF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABB63BB28;
-	Tue,  5 Dec 2023 22:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60D33FB14;
+	Tue,  5 Dec 2023 22:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QfZxWlKs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CFc4/UhR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78862196
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:43:28 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6ce831cbba6so109489b3a.2
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 14:43:28 -0800 (PST)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C3B196
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 14:43:32 -0800 (PST)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5d3644ca426so62375687b3.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 14:43:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1701816208; x=1702421008; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1701816212; x=1702421012; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s5PDjvnXiofAm+LfrZr5GVjzdYbiyiT62E/CMkJfzm4=;
-        b=QfZxWlKsHMlPcqy9Kt+NlA82ZbgqK7VVPUBj50xMjomFqi0DrN66LhIjiZCaiQnCmc
-         wxlKmRlSImP4+A1h+jCW63Baq6M3r5zGaiNsVQaNY2PokzeDJGVImg1pDxQToXNv7O2x
-         FCDL1Hdqs/fxziQB78yMWtxDAKvGOA092rBMM=
+        bh=dtSI3RVsMQQR7/2+elZAKcCJgIVnWTJ454GSVXMl11M=;
+        b=CFc4/UhREjHsa1OWFquj1jT8qCrUfB1yffTGoDvxqrRll1bs7j0T0CjqcOD0zqcbE3
+         cSse4Q5HSlT1E9T9c8YS+//f0C5FO/T/HOsEbb33nw0qXQOAeZWV3foB6clDsaRXsV4r
+         84VWdDNNvnQKJLAIA6OurnRFC1lYkX23yY4qCYaOWdsJYKOV9Mew/GDjdZqiWevxVgRU
+         ab+MyrxxK5JVcCMZ2r2bayBp61BQcFL6mR2J7zTnWHCcmmsM3dR/RsWre3jMI+i1TQyb
+         nYsM2AvMVHEVAIu1GQQuU3LUJtYtz3PRY9bjsuwtEHC/6BlfG7riQVZwbF86UwyAQVjl
+         oacQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701816208; x=1702421008;
+        d=1e100.net; s=20230601; t=1701816212; x=1702421012;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s5PDjvnXiofAm+LfrZr5GVjzdYbiyiT62E/CMkJfzm4=;
-        b=nCl5WypUm4Dyxaylsn4Fy9232wBEWpbbSy7AzamMeo9HwRVwGwCtbBRRaazextsnlV
-         Zkr2l8g4v99iH7BwKXWarV2KAtpQwa4RU0M8IWTOXTxb8shnoN8IyyW+8oOZRxHcRF7T
-         RpDQk+lkojAq7oriuvdvBtiSQ7GLjaBXbT5DqZ4NNJp9SFpnQi/6iBBZNOkxmCxl8zCN
-         DcwF80nQth8lA5hy5iuyZ/oBjvJg+GTgiDuoLO8c4/1/+ng3Pd3pS/DLrzVSzX772U78
-         /4ICFqDXJn3gPA2+EtJ/tU1XQUumqwHhZll1kKFOmSWPE9E4PaFFBi3NywUWeL0fOfLg
-         C7XQ==
-X-Gm-Message-State: AOJu0YxJjAEv3B2UtR4lcAZNyDaPhsNgfXeg898KhQ3Jv+Pi0S+F1eAC
-	IGLoVuOsiQviGKRezEErVBmR4lfqgU6TXVt/KaycstRTZ+GPijcLnI8bYYYE4thni9d8r70jK7c
-	l7Pelbh2XvV/R1tcZVWOsJEI=
-X-Google-Smtp-Source: AGHT+IGLyjhmShxcrztf4iUASVXKLIZrQvbl2nOMjR/Yv9SysVtwrvaOGSlk/eSVNbluuvrw8muVoWkRUp1fFXY/kkM=
-X-Received: by 2002:a05:6a20:1608:b0:18c:b6:ab4f with SMTP id
- l8-20020a056a20160800b0018c00b6ab4fmr4318468pzj.48.1701816207958; Tue, 05 Dec
- 2023 14:43:27 -0800 (PST)
+        bh=dtSI3RVsMQQR7/2+elZAKcCJgIVnWTJ454GSVXMl11M=;
+        b=bqatXwp7n2PJVfVKBDcC0sf9QZ6gC3YDPsx4Lx/WkUAg7ULAM0sko7GE2rnTDYHIwS
+         NCTp60MScpK3zHVq9vGkTzYuGS+3nBYsYdbQVCtpzPiA9wcQ1+SR14V9htucpJ0IB1P1
+         hiYr04J86AqsnFxmkpPgTGRI+feDG/dDl5oRIdb44EAQljHHI4G9YyYLx3UOngyZWDxo
+         lfRJ0B8D1JZU7gveF4FKR3ydXDgmHncP/8PgrvPB1a4XbtEnkhNKATgFkOxr7cNP2hNr
+         mX+J0GZLHbW5avWw9MnsmNJ0Lmf4vOez3/OJoK2nzYNYWeyVtBNn/n99Ydvc603nNlhi
+         45tw==
+X-Gm-Message-State: AOJu0Ywidf0FjFzQUV+WU/WwkKaDzMKIHEsHZIaoR9H3qGdyZomDOSOp
+	/IydcfpZOgLARsWZkT9yS6H0LHgAHmGmP8qIqi0pfw==
+X-Google-Smtp-Source: AGHT+IG0Sbxe2OeMoDP49Zqjj9phOqtnwOZgssc629Hv0fiAx8lYbuASp4gd5krF91atX7BoIAOHnkq5e/bFbLGU+Lw=
+X-Received: by 2002:a05:690c:c02:b0:5d8:5eac:8971 with SMTP id
+ cl2-20020a05690c0c0200b005d85eac8971mr3925911ywb.53.1701816211859; Tue, 05
+ Dec 2023 14:43:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231122233058.185601-8-amakhalov@vmware.com> <20231201232452.220355-1-amakhalov@vmware.com>
- <20231201232452.220355-7-amakhalov@vmware.com> <20231204103100.GYZW2qZE9tbGMtuVgY@fat_crate.local>
- <c2519c9a-8518-403a-9bca-cb79a5f2a6e9@intel.com> <204f743d-2901-4ad2-bbcc-a7857a8644e7@broadcom.com>
-In-Reply-To: <204f743d-2901-4ad2-bbcc-a7857a8644e7@broadcom.com>
-From: Tim Merrifield <tim.merrifield@broadcom.com>
-Date: Tue, 5 Dec 2023 16:43:16 -0600
-Message-ID: <CAJfbqWyeubVofe4BHQC+a3wacwk0kMPECa8mxZ7gkzhBJ3d5LA@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] x86/vmware: Add TDX hypercall support
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, Borislav Petkov <bp@alien8.de>, 
-	Alexey Makhalov <amakhalov@vmware.com>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, hpa@zytor.com, dave.hansen@linux.intel.co, 
-	mingo@redhat.com, tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org, 
-	richardcochran@gmail.com, linux-input@vger.kernel.org, 
-	dmitry.torokhov@gmail.com, zackr@vmware.com, 
-	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com, namit@vmware.com, 
-	timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com, 
-	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com, 
-	tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com, 
-	horms@kernel.org
+References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de> <b0488fa6181a47668e5737905ae7adc8d7cd055e.1701713943.git.u.kleine-koenig@pengutronix.de>
+In-Reply-To: <b0488fa6181a47668e5737905ae7adc8d7cd055e.1701713943.git.u.kleine-koenig@pengutronix.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 5 Dec 2023 23:43:19 +0100
+Message-ID: <CACRpkdbszYnpuDYeUCKiMwJvV9tq8b4Yq8bmsTr7vK5g_b=Qng@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 6/9] net: wan/ixp4xx_hss: Convert to platform
+ remove callback returning void
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Linus Walleij <linusw@kernel.org>, 
+	Imre Kaloz <kaloz@openwrt.org>, linux-arm-kernel@lists.infradead.org, 
+	netdev@vger.kernel.org, kernel@pengutronix.de
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Dave and Alexey,
+On Mon, Dec 4, 2023 at 7:31=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@pengutronix.de> wrote:
 
-Regarding VMware-specific checks, it may be beneficial to add some
-additional checks
-such as ensuring that the hypervisor vendor is VMware,
-r12=3D=3DVMWARE_HYPERVISOR_MAGIC,
-r10=3D=3DVMWARE_TDX_VENDOR_LEAF, r11=3D=3DVMWARE_TDX_HCALL_FUNC and r13 (co=
-mmand) is
-restricted to those few commands we expect to be invoked from the
-kernel or drivers by VMware-specific
-code.
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+>
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+>
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+>
+> Link: https://lore.kernel.org/r/20231117095922.876489-8-u.kleine-koenig@p=
+engutronix.de
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 
-If we add these checks, would folks be OK with exporting this function?
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-
-On Tue, Dec 5, 2023 at 3:41=E2=80=AFPM Alexey Makhalov
-<alexey.makhalov@broadcom.com> wrote:
->
->
->
-> On 12/5/23 1:24 PM, Dave Hansen wrote:
-> > On 12/4/23 02:31, Borislav Petkov wrote:
-> >> On Fri, Dec 01, 2023 at 03:24:52PM -0800, Alexey Makhalov wrote:
-> >>> +#ifdef CONFIG_INTEL_TDX_GUEST
-> >>> +/* __tdx_hypercall() is not exported. So, export the wrapper */
-> >>> +void vmware_tdx_hypercall_args(struct tdx_module_args *args)
-> >>> +{
-> >>> +   __tdx_hypercall(args);
-> >>> +}
-> >>> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall_args);
-> >> Uuuh, lovely. I'd like to see what the TDX folks think about this
-> >> export first.
-> >
-> > I don't really like it much.  This does a generic thing (make a TDX
-> > hypercall) with a specific name ("vmware_").  If you want to make an
-> > argument that a certain chunk of the __tdx_hypercall() space is just fo=
-r
-> > VMWare and you also add a VMWare-specific check and then export *that*,
-> > it might be acceptable.
-> >
-> > But I don't want random modules able to make random, unrestricted TDX
-> > hypercalls.  That's asking for trouble.
->
-> Considering exporting of __tdx_hypercall for random modules is not an
-> option, what VMware specific checks you are suggesting?
->
-> --
-> This electronic communication and the information and any files transmitt=
-ed
-> with it, or attached to it, are confidential and are intended solely for
-> the use of the individual or entity to whom it is addressed and may conta=
-in
-> information that is confidential, legally privileged, protected by privac=
-y
-> laws, or otherwise restricted from disclosure to anyone else. If you are
-> not the intended recipient or the person responsible for delivering the
-> e-mail to the intended recipient, you are hereby notified that any use,
-> copying, distributing, dissemination, forwarding, printing, or copying of
-> this e-mail is strictly prohibited. If you received this e-mail in error,
-> please return the e-mail to the sender, delete it from your computer, and
-> destroy any printed copy of it.
-
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+Yours,
+Linus Walleij
 
