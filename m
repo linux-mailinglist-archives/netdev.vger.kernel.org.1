@@ -1,107 +1,122 @@
-Return-Path: <netdev+bounces-53841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46272804D54
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:13:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56845804D77
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741D41C20B47
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:13:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8836B1C20A9E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9974D3DB91;
-	Tue,  5 Dec 2023 09:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDF53E475;
+	Tue,  5 Dec 2023 09:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m36ly+os"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="OOs6rrNx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641913C082;
-	Tue,  5 Dec 2023 09:13:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2024C433C8;
-	Tue,  5 Dec 2023 09:13:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701767630;
-	bh=eJuwNnWu6g9nwVGxomFxgvI4Y9eQAK/z4W+ooWCv1FE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m36ly+ost0Hm+D/k5ncdMp8hmQgNKenkoAe71TF6RTqgotjTcUC5UzKJXJeZL3Ax0
-	 gpVQIbuRYeoZadwQlhqTJrH5gg3k++yN2ywrfF5nCx0CoGWHXG8jKbyf5XIbsAT5Zx
-	 7Ql3YmJDP0CVimx4ekDg6+9eFXLkdhRXKUADGe31bBi2JGsMu4MW/eYQWM2oax5nvA
-	 Yf722/uyY0IXfaL4jk7x3HmqUET3+0hzxdfuUtTe6MKuEflBJeDoQRQCMkVGnfpUxH
-	 h6qJpM90+KYs5saftdxzo8mwZk/4QW7nXl5kPjeSyvXBH5tj0TiDlRIigkBDkZEbWf
-	 ZeoVpSURE7zXA==
-Date: Tue, 5 Dec 2023 09:13:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, paul@paul-moore.com, brauner@kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v11 bpf-next 02/17] bpf: add BPF token delegation mount
- options to BPF FS
-Message-ID: <20231205091344.GR50400@kernel.org>
-References: <20231127190409.2344550-1-andrii@kernel.org>
- <20231127190409.2344550-3-andrii@kernel.org>
- <20231130163655.GC32077@kernel.org>
- <CAEf4BzZ0JWFrS_DLk_YOGNqyh39kqFcCNbd_D6mCM6d0mzxO_Q@mail.gmail.com>
- <CAEf4BzbN2xovoTyQeK1sHZdB-YMeiC=U7oOmUcpcb5_ZHEcFgA@mail.gmail.com>
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0875483;
+	Tue,  5 Dec 2023 01:20:09 -0800 (PST)
+Received: from localhost.ispras.ru (unknown [10.10.165.7])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 3F8CD40F1DE9;
+	Tue,  5 Dec 2023 09:20:04 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 3F8CD40F1DE9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1701768007;
+	bh=Xkj0nuUUERVo3DmD0W5CbQml3tG2cDGWBXJRyDsrHq8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OOs6rrNxIXNTpiu+wwKGkoIxiCIgN0JjlOkTYcgNboYScKjXAtJUNbYxCx1uhxUV8
+	 V+dSISTy/vUdFlBok1a3MZBkLoxXytP8ZzQhgiKfvPLttDjHjp4EYZz5IX8s9V5rXa
+	 43jfNC40GiHt+8/BgkeP+wcGGsb2DrgnsNzJMeOs=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	v9fs@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org
+Subject: [PATCH v2] net: 9p: avoid freeing uninit memory in p9pdu_vreadf
+Date: Tue,  5 Dec 2023 12:19:50 +0300
+Message-ID: <20231205091952.24754-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <ZW7oQ1KPWTbiGSzL@codewreck.org>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzbN2xovoTyQeK1sHZdB-YMeiC=U7oOmUcpcb5_ZHEcFgA@mail.gmail.com>
 
-On Thu, Nov 30, 2023 at 10:13:41AM -0800, Andrii Nakryiko wrote:
-> On Thu, Nov 30, 2023 at 10:03 AM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Thu, Nov 30, 2023 at 8:37 AM Simon Horman <horms@kernel.org> wrote:
-> > >
-> > > On Mon, Nov 27, 2023 at 11:03:54AM -0800, Andrii Nakryiko wrote:
-> > >
-> > > ...
-> > >
-> > > > @@ -764,7 +817,10 @@ static int bpf_get_tree(struct fs_context *fc)
-> > > >
-> > > >  static void bpf_free_fc(struct fs_context *fc)
-> > > >  {
-> > > > -     kfree(fc->fs_private);
-> > > > +     struct bpf_mount_opts *opts = fc->s_fs_info;
-> > > > +
-> > > > +     if (opts)
-> > > > +             kfree(opts);
-> > > >  }
-> > >
-> > > Hi Andrii,
-> > >
-> > > as it looks like there will be a v12, I have a minor nit to report: There
-> > > is no need to check if opts is non-NULL because kfree() is basically a
-> > > no-op if it's argument is NULL.
-> > >
-> > > So perhaps this can become (completely untested!):
-> > >
-> > > static void bpf_free_fc(struct fs_context *fc)
-> > > {
-> > >         kfree(fc->s_fs_info);
-> > > }
-> > >
-> >
-> > sure, I can drop the check, I wasn't sure if it's canonical or not to
-> > check the argument for NULL before calling kfree(). For user-space
-> > it's definitely quite expected to not have to check for null before
-> > calling free().
-> 
-> Heh, turns out I already simplified this, but it's in the next patch.
-> I'll move it into patch #2, though, where it actually belongs.
+If an error occurs while processing an array of strings in p9pdu_vreadf
+then uninitialized members of *wnames array are freed.
 
-Thanks. I do believe that for kernel code not checking for NULL here
-is preferred.
+Fix this by iterating over only lower indices of the array. Also handle
+possible uninit *wnames usage if first p9pdu_readf() call inside 'T' case
+fails.
+
+Found by Linux Verification Center (linuxtesting.org).
+
+Fixes: ace51c4dd2f9 ("9p: add new protocol support code")
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+---
+v2: I've missed that *wnames can also be left uninitialized. Please
+ignore the patch v1. As an answer to Dominique's comment: my
+organization marks this statement in all commits.
+
+ net/9p/protocol.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/net/9p/protocol.c b/net/9p/protocol.c
+index 4e3a2a1ffcb3..043b621f8b84 100644
+--- a/net/9p/protocol.c
++++ b/net/9p/protocol.c
+@@ -393,6 +393,8 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+ 		case 'T':{
+ 				uint16_t *nwname = va_arg(ap, uint16_t *);
+ 				char ***wnames = va_arg(ap, char ***);
++				int i;
++				*wnames = NULL;
+ 
+ 				errcode = p9pdu_readf(pdu, proto_version,
+ 								"w", nwname);
+@@ -406,8 +408,6 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+ 				}
+ 
+ 				if (!errcode) {
+-					int i;
+-
+ 					for (i = 0; i < *nwname; i++) {
+ 						errcode =
+ 						    p9pdu_readf(pdu,
+@@ -421,13 +421,11 @@ p9pdu_vreadf(struct p9_fcall *pdu, int proto_version, const char *fmt,
+ 
+ 				if (errcode) {
+ 					if (*wnames) {
+-						int i;
+-
+-						for (i = 0; i < *nwname; i++)
++						while (--i >= 0)
+ 							kfree((*wnames)[i]);
++						kfree(*wnames);
++						*wnames = NULL;
+ 					}
+-					kfree(*wnames);
+-					*wnames = NULL;
+ 				}
+ 			}
+ 			break;
+-- 
+2.43.0
+
 
