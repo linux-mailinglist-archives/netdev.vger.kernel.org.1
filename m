@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-54055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4026805D03
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:12:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334CE805D0A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:14:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ECBD1F216FC
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:12:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A5F28209C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740EB6A35A;
-	Tue,  5 Dec 2023 18:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7029465ED0;
+	Tue,  5 Dec 2023 18:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="k6YSreJE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YKQh5usf"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2072.outbound.protection.outlook.com [40.107.13.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE2FA5
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 10:12:02 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PeR2I4tzlIXF6TWO6Ais+eS/Ahw+UAli88MHsOgyVxXd4Pgrrt86Pv1ZBTuKFk2ohErd32wi5pocswoSXiQAtkaJdl8lHwI6TSQKQbINNLf2+ftF0ExdA2q/2oTWboedxFvgVFhbVpC6ZKS/wpkbxIcKuOOXoszwnCdN13CvSBFOiWecJQY57DYq0afmu1a/BKvwFRgA07S7p4ZpE7Bij2n+3869028vkUN9/8mqoEG5WWmJaakvJMr8vseXGyhV73f9henT+yHBs/QsyqlQMPhOlla47c2CYOELih+q5SIsL2pp6J12l2f8nd9U0xgUZK6NMNa/kc8Wt+TVkHtXBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fJODtTmvyf0FgRsDpJCn7hQ8S2u7FRD8Ih6do3zuUVc=;
- b=EQI5/a45sGgECc9/tmmAZPrp8QX/1WM7ccs949iQPTkwUvq8qCXSx2yDQtCuwR59UGrDO7R6BT1KYM2iuFZbeYUp7YizE9EtXQdQOQWwRwqDe7JE82rbM/8+4dB+0wg/aF7BW9rhujhoRLm90jLTxIbXs6N0hAoxsTuIdwwVcy/U+jXioBXi00xfnWCbDvkMAAAuX4qIVMFsM9EL0j/vUamMR0dS3YgY5tkDjuH/VdBxy8Ycmi9g2+vsp5/04EKhaLcXoGuXaTopa96V9rpvmlpNeESSp04hkKgHSlXv0cUbCmSPtqtGqbvDvzvOKsHHbmAHM9nvu064qczZCMpP/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fJODtTmvyf0FgRsDpJCn7hQ8S2u7FRD8Ih6do3zuUVc=;
- b=k6YSreJE/8kj+2X/Mrq5vtyrLNu41z+XuYcJrDKqOHmTBuOgxPutnSts7YI1273ZL2BxETtu86AUmXxkE+40oZbc0Z050T7bAVPITYa7MJMbPr28jrRJkYy+uFbTuVcukUJYTcU3bj5qykpNg2ovv8soep9T12tBZU5GlB2+VGs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM0PR04MB7124.eurprd04.prod.outlook.com (2603:10a6:208:1a0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.24; Tue, 5 Dec
- 2023 18:12:00 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.012; Tue, 5 Dec 2023
- 18:12:00 +0000
-Date: Tue, 5 Dec 2023 20:11:56 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 6/6] net: dsa: mv88e6xxx: Add "rmon" counter
- group support
-Message-ID: <20231205181156.y5p57cb2rgukyjwz@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205160418.3770042-7-tobias@waldekranz.com>
-X-ClientProxiedBy: AM6PR10CA0041.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:209:80::18) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46941A2;
+	Tue,  5 Dec 2023 10:14:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+EEdAY5I5fDE6iNN/6bW8wHl8UaPsKF7/BDuoeVzsws=; b=YKQh5usfx8LdrGc7W+RHN5PT1c
+	VJiaeKCkgyk6iWrrXXvYZirpg/LeSBE920nEDENyfOuPLQ0AXdG2MovxQgdlj35w/asSVRszrQuds
+	FpEoA7wxnWLy3SQ5AoQBi9mquXz2q1l18OzPozKs9YcXIPBeAoiqJnI49d1VVX8X47AkmCSKoDNtO
+	VwXF7bNh+TbyG1PU8EwM8FkzjSzmbJiah5uJ1NwNn5Zl9CJglBVAeJ1RdvYcY2XDNpi1CcbkTqP0p
+	RPoT5GkyxZtL1XaxOEOv45a8HW69TIIgQYbaRMpz0Bk9dV4tFYyU8/hlLkB8w8fUwQ3+Oe9eC1MRl
+	cJFFrIJg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38970)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rAZvw-0007Ce-1t;
+	Tue, 05 Dec 2023 18:14:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rAZvw-0001vd-0E; Tue, 05 Dec 2023 18:14:12 +0000
+Date: Tue, 5 Dec 2023 18:14:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Harini Katakam <harini.katakam@amd.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, workflows@vger.kernel.org
+Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
+ MMD read/write
+Message-ID: <ZW9oc9TO93kOq20s@shell.armlinux.org.uk>
+References: <20231128133630.7829-1-ansuelsmth@gmail.com>
+ <20231128133630.7829-3-ansuelsmth@gmail.com>
+ <20231204181752.2be3fd68@kernel.org>
+ <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
+ <656f37a6.5d0a0220.96144.356f@mx.google.com>
+ <adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
+ <ZW89errbJWUt33vz@shell.armlinux.org.uk>
+ <20231205072912.2d79a1d5@kernel.org>
+ <ZW9LroqqugXzqAY9@shell.armlinux.org.uk>
+ <d2762241-f60a-4d61-babe-ce9535d9adde@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM0PR04MB7124:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39b7b2ee-b067-4eb5-3e06-08dbf5bdacd1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	W1QnPf/mVOzyMRtQjVRwwda4PI+uDov5vHnKYOX0hnGSXm+UEQddOqTsUpuYeY/C7BJa8G6JTR6cfzaDPA5BcT++Jle1uoKcb8isqWWuk4Vkiw0rh2hjdLCTFLvASzlgAYhJKbcJg6hYagyt8xRALvu18o+5L0PXopv7sNubVlrdleznkNAsaPwWC96pghry/GheN3RrvgtvCVAMqcV40yx2SBWNWSk0/AUDknAKGNeZQ1fGaRkfjMLUVm6q4ZXfB4E/JyfCcdtdiZVzqpw5SJVgHrZhCKgn3wHYFwcCaC497m3qFqghA3OWuKHngEJZ9/nqvMEhj4BX/0V2HeVXY8CCf59LSVYaE6Tn8aUdEg/e7cjH5YX5jRReakhe1w6CIitNVFWU/991Ek1FBhyUw5nRkditIFdbCGZleovrUxvrFA9MZsIAOurSQe3f6ju12iZ3L8J0cHe9hYAwue/YLOEmuVQqNqLmE1S3RffOJeW57pyFlHwtJiQ98FBVxOcc0rRy/KEpLLvxC9JbXmT/Y9dHGKzNv65VrwpZJJVS7OUBddmHHo1PDhICbL8JCZ6N
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(136003)(39860400002)(366004)(396003)(346002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(38100700002)(26005)(1076003)(83380400001)(86362001)(9686003)(6512007)(66476007)(33716001)(316002)(66946007)(6916009)(478600001)(6506007)(66556008)(6486002)(6666004)(5660300002)(4326008)(8936002)(8676002)(44832011)(2906002)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?87DoRav1K+tFGeCrdTsFeEREzYltHTEmH7+vHBf7/H1g9ofn59Au9ZqkcuTO?=
- =?us-ascii?Q?bCmCPsZ5GuDV/MnY/g/kzn1u0HO3XzkmfzVWDqYHEhZdNn4GQl3Wps15OLY5?=
- =?us-ascii?Q?UK3BlA5oWX/qO3W4jAI2s+AkLGxhdsKE/s7NBa21rYasLFzyeM2jZ066+0zo?=
- =?us-ascii?Q?xMcNI6vHBAevLEIRHJ0cHnltSCj43iFgDbo0+e9z7+IigfysrwpK8q3dqKY/?=
- =?us-ascii?Q?ikGjXRoF8Fzko8Tsbkpo/k9d9Dlo5NRBfHuXc2nSqE07H12z1QKC6GA48BbY?=
- =?us-ascii?Q?JB7OjvmI3+NQbZEzFAzr52Ft78P6WdbpYdnFlKn8rV9eUYSMyNhOcr3GtBec?=
- =?us-ascii?Q?Rcb4hF+MXUvG04ILXGoHNZO7QHAKVTdBCAfMXlGMSnIALtydlJa4SS615v1P?=
- =?us-ascii?Q?7Nh27IumRm7Fty/LlE37R7VAkZrMc7rANYFUn7aU8ustQATDtc2SeTJTyfPG?=
- =?us-ascii?Q?rddavcfRNqyYSYuMkp9iMkDVqfgpbSMz0nKF4COxkUfu5vYJKcd+gstMMckp?=
- =?us-ascii?Q?G4dSZVIB6qsJXpkEVxsVw1FacHGmNM1nTC8CI4eXs24vo1oqNrcc5vp1wnQ1?=
- =?us-ascii?Q?SSeqrRakJ9ffHq5aV6+DAaLphRpYLFuoM9LJjOzDUcMjEWWiBk1i3heXgiQk?=
- =?us-ascii?Q?SvTm4aEhqtjZ2Esgilp5Dk8bMjlj81EZ2XHL1d/7fY14z0Ck7tz1erRr0Nji?=
- =?us-ascii?Q?Vq0/Fm8Im3vXYytrt9hrowqAtnJyvozm3ob3bGq9GIfyhL7wT19C8d0OJjNR?=
- =?us-ascii?Q?CbljFvUaX8DCHUf3ns5KsuQQqAAc7hhdpX+NCM+T8tLyg2W4X4YDun8YyXQ1?=
- =?us-ascii?Q?qgA/Z5xqTsDm4dbqix2/YxGQkEZnQuV6RfWaQutHx2HzKXo6iGcmqr6LF2yU?=
- =?us-ascii?Q?xpF5C0a6zWKHdKp7oOww+3gJzOXuzpxEnMx7HlaXuaFizXVxCgwM08yvHbKP?=
- =?us-ascii?Q?ZfeIFNPh36WBgkRdqiyXaqRUSogCqtgqM4fxkYnCe8ur9Xx7WnZgFgCfcavW?=
- =?us-ascii?Q?NpeBKLRgaeSOOKMDLkAgJD4MhnIehDHocrEzU7m1OGWjGIOM2j1ick62ov/8?=
- =?us-ascii?Q?hT8qYXU4kdJ5DesjJqnQgu3LddS+N0iHUdAB5rVEPLcY7dEulX8fiKbqySoQ?=
- =?us-ascii?Q?4CpC6Lmsjdvkm0Aj/6w0d5ADGfdg/pPXhPDQ4A6T+onBbeBAFV8XH7kzxBhO?=
- =?us-ascii?Q?OjsV3P0KrFFpWLrcfTVksogRE2/lxXmApGvsM1s5rW73jEIAbTc+GR+Pfh5L?=
- =?us-ascii?Q?m2gqkcQLwgVe5tH7f/TjvNM9l2oOaqQ437aNxMN25VTm7WE/REuW4Wm+Scft?=
- =?us-ascii?Q?syw64Vzf81K/B9oGApOGlS4fltDolZqKkSsm9UNggHXoErJ6i95kEvWngebH?=
- =?us-ascii?Q?TXrcZNlbtgkqZ2jnF99JQI8+wWHZ8fiBy9G+gnwiqLucb+xv1uxQ9fRgzbwD?=
- =?us-ascii?Q?B0kuy+0bDNP2dfzUE/3QqWOq0sPYRhClXIJS9jtfQOLb0KzzbHJFzz223E4m?=
- =?us-ascii?Q?YlRV5Fvskel9N/bvpB2pDrpuViMhJJq75SXBpl+NKquibACrjn/T+HXabKLj?=
- =?us-ascii?Q?5SSzoKiccr7Pq4CB5Dxu4KOubhO2RnWpDz61Fh+ANaFqWr8fEKhdWWOO/0my?=
- =?us-ascii?Q?Sg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39b7b2ee-b067-4eb5-3e06-08dbf5bdacd1
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 18:12:00.2494
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bA8uLd4yKgVcWB6qew7BCvh49HafKJAo6uiEKgWcsiVDNaDAHUIV4ulsW34UQn+Se3qotQOYTpA4erX9OSXILA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7124
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2762241-f60a-4d61-babe-ce9535d9adde@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Dec 05, 2023 at 05:04:18PM +0100, Tobias Waldekranz wrote:
-> Report the applicable subset of an mv88e6xxx port's counters using
-> ethtool's standardized "rmon" counter group.
+On Tue, Dec 05, 2023 at 09:44:05AM -0800, Jeff Johnson wrote:
+> On 12/5/2023 8:11 AM, Russell King (Oracle) wrote:
+> > On Tue, Dec 05, 2023 at 07:29:12AM -0800, Jakub Kicinski wrote:
+> >> On Tue, 5 Dec 2023 15:10:50 +0000 Russell King (Oracle) wrote:
+> >>> I've raised this before in other subsystems, and it's suggested that
+> >>> it's better to have it in the .c file. I guess the reason is that it's
+> >>> more obvious that the function is documented when modifying it, so
+> >>> there's a higher probability that the kdoc will get updated when the
+> >>> function is altered.
+> >>
+> >> Plus I think people using IDEs (i.e. not me) may use the "jump to
+> >> definition" functionality, to find the doc? 
+> >>
+> >> TBH I thought putting kdoc in the C source was documented in the coding
+> >> style, but I can't find any mention of it now.
+> > 
+> > Well, in Documentation/doc-guide/kernel-doc.rst:
+> > 
+> >   The function and type kernel-doc comments should be placed just before
+> >   the function or type being described in order to maximise the chance
+> >   that somebody changing the code will also change the documentation.
+> > 
+> > That implies (but not explicitly) that it should be at the function
+> > definition site, since "changing the code" is used as an argument as
+> > I did in my previous email.
+> > 
+> > Secondly, this document goes on to give an example of running
+> > scripts/kernel-doc on a .c file.
+> > 
+> > Thirdly, there are seven references in this document of kernel-doc
+> > in .c files, and only one for kernel-doc in a .h file. So this suggests
+> > that "it will be in a .c file" isn't a rule (it can't be because of
+> > documenting structures!)
+> > 
+> > So let's not get hung up on whether it should be in .c or .h because I
+> > think that isn't relevant. Instead, I think it's about "it should be at
+> > the definition site" - that being a structure definition or a function
+> > definition, and not at a function prototype.
+> > 
+> > The only exception I can think of is the style I've used in
+> > linux/phylink.h for the _method_ definitions which look like function
+> > prototypes - that's just a work-around because one can't kernel-doc
+> > the structure-of-function-pointers and document the function parameters
+> > without jumping through that hoop, and it would be silly to document
+> > the methods in some random driver!
+> > 
 > 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
->  drivers/net/dsa/mv88e6xxx/chip.c | 42 ++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
+> The Linux Kernel philosophy of documenting functions instead of
+> prototypes has always bothered me since I'm "old school" and am
+> ingrained with the software engineering philosophy that you document
+> interfaces, not implementations. This was reinforced early in my career
+> by working on multiple projects in different programming languages using
+> processes outlined in DOD-STD-2167A, and for some projects, especially
+> ones written in Ada, the header files were the design and the documentation.
 > 
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 1a16698181fb..2e74109196f4 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -1357,6 +1357,47 @@ static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
-> +	MV88E6XXX_RMON_STAT_MAP(in_undersize, undersize_pkts);
-> +	MV88E6XXX_RMON_STAT_MAP(in_oversize, oversize_pkts);
-> +	MV88E6XXX_RMON_STAT_MAP(in_fragments, fragments);
-> +	MV88E6XXX_RMON_STAT_MAP(in_jabber, jabbers);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_64bytes, hist[0]);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_65_127bytes, hist[1]);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_128_255bytes, hist[2]);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_256_511bytes, hist[3]);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_512_1023bytes, hist[4]);
-> +	MV88E6XXX_RMON_STAT_MAP(hist_1024_max_bytes, hist[5]);
+> This philosophy was further enforced when working with closed source
+> projects (Windows, IOS, VxWorks) where all the documentation was
+> contained in shared header files.
+> 
+> So in my experience a function prototype IS the function definition, and
+> the actual function is just the implementation of that definition.
+> 
+> But that thinking obviously isn't shared by others.
 
-I see that these are in STATS_TYPE_BANK0 and that every switch provides
-that. Good.
+Interestingly, the view that a function prototype is a function
+definition does not seem to be shared by w3school, Microsoft, IBM,
+and many more.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+If we look at the C99 standard, then 6.9.1 Function definitions gives
+the syntax as including a compound-statement, which is defined as
+requiring the curley braces and contents. Therefore, a function
+definition as defined by the C standard includes its body.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
