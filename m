@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-54002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345A880594F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:00:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18AA680596D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:04:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0485B20E43
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:00:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEEEA1F2181F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA3A60B9C;
-	Tue,  5 Dec 2023 16:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E087268EA7;
+	Tue,  5 Dec 2023 16:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="LUXNMk3o"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="DjEdXfg+"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4895B194
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:00:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=ocHwCN7Qch9RFn3Q8RQY6psnCivqAr3KyNEVY6wSi4M=; t=1701792016; x=1703001616; 
-	b=LUXNMk3oz0fU4+Tfhi4JuCeV3pRmDwF8M6fQIj4533FyiUTgNM7vsNv7MlQHVrOR3gedJPLyy20
-	SBR8avUXA1dCOJbBU4+N2B6QPfPgMeqBHTleCYp/XUBaM2FKaHvcFJ45JPfjXoO7oys98yrhktAVq
-	WCI1mdV/PLGRiOijbXuI0LUcNZ1td7FsBK40q+/W83NPxVGPaRZC7HPqpM9aw34Ey3tBUGF83RWcZ
-	lJ4ABRp0ea5SVS8f7jposLqSpDRb8bSOyz4B/4D8KP89RG8xZCTjAVQI8s4LAMXiuMFfcW17swnP6
-	UCM2DinMLqWfTlMuCYou2xhOAxdrB3I+x7mQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAXqH-0000000GOm7-0zNb;
-	Tue, 05 Dec 2023 17:00:13 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next] net: rtnetlink: remove local list in __linkwatch_run_queue()
-Date: Tue,  5 Dec 2023 17:00:11 +0100
-Message-ID: <20231205170011.56576dcc1727.I698b72219d9f6ce789bd209b8f6dffd0ca32a8f2@changeid>
-X-Mailer: git-send-email 2.43.0
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F8AC0
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:04:30 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50bf2d9b3fdso3554000e87.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:04:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701792268; x=1702397068; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hefuVLI8dQRhxU+WHeoQIQVTulctItLqeJf3NGa2D5E=;
+        b=DjEdXfg+5gGbjwDFPvW4NoWTXWyqHHsc+HMUxXxa2I6d3e5j33WmCUbd8njHeQhVYF
+         xWqgqRZfzDUpIUQSoA5fKmbGTzi3YXApmmNNFzAWI8lKuvqQdWGI9ZStQE1WuPAzOiTr
+         kPZZ4/RaqLf/bpn+jiXRspDy0OUi1QDbadvCsi1/hdTg/a/lUNkySV5LzEpD+qFivVFX
+         /XJMp2bP7H9x/yjnV2SyhCNKaiu5CADC8vDlNzsdmCpEWnW1hrYPT2iNdT7BKy3ml4nQ
+         CISnEXa5W3r8/SRMbju/feoa/nxNInT/mj16mEXiMuyd9SyhkaYT/9pV0+5XunEcEaUO
+         rnhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701792268; x=1702397068;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hefuVLI8dQRhxU+WHeoQIQVTulctItLqeJf3NGa2D5E=;
+        b=Ksr8kq7uw8KQrUeY3BynzbfGLfXXeaauCfpiZTsDwrYbuNRNhqQcaZaL5EleqoT94f
+         ebcvzaRwfV1Na9/D6FNtDo+7P11k7Xw+55zXdDG7uTdYDCX0uZCb6mUXM/cDkdzK6//F
+         j27JRAXMV7ESuibsdMVD28mC3MxNUIDLQR/nDHXRtjrEHINCWpU+p/Hap7duCjAwe8Od
+         Dl3rRyQ6sJW8a+5wht35Lwfr2aMJeRruhR2aqhPrLiyyFfGS2QMDmxCFeCIacXfwbhwt
+         FyFqChapHhZmQm9z7KDJ+HN+exs57no6q2QQv6LSONmufqZcFq6mS3MvMnu/M034KBha
+         Y8YA==
+X-Gm-Message-State: AOJu0YyZiYDsbJ5yO1XcLUs2jd+8lyqM3/pYSbxAGep+LrbhMbBC6buv
+	DLPM9ymshvljy9zfNSfnOyrSaw==
+X-Google-Smtp-Source: AGHT+IH7rTBHM5u+Fv4fzHZOdGUY3Z1ncNDxD2LZ96x3Mj8kpv9VudAbxZAhdqwjb8PIIUzybxr0hQ==
+X-Received: by 2002:a05:6512:1301:b0:50c:d79:b229 with SMTP id x1-20020a056512130100b0050c0d79b229mr685880lfu.23.1701792268493;
+        Tue, 05 Dec 2023 08:04:28 -0800 (PST)
+Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id h25-20020a056512055900b0050c0bbbe3d2sm171341lfl.256.2023.12.05.08.04.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Dec 2023 08:04:27 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 net-next 0/6] net: dsa: mv88e6xxx: Add "eth-mac" and "rmon" counter group support
+Date: Tue,  5 Dec 2023 17:04:12 +0100
+Message-Id: <20231205160418.3770042-1-tobias@waldekranz.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+The majority of the changes (2/6) are about refactoring the existing
+ethtool statistics support to make it possible to read individual
+counters, rather than the whole set.
 
-Due to linkwatch_forget_dev() (and perhaps others?) checking for
-list_empty(&dev->link_watch_list), we must have all manipulations
-of even the local on-stack list 'wrk' here under spinlock, since
-even that list can be reached otherwise via dev->link_watch_list.
+4/6 tries to collect all information about a stat in a single place
+using a mapper macro, which is then used to generate the original list
+of stats, along with a matching enum. checkpatch is less than amused
+with this construct, but prior art exists (__BPF_FUNC_MAPPER in
+include/uapi/linux/bpf.h, for example).
 
-This is already the case, but makes this a bit counter-intuitive,
-often local lists are used to _not_ have to use locking for their
-local use.
+With that in place, adding the actual counter groups is pretty
+straight forward (5-6/6).
 
-Remove the local list as it doesn't seem to serve any purpose.
-While at it, move a variable declaration into the loop using it.
+v1 -> v2:
+- Added 1/6
+- Added 3/6
+- Changed prototype of stats operation to reflect the fact that the
+  number of read stats are returned, no errors
+- Moved comma into MV88E6XXX_HW_STAT_MAPPER definition
+- Avoid the construction of mapping table iteration which relied on
+  struct layouts outside of mv88e6xxx's control
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
- net/core/link_watch.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+Tobias Waldekranz (6):
+  net: dsa: mv88e6xxx: Push locking into stats snapshotting
+  net: dsa: mv88e6xxx: Create API to read a single stat counter
+  net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
+  net: dsa: mv88e6xxx: Give each hw stat an ID
+  net: dsa: mv88e6xxx: Add "eth-mac" counter group support
+  net: dsa: mv88e6xxx: Add "rmon" counter group support
 
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index c469d1c4db5d..ed3e5391fa79 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -192,8 +192,6 @@ static void __linkwatch_run_queue(int urgent_only)
- #define MAX_DO_DEV_PER_LOOP	100
- 
- 	int do_dev = MAX_DO_DEV_PER_LOOP;
--	struct net_device *dev;
--	LIST_HEAD(wrk);
- 
- 	/* Give urgent case more budget */
- 	if (urgent_only)
-@@ -215,11 +213,11 @@ static void __linkwatch_run_queue(int urgent_only)
- 	clear_bit(LW_URGENT, &linkwatch_flags);
- 
- 	spin_lock_irq(&lweventlist_lock);
--	list_splice_init(&lweventlist, &wrk);
-+	while (!list_empty(&lweventlist) && do_dev > 0) {
-+		struct net_device *dev;
- 
--	while (!list_empty(&wrk) && do_dev > 0) {
--
--		dev = list_first_entry(&wrk, struct net_device, link_watch_list);
-+		dev = list_first_entry(&lweventlist, struct net_device,
-+				       link_watch_list);
- 		list_del_init(&dev->link_watch_list);
- 
- 		if (!netif_device_present(dev) ||
-@@ -237,9 +235,6 @@ static void __linkwatch_run_queue(int urgent_only)
- 		spin_lock_irq(&lweventlist_lock);
- 	}
- 
--	/* Add the remaining work back to lweventlist */
--	list_splice_init(&wrk, &lweventlist);
--
- 	if (!list_empty(&lweventlist))
- 		linkwatch_schedule_work(0);
- 	spin_unlock_irq(&lweventlist_lock);
+ drivers/net/dsa/mv88e6xxx/chip.c   | 390 +++++++++++++++++++----------
+ drivers/net/dsa/mv88e6xxx/chip.h   |  31 +--
+ drivers/net/dsa/mv88e6xxx/serdes.c |  10 +-
+ drivers/net/dsa/mv88e6xxx/serdes.h |   8 +-
+ 4 files changed, 278 insertions(+), 161 deletions(-)
+
 -- 
-2.43.0
+2.34.1
 
 
