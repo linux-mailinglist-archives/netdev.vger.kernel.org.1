@@ -1,189 +1,188 @@
-Return-Path: <netdev+bounces-54069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33A7805EBB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:39:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3410E805F3A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3DDD1C20FAB
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:39:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FFA1C20F9D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF5F6AB96;
-	Tue,  5 Dec 2023 19:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qqoSx7pP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C986E6DD08;
+	Tue,  5 Dec 2023 20:15:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD4F1B2
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:39:44 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso1770a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 11:39:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701805182; x=1702409982; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+2ld4m3MhERUPzTktQlQjP4JXlULIXkqWAkTLoxmcz0=;
-        b=qqoSx7pPuMdeAzs9JxbtFBD0v093lEMUT1P/ZtAu0eiWoUZSH8FIyGh3+CLK5MDIWZ
-         5RV1yDLoppjAjXJLjMz2YWiTLGVfeXvQZ/wyEf6hQYP9hDq/Mr5Vew8aAb2Lmg0/FvbV
-         lV76DnrtMLKRksRhUHALcJD/kRIkPIWHJKu29qh17wN+dDqtoC06KqD86gMwYpaAco5B
-         gLCZrObSEyI3CsXRjCIt85IormIACHEPcHYNMbM84PbjEdWMFCM2OZAaMNXQAI5yP6YF
-         h/0k2GRf0CFN9pYLY/M7YZgsZ6qBw5mWGcnLpZAcjua9WnazcqCVfywU3PG7OLF25JiB
-         5QDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701805182; x=1702409982;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+2ld4m3MhERUPzTktQlQjP4JXlULIXkqWAkTLoxmcz0=;
-        b=FfxD4yGAyoeqIO58NTYAodS0yBG7GxLhSTeXJNBi5nIlpgyzmCniqR76AnLfwcB/Xh
-         JkH48dCVNPyzOAo3p9sj5tqFDhF5uo4AbHmlBnYnfSeZOiXQYHN/aIrfmXgVIqeQrzME
-         9HlQVgsIsRnrO1Q9aJu5lWTyCIxzR9qcUtn3bbqWwZJtSFMEdR8nXqDkWmENeqR3Nx35
-         MjeVOn1cEYHzhQ8/KDf+AcF+emTMANHZVVlfb8mU64arynnr4On035TDzbXWcvHSbRdD
-         hIVkWHuERGMgaHPk06i8mpHLLQ2o0WGD2YjATVcVzBoJMTtAf42Ay7bbsKaFoRlOwmJq
-         g5DQ==
-X-Gm-Message-State: AOJu0YzKe+8PiBxYN6vXhcdZTAeaEeJdtowSdXb0/Nppy8/0rMbS7cG4
-	4xy9iR+H1nD3ST7bLIfllks2Vo+8pMW4rH3JXOLC1g==
-X-Google-Smtp-Source: AGHT+IG22KQbpxLNZILlyWiioOluPpeZuIABSGkhe5oy2RfeUiCtalpZlaYUFGxQsY9Z2DSP5cxTPadCnBZ25d1mRUo=
-X-Received: by 2002:a50:c35d:0:b0:54a:ee8b:7a8c with SMTP id
- q29-20020a50c35d000000b0054aee8b7a8cmr12527edb.0.1701805182213; Tue, 05 Dec
- 2023 11:39:42 -0800 (PST)
+X-Greylist: delayed 1834 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Dec 2023 12:15:32 PST
+Received: from mailer.gwdg.de (mailer.gwdg.de [134.76.10.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74699109
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 12:15:32 -0800 (PST)
+Received: from mbx19-fmz-05.um.gwdg.de ([10.108.142.64] helo=email.gwdg.de)
+	by mailer.gwdg.de with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+	(GWDG Mailer)
+	(envelope-from <rossow@cispa.de>)
+	id 1rAbLi-00078d-1R;
+	Tue, 05 Dec 2023 20:44:54 +0100
+Received: from [192.168.178.20] (10.250.9.199) by MBX19-FMZ-05.um.gwdg.de
+ (10.108.142.64) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.2.1258.28; Tue, 5 Dec
+ 2023 11:44:54 -0800
+Message-ID: <901b48cc-a9cc-43a3-bb8d-9ef7f3bd8baa@cispa.de>
+Date: Tue, 5 Dec 2023 20:44:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231204114322.9218-1-lulie@linux.alibaba.com>
- <CANn89iKUHQHA2wHw9k1SiazJf7ag7i4Tz+FPutgu870teVw_Bg@mail.gmail.com> <1701740897.6795166-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1701740897.6795166-1-xuanzhuo@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Dec 2023 20:39:28 +0100
-Message-ID: <CANn89i+Xs3sSDQcub9p=YGUp1_XainGQpS=0RVpYTiDjvRN1rw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: add tracepoints for data send/recv/acked
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, martin.lau@linux.dev, 
-	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	dust.li@linux.alibaba.com, alibuda@linux.alibaba.com, guwen@linux.alibaba.com, 
-	hengqi@linux.alibaba.com, Philo Lu <lulie@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: do not accept ACK of bytes we never sent
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, Yuchung Cheng <ycheng@google.com>
+CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Neal Cardwell
+	<ncardwell@google.com>, Soheil Hassas Yeganeh <soheil@google.com>,
+	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>, Yepeng Pan
+	<yepeng.pan@cispa.de>
+References: <20231205161841.2702925-1-edumazet@google.com>
+ <CAK6E8=dCNTuZvyHJYUzv-BmFVkxa=cnDazgLdCtDLvrGmEWT0w@mail.gmail.com>
+ <CANn89iK++qfrGEg=2dxfFLXc_SAOUvjwTgtt55L8yRZbVW8a2Q@mail.gmail.com>
+From: Christian Rossow <rossow@cispa.de>
+In-Reply-To: <CANn89iK++qfrGEg=2dxfFLXc_SAOUvjwTgtt55L8yRZbVW8a2Q@mail.gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+	micalg=sha-512; boundary="------------ms050002010204070106000400"
+X-ClientProxiedBy: excmbx-16.um.gwdg.de (134.76.9.227) To
+ MBX19-FMZ-05.um.gwdg.de (10.108.142.64)
+X-Virus-Scanned: (clean) by clamav
 
-On Tue, Dec 5, 2023 at 3:11=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
-m> wrote:
->
-> On Mon, 4 Dec 2023 13:28:21 +0100, Eric Dumazet <edumazet@google.com> wro=
-te:
-> > On Mon, Dec 4, 2023 at 12:43=E2=80=AFPM Philo Lu <lulie@linux.alibaba.c=
-om> wrote:
-> > >
-> > > Add 3 tracepoints, namely tcp_data_send/tcp_data_recv/tcp_data_acked,
-> > > which will be called every time a tcp data packet is sent, received, =
-and
-> > > acked.
-> > > tcp_data_send: called after a data packet is sent.
-> > > tcp_data_recv: called after a data packet is receviced.
-> > > tcp_data_acked: called after a valid ack packet is processed (some se=
-nt
-> > > data are ackknowledged).
-> > >
-> > > We use these callbacks for fine-grained tcp monitoring, which collect=
-s
-> > > and analyses every tcp request/response event information. The whole
-> > > system has been described in SIGMOD'18 (see
-> > > https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
-> > > achieve this with bpf, we require hooks for data events that call bpf
-> > > prog (1) when any data packet is sent/received/acked, and (2) after
-> > > critical tcp state variables have been updated (e.g., snd_una, snd_nx=
-t,
-> > > rcv_nxt). However, existing bpf hooks cannot meet our requirements.
-> > > Besides, these tracepoints help to debug tcp when data send/recv/acke=
-d.
-> >
-> > This I do not understand.
-> >
-> > >
-> > > Though kretprobe/fexit can also be used to collect these information,
-> > > they will not work if the kernel functions get inlined. Considering t=
-he
-> > > stability, we prefer tracepoint as the solution.
-> >
-> > I dunno, this seems quite weak to me. I see many patches coming to add
-> > tracing in the stack, but no patches fixing any issues.
->
->
-> We have implemented a mechanism to split the request and response from th=
-e TCP
-> connection using these "hookers", which can handle various protocols such=
- as
-> HTTP, HTTPS, Redis, and MySQL. This mechanism allows us to record importa=
-nt
-> information about each request and response, including the amount of data
-> uploaded, the time taken by the server to handle the request, and the tim=
-e taken
-> for the client to receive the response. This mechanism has been running
-> internally for many years and has proven to be very useful.
->
-> One of the main benefits of this mechanism is that it helps in locating t=
-he
-> source of any issues or problems that may arise. For example, if there is=
- a
-> problem with the network, the application, or the machine, we can use thi=
-s
-> mechanism to identify and isolate the issue.
->
-> TCP has long been a challenge when it comes to tracking the transmission =
-of data
-> on the network. The application can only confirm that it has sent a certa=
-in
-> amount of data to the kernel, but it has limited visibility into whether =
-the
-> client has actually received this data. Our mechanism addresses this issu=
-e by
-> providing insights into the amount of data received by the client and the=
- time
-> it was received. Furthermore, we can also detect any packet loss or delay=
-s
-> caused by the server.
->
-> https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/7912288961/9=
-732df025beny.svg
->
-> So, we do not want to add some tracepoint to do some unknow debug.
-> We have a clear goal. debugging is just an incidental capability.
->
+--------------ms050002010204070106000400
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We have powerful mechanisms in the stack already that ordinary (no
-privilege requested) applications can readily use.
+> Perhaps Yepeng Pan and Christian Rossow have plans to bring this issue to IETF.
+We already brought this up to the IETF TCP WG chairs a few weeks ago. 
+It's still unclear if the TCP WG wants to work on an Internet Draft that 
+mitigates "ghost ACKs". We'll follow up with them.
 
-We have been using them for a while.
+Cheers,
+Christian
 
-If existing mechanisms are missing something you need, please expand them.
+--------------ms050002010204070106000400
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: Kryptografische S/MIME-Signatur
 
-For reference, start looking at tcp_get_timestamping_opt_stats() history.
-
-Sender side can for instance get precise timestamps.
-
-Combinations of these timestamps reveal different parts of the overall
-network latency,
-
-T0: sendmsg() enters TCP
-T1: first byte enters qdisc
-T2: first byte sent to the NIC
-T3: first byte ACKed in TCP
-T4: last byte sent to the NIC
-T5: last byte ACKed
-T1 - T0: how long the first byte was blocked in the TCP layer ("Head
-of Line Blocking" latency).
-T2 - T1: how long the first byte was blocked in the Linux traffic
-shaping layer (known as QDisc).
-T3 - T2: the network =E2=80=98distance=E2=80=99 (propagation delay + curren=
-t queuing
-delay along the network path and at the receiver).
-T5 - T2: how fast the sent chunk was delivered.
-Message Size / (T5 - T0): goodput (from application=E2=80=99s perspective)
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgMFADCABgkqhkiG9w0BBwEAAKCC
+EeYwggUSMIID+qADAgECAgkA4wvV+K8l2YEwDQYJKoZIhvcNAQELBQAwgYIxCzAJBgNVBAYT
+AkRFMSswKQYDVQQKDCJULVN5c3RlbXMgRW50ZXJwcmlzZSBTZXJ2aWNlcyBHbWJIMR8wHQYD
+VQQLDBZULVN5c3RlbXMgVHJ1c3QgQ2VudGVyMSUwIwYDVQQDDBxULVRlbGVTZWMgR2xvYmFs
+Um9vdCBDbGFzcyAyMB4XDTE2MDIyMjEzMzgyMloXDTMxMDIyMjIzNTk1OVowgZUxCzAJBgNV
+BAYTAkRFMUUwQwYDVQQKEzxWZXJlaW4genVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVu
+IEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsTB0RGTi1QS0kxLTArBgNVBAMTJERG
+Ti1WZXJlaW4gQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkgMjCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAMtg1/9moUHN0vqHl4pzq5lN6mc5WqFggEcVToyVsuXPztNXS43O+FZs
+FVV2B+pG/cgDRWM+cNSrVICxI5y+NyipCf8FXRgPxJiZN7Mg9mZ4F4fCnQ7MSjLnFp2uDo0p
+eQcAIFTcFV9Kltd4tjTTwXS1nem/wHdN6r1ZB+BaL2w8pQDcNb1lDY9/Mm3yWmpLYgHurDg0
+WUU2SQXaeMpqbVvAgWsRzNI8qIv4cRrKO+KA3Ra0Z3qLNupOkSk9s1FcragMvp0049ENF4N1
+xDkesJQLEvHVaY4l9Lg9K7/AjsMeO6W/VRCrKq4Xl14zzsjz9AkH4wKGMUZrAcUQDBHHWekC
+AwEAAaOCAXQwggFwMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUk+PYMiba1fFKpZFK4OpL
+4qIMz+EwHwYDVR0jBBgwFoAUv1kgNgB5oKAia4zV8mHSuCzLgkowEgYDVR0TAQH/BAgwBgEB
+/wIBAjAzBgNVHSAELDAqMA8GDSsGAQQBga0hgiwBAQQwDQYLKwYBBAGBrSGCLB4wCAYGZ4EM
+AQICMEwGA1UdHwRFMEMwQaA/oD2GO2h0dHA6Ly9wa2kwMzM2LnRlbGVzZWMuZGUvcmwvVGVs
+ZVNlY19HbG9iYWxSb290X0NsYXNzXzIuY3JsMIGGBggrBgEFBQcBAQR6MHgwLAYIKwYBBQUH
+MAGGIGh0dHA6Ly9vY3NwMDMzNi50ZWxlc2VjLmRlL29jc3ByMEgGCCsGAQUFBzAChjxodHRw
+Oi8vcGtpMDMzNi50ZWxlc2VjLmRlL2NydC9UZWxlU2VjX0dsb2JhbFJvb3RfQ2xhc3NfMi5j
+ZXIwDQYJKoZIhvcNAQELBQADggEBAIcL/z4Cm2XIVi3WO5qYi3FP2ropqiH5Ri71sqQPrhE4
+eTizDnS6dl2e6BiClmLbTDPo3flq3zK9LExHYFV/53RrtCyD2HlrtrdNUAtmB7Xts5et6u5/
+MOaZ/SLick0+hFvu+c+Z6n/XUjkurJgARH5pO7917tALOxrN5fcPImxHhPalR6D90Bo0fa3S
+PXez7vTXTf/D6OWST1k+kEcQSrCFWMBvf/iu7QhCnh7U3xQuTY+8npTD5+32GPg8SecmqKc2
+2CzeIs2LgtjZeOJVEqM7h0S2EQvVDFKvaYwPBt/QolOLV5h7z/0HJPT8vcP9SpIClxvyt7bP
+ZYoaorVyGTkwggWsMIIElKADAgECAgcbY7rQHiw9MA0GCSqGSIb3DQEBCwUAMIGVMQswCQYD
+VQQGEwJERTFFMEMGA1UEChM8VmVyZWluIHp1ciBGb2VyZGVydW5nIGVpbmVzIERldXRzY2hl
+biBGb3JzY2h1bmdzbmV0emVzIGUuIFYuMRAwDgYDVQQLEwdERk4tUEtJMS0wKwYDVQQDEyRE
+Rk4tVmVyZWluIENlcnRpZmljYXRpb24gQXV0aG9yaXR5IDIwHhcNMTYwNTI0MTEzODQwWhcN
+MzEwMjIyMjM1OTU5WjCBjTELMAkGA1UEBhMCREUxRTBDBgNVBAoMPFZlcmVpbiB6dXIgRm9l
+cmRlcnVuZyBlaW5lcyBEZXV0c2NoZW4gRm9yc2NodW5nc25ldHplcyBlLiBWLjEQMA4GA1UE
+CwwHREZOLVBLSTElMCMGA1UEAwwcREZOLVZlcmVpbiBHbG9iYWwgSXNzdWluZyBDQTCCASIw
+DQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ07eRxH3h+Gy8Zp1xCeOdfZojDbchwFfylf
+S2jxrRnWTOFrG7ELf6Gr4HuLi9gtzm6IOhDuV+UefwRRNuu6cG1joL6WLkDh0YNMZj0cZGnl
+m6Stcq5oOVGHecwX064vXWNxSzl660Knl5BpBb+Q/6RAcL0D57+eGIgfn5mITQ5HjUhfZZkQ
+0tkqSe3BuS0dnxLLFdM/fx5ULzquk1enfnjK1UriGuXtQX1TX8izKvWKMKztFwUkP7agCwf9
+TRqaA1KgNpzeJIdl5Of6x5ZzJBTN0OgbaJ4YWa52fvfRCng8h0uwN89Tyjo4EPPLR22MZD08
+WkVKusqAfLjz56dMTM0CAwEAAaOCAgUwggIBMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYDVR0P
+AQH/BAQDAgEGMCkGA1UdIAQiMCAwDQYLKwYBBAGBrSGCLB4wDwYNKwYBBAGBrSGCLAEBBDAd
+BgNVHQ4EFgQUazqYi/nyU4na4K2yMh4JH+iqO3QwHwYDVR0jBBgwFoAUk+PYMiba1fFKpZFK
+4OpL4qIMz+EwgY8GA1UdHwSBhzCBhDBAoD6gPIY6aHR0cDovL2NkcDEucGNhLmRmbi5kZS9n
+bG9iYWwtcm9vdC1nMi1jYS9wdWIvY3JsL2NhY3JsLmNybDBAoD6gPIY6aHR0cDovL2NkcDIu
+cGNhLmRmbi5kZS9nbG9iYWwtcm9vdC1nMi1jYS9wdWIvY3JsL2NhY3JsLmNybDCB3QYIKwYB
+BQUHAQEEgdAwgc0wMwYIKwYBBQUHMAGGJ2h0dHA6Ly9vY3NwLnBjYS5kZm4uZGUvT0NTUC1T
+ZXJ2ZXIvT0NTUDBKBggrBgEFBQcwAoY+aHR0cDovL2NkcDEucGNhLmRmbi5kZS9nbG9iYWwt
+cm9vdC1nMi1jYS9wdWIvY2FjZXJ0L2NhY2VydC5jcnQwSgYIKwYBBQUHMAKGPmh0dHA6Ly9j
+ZHAyLnBjYS5kZm4uZGUvZ2xvYmFsLXJvb3QtZzItY2EvcHViL2NhY2VydC9jYWNlcnQuY3J0
+MA0GCSqGSIb3DQEBCwUAA4IBAQCBeEWkTqR/DlXwCbFqPnjMaDWpHPOVnj/z+N9rOHeJLI21
+rT7H8pTNoAauusyosa0zCLYkhmI2THhuUPDVbmCNT1IxQ5dGdfBi5G5mUcFCMWdQ5UnnOR7L
+n8qGSN4IFP8VSytmm6A4nwDO/afr0X9XLchMX9wQEZc+lgQCXISoKTlslPwQkgZ7nu7YRrQb
+tQMMONncsKk/cQYLsgMHM8KNSGMlJTx6e1du94oFOO+4oK4v9NsH1VuEGMGpuEvObJAaguS5
+Pfp38dIfMwK/U+d2+dwmJUFvL6Yb+qQTkPp8ftkLYF3sv8pBoGH7EUkp2KgtdRXYShjqFu9V
+NCIaE40GMIIHHDCCBgSgAwIBAgIMJQzG/6+9NLIdl972MA0GCSqGSIb3DQEBCwUAMIGNMQsw
+CQYDVQQGEwJERTFFMEMGA1UECgw8VmVyZWluIHp1ciBGb2VyZGVydW5nIGVpbmVzIERldXRz
+Y2hlbiBGb3JzY2h1bmdzbmV0emVzIGUuIFYuMRAwDgYDVQQLDAdERk4tUEtJMSUwIwYDVQQD
+DBxERk4tVmVyZWluIEdsb2JhbCBJc3N1aW5nIENBMB4XDTIxMDcxMzA4MDYxMFoXDTI0MDcx
+MjA4MDYxMFowgb0xCzAJBgNVBAYTAkRFMREwDwYDVQQIDAhTYWFybGFuZDEVMBMGA1UEBwwM
+U2FhcmJydWVja2VuMUQwQgYDVQQKDDtDSVNQQSAtIEhlbG1ob2x0ei1aZW50cnVtIGZ1ZXIg
+SW5mb3JtYXRpb25zc2ljaGVyaGVpdCBnR21iSDEPMA0GA1UEBAwGUm9zc293MRIwEAYDVQQq
+DAlDaHJpc3RpYW4xGTAXBgNVBAMMEENocmlzdGlhbiBSb3Nzb3cwggIiMA0GCSqGSIb3DQEB
+AQUAA4ICDwAwggIKAoICAQDJlXUl7oklBIjrfbkAzeNHA+Rd0giiEWq4JJHQBNBc2uenRRMp
+1nFpL7CeaaZWCY3sGhhTguTtPu2/AP1pWxgDfxspPYqGU5zDdSHBLEn0cPbeQWGOuG0+djj9
+yRY5hoGoVTfz7JFYg+61eNJT3naGOs3jvzrxwZaEcC5UiQy5Tk/vi5uSYBwhNDhgmcYQZztN
+q/jUFXoqb1cWjCbKaAfpFvFektlgZe820SO+azJ5ocPnar0M/TV7+sv984WhDzdL/E0CvEoe
+U1Vn9VIoLuxzA4qfPqa9MQXNofr2SZizX008VnBVa4qjQZGgXDJ45BNvdas/g2H2xyDNRdZf
+8BNmL/K+qyLK/Pg2QPzmZ5j+sAcTwqiMoQBGKwn5TZQCxfY3Izwpw31+Aj7jO9Sk7kVvre+S
+zZuGJ5IUrUUAYz3ZPYgLLhwo+GnFNc+mdDgcFNsbmucnkUEKw6rekAmi8ajavDgzdx6FJ4pK
+XaqAJFmdf6r80uCJVOwC3nd8j+u8tAvYhTaQzbeNR3MGuM96mQEzUrWI5EqKZWM7iaEnPJkd
+WSK3V396BS1oUu8mQ9JGjuikT8fx5TmyyznZ8tEJesaxcfmYP/b+Ov5PNnB9GZr99DTvHV8k
+coZsnvlQWkKIfIXjtxZuQJzwIJ0fUJaBvI50tK+85HPEvkzEVEcWOjg50wIDAQABo4ICSDCC
+AkQwPgYDVR0gBDcwNTAPBg0rBgEEAYGtIYIsAQEEMBAGDisGAQQBga0hgiwBAQQJMBAGDisG
+AQQBga0hgiwCAQQJMAkGA1UdEwQCMAAwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsG
+AQUFBwMCBggrBgEFBQcDBDAdBgNVHQ4EFgQUqflVUwHPDIdbJCAC27Abtel9ELwwHwYDVR0j
+BBgwFoAUazqYi/nyU4na4K2yMh4JH+iqO3QwGgYDVR0RBBMwEYEPcm9zc293QGNpc3BhLmRl
+MIGNBgNVHR8EgYUwgYIwP6A9oDuGOWh0dHA6Ly9jZHAxLnBjYS5kZm4uZGUvZGZuLWNhLWds
+b2JhbC1nMi9wdWIvY3JsL2NhY3JsLmNybDA/oD2gO4Y5aHR0cDovL2NkcDIucGNhLmRmbi5k
+ZS9kZm4tY2EtZ2xvYmFsLWcyL3B1Yi9jcmwvY2FjcmwuY3JsMIHbBggrBgEFBQcBAQSBzjCB
+yzAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AucGNhLmRmbi5kZS9PQ1NQLVNlcnZlci9PQ1NQ
+MEkGCCsGAQUFBzAChj1odHRwOi8vY2RwMS5wY2EuZGZuLmRlL2Rmbi1jYS1nbG9iYWwtZzIv
+cHViL2NhY2VydC9jYWNlcnQuY3J0MEkGCCsGAQUFBzAChj1odHRwOi8vY2RwMi5wY2EuZGZu
+LmRlL2Rmbi1jYS1nbG9iYWwtZzIvcHViL2NhY2VydC9jYWNlcnQuY3J0MA0GCSqGSIb3DQEB
+CwUAA4IBAQBfaZ1OMq17DivzbyIkp6cYzWeDOOr7Ws+HkGP7Cv0N17mGfoT3GG8kZh3nG7W+
+rywRUpWcSPpMBOVn8e7nBghYYSSzrfRWIwdNwV6NNxXmsqwcP3PbPbK9CZMsmHeOhW4nTbcn
+eS/+HpxXNerjRrSnLzRdQMTU4Zw89Z2IRdAdj7z9v7YiZ1fAAdbpoD+70Yz0kQu1LrW3Rxa2
+0/TIpC17/YNQKIBEas0t+7BtrLZgXe2z+3CiDEr8GreyoydV9v+X68Asz4rRDJT2sJVESdHR
+UVRH9xH+SKSnoZWhi99X9PA6oE7ZFAO5XK0g+AEhCMMNjeWYGLJQyqQKSltJRt0WMYIFKzCC
+BScCAQEwgZ4wgY0xCzAJBgNVBAYTAkRFMUUwQwYDVQQKDDxWZXJlaW4genVyIEZvZXJkZXJ1
+bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsMB0RG
+Ti1QS0kxJTAjBgNVBAMMHERGTi1WZXJlaW4gR2xvYmFsIElzc3VpbmcgQ0ECDCUMxv+vvTSy
+HZfe9jANBglghkgBZQMEAgMFAKCCAl0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
+hkiG9w0BCQUxDxcNMjMxMjA1MTk0NDUzWjBPBgkqhkiG9w0BCQQxQgRAGLe3NyBtMTmcRkPa
+/F6eXikWiloNOs3T7Ftq9RAQWmbMIVG3BA5BJShsEUi3Jaj/6BHbZI8C5iJlh9GE0BFexjBs
+BgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcw
+DgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMCAgEo
+MIGvBgkrBgEEAYI3EAQxgaEwgZ4wgY0xCzAJBgNVBAYTAkRFMUUwQwYDVQQKDDxWZXJlaW4g
+enVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNjaHVuZ3NuZXR6ZXMgZS4gVi4x
+EDAOBgNVBAsMB0RGTi1QS0kxJTAjBgNVBAMMHERGTi1WZXJlaW4gR2xvYmFsIElzc3Vpbmcg
+Q0ECDCUMxv+vvTSyHZfe9jCBsQYLKoZIhvcNAQkQAgsxgaGggZ4wgY0xCzAJBgNVBAYTAkRF
+MUUwQwYDVQQKDDxWZXJlaW4genVyIEZvZXJkZXJ1bmcgZWluZXMgRGV1dHNjaGVuIEZvcnNj
+aHVuZ3NuZXR6ZXMgZS4gVi4xEDAOBgNVBAsMB0RGTi1QS0kxJTAjBgNVBAMMHERGTi1WZXJl
+aW4gR2xvYmFsIElzc3VpbmcgQ0ECDCUMxv+vvTSyHZfe9jANBgkqhkiG9w0BAQEFAASCAgBA
+mbrzj2BYeWqZTlRnuplwKVLIESzBfEn47Snd7J3YHuhcWnVafZOGK5PMMjPJN/UE7gcw+1Y9
+7Ja0utylqnmLIapaqrXhKybVWcPyMSgWIaAZcn9hFzUXI36w3D6sCLsLjmXNaiH/LEsF/+RL
+Oe8v1DjiT+bklPrHM9H2bmKKMkskRVx8/uE/XSBJmxJ6rkn5KoVt2Eg90FvR8jtrzIxP0mQA
+tFEgslxyhyj1pxvURlp3yNphgwKG1a5WUywiHk9/F7Hqicw1ZNA8jMbPOUtlB4Qwzc2wfQHW
+7TmBVhRgc+EuQV6SWG+091WC2klqKE6VkupwZ6COy4dgGPxO1lB7bDCxJ889qYQC8om5waYG
+9yJqV8HorYdBy65ZoXvfdT6zEYwrzwdn3BWcBbfqkala+uGz5QFPanluYz8aqE6admBkEIed
+JC0G7DaemVFhR080e6ppSYK/GaefZvPH89vO5H9+YFxpdlf32a/FwbppALNef46GuddJdTRF
+0wDpvep8RSniDHlPEawQ6BdhqFBY6X2MVZ1HVihrV61X/0dG7hU9hQOrHSao7pjw4KvENpli
+GWEzgt8PcAUYzfObY8ETAGgPba88YPqI/V9ZsRN0WcjzsDDIDHZsM4WuvspnTrGxFrfhlATZ
+ag2N3SAGVi5+OT7sXab4vl8cxRMdiqfucAAAAAAAAA==
+--------------ms050002010204070106000400--
 
