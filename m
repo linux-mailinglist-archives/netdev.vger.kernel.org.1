@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-54143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB43B8060FF
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:46:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67F01806100
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B3F21C210DA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:46:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1325D1F2105C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE176F621;
-	Tue,  5 Dec 2023 21:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69256F62C;
+	Tue,  5 Dec 2023 21:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lpU+Lf/R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lgHVUslh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC0B6E2B3
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 21:45:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E0A7C433C7;
-	Tue,  5 Dec 2023 21:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2A86F62B
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 21:45:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 331D1C433C7;
+	Tue,  5 Dec 2023 21:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701812747;
-	bh=8O9wDMP14dZCYHfHI0CG1sDkCxt6e7Gh27bn5wxi/UY=;
+	s=k20201202; t=1701812748;
+	bh=qG6fsAUg4ZMO0LY58+JNEFvpwY/mbCvSq5Jad7PHlEI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lpU+Lf/RfzR6oLDb6eUmTh9DmHijItTEQ1zPqnvcdV7nhhJqzPnq43T+Aj+zYZuEo
-	 YucFYqxge4prEZozms3SLfyujDD5imfkgrKcOpzylJnkF6PT02ff3VRnjzzCEtO1P7
-	 X6f9IzQyobyo+sjmk/liz7jKSTAAY5iKiuvk4MsP0tYvVzmekEZ9l9cqbE5klVRpmd
-	 VJKphRY6VXhQKV9fzyDI6RlP6J1DWC901UTr9bmtttHpAy2Adzy3JWuSku082p/R4J
-	 N9PzAKs3HDuL4SARBIgy+MtAZ0laVDN6IcqACI1CRqOq9GgHCSTiGxpBTmAiGF/qQr
-	 rqv5pjNiF6WdQ==
+	b=lgHVUslhqGGreUMSnOzipCVV+ws3cQnGxqaNQMYMtevlWaVzrOWdlL1YALm73cMsp
+	 oubVRBXhGZR4vdmXQmvYwlqJCgpuiVqIi3w7cbPBDRbLaquI7zNB1w29KhxVnLwDjY
+	 VwXwNrLD5yW3fGSkYb0ogkUzSoxua09GitFLQZnHvCq05tPz5AADXnmouz4zz4q+e0
+	 dORvCKy8rTj9+DWJuu+1+ntt48EEqcxn5vqY4LZFyfTYuZIvCgm7VQ1+nWJoMUWw/n
+	 7VIt5YVO2MnRmebDRATeyP8PMVgaRyVW5WZVDUHlDDm/SYRi1mEfJvwFcQX0uLbhDk
+	 qA/cl7yPNPmTw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net V3 11/15] net/mlx5: Nack sync reset request when HotPlug is enabled
-Date: Tue,  5 Dec 2023 13:45:30 -0800
-Message-ID: <20231205214534.77771-12-saeed@kernel.org>
+	Gavin Li <gavinl@nvidia.com>,
+	Gavi Teitz <gavi@nvidia.com>
+Subject: [net V3 12/15] net/mlx5e: Check netdev pointer before checking its net ns
+Date: Tue,  5 Dec 2023 13:45:31 -0800
+Message-ID: <20231205214534.77771-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231205214534.77771-1-saeed@kernel.org>
 References: <20231205214534.77771-1-saeed@kernel.org>
@@ -56,68 +56,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Moshe Shemesh <moshe@nvidia.com>
+From: Gavin Li <gavinl@nvidia.com>
 
-Current sync reset flow is not supported when PCIe bridge connected
-directly to mlx5 device has HotPlug interrupt enabled and can be
-triggered on link state change event. Return nack on reset request in
-such case.
+Previously, when comparing the net namespaces, the case where the netdev
+doesn't exist wasn't taken into account, and therefore can cause a crash.
+In such a case, the comparing function should return false, as there is no
+netdev->net to compare the devlink->net to.
 
-Fixes: 92501fa6e421 ("net/mlx5: Ack on sync_reset_request only if PF can do reset_now")
-Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Shay Drory <shayd@nvidia.com>
+Furthermore, this will result in an attempt to enter switchdev mode
+without a netdev to fail, and which is the desired result as there is no
+meaning in switchdev mode without a net device.
+
+Fixes: 662404b24a4c ("net/mlx5e: Block entering switchdev mode with ns inconsistency")
+Signed-off-by: Gavin Li <gavinl@nvidia.com>
+Reviewed-by: Gavi Teitz <gavi@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/core/fw_reset.c    | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ .../mellanox/mlx5/core/eswitch_offloads.c        | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-index b568988e92e3..c4e19d627da2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-@@ -325,6 +325,29 @@ static void mlx5_fw_live_patch_event(struct work_struct *work)
- 		mlx5_core_err(dev, "Failed to reload FW tracer\n");
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index bf78eeca401b..bb8bcb448ae9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -3653,14 +3653,18 @@ static int esw_inline_mode_to_devlink(u8 mlx5_mode, u8 *mode)
+ 
+ static bool esw_offloads_devlink_ns_eq_netdev_ns(struct devlink *devlink)
+ {
++	struct mlx5_core_dev *dev = devlink_priv(devlink);
+ 	struct net *devl_net, *netdev_net;
+-	struct mlx5_eswitch *esw;
+-
+-	esw = mlx5_devlink_eswitch_nocheck_get(devlink);
+-	netdev_net = dev_net(esw->dev->mlx5e_res.uplink_netdev);
+-	devl_net = devlink_net(devlink);
++	bool ret = false;
+ 
+-	return net_eq(devl_net, netdev_net);
++	mutex_lock(&dev->mlx5e_res.uplink_netdev_lock);
++	if (dev->mlx5e_res.uplink_netdev) {
++		netdev_net = dev_net(dev->mlx5e_res.uplink_netdev);
++		devl_net = devlink_net(devlink);
++		ret = net_eq(devl_net, netdev_net);
++	}
++	mutex_unlock(&dev->mlx5e_res.uplink_netdev_lock);
++	return ret;
  }
  
-+#if IS_ENABLED(CONFIG_HOTPLUG_PCI_PCIE)
-+static int mlx5_check_hotplug_interrupt(struct mlx5_core_dev *dev)
-+{
-+	struct pci_dev *bridge = dev->pdev->bus->self;
-+	u16 reg16;
-+	int err;
-+
-+	if (!bridge)
-+		return -EOPNOTSUPP;
-+
-+	err = pcie_capability_read_word(bridge, PCI_EXP_SLTCTL, &reg16);
-+	if (err)
-+		return err;
-+
-+	if ((reg16 & PCI_EXP_SLTCTL_HPIE) && (reg16 & PCI_EXP_SLTCTL_DLLSCE)) {
-+		mlx5_core_warn(dev, "FW reset is not supported as HotPlug is enabled\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+#endif
-+
- static int mlx5_check_dev_ids(struct mlx5_core_dev *dev, u16 dev_id)
- {
- 	struct pci_bus *bridge_bus = dev->pdev->bus;
-@@ -357,6 +380,12 @@ static bool mlx5_is_reset_now_capable(struct mlx5_core_dev *dev)
- 		return false;
- 	}
- 
-+#if IS_ENABLED(CONFIG_HOTPLUG_PCI_PCIE)
-+	err = mlx5_check_hotplug_interrupt(dev);
-+	if (err)
-+		return false;
-+#endif
-+
- 	err = pci_read_config_word(dev->pdev, PCI_DEVICE_ID, &dev_id);
- 	if (err)
- 		return false;
+ int mlx5_eswitch_block_mode(struct mlx5_core_dev *dev)
 -- 
 2.43.0
 
