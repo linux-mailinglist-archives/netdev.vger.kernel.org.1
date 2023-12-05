@@ -1,120 +1,115 @@
-Return-Path: <netdev+bounces-54001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10645805948
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:59:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 345A880594F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 886471F2156A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:59:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0485B20E43
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9226260B91;
-	Tue,  5 Dec 2023 15:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA3A60B9C;
+	Tue,  5 Dec 2023 16:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iKqBKfFS"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="LUXNMk3o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF04A120
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:58:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701791936; x=1733327936;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UNI2sjfhfAVzVBgHSg5tQ21tJQX6wOTTkGMNm8iRUbg=;
-  b=iKqBKfFS+5hxYWoBwhVu5CLxjRReIo15G4IOHsUGAw7wnAScc5Fod7QN
-   Rqw2/iLdhk0PsuNAzoLsaa9D+qSoYVjthwLwSwJgo7EFMCpOUypbKGCrH
-   wDSCEGfzjv9VcuxaJhQAWDTU+/kYgpDAaEz6cxGNegbzZ4Ez9h20bfYyP
-   GNiMfDkKKFou1xMcx86OlZPTpAK+o4TZ1Kiwq/6W3jfTIPABJez6D4fOx
-   a+TEEFLNJSWkpDQdpDZ+nAVPWN4U+YU6QMI7HqSkZ2CjNpdwoD9IiaY+m
-   C8AVtCrxMjUqvYiABlmYILCCXcTBer31r7gtNtvcWHEh6jBDoeMRFmJBN
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="979025"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="979025"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 07:58:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="837010730"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="837010730"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 07:58:52 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rAXou-000000024uA-2q04;
-	Tue, 05 Dec 2023 17:58:48 +0200
-Date: Tue, 5 Dec 2023 17:58:48 +0200
-From: "andriy.shevchenko@linux.intel.com" <andriy.shevchenko@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"Hadi Salim, Jamal" <jhs@mojatatu.com>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"Nambiar, Amritha" <amritha.nambiar@intel.com>,
-	"sdf@google.com" <sdf@google.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [patch net-next v4 8/9] devlink: add a command to set
- notification filter and use it for multicasts
-Message-ID: <ZW9IuN82orhqwjvV@smile.fi.intel.com>
-References: <20231123181546.521488-1-jiri@resnulli.us>
- <20231123181546.521488-9-jiri@resnulli.us>
- <6dbb53ac-ec93-31cd-5201-0d49b0fdf0bb@intel.com>
- <ZW39QoYQUSyIr89P@nanopsycho>
- <CO1PR11MB5089142F465D060B9AE3FDC0D686A@CO1PR11MB5089.namprd11.prod.outlook.com>
- <ZW7Vn4F6bm2hYgpi@nanopsycho>
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4895B194
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:00:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=ocHwCN7Qch9RFn3Q8RQY6psnCivqAr3KyNEVY6wSi4M=; t=1701792016; x=1703001616; 
+	b=LUXNMk3oz0fU4+Tfhi4JuCeV3pRmDwF8M6fQIj4533FyiUTgNM7vsNv7MlQHVrOR3gedJPLyy20
+	SBR8avUXA1dCOJbBU4+N2B6QPfPgMeqBHTleCYp/XUBaM2FKaHvcFJ45JPfjXoO7oys98yrhktAVq
+	WCI1mdV/PLGRiOijbXuI0LUcNZ1td7FsBK40q+/W83NPxVGPaRZC7HPqpM9aw34Ey3tBUGF83RWcZ
+	lJ4ABRp0ea5SVS8f7jposLqSpDRb8bSOyz4B/4D8KP89RG8xZCTjAVQI8s4LAMXiuMFfcW17swnP6
+	UCM2DinMLqWfTlMuCYou2xhOAxdrB3I+x7mQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rAXqH-0000000GOm7-0zNb;
+	Tue, 05 Dec 2023 17:00:13 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next] net: rtnetlink: remove local list in __linkwatch_run_queue()
+Date: Tue,  5 Dec 2023 17:00:11 +0100
+Message-ID: <20231205170011.56576dcc1727.I698b72219d9f6ce789bd209b8f6dffd0ca32a8f2@changeid>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZW7Vn4F6bm2hYgpi@nanopsycho>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 05, 2023 at 08:47:43AM +0100, Jiri Pirko wrote:
-> Mon, Dec 04, 2023 at 08:17:24PM CET, jacob.e.keller@intel.com wrote:
-> >> -----Original Message-----
-> >> From: Jiri Pirko <jiri@resnulli.us>
-> >> Sent: Monday, December 4, 2023 8:25 AM
-> >> Mon, Nov 27, 2023 at 04:40:22PM CET, przemyslaw.kitszel@intel.com wrote:
-> >> >On 11/23/23 19:15, Jiri Pirko wrote:
+From: Johannes Berg <johannes.berg@intel.com>
 
-...
+Due to linkwatch_forget_dev() (and perhaps others?) checking for
+list_empty(&dev->link_watch_list), we must have all manipulations
+of even the local on-stack list 'wrk' here under spinlock, since
+even that list can be reached otherwise via dev->link_watch_list.
 
-> >> >> +	if (attrs[DEVLINK_ATTR_BUS_NAME])
-> >> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_BUS_NAME]) + 1;
-> >> >> +	if (attrs[DEVLINK_ATTR_DEV_NAME])
-> >> >> +		data_size += nla_len(attrs[DEVLINK_ATTR_DEV_NAME]) + 1;
-> >> >> +
-> >> >> +	flt = kzalloc(sizeof(*flt) + data_size, GFP_KERNEL);
-> >> >
-> >> >instead of arithmetic here, you could use struct_size()
-> >> 
-> >> That is used for flex array, yet I have no flex array here.
-> >
-> >Yea this isn't a flexible array. You could use size_add to ensure that this
-> >can't overflow. I don't know what the bound on the attribute sizes is.
-> 
-> Okay, will do that to be on a safe side.
+This is already the case, but makes this a bit counter-intuitive,
+often local lists are used to _not_ have to use locking for their
+local use.
 
-If we go this direction it may be makes sense to have done inside nla_len():ish
-type of helper, so it will be once for everyone. But I haven't checked the code
-on how many cases we have when we need to count the size depending on the present
-attributes.
+Remove the local list as it doesn't seem to serve any purpose.
+While at it, move a variable declaration into the loop using it.
 
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ net/core/link_watch.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index c469d1c4db5d..ed3e5391fa79 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -192,8 +192,6 @@ static void __linkwatch_run_queue(int urgent_only)
+ #define MAX_DO_DEV_PER_LOOP	100
+ 
+ 	int do_dev = MAX_DO_DEV_PER_LOOP;
+-	struct net_device *dev;
+-	LIST_HEAD(wrk);
+ 
+ 	/* Give urgent case more budget */
+ 	if (urgent_only)
+@@ -215,11 +213,11 @@ static void __linkwatch_run_queue(int urgent_only)
+ 	clear_bit(LW_URGENT, &linkwatch_flags);
+ 
+ 	spin_lock_irq(&lweventlist_lock);
+-	list_splice_init(&lweventlist, &wrk);
++	while (!list_empty(&lweventlist) && do_dev > 0) {
++		struct net_device *dev;
+ 
+-	while (!list_empty(&wrk) && do_dev > 0) {
+-
+-		dev = list_first_entry(&wrk, struct net_device, link_watch_list);
++		dev = list_first_entry(&lweventlist, struct net_device,
++				       link_watch_list);
+ 		list_del_init(&dev->link_watch_list);
+ 
+ 		if (!netif_device_present(dev) ||
+@@ -237,9 +235,6 @@ static void __linkwatch_run_queue(int urgent_only)
+ 		spin_lock_irq(&lweventlist_lock);
+ 	}
+ 
+-	/* Add the remaining work back to lweventlist */
+-	list_splice_init(&wrk, &lweventlist);
+-
+ 	if (!list_empty(&lweventlist))
+ 		linkwatch_schedule_work(0);
+ 	spin_unlock_irq(&lweventlist_lock);
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.43.0
 
 
