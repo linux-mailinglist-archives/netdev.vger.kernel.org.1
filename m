@@ -1,162 +1,151 @@
-Return-Path: <netdev+bounces-54127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9788060A7
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:24:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A2168060CD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 22:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA8751F21794
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:24:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CA5F1C2102E
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 21:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31856E594;
-	Tue,  5 Dec 2023 21:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0846E5B8;
+	Tue,  5 Dec 2023 21:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="ouEwpuIw"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="COJCdoI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FCFD46
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:24:43 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-50bf32c0140so3568984e87.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 13:24:43 -0800 (PST)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D4C2721
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 13:31:32 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-db54ec0c7b8so238863276.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 13:31:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701811481; x=1702416281; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDjB2+9d0q9+F4oO9wErWsIqLBdeODlH8UsFKkO9NRk=;
-        b=ouEwpuIwF/prN1AtNpse+88UlhrjkoYTI/6pR/Lpn3HBBKBhnPu/SRloONvaKHobhJ
-         mJsrvWoJVLIIfaXY61ZSamVw8Cppn8846WrauyuOlAA+zcY56tE66/XG31mn/JC021V1
-         FXW0Or2N5xjE6eoOe6gz0HEphdH7JxGVtwWrI486Z3dunucBfZoH1Papw2uYqmDNl5CX
-         tekg3n5gsyjHzh0v4b5ufNlYT9tWZZY5xjRkEOl9y8KcLYqhpJ4eNwIfWzj7H4Tefaub
-         XmdbEgBdx5K/1CQNtvLnzjvf0PQxlZeHYQKQuCfK31DiZPGx8WjmwzbJXGsTagVxcKLI
-         lVJQ==
+        d=paul-moore.com; s=google; t=1701811891; x=1702416691; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DCWlUj7m/TUVBxbveuACbE3ZhjXxRgHmisPs0nAyjOE=;
+        b=COJCdoI6jSTFYAszq36g6D2WpqboTfn5ALcUwpywY94chncEGF4Zhx8pf75MmxLPzo
+         ZwCp7Z6/2G09OF+WeisyAseTTjKgb6rMMbNsXExQH2qH5BOBXDRrV+myWLK1CABNV4UC
+         zb2804oXsAVU6bMac6FJ1q0ZTYodqdRm5j30uvzHFvYd3Oe5P0wOFMt2lYaPnCeDHgAi
+         zRpb32eUWK+6FGukiXm1UTv7k0qooljNRjMizZRL41dgLZ69N764xB5Auh/PBMqpCNQj
+         APZK3V3E899zYfZbl9pNMQbGUfdZDOz2ivTkzRWuhoc+MvyBkpUkv//AeLJ5JisCWEJJ
+         u7Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701811481; x=1702416281;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wDjB2+9d0q9+F4oO9wErWsIqLBdeODlH8UsFKkO9NRk=;
-        b=sn6c4IvNfEnMi+vKkKeojRTvbB6gaEnLkAkhgbSqOSf1ZOVRjiCroyeBLyhak+TrR4
-         iO/OswY+mrapu7lpA4Yd58vUQUpE7xky3PYrxIbQhF3gE9hYZMyzUbjk5C8inWyBztQD
-         BrvQmHw0Rw15yxdNsGyZag1FaK6gSQH9UtwP+BnHG9IAUBttcVcZbwJCEcIWBdQMJro0
-         uEzDK3HLg4RH3zotZdbdVu5Rh5xS+4ebcs6ZUXk1S7vaP33gDXABqmDnlCrF435ymZDU
-         jnw+vAC4nL+WLU/1vMiZOc/DB/YbnSanJxognr4JGEXwsElI1lmGh+f1RWP/mEvhcy0E
-         P2yw==
-X-Gm-Message-State: AOJu0YxyeMWTFuvFU9U0+5FEWPQszgoTp/DZ7Zdxy0rSwiVgDykKEJqv
-	3/RGC/OFW5swhsvaF/xIJCtthU/fqderGEWpbvw=
-X-Google-Smtp-Source: AGHT+IG0uNSjwW0GH2/1Xl9elFsgq6HfvmQK4XtQKTQuFolA5Q104UFVGqeFXm+9rtDyrQ8OIYvTZg==
-X-Received: by 2002:a05:6512:3d8e:b0:50b:e625:245c with SMTP id k14-20020a0565123d8e00b0050be625245cmr3336848lfv.47.1701811481065;
-        Tue, 05 Dec 2023 13:24:41 -0800 (PST)
-Received: from wkz-x13 (h-176-10-137-178.NA.cust.bahnhof.se. [176.10.137.178])
-        by smtp.gmail.com with ESMTPSA id o12-20020ac2494c000000b0050bf0320718sm942068lfi.95.2023.12.05.13.24.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 13:24:40 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
- f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 5/6] net: dsa: mv88e6xxx: Add "eth-mac"
- counter group support
-In-Reply-To: <20231205180740.aenvbx6vxbx3d6o4@skbuf>
-References: <20231205180740.aenvbx6vxbx3d6o4@skbuf>
-Date: Tue, 05 Dec 2023 22:24:39 +0100
-Message-ID: <87y1e88hrc.fsf@waldekranz.com>
+        d=1e100.net; s=20230601; t=1701811891; x=1702416691;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DCWlUj7m/TUVBxbveuACbE3ZhjXxRgHmisPs0nAyjOE=;
+        b=uksmAw8iHfGnI0h63kiOsGudvfIt7fh0JsE8kr/EIJtXCX16WM9wVcTdAkjAoi+ymL
+         VzyTjqkf6SxhOYaFNQFIad4J3hNXnIBFG9v5wdSQRpa1hkCtiwd0iMDXqUWFXYVUecuF
+         qG3myFV/xe7BQkNhrw4QZLa3EisqlLde3khw0/Qwpk/AVe4IdjfaqWHeaNVINktmoqGR
+         c930lvKDEH4F0iksa5I6XPv12mROct9XDkb+4ZTGrCHr58c/QApxx7tBLJNMudSBDBIt
+         zR70k1t9ZrmwsqHYA5lJ8+g1HnWwyLvjAuT20SYvVyj55+Jt3gfs4GpvvzfQUHH0RHND
+         vOig==
+X-Gm-Message-State: AOJu0Yyo7DKTWTrO1GmBvJxrPhIK30IEDH67HuqdwR2Eo2kN5GNE9nk/
+	tyu5pZT8hRpAQeayF+Kg3Pflu0W7ncrLZa2Q/DTD
+X-Google-Smtp-Source: AGHT+IHwOBCUJ7VoDCxkP/0bmnjLbDc1iTH7bsrP/zrgAjrf91uJBTPKrWd6z8h4v3WgDEBA+xmeV8A5C/Hd1wf57zg=
+X-Received: by 2002:a25:f445:0:b0:db7:dacf:6f4 with SMTP id
+ p5-20020a25f445000000b00db7dacf06f4mr1296574ybe.56.1701811891206; Tue, 05 Dec
+ 2023 13:31:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231123092314.91299-1-Ilia.Gavrilov@infotecs.ru> <CAHC9VhQGX_22WTdZG4+K8WYQK-G21j8NM9Wy0TodgPAZk57TCQ@mail.gmail.com>
+In-Reply-To: <CAHC9VhQGX_22WTdZG4+K8WYQK-G21j8NM9Wy0TodgPAZk57TCQ@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 5 Dec 2023 16:31:20 -0500
+Message-ID: <CAHC9VhTEREuTymgMW8zmQcRZCOpW8M0MZPcKto17ve5Aw1_2gg@mail.gmail.com>
+Subject: Re: [PATCH net v2] calipso: Fix memory leak in netlbl_calipso_add_pass()
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Huw Davies <huw@codeweavers.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-security-module@vger.kernel.org" <linux-security-module@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On tis, dec 05, 2023 at 20:07, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
-> On Tue, Dec 05, 2023 at 05:04:17PM +0100, Tobias Waldekranz wrote:
->> Report the applicable subset of an mv88e6xxx port's counters using
->> ethtool's standardized "eth-mac" counter group.
->> 
->> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->> ---
->>  drivers/net/dsa/mv88e6xxx/chip.c | 39 ++++++++++++++++++++++++++++++++
->>  1 file changed, 39 insertions(+)
->> 
->> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
->> index 473f31761b26..1a16698181fb 100644
->> --- a/drivers/net/dsa/mv88e6xxx/chip.c
->> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
->> @@ -1319,6 +1319,44 @@ static void mv88e6xxx_get_ethtool_stats(struct dsa_switch *ds, int port,
->>  	mv88e6xxx_get_stats(chip, port, data);
->>  }
->>  
->> +static void mv88e6xxx_get_eth_mac_stats(struct dsa_switch *ds, int port,
->> +					struct ethtool_eth_mac_stats *mac_stats)
->> +{
->> +	struct mv88e6xxx_chip *chip = ds->priv;
->> +	int ret;
->> +
->> +	ret = mv88e6xxx_stats_snapshot(chip, port);
->> +	if (ret < 0)
->> +		return;
->> +
->> +#define MV88E6XXX_ETH_MAC_STAT_MAP(_id, _member)			\
->> +	mv88e6xxx_stats_get_stat(chip, port,				\
->> +				 &mv88e6xxx_hw_stats[MV88E6XXX_HW_STAT_ID_ ## _id], \
->> +				 &mac_stats->stats._member)
->> +
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(out_unicast, FramesTransmittedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(single, SingleCollisionFrames);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(multiple, MultipleCollisionFrames);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(in_unicast, FramesReceivedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(in_fcs_error, FrameCheckSequenceErrors);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(out_octets, OctetsTransmittedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(deferred, FramesWithDeferredXmissions);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(late, LateCollisions);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(in_good_octets, OctetsReceivedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(out_multicasts, MulticastFramesXmittedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(out_broadcasts, BroadcastFramesXmittedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(excessive, FramesWithExcessiveDeferral);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(in_multicasts, MulticastFramesReceivedOK);
->> +	MV88E6XXX_ETH_MAC_STAT_MAP(in_broadcasts, BroadcastFramesReceivedOK);
->> +
->> +#undef MV88E6XXX_ETH_MAC_STAT_MAP
+On Sat, Nov 25, 2023 at 9:47=E2=80=AFAM Paul Moore <paul@paul-moore.com> wr=
+ote:
 >
-> I don't exactly enjoy this use (and placement) of the C preprocessor macro
-> when spelling out code would have worked just fine, but to each his own.
-> At least it is consistent in that we can jump to the other occurrences
-> of the statistics counter.
-
-Fair enough. I was trying to come up with something that would make it
-easy to audit the chosen mapping between "native" and "standard" counter
-names, since I imagine that is what future readers of this are going to
-be interested in.
-
->> +
->> +	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.MulticastFramesXmittedOK;
->> +	mac_stats->stats.FramesTransmittedOK += mac_stats->stats.BroadcastFramesXmittedOK;
->> +	mac_stats->stats.FramesReceivedOK += mac_stats->stats.MulticastFramesReceivedOK;
->> +	mac_stats->stats.FramesReceivedOK += mac_stats->stats.BroadcastFramesReceivedOK;
->> +}
+> On Thu, Nov 23, 2023 at 4:25=E2=80=AFAM Gavrilov Ilia <Ilia.Gavrilov@info=
+tecs.ru> wrote:
+> >
+> > If IPv6 support is disabled at boot (ipv6.disable=3D1),
+> > the calipso_init() -> netlbl_calipso_ops_register() function isn't call=
+ed,
+> > and the netlbl_calipso_ops_get() function always returns NULL.
+> > In this case, the netlbl_calipso_add_pass() function allocates memory
+> > for the doi_def variable but doesn't free it with the calipso_doi_free(=
+).
+> >
+> > BUG: memory leak
+> > unreferenced object 0xffff888011d68180 (size 64):
+> >   comm "syz-executor.1", pid 10746, jiffies 4295410986 (age 17.928s)
+> >   hex dump (first 32 bytes):
+> >     00 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00  ................
+> >     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> >   backtrace:
+> >     [<00000000730d8770>] kmalloc include/linux/slab.h:552 [inline]
+> >     [<00000000730d8770>] netlbl_calipso_add_pass net/netlabel/netlabel_=
+calipso.c:76 [inline]
+> >     [<00000000730d8770>] netlbl_calipso_add+0x22e/0x4f0 net/netlabel/ne=
+tlabel_calipso.c:111
+> >     [<0000000002e662c0>] genl_family_rcv_msg_doit+0x22f/0x330 net/netli=
+nk/genetlink.c:739
+> >     [<00000000a08d6d74>] genl_family_rcv_msg net/netlink/genetlink.c:78=
+3 [inline]
+> >     [<00000000a08d6d74>] genl_rcv_msg+0x341/0x5a0 net/netlink/genetlink=
+.c:800
+> >     [<0000000098399a97>] netlink_rcv_skb+0x14d/0x440 net/netlink/af_net=
+link.c:2515
+> >     [<00000000ff7db83b>] genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
+> >     [<000000000cf53b8c>] netlink_unicast_kernel net/netlink/af_netlink.=
+c:1313 [inline]
+> >     [<000000000cf53b8c>] netlink_unicast+0x54b/0x800 net/netlink/af_net=
+link.c:1339
+> >     [<00000000d78cd38b>] netlink_sendmsg+0x90a/0xdf0 net/netlink/af_net=
+link.c:1934
+> >     [<000000008328a57f>] sock_sendmsg_nosec net/socket.c:651 [inline]
+> >     [<000000008328a57f>] sock_sendmsg+0x157/0x190 net/socket.c:671
+> >     [<000000007b65a1b5>] ____sys_sendmsg+0x712/0x870 net/socket.c:2342
+> >     [<0000000083da800e>] ___sys_sendmsg+0xf8/0x170 net/socket.c:2396
+> >     [<000000004a9b827f>] __sys_sendmsg+0xea/0x1b0 net/socket.c:2429
+> >     [<0000000061b64d3a>] do_syscall_64+0x30/0x40 arch/x86/entry/common.=
+c:46
+> >     [<00000000a1265347>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+> >
+> > Found by InfoTeCS on behalf of Linux Verification Center
+> > (linuxtesting.org) with Syzkaller
+> >
+> > Fixes: cb72d38211ea ("netlabel: Initial support for the CALIPSO netlink=
+ protocol.")
+> > Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+> > ---
+> > v2:
+> >   - return the error code in netlbl_calipso_add() if the variable calip=
+so_hops is NULL
+> > v1: https://lore.kernel.org/all/20231122135242.2779058-1-Ilia.Gavrilov@=
+infotecs.ru/
+> >
+> >  net/netlabel/netlabel_calipso.c | 49 +++++++++++++++++----------------
+> >  1 file changed, 26 insertions(+), 23 deletions(-)
 >
-> Not sure if there's a "best thing to do" in case a previous mv88e6xxx_stats_get_stat()
-> call fails. In net/ethtool/stats.c we have ethtool_stats_sum(), and that's the
-> core saying that U64_MAX means one of the sum terms was not reported by
-> the driver, and it makes that transparent by simply returning the other.
+> This looks good to me, thanks!
 >
-> Here, "not reported by the driver" is due to a bus I/O error, and using
-> ethtool_stats_sum() as-is would hide that error away completely, and
-> report only the other sum term. Sounds like a failure that would be too
-> silent. Whereas your proposal would just report a wildly incorrect
-> number - but at high data rates (for offloaded traffic, too), maybe that
-> wouldn't be exactly trivial to notice, either.
->
-> Maybe we need a variant of ethtool_stats_sum() that requires both terms,
-> otherwise returns ETHTOOL_STAT_NOT_SET?
+> Acked-by: Paul Moore <paul@paul-moore.com>
 
-That sounds like a good idea.
+A quick follow-up to see if this patch was picked up by the networking
+folks?  I didn't get a patchwork notification, and I don't see it in
+Linus' tree, but perhaps I missed something?
 
-> Anyway, this is not a blocker for the current patch set, which is a bit
-> too large to resend for trivial matters.
->
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-
-Thanks for the review!
+--=20
+paul-moore.com
 
