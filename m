@@ -1,147 +1,166 @@
-Return-Path: <netdev+bounces-54040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD07805B2A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:33:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920F9805B44
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:44:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48485B21027
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:33:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E191F212E1
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD87268B67;
-	Tue,  5 Dec 2023 17:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B7B68B81;
+	Tue,  5 Dec 2023 17:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embedd.com header.i=@embedd.com header.b="HTe6Ekar";
-	dkim=pass (1024-bit key) header.d=embedd.com header.i=@embedd.com header.b="lcmjBcLh"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Lh9kok/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.as201155.net (mail.as201155.net [185.84.6.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE84B18D
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=embedd.com;
-	s=dkim1; h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ozlpccOc57vALYVDByoFC351FCd7Cc1UYQhrqYThCwc=; b=HTe6EkarLNVlnZmCoY9NZNjc5q
-	yaoRGUtKidEYITDIltpElIpcNiX2KCk/TSoryaLLgS5XWeVPR7fjKmOKYIL4CJYJbt1zyLciUUQtH
-	i4DMT6WpxIZ9Sm25ZHTjW9nMoYVtuFMu6fqrVuRVc59n+HHMPJvO9B5UTJALuWtdnFasXSmPBjUVV
-	lNZtuX6VHJWC+8rz5ALVokvwNjkcKFuBfmde5HlWLOdcH2hazSpln9ko2pXxYOHtigbhNkS541fLK
-	82WqAh8XribmpV27Qmk7qtz4QJyhG13VNszFPFVYTabXbBQKW1z8Zw5Sve/NDG6B7ip6BWTWKFc/R
-	iy8po6nA==;
-Received: from smtps.newmedia-net.de ([2a05:a1c0:0:de::167]:36568 helo=webmail.newmedia-net.de)
-	by mail.as201155.net with esmtps  (TLS1) tls TLS_RSA_WITH_AES_256_CBC_SHA
-	(Exim 4.96)
-	(envelope-from <dd@embedd.com>)
-	id 1rAZIg-0005wV-3C;
-	Tue, 05 Dec 2023 18:33:39 +0100
-X-SASI-Hits: BODYTEXTP_SIZE_3000_LESS 0.000000, BODY_SIZE_1100_1199 0.000000,
-	BODY_SIZE_2000_LESS 0.000000, BODY_SIZE_5000_LESS 0.000000,
-	BODY_SIZE_7000_LESS 0.000000, CTE_QUOTED_PRINTABLE 0.000000,
-	CT_TEXT_PLAIN_UTF8_CAPS 0.000000, DKIM_ALIGNS 0.000000,
-	DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
-	IN_REP_TO 0.000000, LEGITIMATE_SIGNS 0.000000, MSG_THREAD 0.000000,
-	MULTIPLE_RCPTS 0.100000, MULTIPLE_REAL_RCPTS 0.000000, NO_CTA_FOUND 0.000000,
-	NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_FOUND 0.000000,
-	NO_URI_HTTPS 0.000000, OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000,
-	REFERENCES 0.000000, RETURN_RECEIPT 0.500000, SENDER_NO_AUTH 0.000000,
-	SUSP_DH_NEG 0.000000, __BODY_NO_MAILTO 0.000000,
-	__BOUNCE_CHALLENGE_SUBJ 0.000000, __BOUNCE_NDR_SUBJ_EXEMPT 0.000000,
-	__BULK_NEGATE 0.000000, __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
-	__CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
-	__CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
-	__DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
-	__FORWARDED_MSG 0.000000, __FROM_DOMAIN_NOT_IN_BODY 0.000000,
-	__FROM_NAME_NOT_IN_ADDR 0.000000, __FUR_RDNS_SOPHOS 0.000000,
-	__HAS_CC_HDR 0.000000, __HAS_FROM 0.000000, __HAS_MSGID 0.000000,
-	__HAS_REFERENCES 0.000000, __HEADER_ORDER_FROM 0.000000,
-	__IN_REP_TO 0.000000, __MAIL_CHAIN 0.000000, __MIME_BOUND_CHARSET 0.000000,
-	__MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
-	__MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
-	__NOTIFICATION_TO 0.000000, __NO_HTML_TAG_RAW 0.000000,
-	__OUTBOUND_SOPHOS_FUR 0.000000, __OUTBOUND_SOPHOS_FUR_IP 0.000000,
-	__OUTBOUND_SOPHOS_FUR_RDNS 0.000000, __RCVD_PASS 0.000000,
-	__REFERENCES 0.000000, __SANE_MSGID 0.000000, __SCAN_D_NEG 0.000000,
-	__SCAN_D_NEG2 0.000000, __SCAN_D_NEG_HEUR 0.000000,
-	__SCAN_D_NEG_HEUR2 0.000000, __SUBJ_ALPHA_END 0.000000,
-	__SUBJ_ALPHA_NEGATE 0.000000, __SUBJ_REPLY 0.000000, __TO_GMAIL 0.000000,
-	__TO_MALFORMED_2 0.000000, __TO_NAME 0.000000,
-	__TO_NAME_DIFF_FROM_ACC 0.000000, __TO_REAL_NAMES 0.000000,
-	__URI_NO_MAILTO 0.000000, __USER_AGENT 0.000000, __X_MAILSCANNER 0.000000
-X-SASI-Probability: 10%
-X-SASI-RCODE: 200
-X-SASI-Version: Antispam-Engine: 5.1.4, AntispamData: 2023.12.5.170315
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=embedd.com; s=mikd;
-	h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID; bh=ozlpccOc57vALYVDByoFC351FCd7Cc1UYQhrqYThCwc=;
-	b=lcmjBcLhWKf/9FWqBwLHOQTmezb619k9uDQ6FojmA27lWFjvupNFIuR7YmCRLcAItR6vcgpLYZ7/RoL/V/M48UMep/l9AIlmpvLXlGpT7EzPjzVHztDNaEOIEIThD2AbuhHtSEPZeZm22/39/uhxRcFSqQ6Eu+5HGWqretCV8fo=;
-Message-ID: <e37d2c6678f33b490e8ab56cd1472429ca3dcc7a.camel@embedd.com>
-Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
- platform init
-From: Daniel Danzberger <dd@embedd.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, 
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
-	 <f.fainelli@gmail.com>
-Date: Tue, 05 Dec 2023 18:33:18 +0100
-In-Reply-To: <20231205165540.jnmzuh4pb5xayode@skbuf>
-References: <20231204154315.3906267-1-dd@embedd.com>
-	 <20231204174330.rjwxenuuxcimbzce@skbuf>
-	 <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
-	 <20231205165540.jnmzuh4pb5xayode@skbuf>
-Disposition-Notification-To: dd@embedd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1-1 
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6416122;
+	Tue,  5 Dec 2023 09:44:43 -0800 (PST)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B5Gj8Mr010893;
+	Tue, 5 Dec 2023 17:44:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=7Dbf8waRVZWnAgsVdsH/eiTCT+E25OhHyj04Hkrg56o=;
+ b=Lh9kok/0AOSA/tfddxmjE5nno6Xt+gIZ8tggXx1BymMcJ69umeN7plU9WlkH5J5wr19H
+ 9KX0W00ZIND2N9ELN2DACyNzOzPkJjRNnyc8Rie+x3SbY5lCd2Gma8MibbZ6Jbv2JUkU
+ Li9AJCkKKoeF0vOAoaeE9rNglTFmUvDWdNpn0bUYl8Gu2O5kda7oL7rYV24hUfhFcPUj
+ O5UP9grpDVwW+/heR/BjduyidqLJ4KhrLP0EjpR5u/QQfzr5RHzJ+0TH+q7QMXTuL/zR
+ eKmMK5LgDXlI64yElQTcnJ89/tu8+JTJSzJ81okbHcQ7W1XEPW8Fw25yazxRtS+GOaP/ JA== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ut71qr91c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Dec 2023 17:44:08 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3B5Hi76q002025
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 5 Dec 2023 17:44:07 GMT
+Received: from [10.110.89.58] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 5 Dec
+ 2023 09:44:06 -0800
+Message-ID: <d2762241-f60a-4d61-babe-ce9535d9adde@quicinc.com>
+Date: Tue, 5 Dec 2023 09:44:05 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received-SPF: pass (webmail.newmedia-net.de: localhost is always allowed.) client-ip=127.0.0.1; envelope-from=dd@embedd.com; helo=webmail.newmedia-net.de;
-X-SA-Exim-Connect-IP: 127.0.0.1
-X-SA-Exim-Mail-From: dd@embedd.com
-X-SA-Exim-Scanned: No (on webmail.newmedia-net.de); SAEximRunCond expanded to false
-X-NMN-MailScanner-Information: Please contact the ISP for more information
-X-NMN-MailScanner-ID: 1rAZIN-0005Mp-VR
-X-NMN-MailScanner: Found to be clean
-X-NMN-MailScanner-From: dd@embedd.com
-X-Received:  from localhost.localdomain ([127.0.0.1] helo=webmail.newmedia-net.de)
-	by webmail.newmedia-net.de with esmtp (Exim 4.72)
-	(envelope-from <dd@embedd.com>)
-	id 1rAZIN-0005Mp-VR; Tue, 05 Dec 2023 18:33:20 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package MMD
+ read/write
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Jakub Kicinski
+	<kuba@kernel.org>
+CC: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>,
+        Florian Fainelli <florian.fainelli@broadcom.com>,
+        Broadcom internal kernel
+ review list <bcm-kernel-feedback-list@broadcom.com>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        David Epping
+	<david.epping@missinglinkelectronics.com>,
+        Vladimir Oltean
+	<olteanv@gmail.com>,
+        Harini Katakam <harini.katakam@amd.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <workflows@vger.kernel.org>
+References: <20231128133630.7829-1-ansuelsmth@gmail.com>
+ <20231128133630.7829-3-ansuelsmth@gmail.com>
+ <20231204181752.2be3fd68@kernel.org>
+ <51aae9d0-5100-41af-ade0-ecebeccbc418@lunn.ch>
+ <656f37a6.5d0a0220.96144.356f@mx.google.com>
+ <adbe5299-de4a-4ac1-90d0-f7ae537287d0@lunn.ch>
+ <ZW89errbJWUt33vz@shell.armlinux.org.uk> <20231205072912.2d79a1d5@kernel.org>
+ <ZW9LroqqugXzqAY9@shell.armlinux.org.uk>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <ZW9LroqqugXzqAY9@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: NKpqRX8BKlW1hDj0TKoHrwWvOGQGJROh
+X-Proofpoint-ORIG-GUID: NKpqRX8BKlW1hDj0TKoHrwWvOGQGJROh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-05_12,2023-12-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 priorityscore=1501
+ adultscore=0 bulkscore=0 phishscore=0 suspectscore=0 clxscore=1011
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2312050140
 
-On Tue, 2023-12-05 at 18:55 +0200, Vladimir Oltean wrote:
-> On Tue, Dec 05, 2023 at 09:00:39AM +0100, Daniel Danzberger wrote:
-> > > Is this all that's necessary for instantiating the ksz driver through
-> > > ds->dev->platform_data? I suppose not, so can you post it all, please=
-?
-> > Yes, that NULL pointer was the only issue I encountered.
->=20
-> I was just thinking, the KSZ9477 has internal PHYs on ports 0-4, and an
-> internal MDIO bus registered in ksz_mdio_register(). The bus registration
-> won't work without OF, since it returns early when not finding
-> of_get_child_by_name(dev->dev->of_node, "mdio").
-Interesting, I did not notice that.
-After the NULL pointer issue was fixed the switch just worked.
->=20
-> Don't you need the internal PHY ports to work?
-For now the switch seems to run just fine, with port 0 being the CPU port a=
-nd 1-4 being used as
-regular switch ports.
-I will do some more testing this week however...
+On 12/5/2023 8:11 AM, Russell King (Oracle) wrote:
+> On Tue, Dec 05, 2023 at 07:29:12AM -0800, Jakub Kicinski wrote:
+>> On Tue, 5 Dec 2023 15:10:50 +0000 Russell King (Oracle) wrote:
+>>> I've raised this before in other subsystems, and it's suggested that
+>>> it's better to have it in the .c file. I guess the reason is that it's
+>>> more obvious that the function is documented when modifying it, so
+>>> there's a higher probability that the kdoc will get updated when the
+>>> function is altered.
+>>
+>> Plus I think people using IDEs (i.e. not me) may use the "jump to
+>> definition" functionality, to find the doc? 
+>>
+>> TBH I thought putting kdoc in the C source was documented in the coding
+>> style, but I can't find any mention of it now.
+> 
+> Well, in Documentation/doc-guide/kernel-doc.rst:
+> 
+>   The function and type kernel-doc comments should be placed just before
+>   the function or type being described in order to maximise the chance
+>   that somebody changing the code will also change the documentation.
+> 
+> That implies (but not explicitly) that it should be at the function
+> definition site, since "changing the code" is used as an argument as
+> I did in my previous email.
+> 
+> Secondly, this document goes on to give an example of running
+> scripts/kernel-doc on a .c file.
+> 
+> Thirdly, there are seven references in this document of kernel-doc
+> in .c files, and only one for kernel-doc in a .h file. So this suggests
+> that "it will be in a .c file" isn't a rule (it can't be because of
+> documenting structures!)
+> 
+> So let's not get hung up on whether it should be in .c or .h because I
+> think that isn't relevant. Instead, I think it's about "it should be at
+> the definition site" - that being a structure definition or a function
+> definition, and not at a function prototype.
+> 
+> The only exception I can think of is the style I've used in
+> linux/phylink.h for the _method_ definitions which look like function
+> prototypes - that's just a work-around because one can't kernel-doc
+> the structure-of-function-pointers and document the function parameters
+> without jumping through that hoop, and it would be silly to document
+> the methods in some random driver!
+> 
 
-And probably checkout some DTS files that use that switch to see what other=
- options I might need
-when going the platform_data path.
+The Linux Kernel philosophy of documenting functions instead of
+prototypes has always bothered me since I'm "old school" and am
+ingrained with the software engineering philosophy that you document
+interfaces, not implementations. This was reinforced early in my career
+by working on multiple projects in different programming languages using
+processes outlined in DOD-STD-2167A, and for some projects, especially
+ones written in Ada, the header files were the design and the documentation.
 
->=20
+This philosophy was further enforced when working with closed source
+projects (Windows, IOS, VxWorks) where all the documentation was
+contained in shared header files.
 
---=20
-Regards
+So in my experience a function prototype IS the function definition, and
+the actual function is just the implementation of that definition.
 
-Daniel Danzberger
-embeDD GmbH, Alter Postplatz 2, CH-6370 Stans
+But that thinking obviously isn't shared by others.
+
+/jeff
 
