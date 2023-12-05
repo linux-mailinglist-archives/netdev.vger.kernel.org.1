@@ -1,130 +1,207 @@
-Return-Path: <netdev+bounces-54037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F2F805B1B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:26:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C262805B1C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C912F28195B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:26:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88F9DB2101C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC4067E8E;
-	Tue,  5 Dec 2023 17:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C613F65ECD;
+	Tue,  5 Dec 2023 17:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="k/8iOW9a"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HWrDhAxr"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2070.outbound.protection.outlook.com [40.107.104.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D78DBA
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:26:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bGLxGMN8cOHBtepjgEnU1Z6LN0m9r3kx2MDlD5ebfVtypmB2tM64cBha4cmQ4BoFQuSKDHrKGcWEquw56iX+JYHSAHU0FZkMDok0KIjju0jtzmQQIvkA72sX0zIUtIdHWIuT8cHe0mO/5F/i/wyjexcuNzP2Da6Fd/cb9FXLoW5q39/CyTUDFSPine/ht62s7OtI7x2N2EJxyb4NYENYTpUT4IqHD3FVuvkRZXI+uTIzf+5jdbg+VCixQ55J0HdXoZ42Hkoq8YX5+9xgoec1NeVHzoIHXvVyiwUEX0XZfCOUP38/WglSgju8cKkL5Qxi7h4SBDQoi3Q9LwhGEMTB3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=md3bxOnRXoGzX/MUwh/BDEssXXS33oKjJVdMH9aYX0g=;
- b=cm6tmblpxMdwIoGOq55HGB4TiYTWw35h3dNJlNCJxwWyvEaBB4OToYo75nXItrcUHmGI7WCRhpbegVOr7SofJpRuB44Mx2PE6sPkDqqzTXP5yye+97a6oCcM0dVPP7y1CsCRyh6TDA9EuN1Vx7z9Xe3yAhjtF9q8sIT4xxQxQWUm0KClc3QKBLeGztgCaPoV4boCVSFIEaso9nihDgs0Y/wFmYgYW6hFKqYuc74MieEjltr32Q8VbGybWHX3upZZJvUWs+5jdbBjV6NLcMboaoTR2ZGVAVIoPUnN1HJD7lCvd/H7mfjGk7t7KdEZ8uObTTI2RiEyP1aam7XXscLxqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=md3bxOnRXoGzX/MUwh/BDEssXXS33oKjJVdMH9aYX0g=;
- b=k/8iOW9aW+ZHoOpx1eYD1iUuIgMfZyhjqg9P2Rz7DXdI3Z5u9VCrUIkAjUHBwn3lCmmKGgKD5jNVO9EYXi9lyHw1/2ZBKOUKvRSjVKnxxLxt3+2QoNbhL5KhQNdZvsZ8Ro+w3CgJCAjvw0ph7osMypfP0GPjqz+NFaf//3DK2tU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB8947.eurprd04.prod.outlook.com (2603:10a6:20b:42e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.24; Tue, 5 Dec
- 2023 17:26:41 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7068.012; Tue, 5 Dec 2023
- 17:26:41 +0000
-Date: Tue, 5 Dec 2023 19:26:38 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch,
-	f.fainelli@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 2/6] net: dsa: mv88e6xxx: Create API to read
- a single stat counter
-Message-ID: <20231205172638.nrat5dzvucm3cq3c@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205160418.3770042-3-tobias@waldekranz.com>
-X-ClientProxiedBy: AS4P189CA0030.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5db::17) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E78E188
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:27:32 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40a4848c6e1so63870455e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 09:27:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701797251; x=1702402051; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vhcUNlmdgJstzF2N43vMJv4MrkkmoZWHzFoo+Jlhya4=;
+        b=HWrDhAxrf/GR+YgBqJjjvVsLJq99O3HgYOfOCGqMFIoJ6JGMFWVoZxPPoU2sg0RPGA
+         /PhF+2DYEyYuIuysp1O6jUGb6BOCBli+oxhUY1/NH6iYQNofidsryveY4mD3WSKzIYnj
+         lSPYEOsqb80Bmt8cPE69/EgLHtKreMpg/izEJKv+Ryj7HArJgNGlEjOZBaATMUoBn36u
+         TyuMiVZHBu/iKN3lIGecdE/lqLKtqNPCwxYtWFwvhHVmnCqSIoAQWw0O1VVSwwBqHAXQ
+         Vt5cx0m+j4q03b1qQ0OM5AMHkaCTUieUpI2HbpuWtDy2UQ3mfrJ7HC+XsVcLuKEWfalm
+         eSOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701797251; x=1702402051;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vhcUNlmdgJstzF2N43vMJv4MrkkmoZWHzFoo+Jlhya4=;
+        b=bPwm1rPfI9e1ePXf+mx7x4jeAu04VptnIs6GSR2kYqPorR2MJqCd9p1S4MIRC9ZwbO
+         t1HjiKbI5I7iZtYUO8PEFH/Vj4rEPUgVZdKBZ/bfT/RVNgceIkRmCn98tSOvsaDTohdZ
+         seqBKmJIfdfZFtfacC6Qmv1DXFYwKBZnFUxtGw3FgCSZSfXD9A4ePCl/0eXkif1V5XVc
+         J6sCrl1W9hCshIFu/tFu3Cpwix/oqudyC5DHA/ALf2lhKsthQ8EuDRdY0K/+zUoTgfLd
+         yHtVVB+BO3rKE036vHb8qgOzkBfPgUbXu7xMhT3vpYKDdlpiLFl9mBBigSs5SMzaqICL
+         l07A==
+X-Gm-Message-State: AOJu0YxZhQmijNLF5rabi4aZ7U6xD7MPtw18lvEeBFMDAAIDhWnWX+u/
+	xy/fUglp+wClY2Yg8YoTL45Prw==
+X-Google-Smtp-Source: AGHT+IE87h13X2oU66Q1tgHVT4uxOvk/B+Km1pW6U4ShM+U9Gfma2t/JckYT9obvn8c5tThjZ5Mzmw==
+X-Received: by 2002:a05:600c:12c8:b0:40b:5e21:bde3 with SMTP id v8-20020a05600c12c800b0040b5e21bde3mr688197wmd.114.1701797250829;
+        Tue, 05 Dec 2023 09:27:30 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.218.27])
+        by smtp.gmail.com with ESMTPSA id uz14-20020a170907118e00b00a0a2cb33ee0sm6974520ejb.203.2023.12.05.09.27.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Dec 2023 09:27:30 -0800 (PST)
+Message-ID: <d41ea6ff-3c29-4a76-833d-19e6a6649d3c@linaro.org>
+Date: Tue, 5 Dec 2023 18:27:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8947:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0e65dbb0-9c97-44ff-a44e-08dbf5b75833
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	XgjqyLotZJJZXG8kZzaP0rdIS0vJY7g7Mmr6MLXty3hTwvb1abwH7nWyAh+zHywu8xQp6T8dE6tzZaT7+hMaEHxE8CA8QYAXzVShm+kmm99/gPZVWcxyXpXHQc0lNL0mW5NZlPNU8z1qW3Igc8Zn4h6HlxAndudBS2M20tnHLKn0pn1jOg//CQxdiaU75F4xS39Plk+fja9HJJzwHBibU6IklmqOHdVoZAOQl7CNgOZa7FIm9GKfWw+AuqXPzDGyLDjq7JPdc788f5BxX9ldENUkx2xlKcSbM0TEuQN8aVE1M28ZO163zPyi/ILJb9PRQ27BreopP9asN3kCwTcSclbitFgX7CSo2mbUPQPviQBYA03HmO8Misv8loWu4daA3zfdBOhiTlr7qUccjDSStkF1OG1szgCBiXwZdKbp5WtG8/rzuAdRQJH3X0sLgB9ki0j7hvydFHXmRjcvBybzTGt6llh6zAXzQhIddlc74hKlGBnnRYlpFwPtZdgNuZVvK7mtoFrlwPhpCrAKTKcATu+hQiTkqwhos66lBBLSYkzvCeQ2zaCuOZued8lr0JA+
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(376002)(136003)(396003)(366004)(39860400002)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(66476007)(66556008)(1076003)(316002)(6916009)(9686003)(4326008)(8676002)(8936002)(66946007)(86362001)(6512007)(6506007)(44832011)(33716001)(26005)(2906002)(4744005)(5660300002)(6666004)(38100700002)(6486002)(478600001)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ogv4ZVVlBJb3z1An1EYG8dDWikpYbaKNcMHmFFBNwmZSDPczB8tdL7iud0Ms?=
- =?us-ascii?Q?zS3oNzuVtgkbpplGkNBpf7nCnR0WEaKAEJkatvqHAUtOTr4vxyEwor+dXTT2?=
- =?us-ascii?Q?YyV0jKZE4QSAUsBFuaWzGDhElQXIRjeHYoVJqgfOLQFyQ5uCKcs1IOuPD1Px?=
- =?us-ascii?Q?x976KxovYcTb2LIf/qObDUbJL5JwcDwVfagEWGbNOsu4A+Pq+kal+WNY05mb?=
- =?us-ascii?Q?Emz1+IISCOM2ey2n090hDW39GposYLOpGjmavxNc/7O3jRVBXmUHGXtF8stv?=
- =?us-ascii?Q?GIYVPOXhB95lj55qmb9fzaXYOGfiJMA5MLtl8ypWduszra+/Kc+ozUVFNG3n?=
- =?us-ascii?Q?+wCGK13hHafaFQc5lp04taddGGwNXQtJECBKYf0YqBIdwwk4WIcmLGoz1uDw?=
- =?us-ascii?Q?qjHd1IkcffOKmAl851/1o1LVc5JqCHnK1MA8hCFHiu/7RIb7WCDM6aNsRnJh?=
- =?us-ascii?Q?Yzk6n16CstfdyKCoRWoKwbAgvDyvlGNXsbtNL0l2K79saUoV00ERocr6L8o+?=
- =?us-ascii?Q?QVjtzhjpPnvsXsMzZSiS3fr/B+muQijuimLOdIY3eGhnfegoQaDasGYaFdna?=
- =?us-ascii?Q?qNyIMO7u9lVe5tJ3yHCluWRnngVRsYiKBCtfZnS08mLoBnQMCklYL1mVz8ay?=
- =?us-ascii?Q?jJcnOX2nbtdiU1mhK0ItjTdZXHeZCFR2FMM6awla0yDYET+PaQ82VjL/8i72?=
- =?us-ascii?Q?ZZtCM1dSOYXzGJJXK6TTrrfmd+1nPpP7dKO3YLtI3LABKfWcHdiX9oLq53dF?=
- =?us-ascii?Q?WRziSVdFsgkR58d8ypvxOUVMSPjR8RAyu4WzGYanknZpja4lnAnDGwbbEE3M?=
- =?us-ascii?Q?M/wBWy572cXELPof0sj5CCbicXiFCRFjtpRvKrw0+H0SVoTYEmHec1j7+8ho?=
- =?us-ascii?Q?TTynqwSBNd2aPj7rl+zn0uau2YS2BaAOhvbEBpcZIvpawdEMc36sEv2vshjI?=
- =?us-ascii?Q?cDNf7rSA2F3sluBstOllgIjyVn5jgRelz/U2f5c33/pQU6ZzjrqO8TYAwAyI?=
- =?us-ascii?Q?i7P0bOZdMIuCcIYasHgWXZIIctxgLr8dFps/71RNnRLxdgpVSFvNatxh6N8A?=
- =?us-ascii?Q?gq5oRa2NmRyv7w9I0QNdVaqK1thk8JYz7qDLVuy6/cEMSealOdWWPHkua/TS?=
- =?us-ascii?Q?kkQnUgUd6kwXBsUI8P74hUyWXgNkmzQPw/qhsAB+0V/zTVLWfXOSsduuq77t?=
- =?us-ascii?Q?morn6sru1HuAgaV0w5TGJyrn7KPKMEskW8TZqxebX5v2fJ8dzr6kkgmLAjP9?=
- =?us-ascii?Q?d34nB8fM3q7dAM/mYWJEs1pSI1M3+xzkRD/J0cg4sKYTQRJqeMSI5Mmo0g6l?=
- =?us-ascii?Q?ngpYoLz4J97IeqPCwahzC4hrwDtlQni5rkc8//XkqwfatAtPB4sZMtw4H65h?=
- =?us-ascii?Q?i6pYldePNhqZxL04O5zcYRA12+fsk+hegqtWZY0926Q8Nneoiyt4TLzFRwaJ?=
- =?us-ascii?Q?x2aJFwxY3CtRExc/2pQqQgjFCCaqKtVqrE6JNpqp9IN8MPQ/EPbuwNNIdxEa?=
- =?us-ascii?Q?A6wdZ3kSQFPscvIA1QFA3s65j0PyIvnKTu3Sc2fhI4ISwoj4qYl3MEHaduvC?=
- =?us-ascii?Q?JChEE03EIFEtiv8yVup/6v6DkV+FH2V78OAJ0SrVEwK9QRDG1YyjSk0pMb+Y?=
- =?us-ascii?Q?0A=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e65dbb0-9c97-44ff-a44e-08dbf5b75833
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 17:26:41.5516
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: groCDzvBvcs5N01hZ02ocWnupASczp6iEDeTyM8sYNJctN3xgKuo72lyScYEoA1KCsq/ra8yDGnjo3rj7p4aWw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8947
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
+Content-Language: en-US
+To: Siddh Raman Pant <code@siddh.me>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Suman Ghosh <sumang@marvell.com>,
+ netdev <netdev@vger.kernel.org>, linux-kernel
+ <linux-kernel@vger.kernel.org>,
+ syzbot+bbe84a4010eeea00982d
+ <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+References: <cover.1701627492.git.code@siddh.me>
+ <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me>
+ <fd709885-c489-4f84-83ab-53cfb4920094@linaro.org>
+ <18c3aff94ef.7cc78f6896702.921153651485959341@siddh.me>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <18c3aff94ef.7cc78f6896702.921153651485959341@siddh.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 05, 2023 at 05:04:14PM +0100, Tobias Waldekranz wrote:
-> This change contains no functional change. We simply push the hardware
-> specific stats logic to a function reading a single counter, rather
-> than the whole set.
+On 05/12/2023 18:21, Siddh Raman Pant wrote:
+> On Tue, 05 Dec 2023 22:10:00 +0530, Krzysztof Kozlowski wrote:
+>>> @@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+>>>  	if (local == NULL)
+>>>  		return 0;
+>>>  
+>>> +	nfc_put_device(local->dev);
+>>
+>> Mismatched order with get. Unwinding is always in reversed order. Or
+>> maybe other order is here on purpose? Then it needs to be explained.
 > 
-> This is a preparatory change for the upcoming standard ethtool
-> statistics support (i.e. "eth-mac", "eth-ctrl" etc.).
-> 
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
+> Yes, local_release() will free local, so local->dev cannot be accessed.
+> Will add a comment.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+So the problem is just storing the pointer? That's not really the valid
+reason.
+
+> 
+>>> @@ -959,8 +963,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+>>>  	}
+>>>  
+>>>  	new_sock = nfc_llcp_sock(new_sk);
+>>> -	new_sock->dev = local->dev;
+>>> +
+>>>  	new_sock->local = nfc_llcp_local_get(local);
+>>> +	if (!new_sock->local) {
+>>
+>> There is already an cleanup path/label, so extend it. Existing code
+>> needs some improvements in that matter as well.
+> 
+> Sure.
+> 
+>>> +		reason = LLCP_DM_REJ;
+>>> +		release_sock(&sock->sk);
+>>> +		sock_put(&sock->sk);
+>>> +		sock_put(&new_sock->sk);
+>>> +		nfc_llcp_sock_free(new_sock);
+>>> +		goto fail;
+>>> +	}
+>>> +
+>>> +	new_sock->dev = local->dev;
+>>>  	new_sock->rw = sock->rw;
+>>>  	new_sock->miux = sock->miux;
+>>>  	new_sock->nfc_protocol = sock->nfc_protocol;
+>>> @@ -1597,7 +1611,13 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+>>>  	if (local == NULL)
+>>>  		return -ENOMEM;
+>>>  
+>>> -	local->dev = ndev;
+>>> +	/* Hold a reference to the device. */
+>>
+>> That's obvious. Instead write something not obvious - why you call
+>> nfc_get_device() while not incrementing reference to llcp_local.
+> 
+> Should I move it after kref_init()? Here, I'm bailing out early so we
+> don't have to do unnecessary init first, and the rest of the function
+> will never fail.
+
+I meant, comment is obvious.
+
+> 
+>>> +	local->dev = nfc_get_device(ndev->idx);
+>>
+>> This looks confusing. If you can access ndev->idx, then ndev reference
+>> was already increased. In such case iterating through all devices to
+>> find it, is unnecessary and confusing.
+> 
+> I agree, it was something I thought about as well. There should be a
+> new function for refcount increment. Maybe the existing one could be
+> renamed to nfc_get_device_from_idx() and a new nfc_get_device() be
+> defined.
+> 
+> I didn't want to introduce improvement patches in this UAF series, as
+> that would be an independent unit of change.
+
+Best regards,
+Krzysztof
+
 
