@@ -1,107 +1,145 @@
-Return-Path: <netdev+bounces-53806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C17F804B1F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:31:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE4F804B43
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:40:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B25D3B20BF1
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:31:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58FF528171A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D8317727;
-	Tue,  5 Dec 2023 07:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="Cxx/1+51"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031F024210;
+	Tue,  5 Dec 2023 07:40:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082DEC9
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 23:31:39 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2c9fdf53abcso19602671fa.1
-        for <netdev@vger.kernel.org>; Mon, 04 Dec 2023 23:31:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1701761496; x=1702366296; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SepWLPTpZWep0dny9zoJICu02H+raP6JV2Ac9O/sL1M=;
-        b=Cxx/1+51uTKWzFD8FYC9ZmP4bg78PFcjC1GQwUIeG1VEPq8dKOCCki+H8eK+YR2mh3
-         hANYoiSZmbYlk2aar5/sJbbLw22a8lmWWY4J/zuuStNBECGxETvNM8dFJFfUILhaQ1le
-         fGNa0cpefEO2OO1yvfHmuLgqBjZhbUQAPuQSFnUkNmtEbWt+WRrZzDcaR6NH1DSll4SB
-         NEmjt+Fdqy7EMzOnfPdkKn5W8hin2AEkWoofvgV18SlIYPSHSoXD5eyA/RUMM/ii6aEd
-         CbHUNXM49T8XurwxhPE2zeSyriBMM21FHePMjJ6QqQFW/+579sYtCnOqgLq190ABzfhC
-         zJYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701761497; x=1702366297;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SepWLPTpZWep0dny9zoJICu02H+raP6JV2Ac9O/sL1M=;
-        b=PDxrfx6Fog8Ak1aVtCeaT4H7GQgXbnrdHEkMXbbJZ7lZl6KhNK9XfBWeY2HCFAgNaS
-         wpDIs0Ik0SVKM1TnHndMd32OLM6Q6JEynDEM8tgnpfpnEYd6zVtVcL9Dk+bPLMpvlceS
-         KTjC+LgQjbdg0g600sWTEFAo9+1UGHNxZj5SKKjNxr/oPh7fXmIvyi8UaelS0lLuqMit
-         7OXMJ/4p31X7MHm/xRrNgiYh9B76SDGxf1Ek95ZRxzQWP4PPrjctkeqwcy3nsgcFF1eX
-         HXWvuzAx4nBGXLE9A0FiTPg9FXTEg00fGa5bSwi5n+gBvfRFrUeUqCiD6eu4E+SA9sr7
-         O6UQ==
-X-Gm-Message-State: AOJu0YyQ1136pTcObx53bLGWwARb4LZ1oB/UG6Y88dLx4YCztKqqw+rb
-	+st7dwlxppDWwmT1Ofs1Scd6m/M6U6Z5YP+LWiI=
-X-Google-Smtp-Source: AGHT+IGDBNzs9WpDpgpRmO39EQ5eFxMKjQplV3/PeUg4z8a1nip69vt1nQjmh0uY8VkW2QqfwYuwIw==
-X-Received: by 2002:a2e:9c8c:0:b0:2ca:5d4:c172 with SMTP id x12-20020a2e9c8c000000b002ca05d4c172mr589223lji.23.1701761496568;
-        Mon, 04 Dec 2023 23:31:36 -0800 (PST)
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id h20-20020a2e5314000000b002c9bb53ee68sm798454ljb.136.2023.12.04.23.31.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 23:31:35 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, kuba@kernel.org, gregory.clement@bootlin.com,
- sebastian.hesselbarth@gmail.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 0/3] net: mvmdio: Performance related
- improvements
-In-Reply-To: <584efde2-d3f3-4318-ab3c-6011719d5c68@lunn.ch>
-References: <20231204100811.2708884-1-tobias@waldekranz.com>
- <584efde2-d3f3-4318-ab3c-6011719d5c68@lunn.ch>
-Date: Tue, 05 Dec 2023 08:31:33 +0100
-Message-ID: <874jgx9kbu.fsf@waldekranz.com>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF3FCB
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 23:40:05 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rAQ1T-0007nO-OE; Tue, 05 Dec 2023 08:39:15 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rAQ1P-00Dh2K-W4; Tue, 05 Dec 2023 08:39:12 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rAQ1P-00EZzR-Lj; Tue, 05 Dec 2023 08:39:11 +0100
+Date: Tue, 5 Dec 2023 08:39:11 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Alexander Aring <alex.aring@gmail.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Zhao Qiang <qiang.zhao@nxp.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Russell King <linux@armlinux.org.uk>, linux-wpan@vger.kernel.org,
+	Andy Gross <agross@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Stephan Gerhold <stephan@gerhold.net>,
+	linux-arm-msm@vger.kernel.org,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org, Alex Elder <elder@kernel.org>,
+	netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>,
+	linux-renesas-soc@vger.kernel.org, kernel@pengutronix.de,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Imre Kaloz <kaloz@openwrt.org>, linuxppc-dev@lists.ozlabs.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove
+ callback returning void
+Message-ID: <20231205073911.e6nphzhc6yjan5vu@pengutronix.de>
+References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
+ <20231205075110.795b88d2@xps-13>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yvpnmk4qagvgsgfh"
+Content-Disposition: inline
+In-Reply-To: <20231205075110.795b88d2@xps-13>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On tis, dec 05, 2023 at 04:47, Andrew Lunn <andrew@lunn.ch> wrote:
-> On Mon, Dec 04, 2023 at 11:08:08AM +0100, Tobias Waldekranz wrote:
->> Observations of the XMDIO bus on a CN9130-based system during a
->> firmware download showed a very low bus utilization, which stemmed
->> from the 150us (10x the average access time) sleep which would take
->> place when the first poll did not succeed.
->> 
->> With this series in place, bus throughput increases by about 10x,
->> multiplied by whatever gain you are able to extract from running the
->> MDC at a higher frequency (hardware dependent).
->> 
->> I would really appreciate it if someone with access to hardware using
->> the IRQ driven path could test that out, since I have not been able to
->> figure out how to set this up on CN9130.
->
-> Hi Tobias
->
-> I tested on Kirkwood:
->
->                mdio: mdio-bus@72004 {
->                         compatible = "marvell,orion-mdio";
->                         #address-cells = <1>;
->                         #size-cells = <0>;
->                         reg = <0x72004 0x84>;
->                         interrupts = <46>;
->
-> The link is reported as up, ethtool shows the expected link mode
-> capabilities, mii-tool dumps look O.K.
->
-> Tested-by: Andrew Lunn <andrew@lunn.ch>
 
-Very much appreciated Andrew, thank you!
+--yvpnmk4qagvgsgfh
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello Miquel,
+
+On Tue, Dec 05, 2023 at 07:51:10AM +0100, Miquel Raynal wrote:
+> u.kleine-koenig@pengutronix.de wrote on Mon,  4 Dec 2023 19:30:40 +0100:
+> > (implicit) v1 of this series can be found at
+> > https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@=
+pengutronix.de.
+> > Changes since then:
+> >=20
+> >  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
+> >    converts ipa to remove_new() and introduces an error message in the
+> >    error path that failed before.
+> >=20
+> >  - Rebased to today's next
+> >=20
+> >  - Add the tags received in the previous round.
+> >=20
+> > Uwe Kleine-K=F6nig (9):
+> >   net: ipa: Convert to platform remove callback returning void
+> >   net: fjes: Convert to platform remove callback returning void
+> >   net: pcs: rzn1-miic: Convert to platform remove callback returning
+> >     void
+> >   net: sfp: Convert to platform remove callback returning void
+> >   net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
+> >     void
+> >   net: wan/ixp4xx_hss: Convert to platform remove callback returning
+> >     void
+> >   net: wwan: qcom_bam_dmux: Convert to platform remove callback
+> >     returning void
+> >   ieee802154: fakelb: Convert to platform remove callback returning void
+> >   ieee802154: hwsim: Convert to platform remove callback returning void
+>=20
+> FYI, I plan on taking patches 8 and 9 through wpan-next.
+
+I forgot to mention explicitly that there are no interdependencies in
+this series. So each maintainer picking up up their patches is fine.
+
+Thanks
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--yvpnmk4qagvgsgfh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmVu054ACgkQj4D7WH0S
+/k6iZAgAk0+g8Khu/Ep6tOFWM4mSMy9654kVheNx2FCbbW/bAMDmjjTU+JefFpX+
+7FjzwXTwgg1LgMrgBGElDY2TT6R2655WJe8jWIEOSjXPJLpqH19V1nbyE4D0ESd/
+j3Ng/QZKClTPeg3Qm/6ECF3YR2HDwT1xnUOYPEJinZcpBjJ/oyH16DVG11rvhYxL
+o+1q0NZqQfR+TEwIRj84WFCmk1UCfG7TVGZSJOmby1+bg7W6Heh+yr/vyyQ+vYEL
+4w0ogQenAk2aIlE7RmrsUp9WFA5pTFVYz+xJOA8tJx9p6pzSRpkXWtCN1ZrUTnnY
+vxZ07dy2791XsDRamfgrGOZgzi9RJg==
+=F8+E
+-----END PGP SIGNATURE-----
+
+--yvpnmk4qagvgsgfh--
 
