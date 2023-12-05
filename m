@@ -1,87 +1,230 @@
-Return-Path: <netdev+bounces-54067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51FEE805EAA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:33:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 895BB805EB7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 20:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7DBBB210EF
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46D1C281F8C
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAF06A35D;
-	Tue,  5 Dec 2023 19:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D904F6AB9C;
+	Tue,  5 Dec 2023 19:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Q/Eo+FEb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qLk7Pqh4"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE01AB
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:33:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=SkMzdOaiE/tH3KLyUGpebGooZ6m/kC6AAcd35NxWXmA=;
-	t=1701804788; x=1703014388; b=Q/Eo+FEbKPrfOziPHy5XnZPDgWyqEAoY9xNRUGnOrPSvk6R
-	aJoy7+UYUfnwneXoGIt5udVb0G1ZB2MGZbmXZjkUlqbDNoapBOfwj3ZCYPoOrpcUnFAfF0sjKxAT7
-	oMW9yyD6H2hYTpiKy2wgjCTBQmq6YxfVA1W0ODxGnLCF9hmIOQEHBzS1kRaz0w3z2rrFlG07rQvta
-	czoMk/VHCCGHUEHAoz9FaYjmfkIc05xpt6URXvwHvoYaBQtlC7rDkPg+jwl4u/V+h77iOAdXSCNev
-	lAr6/sL30Zwx2SVTyBBV8JgkSkTJH1LLNVZ1brrjRU5IR93TudPfhqp/kv8Zqupg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rAbAF-0000000GWCC-2rbp;
-	Tue, 05 Dec 2023 20:33:03 +0100
-Message-ID: <1d986c73c1d39b0cced7d8d2119fba4b2a02418b.camel@sipsolutions.net>
-Subject: Re: [RFC PATCH] net: ethtool: do runtime PM outside RTNL
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Marc MERLIN <marc@merlins.org>
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org,
- Heiner Kallweit <hkallweit1@gmail.com>
-Date: Tue, 05 Dec 2023 20:33:02 +0100
-In-Reply-To: <20231205024652.GA12805@merlins.org>
-References: 
-	<20231204200710.40c291e60cea.I2deb5804ef1739a2af307283d320ef7d82456494@changeid>
-	 <20231204200038.GA9330@merlins.org>
-	 <a6ac887f7ce8af0235558752d0c781b817f1795a.camel@sipsolutions.net>
-	 <20231204203622.GB9330@merlins.org>
-	 <24577c9b8b4d398fe34bd756354c33b80cf67720.camel@sipsolutions.net>
-	 <20231204205439.GA32680@merlins.org> <20231204212849.GA25864@merlins.org>
-	 <20231205024652.GA12805@merlins.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4A42183
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 11:39:30 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5c680110ea9so2824218a12.2
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 11:39:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701805170; x=1702409970; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xfq67iLmriDqfduTRY0M8dju8QhNwul2zcs5mKn+Qdk=;
+        b=qLk7Pqh4Pd9QsKsbP60577NqraCUiybzAGtjqVrmb3yTT0fZZDlCA6TsvS3vuT2iOB
+         hky+24GulvywVn0x1HL0oSBsjpNVQ04MJOgVctAytLuBKCC0A+y/Pt0g3bt4ATD3Vxaj
+         IcbSQMiQdvW4I+bTkBHWzxKZH+AsfGiDp0HuTB9q4TGD6VMcyVNzi/Goy5jxmvjqGVXx
+         kxC+Po70jB5erw0iT79pdQ4U6jxwvQ2TenwMOfhXivYl6F34MyiOQ7l76PMAKah8nfri
+         p66f0Nqqyb4v0l4v+r1q7uTuDTZij81VAvwIiwgqeG280+UTiohhLakX5684GNT0y4w1
+         Po8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701805170; x=1702409970;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xfq67iLmriDqfduTRY0M8dju8QhNwul2zcs5mKn+Qdk=;
+        b=HRbDHh/9Ziz09Psswhr4NTf2QW/RjUaYGLwBZYPo50ma2jH+PLXFiMv1gv0oD1qA6G
+         2gM12V1X3kexGWbhIfWZxbl/yFFZ+k4ME9n0ND3m0vkoCBtyuC7nHKw3Mguclr4knW15
+         FDJJqUQwsAdWh4X5aTowit/CzoRLspivDuv9pMzLB6dcrSSgAXIGm+1nosZpzeMnpEjT
+         6mGB7XOImASIDPioQv2lDWZf9MIwOCSLXxIbiQQNGd/XOvzzK0eyn0wuGuSLWfB0yZnl
+         UA9nqZeynMW/ycEIjl9xSI/OnF9HGHpBdpH+7p6ZrcUxX23ZJ13jP+jrG2vK0aApSdcW
+         fOaA==
+X-Gm-Message-State: AOJu0YzwtHV1hRI4TL2wnglK5kIkfAxzZFLnNCu+l6PVLj0H9Xbk3lZT
+	C8jQ7BbJYY6VGrx35d9iq68qCQ4=
+X-Google-Smtp-Source: AGHT+IFIztxj2eUKXZ2GS1Ca6Xtk1G+ZaZVM3GaQJJGqcaBfxYyvfWdWIYuJqHVvsmWQlJgRFVSGrCQ=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:1220:0:b0:5c2:2f9:c374 with SMTP id
+ h32-20020a631220000000b005c202f9c374mr4433763pgl.9.1701805169961; Tue, 05 Dec
+ 2023 11:39:29 -0800 (PST)
+Date: Tue, 5 Dec 2023 11:39:28 -0800
+In-Reply-To: <656f66023f7bd_3dd6422942a@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Mime-Version: 1.0
+References: <20231203165129.1740512-1-yoong.siang.song@intel.com>
+ <20231203165129.1740512-3-yoong.siang.song@intel.com> <43b01013-e78b-417e-b169-91909c7309b1@kernel.org>
+ <656de830e8d70_2e983e294ca@willemb.c.googlers.com.notmuch>
+ <PH0PR11MB583000826591093B98BA841DD885A@PH0PR11MB5830.namprd11.prod.outlook.com>
+ <5a0faf8cc9ec3ab0d5082c66b909c582c8f1eae6.camel@siemens.com>
+ <CAKH8qBuXL8bOYtfKKPS8y=KJqouDptyciCjr0wNKVHtNj6BmqA@mail.gmail.com> <656f66023f7bd_3dd6422942a@willemb.c.googlers.com.notmuch>
+Message-ID: <ZW98UW033wCy9vI-@google.com>
+Subject: Re: [xdp-hints] Re: [PATCH bpf-next v3 2/3] net: stmmac: add Launch
+ Time support to XDP ZC
+From: Stanislav Fomichev <sdf@google.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Florian Bezdeka <florian.bezdeka@siemens.com>, yoong.siang.song@intel.com, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Bjorn Topel <bjorn@kernel.org>, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Willem de Bruijn <willemb@google.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2023-12-04 at 18:46 -0800, Marc MERLIN wrote:
+On 12/05, Willem de Bruijn wrote:
+> Stanislav Fomichev wrote:
+> > On Tue, Dec 5, 2023 at 7:34=E2=80=AFAM Florian Bezdeka
+> > <florian.bezdeka@siemens.com> wrote:
+> > >
+> > > On Tue, 2023-12-05 at 15:25 +0000, Song, Yoong Siang wrote:
+> > > > On Monday, December 4, 2023 10:55 PM, Willem de Bruijn wrote:
+> > > > > Jesper Dangaard Brouer wrote:
+> > > > > >
+> > > > > >
+> > > > > > On 12/3/23 17:51, Song Yoong Siang wrote:
+> > > > > > > This patch enables Launch Time (Time-Based Scheduling) suppor=
+t to XDP zero
+> > > > > > > copy via XDP Tx metadata framework.
+> > > > > > >
+> > > > > > > Signed-off-by: Song Yoong Siang<yoong.siang.song@intel.com>
+> > > > > > > ---
+> > > > > > >   drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  2 ++
+> > > > > >
+> > > > > > As requested before, I think we need to see another driver impl=
+ementing
+> > > > > > this.
+> > > > > >
+> > > > > > I propose driver igc and chip i225.
+> > > >
+> > > > Sure. I will include igc patches in next version.
+> > > >
+> > > > > >
+> > > > > > The interesting thing for me is to see how the LaunchTime max 1=
+ second
+> > > > > > into the future[1] is handled code wise. One suggestion is to a=
+dd a
+> > > > > > section to Documentation/networking/xsk-tx-metadata.rst per dri=
+ver that
+> > > > > > mentions/documents these different hardware limitations.  It is=
+ natural
+> > > > > > that different types of hardware have limitations.  This is a c=
+lose-to
+> > > > > > hardware-level abstraction/API, and IMHO as long as we document=
+ the
+> > > > > > limitations we can expose this API without too many limitations=
+ for more
+> > > > > > capable hardware.
+> > > >
+> > > > Sure. I will try to add hardware limitations in documentation.
+> > > >
+> > > > >
+> > > > > I would assume that the kfunc will fail when a value is passed th=
+at
+> > > > > cannot be programmed.
+> > > > >
+> > > >
+> > > > In current design, the xsk_tx_metadata_request() dint got return va=
+lue.
+> > > > So user won't know if their request is fail.
+> > > > It is complex to inform user which request is failing.
+> > > > Therefore, IMHO, it is good that we let driver handle the error sil=
+ently.
+> > > >
+> > >
+> > > If the programmed value is invalid, the packet will be "dropped" / wi=
+ll
+> > > never make it to the wire, right?
 >=20
-> [13323.572484] iwlwifi 0000:09:00.0: TB bug workaround: copied 152 bytes =
-from 0xffffff68 to 0xfd080000
-> [13328.000825] iwlwifi 0000:09:00.0: TB bug workaround: copied 1272 bytes=
- from 0xfffffb08 to 0xff42c000
-> [13367.278564] iwlwifi 0000:09:00.0: TB bug workaround: copied 1328 bytes=
- from 0xfffffad0 to 0xfec41000
-> [13389.737971] iwlwifi 0000:09:00.0: TB bug workaround: copied 572 bytes =
-from 0xfffffdc4 to 0xff091000
-> [13389.860480] iwlwifi 0000:09:00.0: TB bug workaround: copied 148 bytes =
-from 0xffffff6c to 0xfe412000
-> [13393.435354] iwlwifi 0000:09:00.0: TB bug workaround: copied 360 bytes =
-from 0xfffffe98 to 0xfedcd000
-> [13409.827199] iwlwifi 0000:09:00.0: TB bug workaround: copied 1348 bytes=
- from 0xfffffabc to 0xfd057000
+> Programmable behavior is to either drop or cap to some boundary
+> value, such as the farthest programmable time in the future: the
+> horizon. In fq:
+>=20
+>                 /* Check if packet timestamp is too far in the future. */
+>                 if (fq_packet_beyond_horizon(skb, q, now)) {
+>                         if (q->horizon_drop) {
+>                                         q->stat_horizon_drops++;
+>                                         return qdisc_drop(skb, sch, to_fr=
+ee);
+>                         }
+>                         q->stat_horizon_caps++;
+>                         skb->tstamp =3D now + q->horizon;
+>                 }
+>                 fq_skb_cb(skb)->time_to_send =3D skb->tstamp;
+>=20
+> Drop is the more obviously correct mode.
+>=20
+> Programming with a clock source that the driver does not support will
+> then be a persistent failure.
+>=20
+> Preferably, this driver capability can be queried beforehand (rather
+> than only through reading error counters afterwards).
+>=20
+> Perhaps it should not be a driver task to convert from possibly
+> multiple clock sources to the device native clock. Right now, we do
+> use per-device timecounters for this, implemented in the driver.
+>=20
+> As for which clocks are relevant. For PTP, I suppose the device PHC,
+> converted to nsec. For pacing offload, TCP uses CLOCK_MONOTONIC.
 
-That's fine, just working around a HW bug on 2^32 address boundaries.
+Do we need to expose some generic netdev netlink apis to query/adjust
+nic clock sources (or maybe there is something existing already)?
+Then the userspace can be responsible for syncing/converting the
+timestamps to the internal nic clocks. +1 to trying to avoid doing
+this in the drivers.
 
-I had a patch a long time ago to make those messages not appear ... not
-sure where it ended up.
+> > > That is clearly a situation that the user should be informed about. F=
+or
+> > > RT systems this normally means that something is really wrong regardi=
+ng
+> > > timing / cycle overflow. Such systems have to react on that situation=
+.
+> >=20
+> > In general, af_xdp is a bit lacking in this 'notify the user that they
+> > somehow messed up' area :-(
+> > For example, pushing a tx descriptor with a wrong addr/len in zc mode
+> > will not give any visible signal back (besides driver potentially
+> > spilling something into dmesg as it was in the mlx case).
+> > We can probably start with having some counters for these events?
+>=20
+> This is because the AF_XDP completion queue descriptor format is only
+> a u64 address?
 
-johannes
+Yeah. XDP_COPY mode has the descriptor validation which is exported via
+recvmsg errno, but zerocopy path seems to be too deep in the stack
+to report something back. And there is no place, as you mention,
+in the completion ring to report the status.
+
+> Could error conditions be reported on tx completion in the metadata,
+> using xsk_tx_metadata_complete?
+
+That would be one way to do it, yes. But then the error reporting depends
+on the metadata opt-in. Having a separate ring to export the errors,
+or having a v2 tx-completions layout with extra 'status' field would also
+work.
+
+But this seems like something that should be handled separately? Because
+we'd have to teach all existing zc drivers to report those errors back
+instead of dropping these descriptors..
 
