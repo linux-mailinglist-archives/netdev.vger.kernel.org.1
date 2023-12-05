@@ -1,95 +1,140 @@
-Return-Path: <netdev+bounces-54034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16FC805B0C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:20:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE165805B0F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:22:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC036281345
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:20:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554F71F212BF
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE4D692BB;
-	Tue,  5 Dec 2023 17:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701F7692BD;
+	Tue,  5 Dec 2023 17:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWOT32AM"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="uF76BNgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F210069280
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C717C433C8;
-	Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701796826;
-	bh=H3KZtBSZ/Y7IZExJ1XMvnf0C8QVYrYDG6bmeA/QsFY4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GWOT32AMpkGzabfcEnFawwGtfWkRrz4gc0Yl859VUGbPcHVVcnI/lZ2xtm/uAOpvi
-	 vPlD/WjjMyJIgQ31gnUBJT0hoacFazL+mOpX/+MH4n+yTP4S6DVVyYYOyMymeKY4Vr
-	 pPychQHoLqnM1k64+dq0OgdLe9lnK4KNI9OteRT3VGPblDV/cA9BAU7wckLQITK5/8
-	 oqBAFC3GuE4CAEKJRupAeWjFO55Bi8kTU0ETwk8lzCOik1M72YqS+KN+WQrZt+YC0O
-	 Ag/KUrtJCc1hzpe5Q4djCbyTEBhLpuh+lCs9bzbViv2z/gH8t56fr0jk46PZD97zGO
-	 ZldQFR+uRNBpQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61B84C43170;
-	Tue,  5 Dec 2023 17:20:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BE3188;
+	Tue,  5 Dec 2023 09:22:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1701796909; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=cWT3Ly1xj+qjQiNaCukHUeUZ/2zObAP0yWVv4KUmiwC7fD+bQNxWhQVykEMMwrvH7us4xvjrnnW5aZXfKO41WZGcj+cZA9sZnVMMny4ybZJKsJus0vJyWM9ZqH2DB/FEk65hq68DpCr6N8VbWfRuGLbmbDVA8psMSd/9k3+k7J0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1701796909; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ZOT5stgB/PObSmgMtYkbkXCE93C5EKs6ibg38Dj4Wfw=; 
+	b=cc8n4CDq4pzr+q8szbJR0iIXjwXO341x8U1r0Hq0kjuY8OHVTbUUEFqLoZn5vlNhvfgT8ryd6Mi9FpesqOCGz6jgAto8ls8Z3bp8yGswO97O4VG0S5lbiQMk9xyL117uC0PfJzoHJwJgmzgzOXIBZlYev/RvFGH+xkBps6OGvvw=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701796909;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=ZOT5stgB/PObSmgMtYkbkXCE93C5EKs6ibg38Dj4Wfw=;
+	b=uF76BNgZzLgo27lRSsBSb4pUafsEMAaCO/1hUsNVFbibwRCCO+um8HhpbeTs0/7q
+	P0oCRQwThoV8cV6LaSaV60LVYPSN7ynKsRb02GpV12XLtDUvPwXxWuOEDBeGLpZUW89
+	6JRH+z13qSZ9lRgXFt64wMlUhylSsXV3VbpFaL8o=
+Received: from mail.zoho.in by mx.zoho.in
+	with SMTP id 1701796877595248.52755350576115; Tue, 5 Dec 2023 22:51:17 +0530 (IST)
+Date: Tue, 05 Dec 2023 22:51:17 +0530
+From: Siddh Raman Pant <code@siddh.me>
+To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>,
+	"Suman Ghosh" <sumang@marvell.com>,
+	"netdev" <netdev@vger.kernel.org>,
+	"linux-kernel" <linux-kernel@vger.kernel.org>,
+	"syzbot+bbe84a4010eeea00982d"
+ <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
+Message-ID: <18c3aff94ef.7cc78f6896702.921153651485959341@siddh.me>
+In-Reply-To: <fd709885-c489-4f84-83ab-53cfb4920094@linaro.org>
+References: <cover.1701627492.git.code@siddh.me>
+ <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me> <fd709885-c489-4f84-83ab-53cfb4920094@linaro.org>
+Subject: Re: [PATCH net-next v3 1/2] nfc: llcp_core: Hold a ref to
+ llcp_local->dev when holding a ref to llcp_local
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] sfc: Implement ndo_hwtstamp_(get|set)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170179682639.32274.15529514811167186143.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Dec 2023 17:20:26 +0000
-References: <20231130135826.19018-1-alex.austin@amd.com>
-In-Reply-To: <20231130135826.19018-1-alex.austin@amd.com>
-To: Alex Austin <alex.austin@amd.com>
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, ecree.xilinx@gmail.com,
- habetsm.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- lorenzo@kernel.org, memxor@gmail.com, alardam@gmail.com, bhelgaas@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 30 Nov 2023 13:58:24 +0000 you wrote:
-> Implement ndo_hwtstamp_get and ndo_hwtstamp_set for sfc and sfc-siena.
+On Tue, 05 Dec 2023 22:10:00 +0530, Krzysztof Kozlowski wrote:
+> > @@ -180,6 +183,7 @@ int nfc_llcp_local_put(struct nfc_llcp_local *local)
+> >  	if (local == NULL)
+> >  		return 0;
+> >  
+> > +	nfc_put_device(local->dev);
 > 
-> Alex Austin (2):
->   sfc: Implement ndo_hwtstamp_(get|set)
->   sfc-siena: Implement ndo_hwtstamp_(get|set)
+> Mismatched order with get. Unwinding is always in reversed order. Or
+> maybe other order is here on purpose? Then it needs to be explained.
+
+Yes, local_release() will free local, so local->dev cannot be accessed.
+Will add a comment.
+
+> > @@ -959,8 +963,18 @@ static void nfc_llcp_recv_connect(struct nfc_llcp_local *local,
+> >  	}
+> >  
+> >  	new_sock = nfc_llcp_sock(new_sk);
+> > -	new_sock->dev = local->dev;
+> > +
+> >  	new_sock->local = nfc_llcp_local_get(local);
+> > +	if (!new_sock->local) {
 > 
->  drivers/net/ethernet/sfc/ef10.c             |  4 +--
->  drivers/net/ethernet/sfc/efx.c              | 24 +++++++++++++----
->  drivers/net/ethernet/sfc/net_driver.h       |  2 +-
->  drivers/net/ethernet/sfc/ptp.c              | 30 ++++++++-------------
->  drivers/net/ethernet/sfc/ptp.h              |  7 +++--
->  drivers/net/ethernet/sfc/siena/efx.c        | 24 +++++++++++++----
->  drivers/net/ethernet/sfc/siena/net_driver.h |  2 +-
->  drivers/net/ethernet/sfc/siena/ptp.c        | 30 +++++++++------------
->  drivers/net/ethernet/sfc/siena/ptp.h        |  7 +++--
->  drivers/net/ethernet/sfc/siena/siena.c      |  2 +-
->  10 files changed, 76 insertions(+), 56 deletions(-)
+> There is already an cleanup path/label, so extend it. Existing code
+> needs some improvements in that matter as well.
 
-Here is the summary with links:
-  - [net-next,1/2] sfc: Implement ndo_hwtstamp_(get|set)
-    https://git.kernel.org/netdev/net-next/c/1ac23674a971
-  - [net-next,2/2] sfc-siena: Implement ndo_hwtstamp_(get|set)
-    https://git.kernel.org/netdev/net-next/c/d82afc800c1e
+Sure.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> > +		reason = LLCP_DM_REJ;
+> > +		release_sock(&sock->sk);
+> > +		sock_put(&sock->sk);
+> > +		sock_put(&new_sock->sk);
+> > +		nfc_llcp_sock_free(new_sock);
+> > +		goto fail;
+> > +	}
+> > +
+> > +	new_sock->dev = local->dev;
+> >  	new_sock->rw = sock->rw;
+> >  	new_sock->miux = sock->miux;
+> >  	new_sock->nfc_protocol = sock->nfc_protocol;
+> > @@ -1597,7 +1611,13 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+> >  	if (local == NULL)
+> >  		return -ENOMEM;
+> >  
+> > -	local->dev = ndev;
+> > +	/* Hold a reference to the device. */
+> 
+> That's obvious. Instead write something not obvious - why you call
+> nfc_get_device() while not incrementing reference to llcp_local.
 
+Should I move it after kref_init()? Here, I'm bailing out early so we
+don't have to do unnecessary init first, and the rest of the function
+will never fail.
 
+> > +	local->dev = nfc_get_device(ndev->idx);
+> 
+> This looks confusing. If you can access ndev->idx, then ndev reference
+> was already increased. In such case iterating through all devices to
+> find it, is unnecessary and confusing.
+
+I agree, it was something I thought about as well. There should be a
+new function for refcount increment. Maybe the existing one could be
+renamed to nfc_get_device_from_idx() and a new nfc_get_device() be
+defined.
+
+I didn't want to introduce improvement patches in this UAF series, as
+that would be an independent unit of change.
+
+Thanks,
+Siddh
 
