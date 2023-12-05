@@ -1,167 +1,165 @@
-Return-Path: <netdev+bounces-53846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF94E804DD9
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:29:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC26E804DE5
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655471F212AA
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:29:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F8E5B20B7F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDB43E48B;
-	Tue,  5 Dec 2023 09:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6EB3F8EA;
+	Tue,  5 Dec 2023 09:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPBRrYIf"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="pVFloQJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 535E310E9
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:29:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701768542;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HWSbeQkndxR8pOH1jrEtRfCn62USiBxMT3pXbunoD3Q=;
-	b=MPBRrYIf1Z6Z/mqlAt8B8qdqHsQSE7KeFl+ay5kBQ2M3ciR/lnOCX3cdQiMQGFN//ndPMC
-	KBNbMs8dODs2G8bWkO60jSXFFkN9+q5Y4aWYdL9fHzpRAe5BVBxnq2OTBQE0sIIdlCExYG
-	XS5a96GrImyH08j3v/L3vNFOWLmSJoo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-zPiF5HBuMJalD6BkmHpsQg-1; Tue, 05 Dec 2023 04:28:59 -0500
-X-MC-Unique: zPiF5HBuMJalD6BkmHpsQg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a1be0f29061so7048266b.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 01:28:59 -0800 (PST)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB29110D2
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:30:56 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-a1a0bc1e415so487063966b.0
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 01:30:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701768655; x=1702373455; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xfeFkv51htlj2mlywp3RvqJAs0k2T5yn0UVwIPqoi5I=;
+        b=pVFloQJWJmuTbg3lDTZ3ajKhnnbAlNcmcNkxcPjuuMG1aZfIXvKmZi9CBRYar4GaUd
+         kNZKtQarDK4crZnwH/8e83G1IKOBKQaBkiaKaj2E3pVDuwrone+4lFDy7XNls+uv5iLr
+         +PM9sii3hvKunlC5j4/wpjlkLRGdm10zw4PRzYeVuZBEfVv4UssWFk8p/XM2CmEysi8J
+         dkd2CGjKR1PABccExH5IF6SFTb80cE5SUkC3PapQk3XCON7HBoaOAcOj9XXUHdlgCQw5
+         4wp6k8hTfMqartCbrk9BjrBJM2PD7/jsSzT95433KRChbwKgH/LY1IvOhW8WDePwXuw7
+         ZL0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701768538; x=1702373338;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HWSbeQkndxR8pOH1jrEtRfCn62USiBxMT3pXbunoD3Q=;
-        b=rm4P/8ac0Ziy4ZfO3YxbhlQGcbYJZtQgGwhnBWreZ/F5X+TIcNU3FC+JYOJXpe9qHw
-         4Zr9mto4/NUkUeAOKhgCB6tx/nGmzgiTSq7jvA34Am6Jz0I3UE/ZvFwn2titUZlrsQPm
-         IBzZXaCtysQ5Q7tMBCIM92iokGOw1OJTh88NS+YpX8sLbdiN8DjrcGbG/y6QUoLE6xce
-         7OLE1yFf7omDc6RJFY6/9BVaLvChIj03bQYx5WsCS8ooEf89O9MCJ+xhlGO5ArHajuBj
-         YWcVUjQvl/I88Ojc01jjcUEMfp4iHsB/2OLqft3kMUzFTuunvw+fD7ASwsih0AWC/cbe
-         W6uQ==
-X-Gm-Message-State: AOJu0YxfhhsuNr65fH/tklNnedsDO15E6KW0/icZYsGK3GLag+v/LYoc
-	WnWAQZazKk4416mWgWo6oOqF7UIgCMLrrwzvfSXjgRWPk12g1PQomBSg3KwpxE65ygXbXTzsJvt
-	BpNHEupdlN7hHHZpAKrIx0KQ7
-X-Received: by 2002:a17:906:3b96:b0:a1c:87a2:c183 with SMTP id u22-20020a1709063b9600b00a1c87a2c183mr484063ejf.5.1701768538131;
-        Tue, 05 Dec 2023 01:28:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGAbf9T1cl753dwNJrA4r4f5Cd5wzRLvS/Q1MW1BiOQwtPcGxLNeQjBeV3vMyTRD3tSBQzs7w==
-X-Received: by 2002:a17:906:3b96:b0:a1c:87a2:c183 with SMTP id u22-20020a1709063b9600b00a1c87a2c183mr484053ejf.5.1701768537730;
-        Tue, 05 Dec 2023 01:28:57 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-54.dyn.eolo.it. [146.241.241.54])
-        by smtp.gmail.com with ESMTPSA id b20-20020a17090636d400b009dd98089a48sm6382410ejc.43.2023.12.05.01.28.56
+        d=1e100.net; s=20230601; t=1701768655; x=1702373455;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xfeFkv51htlj2mlywp3RvqJAs0k2T5yn0UVwIPqoi5I=;
+        b=bPE3X5NxpfxzfU2AqJiz/awCQ3yScsuF/c0MOiS568GK42GrzSwNZxKV51i8BSFyXW
+         uVLLHsrIQR5qVdDrnrV9sGQJN+p+itYahYXGZZMLhb24JQrDQH+Lm/RobgMW9ZBeFf8v
+         V6F9beEcRqpZoo4GZQ6I4Dirc+FlA8S89LzckgDb36YJDP6Mcp0y8rCLyf3wX5DG05v1
+         Hy3MWRraZqQuOMsA6nnJucPUhlNiFbppSnvaSr4oSdZO96A8kHj0x7nwITUulvrYJFyU
+         0uiQFHWTddC2Q13JyG13HXkRZJ+xYfTuHTM0ThaHAAhm/fVWnt9RA/EaiomRj6fuuS5D
+         BsBA==
+X-Gm-Message-State: AOJu0Yw4qHFPWjfmzzTP7LEbsX/2XN3l4vENmR4zrAI2e5qq48R/00yY
+	EBUWchF5bnyR+27/pvahiAMWIg==
+X-Google-Smtp-Source: AGHT+IE5Is0T9Gb2pkAaMCcvdCp2+wE6MdXTNVK19edYJVfCNbwyivqpHxNj5ZqvY6JGLEncHhBXcw==
+X-Received: by 2002:a17:906:1ba1:b0:a1a:57e2:2cac with SMTP id r1-20020a1709061ba100b00a1a57e22cacmr2495919ejg.144.1701768655390;
+        Tue, 05 Dec 2023 01:30:55 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id gq18-20020a170906e25200b00a0988d69549sm6352748ejb.189.2023.12.05.01.30.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 01:28:57 -0800 (PST)
-Message-ID: <d657f059d384419fe4df02580a4af9cf69e0e9c2.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 1/6] ptp: clockmatrix: support 32-bit
- address space
-From: Paolo Abeni <pabeni@redhat.com>
-To: Simon Horman <horms@kernel.org>, Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
-Date: Tue, 05 Dec 2023 10:28:56 +0100
-In-Reply-To: <20231205092429.GS50400@kernel.org>
-References: 
-	<PH7PR03MB70644CE21E835B48799F3EB3A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
-	 <20231205092429.GS50400@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 05 Dec 2023 01:30:54 -0800 (PST)
+Date: Tue, 5 Dec 2023 10:30:53 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
+Subject: Re: [net 09/15] net/mlx5e: Forbid devlink reload if IPSec rules are
+ offloaded
+Message-ID: <ZW7tzZZj+zpDSyLk@nanopsycho>
+References: <20231122014804.27716-1-saeed@kernel.org>
+ <20231122014804.27716-10-saeed@kernel.org>
+ <ZV3GSeNC0Pe3ubhB@nanopsycho>
+ <20231122093546.GA4760@unreal>
+ <ZV3O7dwQMLlNFZp3@nanopsycho>
+ <20231122112832.GB4760@unreal>
+ <ZWXW5o9XIb0RHpkb@nanopsycho>
+ <20231128160849.GA6535@unreal>
+ <ZWdP4utCeq4MIJ99@nanopsycho>
+ <20231204170538.GC5136@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231204170538.GC5136@unreal>
 
-On Tue, 2023-12-05 at 09:24 +0000, Simon Horman wrote:
-> On Thu, Nov 30, 2023 at 01:46:29PM -0500, Min Li wrote:
-> > From: Min Li <min.li.xe@renesas.com>
-> >=20
-> > We used to assume 0x2010xxxx address. Now that
-> > we need to access 0x2011xxxx address, we need
-> > to support read/write the whole 32-bit address space.
-> >=20
-> > Signed-off-by: Min Li <min.li.xe@renesas.com>
->=20
-> ...
->=20
-> > diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatri=
-x.c
-> > index f6f9d4adce04..f8556627befa 100644
-> > --- a/drivers/ptp/ptp_clockmatrix.c
-> > +++ b/drivers/ptp/ptp_clockmatrix.c
-> > @@ -41,8 +41,8 @@ module_param(firmware, charp, 0);
-> >  static int _idtcm_adjfine(struct idtcm_channel *channel, long scaled_p=
-pm);
-> > =20
-> >  static inline int idtcm_read(struct idtcm *idtcm,
-> > -			     u16 module,
-> > -			     u16 regaddr,
-> > +			     u32 module,
-> > +			     u32 regaddr,
-> >  			     u8 *buf,
-> >  			     u16 count)
-> >  {
-> > @@ -50,8 +50,8 @@ static inline int idtcm_read(struct idtcm *idtcm,
-> >  }
-> > =20
-> >  static inline int idtcm_write(struct idtcm *idtcm,
-> > -			      u16 module,
-> > -			      u16 regaddr,
-> > +			      u32 module,
-> > +			      u32 regaddr,
-> >  			      u8 *buf,
-> >  			      u16 count)
-> >  {
->=20
-> Hi Min Li,
->=20
-> My understanding of Paolo's review of v5 was that it would be cleaner to:
->=20
-> 1. Leave the type of the module parameter as u16
-> 2. Update the type of the regaddr parameter to u32
+Mon, Dec 04, 2023 at 06:05:38PM CET, leon@kernel.org wrote:
+>On Wed, Nov 29, 2023 at 03:51:14PM +0100, Jiri Pirko wrote:
+>> Tue, Nov 28, 2023 at 05:08:49PM CET, leon@kernel.org wrote:
+>> >On Tue, Nov 28, 2023 at 01:02:46PM +0100, Jiri Pirko wrote:
+>> >> Wed, Nov 22, 2023 at 12:28:32PM CET, leon@kernel.org wrote:
+>> >> >On Wed, Nov 22, 2023 at 10:50:37AM +0100, Jiri Pirko wrote:
+>> >> >> Wed, Nov 22, 2023 at 10:35:46AM CET, leon@kernel.org wrote:
+>> >> >> >On Wed, Nov 22, 2023 at 10:13:45AM +0100, Jiri Pirko wrote:
+>> >> >> >> Wed, Nov 22, 2023 at 02:47:58AM CET, saeed@kernel.org wrote:
+>> >> >> >> >From: Jianbo Liu <jianbol@nvidia.com>
+>> >> 
+>> >> [...]
+>> >> 
+>> >> 
+>> >> >while we are in eswitch. It is skipped in lines 1556-1558:
+>> >> >
+>> >> >  1548 static void
+>> >> >  1549 mlx5e_vport_rep_unload(struct mlx5_eswitch_rep *rep)
+>> >> >  1550 {
+>> >> >  1551         struct mlx5e_rep_priv *rpriv = mlx5e_rep_to_rep_priv(rep);
+>> >> >  1552         struct net_device *netdev = rpriv->netdev;
+>> >> >  1553         struct mlx5e_priv *priv = netdev_priv(netdev);
+>> >> >  1554         void *ppriv = priv->ppriv;
+>> >> >  1555
+>> >> >  1556         if (rep->vport == MLX5_VPORT_UPLINK) {
+>> >> >  1557                 mlx5e_vport_uplink_rep_unload(rpriv);
+>> >> >  1558                 goto free_ppriv;
+>> >> >  1559         }
+>> >> 
+>> >> Uplink netdev is created and destroyed by a different code:
+>> >> mlx5e_probe()
+>> >> mlx5e_remove()
+>> >> 
+>> >> According to my testing. The uplink netdev is properly removed and
+>> >> re-added during reload-reinit. What am I missing?
+>> >
+>> >You are missing internal profile switch from eswitch to legacy,
+>> >when you perform driver unload.
+>> >
+>> >Feel free to contact me or Jianbo offline if you need more mlx5 specific
+>> >details.
+>> 
+>> Got it. But that switch can happend independently of devlink reload
+>> reinit. 
+>
+>Right, devlink reload was relatively easy "to close" and users would see
+>the reason for it.
 
-[almost over the air conflict here ;) ]
+It's a wrong fix. We should fix this properly.
 
-I think the module parameter as u32 is needed, as later macro
-definitions will leverage that.
-
->=20
-> And...
->=20
-> ...
->=20
-> > @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
-> >  	val =3D SYNCTRL1_MASTER_SYNC_RST;
-> > =20
-> >  	/* Place master sync in reset */
-> > -	err =3D idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
-> > +	err =3D idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
-> >  	if (err)
-> >  		return err;
-> > =20
-> > -	err =3D idtcm_write(idtcm, 0, sync_ctrl0, &sync_src, sizeof(sync_src)=
-);
-> > +	err =3D idtcm_write(idtcm, sync_ctrl0, 0, &sync_src, sizeof(sync_src)=
-);
-> >  	if (err)
-> >  		return err;
-> > =20
->=20
-> ... avoid the need for changes like the two above.
-
-This part is correct/what I meant ;)
-
-Cheers,
-
-Paolo
-
+>
+>
+>> Also, I think it cause more issues than just abandoned ipsec rules.
+>
+>Yes, it is.
+>
+>> 
+>> 
+>> >
+>> >Thanks
+>> >
+>> >> 
+>> >> 
+>> >> 
+>> >> >  1560
+>> >> >  1561         unregister_netdev(netdev);
+>> >> >  1562         mlx5e_rep_vnic_reporter_destroy(priv);
+>> >> >  1563         mlx5e_detach_netdev(priv);
+>> >> >  1564         priv->profile->cleanup(priv);
+>> >> >  1565         mlx5e_destroy_netdev(priv);
+>> >> >  1566 free_ppriv:
+>> >> >  1567         kvfree(ppriv); /* mlx5e_rep_priv */
+>> >> >  1568 }
+>> >> >
+>> >> 
+>> >> [...]
+>> >> 
+>> >> 
 
