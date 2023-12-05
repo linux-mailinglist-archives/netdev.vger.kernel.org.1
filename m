@@ -1,109 +1,91 @@
-Return-Path: <netdev+bounces-53748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9309804562
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:00:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4FD804564
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 04:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79979280AB3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:00:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09631C20A5A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FAC4C6C;
-	Tue,  5 Dec 2023 03:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8431D5664;
+	Tue,  5 Dec 2023 03:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ghkrNVs2"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="GIIo97CD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02A5CD;
-	Mon,  4 Dec 2023 19:00:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VZoBFo7vkkOE+8ETmoqLoMpJqmfxzyZ/oRh4/28PaWM=; b=ghkrNVs22VmbwG5bG2CPELHwz3
-	E0PJfkDyfVH1wav5L+QjNpNctwq261tJcpzANvGrQAojZ40AeBabvD45/Zc7QofyUhPeUXeJSQSRX
-	kBsJYMLh0e1GCbl0HSQNHv5Dr+PQOPZhc0vlRWhh1JWTlLdBgCwJLZxY4N2hm8FALs+Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rALfk-0022kp-HU; Tue, 05 Dec 2023 04:00:32 +0100
-Date: Tue, 5 Dec 2023 04:00:32 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
- activate if hw-controlled
-Message-ID: <4c9396eb-f255-4277-8151-caa28c8ea0d3@lunn.ch>
-References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
- <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
- <CAFSsGVvBfvkotAd+p++bzca4Km8pHVzNJEGV6CAjYULVOWuD2Q@mail.gmail.com>
- <7535cb07-31ab-407d-9226-7b3f65050a65@lunn.ch>
- <c57558a4-9f3a-48fa-acb7-e3eb2349c666@gmail.com>
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81D7CD;
+	Mon,  4 Dec 2023 19:01:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1701745275; x=1733281275;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=edD6I/2cJPvUq46ZoGJHjc6YdQlKiXMFui8V5tcUIfc=;
+  b=GIIo97CD1kEbmLgG9a95WqzYAPLaMZyhUwe/lbOMFjppnc3Mf0E60+cU
+   3jcVWpbjPFt+NWbJhQEU5WMAnQH1eY3zU/gQeV2rmfdmgMG12QFrX1Uih
+   8mo9+jhdl+AYG994PFKgVw7GuEW5r8bxRdXJ3Ymj1q0h2KqBoPnsOQai4
+   g=;
+X-IronPort-AV: E=Sophos;i="6.04,251,1695686400"; 
+   d="scan'208";a="169982829"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 03:01:13 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id 7FEE4807EE;
+	Tue,  5 Dec 2023 03:01:11 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:44108]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.133:2525] with esmtp (Farcaster)
+ id 9fd950d9-b1a3-4d34-a170-bdecb523e67d; Tue, 5 Dec 2023 03:01:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 9fd950d9-b1a3-4d34-a170-bdecb523e67d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Tue, 5 Dec 2023 03:01:09 +0000
+Received: from 88665a182662.ant.amazon.com (10.119.0.105) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 5 Dec 2023 03:01:05 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <alexei.starovoitov@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 bpf-next 3/3] selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
+Date: Tue, 5 Dec 2023 12:00:56 +0900
+Message-ID: <20231205030056.96419-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAADnVQKY74ynj8PB62Wf4xgDN6sC=VawQwy5V3YbRx-2tbcwNw@mail.gmail.com>
+References: <CAADnVQKY74ynj8PB62Wf4xgDN6sC=VawQwy5V3YbRx-2tbcwNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c57558a4-9f3a-48fa-acb7-e3eb2349c666@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-> Let's take a very simple use case: We have a one bit configuration to
-> switch a LED between link_100 and link_1000 hw trigger mode.
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 4 Dec 2023 18:13:55 -0800
+> On Mon, Dec 4, 2023 at 5:36 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > +static __always_inline int tcp_load_headers(struct tcp_syncookie *ctx)
 > 
-> Then we have the atomicity issue you described: We can't go directly
-> from one hw-controlled mode to the other, we have to go via both
-> modes active or no mode active.
+> ...
 > 
-> And unfortunately we don't have the option to indicate this by some
-> optical LED activity like blinking, especially if the link is down
-> at the moment.
+> > +static __always_inline int tcp_reload_headers(struct tcp_syncookie *ctx)
 > 
-> Would be a pity if our nice framework can't support such a simple
-> use case. So, what I could imagine, we react based on the return code
-> from hw_control_is_supported():
-> 
-> - 0: use hw control
-> - -EOPNOTSUPP: fall back to LED software control, no error returned to use
-> - -ENOTSUPP (another idea: ENOEXEC): store new mode in trigger_data->mode and return error to the user
-> - other errors: don't store new mode and return error to user
-> 
-> Not fully intuitive and the subtle difference between EOPNOTSUPP and
-> ENOTSUPP may confuse driver authors adding device LED support.
+> please remove __always_inline here and in all other places.
+> The generated code will be much better == faster and the verifier
+> should be able to understand it.
 
-Using an NFS error code for LEDs will definitely confuse
-developers. This is not a network file system, where it is valid to
-use ENOTSUPP.
+I confirmed the test worked without __always_inline.
+I'll fix it in v5.
 
-I actually think we need to define some best practices, ordered on
-what the hardware can do.
-
-1) With software control, set_brightness should do what you expect,
-not return an error.
-
-2) Without full software control, but there is a mechanism to report a
-problem, like constant blinking, or off, do that, and return
--EOPNOTSUPP.
-
-3) Really dumb hardware like this, set_brightness should be a NULL
-pointer. The core returns -EOPNOTSUPP.
-
-The core should return this -EOPNOTSUPP to user space, but it should
-accept the configuration change. So the user can put it into an
-invalid state, in order to get to a valid state with further
-configuration.
-
-I don't see an easy way to let the user know what the valid states
-are. We currently have a 10bit state. I don't think we can put all the
-valid ones in a /sysfs file, especially when QCA8K pretty much
-supports everything.
-
-	 Andrew
+Thanks!
 
