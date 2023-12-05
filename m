@@ -1,70 +1,130 @@
-Return-Path: <netdev+bounces-53843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B48804D7F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:21:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270C9804DB9
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 10:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D24DB1C20B2F
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:21:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571EF1C20A7A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABAF3E496;
-	Tue,  5 Dec 2023 09:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E113E483;
+	Tue,  5 Dec 2023 09:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+ur2qqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DC583
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 01:21:31 -0800 (PST)
-X-QQ-mid:Yeas1t1701768050t854t48136
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.204.154.156])
-X-QQ-SSF:00400000000000F0FSF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 13344881203513048041
-To: "'duanqiangwen'" <duanqiangwen@net-swift.com>,
-	<netdev@vger.kernel.org>,
-	<kuba@kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<davem@davemloft.net>,
-	<pabeni@redhat.com>,
-	<yang.lee@linux.alibaba.com>,
-	<error27@gmail.com>,
-	<horms@kernel.org>
-References: <20231205065033.19536-1-duanqiangwen@net-swift.com>
-In-Reply-To: <20231205065033.19536-1-duanqiangwen@net-swift.com>
-Subject: RE: [PATCH net] net: libwx: fix memory leak on free page
-Date: Tue, 5 Dec 2023 17:20:49 +0800
-Message-ID: <04f201da275c$566735d0$0335a170$@trustnetic.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2AE3C082
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:24:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B04DC433C7;
+	Tue,  5 Dec 2023 09:24:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701768273;
+	bh=LE4v9iNcz3QGxhQv8zqdcmJBFGyHYI45ixnNodZ4Tnc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R+ur2qqE4tEKBVcwnd+4nPXAEG3oHW3XTb9zLUw0xjJPl4Hml+yoh1l+izgkexVxb
+	 kiv4xnO0z60QIpEPVuq9P7poxaNliwATjcG+fw6ZgbHBsUkd8O1nPR+6PgnfpseNGy
+	 5aUAgXICvXLpf2/0hhqdE0u167ZQkU/THjJMf7QC6QJHnBSAsvYn29I7O8thX1l7qG
+	 c4jhFVuYoSWnF6GVkNeybZZhBVFe7ED9AnkU2KOb+2T3o5OKv4aBMWcSyBSKhuBaSC
+	 R3cshUcCLL4GhH4/xLRaUttjxHVPypjVnILfX6ZKMtZbPsw42tCwVxP2IASWxroSaD
+	 dAMUV6wp4g72A==
+Date: Tue, 5 Dec 2023 09:24:29 +0000
+From: Simon Horman <horms@kernel.org>
+To: Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v6 1/6] ptp: clockmatrix: support 32-bit address
+ space
+Message-ID: <20231205092429.GS50400@kernel.org>
+References: <PH7PR03MB70644CE21E835B48799F3EB3A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQJx97aawQypS/CXAFrzFUrGxQZG6q9qx4TA
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR03MB70644CE21E835B48799F3EB3A082A@PH7PR03MB7064.namprd03.prod.outlook.com>
 
-> @@ -2248,8 +2180,7 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
+On Thu, Nov 30, 2023 at 01:46:29PM -0500, Min Li wrote:
+> From: Min Li <min.li.xe@renesas.com>
 > 
->  		/* free resources associated with mapping */
->  		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
-> -		__page_frag_cache_drain(rx_buffer->page,
-> -					rx_buffer->pagecnt_bias);
-> +
-
-No need to add this blank line. Other looks good to me, thanks!
-
-Reviewed-by: Jiawen Wu <jiawenwu@trustnetic.com>
-
+> We used to assume 0x2010xxxx address. Now that
+> we need to access 0x2011xxxx address, we need
+> to support read/write the whole 32-bit address space.
 > 
->  		i++;
->  		rx_buffer++;
- 
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
+
+...
+
+> diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
+> index f6f9d4adce04..f8556627befa 100644
+> --- a/drivers/ptp/ptp_clockmatrix.c
+> +++ b/drivers/ptp/ptp_clockmatrix.c
+> @@ -41,8 +41,8 @@ module_param(firmware, charp, 0);
+>  static int _idtcm_adjfine(struct idtcm_channel *channel, long scaled_ppm);
+>  
+>  static inline int idtcm_read(struct idtcm *idtcm,
+> -			     u16 module,
+> -			     u16 regaddr,
+> +			     u32 module,
+> +			     u32 regaddr,
+>  			     u8 *buf,
+>  			     u16 count)
+>  {
+> @@ -50,8 +50,8 @@ static inline int idtcm_read(struct idtcm *idtcm,
+>  }
+>  
+>  static inline int idtcm_write(struct idtcm *idtcm,
+> -			      u16 module,
+> -			      u16 regaddr,
+> +			      u32 module,
+> +			      u32 regaddr,
+>  			      u8 *buf,
+>  			      u16 count)
+>  {
+
+Hi Min Li,
+
+My understanding of Paolo's review of v5 was that it would be cleaner to:
+
+1. Leave the type of the module parameter as u16
+2. Update the type of the regaddr parameter to u32
+
+And...
+
+...
+
+> @@ -553,11 +554,11 @@ static int _sync_pll_output(struct idtcm *idtcm,
+>  	val = SYNCTRL1_MASTER_SYNC_RST;
+>  
+>  	/* Place master sync in reset */
+> -	err = idtcm_write(idtcm, 0, sync_ctrl1, &val, sizeof(val));
+> +	err = idtcm_write(idtcm, sync_ctrl1, 0, &val, sizeof(val));
+>  	if (err)
+>  		return err;
+>  
+> -	err = idtcm_write(idtcm, 0, sync_ctrl0, &sync_src, sizeof(sync_src));
+> +	err = idtcm_write(idtcm, sync_ctrl0, 0, &sync_src, sizeof(sync_src));
+>  	if (err)
+>  		return err;
+>  
+
+... avoid the need for changes like the two above.
+
+As it is the meaning of module and regaddr are subtly reversed.
+If that is intentional then it really ought to be at least stated
+in the patch. And, IMHO, ideally a separate patch.
+
+As it is, reversing the meaning of these parameters seems
+to add extra churn to this patch.
+
+
+
 
 
