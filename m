@@ -1,184 +1,86 @@
-Return-Path: <netdev+bounces-54052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27612805CE2
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:07:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D791B805CEE
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CED241F215C7
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:07:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14E771C210B7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DC83FB3D;
-	Tue,  5 Dec 2023 18:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29CD95F1F4;
+	Tue,  5 Dec 2023 18:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTQllM/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id AAEC0122
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 10:07:42 -0800 (PST)
-Received: (qmail 425300 invoked by uid 1000); 5 Dec 2023 13:07:41 -0500
-Date: Tue, 5 Dec 2023 13:07:41 -0500
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: oneukum@suse.com, davem@davemloft.net, edumazet@google.com,
-  greg@kroah.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-  linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-  stable@vger.kernel.org
-Subject: Re: [PATCH v4] net: usb: ax88179_178a: avoid failed operations when
- device is disconnected
-Message-ID: <624ad05b-0b90-4d1c-b06b-7a75473401c3@rowland.harvard.edu>
-References: <4ce32363-378c-4ea3-9a4e-d7274d4f7787@suse.com>
- <20231205135154.516342-1-jtornosm@redhat.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0241B3FB3D;
+	Tue,  5 Dec 2023 18:10:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E784C433C8;
+	Tue,  5 Dec 2023 18:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701799803;
+	bh=LU1lm5euECpqcvRwZ7jyN4+iInnCJKP6smuWa4x8dak=;
+	h=Date:From:To:Cc:Subject:From;
+	b=aTQllM/9zBjVF6JB6gnBDZtrpFBcTDUDKx96BRAHx0Eyt/NGJZWyLXCkAgTWZ9Kw8
+	 QBeZIcfOP2r6iXUoDGbQ5PKGXAKYBiIc2PAaDlvpYZ4tLGYuY3A6rVwPKb7Ny6kHu4
+	 kui4NGYkf4LwppIc1tJLQyfhZA6LkAkFHeMxn0UzQ7zZH0Bv1lYtyTGtBwfgNIwzoe
+	 QXBIiDTmxjQWHDXSz9d/UJ+9S6TKWGGLrc3DnldOtGwq8I78xmKKK/ElhhJXiZgxOQ
+	 rhWlmt2A52hFcQ37mBnwXAHR0usnhimh0XqtzlAO5ntow5CnCbNqSrL/B/9CGL0SaR
+	 ymI3Afbec+8eg==
+Date: Tue, 5 Dec 2023 10:10:02 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Cc: Kalle Valo <kvalo@kernel.org>, Johannes Berg
+ <johannes@sipsolutions.net>, fw@strlen.de, pablo@netfilter.org,
+ torvalds@linux-foundation.org, bpf@vger.kernel.org
+Subject: [ANN] Winter break shutdown plan
+Message-ID: <20231205101002.1c09e027@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205135154.516342-1-jtornosm@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 05, 2023 at 02:51:54PM +0100, Jose Ignacio Tornos Martinez wrote:
-> When the device is disconnected we get the following messages showing
-> failed operations:
-> Nov 28 20:22:11 localhost kernel: usb 2-3: USB disconnect, device number 2
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: unregister 'ax88179_178a' usb-0000:02:00.0-3, ASIX AX88179 USB 3.0 Gigabit Ethernet
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: Failed to read reg index 0x0002: -19
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3: Failed to write reg index 0x0002: -19
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0002: -19
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0001: -19
-> Nov 28 20:22:11 localhost kernel: ax88179_178a 2-3:1.0 enp2s0u3 (unregistered): Failed to write reg index 0x0002: -19
-> 
-> The reason is that although the device is detached, normal stop and
-> unbind operations are commanded from the driver. These operations are
-> not necessary in this situation, so avoid these logs when the device is
-> detached if the result of the operation is -ENODEV and if the new flag
-> informing about the disconnecting status is enabled.
-> 
-> cc: stable@vger.kernel.org
-> Fixes: e2ca90c276e1f ("ax88179_178a: ASIX AX88179_178A USB 3.0/2.0 to gigabit ethernet adapter driver")
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> ---
-> V1 -> V2:
-> - Follow the suggestions from Alan Stern and Oliver Neukum to check the
-> result of the operations (-ENODEV) and not the internal state of the USB 
-> layer (USB_STATE_NOTATTACHED).
-> V2 -> V3
-> - Add cc: stable line in the signed-off-by area.
-> V3 -> V4
-> - Follow the suggestions from Oliver Neukum to use only one flag when
-> disconnecting and include barriers to avoid memory ordering issues.
+Hi!
 
-The __ax88179_read_cmd() and __ax88179_write_cmd() routines are 
-asynchronous with respect to ax88179_disconnect(), right?  Or at least, 
-they are if they run as a result of the user closing the network 
-interface.  Otherwise there wouldn't be any memory ordering issues.
+tl;dr net-next will be closed Dec 23rd - Jan 1st (incl.)
 
-But the memory barriers you added are not the proper solution.  What you 
-need here is _synchronization_, not _ordering_.  As it is, the memory 
-barriers you have added don't do anything; they shouldn't be in the 
-patch.
+Last year the winter holidays fell right after the v6.3 merge window.
+We used this as an opportunity to extend the net-next shutdown over
+the winter and new year's celebrations. The concept of shutting down
+-next development seems to have overwhelming support, the real question
+is whether to shut down for one or two weeks, rather than whether to
+shut down at all.
 
-If you would like a more in-depth explanation, let me know.
+The timing of the merge window is not as lucky this time. We will have
+to do a "mid-cycle shutdown". net-next will "close" for feature
+development, refactoring, etc. Because some code will exist in net-next
+only, however, net-next will remain open for fixes. A bit confusing, but
+hopefully we all understand what a fix is ;) Maybe a better way 
+to phrase the shutdown this time would be "fixes only" rather than
+"net-next is closed".
 
-Alan Stern
+Regarding timing - we did a small poll among developers and/or
+attendees of the bi-weekly call and the conclusion seems to be
+that we should shut down on Dec 23rd (Saturday) and reopen on Jan 2nd.
+Two-week shutdown had some support but it's hard to know whether to
+fit the extra week before Christmas or after New Year or to split it...
 
->  drivers/net/usb/ax88179_178a.c | 38 +++++++++++++++++++++++++++-------
->  1 file changed, 31 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-> index 4ea0e155bb0d..1c671f2a43ee 100644
-> --- a/drivers/net/usb/ax88179_178a.c
-> +++ b/drivers/net/usb/ax88179_178a.c
-> @@ -173,6 +173,7 @@ struct ax88179_data {
->  	u8 in_pm;
->  	u32 wol_supported;
->  	u32 wolopts;
-> +	u8 disconnecting;
->  };
->  
->  struct ax88179_int_data {
-> @@ -208,6 +209,7 @@ static int __ax88179_read_cmd(struct usbnet *dev, u8 cmd, u16 value, u16 index,
->  {
->  	int ret;
->  	int (*fn)(struct usbnet *, u8, u8, u16, u16, void *, u16);
-> +	struct ax88179_data *ax179_data = dev->driver_priv;
->  
->  	BUG_ON(!dev);
->  
-> @@ -219,9 +221,12 @@ static int __ax88179_read_cmd(struct usbnet *dev, u8 cmd, u16 value, u16 index,
->  	ret = fn(dev, cmd, USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
->  		 value, index, data, size);
->  
-> -	if (unlikely(ret < 0))
-> -		netdev_warn(dev->net, "Failed to read reg index 0x%04x: %d\n",
-> -			    index, ret);
-> +	if (unlikely(ret < 0)) {
-> +		smp_rmb();
-> +		if (!(ret == -ENODEV && ax179_data->disconnecting))
-> +			netdev_warn(dev->net, "Failed to read reg index 0x%04x: %d\n",
-> +				    index, ret);
-> +	}
->  
->  	return ret;
->  }
-> @@ -231,6 +236,7 @@ static int __ax88179_write_cmd(struct usbnet *dev, u8 cmd, u16 value, u16 index,
->  {
->  	int ret;
->  	int (*fn)(struct usbnet *, u8, u8, u16, u16, const void *, u16);
-> +	struct ax88179_data *ax179_data = dev->driver_priv;
->  
->  	BUG_ON(!dev);
->  
-> @@ -242,9 +248,12 @@ static int __ax88179_write_cmd(struct usbnet *dev, u8 cmd, u16 value, u16 index,
->  	ret = fn(dev, cmd, USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
->  		 value, index, data, size);
->  
-> -	if (unlikely(ret < 0))
-> -		netdev_warn(dev->net, "Failed to write reg index 0x%04x: %d\n",
-> -			    index, ret);
-> +	if (unlikely(ret < 0)) {
-> +		smp_rmb();
-> +		if (!(ret == -ENODEV && ax179_data->disconnecting))
-> +			netdev_warn(dev->net, "Failed to write reg index 0x%04x: %d\n",
-> +				    index, ret);
-> +	}
->  
->  	return ret;
->  }
-> @@ -492,6 +501,21 @@ static int ax88179_resume(struct usb_interface *intf)
->  	return usbnet_resume(intf);
->  }
->  
-> +static void ax88179_disconnect(struct usb_interface *intf)
-> +{
-> +	struct usbnet *dev = usb_get_intfdata(intf);
-> +	struct ax88179_data *ax179_data;
-> +
-> +	if (!dev)
-> +		return;
-> +
-> +	ax179_data = dev->driver_priv;
-> +	ax179_data->disconnecting = 1;
-> +	smp_wmb();
-> +
-> +	usbnet_disconnect(intf);
-> +}
-> +
->  static void
->  ax88179_get_wol(struct net_device *net, struct ethtool_wolinfo *wolinfo)
->  {
-> @@ -1906,7 +1930,7 @@ static struct usb_driver ax88179_178a_driver = {
->  	.suspend =	ax88179_suspend,
->  	.resume =	ax88179_resume,
->  	.reset_resume =	ax88179_resume,
-> -	.disconnect =	usbnet_disconnect,
-> +	.disconnect =	ax88179_disconnect,
->  	.supports_autosuspend = 1,
->  	.disable_hub_initiated_lpm = 1,
->  };
-> -- 
-> 2.43.0
-> 
+Depending on the urgency and volume of fixes we hope to also skip
+the PR to Linus on Dec 28th.
+
+Hopefully the merge window for v6.8 will open on Jan 7th or 14th,
+giving us at least a week to settle any -next code which is ready
+after the break.
+
+As always during net-next closures RFC posting of net-next code are
+not be discouraged.
 
