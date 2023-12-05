@@ -1,146 +1,214 @@
-Return-Path: <netdev+bounces-53771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BBA1804993
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:58:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20BCA8049B6
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17902B20C90
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 05:58:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC00DB209F8
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424A0D516;
-	Tue,  5 Dec 2023 05:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sniVjpRX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2137DD520;
+	Tue,  5 Dec 2023 06:05:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [IPv6:2001:41d0:203:375::af])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1A9111
-	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 21:58:27 -0800 (PST)
-Message-ID: <95f41a77-e283-4e86-82e1-4a46c9dfeb30@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701755906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DL3qjRnnr1J0x60ad6AbwIOX+fKEVZW9nzRwjVpt3vc=;
-	b=sniVjpRXqnO7Qb50Blf1hSO8pzwvcCCgqRaUiWwWq/F4KLUIm+/hOEZo650a68X3lbtW13
-	JgNPkkSTNs5Fa2iuQuFVzfC6U7ser+bYLqIPR6YNaNsQKPkMlhKyAjoFbPqttNYZVje8rV
-	b8Y2udO125ZwU94LZEMTDc5TARg2EuI=
-Date: Tue, 5 Dec 2023 13:58:23 +0800
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB00C3
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 22:05:28 -0800 (PST)
+X-QQ-mid: bizesmtp79t1701756322thila8y7
+Received: from dsp-duanqiangwen.trustnetic.com ( [115.204.154.156])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 05 Dec 2023 14:05:21 +0800 (CST)
+X-QQ-SSF: 01400000000000D0E000000B0000000
+X-QQ-FEAT: XBN7tc9DADJgkKykT2SWqqDc+Z9grPiUnMAzosRxQ9wV7Wm0z36Ru2lBqVfGC
+	2YIomOLnm8La9pGMmv3R/9HKw/DMUyJQfO5DCO2fmMSrehNxl09DmCFmCuGMAbxpCTxOEKr
+	QR44hEackksvo5xVWY/iRepVSqMw5S0t2Y2PFl5KdbLAiyYchE4+vulymd3k+WdSmd6alBH
+	1D5pI/DTfaXDxxVz3QmFmxpT7LPi9rCusTrAy8Uktuv8SOmAc47iOfuPeYNYPzbQggGikw8
+	osBjQ+qSl+bz9yoDPTaM5I1TkOtpD9DyjqAoVaLQbGyUipNH9KWEG56WspNeTkt8Y86233T
+	WF6v/CMh8FXB48m+h3TplS+NzXpLp5B2RP7dNh0PuM2sJedkD6RVDhKWp1WUkrRHptdIqRS
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 14604638171973579300
+From: duanqiangwen <duanqiangwen@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: duanqiangwen <duanqiangwen@net-swift.com>
+Subject: [PATCH net] net: libwx: fix memory leak on free page
+Date: Tue,  5 Dec 2023 14:05:18 +0800
+Message-Id: <20231205060518.8872-1-duanqiangwen@net-swift.com>
+X-Mailer: git-send-email 2.12.2.windows.1
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH for-next v5 7/7] RDMA/rxe: Add module parameters for mcast
- limits
-To: Bob Pearson <rpearsonhpe@gmail.com>, jgg@nvidia.com,
- linux-rdma@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org
-References: <20231205002613.10219-1-rpearsonhpe@gmail.com>
- <20231205002613.10219-5-rpearsonhpe@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20231205002613.10219-5-rpearsonhpe@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Add  David S. Miller and  David Ahern.
+ifconfig ethx up, will set page->refcount larger than 1,
+and then ifconfig ethx down, calling __page_frag_cache_drain()
+to free pages, it is not compatible with page pool.
+So deleting codes which changing page->refcount.
 
-They are the maintainers in netdev and very familiar with mcast.
+Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
 
-Zhu Yanjun
+Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
+---
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 83 +++-------------------------
+ drivers/net/ethernet/wangxun/libwx/wx_type.h |  1 -
+ 2 files changed, 7 insertions(+), 77 deletions(-)
 
-在 2023/12/5 8:26, Bob Pearson 写道:
-> Add module parameters for max_mcast_grp, max_mcast_qp_attach,
-> and tot_mcast_qp_attach to allow setting these parameters to
-> small values when the driver is loaded to support testing these
-> limits.
->
-> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
-> ---
->   drivers/infiniband/sw/rxe/Makefile    |  3 ++-
->   drivers/infiniband/sw/rxe/rxe.c       |  6 +++---
->   drivers/infiniband/sw/rxe/rxe_param.c | 23 +++++++++++++++++++++++
->   drivers/infiniband/sw/rxe/rxe_param.h |  4 ++++
->   4 files changed, 32 insertions(+), 4 deletions(-)
->   create mode 100644 drivers/infiniband/sw/rxe/rxe_param.c
->
-> diff --git a/drivers/infiniband/sw/rxe/Makefile b/drivers/infiniband/sw/rxe/Makefile
-> index 5395a581f4bb..b183924ea01d 100644
-> --- a/drivers/infiniband/sw/rxe/Makefile
-> +++ b/drivers/infiniband/sw/rxe/Makefile
-> @@ -22,4 +22,5 @@ rdma_rxe-y := \
->   	rxe_mcast.o \
->   	rxe_task.o \
->   	rxe_net.o \
-> -	rxe_hw_counters.o
-> +	rxe_hw_counters.o \
-> +	rxe_param.o
-> diff --git a/drivers/infiniband/sw/rxe/rxe.c b/drivers/infiniband/sw/rxe/rxe.c
-> index 147cb16e937d..599fbfdeb426 100644
-> --- a/drivers/infiniband/sw/rxe/rxe.c
-> +++ b/drivers/infiniband/sw/rxe/rxe.c
-> @@ -59,9 +59,9 @@ static void rxe_init_device_param(struct rxe_dev *rxe)
->   	rxe->attr.max_res_rd_atom		= RXE_MAX_RES_RD_ATOM;
->   	rxe->attr.max_qp_init_rd_atom		= RXE_MAX_QP_INIT_RD_ATOM;
->   	rxe->attr.atomic_cap			= IB_ATOMIC_HCA;
-> -	rxe->attr.max_mcast_grp			= RXE_MAX_MCAST_GRP;
-> -	rxe->attr.max_mcast_qp_attach		= RXE_MAX_MCAST_QP_ATTACH;
-> -	rxe->attr.max_total_mcast_qp_attach	= RXE_MAX_TOT_MCAST_QP_ATTACH;
-> +	rxe->attr.max_mcast_grp			= rxe_max_mcast_grp;
-> +	rxe->attr.max_mcast_qp_attach		= rxe_max_mcast_qp_attach;
-> +	rxe->attr.max_total_mcast_qp_attach	= rxe_max_tot_mcast_qp_attach;
->   	rxe->attr.max_ah			= RXE_MAX_AH;
->   	rxe->attr.max_srq			= RXE_MAX_SRQ;
->   	rxe->attr.max_srq_wr			= RXE_MAX_SRQ_WR;
-> diff --git a/drivers/infiniband/sw/rxe/rxe_param.c b/drivers/infiniband/sw/rxe/rxe_param.c
-> new file mode 100644
-> index 000000000000..27873e7de753
-> --- /dev/null
-> +++ b/drivers/infiniband/sw/rxe/rxe_param.c
-> @@ -0,0 +1,23 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-> +/*
-> + * Copyright (c) 2023 Hewlett Packard Enterprise, Inc. All rights reserved.
-> + */
-> +
-> +#include "rxe.h"
-> +
-> +int rxe_max_mcast_grp = RXE_MAX_MCAST_GRP;
-> +module_param_named(max_mcast_grp, rxe_max_mcast_grp, int, 0444);
-> +MODULE_PARM_DESC(max_mcast_grp,
-> +	"Maximum number of multicast groups per device");
-> +
-> +int rxe_max_mcast_qp_attach = RXE_MAX_MCAST_QP_ATTACH;
-> +module_param_named(max_mcast_qp_attach, rxe_max_mcast_qp_attach,
-> +		int, 0444);
-> +MODULE_PARM_DESC(max_mcast_qp_attach,
-> +	"Maximum number of QPs attached to a multicast group");
-> +
-> +int rxe_max_tot_mcast_qp_attach = RXE_MAX_TOT_MCAST_QP_ATTACH;
-> +module_param_named(max_tot_mcast_qp_attach, rxe_max_tot_mcast_qp_attach,
-> +		int, 0444);
-> +MODULE_PARM_DESC(max_tot_mcast_qp_attach,
-> +	"Maximum total number of QPs attached to multicast groups per device");
-> diff --git a/drivers/infiniband/sw/rxe/rxe_param.h b/drivers/infiniband/sw/rxe/rxe_param.h
-> index d2f57ead78ad..d6fe50f5f483 100644
-> --- a/drivers/infiniband/sw/rxe/rxe_param.h
-> +++ b/drivers/infiniband/sw/rxe/rxe_param.h
-> @@ -125,6 +125,10 @@ enum rxe_device_param {
->   	RXE_VENDOR_ID			= 0XFFFFFF,
->   };
->   
-> +extern int rxe_max_mcast_grp;
-> +extern int rxe_max_mcast_qp_attach;
-> +extern int rxe_max_tot_mcast_qp_attach;
-> +
->   /* default/initial rxe port parameters */
->   enum rxe_port_param {
->   	RXE_PORT_GID_TBL_LEN		= 1024,
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index a5a50b5a8816..945543dd5f15 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -160,60 +160,6 @@ static __le32 wx_test_staterr(union wx_rx_desc *rx_desc,
+ 	return rx_desc->wb.upper.status_error & cpu_to_le32(stat_err_bits);
+ }
+ 
+-static bool wx_can_reuse_rx_page(struct wx_rx_buffer *rx_buffer,
+-				 int rx_buffer_pgcnt)
+-{
+-	unsigned int pagecnt_bias = rx_buffer->pagecnt_bias;
+-	struct page *page = rx_buffer->page;
+-
+-	/* avoid re-using remote and pfmemalloc pages */
+-	if (!dev_page_is_reusable(page))
+-		return false;
+-
+-#if (PAGE_SIZE < 8192)
+-	/* if we are only owner of page we can reuse it */
+-	if (unlikely((rx_buffer_pgcnt - pagecnt_bias) > 1))
+-		return false;
+-#endif
+-
+-	/* If we have drained the page fragment pool we need to update
+-	 * the pagecnt_bias and page count so that we fully restock the
+-	 * number of references the driver holds.
+-	 */
+-	if (unlikely(pagecnt_bias == 1)) {
+-		page_ref_add(page, USHRT_MAX - 1);
+-		rx_buffer->pagecnt_bias = USHRT_MAX;
+-	}
+-
+-	return true;
+-}
+-
+-/**
+- * wx_reuse_rx_page - page flip buffer and store it back on the ring
+- * @rx_ring: rx descriptor ring to store buffers on
+- * @old_buff: donor buffer to have page reused
+- *
+- * Synchronizes page for reuse by the adapter
+- **/
+-static void wx_reuse_rx_page(struct wx_ring *rx_ring,
+-			     struct wx_rx_buffer *old_buff)
+-{
+-	u16 nta = rx_ring->next_to_alloc;
+-	struct wx_rx_buffer *new_buff;
+-
+-	new_buff = &rx_ring->rx_buffer_info[nta];
+-
+-	/* update, and store next to alloc */
+-	nta++;
+-	rx_ring->next_to_alloc = (nta < rx_ring->count) ? nta : 0;
+-
+-	/* transfer page from old buffer to new buffer */
+-	new_buff->page = old_buff->page;
+-	new_buff->page_dma = old_buff->page_dma;
+-	new_buff->page_offset = old_buff->page_offset;
+-	new_buff->pagecnt_bias	= old_buff->pagecnt_bias;
+-}
+-
+ static void wx_dma_sync_frag(struct wx_ring *rx_ring,
+ 			     struct wx_rx_buffer *rx_buffer)
+ {
+@@ -270,8 +216,6 @@ static struct wx_rx_buffer *wx_get_rx_buffer(struct wx_ring *rx_ring,
+ 				      size,
+ 				      DMA_FROM_DEVICE);
+ skip_sync:
+-	rx_buffer->pagecnt_bias--;
+-
+ 	return rx_buffer;
+ }
+ 
+@@ -280,19 +224,9 @@ static void wx_put_rx_buffer(struct wx_ring *rx_ring,
+ 			     struct sk_buff *skb,
+ 			     int rx_buffer_pgcnt)
+ {
+-	if (wx_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
+-		/* hand second half of page back to the ring */
+-		wx_reuse_rx_page(rx_ring, rx_buffer);
+-	} else {
+-		if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
+-			/* the page has been released from the ring */
+-			WX_CB(skb)->page_released = true;
+-		else
+-			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+-
+-		__page_frag_cache_drain(rx_buffer->page,
+-					rx_buffer->pagecnt_bias);
+-	}
++	if (!IS_ERR(skb) && WX_CB(skb)->dma == rx_buffer->dma)
++		/* the page has been released from the ring */
++		WX_CB(skb)->page_released = true;
+ 
+ 	/* clear contents of rx_buffer */
+ 	rx_buffer->page = NULL;
+@@ -335,11 +269,12 @@ static struct sk_buff *wx_build_skb(struct wx_ring *rx_ring,
+ 		if (size <= WX_RXBUFFER_256) {
+ 			memcpy(__skb_put(skb, size), page_addr,
+ 			       ALIGN(size, sizeof(long)));
+-			rx_buffer->pagecnt_bias++;
+-
++			page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+ 			return skb;
+ 		}
+ 
++		skb_mark_for_recycle(skb);
++
+ 		if (!wx_test_staterr(rx_desc, WX_RXD_STAT_EOP))
+ 			WX_CB(skb)->dma = rx_buffer->dma;
+ 
+@@ -382,8 +317,6 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx_ring,
+ 	bi->page_dma = dma;
+ 	bi->page = page;
+ 	bi->page_offset = 0;
+-	page_ref_add(page, USHRT_MAX - 1);
+-	bi->pagecnt_bias = USHRT_MAX;
+ 
+ 	return true;
+ }
+@@ -723,7 +656,6 @@ static int wx_clean_rx_irq(struct wx_q_vector *q_vector,
+ 		/* exit if we failed to retrieve a buffer */
+ 		if (!skb) {
+ 			rx_ring->rx_stats.alloc_rx_buff_failed++;
+-			rx_buffer->pagecnt_bias++;
+ 			break;
+ 		}
+ 
+@@ -2248,8 +2180,7 @@ static void wx_clean_rx_ring(struct wx_ring *rx_ring)
+ 
+ 		/* free resources associated with mapping */
+ 		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+-		__page_frag_cache_drain(rx_buffer->page,
+-					rx_buffer->pagecnt_bias);
++
+ 
+ 		i++;
+ 		rx_buffer++;
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 165e82de772e..83f9bb7b3c22 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -787,7 +787,6 @@ struct wx_rx_buffer {
+ 	dma_addr_t page_dma;
+ 	struct page *page;
+ 	unsigned int page_offset;
+-	u16 pagecnt_bias;
+ };
+ 
+ struct wx_queue_stats {
+-- 
+2.12.2.windows.1
+
 
