@@ -1,154 +1,180 @@
-Return-Path: <netdev+bounces-53765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A87D804980
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:53:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B5E804984
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060EF2814BF
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 05:53:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ADE61C20D4B
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 05:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D5CD2E9;
-	Tue,  5 Dec 2023 05:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBD1D2F8;
+	Tue,  5 Dec 2023 05:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="azAj7eL1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eHqqY+rA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BE8AA;
-	Mon,  4 Dec 2023 21:53:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701755619; x=1733291619;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bFFeeF8hJ3DxE50au0V2o4iCp73fC+lbzXYWg5k/A/o=;
-  b=azAj7eL1U16j4HcCYOXpiTtrsJDi5jsAjhd4CXRGeMvER9FQISvS0raS
-   GSeP3vgeox4W2Txfvgbm6Ypu4osD+pwu/3PAZfy0tqyV6Dfeo/8niKHnO
-   7cyj0siOEefqYQKg/uS36JLWD9mKlWgQocyUXCNFhGO9NqDyWwbks/Vky
-   uzex9G8SMTyTjIdCc9S61G4qCidN5fDfOsUCEjxpTUfpu8biHMsm8ELL7
-   A3D5u7hj7ctdAaH25T+iKXbrHshDSK5Sof28MKLbccTcHw507hNJ2B+k4
-   G8uvYXiIT53a/8Vp7T7/9rvxHC1Omj9wJHG6tu8nGLz3n2BLhljxTobHG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="425008173"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="425008173"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 21:53:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="841329822"
-X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
-   d="scan'208";a="841329822"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 04 Dec 2023 21:53:35 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rAONA-0008PG-1l;
-	Tue, 05 Dec 2023 05:53:32 +0000
-Date: Tue, 5 Dec 2023 13:53:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sneh Shah <quic_snehshah@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-	Andrew Halaney <ahalaney@redhat.com>
-Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for
- qcom ethqos
-Message-ID: <202312051347.L3L2pNLv-lkp@intel.com>
-References: <20231204084854.31543-1-quic_snehshah@quicinc.com>
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 261E118A
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 21:53:46 -0800 (PST)
+Message-ID: <0b103b8d-3462-42d3-bc06-803c0b6ca153@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701755623;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nzjIUhOpfaIjSD+vTUTAHKVvbPYzafZthOVKY21wrlc=;
+	b=eHqqY+rAza4lLvQA4eVECfLCNipbrY8hQMhBTFn3Rb8eQkzbWIFwhMOo/ii5XRrSZu9yM4
+	97lnesTMq7PIEv+x+3E+jrU8YeRMIHKYgefYbIYtc7NbOwjFy4SRQSCU5MgBaOcKhd/wNb
+	KN9m4W3zsCVwmphYx0fswwFsyVf4hq4=
+Date: Tue, 5 Dec 2023 13:53:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204084854.31543-1-quic_snehshah@quicinc.com>
+Subject: Re: [PATCH for-next v5 2/7] RDMA/rxe: Fix sending of mcast packets
+To: Bob Pearson <rpearsonhpe@gmail.com>, jgg@nvidia.com,
+ linux-rdma@vger.kernel.org, dsahern@kernel.org,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20231205002322.10143-1-rpearsonhpe@gmail.com>
+ <20231205002322.10143-3-rpearsonhpe@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20231205002322.10143-3-rpearsonhpe@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Sneh,
+Add  David S. Miller and  David Ahern.
 
-kernel test robot noticed the following build warnings:
+They are the maintainers in netdev and very familiar with mcast.
 
-[auto build test WARNING on net-next/main]
+Zhu Yanjun
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sneh-Shah/net-stmmac-qcom-ethqos-Add-sysfs-nodes-for-qcom-ethqos/20231204-165232
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231204084854.31543-1-quic_snehshah%40quicinc.com
-patch subject: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for qcom ethqos
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231205/202312051347.L3L2pNLv-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231205/202312051347.L3L2pNLv-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202312051347.L3L2pNLv-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c: In function 'gvm_queue_mapping_store':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c:770:13: warning: variable 'prio' set but not used [-Wunused-but-set-variable]
-     770 |         u32 prio;
-         |             ^~~~
-
-
-vim +/prio +770 drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-
-   762	
-   763	static ssize_t gvm_queue_mapping_store(struct device *dev,
-   764					       struct device_attribute *attr,
-   765					       const char *user_buf, size_t size)
-   766	{
-   767		struct net_device *netdev = to_net_dev(dev);
-   768		struct stmmac_priv *priv;
-   769		struct qcom_ethqos *ethqos;
- > 770		u32 prio;
-   771		s8 input = 0;
-   772	
-   773		if (!netdev) {
-   774			pr_err("netdev is NULL\n");
-   775			return -EINVAL;
-   776		}
-   777	
-   778		priv = netdev_priv(netdev);
-   779		if (!priv) {
-   780			pr_err("priv is NULL\n");
-   781			return -EINVAL;
-   782		}
-   783	
-   784		ethqos = priv->plat->bsp_priv;
-   785		if (!ethqos) {
-   786			pr_err("ethqos is NULL\n");
-   787			return -EINVAL;
-   788		}
-   789	
-   790		if (kstrtos8(user_buf, 0, &input)) {
-   791			pr_err("Error in reading option from user\n");
-   792			return -EINVAL;
-   793		}
-   794	
-   795		if (input == ethqos->gvm_queue)
-   796			pr_err("No effect as duplicate input\n");
-   797	
-   798		ethqos->gvm_queue = input;
-   799		prio  = 1 << input;
-   800	
-   801		return size;
-   802	}
-   803	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+在 2023/12/5 8:23, Bob Pearson 写道:
+> Currently the rdma_rxe driver does not send mcast packets correctly.
+> It uses the wrong qp number for the packets.
+>
+> Add a mask bit to indicate that a multicast packet has been locally
+> sent and use to set the correct qpn for multicast packets and
+> identify mcast packets when sending.
+>
+> Fixes: 8700e3e7c485 ("Soft RoCE driver")
+> Signed-off-by: Bob Pearson <rpearsonhpe@gmail.com>
+> ---
+>   drivers/infiniband/sw/rxe/rxe_av.c     |  7 +++++++
+>   drivers/infiniband/sw/rxe/rxe_loc.h    |  1 +
+>   drivers/infiniband/sw/rxe/rxe_net.c    |  4 +++-
+>   drivers/infiniband/sw/rxe/rxe_opcode.h |  2 +-
+>   drivers/infiniband/sw/rxe/rxe_recv.c   |  4 ++++
+>   drivers/infiniband/sw/rxe/rxe_req.c    | 11 +++++++++--
+>   6 files changed, 25 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/infiniband/sw/rxe/rxe_av.c b/drivers/infiniband/sw/rxe/rxe_av.c
+> index 4ac17b8def28..022173eb5d75 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_av.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_av.c
+> @@ -7,6 +7,13 @@
+>   #include "rxe.h"
+>   #include "rxe_loc.h"
+>   
+> +bool rxe_is_mcast_av(struct rxe_av *av)
+> +{
+> +	struct in6_addr *daddr = (struct in6_addr *)av->grh.dgid.raw;
+> +
+> +	return rdma_is_multicast_addr(daddr);
+> +}
+> +
+>   void rxe_init_av(struct rdma_ah_attr *attr, struct rxe_av *av)
+>   {
+>   	rxe_av_from_attr(rdma_ah_get_port_num(attr), av, attr);
+> diff --git a/drivers/infiniband/sw/rxe/rxe_loc.h b/drivers/infiniband/sw/rxe/rxe_loc.h
+> index 3d2504a0ae56..62b2b25903fc 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_loc.h
+> +++ b/drivers/infiniband/sw/rxe/rxe_loc.h
+> @@ -8,6 +8,7 @@
+>   #define RXE_LOC_H
+>   
+>   /* rxe_av.c */
+> +bool rxe_is_mcast_av(struct rxe_av *av);
+>   void rxe_init_av(struct rdma_ah_attr *attr, struct rxe_av *av);
+>   int rxe_chk_ah_attr(struct rxe_dev *rxe, struct rdma_ah_attr *attr);
+>   void rxe_av_from_attr(u8 port_num, struct rxe_av *av,
+> diff --git a/drivers/infiniband/sw/rxe/rxe_net.c b/drivers/infiniband/sw/rxe/rxe_net.c
+> index cd59666158b1..58c3f3759bf0 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_net.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_net.c
+> @@ -431,7 +431,9 @@ int rxe_xmit_packet(struct rxe_qp *qp, struct rxe_pkt_info *pkt,
+>   
+>   	rxe_icrc_generate(skb, pkt);
+>   
+> -	if (pkt->mask & RXE_LOOPBACK_MASK)
+> +	if (pkt->mask & RXE_MCAST_MASK)
+> +		err = rxe_send(skb, pkt);
+> +	else if (pkt->mask & RXE_LOOPBACK_MASK)
+>   		err = rxe_loopback(skb, pkt);
+>   	else
+>   		err = rxe_send(skb, pkt);
+> diff --git a/drivers/infiniband/sw/rxe/rxe_opcode.h b/drivers/infiniband/sw/rxe/rxe_opcode.h
+> index 5686b691d6b8..c4cf672ea26d 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_opcode.h
+> +++ b/drivers/infiniband/sw/rxe/rxe_opcode.h
+> @@ -85,7 +85,7 @@ enum rxe_hdr_mask {
+>   	RXE_END_MASK		= BIT(NUM_HDR_TYPES + 11),
+>   
+>   	RXE_LOOPBACK_MASK	= BIT(NUM_HDR_TYPES + 12),
+> -
+> +	RXE_MCAST_MASK		= BIT(NUM_HDR_TYPES + 13),
+>   	RXE_ATOMIC_WRITE_MASK   = BIT(NUM_HDR_TYPES + 14),
+>   
+>   	RXE_READ_OR_ATOMIC_MASK	= (RXE_READ_MASK | RXE_ATOMIC_MASK),
+> diff --git a/drivers/infiniband/sw/rxe/rxe_recv.c b/drivers/infiniband/sw/rxe/rxe_recv.c
+> index 5861e4244049..7153de0799fc 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_recv.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_recv.c
+> @@ -217,6 +217,10 @@ static void rxe_rcv_mcast_pkt(struct rxe_dev *rxe, struct sk_buff *skb)
+>   	list_for_each_entry(mca, &mcg->qp_list, qp_list) {
+>   		qp = mca->qp;
+>   
+> +		/* don't reply packet to sender if locally sent */
+> +		if (pkt->mask & RXE_MCAST_MASK && qp_num(qp) == deth_sqp(pkt))
+> +			continue;
+> +
+>   		/* validate qp for incoming packet */
+>   		err = check_type_state(rxe, pkt, qp);
+>   		if (err)
+> diff --git a/drivers/infiniband/sw/rxe/rxe_req.c b/drivers/infiniband/sw/rxe/rxe_req.c
+> index d8c41fd626a9..599bec88cb54 100644
+> --- a/drivers/infiniband/sw/rxe/rxe_req.c
+> +++ b/drivers/infiniband/sw/rxe/rxe_req.c
+> @@ -442,8 +442,12 @@ static struct sk_buff *init_req_packet(struct rxe_qp *qp,
+>   			(pkt->mask & (RXE_WRITE_MASK | RXE_IMMDT_MASK)) ==
+>   			(RXE_WRITE_MASK | RXE_IMMDT_MASK));
+>   
+> -	qp_num = (pkt->mask & RXE_DETH_MASK) ? ibwr->wr.ud.remote_qpn :
+> -					 qp->attr.dest_qp_num;
+> +	if (pkt->mask & RXE_MCAST_MASK)
+> +		qp_num = IB_MULTICAST_QPN;
+> +	else if (pkt->mask & RXE_DETH_MASK)
+> +		qp_num = ibwr->wr.ud.remote_qpn;
+> +	else
+> +		qp_num = qp->attr.dest_qp_num;
+>   
+>   	ack_req = ((pkt->mask & RXE_END_MASK) ||
+>   		(qp->req.noack_pkts++ > RXE_MAX_PKT_PER_ACK));
+> @@ -809,6 +813,9 @@ int rxe_requester(struct rxe_qp *qp)
+>   		goto err;
+>   	}
+>   
+> +	if (rxe_is_mcast_av(av))
+> +		pkt.mask |= RXE_MCAST_MASK;
+> +
+>   	skb = init_req_packet(qp, av, wqe, opcode, payload, &pkt);
+>   	if (unlikely(!skb)) {
+>   		rxe_dbg_qp(qp, "Failed allocating skb\n");
 
