@@ -1,88 +1,198 @@
-Return-Path: <netdev+bounces-53787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D298049E5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:14:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 400AD8049E7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:15:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680C81F214C5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:14:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F7461F21486
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 06:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FD2171BE;
-	Tue,  5 Dec 2023 06:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9573DDC2;
+	Tue,  5 Dec 2023 06:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOEFVcze"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C95J1hdb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DAB171A8
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 06:13:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC0AC433C7;
-	Tue,  5 Dec 2023 06:13:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701756834;
-	bh=0olGoP/DDNOnO9J0W8cswJ78sOoZ6xFirua5/QysDXk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XOEFVcze7fuE9qAQY2JTrQoaF346eNBKiqkEA99C2im1K8fcofXYjHSrU5ZJf/4T7
-	 bYklbme8NhfxPa0isZJyIZOosX1V+xnVpw0JbQsXqgxV0Xvu068BjByHJSCEqMVV1R
-	 DH1rkdLq9wTGq9fCoyM3GVScCA2H+YRG0Y2n1RgX2lajAxYSZGvYKr+tygx8mVDrM6
-	 idqy+Uo8HuKvb/AMIRE7i72IW7aARTIhOG0iLmakwPk6SPSy6vfH1xEq50/qL0NUMe
-	 9FjfArUaZYXp7Bnw+MLBSJ00w3jz7eZb54hrPQD5dw/7It5rn3ZQme36tzwQQit6f/
-	 ufNCap/TA800A==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [net V2 14/14] net/mlx5: Fix a NULL vs IS_ERR() check
-Date: Mon,  4 Dec 2023 22:13:27 -0800
-Message-ID: <20231205061327.44638-15-saeed@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231205061327.44638-1-saeed@kernel.org>
-References: <20231205061327.44638-1-saeed@kernel.org>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B39B6
+	for <netdev@vger.kernel.org>; Mon,  4 Dec 2023 22:15:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1701756931; x=1733292931;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qmjg+1VRxdd8+eobKcgbvxIkMq/MXe/qYFOAd3WNrbM=;
+  b=C95J1hdb9/rIaQn3mrEdsquvbsSZfPbk93AH7JXl8TJX/40kvfAhb4W7
+   WZGLh00G32wn48gD9XlWwm+F+TOW2zBcAZVRSefcd2bGzXRkwEeoGC0ve
+   Ksi3TF8Whql/36ZXh2xHsPM4lpDx/jmcfDGtH4rJJxzrA8PN6ywJxouIF
+   SZXhp9hS6TX0azbTgTuHMAJwaJORMD0J4Kqp7KEbme9llD/ELDKwRLeUM
+   SL4BrVALKA6SaGOr0Eh9rSExO8+W0Npaav5zsaVDHy8R5tgoiSg5oK0CC
+   dBcSboRSIEM9xBP4xCb5ovYQyM6gHj1Moj5hh2RzN1XEKkTSFjIYbC3fJ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="691669"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="691669"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2023 22:15:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10914"; a="861643559"
+X-IronPort-AV: E=Sophos;i="6.04,251,1695711600"; 
+   d="scan'208";a="861643559"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Dec 2023 22:15:30 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Dec 2023 22:15:30 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 4 Dec 2023 22:15:30 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 4 Dec 2023 22:15:30 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hyBf2sumy0G8pxkPyAIDX8z4bEzU9l13hsH1BkJZPmr1SNEQxo+50Oz3StiTaRWS1+smjlJ+41kbPtbOfnRfRxlajg7zdGAU98z5VYktnn0LsyDihcMR+R9dcNNDExOvWKxkzCpiPsHt6YOvP9YloM25HYH/AN628IJxWKrK5N+0fXFfpZaGXMLHBnZEFxjA/GDB8wPkKTOooVBBg9vfUQWNwWD8+TQEB1a0Ik3aUpqfoWi3d49Y2lm2mNPf24xrN/SSWOZzLQcOPqL2Y2s4Ujbb06+evIRBCJInPCS4wze9CJC5YBE8wmiauVwyBSyDlwNj2aH6hXzkSUq23ZtT1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=so94VD/J/hfWvO1C7YwlZmYSWY5Ejn0XUThw6PPbp9w=;
+ b=hwAnWLOl1fCO+/2/Ycy8168x61CEq07wjwLLXVy1yEHP016dcdK7tZdlbZfmRJ0wm1dgAhOIvTJS+kRnaEkBQAstr7wrbxuuN4heKp/prbrN2vTsPabvDsKRXd6qvKsjaTuJheN2kljIaO1Os+1PiPmiC8WMw91vGj/I1mvK6eHUJsq6t7OdWLjFAzLxYtYpdxqF3G/Tp7cAvb+Dm9Wj2bvVwGcqXPtXGjXZXg9IUnuujPw5BPrimKU+VXe9/V35WQW+CAfLz+MsEamndpyaotacI6qmN4mcCN54IS+kATRUpnXye1bhH989cjEMBPsagHjGx5s0UUxZpTw/FlnIrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by SN7PR11MB8112.namprd11.prod.outlook.com (2603:10b6:806:2ea::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.33; Tue, 5 Dec
+ 2023 06:15:27 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::954:6050:f988:740f%4]) with mapi id 15.20.7046.033; Tue, 5 Dec 2023
+ 06:15:27 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: Julia Lawall <Julia.Lawall@inria.fr>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Marcin Szycik <marcin.szycik@linux.intel.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 03/13] intel: legacy: field
+ prep conversion
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 03/13] intel: legacy: field
+ prep conversion
+Thread-Index: AQHaHMCzeGwEQd4MAUuWzHdpxurTj7CaSq9w
+Date: Tue, 5 Dec 2023 06:15:26 +0000
+Message-ID: <BL0PR11MB312213B325230CEA3749B9A6BD85A@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231121211921.19834-1-jesse.brandeburg@intel.com>
+ <20231121211921.19834-4-jesse.brandeburg@intel.com>
+In-Reply-To: <20231121211921.19834-4-jesse.brandeburg@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SN7PR11MB8112:EE_
+x-ms-office365-filtering-correlation-id: bcc7d6f0-28d4-4709-4590-08dbf55992b9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fKpglooowKV0fgwNu+rR+YN9qeVcIRCnILxhQbYxRfwJVIna7nrorpoY1+jUJJ+NjtmlQTY/pSKyK2LpZ1ccU/mDUzMPmkv2ohUDyCB3I1HtPNM7hKVdq03Fy1Qn6tlHnTR46MtjqJS3h/gT9Tre2UuLgChMG9fUgLprlVVXOAT5EHxBBtRDTZuDwmJlMkxtRE+jWbjXGAhoHecRagaBXc84gsG3Tk54b8WmIbM7JD92GptUXgTE8hR2vKKY5Kmo5QOVMVGGK42IflT+8vR59/KPDHisFdFHUCDD7tTgiGO4z4c4z9lOVrqsCoepCxFnhOZ5Iv3iebj0sSpiyOnbvlggFSEPdtTI7mrAYWDdFHjK4SYyk1VAwtAJtZsuJO83St4S0sWiO2EM7D2QQpdueB1zYT8h9JgB83fTxcfwDTA+Brpazkr4FSBf8YQSrPtfLH5PMUqg9HWalaJjCSKeBPhmWS9lXu/cfjVI+Ks7hvr3dVQV/ppB+LKpX5JYBkUiDNWi5JuRyCxk55vg4sQzGyePYZeWnnrsaV52F399lWRfFjrstJdrSz2waWME/76YwPaVmEXG7nQPLivte4hZMjV7pfKx/Sk+oiVun0rqE9ztBvjLdYkg4ThPV8SSOyuf
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(396003)(376002)(366004)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(38100700002)(55016003)(33656002)(38070700009)(122000001)(2906002)(5660300002)(83380400001)(71200400001)(53546011)(82960400001)(26005)(6506007)(7696005)(9686003)(76116006)(478600001)(110136005)(41300700001)(66946007)(66476007)(54906003)(66446008)(66556008)(8936002)(52536014)(316002)(86362001)(64756008)(4326008)(8676002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?axcDfTcuBBPq1TLgpOWe+kxhHO4ciMWVwlZwGMWILb32T1wNlIMTP5rQoDEz?=
+ =?us-ascii?Q?rxFudP1XHMrrW1UQVkm7bA/W/iCxbhfwLufOzqbb+au357iD7aXAVoRIxbId?=
+ =?us-ascii?Q?a97wiX6rpTW3v81dsWouTg5QILQrMT+B6T1yS8omFFTqvz2wIqwg+S17T7fH?=
+ =?us-ascii?Q?p6EpTxADtFsWgpkoE/A4C/MYTmPt9jEi7TXZnphxX4EdhjJcI502v4EEHRoT?=
+ =?us-ascii?Q?CgdkdF8XPvNylTzIV9IqCV7OT5JYWJl8xzagOnyxuEt4cGvYjilyhqNTnhHr?=
+ =?us-ascii?Q?SiN2ucRYMP2LMaNx3KNnha2yjuqJJBXQlkTRlGcfoVEuJ4zFea+utIiAqcC7?=
+ =?us-ascii?Q?EXpwJFYbAAN/r4HwWz8pvjZ5orK6YM0uX1IqilDbjPhrozzMLQ9OEath4P/R?=
+ =?us-ascii?Q?U3BMHvY3aXRZticJR8XUcHIzBYuyoZdWOtqugUqMbaNx4gmVG+o90bf7sWGx?=
+ =?us-ascii?Q?1A5HQ+jY0ucdVOSw8JkS7Oe7OA4wyCr47cdC1h2ecm1gkN7PH0JVRv6tko6q?=
+ =?us-ascii?Q?cGoxgcJyDEmgZrClwj/W5t5tbQEJwHZ0hYlrFjpaJfDC3wz6P4X78XSBujvZ?=
+ =?us-ascii?Q?bNP6KryEa6UD3LamMKeh6ojKdo049R4ZgTWdgxWhj1jvc+fV1p051Mob8qbN?=
+ =?us-ascii?Q?xn/xjIyAAXch25EFvdgl+RNwJqpiJs/Nya+s0jQc9V+k8hJTU4A94Le1yZfp?=
+ =?us-ascii?Q?vvhnZ76FQTQpcqITFLYZhxvVclh6EcNd1NmqxS5vbTfoiCb54teF7O7SSv1M?=
+ =?us-ascii?Q?PHQnkTMAk4/1J2O4AAVSDZBQDXoKmdgpB2GRz9I+1i74EMSjwpPqjZxFLzpl?=
+ =?us-ascii?Q?HwhI7BUN4OSC9Gdepyh8LfurdcMt3koyqqL3mkr6XYFxI+jeEwjaskhrCblJ?=
+ =?us-ascii?Q?F7sXYEmeBGtzJw8w8S50mR6SnPHSaf3WXK4RTdbU+kZ0zxgI062T27jtfwLY?=
+ =?us-ascii?Q?ued3M/vffnhrqrJoXELb14LJ97IDSecKH0zSBCJVhyc3JoM+q5napHExJowt?=
+ =?us-ascii?Q?L3hqGJfxAIWeN2kf9XICXhGdLfH7LJzwsM/2P5kAt9188CXvHrPx7aWOK0q9?=
+ =?us-ascii?Q?P8z/i+sV4TnPVJrjAU3Mkl9Bs8wi6yBil+76T/fpdrirjJI7qw2CfP41ekB3?=
+ =?us-ascii?Q?/UuvQCFYno4uvZrSkS0WwsU/Bd0mbQboCQPV6XlawbyGxuBxeVPzmG6e8M53?=
+ =?us-ascii?Q?Bij5AJfCtgYa6G/3IU7sy5fXjZdXUn16Z5zVm/yhWb7CO/qZTUzoDzVci8jj?=
+ =?us-ascii?Q?CVSIAnhwIGW7hv5k8prkuomPB01BDsASCHD5fB68wQfPO6K2c1TJeVMYOqyk?=
+ =?us-ascii?Q?OiXIy74q9KMcRMcVz7BeO6kNS6L79isKqKK0032IuMropNmyfu8vXmdwfqMd?=
+ =?us-ascii?Q?oQ5tpco9/DltQqvbrZN4Fz3+F6IxUGsbS1j9bPRPUfmLtMp8U9ZBVIZKPHlp?=
+ =?us-ascii?Q?5w4lE2SZqe688gSCyDP+BYxfVt81aduLmB2Tq54j5iWT+VKVpDmfm0w8Og2R?=
+ =?us-ascii?Q?SH4SntyM6na/XSMZ2UIaDSK8fMsM/zyeNHHXjZaCD/qcpFuo1sijfmv/Eycq?=
+ =?us-ascii?Q?LkqXbCmSKL5mV5bIacxf7Gpfd0K/n73yygTbu5Y2rZuiDlPJ/g8dN7ivS1es?=
+ =?us-ascii?Q?3Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcc7d6f0-28d4-4709-4590-08dbf55992b9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2023 06:15:26.5233
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Edr7LVzQFGXvOTXYzMaZihLaa/NWMU/IBmhUNjM4QWl+TTZzv6gSktWwFZnSAu31lE8itm4EZboSGzYTZ8j8EvAIe+ye3ZQ+Sq5UyqpTIIJ1Lo0YYLXR0vTWJ3E6vVS4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8112
+X-OriginatorOrg: intel.com
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+esse Brandeburg
+> Sent: Wednesday, November 22, 2023 2:49 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Julia Lawall <Julia.Lawall@inria.fr>; netdev@vger.kernel.org; Marcin =
+Szycik <marcin.szycik@linux.intel.com>; Brandeburg, Jesse <jesse.brandeburg=
+@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v1 03/13] intel: legacy: field=
+ prep conversion
+>
+> Refactor several older Intel drivers to use FIELD_PREP(), which reduces
+> lines of code and adds clarity of intent.
+>
+> This code was generated by the following coccinelle/spatch script and
+> then manually repaired.
+>
+> @prep@
+> constant shift,mask;
+> type T;
+> expression a;
+> @@
+> -(((T)(a) << shift) & mask)
+> +FIELD_PREP(mask, a)
+>
+> Cc: Julia Lawall <Julia.Lawall@inria.fr>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> ---
+>  drivers/net/ethernet/intel/e1000e/80003es2lan.c | 7 +++----
+>  drivers/net/ethernet/intel/e1000e/phy.c         | 7 +++----
+>  drivers/net/ethernet/intel/fm10k/fm10k_pf.c     | 3 +--
+>  drivers/net/ethernet/intel/igb/e1000_phy.c      | 4 ++--
+>  drivers/net/ethernet/intel/igb/igb_ethtool.c    | 3 +--
+>  drivers/net/ethernet/intel/igb/igb_main.c       | 9 +++------
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c  | 2 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c   | 4 ++--
+>  8 files changed, 16 insertions(+), 23 deletions(-)
+>
 
-The mlx5_esw_offloads_devlink_port() function returns error pointers, not
-NULL.
-
-Fixes: 7bef147a6ab6 ("net/mlx5: Don't skip vport check")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 3ab682bbcf86..1bf7540a65ad 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -1497,7 +1497,7 @@ mlx5e_vport_vf_rep_load(struct mlx5_core_dev *dev, struct mlx5_eswitch_rep *rep)
- 
- 	dl_port = mlx5_esw_offloads_devlink_port(dev->priv.eswitch,
- 						 rpriv->rep->vport);
--	if (dl_port) {
-+	if (!IS_ERR(dl_port)) {
- 		SET_NETDEV_DEVLINK_PORT(netdev, dl_port);
- 		mlx5e_rep_vnic_reporter_create(priv, dl_port);
- 	}
--- 
-2.43.0
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
