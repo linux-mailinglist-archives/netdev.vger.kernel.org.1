@@ -1,117 +1,118 @@
-Return-Path: <netdev+bounces-53932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6F380542A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:30:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 090D480542D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 13:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53ABA1F2138A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6DD01F213FD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 12:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4EB5C069;
-	Tue,  5 Dec 2023 12:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E138C59E33;
+	Tue,  5 Dec 2023 12:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sQZZwwqY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LBVKtPQm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AE45C8E5;
-	Tue,  5 Dec 2023 12:30:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E27FC433C7;
-	Tue,  5 Dec 2023 12:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701779427;
-	bh=i2NjnPcjqzZPfpDlTdN9FbnXNpUmLP4BhyFhxi61hTI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sQZZwwqYttz2wavoQ9qX/uZoPMoHoakl9mOSJ7GMyJk0jTlfnGNqin+aG6twhaw7F
-	 ebR9+zzyxIL+O0rw80tEH8kilo4RIE/mKBXjWQMz+tEZRYaol8B8qsPLxrDlRfi3OY
-	 Iw3TRTuGqT5nklQaPOoP8vzluPLNpYl0aqx3++FcdO+8fMQqwymNvC2I5xsNn3743J
-	 fq0ha7qfYRni/9m9gdfUj2Xpsm3z791kNQDt3CKhQg+mHlrykdEk0CfrdMbbE29t12
-	 QlEP2bvXGRa+cjtLCHTBqttjECdv0jRQPUULj+DZGzTp6V09vrRNz/ClkMggGrfbB1
-	 g3n3fgEIdjvVw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45E65C40C5E;
-	Tue,  5 Dec 2023 12:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D310C6;
+	Tue,  5 Dec 2023 04:32:09 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5B801FF811;
+	Tue,  5 Dec 2023 12:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701779528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DgcnHD3vyBMyp03Zy3XMz8GUwdycjO24GHf/1xFuXTY=;
+	b=LBVKtPQmrUQ6Vu0G6IcPAIa8eJoxjxXJkgPJpFKcHVeuiAv6/8G9VGnHA5N8JqYmKhT4TB
+	rbS6qBwhmw9YFtJb1d2+jAIzzEgLmCsKG7EwK8FsFnP13KTeVJfi/62NqzRtmHgES/9XHx
+	b8Q6znSSChPfEGHvAy3iISOdVQl43UBChfES/DAms5SmpIPq6x9C5AckHcNjiJQ8EtgUz6
+	tfH3YL9GyBR3qqMLENJEj1B5/EGrU0T8wOXU34b50N4WTrNYh4OwbP/LrzjiT2YMlGVXZz
+	dd3ktMSEwO96aaAwPW709BuHUke59iTw9AoljYR7k17TTOQWvbkwk3J3KbLBmw==
+Date: Tue, 5 Dec 2023 13:32:05 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Jose
+ Abreu <Jose.Abreu@synopsys.com>, Tomer Maimon <tmaimon77@gmail.com>, Rob
+ Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, openbmc@lists.ozlabs.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 09/16] net: mdio: Add Synopsys DW XPCS
+ management interface support
+Message-ID: <20231205133205.3309ab91@device.home>
+In-Reply-To: <20231205103559.9605-10-fancer.lancer@gmail.com>
+References: <20231205103559.9605-1-fancer.lancer@gmail.com>
+	<20231205103559.9605-10-fancer.lancer@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv3 net-next 00/14] Conver net selftests to run in unique
- namespace (Part 1)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170177942728.20095.16452209434695767397.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Dec 2023 12:30:27 +0000
-References: <20231202020110.362433-1-liuhangbin@gmail.com>
-In-Reply-To: <20231202020110.362433-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, dsahern@kernel.org,
- linux-kselftest@vger.kernel.org, po-hsu.lin@canonical.com, gnault@redhat.com,
- petrm@nvidia.com, prestwoj@gmail.com, jhpark1013@gmail.com,
- idosch@nvidia.com, justin.iurman@uliege.be, lucien.xin@gmail.com,
- jchapman@katalix.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello:
+Hi Serge,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Tue,  5 Dec 2023 13:35:30 +0300
+Serge Semin <fancer.lancer@gmail.com> wrote:
 
-On Sat,  2 Dec 2023 10:00:56 +0800 you wrote:
-> As Guillaume pointed, many selftests create namespaces with very common
-> names (like "client" or "server") or even (partially) run directly in init_net.
-> This makes these tests prone to failure if another namespace with the same
-> name already exists. It also makes it impossible to run several instances
-> of these tests in parallel.
+> Synopsys DesignWare XPCS IP-core can be synthesized with the device CSRs
+> being accessible over MCI or APB3 interface instead of the MDIO bus (see
+> the CSR_INTERFACE HDL parameter). Thus all the PCS registers can be just
+> memory mapped and be a subject of standard MMIO operations of course
+> taking into account the way the Clause C45 CSRs mapping is defined. This
+> commit is about adding a device driver for the DW XPCS Management
+> Interface platform device and registering it in the framework of the
+> kernel MDIO subsystem.
 > 
-> This patch set intend to conver all the net selftests to run in unique namespace,
-> so we can update the selftest freamwork to run all tests in it's own namespace
-> in parallel. After update, we only need to wait for the test which need
-> longest time.
-> 
-> [...]
+> DW XPCS platform device is supposed to be described by the respective
+> compatible string "snps,dw-xpcs-mi", CSRs memory space and optional
+> peripheral bus clock source. Note depending on the INDIRECT_ACCESS DW XPCS
+> IP-core synthesize parameter the memory-mapped reg-space can be
+> represented as either directly or indirectly mapped Clause 45 space. In
+> the former case the particular address is determined based on the MMD
+> device and the registers offset (5 + 16 bits all together) within the
+> device reg-space. In the later case there is only 256 lower address bits
+> are utilized for the registers mapping. The upper bits are supposed to be
+> written into the respective viewport CSR in order to reach the entire C45
+> space.
 
-Here is the summary with links:
-  - [PATCHv3,net-next,01/14] selftests/net: add lib.sh
-    https://git.kernel.org/netdev/net-next/c/25ae948b4478
-  - [PATCHv3,net-next,02/14] selftests/net: convert arp_ndisc_evict_nocarrier.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/64227511ad57
-  - [PATCHv3,net-next,03/14] selftests/net: specify the interface when do arping
-    https://git.kernel.org/netdev/net-next/c/7f770d28f2e5
-  - [PATCHv3,net-next,04/14] selftests/net: convert arp_ndisc_untracked_subnets.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/3a0f3367006f
-  - [PATCHv3,net-next,05/14] selftests/net: convert cmsg tests to make them run in unique namespace
-    https://git.kernel.org/netdev/net-next/c/7c16d485fec5
-  - [PATCHv3,net-next,06/14] selftests/net: convert drop_monitor_tests.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/0d8b488792e4
-  - [PATCHv3,net-next,07/14] selftests/net: convert traceroute.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/baf37f213c88
-  - [PATCHv3,net-next,08/14] selftests/net: convert icmp_redirect.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/c1516b3563ac
-  - [PATCHv3,net-next,09/14] sleftests/net: convert icmp.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/80b74bd33421
-  - [PATCHv3,net-next,10/14] selftests/net: convert ioam6.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/2ab1ee827e97
-  - [PATCHv3,net-next,11/14] selftests/net: convert l2tp.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/4affb17c0d0e
-  - [PATCHv3,net-next,12/14] selftests/net: convert ndisc_unsolicited_na_test.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/3e05fc0c56bb
-  - [PATCHv3,net-next,13/14] selftests/net: convert sctp_vrf.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/90e271f65ee4
-  - [PATCHv3,net-next,14/14] selftests/net: convert unicast_extensions.sh to run it in unique namespace
-    https://git.kernel.org/netdev/net-next/c/0f4765d0b48d
+Too bad the mdio-regmap driver can't be re-used here, it would deal
+with reg width for you, for example. I guess the main reason would be
+the direct vs indirect accesses ?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I do have a comment tough :
 
+[...]
 
+> +static inline ptrdiff_t dw_xpcs_mmio_addr_format(int dev, int reg)
+> +{
+> +	return FIELD_PREP(0x1f0000, dev) | FIELD_PREP(0xffff, reg);
+> +}
+> +
+> +static inline u16 dw_xpcs_mmio_addr_page(ptrdiff_t csr)
+> +{
+> +	return FIELD_GET(0x1fff00, csr);
+> +}
+> +
+> +static inline ptrdiff_t dw_xpcs_mmio_addr_offset(ptrdiff_t csr)
+> +{
+> +	return FIELD_GET(0xff, csr);
+> +}
+
+You shouldn't use inline in C files, only in headers.
+
+Maxime
 
