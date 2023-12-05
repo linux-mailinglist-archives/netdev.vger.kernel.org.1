@@ -1,87 +1,106 @@
-Return-Path: <netdev+bounces-54049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044A4805CC5
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:02:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AFAB805CBE
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 19:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A31891F21446
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:02:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6671281E87
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8556A346;
-	Tue,  5 Dec 2023 18:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7B56A34A;
+	Tue,  5 Dec 2023 18:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="B1taG/fL"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="XoptdEkI"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7CC122;
-	Tue,  5 Dec 2023 10:02:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1701799319; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=OZCIJtJgraukf00QLXH1/JTROZPddFlSMELMgKBHZcz1HI0SMnaEeg287DKzb+j6wFhGEh5kTUjcxrURypkXoelW8TsGYkFbJP4Hop3wEEid3lPS6cturw/uBFb3eUXBXnnI/G8gOJLoNnGMHUdctDJH8SX5sO7RDhHqMOqiRJk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1701799319; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=xNtMIw1gYkg4/iqMqcGWC2L7v3kfYsE4S60OOFQ8WUA=; 
-	b=Ts708fS/zcB3x34en3v6XzWtaJKSwwfLkacD9cJnx6oTaDy8NRqUfsFPxiGabD4Gzo3qnaoCECkSIAgsvqidcD/K1drXQzSkBmw1Rfa5rOqGhsAhPFTWIBc67UWgFverXmLfJ8pwreXD76z7dROUbCjuCSxIvUi0+NT1yDYzTfM=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1701799319;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=xNtMIw1gYkg4/iqMqcGWC2L7v3kfYsE4S60OOFQ8WUA=;
-	b=B1taG/fL9uF528x4RVdjmRVTOzsK4OhrNGEHmd9CEDAfvp5RXFNiKzLdgayXBxfo
-	H5HSjdp/CTt46lAilu4jwyn1CCYFE5KPc1gzr3jFEMG9iH1QK+mSqcwEjLHmxYnQMZM
-	3k/1FArjjxWwDzTfgMDGbBSRsrf8BO5l3kKvhscw=
-Received: from mail.zoho.in by mx.zoho.in
-	with SMTP id 1701799288673295.52866850298255; Tue, 5 Dec 2023 23:31:28 +0530 (IST)
-Date: Tue, 05 Dec 2023 23:31:28 +0530
-From: Siddh Raman Pant <code@siddh.me>
-To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>,
-	"Suman Ghosh" <sumang@marvell.com>,
-	"netdev" <netdev@vger.kernel.org>,
-	"linux-kernel" <linux-kernel@vger.kernel.org>,
-	"syzbot+bbe84a4010eeea00982d"
- <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-Message-ID: <18c3b245f39.5eac9b5898943.4628342226240608054@siddh.me>
-In-Reply-To: <d41ea6ff-3c29-4a76-833d-19e6a6649d3c@linaro.org>
-References: <cover.1701627492.git.code@siddh.me>
- <4143dc4398aa4940a76d3f375ec7984e98891a11.1701627492.git.code@siddh.me>
- <fd709885-c489-4f84-83ab-53cfb4920094@linaro.org>
- <18c3aff94ef.7cc78f6896702.921153651485959341@siddh.me> <d41ea6ff-3c29-4a76-833d-19e6a6649d3c@linaro.org>
-Subject: Re: [PATCH net-next v3 1/2] nfc: llcp_core: Hold a ref to
- llcp_local->dev when holding a ref to llcp_local
+Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A284D5A
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 10:01:53 -0800 (PST)
+Received: from [192.168.1.18] ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id AZjvrRTwOSNyBAZjvr0n3q; Tue, 05 Dec 2023 19:01:51 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1701799311;
+	bh=hvbZ1hzkZAW9+ll+Cf0H0hMrUli14aQS6HIa8H1AiEs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=XoptdEkIyaphDGvNlkuK50h82d3TT88V3o4uepBihG58+UUJ9+WkFgg+i5GXukzuB
+	 m6di0bERiVC9fyjAJbBYKflD1Uaoq9Q+yirlHlHFexeL4ircFJQC6pU7RWM1qE0bIh
+	 bH1OZNcd/vrsuS+ieYI9rU0yqSbcePcmLZOUCAaoKh54B/ctCPvySPch5rf9U4IoMQ
+	 ICZKlktLrX8zVPrOiGqDiIQSvNrgiQZCMPpwAZj59Rp3W/h4uYIyOFc4zQhyIvR0EC
+	 AorPDR1vYKF9CbT1fjB07NijCvh11KyQRUjPpU9k5Zrh9m2BW5vpimmezFYsfizEvY
+	 U+SAmVVoRm3AQ==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 05 Dec 2023 19:01:51 +0100
+X-ME-IP: 92.140.202.140
+Message-ID: <e6752370-7aba-4b47-90ff-7896a49ba84b@wanadoo.fr>
+Date: Tue, 5 Dec 2023 19:01:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+To: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+ Dent Project <dentproject@linuxfoundation.org>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+ <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+ <6eeead27-e1b1-48e4-8a3b-857e1c33496b@wanadoo.fr>
+ <20231204231655.19baa1a4@kmaincent-XPS-13-7390>
+Content-Language: fr, en-US
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20231204231655.19baa1a4@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 05 Dec 2023 22:57:28 +0530, Krzysztof Kozlowski wrote:
-> >> Mismatched order with get. Unwinding is always in reversed order. Or
-> >> maybe other order is here on purpose? Then it needs to be explained.
-> > 
-> > Yes, local_release() will free local, so local->dev cannot be accessed.
-> > Will add a comment.
+Le 04/12/2023 à 23:16, Köry Maincent a écrit :
+> Thanks for your review!
 > 
-> So the problem is just storing the pointer? That's not really the valid
-> reason.
+> On Sun, 3 Dec 2023 22:11:46 +0100
+> Christophe JAILLET <christophe.jaillet@wanadoo.fr> wrote:
+> 
+>>> +
+>>> +	fwl = firmware_upload_register(THIS_MODULE, dev, dev_name(dev),
+>>> +				       &pd692x0_fw_ops, priv);
+>>> +	if (IS_ERR(fwl)) {
+>>> +		dev_err(dev, "Failed to register to the Firmware Upload
+>>> API\n");
+>>> +		ret = PTR_ERR(fwl);
+>>> +		return ret;
+>>
+>> Nit: return dev_err_probe()?
+> 
+> No EPROBE_DEFER error can be catch from firmware_upload_register() function, so
+> it's not needed.
 
-Oops, my bad. What would be the valid reason? (if any)
+Hi,
 
-Thanks,
-Siddh
+up to you to take it or not, but dev_err_probe() also logs the error 
+code in a human readable way and it saves a few lines of code.
+
+If I remember correctly, it also saves some bytes in the .o file.
+
+Other than that, it is a matter of style.
+
+CJ
+
+> 
+> Regards,
+
 
