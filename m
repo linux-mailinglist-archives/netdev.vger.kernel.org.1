@@ -1,140 +1,102 @@
-Return-Path: <netdev+bounces-53731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE32580447E
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:11:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13852804441
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:48:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D0BB1C20BAE
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:11:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFB551F2133A
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 01:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEBC3D7F;
-	Tue,  5 Dec 2023 02:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7231870;
+	Tue,  5 Dec 2023 01:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gctY3hSO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5A4107;
-	Mon,  4 Dec 2023 18:10:59 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VxsMv1R_1701742256;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VxsMv1R_1701742256)
-          by smtp.aliyun-inc.com;
-          Tue, 05 Dec 2023 10:10:56 +0800
-Message-ID: <1701740897.6795166-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next] tcp: add tracepoints for data send/recv/acked
-Date: Tue, 5 Dec 2023 09:48:17 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,
- rostedt@goodmis.org,
- mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com,
- davem@davemloft.net,
- dsahern@kernel.org,
- kuba@kernel.org,
- pabeni@redhat.com,
- martin.lau@linux.dev,
- linux-trace-kernel@vger.kernel.org,
- bpf@vger.kernel.org,
- dust.li@linux.alibaba.com,
- alibuda@linux.alibaba.com,
- guwen@linux.alibaba.com,
- hengqi@linux.alibaba.com,
- Philo Lu <lulie@linux.alibaba.com>
-References: <20231204114322.9218-1-lulie@linux.alibaba.com>
- <CANn89iKUHQHA2wHw9k1SiazJf7ag7i4Tz+FPutgu870teVw_Bg@mail.gmail.com>
-In-Reply-To: <CANn89iKUHQHA2wHw9k1SiazJf7ag7i4Tz+FPutgu870teVw_Bg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE15C1C13;
+	Tue,  5 Dec 2023 01:48:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306D5C433C8;
+	Tue,  5 Dec 2023 01:48:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701740916;
+	bh=u6mofPvRKrtmonF/7EVu4FENIouv9pimKacSkGVq2J8=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=gctY3hSOu3E8Zz9JBFyE9f3XGk3yHKdYyXP0MxP3lYo50XHLujZQ4VVaqSWx9Qp2e
+	 mNvefPUcOLeqzGEVmawe5ocV0LL70HwdpaDPGGg3QMgtVur2bzrVCXVkCXzziGAE29
+	 6/CTHWvs6C6UNYzXXXTWEF2YPC7fx1WgNx7tbBPij6CtsiL/Q0RvbNuB3xVO6dpJjG
+	 SloS9gJvLQHE2itlONnW1YaYyCQUU0HxduTiy2yHixTTJp5ka6fKlmXH9eYXNEIQ1W
+	 WdHueoEzW+LsqPG5HJP+RPYQHTs26un0Zm09/Du+8AfH94mzCBTPTuOABchZSN2A+5
+	 2GF3dkKInANdQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 05 Dec 2023 03:48:32 +0200
+Message-Id: <CXG0T2MKC8H4.2WAVL6YCX9XC7@kernel.org>
+Cc: <rust-for-linux@vger.kernel.org>, <andrew@lunn.ch>, <tmgross@umich.edu>,
+ <miguel.ojeda.sandonis@gmail.com>, <benno.lossin@proton.me>,
+ <wedsonaf@gmail.com>, <aliceryhl@google.com>, <boqun.feng@gmail.com>
+Subject: Re: [PATCH net-next v9 2/4] rust: net::phy add module_phy_driver
+ macro
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>, <netdev@vger.kernel.org>
+X-Mailer: aerc 0.16.0
+References: <20231205011420.1246000-1-fujita.tomonori@gmail.com>
+ <20231205011420.1246000-3-fujita.tomonori@gmail.com>
+In-Reply-To: <20231205011420.1246000-3-fujita.tomonori@gmail.com>
 
-On Mon, 4 Dec 2023 13:28:21 +0100, Eric Dumazet <edumazet@google.com> wrote:
-> On Mon, Dec 4, 2023 at 12:43=E2=80=AFPM Philo Lu <lulie@linux.alibaba.com=
-> wrote:
-> >
-> > Add 3 tracepoints, namely tcp_data_send/tcp_data_recv/tcp_data_acked,
-> > which will be called every time a tcp data packet is sent, received, and
-> > acked.
-> > tcp_data_send: called after a data packet is sent.
-> > tcp_data_recv: called after a data packet is receviced.
-> > tcp_data_acked: called after a valid ack packet is processed (some sent
-> > data are ackknowledged).
-> >
-> > We use these callbacks for fine-grained tcp monitoring, which collects
-> > and analyses every tcp request/response event information. The whole
-> > system has been described in SIGMOD'18 (see
-> > https://dl.acm.org/doi/pdf/10.1145/3183713.3190659 for details). To
-> > achieve this with bpf, we require hooks for data events that call bpf
-> > prog (1) when any data packet is sent/received/acked, and (2) after
-> > critical tcp state variables have been updated (e.g., snd_una, snd_nxt,
-> > rcv_nxt). However, existing bpf hooks cannot meet our requirements.
-> > Besides, these tracepoints help to debug tcp when data send/recv/acked.
+On Tue Dec 5, 2023 at 3:14 AM EET, FUJITA Tomonori wrote:
+> This macro creates an array of kernel's `struct phy_driver` and
+> registers it. This also corresponds to the kernel's
+> `MODULE_DEVICE_TABLE` macro, which embeds the information for module
+> loading into the module binary file.
 >
-> This I do not understand.
+> A PHY driver should use this macro.
 >
-> >
-> > Though kretprobe/fexit can also be used to collect these information,
-> > they will not work if the kernel functions get inlined. Considering the
-> > stability, we prefer tracepoint as the solution.
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> ---
+>  rust/kernel/net/phy.rs | 146 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 146 insertions(+)
 >
-> I dunno, this seems quite weak to me. I see many patches coming to add
-> tracing in the stack, but no patches fixing any issues.
+> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> index 5d220187eec9..d9cec139324a 100644
+> --- a/rust/kernel/net/phy.rs
+> +++ b/rust/kernel/net/phy.rs
+> @@ -752,3 +752,149 @@ const fn as_int(&self) -> u32 {
+>          }
+>      }
+>  }
+> +
+> +/// Declares a kernel module for PHYs drivers.
+> +///
+> +/// This creates a static array of kernel's `struct phy_driver` and regi=
+sters it.
 
+s/This creates a static array/Creates a static array/
 
-We have implemented a mechanism to split the request and response from the =
-TCP
-connection using these "hookers", which can handle various protocols such as
-HTTP, HTTPS, Redis, and MySQL. This mechanism allows us to record important
-information about each request and response, including the amount of data
-uploaded, the time taken by the server to handle the request, and the time =
-taken
-for the client to receive the response. This mechanism has been running
-internally for many years and has proven to be very useful.
+Suggestion for better formulation:
 
-One of the main benefits of this mechanism is that it helps in locating the
-source of any issues or problems that may arise. For example, if there is a
-problem with the network, the application, or the machine, we can use this
-mechanism to identify and isolate the issue.
+"Creates a static array of `struct phy driver` instances, and registers the=
+m.""
 
-TCP has long been a challenge when it comes to tracking the transmission of=
- data
-on the network. The application can only confirm that it has sent a certain
-amount of data to the kernel, but it has limited visibility into whether the
-client has actually received this data. Our mechanism addresses this issue =
-by
-providing insights into the amount of data received by the client and the t=
-ime
-it was received. Furthermore, we can also detect any packet loss or delays
-caused by the server.
+> +/// This also corresponds to the kernel's `MODULE_DEVICE_TABLE` macro, w=
+hich embeds the information
+> +/// for module loading into the module binary file. Every driver needs a=
+n entry in `device_table`.
 
-https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/7912288961/973=
-2df025beny.svg
+s/This/`kernel::module_phy_driver`/
 
-So, we do not want to add some tracepoint to do some unknow debug.
-We have a clear goal. debugging is just an incidental capability.
+Or at least I did not see it introduced earlier in the text.
 
-Thanks.
-
-
->
-> It really looks like : We do not know how TCP stack works, we do not
-> know if there is any issue,
-> let us add trace points to help us to make forward progress in our analys=
-is.
->
-> These tracepoints will not tell how many segments/bytes were
-> sent/acked/received, I really do not see
-> how we will avoid adding in the future more stuff, forcing the
-> compiler to save more state
-> just in case the tracepoint needs the info.
->
-> The argument of "add minimal info", so that we can silently add more
-> stuff in the future "for free" is not something I buy.
->
-> I very much prefer that you make sure the stuff you need is not
-> inlined, so that standard kprobe/kretprobe facility can be used.
+BR, Jarkko
 
