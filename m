@@ -1,85 +1,92 @@
-Return-Path: <netdev+bounces-53732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6435804483
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:14:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D5380448D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 03:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6023C1F2135B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:14:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 976B52813C4
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 02:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F294689;
-	Tue,  5 Dec 2023 02:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC23E46AD;
+	Tue,  5 Dec 2023 02:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jl7jH0OH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPhJIaUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC215107;
-	Mon,  4 Dec 2023 18:14:07 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40c09f5a7cfso21214345e9.0;
-        Mon, 04 Dec 2023 18:14:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701742446; x=1702347246; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TLYOJitG6MsmYZ52J6r5K0brTXqqI1z2ZXUGcmpI7uQ=;
-        b=jl7jH0OHdO7iMSsDaWMnUAf6nDTlxwbTrB+DGcIyFgTZIrDFYe6GvxQ2FgYAhB4lvL
-         L7fbEEqHIA/GGOWD3nL5GPalBuH1yXbkvwTRvP7c+fKXOwcHqE64wYBAdVWytSm9VPar
-         PpsUubKIGLbXf7jYK3VztPezsoii7x8gi2NF/F6wJ55hW178zeJhAinA16zkA9fmLHEK
-         dSpq/F0W4ge4FKHwLpMEjOJRMuOklLB5lvWmjET8sbt5JWiQnSTnz7Pkk+OPXRDHqJsw
-         T0NMrhwqHve0yZI1BeRXQ4BiZzYnkR41AeurCqJsRVOGlNMK1hAPRQgbgTEwELhKfq2r
-         vAKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701742446; x=1702347246;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TLYOJitG6MsmYZ52J6r5K0brTXqqI1z2ZXUGcmpI7uQ=;
-        b=H9UXUAGUCX1D5cwESOUa1qw5W2RHKsWteZpoz6bWk+wlP8bcC4b+EYGXXnrvEG7XsW
-         FeBaC/yGqBMP67oj0Kkj9RpY5PnqN/07ktUeRt5h5n0jh1kOhKmcGNiXyDqS/OxN7mGF
-         4PFnM4hvTUlsflzQ6iCekIdJoNktTCO1ODpR+PSdMK8/NlQiEsUCgFUrupGt5k3VcetK
-         lbov1OuayaHknXt0ApWnJif6uimfuC/5ZGLd5Mk8YBAEK3LYv3QS5qAlOcDtlu62E+YW
-         XRIAQzQiq/s5rupH1TZVUHpYd0ZxBNwqnZsZLuEDD1qdq463bS3KFdFyLyncnAi51aWv
-         7BaQ==
-X-Gm-Message-State: AOJu0Yxg4SmftDLwRlJOYP6Zz5asBsg55tfi1yPncmC0YZnjGdgM+idl
-	spTzVU2jevc0GwapL9J2q2tbcbK1qsgZh+yw0lo=
-X-Google-Smtp-Source: AGHT+IHPexNKUJ22o+YlNP4qkph2kU0vWUYC1l2LYSKbQX5qjGBQpVF11/+hlFiOTTfeouXuFa0sCKH2UF+tDOZDGnI=
-X-Received: by 2002:adf:f3d1:0:b0:333:2fd2:6f7a with SMTP id
- g17-20020adff3d1000000b003332fd26f7amr4050306wrp.132.1701742446148; Mon, 04
- Dec 2023 18:14:06 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFD04689
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 02:17:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BAF2C433C8;
+	Tue,  5 Dec 2023 02:17:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701742674;
+	bh=CFuIQBFb4jQLP5hJXSZ1DamnTQmlulyUK6o3iWa+amA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QPhJIaURVkaehK07DiA9eU7x4cF/P10zqZmv6Gx6GiTtbUDmQj0fxdb3uMce1NdRd
+	 Owsw6ukeGy96FxYtXL22lMsoYsmwV/mAD+NnJJAVP8VdZ8jPdk4EzbSrFQXjT8FJSe
+	 lhRshCmKH/h7Sl5BVk3rEILYGeDJ7sYgmaTdwDai9aoSfefuSLBrDlZLZQJmqVuAsV
+	 xYQsCXgbVQEm908rvw/PNhrpFfPiMv3vClnnexPXg6hG1UdLiKdEsS+PFesBI+hIcH
+	 7j0YdVgbRmhefip2PIRQ2fIZTkS2brQi+sl6Ly+WF6TjpJBvwHh5DSPTpDS9C9yQp9
+	 f1GbEGR3xDw4A==
+Date: Mon, 4 Dec 2023 18:17:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, David Epping
+ <david.epping@missinglinkelectronics.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Harini Katakam <harini.katakam@amd.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3 3/3] net: phy: add support for PHY package
+ MMD read/write
+Message-ID: <20231204181752.2be3fd68@kernel.org>
+In-Reply-To: <20231128133630.7829-3-ansuelsmth@gmail.com>
+References: <20231128133630.7829-1-ansuelsmth@gmail.com>
+	<20231128133630.7829-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231205013420.88067-1-kuniyu@amazon.com> <20231205013420.88067-4-kuniyu@amazon.com>
-In-Reply-To: <20231205013420.88067-4-kuniyu@amazon.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 4 Dec 2023 18:13:55 -0800
-Message-ID: <CAADnVQKY74ynj8PB62Wf4xgDN6sC=VawQwy5V3YbRx-2tbcwNw@mail.gmail.com>
-Subject: Re: [PATCH v4 bpf-next 3/3] selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Eric Dumazet <edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 4, 2023 at 5:36=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> +static __always_inline int tcp_load_headers(struct tcp_syncookie *ctx)
+On Tue, 28 Nov 2023 14:36:30 +0100 Christian Marangi wrote:
+> +/**
+> + * phy_package_write_mmd - Convenience function for writing a register
+> + * on an MMD on a given PHY using the PHY package base addr, added of
+> + * the addr_offset value.
+> + * @phydev: The phy_device struct
+> + * @addr_offset: The offset to be added to PHY package base_addr
+> + * @devad: The MMD to read from
+> + * @regnum: The register on the MMD to read
+> + * @val: value to write to @regnum
+> + *
+> + * Same rules as for phy_write();
+> + *
+> + * NOTE: It's assumed that the entire PHY package is either C22 or C45.
+> + */
 
-...
+> +/*
+> + * phy_package_write_mmd - Convenience function for writing a register
+> + * on an MMD on a given PHY using the PHY package base addr, added of
+> + * the addr_offset value.
+> + */
+> +int phy_package_write_mmd(struct phy_device *phydev,
+> +			  unsigned int addr_offset, int devad,
+> +			  u32 regnum, u16 val);
 
-> +static __always_inline int tcp_reload_headers(struct tcp_syncookie *ctx)
+Hm, I see there's some precedent here already for this duplicated
+semi-kdoc. It seems a bit unusual. If I was looking for kdoc and 
+found the header one I'd probably not look at the source file at all.
 
-please remove __always_inline here and in all other places.
-The generated code will be much better =3D=3D faster and the verifier
-should be able to understand it.
+Andrew, WDYT?
 
