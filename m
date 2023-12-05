@@ -1,226 +1,285 @@
-Return-Path: <netdev+bounces-53833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F48804C98
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:36:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96DF804CC7
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03FF028170B
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14CE41C20D52
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C443DF6E;
-	Tue,  5 Dec 2023 08:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ABD241E8;
+	Tue,  5 Dec 2023 08:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsUmtru+"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="YckqmP0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE9C10CB
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:36:49 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54cae99a48aso4106045a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 00:36:49 -0800 (PST)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE2D9C
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:41:05 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54c846da5e9so2461147a12.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 00:41:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701765408; x=1702370208; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1VY0/mtm7gAeXOQh2N9ZoTaOLPJn+ytFRtPnmXW3E1o=;
-        b=WsUmtru+sIlHapmz0e1nwfCSylM/McvhvPwzoPIBVqgsgwGP4nX1SX9trqWycQZV8N
-         mjddpC81yuYOeUGTmALq487ZsbpVRMOUD5KKXVuwtitV9ciSNIXnXEeJLYb2uxAx/nmQ
-         bgKfoR204XzoqGfrmL4/aWmSpgUhvF/EZnvs/+/zL1v4sHCvKCKXWd9HqTKO2wl+Ecgj
-         Uuvm02zl6WXWlmEOo7zYMACGn37wHzPl1Fz5q9oEmWijXaL9JtQmqJXG+UMVrS6j9nEH
-         jGSoY1yoaJ08w5A4dg5jV+6Xzi78MoGqq0Whl5S7uoWZNhQfww2W/ZqVgrpZTRYFteIJ
-         866g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1701765664; x=1702370464; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4gvIYZNGKC5V1TKXAsB6opS8k0gKBhdEDI5JBpE5yRI=;
+        b=YckqmP0PEsLzRd8fLw7B2EbAnyxSCJCijEMaMC2X/hB6G+DvjJoMG7QLBWMalM/mlv
+         zYFHvxud/srYLe6lax7vna0exPWL3NtWoDqEN0Y0y8v7oW4l+z6cxBKP9+Rb9t4eMVuu
+         g2gY8T6pdjMtDx2N90LUtzF0Qiju6WJrXRdHVI1lIIOcxerHBp9H3gppAogTY+hpOu2j
+         uchRLUbXYGAbWRFSJEe6akP3YFRj+FPl0bcVTVaDd489l/jDz/DqitA76kpLE7GK2aYw
+         0/rZFVnzTGP29agoHhKoy7zRTDgA+WlPRHlK6pqyPRfoDUlvWp0NieyRhQIz/2V19rg/
+         f1PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701765408; x=1702370208;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1VY0/mtm7gAeXOQh2N9ZoTaOLPJn+ytFRtPnmXW3E1o=;
-        b=MF8zgDkKk6vSP0TNVVS4BWzIa5dOwLy2IwnzCZiu+3halJ1Pv4ELRxIaT4FSPwhbdE
-         Td2zZSVYv/1J5MdmHEW6qjoW6fPVDEWlXjMdynuXy5rml5VW7gr9UCtXlEOkUznyIUVE
-         nXUT/kPMQJzHtro3kTGatojz+M88S9Jx8ESbaE3y/XtK0BFdrW2MmVfZayI6HU/YaWm9
-         rZz4fMwETcj+emP8msw/aGbp60MiHbgQ2KkdTKFEpzph3J//Qt8+k9+0LuLUSZVvf2tU
-         08Zv4nXRL08WEr6DJMeSC//JC7rhKM5HB1tD6bmp4pc2csBmnbugOWlO3296urjs2oKJ
-         wWRg==
-X-Gm-Message-State: AOJu0YwZBpJBqL2MXbPa86Va/uE9D1EpdHNhBhjK7ucZHIRgUcaWQ9Wt
-	eSQvfQ64xHVB98NxrORvADA=
-X-Google-Smtp-Source: AGHT+IH3CuaXPSNW3/aOqLDDuRLw9CgRk7zmkn6YIlxMGo8bIoA4BiUIXw5uwMX1ZtqasdpabM+aMQ==
-X-Received: by 2002:aa7:cd5a:0:b0:54b:3599:dc4a with SMTP id v26-20020aa7cd5a000000b0054b3599dc4amr1191734edw.9.1701765408121;
-        Tue, 05 Dec 2023 00:36:48 -0800 (PST)
-Received: from skbuf ([188.27.185.68])
-        by smtp.gmail.com with ESMTPSA id q13-20020aa7da8d000000b0054cfb16de51sm772267eds.3.2023.12.05.00.36.47
+        d=1e100.net; s=20230601; t=1701765664; x=1702370464;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4gvIYZNGKC5V1TKXAsB6opS8k0gKBhdEDI5JBpE5yRI=;
+        b=j72TNeYrCLtOmURW+MNCyoE/gAmR8jIZSB8Ij9NNnu212BbpmwFZ9KLgDvLlhEOcHO
+         RFbA8ITNDvz3kfvwXucl6p/Ztzzw3MZIktLZoAG0lzS45bNUke5Bzi+Z5n3TxDrnhgB4
+         9Hy29WrIEDy1E92CZYB57bRrQiRKGUcWPgUkAdNAL6zXJeG9X6ATpBPAjSotw6YM8zUq
+         tWakWP+dXn1bxHNonCxM0l4cxsPhE6Q+sWK0uMYYU+CGLDV7ML7e72HAONu+22+/hTdc
+         FD0+aanv9K4FuzCGs0yOmbOdRaB+UNRHIBx24L03aHhZAsg5VuuHlb9nmUykSgXE4+I0
+         5JvA==
+X-Gm-Message-State: AOJu0Yw5Tk78oMvAdfBQEMXvXh7jmMP3HG+UgJxrsNN3UTVLBDbmoz6Y
+	/7zFZKTG+f0kd1yGLKaVHrRS9w==
+X-Google-Smtp-Source: AGHT+IFgBK20UXoI1hWHYBOOTTulTwp6tvH8cR2S4DYdBQKIpVPE9we21jY1uk0BJKJBz6B/64djew==
+X-Received: by 2002:a50:d68d:0:b0:54b:53f0:2696 with SMTP id r13-20020a50d68d000000b0054b53f02696mr3842151edi.30.1701765664023;
+        Tue, 05 Dec 2023 00:41:04 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id f26-20020aa7d85a000000b0054ccc3b2109sm763476eds.57.2023.12.05.00.41.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 00:36:47 -0800 (PST)
-Date: Tue, 5 Dec 2023 10:36:46 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Danzberger <dd@embedd.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
- platform init
-Message-ID: <20231205083646.h2tqkwourtdyzdee@skbuf>
-References: <20231204154315.3906267-1-dd@embedd.com>
- <20231204174330.rjwxenuuxcimbzce@skbuf>
- <20231204154315.3906267-1-dd@embedd.com>
- <20231204174330.rjwxenuuxcimbzce@skbuf>
- <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
- <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+        Tue, 05 Dec 2023 00:41:03 -0800 (PST)
+Date: Tue, 5 Dec 2023 09:41:02 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Marcelo Ricardo Leitner <mleitner@redhat.com>,
+	Jamal Hadi Salim <hadi@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	xiyou.wangcong@gmail.com, vladbu@nvidia.com, paulb@nvidia.com,
+	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
+Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
+ blockcast tc action
+Message-ID: <ZW7iHub0oM5SZ/SF@nanopsycho>
+References: <ZV9b0HrM5WespGMW@nanopsycho>
+ <CAM0EoMnwAHO_AvEYiL=aTwNBjs29ww075Lq1qwvCwuYtB_Qz7A@mail.gmail.com>
+ <ZV9tCT9d7dm7dOeA@nanopsycho>
+ <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
+ <ZV+DPmXrANEh6gF8@nanopsycho>
+ <CAM0EoMkQaEAaKc7D6kVe+p6f=-Ddd7enoKgRdeWBnqbN2zPhfA@mail.gmail.com>
+ <CALnP8ZbaT+jdBvaggAPW=yiW61fip6cjnZcU48tb2-5orqdeMg@mail.gmail.com>
+ <CAM0EoMmso7Y0g9jQ=FfJLuV9JTDct5Qqb5-W4+nd0Xb9DBkGkA@mail.gmail.com>
+ <ZW2gwaj/LBNL8J3P@nanopsycho>
+ <CAM0EoMmvkT5JEm7tUNa-zGD1g80usR=KUAF0zO5uDV70Z-5hmA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
- <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMmvkT5JEm7tUNa-zGD1g80usR=KUAF0zO5uDV70Z-5hmA@mail.gmail.com>
 
-On Tue, Dec 05, 2023 at 09:00:39AM +0100, Daniel Danzberger wrote:
-> > Is this all that's necessary for instantiating the ksz driver through
-> > ds->dev->platform_data? I suppose not, so can you post it all, please?
-> Yes, that NULL pointer was the only issue I encountered.
-> 
-> Here is the module I use to instantiate the switch, which works fine so far in our
-> linux v6.1 x86_64 builds:
-> --
-> #include <linux/kernel.h>
-> #include <linux/module.h>
-> #include <linux/i2c.h>
-> #include <linux/netdevice.h>
-> #include <net/dsa.h>
-> 
-> static struct i2c_client *i2cdev;
-> 
-> static struct dsa_chip_data ksz9477_dsa = {
-> 	.port_names = {
-> 		"cpu",
-> 		"lan1",
-> 		"lan2",
-> 		"lan3",
-> 		"lan4"
-> 	}
-> };
-> 
-> static struct i2c_board_info t2t_ngr421_i2c_board_info = {
-> 	I2C_BOARD_INFO("ksz9477-switch", 0x5f),
-> 	.platform_data	= &ksz9477_dsa,
-> };
-> 
-> static int __init t2t_ngr421_platform_init(void)
-> {
-> 	struct i2c_adapter *adapter = i2c_get_adapter(11);
-> 	struct net_device *netdev_cpu = NULL, *nd;
-> 
-> 	if (adapter == NULL) {
-> 		pr_err("t2t-ngr421: Missing FT260 I2C Adapter");
-> 		return -ENODEV;
-> 	}
-> 
-> 	read_lock(&dev_base_lock);
-> 	for_each_netdev(&init_net, nd) {
-> 		if (!strcmp(nd->name, "eth0")) {
-> 			netdev_cpu = nd;
-> 			break;
-> 		}
-> 	}
-> 	read_unlock(&dev_base_lock);
-> 
-> 	if (netdev_cpu == NULL) {
-> 		pr_err("t2t-ngr421: Missing netdev eth0");
-> 		return -ENODEV;
-> 	}
-> 		
-> 	ksz9477_dsa.netdev[0] = &netdev_cpu->dev;
-> 	i2cdev = i2c_new_client_device(adapter, &t2t_ngr421_i2c_board_info);
-> 	return i2cdev ? 0 : -ENODEV;
-> }
-> 
-> static void t2t_ngr421_platform_deinit(void)
-> {
-> 	if (i2cdev)
-> 		i2c_unregister_device(i2cdev);
-> }
-> 
-> module_init(t2t_ngr421_platform_init);
-> module_exit(t2t_ngr421_platform_deinit);
-> 
-> MODULE_AUTHOR("Daniel Danzberger <dd@embedd.com>");
-> MODULE_DESCRIPTION("T2T NGR421 platform driver");
-> MODULE_LICENSE("GPL v2");
-> --
+Mon, Dec 04, 2023 at 09:10:18PM CET, jhs@mojatatu.com wrote:
+>On Mon, Dec 4, 2023 at 4:49 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Fri, Dec 01, 2023 at 07:45:47PM CET, jhs@mojatatu.com wrote:
+>> >On Mon, Nov 27, 2023 at 1:52 PM Marcelo Ricardo Leitner
+>> ><mleitner@redhat.com> wrote:
+>> >>
+>> >> On Mon, Nov 27, 2023 at 10:50:48AM -0500, Jamal Hadi Salim wrote:
+>> >> > On Thu, Nov 23, 2023 at 11:52 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> > >
+>> >> > > Thu, Nov 23, 2023 at 05:21:51PM CET, hadi@mojatatu.com wrote:
+>> >> > > >On Thu, Nov 23, 2023 at 10:17 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> > > >>
+>> >> > > >> Thu, Nov 23, 2023 at 03:38:35PM CET, jhs@mojatatu.com wrote:
+>> >> > > >> >On Thu, Nov 23, 2023 at 9:04 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> > > >> >>
+>> >> > > >> >> Thu, Nov 23, 2023 at 02:37:13PM CET, jhs@mojatatu.com wrote:
+>> >> > > >> >> >On Thu, Nov 23, 2023 at 3:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> > > >> >> >>
+>> >> > > >> >> >> Fri, Nov 10, 2023 at 10:46:18PM CET, victor@mojatatu.com wrote:
+>> >> > > >> >> >> >This action takes advantage of the presence of tc block ports set in the
+>> >> > > >> >> >> >datapath and multicasts a packet to ports on a block. By default, it will
+>> >> > > >> >> >> >broadcast the packet to a block, that is send to all members of the block except
+>> >> > > >> >> >> >the port in which the packet arrived on. However, the user may specify
+>> >> > > >> >> >> >the option "tx_type all", which will send the packet to all members of the
+>> >> > > >> >> >> >block indiscriminately.
+>> >> > > >> >> >> >
+>> >> > > >> >> >> >Example usage:
+>> >> > > >> >> >> >    $ tc qdisc add dev ens7 ingress_block 22
+>> >> > > >> >> >> >    $ tc qdisc add dev ens8 ingress_block 22
+>> >> > > >> >> >> >
+>> >> > > >> >> >> >Now we can add a filter to broadcast packets to ports on ingress block id 22:
+>> >> > > >> >> >> >$ tc filter add block 22 protocol ip pref 25 \
+>> >> > > >> >> >> >  flower dst_ip 192.168.0.0/16 action blockcast blockid 22
+>> >> > > >> >> >>
+>> >> > > >> >> >> Name the arg "block" so it is consistent with "filter add block". Make
+>> >> > > >> >> >> sure this is aligned netlink-wise as well.
+>> >> > > >> >> >>
+>> >> > > >> >> >>
+>> >> > > >> >> >> >
+>> >> > > >> >> >> >Or if we wish to send to all ports in the block:
+>> >> > > >> >> >> >$ tc filter add block 22 protocol ip pref 25 \
+>> >> > > >> >> >> >  flower dst_ip 192.168.0.0/16 action blockcast blockid 22 tx_type all
+>> >> > > >> >> >>
+>> >> > > >> >> >> I read the discussion the the previous version again. I suggested this
+>> >> > > >> >> >> to be part of mirred. Why exactly that was not addressed?
+>> >> > > >> >> >>
+>> >> > > >> >> >
+>> >> > > >> >> >I am the one who pushed back (in that discussion). Actions should be
+>> >> > > >> >> >small and specific. Like i had said in that earlier discussion it was
+>> >> > > >> >> >a mistake to make mirred do both mirror and redirect - they should
+>> >> > > >> >>
+>> >> > > >> >> For mirror and redirect, I agree. For redirect and redirect, does not
+>> >> > > >> >> make much sense. It's just confusing for the user.
+>> >> > > >> >>
+>> >> > > >> >
+>> >> > > >> >Blockcast only emulates the mirror part. I agree redirect doesnt make
+>> >> > > >> >any sense because once you redirect the packet is gone.
+>> >> > > >>
+>> >> > > >> How is it mirror? It is redirect to multiple, isn't it?
+>> >> > > >>
+>> >> > > >>
+>> >> > > >> >
+>> >> > > >> >> >have been two actions. So i feel like adding a block to mirred is
+>> >> > > >> >> >adding more knobs. We are also going to add dev->group as a way to
+>> >> > > >> >> >select what devices to mirror to. Should that be in mirred as well?
+>> >> > > >> >>
+>> >> > > >> >> I need more details.
+>> >> > > >> >>
+>> >> > > >> >
+>> >> > > >> >You set any port you want to be mirrored to using ip link, example:
+>> >> > > >> >ip link set dev $DEV1 group 2
+>> >> > > >> >ip link set dev $DEV2 group 2
+>> >> > > >>
+>> >> > > >> That does not looks correct at all. Do tc stuff in tc, no?
+>> >> > > >>
+>> >> > > >>
+>> >> > > >> >...
+>> >> > > >> >
+>> >> > > >> >Then you can blockcast:
+>> >> > > >> >tc filter add devx protocol ip pref 25 \
+>> >> > > >> >  flower dst_ip 192.168.0.0/16 action blockcast group 2
+>> >> > > >>
+>> >> > > >> "blockcasting" to something that is not a block anymore. Not nice.
+>> >>
+>> >> +1
+>> >>
+>> >> > > >>
+>> >> > > >
+>> >> > > >Sorry, missed this one. Yes blockcasting is no longer appropriate  -
+>> >> > > >perhaps a different action altogether.
+>> >> > >
+>> >> > > mirret redirect? :)
+>> >> > >
+>> >> > > With target of:
+>> >> > > 1) dev (the current one)
+>> >> > > 2) block
+>> >> > > 3) group
+>> >> > > ?
+>> >> >
+>> >> > tbh, I dont like it - but we need to make progress. I will defer to Marcelo.
+>> >>
+>> >> With the addition of a new output type that I didn't foresee, that
+>> >> AFAICS will use the same parameters as the block output, creating a
+>> >> new action for it is a lot of boilerplate for just having a different
+>> >> name. If these new two actions can share parsing code and everything,
+>> >> then it's not too far for mirred also use. And if we stick to the
+>> >> concept of one single action for outputting to multiple interfaces,
+>> >> even just deciding on the new name became quite challenging now.
+>> >> "groupcast" is misleading. "multicast" no good, "multimirred" not
+>> >> intuitive, "supermirred" what? and so on..
+>> >>
+>> >> I still think that it will become a very complex action, but well,
+>> >> hopefully the man page can be updated in a way to minimize the
+>> >> confusion.
+>> >
+>> >Ok, so we are moving forward with mirred "mirror" option only for this then...
+>>
+>> Could you remind me why mirror and not redirect? Does the packet
+>> continue through the stack?
+>
+>For mirror it is _a copy_ of the packet so it continues up the stack
+>and you can have other actions follow it (including multiple mirrors
+>after the first mirror). For redirect the packet is TC_ACT_CONSUMED -
+>so removed from the stack processing (and cant be sent to more ports).
+>That is how mirred has always worked and i believe thats how most
+>hardware works as well.
+>So sending to multiple ports has to be mirroring semantics (most
+>hardware assumes the same semantics).
 
-Pfff, I hate that "eth0" search. If you have a udev naming rule and the
-driver is built as a module, you break it. Although you don't even need
-that. Insert a USB to Ethernet adapter and all bets are off regarding
-which one is eth0 and which one is eth1. It's good as prototyping code
-and not much more.
+You assume cloning (sending to multiple ports) means mirror,
+that is I believe a mistake. Look at it from the perspective of
+replacing device by target for each action. Currently we have:
 
-Admittedly, that's the only thing that DSA offers currently when there's
-no firmware description of the switch, but I think it wouldn't even be
-that hard to do better. Someone needs to take a close look at Marcin
-Wojtas' work of converting DSA to fwnode APIs
-https://lore.kernel.org/netdev/20230116173420.1278704-1-mw@semihalf.com/
-then we could replace the platform_data with software nodes and references.
-That should actually be in our own best interest as maintainers, since
-it should unify the handling of the 2 probing cases in the DSA core.
-I might be able to find some time to do that early next year.
+1) mirred mirror TARGET_DEVICE
+   Clones, sends to TARGET_DEVICE and continues up the stack
+2) mirred redirect TARGET_DEVICE
+   Sends to TARGET_DEVICE, nothing is sent up the stack
 
-Except for dsa_loop_bdinfo.c which is easy to test by anyone, I don't
-see any other board init code physically present in mainline. So please
-do _not_ submit the board code, so I can pretend I didn't see it, and
-for the responsibility of converting it to the new API to fall on you :)
+For block target, there should be exacly the same semantics:
 
-(or, of course, you may want to take on the bigger task yourself ahead
-of me, case in which your board code, edited to use fwnode_create_software_node(),
-would be perfectly welcome in mainline)
+1) mirred mirror TARGET_BLOCK
+   Clones (multiple times, for each block member), sends to TARGET_BLOCK
+   and continues up the stack
+2) mirred redirect TARGET_BLOCK
+   Clones (multiple times, for each block member - 1), sends to
+   TARGET_BLOCK, nothing is sent up the stack
 
-But let's do something about the ksz driver's use of the platform_data
-structures, since it wasn't even on my radar of something that might be
-able to support that use case. More below.
 
-> > Looking at dsa_switch_probe() -> dsa_switch_parse(), it expects
-> > ds->dev->platform_data to contain a struct dsa_chip_data. This is in
-> > contrast with ksz_spi.c, ksz9477_i2c.c and ksz8863_smi.c, which expect
-> > the dev->platform_data to have the struct ksz_platform_data type.
-> > But struct ksz_platform_data does not contain struct dsa_chip_data as
-> > first element.
-> 
-> Noticed that as well.
-> But hence the 'struct ksz_platform_data' isn't used anywhere, I passed (see module above) 'struct
-> dsa_chip_data' directly.
 
-What do you mean struct ksz_platform_data isn't used anywhere? What about this?
-
-int ksz_switch_register(struct ksz_device *dev)
-{
-	const struct ksz_chip_data *info;
-	struct device_node *port, *ports;
-	phy_interface_t interface;
-	unsigned int port_num;
-	int ret;
-	int i;
-
-	if (dev->pdata)
-		dev->chip_id = dev->pdata->chip_id;
-
-with dev->pdata assigned like this:
-
-static int ksz9477_i2c_probe(struct i2c_client *i2c)
-{
-	struct ksz_device *dev;
-
-	dev = ksz_switch_alloc(&i2c->dev, i2c);
-	if (!dev)
-		return -ENOMEM;
-
-	if (i2c->dev.platform_data)
-		dev->pdata = i2c->dev.platform_data;
-
-What is your dev->chip_id before and after this? The code dereferences
-the first 4 bytes of struct dsa_chip_data as if it was the chip_id field
-of struct ksz_platform_data. There is a bunch of code that depends on
-dev->chip_id at runtime.
+>
+>cheers,
+>jamal
+>
+>>
+>> >
+>> >cheers,
+>> >jamal
+>> >
+>> >> Cheers,
+>> >> Marcelo
+>> >>
+>> >> >
+>> >> > cheers,
+>> >> > jamal
+>> >> >
+>> >> > >
+>> >> > > >
+>> >> > > >cheers,
+>> >> > > >jamal
+>> >> > > >> >
+>> >> > > >> >cheers,
+>> >> > > >> >jamal
+>> >> > > >> >
+>> >> > > >> >>
+>> >> > > >> >> >
+>> >> > > >> >> >cheers,
+>> >> > > >> >> >jamal
+>> >> > > >> >> >
+>> >> > > >> >> >> Instead of:
+>> >> > > >> >> >> $ tc filter add block 22 protocol ip pref 25 \
+>> >> > > >> >> >>   flower dst_ip 192.168.0.0/16 action blockcast blockid 22
+>> >> > > >> >> >> You'd have:
+>> >> > > >> >> >> $ tc filter add block 22 protocol ip pref 25 \
+>> >> > > >> >> >>   flower dst_ip 192.168.0.0/16 action mirred egress redirect block 22
+>> >> > > >> >> >>
+>> >> > > >> >> >> I don't see why we need special action for this.
+>> >> > > >> >> >>
+>> >> > > >> >> >> Regarding "tx_type all":
+>> >> > > >> >> >> Do you expect to have another "tx_type"? Seems to me a bit odd. Why not
+>> >> > > >> >> >> to have this as "no_src_skip" or some other similar arg, without value
+>> >> > > >> >> >> acting as a bool (flag) on netlink level.
+>> >> > > >> >> >>
+>> >> > > >> >> >>
+>> >> >
+>> >>
 
