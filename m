@@ -1,161 +1,248 @@
-Return-Path: <netdev+bounces-53811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9125804B9D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:00:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA72804B9F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0891F20EED
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:00:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA7CDB20A9D
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349183399A;
-	Tue,  5 Dec 2023 08:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19EA3399A;
+	Tue,  5 Dec 2023 08:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uy9b9I83"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embedd.com header.i=@embedd.com header.b="dMoyEWjw";
+	dkim=pass (1024-bit key) header.d=embedd.com header.i=@embedd.com header.b="pmTNVWrX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54354C6
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:00:48 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54c79cca895so9377a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 00:00:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701763247; x=1702368047; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YBrtDZnHhmERsGfSGwxcZ4uuPk1wFk1eYV41lFIXMNo=;
-        b=Uy9b9I83ywXItaYKX4J8cmHn+kuK5+SNHwscNxVyO1VKJTW7giMNGd3vNOYC2aez2B
-         aSN6FTzpjzAxllhXssG3AOM/uGgrbc0aKyjc/IybLJZBlkc8ITfGrmtYjh8pv9opCc0j
-         Ccr5RmSTzHewUbpATt3LewszcSnzbhkB/sOZEADyiz0mbfe7V1uJiJOa9maOmUPNfUBT
-         d3x94cBC4POIiW/dN2f1jxnNnn7sWG93LLnTP1I0FGVtZWBB++YZWGBxaNvFEFus8QxE
-         0V7UepPuU/Zt8EsmeXw0BQhbtY5jxDCOnxjxtaIZXcPgOcWDEVKW8eIppECdK3iCFQRM
-         rp6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701763247; x=1702368047;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YBrtDZnHhmERsGfSGwxcZ4uuPk1wFk1eYV41lFIXMNo=;
-        b=coTgq8+VoiLaha+yECYcR/OeI85yMkuSynHG0HqSEdH49eYVrQC/fYJuY+cByd+3Y0
-         Hb8KxQuirmn9h+BIPNzeKqmAELRLvo/Geidv3Sz5Pg6AuTobjmM+7MBTRII5UglLy2BJ
-         SvNEpy9pBIXKLQO90/pvKWE6eiuU3iZVMnkBEJyGQ3ArfX0qJts2qCCXHJ9b7ZKwz2d/
-         oxIMWcB+fO4Qz/zVgA+WrZXI7vclP2n2tE4XhIZSw0RHPPE6rpuoGsHY3WC0GuAiQMP6
-         B949RvVzbn0Qk8WX1xYmC1UN+uJKYTm9BhQpQVUavP+0LvvfSi2WRESrk/xrRznZtKAQ
-         LYTA==
-X-Gm-Message-State: AOJu0YzgfMWk02jVLyYNhOUHu964qXpCVXMIPGtaLEwxmS/yKqRg7/K2
-	cS7Zm1eCTONkTvnW5LgzhV7KpbMLBZNgMhYmz50Q/g==
-X-Google-Smtp-Source: AGHT+IGTWSkWHGqACURo+daOEICeNg8WH3yLmgljr7qcEj6yyd16dvZBo2U9uvM+yLinzNfTeR+BFyDr83i5Y3LqzVs=
-X-Received: by 2002:a50:99de:0:b0:54a:ee8b:7a99 with SMTP id
- n30-20020a5099de000000b0054aee8b7a99mr406156edb.0.1701763246503; Tue, 05 Dec
- 2023 00:00:46 -0800 (PST)
+Received: from mail.as201155.net (mail.as201155.net [185.84.6.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFF2134
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:01:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=embedd.com;
+	s=dkim1; h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ud/T4G2/nBedhWOuOssvlcnce+6WlWhTF8yQVnFpOxI=; b=dMoyEWjw0l9T0BFrU2/ewvSYEP
+	6jax1sFkEIs9b6+QK6lWqpb3luIqcS2GiRNfAHLsYC/WXu9bakHJy+vR9EjfUvUFp1wKn3oS+RYo3
+	z8M1a6ofiPpUuWrOXIqArETO3jJkkiEPt++AntvGSCyK3/aDSe7cKf9Fp9ka6fwNsImLJmIj6OMMo
+	YylbhXc76CfNiAdQ4AwVlgSE4Lp0sY1MiPRYEhfqsSf3MmQYd/YieZ25Ud4SoQwiMOZ5oomYj8pJL
+	r9YIRG36Mx5yvnnayIyFvHWQ6DRyhGFU2JueI7oiHZzDpa0ameOr/4+dCFbKASa8N8a5/LohIbc4t
+	BHnNFYRQ==;
+Received: from smtps.newmedia-net.de ([2a05:a1c0:0:de::167]:34714 helo=webmail.newmedia-net.de)
+	by mail.as201155.net with esmtps  (TLS1) tls TLS_RSA_WITH_AES_256_CBC_SHA
+	(Exim 4.96)
+	(envelope-from <dd@embedd.com>)
+	id 1rAQMV-0006BY-1u;
+	Tue, 05 Dec 2023 09:00:59 +0100
+X-SASI-Hits: BODY_SIZE_3000_3999 0.000000, BODY_SIZE_5000_LESS 0.000000,
+	BODY_SIZE_7000_LESS 0.000000, CTE_QUOTED_PRINTABLE 0.000000,
+	CT_TEXT_PLAIN_UTF8_CAPS 0.000000, DKIM_ALIGNS 0.000000,
+	DKIM_SIGNATURE 0.000000, HTML_00_01 0.050000, HTML_00_10 0.050000,
+	IN_REP_TO 0.000000, LEGITIMATE_SIGNS 0.000000, MSG_THREAD 0.000000,
+	MULTIPLE_RCPTS 0.100000, MULTIPLE_REAL_RCPTS 0.000000,
+	NO_CTA_URI_FOUND 0.000000, NO_FUR_HEADER 0.000000, NO_URI_HTTPS 0.000000,
+	OUTBOUND 0.000000, OUTBOUND_SOPHOS 0.000000, REFERENCES 0.000000,
+	RETURN_RECEIPT 0.500000, SENDER_NO_AUTH 0.000000, SUSP_DH_NEG 0.000000,
+	__ANY_URI 0.000000, __BODY_NO_MAILTO 0.000000,
+	__BOUNCE_CHALLENGE_SUBJ 0.000000, __BOUNCE_NDR_SUBJ_EXEMPT 0.000000,
+	__BULK_NEGATE 0.000000, __CC_NAME 0.000000, __CC_NAME_DIFF_FROM_ACC 0.000000,
+	__CC_REAL_NAMES 0.000000, __CT 0.000000, __CTE 0.000000,
+	__CT_TEXT_PLAIN 0.000000, __DKIM_ALIGNS_1 0.000000, __DKIM_ALIGNS_2 0.000000,
+	__DQ_NEG_DOMAIN 0.000000, __DQ_NEG_HEUR 0.000000, __DQ_NEG_IP 0.000000,
+	__FORWARDED_MSG 0.000000, __FROM_NAME_NOT_IN_ADDR 0.000000,
+	__FUR_RDNS_SOPHOS 0.000000, __HAS_CC_HDR 0.000000, __HAS_FROM 0.000000,
+	__HAS_MSGID 0.000000, __HAS_REFERENCES 0.000000,
+	__HEADER_ORDER_FROM 0.000000, __INVOICE_MULTILINGUAL 0.000000,
+	__IN_REP_TO 0.000000, __MAIL_CHAIN 0.000000, __MIME_BOUND_CHARSET 0.000000,
+	__MIME_TEXT_ONLY 0.000000, __MIME_TEXT_P 0.000000, __MIME_TEXT_P1 0.000000,
+	__MIME_VERSION 0.000000, __MULTIPLE_RCPTS_CC_X2 0.000000,
+	__NOTIFICATION_TO 0.000000, __NO_HTML_TAG_RAW 0.000000,
+	__OUTBOUND_SOPHOS_FUR 0.000000, __OUTBOUND_SOPHOS_FUR_IP 0.000000,
+	__OUTBOUND_SOPHOS_FUR_RDNS 0.000000, __RCVD_PASS 0.000000,
+	__REFERENCES 0.000000, __SANE_MSGID 0.000000, __SCAN_D_NEG 0.000000,
+	__SCAN_D_NEG2 0.000000, __SCAN_D_NEG_HEUR 0.000000,
+	__SCAN_D_NEG_HEUR2 0.000000, __SUBJ_ALPHA_END 0.000000,
+	__SUBJ_ALPHA_NEGATE 0.000000, __SUBJ_REPLY 0.000000, __TO_GMAIL 0.000000,
+	__TO_MALFORMED_2 0.000000, __TO_NAME 0.000000,
+	__TO_NAME_DIFF_FROM_ACC 0.000000, __TO_REAL_NAMES 0.000000,
+	__URI_MAILTO 0.000000, __URI_NO_WWW 0.000000, __URI_NS 0.000000,
+	__USER_AGENT 0.000000, __X_MAILSCANNER 0.000000
+X-SASI-Probability: 10%
+X-SASI-RCODE: 200
+X-SASI-Version: Antispam-Engine: 5.1.4, AntispamData: 2023.12.5.73015
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=embedd.com; s=mikd;
+	h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID; bh=ud/T4G2/nBedhWOuOssvlcnce+6WlWhTF8yQVnFpOxI=;
+	b=pmTNVWrXuON+TxHUwv+dGmy7TyOe8rMoQVi4E8VxHRvKMLJf/PZL299IDDtSFLMhZn6NGJJAWPNUkqf6csDBLFxBGWWwbl4cNRX/YPpAwlQoasUDEMS0IFEGv13Hd9qnA3kZiqUHh8PN7Np/WePfy2+BoZuK/Oe/gW8Fr+29Tbw=;
+Message-ID: <577c2f8511b700624cdfdf75db5b1a90cf71314b.camel@embedd.com>
+Subject: Re: [PATCH] net: dsa: microchip: fix NULL pointer dereference on
+ platform init
+From: Daniel Danzberger <dd@embedd.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, 
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+	 <f.fainelli@gmail.com>
+Date: Tue, 05 Dec 2023 09:00:39 +0100
+In-Reply-To: <20231204174330.rjwxenuuxcimbzce@skbuf>
+References: <20231204154315.3906267-1-dd@embedd.com>
+	 <20231204174330.rjwxenuuxcimbzce@skbuf>
+Disposition-Notification-To: dd@embedd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.1-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201083926.1817394-1-judyhsiao@chromium.org>
- <CANn89iJMbMZdnJRP0CUVfEi20whhShBfO+DAmdaerhiXfiTx5A@mail.gmail.com> <CAD=FV=VqmkydL2XXMWNZ7+89F_6nzGZiGfkknaBgf4Zncng1SQ@mail.gmail.com>
-In-Reply-To: <CAD=FV=VqmkydL2XXMWNZ7+89F_6nzGZiGfkknaBgf4Zncng1SQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Dec 2023 09:00:33 +0100
-Message-ID: <CANn89iLuxfSZs+HV6-3=2FJL_KHg3=7WLZ109VXqsXO2-k+KvQ@mail.gmail.com>
-Subject: Re: [PATCH v1] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-To: Doug Anderson <dianders@chromium.org>
-Cc: Judy Hsiao <judyhsiao@chromium.org>, David Ahern <dsahern@kernel.org>, 
-	Simon Horman <horms@kernel.org>, Brian Haley <haleyb.dev@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass (webmail.newmedia-net.de: localhost is always allowed.) client-ip=127.0.0.1; envelope-from=dd@embedd.com; helo=webmail.newmedia-net.de;
+X-SA-Exim-Connect-IP: 127.0.0.1
+X-SA-Exim-Mail-From: dd@embedd.com
+X-SA-Exim-Scanned: No (on webmail.newmedia-net.de); SAEximRunCond expanded to false
+X-NMN-MailScanner-Information: Please contact the ISP for more information
+X-NMN-MailScanner-ID: 1rAQMC-000293-H2
+X-NMN-MailScanner: Found to be clean
+X-NMN-MailScanner-From: dd@embedd.com
+X-Received:  from localhost.localdomain ([127.0.0.1] helo=webmail.newmedia-net.de)
+	by webmail.newmedia-net.de with esmtp (Exim 4.72)
+	(envelope-from <dd@embedd.com>)
+	id 1rAQMC-000293-H2; Tue, 05 Dec 2023 09:00:40 +0100
 
-On Tue, Dec 5, 2023 at 12:40=E2=80=AFAM Doug Anderson <dianders@chromium.or=
-g> wrote:
->
-> Hi,
->
-> On Fri, Dec 1, 2023 at 1:10=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Fri, Dec 1, 2023 at 9:39=E2=80=AFAM Judy Hsiao <judyhsiao@chromium.o=
-rg> wrote:
-> > >
-> > > We are seeing cases where neigh_cleanup_and_release() is called by
-> > > neigh_forced_gc() many times in a row with preemption turned off.
-> > > When running on a low powered CPU at a low CPU frequency, this has
-> > > been measured to keep preemption off for ~10 ms. That's not great on =
-a
-> > > system with HZ=3D1000 which expects tasks to be able to schedule in
-> > > with ~1ms latency.
-> >
-> > This will not work in general, because this code runs with BH blocked.
-> >
-> > jiffies will stay untouched for many more ms on systems with only one C=
-PU.
-> >
-> > I would rather not rely on jiffies here but ktime_get_ns() [1]
-> >
-> > Also if we break the loop based on time, we might be unable to purge
-> > the last elements in gc_list.
-> > We might need to use a second list to make sure to cycle over all
-> > elements eventually.
-> >
-> >
-> > [1]
-> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-> > index df81c1f0a57047e176b7c7e4809d2dae59ba6be5..e2340e6b07735db8cf6e75d=
-23ef09bb4b0db53b4
-> > 100644
-> > --- a/net/core/neighbour.c
-> > +++ b/net/core/neighbour.c
-> > @@ -253,9 +253,11 @@ static int neigh_forced_gc(struct neigh_table *tbl=
-)
-> >  {
-> >         int max_clean =3D atomic_read(&tbl->gc_entries) -
-> >                         READ_ONCE(tbl->gc_thresh2);
-> > +       u64 tmax =3D ktime_get_ns() + NSEC_PER_MSEC;
-> >         unsigned long tref =3D jiffies - 5 * HZ;
-> >         struct neighbour *n, *tmp;
-> >         int shrunk =3D 0;
-> > +       int loop =3D 0;
-> >
-> >         NEIGH_CACHE_STAT_INC(tbl, forced_gc_runs);
-> >
-> > @@ -279,10 +281,16 @@ static int neigh_forced_gc(struct neigh_table *tb=
-l)
-> >                         if (shrunk >=3D max_clean)
-> >                                 break;
-> >                 }
-> > +               if (++loop =3D=3D 16) {
-> > +                       if (ktime_get_ns() > tmax)
-> > +                               goto unlock;
-> > +                       loop =3D 0;
-> > +               }
-> >         }
-> >
-> >         WRITE_ONCE(tbl->last_flush, jiffies);
-> >
-> > +unlock:
-> >         write_unlock_bh(&tbl->lock);
->
-> I'm curious what the plan here is. Your patch looks OK to me and I
-> could give it a weak Reviewed-by, but I don't know the code well
-> enough to know if we also need to address your second comment that we
-> need to "use a second list to make sure to cycle over all elements
-> eventually". Is that something you'd expect to get resolved before
-> landing?
+Hi,
 
-Please Judy send a V2 of the patch.
+On Mon, 2023-12-04 at 19:43 +0200, Vladimir Oltean wrote:
+> Hello Daniel,
+>=20
+> On Mon, Dec 04, 2023 at 04:43:15PM +0100, Daniel Danzberger wrote:
+> > Fixes a NULL pointer access when registering a switch device that has
+> > not been defined via DTS.
+> >=20
+> > This might happen when the switch is used on a platform like x86 that
+> > doesn't use DTS and instantiates devices in platform specific init code=
+.
+> >=20
+> > Signed-off-by: Daniel Danzberger <dd@embedd.com>
+> > ---
+> > =C2=A0drivers/net/dsa/microchip/ksz_common.c | 2 +-
+> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/m=
+icrochip/ksz_common.c
+> > index 9545aed905f5..525e13d9e39c 100644
+> > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > @@ -1678,7 +1678,7 @@ static int ksz_check_device_id(struct ksz_device =
+*dev)
+> > =C2=A0	dt_chip_data =3D of_device_get_match_data(dev->dev);
+> > =C2=A0
+> > =C2=A0	/* Check for Device Tree and Chip ID */
+> > -	if (dt_chip_data->chip_id !=3D dev->chip_id) {
+> > +	if (dt_chip_data && dt_chip_data->chip_id !=3D dev->chip_id) {
+> > =C2=A0		dev_err(dev->dev,
+> > =C2=A0			"Device tree specifies chip %s but found %s, please fix it!\n"=
+,
+> > =C2=A0			dt_chip_data->dev_name, dev->info->dev_name);
+> > --=20
+> > 2.39.2
+> >=20
+> >=20
+>=20
+> Is this all that's necessary for instantiating the ksz driver through
+> ds->dev->platform_data? I suppose not, so can you post it all, please?
+Yes, that NULL pointer was the only issue I encountered.
 
-I gave feedback, my intention was not to author the patch.
+Here is the module I use to instantiate the switch, which works fine so far=
+ in our
+linux v6.1 x86_64 builds:
+--
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/i2c.h>
+#include <linux/netdevice.h>
+#include <net/dsa.h>
 
-This is standard procedure, I now realize this was Judy first
-contribution, sorry for not making this clear.
+static struct i2c_client *i2cdev;
 
-I will simply add a "Reviewed-by: ..." tag when I agree with the result.
+static struct dsa_chip_data ksz9477_dsa =3D {
+	.port_names =3D {
+		"cpu",
+		"lan1",
+		"lan2",
+		"lan3",
+		"lan4"
+	}
+};
+
+static struct i2c_board_info t2t_ngr421_i2c_board_info =3D {
+	I2C_BOARD_INFO("ksz9477-switch", 0x5f),
+	.platform_data	=3D &ksz9477_dsa,
+};
+
+static int __init t2t_ngr421_platform_init(void)
+{
+	struct i2c_adapter *adapter =3D i2c_get_adapter(11);
+	struct net_device *netdev_cpu =3D NULL, *nd;
+
+	if (adapter =3D=3D NULL) {
+		pr_err("t2t-ngr421: Missing FT260 I2C Adapter");
+		return -ENODEV;
+	}
+
+	read_lock(&dev_base_lock);
+	for_each_netdev(&init_net, nd) {
+		if (!strcmp(nd->name, "eth0")) {
+			netdev_cpu =3D nd;
+			break;
+		}
+	}
+	read_unlock(&dev_base_lock);
+
+	if (netdev_cpu =3D=3D NULL) {
+		pr_err("t2t-ngr421: Missing netdev eth0");
+		return -ENODEV;
+	}
+	=09
+	ksz9477_dsa.netdev[0] =3D &netdev_cpu->dev;
+	i2cdev =3D i2c_new_client_device(adapter, &t2t_ngr421_i2c_board_info);
+	return i2cdev ? 0 : -ENODEV;
+}
+
+static void t2t_ngr421_platform_deinit(void)
+{
+	if (i2cdev)
+		i2c_unregister_device(i2cdev);
+}
+
+module_init(t2t_ngr421_platform_init);
+module_exit(t2t_ngr421_platform_deinit);
+
+MODULE_AUTHOR("Daniel Danzberger <dd@embedd.com>");
+MODULE_DESCRIPTION("T2T NGR421 platform driver");
+MODULE_LICENSE("GPL v2");
+--
+
+>=20
+> Looking at dsa_switch_probe() -> dsa_switch_parse(), it expects
+> ds->dev->platform_data to contain a struct dsa_chip_data. This is in
+> contrast with ksz_spi.c, ksz9477_i2c.c and ksz8863_smi.c, which expect
+> the dev->platform_data to have the struct ksz_platform_data type.
+> But struct ksz_platform_data does not contain struct dsa_chip_data as
+> first element.
+
+Noticed that as well.
+But hence the 'struct ksz_platform_data' isn't used anywhere, I passed (see=
+ module above) 'struct
+dsa_chip_data' directly.
+Which is what the DSA code at net/dsa/dsa2.c expects in:
+ static int dsa_switch_parse(struct dsa_switch *ds, struct dsa_chip_data *c=
+d)
+
+--=20
+Regards
+
+Daniel Danzberger
+embeDD GmbH, Alter Postplatz 2, CH-6370 Stans
 
