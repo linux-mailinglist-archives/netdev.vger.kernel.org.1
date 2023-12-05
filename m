@@ -1,165 +1,93 @@
-Return-Path: <netdev+bounces-53982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8418580580D
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:58:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC5C805AAD
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 18:05:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EB5A28180A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 14:58:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDFD21C20F54
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C80F67E6F;
-	Tue,  5 Dec 2023 14:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA3F69286;
+	Tue,  5 Dec 2023 17:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ECiJfHJr"
+	dkim=pass (1024-bit key) header.d=piedallu.me header.i=@piedallu.me header.b="AVQE/6Lk"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 323CA1B6;
-	Tue,  5 Dec 2023 06:58:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Niv+uFMMZ47PdYI45Y9AoLriOrLQtx81cAeZSJ25KPY=; b=ECiJfHJrsr/f0L+71GqdBnpXnC
-	lNdo5YsQfw3YwR5YsupiWzdR/S/Lzz8Oo81W0jeZ/BB+e6wGAQMJBGJUZo/X1Cc3c//0boPlHxrC9
-	Tds6aGdauv5GLQFy3nLOSw5BH7pHcLIRAaVqF6tV64N7xI3LjkMv7FItwu21vhjhdYvUNeKr2TYme
-	gr78D0OUB2OVMIfP6iBCP6ZKx3FFRFGgg8TsQLLlcB7gL+3eWh/c6/h4iAfxzd/YtJwmVoR1i4fps
-	01GQ2rAgoeBr8uyA82aCDmza9wcGEEh/GrGnK7oNGfbQeiSK82MFYntbBH6LvVkpTe+NGJispS/4Q
-	CwS1tqWg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36310)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rAWsF-0006vo-0d;
-	Tue, 05 Dec 2023 14:58:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rAWsH-0001nv-2u; Tue, 05 Dec 2023 14:58:13 +0000
-Date: Tue, 5 Dec 2023 14:58:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2 08/12] net: phy: at803x: move specific at8031
- WOL bits to dedicated function
-Message-ID: <ZW86hcgt8nhbSpfq@shell.armlinux.org.uk>
-References: <20231201001423.20989-1-ansuelsmth@gmail.com>
- <20231201001423.20989-9-ansuelsmth@gmail.com>
- <bdbe618d4fd38469e4e139ce4ebd161766f2e4d5.camel@redhat.com>
+X-Greylist: delayed 11124 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Dec 2023 09:05:45 PST
+Received: from 3.mo580.mail-out.ovh.net (3.mo580.mail-out.ovh.net [178.33.255.153])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F3383
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 09:05:45 -0800 (PST)
+Received: from mxplan8.mail.ovh.net (unknown [10.109.146.96])
+	by mo580.mail-out.ovh.net (Postfix) with ESMTPS id 597382435D;
+	Tue,  5 Dec 2023 14:00:19 +0000 (UTC)
+Received: from piedallu.me (37.59.142.107) by mxplan8.mail.ovh.net
+ (172.16.2.11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 5 Dec
+ 2023 15:00:18 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-107S001432695c8-33c5-4fb7-8a7c-d9542a815873,
+                    74C7C1992E4F488363DD529DEE5BA00C4ED99BDC) smtp.auth=postmaster@piedallu.me
+X-OVh-ClientIp: 176.169.226.152
+Received: from salamandar.fr.lan (unknown [45.81.62.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by piedallu.me (Postfix) with ESMTPSA id 1E2D06004D;
+	Tue,  5 Dec 2023 11:20:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=piedallu.me;
+	s=mailkey; t=1701771640;
+	bh=36C+DjkFIsZAsYt7V6sqOaJ1IjI6J30mM0cjv7+1rp8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=AVQE/6Lk6PxoJp0M8anlRYtH5KL8G4nGt2f2ZRWwMVWelpNc/e3miIK30qRW2KEzP
+	 Fj2UVI33nmAbgBjUa4THc9dKo86FKXftxKGZp3p+vGGLGWA4ts3UQMk0wX1R++i4yj
+	 UKHjfPsj03oDLFVTYbBgC92XG5alQIXAvsMOxqko=
+From: =?UTF-8?q?F=C3=A9lix=20Pi=C3=A9dallu?= <felix@piedallu.me>
+To: andrew@lunn.ch
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ramon.nordin.rodriguez@ferroamp.se
+Subject:
+Date: Tue,  5 Dec 2023 11:20:39 +0100
+Message-ID: <20231205102039.2917039-1-felix@piedallu.me>
+In-Reply-To: <f25ed798-e116-4f6f-ad3c-5060c7d540d0@lunn.ch>
+References: <f25ed798-e116-4f6f-ad3c-5060c7d540d0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bdbe618d4fd38469e4e139ce4ebd161766f2e4d5.camel@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-GUID: d137995d-c8aa-4c45-9d08-67be1aa9503b
+X-Ovh-Tracer-Id: 3238932558428276914
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 10
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrudejkedgheelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucfgmhhpthihuchsuhgsjhgvtghtucdluddtmdenucfjughrpefhvfevufffkfgjfhggtgfgsehtkeertddttdejnecuhfhrohhmpefhrohlihigucfrihoruggrlhhluhcuoehfvghlihigsehpihgvuggrlhhluhdrmhgvqeenucggtffrrghtthgvrhhnpeffteegleduieefleeigeeuueettdelteegheehvdeuleekveduteegkeekgeevvdenucffohhmrghinhepmhhitghrohgthhhiphdrtghomhenucfkpheptddrtddrtddrtddpudejiedrudeiledrvddviedrudehvddpgeehrdekuddriedvrddujeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhhvghlohepmhigphhlrghnkedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehfvghlihigsehpihgvuggrlhhluhdrmhgvpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehkedt
 
-On Tue, Dec 05, 2023 at 10:32:55AM +0100, Paolo Abeni wrote:
-> On Fri, 2023-12-01 at 01:14 +0100, Christian Marangi wrote:
-> > Move specific at8031 WOL enable/disable to dedicated function to make
-> > at803x_set_wol more generic.
-> > 
-> > This is needed in preparation for PHY driver split as qca8081 share the
-> > same function to toggle WOL settings.
-> > 
-> > In this new implementation WOL module in at8031 is enabled after the
-> > generic interrupt is setup. This should not cause any problem as the
-> > WOL_INT has a separate implementation and only relay on MAC bits.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  drivers/net/phy/at803x.c | 42 ++++++++++++++++++++++++----------------
-> >  1 file changed, 25 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-> > index 02ac71f98466..2de7a59c0faa 100644
-> > --- a/drivers/net/phy/at803x.c
-> > +++ b/drivers/net/phy/at803x.c
-> > @@ -466,27 +466,11 @@ static int at803x_set_wol(struct phy_device *phydev,
-> >  			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
-> >  				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
-> >  
-> > -		/* Enable WOL function for 1588 */
-> > -		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
-> > -			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> > -					     AT803X_PHY_MMD3_WOL_CTRL,
-> > -					     0, AT803X_WOL_EN);
-> > -			if (ret)
-> > -				return ret;
-> > -		}
-> >  		/* Enable WOL interrupt */
-> >  		ret = phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_WOL);
-> >  		if (ret)
-> >  			return ret;
-> >  	} else {
-> > -		/* Disable WoL function for 1588 */
-> > -		if (phydev->drv->phy_id == ATH8031_PHY_ID) {
-> > -			ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> > -					     AT803X_PHY_MMD3_WOL_CTRL,
-> > -					     AT803X_WOL_EN, 0);
-> > -			if (ret)
-> > -				return ret;
-> > -		}
-> >  		/* Disable WOL interrupt */
-> >  		ret = phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL, 0);
-> >  		if (ret)
-> > @@ -1611,6 +1595,30 @@ static int at8031_config_init(struct phy_device *phydev)
-> >  	return at803x_config_init(phydev);
-> >  }
-> >  
-> > +static int at8031_set_wol(struct phy_device *phydev,
-> > +			  struct ethtool_wolinfo *wol)
-> > +{
-> > +	int ret;
-> > +
-> > +	/* First setup MAC address and enable WOL interrupt */
-> > +	ret = at803x_set_wol(phydev, wol);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	if (wol->wolopts & WAKE_MAGIC)
-> > +		/* Enable WOL function for 1588 */
-> > +		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> > +				     AT803X_PHY_MMD3_WOL_CTRL,
-> > +				     0, AT803X_WOL_EN);
-> > +	else
-> > +		/* Disable WoL function for 1588 */
-> > +		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-> > +				     AT803X_PHY_MMD3_WOL_CTRL,
-> > +				     AT803X_WOL_EN, 0);
-> > +
-> > +	return ret;
-> 
-> If I read correctly, the above changes the order of some WoL
-> initialization steps: now WOL_CTRL is touched after
-> AT803X_INTR_ENABLE_WOL. Is that correct?
+Subject: Re: [PATCH 2/3] net: microchip_t1s: add support for LAN867x Rev.C1
 
-It is fine.
+Hi, 
 
-AT803X_INTR_ENABLE_WOL enables or disables whether the INT pin (which
-is used for any interrupt from the PHY) is used to signal WOL - it's
-the interrupt enable for the WoL function.
+> So there is a gap in the revisions. Maybe a B2 exists?
 
-The MMD3 WOL_EN bit controls whether the WoL function is enabled, and
-thus whether the WOL_INT pin will signal WoL. WOL_EN should not be
-set until we have initialised the WoL function, and thus that needs
-to happen _after_ the MAC address has been programmed.
+Actually, probably not. Some search gives this datasheet:
 
-Clearing WOL_EN afterwards is not a problem because it will already
-have been setup, or is in its power-on default state.
+https://ww1.microchip.com/downloads/aemDocuments/documents/AIS/ProductDocuments/DataSheets/LAN8670-1-2-Data-Sheet-60001573.pdf
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+And page 2 (table 1) shows only revisions A0 (rev0), B1, (rev2), C1 (rev4).
+Not sure about why only even revision numbers are released ?
+
+Page 193 (table 10-1) also shows only B1 and C1. So you can be confident that only those exist.
+
+@Ramón, thank you for your work on this driver!
+
+Félix Piédallu
 
