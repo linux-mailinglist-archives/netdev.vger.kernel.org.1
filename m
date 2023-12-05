@@ -1,96 +1,143 @@
-Return-Path: <netdev+bounces-53997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 343E98058D3
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:34:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730B58058A0
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:27:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD951B20EBC
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:34:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE3B281CA1
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 15:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B2F5F1D5;
-	Tue,  5 Dec 2023 15:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA8868EA1;
+	Tue,  5 Dec 2023 15:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D8SQavk1"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="d6NIrTO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E72BA
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:34:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701790472; x=1733326472;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xKJsV2VIWWPX82sNFGSjSZGbewbDfqmBqUfrgSjb0eQ=;
-  b=D8SQavk1YcLKEsfYSBLWW4vVfpa/yLm9FpAGpWysaG1xRhoYRlCWk5bp
-   PcQG1BtcLqoQ8tV762j+xtgfg8VUnSyWJQyrWUGZzd9DAidcc30Iq0ukG
-   QXq5uedtDaBEqiNb8yLjK00bj541NPQ2kA9JXuAWcaY0xOpT6Hv/UnY3+
-   sIKizI+AR/CCwzu2F6W3JvoSYgoY/YFRgnkApliVR/BzU1ir/Lhp/I3ZN
-   COG5kWg1BF2JccuEvJ0l2lj+XIf5TsKhcrtpW/hp1/wNKkgpvdVatv6oe
-   /h+Qydv6TcKlM2J7NTyGvUZXj6rincjakB0XkzQ5R0igEaxN49Np959Fz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="378935328"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="378935328"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2023 07:34:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10915"; a="894416023"
-X-IronPort-AV: E=Sophos;i="6.04,252,1695711600"; 
-   d="scan'208";a="894416023"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga004.jf.intel.com with ESMTP; 05 Dec 2023 07:34:29 -0800
-Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id E64A1369E5;
-	Tue,  5 Dec 2023 15:34:28 +0000 (GMT)
-From: Pawel Chmielewski <pawel.chmielewski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Ngai-Mint Kwan <ngai-mint.kwan@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>
-Subject: [PATCH iwl-next] ice: Do not get coalesce settings while in reset
-Date: Tue,  5 Dec 2023 16:26:20 +0100
-Message-Id: <20231205152620.568183-1-pawel.chmielewski@intel.com>
-X-Mailer: git-send-email 2.37.3
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC12483
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 07:27:43 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5d719a2004fso23750807b3.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 07:27:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701790063; x=1702394863; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m7NMZBJFuzJm9QBSqDeCnakSBPeijOZp7b6KYiwK9sU=;
+        b=d6NIrTO+jku1s3fp5i7AW/CinZBicOfjIyx/eFwd4l9HLeipMIZJGhidF0dZkttXE4
+         G+xsCiwbntSOg5Gqs/55NILN+KhZBafrxL+mMRc/yVXMEaCS2ihGDMDRVoVJo4/CLmrs
+         dIyjOjQ8fvc1cb3ZHTNi8kwoale/xXvh/WARIPbJRc4a0cDexCwT8MeGX9PdYRw5paEK
+         7MIURJnpZsrf29L/aIjr3GBApGdf98FBjOELQAwIH0HnZ+iVpyWGGEeXBwKKqid3j2VA
+         0aZYHTcPHOTWOQSUp35yMpS4Qlg79zXA0OuWOQLWjqO0P6pAcT4sQ2jGEmhNUIlWJSCa
+         Fg6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701790063; x=1702394863;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m7NMZBJFuzJm9QBSqDeCnakSBPeijOZp7b6KYiwK9sU=;
+        b=Dv1nAbNx6n07rRVNyREQXMC+M5gSNsyVAKeHArfFaNpmx5/dP3xizfC7RUjRdQ8SIM
+         wADZIBFHVfqPsFsO6l1C0wcCR/tV89zYuquUoELSqj6xqzSSn+3Y0h0B1fdgv1gchl3X
+         XnUGEXR92xa/MC2rjgGtXTKDh6TmlPC8YHZylfkchcTH11EZw2eyr9Euqza8YV9Pf+zY
+         KXilmdu2xLTypdNb/hPWciUlqL/DTgMsUj+I8kFUy0/CdzS7OeukAV2ZoOc9/NIBOqhL
+         WGKfXXNGcYqKMZhEaQOkX44LUxXwSLMKKH4CTAmxTA/nxrcHRDrp0aYoZiuBpVopYxr9
+         e9Vw==
+X-Gm-Message-State: AOJu0YwmNQT0zc5uxbmR2QFwxU6z69Uo6NB5jQ2c53hQdNQz3z4Khg7w
+	4/cGgQHhUcNYpX7IjWPhEl+1/Z+MQhJix56DE+HrdDlwIGxC92m/
+X-Google-Smtp-Source: AGHT+IEHd/PFJoDos4SbsYnXSfYkz28GiyIuHqh3uNGMY9nOEwZ+4T3tZkiUWWR3P2CZcQ1czcCQob5d76iUvisd+TA=
+X-Received: by 2002:a81:9b04:0:b0:5d7:1940:8dde with SMTP id
+ s4-20020a819b04000000b005d719408ddemr2828349ywg.69.1701790063052; Tue, 05 Dec
+ 2023 07:27:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAM0EoMnwAHO_AvEYiL=aTwNBjs29ww075Lq1qwvCwuYtB_Qz7A@mail.gmail.com>
+ <ZV9tCT9d7dm7dOeA@nanopsycho> <CAAFAkD-awfzQTO6yRYeooXwW+7zEub0BiGkbke=o=fTKpzN__g@mail.gmail.com>
+ <ZV+DPmXrANEh6gF8@nanopsycho> <CAM0EoMkQaEAaKc7D6kVe+p6f=-Ddd7enoKgRdeWBnqbN2zPhfA@mail.gmail.com>
+ <CALnP8ZbaT+jdBvaggAPW=yiW61fip6cjnZcU48tb2-5orqdeMg@mail.gmail.com>
+ <CAM0EoMmso7Y0g9jQ=FfJLuV9JTDct5Qqb5-W4+nd0Xb9DBkGkA@mail.gmail.com>
+ <ZW2gwaj/LBNL8J3P@nanopsycho> <CAM0EoMmvkT5JEm7tUNa-zGD1g80usR=KUAF0zO5uDV70Z-5hmA@mail.gmail.com>
+ <ZW7iHub0oM5SZ/SF@nanopsycho> <CALnP8ZYm2T1TaajZ6RejyaHqhs71VrVGfYr-+Ssj=7GhmwO0Hw@mail.gmail.com>
+In-Reply-To: <CALnP8ZYm2T1TaajZ6RejyaHqhs71VrVGfYr-+Ssj=7GhmwO0Hw@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 5 Dec 2023 10:27:31 -0500
+Message-ID: <CAM0EoMmax-t+ZiaQAOJxhDOtRK2Gi3_TcqVoLEhDQWjsfOaRJQ@mail.gmail.com>
+Subject: Re: [PATCH net-next RFC v5 4/4] net/sched: act_blockcast: Introduce
+ blockcast tc action
+To: Marcelo Ricardo Leitner <mleitner@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Jamal Hadi Salim <hadi@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
+	vladbu@nvidia.com, paulb@nvidia.com, pctammela@mojatatu.com, 
+	netdev@vger.kernel.org, kernel@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+On Tue, Dec 5, 2023 at 9:52=E2=80=AFAM Marcelo Ricardo Leitner
+<mleitner@redhat.com> wrote:
+>
+> On Tue, Dec 05, 2023 at 09:41:02AM +0100, Jiri Pirko wrote:
+> > Mon, Dec 04, 2023 at 09:10:18PM CET, jhs@mojatatu.com wrote:
+> > >On Mon, Dec 4, 2023 at 4:49=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
+rote:
+> > >>
+> > >> Fri, Dec 01, 2023 at 07:45:47PM CET, jhs@mojatatu.com wrote:
+> ...
+> > >> >Ok, so we are moving forward with mirred "mirror" option only for t=
+his then...
+> > >>
+> > >> Could you remind me why mirror and not redirect? Does the packet
+> > >> continue through the stack?
+> > >
+> > >For mirror it is _a copy_ of the packet so it continues up the stack
+> > >and you can have other actions follow it (including multiple mirrors
+> > >after the first mirror). For redirect the packet is TC_ACT_CONSUMED -
+> > >so removed from the stack processing (and cant be sent to more ports).
+> > >That is how mirred has always worked and i believe thats how most
+> > >hardware works as well.
+> > >So sending to multiple ports has to be mirroring semantics (most
+> > >hardware assumes the same semantics).
+> >
+> > You assume cloning (sending to multiple ports) means mirror,
+> > that is I believe a mistake. Look at it from the perspective of
+> > replacing device by target for each action. Currently we have:
+> >
+> > 1) mirred mirror TARGET_DEVICE
+> >    Clones, sends to TARGET_DEVICE and continues up the stack
+> > 2) mirred redirect TARGET_DEVICE
+> >    Sends to TARGET_DEVICE, nothing is sent up the stack
+> >
+> > For block target, there should be exacly the same semantics:
+> >
+> > 1) mirred mirror TARGET_BLOCK
+> >    Clones (multiple times, for each block member), sends to TARGET_BLOC=
+K
+> >    and continues up the stack
+> > 2) mirred redirect TARGET_BLOCK
+> >    Clones (multiple times, for each block member - 1), sends to
+> >    TARGET_BLOCK, nothing is sent up the stack
+>
+> This makes sense to me as well. When I first read Jamal's email I
+> didn't spot any confusion, but now I see there can be some. I think he
+> meant pretty much the same thing, referencing cascading other outputs
+> after blockcast (and not the inner outputs, lets say), but that's just
+> my interpretation. :)
 
-Getting coalesce settings while reset is in progress can cause NULL
-pointer deference bug.
-If under reset, abort get coalesce for ethtool.
+In my (shall i say long experience) I have never seen the prescribed
+behavior of redirect meaning mirror to (all - last one) then redirect
+on last one.. Jiri, does spectrum work like this?
+Neither in s/w nor in h/w. From h/w - example, the nvidia CX6 you have
+to give explicit mirror, mirror, mirror, redirect. IOW, i dont think
+the hardware can be told "here's a list of ports, please mirror to all
+of them and for the last one steal the packet and redirect".
+Having said that i am not opposed to it - it will just make the code
+slightly more complex and i am sure slightly slower in the datapath.
 
-Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index bde9bc74f928..2d565cc484a0 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3747,6 +3747,9 @@ __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_vsi *vsi = np->vsi;
- 
-+	if (ice_is_reset_in_progress(vsi->back->state))
-+		return -EBUSY;
-+
- 	if (q_num < 0)
- 		q_num = 0;
- 
--- 
-2.37.3
-
+cheers,
+jamal
 
