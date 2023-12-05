@@ -1,127 +1,105 @@
-Return-Path: <netdev+bounces-53819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 344BA804BB8
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:04:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A632804BBE
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9B39B20D63
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:04:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61C39B20D70
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBD635F13;
-	Tue,  5 Dec 2023 08:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874BC39FC2;
+	Tue,  5 Dec 2023 08:04:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWjHr+v0"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ie156mfx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AED5127
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 00:04:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701763463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QG11b661HftUVVcgqj8uwD4Zdvva2ZlfcVebX4a7hqE=;
-	b=LWjHr+v0WEUMyIbA0xKxky1nnywLvZ99+RyvJWBVBI2HAaGkiCtQ9rkB1ixIEB3TkQwZoq
-	RdPRdNEDnwIIWxSuqQI7k1sPmIjFSRngfFPbIrmmjFCEebYprKOhp0GOxlC5sA5RHYAWQF
-	AwbhQQanrnxYmSQ875LFm4Hs0zoUmiU=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-gr-Pc9FpNsKsW_kC6bvpTQ-1; Tue, 05 Dec 2023 03:04:15 -0500
-X-MC-Unique: gr-Pc9FpNsKsW_kC6bvpTQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-54c8febd0b0so223125a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 00:04:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701763454; x=1702368254;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QG11b661HftUVVcgqj8uwD4Zdvva2ZlfcVebX4a7hqE=;
-        b=UM0H8/qJ+wc8D/kajxgRH/cKtDGFW6AUjJaV+VW7SqV2QGgj9YmE9hBKSX+5Bdng61
-         qNmKPcu1TBPDBMvsibbeBd1OoxiCf5E0hEBEjW0a9lefRwpvKzvMIEs4KLbu6rnF9Vwz
-         b5meFE6QOkaAu/ORMT5ENf5TAWt9NnhTB6p6PPhh/LPnTH7kqFVHB2PkZmp2Q3iERPJd
-         vzlACFKXXn++f0aMuybTvpxvyaxPfpx9IO5A1YC16UQvNY7j5NzQuC1bx86VrvICuZEE
-         4s8avNJGbO8nW7Vhb6ye1hmc544Av1Z+cTcQE/85OJJG2tV/KW6gFtgpqlVrrTyiTQaN
-         XByQ==
-X-Gm-Message-State: AOJu0YzbmkFPASLuolUzNKDGbgoUnP/CNFz84wSOdC3P3wa39ASU5/wU
-	VKXpHfViNsy6eMr3neulYszvAYTL5DOHEVLtCh9QeFL0dUodQRhT63Y17eTcBIRzZBmlSyKnTSc
-	z8B3G8dO9ViTfew/o
-X-Received: by 2002:a05:6402:26c5:b0:54c:d1a2:4607 with SMTP id x5-20020a05640226c500b0054cd1a24607mr3368988edd.3.1701763454003;
-        Tue, 05 Dec 2023 00:04:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEtXpMsawMsuFwRkEnoQMMcXKCPnk2BWpymAzqEFedNYhFu5lgiRc7w0ozIKmOHNaM1R42zQw==
-X-Received: by 2002:a05:6402:26c5:b0:54c:d1a2:4607 with SMTP id x5-20020a05640226c500b0054cd1a24607mr3368977edd.3.1701763453676;
-        Tue, 05 Dec 2023 00:04:13 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-54.dyn.eolo.it. [146.241.241.54])
-        by smtp.gmail.com with ESMTPSA id n10-20020aa7c44a000000b0054cd6346685sm720230edr.35.2023.12.05.00.04.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 00:04:13 -0800 (PST)
-Message-ID: <73ef03a1607f221c7939cb0646c17c5435dcecd1.camel@redhat.com>
-Subject: Re: [PATCHv2] USB: gl620a: check for rx buffer overflow
-From: Paolo Abeni <pabeni@redhat.com>
-To: Oliver Neukum <oneukum@suse.com>, dmitry.bezrukov@aquantia.com, 
- marcinguy@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Date: Tue, 05 Dec 2023 09:04:11 +0100
-In-Reply-To: <20231122095306.15175-1-oneukum@suse.com>
-References: <20231122095306.15175-1-oneukum@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DE583;
+	Tue,  5 Dec 2023 00:04:50 -0800 (PST)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B56OgUu010784;
+	Tue, 5 Dec 2023 00:04:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=2v7hVOtPK2yq7lmi8EzueIP6M2JLGBrzUhoc6+whsqk=;
+ b=Ie156mfxVJHHbH42QonTw7YCf4tYLLJm1xxk4zexw10Wx2Veh03TxjjPyoXNVV85HtsB
+ qmANy4GiZ5IPtFhvxNgYyVTI9vokEuFuKuJem2WTTwTnrPU7RZkIorMfd2QzVlFxRlnh
+ 6INqkKiyigSHCj6ue1iJ6uvLe1nDuanhkDLnpInLOK5679hYu0PEM8WsHSpbeKXS3fXn
+ UGlktK7a7yBBvwt501+pWNcP84rthrqdn50ZIVNZN5nJFl99OMe4v7pqlnhNyFejftgo
+ FoIY5VwrjfDsgWAOzBp/BP9ERPQj6V7uRjs+Wf0wJhV67g49saQzQR5KASSmCnc4TKSD Sw== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ur4yrrq47-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 05 Dec 2023 00:04:42 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 5 Dec
+ 2023 00:04:39 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 5 Dec 2023 00:04:39 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 126F93F70A6;
+	Tue,  5 Dec 2023 00:04:35 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <jerinj@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>
+Subject: [net v4 PATCH 0/5] octeontx2-af: miscellaneous fixes
+Date: Tue, 5 Dec 2023 13:34:29 +0530
+Message-ID: <20231205080434.27604-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Proofpoint-GUID: _BV2wP90xjzwZb79cZQC_tV7oOqsKo0Z
+X-Proofpoint-ORIG-GUID: _BV2wP90xjzwZb79cZQC_tV7oOqsKo0Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-05_03,2023-12-04_01,2023-05-22_02
 
-On Wed, 2023-11-22 at 10:52 +0100, Oliver Neukum wrote:
-> The driver checks for a single package overflowing
-> maximum size. That needs to be done, but it is not
-> enough. As a single transmission can contain a high
-> number of packets, we also need to check whether
-> the aggregate of messages in itself short enough
-> overflow the buffer.
-> That is easiest done by checking that the current
-> packet does not overflow the buffer.
->=20
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+The series of patches fixes various issues related to mcs
+and NIX link registers.
 
-This looks like a bugfix, so a suitable Fixes tag should be included.
+v3-v4:
+ Used FIELD_PREP macro and proper data types.
 
-> ---
->=20
-> v2: corrected typo in commit message
-> =20
->  drivers/net/usb/gl620a.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/drivers/net/usb/gl620a.c b/drivers/net/usb/gl620a.c
-> index 46af78caf457..d33ae15abdc1 100644
-> --- a/drivers/net/usb/gl620a.c
-> +++ b/drivers/net/usb/gl620a.c
-> @@ -104,6 +104,10 @@ static int genelink_rx_fixup(struct usbnet *dev, str=
-uct sk_buff *skb)
->  			return 0;
->  		}
-> =20
-> +		/* we also need to check for overflowing the buffer */
-> +		if (size > skb->len)
-> +			return 0;
+v2-v3:
+ Fixed typo error in patch 4 commit message.
 
-I think the above is not strict enough: at this point skb->data points
-to the gl_packet header. The first 4 bytes in skb are gl_packet-
->packet_length. To ensure an overflow is avoided you should check for:
+v1-v2:
+ Fixed author name for patch 5.
+ Added Reviewed-by.
 
-		if (size + 4 > skb->len)
+Geetha sowjanya (3):
+  octeontx2-af: Fix mcs sa cam entries size
+  octeontx2-af: Fix mcs stats register address
+  octeontx2-af: Add missing mcs flr handler call
 
-likely with a describing comment.
+Nithin Dabilpuram (1):
+  octeontx2-af: Adjust Tx credits when MCS external bypass is disabled
 
-Cheers,
+Rahul Bhansali (1):
+  octeontx2-af: Update Tx link register range
 
-Paolo
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  2 +-
+ .../net/ethernet/marvell/octeontx2/af/mcs.c   | 16 ++++++++--
+ .../net/ethernet/marvell/octeontx2/af/mcs.h   |  2 ++
+ .../ethernet/marvell/octeontx2/af/mcs_reg.h   | 31 ++++++++++++++++---
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |  3 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  1 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  8 +++++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.c   |  4 +--
+ 8 files changed, 58 insertions(+), 9 deletions(-)
+
+-- 
+2.25.1
 
 
