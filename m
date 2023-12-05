@@ -1,126 +1,284 @@
-Return-Path: <netdev+bounces-53831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-53804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F48C804C8C
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 09:36:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9A4804B14
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72D74B20B75
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 08:36:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CBEC1C20E25
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 07:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02F33C067;
-	Tue,  5 Dec 2023 08:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D23171A8;
+	Tue,  5 Dec 2023 07:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YiBfDOfk"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vAon/PrE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518F39C;
-	Tue,  5 Dec 2023 00:36:11 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40c09d0b045so24822865e9.0;
-        Tue, 05 Dec 2023 00:36:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701765370; x=1702370170; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Aw3bIBLD9I3okY+FLIk3qcmw2Q86Yjtp0TosIQ3nxc=;
-        b=YiBfDOfk6eXA4TCcJapBrWa/6S1aFvaczpehWjjcWhueCWCYPtJ+9E+nZM+eks8Jrw
-         AqTrqBVgddQ6MQA8m+SqJAdb1ZUzatg+Eweqkiks/pma5NIAMp74CWVsnyvZGYV4Ws91
-         NlsV2P34livgTEug4dlIYyKhZBdxtnnyWCi52a+3fZoP9NJtjBpoqPgRBAgddfn/r2Dd
-         Fuf/E6H9dbeWEHAB0iypuuvLLqnV3rec0q33+0hvkpGkxs7E2b5uN5WwARjZ9kibmHiL
-         PwlWz6+syxzTB9yfFZKjsHK+lqhT4ks9vRGvNgrUhAWoSOqMpovePPmBSEBWBNfVpP6X
-         03+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701765370; x=1702370170;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Aw3bIBLD9I3okY+FLIk3qcmw2Q86Yjtp0TosIQ3nxc=;
-        b=ZaZ8UraX2EYIRXBEQV2X8+2vsJcdHoNugsppvf2K8ANs7jOztD6y8H5LdHKvgz25GR
-         U7xUusIfe1ojOOL0ofW3hxXMYovzy7f/qLBuWVeHbV4+iW7hkB46+F6r8GSl95c8mOAN
-         FcJrDCjxJEAmkAw3eeAqscDQUz9CecDmtMVj9mpG28H6AIifMJxrK+8pC/vTqojsEiDp
-         vSL6ZzNeojsdDF4QGUIMDuLzvARXjYxeTV/hx7YZ0Vbx4gmYfDyLkr9cHPKYhgJiBbRC
-         ir6GKlJc7avmxuJNZyzuBYakdGRRDwuvUo/nt1uQtTdsn0V+PvYOKDkcQufrJm1yLSGI
-         V/qw==
-X-Gm-Message-State: AOJu0Yyp+i8q05Cbx3L63F7HcbeuguRPYOemF/M2RaGpx1KOdsKDmUCQ
-	b05CGeoY7IxnshZCiiEKoYM=
-X-Google-Smtp-Source: AGHT+IHA4ZhRcANCZDUbwlmwBRjksD6TxpQ/dpSl1pEnljWePSXPlPmHuMNWKms66b3kHWxKZikY3A==
-X-Received: by 2002:a1c:720f:0:b0:40c:902:d1d3 with SMTP id n15-20020a1c720f000000b0040c0902d1d3mr159698wmc.222.1701765369429;
-        Tue, 05 Dec 2023 00:36:09 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:d9c9:f651:32f4:3bc])
-        by smtp.gmail.com with ESMTPSA id m16-20020a05600c4f5000b0040b349c91acsm21413126wmq.16.2023.12.05.00.36.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Dec 2023 00:36:08 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
- Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
- <jacob.e.keller@intel.com>,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 6/6] doc/netlink/specs: Add a spec for tc
-In-Reply-To: <20231204103247.6476f4b4@kernel.org> (Jakub Kicinski's message of
-	"Mon, 4 Dec 2023 10:32:47 -0800")
-Date: Mon, 04 Dec 2023 22:38:23 +0000
-Message-ID: <m2wmtt4mqo.fsf@gmail.com>
-References: <20231130214959.27377-1-donald.hunter@gmail.com>
-	<20231130214959.27377-7-donald.hunter@gmail.com>
-	<20231201181325.4a12e03b@kernel.org> <m2zfyq53wz.fsf@gmail.com>
-	<20231204103247.6476f4b4@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B174AAA;
+	Mon,  4 Dec 2023 23:22:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G4vTuCijQ/NnlVJ+Wh3WfNdzS+ax3vntxJuOUguQU4Cik00e8lZcPKu7spb0C1VVqF+UcqQE/OlQ26LNPFJq51L07bEApnq6dn3PqWE8IxGtoAgDXur6MPSCEoi+VOD5rK61QGSI/JDs6MC1S7w3ZmAPVuvLVgGwinxNHyCv0M9kRE2sWrQ3rMZYv/dRNXbwDG3C7wN3czzDpB9ZrBWyuDSmPQ/kAtXwSLafQgC7NAFNQcL273n92qycMJ4apzq0G9oLDMPq8IvFTESjEO9lZXYVbAbClJu8ohp22KBQgNAIKjKvBMaUuJAyjQlU35KPEYyvwq3rzCdhymhz2ksWsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IujlPXLGAlVI6DhhUG8t6n7h1PeBtVYcUyz/Eec5P6g=;
+ b=DdPlAmcEQjcO0Du4EQClsAnE4LtAdxondc5BRa7s+peDEB+1IteBkXIqlkSiScwkURyn5NVs1x0c1RdfF/swmtgbCYcLhFiv1fKcp6M8A+PfmUPYtLXvaxMDg4UtAsLZwfdHmwlVpKh6Eg7z1LOzUA2dr1on/ewPvH37ozfL73DgnaKnBdkFmhRWICytUlOMMcqlPwtQOsXE9y7nGf7CMh1ZEVtmz+vT7WxZhrkLhie1MrGmNQfvDxRbNnheh4M1EerDRPwXdmWcXJtSSvilfFI+6NuP5KtUayjWBDyGlfzq5AqVNPA58+6ZVEZuz87/nQpnqHq9Xi6SsJwIbz6aLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IujlPXLGAlVI6DhhUG8t6n7h1PeBtVYcUyz/Eec5P6g=;
+ b=vAon/PrEgQbJqVnjxBCS0Bd5JyrhOAluLE3p/eyGFsHemoxFivr6HbvMItjE6OxIZoEtPkcsnmuA2ncs5K1lr2X4s/Rm4HS4AbIPjBnA6A5R3cy0TQzkXAOgARxiww061n5z6bapqUF75JMRaIjtoBIPW7YpqPwyNWg6gKtBRWk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
+ MN2PR12MB4317.namprd12.prod.outlook.com (2603:10b6:208:1d0::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
+ 2023 07:22:20 +0000
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::8650:7935:179:f18c]) by DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::8650:7935:179:f18c%4]) with mapi id 15.20.7046.033; Tue, 5 Dec 2023
+ 07:22:20 +0000
+Message-ID: <67fe48be-8e10-47f7-bf47-e819ed02e732@amd.com>
+Date: Tue, 5 Dec 2023 15:22:07 +0800
+User-Agent: Mozilla Thunderbird
+Cc: majun@amd.com, Evan Quan <quanliangl@hotmail.com>
+Subject: Re: [PATCH v14 2/9] platform/x86/amd: Add support for AMD ACPI based
+ Wifi band RFI mitigation feature
+To: Hans de Goede <hdegoede@redhat.com>, Ma Jun <Jun.Ma2@amd.com>,
+ amd-gfx@lists.freedesktop.org, lenb@kernel.org, johannes@sipsolutions.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com,
+ mario.limonciello@amd.com, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
+References: <20231129091348.3972539-1-Jun.Ma2@amd.com>
+ <20231129091348.3972539-3-Jun.Ma2@amd.com>
+ <99de0223-6d28-4379-ac2a-ef093ee0386c@redhat.com>
+Content-Language: en-US
+From: "Ma, Jun" <majun@amd.com>
+In-Reply-To: <99de0223-6d28-4379-ac2a-ef093ee0386c@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR01CA0163.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::19) To DM4PR12MB6351.namprd12.prod.outlook.com
+ (2603:10b6:8:a2::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|MN2PR12MB4317:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b29fc74-337c-4d8d-f8cf-08dbf562eae6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DsC0tE+n7kJlOFHx4M+Uu1qD2XOQVNsGVHyPA03a36/wbIYflT3iNfZ2BebPq4gfzvW8hd2o9nrW9+1tL/UOmPt+VyJGU3A3qcQbK1juSTMYvbJeoAg/gzdknPxN9WAbG+PWZTlRZapVEBo+I/mBY8CIEp2wAqksMH6B3VqWow0j9MbUlnFcE5kbOTJlXx/AO60PfnvJtvGm7Bt2oU2Zic3s+zYsTkwi8ogySF5jJO2bBQZVXD7HwI14DtCSUf5ZP80ZeXs4WL8+vREMAS8om1ItgQDEsIerFAqeqy3dL51bwwBXodfjMOz2TIZxOYdnWFYeCYMcJxfjPe2LQds3y1dWMaHL5f7RAJ8y4akZleNveZNMY1x0RQwA4UVU9bx8/J9mNvz7GXWgTXAJJUhKoTpSSBflHg7glAhs+qibIGGc4n/KamkfRthB/N3/syNJHvh1o34rI7DKfsWsqDQR9L1w553Lu5rXX5qN5NuRCfoXnMh/GSKIBSsw2BTSWDWwCZFg9QJdVy09TDEyhU2u7pztIemiJ5gjUFiGen8MSpvASb//L32YvEv+seuiCerLrmK/AyM2UaC09f7Xu5plRfFemaRun1DvO0AlgzPImpaVyqgPEUp/1frOgtOZIKQAnshralq+sNXIgBgYHuUFaqssYKydpd+982/zfxrShik=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(39860400002)(396003)(366004)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(31686004)(921008)(6512007)(45080400002)(478600001)(6506007)(8676002)(6486002)(53546011)(2616005)(6666004)(26005)(110136005)(4326008)(66476007)(66556008)(66946007)(83380400001)(8936002)(316002)(38100700002)(7416002)(36756003)(41300700001)(5660300002)(31696002)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dk15T1h0Q2gyU2tleWZQbG9qaWZoUExHWCtacmdXTUMxN1d3eGFWVllnVnFO?=
+ =?utf-8?B?ZUxUZGZwclY2aUUwYVh2bXhsZ09oZUdIS3p5ZGVSN1VuVDdza2RGaTVYOUoz?=
+ =?utf-8?B?ZGRiVlZvdWE5UnN5L1IwOVg2eVBoa2E2N2tnUHBoTVE4cEx1UVJhZ2JxVXc3?=
+ =?utf-8?B?TWwrMWJ6MmFNUDRrSzRUY0FRQWdYODlYQ0IzZFZac1YxU29tVFN3OE51OVRy?=
+ =?utf-8?B?UlJwaUdYcGtWeXd4NjRrUE96MElialNGQysydEJCZ3JZNENWZ0Y3TG1wNTRy?=
+ =?utf-8?B?UkNZUXRzTFlkMnVEa3dCVDYzRW5ERXVxVUdqQkI5V2MyWUtQYnBrdVYrMk1n?=
+ =?utf-8?B?WkJmODNtcDF1MnNXWHl6Zy8zblRhUG1Ca0Y1UCtnVTBYNk1lVW9FOGV2bW4w?=
+ =?utf-8?B?RUpORmRzMzBnZVEvbmpyUytxbnpGeWpHR2JXUDdCakJQWmtzMXNidi9LQkF0?=
+ =?utf-8?B?TmZNbXVtZXhKZkcxSis0Z0FXdGRpb3RIYkVZY0M5cGZpQkY0Ynp1VVQvejBT?=
+ =?utf-8?B?bUhpWmNjQ3FFYkpQdUZ6TVFHZm9xbmx2elJOQlg5LzA0V0ZkQmw4aWNiQlhE?=
+ =?utf-8?B?ckNZZUgwM3RUYVdTMzFodUsySkNoRVRhbTBpUlJ0amxRNTMrYjcyY3ZTaE02?=
+ =?utf-8?B?TE40R25nWHVBQ09iN0FLZG92UytzanRjRHkrNEtaNjJ5WEIxckRiSWZnSE9o?=
+ =?utf-8?B?bmZMd3R0eDRPRGhWTnlkc3VXRlNhNk11YWgweVRtTFZYdUdNamdoUC9tSlRD?=
+ =?utf-8?B?RnVJRWQzRCtIR3BnNFd6dGZrbmJpR1VuTDNrRXFaZ1dGYzMzbkRkVGY3cXpR?=
+ =?utf-8?B?WEVDVno2alNRcHlyUmkzNkJiaVo5VHR1V1F5YUdiRzJwdkt1bUZ2WjRxUEdH?=
+ =?utf-8?B?OUdLUDdqcFkvTnBNa1F4dms3RTQ2SExJNTlyeTZxc1dMSTNhOFZkc1FEVDlk?=
+ =?utf-8?B?cE42aFBjUlNiUnVheDZZOEUrTWRCb1lkei95MlBXb1NzZjZTbGZoUU9ZMlJN?=
+ =?utf-8?B?VlNUcUx5Ukw0ZDI1d2Qwekd2WVMzT1BFdE5zY2JvbTI2L0FXSVAxSFM4TXE3?=
+ =?utf-8?B?REdhSmJPbHBJS2tlR256Zkp2ZThCeDg4bWoxOWdMVGdsdkN2NUlGcFYxM1h5?=
+ =?utf-8?B?MFg0bE05UUlhbmkyWGNpYmxEZVd6M0xISlJoZXZnMEtnZHhEVURPckhCYlAv?=
+ =?utf-8?B?U25wdEJzZGt5SHRBbXRndyt0QVhyeHJiMnV2Rzh2Y0lZK0NqdjJvckZnOTQ3?=
+ =?utf-8?B?dDhYQlVTcVBrN05lU0k0OFc2VVZSZ1pnaW0rOFdLdytJVzAvVXEyMlhZMzBy?=
+ =?utf-8?B?a2RML2EzV1FGZzEzcEMwclREN2NwakFxNDBUNTBiTUxZSkh3Y2RtMnhxdWxu?=
+ =?utf-8?B?d1ppZjNLemhmWkRQWkk0R050eDNNL0k2Y2p4Qzg2TnEvL3ZBckZRYVFkRXZP?=
+ =?utf-8?B?SXhOYU04K3o0OFpkRk5PNlhPRUE0RkdKTTNmOHFsRlpmZlA5WldpeDBZVDRk?=
+ =?utf-8?B?d3B2RGZEWG1vVlZNakdGSWFvRWNqZmkyN0VOTEcxOWptd29ia0NMM255OEhS?=
+ =?utf-8?B?cnEvbUJlOFNScCt3N1F0NGlwZUJ6a3lXSVQwYzBYMVBqSGd4VEZQMGliTGhk?=
+ =?utf-8?B?NGlxWlBoOEdreXkyeEd0VjFvVnQzTmEvdjVIRWRpT2p3MlE5d2xycTJLNDdD?=
+ =?utf-8?B?aFhKNndxUmJnUlA2NkI0N0U4c1F4S05pTVdKY2k0ZU53NE04cFVOTmVseWdO?=
+ =?utf-8?B?cEZ0N3ZiSysrL0RnNGZQWWNheUNBMGIxQ0h2V2dLeWNYUEk5WTJOWE5uTlc1?=
+ =?utf-8?B?Y2lMaGxjQ1dFTVNzNGNaenl3WENZS01tall6S2lSQzE1ZHp4M0ZqckVwRGwz?=
+ =?utf-8?B?VXR1cW8rVUJEaEp3N1VrM3F2ZlExcjQvQTd0RzBoUUlNWnZOUnhlSkNOa3NQ?=
+ =?utf-8?B?YVgwRlNqUUJUeW9MTjBTYThFem9hOTZQN0twSEpybmpvODVBU2k0ZFhKZ1VG?=
+ =?utf-8?B?Q1hzK2VTbTl4T0t5VDl0TGFNWThnZG4vd0dhOVRzVTlSWEtJdHFqL3NBcTN1?=
+ =?utf-8?B?UXhpWDlhUFg0V1M0bUVlOWprZkFtY053bVhjYjl1aDh5V0J4T09jMHhGd3gw?=
+ =?utf-8?Q?b2oo8KXryhj0GBhXWSBTU5SJr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b29fc74-337c-4d8d-f8cf-08dbf562eae6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 07:22:20.1019
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VPndJ1BryngIR45G1rfY9+DLFRPMBmIB3oXXrrqY8GyVBOSuP0IDaPIYVD74g+J8
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4317
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi Hans,
 
-> On Mon, 04 Dec 2023 16:27:24 +0000 Donald Hunter wrote:
->> > Ugh. Meaning the selector is at a "previous" level of nesting?
+On 12/4/2023 9:00 PM, Hans de Goede wrote:
+> Hi,
+> 
+> On 11/29/23 10:13, Ma Jun wrote:
+>> Due to electrical and mechanical constraints in certain platform designs
+>> there may be likely interference of relatively high-powered harmonics of
+>> the (G-)DDR memory clocks with local radio module frequency bands used
+>> by Wifi 6/6e/7.
 >>
->> That's right. I wonder if we should use a relative syntax like "../kind"
->> for the selector. Will either need to pass the known attrs to nest
->> parsing, or pass a resolver instead?
->
-> ../kind is my first thought, too.
->
-> But on reflection I reckon it may make the codegen and Python parser
-> quite a bit more complex. :S
+>> To mitigate this, AMD has introduced a mechanism that devices can use to
+>> notify active use of particular frequencies so that other devices can make
+>> relative internal adjustments as necessary to avoid this resonance.
+>>
+>> Co-developed-by: Evan Quan <quanliangl@hotmail.com>
+>> Signed-off-by: Evan Quan <quanliangl@hotmail.com>
+>> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+>>
+>> --
+>> v11:
+>>  - fix typo(Simon)
+>> v12:
+>>  - Fix the code logic (Rafael)
+>>  - Move amd_wbrf.c to drivers/platform/x86/amd/wbrf.c
+>>  - Updated Evan's email because he's no longer at AMD.Thanks
+>> for his work in earlier versions.
+>> v13:
+>>  - Fix the format issue (IIpo Jarvinen)
+>>  - Add comment for some functions
+>> v14:
+>>  - Use the apci_check_dsm and acpi_evaluate_dsm (Hans de Goede)
+> 
+> Thank you this is much better.
+> 
+> I notice that the #define ACPI_AMD_WBRF_METHOD	"\\WBRF"
+> still exists though and that this is still used in
+> static bool acpi_amd_wbrf_supported_system(void).
+> 
+> I think it might be better to just remove
+> these 2 all together.
+> 
+> Checking if a DSM with the expected GUID is present
+> and if that has the correct bits set in its supported
+> mask should be enough.
+> 
+> And on future systems the implementer may decide to
+> not have a WBRF helper function at all and instead
+> handle everything in the _DSM method.
+> 
+> So the "\\WBRF" check seems to be checking for
+> what really is an implementation detail.
+> 
+Yes,you are right. I will fix these issues.
+Thanks for your review and suggestion. 
 
-That was my main concern with it too.
-
-Another thought I had was to explicitly mark attrs that get used as
-selector keys, but I don't think that actually buys us anything.
-
-> Passing in known selector attrs to nests sounds good. Assuming we never
-> have to do something like: "../other-nest/attr".
-> Or perhaps in that case we can support passing in nested attrs, just
-> not backtracking? Backtracking is the hard part, really. Yeah, that
-> sounds simplest, at least at the "thought exercise level" :)
->
-> What would "resolver" look like?
-
-I was thinking a resolver would be a class with a single lookup method
-that internally holds attributes from the current scope and has a parent
-it can delegate to. It would try to resolve e.g. "kind" in current scope
-then, on failure, delegate to its parent. When recursing to decode a
-submsg, create a new resolver with the current one as its parent.
-
-If we did it this way, there'd be no need for "../kind".
-
-> BTW how do we deal with ordering. Do we require that selector attr
-> must be present in the message before the submsg? I think in practice
-> is should always be the case, but we should document that.
-
-The selector attr is de-facto present in the message before it is
-needed, both at the same level and for sub messages. So, yeah, I think
-we require this and agreed we should document it. I will do that in
-the next revision.
-
-From what I have seen so far, selector attrs are at same level or at
-root level, but I'm not confident that will hold true for all of the raw
-families.
+Regards,
+Ma Jun
+> 2 other very small remark
+> 
+>> +/**
+>> + * acpi_amd_wbrf_supported_producer - determine if the WBRF can be enabled
+>> + *                                    for the device as a producer
+>> + *
+>> + * @dev: device pointer
+>> + *
+>> + * Check if the platform equipped with necessary implementations to
+>> + * support WBRF for the device as a producer.
+>> + *
+>> + * Return:
+>> + * true if WBRF is supported, otherwise returns false
+>> + */
+>> +bool acpi_amd_wbrf_supported_producer(struct device *dev)
+>> +{
+>> +	struct acpi_device *adev;
+>> +
+>> +	adev = ACPI_COMPANION(dev);
+>> +	if (!adev)
+>> +		return false;
+>> +
+>> +	if (!acpi_amd_wbrf_supported_system())
+>> +		return false;
+>> +
+>> +
+>> +	return acpi_check_dsm(adev->handle, &wifi_acpi_dsm_guid,
+>> +			      WBRF_REVISION, BIT(WBRF_RECORD));
+>> +}
+>> +EXPORT_SYMBOL_GPL(acpi_amd_wbrf_supported_producer);
+> 
+> Please don't use double empty lines, one empty line to separate things
+> is enough.
+> 
+>> +
+>> +/**
+>> + * acpi_amd_wbrf_supported_consumer - determine if the WBRF can be enabled
+>> + *                                    for the device as a consumer
+>> + *
+>> + * @dev: device pointer
+>> + *
+>> + * Determine if the platform equipped with necessary implementations to
+>> + * support WBRF for the device as a consumer.
+>> + *
+>> + * Return:
+>> + * true if WBRF is supported, otherwise returns false.
+>> + */
+>> +bool acpi_amd_wbrf_supported_consumer(struct device *dev)
+>> +{
+>> +	struct acpi_device *adev;
+>> +
+>> +	adev = ACPI_COMPANION(dev);
+>> +	if (!adev)
+>> +		return false;
+>> +
+>> +	if (!acpi_amd_wbrf_supported_system())
+>> +		return false;
+>> +
+>> +	return acpi_check_dsm(adev->handle, &wifi_acpi_dsm_guid,
+>> +			      WBRF_REVISION, BIT(WBRF_RETRIEVE));
+>> +}
+>> +EXPORT_SYMBOL_GPL(acpi_amd_wbrf_supported_consumer);
+>> +
+>> +/**
+>> + * amd_wbrf_retrieve_freq_band - retrieve current active frequency
+>> + *                                     bands
+> 
+> You may go a bit over the 80 chars limit, please just make this
+> a single line:
+> 
+>  * amd_wbrf_retrieve_freq_band - retrieve current active frequency bands
+> 
+>> + *
+>> + * @dev: device pointer
+>> + * @out: output structure containing all the active frequency bands
+>> + *
+>> + * Retrieve the current active frequency bands which were broadcasted
+>> + * by other producers. The consumer who calls this API should take
+>> + * proper actions if any of the frequency band may cause RFI with its
+>> + * own frequency band used.
+>> + *
+>> + * Return:
+>> + * 0 for getting wifi freq band successfully.
+>> + * Returns a negative error code for failure.
+>> + */
+> 
+> Regards,
+> 
+> Hans
+> 
 
