@@ -1,256 +1,128 @@
-Return-Path: <netdev+bounces-54018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938348059E7
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:24:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576A08059F2
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 17:28:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF28B2120A
-	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:24:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 017A91F2159F
+	for <lists+netdev@lfdr.de>; Tue,  5 Dec 2023 16:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAE1675A9;
-	Tue,  5 Dec 2023 16:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDCD675B1;
+	Tue,  5 Dec 2023 16:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="v16FblpM"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="azyA7A7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A727122
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:23:48 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5d3644ca426so57626957b3.1
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:23:48 -0800 (PST)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD28C3
+	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 08:28:02 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1d06d4d685aso19966125ad.3
+        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 08:28:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701793428; x=1702398228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YAbXwpRgDFgfs4oKyWehmC86yPoHD7aoYIYc9vhsGuc=;
-        b=v16FblpMlnghhmAoFp37wip+fj4EJXSPnuopCx9DjCarAAIbRvFCtBlMRvlNqAYlWO
-         1L6jTFYsVz7xHmSm5Ws+OvaK4hlcD5L38UG+qIA1NNkd1u6pl9fMH2lKn/pGwmwuJ3d/
-         rqEv0SVZiWr0XAecp8RJ2depfk4PZyTEAb169UgqNhnAyIf7fxTDBFxCPvvTj6KbgAGC
-         aRI996Eaf6QYnS0LxUJSqDmJzxKllKSJ4RJAQv517QEtko2F9hVOhMtPlB/Enu9IR8QD
-         ZxWa8ldj0/vn2Roe6M4bM9r9y3Ix8eLEsTt7hH7TOkb4zV26WZrC5A1MEokwOX3Xxo6Z
-         R25A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1701793682; x=1702398482; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sE5yWCGwWzGkKU3Lzed5KPrdiD+mjsaQqvyJhkisET4=;
+        b=azyA7A7RFaVeg3M1+/H+wS7frL6/9cxyp6hT9QcF8131cW9tdvjJat/+mQmMyeqliW
+         oGa3nLwDjLQG47Bf/SEFSjjxI/d25+JtyCBBQuhK6LKbl18hroGotL5B/1J714SsCeXi
+         LpffZ5CyD6nxu0dUefsy4jGX3dDfyWYJQocV9MVklhnOMTyhJrDLukYDS9gqepbwLCqH
+         L29sXfIvi380fCKRJAAq6izlSv3TlrhZryVgOfIjFxmPLXOJnEPYxVlQpYkQMzv2B2EA
+         YHpq5HaGy5EE9VL3lL4Fgen4bPDLETVmfGsNkWru8TvT7jnDSnZpEKMcwk5yitQ6ugHk
+         mEXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701793428; x=1702398228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YAbXwpRgDFgfs4oKyWehmC86yPoHD7aoYIYc9vhsGuc=;
-        b=QO7xIczK8/QE5R5P6RunSeWtinXVUUwg6fzQtwwE6FA8dot99AtpIAkX1/Cls3OEtn
-         ukZBACLl9GFT0plIi1PsmKk/ZSaSbwZPiVFc5n+XhZ4vyCIok06mLR0UShWiqqDrCaJ0
-         +pR/BfFL52c7OvUICJzbO7itamygNoroYGIB9RFg+FPctbswLXVPxxb/xeyaxBlEJmzr
-         BY/0yazH2P0lWI6o5nTMb9pJjllLtZmU+2Wt/V5xSmhyognSXs/5yvw8KyM7pJEpzp2s
-         HcVz0Woqh1HEZSvyd9vPWg/ucwB5Ky5xO5iASjtI8jOo4HX3MYMM9uSh8n6ToI6oYHsz
-         mj4g==
-X-Gm-Message-State: AOJu0Yx76j8p2P8Otc2SWPDVibSpafcMkYO8U2SQXXoe4w9TEQgvpCib
-	C4u/ToAFLhQqCVMhYWt6+Isa4QCHs0EEaUHXhnekpA==
-X-Google-Smtp-Source: AGHT+IG2RqlRgezYi6QCtZRukN9VkP1Ymuig7H0dBKCFX+KQG4RnHn8xpB0giKFOz6sYzbMcRSiF11JZMTLUsqpAvm8=
-X-Received: by 2002:a0d:e881:0:b0:5d9:1524:e315 with SMTP id
- r123-20020a0de881000000b005d91524e315mr2642283ywe.17.1701793427715; Tue, 05
- Dec 2023 08:23:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701793682; x=1702398482;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sE5yWCGwWzGkKU3Lzed5KPrdiD+mjsaQqvyJhkisET4=;
+        b=myHNs69jneZ/zv/FR5xCxFi6lrn291H73JO6XGCv7ZjBafxKWu9nppJEJKXBIwmTE4
+         Y6YK6TYTjl4GjVio8Vm4oBvee+g6abuXs/PvgMHrWn1EQGqcK0O4/Ok3mB4sI8e2BjS0
+         B8HMAyHIN4+w+zHqiLq9CoECrQLDNwsAoolkE7M0Qev0dv7Mb8iVXr5Yh7mE1eGzO/fu
+         GvUfyZMTPVqtXt7CqrAjCEPgcdiS13zo8UkjwA+g1ASZI6LtmPP29qaSWwCyleNEPj0M
+         O0poYyi0gJmAzMfxYY1Sy8CdR+0sFY6AKykcC4Qzhky6YbvyWLK44E5dzKhxyxetIniB
+         dHLA==
+X-Gm-Message-State: AOJu0YysjJCR/I+papov9snyqat+syOKhQn+Bjs36IkPKFKjfCkzLzqq
+	z3BHC9YoxtVPMdsMF4hHc6rd2g==
+X-Google-Smtp-Source: AGHT+IHQkcZI61BYx5Isxo8pZcdqVL5JAPvc5QiqMnPD34Np4jMtAj4vHHAAJ16WibMU6QX0xlBtmw==
+X-Received: by 2002:a17:902:6a82:b0:1d0:6ffd:f231 with SMTP id n2-20020a1709026a8200b001d06ffdf231mr3663192plk.135.1701793682278;
+        Tue, 05 Dec 2023 08:28:02 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c0:638:b3b3:3480:1b98:451d? ([2804:7f1:e2c0:638:b3b3:3480:1b98:451d])
+        by smtp.gmail.com with ESMTPSA id jk19-20020a170903331300b001cf570b10dasm8745364plb.65.2023.12.05.08.27.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Dec 2023 08:28:01 -0800 (PST)
+Message-ID: <30bc72f5-b21b-4846-b97b-1251b3dc3d4c@mojatatu.com>
+Date: Tue, 5 Dec 2023 13:27:56 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231201182904.532825-1-jhs@mojatatu.com> <20231201182904.532825-16-jhs@mojatatu.com>
- <656e6f8d7c99f_207cb2087c@john.notmuch> <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
-In-Reply-To: <2eb488f9-af4a-4e28-0de0-d4dbc1e166f5@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 5 Dec 2023 11:23:36 -0500
-Message-ID: <CAM0EoM=MJJH9zNdiEHYpkYYQ_7WqobGv_v8wp04R7HhdPW8TxA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 15/15] p4tc: add P4 classifier
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
-	deb.chatterjee@intel.com, anjali.singhai@intel.com, namrata.limaye@intel.com, 
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
-	horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] net: sched: Move drop_reason to struct
+ tc_skb_cb
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>,
+ Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: dcaratti@redhat.com, netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20231201230011.2925305-1-victor@mojatatu.com>
+ <20231201230011.2925305-2-victor@mojatatu.com>
+ <7315d962-0911-81b9-7e60-452ab71e3193@iogearbox.net>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <7315d962-0911-81b9-7e60-452ab71e3193@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 5, 2023 at 8:43=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
-t> wrote:
->
-> On 12/5/23 1:32 AM, John Fastabend wrote:
-> > Jamal Hadi Salim wrote:
-> >> Introduce P4 tc classifier. A tc filter instantiated on this classifie=
-r
-> >> is used to bind a P4 pipeline to one or more netdev ports. To use P4
-> >> classifier you must specify a pipeline name that will be associated to
-> >> this filter, a s/w parser and datapath ebpf program. The pipeline must=
- have
-> >> already been created via a template.
-> >> For example, if we were to add a filter to ingress of network interfac=
-e
-> >> device $P0 and associate it to P4 pipeline simple_l3 we'd issue the
-> >> following command:
-> >
-> > In addition to my comments from last iteration.
-> >
-> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
-_l3 \
-> >>      action bpf obj $PARSER.o section prog/tc-parser \
-> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > Having multiple object files is a mistake IMO and will cost
-> > performance. Have a single object file avoid stitching together
-> > metadata and run to completion. And then run entirely from XDP
-> > this is how we have been getting good performance numbers.
->
-> +1, fully agree.
+On 05/12/2023 08:06, Daniel Borkmann wrote:
+>> [...]
+>> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+>> index dcb9160e6467..c499b56bb215 100644
+>> --- a/include/net/sch_generic.h
+>> +++ b/include/net/sch_generic.h
+>> @@ -332,7 +332,6 @@ struct tcf_result {
+>>           };
+>>           const struct tcf_proto *goto_tp;
+>>       };
+>> -    enum skb_drop_reason        drop_reason;
+>>   };
+>>   struct tcf_chain;
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 3950ced396b5..323496ca0dc3 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -3924,14 +3924,15 @@ static int tc_run(struct tcx_entry *entry, 
+>> struct sk_buff *skb,
+>>       tc_skb_cb(skb)->mru = 0;
+>>       tc_skb_cb(skb)->post_ct = false;
+>> -    res.drop_reason = *drop_reason;
+>> +    tc_skb_cb(skb)->post_ct = false;
+> 
+> Why the double assignment ?
 
-As I stated earlier: while performance is important it is not the
-highest priority for what we are doing, rather correctness is. We dont
-want to be wrestling with the verifier or some other limitation like
-tail call limits to gain some increase in a few kkps. We are taking a
-gamble with the parser which is not using any kfuncs at the moment.
-Putting them all in one program will increase the risk.
+Sigh, sorry will change that in v3.
 
-As i responded to you earlier,  we just dont want to lose
-functionality, some sample space:
-- we could have multiple pipelines with different priorities - and
-each pipeline may have its own logic with many tables etc (and the
-choice to iterate the next one is essentially encoded in the tc action
-codes)
-- we want to be able to split the pipeline into parts that can run _in
-unison_ in h/w, xdp, and tc
-- we use tc block to map groups of ports heavily
-- we use netlink as our control API
+> 
+>> +    tcf_set_drop_reason(skb, *drop_reason);
+>>       mini_qdisc_bstats_cpu_update(miniq, skb);
+>>       ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, 
+>> false);
+>>       /* Only tcf related quirks below. */
+>>       switch (ret) {
+>>       case TC_ACT_SHOT:
+>> -        *drop_reason = res.drop_reason;
+>> +        *drop_reason = tc_skb_cb_drop_reason(skb);
+> 
+> nit: I'd rename into tcf_get_drop_reason() so it aligns with the 
+> tcf_set_drop_reason().
+> It's weird to name the getter tc_skb_cb_drop_reason() instead.
 
-> >> $PROGNAME.o and $PARSER.o is a compilation of the eBPF programs genera=
-ted
-> >> by the P4 compiler and will be the representation of the P4 program.
-> >> Note that filter understands that $PARSER.o is a parser to be loaded
-> >> at the tc level. The datapath program is merely an eBPF action.
-> >>
-> >> Note we do support a distinct way of loading the parser as opposed to
-> >> making it be an action, the above example would be:
-> >>
-> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
-_l3 \
-> >>      prog type tc obj $PARSER.o ... \
-> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >>
-> >> We support two types of loadings of these initial programs in the pipe=
-line
-> >> and differentiate between what gets loaded at tc vs xdp by using synta=
-x of
-> >>
-> >> either "prog type tc obj" or "prog type xdp obj"
-> >>
-> >> For XDP:
-> >>
-> >> tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
-> >>      prog type xdp obj $PARSER.o section parser/xdp \
-> >>      pinned_link /sys/fs/bpf/mylink \
-> >>      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > I don't think tc should be loading xdp programs. XDP is not 'tc'.
->
-> For XDP, we do have a separate attach API, for BPF links we have bpf_xdp_=
-link_attach()
-> via bpf(2) and regular progs we have the classic way via dev_change_xdp_f=
-d() with
-> IFLA_XDP_* attributes. Mid-term we'll also add bpf_mprog support for XDP =
-to allow
-> multi-user attachment. tc kernel code should not add yet another way of a=
-ttaching XDP,
-> this should just reuse existing uapi infra instead from userspace control=
- plane side.
+Seems more consistent, will do.
 
-I am probably missing something. We are not loading the XDP program -
-it is preloaded, the only thing the filter does above is grabbing a
-reference to it. The P4 pipeline in this case is split into a piece
-(the parser) that runs on XDP and some that runs on tc. And as i
-mentioned earlier we could go further another piece which is part of
-the pipeline may run in hw. And infact in the future a compiler will
-be able to generate code that is split across machines. For our s/w
-datapath on the same node the only split is between tc and XDP.
+>> [...]
 
-
-> >> The theory of operations is as follows:
-> >>
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D1. PARSING=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> The packet first encounters the parser.
-> >> The parser is implemented in ebpf residing either at the TC or XDP
-> >> level. The parsed header values are stored in a shared eBPF map.
-> >> When the parser runs at XDP level, we load it into XDP using tc filter
-> >> command and pin it to a file.
-> >>
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D2. ACTIONS=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> In the above example, the P4 program (minus the parser) is encoded in =
-an
-> >> action($PROGNAME.o). It should be noted that classical tc actions
-> >> continue to work:
-> >> IOW, someone could decide to add a mirred action to mirror all packets
-> >> after or before the ebpf action.
-> >>
-> >> tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple=
-_l3 \
-> >>      prog type tc obj $PARSER.o section parser/tc-ingress \
-> >>      action bpf obj $PROGNAME.o section prog/tc-ingress \
-> >>      action mirred egress mirror index 1 dev $P1 \
-> >>      action bpf obj $ANOTHERPROG.o section mysect/section-1
-> >>
-> >> It should also be noted that it is feasible to split some of the ingre=
-ss
-> >> datapath into XDP first and more into TC later (as was shown above for
-> >> example where the parser runs at XDP level). YMMV.
-> >
-> > Is there any performance value in partial XDP and partial TC? The main
-> > wins we see in XDP are when we can drop, redirect, etc the packet
-> > entirely in XDP and avoid skb altogether.
-> >
-> >>
-> >> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> >> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> >> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> >> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> >> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> The cls_p4 is roughly a copy of {cls,act}_bpf, and from a BPF community s=
-ide
-> we moved away from this some time ago for the benefit of a better managem=
-ent
-> API for tc BPF programs via bpf(2) through bpf_mprog (see libbpf and BPF =
-selftests
-> around this), as mentioned earlier. Please use this instead for your user=
-space
-> control plane, otherwise we are repeating the same mistakes from the past=
- again
-> that were already fixed.
-
-Sorry, that is your use case for kubernetes and not ours. We want to
-use the tc infra. We want to use netlink. I could be misreading what
-you are saying but it seems that you are suggesting that tc infra is
-now obsolete as far as ebpf is concerned? Overall: It is a bit selfish
-to say your use case dictates how other people use ebpf. ebpf is just
-a means to an end for us and _is not the end goal_ - just an infra
-toolset. We spent a long time compromising to meet you somewhere when
-you asked us to use ebpf but you are pushing it now .
-
-If you feel we should unify the P4 classifier with the tc ebpf
-classifier etc then we are going to need some changes that are not
-going to be useful for other people. And i dont see the point in that.
-
-cheers,
-jamal
-
-> Therefore, from BPF side:
->
-> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
->
-> Cheers,
-> Daniel
 
