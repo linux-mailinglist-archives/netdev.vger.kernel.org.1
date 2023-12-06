@@ -1,96 +1,106 @@
-Return-Path: <netdev+bounces-54543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E9078076D9
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:45:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD188076DA
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 18:45:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30624B20DA0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:45:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28FF4B20EE7
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 17:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1D16AB92;
-	Wed,  6 Dec 2023 17:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A3A6D1C0;
+	Wed,  6 Dec 2023 17:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="MeLK9sxS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hgzt9I+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AE0D122;
-	Wed,  6 Dec 2023 09:45:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=To:References:Message-Id:Content-Transfer-Encoding:Cc:Date:
-	In-Reply-To:From:Subject:Mime-Version:Content-Type:Sender:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=GE1VPm5btBMd9mwfn4sOjYmloAWowP1CRL1VphR/cGk=;
-	b=MeLK9sxS71BKJZtcAMnuP3Y/B0MjbmYnI6eXktt1U2K1EcLNjVjwTHXvc14As0RrfZSswJQaF13
-	/Ob7ps4nSFUGGxxclRMWR65tPVdZ2Z6Y3sHPwdUN5/lNHk2nn2idIjM5u1GJmNUE8d6yQcslIBeUC
-	Azjf8vIu/9olYRiUnpMMDnHcqmzpMqb+1a9Mvjf5hK/QXiApvNBlMuI9R1zqZ5+/Tpmmvy9qlqqAf
-	M2U7LHXfdQmMsw7o0VW9PzMHShVIie/KtGfQ9j3LxX8S+eOPAxdQIGiUXBMmH4RXRvDQx8/aAClwW
-	GOHDT/I1CHqXwaN9HOl5UVLAnZit1PrVn84w==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1rAvxb-0008mt-Tq; Wed, 06 Dec 2023 18:45:23 +0100
-Received: from [2a06:4004:10df:0:b8be:58d4:e5aa:7fa7] (helo=smtpclient.apple)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sean@geanix.com>)
-	id 1rAvxb-0009aj-6S; Wed, 06 Dec 2023 18:45:23 +0100
-Content-Type: text/plain;
-	charset=utf-8
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51AC4D50;
+	Wed,  6 Dec 2023 09:45:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1mo1LgfKsz3GNeuJdlpVdTsBLDDEkpPEzTaq9ExbB5k=; b=hgzt9I+uUlQkrxtxNPIpTm7nE2
+	/A9hOHwJK92xwF2Vgt2OyRKbFJZmL3kCtQTNdceEjJRRDxP+jxp+7xNT1tlaYkk8+AtY0ax1V7bAe
+	W3d668LWGdsZZAHCFaRWbBrIrO3l1MfB5UuiVqNjKg/rStzVJPxVBSHXGjtpUDDlItI8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rAvxj-002El3-VR; Wed, 06 Dec 2023 18:45:31 +0100
+Date: Wed, 6 Dec 2023 18:45:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] leds: trigger: netdev: skip setting baseline state in
+ activate if hw-controlled
+Message-ID: <a53883cd-f843-45a5-82d3-483d80e9a806@lunn.ch>
+References: <49f1b91e-a637-4062-83c6-f851f7c80628@gmail.com>
+ <a69ebe41-3f37-4988-a0bc-e53f79df27f2@lunn.ch>
+ <CAFSsGVvBfvkotAd+p++bzca4Km8pHVzNJEGV6CAjYULVOWuD2Q@mail.gmail.com>
+ <7535cb07-31ab-407d-9226-7b3f65050a65@lunn.ch>
+ <c57558a4-9f3a-48fa-acb7-e3eb2349c666@gmail.com>
+ <4c9396eb-f255-4277-8151-caa28c8ea0d3@lunn.ch>
+ <9a8373c6-e916-4a98-858a-294e7bed9f24@gmail.com>
+ <d42dd05d-fc76-4040-aa15-8bbc4aa535f3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.200.91.1.1\))
-Subject: Re: [PATCH v2 net] net: dsa: microchip: provide a list of valid
- protocols for xmit handler
-From: Sean Nyekjaer <sean@geanix.com>
-In-Reply-To: <20231206173543.ag7xb4vhcjknyiyv@skbuf>
-Date: Wed, 6 Dec 2023 18:45:12 +0100
-Cc: Woojung.Huh@microchip.com,
- UNGLinuxDriver@microchip.com,
- andrew@lunn.ch,
- f.fainelli@gmail.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com,
- Arun.Ramadoss@microchip.com,
- ceggers@arri.de,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2244A511-6F6F-4711-9BE0-30786B021AE5@geanix.com>
-References: <20231206071655.1626479-1-sean@geanix.com>
- <DM6PR11MB4124D98726836442169C2C55E184A@DM6PR11MB4124.namprd11.prod.outlook.com>
- <20231206173543.ag7xb4vhcjknyiyv@skbuf>
-To: Vladimir Oltean <olteanv@gmail.com>,
- Madhuri.Sripada@microchip.com
-X-Mailer: Apple Mail (2.3774.200.91.1.1)
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27115/Wed Dec  6 09:44:21 2023)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d42dd05d-fc76-4040-aa15-8bbc4aa535f3@gmail.com>
 
-Hi Vladimir and Madhuri,
+> >> I actually think we need to define some best practices, ordered on
+> >> what the hardware can do.
+> >>
+> >> 1) With software control, set_brightness should do what you expect,
+> >> not return an error.
+> >>
+> >> 2) Without full software control, but there is a mechanism to report a
+> >> problem, like constant blinking, or off, do that, and return
+> >> -EOPNOTSUPP.
+> >>
+> >> 3) Really dumb hardware like this, set_brightness should be a NULL
+> >> pointer. The core returns -EOPNOTSUPP.
+> >>
+> >> The core should return this -EOPNOTSUPP to user space, but it should
+> >> accept the configuration change. So the user can put it into an
+> >> invalid state, in order to get to a valid state with further
+> >> configuration.
+> >>
+> > Sounds good to me. Let me come up with a RFC patch.
+> > 
+> >> I don't see an easy way to let the user know what the valid states
+> >> are. We currently have a 10bit state. I don't think we can put all the
+> >> valid ones in a /sysfs file, especially when QCA8K pretty much
+> >> supports everything.
+> >>
+> >> 	 Andrew
+> > 
+> > Heiner
+> 
+> Patch is so simple that I send it this way. What do you think?
 
-> On 6 Dec 2023, at 18.35, Vladimir Oltean <olteanv@gmail.com> wrote:
->=20
-> On Wed, Dec 06, 2023 at 05:22:55PM +0000, =
-Madhuri.Sripada@microchip.com wrote:
->> NULL check is missing here.
+That is simpler than i expected.
 
-Did here what every other driver does, that uses the =
-connect_tag_protocol() method.
-(As per Vladimir=E2=80=99s instructions)
-Not one of them, does a NULL check.
+But i think we need to document our expectations. What do we expect an
+LED driver to do when it cannot support software blinking. So please
+could you add a comment somewhere. Maybe extend the
 
->=20
-> Don't just leave it there, also explain why.
+/*
+ *Configurable sysfs attributes:
+ *
 
-Message to me?
+section?
 
-/Sean=
+Thanks
+	Andrew
 
