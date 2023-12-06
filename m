@@ -1,155 +1,138 @@
-Return-Path: <netdev+bounces-54612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3097E8079F0
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:01:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B408079FB
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 22:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 610651C20FB7
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:01:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 312E0B20FC8
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 21:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5D04B5DE;
-	Wed,  6 Dec 2023 21:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFD6495ED;
+	Wed,  6 Dec 2023 21:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hKSkNV42"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xA6JrMKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A18D68;
-	Wed,  6 Dec 2023 13:01:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1701896464; x=1733432464;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kViqL5iu7m0sHw4/e5BszHWWKsyV2Qyplp/yjTRAfUM=;
-  b=hKSkNV42zs0LGgtB3P0Iux9/QhoiGTeY91ZVZ0L+5YBBVqB2HXSiEamj
-   SDyjLEv4NV/kAzSgB6143f9C/87agPEp9txfRCF8u9tF8NyUfkkXZz61+
-   zLnT14aOw5R/2vah0Z+cUaESCdii9g/8XNKHBh50cPu4iXJ+6ak3uOTiB
-   U05lCR0AHdUmpsRw7yGWc1ltJhErGoa5EfbneL3cCtE6arYk/oE2XE3BI
-   LvlGPGdjhHDqkAlyTmcydK4iaq4w+maaoq+6g8Cvc5zWHdy27g3AJ0L9w
-   4BtnO2dBIPS0cSxHMdf2ur7FdQqWkBQ6iYDWslVrSeT/ddy6dlC2I5ljN
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="425278189"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="425278189"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2023 13:01:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10916"; a="837448544"
-X-IronPort-AV: E=Sophos;i="6.04,256,1695711600"; 
-   d="scan'208";a="837448544"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Dec 2023 13:01:00 -0800
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6716B32A17;
-	Wed,  6 Dec 2023 21:00:58 +0000 (GMT)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: bpf@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	netdev@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Aleksander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH bpf-next v4 2/2] net, xdp: allow metadata > 32
-Date: Wed,  6 Dec 2023 21:59:19 +0100
-Message-ID: <20231206205919.404415-3-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231206205919.404415-1-larysa.zaremba@intel.com>
-References: <20231206205919.404415-1-larysa.zaremba@intel.com>
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A8AD46
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 13:02:42 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54c79cca895so3550a12.0
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 13:02:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701896561; x=1702501361; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z+uaQdQz6QrhFhwF1BGDVo3HvtsF0av/JrsCNPWP0H8=;
+        b=xA6JrMKK7zq5t7NH0UhLIEyiI/WUR5uZQNJY5T7XDC3iR77qkbVZXgbn8VaVtKzGiH
+         9PrKVtVZdUrIDLfASfqYgYXsB2Q12BgcFnm+dOWmW4LSOWnejnN57gitRSfmKTNX5baB
+         lhDPriynQtfAADCa1Dohny7W8ToV0ZVUZwRprq8l+amgVkRxcnvLRUvib+dcj5LRjLTs
+         DzMUUcH0Puc1XuZxsm48ywpEh8aCJXwgPUew1iTZ7Ga9tEQ+VJefFoHFQTcheJOWbBQ0
+         OtS6DNLHudhbxb4dc+PoW4C5dlLeW2rAC5BauAvd4wD3H7F7ySifEpCaoxLBnv26bPx/
+         Iosg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701896561; x=1702501361;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z+uaQdQz6QrhFhwF1BGDVo3HvtsF0av/JrsCNPWP0H8=;
+        b=L+4jrlRznHzUWqcX/EW6mr1wF5g9wi+6zlQgawz4WJTtYkIbL+uBjIiVFhNHjdJtnO
+         8/0AFxI04Bc9q/43j6QnKRpv+PtIxjZwFNXBwAM0BtmnTRp6Ha9f0YsxNTBWHTTAwlnu
+         4U8ebjhOopxL8dSHnoSPBspXASW/LuEXThJ/i6d7Vc1qA03aJuiZou3mnsldIUoKzMNg
+         haHqBfmg64FnPwNhbok8zaYI5MsKDXKR0jJN8SO5gH5t4HD7izvHK16IIL9gLY4KNzAv
+         gmxyykHqk/Ije6yBvxNIG3UVpssouIvkjOuyIRHE4ABCP63XnQE41uBDH4/ZDn/MiooI
+         a2Bw==
+X-Gm-Message-State: AOJu0Yza3jLIF/Ij7rhWSWYXGlyjUIaaWC3DzbAFlvLAUEzH6dQp6WR2
+	1PL2tlwcXew0nCzZ7jd0eRAsKX6HAl0Bv5KQg0KLZQ==
+X-Google-Smtp-Source: AGHT+IGaFpPeOUa5pJ8acL4jNk8ba2S6zn80/0RY0+ToikBAjDYwgKXjIIG+inhLt+24e/6pD2aIRpWsch8xjOOWqFw=
+X-Received: by 2002:a50:baae:0:b0:545:279:d075 with SMTP id
+ x43-20020a50baae000000b005450279d075mr115598ede.1.1701896560601; Wed, 06 Dec
+ 2023 13:02:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAG48ez0TfTAkaRWFCTb44x=TWP_sDZVx-5U2hvfQSFOhghNrCA@mail.gmail.com>
+ <CAG48ez1hXk_cffp3dy-bYMcoyCCj-EySYR5SzYrNiRHGD=hOUg@mail.gmail.com>
+ <ZW+Yv6TR+EMBp03f@orbyte.nwl.cc> <CAG48ez2G4q-50242WRE01iaKfAhd0D+XT9Ry0uS767ceHEzHXA@mail.gmail.com>
+ <ZXDctabBrEFMVxg2@orbyte.nwl.cc>
+In-Reply-To: <ZXDctabBrEFMVxg2@orbyte.nwl.cc>
+From: Jann Horn <jannh@google.com>
+Date: Wed, 6 Dec 2023 22:02:04 +0100
+Message-ID: <CAG48ez1ixOapt330sDoCfhnVhN0VmO=i9H8cSQontGkvi_NT7A@mail.gmail.com>
+Subject: Re: Is xt_owner's owner_mt() racy with sock_orphan()? [worse with new
+ TYPESAFE_BY_RCU file lifetime?]
+To: Phil Sutter <phil@nwl.cc>, Jann Horn <jannh@google.com>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, netfilter-devel <netfilter-devel@vger.kernel.org>, coreteam@netfilter.org, 
+	Christian Brauner <brauner@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Network Development <netdev@vger.kernel.org>, kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Aleksander Lobakin <aleksander.lobakin@intel.com>
+On Wed, Dec 6, 2023 at 9:42=E2=80=AFPM Phil Sutter <phil@nwl.cc> wrote:
+>
+> On Wed, Dec 06, 2023 at 05:28:44PM +0100, Jann Horn wrote:
+> > On Tue, Dec 5, 2023 at 10:40=E2=80=AFPM Phil Sutter <phil@nwl.cc> wrote=
+:
+> > > On Tue, Dec 05, 2023 at 06:08:29PM +0100, Jann Horn wrote:
+> > > > On Tue, Dec 5, 2023 at 5:40=E2=80=AFPM Jann Horn <jannh@google.com>=
+ wrote:
+> > > > >
+> > > > > Hi!
+> > > > >
+> > > > > I think this code is racy, but testing that seems like a pain...
+> > > > >
+> > > > > owner_mt() in xt_owner runs in context of a NF_INET_LOCAL_OUT or
+> > > > > NF_INET_POST_ROUTING hook. It first checks that sk->sk_socket is
+> > > > > non-NULL, then checks that sk->sk_socket->file is non-NULL, then
+> > > > > accesses the ->f_cred of that file.
+> > > > >
+> > > > > I don't see anything that protects this against a concurrent
+> > > > > sock_orphan(), which NULLs out the sk->sk_socket pointer, if we'r=
+e in
+> > > >
+> > > > Ah, and all the other users of ->sk_socket in net/netfilter/ do it
+> > > > under the sk_callback_lock... so I guess the fix would be to add th=
+e
+> > > > same in owner_mt?
+> > >
+> > > Sounds reasonable, although I wonder how likely a socket is to
+> > > orphan while netfilter is processing a packet it just sent.
+> > >
+> > > How about the attached patch? Not sure what hash to put into a Fixes:
+> > > tag given this is a day 1 bug and ipt_owner/ip6t_owner predate git.
+> >
+> > Looks mostly reasonable to me; though I guess it's a bit weird to have
+> > two separate bailout paths for checking whether sk->sk_socket is NULL,
+> > where the first check can race, and the second check uses different
+> > logic for determining the return value; I don't know whether that
+> > actually matters semantically. But I'm not sure how to make it look
+> > nicer either.
+>
+> I find the code pretty confusing since it combines three matches (socket
+> UID, socket GID and socket existence) via binary ops. The second bail
+> disregards socket existence bits, I assumed it was deliberate and thus
+> decided to leave the first part as-is.
+>
+> > I guess you could add a READ_ONCE() around the first read to signal
+> > that that's a potentially racy read, but I don't feel strongly about
+> > that.
+>
+> Is this just annotation or do you see a practical effect of using
+> READ_ONCE() there?
 
-32 bytes may be not enough for some custom metadata. Relax the restriction,
-allow metadata larger than 32 bytes and make __skb_metadata_differs() work
-with bigger lengths.
+I mostly just meant that as an annotation. My understanding is that in
+theory, racy reads can cause the compiler to do some terrible things
+to your code (https://lore.kernel.org/all/CAG48ez2nFks+yN1Kp4TZisso+rjvv_4U=
+W0FTo8iFUd4Qyq1qDw@mail.gmail.com/),
+but that's almost certainly not going to happen here.
 
-Now size of metadata is only limited by the fact it is stored as u8
-in skb_shared_info, so maximum possible value is 255. Size still has to be
-aligned to 4, so the actual upper limit becomes 252. Most driver
-implementations will offer less, none can offer more.
-
-Other important conditions, such as having enough space for xdp_frame
-building, are already checked in bpf_xdp_adjust_meta().
-
-Signed-off-by: Aleksander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- include/linux/skbuff.h | 13 ++++++++-----
- include/net/xdp.h      |  7 ++++++-
- 2 files changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index b370eb8d70f7..df6ef42639d8 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4247,10 +4247,13 @@ static inline bool __skb_metadata_differs(const struct sk_buff *skb_a,
- {
- 	const void *a = skb_metadata_end(skb_a);
- 	const void *b = skb_metadata_end(skb_b);
--	/* Using more efficient varaiant than plain call to memcmp(). */
--#if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && BITS_PER_LONG == 64
- 	u64 diffs = 0;
- 
-+	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
-+	    BITS_PER_LONG != 64)
-+		goto slow;
-+
-+	/* Using more efficient variant than plain call to memcmp(). */
- 	switch (meta_len) {
- #define __it(x, op) (x -= sizeof(u##op))
- #define __it_diff(a, b, op) (*(u##op *)__it(a, op)) ^ (*(u##op *)__it(b, op))
-@@ -4270,11 +4273,11 @@ static inline bool __skb_metadata_differs(const struct sk_buff *skb_a,
- 		fallthrough;
- 	case  4: diffs |= __it_diff(a, b, 32);
- 		break;
-+	default:
-+slow:
-+		return memcmp(a - meta_len, b - meta_len, meta_len);
- 	}
- 	return diffs;
--#else
--	return memcmp(a - meta_len, b - meta_len, meta_len);
--#endif
- }
- 
- static inline bool skb_metadata_differs(const struct sk_buff *skb_a,
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index 349c36fb5fd8..5d3673afc037 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -369,7 +369,12 @@ xdp_data_meta_unsupported(const struct xdp_buff *xdp)
- 
- static inline bool xdp_metalen_invalid(unsigned long metalen)
- {
--	return (metalen & (sizeof(__u32) - 1)) || (metalen > 32);
-+	unsigned long meta_max;
-+
-+	meta_max = type_max(typeof_member(struct skb_shared_info, meta_len));
-+	BUILD_BUG_ON(!__builtin_constant_p(meta_max));
-+
-+	return !IS_ALIGNED(metalen, sizeof(u32)) || metalen > meta_max;
- }
- 
- struct xdp_attachment_info {
--- 
-2.41.0
-
+(Well, I guess doing a READ_ONCE() at one side without doing
+WRITE_ONCE() on the other side is also unclean...)
 
