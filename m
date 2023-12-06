@@ -1,95 +1,204 @@
-Return-Path: <netdev+bounces-54313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 801F880687E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:34:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6237D80688F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 08:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B134A1C20A9E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:34:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91DA1F21700
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 07:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3834417734;
-	Wed,  6 Dec 2023 07:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E511775A;
+	Wed,  6 Dec 2023 07:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RVgXsKxL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRlvlu/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7161A1B5
-	for <netdev@vger.kernel.org>; Tue,  5 Dec 2023 23:34:39 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so7891a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Dec 2023 23:34:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701848078; x=1702452878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XrLGOurk8L5L0NnPLUV2I7uNbYLxUdBqrFGq7mAToT4=;
-        b=RVgXsKxLYCuPUrDTXabS/YaKPggmrfdjbfeFicZ+ty34bG93X6Qbr7MrmwwVDkiro8
-         gi8vX159tHoXz5e4VcjKjGrE90vdyimjZ6pNtipmXzYTgJMXVGba5b9kuUowW4JFincb
-         Y/fR5IXQ6bzPh8WvgpIT9QWwifm1YEvNxMVPnX4U0pGUCGfFUWRcQGRTJ5oiHzOGSBB2
-         SO1dQCxh4N9EMPW74vmxhmTSOHMbTVh6Mw8qLShws+tvknuJHnq4HiX3Zl9JVRtUCKDy
-         OHFjmf5I6j4DwubaYzIrrpFAXHlIiAZ3LyDzv4chD+yAZnKVJbXKBD9xsv4caHCiyNGO
-         /OGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701848078; x=1702452878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XrLGOurk8L5L0NnPLUV2I7uNbYLxUdBqrFGq7mAToT4=;
-        b=EVQ6J4b4tDKMQQi/tfX2NhcQKd8CRv15oUuH/VeGRsQSxBWXpNNd5AxTiMjgpo9bGZ
-         ogZdkRIoFcXj2iine3gQZWv3Wj2yhJuBDTlqK27rTArVmQVh9JDQ2kHnxOapofEZFIot
-         tsTWsu/DlBVpK86kQ285b6TIONqu1tOhPnuLYDdP2VXdgwlJkJrwuxP/bZfBgqN8mz76
-         9zSccjkYtWQ6NOqqhUml792dwr6sqtyHagqnwnJXu/UB+Ae5TUFZdzcezahsgkcP8WYQ
-         ZpmU6LungNmu2PfqV17OH8DId+cCVxygpCSVclDMWB3qNbjEb8N0cnd4kvtTe6j/bvPo
-         zwuA==
-X-Gm-Message-State: AOJu0YweoEmzhSNlBzD4TwtHemwHdQJfbb1km4vEM+iqn1d8v2Px+B9u
-	I7GE50UUPbNhUjj441kVXcd6o3N6Idlgb7o7xfU4YQ==
-X-Google-Smtp-Source: AGHT+IGldiRIFyGKYysUNKi5CQSdX373OFF+v40mkRnSHG6nIDPkTDJD/kDCf/0mazNx1HSyGQ9CMJ5qmSJ/VPpXWqA=
-X-Received: by 2002:a50:d744:0:b0:54c:384b:e423 with SMTP id
- i4-20020a50d744000000b0054c384be423mr40767edj.5.1701848077557; Tue, 05 Dec
- 2023 23:34:37 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE7110A25;
+	Wed,  6 Dec 2023 07:37:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAC18C433C7;
+	Wed,  6 Dec 2023 07:37:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701848249;
+	bh=YBWUFqOAhQYvAfOCxrjSoMu61oZulwiM8oxn+ueFF5E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eRlvlu/lJ4h/JFsaezO85sUEgvb7C+8piV61wdrD5QvERroxh3GYgVDDrvE8kOgxr
+	 BmhFaeDd5Xeni1GvMhA/yjqYbWtjNmYo4CkffRYRL/W9fQrRo4BzJJcPc4oIOQ5W/6
+	 frO8Iiv+js1PGz1ermFXBGZ+tC0rQ0W77OFDbamQycRCO5Vn3UuZ8X8nLv3ZYIyR3k
+	 wFqJ9ClH9IwPCft7PGEpDPuEqrOCkPWhubLeiLkoYLacjijazfboPzGZaxXLNqUvjy
+	 6FrFKxhfqQYv7voDp0miMVB+Yg80NlG0q8d+3+VbmyhjGhfdQcGkwpKLOJ0wCn7QAs
+	 b9vQVkyeAXICw==
+From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+To: gregkh@linuxfoundation.org
+Cc: linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH 04/27] tty: make tty_operations::send_xchar accept u8 char
+Date: Wed,  6 Dec 2023 08:36:49 +0100
+Message-ID: <20231206073712.17776-5-jirislaby@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231206073712.17776-1-jirislaby@kernel.org>
+References: <20231206073712.17776-1-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231206033913.1290566-1-judyhsiao@chromium.org>
-In-Reply-To: <20231206033913.1290566-1-judyhsiao@chromium.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Dec 2023 08:34:24 +0100
-Message-ID: <CANn89iKiG0oLhkYQj=OkhvcWyR_kfSsot_2zo9hFCm1A7u-tWA@mail.gmail.com>
-Subject: Re: [PATCH v2] neighbour: Don't let neigh_forced_gc() disable
- preemption for long
-To: Judy Hsiao <judyhsiao@chromium.org>
-Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Douglas Anderson <dianders@chromium.org>, Brian Haley <haleyb.dev@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Joel Granados <joel.granados@gmail.com>, Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 6, 2023 at 4:39=E2=80=AFAM Judy Hsiao <judyhsiao@chromium.org> =
-wrote:
->
-> We are seeing cases where neigh_cleanup_and_release() is called by
-> neigh_forced_gc() many times in a row with preemption turned off.
-> When running on a low powered CPU at a low CPU frequency, this has
-> been measured to keep preemption off for ~10 ms. That's not great on a
-> system with HZ=3D1000 which expects tasks to be able to schedule in
-> with ~1ms latency.
->
-> Suggested-by: Douglas Anderson <dianders@chromium.org>
-> Signed-off-by: Judy Hsiao <judyhsiao@chromium.org>
->
-> ---
->
-> Changes in v2:
-> - Use ktime_get_ns() for timeout calculation instead of jiffies.
+tty_operations::send_xchar is one of the last users of 'char' type for
+characters in the tty layer. Convert it to u8 now.
 
-SGTM, thanks.
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Cc: Karsten Keil <isdn@linux-pingi.de>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+---
+ drivers/isdn/capi/capi.c         | 4 ++--
+ drivers/mmc/core/sdio_uart.c     | 2 +-
+ drivers/tty/amiserial.c          | 2 +-
+ drivers/tty/serial/serial_core.c | 2 +-
+ drivers/tty/tty_io.c             | 2 +-
+ include/linux/tty.h              | 2 +-
+ include/linux/tty_driver.h       | 4 ++--
+ net/bluetooth/rfcomm/tty.c       | 2 +-
+ 8 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
+index 2f3789515445..6e80d7bd3c4d 100644
+--- a/drivers/isdn/capi/capi.c
++++ b/drivers/isdn/capi/capi.c
+@@ -1231,9 +1231,9 @@ static void capinc_tty_hangup(struct tty_struct *tty)
+ 	tty_port_hangup(&mp->port);
+ }
+ 
+-static void capinc_tty_send_xchar(struct tty_struct *tty, char ch)
++static void capinc_tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+-	pr_debug("capinc_tty_send_xchar(%d)\n", ch);
++	pr_debug("capinc_tty_send_xchar(%u)\n", ch);
+ }
+ 
+ static const struct tty_operations capinc_ops = {
+diff --git a/drivers/mmc/core/sdio_uart.c b/drivers/mmc/core/sdio_uart.c
+index a05322f15771..370fadf1d6d1 100644
+--- a/drivers/mmc/core/sdio_uart.c
++++ b/drivers/mmc/core/sdio_uart.c
+@@ -792,7 +792,7 @@ static unsigned int sdio_uart_chars_in_buffer(struct tty_struct *tty)
+ 	return kfifo_len(&port->xmit_fifo);
+ }
+ 
+-static void sdio_uart_send_xchar(struct tty_struct *tty, char ch)
++static void sdio_uart_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct sdio_uart_port *port = tty->driver_data;
+ 
+diff --git a/drivers/tty/amiserial.c b/drivers/tty/amiserial.c
+index a80f059f77bf..a30dc054ffbf 100644
+--- a/drivers/tty/amiserial.c
++++ b/drivers/tty/amiserial.c
+@@ -811,7 +811,7 @@ static void rs_flush_buffer(struct tty_struct *tty)
+  * This function is used to send a high-priority XON/XOFF character to
+  * the device
+  */
+-static void rs_send_xchar(struct tty_struct *tty, char ch)
++static void rs_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct serial_state *info = tty->driver_data;
+         unsigned long flags;
+diff --git a/drivers/tty/serial/serial_core.c b/drivers/tty/serial/serial_core.c
+index 0393853b9947..80085b151b34 100644
+--- a/drivers/tty/serial/serial_core.c
++++ b/drivers/tty/serial/serial_core.c
+@@ -687,7 +687,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
+  * This function is used to send a high-priority XON/XOFF character to
+  * the device
+  */
+-static void uart_send_xchar(struct tty_struct *tty, char ch)
++static void uart_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	struct uart_state *state = tty->driver_data;
+ 	struct uart_port *port;
+diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+index 005d91c63707..6a502110da61 100644
+--- a/drivers/tty/tty_io.c
++++ b/drivers/tty/tty_io.c
+@@ -1149,7 +1149,7 @@ ssize_t redirected_tty_write(struct kiocb *iocb, struct iov_iter *iter)
+  *
+  * Locking: none for xchar method, write ordering for write method.
+  */
+-int tty_send_xchar(struct tty_struct *tty, char ch)
++int tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	bool was_stopped = tty->flow.stopped;
+ 
+diff --git a/include/linux/tty.h b/include/linux/tty.h
+index e96c85f4f91e..d3bedcc08738 100644
+--- a/include/linux/tty.h
++++ b/include/linux/tty.h
+@@ -410,7 +410,7 @@ void tty_wait_until_sent(struct tty_struct *tty, long timeout);
+ void stop_tty(struct tty_struct *tty);
+ void start_tty(struct tty_struct *tty);
+ void tty_write_message(struct tty_struct *tty, char *msg);
+-int tty_send_xchar(struct tty_struct *tty, char ch);
++int tty_send_xchar(struct tty_struct *tty, u8 ch);
+ int tty_put_char(struct tty_struct *tty, unsigned char c);
+ unsigned int tty_chars_in_buffer(struct tty_struct *tty);
+ unsigned int tty_write_room(struct tty_struct *tty);
+diff --git a/include/linux/tty_driver.h b/include/linux/tty_driver.h
+index f428c1b784a2..7372124fbf90 100644
+--- a/include/linux/tty_driver.h
++++ b/include/linux/tty_driver.h
+@@ -242,7 +242,7 @@ struct serial_struct;
+  *	Optional: If not provided, the device is assumed to have no FIFO.
+  *	Usually correct to invoke via tty_wait_until_sent(). May sleep.
+  *
+- * @send_xchar: ``void ()(struct tty_struct *tty, char ch)``
++ * @send_xchar: ``void ()(struct tty_struct *tty, u8 ch)``
+  *
+  *	This routine is used to send a high-priority XON/XOFF character (@ch)
+  *	to the @tty device.
+@@ -374,7 +374,7 @@ struct tty_operations {
+ 	void (*flush_buffer)(struct tty_struct *tty);
+ 	void (*set_ldisc)(struct tty_struct *tty);
+ 	void (*wait_until_sent)(struct tty_struct *tty, int timeout);
+-	void (*send_xchar)(struct tty_struct *tty, char ch);
++	void (*send_xchar)(struct tty_struct *tty, u8 ch);
+ 	int (*tiocmget)(struct tty_struct *tty);
+ 	int (*tiocmset)(struct tty_struct *tty,
+ 			unsigned int set, unsigned int clear);
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 94ec913dfb76..69c75c041fe1 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -1041,7 +1041,7 @@ static void rfcomm_tty_flush_buffer(struct tty_struct *tty)
+ 	tty_wakeup(tty);
+ }
+ 
+-static void rfcomm_tty_send_xchar(struct tty_struct *tty, char ch)
++static void rfcomm_tty_send_xchar(struct tty_struct *tty, u8 ch)
+ {
+ 	BT_DBG("tty %p ch %c", tty, ch);
+ }
+-- 
+2.43.0
+
 
