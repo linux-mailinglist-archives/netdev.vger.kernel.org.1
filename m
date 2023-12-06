@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-54441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-54442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5765C80714A
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:53:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE48580714F
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 14:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CAE31F2125E
-	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:53:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A88E1C20C76
+	for <lists+netdev@lfdr.de>; Wed,  6 Dec 2023 13:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6993BB3C;
-	Wed,  6 Dec 2023 13:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475BC3BB3C;
+	Wed,  6 Dec 2023 13:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="do5UeC6Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oLeJA4CA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F2BD1;
-	Wed,  6 Dec 2023 05:53:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZMxTBdEVgr5LReWJcDBdaRxFXxTwHu3OEqZQ7L+jIbM=; b=do5UeC6QVxG1xmzolqXjm+3JpY
-	GmBPI2dyYiXm60UrnGOB1kz1kAjIJunZLfwJvNbSi24xsWBjTaNZE9wDwhmqhLA0r/6dj2eYb48QS
-	mlyiwn4scZdJXBHokrPHA/spCX6H+04UoP226065WLKdi86tYQ4RV62a6ibl/zAwNHGM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rAsKh-002DA0-Os; Wed, 06 Dec 2023 14:52:59 +0100
-Date: Wed, 6 Dec 2023 14:52:59 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>,
-	andersson@kernel.org
-Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: Add sysfs nodes for
- qcom ethqos
-Message-ID: <0c966845-2bbc-4196-806d-6a33e435bf7d@lunn.ch>
-References: <20231204084854.31543-1-quic_snehshah@quicinc.com>
- <3e4a1b9c-ed0f-466e-ba11-fc5b7ef308a1@lunn.ch>
- <5d5f3955-fc30-428c-99f4-42f9b7580a84@quicinc.com>
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891CBD50
+	for <netdev@vger.kernel.org>; Wed,  6 Dec 2023 05:53:24 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso8952a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Dec 2023 05:53:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701870803; x=1702475603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d+gLZKiKj1GCcMobmu/DUk62mvWsOs0b7/e7NkIe1CE=;
+        b=oLeJA4CAU5VKPmxqltgKScm2YYivPL2s7kokDZ11L4rwADBz0BTI6T6RjfrCPrBOxU
+         3T7KrycVZcetpLk4KU4vDCD3y0zSKBcFU3RLO/9zY93RzkgTmCiAjKyllP33qbfWBeln
+         gFTIdG5jJZwpGaPVoem+qQvS9UEbtrlFpfNWNCOdpEFRb5M1oD52LpIkygSrwzQsuxUp
+         envLdZ+6+j0JcZ3XXZ9QE5Ll5v4vtFll8ic1475orAY+hydx6L81lbYoPWrT7F//fy6c
+         CPB805xkDfKFQ1lqaRvi++kBYWeZZ/Fly0fiuhkUp8XE3/nuKlS7E8Wtsexfz0xOBZAp
+         r5YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701870803; x=1702475603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d+gLZKiKj1GCcMobmu/DUk62mvWsOs0b7/e7NkIe1CE=;
+        b=cWCl0oDLR2gRN+++ZIBIpzNmPsNP+5HaknNLyNiboBXl/rF2XkWJzz9e8AMiTSmOdZ
+         XfA0L780+wIcNH6SeGGfOdFYJaKyD7xDUJHGkVO3hPZ+bOWqUp95yj6yqqWVST4zW7hW
+         66CBu5OlJAMHi3j3I0cOskN/ym6YSg4MHgZzFaBtLC5Aj11wbn+hh2fz672fZw/3Eipu
+         YlVbDpbJttx5tvnHTsse5sf/VDikRlZCLriv0ALsbYJ6dWyMFzX0T2cpUMOFKnO0R3dG
+         JLQE7G7AUz+MXLmcn68YFR3E4yBUN9iDkjlIRrPtNjXPYLcnA7lil8Bp6H43ilpQVYGI
+         WXAA==
+X-Gm-Message-State: AOJu0Yz1wcFJ7tAtvpve4JBkUTFYXSLSQNg42Kg7wBNyFYMJL2Dp/dD7
+	veFREv0O0vwFhUt905KkmJkhkvFrBXc3CA46IhpmCA==
+X-Google-Smtp-Source: AGHT+IFIDix0CAvjRl+6bl9SxYnnl9tQeRl3UbNWwZSdM4WPZ5ygMYG41gGwLszA67qDUP7Og9mVV4CMH271YQ4Bgrs=
+X-Received: by 2002:a50:d0cc:0:b0:54c:9996:7833 with SMTP id
+ g12-20020a50d0cc000000b0054c99967833mr67928edf.7.1701870802633; Wed, 06 Dec
+ 2023 05:53:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5d5f3955-fc30-428c-99f4-42f9b7580a84@quicinc.com>
+References: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+In-Reply-To: <4e505d4198e946a8be03fb1b4c3072b0@AcuMS.aculab.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 Dec 2023 14:53:08 +0100
+Message-ID: <CANn89iKCECyTvRnedsS-0BGBXi00L3Kj+HrmpNQnejm0vMD5Hg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] Use READ/WRITE_ONCE() for IP local_port_range.
+To: David Laight <David.Laight@aculab.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Stephen Hemminger <stephen@networkplumber.org>, David Ahern <dsahern@kernel.org>, 
+	"jakub@cloudflare.com" <jakub@cloudflare.com>, Mat Martineau <martineau@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 06, 2023 at 05:17:25PM +0530, Sneh Shah wrote:
-> 
-> 
-> On 12/5/2023 8:38 PM, Andrew Lunn wrote:
-> > On Mon, Dec 04, 2023 at 02:18:54PM +0530, Sneh Shah wrote:
-> >> Add sysfs nodes to conifigure routing of specific vlan id to GVM queue.
-> >> GVM queue is not exposed to PVM stmmac, so TC ops can't configure routing.
-> > 
-> > Adding files in /sysfs has ~0 chance of being accepted.
-> > 
-> > As requested, please explain what all these different hardware blocks
-> > are, and what you are trying to achieve. We can then recommend the
-> > correct interface.
-> > 
-> >     Andrew
-> > 
-> > ---
-> > pw-bot: cr
-> 
+On Wed, Dec 6, 2023 at 2:44=E2=80=AFPM David Laight <David.Laight@aculab.co=
+m> wrote:
+>
+> Commit 227b60f5102cd added a seqlock to ensure that the low and high
+> port numbers were always updated together.
+> This is overkill because the two 16bit port numbers can be held in
+> a u32 and read/written in a single instruction.
+>
+> More recently 91d0b78c5177f added support for finer per-socket limits.
+> The user-supplied value is 'high << 16 | low' but they are held
+> separately and the socket options protected by the socket lock.
+>
+> Use a u32 containing 'high << 16 | low' for both the 'net' and 'sk'
+> fields and use READ_ONCE()/WRITE_ONCE() to ensure both values are
+> always updated together.
+>
+> Change (the now trival) inet_get_local_port_range() to a static inline
+> to optimise the calling code.
+> (In particular avoiding returning integers by reference.)
+>
+> Signed-off-by: David Laight <david.laight@aculab.com>
 
-> We have multiVM Architecture here. PVM will have stmmac running with
-> 4 Rx Tx queues. stmmac in PVM is responsible to configure whole
-> ethernet HW MAC/DMA/MTL ( including clocks, regulators and other
-> core bsp elements).
+SGTM thanks.
 
-Please remember that stmmac is mostly used in embedded systems. People
-used to embedded systems generally don't know virtual machine
-terminology. So please spell out what PBM, GVM, etc mean.
-
-> In GVM we have thin Ethernet driver, which is responsible to
-> configure and manage only 1 Rx/TX queue, i.e 5th Rx/Tx ethernet
-> queue. GVM can't access any other resisters apart from this 5th
-> queue specific MTL and DMA registers.
- 
-> We need to route vlan traffic of a specific Priority to GVM Queue
-> (Ethernet queue 5) via programming a MAC register. The MAC register
-> is not accessible in GVM and has to be programmed from PVM. stmmac
-> already has TC OPS to program this routing via vlan
-> priority. However, as PVM has only 4 queues enabled, TC tool will
-> not take 5th queue as input. Hence, these nodes were added to
-> conifure the MAC register to route specific vlan packets to 5th
-> queue in GVM.
- 
-> Note: The queues mentioned above are HW MTL Queues and DMA
-> Channels. The routing can be done in the HW itself based on vlan pcp
-> before the packets reach to driver.
-
-Is the normal way you would do this is like this:
-
-tc qdisc add dev eth1 parent root handle 100 \
-mqprio num_tc 4 \
-map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
-queues 1@0 1@1 1@2 1@3 \
-hw 1
-
-But you are saying that you cannot extend this to 5 queues?
-
-    Andrew
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
